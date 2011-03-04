@@ -409,11 +409,9 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	name = [newName copy];
 }
 
-- (void)setType:(ZGVariableType)newType
-	pointerSize:(unsigned long long)pointerSize
+// frees value, freezeValue, makes unfrozen
+- (void)cleanState
 {
-	type = newType;
-	
 	if (value)
 	{
 		free(value);
@@ -431,8 +429,26 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		isFrozen = NO;
 	}
+}
+
+- (void)setType:(ZGVariableType)newType
+	pointerSize:(unsigned long long)pointerSize
+{
+	type = newType;
+	
+	[self cleanState];
 	
 	size = [ZGVariable sizeFromType:newType
+						pointerSize:pointerSize];
+}
+
+// Precondition: size != pointerSize, otherwise this is a wasted effort
+//               also, this must be a pointer type variable
+- (void)setPointerSize:(unsigned long long)pointerSize
+{
+	[self cleanState];
+	
+	size = [ZGVariable sizeFromType:type
 						pointerSize:pointerSize];
 }
 

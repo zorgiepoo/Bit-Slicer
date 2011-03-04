@@ -245,15 +245,36 @@
 #pragma mark Watching other applications
 
 - (IBAction)runningApplicationsPopUpButtonRequest:(id)sender
-{	
+{
+	BOOL pointerSizeChanged = YES;
+	
 	if ([[sender selectedItem] representedObject] != currentProcess)
 	{
+		if ([[sender selectedItem] representedObject] && currentProcess
+			&& ((ZGProcess *)[[sender selectedItem] representedObject])->is64Bit != currentProcess->is64Bit)
+		{
+			pointerSizeChanged = YES;
+		}
 		// this is about as far as we go when it comes to undo/redos...
 		[[self undoManager] removeAllActions];
 	}
 	
 	[currentProcess release];
 	currentProcess = [[[sender selectedItem] representedObject] retain];
+	
+	if (pointerSizeChanged)
+	{
+		// Update the pointer variable sizes
+		for (ZGVariable *variable in watchVariablesArray)
+		{
+			if (variable->type == ZGPointer)
+			{
+				[variable setPointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+			}
+		}
+		
+		[watchVariablesTableView reloadData];
+	}
 	
 	// keep track of the process the user targeted
 	[ZGDocumentController setLastSelectedProcessName:[currentProcess name]];

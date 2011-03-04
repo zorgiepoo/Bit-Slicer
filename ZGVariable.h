@@ -81,5 +81,6 @@ typedef enum
 - (void)setFreezeValue:(void *)newFreezeValue;
 - (void)setName:(NSString *)newName;
 - (void)setType:(ZGVariableType)newType pointerSize:(unsigned long long)pointerSize;
+- (void)setPointerSize:(unsigned long long)pointerSize;
 
 @end
