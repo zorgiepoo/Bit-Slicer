@@ -945,11 +945,13 @@
 - (IBAction)addVariable:(id)sender
 {
 	ZGVariableQualifier qualifier = [[variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
+	
 	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL
 														size:0
 													 address:0
 														type:[sender tag]
-												   qualifier:qualifier];
+												   qualifier:qualifier
+												 pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 	
 	[variable setShouldBeSearched:NO];
 	
@@ -1061,7 +1063,7 @@
 		value = malloc(*dataSize);
 		memcpy(value, &variableValue, *dataSize);
 	}
-	else if (dataType == ZGInt32)
+	else if (dataType == ZGInt32 || (dataType == ZGPointer && !currentProcess->is64Bit))
 	{
 		int32_t variableValue = 0;
 		
@@ -1097,7 +1099,7 @@
 		value = malloc(*dataSize);
 		memcpy(value, &variableValue, *dataSize);
 	}
-	else if (dataType == ZGInt64)
+	else if (dataType == ZGInt64 || (dataType == ZGPointer && currentProcess->is64Bit))
 	{
 		int64_t variableValue = 0;
 		
@@ -1554,6 +1556,7 @@
 																		  selector:@selector(updateSearchUserInterface:)];
 			
 			ZGVariableQualifier qualifier = [[variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
+			unsigned long long pointerSize = currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
 			
 			search_for_data_t searchForDataCallback = ^(void *data, void *data2, vm_address_t address, int currentRegionNumber)
 			{
@@ -1563,7 +1566,8 @@
 																		   size:dataSize
 																		address:address
 																		   type:dataType
-																	  qualifier:qualifier];
+																	  qualifier:qualifier
+																	pointerSize:pointerSize];
 					
 					[temporaryVariablesArray addObject:newVariable];
 					[newVariable release];
@@ -1901,7 +1905,7 @@
 	[[[self undoManager] prepareWithInvocationTarget:self] changeVariable:variable
 																  newType:variable->type];
 	
-	[variable setType:type];
+	[variable setType:type pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 	
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
 	{
@@ -1957,7 +1961,22 @@
 			
 			newValue = &int16Value;
 			break;
+		case ZGPointer:
+			if (currentProcess->is64Bit)
+			{
+				if (variable->size == sizeof(int32_t))
+				{
+					goto INT32_BIT;
+				}
+				else if (variable->size == sizeof(int64_t))
+				{
+					goto INT64_BIT;
+				}
+			}
+			
+			break;
 		case ZGInt32:
+		INT32_BIT:
 			if (stringIsAHexRepresentation)
 			{
 				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)&int32Value];
@@ -1982,6 +2001,7 @@
 			newValue = &floatValue;
 			break;
 		case ZGInt64:
+		INT64_BIT:
 			if (stringIsAHexRepresentation)
 			{
 				[[NSScanner scannerWithString:stringObject] scanHexLongLong:(unsigned long long *)&int64Value];

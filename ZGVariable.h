@@ -20,6 +20,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class ZGProcess;
+
 extern NSString *ZGVariablePboardType;
 
 typedef enum
@@ -32,6 +34,7 @@ typedef enum
 	ZGDouble,
 	ZGUTF8String,
 	ZGUTF16String,
+	ZGPointer
 } ZGVariableType;
 
 typedef enum
@@ -66,7 +69,8 @@ typedef enum
 			   size:(unsigned long long)aSize
 			address:(unsigned long long)anAddress
 			   type:(ZGVariableType)aType
-		  qualifier:(ZGVariableQualifier)aQualifier;
+		  qualifier:(ZGVariableQualifier)aQualifier
+		pointerSize:(unsigned long long)pointerSize;
 
 - (NSString *)name;
 - (NSString *)stringValue;
@@ -76,6 +80,6 @@ typedef enum
 - (void)setVariableValue:(void *)newValue;
 - (void)setFreezeValue:(void *)newFreezeValue;
 - (void)setName:(NSString *)newName;
-- (void)setType:(ZGVariableType)newType;
+- (void)setType:(ZGVariableType)newType pointerSize:(unsigned long long)pointerSize;
 
 @end

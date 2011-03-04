@@ -131,6 +131,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 }
 
 + (unsigned long long)sizeFromType:(ZGVariableType)type
+					   pointerSize:(unsigned long long)pointerSize
 {
 	unsigned long long size = 0;
 	
@@ -150,6 +151,9 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		case ZGDouble:
 			size = 8;
 			break;
+		case ZGPointer:
+			size = pointerSize;
+			break;
 		default:
 			break;
 	}
@@ -162,6 +166,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			address:(unsigned long long)anAddress
 			   type:(ZGVariableType)aType
 		  qualifier:(ZGVariableQualifier)aQualifier
+		pointerSize:(unsigned long long)pointerSize
 {
 	if (self = [super init])
 	{
@@ -170,7 +175,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		
 		if (!size)
 		{
-			size = [ZGVariable sizeFromType:type];
+			size = [ZGVariable sizeFromType:type
+								pointerSize:pointerSize];
 		}
 		 
 		address = anAddress;
@@ -314,6 +320,16 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 					[self setStringValue:[NSString stringWithFormat:@"%llu", *((uint64_t *)value)]];
 				}
 				break;
+			case ZGPointer:
+				if (size == sizeof(int32_t))
+				{
+					[self setStringValue:[NSString stringWithFormat:@"0x%X", *((uint32_t *)value)]];
+				}
+				else if (size == sizeof(int64_t))
+				{
+					[self setStringValue:[NSString stringWithFormat:@"0x%llX", *((uint64_t *)value)]];
+				}
+				break;
 			case ZGFloat:
 				[self setStringValue:[NSString stringWithFormat:@"%f", *((float *)value)]];
 				break;
@@ -394,6 +410,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 }
 
 - (void)setType:(ZGVariableType)newType
+	pointerSize:(unsigned long long)pointerSize
 {
 	type = newType;
 	
@@ -415,7 +432,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		isFrozen = NO;
 	}
 	
-	size = [ZGVariable sizeFromType:newType];
+	size = [ZGVariable sizeFromType:newType
+						pointerSize:pointerSize];
 }
 
 @end
