@@ -1966,17 +1966,17 @@
 			{
 				if (variable->size == sizeof(int32_t))
 				{
-					goto INT32_BIT;
+					goto INT32_BIT_CHANGE_VARIABLE;
 				}
 				else if (variable->size == sizeof(int64_t))
 				{
-					goto INT64_BIT;
+					goto INT64_BIT_CHANGE_VARIABLE;
 				}
 			}
 			
 			break;
 		case ZGInt32:
-		INT32_BIT:
+		INT32_BIT_CHANGE_VARIABLE:
 			if (stringIsAHexRepresentation)
 			{
 				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)&int32Value];
@@ -2001,7 +2001,7 @@
 			newValue = &floatValue;
 			break;
 		case ZGInt64:
-		INT64_BIT:
+		INT64_BIT_CHANGE_VARIABLE:
 			if (stringIsAHexRepresentation)
 			{
 				[[NSScanner scannerWithString:stringObject] scanHexLongLong:(unsigned long long *)&int64Value];

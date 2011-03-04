@@ -346,7 +346,7 @@
 											<int key="NSTag">7</int>
 											<reference key="NSTarget" ref="936458306"/>
 										</object>
-										<object class="NSMenuItem" id="626631927">
+										<object class="NSMenuItem" id="427357617">
 											<reference key="NSMenu" ref="300783273"/>
 											<bool key="NSIsDisabled">YES</bool>
 											<bool key="NSIsSeparator">YES</bool>
@@ -358,7 +358,7 @@
 											<string key="NSAction">_popUpItemAction:</string>
 											<reference key="NSTarget" ref="936458306"/>
 										</object>
-										<object class="NSMenuItem" id="787604637">
+										<object class="NSMenuItem" id="776501962">
 											<reference key="NSMenu" ref="300783273"/>
 											<string key="NSTitle">Pointer</string>
 											<string key="NSKeyEquiv"/>
@@ -656,17 +656,15 @@
 														<string key="NSKeyEquivalent"/>
 														<int key="NSPeriodicDelay">400</int>
 														<int key="NSPeriodicInterval">75</int>
-														<object class="NSMenuItem" key="NSMenuItem" id="415463133">
+														<object class="NSMenuItem" key="NSMenuItem" id="642112806">
 															<reference key="NSMenu" ref="520897864"/>
-															<string key="NSTitle">UTF16</string>
+															<string key="NSTitle">Int8</string>
 															<string key="NSKeyEquiv"/>
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
-															<int key="NSState">1</int>
 															<reference key="NSOnImage" ref="29992920"/>
 															<reference key="NSMixedImage" ref="296154451"/>
 															<string key="NSAction">_popUpItemAction:</string>
-															<int key="NSTag">7</int>
 															<reference key="NSTarget" ref="200985047"/>
 														</object>
 														<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -674,17 +672,7 @@
 															<string key="NSTitle">OtherViews</string>
 															<object class="NSMutableArray" key="NSMenuItems">
 																<bool key="EncodedWithXMLCoder">YES</bool>
-																<object class="NSMenuItem" id="642112806">
-																	<reference key="NSMenu" ref="520897864"/>
-																	<string key="NSTitle">Int8</string>
-																	<string key="NSKeyEquiv"/>
-																	<int key="NSKeyEquivModMask">1048576</int>
-																	<int key="NSMnemonicLoc">2147483647</int>
-																	<reference key="NSOnImage" ref="29992920"/>
-																	<reference key="NSMixedImage" ref="296154451"/>
-																	<string key="NSAction">_popUpItemAction:</string>
-																	<reference key="NSTarget" ref="200985047"/>
-																</object>
+																<reference ref="642112806"/>
 																<object class="NSMenuItem" id="192980910">
 																	<reference key="NSMenu" ref="520897864"/>
 																	<string key="NSTitle">Int16</string>
@@ -757,11 +745,33 @@
 																	<int key="NSTag">6</int>
 																	<reference key="NSTarget" ref="200985047"/>
 																</object>
-																<reference ref="415463133"/>
+																<object class="NSMenuItem" id="415463133">
+																	<reference key="NSMenu" ref="520897864"/>
+																	<string key="NSTitle">UTF16</string>
+																	<string key="NSKeyEquiv"/>
+																	<int key="NSKeyEquivModMask">1048576</int>
+																	<int key="NSMnemonicLoc">2147483647</int>
+																	<reference key="NSOnImage" ref="29992920"/>
+																	<reference key="NSMixedImage" ref="296154451"/>
+																	<string key="NSAction">_popUpItemAction:</string>
+																	<int key="NSTag">7</int>
+																	<reference key="NSTarget" ref="200985047"/>
+																</object>
+																<object class="NSMenuItem" id="271022440">
+																	<reference key="NSMenu" ref="520897864"/>
+																	<string key="NSTitle">Pointer</string>
+																	<string key="NSKeyEquiv"/>
+																	<int key="NSKeyEquivModMask">1048576</int>
+																	<int key="NSMnemonicLoc">2147483647</int>
+																	<reference key="NSOnImage" ref="29992920"/>
+																	<reference key="NSMixedImage" ref="296154451"/>
+																	<string key="NSAction">_popUpItemAction:</string>
+																	<int key="NSTag">8</int>
+																	<reference key="NSTarget" ref="200985047"/>
+																</object>
 															</object>
 															<reference key="NSMenuFont" ref="26"/>
 														</object>
-														<int key="NSSelectedIndex">7</int>
 														<int key="NSPreferredEdge">3</int>
 														<bool key="NSUsesItemFromMenu">YES</bool>
 														<bool key="NSAltersState">YES</bool>
@@ -2403,8 +2413,8 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="6845133"/>
 							<reference ref="671352518"/>
 							<reference ref="670045141"/>
-							<reference ref="787604637"/>
-							<reference ref="626631927"/>
+							<reference ref="776501962"/>
+							<reference ref="427357617"/>
 						</object>
 						<reference key="parent" ref="936458306"/>
 					</object>
@@ -2969,6 +2979,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="21162571"/>
 							<reference ref="615265622"/>
 							<reference ref="415463133"/>
+							<reference ref="271022440"/>
 						</object>
 						<reference key="parent" ref="200985047"/>
 					</object>
@@ -3106,13 +3117,18 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100481</int>
-						<reference key="object" ref="787604637"/>
+						<reference key="object" ref="776501962"/>
 						<reference key="parent" ref="300783273"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100482</int>
-						<reference key="object" ref="626631927"/>
+						<reference key="object" ref="427357617"/>
 						<reference key="parent" ref="300783273"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">100483</int>
+						<reference key="object" ref="271022440"/>
+						<reference key="parent" ref="520897864"/>
 					</object>
 				</object>
 			</object>
@@ -3260,6 +3276,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>100480.IBPluginDependency</string>
 					<string>100481.IBPluginDependency</string>
 					<string>100482.IBPluginDependency</string>
+					<string>100483.IBPluginDependency</string>
 					<string>5.IBEditorWindowLastContentRect</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBWindowTemplateEditedContentRect</string>
@@ -3390,7 +3407,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{491, 639}, {324, 139}}</string>
+					<string>{{-1025, 650}, {362, 156}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3432,6 +3449,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{-1262, 538}, {631, 346}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{-1262, 538}, {631, 346}}</string>
@@ -3459,7 +3477,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100482</int>
+			<int key="maxID">100483</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

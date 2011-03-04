@@ -26,6 +26,16 @@ BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, co
 	
 	switch (type)
 	{
+		case ZGPointer:
+			if (size == sizeof(int32_t))
+			{
+				goto INT32_LESS_THAN;
+			}
+			else if (size == sizeof(int64_t))
+			{
+				goto INT64_LESS_THAN;
+			}
+			break;
 		case ZGInt8:
 			isLessThan = *((int8_t *)value1) < *((int8_t *)value2);
 			if (searchArguments->rangeValue && isLessThan)
@@ -41,6 +51,7 @@ BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, co
 			}
 			break;
 		case ZGInt32:
+		INT32_LESS_THAN:
 			isLessThan = *((int32_t *)value1) < *((int32_t *)value2);
 			if (searchArguments->rangeValue && isLessThan)
 			{
@@ -48,6 +59,7 @@ BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, co
 			}
 			break;
 		case ZGInt64:
+		INT64_LESS_THAN:
 			isLessThan = *((int64_t *)value1) < *((int64_t *)value2);
 			if (searchArguments->rangeValue && isLessThan)
 			{
@@ -81,6 +93,16 @@ BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1,
 	
 	switch (type)
 	{
+		case ZGPointer:
+			if (size == sizeof(int32_t))
+			{
+				goto INT32_GREATER_THAN;
+			}
+			else if (size == sizeof(int64_t))
+			{
+				goto INT64_GREATER_THAN;
+			}
+			break;
 		case ZGInt8:
 			isGreaterThan = *((int8_t *)value1) > *((int8_t *)value2);
 			if (searchArguments->rangeValue && isGreaterThan)
@@ -96,6 +118,7 @@ BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1,
 			}
 			break;
 		case ZGInt32:
+		INT32_GREATER_THAN:
 			isGreaterThan = *((int32_t *)value1) > *((int32_t *)value2);
 			if (searchArguments->rangeValue && isGreaterThan)
 			{
@@ -103,6 +126,7 @@ BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1,
 			}
 			break;
 		case ZGInt64:
+		INT64_GREATER_THAN:
 			isGreaterThan = *((int64_t *)value1) > *((int64_t *)value2);
 			if (searchArguments->rangeValue && isGreaterThan)
 			{
@@ -136,6 +160,16 @@ BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const
 	
 	switch (type)
 	{
+		case ZGPointer:
+			if (size == sizeof(int32_t))
+			{
+				goto INT32_EQUAL_TO;
+			}
+			else if (size == sizeof(int64_t))
+			{
+				goto INT64_EQUAL_TO;
+			}
+			break;
 		case ZGInt8:
 			isEqual = *((int8_t *)value1) == *((int8_t *)value2);
 			break;
@@ -143,9 +177,11 @@ BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const
 			isEqual = *((int16_t *)value1) == *((int16_t *)value2);
 			break;
 		case ZGInt32:
+		INT32_EQUAL_TO:
 			isEqual = *((int32_t *)value1) == *((int32_t *)value2);
 			break;
 		case ZGInt64:
+		INT64_EQUAL_TO:
 			isEqual = *((int64_t *)value1) == *((int64_t *)value2);
 			break;
 		case ZGFloat:
