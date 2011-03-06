@@ -1617,11 +1617,11 @@
 			{
 				if (searchArguments.isImplicit)
 				{
-					ZGSearchForSavedData([currentProcess processID], dataSize, searchData, searchForDataCallback);
+					ZGSearchForSavedData([currentProcess processID], currentProcess->is64Bit, dataSize, searchData, searchForDataCallback);
 				}
 				else
 				{
-					ZGSearchForData([currentProcess processID], dataType, dataSize, searchData, searchForDataCallback);
+					ZGSearchForData([currentProcess processID], currentProcess->is64Bit, dataType, dataSize, searchData, searchForDataCallback);
 				}
 				dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
 			};

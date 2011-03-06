@@ -337,12 +337,12 @@ BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData)
 	return searchData->searchDidCancel;
 }
 
-void ZGSearchForSavedData(pid_t process, mach_vm_size_t dataSize, ZGSearchData *searchData, search_for_data_t block)
-{	
+void ZGSearchForSavedData(pid_t process, BOOL is64Bit, mach_vm_size_t dataSize, ZGSearchData *searchData, search_for_data_t block)
+{
 	ZGInitializeSearch(searchData);
 	
-	// doubles and 64-bit integers are on 4 byte boundaries, while everything else is on its own size of boundary
-	mach_vm_size_t dataAlignment = dataSize == 8 ? 4 : dataSize;
+	// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
+	mach_vm_size_t dataAlignment = (!is64Bit && dataSize == 8) ? 4 : dataSize;
 	
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
@@ -384,13 +384,13 @@ void ZGSearchForSavedData(pid_t process, mach_vm_size_t dataSize, ZGSearchData *
 	}
 }
 
-void ZGSearchForData(pid_t process, ZGVariableType dataType, mach_vm_size_t dataSize, ZGSearchData *searchData, search_for_data_t block)
+void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, mach_vm_size_t dataSize, ZGSearchData *searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
 	
-	// doubles and 64-bit integers are on 4 byte boundaries, while everything else is on its own size of boundary
+	// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
 	// except for strings, which always operate on one byte boundaries
-	mach_vm_size_t dataAlignment = (dataType == ZGUTF8String || dataType == ZGUTF16String) ? 1 : (dataSize == 8 ? 4 : dataSize);
+	mach_vm_size_t dataAlignment = (dataType == ZGUTF8String || dataType == ZGUTF16String) ? 1 : (!is64Bit && dataSize == 8 ? 4 : dataSize);
 	
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
