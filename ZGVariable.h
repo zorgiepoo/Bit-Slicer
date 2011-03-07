@@ -20,8 +20,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class ZGProcess;
-
 extern NSString *ZGVariablePboardType;
 
 typedef enum
