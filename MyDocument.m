@@ -28,6 +28,10 @@
 #import "ZGCalculator.h"
 #import "ZGTimer.h"
 
+// for chmod
+#import <sys/types.h>
+#import <sys/stat.h>
+
 @interface MyDocument (Private)
 
 - (void)updateRunningApplicationProcesses;
@@ -179,6 +183,22 @@
 	[flagsLabel setTextColor:[NSColor disabledControlTextColor]];
 	
 	[watchVariablesTableView registerForDraggedTypes:[NSArray arrayWithObject:ZGVariableReorderType]];
+}
+
+- (BOOL)writeToURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
+{
+	BOOL result = [super writeToURL:absoluteURL ofType:typeName error:outError];
+	
+	if (result)
+	{
+		// Change the permissions on the document file to something more sane
+		if (chmod([[absoluteURL path] UTF8String], 0777) == -1)
+		{
+			NSLog(@"chmod failed: %s", strerror(errno));
+		}
+	}
+
+	return result;
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
