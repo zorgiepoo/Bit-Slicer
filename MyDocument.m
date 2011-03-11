@@ -569,94 +569,6 @@
 	}
 }
 
-// Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
-- (NSString *)evaluateAddress:(NSMutableString *)addressFormula
-					  process:(ZGProcess *)process
-{
-	NSInteger addressFormulaIndex;
-	int numberOfOpenBrackets = 0;
-	int numberOfClosedBrackets = 0;
-	int firstOpenBracket = -1;
-	int matchingClosedBracket = -1;
-	
-	for (addressFormulaIndex = 0; addressFormulaIndex < [addressFormula length]; addressFormulaIndex++)
-	{
-		if ([addressFormula characterAtIndex:addressFormulaIndex] == '[')
-		{
-			numberOfOpenBrackets++;
-			if (firstOpenBracket == -1)
-			{
-				firstOpenBracket = addressFormulaIndex;
-			}
-		}
-		else if ([addressFormula characterAtIndex:addressFormulaIndex] == ']')
-		{
-			numberOfClosedBrackets++;
-			if (numberOfClosedBrackets == numberOfOpenBrackets)
-			{
-				matchingClosedBracket = addressFormulaIndex;
-				
-				if (firstOpenBracket != -1 && matchingClosedBracket != -1)
-				{
-					NSString *innerExpression = [addressFormula substringWithRange:NSMakeRange(firstOpenBracket + 1, matchingClosedBracket - firstOpenBracket - 1)];
-					NSString *addressExpression = [self evaluateAddress:[NSMutableString stringWithString:innerExpression]
-																process:process];
-					
-					mach_vm_address_t address;
-					if ([addressExpression isHexRepresentation])
-					{
-						[[NSScanner scannerWithString:addressExpression] scanHexLongLong:&address];
-					}
-					else
-					{
-						[[NSScanner scannerWithString:addressExpression] scanLongLong:(long long *)&address];
-					}
-					
-					mach_vm_size_t size = process->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
-					void *value = malloc(size);
-					
-					NSMutableString *newExpression;
-					
-					if (ZGReadBytes([process processID], address, value, size))
-					{
-						if (process->is64Bit)
-						{
-							newExpression = [NSMutableString stringWithFormat:@"%llu", *((int64_t *)value)];
-						}
-						else
-						{
-							newExpression = [NSMutableString stringWithFormat:@"%u", *((int32_t *)value)];
-						}
-					}
-					else
-					{
-						newExpression = [NSMutableString stringWithString:@"0x0"];
-					}
-					
-					free(value);
-					
-					[addressFormula replaceCharactersInRange:NSMakeRange(firstOpenBracket, matchingClosedBracket - firstOpenBracket + 1)
-												  withString:newExpression];
-				}
-				else
-				{
-					// just a plain simple expression
-					addressFormula = [NSMutableString stringWithString:[ZGCalculator evaluateBasicExpression:addressFormula]];
-				}
-				
-				firstOpenBracket = -1;
-				numberOfClosedBrackets = 0;
-				numberOfOpenBrackets = 0;
-				// Go back to 0 to scan the whole string again
-				// We can't just continue from where we just were if a string replacement occurred
-				addressFormulaIndex = -1;
-			}
-		}
-	}
-	
-	return [ZGCalculator evaluateBasicExpression:addressFormula];
-}
-
 - (void)updateWatchVariablesTable:(NSTimer *)timer
 {
 	if (![[self windowForSheet] isVisible])
@@ -673,8 +585,8 @@
 			 ZGVariable *variable = object;
 			 if (variable->isPointer)
 			 {
-				 NSString *newAddress = [self evaluateAddress:[NSMutableString stringWithString:[variable addressFormula]]
-													  process:currentProcess];
+				 NSString *newAddress = [ZGCalculator evaluateAddress:[NSMutableString stringWithString:[variable addressFormula]]
+															  process:currentProcess];
 				 
 				 if (variable->address != [newAddress unsignedLongLongValue])
 				 {
