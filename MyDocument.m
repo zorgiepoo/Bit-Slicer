@@ -172,7 +172,6 @@
 	
 	if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_EXPAND_OPTIONS])
 	{
-		[optionsDisclosureButton setState:NSOffState];
 		[self optionsDisclosureButton:nil];
 	}
 	
@@ -825,6 +824,13 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		*expandedWindowMinSize = [watchWindow minSize];
+	}
+	
+	// This occurs when sender is nil (when we call it in code), or when
+	// it's called by another action (eg: the "Options" label button)
+	if (sender != optionsDisclosureButton)
+	{
+		[optionsDisclosureButton setState:[optionsDisclosureButton state] == NSOnState ? NSOffState : NSOnState];
 	}
 	
 	switch ([optionsDisclosureButton state])
