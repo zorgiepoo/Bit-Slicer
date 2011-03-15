@@ -38,6 +38,7 @@
 	IBOutlet NSTableView			*watchVariablesTableView;
 	IBOutlet NSPopUpButton			*dataTypesPopUpButton;
 	IBOutlet NSPopUpButton			*functionPopUpButton;
+	IBOutlet NSView					*optionsView;
 	IBOutlet NSButton				*clearButton;
 	IBOutlet NSButton				*searchButton;
 	IBOutlet NSMatrix				*variableQualifierMatrix;
@@ -74,6 +75,7 @@
 - (IBAction)qualifierMatrixButtonRequest:(id)sender;
 - (IBAction)compareInitialValuesCheckBoxRequest:(id)sender;
 - (IBAction)lockTarget:(id)sender;
+- (IBAction)optionsDisclosureButton:(id)sender;
 - (IBAction)searchValue:(id)sender;
 - (IBAction)getInitialValues:(id)sender;
 - (IBAction)clearSearchValues:(id)sender;

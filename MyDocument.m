@@ -793,6 +793,19 @@
 	}
 }
 
+- (IBAction)optionsDisclosureButton:(id)sender
+{
+	switch ([sender state])
+	{
+		case NSOnState:
+			[optionsView setHidden:NO];
+			break;
+		case NSOffState:
+			[optionsView setHidden:YES];
+			break;
+	}
+}
+
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag
 {
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
