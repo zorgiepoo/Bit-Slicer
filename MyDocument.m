@@ -162,6 +162,9 @@
 	
 	[watchVariablesTableView setDelegate:self];
 	
+	[optionsDisclosureButton setState:NSOffState];
+	[self optionsDisclosureButton:nil];
+	
 	if (!desiredProcessName)
 	{
 		desiredProcessName = [[ZGDocumentController lastSelectedProcessName] copy];
@@ -793,15 +796,65 @@
 	}
 }
 
+static NSSize *expandedWindowMinSize = nil;
 - (IBAction)optionsDisclosureButton:(id)sender
 {
-	switch ([sender state])
+	NSRect windowFrame = [watchWindow frame];
+	
+	// The first time this method is called, the disclosure triangle is expanded
+	// Record the minimize size of the window before we expand the content
+	// This will make it easy to keep track of the minimum window size when expanded,
+	// and will make it easy to calculate the minimum window size when contracted.
+	if (!expandedWindowMinSize)
+	{
+		expandedWindowMinSize = malloc(sizeof(NSSize));
+		if (!expandedWindowMinSize)
+		{
+			NSLog(@"optionsDisclosureButton: Not enough memory");
+		}
+		
+		*expandedWindowMinSize = [watchWindow minSize];
+	}
+	
+	switch ([optionsDisclosureButton state])
 	{
 		case NSOnState:
+			// Check if we need to resize based on the relative position between the functionPopUpButton and the optionsView
+			// If so, this means that the functionPopUpButton's y origin > optionsView y origin
+			if ([optionsView frame].origin.y < [functionPopUpButton frame].origin.y + [functionPopUpButton frame].size.height + 6)
+			{
+				// Resize the window to its the minimum size when the disclosure triangle is expanded
+				windowFrame.size.height += ([functionPopUpButton frame].origin.y + [functionPopUpButton frame].size.height + 6) - [optionsView frame].origin.y;
+				windowFrame.origin.y -= ([functionPopUpButton frame].origin.y + [functionPopUpButton frame].size.height + 6) - [optionsView frame].origin.y;
+				
+				[watchWindow setFrame:windowFrame
+							  display:YES
+							  animate:YES];
+			}
+			
 			[optionsView setHidden:NO];
+			
+			[watchWindow setMinSize:*expandedWindowMinSize];
 			break;
 		case NSOffState:
 			[optionsView setHidden:YES];
+			
+			// Only resize when the window is at the minimum size
+			if (windowFrame.size.height == [watchWindow minSize].height)
+			{
+				windowFrame.size.height -= [optionsView frame].size.height + 6;
+				windowFrame.origin.y += [optionsView frame].size.height + 6;
+				
+				[watchWindow setFrame:windowFrame
+							  display:YES
+							  animate:YES];
+			}
+			
+			NSSize minSize = *expandedWindowMinSize;
+			minSize.height -= [optionsView frame].size.height + 6;
+			[watchWindow setMinSize:minSize];
+			break;
+		default:
 			break;
 	}
 }

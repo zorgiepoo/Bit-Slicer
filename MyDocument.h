@@ -38,6 +38,7 @@
 	IBOutlet NSTableView			*watchVariablesTableView;
 	IBOutlet NSPopUpButton			*dataTypesPopUpButton;
 	IBOutlet NSPopUpButton			*functionPopUpButton;
+	IBOutlet NSButton				*optionsDisclosureButton;
 	IBOutlet NSView					*optionsView;
 	IBOutlet NSButton				*clearButton;
 	IBOutlet NSButton				*searchButton;
