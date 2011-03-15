@@ -253,7 +253,7 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 		
 		while (mach_vm_region(task, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 		{
-			if (lastAddress != address || !((regionInfo.protection & VM_PROT_READ) && (regionInfo.protection & VM_PROT_WRITE)))
+			if (lastAddress != address || !(regionInfo.protection & VM_PROT_READ))
 			{
 				// We're done with this piece of data
 				ZGSavePieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
@@ -261,7 +261,7 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 				currentData = nil;
 			}
 			
-			if ((regionInfo.protection & VM_PROT_READ) && (regionInfo.protection & VM_PROT_WRITE))
+			if (regionInfo.protection & VM_PROT_READ)
 			{
 				if (!currentData)
 				{
