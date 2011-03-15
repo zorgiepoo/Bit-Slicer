@@ -67,9 +67,17 @@
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
 #define CHECK_CHILD_PROCESSES_TIME_INTERVAL	2.0
 
+#define ZG_EXPAND_OPTIONS @"ZG_EXPAND_OPTIONS"
+
 @implementation MyDocument
 
 #pragma mark Document stuff
+
++ (void)initialize
+{
+	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+																						forKey:ZG_EXPAND_OPTIONS]];
+}
 
 - (id)init
 {
@@ -162,8 +170,11 @@
 	
 	[watchVariablesTableView setDelegate:self];
 	
-	[optionsDisclosureButton setState:NSOffState];
-	[self optionsDisclosureButton:nil];
+	if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_EXPAND_OPTIONS])
+	{
+		[optionsDisclosureButton setState:NSOffState];
+		[self optionsDisclosureButton:nil];
+	}
 	
 	if (!desiredProcessName)
 	{
@@ -857,6 +868,9 @@ static NSSize *expandedWindowMinSize = nil;
 		default:
 			break;
 	}
+	
+	[[NSUserDefaults standardUserDefaults] setBool:[optionsDisclosureButton state]
+											forKey:ZG_EXPAND_OPTIONS];
 }
 
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag
