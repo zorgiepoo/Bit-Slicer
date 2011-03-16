@@ -2356,7 +2356,7 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 	else
 	{
-		displayString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:MAX_TABLE_VIEW_ITEMS]],[numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:[watchVariablesArray count]]]];
+		displayString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInt:MAX_TABLE_VIEW_ITEMS]],[numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:[watchVariablesArray count]]]];
 	}
 	
 	[numberOfVariablesFormatter release];
