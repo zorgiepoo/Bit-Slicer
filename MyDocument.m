@@ -518,6 +518,8 @@
 	[scanReadOnlyValuesCheckBox setEnabled:NO];
 	[ignoreCaseCheckBox setEnabled:NO];
 	[includeNullTerminatorCheckBox setEnabled:NO];
+	[beginningAddressTextField setEnabled:NO];
+	[endingAddressTextField setEnabled:NO];
 }
 
 - (void)resumeDocument
@@ -552,6 +554,9 @@
 		[ignoreCaseCheckBox setEnabled:YES];
 		[includeNullTerminatorCheckBox setEnabled:YES];
 	}
+	
+	[beginningAddressTextField setEnabled:YES];
+	[endingAddressTextField setEnabled:YES];
 	
 	[watchWindow makeFirstResponder:searchValueTextField];
 }
