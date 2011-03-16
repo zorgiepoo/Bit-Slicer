@@ -26,7 +26,6 @@
 	
 @public
 	// searching related stuff
-	int numberOfRegions;
 	int searchProgress;
 	int numberOfVariablesFound;
 	

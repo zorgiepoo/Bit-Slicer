@@ -46,7 +46,8 @@
 typedef void (^search_for_data_t)(void *data, void *data2, vm_address_t address, int currentRegionNumber);
 typedef void (^memory_dump_t)(int currentRegionNumber);
 
-int ZGInitializeTaskForProcess(pid_t process);
+BOOL ZGIsProcessValid(pid_t process);
+int ZGNumberOfRegionsForProcess(pid_t process);
 BOOL ZGReadBytes(pid_t process, mach_vm_address_t address, void *bytes, mach_vm_size_t size);
 BOOL ZGReadBytesCarefully(pid_t process, mach_vm_address_t address, void *bytes, mach_vm_size_t *size);
 BOOL ZGWriteBytes(pid_t process, mach_vm_address_t address, const void *bytes, mach_vm_size_t size);

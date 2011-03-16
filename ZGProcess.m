@@ -26,7 +26,6 @@
 
 @synthesize processID;
 @synthesize name;
-@synthesize numberOfRegions;
 
 
 static NSArray *frozenProcesses = nil;
@@ -111,10 +110,14 @@ static NSArray *frozenProcesses = nil;
 	[super dealloc];
 }
 
+- (int)numberOfRegions
+{
+	return ZGNumberOfRegionsForProcess(processID);
+}
+
 - (BOOL)grantUsAccess
 {
-	numberOfRegions = ZGInitializeTaskForProcess(processID);
-	return numberOfRegions != INVALID_PROCESS_INITIALIZATION;
+	return ZGIsProcessValid(processID);
 }
 
 @end

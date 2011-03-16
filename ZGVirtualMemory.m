@@ -24,15 +24,24 @@
 @implementation ZGSearchData
 @end
 
-int ZGInitializeTaskForProcess(pid_t process)
+BOOL ZGIsProcessValid(pid_t process)
+{
+	vm_map_t task = MACH_PORT_NULL;
+	BOOL success = (task_for_pid(current_task(), process, &task) == KERN_SUCCESS);
+	
+	if (success && task != MACH_PORT_NULL)
+	{
+		mach_port_deallocate(current_task(), task);
+	}
+	
+	return success;
+}
+
+int ZGNumberOfRegionsForProcess(pid_t process)
 {
 	vm_map_t task = MACH_PORT_NULL;
 	int numberOfRegions = 0;
-	if (task_for_pid(current_task(), process, &task) != KERN_SUCCESS)
-	{
-		numberOfRegions = INVALID_PROCESS_INITIALIZATION;
-	}
-	else
+	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
 		mach_vm_address_t address = 0x0;
 		mach_vm_size_t size;

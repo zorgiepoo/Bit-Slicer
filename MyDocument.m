@@ -1809,7 +1809,7 @@ static NSSize *expandedWindowMinSize = nil;
 		return;
 	}
 	
-	[searchingProgressIndicator setMaxValue:currentProcess->numberOfRegions];
+	[searchingProgressIndicator setMaxValue:[currentProcess numberOfRegions]];
 	
 	updateSearchUserInterfaceTimer = [[NSTimer scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
 																	   target:self
@@ -2820,7 +2820,7 @@ static NSSize *expandedWindowMinSize = nil;
 														attributes:[NSDictionary dictionaryWithObjectsAndKeys:NSUserName(), NSFileGroupOwnerAccountName, NSUserName(), NSFileOwnerAccountName, nil]
 															 error:NULL];
 			 
-			 [searchingProgressIndicator setMaxValue:currentProcess->numberOfRegions];
+			 [searchingProgressIndicator setMaxValue:[currentProcess numberOfRegions]];
 			 
 			 updateSearchUserInterfaceTimer = [[NSTimer scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
 																				target:self
