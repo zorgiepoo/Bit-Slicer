@@ -520,6 +520,8 @@
 	[includeNullTerminatorCheckBox setEnabled:NO];
 	[beginningAddressTextField setEnabled:NO];
 	[endingAddressTextField setEnabled:NO];
+	[beginningAddressLabel setTextColor:[NSColor disabledControlTextColor]];
+	[endingAddressLabel setTextColor:[NSColor disabledControlTextColor]];
 }
 
 - (void)resumeDocument
@@ -557,6 +559,8 @@
 	
 	[beginningAddressTextField setEnabled:YES];
 	[endingAddressTextField setEnabled:YES];
+	[beginningAddressLabel setTextColor:[NSColor controlTextColor]];
+	[endingAddressLabel setTextColor:[NSColor controlTextColor]];
 	
 	[watchWindow makeFirstResponder:searchValueTextField];
 }

@@ -51,7 +51,9 @@
 	IBOutlet NSTextField			*memoryDumpFromAddressTextField;
 	IBOutlet NSTextField			*memoryDumpToAddressTextField;
 	IBOutlet NSButton				*compareInitialValuesCheckBox;
+	IBOutlet NSTextField			*beginningAddressLabel;
 	IBOutlet NSTextField			*beginningAddressTextField;
+	IBOutlet NSTextField			*endingAddressLabel;
 	IBOutlet NSTextField			*endingAddressTextField;
 	IBOutlet NSButton				*scanReadOnlyValuesCheckBox;
 	IBOutlet NSButton				*ignoreCaseCheckBox;
