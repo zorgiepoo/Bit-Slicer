@@ -1195,6 +1195,21 @@ static NSSize *expandedWindowMinSize = nil;
 	return value;
 }
 
+- (unsigned long long)memoryAddressFromExpression:(NSString *)expression
+{
+	unsigned long long address;
+	if ([expression isHexRepresentation])
+	{
+		[[NSScanner scannerWithString:expression] scanHexLongLong:&address];
+	}
+	else
+	{
+		address = [expression unsignedLongLongValue];
+	}
+	
+	return address;
+}
+
 - (void)setWatchVariablesArray:(NSArray *)newWatchVariablesArray
 {
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
@@ -1559,6 +1574,37 @@ static NSSize *expandedWindowMinSize = nil;
 			}
 		}
 		
+		// Deal with beginning and ending addresses, if there are any
+		
+		NSString *calculatedBeginAddress = [ZGCalculator evaluateExpression:[beginningAddressTextField stringValue]];
+		NSString *calculatedEndAddress = [ZGCalculator evaluateExpression:[endingAddressTextField stringValue]];
+		
+		if (![calculatedBeginAddress isEqualToString:@""])
+		{
+			searchArguments.beginAddress = [self memoryAddressFromExpression:calculatedBeginAddress];
+			searchArguments.beginAddressExists = YES;
+		}
+		else
+		{
+			searchArguments.beginAddressExists = NO;
+		}
+		
+		if (![calculatedEndAddress isEqualToString:@""])
+		{
+			searchArguments.endAddress = [self memoryAddressFromExpression:calculatedEndAddress];
+			searchArguments.endAddressExists = YES;
+		}
+		else
+		{
+			searchArguments.endAddressExists = NO;
+		}
+		
+		if (searchArguments.beginAddressExists && searchArguments.endAddressExists && searchArguments.beginAddress >= searchArguments.endAddress)
+		{
+			NSRunAlertPanel(@"Invalid Input", @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted.", nil, nil, nil, nil);
+			return;
+		}
+		
 		NSMutableArray *temporaryVariablesArray = [[NSMutableArray alloc] init];
 		
 		// Add all variables whose value should not be searched for, first
@@ -1602,6 +1648,14 @@ static NSSize *expandedWindowMinSize = nil;
 			
 			search_for_data_t searchForDataCallback = ^(void *data, void *data2, vm_address_t address, int currentRegionNumber)
 			{
+				if (!searchArguments.beginAddressExists || searchArguments.beginAddress >= address)
+				{
+				}
+				
+				if (!searchArguments.endAddressExists || searchArguments.endAddress > address + dataSize)
+				{
+				}
+				
 				if (compareFunction(&searchArguments, data, (data2 != NULL) ? data2 : searchValue, dataType, dataSize, &collator))
 				{
 					ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:data
@@ -2646,28 +2700,10 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)memoryDumpOkayButton:(id)sender
 {
 	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpFromAddressTextField stringValue]];
-	
-	unsigned long long fromAddress;
-	if ([fromAddressExpression isHexRepresentation])
-	{
-		[[NSScanner scannerWithString:fromAddressExpression] scanHexLongLong:&fromAddress];
-	}
-	else
-	{
-		fromAddress = [fromAddressExpression unsignedLongLongValue];
-	}
+	unsigned long long fromAddress = [self memoryAddressFromExpression:fromAddressExpression];
 	
 	NSString *toAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpToAddressTextField stringValue]];
-	
-	unsigned long long toAddress;
-	if ([toAddressExpression isHexRepresentation])
-	{
-		[[NSScanner scannerWithString:toAddressExpression] scanHexLongLong:&toAddress];
-	}
-	else
-	{
-		toAddress = [toAddressExpression unsignedLongLongValue];
-	}
+	unsigned long long toAddress = [self memoryAddressFromExpression:toAddressExpression];
 	
 	if (toAddress > fromAddress && ![fromAddressExpression isEqualToString:@""] && ![toAddressExpression isEqualToString:@""])
 	{

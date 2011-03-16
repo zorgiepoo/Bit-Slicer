@@ -18,15 +18,23 @@
  * Copyright 2010 zgcoder. All rights reserved.
  */
 
+#import "ZGVirtualMemory.h"
+
 typedef struct
 {
 	double epsilon;
 	void *rangeValue;
 	BOOL sensitive; // "Hi" == "hi" if insensitive
 	BOOL disregardNullTerminator;
-	BOOL isImplicit;
+	BOOL isImplicit; // Should compare stored values?
 	
 	NSString *lastEpsilonValue;
 	NSString *lastAboveRangeValue;
 	NSString *lastBelowRangeValue;
+	
+	// these are not NSString's because there's no reason to save the values
+	mach_vm_address_t beginAddress;
+	mach_vm_address_t endAddress;
+	BOOL beginAddressExists;
+	BOOL endAddressExists;
 } ZGSearchArguments;
