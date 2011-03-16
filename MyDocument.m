@@ -281,10 +281,10 @@
 {
 	BOOL pointerSizeChanged = YES;
 	
-	if ([[sender selectedItem] representedObject] != currentProcess)
+	if ([[runningApplicationsPopUpButton selectedItem] representedObject] != currentProcess)
 	{
-		if ([[sender selectedItem] representedObject] && currentProcess
-			&& ((ZGProcess *)[[sender selectedItem] representedObject])->is64Bit != currentProcess->is64Bit)
+		if ([[runningApplicationsPopUpButton selectedItem] representedObject] && currentProcess
+			&& ((ZGProcess *)[[runningApplicationsPopUpButton selectedItem] representedObject])->is64Bit != currentProcess->is64Bit)
 		{
 			pointerSizeChanged = YES;
 		}
@@ -293,7 +293,7 @@
 	}
 	
 	[currentProcess release];
-	currentProcess = [[[sender selectedItem] representedObject] retain];
+	currentProcess = [[[runningApplicationsPopUpButton selectedItem] representedObject] retain];
 	
 	if (pointerSizeChanged)
 	{
@@ -312,9 +312,12 @@
 	// keep track of the process the user targeted
 	[ZGDocumentController setLastSelectedProcessName:[currentProcess name]];
 	
-	// change the desired process
-	[desiredProcessName release];
-	desiredProcessName = [[currentProcess name] copy];
+	if (sender)
+	{
+		// change the desired process
+		[desiredProcessName release];
+		desiredProcessName = [[currentProcess name] copy];
+	}
 	
 	if (currentProcess)
 	{
@@ -371,7 +374,7 @@
 				foundTargettedProcess = YES;
 				[currentProcess setProcessID:[runningApplication processIdentifier]];
 				[currentProcess setName:[runningApplication localizedName]];
-				[self runningApplicationsPopUpButtonRequest:runningApplicationsPopUpButton];
+				[self runningApplicationsPopUpButtonRequest:nil];
 			}
 			else if ([currentProcess processID] == [runningApplication processIdentifier])
 			{
@@ -388,12 +391,12 @@
 		if (firstRegularApplicationMenuItem)
 		{
 			[runningApplicationsPopUpButton selectItem:firstRegularApplicationMenuItem];
-			[self runningApplicationsPopUpButtonRequest:runningApplicationsPopUpButton];
+			[self runningApplicationsPopUpButtonRequest:nil];
 		}
 		else if ([runningApplicationsPopUpButton indexOfSelectedItem] >= 0)
 		{
 			[runningApplicationsPopUpButton selectItemAtIndex:0];
-			[self runningApplicationsPopUpButtonRequest:runningApplicationsPopUpButton];
+			[self runningApplicationsPopUpButtonRequest:nil];
 		}
 	}
 	
@@ -411,7 +414,7 @@
 		[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (%i)", [currentProcess name], [currentProcess processID]]];
 		
 		// need to grant access
-		[self runningApplicationsPopUpButtonRequest:runningApplicationsPopUpButton];
+		[self runningApplicationsPopUpButtonRequest:nil];
 		
 		[searchButton setEnabled:YES];
 	}
