@@ -663,9 +663,10 @@
 				 
 				 if (ZGReadBytes([currentProcess processID], variable->address, value, variable->size))
 				 {
-					 if (variable->lastUpdatedSize != variable->size || !variable->value || notEqualFunction(&searchArguments, value, variable->value, variable->type, variable->size, &collator))
+					 NSString *oldStringValue = [variable stringValue];
+					 [variable setVariableValue:value];
+					 if (![[variable stringValue] isEqualToString:oldStringValue])
 					 {
-						 [variable setVariableValue:value];
 						 [watchVariablesTableView reloadData];
 					 }
 				 }
