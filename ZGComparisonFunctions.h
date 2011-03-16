@@ -19,6 +19,7 @@
  */
 
 #import "ZGVariable.h"
+#import "ZGVirtualMemory.h"
 #import "ZGSearching.h"
 
 typedef enum
@@ -29,7 +30,7 @@ typedef enum
 	ZGLessThan,
 } ZGFunctionType;
 
-BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, int size, void *unused);
-BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, int size, void *unused);
-BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, int size, void *collator);
-BOOL notEqualFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, int size, void *collator);
+BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, mach_vm_size_t size, void *unused);
+BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, mach_vm_size_t size, void *unused);
+BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, mach_vm_size_t size, void *collator);
+BOOL notEqualFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, mach_vm_size_t size, void *collator);

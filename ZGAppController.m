@@ -143,7 +143,7 @@ static BOOL didRegisteredHotKey = NO;
 	}
 	
 	NSNumber *hotKeyCodeNumber = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_HOT_KEY];
-	if (hotKeyCodeNumber && [hotKeyCodeNumber integerValue] != INVALID_KEY_CODE)
+	if (hotKeyCodeNumber && [hotKeyCodeNumber intValue] != INVALID_KEY_CODE)
 	{
 		EventTypeSpec eventType;
 		eventType.eventClass = kEventClassKeyboard;
@@ -155,7 +155,7 @@ static BOOL didRegisteredHotKey = NO;
 		hotKeyID.signature = 'htk1';
 		hotKeyID.id = 1;
 		
-		RegisterEventHotKey([hotKeyCodeNumber integerValue], 0, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef);
+		RegisterEventHotKey([hotKeyCodeNumber intValue], 0, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef);
 		
 		didRegisteredHotKey = YES;
 	}

@@ -127,10 +127,10 @@
 					  process:(ZGProcess *)process
 {
 	NSUInteger addressFormulaIndex;
-	int numberOfOpenBrackets = 0;
-	int numberOfClosedBrackets = 0;
-	int firstOpenBracket = -1;
-	int matchingClosedBracket = -1;
+	NSInteger numberOfOpenBrackets = 0;
+	NSInteger numberOfClosedBrackets = 0;
+	NSInteger firstOpenBracket = -1;
+	NSInteger matchingClosedBracket = -1;
 	
 	for (addressFormulaIndex = 0; addressFormulaIndex < [addressFormula length]; addressFormulaIndex++)
 	{

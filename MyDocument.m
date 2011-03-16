@@ -61,7 +61,7 @@
 
 #define ZGVariableReorderType				@"ZGVariableReorderType"
 
-#define MAX_TABLE_VIEW_ITEMS				((NSUInteger)1000)
+#define MAX_TABLE_VIEW_ITEMS				((unsigned int)1000)
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
@@ -1637,12 +1637,12 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		[self prepareDocumentTask];
 		
-		static BOOL (*compareFunctions[4])(ZGSearchArguments *, const void *, const void *, ZGVariableType, int, void *) =
+		static BOOL (*compareFunctions[4])(ZGSearchArguments *, const void *, const void *, ZGVariableType, mach_vm_size_t, void *) =
 		{
 			equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction,
 		};
 		
-		BOOL (*compareFunction)(ZGSearchArguments *, const void *, const void *, ZGVariableType, int, void *) = compareFunctions[functionType];
+		BOOL (*compareFunction)(ZGSearchArguments *, const void *, const void *, ZGVariableType, mach_vm_size_t, void *) = compareFunctions[functionType];
 		
 		if (!goingToNarrowDownSearches)
 		{
@@ -2275,7 +2275,9 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return MIN(MAX_TABLE_VIEW_ITEMS, [watchVariablesArray count]);
+	// This conversion to unsigned int is kind of awkward to me, but seems like the only way to get rid of an
+	// implicit conversion warning
+	return MIN(MAX_TABLE_VIEW_ITEMS, (unsigned int)[watchVariablesArray count]);
 }
 
 #pragma mark Table View Delegate Methods
@@ -2350,11 +2352,11 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	if ([watchVariablesArray count] <= MAX_TABLE_VIEW_ITEMS)
 	{
-		displayString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithInt:[watchVariablesArray count]]]];
+		displayString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:[watchVariablesArray count]]]];
 	}
 	else
 	{
-		displayString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithInt:MAX_TABLE_VIEW_ITEMS]],[numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithInt:[watchVariablesArray count]]]];
+		displayString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:MAX_TABLE_VIEW_ITEMS]],[numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:[watchVariablesArray count]]]];
 	}
 	
 	[numberOfVariablesFormatter release];

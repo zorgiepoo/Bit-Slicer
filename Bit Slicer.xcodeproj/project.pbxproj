@@ -337,6 +337,8 @@
 					"-Wall",
 					"-Wextra",
 					"-Wno-unused-parameter",
+					"-Wshorten-64-to-32",
+					"-Wswitch",
 				);
 			};
 			name = Debug;
@@ -367,6 +369,8 @@
 					"-Wall",
 					"-Wextra",
 					"-Wno-unused-parameter",
+					"-Wshorten-64-to-32",
+					"-Wswitch",
 				);
 			};
 			name = Release;

@@ -105,7 +105,7 @@ BOOL ZGWriteBytes(pid_t process, mach_vm_address_t address, const void *bytes, m
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
-		success = (mach_vm_write(task, address, (mach_vm_address_t)bytes, size) == KERN_SUCCESS);
+		success = (mach_vm_write(task, address, (mach_vm_address_t)bytes, (mach_msg_type_number_t)size) == KERN_SUCCESS);
 		
 		if (task != MACH_PORT_NULL)
 		{
