@@ -40,9 +40,9 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.3a1</string>
+	<string>1.3a2</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3a1</string>
+	<string>1.3a2</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
 	<key>NSMainNibFile</key>
