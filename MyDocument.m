@@ -515,6 +515,7 @@
 	[searchButton setTitle:@"Cancel"];
 	[searchButton setKeyEquivalent:@"\e"];
 	[compareInitialValuesCheckBox setEnabled:NO];
+	[scanReadOnlyValuesCheckBox setEnabled:NO];
 	[ignoreCaseCheckBox setEnabled:NO];
 	[includeNullTerminatorCheckBox setEnabled:NO];
 }
@@ -542,6 +543,8 @@
 	
 	[variableQualifierMatrix setEnabled:YES];
 	[functionPopUpButton setEnabled:YES];
+	
+	[scanReadOnlyValuesCheckBox setEnabled:YES];
 	
 	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
 	if (dataType == ZGUTF8String || dataType == ZGUTF16String)
@@ -1639,6 +1642,7 @@ static NSSize *expandedWindowMinSize = nil;
 				}
 				else
 				{
+					searchData->scanReadOnly = ([scanReadOnlyValuesCheckBox state] == NSOnState);
 					ZGSearchForData([currentProcess processID], currentProcess->is64Bit, dataType, dataSize, searchData, searchForDataCallback);
 				}
 				dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);

@@ -38,6 +38,8 @@
 	
 	NSArray *savedData;
 	NSArray *tempSavedData;
+	
+	BOOL scanReadOnly;
 }
 @end
 

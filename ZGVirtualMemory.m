@@ -405,7 +405,7 @@ void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, mach_
 		
 		while (mach_vm_region(task, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS)
 		{
-			if ((regionInfo.protection & VM_PROT_WRITE) && (regionInfo.protection & VM_PROT_READ))
+			if (regionInfo.protection & VM_PROT_READ && (searchData->scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
 			{
 				char *bytes = malloc(size);
 				
