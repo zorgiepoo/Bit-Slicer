@@ -84,8 +84,8 @@
 									 range:NSMakeRange(0, [expression length])];
 	unsigned long long accumulator = 0;
 	char operator = 0;
-	NSInteger characterIndex;
-	NSInteger numberIndex = 0;
+	NSUInteger characterIndex;
+	NSUInteger numberIndex = 0;
 	for (characterIndex = 0; characterIndex < [expression length]; characterIndex++)
 	{
 		if ([expression characterAtIndex:characterIndex] == '+' || [expression characterAtIndex:characterIndex] == '-' || characterIndex == [expression length] - 1)
@@ -126,7 +126,7 @@
 + (NSString *)evaluateAddress:(NSMutableString *)addressFormula
 					  process:(ZGProcess *)process
 {
-	NSInteger addressFormulaIndex;
+	NSUInteger addressFormulaIndex;
 	int numberOfOpenBrackets = 0;
 	int numberOfClosedBrackets = 0;
 	int firstOpenBracket = -1;

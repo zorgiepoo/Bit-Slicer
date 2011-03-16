@@ -93,7 +93,7 @@ static NSArray *frozenProcesses = nil;
 		 processID:(int)aProcessID
 		  set64Bit:(BOOL)flag64Bit
 {
-	if (self = [super init])
+	if ((self = [super init]))
 	{
 		[self setName:processName];
 		[self setProcessID:aProcessID];

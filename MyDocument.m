@@ -61,7 +61,7 @@
 
 #define ZGVariableReorderType				@"ZGVariableReorderType"
 
-#define MAX_TABLE_VIEW_ITEMS				1000
+#define MAX_TABLE_VIEW_ITEMS				((NSUInteger)1000)
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1

@@ -168,7 +168,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		  qualifier:(ZGVariableQualifier)aQualifier
 		pointerSize:(unsigned long long)pointerSize
 {
-	if (self = [super init])
+	if ((self = [super init]))
 	{
 		size = aSize;
 		type = aType;
