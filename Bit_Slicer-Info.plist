@@ -7,7 +7,7 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
-			<key>LSItemContentTypes</key>
+			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>slice</string>
 			</array>
@@ -15,6 +15,10 @@
 			<string></string>
 			<key>CFBundleTypeName</key>
 			<string>Bit Slicer Document</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>slice</string>
+			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>NSDocumentClass</key>
