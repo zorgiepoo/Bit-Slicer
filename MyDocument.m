@@ -1850,7 +1850,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	dispatch_block_t searchForDataBlock = ^
 	{
-		searchData->tempSavedData = ZGGetAllData(currentProcess);
+		searchData->tempSavedData = ZGGetAllData(currentProcess, [scanReadOnlyValuesCheckBox state]);
 		if (searchData->tempSavedData)
 		{
 			[searchData->tempSavedData retain];

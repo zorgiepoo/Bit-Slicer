@@ -51,7 +51,7 @@ BOOL ZGReadBytes(pid_t process, mach_vm_address_t address, void *bytes, mach_vm_
 BOOL ZGReadBytesCarefully(pid_t process, mach_vm_address_t address, void *bytes, mach_vm_size_t *size);
 BOOL ZGWriteBytes(pid_t process, mach_vm_address_t address, const void *bytes, mach_vm_size_t size);
 void ZGFreeData(NSArray *dataArray);
-NSArray *ZGGetAllData(ZGProcess *process);
+NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly);
 void *ZGSavedValue(mach_vm_address_t address, ZGSearchData *searchData, mach_vm_size_t dataSize);
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process);
 void ZGInitializeSearch(ZGSearchData *searchData);

@@ -141,7 +141,7 @@ void ZGFreeData(NSArray *dataArray)
 	}
 }
 
-NSArray *ZGGetAllData(ZGProcess *process)
+NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 {
 	NSMutableArray *dataArray = [[NSMutableArray alloc] init];
 	
@@ -159,7 +159,7 @@ NSArray *ZGGetAllData(ZGProcess *process)
 		
 		while (mach_vm_region(task, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 		{
-			if ((regionInfo.protection & VM_PROT_READ) && (regionInfo.protection & VM_PROT_WRITE))
+			if ((regionInfo.protection & VM_PROT_READ) && (scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
 			{
 				void *bytes = malloc(size);
 				
