@@ -20,7 +20,7 @@
 		775FCB3611719F95000054FB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB3511719F95000054FB /* Security.framework */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
 		775FD70B1224B66F004425EA /* calc in Resources */ = {isa = PBXBuildFile; fileRef = 775FD7081224B66F004425EA /* calc */; };
-		77A8689811FA95730062EEAE /* bitsliceicon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 77A8689711FA95730062EEAE /* bitsliceicon.icns */; };
+		77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 77A8689711FA95730062EEAE /* bitslicericon.icns */; };
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
 		77D037371224334E0083E057 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D037361224334E0083E057 /* ZGCalculator.m */; };
 		77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FC461F12237F71003CB09B /* NSStringAdditions.m */; };
@@ -60,7 +60,7 @@
 		775FCB3511719F95000054FB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		775FD7081224B66F004425EA /* calc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = calc; sourceTree = "<group>"; };
-		77A8689711FA95730062EEAE /* bitsliceicon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = bitsliceicon.icns; sourceTree = "<group>"; };
+		77A8689711FA95730062EEAE /* bitslicericon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = bitslicericon.icns; sourceTree = "<group>"; };
 		77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGComparisonFunctions.h; sourceTree = "<group>"; };
 		77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGComparisonFunctions.m; sourceTree = "<group>"; };
 		77CB9772121CDCB8000A91DE /* ZGSearching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGSearching.h; sourceTree = "<group>"; };
@@ -169,7 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				775FD7081224B66F004425EA /* calc */,
-				77A8689711FA95730062EEAE /* bitsliceicon.icns */,
+				77A8689711FA95730062EEAE /* bitslicericon.icns */,
 				8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
 				1DDD58280DA1D0D100B32029 /* MyDocument.xib */,
@@ -242,7 +242,7 @@
 				1DDD582C0DA1D0D100B32029 /* MyDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
 				775FCB2A11719E4A000054FB /* Preferences.xib in Resources */,
-				77A8689811FA95730062EEAE /* bitsliceicon.icns in Resources */,
+				77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */,
 				775FD70B1224B66F004425EA /* calc in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
