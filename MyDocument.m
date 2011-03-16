@@ -1648,15 +1648,9 @@ static NSSize *expandedWindowMinSize = nil;
 			
 			search_for_data_t searchForDataCallback = ^(void *data, void *data2, vm_address_t address, int currentRegionNumber)
 			{
-				if (!searchArguments.beginAddressExists || searchArguments.beginAddress >= address)
-				{
-				}
-				
-				if (!searchArguments.endAddressExists || searchArguments.endAddress > address + dataSize)
-				{
-				}
-				
-				if (compareFunction(&searchArguments, data, (data2 != NULL) ? data2 : searchValue, dataType, dataSize, &collator))
+				if ((!searchArguments.beginAddressExists || searchArguments.beginAddress <= address) &&
+					(!searchArguments.endAddressExists || searchArguments.endAddress >= address + dataSize) &&
+					compareFunction(&searchArguments, data, (data2 != NULL) ? data2 : searchValue, dataType, dataSize, &collator))
 				{
 					ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:data
 																		   size:dataSize
@@ -1736,7 +1730,9 @@ static NSSize *expandedWindowMinSize = nil;
 				{
 					if (variable->shouldBeSearched)
 					{
-						if (variable->size > 0 && dataSize > 0)
+						if (variable->size > 0 && dataSize > 0 &&
+							(!searchArguments.beginAddressExists || searchArguments.beginAddress <= variable->address) &&
+							(!searchArguments.endAddressExists || searchArguments.endAddress >= variable->address + dataSize))
 						{
 							void *value = malloc(dataSize);
 							if (ZGReadBytes(processID, variable->address, value, dataSize))
