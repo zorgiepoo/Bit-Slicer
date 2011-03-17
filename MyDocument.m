@@ -1659,7 +1659,7 @@ static NSSize *expandedWindowMinSize = nil;
 			ZGVariableQualifier qualifier = [[variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
 			unsigned long long pointerSize = currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
 			
-			search_for_data_t searchForDataCallback = ^(void *data, void *data2, vm_address_t address, int currentRegionNumber)
+			search_for_data_t searchForDataCallback = ^(void *data, void *data2, mach_vm_address_t address, int currentRegionNumber)
 			{
 				if ((!searchArguments.beginAddressExists || searchArguments.beginAddress <= address) &&
 					(!searchArguments.endAddressExists || searchArguments.endAddress >= address + dataSize) &&

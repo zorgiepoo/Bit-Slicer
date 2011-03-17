@@ -105,7 +105,7 @@ BOOL ZGWriteBytes(pid_t process, mach_vm_address_t address, const void *bytes, m
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
-		success = (mach_vm_write(task, address, (mach_vm_address_t)bytes, (mach_msg_type_number_t)size) == KERN_SUCCESS);
+		success = (mach_vm_write(task, address, (vm_offset_t)bytes, (mach_msg_type_number_t)size) == KERN_SUCCESS);
 		
 		if (task != MACH_PORT_NULL)
 		{
@@ -170,7 +170,7 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 		{
 			if ((regionInfo.protection & VM_PROT_READ) && (scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
 			{
-				void *bytes = malloc(size);
+				void *bytes = malloc((size_t)size);
 				
 				if (bytes)
 				{
@@ -278,11 +278,11 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 					currentStartingAddress = address;
 				}
 				
-				void *bytes = malloc(size);
+				void *bytes = malloc((size_t)size);
 				ZGReadBytes(process->processID, address, bytes, size);
 				
 				[currentData appendBytes:bytes
-								  length:size];
+								  length:(NSUInteger)size];
 				
 				free(bytes);
 			}
@@ -362,7 +362,7 @@ void ZGSearchForSavedData(pid_t process, BOOL is64Bit, mach_vm_size_t dataSize, 
 		{
 			ZGRegion *region = [regionValue pointerValue];
 			mach_vm_address_t offset = 0;
-			char *currentData = malloc(region->size);
+			char *currentData = malloc((size_t)region->size);
 			mach_vm_size_t size = region->size;
 			
 			if (mach_vm_read_overwrite(task, region->address, size, (mach_vm_address_t)currentData, &size) == KERN_SUCCESS)
@@ -416,7 +416,7 @@ void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, mach_
 		{
 			if (regionInfo.protection & VM_PROT_READ && (searchData->scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
 			{
-				char *bytes = malloc(size);
+				char *bytes = malloc((size_t)size);
 				
 				if (bytes)
 				{
@@ -461,7 +461,7 @@ mach_vm_size_t ZGGetStringSize(pid_t process, mach_vm_address_t address, ZGVaria
 		if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 		{
 			mach_vm_size_t characterSize = dataType == ZGUTF8String ? sizeof(char) : sizeof(unichar);
-			void *theByte = malloc(characterSize);
+			void *theByte = malloc((size_t)characterSize);
 			
 			if (theByte)
 			{

@@ -166,7 +166,7 @@
 					}
 					
 					mach_vm_size_t size = process->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
-					void *value = malloc(size);
+					void *value = malloc((size_t)size);
 					
 					NSMutableString *newExpression;
 					

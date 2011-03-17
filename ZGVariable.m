@@ -72,14 +72,14 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	if (value)
 	{
 		[coder encodeBytes:value
-					length:size
+					length:(NSUInteger)size
 					forKey:ZGValueKey];
 	}
 	
 	if (freezeValue)
 	{
 		[coder encodeBytes:freezeValue
-					length:size
+					length:(NSUInteger)size
 					forKey:ZGFreezeValueKey];
 	}
 }
@@ -337,13 +337,13 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				[self setStringValue:[NSString stringWithFormat:@"%lf", *((double *)value)]];
 				break;
 			case ZGUTF8String:
-				stringValue = [[NSString alloc] initWithData:[NSData dataWithBytes:value length:size - 1]
+				stringValue = [[NSString alloc] initWithData:[NSData dataWithBytes:value length:(NSUInteger)(size - 1)]
 													encoding:NSUTF8StringEncoding];
 				
 				// UTF8 string encoding can fail sometimes on some invalid-ish strings
 				if (!stringValue)
 				{
-					newStringValue = [[NSString alloc] initWithData:[NSData dataWithBytes:value length:size - 1]
+					newStringValue = [[NSString alloc] initWithData:[NSData dataWithBytes:value length:(NSUInteger)(size - 1)]
 														   encoding:NSASCIIStringEncoding];
 					[self setStringValue:newStringValue];
 					[newStringValue release];
@@ -357,7 +357,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				
 				break;
 			case ZGUTF16String:
-				newStringValue = [[NSString alloc] initWithData:[NSData dataWithBytes:value length:size]
+				newStringValue = [[NSString alloc] initWithData:[NSData dataWithBytes:value length:(NSUInteger)size]
 													   encoding:NSUTF16LittleEndianStringEncoding];
 				
 				[self setStringValue:newStringValue];
@@ -387,8 +387,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 	if (newValue && size > 0)
 	{
-		value = malloc(size);
-		memcpy(value, newValue, size);
+		value = malloc((size_t)size);
+		memcpy(value, newValue, (size_t)size);
 	}
 }
 
@@ -399,8 +399,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		free(freezeValue);
 	}
 	
-	freezeValue = malloc(size);
-	memcpy(freezeValue, newFreezeValue, size);
+	freezeValue = malloc((size_t)size);
+	memcpy(freezeValue, newFreezeValue, (size_t)size);
 }
 
 - (void)setName:(NSString *)newName

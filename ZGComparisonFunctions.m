@@ -195,11 +195,11 @@ BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const
 			// or size to include for the NULL terminator
 			if (searchArguments->sensitive)
 			{
-				isEqual = (memcmp(value1, value2, size - searchArguments->disregardNullTerminator) == 0);
+				isEqual = (memcmp(value1, value2, (size_t)(size - searchArguments->disregardNullTerminator)) == 0);
 			}
 			else
 			{
-				isEqual = (strncasecmp(value1, value2, size - searchArguments->disregardNullTerminator) == 0);
+				isEqual = (strncasecmp(value1, value2, (size_t)(size - searchArguments->disregardNullTerminator)) == 0);
 			}
 			break;
 		case ZGUTF16String:
@@ -215,11 +215,11 @@ BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const
 			
 			if (searchArguments->sensitive)
 			{
-				isEqual = (memcmp(value1, value2, size) == 0);
+				isEqual = (memcmp(value1, value2, (size_t)size) == 0);
 			}
 			else
 			{
-				UCCompareText(*((CollatorRef *)collator), value1, size / sizeof(unichar), value2, size / sizeof(unichar), (Boolean *)&isEqual, NULL);
+				UCCompareText(*((CollatorRef *)collator), value1, ((size_t)size) / sizeof(unichar), value2, ((size_t)size) / sizeof(unichar), (Boolean *)&isEqual, NULL);
 			}
 			break;
 	}

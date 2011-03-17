@@ -43,7 +43,7 @@
 }
 @end
 
-typedef void (^search_for_data_t)(void *data, void *data2, vm_address_t address, int currentRegionNumber);
+typedef void (^search_for_data_t)(void *data, void *data2, mach_vm_address_t address, int currentRegionNumber);
 typedef void (^memory_dump_t)(int currentRegionNumber);
 
 BOOL ZGIsProcessValid(pid_t process);
