@@ -666,7 +666,7 @@
 			 
 			 if (variable->size)
 			 {
-				 void *value = malloc(variable->size);
+				 void *value = malloc((size_t)variable->size);
 				 
 				 if (ZGReadBytes([currentProcess processID], variable->address, value, variable->size))
 				 {
@@ -1096,8 +1096,8 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		*dataSize = 1;
-		value = malloc(*dataSize);
-		memcpy(value, &variableValue, *dataSize);
+		value = malloc((size_t)*dataSize);
+		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
 	else if (dataType == ZGInt16)
 	{
@@ -1115,8 +1115,8 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		*dataSize = 2;
-		value = malloc(*dataSize);
-		memcpy(value, &variableValue, *dataSize);
+		value = malloc((size_t)*dataSize);
+		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
 	else if (dataType == ZGInt32 || (dataType == ZGPointer && !currentProcess->is64Bit))
 	{
@@ -1134,8 +1134,8 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		*dataSize = 4;
-		value = malloc(*dataSize);
-		memcpy(value, &variableValue, *dataSize);
+		value = malloc((size_t)*dataSize);
+		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
 	else if (dataType == ZGFloat)
 	{
@@ -1151,8 +1151,8 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		*dataSize = 4;
-		value = malloc(*dataSize);
-		memcpy(value, &variableValue, *dataSize);
+		value = malloc((size_t)*dataSize);
+		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
 	else if (dataType == ZGInt64 || (dataType == ZGPointer && currentProcess->is64Bit))
 	{
@@ -1170,8 +1170,8 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		*dataSize = 8;
-		value = malloc(*dataSize);
-		memcpy(value, &variableValue, *dataSize);
+		value = malloc((size_t)*dataSize);
+		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
 	else if (dataType == ZGDouble)
 	{
@@ -1187,20 +1187,20 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		*dataSize = 8;
-		value = malloc(*dataSize);
-		memcpy(value, &variableValue, *dataSize);
+		value = malloc((size_t)*dataSize);
+		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
 	else if (dataType == ZGUTF8String)
 	{
 		const char *variableValue = [stringValue cStringUsingEncoding:NSUTF8StringEncoding];
 		*dataSize = strlen(variableValue) + 1;
-		value = malloc(*dataSize);
-		strncpy(value, variableValue, *dataSize);
+		value = malloc((size_t)*dataSize);
+		strncpy(value, variableValue, (size_t)*dataSize);
 	}
 	else if (dataType == ZGUTF16String)
 	{
 		*dataSize = [stringValue length] * sizeof(unichar);
-		value = malloc(*dataSize);
+		value = malloc((size_t)*dataSize);
 		[stringValue getCharacters:value
 							 range:NSMakeRange(0, [stringValue length])];
 	}
@@ -1747,7 +1747,7 @@ static NSSize *expandedWindowMinSize = nil;
 							(!searchArguments.beginAddressExists || searchArguments.beginAddress <= variable->address) &&
 							(!searchArguments.endAddressExists || searchArguments.endAddress >= variable->address + dataSize))
 						{
-							void *value = malloc(dataSize);
+							void *value = malloc((size_t)dataSize);
 							if (ZGReadBytes(processID, variable->address, value, dataSize))
 							{
 								void *value2 = searchArguments.isImplicit ? ZGSavedValue(variable->address, searchData, dataSize) : searchValue;
@@ -2140,7 +2140,7 @@ static NSSize *expandedWindowMinSize = nil;
 			
 			if (variable->size)
 			{
-				newValue = malloc(variable->size);
+				newValue = malloc((size_t)variable->size);
 				[stringObject getCharacters:newValue
 									  range:NSMakeRange(0, [stringObject length])];
 			}
@@ -2733,14 +2733,14 @@ static NSSize *expandedWindowMinSize = nil;
 				 {
 					 
 					 mach_vm_size_t size = toAddress - fromAddress;
-					 void *bytes = malloc(size);
+					 void *bytes = malloc((size_t)size);
 					 
 					 if (bytes)
 					 {
 						 ZGReadBytesCarefully([currentProcess processID], fromAddress, bytes, &size);
 						 
 						 NSData *data = [NSData dataWithBytes:bytes
-													   length:size];
+													   length:(NSUInteger)size];
 						 
 						 success = [data writeToFile:[savePanel filename]
 										  atomically:NO];
