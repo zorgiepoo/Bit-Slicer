@@ -1457,7 +1457,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									<object class="NSButtonCell" key="NSCell" id="1052922599">
 										<int key="NSCellFlags">67239424</int>
 										<int key="NSCellFlags2">131072</int>
-										<string key="NSContents">Scan Un-writable Values</string>
+										<string key="NSContents">Scan Unwritable Values</string>
 										<reference key="NSSupport" ref="26"/>
 										<reference key="NSControlView" ref="248151591"/>
 										<int key="NSButtonFlags">1211912703</int>
