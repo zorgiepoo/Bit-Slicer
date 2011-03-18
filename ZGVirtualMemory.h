@@ -29,8 +29,6 @@
 typedef mach_vm_address_t ZGMemoryAddress;
 typedef mach_vm_size_t ZGMemorySize;
 
-#define INVALID_PROCESS_INITIALIZATION	-1
-
 @class ZGProcess;
 
 @interface ZGSearchData : NSObject
