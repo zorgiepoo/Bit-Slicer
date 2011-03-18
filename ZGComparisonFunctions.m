@@ -20,7 +20,7 @@
 
 #import "ZGComparisonFunctions.h"
 
-BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, mach_vm_size_t size, void *unused)
+BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *unused)
 {
 	BOOL isLessThan = NO;
 	
@@ -87,7 +87,7 @@ BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, co
 	return isLessThan;
 }
 
-BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, mach_vm_size_t size, void *unused)
+BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *unused)
 {
 	BOOL isGreaterThan = NO;
 	
@@ -154,7 +154,7 @@ BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1,
 	return isGreaterThan;
 }
 
-BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, mach_vm_size_t size, void *collator)
+BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *collator)
 {
 	BOOL isEqual = NO;
 	
@@ -227,7 +227,7 @@ BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const
 	return isEqual;
 }
 
-BOOL notEqualFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, mach_vm_size_t size, void *collator)
+BOOL notEqualFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *collator)
 {
 	return !equalFunction(searchArguments, value1, value2, type, size, collator);
 }

@@ -155,7 +155,7 @@
 					NSString *addressExpression = [self evaluateAddress:[NSMutableString stringWithString:innerExpression]
 																process:process];
 					
-					mach_vm_address_t address;
+					ZGMemoryAddress address;
 					if ([addressExpression isHexRepresentation])
 					{
 						[[NSScanner scannerWithString:addressExpression] scanHexLongLong:&address];
@@ -165,7 +165,7 @@
 						[[NSScanner scannerWithString:addressExpression] scanLongLong:(long long *)&address];
 					}
 					
-					mach_vm_size_t size = process->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
+					ZGMemorySize size = process->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
 					void *value = malloc((size_t)size);
 					
 					NSMutableString *newExpression;

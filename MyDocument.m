@@ -1075,7 +1075,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (void *)valueFromString:(NSString *)stringValue
 				 dataType:(ZGVariableType)dataType
-				 dataSize:(mach_vm_size_t *)dataSize
+				 dataSize:(ZGMemorySize *)dataSize
 {
 	void *value = NULL;
 	BOOL searchValueIsAHexRepresentation = [stringValue isHexRepresentation];
@@ -1473,7 +1473,7 @@ static NSSize *expandedWindowMinSize = nil;
 		[watchVariablesTableView setNeedsDisplay:YES];
 		
 		// Basic search information
-		mach_vm_size_t dataSize = 0;
+		ZGMemorySize dataSize = 0;
 		void *searchValue = NULL;
 		
 		// Set default search arguments
@@ -1540,7 +1540,7 @@ static NSSize *expandedWindowMinSize = nil;
 					if (!flagsFieldIsBlank)
 					{
 						// Clearly a range type of search
-						mach_vm_size_t rangeDataSize;
+						ZGMemorySize rangeDataSize;
 						searchArguments.rangeValue = [self valueFromString:flagsExpression
 																  dataType:dataType
 																  dataSize:&rangeDataSize];
@@ -1566,7 +1566,7 @@ static NSSize *expandedWindowMinSize = nil;
 					if (!flagsFieldIsBlank)
 					{
 						// Clearly an epsilon flag
-						mach_vm_size_t epsilonDataSize;
+						ZGMemorySize epsilonDataSize;
 						void *epsilon = [self valueFromString:flagsExpression
 													 dataType:ZGDouble
 													 dataSize:&epsilonDataSize];
@@ -1637,12 +1637,12 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		[self prepareDocumentTask];
 		
-		static BOOL (*compareFunctions[4])(ZGSearchArguments *, const void *, const void *, ZGVariableType, mach_vm_size_t, void *) =
+		static BOOL (*compareFunctions[4])(ZGSearchArguments *, const void *, const void *, ZGVariableType, ZGMemorySize, void *) =
 		{
 			equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction,
 		};
 		
-		BOOL (*compareFunction)(ZGSearchArguments *, const void *, const void *, ZGVariableType, mach_vm_size_t, void *) = compareFunctions[functionType];
+		BOOL (*compareFunction)(ZGSearchArguments *, const void *, const void *, ZGVariableType, ZGMemorySize, void *) = compareFunctions[functionType];
 		
 		if (!goingToNarrowDownSearches)
 		{
@@ -1659,7 +1659,7 @@ static NSSize *expandedWindowMinSize = nil;
 			ZGVariableQualifier qualifier = [[variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
 			unsigned long long pointerSize = currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
 			
-			search_for_data_t searchForDataCallback = ^(void *data, void *data2, mach_vm_address_t address, int currentRegionNumber)
+			search_for_data_t searchForDataCallback = ^(void *data, void *data2, ZGMemoryAddress address, int currentRegionNumber)
 			{
 				if ((!searchArguments.beginAddressExists || searchArguments.beginAddress <= address) &&
 					(!searchArguments.endAddressExists || searchArguments.endAddress >= address + dataSize) &&
@@ -2732,7 +2732,7 @@ static NSSize *expandedWindowMinSize = nil;
 				 @try
 				 {
 					 
-					 mach_vm_size_t size = toAddress - fromAddress;
+					 ZGMemorySize size = toAddress - fromAddress;
 					 void *bytes = malloc((size_t)size);
 					 
 					 if (bytes)

@@ -26,6 +26,9 @@
 #import <mach/mach_vm.h>
 #import <mach/mach.h>
 
+typedef mach_vm_address_t ZGMemoryAddress;
+typedef mach_vm_size_t ZGMemorySize;
+
 #define INVALID_PROCESS_INITIALIZATION	-1
 
 @class ZGProcess;
@@ -43,25 +46,25 @@
 }
 @end
 
-typedef void (^search_for_data_t)(void *data, void *data2, mach_vm_address_t address, int currentRegionNumber);
+typedef void (^search_for_data_t)(void *data, void *data2, ZGMemoryAddress address, int currentRegionNumber);
 typedef void (^memory_dump_t)(int currentRegionNumber);
 
 BOOL ZGIsProcessValid(pid_t process);
 int ZGNumberOfRegionsForProcess(pid_t process);
-BOOL ZGReadBytes(pid_t process, mach_vm_address_t address, void *bytes, mach_vm_size_t size);
-BOOL ZGReadBytesCarefully(pid_t process, mach_vm_address_t address, void *bytes, mach_vm_size_t *size);
-BOOL ZGWriteBytes(pid_t process, mach_vm_address_t address, const void *bytes, mach_vm_size_t size);
+BOOL ZGReadBytes(pid_t process, ZGMemoryAddress address, void *bytes, ZGMemorySize size);
+BOOL ZGReadBytesCarefully(pid_t process, ZGMemoryAddress address, void *bytes, ZGMemorySize *size);
+BOOL ZGWriteBytes(pid_t process, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
 void ZGFreeData(NSArray *dataArray);
 NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly);
-void *ZGSavedValue(mach_vm_address_t address, ZGSearchData *searchData, mach_vm_size_t dataSize);
+void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySize dataSize);
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process);
 void ZGInitializeSearch(ZGSearchData *searchData);
 void ZGCancelSearch(ZGSearchData *searchData);
 BOOL ZGSearchIsCancelling(ZGSearchData *searchData);
 void ZGCancelSearchImmediately(ZGSearchData *searchData);
 BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData);
-void ZGSearchForSavedData(pid_t process, BOOL is64Bit, mach_vm_size_t dataSize, ZGSearchData *searchData, search_for_data_t block);
-void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, mach_vm_size_t dataSize, ZGSearchData *searchData, search_for_data_t block);
-mach_vm_size_t ZGGetStringSize(pid_t process, mach_vm_address_t address, ZGVariableType dataType);
+void ZGSearchForSavedData(pid_t process, BOOL is64Bit, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block);
+void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block);
+ZGMemorySize ZGGetStringSize(pid_t process, ZGMemoryAddress address, ZGVariableType dataType);
 BOOL ZGPauseProcess(pid_t process);
 BOOL ZGUnpauseProcess(pid_t process);

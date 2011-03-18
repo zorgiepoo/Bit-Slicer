@@ -43,8 +43,8 @@ int ZGNumberOfRegionsForProcess(pid_t process)
 	int numberOfRegions = 0;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
-		mach_vm_address_t address = 0x0;
-		mach_vm_size_t size;
+		ZGMemoryAddress address = 0x0;
+		ZGMemorySize size;
 		vm_region_basic_info_data_64_t info;
 		mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
 		mach_port_t objectName = MACH_PORT_NULL;
@@ -64,13 +64,13 @@ int ZGNumberOfRegionsForProcess(pid_t process)
 	return numberOfRegions;
 }
 
-BOOL ZGReadBytes(pid_t process, mach_vm_address_t address, void *bytes, mach_vm_size_t size)
+BOOL ZGReadBytes(pid_t process, ZGMemoryAddress address, void *bytes, ZGMemorySize size)
 {
 	BOOL success = NO;
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
-		success = (mach_vm_read_overwrite(task, address, size, (mach_vm_address_t)bytes, &size) == KERN_SUCCESS);
+		success = (mach_vm_read_overwrite(task, address, size, (ZGMemoryAddress)bytes, &size) == KERN_SUCCESS);
 		
 		if (task != MACH_PORT_NULL)
 		{
@@ -81,14 +81,14 @@ BOOL ZGReadBytes(pid_t process, mach_vm_address_t address, void *bytes, mach_vm_
 	return success;
 }
 
-BOOL ZGReadBytesCarefully(pid_t process, mach_vm_address_t address, void *bytes, mach_vm_size_t *size)
+BOOL ZGReadBytesCarefully(pid_t process, ZGMemoryAddress address, void *bytes, ZGMemorySize *size)
 {
 	BOOL success = NO;
 	vm_map_t task = MACH_PORT_NULL;
-	mach_vm_size_t originalSize = *size;
+	ZGMemorySize originalSize = *size;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
-		success = (mach_vm_read_overwrite(task, address, originalSize, (mach_vm_address_t)bytes, size) == KERN_SUCCESS);
+		success = (mach_vm_read_overwrite(task, address, originalSize, (ZGMemoryAddress)bytes, size) == KERN_SUCCESS);
 		
 		if (task != MACH_PORT_NULL)
 		{
@@ -99,7 +99,7 @@ BOOL ZGReadBytesCarefully(pid_t process, mach_vm_address_t address, void *bytes,
 	return success;
 }
 
-BOOL ZGWriteBytes(pid_t process, mach_vm_address_t address, const void *bytes, mach_vm_size_t size)
+BOOL ZGWriteBytes(pid_t process, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)
 {
 	BOOL success = NO;
 	vm_map_t task = MACH_PORT_NULL;
@@ -117,11 +117,11 @@ BOOL ZGWriteBytes(pid_t process, mach_vm_address_t address, const void *bytes, m
 }
 
 // helper function for ZGSaveAllDataToDirectory
-void ZGSavePieceOfData(NSMutableData *currentData, mach_vm_address_t currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
+void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
 {
 	if (currentData)
 	{
-		mach_vm_address_t endAddress = currentStartingAddress + [currentData length];
+		ZGMemoryAddress endAddress = currentStartingAddress + [currentData length];
 		(*fileNumber)++;
 		[currentData writeToFile:[directory stringByAppendingPathComponent:[NSString stringWithFormat:@"(%i) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
 					  atomically:NO];
@@ -135,8 +135,8 @@ void ZGSavePieceOfData(NSMutableData *currentData, mach_vm_address_t currentStar
 
 typedef struct
 {
-	mach_vm_address_t address;
-	mach_vm_size_t size;
+	ZGMemoryAddress address;
+	ZGMemorySize size;
 	void *bytes;
 } ZGRegion;
 
@@ -157,8 +157,8 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process->processID, &task) == KERN_SUCCESS)
 	{
-		mach_vm_address_t address = 0x0;
-		mach_vm_size_t size;
+		ZGMemoryAddress address = 0x0;
+		ZGMemorySize size;
 		vm_region_basic_info_data_64_t regionInfo;
 		mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
 		mach_port_t objectName = MACH_PORT_NULL;
@@ -174,9 +174,9 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 				
 				if (bytes)
 				{
-					mach_vm_size_t outputSize = size;
+					ZGMemorySize outputSize = size;
 					
-					if (mach_vm_read_overwrite(task, address, size, (mach_vm_address_t)bytes, &outputSize) == KERN_SUCCESS)
+					if (mach_vm_read_overwrite(task, address, size, (ZGMemoryAddress)bytes, &outputSize) == KERN_SUCCESS)
 					{
 						ZGRegion *memoryRegion = malloc(sizeof(ZGRegion));
 						memoryRegion->bytes = bytes;
@@ -219,7 +219,7 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 	return dataArray;
 }
 
-void *ZGSavedValue(mach_vm_address_t address, ZGSearchData *searchData, mach_vm_size_t dataSize)
+void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySize dataSize)
 {
 	void *value = NULL;
 	
@@ -244,15 +244,15 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 	
 	if (task_for_pid(current_task(), process->processID, &task) == KERN_SUCCESS)
 	{
-		mach_vm_address_t address = 0x0;
-		mach_vm_address_t lastAddress = address;
-		mach_vm_size_t size;
+		ZGMemoryAddress address = 0x0;
+		ZGMemoryAddress lastAddress = address;
+		ZGMemorySize size;
 		vm_region_basic_info_data_64_t regionInfo;
 		mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
 		mach_port_t objectName = MACH_PORT_NULL;
 		
 		NSMutableData *currentData = nil;
-		mach_vm_address_t currentStartingAddress = address;
+		ZGMemoryAddress currentStartingAddress = address;
 		int fileNumber = 0;
 		
 		FILE *mergedFile = fopen([[directory stringByAppendingPathComponent:@"(All) Merged"] UTF8String], "w");
@@ -346,12 +346,12 @@ BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData)
 	return searchData->searchDidCancel;
 }
 
-void ZGSearchForSavedData(pid_t process, BOOL is64Bit, mach_vm_size_t dataSize, ZGSearchData *searchData, search_for_data_t block)
+void ZGSearchForSavedData(pid_t process, BOOL is64Bit, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
 	
 	// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
-	mach_vm_size_t dataAlignment = (!is64Bit && dataSize == 8) ? 4 : dataSize;
+	ZGMemorySize dataAlignment = (!is64Bit && dataSize == 8) ? 4 : dataSize;
 	
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
@@ -361,11 +361,11 @@ void ZGSearchForSavedData(pid_t process, BOOL is64Bit, mach_vm_size_t dataSize, 
 		for (NSValue *regionValue in searchData->savedData)
 		{
 			ZGRegion *region = [regionValue pointerValue];
-			mach_vm_address_t offset = 0;
+			ZGMemoryAddress offset = 0;
 			char *currentData = malloc((size_t)region->size);
-			mach_vm_size_t size = region->size;
+			ZGMemorySize size = region->size;
 			
-			if (mach_vm_read_overwrite(task, region->address, size, (mach_vm_address_t)currentData, &size) == KERN_SUCCESS)
+			if (mach_vm_read_overwrite(task, region->address, size, (ZGMemoryAddress)currentData, &size) == KERN_SUCCESS)
 			{
 				do
 				{
@@ -393,19 +393,19 @@ void ZGSearchForSavedData(pid_t process, BOOL is64Bit, mach_vm_size_t dataSize, 
 	}
 }
 
-void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, mach_vm_size_t dataSize, ZGSearchData *searchData, search_for_data_t block)
+void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
 	
 	// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
 	// except for strings, which always operate on one byte boundaries
-	mach_vm_size_t dataAlignment = (dataType == ZGUTF8String || dataType == ZGUTF16String) ? 1 : (!is64Bit && dataSize == 8 ? 4 : dataSize);
+	ZGMemorySize dataAlignment = (dataType == ZGUTF8String || dataType == ZGUTF16String) ? 1 : (!is64Bit && dataSize == 8 ? 4 : dataSize);
 	
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
-		mach_vm_address_t address = 0x0;
-		mach_vm_size_t size;
+		ZGMemoryAddress address = 0x0;
+		ZGMemorySize size;
 		mach_port_t objectName = MACH_PORT_NULL;
 		vm_region_basic_info_data_t regionInfo;
 		mach_msg_type_number_t regionInfoSize = VM_REGION_BASIC_INFO_COUNT_64;
@@ -420,7 +420,7 @@ void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, mach_
 				
 				if (bytes)
 				{
-					if (mach_vm_read_overwrite(task, address, size, (mach_vm_address_t)bytes, &size) == KERN_SUCCESS)
+					if (mach_vm_read_overwrite(task, address, size, (ZGMemoryAddress)bytes, &size) == KERN_SUCCESS)
 					{
 						int dataIndex = 0;
 						while (dataIndex + dataSize <= size && !searchData->shouldCancelSearch)
@@ -451,25 +451,25 @@ void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, mach_
 	}
 }
 
-mach_vm_size_t ZGGetStringSize(pid_t process, mach_vm_address_t address, ZGVariableType dataType)
+ZGMemorySize ZGGetStringSize(pid_t process, ZGMemoryAddress address, ZGVariableType dataType)
 {
-	mach_vm_size_t totalSize = 0;
+	ZGMemorySize totalSize = 0;
 	vm_map_t task = MACH_PORT_NULL;
 	
 	@try
 	{
 		if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 		{
-			mach_vm_size_t characterSize = dataType == ZGUTF8String ? sizeof(char) : sizeof(unichar);
+			ZGMemorySize characterSize = dataType == ZGUTF8String ? sizeof(char) : sizeof(unichar);
 			void *theByte = malloc((size_t)characterSize);
 			
 			if (theByte)
 			{
 				while (YES)
 				{
-					mach_vm_size_t outputtedSize = characterSize;
+					ZGMemorySize outputtedSize = characterSize;
 					
-					if (mach_vm_read_overwrite(task, address, characterSize, (mach_vm_address_t)theByte, &outputtedSize) == KERN_SUCCESS)
+					if (mach_vm_read_overwrite(task, address, characterSize, (ZGMemoryAddress)theByte, &outputtedSize) == KERN_SUCCESS)
 					{
 						if ((dataType == ZGUTF8String && *((char *)theByte) == 0) || (dataType == ZGUTF16String && *((unichar *)theByte) == 0))
 						{

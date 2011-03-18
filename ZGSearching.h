@@ -33,8 +33,8 @@ typedef struct
 	NSString *lastBelowRangeValue;
 	
 	// these are not NSString's because there's no reason to save the values
-	mach_vm_address_t beginAddress;
-	mach_vm_address_t endAddress;
+	ZGMemoryAddress beginAddress;
+	ZGMemoryAddress endAddress;
 	BOOL beginAddressExists;
 	BOOL endAddressExists;
 } ZGSearchArguments;
