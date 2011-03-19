@@ -52,9 +52,9 @@ typedef enum
 	BOOL shouldBeSearched;
 	BOOL isFrozen;
 	BOOL isPointer;
-	unsigned long long address;
-	unsigned long long size;
-	unsigned long long lastUpdatedSize;
+	ZGMemoryAddress address;
+	ZGMemorySize size;
+	ZGMemorySize lastUpdatedSize;
 	ZGVariableType type;
 	ZGVariableQualifier qualifier;
 	void *value;

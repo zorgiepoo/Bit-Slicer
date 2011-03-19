@@ -1208,9 +1208,9 @@ static NSSize *expandedWindowMinSize = nil;
 	return value;
 }
 
-- (unsigned long long)memoryAddressFromExpression:(NSString *)expression
+- (ZGMemoryAddress)memoryAddressFromExpression:(NSString *)expression
 {
-	unsigned long long address;
+	ZGMemoryAddress address;
 	if ([expression isHexRepresentation])
 	{
 		[[NSScanner scannerWithString:expression] scanHexLongLong:&address];
@@ -1657,7 +1657,7 @@ static NSSize *expandedWindowMinSize = nil;
 																		  selector:@selector(updateSearchUserInterface:)];
 			
 			ZGVariableQualifier qualifier = [[variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
-			unsigned long long pointerSize = currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
+			ZGMemorySize pointerSize = currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
 			
 			search_for_data_t searchForDataCallback = ^(void *data, void *data2, ZGMemoryAddress address, int currentRegionNumber)
 			{
@@ -2711,10 +2711,10 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)memoryDumpOkayButton:(id)sender
 {
 	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpFromAddressTextField stringValue]];
-	unsigned long long fromAddress = [self memoryAddressFromExpression:fromAddressExpression];
+	ZGMemoryAddress fromAddress = [self memoryAddressFromExpression:fromAddressExpression];
 	
 	NSString *toAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpToAddressTextField stringValue]];
-	unsigned long long toAddress = [self memoryAddressFromExpression:toAddressExpression];
+	ZGMemoryAddress toAddress = [self memoryAddressFromExpression:toAddressExpression];
 	
 	if (toAddress > fromAddress && ![fromAddressExpression isEqualToString:@""] && ![toAddressExpression isEqualToString:@""])
 	{

@@ -130,10 +130,10 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return self;
 }
 
-+ (unsigned long long)sizeFromType:(ZGVariableType)type
-					   pointerSize:(ZGMemorySize)pointerSize
++ (ZGMemorySize)sizeFromType:(ZGVariableType)type
+				 pointerSize:(ZGMemorySize)pointerSize
 {
-	unsigned long long size = 0;
+	ZGMemorySize size = 0;
 	
 	switch (type)
 	{
