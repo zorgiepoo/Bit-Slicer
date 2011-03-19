@@ -19,6 +19,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import "ZGMemoryTypes.h"
 
 extern NSString *ZGVariablePboardType;
 
@@ -64,11 +65,11 @@ typedef enum
 @property (copy, nonatomic) NSString *addressFormula;
 
 - (id)initWithValue:(void *)aValue
-			   size:(unsigned long long)aSize
-			address:(unsigned long long)anAddress
+			   size:(ZGMemorySize)aSize
+			address:(ZGMemoryAddress)anAddress
 			   type:(ZGVariableType)aType
 		  qualifier:(ZGVariableQualifier)aQualifier
-		pointerSize:(unsigned long long)pointerSize;
+		pointerSize:(ZGMemorySize)pointerSize;
 
 - (NSString *)name;
 - (NSString *)stringValue;
@@ -78,7 +79,7 @@ typedef enum
 - (void)setVariableValue:(void *)newValue;
 - (void)setFreezeValue:(void *)newFreezeValue;
 - (void)setName:(NSString *)newName;
-- (void)setType:(ZGVariableType)newType pointerSize:(unsigned long long)pointerSize;
-- (void)setPointerSize:(unsigned long long)pointerSize;
+- (void)setType:(ZGVariableType)newType pointerSize:(ZGMemorySize)pointerSize;
+- (void)setPointerSize:(ZGMemorySize)pointerSize;
 
 @end

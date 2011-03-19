@@ -18,6 +18,8 @@
  * Copyright 2010 zgcoder. All rights reserved.
  */
 
+#import "ZGSearching.h"
+#import "ZGMemoryTypes.h"
 #import "ZGVariable.h"
 #import <mach/mach_traps.h>
 #import <signal.h>
@@ -25,9 +27,6 @@
 #import <mach/vm_map.h>
 #import <mach/mach_vm.h>
 #import <mach/mach.h>
-
-typedef mach_vm_address_t ZGMemoryAddress;
-typedef mach_vm_size_t ZGMemorySize;
 
 @class ZGProcess;
 

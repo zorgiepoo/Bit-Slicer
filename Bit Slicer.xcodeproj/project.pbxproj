@@ -60,6 +60,7 @@
 		775FCB3511719F95000054FB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		775FD7081224B66F004425EA /* calc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = calc; sourceTree = "<group>"; };
+		778939221334308300B6AACB /* ZGMemoryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryTypes.h; sourceTree = "<group>"; };
 		77A8689711FA95730062EEAE /* bitslicericon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = bitslicericon.icns; sourceTree = "<group>"; };
 		77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGComparisonFunctions.h; sourceTree = "<group>"; };
 		77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGComparisonFunctions.m; sourceTree = "<group>"; };
@@ -144,6 +145,7 @@
 				775FCB1711719DF6000054FB /* ZGProcess.m */,
 				775FCB1811719DF6000054FB /* ZGVariable.h */,
 				775FCB1911719DF6000054FB /* ZGVariable.m */,
+				778939221334308300B6AACB /* ZGMemoryTypes.h */,
 				7714D3F011B87C7E0028E6B2 /* ZGVirtualMemory.h */,
 				7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */,
 				77D037351224334E0083E057 /* ZGCalculator.h */,

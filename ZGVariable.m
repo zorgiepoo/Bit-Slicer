@@ -131,7 +131,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 }
 
 + (unsigned long long)sizeFromType:(ZGVariableType)type
-					   pointerSize:(unsigned long long)pointerSize
+					   pointerSize:(ZGMemorySize)pointerSize
 {
 	unsigned long long size = 0;
 	
@@ -162,11 +162,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 }
 
 - (id)initWithValue:(void *)aValue
-			   size:(unsigned long long)aSize
-			address:(unsigned long long)anAddress
+			   size:(ZGMemorySize)aSize
+			address:(ZGMemoryAddress)anAddress
 			   type:(ZGVariableType)aType
 		  qualifier:(ZGVariableQualifier)aQualifier
-		pointerSize:(unsigned long long)pointerSize
+		pointerSize:(ZGMemorySize)pointerSize
 {
 	if ((self = [super init]))
 	{
@@ -432,7 +432,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 }
 
 - (void)setType:(ZGVariableType)newType
-	pointerSize:(unsigned long long)pointerSize
+	pointerSize:(ZGMemorySize)pointerSize
 {
 	type = newType;
 	
@@ -444,7 +444,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 // Precondition: size != pointerSize, otherwise this is a wasted effort
 //               also, this must be a pointer type variable
-- (void)setPointerSize:(unsigned long long)pointerSize
+- (void)setPointerSize:(ZGMemorySize)pointerSize
 {
 	[self cleanState];
 	

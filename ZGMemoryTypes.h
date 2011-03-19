@@ -14,27 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Bit Slicer.  If not, see <http://www.gnu.org/licenses/>.
  * 
- * Created by Mayur Pawashe on 8/18/10.
- * Copyright 2010 zgcoder. All rights reserved.
+ * Created by Mayur Pawashe on 3/18/11.
+ * Copyright 2011 zgcoder. All rights reserved.
  */
 
-#import "ZGMemoryTypes.h"
-
-typedef struct
-{
-	double epsilon;
-	void *rangeValue;
-	BOOL sensitive; // "Hi" == "hi" if insensitive
-	BOOL disregardNullTerminator;
-	BOOL isImplicit; // Should compare stored values?
-	
-	NSString *lastEpsilonValue;
-	NSString *lastAboveRangeValue;
-	NSString *lastBelowRangeValue;
-	
-	// these are not NSString's because there's no reason to save the values
-	ZGMemoryAddress beginAddress;
-	ZGMemoryAddress endAddress;
-	BOOL beginAddressExists;
-	BOOL endAddressExists;
-} ZGSearchArguments;
+typedef mach_vm_address_t ZGMemoryAddress;
+typedef mach_vm_size_t ZGMemorySize;
