@@ -351,7 +351,7 @@
 		if ([runningApplication processIdentifier] != [[NSRunningApplication currentApplication] processIdentifier])
 		{
 			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-			[menuItem setTitle:[NSString stringWithFormat:@"%@ (%i)", [runningApplication localizedName], [runningApplication processIdentifier]]];
+			[menuItem setTitle:[NSString stringWithFormat:@"%@ (%d)", [runningApplication localizedName], [runningApplication processIdentifier]]];
 			NSImage *iconImage = [runningApplication icon];
 			[iconImage setSize:NSMakeSize(16, 16)];
 			[menuItem setImage:iconImage];
@@ -411,7 +411,7 @@
 	if ([currentProcess processID] == NON_EXISTENT_PID_NUMBER && [[runningApplication localizedName] isEqualToString:[currentProcess name]])
 	{
 		[currentProcess	setProcessID:[runningApplication processIdentifier]];
-		[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (%i)", [currentProcess name], [currentProcess processID]]];
+		[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [currentProcess name], [currentProcess processID]]];
 		
 		// need to grant access
 		[self runningApplicationsPopUpButtonRequest:nil];

@@ -283,7 +283,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			case ZGInt8:
 				if (qualifier == ZGSigned)
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%i", *((int8_t *)value)]];
+					[self setStringValue:[NSString stringWithFormat:@"%d", *((int8_t *)value)]];
 				}
 				else
 				{
@@ -293,7 +293,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			case ZGInt16:
 				if (qualifier == ZGSigned)
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%i", *((int16_t *)value)]];
+					[self setStringValue:[NSString stringWithFormat:@"%d", *((int16_t *)value)]];
 				}
 				else
 				{
@@ -303,7 +303,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			case ZGInt32:
 				if (qualifier == ZGSigned)
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%i", *((int32_t *)value)]];
+					[self setStringValue:[NSString stringWithFormat:@"%d", *((int32_t *)value)]];
 				}
 				else
 				{

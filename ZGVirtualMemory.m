@@ -123,7 +123,7 @@ void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStarti
 	{
 		ZGMemoryAddress endAddress = currentStartingAddress + [currentData length];
 		(*fileNumber)++;
-		[currentData writeToFile:[directory stringByAppendingPathComponent:[NSString stringWithFormat:@"(%i) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
+		[currentData writeToFile:[directory stringByAppendingPathComponent:[NSString stringWithFormat:@"(%d) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
 					  atomically:NO];
 		
 		if (mergedFile)
