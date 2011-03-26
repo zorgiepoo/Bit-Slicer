@@ -473,8 +473,8 @@ ZGMemorySize ZGGetStringSize(pid_t process, ZGMemoryAddress address, ZGVariableT
 					{
 						if ((dataType == ZGUTF8String && *((char *)theByte) == 0) || (dataType == ZGUTF16String && *((unichar *)theByte) == 0))
 						{
-							// Only count the null terminator for a UTF-8 string.
-							if (dataType == ZGUTF8String)
+							// Only count the null terminator for a UTF-8 string, as long as the string has some length
+							if (totalSize && dataType == ZGUTF8String)
 							{
 								totalSize += characterSize;
 							}
