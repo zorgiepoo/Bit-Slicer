@@ -1577,7 +1577,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									<object class="NSButtonCell" key="NSCell" id="589174248">
 										<int key="NSCellFlags">604110336</int>
 										<int key="NSCellFlags2">131072</int>
-										<string key="NSContents">Exact Length</string>
+										<string key="NSContents">Exact String Length</string>
 										<reference key="NSSupport" ref="424891046"/>
 										<reference key="NSControlView" ref="882116604"/>
 										<int key="NSButtonFlags">1211912703</int>
@@ -1600,7 +1600,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									<object class="NSButtonCell" key="NSCell" id="490671326">
 										<int key="NSCellFlags">604110336</int>
 										<int key="NSCellFlags2">131072</int>
-										<string key="NSContents">Ignore Case</string>
+										<string key="NSContents">Ignore String Case</string>
 										<reference key="NSSupport" ref="26"/>
 										<reference key="NSControlView" ref="479416978"/>
 										<int key="NSButtonFlags">1211912703</int>
