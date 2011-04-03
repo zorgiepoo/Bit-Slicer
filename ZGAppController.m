@@ -198,4 +198,10 @@ static BOOL didRegisteredHotKey = NO;
 	[preferencesController showWindow:nil];
 }
 
+#define FAQ_URL @"http://forum.portingteam.com/viewtopic.php?f=245&t=6914"
+- (IBAction)help:(id)sender
+{
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:FAQ_URL]];
+}
+
 @end

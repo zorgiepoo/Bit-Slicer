@@ -33,5 +33,6 @@
 - (void)authenticateWithURL:(NSURL *)url;
 + (void)registerPauseAndUnpauseHotKey;
 - (IBAction)openPreferences:(id)sender;
+- (IBAction)help:(id)sender;
 
 @end
