@@ -1592,8 +1592,14 @@ static NSSize *expandedWindowMinSize = nil;
 		NSString *calculatedBeginAddress = [ZGCalculator evaluateExpression:[beginningAddressTextField stringValue]];
 		NSString *calculatedEndAddress = [ZGCalculator evaluateExpression:[endingAddressTextField stringValue]];
 		
-		if (![calculatedBeginAddress isEqualToString:@""])
+		if (![[beginningAddressTextField stringValue] isEqualToString:@""])
 		{
+			if ([self testSearchComponent:calculatedBeginAddress])
+			{
+				NSRunAlertPanel(@"Invalid Input", @"The expression in the beginning address field is not valid.", nil, nil, nil, nil);
+				return;
+			}
+			
 			searchArguments.beginAddress = [self memoryAddressFromExpression:calculatedBeginAddress];
 			searchArguments.beginAddressExists = YES;
 		}
@@ -1602,8 +1608,14 @@ static NSSize *expandedWindowMinSize = nil;
 			searchArguments.beginAddressExists = NO;
 		}
 		
-		if (![calculatedEndAddress isEqualToString:@""])
+		if (![[endingAddressTextField stringValue] isEqualToString:@""])
 		{
+			if ([self testSearchComponent:calculatedEndAddress])
+			{
+				NSRunAlertPanel(@"Invalid Input", @"The expression in the ending address field is not valid.", nil, nil, nil, nil);
+				return;
+			}
+			
 			searchArguments.endAddress = [self memoryAddressFromExpression:calculatedEndAddress];
 			searchArguments.endAddressExists = YES;
 		}
