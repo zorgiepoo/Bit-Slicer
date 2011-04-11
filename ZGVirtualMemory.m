@@ -351,7 +351,8 @@ void ZGSearchForSavedData(pid_t process, BOOL is64Bit, ZGMemorySize dataSize, ZG
 	ZGInitializeSearch(searchData);
 	
 	// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
-	ZGMemorySize dataAlignment = (!is64Bit && dataSize == 8) ? 4 : dataSize;
+	//ZGMemorySize dataAlignment = (!is64Bit && dataSize == 8) ? 4 : dataSize;
+	ZGMemorySize dataAlignment = 1;
 	
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
@@ -399,7 +400,8 @@ void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, ZGMem
 	
 	// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
 	// except for strings, which always operate on one byte boundaries
-	ZGMemorySize dataAlignment = (dataType == ZGUTF8String || dataType == ZGUTF16String) ? 1 : (!is64Bit && dataSize == 8 ? 4 : dataSize);
+	//ZGMemorySize dataAlignment = (dataType == ZGUTF8String || dataType == ZGUTF16String) ? 1 : (!is64Bit && dataSize == 8 ? 4 : dataSize);
+	ZGMemorySize dataAlignment = 1;
 	
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
