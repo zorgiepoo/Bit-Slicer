@@ -837,6 +837,7 @@ static NSSize *expandedWindowMinSize = nil;
 		if (!expandedWindowMinSize)
 		{
 			NSLog(@"optionsDisclosureButton: Not enough memory");
+			return;
 		}
 		
 		*expandedWindowMinSize = [watchWindow minSize];
