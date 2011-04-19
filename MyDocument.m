@@ -519,6 +519,7 @@
 	[searchButton setKeyEquivalent:@"\e"];
 	[compareInitialValuesCheckBox setEnabled:NO];
 	[scanReadOnlyValuesCheckBox setEnabled:NO];
+	[ignoreDataAlignmentCheckBox setEnabled:NO];
 	[ignoreCaseCheckBox setEnabled:NO];
 	[includeNullTerminatorCheckBox setEnabled:NO];
 	[beginningAddressTextField setEnabled:NO];
@@ -552,6 +553,7 @@
 	[functionPopUpButton setEnabled:YES];
 	
 	[scanReadOnlyValuesCheckBox setEnabled:YES];
+	[ignoreDataAlignmentCheckBox setEnabled:YES];
 	
 	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
 	if (dataType == ZGUTF8String || dataType == ZGUTF16String)
