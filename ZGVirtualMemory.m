@@ -346,14 +346,14 @@ BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData)
 	return searchData->searchDidCancel;
 }
 
-ZGMemorySize ZGDataAlignment(BOOL is64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
+ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
 {
 	ZGMemorySize dataAlignment = 1;
 	
 	if (dataType != ZGUTF8String && dataType != ZGUTF16String)
 	{
 		// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
-		dataAlignment = (!is64Bit && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
+		dataAlignment = (!isProcess64Bit && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
 	}
 	
 	return dataAlignment;
@@ -403,7 +403,7 @@ void ZGSearchForSavedData(pid_t process, ZGMemorySize dataAlignment, ZGMemorySiz
 	}
 }
 
-void ZGSearchForData(pid_t process, ZGMemorySize dataAlignment, ZGVariableType dataType, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
+void ZGSearchForData(pid_t process, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
 	

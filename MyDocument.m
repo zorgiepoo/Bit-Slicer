@@ -1710,14 +1710,16 @@ static NSSize *expandedWindowMinSize = nil;
 			};
 			dispatch_block_t searchForDataBlock = ^
 			{
+				ZGMemorySize dataAlignment = ([ignoreDataAlignmentCheckBox state] == NSOnState) ? 1 : ZGDataAlignment(currentProcess->is64Bit, dataType, dataSize);
+				
 				if (searchArguments.isImplicit)
 				{
-					ZGSearchForSavedData([currentProcess processID], currentProcess->is64Bit, dataSize, searchData, searchForDataCallback);
+					ZGSearchForSavedData([currentProcess processID], dataAlignment, dataSize, searchData, searchForDataCallback);
 				}
 				else
 				{
 					searchData->scanReadOnly = ([scanReadOnlyValuesCheckBox state] == NSOnState);
-					ZGSearchForData([currentProcess processID], currentProcess->is64Bit, dataType, dataSize, searchData, searchForDataCallback);
+					ZGSearchForData([currentProcess processID], dataAlignment, dataSize, searchData, searchForDataCallback);
 				}
 				dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
 			};
