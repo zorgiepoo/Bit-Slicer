@@ -56,6 +56,7 @@
 	IBOutlet NSTextField			*endingAddressLabel;
 	IBOutlet NSTextField			*endingAddressTextField;
 	IBOutlet NSButton				*scanReadOnlyValuesCheckBox;
+	IBOutlet NSButton				*ignoreDataAlignmentCheckBox;
 	IBOutlet NSButton				*ignoreCaseCheckBox;
 	IBOutlet NSButton				*includeNullTerminatorCheckBox;
 	IBOutlet NSWindow				*watchWindow;

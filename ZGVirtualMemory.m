@@ -346,13 +346,22 @@ BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData)
 	return searchData->searchDidCancel;
 }
 
-void ZGSearchForSavedData(pid_t process, BOOL is64Bit, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
+ZGMemorySize ZGDataAlignment(BOOL is64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
+{
+	ZGMemorySize dataAlignment = 1;
+	
+	if (dataType != ZGUTF8String && dataType != ZGUTF16String)
+	{
+		// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
+		dataAlignment = (!is64Bit && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
+	}
+	
+	return dataAlignment;
+}
+
+void ZGSearchForSavedData(pid_t process, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
-	
-	// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
-	//ZGMemorySize dataAlignment = (!is64Bit && dataSize == 8) ? 4 : dataSize;
-	ZGMemorySize dataAlignment = 1;
 	
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
@@ -394,14 +403,9 @@ void ZGSearchForSavedData(pid_t process, BOOL is64Bit, ZGMemorySize dataSize, ZG
 	}
 }
 
-void ZGSearchForData(pid_t process, BOOL is64Bit, ZGVariableType dataType, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
+void ZGSearchForData(pid_t process, ZGMemorySize dataAlignment, ZGVariableType dataType, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
-	
-	// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
-	// except for strings, which always operate on one byte boundaries
-	//ZGMemorySize dataAlignment = (dataType == ZGUTF8String || dataType == ZGUTF16String) ? 1 : (!is64Bit && dataSize == 8 ? 4 : dataSize);
-	ZGMemorySize dataAlignment = 1;
 	
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
