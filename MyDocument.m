@@ -922,6 +922,8 @@ static NSSize *expandedWindowMinSize = nil;
 		[includeNullTerminatorCheckBox setState:NSOffState];
 	}
 	
+	[ignoreDataAlignmentCheckBox setEnabled:(newTag != ZGUTF8String && newTag != ZGInt8)];
+	
 	[self updateFlags];
 
 	[[self undoManager] setActionName:@"Data Type Change"];
