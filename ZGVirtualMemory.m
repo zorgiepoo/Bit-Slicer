@@ -348,11 +348,19 @@ BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData)
 
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
 {
-	ZGMemorySize dataAlignment = 1;
+	ZGMemorySize dataAlignment;
 	
-	if (dataType != ZGUTF8String && dataType != ZGUTF16String)
+	if (dataType == ZGUTF8String)
 	{
-		// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while everything else is on its own size of boundary
+		dataAlignment = sizeof(int8_t);
+	}
+	else if (dataType == ZGUTF16String)
+	{
+		dataAlignment = sizeof(int16_t);
+	}
+	else
+	{
+		// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while every other integral type is on its own size of boundary
 		dataAlignment = (!isProcess64Bit && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
 	}
 	
