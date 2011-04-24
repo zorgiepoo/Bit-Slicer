@@ -54,55 +54,6 @@
 	return newExpression;
 }
 
-// Only works with simple expressions where there are only numbers, spaces, +, and -, but it's much faster than
-// what evaluateExpression: does
-+ (NSString *)evaluateBasicExpression:(NSString *)anExpression
-{
-	NSMutableString *expression = [NSMutableString stringWithString:anExpression];
-	[expression replaceOccurrencesOfString:@" "
-								withString:@""
-								   options:NSLiteralSearch
-									 range:NSMakeRange(0, [expression length])];
-	unsigned long long accumulator = 0;
-	char operator = 0;
-	NSUInteger characterIndex;
-	NSUInteger numberIndex = 0;
-	for (characterIndex = 0; characterIndex < [expression length]; characterIndex++)
-	{
-		if ([expression characterAtIndex:characterIndex] == '+' || [expression characterAtIndex:characterIndex] == '-' || characterIndex == [expression length] - 1)
-		{
-			NSString *number = [expression substringWithRange:NSMakeRange(numberIndex, (characterIndex == [expression length] - 1) ? (characterIndex + 1 - numberIndex) : (characterIndex - numberIndex))];
-			unsigned long long value;
-			if ([number isHexRepresentation])
-			{
-				[[NSScanner scannerWithString:number] scanHexLongLong:&value];
-			}
-			else
-			{
-				[[NSScanner scannerWithString:number] scanLongLong:(long long *)&value];
-			}
-			
-			if (numberIndex == 0)
-			{
-				accumulator = value;
-			}
-			else if (operator == '+')
-			{
-				accumulator += value;
-			}
-			else if (operator == '-')
-			{
-				accumulator -= value;
-			}
-			
-			numberIndex = characterIndex + 1;
-			operator = [expression characterAtIndex:characterIndex];
-		}
-	}
-	
-	return [NSString stringWithFormat:@"%llu", accumulator];
-}
-
 // Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
 + (NSString *)evaluateAddress:(NSMutableString *)addressFormula
 					  process:(ZGProcess *)process
@@ -175,7 +126,7 @@
 				else
 				{
 					// just a plain simple expression
-					addressFormula = [NSMutableString stringWithString:[ZGCalculator evaluateBasicExpression:addressFormula]];
+					addressFormula = [NSMutableString stringWithString:[[self class] evaluateExpression:addressFormula]];
 				}
 				
 				firstOpenBracket = -1;
@@ -188,7 +139,7 @@
 		}
 	}
 	
-	return [ZGCalculator evaluateBasicExpression:addressFormula];
+	return [[self class] evaluateExpression:addressFormula];
 }
 
 @end

@@ -27,7 +27,6 @@
 
 + (void)initializeCalculator;
 + (NSString *)evaluateExpression:(NSString *)expression;
-+ (NSString *)evaluateBasicExpression:(NSString *)anExpression;
 + (NSString *)evaluateAddress:(NSMutableString *)addressFormula
 					  process:(ZGProcess *)process;
 
