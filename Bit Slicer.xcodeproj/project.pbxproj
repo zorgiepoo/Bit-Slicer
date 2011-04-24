@@ -19,7 +19,7 @@
 		775FCB2A11719E4A000054FB /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 775FCB2811719E4A000054FB /* Preferences.xib */; };
 		775FCB3611719F95000054FB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB3511719F95000054FB /* Security.framework */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
-		775FD70B1224B66F004425EA /* calc in Resources */ = {isa = PBXBuildFile; fileRef = 775FD7081224B66F004425EA /* calc */; };
+		778BA6611363E972008ACD6B /* Ruby.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 778BA6601363E972008ACD6B /* Ruby.framework */; };
 		77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 77A8689711FA95730062EEAE /* bitslicericon.icns */; };
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
 		77D037371224334E0083E057 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D037361224334E0083E057 /* ZGCalculator.m */; };
@@ -59,8 +59,8 @@
 		775FCB2911719E4A000054FB /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/Preferences.xib; sourceTree = "<group>"; };
 		775FCB3511719F95000054FB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
-		775FD7081224B66F004425EA /* calc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = calc; sourceTree = "<group>"; };
 		778939221334308300B6AACB /* ZGMemoryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryTypes.h; sourceTree = "<group>"; };
+		778BA6601363E972008ACD6B /* Ruby.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ruby.framework; path = System/Library/Frameworks/Ruby.framework; sourceTree = SDKROOT; };
 		77A8689711FA95730062EEAE /* bitslicericon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = bitslicericon.icns; sourceTree = "<group>"; };
 		77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGComparisonFunctions.h; sourceTree = "<group>"; };
 		77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGComparisonFunctions.m; sourceTree = "<group>"; };
@@ -81,6 +81,7 @@
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 				775FCB3611719F95000054FB /* Security.framework in Frameworks */,
 				775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */,
+				778BA6611363E972008ACD6B /* Ruby.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +91,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				778BA6601363E972008ACD6B /* Ruby.framework */,
 				775FCB4111719FAF000054FB /* Carbon.framework */,
 				775FCB3511719F95000054FB /* Security.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
@@ -118,7 +120,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* Bit Slicer */ = {
 			isa = PBXGroup;
 			children = (
-				2A37F4ABFDCFA73011CA2CEA /* Classes */,
+				2A37F4ABFDCFA73011CA2CEA /* Code */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
@@ -127,7 +129,7 @@
 			name = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		2A37F4ABFDCFA73011CA2CEA /* Classes */ = {
+		2A37F4ABFDCFA73011CA2CEA /* Code */ = {
 			isa = PBXGroup;
 			children = (
 				775FCB1011719DF6000054FB /* ZGAppController.h */,
@@ -155,7 +157,7 @@
 				77FC461E12237F71003CB09B /* NSStringAdditions.h */,
 				77FC461F12237F71003CB09B /* NSStringAdditions.m */,
 			);
-			name = Classes;
+			name = Code;
 			sourceTree = "<group>";
 		};
 		2A37F4AFFDCFA73011CA2CEA /* Other Sources */ = {
@@ -170,7 +172,6 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				775FD7081224B66F004425EA /* calc */,
 				77A8689711FA95730062EEAE /* bitslicericon.icns */,
 				8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
@@ -245,7 +246,6 @@
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
 				775FCB2A11719E4A000054FB /* Preferences.xib in Resources */,
 				77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */,
-				775FD70B1224B66F004425EA /* calc in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

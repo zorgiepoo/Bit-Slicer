@@ -23,6 +23,7 @@
 #import <Security/AuthorizationTags.h>
 #import "ZGPreferencesController.h"
 #import "ZGProcess.h"
+#import "ZGCalculator.h"
 
 @implementation ZGAppController
 
@@ -169,6 +170,7 @@ static BOOL didRegisteredHotKey = NO;
 	}
 	
 	[ZGAppController registerPauseAndUnpauseHotKey];
+	[ZGCalculator initializeCalculator];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification

@@ -24,53 +24,34 @@
 #import "ZGProcess.h"
 #import <unistd.h>
 
+#import <Ruby/ruby.h>
+
 @implementation ZGCalculator
+
++ (void)initializeCalculator
+{
+	ruby_init();
+	ruby_init_loadpath();
+}
 
 + (NSString *)evaluateExpression:(NSString *)expression
 {
-#ifndef _DEBUG
-	NSString *newExpression = nil;
+	NSString *newExpression = expression;
 	
-	@try
+	int resultState;
+	VALUE result = rb_funcall(rb_eval_string_protect([expression UTF8String], &resultState), rb_intern("to_s"), 0);
+	if (resultState != 0)
 	{
-		if ([[NSFileManager defaultManager] fileExistsAtPath:CALC_PATH])
-		{
-			NSTask *task = [[NSTask alloc] init];
-			
-			[task setLaunchPath:CALC_PATH];
-			[task setArguments:[NSArray arrayWithObjects:@"--", [NSString stringWithFormat:@"%@", expression], nil]];
-			
-			NSPipe *outputPipe = [NSPipe pipe];
-			[task setStandardOutput:outputPipe];
-			
-			[task launch];
-			[task waitUntilExit];
-			
-			NSString *dataString = [[NSString alloc] initWithData:[[outputPipe fileHandleForReading] readDataToEndOfFile]
-														 encoding:NSUTF8StringEncoding];
-			
-			newExpression = [dataString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-			[dataString release];
-			
-			if ([newExpression length] > 1 && [newExpression characterAtIndex:0] == '~')
-			{
-				// This is an approximation, just cut the character off..
-				newExpression = [newExpression substringFromIndex:1];
-			}
-		}
-	}
-	@catch (NSException *exception)
-	{
-		NSLog(@"Calculator is broken: (%@) %@", [exception name], [exception reason]);
+		// Ruby failed to evaluate the expression
 		newExpression = nil;
 	}
+	else if (result != Qnil && TYPE(result) == T_STRING)
+	{
+		newExpression = [NSString stringWithCString:((struct RString *)result)->ptr
+										   encoding:NSUTF8StringEncoding];
+	}
 	
-	return (newExpression == nil ? expression : newExpression);
-#else
-	// The calculator will not run in debug mode if one process is still open for receiving input
-	// so I'll do this instead..
-	return expression;
-#endif
+	return newExpression;
 }
 
 // Only works with simple expressions where there are only numbers, spaces, +, and -, but it's much faster than
