@@ -38,17 +38,15 @@
 {
 	NSString *newExpression = expression;
 	
-	int resultState;
-	VALUE result = rb_funcall(rb_eval_string_protect([expression UTF8String], &resultState), rb_intern("to_s"), 0);
-	if (resultState != 0)
+	if (expression)
 	{
-		// Ruby failed to evaluate the expression
-		newExpression = nil;
-	}
-	else if (result != Qnil && TYPE(result) == T_STRING)
-	{
-		newExpression = [NSString stringWithCString:((struct RString *)result)->ptr
-										   encoding:NSUTF8StringEncoding];
+		int resultState;
+		VALUE result = rb_funcall(rb_eval_string_protect([expression UTF8String], &resultState), rb_intern("to_s"), 0);
+		if (resultState == 0 && result != Qnil && TYPE(result) == T_STRING)
+		{
+			newExpression = [NSString stringWithCString:((struct RString *)result)->ptr
+											   encoding:NSUTF8StringEncoding];
+		}
 	}
 	
 	return newExpression;
