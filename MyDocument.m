@@ -553,9 +553,14 @@
 	[functionPopUpButton setEnabled:YES];
 	
 	[scanReadOnlyValuesCheckBox setEnabled:YES];
-	[ignoreDataAlignmentCheckBox setEnabled:YES];
 	
 	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
+	
+	if (dataType != ZGUTF8String && dataType != ZGInt8)
+	{
+		[ignoreDataAlignmentCheckBox setEnabled:YES];
+	}
+	
 	if (dataType == ZGUTF8String || dataType == ZGUTF16String)
 	{
 		[ignoreCaseCheckBox setEnabled:YES];
