@@ -65,7 +65,6 @@
 	ZGProcess						*currentProcess;
 	NSString						*desiredProcessName;
 	ZGTimer							*watchVariablesTimer;
-	ZGTimer							*checkChildProcessesTimer;
 	ZGTimer							*updateSearchUserInterfaceTimer;
 	BOOL							shouldIgnoreTableViewSelectionChange;
 	ZGVariableType					currentSearchDataType;

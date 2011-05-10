@@ -22,10 +22,15 @@
 #import <Carbon/Carbon.h>
 @class ZGPreferencesController;
 
+#define ZGProcessLaunched    @"ZGProcessLaunched"
+#define ZGProcessTerminated  @"ZGProcessTerminated"
+#define ZGRunningApplication @"ZGRunningApplication"
+
 @interface ZGAppController : NSObject
 {
 	BOOL applicationIsAuthenticated;
 	ZGPreferencesController *preferencesController;
+	NSArray *runningApplications; 
 }
 
 @property (readonly) BOOL applicationIsAuthenticated;

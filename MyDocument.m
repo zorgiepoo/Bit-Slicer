@@ -65,7 +65,7 @@
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
-#define CHECK_CHILD_PROCESSES_TIME_INTERVAL	2.0
+#define CHECK_PROCESSES_TIME_INTERVAL	0.5
 
 #define ZG_EXPAND_OPTIONS @"ZG_EXPAND_OPTIONS"
 
@@ -84,15 +84,6 @@
     self = [super init];
     if (self)
 	{
-		[[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
-															   selector:@selector(anotherApplicationLaunched:)
-																   name:NSWorkspaceWillLaunchApplicationNotification
-																 object:nil];
-		[[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
-															   selector:@selector(anotherApplicationTerminated:)
-																   name:NSWorkspaceDidTerminateApplicationNotification
-																 object:nil];
-		
 		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &collator);
 		
 		searchData = [[ZGSearchData alloc] init];
@@ -108,11 +99,7 @@
 
 - (void)dealloc
 {
-	[[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
-	
-	[checkChildProcessesTimer invalidate];
-	[checkChildProcessesTimer release];
-	checkChildProcessesTimer = nil;
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[watchVariablesTimer invalidate];
 	[watchVariablesTimer release];
@@ -182,9 +169,15 @@
 	
 	[self updateRunningApplicationProcesses];
 	
-	checkChildProcessesTimer = [[ZGTimer alloc] initWithTimeInterval:CHECK_CHILD_PROCESSES_TIME_INTERVAL
-															  target:self
-															selector:@selector(checkChildProcesses:)];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(anApplicationLaunched:)
+												 name:ZGProcessLaunched
+											   object:nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(anApplicationTerminated:)
+												 name:ZGProcessTerminated
+											   object:nil];
 	
 	currentSearchDataType = [[dataTypesPopUpButton selectedItem] tag];
 	
@@ -406,8 +399,9 @@
 	}
 }
 
-- (void)anApplicationLaunched:(NSRunningApplication *)runningApplication
+- (void)anApplicationLaunched:(NSNotification *)notification
 {
+	NSRunningApplication *runningApplication = [[notification userInfo] objectForKey:ZGRunningApplication];
 	if ([currentProcess processID] == NON_EXISTENT_PID_NUMBER && [[runningApplication localizedName] isEqualToString:[currentProcess name]])
 	{
 		[currentProcess	setProcessID:[runningApplication processIdentifier]];
@@ -424,13 +418,9 @@
 	}
 }
 
-- (void)anotherApplicationLaunched:(NSNotification *)notification
+- (void)anApplicationTerminated:(NSNotification *)notification
 {
-	[self anApplicationLaunched:[[notification userInfo] objectForKey:@"NSWorkspaceApplicationKey"]];
-}
-
-- (void)anApplicationTerminated:(NSRunningApplication *)runningApplication
-{
+	NSRunningApplication *runningApplication = [[notification userInfo] objectForKey:ZGRunningApplication];
 	[ZGProcess removeFrozenProcess:[runningApplication processIdentifier]];
 	
 	if (([clearButton isEnabled] || [[searchButton title] isEqualToString:@"Cancel"]) && [[runningApplication localizedName] isEqualToString:[currentProcess name]])
@@ -450,50 +440,6 @@
 	{
 		[self updateRunningApplicationProcesses];
 	}
-}
-
-- (void)anotherApplicationTerminated:(NSNotification *)notification
-{
-	[self anApplicationTerminated:[[notification userInfo] objectForKey:@"NSWorkspaceApplicationKey"]];
-}
-
-- (void)checkChildProcesses:(NSTimer *)timer
-{
-	if (![[self windowForSheet] isVisible])
-	{
-		return;
-	}
-	
-	// So basically, NSWorkspace's methods for notifying us of processes terminating and launching,
-	// don't notify us of processes that main applications spawn
-	// So we check every few seconds if any new child-spawned application spawns
-	// In my experience, an example of this is with Chrome processes
-	
-	NSArray *newRunningApplications = [[NSWorkspace sharedWorkspace] runningApplications];
-	
-	if ([runningApplications count] > 0)
-	{
-		for (NSRunningApplication *runningApplication in newRunningApplications)
-		{
-			// Check if a process spawned
-			if ([runningApplication activationPolicy] != NSApplicationActivationPolicyRegular && ![runningApplications containsObject:runningApplication])
-			{
-				[self anApplicationLaunched:runningApplication];
-			}
-		}
-	}
-	
-	for (NSRunningApplication *runningApplication in runningApplications)
-	{
-		// Check if a process terminated
-		if ([runningApplication activationPolicy] != NSApplicationActivationPolicyRegular && ![newRunningApplications containsObject:runningApplication])
-		{
-			[self anApplicationTerminated:runningApplication];
-		}
-	}
-	
-	[runningApplications release];
-	runningApplications = [newRunningApplications retain];
 }
 
 #pragma mark Updating user interface

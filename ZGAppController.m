@@ -29,6 +29,8 @@
 
 @synthesize applicationIsAuthenticated;
 
+#pragma mark Authenticating
+
 void authMe(const char * FullPathToMe, NSURL *url)
 {
 	// get authorization as root
@@ -121,6 +123,8 @@ BOOL amIWorthy(void)
 	}
 }
 
+#pragma mark Pausing and Unpausing processes
+
 OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef theEvent, void *userData)
 {
 	for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
@@ -162,17 +166,6 @@ static BOOL didRegisteredHotKey = NO;
 	}
 }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)notification
-{
-	if (!applicationIsAuthenticated)
-	{
-		[self authenticateWithURL:nil];
-	}
-	
-	[ZGAppController registerPauseAndUnpauseHotKey];
-	[ZGCalculator initializeCalculator];
-}
-
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
 	// Make sure that we unfreeze all processes that we may have frozen
@@ -185,10 +178,32 @@ static BOOL didRegisteredHotKey = NO;
 	}
 }
 
+#pragma mark Controller behavior
+
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
 	return amIWorthy();
 }
+
+#define CHECK_PROCESSES_TIME_INTERVAL 0.5
+- (void)applicationDidFinishLaunching:(NSNotification *)notification
+{
+	if (!applicationIsAuthenticated)
+	{
+		[self authenticateWithURL:nil];
+	}
+	
+	[ZGAppController registerPauseAndUnpauseHotKey];
+	[ZGCalculator initializeCalculator];
+	
+	[NSTimer scheduledTimerWithTimeInterval:CHECK_PROCESSES_TIME_INTERVAL
+									 target:self
+								   selector:@selector(checkProcesses:)
+								   userInfo:nil
+									repeats:YES];
+}
+
+#pragma mark Actions
 
 - (IBAction)openPreferences:(id)sender
 {
@@ -204,6 +219,51 @@ static BOOL didRegisteredHotKey = NO;
 - (IBAction)help:(id)sender
 {
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:FAQ_URL]];
+}
+
+#pragma mark Watching processes
+
+- (void)checkProcesses:(NSTimer *)timer
+{
+	// So basically, NSWorkspace's methods for notifying us of processes terminating and launching,
+	// don't notify us of processes that main applications spawn
+	// So we check every few seconds if any new process spawns
+	// In my experience, an example of this is with Chrome processes
+	
+	NSArray *newRunningApplications = [[NSWorkspace sharedWorkspace] runningApplications];
+	BOOL anApplicationLaunchedOrTerminated = NO;
+	
+	for (NSRunningApplication *runningApplication in newRunningApplications)
+	{
+		// Check if a process spawned
+		if (![runningApplications containsObject:runningApplication])
+		{
+			[[NSNotificationCenter defaultCenter] postNotificationName:ZGProcessLaunched
+																object:self
+															  userInfo:[NSDictionary dictionaryWithObject:runningApplication
+																								   forKey:ZGRunningApplication]];
+			anApplicationLaunchedOrTerminated = YES;
+		}
+	}
+	
+	for (NSRunningApplication *runningApplication in runningApplications)
+	{
+		// Check if a process terminated
+		if (![newRunningApplications containsObject:runningApplication])
+		{
+			[[NSNotificationCenter defaultCenter] postNotificationName:ZGProcessTerminated
+																object:self
+															  userInfo:[NSDictionary dictionaryWithObject:runningApplication
+																								   forKey:ZGRunningApplication]];
+			anApplicationLaunchedOrTerminated = YES;
+		}
+	}
+	
+	if (anApplicationLaunchedOrTerminated)
+	{
+		[runningApplications release];
+		runningApplications = [newRunningApplications retain];
+	}
 }
 
 @end
