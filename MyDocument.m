@@ -134,9 +134,6 @@
 	[watchVariablesArray release];
 	watchVariablesArray = nil;
 	
-	[runningApplications release];
-	runningApplications = nil;
-	
 	[currentProcess release];
 	currentProcess = nil;
 	

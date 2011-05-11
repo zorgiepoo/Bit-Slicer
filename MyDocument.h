@@ -61,7 +61,6 @@
 	IBOutlet NSButton				*includeNullTerminatorCheckBox;
 	IBOutlet NSWindow				*watchWindow;
 	NSArray							*watchVariablesArray;
-	NSArray							*runningApplications;
 	ZGProcess						*currentProcess;
 	NSString						*desiredProcessName;
 	ZGTimer							*watchVariablesTimer;
