@@ -33,21 +33,21 @@
 	BOOL isDoingMemoryDump;
 	BOOL isStoringAllData;
 	
-	int processID;
+	pid_t processID;
 	BOOL is64Bit;
 }
 
 + (NSArray *)frozenProcesses;
-+ (void)addFrozenProcess:(int)pid;
-+ (void)removeFrozenProcess:(int)pid;
-+ (void)pauseOrUnpauseProcess:(int)pid;
++ (void)addFrozenProcess:(pid_t)pid;
++ (void)removeFrozenProcess:(pid_t)pid;
++ (void)pauseOrUnpauseProcess:(pid_t)pid;
 
 - (id)initWithName:(NSString *)processName
-		 processID:(int)aProcessID
+		 processID:(pid_t)aProcessID
 		  set64Bit:(BOOL)flag64Bit;
 - (BOOL)grantUsAccess;
 
-@property (assign) int processID;
+@property (assign) pid_t processID;
 @property (copy) NSString *name;
 @property (readonly) int numberOfRegions;
 

@@ -39,14 +39,14 @@ static NSArray *frozenProcesses = nil;
 	return frozenProcesses;
 }
 
-+ (void)addFrozenProcess:(int)pid
++ (void)addFrozenProcess:(pid_t)pid
 {
 	NSArray *oldFrozenProcesses = frozenProcesses;
 	frozenProcesses = [[frozenProcesses arrayByAddingObject:[NSNumber numberWithInt:pid]] retain];
 	[oldFrozenProcesses release];
 }
 
-+ (void)removeFrozenProcess:(int)pid
++ (void)removeFrozenProcess:(pid_t)pid
 {
 	NSMutableArray *mutableArray = [[NSMutableArray alloc] init];
 	
@@ -63,7 +63,7 @@ static NSArray *frozenProcesses = nil;
 	[mutableArray release];
 }
 
-+ (void)pauseOrUnpauseProcess:(int)pid
++ (void)pauseOrUnpauseProcess:(pid_t)pid
 {
 	BOOL success;
 	
@@ -90,7 +90,7 @@ static NSArray *frozenProcesses = nil;
 }
 
 - (id)initWithName:(NSString *)processName
-		 processID:(int)aProcessID
+		 processID:(pid_t)aProcessID
 		  set64Bit:(BOOL)flag64Bit
 {
 	if ((self = [super init]))
