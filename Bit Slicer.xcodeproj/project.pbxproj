@@ -31,6 +31,7 @@
 		77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 77A8689711FA95730062EEAE /* bitslicericon.icns */; };
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
 		77D037371224334E0083E057 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D037361224334E0083E057 /* ZGCalculator.m */; };
+		77D5AEB5137C84D300026388 /* ZGVerticalScrollerRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */; };
 		77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FC461F12237F71003CB09B /* NSStringAdditions.m */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC310486D014006FF6A4 /* MyDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* MyDocument.m */; settings = {ATTRIBUTES = (); }; };
@@ -101,6 +102,8 @@
 		77CB9772121CDCB8000A91DE /* ZGSearching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGSearching.h; sourceTree = "<group>"; };
 		77D037351224334E0083E057 /* ZGCalculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGCalculator.h; sourceTree = "<group>"; };
 		77D037361224334E0083E057 /* ZGCalculator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGCalculator.m; sourceTree = "<group>"; };
+		77D5AEB3137C84CE00026388 /* ZGVerticalScrollerRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVerticalScrollerRepresenter.h; sourceTree = "<group>"; };
+		77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVerticalScrollerRepresenter.m; sourceTree = "<group>"; };
 		77FC461E12237F71003CB09B /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringAdditions.h; sourceTree = "<group>"; };
 		77FC461F12237F71003CB09B /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSStringAdditions.m; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bit_Slicer-Info.plist"; sourceTree = "<group>"; };
@@ -236,6 +239,8 @@
 			children = (
 				770EA81F137B6E6D007FB85A /* ZGMemoryViewer.h */,
 				770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */,
+				77D5AEB3137C84CE00026388 /* ZGVerticalScrollerRepresenter.h */,
+				77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */,
 				7787C4D7137BB59100BFF606 /* ZGStatusBarRepresenter.h */,
 				7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */,
 				7787C4F0137C5A8200BFF606 /* ZGLineCountingRepresenter.h */,
@@ -331,6 +336,7 @@
 				7787C4D9137BB59200BFF606 /* ZGStatusBarRepresenter.m in Sources */,
 				7787C4EE137C556000BFF606 /* ZGLineCountingView.m in Sources */,
 				7787C4F2137C5A8300BFF606 /* ZGLineCountingRepresenter.m in Sources */,
+				77D5AEB5137C84D300026388 /* ZGVerticalScrollerRepresenter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -21,6 +21,7 @@
 #import "ZGMemoryViewer.h"
 #import "ZGStatusBarRepresenter.h"
 #import "ZGLineCountingRepresenter.h"
+#import "ZGVerticalScrollerRepresenter.h"
 #import "ZGProcess.h"
 #import "ZGAppController.h"
 #import "ZGDocumentController.h"
@@ -76,6 +77,13 @@
 	lineCountingRepresenter = [[ZGLineCountingRepresenter alloc] init];
 	[lineCountingRepresenter setMinimumDigitCount:DEFAULT_MINIMUM_LINE_DIGIT_COUNT];
 	[lineCountingRepresenter setLineNumberFormat:HFLineNumberFormatHexadecimal];
+	
+	ZGVerticalScrollerRepresenter *verticalScrollerRepresenter = [[ZGVerticalScrollerRepresenter alloc] init];
+	
+	[[textView controller] addRepresenter:verticalScrollerRepresenter];
+	[[textView layoutRepresenter] addRepresenter:verticalScrollerRepresenter];
+	
+	[verticalScrollerRepresenter release];
 	
 	[[textView controller] addRepresenter:lineCountingRepresenter];
 	[[textView layoutRepresenter] addRepresenter:lineCountingRepresenter];

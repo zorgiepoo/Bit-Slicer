@@ -250,7 +250,7 @@
 														<object class="HFRepresenterHexTextView" id="202595774">
 															<reference key="NSNextResponder" ref="130391332"/>
 															<int key="NSvFlags">274</int>
-															<string key="NSFrameSize">{336, 314}</string>
+															<string key="NSFrameSize">{345, 314}</string>
 															<reference key="NSSuperview" ref="130391332"/>
 															<object class="HFHexTextRepresenter" key="HFRepresenter" id="82994331">
 																<object class="HFController" key="HFController" id="1052702862">
@@ -269,7 +269,7 @@
 																					<object class="HFRepresenterStringEncodingTextView" key="HFRepresenterView" id="981899508">
 																						<reference key="NSNextResponder" ref="130391332"/>
 																						<int key="NSvFlags">272</int>
-																						<string key="NSFrame">{{336, 0}, {116, 314}}</string>
+																						<string key="NSFrame">{{345, 0}, {122, 314}}</string>
 																						<reference key="NSSuperview" ref="130391332"/>
 																						<reference key="HFRepresenter" ref="747202516"/>
 																						<object class="NSFont" key="HFFont" id="661351988">
@@ -308,27 +308,13 @@
 																					</object>
 																					<int key="HFStringEncoding">30</int>
 																				</object>
-																				<object class="HFVerticalScrollerRepresenter" id="1034291888">
-																					<reference key="HFController" ref="1052702862"/>
-																					<string key="HFLayoutPosition">{2, 0}</string>
-																					<object class="NSScroller" key="HFRepresenterView" id="694884319">
-																						<reference key="NSNextResponder" ref="130391332"/>
-																						<int key="NSvFlags">272</int>
-																						<string key="NSFrame">{{452, 0}, {15, 314}}</string>
-																						<reference key="NSSuperview" ref="130391332"/>
-																						<reference key="NSTarget" ref="1034291888"/>
-																						<string key="NSAction">scrollerDidChangeValue:</string>
-																						<double key="NSPercent">1</double>
-																					</object>
-																				</object>
 																			</object>
 																			<bool key="HFMaximizesBytesPerLine">YES</bool>
 																		</object>
 																		<reference ref="82994331"/>
 																		<reference ref="747202516"/>
-																		<reference ref="1034291888"/>
 																	</object>
-																	<int key="HFBytesPerLine">18</int>
+																	<int key="HFBytesPerLine">19</int>
 																	<int key="HFBytesPerColumn">1</int>
 																	<reference key="HFFont" ref="661351988"/>
 																	<double key="HFLineHeight">14</double>
@@ -354,7 +340,6 @@
 															<bool key="HFEditable">NO</bool>
 														</object>
 														<reference ref="981899508"/>
-														<reference ref="694884319"/>
 													</object>
 													<string key="NSFrame">{{1, 1}, {467, 314}}</string>
 													<reference key="NSSuperview" ref="979578277"/>
