@@ -279,7 +279,7 @@
 		// So we need to change the current selection accordingly
 		if ((minimumLocation < displayedLocation || minimumLocation >= displayedEndLocation) || (maximumLocation < displayedLocation || maximumLocation >= displayedEndLocation))
 		{
-			[[textView controller] setSelectedContentsRanges:[NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(displayedLocation, 0)]]];
+			[[textView controller] setSelectedContentsRanges:[NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(ceill(displayedLineRange.location) * [[textView controller] bytesPerLine], 0)]]];
 			displayedLineRange = [[textView controller] displayedLineRange];
 		}
 		
