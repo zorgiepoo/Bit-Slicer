@@ -24,10 +24,10 @@
 
 @interface ZGStatusBarRepresenter : HFStatusBarRepresenter
 {
-	ZGMemoryAddress _beginningOffset;
+	ZGMemoryAddress _beginningMemoryAddress;
 }
 
-- (void)setBeginningOffset:(ZGMemoryAddress)offset;
+- (void)setBeginningMemoryAddress:(ZGMemoryAddress)newBeginningMemoryAddress;
 // expose this private method
 - (void)updateString;
 

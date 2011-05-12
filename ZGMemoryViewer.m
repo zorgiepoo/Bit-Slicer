@@ -114,7 +114,7 @@
 	currentMemoryAddress = 0;
 	currentMemorySize = 0;
 	[lineCountingRepresenter setBeginningMemoryAddress:0];
-	[statusBarRepresenter setBeginningOffset:0];
+	[statusBarRepresenter setBeginningMemoryAddress:0];
 	[textView setData:[NSData data]];
 }
 
@@ -227,7 +227,7 @@
 					currentMemoryAddress = memoryAddress;
 					currentMemorySize = memorySize;
 					
-					[statusBarRepresenter setBeginningOffset:currentMemoryAddress];
+					[statusBarRepresenter setBeginningMemoryAddress:currentMemoryAddress];
 					// Select the first byte of data
 					[[statusBarRepresenter controller] setSelectedContentsRanges:[NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(0, 0)]]];
 					// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update

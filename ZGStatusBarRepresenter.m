@@ -36,24 +36,24 @@
 
 @implementation ZGStatusBarRepresenter
 
-- (void)setBeginningOffset:(ZGMemoryAddress)offset
+- (void)setBeginningMemoryAddress:(ZGMemoryAddress)newBeginningMemoryAddress
 {
-	_beginningOffset = offset;
+	_beginningMemoryAddress = newBeginningMemoryAddress;
 }
 
 - (NSString *)stringForEmptySelectionAtOffset:(unsigned long long)offset length:(unsigned long long)length
 {
-    return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningOffset]];
+    return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningMemoryAddress]];
 }
 
 - (NSString *)stringForSingleByteSelectionAtOffset:(unsigned long long)offset length:(unsigned long long)length
 {
-    return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningOffset]];
+    return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningMemoryAddress]];
 }
 
 - (NSString *)stringForSingleRangeSelection:(HFRange)range length:(unsigned long long)length
 {
-    return [NSString stringWithFormat:@"%@ selected at address %@", [self describeLength:range.length], [self describeOffsetExcludingApproximate:range.location + _beginningOffset]];
+    return [NSString stringWithFormat:@"%@ selected at address %@", [self describeLength:range.length], [self describeOffsetExcludingApproximate:range.location + _beginningMemoryAddress]];
 }
 
 - (NSString *)stringForMultipleSelectionsWithLength:(unsigned long long)multipleSelectionLength length:(unsigned long long)length
