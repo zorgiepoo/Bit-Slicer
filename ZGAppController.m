@@ -22,6 +22,7 @@
 #import <SecurityFoundation/SFAuthorization.h>
 #import <Security/AuthorizationTags.h>
 #import "ZGPreferencesController.h"
+#import "ZGMemoryViewer.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 
@@ -213,6 +214,16 @@ static BOOL didRegisteredHotKey = NO;
 	}
 	
 	[preferencesController showWindow:nil];
+}
+
+- (IBAction)openMemoryViewer:(id)sender
+{
+	if (!memoryViewer)
+	{
+		memoryViewer = [[ZGMemoryViewer alloc] init];
+	}
+	
+	[memoryViewer showWindow:nil];
 }
 
 #define FAQ_URL @"http://forum.portingteam.com/viewtopic.php?f=245&t=6914"

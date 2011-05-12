@@ -21,6 +21,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
 @class ZGPreferencesController;
+@class ZGMemoryViewer;
 
 #define ZGProcessLaunched    @"ZGProcessLaunched"
 #define ZGProcessTerminated  @"ZGProcessTerminated"
@@ -30,7 +31,8 @@
 {
 	BOOL applicationIsAuthenticated;
 	ZGPreferencesController *preferencesController;
-	NSArray *runningApplications; 
+	ZGMemoryViewer *memoryViewer;
+	NSArray *runningApplications;
 }
 
 @property (readonly) BOOL applicationIsAuthenticated;
@@ -38,6 +40,7 @@
 - (void)authenticateWithURL:(NSURL *)url;
 + (void)registerPauseAndUnpauseHotKey;
 - (IBAction)openPreferences:(id)sender;
+- (IBAction)openMemoryViewer:(id)sender;
 - (IBAction)help:(id)sender;
 
 @end

@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		1DDD582C0DA1D0D100B32029 /* MyDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* MyDocument.xib */; };
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
+		770EA821137B6E6D007FB85A /* ZGMemoryViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */; };
+		770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770EA822137B6FDE007FB85A /* MemoryViewer.xib */; };
+		770EA826137B74C6007FB85A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 770EA825137B74C6007FB85A /* HexFiend.framework */; };
+		770EA828137B74FB007FB85A /* HexFiend.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 770EA825137B74C6007FB85A /* HexFiend.framework */; };
+		770EA82B137BA8E5007FB85A /* ZGUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA829137BA8E1007FB85A /* ZGUtilities.m */; };
 		7714D3F211B87C7E0028E6B2 /* ZGVirtualMemory.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */; };
 		7720DCD21266711B004467C0 /* ZGTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7720DCD11266711B004467C0 /* ZGTimer.m */; };
 		775FCB1B11719DF6000054FB /* ZGAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1111719DF6000054FB /* ZGAppController.m */; };
@@ -19,6 +24,9 @@
 		775FCB2A11719E4A000054FB /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 775FCB2811719E4A000054FB /* Preferences.xib */; };
 		775FCB3611719F95000054FB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB3511719F95000054FB /* Security.framework */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
+		7787C4D9137BB59200BFF606 /* ZGStatusBarRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */; };
+		7787C4EE137C556000BFF606 /* ZGLineCountingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4ED137C556000BFF606 /* ZGLineCountingView.m */; };
+		7787C4F2137C5A8300BFF606 /* ZGLineCountingRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */; };
 		778BA6611363E972008ACD6B /* Ruby.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 778BA6601363E972008ACD6B /* Ruby.framework */; };
 		77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 77A8689711FA95730062EEAE /* bitslicericon.icns */; };
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
@@ -29,6 +37,19 @@
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		770EA827137B74F2007FB85A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				770EA828137B74FB007FB85A /* HexFiend.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -42,6 +63,12 @@
 		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		770EA81F137B6E6D007FB85A /* ZGMemoryViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryViewer.h; sourceTree = "<group>"; };
+		770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryViewer.m; sourceTree = "<group>"; };
+		770EA823137B6FDE007FB85A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MemoryViewer.xib; sourceTree = "<group>"; };
+		770EA825137B74C6007FB85A /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HexFiend.framework; sourceTree = "<group>"; };
+		770EA829137BA8E1007FB85A /* ZGUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGUtilities.m; sourceTree = "<group>"; };
+		770EA82A137BA8E3007FB85A /* ZGUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGUtilities.h; sourceTree = "<group>"; };
 		7714D3F011B87C7E0028E6B2 /* ZGVirtualMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVirtualMemory.h; sourceTree = "<group>"; };
 		7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVirtualMemory.m; sourceTree = "<group>"; };
 		7720DCD01266711B004467C0 /* ZGTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGTimer.h; sourceTree = "<group>"; };
@@ -59,6 +86,13 @@
 		775FCB2911719E4A000054FB /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/Preferences.xib; sourceTree = "<group>"; };
 		775FCB3511719F95000054FB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		7787C4D7137BB59100BFF606 /* ZGStatusBarRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGStatusBarRepresenter.h; sourceTree = "<group>"; };
+		7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGStatusBarRepresenter.m; sourceTree = "<group>"; };
+		7787C4EC137C555F00BFF606 /* ZGLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGLineCountingView.h; sourceTree = "<group>"; };
+		7787C4ED137C556000BFF606 /* ZGLineCountingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGLineCountingView.m; sourceTree = "<group>"; };
+		7787C4EF137C55C300BFF606 /* HFLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HFLineCountingView.h; sourceTree = "<group>"; };
+		7787C4F0137C5A8200BFF606 /* ZGLineCountingRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGLineCountingRepresenter.h; sourceTree = "<group>"; };
+		7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGLineCountingRepresenter.m; sourceTree = "<group>"; };
 		778939221334308300B6AACB /* ZGMemoryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryTypes.h; sourceTree = "<group>"; };
 		778BA6601363E972008ACD6B /* Ruby.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ruby.framework; path = System/Library/Frameworks/Ruby.framework; sourceTree = SDKROOT; };
 		77A8689711FA95730062EEAE /* bitslicericon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = bitslicericon.icns; sourceTree = "<group>"; };
@@ -82,6 +116,7 @@
 				775FCB3611719F95000054FB /* Security.framework in Frameworks */,
 				775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */,
 				778BA6611363E972008ACD6B /* Ruby.framework in Frameworks */,
+				770EA826137B74C6007FB85A /* HexFiend.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,6 +126,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				770EA825137B74C6007FB85A /* HexFiend.framework */,
 				778BA6601363E972008ACD6B /* Ruby.framework */,
 				775FCB4111719FAF000054FB /* Carbon.framework */,
 				775FCB3511719F95000054FB /* Security.framework */,
@@ -132,6 +168,7 @@
 		2A37F4ABFDCFA73011CA2CEA /* Code */ = {
 			isa = PBXGroup;
 			children = (
+				77D5AEAC137C6FC000026388 /* Memory Viewer */,
 				775FCB1011719DF6000054FB /* ZGAppController.h */,
 				775FCB1111719DF6000054FB /* ZGAppController.m */,
 				775FCB1211719DF6000054FB /* ZGDocumentController.h */,
@@ -140,6 +177,8 @@
 				775FCB1511719DF6000054FB /* ZGPreferencesController.m */,
 				2A37F4AEFDCFA73011CA2CEA /* MyDocument.h */,
 				2A37F4ACFDCFA73011CA2CEA /* MyDocument.m */,
+				770EA82A137BA8E3007FB85A /* ZGUtilities.h */,
+				770EA829137BA8E1007FB85A /* ZGUtilities.m */,
 				77CB9772121CDCB8000A91DE /* ZGSearching.h */,
 				77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */,
 				77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */,
@@ -178,6 +217,7 @@
 				1DDD58280DA1D0D100B32029 /* MyDocument.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 				775FCB2811719E4A000054FB /* Preferences.xib */,
+				770EA822137B6FDE007FB85A /* MemoryViewer.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -191,6 +231,22 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		77D5AEAC137C6FC000026388 /* Memory Viewer */ = {
+			isa = PBXGroup;
+			children = (
+				770EA81F137B6E6D007FB85A /* ZGMemoryViewer.h */,
+				770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */,
+				7787C4D7137BB59100BFF606 /* ZGStatusBarRepresenter.h */,
+				7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */,
+				7787C4F0137C5A8200BFF606 /* ZGLineCountingRepresenter.h */,
+				7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */,
+				7787C4EF137C55C300BFF606 /* HFLineCountingView.h */,
+				7787C4EC137C555F00BFF606 /* ZGLineCountingView.h */,
+				7787C4ED137C556000BFF606 /* ZGLineCountingView.m */,
+			);
+			name = "Memory Viewer";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -201,6 +257,7 @@
 				8D15AC2B0486D014006FF6A4 /* Resources */,
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
+				770EA827137B74F2007FB85A /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -246,6 +303,7 @@
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
 				775FCB2A11719E4A000054FB /* Preferences.xib in Resources */,
 				77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */,
+				770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,6 +326,11 @@
 				77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */,
 				77D037371224334E0083E057 /* ZGCalculator.m in Sources */,
 				7720DCD21266711B004467C0 /* ZGTimer.m in Sources */,
+				770EA821137B6E6D007FB85A /* ZGMemoryViewer.m in Sources */,
+				770EA82B137BA8E5007FB85A /* ZGUtilities.m in Sources */,
+				7787C4D9137BB59200BFF606 /* ZGStatusBarRepresenter.m in Sources */,
+				7787C4EE137C556000BFF606 /* ZGLineCountingView.m in Sources */,
+				7787C4F2137C5A8300BFF606 /* ZGLineCountingRepresenter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,6 +361,14 @@
 			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
+		770EA822137B6FDE007FB85A /* MemoryViewer.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				770EA823137B6FDE007FB85A /* English */,
+			);
+			name = MemoryViewer.xib;
+			sourceTree = "<group>";
+		};
 		775FCB2811719E4A000054FB /* Preferences.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -318,6 +389,10 @@
 					x86_64,
 				);
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_ENABLE_OBJC_GC = unsupported;
@@ -354,6 +429,10 @@
 					x86_64,
 				);
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

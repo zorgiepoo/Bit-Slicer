@@ -27,6 +27,7 @@
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
 #import "ZGTimer.h"
+#import "ZGUtilities.h"
 
 // for chmod
 #import <sys/types.h>
@@ -1161,21 +1162,6 @@ static NSSize *expandedWindowMinSize = nil;
 	return value;
 }
 
-- (ZGMemoryAddress)memoryAddressFromExpression:(NSString *)expression
-{
-	ZGMemoryAddress address;
-	if ([expression isHexRepresentation])
-	{
-		[[NSScanner scannerWithString:expression] scanHexLongLong:&address];
-	}
-	else
-	{
-		address = [expression unsignedLongLongValue];
-	}
-	
-	return address;
-}
-
 - (void)setWatchVariablesArray:(NSArray *)newWatchVariablesArray
 {
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
@@ -1294,25 +1280,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (NSString *)testSearchComponent:(NSString *)searchComponent
 {
-	// Make sure it's not in hex
-	if ([searchComponent isHexRepresentation])
-	{
-	}
-	else
-	{
-		// Make sure it's a valid number
-		NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-		NSNumber *number = [numberFormatter numberFromString:searchComponent];
-		if (!number)
-		{
-			[numberFormatter release];
-			return @"The function you are using requires the search value to be a valid expression.";
-		}
-		
-		[numberFormatter release];
-	}
-	
-	return nil;
+	return isValidNumber(searchComponent) ? nil : @"The function you are using requires the search value to be a valid expression."; 
 }
 
 - (NSString *)confirmSearchInput:(NSString *)expression
@@ -1553,7 +1521,7 @@ static NSSize *expandedWindowMinSize = nil;
 				return;
 			}
 			
-			searchArguments.beginAddress = [self memoryAddressFromExpression:calculatedBeginAddress];
+			searchArguments.beginAddress = memoryAddressFromExpression(calculatedBeginAddress);
 			searchArguments.beginAddressExists = YES;
 		}
 		else
@@ -1569,7 +1537,7 @@ static NSSize *expandedWindowMinSize = nil;
 				return;
 			}
 			
-			searchArguments.endAddress = [self memoryAddressFromExpression:calculatedEndAddress];
+			searchArguments.endAddress = memoryAddressFromExpression(calculatedEndAddress);
 			searchArguments.endAddressExists = YES;
 		}
 		else
@@ -2678,10 +2646,10 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)memoryDumpOkayButton:(id)sender
 {
 	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpFromAddressTextField stringValue]];
-	ZGMemoryAddress fromAddress = [self memoryAddressFromExpression:fromAddressExpression];
+	ZGMemoryAddress fromAddress = memoryAddressFromExpression(fromAddressExpression);
 	
 	NSString *toAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpToAddressTextField stringValue]];
-	ZGMemoryAddress toAddress = [self memoryAddressFromExpression:toAddressExpression];
+	ZGMemoryAddress toAddress = memoryAddressFromExpression(toAddressExpression);
 	
 	if (toAddress > fromAddress && ![fromAddressExpression isEqualToString:@""] && ![toAddressExpression isEqualToString:@""])
 	{
