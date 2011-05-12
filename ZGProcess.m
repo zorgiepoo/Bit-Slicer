@@ -27,7 +27,6 @@
 @synthesize processID;
 @synthesize name;
 
-
 static NSArray *frozenProcesses = nil;
 + (NSArray *)frozenProcesses
 {

@@ -261,7 +261,7 @@
 		HFFPRange displayedLineRange = [[textView controller] displayedLineRange];
 		
 		unsigned long long displayedLocation = (unsigned long long)(displayedLineRange.location * [[textView controller] bytesPerLine]);
-		unsigned long long displayedLength = (unsigned long long)(displayedLineRange.length * [[textView controller] bytesPerLine]);
+		unsigned long long displayedEndLocation = (unsigned long long)([[textView controller] bytesPerLine] * (displayedLineRange.location + displayedLineRange.length));
 		
 		unsigned long long minimumLocation = [[textView controller] minimumSelectionLocation];
 		unsigned long long maximumLocation = [[textView controller] maximumSelectionLocation];
@@ -269,7 +269,7 @@
 		// If the current selection is not visible, then make it visible
 		// If we replace the bytes and the current selection is not visible, it will scroll to the current selection
 		// So we need to change the current selection accordingly
-		if ((minimumLocation < displayedLocation || minimumLocation >= displayedLocation + displayedLength) || (maximumLocation < displayedLocation || maximumLocation >= displayedLocation + displayedLength))
+		if ((minimumLocation < displayedLocation || minimumLocation >= displayedEndLocation) || (maximumLocation < displayedLocation || maximumLocation >= displayedEndLocation))
 		{
 			[[textView controller] setSelectedContentsRanges:[NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(displayedLocation, 0)]]];
 			displayedLineRange = [[textView controller] displayedLineRange];
