@@ -226,10 +226,30 @@ static BOOL didRegisteredHotKey = NO;
 	[memoryViewer showWindow:nil];
 }
 
+- (IBAction)jumpToMemoryAddress:(id)sender
+{
+	[memoryViewer jumpToMemoryAddressRequest];
+}
+
 #define FAQ_URL @"http://forum.portingteam.com/viewtopic.php?f=245&t=6914"
 - (IBAction)help:(id)sender
 {
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:FAQ_URL]];
+}
+
+#pragma mark Menu Item Validation
+
+- (BOOL)validateMenuItem:(NSMenuItem *)theMenuItem
+{
+	if ([theMenuItem action] == @selector(jumpToMemoryAddress:))
+	{
+		if (!memoryViewer || ![memoryViewer canJumpToAddress])
+		{
+			return NO;
+		}
+	}
+	
+	return YES;
 }
 
 #pragma mark Watching processes

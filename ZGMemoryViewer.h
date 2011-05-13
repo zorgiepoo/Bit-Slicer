@@ -31,10 +31,14 @@
 	IBOutlet NSTextField *addressTextField;
 	IBOutlet NSTextField *sizeTextField;
 	IBOutlet HFTextView *textView;
+	
+	IBOutlet NSWindow *jumpToAddressWindow;
+	IBOutlet NSTextField *jumpToAddressTextField;
+	
 	ZGStatusBarRepresenter *statusBarRepresenter;
 	ZGLineCountingRepresenter *lineCountingRepresenter;
-	pid_t currentProcessIdentifier;
 	
+	pid_t currentProcessIdentifier;
 	ZGMemoryAddress currentMemoryAddress;
 	ZGMemorySize currentMemorySize;
 	
@@ -43,5 +47,9 @@
 
 - (IBAction)runningApplicationsPopUpButton:(id)sender;
 - (IBAction)changeMemoryView:(id)sender;
+- (IBAction)jumpToMemoryAddressOKButton:(id)sender;
+- (IBAction)jumpToMemoryAddressCancelButton:(id)sender;
+- (void)jumpToMemoryAddressRequest;
+- (BOOL)canJumpToAddress;
 
 @end

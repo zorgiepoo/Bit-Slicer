@@ -41,6 +41,7 @@
 + (void)registerPauseAndUnpauseHotKey;
 - (IBAction)openPreferences:(id)sender;
 - (IBAction)openMemoryViewer:(id)sender;
+- (IBAction)jumpToMemoryAddress:(id)sender;
 - (IBAction)help:(id)sender;
 
 @end

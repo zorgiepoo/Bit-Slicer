@@ -314,4 +314,67 @@
 	}
 }
 
+- (IBAction)jumpToMemoryAddressOKButton:(id)sender
+{
+	if ([[jumpToAddressTextField stringValue] isEqualToString:@""])
+	{
+		NSBeep();
+		return;
+	}
+	
+	NSString *calculatedMemoryAddress = [ZGCalculator evaluateExpression:[jumpToAddressTextField stringValue]];
+	
+	if (!isValidNumber(calculatedMemoryAddress))
+	{
+		NSRunAlertPanel(@"Not valid Memory Address", @"This is not a valid memory address.", nil, nil, nil);
+		return;
+	}
+	
+	ZGMemoryAddress memoryAddress = memoryAddressFromExpression(calculatedMemoryAddress);
+	
+	if (memoryAddress < currentMemoryAddress || memoryAddress >= currentMemoryAddress + currentMemorySize)
+	{
+		NSRunAlertPanel(@"Out of Bounds", @"This memory address is not in the viewer.", nil, nil, nil);
+		return;
+	}
+	
+	unsigned long long offset = (unsigned long long)(memoryAddress - currentMemoryAddress);
+	
+	long double offsetLine = ((long double)offset) / [[textView controller] bytesPerLine];
+	
+	HFFPRange displayedLineRange = [[textView controller] displayedLineRange];
+	
+	if (offsetLine < displayedLineRange.location || offsetLine > displayedLineRange.location + displayedLineRange.length)
+	{
+		[[textView controller] scrollByLines:offsetLine - displayedLineRange.location];
+	}
+	
+	// Select one byte from the offset
+	[[textView controller] setSelectedContentsRanges:[NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(offset, 1)]]];
+	[[textView controller] pulseSelection];
+	
+	[NSApp endSheet:jumpToAddressWindow];
+	[jumpToAddressWindow close];
+}
+
+- (IBAction)jumpToMemoryAddressCancelButton:(id)sender
+{
+	[NSApp endSheet:jumpToAddressWindow];
+	[jumpToAddressWindow close];
+}
+
+- (void)jumpToMemoryAddressRequest
+{
+	[NSApp beginSheet:jumpToAddressWindow
+	   modalForWindow:[self window]
+		modalDelegate:self
+	   didEndSelector:nil
+		  contextInfo:NULL];
+}
+
+- (BOOL)canJumpToAddress
+{
+	return [[self window] isKeyWindow] && currentMemorySize > 0;
+}
+
 @end
