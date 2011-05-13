@@ -62,7 +62,7 @@
 
 #define ZGVariableReorderType				@"ZGVariableReorderType"
 
-#define MAX_TABLE_VIEW_ITEMS				((unsigned int)1000)
+#define MAX_TABLE_VIEW_ITEMS				((NSInteger)1000)
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
@@ -917,6 +917,7 @@ static NSSize *expandedWindowMinSize = nil;
 	[watchVariablesArray release];
 	watchVariablesArray = [[NSArray arrayWithArray:temporaryArray] retain];
 	[temporaryArray release];
+	
 	[watchVariablesTableView reloadData];
 }
 
@@ -1813,7 +1814,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (NSDragOperation)tableView:(NSTableView *)tableView 
 				validateDrop:(id <NSDraggingInfo>)draggingInfo 
-				 proposedRow:(int)row 
+				 proposedRow:(NSInteger)row 
 	   proposedDropOperation:(NSTableViewDropOperation)operation
 {
 	if ([[[draggingInfo draggingPasteboard] types] containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
@@ -1836,7 +1837,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (BOOL)tableView:(NSTableView *)tableView
 	   acceptDrop:(id <NSDraggingInfo>)draggingInfo 
-			  row:(int)newRow
+			  row:(NSInteger)newRow
 	dropOperation:(NSTableViewDropOperation)operation
 {	
 	NSMutableArray *variables = [NSMutableArray arrayWithArray:watchVariablesArray];
@@ -1881,9 +1882,9 @@ static NSSize *expandedWindowMinSize = nil;
 
 #pragma mark Table View Data Source Methods
 
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-	if (aTableView == watchVariablesTableView)
+	if (aTableView == watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
 	{
 		if ([[aTableColumn identifier] isEqualToString:@"name"])
 		{
@@ -2175,9 +2176,9 @@ static NSSize *expandedWindowMinSize = nil;
 																			   rowIndexes:rowIndexes];
 }
 
-- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-	if (aTableView == watchVariablesTableView)
+	if (aTableView == watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
 	{
 		if ([[aTableColumn identifier] isEqualToString:@"name"])
 		{
@@ -2208,11 +2209,11 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 }
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	// This conversion to unsigned int is kind of awkward to me, but seems like the only way to get rid of an
 	// implicit conversion warning
-	return MIN(MAX_TABLE_VIEW_ITEMS, (unsigned int)[watchVariablesArray count]);
+	return MIN(MAX_TABLE_VIEW_ITEMS, (NSInteger)[watchVariablesArray count]);
 }
 
 #pragma mark Table View Delegate Methods
@@ -2244,6 +2245,11 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 	else if ([[aTableColumn identifier] isEqualToString:@"address"])
 	{
+		if (rowIndex < 0 || (NSUInteger)rowIndex >= [watchVariablesArray count])
+		{
+			return NO;
+		}
+		
 		ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
 		if (variable && variable->isPointer)
 		{
