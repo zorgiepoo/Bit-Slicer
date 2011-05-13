@@ -68,25 +68,48 @@
 												 name:ZGProcessTerminated
 											   object:nil];
 	
+	[[textView controller] setEditable:NO];
+	
+	// So, I've no idea what HFTextView does by default, remove any type of representer that it might have and that we want to add
+	NSMutableArray *representersToRemove = [[NSMutableArray alloc] init];
+	
+	for (HFRepresenter *representer in [[textView layoutRepresenter] representers])
+	{
+		if ([representer isKindOfClass:[HFStatusBarRepresenter class]] || [representer isKindOfClass:[HFLineCountingRepresenter class]] || [representer isKindOfClass:[HFVerticalScrollerRepresenter class]])
+		{
+			[representersToRemove addObject:representer];
+		}
+	}
+	
+	for (HFRepresenter *representer in representersToRemove)
+	{
+		[[textView layoutRepresenter] removeRepresenter:representer];
+	}
+	
+	[representersToRemove release];
+	
+	// Add custom status bar
 	statusBarRepresenter = [[ZGStatusBarRepresenter alloc] init];
 	[statusBarRepresenter setStatusMode:HFStatusModeHexadecimal];
 	
 	[[textView controller] addRepresenter:statusBarRepresenter];
 	[[textView layoutRepresenter] addRepresenter:statusBarRepresenter];
 	
+	// Add custom line counter
 	lineCountingRepresenter = [[ZGLineCountingRepresenter alloc] init];
 	[lineCountingRepresenter setMinimumDigitCount:DEFAULT_MINIMUM_LINE_DIGIT_COUNT];
 	[lineCountingRepresenter setLineNumberFormat:HFLineNumberFormatHexadecimal];
 	
+	[[textView controller] addRepresenter:lineCountingRepresenter];
+	[[textView layoutRepresenter] addRepresenter:lineCountingRepresenter];
+	
+	// Add custom scroller
 	ZGVerticalScrollerRepresenter *verticalScrollerRepresenter = [[ZGVerticalScrollerRepresenter alloc] init];
 	
 	[[textView controller] addRepresenter:verticalScrollerRepresenter];
 	[[textView layoutRepresenter] addRepresenter:verticalScrollerRepresenter];
 	
 	[verticalScrollerRepresenter release];
-	
-	[[textView controller] addRepresenter:lineCountingRepresenter];
-	[[textView layoutRepresenter] addRepresenter:lineCountingRepresenter];
 }
 
 - (IBAction)showWindow:(id)sender
