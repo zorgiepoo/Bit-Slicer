@@ -1108,14 +1108,6 @@
 					<int key="connectionID">700</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">appController</string>
-						<reference key="source" ref="491022273"/>
-						<reference key="destination" ref="187132439"/>
-					</object>
-					<int key="connectionID">701</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">openPreferences:</string>
 						<reference key="source" ref="187132439"/>
@@ -1194,6 +1186,14 @@
 						<reference key="destination" ref="480671132"/>
 					</object>
 					<int key="connectionID">824</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">documentController</string>
+						<reference key="source" ref="187132439"/>
+						<reference key="destination" ref="491022273"/>
+					</object>
+					<int key="connectionID">825</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2116,7 +2116,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">824</int>
+			<int key="maxID">825</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2745,6 +2745,17 @@
 							</object>
 						</object>
 					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">documentController</string>
+						<string key="NS.object.0">ZGDocumentController</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">documentController</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">documentController</string>
+							<string key="candidateClassName">ZGDocumentController</string>
+						</object>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/ZGAppController.h</string>
@@ -2753,17 +2764,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDocumentController</string>
 					<string key="superclassName">NSDocumentController</string>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">appController</string>
-						<string key="NS.object.0">ZGAppController</string>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<string key="NS.key.0">appController</string>
-						<object class="IBToOneOutletInfo" key="NS.object.0">
-							<string key="name">appController</string>
-							<string key="candidateClassName">ZGAppController</string>
-						</object>
-					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/ZGDocumentController.h</string>

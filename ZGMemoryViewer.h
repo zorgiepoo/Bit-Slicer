@@ -45,6 +45,9 @@
 	NSTimer *checkMemoryTimer;
 }
 
+- (pid_t)currentProcessIdentifier;
+- (ZGMemoryAddress)selectedAddress;
+
 - (IBAction)runningApplicationsPopUpButton:(id)sender;
 - (IBAction)changeMemoryView:(id)sender;
 - (IBAction)jumpToMemoryAddressOKButton:(id)sender;

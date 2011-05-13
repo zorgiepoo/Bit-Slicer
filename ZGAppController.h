@@ -20,6 +20,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
+@class ZGDocumentController;
 @class ZGPreferencesController;
 @class ZGMemoryViewer;
 
@@ -29,6 +30,7 @@
 
 @interface ZGAppController : NSObject
 {
+	IBOutlet ZGDocumentController *documentController;
 	BOOL applicationIsAuthenticated;
 	ZGPreferencesController *preferencesController;
 	ZGMemoryViewer *memoryViewer;
@@ -36,6 +38,10 @@
 }
 
 @property (readonly) BOOL applicationIsAuthenticated;
+
++ (ZGAppController *)sharedController;
+- (ZGMemoryViewer *)memoryViewer;
+- (ZGDocumentController *)documentController;
 
 - (void)authenticateWithURL:(NSURL *)url;
 + (void)registerPauseAndUnpauseHotKey;

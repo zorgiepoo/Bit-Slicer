@@ -19,6 +19,7 @@
  */
 
 #import "ZGDocumentController.h"
+#import "ZGAppController.h"
 
 @implementation ZGDocumentController
 
@@ -26,9 +27,9 @@
 							display:(BOOL)displayDocument
 							  error:(NSError **)outError
 {	
-	if (![appController applicationIsAuthenticated])
+	if (![[ZGAppController sharedController] applicationIsAuthenticated])
 	{
-		[appController authenticateWithURL:absoluteURL];
+		[[ZGAppController sharedController] authenticateWithURL:absoluteURL];
 	}
 	
 	return [super openDocumentWithContentsOfURL:absoluteURL
@@ -36,17 +37,13 @@
 										  error:outError];
 }
 
-// lastSelectedProcessName keeps track of the last targeted process
-// useful for guessing what process the user may want to target
-// when creating a new document
-static NSString *lastSelectedProcessName = nil;
-+ (void)setLastSelectedProcessName:(NSString *)processName
+- (void)setLastSelectedProcessName:(NSString *)processName
 {
 	[lastSelectedProcessName release];
 	lastSelectedProcessName = [processName copy];
 }
 
-+ (NSString *)lastSelectedProcessName
+- (NSString *)lastSelectedProcessName
 {
 	return lastSelectedProcessName;
 }

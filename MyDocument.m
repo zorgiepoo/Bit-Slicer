@@ -22,7 +22,9 @@
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVariable.h"
+#import "ZGAppController.h"
 #import "ZGDocumentController.h"
+#import "ZGMemoryViewer.h"
 #import "ZGComparisonFunctions.h"
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
@@ -162,7 +164,7 @@
 	
 	if (!desiredProcessName)
 	{
-		desiredProcessName = [[ZGDocumentController lastSelectedProcessName] copy];
+		desiredProcessName = [[[[ZGAppController sharedController] documentController] lastSelectedProcessName] copy];
 	}
 	
 	[self updateRunningApplicationProcesses];
@@ -301,7 +303,7 @@
 	}
 	
 	// keep track of the process the user targeted
-	[ZGDocumentController setLastSelectedProcessName:[currentProcess name]];
+	[[[ZGAppController sharedController] documentController] setLastSelectedProcessName:[currentProcess name]];
 	
 	if (sender)
 	{
@@ -956,9 +958,16 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	ZGVariableQualifier qualifier = [[variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
 	
+	// Try to get an initial address from the memory viewer's selection
+	ZGMemoryAddress initialAddress = 0x0;
+	if ([[ZGAppController sharedController] memoryViewer] && [[[ZGAppController sharedController] memoryViewer] currentProcessIdentifier] == [currentProcess processID])
+	{
+		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddress];
+	}
+	
 	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL
 														size:0
-													 address:0
+													 address:initialAddress
 														type:[sender tag]
 												   qualifier:qualifier
 												 pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];

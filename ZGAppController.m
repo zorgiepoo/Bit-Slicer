@@ -19,6 +19,7 @@
  */
 
 #import "ZGAppController.h"
+#import "ZGDocumentController.h"
 #import <SecurityFoundation/SFAuthorization.h>
 #import <Security/AuthorizationTags.h>
 #import "ZGPreferencesController.h"
@@ -29,6 +30,37 @@
 @implementation ZGAppController
 
 @synthesize applicationIsAuthenticated;
+
+#pragma mark Singleton & Accessors
+
+static ZGAppController *sharedInstance = nil;
+
++ (ZGAppController *)sharedController
+{
+	return sharedInstance;
+}
+
+- (id)init
+{
+	self = [super init];
+	
+	if (self)
+	{
+		sharedInstance = self;
+	}
+	
+	return self;
+}
+
+- (ZGMemoryViewer *)memoryViewer
+{
+	return memoryViewer;
+}
+
+- (ZGDocumentController *)documentController
+{
+	return documentController;
+}
 
 #pragma mark Authenticating
 

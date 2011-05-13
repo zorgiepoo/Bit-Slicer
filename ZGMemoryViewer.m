@@ -40,6 +40,18 @@
 
 @implementation ZGMemoryViewer
 
+#pragma mark Accessors
+
+- (pid_t)currentProcessIdentifier
+{
+	return currentProcessIdentifier;
+}
+
+- (ZGMemoryAddress)selectedAddress
+{
+	return (currentMemorySize > 0) ? ((ZGMemoryAddress)([[[[textView controller] selectedContentsRanges] objectAtIndex:0] HFRange].location) + currentMemoryAddress) : 0x0;
+}
+
 #pragma mark Initialization
 
 - (id)init
@@ -56,7 +68,7 @@
 	// For handling windowWillClose:
 	[[self window] setDelegate:self];
 	
-	[self updateRunningApplicationProcesses:[ZGDocumentController lastSelectedProcessName]];
+	[self updateRunningApplicationProcesses:[[[ZGAppController sharedController] documentController] lastSelectedProcessName]];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(anApplicationLaunchedOrTerminated:)

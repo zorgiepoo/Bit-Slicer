@@ -19,14 +19,16 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "ZGAppController.h"
 
 @interface ZGDocumentController : NSDocumentController
 {
-	IBOutlet ZGAppController *appController;
+	// lastSelectedProcessName keeps track of the last targeted process
+	// useful for guessing what process the user may want to target
+	// when creating a new document
+	NSString *lastSelectedProcessName;
 }
 
-+ (void)setLastSelectedProcessName:(NSString *)processName;
-+ (NSString *)lastSelectedProcessName;
+- (void)setLastSelectedProcessName:(NSString *)processName;
+- (NSString *)lastSelectedProcessName;
 
 @end
