@@ -21,8 +21,6 @@
 #import <Cocoa/Cocoa.h>
 @class ZGProcess;
 
-#define CALC_PATH [[NSBundle mainBundle] pathForResource:@"calc-static" ofType:nil inDirectory:@"calc"]
-
 @interface ZGCalculator : NSObject
 
 + (void)initializeCalculator;
