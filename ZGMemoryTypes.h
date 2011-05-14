@@ -20,3 +20,4 @@
 
 typedef mach_vm_address_t ZGMemoryAddress;
 typedef mach_vm_size_t ZGMemorySize;
+typedef vm_prot_t ZGMemoryProtection;

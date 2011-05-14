@@ -19,6 +19,7 @@
  */
 
 #import "MyDocument.h"
+#import "ZGAdditionalTasksController.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVariable.h"
@@ -66,13 +67,34 @@
 
 #define MAX_TABLE_VIEW_ITEMS				((NSInteger)1000)
 
-#define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
 #define CHECK_PROCESSES_TIME_INTERVAL	0.5
 
 #define ZG_EXPAND_OPTIONS @"ZG_EXPAND_OPTIONS"
 
 @implementation MyDocument
+
+#pragma mark Accessors
+
+- (ZGProcess *)currentProcess
+{
+	return currentProcess;
+}
+
+- (NSArray *)selectedVariables
+{
+	return ([watchVariablesTableView selectedRow] == -1) ? nil : [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
+}
+
+- (BOOL)canStartTask
+{
+	return [[searchButton title] isEqualToString:@"Search"];
+}
+
+- (BOOL)canCancelTask
+{
+	return [[searchButton title] isEqualToString:@"Cancel"];
+}
 
 #pragma mark Document stuff
 
@@ -423,7 +445,7 @@
 	NSRunningApplication *runningApplication = [[notification userInfo] objectForKey:ZGRunningApplication];
 	[ZGProcess removeFrozenProcess:[runningApplication processIdentifier]];
 	
-	if (([clearButton isEnabled] || [[searchButton title] isEqualToString:@"Cancel"]) && [[runningApplication localizedName] isEqualToString:[currentProcess name]])
+	if (([clearButton isEnabled] || [self canCancelTask]) && [[runningApplication localizedName] isEqualToString:[currentProcess name]])
 	{
 		NSAttributedString *status = [[NSAttributedString alloc] initWithString:@"Process terminated."
 																	 attributes:[NSDictionary dictionaryWithObject:[NSColor redColor]
@@ -521,15 +543,10 @@
 	[watchWindow makeFirstResponder:searchValueTextField];
 }
 
-- (void)updateMemoryDumpOrStoreUserInterface:(NSTimer *)timer
+- (void)updateMemoryStoreUserInterface:(NSTimer *)timer
 {
 	if ([[self windowForSheet] isVisible])
 	{
-		if ([[searchButton title] isEqualToString:@"Search"])
-		{
-			[self prepareDocumentTask];
-		}
-		
 		[searchingProgressIndicator setDoubleValue:currentProcess->searchProgress];
 	}
 }
@@ -1387,7 +1404,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	BOOL goingToNarrowDownSearches = [self isInNarrowSearchMode];
 	
-	if ([[searchButton title] isEqualToString:@"Search"])
+	if ([self canStartTask])
 	{
 		// Find all variables that are set to be searched, but shouldn't be
 		// this is if the variable's data type does not match, or if the variable
@@ -1762,15 +1779,15 @@ static NSSize *expandedWindowMinSize = nil;
 		return;
 	}
 	
+	[self prepareDocumentTask];
+	
 	[searchingProgressIndicator setMaxValue:[currentProcess numberOfRegions]];
 	
 	updateSearchUserInterfaceTimer = [[NSTimer scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
 																	   target:self
-																	 selector:@selector(updateMemoryDumpOrStoreUserInterface:)
+																	 selector:@selector(updateMemoryStoreUserInterface:)
 																	 userInfo:nil
 																	  repeats:YES] retain];
-	//not doing this here, there's a bug with setKeyEquivalent, instead i'm going to do this in the timer
-	//[self prepareDocumentTask];
 	[generalStatusTextField setStringValue:@"Storing All Values..."];
 	
 	dispatch_block_t searchForDataCompleteBlock = ^
@@ -2242,7 +2259,7 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	if ([[aTableColumn identifier] isEqualToString:@"value"])
 	{
-		if (![[searchButton title] isEqualToString:@"Search"] || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+		if (![self canStartTask] || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
 		{
 			NSBeep();
 			return NO;
@@ -2392,7 +2409,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if ([theMenuItem action] == @selector(addVariable:))
 	{
-		if (![[searchButton title] isEqualToString:@"Search"])
+		if (![self canStartTask])
 		{
 			return NO;
 		}
@@ -2400,7 +2417,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if ([theMenuItem action] == @selector(lockTarget:))
 	{
-		if (![[searchButton title] isEqualToString:@"Search"])
+		if (![self canStartTask])
 		{
 			[theMenuItem setTitle:@"Unlock Target"];
 			return NO;
@@ -2420,7 +2437,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if ([theMenuItem action] == @selector(undo:))
 	{
-		if ([[searchButton title] isEqualToString:@"Cancel"])
+		if ([self canCancelTask])
 		{
 			return NO;
 		}
@@ -2436,7 +2453,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if ([theMenuItem action] == @selector(paste:))
 	{
-		if ([[searchButton title] isEqualToString:@"Cancel"] || ![[NSPasteboard generalPasteboard] dataForType:ZGVariablePboardType])
+		if ([self canCancelTask] || ![[NSPasteboard generalPasteboard] dataForType:ZGVariablePboardType])
 		{
 			return NO;
 		}
@@ -2470,7 +2487,7 @@ static NSSize *expandedWindowMinSize = nil;
 			[theMenuItem setTitle:@"Edit Variable Value…"];
 		}
 		
-		if ([[searchButton title] isEqualToString:@"Cancel"] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+		if ([self canCancelTask] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -2478,15 +2495,15 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if ([theMenuItem action] == @selector(editVariablesAddress:))
 	{
-		if ([[searchButton title] isEqualToString:@"Cancel"] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+		if ([self canCancelTask] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
 	}
 	
-	else if ([theMenuItem action] == @selector(memoryDumpRequest:) || [theMenuItem action] == @selector(memoryDumpAllRequest:) || [theMenuItem action] == @selector(getInitialValues:))
+	else if ([theMenuItem action] == @selector(memoryDumpRequest:) || [theMenuItem action] == @selector(memoryDumpAllRequest:) || [theMenuItem action] == @selector(getInitialValues:) || [theMenuItem action] == @selector(changeMemoryProtection:))
 	{
-		if ([[searchButton title] isEqualToString:@"Cancel"] || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+		if ([self canCancelTask] || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -2656,175 +2673,21 @@ static NSSize *expandedWindowMinSize = nil;
 		  contextInfo:NULL];
 }
 
-#pragma mark Memory Dumps
-
-- (IBAction)memoryDumpOkayButton:(id)sender
-{
-	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpFromAddressTextField stringValue]];
-	ZGMemoryAddress fromAddress = memoryAddressFromExpression(fromAddressExpression);
-	
-	NSString *toAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpToAddressTextField stringValue]];
-	ZGMemoryAddress toAddress = memoryAddressFromExpression(toAddressExpression);
-	
-	if (toAddress > fromAddress && ![fromAddressExpression isEqualToString:@""] && ![toAddressExpression isEqualToString:@""])
-	{
-		[NSApp endSheet:memoryDumpWindow];
-		[memoryDumpWindow close];
-		
-		NSSavePanel *savePanel = [NSSavePanel savePanel];
-		[savePanel beginSheetModalForWindow:watchWindow
-						  completionHandler:^(NSInteger result)
-		 {
-			 if (result == NSFileHandlingPanelOKButton)
-			 {
-				 BOOL success = YES;
-				 
-				 @try
-				 {
-					 
-					 ZGMemorySize size = toAddress - fromAddress;
-					 void *bytes = malloc((size_t)size);
-					 
-					 if (bytes)
-					 {
-						 ZGReadBytesCarefully([currentProcess processID], fromAddress, bytes, &size);
-						 
-						 NSData *data = [NSData dataWithBytes:bytes
-													   length:(NSUInteger)size];
-						 
-						 success = [data writeToFile:[savePanel filename]
-										  atomically:NO];
-						 
-						 free(bytes); 
-					 }
-					 else
-					 {
-						 NSLog(@"Failed to allocate region");
-						 success = NO;
-					 }
-				 }
-				 @catch (NSException *exception)
-				 {
-					 NSLog(@"Failed to write data");
-					 success = NO;
-				 }
-				 @finally
-				 {
-					 if (!success)
-					 {
-						 NSRunAlertPanel(@"The Memory Dump failed",
-										 @"An error resulted in writing the memory dump.",
-										 @"OK", nil, nil);
-					 }
-				 }
-			 }
-		 }];
-	}
-	else
-	{
-		NSRunAlertPanel(@"Invalid range",
-						@"Please make sure you typed in the addresses correctly.",
-						@"OK", nil, nil);
-	}
-}
-
-- (IBAction)memoryDumpCancelButton:(id)sender
-{
-	[NSApp endSheet:memoryDumpWindow];
-	[memoryDumpWindow close];
-}
+#pragma mark Additional tasks handling
 
 - (IBAction)memoryDumpRequest:(id)sender
 {
-	// guess what the user may want if nothing is in the text fields
-	if ([[memoryDumpFromAddressTextField stringValue] isEqualToString:@""] && [[memoryDumpToAddressTextField stringValue] isEqualToString:@""] && [watchVariablesTableView selectedRow] != -1)
-	{
-		ZGVariable *firstVariable = [watchVariablesArray objectAtIndex:[[watchVariablesTableView selectedRowIndexes] firstIndex]];
-		ZGVariable *lastVariable = [watchVariablesArray objectAtIndex:[[watchVariablesTableView selectedRowIndexes] lastIndex]];
-		
-		[memoryDumpFromAddressTextField setStringValue:[firstVariable addressStringValue]];
-		
-		if (firstVariable != lastVariable)
-		{
-			[memoryDumpToAddressTextField setStringValue:[lastVariable addressStringValue]];
-		}
-	}
-	
-	[NSApp beginSheet:memoryDumpWindow
-	   modalForWindow:watchWindow
-		modalDelegate:self
-	   didEndSelector:nil
-		  contextInfo:NULL];
+	[additionalTasksController memoryDumpRequest];
 }
 
 - (IBAction)memoryDumpAllRequest:(id)sender
 {
-	NSSavePanel *savePanel = [NSSavePanel savePanel];
-	[savePanel setMessage:@"Choose a folder name to save the memory dump files. This may take a while."];
-	
-	[savePanel beginSheetModalForWindow:watchWindow
-					  completionHandler:^(NSInteger result)
-	 {
-		 if (result == NSFileHandlingPanelOKButton)
-		 {
-			 if ([[NSFileManager defaultManager] fileExistsAtPath:[savePanel filename]])
-			 {
-				 [[NSFileManager defaultManager] removeItemAtPath:[savePanel filename]
-															error:NULL];
-			 }
-			 
-			 // Since Bit Slicer is running as root, we'll need to pass attributes dictionary so that
-			 // the folder is owned by the user
-			 [[NSFileManager defaultManager] createDirectoryAtPath:[savePanel filename]
-									   withIntermediateDirectories:NO
-														attributes:[NSDictionary dictionaryWithObjectsAndKeys:NSUserName(), NSFileGroupOwnerAccountName, NSUserName(), NSFileOwnerAccountName, nil]
-															 error:NULL];
-			 
-			 [searchingProgressIndicator setMaxValue:[currentProcess numberOfRegions]];
-			 
-			 updateSearchUserInterfaceTimer = [[NSTimer scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-																				target:self
-																			  selector:@selector(updateMemoryDumpOrStoreUserInterface:)
-																			  userInfo:nil
-																			   repeats:YES] retain];
-			 
-			 //not doing this here, there's a bug with setKeyEquivalent, instead i'm going to do this in the timer
-			 //[self prepareDocumentTask];
-			 [generalStatusTextField setStringValue:@"Writing Memory Dump..."];
-			 
-			 dispatch_block_t searchForDataCompleteBlock = ^
-			 {
-				 [updateSearchUserInterfaceTimer invalidate];
-				 [updateSearchUserInterfaceTimer release];
-				 updateSearchUserInterfaceTimer = nil;
-				 
-				 if (!currentProcess->isDoingMemoryDump)
-				 {
-					 [generalStatusTextField setStringValue:@"Canceled Memory Dump"];
-				 }
-				 else
-				 {
-					 currentProcess->isDoingMemoryDump = NO;
-					 [generalStatusTextField setStringValue:@"Finished Memory Dump"];
-				 }
-				 [searchingProgressIndicator setDoubleValue:0];
-				 [self resumeDocument];
-			 };
-			 
-			 dispatch_block_t searchForDataBlock = ^
-			 {
-				 if (!ZGSaveAllDataToDirectory([savePanel filename], currentProcess))
-				 {
-					 NSRunAlertPanel(@"The Memory Dump failed",
-									 @"An error resulted in writing the memory dump.",
-									 @"OK", nil, nil);
-				 }
-				  
-				 dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
-			 };
-			 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchForDataBlock);
-		 }
-	 }];
+	[additionalTasksController memoryDumpAllRequest];
+}
+
+- (IBAction)changeMemoryProtection:(id)sender
+{
+	[additionalTasksController changeMemoryProtectionRequest];
 }
 
 #pragma mark Pausing and Unpausing Processes

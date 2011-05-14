@@ -16,6 +16,7 @@
 		770EA82B137BA8E5007FB85A /* ZGUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA829137BA8E1007FB85A /* ZGUtilities.m */; };
 		7714D3F211B87C7E0028E6B2 /* ZGVirtualMemory.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */; };
 		7720DCD21266711B004467C0 /* ZGTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7720DCD11266711B004467C0 /* ZGTimer.m */; };
+		77500814137DFD1000CE327E /* ZGAdditionalTasksController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77500813137DFD0F00CE327E /* ZGAdditionalTasksController.m */; };
 		775FCB1B11719DF6000054FB /* ZGAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1111719DF6000054FB /* ZGAppController.m */; };
 		775FCB1C11719DF6000054FB /* ZGDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1311719DF6000054FB /* ZGDocumentController.m */; };
 		775FCB1D11719DF6000054FB /* ZGPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1511719DF6000054FB /* ZGPreferencesController.m */; };
@@ -74,6 +75,8 @@
 		7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVirtualMemory.m; sourceTree = "<group>"; };
 		7720DCD01266711B004467C0 /* ZGTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGTimer.h; sourceTree = "<group>"; };
 		7720DCD11266711B004467C0 /* ZGTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGTimer.m; sourceTree = "<group>"; };
+		77500812137DFD0F00CE327E /* ZGAdditionalTasksController.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ZGAdditionalTasksController.h; sourceTree = "<group>"; };
+		77500813137DFD0F00CE327E /* ZGAdditionalTasksController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGAdditionalTasksController.m; sourceTree = "<group>"; };
 		775FCB1011719DF6000054FB /* ZGAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGAppController.h; sourceTree = "<group>"; };
 		775FCB1111719DF6000054FB /* ZGAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGAppController.m; sourceTree = "<group>"; };
 		775FCB1211719DF6000054FB /* ZGDocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDocumentController.h; sourceTree = "<group>"; };
@@ -180,6 +183,8 @@
 				775FCB1511719DF6000054FB /* ZGPreferencesController.m */,
 				2A37F4AEFDCFA73011CA2CEA /* MyDocument.h */,
 				2A37F4ACFDCFA73011CA2CEA /* MyDocument.m */,
+				77500812137DFD0F00CE327E /* ZGAdditionalTasksController.h */,
+				77500813137DFD0F00CE327E /* ZGAdditionalTasksController.m */,
 				770EA82A137BA8E3007FB85A /* ZGUtilities.h */,
 				770EA829137BA8E1007FB85A /* ZGUtilities.m */,
 				77CB9772121CDCB8000A91DE /* ZGSearching.h */,
@@ -337,6 +342,7 @@
 				7787C4EE137C556000BFF606 /* ZGLineCountingView.m in Sources */,
 				7787C4F2137C5A8300BFF606 /* ZGLineCountingRepresenter.m in Sources */,
 				77D5AEB5137C84D300026388 /* ZGVerticalScrollerRepresenter.m in Sources */,
+				77500814137DFD1000CE327E /* ZGAdditionalTasksController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

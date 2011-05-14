@@ -25,6 +25,9 @@
 @class ZGSearchData;
 @class ZGProcess;
 @class ZGTimer;
+@class ZGAdditionalTasksController;
+
+#define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 
 @interface MyDocument : NSDocument <NSTableViewDelegate>
 {
@@ -47,9 +50,6 @@
 	IBOutlet NSTextField			*editVariablesValueTextField;
 	IBOutlet NSWindow				*editVariablesAddressWindow;
 	IBOutlet NSTextField            *editVariablesAddressTextField;
-	IBOutlet NSWindow				*memoryDumpWindow;
-	IBOutlet NSTextField			*memoryDumpFromAddressTextField;
-	IBOutlet NSTextField			*memoryDumpToAddressTextField;
 	IBOutlet NSButton				*compareInitialValuesCheckBox;
 	IBOutlet NSTextField			*beginningAddressLabel;
 	IBOutlet NSTextField			*beginningAddressTextField;
@@ -60,6 +60,7 @@
 	IBOutlet NSButton				*ignoreCaseCheckBox;
 	IBOutlet NSButton				*includeNullTerminatorCheckBox;
 	IBOutlet NSWindow				*watchWindow;
+	IBOutlet ZGAdditionalTasksController *additionalTasksController;
 	NSArray							*watchVariablesArray;
 	ZGProcess						*currentProcess;
 	NSString						*desiredProcessName;
@@ -73,6 +74,12 @@
 	// For comparing unicode strings
 	CollatorRef						collator;
 }
+
+- (ZGProcess *)currentProcess;
+- (NSArray *)selectedVariables;
+- (void)prepareDocumentTask;
+- (void)resumeDocument;
+- (BOOL)canStartTask;
 
 - (IBAction)runningApplicationsPopUpButtonRequest:(id)sender;
 - (IBAction)dataTypePopUpButtonRequest:(id)sender;
@@ -96,10 +103,9 @@
 - (IBAction)editVariablesAddressOkayButton:(id)sender;
 - (IBAction)editVariablesAddress:(id)sender;
 
-- (IBAction)memoryDumpOkayButton:(id)sender;
-- (IBAction)memoryDumpCancelButton:(id)sender;
 - (IBAction)memoryDumpRequest:(id)sender;
 - (IBAction)memoryDumpAllRequest:(id)sender;
+- (IBAction)changeMemoryProtection:(id)sender;
 
 - (IBAction)pauseOrUnpauseProcess:(id)sender;
 

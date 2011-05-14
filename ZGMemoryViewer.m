@@ -250,7 +250,7 @@
 	if (isValidNumber(calculatedMemoryAddress) && isValidNumber(calculatedMemorySize))
 	{
 		ZGMemoryAddress memoryAddress = memoryAddressFromExpression(calculatedMemoryAddress);
-		ZGMemorySize memorySize = memoryAddressFromExpression(calculatedMemorySize);
+		ZGMemorySize memorySize = (ZGMemorySize)memoryAddressFromExpression(calculatedMemorySize);
 		
 		// Make sure this is an actual new change
 		if (memoryAddress == currentMemoryAddress && memorySize == currentMemorySize)

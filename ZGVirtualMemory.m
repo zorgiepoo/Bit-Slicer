@@ -116,6 +116,23 @@ BOOL ZGWriteBytes(pid_t process, ZGMemoryAddress address, const void *bytes, ZGM
 	return success;
 }
 
+BOOL ZGProtect(pid_t process, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection)
+{
+	BOOL success = NO;
+	vm_map_t task = MACH_PORT_NULL;
+	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
+	{
+		success = (mach_vm_protect(task, address, size, NO, protection) == KERN_SUCCESS);
+		
+		if (task != MACH_PORT_NULL)
+		{
+			mach_port_deallocate(current_task(), task);
+		}
+	}
+	
+	return success;
+}
+
 // helper function for ZGSaveAllDataToDirectory
 void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
 {
