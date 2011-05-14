@@ -1374,7 +1374,6 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	if ([newVariablesArray count] != [watchVariablesArray count])
 	{
-		// time to set the undo action!
 		[[self undoManager] setActionName:@"Search"];
 		[[[self undoManager] prepareWithInvocationTarget:self] setWatchVariablesArray:watchVariablesArray];
 	}
@@ -2237,8 +2236,6 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	// This conversion to unsigned int is kind of awkward to me, but seems like the only way to get rid of an
-	// implicit conversion warning
 	return MIN(MAX_TABLE_VIEW_ITEMS, (NSInteger)[watchVariablesArray count]);
 }
 
