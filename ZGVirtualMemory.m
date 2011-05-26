@@ -149,7 +149,7 @@ BOOL ZGProtect(pid_t process, ZGMemoryAddress address, ZGMemorySize size, ZGMemo
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
-		success = (mach_vm_protect(task, address, size, NO, protection) == KERN_SUCCESS);
+		success = (mach_vm_protect(task, address, size, FALSE, protection) == KERN_SUCCESS);
 		
 		if (task != MACH_PORT_NULL)
 		{

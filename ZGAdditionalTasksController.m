@@ -222,34 +222,47 @@
 	
 	if (size > 0 && ![addressExpression isEqualToString:@""] && ![sizeExpression isEqualToString:@""])
 	{
-		ZGMemoryProtection protection = VM_PROT_NONE;
-		
-		if ([changeProtectionReadButton state] == NSOnState)
-		{
-			protection |= VM_PROT_READ;
-		}
-		
-		if ([changeProtectionWriteButton state] == NSOnState)
-		{
-			protection |= VM_PROT_WRITE;
-		}
-		
-		if ([changeProtectionExecuteButton state] == NSOnState)
-		{
-			protection |= VM_PROT_EXECUTE;
-		}
-		
-		if (!ZGProtect([[document currentProcess] processID], address, size, protection))
-		{
-			NSRunAlertPanel(@"Memory Protection Change Failed",
-							@"The memory's protection could not be changed to the specified permissions.",
+        // First check if we can find the memory region the address resides in
+        ZGMemoryAddress memoryAddress = address;
+        ZGMemorySize memorySize;
+        ZGMemoryProtection memoryProtection;
+        if (!ZGMemoryProtectionInRegion([[document currentProcess] processID], &memoryAddress, &memorySize, &memoryProtection))
+        {
+            NSRunAlertPanel(@"Memory Protection Change Failed",
+							@"The specified memory address could not be located within a memory region.",
 							@"OK", nil, nil);
-		}
-		else
-		{
-			[NSApp endSheet:changeProtectionWindow];
-			[changeProtectionWindow close];
-		}
+        }
+        else
+        {
+            ZGMemoryProtection protection = VM_PROT_NONE;
+            
+            if ([changeProtectionReadButton state] == NSOnState)
+            {
+                protection |= VM_PROT_READ;
+            }
+            
+            if ([changeProtectionWriteButton state] == NSOnState)
+            {
+                protection |= VM_PROT_WRITE;
+            }
+            
+            if ([changeProtectionExecuteButton state] == NSOnState)
+            {
+                protection |= VM_PROT_EXECUTE;
+            }
+            
+            if (!ZGProtect([[document currentProcess] processID], address, size, protection))
+            {
+                NSRunAlertPanel(@"Memory Protection Change Failed",
+                                @"The memory's protection could not be changed to the specified permissions.",
+                                @"OK", nil, nil);
+            }
+            else
+            {
+                [NSApp endSheet:changeProtectionWindow];
+                [changeProtectionWindow close];
+            } 
+        }
 	}
 	else
 	{
@@ -275,6 +288,21 @@
 		
 		[changeProtectionAddressTextField setStringValue:[firstVariable addressStringValue]];
 		[changeProtectionSizeTextField setStringValue:[NSString stringWithFormat:@"%lld", firstVariable->size]];
+        
+        ZGMemoryProtection memoryProtection;
+        ZGMemoryAddress memoryAddress = firstVariable->address;
+        ZGMemorySize memorySize;
+        
+        // Tell the user what the current memory protection is set as for the variable
+        if (ZGMemoryProtectionInRegion([[document currentProcess] processID], &memoryAddress, &memorySize, &memoryProtection))
+        {
+            if (memoryAddress <= firstVariable->address && memoryAddress + memorySize >= firstVariable->address + firstVariable->size)
+            {
+                [changeProtectionReadButton setState:memoryProtection & VM_PROT_READ];
+                [changeProtectionWriteButton setState:memoryProtection & VM_PROT_WRITE];
+                [changeProtectionExecuteButton setState:memoryProtection & VM_PROT_EXECUTE];
+            }
+        }
 	}
 	
 	[NSApp beginSheet:changeProtectionWindow
