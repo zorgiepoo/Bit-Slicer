@@ -269,7 +269,7 @@
 {
 	// guess what the user may want if nothing is in the text fields
 	NSArray *selectedVariables = [document selectedVariables];
-	if (selectedVariables && [[changeProtectionAddressTextField stringValue] isEqualToString:@""] && [[changeProtectionSizeTextField stringValue] isEqualToString:@""])
+	if (selectedVariables)
 	{
 		ZGVariable *firstVariable = [selectedVariables objectAtIndex:0];
 		
