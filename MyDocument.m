@@ -2261,10 +2261,30 @@ static NSSize *expandedWindowMinSize = nil;
 			NSBeep();
 			return NO;
 		}
-		else if (![clearButton isEnabled])
+        
+        ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
+        if (!variable)
+        {
+            return NO;
+        }
+        
+        if (![clearButton isEnabled])
 		{
 			[self lockTarget];
 		}
+        
+        ZGMemoryProtection memoryProtection;
+        ZGMemoryAddress memoryAddress = variable->address;
+        ZGMemorySize memorySize;
+        
+        if (ZGMemoryProtectionInRegion([currentProcess processID], &memoryAddress, &memorySize, &memoryProtection))
+        {
+            // if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
+            if (memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE))
+            {
+                return NO;
+            }
+        }
 	}
 	else if ([[aTableColumn identifier] isEqualToString:@"address"])
 	{

@@ -116,6 +116,33 @@ BOOL ZGWriteBytes(pid_t process, ZGMemoryAddress address, const void *bytes, ZGM
 	return success;
 }
 
+BOOL ZGMemoryProtectionInRegion(pid_t process, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection)
+{
+    BOOL success = NO;
+    vm_map_t task = MACH_PORT_NULL;
+    
+    if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
+	{
+		mach_port_t objectName = MACH_PORT_NULL;
+		vm_region_basic_info_data_t regionInfo;
+		mach_msg_type_number_t regionInfoSize = VM_REGION_BASIC_INFO_COUNT_64;
+		
+		success = mach_vm_region(task, address, size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS;
+		
+        if (success)
+        {
+            *memoryProtection = regionInfo.protection;
+        }
+        
+		if (task != MACH_PORT_NULL)
+		{
+			mach_port_deallocate(current_task(), task);
+		}
+	}
+    
+    return success;
+}
+
 BOOL ZGProtect(pid_t process, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection)
 {
 	BOOL success = NO;

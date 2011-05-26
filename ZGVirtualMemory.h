@@ -51,6 +51,7 @@ int ZGNumberOfRegionsForProcess(pid_t process);
 BOOL ZGReadBytes(pid_t process, ZGMemoryAddress address, void *bytes, ZGMemorySize size);
 BOOL ZGReadBytesCarefully(pid_t process, ZGMemoryAddress address, void *bytes, ZGMemorySize *size);
 BOOL ZGWriteBytes(pid_t process, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
+BOOL ZGMemoryProtectionInRegion(pid_t process, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection);
 BOOL ZGProtect(pid_t process, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection);
 void ZGFreeData(NSArray *dataArray);
 NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly);
