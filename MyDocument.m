@@ -2282,6 +2282,7 @@ static NSSize *expandedWindowMinSize = nil;
             // if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
             if (memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE))
             {
+                NSBeep();
                 return NO;
             }
         }
