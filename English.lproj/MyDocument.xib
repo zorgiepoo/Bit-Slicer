@@ -1518,16 +1518,16 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<object class="NSButton" id="125714169">
 									<reference key="NSNextResponder" ref="75092938"/>
 									<int key="NSvFlags">268</int>
-									<string key="NSFrame">{{9, 188}, {156, 18}}</string>
+									<string key="NSFrame">{{9, 188}, {149, 18}}</string>
 									<reference key="NSSuperview" ref="75092938"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="248151591"/>
 									<int key="NSViewLayerContentsRedrawPolicy">2</int>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="868354650">
-										<int key="NSCellFlags">67239424</int>
+										<int key="NSCellFlags">604110336</int>
 										<int key="NSCellFlags2">131072</int>
-										<string key="NSContents">Ignore Unwritable Values</string>
+										<string key="NSContents">Compare Stored Values</string>
 										<reference key="NSSupport" ref="26"/>
 										<reference key="NSControlView" ref="125714169"/>
 										<int key="NSButtonFlags">1211912703</int>
@@ -1550,9 +1550,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									<int key="NSViewLayerContentsRedrawPolicy">2</int>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="1052922599">
-										<int key="NSCellFlags">604110336</int>
+										<int key="NSCellFlags">-2080244224</int>
 										<int key="NSCellFlags2">131072</int>
-										<string key="NSContents">Compare Stored Values</string>
+										<string key="NSContents">Scan Unwritable Values</string>
 										<reference key="NSSupport" ref="26"/>
 										<reference key="NSControlView" ref="248151591"/>
 										<int key="NSButtonFlags">1211912703</int>
@@ -2898,14 +2898,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">ignoreUnwritableValuesCheckBox</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="125714169"/>
-					</object>
-					<int key="connectionID">100657</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">ignoreDataAlignmentCheckBox</string>
 						<reference key="source" ref="512844837"/>
 						<reference key="destination" ref="849671193"/>
@@ -2916,9 +2908,17 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">compareInitialValuesCheckBox</string>
 						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="125714169"/>
+					</object>
+					<int key="connectionID">100660</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">scanUnwritableValuesCheckBox</string>
+						<reference key="source" ref="512844837"/>
 						<reference key="destination" ref="248151591"/>
 					</object>
-					<int key="connectionID">100659</int>
+					<int key="connectionID">100662</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -4649,7 +4649,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100659</int>
+			<int key="maxID">100662</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4865,11 +4865,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>generalStatusTextField</string>
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
-							<string>ignoreUnwritableValuesCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
+							<string>scanUnwritableValuesCheckBox</string>
 							<string>searchButton</string>
 							<string>searchValueLabel</string>
 							<string>searchValueTextField</string>
@@ -4900,9 +4900,9 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
-							<string>NSButton</string>
 							<string>NSView</string>
 							<string>NSPopUpButton</string>
+							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -4934,11 +4934,11 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>generalStatusTextField</string>
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
-							<string>ignoreUnwritableValuesCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
+							<string>scanUnwritableValuesCheckBox</string>
 							<string>searchButton</string>
 							<string>searchValueLabel</string>
 							<string>searchValueTextField</string>
@@ -5022,10 +5022,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">ignoreUnwritableValuesCheckBox</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
 								<string key="name">includeNullTerminatorCheckBox</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
@@ -5040,6 +5036,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<object class="IBToOneOutletInfo">
 								<string key="name">runningApplicationsPopUpButton</string>
 								<string key="candidateClassName">NSPopUpButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">scanUnwritableValuesCheckBox</string>
+								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">searchButton</string>

@@ -486,7 +486,7 @@
 	[searchButton setTitle:@"Cancel"];
 	[searchButton setKeyEquivalent:@"\e"];
 	[compareInitialValuesCheckBox setEnabled:NO];
-	[ignoreUnwritableValuesCheckBox setEnabled:NO];
+	[scanUnwritableValuesCheckBox setEnabled:NO];
 	[ignoreDataAlignmentCheckBox setEnabled:NO];
 	[ignoreCaseCheckBox setEnabled:NO];
 	[includeNullTerminatorCheckBox setEnabled:NO];
@@ -520,7 +520,7 @@
 	[variableQualifierMatrix setEnabled:YES];
 	[functionPopUpButton setEnabled:YES];
 	
-	[ignoreUnwritableValuesCheckBox setEnabled:YES];
+	[scanUnwritableValuesCheckBox setEnabled:YES];
 	
 	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
 	
@@ -1664,7 +1664,7 @@ static NSSize *expandedWindowMinSize = nil;
 				}
 				else
 				{
-					searchData->scanReadOnly = ([ignoreUnwritableValuesCheckBox state] == NSOffState);
+					searchData->scanReadOnly = ([scanUnwritableValuesCheckBox state] == NSOnState);
 					ZGSearchForData([currentProcess processID], dataAlignment, dataSize, searchData, searchForDataCallback);
 				}
 				dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
@@ -1824,7 +1824,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	dispatch_block_t searchForDataBlock = ^
 	{
-		searchData->tempSavedData = ZGGetAllData(currentProcess, ![ignoreUnwritableValuesCheckBox state]);
+		searchData->tempSavedData = ZGGetAllData(currentProcess, [scanUnwritableValuesCheckBox state]);
 		if (searchData->tempSavedData)
 		{
 			[searchData->tempSavedData retain];
