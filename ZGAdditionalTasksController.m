@@ -294,14 +294,19 @@
         ZGMemorySize memorySize;
         
         // Tell the user what the current memory protection is set as for the variable
-        if (ZGMemoryProtectionInRegion([[document currentProcess] processID], &memoryAddress, &memorySize, &memoryProtection))
+        if (ZGMemoryProtectionInRegion([[document currentProcess] processID], &memoryAddress, &memorySize, &memoryProtection) &&
+            memoryAddress <= firstVariable->address && memoryAddress + memorySize >= firstVariable->address + firstVariable->size)
         {
-            if (memoryAddress <= firstVariable->address && memoryAddress + memorySize >= firstVariable->address + firstVariable->size)
-            {
-                [changeProtectionReadButton setState:memoryProtection & VM_PROT_READ];
-                [changeProtectionWriteButton setState:memoryProtection & VM_PROT_WRITE];
-                [changeProtectionExecuteButton setState:memoryProtection & VM_PROT_EXECUTE];
-            }
+            [changeProtectionReadButton setState:memoryProtection & VM_PROT_READ];
+            [changeProtectionWriteButton setState:memoryProtection & VM_PROT_WRITE];
+            [changeProtectionExecuteButton setState:memoryProtection & VM_PROT_EXECUTE];
+        }
+        else
+        {
+            // Turn everything off if we couldn't find the current memory protection
+            [changeProtectionReadButton setState:NSOffState];
+            [changeProtectionWriteButton setState:NSOffState];
+            [changeProtectionExecuteButton setState:NSOffState];
         }
 	}
 	
