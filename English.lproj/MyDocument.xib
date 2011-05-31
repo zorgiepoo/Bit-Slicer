@@ -2625,14 +2625,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<int key="connectionID">100474</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">compareInitialValuesCheckBoxRequest:</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="849671193"/>
-					</object>
-					<int key="connectionID">100497</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">includeNullTerminatorCheckBox</string>
 						<reference key="source" ref="512844837"/>
@@ -2919,6 +2911,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="destination" ref="248151591"/>
 					</object>
 					<int key="connectionID">100662</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">compareInitialValuesCheckBoxRequest:</string>
+						<reference key="source" ref="512844837"/>
+						<reference key="destination" ref="125714169"/>
+					</object>
+					<int key="connectionID">100663</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -4649,7 +4649,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100662</int>
+			<int key="maxID">100663</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
