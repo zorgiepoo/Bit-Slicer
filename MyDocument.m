@@ -889,12 +889,11 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 }
 
-- (BOOL)isFunctionTypeStore
+- (BOOL)isFunctionTypeStore:(NSInteger)functionTypeTag
 {
-    ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
     BOOL isFunctionTypeStore;
     
-    switch (functionType)
+    switch (functionTypeTag)
     {
         case ZGEqualsStored:
         case ZGNotEqualsStored:
@@ -907,6 +906,11 @@ static NSSize *expandedWindowMinSize = nil;
     }
     
     return isFunctionTypeStore;
+}
+
+- (BOOL)isFunctionTypeStore
+{
+    return [self isFunctionTypeStore:[[functionPopUpButton selectedItem] tag]];
 }
 
 - (IBAction)functionTypePopUpButtonRequest:(id)sender
@@ -2536,19 +2540,9 @@ static NSSize *expandedWindowMinSize = nil;
 	}
     else if ([theMenuItem action] == @selector(functionTypePopUpButtonRequest:))
     {
-        switch ([theMenuItem tag])
+        if ([self isFunctionTypeStore:[theMenuItem tag]] && !(searchData->savedData))
         {
-            case ZGEqualsStored:
-            case ZGNotEqualsStored:
-            case ZGGreaterThanStored:
-            case ZGLessThanStored:
-                if (!(searchData->savedData))
-                {
-                    return NO;
-                }
-                break;
-            default:
-                break;
+            return NO;
         }
     }
 	
