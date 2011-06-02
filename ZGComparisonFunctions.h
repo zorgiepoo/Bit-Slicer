@@ -24,10 +24,16 @@
 
 typedef enum
 {
+    // Regular comparisons
 	ZGEquals = 0,
 	ZGNotEquals,
 	ZGGreaterThan,
 	ZGLessThan,
+    // Stored comparisons
+    ZGEqualsStored,
+    ZGNotEqualsStored,
+    ZGGreaterThanStored,
+    ZGLessThanStored
 } ZGFunctionType;
 
 BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *unused);

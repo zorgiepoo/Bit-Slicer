@@ -50,7 +50,6 @@
 	IBOutlet NSTextField			*editVariablesValueTextField;
 	IBOutlet NSWindow				*editVariablesAddressWindow;
 	IBOutlet NSTextField            *editVariablesAddressTextField;
-	IBOutlet NSButton				*compareInitialValuesCheckBox;
 	IBOutlet NSTextField			*beginningAddressLabel;
 	IBOutlet NSTextField			*beginningAddressTextField;
 	IBOutlet NSTextField			*endingAddressLabel;
@@ -85,7 +84,6 @@
 - (IBAction)dataTypePopUpButtonRequest:(id)sender;
 - (IBAction)functionTypePopUpButtonRequest:(id)sender;
 - (IBAction)qualifierMatrixButtonRequest:(id)sender;
-- (IBAction)compareInitialValuesCheckBoxRequest:(id)sender;
 - (IBAction)lockTarget:(id)sender;
 - (IBAction)optionsDisclosureButton:(id)sender;
 - (IBAction)searchValue:(id)sender;
