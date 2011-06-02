@@ -280,7 +280,7 @@
 
 - (void)changeMemoryProtectionRequest
 {
-	// guess what the user may want if nothing is in the text fields
+	// guess what the user may want based on the selected variables
 	NSArray *selectedVariables = [document selectedVariables];
 	if (selectedVariables)
 	{
