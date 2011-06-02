@@ -238,9 +238,15 @@
 {
 	if ([[addressTextField stringValue] isEqualToString:@""] || [[sizeTextField stringValue] isEqualToString:@""])
 	{
-		// don't even bother yet checking
+		// don't even bother yet checking if nothing is filled out
 		return;
 	}
+    
+    if (lastFailedAddressString && lastFailedSizeString && [[addressTextField stringValue] isEqualToString:lastFailedAddressString] && [[sizeTextField stringValue] isEqualToString:lastFailedSizeString])
+    {
+        // also don't bother checking yet if the last failure is the same as this one
+        return;
+    }
 	
 	NSString *calculatedMemoryAddress = [ZGCalculator evaluateExpression:[addressTextField stringValue]];
 	NSString *calculatedMemorySize = [ZGCalculator evaluateExpression:[sizeTextField stringValue]];
@@ -293,6 +299,12 @@
 	
 	if (!success)
 	{
+        [lastFailedAddressString release];
+        lastFailedAddressString = [[addressTextField stringValue] copy];
+        
+        [lastFailedSizeString release];
+        lastFailedSizeString = [[sizeTextField stringValue] copy];
+        
 		NSRunAlertPanel(@"An error occurred", @"An unknown error occurred. Perhaps the address & size fields were not entered correctly, or that memory could not be read from the specified range.", nil, nil, nil);
 	}
 }
