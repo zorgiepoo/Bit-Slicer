@@ -2637,17 +2637,45 @@ static NSSize *expandedWindowMinSize = nil;
 	[editVariablesValueWindow close];
 	
 	NSArray *variables = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
-	NSMutableArray *valuesArray = [[NSMutableArray alloc] init];
-	
-	[variables enumerateObjectsUsingBlock:^(id variable, NSUInteger index, BOOL *stop)
-	 {
-		 [valuesArray addObject:[editVariablesValueTextField stringValue]];
-	 }];
-	
-	[self editVariables:variables
-			  newValues:valuesArray];
-	
-	[valuesArray release];
+    NSMutableArray *validVariables = [[NSMutableArray alloc] init];
+    
+    for (ZGVariable *variable in variables)
+    {
+        ZGMemoryProtection memoryProtection;
+        ZGMemoryAddress memoryAddress = variable->address;
+        ZGMemorySize memorySize;
+        
+        if (ZGMemoryProtectionInRegion([currentProcess processID], &memoryAddress, &memorySize, &memoryProtection))
+        {
+            // if !(the variable is within a single memory region and the memory region is not writable), then the variable is editable
+            if (!(memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE)))
+            {
+                [validVariables addObject:variable];
+            }
+        }
+    }
+    
+    if ([validVariables count] == 0)
+    {
+        NSRunAlertPanel(@"Writing Variables Failed", @"The selected variables could not be overwritten. Perhaps try to change the memory protection on the variable?", nil, nil, nil);
+    }
+    else
+    {
+        NSMutableArray *valuesArray = [[NSMutableArray alloc] init];
+        
+        NSUInteger variableIndex;
+        for (variableIndex = 0; variableIndex < [validVariables count]; variableIndex++)
+        {
+            [valuesArray addObject:[editVariablesValueTextField stringValue]];
+        }
+        
+        [self editVariables:validVariables
+                  newValues:valuesArray];
+        
+        [valuesArray release];
+    }
+    
+    [validVariables release];
 }
 
 - (IBAction)editVariablesValue:(id)sender
