@@ -151,6 +151,10 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		case ZGDouble:
 			size = 8;
 			break;
+        case ZGByteArray:
+            // Use an arbitrary size, anything is better than 0
+            size = 4;
+            break;
 		case ZGPointer:
 			size = pointerSize;
 			break;

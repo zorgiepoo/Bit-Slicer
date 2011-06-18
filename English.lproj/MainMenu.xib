@@ -12,9 +12,9 @@
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<string>NSMenu</string>
 			<string>NSMenuItem</string>
 			<string>NSCustomObject</string>
-			<string>NSMenu</string>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -607,6 +607,26 @@
 												<reference key="NSMixedImage" ref="310636482"/>
 												<int key="NSTag">7</int>
 											</object>
+											<object class="NSMenuItem" id="343524944">
+												<reference key="NSMenu" ref="783627442"/>
+												<bool key="NSIsDisabled">YES</bool>
+												<bool key="NSIsSeparator">YES</bool>
+												<string key="NSTitle"/>
+												<string key="NSKeyEquiv"/>
+												<int key="NSMnemonicLoc">2147483647</int>
+												<reference key="NSOnImage" ref="1033313550"/>
+												<reference key="NSMixedImage" ref="310636482"/>
+											</object>
+											<object class="NSMenuItem" id="1048178358">
+												<reference key="NSMenu" ref="783627442"/>
+												<string key="NSTitle">Byte Array</string>
+												<string key="NSKeyEquiv">9</string>
+												<int key="NSKeyEquivModMask">1048576</int>
+												<int key="NSMnemonicLoc">2147483647</int>
+												<reference key="NSOnImage" ref="1033313550"/>
+												<reference key="NSMixedImage" ref="310636482"/>
+												<int key="NSTag">9</int>
+											</object>
 											<object class="NSMenuItem" id="421386194">
 												<reference key="NSMenu" ref="783627442"/>
 												<bool key="NSIsDisabled">YES</bool>
@@ -620,7 +640,7 @@
 											<object class="NSMenuItem" id="431577840">
 												<reference key="NSMenu" ref="783627442"/>
 												<string key="NSTitle">Pointer</string>
-												<string key="NSKeyEquiv">9</string>
+												<string key="NSKeyEquiv">0</string>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="1033313550"/>
@@ -1222,6 +1242,14 @@
 					</object>
 					<int key="connectionID">829</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">addVariable:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="1048178358"/>
+					</object>
+					<int key="connectionID">831</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1655,6 +1683,8 @@
 							<reference ref="374446627"/>
 							<reference ref="431577840"/>
 							<reference ref="421386194"/>
+							<reference ref="1048178358"/>
+							<reference ref="343524944"/>
 						</object>
 						<reference key="parent" ref="218791066"/>
 					</object>
@@ -1842,6 +1872,16 @@
 						<reference key="object" ref="271236109"/>
 						<reference key="parent" ref="477738828"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">830</int>
+						<reference key="object" ref="1048178358"/>
+						<reference key="parent" ref="783627442"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">832</int>
+						<reference key="object" ref="343524944"/>
+						<reference key="parent" ref="783627442"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -1993,6 +2033,8 @@
 					<string>827.IBPluginDependency</string>
 					<string>83.IBPluginDependency</string>
 					<string>83.ImportedFromIB2</string>
+					<string>830.IBPluginDependency</string>
+					<string>832.IBPluginDependency</string>
 					<string>92.IBPluginDependency</string>
 					<string>92.ImportedFromIB2</string>
 				</object>
@@ -2144,6 +2186,8 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 				</object>
 			</object>
@@ -2159,7 +2203,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">829</int>
+			<int key="maxID">832</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2239,7 +2283,6 @@
 							<string>addVariable:</string>
 							<string>changeMemoryProtection:</string>
 							<string>clearSearchValues:</string>
-							<string>compareInitialValuesCheckBoxRequest:</string>
 							<string>copy:</string>
 							<string>dataTypePopUpButtonRequest:</string>
 							<string>editVariablesAddress:</string>
@@ -2286,7 +2329,6 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
-							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -2296,7 +2338,6 @@
 							<string>addVariable:</string>
 							<string>changeMemoryProtection:</string>
 							<string>clearSearchValues:</string>
-							<string>compareInitialValuesCheckBoxRequest:</string>
 							<string>copy:</string>
 							<string>dataTypePopUpButtonRequest:</string>
 							<string>editVariablesAddress:</string>
@@ -2330,10 +2371,6 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">clearSearchValues:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">compareInitialValuesCheckBoxRequest:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2426,7 +2463,6 @@
 							<string>beginningAddressLabel</string>
 							<string>beginningAddressTextField</string>
 							<string>clearButton</string>
-							<string>compareInitialValuesCheckBox</string>
 							<string>dataTypesPopUpButton</string>
 							<string>editVariablesAddressTextField</string>
 							<string>editVariablesAddressWindow</string>
@@ -2444,7 +2480,7 @@
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
-							<string>scanReadOnlyValuesCheckBox</string>
+							<string>scanUnwritableValuesCheckBox</string>
 							<string>searchButton</string>
 							<string>searchValueLabel</string>
 							<string>searchValueTextField</string>
@@ -2458,7 +2494,6 @@
 							<string>ZGAdditionalTasksController</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
-							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSTextField</string>
@@ -2495,7 +2530,6 @@
 							<string>beginningAddressLabel</string>
 							<string>beginningAddressTextField</string>
 							<string>clearButton</string>
-							<string>compareInitialValuesCheckBox</string>
 							<string>dataTypesPopUpButton</string>
 							<string>editVariablesAddressTextField</string>
 							<string>editVariablesAddressWindow</string>
@@ -2513,7 +2547,7 @@
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
-							<string>scanReadOnlyValuesCheckBox</string>
+							<string>scanUnwritableValuesCheckBox</string>
 							<string>searchButton</string>
 							<string>searchValueLabel</string>
 							<string>searchValueTextField</string>
@@ -2538,10 +2572,6 @@
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">clearButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">compareInitialValuesCheckBox</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
@@ -2613,7 +2643,7 @@
 								<string key="candidateClassName">NSPopUpButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">scanReadOnlyValuesCheckBox</string>
+								<string key="name">scanUnwritableValuesCheckBox</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
@@ -2771,10 +2801,10 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>changeProtectionAddressTextField</string>
 							<string>changeProtectionExecuteButton</string>
-							<string>changeProtectionFromAddressTextField</string>
 							<string>changeProtectionReadButton</string>
-							<string>changeProtectionToAddressTextField</string>
+							<string>changeProtectionSizeTextField</string>
 							<string>changeProtectionWindow</string>
 							<string>changeProtectionWriteButton</string>
 							<string>document</string>
@@ -2787,8 +2817,8 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSButton</string>
 							<string>NSTextField</string>
+							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSWindow</string>
@@ -2806,10 +2836,10 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>changeProtectionAddressTextField</string>
 							<string>changeProtectionExecuteButton</string>
-							<string>changeProtectionFromAddressTextField</string>
 							<string>changeProtectionReadButton</string>
-							<string>changeProtectionToAddressTextField</string>
+							<string>changeProtectionSizeTextField</string>
 							<string>changeProtectionWindow</string>
 							<string>changeProtectionWriteButton</string>
 							<string>document</string>
@@ -2823,19 +2853,19 @@
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">changeProtectionExecuteButton</string>
-								<string key="candidateClassName">NSButton</string>
+								<string key="name">changeProtectionAddressTextField</string>
+								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">changeProtectionFromAddressTextField</string>
-								<string key="candidateClassName">NSTextField</string>
+								<string key="name">changeProtectionExecuteButton</string>
+								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">changeProtectionReadButton</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">changeProtectionToAddressTextField</string>
+								<string key="name">changeProtectionSizeTextField</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
