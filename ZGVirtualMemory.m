@@ -394,7 +394,7 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 {
 	ZGMemorySize dataAlignment;
 	
-	if (dataType == ZGUTF8String)
+	if (dataType == ZGUTF8String || dataType == ZGByteArray)
 	{
 		dataAlignment = sizeof(int8_t);
 	}

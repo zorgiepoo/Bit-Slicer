@@ -636,12 +636,13 @@
 				 
 				 if (ZGReadBytes([currentProcess processID], variable->address, value, variable->size))
 				 {
-					 NSString *oldStringValue = [variable stringValue];
+					 NSString *oldStringValue = [[variable stringValue] copy];
 					 [variable setVariableValue:value];
 					 if (![[variable stringValue] isEqualToString:oldStringValue])
 					 {
 						 [watchVariablesTableView reloadData];
 					 }
+                     [oldStringValue release];
 				 }
 				 else if (variable->value)
 				 {
@@ -1202,6 +1203,23 @@ static NSSize *expandedWindowMinSize = nil;
 		[stringValue getCharacters:value
 							 range:NSMakeRange(0, [stringValue length])];
 	}
+    else if (dataType == ZGByteArray)
+    {
+        NSArray *bytesArray = [stringValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        
+        *dataSize = [bytesArray count];
+        value = malloc((size_t)*dataSize);
+        
+        char *valuePtr = value;
+        
+        for (NSString *byteString in bytesArray)
+        {
+            unsigned int theValue = 0;
+            [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
+            *valuePtr = (char)theValue;
+            valuePtr++;
+        }
+    }
 	
 	return value;
 }
@@ -1331,7 +1349,7 @@ static NSSize *expandedWindowMinSize = nil;
 	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
 	ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
 	
-	if (dataType != ZGUTF8String && dataType != ZGUTF16String)
+	if (dataType != ZGUTF8String && dataType != ZGUTF16String && dataType != ZGByteArray)
 	{
 		// This doesn't matter if the search is implicit
 		if (!searchArguments.isImplicit)
@@ -1346,12 +1364,12 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 	else if (functionType != ZGEquals && functionType != ZGNotEquals && functionType != ZGEqualsStored && functionType != ZGNotEqualsStored)
 	{
-		return @"The function you are using does not support Strings.";
+		return [NSString stringWithFormat:@"The function you are using does not support %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
 	}
 	
-	if ((dataType == ZGUTF8String || dataType == ZGUTF16String) && searchArguments.isImplicit)
+	if ((dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray) && searchArguments.isImplicit)
 	{
-		return @"Comparing Stored Values is not supported for Strings.";
+		return [NSString stringWithFormat:@"Comparing Stored Values is not supported for %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
 	}
 	
 	return nil;
@@ -1454,7 +1472,7 @@ static NSSize *expandedWindowMinSize = nil;
 		NSString *evaluatedSearchExpression = nil;
 		NSString *inputErrorMessage = nil;
 		
-		evaluatedSearchExpression = (dataType == ZGUTF8String || dataType == ZGUTF16String)
+		evaluatedSearchExpression = (dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
 									? [searchValueTextField stringValue]
 									: [ZGCalculator evaluateExpression:[searchValueTextField stringValue]];
 		inputErrorMessage = [self confirmSearchInput:evaluatedSearchExpression];
@@ -1465,10 +1483,13 @@ static NSSize *expandedWindowMinSize = nil;
 			return;
 		}
 		
-		// get search value and data size
-		searchValue = [self valueFromString:evaluatedSearchExpression
-								   dataType:dataType
-								   dataSize:&dataSize];
+        if (!searchArguments.isImplicit)
+        {
+            // get search value and data size
+            searchValue = [self valueFromString:evaluatedSearchExpression
+                                       dataType:dataType
+                                       dataSize:&dataSize];
+        }
 		
 		// We want to read the null terminator in this case... even though we normally don't store the terminator
 		// internally for UTF-16 strings. Lame hack, I know.
@@ -1477,17 +1498,12 @@ static NSSize *expandedWindowMinSize = nil;
 			dataSize += sizeof(unichar);
 		}
 		
-		if (searchArguments.isImplicit)
-		{
-			searchValue = NULL;
-		}
-		
 		ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
 		BOOL flagsFieldIsBlank = [[[flagsTextField stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@""];
 		
 		if ([flagsTextField isEnabled])
 		{
-			NSString *flagsExpression = (dataType == ZGUTF8String || dataType == ZGUTF16String) ? [flagsTextField stringValue] : [ZGCalculator evaluateExpression:[flagsTextField stringValue]];
+			NSString *flagsExpression = (dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray) ? [flagsTextField stringValue] : [ZGCalculator evaluateExpression:[flagsTextField stringValue]];
 			inputErrorMessage = [self testSearchComponent:flagsExpression];
 			
 			if (inputErrorMessage && !flagsFieldIsBlank)
@@ -1941,7 +1957,8 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		else if ([[aTableColumn identifier] isEqualToString:@"type"])
 		{
-			return [NSNumber numberWithInt:((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->type];
+            ZGVariableType type = ((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->type;
+			return [NSNumber numberWithInteger:[[aTableColumn dataCell] indexOfItemWithTag:type]];
 		}
 	}
 	
@@ -1979,12 +1996,16 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (void)changeVariable:(ZGVariable *)variable
 			   newType:(ZGVariableType)type
+               newSize:(ZGMemorySize)size
 {
 	[[self undoManager] setActionName:@"Type Change"];
 	[[[self undoManager] prepareWithInvocationTarget:self] changeVariable:variable
-																  newType:variable->type];
+																  newType:variable->type
+                                                                  newSize:variable->size];
 	
-	[variable setType:type pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+	[variable setType:type
+        requestedSize:size
+          pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 	
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
 	{
@@ -1997,6 +2018,7 @@ static NSSize *expandedWindowMinSize = nil;
 	  shouldRecordUndo:(BOOL)recordUndoFlag
 {
 	void *newValue = NULL;
+    ZGMemorySize oldSize = variable->size;
 	
 	int8_t int8Value = 0;
 	int16_t int16Value = 0;
@@ -2005,7 +2027,7 @@ static NSSize *expandedWindowMinSize = nil;
 	float floatValue = 0.0;
 	double doubleValue = 0.0;
 	
-	if (variable->type != ZGUTF8String && variable->type != ZGUTF16String)
+	if (variable->type != ZGUTF8String && variable->type != ZGUTF16String && variable->type != ZGByteArray)
 	{
 		stringObject = [ZGCalculator evaluateExpression:stringObject];
 	}
@@ -2126,6 +2148,26 @@ static NSSize *expandedWindowMinSize = nil;
 			}
 			
 			break;
+            
+        case ZGByteArray:
+        {
+            NSArray *bytesArray = [stringObject componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            
+            variable->size = [bytesArray count];
+            newValue = malloc(variable->size);
+            
+            char *valuePtr = newValue;
+            
+            for (NSString *byteString in bytesArray)
+            {
+                unsigned int theValue = 0;
+                [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
+                *valuePtr = (char)theValue;
+                valuePtr++;
+            }
+            
+            break;
+        }
 	}
 	
 	if (newValue)
@@ -2168,6 +2210,11 @@ static NSSize *expandedWindowMinSize = nil;
 					successfulWrite = NO;
 				}
 			}
+            
+            if (variable->type == ZGByteArray && !successfulWrite)
+            {
+                variable->size = oldSize;
+            }
 			
 			if (successfulWrite && recordUndoFlag)
 			{
@@ -2241,7 +2288,8 @@ static NSSize *expandedWindowMinSize = nil;
 		else if (([[aTableColumn identifier] isEqualToString:@"type"]))
 		{
 			[self changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-						 newType:[anObject integerValue]];
+						 newType:[[aTableColumn dataCell] indexOfItemWithTag:[anObject integerValue]]
+                         newSize:((ZGVariable *)([watchVariablesArray objectAtIndex:rowIndex]))->size];
 		}
 	}
 }

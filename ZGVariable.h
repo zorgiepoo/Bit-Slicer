@@ -33,7 +33,8 @@ typedef enum
 	ZGDouble,
 	ZGUTF8String,
 	ZGUTF16String,
-	ZGPointer
+	ZGPointer,
+    ZGByteArray
 } ZGVariableType;
 
 typedef enum
@@ -79,7 +80,9 @@ typedef enum
 - (void)setVariableValue:(void *)newValue;
 - (void)setFreezeValue:(void *)newFreezeValue;
 - (void)setName:(NSString *)newName;
-- (void)setType:(ZGVariableType)newType pointerSize:(ZGMemorySize)pointerSize;
+- (void)setType:(ZGVariableType)newType
+  requestedSize:(ZGMemorySize)requestedSize
+	pointerSize:(ZGMemorySize)pointerSize;
 - (void)setPointerSize:(ZGMemorySize)pointerSize;
 
 @end

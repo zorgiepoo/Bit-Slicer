@@ -222,6 +222,9 @@ BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const
 				UCCompareText(*((CollatorRef *)collator), value1, ((size_t)size) / sizeof(unichar), value2, ((size_t)size) / sizeof(unichar), (Boolean *)&isEqual, NULL);
 			}
 			break;
+        case ZGByteArray:
+            isEqual = (memcmp(value1, value2, size) == 0);
+            break;
 	}
 	
 	return isEqual;

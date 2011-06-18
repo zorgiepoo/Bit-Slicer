@@ -369,6 +369,28 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				}
 				
 				break;
+            case ZGByteArray:
+            {
+                ZGMemorySize byteIndex;
+                unsigned char *valuePtr = value;
+                NSMutableString *byteString = [NSMutableString stringWithString:@""];
+                for (byteIndex = 0; byteIndex < size; byteIndex++)
+                {
+                    NSString *hexString = [NSString stringWithFormat:@"%X", valuePtr[byteIndex]];
+                    // Make each byte two digits so it looks nice
+                    if ([hexString length] == 1)
+                    {
+                        hexString = [@"0" stringByAppendingString:hexString];
+                    }
+                    [byteString appendFormat:@"%@", hexString];
+                    if (byteIndex < size - 1)
+                    {
+                        [byteString appendString:@" "];
+                    }
+                }
+                [self setStringValue:byteString];
+                break;
+            }
 		}
 	}
 	else
@@ -432,14 +454,22 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 }
 
 - (void)setType:(ZGVariableType)newType
+  requestedSize:(ZGMemorySize)requestedSize
 	pointerSize:(ZGMemorySize)pointerSize
 {
 	type = newType;
 	
 	[self cleanState];
 	
-	size = [ZGVariable sizeFromType:newType
-						pointerSize:pointerSize];
+    if (newType == ZGByteArray)
+    {
+        size = requestedSize;
+    }
+    else
+    {
+        size = [ZGVariable sizeFromType:newType
+                            pointerSize:pointerSize];
+    }
 }
 
 // Precondition: size != pointerSize, otherwise this is a wasted effort
