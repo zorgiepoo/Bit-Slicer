@@ -569,7 +569,7 @@
 	{
 		return;
 	}
-	
+    
 	// First, update all the variable's addresses that are pointers
 	// We don't want to update this when the user is editing something in the table
 	if ([currentProcess processID] != NON_EXISTENT_PID_NUMBER && [watchVariablesTableView editedRow] == -1)
@@ -621,10 +621,8 @@
 		// Read all the variables and update them in the table view if needed
 		NSRange visibleRowsRange = [watchVariablesTableView rowsInRect:[watchVariablesTableView visibleRect]];
 		
-		[[watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
+		[[watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 		 {
-			 ZGVariable *variable = object;
-			 
 			 if (variable->type == ZGUTF8String || variable->type == ZGUTF16String)
 			 {
 				 variable->size = ZGGetStringSize([currentProcess processID], variable->address, variable->type);
@@ -633,24 +631,32 @@
 			 if (variable->size)
 			 {
 				 void *value = malloc((size_t)variable->size);
-				 
-				 if (ZGReadBytes([currentProcess processID], variable->address, value, variable->size))
-				 {
-					 NSString *oldStringValue = [[variable stringValue] copy];
-					 [variable setVariableValue:value];
-					 if (![[variable stringValue] isEqualToString:oldStringValue])
-					 {
-						 [watchVariablesTableView reloadData];
-					 }
-                     [oldStringValue release];
-				 }
-				 else if (variable->value)
-				 {
-					 [variable setVariableValue:NULL];
-					 [watchVariablesTableView reloadData];
-				 }
-				 
-				 free(value);
+                 
+                 if (value)
+                 {
+                     if (ZGReadBytes([currentProcess processID], variable->address, value, variable->size))
+                     {
+                         NSString *oldStringValue = [[variable stringValue] copy];
+                         [variable setVariableValue:value];
+                         if (![[variable stringValue] isEqualToString:oldStringValue])
+                         {
+                             [watchVariablesTableView reloadData];
+                         }
+                         [oldStringValue release];
+                     }
+                     else if (variable->value)
+                     {
+                         [variable setVariableValue:NULL];
+                         [watchVariablesTableView reloadData];
+                     }
+                     
+                     free(value);
+                 }
+                 else if (variable->value)
+                 {
+                     [variable setVariableValue:NULL];
+                     [watchVariablesTableView reloadData];
+                 }
 			 }
 			 else if (variable->lastUpdatedSize)
 			 {
@@ -2145,8 +2151,11 @@ static NSSize *expandedWindowMinSize = nil;
 			{
 				// String "" can be of 0 length
 				newValue = malloc(sizeof(unichar));
-				unichar nullTerminator = 0;
-				memcpy(newValue, &nullTerminator, sizeof(unichar));
+                if (newValue)
+                {
+                    unichar nullTerminator = 0;
+                    memcpy(newValue, &nullTerminator, sizeof(unichar));
+                }
 			}
 			
 			break;
@@ -2161,22 +2170,29 @@ static NSSize *expandedWindowMinSize = nil;
             // this is the maximum size allocated needed
             newValue = malloc(variable->size);
             
-            unsigned char *valuePtr = newValue;
-            writeSize = 0;
-            
-            for (NSString *byteString in bytesArray)
+            if (newValue)
             {
-                unsigned int theValue = 0;
-                [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
-                *valuePtr = (unsigned char)theValue;
-                valuePtr++;
+                unsigned char *valuePtr = newValue;
+                writeSize = 0;
                 
-                if ([[byteString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0)
+                for (NSString *byteString in bytesArray)
                 {
-                    break;
+                    unsigned int theValue = 0;
+                    [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
+                    *valuePtr = (unsigned char)theValue;
+                    valuePtr++;
+                    
+                    if ([[byteString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0)
+                    {
+                        break;
+                    }
+                    
+                    writeSize++;
                 }
-                
-                writeSize++;
+            }
+            else
+            {
+                variable->size = writeSize;
             }
             
             break;
@@ -2213,8 +2229,12 @@ static NSSize *expandedWindowMinSize = nil;
 					successfulWrite = NO;
 				}
 			}
+            else
+            {
+                successfulWrite = NO;
+            }
 			
-			if (variable->type == ZGUTF16String)
+			if (successfulWrite && variable->type == ZGUTF16String)
 			{
 				// Don't forget to write the null terminator
 				unichar nullTerminator = 0;
@@ -2238,7 +2258,7 @@ static NSSize *expandedWindowMinSize = nil;
 			}
 		}
 		
-		if (variable->type == ZGUTF16String)
+		if (variable->type == ZGUTF16String || variable->type == ZGByteArray)
 		{
 			free(newValue);
 		}

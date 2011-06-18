@@ -419,7 +419,10 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	if (newValue && size > 0)
 	{
 		value = malloc((size_t)size);
-		memcpy(value, newValue, (size_t)size);
+        if (value)
+        {
+            memcpy(value, newValue, (size_t)size);
+        }
 	}
 }
 
@@ -431,7 +434,10 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	}
 	
 	freezeValue = malloc((size_t)size);
-	memcpy(freezeValue, newFreezeValue, (size_t)size);
+    if (freezeValue)
+    {
+        memcpy(freezeValue, newFreezeValue, (size_t)size);
+    }
 }
 
 - (void)setName:(NSString *)newName
