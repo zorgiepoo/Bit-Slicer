@@ -2018,7 +2018,7 @@ static NSSize *expandedWindowMinSize = nil;
 	  shouldRecordUndo:(BOOL)recordUndoFlag
 {
 	void *newValue = NULL;
-    ZGMemorySize oldSize = variable->size;
+    ZGMemorySize writeSize = variable->size; // specifically needed for byte arrays
 	
 	int8_t int8Value = 0;
 	int16_t int16Value = 0;
@@ -2129,9 +2129,11 @@ static NSSize *expandedWindowMinSize = nil;
 		case ZGUTF8String:
 			newValue = (void *)[stringObject cStringUsingEncoding:NSUTF8StringEncoding];
 			variable->size = strlen(newValue) + 1;
+            writeSize = variable->size;
 			break;
 		case ZGUTF16String:
 			variable->size = [stringObject length] * sizeof(unichar);
+            writeSize = variable->size;
 			
 			if (variable->size)
 			{
@@ -2153,10 +2155,15 @@ static NSSize *expandedWindowMinSize = nil;
         {
             NSArray *bytesArray = [stringObject componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
             
+            // this is the size the user wants
             variable->size = [bytesArray count];
+            
+            // this is the maximum size allocated needed
             newValue = malloc(variable->size);
             
             char *valuePtr = newValue;
+            BOOL willStopIncrementingWriteSize = NO;
+            writeSize = 0;
             
             for (NSString *byteString in bytesArray)
             {
@@ -2164,6 +2171,16 @@ static NSSize *expandedWindowMinSize = nil;
                 [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
                 *valuePtr = (char)theValue;
                 valuePtr++;
+                
+                if ([[byteString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0)
+                {
+                    willStopIncrementingWriteSize = YES;
+                }
+                
+                if (!willStopIncrementingWriteSize)
+                {
+                    writeSize++;
+                }
             }
             
             break;
@@ -2193,9 +2210,9 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			BOOL successfulWrite = YES;
 			
-			if (variable->size)
+			if (writeSize)
 			{
-				if (!ZGWriteBytes([currentProcess processID], variable->address, newValue, variable->size))
+				if (!ZGWriteBytes([currentProcess processID], variable->address, newValue, writeSize))
 				{
 					successfulWrite = NO;
 				}
@@ -2205,16 +2222,11 @@ static NSSize *expandedWindowMinSize = nil;
 			{
 				// Don't forget to write the null terminator
 				unichar nullTerminator = 0;
-				if (!ZGWriteBytes([currentProcess processID], variable->address + variable->size, &nullTerminator, sizeof(unichar)))
+				if (!ZGWriteBytes([currentProcess processID], variable->address + writeSize, &nullTerminator, sizeof(unichar)))
 				{
 					successfulWrite = NO;
 				}
 			}
-            
-            if (variable->type == ZGByteArray && !successfulWrite)
-            {
-                variable->size = oldSize;
-            }
 			
 			if (successfulWrite && recordUndoFlag)
 			{
