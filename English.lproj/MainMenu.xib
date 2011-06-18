@@ -607,7 +607,7 @@
 												<reference key="NSMixedImage" ref="310636482"/>
 												<int key="NSTag">7</int>
 											</object>
-											<object class="NSMenuItem" id="343524944">
+											<object class="NSMenuItem" id="979344748">
 												<reference key="NSMenu" ref="783627442"/>
 												<bool key="NSIsDisabled">YES</bool>
 												<bool key="NSIsSeparator">YES</bool>
@@ -617,7 +617,7 @@
 												<reference key="NSOnImage" ref="1033313550"/>
 												<reference key="NSMixedImage" ref="310636482"/>
 											</object>
-											<object class="NSMenuItem" id="1048178358">
+											<object class="NSMenuItem" id="1010840486">
 												<reference key="NSMenu" ref="783627442"/>
 												<string key="NSTitle">Byte Array</string>
 												<string key="NSKeyEquiv">9</string>
@@ -664,6 +664,15 @@
 									<string key="NSTitle">Edit Variable Address…</string>
 									<string key="NSKeyEquiv">E</string>
 									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="1033313550"/>
+									<reference key="NSMixedImage" ref="310636482"/>
+								</object>
+								<object class="NSMenuItem" id="424445454">
+									<reference key="NSMenu" ref="477738828"/>
+									<string key="NSTitle">Edit Variable Size…</string>
+									<string key="NSKeyEquiv">e</string>
+									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
@@ -1246,9 +1255,17 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">addVariable:</string>
 						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="1048178358"/>
+						<reference key="destination" ref="1010840486"/>
 					</object>
 					<int key="connectionID">831</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">editVariablesSize:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="424445454"/>
+					</object>
+					<int key="connectionID">835</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1649,6 +1666,7 @@
 							<reference ref="294871457"/>
 							<reference ref="225067832"/>
 							<reference ref="271236109"/>
+							<reference ref="424445454"/>
 						</object>
 						<reference key="parent" ref="179297160"/>
 					</object>
@@ -1683,8 +1701,8 @@
 							<reference ref="374446627"/>
 							<reference ref="431577840"/>
 							<reference ref="421386194"/>
-							<reference ref="1048178358"/>
-							<reference ref="343524944"/>
+							<reference ref="1010840486"/>
+							<reference ref="979344748"/>
 						</object>
 						<reference key="parent" ref="218791066"/>
 					</object>
@@ -1874,13 +1892,18 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">830</int>
-						<reference key="object" ref="1048178358"/>
+						<reference key="object" ref="1010840486"/>
 						<reference key="parent" ref="783627442"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">832</int>
-						<reference key="object" ref="343524944"/>
+						<reference key="object" ref="979344748"/>
 						<reference key="parent" ref="783627442"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">833</int>
+						<reference key="object" ref="424445454"/>
+						<reference key="parent" ref="477738828"/>
 					</object>
 				</object>
 			</object>
@@ -2035,6 +2058,7 @@
 					<string>83.ImportedFromIB2</string>
 					<string>830.IBPluginDependency</string>
 					<string>832.IBPluginDependency</string>
+					<string>833.IBPluginDependency</string>
 					<string>92.IBPluginDependency</string>
 					<string>92.ImportedFromIB2</string>
 				</object>
@@ -2188,6 +2212,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 				</object>
 			</object>
@@ -2203,7 +2228,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">832</int>
+			<int key="maxID">835</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2288,6 +2313,9 @@
 							<string>editVariablesAddress:</string>
 							<string>editVariablesAddressCancelButton:</string>
 							<string>editVariablesAddressOkayButton:</string>
+							<string>editVariablesSize:</string>
+							<string>editVariablesSizeCancelButton:</string>
+							<string>editVariablesSizeOkayButton:</string>
 							<string>editVariablesValue:</string>
 							<string>editVariablesValueCancelButton:</string>
 							<string>editVariablesValueOkayButton:</string>
@@ -2329,6 +2357,9 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
@@ -2343,6 +2374,9 @@
 							<string>editVariablesAddress:</string>
 							<string>editVariablesAddressCancelButton:</string>
 							<string>editVariablesAddressOkayButton:</string>
+							<string>editVariablesSize:</string>
+							<string>editVariablesSizeCancelButton:</string>
+							<string>editVariablesSizeOkayButton:</string>
 							<string>editVariablesValue:</string>
 							<string>editVariablesValueCancelButton:</string>
 							<string>editVariablesValueOkayButton:</string>
@@ -2391,6 +2425,18 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">editVariablesAddressOkayButton:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">editVariablesSize:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">editVariablesSizeCancelButton:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">editVariablesSizeOkayButton:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2466,6 +2512,8 @@
 							<string>dataTypesPopUpButton</string>
 							<string>editVariablesAddressTextField</string>
 							<string>editVariablesAddressWindow</string>
+							<string>editVariablesSizeTextField</string>
+							<string>editVariablesSizeWindow</string>
 							<string>editVariablesValueTextField</string>
 							<string>editVariablesValueWindow</string>
 							<string>endingAddressLabel</string>
@@ -2496,6 +2544,8 @@
 							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
+							<string>NSWindow</string>
 							<string>NSTextField</string>
 							<string>NSWindow</string>
 							<string>NSTextField</string>
@@ -2533,6 +2583,8 @@
 							<string>dataTypesPopUpButton</string>
 							<string>editVariablesAddressTextField</string>
 							<string>editVariablesAddressWindow</string>
+							<string>editVariablesSizeTextField</string>
+							<string>editVariablesSizeWindow</string>
 							<string>editVariablesValueTextField</string>
 							<string>editVariablesValueWindow</string>
 							<string>endingAddressLabel</string>
@@ -2584,6 +2636,14 @@
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">editVariablesAddressWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">editVariablesSizeTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">editVariablesSizeWindow</string>
 								<string key="candidateClassName">NSWindow</string>
 							</object>
 							<object class="IBToOneOutletInfo">

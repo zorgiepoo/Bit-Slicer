@@ -76,6 +76,7 @@ typedef enum
 - (NSString *)stringValue;
 - (void)updateStringValue;
 - (NSString *)addressStringValue;
+- (NSString *)sizeStringValue;
 - (void)setAddressStringValue:(NSString *)newAddressString;
 - (void)setVariableValue:(void *)newValue;
 - (void)setFreezeValue:(void *)newFreezeValue;

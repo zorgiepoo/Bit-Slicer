@@ -2590,6 +2590,33 @@ static NSSize *expandedWindowMinSize = nil;
 			return NO;
 		}
 	}
+    
+    else if ([theMenuItem action] == @selector(editVariablesSize:))
+    {
+        if ([[watchVariablesTableView selectedRowIndexes] count] != 1)
+		{
+			[theMenuItem setTitle:@"Edit Variable Sizes…"];
+		}
+		else
+		{
+			[theMenuItem setTitle:@"Edit Variable Size…"];
+		}
+        
+        if ([self canCancelTask] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+		{
+			return NO;
+		}
+        
+        // All selected variables must be Byte Array's
+        NSArray *selectedVariables = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
+        for (ZGVariable *variable in selectedVariables)
+        {
+            if (variable->type != ZGByteArray)
+            {
+                return NO;
+            }
+        }
+    }
 	
 	else if ([theMenuItem action] == @selector(memoryDumpRequest:) || [theMenuItem action] == @selector(memoryDumpAllRequest:) || [theMenuItem action] == @selector(getInitialValues:) || [theMenuItem action] == @selector(changeMemoryProtection:))
 	{
@@ -2792,6 +2819,89 @@ static NSSize *expandedWindowMinSize = nil;
 	[editVariablesAddressTextField setStringValue:[variable addressFormula]];
 	
 	[NSApp beginSheet:editVariablesAddressWindow
+	   modalForWindow:watchWindow
+		modalDelegate:self
+	   didEndSelector:nil
+		  contextInfo:NULL];
+}
+
+#pragma mark Edit Variables Sizes (Byte Arrays)
+
+- (IBAction)editVariablesSizeCancelButton:(id)sender
+{
+    [NSApp endSheet:editVariablesSizeWindow];
+	[editVariablesSizeWindow close];
+}
+
+- (void)editVariables:(NSArray *)variables
+       requestedSizes:(NSArray *)requestedSizes
+{
+    NSMutableArray *currentVariableSizes = [[NSMutableArray alloc] init];
+    
+    for (ZGVariable *variable in variables)
+    {
+        [currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:variable->size]];
+    }
+    
+	[[self undoManager] setActionName:@"Size Change"];
+	[[[self undoManager] prepareWithInvocationTarget:self] editVariables:variables
+                                                          requestedSizes:currentVariableSizes];
+    
+    [currentVariableSizes release];
+    
+    [variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+     {
+         variable->size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
+     }];
+    
+    [watchVariablesTableView reloadData];
+}
+
+- (IBAction)editVariablesSizeOkayButton:(id)sender
+{
+    NSString *sizeExpression = [ZGCalculator evaluateExpression:[editVariablesSizeTextField stringValue]];
+    ZGMemorySize requestedSize = 0;
+    if ([sizeExpression isHexRepresentation])
+    {
+        [[NSScanner scannerWithString:sizeExpression] scanHexLongLong:&requestedSize];
+    }
+    else
+    {
+        requestedSize = [sizeExpression unsignedLongLongValue];
+    }
+    
+    if (requestedSize == 0)
+    {
+        NSRunAlertPanel(@"Failed to edit size", @"The size must be greater than 0.", nil, nil, nil);
+    }
+    else
+    {
+        [NSApp endSheet:editVariablesSizeWindow];
+        [editVariablesSizeWindow close];
+        
+        NSArray *variables = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
+        
+        NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
+        
+        NSUInteger variableIndex;
+        for (variableIndex = 0; variableIndex < [variables count]; variableIndex++)
+        {
+            [requestedSizes addObject:[NSNumber numberWithUnsignedLongLong:requestedSize]];
+        }
+        
+        [self editVariables:variables
+             requestedSizes:requestedSizes];
+        
+        [requestedSizes release];
+    }
+}
+
+- (IBAction)editVariablesSize:(id)sender
+{
+    ZGVariable *firstVariable = [watchVariablesArray objectAtIndex:[watchVariablesTableView selectedRow]];
+    [editVariablesSizeTextField setStringValue:[firstVariable sizeStringValue]];
+	
+	[NSApp beginSheet:editVariablesSizeWindow
 	   modalForWindow:watchWindow
 		modalDelegate:self
 	   didEndSelector:nil

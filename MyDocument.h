@@ -31,47 +31,49 @@
 
 @interface MyDocument : NSDocument <NSTableViewDelegate>
 {
-	IBOutlet NSPopUpButton			*runningApplicationsPopUpButton;
-	IBOutlet NSTextField			*generalStatusTextField;
-	IBOutlet NSTextField			*searchValueTextField;
-	IBOutlet NSTextField			*searchValueLabel;
-	IBOutlet NSTextField			*flagsTextField;
-	IBOutlet NSTextField			*flagsLabel;
-	IBOutlet NSProgressIndicator	*searchingProgressIndicator;
-	IBOutlet NSTableView			*watchVariablesTableView;
-	IBOutlet NSPopUpButton			*dataTypesPopUpButton;
-	IBOutlet NSPopUpButton			*functionPopUpButton;
-	IBOutlet NSButton				*optionsDisclosureButton;
-	IBOutlet NSView					*optionsView;
-	IBOutlet NSButton				*clearButton;
-	IBOutlet NSButton				*searchButton;
-	IBOutlet NSMatrix				*variableQualifierMatrix;
-	IBOutlet NSWindow				*editVariablesValueWindow;
-	IBOutlet NSTextField			*editVariablesValueTextField;
-	IBOutlet NSWindow				*editVariablesAddressWindow;
-	IBOutlet NSTextField            *editVariablesAddressTextField;
-	IBOutlet NSTextField			*beginningAddressLabel;
-	IBOutlet NSTextField			*beginningAddressTextField;
-	IBOutlet NSTextField			*endingAddressLabel;
-	IBOutlet NSTextField			*endingAddressTextField;
-	IBOutlet NSButton				*scanUnwritableValuesCheckBox;
-	IBOutlet NSButton				*ignoreDataAlignmentCheckBox;
-	IBOutlet NSButton				*ignoreCaseCheckBox;
-	IBOutlet NSButton				*includeNullTerminatorCheckBox;
-	IBOutlet NSWindow				*watchWindow;
+	IBOutlet NSPopUpButton			     *runningApplicationsPopUpButton;
+	IBOutlet NSTextField			     *generalStatusTextField;
+	IBOutlet NSTextField			     *searchValueTextField;
+	IBOutlet NSTextField			     *searchValueLabel;
+	IBOutlet NSTextField			     *flagsTextField;
+	IBOutlet NSTextField			     *flagsLabel;
+	IBOutlet NSProgressIndicator	     *searchingProgressIndicator;
+	IBOutlet NSTableView			     *watchVariablesTableView;
+	IBOutlet NSPopUpButton			     *dataTypesPopUpButton;
+	IBOutlet NSPopUpButton			     *functionPopUpButton;
+	IBOutlet NSButton				     *optionsDisclosureButton;
+	IBOutlet NSView					     *optionsView;
+	IBOutlet NSButton				     *clearButton;
+	IBOutlet NSButton				     *searchButton;
+	IBOutlet NSMatrix				     *variableQualifierMatrix;
+	IBOutlet NSWindow				     *editVariablesValueWindow;
+	IBOutlet NSTextField			     *editVariablesValueTextField;
+	IBOutlet NSWindow				     *editVariablesAddressWindow;
+	IBOutlet NSTextField                 *editVariablesAddressTextField;
+    IBOutlet NSWindow                    *editVariablesSizeWindow;
+    IBOutlet NSTextField                 *editVariablesSizeTextField;
+	IBOutlet NSTextField			     *beginningAddressLabel;
+	IBOutlet NSTextField			     *beginningAddressTextField;
+	IBOutlet NSTextField			     *endingAddressLabel;
+	IBOutlet NSTextField			     *endingAddressTextField;
+	IBOutlet NSButton				     *scanUnwritableValuesCheckBox;
+	IBOutlet NSButton				     *ignoreDataAlignmentCheckBox;
+	IBOutlet NSButton				     *ignoreCaseCheckBox;
+	IBOutlet NSButton				     *includeNullTerminatorCheckBox;
+	IBOutlet NSWindow				     *watchWindow;
 	IBOutlet ZGAdditionalTasksController *additionalTasksController;
-	NSArray							*watchVariablesArray;
-	ZGProcess						*currentProcess;
-	NSString						*desiredProcessName;
-	ZGTimer							*watchVariablesTimer;
-	ZGTimer							*updateSearchUserInterfaceTimer;
-	BOOL							shouldIgnoreTableViewSelectionChange;
-	ZGVariableType					currentSearchDataType;
-	ZGSearchData					*searchData;
-	ZGSearchArguments				searchArguments;
+	NSArray							     *watchVariablesArray;
+	ZGProcess						     *currentProcess;
+	NSString						     *desiredProcessName;
+	ZGTimer							     *watchVariablesTimer;
+	ZGTimer							     *updateSearchUserInterfaceTimer;
+	BOOL							     shouldIgnoreTableViewSelectionChange;
+	ZGVariableType					     currentSearchDataType;
+	ZGSearchData					     *searchData;
+	ZGSearchArguments				     searchArguments;
 	
 	// For comparing unicode strings
-	CollatorRef						collator;
+	CollatorRef						     collator;
 }
 
 - (ZGProcess *)currentProcess;
@@ -100,6 +102,10 @@
 - (IBAction)editVariablesAddressCancelButton:(id)sender;
 - (IBAction)editVariablesAddressOkayButton:(id)sender;
 - (IBAction)editVariablesAddress:(id)sender;
+
+- (IBAction)editVariablesSizeCancelButton:(id)sender;
+- (IBAction)editVariablesSizeOkayButton:(id)sender;
+- (IBAction)editVariablesSize:(id)sender;
 
 - (IBAction)memoryDumpRequest:(id)sender;
 - (IBAction)memoryDumpAllRequest:(id)sender;
