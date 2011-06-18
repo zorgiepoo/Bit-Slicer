@@ -2163,7 +2163,7 @@ static NSSize *expandedWindowMinSize = nil;
             variable->size = [bytesArray count];
             
             // this is the maximum size allocated needed
-            newValue = malloc(variable->size);
+            newValue = malloc((size_t)variable->size);
             
             if (newValue)
             {

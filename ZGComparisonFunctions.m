@@ -223,7 +223,7 @@ BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const
 			}
 			break;
         case ZGByteArray:
-            isEqual = (memcmp(value1, value2, size) == 0);
+            isEqual = (memcmp(value1, value2, (size_t)size) == 0);
             break;
 	}
 	
