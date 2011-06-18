@@ -2853,24 +2853,48 @@ static NSSize *expandedWindowMinSize = nil;
        requestedSizes:(NSArray *)requestedSizes
 {
     NSMutableArray *currentVariableSizes = [[NSMutableArray alloc] init];
+    NSMutableArray *validVariables = [[NSMutableArray alloc] init];
     
-    for (ZGVariable *variable in variables)
-    {
-        [currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:variable->size]];
-    }
-    
-	[[self undoManager] setActionName:@"Size Change"];
-	[[[self undoManager] prepareWithInvocationTarget:self] editVariables:variables
-                                                          requestedSizes:currentVariableSizes];
-    
-    [currentVariableSizes release];
-    
+    // Make sure the size changes are possible. Only change the ones that seem possible.
     [variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
      {
-         variable->size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
+         ZGMemorySize size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
+         void *buffer = malloc((size_t)size);
+         
+         if (buffer)
+         { 
+             if (ZGReadBytesCarefully([currentProcess processID], variable->address, buffer, &size))
+             {
+                 if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
+                 {
+                     [validVariables addObject:variable];
+                     [currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:variable->size]];
+                 }
+             }
+             free(buffer);
+         }
      }];
     
-    [watchVariablesTableView reloadData];
+    if ([validVariables count] > 0)
+    {
+        [[self undoManager] setActionName:@"Size Change"];
+        [[[self undoManager] prepareWithInvocationTarget:self] editVariables:validVariables
+                                                              requestedSizes:currentVariableSizes];
+        
+        [validVariables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+         {
+             variable->size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
+         }];
+        
+        [watchVariablesTableView reloadData];
+    }
+    else
+    {
+        NSRunAlertPanel(@"Failed to change size", @"The size that you have requested could not be changed. Perhaps it is too big of a value?", nil, nil, nil);
+    }
+    
+    [currentVariableSizes release];
+    [validVariables release];
 }
 
 - (IBAction)editVariablesSizeOkayButton:(id)sender
