@@ -405,7 +405,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (NSString *)sizeStringValue
 {
-    return [NSString stringWithFormat:@"%lld", size];
+    return [NSString stringWithFormat:@"%llu", size];
 }
 
 - (void)setVariableValue:(void *)newValue

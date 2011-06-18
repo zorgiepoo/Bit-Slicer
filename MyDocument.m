@@ -1210,13 +1210,13 @@ static NSSize *expandedWindowMinSize = nil;
         *dataSize = [bytesArray count];
         value = malloc((size_t)*dataSize);
         
-        char *valuePtr = value;
+        unsigned char *valuePtr = value;
         
         for (NSString *byteString in bytesArray)
         {
             unsigned int theValue = 0;
             [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
-            *valuePtr = (char)theValue;
+            *valuePtr = (unsigned char)theValue;
             valuePtr++;
         }
     }
@@ -2161,26 +2161,22 @@ static NSSize *expandedWindowMinSize = nil;
             // this is the maximum size allocated needed
             newValue = malloc(variable->size);
             
-            char *valuePtr = newValue;
-            BOOL willStopIncrementingWriteSize = NO;
+            unsigned char *valuePtr = newValue;
             writeSize = 0;
             
             for (NSString *byteString in bytesArray)
             {
                 unsigned int theValue = 0;
                 [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
-                *valuePtr = (char)theValue;
+                *valuePtr = (unsigned char)theValue;
                 valuePtr++;
                 
                 if ([[byteString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0)
                 {
-                    willStopIncrementingWriteSize = YES;
+                    break;
                 }
                 
-                if (!willStopIncrementingWriteSize)
-                {
-                    writeSize++;
-                }
+                writeSize++;
             }
             
             break;
@@ -2860,6 +2856,7 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)editVariablesSizeOkayButton:(id)sender
 {
     NSString *sizeExpression = [ZGCalculator evaluateExpression:[editVariablesSizeTextField stringValue]];
+    
     ZGMemorySize requestedSize = 0;
     if ([sizeExpression isHexRepresentation])
     {
@@ -2870,7 +2867,11 @@ static NSSize *expandedWindowMinSize = nil;
         requestedSize = [sizeExpression unsignedLongLongValue];
     }
     
-    if (requestedSize == 0)
+    if (!isValidNumber(sizeExpression))
+    {
+        NSRunAlertPanel(@"Invalid size", @"The size you have supplied is not valid.", nil, nil, nil);
+    }
+    else if (requestedSize <= 0)
     {
         NSRunAlertPanel(@"Failed to edit size", @"The size must be greater than 0.", nil, nil, nil);
     }
