@@ -652,11 +652,6 @@
                      
                      free(value);
                  }
-                 else if (variable->value)
-                 {
-                     [variable setVariableValue:NULL];
-                     [watchVariablesTableView reloadData];
-                 }
 			 }
 			 else if (variable->lastUpdatedSize)
 			 {
