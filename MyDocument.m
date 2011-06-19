@@ -1496,8 +1496,9 @@ static NSSize *expandedWindowMinSize = nil;
 			dataSize += sizeof(unichar);
 		}
         
-        if (searchArguments.isImplicit)
+        if (searchArguments.isImplicit && searchValue)
         {
+            free(searchValue);
             searchValue = NULL;
         }
 		
