@@ -1377,7 +1377,7 @@ static NSSize *expandedWindowMinSize = nil;
 	if (dataType != ZGUTF8String && dataType != ZGUTF16String && dataType != ZGByteArray)
 	{
 		// This doesn't matter if the search is implicit or if it's a regular function type
-		if (!searchArguments.isImplicit || functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
+		if ([self doesFunctionTypeAllowSearchInput])
 		{
 			NSString *inputError = [self testSearchComponent:expression];
 			
@@ -1522,7 +1522,7 @@ static NSSize *expandedWindowMinSize = nil;
         
         ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
         
-        if (searchArguments.isImplicit && searchValue && functionType != ZGEqualsStoredPlus && functionType != ZGNotEqualsStoredPlus)
+        if (searchValue && ![self doesFunctionTypeAllowSearchInput])
         {
             free(searchValue);
             searchValue = NULL;
