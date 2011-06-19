@@ -1484,13 +1484,10 @@ static NSSize *expandedWindowMinSize = nil;
 			return;
 		}
 		
-        if (!searchArguments.isImplicit)
-        {
-            // get search value and data size
-            searchValue = [self valueFromString:evaluatedSearchExpression
-                                       dataType:dataType
-                                       dataSize:&dataSize];
-        }
+        // get search value and data size
+        searchValue = [self valueFromString:evaluatedSearchExpression
+                                   dataType:dataType
+                                   dataSize:&dataSize];
 		
 		// We want to read the null terminator in this case... even though we normally don't store the terminator
 		// internally for UTF-16 strings. Lame hack, I know.
@@ -1498,6 +1495,11 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			dataSize += sizeof(unichar);
 		}
+        
+        if (searchArguments.isImplicit)
+        {
+            searchValue = NULL;
+        }
 		
 		ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
 		BOOL flagsFieldIsBlank = [[[flagsTextField stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@""];
