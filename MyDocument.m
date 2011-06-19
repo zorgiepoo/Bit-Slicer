@@ -52,6 +52,7 @@
 
 - (BOOL)isInNarrowSearchMode;
 
+- (BOOL)doesFunctionTypeAllowSearchInput;
 - (BOOL)isFunctionTypeStore;
 
 @end
@@ -503,7 +504,7 @@
 	
 	[dataTypesPopUpButton setEnabled:YES];
     
-	if (![self isFunctionTypeStore])
+	if ([self doesFunctionTypeAllowSearchInput])
 	{
 		[searchValueTextField setEnabled:YES];
 	}
@@ -736,7 +737,7 @@
 		[flagsTextField setEnabled:YES];
 		[flagsLabel setTextColor:[NSColor controlTextColor]];
 		
-		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored)
+		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
 		{
 			// epsilon
 			[flagsLabel setStringValue:@"Epsilon:"];
@@ -757,7 +758,7 @@
 	}
 	else /* if data type is an integer type */
 	{
-		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored)
+		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
 		{
 			[flagsTextField setEnabled:NO];
 			[flagsTextField setStringValue:@""];
@@ -891,6 +892,27 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 }
 
+- (BOOL)doesFunctionTypeAllowSearchInput
+{
+    BOOL allows;
+    switch ([[functionPopUpButton selectedItem] tag])
+    {
+        case ZGEquals:
+        case ZGNotEquals:
+        case ZGGreaterThan:
+        case ZGLessThan:
+        case ZGEqualsStoredPlus:
+        case ZGNotEqualsStoredPlus:
+            allows = YES;
+            break;
+        default:
+            allows = NO;
+            break;
+    }
+    
+    return allows;
+}
+
 - (BOOL)isFunctionTypeStore:(NSInteger)functionTypeTag
 {
     BOOL isFunctionTypeStore;
@@ -901,6 +923,8 @@ static NSSize *expandedWindowMinSize = nil;
         case ZGNotEqualsStored:
         case ZGGreaterThanStored:
         case ZGLessThanStored:
+        case ZGEqualsStoredPlus:
+        case ZGNotEqualsStoredPlus:
             isFunctionTypeStore = YES;
             break;
         default:
@@ -919,7 +943,7 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	[self updateFlags];
     
-    if ([self isFunctionTypeStore])
+    if (![self doesFunctionTypeAllowSearchInput])
     {
         [searchValueTextField setEnabled:NO];
         [searchValueLabel setTextColor:[NSColor disabledControlTextColor]];
@@ -1240,7 +1264,7 @@ static NSSize *expandedWindowMinSize = nil;
 	[watchVariablesTableView reloadData];
 	
 	// Make sure the search value field is enabled if we aren't doing a store comparison
-    if (![self isFunctionTypeStore])
+    if ([self doesFunctionTypeAllowSearchInput])
     {
         [searchValueTextField setEnabled:YES];
         [searchValueLabel setTextColor:[NSColor controlTextColor]]; 
@@ -1352,8 +1376,8 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	if (dataType != ZGUTF8String && dataType != ZGUTF16String && dataType != ZGByteArray)
 	{
-		// This doesn't matter if the search is implicit
-		if (!searchArguments.isImplicit)
+		// This doesn't matter if the search is implicit or if it's a regular function type
+		if (!searchArguments.isImplicit || functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
 		{
 			NSString *inputError = [self testSearchComponent:expression];
 			
@@ -1363,7 +1387,7 @@ static NSSize *expandedWindowMinSize = nil;
 			}
 		}
 	}
-	else if (functionType != ZGEquals && functionType != ZGNotEquals && functionType != ZGEqualsStored && functionType != ZGNotEqualsStored)
+	else if (functionType != ZGEquals && functionType != ZGNotEquals && functionType != ZGEqualsStored && functionType != ZGNotEqualsStored && functionType != ZGEqualsStoredPlus && functionType != ZGNotEqualsStoredPlus)
 	{
 		return [NSString stringWithFormat:@"The function you are using does not support %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
 	}
@@ -1393,7 +1417,7 @@ static NSSize *expandedWindowMinSize = nil;
 	watchVariablesArray = [[NSArray array] retain];
 	[watchVariablesTableView reloadData];
 	
-	if (![self isFunctionTypeStore])
+	if ([self doesFunctionTypeAllowSearchInput])
 	{
 		[searchValueTextField setEnabled:YES];
 	}
@@ -1496,13 +1520,14 @@ static NSSize *expandedWindowMinSize = nil;
 			dataSize += sizeof(unichar);
 		}
         
-        if (searchArguments.isImplicit && searchValue)
+        ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
+        
+        if (searchArguments.isImplicit && searchValue && functionType != ZGEqualsStoredPlus && functionType != ZGNotEqualsStoredPlus)
         {
             free(searchValue);
             searchValue = NULL;
         }
 		
-		ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
 		BOOL flagsFieldIsBlank = [[[flagsTextField stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@""];
 		
 		if ([flagsTextField isEnabled])
@@ -1632,12 +1657,14 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		[self prepareDocumentTask];
 		
-		static BOOL (*compareFunctions[8])(ZGSearchArguments *, const void *, const void *, ZGVariableType, ZGMemorySize, void *) =
+		static BOOL (*compareFunctions[10])(ZGSearchArguments *, const void *, const void *, ZGVariableType, ZGMemorySize, void *) =
 		{
-			equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction
+			equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalPlusFunction, notEqualPlusFunction
 		};
 		
 		BOOL (*compareFunction)(ZGSearchArguments *, const void *, const void *, ZGVariableType, ZGMemorySize, void *) = compareFunctions[functionType];
+        
+        void *extraData = (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus) ? searchValue : &collator;
 		
 		if (!goingToNarrowDownSearches)
 		{
@@ -1658,7 +1685,7 @@ static NSSize *expandedWindowMinSize = nil;
 			{
 				if ((!searchArguments.beginAddressExists || searchArguments.beginAddress <= address) &&
 					(!searchArguments.endAddressExists || searchArguments.endAddress >= address + dataSize) &&
-					compareFunction(&searchArguments, data, (data2 != NULL) ? data2 : searchValue, dataType, dataSize, &collator))
+					compareFunction(&searchArguments, data, (data2 != NULL) ? data2 : searchValue, dataType, dataSize, extraData))
 				{
 					ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:data
 																		   size:dataSize
@@ -1749,7 +1776,7 @@ static NSSize *expandedWindowMinSize = nil;
 							{
 								void *value2 = searchArguments.isImplicit ? ZGSavedValue(variable->address, searchData, dataSize) : searchValue;
 								
-								if (value2 && compareFunction(&searchArguments, value, value2, dataType, dataSize, &collator))
+								if (value2 && compareFunction(&searchArguments, value, value2, dataType, dataSize, extraData))
 								{
 									[temporaryVariablesArray addObject:variable];
 									currentProcess->numberOfVariablesFound++;

@@ -33,10 +33,15 @@ typedef enum
     ZGEqualsStored,
     ZGNotEqualsStored,
     ZGGreaterThanStored,
-    ZGLessThanStored
+    ZGLessThanStored,
+    // Special Stored comparisons
+    ZGEqualsStoredPlus,
+    ZGNotEqualsStoredPlus,
 } ZGFunctionType;
 
 BOOL lessThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *unused);
 BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *unused);
 BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *collator);
 BOOL notEqualFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *collator);
+BOOL equalPlusFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *offset);
+BOOL notEqualPlusFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *offset);

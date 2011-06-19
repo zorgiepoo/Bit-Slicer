@@ -234,3 +234,61 @@ BOOL notEqualFunction(ZGSearchArguments *searchArguments, const void *value1, co
 {
 	return !equalFunction(searchArguments, value1, value2, type, size, collator);
 }
+
+BOOL equalPlusFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *offset)
+{
+    switch (type)
+    {
+        case ZGPointer:
+			if (size == sizeof(int32_t))
+			{
+				goto INT32_EQUAL_TO_PLUS;
+			}
+			else if (size == sizeof(int64_t))
+			{
+				goto INT64_EQUAL_TO_PLUS;
+			}
+			break;
+		case ZGInt8:
+        {
+            int8_t compareValue = *((int8_t *)value2) + *((int8_t *)offset);
+            return equalFunction(searchArguments, value1, &compareValue, type, size, NULL);
+        }
+		case ZGInt16:
+        {
+            int16_t compareValue = *((int16_t *)value2) + *((int16_t *)offset);
+            return equalFunction(searchArguments, value1, &compareValue, type, size, NULL);
+        }
+		case ZGInt32:
+		INT32_EQUAL_TO_PLUS:
+        {
+            int32_t compareValue = *((int32_t *)value2) + *((int32_t *)offset);
+            return equalFunction(searchArguments, value1, &compareValue, type, size, NULL);
+        }
+		case ZGInt64:
+		INT64_EQUAL_TO_PLUS:
+        {
+            int64_t compareValue = *((int64_t *)value2) + *((int64_t *)offset);
+            return equalFunction(searchArguments, value1, &compareValue, type, size, NULL);
+        }
+		case ZGFloat:
+        {
+            float compareValue = *((float *)value2) + *((float *)offset);
+            return equalFunction(searchArguments, value1, &compareValue, type, size, NULL);
+        }
+		case ZGDouble:
+        {
+            double compareValue = *((double *)value2) + *((double *)offset);
+            return equalFunction(searchArguments, value1, &compareValue, type, size, NULL);
+        }
+		default:
+			break;
+    }
+    
+    return NO;
+}
+
+BOOL notEqualPlusFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *offset)
+{
+    return !equalPlusFunction(searchArguments, value1, value2, type, size, offset);
+}
