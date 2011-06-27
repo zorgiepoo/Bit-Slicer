@@ -29,6 +29,7 @@
     ZGLineCountingView *result = [[ZGLineCountingView alloc] initWithFrame:NSMakeRect(0, 0, 60, 10)];
     [result setRepresenter:self];
     [result setAutoresizingMask:NSViewHeightSizable];
+    // clang complains but perhaps this is how HexFiend library manages its memory? Argh.
     return result;
 }
 

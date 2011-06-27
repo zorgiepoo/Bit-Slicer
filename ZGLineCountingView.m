@@ -85,6 +85,7 @@
     }
     //HFASSERT(bufferIndex == characterCount);
     
+    // clang complains but perhaps this is how HexFiend library manages its memory? Argh.
     NSString *string = [[NSString alloc] initWithBytesNoCopy:(void *)buffer length:bufferIndex encoding:NSASCIIStringEncoding freeWhenDone:YES];
     return string;
 }
