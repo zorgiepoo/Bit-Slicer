@@ -40,6 +40,8 @@
 
 - (void)updateRunningApplicationProcesses;
 
+- (void)setWatchVariablesArray:(NSArray *)newWatchVariablesArray;
+
 - (void)addVariables:(NSArray *)variables
 		atRowIndexes:(NSIndexSet *)rowIndexes;
 
@@ -202,58 +204,27 @@
     return YES;
 }
 
-- (void)windowControllerDidLoadNib:(NSWindowController *) aController
+- (void)loadDocumentUserInterface
 {
-    [super windowControllerDidLoadNib:aController];
-	
-	[watchVariablesTableView setDelegate:self];
-	
-	if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_EXPAND_OPTIONS])
-	{
-		[self optionsDisclosureButton:nil];
-	}
-    
-    if ([watchWindow respondsToSelector:@selector(setCollectionBehavior:)])
-    {
-        [watchWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(watchWindowDidExitFullScreen:)
-                                                     name:NSWindowDidExitFullScreenNotification
-                                                   object:watchWindow];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(watchWindowWillExitFullScreen:)
-                                                     name:NSWindowWillExitFullScreenNotification
-                                                   object:watchWindow];
-    }
-	
-	if (!desiredProcessName)
+    if (!desiredProcessName)
 	{
 		desiredProcessName = [[[[ZGAppController sharedController] documentController] lastSelectedProcessName] copy];
 	}
+    
+    if (documentState.isReverted)
+    {
+        [generalStatusTextField setStringValue:@""];
+    }
 	
 	[self updateRunningApplicationProcesses];
-	
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(anApplicationLaunched:)
-												 name:ZGProcessLaunched
-											   object:nil];
-	
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(anApplicationTerminated:)
-												 name:ZGProcessTerminated
-											   object:nil];
-	
-	watchVariablesTimer = [[ZGTimer alloc] initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
-														 target:self
-													   selector:@selector(updateWatchVariablesTable:)];
-	
-	[watchVariablesTableView registerForDraggedTypes:[NSArray arrayWithObject:ZGVariableReorderType]];
     
     currentSearchDataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
     
     if (documentState.loadedFromSave)
     {
+        [self setWatchVariablesArray:documentState.watchVariablesArray];
+        [documentState.watchVariablesArray release];
+        
         [self selectDataTypeWithTag:(ZGVariableType)documentState.selectedDatatypeTag
                          recordUndo:NO];
         
@@ -290,9 +261,54 @@
     }
     else
     {
+        [self setWatchVariablesArray:[NSArray array]];
         searchArguments.lastEpsilonValue = [[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON] retain];
         [flagsLabel setTextColor:[NSColor disabledControlTextColor]];
     }
+}
+
+- (void)windowControllerDidLoadNib:(NSWindowController *) aController
+{
+    [super windowControllerDidLoadNib:aController];
+	
+	[watchVariablesTableView setDelegate:self];
+	
+	if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_EXPAND_OPTIONS])
+	{
+		[self optionsDisclosureButton:nil];
+	}
+    
+    if ([watchWindow respondsToSelector:@selector(setCollectionBehavior:)])
+    {
+        [watchWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(watchWindowDidExitFullScreen:)
+                                                     name:NSWindowDidExitFullScreenNotification
+                                                   object:watchWindow];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(watchWindowWillExitFullScreen:)
+                                                     name:NSWindowWillExitFullScreenNotification
+                                                   object:watchWindow];
+    }
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(anApplicationLaunched:)
+												 name:ZGProcessLaunched
+											   object:nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(anApplicationTerminated:)
+												 name:ZGProcessTerminated
+											   object:nil];
+	
+	watchVariablesTimer = [[ZGTimer alloc] initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
+														 target:self
+													   selector:@selector(updateWatchVariablesTable:)];
+	
+	[watchVariablesTableView registerForDraggedTypes:[NSArray arrayWithObject:ZGVariableReorderType]];
+    
+    [self loadDocumentUserInterface];
 }
 
 - (BOOL)writeToURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
@@ -393,6 +409,12 @@
 	return [mutableData autorelease];
 }
 
+- (BOOL)revertToContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
+{
+    documentState.isReverted = YES;
+    return [super revertToContentsOfURL:absoluteURL ofType:typeName error:outError];
+}
+
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
 {
     if ( outError != NULL )
@@ -404,7 +426,7 @@
 	
 	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
 	
-	watchVariablesArray = [[keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey] retain];
+	documentState.watchVariablesArray = [[keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey] retain];
 	desiredProcessName = [[keyedUnarchiver decodeObjectForKey:ZGProcessNameKey] retain];
     
     documentState.loadedFromSave = YES;
@@ -425,8 +447,15 @@
     searchArguments.lastBelowRangeValue = [[keyedUnarchiver decodeObjectForKey:ZGBelowValueKey] copy];
 	
 	[keyedUnarchiver release];
+    
+    BOOL success = documentState.watchVariablesArray != nil && desiredProcessName != nil;
+    if (success && documentState.isReverted)
+    {
+        [self loadDocumentUserInterface];
+        documentState.isReverted = NO;
+    }
 	
-    return watchVariablesArray != nil && desiredProcessName != nil;
+    return success;
 }
 
 #pragma mark Watching other applications
@@ -763,46 +792,49 @@
 		// Read all the variables and update them in the table view if needed
 		NSRange visibleRowsRange = [watchVariablesTableView rowsInRect:[watchVariablesTableView visibleRect]];
 		
-		[[watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
-		 {
-			 if (variable->type == ZGUTF8String || variable->type == ZGUTF16String)
-			 {
-				 variable->size = ZGGetStringSize([currentProcess processID], variable->address, variable->type);
-			 }
-			 
-			 if (variable->size)
-			 {
-				 void *value = malloc((size_t)variable->size);
-                 
-                 if (value)
+        if (visibleRowsRange.location + visibleRowsRange.length <= [watchVariablesArray count])
+        {
+            [[watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+             {
+                 if (variable->type == ZGUTF8String || variable->type == ZGUTF16String)
                  {
-                     if (ZGReadBytes([currentProcess processID], variable->address, value, variable->size))
+                     variable->size = ZGGetStringSize([currentProcess processID], variable->address, variable->type);
+                 }
+                 
+                 if (variable->size)
+                 {
+                     void *value = malloc((size_t)variable->size);
+                     
+                     if (value)
                      {
-                         NSString *oldStringValue = [[variable stringValue] copy];
-                         [variable setVariableValue:value];
-                         if (![[variable stringValue] isEqualToString:oldStringValue])
+                         if (ZGReadBytes([currentProcess processID], variable->address, value, variable->size))
                          {
+                             NSString *oldStringValue = [[variable stringValue] copy];
+                             [variable setVariableValue:value];
+                             if (![[variable stringValue] isEqualToString:oldStringValue])
+                             {
+                                 [watchVariablesTableView reloadData];
+                             }
+                             [oldStringValue release];
+                         }
+                         else if (variable->value)
+                         {
+                             [variable setVariableValue:NULL];
                              [watchVariablesTableView reloadData];
                          }
-                         [oldStringValue release];
+                         
+                         free(value);
                      }
-                     else if (variable->value)
-                     {
-                         [variable setVariableValue:NULL];
-                         [watchVariablesTableView reloadData];
-                     }
-                     
-                     free(value);
                  }
-			 }
-			 else if (variable->lastUpdatedSize)
-			 {
-				 [variable setVariableValue:NULL];
-				 [watchVariablesTableView reloadData];
-			 }
-			 
-			 variable->lastUpdatedSize = variable->size;
-		 }];
+                 else if (variable->lastUpdatedSize)
+                 {
+                     [variable setVariableValue:NULL];
+                     [watchVariablesTableView reloadData];
+                 }
+                 
+                 variable->lastUpdatedSize = variable->size;
+             }];
+        }
 	}
 }
 
@@ -1606,6 +1638,8 @@ static NSSize *expandedWindowMinSize = nil;
 	[self updateRunningApplicationProcesses];
 	
 	[generalStatusTextField setStringValue:@"Cleared search."];
+    
+    [self markDocumentChange:nil];
 }
 
 - (void)searchCleanUp:(NSArray *)newVariablesArray
@@ -2554,28 +2588,31 @@ static NSSize *expandedWindowMinSize = nil;
 			return NO;
 		}
         
-        ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
-        if (!variable)
+        if (rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
         {
-            return NO;
-        }
-        
-        if (![clearButton isEnabled])
-		{
-			[self lockTarget];
-		}
-        
-        ZGMemoryProtection memoryProtection;
-        ZGMemoryAddress memoryAddress = variable->address;
-        ZGMemorySize memorySize;
-        
-        if (ZGMemoryProtectionInRegion([currentProcess processID], &memoryAddress, &memorySize, &memoryProtection))
-        {
-            // if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
-            if (memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE))
+            ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
+            if (!variable)
             {
-                NSBeep();
                 return NO;
+            }
+            
+            if (![clearButton isEnabled])
+            {
+                [self lockTarget];
+            }
+            
+            ZGMemoryProtection memoryProtection;
+            ZGMemoryAddress memoryAddress = variable->address;
+            ZGMemorySize memorySize;
+            
+            if (ZGMemoryProtectionInRegion([currentProcess processID], &memoryAddress, &memorySize, &memoryProtection))
+            {
+                // if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
+                if (memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE))
+                {
+                    NSBeep();
+                    return NO;
+                }
             }
         }
 	}
@@ -2604,14 +2641,17 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	if ([[aTableColumn identifier] isEqualToString:@"address"])
 	{
-		if (((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->isFrozen)
-		{
-			[aCell setTextColor:[NSColor redColor]];
-		}
-		else
-		{
-			[aCell setTextColor:[NSColor textColor]];
-		}
+        if (rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
+        {
+            if (((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->isFrozen)
+            {
+                [aCell setTextColor:[NSColor redColor]];
+            }
+            else
+            {
+                [aCell setTextColor:[NSColor textColor]];
+            }
+        }
 	}
 }
 
