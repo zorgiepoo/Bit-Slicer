@@ -2893,7 +2893,7 @@ static NSSize *expandedWindowMinSize = nil;
         }
     }
 	
-	return YES;
+	return [super validateMenuItem:theMenuItem];
 }
 
 #pragma mark Global Actions
