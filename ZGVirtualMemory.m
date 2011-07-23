@@ -197,7 +197,7 @@ void ZGFreeData(NSArray *dataArray)
 NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 {
 	NSMutableArray *dataArray = [[NSMutableArray alloc] init];
-	
+    
 	vm_map_t task = MACH_PORT_NULL;
 	if (task_for_pid(current_task(), process->processID, &task) == KERN_SUCCESS)
 	{

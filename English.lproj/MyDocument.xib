@@ -3154,6 +3154,70 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<int key="connectionID">100693</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">markDocumentChange:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="248151591"/>
+					</object>
+					<int key="connectionID">100697</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">markDocumentChange:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="849671193"/>
+					</object>
+					<int key="connectionID">100698</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">markDocumentChange:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="882116604"/>
+					</object>
+					<int key="connectionID">100699</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">markDocumentChange:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="479416978"/>
+					</object>
+					<int key="connectionID">100700</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">markDocumentChange:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="358453160"/>
+					</object>
+					<int key="connectionID">100701</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">markDocumentChange:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="786865229"/>
+					</object>
+					<int key="connectionID">100702</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">markDocumentChange:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="528526329"/>
+					</object>
+					<int key="connectionID">100703</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">markDocumentChange:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="800712320"/>
+					</object>
+					<int key="connectionID">100704</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -4899,7 +4963,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100696</int>
+			<int key="maxID">100704</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4929,6 +4993,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>functionTypePopUpButtonRequest:</string>
 							<string>getInitialValues:</string>
 							<string>lockTarget:</string>
+							<string>markDocumentChange:</string>
 							<string>memoryDumpAllRequest:</string>
 							<string>memoryDumpRequest:</string>
 							<string>optionsDisclosureButton:</string>
@@ -4940,6 +5005,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -4990,6 +5056,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>functionTypePopUpButtonRequest:</string>
 							<string>getInitialValues:</string>
 							<string>lockTarget:</string>
+							<string>markDocumentChange:</string>
 							<string>memoryDumpAllRequest:</string>
 							<string>memoryDumpRequest:</string>
 							<string>optionsDisclosureButton:</string>
@@ -5071,6 +5138,10 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">lockTarget:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">markDocumentChange:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

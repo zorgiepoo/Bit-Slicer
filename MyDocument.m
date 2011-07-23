@@ -54,6 +54,13 @@
 
 - (BOOL)doesFunctionTypeAllowSearchInput;
 - (BOOL)isFunctionTypeStore;
+- (BOOL)isFunctionTypeStore:(NSInteger)functionTypeTag;
+
+- (void)selectDataTypeWithTag:(ZGVariableType)newTag
+                   recordUndo:(BOOL)recordUndo;
+
+- (void)functionTypePopUpButtonRequest:(id)sender
+                           markChanges:(BOOL)shouldMarkChanges;
 
 @end
 
@@ -67,6 +74,20 @@
 #define ZGProcessNameKey					@"ZGProcessNameKey"
 
 #define ZGVariableReorderType				@"ZGVariableReorderType"
+
+#define ZGSelectedDataTypeTag               @"ZGSelectedDataTypeTag"
+#define ZGQualifierTagKey                   @"ZGQualifierKey"
+#define ZGFunctionTypeTagKey                @"ZGFunctionTypeTagKey"
+#define ZGScanUnwritableValuesKey           @"ZGScanUnwritableValuesKey"
+#define ZGIgnoreDataAlignmentKey            @"ZGIgnoreDataAlignmentKey"
+#define ZGExactStringLengthKey              @"ZGExactStringLengthKey"
+#define ZGIgnoreStringCaseKey               @"ZGIgnoreStringCaseKey"
+#define ZGBeginningAddressKey               @"ZGBeginningAddressKey"
+#define ZGEndingAddressKey                  @"ZGEndingAddressKey"
+#define ZGEpsilonKey                        @"ZGEpsilonKey"
+#define ZGAboveValueKey                     @"ZGAboveValueKey"
+#define ZGBelowValueKey                     @"ZGBelowValueKey"
+#define ZGSearchStringValueKey              @"ZGSearchStringValueKey"
 
 #define MAX_TABLE_VIEW_ITEMS				((NSInteger)1000)
 
@@ -176,6 +197,11 @@
 	return @"MyDocument";
 }
 
++ (BOOL)autosavesInPlace
+{
+    return YES;
+}
+
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
 {
     [super windowControllerDidLoadNib:aController];
@@ -218,16 +244,55 @@
 												 name:ZGProcessTerminated
 											   object:nil];
 	
-	currentSearchDataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
-	
 	watchVariablesTimer = [[ZGTimer alloc] initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
 														 target:self
 													   selector:@selector(updateWatchVariablesTable:)];
 	
-	searchArguments.lastEpsilonValue = [[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON] retain];
-	[flagsLabel setTextColor:[NSColor disabledControlTextColor]];
-	
 	[watchVariablesTableView registerForDraggedTypes:[NSArray arrayWithObject:ZGVariableReorderType]];
+    
+    currentSearchDataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
+    
+    if (documentState.loadedFromSave)
+    {
+        [self selectDataTypeWithTag:(ZGVariableType)documentState.selectedDatatypeTag
+                         recordUndo:NO];
+        
+        [variableQualifierMatrix selectCellWithTag:documentState.qualifierTag];
+        
+        [scanUnwritableValuesCheckBox setState:documentState.scanUnwritableValues];
+        [ignoreDataAlignmentCheckBox setState:documentState.ignoreDataAlignment];
+        [includeNullTerminatorCheckBox setState:documentState.exactStringLength];
+        [ignoreCaseCheckBox setState:documentState.ignoreStringCase];
+        
+        if (documentState.beginningAddress)
+        {
+            [beginningAddressTextField setStringValue:documentState.beginningAddress];
+            [documentState.beginningAddress release];
+        }
+        if (documentState.endingAddress)
+        {
+            [endingAddressTextField setStringValue:documentState.endingAddress];
+            [documentState.endingAddress release];
+        }
+        
+        if (![self isFunctionTypeStore:documentState.functionTypeTag])
+        {
+            [functionPopUpButton selectItemWithTag:documentState.functionTypeTag];
+            [self functionTypePopUpButtonRequest:nil
+                                     markChanges:NO];
+        }
+        
+        if (documentState.searchValue)
+        {
+            [searchValueTextField setStringValue:documentState.searchValue];
+            [documentState.searchValue release];
+        }
+    }
+    else
+    {
+        searchArguments.lastEpsilonValue = [[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON] retain];
+        [flagsLabel setTextColor:[NSColor disabledControlTextColor]];
+    }
 }
 
 - (BOOL)writeToURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
@@ -278,6 +343,46 @@
 	
 	[keyedArchiver encodeObject:[currentProcess name]
 						 forKey:ZGProcessNameKey];
+    
+    [keyedArchiver encodeInt32:(int32_t)[[dataTypesPopUpButton selectedItem] tag]
+                          forKey:ZGSelectedDataTypeTag];
+    
+    [keyedArchiver encodeInt32:(int32_t)[[variableQualifierMatrix selectedCell] tag]
+                        forKey:ZGQualifierTagKey];
+    
+    [keyedArchiver encodeInt32:(int32_t)[[functionPopUpButton selectedItem] tag]
+                        forKey:ZGFunctionTypeTagKey];
+    
+    [keyedArchiver encodeBool:[scanUnwritableValuesCheckBox state]
+                       forKey:ZGScanUnwritableValuesKey];
+    
+    [keyedArchiver encodeBool:[ignoreDataAlignmentCheckBox state]
+                       forKey:ZGIgnoreDataAlignmentKey];
+    
+    [keyedArchiver encodeBool:[includeNullTerminatorCheckBox state]
+                       forKey:ZGExactStringLengthKey];
+    
+    [keyedArchiver encodeBool:[ignoreCaseCheckBox state]
+                       forKey:ZGIgnoreStringCaseKey];
+    
+    [keyedArchiver encodeObject:[beginningAddressTextField stringValue]
+                         forKey:ZGBeginningAddressKey];
+    
+    [keyedArchiver encodeObject:[endingAddressTextField stringValue]
+                         forKey:ZGEndingAddressKey];
+    
+    [keyedArchiver encodeObject:searchArguments.lastEpsilonValue
+                         forKey:ZGEpsilonKey];
+    
+    [keyedArchiver encodeObject:searchArguments.lastAboveRangeValue
+                         forKey:ZGAboveValueKey];
+    
+    [keyedArchiver encodeObject:searchArguments.lastBelowRangeValue
+                         forKey:ZGBelowValueKey];
+    
+    [keyedArchiver encodeObject:[searchValueTextField stringValue]
+                         forKey:ZGSearchStringValueKey];
+    
 	
 	[desiredProcessName release];
 	desiredProcessName = [[currentProcess name] copy];
@@ -301,6 +406,23 @@
 	
 	watchVariablesArray = [[keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey] retain];
 	desiredProcessName = [[keyedUnarchiver decodeObjectForKey:ZGProcessNameKey] retain];
+    
+    documentState.loadedFromSave = YES;
+    documentState.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
+    documentState.qualifierTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey];
+    documentState.functionTypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey];
+    documentState.scanUnwritableValues = [keyedUnarchiver decodeBoolForKey:ZGScanUnwritableValuesKey];
+    documentState.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
+    documentState.exactStringLength = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
+    documentState.ignoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
+    documentState.beginningAddress = [[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey] copy];
+    documentState.endingAddress = [[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey] copy];
+    
+    documentState.searchValue = [[keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey] copy];
+    
+    searchArguments.lastEpsilonValue = [[keyedUnarchiver decodeObjectForKey:ZGEpsilonKey] copy];
+    searchArguments.lastAboveRangeValue = [[keyedUnarchiver decodeObjectForKey:ZGAboveValueKey] copy];
+    searchArguments.lastBelowRangeValue = [[keyedUnarchiver decodeObjectForKey:ZGBelowValueKey] copy];
 	
 	[keyedUnarchiver release];
 	
@@ -482,6 +604,11 @@
 }
 
 #pragma mark Updating user interface
+
+- (IBAction)markDocumentChange:(id)sender
+{
+    [self updateChangeCount:NSChangeDone];
+}
 
 - (void)updateNumberOfVariablesFoundDisplay
 {
@@ -700,6 +827,8 @@
 	}
 	
 	[watchVariablesTableView reloadData];
+    
+    [self markDocumentChange:nil];
 }
 
 - (void)updateFlagsRangeTextField
@@ -886,45 +1015,48 @@ static NSSize *expandedWindowMinSize = nil;
 }
 
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag
+                   recordUndo:(BOOL)recordUndo
 {
-	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
-	{
-		[dataTypesPopUpButton selectItemWithTag:newTag];
-	}
-	
-	[functionPopUpButton setEnabled:YES];
-	[variableQualifierMatrix setEnabled:YES];
-	
-	if (newTag == ZGUTF8String || newTag == ZGUTF16String)
-	{
-		[ignoreCaseCheckBox setEnabled:YES];
-		[includeNullTerminatorCheckBox setEnabled:YES];
-	}
-	else
-	{
-		[ignoreCaseCheckBox setEnabled:NO];
-		[ignoreCaseCheckBox setState:NSOffState];
-		
-		[includeNullTerminatorCheckBox setEnabled:NO];
-		[includeNullTerminatorCheckBox setState:NSOffState];
-	}
-	
-	[ignoreDataAlignmentCheckBox setEnabled:(newTag != ZGUTF8String && newTag != ZGInt8)];
-	
-	[self updateFlags];
-
-	[[self undoManager] setActionName:@"Data Type Change"];
-	[[[self undoManager] prepareWithInvocationTarget:self] selectDataTypeWithTag:currentSearchDataType];
-	
-	currentSearchDataType = newTag;
+    if (currentSearchDataType != newTag)
+    {
+        [dataTypesPopUpButton selectItemWithTag:newTag];
+        
+        [functionPopUpButton setEnabled:YES];
+        [variableQualifierMatrix setEnabled:YES];
+        
+        if (newTag == ZGUTF8String || newTag == ZGUTF16String)
+        {
+            [ignoreCaseCheckBox setEnabled:YES];
+            [includeNullTerminatorCheckBox setEnabled:YES];
+        }
+        else
+        {
+            [ignoreCaseCheckBox setEnabled:NO];
+            [ignoreCaseCheckBox setState:NSOffState];
+            
+            [includeNullTerminatorCheckBox setEnabled:NO];
+            [includeNullTerminatorCheckBox setState:NSOffState];
+        }
+        
+        [ignoreDataAlignmentCheckBox setEnabled:(newTag != ZGUTF8String && newTag != ZGInt8)];
+        
+        [self updateFlags];
+        
+        if (recordUndo)
+        {
+            [[self undoManager] setActionName:@"Data Type Change"];
+            [[[self undoManager] prepareWithInvocationTarget:self] selectDataTypeWithTag:currentSearchDataType
+                                                                              recordUndo:YES];
+        }
+        
+        currentSearchDataType = newTag;
+    }
 }
 
 - (IBAction)dataTypePopUpButtonRequest:(id)sender
 {
-	if ([[sender selectedItem] tag] != currentSearchDataType)
-	{
-		[self selectDataTypeWithTag:(ZGVariableType)[[sender selectedItem] tag]];
-	}
+    [self selectDataTypeWithTag:(ZGVariableType)[[sender selectedItem] tag]
+                     recordUndo:YES];
 }
 
 - (BOOL)doesFunctionTypeAllowSearchInput
@@ -974,9 +1106,10 @@ static NSSize *expandedWindowMinSize = nil;
     return [self isFunctionTypeStore:[[functionPopUpButton selectedItem] tag]];
 }
 
-- (IBAction)functionTypePopUpButtonRequest:(id)sender
+- (void)functionTypePopUpButtonRequest:(id)sender
+                           markChanges:(BOOL)shouldMarkChanges
 {
-	[self updateFlags];
+    [self updateFlags];
     
     if (![self doesFunctionTypeAllowSearchInput])
     {
@@ -989,6 +1122,17 @@ static NSSize *expandedWindowMinSize = nil;
         [searchValueLabel setTextColor:[NSColor controlTextColor]];
         [watchWindow makeFirstResponder:searchValueTextField];
     }
+    
+    if (shouldMarkChanges)
+    {
+        [self markDocumentChange:nil];
+    }
+}
+
+- (IBAction)functionTypePopUpButtonRequest:(id)sender
+{
+    [self functionTypePopUpButtonRequest:sender
+                             markChanges:YES];
 }
 
 #pragma mark Adding & Removing Variables

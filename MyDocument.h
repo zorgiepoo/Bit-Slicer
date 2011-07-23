@@ -74,6 +74,21 @@
 	
 	// For comparing unicode strings
 	CollatorRef						     collator;
+    
+    struct DocumentInfo
+    {
+        BOOL loadedFromSave;
+        NSInteger selectedDatatypeTag;
+        NSInteger qualifierTag;
+        NSInteger functionTypeTag;
+        BOOL scanUnwritableValues;
+        BOOL ignoreDataAlignment;
+        BOOL exactStringLength;
+        BOOL ignoreStringCase;
+        NSString *beginningAddress;
+        NSString *endingAddress;
+        NSString *searchValue;
+    } documentState;
 }
 
 - (ZGProcess *)currentProcess;
@@ -94,6 +109,8 @@
 - (IBAction)removeSelectedSearchValues:(id)sender;
 - (IBAction)addVariable:(id)sender;
 - (IBAction)freezeVariables:(id)sender;
+
+- (IBAction)markDocumentChange:(id)sender;
 
 - (IBAction)editVariablesValueCancelButton:(id)sender;
 - (IBAction)editVariablesValueOkayButton:(id)sender;
