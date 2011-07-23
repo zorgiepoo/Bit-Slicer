@@ -63,7 +63,7 @@
 						 NSData *data = [NSData dataWithBytes:bytes
 													   length:(NSUInteger)size];
 						 
-						 success = [data writeToFile:[savePanel filename]
+						 success = [data writeToURL:[savePanel URL]
 										  atomically:NO];
 						 
 						 free(bytes); 
@@ -151,15 +151,15 @@
 	 {
 		 if (result == NSFileHandlingPanelOKButton)
 		 {
-			 if ([[NSFileManager defaultManager] fileExistsAtPath:[savePanel filename]])
+			 if ([[NSFileManager defaultManager] fileExistsAtPath:[[savePanel URL] relativePath]])
 			 {
-				 [[NSFileManager defaultManager] removeItemAtPath:[savePanel filename]
+				 [[NSFileManager defaultManager] removeItemAtPath:[[savePanel URL] relativePath]
 															error:NULL];
 			 }
 			 
 			 // Since Bit Slicer is running as root, we'll need to pass attributes dictionary so that
 			 // the folder is owned by the user
-			 [[NSFileManager defaultManager] createDirectoryAtPath:[savePanel filename]
+			 [[NSFileManager defaultManager] createDirectoryAtPath:[[savePanel URL] relativePath]
 									   withIntermediateDirectories:NO
 														attributes:[NSDictionary dictionaryWithObjectsAndKeys:NSUserName(), NSFileGroupOwnerAccountName, NSUserName(), NSFileOwnerAccountName, nil]
 															 error:NULL];
@@ -196,7 +196,7 @@
 			 
 			 dispatch_block_t searchForDataBlock = ^
 			 {
-				 if (!ZGSaveAllDataToDirectory([savePanel filename], [document currentProcess]))
+				 if (!ZGSaveAllDataToDirectory([[savePanel URL] relativePath], [document currentProcess]))
 				 {
 					 NSRunAlertPanel(@"The Memory Dump failed",
 									 @"An error resulted in writing the memory dump.",

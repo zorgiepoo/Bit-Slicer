@@ -186,6 +186,20 @@
 	{
 		[self optionsDisclosureButton:nil];
 	}
+    
+    if ([watchWindow respondsToSelector:@selector(setCollectionBehavior:)])
+    {
+        [watchWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(watchWindowDidExitFullScreen:)
+                                                     name:NSWindowDidExitFullScreenNotification
+                                                   object:watchWindow];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(watchWindowWillExitFullScreen:)
+                                                     name:NSWindowWillExitFullScreenNotification
+                                                   object:watchWindow];
+    }
 	
 	if (!desiredProcessName)
 	{
@@ -204,7 +218,7 @@
 												 name:ZGProcessTerminated
 											   object:nil];
 	
-	currentSearchDataType = [[dataTypesPopUpButton selectedItem] tag];
+	currentSearchDataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
 	
 	watchVariablesTimer = [[ZGTimer alloc] initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
 														 target:self
@@ -519,7 +533,7 @@
 	
 	[scanUnwritableValuesCheckBox setEnabled:YES];
 	
-	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
+	ZGVariableType dataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
 	
 	if (dataType != ZGUTF8String && dataType != ZGInt8)
 	{
@@ -667,7 +681,7 @@
 
 - (IBAction)qualifierMatrixButtonRequest:(id)sender
 {
-	ZGVariableQualifier newQualifier = [[variableQualifierMatrix selectedCell] tag];
+	ZGVariableQualifier newQualifier = (ZGVariableQualifier)[[variableQualifierMatrix selectedCell] tag];
 	
 	for (ZGVariable *variable in watchVariablesArray)
 	{
@@ -690,7 +704,7 @@
 
 - (void)updateFlagsRangeTextField
 {
-	ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
+	ZGFunctionType functionType = (ZGFunctionType)[[functionPopUpButton selectedItem] tag];
 	
 	if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored)
 	{
@@ -722,8 +736,8 @@
 
 - (void)updateFlags
 {
-	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
-	ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
+	ZGVariableType dataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
+	ZGFunctionType functionType = (ZGFunctionType)[[functionPopUpButton selectedItem] tag];
 	
 	if (dataType == ZGUTF8String || dataType == ZGUTF16String)
 	{
@@ -779,7 +793,7 @@
 static NSSize *expandedWindowMinSize = nil;
 - (IBAction)optionsDisclosureButton:(id)sender
 {
-	NSRect windowFrame = [watchWindow frame];
+    NSRect windowFrame = [watchWindow frame];
 	
 	// The first time this method is called, the disclosure triangle is expanded
 	// Record the minimize size of the window before we expand the content
@@ -850,6 +864,27 @@ static NSSize *expandedWindowMinSize = nil;
 											forKey:ZG_EXPAND_OPTIONS];
 }
 
+- (void)watchWindowWillExitFullScreen:(NSNotificationCenter *)notification
+{
+    [optionsView setHidden:YES];
+}
+
+- (void)watchWindowDidExitFullScreen:(NSNotification *)notification
+{
+    if (expandedWindowMinSize && [watchWindow minSize].height == expandedWindowMinSize->height)
+    {
+        if ([watchWindow frame].size.height < expandedWindowMinSize->height)
+        {
+            [optionsDisclosureButton setState:NSOffState];
+            [self optionsDisclosureButton:nil];
+        }
+        else
+        {
+            [optionsView setHidden:NO];
+        }
+    }
+}
+
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag
 {
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
@@ -888,7 +923,7 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	if ([[sender selectedItem] tag] != currentSearchDataType)
 	{
-		[self selectDataTypeWithTag:[[sender selectedItem] tag]];
+		[self selectDataTypeWithTag:(ZGVariableType)[[sender selectedItem] tag]];
 	}
 }
 
@@ -1028,7 +1063,7 @@ static NSSize *expandedWindowMinSize = nil;
 	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL
 														size:0
 													 address:initialAddress
-														type:[sender tag]
+														type:(ZGVariableType)[sender tag]
 												   qualifier:qualifier
 												 pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 	
@@ -1349,7 +1384,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (BOOL)isInNarrowSearchMode
 {
-	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
+	ZGVariableType dataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
 	
 	BOOL goingToNarrowDownSearches = NO;
 	for (ZGVariable *variable in watchVariablesArray)
@@ -1371,8 +1406,8 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (NSString *)confirmSearchInput:(NSString *)expression
 {
-	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
-	ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
+	ZGVariableType dataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
+	ZGFunctionType functionType = (ZGFunctionType)[[functionPopUpButton selectedItem] tag];
 	
 	if (dataType != ZGUTF8String && dataType != ZGUTF16String && dataType != ZGByteArray)
 	{
@@ -1457,8 +1492,8 @@ static NSSize *expandedWindowMinSize = nil;
 }
 
 - (IBAction)searchValue:(id)sender
-{	
-	ZGVariableType dataType = [[dataTypesPopUpButton selectedItem] tag];
+{
+	ZGVariableType dataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
 	
 	BOOL goingToNarrowDownSearches = [self isInNarrowSearchMode];
 	
@@ -1520,7 +1555,7 @@ static NSSize *expandedWindowMinSize = nil;
 			dataSize += sizeof(unichar);
 		}
         
-        ZGFunctionType functionType = [[functionPopUpButton selectedItem] tag];
+        ZGFunctionType functionType = (ZGFunctionType)[[functionPopUpButton selectedItem] tag];
         
         if (searchValue && ![self doesFunctionTypeAllowSearchInput])
         {
@@ -2341,7 +2376,7 @@ static NSSize *expandedWindowMinSize = nil;
 		else if (([[aTableColumn identifier] isEqualToString:@"type"]))
 		{
 			[self changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-						 newType:[[aTableColumn dataCell] indexOfItemWithTag:[anObject integerValue]]
+						 newType:(ZGVariableType)[[aTableColumn dataCell] indexOfItemWithTag:[anObject integerValue]]
                          newSize:((ZGVariable *)([watchVariablesArray objectAtIndex:rowIndex]))->size];
 		}
 	}
