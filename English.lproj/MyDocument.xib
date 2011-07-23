@@ -309,9 +309,9 @@
 								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
-								<object class="NSMenuItem" key="NSMenuItem" id="992982768">
+								<object class="NSMenuItem" key="NSMenuItem" id="681889359">
 									<reference key="NSMenu" ref="300783273"/>
-									<string key="NSTitle">32-bit Integer</string>
+									<string key="NSTitle">Double</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -319,7 +319,7 @@
 									<reference key="NSOnImage" ref="29992920"/>
 									<reference key="NSMixedImage" ref="296154451"/>
 									<string key="NSAction">_popUpItemAction:</string>
-									<int key="NSTag">2</int>
+									<int key="NSTag">5</int>
 									<reference key="NSTarget" ref="936458306"/>
 								</object>
 								<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -350,7 +350,18 @@
 											<int key="NSTag">1</int>
 											<reference key="NSTarget" ref="936458306"/>
 										</object>
-										<reference ref="992982768"/>
+										<object class="NSMenuItem" id="992982768">
+											<reference key="NSMenu" ref="300783273"/>
+											<string key="NSTitle">32-bit Integer</string>
+											<string key="NSKeyEquiv"/>
+											<int key="NSKeyEquivModMask">1048576</int>
+											<int key="NSMnemonicLoc">2147483647</int>
+											<reference key="NSOnImage" ref="29992920"/>
+											<reference key="NSMixedImage" ref="296154451"/>
+											<string key="NSAction">_popUpItemAction:</string>
+											<int key="NSTag">2</int>
+											<reference key="NSTarget" ref="936458306"/>
+										</object>
 										<object class="NSMenuItem" id="671352518">
 											<reference key="NSMenu" ref="300783273"/>
 											<string key="NSTitle">64-bit Integer</string>
@@ -387,18 +398,7 @@
 											<int key="NSTag">4</int>
 											<reference key="NSTarget" ref="936458306"/>
 										</object>
-										<object class="NSMenuItem" id="681889359">
-											<reference key="NSMenu" ref="300783273"/>
-											<string key="NSTitle">Double</string>
-											<string key="NSKeyEquiv"/>
-											<int key="NSKeyEquivModMask">1048576</int>
-											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="29992920"/>
-											<reference key="NSMixedImage" ref="296154451"/>
-											<string key="NSAction">_popUpItemAction:</string>
-											<int key="NSTag">5</int>
-											<reference key="NSTarget" ref="936458306"/>
-										</object>
+										<reference ref="681889359"/>
 										<object class="NSMenuItem" id="6845133">
 											<reference key="NSMenu" ref="300783273"/>
 											<bool key="NSIsDisabled">YES</bool>
@@ -486,7 +486,7 @@
 									</object>
 									<reference key="NSMenuFont" ref="394785352"/>
 								</object>
-								<int key="NSSelectedIndex">2</int>
+								<int key="NSSelectedIndex">6</int>
 								<int key="NSPreferredEdge">1</int>
 								<bool key="NSUsesItemFromMenu">YES</bool>
 								<bool key="NSAltersState">YES</bool>
@@ -937,7 +937,7 @@
 													<double key="NSMaxWidth">50</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
 														<int key="NSCellFlags">75628096</int>
-														<int key="NSCellFlags2">2048</int>
+														<int key="NSCellFlags2">134219776</int>
 														<string key="NSContents">Search</string>
 														<reference key="NSSupport" ref="26"/>
 														<reference key="NSBackgroundColor" ref="10172512"/>
