@@ -67,6 +67,11 @@
 {
 	// For handling windowWillClose:
 	[[self window] setDelegate:self];
+    
+    if ([[self window] respondsToSelector:@selector(setCollectionBehavior:)])
+    {
+        [[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+    }
 	
 	[self updateRunningApplicationProcesses:[[[ZGAppController sharedController] documentController] lastSelectedProcessName]];
 	
