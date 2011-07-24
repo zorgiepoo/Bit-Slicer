@@ -32,6 +32,12 @@
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 8
 
+#define ZGMemoryViewerAddressField      @"ZGMemoryViewerAddressField"
+#define ZGMemoryViewerSizeField         @"ZGMemoryViewerSizeField"
+#define ZGMemoryViewerAddress           @"ZGMemoryViewerAddress"
+#define ZGMemoryViewerSize              @"ZGMemoryViewerSize"
+#define ZGMemoryViewerProcessName       @"ZGMemoryViewerProcessName"
+
 @interface ZGMemoryViewer (Private)
 
 - (void)updateRunningApplicationProcesses:(NSString *)desiredProcessName;
@@ -63,6 +69,48 @@
 	return self;
 }
 
+- (void)encodeRestorableStateWithCoder:(NSCoder *)coder
+{
+    [super encodeRestorableStateWithCoder:coder];
+    
+    [coder encodeObject:[addressTextField stringValue]
+                 forKey:ZGMemoryViewerAddressField];
+    
+    [coder encodeObject:[sizeTextField stringValue]
+                 forKey:ZGMemoryViewerSizeField];
+    
+    [coder encodeInt64:(int64_t)currentMemoryAddress
+                forKey:ZGMemoryViewerAddress];
+    
+    [coder encodeInt64:(int64_t)currentMemorySize
+                forKey:ZGMemoryViewerSize];
+    
+    [coder encodeObject:[[[runningApplicationsPopUpButton selectedItem] representedObject] name]
+                 forKey:ZGMemoryViewerProcessName];
+}
+
+- (void)restoreStateWithCoder:(NSCoder *)coder
+{
+    [super restoreStateWithCoder:coder];
+    
+    NSString *memoryViewerAddressField = [coder decodeObjectForKey:ZGMemoryViewerAddressField];
+    if (memoryViewerAddressField)
+    {
+        [addressTextField setStringValue:memoryViewerAddressField];
+    }
+    
+    NSString *memoryViewerSizeField = [coder decodeObjectForKey:ZGMemoryViewerSizeField];
+    if (memoryViewerSizeField)
+    {
+        [sizeTextField setStringValue:[coder decodeObjectForKey:ZGMemoryViewerSizeField]];
+    }
+    
+    currentMemoryAddress = [coder decodeInt64ForKey:ZGMemoryViewerAddress];
+    currentMemorySize = [coder decodeInt64ForKey:ZGMemoryViewerSize];
+    [self changeMemoryView:nil];
+    [self updateRunningApplicationProcesses:[coder decodeObjectForKey:ZGMemoryViewerProcessName]];
+}
+
 - (void)windowDidLoad
 {
 	// For handling windowWillClose:
@@ -71,6 +119,13 @@
     if ([[self window] respondsToSelector:@selector(setCollectionBehavior:)])
     {
         [[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+    }
+    
+    if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
+    {
+        [[self window] setRestorable:YES];
+        [[self window] setRestorationClass:[ZGAppController class]];
+        [self invalidateRestorableState];
     }
 	
 	[self updateRunningApplicationProcesses:[[[ZGAppController sharedController] documentController] lastSelectedProcessName]];
@@ -233,6 +288,7 @@
 	{
 		currentProcessIdentifier = [[[runningApplicationsPopUpButton selectedItem] representedObject] processID];
 		[self clearData];
+        [self invalidateRestorableState];
 	}
 }
 
@@ -246,12 +302,6 @@
 		// don't even bother yet checking if nothing is filled out
 		return;
 	}
-    
-    if (lastFailedAddressString && lastFailedSizeString && [[addressTextField stringValue] isEqualToString:lastFailedAddressString] && [[sizeTextField stringValue] isEqualToString:lastFailedSizeString])
-    {
-        // also don't bother checking yet if the last failure is the same as this one
-        return;
-    }
 	
 	NSString *calculatedMemoryAddress = [ZGCalculator evaluateExpression:[addressTextField stringValue]];
 	NSString *calculatedMemorySize = [ZGCalculator evaluateExpression:[sizeTextField stringValue]];
@@ -262,12 +312,6 @@
 	{
 		ZGMemoryAddress memoryAddress = memoryAddressFromExpression(calculatedMemoryAddress);
 		ZGMemorySize memorySize = (ZGMemorySize)memoryAddressFromExpression(calculatedMemorySize);
-		
-		// Make sure this is an actual new change
-		if (memoryAddress == currentMemoryAddress && memorySize == currentMemorySize)
-		{
-			return;
-		}
 		
 		if (memorySize > 0)
 		{
@@ -301,16 +345,12 @@
 			}
 		}
 	}
+    
+    [self invalidateRestorableState];
 	
 	if (!success)
 	{
-        [lastFailedAddressString release];
-        lastFailedAddressString = [[addressTextField stringValue] copy];
-        
-        [lastFailedSizeString release];
-        lastFailedSizeString = [[sizeTextField stringValue] copy];
-        
-		NSRunAlertPanel(@"An error occurred", @"An unknown error occurred. Perhaps the address & size fields were not entered correctly, or that memory could not be read from the specified range.", nil, nil, nil);
+        [self clearData];
 	}
 }
 

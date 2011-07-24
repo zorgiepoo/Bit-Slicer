@@ -37,9 +37,6 @@
 	
 	ZGStatusBarRepresenter *statusBarRepresenter;
 	ZGLineCountingRepresenter *lineCountingRepresenter;
-    
-    NSString *lastFailedAddressString;
-    NSString *lastFailedSizeString;
 	
 	pid_t currentProcessIdentifier;
 	ZGMemoryAddress currentMemoryAddress;

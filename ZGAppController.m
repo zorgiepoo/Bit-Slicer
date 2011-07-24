@@ -27,6 +27,13 @@
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 
+@interface ZGAppController (Private)
+
+- (void)openMemoryViewer:(id)sender
+              showWindow:(BOOL)shouldShowWindow;
+
+@end
+
 @implementation ZGAppController
 
 @synthesize applicationIsAuthenticated;
@@ -248,14 +255,41 @@ static BOOL didRegisteredHotKey = NO;
 	[preferencesController showWindow:nil];
 }
 
-- (IBAction)openMemoryViewer:(id)sender
++ (void)restoreWindowWithIdentifier:(NSString *)identifier
+                              state:(NSCoder *)state
+                  completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
-	if (!memoryViewer)
+    NSLog(@"ok");
+    NSLog(@"%@", identifier);
+    if ([identifier isEqualToString:@"ZGMemoryViewerID"])
+    {
+        NSLog(@"hi");
+        
+        [[self sharedController] openMemoryViewer:nil
+                                       showWindow:NO];
+        
+        completionHandler([[[self sharedController] memoryViewer] window], nil);
+    }
+}
+
+- (void)openMemoryViewer:(id)sender
+              showWindow:(BOOL)shouldShowWindow
+{
+    if (!memoryViewer)
 	{
 		memoryViewer = [[ZGMemoryViewer alloc] init];
 	}
 	
-	[memoryViewer showWindow:nil];
+    if (shouldShowWindow)
+    {
+        [memoryViewer showWindow:nil];
+    }
+}
+
+- (IBAction)openMemoryViewer:(id)sender
+{
+    [self openMemoryViewer:sender
+                showWindow:YES];
 }
 
 - (IBAction)jumpToMemoryAddress:(id)sender
