@@ -255,6 +255,7 @@ static BOOL didRegisteredHotKey = NO;
 
 #pragma mark Actions
 
+#ifndef _DEBUG
 + (void)restoreWindowWithIdentifier:(NSString *)identifier
                               state:(NSCoder *)state
                   completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
@@ -274,6 +275,7 @@ static BOOL didRegisteredHotKey = NO;
         completionHandler([[[self sharedController] preferencesController] window], nil);
     }
 }
+#endif
 
 - (void)openPreferences:(id)sender
              showWindow:(BOOL)shouldShowWindow

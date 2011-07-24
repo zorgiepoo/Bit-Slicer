@@ -113,10 +113,12 @@
 
 - (void)markChanges
 {
+#ifndef _DEBUG
     if ([self respondsToSelector:@selector(invalidateRestorableState)])
     {
         [self invalidateRestorableState];
     }
+#endif
 }
 
 - (void)windowDidLoad
@@ -129,6 +131,7 @@
         [[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
     }
     
+#ifndef _DEBUG
     if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
     {
         [[self window] setRestorable:YES];
@@ -136,6 +139,7 @@
         [[self window] setIdentifier:ZGMemoryViewerIdentifier];
         [self markChanges];
     }
+#endif
 	
 	[self updateRunningApplicationProcesses:[[[ZGAppController sharedController] documentController] lastSelectedProcessName]];
 	

@@ -43,6 +43,7 @@
 
 - (void)windowDidLoad
 {
+#ifndef _DEBUG
     if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
     {
         [[self window] setRestorable:YES];
@@ -50,6 +51,7 @@
         [[self window] setIdentifier:ZGPreferencesIdentifier];
         [self invalidateRestorableState];
     }
+#endif
     
     [hotkeyRecorder setAllowsKeyOnly:YES
                     escapeKeysRecord:NO];
