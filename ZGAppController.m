@@ -259,12 +259,8 @@ static BOOL didRegisteredHotKey = NO;
                               state:(NSCoder *)state
                   completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
-    NSLog(@"ok");
-    NSLog(@"%@", identifier);
     if ([identifier isEqualToString:@"ZGMemoryViewerID"])
     {
-        NSLog(@"hi");
-        
         [[self sharedController] openMemoryViewer:nil
                                        showWindow:NO];
         
