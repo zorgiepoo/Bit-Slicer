@@ -27,6 +27,9 @@
 {
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:INVALID_KEY_CODE]
 																						forKey:ZG_HOT_KEY]];
+    
+    [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:0]
+																						forKey:ZG_HOT_KEY_MODIFIER]];
 }
 
 - (id)init
@@ -47,15 +50,35 @@
         [[self window] setIdentifier:ZGPreferencesIdentifier];
         [self invalidateRestorableState];
     }
-	[hotKeysPopUpButton selectItemWithTag:[[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY]];
+    
+    [hotkeyRecorder setAllowsKeyOnly:YES
+                    escapeKeysRecord:NO];
+    
+    NSInteger hotkeyCode = [[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY];
+    // INVALID_KEY_CODE used to be set at -999 (now it's at -1), so just take this into account
+    if (hotkeyCode < INVALID_KEY_CODE)
+    {
+        hotkeyCode = INVALID_KEY_CODE;
+        [[NSUserDefaults standardUserDefaults] setInteger:INVALID_KEY_CODE
+                                                   forKey:ZG_HOT_KEY];
+    }
+    
+    KeyCombo hotkeyCombo;
+    hotkeyCombo.code = hotkeyCode;
+    hotkeyCombo.flags = SRCarbonToCocoaFlags([[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY_MODIFIER]);
+    
+    [hotkeyRecorder setKeyCombo:hotkeyCombo];
 }
 
-- (IBAction)changeHotKey:(id)sender
+- (void)shortcutRecorder:(SRRecorderControl *)aRecorder keyComboDidChange:(KeyCombo)newKeyCombo
 {
-	[[NSUserDefaults standardUserDefaults] setInteger:[[sender selectedItem] tag]
+    [[NSUserDefaults standardUserDefaults] setInteger:[aRecorder keyCombo].code
 											   forKey:ZG_HOT_KEY];
-	
-	[ZGAppController registerPauseAndUnpauseHotKey];
+    
+    [[NSUserDefaults standardUserDefaults] setInteger:SRCocoaToCarbonFlags([aRecorder keyCombo].flags)
+											   forKey:ZG_HOT_KEY_MODIFIER];
+    
+    [ZGAppController registerPauseAndUnpauseHotKey];
 }
 
 @end

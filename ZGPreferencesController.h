@@ -19,16 +19,17 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import <ShortcutRecorder/ShortcutRecorder.h>
 
-#define INVALID_KEY_CODE            -999
+// INVALID_KEY_CODE used to be -999, take in account
+#define INVALID_KEY_CODE            -1
+#define ZG_HOT_KEY_MODIFIER         @"ZG_HOT_KEY_MODIFIER"
 #define ZG_HOT_KEY                  @"ZG_HOT_KEY_CODE"
 #define ZGPreferencesIdentifier     @"ZGPreferencesID"
 
 @interface ZGPreferencesController : NSWindowController
 {
-	IBOutlet NSPopUpButton *hotKeysPopUpButton;
+    IBOutlet SRRecorderControl *hotkeyRecorder;
 }
-
-- (IBAction)changeHotKey:(id)sender;
 
 @end
