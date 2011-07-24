@@ -39,6 +39,7 @@
 
 @property (readonly) BOOL applicationIsAuthenticated;
 
++ (BOOL)isRunningLaterThanLion;
 + (ZGAppController *)sharedController;
 - (ZGPreferencesController *)preferencesController;
 - (ZGMemoryViewer *)memoryViewer;

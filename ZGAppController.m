@@ -45,6 +45,24 @@
 
 static ZGAppController *sharedInstance = nil;
 
++ (BOOL)isRunningLaterThanLion
+{
+    SInt32 majorVersion;
+    SInt32 minorVersion;
+    
+    if (Gestalt(gestaltSystemVersionMajor, &majorVersion) != noErr)
+    {
+        return NO;
+    }
+    
+    if (Gestalt(gestaltSystemVersionMinor, &minorVersion) != noErr)
+    {
+        return NO;
+    }
+    
+    return (majorVersion == 10 && minorVersion >= 7) || majorVersion > 10;
+}
+
 + (ZGAppController *)sharedController
 {
 	return sharedInstance;
@@ -243,7 +261,7 @@ static BOOL didRegisteredHotKey = NO;
 		[self authenticateWithURL:nil];
 	}
 	
-	[ZGAppController registerPauseAndUnpauseHotKey];
+	[[self class] registerPauseAndUnpauseHotKey];
 	[ZGCalculator initializeCalculator];
 	
 	[NSTimer scheduledTimerWithTimeInterval:CHECK_PROCESSES_TIME_INTERVAL

@@ -126,10 +126,7 @@
 	// For handling windowWillClose:
 	[[self window] setDelegate:self];
     
-    if ([[self window] respondsToSelector:@selector(setCollectionBehavior:)])
-    {
-        [[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
-    }
+    [[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
     
 #ifndef _DEBUG
     if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])

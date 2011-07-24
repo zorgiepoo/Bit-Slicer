@@ -278,9 +278,10 @@
 		[self optionsDisclosureButton:nil];
 	}
     
-    if ([watchWindow respondsToSelector:@selector(setCollectionBehavior:)])
+    [watchWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+    
+    if ([ZGAppController isRunningLaterThanLion])
     {
-        [watchWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(watchWindowDidExitFullScreen:)
                                                      name:NSWindowDidExitFullScreenNotification
