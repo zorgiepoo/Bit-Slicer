@@ -40,6 +40,13 @@
 
 - (void)windowDidLoad
 {
+    if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
+    {
+        [[self window] setRestorable:YES];
+        [[self window] setRestorationClass:[ZGAppController class]];
+        [[self window] setIdentifier:ZGPreferencesIdentifier];
+        [self invalidateRestorableState];
+    }
 	[hotKeysPopUpButton selectItemWithTag:[[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY]];
 }
 

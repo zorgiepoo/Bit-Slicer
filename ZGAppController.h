@@ -40,6 +40,7 @@
 @property (readonly) BOOL applicationIsAuthenticated;
 
 + (ZGAppController *)sharedController;
+- (ZGPreferencesController *)preferencesController;
 - (ZGMemoryViewer *)memoryViewer;
 - (ZGDocumentController *)documentController;
 

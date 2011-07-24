@@ -782,7 +782,6 @@
 					<string>1.IBPluginDependency</string>
 					<string>1.IBWindowTemplateEditedContentRect</string>
 					<string>1.NSWindowTemplate.visibleAtLaunch</string>
-					<string>1.userInterfaceItemIdentifier</string>
 					<string>15.IBPluginDependency</string>
 					<string>16.IBPluginDependency</string>
 					<string>17.IBPluginDependency</string>
@@ -821,7 +820,6 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{206, 416}, {547, 417}}</string>
 					<boolean value="NO"/>
-					<string>ZGMemoryViewerID</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>

@@ -111,6 +111,14 @@
     [self updateRunningApplicationProcesses:[coder decodeObjectForKey:ZGMemoryViewerProcessName]];
 }
 
+- (void)markChanges
+{
+    if ([self respondsToSelector:@selector(invalidateRestorableState)])
+    {
+        [self invalidateRestorableState];
+    }
+}
+
 - (void)windowDidLoad
 {
 	// For handling windowWillClose:
@@ -125,7 +133,8 @@
     {
         [[self window] setRestorable:YES];
         [[self window] setRestorationClass:[ZGAppController class]];
-        [self invalidateRestorableState];
+        [[self window] setIdentifier:ZGMemoryViewerIdentifier];
+        [self markChanges];
     }
 	
 	[self updateRunningApplicationProcesses:[[[ZGAppController sharedController] documentController] lastSelectedProcessName]];
@@ -288,7 +297,7 @@
 	{
 		currentProcessIdentifier = [[[runningApplicationsPopUpButton selectedItem] representedObject] processID];
 		[self clearData];
-        [self invalidateRestorableState];
+        [self markChanges];
 	}
 }
 
@@ -346,7 +355,7 @@
 		}
 	}
     
-    [self invalidateRestorableState];
+    [self markChanges];
 	
 	if (!success)
 	{

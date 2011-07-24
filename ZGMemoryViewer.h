@@ -22,6 +22,8 @@
 #import <HexFiend/HexFiend.h>
 #import "ZGMemoryTypes.h"
 
+#define ZGMemoryViewerIdentifier    @"ZGMemoryViewerIdentifier"
+
 @class ZGStatusBarRepresenter;
 @class ZGLineCountingRepresenter;
 

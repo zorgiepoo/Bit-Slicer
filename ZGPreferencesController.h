@@ -20,8 +20,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-#define INVALID_KEY_CODE	-999
-#define ZG_HOT_KEY			@"ZG_HOT_KEY_CODE"
+#define INVALID_KEY_CODE            -999
+#define ZG_HOT_KEY                  @"ZG_HOT_KEY_CODE"
+#define ZGPreferencesIdentifier     @"ZGPreferencesID"
 
 @interface ZGPreferencesController : NSWindowController
 {

@@ -29,6 +29,9 @@
 
 @interface ZGAppController (Private)
 
+- (void)openPreferences:(id)sender
+             showWindow:(BOOL)shouldShowWindow;
+
 - (void)openMemoryViewer:(id)sender
               showWindow:(BOOL)shouldShowWindow;
 
@@ -57,6 +60,11 @@ static ZGAppController *sharedInstance = nil;
 	}
 	
 	return self;
+}
+
+- (ZGPreferencesController *)preferencesController
+{
+    return preferencesController;
 }
 
 - (ZGMemoryViewer *)memoryViewer
@@ -245,27 +253,44 @@ static BOOL didRegisteredHotKey = NO;
 
 #pragma mark Actions
 
-- (IBAction)openPreferences:(id)sender
-{
-	if (!preferencesController)
-	{
-		preferencesController = [[ZGPreferencesController alloc] init];
-	}
-	
-	[preferencesController showWindow:nil];
-}
-
 + (void)restoreWindowWithIdentifier:(NSString *)identifier
                               state:(NSCoder *)state
                   completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
-    if ([identifier isEqualToString:@"ZGMemoryViewerID"])
+    if ([identifier isEqualToString:ZGMemoryViewerIdentifier])
     {
         [[self sharedController] openMemoryViewer:nil
                                        showWindow:NO];
         
         completionHandler([[[self sharedController] memoryViewer] window], nil);
     }
+    else if ([identifier isEqualToString:ZGPreferencesIdentifier])
+    {
+        [[self sharedController] openPreferences:nil
+                                      showWindow:NO];
+        
+        completionHandler([[[self sharedController] preferencesController] window], nil);
+    }
+}
+
+- (void)openPreferences:(id)sender
+             showWindow:(BOOL)shouldShowWindow
+{
+    if (!preferencesController)
+	{
+		preferencesController = [[ZGPreferencesController alloc] init];
+	}
+	
+    if (shouldShowWindow)
+    {
+        [preferencesController showWindow:nil];
+    }
+}
+
+- (IBAction)openPreferences:(id)sender
+{
+    [self openPreferences:sender
+               showWindow:YES];
 }
 
 - (void)openMemoryViewer:(id)sender
