@@ -89,8 +89,6 @@
         NSString *endingAddress;
         NSString *searchValue;
         NSArray *watchVariablesArray;
-        
-        BOOL isReverted;
     } documentState;
 }
 

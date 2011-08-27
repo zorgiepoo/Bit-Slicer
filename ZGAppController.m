@@ -260,7 +260,7 @@ static BOOL didRegisteredHotKey = NO;
 	{
 		[self authenticateWithURL:nil];
 	}
-	
+    
 	[[self class] registerPauseAndUnpauseHotKey];
 	[ZGCalculator initializeCalculator];
 	

@@ -309,9 +309,9 @@
 								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
-								<object class="NSMenuItem" key="NSMenuItem" id="681889359">
+								<object class="NSMenuItem" key="NSMenuItem" id="992982768">
 									<reference key="NSMenu" ref="300783273"/>
-									<string key="NSTitle">Double</string>
+									<string key="NSTitle">32-bit Integer</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -319,7 +319,7 @@
 									<reference key="NSOnImage" ref="29992920"/>
 									<reference key="NSMixedImage" ref="296154451"/>
 									<string key="NSAction">_popUpItemAction:</string>
-									<int key="NSTag">5</int>
+									<int key="NSTag">2</int>
 									<reference key="NSTarget" ref="936458306"/>
 								</object>
 								<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -350,18 +350,7 @@
 											<int key="NSTag">1</int>
 											<reference key="NSTarget" ref="936458306"/>
 										</object>
-										<object class="NSMenuItem" id="992982768">
-											<reference key="NSMenu" ref="300783273"/>
-											<string key="NSTitle">32-bit Integer</string>
-											<string key="NSKeyEquiv"/>
-											<int key="NSKeyEquivModMask">1048576</int>
-											<int key="NSMnemonicLoc">2147483647</int>
-											<reference key="NSOnImage" ref="29992920"/>
-											<reference key="NSMixedImage" ref="296154451"/>
-											<string key="NSAction">_popUpItemAction:</string>
-											<int key="NSTag">2</int>
-											<reference key="NSTarget" ref="936458306"/>
-										</object>
+										<reference ref="992982768"/>
 										<object class="NSMenuItem" id="671352518">
 											<reference key="NSMenu" ref="300783273"/>
 											<string key="NSTitle">64-bit Integer</string>
@@ -398,7 +387,18 @@
 											<int key="NSTag">4</int>
 											<reference key="NSTarget" ref="936458306"/>
 										</object>
-										<reference ref="681889359"/>
+										<object class="NSMenuItem" id="681889359">
+											<reference key="NSMenu" ref="300783273"/>
+											<string key="NSTitle">Double</string>
+											<string key="NSKeyEquiv"/>
+											<int key="NSKeyEquivModMask">1048576</int>
+											<int key="NSMnemonicLoc">2147483647</int>
+											<reference key="NSOnImage" ref="29992920"/>
+											<reference key="NSMixedImage" ref="296154451"/>
+											<string key="NSAction">_popUpItemAction:</string>
+											<int key="NSTag">5</int>
+											<reference key="NSTarget" ref="936458306"/>
+										</object>
 										<object class="NSMenuItem" id="6845133">
 											<reference key="NSMenu" ref="300783273"/>
 											<bool key="NSIsDisabled">YES</bool>
@@ -486,7 +486,7 @@
 									</object>
 									<reference key="NSMenuFont" ref="394785352"/>
 								</object>
-								<int key="NSSelectedIndex">6</int>
+								<int key="NSSelectedIndex">2</int>
 								<int key="NSPreferredEdge">1</int>
 								<bool key="NSUsesItemFromMenu">YES</bool>
 								<bool key="NSAltersState">YES</bool>
@@ -642,7 +642,7 @@
 											<string key="NSFrameSize">{376, 368}</string>
 											<reference key="NSSuperview" ref="834586174"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="615395334"/>
+											<reference key="NSNextKeyView" ref="824921253"/>
 											<int key="NSViewLayerContentsRedrawPolicy">2</int>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTableHeaderView" key="NSHeaderView" id="920697892">
@@ -1047,7 +1047,7 @@
 							<string key="NSFrame">{{247, 52}, {378, 386}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="824921253"/>
+							<reference key="NSNextKeyView" ref="834586174"/>
 							<int key="NSViewLayerContentsRedrawPolicy">2</int>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="615395334"/>
@@ -1064,7 +1064,6 @@
 							<string key="NSFrame">{{10, 16}, {617, 20}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<int key="NSViewLayerContentsRedrawPolicy">2</int>
 							<int key="NSpiFlags">16392</int>
 							<double key="NSMaxValue">100</double>

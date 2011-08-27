@@ -31,7 +31,7 @@
 	{
 		[[ZGAppController sharedController] authenticateWithURL:absoluteURL];
 	}
-	
+    
 	return [super openDocumentWithContentsOfURL:absoluteURL
 										display:displayDocument
 										  error:outError];

@@ -35,6 +35,7 @@
 // for chmod
 #import <sys/types.h>
 #import <sys/stat.h>
+#import <pwd.h>
 
 @interface MyDocument (Private)
 
@@ -211,7 +212,8 @@
 		desiredProcessName = [[[[ZGAppController sharedController] documentController] lastSelectedProcessName] copy];
 	}
     
-    if (documentState.isReverted)
+    // check if the document is being reverted
+    if (watchWindow)
     {
         [generalStatusTextField setStringValue:@""];
     }
@@ -312,33 +314,59 @@
     [self loadDocumentUserInterface];
 }
 
+- (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
+{
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[absoluteURL path]])
+    {
+        NSLog(@"Changing permission on %@", [absoluteURL path]);
+        struct passwd *passwdInfo = getpwnam("mayur");
+        
+        if (passwdInfo)
+        {
+            NSLog(@"user id is %d", passwdInfo->pw_uid);
+            NSLog(@"group id is %d", passwdInfo->pw_gid);
+            
+            if (chown([[absoluteURL path] UTF8String], passwdInfo->pw_uid, passwdInfo->pw_gid) == -1)
+            {
+                NSLog(@"chown failed at write: %s", strerror(errno));
+            }
+        }
+    }
+    else
+    {
+        NSLog(@"Not changing permission for %@", absoluteURL);
+    }
+    return [super readFromURL:absoluteURL ofType:typeName error:outError];
+}
+
 - (BOOL)writeToURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
 {
-	BOOL result = [super writeToURL:absoluteURL ofType:typeName error:outError];
+    BOOL result = [super writeToURL:absoluteURL ofType:typeName error:outError];
 	
 	if (result)
 	{
-		// Change the permissions on the document file to something more sane
-		if (chmod([[absoluteURL path] UTF8String], 0777) == -1)
-		{
-			NSLog(@"chmod failed: %s", strerror(errno));
-		}
+        struct passwd *passwdInfo = getpwnam("mayur");
+        
+        if (passwdInfo)
+        {
+            NSLog(@"user id is %d", passwdInfo->pw_uid);
+            NSLog(@"group id is %d", passwdInfo->pw_gid);
+            
+            if (chown([[absoluteURL path] UTF8String], passwdInfo->pw_uid, passwdInfo->pw_gid) == -1)
+            {
+                NSLog(@"chown failed at write: %s", strerror(errno));
+                result = NO;
+            }
+        }
 	}
 
 	return result;
 }
 
-- (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError
-{	
-	if (outError != NULL)
-	{
-		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain
-										code:unimpErr
-									userInfo:nil];
-	}
-	
-	NSMutableData *mutableData = [[NSMutableData alloc] init];
-	NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:mutableData];
+- (NSFileWrapper *)fileWrapperOfType:(NSString *)typeName error:(NSError **)outError
+{
+    NSMutableData *writeData = [[NSMutableData alloc] init];
+	NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:writeData];
 	
 	NSArray *watchVariablesArrayToSave;
 	
@@ -362,7 +390,7 @@
 						 forKey:ZGProcessNameKey];
     
     [keyedArchiver encodeInt32:(int32_t)[[dataTypesPopUpButton selectedItem] tag]
-                          forKey:ZGSelectedDataTypeTag];
+                        forKey:ZGSelectedDataTypeTag];
     
     [keyedArchiver encodeInt32:(int32_t)[[variableQualifierMatrix selectedCell] tag]
                         forKey:ZGQualifierTagKey];
@@ -406,26 +434,18 @@
 	
 	[keyedArchiver finishEncoding];
 	[keyedArchiver release];
-	
-	return [mutableData autorelease];
+    
+    NSFileWrapper *fileWrapper = [[NSFileWrapper alloc] initRegularFileWithContents:writeData];
+    [writeData release];
+    
+    return [fileWrapper autorelease];
 }
 
-- (BOOL)revertToContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
+- (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError **)outError
 {
-    documentState.isReverted = YES;
-    return [super revertToContentsOfURL:absoluteURL ofType:typeName error:outError];
-}
-
-- (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
-{
-    if ( outError != NULL )
-	{
-		*outError = [NSError errorWithDomain:NSOSStatusErrorDomain
-										code:unimpErr
-									userInfo:NULL];
-	}
-	
-	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
+    NSData *readData = [fileWrapper regularFileContents];
+    
+    NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
 	
 	documentState.watchVariablesArray = [[keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey] retain];
 	desiredProcessName = [[keyedUnarchiver decodeObjectForKey:ZGProcessNameKey] retain];
@@ -450,12 +470,11 @@
 	[keyedUnarchiver release];
     
     BOOL success = documentState.watchVariablesArray != nil && desiredProcessName != nil;
-    if (success && documentState.isReverted)
+    if (success && watchWindow)
     {
         [self loadDocumentUserInterface];
-        documentState.isReverted = NO;
     }
-	
+    
     return success;
 }
 
@@ -2308,17 +2327,14 @@ static NSSize *expandedWindowMinSize = nil;
 			newValue = &int16Value;
 			break;
 		case ZGPointer:
-			if (currentProcess->is64Bit)
-			{
-				if (variable->size == sizeof(int32_t))
-				{
-					goto INT32_BIT_CHANGE_VARIABLE;
-				}
-				else if (variable->size == sizeof(int64_t))
-				{
-					goto INT64_BIT_CHANGE_VARIABLE;
-				}
-			}
+            if (variable->size == sizeof(int32_t))
+            {
+                goto INT32_BIT_CHANGE_VARIABLE;
+            }
+            else if (variable->size == sizeof(int64_t))
+            {
+                goto INT64_BIT_CHANGE_VARIABLE;
+            }
 			
 			break;
 		case ZGInt32:
