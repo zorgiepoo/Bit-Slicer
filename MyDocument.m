@@ -314,55 +314,6 @@
     [self loadDocumentUserInterface];
 }
 
-- (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
-{
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[absoluteURL path]])
-    {
-        NSLog(@"Changing permission on %@", [absoluteURL path]);
-        struct passwd *passwdInfo = getpwnam("mayur");
-        
-        if (passwdInfo)
-        {
-            NSLog(@"user id is %d", passwdInfo->pw_uid);
-            NSLog(@"group id is %d", passwdInfo->pw_gid);
-            
-            if (chown([[absoluteURL path] UTF8String], passwdInfo->pw_uid, passwdInfo->pw_gid) == -1)
-            {
-                NSLog(@"chown failed at write: %s", strerror(errno));
-            }
-        }
-    }
-    else
-    {
-        NSLog(@"Not changing permission for %@", absoluteURL);
-    }
-    return [super readFromURL:absoluteURL ofType:typeName error:outError];
-}
-
-- (BOOL)writeToURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
-{
-    BOOL result = [super writeToURL:absoluteURL ofType:typeName error:outError];
-	
-	if (result)
-	{
-        struct passwd *passwdInfo = getpwnam("mayur");
-        
-        if (passwdInfo)
-        {
-            NSLog(@"user id is %d", passwdInfo->pw_uid);
-            NSLog(@"group id is %d", passwdInfo->pw_gid);
-            
-            if (chown([[absoluteURL path] UTF8String], passwdInfo->pw_uid, passwdInfo->pw_gid) == -1)
-            {
-                NSLog(@"chown failed at write: %s", strerror(errno));
-                result = NO;
-            }
-        }
-	}
-
-	return result;
-}
-
 - (NSFileWrapper *)fileWrapperOfType:(NSString *)typeName error:(NSError **)outError
 {
     NSMutableData *writeData = [[NSMutableData alloc] init];
