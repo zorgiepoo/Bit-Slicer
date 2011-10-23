@@ -29,11 +29,6 @@ BOOL ZGIsProcessValid(pid_t process)
 	vm_map_t task = MACH_PORT_NULL;
 	BOOL success = (task_for_pid(current_task(), process, &task) == KERN_SUCCESS);
 	
-	if (success && task != MACH_PORT_NULL)
-	{
-		mach_port_deallocate(current_task(), task);
-	}
-	
 	return success;
 }
 
@@ -54,11 +49,6 @@ int ZGNumberOfRegionsForProcess(pid_t process)
 			numberOfRegions++;
 			address += size;
 		}
-		
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
-		}
 	}
 	
 	return numberOfRegions;
@@ -71,11 +61,6 @@ BOOL ZGReadBytes(pid_t process, ZGMemoryAddress address, void *bytes, ZGMemorySi
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
 		success = (mach_vm_read_overwrite(task, address, size, (ZGMemoryAddress)bytes, &size) == KERN_SUCCESS);
-		
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
-		}
 	}
 	
 	return success;
@@ -89,11 +74,6 @@ BOOL ZGReadBytesCarefully(pid_t process, ZGMemoryAddress address, void *bytes, Z
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
 		success = (mach_vm_read_overwrite(task, address, originalSize, (ZGMemoryAddress)bytes, size) == KERN_SUCCESS);
-		
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
-		}
 	}
 	
 	return success;
@@ -106,11 +86,6 @@ BOOL ZGWriteBytes(pid_t process, ZGMemoryAddress address, const void *bytes, ZGM
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
 		success = (mach_vm_write(task, address, (vm_offset_t)bytes, (mach_msg_type_number_t)size) == KERN_SUCCESS);
-		
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
-		}
 	}
 	
 	return success;
@@ -133,11 +108,6 @@ BOOL ZGMemoryProtectionInRegion(pid_t process, ZGMemoryAddress *address, ZGMemor
         {
             *memoryProtection = regionInfo.protection;
         }
-        
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
-		}
 	}
     
     return success;
@@ -150,11 +120,6 @@ BOOL ZGProtect(pid_t process, ZGMemoryAddress address, ZGMemorySize size, ZGMemo
 	if (task_for_pid(current_task(), process, &task) == KERN_SUCCESS)
 	{
 		success = (mach_vm_protect(task, address, size, FALSE, protection) == KERN_SUCCESS);
-		
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
-		}
 	}
 	
 	return success;
@@ -248,11 +213,6 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 				dataArray = nil;
 				break;
 			}
-		}
-		
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
 		}
 	}
 	
@@ -353,11 +313,6 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 		}
 		
 		success = YES;
-		
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
-		}
 	}
 	
 	return success;
@@ -447,11 +402,6 @@ void ZGSearchForSavedData(pid_t process, ZGMemorySize dataAlignment, ZGMemorySiz
 			
 			currentRegionNumber++;
 		}
-		
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
-		}
 	}
 }
 
@@ -500,11 +450,6 @@ void ZGSearchForData(pid_t process, ZGMemorySize dataAlignment, ZGMemorySize dat
 			
 			currentRegionNumber++;
 			address += size;
-		}
-		
-		if (task != MACH_PORT_NULL)
-		{
-			mach_port_deallocate(current_task(), task);
 		}
 	}
 }
@@ -556,11 +501,6 @@ ZGMemorySize ZGGetStringSize(pid_t process, ZGMemoryAddress address, ZGVariableT
 	@catch (NSException *exception)
 	{
 		totalSize = 0;
-	}
-	
-	if (task != MACH_PORT_NULL)
-	{
-		mach_port_deallocate(current_task(), task);
 	}
 	
 	return totalSize;
