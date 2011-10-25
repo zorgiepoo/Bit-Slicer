@@ -1443,18 +1443,17 @@ static NSSize *expandedWindowMinSize = nil;
             }
             else
             {
-                if ([byteString length] != 2)
-                {
-                    *valuePtr = 0;
-                }
-                else
+                *valuePtr = 0;
+                if ([byteString length] == 2)
                 {
                     [[NSScanner scannerWithString:[byteString substringToIndex:1]] scanHexInt:&theValue];
-                    //*valuePtr = ((unsigned char)theValue) & (unsigned char)0xF0;
-                    *valuePtr = ((*valuePtr) & 0xF0) | ((unsigned char)theValue);
+                    
+                    *valuePtr = (((unsigned char)theValue) << 4) & 0xF0;
+                    
+                    theValue = 0;
                     [[NSScanner scannerWithString:[byteString substringFromIndex:1]] scanHexInt:&theValue];
-                    //*valuePtr &= ((unsigned char)theValue) & (unsigned char)0x0F;
-                    *valuePtr = ((*valuePtr) & 0xF0) | (((unsigned char)theValue) << 4);
+                    
+                    *valuePtr |= ((unsigned char)theValue) & 0x0F;
                 }
             }
             
@@ -1463,6 +1462,63 @@ static NSSize *expandedWindowMinSize = nil;
     }
 	
 	return value;
+}
+
+- (unsigned char *)allocateFlagsForByteArrayWildcards:(NSString *)searchValue
+{
+    NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    
+    unsigned char *data = malloc([bytesArray count] * sizeof(unsigned char) * 2);
+    
+    if (data)
+    {
+        BOOL didUseWildcard = NO;
+        unsigned int dataIndex = 0;
+        for (NSString *byteString in bytesArray)
+        {
+            if ([byteString length] != 2)
+            {
+                data[dataIndex] = 0;
+                dataIndex++;
+                data[dataIndex] = 0;
+                dataIndex++;
+            }
+            else
+            {
+                if ([[byteString substringToIndex:1] isEqualToString:@"?"] || [[byteString substringToIndex:1] isEqualToString:@"*"])
+                {
+                    data[dataIndex] = 1;
+                    didUseWildcard = YES;
+                }
+                else
+                {
+                    data[dataIndex] = 0;
+                }
+                
+                dataIndex++;
+                
+                if ([[byteString substringFromIndex:1] isEqualToString:@"?"] || [[byteString substringFromIndex:1] isEqualToString:@"*"])
+                {
+                    data[dataIndex] = 1;
+                    didUseWildcard = YES;
+                }
+                else
+                {
+                    data[dataIndex] = 0;
+                }
+                
+                dataIndex++;
+            }
+        }
+        
+        if (!didUseWildcard)
+        {
+            free(data);
+            data = NULL;
+        }
+    }
+    
+    return data;
 }
 
 - (void)setWatchVariablesArray:(NSArray *)newWatchVariablesArray
@@ -1882,7 +1938,7 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		BOOL (*compareFunction)(ZGSearchArguments *, const void *, const void *, ZGVariableType, ZGMemorySize, void *) = compareFunctions[functionType];
         
-        void *extraData = (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus) ? searchValue : &collator;
+        void *extraData = dataType == ZGByteArray ? [self allocateFlagsForByteArrayWildcards:evaluatedSearchExpression] : ((functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus) ? searchValue : &collator);
 		
 		if (!goingToNarrowDownSearches)
 		{
@@ -1927,6 +1983,11 @@ static NSSize *expandedWindowMinSize = nil;
 				{
 					free(searchValue);
 				}
+                
+                if (extraData && dataType == ZGByteArray)
+                {
+                    free(extraData);
+                }
 				
 				[updateSearchUserInterfaceTimer invalidate];
 				[updateSearchUserInterfaceTimer release];
@@ -1972,6 +2033,10 @@ static NSSize *expandedWindowMinSize = nil;
 				{
 					free(searchValue);
 				}
+                if (extraData && dataType == ZGByteArray)
+                {
+                    free(extraData);
+                }
 				[updateSearchUserInterfaceTimer invalidate];
 				[updateSearchUserInterfaceTimer release];
 				updateSearchUserInterfaceTimer = nil;

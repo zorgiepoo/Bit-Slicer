@@ -154,7 +154,7 @@ BOOL greaterThanFunction(ZGSearchArguments *searchArguments, const void *value1,
 	return isGreaterThan;
 }
 
-BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *collator)
+BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const void *value2, ZGVariableType type, ZGMemorySize size, void *extraData)
 {
 	BOOL isEqual = NO;
 	
@@ -219,11 +219,42 @@ BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const
 			}
 			else
 			{
-				UCCompareText(*((CollatorRef *)collator), value1, ((size_t)size) / sizeof(unichar), value2, ((size_t)size) / sizeof(unichar), (Boolean *)&isEqual, NULL);
+				UCCompareText(*((CollatorRef *)extraData), value1, ((size_t)size) / sizeof(unichar), value2, ((size_t)size) / sizeof(unichar), (Boolean *)&isEqual, NULL);
 			}
 			break;
         case ZGByteArray:
-            isEqual = (memcmp(value1, value2, (size_t)size) == 0);
+            if (!extraData)
+            {
+                isEqual = (memcmp(value1, value2, (size_t)size) == 0);
+            }
+            else
+            {
+                isEqual = YES;
+                unsigned char *byteArrayFlags = extraData;
+                const unsigned char *value1Array = value1;
+                const unsigned char *value2Array = value2;
+                
+                unsigned int bitIndex = 0;
+                unsigned int byteIndex;
+                for (byteIndex = 0; byteIndex < size; byteIndex++)
+                {
+                    if (!byteArrayFlags[bitIndex] && ((value1Array[byteIndex] & 0xF0) != (value2Array[byteIndex] & 0xF0)))
+                    {
+                        isEqual = NO;
+                        break;
+                    }
+                    
+                    bitIndex++;
+                    
+                    if (!byteArrayFlags[bitIndex] && ((value1Array[byteIndex] & 0x0F) != (value2Array[byteIndex] & 0x0F)))
+                    {
+                        isEqual = NO;
+                        break;
+                    }
+                    
+                    bitIndex++;
+                }
+            }
             break;
 	}
 	
