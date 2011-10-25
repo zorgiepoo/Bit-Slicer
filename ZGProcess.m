@@ -19,12 +19,11 @@
  */
 
 #import "ZGProcess.h"
-#import "ZGVirtualMemory.h"
-#import <sys/sysctl.h>
 
 @implementation ZGProcess
 
 @synthesize processID;
+@synthesize processTask;
 @synthesize name;
 
 static NSArray *frozenProcesses = nil;
@@ -111,12 +110,12 @@ static NSArray *frozenProcesses = nil;
 
 - (int)numberOfRegions
 {
-	return ZGNumberOfRegionsForProcess(processID);
+	return ZGNumberOfRegionsForProcess(processTask);
 }
 
 - (BOOL)grantUsAccess
 {
-	return ZGIsProcessValid(processID);
+	return ZGIsProcessValid(processID, &processTask);
 }
 
 @end

@@ -58,7 +58,7 @@
 					 
 					 if (bytes)
 					 {
-						 ZGReadBytesCarefully([[document currentProcess] processID], fromAddress, bytes, &size);
+						 ZGReadBytesCarefully([[document currentProcess] processTask], fromAddress, bytes, &size);
 						 
 						 NSData *data = [NSData dataWithBytes:bytes
 													   length:(NSUInteger)size];
@@ -226,7 +226,7 @@
         ZGMemoryAddress memoryAddress = address;
         ZGMemorySize memorySize;
         ZGMemoryProtection memoryProtection;
-        if (!ZGMemoryProtectionInRegion([[document currentProcess] processID], &memoryAddress, &memorySize, &memoryProtection))
+        if (!ZGMemoryProtectionInRegion([[document currentProcess] processTask], &memoryAddress, &memorySize, &memoryProtection))
         {
             NSRunAlertPanel(@"Memory Protection Change Failed",
 							@"The specified memory address could not be located within a memory region.",
@@ -251,7 +251,7 @@
                 protection |= VM_PROT_EXECUTE;
             }
             
-            if (!ZGProtect([[document currentProcess] processID], address, size, protection))
+            if (!ZGProtect([[document currentProcess] processTask], address, size, protection))
             {
                 NSRunAlertPanel(@"Memory Protection Change Failed",
                                 @"The memory's protection could not be changed to the specified permissions.",
@@ -294,7 +294,7 @@
         ZGMemorySize memorySize;
         
         // Tell the user what the current memory protection is set as for the variable
-        if (ZGMemoryProtectionInRegion([[document currentProcess] processID], &memoryAddress, &memorySize, &memoryProtection) &&
+        if (ZGMemoryProtectionInRegion([[document currentProcess] processTask], &memoryAddress, &memorySize, &memoryProtection) &&
             memoryAddress <= firstVariable->address && memoryAddress + memorySize >= firstVariable->address + firstVariable->size)
         {
             [changeProtectionReadButton setState:memoryProtection & VM_PROT_READ];

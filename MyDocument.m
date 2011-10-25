@@ -758,13 +758,13 @@
 			 {
 				 if (variable->size)
 				 {
-					 ZGWriteBytes([currentProcess processID], variable->address, variable->freezeValue, variable->size);
+					 ZGWriteBytes([currentProcess processTask], variable->address, variable->freezeValue, variable->size);
 				 }
 				 
 				 if (variable->type == ZGUTF16String)
 				 {
 					 unichar terminatorValue = 0;
-					 ZGWriteBytes([currentProcess processID], variable->address + variable->size, &terminatorValue, sizeof(unichar));
+					 ZGWriteBytes([currentProcess processTask], variable->address + variable->size, &terminatorValue, sizeof(unichar));
 				 }
 			 }
 		 }];
@@ -783,7 +783,7 @@
              {
                  if (variable->type == ZGUTF8String || variable->type == ZGUTF16String)
                  {
-                     variable->size = ZGGetStringSize([currentProcess processID], variable->address, variable->type);
+                     variable->size = ZGGetStringSize([currentProcess processTask], variable->address, variable->type);
                  }
                  
                  if (variable->size)
@@ -792,7 +792,7 @@
                      
                      if (value)
                      {
-                         if (ZGReadBytes([currentProcess processID], variable->address, value, variable->size))
+                         if (ZGReadBytes([currentProcess processTask], variable->address, value, variable->size))
                          {
                              NSString *oldStringValue = [[variable stringValue] copy];
                              [variable setVariableValue:value];
@@ -1436,8 +1436,28 @@ static NSSize *expandedWindowMinSize = nil;
         for (NSString *byteString in bytesArray)
         {
             unsigned int theValue = 0;
-            [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
-            *valuePtr = (unsigned char)theValue;
+            if (([byteString rangeOfString:@"?"].location == NSNotFound && [byteString rangeOfString:@"*"].location == NSNotFound) || [byteString length] != 2)
+            {
+                [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
+                *valuePtr = (unsigned char)theValue;
+            }
+            else
+            {
+                if ([byteString length] != 2)
+                {
+                    *valuePtr = 0;
+                }
+                else
+                {
+                    [[NSScanner scannerWithString:[byteString substringToIndex:1]] scanHexInt:&theValue];
+                    //*valuePtr = ((unsigned char)theValue) & (unsigned char)0xF0;
+                    *valuePtr = ((*valuePtr) & 0xF0) | ((unsigned char)theValue);
+                    [[NSScanner scannerWithString:[byteString substringFromIndex:1]] scanHexInt:&theValue];
+                    //*valuePtr &= ((unsigned char)theValue) & (unsigned char)0x0F;
+                    *valuePtr = ((*valuePtr) & 0xF0) | (((unsigned char)theValue) << 4);
+                }
+            }
+            
             valuePtr++;
         }
     }
@@ -1921,12 +1941,12 @@ static NSSize *expandedWindowMinSize = nil;
 				
 				if (searchArguments.isImplicit)
 				{
-					ZGSearchForSavedData([currentProcess processID], dataAlignment, dataSize, searchData, searchForDataCallback);
+					ZGSearchForSavedData([currentProcess processTask], dataAlignment, dataSize, searchData, searchForDataCallback);
 				}
 				else
 				{
 					searchData->scanReadOnly = ([scanUnwritableValuesCheckBox state] == NSOnState);
-					ZGSearchForData([currentProcess processID], dataAlignment, dataSize, searchData, searchForDataCallback);
+					ZGSearchForData([currentProcess processTask], dataAlignment, dataSize, searchData, searchForDataCallback);
 				}
 				dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
 			};
@@ -1934,7 +1954,7 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		else /* if (goingToNarrowDownSearches) */
 		{
-			int processID = [currentProcess processID];
+			ZGMemoryMap processTask = [currentProcess processTask];
 			
 			[searchingProgressIndicator setMaxValue:[watchVariablesArray count]];
 			currentProcess->searchProgress = 0;
@@ -1970,7 +1990,7 @@ static NSSize *expandedWindowMinSize = nil;
 							(!searchArguments.endAddressExists || searchArguments.endAddress >= variable->address + dataSize))
 						{
 							void *value = malloc((size_t)dataSize);
-							if (ZGReadBytes(processID, variable->address, value, dataSize))
+							if (ZGReadBytes(processTask, variable->address, value, dataSize))
 							{
 								void *value2 = searchArguments.isImplicit ? ZGSavedValue(variable->address, searchData, dataSize) : searchValue;
 								
@@ -2444,7 +2464,7 @@ static NSSize *expandedWindowMinSize = nil;
 			
 			if (writeSize)
 			{
-				if (!ZGWriteBytes([currentProcess processID], variable->address, newValue, writeSize))
+				if (!ZGWriteBytes([currentProcess processTask], variable->address, newValue, writeSize))
 				{
 					successfulWrite = NO;
 				}
@@ -2458,7 +2478,7 @@ static NSSize *expandedWindowMinSize = nil;
 			{
 				// Don't forget to write the null terminator
 				unichar nullTerminator = 0;
-				if (!ZGWriteBytes([currentProcess processID], variable->address + writeSize, &nullTerminator, sizeof(unichar)))
+				if (!ZGWriteBytes([currentProcess processTask], variable->address + writeSize, &nullTerminator, sizeof(unichar)))
 				{
 					successfulWrite = NO;
 				}
@@ -2587,7 +2607,7 @@ static NSSize *expandedWindowMinSize = nil;
             ZGMemoryAddress memoryAddress = variable->address;
             ZGMemorySize memorySize;
             
-            if (ZGMemoryProtectionInRegion([currentProcess processID], &memoryAddress, &memorySize, &memoryProtection))
+            if (ZGMemoryProtectionInRegion([currentProcess processTask], &memoryAddress, &memorySize, &memoryProtection))
             {
                 // if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
                 if (memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE))
@@ -2974,7 +2994,7 @@ static NSSize *expandedWindowMinSize = nil;
         ZGMemoryAddress memoryAddress = variable->address;
         ZGMemorySize memorySize;
         
-        if (ZGMemoryProtectionInRegion([currentProcess processID], &memoryAddress, &memorySize, &memoryProtection))
+        if (ZGMemoryProtectionInRegion([currentProcess processTask], &memoryAddress, &memorySize, &memoryProtection))
         {
             // if !(the variable is within a single memory region and the memory region is not writable), then the variable is editable
             if (!(memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE)))
@@ -3089,7 +3109,7 @@ static NSSize *expandedWindowMinSize = nil;
          
          if (buffer)
          { 
-             if (ZGReadBytesCarefully([currentProcess processID], variable->address, buffer, &size))
+             if (ZGReadBytesCarefully([currentProcess processTask], variable->address, buffer, &size))
              {
                  if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
                  {

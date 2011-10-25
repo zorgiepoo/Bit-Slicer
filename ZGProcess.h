@@ -19,6 +19,8 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import "ZGVirtualMemory.h"
+#import <sys/sysctl.h>
 
 @interface ZGProcess : NSObject
 {
@@ -34,6 +36,7 @@
 	BOOL isStoringAllData;
 	
 	pid_t processID;
+    ZGMemoryMap processTask;
 	BOOL is64Bit;
 }
 
@@ -48,6 +51,7 @@
 - (BOOL)grantUsAccess;
 
 @property (assign) pid_t processID;
+@property (assign) ZGMemoryMap processTask;
 @property (copy) NSString *name;
 @property (readonly) int numberOfRegions;
 

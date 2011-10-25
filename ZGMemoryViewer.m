@@ -46,6 +46,8 @@
 
 @implementation ZGMemoryViewer
 
+#warning Fix memory viewer to use a task rather than a PID when passing to VM functions
+
 #pragma mark Accessors
 
 - (pid_t)currentProcessIdentifier
