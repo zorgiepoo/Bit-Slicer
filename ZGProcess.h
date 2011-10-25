@@ -49,6 +49,7 @@
 		 processID:(pid_t)aProcessID
 		  set64Bit:(BOOL)flag64Bit;
 - (BOOL)grantUsAccess;
+- (BOOL)hasGrantedAccess;
 
 @property (assign) pid_t processID;
 @property (assign) ZGMemoryMap processTask;

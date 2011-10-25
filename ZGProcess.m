@@ -96,6 +96,7 @@ static NSArray *frozenProcesses = nil;
 		[self setName:processName];
 		[self setProcessID:aProcessID];
 		is64Bit = flag64Bit;
+        processTask = MACH_PORT_NULL;
 	}
 	
 	return self;
@@ -116,6 +117,11 @@ static NSArray *frozenProcesses = nil;
 - (BOOL)grantUsAccess
 {
 	return ZGIsProcessValid(processID, &processTask);
+}
+
+- (BOOL)hasGrantedAccess
+{
+    return (processTask != MACH_PORT_NULL);
 }
 
 @end

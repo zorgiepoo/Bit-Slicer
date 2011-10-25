@@ -46,18 +46,33 @@
 
 @implementation ZGMemoryViewer
 
-#warning Fix memory viewer to use a task rather than a PID when passing to VM functions
-
 #pragma mark Accessors
 
 - (pid_t)currentProcessIdentifier
 {
-	return currentProcessIdentifier;
+	return [currentProcess processID];
 }
 
 - (ZGMemoryAddress)selectedAddress
 {
 	return (currentMemorySize > 0) ? ((ZGMemoryAddress)([[[[textView controller] selectedContentsRanges] objectAtIndex:0] HFRange].location) + currentMemoryAddress) : 0x0;
+}
+
+#pragma mark Setters
+
+- (void)setCurrentProcess:(ZGProcess *)newProcess
+{
+    [newProcess retain];
+    [currentProcess release];
+    
+    currentProcess = newProcess;
+    if (![currentProcess hasGrantedAccess])
+    {
+        if (![currentProcess grantUsAccess])
+        {
+            NSLog(@"Memory viewer failed to grant access to PID %d", [currentProcess processID]);
+        }
+    }
 }
 
 #pragma mark Initialization
@@ -262,7 +277,7 @@
 				firstRegularApplicationMenuItem = [menuItem retain];
 			}
 			
-			if (currentProcessIdentifier == [runningApplication processIdentifier] || [desiredProcessName isEqualToString:[runningApplication localizedName]])
+			if ([currentProcess processID] == [runningApplication processIdentifier] || [desiredProcessName isEqualToString:[runningApplication localizedName]])
 			{
 				[runningApplicationsPopUpButton selectItem:[runningApplicationsPopUpButton lastItem]];
 				foundTargettedProcess = YES;
@@ -291,14 +306,14 @@
 		[firstRegularApplicationMenuItem release];
 	}
 	
-	currentProcessIdentifier = [[[runningApplicationsPopUpButton selectedItem] representedObject] processID];
+	[self setCurrentProcess:[[runningApplicationsPopUpButton selectedItem] representedObject]];
 }
 
 - (IBAction)runningApplicationsPopUpButton:(id)sender
 {
-	if ([[[runningApplicationsPopUpButton selectedItem] representedObject] processID] != currentProcessIdentifier)
+	if ([[[runningApplicationsPopUpButton selectedItem] representedObject] processID] != [currentProcess processID])
 	{
-		currentProcessIdentifier = [[[runningApplicationsPopUpButton selectedItem] representedObject] processID];
+		[self setCurrentProcess:[[runningApplicationsPopUpButton selectedItem] representedObject]];
 		[self clearData];
         [self markChanges];
 	}
@@ -330,7 +345,7 @@
 			void *bytes = malloc((size_t)memorySize);
 			if (bytes)
 			{
-				if (ZGReadBytesCarefully(currentProcessIdentifier, memoryAddress, bytes, &memorySize) && memorySize > 0)
+				if (ZGReadBytesCarefully([currentProcess processTask], memoryAddress, bytes, &memorySize) && memorySize > 0)
 				{
 					// Replace all the contents of the textview
 					[textView setData:[NSData dataWithBytes:bytes length:(NSUInteger)memorySize]];
@@ -402,7 +417,7 @@
 			void *bytes = malloc((size_t)readSize);
 			if (bytes)
 			{
-				if (ZGReadBytesCarefully(currentProcessIdentifier, readAddress, bytes, &readSize) && readSize > 0)
+				if (ZGReadBytesCarefully([currentProcess processTask], readAddress, bytes, &readSize) && readSize > 0)
 				{
 					HFFullMemoryByteSlice *byteSlice = [[HFFullMemoryByteSlice alloc] initWithData:[NSData dataWithBytes:bytes length:(NSUInteger)readSize]];
 					HFByteArray *newByteArray = [[textView controller] byteArray];

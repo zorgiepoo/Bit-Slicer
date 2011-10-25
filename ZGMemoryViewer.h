@@ -26,6 +26,7 @@
 
 @class ZGStatusBarRepresenter;
 @class ZGLineCountingRepresenter;
+@class ZGProcess;
 
 @interface ZGMemoryViewer : NSWindowController <NSWindowDelegate>
 {
@@ -40,7 +41,7 @@
 	ZGStatusBarRepresenter *statusBarRepresenter;
 	ZGLineCountingRepresenter *lineCountingRepresenter;
 	
-	pid_t currentProcessIdentifier;
+    ZGProcess *currentProcess;
 	ZGMemoryAddress currentMemoryAddress;
 	ZGMemorySize currentMemorySize;
 	
