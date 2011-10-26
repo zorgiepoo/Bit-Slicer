@@ -2,4 +2,4 @@ I wanted a decent tool that assists me in inspecting and modifying a program at 
 
 For a bit of a information / FAQ / tutorial: http://forum.portingteam.com/viewtopic.php?f=245&t=6914
 
-For source code: http://tools.assembla.com/bit_slicer
+For source code: https://bitbucket.org/zorgiepoo/bit-slicer
