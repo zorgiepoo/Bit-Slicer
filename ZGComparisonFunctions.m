@@ -229,31 +229,27 @@ BOOL equalFunction(ZGSearchArguments *searchArguments, const void *value1, const
             }
             else
             {
-                isEqual = YES;
                 unsigned char *byteArrayFlags = extraData;
                 const unsigned char *value1Array = value1;
                 const unsigned char *value2Array = value2;
-                
-                unsigned int bitIndex = 0;
-                unsigned int byteIndex;
-                for (byteIndex = 0; byteIndex < size; byteIndex++)
-                {
-                    if (!byteArrayFlags[bitIndex] && ((value1Array[byteIndex] & 0xF0) != (value2Array[byteIndex] & 0xF0)))
-                    {
-                        isEqual = NO;
-                        break;
-                    }
-                    
-                    bitIndex++;
-                    
-                    if (!byteArrayFlags[bitIndex] && ((value1Array[byteIndex] & 0x0F) != (value2Array[byteIndex] & 0x0F)))
-                    {
-                        isEqual = NO;
-                        break;
-                    }
-                    
-                    bitIndex++;
-                }
+				
+				isEqual = YES;
+				
+				unsigned int byteIndex;
+				for (byteIndex = 0; byteIndex < size; byteIndex++)
+				{
+					if (!(byteArrayFlags[byteIndex] & 0xF0) && ((value1Array[byteIndex] & 0xF0) != (value2Array[byteIndex] & 0xF0)))
+					{
+						isEqual = NO;
+						break;
+					}
+					
+					if (!(byteArrayFlags[byteIndex] & 0x0F) && ((value1Array[byteIndex] & 0x0F) != (value2Array[byteIndex] & 0x0F)))
+					{
+						isEqual = NO;
+						break;
+					}
+				}
             }
             break;
 	}

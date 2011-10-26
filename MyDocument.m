@@ -1468,48 +1468,28 @@ static NSSize *expandedWindowMinSize = nil;
 {
     NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     
-    unsigned char *data = malloc([bytesArray count] * sizeof(unsigned char) * 2);
+    unsigned char *data = calloc(1, [bytesArray count] * sizeof(unsigned char));
     
     if (data)
     {
-        BOOL didUseWildcard = NO;
-        unsigned int dataIndex = 0;
-        for (NSString *byteString in bytesArray)
-        {
-            if ([byteString length] != 2)
-            {
-                data[dataIndex] = 0;
-                dataIndex++;
-                data[dataIndex] = 0;
-                dataIndex++;
-            }
-            else
-            {
-                if ([[byteString substringToIndex:1] isEqualToString:@"?"] || [[byteString substringToIndex:1] isEqualToString:@"*"])
-                {
-                    data[dataIndex] = 1;
-                    didUseWildcard = YES;
-                }
-                else
-                {
-                    data[dataIndex] = 0;
-                }
-                
-                dataIndex++;
-                
-                if ([[byteString substringFromIndex:1] isEqualToString:@"?"] || [[byteString substringFromIndex:1] isEqualToString:@"*"])
-                {
-                    data[dataIndex] = 1;
-                    didUseWildcard = YES;
-                }
-                else
-                {
-                    data[dataIndex] = 0;
-                }
-                
-                dataIndex++;
-            }
-        }
+        __block BOOL didUseWildcard = NO;
+		[bytesArray enumerateObjectsUsingBlock:^(NSString *byteString, NSUInteger byteIndex, BOOL *stop)
+		 {
+			 if ([byteString length] == 2)
+			 {
+				 if ([[byteString substringToIndex:1] isEqualToString:@"?"] || [[byteString substringToIndex:1] isEqualToString:@"*"])
+				 {
+					 data[byteIndex] |= 0xF0;
+					 didUseWildcard = YES;
+				 }
+				 
+				 if ([[byteString substringFromIndex:1] isEqualToString:@"?"] || [[byteString substringFromIndex:1] isEqualToString:@"*"])
+				 {
+					 data[byteIndex] |= 0x0F;
+					 didUseWildcard = YES;
+				 }
+			 }
+		 }];
         
         if (!didUseWildcard)
         {
