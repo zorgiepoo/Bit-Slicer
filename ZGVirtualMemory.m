@@ -56,7 +56,6 @@ int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask)
 
 BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, ZGMemorySize size)
 {
-    static pointer_t lastDataPointer = 0;
     pointer_t dataPointer = 0;
     mach_msg_type_number_t dataSize = 0;
     BOOL success = NO;
@@ -65,7 +64,6 @@ BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, 
     {
         success = YES;
         memcpy(bytes, (void *)dataPointer, dataSize);
-        lastDataPointer = dataPointer;
     }
     
     return success;
