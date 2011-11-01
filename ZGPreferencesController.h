@@ -27,6 +27,7 @@
 #define ZG_HOT_KEY                  @"ZG_HOT_KEY_CODE"
 #define ZG_CHECK_FOR_UPDATES		@"ZG_CHECK_FOR_UPDATES"
 #define ZG_CHECK_FOR_ALPHA_UPDATES  @"ZG_CHECK_FOR_ALPHA_UPDATES"
+#define ZG_DEFAULT_WEB_BROWSER      @"ZG_DEFAULT_WEB_BROWSER"
 #define ZGPreferencesIdentifier     @"ZGPreferencesID"
 
 @interface ZGPreferencesController : NSWindowController

@@ -28,6 +28,8 @@
 #define ZGProcessTerminated  @"ZGProcessTerminated"
 #define ZGRunningApplication @"ZGRunningApplication"
 
+#define BIT_SLICER_VERSION_FILE @"http://dl.dropbox.com/u/10108199/bit_slicer/bit_slicer_version.plist"
+
 @interface ZGAppController : NSObject
 {
 	IBOutlet ZGDocumentController *documentController;
