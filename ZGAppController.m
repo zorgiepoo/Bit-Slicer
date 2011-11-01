@@ -170,29 +170,6 @@ BOOL amIWorthy(void)
 	return stat == errAuthorizationSuccess || checkExecutablePermissions();
 }
 
-- (void)openWebURL:(NSURL *)url
-{
-	// openURL: is not desirable when Bit Slicer is run as root user since root user appears to ignore default web browser and uses Safari
-	if (![[NSWorkspace sharedWorkspace] openURLs:[NSArray arrayWithObject:url]
-						 withAppBundleIdentifier:[[NSUserDefaults standardUserDefaults] objectForKey:ZG_DEFAULT_WEB_BROWSER]
-										 options:NSWorkspaceLaunchDefault
-				  additionalEventParamDescriptor:[NSAppleEventDescriptor nullDescriptor]
-							   launchIdentifiers:NULL])
-	{
-		NSLog(@"Failed to load latest version URL attempt #1: %@", url);
-		if (![[NSWorkspace sharedWorkspace] openURL:url])
-		{
-			NSLog(@"Failed to load latest version URL attempt #2: %@", url);
-		}
-	}
-}
-
-- (void)invokeActionsBeforeAuthenticating
-{
-	[[NSUserDefaults standardUserDefaults] setObject:[[NSBundle bundleWithURL:[[NSWorkspace sharedWorkspace] URLForApplicationToOpenURL:[NSURL URLWithString:BIT_SLICER_VERSION_FILE]]] bundleIdentifier]
-											  forKey:ZG_DEFAULT_WEB_BROWSER];
-}
-
 - (void)authenticateWithURL:(NSURL *)url
 {
 	if (amIWorthy())
@@ -207,7 +184,6 @@ BOOL amIWorthy(void)
 	}
 	else
 	{
-		[self invokeActionsBeforeAuthenticating];
 		authMe([[[NSBundle mainBundle] executablePath] UTF8String], url);
 		[NSApp terminate:nil];
 	}
@@ -279,10 +255,8 @@ static BOOL didRegisteredHotKey = NO;
 
 - (void)checkForUpdates
 {
-	NSLog(@"moo");
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_UPDATES])
 	{
-		NSLog(@"boo");
 		__block NSDictionary *latestVersionDictionary = nil;
 		
 		dispatch_block_t compareVersionsBlock = ^
@@ -324,7 +298,7 @@ static BOOL didRegisteredHotKey = NO;
 					switch (NSRunAlertPanel(@"A new version is available", @"You currently have version %@. Do you want to update to %@?", @"Yes", @"No", @"Don't ask me again", currentShortVersion, latestShortVersion))
 					{
 						case NSAlertDefaultReturn: // yes, I want update
-							[self openWebURL:[NSURL URLWithString:latestVersionURL]];
+							[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:latestVersionURL]];
 							break;
 						case NSAlertOtherReturn: // don't ask again
 							[[NSUserDefaults standardUserDefaults] setBool:NO
@@ -345,7 +319,6 @@ static BOOL didRegisteredHotKey = NO;
 		
 		dispatch_block_t queryLatestVersionBlock = ^
 		{
-			NSLog(@"rawrk");
 			latestVersionDictionary = [[NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:BIT_SLICER_VERSION_FILE]] retain];
 			dispatch_async(dispatch_get_main_queue(), compareVersionsBlock);
 		};
@@ -445,7 +418,7 @@ static BOOL didRegisteredHotKey = NO;
 #define FAQ_URL @"http://forum.portingteam.com/viewtopic.php?f=245&t=6914"
 - (IBAction)help:(id)sender
 {	
-	[self openWebURL:[NSURL URLWithString:FAQ_URL]];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:FAQ_URL]];
 }
 
 #pragma mark Menu Item Validation
