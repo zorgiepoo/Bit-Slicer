@@ -30,6 +30,12 @@
     
     [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:0]
 																						forKey:ZG_HOT_KEY_MODIFIER]];
+	
+	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES]
+																						forKey:ZG_CHECK_FOR_UPDATES]];
+	
+	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
+																						forKey:ZG_CHECK_FOR_ALPHA_UPDATES]];
 }
 
 - (id)init
@@ -70,6 +76,19 @@
     hotkeyCombo.flags = SRCarbonToCocoaFlags([[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY_MODIFIER]);
     
     [hotkeyRecorder setKeyCombo:hotkeyCombo];
+	
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_UPDATES])
+	{
+		if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
+		{
+			[checkForAlphaUpdatesButton setState:NSOnState];
+		}
+	}
+	else
+	{
+		[checkForAlphaUpdatesButton setEnabled:NO];
+		[checkForUpdatesButton setState:NSOffState];
+	}
 }
 
 - (void)shortcutRecorder:(SRRecorderControl *)aRecorder keyComboDidChange:(KeyCombo)newKeyCombo
@@ -81,6 +100,35 @@
 											   forKey:ZG_HOT_KEY_MODIFIER];
     
     [ZGAppController registerPauseAndUnpauseHotKey];
+}
+
+- (IBAction)checkForUpdatesButton:(id)sender
+{
+	if ([checkForUpdatesButton state] == NSOffState)
+	{
+		[checkForAlphaUpdatesButton setEnabled:NO];
+		[checkForAlphaUpdatesButton setState:NSOffState];
+		[[NSUserDefaults standardUserDefaults] setBool:NO
+												forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+	}
+	else
+	{
+		[checkForAlphaUpdatesButton setEnabled:YES];
+	}
+	
+	[[NSUserDefaults standardUserDefaults] setBool:[checkForUpdatesButton state] == NSOnState
+											forKey:ZG_CHECK_FOR_UPDATES];
+}
+
+- (IBAction)checkForAlphaUpdatesButton:(id)sender
+{
+	[[NSUserDefaults standardUserDefaults] setBool:[checkForAlphaUpdatesButton state] == NSOnState
+											forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+}
+
+- (void)updateAlphaUpdatesUI
+{
+	[checkForAlphaUpdatesButton setState:[[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES]];
 }
 
 @end

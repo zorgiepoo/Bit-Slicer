@@ -25,11 +25,19 @@
 #define INVALID_KEY_CODE            -1
 #define ZG_HOT_KEY_MODIFIER         @"ZG_HOT_KEY_MODIFIER"
 #define ZG_HOT_KEY                  @"ZG_HOT_KEY_CODE"
+#define ZG_CHECK_FOR_UPDATES		@"ZG_CHECK_FOR_UPDATES"
+#define ZG_CHECK_FOR_ALPHA_UPDATES  @"ZG_CHECK_FOR_ALPHA_UPDATES"
 #define ZGPreferencesIdentifier     @"ZGPreferencesID"
 
 @interface ZGPreferencesController : NSWindowController
 {
     IBOutlet SRRecorderControl *hotkeyRecorder;
+	IBOutlet NSButton *checkForUpdatesButton;
+	IBOutlet NSButton *checkForAlphaUpdatesButton;
 }
+
+- (IBAction)checkForUpdatesButton:(id)sender;
+- (IBAction)checkForAlphaUpdatesButton:(id)sender;
+- (void)updateAlphaUpdatesUI;
 
 @end

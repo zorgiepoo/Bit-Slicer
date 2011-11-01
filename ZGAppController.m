@@ -253,6 +253,82 @@ static BOOL didRegisteredHotKey = NO;
 	return amIWorthy();
 }
 
+- (void)checkForUpdates
+{
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_UPDATES])
+	{
+		__block NSDictionary *latestVersionDictionary = nil;
+		
+		dispatch_block_t compareVersionsBlock = ^
+		{
+			if (latestVersionDictionary)
+			{
+				NSString *currentShortVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+				NSString *currentBuildString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+				double currentVersion = [currentBuildString doubleValue];
+				double latestStableVersion = [[latestVersionDictionary objectForKey:@"Build-Stable"] doubleValue];
+				double latestAlphaVersion = [[latestVersionDictionary objectForKey:@"Build-Alpha"] doubleValue];
+				
+				BOOL checkForAlphas = [[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+				if (!checkForAlphas && (floor(currentVersion) != currentVersion))
+				{
+					// we are in an alpha version, so we should check for alpha updates since we're already checking for regular updates
+					[[NSUserDefaults standardUserDefaults] setBool:YES
+															forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+					[preferencesController updateAlphaUpdatesUI];
+					checkForAlphas = YES;
+				}
+				
+				NSString *latestShortVersion = nil;
+				NSString *latestVersionURL = nil;
+				
+				if (checkForAlphas && (latestAlphaVersion > latestStableVersion) && (latestAlphaVersion > currentVersion))
+				{
+					latestShortVersion = [latestVersionDictionary objectForKey:@"Version-Alpha"];
+					latestVersionURL = [latestVersionDictionary objectForKey:@"URL-Alpha"];
+				}
+				else if (latestStableVersion > currentVersion)
+				{
+					latestShortVersion = [latestVersionDictionary objectForKey:@"Version-Stable"];
+					latestVersionURL = [latestVersionDictionary objectForKey:@"URL-Stable"];
+				}
+				
+				if (latestShortVersion && latestVersionURL)
+				{
+					switch (NSRunAlertPanel(@"A new version is available", @"You currently have version %@. Do you want to update to %@?", @"Yes", @"No", @"Don't ask me again", currentShortVersion, latestShortVersion))
+					{
+						case NSAlertDefaultReturn: // yes, I want update
+							if (![[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:latestVersionURL]])
+							{
+								NSLog(@"Could not open URL for updates");
+							}
+							break;
+						case NSAlertOtherReturn: // don't ask again
+							[[NSUserDefaults standardUserDefaults] setBool:NO
+																	forKey:ZG_CHECK_FOR_UPDATES];
+							[[NSUserDefaults standardUserDefaults] setBool:NO
+																	forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+							break;
+					}
+				}
+			}
+			else
+			{
+				NSLog(@"Cannot find latest version of Bit Slicer");
+			}
+			
+			[latestVersionDictionary release];
+		};
+		
+		dispatch_block_t queryLatestVersionBlock = ^
+		{
+			latestVersionDictionary = [[NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:@"http://dl.dropbox.com/u/10108199/bit_slicer/bit_slicer_version.plist"]] retain];
+			dispatch_async(dispatch_get_main_queue(), compareVersionsBlock);
+		};
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), queryLatestVersionBlock);
+	}
+}
+
 #define CHECK_PROCESSES_TIME_INTERVAL 0.5
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
@@ -263,6 +339,8 @@ static BOOL didRegisteredHotKey = NO;
     
 	[[self class] registerPauseAndUnpauseHotKey];
 	[ZGCalculator initializeCalculator];
+	
+	[self checkForUpdates];
 	
 	[NSTimer scheduledTimerWithTimeInterval:CHECK_PROCESSES_TIME_INTERVAL
 									 target:self
