@@ -334,6 +334,10 @@ static BOOL didRegisteredHotKey = NO;
 		[self authenticateWithURL:nil];
 	}
     
+    // Initialize preference defaults
+    [self openPreferences:nil
+               showWindow:NO];
+    
 	[[self class] registerPauseAndUnpauseHotKey];
 	[ZGCalculator initializeCalculator];
 	
