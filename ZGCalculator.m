@@ -100,7 +100,7 @@
 					
 					NSMutableString *newExpression;
 					
-					if (ZGReadBytes([process processID], address, value, size))
+					if (ZGReadBytes([process processTask], address, value, size))
 					{
 						if (process->is64Bit)
 						{
