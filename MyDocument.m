@@ -2001,11 +2001,9 @@ static NSSize *expandedWindowMinSize = nil;
 			currentProcess->searchProgress = 0;
 			currentProcess->numberOfVariablesFound = 0;
 			
-			updateSearchUserInterfaceTimer = [[NSTimer scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-																			   target:self
-																			 selector:@selector(updateSearchUserInterface:)
-																			 userInfo:nil
-																			  repeats:YES] retain];
+			updateSearchUserInterfaceTimer = [[ZGTimer alloc] initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+																			target:self
+																		  selector:@selector(updateSearchUserInterface:)];
 			
 			dispatch_block_t completeSearchBlock = ^
 			{
@@ -2108,11 +2106,11 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	[searchingProgressIndicator setMaxValue:[currentProcess numberOfRegions]];
 	
-	updateSearchUserInterfaceTimer = [[NSTimer scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-																	   target:self
-																	 selector:@selector(updateMemoryStoreUserInterface:)
-																	 userInfo:nil
-																	  repeats:YES] retain];
+	updateSearchUserInterfaceTimer = [[ZGTimer alloc] initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+																	target:self
+																  selector:@selector(updateMemoryStoreUserInterface:)];
+	
+	
 	[generalStatusTextField setStringValue:@"Storing All Values..."];
 	
 	dispatch_block_t searchForDataCompleteBlock = ^
