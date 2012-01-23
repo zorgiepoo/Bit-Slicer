@@ -419,7 +419,7 @@ static BOOL didRegisteredHotKey = NO;
 	[memoryViewer jumpToMemoryAddressRequest];
 }
 
-#define FAQ_URL @"http://forum.portingteam.com/viewtopic.php?f=245&t=6914"
+#define FAQ_URL @"http://portingteam.com/index.php/topic/4454-faq-information/"
 - (IBAction)help:(id)sender
 {	
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:FAQ_URL]];
