@@ -321,7 +321,7 @@
         // Change the permissions on the document file to something more sane
         if (chmod([[absoluteURL path] UTF8String], 0777) == -1)
         {
-            NSLog(@"chmod fialed: %s", strerror(errno));
+            NSLog(@"chmod failed: %s", strerror(errno));
         }
     }
     
