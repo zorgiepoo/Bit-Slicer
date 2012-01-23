@@ -265,7 +265,7 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 			}
 			
 			void *bytes = malloc((size_t)size);
-			ZGReadBytes(process->processID, address, bytes, size);
+			ZGReadBytes(process->processTask, address, bytes, size);
 			
 			[currentData appendBytes:bytes
   	                          length:(NSUInteger)size];
