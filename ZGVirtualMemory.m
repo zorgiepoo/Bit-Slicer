@@ -58,7 +58,7 @@ int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask)
 
 BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, ZGMemorySize size)
 {
-    pointer_t dataPointer = 0;
+    vm_offset_t dataPointer = 0;
     mach_msg_type_number_t dataSize = 0;
     BOOL success = NO;
     
@@ -66,6 +66,8 @@ BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, 
     {
         success = YES;
         memcpy(bytes, (void *)dataPointer, dataSize);
+		
+		mach_vm_deallocate(current_task(), dataPointer, dataSize);
     }
     
     return success;
@@ -74,7 +76,7 @@ BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, 
 BOOL ZGReadBytesCarefully(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, ZGMemorySize *size)
 {
 	ZGMemorySize originalSize = *size;
-    pointer_t dataPointer = 0;
+    vm_offset_t dataPointer = 0;
     mach_msg_type_number_t dataSize = 0;
     BOOL success = NO;
     if (mach_vm_read(processTask, address, originalSize, &dataPointer, &dataSize) == KERN_SUCCESS)
@@ -82,6 +84,8 @@ BOOL ZGReadBytesCarefully(ZGMemoryMap processTask, ZGMemoryAddress address, void
         success = YES;
         memcpy(bytes, (void *)dataPointer, dataSize);
         *size = dataSize;
+		
+		mach_vm_deallocate(current_task(), dataPointer, dataSize);
     }
     
     return success;
