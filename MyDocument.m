@@ -2308,9 +2308,12 @@ static NSSize *expandedWindowMinSize = nil;
 - (void)changeVariable:(ZGVariable *)variable
 			  newValue:(NSString *)stringObject
 	  shouldRecordUndo:(BOOL)recordUndoFlag
-{
+{	
 	void *newValue = NULL;
     ZGMemorySize writeSize = variable->size; // specifically needed for byte arrays
+	
+	// It's important to retrieve this now instead of later as changing the variable's size may cause a bad side effect to this method
+	NSString *oldStringValue = [variable stringValue];
 	
 	int8_t int8Value = 0;
 	int16_t int16Value = 0;
@@ -2531,7 +2534,7 @@ static NSSize *expandedWindowMinSize = nil;
 			{
 				[[self undoManager] setActionName:@"Value Change"];
 				[[[self undoManager] prepareWithInvocationTarget:self] changeVariable:variable
-																			 newValue:[variable stringValue]
+																			 newValue:oldStringValue
 																	 shouldRecordUndo:YES];
 				
 				if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
