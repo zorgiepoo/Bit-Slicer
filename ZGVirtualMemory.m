@@ -69,7 +69,7 @@ BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, 
 			
 		mach_vm_deallocate(current_task(), dataPointer, dataSize);
 	}
-	 
+	
 	return success;
 }
 
