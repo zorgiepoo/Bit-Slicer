@@ -2313,7 +2313,7 @@ static NSSize *expandedWindowMinSize = nil;
     ZGMemorySize writeSize = variable->size; // specifically needed for byte arrays
 	
 	// It's important to retrieve this now instead of later as changing the variable's size may cause a bad side effect to this method
-	NSString *oldStringValue = [variable stringValue];
+	NSString *oldStringValue = [[variable stringValue] copy];
 	
 	int8_t int8Value = 0;
 	int16_t int16Value = 0;
@@ -2549,6 +2549,8 @@ static NSSize *expandedWindowMinSize = nil;
 			free(newValue);
 		}
 	}
+    
+    [oldStringValue release];
 }
 
 - (void)changeVariableShouldBeSearched:(BOOL)shouldBeSearched
