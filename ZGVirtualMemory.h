@@ -48,8 +48,8 @@ typedef void (^memory_dump_t)(int currentRegionNumber);
 
 BOOL ZGIsProcessValid(pid_t process, ZGMemoryMap *task);
 int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask);
-BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, ZGMemorySize size);
-BOOL ZGReadBytesCarefully(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, ZGMemorySize *size);
+BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size);
+void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size);
 BOOL ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
 BOOL ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection);
 BOOL ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection);

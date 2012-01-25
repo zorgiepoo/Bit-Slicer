@@ -54,25 +54,23 @@
 				 {
 					 
 					 ZGMemorySize size = toAddress - fromAddress;
-					 void *bytes = malloc((size_t)size);
-					 
-					 if (bytes)
-					 {
-						 ZGReadBytesCarefully([[document currentProcess] processTask], fromAddress, bytes, &size);
-						 
-						 NSData *data = [NSData dataWithBytes:bytes
-													   length:(NSUInteger)size];
-						 
-						 success = [data writeToURL:[savePanel URL]
-										  atomically:NO];
-						 
-						 free(bytes); 
-					 }
-					 else
-					 {
-						 NSLog(@"Failed to allocate region");
+					 void *bytes = NULL;
+                     
+                     if (ZGReadBytes([[document currentProcess] processTask], fromAddress, &bytes, &size))
+                     {
+                         NSData *data = [NSData dataWithBytes:bytes
+                                                       length:(NSUInteger)size];
+                         
+                         success = [data writeToURL:[savePanel URL]
+                                         atomically:NO];
+                         
+                         ZGFreeBytes([[document currentProcess] processTask], bytes, size);
+                     }
+                     else
+                     {
+                         NSLog(@"Failed to read region");
 						 success = NO;
-					 }
+                     }
 				 }
 				 @catch (NSException *exception)
 				 {

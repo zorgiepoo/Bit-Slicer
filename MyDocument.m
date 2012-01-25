@@ -781,6 +781,8 @@
         {
             [[watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
              {
+                 NSString *oldStringValue = [[variable stringValue] copy];
+                 
                  if (variable->type == ZGUTF8String || variable->type == ZGUTF16String)
                  {
                      variable->size = ZGGetStringSize([currentProcess processTask], variable->address, variable->type);
@@ -788,27 +790,23 @@
                  
                  if (variable->size)
                  {
-                     void *value = malloc((size_t)variable->size);
+                     ZGMemorySize outputSize = variable->size;
+                     void *value = NULL;
                      
-                     if (value)
+                     if (ZGReadBytes([currentProcess processTask], variable->address, &value, &outputSize))
                      {
-                         if (ZGReadBytes([currentProcess processTask], variable->address, value, variable->size))
+                         [variable setVariableValue:value];
+                         if (![[variable stringValue] isEqualToString:oldStringValue])
                          {
-                             NSString *oldStringValue = [[variable stringValue] copy];
-                             [variable setVariableValue:value];
-                             if (![[variable stringValue] isEqualToString:oldStringValue])
-                             {
-                                 [watchVariablesTableView reloadData];
-                             }
-                             [oldStringValue release];
-                         }
-                         else if (variable->value)
-                         {
-                             [variable setVariableValue:NULL];
                              [watchVariablesTableView reloadData];
                          }
                          
-                         free(value);
+                         ZGFreeBytes([currentProcess processTask], value, outputSize);
+                     }
+                     else if (variable->value)
+                     {
+                         [variable setVariableValue:NULL];
+                         [watchVariablesTableView reloadData];
                      }
                  }
                  else if (variable->lastUpdatedSize)
@@ -818,6 +816,8 @@
                  }
                  
                  variable->lastUpdatedSize = variable->size;
+                 
+                 [oldStringValue release];
              }];
         }
 	}
@@ -2032,8 +2032,9 @@ static NSSize *expandedWindowMinSize = nil;
 							(!searchArguments.beginAddressExists || searchArguments.beginAddress <= variable->address) &&
 							(!searchArguments.endAddressExists || searchArguments.endAddress >= variable->address + dataSize))
 						{
-							void *value = malloc((size_t)dataSize);
-							if (ZGReadBytes(processTask, variable->address, value, dataSize))
+                            ZGMemorySize outputSize = dataSize;
+							void *value = NULL;
+							if (ZGReadBytes(processTask, variable->address, &value, &outputSize))
 							{
 								void *value2 = searchArguments.isImplicit ? ZGSavedValue(variable->address, searchData, dataSize) : searchValue;
 								
@@ -2042,9 +2043,9 @@ static NSSize *expandedWindowMinSize = nil;
 									[temporaryVariablesArray addObject:variable];
 									currentProcess->numberOfVariablesFound++;
 								}
+                                
+                                ZGFreeBytes(processTask, value, outputSize);
 							}
-							
-							free(value);
 						}
 					}
 					
@@ -3153,19 +3154,17 @@ static NSSize *expandedWindowMinSize = nil;
     [variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
      {
          ZGMemorySize size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
-         void *buffer = malloc((size_t)size);
+         void *buffer = NULL;
          
-         if (buffer)
-         { 
-             if (ZGReadBytesCarefully([currentProcess processTask], variable->address, buffer, &size))
+         if (ZGReadBytes([currentProcess processTask], variable->address, &buffer, &size))
+         {
+             if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
              {
-                 if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
-                 {
-                     [validVariables addObject:variable];
-                     [currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:variable->size]];
-                 }
+                 [validVariables addObject:variable];
+                 [currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:variable->size]];
              }
-             free(buffer);
+             
+             ZGFreeBytes([currentProcess processTask], buffer, size);
          }
      }];
     

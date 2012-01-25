@@ -342,34 +342,32 @@
 		
 		if (memorySize > 0)
 		{
-			void *bytes = malloc((size_t)memorySize);
-			if (bytes)
-			{
-				if (ZGReadBytesCarefully([currentProcess processTask], memoryAddress, bytes, &memorySize) && memorySize > 0)
-				{
-					// Replace all the contents of the textview
-					[textView setData:[NSData dataWithBytes:bytes length:(NSUInteger)memorySize]];
-					currentMemoryAddress = memoryAddress;
-					currentMemorySize = memorySize;
-					
-					[statusBarRepresenter setBeginningMemoryAddress:currentMemoryAddress];
-					// Select the first byte of data
-					[[statusBarRepresenter controller] setSelectedContentsRanges:[NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(0, 0)]]];
-					// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
-					[statusBarRepresenter updateString];
-					
-					[lineCountingRepresenter setMinimumDigitCount:HFCountDigitsBase16(memoryAddress + memorySize)];
-					[lineCountingRepresenter setBeginningMemoryAddress:currentMemoryAddress];
-					// This will force the line numbers to update
-					[[lineCountingRepresenter view] setNeedsDisplay:YES];
-					// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
-					[[textView layoutRepresenter] performLayout];
-					
-					success = YES;
-				}
-				
-				free(bytes);
-			}
+			void *bytes = NULL;
+            
+            if (ZGReadBytes([currentProcess processTask], memoryAddress, &bytes, &memorySize) && memorySize > 0)
+            {
+                // Replace all the contents of the textview
+                [textView setData:[NSData dataWithBytes:bytes length:(NSUInteger)memorySize]];
+                currentMemoryAddress = memoryAddress;
+                currentMemorySize = memorySize;
+                
+                [statusBarRepresenter setBeginningMemoryAddress:currentMemoryAddress];
+                // Select the first byte of data
+                [[statusBarRepresenter controller] setSelectedContentsRanges:[NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(0, 0)]]];
+                // To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
+                [statusBarRepresenter updateString];
+                
+                [lineCountingRepresenter setMinimumDigitCount:HFCountDigitsBase16(memoryAddress + memorySize)];
+                [lineCountingRepresenter setBeginningMemoryAddress:currentMemoryAddress];
+                // This will force the line numbers to update
+                [[lineCountingRepresenter view] setNeedsDisplay:YES];
+                // This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
+                [[textView layoutRepresenter] performLayout];
+                
+                success = YES;
+                
+                ZGFreeBytes([currentProcess processTask], bytes, memorySize);
+            }
 		}
 	}
     
@@ -414,21 +412,19 @@
 				readSize = (currentMemoryAddress + currentMemorySize) - readAddress;
 			}
 			
-			void *bytes = malloc((size_t)readSize);
-			if (bytes)
-			{
-				if (ZGReadBytesCarefully([currentProcess processTask], readAddress, bytes, &readSize) && readSize > 0)
-				{
-					HFFullMemoryByteSlice *byteSlice = [[HFFullMemoryByteSlice alloc] initWithData:[NSData dataWithBytes:bytes length:(NSUInteger)readSize]];
-					HFByteArray *newByteArray = [[textView controller] byteArray];
-					
-					[newByteArray insertByteSlice:byteSlice inRange:HFRangeMake((ZGMemoryAddress)(displayedLineRange.location * [[textView controller] bytesPerLine]), readSize)];
-					[[textView controller] replaceByteArray:newByteArray];
-					
-					[byteSlice release];
-				}
-				free(bytes);
-			}
+			void *bytes = NULL;
+            if (ZGReadBytes([currentProcess processTask], readAddress, &bytes, &readSize) && readSize > 0)
+            {
+                HFFullMemoryByteSlice *byteSlice = [[HFFullMemoryByteSlice alloc] initWithData:[NSData dataWithBytes:bytes length:(NSUInteger)readSize]];
+                HFByteArray *newByteArray = [[textView controller] byteArray];
+                
+                [newByteArray insertByteSlice:byteSlice inRange:HFRangeMake((ZGMemoryAddress)(displayedLineRange.location * [[textView controller] bytesPerLine]), readSize)];
+                [[textView controller] replaceByteArray:newByteArray];
+                
+                [byteSlice release];
+                
+                ZGFreeBytes([currentProcess processTask], bytes, readSize);
+            }
 		}
 	}
 }

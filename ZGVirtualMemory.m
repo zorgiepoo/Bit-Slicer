@@ -56,24 +56,8 @@ int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask)
 	return numberOfRegions;
 }
 
-BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, ZGMemorySize size)
-{
-	vm_offset_t dataPointer = 0;
-	mach_msg_type_number_t dataSize = 0;
-	BOOL success = NO;
-    
-	if (mach_vm_read(processTask, address, size, &dataPointer, &dataSize) == KERN_SUCCESS)
-	{
-		success = YES;
-		memcpy(bytes, (void *)dataPointer, dataSize);
-			
-		mach_vm_deallocate(current_task(), dataPointer, dataSize);
-	}
-	
-	return success;
-}
-
-BOOL ZGReadBytesCarefully(ZGMemoryMap processTask, ZGMemoryAddress address, void *bytes, ZGMemorySize *size)
+// ZGReadBytes allocates memory, the caller is responsible for deallocating it using ZGFreeBytes(...)
+BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size)
 {
 	ZGMemorySize originalSize = *size;
 	vm_offset_t dataPointer = 0;
@@ -82,13 +66,16 @@ BOOL ZGReadBytesCarefully(ZGMemoryMap processTask, ZGMemoryAddress address, void
 	if (mach_vm_read(processTask, address, originalSize, &dataPointer, &dataSize) == KERN_SUCCESS)
 	{
 		success = YES;
-		memcpy(bytes, (void *)dataPointer, dataSize);
+        *bytes = (void *)dataPointer;
 		*size = dataSize;
-		
-		mach_vm_deallocate(current_task(), dataPointer, dataSize);
 	}
 	
 	return success;
+}
+
+void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size)
+{
+    mach_vm_deallocate(current_task(), (vm_offset_t)bytes, size);
 }
 
 BOOL ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)
@@ -137,6 +124,7 @@ void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStarti
 
 typedef struct
 {
+    ZGMemoryMap processTask;
 	ZGMemoryAddress address;
 	ZGMemorySize size;
 	void *bytes;
@@ -147,7 +135,7 @@ void ZGFreeData(NSArray *dataArray)
 	for (NSValue *value in dataArray)
 	{
 		ZGRegion *memoryRegion = [value pointerValue];
-		free(memoryRegion->bytes);
+        ZGFreeBytes(memoryRegion->processTask, memoryRegion->bytes, memoryRegion->size);
 		free(memoryRegion);
 	}
 }
@@ -169,23 +157,17 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 	{
 		if ((regionInfo.protection & VM_PROT_READ) && (scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
 		{
-			void *bytes = malloc((size_t)size);
-			if (bytes)
-			{
-				if (ZGReadBytesCarefully(process->processTask, address, bytes, &size))
-				{
-					ZGRegion *memoryRegion = malloc(sizeof(ZGRegion));
-					memoryRegion->bytes = bytes;
-					memoryRegion->address = address;
-					memoryRegion->size = size;
-					
-					[dataArray addObject:[NSValue valueWithPointer:memoryRegion]];
-				}
-				else
-				{
-				    free(bytes);
-				}
-			}
+			void *bytes = NULL;
+            if (ZGReadBytes(process->processTask, address, &bytes, &size))
+            {
+                ZGRegion *memoryRegion = malloc(sizeof(ZGRegion));
+                memoryRegion->processTask = process->processTask;
+                memoryRegion->bytes = bytes;
+                memoryRegion->address = address;
+                memoryRegion->size = size;
+                
+                [dataArray addObject:[NSValue valueWithPointer:memoryRegion]];
+            }
 		}
 		
 		address += size;
@@ -195,9 +177,9 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 		if (!process->isStoringAllData)
 		{
 			ZGFreeData(dataArray);
-	    [dataArray release];
-	    dataArray = nil;
-	    break;
+            [dataArray release];
+            dataArray = nil;
+            break;
 		}
 	}
 	
@@ -264,12 +246,15 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 				currentStartingAddress = address;
 			}
 			
-			void *bytes = malloc((size_t)size);
-			ZGReadBytes(process->processTask, address, bytes, size);
-			
-			[currentData appendBytes:bytes
-  	                          length:(NSUInteger)size];
-			free(bytes);
+            // outputSize should not differ from size
+            ZGMemorySize outputSize = size;
+			void *bytes = NULL;
+			if (ZGReadBytes(process->processTask, address, &bytes, &outputSize))
+            {
+                [currentData appendBytes:bytes
+                                  length:(NSUInteger)size];
+                ZGFreeBytes(process->processTask, bytes, outputSize);
+            }
 		}
 		
 		address += size;
@@ -356,10 +341,10 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 	{
 		ZGRegion *region = [regionValue pointerValue];
 		ZGMemoryAddress offset = 0;
-		char *currentData = malloc((size_t)region->size);
+		char *currentData = NULL;
 		ZGMemorySize size = region->size;
 		
-		if (ZGReadBytesCarefully(processTask, region->address, currentData, &size))
+		if (ZGReadBytes(processTask, region->address, (void **)&currentData, &size))
 		{
 			do
 			{
@@ -367,9 +352,9 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 				offset += dataAlignment;
 			}
 			while (offset + dataSize <= size && !searchData->shouldCancelSearch);
+            
+            ZGFreeBytes(processTask, currentData, size);
 		}
-		
-		free(currentData);
 		
 		if (searchData->shouldCancelSearch)
 		{
@@ -397,21 +382,18 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 	{
 		if (regionInfo.protection & VM_PROT_READ && (searchData->scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
 		{
-			char *bytes = malloc((size_t)size);
-			
-			if (bytes)
-			{
-				if (ZGReadBytesCarefully(processTask, address, bytes, &size))
-				{
-					int dataIndex = 0;
-					while (dataIndex + dataSize <= size && !searchData->shouldCancelSearch)
-					{
-						block(&bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
-						dataIndex += dataAlignment;
-					}
-				}
-				free(bytes);
-			}
+			char *bytes = NULL;
+            if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
+            {
+                int dataIndex = 0;
+                while (dataIndex + dataSize <= size && !searchData->shouldCancelSearch)
+                {
+                    block(&bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
+                    dataIndex += dataAlignment;
+                }
+                
+                ZGFreeBytes(processTask, bytes, size);
+            }
 		}
 		
 		if (searchData->shouldCancelSearch)
@@ -428,47 +410,44 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType)
 {
 	ZGMemorySize totalSize = 0;
-	@try
-	{
-		ZGMemorySize characterSize = dataType == ZGUTF8String ? sizeof(char) : sizeof(unichar);
-		void *theByte = malloc((size_t)characterSize);
-		
-		if (theByte)
-		{
-			while (YES)
-			{
-				ZGMemorySize outputtedSize = characterSize;
-				
-				if (ZGReadBytesCarefully(processTask, address, theByte, &outputtedSize))
-				{
-					if ((dataType == ZGUTF8String && *((char *)theByte) == 0) || (dataType == ZGUTF16String && *((unichar *)theByte) == 0))
-					{
-						// Only count the null terminator for a UTF-8 string, as long as the string has some length
-						if (totalSize && dataType == ZGUTF8String)
-						{
-							totalSize += characterSize;
-						}
-						
-						break;
-					}
-				}
-				else
-				{
-					totalSize = 0;
-					break;
-				}
-				
-				totalSize += characterSize;
-				address += characterSize;
-			}
-			
-			free(theByte);
-		}
-	}
-	@catch (NSException *exception)
-	{
-		totalSize = 0;
-	}
+    
+    ZGMemorySize characterSize = dataType == ZGUTF8String ? sizeof(char) : sizeof(unichar);
+    void *theByte = NULL;
+    
+    while (YES)
+    {
+        BOOL shouldBreak = NO;
+        ZGMemorySize outputtedSize = characterSize;
+        
+        if (ZGReadBytes(processTask, address, &theByte, &outputtedSize))
+        {
+            if ((dataType == ZGUTF8String && *((char *)theByte) == 0) || (dataType == ZGUTF16String && *((unichar *)theByte) == 0))
+            {
+                // Only count the null terminator for a UTF-8 string, as long as the string has some length
+                if (totalSize && dataType == ZGUTF8String)
+                {
+                    totalSize += characterSize;
+                }
+                
+                shouldBreak = YES;
+            }
+            
+            ZGFreeBytes(processTask, theByte, outputtedSize);
+        }
+        else
+        {
+            totalSize = 0;
+            shouldBreak = YES;
+        }
+        
+        if (shouldBreak)
+        {
+            break;
+        }
+        
+        totalSize += characterSize;
+        address += characterSize;
+    }
 	
 	return totalSize;
 }

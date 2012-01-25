@@ -96,11 +96,11 @@
 					}
 					
 					ZGMemorySize size = process->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
-					void *value = malloc((size_t)size);
+					void *value = NULL;
 					
 					NSMutableString *newExpression;
 					
-					if (ZGReadBytes([process processTask], address, value, size))
+					if (ZGReadBytes([process processTask], address, &value, &size))
 					{
 						if (process->is64Bit)
 						{
@@ -110,13 +110,13 @@
 						{
 							newExpression = [NSMutableString stringWithFormat:@"%u", *((int32_t *)value)];
 						}
+                        
+                        ZGFreeBytes([process processTask], value, size);
 					}
 					else
 					{
 						newExpression = [NSMutableString stringWithString:@"0x0"];
 					}
-					
-					free(value);
 					
 					[addressFormula replaceCharactersInRange:NSMakeRange(firstOpenBracket, matchingClosedBracket - firstOpenBracket + 1)
 												  withString:newExpression];
