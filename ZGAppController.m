@@ -97,6 +97,7 @@ static ZGAppController *sharedInstance = nil;
 
 #pragma mark Authenticating
 
+// http://os-tres.net/blog/2010/02/17/mac-os-x-and-task-for-pid-mach-call/
 int acquireTaskportRight(void)
 {
 	OSStatus stat;
@@ -262,7 +263,14 @@ static BOOL didRegisteredHotKey = NO;
 #define CHECK_PROCESSES_TIME_INTERVAL 0.5
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {	
-	acquireTaskportRight();
+	if (acquireTaskportRight() != 0)
+	{
+		NSLog(@"Failed to acquire taskport rights");
+		
+		NSRunAlertPanel(@"Insufficient privileges", @"Bit Slicer failed to acquire privileges needed to access another process' memory space.", nil, nil, nil);
+		
+		[NSApp terminate:nil];
+	}
     
     // Initialize preference defaults
     [self openPreferences:nil
