@@ -97,96 +97,34 @@ static ZGAppController *sharedInstance = nil;
 
 #pragma mark Authenticating
 
-void authMe(const char * FullPathToMe, NSURL *url)
+int acquireTaskportRight(void)
 {
-	// get authorization as root
+	OSStatus stat;
+	AuthorizationItem taskport_item[1];
+	taskport_item[0].name = "system.privilege.taskport:";
+	taskport_item[0].valueLength = 0;
+	taskport_item[0].value = NULL;
+	taskport_item[0].flags = 0;
 	
-	OSStatus myStatus;
+	AuthorizationRights rights = {1, taskport_item}, *out_rights = NULL;
+	AuthorizationRef author;
 	
-	// set up Authorization Item
-	AuthorizationItem myItems[1];
-	myItems[0].name = kAuthorizationRightExecute;
-	myItems[0].valueLength = 0;
-	myItems[0].value = NULL;
-	myItems[0].flags = 0;
+	AuthorizationFlags auth_flags = kAuthorizationFlagExtendRights | kAuthorizationFlagPreAuthorize | kAuthorizationFlagInteractionAllowed | ( 1 << 5);
 	
-	// Set up Authorization Rights
-	AuthorizationRights myRights;
-	myRights.count = sizeof (myItems) / sizeof (myItems[0]);
-	myRights.items = myItems;
+	stat = AuthorizationCreate (NULL, kAuthorizationEmptyEnvironment,auth_flags,&author);
+	if (stat != errAuthorizationSuccess)
+    {
+		NSLog(@"Failure on AuthorizationCreate");
+		return 0;
+    }
 	
-	// set up Authorization Flags
-	AuthorizationFlags myFlags;
-	myFlags =
-	kAuthorizationFlagDefaults |
-	kAuthorizationFlagInteractionAllowed |
-	kAuthorizationFlagExtendRights;
-	
-	// Create an Authorization Ref using Objects above. NOTE: Login bod comes up with this call.
-	AuthorizationRef myAuthorizationRef;
-	myStatus = AuthorizationCreate (&myRights, kAuthorizationEmptyEnvironment, myFlags, &myAuthorizationRef);
-	
-	if (myStatus == errAuthorizationSuccess)
-	{
-		// prepare communication path - used to signal that process is loaded
-		FILE *myCommunicationsPipe = NULL;
-		char myReadBuffer[] = " ";
-		char *arguments[2] = {NULL, NULL};
-		
-		if (url)
-		{
-			arguments[0] = (char *)[[url relativePath] cStringUsingEncoding:NSUTF8StringEncoding];
-		}
-		
-		// run this app in GOD mode by passing authorization ref and comm pipe (asynchoronous call to external application)
-		myStatus = AuthorizationExecuteWithPrivileges(myAuthorizationRef,FullPathToMe,kAuthorizationFlagDefaults,arguments,&myCommunicationsPipe);
-		
-		// external app is running asynchronously - it will send to stdout when loaded
-		if (myStatus == errAuthorizationSuccess)
-		{
-			read (fileno (myCommunicationsPipe), myReadBuffer, sizeof (myReadBuffer));
-			fclose(myCommunicationsPipe);
-		}
-		
-		// release authorization reference
-		/* myStatus = */ AuthorizationFree (myAuthorizationRef, kAuthorizationFlagDestroyRights);
-	}
-}
-
-BOOL checkExecutablePermissions(void)
-{
-	NSDictionary	*applicationAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[[NSBundle mainBundle] executablePath] error:NULL];
-	
-	// We expect 2755 as octal (1517 as decimal, -rwxr-sr-x as extended notation)
-	return ([applicationAttributes filePosixPermissions] == 1517 && [[applicationAttributes fileGroupOwnerAccountName] isEqualToString: @"procmod"]);
-}
-
-BOOL amIWorthy(void)
-{
-	// running as root?
-	AuthorizationRef myAuthRef;
-	OSStatus stat = AuthorizationCopyPrivilegedReference(&myAuthRef,kAuthorizationFlagDefaults);
-	
-	return stat == errAuthorizationSuccess || checkExecutablePermissions();
-}
-
-- (void)authenticateWithURL:(NSURL *)url
-{
-	if (amIWorthy())
-	{
-#ifndef _DEBUG
-		printf("Don't forget to flush! ;-) "); // signal back to close caller
-#endif
-		fflush(stdout);
-		
-		[NSApp activateIgnoringOtherApps:YES];
-		applicationIsAuthenticated = YES;
-	}
-	else
-	{
-		authMe([[[NSBundle mainBundle] executablePath] UTF8String], url);
-		[NSApp terminate:nil];
-	}
+	stat = AuthorizationCopyRights ( author, &rights, kAuthorizationEmptyEnvironment, auth_flags,&out_rights);
+	if (stat != errAuthorizationSuccess)
+    {
+		NSLog(@"Failure on AuthorizationCopyRights");
+		return 1;
+    }
+	return 0;
 }
 
 #pragma mark Pausing and Unpausing processes
@@ -247,11 +185,6 @@ static BOOL didRegisteredHotKey = NO;
 }
 
 #pragma mark Controller behavior
-
-- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
-{
-	return amIWorthy();
-}
 
 - (void)checkForUpdates
 {
@@ -329,10 +262,7 @@ static BOOL didRegisteredHotKey = NO;
 #define CHECK_PROCESSES_TIME_INTERVAL 0.5
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {	
-	if (!applicationIsAuthenticated)
-	{
-		[self authenticateWithURL:nil];
-	}
+	acquireTaskportRight();
     
     // Initialize preference defaults
     [self openPreferences:nil
@@ -352,7 +282,6 @@ static BOOL didRegisteredHotKey = NO;
 
 #pragma mark Actions
 
-#ifndef _DEBUG
 + (void)restoreWindowWithIdentifier:(NSString *)identifier
                               state:(NSCoder *)state
                   completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
@@ -372,7 +301,6 @@ static BOOL didRegisteredHotKey = NO;
         completionHandler([[[self sharedController] preferencesController] window], nil);
     }
 }
-#endif
 
 - (void)openPreferences:(id)sender
              showWindow:(BOOL)shouldShowWindow

@@ -47,7 +47,6 @@
 - (ZGMemoryViewer *)memoryViewer;
 - (ZGDocumentController *)documentController;
 
-- (void)authenticateWithURL:(NSURL *)url;
 + (void)registerPauseAndUnpauseHotKey;
 - (IBAction)openPreferences:(id)sender;
 - (IBAction)openMemoryViewer:(id)sender;

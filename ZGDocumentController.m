@@ -23,20 +23,6 @@
 
 @implementation ZGDocumentController
 
-- (id)openDocumentWithContentsOfURL:(NSURL *)absoluteURL
-							display:(BOOL)displayDocument
-							  error:(NSError **)outError
-{	
-	if (![[ZGAppController sharedController] applicationIsAuthenticated])
-	{
-		[[ZGAppController sharedController] authenticateWithURL:absoluteURL];
-	}
-    
-	return [super openDocumentWithContentsOfURL:absoluteURL
-										display:displayDocument
-										  error:outError];
-}
-
 - (void)setLastSelectedProcessName:(NSString *)processName
 {
 	[lastSelectedProcessName release];
