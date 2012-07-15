@@ -114,17 +114,17 @@ int acquireTaskportRight(void)
 	
 	stat = AuthorizationCreate (NULL, kAuthorizationEmptyEnvironment,auth_flags,&author);
 	if (stat != errAuthorizationSuccess)
-    {
+	{
 		NSLog(@"Failure on AuthorizationCreate");
 		return 0;
-    }
+	}
 	
 	stat = AuthorizationCopyRights ( author, &rights, kAuthorizationEmptyEnvironment, auth_flags,&out_rights);
 	if (stat != errAuthorizationSuccess)
-    {
+	{
 		NSLog(@"Failure on AuthorizationCopyRights");
 		return 1;
-    }
+	}
 	return 0;
 }
 
