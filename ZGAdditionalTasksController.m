@@ -155,11 +155,9 @@
 															error:NULL];
 			 }
 			 
-			 // Since Bit Slicer is running as root, we'll need to pass attributes dictionary so that
-			 // the folder is owned by the user
 			 [[NSFileManager defaultManager] createDirectoryAtPath:[[savePanel URL] relativePath]
 									   withIntermediateDirectories:NO
-														attributes:[NSDictionary dictionaryWithObjectsAndKeys:NSUserName(), NSFileGroupOwnerAccountName, NSUserName(), NSFileOwnerAccountName, nil]
+														attributes:nil
 															 error:NULL];
 			 
 			 [searchingProgressIndicator setMaxValue:[[document currentProcess] numberOfRegions]];
