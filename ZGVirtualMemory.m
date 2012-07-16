@@ -167,6 +167,8 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
                 memoryRegion->size = size;
                 
                 [dataArray addObject:[NSValue valueWithPointer:memoryRegion]];
+				
+				// Don't free memory now. It will be free when ZGFreeData is called
             }
 		}
 		
