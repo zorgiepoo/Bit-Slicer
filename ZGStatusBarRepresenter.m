@@ -43,22 +43,22 @@
 
 - (NSString *)stringForEmptySelectionAtOffset:(unsigned long long)offset length:(unsigned long long)length
 {
-    return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningMemoryAddress]];
+	return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningMemoryAddress]];
 }
 
 - (NSString *)stringForSingleByteSelectionAtOffset:(unsigned long long)offset length:(unsigned long long)length
 {
-    return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningMemoryAddress]];
+	return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningMemoryAddress]];
 }
 
 - (NSString *)stringForSingleRangeSelection:(HFRange)range length:(unsigned long long)length
 {
-    return [NSString stringWithFormat:@"%@ selected at address %@", [self describeLength:range.length], [self describeOffsetExcludingApproximate:range.location + _beginningMemoryAddress]];
+	return [NSString stringWithFormat:@"%@ selected at address %@", [self describeLength:range.length], [self describeOffsetExcludingApproximate:range.location + _beginningMemoryAddress]];
 }
 
 - (NSString *)stringForMultipleSelectionsWithLength:(unsigned long long)multipleSelectionLength length:(unsigned long long)length
 {
-    return [NSString stringWithFormat:@"%@ selected at multiple addresses", [self describeLength:multipleSelectionLength]];
+	return [NSString stringWithFormat:@"%@ selected at multiple addresses", [self describeLength:multipleSelectionLength]];
 }
 
 - (void)setStatusMode:(HFStatusBarMode)mode

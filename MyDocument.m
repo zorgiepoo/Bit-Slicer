@@ -38,8 +38,7 @@
 
 - (void)setWatchVariablesArray:(NSArray *)newWatchVariablesArray;
 
-- (void)addVariables:(NSArray *)variables
-		atRowIndexes:(NSIndexSet *)rowIndexes;
+- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
 
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes;
 
@@ -54,43 +53,41 @@
 - (BOOL)isFunctionTypeStore;
 - (BOOL)isFunctionTypeStore:(NSInteger)functionTypeTag;
 
-- (void)selectDataTypeWithTag:(ZGVariableType)newTag
-                   recordUndo:(BOOL)recordUndo;
+- (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo;
 
-- (void)functionTypePopUpButtonRequest:(id)sender
-                           markChanges:(BOOL)shouldMarkChanges;
+- (void)functionTypePopUpButtonRequest:(id)sender markChanges:(BOOL)shouldMarkChanges;
 
 @end
 
-#define SIGNED_BUTTON_CELL_TAG				0
-#define VALUE_TABLE_COLUMN_INDEX			1
-#define NON_EXISTENT_PID_NUMBER				-1
+#define SIGNED_BUTTON_CELL_TAG 0
+#define VALUE_TABLE_COLUMN_INDEX 1
+#define NON_EXISTENT_PID_NUMBER -1
 
-#define DEFAULT_FLOATING_POINT_EPSILON		0.1
+#define DEFAULT_FLOATING_POINT_EPSILON 0.1
 
-#define ZGWatchVariablesArrayKey			@"ZGWatchVariablesArrayKey"
-#define ZGProcessNameKey					@"ZGProcessNameKey"
+#define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
+#define ZGProcessNameKey @"ZGProcessNameKey"
 
-#define ZGVariableReorderType				@"ZGVariableReorderType"
+#define ZGVariableReorderType @"ZGVariableReorderType"
 
-#define ZGSelectedDataTypeTag               @"ZGSelectedDataTypeTag"
-#define ZGQualifierTagKey                   @"ZGQualifierKey"
-#define ZGFunctionTypeTagKey                @"ZGFunctionTypeTagKey"
-#define ZGScanUnwritableValuesKey           @"ZGScanUnwritableValuesKey"
-#define ZGIgnoreDataAlignmentKey            @"ZGIgnoreDataAlignmentKey"
-#define ZGExactStringLengthKey              @"ZGExactStringLengthKey"
-#define ZGIgnoreStringCaseKey               @"ZGIgnoreStringCaseKey"
-#define ZGBeginningAddressKey               @"ZGBeginningAddressKey"
-#define ZGEndingAddressKey                  @"ZGEndingAddressKey"
-#define ZGEpsilonKey                        @"ZGEpsilonKey"
-#define ZGAboveValueKey                     @"ZGAboveValueKey"
-#define ZGBelowValueKey                     @"ZGBelowValueKey"
-#define ZGSearchStringValueKey              @"ZGSearchStringValueKey"
+#define ZGSelectedDataTypeTag @"ZGSelectedDataTypeTag"
+#define ZGQualifierTagKey @"ZGQualifierKey"
+#define ZGFunctionTypeTagKey @"ZGFunctionTypeTagKey"
+#define ZGScanUnwritableValuesKey @"ZGScanUnwritableValuesKey"
+#define ZGIgnoreDataAlignmentKey @"ZGIgnoreDataAlignmentKey"
+#define ZGExactStringLengthKey @"ZGExactStringLengthKey"
+#define ZGIgnoreStringCaseKey @"ZGIgnoreStringCaseKey"
+#define ZGBeginningAddressKey @"ZGBeginningAddressKey"
+#define ZGEndingAddressKey @"ZGEndingAddressKey"
+#define ZGEpsilonKey @"ZGEpsilonKey"
+#define ZGAboveValueKey @"ZGAboveValueKey"
+#define ZGBelowValueKey @"ZGBelowValueKey"
+#define ZGSearchStringValueKey @"ZGSearchStringValueKey"
 
-#define MAX_TABLE_VIEW_ITEMS				((NSInteger)1000)
+#define MAX_TABLE_VIEW_ITEMS ((NSInteger)1000)
 
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
-#define CHECK_PROCESSES_TIME_INTERVAL	0.5
+#define CHECK_PROCESSES_TIME_INTERVAL 0.5
 
 #define ZG_EXPAND_OPTIONS @"ZG_EXPAND_OPTIONS"
 
@@ -122,14 +119,17 @@
 
 + (void)initialize
 {
-	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
-																						forKey:ZG_EXPAND_OPTIONS]];
+	[[NSUserDefaults standardUserDefaults]
+	 registerDefaults:
+		[NSDictionary
+		 dictionaryWithObject:[NSNumber numberWithBool:NO]
+		 forKey:ZG_EXPAND_OPTIONS]];
 }
 
 - (id)init
 {
-    self = [super init];
-    if (self)
+	self = [super init];
+	if (self)
 	{
 		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &collator);
 		
@@ -140,8 +140,8 @@
 		searchArguments.lastEpsilonValue = nil;
 		searchArguments.lastAboveRangeValue = nil;
 		searchArguments.lastBelowRangeValue = nil;
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)dealloc
@@ -202,116 +202,125 @@
 
 - (void)loadDocumentUserInterface
 {
-    if (!desiredProcessName)
+	if (!desiredProcessName)
 	{
 		desiredProcessName = [[[[ZGAppController sharedController] documentController] lastSelectedProcessName] copy];
 	}
     
-    // check if the document is being reverted
-    if (watchWindow)
-    {
-        [generalStatusTextField setStringValue:@""];
-    }
+	// check if the document is being reverted
+	if (watchWindow)
+	{
+		[generalStatusTextField setStringValue:@""];
+	}
 	
 	[self updateRunningApplicationProcesses];
-    
-    currentSearchDataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
-    
-    if (documentState.loadedFromSave)
-    {
-        [self setWatchVariablesArray:documentState.watchVariablesArray];
-        [documentState.watchVariablesArray release];
+	
+	currentSearchDataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
+
+	if (documentState.loadedFromSave)
+	{
+		[self setWatchVariablesArray:documentState.watchVariablesArray];
+		[documentState.watchVariablesArray release];
         
-        [self selectDataTypeWithTag:(ZGVariableType)documentState.selectedDatatypeTag
-                         recordUndo:NO];
+		[self
+		 selectDataTypeWithTag:(ZGVariableType)documentState.selectedDatatypeTag
+		 recordUndo:NO];
         
-        [variableQualifierMatrix selectCellWithTag:documentState.qualifierTag];
+		[variableQualifierMatrix selectCellWithTag:documentState.qualifierTag];
+
+		[scanUnwritableValuesCheckBox setState:documentState.scanUnwritableValues];
+		[ignoreDataAlignmentCheckBox setState:documentState.ignoreDataAlignment];
+		[includeNullTerminatorCheckBox setState:documentState.exactStringLength];
+		[ignoreCaseCheckBox setState:documentState.ignoreStringCase];
+
+		if (documentState.beginningAddress)
+		{
+			[beginningAddressTextField setStringValue:documentState.beginningAddress];
+			[documentState.beginningAddress release];
+		}
+		
+		if (documentState.endingAddress)
+		{
+			[endingAddressTextField setStringValue:documentState.endingAddress];
+			[documentState.endingAddress release];
+		}
+
+		if (![self isFunctionTypeStore:documentState.functionTypeTag])
+		{
+			[functionPopUpButton selectItemWithTag:documentState.functionTypeTag];
+			[self
+			 functionTypePopUpButtonRequest:nil
+			 markChanges:NO];
+		}
         
-        [scanUnwritableValuesCheckBox setState:documentState.scanUnwritableValues];
-        [ignoreDataAlignmentCheckBox setState:documentState.ignoreDataAlignment];
-        [includeNullTerminatorCheckBox setState:documentState.exactStringLength];
-        [ignoreCaseCheckBox setState:documentState.ignoreStringCase];
-        
-        if (documentState.beginningAddress)
-        {
-            [beginningAddressTextField setStringValue:documentState.beginningAddress];
-            [documentState.beginningAddress release];
-        }
-        if (documentState.endingAddress)
-        {
-            [endingAddressTextField setStringValue:documentState.endingAddress];
-            [documentState.endingAddress release];
-        }
-        
-        if (![self isFunctionTypeStore:documentState.functionTypeTag])
-        {
-            [functionPopUpButton selectItemWithTag:documentState.functionTypeTag];
-            [self functionTypePopUpButtonRequest:nil
-                                     markChanges:NO];
-        }
-        
-        if (documentState.searchValue)
-        {
-            [searchValueTextField setStringValue:documentState.searchValue];
-            [documentState.searchValue release];
-        }
-    }
-    else
-    {
-        [self setWatchVariablesArray:[NSArray array]];
-        searchArguments.lastEpsilonValue = [[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON] retain];
-        [flagsLabel setTextColor:[NSColor disabledControlTextColor]];
-    }
+		if (documentState.searchValue)
+		{
+			[searchValueTextField setStringValue:documentState.searchValue];
+			[documentState.searchValue release];
+		}
+	}
+	else
+	{
+		[self setWatchVariablesArray:[NSArray array]];
+		searchArguments.lastEpsilonValue = [[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON] retain];
+		[flagsLabel setTextColor:[NSColor disabledControlTextColor]];
+	}
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
 {
-    [super windowControllerDidLoadNib:aController];
-	
+	[super windowControllerDidLoadNib:aController];
+
 	[watchVariablesTableView setDelegate:self];
 	
 	if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_EXPAND_OPTIONS])
 	{
 		[self optionsDisclosureButton:nil];
 	}
-    
-    [watchWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
-    
-    if ([ZGAppController isRunningLaterThanLion])
-    {
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(watchWindowDidExitFullScreen:)
-                                                     name:NSWindowDidExitFullScreenNotification
-                                                   object:watchWindow];
+
+	[watchWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+
+	if ([ZGAppController isRunningLaterThanLion])
+	{
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(watchWindowDidExitFullScreen:)
+		 name:NSWindowDidExitFullScreenNotification
+		 object:watchWindow];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(watchWindowWillExitFullScreen:)
-                                                     name:NSWindowWillExitFullScreenNotification
-                                                   object:watchWindow];
-    }
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(watchWindowWillExitFullScreen:)
+		 name:NSWindowWillExitFullScreenNotification
+		 object:watchWindow];
+	}
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(anApplicationLaunched:)
-												 name:ZGProcessLaunched
-											   object:nil];
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(anApplicationLaunched:)
+	 name:ZGProcessLaunched
+	 object:nil];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(anApplicationTerminated:)
-												 name:ZGProcessTerminated
-											   object:nil];
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(anApplicationTerminated:)
+	 name:ZGProcessTerminated
+	 object:nil];
 	
-	watchVariablesTimer = [[ZGTimer alloc] initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
-														 target:self
-													   selector:@selector(updateWatchVariablesTable:)];
+	watchVariablesTimer =
+		[[ZGTimer alloc]
+		 initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
+		 target:self
+		 selector:@selector(updateWatchVariablesTable:)];
 	
 	[watchVariablesTableView registerForDraggedTypes:[NSArray arrayWithObject:ZGVariableReorderType]];
-    
-    [self loadDocumentUserInterface];
+	
+	[self loadDocumentUserInterface];
 }
 
 - (NSFileWrapper *)fileWrapperOfType:(NSString *)typeName error:(NSError **)outError
 {
-    NSMutableData *writeData = [[NSMutableData alloc] init];
+	NSMutableData *writeData = [[NSMutableData alloc] init];
 	NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:writeData];
 	
 	NSArray *watchVariablesArrayToSave;
@@ -329,99 +338,113 @@
 		watchVariablesArrayToSave = watchVariablesArray;
 	}
 	
-	[keyedArchiver encodeObject:watchVariablesArrayToSave
-						 forKey:ZGWatchVariablesArrayKey];
+	[keyedArchiver
+	 encodeObject:watchVariablesArrayToSave
+	 forKey:ZGWatchVariablesArrayKey];
 	
-	[keyedArchiver encodeObject:[currentProcess name]
-						 forKey:ZGProcessNameKey];
+	[keyedArchiver
+	 encodeObject:[currentProcess name]
+	 forKey:ZGProcessNameKey];
     
-    [keyedArchiver encodeInt32:(int32_t)[[dataTypesPopUpButton selectedItem] tag]
-                        forKey:ZGSelectedDataTypeTag];
+	[keyedArchiver
+	 encodeInt32:(int32_t)[[dataTypesPopUpButton selectedItem] tag]
+	 forKey:ZGSelectedDataTypeTag];
     
-    [keyedArchiver encodeInt32:(int32_t)[[variableQualifierMatrix selectedCell] tag]
-                        forKey:ZGQualifierTagKey];
+	[keyedArchiver
+	 encodeInt32:(int32_t)[[variableQualifierMatrix selectedCell] tag]
+	 forKey:ZGQualifierTagKey];
     
-    [keyedArchiver encodeInt32:(int32_t)[[functionPopUpButton selectedItem] tag]
-                        forKey:ZGFunctionTypeTagKey];
+	[keyedArchiver
+	 encodeInt32:(int32_t)[[functionPopUpButton selectedItem] tag]
+	 forKey:ZGFunctionTypeTagKey];
     
-    [keyedArchiver encodeBool:[scanUnwritableValuesCheckBox state]
-                       forKey:ZGScanUnwritableValuesKey];
+	[keyedArchiver
+	 encodeBool:[scanUnwritableValuesCheckBox state]
+	 forKey:ZGScanUnwritableValuesKey];
     
-    [keyedArchiver encodeBool:[ignoreDataAlignmentCheckBox state]
-                       forKey:ZGIgnoreDataAlignmentKey];
+	[keyedArchiver
+	 encodeBool:[ignoreDataAlignmentCheckBox state]
+	 forKey:ZGIgnoreDataAlignmentKey];
     
-    [keyedArchiver encodeBool:[includeNullTerminatorCheckBox state]
-                       forKey:ZGExactStringLengthKey];
+	[keyedArchiver
+	 encodeBool:[includeNullTerminatorCheckBox state]
+	 forKey:ZGExactStringLengthKey];
     
-    [keyedArchiver encodeBool:[ignoreCaseCheckBox state]
-                       forKey:ZGIgnoreStringCaseKey];
+	[keyedArchiver
+	 encodeBool:[ignoreCaseCheckBox state]
+	 forKey:ZGIgnoreStringCaseKey];
     
-    [keyedArchiver encodeObject:[beginningAddressTextField stringValue]
-                         forKey:ZGBeginningAddressKey];
+	[keyedArchiver
+	 encodeObject:[beginningAddressTextField stringValue]
+	 forKey:ZGBeginningAddressKey];
     
-    [keyedArchiver encodeObject:[endingAddressTextField stringValue]
-                         forKey:ZGEndingAddressKey];
+	[keyedArchiver
+	 encodeObject:[endingAddressTextField stringValue]
+	 forKey:ZGEndingAddressKey];
     
-    [keyedArchiver encodeObject:searchArguments.lastEpsilonValue
-                         forKey:ZGEpsilonKey];
+	[keyedArchiver
+	 encodeObject:searchArguments.lastEpsilonValue
+	 forKey:ZGEpsilonKey];
     
-    [keyedArchiver encodeObject:searchArguments.lastAboveRangeValue
-                         forKey:ZGAboveValueKey];
+	[keyedArchiver
+	 encodeObject:searchArguments.lastAboveRangeValue
+	 forKey:ZGAboveValueKey];
     
-    [keyedArchiver encodeObject:searchArguments.lastBelowRangeValue
-                         forKey:ZGBelowValueKey];
+	[keyedArchiver
+	 encodeObject:searchArguments.lastBelowRangeValue
+	 forKey:ZGBelowValueKey];
     
-    [keyedArchiver encodeObject:[searchValueTextField stringValue]
-                         forKey:ZGSearchStringValueKey];
+	[keyedArchiver
+	 encodeObject:[searchValueTextField stringValue]
+	 forKey:ZGSearchStringValueKey];
     
-	
 	[desiredProcessName release];
 	desiredProcessName = [[currentProcess name] copy];
 	
 	[keyedArchiver finishEncoding];
 	[keyedArchiver release];
-    
-    NSFileWrapper *fileWrapper = [[NSFileWrapper alloc] initRegularFileWithContents:writeData];
-    [writeData release];
-    
-    return [fileWrapper autorelease];
+
+	NSFileWrapper *fileWrapper = [[NSFileWrapper alloc] initRegularFileWithContents:writeData];
+	[writeData release];
+	
+	return [fileWrapper autorelease];
 }
 
 - (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError **)outError
 {
-    NSData *readData = [fileWrapper regularFileContents];
-    
-    NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
+	NSData *readData = [fileWrapper regularFileContents];
+	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
 	
 	documentState.watchVariablesArray = [[keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey] retain];
 	desiredProcessName = [[keyedUnarchiver decodeObjectForKey:ZGProcessNameKey] retain];
-    
-    documentState.loadedFromSave = YES;
-    documentState.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
-    documentState.qualifierTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey];
-    documentState.functionTypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey];
-    documentState.scanUnwritableValues = [keyedUnarchiver decodeBoolForKey:ZGScanUnwritableValuesKey];
-    documentState.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
-    documentState.exactStringLength = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
-    documentState.ignoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
-    documentState.beginningAddress = [[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey] copy];
-    documentState.endingAddress = [[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey] copy];
-    
-    documentState.searchValue = [[keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey] copy];
-    
-    searchArguments.lastEpsilonValue = [[keyedUnarchiver decodeObjectForKey:ZGEpsilonKey] copy];
-    searchArguments.lastAboveRangeValue = [[keyedUnarchiver decodeObjectForKey:ZGAboveValueKey] copy];
-    searchArguments.lastBelowRangeValue = [[keyedUnarchiver decodeObjectForKey:ZGBelowValueKey] copy];
 	
+	documentState.loadedFromSave = YES;
+	documentState.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
+	documentState.qualifierTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey];
+	documentState.functionTypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey];
+	documentState.scanUnwritableValues = [keyedUnarchiver decodeBoolForKey:ZGScanUnwritableValuesKey];
+	documentState.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
+	documentState.exactStringLength = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
+	documentState.ignoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
+	documentState.beginningAddress = [[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey] copy];
+	documentState.endingAddress = [[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey] copy];
+	
+	documentState.searchValue = [[keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey] copy];
+
+	searchArguments.lastEpsilonValue = [[keyedUnarchiver decodeObjectForKey:ZGEpsilonKey] copy];
+	searchArguments.lastAboveRangeValue = [[keyedUnarchiver decodeObjectForKey:ZGAboveValueKey] copy];
+	searchArguments.lastBelowRangeValue = [[keyedUnarchiver decodeObjectForKey:ZGBelowValueKey] copy];
+
 	[keyedUnarchiver release];
-    
-    BOOL success = documentState.watchVariablesArray != nil && desiredProcessName != nil;
-    if (success && watchWindow)
-    {
-        [self loadDocumentUserInterface];
-    }
-    
-    return success;
+	
+	BOOL success = documentState.watchVariablesArray != nil && desiredProcessName != nil;
+	
+	if (success && watchWindow)
+	{
+		[self loadDocumentUserInterface];
+	}
+	
+	return success;
 }
 
 #pragma mark Watching other applications
@@ -472,9 +495,10 @@
 	{
 		if (![currentProcess grantUsAccess])
 		{
-			NSAttributedString *errorMessage = [[NSAttributedString alloc] initWithString:@"Process Load Error!"
-																			   attributes:[NSDictionary dictionaryWithObject:[NSColor redColor]
-																													  forKey:NSForegroundColorAttributeName]];
+			NSAttributedString *errorMessage =
+				[[NSAttributedString alloc]
+				 initWithString:@"Process Load Error!"
+				 attributes:[NSDictionary dictionaryWithObject:[NSColor redColor] forKey:NSForegroundColorAttributeName]];
 			
 			[generalStatusTextField setAttributedStringValue:errorMessage];
 			
@@ -504,9 +528,12 @@
 			NSImage *iconImage = [runningApplication icon];
 			[iconImage setSize:NSMakeSize(16, 16)];
 			[menuItem setImage:iconImage];
-			ZGProcess *representedProcess = [[ZGProcess alloc] initWithName:[runningApplication localizedName]
-																  processID:[runningApplication processIdentifier]
-																   set64Bit:([runningApplication executableArchitecture] == NSBundleExecutableArchitectureX86_64)];
+			
+			ZGProcess *representedProcess =
+				[[ZGProcess alloc]
+				 initWithName:[runningApplication localizedName]
+				 processID:[runningApplication processIdentifier]
+				 set64Bit:([runningApplication executableArchitecture] == NSBundleExecutableArchitectureX86_64)];
 			[menuItem setRepresentedObject:representedProcess];
 			[representedProcess release];
 			
@@ -560,7 +587,7 @@
 	NSRunningApplication *runningApplication = [[notification userInfo] objectForKey:ZGRunningApplication];
 	if ([currentProcess processID] == NON_EXISTENT_PID_NUMBER && [[runningApplication localizedName] isEqualToString:[currentProcess name]])
 	{
-		[currentProcess	setProcessID:[runningApplication processIdentifier]];
+		[currentProcess setProcessID:[runningApplication processIdentifier]];
 		[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [currentProcess name], [currentProcess processID]]];
 		
 		// need to grant access
@@ -581,9 +608,14 @@
 	
 	if (([clearButton isEnabled] || [self canCancelTask]) && [[runningApplication localizedName] isEqualToString:[currentProcess name]])
 	{
-		NSAttributedString *status = [[NSAttributedString alloc] initWithString:@"Process terminated."
-																	 attributes:[NSDictionary dictionaryWithObject:[NSColor redColor]
-																											forKey:NSForegroundColorAttributeName]];
+		NSAttributedString *status =
+			[[NSAttributedString alloc]
+			 initWithString:@"Process terminated."
+			 attributes:
+				[NSDictionary
+				 dictionaryWithObject:[NSColor redColor]
+				 forKey:NSForegroundColorAttributeName]];
+		
 		[generalStatusTextField setAttributedStringValue:status];
 		
 		[status release];
@@ -716,8 +748,10 @@
 			 ZGVariable *variable = object;
 			 if (variable->isPointer)
 			 {
-				 NSString *newAddress = [ZGCalculator evaluateAddress:[NSMutableString stringWithString:[variable addressFormula]]
-															  process:currentProcess];
+				 NSString *newAddress =
+					[ZGCalculator
+					 evaluateAddress:[NSMutableString stringWithString:[variable addressFormula]]
+					 process:currentProcess];
 				 
 				 if (variable->address != [newAddress unsignedLongLongValue])
 				 {
@@ -758,49 +792,48 @@
 		// Read all the variables and update them in the table view if needed
 		NSRange visibleRowsRange = [watchVariablesTableView rowsInRect:[watchVariablesTableView visibleRect]];
 		
-        if (visibleRowsRange.location + visibleRowsRange.length <= [watchVariablesArray count])
-        {
-            [[watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
-             {
-                 NSString *oldStringValue = [[variable stringValue] copy];
-                 
-                 if (variable->type == ZGUTF8String || variable->type == ZGUTF16String)
-                 {
-                     variable->size = ZGGetStringSize([currentProcess processTask], variable->address, variable->type);
-                 }
-                 
-                 if (variable->size)
-                 {
-                     ZGMemorySize outputSize = variable->size;
-                     void *value = NULL;
-                     
-                     if (ZGReadBytes([currentProcess processTask], variable->address, &value, &outputSize))
-                     {
-                         [variable setVariableValue:value];
-                         if (![[variable stringValue] isEqualToString:oldStringValue])
-                         {
-                             [watchVariablesTableView reloadData];
-                         }
-                         
-                         ZGFreeBytes([currentProcess processTask], value, outputSize);
-                     }
-                     else if (variable->value)
-                     {
-                         [variable setVariableValue:NULL];
-                         [watchVariablesTableView reloadData];
-                     }
-                 }
-                 else if (variable->lastUpdatedSize)
-                 {
-                     [variable setVariableValue:NULL];
-                     [watchVariablesTableView reloadData];
-                 }
-                 
-                 variable->lastUpdatedSize = variable->size;
-                 
-                 [oldStringValue release];
-             }];
-        }
+		if (visibleRowsRange.location + visibleRowsRange.length <= [watchVariablesArray count])
+		{
+			[[watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+			{
+				NSString *oldStringValue = [[variable stringValue] copy];
+				if (variable->type == ZGUTF8String || variable->type == ZGUTF16String)
+				{
+					variable->size = ZGGetStringSize([currentProcess processTask], variable->address, variable->type);
+				}
+				
+				if (variable->size)
+				{
+					ZGMemorySize outputSize = variable->size;
+					void *value = NULL;
+					
+					if (ZGReadBytes([currentProcess processTask], variable->address, &value, &outputSize))
+					{
+						[variable setVariableValue:value];
+						if (![[variable stringValue] isEqualToString:oldStringValue])
+						{
+							[watchVariablesTableView reloadData];
+						}
+						
+						ZGFreeBytes([currentProcess processTask], value, outputSize);
+					}
+					else if (variable->value)
+					{
+						[variable setVariableValue:NULL];
+						[watchVariablesTableView reloadData];
+					}
+				}
+				else if (variable->lastUpdatedSize)
+				{
+					[variable setVariableValue:NULL];
+					[watchVariablesTableView reloadData];
+				}
+				
+				variable->lastUpdatedSize = variable->size;
+				
+				[oldStringValue release];
+			}];
+		}
 	}
 }
 
@@ -825,8 +858,8 @@
 	}
 	
 	[watchVariablesTableView reloadData];
-    
-    [self markDocumentChange:nil];
+	
+	[self markDocumentChange:nil];
 }
 
 - (void)updateFlagsRangeTextField
@@ -956,9 +989,10 @@ static NSSize *expandedWindowMinSize = nil;
 				windowFrame.size.height += ([functionPopUpButton frame].origin.y + [functionPopUpButton frame].size.height + 6) - [optionsView frame].origin.y;
 				windowFrame.origin.y -= ([functionPopUpButton frame].origin.y + [functionPopUpButton frame].size.height + 6) - [optionsView frame].origin.y;
 				
-				[watchWindow setFrame:windowFrame
-							  display:YES
-							  animate:YES];
+				[watchWindow
+				 setFrame:windowFrame
+				 display:YES
+				 animate:YES];
 			}
 			
 			[optionsView setHidden:NO];
@@ -974,9 +1008,10 @@ static NSSize *expandedWindowMinSize = nil;
 				windowFrame.size.height -= [optionsView frame].size.height + 6;
 				windowFrame.origin.y += [optionsView frame].size.height + 6;
 				
-				[watchWindow setFrame:windowFrame
-							  display:YES
-							  animate:YES];
+				[watchWindow
+				 setFrame:windowFrame
+				 display:YES
+				 animate:YES];
 			}
 			
 			NSSize minSize = *expandedWindowMinSize;
@@ -987,150 +1022,152 @@ static NSSize *expandedWindowMinSize = nil;
 			break;
 	}
 	
-	[[NSUserDefaults standardUserDefaults] setBool:[optionsDisclosureButton state]
-											forKey:ZG_EXPAND_OPTIONS];
+	[[NSUserDefaults standardUserDefaults]
+	 setBool:[optionsDisclosureButton state]
+	 forKey:ZG_EXPAND_OPTIONS];
 }
 
 - (void)watchWindowWillExitFullScreen:(NSNotificationCenter *)notification
 {
-    [optionsView setHidden:YES];
+	[optionsView setHidden:YES];
 }
 
 - (void)watchWindowDidExitFullScreen:(NSNotification *)notification
 {
-    if (expandedWindowMinSize && [watchWindow minSize].height == expandedWindowMinSize->height)
-    {
-        if ([watchWindow frame].size.height < expandedWindowMinSize->height)
-        {
-            [optionsDisclosureButton setState:NSOffState];
-            [self optionsDisclosureButton:nil];
-        }
-        else
-        {
-            [optionsView setHidden:NO];
-        }
-    }
+	if (expandedWindowMinSize && [watchWindow minSize].height == expandedWindowMinSize->height)
+	{
+		if ([watchWindow frame].size.height < expandedWindowMinSize->height)
+		{
+			[optionsDisclosureButton setState:NSOffState];
+			[self optionsDisclosureButton:nil];
+		}
+		else
+		{
+			[optionsView setHidden:NO];
+		}
+	}
 }
 
-- (void)selectDataTypeWithTag:(ZGVariableType)newTag
-                   recordUndo:(BOOL)recordUndo
+- (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo
 {
-    if (currentSearchDataType != newTag)
-    {
-        [dataTypesPopUpButton selectItemWithTag:newTag];
-        
-        [functionPopUpButton setEnabled:YES];
-        [variableQualifierMatrix setEnabled:YES];
-        
-        if (newTag == ZGUTF8String || newTag == ZGUTF16String)
-        {
-            [ignoreCaseCheckBox setEnabled:YES];
-            [includeNullTerminatorCheckBox setEnabled:YES];
-        }
-        else
-        {
-            [ignoreCaseCheckBox setEnabled:NO];
-            [ignoreCaseCheckBox setState:NSOffState];
-            
-            [includeNullTerminatorCheckBox setEnabled:NO];
-            [includeNullTerminatorCheckBox setState:NSOffState];
-        }
-        
-        [ignoreDataAlignmentCheckBox setEnabled:(newTag != ZGUTF8String && newTag != ZGInt8)];
-        
-        [self updateFlags];
-        
-        if (recordUndo)
-        {
-            [[self undoManager] setActionName:@"Data Type Change"];
-            [[[self undoManager] prepareWithInvocationTarget:self] selectDataTypeWithTag:currentSearchDataType
-                                                                              recordUndo:YES];
-        }
-        
-        currentSearchDataType = newTag;
-    }
+	if (currentSearchDataType != newTag)
+	{
+		[dataTypesPopUpButton selectItemWithTag:newTag];
+
+		[functionPopUpButton setEnabled:YES];
+		[variableQualifierMatrix setEnabled:YES];
+
+		if (newTag == ZGUTF8String || newTag == ZGUTF16String)
+		{
+			[ignoreCaseCheckBox setEnabled:YES];
+			[includeNullTerminatorCheckBox setEnabled:YES];
+		}
+		else
+		{
+			[ignoreCaseCheckBox setEnabled:NO];
+			[ignoreCaseCheckBox setState:NSOffState];
+
+			[includeNullTerminatorCheckBox setEnabled:NO];
+			[includeNullTerminatorCheckBox setState:NSOffState];
+		}
+
+		[ignoreDataAlignmentCheckBox setEnabled:(newTag != ZGUTF8String && newTag != ZGInt8)];
+
+		[self updateFlags];
+
+		if (recordUndo)
+		{
+			[[self undoManager] setActionName:@"Data Type Change"];
+			[[[self undoManager] prepareWithInvocationTarget:self]
+			 selectDataTypeWithTag:currentSearchDataType
+			 recordUndo:YES];
+		}
+		
+		currentSearchDataType = newTag;
+	}
 }
 
 - (IBAction)dataTypePopUpButtonRequest:(id)sender
 {
-    [self selectDataTypeWithTag:(ZGVariableType)[[sender selectedItem] tag]
-                     recordUndo:YES];
+	[self
+	 selectDataTypeWithTag:(ZGVariableType)[[sender selectedItem] tag]
+	 recordUndo:YES];
 }
 
 - (BOOL)doesFunctionTypeAllowSearchInput
 {
-    BOOL allows;
-    switch ([[functionPopUpButton selectedItem] tag])
-    {
-        case ZGEquals:
-        case ZGNotEquals:
-        case ZGGreaterThan:
-        case ZGLessThan:
-        case ZGEqualsStoredPlus:
-        case ZGNotEqualsStoredPlus:
-            allows = YES;
-            break;
-        default:
-            allows = NO;
-            break;
-    }
-    
-    return allows;
+	BOOL allows;
+	switch ([[functionPopUpButton selectedItem] tag])
+	{
+		case ZGEquals:
+		case ZGNotEquals:
+		case ZGGreaterThan:
+		case ZGLessThan:
+		case ZGEqualsStoredPlus:
+		case ZGNotEqualsStoredPlus:
+			allows = YES;
+			break;
+		default:
+			allows = NO;
+			break;
+	}
+
+	return allows;
 }
 
 - (BOOL)isFunctionTypeStore:(NSInteger)functionTypeTag
 {
-    BOOL isFunctionTypeStore;
-    
-    switch (functionTypeTag)
-    {
-        case ZGEqualsStored:
-        case ZGNotEqualsStored:
-        case ZGGreaterThanStored:
-        case ZGLessThanStored:
-        case ZGEqualsStoredPlus:
-        case ZGNotEqualsStoredPlus:
-            isFunctionTypeStore = YES;
-            break;
-        default:
-            isFunctionTypeStore = NO;
-    }
-    
-    return isFunctionTypeStore;
+	BOOL isFunctionTypeStore;
+	
+	switch (functionTypeTag)
+	{
+		case ZGEqualsStored:
+		case ZGNotEqualsStored:
+		case ZGGreaterThanStored:
+		case ZGLessThanStored:
+		case ZGEqualsStoredPlus:
+		case ZGNotEqualsStoredPlus:
+			isFunctionTypeStore = YES;
+			break;
+		default:
+			isFunctionTypeStore = NO;
+	}
+
+	return isFunctionTypeStore;
 }
 
 - (BOOL)isFunctionTypeStore
 {
-    return [self isFunctionTypeStore:[[functionPopUpButton selectedItem] tag]];
+	return [self isFunctionTypeStore:[[functionPopUpButton selectedItem] tag]];
 }
 
-- (void)functionTypePopUpButtonRequest:(id)sender
-                           markChanges:(BOOL)shouldMarkChanges
+- (void)functionTypePopUpButtonRequest:(id)sender markChanges:(BOOL)shouldMarkChanges
 {
-    [self updateFlags];
-    
-    if (![self doesFunctionTypeAllowSearchInput])
-    {
-        [searchValueTextField setEnabled:NO];
-        [searchValueLabel setTextColor:[NSColor disabledControlTextColor]];
-    }
-    else
-    {
-        [searchValueTextField setEnabled:YES];
-        [searchValueLabel setTextColor:[NSColor controlTextColor]];
-        [watchWindow makeFirstResponder:searchValueTextField];
-    }
-    
-    if (shouldMarkChanges)
-    {
-        [self markDocumentChange:nil];
-    }
+	[self updateFlags];
+	
+	if (![self doesFunctionTypeAllowSearchInput])
+	{
+		[searchValueTextField setEnabled:NO];
+		[searchValueLabel setTextColor:[NSColor disabledControlTextColor]];
+	}
+	else
+	{
+		[searchValueTextField setEnabled:YES];
+		[searchValueLabel setTextColor:[NSColor controlTextColor]];
+		[watchWindow makeFirstResponder:searchValueTextField];
+	}
+
+	if (shouldMarkChanges)
+	{
+		[self markDocumentChange:nil];
+	}
 }
 
 - (IBAction)functionTypePopUpButtonRequest:(id)sender
 {
-    [self functionTypePopUpButtonRequest:sender
-                             markChanges:YES];
+	[self
+	 functionTypePopUpButtonRequest:sender
+	 markChanges:YES];
 }
 
 #pragma mark Adding & Removing Variables
@@ -1147,8 +1184,9 @@ static NSSize *expandedWindowMinSize = nil;
 	{
 		[[self undoManager] setActionName:[NSString stringWithFormat:@"Delete Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
 	}
-	[[[self undoManager] prepareWithInvocationTarget:self] addVariables:[watchVariablesArray objectsAtIndexes:rowIndexes]
-														   atRowIndexes:rowIndexes];
+	[[[self undoManager] prepareWithInvocationTarget:self]
+	 addVariables:[watchVariablesArray objectsAtIndexes:rowIndexes]
+	 atRowIndexes:rowIndexes];
 	
 	[temporaryArray addObjectsFromArray:watchVariablesArray];
 	[temporaryArray removeObjectsAtIndexes:rowIndexes];
@@ -1160,8 +1198,7 @@ static NSSize *expandedWindowMinSize = nil;
 	[watchVariablesTableView reloadData];
 }
 
-- (void)addVariables:(NSArray *)variables
-		atRowIndexes:(NSIndexSet *)rowIndexes
+- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes
 {
 	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithArray:watchVariablesArray];
 	[temporaryArray insertObjects:variables
@@ -1202,25 +1239,29 @@ static NSSize *expandedWindowMinSize = nil;
 		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddress];
 	}
 	
-	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL
-														size:0
-													 address:initialAddress
-														type:(ZGVariableType)[sender tag]
-												   qualifier:qualifier
-												 pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+	ZGVariable *variable =
+		[[ZGVariable alloc]
+		 initWithValue:NULL
+		 size:0
+		 address:initialAddress
+		 type:(ZGVariableType)[sender tag]
+		 qualifier:qualifier
+		 pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 	
 	[variable setShouldBeSearched:NO];
 	
-	[self addVariables:[NSArray arrayWithObject:variable]
-		  atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
+	[self
+	 addVariables:[NSArray arrayWithObject:variable]
+	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
 	
 	[variable release];
 	
 	// have the user edit the variable's address
-	[watchVariablesTableView editColumn:[watchVariablesTableView columnWithIdentifier:@"address"]
-									row:0
-							  withEvent:nil
-								 select:YES];
+	[watchVariablesTableView
+	 editColumn:[watchVariablesTableView columnWithIdentifier:@"address"]
+	 row:0
+	 withEvent:nil
+	 select:YES];
 }
 
 #pragma mark Freezing variables
@@ -1228,15 +1269,15 @@ static NSSize *expandedWindowMinSize = nil;
 - (void)freezeOrUnfreezeVariablesAtRoxIndexes:(NSIndexSet *)rowIndexes
 {
 	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger rowIndex, BOOL *stop)
-	 {
-		 ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
-		 variable->isFrozen = !(variable->isFrozen);
-		 
-		 if (variable->isFrozen)
-		 {
-			 [variable setFreezeValue:variable->value];
-		 }
-	 }];
+	{
+		ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
+		variable->isFrozen = !(variable->isFrozen);
+
+		if (variable->isFrozen)
+		{
+			[variable setFreezeValue:variable->value];
+		}
+	}];
 	
 	[watchVariablesTableView reloadData];
 	
@@ -1274,9 +1315,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 #pragma mark Useful Methods
 
-- (void *)valueFromString:(NSString *)stringValue
-				 dataType:(ZGVariableType)dataType
-				 dataSize:(ZGMemorySize *)dataSize
+- (void *)valueFromString:(NSString *)stringValue dataType:(ZGVariableType)dataType dataSize:(ZGMemorySize *)dataSize
 {
 	void *value = NULL;
 	BOOL searchValueIsAHexRepresentation = [stringValue isHexRepresentation];
@@ -1405,81 +1444,79 @@ static NSSize *expandedWindowMinSize = nil;
 		[stringValue getCharacters:value
 							 range:NSMakeRange(0, [stringValue length])];
 	}
-    else if (dataType == ZGByteArray)
-    {
-        NSArray *bytesArray = [stringValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        
-        *dataSize = [bytesArray count];
-        value = malloc((size_t)*dataSize);
-        
-        unsigned char *valuePtr = value;
-        
-        for (NSString *byteString in bytesArray)
-        {
-            unsigned int theValue = 0;
-            if (([byteString rangeOfString:@"?"].location == NSNotFound && [byteString rangeOfString:@"*"].location == NSNotFound) || [byteString length] != 2)
-            {
-                [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
-                *valuePtr = (unsigned char)theValue;
-            }
-            else
-            {
-                *valuePtr = 0;
-                if ([byteString length] == 2)
-                {
-                    [[NSScanner scannerWithString:[byteString substringToIndex:1]] scanHexInt:&theValue];
-                    
-                    *valuePtr = (((unsigned char)theValue) << 4) & 0xF0;
-                    
-                    theValue = 0;
-                    [[NSScanner scannerWithString:[byteString substringFromIndex:1]] scanHexInt:&theValue];
-                    
-                    *valuePtr |= ((unsigned char)theValue) & 0x0F;
-                }
-            }
-            
-            valuePtr++;
-        }
-    }
+	
+	else if (dataType == ZGByteArray)
+	{
+		NSArray *bytesArray = [stringValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+		*dataSize = [bytesArray count];
+		value = malloc((size_t)*dataSize);
+		
+		unsigned char *valuePtr = value;
+		
+		for (NSString *byteString in bytesArray)
+		{
+			unsigned int theValue = 0;
+			if (([byteString rangeOfString:@"?"].location == NSNotFound && [byteString rangeOfString:@"*"].location == NSNotFound) || [byteString length] != 2)
+			{
+				[[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
+				*valuePtr = (unsigned char)theValue;
+			}
+			else
+			{
+				*valuePtr = 0;
+				if ([byteString length] == 2)
+				{
+					[[NSScanner scannerWithString:[byteString substringToIndex:1]] scanHexInt:&theValue];
+					*valuePtr = (((unsigned char)theValue) << 4) & 0xF0;
+					theValue = 0;
+					[[NSScanner scannerWithString:[byteString substringFromIndex:1]] scanHexInt:&theValue];
+					*valuePtr |= ((unsigned char)theValue) & 0x0F;
+				}
+			}
+			
+			valuePtr++;
+		}
+	}
 	
 	return value;
 }
 
 - (unsigned char *)allocateFlagsForByteArrayWildcards:(NSString *)searchValue
 {
-    NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    
-    unsigned char *data = calloc(1, [bytesArray count] * sizeof(unsigned char));
-    
-    if (data)
-    {
-        __block BOOL didUseWildcard = NO;
+	NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+	unsigned char *data = calloc(1, [bytesArray count] * sizeof(unsigned char));
+
+	if (data)
+	{
+		__block BOOL didUseWildcard = NO;
 		[bytesArray enumerateObjectsUsingBlock:^(NSString *byteString, NSUInteger byteIndex, BOOL *stop)
-		 {
-			 if ([byteString length] == 2)
-			 {
-				 if ([[byteString substringToIndex:1] isEqualToString:@"?"] || [[byteString substringToIndex:1] isEqualToString:@"*"])
-				 {
-					 data[byteIndex] |= 0xF0;
-					 didUseWildcard = YES;
-				 }
-				 
-				 if ([[byteString substringFromIndex:1] isEqualToString:@"?"] || [[byteString substringFromIndex:1] isEqualToString:@"*"])
-				 {
-					 data[byteIndex] |= 0x0F;
-					 didUseWildcard = YES;
-				 }
-			 }
-		 }];
-        
-        if (!didUseWildcard)
-        {
-            free(data);
-            data = NULL;
-        }
-    }
+		{
+			if ([byteString length] == 2)
+			{
+				if ([[byteString substringToIndex:1] isEqualToString:@"?"] || [[byteString substringToIndex:1] isEqualToString:@"*"])
+				{
+					data[byteIndex] |= 0xF0;
+					didUseWildcard = YES;
+				}
+				
+				if ([[byteString substringFromIndex:1] isEqualToString:@"?"] || [[byteString substringFromIndex:1] isEqualToString:@"*"])
+				{
+					data[byteIndex] |= 0x0F;
+					didUseWildcard = YES;
+				}
+			}
+		}];
+		
+		if (!didUseWildcard)
+		{
+			free(data);
+			data = NULL;
+		}
+	}
     
-    return data;
+	return data;
 }
 
 - (void)setWatchVariablesArray:(NSArray *)newWatchVariablesArray
@@ -1497,11 +1534,11 @@ static NSSize *expandedWindowMinSize = nil;
 	[watchVariablesTableView reloadData];
 	
 	// Make sure the search value field is enabled if we aren't doing a store comparison
-    if ([self doesFunctionTypeAllowSearchInput])
-    {
-        [searchValueTextField setEnabled:YES];
-        [searchValueLabel setTextColor:[NSColor controlTextColor]]; 
-    }
+	if ([self doesFunctionTypeAllowSearchInput])
+	{
+		[searchValueTextField setEnabled:YES];
+		[searchValueLabel setTextColor:[NSColor controlTextColor]]; 
+	}
 }
 
 #pragma mark Locking  & Unlocking
@@ -1660,8 +1697,8 @@ static NSSize *expandedWindowMinSize = nil;
 	[self updateRunningApplicationProcesses];
 	
 	[generalStatusTextField setStringValue:@"Cleared search."];
-    
-    [self markDocumentChange:nil];
+	
+	[self markDocumentChange:nil];
 }
 
 - (void)searchCleanUp:(NSArray *)newVariablesArray
@@ -1732,9 +1769,11 @@ static NSSize *expandedWindowMinSize = nil;
 		NSString *evaluatedSearchExpression = nil;
 		NSString *inputErrorMessage = nil;
 		
-		evaluatedSearchExpression = (dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
-									? [searchValueTextField stringValue]
-									: [ZGCalculator evaluateExpression:[searchValueTextField stringValue]];
+		evaluatedSearchExpression =
+			(dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
+			? [searchValueTextField stringValue]
+			: [ZGCalculator evaluateExpression:[searchValueTextField stringValue]];
+		
 		inputErrorMessage = [self confirmSearchInput:evaluatedSearchExpression];
 		
 		if (inputErrorMessage)
@@ -1743,10 +1782,12 @@ static NSSize *expandedWindowMinSize = nil;
 			return;
 		}
 		
-        // get search value and data size
-        searchValue = [self valueFromString:evaluatedSearchExpression
-                                   dataType:dataType
-                                   dataSize:&dataSize];
+		// get search value and data size
+		searchValue =
+			[self
+			 valueFromString:evaluatedSearchExpression
+			 dataType:dataType
+			 dataSize:&dataSize];
 		
 		// We want to read the null terminator in this case... even though we normally don't store the terminator
 		// internally for UTF-16 strings. Lame hack, I know.
@@ -1754,25 +1795,32 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			dataSize += sizeof(unichar);
 		}
-        
-        ZGFunctionType functionType = (ZGFunctionType)[[functionPopUpButton selectedItem] tag];
-        
-        if (searchValue && ![self doesFunctionTypeAllowSearchInput])
-        {
-            free(searchValue);
-            searchValue = NULL;
-        }
+		
+		ZGFunctionType functionType = (ZGFunctionType)[[functionPopUpButton selectedItem] tag];
+		
+		if (searchValue && ![self doesFunctionTypeAllowSearchInput])
+		{
+			free(searchValue);
+			searchValue = NULL;
+		}
 		
 		BOOL flagsFieldIsBlank = [[[flagsTextField stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@""];
 		
 		if ([flagsTextField isEnabled])
 		{
-			NSString *flagsExpression = (dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray) ? [flagsTextField stringValue] : [ZGCalculator evaluateExpression:[flagsTextField stringValue]];
+			NSString *flagsExpression =
+				(dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
+				? [flagsTextField stringValue]
+				: [ZGCalculator evaluateExpression:[flagsTextField stringValue]];
+			
 			inputErrorMessage = [self testSearchComponent:flagsExpression];
 			
 			if (inputErrorMessage && !flagsFieldIsBlank)
 			{
-				NSString *field = (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored) ? @"Epsilon" : ((functionType == ZGGreaterThan || functionType == ZGGreaterThanStored) ? @"Below" : @"Above");
+				NSString *field =
+					(functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored)
+					? @"Epsilon"
+					: ((functionType == ZGGreaterThan || functionType == ZGGreaterThanStored) ? @"Below" : @"Above");
 				NSRunAlertPanel(@"Invalid Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
 				return;
 			}
@@ -1784,9 +1832,11 @@ static NSSize *expandedWindowMinSize = nil;
 					{
 						// Clearly a range type of search
 						ZGMemorySize rangeDataSize;
-						searchArguments.rangeValue = [self valueFromString:flagsExpression
-																  dataType:dataType
-																  dataSize:&rangeDataSize];
+						searchArguments.rangeValue =
+							[self
+							 valueFromString:flagsExpression
+							 dataType:dataType
+							 dataSize:&rangeDataSize];
 					}
 					else
 					{
@@ -1810,9 +1860,11 @@ static NSSize *expandedWindowMinSize = nil;
 					{
 						// Clearly an epsilon flag
 						ZGMemorySize epsilonDataSize;
-						void *epsilon = [self valueFromString:flagsExpression
-													 dataType:ZGDouble
-													 dataSize:&epsilonDataSize];
+						void *epsilon =
+							[self
+							 valueFromString:flagsExpression
+							 dataType:ZGDouble
+							 dataSize:&epsilonDataSize];
 						if (epsilon)
 						{
 							searchArguments.epsilon = *((double *)epsilon);
@@ -1899,7 +1951,10 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		BOOL (*compareFunction)(ZGSearchArguments *, const void *, const void *, ZGVariableType, ZGMemorySize, void *) = compareFunctions[functionType];
         
-        void *extraData = dataType == ZGByteArray ? [self allocateFlagsForByteArrayWildcards:evaluatedSearchExpression] : ((functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus) ? searchValue : &collator);
+		void *extraData =
+			dataType == ZGByteArray
+			? [self allocateFlagsForByteArrayWildcards:evaluatedSearchExpression]
+			: ((functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus) ? searchValue : &collator);
 		
 		if (!goingToNarrowDownSearches)
 		{
@@ -1909,12 +1964,20 @@ static NSSize *expandedWindowMinSize = nil;
 			currentProcess->numberOfVariablesFound = 0;
 			currentProcess->searchProgress = 0;
 			
-			updateSearchUserInterfaceTimer = [[ZGTimer alloc] initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-																			target:self
-																		  selector:@selector(updateSearchUserInterface:)];
+			updateSearchUserInterfaceTimer =
+				[[ZGTimer alloc]
+				 initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+				 target:self
+				 selector:@selector(updateSearchUserInterface:)];
 			
-			ZGVariableQualifier qualifier = [[variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
-			ZGMemorySize pointerSize = currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
+			ZGVariableQualifier qualifier =
+				[[variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState
+				? ZGSigned
+				: ZGUnsigned;
+			ZGMemorySize pointerSize =
+				currentProcess->is64Bit
+				? sizeof(int64_t)
+				: sizeof(int32_t);
 			
 			search_for_data_t searchForDataCallback = ^(void *data, void *data2, ZGMemoryAddress address, int currentRegionNumber)
 			{
@@ -1922,16 +1985,18 @@ static NSSize *expandedWindowMinSize = nil;
 					(!searchArguments.endAddressExists || searchArguments.endAddress >= address + dataSize) &&
 					compareFunction(&searchArguments, data, (data2 != NULL) ? data2 : searchValue, dataType, dataSize, extraData))
 				{
-					ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:data
-																		   size:dataSize
-																		address:address
-																		   type:dataType
-																	  qualifier:qualifier
-																	pointerSize:pointerSize];
+					ZGVariable *newVariable =
+						[[ZGVariable alloc]
+						 initWithValue:data
+						 size:dataSize
+						 address:address
+						 type:dataType
+						 qualifier:qualifier
+						 pointerSize:pointerSize];
 					
 					[temporaryVariablesArray addObject:newVariable];
 					[newVariable release];
-					
+					 
 					currentProcess->numberOfVariablesFound++;
 				}
 				
@@ -1945,10 +2010,10 @@ static NSSize *expandedWindowMinSize = nil;
 					free(searchValue);
 				}
                 
-                if (extraData && dataType == ZGByteArray)
-                {
-                    free(extraData);
-                }
+				if (extraData && dataType == ZGByteArray)
+				{
+					free(extraData);
+				}
 				
 				[updateSearchUserInterfaceTimer invalidate];
 				[updateSearchUserInterfaceTimer release];
@@ -1959,7 +2024,10 @@ static NSSize *expandedWindowMinSize = nil;
 			};
 			dispatch_block_t searchForDataBlock = ^
 			{
-				ZGMemorySize dataAlignment = ([ignoreDataAlignmentCheckBox state] == NSOnState) ? sizeof(int8_t) : ZGDataAlignment(currentProcess->is64Bit, dataType, dataSize);
+				ZGMemorySize dataAlignment =
+					([ignoreDataAlignmentCheckBox state] == NSOnState)
+					? sizeof(int8_t)
+					: ZGDataAlignment(currentProcess->is64Bit, dataType, dataSize);
 				
 				if (searchArguments.isImplicit)
 				{
@@ -1982,9 +2050,11 @@ static NSSize *expandedWindowMinSize = nil;
 			currentProcess->searchProgress = 0;
 			currentProcess->numberOfVariablesFound = 0;
 			
-			updateSearchUserInterfaceTimer = [[ZGTimer alloc] initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-																			target:self
-																		  selector:@selector(updateSearchUserInterface:)];
+			updateSearchUserInterfaceTimer =
+				[[ZGTimer alloc]
+				 initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+				 target:self
+				 selector:@selector(updateSearchUserInterface:)];
 			
 			dispatch_block_t completeSearchBlock = ^
 			{
@@ -1992,10 +2062,11 @@ static NSSize *expandedWindowMinSize = nil;
 				{
 					free(searchValue);
 				}
-                if (extraData && dataType == ZGByteArray)
-                {
-                    free(extraData);
-                }
+				
+				if (extraData && dataType == ZGByteArray)
+				{
+					free(extraData);
+				}
 				[updateSearchUserInterfaceTimer invalidate];
 				[updateSearchUserInterfaceTimer release];
 				updateSearchUserInterfaceTimer = nil;
@@ -2013,7 +2084,7 @@ static NSSize *expandedWindowMinSize = nil;
 							(!searchArguments.beginAddressExists || searchArguments.beginAddress <= variable->address) &&
 							(!searchArguments.endAddressExists || searchArguments.endAddress >= variable->address + dataSize))
 						{
-                            ZGMemorySize outputSize = dataSize;
+							ZGMemorySize outputSize = dataSize;
 							void *value = NULL;
 							if (ZGReadBytes(processTask, variable->address, &value, &outputSize))
 							{
@@ -2024,8 +2095,8 @@ static NSSize *expandedWindowMinSize = nil;
 									[temporaryVariablesArray addObject:variable];
 									currentProcess->numberOfVariablesFound++;
 								}
-                                
-                                ZGFreeBytes(processTask, value, outputSize);
+								
+								ZGFreeBytes(processTask, value, outputSize);
 							}
 						}
 					}
@@ -2088,9 +2159,11 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	[searchingProgressIndicator setMaxValue:[currentProcess numberOfRegions]];
 	
-	updateSearchUserInterfaceTimer = [[ZGTimer alloc] initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-																	target:self
-																  selector:@selector(updateMemoryStoreUserInterface:)];
+	updateSearchUserInterfaceTimer =
+		[[ZGTimer alloc]
+		 initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+		 target:self
+		 selector:@selector(updateMemoryStoreUserInterface:)];
 	
 	
 	[generalStatusTextField setStringValue:@"Storing All Values..."];
@@ -2139,10 +2212,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 #pragma mark Table View Drag & Drop
 
-- (NSDragOperation)tableView:(NSTableView *)tableView 
-				validateDrop:(id <NSDraggingInfo>)draggingInfo 
-				 proposedRow:(NSInteger)row 
-	   proposedDropOperation:(NSTableViewDropOperation)operation
+- (NSDragOperation)tableView:(NSTableView *)tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
 {
 	if ([[[draggingInfo draggingPasteboard] types] containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
 	{
@@ -2162,10 +2232,7 @@ static NSSize *expandedWindowMinSize = nil;
 	[watchVariablesTableView reloadData];
 }
 
-- (BOOL)tableView:(NSTableView *)tableView
-	   acceptDrop:(id <NSDraggingInfo>)draggingInfo 
-			  row:(NSInteger)newRow
-	dropOperation:(NSTableViewDropOperation)operation
+- (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo  row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
 {	
 	NSMutableArray *variables = [NSMutableArray arrayWithArray:watchVariablesArray];
 	NSArray *rows = [[draggingInfo draggingPasteboard] propertyListForType:ZGVariableReorderType];
@@ -2173,15 +2240,17 @@ static NSSize *expandedWindowMinSize = nil;
 	// Fill in the current rows with null objects
 	for (NSNumber *row in rows)
 	{
-		[variables replaceObjectAtIndex:[row integerValue]
-							 withObject:[NSNull null]];
+		[variables
+		 replaceObjectAtIndex:[row integerValue]
+		 withObject:[NSNull null]];
 	}
 	
 	// Insert the objects to the new position
 	for (NSNumber *row in rows)
 	{
-		[variables insertObject:[watchVariablesArray objectAtIndex:[row integerValue]]
-						atIndex:newRow];
+		[variables
+		 insertObject:[watchVariablesArray objectAtIndex:[row integerValue]]
+		 atIndex:newRow];
 		
 		newRow++;
 	}
@@ -2195,14 +2264,13 @@ static NSSize *expandedWindowMinSize = nil;
 	return YES;
 }
 
-- (BOOL)tableView:(NSTableView *)view
-		writeRows:(NSArray *)rows 
-	 toPasteboard:(NSPasteboard *)pasteboard
+- (BOOL)tableView:(NSTableView *)view writeRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pasteboard
 {
 	[pasteboard declareTypes:[NSArray arrayWithObject:ZGVariableReorderType] owner:self];
 	
-	[pasteboard setPropertyList:rows
-						forType:ZGVariableReorderType];
+	[pasteboard
+	 setPropertyList:rows
+	 forType:ZGVariableReorderType];
 	
 	return YES;
 }
@@ -2231,7 +2299,7 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		else if ([[aTableColumn identifier] isEqualToString:@"type"])
 		{
-            ZGVariableType type = ((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->type;
+			ZGVariableType type = ((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->type;
 			return [NSNumber numberWithInteger:[[aTableColumn dataCell] indexOfItemWithTag:type]];
 		}
 	}
@@ -2239,12 +2307,12 @@ static NSSize *expandedWindowMinSize = nil;
 	return nil;
 }
 
-- (void)changeVariable:(ZGVariable *)variable
-			   newName:(NSString *)newName
+- (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName
 {
 	[[self undoManager] setActionName:@"Name Change"];
-	[[[self undoManager] prepareWithInvocationTarget:self] changeVariable:variable
-																  newName:[variable name]];
+	[[[self undoManager] prepareWithInvocationTarget:self]
+	 changeVariable:variable
+	 newName:[variable name]];
 	
 	[variable setName:newName];
 	
@@ -2254,12 +2322,13 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 }
 
-- (void)changeVariable:(ZGVariable *)variable
-			newAddress:(NSString *)newAddress
+- (void)changeVariable:(ZGVariable *)variable newAddress:(NSString *)newAddress
 {
 	[[self undoManager] setActionName:@"Address Change"];
-	[[[self undoManager] prepareWithInvocationTarget:self] changeVariable:variable
-															   newAddress:[variable addressStringValue]];
+	[[[self undoManager] prepareWithInvocationTarget:self]
+		changeVariable:variable
+		newAddress:[variable addressStringValue]];
+	
 	[variable setAddressStringValue:[ZGCalculator evaluateExpression:newAddress]];
 	
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
@@ -2268,18 +2337,18 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 }
 
-- (void)changeVariable:(ZGVariable *)variable
-			   newType:(ZGVariableType)type
-               newSize:(ZGMemorySize)size
+- (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size
 {
 	[[self undoManager] setActionName:@"Type Change"];
-	[[[self undoManager] prepareWithInvocationTarget:self] changeVariable:variable
-																  newType:variable->type
-                                                                  newSize:variable->size];
+	[[[self undoManager] prepareWithInvocationTarget:self]
+	 changeVariable:variable
+	 newType:variable->type
+	 newSize:variable->size];
 	
-	[variable setType:type
-        requestedSize:size
-          pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+	[variable
+	 setType:type
+	 requestedSize:size
+	 pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 	
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
 	{
@@ -2287,12 +2356,10 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 }
 
-- (void)changeVariable:(ZGVariable *)variable
-			  newValue:(NSString *)stringObject
-	  shouldRecordUndo:(BOOL)recordUndoFlag
-{	
+- (void) changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag
+{
 	void *newValue = NULL;
-    ZGMemorySize writeSize = variable->size; // specifically needed for byte arrays
+	ZGMemorySize writeSize = variable->size; // specifically needed for byte arrays
 	
 	// It's important to retrieve this now instead of later as changing the variable's size may cause a bad side effect to this method
 	NSString *oldStringValue = [[variable stringValue] copy];
@@ -2340,14 +2407,14 @@ static NSSize *expandedWindowMinSize = nil;
 			newValue = &int16Value;
 			break;
 		case ZGPointer:
-            if (variable->size == sizeof(int32_t))
-            {
-                goto INT32_BIT_CHANGE_VARIABLE;
-            }
-            else if (variable->size == sizeof(int64_t))
-            {
-                goto INT64_BIT_CHANGE_VARIABLE;
-            }
+			if (variable->size == sizeof(int32_t))
+			{
+				goto INT32_BIT_CHANGE_VARIABLE;
+			}
+			else if (variable->size == sizeof(int64_t))
+			{
+				goto INT64_BIT_CHANGE_VARIABLE;
+			}
 			
 			break;
 		case ZGInt32:
@@ -2403,68 +2470,70 @@ static NSSize *expandedWindowMinSize = nil;
 		case ZGUTF8String:
 			newValue = (void *)[stringObject cStringUsingEncoding:NSUTF8StringEncoding];
 			variable->size = strlen(newValue) + 1;
-            writeSize = variable->size;
+			writeSize = variable->size;
 			break;
 		case ZGUTF16String:
 			variable->size = [stringObject length] * sizeof(unichar);
-            writeSize = variable->size;
+			writeSize = variable->size;
 			
 			if (variable->size)
 			{
 				newValue = malloc((size_t)variable->size);
-				[stringObject getCharacters:newValue
-									  range:NSMakeRange(0, [stringObject length])];
+				[stringObject
+					getCharacters:newValue
+					range:NSMakeRange(0, [stringObject length])];
 			}
 			else
 			{
 				// String "" can be of 0 length
 				newValue = malloc(sizeof(unichar));
-                if (newValue)
-                {
-                    unichar nullTerminator = 0;
-                    memcpy(newValue, &nullTerminator, sizeof(unichar));
-                }
+				
+				if (newValue)
+				{
+					unichar nullTerminator = 0;
+					memcpy(newValue, &nullTerminator, sizeof(unichar));
+				}
 			}
 			
 			break;
-            
-        case ZGByteArray:
-        {
-            NSArray *bytesArray = [stringObject componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-            
-            // this is the size the user wants
-            variable->size = [bytesArray count];
-            
-            // this is the maximum size allocated needed
-            newValue = malloc((size_t)variable->size);
-            
-            if (newValue)
-            {
-                unsigned char *valuePtr = newValue;
-                writeSize = 0;
-                
-                for (NSString *byteString in bytesArray)
-                {
-                    unsigned int theValue = 0;
-                    [[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
-                    *valuePtr = (unsigned char)theValue;
-                    valuePtr++;
-                    
-                    if ([[byteString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0)
-                    {
-                        break;
-                    }
-                    
-                    writeSize++;
-                }
-            }
-            else
-            {
-                variable->size = writeSize;
-            }
-            
-            break;
-        }
+		
+		case ZGByteArray:
+		{
+			NSArray *bytesArray = [stringObject componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+
+			// this is the size the user wants
+			variable->size = [bytesArray count];
+
+			// this is the maximum size allocated needed
+			newValue = malloc((size_t)variable->size);
+
+			if (newValue)
+			{
+				unsigned char *valuePtr = newValue;
+				writeSize = 0;
+				
+				for (NSString *byteString in bytesArray)
+				{
+					unsigned int theValue = 0;
+					[[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
+					*valuePtr = (unsigned char)theValue;
+					valuePtr++;
+					
+					if ([[byteString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0)
+					{
+						break;
+					}
+					
+					writeSize++;
+				}
+			}
+			else
+			{
+				variable->size = writeSize;
+			}
+			
+			break;
+		}
 	}
 	
 	if (newValue)
@@ -2476,9 +2545,10 @@ static NSSize *expandedWindowMinSize = nil;
 			if (recordUndoFlag)
 			{
 				[[self undoManager] setActionName:@"Freeze Value Change"];
-				[[[self undoManager] prepareWithInvocationTarget:self] changeVariable:variable
-																			 newValue:[variable stringValue]
-																	 shouldRecordUndo:YES];
+				[[[self undoManager] prepareWithInvocationTarget:self]
+					changeVariable:variable
+					newValue:[variable stringValue]
+					shouldRecordUndo:YES];
 				
 				if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
 				{
@@ -2497,10 +2567,10 @@ static NSSize *expandedWindowMinSize = nil;
 					successfulWrite = NO;
 				}
 			}
-            else
-            {
-                successfulWrite = NO;
-            }
+			else
+			{
+				successfulWrite = NO;
+			}
 			
 			if (successfulWrite && variable->type == ZGUTF16String)
 			{
@@ -2515,9 +2585,10 @@ static NSSize *expandedWindowMinSize = nil;
 			if (successfulWrite && recordUndoFlag)
 			{
 				[[self undoManager] setActionName:@"Value Change"];
-				[[[self undoManager] prepareWithInvocationTarget:self] changeVariable:variable
-																			 newValue:oldStringValue
-																	 shouldRecordUndo:YES];
+				[[[self undoManager] prepareWithInvocationTarget:self]
+				 changeVariable:variable
+				 newValue:oldStringValue
+				 shouldRecordUndo:YES];
 				
 				if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
 				{
@@ -2531,12 +2602,11 @@ static NSSize *expandedWindowMinSize = nil;
 			free(newValue);
 		}
 	}
-    
-    [oldStringValue release];
+	
+	[oldStringValue release];
 }
 
-- (void)changeVariableShouldBeSearched:(BOOL)shouldBeSearched
-							rowIndexes:(NSIndexSet *)rowIndexes
+- (void)changeVariableShouldBeSearched:(BOOL)shouldBeSearched rowIndexes:(NSIndexSet *)rowIndexes
 {
 	NSUInteger currentIndex = [rowIndexes firstIndex];
 	while (currentIndex != NSNotFound)
@@ -2554,8 +2624,9 @@ static NSSize *expandedWindowMinSize = nil;
 	[watchVariablesTableView reloadData];
 	
 	[[self undoManager] setActionName:[NSString stringWithFormat:@"Search Variable%@ Change", ([rowIndexes count] > 1) ? @"s" : @""]];
-	[[[self undoManager] prepareWithInvocationTarget:self] changeVariableShouldBeSearched:!shouldBeSearched
-																			   rowIndexes:rowIndexes];
+	[[[self undoManager] prepareWithInvocationTarget:self]
+	 changeVariableShouldBeSearched:!shouldBeSearched
+	 rowIndexes:rowIndexes];
 }
 
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
@@ -2564,30 +2635,35 @@ static NSSize *expandedWindowMinSize = nil;
 	{
 		if ([[aTableColumn identifier] isEqualToString:@"name"])
 		{
-			[self changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-						 newName:anObject];
+			[self
+			 changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
+			 newName:anObject];
 		}
 		else if ([[aTableColumn identifier] isEqualToString:@"address"])
 		{
-			[self changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-					  newAddress:anObject];
+			[self
+			 changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
+			 newAddress:anObject];
 		}
 		else if ([[aTableColumn identifier] isEqualToString:@"value"])
 		{
-			[self changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-						newValue:anObject
-				shouldRecordUndo:YES];
+			[self
+			 changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
+			 newValue:anObject
+			 shouldRecordUndo:YES];
 		}
 		else if ([[aTableColumn identifier] isEqualToString:@"shouldBeSearched"])
 		{
-			[self changeVariableShouldBeSearched:[anObject boolValue]
-									  rowIndexes:[watchVariablesTableView selectedRowIndexes]];
+			[self
+			 changeVariableShouldBeSearched:[anObject boolValue]
+			 rowIndexes:[watchVariablesTableView selectedRowIndexes]];
 		}
 		else if (([[aTableColumn identifier] isEqualToString:@"type"]))
 		{
-			[self changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-						 newType:(ZGVariableType)[[aTableColumn dataCell] indexOfItemWithTag:[anObject integerValue]]
-                         newSize:((ZGVariable *)([watchVariablesArray objectAtIndex:rowIndex]))->size];
+			[self
+			 changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
+			 newType:(ZGVariableType)[[aTableColumn dataCell] indexOfItemWithTag:[anObject integerValue]]
+			 newSize:((ZGVariable *)([watchVariablesArray objectAtIndex:rowIndex]))->size];
 		}
 	}
 }
@@ -2620,33 +2696,33 @@ static NSSize *expandedWindowMinSize = nil;
 			return NO;
 		}
         
-        if (rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
-        {
-            ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
-            if (!variable)
-            {
-                return NO;
-            }
+		if (rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
+		{
+			ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
+			if (!variable)
+			{
+				return NO;
+			}
             
-            if (![clearButton isEnabled])
-            {
-                [self lockTarget];
-            }
-            
-            ZGMemoryProtection memoryProtection;
-            ZGMemoryAddress memoryAddress = variable->address;
-            ZGMemorySize memorySize;
-            
-            if (ZGMemoryProtectionInRegion([currentProcess processTask], &memoryAddress, &memorySize, &memoryProtection))
-            {
-                // if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
-                if (memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE))
-                {
-                    NSBeep();
-                    return NO;
-                }
-            }
-        }
+			if (![clearButton isEnabled])
+			{
+				[self lockTarget];
+			}
+			
+			ZGMemoryProtection memoryProtection;
+			ZGMemoryAddress memoryAddress = variable->address;
+			ZGMemorySize memorySize;
+			
+			if (ZGMemoryProtectionInRegion([currentProcess processTask], &memoryAddress, &memorySize, &memoryProtection))
+			{
+				// if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
+				if (memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE))
+				{
+					NSBeep();
+					return NO;
+				}
+			}
+		}
 	}
 	else if ([[aTableColumn identifier] isEqualToString:@"address"])
 	{
@@ -2666,33 +2742,25 @@ static NSSize *expandedWindowMinSize = nil;
 	return YES;
 }
 
-- (void)tableView:(NSTableView *)aTableView
-  willDisplayCell:(id)aCell
-   forTableColumn:(NSTableColumn *)aTableColumn
-			  row:(NSInteger)rowIndex
+- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	if ([[aTableColumn identifier] isEqualToString:@"address"])
 	{
-        if (rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
-        {
-            if (((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->isFrozen)
-            {
-                [aCell setTextColor:[NSColor redColor]];
-            }
-            else
-            {
-                [aCell setTextColor:[NSColor textColor]];
-            }
-        }
+		if (rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
+		{
+			if (((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->isFrozen)
+			{
+				[aCell setTextColor:[NSColor redColor]];
+			}
+			else
+			{
+				[aCell setTextColor:[NSColor textColor]];
+			}
+		}
 	}
 }
 
-- (NSString *)tableView:(NSTableView *)aTableView
-		 toolTipForCell:(NSCell *)aCell
-				   rect:(NSRectPointer)rect
-			tableColumn:(NSTableColumn *)aTableColumn
-					row:(NSInteger)row
-		  mouseLocation:(NSPoint)mouseLocation
+- (NSString *)tableView:(NSTableView *)aTableView toolTipForCell:(NSCell *)aCell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
 {
 	NSString *displayString = nil;
 	
@@ -2885,7 +2953,7 @@ static NSSize *expandedWindowMinSize = nil;
     
     else if ([theMenuItem action] == @selector(editVariablesSize:))
     {
-        if ([[watchVariablesTableView selectedRowIndexes] count] != 1)
+		if ([[watchVariablesTableView selectedRowIndexes] count] != 1)
 		{
 			[theMenuItem setTitle:@"Edit Variable Sizes…"];
 		}
@@ -2893,22 +2961,22 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			[theMenuItem setTitle:@"Edit Variable Size…"];
 		}
-        
-        if ([self canCancelTask] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+		
+		if ([self canCancelTask] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
-        
-        // All selected variables must be Byte Array's
-        NSArray *selectedVariables = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
-        for (ZGVariable *variable in selectedVariables)
-        {
-            if (variable->type != ZGByteArray)
-            {
-                return NO;
-            }
-        }
-    }
+		
+		// All selected variables must be Byte Array's
+		NSArray *selectedVariables = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
+		for (ZGVariable *variable in selectedVariables)
+		{
+			if (variable->type != ZGByteArray)
+			{
+				return NO;
+			}
+		}
+	}
 	
 	else if ([theMenuItem action] == @selector(memoryDumpRequest:) || [theMenuItem action] == @selector(memoryDumpAllRequest:) || [theMenuItem action] == @selector(getInitialValues:) || [theMenuItem action] == @selector(changeMemoryProtection:))
 	{
@@ -2917,13 +2985,13 @@ static NSSize *expandedWindowMinSize = nil;
 			return NO;
 		}
 	}
-    else if ([theMenuItem action] == @selector(functionTypePopUpButtonRequest:))
-    {
-        if ([self isFunctionTypeStore:[theMenuItem tag]] && !(searchData->savedData))
-        {
-            return NO;
-        }
-    }
+	else if ([theMenuItem action] == @selector(functionTypePopUpButtonRequest:))
+	{
+		if ([self isFunctionTypeStore:[theMenuItem tag]] && !(searchData->savedData))
+		{
+			return NO;
+		}
+	}
 	
 	return [super validateMenuItem:theMenuItem];
 }
@@ -2932,8 +3000,9 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (IBAction)copy:(id)sender
 {
-	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObjects:NSStringPboardType, ZGVariablePboardType, nil]
-											 owner:self];
+	[[NSPasteboard generalPasteboard]
+	 declareTypes:[NSArray arrayWithObjects:NSStringPboardType, ZGVariablePboardType, nil]
+	 owner:self];
 	
 	NSMutableString *stringToWrite = [[NSMutableString alloc] init];
 	NSArray *variablesArray = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
@@ -2946,13 +3015,15 @@ static NSSize *expandedWindowMinSize = nil;
 	// Remove the last '\n' character
 	[stringToWrite deleteCharactersInRange:NSMakeRange([stringToWrite length] - 1, 1)];
 	
-	[[NSPasteboard generalPasteboard] setString:stringToWrite
-										forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard]
+	 setString:stringToWrite
+	 forType:NSStringPboardType];
 	
 	[stringToWrite release];
 	
-	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray]
-									  forType:ZGVariablePboardType];
+	[[NSPasteboard generalPasteboard]
+	 setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray]
+	 forType:ZGVariablePboardType];
 }
 
 - (IBAction)paste:(id)sender
@@ -2973,8 +3044,9 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, [variablesToInsertArray count])];
 		
-		[self addVariables:variablesToInsertArray
-			  atRowIndexes:indexesToInsert];
+		[self
+		 addVariables:variablesToInsertArray
+		 atRowIndexes:indexesToInsert];
 	}
 }
 
@@ -2986,8 +3058,7 @@ static NSSize *expandedWindowMinSize = nil;
 	[editVariablesValueWindow close];
 }
 
-- (void)editVariables:(NSArray *)variables
-			newValues:(NSArray *)newValues
+- (void)editVariables:(NSArray *)variables newValues:(NSArray *)newValues
 {
 	NSMutableArray *oldValues = [[NSMutableArray alloc] init];
 	
@@ -2997,16 +3068,19 @@ static NSSize *expandedWindowMinSize = nil;
 		 
 		 [oldValues addObject:[variable stringValue]];
 		 
-		 [self changeVariable:variable
-					 newValue:[newValues objectAtIndex:index]
-			 shouldRecordUndo:NO];
+		 [self
+		  changeVariable:variable
+		  newValue:[newValues objectAtIndex:index]
+		  shouldRecordUndo:NO];
 	 }];
 	
 	[watchVariablesTableView reloadData];
 	
 	[[self undoManager] setActionName:@"Edit Variables"];
-	[[[self undoManager] prepareWithInvocationTarget:self] editVariables:variables
-															   newValues:oldValues];
+	[[[self undoManager] prepareWithInvocationTarget:self]
+	 editVariables:variables
+	 newValues:oldValues];
+	
 	[oldValues release];
 }
 
@@ -3016,56 +3090,58 @@ static NSSize *expandedWindowMinSize = nil;
 	[editVariablesValueWindow close];
 	
 	NSArray *variables = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
-    NSMutableArray *validVariables = [[NSMutableArray alloc] init];
-    
-    for (ZGVariable *variable in variables)
-    {
-        ZGMemoryProtection memoryProtection;
-        ZGMemoryAddress memoryAddress = variable->address;
-        ZGMemorySize memorySize;
+	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
+	
+	for (ZGVariable *variable in variables)
+	{
+		ZGMemoryProtection memoryProtection;
+		ZGMemoryAddress memoryAddress = variable->address;
+		ZGMemorySize memorySize;
+		
+		if (ZGMemoryProtectionInRegion([currentProcess processTask], &memoryAddress, &memorySize, &memoryProtection))
+		{
+			// if !(the variable is within a single memory region and the memory region is not writable), then the variable is editable
+			if (!(memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE)))
+			{
+				[validVariables addObject:variable];
+			}
+		}
+	}
+
+	if ([validVariables count] == 0)
+	{
+		NSRunAlertPanel(@"Writing Variables Failed", @"The selected variables could not be overwritten. Perhaps try to change the memory protection on the variable?", nil, nil, nil);
+	}
+	else
+	{
+		NSMutableArray *valuesArray = [[NSMutableArray alloc] init];
+
+		NSUInteger variableIndex;
+		for (variableIndex = 0; variableIndex < [validVariables count]; variableIndex++)
+		{
+			[valuesArray addObject:[editVariablesValueTextField stringValue]];
+		}
+		
+		[self
+		 editVariables:validVariables
+		 newValues:valuesArray];
         
-        if (ZGMemoryProtectionInRegion([currentProcess processTask], &memoryAddress, &memorySize, &memoryProtection))
-        {
-            // if !(the variable is within a single memory region and the memory region is not writable), then the variable is editable
-            if (!(memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE)))
-            {
-                [validVariables addObject:variable];
-            }
-        }
-    }
-    
-    if ([validVariables count] == 0)
-    {
-        NSRunAlertPanel(@"Writing Variables Failed", @"The selected variables could not be overwritten. Perhaps try to change the memory protection on the variable?", nil, nil, nil);
-    }
-    else
-    {
-        NSMutableArray *valuesArray = [[NSMutableArray alloc] init];
-        
-        NSUInteger variableIndex;
-        for (variableIndex = 0; variableIndex < [validVariables count]; variableIndex++)
-        {
-            [valuesArray addObject:[editVariablesValueTextField stringValue]];
-        }
-        
-        [self editVariables:validVariables
-                  newValues:valuesArray];
-        
-        [valuesArray release];
-    }
-    
-    [validVariables release];
+		[valuesArray release];
+	}
+	
+	[validVariables release];
 }
 
 - (IBAction)editVariablesValue:(id)sender
 {
 	[editVariablesValueTextField setStringValue:[[watchVariablesArray objectAtIndex:[watchVariablesTableView selectedRow]] stringValue]];
 	
-	[NSApp beginSheet:editVariablesValueWindow
-	   modalForWindow:watchWindow
-		modalDelegate:self
-	   didEndSelector:nil
-		  contextInfo:NULL];
+	[NSApp
+	 beginSheet:editVariablesValueWindow
+	 modalForWindow:watchWindow
+	 modalDelegate:self
+	 didEndSelector:nil
+	 contextInfo:NULL];
 }
 
 #pragma mark Edit Variables Address
@@ -3076,12 +3152,12 @@ static NSSize *expandedWindowMinSize = nil;
 	[editVariablesAddressWindow close];
 }
 
-- (void)editVariable:(ZGVariable *)variable
-	  addressFormula:(NSString *)newAddressFormula
+- (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula
 {
 	[[self undoManager] setActionName:@"Address Change"];
-	[[[self undoManager] prepareWithInvocationTarget:self] editVariable:variable
-														 addressFormula:[variable addressFormula]];
+	[[[self undoManager] prepareWithInvocationTarget:self]
+	 editVariable:variable
+	 addressFormula:[variable addressFormula]];
 	
 	[variable setAddressFormula:newAddressFormula];
 	if ([newAddressFormula rangeOfString:@"["].location != NSNotFound && [newAddressFormula rangeOfString:@"]"].location != NSNotFound)
@@ -3101,8 +3177,9 @@ static NSSize *expandedWindowMinSize = nil;
 	[NSApp endSheet:editVariablesAddressWindow];
 	[editVariablesAddressWindow close];
 	
-	[self editVariable:[watchVariablesArray objectAtIndex:[watchVariablesTableView selectedRow]]
-		addressFormula:[editVariablesAddressTextField stringValue]];
+	[self
+	 editVariable:[watchVariablesArray objectAtIndex:[watchVariablesTableView selectedRow]]
+	 addressFormula:[editVariablesAddressTextField stringValue]];
 }
 
 - (IBAction)editVariablesAddress:(id)sender
@@ -3110,121 +3187,123 @@ static NSSize *expandedWindowMinSize = nil;
 	ZGVariable *variable = [watchVariablesArray objectAtIndex:[watchVariablesTableView selectedRow]];
 	[editVariablesAddressTextField setStringValue:[variable addressFormula]];
 	
-	[NSApp beginSheet:editVariablesAddressWindow
-	   modalForWindow:watchWindow
-		modalDelegate:self
-	   didEndSelector:nil
-		  contextInfo:NULL];
+	[NSApp
+	 beginSheet:editVariablesAddressWindow
+	 modalForWindow:watchWindow
+	 modalDelegate:self
+	 didEndSelector:nil
+	 contextInfo:NULL];
 }
 
 #pragma mark Edit Variables Sizes (Byte Arrays)
 
 - (IBAction)editVariablesSizeCancelButton:(id)sender
 {
-    [NSApp endSheet:editVariablesSizeWindow];
+	[NSApp endSheet:editVariablesSizeWindow];
 	[editVariablesSizeWindow close];
 }
 
-- (void)editVariables:(NSArray *)variables
-       requestedSizes:(NSArray *)requestedSizes
+- (void)editVariables:(NSArray *)variables requestedSizes:(NSArray *)requestedSizes
 {
-    NSMutableArray *currentVariableSizes = [[NSMutableArray alloc] init];
-    NSMutableArray *validVariables = [[NSMutableArray alloc] init];
-    
-    // Make sure the size changes are possible. Only change the ones that seem possible.
-    [variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
-     {
-         ZGMemorySize size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
-         void *buffer = NULL;
-         
-         if (ZGReadBytes([currentProcess processTask], variable->address, &buffer, &size))
-         {
-             if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
-             {
-                 [validVariables addObject:variable];
-                 [currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:variable->size]];
-             }
-             
-             ZGFreeBytes([currentProcess processTask], buffer, size);
-         }
-     }];
-    
-    if ([validVariables count] > 0)
-    {
-        [[self undoManager] setActionName:@"Size Change"];
-        [[[self undoManager] prepareWithInvocationTarget:self] editVariables:validVariables
-                                                              requestedSizes:currentVariableSizes];
-        
-        [validVariables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
-         {
-             variable->size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
-         }];
-        
-        [watchVariablesTableView reloadData];
-    }
-    else
-    {
-        NSRunAlertPanel(@"Failed to change size", @"The size that you have requested could not be changed. Perhaps it is too big of a value?", nil, nil, nil);
-    }
-    
-    [currentVariableSizes release];
-    [validVariables release];
+	NSMutableArray *currentVariableSizes = [[NSMutableArray alloc] init];
+	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
+
+	// Make sure the size changes are possible. Only change the ones that seem possible.
+	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+	{
+		ZGMemorySize size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
+		void *buffer = NULL;
+
+		if (ZGReadBytes([currentProcess processTask], variable->address, &buffer, &size))
+		{
+			if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
+			{
+				[validVariables addObject:variable];
+				[currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:variable->size]];
+			}
+			
+			ZGFreeBytes([currentProcess processTask], buffer, size);
+		}
+	}];
+
+	if ([validVariables count] > 0)
+	{
+		[[self undoManager] setActionName:@"Size Change"];
+		[[[self undoManager] prepareWithInvocationTarget:self]
+		 editVariables:validVariables
+		 requestedSizes:currentVariableSizes];
+
+		[validVariables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+		{
+			variable->size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
+		}];
+		
+		[watchVariablesTableView reloadData];
+	}
+	else
+	{
+		NSRunAlertPanel(@"Failed to change size", @"The size that you have requested could not be changed. Perhaps it is too big of a value?", nil, nil, nil);
+	}
+
+	[currentVariableSizes release];
+	[validVariables release];
 }
 
 - (IBAction)editVariablesSizeOkayButton:(id)sender
 {
-    NSString *sizeExpression = [ZGCalculator evaluateExpression:[editVariablesSizeTextField stringValue]];
-    
-    ZGMemorySize requestedSize = 0;
-    if ([sizeExpression isHexRepresentation])
-    {
-        [[NSScanner scannerWithString:sizeExpression] scanHexLongLong:&requestedSize];
-    }
-    else
-    {
-        requestedSize = [sizeExpression unsignedLongLongValue];
-    }
-    
-    if (!isValidNumber(sizeExpression))
-    {
-        NSRunAlertPanel(@"Invalid size", @"The size you have supplied is not valid.", nil, nil, nil);
-    }
-    else if (requestedSize <= 0)
-    {
-        NSRunAlertPanel(@"Failed to edit size", @"The size must be greater than 0.", nil, nil, nil);
-    }
-    else
-    {
-        [NSApp endSheet:editVariablesSizeWindow];
-        [editVariablesSizeWindow close];
+	NSString *sizeExpression = [ZGCalculator evaluateExpression:[editVariablesSizeTextField stringValue]];
+
+	ZGMemorySize requestedSize = 0;
+	if ([sizeExpression isHexRepresentation])
+	{
+		[[NSScanner scannerWithString:sizeExpression] scanHexLongLong:&requestedSize];
+	}
+	else
+	{
+		requestedSize = [sizeExpression unsignedLongLongValue];
+	}
+	
+	if (!isValidNumber(sizeExpression))
+	{
+		NSRunAlertPanel(@"Invalid size", @"The size you have supplied is not valid.", nil, nil, nil);
+	}
+	else if (requestedSize <= 0)
+	{
+		NSRunAlertPanel(@"Failed to edit size", @"The size must be greater than 0.", nil, nil, nil);
+	}
+	else
+	{
+		[NSApp endSheet:editVariablesSizeWindow];
+		[editVariablesSizeWindow close];
+
+		NSArray *variables = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
+		NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
+
+		NSUInteger variableIndex;
+		for (variableIndex = 0; variableIndex < [variables count]; variableIndex++)
+		{
+			[requestedSizes addObject:[NSNumber numberWithUnsignedLongLong:requestedSize]];
+		}
+		
+		[self
+		 editVariables:variables
+		 requestedSizes:requestedSizes];
         
-        NSArray *variables = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
-        
-        NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
-        
-        NSUInteger variableIndex;
-        for (variableIndex = 0; variableIndex < [variables count]; variableIndex++)
-        {
-            [requestedSizes addObject:[NSNumber numberWithUnsignedLongLong:requestedSize]];
-        }
-        
-        [self editVariables:variables
-             requestedSizes:requestedSizes];
-        
-        [requestedSizes release];
-    }
+		[requestedSizes release];
+	}
 }
 
 - (IBAction)editVariablesSize:(id)sender
 {
-    ZGVariable *firstVariable = [watchVariablesArray objectAtIndex:[watchVariablesTableView selectedRow]];
-    [editVariablesSizeTextField setStringValue:[firstVariable sizeStringValue]];
+	ZGVariable *firstVariable = [watchVariablesArray objectAtIndex:[watchVariablesTableView selectedRow]];
+	[editVariablesSizeTextField setStringValue:[firstVariable sizeStringValue]];
 	
-	[NSApp beginSheet:editVariablesSizeWindow
-	   modalForWindow:watchWindow
-		modalDelegate:self
-	   didEndSelector:nil
-		  contextInfo:NULL];
+	[NSApp
+	 beginSheet:editVariablesSizeWindow
+	 modalForWindow:watchWindow
+	 modalDelegate:self
+	 didEndSelector:nil
+	 contextInfo:NULL];
 }
 
 #pragma mark Additional tasks handling

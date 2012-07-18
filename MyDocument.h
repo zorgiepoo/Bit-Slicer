@@ -31,65 +31,65 @@
 
 @interface MyDocument : NSDocument <NSTableViewDelegate>
 {
-	IBOutlet NSPopUpButton			     *runningApplicationsPopUpButton;
-	IBOutlet NSTextField			     *generalStatusTextField;
-	IBOutlet NSTextField			     *searchValueTextField;
-	IBOutlet NSTextField			     *searchValueLabel;
-	IBOutlet NSTextField			     *flagsTextField;
-	IBOutlet NSTextField			     *flagsLabel;
-	IBOutlet NSProgressIndicator	     *searchingProgressIndicator;
-	IBOutlet NSTableView			     *watchVariablesTableView;
-	IBOutlet NSPopUpButton			     *dataTypesPopUpButton;
-	IBOutlet NSPopUpButton			     *functionPopUpButton;
-	IBOutlet NSButton				     *optionsDisclosureButton;
-	IBOutlet NSView					     *optionsView;
-	IBOutlet NSButton				     *clearButton;
-	IBOutlet NSButton				     *searchButton;
-	IBOutlet NSMatrix				     *variableQualifierMatrix;
-	IBOutlet NSWindow				     *editVariablesValueWindow;
-	IBOutlet NSTextField			     *editVariablesValueTextField;
-	IBOutlet NSWindow				     *editVariablesAddressWindow;
-	IBOutlet NSTextField                 *editVariablesAddressTextField;
-    IBOutlet NSWindow                    *editVariablesSizeWindow;
-    IBOutlet NSTextField                 *editVariablesSizeTextField;
-	IBOutlet NSTextField			     *beginningAddressLabel;
-	IBOutlet NSTextField			     *beginningAddressTextField;
-	IBOutlet NSTextField			     *endingAddressLabel;
-	IBOutlet NSTextField			     *endingAddressTextField;
-	IBOutlet NSButton				     *scanUnwritableValuesCheckBox;
-	IBOutlet NSButton				     *ignoreDataAlignmentCheckBox;
-	IBOutlet NSButton				     *ignoreCaseCheckBox;
-	IBOutlet NSButton				     *includeNullTerminatorCheckBox;
-	IBOutlet NSWindow				     *watchWindow;
+	IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
+	IBOutlet NSTextField *generalStatusTextField;
+	IBOutlet NSTextField *searchValueTextField;
+	IBOutlet NSTextField *searchValueLabel;
+	IBOutlet NSTextField *flagsTextField;
+	IBOutlet NSTextField *flagsLabel;
+	IBOutlet NSProgressIndicator *searchingProgressIndicator;
+	IBOutlet NSTableView *watchVariablesTableView;
+	IBOutlet NSPopUpButton *dataTypesPopUpButton;
+	IBOutlet NSPopUpButton *functionPopUpButton;
+	IBOutlet NSButton *optionsDisclosureButton;
+	IBOutlet NSView *optionsView;
+	IBOutlet NSButton *clearButton;
+	IBOutlet NSButton *searchButton;
+	IBOutlet NSMatrix *variableQualifierMatrix;
+	IBOutlet NSWindow *editVariablesValueWindow;
+	IBOutlet NSTextField *editVariablesValueTextField;
+	IBOutlet NSWindow *editVariablesAddressWindow;
+	IBOutlet NSTextField *editVariablesAddressTextField;
+	IBOutlet NSWindow *editVariablesSizeWindow;
+	IBOutlet NSTextField *editVariablesSizeTextField;
+	IBOutlet NSTextField *beginningAddressLabel;
+	IBOutlet NSTextField *beginningAddressTextField;
+	IBOutlet NSTextField *endingAddressLabel;
+	IBOutlet NSTextField *endingAddressTextField;
+	IBOutlet NSButton *scanUnwritableValuesCheckBox;
+	IBOutlet NSButton *ignoreDataAlignmentCheckBox;
+	IBOutlet NSButton *ignoreCaseCheckBox;
+	IBOutlet NSButton *includeNullTerminatorCheckBox;
+	IBOutlet NSWindow *watchWindow;
 	IBOutlet ZGAdditionalTasksController *additionalTasksController;
-	NSArray							     *watchVariablesArray;
-	ZGProcess						     *currentProcess;
-	NSString						     *desiredProcessName;
-	ZGTimer							     *watchVariablesTimer;
-	ZGTimer							     *updateSearchUserInterfaceTimer;
-	BOOL							     shouldIgnoreTableViewSelectionChange;
-	ZGVariableType					     currentSearchDataType;
-	ZGSearchData					     *searchData;
-	ZGSearchArguments				     searchArguments;
+	NSArray *watchVariablesArray;
+	ZGProcess *currentProcess;
+	NSString *desiredProcessName;
+	ZGTimer *watchVariablesTimer;
+	ZGTimer *updateSearchUserInterfaceTimer;
+	BOOL shouldIgnoreTableViewSelectionChange;
+	ZGVariableType currentSearchDataType;
+	ZGSearchData *searchData;
+	ZGSearchArguments searchArguments;
 	
 	// For comparing unicode strings
-	CollatorRef						     collator;
-    
-    struct DocumentInfo
-    {
-        BOOL loadedFromSave;
-        NSInteger selectedDatatypeTag;
-        NSInteger qualifierTag;
-        NSInteger functionTypeTag;
-        BOOL scanUnwritableValues;
-        BOOL ignoreDataAlignment;
-        BOOL exactStringLength;
-        BOOL ignoreStringCase;
-        NSString *beginningAddress;
-        NSString *endingAddress;
-        NSString *searchValue;
-        NSArray *watchVariablesArray;
-    } documentState;
+	CollatorRef collator;
+	
+	struct DocumentInfo
+	{
+		BOOL loadedFromSave;
+		NSInteger selectedDatatypeTag;
+		NSInteger qualifierTag;
+		NSInteger functionTypeTag;
+		BOOL scanUnwritableValues;
+		BOOL ignoreDataAlignment;
+		BOOL exactStringLength;
+		BOOL ignoreStringCase;
+		NSString *beginningAddress;
+		NSString *endingAddress;
+		NSString *searchValue;
+		NSArray *watchVariablesArray;
+	} documentState;
 }
 
 - (ZGProcess *)currentProcess;

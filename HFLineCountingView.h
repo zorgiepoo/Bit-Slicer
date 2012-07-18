@@ -9,21 +9,22 @@
 #import <Cocoa/Cocoa.h>
 #import <HexFiend/HFLineCountingRepresenter.h>
 
-@interface HFLineCountingView : NSView {
-    NSFont *font;
-    CGFloat lineHeight;
-    HFFPRange lineRangeToDraw;
-    NSLayoutManager *layoutManager;
-    NSTextStorage *textStorage;
-    NSTextContainer *textContainer;
-    NSDictionary *textAttributes;
-    HFLineCountingRepresenter *representer; //not retained
-    
-    NSUInteger bytesPerLine;
-    unsigned long long storedLineIndex;
-    NSUInteger storedLineCount;
-    HFLineNumberFormat lineNumberFormat;
-    BOOL useStringDrawingPath;
+@interface HFLineCountingView : NSView
+{
+	NSFont *font;
+	CGFloat lineHeight;
+	HFFPRange lineRangeToDraw;
+	NSLayoutManager *layoutManager;
+	NSTextStorage *textStorage;
+	NSTextContainer *textContainer;
+	NSDictionary *textAttributes;
+	HFLineCountingRepresenter *representer; //not retained
+	
+	NSUInteger bytesPerLine;
+	unsigned long long storedLineIndex;
+	NSUInteger storedLineCount;
+	HFLineNumberFormat lineNumberFormat;
+	BOOL useStringDrawingPath;
 }
 
 - (void)setFont:(NSFont *)val;

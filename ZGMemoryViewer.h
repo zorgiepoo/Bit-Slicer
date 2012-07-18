@@ -22,7 +22,7 @@
 #import <HexFiend/HexFiend.h>
 #import "ZGMemoryTypes.h"
 
-#define ZGMemoryViewerIdentifier    @"ZGMemoryViewerIdentifier"
+#define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
 
 @class ZGStatusBarRepresenter;
 @class ZGLineCountingRepresenter;
@@ -41,7 +41,7 @@
 	ZGStatusBarRepresenter *statusBarRepresenter;
 	ZGLineCountingRepresenter *lineCountingRepresenter;
 	
-    ZGProcess *currentProcess;
+	ZGProcess *currentProcess;
 	ZGMemoryAddress currentMemoryAddress;
 	ZGMemorySize currentMemorySize;
 	

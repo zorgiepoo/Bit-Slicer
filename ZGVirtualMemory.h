@@ -32,7 +32,7 @@
 
 @interface ZGSearchData : NSObject
 {
-	@public
+@public
 	BOOL shouldCancelSearch;
 	BOOL searchDidCancel;
 	

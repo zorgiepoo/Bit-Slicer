@@ -25,17 +25,29 @@
 
 + (void)initialize
 {
-	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:INVALID_KEY_CODE]
-																						forKey:ZG_HOT_KEY]];
+	[[NSUserDefaults standardUserDefaults]
+	 registerDefaults:
+		[NSDictionary
+		 dictionaryWithObject:[NSNumber numberWithInteger:INVALID_KEY_CODE]
+		 forKey:ZG_HOT_KEY]];
     
-    [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:0]
-																						forKey:ZG_HOT_KEY_MODIFIER]];
+	[[NSUserDefaults standardUserDefaults]
+	 registerDefaults:
+		[NSDictionary
+		 dictionaryWithObject:[NSNumber numberWithInteger:0]
+		 forKey:ZG_HOT_KEY_MODIFIER]];
 	
-	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES]
-																						forKey:ZG_CHECK_FOR_UPDATES]];
+	[[NSUserDefaults standardUserDefaults]
+	 registerDefaults:
+		[NSDictionary
+		 dictionaryWithObject:[NSNumber numberWithBool:YES]
+		 forKey:ZG_CHECK_FOR_UPDATES]];
 	
-	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
-																						forKey:ZG_CHECK_FOR_ALPHA_UPDATES]];
+	[[NSUserDefaults standardUserDefaults]
+	 registerDefaults:
+		[NSDictionary
+		 dictionaryWithObject:[NSNumber numberWithBool:NO]
+		 forKey:ZG_CHECK_FOR_ALPHA_UPDATES]];
 }
 
 - (id)init
@@ -49,31 +61,29 @@
 
 - (void)windowDidLoad
 {
-    if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
-    {
-        [[self window] setRestorable:YES];
-        [[self window] setRestorationClass:[ZGAppController class]];
-        [[self window] setIdentifier:ZGPreferencesIdentifier];
-        [self invalidateRestorableState];
-    }
-    
-    [hotkeyRecorder setAllowsKeyOnly:YES
-                    escapeKeysRecord:NO];
-    
-    NSInteger hotkeyCode = [[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY];
-    // INVALID_KEY_CODE used to be set at -999 (now it's at -1), so just take this into account
-    if (hotkeyCode < INVALID_KEY_CODE)
-    {
-        hotkeyCode = INVALID_KEY_CODE;
-        [[NSUserDefaults standardUserDefaults] setInteger:INVALID_KEY_CODE
-                                                   forKey:ZG_HOT_KEY];
-    }
-    
-    KeyCombo hotkeyCombo;
-    hotkeyCombo.code = hotkeyCode;
-    hotkeyCombo.flags = SRCarbonToCocoaFlags([[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY_MODIFIER]);
-    
-    [hotkeyRecorder setKeyCombo:hotkeyCombo];
+	if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
+	{
+		[[self window] setRestorable:YES];
+		[[self window] setRestorationClass:[ZGAppController class]];
+		[[self window] setIdentifier:ZGPreferencesIdentifier];
+		[self invalidateRestorableState];
+	}
+	
+	[hotkeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
+	
+	NSInteger hotkeyCode = [[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY];
+	// INVALID_KEY_CODE used to be set at -999 (now it's at -1), so just take this into account
+	if (hotkeyCode < INVALID_KEY_CODE)
+	{
+		hotkeyCode = INVALID_KEY_CODE;
+		[[NSUserDefaults standardUserDefaults] setInteger:INVALID_KEY_CODE forKey:ZG_HOT_KEY];
+	}
+	
+	KeyCombo hotkeyCombo;
+	hotkeyCombo.code = hotkeyCode;
+	hotkeyCombo.flags = SRCarbonToCocoaFlags([[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY_MODIFIER]);
+	
+	[hotkeyRecorder setKeyCombo:hotkeyCombo];
 	
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_UPDATES])
 	{
@@ -91,13 +101,15 @@
 
 - (void)shortcutRecorder:(SRRecorderControl *)aRecorder keyComboDidChange:(KeyCombo)newKeyCombo
 {
-    [[NSUserDefaults standardUserDefaults] setInteger:[aRecorder keyCombo].code
-											   forKey:ZG_HOT_KEY];
+	[[NSUserDefaults standardUserDefaults]
+	 setInteger:[aRecorder keyCombo].code
+	 forKey:ZG_HOT_KEY];
     
-    [[NSUserDefaults standardUserDefaults] setInteger:SRCocoaToCarbonFlags([aRecorder keyCombo].flags)
-											   forKey:ZG_HOT_KEY_MODIFIER];
-    
-    [ZGAppController registerPauseAndUnpauseHotKey];
+	[[NSUserDefaults standardUserDefaults]
+	 setInteger:SRCocoaToCarbonFlags([aRecorder keyCombo].flags)
+	 forKey:ZG_HOT_KEY_MODIFIER];
+	
+	[ZGAppController registerPauseAndUnpauseHotKey];
 }
 
 - (IBAction)checkForUpdatesButton:(id)sender
@@ -106,22 +118,25 @@
 	{
 		[checkForAlphaUpdatesButton setEnabled:NO];
 		[checkForAlphaUpdatesButton setState:NSOffState];
-		[[NSUserDefaults standardUserDefaults] setBool:NO
-												forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+		[[NSUserDefaults standardUserDefaults]
+		 setBool:NO
+		 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 	}
 	else
 	{
 		[checkForAlphaUpdatesButton setEnabled:YES];
 	}
 	
-	[[NSUserDefaults standardUserDefaults] setBool:[checkForUpdatesButton state] == NSOnState
-											forKey:ZG_CHECK_FOR_UPDATES];
+	[[NSUserDefaults standardUserDefaults]
+	 setBool:([checkForUpdatesButton state] == NSOnState)
+	 forKey:ZG_CHECK_FOR_UPDATES];
 }
 
 - (IBAction)checkForAlphaUpdatesButton:(id)sender
 {
-	[[NSUserDefaults standardUserDefaults] setBool:[checkForAlphaUpdatesButton state] == NSOnState
-											forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+	[[NSUserDefaults standardUserDefaults]
+	 setBool:[checkForAlphaUpdatesButton state] == NSOnState
+	 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 }
 
 - (void)updateAlphaUpdatesUI

@@ -32,11 +32,11 @@
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 8
 
-#define ZGMemoryViewerAddressField      @"ZGMemoryViewerAddressField"
-#define ZGMemoryViewerSizeField         @"ZGMemoryViewerSizeField"
-#define ZGMemoryViewerAddress           @"ZGMemoryViewerAddress"
-#define ZGMemoryViewerSize              @"ZGMemoryViewerSize"
-#define ZGMemoryViewerProcessName       @"ZGMemoryViewerProcessName"
+#define ZGMemoryViewerAddressField @"ZGMemoryViewerAddressField"
+#define ZGMemoryViewerSizeField @"ZGMemoryViewerSizeField"
+#define ZGMemoryViewerAddress @"ZGMemoryViewerAddress"
+#define ZGMemoryViewerSize @"ZGMemoryViewerSize"
+#define ZGMemoryViewerProcessName @"ZGMemoryViewerProcessName"
 
 @interface ZGMemoryViewer (Private)
 
@@ -62,17 +62,17 @@
 
 - (void)setCurrentProcess:(ZGProcess *)newProcess
 {
-    [newProcess retain];
-    [currentProcess release];
-    
-    currentProcess = newProcess;
-    if (![currentProcess hasGrantedAccess])
-    {
-        if (![currentProcess grantUsAccess])
-        {
-            NSLog(@"Memory viewer failed to grant access to PID %d", [currentProcess processID]);
-        }
-    }
+	[newProcess retain];
+	[currentProcess release];
+	
+	currentProcess = newProcess;
+	if (![currentProcess hasGrantedAccess])
+	{
+		if (![currentProcess grantUsAccess])
+		{
+			NSLog(@"Memory viewer failed to grant access to PID %d", [currentProcess processID]);
+		}
+	}
 }
 
 #pragma mark Initialization
@@ -90,78 +90,85 @@
 {
     [super encodeRestorableStateWithCoder:coder];
     
-    [coder encodeObject:[addressTextField stringValue]
-                 forKey:ZGMemoryViewerAddressField];
+    [coder
+		 encodeObject:[addressTextField stringValue]
+		 forKey:ZGMemoryViewerAddressField];
     
-    [coder encodeObject:[sizeTextField stringValue]
-                 forKey:ZGMemoryViewerSizeField];
+    [coder
+		 encodeObject:[sizeTextField stringValue]
+		 forKey:ZGMemoryViewerSizeField];
     
-    [coder encodeInt64:(int64_t)currentMemoryAddress
-                forKey:ZGMemoryViewerAddress];
+    [coder
+		 encodeInt64:(int64_t)currentMemoryAddress
+		 forKey:ZGMemoryViewerAddress];
     
-    [coder encodeInt64:(int64_t)currentMemorySize
-                forKey:ZGMemoryViewerSize];
+    [coder
+		 encodeInt64:(int64_t)currentMemorySize
+		 forKey:ZGMemoryViewerSize];
     
-    [coder encodeObject:[[[runningApplicationsPopUpButton selectedItem] representedObject] name]
-                 forKey:ZGMemoryViewerProcessName];
+    [coder
+		 encodeObject:[[[runningApplicationsPopUpButton selectedItem] representedObject] name]
+		 forKey:ZGMemoryViewerProcessName];
 }
 
 - (void)restoreStateWithCoder:(NSCoder *)coder
 {
-    [super restoreStateWithCoder:coder];
-    
-    NSString *memoryViewerAddressField = [coder decodeObjectForKey:ZGMemoryViewerAddressField];
-    if (memoryViewerAddressField)
-    {
-        [addressTextField setStringValue:memoryViewerAddressField];
-    }
-    
-    NSString *memoryViewerSizeField = [coder decodeObjectForKey:ZGMemoryViewerSizeField];
-    if (memoryViewerSizeField)
-    {
-        [sizeTextField setStringValue:[coder decodeObjectForKey:ZGMemoryViewerSizeField]];
-    }
-    
-    currentMemoryAddress = [coder decodeInt64ForKey:ZGMemoryViewerAddress];
-    currentMemorySize = [coder decodeInt64ForKey:ZGMemoryViewerSize];
-    [self changeMemoryView:nil];
-    [self updateRunningApplicationProcesses:[coder decodeObjectForKey:ZGMemoryViewerProcessName]];
+	[super restoreStateWithCoder:coder];
+	
+	NSString *memoryViewerAddressField = [coder decodeObjectForKey:ZGMemoryViewerAddressField];
+	if (memoryViewerAddressField)
+	{
+		[addressTextField setStringValue:memoryViewerAddressField];
+	}
+	
+	NSString *memoryViewerSizeField = [coder decodeObjectForKey:ZGMemoryViewerSizeField];
+	if (memoryViewerSizeField)
+	{
+		[sizeTextField setStringValue:[coder decodeObjectForKey:ZGMemoryViewerSizeField]];
+	}
+	
+	currentMemoryAddress = [coder decodeInt64ForKey:ZGMemoryViewerAddress];
+	currentMemorySize = [coder decodeInt64ForKey:ZGMemoryViewerSize];
+	[self changeMemoryView:nil];
+	[self updateRunningApplicationProcesses:[coder decodeObjectForKey:ZGMemoryViewerProcessName]];
 }
 
 - (void)markChanges
 {
-    if ([self respondsToSelector:@selector(invalidateRestorableState)])
-    {
-        [self invalidateRestorableState];
-    }
+	if ([self respondsToSelector:@selector(invalidateRestorableState)])
+	{
+		[self invalidateRestorableState];
+	}
 }
 
 - (void)windowDidLoad
 {
 	// For handling windowWillClose:
 	[[self window] setDelegate:self];
-    
-    [[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
-    
-    if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
-    {
-        [[self window] setRestorable:YES];
-        [[self window] setRestorationClass:[ZGAppController class]];
-        [[self window] setIdentifier:ZGMemoryViewerIdentifier];
-        [self markChanges];
-    }
 	
+	[[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+	
+	if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
+	{
+		[[self window] setRestorable:YES];
+		[[self window] setRestorationClass:[ZGAppController class]];
+		[[self window] setIdentifier:ZGMemoryViewerIdentifier];
+		[self markChanges];
+	}
+
 	[self updateRunningApplicationProcesses:[[[ZGAppController sharedController] documentController] lastSelectedProcessName]];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(anApplicationLaunchedOrTerminated:)
-												 name:ZGProcessLaunched
-											   object:nil];
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(anApplicationLaunchedOrTerminated:)
+	 name:ZGProcessLaunched
+	 object:nil];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(anApplicationLaunchedOrTerminated:)
-												 name:ZGProcessTerminated
-											   object:nil];
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(anApplicationLaunchedOrTerminated:)
+	 name:ZGProcessTerminated
+	 object:nil];
 	
 	[[textView controller] setEditable:NO];
 	
@@ -213,11 +220,12 @@
 	
 	if (!checkMemoryTimer)
 	{
-		checkMemoryTimer = [[NSTimer scheduledTimerWithTimeInterval:READ_MEMORY_INTERVAL
-															 target:self
-														   selector:@selector(readMemory:)
-														   userInfo:nil
-															repeats:YES] retain];
+		checkMemoryTimer =
+			[[NSTimer scheduledTimerWithTimeInterval:READ_MEMORY_INTERVAL
+			 target:self
+			 selector:@selector(readMemory:)
+			 userInfo:nil
+			 repeats:YES] retain];
 	}
 }
 
@@ -260,9 +268,11 @@
 			NSImage *iconImage = [runningApplication icon];
 			[iconImage setSize:NSMakeSize(16, 16)];
 			[menuItem setImage:iconImage];
-			ZGProcess *representedProcess = [[ZGProcess alloc] initWithName:[runningApplication localizedName]
-																  processID:[runningApplication processIdentifier]
-																   set64Bit:([runningApplication executableArchitecture] == NSBundleExecutableArchitectureX86_64)];
+			ZGProcess *representedProcess =
+				[[ZGProcess alloc]
+				 initWithName:[runningApplication localizedName]
+				 processID:[runningApplication processIdentifier]
+				 set64Bit:([runningApplication executableArchitecture] == NSBundleExecutableArchitectureX86_64)];
 			[menuItem setRepresentedObject:representedProcess];
 			[representedProcess release];
 			
@@ -311,7 +321,7 @@
 	{
 		[self setCurrentProcess:[[runningApplicationsPopUpButton selectedItem] representedObject]];
 		[self clearData];
-        [self markChanges];
+		[self markChanges];
 	}
 }
 
@@ -339,39 +349,39 @@
 		if (memorySize > 0)
 		{
 			void *bytes = NULL;
-            
-            if (ZGReadBytes([currentProcess processTask], memoryAddress, &bytes, &memorySize) && memorySize > 0)
-            {
-                // Replace all the contents of the textview
-                [textView setData:[NSData dataWithBytes:bytes length:(NSUInteger)memorySize]];
-                currentMemoryAddress = memoryAddress;
-                currentMemorySize = memorySize;
-                
-                [statusBarRepresenter setBeginningMemoryAddress:currentMemoryAddress];
-                // Select the first byte of data
-                [[statusBarRepresenter controller] setSelectedContentsRanges:[NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(0, 0)]]];
-                // To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
-                [statusBarRepresenter updateString];
-                
-                [lineCountingRepresenter setMinimumDigitCount:HFCountDigitsBase16(memoryAddress + memorySize)];
-                [lineCountingRepresenter setBeginningMemoryAddress:currentMemoryAddress];
-                // This will force the line numbers to update
-                [[lineCountingRepresenter view] setNeedsDisplay:YES];
-                // This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
-                [[textView layoutRepresenter] performLayout];
-                
-                success = YES;
-                
-                ZGFreeBytes([currentProcess processTask], bytes, memorySize);
-            }
+			
+			if (ZGReadBytes([currentProcess processTask], memoryAddress, &bytes, &memorySize) && memorySize > 0)
+			{
+				// Replace all the contents of the textview
+				[textView setData:[NSData dataWithBytes:bytes length:(NSUInteger)memorySize]];
+				currentMemoryAddress = memoryAddress;
+				currentMemorySize = memorySize;
+				
+				[statusBarRepresenter setBeginningMemoryAddress:currentMemoryAddress];
+				// Select the first byte of data
+				[[statusBarRepresenter controller] setSelectedContentsRanges:[NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(0, 0)]]];
+				// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
+				[statusBarRepresenter updateString];
+				
+				[lineCountingRepresenter setMinimumDigitCount:HFCountDigitsBase16(memoryAddress + memorySize)];
+				[lineCountingRepresenter setBeginningMemoryAddress:currentMemoryAddress];
+				// This will force the line numbers to update
+				[[lineCountingRepresenter view] setNeedsDisplay:YES];
+				// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
+				[[textView layoutRepresenter] performLayout];
+				
+				success = YES;
+				
+				ZGFreeBytes([currentProcess processTask], bytes, memorySize);
+			}
 		}
 	}
-    
-    [self markChanges];
+	
+	[self markChanges];
 	
 	if (!success)
 	{
-        [self clearData];
+		[self clearData];
 	}
 }
 
@@ -409,18 +419,18 @@
 			}
 			
 			void *bytes = NULL;
-            if (ZGReadBytes([currentProcess processTask], readAddress, &bytes, &readSize) && readSize > 0)
-            {
-                HFFullMemoryByteSlice *byteSlice = [[HFFullMemoryByteSlice alloc] initWithData:[NSData dataWithBytes:bytes length:(NSUInteger)readSize]];
-                HFByteArray *newByteArray = [[textView controller] byteArray];
-                
-                [newByteArray insertByteSlice:byteSlice inRange:HFRangeMake((ZGMemoryAddress)(displayedLineRange.location * [[textView controller] bytesPerLine]), readSize)];
-                [[textView controller] replaceByteArray:newByteArray];
-                
-                [byteSlice release];
-                
-                ZGFreeBytes([currentProcess processTask], bytes, readSize);
-            }
+			if (ZGReadBytes([currentProcess processTask], readAddress, &bytes, &readSize) && readSize > 0)
+			{
+				HFFullMemoryByteSlice *byteSlice = [[HFFullMemoryByteSlice alloc] initWithData:[NSData dataWithBytes:bytes length:(NSUInteger)readSize]];
+				HFByteArray *newByteArray = [[textView controller] byteArray];
+				
+				[newByteArray insertByteSlice:byteSlice inRange:HFRangeMake((ZGMemoryAddress)(displayedLineRange.location * [[textView controller] bytesPerLine]), readSize)];
+				[[textView controller] replaceByteArray:newByteArray];
+				
+				[byteSlice release];
+				
+				ZGFreeBytes([currentProcess processTask], bytes, readSize);
+			}
 		}
 	}
 }
@@ -476,11 +486,12 @@
 
 - (void)jumpToMemoryAddressRequest
 {
-	[NSApp beginSheet:jumpToAddressWindow
-	   modalForWindow:[self window]
-		modalDelegate:self
-	   didEndSelector:nil
-		  contextInfo:NULL];
+	[NSApp
+	 beginSheet:jumpToAddressWindow
+	 modalForWindow:[self window]
+	 modalDelegate:self
+	 didEndSelector:nil
+	 contextInfo:NULL];
 }
 
 - (BOOL)canJumpToAddress

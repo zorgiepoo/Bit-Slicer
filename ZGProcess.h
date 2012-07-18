@@ -36,7 +36,7 @@
 	BOOL isStoringAllData;
 	
 	pid_t processID;
-    ZGMemoryMap processTask;
+	ZGMemoryMap processTask;
 	BOOL is64Bit;
 }
 
@@ -45,9 +45,7 @@
 + (void)removeFrozenProcess:(pid_t)pid;
 + (void)pauseOrUnpauseProcess:(pid_t)pid;
 
-- (id)initWithName:(NSString *)processName
-		 processID:(pid_t)aProcessID
-		  set64Bit:(BOOL)flag64Bit;
+- (id)initWithName:(NSString *)processName processID:(pid_t)aProcessID set64Bit:(BOOL)flag64Bit;
 - (BOOL)grantUsAccess;
 - (BOOL)hasGrantedAccess;
 

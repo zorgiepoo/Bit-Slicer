@@ -22,9 +22,7 @@
 
 @implementation ZGTimer
 
-- (id)initWithTimeInterval:(NSTimeInterval)timeInterval
-					target:(id)theTarget
-				  selector:(SEL)theSelector
+- (id)initWithTimeInterval:(NSTimeInterval)timeInterval target:(id)theTarget selector:(SEL)theSelector
 {
 	self = [super init];
 	
@@ -32,11 +30,13 @@
 	{
 		target = theTarget;
 		selector = theSelector;
-		timer = [[NSTimer scheduledTimerWithTimeInterval:timeInterval
-												  target:self
-												selector:@selector(invoke)
-												userInfo:nil
-												 repeats:YES] retain];
+		timer =
+			[[NSTimer
+			  scheduledTimerWithTimeInterval:timeInterval
+			  target:self
+			  selector:@selector(invoke)
+			  userInfo:nil
+			  repeats:YES] retain];
 	}
 	
 	return self;
@@ -44,8 +44,7 @@
 
 - (void)invoke
 {
-	[target performSelector:selector
-				 withObject:timer];
+	[target performSelector:selector withObject:timer];
 }
 
 - (void)invalidate
