@@ -19,7 +19,8 @@
  */
 
 #import "MyDocument.h"
-#import "ZGAdditionalTasksController.h"
+#import "ZGMemoryDumpController.h"
+#import "ZGMemoryProtectionController.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVariable.h"
@@ -94,6 +95,10 @@
 @implementation MyDocument
 
 #pragma mark Accessors
+
+@synthesize watchWindow;
+@synthesize searchingProgressIndicator;
+@synthesize generalStatusTextField;
 
 - (ZGProcess *)currentProcess
 {
@@ -2978,7 +2983,7 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
-	else if ([theMenuItem action] == @selector(memoryDumpRequest:) || [theMenuItem action] == @selector(memoryDumpAllRequest:) || [theMenuItem action] == @selector(getInitialValues:) || [theMenuItem action] == @selector(changeMemoryProtection:))
+	else if ([theMenuItem action] == @selector(memoryDumpRangeRequest:) || [theMenuItem action] == @selector(memoryDumpAllRequest:) || [theMenuItem action] == @selector(getInitialValues:) || [theMenuItem action] == @selector(changeMemoryProtection:))
 	{
 		if ([self canCancelTask] || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
 		{
@@ -3308,19 +3313,19 @@ static NSSize *expandedWindowMinSize = nil;
 
 #pragma mark Additional tasks handling
 
-- (IBAction)memoryDumpRequest:(id)sender
+- (IBAction)memoryDumpRangeRequest:(id)sender
 {
-	[additionalTasksController memoryDumpRequest];
+	[memoryDumpController memoryDumpRangeRequest];
 }
 
 - (IBAction)memoryDumpAllRequest:(id)sender
 {
-	[additionalTasksController memoryDumpAllRequest];
+	[memoryDumpController memoryDumpAllRequest];
 }
 
 - (IBAction)changeMemoryProtection:(id)sender
 {
-	[additionalTasksController changeMemoryProtectionRequest];
+	[memoryProtectionController changeMemoryProtectionRequest];
 }
 
 #pragma mark Pausing and Unpausing Processes

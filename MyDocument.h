@@ -25,7 +25,8 @@
 @class ZGSearchData;
 @class ZGProcess;
 @class ZGTimer;
-@class ZGAdditionalTasksController;
+@class ZGMemoryDumpController;
+@class ZGMemoryProtectionController;
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 
@@ -61,7 +62,8 @@
 	IBOutlet NSButton *ignoreCaseCheckBox;
 	IBOutlet NSButton *includeNullTerminatorCheckBox;
 	IBOutlet NSWindow *watchWindow;
-	IBOutlet ZGAdditionalTasksController *additionalTasksController;
+	IBOutlet ZGMemoryDumpController *memoryDumpController;
+	IBOutlet ZGMemoryProtectionController *memoryProtectionController;
 	NSArray *watchVariablesArray;
 	ZGProcess *currentProcess;
 	NSString *desiredProcessName;
@@ -91,6 +93,10 @@
 		NSArray *watchVariablesArray;
 	} documentState;
 }
+
+@property (readonly) IBOutlet NSWindow *watchWindow;
+@property (readonly) IBOutlet NSProgressIndicator *searchingProgressIndicator;
+@property (readonly) IBOutlet NSTextField *generalStatusTextField;
 
 - (ZGProcess *)currentProcess;
 - (NSArray *)selectedVariables;
@@ -125,8 +131,9 @@
 - (IBAction)editVariablesSizeOkayButton:(id)sender;
 - (IBAction)editVariablesSize:(id)sender;
 
-- (IBAction)memoryDumpRequest:(id)sender;
+- (IBAction)memoryDumpRangeRequest:(id)sender;
 - (IBAction)memoryDumpAllRequest:(id)sender;
+
 - (IBAction)changeMemoryProtection:(id)sender;
 
 - (IBAction)pauseOrUnpauseProcess:(id)sender;
