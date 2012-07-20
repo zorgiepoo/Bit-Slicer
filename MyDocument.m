@@ -99,11 +99,7 @@
 @synthesize watchWindow;
 @synthesize searchingProgressIndicator;
 @synthesize generalStatusTextField;
-
-- (ZGProcess *)currentProcess
-{
-	return currentProcess;
-}
+@synthesize currentProcess;
 
 - (NSArray *)selectedVariables
 {

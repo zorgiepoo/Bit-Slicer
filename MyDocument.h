@@ -97,8 +97,8 @@
 @property (readonly) IBOutlet NSWindow *watchWindow;
 @property (readonly) IBOutlet NSProgressIndicator *searchingProgressIndicator;
 @property (readonly) IBOutlet NSTextField *generalStatusTextField;
+@property (readonly) ZGProcess *currentProcess;
 
-- (ZGProcess *)currentProcess;
 - (NSArray *)selectedVariables;
 - (void)prepareDocumentTask;
 - (void)resumeDocument;
