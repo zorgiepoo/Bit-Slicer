@@ -378,7 +378,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 	vm_region_basic_info_data_t regionInfo;
 	mach_msg_type_number_t regionInfoSize = VM_REGION_BASIC_INFO_COUNT_64;
 
-	int currentRegionNumber = 0;
+	ZGMemorySize currentRegionNumber = 0;
 	
 	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS)
 	{
@@ -387,7 +387,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 			char *bytes = NULL;
 			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
 			{
-				int dataIndex = 0;
+				ZGMemorySize dataIndex = 0;
 				while (dataIndex + dataSize <= size && !searchData->shouldCancelSearch)
 				{
 					block(&bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);

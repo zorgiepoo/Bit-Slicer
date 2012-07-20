@@ -43,8 +43,7 @@
 }
 @end
 
-typedef void (^search_for_data_t)(void *data, void *data2, ZGMemoryAddress address, int currentRegionNumber);
-typedef void (^memory_dump_t)(int currentRegionNumber);
+typedef void (^search_for_data_t)(void *data, void *data2, ZGMemoryAddress address, ZGMemorySize currentRegionNumber);
 
 BOOL ZGIsProcessValid(pid_t process, ZGMemoryMap *task);
 int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask);

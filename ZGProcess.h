@@ -28,7 +28,7 @@
 	
 @public
 	// searching related stuff
-	int searchProgress;
+	ZGMemorySize searchProgress;
 	int numberOfVariablesFound;
 	
 	// other task-intensive related stuff

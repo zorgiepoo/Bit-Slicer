@@ -712,7 +712,7 @@
 {
 	if ([[self windowForSheet] isVisible])
 	{
-		[searchingProgressIndicator setDoubleValue:currentProcess->searchProgress];
+		[searchingProgressIndicator setDoubleValue:(double)currentProcess->searchProgress];
 	}
 }
 
@@ -722,7 +722,7 @@
 	{
 		if (!ZGSearchIsCancelling(searchData))
 		{
-			[searchingProgressIndicator setDoubleValue:currentProcess->searchProgress];
+			[searchingProgressIndicator setDoubleValue:(double)currentProcess->searchProgress];
 			[self updateNumberOfVariablesFoundDisplay];
 		}
 		else
@@ -1712,7 +1712,7 @@ static NSSize *expandedWindowMinSize = nil;
 	currentProcess->searchProgress = 0;
 	if (ZGSearchDidCancelSearch(searchData))
 	{
-		[searchingProgressIndicator setDoubleValue:currentProcess->searchProgress];
+		[searchingProgressIndicator setDoubleValue:(double)currentProcess->searchProgress];
 		[generalStatusTextField setStringValue:@"Search canceled."];
 	}
 	else
@@ -1979,7 +1979,7 @@ static NSSize *expandedWindowMinSize = nil;
 				? sizeof(int64_t)
 				: sizeof(int32_t);
 			
-			search_for_data_t searchForDataCallback = ^(void *data, void *data2, ZGMemoryAddress address, int currentRegionNumber)
+			search_for_data_t searchForDataCallback = ^(void *data, void *data2, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
 			{
 				if ((!searchArguments.beginAddressExists || searchArguments.beginAddress <= address) &&
 					(!searchArguments.endAddressExists || searchArguments.endAddress >= address + dataSize) &&
@@ -2193,7 +2193,7 @@ static NSSize *expandedWindowMinSize = nil;
 			
 			[generalStatusTextField setStringValue:@"Finished Memory Store"];
 		}
-		[searchingProgressIndicator setDoubleValue:0];
+		[searchingProgressIndicator setDoubleValue:0.0];
 		[self resumeDocument];
 	};
 	
