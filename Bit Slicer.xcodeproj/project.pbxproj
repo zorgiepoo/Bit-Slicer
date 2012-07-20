@@ -12,6 +12,7 @@
 		770930AC15B8F72F009705A6 /* ZGMemoryDumpController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */; };
 		770930AF15B9003D009705A6 /* ZGMemoryProtectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930AE15B9003D009705A6 /* ZGMemoryProtectionController.m */; };
 		770930B215B9070B009705A6 /* ZGDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930B115B9070B009705A6 /* ZGDocument.m */; };
+		770930B515B92204009705A6 /* ZGVariableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930B415B92203009705A6 /* ZGVariableController.m */; };
 		770EA821137B6E6D007FB85A /* ZGMemoryViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */; };
 		770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770EA822137B6FDE007FB85A /* MemoryViewer.xib */; };
 		770EA826137B74C6007FB85A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 770EA825137B74C6007FB85A /* HexFiend.framework */; };
@@ -74,6 +75,8 @@
 		770930AE15B9003D009705A6 /* ZGMemoryProtectionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryProtectionController.m; sourceTree = "<group>"; };
 		770930B015B9070B009705A6 /* ZGDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDocument.h; sourceTree = "<group>"; };
 		770930B115B9070B009705A6 /* ZGDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDocument.m; sourceTree = "<group>"; };
+		770930B315B92203009705A6 /* ZGVariableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVariableController.h; sourceTree = "<group>"; };
+		770930B415B92203009705A6 /* ZGVariableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVariableController.m; sourceTree = "<group>"; };
 		770EA81F137B6E6D007FB85A /* ZGMemoryViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryViewer.h; sourceTree = "<group>"; };
 		770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryViewer.m; sourceTree = "<group>"; };
 		770EA823137B6FDE007FB85A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MemoryViewer.xib; sourceTree = "<group>"; };
@@ -187,12 +190,14 @@
 				77D5AEAC137C6FC000026388 /* Memory Viewer */,
 				775FCB1011719DF6000054FB /* ZGAppController.h */,
 				775FCB1111719DF6000054FB /* ZGAppController.m */,
+				775FCB1411719DF6000054FB /* ZGPreferencesController.h */,
+				775FCB1511719DF6000054FB /* ZGPreferencesController.m */,
 				775FCB1211719DF6000054FB /* ZGDocumentController.h */,
 				775FCB1311719DF6000054FB /* ZGDocumentController.m */,
 				770930B015B9070B009705A6 /* ZGDocument.h */,
 				770930B115B9070B009705A6 /* ZGDocument.m */,
-				775FCB1411719DF6000054FB /* ZGPreferencesController.h */,
-				775FCB1511719DF6000054FB /* ZGPreferencesController.m */,
+				770930B315B92203009705A6 /* ZGVariableController.h */,
+				770930B415B92203009705A6 /* ZGVariableController.m */,
 				770930AA15B8F72F009705A6 /* ZGMemoryDumpController.h */,
 				770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */,
 				770930AD15B9003D009705A6 /* ZGMemoryProtectionController.h */,
@@ -359,6 +364,7 @@
 				770930AC15B8F72F009705A6 /* ZGMemoryDumpController.m in Sources */,
 				770930AF15B9003D009705A6 /* ZGMemoryProtectionController.m in Sources */,
 				770930B215B9070B009705A6 /* ZGDocument.m in Sources */,
+				770930B515B92204009705A6 /* ZGVariableController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

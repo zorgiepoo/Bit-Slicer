@@ -25,6 +25,7 @@
 @class ZGSearchData;
 @class ZGProcess;
 @class ZGTimer;
+@class ZGVariableController;
 @class ZGMemoryDumpController;
 @class ZGMemoryProtectionController;
 
@@ -47,12 +48,6 @@
 	IBOutlet NSButton *clearButton;
 	IBOutlet NSButton *searchButton;
 	IBOutlet NSMatrix *variableQualifierMatrix;
-	IBOutlet NSWindow *editVariablesValueWindow;
-	IBOutlet NSTextField *editVariablesValueTextField;
-	IBOutlet NSWindow *editVariablesAddressWindow;
-	IBOutlet NSTextField *editVariablesAddressTextField;
-	IBOutlet NSWindow *editVariablesSizeWindow;
-	IBOutlet NSTextField *editVariablesSizeTextField;
 	IBOutlet NSTextField *beginningAddressLabel;
 	IBOutlet NSTextField *beginningAddressTextField;
 	IBOutlet NSTextField *endingAddressLabel;
@@ -62,6 +57,7 @@
 	IBOutlet NSButton *ignoreCaseCheckBox;
 	IBOutlet NSButton *includeNullTerminatorCheckBox;
 	IBOutlet NSWindow *watchWindow;
+	IBOutlet ZGVariableController *variableController;
 	IBOutlet ZGMemoryDumpController *memoryDumpController;
 	IBOutlet ZGMemoryProtectionController *memoryProtectionController;
 	NSArray *watchVariablesArray;
@@ -97,7 +93,10 @@
 @property (readonly) IBOutlet NSWindow *watchWindow;
 @property (readonly) IBOutlet NSProgressIndicator *searchingProgressIndicator;
 @property (readonly) IBOutlet NSTextField *generalStatusTextField;
+@property (readonly) IBOutlet NSTableView *watchVariablesTableView;
+@property (readonly) NSArray *watchVariablesArray;
 @property (readonly) ZGProcess *currentProcess;
+@property (readwrite) BOOL shouldIgnoreTableViewSelectionChange;
 
 - (NSArray *)selectedVariables;
 - (void)prepareDocumentTask;
@@ -117,18 +116,8 @@
 - (IBAction)addVariable:(id)sender;
 - (IBAction)freezeVariables:(id)sender;
 
-- (IBAction)markDocumentChange:(id)sender;
-
-- (IBAction)editVariablesValueCancelButton:(id)sender;
-- (IBAction)editVariablesValueOkayButton:(id)sender;
 - (IBAction)editVariablesValue:(id)sender;
-
-- (IBAction)editVariablesAddressCancelButton:(id)sender;
-- (IBAction)editVariablesAddressOkayButton:(id)sender;
 - (IBAction)editVariablesAddress:(id)sender;
-
-- (IBAction)editVariablesSizeCancelButton:(id)sender;
-- (IBAction)editVariablesSizeOkayButton:(id)sender;
 - (IBAction)editVariablesSize:(id)sender;
 
 - (IBAction)memoryDumpRangeRequest:(id)sender;
