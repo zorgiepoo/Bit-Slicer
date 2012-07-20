@@ -28,7 +28,6 @@
 	NSString *lastSelectedProcessName;
 }
 
-- (void)setLastSelectedProcessName:(NSString *)processName;
-- (NSString *)lastSelectedProcessName;
+@property (readwrite, copy) NSString *lastSelectedProcessName;
 
 @end
