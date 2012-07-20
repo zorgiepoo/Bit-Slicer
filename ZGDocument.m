@@ -3307,7 +3307,7 @@ static NSSize *expandedWindowMinSize = nil;
 	 contextInfo:NULL];
 }
 
-#pragma mark Additional tasks handling
+#pragma mark Memory Dump Handling
 
 - (IBAction)memoryDumpRangeRequest:(id)sender
 {
@@ -3318,6 +3318,8 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	[memoryDumpController memoryDumpAllRequest];
 }
+
+#pragma mark Memory Protection Handling
 
 - (IBAction)changeMemoryProtection:(id)sender
 {
