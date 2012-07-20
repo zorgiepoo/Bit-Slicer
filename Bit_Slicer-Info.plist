@@ -22,7 +22,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>NSDocumentClass</key>
-			<string>MyDocument</string>
+			<string>ZGDocument</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>

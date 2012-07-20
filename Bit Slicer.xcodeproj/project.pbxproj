@@ -11,6 +11,7 @@
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
 		770930AC15B8F72F009705A6 /* ZGMemoryDumpController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */; };
 		770930AF15B9003D009705A6 /* ZGMemoryProtectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930AE15B9003D009705A6 /* ZGMemoryProtectionController.m */; };
+		770930B215B9070B009705A6 /* ZGDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930B115B9070B009705A6 /* ZGDocument.m */; };
 		770EA821137B6E6D007FB85A /* ZGMemoryViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */; };
 		770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770EA822137B6FDE007FB85A /* MemoryViewer.xib */; };
 		770EA826137B74C6007FB85A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 770EA825137B74C6007FB85A /* HexFiend.framework */; };
@@ -38,7 +39,6 @@
 		77F6097013DBCE2000FD5D92 /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */; };
 		77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FC461F12237F71003CB09B /* NSStringAdditions.m */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
-		8D15AC310486D014006FF6A4 /* MyDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* MyDocument.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -65,8 +65,6 @@
 		1DDD58290DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MyDocument.xib; sourceTree = "<group>"; };
 		1DDD582B0DA1D0D100B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		2564AD2C0F5327BB00F57823 /* Bit_Slicer_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bit_Slicer_Prefix.pch; sourceTree = "<group>"; };
-		2A37F4ACFDCFA73011CA2CEA /* MyDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyDocument.m; sourceTree = "<group>"; };
-		2A37F4AEFDCFA73011CA2CEA /* MyDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyDocument.h; sourceTree = "<group>"; };
 		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -74,6 +72,8 @@
 		770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryDumpController.m; sourceTree = "<group>"; };
 		770930AD15B9003D009705A6 /* ZGMemoryProtectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryProtectionController.h; sourceTree = "<group>"; };
 		770930AE15B9003D009705A6 /* ZGMemoryProtectionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryProtectionController.m; sourceTree = "<group>"; };
+		770930B015B9070B009705A6 /* ZGDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDocument.h; sourceTree = "<group>"; };
+		770930B115B9070B009705A6 /* ZGDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDocument.m; sourceTree = "<group>"; };
 		770EA81F137B6E6D007FB85A /* ZGMemoryViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryViewer.h; sourceTree = "<group>"; };
 		770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryViewer.m; sourceTree = "<group>"; };
 		770EA823137B6FDE007FB85A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MemoryViewer.xib; sourceTree = "<group>"; };
@@ -189,10 +189,10 @@
 				775FCB1111719DF6000054FB /* ZGAppController.m */,
 				775FCB1211719DF6000054FB /* ZGDocumentController.h */,
 				775FCB1311719DF6000054FB /* ZGDocumentController.m */,
+				770930B015B9070B009705A6 /* ZGDocument.h */,
+				770930B115B9070B009705A6 /* ZGDocument.m */,
 				775FCB1411719DF6000054FB /* ZGPreferencesController.h */,
 				775FCB1511719DF6000054FB /* ZGPreferencesController.m */,
-				2A37F4AEFDCFA73011CA2CEA /* MyDocument.h */,
-				2A37F4ACFDCFA73011CA2CEA /* MyDocument.m */,
 				770930AA15B8F72F009705A6 /* ZGMemoryDumpController.h */,
 				770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */,
 				770930AD15B9003D009705A6 /* ZGMemoryProtectionController.h */,
@@ -339,7 +339,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D15AC310486D014006FF6A4 /* MyDocument.m in Sources */,
 				8D15AC320486D014006FF6A4 /* main.m in Sources */,
 				775FCB1B11719DF6000054FB /* ZGAppController.m in Sources */,
 				775FCB1C11719DF6000054FB /* ZGDocumentController.m in Sources */,
@@ -359,6 +358,7 @@
 				77D5AEB5137C84D300026388 /* ZGVerticalScrollerRepresenter.m in Sources */,
 				770930AC15B8F72F009705A6 /* ZGMemoryDumpController.m in Sources */,
 				770930AF15B9003D009705A6 /* ZGMemoryProtectionController.m in Sources */,
+				770930B215B9070B009705A6 /* ZGDocument.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

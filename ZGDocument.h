@@ -30,7 +30,7 @@
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 
-@interface MyDocument : NSDocument <NSTableViewDelegate>
+@interface ZGDocument : NSDocument <NSTableViewDelegate>
 {
 	IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 	IBOutlet NSTextField *generalStatusTextField;

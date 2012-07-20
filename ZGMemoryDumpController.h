@@ -19,11 +19,11 @@
  */
 
 #import <Foundation/Foundation.h>
-@class MyDocument;
+@class ZGDocument;
 
 @interface ZGMemoryDumpController : NSObject
 {
-	IBOutlet MyDocument *document;
+	IBOutlet ZGDocument *document;
 	
 	IBOutlet NSWindow *memoryDumpWindow;
 	IBOutlet NSTextField *memoryDumpFromAddressTextField;

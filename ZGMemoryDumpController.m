@@ -19,7 +19,7 @@
  */
 
 #import "ZGMemoryDumpController.h"
-#import "MyDocument.h"
+#import "ZGDocument.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGMemoryTypes.h"

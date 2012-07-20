@@ -18,7 +18,7 @@
  * Copyright 2010 zgcoder. All rights reserved.
  */
 
-#import "MyDocument.h"
+#import "ZGDocument.h"
 #import "ZGMemoryDumpController.h"
 #import "ZGMemoryProtectionController.h"
 #import "ZGProcess.h"
@@ -33,7 +33,7 @@
 #import "ZGTimer.h"
 #import "ZGUtilities.h"
 
-@interface MyDocument (Private)
+@interface ZGDocument (Private)
 
 - (void)updateRunningApplicationProcesses;
 
@@ -92,7 +92,7 @@
 
 #define ZG_EXPAND_OPTIONS @"ZG_EXPAND_OPTIONS"
 
-@implementation MyDocument
+@implementation ZGDocument
 
 #pragma mark Accessors
 
