@@ -2084,8 +2084,8 @@ static NSSize *expandedWindowMinSize = nil;
 	[[self undoManager] setActionName:@"Move"];
 	[[[self undoManager] prepareWithInvocationTarget:self] reorderVariables:watchVariablesArray];
 	
-	[watchVariablesArray release];
-	watchVariablesArray = [[NSArray arrayWithArray:newVariables] retain];
+	[self setWatchVariablesArray:[NSArray arrayWithArray:newVariables]];
+	
 	[watchVariablesTableView reloadData];
 }
 
