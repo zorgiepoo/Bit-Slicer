@@ -93,8 +93,9 @@
 @property (readonly) IBOutlet NSWindow *watchWindow;
 @property (readonly) IBOutlet NSProgressIndicator *searchingProgressIndicator;
 @property (readonly) IBOutlet NSTextField *generalStatusTextField;
+@property (readonly) IBOutlet NSMatrix *variableQualifierMatrix;
 @property (readonly) IBOutlet NSTableView *watchVariablesTableView;
-@property (readonly) NSArray *watchVariablesArray;
+@property (readwrite, retain) NSArray *watchVariablesArray;
 @property (readonly) ZGProcess *currentProcess;
 @property (readwrite) BOOL shouldIgnoreTableViewSelectionChange;
 

@@ -20,6 +20,8 @@
 
 #import "ZGVariableController.h"
 #import "ZGDocument.h"
+#import "ZGAppController.h"
+#import "ZGMemoryViewer.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
 #import "NSStringAdditions.h"
@@ -27,6 +29,202 @@
 #import "ZGUtilities.h"
 
 @implementation ZGVariableController
+
+#pragma mark Freezing variables
+
+- (void)freezeOrUnfreezeVariablesAtRoxIndexes:(NSIndexSet *)rowIndexes
+{
+	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger rowIndex, BOOL *stop)
+	 {
+		 ZGVariable *variable = [[document watchVariablesArray] objectAtIndex:rowIndex];
+		 variable->isFrozen = !(variable->isFrozen);
+		 
+		 if (variable->isFrozen)
+		 {
+			 [variable setFreezeValue:variable->value];
+		 }
+	 }];
+	
+	[[document watchVariablesTableView] reloadData];
+	
+	// check whether we want to use "Undo Freeze" or "Redo Freeze" or "Undo Unfreeze" or "Redo Unfreeze"
+	if (((ZGVariable *)[[document watchVariablesArray] objectAtIndex:[rowIndexes firstIndex]])->isFrozen)
+	{
+		if ([[document undoManager] isUndoing])
+		{
+			[[document undoManager] setActionName:@"Unfreeze"];
+		}
+		else
+		{
+			[[document undoManager] setActionName:@"Freeze"];
+		}
+	}
+	else
+	{
+		if ([[document undoManager] isUndoing])
+		{
+			[[document undoManager] setActionName:@"Freeze"];
+		}
+		else
+		{
+			[[document undoManager] setActionName:@"Unfreeze"];
+		}
+	}
+	
+	[[[document undoManager] prepareWithInvocationTarget:self] freezeOrUnfreezeVariablesAtRoxIndexes:rowIndexes];
+}
+
+- (void)freezeVariables
+{
+	[self freezeOrUnfreezeVariablesAtRoxIndexes:[[document watchVariablesTableView] selectedRowIndexes]];
+}
+
+#pragma mark Copying & Pasting
+
+- (void)copyVariables
+{
+	[[NSPasteboard generalPasteboard]
+	 declareTypes:[NSArray arrayWithObjects:NSStringPboardType, ZGVariablePboardType, nil]
+	 owner:self];
+	
+	NSMutableString *stringToWrite = [[NSMutableString alloc] init];
+	NSArray *variablesArray = [[document watchVariablesArray] objectsAtIndexes:[[document watchVariablesTableView] selectedRowIndexes]];
+	
+	for (ZGVariable *variable in variablesArray)
+	{
+		[stringToWrite appendFormat:@"%@ %@ %@\n", [variable name], [variable addressStringValue], [variable stringValue]];
+	}
+	
+	// Remove the last '\n' character
+	[stringToWrite deleteCharactersInRange:NSMakeRange([stringToWrite length] - 1, 1)];
+	
+	[[NSPasteboard generalPasteboard]
+	 setString:stringToWrite
+	 forType:NSStringPboardType];
+	
+	[stringToWrite release];
+	
+	[[NSPasteboard generalPasteboard]
+	 setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray]
+	 forType:ZGVariablePboardType];
+}
+
+- (void)pasteVariables
+{
+	NSData *pasteboardData = [[NSPasteboard generalPasteboard] dataForType:ZGVariablePboardType];
+	if (pasteboardData)
+	{
+		NSArray *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
+		NSInteger currentIndex = [[document watchVariablesTableView] selectedRow];
+		if (currentIndex == -1)
+		{
+			currentIndex = 0;
+		}
+		else
+		{
+			currentIndex++;
+		}
+		
+		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, [variablesToInsertArray count])];
+		
+		[self
+		 addVariables:variablesToInsertArray
+		 atRowIndexes:indexesToInsert];
+	}
+}
+
+#pragma mark Adding & Removing Variables
+
+- (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
+{
+	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithCapacity:[[document watchVariablesArray] count]];
+	
+	if ([[document undoManager] isUndoing])
+	{
+		[[document undoManager] setActionName:[NSString stringWithFormat:@"Add Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
+	}
+	else
+	{
+		[[document undoManager] setActionName:[NSString stringWithFormat:@"Delete Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
+	}
+	[[[document undoManager] prepareWithInvocationTarget:self]
+	 addVariables:[[document watchVariablesArray] objectsAtIndexes:rowIndexes]
+	 atRowIndexes:rowIndexes];
+	
+	[temporaryArray addObjectsFromArray:[document watchVariablesArray]];
+	[temporaryArray removeObjectsAtIndexes:rowIndexes];
+	
+	[document setWatchVariablesArray:[NSArray arrayWithArray:temporaryArray]];
+	[temporaryArray release];
+	
+	[[document watchVariablesTableView] reloadData];
+}
+
+- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes
+{
+	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithArray:[document watchVariablesArray]];
+	[temporaryArray insertObjects:variables
+						atIndexes:rowIndexes];
+	
+	[document setWatchVariablesArray:[NSArray arrayWithArray:temporaryArray]];
+	
+	[temporaryArray release];
+	[[document watchVariablesTableView] reloadData];
+	
+	if ([[document undoManager] isUndoing])
+	{
+		[[document undoManager] setActionName:[NSString stringWithFormat:@"Delete Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
+	}
+	else
+	{
+		[[document undoManager] setActionName:[NSString stringWithFormat:@"Add Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
+	}
+	[[[document undoManager] prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
+	
+	[[document generalStatusTextField] setStringValue:@""];
+}
+
+- (void)removeSelectedSearchValues
+{
+	[self removeVariablesAtRowIndexes:[[document watchVariablesTableView] selectedRowIndexes]];
+	[[document generalStatusTextField] setStringValue:@""];
+}
+
+- (void)addVariable:(id)sender
+{
+	ZGVariableQualifier qualifier = [[[document variableQualifierMatrix] cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
+	
+	// Try to get an initial address from the memory viewer's selection
+	ZGMemoryAddress initialAddress = 0x0;
+	if ([[ZGAppController sharedController] memoryViewer] && [[[ZGAppController sharedController] memoryViewer] currentProcessIdentifier] == [[document currentProcess] processID])
+	{
+		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddress];
+	}
+	
+	ZGVariable *variable =
+	[[ZGVariable alloc]
+	 initWithValue:NULL
+	 size:0
+	 address:initialAddress
+	 type:(ZGVariableType)[sender tag]
+	 qualifier:qualifier
+	 pointerSize:[document currentProcess]->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+	
+	[variable setShouldBeSearched:NO];
+	
+	[self
+	 addVariables:[NSArray arrayWithObject:variable]
+	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
+	
+	[variable release];
+	
+	// have the user edit the variable's address
+	[[document watchVariablesTableView]
+	 editColumn:[[document watchVariablesTableView] columnWithIdentifier:@"address"]
+	 row:0
+	 withEvent:nil
+	 select:YES];
+}
 
 #pragma mark Changing Variables
 

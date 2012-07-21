@@ -22,6 +22,8 @@
 #import "ZGMemoryTypes.h"
 #import "ZGVariable.h"
 
+#define SIGNED_BUTTON_CELL_TAG 0
+
 @class ZGDocument;
 
 @interface ZGVariableController : NSObject
@@ -35,6 +37,14 @@
 	IBOutlet NSWindow *editVariablesSizeWindow;
 	IBOutlet NSTextField *editVariablesSizeTextField;
 }
+
+- (void)freezeVariables;
+
+- (void)copyVariables;
+- (void)pasteVariables;
+
+- (void)removeSelectedSearchValues;
+- (void)addVariable:(id)sender;
 
 - (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName;
 - (void)changeVariable:(ZGVariable *)variable newAddress:(NSString *)newAddress;

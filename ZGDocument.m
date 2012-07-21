@@ -38,11 +38,7 @@
 
 - (void)updateRunningApplicationProcesses;
 
-- (void)setWatchVariablesArray:(NSArray *)newWatchVariablesArray;
-
-- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
-
-- (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes;
+- (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray;
 
 - (void)lockTarget;
 - (void)unlockTarget;
@@ -61,7 +57,6 @@
 
 @end
 
-#define SIGNED_BUTTON_CELL_TAG 0
 #define VALUE_TABLE_COLUMN_INDEX 1
 #define NON_EXISTENT_PID_NUMBER -1
 
@@ -104,6 +99,7 @@
 @synthesize watchVariablesTableView;
 @synthesize watchVariablesArray;
 @synthesize shouldIgnoreTableViewSelectionChange;
+@synthesize variableQualifierMatrix;
 
 - (NSArray *)selectedVariables
 {
@@ -224,7 +220,7 @@
 
 	if (documentState.loadedFromSave)
 	{
-		[self setWatchVariablesArray:documentState.watchVariablesArray];
+		[self setWatchVariablesArrayAndUpdateInterface:documentState.watchVariablesArray];
 		[documentState.watchVariablesArray release];
         
 		[self
@@ -266,7 +262,7 @@
 	}
 	else
 	{
-		[self setWatchVariablesArray:[NSArray array]];
+		[self setWatchVariablesArrayAndUpdateInterface:[NSArray array]];
 		searchArguments.lastEpsilonValue = [[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON] retain];
 		[flagsLabel setTextColor:[NSColor disabledControlTextColor]];
 	}
@@ -1175,149 +1171,6 @@ static NSSize *expandedWindowMinSize = nil;
 	 markChanges:YES];
 }
 
-#pragma mark Adding & Removing Variables
-
-- (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
-{
-	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithCapacity:[watchVariablesArray count]];
-	
-	if ([[self undoManager] isUndoing])
-	{
-		[[self undoManager] setActionName:[NSString stringWithFormat:@"Add Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
-	}
-	else
-	{
-		[[self undoManager] setActionName:[NSString stringWithFormat:@"Delete Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
-	}
-	[[[self undoManager] prepareWithInvocationTarget:self]
-	 addVariables:[watchVariablesArray objectsAtIndexes:rowIndexes]
-	 atRowIndexes:rowIndexes];
-	
-	[temporaryArray addObjectsFromArray:watchVariablesArray];
-	[temporaryArray removeObjectsAtIndexes:rowIndexes];
-	
-	[watchVariablesArray release];
-	watchVariablesArray = [[NSArray arrayWithArray:temporaryArray] retain];
-	[temporaryArray release];
-	
-	[watchVariablesTableView reloadData];
-}
-
-- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes
-{
-	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithArray:watchVariablesArray];
-	[temporaryArray insertObjects:variables
-						atIndexes:rowIndexes];
-	
-	[watchVariablesArray release];
-	watchVariablesArray = [[NSArray arrayWithArray:temporaryArray] retain];
-	[temporaryArray release];
-	[watchVariablesTableView reloadData];
-	
-	if ([[self undoManager] isUndoing])
-	{
-		[[self undoManager] setActionName:[NSString stringWithFormat:@"Delete Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
-	}
-	else
-	{
-		[[self undoManager] setActionName:[NSString stringWithFormat:@"Add Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
-	}
-	[[[self undoManager] prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
-	
-	[generalStatusTextField setStringValue:@""];
-}
-
-- (IBAction)removeSelectedSearchValues:(id)sender
-{
-	[self removeVariablesAtRowIndexes:[watchVariablesTableView selectedRowIndexes]];
-	[generalStatusTextField setStringValue:@""];
-}
-
-- (IBAction)addVariable:(id)sender
-{
-	ZGVariableQualifier qualifier = [[variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
-	
-	// Try to get an initial address from the memory viewer's selection
-	ZGMemoryAddress initialAddress = 0x0;
-	if ([[ZGAppController sharedController] memoryViewer] && [[[ZGAppController sharedController] memoryViewer] currentProcessIdentifier] == [currentProcess processID])
-	{
-		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddress];
-	}
-	
-	ZGVariable *variable =
-		[[ZGVariable alloc]
-		 initWithValue:NULL
-		 size:0
-		 address:initialAddress
-		 type:(ZGVariableType)[sender tag]
-		 qualifier:qualifier
-		 pointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
-	
-	[variable setShouldBeSearched:NO];
-	
-	[self
-	 addVariables:[NSArray arrayWithObject:variable]
-	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
-	
-	[variable release];
-	
-	// have the user edit the variable's address
-	[watchVariablesTableView
-	 editColumn:[watchVariablesTableView columnWithIdentifier:@"address"]
-	 row:0
-	 withEvent:nil
-	 select:YES];
-}
-
-#pragma mark Freezing variables
-
-- (void)freezeOrUnfreezeVariablesAtRoxIndexes:(NSIndexSet *)rowIndexes
-{
-	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger rowIndex, BOOL *stop)
-	{
-		ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
-		variable->isFrozen = !(variable->isFrozen);
-
-		if (variable->isFrozen)
-		{
-			[variable setFreezeValue:variable->value];
-		}
-	}];
-	
-	[watchVariablesTableView reloadData];
-	
-	// check whether we want to use "Undo Freeze" or "Redo Freeze" or "Undo Unfreeze" or "Redo Unfreeze"
-	if (((ZGVariable *)[watchVariablesArray objectAtIndex:[rowIndexes firstIndex]])->isFrozen)
-	{
-		if ([[self undoManager] isUndoing])
-		{
-			[[self undoManager] setActionName:@"Unfreeze"];
-		}
-		else
-		{
-			[[self undoManager] setActionName:@"Freeze"];
-		}
-	}
-	else
-	{
-		if ([[self undoManager] isUndoing])
-		{
-			[[self undoManager] setActionName:@"Freeze"];
-		}
-		else
-		{
-			[[self undoManager] setActionName:@"Unfreeze"];
-		}
-	}
-
-	[[[self undoManager] prepareWithInvocationTarget:self] freezeOrUnfreezeVariablesAtRoxIndexes:rowIndexes];
-}
-
-- (IBAction)freezeVariables:(id)sender
-{
-	[self freezeOrUnfreezeVariablesAtRoxIndexes:[watchVariablesTableView selectedRowIndexes]];
-}
-
 #pragma mark Useful Methods
 
 - (void *)valueFromString:(NSString *)stringValue dataType:(ZGVariableType)dataType dataSize:(ZGMemorySize *)dataSize
@@ -1524,18 +1377,17 @@ static NSSize *expandedWindowMinSize = nil;
 	return data;
 }
 
-- (void)setWatchVariablesArray:(NSArray *)newWatchVariablesArray
+- (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray
 {
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
 	{
 		// Clear the status
 		[generalStatusTextField setStringValue:@""];
 		
-		[[[self undoManager] prepareWithInvocationTarget:self] setWatchVariablesArray:watchVariablesArray];
+		[[[self undoManager] prepareWithInvocationTarget:self] setWatchVariablesArrayAndUpdateInterface:watchVariablesArray];
 	}
 	
-	[watchVariablesArray release];
-	watchVariablesArray = [newWatchVariablesArray retain];
+	[self setWatchVariablesArray:newWatchVariablesArray];
 	[watchVariablesTableView reloadData];
 	
 	// Make sure the search value field is enabled if we aren't doing a store comparison
@@ -1711,7 +1563,7 @@ static NSSize *expandedWindowMinSize = nil;
 	if ([newVariablesArray count] != [watchVariablesArray count])
 	{
 		[[self undoManager] setActionName:@"Search"];
-		[[[self undoManager] prepareWithInvocationTarget:self] setWatchVariablesArray:watchVariablesArray];
+		[[[self undoManager] prepareWithInvocationTarget:self] setWatchVariablesArrayAndUpdateInterface:watchVariablesArray];
 	}
 	
 	currentProcess->searchProgress = 0;
@@ -2679,61 +2531,32 @@ static NSSize *expandedWindowMinSize = nil;
 	return [super validateMenuItem:theMenuItem];
 }
 
-#pragma mark Global Actions
+#pragma mark Variables Handling
+
+- (IBAction)freezeVariables:(id)sender
+{
+	[variableController freezeVariables];
+}
 
 - (IBAction)copy:(id)sender
 {
-	[[NSPasteboard generalPasteboard]
-	 declareTypes:[NSArray arrayWithObjects:NSStringPboardType, ZGVariablePboardType, nil]
-	 owner:self];
-	
-	NSMutableString *stringToWrite = [[NSMutableString alloc] init];
-	NSArray *variablesArray = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
-	
-	for (ZGVariable *variable in variablesArray)
-	{
-		[stringToWrite appendFormat:@"%@ %@ %@\n", [variable name], [variable addressStringValue], [variable stringValue]];
-	}
-	
-	// Remove the last '\n' character
-	[stringToWrite deleteCharactersInRange:NSMakeRange([stringToWrite length] - 1, 1)];
-	
-	[[NSPasteboard generalPasteboard]
-	 setString:stringToWrite
-	 forType:NSStringPboardType];
-	
-	[stringToWrite release];
-	
-	[[NSPasteboard generalPasteboard]
-	 setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray]
-	 forType:ZGVariablePboardType];
+	[variableController copyVariables];
 }
 
 - (IBAction)paste:(id)sender
 {
-	NSData *pasteboardData = [[NSPasteboard generalPasteboard] dataForType:ZGVariablePboardType];
-	if (pasteboardData)
-	{
-		NSArray *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
-		NSInteger currentIndex = [watchVariablesTableView selectedRow];
-		if (currentIndex == -1)
-		{
-			currentIndex = 0;
-		}
-		else
-		{
-			currentIndex++;
-		}
-		
-		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, [variablesToInsertArray count])];
-		
-		[self
-		 addVariables:variablesToInsertArray
-		 atRowIndexes:indexesToInsert];
-	}
+	[variableController pasteVariables];
 }
 
-#pragma mark Editing Variables Handling
+- (IBAction)removeSelectedSearchValues:(id)sender
+{
+	[variableController removeSelectedSearchValues];
+}
+
+- (IBAction)addVariable:(id)sender
+{
+	[variableController addVariable:sender];
+}
 
 - (IBAction)editVariablesValue:(id)sender
 {
