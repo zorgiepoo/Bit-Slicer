@@ -1406,11 +1406,10 @@ static NSSize *expandedWindowMinSize = nil;
 			}
 			
 			[searchData setBeginAddress:memoryAddressFromExpression(calculatedBeginAddress)];
-			[searchData setBeginAddressExists:YES];
 		}
 		else
 		{
-			[searchData setBeginAddressExists:NO];
+			[searchData setBeginAddress:0x0];
 		}
 		
 		if (![[endingAddressTextField stringValue] isEqualToString:@""])
@@ -1422,14 +1421,13 @@ static NSSize *expandedWindowMinSize = nil;
 			}
 			
 			[searchData setEndAddress:memoryAddressFromExpression(calculatedEndAddress)];
-			[searchData setEndAddressExists:YES];
 		}
 		else
 		{
-			[searchData setEndAddressExists:NO];
+			[searchData setEndAddress:MAX_MEMORY_ADDRESS];
 		}
 		
-		if ([searchData beginAddressExists] && [searchData endAddressExists] && [searchData beginAddress] >= [searchData endAddress])
+		if ([searchData beginAddress] >= [searchData endAddress])
 		{
 			NSRunAlertPanel(@"Invalid Input", @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted.", nil, nil, nil, nil);
 			return;
@@ -1496,9 +1494,7 @@ static NSSize *expandedWindowMinSize = nil;
 			
 			search_for_data_t searchForDataCallback = ^(void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
 			{
-				if ((!searchData->beginAddressExists || searchData->beginAddress <= address) &&
-					(!searchData->endAddressExists || searchData->endAddress >= address + dataSize) &&
-					compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
+				if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
 				{
 					ZGVariable *newVariable =
 						[[ZGVariable alloc]
@@ -1587,22 +1583,22 @@ static NSSize *expandedWindowMinSize = nil;
 					if (variable->shouldBeSearched)
 					{
 						if (variable->size > 0 && dataSize > 0 &&
-							(!searchData->beginAddressExists || searchData->beginAddress <= variable->address) &&
-							(!searchData->endAddressExists || searchData->endAddress >= variable->address + dataSize))
+							(searchData->beginAddress <= variable->address) &&
+							(searchData->endAddress >= variable->address + dataSize))
 						{
 							ZGMemorySize outputSize = dataSize;
-							void *value = NULL;
-							if (ZGReadBytes(processTask, variable->address, &value, &outputSize))
+							void *variableValue = NULL;
+							if (ZGReadBytes(processTask, variable->address, &variableValue, &outputSize))
 							{
-								void *value2 = searchData->shouldCompareStoredValues ? ZGSavedValue(variable->address, searchData, dataSize) : searchValue;
+								void *compareValue = searchData->shouldCompareStoredValues ? ZGSavedValue(variable->address, searchData, dataSize) : searchValue;
 								
-								if (value2 && compareFunction(searchData, value, value2, dataType, dataSize))
+								if (compareValue && compareFunction(searchData, variableValue, compareValue, dataType, dataSize))
 								{
 									[temporaryVariablesArray addObject:variable];
 									currentProcess->numberOfVariablesFound++;
 								}
 								
-								ZGFreeBytes(processTask, value, outputSize);
+								ZGFreeBytes(processTask, variableValue, outputSize);
 							}
 						}
 					}

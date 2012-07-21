@@ -25,8 +25,6 @@
 	// these are not NSString's because there's no reason to save the values
 	ZGMemoryAddress beginAddress;
 	ZGMemoryAddress endAddress;
-	BOOL beginAddressExists;
-	BOOL endAddressExists;
 	
 	BOOL shouldCancelSearch;
 	BOOL searchDidCancel;
@@ -56,9 +54,7 @@
 @property (readwrite) BOOL shouldIgnoreStringCase;
 @property (readwrite) BOOL shouldIncludeNullTerminator;
 @property (readwrite) ZGMemoryAddress beginAddress;
-@property (readwrite) BOOL beginAddressExists;
 @property (readwrite) ZGMemoryAddress endAddress;
-@property (readwrite) BOOL endAddressExists;
 @property (readwrite) BOOL shouldScanUnwritableValues;
 @property (readwrite, assign) void *compareOffset;
 

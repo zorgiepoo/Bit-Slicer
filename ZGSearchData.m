@@ -22,9 +22,7 @@
 @synthesize shouldIgnoreStringCase;
 @synthesize shouldIncludeNullTerminator;
 @synthesize beginAddress;
-@synthesize beginAddressExists;
 @synthesize endAddress;
-@synthesize endAddressExists;
 @synthesize shouldScanUnwritableValues;
 @synthesize compareOffset;
 
@@ -37,6 +35,8 @@
 	if (self)
 	{
 		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &collator);
+		[self setBeginAddress:0x0];
+		[self setEndAddress:MAX_MEMORY_ADDRESS];
 	}
 	return self;
 }

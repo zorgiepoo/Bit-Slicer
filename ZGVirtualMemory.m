@@ -344,11 +344,18 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 		char *currentData = NULL;
 		ZGMemorySize size = region->size;
 		
-		if (ZGReadBytes(processTask, region->address, (void **)&currentData, &size))
+		// Skipping an entire region will provide significant performance benefits
+		if (region->address < searchData->endAddress &&
+			region->address + size > searchData->beginAddress &&
+			ZGReadBytes(processTask, region->address, (void **)&currentData, &size))
 		{
 			do
 			{
-				block(&currentData[offset], region->bytes + offset, region->address + offset, currentRegionNumber);
+				if (searchData->beginAddress <= region->address + offset &&
+					searchData->endAddress >= region->address + offset + dataSize)
+				{
+					block(&currentData[offset], region->bytes + offset, region->address + offset, currentRegionNumber);
+				}
 				offset += dataAlignment;
 			}
 			while (offset + dataSize <= size && !searchData->shouldCancelSearch);
@@ -380,7 +387,10 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 	
 	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS)
 	{
-		if (regionInfo.protection & VM_PROT_READ && (searchData->shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
+		// Skipping an entire region will provide significant performance benefits
+		if (address < searchData->endAddress &&
+			address + size > searchData->beginAddress &&
+			regionInfo.protection & VM_PROT_READ && (searchData->shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
 			char *bytes = NULL;
 			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
@@ -388,7 +398,11 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 				ZGMemorySize dataIndex = 0;
 				while (dataIndex + dataSize <= size && !searchData->shouldCancelSearch)
 				{
-					block(&bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
+					if (searchData->beginAddress <= address + dataIndex &&
+						searchData->endAddress >= address + dataIndex + dataSize)
+					{
+						block(&bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
+					}
 					dataIndex += dataAlignment;
 				}
 				
