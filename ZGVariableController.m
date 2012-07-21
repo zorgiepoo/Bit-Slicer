@@ -88,22 +88,19 @@
 	 declareTypes:[NSArray arrayWithObjects:NSStringPboardType, ZGVariablePboardType, nil]
 	 owner:self];
 	
-	NSMutableString *stringToWrite = [[NSMutableString alloc] init];
+	NSMutableArray *linesToWrite = [[NSMutableArray alloc] init];
 	NSArray *variablesArray = [[document watchVariablesArray] objectsAtIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
 	
 	for (ZGVariable *variable in variablesArray)
 	{
-		[stringToWrite appendFormat:@"%@ %@ %@\n", [variable name], [variable addressStringValue], [variable stringValue]];
+		[linesToWrite addObject:[NSString stringWithFormat:@"%@ %@ %@", [variable name], [variable addressStringValue], [variable stringValue]]];
 	}
 	
-	// Remove the last '\n' character
-	[stringToWrite deleteCharactersInRange:NSMakeRange([stringToWrite length] - 1, 1)];
-	
 	[[NSPasteboard generalPasteboard]
-	 setString:stringToWrite
+	 setString:[linesToWrite componentsJoinedByString:@"\n"]
 	 forType:NSStringPboardType];
 	
-	[stringToWrite release];
+	[linesToWrite release];
 	
 	[[NSPasteboard generalPasteboard]
 	 setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray]
