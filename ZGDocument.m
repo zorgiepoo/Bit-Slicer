@@ -173,11 +173,9 @@
 	[searchData release];
 	searchData = nil;
 	
-	[watchVariablesArray release];
-	watchVariablesArray = nil;
+	[self setWatchVariablesArray:nil];
 	
-	[currentProcess release];
-	currentProcess = nil;
+	[self setCurrentProcess:nil];
 	
 	[desiredProcessName release];
 	desiredProcessName = nil;

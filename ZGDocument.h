@@ -97,7 +97,7 @@
 @property (readonly) IBOutlet NSMatrix *variableQualifierMatrix;
 @property (readonly) IBOutlet NSButton *clearButton;
 @property (readwrite, retain) NSArray *watchVariablesArray;
-@property (readonly) ZGProcess *currentProcess;
+@property (readwrite, retain) ZGProcess *currentProcess;
 @property (readonly) ZGDocumentTableController *tableController;
 @property (readonly) ZGVariableController *variableController;
 
