@@ -29,11 +29,29 @@
 #import "ZGAppController.h"
 #import "ZGDocumentController.h"
 #import "ZGMemoryViewer.h"
+#import "ZGSearchData.h"
 #import "ZGComparisonFunctions.h"
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
 #import "ZGTimer.h"
 #import "ZGUtilities.h"
+
+@implementation ZGDocumentInfo
+
+@synthesize loadedFromSave;
+@synthesize selectedDatatypeTag;
+@synthesize qualifierTag;
+@synthesize functionTypeTag;
+@synthesize scanUnwritableValues;
+@synthesize ignoreDataAlignment;
+@synthesize exactStringLength;
+@synthesize ignoreStringCase;
+@synthesize beginningAddress;
+@synthesize endingAddress;
+@synthesize searchValue;
+@synthesize watchVariablesArray;
+
+@end
 
 @interface ZGDocument (Private)
 
@@ -126,15 +144,8 @@
 	self = [super init];
 	if (self)
 	{
-		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &collator);
-		
+		documentState = [[ZGDocumentInfo alloc] init];		
 		searchData = [[ZGSearchData alloc] init];
-		searchData->savedData = nil;
-		searchData->tempSavedData = nil;
-		
-		searchArguments.lastEpsilonValue = nil;
-		searchArguments.lastAboveRangeValue = nil;
-		searchArguments.lastBelowRangeValue = nil;
 	}
 	return self;
 }
@@ -151,25 +162,6 @@
 	[updateSearchUserInterfaceTimer release];
 	updateSearchUserInterfaceTimer = nil;
 	
-	UCDisposeCollator(&collator);
-	
-	if (searchArguments.rangeValue)
-	{
-		free(searchArguments.rangeValue);
-		searchArguments.rangeValue = NULL;
-	}
-	
-	[searchArguments.lastEpsilonValue release];
-	[searchArguments.lastAboveRangeValue release];
-	[searchArguments.lastBelowRangeValue release];
-	
-	if (searchData && searchData->savedData)
-	{
-		ZGFreeData(searchData->savedData);
-		[searchData->savedData release];
-		searchData->savedData = nil;
-	}
-	
 	[searchData release];
 	searchData = nil;
 	
@@ -179,6 +171,8 @@
 	
 	[desiredProcessName release];
 	desiredProcessName = nil;
+	
+	[documentState release];
 	
 	[super dealloc];
 }
@@ -210,52 +204,52 @@
 	
 	currentSearchDataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
 
-	if (documentState.loadedFromSave)
+	if ([documentState loadedFromSave])
 	{
-		[self setWatchVariablesArrayAndUpdateInterface:documentState.watchVariablesArray];
-		[documentState.watchVariablesArray release];
+		[self setWatchVariablesArrayAndUpdateInterface:[documentState watchVariablesArray]];
+		[documentState setWatchVariablesArray:nil];
         
 		[self
-		 selectDataTypeWithTag:(ZGVariableType)documentState.selectedDatatypeTag
+		 selectDataTypeWithTag:(ZGVariableType)[documentState selectedDatatypeTag]
 		 recordUndo:NO];
         
-		[variableQualifierMatrix selectCellWithTag:documentState.qualifierTag];
+		[variableQualifierMatrix selectCellWithTag:[documentState qualifierTag]];
 
-		[scanUnwritableValuesCheckBox setState:documentState.scanUnwritableValues];
-		[ignoreDataAlignmentCheckBox setState:documentState.ignoreDataAlignment];
-		[includeNullTerminatorCheckBox setState:documentState.exactStringLength];
-		[ignoreCaseCheckBox setState:documentState.ignoreStringCase];
+		[scanUnwritableValuesCheckBox setState:[documentState scanUnwritableValues]];
+		[ignoreDataAlignmentCheckBox setState:[documentState ignoreDataAlignment]];
+		[includeNullTerminatorCheckBox setState:[documentState exactStringLength]];
+		[ignoreCaseCheckBox setState:[documentState ignoreStringCase]];
 
-		if (documentState.beginningAddress)
+		if ([documentState beginningAddress])
 		{
-			[beginningAddressTextField setStringValue:documentState.beginningAddress];
-			[documentState.beginningAddress release];
+			[beginningAddressTextField setStringValue:[documentState beginningAddress]];
+			[documentState setBeginningAddress:nil];
 		}
 		
-		if (documentState.endingAddress)
+		if ([documentState endingAddress])
 		{
-			[endingAddressTextField setStringValue:documentState.endingAddress];
-			[documentState.endingAddress release];
+			[endingAddressTextField setStringValue:[documentState endingAddress]];
+			[documentState setEndingAddress:nil];
 		}
 
-		if (![self isFunctionTypeStore:documentState.functionTypeTag])
+		if (![self isFunctionTypeStore:[documentState functionTypeTag]])
 		{
-			[functionPopUpButton selectItemWithTag:documentState.functionTypeTag];
+			[functionPopUpButton selectItemWithTag:[documentState functionTypeTag]];
 			[self
 			 functionTypePopUpButtonRequest:nil
 			 markChanges:NO];
 		}
         
-		if (documentState.searchValue)
+		if ([documentState searchValue])
 		{
-			[searchValueTextField setStringValue:documentState.searchValue];
-			[documentState.searchValue release];
+			[searchValueTextField setStringValue:[documentState searchValue]];
+			[documentState setSearchValue:nil];
 		}
 	}
 	else
 	{
 		[self setWatchVariablesArrayAndUpdateInterface:[NSArray array]];
-		searchArguments.lastEpsilonValue = [[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON] retain];
+		[searchData setLastEpsilonValue:[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON]];
 		[flagsLabel setTextColor:[NSColor disabledControlTextColor]];
 	}
 }
@@ -372,15 +366,15 @@
 	 forKey:ZGEndingAddressKey];
     
 	[keyedArchiver
-	 encodeObject:searchArguments.lastEpsilonValue
+	 encodeObject:[searchData lastEpsilonValue]
 	 forKey:ZGEpsilonKey];
     
 	[keyedArchiver
-	 encodeObject:searchArguments.lastAboveRangeValue
+	 encodeObject:[searchData lastAboveRangeValue]
 	 forKey:ZGAboveValueKey];
     
 	[keyedArchiver
-	 encodeObject:searchArguments.lastBelowRangeValue
+	 encodeObject:[searchData lastBelowRangeValue]
 	 forKey:ZGBelowValueKey];
     
 	[keyedArchiver
@@ -404,29 +398,29 @@
 	NSData *readData = [fileWrapper regularFileContents];
 	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
 	
-	documentState.watchVariablesArray = [[keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey] retain];
+	[documentState setWatchVariablesArray:[keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey]];
 	desiredProcessName = [[keyedUnarchiver decodeObjectForKey:ZGProcessNameKey] retain];
 	
-	documentState.loadedFromSave = YES;
-	documentState.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
-	documentState.qualifierTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey];
-	documentState.functionTypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey];
-	documentState.scanUnwritableValues = [keyedUnarchiver decodeBoolForKey:ZGScanUnwritableValuesKey];
-	documentState.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
-	documentState.exactStringLength = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
-	documentState.ignoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
-	documentState.beginningAddress = [[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey] copy];
-	documentState.endingAddress = [[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey] copy];
+	[documentState setLoadedFromSave:YES];
+	[documentState setSelectedDatatypeTag:(NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag]];
+	[documentState setQualifierTag:(NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey]];
+	[documentState setFunctionTypeTag:(NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey]];
+	[documentState setScanUnwritableValues:[keyedUnarchiver decodeBoolForKey:ZGScanUnwritableValuesKey]];
+	[documentState setIgnoreDataAlignment:[keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey]];
+	[documentState setExactStringLength:[keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey]];
+	[documentState setIgnoreStringCase:[keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey]];
+	[documentState setBeginningAddress:[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey]];
+	[documentState setEndingAddress:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
 	
-	documentState.searchValue = [[keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey] copy];
-
-	searchArguments.lastEpsilonValue = [[keyedUnarchiver decodeObjectForKey:ZGEpsilonKey] copy];
-	searchArguments.lastAboveRangeValue = [[keyedUnarchiver decodeObjectForKey:ZGAboveValueKey] copy];
-	searchArguments.lastBelowRangeValue = [[keyedUnarchiver decodeObjectForKey:ZGBelowValueKey] copy];
+	[documentState setSearchValue:[keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey]];
+	
+	[searchData setLastEpsilonValue:[keyedUnarchiver decodeObjectForKey:ZGEpsilonKey]];
+	[searchData setLastAboveRangeValue:[keyedUnarchiver decodeObjectForKey:ZGAboveValueKey]];
+	[searchData setLastBelowRangeValue:[keyedUnarchiver decodeObjectForKey:ZGBelowValueKey]];
 
 	[keyedUnarchiver release];
 	
-	BOOL success = documentState.watchVariablesArray != nil && desiredProcessName != nil;
+	BOOL success = [documentState watchVariablesArray] != nil && desiredProcessName != nil;
 	
 	if (success && watchWindow)
 	{
@@ -754,9 +748,9 @@
 	{
 		[flagsLabel setStringValue:@"Below:"];
 		
-		if (searchArguments.lastBelowRangeValue)
+		if ([searchData lastBelowRangeValue])
 		{
-			[flagsTextField setStringValue:searchArguments.lastBelowRangeValue];
+			[flagsTextField setStringValue:[searchData lastBelowRangeValue]];
 		}
 		else
 		{
@@ -767,9 +761,9 @@
 	{
 		[flagsLabel setStringValue:@"Above:"];
 		
-		if (searchArguments.lastAboveRangeValue)
+		if ([searchData lastAboveRangeValue])
 		{
-			[flagsTextField setStringValue:searchArguments.lastAboveRangeValue];
+			[flagsTextField setStringValue:[searchData lastAboveRangeValue]];
 		}
 		else
 		{
@@ -799,9 +793,9 @@
 		{
 			// epsilon
 			[flagsLabel setStringValue:@"Epsilon:"];
-			if (searchArguments.lastEpsilonValue)
+			if ([searchData lastEpsilonValue])
 			{
-				[flagsTextField setStringValue:searchArguments.lastEpsilonValue];
+				[flagsTextField setStringValue:[searchData lastEpsilonValue]];
 			}
 			else
 			{
@@ -1056,210 +1050,6 @@ static NSSize *expandedWindowMinSize = nil;
 
 #pragma mark Useful Methods
 
-- (void *)valueFromString:(NSString *)stringValue dataType:(ZGVariableType)dataType dataSize:(ZGMemorySize *)dataSize
-{
-	void *value = NULL;
-	BOOL searchValueIsAHexRepresentation = [stringValue isHexRepresentation];
-	
-	if (dataType == ZGInt8)
-	{
-		int8_t variableValue = 0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			unsigned int theValue = 0;
-			[[NSScanner scannerWithString:stringValue] scanHexInt:&theValue];
-			variableValue = theValue;
-		}
-		else
-		{
-			variableValue = [stringValue intValue];
-		}
-		
-		*dataSize = 1;
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
-	}
-	else if (dataType == ZGInt16)
-	{
-		int16_t variableValue = 0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			unsigned int theValue = 0;
-			[[NSScanner scannerWithString:stringValue] scanHexInt:&theValue];
-			variableValue = theValue;
-		}
-		else
-		{
-			variableValue = [stringValue intValue];
-		}
-		
-		*dataSize = 2;
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
-	}
-	else if (dataType == ZGInt32 || (dataType == ZGPointer && !currentProcess->is64Bit))
-	{
-		int32_t variableValue = 0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			unsigned int theValue = 0;
-			[[NSScanner scannerWithString:stringValue] scanHexInt:&theValue];
-			variableValue = theValue;
-		}
-		else
-		{
-			variableValue = [stringValue unsignedIntValue];
-		}
-		
-		*dataSize = 4;
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
-	}
-	else if (dataType == ZGFloat)
-	{
-		float variableValue = 0.0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			[[NSScanner scannerWithString:stringValue] scanHexFloat:&variableValue];
-		}
-		else
-		{
-			variableValue = [stringValue floatValue];
-		}
-		
-		*dataSize = 4;
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
-	}
-	else if (dataType == ZGInt64 || (dataType == ZGPointer && currentProcess->is64Bit))
-	{
-		int64_t variableValue = 0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			unsigned long long theValue = 0;
-			[[NSScanner scannerWithString:stringValue] scanHexLongLong:&theValue];
-			variableValue = theValue;
-		}
-		else
-		{
-			variableValue = [stringValue unsignedLongLongValue];
-		}
-		
-		*dataSize = 8;
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
-	}
-	else if (dataType == ZGDouble)
-	{
-		double variableValue = 0.0;
-		
-		if (searchValueIsAHexRepresentation)
-		{
-			[[NSScanner scannerWithString:stringValue] scanHexDouble:&variableValue];
-		}
-		else
-		{
-			variableValue = [stringValue doubleValue];
-		}
-		
-		*dataSize = 8;
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
-	}
-	else if (dataType == ZGUTF8String)
-	{
-		const char *variableValue = [stringValue cStringUsingEncoding:NSUTF8StringEncoding];
-		*dataSize = strlen(variableValue) + 1;
-		value = malloc((size_t)*dataSize);
-		strncpy(value, variableValue, (size_t)*dataSize);
-	}
-	else if (dataType == ZGUTF16String)
-	{
-		*dataSize = [stringValue length] * sizeof(unichar);
-		value = malloc((size_t)*dataSize);
-		[stringValue getCharacters:value
-							 range:NSMakeRange(0, [stringValue length])];
-	}
-	
-	else if (dataType == ZGByteArray)
-	{
-		NSArray *bytesArray = [stringValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-
-		*dataSize = [bytesArray count];
-		value = malloc((size_t)*dataSize);
-		
-		unsigned char *valuePtr = value;
-		
-		for (NSString *byteString in bytesArray)
-		{
-			unsigned int theValue = 0;
-			if (([byteString rangeOfString:@"?"].location == NSNotFound && [byteString rangeOfString:@"*"].location == NSNotFound) || [byteString length] != 2)
-			{
-				[[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
-				*valuePtr = (unsigned char)theValue;
-			}
-			else
-			{
-				*valuePtr = 0;
-				if ([byteString length] == 2)
-				{
-					[[NSScanner scannerWithString:[byteString substringToIndex:1]] scanHexInt:&theValue];
-					*valuePtr = (((unsigned char)theValue) << 4) & 0xF0;
-					theValue = 0;
-					[[NSScanner scannerWithString:[byteString substringFromIndex:1]] scanHexInt:&theValue];
-					*valuePtr |= ((unsigned char)theValue) & 0x0F;
-				}
-			}
-			
-			valuePtr++;
-		}
-	}
-	
-	return value;
-}
-
-- (unsigned char *)allocateFlagsForByteArrayWildcards:(NSString *)searchValue
-{
-	NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-
-	unsigned char *data = calloc(1, [bytesArray count] * sizeof(unsigned char));
-
-	if (data)
-	{
-		__block BOOL didUseWildcard = NO;
-		[bytesArray enumerateObjectsUsingBlock:^(NSString *byteString, NSUInteger byteIndex, BOOL *stop)
-		{
-			if ([byteString length] == 2)
-			{
-				if ([[byteString substringToIndex:1] isEqualToString:@"?"] || [[byteString substringToIndex:1] isEqualToString:@"*"])
-				{
-					data[byteIndex] |= 0xF0;
-					didUseWildcard = YES;
-				}
-				
-				if ([[byteString substringFromIndex:1] isEqualToString:@"?"] || [[byteString substringFromIndex:1] isEqualToString:@"*"])
-				{
-					data[byteIndex] |= 0x0F;
-					didUseWildcard = YES;
-				}
-			}
-		}];
-		
-		if (!didUseWildcard)
-		{
-			free(data);
-			data = NULL;
-		}
-	}
-    
-	return data;
-}
-
 - (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray
 {
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
@@ -1386,7 +1176,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	if (dataType != ZGUTF8String && dataType != ZGUTF16String && dataType != ZGByteArray)
 	{
-		// This doesn't matter if the search is implicit or if it's a regular function type
+		// This doesn't matter if the search is comparing stored values or if it's a regular function type
 		if ([self doesFunctionTypeAllowSearchInput])
 		{
 			NSString *inputError = [self testSearchComponent:expression];
@@ -1402,7 +1192,7 @@ static NSSize *expandedWindowMinSize = nil;
 		return [NSString stringWithFormat:@"The function you are using does not support %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
 	}
 	
-	if ((dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray) && searchArguments.isImplicit)
+	if ((dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray) && [searchData shouldCompareStoredValues])
 	{
 		return [NSString stringWithFormat:@"Comparing Stored Values is not supported for %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
 	}
@@ -1494,16 +1284,12 @@ static NSSize *expandedWindowMinSize = nil;
 		void *searchValue = NULL;
 		
 		// Set default search arguments
-		searchArguments.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
-		if (searchArguments.rangeValue)
-		{
-			free(searchArguments.rangeValue);
-		}
-		searchArguments.rangeValue = NULL;
+		[searchData setEpsilon:DEFAULT_FLOATING_POINT_EPSILON];
+		[searchData setRangeValue:NULL];
 		
-		searchArguments.sensitive = ![ignoreCaseCheckBox state];
-		searchArguments.disregardNullTerminator = ![includeNullTerminatorCheckBox state];
-		searchArguments.isImplicit = [self isFunctionTypeStore];
+		[searchData setShouldIgnoreStringCase:[ignoreCaseCheckBox state]];
+		[searchData setShouldIncludeNullTerminator:[includeNullTerminatorCheckBox state]];
+		[searchData setShouldCompareStoredValues:[self isFunctionTypeStore]];
 		
 		NSString *evaluatedSearchExpression = nil;
 		NSString *inputErrorMessage = nil;
@@ -1522,15 +1308,11 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		// get search value and data size
-		searchValue =
-			[self
-			 valueFromString:evaluatedSearchExpression
-			 dataType:dataType
-			 dataSize:&dataSize];
+		searchValue = valueFromString(currentProcess, evaluatedSearchExpression, dataType, &dataSize);
 		
 		// We want to read the null terminator in this case... even though we normally don't store the terminator
 		// internally for UTF-16 strings. Lame hack, I know.
-		if (!searchArguments.disregardNullTerminator && dataType == ZGUTF16String)
+		if ([searchData shouldIncludeNullTerminator] && dataType == ZGUTF16String)
 		{
 			dataSize += sizeof(unichar);
 		}
@@ -1571,26 +1353,20 @@ static NSSize *expandedWindowMinSize = nil;
 					{
 						// Clearly a range type of search
 						ZGMemorySize rangeDataSize;
-						searchArguments.rangeValue =
-							[self
-							 valueFromString:flagsExpression
-							 dataType:dataType
-							 dataSize:&rangeDataSize];
+						[searchData setRangeValue:valueFromString(currentProcess, flagsExpression, dataType, &rangeDataSize)];
 					}
 					else
 					{
-						searchArguments.rangeValue = NULL;
+						[searchData setRangeValue:NULL];
 					}
 					
 					if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored)
 					{
-						[searchArguments.lastBelowRangeValue release];
-						searchArguments.lastBelowRangeValue = [[flagsTextField stringValue] copy];
+						[searchData setLastBelowRangeValue:[flagsTextField stringValue]];
 					}
 					else if (functionType == ZGLessThan || functionType == ZGLessThanStored)
 					{
-						[searchArguments.lastAboveRangeValue release];
-						searchArguments.lastAboveRangeValue = [[flagsTextField stringValue] copy];
+						[searchData setLastAboveRangeValue:[flagsTextField stringValue]];
 					}
 				}
 				else
@@ -1599,24 +1375,19 @@ static NSSize *expandedWindowMinSize = nil;
 					{
 						// Clearly an epsilon flag
 						ZGMemorySize epsilonDataSize;
-						void *epsilon =
-							[self
-							 valueFromString:flagsExpression
-							 dataType:ZGDouble
-							 dataSize:&epsilonDataSize];
+						void *epsilon = valueFromString(currentProcess, flagsExpression, ZGDouble, &epsilonDataSize);
 						if (epsilon)
 						{
-							searchArguments.epsilon = *((double *)epsilon);
+							[searchData setEpsilon:*((double *)epsilon)];
 							free(epsilon);
 						}
 					}
 					else
 					{
-						searchArguments.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
+						[searchData setEpsilon:DEFAULT_FLOATING_POINT_EPSILON];
 					}
 					
-					[searchArguments.lastEpsilonValue release];
-					searchArguments.lastEpsilonValue = [[flagsTextField stringValue] copy];
+					[searchData setLastEpsilonValue:[flagsTextField stringValue]];
 				}
 			}
 		}
@@ -1634,12 +1405,12 @@ static NSSize *expandedWindowMinSize = nil;
 				return;
 			}
 			
-			searchArguments.beginAddress = memoryAddressFromExpression(calculatedBeginAddress);
-			searchArguments.beginAddressExists = YES;
+			[searchData setBeginAddress:memoryAddressFromExpression(calculatedBeginAddress)];
+			[searchData setBeginAddressExists:YES];
 		}
 		else
 		{
-			searchArguments.beginAddressExists = NO;
+			[searchData setBeginAddressExists:NO];
 		}
 		
 		if (![[endingAddressTextField stringValue] isEqualToString:@""])
@@ -1650,15 +1421,15 @@ static NSSize *expandedWindowMinSize = nil;
 				return;
 			}
 			
-			searchArguments.endAddress = memoryAddressFromExpression(calculatedEndAddress);
-			searchArguments.endAddressExists = YES;
+			[searchData setEndAddress:memoryAddressFromExpression(calculatedEndAddress)];
+			[searchData setEndAddressExists:YES];
 		}
 		else
 		{
-			searchArguments.endAddressExists = NO;
+			[searchData setEndAddressExists:NO];
 		}
 		
-		if (searchArguments.beginAddressExists && searchArguments.endAddressExists && searchArguments.beginAddress >= searchArguments.endAddress)
+		if ([searchData beginAddressExists] && [searchData endAddressExists] && [searchData beginAddress] >= [searchData endAddress])
 		{
 			NSRunAlertPanel(@"Invalid Input", @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted.", nil, nil, nil, nil);
 			return;
@@ -1683,17 +1454,22 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		[self prepareDocumentTask];
 		
-		static BOOL (*compareFunctions[10])(ZGSearchArguments *, const void *, const void *, ZGVariableType, ZGMemorySize, void *) =
+		static BOOL (*compareFunctions[10])(ZGSearchData *, const void *, const void *, ZGVariableType, ZGMemorySize) =
 		{
 			equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalPlusFunction, notEqualPlusFunction
 		};
 		
-		BOOL (*compareFunction)(ZGSearchArguments *, const void *, const void *, ZGVariableType, ZGMemorySize, void *) = compareFunctions[functionType];
+		BOOL (*compareFunction)(ZGSearchData *, const void *, const void *, ZGVariableType, ZGMemorySize) = compareFunctions[functionType];
         
-		void *extraData =
-			dataType == ZGByteArray
-			? [self allocateFlagsForByteArrayWildcards:evaluatedSearchExpression]
-			: ((functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus) ? searchValue : &collator);
+		if (dataType == ZGByteArray)
+		{
+			[searchData setByteArrayFlags:allocateFlagsForByteArrayWildcards(evaluatedSearchExpression)];
+		}
+		
+		if (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
+		{
+			[searchData setCompareOffset:searchValue];
+		}
 		
 		if (!goingToNarrowDownSearches)
 		{
@@ -1718,15 +1494,15 @@ static NSSize *expandedWindowMinSize = nil;
 				? sizeof(int64_t)
 				: sizeof(int32_t);
 			
-			search_for_data_t searchForDataCallback = ^(void *data, void *data2, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
+			search_for_data_t searchForDataCallback = ^(void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
 			{
-				if ((!searchArguments.beginAddressExists || searchArguments.beginAddress <= address) &&
-					(!searchArguments.endAddressExists || searchArguments.endAddress >= address + dataSize) &&
-					compareFunction(&searchArguments, data, (data2 != NULL) ? data2 : searchValue, dataType, dataSize, extraData))
+				if ((!searchData->beginAddressExists || searchData->beginAddress <= address) &&
+					(!searchData->endAddressExists || searchData->endAddress >= address + dataSize) &&
+					compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
 				{
 					ZGVariable *newVariable =
 						[[ZGVariable alloc]
-						 initWithValue:data
+						 initWithValue:variableData
 						 size:dataSize
 						 address:address
 						 type:dataType
@@ -1735,7 +1511,7 @@ static NSSize *expandedWindowMinSize = nil;
 					
 					[temporaryVariablesArray addObject:newVariable];
 					[newVariable release];
-					 
+					
 					currentProcess->numberOfVariablesFound++;
 				}
 				
@@ -1747,11 +1523,6 @@ static NSSize *expandedWindowMinSize = nil;
 				if (searchValue)
 				{
 					free(searchValue);
-				}
-                
-				if (extraData && dataType == ZGByteArray)
-				{
-					free(extraData);
 				}
 				
 				[updateSearchUserInterfaceTimer invalidate];
@@ -1768,13 +1539,13 @@ static NSSize *expandedWindowMinSize = nil;
 					? sizeof(int8_t)
 					: ZGDataAlignment(currentProcess->is64Bit, dataType, dataSize);
 				
-				if (searchArguments.isImplicit)
+				if ([searchData shouldCompareStoredValues])
 				{
 					ZGSearchForSavedData([currentProcess processTask], dataAlignment, dataSize, searchData, searchForDataCallback);
 				}
 				else
 				{
-					searchData->scanReadOnly = ([scanUnwritableValuesCheckBox state] == NSOnState);
+					[searchData setShouldScanUnwritableValues:([scanUnwritableValuesCheckBox state] == NSOnState)];
 					ZGSearchForData([currentProcess processTask], dataAlignment, dataSize, searchData, searchForDataCallback);
 				}
 				dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
@@ -1802,10 +1573,6 @@ static NSSize *expandedWindowMinSize = nil;
 					free(searchValue);
 				}
 				
-				if (extraData && dataType == ZGByteArray)
-				{
-					free(extraData);
-				}
 				[updateSearchUserInterfaceTimer invalidate];
 				[updateSearchUserInterfaceTimer release];
 				updateSearchUserInterfaceTimer = nil;
@@ -1820,16 +1587,16 @@ static NSSize *expandedWindowMinSize = nil;
 					if (variable->shouldBeSearched)
 					{
 						if (variable->size > 0 && dataSize > 0 &&
-							(!searchArguments.beginAddressExists || searchArguments.beginAddress <= variable->address) &&
-							(!searchArguments.endAddressExists || searchArguments.endAddress >= variable->address + dataSize))
+							(!searchData->beginAddressExists || searchData->beginAddress <= variable->address) &&
+							(!searchData->endAddressExists || searchData->endAddress >= variable->address + dataSize))
 						{
 							ZGMemorySize outputSize = dataSize;
 							void *value = NULL;
 							if (ZGReadBytes(processTask, variable->address, &value, &outputSize))
 							{
-								void *value2 = searchArguments.isImplicit ? ZGSavedValue(variable->address, searchData, dataSize) : searchValue;
+								void *value2 = searchData->shouldCompareStoredValues ? ZGSavedValue(variable->address, searchData, dataSize) : searchValue;
 								
-								if (value2 && compareFunction(&searchArguments, value, value2, dataType, dataSize, extraData))
+								if (value2 && compareFunction(searchData, value, value2, dataType, dataSize))
 								{
 									[temporaryVariablesArray addObject:variable];
 									currentProcess->numberOfVariablesFound++;
@@ -1921,14 +1688,8 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			currentProcess->isStoringAllData = NO;
 			
-			if (searchData->savedData)
-			{
-				ZGFreeData(searchData->savedData);
-				[searchData->savedData release];
-			}
-			
-			searchData->savedData = searchData->tempSavedData;
-			searchData->tempSavedData = nil;
+			[searchData setSavedData:[searchData tempSavedData]];
+			[searchData setTempSavedData:nil];
 			
 			[generalStatusTextField setStringValue:@"Finished Memory Store"];
 		}
@@ -1938,11 +1699,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	dispatch_block_t searchForDataBlock = ^
 	{
-		searchData->tempSavedData = ZGGetAllData(currentProcess, [scanUnwritableValuesCheckBox state]);
-		if (searchData->tempSavedData)
-		{
-			[searchData->tempSavedData retain];
-		}
+		[searchData setTempSavedData:ZGGetAllData(currentProcess, [scanUnwritableValuesCheckBox state])];
 		
 		dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
 	};
@@ -2150,7 +1907,7 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 	else if ([theMenuItem action] == @selector(functionTypePopUpButtonRequest:))
 	{
-		if ([self isFunctionTypeStore:[theMenuItem tag]] && !(searchData->savedData))
+		if ([self isFunctionTypeStore:[theMenuItem tag]] && !([searchData savedData]))
 		{
 			return NO;
 		}

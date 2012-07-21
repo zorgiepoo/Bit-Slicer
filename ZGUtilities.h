@@ -20,6 +20,12 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGVariable.h"
+
+@class ZGProcess;
 
 ZGMemoryAddress memoryAddressFromExpression(NSString *expression);
 BOOL isValidNumber(NSString *expression);
+
+void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
+unsigned char *allocateFlagsForByteArrayWildcards(NSString *searchValue);

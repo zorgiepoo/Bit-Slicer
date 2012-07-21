@@ -20,9 +20,7 @@
 
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
-
-@implementation ZGSearchData
-@end
+#import "ZGSearchData.h"
 
 void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile);
 
@@ -141,7 +139,7 @@ void ZGFreeData(NSArray *dataArray)
 	}
 }
 
-NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
+NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 {
 	NSMutableArray *dataArray = [[NSMutableArray alloc] init];
     
@@ -156,7 +154,7 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 	
 	while (mach_vm_region(process->processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
-		if ((regionInfo.protection & VM_PROT_READ) && (scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
+		if ((regionInfo.protection & VM_PROT_READ) && (shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
 			void *bytes = NULL;
 			if (ZGReadBytes(process->processTask, address, &bytes, &size))
@@ -197,7 +195,7 @@ void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySi
 {
 	void *value = NULL;
 	
-	for (NSValue *regionValue in searchData->savedData)
+	for (NSValue *regionValue in [searchData savedData])
 	{
 		ZGRegion *region = [regionValue pointerValue];
 		
@@ -287,24 +285,24 @@ EXIT_ON_CANCEL:
 
 void ZGInitializeSearch(ZGSearchData *searchData)
 {
-	searchData->shouldCancelSearch = NO;
-	searchData->searchDidCancel = NO;
+	[searchData setShouldCancelSearch:NO];
+	[searchData setSearchDidCancel:NO];
 }
 
 void ZGCancelSearchImmediately(ZGSearchData *searchData)
 {
-	searchData->shouldCancelSearch = YES;
-	searchData->searchDidCancel = YES;
+	[searchData setShouldCancelSearch:YES];
+	[searchData setSearchDidCancel:YES];
 }
 
 void ZGCancelSearch(ZGSearchData *searchData)
 {
-	searchData->shouldCancelSearch = YES;
+	[searchData setShouldCancelSearch:YES];
 }
 
 BOOL ZGSearchIsCancelling(ZGSearchData *searchData)
 {
-	return searchData->shouldCancelSearch;
+	return [searchData shouldCancelSearch];
 }
 
 BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData)
@@ -339,7 +337,7 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 	
 	int currentRegionNumber = 0;
 	
-	for (NSValue *regionValue in searchData->savedData)
+	for (NSValue *regionValue in [searchData savedData])
 	{
 		ZGRegion *region = [regionValue pointerValue];
 		ZGMemoryAddress offset = 0;
@@ -360,7 +358,7 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 		
 		if (searchData->shouldCancelSearch)
 		{
-			searchData->searchDidCancel = YES;
+			[searchData setSearchDidCancel:YES];
 			return;
 		}
 		
@@ -382,7 +380,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 	
 	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS)
 	{
-		if (regionInfo.protection & VM_PROT_READ && (searchData->scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
+		if (regionInfo.protection & VM_PROT_READ && (searchData->shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
 			char *bytes = NULL;
 			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
@@ -400,7 +398,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 		
 		if (searchData->shouldCancelSearch)
 		{
-			searchData->searchDidCancel = YES;
+			[searchData setSearchDidCancel:YES];
 			return;
 		}
 		

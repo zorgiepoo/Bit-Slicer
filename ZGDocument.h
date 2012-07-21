@@ -20,7 +20,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ZGVariable.h"
-#import "ZGSearching.h"
 #import "ZGComparisonFunctions.h"
 @class ZGSearchData;
 @class ZGProcess;
@@ -32,6 +31,37 @@
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 #define NON_EXISTENT_PID_NUMBER -1
+
+@interface ZGDocumentInfo : NSObject
+{
+	BOOL loadedFromSave;
+	NSInteger selectedDatatypeTag;
+	NSInteger qualifierTag;
+	NSInteger functionTypeTag;
+	BOOL scanUnwritableValues;
+	BOOL ignoreDataAlignment;
+	BOOL exactStringLength;
+	BOOL ignoreStringCase;
+	NSString *beginningAddress;
+	NSString *endingAddress;
+	NSString *searchValue;
+	NSArray *watchVariablesArray;
+}
+
+@property (readwrite) BOOL loadedFromSave;
+@property (readwrite) NSInteger selectedDatatypeTag;
+@property (readwrite) NSInteger qualifierTag;
+@property (readwrite) NSInteger functionTypeTag;
+@property (readwrite) BOOL scanUnwritableValues;
+@property (readwrite) BOOL ignoreDataAlignment;
+@property (readwrite) BOOL exactStringLength;
+@property (readwrite) BOOL ignoreStringCase;
+@property (readwrite, copy) NSString *beginningAddress;
+@property (readwrite, copy) NSString *endingAddress;
+@property (readwrite, copy) NSString *searchValue;
+@property (readwrite, retain) NSArray *watchVariablesArray;
+
+@end
 
 @interface ZGDocument : NSDocument
 {
@@ -69,26 +99,8 @@
 	ZGTimer *updateSearchUserInterfaceTimer;
 	ZGVariableType currentSearchDataType;
 	ZGSearchData *searchData;
-	ZGSearchArguments searchArguments;
 	
-	// For comparing unicode strings
-	CollatorRef collator;
-	
-	struct DocumentInfo
-	{
-		BOOL loadedFromSave;
-		NSInteger selectedDatatypeTag;
-		NSInteger qualifierTag;
-		NSInteger functionTypeTag;
-		BOOL scanUnwritableValues;
-		BOOL ignoreDataAlignment;
-		BOOL exactStringLength;
-		BOOL ignoreStringCase;
-		NSString *beginningAddress;
-		NSString *endingAddress;
-		NSString *searchValue;
-		NSArray *watchVariablesArray;
-	} documentState;
+	ZGDocumentInfo *documentState;
 }
 
 @property (readonly) IBOutlet NSWindow *watchWindow;

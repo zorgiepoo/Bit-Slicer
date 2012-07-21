@@ -25,6 +25,7 @@
 @synthesize processID;
 @synthesize processTask;
 @synthesize name;
+@synthesize is64Bit;
 
 static NSArray *frozenProcesses = nil;
 + (NSArray *)frozenProcesses
@@ -93,7 +94,7 @@ static NSArray *frozenProcesses = nil;
 	{
 		[self setName:processName];
 		[self setProcessID:aProcessID];
-		is64Bit = flag64Bit;
+		[self setIs64Bit:flag64Bit];
 		processTask = MACH_PORT_NULL;
 	}
 	

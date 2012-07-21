@@ -53,5 +53,6 @@
 @property (assign) ZGMemoryMap processTask;
 @property (copy) NSString *name;
 @property (readonly) int numberOfRegions;
+@property (readwrite) BOOL is64Bit;
 
 @end
