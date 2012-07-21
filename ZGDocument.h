@@ -26,12 +26,14 @@
 @class ZGProcess;
 @class ZGTimer;
 @class ZGVariableController;
+@class ZGDocumentTableController;
 @class ZGMemoryDumpController;
 @class ZGMemoryProtectionController;
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
+#define NON_EXISTENT_PID_NUMBER -1
 
-@interface ZGDocument : NSDocument <NSTableViewDelegate>
+@interface ZGDocument : NSDocument
 {
 	IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 	IBOutlet NSTextField *generalStatusTextField;
@@ -40,7 +42,6 @@
 	IBOutlet NSTextField *flagsTextField;
 	IBOutlet NSTextField *flagsLabel;
 	IBOutlet NSProgressIndicator *searchingProgressIndicator;
-	IBOutlet NSTableView *watchVariablesTableView;
 	IBOutlet NSPopUpButton *dataTypesPopUpButton;
 	IBOutlet NSPopUpButton *functionPopUpButton;
 	IBOutlet NSButton *optionsDisclosureButton;
@@ -58,6 +59,7 @@
 	IBOutlet NSButton *includeNullTerminatorCheckBox;
 	IBOutlet NSWindow *watchWindow;
 	IBOutlet ZGVariableController *variableController;
+	IBOutlet ZGDocumentTableController *tableController;
 	IBOutlet ZGMemoryDumpController *memoryDumpController;
 	IBOutlet ZGMemoryProtectionController *memoryProtectionController;
 	NSArray *watchVariablesArray;
@@ -65,7 +67,6 @@
 	NSString *desiredProcessName;
 	ZGTimer *watchVariablesTimer;
 	ZGTimer *updateSearchUserInterfaceTimer;
-	BOOL shouldIgnoreTableViewSelectionChange;
 	ZGVariableType currentSearchDataType;
 	ZGSearchData *searchData;
 	ZGSearchArguments searchArguments;
@@ -94,15 +95,19 @@
 @property (readonly) IBOutlet NSProgressIndicator *searchingProgressIndicator;
 @property (readonly) IBOutlet NSTextField *generalStatusTextField;
 @property (readonly) IBOutlet NSMatrix *variableQualifierMatrix;
-@property (readonly) IBOutlet NSTableView *watchVariablesTableView;
+@property (readonly) IBOutlet NSButton *clearButton;
 @property (readwrite, retain) NSArray *watchVariablesArray;
 @property (readonly) ZGProcess *currentProcess;
-@property (readwrite) BOOL shouldIgnoreTableViewSelectionChange;
+@property (readonly) ZGDocumentTableController *tableController;
+@property (readonly) ZGVariableController *variableController;
 
 - (NSArray *)selectedVariables;
 - (void)prepareDocumentTask;
 - (void)resumeDocument;
 - (BOOL)canStartTask;
+
+- (void)lockTarget;
+- (void)unlockTarget;
 
 - (IBAction)runningApplicationsPopUpButtonRequest:(id)sender;
 - (IBAction)dataTypePopUpButtonRequest:(id)sender;

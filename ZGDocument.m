@@ -20,6 +20,7 @@
 
 #import "ZGDocument.h"
 #import "ZGVariableController.h"
+#import "ZGDocumentTableController.h"
 #import "ZGMemoryDumpController.h"
 #import "ZGMemoryProtectionController.h"
 #import "ZGProcess.h"
@@ -40,9 +41,6 @@
 
 - (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray;
 
-- (void)lockTarget;
-- (void)unlockTarget;
-
 - (void)updateFlags;
 
 - (BOOL)isInNarrowSearchMode;
@@ -58,14 +56,11 @@
 @end
 
 #define VALUE_TABLE_COLUMN_INDEX 1
-#define NON_EXISTENT_PID_NUMBER -1
 
 #define DEFAULT_FLOATING_POINT_EPSILON 0.1
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
 #define ZGProcessNameKey @"ZGProcessNameKey"
-
-#define ZGVariableReorderType @"ZGVariableReorderType"
 
 #define ZGSelectedDataTypeTag @"ZGSelectedDataTypeTag"
 #define ZGQualifierTagKey @"ZGQualifierKey"
@@ -81,8 +76,6 @@
 #define ZGBelowValueKey @"ZGBelowValueKey"
 #define ZGSearchStringValueKey @"ZGSearchStringValueKey"
 
-#define MAX_TABLE_VIEW_ITEMS ((NSInteger)1000)
-
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
 #define CHECK_PROCESSES_TIME_INTERVAL 0.5
 
@@ -96,14 +89,15 @@
 @synthesize searchingProgressIndicator;
 @synthesize generalStatusTextField;
 @synthesize currentProcess;
-@synthesize watchVariablesTableView;
+@synthesize clearButton;
 @synthesize watchVariablesArray;
-@synthesize shouldIgnoreTableViewSelectionChange;
 @synthesize variableQualifierMatrix;
+@synthesize tableController;
+@synthesize variableController;
 
 - (NSArray *)selectedVariables
 {
-	return ([watchVariablesTableView selectedRow] == -1) ? nil : [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
+	return ([[tableController watchVariablesTableView] selectedRow] == -1) ? nil : [watchVariablesArray objectsAtIndexes:[[tableController watchVariablesTableView] selectedRowIndexes]];
 }
 
 - (BOOL)canStartTask
@@ -271,8 +265,6 @@
 - (void)windowControllerDidLoadNib:(NSWindowController *) aController
 {
 	[super windowControllerDidLoadNib:aController];
-
-	[watchVariablesTableView setDelegate:self];
 	
 	if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_EXPAND_OPTIONS])
 	{
@@ -311,10 +303,8 @@
 	watchVariablesTimer =
 		[[ZGTimer alloc]
 		 initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
-		 target:self
+		 target:tableController
 		 selector:@selector(updateWatchVariablesTable:)];
-	
-	[watchVariablesTableView registerForDraggedTypes:[NSArray arrayWithObject:ZGVariableReorderType]];
 	
 	[self loadDocumentUserInterface];
 }
@@ -479,7 +469,7 @@
 			}
 		}
 		
-		[watchVariablesTableView reloadData];
+		[[tableController watchVariablesTableView] reloadData];
 	}
 	
 	// keep track of the process the user targeted
@@ -733,111 +723,6 @@
 	}
 }
 
-- (void)updateWatchVariablesTable:(NSTimer *)timer
-{
-	if (![[self windowForSheet] isVisible])
-	{
-		return;
-	}
-    
-	// First, update all the variable's addresses that are pointers
-	// We don't want to update this when the user is editing something in the table
-	if ([currentProcess processID] != NON_EXISTENT_PID_NUMBER && [watchVariablesTableView editedRow] == -1)
-	{
-		[watchVariablesArray enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
-		 {
-			 ZGVariable *variable = object;
-			 if (variable->isPointer)
-			 {
-				 NSString *newAddress =
-					[ZGCalculator
-					 evaluateAddress:[NSMutableString stringWithString:[variable addressFormula]]
-					 process:currentProcess];
-				 
-				 if (variable->address != [newAddress unsignedLongLongValue])
-				 {
-					 [variable setAddressStringValue:newAddress];
-					 [watchVariablesTableView reloadData];
-				 }
-			 }
-		 }];
-	}
-	
-	// Then check that the process is locked and that the process is alive
-	if ([clearButton isEnabled] && [currentProcess processID] != NON_EXISTENT_PID_NUMBER)
-	{
-		// Freeze all variables that need be frozen!
-		[watchVariablesArray enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
-		 {
-			 ZGVariable *variable = object;
-			 if (variable->isFrozen && variable->freezeValue)
-			 {
-				 if (variable->size)
-				 {
-					 ZGWriteBytes([currentProcess processTask], variable->address, variable->freezeValue, variable->size);
-				 }
-				 
-				 if (variable->type == ZGUTF16String)
-				 {
-					 unichar terminatorValue = 0;
-					 ZGWriteBytes([currentProcess processTask], variable->address + variable->size, &terminatorValue, sizeof(unichar));
-				 }
-			 }
-		 }];
-	}
-	
-	// if any variables are changing, that means that we'll have to reload the table, and that'd be very bad
-	// if the user is in the process of editing a variable's value, so don't do it then
-	if ([currentProcess processID] != NON_EXISTENT_PID_NUMBER && [watchVariablesTableView editedRow] == -1)
-	{
-		// Read all the variables and update them in the table view if needed
-		NSRange visibleRowsRange = [watchVariablesTableView rowsInRect:[watchVariablesTableView visibleRect]];
-		
-		if (visibleRowsRange.location + visibleRowsRange.length <= [watchVariablesArray count])
-		{
-			[[watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
-			{
-				NSString *oldStringValue = [[variable stringValue] copy];
-				if (variable->type == ZGUTF8String || variable->type == ZGUTF16String)
-				{
-					variable->size = ZGGetStringSize([currentProcess processTask], variable->address, variable->type);
-				}
-				
-				if (variable->size)
-				{
-					ZGMemorySize outputSize = variable->size;
-					void *value = NULL;
-					
-					if (ZGReadBytes([currentProcess processTask], variable->address, &value, &outputSize))
-					{
-						[variable setVariableValue:value];
-						if (![[variable stringValue] isEqualToString:oldStringValue])
-						{
-							[watchVariablesTableView reloadData];
-						}
-						
-						ZGFreeBytes([currentProcess processTask], value, outputSize);
-					}
-					else if (variable->value)
-					{
-						[variable setVariableValue:NULL];
-						[watchVariablesTableView reloadData];
-					}
-				}
-				else if (variable->lastUpdatedSize)
-				{
-					[variable setVariableValue:NULL];
-					[watchVariablesTableView reloadData];
-				}
-				
-				variable->lastUpdatedSize = variable->size;
-				
-				[oldStringValue release];
-			}];
-		}
-	}
-}
-
 - (IBAction)qualifierMatrixButtonRequest:(id)sender
 {
 	ZGVariableQualifier newQualifier = (ZGVariableQualifier)[[variableQualifierMatrix selectedCell] tag];
@@ -858,7 +743,7 @@
 		}
 	}
 	
-	[watchVariablesTableView reloadData];
+	[[tableController watchVariablesTableView] reloadData];
 	
 	[self markDocumentChange];
 }
@@ -1388,7 +1273,7 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 	
 	[self setWatchVariablesArray:newWatchVariablesArray];
-	[watchVariablesTableView reloadData];
+	[[tableController watchVariablesTableView] reloadData];
 	
 	// Make sure the search value field is enabled if we aren't doing a store comparison
 	if ([self doesFunctionTypeAllowSearchInput])
@@ -1540,9 +1425,8 @@ static NSSize *expandedWindowMinSize = nil;
 	// we enable the search button in case its disabled, as what would happen if the targetted application terminates when in a multiple search situation
 	[searchButton setEnabled:YES];
 	
-	[watchVariablesArray release];
-	watchVariablesArray = [[NSArray array] retain];
-	[watchVariablesTableView reloadData];
+	[self setWatchVariablesArray:[NSArray array]];
+	[[tableController watchVariablesTableView] reloadData];
 	
 	if ([self doesFunctionTypeAllowSearchInput])
 	{
@@ -1579,7 +1463,7 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		[watchVariablesArray release];
 		watchVariablesArray = [[NSArray arrayWithArray:newVariablesArray] retain];
-		[watchVariablesTableView reloadData];
+		[[tableController watchVariablesTableView] reloadData];
 	}
 	
 	[self resumeDocument];
@@ -1605,7 +1489,7 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		// Re-display in case we set variables to not be searched
-		[watchVariablesTableView setNeedsDisplay:YES];
+		[[tableController watchVariablesTableView] setNeedsDisplay:YES];
 		
 		// Basic search information
 		ZGMemorySize dataSize = 0;
@@ -2067,260 +1951,6 @@ static NSSize *expandedWindowMinSize = nil;
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchForDataBlock);
 }
 
-#pragma mark Table View Drag & Drop
-
-- (NSDragOperation)tableView:(NSTableView *)tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
-{
-	if ([[[draggingInfo draggingPasteboard] types] containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
-	{
-		return NSDragOperationMove;
-	}
-	
-	return NSDragOperationNone;
-}
-
-- (void)reorderVariables:(NSArray *)newVariables
-{
-	[[self undoManager] setActionName:@"Move"];
-	[[[self undoManager] prepareWithInvocationTarget:self] reorderVariables:watchVariablesArray];
-	
-	[self setWatchVariablesArray:[NSArray arrayWithArray:newVariables]];
-	
-	[watchVariablesTableView reloadData];
-}
-
-- (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo  row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
-{	
-	NSMutableArray *variables = [NSMutableArray arrayWithArray:watchVariablesArray];
-	NSArray *rows = [[draggingInfo draggingPasteboard] propertyListForType:ZGVariableReorderType];
-	
-	// Fill in the current rows with null objects
-	for (NSNumber *row in rows)
-	{
-		[variables
-		 replaceObjectAtIndex:[row integerValue]
-		 withObject:[NSNull null]];
-	}
-	
-	// Insert the objects to the new position
-	for (NSNumber *row in rows)
-	{
-		[variables
-		 insertObject:[watchVariablesArray objectAtIndex:[row integerValue]]
-		 atIndex:newRow];
-		
-		newRow++;
-	}
-	
-	// Remove all the old objects
-	[variables removeObject:[NSNull null]];
-	
-	// Set the new variables
-	[self reorderVariables:variables];
-	
-	return YES;
-}
-
-- (BOOL)tableView:(NSTableView *)view writeRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pasteboard
-{
-	[pasteboard declareTypes:[NSArray arrayWithObject:ZGVariableReorderType] owner:self];
-	
-	[pasteboard
-	 setPropertyList:rows
-	 forType:ZGVariableReorderType];
-	
-	return YES;
-}
-
-#pragma mark Table View Data Source Methods
-
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
-{
-	if (aTableView == watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
-	{
-		if ([[aTableColumn identifier] isEqualToString:@"name"])
-		{
-			return [[watchVariablesArray objectAtIndex:rowIndex] name];
-		}
-		else if ([[aTableColumn identifier] isEqualToString:@"address"])
-		{
-			return [[watchVariablesArray objectAtIndex:rowIndex] addressStringValue];
-		}
-		else if ([[aTableColumn identifier] isEqualToString:@"value"])
-		{
-			return [[watchVariablesArray objectAtIndex:rowIndex] stringValue];
-		}
-		else if ([[aTableColumn identifier] isEqualToString:@"shouldBeSearched"])
-		{
-			return [NSNumber numberWithBool:[[watchVariablesArray objectAtIndex:rowIndex] shouldBeSearched]];
-		}
-		else if ([[aTableColumn identifier] isEqualToString:@"type"])
-		{
-			ZGVariableType type = ((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->type;
-			return [NSNumber numberWithInteger:[[aTableColumn dataCell] indexOfItemWithTag:type]];
-		}
-	}
-	
-	return nil;
-}
-
-- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
-{
-	if (aTableView == watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
-	{
-		if ([[aTableColumn identifier] isEqualToString:@"name"])
-		{
-			[variableController
-			 changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-			 newName:anObject];
-		}
-		else if ([[aTableColumn identifier] isEqualToString:@"address"])
-		{
-			[variableController
-			 changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-			 newAddress:anObject];
-		}
-		else if ([[aTableColumn identifier] isEqualToString:@"value"])
-		{
-			[variableController
-			 changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-			 newValue:anObject
-			 shouldRecordUndo:YES];
-		}
-		else if ([[aTableColumn identifier] isEqualToString:@"shouldBeSearched"])
-		{
-			[variableController
-			 changeVariableShouldBeSearched:[anObject boolValue]
-			 rowIndexes:[watchVariablesTableView selectedRowIndexes]];
-		}
-		else if (([[aTableColumn identifier] isEqualToString:@"type"]))
-		{
-			[variableController
-			 changeVariable:[watchVariablesArray objectAtIndex:rowIndex]
-			 newType:(ZGVariableType)[[aTableColumn dataCell] indexOfItemWithTag:[anObject integerValue]]
-			 newSize:((ZGVariable *)([watchVariablesArray objectAtIndex:rowIndex]))->size];
-		}
-	}
-}
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
-{
-	return MIN(MAX_TABLE_VIEW_ITEMS, (NSInteger)[watchVariablesArray count]);
-}
-
-#pragma mark Table View Delegate Methods
-
-- (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
-{
-	if ([self shouldIgnoreTableViewSelectionChange])
-	{
-		[self setShouldIgnoreTableViewSelectionChange:NO];
-		return NO;
-	}
-	
-	return YES;
-}
-
-- (BOOL)tableView:(NSTableView *)aTableView shouldEditTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
-{
-	if ([[aTableColumn identifier] isEqualToString:@"value"])
-	{
-		if (![self canStartTask] || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
-		{
-			NSBeep();
-			return NO;
-		}
-        
-		if (rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
-		{
-			ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
-			if (!variable)
-			{
-				return NO;
-			}
-            
-			if (![clearButton isEnabled])
-			{
-				[self lockTarget];
-			}
-			
-			ZGMemoryProtection memoryProtection;
-			ZGMemoryAddress memoryAddress = variable->address;
-			ZGMemorySize memorySize;
-			
-			if (ZGMemoryProtectionInRegion([currentProcess processTask], &memoryAddress, &memorySize, &memoryProtection))
-			{
-				// if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
-				if (memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE))
-				{
-					NSBeep();
-					return NO;
-				}
-			}
-		}
-	}
-	else if ([[aTableColumn identifier] isEqualToString:@"address"])
-	{
-		if (rowIndex < 0 || (NSUInteger)rowIndex >= [watchVariablesArray count])
-		{
-			return NO;
-		}
-		
-		ZGVariable *variable = [watchVariablesArray objectAtIndex:rowIndex];
-		if (variable && variable->isPointer)
-		{
-			[self editVariablesAddress:nil];
-			return NO;
-		}
-	}
-	
-	return YES;
-}
-
-- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
-{
-	if ([[aTableColumn identifier] isEqualToString:@"address"])
-	{
-		if (rowIndex >= 0 && (NSUInteger)rowIndex < [watchVariablesArray count])
-		{
-			if (((ZGVariable *)[watchVariablesArray objectAtIndex:rowIndex])->isFrozen)
-			{
-				[aCell setTextColor:[NSColor redColor]];
-			}
-			else
-			{
-				[aCell setTextColor:[NSColor textColor]];
-			}
-		}
-	}
-}
-
-- (NSString *)tableView:(NSTableView *)aTableView toolTipForCell:(NSCell *)aCell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
-{
-	NSString *displayString = nil;
-	
-	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
-	[numberOfVariablesFormatter setFormat:@"#,###"];
-	
-	if ([watchVariablesArray count] <= MAX_TABLE_VIEW_ITEMS)
-	{
-		displayString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:[watchVariablesArray count]]]];
-	}
-	else
-	{
-		displayString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInt:MAX_TABLE_VIEW_ITEMS]],[numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:[watchVariablesArray count]]]];
-	}
-	
-	[numberOfVariablesFormatter release];
-	
-	if (displayString && [watchVariablesArray count] != 1)
-	{
-		displayString = [displayString stringByAppendingString:@"s"];
-	}
-	
-	return displayString;
-}
-
 #pragma mark Menu item validation
 
 - (BOOL)validateMenuItem:(NSMenuItem *)theMenuItem
@@ -2335,7 +1965,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if ([theMenuItem action] == @selector(removeSelectedSearchValues:))
 	{
-		if ([watchVariablesTableView selectedRow] < 0 || [watchWindow firstResponder] != watchVariablesTableView)
+		if ([[tableController watchVariablesTableView] selectedRow] < 0 || [watchWindow firstResponder] != [tableController watchVariablesTableView])
 		{
 			return NO;
 		}
@@ -2346,10 +1976,10 @@ static NSSize *expandedWindowMinSize = nil;
 		if ([watchVariablesArray count] > 0)
 		{
 			// All the variables selected need to either be all unfrozen or all frozen
-			BOOL isFrozen = ((ZGVariable *)[watchVariablesArray objectAtIndex:[watchVariablesTableView selectedRow]])->isFrozen;
+			BOOL isFrozen = ((ZGVariable *)[watchVariablesArray objectAtIndex:[[tableController watchVariablesTableView] selectedRow]])->isFrozen;
 			BOOL isInconsistent = NO;
 			
-			NSUInteger currentIndex = [[watchVariablesTableView selectedRowIndexes] firstIndex];
+			NSUInteger currentIndex = [[[tableController watchVariablesTableView] selectedRowIndexes] firstIndex];
 			while (currentIndex != NSNotFound)
 			{
 				ZGVariable *variable = [watchVariablesArray objectAtIndex:currentIndex];
@@ -2359,7 +1989,7 @@ static NSSize *expandedWindowMinSize = nil;
 					isInconsistent = YES;
 					break;
 				}
-				currentIndex = [[watchVariablesTableView selectedRowIndexes] indexGreaterThanIndex:currentIndex];
+				currentIndex = [[[tableController watchVariablesTableView] selectedRowIndexes] indexGreaterThanIndex:currentIndex];
 			}
 			
 			NSString *title;
@@ -2373,7 +2003,7 @@ static NSSize *expandedWindowMinSize = nil;
 				title = @"Freeze Variable";
 			}
 			
-			if ([[watchVariablesTableView selectedRowIndexes] count] > 1)
+			if ([[[tableController watchVariablesTableView] selectedRowIndexes] count] > 1)
 			{
 				title = [title stringByAppendingString:@"s"];
 			}
@@ -2430,7 +2060,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if ([theMenuItem action] == @selector(copy:))
 	{
-		if ([[watchVariablesTableView selectedRowIndexes] count] == 0)
+		if ([[[tableController watchVariablesTableView] selectedRowIndexes] count] == 0)
 		{
 			return NO;
 		}
@@ -2463,7 +2093,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if ([theMenuItem action] == @selector(editVariablesValue:))
 	{
-		if ([[watchVariablesTableView selectedRowIndexes] count] != 1)
+		if ([[[tableController watchVariablesTableView] selectedRowIndexes] count] != 1)
 		{
 			[theMenuItem setTitle:@"Edit Variable Values…"];
 		}
@@ -2472,7 +2102,7 @@ static NSSize *expandedWindowMinSize = nil;
 			[theMenuItem setTitle:@"Edit Variable Value…"];
 		}
 		
-		if ([self canCancelTask] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+		if ([self canCancelTask] || [[tableController watchVariablesTableView] selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -2480,7 +2110,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if ([theMenuItem action] == @selector(editVariablesAddress:))
 	{
-		if ([self canCancelTask] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+		if ([self canCancelTask] || [[tableController watchVariablesTableView] selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -2488,7 +2118,7 @@ static NSSize *expandedWindowMinSize = nil;
     
     else if ([theMenuItem action] == @selector(editVariablesSize:))
     {
-		if ([[watchVariablesTableView selectedRowIndexes] count] != 1)
+		if ([[[tableController watchVariablesTableView] selectedRowIndexes] count] != 1)
 		{
 			[theMenuItem setTitle:@"Edit Variable Sizes…"];
 		}
@@ -2497,13 +2127,13 @@ static NSSize *expandedWindowMinSize = nil;
 			[theMenuItem setTitle:@"Edit Variable Size…"];
 		}
 		
-		if ([self canCancelTask] || [watchVariablesTableView selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+		if ([self canCancelTask] || [[tableController watchVariablesTableView] selectedRow] == -1 || [currentProcess processID] == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
 		
 		// All selected variables must be Byte Array's
-		NSArray *selectedVariables = [watchVariablesArray objectsAtIndexes:[watchVariablesTableView selectedRowIndexes]];
+		NSArray *selectedVariables = [watchVariablesArray objectsAtIndexes:[[tableController watchVariablesTableView] selectedRowIndexes]];
 		for (ZGVariable *variable in selectedVariables)
 		{
 			if (variable->type != ZGByteArray)

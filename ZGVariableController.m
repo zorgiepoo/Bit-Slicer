@@ -20,6 +20,7 @@
 
 #import "ZGVariableController.h"
 #import "ZGDocument.h"
+#import "ZGDocumentTableController.h"
 #import "ZGAppController.h"
 #import "ZGMemoryViewer.h"
 #import "ZGVariable.h"
@@ -45,7 +46,7 @@
 		 }
 	 }];
 	
-	[[document watchVariablesTableView] reloadData];
+	[[[document tableController] watchVariablesTableView] reloadData];
 	
 	// check whether we want to use "Undo Freeze" or "Redo Freeze" or "Undo Unfreeze" or "Redo Unfreeze"
 	if (((ZGVariable *)[[document watchVariablesArray] objectAtIndex:[rowIndexes firstIndex]])->isFrozen)
@@ -76,7 +77,7 @@
 
 - (void)freezeVariables
 {
-	[self freezeOrUnfreezeVariablesAtRoxIndexes:[[document watchVariablesTableView] selectedRowIndexes]];
+	[self freezeOrUnfreezeVariablesAtRoxIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
 }
 
 #pragma mark Copying & Pasting
@@ -88,7 +89,7 @@
 	 owner:self];
 	
 	NSMutableString *stringToWrite = [[NSMutableString alloc] init];
-	NSArray *variablesArray = [[document watchVariablesArray] objectsAtIndexes:[[document watchVariablesTableView] selectedRowIndexes]];
+	NSArray *variablesArray = [[document watchVariablesArray] objectsAtIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
 	
 	for (ZGVariable *variable in variablesArray)
 	{
@@ -115,7 +116,7 @@
 	if (pasteboardData)
 	{
 		NSArray *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
-		NSInteger currentIndex = [[document watchVariablesTableView] selectedRow];
+		NSInteger currentIndex = [[[document tableController] watchVariablesTableView] selectedRow];
 		if (currentIndex == -1)
 		{
 			currentIndex = 0;
@@ -157,7 +158,7 @@
 	[document setWatchVariablesArray:[NSArray arrayWithArray:temporaryArray]];
 	[temporaryArray release];
 	
-	[[document watchVariablesTableView] reloadData];
+	[[[document tableController] watchVariablesTableView] reloadData];
 }
 
 - (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes
@@ -169,7 +170,7 @@
 	[document setWatchVariablesArray:[NSArray arrayWithArray:temporaryArray]];
 	
 	[temporaryArray release];
-	[[document watchVariablesTableView] reloadData];
+	[[[document tableController] watchVariablesTableView] reloadData];
 	
 	if ([[document undoManager] isUndoing])
 	{
@@ -186,7 +187,7 @@
 
 - (void)removeSelectedSearchValues
 {
-	[self removeVariablesAtRowIndexes:[[document watchVariablesTableView] selectedRowIndexes]];
+	[self removeVariablesAtRowIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
 	[[document generalStatusTextField] setStringValue:@""];
 }
 
@@ -219,8 +220,8 @@
 	[variable release];
 	
 	// have the user edit the variable's address
-	[[document watchVariablesTableView]
-	 editColumn:[[document watchVariablesTableView] columnWithIdentifier:@"address"]
+	[[[document tableController] watchVariablesTableView]
+	 editColumn:[[[document tableController] watchVariablesTableView] columnWithIdentifier:@"address"]
 	 row:0
 	 withEvent:nil
 	 select:YES];
@@ -239,7 +240,7 @@
 	
 	if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
 	{
-		[[document watchVariablesTableView] reloadData];
+		[[[document tableController] watchVariablesTableView] reloadData];
 	}
 }
 
@@ -254,7 +255,7 @@
 	
 	if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
 	{
-		[[document watchVariablesTableView] reloadData];
+		[[[document tableController] watchVariablesTableView] reloadData];
 	}
 }
 
@@ -273,7 +274,7 @@
 	
 	if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
 	{
-		[[document watchVariablesTableView] reloadData];
+		[[[document tableController] watchVariablesTableView] reloadData];
 	}
 }
 
@@ -473,7 +474,7 @@
 				
 				if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
 				{
-					[[document watchVariablesTableView] reloadData];
+					[[[document tableController] watchVariablesTableView] reloadData];
 				}
 			}
 		}
@@ -513,7 +514,7 @@
 				
 				if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
 				{
-					[[document watchVariablesTableView] reloadData];
+					[[[document tableController] watchVariablesTableView] reloadData];
 				}
 			}
 		}
@@ -538,11 +539,11 @@
 	
 	if (![[document undoManager] isUndoing] && ![[document undoManager] isRedoing] && [rowIndexes count] > 1)
 	{
-		[document setShouldIgnoreTableViewSelectionChange:YES];
+		[[document tableController] setShouldIgnoreTableViewSelectionChange:YES];
 	}
 	
 	// the table view always needs to be reloaded because of being able to select multiple indexes
-	[[document watchVariablesTableView] reloadData];
+	[[[document tableController] watchVariablesTableView] reloadData];
 	
 	[[document undoManager] setActionName:[NSString stringWithFormat:@"Search Variable%@ Change", ([rowIndexes count] > 1) ? @"s" : @""]];
 	[[[document undoManager] prepareWithInvocationTarget:self]
@@ -574,7 +575,7 @@
 		  shouldRecordUndo:NO];
 	 }];
 	
-	[[document watchVariablesTableView] reloadData];
+	[[[document tableController] watchVariablesTableView] reloadData];
 	
 	[[document undoManager] setActionName:@"Edit Variables"];
 	[[[document undoManager] prepareWithInvocationTarget:self]
@@ -589,7 +590,7 @@
 	[NSApp endSheet:editVariablesValueWindow];
 	[editVariablesValueWindow close];
 	
-	NSArray *variables = [[document watchVariablesArray] objectsAtIndexes:[[document watchVariablesTableView] selectedRowIndexes]];
+	NSArray *variables = [[document watchVariablesArray] objectsAtIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
 	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
 	
 	for (ZGVariable *variable in variables)
@@ -634,7 +635,7 @@
 
 - (void)editVariablesValueRequest
 {
-	[editVariablesValueTextField setStringValue:[[[document watchVariablesArray] objectAtIndex:[[document watchVariablesTableView] selectedRow]] stringValue]];
+	[editVariablesValueTextField setStringValue:[[[document watchVariablesArray] objectAtIndex:[[[document tableController] watchVariablesTableView] selectedRow]] stringValue]];
 	
 	[NSApp
 	 beginSheet:editVariablesValueWindow
@@ -668,7 +669,7 @@
 	{
 		variable->isPointer = NO;
 		[variable setAddressStringValue:[ZGCalculator evaluateExpression:newAddressFormula]];
-		[[document watchVariablesTableView] reloadData];
+		[[[document tableController] watchVariablesTableView] reloadData];
 	}
 }
 
@@ -678,13 +679,13 @@
 	[editVariablesAddressWindow close];
 	
 	[self
-	 editVariable:[[document watchVariablesArray] objectAtIndex:[[document watchVariablesTableView] selectedRow]]
+	 editVariable:[[document watchVariablesArray] objectAtIndex:[[[document tableController] watchVariablesTableView] selectedRow]]
 	 addressFormula:[editVariablesAddressTextField stringValue]];
 }
 
 - (void)editVariablesAddressRequest
 {
-	ZGVariable *variable = [[document watchVariablesArray] objectAtIndex:[[document watchVariablesTableView] selectedRow]];
+	ZGVariable *variable = [[document watchVariablesArray] objectAtIndex:[[[document tableController] watchVariablesTableView] selectedRow]];
 	[editVariablesAddressTextField setStringValue:[variable addressFormula]];
 	
 	[NSApp
@@ -738,7 +739,7 @@
 			 variable->size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
 		 }];
 		
-		[[document watchVariablesTableView] reloadData];
+		[[[document tableController] watchVariablesTableView] reloadData];
 	}
 	else
 	{
@@ -776,7 +777,7 @@
 		[NSApp endSheet:editVariablesSizeWindow];
 		[editVariablesSizeWindow close];
 		
-		NSArray *variables = [[document watchVariablesArray] objectsAtIndexes:[[document watchVariablesTableView] selectedRowIndexes]];
+		NSArray *variables = [[document watchVariablesArray] objectsAtIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
 		NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
 		
 		NSUInteger variableIndex;
@@ -795,7 +796,7 @@
 
 - (void)editVariablesSizeRequest
 {
-	ZGVariable *firstVariable = [[document watchVariablesArray] objectAtIndex:[[document watchVariablesTableView] selectedRow]];
+	ZGVariable *firstVariable = [[document watchVariablesArray] objectAtIndex:[[[document tableController] watchVariablesTableView] selectedRow]];
 	[editVariablesSizeTextField setStringValue:[firstVariable sizeStringValue]];
 	
 	[NSApp
