@@ -513,6 +513,33 @@
 
 - (void)removeRunningApplicationFromPopupButton:(NSRunningApplication *)oldRunningApplication
 {
+	// Great, a process terminated, but we don't know which one
+	if ([oldRunningApplication processIdentifier] == -1)
+	{
+		NSLog(@"Yes, process ID was -1");
+		NSMutableArray *menuItemsToRemove = [[NSMutableArray alloc] init];
+		for (NSMenuItem *menuItem in [runningApplicationsPopUpButton itemArray])
+		{
+			NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:[[menuItem representedObject] processID]];
+			if ([runningApplication processIdentifier] == -1 || ![[[NSWorkspace sharedWorkspace] runningApplications] containsObject:runningApplication])
+			{
+				if ([[menuItem representedObject] processID] == [currentProcess processID])
+				{
+					oldRunningApplication = nil;
+				}
+				else
+				{
+					[menuItemsToRemove addObject:menuItem];
+				}
+			}
+		}
+		
+		for (id menuItem in menuItemsToRemove)
+		{
+			[runningApplicationsPopUpButton removeItemAtIndex:[runningApplicationsPopUpButton indexOfItem:menuItem]];
+		}
+	}
+	
 	// Just to be sure
 	if ([oldRunningApplication processIdentifier] != [[NSRunningApplication currentApplication] processIdentifier])
 	{
@@ -536,7 +563,7 @@
 			[currentProcess setProcessID:NON_EXISTENT_PID_NUMBER];
 			[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (none)", [currentProcess name]]];
 		}
-		else
+		else if ([oldRunningApplication processIdentifier] != -1)
 		{
 			// Find the menu item, and remove it
 			NSMenuItem *itemToRemove = nil;
