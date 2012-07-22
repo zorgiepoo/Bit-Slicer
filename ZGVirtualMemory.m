@@ -20,9 +20,7 @@
 
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
-
-@implementation ZGSearchData
-@end
+#import "ZGSearchData.h"
 
 void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile);
 
@@ -66,7 +64,7 @@ BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes,
 	if (mach_vm_read(processTask, address, originalSize, &dataPointer, &dataSize) == KERN_SUCCESS)
 	{
 		success = YES;
-        *bytes = (void *)dataPointer;
+		*bytes = (void *)dataPointer;
 		*size = dataSize;
 	}
 	
@@ -75,7 +73,7 @@ BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes,
 
 void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size)
 {
-    mach_vm_deallocate(current_task(), (vm_offset_t)bytes, size);
+	mach_vm_deallocate(current_task(), (vm_offset_t)bytes, size);
 }
 
 BOOL ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)
@@ -112,8 +110,9 @@ void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStarti
 	{
 		ZGMemoryAddress endAddress = currentStartingAddress + [currentData length];
 		(*fileNumber)++;
-		[currentData writeToFile:[directory stringByAppendingPathComponent:[NSString stringWithFormat:@"(%d) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
-					  atomically:NO];
+		[currentData
+		 writeToFile:[directory stringByAppendingPathComponent:[NSString stringWithFormat:@"(%d) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
+		 atomically:NO];
 		
 		if (mergedFile)
 		{
@@ -124,7 +123,7 @@ void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStarti
 
 typedef struct
 {
-    ZGMemoryMap processTask;
+	ZGMemoryMap processTask;
 	ZGMemoryAddress address;
 	ZGMemorySize size;
 	void *bytes;
@@ -135,12 +134,12 @@ void ZGFreeData(NSArray *dataArray)
 	for (NSValue *value in dataArray)
 	{
 		ZGRegion *memoryRegion = [value pointerValue];
-        ZGFreeBytes(memoryRegion->processTask, memoryRegion->bytes, memoryRegion->size);
+		ZGFreeBytes(memoryRegion->processTask, memoryRegion->bytes, memoryRegion->size);
 		free(memoryRegion);
 	}
 }
 
-NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
+NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 {
 	NSMutableArray *dataArray = [[NSMutableArray alloc] init];
     
@@ -155,19 +154,20 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 	
 	while (mach_vm_region(process->processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
-		if ((regionInfo.protection & VM_PROT_READ) && (scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
+		if ((regionInfo.protection & VM_PROT_READ) && (shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
 			void *bytes = NULL;
-            if (ZGReadBytes(process->processTask, address, &bytes, &size))
-            {
-                ZGRegion *memoryRegion = malloc(sizeof(ZGRegion));
-                memoryRegion->processTask = process->processTask;
-                memoryRegion->bytes = bytes;
-                memoryRegion->address = address;
-                memoryRegion->size = size;
-                
-                [dataArray addObject:[NSValue valueWithPointer:memoryRegion]];
-            }
+			if (ZGReadBytes(process->processTask, address, &bytes, &size))
+			{
+				ZGRegion *memoryRegion = malloc(sizeof(ZGRegion));
+				memoryRegion->processTask = process->processTask;
+				memoryRegion->bytes = bytes;
+				memoryRegion->address = address;
+				memoryRegion->size = size;
+				
+				[dataArray addObject:[NSValue valueWithPointer:memoryRegion]];
+				// Don't free memory now. It will be free when ZGFreeData is called
+			}
 		}
 		
 		address += size;
@@ -177,9 +177,10 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly)
 		if (!process->isStoringAllData)
 		{
 			ZGFreeData(dataArray);
-            [dataArray release];
-            dataArray = nil;
-            break;
+			
+			[dataArray release];
+			dataArray = nil;
+			break;
 		}
 	}
 	
@@ -194,7 +195,7 @@ void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySi
 {
 	void *value = NULL;
 	
-	for (NSValue *regionValue in searchData->savedData)
+	for (NSValue *regionValue in [searchData savedData])
 	{
 		ZGRegion *region = [regionValue pointerValue];
 		
@@ -246,15 +247,14 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 				currentStartingAddress = address;
 			}
 			
-            // outputSize should not differ from size
-            ZGMemorySize outputSize = size;
+			// outputSize should not differ from size
+			ZGMemorySize outputSize = size;
 			void *bytes = NULL;
 			if (ZGReadBytes(process->processTask, address, &bytes, &outputSize))
-            {
-                [currentData appendBytes:bytes
-                                  length:(NSUInteger)size];
-                ZGFreeBytes(process->processTask, bytes, outputSize);
-            }
+			{
+				[currentData appendBytes:bytes length:(NSUInteger)size];
+				ZGFreeBytes(process->processTask, bytes, outputSize);
+			}
 		}
 		
 		address += size;
@@ -285,24 +285,24 @@ EXIT_ON_CANCEL:
 
 void ZGInitializeSearch(ZGSearchData *searchData)
 {
-	searchData->shouldCancelSearch = NO;
-	searchData->searchDidCancel = NO;
+	[searchData setShouldCancelSearch:NO];
+	[searchData setSearchDidCancel:NO];
 }
 
 void ZGCancelSearchImmediately(ZGSearchData *searchData)
 {
-	searchData->shouldCancelSearch = YES;
-	searchData->searchDidCancel = YES;
+	[searchData setShouldCancelSearch:YES];
+	[searchData setSearchDidCancel:YES];
 }
 
 void ZGCancelSearch(ZGSearchData *searchData)
 {
-	searchData->shouldCancelSearch = YES;
+	[searchData setShouldCancelSearch:YES];
 }
 
 BOOL ZGSearchIsCancelling(ZGSearchData *searchData)
 {
-	return searchData->shouldCancelSearch;
+	return [searchData shouldCancelSearch];
 }
 
 BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData)
@@ -337,28 +337,35 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 	
 	int currentRegionNumber = 0;
 	
-	for (NSValue *regionValue in searchData->savedData)
+	for (NSValue *regionValue in [searchData savedData])
 	{
 		ZGRegion *region = [regionValue pointerValue];
 		ZGMemoryAddress offset = 0;
 		char *currentData = NULL;
 		ZGMemorySize size = region->size;
 		
-		if (ZGReadBytes(processTask, region->address, (void **)&currentData, &size))
+		// Skipping an entire region will provide significant performance benefits
+		if (region->address < searchData->endAddress &&
+			region->address + size > searchData->beginAddress &&
+			ZGReadBytes(processTask, region->address, (void **)&currentData, &size))
 		{
 			do
 			{
-				block(&currentData[offset], region->bytes + offset, region->address + offset, currentRegionNumber);
+				if (searchData->beginAddress <= region->address + offset &&
+					searchData->endAddress >= region->address + offset + dataSize)
+				{
+					block(&currentData[offset], region->bytes + offset, region->address + offset, currentRegionNumber);
+				}
 				offset += dataAlignment;
 			}
 			while (offset + dataSize <= size && !searchData->shouldCancelSearch);
-            
-            ZGFreeBytes(processTask, currentData, size);
+			
+			ZGFreeBytes(processTask, currentData, size);
 		}
 		
 		if (searchData->shouldCancelSearch)
 		{
-			searchData->searchDidCancel = YES;
+			[searchData setSearchDidCancel:YES];
 			return;
 		}
 		
@@ -376,29 +383,36 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 	vm_region_basic_info_data_t regionInfo;
 	mach_msg_type_number_t regionInfoSize = VM_REGION_BASIC_INFO_COUNT_64;
 
-	int currentRegionNumber = 0;
+	ZGMemorySize currentRegionNumber = 0;
 	
 	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS)
 	{
-		if (regionInfo.protection & VM_PROT_READ && (searchData->scanReadOnly || (regionInfo.protection & VM_PROT_WRITE)))
+		// Skipping an entire region will provide significant performance benefits
+		if (address < searchData->endAddress &&
+			address + size > searchData->beginAddress &&
+			regionInfo.protection & VM_PROT_READ && (searchData->shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
 			char *bytes = NULL;
-            if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
-            {
-                int dataIndex = 0;
-                while (dataIndex + dataSize <= size && !searchData->shouldCancelSearch)
-                {
-                    block(&bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
-                    dataIndex += dataAlignment;
-                }
-                
-                ZGFreeBytes(processTask, bytes, size);
-            }
+			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
+			{
+				ZGMemorySize dataIndex = 0;
+				while (dataIndex + dataSize <= size && !searchData->shouldCancelSearch)
+				{
+					if (searchData->beginAddress <= address + dataIndex &&
+						searchData->endAddress >= address + dataIndex + dataSize)
+					{
+						block(&bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
+					}
+					dataIndex += dataAlignment;
+				}
+				
+				ZGFreeBytes(processTask, bytes, size);
+			}
 		}
 		
 		if (searchData->shouldCancelSearch)
 		{
-			searchData->searchDidCancel = YES;
+			[searchData setSearchDidCancel:YES];
 			return;
 		}
 		
@@ -410,44 +424,44 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType)
 {
 	ZGMemorySize totalSize = 0;
-    
-    ZGMemorySize characterSize = dataType == ZGUTF8String ? sizeof(char) : sizeof(unichar);
-    void *theByte = NULL;
-    
-    while (YES)
-    {
-        BOOL shouldBreak = NO;
-        ZGMemorySize outputtedSize = characterSize;
-        
-        if (ZGReadBytes(processTask, address, &theByte, &outputtedSize))
-        {
-            if ((dataType == ZGUTF8String && *((char *)theByte) == 0) || (dataType == ZGUTF16String && *((unichar *)theByte) == 0))
-            {
-                // Only count the null terminator for a UTF-8 string, as long as the string has some length
-                if (totalSize && dataType == ZGUTF8String)
-                {
-                    totalSize += characterSize;
-                }
-                
-                shouldBreak = YES;
-            }
-            
-            ZGFreeBytes(processTask, theByte, outputtedSize);
-        }
-        else
-        {
-            totalSize = 0;
-            shouldBreak = YES;
-        }
-        
-        if (shouldBreak)
-        {
-            break;
-        }
-        
-        totalSize += characterSize;
-        address += characterSize;
-    }
+	
+	ZGMemorySize characterSize = dataType == ZGUTF8String ? sizeof(char) : sizeof(unichar);
+	void *theByte = NULL;
+	
+	while (YES)
+	{
+		BOOL shouldBreak = NO;
+		ZGMemorySize outputtedSize = characterSize;
+		
+		if (ZGReadBytes(processTask, address, &theByte, &outputtedSize))
+		{
+			if ((dataType == ZGUTF8String && *((char *)theByte) == 0) || (dataType == ZGUTF16String && *((unichar *)theByte) == 0))
+			{
+				// Only count the null terminator for a UTF-8 string, as long as the string has some length
+				if (totalSize && dataType == ZGUTF8String)
+				{
+					totalSize += characterSize;
+				}
+				
+				shouldBreak = YES;
+			}
+			
+			ZGFreeBytes(processTask, theByte, outputtedSize);
+		}
+		else
+		{
+			totalSize = 0;
+			shouldBreak = YES;
+		}
+		
+		if (shouldBreak)
+		{
+			break;
+		}
+		
+		totalSize += characterSize;
+		address += characterSize;
+	}
 	
 	return totalSize;
 }

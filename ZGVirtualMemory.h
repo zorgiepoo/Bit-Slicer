@@ -18,7 +18,6 @@
  * Copyright 2010 zgcoder. All rights reserved.
  */
 
-#import "ZGSearching.h"
 #import "ZGMemoryTypes.h"
 #import "ZGVariable.h"
 #import <mach/mach_traps.h>
@@ -28,23 +27,10 @@
 #import <mach/mach_vm.h>
 #import <mach/mach.h>
 
+@class ZGSearchData;
 @class ZGProcess;
 
-@interface ZGSearchData : NSObject
-{
-	@public
-	BOOL shouldCancelSearch;
-	BOOL searchDidCancel;
-	
-	NSArray *savedData;
-	NSArray *tempSavedData;
-	
-	BOOL scanReadOnly;
-}
-@end
-
-typedef void (^search_for_data_t)(void *data, void *data2, ZGMemoryAddress address, int currentRegionNumber);
-typedef void (^memory_dump_t)(int currentRegionNumber);
+typedef void (^search_for_data_t)(void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber);
 
 BOOL ZGIsProcessValid(pid_t process, ZGMemoryMap *task);
 int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask);
@@ -54,7 +40,7 @@ BOOL ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *
 BOOL ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection);
 BOOL ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection);
 void ZGFreeData(NSArray *dataArray);
-NSArray *ZGGetAllData(ZGProcess *process, BOOL scanReadOnly);
+NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues);
 void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySize dataSize);
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process);
 void ZGInitializeSearch(ZGSearchData *searchData);

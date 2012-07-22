@@ -29,9 +29,7 @@
 	SEL selector;
 }
 
-- (id)initWithTimeInterval:(NSTimeInterval)timeInterval
-					target:(id)theTarget
-				  selector:(SEL)theSelector;
+- (id)initWithTimeInterval:(NSTimeInterval)timeInterval target:(id)theTarget selector:(SEL)theSelector;
 
 - (void)invalidate;
 

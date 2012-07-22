@@ -14,18 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Bit Slicer.  If not, see <http://www.gnu.org/licenses/>.
  * 
- * Created by Mayur Pawashe on 5/12/11.
- * Copyright 2010 zgcoder. All rights reserved.
+ * Created by Mayur Pawashe on 7/19/12.
+ * Copyright 2012 zgcoder. All rights reserved.
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
-#import "ZGVariable.h"
+@class ZGDocument;
 
-@class ZGProcess;
+@interface ZGMemoryProtectionController : NSObject
+{
+	IBOutlet ZGDocument *document;
+	
+	IBOutlet NSWindow *changeProtectionWindow;
+	IBOutlet NSTextField *changeProtectionAddressTextField;
+	IBOutlet NSTextField *changeProtectionSizeTextField;
+	IBOutlet NSButton *changeProtectionReadButton;
+	IBOutlet NSButton *changeProtectionWriteButton;
+	IBOutlet NSButton *changeProtectionExecuteButton;
+}
 
-ZGMemoryAddress memoryAddressFromExpression(NSString *expression);
-BOOL isValidNumber(NSString *expression);
+- (IBAction)changeProtectionOkayButton:(id)sender;
+- (IBAction)changeProtectionCancelButton:(id)sender;
 
-void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
-unsigned char *allocateFlagsForByteArrayWildcards(NSString *searchValue);
+- (void)changeMemoryProtectionRequest;
+
+@end

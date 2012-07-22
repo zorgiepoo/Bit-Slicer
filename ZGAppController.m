@@ -29,11 +29,8 @@
 
 @interface ZGAppController (Private)
 
-- (void)openPreferences:(id)sender
-             showWindow:(BOOL)shouldShowWindow;
-
-- (void)openMemoryViewer:(id)sender
-              showWindow:(BOOL)shouldShowWindow;
+- (void)openPreferences:(id)sender showWindow:(BOOL)shouldShowWindow;
+- (void)openMemoryViewer:(id)sender showWindow:(BOOL)shouldShowWindow;
 
 @end
 
@@ -47,20 +44,20 @@ static ZGAppController *sharedInstance = nil;
 
 + (BOOL)isRunningLaterThanLion
 {
-    SInt32 majorVersion;
-    SInt32 minorVersion;
-    
-    if (Gestalt(gestaltSystemVersionMajor, &majorVersion) != noErr)
-    {
-        return NO;
-    }
-    
-    if (Gestalt(gestaltSystemVersionMinor, &minorVersion) != noErr)
-    {
-        return NO;
-    }
-    
-    return (majorVersion == 10 && minorVersion >= 7) || majorVersion > 10;
+	SInt32 majorVersion;
+	SInt32 minorVersion;
+	
+	if (Gestalt(gestaltSystemVersionMajor, &majorVersion) != noErr)
+	{
+		return NO;
+	}
+	
+	if (Gestalt(gestaltSystemVersionMinor, &minorVersion) != noErr)
+	{
+		return NO;
+	}
+	
+	return (majorVersion == 10 && minorVersion >= 7) || majorVersion > 10;
 }
 
 + (ZGAppController *)sharedController
@@ -82,7 +79,7 @@ static ZGAppController *sharedInstance = nil;
 
 - (ZGPreferencesController *)preferencesController
 {
-    return preferencesController;
+	return preferencesController;
 }
 
 - (ZGMemoryViewer *)memoryViewer
@@ -153,7 +150,7 @@ static BOOL didRegisteredHotKey = NO;
 	}
 	
 	NSNumber *hotKeyCodeNumber = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_HOT_KEY];
-    NSNumber *hotKeyModifier = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_HOT_KEY_MODIFIER];
+	NSNumber *hotKeyModifier = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_HOT_KEY_MODIFIER];
     
 	if (hotKeyCodeNumber && [hotKeyCodeNumber intValue] > INVALID_KEY_CODE)
 	{
@@ -235,10 +232,13 @@ static BOOL didRegisteredHotKey = NO;
 							[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:latestVersionURL]];
 							break;
 						case NSAlertOtherReturn: // don't ask again
-							[[NSUserDefaults standardUserDefaults] setBool:NO
-																	forKey:ZG_CHECK_FOR_UPDATES];
-							[[NSUserDefaults standardUserDefaults] setBool:NO
-																	forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+							[[NSUserDefaults standardUserDefaults]
+							 setBool:NO
+							 forKey:ZG_CHECK_FOR_UPDATES];
+							
+							[[NSUserDefaults standardUserDefaults]
+							 setBool:NO
+							 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 							break;
 					}
 				}
@@ -260,7 +260,6 @@ static BOOL didRegisteredHotKey = NO;
 	}
 }
 
-#define CHECK_PROCESSES_TIME_INTERVAL 0.5
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {	
 	if (acquireTaskportRight() != 0)
@@ -272,82 +271,71 @@ static BOOL didRegisteredHotKey = NO;
 		[NSApp terminate:nil];
 	}
     
-    // Initialize preference defaults
-    [self openPreferences:nil
-               showWindow:NO];
+	// Initialize preference defaults
+	[self openPreferences:nil showWindow:NO];
     
 	[[self class] registerPauseAndUnpauseHotKey];
 	[ZGCalculator initializeCalculator];
 	
 	[self checkForUpdates];
-	
-	[NSTimer scheduledTimerWithTimeInterval:CHECK_PROCESSES_TIME_INTERVAL
-									 target:self
-								   selector:@selector(checkProcesses:)
-								   userInfo:nil
-									repeats:YES];
 }
 
 #pragma mark Actions
 
-+ (void)restoreWindowWithIdentifier:(NSString *)identifier
-                              state:(NSCoder *)state
-                  completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
++ (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
-    if ([identifier isEqualToString:ZGMemoryViewerIdentifier])
-    {
-        [[self sharedController] openMemoryViewer:nil
-                                       showWindow:NO];
+	if ([identifier isEqualToString:ZGMemoryViewerIdentifier])
+	{
+		[[self sharedController]
+		 openMemoryViewer:nil
+		 showWindow:NO];
         
-        completionHandler([[[self sharedController] memoryViewer] window], nil);
-    }
-    else if ([identifier isEqualToString:ZGPreferencesIdentifier])
-    {
-        [[self sharedController] openPreferences:nil
-                                      showWindow:NO];
-        
-        completionHandler([[[self sharedController] preferencesController] window], nil);
-    }
+		completionHandler([[[self sharedController] memoryViewer] window], nil);
+	}
+	else if ([identifier isEqualToString:ZGPreferencesIdentifier])
+	{
+		[[self sharedController]
+		 openPreferences:nil
+		 showWindow:NO];
+		
+		completionHandler([[[self sharedController] preferencesController] window], nil);
+	}
 }
 
-- (void)openPreferences:(id)sender
-             showWindow:(BOOL)shouldShowWindow
+- (void)openPreferences:(id)sender showWindow:(BOOL)shouldShowWindow
 {
-    if (!preferencesController)
+	if (!preferencesController)
 	{
 		preferencesController = [[ZGPreferencesController alloc] init];
 	}
 	
-    if (shouldShowWindow)
-    {
-        [preferencesController showWindow:nil];
-    }
+	if (shouldShowWindow)
+	{
+		[preferencesController showWindow:nil];
+	}
 }
 
 - (IBAction)openPreferences:(id)sender
 {
-    [self openPreferences:sender
-               showWindow:YES];
+	[self openPreferences:sender showWindow:YES];
 }
 
-- (void)openMemoryViewer:(id)sender
-              showWindow:(BOOL)shouldShowWindow
+- (void)openMemoryViewer:(id)sender showWindow:(BOOL)shouldShowWindow
 {
-    if (!memoryViewer)
+	if (!memoryViewer)
 	{
 		memoryViewer = [[ZGMemoryViewer alloc] init];
 	}
 	
-    if (shouldShowWindow)
-    {
-        [memoryViewer showWindow:nil];
-    }
+	if (shouldShowWindow)
+	{
+		[memoryViewer showWindow:nil];
+	}
 }
 
 - (IBAction)openMemoryViewer:(id)sender
 {
-    [self openMemoryViewer:sender
-                showWindow:YES];
+	[self openMemoryViewer:sender showWindow:YES];
 }
 
 - (IBAction)jumpToMemoryAddress:(id)sender
@@ -374,51 +362,6 @@ static BOOL didRegisteredHotKey = NO;
 	}
 	
 	return YES;
-}
-
-#pragma mark Watching processes
-
-- (void)checkProcesses:(NSTimer *)timer
-{
-	// So basically, NSWorkspace's methods for notifying us of processes terminating and launching,
-	// don't notify us of processes that main applications spawn
-	// So we check every few seconds if any new process spawns
-	// In my experience, an example of this is with Chrome processes
-	
-	NSArray *newRunningApplications = [[NSWorkspace sharedWorkspace] runningApplications];
-	BOOL anApplicationLaunchedOrTerminated = NO;
-	
-	for (NSRunningApplication *runningApplication in newRunningApplications)
-	{
-		// Check if a process spawned
-		if (![runningApplications containsObject:runningApplication])
-		{
-			[[NSNotificationCenter defaultCenter] postNotificationName:ZGProcessLaunched
-																object:self
-															  userInfo:[NSDictionary dictionaryWithObject:runningApplication
-																								   forKey:ZGRunningApplication]];
-			anApplicationLaunchedOrTerminated = YES;
-		}
-	}
-	
-	for (NSRunningApplication *runningApplication in runningApplications)
-	{
-		// Check if a process terminated
-		if (![newRunningApplications containsObject:runningApplication])
-		{
-			[[NSNotificationCenter defaultCenter] postNotificationName:ZGProcessTerminated
-																object:self
-															  userInfo:[NSDictionary dictionaryWithObject:runningApplication
-																								   forKey:ZGRunningApplication]];
-			anApplicationLaunchedOrTerminated = YES;
-		}
-	}
-	
-	if (anApplicationLaunchedOrTerminated)
-	{
-		[runningApplications release];
-		runningApplications = [newRunningApplications retain];
-	}
 }
 
 @end

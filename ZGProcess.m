@@ -25,6 +25,7 @@
 @synthesize processID;
 @synthesize processTask;
 @synthesize name;
+@synthesize is64Bit;
 
 static NSArray *frozenProcesses = nil;
 + (NSArray *)frozenProcesses
@@ -87,16 +88,14 @@ static NSArray *frozenProcesses = nil;
 	}
 }
 
-- (id)initWithName:(NSString *)processName
-		 processID:(pid_t)aProcessID
-		  set64Bit:(BOOL)flag64Bit
+- (id)initWithName:(NSString *)processName processID:(pid_t)aProcessID set64Bit:(BOOL)flag64Bit
 {
 	if ((self = [super init]))
 	{
 		[self setName:processName];
 		[self setProcessID:aProcessID];
-		is64Bit = flag64Bit;
-        processTask = MACH_PORT_NULL;
+		[self setIs64Bit:flag64Bit];
+		processTask = MACH_PORT_NULL;
 	}
 	
 	return self;

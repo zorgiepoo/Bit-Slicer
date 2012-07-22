@@ -18,7 +18,11 @@
  * Copyright 2011 zgcoder. All rights reserved.
  */
 
+#import <stdint.h>
+
 typedef mach_vm_address_t ZGMemoryAddress;
 typedef mach_vm_size_t ZGMemorySize;
 typedef vm_prot_t ZGMemoryProtection;
 typedef vm_map_t ZGMemoryMap;
+
+#define MAX_MEMORY_ADDRESS ((ZGMemoryAddress)UINT64_MAX)

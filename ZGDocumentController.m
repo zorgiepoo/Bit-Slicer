@@ -23,15 +23,6 @@
 
 @implementation ZGDocumentController
 
-- (void)setLastSelectedProcessName:(NSString *)processName
-{
-	[lastSelectedProcessName release];
-	lastSelectedProcessName = [processName copy];
-}
-
-- (NSString *)lastSelectedProcessName
-{
-	return lastSelectedProcessName;
-}
+@synthesize lastSelectedProcessName;
 
 @end

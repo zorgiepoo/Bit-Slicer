@@ -44,8 +44,10 @@
 		VALUE result = rb_funcall(rb_eval_string_protect([expression UTF8String], &resultState), rb_intern("to_s"), 0);
 		if (resultState == 0 && result != Qnil && TYPE(result) == T_STRING)
 		{
-			newExpression = [NSString stringWithCString:((struct RString *)result)->ptr
-											   encoding:NSUTF8StringEncoding];
+			newExpression =
+				[NSString
+				 stringWithCString:((struct RString *)result)->ptr
+				 encoding:NSUTF8StringEncoding];
 		}
 	}
 	
@@ -53,8 +55,7 @@
 }
 
 // Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
-+ (NSString *)evaluateAddress:(NSMutableString *)addressFormula
-					  process:(ZGProcess *)process
++ (NSString *)evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process
 {
 	NSUInteger addressFormulaIndex;
 	NSInteger numberOfOpenBrackets = 0;
@@ -82,8 +83,10 @@
 				if (firstOpenBracket != -1 && matchingClosedBracket != -1)
 				{
 					NSString *innerExpression = [addressFormula substringWithRange:NSMakeRange(firstOpenBracket + 1, matchingClosedBracket - firstOpenBracket - 1)];
-					NSString *addressExpression = [self evaluateAddress:[NSMutableString stringWithString:innerExpression]
-																process:process];
+					NSString *addressExpression =
+						[self
+						 evaluateAddress:[NSMutableString stringWithString:innerExpression]
+						 process:process];
 					
 					ZGMemoryAddress address;
 					if ([addressExpression isHexRepresentation])
@@ -118,8 +121,9 @@
 						newExpression = [NSMutableString stringWithString:@"0x0"];
 					}
 					
-					[addressFormula replaceCharactersInRange:NSMakeRange(firstOpenBracket, matchingClosedBracket - firstOpenBracket + 1)
-												  withString:newExpression];
+					[addressFormula
+					 replaceCharactersInRange:NSMakeRange(firstOpenBracket, matchingClosedBracket - firstOpenBracket + 1)
+					 withString:newExpression];
 				}
 				else
 				{

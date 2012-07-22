@@ -14,27 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Bit Slicer.  If not, see <http://www.gnu.org/licenses/>.
  * 
- * Created by Mayur Pawashe on 8/18/10.
- * Copyright 2010 zgcoder. All rights reserved.
+ * Created by Mayur Pawashe on 7/21/12.
+ * Copyright 2012 zgcoder. All rights reserved.
  */
 
-#import "ZGMemoryTypes.h"
+#import <Foundation/Foundation.h>
 
-typedef struct
+#define MAX_TABLE_VIEW_ITEMS ((NSInteger)1000)
+
+@class ZGDocument;
+@class ZGVariableController;
+
+@interface ZGDocumentTableController : NSObject <NSTableViewDelegate>
 {
-	double epsilon;
-	void *rangeValue;
-	BOOL sensitive; // "Hi" == "hi" if insensitive
-	BOOL disregardNullTerminator;
-	BOOL isImplicit; // Should compare stored values?
-	
-	NSString *lastEpsilonValue;
-	NSString *lastAboveRangeValue;
-	NSString *lastBelowRangeValue;
-	
-	// these are not NSString's because there's no reason to save the values
-	ZGMemoryAddress beginAddress;
-	ZGMemoryAddress endAddress;
-	BOOL beginAddressExists;
-	BOOL endAddressExists;
-} ZGSearchArguments;
+	IBOutlet ZGDocument *document;
+	IBOutlet NSTableView *watchVariablesTableView;
+}
+
+@property (readwrite) BOOL shouldIgnoreTableViewSelectionChange;
+@property (readonly) NSTableView *watchVariablesTableView;
+
+@end

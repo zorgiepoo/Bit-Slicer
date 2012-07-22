@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
-		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">11A511</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1617</string>
-		<string key="IBDocument.AppKitVersion">1138</string>
-		<string key="IBDocument.HIToolboxVersion">566.00</string>
+		<int key="IBDocument.SystemTarget">1070</int>
+		<string key="IBDocument.SystemVersion">11E53</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
+		<string key="IBDocument.AppKitVersion">1138.47</string>
+		<string key="IBDocument.HIToolboxVersion">569.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1617</string>
+			<string key="NS.object.0">2182</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -21,11 +21,8 @@
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys" id="0">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
-			<reference key="dict.values" ref="0"/>
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="1048">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -483,17 +480,8 @@
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="223375760">
 									<reference key="NSMenu" ref="477738828"/>
-									<string key="NSTitle">Reset Search</string>
+									<string key="NSTitle">Clear Search</string>
 									<string key="NSKeyEquiv">r</string>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="1033313550"/>
-									<reference key="NSMixedImage" ref="310636482"/>
-								</object>
-								<object class="NSMenuItem" id="819150892">
-									<reference key="NSMenu" ref="477738828"/>
-									<string key="NSTitle">Lock Target</string>
-									<string key="NSKeyEquiv">l</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="1033313550"/>
@@ -875,6 +863,30 @@
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">terminate:</string>
+						<reference key="source" ref="1050"/>
+						<reference key="destination" ref="632727374"/>
+					</object>
+					<int key="connectionID">448</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">orderFrontStandardAboutPanel:</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="238522557"/>
+					</object>
+					<int key="connectionID">142</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">delegate</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="187132439"/>
+					</object>
+					<int key="connectionID">700</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">performMiniaturize:</string>
 						<reference key="source" ref="1014"/>
 						<reference key="destination" ref="1011231497"/>
@@ -896,14 +908,6 @@
 						<reference key="destination" ref="759406840"/>
 					</object>
 					<int key="connectionID">127</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">orderFrontStandardAboutPanel:</string>
-						<reference key="source" ref="1021"/>
-						<reference key="destination" ref="238522557"/>
-					</object>
-					<int key="connectionID">142</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1051,14 +1055,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">terminate:</string>
-						<reference key="source" ref="1050"/>
-						<reference key="destination" ref="632727374"/>
-					</object>
-					<int key="connectionID">448</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">pasteAsPlainText:</string>
 						<reference key="source" ref="1014"/>
 						<reference key="destination" ref="763435172"/>
@@ -1155,51 +1151,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">lockTarget:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="819150892"/>
-					</object>
-					<int key="connectionID">688</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">pauseOrUnpauseProcess:</string>
 						<reference key="source" ref="1014"/>
 						<reference key="destination" ref="165625326"/>
 					</object>
 					<int key="connectionID">690</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="1021"/>
-						<reference key="destination" ref="187132439"/>
-					</object>
-					<int key="connectionID">700</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">openPreferences:</string>
-						<reference key="source" ref="187132439"/>
-						<reference key="destination" ref="609285721"/>
-					</object>
-					<int key="connectionID">746</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">editVariablesValue:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="428133392"/>
-					</object>
-					<int key="connectionID">761</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">editVariablesAddress:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="378992387"/>
-					</object>
-					<int key="connectionID">764</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1208,22 +1164,6 @@
 						<reference key="destination" ref="431577840"/>
 					</object>
 					<int key="connectionID">769</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">help:</string>
-						<reference key="source" ref="187132439"/>
-						<reference key="destination" ref="253952766"/>
-					</object>
-					<int key="connectionID">770</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">openMemoryViewer:</string>
-						<reference key="source" ref="187132439"/>
-						<reference key="destination" ref="920613678"/>
-					</object>
-					<int key="connectionID">802</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1243,11 +1183,83 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">memoryDumpRequest:</string>
+						<string key="label">changeMemoryProtection:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="271236109"/>
+					</object>
+					<int key="connectionID">829</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">addVariable:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="1010840486"/>
+					</object>
+					<int key="connectionID">831</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">toggleFullScreen:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="1059119054"/>
+					</object>
+					<int key="connectionID">839</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">memoryDumpRangeRequest:</string>
 						<reference key="source" ref="1014"/>
 						<reference key="destination" ref="1008752418"/>
 					</object>
-					<int key="connectionID">820</int>
+					<int key="connectionID">840</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">editVariablesValue:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="428133392"/>
+					</object>
+					<int key="connectionID">844</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">editVariablesAddress:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="378992387"/>
+					</object>
+					<int key="connectionID">845</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">editVariablesSize:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="424445454"/>
+					</object>
+					<int key="connectionID">846</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openPreferences:</string>
+						<reference key="source" ref="187132439"/>
+						<reference key="destination" ref="609285721"/>
+					</object>
+					<int key="connectionID">746</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">help:</string>
+						<reference key="source" ref="187132439"/>
+						<reference key="destination" ref="253952766"/>
+					</object>
+					<int key="connectionID">770</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openMemoryViewer:</string>
+						<reference key="source" ref="187132439"/>
+						<reference key="destination" ref="920613678"/>
+					</object>
+					<int key="connectionID">802</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1265,45 +1277,15 @@
 					</object>
 					<int key="connectionID">825</int>
 				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeMemoryProtection:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="271236109"/>
-					</object>
-					<int key="connectionID">829</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">addVariable:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="1010840486"/>
-					</object>
-					<int key="connectionID">831</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">editVariablesSize:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="424445454"/>
-					</object>
-					<int key="connectionID">835</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">toggleFullScreen:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="1059119054"/>
-					</object>
-					<int key="connectionID">839</int>
-				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="IBObjectRecord">
 						<int key="objectID">0</int>
-						<reference key="object" ref="0"/>
+						<object class="NSArray" key="object" id="0">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
 						<reference key="children" ref="1048"/>
 						<nil key="parent"/>
 					</object>
@@ -1681,7 +1663,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="218791066"/>
 							<reference ref="789520852"/>
-							<reference ref="819150892"/>
 							<reference ref="428133392"/>
 							<reference ref="374097592"/>
 							<reference ref="165625326"/>
@@ -1788,11 +1769,6 @@
 						<int key="objectID">684</int>
 						<reference key="object" ref="374446627"/>
 						<reference key="parent" ref="783627442"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">686</int>
-						<reference key="object" ref="819150892"/>
-						<reference key="parent" ref="477738828"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">689</int>
@@ -2013,7 +1989,6 @@
 					<string>671.IBPluginDependency</string>
 					<string>681.IBPluginDependency</string>
 					<string>684.IBPluginDependency</string>
-					<string>686.IBPluginDependency</string>
 					<string>689.IBPluginDependency</string>
 					<string>691.IBPluginDependency</string>
 					<string>695.IBPluginDependency</string>
@@ -2048,9 +2023,8 @@
 					<string>837.IBPluginDependency</string>
 					<string>92.IBPluginDependency</string>
 				</object>
-				<object class="NSMutableArray" key="dict.values">
+				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2160,7 +2134,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">839</int>
+			<int key="maxID">846</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2175,7 +2149,7 @@
 							<string>clearSearchValues:</string>
 							<string>removeSelectedSearchValues:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>id</string>
@@ -2190,7 +2164,7 @@
 							<string>clearSearchValues:</string>
 							<string>removeSelectedSearchValues:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">addVariable:</string>
@@ -2231,7 +2205,72 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">MyDocument</string>
+					<string key="className">ZGAppController</string>
+					<string key="superclassName">NSObject</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>help:</string>
+							<string>jumpToMemoryAddress:</string>
+							<string>openMemoryViewer:</string>
+							<string>openPreferences:</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>help:</string>
+							<string>jumpToMemoryAddress:</string>
+							<string>openMemoryViewer:</string>
+							<string>openPreferences:</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">help:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">jumpToMemoryAddress:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">openMemoryViewer:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">openPreferences:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">documentController</string>
+						<string key="NS.object.0">ZGDocumentController</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">documentController</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">documentController</string>
+							<string key="candidateClassName">ZGDocumentController</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGAppController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGDocument</string>
 					<string key="superclassName">NSDocument</string>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2243,20 +2282,13 @@
 							<string>copy:</string>
 							<string>dataTypePopUpButtonRequest:</string>
 							<string>editVariablesAddress:</string>
-							<string>editVariablesAddressCancelButton:</string>
-							<string>editVariablesAddressOkayButton:</string>
 							<string>editVariablesSize:</string>
-							<string>editVariablesSizeCancelButton:</string>
-							<string>editVariablesSizeOkayButton:</string>
 							<string>editVariablesValue:</string>
-							<string>editVariablesValueCancelButton:</string>
-							<string>editVariablesValueOkayButton:</string>
 							<string>freezeVariables:</string>
 							<string>functionTypePopUpButtonRequest:</string>
 							<string>getInitialValues:</string>
-							<string>lockTarget:</string>
 							<string>memoryDumpAllRequest:</string>
-							<string>memoryDumpRequest:</string>
+							<string>memoryDumpRangeRequest:</string>
 							<string>optionsDisclosureButton:</string>
 							<string>pauseOrUnpauseProcess:</string>
 							<string>qualifierMatrixButtonRequest:</string>
@@ -2264,15 +2296,8 @@
 							<string>runningApplicationsPopUpButtonRequest:</string>
 							<string>searchValue:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -2304,20 +2329,13 @@
 							<string>copy:</string>
 							<string>dataTypePopUpButtonRequest:</string>
 							<string>editVariablesAddress:</string>
-							<string>editVariablesAddressCancelButton:</string>
-							<string>editVariablesAddressOkayButton:</string>
 							<string>editVariablesSize:</string>
-							<string>editVariablesSizeCancelButton:</string>
-							<string>editVariablesSizeOkayButton:</string>
 							<string>editVariablesValue:</string>
-							<string>editVariablesValueCancelButton:</string>
-							<string>editVariablesValueOkayButton:</string>
 							<string>freezeVariables:</string>
 							<string>functionTypePopUpButtonRequest:</string>
 							<string>getInitialValues:</string>
-							<string>lockTarget:</string>
 							<string>memoryDumpAllRequest:</string>
-							<string>memoryDumpRequest:</string>
+							<string>memoryDumpRangeRequest:</string>
 							<string>optionsDisclosureButton:</string>
 							<string>pauseOrUnpauseProcess:</string>
 							<string>qualifierMatrixButtonRequest:</string>
@@ -2325,7 +2343,7 @@
 							<string>runningApplicationsPopUpButtonRequest:</string>
 							<string>searchValue:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">addVariable:</string>
@@ -2352,35 +2370,11 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">editVariablesAddressCancelButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesAddressOkayButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
 								<string key="name">editVariablesSize:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">editVariablesSizeCancelButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesSizeOkayButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
 								<string key="name">editVariablesValue:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesValueCancelButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesValueOkayButton:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2396,15 +2390,11 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">lockTarget:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
 								<string key="name">memoryDumpAllRequest:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">memoryDumpRequest:</string>
+								<string key="name">memoryDumpRangeRequest:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2437,17 +2427,10 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>additionalTasksController</string>
 							<string>beginningAddressLabel</string>
 							<string>beginningAddressTextField</string>
 							<string>clearButton</string>
 							<string>dataTypesPopUpButton</string>
-							<string>editVariablesAddressTextField</string>
-							<string>editVariablesAddressWindow</string>
-							<string>editVariablesSizeTextField</string>
-							<string>editVariablesSizeWindow</string>
-							<string>editVariablesValueTextField</string>
-							<string>editVariablesValueWindow</string>
 							<string>endingAddressLabel</string>
 							<string>endingAddressTextField</string>
 							<string>flagsLabel</string>
@@ -2457,6 +2440,8 @@
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
+							<string>memoryDumpController</string>
+							<string>memoryProtectionController</string>
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
@@ -2465,23 +2450,17 @@
 							<string>searchValueLabel</string>
 							<string>searchValueTextField</string>
 							<string>searchingProgressIndicator</string>
+							<string>tableController</string>
+							<string>variableController</string>
 							<string>variableQualifierMatrix</string>
-							<string>watchVariablesTableView</string>
 							<string>watchWindow</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ZGAdditionalTasksController</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSPopUpButton</string>
-							<string>NSTextField</string>
-							<string>NSWindow</string>
-							<string>NSTextField</string>
-							<string>NSWindow</string>
-							<string>NSTextField</string>
-							<string>NSWindow</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -2491,6 +2470,8 @@
 							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
+							<string>ZGMemoryDumpController</string>
+							<string>ZGMemoryProtectionController</string>
 							<string>NSButton</string>
 							<string>NSView</string>
 							<string>NSPopUpButton</string>
@@ -2499,8 +2480,9 @@
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSProgressIndicator</string>
+							<string>ZGDocumentTableController</string>
+							<string>ZGVariableController</string>
 							<string>NSMatrix</string>
-							<string>NSTableView</string>
 							<string>NSWindow</string>
 						</object>
 					</object>
@@ -2508,17 +2490,10 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>additionalTasksController</string>
 							<string>beginningAddressLabel</string>
 							<string>beginningAddressTextField</string>
 							<string>clearButton</string>
 							<string>dataTypesPopUpButton</string>
-							<string>editVariablesAddressTextField</string>
-							<string>editVariablesAddressWindow</string>
-							<string>editVariablesSizeTextField</string>
-							<string>editVariablesSizeWindow</string>
-							<string>editVariablesValueTextField</string>
-							<string>editVariablesValueWindow</string>
 							<string>endingAddressLabel</string>
 							<string>endingAddressTextField</string>
 							<string>flagsLabel</string>
@@ -2528,6 +2503,8 @@
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
+							<string>memoryDumpController</string>
+							<string>memoryProtectionController</string>
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
@@ -2536,16 +2513,13 @@
 							<string>searchValueLabel</string>
 							<string>searchValueTextField</string>
 							<string>searchingProgressIndicator</string>
+							<string>tableController</string>
+							<string>variableController</string>
 							<string>variableQualifierMatrix</string>
-							<string>watchVariablesTableView</string>
 							<string>watchWindow</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">additionalTasksController</string>
-								<string key="candidateClassName">ZGAdditionalTasksController</string>
-							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">beginningAddressLabel</string>
 								<string key="candidateClassName">NSTextField</string>
@@ -2561,30 +2535,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">dataTypesPopUpButton</string>
 								<string key="candidateClassName">NSPopUpButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">editVariablesAddressTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">editVariablesAddressWindow</string>
-								<string key="candidateClassName">NSWindow</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">editVariablesSizeTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">editVariablesSizeWindow</string>
-								<string key="candidateClassName">NSWindow</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">editVariablesValueTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">editVariablesValueWindow</string>
-								<string key="candidateClassName">NSWindow</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">endingAddressLabel</string>
@@ -2623,6 +2573,14 @@
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">memoryDumpController</string>
+								<string key="candidateClassName">ZGMemoryDumpController</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">memoryProtectionController</string>
+								<string key="candidateClassName">ZGMemoryProtectionController</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">optionsDisclosureButton</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
@@ -2655,12 +2613,16 @@
 								<string key="candidateClassName">NSProgressIndicator</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">variableQualifierMatrix</string>
-								<string key="candidateClassName">NSMatrix</string>
+								<string key="name">tableController</string>
+								<string key="candidateClassName">ZGDocumentTableController</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">watchVariablesTableView</string>
-								<string key="candidateClassName">NSTableView</string>
+								<string key="name">variableController</string>
+								<string key="candidateClassName">ZGVariableController</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">variableQualifierMatrix</string>
+								<string key="candidateClassName">NSMatrix</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">watchWindow</string>
@@ -2670,28 +2632,69 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/MyDocument.h</string>
+						<string key="minorKey">./Classes/ZGDocument.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">NSDocument</string>
+					<string key="className">ZGDocumentController</string>
+					<string key="superclassName">NSDocumentController</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGDocumentController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGDocumentTableController</string>
+					<string key="superclassName">NSObject</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>document</string>
+							<string>watchVariablesTableView</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>ZGDocument</string>
+							<string>NSTableView</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>document</string>
+							<string>watchVariablesTableView</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">document</string>
+								<string key="candidateClassName">ZGDocument</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">watchVariablesTableView</string>
+								<string key="candidateClassName">NSTableView</string>
+							</object>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGDocumentTableController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGMemoryDumpController</string>
+					<string key="superclassName">NSObject</string>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>printDocument:</string>
-							<string>revertDocumentToSaved:</string>
-							<string>runPageLayout:</string>
-							<string>saveDocument:</string>
-							<string>saveDocumentAs:</string>
-							<string>saveDocumentTo:</string>
+							<string>memoryDumpCancelButton:</string>
+							<string>memoryDumpOkayButton:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 						</object>
@@ -2700,48 +2703,74 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>printDocument:</string>
-							<string>revertDocumentToSaved:</string>
-							<string>runPageLayout:</string>
-							<string>saveDocument:</string>
-							<string>saveDocumentAs:</string>
-							<string>saveDocumentTo:</string>
+							<string>memoryDumpCancelButton:</string>
+							<string>memoryDumpOkayButton:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
-								<string key="name">printDocument:</string>
+								<string key="name">memoryDumpCancelButton:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">revertDocumentToSaved:</string>
+								<string key="name">memoryDumpOkayButton:</string>
 								<string key="candidateClassName">id</string>
 							</object>
-							<object class="IBActionInfo">
-								<string key="name">runPageLayout:</string>
-								<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>document</string>
+							<string>memoryDumpFromAddressTextField</string>
+							<string>memoryDumpToAddressTextField</string>
+							<string>memoryDumpWindow</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>ZGDocument</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSWindow</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>document</string>
+							<string>memoryDumpFromAddressTextField</string>
+							<string>memoryDumpToAddressTextField</string>
+							<string>memoryDumpWindow</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">document</string>
+								<string key="candidateClassName">ZGDocument</string>
 							</object>
-							<object class="IBActionInfo">
-								<string key="name">saveDocument:</string>
-								<string key="candidateClassName">id</string>
+							<object class="IBToOneOutletInfo">
+								<string key="name">memoryDumpFromAddressTextField</string>
+								<string key="candidateClassName">NSTextField</string>
 							</object>
-							<object class="IBActionInfo">
-								<string key="name">saveDocumentAs:</string>
-								<string key="candidateClassName">id</string>
+							<object class="IBToOneOutletInfo">
+								<string key="name">memoryDumpToAddressTextField</string>
+								<string key="candidateClassName">NSTextField</string>
 							</object>
-							<object class="IBActionInfo">
-								<string key="name">saveDocumentTo:</string>
-								<string key="candidateClassName">id</string>
+							<object class="IBToOneOutletInfo">
+								<string key="name">memoryDumpWindow</string>
+								<string key="candidateClassName">NSWindow</string>
 							</object>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/NSDocument.h</string>
+						<string key="minorKey">./Classes/ZGMemoryDumpController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">ZGAdditionalTasksController</string>
+					<string key="className">ZGMemoryProtectionController</string>
 					<string key="superclassName">NSObject</string>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -2749,13 +2778,9 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>changeProtectionCancelButton:</string>
 							<string>changeProtectionOkayButton:</string>
-							<string>memoryDumpCancelButton:</string>
-							<string>memoryDumpOkayButton:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 						</object>
@@ -2766,10 +2791,8 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>changeProtectionCancelButton:</string>
 							<string>changeProtectionOkayButton:</string>
-							<string>memoryDumpCancelButton:</string>
-							<string>memoryDumpOkayButton:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">changeProtectionCancelButton:</string>
@@ -2777,14 +2800,6 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">changeProtectionOkayButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">memoryDumpCancelButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">memoryDumpOkayButton:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 						</object>
@@ -2800,14 +2815,8 @@
 							<string>changeProtectionWindow</string>
 							<string>changeProtectionWriteButton</string>
 							<string>document</string>
-							<string>generalStatusTextField</string>
-							<string>memoryDumpFromAddressTextField</string>
-							<string>memoryDumpToAddressTextField</string>
-							<string>memoryDumpWindow</string>
-							<string>searchingProgressIndicator</string>
-							<string>watchWindow</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSTextField</string>
 							<string>NSButton</string>
@@ -2815,13 +2824,7 @@
 							<string>NSTextField</string>
 							<string>NSWindow</string>
 							<string>NSButton</string>
-							<string>MyDocument</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSWindow</string>
-							<string>NSProgressIndicator</string>
-							<string>NSWindow</string>
+							<string>ZGDocument</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -2835,14 +2838,8 @@
 							<string>changeProtectionWindow</string>
 							<string>changeProtectionWriteButton</string>
 							<string>document</string>
-							<string>generalStatusTextField</string>
-							<string>memoryDumpFromAddressTextField</string>
-							<string>memoryDumpToAddressTextField</string>
-							<string>memoryDumpWindow</string>
-							<string>searchingProgressIndicator</string>
-							<string>watchWindow</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
 								<string key="name">changeProtectionAddressTextField</string>
@@ -2870,53 +2867,33 @@
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">document</string>
-								<string key="candidateClassName">MyDocument</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">generalStatusTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryDumpFromAddressTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryDumpToAddressTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryDumpWindow</string>
-								<string key="candidateClassName">NSWindow</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">searchingProgressIndicator</string>
-								<string key="candidateClassName">NSProgressIndicator</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">watchWindow</string>
-								<string key="candidateClassName">NSWindow</string>
+								<string key="candidateClassName">ZGDocument</string>
 							</object>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ZGAdditionalTasksController.h</string>
+						<string key="minorKey">./Classes/ZGMemoryProtectionController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">ZGAppController</string>
+					<string key="className">ZGVariableController</string>
 					<string key="superclassName">NSObject</string>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>help:</string>
-							<string>jumpToMemoryAddress:</string>
-							<string>openMemoryViewer:</string>
-							<string>openPreferences:</string>
+							<string>editVariablesAddressCancelButton:</string>
+							<string>editVariablesAddressOkayButton:</string>
+							<string>editVariablesSizeCancelButton:</string>
+							<string>editVariablesSizeOkayButton:</string>
+							<string>editVariablesValueCancelButton:</string>
+							<string>editVariablesValueOkayButton:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -2927,63 +2904,117 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>help:</string>
-							<string>jumpToMemoryAddress:</string>
-							<string>openMemoryViewer:</string>
-							<string>openPreferences:</string>
+							<string>editVariablesAddressCancelButton:</string>
+							<string>editVariablesAddressOkayButton:</string>
+							<string>editVariablesSizeCancelButton:</string>
+							<string>editVariablesSizeOkayButton:</string>
+							<string>editVariablesValueCancelButton:</string>
+							<string>editVariablesValueOkayButton:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
-								<string key="name">help:</string>
+								<string key="name">editVariablesAddressCancelButton:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">jumpToMemoryAddress:</string>
+								<string key="name">editVariablesAddressOkayButton:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">openMemoryViewer:</string>
+								<string key="name">editVariablesSizeCancelButton:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">openPreferences:</string>
+								<string key="name">editVariablesSizeOkayButton:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">editVariablesValueCancelButton:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">editVariablesValueOkayButton:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">documentController</string>
-						<string key="NS.object.0">ZGDocumentController</string>
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>document</string>
+							<string>editVariablesAddressTextField</string>
+							<string>editVariablesAddressWindow</string>
+							<string>editVariablesSizeTextField</string>
+							<string>editVariablesSizeWindow</string>
+							<string>editVariablesValueTextField</string>
+							<string>editVariablesValueWindow</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>ZGDocument</string>
+							<string>NSTextField</string>
+							<string>NSWindow</string>
+							<string>NSTextField</string>
+							<string>NSWindow</string>
+							<string>NSTextField</string>
+							<string>NSWindow</string>
+						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<string key="NS.key.0">documentController</string>
-						<object class="IBToOneOutletInfo" key="NS.object.0">
-							<string key="name">documentController</string>
-							<string key="candidateClassName">ZGDocumentController</string>
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>document</string>
+							<string>editVariablesAddressTextField</string>
+							<string>editVariablesAddressWindow</string>
+							<string>editVariablesSizeTextField</string>
+							<string>editVariablesSizeWindow</string>
+							<string>editVariablesValueTextField</string>
+							<string>editVariablesValueWindow</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">document</string>
+								<string key="candidateClassName">ZGDocument</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">editVariablesAddressTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">editVariablesAddressWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">editVariablesSizeTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">editVariablesSizeWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">editVariablesValueTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">editVariablesValueWindow</string>
+								<string key="candidateClassName">NSWindow</string>
+							</object>
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ZGAppController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ZGDocumentController</string>
-					<string key="superclassName">NSDocumentController</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ZGDocumentController.h</string>
+						<string key="minorKey">./Classes/ZGVariableController.h</string>
 					</object>
 				</object>
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<integer value="1060" key="NS.object.0"/>
-		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>
 			<integer value="3000" key="NS.object.0"/>
@@ -2997,10 +3028,10 @@
 				<string>NSMenuCheckmark</string>
 				<string>NSMenuMixedState</string>
 			</object>
-			<object class="NSMutableArray" key="dict.values">
+			<object class="NSArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>{9, 8}</string>
-				<string>{7, 2}</string>
+				<string>{11, 11}</string>
+				<string>{10, 3}</string>
 			</object>
 		</object>
 	</data>
