@@ -547,7 +547,7 @@
 	// Just to be sure
 	if ([oldRunningApplication processIdentifier] != [[NSRunningApplication currentApplication] processIdentifier])
 	{
-		// oldRunningApplication == nil, means current process terminated (was in middle of a search)
+		// oldRunningApplication == nil, means remove 'current process'
 		if ([currentProcess processID] == [oldRunningApplication processIdentifier] || !oldRunningApplication)
 		{
 			// Don't remove the item, just indicate it's terminated
