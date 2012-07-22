@@ -468,7 +468,7 @@
 		[self markDocumentChange];
 	}
 	
-	if (currentProcess)
+	if (currentProcess && [currentProcess processID] != NON_EXISTENT_PID_NUMBER)
 	{
 		if (![currentProcess grantUsAccess])
 		{
@@ -507,8 +507,11 @@
 	
 	[itemsToRemove release];
 	
-	// If we're switching to a process, search button should be enabled
-	[searchButton setEnabled:YES];
+	// If we're switching to a process, search button should be enabled if it's alive
+	if ([currentProcess processID] != NON_EXISTENT_PID_NUMBER)
+	{
+		[searchButton setEnabled:YES];
+	}
 }
 
 - (void)removeRunningApplicationFromPopupButton:(NSRunningApplication *)oldRunningApplication
