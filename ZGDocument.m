@@ -538,6 +538,8 @@
 		{
 			[runningApplicationsPopUpButton removeItemAtIndex:[runningApplicationsPopUpButton indexOfItem:menuItem]];
 		}
+		
+		[menuItemsToRemove release];
 	}
 	
 	// Just to be sure
