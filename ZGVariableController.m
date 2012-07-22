@@ -156,6 +156,8 @@
 	[temporaryArray release];
 	
 	[[[document tableController] watchVariablesTableView] reloadData];
+	
+	[document updateClearButton];
 }
 
 - (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes
@@ -180,6 +182,8 @@
 	[[[document undoManager] prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
 	
 	[[document generalStatusTextField] setStringValue:@""];
+	
+	[document updateClearButton];
 }
 
 - (void)removeSelectedSearchValues

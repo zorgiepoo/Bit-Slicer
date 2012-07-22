@@ -55,8 +55,6 @@
 
 @interface ZGDocument (Private)
 
-- (void)updateRunningApplicationProcesses;
-
 - (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray;
 
 - (void)updateFlags;
@@ -72,8 +70,6 @@
 - (void)functionTypePopUpButtonRequest:(id)sender markChanges:(BOOL)shouldMarkChanges;
 
 @end
-
-#define VALUE_TABLE_COLUMN_INDEX 1
 
 #define DEFAULT_FLOATING_POINT_EPSILON 0.1
 
@@ -107,7 +103,8 @@
 @synthesize searchingProgressIndicator;
 @synthesize generalStatusTextField;
 @synthesize currentProcess;
-@synthesize clearButton;
+@synthesize documentState;
+@synthesize desiredProcessName;
 @synthesize watchVariablesArray;
 @synthesize variableQualifierMatrix;
 @synthesize tableController;
@@ -144,7 +141,6 @@
 	self = [super init];
 	if (self)
 	{
-		documentState = [[ZGDocumentInfo alloc] init];		
 		searchData = [[ZGSearchData alloc] init];
 	}
 	return self;
@@ -153,6 +149,10 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+	[[NSWorkspace sharedWorkspace]
+	 removeObserver:self
+	 forKeyPath:@"runningApplications"];
 	
 	[watchVariablesTimer invalidate];
 	[watchVariablesTimer release];
@@ -166,13 +166,8 @@
 	searchData = nil;
 	
 	[self setWatchVariablesArray:nil];
-	
 	[self setCurrentProcess:nil];
-	
-	[desiredProcessName release];
-	desiredProcessName = nil;
-	
-	[documentState release];
+	[self setDesiredProcessName:nil];
 	
 	[super dealloc];
 }
@@ -189,9 +184,9 @@
 
 - (void)loadDocumentUserInterface
 {
-	if (!desiredProcessName)
+	if (![self desiredProcessName])
 	{
-		desiredProcessName = [[[[ZGAppController sharedController] documentController] lastSelectedProcessName] copy];
+		[self setDesiredProcessName:[[[ZGAppController sharedController] documentController] lastSelectedProcessName]];
 	}
     
 	// check if the document is being reverted
@@ -200,51 +195,63 @@
 		[generalStatusTextField setStringValue:@""];
 	}
 	
-	[self updateRunningApplicationProcesses];
+	// Add running applications to popup button
+	for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
+	{
+		[self addRunningApplicationToPopupButton:runningApplication];
+	}
+	
+	[[NSWorkspace sharedWorkspace]
+	 addObserver:self
+	 forKeyPath:@"runningApplications"
+	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+	 context:NULL];
 	
 	currentSearchDataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
 
-	if ([documentState loadedFromSave])
+	if ([[self documentState] loadedFromSave])
 	{
-		[self setWatchVariablesArrayAndUpdateInterface:[documentState watchVariablesArray]];
+		[self setWatchVariablesArrayAndUpdateInterface:[[self documentState] watchVariablesArray]];
 		[documentState setWatchVariablesArray:nil];
         
 		[self
-		 selectDataTypeWithTag:(ZGVariableType)[documentState selectedDatatypeTag]
+		 selectDataTypeWithTag:(ZGVariableType)[[self documentState] selectedDatatypeTag]
 		 recordUndo:NO];
         
-		[variableQualifierMatrix selectCellWithTag:[documentState qualifierTag]];
+		[variableQualifierMatrix selectCellWithTag:[[self documentState] qualifierTag]];
 
-		[scanUnwritableValuesCheckBox setState:[documentState scanUnwritableValues]];
-		[ignoreDataAlignmentCheckBox setState:[documentState ignoreDataAlignment]];
-		[includeNullTerminatorCheckBox setState:[documentState exactStringLength]];
-		[ignoreCaseCheckBox setState:[documentState ignoreStringCase]];
-
-		if ([documentState beginningAddress])
+		[scanUnwritableValuesCheckBox setState:[[self documentState] scanUnwritableValues]];
+		[ignoreDataAlignmentCheckBox setState:[[self documentState] ignoreDataAlignment]];
+		[includeNullTerminatorCheckBox setState:[[self documentState] exactStringLength]];
+		[ignoreCaseCheckBox setState:[[self documentState] ignoreStringCase]];
+		
+		if ([[self documentState] beginningAddress])
 		{
-			[beginningAddressTextField setStringValue:[documentState beginningAddress]];
-			[documentState setBeginningAddress:nil];
+			[beginningAddressTextField setStringValue:[[self documentState] beginningAddress]];
+			[[self documentState] setBeginningAddress:nil];
 		}
 		
-		if ([documentState endingAddress])
+		if ([[self documentState] endingAddress])
 		{
-			[endingAddressTextField setStringValue:[documentState endingAddress]];
-			[documentState setEndingAddress:nil];
+			[endingAddressTextField setStringValue:[[self documentState] endingAddress]];
+			[[self documentState] setEndingAddress:nil];
 		}
 
-		if (![self isFunctionTypeStore:[documentState functionTypeTag]])
+		if (![self isFunctionTypeStore:[[self documentState] functionTypeTag]])
 		{
-			[functionPopUpButton selectItemWithTag:[documentState functionTypeTag]];
+			[functionPopUpButton selectItemWithTag:[[self documentState] functionTypeTag]];
 			[self
 			 functionTypePopUpButtonRequest:nil
 			 markChanges:NO];
 		}
         
-		if ([documentState searchValue])
+		if ([[self documentState] searchValue])
 		{
-			[searchValueTextField setStringValue:[documentState searchValue]];
-			[documentState setSearchValue:nil];
+			[searchValueTextField setStringValue:[[self documentState] searchValue]];
+			[[self documentState] setSearchValue:nil];
 		}
+		
+		[self setDocumentState:nil];
 	}
 	else
 	{
@@ -279,18 +286,6 @@
 		 name:NSWindowWillExitFullScreenNotification
 		 object:watchWindow];
 	}
-	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(anApplicationLaunched:)
-	 name:ZGProcessLaunched
-	 object:nil];
-	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(anApplicationTerminated:)
-	 name:ZGProcessTerminated
-	 object:nil];
 	
 	watchVariablesTimer =
 		[[ZGTimer alloc]
@@ -381,8 +376,7 @@
 	 encodeObject:[searchValueTextField stringValue]
 	 forKey:ZGSearchStringValueKey];
     
-	[desiredProcessName release];
-	desiredProcessName = [[currentProcess name] copy];
+	[self setDesiredProcessName:[currentProcess name]];
 	
 	[keyedArchiver finishEncoding];
 	[keyedArchiver release];
@@ -398,29 +392,31 @@
 	NSData *readData = [fileWrapper regularFileContents];
 	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
 	
-	[documentState setWatchVariablesArray:[keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey]];
-	desiredProcessName = [[keyedUnarchiver decodeObjectForKey:ZGProcessNameKey] retain];
+	[self setDocumentState:[[[ZGDocumentInfo alloc] init] autorelease]];
 	
-	[documentState setLoadedFromSave:YES];
-	[documentState setSelectedDatatypeTag:(NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag]];
-	[documentState setQualifierTag:(NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey]];
-	[documentState setFunctionTypeTag:(NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey]];
-	[documentState setScanUnwritableValues:[keyedUnarchiver decodeBoolForKey:ZGScanUnwritableValuesKey]];
-	[documentState setIgnoreDataAlignment:[keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey]];
-	[documentState setExactStringLength:[keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey]];
-	[documentState setIgnoreStringCase:[keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey]];
-	[documentState setBeginningAddress:[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey]];
-	[documentState setEndingAddress:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
+	[[self documentState] setWatchVariablesArray:[keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey]];
+	[self setDesiredProcessName:[keyedUnarchiver decodeObjectForKey:ZGProcessNameKey]];
 	
-	[documentState setSearchValue:[keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey]];
+	[[self documentState] setLoadedFromSave:YES];
+	[[self documentState] setSelectedDatatypeTag:(NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag]];
+	[[self documentState] setQualifierTag:(NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey]];
+	[[self documentState] setFunctionTypeTag:(NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey]];
+	[[self documentState] setScanUnwritableValues:[keyedUnarchiver decodeBoolForKey:ZGScanUnwritableValuesKey]];
+	[[self documentState] setIgnoreDataAlignment:[keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey]];
+	[[self documentState] setExactStringLength:[keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey]];
+	[[self documentState] setIgnoreStringCase:[keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey]];
+	[[self documentState] setBeginningAddress:[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey]];
+	[[self documentState] setEndingAddress:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
+	
+	[[self documentState] setSearchValue:[keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey]];
 	
 	[searchData setLastEpsilonValue:[keyedUnarchiver decodeObjectForKey:ZGEpsilonKey]];
 	[searchData setLastAboveRangeValue:[keyedUnarchiver decodeObjectForKey:ZGAboveValueKey]];
 	[searchData setLastBelowRangeValue:[keyedUnarchiver decodeObjectForKey:ZGBelowValueKey]];
-
+	
 	[keyedUnarchiver release];
 	
-	BOOL success = [documentState watchVariablesArray] != nil && desiredProcessName != nil;
+	BOOL success = [[self documentState] watchVariablesArray] != nil && [self desiredProcessName] != nil;
 	
 	if (success && watchWindow)
 	{
@@ -447,8 +443,7 @@
 		[[self undoManager] removeAllActions];
 	}
 	
-	[currentProcess release];
-	currentProcess = [[[runningApplicationsPopUpButton selectedItem] representedObject] retain];
+	[self setCurrentProcess:[[runningApplicationsPopUpButton selectedItem] representedObject]];
 	
 	if (pointerSizeChanged)
 	{
@@ -467,11 +462,10 @@
 	// keep track of the process the user targeted
 	[[[ZGAppController sharedController] documentController] setLastSelectedProcessName:[currentProcess name]];
 	
-	if (sender)
+	if (sender && ![[self desiredProcessName] isEqualToString:[currentProcess name]])
 	{
-		// change the desired process
-		[desiredProcessName release];
-		desiredProcessName = [[currentProcess name] copy];
+		[self setDesiredProcessName:[currentProcess name]];
+		[self markDocumentChange];
 	}
 	
 	if (currentProcess)
@@ -493,123 +487,149 @@
 			[generalStatusTextField setStringValue:@""];
 		}
 	}
-}
-
-- (void)updateRunningApplicationProcesses
-{
-	[runningApplicationsPopUpButton removeAllItems];
 	
-	NSMenuItem *firstRegularApplicationMenuItem = nil;
-	
-	BOOL foundTargettedProcess = NO;
-	for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
+	// Trash all other menu items if they're dead
+	NSMutableArray *itemsToRemove = [[NSMutableArray alloc] init];
+	for (NSMenuItem *menuItem in [runningApplicationsPopUpButton itemArray])
 	{
-		if ([runningApplication processIdentifier] != [[NSRunningApplication currentApplication] processIdentifier])
+		if (menuItem != [runningApplicationsPopUpButton selectedItem] &&
+			([[menuItem representedObject] processID] == NON_EXISTENT_PID_NUMBER ||
+			 ![[[NSWorkspace sharedWorkspace] runningApplications] containsObject:[NSRunningApplication runningApplicationWithProcessIdentifier:[[menuItem representedObject] processID]]]))
 		{
-			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-			[menuItem setTitle:[NSString stringWithFormat:@"%@ (%d)", [runningApplication localizedName], [runningApplication processIdentifier]]];
-			NSImage *iconImage = [runningApplication icon];
-			[iconImage setSize:NSMakeSize(16, 16)];
-			[menuItem setImage:iconImage];
-			
-			ZGProcess *representedProcess =
-				[[ZGProcess alloc]
-				 initWithName:[runningApplication localizedName]
-				 processID:[runningApplication processIdentifier]
-				 set64Bit:([runningApplication executableArchitecture] == NSBundleExecutableArchitectureX86_64)];
-			[menuItem setRepresentedObject:representedProcess];
-			[representedProcess release];
-			
-			[[runningApplicationsPopUpButton menu] addItem:menuItem];
-			
-			if (!firstRegularApplicationMenuItem && [runningApplication activationPolicy] == NSApplicationActivationPolicyRegular)
-			{
-				firstRegularApplicationMenuItem = [menuItem retain];
-			}
-			
-			if (![[currentProcess name] isEqualToString:desiredProcessName] && [desiredProcessName isEqualToString:[runningApplication localizedName]])
-			{
-				[runningApplicationsPopUpButton selectItem:[runningApplicationsPopUpButton lastItem]];
-				foundTargettedProcess = YES;
-				[currentProcess setProcessID:[runningApplication processIdentifier]];
-				[currentProcess setName:[runningApplication localizedName]];
-				[self runningApplicationsPopUpButtonRequest:nil];
-			}
-			else if ([currentProcess processID] == [runningApplication processIdentifier])
-			{
-				[runningApplicationsPopUpButton selectItem:[runningApplicationsPopUpButton lastItem]];
-				foundTargettedProcess = YES;
-			}
-			
-			[menuItem release];
+			[itemsToRemove addObject:menuItem];
 		}
 	}
 	
-	if (!foundTargettedProcess)
+	for (id item in itemsToRemove)
 	{
-		if (firstRegularApplicationMenuItem)
-		{
-			[runningApplicationsPopUpButton selectItem:firstRegularApplicationMenuItem];
-			[self runningApplicationsPopUpButtonRequest:nil];
-		}
-		else if ([runningApplicationsPopUpButton indexOfSelectedItem] >= 0)
-		{
-			[runningApplicationsPopUpButton selectItemAtIndex:0];
-			[self runningApplicationsPopUpButtonRequest:nil];
-		}
+		[runningApplicationsPopUpButton removeItemAtIndex:[runningApplicationsPopUpButton indexOfItem:item]];
 	}
 	
-	if (firstRegularApplicationMenuItem)
-	{
-		[firstRegularApplicationMenuItem release];
-	}
-}
-
-- (void)anApplicationLaunched:(NSNotification *)notification
-{
-	NSRunningApplication *runningApplication = [[notification userInfo] objectForKey:ZGRunningApplication];
-	if ([currentProcess processID] == NON_EXISTENT_PID_NUMBER && [[runningApplication localizedName] isEqualToString:[currentProcess name]])
-	{
-		[currentProcess setProcessID:[runningApplication processIdentifier]];
-		[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (%d)", [currentProcess name], [currentProcess processID]]];
-		
-		// need to grant access
-		[self runningApplicationsPopUpButtonRequest:nil];
-		
-		[searchButton setEnabled:YES];
-	}
-	else if ([currentProcess processID] != NON_EXISTENT_PID_NUMBER)
-	{
-		[self updateRunningApplicationProcesses];
-	}
-}
-
-- (void)anApplicationTerminated:(NSNotification *)notification
-{
-	NSRunningApplication *runningApplication = [[notification userInfo] objectForKey:ZGRunningApplication];
-	[ZGProcess removeFrozenProcess:[runningApplication processIdentifier]];
+	[itemsToRemove release];
 	
-	if (([clearButton isEnabled] || [self canCancelTask]) && [[runningApplication localizedName] isEqualToString:[currentProcess name]])
+	// If we're switching to a process, search button should be enabled
+	[searchButton setEnabled:YES];
+}
+
+- (void)removeRunningApplicationFromPopupButton:(NSRunningApplication *)oldRunningApplication
+{
+	// Just to be sure
+	if ([oldRunningApplication processIdentifier] != [[NSRunningApplication currentApplication] processIdentifier])
 	{
-		NSAttributedString *status =
+		// oldRunningApplication == nil, means current process terminated (was in middle of a search)
+		if ([currentProcess processID] == [oldRunningApplication processIdentifier] || !oldRunningApplication)
+		{
+			// Don't remove the item, just indicate it's terminated
+			NSAttributedString *status =
 			[[NSAttributedString alloc]
 			 initWithString:@"Process terminated."
 			 attributes:
-				[NSDictionary
-				 dictionaryWithObject:[NSColor redColor]
-				 forKey:NSForegroundColorAttributeName]];
-		
-		[generalStatusTextField setAttributedStringValue:status];
-		
-		[status release];
-		
-		[searchButton setEnabled:NO];
-		[currentProcess setProcessID:NON_EXISTENT_PID_NUMBER];
-		[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (none)", [currentProcess name]]];
+			 [NSDictionary
+			  dictionaryWithObject:[NSColor redColor]
+			  forKey:NSForegroundColorAttributeName]];
+			
+			[generalStatusTextField setAttributedStringValue:status];
+			
+			[status release];
+			
+			[searchButton setEnabled:NO];
+			[currentProcess setProcessID:NON_EXISTENT_PID_NUMBER];
+			[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (none)", [currentProcess name]]];
+		}
+		else
+		{
+			// Find the menu item, and remove it
+			NSMenuItem *itemToRemove = nil;
+			for (NSMenuItem *item in [runningApplicationsPopUpButton itemArray])
+			{
+				if ([[item representedObject] processID] == [oldRunningApplication processIdentifier])
+				{
+					itemToRemove = item;
+					break;
+				}
+			}
+			
+			if (itemToRemove)
+			{
+				[runningApplicationsPopUpButton removeItemAtIndex:[runningApplicationsPopUpButton indexOfItem:itemToRemove]];
+			}
+		}
 	}
-	else if ([currentProcess processID] != NON_EXISTENT_PID_NUMBER)
+}
+
+- (void)addRunningApplicationToPopupButton:(NSRunningApplication *)newRunningApplication
+{
+	// Don't add ourselves
+	if ([newRunningApplication processIdentifier] != [[NSRunningApplication currentApplication] processIdentifier])
 	{
-		[self updateRunningApplicationProcesses];
+		// Check if a dead application can be 'revived'
+		for (NSMenuItem *menuItem in [runningApplicationsPopUpButton itemArray])
+		{
+			ZGProcess *process = [menuItem representedObject];
+			if (process == currentProcess &&
+				[currentProcess processID] == NON_EXISTENT_PID_NUMBER &&
+				[[currentProcess name] isEqualToString:[newRunningApplication localizedName]])
+			{
+				[currentProcess setProcessID:[newRunningApplication processIdentifier]];
+				[menuItem setTitle:[NSString stringWithFormat:@"%@ (%d)", [currentProcess name], [currentProcess processID]]];
+				[self runningApplicationsPopUpButtonRequest:nil];
+				[searchButton setEnabled:YES];
+				return;
+			}
+		}
+		
+		// Otherwise add the new application
+		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+		[menuItem setTitle:[NSString stringWithFormat:@"%@ (%d)", [newRunningApplication localizedName], [newRunningApplication processIdentifier]]];
+		NSImage *iconImage = [newRunningApplication icon];
+		[iconImage setSize:NSMakeSize(16, 16)];
+		[menuItem setImage:iconImage];
+		
+		ZGProcess *representedProcess =
+		[[ZGProcess alloc]
+		 initWithName:[newRunningApplication localizedName]
+		 processID:[newRunningApplication processIdentifier]
+		 set64Bit:([newRunningApplication executableArchitecture] == NSBundleExecutableArchitectureX86_64)];
+		
+		[menuItem setRepresentedObject:representedProcess];
+		[representedProcess release];
+		
+		[[runningApplicationsPopUpButton menu] addItem:menuItem];
+		
+		// If we found desired process name, select it
+		if (![[currentProcess name] isEqualToString:[self desiredProcessName]] &&
+			[[self desiredProcessName] isEqualToString:[newRunningApplication localizedName]])
+		{
+			[runningApplicationsPopUpButton selectItem:menuItem];
+			[self runningApplicationsPopUpButtonRequest:nil];
+		}
+		
+		[menuItem release];
+	}
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if (object == [NSWorkspace sharedWorkspace])
+	{
+		NSArray *newRunningApplications = [change objectForKey:NSKeyValueChangeNewKey];
+		NSArray *oldRunningApplications = [change objectForKey:NSKeyValueChangeOldKey];
+		
+		if (newRunningApplications)
+		{
+			for (NSRunningApplication *runningApplication in newRunningApplications)
+			{
+				[self addRunningApplicationToPopupButton:runningApplication];
+			}
+		}
+		
+		if (oldRunningApplications)
+		{
+			for (NSRunningApplication *runningApplication in oldRunningApplications)
+			{
+				[self removeRunningApplicationFromPopupButton:runningApplication];
+			}
+		}
 	}
 }
 
@@ -688,7 +708,19 @@
 	[beginningAddressLabel setTextColor:[NSColor controlTextColor]];
 	[endingAddressLabel setTextColor:[NSColor controlTextColor]];
 	
+	[runningApplicationsPopUpButton setEnabled:YES];
+	
 	[watchWindow makeFirstResponder:searchValueTextField];
+	
+	if ([currentProcess processID] == NON_EXISTENT_PID_NUMBER)
+	{
+		[self removeRunningApplicationFromPopupButton:nil];
+	}
+}
+
+- (void)updateClearButton
+{
+	[clearButton setEnabled:[[self watchVariablesArray] count] > 0];
 }
 
 - (void)updateMemoryStoreUserInterface:(NSTimer *)timer
@@ -1069,80 +1101,8 @@ static NSSize *expandedWindowMinSize = nil;
 		[searchValueTextField setEnabled:YES];
 		[searchValueLabel setTextColor:[NSColor controlTextColor]]; 
 	}
-}
-
-#pragma mark Locking  & Unlocking
-
-- (void)unlockTarget
-{
-	[clearButton setEnabled:NO];
-	[runningApplicationsPopUpButton setEnabled:YES];
-	[variableQualifierMatrix setEnabled:YES];
 	
-	// we enable the search button in case its disabled, as what would happen if the targetted application terminates when in a multiple search situation
-	[searchButton setEnabled:YES];
-	
-	BOOL unlockingFromDeadProcess = ([currentProcess processID] == NON_EXISTENT_PID_NUMBER);
-	
-	[self updateRunningApplicationProcesses];
-	
-	if (!unlockingFromDeadProcess)
-	{
-		[generalStatusTextField setStringValue:[NSString stringWithFormat:@"Unlocked %@", [currentProcess name]]];
-		
-		if ([[self undoManager] isUndoing])
-		{
-			[[self undoManager] setActionName:@"Lock Target"];
-		}
-		else if ([[self undoManager] isRedoing])
-		{
-			[[self undoManager] setActionName:@"Unlock Target"];
-		}
-		[[[self undoManager] prepareWithInvocationTarget:self] lockTarget];
-	}
-	else
-	{
-		[[self undoManager] removeAllActions];
-	}
-}
-
-- (void)lockTarget
-{
-	[clearButton setEnabled:YES];
-	[runningApplicationsPopUpButton setEnabled:NO];
-	
-	[generalStatusTextField setStringValue:[NSString stringWithFormat:@"Locked %@", [currentProcess name]]];
-	
-	if (desiredProcessName && ![desiredProcessName isEqualToString:[currentProcess name]])
-	{
-		[desiredProcessName release];
-		desiredProcessName = [[currentProcess name] copy];
-	}
-	
-	if ([[self undoManager] isUndoing])
-	{
-		[[self undoManager] setActionName:@"Unlock Target"];
-	}
-	else if ([[self undoManager] isRedoing])
-	{
-		[[self undoManager] setActionName:@"Lock Target"];
-	}
-	
-	[[[self undoManager] prepareWithInvocationTarget:self] unlockTarget];
-}
-
-- (IBAction)lockTarget:(id)sender
-{
-	if (![clearButton isEnabled])
-	{
-		[[self undoManager] setActionName:@"Lock Target"];
-		[self lockTarget];
-	}
-	else
-	{
-		[[self undoManager] setActionName:@"Unlock Target"];
-		[self unlockTarget];
-	}
+	[self updateClearButton];
 }
 
 #pragma mark Confirm Input Methods
@@ -1210,8 +1170,10 @@ static NSSize *expandedWindowMinSize = nil;
 	[dataTypesPopUpButton setEnabled:YES];
 	[variableQualifierMatrix setEnabled:YES];
 	
-	// we enable the search button in case its disabled, as what would happen if the targetted application terminates when in a multiple search situation
-	[searchButton setEnabled:YES];
+	if ([currentProcess processID] != NON_EXISTENT_PID_NUMBER)
+	{
+		[searchButton setEnabled:YES];
+	}
 	
 	[self setWatchVariablesArray:[NSArray array]];
 	[[tableController watchVariablesTableView] reloadData];
@@ -1223,9 +1185,10 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	[clearButton setEnabled:NO];
 	
-	[self updateRunningApplicationProcesses];
-	
-	[generalStatusTextField setStringValue:@"Cleared search."];
+	if ([currentProcess processID] != NON_EXISTENT_PID_NUMBER)
+	{
+		[generalStatusTextField setStringValue:@"Cleared search."];
+	}
 	
 	[self markDocumentChange];
 }
@@ -1778,26 +1741,6 @@ static NSSize *expandedWindowMinSize = nil;
 		if (![self canStartTask])
 		{
 			return NO;
-		}
-	}
-	
-	else if ([theMenuItem action] == @selector(lockTarget:))
-	{
-		if (![self canStartTask])
-		{
-			[theMenuItem setTitle:@"Unlock Target"];
-			return NO;
-		}
-		else
-		{
-			if ([clearButton isEnabled])
-			{
-				[theMenuItem setTitle:@"Unlock Target"];
-			}
-			else
-			{
-				[theMenuItem setTitle:@"Lock Target"];
-			}
 		}
 	}
 	

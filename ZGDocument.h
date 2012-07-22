@@ -107,9 +107,10 @@
 @property (readonly) IBOutlet NSProgressIndicator *searchingProgressIndicator;
 @property (readonly) IBOutlet NSTextField *generalStatusTextField;
 @property (readonly) IBOutlet NSMatrix *variableQualifierMatrix;
-@property (readonly) IBOutlet NSButton *clearButton;
 @property (readwrite, retain) NSArray *watchVariablesArray;
 @property (readwrite, retain) ZGProcess *currentProcess;
+@property (readwrite, copy) NSString *desiredProcessName;
+@property (readwrite, retain) ZGDocumentInfo *documentState;
 @property (readonly) ZGDocumentTableController *tableController;
 @property (readonly) ZGVariableController *variableController;
 
@@ -118,14 +119,12 @@
 - (void)resumeDocument;
 - (BOOL)canStartTask;
 
-- (void)lockTarget;
-- (void)unlockTarget;
+- (void)updateClearButton;
 
 - (IBAction)runningApplicationsPopUpButtonRequest:(id)sender;
 - (IBAction)dataTypePopUpButtonRequest:(id)sender;
 - (IBAction)functionTypePopUpButtonRequest:(id)sender;
 - (IBAction)qualifierMatrixButtonRequest:(id)sender;
-- (IBAction)lockTarget:(id)sender;
 - (IBAction)optionsDisclosureButton:(id)sender;
 - (IBAction)searchValue:(id)sender;
 - (IBAction)getInitialValues:(id)sender;

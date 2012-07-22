@@ -71,8 +71,8 @@
 		 }];
 	}
 	
-	// Then check that the process is locked and that the process is alive
-	if ([[document clearButton] isEnabled] && [[document currentProcess] processID] != NON_EXISTENT_PID_NUMBER)
+	// Then check that the process is alive
+	if ([[document currentProcess] processID] != NON_EXISTENT_PID_NUMBER)
 	{
 		// Freeze all variables that need be frozen!
 		[[document watchVariablesArray] enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
@@ -316,11 +316,6 @@
 			if (!variable)
 			{
 				return NO;
-			}
-            
-			if (![[document clearButton] isEnabled])
-			{
-				[document lockTarget];
 			}
 			
 			ZGMemoryProtection memoryProtection;

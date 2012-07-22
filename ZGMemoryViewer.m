@@ -158,17 +158,11 @@
 
 	[self updateRunningApplicationProcesses:[[[ZGAppController sharedController] documentController] lastSelectedProcessName]];
 	
-	[[NSNotificationCenter defaultCenter]
+	[[NSWorkspace sharedWorkspace]
 	 addObserver:self
-	 selector:@selector(anApplicationLaunchedOrTerminated:)
-	 name:ZGProcessLaunched
-	 object:nil];
-	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(anApplicationLaunchedOrTerminated:)
-	 name:ZGProcessTerminated
-	 object:nil];
+	 forKeyPath:@"runningApplications"
+	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+	 context:NULL];
 	
 	[[textView controller] setEditable:NO];
 	
@@ -238,9 +232,12 @@
 
 #pragma mark Updating running applications
 
-- (void)anApplicationLaunchedOrTerminated:(NSNotification *)notification
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	[self updateRunningApplicationProcesses:nil];
+	if (object == [NSWorkspace sharedWorkspace])
+	{
+		[self updateRunningApplicationProcesses:nil];
+	}
 }
 
 - (void)clearData
