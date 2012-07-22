@@ -519,7 +519,6 @@
 	// Great, a process terminated, but we don't know which one
 	if ([oldRunningApplication processIdentifier] == -1)
 	{
-		NSLog(@"Yes, process ID was -1");
 		NSMutableArray *menuItemsToRemove = [[NSMutableArray alloc] init];
 		for (NSMenuItem *menuItem in [runningApplicationsPopUpButton itemArray])
 		{
