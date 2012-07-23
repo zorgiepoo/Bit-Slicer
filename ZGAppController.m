@@ -27,13 +27,6 @@
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 
-@interface ZGAppController (Private)
-
-- (void)openPreferences:(id)sender showWindow:(BOOL)shouldShowWindow;
-- (void)openMemoryViewer:(id)sender showWindow:(BOOL)shouldShowWindow;
-
-@end
-
 @implementation ZGAppController
 
 @synthesize applicationIsAuthenticated;

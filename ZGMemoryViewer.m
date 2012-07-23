@@ -38,12 +38,6 @@
 #define ZGMemoryViewerSize @"ZGMemoryViewerSize"
 #define ZGMemoryViewerProcessName @"ZGMemoryViewerProcessName"
 
-@interface ZGMemoryViewer (Private)
-
-- (void)updateRunningApplicationProcesses:(NSString *)desiredProcessName;
-
-@end
-
 @implementation ZGMemoryViewer
 
 #pragma mark Accessors
