@@ -53,24 +53,6 @@
 
 @end
 
-@interface ZGDocument (Private)
-
-- (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray;
-
-- (void)updateFlags;
-
-- (BOOL)isInNarrowSearchMode;
-
-- (BOOL)doesFunctionTypeAllowSearchInput;
-- (BOOL)isFunctionTypeStore;
-- (BOOL)isFunctionTypeStore:(NSInteger)functionTypeTag;
-
-- (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo;
-
-- (void)functionTypePopUpButtonRequest:(id)sender markChanges:(BOOL)shouldMarkChanges;
-
-@end
-
 #define DEFAULT_FLOATING_POINT_EPSILON 0.1
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
@@ -195,11 +177,7 @@
 		[generalStatusTextField setStringValue:@""];
 	}
 	
-	// Add running applications to popup button
-	for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
-	{
-		[self addRunningApplicationToPopupButton:runningApplication];
-	}
+	[self addApplicationsToPopupButton];
 	
 	[[NSWorkspace sharedWorkspace]
 	 addObserver:self
@@ -514,6 +492,37 @@
 	}
 }
 
+- (void)addApplicationsToPopupButton
+{
+	// Add running applications to popup button
+	for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
+	{
+		[self addRunningApplicationToPopupButton:runningApplication];
+	}
+	
+	if (![[[self currentProcess] name] isEqualToString:desiredProcessName])
+	{
+		ZGProcess *deadProcess =
+		[[ZGProcess alloc]
+		 initWithName:[self desiredProcessName]
+		 processID:NON_EXISTENT_PID_NUMBER
+		 set64Bit:YES];
+		
+		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+		[menuItem setTitle:[NSString stringWithFormat:@"%@ (none)", [deadProcess name]]];
+		[menuItem setRepresentedObject:deadProcess];
+		[deadProcess release];
+		
+		[[runningApplicationsPopUpButton menu] addItem:menuItem];
+		
+		[runningApplicationsPopUpButton selectItem:menuItem];
+		[menuItem release];
+		
+		[self runningApplicationsPopUpButtonRequest:nil];
+		[self removeRunningApplicationFromPopupButton:nil];
+	}
+}
+
 - (void)removeRunningApplicationFromPopupButton:(NSRunningApplication *)oldRunningApplication
 {
 	// Great, a process terminated, but we don't know which one
@@ -566,6 +575,15 @@
 			[searchButton setEnabled:NO];
 			[currentProcess setProcessID:NON_EXISTENT_PID_NUMBER];
 			[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (none)", [currentProcess name]]];
+			
+			// Set the icon to the standard one, hardcoding the path for it because I don't know how else to get the image
+			NSImage *regularAppIcon = [[NSImage alloc] initWithContentsOfFile:@"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarAppsFolderIcon.icns"];
+			if (regularAppIcon)
+			{
+				[regularAppIcon setSize:NSMakeSize(16, 16)];
+				[[runningApplicationsPopUpButton selectedItem] setImage:regularAppIcon];
+			}
+			[regularAppIcon release];
 		}
 		else if ([oldRunningApplication processIdentifier] != -1)
 		{
@@ -602,7 +620,14 @@
 				[[currentProcess name] isEqualToString:[newRunningApplication localizedName]])
 			{
 				[currentProcess setProcessID:[newRunningApplication processIdentifier]];
+				[currentProcess setIs64Bit:([newRunningApplication executableArchitecture] == NSBundleExecutableArchitectureX86_64)];
 				[menuItem setTitle:[NSString stringWithFormat:@"%@ (%d)", [currentProcess name], [currentProcess processID]]];
+				
+				NSImage *iconImage = [[newRunningApplication icon] copy];
+				[iconImage setSize:NSMakeSize(16, 16)];
+				[menuItem setImage:iconImage];
+				[iconImage release];
+				
 				[self runningApplicationsPopUpButtonRequest:nil];
 				[searchButton setEnabled:YES];
 				return;
@@ -612,9 +637,11 @@
 		// Otherwise add the new application
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
 		[menuItem setTitle:[NSString stringWithFormat:@"%@ (%d)", [newRunningApplication localizedName], [newRunningApplication processIdentifier]]];
-		NSImage *iconImage = [newRunningApplication icon];
+		
+		NSImage *iconImage = [[newRunningApplication icon] copy];
 		[iconImage setSize:NSMakeSize(16, 16)];
 		[menuItem setImage:iconImage];
+		[iconImage release];
 		
 		ZGProcess *representedProcess =
 		[[ZGProcess alloc]
