@@ -576,8 +576,8 @@
 			[currentProcess setProcessID:NON_EXISTENT_PID_NUMBER];
 			[[runningApplicationsPopUpButton selectedItem] setTitle:[NSString stringWithFormat:@"%@ (none)", [currentProcess name]]];
 			
-			// Set the icon to the standard one, hardcoding the path for it because I don't know how else to get the image
-			NSImage *regularAppIcon = [[NSImage alloc] initWithContentsOfFile:@"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarAppsFolderIcon.icns"];
+			// Set the icon to the standard one
+			NSImage *regularAppIcon = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
 			if (regularAppIcon)
 			{
 				[regularAppIcon setSize:NSMakeSize(16, 16)];
