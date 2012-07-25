@@ -561,12 +561,12 @@
 		{
 			// Don't remove the item, just indicate it's terminated
 			NSAttributedString *status =
-			[[NSAttributedString alloc]
-			 initWithString:@"Process terminated."
-			 attributes:
-			 [NSDictionary
-			  dictionaryWithObject:[NSColor redColor]
-			  forKey:NSForegroundColorAttributeName]];
+				[[NSAttributedString alloc]
+				 initWithString:[NSString stringWithFormat:@"%@ is not running.", [currentProcess name]]
+				 attributes:
+				 [NSDictionary
+				  dictionaryWithObject:[NSColor redColor]
+				  forKey:NSForegroundColorAttributeName]];
 			
 			[generalStatusTextField setAttributedStringValue:status];
 			
