@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
+#define DEFAULT_FLOATING_POINT_EPSILON 0.1
+
 @interface ZGSearchData : NSObject
 {
 @public

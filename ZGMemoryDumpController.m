@@ -25,6 +25,7 @@
 #import "ZGMemoryTypes.h"
 #import "ZGUtilities.h"
 #import "ZGVirtualMemory.h"
+#import "ZGDocumentSearchController.h"
 
 @implementation ZGMemoryDumpController
 
@@ -132,9 +133,9 @@
 
 - (void)updateMemoryDumpProgress:(NSTimer *)timer
 {
-	if ([document canStartTask])
+	if ([[document searchController] canStartTask])
 	{
-		[document prepareDocumentTask];
+		[[document searchController] prepareTask];
 	}
 	
 	[[document searchingProgressIndicator] setDoubleValue:[document currentProcess]->searchProgress];
@@ -195,7 +196,7 @@
 					 [[document generalStatusTextField] setStringValue:@"Finished Memory Dump"];
 				 }
 				 [[document searchingProgressIndicator] setDoubleValue:0.0];
-				 [document resumeDocument];
+				 [[document searchController] resumeFromTask];
 			 };
 			 
 			 dispatch_block_t searchForDataBlock = ^

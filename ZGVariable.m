@@ -25,6 +25,9 @@
 
 @synthesize shouldBeSearched;
 @synthesize addressFormula;
+@synthesize type;
+@synthesize isFrozen;
+@synthesize qualifier;
 
 NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 

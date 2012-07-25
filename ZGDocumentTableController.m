@@ -20,6 +20,7 @@
 
 #import "ZGDocumentTableController.h"
 #import "ZGDocument.h"
+#import "ZGDocumentSearchController.h"
 #import "ZGVariableController.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
@@ -304,7 +305,7 @@
 {
 	if ([[tableColumn identifier] isEqualToString:@"value"])
 	{
-		if (![document canStartTask] || [[document currentProcess] processID] == NON_EXISTENT_PID_NUMBER)
+		if (![[document searchController] canStartTask] || [[document currentProcess] processID] == NON_EXISTENT_PID_NUMBER)
 		{
 			NSBeep();
 			return NO;

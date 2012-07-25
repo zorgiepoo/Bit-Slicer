@@ -8,11 +8,28 @@
 
 #import <Foundation/Foundation.h>
 
+#define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
+
 @class ZGDocument;
+@class ZGSearchData;
+@class ZGTimer;
 
 @interface ZGDocumentSearchController : NSObject
 {
 	IBOutlet ZGDocument *document;
+	ZGSearchData *searchData;
+	ZGTimer *updateSearchUserInterfaceTimer;
 }
+
+@property (readonly) ZGSearchData *searchData;
+
+- (BOOL)canStartTask;
+- (BOOL)canCancelTask;
+- (void)prepareTask;
+- (void)resumeFromTask;
+
+- (void)clear;
+- (void)search;
+- (void)storeAllValues;
 
 @end

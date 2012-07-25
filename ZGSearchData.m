@@ -37,6 +37,7 @@
 		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &collator);
 		[self setBeginAddress:0x0];
 		[self setEndAddress:MAX_MEMORY_ADDRESS];
+		[self setLastEpsilonValue:[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON]];
 	}
 	return self;
 }

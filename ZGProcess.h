@@ -54,5 +54,9 @@
 @property (copy) NSString *name;
 @property (readonly) int numberOfRegions;
 @property (readwrite) BOOL is64Bit;
+@property (readwrite) ZGMemorySize searchProgress;
+@property (readwrite) int numberOfVariablesFound;
+@property (readwrite) BOOL isDoingMemoryDump;
+@property (readwrite) BOOL isStoringAllData;
 
 @end

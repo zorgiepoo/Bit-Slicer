@@ -64,6 +64,9 @@ typedef enum
 
 @property (assign) BOOL shouldBeSearched;
 @property (copy, nonatomic) NSString *addressFormula;
+@property (readonly) ZGVariableType type;
+@property (readonly) BOOL isFrozen;
+@property (readwrite) ZGVariableQualifier qualifier;
 
 - (id)initWithValue:(void *)aValue size:(ZGMemorySize)aSize address:(ZGMemoryAddress)anAddress type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)aQualifier pointerSize:(ZGMemorySize)pointerSize;
 

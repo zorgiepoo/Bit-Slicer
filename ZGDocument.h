@@ -21,15 +21,15 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGVariable.h"
 #import "ZGComparisonFunctions.h"
-@class ZGSearchData;
+
 @class ZGProcess;
 @class ZGTimer;
 @class ZGVariableController;
+@class ZGDocumentSearchController;
 @class ZGDocumentTableController;
 @class ZGMemoryDumpController;
 @class ZGMemoryProtectionController;
 
-#define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
 #define NON_EXISTENT_PID_NUMBER -1
 
 @interface ZGDocumentInfo : NSObject
@@ -89,6 +89,7 @@
 	IBOutlet NSButton *includeNullTerminatorCheckBox;
 	IBOutlet NSWindow *watchWindow;
 	IBOutlet ZGVariableController *variableController;
+	IBOutlet ZGDocumentSearchController *searchController;
 	IBOutlet ZGDocumentTableController *tableController;
 	IBOutlet ZGMemoryDumpController *memoryDumpController;
 	IBOutlet ZGMemoryProtectionController *memoryProtectionController;
@@ -96,9 +97,7 @@
 	ZGProcess *currentProcess;
 	NSString *desiredProcessName;
 	ZGTimer *watchVariablesTimer;
-	ZGTimer *updateSearchUserInterfaceTimer;
 	ZGVariableType currentSearchDataType;
-	ZGSearchData *searchData;
 	
 	ZGDocumentInfo *documentState;
 }
@@ -107,19 +106,42 @@
 @property (readonly) IBOutlet NSProgressIndicator *searchingProgressIndicator;
 @property (readonly) IBOutlet NSTextField *generalStatusTextField;
 @property (readonly) IBOutlet NSMatrix *variableQualifierMatrix;
+@property (readonly) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
+@property (readonly) IBOutlet NSPopUpButton *dataTypesPopUpButton;
+@property (readonly) IBOutlet NSButton *searchButton;
+@property (readonly) IBOutlet NSButton *clearButton;
+@property (readonly) IBOutlet NSTextField *searchValueTextField;
+@property (readonly) IBOutlet NSTextField *flagsTextField;
+@property (readonly) IBOutlet NSPopUpButton *functionPopUpButton;
+@property (readonly) IBOutlet NSButton *scanUnwritableValuesCheckBox;
+@property (readonly) IBOutlet NSButton *ignoreDataAlignmentCheckBox;
+@property (readonly) IBOutlet NSButton *ignoreCaseCheckBox;
+@property (readonly) IBOutlet NSButton *includeNullTerminatorCheckBox;
+@property (readonly) IBOutlet NSTextField *beginningAddressTextField;
+@property (readonly) IBOutlet NSTextField *endingAddressTextField;
+@property (readonly) IBOutlet NSTextField *beginningAddressLabel;
+@property (readonly) IBOutlet NSTextField *endingAddressLabel;
+
 @property (readwrite, retain) NSArray *watchVariablesArray;
 @property (readwrite, retain) ZGProcess *currentProcess;
 @property (readwrite, copy) NSString *desiredProcessName;
 @property (readwrite, retain) ZGDocumentInfo *documentState;
-@property (readonly) ZGDocumentTableController *tableController;
-@property (readonly) ZGVariableController *variableController;
+@property (readonly) IBOutlet ZGDocumentTableController *tableController;
+@property (readonly) IBOutlet ZGVariableController *variableController;
+@property (readonly) IBOutlet ZGDocumentSearchController *searchController;
 
 - (NSArray *)selectedVariables;
-- (void)prepareDocumentTask;
-- (void)resumeDocument;
-- (BOOL)canStartTask;
+- (void)markDocumentChange;
 
 - (void)updateClearButton;
+- (void)updateFlags;
+
+- (BOOL)doesFunctionTypeAllowSearchInput;
+- (BOOL)isFunctionTypeStore;
+
+- (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray;
+
+- (void)removeRunningApplicationFromPopupButton:(NSRunningApplication *)oldRunningApplication;
 
 - (IBAction)runningApplicationsPopUpButtonRequest:(id)sender;
 - (IBAction)dataTypePopUpButtonRequest:(id)sender;
@@ -127,7 +149,7 @@
 - (IBAction)qualifierMatrixButtonRequest:(id)sender;
 - (IBAction)optionsDisclosureButton:(id)sender;
 - (IBAction)searchValue:(id)sender;
-- (IBAction)getInitialValues:(id)sender;
+- (IBAction)storeAllValues:(id)sender;
 - (IBAction)clearSearchValues:(id)sender;
 - (IBAction)removeSelectedSearchValues:(id)sender;
 - (IBAction)addVariable:(id)sender;

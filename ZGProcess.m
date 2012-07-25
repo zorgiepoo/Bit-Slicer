@@ -26,6 +26,10 @@
 @synthesize processTask;
 @synthesize name;
 @synthesize is64Bit;
+@synthesize searchProgress;
+@synthesize numberOfVariablesFound;
+@synthesize isDoingMemoryDump;
+@synthesize isStoringAllData;
 
 static NSArray *frozenProcesses = nil;
 + (NSArray *)frozenProcesses
