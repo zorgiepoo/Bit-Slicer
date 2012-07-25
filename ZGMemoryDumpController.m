@@ -138,7 +138,7 @@
 		[[document searchController] prepareTask];
 	}
 	
-	[[document searchingProgressIndicator] setDoubleValue:[document currentProcess]->searchProgress];
+	[[document searchingProgressIndicator] setDoubleValue:[[document currentProcess] searchProgress]];
 }
 
 - (void)memoryDumpAllRequest
@@ -186,13 +186,13 @@
 				 [progressTimer invalidate];
 				 [progressTimer release];
 				 
-				 if (!([document currentProcess]->isDoingMemoryDump))
+				 if (!([[document currentProcess] isDoingMemoryDump]))
 				 {
 					 [[document generalStatusTextField] setStringValue:@"Canceled Memory Dump"];
 				 }
 				 else
 				 {
-					 [document currentProcess]->isDoingMemoryDump = NO;
+					 [[document currentProcess] setIsDoingMemoryDump:NO];
 					 [[document generalStatusTextField] setStringValue:@"Finished Memory Dump"];
 				 }
 				 [[document searchingProgressIndicator] setDoubleValue:0.0];

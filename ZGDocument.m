@@ -82,6 +82,7 @@
 @synthesize currentProcess;
 @synthesize documentState;
 @synthesize desiredProcessName;
+@synthesize currentSearchDataType;
 @synthesize watchVariablesArray;
 @synthesize variableQualifierMatrix;
 @synthesize runningApplicationsPopUpButton;
@@ -169,7 +170,7 @@
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	 context:NULL];
 	
-	currentSearchDataType = (ZGVariableType)[[dataTypesPopUpButton selectedItem] tag];
+	[self setCurrentSearchDataType:(ZGVariableType)[[dataTypesPopUpButton selectedItem] tag]];
 
 	if ([[self documentState] loadedFromSave])
 	{
@@ -395,11 +396,11 @@
 	
 	if ([[runningApplicationsPopUpButton selectedItem] representedObject] != currentProcess)
 	{
-		if ([[runningApplicationsPopUpButton selectedItem] representedObject] && currentProcess
-			&& ((ZGProcess *)[[runningApplicationsPopUpButton selectedItem] representedObject])->is64Bit != currentProcess->is64Bit)
+		if ([[runningApplicationsPopUpButton selectedItem] representedObject] && currentProcess && [[[runningApplicationsPopUpButton selectedItem] representedObject] is64Bit] != [currentProcess is64Bit])
 		{
 			pointerSizeChanged = YES;
 		}
+		
 		// this is about as far as we go when it comes to undo/redos...
 		[[self undoManager] removeAllActions];
 	}
@@ -411,9 +412,9 @@
 		// Update the pointer variable sizes
 		for (ZGVariable *variable in watchVariablesArray)
 		{
-			if (variable->type == ZGPointer)
+			if ([variable type] == ZGPointer)
 			{
-				[variable setPointerSize:currentProcess->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+				[variable setPointerSize:[currentProcess is64Bit] ? sizeof(int64_t) : sizeof(int32_t)];
 			}
 		}
 		
@@ -483,7 +484,7 @@
 		[self addRunningApplicationToPopupButton:runningApplication];
 	}
 	
-	if (![[[self currentProcess] name] isEqualToString:desiredProcessName])
+	if ([self desiredProcessName] && ![[[self currentProcess] name] isEqualToString:desiredProcessName])
 	{
 		ZGProcess *deadProcess =
 		[[ZGProcess alloc]
@@ -899,7 +900,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo
 {
-	if (currentSearchDataType != newTag)
+	if ([self currentSearchDataType] != newTag)
 	{
 		[dataTypesPopUpButton selectItemWithTag:newTag];
 
@@ -928,11 +929,11 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			[[self undoManager] setActionName:@"Data Type Change"];
 			[[[self undoManager] prepareWithInvocationTarget:self]
-			 selectDataTypeWithTag:currentSearchDataType
+			 selectDataTypeWithTag:[self currentSearchDataType]
 			 recordUndo:YES];
 		}
 		
-		currentSearchDataType = newTag;
+		[self setCurrentSearchDataType:newTag];
 	}
 }
 
@@ -1069,7 +1070,7 @@ static NSSize *expandedWindowMinSize = nil;
 		if ([watchVariablesArray count] > 0)
 		{
 			// All the variables selected need to either be all unfrozen or all frozen
-			BOOL isFrozen = ((ZGVariable *)[watchVariablesArray objectAtIndex:[[tableController watchVariablesTableView] selectedRow]])->isFrozen;
+			BOOL isFrozen = [[watchVariablesArray objectAtIndex:[[tableController watchVariablesTableView] selectedRow]] isFrozen];
 			BOOL isInconsistent = NO;
 			
 			NSUInteger currentIndex = [[[tableController watchVariablesTableView] selectedRowIndexes] firstIndex];
@@ -1077,7 +1078,7 @@ static NSSize *expandedWindowMinSize = nil;
 			{
 				ZGVariable *variable = [watchVariablesArray objectAtIndex:currentIndex];
 				// we should also check if the variable has an existing value at all
-				if (variable && (variable->isFrozen != isFrozen || !variable->value))
+				if (variable && ([variable isFrozen] != isFrozen || ![variable value]))
 				{
 					isInconsistent = YES;
 					break;
@@ -1085,16 +1086,7 @@ static NSSize *expandedWindowMinSize = nil;
 				currentIndex = [[[tableController watchVariablesTableView] selectedRowIndexes] indexGreaterThanIndex:currentIndex];
 			}
 			
-			NSString *title;
-			
-			if (isFrozen)
-			{
-				title = @"Unfreeze Variable";
-			}
-			else
-			{
-				title = @"Freeze Variable";
-			}
+			NSString *title = isFrozen ? @"Unfreeze Variable" : @"Freeze Variable";
 			
 			if ([[[tableController watchVariablesTableView] selectedRowIndexes] count] > 1)
 			{
@@ -1209,7 +1201,7 @@ static NSSize *expandedWindowMinSize = nil;
 		NSArray *selectedVariables = [watchVariablesArray objectsAtIndexes:[[tableController watchVariablesTableView] selectedRowIndexes]];
 		for (ZGVariable *variable in selectedVariables)
 		{
-			if (variable->type != ZGByteArray)
+			if ([variable type] != ZGByteArray)
 			{
 				return NO;
 			}

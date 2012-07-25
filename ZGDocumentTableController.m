@@ -24,6 +24,7 @@
 #import "ZGVariableController.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
+#import "ZGVariable.h"
 #import "NSStringAdditions.h"
 
 @implementation ZGDocumentTableController
@@ -236,7 +237,7 @@
 		}
 		else if ([[tableColumn identifier] isEqualToString:@"type"])
 		{
-			ZGVariableType type = ((ZGVariable *)[[document watchVariablesArray] objectAtIndex:rowIndex])->type;
+			ZGVariableType type = [(ZGVariable *)[[document watchVariablesArray] objectAtIndex:rowIndex] type];
 			return [NSNumber numberWithInteger:[[tableColumn dataCell] indexOfItemWithTag:type]];
 		}
 	}
@@ -319,14 +320,14 @@
 				return NO;
 			}
 			
-			ZGMemoryProtection memoryProtection;
-			ZGMemoryAddress memoryAddress = variable->address;
-			ZGMemorySize memorySize;
+			ZGMemoryProtection memoryProtection = 0;
+			ZGMemoryAddress memoryAddress = [variable address];
+			ZGMemorySize memorySize = 0;
 			
 			if (ZGMemoryProtectionInRegion([[document currentProcess] processTask], &memoryAddress, &memorySize, &memoryProtection))
 			{
 				// if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
-				if (memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE))
+				if (memoryAddress <= [variable address] && memoryAddress + memorySize >= [variable address] + [variable size] && !(memoryProtection & VM_PROT_WRITE))
 				{
 					NSBeep();
 					return NO;
@@ -342,7 +343,7 @@
 		}
 		
 		ZGVariable *variable = [[document watchVariablesArray] objectAtIndex:rowIndex];
-		if (variable && variable->isPointer)
+		if ([variable isPointer])
 		{
 			[document editVariablesAddress:nil];
 			return NO;
@@ -358,7 +359,7 @@
 	{
 		if (rowIndex >= 0 && (NSUInteger)rowIndex < [[document watchVariablesArray] count])
 		{
-			if (((ZGVariable *)[[document watchVariablesArray] objectAtIndex:rowIndex])->isFrozen)
+			if ([[[document watchVariablesArray] objectAtIndex:rowIndex] isFrozen])
 			{
 				[cell setTextColor:[NSColor redColor]];
 			}

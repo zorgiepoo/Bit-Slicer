@@ -49,7 +49,7 @@
 	[[[document tableController] watchVariablesTableView] reloadData];
 	
 	// check whether we want to use "Undo Freeze" or "Redo Freeze" or "Undo Unfreeze" or "Redo Unfreeze"
-	if (((ZGVariable *)[[document watchVariablesArray] objectAtIndex:[rowIndexes firstIndex]])->isFrozen)
+	if ([[[document watchVariablesArray] objectAtIndex:[rowIndexes firstIndex]] isFrozen])
 	{
 		if ([[document undoManager] isUndoing])
 		{
@@ -204,13 +204,13 @@
 	}
 	
 	ZGVariable *variable =
-	[[ZGVariable alloc]
-	 initWithValue:NULL
-	 size:0
-	 address:initialAddress
-	 type:(ZGVariableType)[sender tag]
-	 qualifier:qualifier
-	 pointerSize:[document currentProcess]->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		[[ZGVariable alloc]
+		 initWithValue:NULL
+		 size:0
+		 address:initialAddress
+		 type:(ZGVariableType)[sender tag]
+		 qualifier:qualifier
+		 pointerSize:[[document currentProcess] is64Bit] ? sizeof(int64_t) : sizeof(int32_t)];
 	
 	[variable setShouldBeSearched:NO];
 	
@@ -265,13 +265,13 @@
 	[[document undoManager] setActionName:@"Type Change"];
 	[[[document undoManager] prepareWithInvocationTarget:self]
 	 changeVariable:variable
-	 newType:variable->type
-	 newSize:variable->size];
+	 newType:[variable type]
+	 newSize:[variable size]];
 	
 	[variable
 	 setType:type
 	 requestedSize:size
-	 pointerSize:[document currentProcess]->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+	 pointerSize:[[document currentProcess] is64Bit] ? sizeof(int64_t) : sizeof(int32_t)];
 	
 	if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
 	{
@@ -282,7 +282,7 @@
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag
 {
 	void *newValue = NULL;
-	ZGMemorySize writeSize = variable->size; // specifically needed for byte arrays
+	ZGMemorySize writeSize = [variable size]; // specifically needed for byte arrays
 	
 	// It's important to retrieve this now instead of later as changing the variable's size may cause a bad side effect to this method
 	NSString *oldStringValue = [[variable stringValue] copy];
@@ -294,14 +294,14 @@
 	float floatValue = 0.0;
 	double doubleValue = 0.0;
 	
-	if (variable->type != ZGUTF8String && variable->type != ZGUTF16String && variable->type != ZGByteArray)
+	if ([variable type] != ZGUTF8String && [variable type] != ZGUTF16String && [variable type] != ZGByteArray)
 	{
 		stringObject = [ZGCalculator evaluateExpression:stringObject];
 	}
 	
 	BOOL stringIsAHexRepresentation = [stringObject isHexRepresentation];
 	
-	switch (variable->type)
+	switch ([variable type])
 	{
 		case ZGInt8:
 			if (stringIsAHexRepresentation)
@@ -330,11 +330,11 @@
 			newValue = &int16Value;
 			break;
 		case ZGPointer:
-			if (variable->size == sizeof(int32_t))
+			if ([variable size] == sizeof(int32_t))
 			{
 				goto INT32_BIT_CHANGE_VARIABLE;
 			}
-			else if (variable->size == sizeof(int64_t))
+			else if ([variable size] == sizeof(int64_t))
 			{
 				goto INT64_BIT_CHANGE_VARIABLE;
 			}
@@ -392,16 +392,16 @@
 			break;
 		case ZGUTF8String:
 			newValue = (void *)[stringObject cStringUsingEncoding:NSUTF8StringEncoding];
-			variable->size = strlen(newValue) + 1;
-			writeSize = variable->size;
+			[variable setSize:strlen(newValue) + 1];
+			writeSize = [variable size];
 			break;
 		case ZGUTF16String:
-			variable->size = [stringObject length] * sizeof(unichar);
-			writeSize = variable->size;
+			[variable setSize:[stringObject length] * sizeof(unichar)];
+			writeSize = [variable size];
 			
-			if (variable->size)
+			if ([variable size])
 			{
-				newValue = malloc((size_t)variable->size);
+				newValue = malloc((size_t)[variable size]);
 				[stringObject
 				 getCharacters:newValue
 				 range:NSMakeRange(0, [stringObject length])];
@@ -425,10 +425,10 @@
 			NSArray *bytesArray = [stringObject componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 			
 			// this is the size the user wants
-			variable->size = [bytesArray count];
+			[variable setSize:[bytesArray count]];
 			
 			// this is the maximum size allocated needed
-			newValue = malloc((size_t)variable->size);
+			newValue = malloc((size_t)[variable size]);
 			
 			if (newValue)
 			{
@@ -452,7 +452,7 @@
 			}
 			else
 			{
-				variable->size = writeSize;
+				[variable setSize:writeSize];
 			}
 			
 			break;
@@ -461,7 +461,7 @@
 	
 	if (newValue)
 	{
-		if (variable->isFrozen)
+		if ([variable isFrozen])
 		{
 			[variable setFreezeValue:newValue];
 			
@@ -485,7 +485,7 @@
 			
 			if (writeSize)
 			{
-				if (!ZGWriteBytes([[document currentProcess] processTask], variable->address, newValue, writeSize))
+				if (!ZGWriteBytes([[document currentProcess] processTask], [variable address], newValue, writeSize))
 				{
 					successfulWrite = NO;
 				}
@@ -495,11 +495,11 @@
 				successfulWrite = NO;
 			}
 			
-			if (successfulWrite && variable->type == ZGUTF16String)
+			if (successfulWrite && [variable type] == ZGUTF16String)
 			{
 				// Don't forget to write the null terminator
 				unichar nullTerminator = 0;
-				if (!ZGWriteBytes([[document currentProcess] processTask], variable->address + writeSize, &nullTerminator, sizeof(unichar)))
+				if (!ZGWriteBytes([[document currentProcess] processTask], [variable address] + writeSize, &nullTerminator, sizeof(unichar)))
 				{
 					successfulWrite = NO;
 				}
@@ -520,7 +520,7 @@
 			}
 		}
 		
-		if (variable->type == ZGUTF16String || variable->type == ZGByteArray)
+		if ([variable type] == ZGUTF16String || [variable type] == ZGByteArray)
 		{
 			free(newValue);
 		}
@@ -597,13 +597,13 @@
 	for (ZGVariable *variable in variables)
 	{
 		ZGMemoryProtection memoryProtection;
-		ZGMemoryAddress memoryAddress = variable->address;
+		ZGMemoryAddress memoryAddress = [variable address];
 		ZGMemorySize memorySize;
 		
 		if (ZGMemoryProtectionInRegion([[document currentProcess] processTask], &memoryAddress, &memorySize, &memoryProtection))
 		{
 			// if !(the variable is within a single memory region and the memory region is not writable), then the variable is editable
-			if (!(memoryAddress <= variable->address && memoryAddress + memorySize >= variable->address + variable->size && !(memoryProtection & VM_PROT_WRITE)))
+			if (!(memoryAddress <= [variable address] && memoryAddress + memorySize >= [variable address] + [variable size] && !(memoryProtection & VM_PROT_WRITE)))
 			{
 				[validVariables addObject:variable];
 			}
@@ -664,11 +664,11 @@
 	[variable setAddressFormula:newAddressFormula];
 	if ([newAddressFormula rangeOfString:@"["].location != NSNotFound && [newAddressFormula rangeOfString:@"]"].location != NSNotFound)
 	{
-		variable->isPointer = YES;
+		[variable setIsPointer:YES];
 	}
 	else
 	{
-		variable->isPointer = NO;
+		[variable setIsPointer:NO];
 		[variable setAddressStringValue:[ZGCalculator evaluateExpression:newAddressFormula]];
 		[[[document tableController] watchVariablesTableView] reloadData];
 	}
@@ -716,12 +716,12 @@
 		 ZGMemorySize size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
 		 void *buffer = NULL;
 		 
-		 if (ZGReadBytes([[document currentProcess] processTask], variable->address, &buffer, &size))
+		 if (ZGReadBytes([[document currentProcess] processTask], [variable address], &buffer, &size))
 		 {
 			 if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
 			 {
 				 [validVariables addObject:variable];
-				 [currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:variable->size]];
+				 [currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:[variable size]]];
 			 }
 			 
 			 ZGFreeBytes([[document currentProcess] processTask], buffer, size);
@@ -737,7 +737,7 @@
 		
 		[validVariables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 		 {
-			 variable->size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
+			 [variable setSize:[[requestedSizes objectAtIndex:index] unsignedLongLongValue]];
 		 }];
 		
 		[[[document tableController] watchVariablesTableView] reloadData];

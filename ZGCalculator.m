@@ -98,14 +98,14 @@
 						[[NSScanner scannerWithString:addressExpression] scanLongLong:(long long *)&address];
 					}
 					
-					ZGMemorySize size = process->is64Bit ? sizeof(int64_t) : sizeof(int32_t);
+					ZGMemorySize size = [process is64Bit] ? sizeof(int64_t) : sizeof(int32_t);
 					void *value = NULL;
 					
 					NSMutableString *newExpression;
 					
 					if (ZGReadBytes([process processTask], address, &value, &size))
 					{
-						if (process->is64Bit)
+						if ([process is64Bit])
 						{
 							newExpression = [NSMutableString stringWithFormat:@"%llu", *((int64_t *)value)];
 						}

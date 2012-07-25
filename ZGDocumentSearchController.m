@@ -534,13 +534,13 @@
 				if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
 				{
 					ZGVariable *newVariable =
-					[[ZGVariable alloc]
-					 initWithValue:variableData
-					 size:dataSize
-					 address:address
-					 type:dataType
-					 qualifier:qualifier
-					 pointerSize:pointerSize];
+						[[ZGVariable alloc]
+						 initWithValue:variableData
+						 size:dataSize
+						 address:address
+						 type:dataType
+						 qualifier:qualifier
+						 pointerSize:pointerSize];
 					
 					[temporaryVariablesArray addObject:newVariable];
 					[newVariable release];
@@ -650,7 +650,7 @@
 	}
 	else
 	{
-		if ([document currentProcess]->isDoingMemoryDump)
+		if ([[document currentProcess] isDoingMemoryDump])
 		{
 			// Cancel memory dump
 			[[document currentProcess] setIsDoingMemoryDump:NO];

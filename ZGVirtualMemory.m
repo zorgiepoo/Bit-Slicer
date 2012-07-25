@@ -149,10 +149,10 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 	mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
 	mach_port_t objectName = MACH_PORT_NULL;
 	
-	process->isStoringAllData = YES;
-	process->searchProgress = 0;
+	[process setIsStoringAllData:YES];
+	[process setSearchProgress:0];
 	
-	while (mach_vm_region(process->processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
+	while (mach_vm_region([process processTask], &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
 		if ((regionInfo.protection & VM_PROT_READ) && (shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
@@ -174,7 +174,7 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 		
 		(process->searchProgress)++;
 		
-		if (!process->isStoringAllData)
+		if (![process isStoringAllData])
 		{
 			ZGFreeData(dataArray);
 			
@@ -184,11 +184,7 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 		}
 	}
 	
-	if (dataArray)
-	{
-		dataArray = [dataArray autorelease];
-	}
-	return dataArray;
+	return [dataArray autorelease];
 }
 
 void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySize dataSize)
@@ -226,10 +222,10 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 	
 	FILE *mergedFile = fopen([[directory stringByAppendingPathComponent:@"(All) Merged"] UTF8String], "w");
 	
-	process->isDoingMemoryDump = YES;
-	process->searchProgress = 0;
+	[process setIsDoingMemoryDump:YES];
+	[process setSearchProgress:0];
     
-	while (mach_vm_region(process->processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
+	while (mach_vm_region([process processTask], &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
 		if (lastAddress != address || !(regionInfo.protection & VM_PROT_READ))
 		{
@@ -250,10 +246,10 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 			// outputSize should not differ from size
 			ZGMemorySize outputSize = size;
 			void *bytes = NULL;
-			if (ZGReadBytes(process->processTask, address, &bytes, &outputSize))
+			if (ZGReadBytes([process processTask], address, &bytes, &outputSize))
 			{
 				[currentData appendBytes:bytes length:(NSUInteger)size];
-				ZGFreeBytes(process->processTask, bytes, outputSize);
+				ZGFreeBytes([process processTask], bytes, outputSize);
 			}
 		}
 		
@@ -262,7 +258,7 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 		
 		(process->searchProgress)++;
   	    
-		if (!process->isDoingMemoryDump)
+		if (![process isDoingMemoryDump])
 		{
 			goto EXIT_ON_CANCEL;
 		}

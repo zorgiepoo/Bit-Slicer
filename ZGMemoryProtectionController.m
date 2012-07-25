@@ -108,15 +108,15 @@
 		ZGVariable *firstVariable = [selectedVariables objectAtIndex:0];
 		
 		[changeProtectionAddressTextField setStringValue:[firstVariable addressStringValue]];
-		[changeProtectionSizeTextField setStringValue:[NSString stringWithFormat:@"%lld", firstVariable->size]];
+		[changeProtectionSizeTextField setStringValue:[NSString stringWithFormat:@"%lld", [firstVariable size]]];
 		
 		ZGMemoryProtection memoryProtection;
-		ZGMemoryAddress memoryAddress = firstVariable->address;
+		ZGMemoryAddress memoryAddress = [firstVariable address];
 		ZGMemorySize memorySize;
 		
 		// Tell the user what the current memory protection is set as for the variable
 		if (ZGMemoryProtectionInRegion([[document currentProcess] processTask], &memoryAddress, &memorySize, &memoryProtection) &&
-            memoryAddress <= firstVariable->address && memoryAddress + memorySize >= firstVariable->address + firstVariable->size)
+            memoryAddress <= [firstVariable address] && memoryAddress + memorySize >= [firstVariable address] + [firstVariable size])
 		{
 			[changeProtectionReadButton setState:memoryProtection & VM_PROT_READ];
 			[changeProtectionWriteButton setState:memoryProtection & VM_PROT_WRITE];

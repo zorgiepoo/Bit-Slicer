@@ -125,6 +125,7 @@
 @property (readwrite, retain) NSArray *watchVariablesArray;
 @property (readwrite, retain) ZGProcess *currentProcess;
 @property (readwrite, copy) NSString *desiredProcessName;
+@property (readwrite) ZGVariableType currentSearchDataType;
 @property (readwrite, retain) ZGDocumentInfo *documentState;
 @property (readonly) IBOutlet ZGDocumentTableController *tableController;
 @property (readonly) IBOutlet ZGVariableController *variableController;

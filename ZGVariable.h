@@ -67,6 +67,10 @@ typedef enum
 @property (readonly) ZGVariableType type;
 @property (readonly) BOOL isFrozen;
 @property (readwrite) ZGVariableQualifier qualifier;
+@property (readonly) ZGMemoryAddress address;
+@property (readwrite) ZGMemorySize size;
+@property (readwrite) BOOL isPointer;
+@property (readonly) void *value;
 
 - (id)initWithValue:(void *)aValue size:(ZGMemorySize)aSize address:(ZGMemoryAddress)anAddress type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)aQualifier pointerSize:(ZGMemorySize)pointerSize;
 

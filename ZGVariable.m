@@ -28,6 +28,10 @@
 @synthesize type;
 @synthesize isFrozen;
 @synthesize qualifier;
+@synthesize address;
+@synthesize size;
+@synthesize isPointer;
+@synthesize value;
 
 NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
