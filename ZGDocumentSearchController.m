@@ -219,7 +219,7 @@
 	{
 		if (!ZGSearchIsCancelling([self searchData]))
 		{
-			[[document searchingProgressIndicator] setDoubleValue:[[document currentProcess] searchProgress]];
+			[[document searchingProgressIndicator] setDoubleValue:(double)[[document currentProcess] searchProgress]];
 			[self updateNumberOfVariablesFoundDisplay];
 		}
 		else

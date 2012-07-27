@@ -120,6 +120,20 @@
 		 forKey:ZG_EXPAND_OPTIONS]];
 }
 
+- (id)init
+{
+	self = [super init];
+	if (self)
+	{
+		[[NSWorkspace sharedWorkspace]
+		 addObserver:self
+		 forKeyPath:@"runningApplications"
+		 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+		 context:NULL];
+	}
+	return self;
+}
+
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -163,12 +177,6 @@
 	}
 	
 	[self addApplicationsToPopupButton];
-	
-	[[NSWorkspace sharedWorkspace]
-	 addObserver:self
-	 forKeyPath:@"runningApplications"
-	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-	 context:NULL];
 	
 	[self setCurrentSearchDataType:(ZGVariableType)[[dataTypesPopUpButton selectedItem] tag]];
 
@@ -595,6 +603,13 @@
 	// Don't add ourselves
 	if ([newRunningApplication processIdentifier] != [[NSRunningApplication currentApplication] processIdentifier])
 	{
+		// Avoid adding processes that won't give us permission to tinker with
+		ZGMemoryMap tempTask;
+		if (!ZGIsProcessValid([newRunningApplication processIdentifier], &tempTask))
+		{
+			return;
+		}
+		
 		// Check if a dead application can be 'revived'
 		for (NSMenuItem *menuItem in [runningApplicationsPopUpButton itemArray])
 		{
@@ -652,7 +667,7 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (object == [NSWorkspace sharedWorkspace])
+	if (object == [NSWorkspace sharedWorkspace] && [[runningApplicationsPopUpButton itemArray] count] > 0)
 	{
 		NSArray *newRunningApplications = [change objectForKey:NSKeyValueChangeNewKey];
 		NSArray *oldRunningApplications = [change objectForKey:NSKeyValueChangeOldKey];

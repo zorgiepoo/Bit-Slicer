@@ -22,8 +22,6 @@
 #import "ZGProcess.h"
 #import "ZGSearchData.h"
 
-void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile);
-
 BOOL ZGIsProcessValid(pid_t process, ZGMemoryMap *task)
 {
 	*task = MACH_PORT_NULL;
