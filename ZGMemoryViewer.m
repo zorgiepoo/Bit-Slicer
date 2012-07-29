@@ -30,7 +30,7 @@
 #import "ZGVirtualMemory.h"
 
 #define READ_MEMORY_INTERVAL 0.1
-#define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 8
+#define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
 
 #define ZGMemoryViewerAddressField @"ZGMemoryViewerAddressField"
 #define ZGMemoryViewerSizeField @"ZGMemoryViewerSizeField"
