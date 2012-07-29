@@ -603,13 +603,6 @@
 	// Don't add ourselves
 	if ([newRunningApplication processIdentifier] != [[NSRunningApplication currentApplication] processIdentifier])
 	{
-		// Avoid adding processes that won't give us permission to tinker with
-		ZGMemoryMap tempTask;
-		if (!ZGIsProcessValid([newRunningApplication processIdentifier], &tempTask))
-		{
-			return;
-		}
-		
 		// Check if a dead application can be 'revived'
 		for (NSMenuItem *menuItem in [runningApplicationsPopUpButton itemArray])
 		{
