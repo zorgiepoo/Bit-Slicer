@@ -2,7 +2,6 @@
 //  HFRepresenter.h
 //  HexFiend_2
 //
-//  Created by Peter Ammon on 11/3/07.
 //  Copyright 2007 ridiculous_fish. All rights reserved.
 //
 
@@ -42,9 +41,13 @@
 */
 - (id)view;
 
+/*! Returns YES if the view has been created, NO if it has not.  To create the view, call the view method.
+ */
+- (BOOL)isViewLoaded;
+
 /*! Override point for creating the view displaying this representation.  This is called on your behalf the first time the \c -view method is called, so you would not want to call this explicitly; however this method must be overridden.  This follows the "create" rule, and so it should return a retained view.
 */
-- (NSView *)createView;
+- (NSView *)createView NS_RETURNS_RETAINED;
 
 /*! Override point for initialization of view, after the HFRepresenter has the view set as its -view property.  The default implementation does nothing.
 */
@@ -95,6 +98,9 @@
 /*! Returns the maximum number of lines that could be displayed at once for a given view height.  Default is to return DBL_MAX. */
 - (double)maximumAvailableLinesForViewHeight:(CGFloat)viewHeight;
 //@}
+
+/*! Returns the required byte granularity.  HFLayoutRepresenter will constrain the bytes per line to a multiple of the granularity, e.g. so that UTF-16 characters are not split across lines.  If different representers have different granularities, then it will constrain it to a multiple of all granularities, which may be very large. The default implementation returns 1. */
+- (NSUInteger)byteGranularity;
 
 /*! @name Auto-layout methods
    Methods for simple auto-layout by HFLayoutRepresenter.  See the HFLayoutRepresenter class for discussion of how it lays out representer views.

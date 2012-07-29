@@ -2,7 +2,6 @@
 //  HFFullMemoryByteSlice.h
 //  HexFiend_2
 //
-//  Created by Peter Ammon on 11/4/07.
 //  Copyright 2007 ridiculous_fish. All rights reserved.
 //
 
@@ -17,6 +16,6 @@
 }
 
 /*! Init with a given NSData, which is copied via the \c -copy message. */
-- initWithData:(NSData *)val;
+- (id)initWithData:(NSData *)val;
 
 @end

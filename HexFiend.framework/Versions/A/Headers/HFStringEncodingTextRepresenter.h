@@ -2,7 +2,6 @@
 //  HFASCIITextRepresenter.h
 //  HexFiend_2
 //
-//  Created by Peter Ammon on 11/11/07.
 //  Copyright 2007 ridiculous_fish. All rights reserved.
 //
 
@@ -16,6 +15,7 @@
 */
 @interface HFStringEncodingTextRepresenter : HFTextRepresenter {
     NSStringEncoding stringEncoding;
+    
 }
 
 /*! Get the string encoding for this representer.  The default encoding is <tt>[NSString defaultCStringEncoding]</tt>. */
