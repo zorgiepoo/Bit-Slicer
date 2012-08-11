@@ -27,26 +27,35 @@
 #import "ZGVirtualMemory.h"
 #import "ZGDocumentSearchController.h"
 
+@interface ZGMemoryDumpController ()
+
+@property (assign) IBOutlet ZGDocument *document;
+@property (assign) IBOutlet NSWindow *memoryDumpWindow;
+@property (assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;
+@property (assign) IBOutlet NSTextField *memoryDumpToAddressTextField;
+
+@end
+
 @implementation ZGMemoryDumpController
 
 #pragma mark Memory Dump in Range
 
 - (IBAction)memoryDumpOkayButton:(id)sender
 {
-	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpFromAddressTextField stringValue]];
+	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:self.memoryDumpFromAddressTextField.stringValue];
 	ZGMemoryAddress fromAddress = memoryAddressFromExpression(fromAddressExpression);
 	
-	NSString *toAddressExpression = [ZGCalculator evaluateExpression:[memoryDumpToAddressTextField stringValue]];
+	NSString *toAddressExpression = [ZGCalculator evaluateExpression:self.memoryDumpToAddressTextField.stringValue];
 	ZGMemoryAddress toAddress = memoryAddressFromExpression(toAddressExpression);
 	
 	if (toAddress > fromAddress && ![fromAddressExpression isEqualToString:@""] && ![toAddressExpression isEqualToString:@""])
 	{
-		[NSApp endSheet:memoryDumpWindow];
-		[memoryDumpWindow close];
+		[NSApp endSheet:self.memoryDumpWindow];
+		[self.memoryDumpWindow close];
 		
-		NSSavePanel *savePanel = [NSSavePanel savePanel];
+		NSSavePanel *savePanel = NSSavePanel.savePanel;
 		[savePanel
-		 beginSheetModalForWindow:[document watchWindow]
+		 beginSheetModalForWindow:self.document.watchWindow
 		 completionHandler:^(NSInteger result)
 		 {
 			 if (result == NSFileHandlingPanelOKButton)
@@ -58,12 +67,12 @@
 					 ZGMemorySize size = toAddress - fromAddress;
 					 void *bytes = NULL;
 					 
-					 if (ZGReadBytes([[document currentProcess] processTask], fromAddress, &bytes, &size))
+					 if (ZGReadBytes(self.document.currentProcess.processTask, fromAddress, &bytes, &size))
 					 {
 						 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
-						 success = [data writeToURL:[savePanel URL] atomically:NO];
+						 success = [data writeToURL:savePanel.URL atomically:NO];
 						 
-						 ZGFreeBytes([[document currentProcess] processTask], bytes, size);
+						 ZGFreeBytes(self.document.currentProcess.processTask, bytes, size);
 					 }
 					 else
 					 {
@@ -100,30 +109,30 @@
 
 - (IBAction)memoryDumpCancelButton:(id)sender
 {
-	[NSApp endSheet:memoryDumpWindow];
-	[memoryDumpWindow close];
+	[NSApp endSheet:self.memoryDumpWindow];
+	[self.memoryDumpWindow close];
 }
 
 - (void)memoryDumpRangeRequest
 {
 	// guess what the user may want if nothing is in the text fields
-	NSArray *selectedVariables = [document selectedVariables];
-	if (selectedVariables && [[memoryDumpFromAddressTextField stringValue] isEqualToString:@""] && [[memoryDumpToAddressTextField stringValue] isEqualToString:@""])
+	NSArray *selectedVariables = self.document.selectedVariables;
+	if (selectedVariables && [self.memoryDumpFromAddressTextField.stringValue isEqualToString:@""] && [self.memoryDumpToAddressTextField.stringValue isEqualToString:@""])
 	{
 		ZGVariable *firstVariable = [selectedVariables objectAtIndex:0];
 		ZGVariable *lastVariable = [selectedVariables lastObject];
 		
-		[memoryDumpFromAddressTextField setStringValue:[firstVariable addressStringValue]];
+		self.memoryDumpFromAddressTextField.stringValue = firstVariable.addressStringValue;
 		
 		if (firstVariable != lastVariable)
 		{
-			[memoryDumpToAddressTextField setStringValue:[lastVariable addressStringValue]];
+			self.memoryDumpToAddressTextField.stringValue = lastVariable.addressStringValue;
 		}
 	}
 	
 	[NSApp
-	 beginSheet:memoryDumpWindow
-	 modalForWindow:[document watchWindow]
+	 beginSheet:self.memoryDumpWindow
+	 modalForWindow:self.document.watchWindow
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
@@ -133,75 +142,73 @@
 
 - (void)updateMemoryDumpProgress:(NSTimer *)timer
 {
-	if ([[document searchController] canStartTask])
+	if ([self.document.searchController canStartTask])
 	{
-		[[document searchController] prepareTask];
+		[self.document.searchController prepareTask];
 	}
 	
-	[[document searchingProgressIndicator] setDoubleValue:[[document currentProcess] searchProgress]];
+	self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress;
 }
 
 - (void)memoryDumpAllRequest
 {
-	NSSavePanel *savePanel = [NSSavePanel savePanel];
-	[savePanel setMessage:@"Choose a folder name to save the memory dump files. This may take a while."];
+	NSSavePanel *savePanel = NSSavePanel.savePanel;
+	savePanel.message = @"Choose a folder name to save the memory dump files. This may take a while.";
 	
 	[savePanel
-	 beginSheetModalForWindow:[document watchWindow]
+	 beginSheetModalForWindow:self.document.watchWindow
 	 completionHandler:^(NSInteger result)
 	 {
 		 if (result == NSFileHandlingPanelOKButton)
 		 {
-			 if ([[NSFileManager defaultManager] fileExistsAtPath:[[savePanel URL] relativePath]])
+			 if ([NSFileManager.defaultManager fileExistsAtPath:savePanel.URL.relativePath])
 			 {
-				 [[NSFileManager defaultManager]
-				  removeItemAtPath:[[savePanel URL] relativePath]
+				 [NSFileManager.defaultManager
+				  removeItemAtPath:savePanel.URL.relativePath
 				  error:NULL];
 			 }
 			 
-			 // Since Bit Slicer is running as root, we'll need to pass attributes dictionary so that
-			 // the folder is owned by the user
 			 [[NSFileManager defaultManager]
-			  createDirectoryAtPath:[[savePanel URL] relativePath]
+			  createDirectoryAtPath:savePanel.URL.relativePath
 			  withIntermediateDirectories:NO
-			  attributes:[NSDictionary dictionaryWithObjectsAndKeys:NSUserName(), NSFileGroupOwnerAccountName, NSUserName(), NSFileOwnerAccountName, nil]
+			  attributes:nil
 			  error:NULL];
 			 
-			 [[document searchingProgressIndicator] setMaxValue:[[document currentProcess] numberOfRegions]];
+			 self.document.searchingProgressIndicator.maxValue = self.document.currentProcess.numberOfRegions;
 			 
 			 NSTimer *progressTimer =
-			 [[NSTimer
-			   scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-			   target:self
-			   selector:@selector(updateMemoryDumpProgress:)
-			   userInfo:nil
-			   repeats:YES] retain];
+				[[NSTimer
+				  scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+				  target:self
+				  selector:@selector(updateMemoryDumpProgress:)
+				  userInfo:nil
+				  repeats:YES] retain];
 			 
 			 //not doing this here, there's a bug with setKeyEquivalent, instead i'm going to do this in the timer
 			 //[document prepareDocumentTask];
-			 [[document generalStatusTextField] setStringValue:@"Writing Memory Dump..."];
+			 self.document.generalStatusTextField.stringValue = @"Writing Memory Dump...";
 			 
 			 dispatch_block_t searchForDataCompleteBlock = ^
 			 {
 				 [progressTimer invalidate];
 				 [progressTimer release];
 				 
-				 if (!([[document currentProcess] isDoingMemoryDump]))
+				 if (!self.document.currentProcess.isDoingMemoryDump)
 				 {
-					 [[document generalStatusTextField] setStringValue:@"Canceled Memory Dump"];
+					 self.document.generalStatusTextField.stringValue = @"Canceled Memory Dump";
 				 }
 				 else
 				 {
-					 [[document currentProcess] setIsDoingMemoryDump:NO];
-					 [[document generalStatusTextField] setStringValue:@"Finished Memory Dump"];
+					 self.document.currentProcess.isDoingMemoryDump = NO;
+					 self.document.generalStatusTextField.stringValue = @"Finished Memory Dump";
 				 }
-				 [[document searchingProgressIndicator] setDoubleValue:0.0];
-				 [[document searchController] resumeFromTask];
+				 self.document.searchingProgressIndicator.doubleValue = 0.0;
+				 [self.document.searchController resumeFromTask];
 			 };
 			 
 			 dispatch_block_t searchForDataBlock = ^
 			 {
-				 if (!ZGSaveAllDataToDirectory([[savePanel URL] relativePath], [document currentProcess]))
+				 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.document.currentProcess))
 				 {
 					 NSRunAlertPanel(
 									 @"The Memory Dump failed",

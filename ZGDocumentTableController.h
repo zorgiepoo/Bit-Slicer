@@ -20,7 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define MAX_TABLE_VIEW_ITEMS ((NSInteger)1000)
+#define MAX_TABLE_VIEW_ITEMS ((NSUInteger)1000)
 
 @class ZGDocument;
 @class ZGVariableController;

@@ -14,42 +14,21 @@
 @interface ZGSearchData : NSObject
 {
 @public
-	double epsilon;
-	void *rangeValue;
-	BOOL shouldIgnoreStringCase;
-	BOOL shouldIncludeNullTerminator;
-	BOOL shouldCompareStoredValues;
-	
-	NSString *lastEpsilonValue;
-	NSString *lastAboveRangeValue;
-	NSString *lastBelowRangeValue;
-	
-	// these are not NSString's because there's no reason to save the values
-	ZGMemoryAddress beginAddress;
-	ZGMemoryAddress endAddress;
-	
-	BOOL shouldCancelSearch;
-	BOOL searchDidCancel;
-	
-	NSArray *savedData;
-	NSArray *tempSavedData;
-	
-	BOOL shouldScanUnwritableValues;
-	
-	// For comparing unicode strings
-	CollatorRef collator;
-	
-	// for wildcard byte array searches
-	unsigned char *byteArrayFlags;
-	
-	void *compareOffset;
+	// All for fast access, for comparison functions
+	void *_rangeValue;
+	double _epsilon;
+	BOOL _shouldIgnoreStringCase;
+	BOOL _shouldIncludeNullTerminator;
+	void *_compareOffset;
+	CollatorRef _collator; // For comparing unicode strings
+	unsigned char *_byteArrayFlags; // For wildcard byte array searches
 }
 
-@property (readonly) void *rangeValue;
+@property (readwrite, nonatomic) void *rangeValue;
 @property (readwrite, copy) NSString *lastEpsilonValue;
 @property (readwrite, copy) NSString *lastAboveRangeValue;
 @property (readwrite, copy) NSString *lastBelowRangeValue;
-@property (readonly) NSArray *savedData;
+@property (readwrite, nonatomic, retain) NSArray *savedData;
 @property (readwrite, retain) NSArray *tempSavedData;
 @property (readwrite) BOOL shouldCompareStoredValues;
 @property (readwrite) double epsilon;
@@ -59,12 +38,9 @@
 @property (readwrite) ZGMemoryAddress endAddress;
 @property (readwrite) BOOL shouldScanUnwritableValues;
 @property (readwrite, assign) void *compareOffset;
+@property (readwrite, nonatomic) unsigned char *byteArrayFlags;
 
 @property (readwrite) BOOL shouldCancelSearch;
 @property (readwrite) BOOL searchDidCancel;
-
-- (void)setRangeValue:(void *)newRangeValue;
-- (void)setSavedData:(NSArray *)newSavedData;
-- (void)setByteArrayFlags:(unsigned char *)newByteArrayFlags;
 
 @end

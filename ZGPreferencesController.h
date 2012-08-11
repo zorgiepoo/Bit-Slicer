@@ -30,14 +30,7 @@
 #define ZGPreferencesIdentifier @"ZGPreferencesID"
 
 @interface ZGPreferencesController : NSWindowController
-{
-    IBOutlet SRRecorderControl *hotkeyRecorder;
-	IBOutlet NSButton *checkForUpdatesButton;
-	IBOutlet NSButton *checkForAlphaUpdatesButton;
-}
 
-- (IBAction)checkForUpdatesButton:(id)sender;
-- (IBAction)checkForAlphaUpdatesButton:(id)sender;
 - (void)updateAlphaUpdatesUI;
 
 @end

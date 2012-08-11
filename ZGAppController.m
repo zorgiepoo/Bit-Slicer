@@ -29,8 +29,6 @@
 
 @implementation ZGAppController
 
-@synthesize applicationIsAuthenticated;
-
 #pragma mark Singleton & Accessors
 
 static ZGAppController *sharedInstance = nil;
@@ -53,7 +51,7 @@ static ZGAppController *sharedInstance = nil;
 	return (majorVersion == 10 && minorVersion >= 7) || majorVersion > 10;
 }
 
-+ (ZGAppController *)sharedController
++ (id)sharedController
 {
 	return sharedInstance;
 }
@@ -68,21 +66,6 @@ static ZGAppController *sharedInstance = nil;
 	}
 	
 	return self;
-}
-
-- (ZGPreferencesController *)preferencesController
-{
-	return preferencesController;
-}
-
-- (ZGMemoryViewer *)memoryViewer
-{
-	return memoryViewer;
-}
-
-- (ZGDocumentController *)documentController
-{
-	return documentController;
 }
 
 #pragma mark Authenticating
@@ -122,9 +105,9 @@ int acquireTaskportRight(void)
 
 OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef theEvent, void *userData)
 {
-	for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
+	for (NSRunningApplication *runningApplication in [NSWorkspace sharedWorkspace].runningApplications)
 	{
-		if ([runningApplication isActive] && [runningApplication processIdentifier] != getpid())
+		if (runningApplication.isActive && runningApplication.processIdentifier != getpid())
 		{
 			[ZGProcess pauseOrUnpauseProcess:[runningApplication processIdentifier]];
 		}
@@ -142,10 +125,10 @@ static BOOL didRegisteredHotKey = NO;
 		UnregisterEventHotKey(hotKeyRef);
 	}
 	
-	NSNumber *hotKeyCodeNumber = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_HOT_KEY];
-	NSNumber *hotKeyModifier = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_HOT_KEY_MODIFIER];
+	NSNumber *hotKeyCodeNumber = [NSUserDefaults.standardUserDefaults objectForKey:ZG_HOT_KEY];
+	NSNumber *hotKeyModifier = [NSUserDefaults.standardUserDefaults objectForKey:ZG_HOT_KEY_MODIFIER];
     
-	if (hotKeyCodeNumber && [hotKeyCodeNumber intValue] > INVALID_KEY_CODE)
+	if (hotKeyCodeNumber && hotKeyCodeNumber.integerValue > INVALID_KEY_CODE)
 	{
 		EventTypeSpec eventType;
 		eventType.eventClass = kEventClassKeyboard;
@@ -157,7 +140,7 @@ static BOOL didRegisteredHotKey = NO;
 		hotKeyID.signature = 'htk1';
 		hotKeyID.id = 1;
 		
-		RegisterEventHotKey([hotKeyCodeNumber intValue], [hotKeyModifier intValue], hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef);
+		RegisterEventHotKey(hotKeyCodeNumber.intValue, hotKeyModifier.intValue, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef);
 		
 		didRegisteredHotKey = YES;
 	}
@@ -166,11 +149,11 @@ static BOOL didRegisteredHotKey = NO;
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
 	// Make sure that we unfreeze all processes that we may have frozen
-	for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
+	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
 	{
-		if ([[ZGProcess frozenProcesses] containsObject:[NSNumber numberWithInt:[runningApplication processIdentifier]]])
+		if ([[ZGProcess frozenProcesses] containsObject:@(runningApplication.processIdentifier)])
 		{
-			[ZGProcess pauseOrUnpauseProcess:[runningApplication processIdentifier]];
+			[ZGProcess pauseOrUnpauseProcess:runningApplication.processIdentifier];
 		}
 	}
 }
@@ -179,7 +162,7 @@ static BOOL didRegisteredHotKey = NO;
 
 - (void)checkForUpdates
 {
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_UPDATES])
+	if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_UPDATES])
 	{
 		__block NSDictionary *latestVersionDictionary = nil;
 		
@@ -187,9 +170,9 @@ static BOOL didRegisteredHotKey = NO;
 		{
 			if (latestVersionDictionary)
 			{
-				NSString *currentShortVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-				NSString *currentBuildString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-				double currentVersion = [currentBuildString doubleValue];
+				NSString *currentShortVersion = [NSBundle.mainBundle.infoDictionary objectForKey:@"CFBundleShortVersionString"];
+				NSString *currentBuildString = [NSBundle.mainBundle.infoDictionary objectForKey:@"CFBundleVersion"];
+				double currentVersion = currentBuildString.doubleValue;
 				double latestStableVersion = [[latestVersionDictionary objectForKey:@"Build-Stable"] doubleValue];
 				double latestAlphaVersion = [[latestVersionDictionary objectForKey:@"Build-Alpha"] doubleValue];
 				
@@ -197,9 +180,8 @@ static BOOL didRegisteredHotKey = NO;
 				if (!checkForAlphas && (floor(currentVersion) != currentVersion))
 				{
 					// we are in an alpha version, so we should check for alpha updates since we're already checking for regular updates
-					[[NSUserDefaults standardUserDefaults] setBool:YES
-															forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
-					[preferencesController updateAlphaUpdatesUI];
+					[[NSUserDefaults standardUserDefaults] setBool:YES forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+					[self.preferencesController updateAlphaUpdatesUI];
 					checkForAlphas = YES;
 				}
 				
@@ -222,14 +204,14 @@ static BOOL didRegisteredHotKey = NO;
 					switch (NSRunAlertPanel(@"A new version is available", @"You currently have version %@. Do you want to update to %@?", @"Yes", @"No", @"Don't ask me again", currentShortVersion, latestShortVersion))
 					{
 						case NSAlertDefaultReturn: // yes, I want update
-							[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:latestVersionURL]];
+							[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:latestVersionURL]];
 							break;
 						case NSAlertOtherReturn: // don't ask again
-							[[NSUserDefaults standardUserDefaults]
+							[NSUserDefaults.standardUserDefaults
 							 setBool:NO
 							 forKey:ZG_CHECK_FOR_UPDATES];
 							
-							[[NSUserDefaults standardUserDefaults]
+							[NSUserDefaults.standardUserDefaults
 							 setBool:NO
 							 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 							break;
@@ -267,7 +249,7 @@ static BOOL didRegisteredHotKey = NO;
 	// Initialize preference defaults
 	[self openPreferences:nil showWindow:NO];
     
-	[[self class] registerPauseAndUnpauseHotKey];
+	[self.class registerPauseAndUnpauseHotKey];
 	[ZGCalculator initializeCalculator];
 	
 	[self checkForUpdates];
@@ -279,7 +261,7 @@ static BOOL didRegisteredHotKey = NO;
 {
 	if ([identifier isEqualToString:ZGMemoryViewerIdentifier])
 	{
-		[[self sharedController]
+		[self.sharedController
 		 openMemoryViewer:nil
 		 showWindow:NO];
         
@@ -297,14 +279,14 @@ static BOOL didRegisteredHotKey = NO;
 
 - (void)openPreferences:(id)sender showWindow:(BOOL)shouldShowWindow
 {
-	if (!preferencesController)
+	if (!self.preferencesController)
 	{
-		preferencesController = [[ZGPreferencesController alloc] init];
+		_preferencesController = [[ZGPreferencesController alloc] init];
 	}
 	
 	if (shouldShowWindow)
 	{
-		[preferencesController showWindow:nil];
+		[self.preferencesController showWindow:nil];
 	}
 }
 
@@ -315,14 +297,14 @@ static BOOL didRegisteredHotKey = NO;
 
 - (void)openMemoryViewer:(id)sender showWindow:(BOOL)shouldShowWindow
 {
-	if (!memoryViewer)
+	if (!self.memoryViewer)
 	{
-		memoryViewer = [[ZGMemoryViewer alloc] init];
+		_memoryViewer = [[ZGMemoryViewer alloc] init];
 	}
 	
 	if (shouldShowWindow)
 	{
-		[memoryViewer showWindow:nil];
+		[self.memoryViewer showWindow:nil];
 	}
 }
 
@@ -333,22 +315,22 @@ static BOOL didRegisteredHotKey = NO;
 
 - (IBAction)jumpToMemoryAddress:(id)sender
 {
-	[memoryViewer jumpToMemoryAddressRequest];
+	[self.memoryViewer jumpToMemoryAddressRequest];
 }
 
 #define FAQ_URL @"http://portingteam.com/index.php/topic/4454-faq-information/"
 - (IBAction)help:(id)sender
 {	
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:FAQ_URL]];
+	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:FAQ_URL]];
 }
 
 #pragma mark Menu Item Validation
 
-- (BOOL)validateMenuItem:(NSMenuItem *)theMenuItem
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-	if ([theMenuItem action] == @selector(jumpToMemoryAddress:))
+	if (menuItem.action == @selector(jumpToMemoryAddress:))
 	{
-		if (!memoryViewer || ![memoryViewer canJumpToAddress])
+		if (!self.memoryViewer || ![self.memoryViewer canJumpToAddress])
 		{
 			return NO;
 		}

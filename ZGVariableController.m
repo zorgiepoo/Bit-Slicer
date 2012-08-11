@@ -29,6 +29,18 @@
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
 
+@interface ZGVariableController ()
+
+@property (assign) IBOutlet ZGDocument *document;
+@property (assign) IBOutlet NSWindow *editVariablesValueWindow;
+@property (assign) IBOutlet NSTextField *editVariablesValueTextField;
+@property (assign) IBOutlet NSWindow *editVariablesAddressWindow;
+@property (assign) IBOutlet NSTextField *editVariablesAddressTextField;
+@property (assign) IBOutlet NSWindow *editVariablesSizeWindow;
+@property (assign) IBOutlet NSTextField *editVariablesSizeTextField;
+
+@end
+
 @implementation ZGVariableController
 
 #pragma mark Freezing variables
@@ -37,83 +49,83 @@
 {
 	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger rowIndex, BOOL *stop)
 	 {
-		 ZGVariable *variable = [[document watchVariablesArray] objectAtIndex:rowIndex];
-		 variable->isFrozen = !(variable->isFrozen);
+		 ZGVariable *variable = [self.document.watchVariablesArray objectAtIndex:rowIndex];
+		 variable.isFrozen = !variable.isFrozen;
 		 
-		 if (variable->isFrozen)
+		 if (variable.isFrozen)
 		 {
-			 [variable setFreezeValue:variable->value];
+			 variable.freezeValue = variable.value;
 		 }
 	 }];
 	
-	[[[document tableController] watchVariablesTableView] reloadData];
+	[self.document.tableController.watchVariablesTableView reloadData];
 	
 	// check whether we want to use "Undo Freeze" or "Redo Freeze" or "Undo Unfreeze" or "Redo Unfreeze"
-	if ([[[document watchVariablesArray] objectAtIndex:[rowIndexes firstIndex]] isFrozen])
+	if ([[self.document.watchVariablesArray objectAtIndex:rowIndexes.firstIndex] isFrozen])
 	{
-		if ([[document undoManager] isUndoing])
+		if (self.document.undoManager.isUndoing)
 		{
-			[[document undoManager] setActionName:@"Unfreeze"];
+			self.document.undoManager.actionName = @"Unfreeze";
 		}
 		else
 		{
-			[[document undoManager] setActionName:@"Freeze"];
+			self.document.undoManager.actionName = @"Freeze";
 		}
 	}
 	else
 	{
-		if ([[document undoManager] isUndoing])
+		if (self.document.undoManager.isUndoing)
 		{
-			[[document undoManager] setActionName:@"Freeze"];
+			self.document.undoManager.actionName = @"Freeze";
 		}
 		else
 		{
-			[[document undoManager] setActionName:@"Unfreeze"];
+			self.document.undoManager.actionName = @"Unfreeze";
 		}
 	}
 	
-	[[[document undoManager] prepareWithInvocationTarget:self] freezeOrUnfreezeVariablesAtRoxIndexes:rowIndexes];
+	[[self.document.undoManager prepareWithInvocationTarget:self] freezeOrUnfreezeVariablesAtRoxIndexes:rowIndexes];
 }
 
 - (void)freezeVariables
 {
-	[self freezeOrUnfreezeVariablesAtRoxIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
+	[self freezeOrUnfreezeVariablesAtRoxIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
 }
 
 #pragma mark Copying & Pasting
 
 - (void)copyVariables
 {
-	[[NSPasteboard generalPasteboard]
+	[NSPasteboard.generalPasteboard
 	 declareTypes:[NSArray arrayWithObjects:NSStringPboardType, ZGVariablePboardType, nil]
 	 owner:self];
 	
 	NSMutableArray *linesToWrite = [[NSMutableArray alloc] init];
-	NSArray *variablesArray = [[document watchVariablesArray] objectsAtIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
+	NSArray *variablesArray = [self.document.watchVariablesArray objectsAtIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
 	
 	for (ZGVariable *variable in variablesArray)
 	{
-		[linesToWrite addObject:[NSString stringWithFormat:@"%@ %@ %@", [variable name], [variable addressStringValue], [variable stringValue]]];
+		[linesToWrite addObject:[NSString stringWithFormat:@"%@ %@ %@", variable.name, variable.addressStringValue, variable.stringValue]];
 	}
 	
-	[[NSPasteboard generalPasteboard]
+	[NSPasteboard.generalPasteboard
 	 setString:[linesToWrite componentsJoinedByString:@"\n"]
 	 forType:NSStringPboardType];
 	
 	[linesToWrite release];
 	
-	[[NSPasteboard generalPasteboard]
+	[NSPasteboard.generalPasteboard
 	 setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray]
 	 forType:ZGVariablePboardType];
 }
 
 - (void)pasteVariables
 {
-	NSData *pasteboardData = [[NSPasteboard generalPasteboard] dataForType:ZGVariablePboardType];
+	NSData *pasteboardData = [NSPasteboard.generalPasteboard dataForType:ZGVariablePboardType];
 	if (pasteboardData)
 	{
 		NSArray *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
-		NSInteger currentIndex = [[[document tableController] watchVariablesTableView] selectedRow];
+		NSInteger currentIndex = self.document.tableController.watchVariablesTableView.selectedRow;
 		if (currentIndex == -1)
 		{
 			currentIndex = 0;
@@ -123,7 +135,7 @@
 			currentIndex++;
 		}
 		
-		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, [variablesToInsertArray count])];
+		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, variablesToInsertArray.count)];
 		
 		[self
 		 addVariables:variablesToInsertArray
@@ -135,70 +147,69 @@
 
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
 {
-	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithCapacity:[[document watchVariablesArray] count]];
+	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithCapacity:self.document.watchVariablesArray.count];
 	
-	if ([[document undoManager] isUndoing])
+	if (self.document.undoManager.isUndoing)
 	{
-		[[document undoManager] setActionName:[NSString stringWithFormat:@"Add Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
+		self.document.undoManager.actionName = [NSString stringWithFormat:@"Add Variable%@", rowIndexes.count > 1 ? @"s" : @""];
 	}
 	else
 	{
-		[[document undoManager] setActionName:[NSString stringWithFormat:@"Delete Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
+		self.document.undoManager.actionName = [NSString stringWithFormat:@"Delete Variable%@", rowIndexes.count > 1 ? @"s" : @""];
 	}
-	[[[document undoManager] prepareWithInvocationTarget:self]
-	 addVariables:[[document watchVariablesArray] objectsAtIndexes:rowIndexes]
+	[[self.document.undoManager prepareWithInvocationTarget:self]
+	 addVariables:[self.document.watchVariablesArray objectsAtIndexes:rowIndexes]
 	 atRowIndexes:rowIndexes];
 	
-	[temporaryArray addObjectsFromArray:[document watchVariablesArray]];
+	[temporaryArray addObjectsFromArray:self.document.watchVariablesArray];
 	[temporaryArray removeObjectsAtIndexes:rowIndexes];
 	
-	[document setWatchVariablesArray:[NSArray arrayWithArray:temporaryArray]];
+	self.document.watchVariablesArray = [NSArray arrayWithArray:temporaryArray];
 	[temporaryArray release];
 	
-	[[[document tableController] watchVariablesTableView] reloadData];
+	[self.document.tableController.watchVariablesTableView reloadData];
 	
-	[document updateClearButton];
+	[self.document updateClearButton];
 }
 
 - (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes
 {
-	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithArray:[document watchVariablesArray]];
-	[temporaryArray insertObjects:variables
-						atIndexes:rowIndexes];
+	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithArray:self.document.watchVariablesArray];
+	[temporaryArray insertObjects:variables atIndexes:rowIndexes];
 	
-	[document setWatchVariablesArray:[NSArray arrayWithArray:temporaryArray]];
+	[self.document setWatchVariablesArray:[NSArray arrayWithArray:temporaryArray]];
 	
 	[temporaryArray release];
-	[[[document tableController] watchVariablesTableView] reloadData];
+	[self.document.tableController.watchVariablesTableView reloadData];
 	
-	if ([[document undoManager] isUndoing])
+	if (self.document.undoManager.isUndoing)
 	{
-		[[document undoManager] setActionName:[NSString stringWithFormat:@"Delete Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
+		self.document.undoManager.actionName = [NSString stringWithFormat:@"Delete Variable%@", rowIndexes.count > 1 ? @"s" : @""];
 	}
 	else
 	{
-		[[document undoManager] setActionName:[NSString stringWithFormat:@"Add Variable%@", [rowIndexes count] > 1 ? @"s" : @""]];
+		self.document.undoManager.actionName = [NSString stringWithFormat:@"Add Variable%@", rowIndexes.count > 1 ? @"s" : @""];
 	}
-	[[[document undoManager] prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
+	[[self.document.undoManager prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
 	
-	[[document generalStatusTextField] setStringValue:@""];
+	self.document.generalStatusTextField.stringValue = @"";
 	
-	[document updateClearButton];
+	[self.document updateClearButton];
 }
 
 - (void)removeSelectedSearchValues
 {
-	[self removeVariablesAtRowIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
-	[[document generalStatusTextField] setStringValue:@""];
+	[self removeVariablesAtRowIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
+	self.document.generalStatusTextField.stringValue = @"";
 }
 
 - (void)addVariable:(id)sender
 {
-	ZGVariableQualifier qualifier = [[[document variableQualifierMatrix] cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
+	ZGVariableQualifier qualifier = [[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
 	
 	// Try to get an initial address from the memory viewer's selection
 	ZGMemoryAddress initialAddress = 0x0;
-	if ([[ZGAppController sharedController] memoryViewer] && [[[ZGAppController sharedController] memoryViewer] currentProcessIdentifier] == [[document currentProcess] processID])
+	if ([[ZGAppController sharedController] memoryViewer] && [[[ZGAppController sharedController] memoryViewer] currentProcessIdentifier] == self.document.currentProcess.processID)
 	{
 		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddress];
 	}
@@ -210,9 +221,9 @@
 		 address:initialAddress
 		 type:(ZGVariableType)[sender tag]
 		 qualifier:qualifier
-		 pointerSize:[[document currentProcess] is64Bit] ? sizeof(int64_t) : sizeof(int32_t)];
+		 pointerSize:self.document.currentProcess.is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 	
-	[variable setShouldBeSearched:NO];
+	variable.shouldBeSearched = NO;
 	
 	[self
 	 addVariables:[NSArray arrayWithObject:variable]
@@ -221,8 +232,8 @@
 	[variable release];
 	
 	// have the user edit the variable's address
-	[[[document tableController] watchVariablesTableView]
-	 editColumn:[[[document tableController] watchVariablesTableView] columnWithIdentifier:@"address"]
+	[self.document.tableController.watchVariablesTableView
+	 editColumn:[self.document.tableController.watchVariablesTableView columnWithIdentifier:@"address"]
 	 row:0
 	 withEvent:nil
 	 select:YES];
@@ -232,60 +243,60 @@
 
 - (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName
 {
-	[[document undoManager] setActionName:@"Name Change"];
-	[[[document undoManager] prepareWithInvocationTarget:self]
+	self.document.undoManager.actionName = @"Name Change";
+	[[self.document.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
-	 newName:[variable name]];
+	 newName:variable.name];
 	
-	[variable setName:newName];
+	variable.name = newName;
 	
-	if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
+	if (self.document.undoManager.isUndoing || self.document.undoManager.isRedoing)
 	{
-		[[[document tableController] watchVariablesTableView] reloadData];
+		[self.document.tableController.watchVariablesTableView reloadData];
 	}
 }
 
 - (void)changeVariable:(ZGVariable *)variable newAddress:(NSString *)newAddress
 {
-	[[document undoManager] setActionName:@"Address Change"];
-	[[[document undoManager] prepareWithInvocationTarget:self]
+	self.document.undoManager.actionName = @"Address Change";
+	[[self.document.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
-	 newAddress:[variable addressStringValue]];
+	 newAddress:variable.addressStringValue];
 	
-	[variable setAddressStringValue:[ZGCalculator evaluateExpression:newAddress]];
+	variable.addressStringValue = [ZGCalculator evaluateExpression:newAddress];
 	
-	if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
+	if (self.document.undoManager.isUndoing || self.document.undoManager.isRedoing)
 	{
-		[[[document tableController] watchVariablesTableView] reloadData];
+		[self.document.tableController.watchVariablesTableView reloadData];
 	}
 }
 
 - (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size
 {
-	[[document undoManager] setActionName:@"Type Change"];
-	[[[document undoManager] prepareWithInvocationTarget:self]
+	self.document.undoManager.actionName = @"Type Change";
+	[[self.document.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
-	 newType:[variable type]
-	 newSize:[variable size]];
+	 newType:variable.type
+	 newSize:variable.size];
 	
 	[variable
 	 setType:type
 	 requestedSize:size
-	 pointerSize:[[document currentProcess] is64Bit] ? sizeof(int64_t) : sizeof(int32_t)];
+	 pointerSize:self.document.currentProcess.is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 	
-	if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
+	if (self.document.undoManager.isUndoing || self.document.undoManager.isRedoing)
 	{
-		[[[document tableController] watchVariablesTableView] reloadData];
+		[self.document.tableController.watchVariablesTableView reloadData];
 	}
 }
 
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag
 {
 	void *newValue = NULL;
-	ZGMemorySize writeSize = [variable size]; // specifically needed for byte arrays
+	ZGMemorySize writeSize = variable.size; // specifically needed for byte arrays
 	
 	// It's important to retrieve this now instead of later as changing the variable's size may cause a bad side effect to this method
-	NSString *oldStringValue = [[variable stringValue] copy];
+	NSString *oldStringValue = [variable.stringValue copy];
 	
 	int8_t int8Value = 0;
 	int16_t int16Value = 0;
@@ -294,14 +305,14 @@
 	float floatValue = 0.0;
 	double doubleValue = 0.0;
 	
-	if ([variable type] != ZGUTF8String && [variable type] != ZGUTF16String && [variable type] != ZGByteArray)
+	if (variable.type != ZGUTF8String && variable.type != ZGUTF16String && variable.type != ZGByteArray)
 	{
 		stringObject = [ZGCalculator evaluateExpression:stringObject];
 	}
 	
-	BOOL stringIsAHexRepresentation = [stringObject isHexRepresentation];
+	BOOL stringIsAHexRepresentation = stringObject.isHexRepresentation;
 	
-	switch ([variable type])
+	switch (variable.type)
 	{
 		case ZGInt8:
 			if (stringIsAHexRepresentation)
@@ -311,7 +322,7 @@
 			}
 			else
 			{
-				int8Value = [stringObject intValue];
+				int8Value = stringObject.intValue;
 			}
 			
 			newValue = &int8Value;
@@ -324,17 +335,17 @@
 			}
 			else
 			{
-				int16Value = [stringObject intValue];
+				int16Value = stringObject.intValue;
 			}
 			
 			newValue = &int16Value;
 			break;
 		case ZGPointer:
-			if ([variable size] == sizeof(int32_t))
+			if (variable.size == sizeof(int32_t))
 			{
 				goto INT32_BIT_CHANGE_VARIABLE;
 			}
-			else if ([variable size] == sizeof(int64_t))
+			else if (variable.size == sizeof(int64_t))
 			{
 				goto INT64_BIT_CHANGE_VARIABLE;
 			}
@@ -348,7 +359,7 @@
 			}
 			else
 			{
-				int32Value = [stringObject intValue];
+				int32Value = stringObject.intValue;
 			}
 			
 			newValue = &int32Value;
@@ -360,7 +371,7 @@
 			}
 			else
 			{
-				floatValue = [stringObject floatValue];
+				floatValue = stringObject.floatValue;
 			}
 			
 			newValue = &floatValue;
@@ -385,26 +396,26 @@
 			}
 			else
 			{
-				doubleValue = [stringObject doubleValue];
+				doubleValue = stringObject.doubleValue;
 			}
 			
 			newValue = &doubleValue;
 			break;
 		case ZGUTF8String:
 			newValue = (void *)[stringObject cStringUsingEncoding:NSUTF8StringEncoding];
-			[variable setSize:strlen(newValue) + 1];
-			writeSize = [variable size];
+			variable.size = strlen(newValue) + 1;
+			writeSize = variable.size;
 			break;
 		case ZGUTF16String:
-			[variable setSize:[stringObject length] * sizeof(unichar)];
-			writeSize = [variable size];
+			variable.size = [stringObject length] * sizeof(unichar);
+			writeSize = variable.size;
 			
-			if ([variable size])
+			if (variable.size)
 			{
-				newValue = malloc((size_t)[variable size]);
+				newValue = malloc((size_t)variable.size);
 				[stringObject
 				 getCharacters:newValue
-				 range:NSMakeRange(0, [stringObject length])];
+				 range:NSMakeRange(0, stringObject.length)];
 			}
 			else
 			{
@@ -422,13 +433,13 @@
 			
 		case ZGByteArray:
 		{
-			NSArray *bytesArray = [stringObject componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+			NSArray *bytesArray = [stringObject componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
 			
 			// this is the size the user wants
-			[variable setSize:[bytesArray count]];
+			variable.size = bytesArray.count;
 			
 			// this is the maximum size allocated needed
-			newValue = malloc((size_t)[variable size]);
+			newValue = malloc((size_t)variable.size);
 			
 			if (newValue)
 			{
@@ -442,7 +453,7 @@
 					*valuePtr = (unsigned char)theValue;
 					valuePtr++;
 					
-					if ([[byteString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] length] == 0)
+					if ([byteString stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet].length == 0)
 					{
 						break;
 					}
@@ -452,7 +463,7 @@
 			}
 			else
 			{
-				[variable setSize:writeSize];
+				variable.size = writeSize;
 			}
 			
 			break;
@@ -461,21 +472,21 @@
 	
 	if (newValue)
 	{
-		if ([variable isFrozen])
+		if (variable.isFrozen)
 		{
-			[variable setFreezeValue:newValue];
+			variable.freezeValue = newValue;
 			
 			if (recordUndoFlag)
 			{
-				[[document undoManager] setActionName:@"Freeze Value Change"];
-				[[[document undoManager] prepareWithInvocationTarget:self]
+				self.document.undoManager.actionName = @"Freeze Value Change";
+				[[self.document.undoManager prepareWithInvocationTarget:self]
 				 changeVariable:variable
-				 newValue:[variable stringValue]
+				 newValue:variable.stringValue
 				 shouldRecordUndo:YES];
 				
-				if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
+				if (self.document.undoManager.isUndoing || self.document.undoManager.isRedoing)
 				{
-					[[[document tableController] watchVariablesTableView] reloadData];
+					[self.document.tableController.watchVariablesTableView reloadData];
 				}
 			}
 		}
@@ -485,7 +496,7 @@
 			
 			if (writeSize)
 			{
-				if (!ZGWriteBytes([[document currentProcess] processTask], [variable address], newValue, writeSize))
+				if (!ZGWriteBytes(self.document.currentProcess.processTask, variable.address, newValue, writeSize))
 				{
 					successfulWrite = NO;
 				}
@@ -495,11 +506,11 @@
 				successfulWrite = NO;
 			}
 			
-			if (successfulWrite && [variable type] == ZGUTF16String)
+			if (successfulWrite && variable.type == ZGUTF16String)
 			{
 				// Don't forget to write the null terminator
 				unichar nullTerminator = 0;
-				if (!ZGWriteBytes([[document currentProcess] processTask], [variable address] + writeSize, &nullTerminator, sizeof(unichar)))
+				if (!ZGWriteBytes(self.document.currentProcess.processTask, variable.address + writeSize, &nullTerminator, sizeof(unichar)))
 				{
 					successfulWrite = NO;
 				}
@@ -507,20 +518,20 @@
 			
 			if (successfulWrite && recordUndoFlag)
 			{
-				[[document undoManager] setActionName:@"Value Change"];
-				[[[document undoManager] prepareWithInvocationTarget:self]
+				self.document.undoManager.actionName = @"Value Change";
+				[[self.document.undoManager prepareWithInvocationTarget:self]
 				 changeVariable:variable
 				 newValue:oldStringValue
 				 shouldRecordUndo:YES];
 				
-				if ([[document undoManager] isUndoing] || [[document undoManager] isRedoing])
+				if (self.document.undoManager.isUndoing || self.document.undoManager.isRedoing)
 				{
-					[[[document tableController] watchVariablesTableView] reloadData];
+					[self.document.tableController.watchVariablesTableView reloadData];
 				}
 			}
 		}
 		
-		if ([variable type] == ZGUTF16String || [variable type] == ZGByteArray)
+		if (variable.type == ZGUTF16String || variable.type == ZGByteArray)
 		{
 			free(newValue);
 		}
@@ -531,23 +542,23 @@
 
 - (void)changeVariableShouldBeSearched:(BOOL)shouldBeSearched rowIndexes:(NSIndexSet *)rowIndexes
 {
-	NSUInteger currentIndex = [rowIndexes firstIndex];
+	NSUInteger currentIndex = rowIndexes.firstIndex;
 	while (currentIndex != NSNotFound)
 	{
-		[[[document watchVariablesArray] objectAtIndex:currentIndex] setShouldBeSearched:shouldBeSearched];
+		[[self.document.watchVariablesArray objectAtIndex:currentIndex] setShouldBeSearched:shouldBeSearched];
 		currentIndex = [rowIndexes indexGreaterThanIndex:currentIndex];
 	}
 	
-	if (![[document undoManager] isUndoing] && ![[document undoManager] isRedoing] && [rowIndexes count] > 1)
+	if (!self.document.undoManager.isUndoing && !self.document.undoManager.isRedoing && rowIndexes.count > 1)
 	{
-		[[document tableController] setShouldIgnoreTableViewSelectionChange:YES];
+		self.document.tableController.shouldIgnoreTableViewSelectionChange = YES;
 	}
 	
 	// the table view always needs to be reloaded because of being able to select multiple indexes
-	[[[document tableController] watchVariablesTableView] reloadData];
+	[self.document.tableController.watchVariablesTableView reloadData];
 	
-	[[document undoManager] setActionName:[NSString stringWithFormat:@"Search Variable%@ Change", ([rowIndexes count] > 1) ? @"s" : @""]];
-	[[[document undoManager] prepareWithInvocationTarget:self]
+	self.document.undoManager.actionName = [NSString stringWithFormat:@"Search Variable%@ Change", (rowIndexes.count > 1) ? @"s" : @""];
+	[[self.document.undoManager prepareWithInvocationTarget:self]
 	 changeVariableShouldBeSearched:!shouldBeSearched
 	 rowIndexes:rowIndexes];
 }
@@ -556,8 +567,8 @@
 
 - (IBAction)editVariablesValueCancelButton:(id)sender
 {
-	[NSApp endSheet:editVariablesValueWindow];
-	[editVariablesValueWindow close];
+	[NSApp endSheet:self.editVariablesValueWindow];
+	[self.editVariablesValueWindow close];
 }
 
 - (void)editVariables:(NSArray *)variables newValues:(NSArray *)newValues
@@ -568,7 +579,7 @@
 	 {
 		 ZGVariable *variable = object;
 		 
-		 [oldValues addObject:[variable stringValue]];
+		 [oldValues addObject:variable.stringValue];
 		 
 		 [self
 		  changeVariable:variable
@@ -576,10 +587,10 @@
 		  shouldRecordUndo:NO];
 	 }];
 	
-	[[[document tableController] watchVariablesTableView] reloadData];
+	[self.document.tableController.watchVariablesTableView reloadData];
 	
-	[[document undoManager] setActionName:@"Edit Variables"];
-	[[[document undoManager] prepareWithInvocationTarget:self]
+	self.document.undoManager.actionName = @"Edit Variables";
+	[[self.document.undoManager prepareWithInvocationTarget:self]
 	 editVariables:variables
 	 newValues:oldValues];
 	
@@ -588,29 +599,29 @@
 
 - (IBAction)editVariablesValueOkayButton:(id)sender
 {
-	[NSApp endSheet:editVariablesValueWindow];
-	[editVariablesValueWindow close];
+	[NSApp endSheet:self.editVariablesValueWindow];
+	[self.editVariablesValueWindow close];
 	
-	NSArray *variables = [[document watchVariablesArray] objectsAtIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
+	NSArray *variables = [self.document.watchVariablesArray objectsAtIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
 	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
 	
 	for (ZGVariable *variable in variables)
 	{
 		ZGMemoryProtection memoryProtection;
-		ZGMemoryAddress memoryAddress = [variable address];
+		ZGMemoryAddress memoryAddress = variable.address;
 		ZGMemorySize memorySize;
 		
-		if (ZGMemoryProtectionInRegion([[document currentProcess] processTask], &memoryAddress, &memorySize, &memoryProtection))
+		if (ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 		{
 			// if !(the variable is within a single memory region and the memory region is not writable), then the variable is editable
-			if (!(memoryAddress <= [variable address] && memoryAddress + memorySize >= [variable address] + [variable size] && !(memoryProtection & VM_PROT_WRITE)))
+			if (!(memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_WRITE)))
 			{
 				[validVariables addObject:variable];
 			}
 		}
 	}
 	
-	if ([validVariables count] == 0)
+	if (validVariables.count == 0)
 	{
 		NSRunAlertPanel(@"Writing Variables Failed", @"The selected variables could not be overwritten. Perhaps try to change the memory protection on the variable?", nil, nil, nil);
 	}
@@ -619,9 +630,9 @@
 		NSMutableArray *valuesArray = [[NSMutableArray alloc] init];
 		
 		NSUInteger variableIndex;
-		for (variableIndex = 0; variableIndex < [validVariables count]; variableIndex++)
+		for (variableIndex = 0; variableIndex < validVariables.count; variableIndex++)
 		{
-			[valuesArray addObject:[editVariablesValueTextField stringValue]];
+			[valuesArray addObject:self.editVariablesValueTextField.stringValue];
 		}
 		
 		[self
@@ -636,11 +647,11 @@
 
 - (void)editVariablesValueRequest
 {
-	[editVariablesValueTextField setStringValue:[[[document watchVariablesArray] objectAtIndex:[[[document tableController] watchVariablesTableView] selectedRow]] stringValue]];
+	self.editVariablesValueTextField.stringValue = [[self.document.watchVariablesArray objectAtIndex:self.document.tableController.watchVariablesTableView.selectedRow] stringValue];
 	
 	[NSApp
-	 beginSheet:editVariablesValueWindow
-	 modalForWindow:[document watchWindow]
+	 beginSheet:self.editVariablesValueWindow
+	 modalForWindow:self.document.watchWindow
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
@@ -650,48 +661,48 @@
 
 - (IBAction)editVariablesAddressCancelButton:(id)sender
 {
-	[NSApp endSheet:editVariablesAddressWindow];
-	[editVariablesAddressWindow close];
+	[NSApp endSheet:self.editVariablesAddressWindow];
+	[self.editVariablesAddressWindow close];
 }
 
 - (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula
 {
-	[[document undoManager] setActionName:@"Address Change"];
-	[[[document undoManager] prepareWithInvocationTarget:self]
+	self.document.undoManager.actionName = @"Address Change";
+	[[self.document.undoManager prepareWithInvocationTarget:self]
 	 editVariable:variable
-	 addressFormula:[variable addressFormula]];
+	 addressFormula:variable.addressFormula];
 	
-	[variable setAddressFormula:newAddressFormula];
+	variable.addressFormula = newAddressFormula;
 	if ([newAddressFormula rangeOfString:@"["].location != NSNotFound && [newAddressFormula rangeOfString:@"]"].location != NSNotFound)
 	{
-		[variable setIsPointer:YES];
+		variable.isPointer = YES;
 	}
 	else
 	{
-		[variable setIsPointer:NO];
-		[variable setAddressStringValue:[ZGCalculator evaluateExpression:newAddressFormula]];
-		[[[document tableController] watchVariablesTableView] reloadData];
+		variable.isPointer = NO;
+		variable.addressStringValue = [ZGCalculator evaluateExpression:newAddressFormula];
+		[self.document.tableController.watchVariablesTableView reloadData];
 	}
 }
 
 - (IBAction)editVariablesAddressOkayButton:(id)sender
 {
-	[NSApp endSheet:editVariablesAddressWindow];
-	[editVariablesAddressWindow close];
+	[NSApp endSheet:self.editVariablesAddressWindow];
+	[self.editVariablesAddressWindow close];
 	
 	[self
-	 editVariable:[[document watchVariablesArray] objectAtIndex:[[[document tableController] watchVariablesTableView] selectedRow]]
-	 addressFormula:[editVariablesAddressTextField stringValue]];
+	 editVariable:[self.document.watchVariablesArray objectAtIndex:self.document.tableController.watchVariablesTableView.selectedRow]
+	 addressFormula:self.editVariablesAddressTextField.stringValue];
 }
 
 - (void)editVariablesAddressRequest
 {
-	ZGVariable *variable = [[document watchVariablesArray] objectAtIndex:[[[document tableController] watchVariablesTableView] selectedRow]];
-	[editVariablesAddressTextField setStringValue:[variable addressFormula]];
+	ZGVariable *variable = [self.document.watchVariablesArray objectAtIndex:self.document.tableController.watchVariablesTableView.selectedRow];
+	self.editVariablesAddressTextField.stringValue = variable.addressFormula;
 	
 	[NSApp
-	 beginSheet:editVariablesAddressWindow
-	 modalForWindow:[document watchWindow]
+	 beginSheet:self.editVariablesAddressWindow
+	 modalForWindow:self.document.watchWindow
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
@@ -701,8 +712,8 @@
 
 - (IBAction)editVariablesSizeCancelButton:(id)sender
 {
-	[NSApp endSheet:editVariablesSizeWindow];
-	[editVariablesSizeWindow close];
+	[NSApp endSheet:self.editVariablesSizeWindow];
+	[self.editVariablesSizeWindow close];
 }
 
 - (void)editVariables:(NSArray *)variables requestedSizes:(NSArray *)requestedSizes
@@ -716,31 +727,31 @@
 		 ZGMemorySize size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
 		 void *buffer = NULL;
 		 
-		 if (ZGReadBytes([[document currentProcess] processTask], [variable address], &buffer, &size))
+		 if (ZGReadBytes(self.document.currentProcess.processTask, variable.address, &buffer, &size))
 		 {
 			 if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
 			 {
 				 [validVariables addObject:variable];
-				 [currentVariableSizes addObject:[NSNumber numberWithUnsignedLongLong:[variable size]]];
+				 [currentVariableSizes addObject:@(variable.size)];
 			 }
 			 
-			 ZGFreeBytes([[document currentProcess] processTask], buffer, size);
+			 ZGFreeBytes(self.document.currentProcess.processTask, buffer, size);
 		 }
 	 }];
 	
-	if ([validVariables count] > 0)
+	if (validVariables.count > 0)
 	{
-		[[document undoManager] setActionName:@"Size Change"];
-		[[[document undoManager] prepareWithInvocationTarget:self]
+		self.document.undoManager.actionName = @"Size Change";
+		[[self.document.undoManager prepareWithInvocationTarget:self]
 		 editVariables:validVariables
 		 requestedSizes:currentVariableSizes];
 		
 		[validVariables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 		 {
-			 [variable setSize:[[requestedSizes objectAtIndex:index] unsignedLongLongValue]];
+			 variable.size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
 		 }];
 		
-		[[[document tableController] watchVariablesTableView] reloadData];
+		[self.document.tableController.watchVariablesTableView reloadData];
 	}
 	else
 	{
@@ -753,16 +764,16 @@
 
 - (IBAction)editVariablesSizeOkayButton:(id)sender
 {
-	NSString *sizeExpression = [ZGCalculator evaluateExpression:[editVariablesSizeTextField stringValue]];
+	NSString *sizeExpression = [ZGCalculator evaluateExpression:self.editVariablesSizeTextField.stringValue];
 	
 	ZGMemorySize requestedSize = 0;
-	if ([sizeExpression isHexRepresentation])
+	if (sizeExpression.isHexRepresentation)
 	{
 		[[NSScanner scannerWithString:sizeExpression] scanHexLongLong:&requestedSize];
 	}
 	else
 	{
-		requestedSize = [sizeExpression unsignedLongLongValue];
+		requestedSize = sizeExpression.unsignedLongLongValue;
 	}
 	
 	if (!isValidNumber(sizeExpression))
@@ -775,16 +786,16 @@
 	}
 	else
 	{
-		[NSApp endSheet:editVariablesSizeWindow];
-		[editVariablesSizeWindow close];
+		[NSApp endSheet:self.editVariablesSizeWindow];
+		[self.editVariablesSizeWindow close];
 		
-		NSArray *variables = [[document watchVariablesArray] objectsAtIndexes:[[[document tableController] watchVariablesTableView] selectedRowIndexes]];
+		NSArray *variables = [self.document.watchVariablesArray objectsAtIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
 		NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
 		
 		NSUInteger variableIndex;
-		for (variableIndex = 0; variableIndex < [variables count]; variableIndex++)
+		for (variableIndex = 0; variableIndex < variables.count; variableIndex++)
 		{
-			[requestedSizes addObject:[NSNumber numberWithUnsignedLongLong:requestedSize]];
+			[requestedSizes addObject:@(requestedSize)];
 		}
 		
 		[self
@@ -797,12 +808,12 @@
 
 - (void)editVariablesSizeRequest
 {
-	ZGVariable *firstVariable = [[document watchVariablesArray] objectAtIndex:[[[document tableController] watchVariablesTableView] selectedRow]];
-	[editVariablesSizeTextField setStringValue:[firstVariable sizeStringValue]];
+	ZGVariable *firstVariable = [self.document.watchVariablesArray objectAtIndex:self.document.tableController.watchVariablesTableView.selectedRow];
+	self.editVariablesSizeTextField.stringValue = firstVariable.sizeStringValue;
 	
 	[NSApp
-	 beginSheet:editVariablesSizeWindow
-	 modalForWindow:[document watchWindow]
+	 beginSheet:self.editVariablesSizeWindow
+	 modalForWindow:self.document.watchWindow
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];

@@ -23,16 +23,6 @@
 
 @implementation ZGVariable
 
-@synthesize shouldBeSearched;
-@synthesize addressFormula;
-@synthesize type;
-@synthesize isFrozen;
-@synthesize qualifier;
-@synthesize address;
-@synthesize size;
-@synthesize isPointer;
-@synthesize value;
-
 NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 #define ZGAddressKey @"ZGAddressKey"
@@ -48,72 +38,72 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGAddressFormulaKey @"ZGAddressFormulaKey"
 
 - (void)encodeWithCoder:(NSCoder *)coder
-{
+{	
 	[coder
-	 encodeInt64:address
+	 encodeInt64:self.address
 	 forKey:ZGAddressKey];
 	
 	[coder
-	 encodeInt64:size
+	 encodeInt64:self.size
 	 forKey:ZGSizeKey];
 	
 	[coder
-	 encodeBool:shouldBeSearched
+	 encodeBool:self.shouldBeSearched
 	 forKey:ZGShouldBeSearchedKey];
 	
 	[coder
-	 encodeBool:isFrozen
+	 encodeBool:self.isFrozen
 	 forKey:ZGIsFrozenKey];
 	
 	[coder
-	 encodeInt32:type
+	 encodeInt32:self.type
 	 forKey:ZGTypeKey];
 	
 	[coder
-	 encodeInt32:qualifier
+	 encodeInt32:self.qualifier
 	 forKey:ZGQualifierKey];
 	
 	[coder
-	 encodeObject:name
+	 encodeObject:self.name
 	 forKey:ZGNameKey];
 	
 	[coder
-	 encodeBool:isPointer
+	 encodeBool:self.isPointer
 	 forKey:ZGIsPointerKey];
 	
 	[coder
-	 encodeObject:addressFormula
+	 encodeObject:self.addressFormula
 	 forKey:ZGAddressFormulaKey];
 	
-	if (value)
+	if (self.value)
 	{
 		[coder
-		 encodeBytes:value
-		 length:(NSUInteger)size
+		 encodeBytes:self.value
+		 length:(NSUInteger)self.size
 		 forKey:ZGValueKey];
 	}
 	
-	if (freezeValue)
+	if (self.freezeValue)
 	{
 		[coder
-		 encodeBytes:freezeValue
-		 length:(NSUInteger)size
+		 encodeBytes:self.freezeValue
+		 length:(NSUInteger)self.size
 		 forKey:ZGFreezeValueKey];
 	}
 }
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	address = [coder decodeInt64ForKey:ZGAddressKey];
-	[self setAddressStringValue:[NSString stringWithFormat:@"0x%llX", address]];
+	_address = [coder decodeInt64ForKey:ZGAddressKey];
+	[self setAddressStringValue:nil];
 	
-	size = [coder decodeInt64ForKey:ZGSizeKey];
-	shouldBeSearched = [coder decodeBoolForKey:ZGShouldBeSearchedKey];
-	isFrozen = [coder decodeBoolForKey:ZGIsFrozenKey];
-	type = [coder decodeInt32ForKey:ZGTypeKey];
-	qualifier = [coder decodeInt32ForKey:ZGQualifierKey];
+	self.size = [coder decodeInt64ForKey:ZGSizeKey];
+	self.shouldBeSearched = [coder decodeBoolForKey:ZGShouldBeSearchedKey];
+	self.isFrozen = [coder decodeBoolForKey:ZGIsFrozenKey];
+	self.type = [coder decodeInt32ForKey:ZGTypeKey];
+	self.qualifier = [coder decodeInt32ForKey:ZGQualifierKey];
 	
-	isPointer = [coder decodeBoolForKey:ZGIsPointerKey];
+	self.isPointer = [coder decodeBoolForKey:ZGIsPointerKey];
 	[self setAddressFormula:[coder decodeObjectForKey:ZGAddressFormulaKey]];
 	
 	NSString *variableName = [coder decodeObjectForKey:ZGNameKey];
@@ -125,13 +115,9 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		 decodeBytesForKey:ZGValueKey
 		 returnedLength:&returnedLength];
 	
-	if (returnedLength == size)
+	if (returnedLength == self.size)
 	{
-		[self setVariableValue:(void *)buffer];
-	}
-	else
-	{
-		value = NULL;
+		self.value = (void *)buffer;
 	}
 	
 	returnedLength = 0;
@@ -140,13 +126,9 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		 decodeBytesForKey:ZGFreezeValueKey
 		 returnedLength:&returnedLength];
 	
-	if (returnedLength == size)
+	if (returnedLength == self.size)
 	{
-		[self setFreezeValue:(void *)buffer];
-	}
-	else
-	{
-		freezeValue = NULL;
+		self.freezeValue = (void *)buffer;
 	}
 	
 	return self;
@@ -190,29 +172,29 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 {
 	if ((self = [super init]))
 	{
-		size = aSize;
-		type = aType;
+		self.size = aSize;
+		self.type = aType;
 		
-		if (!size)
+		if (!self.size)
 		{
-			size =
+			self.size =
 				[ZGVariable
-				 sizeFromType:type
+				 sizeFromType:self.type
 				 pointerSize:pointerSize];
 		}
 		 
-		address = anAddress;
-		qualifier = aQualifier;
-		shouldBeSearched = YES;
+		_address = anAddress;
+		self.qualifier = aQualifier;
+		self.shouldBeSearched = YES;
 		
 		if (aValue)
 		{
-			[self setVariableValue:aValue];
+			self.value = aValue;
 		}
 		
-		freezeValue = NULL;
+		_freezeValue = NULL;
 		
-		[self setName:@""];
+		self.name = @"";
 	}
 	
 	return self;
@@ -220,37 +202,32 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (void)dealloc
 {
-	if (value)
+	if (_value)
 	{
-		free(value);
+		free(_value);
 	}
 	
-	if (freezeValue)
+	if (_freezeValue)
 	{
-		free(freezeValue);
+		free(_freezeValue);
 	}
 	
-	[addressStringValue release];
-	[addressFormula release];
-	[stringValue release];
-	[name release];
+	[_addressStringValue release];
+	self.addressFormula = nil;
+	self.stringValue = nil;
+	self.name = nil;
 	
 	[super dealloc];
 }
 
-- (NSString *)name
-{
-	return name;
-}
-
 - (NSString *)addressStringValue
 {
-	if (!addressStringValue)
+	if (!_addressStringValue)
 	{
 		[self setAddressStringValue:nil];
 	}
 	
-	return addressStringValue;
+	return _addressStringValue;
 }
 
 - (void)setAddressStringValue:(NSString *)newAddressString
@@ -259,160 +236,154 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		if ([newAddressString isHexRepresentation])
 		{
-			[[NSScanner scannerWithString:newAddressString] scanHexLongLong:&address];
+			[[NSScanner scannerWithString:newAddressString] scanHexLongLong:&_address];
 		}
 		else
 		{
-			[[NSScanner scannerWithString:newAddressString] scanLongLong:(long long *)&address];
+			[[NSScanner scannerWithString:newAddressString] scanLongLong:(long long *)&_address];
 		}
 	}
 	
-	[addressStringValue release];
-	addressStringValue = [[NSString stringWithFormat:@"0x%llX", address] retain];
+	[_addressStringValue release];
+	_addressStringValue = [[NSString stringWithFormat:@"0x%llX", self.address] copy];
 }
 
 - (NSString *)addressFormula
 {
-	if (!addressFormula)
+	if (!_addressFormula)
 	{
-		[self setAddressFormula:[self addressStringValue]];
+		self.addressFormula = self.addressStringValue;
 	}
 	
-	return addressFormula;
+	return _addressFormula;
 }
 
 - (NSString *)stringValue
 {
 	[self updateStringValue];
 	
-	return stringValue;
-}
-
-- (void)setStringValue:(NSString *)newStringValue
-{
-	[stringValue release];
-	stringValue = [newStringValue copy];
+	return _stringValue;
 }
 
 - (void)updateStringValue
 {
-	if (size > 0 && value)
+	if (self.size > 0 && _value)
 	{
 		NSString *newStringValue = nil;
 		
-		switch (type)
+		switch (self.type)
 		{
 			case ZGInt8:
-				if (qualifier == ZGSigned)
+				if (self.qualifier == ZGSigned)
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%d", *((int8_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"%d", *((int8_t *)_value)];
 				}
 				else
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%u", *((uint8_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"%u", *((uint8_t *)_value)];
 				}
 				break;
 			case ZGInt16:
-				if (qualifier == ZGSigned)
+				if (self.qualifier == ZGSigned)
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%d", *((int16_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"%d", *((int16_t *)_value)];
 				}
 				else
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%u", *((uint16_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"%u", *((uint16_t *)_value)];
 				}
 				break;
 			case ZGInt32:
-				if (qualifier == ZGSigned)
+				if (self.qualifier == ZGSigned)
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%d", *((int32_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"%d", *((int32_t *)_value)];
 				}
 				else
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%u", *((uint32_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"%u", *((uint32_t *)_value)];
 				}
 				break;
 			case ZGInt64:
-				if (qualifier == ZGSigned)
+				if (self.qualifier == ZGSigned)
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%lld", *((int64_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"%lld", *((int64_t *)_value)];
 				}
 				else
 				{
-					[self setStringValue:[NSString stringWithFormat:@"%llu", *((uint64_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"%llu", *((uint64_t *)_value)];
 				}
 				break;
 			case ZGPointer:
-				if (size == sizeof(int32_t))
+				if (self.size == sizeof(int32_t))
 				{
-					[self setStringValue:[NSString stringWithFormat:@"0x%X", *((uint32_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"0x%X", *((uint32_t *)_value)];
 				}
-				else if (size == sizeof(int64_t))
+				else if (self.size == sizeof(int64_t))
 				{
-					[self setStringValue:[NSString stringWithFormat:@"0x%llX", *((uint64_t *)value)]];
+					self.stringValue = [NSString stringWithFormat:@"0x%llX", *((uint64_t *)_value)];
 				}
 				break;
 			case ZGFloat:
-				[self setStringValue:[NSString stringWithFormat:@"%f", *((float *)value)]];
+				self.stringValue = [NSString stringWithFormat:@"%f", *((float *)_value)];
 				break;
 			case ZGDouble:
-				[self setStringValue:[NSString stringWithFormat:@"%lf", *((double *)value)]];
+				self.stringValue = [NSString stringWithFormat:@"%lf", *((double *)_value)];
 				break;
 			case ZGUTF8String:
-				stringValue =
+				_stringValue =
 					[[NSString alloc]
-					 initWithData:[NSData dataWithBytes:value length:(NSUInteger)(size - 1)]
+					 initWithData:[NSData dataWithBytes:_value length:(NSUInteger)(self.size - 1)]
 					 encoding:NSUTF8StringEncoding];
 				
 				// UTF8 string encoding can fail sometimes on some invalid-ish strings
-				if (!stringValue)
+				if (!_stringValue)
 				{
 					newStringValue =
 						[[NSString alloc]
-						 initWithData:[NSData dataWithBytes:value length:(NSUInteger)(size - 1)]
+						 initWithData:[NSData dataWithBytes:_value length:(NSUInteger)(self.size - 1)]
 						 encoding:NSASCIIStringEncoding];
 					[self setStringValue:newStringValue];
 					[newStringValue release];
 					newStringValue = nil;
 				}
 				
-				if (!stringValue)
+				if (!_stringValue)
 				{
-					[self setStringValue:@""];
+					self.stringValue = @"";
 				}
 				
 				break;
 			case ZGUTF16String:
 				newStringValue =
 					[[NSString alloc]
-					 initWithData:[NSData dataWithBytes:value length:(NSUInteger)size]
+					 initWithData:[NSData dataWithBytes:_value length:(NSUInteger)self.size]
 					 encoding:NSUTF16LittleEndianStringEncoding];
 				
-				[self setStringValue:newStringValue];
+				self.stringValue = newStringValue;
 				[newStringValue release];
 				
-				if (!stringValue)
+				if (!_stringValue)
 				{
-					[self setStringValue:@""];
+					self.stringValue = @"";
 				}
 				
 				break;
 			case ZGByteArray:
 			{
 				ZGMemorySize byteIndex;
-				unsigned char *valuePtr = value;
+				unsigned char *valuePtr = _value;
 				NSMutableString *byteString = [NSMutableString stringWithString:@""];
-				for (byteIndex = 0; byteIndex < size; byteIndex++)
+				for (byteIndex = 0; byteIndex < self.size; byteIndex++)
 				{
 					NSString *hexString = [NSString stringWithFormat:@"%X", valuePtr[byteIndex]];
 					// Make each byte two digits so it looks nice
-					if ([hexString length] == 1)
+					if (hexString.length == 1)
 					{
 						hexString = [@"0" stringByAppendingString:hexString];
 					}
 					
 					[byteString appendFormat:@"%@", hexString];
-					if (byteIndex < size - 1)
+					if (byteIndex < self.size - 1)
 					{
 						[byteString appendString:@" "];
 					}
@@ -425,89 +396,69 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	}
 	else
 	{
-		[self setStringValue:@""];
+		self.stringValue = @"";
 	}
 }
 
 - (NSString *)sizeStringValue
 {
-	return [NSString stringWithFormat:@"%llu", size];
+	return [NSString stringWithFormat:@"%llu", self.size];
 }
 
-- (void)setVariableValue:(void *)newValue
+- (void)setValue:(void *)newValue
 {
-	if (value)
+	if (_value)
 	{
-		free(value);
-		value = NULL;
+		free(_value);
+		_value = NULL;
 	}
 
-	if (newValue && size > 0)
+	if (newValue && self.size > 0)
 	{
-		value = malloc((size_t)size);
-		if (value)
+		_value = malloc((size_t)self.size);
+		if (_value)
 		{
-			memcpy(value, newValue, (size_t)size);
+			memcpy(_value, newValue, (size_t)self.size);
 		}
 	}
 }
 
 - (void)setFreezeValue:(void *)newFreezeValue
 {
-	if (freezeValue)
+	if (_freezeValue)
 	{
-		free(freezeValue);
+		free(_freezeValue);
+		_freezeValue = NULL;
 	}
 	
-	freezeValue = malloc((size_t)size);
-	if (freezeValue)
+	if (newFreezeValue)
 	{
-		memcpy(freezeValue, newFreezeValue, (size_t)size);
+		_freezeValue = malloc((size_t)self.size);
+		if (_freezeValue)
+		{
+			memcpy(_freezeValue, newFreezeValue, (size_t)self.size);
+		}
 	}
-}
-
-- (void)setName:(NSString *)newName
-{
-	[name release];
-	name = [newName copy];
 }
 
 // frees value, freezeValue, makes unfrozen
 - (void)cleanState
 {
-	if (value)
-	{
-		free(value);
-		value = NULL;
-	}
+	self.value = NULL;
 	
 	// Only safe way to go about the freeze value is to remove it..
-	if (freezeValue)
-	{
-		free(freezeValue);
-		freezeValue = NULL;
-	}
+	self.freezeValue = NULL;
 	
-	if (isFrozen)
-	{
-		isFrozen = NO;
-	}
+	self.isFrozen = NO;
 }
 
 - (void)setType:(ZGVariableType)newType requestedSize:(ZGMemorySize)requestedSize pointerSize:(ZGMemorySize)pointerSize
 {
-	type = newType;
+	self.type = newType;
 	
 	[self cleanState];
 	
-	if (newType == ZGByteArray)
-	{
-		size = requestedSize;
-	}
-	else
-	{
-		size = [ZGVariable sizeFromType:newType pointerSize:pointerSize];
-	}
+	self.size = (newType == ZGByteArray) ? requestedSize : [ZGVariable sizeFromType:newType pointerSize:pointerSize];
 }
 
 // Precondition: size != pointerSize, otherwise this is a wasted effort
@@ -515,7 +466,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 - (void)setPointerSize:(ZGMemorySize)pointerSize
 {
 	[self cleanState];
-	size = [ZGVariable sizeFromType:type pointerSize:pointerSize];
+	self.size = [ZGVariable sizeFromType:self.type pointerSize:pointerSize];
 }
 
 @end

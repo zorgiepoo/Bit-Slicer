@@ -19,19 +19,8 @@
  */
 
 #import <Foundation/Foundation.h>
-@class ZGDocument;
 
 @interface ZGMemoryDumpController : NSObject
-{
-	IBOutlet ZGDocument *document;
-	
-	IBOutlet NSWindow *memoryDumpWindow;
-	IBOutlet NSTextField *memoryDumpFromAddressTextField;
-	IBOutlet NSTextField *memoryDumpToAddressTextField;
-}
-
-- (IBAction)memoryDumpOkayButton:(id)sender;
-- (IBAction)memoryDumpCancelButton:(id)sender;
 
 - (void)memoryDumpRangeRequest;
 - (void)memoryDumpAllRequest;

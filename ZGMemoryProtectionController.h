@@ -19,22 +19,8 @@
  */
 
 #import <Foundation/Foundation.h>
-@class ZGDocument;
 
 @interface ZGMemoryProtectionController : NSObject
-{
-	IBOutlet ZGDocument *document;
-	
-	IBOutlet NSWindow *changeProtectionWindow;
-	IBOutlet NSTextField *changeProtectionAddressTextField;
-	IBOutlet NSTextField *changeProtectionSizeTextField;
-	IBOutlet NSButton *changeProtectionReadButton;
-	IBOutlet NSButton *changeProtectionWriteButton;
-	IBOutlet NSButton *changeProtectionExecuteButton;
-}
-
-- (IBAction)changeProtectionOkayButton:(id)sender;
-- (IBAction)changeProtectionCancelButton:(id)sender;
 
 - (void)changeMemoryProtectionRequest;
 

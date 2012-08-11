@@ -114,7 +114,7 @@
 							newExpression = [NSMutableString stringWithFormat:@"%u", *((int32_t *)value)];
 						}
                         
-                        ZGFreeBytes([process processTask], value, size);
+						ZGFreeBytes([process processTask], value, size);
 					}
 					else
 					{

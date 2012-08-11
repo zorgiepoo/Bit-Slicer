@@ -23,22 +23,16 @@
 #import <sys/sysctl.h>
 
 @interface ZGProcess : NSObject
-{
-	NSString *name;
-	
-@public
-	// searching related stuff
-	ZGMemorySize searchProgress;
-	int numberOfVariablesFound;
-	
-	// other task-intensive related stuff
-	BOOL isDoingMemoryDump;
-	BOOL isStoringAllData;
-	
-	pid_t processID;
-	ZGMemoryMap processTask;
-	BOOL is64Bit;
-}
+
+@property (readwrite) pid_t processID;
+@property (readwrite) ZGMemoryMap processTask;
+@property (readwrite, copy) NSString *name;
+@property (readonly) int numberOfRegions;
+@property (readwrite) BOOL is64Bit;
+@property (readwrite) ZGMemorySize searchProgress;
+@property (readwrite) int numberOfVariablesFound;
+@property (readwrite) BOOL isDoingMemoryDump;
+@property (readwrite) BOOL isStoringAllData;
 
 + (NSArray *)frozenProcesses;
 + (void)addFrozenProcess:(pid_t)pid;
@@ -48,15 +42,5 @@
 - (id)initWithName:(NSString *)processName processID:(pid_t)aProcessID set64Bit:(BOOL)flag64Bit;
 - (BOOL)grantUsAccess;
 - (BOOL)hasGrantedAccess;
-
-@property (assign) pid_t processID;
-@property (assign) ZGMemoryMap processTask;
-@property (copy) NSString *name;
-@property (readonly) int numberOfRegions;
-@property (readwrite) BOOL is64Bit;
-@property (readwrite) ZGMemorySize searchProgress;
-@property (readwrite) int numberOfVariablesFound;
-@property (readwrite) BOOL isDoingMemoryDump;
-@property (readwrite) BOOL isStoringAllData;
 
 @end

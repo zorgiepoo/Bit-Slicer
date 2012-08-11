@@ -22,15 +22,6 @@
 
 @implementation ZGProcess
 
-@synthesize processID;
-@synthesize processTask;
-@synthesize name;
-@synthesize is64Bit;
-@synthesize searchProgress;
-@synthesize numberOfVariablesFound;
-@synthesize isDoingMemoryDump;
-@synthesize isStoringAllData;
-
 static NSArray *frozenProcesses = nil;
 + (NSArray *)frozenProcesses
 {
@@ -45,7 +36,7 @@ static NSArray *frozenProcesses = nil;
 + (void)addFrozenProcess:(pid_t)pid
 {
 	NSArray *oldFrozenProcesses = frozenProcesses;
-	frozenProcesses = [[frozenProcesses arrayByAddingObject:[NSNumber numberWithInt:pid]] retain];
+	frozenProcesses = [[frozenProcesses arrayByAddingObject:@(pid)] retain];
 	[oldFrozenProcesses release];
 }
 
@@ -55,7 +46,7 @@ static NSArray *frozenProcesses = nil;
 	
 	for (NSNumber *currentPID in frozenProcesses)
 	{
-		if ([currentPID intValue] != pid)
+		if (currentPID.intValue != pid)
 		{
 			[mutableArray addObject:currentPID];
 		}
@@ -70,7 +61,7 @@ static NSArray *frozenProcesses = nil;
 {
 	BOOL success;
 	
-	if ([[ZGProcess frozenProcesses] containsObject:[NSNumber numberWithInt:pid]])
+	if ([ZGProcess.frozenProcesses containsObject:@(pid)])
 	{
 		// Unfreeze
 		success = ZGUnpauseProcess(pid);
@@ -96,10 +87,10 @@ static NSArray *frozenProcesses = nil;
 {
 	if ((self = [super init]))
 	{
-		[self setName:processName];
-		[self setProcessID:aProcessID];
-		[self setIs64Bit:flag64Bit];
-		processTask = MACH_PORT_NULL;
+		self.name = processName;
+		self.processID = aProcessID;
+		self.is64Bit = flag64Bit;
+		self.processTask = MACH_PORT_NULL;
 	}
 	
 	return self;
@@ -107,24 +98,24 @@ static NSArray *frozenProcesses = nil;
 
 - (void)dealloc
 {
-	[name release];
+	self.name = nil;
 	
 	[super dealloc];
 }
 
 - (int)numberOfRegions
 {
-	return ZGNumberOfRegionsForProcess(processTask);
+	return ZGNumberOfRegionsForProcess(self.processTask);
 }
 
 - (BOOL)grantUsAccess
 {
-	return ZGIsProcessValid(processID, &processTask);
+	return ZGIsProcessValid(self.processID, &_processTask);
 }
 
 - (BOOL)hasGrantedAccess
 {
-    return (processTask != MACH_PORT_NULL);
+    return (self.processTask != MACH_PORT_NULL);
 }
 
 @end

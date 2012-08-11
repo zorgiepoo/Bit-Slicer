@@ -20,7 +20,8 @@
 
 #import "ZGVariable.h"
 #import "ZGVirtualMemory.h"
-#import "ZGSearchData.h"
+
+@class ZGSearchData;
 
 typedef enum
 {

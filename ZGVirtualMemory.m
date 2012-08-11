@@ -114,7 +114,7 @@ void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStarti
 		
 		if (mergedFile)
 		{
-			fwrite([currentData bytes], [currentData length], 1, mergedFile);
+			fwrite(currentData.bytes, currentData.length, 1, mergedFile);
 		}
 	}
 }
@@ -131,7 +131,7 @@ void ZGFreeData(NSArray *dataArray)
 {
 	for (NSValue *value in dataArray)
 	{
-		ZGRegion *memoryRegion = [value pointerValue];
+		ZGRegion *memoryRegion = value.pointerValue;
 		ZGFreeBytes(memoryRegion->processTask, memoryRegion->bytes, memoryRegion->size);
 		free(memoryRegion);
 	}
@@ -147,18 +147,18 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 	mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
 	mach_port_t objectName = MACH_PORT_NULL;
 	
-	[process setIsStoringAllData:YES];
-	[process setSearchProgress:0];
+	process.isStoringAllData = YES;
+	process.searchProgress = 0;
 	
 	while (mach_vm_region([process processTask], &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
 		if ((regionInfo.protection & VM_PROT_READ) && (shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
 			void *bytes = NULL;
-			if (ZGReadBytes(process->processTask, address, &bytes, &size))
+			if (ZGReadBytes(process.processTask, address, &bytes, &size))
 			{
 				ZGRegion *memoryRegion = malloc(sizeof(ZGRegion));
-				memoryRegion->processTask = process->processTask;
+				memoryRegion->processTask = process.processTask;
 				memoryRegion->bytes = bytes;
 				memoryRegion->address = address;
 				memoryRegion->size = size;
@@ -170,9 +170,9 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 		
 		address += size;
 		
-		(process->searchProgress)++;
+		process.searchProgress++;
 		
-		if (![process isStoringAllData])
+		if (!process.isStoringAllData)
 		{
 			ZGFreeData(dataArray);
 			
@@ -189,9 +189,9 @@ void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySi
 {
 	void *value = NULL;
 	
-	for (NSValue *regionValue in [searchData savedData])
+	for (NSValue *regionValue in searchData.savedData)
 	{
-		ZGRegion *region = [regionValue pointerValue];
+		ZGRegion *region = regionValue.pointerValue;
 		
 		if (address >= region->address && address + dataSize <= region->address + region->size)
 		{
@@ -220,10 +220,10 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 	
 	FILE *mergedFile = fopen([[directory stringByAppendingPathComponent:@"(All) Merged"] UTF8String], "w");
 	
-	[process setIsDoingMemoryDump:YES];
-	[process setSearchProgress:0];
+	process.isDoingMemoryDump = YES;
+	process.searchProgress = 0;
     
-	while (mach_vm_region([process processTask], &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
+	while (mach_vm_region(process.processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
 		if (lastAddress != address || !(regionInfo.protection & VM_PROT_READ))
 		{
@@ -244,19 +244,19 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 			// outputSize should not differ from size
 			ZGMemorySize outputSize = size;
 			void *bytes = NULL;
-			if (ZGReadBytes([process processTask], address, &bytes, &outputSize))
+			if (ZGReadBytes(process.processTask, address, &bytes, &outputSize))
 			{
 				[currentData appendBytes:bytes length:(NSUInteger)size];
-				ZGFreeBytes([process processTask], bytes, outputSize);
+				ZGFreeBytes(process.processTask, bytes, outputSize);
 			}
 		}
 		
 		address += size;
 		lastAddress = address;
 		
-		(process->searchProgress)++;
+		process.searchProgress++;
   	    
-		if (![process isDoingMemoryDump])
+		if (!process.isDoingMemoryDump)
 		{
 			goto EXIT_ON_CANCEL;
 		}
@@ -279,29 +279,29 @@ EXIT_ON_CANCEL:
 
 void ZGInitializeSearch(ZGSearchData *searchData)
 {
-	[searchData setShouldCancelSearch:NO];
-	[searchData setSearchDidCancel:NO];
+	searchData.shouldCancelSearch = NO;
+	searchData.searchDidCancel = NO;
 }
 
 void ZGCancelSearchImmediately(ZGSearchData *searchData)
 {
-	[searchData setShouldCancelSearch:YES];
-	[searchData setSearchDidCancel:YES];
+	searchData.shouldCancelSearch = YES;
+	searchData.searchDidCancel = YES;
 }
 
 void ZGCancelSearch(ZGSearchData *searchData)
 {
-	[searchData setShouldCancelSearch:YES];
+	searchData.shouldCancelSearch = YES;
 }
 
 BOOL ZGSearchIsCancelling(ZGSearchData *searchData)
 {
-	return [searchData shouldCancelSearch];
+	return searchData.shouldCancelSearch;
 }
 
 BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData)
 {
-	return searchData->searchDidCancel;
+	return searchData.searchDidCancel;
 }
 
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
@@ -329,37 +329,40 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 {
 	ZGInitializeSearch(searchData);
 	
+	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
+	ZGMemoryAddress dataEndAddress = searchData.endAddress;
+	
 	int currentRegionNumber = 0;
 	
-	for (NSValue *regionValue in [searchData savedData])
+	for (NSValue *regionValue in searchData.savedData)
 	{
-		ZGRegion *region = [regionValue pointerValue];
+		ZGRegion *region = regionValue.pointerValue;
 		ZGMemoryAddress offset = 0;
 		char *currentData = NULL;
 		ZGMemorySize size = region->size;
 		
 		// Skipping an entire region will provide significant performance benefits
-		if (region->address < searchData->endAddress &&
-			region->address + size > searchData->beginAddress &&
+		if (region->address < dataEndAddress &&
+			region->address + size > dataBeginAddress &&
 			ZGReadBytes(processTask, region->address, (void **)&currentData, &size))
 		{
 			do
 			{
-				if (searchData->beginAddress <= region->address + offset &&
-					searchData->endAddress >= region->address + offset + dataSize)
+				if (dataBeginAddress <= region->address + offset &&
+					dataEndAddress >= region->address + offset + dataSize)
 				{
 					block(&currentData[offset], region->bytes + offset, region->address + offset, currentRegionNumber);
 				}
 				offset += dataAlignment;
 			}
-			while (offset + dataSize <= size && !searchData->shouldCancelSearch);
+			while (offset + dataSize <= size && !searchData.shouldCancelSearch);
 			
 			ZGFreeBytes(processTask, currentData, size);
 		}
 		
-		if (searchData->shouldCancelSearch)
+		if (searchData.shouldCancelSearch)
 		{
-			[searchData setSearchDidCancel:YES];
+			searchData.searchDidCancel = YES;
 			return;
 		}
 		
@@ -379,21 +382,25 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 
 	ZGMemorySize currentRegionNumber = 0;
 	
+	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
+	ZGMemoryAddress dataEndAddress = searchData.endAddress;
+	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
+	
 	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS)
 	{
 		// Skipping an entire region will provide significant performance benefits
-		if (address < searchData->endAddress &&
-			address + size > searchData->beginAddress &&
-			regionInfo.protection & VM_PROT_READ && (searchData->shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
+		if (address < dataEndAddress &&
+			address + size > dataBeginAddress &&
+			regionInfo.protection & VM_PROT_READ && (shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
 			char *bytes = NULL;
 			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
 			{
 				ZGMemorySize dataIndex = 0;
-				while (dataIndex + dataSize <= size && !searchData->shouldCancelSearch)
+				while (dataIndex + dataSize <= size && !searchData.shouldCancelSearch)
 				{
-					if (searchData->beginAddress <= address + dataIndex &&
-						searchData->endAddress >= address + dataIndex + dataSize)
+					if (dataBeginAddress <= address + dataIndex &&
+						dataEndAddress >= address + dataIndex + dataSize)
 					{
 						block(&bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
 					}
@@ -404,9 +411,9 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 			}
 		}
 		
-		if (searchData->shouldCancelSearch)
+		if (searchData.shouldCancelSearch)
 		{
-			[searchData setSearchDidCancel:YES];
+			searchData.searchDidCancel = YES;
 			return;
 		}
 		

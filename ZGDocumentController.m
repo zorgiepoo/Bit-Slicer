@@ -19,10 +19,7 @@
  */
 
 #import "ZGDocumentController.h"
-#import "ZGAppController.h"
 
 @implementation ZGDocumentController
-
-@synthesize lastSelectedProcessName;
 
 @end

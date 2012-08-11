@@ -24,19 +24,7 @@
 
 #define SIGNED_BUTTON_CELL_TAG 0
 
-@class ZGDocument;
-
 @interface ZGVariableController : NSObject
-{
-	IBOutlet ZGDocument *document;
-	
-	IBOutlet NSWindow *editVariablesValueWindow;
-	IBOutlet NSTextField *editVariablesValueTextField;
-	IBOutlet NSWindow *editVariablesAddressWindow;
-	IBOutlet NSTextField *editVariablesAddressTextField;
-	IBOutlet NSWindow *editVariablesSizeWindow;
-	IBOutlet NSTextField *editVariablesSizeTextField;
-}
 
 - (void)freezeVariables;
 
@@ -52,16 +40,8 @@
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag;
 - (void)changeVariableShouldBeSearched:(BOOL)shouldBeSearched rowIndexes:(NSIndexSet *)rowIndexes;
 
-- (IBAction)editVariablesValueCancelButton:(id)sender;
-- (IBAction)editVariablesValueOkayButton:(id)sender;
 - (void)editVariablesValueRequest;
-
-- (IBAction)editVariablesAddressCancelButton:(id)sender;
-- (IBAction)editVariablesAddressOkayButton:(id)sender;
 - (void)editVariablesAddressRequest;
-
-- (IBAction)editVariablesSizeCancelButton:(id)sender;
-- (IBAction)editVariablesSizeOkayButton:(id)sender;
 - (void)editVariablesSizeRequest;
 
 @end

@@ -25,13 +25,13 @@
 ZGMemoryAddress memoryAddressFromExpression(NSString *expression)
 {
 	ZGMemoryAddress address;
-	if ([expression isHexRepresentation])
+	if (expression.isHexRepresentation)
 	{
 		[[NSScanner scannerWithString:expression] scanHexLongLong:&address];
 	}
 	else
 	{
-		address = [expression unsignedLongLongValue];
+		address = expression.unsignedLongLongValue;
 	}
 	
 	return address;
@@ -56,7 +56,7 @@ BOOL isValidNumber(NSString *expression)
 void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
 {
 	void *value = NULL;
-	BOOL searchValueIsAHexRepresentation = [stringValue isHexRepresentation];
+	BOOL searchValueIsAHexRepresentation = stringValue.isHexRepresentation;
 	
 	if (dataType == ZGInt8)
 	{
@@ -70,7 +70,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		}
 		else
 		{
-			variableValue = [stringValue intValue];
+			variableValue = stringValue.intValue;
 		}
 		
 		*dataSize = 1;
@@ -89,14 +89,14 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		}
 		else
 		{
-			variableValue = [stringValue intValue];
+			variableValue = stringValue.intValue;
 		}
 		
 		*dataSize = 2;
 		value = malloc((size_t)*dataSize);
 		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
-	else if (dataType == ZGInt32 || (dataType == ZGPointer && ![process is64Bit]))
+	else if (dataType == ZGInt32 || (dataType == ZGPointer && !process.is64Bit))
 	{
 		int32_t variableValue = 0;
 		
@@ -108,7 +108,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		}
 		else
 		{
-			variableValue = [stringValue unsignedIntValue];
+			variableValue = stringValue.unsignedIntValue;
 		}
 		
 		*dataSize = 4;
@@ -125,14 +125,14 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		}
 		else
 		{
-			variableValue = [stringValue floatValue];
+			variableValue = stringValue.floatValue;
 		}
 		
 		*dataSize = 4;
 		value = malloc((size_t)*dataSize);
 		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
-	else if (dataType == ZGInt64 || (dataType == ZGPointer && [process is64Bit]))
+	else if (dataType == ZGInt64 || (dataType == ZGPointer && process.is64Bit))
 	{
 		int64_t variableValue = 0;
 		
@@ -144,7 +144,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		}
 		else
 		{
-			variableValue = [stringValue unsignedLongLongValue];
+			variableValue = stringValue.unsignedLongLongValue;
 		}
 		
 		*dataSize = 8;
@@ -161,7 +161,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		}
 		else
 		{
-			variableValue = [stringValue doubleValue];
+			variableValue = stringValue.doubleValue;
 		}
 		
 		*dataSize = 8;
@@ -177,17 +177,16 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 	}
 	else if (dataType == ZGUTF16String)
 	{
-		*dataSize = [stringValue length] * sizeof(unichar);
+		*dataSize = stringValue.length * sizeof(unichar);
 		value = malloc((size_t)*dataSize);
-		[stringValue getCharacters:value
-							 range:NSMakeRange(0, [stringValue length])];
+		[stringValue getCharacters:value range:NSMakeRange(0, stringValue.length)];
 	}
 	
 	else if (dataType == ZGByteArray)
 	{
-		NSArray *bytesArray = [stringValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+		NSArray *bytesArray = [stringValue componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
 		
-		*dataSize = [bytesArray count];
+		*dataSize = bytesArray.count;
 		value = malloc((size_t)*dataSize);
 		
 		unsigned char *valuePtr = value;
@@ -195,7 +194,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		for (NSString *byteString in bytesArray)
 		{
 			unsigned int theValue = 0;
-			if (([byteString rangeOfString:@"?"].location == NSNotFound && [byteString rangeOfString:@"*"].location == NSNotFound) || [byteString length] != 2)
+			if (([byteString rangeOfString:@"?"].location == NSNotFound && [byteString rangeOfString:@"*"].location == NSNotFound) || byteString.length != 2)
 			{
 				[[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
 				*valuePtr = (unsigned char)theValue;
@@ -203,7 +202,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 			else
 			{
 				*valuePtr = 0;
-				if ([byteString length] == 2)
+				if (byteString.length == 2)
 				{
 					[[NSScanner scannerWithString:[byteString substringToIndex:1]] scanHexInt:&theValue];
 					*valuePtr = (((unsigned char)theValue) << 4) & 0xF0;
@@ -222,16 +221,16 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 
 unsigned char *allocateFlagsForByteArrayWildcards(NSString *searchValue)
 {
-	NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+	NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
 	
-	unsigned char *data = calloc(1, [bytesArray count] * sizeof(unsigned char));
+	unsigned char *data = calloc(1, bytesArray.count * sizeof(unsigned char));
 	
 	if (data)
 	{
 		__block BOOL didUseWildcard = NO;
 		[bytesArray enumerateObjectsUsingBlock:^(NSString *byteString, NSUInteger byteIndex, BOOL *stop)
 		 {
-			 if ([byteString length] == 2)
+			 if (byteString.length == 2)
 			 {
 				 if ([[byteString substringToIndex:1] isEqualToString:@"?"] || [[byteString substringToIndex:1] isEqualToString:@"*"])
 				 {

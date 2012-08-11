@@ -19,6 +19,7 @@
  */
 
 #import "ZGComparisonFunctions.h"
+#import "ZGSearchData.h"
 
 inline BOOL lessThanFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
 {
@@ -38,46 +39,46 @@ inline BOOL lessThanFunction(ZGSearchData *searchData, const void *variableValue
 			break;
 		case ZGInt8:
 			isLessThan = *((int8_t *)variableValue) < *((int8_t *)compareValue);
-			if (searchData->rangeValue && isLessThan)
+			if (searchData->_rangeValue && isLessThan)
 			{
-				isLessThan = *((int8_t *)variableValue) > *((int8_t *)searchData->rangeValue);
+				isLessThan = *((int8_t *)variableValue) > *((int8_t *)searchData->_rangeValue);
 			}
 			break;
 		case ZGInt16:
 			isLessThan = *((int16_t *)variableValue) < *((int16_t *)compareValue);
-			if (searchData->rangeValue && isLessThan)
+			if (searchData->_rangeValue && isLessThan)
 			{
-				isLessThan = *((int16_t *)variableValue) > *((int16_t *)searchData->rangeValue);
+				isLessThan = *((int16_t *)variableValue) > *((int16_t *)searchData->_rangeValue);
 			}
 			break;
 		case ZGInt32:
 		INT32_LESS_THAN:
 			isLessThan = *((int32_t *)variableValue) < *((int32_t *)compareValue);
-			if (searchData->rangeValue && isLessThan)
+			if (searchData->_rangeValue && isLessThan)
 			{
-				isLessThan = *((int32_t *)variableValue) > *((int32_t *)searchData->rangeValue);
+				isLessThan = *((int32_t *)variableValue) > *((int32_t *)searchData->_rangeValue);
 			}
 			break;
 		case ZGInt64:
 		INT64_LESS_THAN:
 			isLessThan = *((int64_t *)variableValue) < *((int64_t *)compareValue);
-			if (searchData->rangeValue && isLessThan)
+			if (searchData->_rangeValue && isLessThan)
 			{
-				isLessThan = *((int64_t *)variableValue) > *((int64_t *)searchData->rangeValue);
+				isLessThan = *((int64_t *)variableValue) > *((int64_t *)searchData->_rangeValue);
 			}
 			break;
 		case ZGFloat:
 			isLessThan = *((float *)variableValue) < *((float *)compareValue);
-			if (searchData->rangeValue && isLessThan)
+			if (searchData->_rangeValue && isLessThan)
 			{
-				isLessThan = *((float *)variableValue) > *((float *)searchData->rangeValue);
+				isLessThan = *((float *)variableValue) > *((float *)searchData->_rangeValue);
 			}
 			break;
 		case ZGDouble:
 			isLessThan = *((double *)variableValue) < *((double *)compareValue);
-			if (searchData->rangeValue && isLessThan)
+			if (searchData->_rangeValue && isLessThan)
 			{
-				isLessThan = *((double *)variableValue) > *((double *)searchData->rangeValue);
+				isLessThan = *((double *)variableValue) > *((double *)searchData->_rangeValue);
 			}
 			break;
 		default:
@@ -105,46 +106,46 @@ inline BOOL greaterThanFunction(ZGSearchData *searchData, const void *variableVa
 			break;
 		case ZGInt8:
 			isGreaterThan = *((int8_t *)variableValue) > *((int8_t *)compareValue);
-			if (searchData->rangeValue && isGreaterThan)
+			if (searchData->_rangeValue && isGreaterThan)
 			{
-				isGreaterThan = *((int8_t *)variableValue) < *((int8_t *)searchData->rangeValue);
+				isGreaterThan = *((int8_t *)variableValue) < *((int8_t *)searchData->_rangeValue);
 			}
 			break;
 		case ZGInt16:
 			isGreaterThan = *((int16_t *)variableValue) > *((int16_t *)compareValue);
-			if (searchData->rangeValue && isGreaterThan)
+			if (searchData->_rangeValue && isGreaterThan)
 			{
-				isGreaterThan = *((int16_t *)variableValue) < *((int16_t *)searchData->rangeValue);
+				isGreaterThan = *((int16_t *)variableValue) < *((int16_t *)searchData->_rangeValue);
 			}
 			break;
 		case ZGInt32:
 		INT32_GREATER_THAN:
 			isGreaterThan = *((int32_t *)variableValue) > *((int32_t *)compareValue);
-			if (searchData->rangeValue && isGreaterThan)
+			if (searchData->_rangeValue && isGreaterThan)
 			{
-				isGreaterThan = *((int32_t *)variableValue) < *((int32_t *)searchData->rangeValue);
+				isGreaterThan = *((int32_t *)variableValue) < *((int32_t *)searchData->_rangeValue);
 			}
 			break;
 		case ZGInt64:
 		INT64_GREATER_THAN:
 			isGreaterThan = *((int64_t *)variableValue) > *((int64_t *)compareValue);
-			if (searchData->rangeValue && isGreaterThan)
+			if (searchData->_rangeValue && isGreaterThan)
 			{
-				isGreaterThan = *((int64_t *)variableValue) < *((int64_t *)searchData->rangeValue);
+				isGreaterThan = *((int64_t *)variableValue) < *((int64_t *)searchData->_rangeValue);
 			}
 			break;
 		case ZGFloat:
 			isGreaterThan = *((float *)variableValue) > *((float *)compareValue);
-			if (searchData->rangeValue && isGreaterThan)
+			if (searchData->_rangeValue && isGreaterThan)
 			{
-				isGreaterThan = *((float *)variableValue) < *((float *)searchData->rangeValue);
+				isGreaterThan = *((float *)variableValue) < *((float *)searchData->_rangeValue);
 			}
 			break;
 		case ZGDouble:
 			isGreaterThan = *((double *)variableValue) > *((double *)compareValue);
-			if (searchData->rangeValue && isGreaterThan)
+			if (searchData->_rangeValue && isGreaterThan)
 			{
-				isGreaterThan = *((double *)variableValue) < *((double *)searchData->rangeValue);
+				isGreaterThan = *((double *)variableValue) < *((double *)searchData->_rangeValue);
 			}
 			break;
 		default:
@@ -185,25 +186,25 @@ inline BOOL equalFunction(ZGSearchData *searchData, const void *variableValue, c
 			isEqual = *((int64_t *)variableValue) == *((int64_t *)compareValue);
 			break;
 		case ZGFloat:
-			isEqual = ABS(*((float *)variableValue) - *((float *)compareValue)) <= searchData->epsilon;
+			isEqual = ABS(*((float *)variableValue) - *((float *)compareValue)) <= searchData->_epsilon;
 			break;
 		case ZGDouble:
-			isEqual = ABS(*((double *)variableValue) - *((double *)compareValue)) <= searchData->epsilon;
+			isEqual = ABS(*((double *)variableValue) - *((double *)compareValue)) <= searchData->_epsilon;
 			break;
 		case ZGUTF8String:
 			// size - 1 to not include for the NULL character,
 			// or size to include for the NULL terminator
-			if (searchData->shouldIgnoreStringCase)
+			if (searchData->_shouldIgnoreStringCase)
 			{
-				isEqual = (strncasecmp(variableValue, compareValue, (size_t)(size - !searchData->shouldIncludeNullTerminator)) == 0);
+				isEqual = (strncasecmp(variableValue, compareValue, (size_t)(size - !searchData->_shouldIncludeNullTerminator)) == 0);
 			}
 			else
 			{
-				isEqual = (memcmp(variableValue, compareValue, (size_t)(size - !searchData->shouldIncludeNullTerminator)) == 0);
+				isEqual = (memcmp(variableValue, compareValue, (size_t)(size - !searchData->_shouldIncludeNullTerminator)) == 0);
 			}
 			break;
 		case ZGUTF16String:
-			if (searchData->shouldIncludeNullTerminator)
+			if (searchData->_shouldIncludeNullTerminator)
 			{
 				size -= sizeof(unichar);
 				// Check for the existing null terminator
@@ -213,9 +214,9 @@ inline BOOL equalFunction(ZGSearchData *searchData, const void *variableValue, c
 				}
 			}
 			
-			if (searchData->shouldIgnoreStringCase)
+			if (searchData->_shouldIgnoreStringCase)
 			{
-				UCCompareText(searchData->collator, variableValue, ((size_t)size) / sizeof(unichar), compareValue, ((size_t)size) / sizeof(unichar), (Boolean *)&isEqual, NULL);
+				UCCompareText(searchData->_collator, variableValue, ((size_t)size) / sizeof(unichar), compareValue, ((size_t)size) / sizeof(unichar), (Boolean *)&isEqual, NULL);
 			}
 			else
 			{
@@ -223,7 +224,7 @@ inline BOOL equalFunction(ZGSearchData *searchData, const void *variableValue, c
 			}
 			break;
 		case ZGByteArray:
-			if (!searchData->byteArrayFlags)
+			if (!searchData->_byteArrayFlags)
 			{
 				isEqual = (memcmp(variableValue, compareValue, (size_t)size) == 0);
 			}
@@ -237,13 +238,13 @@ inline BOOL equalFunction(ZGSearchData *searchData, const void *variableValue, c
 				unsigned int byteIndex;
 				for (byteIndex = 0; byteIndex < size; byteIndex++)
 				{
-					if (!(searchData->byteArrayFlags[byteIndex] & 0xF0) && ((variableValueArray[byteIndex] & 0xF0) != (compareValueArray[byteIndex] & 0xF0)))
+					if (!(searchData->_byteArrayFlags[byteIndex] & 0xF0) && ((variableValueArray[byteIndex] & 0xF0) != (compareValueArray[byteIndex] & 0xF0)))
 					{
 						isEqual = NO;
 						break;
 					}
 					
-					if (!(searchData->byteArrayFlags[byteIndex] & 0x0F) && ((variableValueArray[byteIndex] & 0x0F) != (compareValueArray[byteIndex] & 0x0F)))
+					if (!(searchData->_byteArrayFlags[byteIndex] & 0x0F) && ((variableValueArray[byteIndex] & 0x0F) != (compareValueArray[byteIndex] & 0x0F)))
 					{
 						isEqual = NO;
 						break;
@@ -277,34 +278,34 @@ inline BOOL equalPlusFunction(ZGSearchData *searchData, const void *variableValu
 			break;
 		case ZGInt8:
 			{
-				int8_t newCompareValue = *((int8_t *)compareValue) + *((int8_t *)searchData->compareOffset);
+				int8_t newCompareValue = *((int8_t *)compareValue) + *((int8_t *)searchData->_compareOffset);
 				return equalFunction(searchData, variableValue, &newCompareValue, type, size);
 			}
 		case ZGInt16:
 			{
-				int16_t newCompareValue = *((int16_t *)compareValue) + *((int16_t *)searchData->compareOffset);
+				int16_t newCompareValue = *((int16_t *)compareValue) + *((int16_t *)searchData->_compareOffset);
 				return equalFunction(searchData, variableValue, &newCompareValue, type, size);
 			}
 		case ZGInt32:
 		INT32_EQUAL_TO_PLUS:
 			{
-				int32_t newCompareValue = *((int32_t *)compareValue) + *((int32_t *)searchData->compareOffset);
+				int32_t newCompareValue = *((int32_t *)compareValue) + *((int32_t *)searchData->_compareOffset);
 				return equalFunction(searchData, variableValue, &newCompareValue, type, size);
 			}
 		case ZGInt64:
 		INT64_EQUAL_TO_PLUS:
 			{
-				int64_t newCompareValue = *((int64_t *)compareValue) + *((int64_t *)searchData->compareOffset);
+				int64_t newCompareValue = *((int64_t *)compareValue) + *((int64_t *)searchData->_compareOffset);
 				return equalFunction(searchData, variableValue, &newCompareValue, type, size);
 			}
 		case ZGFloat:
 			{
-				float newCompareValue = *((float *)compareValue) + *((float *)searchData->compareOffset);
+				float newCompareValue = *((float *)compareValue) + *((float *)searchData->_compareOffset);
 				return equalFunction(searchData, variableValue, &newCompareValue, type, size);
 			}
 		case ZGDouble:
 			{
-				double newCompareValue = *((double *)compareValue) + *((double *)searchData->compareOffset);
+				double newCompareValue = *((double *)compareValue) + *((double *)searchData->_compareOffset);
 				return equalFunction(searchData, variableValue, &newCompareValue, type, size);
 			}
 		default:

@@ -28,24 +28,21 @@
 
 @interface ZGAppController : NSObject
 {
-	IBOutlet ZGDocumentController *documentController;
-	BOOL applicationIsAuthenticated;
-	ZGPreferencesController *preferencesController;
-	ZGMemoryViewer *memoryViewer;
+	ZGDocumentController *_documentController;
+	ZGMemoryViewer *_memoryViewer;
+	ZGPreferencesController *_preferencesController;
 }
 
-@property (readonly) BOOL applicationIsAuthenticated;
+@property (assign) IBOutlet id documentController;
+@property (readonly) id preferencesController;
+@property (readonly) id memoryViewer;
+// lastSelectedProcessName keeps track of the last targeted process in a document
+@property (readwrite, copy) NSString *lastSelectedProcessName;
+
++ (id)sharedController;
 
 + (BOOL)isRunningLaterThanLion;
-+ (ZGAppController *)sharedController;
-- (ZGPreferencesController *)preferencesController;
-- (ZGMemoryViewer *)memoryViewer;
-- (ZGDocumentController *)documentController;
 
 + (void)registerPauseAndUnpauseHotKey;
-- (IBAction)openPreferences:(id)sender;
-- (IBAction)openMemoryViewer:(id)sender;
-- (IBAction)jumpToMemoryAddress:(id)sender;
-- (IBAction)help:(id)sender;
 
 @end

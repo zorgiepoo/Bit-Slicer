@@ -45,44 +45,29 @@ typedef enum
 
 @interface ZGVariable : NSObject <NSCoding>
 {
-	NSString *addressStringValue;
-	NSString *addressFormula;
-	NSString *stringValue;
-	NSString *name;
-@public
-	BOOL shouldBeSearched;
-	BOOL isFrozen;
-	BOOL isPointer;
-	ZGMemoryAddress address;
-	ZGMemorySize size;
-	ZGMemorySize lastUpdatedSize;
-	ZGVariableType type;
-	ZGVariableQualifier qualifier;
-	void *value;
-	void *freezeValue;
+	NSString *_addressStringValue;
 }
 
 @property (assign) BOOL shouldBeSearched;
 @property (copy, nonatomic) NSString *addressFormula;
-@property (readonly) ZGVariableType type;
-@property (readonly) BOOL isFrozen;
+@property (readwrite) ZGVariableType type;
+@property (readwrite) BOOL isFrozen;
 @property (readwrite) ZGVariableQualifier qualifier;
 @property (readonly) ZGMemoryAddress address;
 @property (readwrite) ZGMemorySize size;
+@property (readwrite) ZGMemorySize lastUpdatedSize;
 @property (readwrite) BOOL isPointer;
-@property (readonly) void *value;
+@property (readwrite, nonatomic) void *value;
+@property (readwrite, copy, nonatomic) NSString *addressStringValue;
+@property (readwrite, copy, nonatomic) NSString *stringValue;
+@property (readwrite, nonatomic) void *freezeValue;
+@property (readonly) NSString *sizeStringValue;
+@property (readwrite, copy) NSString *name;
 
 - (id)initWithValue:(void *)aValue size:(ZGMemorySize)aSize address:(ZGMemoryAddress)anAddress type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)aQualifier pointerSize:(ZGMemorySize)pointerSize;
 
-- (NSString *)name;
-- (NSString *)stringValue;
 - (void)updateStringValue;
-- (NSString *)addressStringValue;
-- (NSString *)sizeStringValue;
-- (void)setAddressStringValue:(NSString *)newAddressString;
-- (void)setVariableValue:(void *)newValue;
-- (void)setFreezeValue:(void *)newFreezeValue;
-- (void)setName:(NSString *)newName;
+
 - (void)setType:(ZGVariableType)newType requestedSize:(ZGMemorySize)requestedSize pointerSize:(ZGMemorySize)pointerSize;
 - (void)setPointerSize:(ZGMemorySize)pointerSize;
 

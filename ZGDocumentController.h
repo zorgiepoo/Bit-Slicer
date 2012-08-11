@@ -21,13 +21,10 @@
 #import <Cocoa/Cocoa.h>
 
 @interface ZGDocumentController : NSDocumentController
-{
-	// lastSelectedProcessName keeps track of the last targeted process
-	// useful for guessing what process the user may want to target
-	// when creating a new document
-	NSString *lastSelectedProcessName;
-}
 
+// lastSelectedProcessName keeps track of the last targeted process
+// useful for guessing what process the user may want to target
+// when creating a new document
 @property (readwrite, copy) NSString *lastSelectedProcessName;
 
 @end

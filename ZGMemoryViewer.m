@@ -138,19 +138,19 @@
 - (void)windowDidLoad
 {
 	// For handling windowWillClose:
-	[[self window] setDelegate:self];
+	[self.window setDelegate:self];
 	
-	[[self window] setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+	[self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 	
-	if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
+	if ([self.window respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
 	{
-		[[self window] setRestorable:YES];
-		[[self window] setRestorationClass:[ZGAppController class]];
-		[[self window] setIdentifier:ZGMemoryViewerIdentifier];
+		self.window.restorable = YES;
+		self.window.restorationClass = ZGAppController.class;
+		self.window.identifier = ZGMemoryViewerIdentifier;
 		[self markChanges];
 	}
 
-	[self updateRunningApplicationProcesses:[[[ZGAppController sharedController] documentController] lastSelectedProcessName]];
+	[self updateRunningApplicationProcesses:[[ZGAppController sharedController] lastSelectedProcessName]];
 	
 	[[NSWorkspace sharedWorkspace]
 	 addObserver:self

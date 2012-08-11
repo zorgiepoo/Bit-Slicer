@@ -11,80 +11,62 @@
 
 @implementation ZGSearchData
 
-@synthesize rangeValue;
-@synthesize lastEpsilonValue;
-@synthesize lastAboveRangeValue;
-@synthesize lastBelowRangeValue;
-@synthesize savedData;
-@synthesize tempSavedData;
-@synthesize shouldCompareStoredValues;
-@synthesize epsilon;
-@synthesize shouldIgnoreStringCase;
-@synthesize shouldIncludeNullTerminator;
-@synthesize beginAddress;
-@synthesize endAddress;
-@synthesize shouldScanUnwritableValues;
-@synthesize compareOffset;
-
-@synthesize shouldCancelSearch;
-@synthesize searchDidCancel;
-
 - (id)init
 {
 	self = [super init];
 	if (self)
 	{
-		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &collator);
-		[self setBeginAddress:0x0];
-		[self setEndAddress:MAX_MEMORY_ADDRESS];
-		[self setLastEpsilonValue:[NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON]];
+		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &_collator);
+		self.beginAddress = 0x0;
+		self.endAddress = MAX_MEMORY_ADDRESS;
+		self.lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	UCDisposeCollator(&collator);
+	UCDisposeCollator(&_collator);
 	
-	[self setLastEpsilonValue:nil];
-	[self setLastAboveRangeValue:nil];
-	[self setLastBelowRangeValue:nil];
-	[self setSavedData:nil];
-	[self setRangeValue:NULL];
-	[self setByteArrayFlags:NULL];
+	self.lastEpsilonValue = nil;
+	self.lastAboveRangeValue = nil;
+	self.lastBelowRangeValue = nil;
+	self.savedData = nil;
+	self.rangeValue = NULL;
+	self.byteArrayFlags = NULL;
 	
 	[super dealloc];
 }
 
 - (void)setRangeValue:(void *)newRangeValue
 {
-	if ([self rangeValue])
+	if (_rangeValue)
 	{
-		free([self rangeValue]);
+		free(_rangeValue);
 	}
 	
-	rangeValue = newRangeValue;
+	_rangeValue = newRangeValue;
 }
 
 - (void)setSavedData:(NSArray *)newSavedData
 {
-	if ([self savedData])
+	if (_savedData)
 	{
-		ZGFreeData([self savedData]);
+		ZGFreeData(_savedData);
 	}
 	
-	[savedData release];
-	savedData = [newSavedData retain];
+	[_savedData release];
+	_savedData = [newSavedData retain];
 }
 
 - (void)setByteArrayFlags:(unsigned char *)newByteArrayFlags
 {
-	if (byteArrayFlags)
+	if (_byteArrayFlags)
 	{
-		free(byteArrayFlags);
+		free(_byteArrayFlags);
 	}
 	
-	byteArrayFlags = newByteArrayFlags;
+	_byteArrayFlags = newByteArrayFlags;
 }
 
 @end

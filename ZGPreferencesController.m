@@ -21,33 +21,26 @@
 #import "ZGPreferencesController.h"
 #import "ZGAppController.h"
 
+@interface ZGPreferencesController ()
+
+@property (assign) IBOutlet SRRecorderControl *hotkeyRecorder;
+@property (assign) IBOutlet NSButton *checkForUpdatesButton;
+@property (assign) IBOutlet NSButton *checkForAlphaUpdatesButton;
+
+@end
+
 @implementation ZGPreferencesController
 
 + (void)initialize
 {
-	[[NSUserDefaults standardUserDefaults]
+	[NSUserDefaults.standardUserDefaults
 	 registerDefaults:
-		[NSDictionary
-		 dictionaryWithObject:[NSNumber numberWithInteger:INVALID_KEY_CODE]
-		 forKey:ZG_HOT_KEY]];
-    
-	[[NSUserDefaults standardUserDefaults]
-	 registerDefaults:
-		[NSDictionary
-		 dictionaryWithObject:[NSNumber numberWithInteger:0]
-		 forKey:ZG_HOT_KEY_MODIFIER]];
-	
-	[[NSUserDefaults standardUserDefaults]
-	 registerDefaults:
-		[NSDictionary
-		 dictionaryWithObject:[NSNumber numberWithBool:YES]
-		 forKey:ZG_CHECK_FOR_UPDATES]];
-	
-	[[NSUserDefaults standardUserDefaults]
-	 registerDefaults:
-		[NSDictionary
-		 dictionaryWithObject:[NSNumber numberWithBool:NO]
-		 forKey:ZG_CHECK_FOR_ALPHA_UPDATES]];
+		@{
+			ZG_HOT_KEY : @((NSInteger)INVALID_KEY_CODE),
+			ZG_HOT_KEY_MODIFIER : @((NSInteger)0),
+			ZG_CHECK_FOR_UPDATES : @YES,
+			ZG_CHECK_FOR_ALPHA_UPDATES : @NO
+		}];
 }
 
 - (id)init
@@ -61,51 +54,51 @@
 
 - (void)windowDidLoad
 {
-	if ([[self window] respondsToSelector:@selector(setRestorable:)] && [[self window] respondsToSelector:@selector(setRestorationClass:)])
+	if ([self.window respondsToSelector:@selector(setRestorable:)] && [self.window respondsToSelector:@selector(setRestorationClass:)])
 	{
-		[[self window] setRestorable:YES];
-		[[self window] setRestorationClass:[ZGAppController class]];
-		[[self window] setIdentifier:ZGPreferencesIdentifier];
+		self.window.restorable = YES;
+		self.window.restorationClass = ZGAppController.class;
+		self.window.identifier = ZGPreferencesIdentifier;
 		[self invalidateRestorableState];
 	}
 	
-	[hotkeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
+	[self.hotkeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
 	
-	NSInteger hotkeyCode = [[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY];
+	NSInteger hotkeyCode = [NSUserDefaults.standardUserDefaults integerForKey:ZG_HOT_KEY];
 	// INVALID_KEY_CODE used to be set at -999 (now it's at -1), so just take this into account
 	if (hotkeyCode < INVALID_KEY_CODE)
 	{
 		hotkeyCode = INVALID_KEY_CODE;
-		[[NSUserDefaults standardUserDefaults] setInteger:INVALID_KEY_CODE forKey:ZG_HOT_KEY];
+		[NSUserDefaults.standardUserDefaults setInteger:INVALID_KEY_CODE forKey:ZG_HOT_KEY];
 	}
 	
 	KeyCombo hotkeyCombo;
 	hotkeyCombo.code = hotkeyCode;
 	hotkeyCombo.flags = SRCarbonToCocoaFlags([[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY_MODIFIER]);
 	
-	[hotkeyRecorder setKeyCombo:hotkeyCombo];
+	self.hotkeyRecorder.keyCombo = hotkeyCombo;
 	
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_UPDATES])
+	if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_UPDATES])
 	{
-		if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
+		if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
 		{
-			[checkForAlphaUpdatesButton setState:NSOnState];
+			self.checkForAlphaUpdatesButton.state = NSOnState;
 		}
 	}
 	else
 	{
-		[checkForAlphaUpdatesButton setEnabled:NO];
-		[checkForUpdatesButton setState:NSOffState];
+		self.checkForAlphaUpdatesButton.enabled = NO;
+		self.checkForUpdatesButton.state = NSOffState;
 	}
 }
 
 - (void)shortcutRecorder:(SRRecorderControl *)aRecorder keyComboDidChange:(KeyCombo)newKeyCombo
 {
-	[[NSUserDefaults standardUserDefaults]
+	[NSUserDefaults.standardUserDefaults
 	 setInteger:[aRecorder keyCombo].code
 	 forKey:ZG_HOT_KEY];
     
-	[[NSUserDefaults standardUserDefaults]
+	[NSUserDefaults.standardUserDefaults
 	 setInteger:SRCocoaToCarbonFlags([aRecorder keyCombo].flags)
 	 forKey:ZG_HOT_KEY_MODIFIER];
 	
@@ -114,34 +107,34 @@
 
 - (IBAction)checkForUpdatesButton:(id)sender
 {
-	if ([checkForUpdatesButton state] == NSOffState)
+	if (self.checkForUpdatesButton.state == NSOffState)
 	{
-		[checkForAlphaUpdatesButton setEnabled:NO];
-		[checkForAlphaUpdatesButton setState:NSOffState];
+		self.checkForAlphaUpdatesButton.enabled = NO;
+		self.checkForAlphaUpdatesButton.state = NSOffState;
 		[[NSUserDefaults standardUserDefaults]
 		 setBool:NO
 		 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 	}
 	else
 	{
-		[checkForAlphaUpdatesButton setEnabled:YES];
+		self.checkForAlphaUpdatesButton.enabled = YES;
 	}
 	
-	[[NSUserDefaults standardUserDefaults]
-	 setBool:([checkForUpdatesButton state] == NSOnState)
+	[NSUserDefaults.standardUserDefaults
+	 setBool:(self.checkForUpdatesButton.state == NSOnState)
 	 forKey:ZG_CHECK_FOR_UPDATES];
 }
 
 - (IBAction)checkForAlphaUpdatesButton:(id)sender
 {
-	[[NSUserDefaults standardUserDefaults]
-	 setBool:[checkForAlphaUpdatesButton state] == NSOnState
+	[NSUserDefaults.standardUserDefaults
+	 setBool:self.checkForAlphaUpdatesButton.state == NSOnState
 	 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 }
 
 - (void)updateAlphaUpdatesUI
 {
-	[checkForAlphaUpdatesButton setState:[[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES]];
+	self.checkForAlphaUpdatesButton.state = [NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 }
 
 @end

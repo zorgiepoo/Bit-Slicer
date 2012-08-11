@@ -45,28 +45,28 @@
 
 - (void)updateWatchVariablesTable:(NSTimer *)timer
 {
-	if (![[document windowForSheet] isVisible])
+	if (!document.windowForSheet.isVisible)
 	{
 		return;
 	}
     
 	// First, update all the variable's addresses that are pointers
 	// We don't want to update this when the user is editing something in the table
-	if ([[document currentProcess] processID] != NON_EXISTENT_PID_NUMBER && [watchVariablesTableView editedRow] == -1)
+	if (document.currentProcess.processID != NON_EXISTENT_PID_NUMBER && watchVariablesTableView.editedRow == -1)
 	{
-		[[document watchVariablesArray] enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
+		[document.watchVariablesArray enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
 		 {
 			 ZGVariable *variable = object;
-			 if (variable->isPointer)
+			 if (variable.isPointer)
 			 {
-				 NSString *newAddress =
-				 [ZGCalculator
-				  evaluateAddress:[NSMutableString stringWithString:[variable addressFormula]]
-				  process:[document currentProcess]];
+				 NSString *newAddressString =
+					[ZGCalculator
+					 evaluateAddress:[NSMutableString stringWithString:variable.addressFormula]
+					 process:document.currentProcess];
 				 
-				 if (variable->address != [newAddress unsignedLongLongValue])
+				 if (variable.address != newAddressString.unsignedLongLongValue)
 				 {
-					 [variable setAddressStringValue:newAddress];
+					 variable.addressStringValue = newAddressString;
 					 [watchVariablesTableView reloadData];
 				 }
 			 }
@@ -74,23 +74,23 @@
 	}
 	
 	// Then check that the process is alive
-	if ([[document currentProcess] processID] != NON_EXISTENT_PID_NUMBER)
+	if (document.currentProcess.processID != NON_EXISTENT_PID_NUMBER)
 	{
 		// Freeze all variables that need be frozen!
-		[[document watchVariablesArray] enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
+		[document.watchVariablesArray enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
 		 {
 			 ZGVariable *variable = object;
-			 if (variable->isFrozen && variable->freezeValue)
+			 if (variable.isFrozen && variable.freezeValue)
 			 {
-				 if (variable->size)
+				 if (variable.size)
 				 {
-					 ZGWriteBytes([[document currentProcess] processTask], variable->address, variable->freezeValue, variable->size);
+					 ZGWriteBytes(document.currentProcess.processTask, variable.address, variable.freezeValue, variable.size);
 				 }
 				 
-				 if (variable->type == ZGUTF16String)
+				 if (variable.type == ZGUTF16String)
 				 {
 					 unichar terminatorValue = 0;
-					 ZGWriteBytes([[document currentProcess] processTask], variable->address + variable->size, &terminatorValue, sizeof(unichar));
+					 ZGWriteBytes(document.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));
 				 }
 			 }
 		 }];
@@ -98,49 +98,49 @@
 	
 	// if any variables are changing, that means that we'll have to reload the table, and that'd be very bad
 	// if the user is in the process of editing a variable's value, so don't do it then
-	if ([[document currentProcess] processID] != NON_EXISTENT_PID_NUMBER && [watchVariablesTableView editedRow] == -1)
+	if (document.currentProcess.processID != NON_EXISTENT_PID_NUMBER && watchVariablesTableView.editedRow == -1)
 	{
 		// Read all the variables and update them in the table view if needed
-		NSRange visibleRowsRange = [watchVariablesTableView rowsInRect:[watchVariablesTableView visibleRect]];
+		NSRange visibleRowsRange = [watchVariablesTableView rowsInRect:watchVariablesTableView.visibleRect];
 		
-		if (visibleRowsRange.location + visibleRowsRange.length <= [[document watchVariablesArray] count])
+		if (visibleRowsRange.location + visibleRowsRange.length <= document.watchVariablesArray.count)
 		{
-			[[[document watchVariablesArray] subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+			[[document.watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 			 {
-				 NSString *oldStringValue = [[variable stringValue] copy];
-				 if (variable->type == ZGUTF8String || variable->type == ZGUTF16String)
+				 NSString *oldStringValue = [variable.stringValue copy];
+				 if (variable.type == ZGUTF8String || variable.type == ZGUTF16String)
 				 {
-					 variable->size = ZGGetStringSize([[document currentProcess] processTask], variable->address, variable->type);
+					 variable.size = ZGGetStringSize(document.currentProcess.processTask, variable.address, variable.type);
 				 }
 				 
-				 if (variable->size)
+				 if (variable.size)
 				 {
-					 ZGMemorySize outputSize = variable->size;
+					 ZGMemorySize outputSize = variable.size;
 					 void *value = NULL;
 					 
-					 if (ZGReadBytes([[document currentProcess] processTask], variable->address, &value, &outputSize))
+					 if (ZGReadBytes(document.currentProcess.processTask, variable.address, &value, &outputSize))
 					 {
-						 [variable setVariableValue:value];
-						 if (![[variable stringValue] isEqualToString:oldStringValue])
+						 variable.value = value;
+						 if (![variable.stringValue isEqualToString:oldStringValue])
 						 {
 							 [watchVariablesTableView reloadData];
 						 }
 						 
-						 ZGFreeBytes([[document currentProcess] processTask], value, outputSize);
+						 ZGFreeBytes(document.currentProcess.processTask, value, outputSize);
 					 }
-					 else if (variable->value)
+					 else if (variable.value)
 					 {
-						 [variable setVariableValue:NULL];
+						 variable.value = NULL;
 						 [watchVariablesTableView reloadData];
 					 }
 				 }
-				 else if (variable->lastUpdatedSize)
+				 else if (variable.lastUpdatedSize)
 				 {
-					 [variable setVariableValue:NULL];
+					 variable.value = NULL;
 					 [watchVariablesTableView reloadData];
 				 }
 				 
-				 variable->lastUpdatedSize = variable->size;
+				 variable.lastUpdatedSize = variable.size;
 				 
 				 [oldStringValue release];
 			 }];
@@ -152,7 +152,7 @@
 
 - (NSDragOperation)tableView:(NSTableView *)tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
 {
-	if ([[[draggingInfo draggingPasteboard] types] containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
+	if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
 	{
 		return NSDragOperationMove;
 	}
@@ -162,39 +162,39 @@
 
 - (void)reorderVariables:(NSArray *)newVariables
 {
-	[[document undoManager] setActionName:@"Move"];
-	[[[document undoManager] prepareWithInvocationTarget:self] reorderVariables:[document watchVariablesArray]];
+	document.undoManager.actionName = @"Move";
+	[[document.undoManager prepareWithInvocationTarget:self] reorderVariables:document.watchVariablesArray];
 	
-	[document setWatchVariablesArray:[NSArray arrayWithArray:newVariables]];
+	document.watchVariablesArray = [NSArray arrayWithArray:newVariables];
 	
 	[watchVariablesTableView reloadData];
 }
 
 - (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo  row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
 {	
-	NSMutableArray *variables = [NSMutableArray arrayWithArray:[document watchVariablesArray]];
-	NSArray *rows = [[draggingInfo draggingPasteboard] propertyListForType:ZGVariableReorderType];
+	NSMutableArray *variables = [NSMutableArray arrayWithArray:document.watchVariablesArray];
+	NSArray *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableReorderType];
 	
 	// Fill in the current rows with null objects
 	for (NSNumber *row in rows)
 	{
 		[variables
-		 replaceObjectAtIndex:[row integerValue]
-		 withObject:[NSNull null]];
+		 replaceObjectAtIndex:row.integerValue
+		 withObject:NSNull.null];
 	}
 	
 	// Insert the objects to the new position
 	for (NSNumber *row in rows)
 	{
 		[variables
-		 insertObject:[[document watchVariablesArray] objectAtIndex:[row integerValue]]
+		 insertObject:[document.watchVariablesArray objectAtIndex:row.integerValue]
 		 atIndex:newRow];
 		
 		newRow++;
 	}
 	
 	// Remove all the old objects
-	[variables removeObject:[NSNull null]];
+	[variables removeObject:NSNull.null];
 	
 	// Set the new variables
 	[self reorderVariables:variables];
@@ -217,28 +217,28 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if (tableView == watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < [[document watchVariablesArray] count])
+	if (tableView == watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < document.watchVariablesArray.count)
 	{
-		if ([[tableColumn identifier] isEqualToString:@"name"])
+		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
 			return [[[document watchVariablesArray] objectAtIndex:rowIndex] name];
 		}
-		else if ([[tableColumn identifier] isEqualToString:@"address"])
+		else if ([tableColumn.identifier isEqualToString:@"address"])
 		{
 			return [[[document watchVariablesArray] objectAtIndex:rowIndex] addressStringValue];
 		}
-		else if ([[tableColumn identifier] isEqualToString:@"value"])
+		else if ([tableColumn.identifier isEqualToString:@"value"])
 		{
 			return [[[document watchVariablesArray] objectAtIndex:rowIndex] stringValue];
 		}
-		else if ([[tableColumn identifier] isEqualToString:@"shouldBeSearched"])
+		else if ([tableColumn.identifier isEqualToString:@"shouldBeSearched"])
 		{
-			return [NSNumber numberWithBool:[[[document watchVariablesArray] objectAtIndex:rowIndex] shouldBeSearched]];
+			return @([[document.watchVariablesArray objectAtIndex:rowIndex] shouldBeSearched]);
 		}
-		else if ([[tableColumn identifier] isEqualToString:@"type"])
+		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
-			ZGVariableType type = [(ZGVariable *)[[document watchVariablesArray] objectAtIndex:rowIndex] type];
-			return [NSNumber numberWithInteger:[[tableColumn dataCell] indexOfItemWithTag:type]];
+			ZGVariableType type = [(ZGVariable *)[document.watchVariablesArray objectAtIndex:rowIndex] type];
+			return @([[tableColumn dataCell] indexOfItemWithTag:type]);
 		}
 	}
 	
@@ -247,55 +247,55 @@
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if (tableView == watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < [[document watchVariablesArray] count])
+	if (tableView == watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < document.watchVariablesArray.count)
 	{
-		if ([[tableColumn identifier] isEqualToString:@"name"])
+		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
-			[[document variableController]
-			 changeVariable:[[document watchVariablesArray] objectAtIndex:rowIndex]
+			[document.variableController
+			 changeVariable:[document.watchVariablesArray objectAtIndex:rowIndex]
 			 newName:object];
 		}
-		else if ([[tableColumn identifier] isEqualToString:@"address"])
+		else if ([tableColumn.identifier isEqualToString:@"address"])
 		{
-			[[document variableController]
-			 changeVariable:[[document watchVariablesArray] objectAtIndex:rowIndex]
+			[document.variableController
+			 changeVariable:[document.watchVariablesArray objectAtIndex:rowIndex]
 			 newAddress:object];
 		}
-		else if ([[tableColumn identifier] isEqualToString:@"value"])
+		else if ([tableColumn.identifier isEqualToString:@"value"])
 		{
-			[[document variableController]
-			 changeVariable:[[document watchVariablesArray] objectAtIndex:rowIndex]
+			[document.variableController
+			 changeVariable:[document.watchVariablesArray objectAtIndex:rowIndex]
 			 newValue:object
 			 shouldRecordUndo:YES];
 		}
-		else if ([[tableColumn identifier] isEqualToString:@"shouldBeSearched"])
+		else if ([tableColumn.identifier isEqualToString:@"shouldBeSearched"])
 		{
-			[[document variableController]
+			[document.variableController
 			 changeVariableShouldBeSearched:[object boolValue]
-			 rowIndexes:[watchVariablesTableView selectedRowIndexes]];
+			 rowIndexes:watchVariablesTableView.selectedRowIndexes];
 		}
-		else if (([[tableColumn identifier] isEqualToString:@"type"]))
+		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
-			[[document variableController]
-			 changeVariable:[[document watchVariablesArray] objectAtIndex:rowIndex]
-			 newType:(ZGVariableType)[[tableColumn dataCell] indexOfItemWithTag:[object integerValue]]
-			 newSize:((ZGVariable *)([[document watchVariablesArray] objectAtIndex:rowIndex]))->size];
+			[document.variableController
+			 changeVariable:[document.watchVariablesArray objectAtIndex:rowIndex]
+			 newType:(ZGVariableType)[tableColumn.dataCell indexOfItemWithTag:[object integerValue]]
+			 newSize:[(ZGVariable *)[document.watchVariablesArray objectAtIndex:rowIndex] size]];
 		}
 	}
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return MIN(MAX_TABLE_VIEW_ITEMS, (NSInteger)[[document watchVariablesArray] count]);
+	return MIN(MAX_TABLE_VIEW_ITEMS, document.watchVariablesArray.count);
 }
 
 #pragma mark Table View Delegate Methods
 
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
 {
-	if ([self shouldIgnoreTableViewSelectionChange])
+	if (self.shouldIgnoreTableViewSelectionChange)
 	{
-		[self setShouldIgnoreTableViewSelectionChange:NO];
+		self.shouldIgnoreTableViewSelectionChange = NO;
 		return NO;
 	}
 	
@@ -304,17 +304,17 @@
 
 - (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if ([[tableColumn identifier] isEqualToString:@"value"])
+	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
-		if (![[document searchController] canStartTask] || [[document currentProcess] processID] == NON_EXISTENT_PID_NUMBER)
+		if (![document.searchController canStartTask] || document.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			NSBeep();
 			return NO;
 		}
         
-		if (rowIndex >= 0 && (NSUInteger)rowIndex < [[document watchVariablesArray] count])
+		if (rowIndex >= 0 && (NSUInteger)rowIndex < document.watchVariablesArray.count)
 		{
-			ZGVariable *variable = [[document watchVariablesArray] objectAtIndex:rowIndex];
+			ZGVariable *variable = [document.watchVariablesArray objectAtIndex:rowIndex];
 			if (!variable)
 			{
 				return NO;
@@ -324,10 +324,10 @@
 			ZGMemoryAddress memoryAddress = [variable address];
 			ZGMemorySize memorySize = 0;
 			
-			if (ZGMemoryProtectionInRegion([[document currentProcess] processTask], &memoryAddress, &memorySize, &memoryProtection))
+			if (ZGMemoryProtectionInRegion(document.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 			{
 				// if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
-				if (memoryAddress <= [variable address] && memoryAddress + memorySize >= [variable address] + [variable size] && !(memoryProtection & VM_PROT_WRITE))
+				if (memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_WRITE))
 				{
 					NSBeep();
 					return NO;
@@ -335,15 +335,15 @@
 			}
 		}
 	}
-	else if ([[tableColumn identifier] isEqualToString:@"address"])
+	else if ([tableColumn.identifier isEqualToString:@"address"])
 	{
-		if (rowIndex < 0 || (NSUInteger)rowIndex >= [[document watchVariablesArray] count])
+		if (rowIndex < 0 || (NSUInteger)rowIndex >= document.watchVariablesArray.count)
 		{
 			return NO;
 		}
 		
-		ZGVariable *variable = [[document watchVariablesArray] objectAtIndex:rowIndex];
-		if ([variable isPointer])
+		ZGVariable *variable = [document.watchVariablesArray objectAtIndex:rowIndex];
+		if (variable.isPointer)
 		{
 			[document editVariablesAddress:nil];
 			return NO;
@@ -355,18 +355,11 @@
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if ([[tableColumn identifier] isEqualToString:@"address"])
+	if ([tableColumn.identifier isEqualToString:@"address"])
 	{
-		if (rowIndex >= 0 && (NSUInteger)rowIndex < [[document watchVariablesArray] count])
+		if (rowIndex >= 0 && (NSUInteger)rowIndex < document.watchVariablesArray.count)
 		{
-			if ([[[document watchVariablesArray] objectAtIndex:rowIndex] isFrozen])
-			{
-				[cell setTextColor:[NSColor redColor]];
-			}
-			else
-			{
-				[cell setTextColor:[NSColor textColor]];
-			}
+			[cell setTextColor:[[document.watchVariablesArray objectAtIndex:rowIndex] isFrozen] ? NSColor.redColor : NSColor.textColor];
 		}
 	}
 }
@@ -376,20 +369,20 @@
 	NSString *displayString = nil;
 	
 	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
-	[numberOfVariablesFormatter setFormat:@"#,###"];
+	numberOfVariablesFormatter.format = @"#,###";
 	
-	if ([[document watchVariablesArray] count] <= MAX_TABLE_VIEW_ITEMS)
+	if (document.watchVariablesArray.count <= MAX_TABLE_VIEW_ITEMS)
 	{
-		displayString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:[[document watchVariablesArray] count]]]];
+		displayString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(document.watchVariablesArray.count)]];
 	}
 	else
 	{
-		displayString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInt:MAX_TABLE_VIEW_ITEMS]],[numberOfVariablesFormatter stringFromNumber:[NSNumber numberWithUnsignedInteger:[[document watchVariablesArray] count]]]];
+		displayString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(MAX_TABLE_VIEW_ITEMS)],[numberOfVariablesFormatter stringFromNumber:@(document.watchVariablesArray.count)]];
 	}
 	
 	[numberOfVariablesFormatter release];
 	
-	if (displayString && [[document watchVariablesArray] count] != 1)
+	if (displayString && document.watchVariablesArray.count != 1)
 	{
 		displayString = [displayString stringByAppendingString:@"s"];
 	}
