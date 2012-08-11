@@ -90,7 +90,6 @@ static NSArray *frozenProcesses = nil;
 		self.name = processName;
 		self.processID = aProcessID;
 		self.is64Bit = flag64Bit;
-		self.processTask = MACH_PORT_NULL;
 	}
 	
 	return self;
@@ -99,8 +98,19 @@ static NSArray *frozenProcesses = nil;
 - (void)dealloc
 {
 	self.name = nil;
+	self.processTask = MACH_PORT_NULL;
 	
 	[super dealloc];
+}
+
+- (void)setProcessTask:(ZGMemoryMap)newProcessTask
+{
+	if (_processTask)
+	{
+		ZGFreeTask(_processTask);
+	}
+	
+	_processTask = newProcessTask;
 }
 
 - (int)numberOfRegions
@@ -110,7 +120,14 @@ static NSArray *frozenProcesses = nil;
 
 - (BOOL)grantUsAccess
 {
-	return ZGIsProcessValid(self.processID, &_processTask);
+	ZGMemoryMap newProcessTask = MACH_PORT_NULL;
+	BOOL success = ZGIsProcessValid(self.processID, &newProcessTask);
+	if (success)
+	{
+		self.processTask = newProcessTask;
+	}
+	
+	return success;
 }
 
 - (BOOL)hasGrantedAccess

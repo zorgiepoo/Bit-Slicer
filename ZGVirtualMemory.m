@@ -34,6 +34,14 @@ BOOL ZGIsProcessValid(pid_t process, ZGMemoryMap *task)
 	return success;
 }
 
+void ZGFreeTask(ZGMemoryMap task)
+{
+	if (mach_port_deallocate(current_task(), task) != KERN_SUCCESS)
+	{
+		NSLog(@"Failed to deallocate mach port");
+	}
+}
+
 int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask)
 {
 	int numberOfRegions = 0;

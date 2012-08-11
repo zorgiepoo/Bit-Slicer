@@ -25,7 +25,7 @@
 @interface ZGProcess : NSObject
 
 @property (readwrite) pid_t processID;
-@property (readwrite) ZGMemoryMap processTask;
+@property (readwrite, nonatomic) ZGMemoryMap processTask;
 @property (readwrite, copy) NSString *name;
 @property (readonly) int numberOfRegions;
 @property (readwrite) BOOL is64Bit;
