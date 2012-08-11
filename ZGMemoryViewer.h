@@ -30,31 +30,16 @@
 
 @interface ZGMemoryViewer : NSWindowController <NSWindowDelegate>
 {
-	IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
-	IBOutlet NSTextField *addressTextField;
-	IBOutlet NSTextField *sizeTextField;
-	IBOutlet HFTextView *textView;
+	ZGStatusBarRepresenter *_statusBarRepresenter;
+	ZGLineCountingRepresenter *_lineCountingRepresenter;
 	
-	IBOutlet NSWindow *jumpToAddressWindow;
-	IBOutlet NSTextField *jumpToAddressTextField;
-	
-	ZGStatusBarRepresenter *statusBarRepresenter;
-	ZGLineCountingRepresenter *lineCountingRepresenter;
-	
-	ZGProcess *currentProcess;
-	ZGMemoryAddress currentMemoryAddress;
-	ZGMemorySize currentMemorySize;
-	
-	NSTimer *checkMemoryTimer;
+	NSTimer *_checkMemoryTimer;
 }
 
-- (pid_t)currentProcessIdentifier;
+@property (readonly) ZGProcess *currentProcess;
+
 - (ZGMemoryAddress)selectedAddress;
 
-- (IBAction)runningApplicationsPopUpButton:(id)sender;
-- (IBAction)changeMemoryView:(id)sender;
-- (IBAction)jumpToMemoryAddressOKButton:(id)sender;
-- (IBAction)jumpToMemoryAddressCancelButton:(id)sender;
 - (void)jumpToMemoryAddressRequest;
 - (BOOL)canJumpToAddress;
 

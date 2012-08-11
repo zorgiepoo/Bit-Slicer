@@ -15,11 +15,6 @@
 @class ZGTimer;
 
 @interface ZGDocumentSearchController : NSObject
-{
-	IBOutlet ZGDocument *document;
-	ZGSearchData *searchData;
-	ZGTimer *updateSearchUserInterfaceTimer;
-}
 
 @property (readonly) ZGSearchData *searchData;
 

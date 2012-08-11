@@ -209,7 +209,7 @@
 	
 	// Try to get an initial address from the memory viewer's selection
 	ZGMemoryAddress initialAddress = 0x0;
-	if ([[ZGAppController sharedController] memoryViewer] && [[[ZGAppController sharedController] memoryViewer] currentProcessIdentifier] == self.document.currentProcess.processID)
+	if ([[ZGAppController sharedController] memoryViewer] && [[[[ZGAppController sharedController] memoryViewer] currentProcess] processID] == self.document.currentProcess.processID)
 	{
 		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddress];
 	}
@@ -298,12 +298,14 @@
 	// It's important to retrieve this now instead of later as changing the variable's size may cause a bad side effect to this method
 	NSString *oldStringValue = [variable.stringValue copy];
 	
-	int8_t int8Value = 0;
-	int16_t int16Value = 0;
-	int32_t int32Value = 0;
-	int64_t int64Value = 0;
-	float floatValue = 0.0;
-	double doubleValue = 0.0;
+	int8_t *int8Value = malloc(sizeof(int8_t));
+	int16_t *int16Value = malloc(sizeof(int16_t));
+	int32_t *int32Value = malloc(sizeof(int32_t));
+	int64_t *int64Value = malloc(sizeof(int64_t));
+	float *floatValue = malloc(sizeof(float));
+	double *doubleValue = malloc(sizeof(double));
+	void *utf16Value = NULL;
+	void *byteArrayValue = NULL;
 	
 	if (variable.type != ZGUTF8String && variable.type != ZGUTF16String && variable.type != ZGByteArray)
 	{
@@ -317,28 +319,28 @@
 		case ZGInt8:
 			if (stringIsAHexRepresentation)
 			{
-				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)&int32Value];
-				int8Value = int32Value;
+				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)int32Value];
+				*int8Value = (int8_t)*int32Value;
 			}
 			else
 			{
-				int8Value = stringObject.intValue;
+				*int8Value = (int8_t)stringObject.intValue;
 			}
 			
-			newValue = &int8Value;
+			newValue = int8Value;
 			break;
 		case ZGInt16:
 			if (stringIsAHexRepresentation)
 			{
-				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)&int32Value];
-				int16Value = int32Value;
+				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)int32Value];
+				*int16Value = (int16_t)*int32Value;
 			}
 			else
 			{
-				int16Value = stringObject.intValue;
+				*int16Value = (int16_t)stringObject.intValue;
 			}
 			
-			newValue = &int16Value;
+			newValue = int16Value;
 			break;
 		case ZGPointer:
 			if (variable.size == sizeof(int32_t))
@@ -355,51 +357,51 @@
 		INT32_BIT_CHANGE_VARIABLE:
 			if (stringIsAHexRepresentation)
 			{
-				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)&int32Value];
+				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)int32Value];
 			}
 			else
 			{
-				int32Value = stringObject.intValue;
+				*int32Value = stringObject.intValue;
 			}
 			
-			newValue = &int32Value;
+			newValue = int32Value;
 			break;
 		case ZGFloat:
 			if (stringIsAHexRepresentation)
 			{
-				[[NSScanner scannerWithString:stringObject] scanHexFloat:&floatValue];
+				[[NSScanner scannerWithString:stringObject] scanHexFloat:floatValue];
 			}
 			else
 			{
-				floatValue = stringObject.floatValue;
+				*floatValue = stringObject.floatValue;
 			}
 			
-			newValue = &floatValue;
+			newValue = floatValue;
 			break;
 		case ZGInt64:
 		INT64_BIT_CHANGE_VARIABLE:
 			if (stringIsAHexRepresentation)
 			{
-				[[NSScanner scannerWithString:stringObject] scanHexLongLong:(unsigned long long *)&int64Value];
+				[[NSScanner scannerWithString:stringObject] scanHexLongLong:(unsigned long long *)int64Value];
 			}
 			else
 			{
-				[[NSScanner scannerWithString:stringObject] scanLongLong:&int64Value];
+				[[NSScanner scannerWithString:stringObject] scanLongLong:int64Value];
 			}
 			
-			newValue = &int64Value;
+			newValue = int64Value;
 			break;
 		case ZGDouble:
 			if (stringIsAHexRepresentation)
 			{
-				[[NSScanner scannerWithString:stringObject] scanHexDouble:&doubleValue];
+				[[NSScanner scannerWithString:stringObject] scanHexDouble:doubleValue];
 			}
 			else
 			{
-				doubleValue = stringObject.doubleValue;
+				*doubleValue = stringObject.doubleValue;
 			}
 			
-			newValue = &doubleValue;
+			newValue = doubleValue;
 			break;
 		case ZGUTF8String:
 			newValue = (void *)[stringObject cStringUsingEncoding:NSUTF8StringEncoding];
@@ -412,7 +414,8 @@
 			
 			if (variable.size)
 			{
-				newValue = malloc((size_t)variable.size);
+				utf16Value = malloc((size_t)variable.size);
+				newValue = utf16Value;
 				[stringObject
 				 getCharacters:newValue
 				 range:NSMakeRange(0, stringObject.length)];
@@ -420,7 +423,8 @@
 			else
 			{
 				// String "" can be of 0 length
-				newValue = malloc(sizeof(unichar));
+				utf16Value = malloc(sizeof(unichar));
+				newValue = utf16Value;
 				
 				if (newValue)
 				{
@@ -439,7 +443,8 @@
 			variable.size = bytesArray.count;
 			
 			// this is the maximum size allocated needed
-			newValue = malloc((size_t)variable.size);
+			byteArrayValue = malloc((size_t)variable.size);
+			newValue = byteArrayValue;
 			
 			if (newValue)
 			{
@@ -530,12 +535,16 @@
 				}
 			}
 		}
-		
-		if (variable.type == ZGUTF16String || variable.type == ZGByteArray)
-		{
-			free(newValue);
-		}
 	}
+	
+	if (int8Value) free(int8Value);
+	if (int16Value) free(int16Value);
+	if (int32Value) free(int32Value);
+	if (int64Value) free(int64Value);
+	if (floatValue) free(floatValue);
+	if (doubleValue) free(doubleValue);
+	if (utf16Value) free(utf16Value);
+	if (byteArrayValue) free(byteArrayValue);
 	
 	[oldStringValue release];
 }
