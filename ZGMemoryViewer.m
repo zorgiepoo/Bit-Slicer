@@ -27,6 +27,7 @@
 #import "ZGUtilities.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
+#import "ZGtimer.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -38,6 +39,11 @@
 #define ZGMemoryViewerProcessName @"ZGMemoryViewerProcessName"
 
 @interface ZGMemoryViewer ()
+
+@property (readwrite, retain) ZGTimer *checkMemoryTimer;
+
+@property (readwrite, retain) ZGStatusBarRepresenter *statusBarRepresenter;
+@property (readwrite, retain) ZGLineCountingRepresenter *lineCountingRepresenter;
 
 @property ZGMemoryAddress currentMemoryAddress;
 @property ZGMemorySize currentMemorySize;
@@ -68,7 +74,7 @@
 	[_currentProcess release];
 	
 	_currentProcess = newProcess;
-	if (![_currentProcess hasGrantedAccess])
+	if (_currentProcess && ![_currentProcess hasGrantedAccess])
 	{
 		if (![_currentProcess grantUsAccess])
 		{
@@ -187,19 +193,19 @@
 	[representersToRemove release];
 	
 	// Add custom status bar
-	_statusBarRepresenter = [[ZGStatusBarRepresenter alloc] init];
-	_statusBarRepresenter.statusMode = HFStatusModeHexadecimal;
+	self.statusBarRepresenter = [[[ZGStatusBarRepresenter alloc] init] autorelease];
+	self.statusBarRepresenter.statusMode = HFStatusModeHexadecimal;
 	
-	[self.textView.controller addRepresenter:_statusBarRepresenter];
-	[[self.textView layoutRepresenter] addRepresenter:_statusBarRepresenter];
+	[self.textView.controller addRepresenter:self.statusBarRepresenter];
+	[[self.textView layoutRepresenter] addRepresenter:self.statusBarRepresenter];
 	
 	// Add custom line counter
-	_lineCountingRepresenter = [[ZGLineCountingRepresenter alloc] init];
-	_lineCountingRepresenter.minimumDigitCount = DEFAULT_MINIMUM_LINE_DIGIT_COUNT;
-	_lineCountingRepresenter.lineNumberFormat = HFLineNumberFormatHexadecimal;
+	self.lineCountingRepresenter = [[[ZGLineCountingRepresenter alloc] init] autorelease];
+	self.lineCountingRepresenter.minimumDigitCount = DEFAULT_MINIMUM_LINE_DIGIT_COUNT;
+	self.lineCountingRepresenter.lineNumberFormat = HFLineNumberFormatHexadecimal;
 	
-	[self.textView.controller addRepresenter:_lineCountingRepresenter];
-	[self.textView.layoutRepresenter addRepresenter:_lineCountingRepresenter];
+	[self.textView.controller addRepresenter:self.lineCountingRepresenter];
+	[self.textView.layoutRepresenter addRepresenter:self.lineCountingRepresenter];
 	
 	// Add custom scroller
 	ZGVerticalScrollerRepresenter *verticalScrollerRepresenter = [[ZGVerticalScrollerRepresenter alloc] init];
@@ -214,22 +220,20 @@
 {
 	[super showWindow:sender];
 	
-	if (!_checkMemoryTimer)
+	if (!self.checkMemoryTimer)
 	{
-		_checkMemoryTimer =
-			[[NSTimer scheduledTimerWithTimeInterval:READ_MEMORY_INTERVAL
+		self.checkMemoryTimer =
+			[[[ZGTimer alloc]
+			 initWithTimeInterval:READ_MEMORY_INTERVAL
 			 target:self
-			 selector:@selector(readMemory:)
-			 userInfo:nil
-			 repeats:YES] retain];
+			 selector:@selector(readMemory:)] autorelease];
 	}
 }
 
 - (void)windowWillClose:(NSNotification *)notification
 {
-	[_checkMemoryTimer invalidate];
-	[_checkMemoryTimer release];
-	_checkMemoryTimer = nil;
+	[self.checkMemoryTimer invalidate];
+	self.checkMemoryTimer = nil;
 }
 
 #pragma mark Updating running applications
@@ -246,8 +250,8 @@
 {
 	self.currentMemoryAddress = 0;
 	self.currentMemorySize = 0;
-	[_lineCountingRepresenter setBeginningMemoryAddress:0];
-	[_statusBarRepresenter setBeginningMemoryAddress:0];
+	[self.lineCountingRepresenter setBeginningMemoryAddress:0];
+	[self.statusBarRepresenter setBeginningMemoryAddress:0];
 	[self.textView setData:[NSData data]];
 }
 
@@ -356,16 +360,16 @@
 				self.currentMemoryAddress = memoryAddress;
 				self.currentMemorySize = memorySize;
 				
-				_statusBarRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
+				self.statusBarRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
 				// Select the first byte of data
-				_statusBarRepresenter.controller.selectedContentsRanges = [NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(0, 0)]];
+				self.statusBarRepresenter.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(0, 0)]];
 				// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
-				[_statusBarRepresenter updateString];
+				[self.statusBarRepresenter updateString];
 				
-				_lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase16(memoryAddress + memorySize);
-				_lineCountingRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
+				self.lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase16(memoryAddress + memorySize);
+				self.lineCountingRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
 				// This will force the line numbers to update
-				[_lineCountingRepresenter.view setNeedsDisplay:YES];
+				[self.lineCountingRepresenter.view setNeedsDisplay:YES];
 				// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
 				[self.textView.layoutRepresenter performLayout];
 				
@@ -401,7 +405,7 @@
 		// So we need to change the current selection accordingly
 		if ((minimumLocation < displayedLocation || minimumLocation >= displayedEndLocation) || (maximumLocation < displayedLocation || maximumLocation >= displayedEndLocation))
 		{
-			self.textView.controller.selectedContentsRanges = [NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(ceill(displayedLineRange.location) * self.textView.controller.bytesPerLine, 0)]];
+			self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(ceill(displayedLineRange.location) * self.textView.controller.bytesPerLine, 0)]];
 			displayedLineRange = self.textView.controller.displayedLineRange;
 		}
 		
@@ -470,7 +474,7 @@
 	}
 	
 	// Select one byte from the offset
-	self.textView.controller.selectedContentsRanges = [NSArray arrayWithObject:[HFRangeWrapper withRange:HFRangeMake(offset, 1)]];
+	self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, 1)]];
 	[self.textView.controller pulseSelection];
 	
 	[NSApp endSheet:self.jumpToAddressWindow];

@@ -16,11 +16,13 @@
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
 #import "ZGTimer.h"
+#import "ZGComparisonFunctions.h"
 
 @interface ZGDocumentSearchController ()
 
-@property (retain, nonatomic, readwrite) ZGTimer *searchUserInterfaceTimer;
+@property (retain, nonatomic, readwrite) ZGTimer *userInterfaceTimer;
 @property (assign) IBOutlet ZGDocument *document;
+@property (readwrite, retain) ZGSearchData *searchData;
 
 @end
 
@@ -34,29 +36,41 @@
 	
 	if (self)
 	{
-		_searchData = [[ZGSearchData alloc] init];
+		self.searchData = [[[ZGSearchData alloc] init] autorelease];
 	}
 	
 	return self;
 }
 
-- (void)dealloc
+- (void)cleanUp
 {
 	self.userInterfaceTimer = nil;
 	
-	[_searchData release];
+	// Force canceling
+	ZGCancelSearchImmediately(self.searchData);
+	self.document.currentProcess.isDoingMemoryDump = NO;
+	self.document.currentProcess.isStoringAllData = NO;
+	
+	self.searchData = nil;
+	self.document = nil;
+}
+
+- (void)dealloc
+{
+	NSLog(@"document-search-controller dealloc");
+	
 	[super dealloc];
 }
 
 - (void)setUserInterfaceTimer:(ZGTimer *)newTimer
 {
-	if (_searchUserInterfaceTimer)
+	if (_userInterfaceTimer)
 	{
-		[_searchUserInterfaceTimer invalidate];
-		[_searchUserInterfaceTimer release];
+		[_userInterfaceTimer invalidate];
+		[_userInterfaceTimer release];
 	}
 	
-	_searchUserInterfaceTimer = [newTimer retain];
+	_userInterfaceTimer = [newTimer retain];
 }
 
 - (void)createUserInterfaceTimer
@@ -286,7 +300,7 @@
 	if (ZGSearchDidCancelSearch(self.searchData))
 	{
 		self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress;
-		self.document.generalStatusTextField.stringValue = @"Search canceled.";
+		self.document.generalStatusTextField.stringValue = @"Canceled search.";
 	}
 	else
 	{
@@ -307,7 +321,7 @@
 	
 	BOOL goingToNarrowDownSearches = self.isInNarrowSearchMode;
 	
-	if ([self canStartTask])
+	if (self.canStartTask)
 	{
 		// Find all variables that are set to be searched, but shouldn't be
 		// this is if the variable's data type does not match, or if the variable
@@ -654,31 +668,36 @@
 	}
 	else
 	{
-		if (self.document.currentProcess.isDoingMemoryDump)
+		[self cancelTask];
+	}
+}
+
+- (void)cancelTask
+{
+	if (self.document.currentProcess.isDoingMemoryDump)
+	{
+		// Cancel memory dump
+		self.document.currentProcess.isDoingMemoryDump = NO;
+		self.document.generalStatusTextField.stringValue = @"Canceling Memory Dump...";
+	}
+	else if (self.document.currentProcess.isStoringAllData)
+	{
+		// Cancel memory store
+		self.document.currentProcess.isStoringAllData = NO;
+		self.document.generalStatusTextField.stringValue = @"Canceling Memory Store...";
+	}
+	else
+	{
+		// Cancel the search
+		self.document.searchButton.enabled = NO;
+		
+		if (self.isInNarrowSearchMode)
 		{
-			// Cancel memory dump
-			self.document.currentProcess.isDoingMemoryDump = NO;
-			self.document.generalStatusTextField.stringValue = @"Canceling Memory Dump...";
-		}
-		else if (self.document.currentProcess.isStoringAllData)
-		{
-			// Cancel memory store
-			self.document.currentProcess.isStoringAllData = NO;
-			self.document.generalStatusTextField.stringValue = @"Canceling Memory Store...";
+			ZGCancelSearchImmediately(self.searchData);
 		}
 		else
 		{
-			// Cancel the search
-			self.document.searchButton.enabled = NO;
-			
-			if (goingToNarrowDownSearches)
-			{
-				ZGCancelSearchImmediately(self.searchData);
-			}
-			else
-			{
-				ZGCancelSearch(self.searchData);
-			}
+			ZGCancelSearch(self.searchData);
 		}
 	}
 }
@@ -701,7 +720,7 @@
 	self.document.generalStatusTextField.stringValue = @"Storing All Values...";
 	
 	dispatch_block_t searchForDataCompleteBlock = ^
-	{self.
+	{
 		self.userInterfaceTimer = nil;
 		
 		if (!self.document.currentProcess.isStoringAllData)

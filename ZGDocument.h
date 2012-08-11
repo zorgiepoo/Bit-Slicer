@@ -19,35 +19,13 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "ZGVariable.h"
-#import "ZGComparisonFunctions.h"
 
 @class ZGProcess;
-@class ZGTimer;
 @class ZGVariableController;
 @class ZGDocumentSearchController;
 @class ZGDocumentTableController;
-@class ZGMemoryDumpController;
-@class ZGMemoryProtectionController;
 
 #define NON_EXISTENT_PID_NUMBER -1
-
-@interface ZGDocumentInfo : NSObject
-
-@property (readwrite) BOOL loadedFromSave;
-@property (readwrite) NSInteger selectedDatatypeTag;
-@property (readwrite) NSInteger qualifierTag;
-@property (readwrite) NSInteger functionTypeTag;
-@property (readwrite) BOOL scanUnwritableValues;
-@property (readwrite) BOOL ignoreDataAlignment;
-@property (readwrite) BOOL exactStringLength;
-@property (readwrite) BOOL ignoreStringCase;
-@property (readwrite, copy) NSString *beginningAddress;
-@property (readwrite, copy) NSString *endingAddress;
-@property (readwrite, copy) NSString *searchValue;
-@property (readwrite, retain) NSArray *watchVariablesArray;
-
-@end
 
 @interface ZGDocument : NSDocument
 {
@@ -55,9 +33,6 @@
 	IBOutlet NSTextField *_flagsLabel;
 	IBOutlet NSButton *_optionsDisclosureButton;
 	IBOutlet NSView *_optionsView;
-	IBOutlet ZGMemoryDumpController *_memoryDumpController;
-	IBOutlet ZGMemoryProtectionController *_memoryProtectionController;
-	ZGTimer *_watchVariablesTimer;
 }
 
 @property (assign) IBOutlet NSWindow *watchWindow;
@@ -80,15 +55,13 @@
 @property (assign) IBOutlet NSTextField *beginningAddressLabel;
 @property (assign) IBOutlet NSTextField *endingAddressLabel;
 
-@property (assign) IBOutlet ZGDocumentTableController *tableController;
-@property (assign) IBOutlet ZGVariableController *variableController;
-@property (assign) IBOutlet ZGDocumentSearchController *searchController;
+@property (strong) IBOutlet ZGDocumentTableController *tableController;
+@property (strong) IBOutlet ZGVariableController *variableController;
+@property (strong) IBOutlet ZGDocumentSearchController *searchController;
 
 @property (readwrite, retain) NSArray *watchVariablesArray;
 @property (readwrite, retain) ZGProcess *currentProcess;
 @property (readwrite, copy) NSString *desiredProcessName;
-@property (readwrite) ZGVariableType currentSearchDataType;
-@property (readwrite, retain) ZGDocumentInfo *documentState;
 
 - (IBAction)editVariablesAddress:(id)sender;
 

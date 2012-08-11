@@ -97,7 +97,7 @@
 - (void)copyVariables
 {
 	[NSPasteboard.generalPasteboard
-	 declareTypes:[NSArray arrayWithObjects:NSStringPboardType, ZGVariablePboardType, nil]
+	 declareTypes:@[NSStringPboardType, ZGVariablePboardType]
 	 owner:self];
 	
 	NSMutableArray *linesToWrite = [[NSMutableArray alloc] init];
@@ -226,7 +226,7 @@
 	variable.shouldBeSearched = NO;
 	
 	[self
-	 addVariables:[NSArray arrayWithObject:variable]
+	 addVariables:@[variable]
 	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
 	
 	[variable release];

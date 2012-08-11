@@ -20,23 +20,31 @@
 
 #import "ZGTimer.h"
 
+@interface ZGTimer ()
+
+@property (readwrite, retain) NSTimer *timer;
+@property (readwrite, assign) id target;
+@property (readwrite, assign) SEL selector;
+
+@end
+
 @implementation ZGTimer
 
-- (id)initWithTimeInterval:(NSTimeInterval)timeInterval target:(id)theTarget selector:(SEL)theSelector
+- (id)initWithTimeInterval:(NSTimeInterval)timeInterval target:(id)target selector:(SEL)selector
 {
 	self = [super init];
 	
 	if (self)
 	{
-		target = theTarget;
-		selector = theSelector;
-		timer =
-			[[NSTimer
+		self.target = target;
+		self.selector = selector;
+		self.timer =
+			[NSTimer
 			  scheduledTimerWithTimeInterval:timeInterval
 			  target:self
 			  selector:@selector(invoke)
 			  userInfo:nil
-			  repeats:YES] retain];
+			  repeats:YES];
 	}
 	
 	return self;
@@ -44,14 +52,13 @@
 
 - (void)invoke
 {
-	[target performSelector:selector withObject:timer];
+	[self.target performSelector:self.selector withObject:self.timer];
 }
 
 - (void)invalidate
 {
-	[timer invalidate];
-	[timer release];
-	timer = nil;
+	[self.timer invalidate];
+	self.timer = nil;
 }
 
 @end

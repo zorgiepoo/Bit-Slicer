@@ -25,11 +25,13 @@
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGVariable.h"
+#import "ZGTimer.h"
 #import "NSStringAdditions.h"
 
 @interface ZGDocumentTableController ()
 
 @property (assign) IBOutlet ZGDocument *document;
+@property (readwrite, retain) ZGTimer *watchVariablesTimer;
 
 @end
 
@@ -37,11 +39,33 @@
 
 #define ZGVariableReorderType @"ZGVariableReorderType"
 
-#pragma mark Birth
+#define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
+
+#pragma mark Birth & Death
 
 - (void)awakeFromNib
 {
-	[self.watchVariablesTableView registerForDraggedTypes:[NSArray arrayWithObject:ZGVariableReorderType]];
+	[self.watchVariablesTableView registerForDraggedTypes:@[ZGVariableReorderType]];
+	self.watchVariablesTimer =
+		[[[ZGTimer alloc]
+		  initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
+		  target:self
+		  selector:@selector(updateWatchVariablesTable:)] autorelease];
+}
+
+- (void)cleanUp
+{
+	[self.watchVariablesTimer invalidate];
+	self.watchVariablesTimer = nil;
+	
+	self.document = nil;
+	self.watchVariablesTableView = nil;
+}
+
+- (void)dealloc
+{
+	NSLog(@"document-table-controller dealloc");
+	[super dealloc];
 }
 
 #pragma mark Updating Table
@@ -207,7 +231,7 @@
 
 - (BOOL)tableView:(NSTableView *)view writeRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pasteboard
 {
-	[pasteboard declareTypes:[NSArray arrayWithObject:ZGVariableReorderType] owner:self];
+	[pasteboard declareTypes:@[ZGVariableReorderType] owner:self];
 	
 	[pasteboard
 	 setPropertyList:rows

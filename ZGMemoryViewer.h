@@ -22,19 +22,11 @@
 #import <HexFiend/HexFiend.h>
 #import "ZGMemoryTypes.h"
 
-#define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
-
-@class ZGStatusBarRepresenter;
-@class ZGLineCountingRepresenter;
 @class ZGProcess;
 
+#define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
+
 @interface ZGMemoryViewer : NSWindowController <NSWindowDelegate>
-{
-	ZGStatusBarRepresenter *_statusBarRepresenter;
-	ZGLineCountingRepresenter *_lineCountingRepresenter;
-	
-	NSTimer *_checkMemoryTimer;
-}
 
 @property (readonly) ZGProcess *currentProcess;
 

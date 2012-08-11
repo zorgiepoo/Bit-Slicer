@@ -32,9 +32,10 @@
 #import "ZGComparisonFunctions.h"
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
-#import "ZGTimer.h"
+#import "ZGVariable.h"
 #import "ZGUtilities.h"
 #import "ZGSearchData.h"
+#import "ZGComparisonFunctions.h"
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
 #define ZGProcessNameKey @"ZGProcessNameKey"
@@ -53,10 +54,35 @@
 #define ZGBelowValueKey @"ZGBelowValueKey"
 #define ZGSearchStringValueKey @"ZGSearchStringValueKey"
 
+@interface ZGDocumentInfo : NSObject
+
+@property (readwrite) BOOL loadedFromSave;
+@property (readwrite) NSInteger selectedDatatypeTag;
+@property (readwrite) NSInteger qualifierTag;
+@property (readwrite) NSInteger functionTypeTag;
+@property (readwrite) BOOL scanUnwritableValues;
+@property (readwrite) BOOL ignoreDataAlignment;
+@property (readwrite) BOOL exactStringLength;
+@property (readwrite) BOOL ignoreStringCase;
+@property (readwrite, copy) NSString *beginningAddress;
+@property (readwrite, copy) NSString *endingAddress;
+@property (readwrite, copy) NSString *searchValue;
+@property (readwrite, retain) NSArray *watchVariablesArray;
+
+@end
+
 @implementation ZGDocumentInfo
 @end
 
-#define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
+@interface ZGDocument ()
+
+@property (readwrite) ZGVariableType currentSearchDataType;
+@property (readwrite, retain) ZGDocumentInfo *documentState;
+
+@property (strong) IBOutlet ZGMemoryDumpController *memoryDumpController;
+@property (assign) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
+
+@end
 
 #define ZG_EXPAND_OPTIONS @"ZG_EXPAND_OPTIONS"
 
@@ -96,9 +122,16 @@
 	 removeObserver:self
 	 forKeyPath:@"runningApplications"];
 	
-	[_watchVariablesTimer invalidate];
-	[_watchVariablesTimer release];
-	_watchVariablesTimer = nil;
+	NSLog(@"document dealloc");
+	
+	[self.searchController cleanUp];
+	self.searchController = nil;
+	
+	[self.tableController cleanUp];
+	self.tableController = nil;
+	
+	[self.memoryDumpController cleanUp];
+	self.memoryDumpController = nil;
 	
 	self.watchVariablesArray = nil;
 	self.currentProcess = nil;
@@ -210,12 +243,6 @@
 		 name:NSWindowWillExitFullScreenNotification
 		 object:self.watchWindow];
 	}
-	
-	_watchVariablesTimer =
-		[[ZGTimer alloc]
-		 initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
-		 target:self.tableController
-		 selector:@selector(updateWatchVariablesTable:)];
 	
 	[self loadDocumentUserInterface];
 }
@@ -418,7 +445,7 @@
 	{
 		if (menuItem != self.runningApplicationsPopUpButton.selectedItem &&
 			([menuItem.representedObject processID] == NON_EXISTENT_PID_NUMBER ||
-			 ![[[NSWorkspace sharedWorkspace] runningApplications] containsObject:[NSRunningApplication runningApplicationWithProcessIdentifier:[menuItem.representedObject processID]]]))
+			 ![NSWorkspace.sharedWorkspace.runningApplications containsObject:[NSRunningApplication runningApplicationWithProcessIdentifier:[menuItem.representedObject processID]]]))
 		{
 			[itemsToRemove addObject:menuItem];
 		}
@@ -441,7 +468,7 @@
 - (void)addApplicationsToPopupButton
 {
 	// Add running applications to popup button
-	for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
+	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
 	{
 		[self addRunningApplicationToPopupButton:runningApplication];
 	}
@@ -1227,19 +1254,19 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (IBAction)memoryDumpRangeRequest:(id)sender
 {
-	[_memoryDumpController memoryDumpRangeRequest];
+	[self.memoryDumpController memoryDumpRangeRequest];
 }
 
 - (IBAction)memoryDumpAllRequest:(id)sender
 {
-	[_memoryDumpController memoryDumpAllRequest];
+	[self.memoryDumpController memoryDumpAllRequest];
 }
 
 #pragma mark Memory Protection Handling
 
 - (IBAction)changeMemoryProtection:(id)sender
 {
-	[_memoryProtectionController changeMemoryProtectionRequest];
+	[self.memoryProtectionController changeMemoryProtectionRequest];
 }
 
 #pragma mark Pausing and Unpausing Processes

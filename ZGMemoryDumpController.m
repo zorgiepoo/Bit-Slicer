@@ -26,6 +26,7 @@
 #import "ZGUtilities.h"
 #import "ZGVirtualMemory.h"
 #import "ZGDocumentSearchController.h"
+#import "ZGtimer.h"
 
 @interface ZGMemoryDumpController ()
 
@@ -34,9 +35,30 @@
 @property (assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;
 @property (assign) IBOutlet NSTextField *memoryDumpToAddressTextField;
 
+@property (readwrite, retain) ZGTimer *progressTimer;
+
 @end
 
 @implementation ZGMemoryDumpController
+
+#pragma mark Death
+
+- (void)cleanUp
+{
+	[self.progressTimer invalidate];
+	self.progressTimer = nil;
+	
+	self.document = nil;
+	self.memoryDumpWindow = nil;
+	self.memoryDumpFromAddressTextField = nil;
+	self.memoryDumpToAddressTextField = nil;
+}
+
+- (void)dealloc
+{
+	NSLog(@"memory-dump-controller dealloc");
+	[super dealloc];
+}
 
 #pragma mark Memory Dump in Range
 
@@ -168,7 +190,7 @@
 				  error:NULL];
 			 }
 			 
-			 [[NSFileManager defaultManager]
+			 [NSFileManager.defaultManager
 			  createDirectoryAtPath:savePanel.URL.relativePath
 			  withIntermediateDirectories:NO
 			  attributes:nil
@@ -176,13 +198,11 @@
 			 
 			 self.document.searchingProgressIndicator.maxValue = self.document.currentProcess.numberOfRegions;
 			 
-			 NSTimer *progressTimer =
-				[[NSTimer
-				  scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-				  target:self
-				  selector:@selector(updateMemoryDumpProgress:)
-				  userInfo:nil
-				  repeats:YES] retain];
+			 self.progressTimer =
+				[[[ZGTimer alloc]
+				 initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+				 target:self
+				 selector:@selector(updateMemoryDumpProgress:)] autorelease];
 			 
 			 //not doing this here, there's a bug with setKeyEquivalent, instead i'm going to do this in the timer
 			 //[document prepareDocumentTask];
@@ -190,8 +210,8 @@
 			 
 			 dispatch_block_t searchForDataCompleteBlock = ^
 			 {
-				 [progressTimer invalidate];
-				 [progressTimer release];
+				 [self.progressTimer invalidate];
+				 self.progressTimer = nil;
 				 
 				 if (!self.document.currentProcess.isDoingMemoryDump)
 				 {

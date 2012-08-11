@@ -25,4 +25,6 @@
 - (void)memoryDumpRangeRequest;
 - (void)memoryDumpAllRequest;
 
+- (void)cleanUp;
+
 @end

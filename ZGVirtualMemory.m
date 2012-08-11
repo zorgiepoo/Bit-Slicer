@@ -218,7 +218,7 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 	ZGMemoryAddress currentStartingAddress = address;
 	int fileNumber = 0;
 	
-	FILE *mergedFile = fopen([[directory stringByAppendingPathComponent:@"(All) Merged"] UTF8String], "w");
+	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
 	
 	process.isDoingMemoryDump = YES;
 	process.searchProgress = 0;

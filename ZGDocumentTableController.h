@@ -27,4 +27,6 @@
 @property (assign) IBOutlet NSTableView *watchVariablesTableView;
 @property (readwrite) BOOL shouldIgnoreTableViewSelectionChange;
 
+- (void)cleanUp;
+
 @end

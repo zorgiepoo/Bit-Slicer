@@ -20,16 +20,11 @@
 
 #import <Cocoa/Cocoa.h>
 
-// The purpose of this class is simply a wrapper of NSTimer so I can avoid retain cycles in NSDocument
+// The purpose of this class is simply a wrapper of NSTimer so I can avoid retain cycles
 
 @interface ZGTimer : NSObject
-{
-	NSTimer *timer;
-	id target;
-	SEL selector;
-}
 
-- (id)initWithTimeInterval:(NSTimeInterval)timeInterval target:(id)theTarget selector:(SEL)theSelector;
+- (id)initWithTimeInterval:(NSTimeInterval)timeInterval target:(id)target selector:(SEL)selector;
 
 - (void)invalidate;
 

@@ -16,15 +16,18 @@
 
 @interface ZGDocumentSearchController : NSObject
 
-@property (readonly) ZGSearchData *searchData;
+@property (readonly, retain) ZGSearchData *searchData;
 
 - (BOOL)canStartTask;
 - (BOOL)canCancelTask;
+- (void)cancelTask;
 - (void)prepareTask;
 - (void)resumeFromTask;
 
 - (void)clear;
 - (void)search;
 - (void)storeAllValues;
+
+- (void)cleanUp;
 
 @end
