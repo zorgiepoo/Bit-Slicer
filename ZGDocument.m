@@ -28,7 +28,6 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVariable.h"
 #import "ZGAppController.h"
-#import "ZGDocumentController.h"
 #import "ZGMemoryViewer.h"
 #import "ZGComparisonFunctions.h"
 #import "NSStringAdditions.h"
@@ -377,7 +376,7 @@
 		{
 			if (variable.type == ZGPointer)
 			{
-				variable.pointerSize = self.currentProcess.is64Bit ? sizeof(int64_t) : sizeof(int32_t);
+				variable.pointerSize = self.currentProcess.pointerSize;
 			}
 		}
 		

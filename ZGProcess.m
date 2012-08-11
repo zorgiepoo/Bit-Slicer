@@ -118,4 +118,9 @@ static NSArray *frozenProcesses = nil;
     return (self.processTask != MACH_PORT_NULL);
 }
 
+- (ZGMemorySize)pointerSize
+{
+	return self.is64Bit ? sizeof(int64_t) : sizeof(int32_t);
+}
+
 @end

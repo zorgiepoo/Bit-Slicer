@@ -43,4 +43,6 @@
 - (BOOL)grantUsAccess;
 - (BOOL)hasGrantedAccess;
 
+- (ZGMemorySize)pointerSize;
+
 @end

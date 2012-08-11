@@ -221,7 +221,7 @@
 		 address:initialAddress
 		 type:(ZGVariableType)[sender tag]
 		 qualifier:qualifier
-		 pointerSize:self.document.currentProcess.is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		 pointerSize:self.document.currentProcess.pointerSize];
 	
 	variable.shouldBeSearched = NO;
 	
@@ -282,7 +282,7 @@
 	[variable
 	 setType:type
 	 requestedSize:size
-	 pointerSize:self.document.currentProcess.is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+	 pointerSize:self.document.currentProcess.pointerSize];
 	
 	if (self.document.undoManager.isUndoing || self.document.undoManager.isRedoing)
 	{

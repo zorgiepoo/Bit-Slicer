@@ -19,7 +19,6 @@
  */
 
 #import "ZGAppController.h"
-#import "ZGDocumentController.h"
 #import <SecurityFoundation/SFAuthorization.h>
 #import <Security/AuthorizationTags.h>
 #import "ZGPreferencesController.h"

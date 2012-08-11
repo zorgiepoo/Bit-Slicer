@@ -24,7 +24,6 @@
 #import "ZGVerticalScrollerRepresenter.h"
 #import "ZGProcess.h"
 #import "ZGAppController.h"
-#import "ZGDocumentController.h"
 #import "ZGUtilities.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
