@@ -22,6 +22,18 @@
 #import "ZGProcess.h"
 #import "ZGSearchData.h"
 
+@interface ZGRegion : NSObject
+
+@property (assign) ZGMemoryMap processTask;
+@property (assign) ZGMemoryAddress address;
+@property (assign) ZGMemorySize size;
+@property (assign) void *bytes;
+
+@end
+
+@implementation ZGRegion
+@end
+
 BOOL ZGIsProcessValid(pid_t process, ZGMemoryMap *task)
 {
 	*task = MACH_PORT_NULL;
@@ -127,21 +139,11 @@ void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStarti
 	}
 }
 
-typedef struct
-{
-	ZGMemoryMap processTask;
-	ZGMemoryAddress address;
-	ZGMemorySize size;
-	void *bytes;
-} ZGRegion;
-
 void ZGFreeData(NSArray *dataArray)
 {
-	for (NSValue *value in dataArray)
+	for (ZGRegion *memoryRegion in dataArray)
 	{
-		ZGRegion *memoryRegion = value.pointerValue;
-		ZGFreeBytes(memoryRegion->processTask, memoryRegion->bytes, memoryRegion->size);
-		free(memoryRegion);
+		ZGFreeBytes(memoryRegion.processTask, memoryRegion.bytes, memoryRegion.size);
 	}
 }
 
@@ -158,21 +160,21 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 	process.isStoringAllData = YES;
 	process.searchProgress = 0;
 	
-	while (mach_vm_region([process processTask], &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
+	while (mach_vm_region(process.processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
 		if ((regionInfo.protection & VM_PROT_READ) && (shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
 			void *bytes = NULL;
 			if (ZGReadBytes(process.processTask, address, &bytes, &size))
 			{
-				ZGRegion *memoryRegion = malloc(sizeof(ZGRegion));
-				memoryRegion->processTask = process.processTask;
-				memoryRegion->bytes = bytes;
-				memoryRegion->address = address;
-				memoryRegion->size = size;
+				ZGRegion *memoryRegion = [[ZGRegion alloc] init];
+				memoryRegion.processTask = process.processTask;
+				memoryRegion.bytes = bytes;
+				memoryRegion.address = address;
+				memoryRegion.size = size;
 				
-				[dataArray addObject:[NSValue valueWithPointer:memoryRegion]];
-				// Don't free memory now. It will be free when ZGFreeData is called
+				[dataArray addObject:memoryRegion];
+				[memoryRegion release];
 			}
 		}
 		
@@ -197,13 +199,11 @@ void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySi
 {
 	void *value = NULL;
 	
-	for (NSValue *regionValue in searchData.savedData)
+	for (ZGRegion *region in searchData.savedData)
 	{
-		ZGRegion *region = regionValue.pointerValue;
-		
-		if (address >= region->address && address + dataSize <= region->address + region->size)
+		if (address >= region.address && address + dataSize <= region.address + region.size)
 		{
-			value = region->bytes + (address - region->address);
+			value = region.bytes + (address - region.address);
 			break;
 		}
 	}
@@ -342,24 +342,23 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 	
 	int currentRegionNumber = 0;
 	
-	for (NSValue *regionValue in searchData.savedData)
+	for (ZGRegion *region in searchData.savedData)
 	{
-		ZGRegion *region = regionValue.pointerValue;
 		ZGMemoryAddress offset = 0;
 		char *currentData = NULL;
-		ZGMemorySize size = region->size;
+		ZGMemorySize size = region.size;
 		
 		// Skipping an entire region will provide significant performance benefits
-		if (region->address < dataEndAddress &&
-			region->address + size > dataBeginAddress &&
-			ZGReadBytes(processTask, region->address, (void **)&currentData, &size))
+		if (region.address < dataEndAddress &&
+			region.address + size > dataBeginAddress &&
+			ZGReadBytes(processTask, region.address, (void **)&currentData, &size))
 		{
 			do
 			{
-				if (dataBeginAddress <= region->address + offset &&
-					dataEndAddress >= region->address + offset + dataSize)
+				if (dataBeginAddress <= region.address + offset &&
+					dataEndAddress >= region.address + offset + dataSize)
 				{
-					block(&currentData[offset], region->bytes + offset, region->address + offset, currentRegionNumber);
+					block(&currentData[offset], region.bytes + offset, region.address + offset, currentRegionNumber);
 				}
 				offset += dataAlignment;
 			}
