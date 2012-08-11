@@ -200,7 +200,7 @@
 				 repeats:YES];
 			 
 			 //not doing this here, there's a bug with setKeyEquivalent, instead i'm going to do this in the timer
-			 //[document prepareDocumentTask];
+			 //[self.document.searchController prepareTask];
 			 self.document.generalStatusTextField.stringValue = @"Writing Memory Dump...";
 			 
 			 dispatch_block_t searchForDataCompleteBlock = ^
