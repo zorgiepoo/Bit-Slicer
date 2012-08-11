@@ -26,7 +26,6 @@
 #import "ZGUtilities.h"
 #import "ZGVirtualMemory.h"
 #import "ZGDocumentSearchController.h"
-#import "ZGtimer.h"
 
 @interface ZGMemoryDumpController ()
 
@@ -35,7 +34,7 @@
 @property (assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;
 @property (assign) IBOutlet NSTextField *memoryDumpToAddressTextField;
 
-@property (readwrite, retain) ZGTimer *progressTimer;
+@property (readwrite, retain) NSTimer *progressTimer;
 
 @end
 
@@ -52,12 +51,6 @@
 	self.memoryDumpWindow = nil;
 	self.memoryDumpFromAddressTextField = nil;
 	self.memoryDumpToAddressTextField = nil;
-}
-
-- (void)dealloc
-{
-	NSLog(@"memory-dump-controller dealloc");
-	[super dealloc];
 }
 
 #pragma mark Memory Dump in Range
@@ -199,10 +192,12 @@
 			 self.document.searchingProgressIndicator.maxValue = self.document.currentProcess.numberOfRegions;
 			 
 			 self.progressTimer =
-				[[[ZGTimer alloc]
-				 initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+				[NSTimer
+				 scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
 				 target:self
-				 selector:@selector(updateMemoryDumpProgress:)] autorelease];
+				 selector:@selector(updateMemoryDumpProgress:)
+				 userInfo:nil
+				 repeats:YES];
 			 
 			 //not doing this here, there's a bug with setKeyEquivalent, instead i'm going to do this in the timer
 			 //[document prepareDocumentTask];

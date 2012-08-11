@@ -122,8 +122,6 @@
 	 removeObserver:self
 	 forKeyPath:@"runningApplications"];
 	
-	NSLog(@"document dealloc");
-	
 	[self.searchController cleanUp];
 	self.searchController = nil;
 	

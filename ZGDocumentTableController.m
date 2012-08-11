@@ -25,13 +25,12 @@
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGVariable.h"
-#import "ZGTimer.h"
 #import "NSStringAdditions.h"
 
 @interface ZGDocumentTableController ()
 
 @property (assign) IBOutlet ZGDocument *document;
-@property (readwrite, retain) ZGTimer *watchVariablesTimer;
+@property (readwrite, retain) NSTimer *watchVariablesTimer;
 
 @end
 
@@ -47,10 +46,12 @@
 {
 	[self.watchVariablesTableView registerForDraggedTypes:@[ZGVariableReorderType]];
 	self.watchVariablesTimer =
-		[[[ZGTimer alloc]
-		  initWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
-		  target:self
-		  selector:@selector(updateWatchVariablesTable:)] autorelease];
+		[NSTimer
+		 scheduledTimerWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
+		 target:self
+		 selector:@selector(updateWatchVariablesTable:)
+		 userInfo:nil
+		 repeats:YES];
 }
 
 - (void)cleanUp
@@ -60,12 +61,6 @@
 	
 	self.document = nil;
 	self.watchVariablesTableView = nil;
-}
-
-- (void)dealloc
-{
-	NSLog(@"document-table-controller dealloc");
-	[super dealloc];
 }
 
 #pragma mark Updating Table

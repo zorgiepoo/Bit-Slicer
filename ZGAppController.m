@@ -235,7 +235,7 @@ static BOOL didRegisteredHotKey = NO;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
-{	
+{
 	if (acquireTaskportRight() != 0)
 	{
 		NSLog(@"Failed to acquire taskport rights");

@@ -15,12 +15,11 @@
 #import "ZGSearchData.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
-#import "ZGTimer.h"
 #import "ZGComparisonFunctions.h"
 
 @interface ZGDocumentSearchController ()
 
-@property (retain, nonatomic, readwrite) ZGTimer *userInterfaceTimer;
+@property (retain, nonatomic, readwrite) NSTimer *userInterfaceTimer;
 @property (assign) IBOutlet ZGDocument *document;
 @property (readwrite, retain) ZGSearchData *searchData;
 
@@ -55,14 +54,7 @@
 	self.document = nil;
 }
 
-- (void)dealloc
-{
-	NSLog(@"document-search-controller dealloc");
-	
-	[super dealloc];
-}
-
-- (void)setUserInterfaceTimer:(ZGTimer *)newTimer
+- (void)setUserInterfaceTimer:(NSTimer *)newTimer
 {
 	if (_userInterfaceTimer)
 	{
@@ -76,10 +68,12 @@
 - (void)createUserInterfaceTimer
 {
 	self.userInterfaceTimer =
-		[[[ZGTimer alloc]
-		  initWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-		  target:self
-		  selector:@selector(updateSearchUserInterface:)] autorelease];
+		[NSTimer
+		 scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+		 target:self
+		 selector:@selector(updateSearchUserInterface:)
+		 userInfo:nil
+		 repeats:YES];
 }
 
 #pragma mark Confirm search input

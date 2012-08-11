@@ -8,11 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-#define USER_INTERFACE_UPDATE_TIME_INTERVAL	0.33
+#define USER_INTERFACE_UPDATE_TIME_INTERVAL	 0.33
 
-@class ZGDocument;
 @class ZGSearchData;
-@class ZGTimer;
 
 @interface ZGDocumentSearchController : NSObject
 

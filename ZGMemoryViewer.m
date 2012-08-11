@@ -27,7 +27,6 @@
 #import "ZGUtilities.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
-#import "ZGtimer.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -40,7 +39,7 @@
 
 @interface ZGMemoryViewer ()
 
-@property (readwrite, retain) ZGTimer *checkMemoryTimer;
+@property (readwrite, retain) NSTimer *checkMemoryTimer;
 
 @property (readwrite, retain) ZGStatusBarRepresenter *statusBarRepresenter;
 @property (readwrite, retain) ZGLineCountingRepresenter *lineCountingRepresenter;
@@ -223,10 +222,12 @@
 	if (!self.checkMemoryTimer)
 	{
 		self.checkMemoryTimer =
-			[[[ZGTimer alloc]
-			 initWithTimeInterval:READ_MEMORY_INTERVAL
+			[NSTimer
+			 scheduledTimerWithTimeInterval:READ_MEMORY_INTERVAL
 			 target:self
-			 selector:@selector(readMemory:)] autorelease];
+			 selector:@selector(readMemory:)
+			 userInfo:nil
+			 repeats:YES];
 	}
 }
 
