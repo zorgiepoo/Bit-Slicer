@@ -328,7 +328,7 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
-void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
+void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
 	
@@ -357,12 +357,12 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 				}
 				offset += dataAlignment;
 			}
-			while (offset + dataSize <= size && !searchData.shouldCancelSearch);
+			while (offset + dataSize <= size && !searchData->_shouldCancelSearch);
 			
 			ZGFreeBytes(processTask, currentData, size);
 		}
 		
-		if (searchData.shouldCancelSearch)
+		if (searchData->_shouldCancelSearch)
 		{
 			searchData.searchDidCancel = YES;
 			return;
@@ -372,7 +372,7 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 	}
 }
 
-void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block)
+void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
 	
@@ -399,7 +399,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
 			{
 				ZGMemorySize dataIndex = 0;
-				while (dataIndex + dataSize <= size && !searchData.shouldCancelSearch)
+				while (dataIndex + dataSize <= size && !searchData->_shouldCancelSearch)
 				{
 					if (dataBeginAddress <= address + dataIndex &&
 						dataEndAddress >= address + dataIndex + dataSize)
@@ -413,7 +413,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 			}
 		}
 		
-		if (searchData.shouldCancelSearch)
+		if (searchData->_shouldCancelSearch)
 		{
 			searchData.searchDidCancel = YES;
 			return;

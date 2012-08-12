@@ -510,7 +510,7 @@
 			equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalPlusFunction, notEqualPlusFunction
 		};
 		
-		BOOL (*compareFunction)(ZGSearchData *, const void *, const void *, ZGVariableType, ZGMemorySize) = compareFunctions[functionType];
+		BOOL (*compareFunction)(ZGSearchData * __unsafe_unretained, const void *, const void *, ZGVariableType, ZGMemorySize) = compareFunctions[functionType];
         
 		if (dataType == ZGByteArray)
 		{
@@ -539,7 +539,7 @@
 			ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
 			
 			ZGProcess *currentProcess = self.document.currentProcess;
-			search_for_data_t searchForDataCallback = ^(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
+			search_for_data_t searchForDataCallback = ^(ZGSearchData * __unsafe_unretained searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
 			{
 				if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
 				{
@@ -557,7 +557,7 @@
 					currentProcess.numberOfVariablesFound++;
 				}
 				
-				currentProcess.searchProgress = currentRegionNumber;
+				currentProcess->_searchProgress = currentRegionNumber;
 			};
 			
 			dispatch_block_t searchForDataCompleteBlock = ^

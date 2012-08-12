@@ -23,6 +23,10 @@
 #import <sys/sysctl.h>
 
 @interface ZGProcess : NSObject
+{
+@public
+	ZGMemorySize _searchProgress;
+}
 
 @property (readwrite, nonatomic) pid_t processID;
 @property (readwrite, nonatomic) ZGMemoryMap processTask;

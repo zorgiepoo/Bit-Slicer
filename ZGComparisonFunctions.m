@@ -21,7 +21,7 @@
 #import "ZGComparisonFunctions.h"
 #import "ZGSearchData.h"
 
-inline BOOL lessThanFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
+inline BOOL lessThanFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
 {
 	BOOL isLessThan = NO;
 	
@@ -88,7 +88,7 @@ inline BOOL lessThanFunction(ZGSearchData *searchData, const void *variableValue
 	return isLessThan;
 }
 
-inline BOOL greaterThanFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
+inline BOOL greaterThanFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
 {
 	BOOL isGreaterThan = NO;
 	
@@ -155,7 +155,7 @@ inline BOOL greaterThanFunction(ZGSearchData *searchData, const void *variableVa
 	return isGreaterThan;
 }
 
-inline BOOL equalFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
+inline BOOL equalFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
 {
 	BOOL isEqual = NO;
 	
@@ -257,12 +257,12 @@ inline BOOL equalFunction(ZGSearchData *searchData, const void *variableValue, c
 	return isEqual;
 }
 
-inline BOOL notEqualFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
+inline BOOL notEqualFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
 {
 	return !equalFunction(searchData, variableValue, compareValue, type, size);
 }
 
-inline BOOL equalPlusFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
+inline BOOL equalPlusFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
 {
 	switch (type)
 	{
@@ -315,7 +315,7 @@ inline BOOL equalPlusFunction(ZGSearchData *searchData, const void *variableValu
 	return NO;
 }
 
-inline BOOL notEqualPlusFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
+inline BOOL notEqualPlusFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size)
 {
     return !equalPlusFunction(searchData, variableValue, compareValue, type, size);
 }

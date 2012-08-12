@@ -40,9 +40,9 @@ typedef enum
 	ZGNotEqualsStoredPlus,
 } ZGFunctionType;
 
-extern inline BOOL lessThanFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-extern inline BOOL greaterThanFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-extern inline BOOL equalFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-extern inline BOOL notEqualFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-extern inline BOOL equalPlusFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-extern inline BOOL notEqualPlusFunction(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
+extern inline BOOL lessThanFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
+extern inline BOOL greaterThanFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
+extern inline BOOL equalFunction(ZGSearchData *__unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
+extern inline BOOL notEqualFunction(ZGSearchData *__unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
+extern inline BOOL equalPlusFunction(ZGSearchData *__unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
+extern inline BOOL notEqualPlusFunction(ZGSearchData *__unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
