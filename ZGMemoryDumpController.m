@@ -53,11 +53,6 @@
 	self.memoryDumpToAddressTextField = nil;
 }
 
-- (void)dealloc
-{
-	NSLog(@"memory dump dealloc");
-}
-
 #pragma mark Memory Dump in Range
 
 - (IBAction)memoryDumpOkayButton:(id)sender

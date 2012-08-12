@@ -54,11 +54,6 @@
 	self.document = nil;
 }
 
-- (void)dealloc
-{
-	NSLog(@"search dealloc");
-}
-
 - (void)setUserInterfaceTimer:(NSTimer *)newTimer
 {
 	[_userInterfaceTimer invalidate];

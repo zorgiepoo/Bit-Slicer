@@ -63,11 +63,6 @@
 	self.watchVariablesTableView = nil;
 }
 
-- (void)dealloc
-{
-	NSLog(@"table dealloc");
-}
-
 #pragma mark Updating Table
 
 - (void)updateWatchVariablesTable:(NSTimer *)timer
