@@ -54,7 +54,7 @@ void ZGFreeTask(ZGMemoryMap task)
 	}
 }
 
-int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask)
+int ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
 {
 	int numberOfRegions = 0;
 	ZGMemoryAddress address = 0x0;

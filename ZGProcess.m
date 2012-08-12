@@ -108,7 +108,7 @@ static NSArray *frozenProcesses = nil;
 
 - (int)numberOfRegions
 {
-	return ZGNumberOfRegionsForProcess(self.processTask);
+	return ZGNumberOfRegionsForProcessTask(self.processTask);
 }
 
 - (BOOL)grantUsAccess

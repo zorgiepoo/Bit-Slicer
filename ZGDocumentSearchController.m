@@ -505,7 +505,7 @@
 		
 		[self prepareTask];
 		
-		static BOOL (*compareFunctions[10])(ZGSearchData *, const void *, const void *, ZGVariableType, ZGMemorySize) =
+		static BOOL (*compareFunctions[10])(ZGSearchData * __unsafe_unretained, const void *, const void *, ZGVariableType, ZGMemorySize) =
 		{
 			equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalPlusFunction, notEqualPlusFunction
 		};

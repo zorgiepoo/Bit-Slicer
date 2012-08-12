@@ -35,7 +35,7 @@ typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, 
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
 
-int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask);
+int ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
 
 BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size);
 void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size);
