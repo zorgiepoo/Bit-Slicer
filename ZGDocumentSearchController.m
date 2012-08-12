@@ -20,8 +20,8 @@
 @interface ZGDocumentSearchController ()
 
 @property (assign) IBOutlet ZGDocument *document;
-@property (retain, nonatomic, readwrite) NSTimer *userInterfaceTimer;
-@property (readwrite, retain, nonatomic) ZGSearchData *searchData;
+@property (strong, nonatomic, readwrite) NSTimer *userInterfaceTimer;
+@property (readwrite, strong, nonatomic) ZGSearchData *searchData;
 
 @end
 
@@ -35,7 +35,7 @@
 	
 	if (self)
 	{
-		self.searchData = [[[ZGSearchData alloc] init] autorelease];
+		self.searchData = [[ZGSearchData alloc] init];
 	}
 	
 	return self;
@@ -54,15 +54,15 @@
 	self.document = nil;
 }
 
+- (void)dealloc
+{
+	NSLog(@"search dealloc");
+}
+
 - (void)setUserInterfaceTimer:(NSTimer *)newTimer
 {
-	if (_userInterfaceTimer)
-	{
-		[_userInterfaceTimer invalidate];
-		[_userInterfaceTimer release];
-	}
-	
-	_userInterfaceTimer = [newTimer retain];
+	[_userInterfaceTimer invalidate];
+	_userInterfaceTimer = newTimer;
 }
 
 - (void)createUserInterfaceTimer
@@ -222,7 +222,6 @@
 	NSNumberFormatter *numberOfVariablesFoundFormatter = [[NSNumberFormatter alloc] init];
 	numberOfVariablesFoundFormatter.format = @"#,###";
 	self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Found %@ value%@...", [numberOfVariablesFoundFormatter stringFromNumber:@(self.document.currentProcess.numberOfVariablesFound)], self.document.currentProcess.numberOfVariablesFound != 1 ? @"s" : @""];
-	[numberOfVariablesFoundFormatter release];
 }
 
 - (void)updateSearchUserInterface:(NSTimer *)timer
@@ -559,7 +558,6 @@
 						 pointerSize:pointerSize];
 					
 					[temporaryVariablesArray addObject:newVariable];
-					[newVariable release];
 					
 					currentProcess.numberOfVariablesFound++;
 				}
@@ -577,7 +575,6 @@
 				self.userInterfaceTimer = nil;
 				
 				[self searchCleanUp:temporaryVariablesArray];
-				[temporaryVariablesArray release];
 			};
 			dispatch_block_t searchForDataBlock = ^
 			{
@@ -613,7 +610,6 @@
 				self.userInterfaceTimer = nil;
 				
 				[self searchCleanUp:temporaryVariablesArray];
-				[temporaryVariablesArray release];
 			};
 			
 			ZGProcess *currentProcess = self.document.currentProcess;

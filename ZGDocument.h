@@ -53,8 +53,8 @@
 @property (strong) IBOutlet ZGVariableController *variableController;
 @property (strong) IBOutlet ZGDocumentSearchController *searchController;
 
-@property (readwrite, retain, nonatomic) NSArray *watchVariablesArray;
-@property (readwrite, retain, nonatomic) ZGProcess *currentProcess;
+@property (readwrite, strong, nonatomic) NSArray *watchVariablesArray;
+@property (readwrite, strong, nonatomic) ZGProcess *currentProcess;
 @property (readwrite, copy, nonatomic) NSString *desiredProcessName;
 
 - (IBAction)editVariablesAddress:(id)sender;

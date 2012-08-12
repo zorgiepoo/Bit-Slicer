@@ -23,11 +23,7 @@
 #import "ZGMemoryTypes.h"
 
 @interface ZGLineCountingRepresenter : HFLineCountingRepresenter
-{
-	ZGMemoryAddress _beginningMemoryAddress;
-}
 
-- (void)setBeginningMemoryAddress:(ZGMemoryAddress)newBeginningMemoryAddress;
-- (ZGMemoryAddress)beginningMemoryAddress;
+@property (readwrite) ZGMemoryAddress beginningMemoryAddress;
 
 @end

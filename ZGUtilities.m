@@ -47,7 +47,6 @@ BOOL isValidNumber(NSString *expression)
 		NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
 		NSNumber *number = [numberFormatter numberFromString:expression];
 		result = (number != nil);
-		[numberFormatter release];
 	}
 	
 	return result;

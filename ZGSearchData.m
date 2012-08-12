@@ -17,7 +17,6 @@
 	if (self)
 	{
 		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &_collator);
-		self.beginAddress = 0x0;
 		self.endAddress = MAX_MEMORY_ADDRESS;
 		self.lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];
 	}
@@ -28,14 +27,8 @@
 {
 	UCDisposeCollator(&_collator);
 	
-	self.lastEpsilonValue = nil;
-	self.lastAboveRangeValue = nil;
-	self.lastBelowRangeValue = nil;
-	self.savedData = nil;
 	self.rangeValue = NULL;
 	self.byteArrayFlags = NULL;
-	
-	[super dealloc];
 }
 
 - (void)setRangeValue:(void *)newRangeValue
@@ -55,8 +48,7 @@
 		ZGFreeData(_savedData);
 	}
 	
-	[_savedData release];
-	_savedData = [newSavedData retain];
+	_savedData = newSavedData;
 }
 
 - (void)setByteArrayFlags:(unsigned char *)newByteArrayFlags

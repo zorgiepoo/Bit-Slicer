@@ -36,11 +36,6 @@
 
 @implementation ZGStatusBarRepresenter
 
-- (void)setBeginningMemoryAddress:(ZGMemoryAddress)newBeginningMemoryAddress
-{
-	_beginningMemoryAddress = newBeginningMemoryAddress;
-}
-
 - (NSString *)stringForEmptySelectionAtOffset:(unsigned long long)offset length:(unsigned long long)length
 {
 	return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningMemoryAddress]];

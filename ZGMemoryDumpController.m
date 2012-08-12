@@ -34,7 +34,7 @@
 @property (assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;
 @property (assign) IBOutlet NSTextField *memoryDumpToAddressTextField;
 
-@property (readwrite, retain, nonatomic) NSTimer *progressTimer;
+@property (readwrite, strong, nonatomic) NSTimer *progressTimer;
 
 @end
 
@@ -51,6 +51,11 @@
 	self.memoryDumpWindow = nil;
 	self.memoryDumpFromAddressTextField = nil;
 	self.memoryDumpToAddressTextField = nil;
+}
+
+- (void)dealloc
+{
+	NSLog(@"memory dump dealloc");
 }
 
 #pragma mark Memory Dump in Range

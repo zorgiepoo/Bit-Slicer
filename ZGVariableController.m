@@ -112,8 +112,6 @@
 	 setString:[linesToWrite componentsJoinedByString:@"\n"]
 	 forType:NSStringPboardType];
 	
-	[linesToWrite release];
-	
 	[NSPasteboard.generalPasteboard
 	 setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray]
 	 forType:ZGVariablePboardType];
@@ -165,7 +163,6 @@
 	[temporaryArray removeObjectsAtIndexes:rowIndexes];
 	
 	self.document.watchVariablesArray = [NSArray arrayWithArray:temporaryArray];
-	[temporaryArray release];
 	
 	[self.document.tableController.watchVariablesTableView reloadData];
 	
@@ -179,7 +176,6 @@
 	
 	[self.document setWatchVariablesArray:[NSArray arrayWithArray:temporaryArray]];
 	
-	[temporaryArray release];
 	[self.document.tableController.watchVariablesTableView reloadData];
 	
 	if (self.document.undoManager.isUndoing)
@@ -228,8 +224,6 @@
 	[self
 	 addVariables:@[variable]
 	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
-	
-	[variable release];
 	
 	// have the user edit the variable's address
 	[self.document.tableController.watchVariablesTableView
@@ -545,8 +539,6 @@
 	if (doubleValue) free(doubleValue);
 	if (utf16Value) free(utf16Value);
 	if (byteArrayValue) free(byteArrayValue);
-	
-	[oldStringValue release];
 }
 
 - (void)changeVariableShouldBeSearched:(BOOL)shouldBeSearched rowIndexes:(NSIndexSet *)rowIndexes
@@ -602,8 +594,6 @@
 	[[self.document.undoManager prepareWithInvocationTarget:self]
 	 editVariables:variables
 	 newValues:oldValues];
-	
-	[oldValues release];
 }
 
 - (IBAction)editVariablesValueOkayButton:(id)sender
@@ -647,11 +637,7 @@
 		[self
 		 editVariables:validVariables
 		 newValues:valuesArray];
-        
-		[valuesArray release];
 	}
-	
-	[validVariables release];
 }
 
 - (void)editVariablesValueRequest
@@ -766,9 +752,6 @@
 	{
 		NSRunAlertPanel(@"Failed to change size", @"The size that you have requested could not be changed. Perhaps it is too big of a value?", nil, nil, nil);
 	}
-	
-	[currentVariableSizes release];
-	[validVariables release];
 }
 
 - (IBAction)editVariablesSizeOkayButton:(id)sender
@@ -810,8 +793,6 @@
 		[self
 		 editVariables:variables
 		 requestedSizes:requestedSizes];
-        
-		[requestedSizes release];
 	}
 }
 

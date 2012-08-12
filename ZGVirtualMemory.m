@@ -174,7 +174,6 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 				memoryRegion.size = size;
 				
 				[dataArray addObject:memoryRegion];
-				[memoryRegion release];
 			}
 		}
 		
@@ -185,14 +184,12 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 		if (!process.isStoringAllData)
 		{
 			ZGFreeData(dataArray);
-			
-			[dataArray release];
 			dataArray = nil;
 			break;
 		}
 	}
 	
-	return [dataArray autorelease];
+	return dataArray;
 }
 
 void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySize dataSize)
@@ -237,7 +234,6 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 		{
 			// We're done with this piece of data
 			ZGSavePieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
-			[currentData release];
 			currentData = nil;
 		}
 		
@@ -273,7 +269,6 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 	ZGSavePieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
     
 EXIT_ON_CANCEL:
-	[currentData release];
 	
 	if (mergedFile)
 	{

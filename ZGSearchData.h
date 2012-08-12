@@ -30,8 +30,8 @@
 @property (readwrite, copy, nonatomic) NSString *lastEpsilonValue;
 @property (readwrite, copy, nonatomic) NSString *lastAboveRangeValue;
 @property (readwrite, copy, nonatomic) NSString *lastBelowRangeValue;
-@property (readwrite, nonatomic, retain) NSArray *savedData;
-@property (readwrite, retain, nonatomic) NSArray *tempSavedData;
+@property (readwrite, strong, nonatomic) NSArray *savedData;
+@property (readwrite, strong, nonatomic) NSArray *tempSavedData;
 @property (readwrite, nonatomic) BOOL shouldCompareStoredValues;
 @property (readwrite, nonatomic) double epsilon;
 @property (readwrite, nonatomic) BOOL shouldIgnoreStringCase;

@@ -35,9 +35,7 @@ static NSArray *frozenProcesses = nil;
 
 + (void)addFrozenProcess:(pid_t)pid
 {
-	NSArray *oldFrozenProcesses = frozenProcesses;
-	frozenProcesses = [[frozenProcesses arrayByAddingObject:@(pid)] retain];
-	[oldFrozenProcesses release];
+	frozenProcesses = [frozenProcesses arrayByAddingObject:@(pid)];
 }
 
 + (void)removeFrozenProcess:(pid_t)pid
@@ -52,9 +50,7 @@ static NSArray *frozenProcesses = nil;
 		}
 	}
 	
-	[frozenProcesses release];
-	frozenProcesses = [[NSArray arrayWithArray:mutableArray] retain];
-	[mutableArray release];
+	frozenProcesses = [NSArray arrayWithArray:mutableArray];
 }
 
 + (void)pauseOrUnpauseProcess:(pid_t)pid
@@ -97,10 +93,7 @@ static NSArray *frozenProcesses = nil;
 
 - (void)dealloc
 {
-	self.name = nil;
 	self.processTask = MACH_PORT_NULL;
-	
-	[super dealloc];
 }
 
 - (void)setProcessTask:(ZGMemoryMap)newProcessTask

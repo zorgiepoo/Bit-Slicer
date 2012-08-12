@@ -14,7 +14,7 @@
 
 @interface ZGDocumentSearchController : NSObject
 
-@property (readonly, retain, nonatomic) ZGSearchData *searchData;
+@property (readonly, strong, nonatomic) ZGSearchData *searchData;
 
 - (BOOL)canStartTask;
 - (BOOL)canCancelTask;

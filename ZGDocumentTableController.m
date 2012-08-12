@@ -30,7 +30,7 @@
 @interface ZGDocumentTableController ()
 
 @property (assign) IBOutlet ZGDocument *document;
-@property (readwrite, retain, nonatomic) NSTimer *watchVariablesTimer;
+@property (readwrite, strong, nonatomic) NSTimer *watchVariablesTimer;
 
 @end
 
@@ -61,6 +61,11 @@
 	
 	self.document = nil;
 	self.watchVariablesTableView = nil;
+}
+
+- (void)dealloc
+{
+	NSLog(@"table dealloc");
 }
 
 #pragma mark Updating Table
@@ -163,8 +168,6 @@
 				 }
 				 
 				 variable.lastUpdatedSize = variable.size;
-				 
-				 [oldStringValue release];
 			 }];
 		}
 	}
@@ -401,8 +404,6 @@
 	{
 		displayString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(MAX_TABLE_VIEW_ITEMS)],[numberOfVariablesFormatter stringFromNumber:@(self.document.watchVariablesArray.count)]];
 	}
-	
-	[numberOfVariablesFormatter release];
 	
 	if (displayString && self.document.watchVariablesArray.count != 1)
 	{

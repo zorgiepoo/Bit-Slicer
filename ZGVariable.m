@@ -23,7 +23,7 @@
 
 @interface ZGVariable ()
 
-@property (readwrite, assign, nonatomic) ZGMemoryAddress address;
+@property (readwrite, nonatomic) ZGMemoryAddress address;
 
 @end
 
@@ -208,13 +208,6 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 {
 	self.value = NULL;
 	self.freezeValue = NULL;
-	
-	[_addressStringValue release];
-	self.addressFormula = nil;
-	self.stringValue = nil;
-	self.name = nil;
-	
-	[super dealloc];
 }
 
 - (NSString *)addressStringValue
@@ -241,7 +234,6 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		}
 	}
 	
-	[_addressStringValue release];
 	_addressStringValue = [[NSString stringWithFormat:@"0x%llX", self.address] copy];
 }
 
@@ -328,9 +320,9 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				break;
 			case ZGUTF8String:
 				self.stringValue =
-					[[[NSString alloc]
+					[[NSString alloc]
 					 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)(self.size - 1)]
-					 encoding:NSUTF8StringEncoding] autorelease];
+					 encoding:NSUTF8StringEncoding];
 				
 				// UTF8 string encoding can fail sometimes on some invalid-ish strings
 				if (!_stringValue)
@@ -339,8 +331,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 						[[NSString alloc]
 						 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)(self.size - 1)]
 						 encoding:NSASCIIStringEncoding];
+					
 					self.stringValue = newStringValue;
-					[newStringValue release];
 				}
 				
 				if (!_stringValue)
@@ -356,7 +348,6 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 					 encoding:NSUTF16LittleEndianStringEncoding];
 				
 				self.stringValue = newStringValue;
-				[newStringValue release];
 				
 				if (!_stringValue)
 				{

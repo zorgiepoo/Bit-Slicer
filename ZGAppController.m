@@ -28,8 +28,8 @@
 
 @interface ZGAppController ()
 
-@property (readwrite, retain, nonatomic) ZGPreferencesController *preferencesController;
-@property (readwrite, retain, nonatomic) ZGMemoryViewer *memoryViewer;
+@property (readwrite, strong, nonatomic) ZGPreferencesController *preferencesController;
+@property (readwrite, strong, nonatomic) ZGMemoryViewer *memoryViewer;
 
 @end
 
@@ -227,13 +227,11 @@ static BOOL didRegisteredHotKey;
 			{
 				NSLog(@"Cannot find latest version of Bit Slicer");
 			}
-			
-			[latestVersionDictionary release];
 		};
 		
 		dispatch_block_t queryLatestVersionBlock = ^
 		{
-			latestVersionDictionary = [[NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:BIT_SLICER_VERSION_FILE]] retain];
+			latestVersionDictionary = [NSDictionary dictionaryWithContentsOfURL:[NSURL URLWithString:BIT_SLICER_VERSION_FILE]];
 			dispatch_async(dispatch_get_main_queue(), compareVersionsBlock);
 		};
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), queryLatestVersionBlock);
@@ -286,7 +284,7 @@ static BOOL didRegisteredHotKey;
 {
 	if (!self.preferencesController)
 	{
-		self.preferencesController = [[[ZGPreferencesController alloc] init] autorelease];
+		self.preferencesController = [[ZGPreferencesController alloc] init];
 	}
 	
 	if (shouldShowWindow)
@@ -304,7 +302,7 @@ static BOOL didRegisteredHotKey;
 {
 	if (!self.memoryViewer)
 	{
-		self.memoryViewer = [[[ZGMemoryViewer alloc] init] autorelease];
+		self.memoryViewer = [[ZGMemoryViewer alloc] init];
 	}
 	
 	if (shouldShowWindow)

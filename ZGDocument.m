@@ -67,7 +67,7 @@
 @property (readwrite, copy, nonatomic) NSString *beginningAddress;
 @property (readwrite, copy, nonatomic) NSString *endingAddress;
 @property (readwrite, copy, nonatomic) NSString *searchValue;
-@property (readwrite, retain, nonatomic) NSArray *watchVariablesArray;
+@property (readwrite, strong, nonatomic) NSArray *watchVariablesArray;
 
 @end
 
@@ -77,7 +77,7 @@
 @interface ZGDocument ()
 
 @property (readwrite) ZGVariableType currentSearchDataType;
-@property (readwrite, retain) ZGDocumentInfo *documentState;
+@property (readwrite, strong) ZGDocumentInfo *documentState;
 
 @property (strong) IBOutlet ZGMemoryDumpController *memoryDumpController;
 @property (assign) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
@@ -127,20 +127,11 @@
 	 removeObserver:self
 	 forKeyPath:@"runningApplications"];
 	
+	NSLog(@"doc dealloc");
+	
 	[self.searchController cleanUp];
-	self.searchController = nil;
-	
 	[self.tableController cleanUp];
-	self.tableController = nil;
-	
 	[self.memoryDumpController cleanUp];
-	self.memoryDumpController = nil;
-	
-	self.watchVariablesArray = nil;
-	self.currentProcess = nil;
-	self.desiredProcessName = nil;
-	
-	[super dealloc];
 }
 
 - (NSString *)windowNibName
@@ -333,12 +324,8 @@
 	self.desiredProcessName = self.currentProcess.name;
 	
 	[keyedArchiver finishEncoding];
-	[keyedArchiver release];
-
-	NSFileWrapper *fileWrapper = [[NSFileWrapper alloc] initRegularFileWithContents:writeData];
-	[writeData release];
 	
-	return [fileWrapper autorelease];
+	return [[NSFileWrapper alloc] initRegularFileWithContents:writeData];
 }
 
 - (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError **)outError
@@ -346,7 +333,7 @@
 	NSData *readData = [fileWrapper regularFileContents];
 	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
 	
-	[self setDocumentState:[[[ZGDocumentInfo alloc] init] autorelease]];
+	[self setDocumentState:[[ZGDocumentInfo alloc] init]];
 	
 	self.documentState.watchVariablesArray = [keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey];
 	self.desiredProcessName = [keyedUnarchiver decodeObjectForKey:ZGProcessNameKey];
@@ -367,8 +354,6 @@
 	self.searchController.searchData.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
 	self.searchController.searchData.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];
 	self.searchController.searchData.lastBelowRangeValue = [keyedUnarchiver decodeObjectForKey:ZGBelowValueKey];
-	
-	[keyedUnarchiver release];
 	
 	BOOL success = self.documentState.watchVariablesArray != nil && self.desiredProcessName != nil;
 	
@@ -432,8 +417,6 @@
 				 attributes:@{NSForegroundColorAttributeName : [NSColor redColor]}];
 			
 			self.generalStatusTextField.attributedStringValue = errorMessage;
-			
-			[errorMessage release];
 		}
 		else
 		{
@@ -458,8 +441,6 @@
 	{
 		[self.runningApplicationsPopUpButton removeItemAtIndex:[self.runningApplicationsPopUpButton indexOfItem:item]];
 	}
-	
-	[itemsToRemove release];
 	
 	// If we're switching to a process, search button should be enabled if it's alive
 	if (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER)
@@ -487,12 +468,10 @@
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
 		menuItem.title = [NSString stringWithFormat:@"%@ (none)", deadProcess.name];
 		menuItem.representedObject = deadProcess;
-		[deadProcess release];
 		
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		
 		[self.runningApplicationsPopUpButton selectItem:menuItem];
-		[menuItem release];
 		
 		[self runningApplicationsPopUpButtonRequest:nil];
 		[self removeRunningApplicationFromPopupButton:nil];
@@ -525,8 +504,6 @@
 		{
 			[self.runningApplicationsPopUpButton removeItemAtIndex:[self.runningApplicationsPopUpButton indexOfItem:menuItem]];
 		}
-		
-		[menuItemsToRemove release];
 	}
 	
 	// Just to be sure
@@ -543,8 +520,6 @@
 			
 			self.generalStatusTextField.attributedStringValue = status;
 			
-			[status release];
-			
 			self.searchButton.enabled = NO;
 			self.currentProcess.processID = NON_EXISTENT_PID_NUMBER;
 			self.runningApplicationsPopUpButton.selectedItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.name];
@@ -556,7 +531,6 @@
 				regularAppIcon.size = NSMakeSize(16, 16);
 				self.runningApplicationsPopUpButton.selectedItem.image = regularAppIcon;
 			}
-			[regularAppIcon release];
 		}
 		else if (oldRunningApplication.processIdentifier != -1)
 		{
@@ -599,7 +573,6 @@
 				NSImage *iconImage = [[newRunningApplication icon] copy];
 				iconImage.size = NSMakeSize(16, 16);
 				menuItem.image = iconImage;
-				[iconImage release];
 				
 				[self runningApplicationsPopUpButtonRequest:nil];
 				self.searchButton.enabled = YES;
@@ -614,7 +587,6 @@
 		NSImage *iconImage = [[newRunningApplication icon] copy];
 		iconImage.size = NSMakeSize(16, 16);
 		menuItem.image = iconImage;
-		[iconImage release];
 		
 		ZGProcess *representedProcess =
 			[[ZGProcess alloc]
@@ -623,7 +595,6 @@
 			 set64Bit:(newRunningApplication.executableArchitecture == NSBundleExecutableArchitectureX86_64)];
 		
 		menuItem.representedObject = representedProcess;
-		[representedProcess release];
 		
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		
@@ -634,8 +605,6 @@
 			[self.runningApplicationsPopUpButton selectItem:menuItem];
 			[self runningApplicationsPopUpButtonRequest:nil];
 		}
-		
-		[menuItem release];
 	}
 }
 

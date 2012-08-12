@@ -39,13 +39,13 @@
 
 @interface ZGMemoryViewer ()
 
-@property (readwrite, retain) NSTimer *checkMemoryTimer;
+@property (readwrite, strong) NSTimer *checkMemoryTimer;
 
-@property (readwrite, retain) ZGStatusBarRepresenter *statusBarRepresenter;
-@property (readwrite, retain) ZGLineCountingRepresenter *lineCountingRepresenter;
+@property (readwrite, strong) ZGStatusBarRepresenter *statusBarRepresenter;
+@property (readwrite, strong) ZGLineCountingRepresenter *lineCountingRepresenter;
 
-@property ZGMemoryAddress currentMemoryAddress;
-@property ZGMemorySize currentMemorySize;
+@property (readwrite) ZGMemoryAddress currentMemoryAddress;
+@property (readwrite) ZGMemorySize currentMemorySize;
 
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSTextField *addressTextField;
@@ -69,9 +69,6 @@
 
 - (void)setCurrentProcess:(ZGProcess *)newProcess
 {
-	[newProcess retain];
-	[_currentProcess release];
-	
 	_currentProcess = newProcess;
 	if (_currentProcess && ![_currentProcess hasGrantedAccess])
 	{
@@ -189,17 +186,15 @@
 		[self.textView.layoutRepresenter removeRepresenter:representer];
 	}
 	
-	[representersToRemove release];
-	
 	// Add custom status bar
-	self.statusBarRepresenter = [[[ZGStatusBarRepresenter alloc] init] autorelease];
+	self.statusBarRepresenter = [[ZGStatusBarRepresenter alloc] init];
 	self.statusBarRepresenter.statusMode = HFStatusModeHexadecimal;
 	
 	[self.textView.controller addRepresenter:self.statusBarRepresenter];
 	[[self.textView layoutRepresenter] addRepresenter:self.statusBarRepresenter];
 	
 	// Add custom line counter
-	self.lineCountingRepresenter = [[[ZGLineCountingRepresenter alloc] init] autorelease];
+	self.lineCountingRepresenter = [[ZGLineCountingRepresenter alloc] init];
 	self.lineCountingRepresenter.minimumDigitCount = DEFAULT_MINIMUM_LINE_DIGIT_COUNT;
 	self.lineCountingRepresenter.lineNumberFormat = HFLineNumberFormatHexadecimal;
 	
@@ -211,8 +206,6 @@
 	
 	[self.textView.controller addRepresenter:verticalScrollerRepresenter];
 	[self.textView.layoutRepresenter addRepresenter:verticalScrollerRepresenter];
-	
-	[verticalScrollerRepresenter release];
 }
 
 - (IBAction)showWindow:(id)sender
@@ -251,9 +244,9 @@
 {
 	self.currentMemoryAddress = 0;
 	self.currentMemorySize = 0;
-	[self.lineCountingRepresenter setBeginningMemoryAddress:0];
-	[self.statusBarRepresenter setBeginningMemoryAddress:0];
-	[self.textView setData:[NSData data]];
+	self.lineCountingRepresenter.beginningMemoryAddress = 0;
+	self.statusBarRepresenter.beginningMemoryAddress = 0;
+	self.textView.data = NSData.data;
 }
 
 - (void)updateRunningApplicationProcesses:(NSString *)desiredProcessName
@@ -277,14 +270,14 @@
 				 initWithName:runningApplication.localizedName
 				 processID:runningApplication.processIdentifier
 				 set64Bit:(runningApplication.executableArchitecture == NSBundleExecutableArchitectureX86_64)];
+			
 			menuItem.representedObject = representedProcess;
-			[representedProcess release];
 			
 			[[self.runningApplicationsPopUpButton menu] addItem:menuItem];
 			
 			if (!firstRegularApplicationMenuItem && runningApplication.activationPolicy == NSApplicationActivationPolicyRegular)
 			{
-				firstRegularApplicationMenuItem = [menuItem retain];
+				firstRegularApplicationMenuItem = menuItem;
 			}
 			
 			if (self.currentProcess.processID == runningApplication.processIdentifier || [desiredProcessName isEqualToString:runningApplication.localizedName])
@@ -292,8 +285,6 @@
 				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 				foundTargettedProcess = YES;
 			}
-			
-			[menuItem release];
 		}
 	}
 	
@@ -309,11 +300,6 @@
 		}
 		
 		[self clearData];
-	}
-	
-	if (firstRegularApplicationMenuItem)
-	{
-		[firstRegularApplicationMenuItem release];
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
@@ -430,8 +416,6 @@
 				
 				[newByteArray insertByteSlice:byteSlice inRange:HFRangeMake((ZGMemoryAddress)(displayedLineRange.location * self.textView.controller.bytesPerLine), readSize)];
 				[self.textView.controller replaceByteArray:newByteArray];
-				
-				[byteSlice release];
 				
 				ZGFreeBytes(self.currentProcess.processTask, bytes, readSize);
 			}

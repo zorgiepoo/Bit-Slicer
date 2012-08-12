@@ -27,8 +27,8 @@
 
 @interface ZGAppController : NSObject
 
-@property (readonly, retain, nonatomic) ZGPreferencesController *preferencesController;
-@property (readonly, retain, nonatomic) ZGMemoryViewer *memoryViewer;
+@property (readonly, strong, nonatomic) ZGPreferencesController *preferencesController;
+@property (readonly, strong, nonatomic) ZGMemoryViewer *memoryViewer;
 // lastSelectedProcessName keeps track of the last targeted process in a document
 @property (readwrite, copy, nonatomic) NSString *lastSelectedProcessName;
 

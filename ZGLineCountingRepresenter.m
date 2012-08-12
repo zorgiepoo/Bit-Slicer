@@ -47,14 +47,4 @@
 {
 }
 
-- (void)setBeginningMemoryAddress:(ZGMemoryAddress)newBeginningMemoryAddress
-{
-	_beginningMemoryAddress = newBeginningMemoryAddress;
-}
-
-- (ZGMemoryAddress)beginningMemoryAddress
-{
-	return _beginningMemoryAddress;
-}
-
 @end

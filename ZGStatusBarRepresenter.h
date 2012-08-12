@@ -23,11 +23,9 @@
 #import "ZGMemoryTypes.h"
 
 @interface ZGStatusBarRepresenter : HFStatusBarRepresenter
-{
-	ZGMemoryAddress _beginningMemoryAddress;
-}
 
-- (void)setBeginningMemoryAddress:(ZGMemoryAddress)newBeginningMemoryAddress;
+@property (readwrite) ZGMemoryAddress beginningMemoryAddress;
+
 // expose this private method
 - (void)updateString;
 
