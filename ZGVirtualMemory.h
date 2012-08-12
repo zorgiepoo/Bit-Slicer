@@ -30,28 +30,35 @@
 @class ZGSearchData;
 @class ZGProcess;
 
-typedef void (^search_for_data_t)(void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber);
+typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber);
 
 BOOL ZGIsProcessValid(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
+
 int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask);
+
 BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size);
 void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size);
 BOOL ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
+
 BOOL ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection);
 BOOL ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection);
+
 void ZGFreeData(NSArray *dataArray);
 NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues);
 void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySize dataSize);
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process);
+
 void ZGInitializeSearch(ZGSearchData *searchData);
 void ZGCancelSearch(ZGSearchData *searchData);
 BOOL ZGSearchIsCancelling(ZGSearchData *searchData);
 void ZGCancelSearchImmediately(ZGSearchData *searchData);
 BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData);
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
+
 void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block);
 void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData *searchData, search_for_data_t block);
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType);
+
 BOOL ZGPauseProcess(pid_t process);
 BOOL ZGUnpauseProcess(pid_t process);

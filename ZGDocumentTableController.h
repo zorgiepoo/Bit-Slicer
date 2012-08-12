@@ -25,7 +25,7 @@
 @interface ZGDocumentTableController : NSObject <NSTableViewDelegate>
 
 @property (assign) IBOutlet NSTableView *watchVariablesTableView;
-@property (readwrite) BOOL shouldIgnoreTableViewSelectionChange;
+@property (readwrite, nonatomic) BOOL shouldIgnoreTableViewSelectionChange;
 
 - (void)cleanUp;
 

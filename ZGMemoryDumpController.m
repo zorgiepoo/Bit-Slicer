@@ -34,7 +34,7 @@
 @property (assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;
 @property (assign) IBOutlet NSTextField *memoryDumpToAddressTextField;
 
-@property (readwrite, retain) NSTimer *progressTimer;
+@property (readwrite, retain, nonatomic) NSTimer *progressTimer;
 
 @end
 
@@ -157,7 +157,7 @@
 
 - (void)updateMemoryDumpProgress:(NSTimer *)timer
 {
-	if ([self.document.searchController canStartTask])
+	if (self.document.searchController.canStartTask)
 	{
 		[self.document.searchController prepareTask];
 	}

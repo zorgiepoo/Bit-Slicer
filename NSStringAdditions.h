@@ -20,7 +20,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 @interface NSString (NSStringAdditions)
 
 - (unsigned int)unsignedIntValue;

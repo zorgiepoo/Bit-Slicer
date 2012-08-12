@@ -30,7 +30,7 @@
 @interface ZGDocumentTableController ()
 
 @property (assign) IBOutlet ZGDocument *document;
-@property (readwrite, retain) NSTimer *watchVariablesTimer;
+@property (readwrite, retain, nonatomic) NSTimer *watchVariablesTimer;
 
 @end
 

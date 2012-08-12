@@ -22,25 +22,27 @@
 	void *_compareOffset;
 	CollatorRef _collator; // For comparing unicode strings
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
+	
+	BOOL _shouldCancelSearch;
 }
 
 @property (readwrite, nonatomic) void *rangeValue;
-@property (readwrite, copy) NSString *lastEpsilonValue;
-@property (readwrite, copy) NSString *lastAboveRangeValue;
-@property (readwrite, copy) NSString *lastBelowRangeValue;
+@property (readwrite, copy, nonatomic) NSString *lastEpsilonValue;
+@property (readwrite, copy, nonatomic) NSString *lastAboveRangeValue;
+@property (readwrite, copy, nonatomic) NSString *lastBelowRangeValue;
 @property (readwrite, nonatomic, retain) NSArray *savedData;
-@property (readwrite, retain) NSArray *tempSavedData;
-@property (readwrite) BOOL shouldCompareStoredValues;
-@property (readwrite) double epsilon;
-@property (readwrite) BOOL shouldIgnoreStringCase;
-@property (readwrite) BOOL shouldIncludeNullTerminator;
-@property (readwrite) ZGMemoryAddress beginAddress;
-@property (readwrite) ZGMemoryAddress endAddress;
-@property (readwrite) BOOL shouldScanUnwritableValues;
-@property (readwrite, assign) void *compareOffset;
+@property (readwrite, retain, nonatomic) NSArray *tempSavedData;
+@property (readwrite, nonatomic) BOOL shouldCompareStoredValues;
+@property (readwrite, nonatomic) double epsilon;
+@property (readwrite, nonatomic) BOOL shouldIgnoreStringCase;
+@property (readwrite, nonatomic) BOOL shouldIncludeNullTerminator;
+@property (readwrite, nonatomic) ZGMemoryAddress beginAddress;
+@property (readwrite, nonatomic) ZGMemoryAddress endAddress;
+@property (readwrite, nonatomic) BOOL shouldScanUnwritableValues;
+@property (readwrite, assign, nonatomic) void *compareOffset;
 @property (readwrite, nonatomic) unsigned char *byteArrayFlags;
 
-@property (readwrite) BOOL shouldCancelSearch;
-@property (readwrite) BOOL searchDidCancel;
+@property (readwrite, nonatomic) BOOL shouldCancelSearch;
+@property (readwrite, nonatomic) BOOL searchDidCancel;
 
 @end

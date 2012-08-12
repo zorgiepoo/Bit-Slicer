@@ -19,9 +19,9 @@
 
 @interface ZGDocumentSearchController ()
 
-@property (retain, nonatomic, readwrite) NSTimer *userInterfaceTimer;
 @property (assign) IBOutlet ZGDocument *document;
-@property (readwrite, retain) ZGSearchData *searchData;
+@property (retain, nonatomic, readwrite) NSTimer *userInterfaceTimer;
+@property (readwrite, retain, nonatomic) ZGSearchData *searchData;
 
 @end
 
@@ -343,6 +343,8 @@
 		self.searchData.shouldIncludeNullTerminator = self.document.includeNullTerminatorCheckBox.state;
 		self.searchData.shouldCompareStoredValues = self.document.isFunctionTypeStore;
 		
+		self.searchData.shouldScanUnwritableValues = (self.document.scanUnwritableValuesCheckBox.state == NSOnState);
+		
 		NSString *evaluatedSearchExpression = nil;
 		NSString *inputErrorMessage = nil;
 		
@@ -376,6 +378,11 @@
 			free(searchValue);
 			searchValue = NULL;
 		}
+		
+		ZGMemorySize dataAlignment =
+			(self.document.ignoreDataAlignmentCheckBox.state == NSOnState)
+			? sizeof(int8_t)
+			: ZGDataAlignment(self.document.currentProcess.is64Bit, dataType, dataSize);
 		
 		BOOL flagsFieldIsBlank = [[self.document.flagsTextField.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] isEqualToString:@""];
 		
@@ -449,7 +456,7 @@
 		NSString *calculatedBeginAddress = [ZGCalculator evaluateExpression:self.document.beginningAddressTextField.stringValue];
 		NSString *calculatedEndAddress = [ZGCalculator evaluateExpression:self.document.endingAddressTextField.stringValue];
 		
-		if (![[self.document.beginningAddressTextField stringValue] isEqualToString:@""])
+		if (![self.document.beginningAddressTextField.stringValue isEqualToString:@""])
 		{
 			if ([self testSearchComponent:calculatedBeginAddress])
 			{
@@ -513,17 +520,17 @@
         
 		if (dataType == ZGByteArray)
 		{
-			[self.searchData setByteArrayFlags:allocateFlagsForByteArrayWildcards(evaluatedSearchExpression)];
+			self.searchData.byteArrayFlags = allocateFlagsForByteArrayWildcards(evaluatedSearchExpression);
 		}
 		
 		if (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
 		{
-			[self.searchData setCompareOffset:searchValue];
+			self.searchData.compareOffset = searchValue;
 		}
 		
 		if (!goingToNarrowDownSearches)
 		{
-			int numberOfRegions = [self.document.currentProcess numberOfRegions];
+			int numberOfRegions = self.document.currentProcess.numberOfRegions;
 			
 			self.document.searchingProgressIndicator.maxValue = numberOfRegions;
 			self.document.currentProcess.numberOfVariablesFound = 0;
@@ -535,15 +542,12 @@
 				[[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState
 				? ZGSigned
 				: ZGUnsigned;
-			ZGMemorySize pointerSize =
-				self.document.currentProcess.is64Bit
-				? sizeof(int64_t)
-				: sizeof(int32_t);
+			ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
 			
 			ZGProcess *currentProcess = self.document.currentProcess;
-			search_for_data_t searchForDataCallback = ^(void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
+			search_for_data_t searchForDataCallback = ^(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
 			{
-				if (compareFunction(self.searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
+				if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
 				{
 					ZGVariable *newVariable =
 						[[ZGVariable alloc]
@@ -557,10 +561,10 @@
 					[temporaryVariablesArray addObject:newVariable];
 					[newVariable release];
 					
-					currentProcess.numberOfVariablesFound++;
+					currentProcess->_numberOfVariablesFound++;
 				}
 				
-				currentProcess.searchProgress = currentRegionNumber;
+				currentProcess->_searchProgress = currentRegionNumber;
 			};
 			
 			dispatch_block_t searchForDataCompleteBlock = ^
@@ -577,18 +581,12 @@
 			};
 			dispatch_block_t searchForDataBlock = ^
 			{
-				ZGMemorySize dataAlignment =
-					(self.document.ignoreDataAlignmentCheckBox.state == NSOnState)
-					? sizeof(int8_t)
-					: ZGDataAlignment(self.document.currentProcess.is64Bit, dataType, dataSize);
-				
 				if (self.searchData.shouldCompareStoredValues)
 				{
 					ZGSearchForSavedData(currentProcess.processTask, dataAlignment, dataSize, self.searchData, searchForDataCallback);
 				}
 				else
 				{
-					self.searchData.shouldScanUnwritableValues = (self.document.scanUnwritableValuesCheckBox.state == NSOnState);
 					ZGSearchForData(currentProcess.processTask, dataAlignment, dataSize, self.searchData, searchForDataCallback);
 				}
 				dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
@@ -621,7 +619,7 @@
 			ZGProcess *currentProcess = self.document.currentProcess;
 			dispatch_block_t searchBlock = ^
 			{
-				for (ZGVariable *variable in self.self.document.watchVariablesArray)
+				for (ZGVariable *variable in _document.watchVariablesArray)
 				{
 					if (variable.shouldBeSearched)
 					{
@@ -633,7 +631,7 @@
 							void *variableValue = NULL;
 							if (ZGReadBytes(processTask, variable.address, &variableValue, &outputSize))
 							{
-								void *compareValue = self.searchData.shouldCompareStoredValues ? ZGSavedValue(variable.address, self.searchData, dataSize) : searchValue;
+								void *compareValue = _searchData.shouldCompareStoredValues ? ZGSavedValue(variable.address, self.searchData, dataSize) : searchValue;
 								
 								if (compareValue && compareFunction(self.searchData, variableValue, compareValue, dataType, dataSize))
 								{

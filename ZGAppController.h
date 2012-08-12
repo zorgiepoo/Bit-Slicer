@@ -20,24 +20,17 @@
 
 #import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
-@class ZGDocumentController;
 @class ZGPreferencesController;
 @class ZGMemoryViewer;
 
 #define BIT_SLICER_VERSION_FILE @"https://dl.dropbox.com/u/10108199/bit_slicer/bit_slicer_version.plist"
 
 @interface ZGAppController : NSObject
-{
-	ZGDocumentController *_documentController;
-	ZGMemoryViewer *_memoryViewer;
-	ZGPreferencesController *_preferencesController;
-}
 
-@property (assign) IBOutlet id documentController;
-@property (readonly) id preferencesController;
-@property (readonly) id memoryViewer;
+@property (readonly, retain, nonatomic) ZGPreferencesController *preferencesController;
+@property (readonly, retain, nonatomic) ZGMemoryViewer *memoryViewer;
 // lastSelectedProcessName keeps track of the last targeted process in a document
-@property (readwrite, copy) NSString *lastSelectedProcessName;
+@property (readwrite, copy, nonatomic) NSString *lastSelectedProcessName;
 
 + (id)sharedController;
 

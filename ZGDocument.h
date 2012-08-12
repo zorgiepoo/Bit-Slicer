@@ -28,12 +28,6 @@
 #define NON_EXISTENT_PID_NUMBER -1
 
 @interface ZGDocument : NSDocument
-{
-	IBOutlet NSTextField *_searchValueLabel;
-	IBOutlet NSTextField *_flagsLabel;
-	IBOutlet NSButton *_optionsDisclosureButton;
-	IBOutlet NSView *_optionsView;
-}
 
 @property (assign) IBOutlet NSWindow *watchWindow;
 @property (assign) IBOutlet NSProgressIndicator *searchingProgressIndicator;
@@ -59,9 +53,9 @@
 @property (strong) IBOutlet ZGVariableController *variableController;
 @property (strong) IBOutlet ZGDocumentSearchController *searchController;
 
-@property (readwrite, retain) NSArray *watchVariablesArray;
-@property (readwrite, retain) ZGProcess *currentProcess;
-@property (readwrite, copy) NSString *desiredProcessName;
+@property (readwrite, retain, nonatomic) NSArray *watchVariablesArray;
+@property (readwrite, retain, nonatomic) ZGProcess *currentProcess;
+@property (readwrite, copy, nonatomic) NSString *desiredProcessName;
 
 - (IBAction)editVariablesAddress:(id)sender;
 

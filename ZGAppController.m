@@ -26,11 +26,16 @@
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 
+@interface ZGAppController ()
+
+@property (readwrite, retain, nonatomic) ZGPreferencesController *preferencesController;
+@property (readwrite, retain, nonatomic) ZGMemoryViewer *memoryViewer;
+
+@end
+
 @implementation ZGAppController
 
 #pragma mark Singleton & Accessors
-
-static ZGAppController *sharedInstance = nil;
 
 + (BOOL)isRunningLaterThanLion
 {
@@ -50,6 +55,7 @@ static ZGAppController *sharedInstance = nil;
 	return (majorVersion == 10 && minorVersion >= 7) || majorVersion > 10;
 }
 
+static id sharedInstance;
 + (id)sharedController
 {
 	return sharedInstance;
@@ -104,11 +110,11 @@ int acquireTaskportRight(void)
 
 OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef theEvent, void *userData)
 {
-	for (NSRunningApplication *runningApplication in [NSWorkspace sharedWorkspace].runningApplications)
+	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
 	{
 		if (runningApplication.isActive && runningApplication.processIdentifier != getpid())
 		{
-			[ZGProcess pauseOrUnpauseProcess:[runningApplication processIdentifier]];
+			[ZGProcess pauseOrUnpauseProcess:runningApplication.processIdentifier];
 		}
 	}
 	
@@ -116,7 +122,7 @@ OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef th
 }
 
 static EventHotKeyRef hotKeyRef;
-static BOOL didRegisteredHotKey = NO;
+static BOOL didRegisteredHotKey;
 + (void)registerPauseAndUnpauseHotKey
 {
 	if (didRegisteredHotKey)
@@ -150,7 +156,7 @@ static BOOL didRegisteredHotKey = NO;
 	// Make sure that we unfreeze all processes that we may have frozen
 	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
 	{
-		if ([[ZGProcess frozenProcesses] containsObject:@(runningApplication.processIdentifier)])
+		if ([ZGProcess.frozenProcesses containsObject:@(runningApplication.processIdentifier)])
 		{
 			[ZGProcess pauseOrUnpauseProcess:runningApplication.processIdentifier];
 		}
@@ -280,7 +286,7 @@ static BOOL didRegisteredHotKey = NO;
 {
 	if (!self.preferencesController)
 	{
-		_preferencesController = [[ZGPreferencesController alloc] init];
+		self.preferencesController = [[[ZGPreferencesController alloc] init] autorelease];
 	}
 	
 	if (shouldShowWindow)
@@ -298,7 +304,7 @@ static BOOL didRegisteredHotKey = NO;
 {
 	if (!self.memoryViewer)
 	{
-		_memoryViewer = [[ZGMemoryViewer alloc] init];
+		self.memoryViewer = [[[ZGMemoryViewer alloc] init] autorelease];
 	}
 	
 	if (shouldShowWindow)
@@ -329,7 +335,7 @@ static BOOL didRegisteredHotKey = NO;
 {
 	if (menuItem.action == @selector(jumpToMemoryAddress:))
 	{
-		if (!self.memoryViewer || ![self.memoryViewer canJumpToAddress])
+		if (!self.memoryViewer || !self.memoryViewer.canJumpToAddress)
 		{
 			return NO;
 		}

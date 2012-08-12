@@ -24,10 +24,10 @@
 
 @interface ZGRegion : NSObject
 
-@property (assign) ZGMemoryMap processTask;
-@property (assign) ZGMemoryAddress address;
-@property (assign) ZGMemorySize size;
-@property (assign) void *bytes;
+@property (assign, nonatomic) ZGMemoryMap processTask;
+@property (assign, nonatomic) ZGMemoryAddress address;
+@property (assign, nonatomic) ZGMemorySize size;
+@property (assign, nonatomic) void *bytes;
 
 @end
 
@@ -358,16 +358,16 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 				if (dataBeginAddress <= region.address + offset &&
 					dataEndAddress >= region.address + offset + dataSize)
 				{
-					block(&currentData[offset], region.bytes + offset, region.address + offset, currentRegionNumber);
+					block(searchData, &currentData[offset], region.bytes + offset, region.address + offset, currentRegionNumber);
 				}
 				offset += dataAlignment;
 			}
-			while (offset + dataSize <= size && !searchData.shouldCancelSearch);
+			while (offset + dataSize <= size && !searchData->_shouldCancelSearch);
 			
 			ZGFreeBytes(processTask, currentData, size);
 		}
 		
-		if (searchData.shouldCancelSearch)
+		if (searchData->_shouldCancelSearch)
 		{
 			searchData.searchDidCancel = YES;
 			return;
@@ -404,12 +404,12 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
 			{
 				ZGMemorySize dataIndex = 0;
-				while (dataIndex + dataSize <= size && !searchData.shouldCancelSearch)
+				while (dataIndex + dataSize <= size && !searchData->_shouldCancelSearch)
 				{
 					if (dataBeginAddress <= address + dataIndex &&
 						dataEndAddress >= address + dataIndex + dataSize)
 					{
-						block(&bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
+						block(searchData, &bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
 					}
 					dataIndex += dataAlignment;
 				}
@@ -418,7 +418,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 			}
 		}
 		
-		if (searchData.shouldCancelSearch)
+		if (searchData->_shouldCancelSearch)
 		{
 			searchData.searchDidCancel = YES;
 			return;

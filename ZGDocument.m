@@ -56,18 +56,18 @@
 
 @interface ZGDocumentInfo : NSObject
 
-@property (readwrite) BOOL loadedFromSave;
-@property (readwrite) NSInteger selectedDatatypeTag;
-@property (readwrite) NSInteger qualifierTag;
-@property (readwrite) NSInteger functionTypeTag;
-@property (readwrite) BOOL scanUnwritableValues;
-@property (readwrite) BOOL ignoreDataAlignment;
-@property (readwrite) BOOL exactStringLength;
-@property (readwrite) BOOL ignoreStringCase;
-@property (readwrite, copy) NSString *beginningAddress;
-@property (readwrite, copy) NSString *endingAddress;
-@property (readwrite, copy) NSString *searchValue;
-@property (readwrite, retain) NSArray *watchVariablesArray;
+@property (readwrite, nonatomic) BOOL loadedFromSave;
+@property (readwrite, nonatomic) NSInteger selectedDatatypeTag;
+@property (readwrite, nonatomic) NSInteger qualifierTag;
+@property (readwrite, nonatomic) NSInteger functionTypeTag;
+@property (readwrite, nonatomic) BOOL scanUnwritableValues;
+@property (readwrite, nonatomic) BOOL ignoreDataAlignment;
+@property (readwrite, nonatomic) BOOL exactStringLength;
+@property (readwrite, nonatomic) BOOL ignoreStringCase;
+@property (readwrite, copy, nonatomic) NSString *beginningAddress;
+@property (readwrite, copy, nonatomic) NSString *endingAddress;
+@property (readwrite, copy, nonatomic) NSString *searchValue;
+@property (readwrite, retain, nonatomic) NSArray *watchVariablesArray;
 
 @end
 
@@ -81,6 +81,11 @@
 
 @property (strong) IBOutlet ZGMemoryDumpController *memoryDumpController;
 @property (assign) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
+
+@property (assign) IBOutlet NSTextField *searchValueLabel;
+@property (assign) IBOutlet NSTextField *flagsLabel;
+@property (assign) IBOutlet NSButton *optionsDisclosureButton;
+@property (assign) IBOutlet NSView *optionsView;
 
 @end
 
@@ -212,7 +217,7 @@
 	else
 	{
 		[self setWatchVariablesArrayAndUpdateInterface:[NSArray array]];
-		_flagsLabel.textColor = [NSColor disabledControlTextColor];
+		self.flagsLabel.textColor = [NSColor disabledControlTextColor];
 	}
 }
 
@@ -702,7 +707,7 @@
 	
 	if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored)
 	{
-		_flagsLabel.stringValue = @"Below:";
+		self.flagsLabel.stringValue = @"Below:";
 		
 		if (self.searchController.searchData.lastBelowRangeValue)
 		{
@@ -715,7 +720,7 @@
 	}
 	else if (functionType == ZGLessThan || functionType == ZGLessThanStored)
 	{
-		_flagsLabel.stringValue = @"Above:";
+		self.flagsLabel.stringValue = @"Above:";
 		
 		if (self.searchController.searchData.lastAboveRangeValue)
 		{
@@ -737,18 +742,18 @@
 	{
 		self.flagsTextField.enabled = NO;
 		self.flagsTextField.stringValue = @"";
-		_flagsLabel.stringValue = @"Flags:";
-		_flagsLabel.textColor = NSColor.disabledControlTextColor;
+		self.flagsLabel.stringValue = @"Flags:";
+		self.flagsLabel.textColor = NSColor.disabledControlTextColor;
 	}
 	else if (dataType == ZGFloat || dataType == ZGDouble)
 	{
 		self.flagsTextField.enabled = YES;
-		_flagsLabel.textColor = NSColor.controlTextColor;
+		self.flagsLabel.textColor = NSColor.controlTextColor;
 		
 		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
 		{
 			// epsilon
-			_flagsLabel.stringValue = @"Epsilon:";
+			self.flagsLabel.stringValue = @"Epsilon:";
 			if (self.searchController.searchData.lastEpsilonValue)
 			{
 				self.flagsTextField.stringValue = self.searchController.searchData.lastEpsilonValue;
@@ -770,8 +775,8 @@
 		{
 			self.flagsTextField.enabled = NO;
 			self.flagsTextField.stringValue = @"";
-			_flagsLabel.stringValue = @"Flags:";
-			_flagsLabel.textColor = NSColor.disabledControlTextColor;
+			self.flagsLabel.stringValue = @"Flags:";
+			self.flagsLabel.textColor = NSColor.disabledControlTextColor;
 		}
 		else
 		{
@@ -779,7 +784,7 @@
 			[self updateFlagsRangeTextField];
 			
 			self.flagsTextField.enabled = YES;
-			_flagsLabel.textColor = NSColor.controlTextColor;
+			self.flagsLabel.textColor = NSColor.controlTextColor;
 		}
 	}
 }
@@ -807,21 +812,21 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	// This occurs when sender is nil (when we call it in code), or when
 	// it's called by another action (eg: the "Options" label button)
-	if (sender != _optionsDisclosureButton)
+	if (sender != self.optionsDisclosureButton)
 	{
-		_optionsDisclosureButton.state = (_optionsDisclosureButton.state == NSOnState ? NSOffState : NSOnState);
+		self.optionsDisclosureButton.state = (self.optionsDisclosureButton.state == NSOnState ? NSOffState : NSOnState);
 	}
 	
-	switch (_optionsDisclosureButton.state)
+	switch (self.optionsDisclosureButton.state)
 	{
 		case NSOnState:
 			// Check if we need to resize based on the relative position between the functionPopUpButton and the optionsView
 			// If so, this means that the functionPopUpButton's y origin > optionsView y origin
-			if (_optionsView.frame.origin.y < self.functionPopUpButton.frame.origin.y + self.functionPopUpButton.frame.size.height + 6)
+			if (self.optionsView.frame.origin.y < self.functionPopUpButton.frame.origin.y + self.functionPopUpButton.frame.size.height + 6)
 			{
 				// Resize the window to its the minimum size when the disclosure triangle is expanded
-				windowFrame.size.height += (self.functionPopUpButton.frame.origin.y + self.functionPopUpButton.frame.size.height + 6) - _optionsView.frame.origin.y;
-				windowFrame.origin.y -= (self.functionPopUpButton.frame.origin.y + self.functionPopUpButton.frame.size.height + 6) - _optionsView.frame.origin.y;
+				windowFrame.size.height += (self.functionPopUpButton.frame.origin.y + self.functionPopUpButton.frame.size.height + 6) - self.optionsView.frame.origin.y;
+				windowFrame.origin.y -= (self.functionPopUpButton.frame.origin.y + self.functionPopUpButton.frame.size.height + 6) - self.optionsView.frame.origin.y;
 				
 				[self.watchWindow
 				 setFrame:windowFrame
@@ -829,18 +834,18 @@ static NSSize *expandedWindowMinSize = nil;
 				 animate:YES];
 			}
 			
-			_optionsView.hidden = NO;
+			self.optionsView.hidden = NO;
 			
 			self.watchWindow.minSize = *expandedWindowMinSize;
 			break;
 		case NSOffState:
-			_optionsView.hidden = YES;
+			self.optionsView.hidden = YES;
 			
 			// Only resize when the window is at the minimum size
 			if (windowFrame.size.height == [self.watchWindow minSize].height)
 			{
-				windowFrame.size.height -= _optionsView.frame.size.height + 6;
-				windowFrame.origin.y += _optionsView.frame.size.height + 6;
+				windowFrame.size.height -= self.optionsView.frame.size.height + 6;
+				windowFrame.origin.y += self.optionsView.frame.size.height + 6;
 				
 				[self.watchWindow
 				 setFrame:windowFrame
@@ -849,7 +854,7 @@ static NSSize *expandedWindowMinSize = nil;
 			}
 			
 			NSSize minSize = *expandedWindowMinSize;
-			minSize.height -= _optionsView.frame.size.height + 6;
+			minSize.height -= self.optionsView.frame.size.height + 6;
 			self.watchWindow.minSize = minSize;
 			break;
 		default:
@@ -857,13 +862,13 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 	
 	[NSUserDefaults.standardUserDefaults
-	 setBool:_optionsDisclosureButton.state
+	 setBool:self.optionsDisclosureButton.state
 	 forKey:ZG_EXPAND_OPTIONS];
 }
 
 - (void)watchWindowWillExitFullScreen:(NSNotificationCenter *)notification
 {
-	_optionsView.hidden = YES;
+	self.optionsView.hidden = YES;
 }
 
 - (void)watchWindowDidExitFullScreen:(NSNotification *)notification
@@ -872,12 +877,12 @@ static NSSize *expandedWindowMinSize = nil;
 	{
 		if (self.watchWindow.frame.size.height < expandedWindowMinSize->height)
 		{
-			_optionsDisclosureButton.state = NSOffState;
+			self.optionsDisclosureButton.state = NSOffState;
 			[self optionsDisclosureButton:nil];
 		}
 		else
 		{
-			_optionsView.hidden = NO;
+			self.optionsView.hidden = NO;
 		}
 	}
 }
@@ -982,12 +987,12 @@ static NSSize *expandedWindowMinSize = nil;
 	if (![self doesFunctionTypeAllowSearchInput])
 	{
 		self.searchValueTextField.enabled = NO;
-		_searchValueLabel.textColor = NSColor.disabledControlTextColor;
+		self.searchValueLabel.textColor = NSColor.disabledControlTextColor;
 	}
 	else
 	{
 		self.searchValueTextField.enabled = YES;
-		_searchValueLabel.textColor = NSColor.controlTextColor;
+		self.searchValueLabel.textColor = NSColor.controlTextColor;
 		[self.watchWindow makeFirstResponder:self.searchValueTextField];
 	}
 
@@ -1023,7 +1028,7 @@ static NSSize *expandedWindowMinSize = nil;
 	if ([self doesFunctionTypeAllowSearchInput])
 	{
 		self.searchValueTextField.enabled = YES;
-		_searchValueLabel.textColor = [NSColor controlTextColor];
+		self.searchValueLabel.textColor = [NSColor controlTextColor];
 	}
 	
 	[self updateClearButton];

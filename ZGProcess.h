@@ -23,16 +23,22 @@
 #import <sys/sysctl.h>
 
 @interface ZGProcess : NSObject
+{
+@public
+	// for fast access
+	ZGMemorySize _searchProgress;
+	int _numberOfVariablesFound;
+}
 
-@property (readwrite) pid_t processID;
+@property (readwrite, nonatomic) pid_t processID;
 @property (readwrite, nonatomic) ZGMemoryMap processTask;
-@property (readwrite, copy) NSString *name;
-@property (readonly) int numberOfRegions;
-@property (readwrite) BOOL is64Bit;
-@property (readwrite) ZGMemorySize searchProgress;
-@property (readwrite) int numberOfVariablesFound;
-@property (readwrite) BOOL isDoingMemoryDump;
-@property (readwrite) BOOL isStoringAllData;
+@property (readwrite, copy, nonatomic) NSString *name;
+@property (readonly, nonatomic) int numberOfRegions;
+@property (readwrite, nonatomic) BOOL is64Bit;
+@property (readwrite, nonatomic) ZGMemorySize searchProgress;
+@property (readwrite, nonatomic) int numberOfVariablesFound;
+@property (readwrite, nonatomic) BOOL isDoingMemoryDump;
+@property (readwrite, nonatomic) BOOL isStoringAllData;
 
 + (NSArray *)frozenProcesses;
 + (void)addFrozenProcess:(pid_t)pid;
