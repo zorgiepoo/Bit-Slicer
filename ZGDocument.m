@@ -102,7 +102,7 @@
 
 + (void)initialize
 {
-	[NSUserDefaults.standardUserDefaults registerDefaults:@{ZG_EXPAND_OPTIONS : @NO}];
+	[NSUserDefaults.standardUserDefaults registerDefaults:@{ZG_EXPAND_OPTIONS : @(NO)}];
 }
 
 - (id)init
