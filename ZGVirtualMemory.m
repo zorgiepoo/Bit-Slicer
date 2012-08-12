@@ -342,18 +342,20 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 		ZGMemoryAddress offset = 0;
 		char *currentData = NULL;
 		ZGMemorySize size = region.size;
+		ZGMemoryAddress regionAddress = region.address;
+		void *regionBytes = region.bytes;
 		
 		// Skipping an entire region will provide significant performance benefits
-		if (region.address < dataEndAddress &&
-			region.address + size > dataBeginAddress &&
-			ZGReadBytes(processTask, region.address, (void **)&currentData, &size))
+		if (regionAddress < dataEndAddress &&
+			regionAddress + size > dataBeginAddress &&
+			ZGReadBytes(processTask, regionAddress, (void **)&currentData, &size))
 		{
 			do
 			{
-				if (dataBeginAddress <= region.address + offset &&
-					dataEndAddress >= region.address + offset + dataSize)
+				if (dataBeginAddress <= regionAddress + offset &&
+					dataEndAddress >= regionAddress + offset + dataSize)
 				{
-					block(searchData, &currentData[offset], region.bytes + offset, region.address + offset, currentRegionNumber);
+					block(searchData, &currentData[offset], regionBytes + offset, regionAddress + offset, currentRegionNumber);
 				}
 				offset += dataAlignment;
 			}
