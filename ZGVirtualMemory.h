@@ -32,7 +32,7 @@
 
 typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber);
 
-BOOL ZGIsProcessValid(pid_t process, ZGMemoryMap *task);
+BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
 
 int ZGNumberOfRegionsForProcess(ZGMemoryMap processTask);

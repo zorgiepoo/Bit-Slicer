@@ -34,7 +34,7 @@
 @implementation ZGRegion
 @end
 
-BOOL ZGIsProcessValid(pid_t process, ZGMemoryMap *task)
+BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 {
 	*task = MACH_PORT_NULL;
 	BOOL success = task_for_pid(current_task(), process, task) == KERN_SUCCESS;

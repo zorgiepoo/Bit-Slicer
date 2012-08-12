@@ -114,7 +114,7 @@ static NSArray *frozenProcesses = nil;
 - (BOOL)grantUsAccess
 {
 	ZGMemoryMap newProcessTask = MACH_PORT_NULL;
-	BOOL success = ZGIsProcessValid(self.processID, &newProcessTask);
+	BOOL success = ZGGetTaskForProcess(self.processID, &newProcessTask);
 	if (success)
 	{
 		self.processTask = newProcessTask;
