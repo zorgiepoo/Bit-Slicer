@@ -22,8 +22,6 @@
 	void *_compareOffset;
 	CollatorRef _collator; // For comparing unicode strings
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
-	
-	BOOL _shouldCancelSearch;
 }
 
 @property (readwrite, nonatomic) void *rangeValue;
