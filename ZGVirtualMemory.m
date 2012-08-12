@@ -362,12 +362,12 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 				}
 				offset += dataAlignment;
 			}
-			while (offset + dataSize <= size && !searchData->_shouldCancelSearch);
+			while (offset + dataSize <= size && !searchData.shouldCancelSearch);
 			
 			ZGFreeBytes(processTask, currentData, size);
 		}
 		
-		if (searchData->_shouldCancelSearch)
+		if (searchData.shouldCancelSearch)
 		{
 			searchData.searchDidCancel = YES;
 			return;
@@ -404,7 +404,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
 			{
 				ZGMemorySize dataIndex = 0;
-				while (dataIndex + dataSize <= size && !searchData->_shouldCancelSearch)
+				while (dataIndex + dataSize <= size && !searchData.shouldCancelSearch)
 				{
 					if (dataBeginAddress <= address + dataIndex &&
 						dataEndAddress >= address + dataIndex + dataSize)
@@ -418,7 +418,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 			}
 		}
 		
-		if (searchData->_shouldCancelSearch)
+		if (searchData.shouldCancelSearch)
 		{
 			searchData.searchDidCancel = YES;
 			return;

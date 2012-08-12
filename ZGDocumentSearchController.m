@@ -561,10 +561,10 @@
 					[temporaryVariablesArray addObject:newVariable];
 					[newVariable release];
 					
-					currentProcess->_numberOfVariablesFound++;
+					currentProcess.numberOfVariablesFound++;
 				}
 				
-				currentProcess->_searchProgress = currentRegionNumber;
+				currentProcess.searchProgress = currentRegionNumber;
 			};
 			
 			dispatch_block_t searchForDataCompleteBlock = ^
@@ -617,23 +617,29 @@
 			};
 			
 			ZGProcess *currentProcess = self.document.currentProcess;
+			ZGMemoryAddress beginningAddress = self.searchData.beginAddress;
+			ZGMemoryAddress endingAddress = self.searchData.endAddress;
 			dispatch_block_t searchBlock = ^
 			{
-				for (ZGVariable *variable in _document.watchVariablesArray)
+				for (ZGVariable *variable in self.document.watchVariablesArray)
 				{
 					if (variable.shouldBeSearched)
 					{
+						ZGMemoryAddress variableAddress = variable.address;
+						
 						if (variable.size > 0 && dataSize > 0 &&
-							(self.searchData.beginAddress <= variable.address) &&
-							(self.searchData.endAddress >= variable.address + dataSize))
+							(beginningAddress <= variableAddress) &&
+							(endingAddress >= variableAddress + dataSize))
 						{
 							ZGMemorySize outputSize = dataSize;
 							void *variableValue = NULL;
-							if (ZGReadBytes(processTask, variable.address, &variableValue, &outputSize))
+							if (ZGReadBytes(processTask, variableAddress, &variableValue, &outputSize))
 							{
-								void *compareValue = _searchData.shouldCompareStoredValues ? ZGSavedValue(variable.address, self.searchData, dataSize) : searchValue;
+								ZGSearchData *searchData = self.searchData;
 								
-								if (compareValue && compareFunction(self.searchData, variableValue, compareValue, dataType, dataSize))
+								void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue;
+								
+								if (compareValue && compareFunction(searchData, variableValue, compareValue, dataType, dataSize))
 								{
 									[temporaryVariablesArray addObject:variable];
 									currentProcess.numberOfVariablesFound++;
