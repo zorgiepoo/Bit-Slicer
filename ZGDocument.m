@@ -411,8 +411,8 @@
 		{
 			NSAttributedString *errorMessage =
 				[[NSAttributedString alloc]
-				 initWithString:@"Process Load Error!"
-				 attributes:@{NSForegroundColorAttributeName : [NSColor redColor]}];
+				 initWithString:[NSString stringWithFormat:@"Failed accessing %@", self.currentProcess.name]
+				 attributes:@{NSForegroundColorAttributeName : NSColor.redColor}];
 			
 			self.generalStatusTextField.attributedStringValue = errorMessage;
 		}
