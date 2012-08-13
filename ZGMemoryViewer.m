@@ -256,7 +256,8 @@
 	NSMenuItem *firstRegularApplicationMenuItem = nil;
 	
 	BOOL foundTargettedProcess = NO;
-	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
+	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
+	for (NSRunningApplication *runningApplication in  [NSWorkspace.sharedWorkspace.runningApplications sortedArrayUsingDescriptors:@[sortDescriptor]])
 	{
 		if (runningApplication.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
 		{
