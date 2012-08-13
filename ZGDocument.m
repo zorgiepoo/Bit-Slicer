@@ -449,8 +449,9 @@
 
 - (void)addApplicationsToPopupButton
 {
-	// Add running applications to popup button
-	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
+	// Add running applications to popup button ; we want activiation policy for NSApplicationActivationPolicyRegular to appear first, since they're more likely to be targetted and more likely to have sufficient privillages for accessing virtual memory
+	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
+	for (NSRunningApplication *runningApplication in [NSWorkspace.sharedWorkspace.runningApplications sortedArrayUsingDescriptors:@[sortDescriptor]])
 	{
 		[self addRunningApplicationToPopupButton:runningApplication];
 	}
@@ -458,10 +459,10 @@
 	if (self.desiredProcessName && ![self.currentProcess.name isEqualToString:self.desiredProcessName])
 	{
 		ZGProcess *deadProcess =
-		[[ZGProcess alloc]
-		 initWithName:[self desiredProcessName]
-		 processID:NON_EXISTENT_PID_NUMBER
-		 set64Bit:YES];
+			[[ZGProcess alloc]
+			 initWithName:[self desiredProcessName]
+			 processID:NON_EXISTENT_PID_NUMBER
+			 set64Bit:YES];
 		
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
 		menuItem.title = [NSString stringWithFormat:@"%@ (none)", deadProcess.name];
