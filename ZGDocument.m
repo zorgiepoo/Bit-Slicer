@@ -144,9 +144,21 @@
 
 - (void)loadDocumentUserInterface
 {
-	if (!self.desiredProcessName)
+	// don't use the last selected process name if the corresponding process isn't alive
+	NSString *lastSelectedProcessName = [[ZGAppController sharedController] lastSelectedProcessName];
+	if (!self.desiredProcessName && lastSelectedProcessName)
 	{
-		self.desiredProcessName = [[ZGAppController sharedController] lastSelectedProcessName];
+		BOOL foundApplication = 
+			([NSWorkspace.sharedWorkspace.runningApplications
+			  indexOfObjectPassingTest:^BOOL (id object, NSUInteger index, BOOL *stop)
+			  {
+				  return [[object localizedName] isEqualToString:lastSelectedProcessName];
+			  }] != NSNotFound);
+		
+		if (foundApplication)
+		{
+			self.desiredProcessName = lastSelectedProcessName;
+		}
 	}
     
 	// check if the document is being reverted
@@ -440,11 +452,8 @@
 		[self.runningApplicationsPopUpButton removeItemAtIndex:[self.runningApplicationsPopUpButton indexOfItem:item]];
 	}
 	
-	// If we're switching to a process, search button should be enabled if it's alive
-	if (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER)
-	{
-		self.searchButton.enabled =YES;
-	}
+	// If we're switching to a process, search button should be enabled if it's alive and if we have access to it
+	self.searchButton.enabled = (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.currentProcess.hasGrantedAccess);
 }
 
 - (void)addApplicationsToPopupButton
@@ -460,7 +469,7 @@
 	{
 		ZGProcess *deadProcess =
 			[[ZGProcess alloc]
-			 initWithName:[self desiredProcessName]
+			 initWithName:self.desiredProcessName
 			 processID:NON_EXISTENT_PID_NUMBER
 			 set64Bit:YES];
 		
@@ -474,6 +483,10 @@
 		
 		[self runningApplicationsPopUpButtonRequest:nil];
 		[self removeRunningApplicationFromPopupButton:nil];
+	}
+	else
+	{
+		[self runningApplicationsPopUpButtonRequest:nil];
 	}
 }
 
