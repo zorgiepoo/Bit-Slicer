@@ -60,14 +60,14 @@ BOOL ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize si
 
 void ZGFreeData(NSArray *dataArray);
 NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues);
-void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySize dataSize);
+void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataSize);
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process);
 
 void ZGInitializeSearch(ZGSearchData *searchData);
 void ZGCancelSearch(ZGSearchData *searchData);
 BOOL ZGSearchIsCancelling(ZGSearchData *searchData);
 void ZGCancelSearchImmediately(ZGSearchData *searchData);
-BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData);
+BOOL ZGSearchDidCancel(ZGSearchData * __unsafe_unretained searchData);
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
 // Avoid using the autoreleasepool in the callback for these search functions, otherwise memory usage may grow

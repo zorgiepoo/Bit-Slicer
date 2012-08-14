@@ -311,7 +311,7 @@
 	}
 	
 	self.document.currentProcess.searchProgress = 0;
-	if (ZGSearchDidCancelSearch(self.searchData))
+	if (ZGSearchDidCancel(self.searchData))
 	{
 		self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress;
 		self.document.generalStatusTextField.stringValue = @"Canceled search.";
@@ -636,6 +636,8 @@
 			ZGProcess *currentProcess = self.document.currentProcess;
 			ZGMemoryAddress beginningAddress = self.searchData.beginAddress;
 			ZGMemoryAddress endingAddress = self.searchData.endAddress;
+			
+			__block ZGSearchData *searchData = self.searchData;
 			dispatch_block_t searchBlock = ^
 			{
 				for (ZGVariable *variable in self.document.watchVariablesArray)
@@ -652,8 +654,6 @@
 							void *variableValue = NULL;
 							if (ZGReadBytes(processTask, variableAddress, &variableValue, &outputSize))
 							{
-								ZGSearchData *searchData = self.searchData;
-								
 								void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue;
 								
 								if (compareValue && compareFunction(searchData, variableValue, compareValue, dataType, dataSize))
@@ -667,7 +667,7 @@
 						}
 					}
 					
-					if (ZGSearchDidCancelSearch(self.searchData))
+					if (ZGSearchDidCancel(searchData))
 					{
 						break;
 					}

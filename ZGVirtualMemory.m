@@ -135,24 +135,6 @@ BOOL ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize si
 	return (mach_vm_protect(processTask, address, size, FALSE, protection) == KERN_SUCCESS);
 }
 
-// helper function for ZGSaveAllDataToDirectory
-void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
-{
-	if (currentData)
-	{
-		ZGMemoryAddress endAddress = currentStartingAddress + [currentData length];
-		(*fileNumber)++;
-		[currentData
-		 writeToFile:[directory stringByAppendingPathComponent:[NSString stringWithFormat:@"(%d) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
-		 atomically:NO];
-		
-		if (mergedFile)
-		{
-			fwrite(currentData.bytes, currentData.length, 1, mergedFile);
-		}
-	}
-}
-
 void ZGFreeData(NSArray *dataArray)
 {
 	for (ZGRegion *memoryRegion in dataArray)
@@ -206,20 +188,39 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 	return dataArray;
 }
 
-void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData *searchData, ZGMemorySize dataSize)
+void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataSize)
 {
 	void *value = NULL;
 	
 	for (ZGRegion *region in searchData.savedData)
 	{
-		if (address >= region.address && address + dataSize <= region.address + region.size)
+		ZGMemoryAddress regionAddress = region.address;
+		if (address >= regionAddress && address + dataSize <= regionAddress + region.size)
 		{
-			value = region.bytes + (address - region.address);
+			value = region.bytes + (address - regionAddress);
 			break;
 		}
 	}
 	
 	return value;
+}
+
+// helper function for ZGSaveAllDataToDirectory
+static void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
+{
+	if (currentData)
+	{
+		ZGMemoryAddress endAddress = currentStartingAddress + [currentData length];
+		(*fileNumber)++;
+		[currentData
+		 writeToFile:[directory stringByAppendingPathComponent:[[NSString alloc] initWithFormat:@"(%d) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
+		 atomically:NO];
+		
+		if (mergedFile)
+		{
+			fwrite(currentData.bytes, currentData.length, 1, mergedFile);
+		}
+	}
 }
 
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
@@ -316,9 +317,9 @@ BOOL ZGSearchIsCancelling(ZGSearchData *searchData)
 	return searchData.shouldCancelSearch;
 }
 
-BOOL ZGSearchDidCancelSearch(ZGSearchData *searchData)
+BOOL ZGSearchDidCancel(ZGSearchData * __unsafe_unretained searchData)
 {
-	return searchData.searchDidCancel;
+	return searchData->_searchDidCancel;
 }
 
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)

@@ -50,6 +50,7 @@
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
 	
 	BOOL _shouldCancelSearch;
+	BOOL _searchDidCancel;
 }
 
 @property (readwrite, nonatomic) void *rangeValue;
