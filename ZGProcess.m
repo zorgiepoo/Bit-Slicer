@@ -120,7 +120,7 @@ static NSArray *frozenProcesses = nil;
 	_processTask = newProcessTask;
 }
 
-- (int)numberOfRegions
+- (NSUInteger)numberOfRegions
 {
 	return ZGNumberOfRegionsForProcessTask(self.processTask);
 }

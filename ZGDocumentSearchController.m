@@ -550,7 +550,7 @@
 		
 		if (!goingToNarrowDownSearches)
 		{
-			int numberOfRegions = self.document.currentProcess.numberOfRegions;
+			NSUInteger numberOfRegions = self.document.currentProcess.numberOfRegions;
 			
 			self.document.searchingProgressIndicator.maxValue = numberOfRegions;
 			self.document.currentProcess.numberOfVariablesFound = 0;

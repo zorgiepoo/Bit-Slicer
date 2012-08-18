@@ -36,15 +36,6 @@
 #import "ZGProcess.h"
 #import "ZGSearchData.h"
 
-@interface ZGRegion : NSObject
-
-@property (assign, nonatomic) ZGMemoryMap processTask;
-@property (assign, nonatomic) ZGMemoryAddress address;
-@property (assign, nonatomic) ZGMemorySize size;
-@property (assign, nonatomic) void *bytes;
-
-@end
-
 @implementation ZGRegion
 @end
 
@@ -68,9 +59,10 @@ void ZGFreeTask(ZGMemoryMap task)
 	}
 }
 
-int ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
+NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
 {
-	int numberOfRegions = 0;
+	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	
 	ZGMemoryAddress address = 0x0;
 	ZGMemorySize size;
 	vm_region_basic_info_data_64_t info;
@@ -79,11 +71,22 @@ int ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
 	
 	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &infoCount, &objectName) == KERN_SUCCESS)
 	{
-		numberOfRegions++;
+		ZGRegion *region = [[ZGRegion alloc] init];
+		region.address = address;
+		region.size = size;
+		region.protection = info.protection;
+		
+		[regions addObject:region];
+		
 		address += size;
 	}
 	
-	return numberOfRegions;
+	return [NSArray arrayWithArray:regions];
+}
+
+NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
+{	
+	return [ZGRegionsForProcessTask(processTask) count];
 }
 
 // ZGReadBytes allocates memory, the caller is responsible for deallocating it using ZGFreeBytes(...)

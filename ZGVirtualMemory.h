@@ -41,6 +41,16 @@
 #import <mach/mach_vm.h>
 #import <mach/mach.h>
 
+@interface ZGRegion : NSObject
+
+@property (assign, nonatomic) ZGMemoryMap processTask;
+@property (assign, nonatomic) ZGMemoryAddress address;
+@property (assign, nonatomic) ZGMemorySize size;
+@property (assign, nonatomic) ZGMemoryProtection protection;
+@property (assign, nonatomic) void *bytes;
+
+@end
+
 @class ZGSearchData;
 @class ZGProcess;
 
@@ -49,7 +59,8 @@ typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, 
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
 
-int ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
+NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
+NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
 
 BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size);
 void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size);
