@@ -46,7 +46,4 @@
 
 - (ZGMemoryAddress)selectedAddress;
 
-- (void)jumpToMemoryAddressRequest;
-- (BOOL)canJumpToAddress;
-
 @end

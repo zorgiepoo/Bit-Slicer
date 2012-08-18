@@ -2,6 +2,7 @@
 //  HFLayoutRepresenter.h
 //  HexFiend_2
 //
+//  Created by Peter Ammon on 12/10/07.
 //  Copyright 2007 ridiculous_fish. All rights reserved.
 //
 
@@ -41,6 +42,7 @@
 @interface HFLayoutRepresenter : HFRepresenter {
     NSMutableArray *representers;
     BOOL maximizesBytesPerLine;
+    
 }
 
 /*! @name Managed representers
@@ -73,12 +75,6 @@
 //@{
 /*! Returns the smallest width that produces the same layout (and, if maximizes bytesPerLine, the same bytes per line) as the proposed width. */
 - (CGFloat)minimumViewWidthForLayoutInProposedWidth:(CGFloat)proposedWidth;
-
-/*! Returns the maximum bytes per line that can fit in the proposed width (ignoring maximizesBytesPerLine).  This is always a multiple of the bytesPerColumn, and always at least bytesPerColumn. */
-- (NSUInteger)maximumBytesPerLineForLayoutInProposedWidth:(CGFloat)proposedWidth;
-
-/*! Returns the smallest width that can support the given bytes per line. */
-- (CGFloat)minimumViewWidthForBytesPerLine:(NSUInteger)bytesPerLine;
 
 /*! Relayouts are triggered when representers are added and removed, or when the view is resized.  You may call this explicitly to trigger a relayout. */
 - (void)performLayout;

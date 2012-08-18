@@ -37,7 +37,6 @@
 
 @interface ZGCalculator : NSObject
 
-+ (void)initializeCalculator;
 + (NSString *)evaluateExpression:(NSString *)expression;
 + (NSString *)evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process;
 

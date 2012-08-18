@@ -42,7 +42,7 @@
 
 @implementation ZGCalculator
 
-+ (void)initializeCalculator
++ (void)initialize
 {
 	ruby_init();
 	ruby_init_loadpath();

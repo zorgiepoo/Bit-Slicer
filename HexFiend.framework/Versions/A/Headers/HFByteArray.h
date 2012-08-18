@@ -2,12 +2,13 @@
 //  HFByteArray.h
 //  HexFiend_2
 //
+//  Created by Peter Ammon on 11/4/07.
 //  Copyright 2007 ridiculous_fish. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
 
-@class HFByteSlice, HFProgressTracker, HFFileReference, HFByteRangeAttributeArray;
+@class HFByteSlice, HFProgressTracker, HFFileReference;
 
 /*! @class HFByteArray
 @brief The principal Model class for HexFiend's MVC architecture.
@@ -31,8 +32,6 @@ enum
     HFASCIIDataStringType
 };
 typedef NSUInteger HFByteArrayDataStringType;
-
-@class HFByteRangeAttributeArray;
 
 @interface HFByteArray : NSObject <NSCopying, NSMutableCopying> {
 @private
@@ -60,9 +59,6 @@ typedef NSUInteger HFByteArrayDataStringType;
 
 /*! Returns an NSEnumerator representing the byte slices of the receiver.  This is implemented as enumerating over the result of -byteSlices, but subclasses can override this to be more efficient. */
 - (NSEnumerator *)byteSliceEnumerator;
-
-/*! Returns the byte slice containing the byte at the given index, and the actual offset of this slice. */
-- (HFByteSlice *)sliceContainingByteAtIndex:(unsigned long long)offset beginningOffset:(unsigned long long *)actualOffset;
 //@}
 
 /*! @name Modifying the byte array
@@ -78,7 +74,7 @@ typedef NSUInteger HFByteArrayDataStringType;
 /*! Delete bytes in the given range.  This is implemented on the base class by creating an empty byte array and inserting it in the range to be deleted, via <tt>insertByteSlice:inRange:</tt>. */
 - (void)deleteBytesInRange:(HFRange)range;
 
-/*! Returns a new HFByteArray containing the given range.  This is an abstract method that concrete subclasses must override. */
+/*! Returns a new HFByteArray containing the given range.  This is an abstract class that concrete subclasses must override. */
 - (HFByteArray *)subarrayWithRange:(HFRange)range;
 //@}
 
@@ -131,7 +127,7 @@ typedef NSUInteger HFByteArrayDataStringType;
     @brief HFByteArray methods for writing to files, and preparing other HFByteArrays for potentially destructive file writes.
 */
 @interface HFByteArray (HFFileWriting)
-/*! Attempts to write the receiver to a file.  This is a concrete method on HFByteArray.
+/* Attempts to write the receiver to a file.  This is a concrete method on HFByteArray.
    @param targetURL A URL to the file to be written to.  It is OK for the receiver to contain one or more instances of HFByteSlice that are sourced from the file.
    @param progressTracker An HFProgressTracker to allow progress reporting and cancelleation for the write operation.
    @param error An out NSError parameter.
@@ -148,23 +144,8 @@ typedef NSUInteger HFByteArrayDataStringType;
 /*! Attempts to modify the receiver so that it no longer depends on any of the HFRanges in the array within the given file.  It is not necessary to perform this operation on the byte array that is being written to the file.
    @param ranges An array of HFRangeWrappers, representing ranges in the given file that the receiver should no longer depend on.
    @param reference The HFFileReference that the receiver should no longer depend on.
-   @param hint A dictionary that can be used to improve the efficiency of the operation, by allowing multiple byte arrays to share the same state.  If you plan to call this method on multiple byte arrays, pass the first one an empty NSMutableDictionary, and pass the same dictionary to subsequent calls.
    @return A YES return indicates the operation was successful, and the receiver no longer contains byte slices that source data from any of the ranges of the given file (or never did).  A NO return indicates that breaking the dependencies would require too much memory, and so the receiver still depends on some of those ranges.
 */
-- (BOOL)clearDependenciesOnRanges:(NSArray *)ranges inFile:(HFFileReference *)reference hint:(NSMutableDictionary *)hint;
-
-@end
-
-
-/*! @category HFByteArray(HFAttributes)
-    @brief HFByteArray methods for attributes of byte arrays.
-*/
-@interface HFByteArray (HFAttributes)
-
-/*! Returns a byte range attribute array for the bytes in the given range. */
-- (HFByteRangeAttributeArray *)attributesForBytesInRange:(HFRange)range;
-
-/*! Returns the HFByteArray level byte range attribute array. Default is to return nil. */
-- (HFByteRangeAttributeArray *)byteRangeAttributeArray;
+- (BOOL)clearDependenciesOnRanges:(NSArray *)ranges inFile:(HFFileReference *)reference;
 
 @end

@@ -2,6 +2,7 @@
 //  HFController.h
 //  HexFiend_2
 //
+//  Created by Peter Ammon on 11/3/07.
 //  Copyright 2007 ridiculous_fish. All rights reserved.
 //
 
@@ -13,7 +14,7 @@
     @abstract The HFController.h header contains the HFController class, which is a central class in Hex Fiend. 
 */
 
-@class HFRepresenter, HFByteArray, HFFileReference, HFControllerCoalescedUndo, HFByteRangeAttributeArray;
+@class HFRepresenter, HFByteArray, HFControllerCoalescedUndo;
 
 /*! @enum HFControllerPropertyBits
     The HFControllerPropertyBits bitmask is used to inform the HFRepresenters of a change in the current state that they may need to react to.  A bitmask of the changed properties is passed to representerChangedProperties:.  It is common for multiple properties to be included in such a bitmask.        
@@ -31,10 +32,7 @@ enum
     HFControllerFont = 1 << 8,			/*!< Indicates that the font property has changed. */
     HFControllerAntialias = 1 << 9,		/*!< Indicates that the shouldAntialias property has changed. */
     HFControllerLineHeight = 1 << 10,		/*!< Indicates that the lineHeight property has changed. */
-    HFControllerViewSizeRatios = 1 << 11,	/*!< Indicates that the optimum size for each view may have changed; used by HFLayoutController after font changes. */
-    HFControllerByteRangeAttributes = 1 << 12,  /*!< Indicates that some attributes of the ByteArray has changed within the document.  There is no indication as to what the change is. */
-    HFControllerByteGranularity = 1 << 13,       /*!< Indicates that the byte granularity has changed.  For example, when moving from ASCII to UTF-16, the byte granularity increases from 1 to 2. */
-    HFControllerBookmarks = 1 << 14       /*!< Indicates that a bookmark has been added or removed. */
+    HFControllerViewSizeRatios = 1 << 11	/*!< Indicates that the optimum size for each view may have changed; used by HFLayoutController after font changes. */
 };
 typedef NSUInteger HFControllerPropertyBits;
 
@@ -68,7 +66,6 @@ The HFControllerMovementGranularity enum is used to specify the granularity of t
 enum
 {
     HFControllerMovementByte, /*!< Move by individual bytes */
-    HFControllerMovementColumn, /*!< Move by a column */
     HFControllerMovementLine, /*!< Move by lines */
     HFControllerMovementPage, /*!< Move by pages */
     HFControllerMovementDocument /*!< Move by the whole document */
@@ -106,11 +103,11 @@ You create an HFController via <tt>[[HFController alloc] init]</tt>.  After that
     HFControllerPropertyBits propertiesToUpdateInCurrentTransaction;
     
     NSUndoManager *undoManager;
-    NSMutableSet *undoOperations;
-    HFControllerCoalescedUndo *undoCoalescer;
     
     unsigned long long selectionAnchor;
     HFRange selectionAnchorRange;
+    
+    HFControllerCoalescedUndo *undoCoalescer;
     
     CFAbsoluteTime pulseSelectionStartTime, pulseSelectionCurrentTime;
     NSTimer *pulseSelectionTimer;
@@ -272,9 +269,6 @@ You create an HFController via <tt>[[HFController alloc] init]</tt>.  After that
 /*! Modify the displayedLineRange as little as possible so that as much of the given range as can fit is visible. */
 - (void)maximizeVisibilityOfContentsRange:(HFRange)range;
 
-/*! Modify the displayedLineRange as to center the given contents range.  If the range is near the bottom or top, this will center as close as possible.  If contents range is too large to fit, it centers the top of the range.  contentsRange may be empty. */
-- (void)centerContentsRange:(HFRange)range;
-
 //@}
 
 /*! @name Font
@@ -399,32 +393,14 @@ You create an HFController via <tt>[[HFController alloc] init]</tt>.  After that
 /*! Copies data within the given HFRange into an in-memory buffer.  This is equivalent to [[controller byteArray] copyBytes:bytes range:range]. */
 - (void)copyBytes:(unsigned char *)bytes range:(HFRange)range;
 
-/*! Convenience method that returns the attributes of the underlying byte array.  You can message it directly to add and remove attributes.  If you do so, be sure to call representer:changedProperties: with the HFControllerByteRangeAttributes bit */
-- (HFByteRangeAttributeArray *)byteRangeAttributeArray;
-
-/*! Returns the attributes for the given range.  This is a union of the receiver's byteRangeAttributeArray properties and the properties returned by the byte array itself.  range.length must be <= NSUIntegerMax. */
-- (HFByteRangeAttributeArray *)attributesForBytesInRange:(HFRange)range;
-
-/*! Returns the range for the given bookmark.  If there is no bookmark, returns {ULLONG_MAX, ULLONG_MAX}. */
-- (HFRange)rangeForBookmark:(NSInteger)bookmark;
-
-/*! Sets the range for the given bookmark.  Pass {ULLONG_MAX, ULLONG_MAX} to remove the bookmark. Undoable. */
-- (void)setRange:(HFRange)range forBookmark:(NSInteger)bookmark;
-
-/*! Returns an NSIndexSet of the bookmarks in the given range. */
-- (NSIndexSet *)bookmarksInRange:(HFRange)range;
-
 /*! Returns total number of bytes.  This is equivalent to [[controller byteArray] length]. */
 - (unsigned long long)contentsLength;
 
 /*! @name File writing dependency handling
 */
 //@{
-/*! Attempts to clear all dependencies on the given file (clipboard, undo, etc.) that could not be preserved if the file were written.  Returns YES if we successfully prepared, NO if someone objected.  This works by posting a HFPrepareForChangeInFileNotification.  HFController does not register for this notification: instead the owners of the HFController are expected to register for HFPrepareForChangeInFileNotification and react appropriately.  */
+/*! Attempts to clear all dependencies on the given file (clipboard, undo, etc.) that could not be preserved if the file were written.  Returns YES if we successfully prepared, NO if someone objected. */
 + (BOOL)prepareForChangeInFile:(NSURL *)targetFile fromWritingByteArray:(HFByteArray *)array;
-
-/*! Attempts to break undo stack dependencies for writing the given file.  If it is unable to do so, it will clear the controller's contributions to the stack. Returns YES if it successfully broke the dependencies, and NO if the stack had to be cleared. */
-- (BOOL)clearUndoManagerDependenciesOnRanges:(NSArray *)ranges inFile:(HFFileReference *)reference hint:(NSMutableDictionary *)hint;
 //@}
 
 @end
@@ -450,5 +426,4 @@ extern NSString * const HFPrepareForChangeInFileNotification;
 extern NSString * const HFChangeInFileByteArrayKey; //!< A key in the HFPrepareForChangeInFileNotification specifying the byte array that will be written
 extern NSString * const HFChangeInFileModifiedRangesKey; //!< A key in the HFPrepareForChangeInFileNotification specifying the array of HFRangeWrappers indicating which parts of the file will be modified
 extern NSString * const HFChangeInFileShouldCancelKey; //!< A key in the HFPrepareForChangeInFileNotification specifying an NSValue containing a pointer to a BOOL.  If set to YES, then someone was unable to prepare and the file should not be saved.  It's a good idea to check if this value points to YES; if so your notification handler does not have to do anything.
-extern NSString * const HFChangeInFileHintKey; //!< The hint parameter that you may pass to clearDependenciesOnRanges:inFile:hint:
 //@}

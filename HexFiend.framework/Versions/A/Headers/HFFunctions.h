@@ -13,7 +13,7 @@ static inline HFRange HFRangeMake(unsigned long long loc, unsigned long long len
 }
 
 /*!
-  Returns true if a given location is within a given HFRange.  If the location is at the end of the range (range.location + range.length) this returns NO.
+  Returns true if a given location is within a given HFRange.
 */
 static inline BOOL HFLocationInRange(unsigned long long location, HFRange range) {
     return location >= range.location && location - range.location < range.length;
@@ -74,22 +74,6 @@ static inline NSUInteger HFSumInt(NSUInteger a, NSUInteger b) {
 }
 
 /*!
- Returns a + b as an NSUInteger, saturating at NSUIntegerMax
- */
-static inline NSUInteger HFSumIntSaturate(NSUInteger a, NSUInteger b) {
-    NSUInteger result = a + b;
-    return (result < a) ? NSUIntegerMax : result;
-}
-
-/*!
- Returns a + b as an unsigned long long, saturating at ULLONG_MAX
- */
-static inline unsigned long long HFSumULLSaturate(unsigned long long a, unsigned long long b) {
-    unsigned long long result = a + b;
-    return (result < a) ? ULLONG_MAX : result;
-}
-
-/*!
   Returns a * b as an unsigned long long.  This asserts on overflow, unless NDEBUG is defined.
 */
 static inline unsigned long long HFProductULL(unsigned long long a, unsigned long long b) {
@@ -115,53 +99,11 @@ static inline unsigned long long HFSubtract(unsigned long long a, unsigned long 
 }
 
 /*!
-  Returns the smallest multiple of B that is equal to or larger than A, and asserts on overflow.
+ Returns the smallest multiple of B strictly larger than A.
 */
-static inline unsigned long long HFRoundUpToMultiple(unsigned long long a, unsigned long long b) {
-    // The usual approach of ((a + (b - 1)) / b) * b doesn't handle overflow correctly
-    unsigned long long remainder = a % b;
-    if (remainder == 0) return a;
-    else return HFSum(a, b - remainder);
-}
-
-/*!
- Returns the smallest multiple of B that is equal to or larger than A, and asserts on overflow.
- */
-static inline NSUInteger HFRoundUpToMultipleInt(NSUInteger a, NSUInteger b) {
-    // The usual approach of ((a + (b - 1)) / b) * b doesn't handle overflow correctly
-    NSUInteger remainder = a % b;
-    if (remainder == 0) return a;
-    else return (NSUInteger)HFSum(a, b - remainder);
-}
-
-/*!
- Returns the least common multiple of A and B, and asserts on overflow or if A or B is zero.
- */
-static inline NSUInteger HFLeastCommonMultiple(NSUInteger a, NSUInteger b) {
-    assert(a > 0);
+static inline unsigned long long HFRoundUpToNextMultiple(unsigned long long a, unsigned long long b) {
     assert(b > 0);
-    
-    /* Compute GCD.  It ends up in U. */
-    NSUInteger t, u = a, v = b;
-    while (v > 0) {
-        t = v;
-        v = u % v;
-        u = t;
-    }
-    
-    /* Return the product divided by the GCD, in an overflow safe manner */
-    return HFProductInt(a/u, b);
-}
-
-
-/*!
- Returns the smallest multiple of B strictly larger than A, or ULLONG_MAX if it would overflow
-*/
-static inline unsigned long long HFRoundUpToNextMultipleSaturate(unsigned long long a, unsigned long long b) {
-    assert(b > 0);
-    unsigned long long result = a + (b - a % b);
-    if (result < a) result = ULLONG_MAX; //the saturation...on overflow go to the max
-    return result;
+    return HFSum(a, b - a % b);
 }
 
 /*! Like NSMaxRange, but for an HFRange. */
@@ -172,21 +114,20 @@ static inline unsigned long long HFMaxRange(HFRange a) {
 
 /*! Returns YES if needle is fully contained within haystack.  Equal ranges are always considered to be subranges of each other (even if they are empty).  Furthermore, a zero length needle at the end of haystack is considered a subrange - for example, {6, 0} is a subrange of {3, 3}. */
 static inline BOOL HFRangeIsSubrangeOfRange(HFRange needle, HFRange haystack) {
-    // If needle starts before haystack, or if needle is longer than haystack, it is not a subrange of haystack
+    // handle the case where our needle starts before haystack, or is longer than haystack.  These conditions are important to prevent overflow in future checks.
     if (needle.location < haystack.location || needle.length > haystack.length) return NO;
     
-    // Their difference in lengths determines the maximum difference in their start locations.  We know that these expressions cannot overflow because of the above checks.
-    return haystack.length - needle.length >= needle.location - haystack.location;
-}
-
-/*! Splits a range about a subrange, returning by reference the prefix and suffix (which may have length zero). */
-static inline void HFRangeSplitAboutSubrange(HFRange range, HFRange subrange, HFRange *outPrefix, HFRange *outSuffix) {
-    // Requires it to be a subrange
-    assert(HFRangeIsSubrangeOfRange(subrange, range));
-    outPrefix->location = range.location;
-    outPrefix->length = HFSubtract(subrange.location, range.location);
-    outSuffix->location = HFMaxRange(subrange);
-    outSuffix->length = HFMaxRange(range) - outSuffix->location;
+    // Equal ranges are considered to be subranges.  This is an important check, because two equal ranges of zero length are considered to be subranges.
+    if (HFRangeEqualsRange(needle, haystack)) return YES;
+    
+    // handle the case where needle is a zero-length range at the very end of haystack.  We consider this a subrange - that is, (6, 0) is a subrange of (3, 3)
+    // rearrange the expression needle.location > haystack.location + haystack.length in a way that cannot overflow
+    if (needle.location - haystack.location > haystack.length) return NO;
+    
+    // rearrange expression: (needle.location + needle.length > haystack.location + haystack.length) in a way that cannot produce overflow
+    if (needle.location - haystack.location > haystack.length - needle.length) return NO;
+    
+    return YES;
 }
 
 /*! Returns YES if the given ranges intersect. Two ranges are considered to intersect if they share at least one index in common.  Thus, zero-length ranges do not intersect anything. */
@@ -215,29 +156,18 @@ static inline HFRange HFUnionRange(HFRange a, HFRange b) {
 
 /*! Returns whether a+b > c+d, as if there were no overflow (so ULLONG_MAX + 1 > 10 + 20) */
 static inline BOOL HFSumIsLargerThanSum(unsigned long long a, unsigned long long b, unsigned long long c, unsigned long long d) {
-#if 1
-    // Theory: compare a/2 + b/2 to c/2 + d/2, and if they're equal, compare a%2 + b%2 to c%2 + d%2.  We may get into trouble if a and b are both even and c and d are both odd: e.g. a = 2, b = 2, c = 1, d = 3.  We would compare 1 + 1 vs 0 + 1, and therefore that 2 + 2 > 1 + 3.  To address this, if both remainders are 1, we add this to the sum.  We know this cannot overflow because ULLONG_MAX is odd, so (ULLONG_MAX/2) + (ULLONG_MAX/2) + 1 does not overflow.
-    unsigned int rem1 = (unsigned)(a%2 + b%2);
-    unsigned int rem2 = (unsigned)(c%2 + d%2);
-    unsigned long long sum1 = a/2 + b/2 + rem1/2;
-    unsigned long long sum2 = c/2 + d/2 + rem2/2;
+    //theory: compare a/2 + b/2 to c/2 + d/2, and if they're equal, compare a%2 + b%2 to c%2 + d%2
+    unsigned long long sum1 = a/2 + b/2;
+    unsigned long long sum2 = c/2 + d/2;
     if (sum1 > sum2) return YES;
     else if (sum1 < sum2) return NO;
     else {
-        // sum1 == sum2, so compare the remainders.  But we have already added in the remainder / 2, so compare the remainders mod 2.
-        if (rem1%2 > rem2%2) return YES;
+        // sum1 == sum2
+        unsigned int sum3 = (unsigned int)(a%2) + (unsigned int)(b%2);
+        unsigned int sum4 = (unsigned int)(c%2) + (unsigned int)(d%2);
+        if (sum3 > sum4) return YES;
         else return NO;
     }
-#else
-    /* Faster version, but not thoroughly tested yet. */
-    unsigned long long xor1 = a^b;
-    unsigned long long xor2 = c^d;
-    unsigned long long avg1 = (a&b)+(xor1/2);
-    unsigned long long avg2 = (c&d)+(xor2/2);
-    unsigned s1l = avg1 > avg2;
-    unsigned eq = (avg1 == avg2);
-    return s1l | ((xor1 & ~xor2) & eq);
-#endif
 }
 
 /*! Returns the absolute value of a - b. */
@@ -376,11 +306,8 @@ static inline NSUInteger HFCountDigitsBase16(unsigned long long val) {
 /*! Returns YES if the given string encoding is a superset of ASCII. */
 BOOL HFStringEncodingIsSupersetOfASCII(NSStringEncoding encoding);
 
-/*! Returns the "granularity" of an encoding, in bytes.  ASCII is 1, UTF-16 is 2, etc.  Variable width encodings return the smallest (e.g. Shift-JIS returns 1). */
-uint8_t HFStringEncodingCharacterLength(NSStringEncoding encoding);
-
 /*! Converts an unsigned long long to NSUInteger.  The unsigned long long should be no more than ULLONG_MAX. */
-static inline unsigned long ll2l(unsigned long long val) { assert(val <= ULONG_MAX); return (unsigned long)val; }
+static inline unsigned long ll2l(unsigned long long val) { assert(val <= NSUIntegerMax); return (unsigned long)val; }
 
 /*! Returns an unsigned long long, which must be no more than ULLONG_MAX, as an unsigned long. */
 static inline CGFloat ld2f(long double val) {
@@ -407,18 +334,6 @@ static inline NSUInteger HFDivideULRoundingUp(NSUInteger a, NSUInteger b) {
     if (a == 0) return 0;
     else return ((a - 1) / b) + 1;
 }
-
-/*! Draws a shadow. */
-void HFDrawShadow(CGContextRef context, NSRect rect, CGFloat size, NSRectEdge rectEdge, BOOL active, NSRect clip);
-
-/*! Registers a view to have the given notificationSEL invoked (taking the NSNotification object) when the window becomes or loses key.  If appToo is YES, this also registers with NSApplication for Activate and Deactivate methods. */
-void HFRegisterViewForWindowAppearanceChanges(NSView *view, SEL notificationSEL, BOOL appToo);
-
-/*! Unregisters a view to have the given notificationSEL invoked when the window becomes or loses key.  If appToo is YES, this also unregisters with NSApplication. */
-void HFUnregisterViewForWindowAppearanceChanges(NSView *view, BOOL appToo);
-
-/*! Returns a description of the given byte count (e.g. "24 kilobytes") */
-NSString *HFDescribeByteCount(unsigned long long count);
 
 /*! @brief An object wrapper for the HFRange type.
 

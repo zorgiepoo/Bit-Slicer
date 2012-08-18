@@ -38,7 +38,6 @@
 #import "ZGPreferencesController.h"
 #import "ZGMemoryViewer.h"
 #import "ZGProcess.h"
-#import "ZGCalculator.h"
 
 @interface ZGAppController ()
 
@@ -267,7 +266,6 @@ static BOOL didRegisteredHotKey;
 	[self openPreferences:nil showWindow:NO];
     
 	[self.class registerPauseAndUnpauseHotKey];
-	[ZGCalculator initializeCalculator];
 	
 	[self checkForUpdates];
 }
@@ -330,30 +328,10 @@ static BOOL didRegisteredHotKey;
 	[self openMemoryViewer:sender showWindow:YES];
 }
 
-- (IBAction)jumpToMemoryAddress:(id)sender
-{
-	[self.memoryViewer jumpToMemoryAddressRequest];
-}
-
 #define FAQ_URL @"http://portingteam.com/index.php/topic/4454-faq-information/"
 - (IBAction)help:(id)sender
 {	
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:FAQ_URL]];
-}
-
-#pragma mark Menu Item Validation
-
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
-{
-	if (menuItem.action == @selector(jumpToMemoryAddress:))
-	{
-		if (!self.memoryViewer || !self.memoryViewer.canJumpToAddress)
-		{
-			return NO;
-		}
-	}
-	
-	return YES;
 }
 
 @end

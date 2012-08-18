@@ -2,12 +2,13 @@
 //  HFByteSlice.h
 //  HexFiend_2
 //
+//  Created by Peter Ammon on 11/4/07.
 //  Copyright 2007 ridiculous_fish. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
 
-@class HFFileReference, HFByteRangeAttributeArray;
+@class HFFileReference;
 
 /*! @class HFByteSlice
 @brief A class representing a source of data for an HFByteArray.
@@ -40,14 +41,5 @@ The two principal subclasses of HFByteSlice are HFSharedMemoryByteSlice and HFFi
 /*! For a given file reference, returns the range within the file that the receiver is sourced from.  If the receiver is not sourced from this file, returns {ULLONG_MAX, ULLONG_MAX}.  The default implementation returns {ULLONG_MAX, ULLONG_MAX}.  This is used during file saving to to determine how to properly overwrite a given file.
 */
 - (HFRange)sourceRangeForFile:(HFFileReference *)reference;
-
-@end
-
-/*! @category HFByteSlice(HFAttributes)
-    @brief Methods for querying attributes of individual byte slices. */
-@interface HFByteSlice (HFAttributes)
-
-/*!  Returns the attributes for the bytes in the given range. */
-- (HFByteRangeAttributeArray *)attributesForBytesInRange:(HFRange)range;
 
 @end

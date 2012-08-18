@@ -2,6 +2,7 @@
 //  HFFileReference.h
 //  HexFiend_2
 //
+//  Created by Peter Ammon on 1/23/08.
 //  Copyright 2008 ridiculous_fish. All rights reserved.
 //
 
@@ -11,18 +12,14 @@
     @brief A reference to an open file.
     
     HFFileReference encapsulates a reference to an open file.  Multiple instances of HFFileByteSlice may share an HFFileReference, so that the file only needs to be opened once.
- 
-    HFFileReference is an abstract class.  You must instantiate either HFUnprivilegedFileReference or HFPrivilegedFileReference.
     
     All HFFileReferences use non-caching IO (F_NOCACHE is set).
 */
 @interface HFFileReference : NSObject {
-    @protected
     int fileDescriptor;
     dev_t device;
-    unsigned long long inode;
     unsigned long long fileLength;
-    mode_t fileMode;
+    unsigned long long inode;
     BOOL isWritable;
 }
 
@@ -61,21 +58,3 @@
 - (BOOL)isEqual:(id)val;
 
 @end
-
-/*! @class HFUnprivilegedFileReference
- @brief A reference to an open file that can be read (and possibly written) using normal C functions
-*/
-@interface HFUnprivilegedFileReference : HFFileReference
-@end
-
-#ifndef HF_NO_PRIVILEGED_FILE_OPERATIONS
-/*! @class HFPrivilegedFileReference
- @brief A reference to an open file that can be read (and possibly written) using our privileged helper process
- */
-@interface HFPrivilegedFileReference : HFFileReference
-
-/*! Attempts to authenticate, returning an error on failure. */
-+ (BOOL)preflightAuthenticationReturningError:(NSError **)error;
-
-@end
-#endif

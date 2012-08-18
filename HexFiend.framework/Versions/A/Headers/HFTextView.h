@@ -2,6 +2,7 @@
 //  HFTextView.h
 //  HexFiend_2
 //
+//  Created by Peter Ammon on 6/28/09.
 //  Copyright 2009 ridiculous_fish. All rights reserved.
 //
 
@@ -27,18 +28,11 @@
 /*! @name Accessing MVC components
 */
 //@{
-
-/*! Returns the HFController for the receiver.  You may want to access this to add or remove HFRepresenters from the text view at runtime. */
-- (HFController *)controller;
-
-/*! Sets the HFController for the receiver.  An HFTextView comes with its own HFController, but you can use this to replace it. */
-- (void)setController:(HFController *)controller;
-
 /*! Returns the HFLayoutRepresenter for the receiver.  You may want to access this to add or remove HFRepresenters from the text view at runtime. */
 - (HFLayoutRepresenter *)layoutRepresenter;
 
-/*! Sets the HFLayoutRepresenter for the receiver.  An HFTextView comes with its own HFLayoutRepresenter, but you can use this to replace it. */
-- (void)setLayoutRepresenter:(HFLayoutRepresenter *)layoutRepresenter;
+/*! Returns the HFController for the receiver.  You may want to access this to add or remove HFRepresenters from the text view at runtime. */
+- (HFController *)controller;
 
 /*! Returns the HFByteArray for the receiver.  This is equivalent to <tt>[[self controller] byteArray]</tt>. */
 - (HFByteArray *)byteArray;

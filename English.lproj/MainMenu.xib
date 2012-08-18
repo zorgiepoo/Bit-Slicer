@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
-		<int key="IBDocument.SystemTarget">1080</int>
+		<int key="IBDocument.SystemTarget">1070</int>
 		<string key="IBDocument.SystemVersion">12A269</string>
 		<string key="IBDocument.InterfaceBuilderVersion">2549</string>
 		<string key="IBDocument.AppKitVersion">1187</string>
@@ -449,15 +449,6 @@
 									<reference key="NSMenu" ref="741161439"/>
 									<string key="NSTitle">View Memory…</string>
 									<string key="NSKeyEquiv">y</string>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="1033313550"/>
-									<reference key="NSMixedImage" ref="310636482"/>
-								</object>
-								<object class="NSMenuItem" id="480671132">
-									<reference key="NSMenu" ref="741161439"/>
-									<string key="NSTitle">Jump to Address…</string>
-									<string key="NSKeyEquiv">j</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="1033313550"/>
@@ -1258,14 +1249,6 @@
 					</object>
 					<int key="connectionID">802</int>
 				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">jumpToMemoryAddress:</string>
-						<reference key="source" ref="187132439"/>
-						<reference key="destination" ref="480671132"/>
-					</object>
-					<int key="connectionID">824</int>
-				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1831,7 +1814,6 @@
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="920613678"/>
-							<reference ref="480671132"/>
 						</object>
 						<reference key="parent" ref="83731579"/>
 					</object>
@@ -1849,11 +1831,6 @@
 						<int key="objectID">813</int>
 						<reference key="object" ref="139457967"/>
 						<reference key="parent" ref="477738828"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">814</int>
-						<reference key="object" ref="480671132"/>
-						<reference key="parent" ref="741161439"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">816</int>
@@ -1991,7 +1968,6 @@
 					<string>81.IBPluginDependency</string>
 					<string>811.IBPluginDependency</string>
 					<string>813.IBPluginDependency</string>
-					<string>814.IBPluginDependency</string>
 					<string>816.IBPluginDependency</string>
 					<string>817.IBPluginDependency</string>
 					<string>818.IBPluginDependency</string>
@@ -2008,7 +1984,6 @@
 				</object>
 				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2256,63 +2231,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGAppController</string>
 					<string key="superclassName">NSObject</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>help:</string>
-							<string>jumpToMemoryAddress:</string>
-							<string>openMemoryViewer:</string>
-							<string>openPreferences:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>help:</string>
-							<string>jumpToMemoryAddress:</string>
-							<string>openMemoryViewer:</string>
-							<string>openPreferences:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">help:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">jumpToMemoryAddress:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">openMemoryViewer:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">openPreferences:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">documentController</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<string key="NS.key.0">documentController</string>
-						<object class="IBToOneOutletInfo" key="NS.object.0">
-							<string key="name">documentController</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/ZGAppController.h</string>
@@ -2336,28 +2254,28 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>_flagsLabel</string>
-							<string>_memoryDumpController</string>
-							<string>_memoryProtectionController</string>
-							<string>_optionsDisclosureButton</string>
-							<string>_optionsView</string>
-							<string>_searchValueLabel</string>
 							<string>beginningAddressLabel</string>
 							<string>beginningAddressTextField</string>
 							<string>clearButton</string>
 							<string>dataTypesPopUpButton</string>
 							<string>endingAddressLabel</string>
 							<string>endingAddressTextField</string>
+							<string>flagsLabel</string>
 							<string>flagsTextField</string>
 							<string>functionPopUpButton</string>
 							<string>generalStatusTextField</string>
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
+							<string>memoryDumpController</string>
+							<string>memoryProtectionController</string>
+							<string>optionsDisclosureButton</string>
+							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
 							<string>scanUnwritableValuesCheckBox</string>
 							<string>searchButton</string>
 							<string>searchController</string>
+							<string>searchValueLabel</string>
 							<string>searchValueTextField</string>
 							<string>searchingProgressIndicator</string>
 							<string>tableController</string>
@@ -2368,27 +2286,27 @@
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSTextField</string>
+							<string>NSPopUpButton</string>
+							<string>NSTextField</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
+							<string>NSButton</string>
 							<string>ZGMemoryDumpController</string>
 							<string>ZGMemoryProtectionController</string>
 							<string>NSButton</string>
 							<string>NSView</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSButton</string>
-							<string>NSPopUpButton</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSPopUpButton</string>
-							<string>NSTextField</string>
-							<string>NSButton</string>
-							<string>NSButton</string>
-							<string>NSButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>ZGDocumentSearchController</string>
+							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSProgressIndicator</string>
 							<string>ZGDocumentTableController</string>
@@ -2401,28 +2319,28 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>_flagsLabel</string>
-							<string>_memoryDumpController</string>
-							<string>_memoryProtectionController</string>
-							<string>_optionsDisclosureButton</string>
-							<string>_optionsView</string>
-							<string>_searchValueLabel</string>
 							<string>beginningAddressLabel</string>
 							<string>beginningAddressTextField</string>
 							<string>clearButton</string>
 							<string>dataTypesPopUpButton</string>
 							<string>endingAddressLabel</string>
 							<string>endingAddressTextField</string>
+							<string>flagsLabel</string>
 							<string>flagsTextField</string>
 							<string>functionPopUpButton</string>
 							<string>generalStatusTextField</string>
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
+							<string>memoryDumpController</string>
+							<string>memoryProtectionController</string>
+							<string>optionsDisclosureButton</string>
+							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
 							<string>scanUnwritableValuesCheckBox</string>
 							<string>searchButton</string>
 							<string>searchController</string>
+							<string>searchValueLabel</string>
 							<string>searchValueTextField</string>
 							<string>searchingProgressIndicator</string>
 							<string>tableController</string>
@@ -2432,30 +2350,6 @@
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">_flagsLabel</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">_memoryDumpController</string>
-								<string key="candidateClassName">ZGMemoryDumpController</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">_memoryProtectionController</string>
-								<string key="candidateClassName">ZGMemoryProtectionController</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">_optionsDisclosureButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">_optionsView</string>
-								<string key="candidateClassName">NSView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">_searchValueLabel</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">beginningAddressLabel</string>
 								<string key="candidateClassName">NSTextField</string>
@@ -2478,6 +2372,10 @@
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">endingAddressTextField</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">flagsLabel</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
@@ -2505,6 +2403,22 @@
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">memoryDumpController</string>
+								<string key="candidateClassName">ZGMemoryDumpController</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">memoryProtectionController</string>
+								<string key="candidateClassName">ZGMemoryProtectionController</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">optionsDisclosureButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">optionsView</string>
+								<string key="candidateClassName">NSView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">runningApplicationsPopUpButton</string>
 								<string key="candidateClassName">NSPopUpButton</string>
 							</object>
@@ -2519,6 +2433,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">searchController</string>
 								<string key="candidateClassName">ZGDocumentSearchController</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">searchValueLabel</string>
+								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">searchValueTextField</string>
@@ -2818,6 +2736,10 @@
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
+		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
+			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
+			<real value="1070" key="NS.object.0"/>
+		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>
 			<integer value="3000" key="NS.object.0"/>
