@@ -347,6 +347,8 @@
 				}
 			}
 			
+			BOOL shouldPulseSelection = YES;
+			
 			if (!chosenRegion || !(chosenRegion.protection & VM_PROT_READ))
 			{
 				chosenRegion = nil;
@@ -364,6 +366,7 @@
 				}
 				
 				calculatedMemoryAddress = 0;
+				shouldPulseSelection = NO;
 			}
 			
 			self.currentMemoryAddress = chosenRegion.address;
@@ -406,7 +409,7 @@
 				
 				[self.window makeFirstResponder:self.textView];
 				
-				[self jumpToMemoryAddress:calculatedMemoryAddress];
+				[self jumpToMemoryAddress:calculatedMemoryAddress shouldPulseSelection:shouldPulseSelection];
 			}
 		}
 	}
@@ -468,7 +471,7 @@
 }
 
 // memoryAddress is assumed to be within bounds of current memory region being viewed
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress shouldPulseSelection:(BOOL)shouldPulseSelection
 {
 	ZGMemoryAddress offset = (ZGMemoryAddress)(memoryAddress - self.currentMemoryAddress);
 	
@@ -483,7 +486,10 @@
 	
 	// Select one byte from the offset
 	self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, 1)]];
-	[self.textView.controller pulseSelection];
+	if (shouldPulseSelection)
+	{
+		[self.textView.controller pulseSelection];
+	}
 }
 
 @end
