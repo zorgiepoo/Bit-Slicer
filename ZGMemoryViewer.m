@@ -157,14 +157,6 @@
 		self.window.identifier = ZGMemoryViewerIdentifier;
 		[self markChanges];
 	}
-
-	[self updateRunningApplicationProcesses:[[ZGAppController sharedController] lastSelectedProcessName]];
-	
-	[[NSWorkspace sharedWorkspace]
-	 addObserver:self
-	 forKeyPath:@"runningApplications"
-	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-	 context:NULL];
 	
 	self.textView.controller.editable = NO;
 	
@@ -204,6 +196,15 @@
 	
 	[self.textView.controller addRepresenter:verticalScrollerRepresenter];
 	[self.textView.layoutRepresenter addRepresenter:verticalScrollerRepresenter];
+	
+	// Add processes to popup button,
+	[self updateRunningApplicationProcesses:[[ZGAppController sharedController] lastSelectedProcessName]];
+	
+	[[NSWorkspace sharedWorkspace]
+	 addObserver:self
+	 forKeyPath:@"runningApplications"
+	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+	 context:NULL];
 }
 
 - (IBAction)showWindow:(id)sender
