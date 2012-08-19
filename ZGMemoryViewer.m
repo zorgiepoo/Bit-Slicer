@@ -484,8 +484,8 @@
 		[self.textView.controller scrollByLines:offsetLine - displayedLineRange.location];
 	}
 	
-	// Select one byte from the offset
-	self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, 1)]];
+	// Select a few bytes from the offset
+	self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN((ZGMemoryAddress)4, self.currentMemoryAddress + self.currentMemorySize - offset))]];
 	if (shouldPulseSelection)
 	{
 		[self.textView.controller pulseSelection];
