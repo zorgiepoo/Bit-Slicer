@@ -407,7 +407,15 @@
 					calculatedMemoryAddress = memoryAddress;
 				}
 				
-				[self.window makeFirstResponder:self.textView];
+				// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
+				for (id representer in self.textView.controller.representers)
+				{
+					if ([representer isKindOfClass:[HFHexTextRepresenter class]])
+					{
+						[self.window makeFirstResponder:[representer view]];
+						break;
+					}
+				}
 				
 				[self jumpToMemoryAddress:calculatedMemoryAddress shouldPulseSelection:shouldPulseSelection];
 			}
