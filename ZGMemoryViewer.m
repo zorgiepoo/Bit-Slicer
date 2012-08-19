@@ -477,21 +477,6 @@
 	{
 		HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
 		
-		ZGMemoryAddress displayedLocation = (ZGMemoryAddress)(displayedLineRange.location * self.textView.controller.bytesPerLine);
-		ZGMemoryAddress displayedEndLocation = (ZGMemoryAddress)(self.textView.controller.bytesPerLine * (displayedLineRange.location + displayedLineRange.length));
-		
-		ZGMemoryAddress minimumLocation = self.textView.controller.minimumSelectionLocation;
-		ZGMemoryAddress maximumLocation = self.textView.controller.maximumSelectionLocation;
-		
-		// If the current selection is not visible, then make it visible
-		// If we replace the bytes and the current selection is not visible, it will scroll to the current selection
-		// So we need to change the current selection accordingly
-		if ((minimumLocation < displayedLocation || minimumLocation >= displayedEndLocation) || (maximumLocation < displayedLocation || maximumLocation >= displayedEndLocation))
-		{
-			self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(ceill(displayedLineRange.location) * self.textView.controller.bytesPerLine, 0)]];
-			displayedLineRange = self.textView.controller.displayedLineRange;
-		}
-		
 		ZGMemoryAddress readAddress = (ZGMemoryAddress)(displayedLineRange.location * self.textView.controller.bytesPerLine) + self.currentMemoryAddress;
 		
 		if (readAddress >= self.currentMemoryAddress && readAddress < self.currentMemoryAddress + self.currentMemorySize)
@@ -511,7 +496,7 @@
 				HFByteArray *newByteArray = self.textView.controller.byteArray;
 				
 				[newByteArray insertByteSlice:byteSlice inRange:HFRangeMake((ZGMemoryAddress)(displayedLineRange.location * self.textView.controller.bytesPerLine), readSize)];
-				[self.textView.controller replaceByteArray:newByteArray];
+				[self.textView.controller setByteArray:newByteArray];
 				
 				ZGFreeBytes(self.currentProcess.processTask, bytes, readSize);
 			}
