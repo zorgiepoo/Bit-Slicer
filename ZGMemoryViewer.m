@@ -370,8 +370,51 @@
 				shouldPulseSelection = NO;
 			}
 			
-			self.currentMemoryAddress = chosenRegion.address;
-			self.currentMemorySize = chosenRegion.size;
+			// Find the memory address and size not only within the chosen region, but also which extends past other regions as long as they are consecutive in memory and are all readable
+			ZGMemoryAddress lastMemoryAddress = 0;
+			BOOL startCounting = NO;
+			NSMutableArray *previousMemoryRegions = [[NSMutableArray alloc] init];
+			self.currentMemorySize = 0;
+			self.currentMemoryAddress = 0;
+			for (ZGRegion *region in memoryRegions)
+			{
+				if (startCounting)
+				{
+					if ((region.protection & VM_PROT_READ) && lastMemoryAddress == region.address)
+					{
+						self.currentMemorySize += region.size;
+					}
+					else
+					{
+						break;
+					}
+				}
+				
+				if (region == chosenRegion)
+				{
+					startCounting = YES;
+					self.currentMemoryAddress = (previousMemoryRegions.count > 0) ? [(ZGRegion *)[previousMemoryRegions objectAtIndex:0] address] : region.address;
+					self.currentMemorySize = region.size;
+					previousMemoryRegions = nil;
+				}
+				else if (!startCounting)
+				{
+					if ((region.protection & VM_PROT_READ) && (previousMemoryRegions.count == 0 || lastMemoryAddress == region.address))
+					{
+						// no need to add multiple regions if we're only interested in the first one
+						if (previousMemoryRegions.count == 0)
+						{
+							[previousMemoryRegions addObject:region];
+						}
+					}
+					else
+					{
+						[previousMemoryRegions removeAllObjects];
+					}
+				}
+				
+				lastMemoryAddress = region.address + region.size;
+			}
 			
 			ZGMemoryAddress memoryAddress = self.currentMemoryAddress;
 			ZGMemorySize memorySize = self.currentMemorySize;
