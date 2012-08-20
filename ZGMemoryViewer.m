@@ -340,7 +340,7 @@
 			{
 				for (ZGRegion *region in memoryRegions)
 				{
-					if (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size)
+					if ((region.protection & VM_PROT_READ) && calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size)
 					{
 						chosenRegion = region;
 						break;
@@ -348,9 +348,8 @@
 				}
 			}
 			
-			if (!chosenRegion || !(chosenRegion.protection & VM_PROT_READ))
+			if (!chosenRegion)
 			{
-				chosenRegion = nil;
 				for (ZGRegion *region in memoryRegions)
 				{
 					if (region.protection & VM_PROT_READ)
@@ -358,10 +357,6 @@
 						chosenRegion = region;
 						break;
 					}
-				}
-				if (!chosenRegion)
-				{
-					chosenRegion = [memoryRegions objectAtIndex:0];
 				}
 				
 				calculatedMemoryAddress = 0;
@@ -390,8 +385,13 @@
 				if (region == chosenRegion)
 				{
 					startCounting = YES;
+					if (lastMemoryAddress != region.address && previousMemoryRegions.count > 0)
+					{
+						[previousMemoryRegions removeAllObjects];
+						self.currentMemorySize = 0;
+					}
 					self.currentMemoryAddress = (previousMemoryRegions.count > 0) ? [(ZGRegion *)[previousMemoryRegions objectAtIndex:0] address] : region.address;
-					self.currentMemorySize = region.size;
+					self.currentMemorySize += region.size;
 					previousMemoryRegions = nil;
 				}
 				else if (!startCounting)
@@ -403,10 +403,13 @@
 						{
 							[previousMemoryRegions addObject:region];
 						}
+						
+						self.currentMemorySize += region.size;
 					}
 					else
 					{
 						[previousMemoryRegions removeAllObjects];
+						self.currentMemorySize = 0;
 					}
 				}
 				
