@@ -428,6 +428,30 @@
 			lastMemoryAddress = region.address + region.size;
 		}
 		
+#define MEMORY_VIEW_THRESHOLD 268435456
+		// Bound the upper and lower half by a threshold so that we will never view too much data that we won't be able to handle, in the rarer cases
+		if (calculatedMemoryAddress > 0)
+		{
+			if (calculatedMemoryAddress >= MEMORY_VIEW_THRESHOLD && calculatedMemoryAddress - MEMORY_VIEW_THRESHOLD > self.currentMemoryAddress)
+			{
+				ZGMemoryAddress newMemoryAddress = calculatedMemoryAddress - MEMORY_VIEW_THRESHOLD;
+				self.currentMemorySize -= newMemoryAddress - self.currentMemoryAddress;
+				self.currentMemoryAddress = newMemoryAddress;
+			}
+			
+			if (calculatedMemoryAddress + MEMORY_VIEW_THRESHOLD < self.currentMemoryAddress + self.currentMemorySize)
+			{
+				self.currentMemorySize -= self.currentMemoryAddress + self.currentMemorySize - (calculatedMemoryAddress + MEMORY_VIEW_THRESHOLD);
+			}
+		}
+		else
+		{
+			if (self.currentMemorySize > MEMORY_VIEW_THRESHOLD * 2)
+			{
+				self.currentMemorySize = MEMORY_VIEW_THRESHOLD * 2;
+			}
+		}
+		
 		ZGMemoryAddress memoryAddress = self.currentMemoryAddress;
 		ZGMemorySize memorySize = self.currentMemorySize;
 		
