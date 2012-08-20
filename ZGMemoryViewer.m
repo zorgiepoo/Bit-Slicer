@@ -352,6 +352,8 @@
 			}
 		}
 		
+		BOOL shouldPulseSelection = YES;
+		
 		if (!chosenRegion)
 		{
 			for (ZGRegion *region in memoryRegions)
@@ -369,6 +371,7 @@
 			}
 			
 			calculatedMemoryAddress = 0;
+			shouldPulseSelection = NO;
 		}
 		
 		// Find the memory address and size not only within the chosen region, but also which extends past other regions as long as they are consecutive in memory and are all readable
@@ -470,7 +473,7 @@
 				}
 			}
 			
-			[self jumpToMemoryAddress:calculatedMemoryAddress];
+			[self jumpToMemoryAddress:calculatedMemoryAddress shouldPulseSelection:shouldPulseSelection];
 		}
 	}
 	
@@ -518,7 +521,7 @@ END_MEMORY_VIEW_CHANGE:
 }
 
 // memoryAddress is assumed to be within bounds of current memory region being viewed
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress shouldPulseSelection:(BOOL)shouldPulseSelection
 {
 	ZGMemoryAddress offset = (ZGMemoryAddress)(memoryAddress - self.currentMemoryAddress);
 	
@@ -533,6 +536,11 @@ END_MEMORY_VIEW_CHANGE:
 	
 	// Select a few bytes from the offset
 	self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN((ZGMemoryAddress)4, self.currentMemoryAddress + self.currentMemorySize - offset))]];
+	
+	if (shouldPulseSelection)
+	{
+		[self.textView.controller pulseSelection];
+	}
 }
 
 @end
