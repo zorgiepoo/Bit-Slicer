@@ -526,9 +526,9 @@ END_MEMORY_VIEW_CHANGE:
 // memoryAddress is assumed to be within bounds of current memory region being viewed
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress
 {
-	ZGMemoryAddress offset = (ZGMemoryAddress)(memoryAddress - self.currentMemoryAddress);
+	long double offset = (long double)(memoryAddress - self.currentMemoryAddress);
 	
-	long double offsetLine = ((long double)offset) / [self.textView.controller bytesPerLine];
+	long double offsetLine = offset / [self.textView.controller bytesPerLine];
 	
 	HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
 	
@@ -536,7 +536,7 @@ END_MEMORY_VIEW_CHANGE:
 	[self.textView.controller scrollByLines:offsetLine - displayedLineRange.location - displayedLineRange.length / 2.0];
 	
 	// Select a few bytes from the offset
-	self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN((ZGMemoryAddress)4, self.currentMemoryAddress + self.currentMemorySize - offset))]];
+	self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN((ZGMemoryAddress)4, self.currentMemoryAddress + self.currentMemorySize - memoryAddress))]];
 	
 	[self.textView.controller pulseSelection];
 }
