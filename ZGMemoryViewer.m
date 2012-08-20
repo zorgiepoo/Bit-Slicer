@@ -532,10 +532,8 @@ END_MEMORY_VIEW_CHANGE:
 	
 	HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
 	
-	if (offsetLine < displayedLineRange.location || offsetLine > displayedLineRange.location + displayedLineRange.length)
-	{
-		[self.textView.controller scrollByLines:offsetLine - displayedLineRange.location];
-	}
+	// the line we want to jump to should be in the middle of the view
+	[self.textView.controller scrollByLines:offsetLine - displayedLineRange.location - displayedLineRange.length / 2.0];
 	
 	// Select a few bytes from the offset
 	self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN((ZGMemoryAddress)4, self.currentMemoryAddress + self.currentMemorySize - offset))]];
