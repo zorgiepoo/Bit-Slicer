@@ -352,7 +352,7 @@
 			}
 		}
 		
-		BOOL shouldJumpToSelection = YES;
+		BOOL shouldMakeSelection = YES;
 		
 		if (!chosenRegion)
 		{
@@ -371,7 +371,7 @@
 			}
 			
 			calculatedMemoryAddress = 0;
-			shouldJumpToSelection = NO;
+			shouldMakeSelection = NO;
 		}
 		
 		// Find the memory address and size not only within the chosen region, but also which extends past other regions as long as they are consecutive in memory and are all readable
@@ -497,10 +497,7 @@
 				}
 			}
 			
-			if (shouldJumpToSelection)
-			{
-				[self jumpToMemoryAddress:calculatedMemoryAddress];
-			}
+			[self jumpToMemoryAddress:calculatedMemoryAddress shouldMakeSelection:shouldMakeSelection];
 		}
 	}
 	
@@ -548,7 +545,7 @@ END_MEMORY_VIEW_CHANGE:
 }
 
 // memoryAddress is assumed to be within bounds of current memory region being viewed
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress shouldMakeSelection:(BOOL)shouldMakeSelection
 {
 	long double offset = (long double)(memoryAddress - self.currentMemoryAddress);
 	
@@ -559,10 +556,13 @@ END_MEMORY_VIEW_CHANGE:
 	// the line we want to jump to should be in the middle of the view
 	[self.textView.controller scrollByLines:offsetLine - displayedLineRange.location - displayedLineRange.length / 2.0];
 	
-	// Select a few bytes from the offset
-	self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN((ZGMemoryAddress)4, self.currentMemoryAddress + self.currentMemorySize - memoryAddress))]];
-	
-	[self.textView.controller pulseSelection];
+	if (shouldMakeSelection)
+	{
+		// Select a few bytes from the offset
+		self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN((ZGMemoryAddress)4, self.currentMemoryAddress + self.currentMemorySize - memoryAddress))]];
+		
+		[self.textView.controller pulseSelection];
+	}
 }
 
 @end
