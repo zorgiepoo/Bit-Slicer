@@ -317,7 +317,12 @@
 {
 	BOOL success = NO;
 	
-	if ([self.currentProcess hasGrantedAccess])
+	if (![self.currentProcess hasGrantedAccess])
+	{
+		goto END_MEMORY_VIEW_CHANGE;
+	}
+	
+	// create scope block to allow for goto
 	{
 		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue];
 		
@@ -331,140 +336,145 @@
 		NSArray *memoryRegions = ZGRegionsForProcessTask(self.currentProcess.processTask);
 		if (memoryRegions.count == 0)
 		{
-			success = NO;
+			goto END_MEMORY_VIEW_CHANGE;
 		}
-		else
+		
+		ZGRegion *chosenRegion = nil;
+		if (calculatedMemoryAddress != 0)
 		{
-			ZGRegion *chosenRegion = nil;
-			if (calculatedMemoryAddress != 0)
+			for (ZGRegion *region in memoryRegions)
 			{
-				for (ZGRegion *region in memoryRegions)
+				if ((region.protection & VM_PROT_READ) && calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size)
 				{
-					if ((region.protection & VM_PROT_READ) && calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size)
-					{
-						chosenRegion = region;
-						break;
-					}
+					chosenRegion = region;
+					break;
+				}
+			}
+		}
+		
+		if (!chosenRegion)
+		{
+			for (ZGRegion *region in memoryRegions)
+			{
+				if (region.protection & VM_PROT_READ)
+				{
+					chosenRegion = region;
+					break;
 				}
 			}
 			
 			if (!chosenRegion)
 			{
-				for (ZGRegion *region in memoryRegions)
+				goto END_MEMORY_VIEW_CHANGE;
+			}
+			
+			calculatedMemoryAddress = 0;
+		}
+		
+		// Find the memory address and size not only within the chosen region, but also which extends past other regions as long as they are consecutive in memory and are all readable
+		ZGMemoryAddress lastMemoryAddress = 0;
+		BOOL startCounting = NO;
+		NSMutableArray *previousMemoryRegions = [[NSMutableArray alloc] init];
+		self.currentMemorySize = 0;
+		self.currentMemoryAddress = 0;
+		for (ZGRegion *region in memoryRegions)
+		{
+			if (startCounting)
+			{
+				if ((region.protection & VM_PROT_READ) && lastMemoryAddress == region.address)
 				{
+					self.currentMemorySize += region.size;
+				}
+				else
+				{
+					break;
+				}
+			}
+			else
+			{
+				if (region.protection & VM_PROT_READ && (previousMemoryRegions.count == 0 || lastMemoryAddress == region.address))
+				{
+					// no need to add multiple regions if we're only interested in the first one
+					if (previousMemoryRegions.count == 0)
+					{
+						[previousMemoryRegions addObject:region];
+					}
+					
+					self.currentMemorySize += region.size;
+				}
+				else
+				{
+					[previousMemoryRegions removeAllObjects];
+					self.currentMemorySize = 0;
+					
 					if (region.protection & VM_PROT_READ)
 					{
-						chosenRegion = region;
-						break;
-					}
-				}
-				
-				calculatedMemoryAddress = 0;
-			}
-			
-			// Find the memory address and size not only within the chosen region, but also which extends past other regions as long as they are consecutive in memory and are all readable
-			ZGMemoryAddress lastMemoryAddress = 0;
-			BOOL startCounting = NO;
-			NSMutableArray *previousMemoryRegions = [[NSMutableArray alloc] init];
-			self.currentMemorySize = 0;
-			self.currentMemoryAddress = 0;
-			for (ZGRegion *region in memoryRegions)
-			{
-				if (startCounting)
-				{
-					if ((region.protection & VM_PROT_READ) && lastMemoryAddress == region.address)
-					{
+						[previousMemoryRegions addObject:region];
 						self.currentMemorySize += region.size;
 					}
-					else
-					{
-						break;
-					}
 				}
-				
-				if (region == chosenRegion)
-				{
-					startCounting = YES;
-					if (lastMemoryAddress != region.address && previousMemoryRegions.count > 0)
-					{
-						[previousMemoryRegions removeAllObjects];
-						self.currentMemorySize = 0;
-					}
-					self.currentMemoryAddress = (previousMemoryRegions.count > 0) ? [(ZGRegion *)[previousMemoryRegions objectAtIndex:0] address] : region.address;
-					self.currentMemorySize += region.size;
-					previousMemoryRegions = nil;
-				}
-				else if (!startCounting)
-				{
-					if ((region.protection & VM_PROT_READ) && (previousMemoryRegions.count == 0 || lastMemoryAddress == region.address))
-					{
-						// no need to add multiple regions if we're only interested in the first one
-						if (previousMemoryRegions.count == 0)
-						{
-							[previousMemoryRegions addObject:region];
-						}
-						
-						self.currentMemorySize += region.size;
-					}
-					else
-					{
-						[previousMemoryRegions removeAllObjects];
-						self.currentMemorySize = 0;
-					}
-				}
-				
-				lastMemoryAddress = region.address + region.size;
 			}
 			
-			ZGMemoryAddress memoryAddress = self.currentMemoryAddress;
-			ZGMemorySize memorySize = self.currentMemorySize;
-			
-			void *bytes = NULL;
-			
-			if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize) && memorySize > 0)
+			if (region == chosenRegion)
 			{
-				// Replace all the contents of the self.textView
-				self.textView.data = [NSData dataWithBytes:bytes length:(NSUInteger)memorySize];
-				self.currentMemoryAddress = memoryAddress;
-				self.currentMemorySize = memorySize;
-				
-				self.statusBarRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
-				// Select the first byte of data
-				self.statusBarRepresenter.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(0, 0)]];
-				// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
-				[self.statusBarRepresenter updateString];
-				
-				self.lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase16(memoryAddress + memorySize);
-				self.lineCountingRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
-				// This will force the line numbers to update
-				[self.lineCountingRepresenter.view setNeedsDisplay:YES];
-				// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
-				[self.textView.layoutRepresenter performLayout];
-				
-				success = YES;
-				
-				ZGFreeBytes(self.currentProcess.processTask, bytes, memorySize);
-				
-				if (!calculatedMemoryAddress)
-				{
-					self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", memoryAddress];
-					calculatedMemoryAddress = memoryAddress;
-				}
-				
-				// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
-				for (id representer in self.textView.controller.representers)
-				{
-					if ([representer isKindOfClass:[HFHexTextRepresenter class]])
-					{
-						[self.window makeFirstResponder:[representer view]];
-						break;
-					}
-				}
-				
-				[self jumpToMemoryAddress:calculatedMemoryAddress];
+				startCounting = YES;
+				self.currentMemoryAddress = [(ZGRegion *)[previousMemoryRegions objectAtIndex:0] address];
+				previousMemoryRegions = nil;
 			}
+			
+			lastMemoryAddress = region.address + region.size;
+		}
+		
+		ZGMemoryAddress memoryAddress = self.currentMemoryAddress;
+		ZGMemorySize memorySize = self.currentMemorySize;
+		
+		void *bytes = NULL;
+		
+		if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize) && memorySize > 0)
+		{
+			// Replace all the contents of the self.textView
+			self.textView.data = [NSData dataWithBytes:bytes length:(NSUInteger)memorySize];
+			self.currentMemoryAddress = memoryAddress;
+			self.currentMemorySize = memorySize;
+			
+			self.statusBarRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
+			// Select the first byte of data
+			self.statusBarRepresenter.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(0, 0)]];
+			// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
+			[self.statusBarRepresenter updateString];
+			
+			self.lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase16(memoryAddress + memorySize);
+			self.lineCountingRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
+			// This will force the line numbers to update
+			[self.lineCountingRepresenter.view setNeedsDisplay:YES];
+			// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
+			[self.textView.layoutRepresenter performLayout];
+			
+			success = YES;
+			
+			ZGFreeBytes(self.currentProcess.processTask, bytes, memorySize);
+			
+			if (!calculatedMemoryAddress)
+			{
+				self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", memoryAddress];
+				calculatedMemoryAddress = memoryAddress;
+			}
+			
+			// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
+			for (id representer in self.textView.controller.representers)
+			{
+				if ([representer isKindOfClass:[HFHexTextRepresenter class]])
+				{
+					[self.window makeFirstResponder:[representer view]];
+					break;
+				}
+			}
+			
+			[self jumpToMemoryAddress:calculatedMemoryAddress];
 		}
 	}
+	
+END_MEMORY_VIEW_CHANGE:
 	
 	[self markChanges];
 	
