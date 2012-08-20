@@ -18,10 +18,9 @@
 		770930BE15BA97B4009705A6 /* ZGSearchData.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930BD15BA97B4009705A6 /* ZGSearchData.m */; };
 		770EA821137B6E6D007FB85A /* ZGMemoryViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */; };
 		770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770EA822137B6FDE007FB85A /* MemoryViewer.xib */; };
-		770EA826137B74C6007FB85A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 770EA825137B74C6007FB85A /* HexFiend.framework */; };
-		770EA828137B74FB007FB85A /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 770EA825137B74C6007FB85A /* HexFiend.framework */; };
 		770EA82B137BA8E5007FB85A /* ZGUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA829137BA8E1007FB85A /* ZGUtilities.m */; };
 		7714D3F211B87C7E0028E6B2 /* ZGVirtualMemory.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */; };
+		772AACD415E1CCFA00E1F788 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 772AACD315E1CCFA00E1F788 /* HexFiend.framework */; };
 		775FCB1B11719DF6000054FB /* ZGAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1111719DF6000054FB /* ZGAppController.m */; };
 		775FCB1D11719DF6000054FB /* ZGPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1511719DF6000054FB /* ZGPreferencesController.m */; };
 		775FCB1E11719DF6000054FB /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1711719DF6000054FB /* ZGProcess.m */; };
@@ -52,7 +51,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				770EA828137B74FB007FB85A /* HexFiend.framework in Copy Frameworks */,
 				77F6097013DBCE2000FD5D92 /* ShortcutRecorder.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -87,11 +85,11 @@
 		770EA81F137B6E6D007FB85A /* ZGMemoryViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryViewer.h; sourceTree = "<group>"; };
 		770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryViewer.m; sourceTree = "<group>"; };
 		770EA823137B6FDE007FB85A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MemoryViewer.xib; sourceTree = "<group>"; };
-		770EA825137B74C6007FB85A /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HexFiend.framework; sourceTree = "<group>"; };
 		770EA829137BA8E1007FB85A /* ZGUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGUtilities.m; sourceTree = "<group>"; };
 		770EA82A137BA8E3007FB85A /* ZGUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGUtilities.h; sourceTree = "<group>"; };
 		7714D3F011B87C7E0028E6B2 /* ZGVirtualMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVirtualMemory.h; sourceTree = "<group>"; };
 		7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVirtualMemory.m; sourceTree = "<group>"; };
+		772AACD315E1CCFA00E1F788 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HexFiend.framework; sourceTree = "<group>"; };
 		775FCB1011719DF6000054FB /* ZGAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGAppController.h; sourceTree = "<group>"; };
 		775FCB1111719DF6000054FB /* ZGAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGAppController.m; sourceTree = "<group>"; };
 		775FCB1411719DF6000054FB /* ZGPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGPreferencesController.h; sourceTree = "<group>"; };
@@ -135,8 +133,8 @@
 				775FCB3611719F95000054FB /* Security.framework in Frameworks */,
 				775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */,
 				778BA6611363E972008ACD6B /* Ruby.framework in Frameworks */,
-				770EA826137B74C6007FB85A /* HexFiend.framework in Frameworks */,
 				77F6096F13DBCDD300FD5D92 /* ShortcutRecorder.framework in Frameworks */,
+				772AACD415E1CCFA00E1F788 /* HexFiend.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,8 +144,8 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				772AACD315E1CCFA00E1F788 /* HexFiend.framework */,
 				77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */,
-				770EA825137B74C6007FB85A /* HexFiend.framework */,
 				778BA6601363E972008ACD6B /* Ruby.framework */,
 				775FCB4111719FAF000054FB /* Carbon.framework */,
 				775FCB3511719F95000054FB /* Security.framework */,
