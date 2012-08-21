@@ -48,14 +48,27 @@
 	ruby_init_loadpath();
 }
 
++ (BOOL)isValidExpression:(NSString *)expression
+{
+	NSMutableCharacterSet *disallowedCharacterSet = [NSMutableCharacterSet letterCharacterSet];
+	// keep characters for hexadecimal notations
+	[disallowedCharacterSet removeCharactersInString:@"xXaAbBcCdDeEfF"];
+	return [[expression componentsSeparatedByCharactersInSet:disallowedCharacterSet] count] <= 1;
+}
+
 + (NSString *)evaluateExpression:(NSString *)expression
 {
 	NSString *newExpression = expression;
 	
-	if (expression)
+	if (![self isValidExpression:newExpression])
+	{
+		newExpression = nil;
+	}
+	
+	if (newExpression)
 	{
 		int resultState;
-		VALUE result = rb_funcall(rb_eval_string_protect([expression UTF8String], &resultState), rb_intern("to_s"), 0);
+		VALUE result = rb_funcall(rb_eval_string_protect([newExpression UTF8String], &resultState), rb_intern("to_s"), 0);
 		if (resultState == 0 && result != Qnil && TYPE(result) == T_STRING)
 		{
 			newExpression =
