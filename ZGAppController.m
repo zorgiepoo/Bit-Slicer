@@ -86,39 +86,6 @@ static id sharedInstance;
 	return self;
 }
 
-#pragma mark Authenticating
-
-// http://os-tres.net/blog/2010/02/17/mac-os-x-and-task-for-pid-mach-call/
-int acquireTaskportRight(void)
-{
-	OSStatus stat;
-	AuthorizationItem taskport_item[1];
-	taskport_item[0].name = "system.privilege.taskport:";
-	taskport_item[0].valueLength = 0;
-	taskport_item[0].value = NULL;
-	taskport_item[0].flags = 0;
-	
-	AuthorizationRights rights = {1, taskport_item}, *out_rights = NULL;
-	AuthorizationRef author;
-	
-	AuthorizationFlags auth_flags = kAuthorizationFlagExtendRights | kAuthorizationFlagPreAuthorize | kAuthorizationFlagInteractionAllowed | ( 1 << 5);
-	
-	stat = AuthorizationCreate (NULL, kAuthorizationEmptyEnvironment,auth_flags,&author);
-	if (stat != errAuthorizationSuccess)
-	{
-		NSLog(@"Failure on AuthorizationCreate");
-		return 0;
-	}
-	
-	stat = AuthorizationCopyRights ( author, &rights, kAuthorizationEmptyEnvironment, auth_flags,&out_rights);
-	if (stat != errAuthorizationSuccess)
-	{
-		NSLog(@"Failure on AuthorizationCopyRights");
-		return 1;
-	}
-	return 0;
-}
-
 #pragma mark Pausing and Unpausing processes
 
 OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef theEvent, void *userData)
@@ -253,15 +220,6 @@ static BOOL didRegisteredHotKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
-	if (acquireTaskportRight() != 0)
-	{
-		NSLog(@"Failed to acquire taskport rights");
-		
-		NSRunAlertPanel(@"Insufficient privileges", @"Bit Slicer failed to acquire privileges needed to access another process' memory space.", nil, nil, nil);
-		
-		[NSApp terminate:nil];
-	}
-    
 	// Initialize preference defaults
 	[self openPreferences:nil showWindow:NO];
     
