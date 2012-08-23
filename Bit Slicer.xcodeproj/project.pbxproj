@@ -27,7 +27,6 @@
 		775FCB1E11719DF6000054FB /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1711719DF6000054FB /* ZGProcess.m */; };
 		775FCB1F11719DF6000054FB /* ZGVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1911719DF6000054FB /* ZGVariable.m */; };
 		775FCB2A11719E4A000054FB /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 775FCB2811719E4A000054FB /* Preferences.xib */; };
-		775FCB3611719F95000054FB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB3511719F95000054FB /* Security.framework */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
 		7787C4D9137BB59200BFF606 /* ZGStatusBarRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7787C4EE137C556000BFF606 /* ZGLineCountingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4ED137C556000BFF606 /* ZGLineCountingView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -101,7 +100,6 @@
 		775FCB1811719DF6000054FB /* ZGVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVariable.h; sourceTree = "<group>"; };
 		775FCB1911719DF6000054FB /* ZGVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVariable.m; sourceTree = "<group>"; };
 		775FCB2911719E4A000054FB /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/Preferences.xib; sourceTree = "<group>"; };
-		775FCB3511719F95000054FB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		7787C4D7137BB59100BFF606 /* ZGStatusBarRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGStatusBarRepresenter.h; sourceTree = "<group>"; };
 		7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGStatusBarRepresenter.m; sourceTree = "<group>"; };
@@ -132,7 +130,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
-				775FCB3611719F95000054FB /* Security.framework in Frameworks */,
 				775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */,
 				778BA6611363E972008ACD6B /* Ruby.framework in Frameworks */,
 				77F6096F13DBCDD300FD5D92 /* ShortcutRecorder.framework in Frameworks */,
@@ -150,7 +147,6 @@
 				77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */,
 				778BA6601363E972008ACD6B /* Ruby.framework */,
 				775FCB4111719FAF000054FB /* Carbon.framework */,
-				775FCB3511719F95000054FB /* Security.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";

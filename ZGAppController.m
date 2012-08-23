@@ -33,8 +33,6 @@
  */
 
 #import "ZGAppController.h"
-#import <SecurityFoundation/SFAuthorization.h>
-#import <Security/AuthorizationTags.h>
 #import "ZGPreferencesController.h"
 #import "ZGMemoryViewer.h"
 #import "ZGProcess.h"

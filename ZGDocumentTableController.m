@@ -90,9 +90,8 @@
 	// We don't want to update this when the user is editing something in the table
 	if (self.document.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.watchVariablesTableView.editedRow == -1)
 	{
-		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
+		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 		 {
-			 ZGVariable *variable = object;
 			 if (variable.isPointer)
 			 {
 				 NSString *newAddressString =
@@ -113,9 +112,8 @@
 	if (self.document.currentProcess.processID != NON_EXISTENT_PID_NUMBER)
 	{
 		// Freeze all variables that need be frozen!
-		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
+		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 		 {
-			 ZGVariable *variable = object;
 			 if (variable.isFrozen && variable.freezeValue)
 			 {
 				 if (variable.size)
