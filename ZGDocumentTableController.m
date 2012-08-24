@@ -144,7 +144,7 @@
 				 NSString *oldStringValue = [variable.stringValue copy];
 				 if (variable.type == ZGUTF8String || variable.type == ZGUTF16String)
 				 {
-					 variable.size = ZGGetStringSize(self.document.currentProcess.processTask, variable.address, variable.type);
+					 variable.size = ZGGetStringSize(self.document.currentProcess.processTask, variable.address, variable.type, variable.size);
 				 }
 				 
 				 if (variable.size)

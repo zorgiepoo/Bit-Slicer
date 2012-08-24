@@ -444,36 +444,62 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 	}
 }
 
-ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType)
+ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize)
 {
 	ZGMemorySize totalSize = 0;
 	
-	ZGMemorySize characterSize = dataType == ZGUTF8String ? sizeof(char) : sizeof(unichar);
-	void *theByte = NULL;
+	ZGMemorySize characterSize = (dataType == ZGUTF8String) ? sizeof(char) : sizeof(unichar);
+	void *buffer = NULL;
+	
+	if (dataType == ZGUTF16String && oldSize % 2 != 0)
+	{
+		oldSize--;
+	}
 	
 	while (YES)
 	{
 		BOOL shouldBreak = NO;
-		ZGMemorySize outputtedSize = characterSize;
+		ZGMemorySize outputtedSize = oldSize > 0 ? oldSize : characterSize;
 		
-		if (ZGReadBytes(processTask, address, &theByte, &outputtedSize))
+		if (ZGReadBytes(processTask, address, &buffer, &outputtedSize))
 		{
-			if ((dataType == ZGUTF8String && *((char *)theByte) == 0) || (dataType == ZGUTF16String && *((unichar *)theByte) == 0))
+			ZGMemorySize numberOfCharacters = outputtedSize / characterSize;
+			if (dataType == ZGUTF16String && outputtedSize % 2 != 0 && numberOfCharacters > 0)
 			{
-				// Only count the null terminator for a UTF-8 string, as long as the string has some length
-				if (totalSize && dataType == ZGUTF8String)
-				{
-					totalSize += characterSize;
-				}
-				
+				numberOfCharacters--;
 				shouldBreak = YES;
 			}
 			
-			ZGFreeBytes(processTask, theByte, outputtedSize);
+			for (ZGMemorySize characterCounter = 0; characterCounter < numberOfCharacters; characterCounter++)
+			{
+				if ((dataType == ZGUTF8String && ((char *)buffer)[characterCounter] == 0) || (dataType == ZGUTF16String && ((unichar *)buffer)[characterCounter] == 0))
+				{
+					// Only count the null terminator for a UTF-8 string, as long as the string has some length
+					if (totalSize && dataType == ZGUTF8String)
+					{
+						totalSize += characterSize;
+					}
+					
+					shouldBreak = YES;
+					break;
+				}
+				
+				totalSize += characterSize;
+			}
+			
+			ZGFreeBytes(processTask, buffer, outputtedSize);
+			
+			if (dataType == ZGUTF16String)
+			{
+				outputtedSize = numberOfCharacters * characterSize;
+			}
 		}
 		else
 		{
-			totalSize = 0;
+			if (dataType == ZGUTF8String)
+			{
+				totalSize = 0;
+			}
 			shouldBreak = YES;
 		}
 		
@@ -482,8 +508,7 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 			break;
 		}
 		
-		totalSize += characterSize;
-		address += characterSize;
+		address += outputtedSize;
 	}
 	
 	return totalSize;
