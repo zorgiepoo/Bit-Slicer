@@ -456,12 +456,21 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 		oldSize--;
 	}
 	
+	BOOL shouldUseOldSize = (oldSize >= characterSize);
+	
 	while (YES)
 	{
 		BOOL shouldBreak = NO;
-		ZGMemorySize outputtedSize = oldSize > 0 ? oldSize : characterSize;
+		ZGMemorySize outputtedSize = shouldUseOldSize ? oldSize : characterSize;
 		
-		if (ZGReadBytes(processTask, address, &buffer, &outputtedSize))
+		BOOL couldReadBytes = ZGReadBytes(processTask, address, &buffer, &outputtedSize);
+		if (!couldReadBytes && shouldUseOldSize)
+		{
+			shouldUseOldSize = NO;
+			continue;
+		}
+		
+		if (couldReadBytes)
 		{
 			ZGMemorySize numberOfCharacters = outputtedSize / characterSize;
 			if (dataType == ZGUTF16String && outputtedSize % 2 != 0 && numberOfCharacters > 0)
