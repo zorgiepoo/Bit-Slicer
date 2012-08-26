@@ -41,21 +41,21 @@
 
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 {
-	*task = MACH_PORT_NULL;
-	BOOL success = task_for_pid(current_task(), process, task) == KERN_SUCCESS;
-	if (!success)
+	kern_return_t result = task_for_pid(current_task(), process, task);
+	if (result != KERN_SUCCESS)
 	{
 		*task = MACH_PORT_NULL;
+		NSLog(@"Failed to get task for process: %s", mach_error_string(result));
 	}
-	
-	return success;
+	return (result == KERN_SUCCESS);
 }
 
 void ZGFreeTask(ZGMemoryMap task)
 {
-	if (mach_port_deallocate(current_task(), task) != KERN_SUCCESS)
+	kern_return_t result;
+	if ((result = mach_port_deallocate(current_task(), task)) != KERN_SUCCESS)
 	{
-		NSLog(@"Failed to deallocate mach port");
+		NSLog(@"Failed to deallocate mach port: %s", mach_error_string(result));
 	}
 }
 
