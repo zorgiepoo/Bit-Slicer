@@ -121,7 +121,7 @@ BOOL ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *addres
 	BOOL success = NO;
 	
 	mach_port_t objectName = MACH_PORT_NULL;
-	vm_region_basic_info_data_t regionInfo;
+	vm_region_basic_info_data_64_t regionInfo;
 	mach_msg_type_number_t regionInfoSize = VM_REGION_BASIC_INFO_COUNT_64;
 	
 	success = mach_vm_region(processTask, address, size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS;
@@ -399,7 +399,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 	ZGMemoryAddress address = 0x0;
 	ZGMemorySize size;
 	mach_port_t objectName = MACH_PORT_NULL;
-	vm_region_basic_info_data_t regionInfo;
+	vm_region_basic_info_data_64_t regionInfo;
 	mach_msg_type_number_t regionInfoSize = VM_REGION_BASIC_INFO_COUNT_64;
 
 	ZGMemorySize currentRegionNumber = 0;
