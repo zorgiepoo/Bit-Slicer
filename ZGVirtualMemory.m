@@ -483,12 +483,6 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 			{
 				if ((dataType == ZGUTF8String && ((char *)buffer)[characterCounter] == 0) || (dataType == ZGUTF16String && ((unichar *)buffer)[characterCounter] == 0))
 				{
-					// Only count the null terminator for a UTF-8 string, as long as the string has some length
-					if (totalSize && dataType == ZGUTF8String)
-					{
-						totalSize += characterSize;
-					}
-					
 					shouldBreak = YES;
 					break;
 				}
@@ -505,10 +499,6 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 		}
 		else
 		{
-			if (dataType == ZGUTF8String)
-			{
-				totalSize = 0;
-			}
 			shouldBreak = YES;
 		}
 		

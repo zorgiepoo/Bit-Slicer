@@ -386,9 +386,16 @@
 		
 		// We want to read the null terminator in this case... even though we normally don't store the terminator
 		// internally for UTF-16 strings. Lame hack, I know.
-		if (self.searchData.shouldIncludeNullTerminator && dataType == ZGUTF16String)
+		if (self.searchData.shouldIncludeNullTerminator)
 		{
-			dataSize += sizeof(unichar);
+			if (dataType == ZGUTF16String)
+			{
+				dataSize += sizeof(unichar);
+			}
+			else if (dataType == ZGUTF8String)
+			{
+				dataSize += sizeof(char);
+			}
 		}
 		
 		ZGFunctionType functionType = (ZGFunctionType)self.document.functionPopUpButton.selectedItem.tag;

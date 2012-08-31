@@ -335,7 +335,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			case ZGUTF8String:
 				self.stringValue =
 					[[NSString alloc]
-					 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)(self.size - 1)]
+					 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)self.size]
 					 encoding:NSUTF8StringEncoding];
 				
 				// UTF8 string encoding can fail sometimes on some invalid-ish strings
@@ -343,7 +343,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				{
 					newStringValue =
 						[[NSString alloc]
-						 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)(self.size - 1)]
+						 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)self.size]
 						 encoding:NSASCIIStringEncoding];
 					
 					self.stringValue = newStringValue;

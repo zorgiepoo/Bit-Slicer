@@ -184,7 +184,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 	else if (dataType == ZGUTF8String)
 	{
 		const char *variableValue = [stringValue cStringUsingEncoding:NSUTF8StringEncoding];
-		*dataSize = strlen(variableValue) + 1;
+		*dataSize = strlen(variableValue);
 		value = malloc((size_t)*dataSize);
 		strncpy(value, variableValue, (size_t)*dataSize);
 	}
