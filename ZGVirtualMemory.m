@@ -444,6 +444,7 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemo
 	}
 }
 
+#define MAX_STRING_SIZE 1024
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize)
 {
 	ZGMemorySize totalSize = 0;
@@ -495,6 +496,12 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 			if (dataType == ZGUTF16String)
 			{
 				outputtedSize = numberOfCharacters * characterSize;
+			}
+			
+			if (totalSize >= MAX_STRING_SIZE)
+			{
+				totalSize = MAX_STRING_SIZE;
+				shouldBreak = YES;
 			}
 		}
 		else
