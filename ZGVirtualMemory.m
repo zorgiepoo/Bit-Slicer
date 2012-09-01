@@ -45,7 +45,7 @@ BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 	if (result != KERN_SUCCESS)
 	{
 		*task = MACH_PORT_NULL;
-		NSLog(@"Failed to get task for process: %s", mach_error_string(result));
+		NSLog(@"Failed to get task for process %d: %s", process, mach_error_string(result));
 	}
 	return (result == KERN_SUCCESS);
 }
