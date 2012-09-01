@@ -80,16 +80,26 @@
 
 - (void)setCurrentProcess:(ZGProcess *)newProcess
 {
+	BOOL shouldUpdateMemoryView = NO;
+	
+	if (_currentProcess.processID != newProcess.processID)
+	{
+		shouldUpdateMemoryView = YES;
+	}
 	_currentProcess = newProcess;
 	if (_currentProcess && ![_currentProcess hasGrantedAccess])
 	{
 		if (![_currentProcess grantUsAccess])
 		{
+			shouldUpdateMemoryView = YES;
 			NSLog(@"Memory viewer failed to grant access to PID %d", _currentProcess.processID);
 		}
 	}
 	
-	[self changeMemoryView:nil];
+	if (shouldUpdateMemoryView)
+	{
+		[self changeMemoryView:nil];
+	}
 }
 
 #pragma mark Initialization
