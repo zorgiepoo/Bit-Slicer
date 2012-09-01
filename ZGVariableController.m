@@ -292,10 +292,7 @@
 	 requestedSize:size
 	 pointerSize:self.document.currentProcess.pointerSize];
 	
-	if (self.document.undoManager.isUndoing || self.document.undoManager.isRedoing)
-	{
-		[self.document.tableController.watchVariablesTableView reloadData];
-	}
+	[self.document.tableController.watchVariablesTableView reloadData];
 }
 
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag
