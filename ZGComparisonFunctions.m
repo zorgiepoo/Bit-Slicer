@@ -210,11 +210,11 @@ inline BOOL equalFunction(ZGSearchData * __unsafe_unretained searchData, const v
 			// or size to include for the NULL terminator
 			if (searchData->_shouldIgnoreStringCase)
 			{
-				isEqual = (strncasecmp(variableValue, compareValue, (size_t)(size - !searchData->_shouldIncludeNullTerminator)) == 0);
+				isEqual = (strncasecmp(variableValue, compareValue, (size_t)size) == 0);
 			}
 			else
 			{
-				isEqual = (memcmp(variableValue, compareValue, (size_t)(size - !searchData->_shouldIncludeNullTerminator)) == 0);
+				isEqual = (memcmp(variableValue, compareValue, (size_t)size) == 0);
 			}
 			break;
 		case ZGUTF16String:
