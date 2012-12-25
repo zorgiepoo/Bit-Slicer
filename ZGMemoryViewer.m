@@ -266,8 +266,7 @@
 {
 	self.dataInspectorRepresenter = [[DataInspectorRepresenter alloc] init];
 	
-	[self relayoutAndResizeWindowPreservingFrame];
-	[[self.textView layoutRepresenter] performLayout];
+	// Add representers for data inspector, then remove them here. We do this otherwise if we try to add the representers some later point, they may not autoresize correctly.
 	
 	[@[self.textView.controller, self.textView.layoutRepresenter] makeObjectsPerformSelector:@selector(addRepresenter:) withObject:self.dataInspectorRepresenter];
 	
