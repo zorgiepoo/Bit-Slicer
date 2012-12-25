@@ -49,7 +49,7 @@
 - (void)resumeFromTask;
 
 - (void)clear;
-- (void)search;
+- (void)searchOrCancel;
 - (void)storeAllValues;
 
 - (void)cleanUp;

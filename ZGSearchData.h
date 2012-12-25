@@ -53,6 +53,10 @@
 	BOOL _searchDidCancel;
 }
 
+@property (readwrite, nonatomic) void *searchValue;
+@property (readwrite, nonatomic) ZGMemorySize dataSize;
+@property (readwrite, nonatomic) ZGMemorySize dataAlignment;
+
 @property (readwrite, nonatomic) void *rangeValue;
 @property (readwrite, copy, nonatomic) NSString *lastEpsilonValue;
 @property (readwrite, copy, nonatomic) NSString *lastAboveRangeValue;

@@ -346,10 +346,12 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
-void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block)
+void ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
 	
+	ZGMemorySize dataAlignment = searchData.dataAlignment;
+	ZGMemorySize dataSize = searchData.dataSize;
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	
@@ -392,10 +394,12 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, Z
 	}
 }
 
-void ZGSearchForData(ZGMemoryMap processTask, ZGMemorySize dataAlignment, ZGMemorySize dataSize, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block)
+void ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
 	
+	ZGMemorySize dataAlignment = searchData.dataAlignment;
+	ZGMemorySize dataSize = searchData.dataSize;
 	ZGMemoryAddress address = 0x0;
 	ZGMemorySize size;
 	mach_port_t objectName = MACH_PORT_NULL;

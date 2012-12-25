@@ -329,364 +329,378 @@
 	[self resumeFromTask];
 }
 
-- (void)search
+- (void)retrieveSearchData
 {
 	ZGVariableType dataType = (ZGVariableType)self.document.dataTypesPopUpButton.selectedItem.tag;
 	
+	// Set default search arguments
+	self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
+	self.searchData.rangeValue = NULL;
+	
+	self.searchData.shouldIgnoreStringCase = self.document.ignoreCaseCheckBox.state;
+	self.searchData.shouldIncludeNullTerminator = self.document.includeNullTerminatorCheckBox.state;
+	self.searchData.shouldCompareStoredValues = self.document.isFunctionTypeStore;
+	
+	self.searchData.shouldScanUnwritableValues = (self.document.scanUnwritableValuesCheckBox.state == NSOnState);
+	
+	NSString *inputErrorMessage = nil;
+	NSString *evaluatedSearchExpression = nil;
+	
+	evaluatedSearchExpression =
+		(dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
+		? self.document.searchValueTextField.stringValue
+		: [ZGCalculator evaluateExpression:self.document.searchValueTextField.stringValue];
+	
+	inputErrorMessage = [self confirmSearchInput:evaluatedSearchExpression];
+	
+	if (inputErrorMessage)
+	{
+		NSRunAlertPanel(@"Invalid Input", inputErrorMessage, nil, nil, nil);
+		return;
+	}
+	
+	// get search value and data size
+	ZGMemorySize tempDataSize = 0;
+	self.searchData.searchValue = valueFromString(self.document.currentProcess, evaluatedSearchExpression, dataType, &tempDataSize);
+	self.searchData.dataSize = tempDataSize;
+	
+	// We want to read the null terminator in this case... even though we normally don't store the terminator
+	// internally for UTF-16 strings. Lame hack, I know.
+	if (self.searchData.shouldIncludeNullTerminator)
+	{
+		if (dataType == ZGUTF16String)
+		{
+			self.searchData.dataSize += sizeof(unichar);
+		}
+		else if (dataType == ZGUTF8String)
+		{
+			self.searchData.dataSize += sizeof(char);
+		}
+	}
+	
+	ZGFunctionType functionType = (ZGFunctionType)self.document.functionPopUpButton.selectedItem.tag;
+	
+	if (self.searchData.searchValue && ![self.document doesFunctionTypeAllowSearchInput])
+	{
+		free(self.searchData.searchValue);
+		self.searchData.searchValue = NULL;
+	}
+	
+	self.searchData.dataAlignment =
+		(self.document.ignoreDataAlignmentCheckBox.state == NSOnState)
+		? sizeof(int8_t)
+		: ZGDataAlignment(self.document.currentProcess.is64Bit, dataType, self.searchData.dataSize);
+	
+	BOOL flagsFieldIsBlank = [[self.document.flagsTextField.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] isEqualToString:@""];
+	
+	if (self.document.flagsTextField.isEnabled)
+	{
+		NSString *flagsExpression =
+			(dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
+			? self.document.flagsTextField.stringValue
+			: [ZGCalculator evaluateExpression:self.document.flagsTextField.stringValue];
+		
+		inputErrorMessage = [self testSearchComponent:flagsExpression];
+		
+		if (inputErrorMessage && !flagsFieldIsBlank)
+		{
+			NSString *field =
+				(functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored)
+				? @"Epsilon"
+				: ((functionType == ZGGreaterThan || functionType == ZGGreaterThanStored) ? @"Below" : @"Above");
+			NSRunAlertPanel(@"Invalid Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
+			return;
+		}
+		else /* if (!inputErrorMessage || flagsFieldIsBlank) */
+		{
+			if (functionType == ZGGreaterThan || functionType == ZGLessThan || functionType == ZGGreaterThanStored || functionType == ZGLessThanStored)
+			{
+				if (!flagsFieldIsBlank)
+				{
+					// Clearly a range type of search
+					ZGMemorySize rangeDataSize;
+					self.searchData.rangeValue = valueFromString(self.document.currentProcess, flagsExpression, dataType, &rangeDataSize);
+				}
+				else
+				{
+					self.searchData.rangeValue = NULL;
+				}
+				
+				if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored)
+				{
+					self.searchData.lastBelowRangeValue = self.document.flagsTextField.stringValue;
+				}
+				else if (functionType == ZGLessThan || functionType == ZGLessThanStored)
+				{
+					self.searchData.lastAboveRangeValue = self.document.flagsTextField.stringValue;
+				}
+			}
+			else
+			{
+				if (!flagsFieldIsBlank)
+				{
+					// Clearly an epsilon flag
+					ZGMemorySize epsilonDataSize;
+					void *epsilon = valueFromString(self.document.currentProcess, flagsExpression, ZGDouble, &epsilonDataSize);
+					if (epsilon)
+					{
+						self.searchData.epsilon = *((double *)epsilon);
+						free(epsilon);
+					}
+				}
+				else
+				{
+					self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
+				}
+				
+				self.searchData.lastEpsilonValue = self.document.flagsTextField.stringValue;
+			}
+		}
+	}
+	
+	// Deal with beginning and ending addresses, if there are any
+	
+	NSString *calculatedBeginAddress = [ZGCalculator evaluateExpression:self.document.beginningAddressTextField.stringValue];
+	NSString *calculatedEndAddress = [ZGCalculator evaluateExpression:self.document.endingAddressTextField.stringValue];
+	
+	if (![self.document.beginningAddressTextField.stringValue isEqualToString:@""])
+	{
+		if ([self testSearchComponent:calculatedBeginAddress])
+		{
+			NSRunAlertPanel(@"Invalid Input", @"The expression in the beginning address field is not valid.", nil, nil, nil, nil);
+			return;
+		}
+		
+		self.searchData.beginAddress = memoryAddressFromExpression(calculatedBeginAddress);
+	}
+	else
+	{
+		self.searchData.beginAddress = 0x0;
+	}
+	
+	if (![self.document.endingAddressTextField.stringValue isEqualToString:@""])
+	{
+		if ([self testSearchComponent:calculatedEndAddress])
+		{
+			NSRunAlertPanel(@"Invalid Input", @"The expression in the ending address field is not valid.", nil, nil, nil, nil);
+			return;
+		}
+		
+		self.searchData.endAddress = memoryAddressFromExpression(calculatedEndAddress);
+	}
+	else
+	{
+		self.searchData.endAddress = MAX_MEMORY_ADDRESS;
+	}
+	
+	if (self.searchData.beginAddress >= self.searchData.endAddress)
+	{
+		NSRunAlertPanel(@"Invalid Input", @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted.", nil, nil, nil, nil);
+		return;
+	}
+	
+	if (dataType == ZGByteArray)
+	{
+		self.searchData.byteArrayFlags = allocateFlagsForByteArrayWildcards(evaluatedSearchExpression);
+	}
+	
+	if (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
+	{
+		self.searchData.compareOffset = self.searchData.searchValue;
+	}
+}
+
+- (void)search
+{
+	ZGVariableType dataType = (ZGVariableType)self.document.dataTypesPopUpButton.selectedItem.tag;
+	ZGFunctionType functionType = (ZGFunctionType)self.document.functionPopUpButton.selectedItem.tag;
+	
 	BOOL goingToNarrowDownSearches = self.isInNarrowSearchMode;
 	
-	if (self.canStartTask)
+	// Find all variables that are set to be searched, but shouldn't be
+	// this is if the variable's data type does not match, or if the variable
+	// is frozen
+	for (ZGVariable *variable in self.document.watchVariablesArray)
 	{
-		// Find all variables that are set to be searched, but shouldn't be
-		// this is if the variable's data type does not match, or if the variable
-		// is frozen
-		for (ZGVariable *variable in self.document.watchVariablesArray)
+		if (variable.shouldBeSearched && (variable.type != dataType || variable.isFrozen))
 		{
-			if (variable.shouldBeSearched && (variable.type != dataType || variable.isFrozen))
-			{
-				variable.shouldBeSearched = NO;
-			}
+			variable.shouldBeSearched = NO;
+		}
+	}
+	
+	// Re-display in case we set variables to not be searched
+	self.document.tableController.watchVariablesTableView.needsDisplay = YES;
+	
+	[self retrieveSearchData];
+	
+	NSMutableArray *temporaryVariablesArray = [[NSMutableArray alloc] init];
+	
+	// Add all variables whose value should not be searched for, first
+	
+	for (ZGVariable *variable in self.document.watchVariablesArray)
+	{
+		if (variable.isFrozen || variable.type != self.document.dataTypesPopUpButton.selectedItem.tag)
+		{
+			variable.shouldBeSearched = NO;
 		}
 		
-		// Re-display in case we set variables to not be searched
-		self.document.tableController.watchVariablesTableView.needsDisplay = YES;
-		
-		// Basic search information
-		ZGMemorySize dataSize = 0;
-		void *searchValue = NULL;
-		
-		// Set default search arguments
-		self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
-		self.searchData.rangeValue = NULL;
-		
-		self.searchData.shouldIgnoreStringCase = self.document.ignoreCaseCheckBox.state;
-		self.searchData.shouldIncludeNullTerminator = self.document.includeNullTerminatorCheckBox.state;
-		self.searchData.shouldCompareStoredValues = self.document.isFunctionTypeStore;
-		
-		self.searchData.shouldScanUnwritableValues = (self.document.scanUnwritableValuesCheckBox.state == NSOnState);
-		
-		NSString *evaluatedSearchExpression = nil;
-		NSString *inputErrorMessage = nil;
-		
-		evaluatedSearchExpression =
-			(dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
-			? self.document.searchValueTextField.stringValue
-			: [ZGCalculator evaluateExpression:self.document.searchValueTextField.stringValue];
-		
-		inputErrorMessage = [self confirmSearchInput:evaluatedSearchExpression];
-		
-		if (inputErrorMessage)
+		if (!variable.shouldBeSearched)
 		{
-			NSRunAlertPanel(@"Invalid Input", inputErrorMessage, nil, nil, nil);
-			return;
+			[temporaryVariablesArray addObject:variable];
 		}
+	}
+	
+	[self prepareTask];
+	
+	static BOOL (*compareFunctions[10])(ZGSearchData * __unsafe_unretained, const void *, const void *, ZGVariableType, ZGMemorySize) =
+	{
+		equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalPlusFunction, notEqualPlusFunction
+	};
+	
+	BOOL (*compareFunction)(ZGSearchData * __unsafe_unretained, const void *, const void *, ZGVariableType, ZGMemorySize) = compareFunctions[functionType];
+	
+	ZGMemorySize dataSize = self.searchData.dataSize;
+	void *searchValue = self.searchData.searchValue;
+	
+	if (!goingToNarrowDownSearches)
+	{
+		NSUInteger numberOfRegions = self.document.currentProcess.numberOfRegions;
 		
-		// get search value and data size
-		searchValue = valueFromString(self.document.currentProcess, evaluatedSearchExpression, dataType, &dataSize);
+		self.document.searchingProgressIndicator.maxValue = numberOfRegions;
+		self.document.currentProcess.numberOfVariablesFound = 0;
+		self.document.currentProcess.searchProgress = 0;
 		
-		// We want to read the null terminator in this case... even though we normally don't store the terminator
-		// internally for UTF-16 strings. Lame hack, I know.
-		if (self.searchData.shouldIncludeNullTerminator)
+		[self createUserInterfaceTimer];
+		
+		ZGVariableQualifier qualifier =
+			[[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState
+			? ZGSigned
+			: ZGUnsigned;
+		ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
+		
+		ZGProcess *currentProcess = self.document.currentProcess;
+		search_for_data_t searchForDataCallback = ^(ZGSearchData * __unsafe_unretained searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
 		{
-			if (dataType == ZGUTF16String)
+			if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
 			{
-				dataSize += sizeof(unichar);
-			}
-			else if (dataType == ZGUTF8String)
-			{
-				dataSize += sizeof(char);
-			}
-		}
-		
-		ZGFunctionType functionType = (ZGFunctionType)self.document.functionPopUpButton.selectedItem.tag;
-		
-		if (searchValue && ![self.document doesFunctionTypeAllowSearchInput])
-		{
-			free(searchValue);
-			searchValue = NULL;
-		}
-		
-		ZGMemorySize dataAlignment =
-			(self.document.ignoreDataAlignmentCheckBox.state == NSOnState)
-			? sizeof(int8_t)
-			: ZGDataAlignment(self.document.currentProcess.is64Bit, dataType, dataSize);
-		
-		BOOL flagsFieldIsBlank = [[self.document.flagsTextField.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] isEqualToString:@""];
-		
-		if (self.document.flagsTextField.isEnabled)
-		{
-			NSString *flagsExpression =
-				(dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
-				? self.document.flagsTextField.stringValue
-				: [ZGCalculator evaluateExpression:self.document.flagsTextField.stringValue];
-			
-			inputErrorMessage = [self testSearchComponent:flagsExpression];
-			
-			if (inputErrorMessage && !flagsFieldIsBlank)
-			{
-				NSString *field =
-					(functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored)
-					? @"Epsilon"
-					: ((functionType == ZGGreaterThan || functionType == ZGGreaterThanStored) ? @"Below" : @"Above");
-				NSRunAlertPanel(@"Invalid Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
-				return;
-			}
-			else /* if (!inputErrorMessage || flagsFieldIsBlank) */
-			{
-				if (functionType == ZGGreaterThan || functionType == ZGLessThan || functionType == ZGGreaterThanStored || functionType == ZGLessThanStored)
-				{
-					if (!flagsFieldIsBlank)
-					{
-						// Clearly a range type of search
-						ZGMemorySize rangeDataSize;
-						self.searchData.rangeValue = valueFromString(self.document.currentProcess, flagsExpression, dataType, &rangeDataSize);
-					}
-					else
-					{
-						self.searchData.rangeValue = NULL;
-					}
-					
-					if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored)
-					{
-						self.searchData.lastBelowRangeValue = self.document.flagsTextField.stringValue;
-					}
-					else if (functionType == ZGLessThan || functionType == ZGLessThanStored)
-					{
-						self.searchData.lastAboveRangeValue = self.document.flagsTextField.stringValue;
-					}
-				}
-				else
-				{
-					if (!flagsFieldIsBlank)
-					{
-						// Clearly an epsilon flag
-						ZGMemorySize epsilonDataSize;
-						void *epsilon = valueFromString(self.document.currentProcess, flagsExpression, ZGDouble, &epsilonDataSize);
-						if (epsilon)
-						{
-							self.searchData.epsilon = *((double *)epsilon);
-							free(epsilon);
-						}
-					}
-					else
-					{
-						self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
-					}
-					
-					self.searchData.lastEpsilonValue = self.document.flagsTextField.stringValue;
-				}
-			}
-		}
-		
-		// Deal with beginning and ending addresses, if there are any
-		
-		NSString *calculatedBeginAddress = [ZGCalculator evaluateExpression:self.document.beginningAddressTextField.stringValue];
-		NSString *calculatedEndAddress = [ZGCalculator evaluateExpression:self.document.endingAddressTextField.stringValue];
-		
-		if (![self.document.beginningAddressTextField.stringValue isEqualToString:@""])
-		{
-			if ([self testSearchComponent:calculatedBeginAddress])
-			{
-				NSRunAlertPanel(@"Invalid Input", @"The expression in the beginning address field is not valid.", nil, nil, nil, nil);
-				return;
+				ZGVariable *newVariable =
+				[[ZGVariable alloc]
+				 initWithValue:variableData
+				 size:dataSize
+				 address:address
+				 type:dataType
+				 qualifier:qualifier
+				 pointerSize:pointerSize];
+				
+				[temporaryVariablesArray addObject:newVariable];
+				
+				currentProcess.numberOfVariablesFound++;
 			}
 			
-			self.searchData.beginAddress = memoryAddressFromExpression(calculatedBeginAddress);
-		}
-		else
-		{
-			self.searchData.beginAddress = 0x0;
-		}
-		
-		if (![self.document.endingAddressTextField.stringValue isEqualToString:@""])
-		{
-			if ([self testSearchComponent:calculatedEndAddress])
-			{
-				NSRunAlertPanel(@"Invalid Input", @"The expression in the ending address field is not valid.", nil, nil, nil, nil);
-				return;
-			}
-			
-			self.searchData.endAddress = memoryAddressFromExpression(calculatedEndAddress);
-		}
-		else
-		{
-			self.searchData.endAddress = MAX_MEMORY_ADDRESS;
-		}
-		
-		if (self.searchData.beginAddress >= self.searchData.endAddress)
-		{
-			NSRunAlertPanel(@"Invalid Input", @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted.", nil, nil, nil, nil);
-			return;
-		}
-		
-		NSMutableArray *temporaryVariablesArray = [[NSMutableArray alloc] init];
-		
-		// Add all variables whose value should not be searched for, first
-		
-		for (ZGVariable *variable in self.document.watchVariablesArray)
-		{
-			if (variable.isFrozen || variable.type != self.document.dataTypesPopUpButton.selectedItem.tag)
-			{
-				variable.shouldBeSearched = NO;
-			}
-			
-			if (!variable.shouldBeSearched)
-			{
-				[temporaryVariablesArray addObject:variable];
-			}
-		}
-		
-		[self prepareTask];
-		
-		static BOOL (*compareFunctions[10])(ZGSearchData * __unsafe_unretained, const void *, const void *, ZGVariableType, ZGMemorySize) =
-		{
-			equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalPlusFunction, notEqualPlusFunction
+			currentProcess->_searchProgress = currentRegionNumber;
 		};
 		
-		BOOL (*compareFunction)(ZGSearchData * __unsafe_unretained, const void *, const void *, ZGVariableType, ZGMemorySize) = compareFunctions[functionType];
-        
-		if (dataType == ZGByteArray)
+		dispatch_block_t searchForDataCompleteBlock = ^
 		{
-			self.searchData.byteArrayFlags = allocateFlagsForByteArrayWildcards(evaluatedSearchExpression);
-		}
+			if (searchValue)
+			{
+				free(searchValue);
+			}
+			
+			self.userInterfaceTimer = nil;
+			
+			[self searchCleanUp:temporaryVariablesArray];
+		};
+		dispatch_block_t searchForDataBlock = ^
+		{
+			if (self.searchData.shouldCompareStoredValues)
+			{
+				ZGSearchForSavedData(currentProcess.processTask, self.searchData, searchForDataCallback);
+			}
+			else
+			{
+				ZGSearchForData(currentProcess.processTask, self.searchData, searchForDataCallback);
+			}
+			dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
+		};
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchForDataBlock);
+	}
+	else /* if (goingToNarrowDownSearches) */
+	{
+		ZGMemoryMap processTask = self.document.currentProcess.processTask;
 		
-		if (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
-		{
-			self.searchData.compareOffset = searchValue;
-		}
+		self.document.searchingProgressIndicator.maxValue = self.document.watchVariablesArray.count;
+		self.document.currentProcess.searchProgress = 0;
+		self.document.currentProcess.numberOfVariablesFound = 0;
 		
-		if (!goingToNarrowDownSearches)
+		[self createUserInterfaceTimer];
+		
+		dispatch_block_t completeSearchBlock = ^
 		{
-			NSUInteger numberOfRegions = self.document.currentProcess.numberOfRegions;
-			
-			self.document.searchingProgressIndicator.maxValue = numberOfRegions;
-			self.document.currentProcess.numberOfVariablesFound = 0;
-			self.document.currentProcess.searchProgress = 0;
-			
-			[self createUserInterfaceTimer];
-			
-			ZGVariableQualifier qualifier =
-				[[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState
-				? ZGSigned
-				: ZGUnsigned;
-			ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
-			
-			ZGProcess *currentProcess = self.document.currentProcess;
-			search_for_data_t searchForDataCallback = ^(ZGSearchData * __unsafe_unretained searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
+			if (self.searchData.searchValue)
 			{
-				if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
-				{
-					ZGVariable *newVariable =
-						[[ZGVariable alloc]
-						 initWithValue:variableData
-						 size:dataSize
-						 address:address
-						 type:dataType
-						 qualifier:qualifier
-						 pointerSize:pointerSize];
-					
-					[temporaryVariablesArray addObject:newVariable];
-					
-					currentProcess.numberOfVariablesFound++;
-				}
-				
-				currentProcess->_searchProgress = currentRegionNumber;
-			};
+				free(self.searchData.searchValue);
+			}
 			
-			dispatch_block_t searchForDataCompleteBlock = ^
-			{
-				if (searchValue)
-				{
-					free(searchValue);
-				}
-				
-				self.userInterfaceTimer = nil;
-				
-				[self searchCleanUp:temporaryVariablesArray];
-			};
-			dispatch_block_t searchForDataBlock = ^
-			{
-				if (self.searchData.shouldCompareStoredValues)
-				{
-					ZGSearchForSavedData(currentProcess.processTask, dataAlignment, dataSize, self.searchData, searchForDataCallback);
-				}
-				else
-				{
-					ZGSearchForData(currentProcess.processTask, dataAlignment, dataSize, self.searchData, searchForDataCallback);
-				}
-				dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
-			};
-			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchForDataBlock);
-		}
-		else /* if (goingToNarrowDownSearches) */
+			self.userInterfaceTimer = nil;
+			
+			[self searchCleanUp:temporaryVariablesArray];
+		};
+		
+		ZGProcess *currentProcess = self.document.currentProcess;
+		ZGMemoryAddress beginningAddress = self.searchData.beginAddress;
+		ZGMemoryAddress endingAddress = self.searchData.endAddress;
+		
+		__block ZGSearchData *searchData = self.searchData;
+		dispatch_block_t searchBlock = ^
 		{
-			ZGMemoryMap processTask = self.document.currentProcess.processTask;
-			
-			self.document.searchingProgressIndicator.maxValue = self.document.watchVariablesArray.count;
-			self.document.currentProcess.searchProgress = 0;
-			self.document.currentProcess.numberOfVariablesFound = 0;
-			
-			[self createUserInterfaceTimer];
-			
-			dispatch_block_t completeSearchBlock = ^
+			for (ZGVariable *variable in self.document.watchVariablesArray)
 			{
-				if (searchValue)
+				if (variable.shouldBeSearched)
 				{
-					free(searchValue);
-				}
-				
-				self.userInterfaceTimer = nil;
-				
-				[self searchCleanUp:temporaryVariablesArray];
-			};
-			
-			ZGProcess *currentProcess = self.document.currentProcess;
-			ZGMemoryAddress beginningAddress = self.searchData.beginAddress;
-			ZGMemoryAddress endingAddress = self.searchData.endAddress;
-			
-			__block ZGSearchData *searchData = self.searchData;
-			dispatch_block_t searchBlock = ^
-			{
-				for (ZGVariable *variable in self.document.watchVariablesArray)
-				{
-					if (variable.shouldBeSearched)
+					ZGMemoryAddress variableAddress = variable.address;
+					
+					if (variable.size > 0 && dataSize > 0 &&
+						(beginningAddress <= variableAddress) &&
+						(endingAddress >= variableAddress + dataSize))
 					{
-						ZGMemoryAddress variableAddress = variable.address;
-						
-						if (variable.size > 0 && dataSize > 0 &&
-							(beginningAddress <= variableAddress) &&
-							(endingAddress >= variableAddress + dataSize))
+						ZGMemorySize outputSize = dataSize;
+						void *variableValue = NULL;
+						if (ZGReadBytes(processTask, variableAddress, &variableValue, &outputSize))
 						{
-							ZGMemorySize outputSize = dataSize;
-							void *variableValue = NULL;
-							if (ZGReadBytes(processTask, variableAddress, &variableValue, &outputSize))
+							void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue;
+							
+							if (compareValue && compareFunction(searchData, variableValue, compareValue, dataType, dataSize))
 							{
-								void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue;
-								
-								if (compareValue && compareFunction(searchData, variableValue, compareValue, dataType, dataSize))
-								{
-									[temporaryVariablesArray addObject:variable];
-									currentProcess.numberOfVariablesFound++;
-								}
-								
-								ZGFreeBytes(processTask, variableValue, outputSize);
+								[temporaryVariablesArray addObject:variable];
+								currentProcess.numberOfVariablesFound++;
 							}
+							
+							ZGFreeBytes(processTask, variableValue, outputSize);
 						}
 					}
-					
-					if (ZGSearchDidCancel(searchData))
-					{
-						break;
-					}
-					
-					currentProcess.searchProgress++;
 				}
 				
-				dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
-			};
-			ZGInitializeSearch(self.searchData);
-			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchBlock);
-		}
+				if (ZGSearchDidCancel(searchData))
+				{
+					break;
+				}
+				
+				currentProcess.searchProgress++;
+			}
+			
+			dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
+		};
+		ZGInitializeSearch(self.searchData);
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchBlock);
+	}
+}
+
+- (void)searchOrCancel
+{
+	if (self.canStartTask)
+	{
+		[self search];
 	}
 	else
 	{
