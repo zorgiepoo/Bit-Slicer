@@ -341,22 +341,22 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 	
 	errno = 0;
 	char *endPtr = NULL;
-	/* note that strtoull handles negative values */
+	// note that strtoull handles negative values
 	unsigned long long unsignedValue = strtoull(buffer, &endPtr, 0);
 	int resultError = errno;
 	
-	/* Make sure we consumed some of the string */
+	// Make sure we consumed some of the string
 	if (endPtr == buffer) return NO;
 	
-	/* Check for conversion errors (overflow, etc.) */
+	// Check for conversion errors (overflow, etc.)
 	if (resultError != 0) return NO;
 	
-	/* Now check to make sure we fit */
+	// Now check to make sure we fit
 	if (! valueCanFitInByteCount(unsignedValue, count)) return NO;
 	
-	/* Actually return the bytes if requested */
+	// Actually return the bytes if requested
 	if (outData != NULL) {
-	    /* Get all 8 bytes in big-endian form */
+	    // Get all 8 bytes in big-endian form
 	    unsigned long long consumableValue = unsignedValue;
 	    unsigned char bytes[8];
 	    unsigned i = 8;
@@ -365,7 +365,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 		consumableValue >>= 8;
 	    }
 	    
-	    /* Now copy the last (least significant) 'count' bytes to outData in the requested endianness */
+	    // Now copy the last (least significant) 'count' bytes to outData in the requested endianness
 	    for (i=0; i < count; i++) {
 		unsigned char byte = bytes[(8 - count + i)];
 		if (endianness == eEndianBig) {
@@ -377,7 +377,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 	    }
 	}
 	
-	/* Victory */
+	// Victory
 	return YES;
     }
     else if (inspectorType == eInspectorTypeFloatingPoint) {
@@ -404,10 +404,10 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 	}
 	int resultError = errno;
 	
-	/* Make sure we consumed some of the string */
+	// Make sure we consumed some of the string
 	if (endPtr == buffer) return NO;
 	
-	/* Check for conversion errors (overflow, etc.) */
+	// Check for conversion errors (overflow, etc.)
 	if (resultError != 0) return NO;
 	
 	if (outData != NULL) {
@@ -419,7 +419,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 		memcpy(bytes, &doubleValue, sizeof doubleValue);
 	    }
 	    
-	    /* Now copy the first 'count' bytes to outData in the requested endianness.  This is different from the integer case - there we always work big-endian because we support more different byteCounts, but here we work in the native endianness because there's no simple way to convert a float or double to big endian form */
+	    // Now copy the first 'count' bytes to outData in the requested endianness.  This is different from the integer case - there we always work big-endian because we support more different byteCounts, but here we work in the native endianness because there's no simple way to convert a float or double to big endian form
 	    NSUInteger i;
 	    for (i=0; i < count; i++) {
 		if (endianness == eNativeEndianness) {
@@ -431,11 +431,11 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 	    }
 	}
 	
-	/* Return triumphantly! */
+	// Return triumphantly!
 	return YES;
     }
     else {
-	/* Unknown inspector type */
+	// Unknown inspector type
 	return NO;
     }
 }
@@ -646,6 +646,7 @@ static NSAttributedString *inspectionError(NSString *s) {
         [tableView reloadData];
     }
     else if ([ident isEqualToString:kInspectorValueColumnIdentifier]) {
+		/*
 	NSUInteger byteCount = [self selectedByteCountForEditing];
 	if (byteCount != INVALID_EDITING_BYTE_COUNT) {
 	    HFASSERT(byteCount <= MAX_EDITABLE_BYTE_COUNT);
@@ -659,6 +660,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 		[controller setSelectedContentsRanges:selectedRanges]; //Hack to preserve the selection across the data insertion
 	    }
 	}
+		 */
     }
     else if ([ident isEqualToString:kInspectorAddButtonColumnIdentifier] || [ident isEqualToString:kInspectorSubtractButtonColumnIdentifier]) {
         /* Nothing to do */
