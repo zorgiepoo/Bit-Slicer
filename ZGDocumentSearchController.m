@@ -579,51 +579,49 @@
 		ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
 		
 		ZGProcess *currentProcess = self.document.currentProcess;
-		search_for_data_t searchForDataCallback = ^(ZGSearchData * __unsafe_unretained searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber)
+		search_for_data_t searchForDataCallback = ^(ZGSearchData * __unsafe_unretained searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber, NSMutableArray * __unsafe_unretained results)
 		{
 			if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
 			{
 				ZGVariable *newVariable =
-				[[ZGVariable alloc]
-				 initWithValue:variableData
-				 size:dataSize
-				 address:address
-				 type:dataType
-				 qualifier:qualifier
-				 pointerSize:pointerSize];
+					[[ZGVariable alloc]
+					 initWithValue:variableData
+					 size:dataSize
+					 address:address
+					 type:dataType
+					 qualifier:qualifier
+					 pointerSize:pointerSize];
 				
-				[temporaryVariablesArray addObject:newVariable];
-				
-				currentProcess.numberOfVariablesFound++;
+				[results addObject:newVariable];
 			}
-			
+		};
+		
+		search_for_data_update_interface_t searchForDataUpdateInterfaceCallback = ^(NSArray * __unsafe_unretained newResults, ZGMemorySize currentRegionNumber)
+		{
+			currentProcess.numberOfVariablesFound += newResults.count;
 			currentProcess->_searchProgress = currentRegionNumber;
 		};
 		
-		dispatch_block_t searchForDataCompleteBlock = ^
-		{
-			if (searchValue)
-			{
-				free(searchValue);
-			}
-			
-			self.userInterfaceTimer = nil;
-			
-			[self searchCleanUp:temporaryVariablesArray];
-		};
-		dispatch_block_t searchForDataBlock = ^
-		{
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 			if (self.searchData.shouldCompareStoredValues)
 			{
 				ZGSearchForSavedData(currentProcess.processTask, self.searchData, searchForDataCallback);
 			}
 			else
 			{
-				ZGSearchForData(currentProcess.processTask, self.searchData, searchForDataCallback);
+				[temporaryVariablesArray addObjectsFromArray:ZGSearchForData(currentProcess.processTask, self.searchData, searchForDataCallback, searchForDataUpdateInterfaceCallback)];
 			}
-			dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
-		};
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchForDataBlock);
+			dispatch_async(dispatch_get_main_queue(), ^{
+				if (searchValue)
+				{
+					free(searchValue);
+				}
+				
+				self.userInterfaceTimer = nil;
+				
+				[self searchCleanUp:temporaryVariablesArray];
+			});
+		});
 	}
 	else /* if (goingToNarrowDownSearches) */
 	{

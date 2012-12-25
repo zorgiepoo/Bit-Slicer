@@ -74,6 +74,6 @@
 @property (readwrite, nonatomic) unsigned char *byteArrayFlags;
 
 @property (readwrite, nonatomic) BOOL shouldCancelSearch;
-@property (readwrite, nonatomic) BOOL searchDidCancel;
+@property (readwrite) BOOL searchDidCancel;
 
 @end

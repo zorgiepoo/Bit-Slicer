@@ -39,6 +39,16 @@
 @implementation ZGRegion
 @end
 
+@interface ZGRegionGroupResults : NSObject
+
+@property (strong, nonatomic) NSMutableArray *results;
+@property (assign) NSUInteger groupNumber;
+
+@end
+
+@implementation ZGRegionGroupResults
+@end
+
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 {
 	kern_return_t result = task_for_pid(current_task(), process, task);
@@ -346,6 +356,41 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
+NSArray *ZGSplitRegionsIntoGroups(NSArray *regions, NSUInteger numberOfGroups)
+{
+	ZGMemorySize totalSize = 0;
+	
+	for (ZGRegion *region in regions)
+	{
+		totalSize += region.size;
+	}
+	
+	NSUInteger numberOfBytesPerGroup = totalSize / numberOfGroups;
+	NSMutableArray *regionGroups = [[NSMutableArray alloc] init];
+	NSMutableArray *currentRegionGroup = [[NSMutableArray alloc] init];
+	ZGMemorySize sizeAccumulator = 0;
+	
+	for (ZGRegion *region in regions)
+	{
+		if (sizeAccumulator <= numberOfBytesPerGroup)
+		{
+			[currentRegionGroup addObject:region];
+		}
+		else
+		{
+			[regionGroups addObject:currentRegionGroup];
+			currentRegionGroup = [[NSMutableArray alloc] init];
+			sizeAccumulator = 0;
+			[currentRegionGroup addObject:region];
+		}
+		sizeAccumulator += region.size;
+	}
+	
+	[regionGroups addObject:currentRegionGroup];
+	
+	return regionGroups;
+}
+
 void ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block)
 {
 	ZGInitializeSearch(searchData);
@@ -375,7 +420,7 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unret
 				if (dataBeginAddress <= regionAddress + offset &&
 					dataEndAddress >= regionAddress + offset + dataSize)
 				{
-					block(searchData, &currentData[offset], regionBytes + offset, regionAddress + offset, currentRegionNumber);
+					block(searchData, &currentData[offset], regionBytes + offset, regionAddress + offset, currentRegionNumber, nil);
 				}
 				offset += dataAlignment;
 			}
@@ -394,14 +439,12 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unret
 	}
 }
 
-void ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block)
+NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t searchForDataBlock, search_for_data_update_interface_t updateInterfaceBlock)
 {
 	ZGInitializeSearch(searchData);
 	
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
-	
-	ZGMemorySize currentRegionNumber = 0;
 	
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
@@ -409,42 +452,95 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained
 	
 	NSArray *regions = ZGRegionsForProcessTask(processTask);
 	
-	for (ZGRegion *region in regions)
+	__block dispatch_semaphore_t finishedSemaphore = dispatch_semaphore_create(0);
+	
+	__block dispatch_semaphore_t regionCountSemaphore = dispatch_semaphore_create(1);
+	__block ZGMemorySize numberOfRegionsProcessed = 0;
+	
+	NSDate *currentDate = [NSDate date];
+	
+	NSArray *regionGroups = ZGSplitRegionsIntoGroups(regions, 12);
+	
+	NSUInteger regionGroupNumber = 0;
+	
+	NSMutableArray *allRegionGroupResults = [[NSMutableArray alloc] init];
+	
+	for (NSArray *regionGroup in regionGroups)
 	{
-		ZGMemoryAddress address = region.address;
-		ZGMemorySize size = region.size;
-		ZGMemoryProtection protection = region.protection;
+		ZGRegionGroupResults *regionGroupResults = [[ZGRegionGroupResults alloc] init];
+		regionGroupResults.groupNumber = regionGroupNumber;
+		regionGroupResults.results = [[NSMutableArray alloc] init];
+		regionGroupNumber++;
 		
-		if (address < dataEndAddress &&
-			address + size > dataBeginAddress &&
-			protection & VM_PROT_READ && (shouldScanUnwritableValues || (protection & VM_PROT_WRITE)))
-		{
-			char *bytes = NULL;
-			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
+		[allRegionGroupResults addObject:regionGroupResults];
+		
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			for (ZGRegion *region in regionGroup)
 			{
-				ZGMemorySize dataIndex = 0;
-				while (dataIndex + dataSize <= size && !searchData->_shouldCancelSearch)
+				NSMutableArray *localResults = [[NSMutableArray alloc] init];
+				ZGMemoryAddress address = region.address;
+				ZGMemorySize size = region.size;
+				ZGMemoryProtection protection = region.protection;
+				
+				if (address < dataEndAddress &&
+					address + size > dataBeginAddress &&
+					protection & VM_PROT_READ && (shouldScanUnwritableValues || (protection & VM_PROT_WRITE)))
 				{
-					if (dataBeginAddress <= address + dataIndex &&
-						dataEndAddress >= address + dataIndex + dataSize)
+					char *bytes = NULL;
+					if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
 					{
-						block(searchData, &bytes[dataIndex], NULL, address + dataIndex, currentRegionNumber);
+						ZGMemorySize dataIndex = 0;
+						while (dataIndex + dataSize <= size && !searchData->_shouldCancelSearch)
+						{
+							if (dataBeginAddress <= address + dataIndex &&
+								dataEndAddress >= address + dataIndex + dataSize)
+							{
+								searchForDataBlock(searchData, &bytes[dataIndex], NULL, address + dataIndex, 0, localResults);
+							}
+							dataIndex += dataAlignment;
+						}
+						
+						ZGFreeBytes(processTask, bytes, size);
 					}
-					dataIndex += dataAlignment;
 				}
 				
-				ZGFreeBytes(processTask, bytes, size);
+				if (searchData->_shouldCancelSearch)
+				{
+					if (!searchData->_searchDidCancel)
+					{
+						searchData.searchDidCancel = YES;
+					}
+				}
+				
+				dispatch_semaphore_wait(regionCountSemaphore, DISPATCH_TIME_FOREVER);
+				numberOfRegionsProcessed++;
+				
+				updateInterfaceBlock(localResults, numberOfRegionsProcessed);
+				
+				[regionGroupResults.results addObjectsFromArray:localResults];
+				localResults = nil;
+				
+				if (numberOfRegionsProcessed == regions.count)
+				{
+					dispatch_semaphore_signal(finishedSemaphore);
+				}
+				dispatch_semaphore_signal(regionCountSemaphore);
 			}
-		}
-		
-		if (searchData->_shouldCancelSearch)
-		{
-			searchData.searchDidCancel = YES;
-			return;
-		}
-		
-		currentRegionNumber++;
+		});
 	}
+	
+	dispatch_semaphore_wait(finishedSemaphore, DISPATCH_TIME_FOREVER);
+	
+	NSMutableArray *allResults = [[NSMutableArray alloc] init];
+	
+	for (ZGRegionGroupResults *regionGroupResults in [allRegionGroupResults sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"groupNumber" ascending:YES]]])
+	{
+		[allResults addObjectsFromArray:regionGroupResults.results];
+	}
+	
+	NSLog(@"Time has been %f", [[NSDate date] timeIntervalSinceDate:currentDate]);
+	
+	return allResults;
 }
 
 #define MAX_STRING_SIZE 1024
