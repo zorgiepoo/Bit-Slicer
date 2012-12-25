@@ -36,6 +36,7 @@
 #import "ZGStatusBarRepresenter.h"
 #import "ZGLineCountingRepresenter.h"
 #import "ZGVerticalScrollerRepresenter.h"
+#import "DataInspectorRepresenter.h"
 #import "ZGProcess.h"
 #import "ZGAppController.h"
 #import "ZGUtilities.h"
@@ -57,6 +58,8 @@
 
 @property (readwrite, strong) ZGStatusBarRepresenter *statusBarRepresenter;
 @property (readwrite, strong) ZGLineCountingRepresenter *lineCountingRepresenter;
+@property (readwrite, strong) DataInspectorRepresenter *dataInspectorRepresenter;
+@property (readwrite) BOOL showsDataInspector;
 
 @property (readwrite) ZGMemoryAddress currentMemoryAddress;
 @property (readwrite) ZGMemorySize currentMemorySize;
@@ -108,8 +111,6 @@
 {
 	self = [super initWithWindowNibName:@"MemoryViewer"];
 	
-	[self setWindowFrameAutosaveName:@"ZGMemoryViewer"];
-	
 	return self;
 }
 
@@ -155,9 +156,6 @@
 
 - (void)windowDidLoad
 {
-	// For handling windowWillClose:
-	self.window.delegate = self;
-	
 	self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
 	
 	if ([self.window respondsToSelector:@selector(setRestorable:)] && [self.window respondsToSelector:@selector(setRestorationClass:)])
@@ -175,7 +173,7 @@
 	
 	for (HFRepresenter *representer in self.textView.layoutRepresenter.representers)
 	{
-		if ([representer isKindOfClass:HFStatusBarRepresenter.class] || [representer isKindOfClass:HFLineCountingRepresenter.class] || [representer isKindOfClass:HFVerticalScrollerRepresenter.class])
+		if ([representer isKindOfClass:HFStatusBarRepresenter.class] || [representer isKindOfClass:HFLineCountingRepresenter.class] || [representer isKindOfClass:HFVerticalScrollerRepresenter.class] || [representer isKindOfClass:[DataInspectorRepresenter class]])
 		{
 			[representersToRemove addObject:representer];
 		}
@@ -207,6 +205,11 @@
 	[self.textView.controller addRepresenter:verticalScrollerRepresenter];
 	[self.textView.layoutRepresenter addRepresenter:verticalScrollerRepresenter];
 	
+	[self initiateDataInspector];
+	
+	// It's important to set frame autosave name after we initiate the data inspector, otherwise the data inspector's frame will not be correct for some reason
+	[[self window] setFrameAutosaveName: @"ZGMemoryViewer"];
+	
 	// Add processes to popup button,
 	[self updateRunningApplicationProcesses:[[ZGAppController sharedController] lastSelectedProcessName]];
 	
@@ -224,12 +227,12 @@
 	if (!self.checkMemoryTimer)
 	{
 		self.checkMemoryTimer =
-			[NSTimer
-			 scheduledTimerWithTimeInterval:READ_MEMORY_INTERVAL
-			 target:self
-			 selector:@selector(readMemory:)
-			 userInfo:nil
-			 repeats:YES];
+		[NSTimer
+		 scheduledTimerWithTimeInterval:READ_MEMORY_INTERVAL
+		 target:self
+		 selector:@selector(readMemory:)
+		 userInfo:nil
+		 repeats:YES];
 	}
 }
 
@@ -237,6 +240,86 @@
 {
 	[self.checkMemoryTimer invalidate];
 	self.checkMemoryTimer = nil;
+}
+
+#pragma mark Data Inspector
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+	if (menuItem.action == @selector(toggleDataInspector:))
+	{
+		[menuItem setState:self.showsDataInspector];
+	}
+	
+	return YES;
+}
+
+- (void)initiateDataInspector
+{
+	self.dataInspectorRepresenter = [[DataInspectorRepresenter alloc] init];
+	
+	[self relayoutAndResizeWindowPreservingFrame];
+	[[self.textView layoutRepresenter] performLayout];
+	
+	[@[self.textView.controller, self.textView.layoutRepresenter] makeObjectsPerformSelector:@selector(addRepresenter:) withObject:self.dataInspectorRepresenter];
+	
+	[self.dataInspectorRepresenter resizeTableViewAfterChangingRowCount];
+	[self relayoutAndResizeWindowPreservingFrame];
+	
+	self.showsDataInspector = YES;
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataInspectorChangedRowCount:) name:DataInspectorDidChangeRowCount object:self.dataInspectorRepresenter];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataInspectorDeletedAllRows:) name:DataInspectorDidDeleteAllRows object:self.dataInspectorRepresenter];
+}
+
+- (IBAction)toggleDataInspector:(id)sender
+{
+	SEL action = self.showsDataInspector ? @selector(removeRepresenter:) : @selector(addRepresenter:);
+	
+	[@[self.textView.controller, self.textView.layoutRepresenter] makeObjectsPerformSelector:action withObject:self.dataInspectorRepresenter];
+	
+	self.showsDataInspector = !self.showsDataInspector;
+}
+
+- (NSSize)minimumWindowFrameSizeForProposedSize:(NSSize)frameSize
+{
+    NSView *layoutView = [self.textView.layoutRepresenter view];
+    NSSize proposedSizeInLayoutCoordinates = [layoutView convertSize:frameSize fromView:nil];
+    CGFloat resultingWidthInLayoutCoordinates = [self.textView.layoutRepresenter minimumViewWidthForLayoutInProposedWidth:proposedSizeInLayoutCoordinates.width];
+    NSSize resultSize = [layoutView convertSize:NSMakeSize(resultingWidthInLayoutCoordinates, proposedSizeInLayoutCoordinates.height) toView:nil];
+    return resultSize;
+}
+
+// Relayout the window without increasing its window frame size
+- (void)relayoutAndResizeWindowPreservingFrame
+{
+	NSWindow *window = [self window];
+	NSRect windowFrame = [window frame];
+	windowFrame.size = [self minimumWindowFrameSizeForProposedSize:windowFrame.size];
+	[window setFrame:windowFrame display:YES];
+}
+
+- (void)dataInspectorDeletedAllRows:(NSNotification *)note
+{
+	DataInspectorRepresenter *inspector = [note object];
+	[self.textView.controller removeRepresenter:inspector];
+	[[self.textView layoutRepresenter] removeRepresenter:inspector];
+	[self relayoutAndResizeWindowPreservingFrame];
+	self.showsDataInspector = NO;
+}
+
+// Called when our data inspector changes its size (number of rows)
+- (void)dataInspectorChangedRowCount:(NSNotification *)note
+{
+	DataInspectorRepresenter *inspector = [note object];
+	CGFloat newHeight = (CGFloat)[[[note userInfo] objectForKey:@"height"] doubleValue];
+	NSView *dataInspectorView = [inspector view];
+	NSSize size = [dataInspectorView frame].size;
+	size.height = newHeight;
+	[dataInspectorView setFrameSize:size];
+	
+	[self.textView.layoutRepresenter performLayout];
 }
 
 #pragma mark Updating running applications

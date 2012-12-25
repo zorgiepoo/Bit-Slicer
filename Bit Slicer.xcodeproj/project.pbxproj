@@ -28,6 +28,8 @@
 		775FCB1F11719DF6000054FB /* ZGVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1911719DF6000054FB /* ZGVariable.m */; };
 		775FCB2A11719E4A000054FB /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 775FCB2811719E4A000054FB /* Preferences.xib */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
+		776346FE16880E68003D01C9 /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 776346FD16880E68003D01C9 /* DataInspectorRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		7763470416881166003D01C9 /* DataInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7763470316881165003D01C9 /* DataInspectorView.xib */; };
 		7787C4D9137BB59200BFF606 /* ZGStatusBarRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7787C4EE137C556000BFF606 /* ZGLineCountingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4ED137C556000BFF606 /* ZGLineCountingView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7787C4F2137C5A8300BFF606 /* ZGLineCountingRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -101,6 +103,9 @@
 		775FCB1911719DF6000054FB /* ZGVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVariable.m; sourceTree = "<group>"; };
 		775FCB2911719E4A000054FB /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/Preferences.xib; sourceTree = "<group>"; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		776346FC16880E68003D01C9 /* DataInspectorRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataInspectorRepresenter.h; sourceTree = "<group>"; };
+		776346FD16880E68003D01C9 /* DataInspectorRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataInspectorRepresenter.m; sourceTree = "<group>"; };
+		7763470316881165003D01C9 /* DataInspectorView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DataInspectorView.xib; sourceTree = "<group>"; };
 		7787C4D7137BB59100BFF606 /* ZGStatusBarRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGStatusBarRepresenter.h; sourceTree = "<group>"; };
 		7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGStatusBarRepresenter.m; sourceTree = "<group>"; };
 		7787C4EC137C555F00BFF606 /* ZGLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGLineCountingView.h; sourceTree = "<group>"; };
@@ -242,6 +247,7 @@
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 				775FCB2811719E4A000054FB /* Preferences.xib */,
 				770EA822137B6FDE007FB85A /* MemoryViewer.xib */,
+				7763470316881165003D01C9 /* DataInspectorView.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -266,6 +272,8 @@
 				7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */,
 				7787C4F0137C5A8200BFF606 /* ZGLineCountingRepresenter.h */,
 				7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */,
+				776346FC16880E68003D01C9 /* DataInspectorRepresenter.h */,
+				776346FD16880E68003D01C9 /* DataInspectorRepresenter.m */,
 				7787C4EF137C55C300BFF606 /* HFLineCountingView.h */,
 				7787C4EC137C555F00BFF606 /* ZGLineCountingView.h */,
 				7787C4ED137C556000BFF606 /* ZGLineCountingView.m */,
@@ -333,6 +341,7 @@
 				775FCB2A11719E4A000054FB /* Preferences.xib in Resources */,
 				77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */,
 				770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */,
+				7763470416881166003D01C9 /* DataInspectorView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,6 +374,7 @@
 				770930B815BA7635009705A6 /* ZGDocumentTableController.m in Sources */,
 				770930BB15BA9060009705A6 /* ZGDocumentSearchController.m in Sources */,
 				770930BE15BA97B4009705A6 /* ZGSearchData.m in Sources */,
+				776346FE16880E68003D01C9 /* DataInspectorRepresenter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

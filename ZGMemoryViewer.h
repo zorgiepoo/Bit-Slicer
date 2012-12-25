@@ -46,4 +46,6 @@
 
 - (ZGMemoryAddress)selectedAddress;
 
+- (IBAction)toggleDataInspector:(id)sender;
+
 @end
