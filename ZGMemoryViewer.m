@@ -570,7 +570,7 @@
 			// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
 			[self.statusBarRepresenter updateString];
 			
-			self.lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase16(memoryAddress + memorySize);
+			self.lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase10(memoryAddress + memorySize);
 			self.lineCountingRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
 			// This will force the line numbers to update
 			[self.lineCountingRepresenter.view setNeedsDisplay:YES];

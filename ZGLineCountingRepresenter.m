@@ -46,18 +46,4 @@
 	return result;
 }
 
-// Don't do cycling
-
-- (void)setLineNumberFormat:(HFLineNumberFormat)format
-{
-	if (format == HFLineNumberFormatHexadecimal)
-	{
-		[super setLineNumberFormat:format];
-	}
-}
-
-- (void)cycleLineNumberFormat
-{
-}
-
 @end
