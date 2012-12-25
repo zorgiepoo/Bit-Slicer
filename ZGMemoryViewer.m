@@ -51,6 +51,7 @@
 #define ZGMemoryViewerAddress @"ZGMemoryViewerAddress"
 #define ZGMemoryViewerSize @"ZGMemoryViewerSize"
 #define ZGMemoryViewerProcessName @"ZGMemoryViewerProcessName"
+#define ZGMemoryViewerShowsDataInspector @"ZGMemoryViewerShowsDataInspector"
 
 @interface ZGMemoryViewer ()
 
@@ -129,6 +130,8 @@
     [coder
 		 encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject name]
 		 forKey:ZGMemoryViewerProcessName];
+	
+	[coder encodeBool:self.showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
 }
 
 - (void)restoreStateWithCoder:(NSCoder *)coder
@@ -144,6 +147,11 @@
 	self.currentMemoryAddress = [coder decodeInt64ForKey:ZGMemoryViewerAddress];
 	
 	[self updateRunningApplicationProcesses:[coder decodeObjectForKey:ZGMemoryViewerProcessName]];
+	
+	if ([coder decodeBoolForKey:ZGMemoryViewerShowsDataInspector])
+	{
+		[self toggleDataInspector:nil];
+	}
 }
 
 - (void)markChanges
@@ -266,7 +274,7 @@
 	[self.dataInspectorRepresenter resizeTableViewAfterChangingRowCount];
 	[self relayoutAndResizeWindowPreservingFrame];
 	
-	self.showsDataInspector = YES;
+	[@[self.textView.controller, self.textView.layoutRepresenter] makeObjectsPerformSelector:@selector(removeRepresenter:) withObject:self.dataInspectorRepresenter];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataInspectorChangedRowCount:) name:DataInspectorDidChangeRowCount object:self.dataInspectorRepresenter];
 	
