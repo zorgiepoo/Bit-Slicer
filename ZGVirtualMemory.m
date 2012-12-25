@@ -400,24 +400,24 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained
 	
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
-	ZGMemoryAddress address = 0x0;
-	ZGMemorySize size;
-	mach_port_t objectName = MACH_PORT_NULL;
-	vm_region_basic_info_data_64_t regionInfo;
-	mach_msg_type_number_t regionInfoSize = VM_REGION_BASIC_INFO_COUNT_64;
-
+	
 	ZGMemorySize currentRegionNumber = 0;
 	
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
 	
-	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS)
+	NSArray *regions = ZGRegionsForProcessTask(processTask);
+	
+	for (ZGRegion *region in regions)
 	{
-		// Skipping an entire region will provide significant performance benefits
+		ZGMemoryAddress address = region.address;
+		ZGMemorySize size = region.size;
+		ZGMemoryProtection protection = region.protection;
+		
 		if (address < dataEndAddress &&
 			address + size > dataBeginAddress &&
-			regionInfo.protection & VM_PROT_READ && (shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
+			protection & VM_PROT_READ && (shouldScanUnwritableValues || (protection & VM_PROT_WRITE)))
 		{
 			char *bytes = NULL;
 			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
@@ -444,7 +444,6 @@ void ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained
 		}
 		
 		currentRegionNumber++;
-		address += size;
 	}
 }
 
