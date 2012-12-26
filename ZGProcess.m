@@ -36,59 +36,18 @@
 
 @implementation ZGProcess
 
-static NSArray *frozenProcesses = nil;
-+ (NSArray *)frozenProcesses
-{
-	if (!frozenProcesses)
++ (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask
+{	
+	integer_t suspendCount;
+	if (ZGSuspendCount(processTask, &suspendCount))
 	{
-		frozenProcesses = [[NSArray alloc] init];
-	}
-	
-	return frozenProcesses;
-}
-
-+ (void)addFrozenProcess:(pid_t)pid
-{
-	frozenProcesses = [frozenProcesses arrayByAddingObject:@(pid)];
-}
-
-+ (void)removeFrozenProcess:(pid_t)pid
-{
-	NSMutableArray *mutableArray = [[NSMutableArray alloc] init];
-	
-	for (NSNumber *currentPID in frozenProcesses)
-	{
-		if (currentPID.intValue != pid)
+		if (suspendCount > 0)
 		{
-			[mutableArray addObject:currentPID];
+			ZGResumeTask(processTask);
 		}
-	}
-	
-	frozenProcesses = [NSArray arrayWithArray:mutableArray];
-}
-
-+ (void)pauseOrUnpauseProcess:(pid_t)pid
-{
-	BOOL success;
-	
-	if ([ZGProcess.frozenProcesses containsObject:@(pid)])
-	{
-		// Unfreeze
-		success = ZGUnpauseProcess(pid);
-		
-		if (success)
+		else
 		{
-			[ZGProcess removeFrozenProcess:pid];
-		}
-	}
-	else
-	{
-		// Freeze
-		success = ZGPauseProcess(pid);
-		
-		if (success)
-		{
-			[ZGProcess addFrozenProcess:pid];
+			ZGSuspendTask(processTask);
 		}
 	}
 }

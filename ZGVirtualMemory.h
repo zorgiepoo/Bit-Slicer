@@ -91,5 +91,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize);
 
-BOOL ZGPauseProcess(pid_t process);
-BOOL ZGUnpauseProcess(pid_t process);
+BOOL ZGSuspendCount(ZGMemoryMap processTask, integer_t *suspendCount);
+
+BOOL ZGSuspendTask(ZGMemoryMap processTask);
+BOOL ZGResumeTask(ZGMemoryMap processTask);

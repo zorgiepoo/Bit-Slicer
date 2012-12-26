@@ -52,10 +52,7 @@
 @property (readwrite, nonatomic) BOOL isDoingMemoryDump;
 @property (readwrite, nonatomic) BOOL isStoringAllData;
 
-+ (NSArray *)frozenProcesses;
-+ (void)addFrozenProcess:(pid_t)pid;
-+ (void)removeFrozenProcess:(pid_t)pid;
-+ (void)pauseOrUnpauseProcess:(pid_t)pid;
++ (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
 - (id)initWithName:(NSString *)processName processID:(pid_t)aProcessID set64Bit:(BOOL)flag64Bit;
 - (BOOL)grantUsAccess;

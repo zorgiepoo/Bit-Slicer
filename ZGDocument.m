@@ -1130,7 +1130,15 @@ static NSSize *expandedWindowMinSize = nil;
 			return NO;
 		}
 		
-		menuItem.title = [ZGProcess.frozenProcesses containsObject:@(self.currentProcess.processID)] ? @"Unpause Target" : @"Pause Target";
+		integer_t suspendCount;
+		if (!ZGSuspendCount(self.currentProcess.processTask, &suspendCount))
+		{
+			return NO;
+		}
+		else
+		{
+			menuItem.title = suspendCount > 0 ? @"Unpause Target" : @"Pause Target";
+		}
 	}
 	
 	else if (menuItem.action == @selector(editVariablesValue:))
@@ -1271,7 +1279,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (IBAction)pauseOrUnpauseProcess:(id)sender
 {
-	[ZGProcess pauseOrUnpauseProcess:self.currentProcess.processID];
+	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }
 
 @end

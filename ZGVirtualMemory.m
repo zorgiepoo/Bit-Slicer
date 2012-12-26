@@ -578,12 +578,27 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 	return totalSize;
 }
 
-BOOL ZGPauseProcess(pid_t process)
+BOOL ZGSuspendCount(ZGMemoryMap processTask, integer_t *suspendCount)
 {
-	return kill(process, SIGSTOP) == 0;
+	*suspendCount = -1;
+	task_basic_info_64_data_t taskInfo;
+	mach_msg_type_number_t count = TASK_BASIC_INFO_64_COUNT;
+	
+	BOOL success = (task_info(processTask, TASK_BASIC_INFO_64, (task_info_t)&taskInfo, &count) == KERN_SUCCESS);
+	if (success)
+	{
+		*suspendCount = taskInfo.suspend_count;
+	}
+	
+	return success;
 }
 
-BOOL ZGUnpauseProcess(pid_t process)
+BOOL ZGSuspendTask(ZGMemoryMap processTask)
 {
-	return kill(process, SIGCONT) == 0;
+	return (task_suspend(processTask) == KERN_SUCCESS);
+}
+
+BOOL ZGResumeTask(ZGMemoryMap processTask)
+{
+	return (task_resume(processTask) == KERN_SUCCESS);
 }

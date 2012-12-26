@@ -92,7 +92,18 @@ OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef th
 	{
 		if (runningApplication.isActive && runningApplication.processIdentifier != getpid())
 		{
-			[ZGProcess pauseOrUnpauseProcess:runningApplication.processIdentifier];
+			ZGMemoryMap processTask = 0;
+			
+			if (ZGGetTaskForProcess(runningApplication.processIdentifier, &processTask))
+			{
+				[ZGProcess pauseOrUnpauseProcessTask:processTask];
+			
+				ZGFreeTask(processTask);
+			}
+			else
+			{
+				NSLog(@"Failed to pause/unpause process with pid %d", runningApplication.processIdentifier);
+			}
 		}
 	}
 	
@@ -126,18 +137,6 @@ static BOOL didRegisteredHotKey;
 		RegisterEventHotKey(hotKeyCodeNumber.intValue, hotKeyModifier.intValue, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef);
 		
 		didRegisteredHotKey = YES;
-	}
-}
-
-- (void)applicationWillTerminate:(NSNotification *)notification
-{
-	// Make sure that we unfreeze all processes that we may have frozen
-	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
-	{
-		if ([ZGProcess.frozenProcesses containsObject:@(runningApplication.processIdentifier)])
-		{
-			[ZGProcess pauseOrUnpauseProcess:runningApplication.processIdentifier];
-		}
 	}
 }
 
