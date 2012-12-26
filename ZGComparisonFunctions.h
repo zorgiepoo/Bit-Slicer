@@ -36,6 +36,8 @@
 #import "ZGVirtualMemory.h"
 #import "ZGSearchData.h"
 
+#define COMPARISON_PARAMETERS ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGMemorySize size
+
 @class ZGSearchData;
 
 typedef enum
@@ -55,11 +57,7 @@ typedef enum
 	ZGNotEqualsStoredPlus,
 } ZGFunctionType;
 
-BOOL equalFunction(ZGSearchData *__unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-BOOL lessThanFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-BOOL greaterThanFunction(ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-BOOL notEqualFunction(ZGSearchData *__unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-BOOL equalPlusFunction(ZGSearchData *__unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
-BOOL notEqualPlusFunction(ZGSearchData *__unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGVariableType type, ZGMemorySize size);
+typedef BOOL (*comparison_function_t)(COMPARISON_PARAMETERS);
 
+comparison_function_t getComparisonFunction(ZGFunctionType functionType, ZGVariableType dataType, BOOL is64Bit);
 

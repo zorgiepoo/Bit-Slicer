@@ -552,12 +552,7 @@
 	
 	[self prepareTask];
 	
-	static BOOL (*compareFunctions[10])(ZGSearchData * __unsafe_unretained, const void *, const void *, ZGVariableType, ZGMemorySize) =
-	{
-		equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalFunction, notEqualFunction, greaterThanFunction, lessThanFunction, equalPlusFunction, notEqualPlusFunction
-	};
-	
-	BOOL (*compareFunction)(ZGSearchData * __unsafe_unretained, const void *, const void *, ZGVariableType, ZGMemorySize) = compareFunctions[functionType];
+	comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.document.currentProcess.is64Bit);
 	
 	ZGMemorySize dataSize = self.searchData.dataSize;
 	void *searchValue = self.searchData.searchValue;
@@ -593,7 +588,7 @@
 		ZGProcess *currentProcess = self.document.currentProcess;
 		search_for_data_t searchForDataCallback = ^(ZGSearchData * __unsafe_unretained searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableArray * __unsafe_unretained results)
 		{
-			if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataType, dataSize))
+			if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataSize))
 			{
 				ZGVariable *newVariable =
 					[[ZGVariable alloc]
@@ -660,7 +655,7 @@
 						{
 							void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue;
 							
-							if (compareValue && compareFunction(searchData, variableValue, compareValue, dataType, dataSize))
+							if (compareValue && compareFunction(searchData, variableValue, compareValue, dataSize))
 							{
 								[temporaryVariablesArray addObject:variable];
 								currentProcess.numberOfVariablesFound++;
