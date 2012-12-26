@@ -58,6 +58,8 @@ typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, 
 
 typedef void (^search_for_data_update_interface_t)(NSArray *newResults, ZGMemorySize currentRegionNumber);
 
+typedef void (^search_for_data_completion_t)(NSArray *results);
+
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
 

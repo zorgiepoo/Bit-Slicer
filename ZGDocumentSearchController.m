@@ -611,6 +611,7 @@
 			{
 				[temporaryVariablesArray addObjectsFromArray:ZGSearchForData(currentProcess.processTask, self.searchData, searchForDataCallback, searchForDataUpdateInterfaceCallback)];
 			}
+			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				if (searchValue)
 				{
