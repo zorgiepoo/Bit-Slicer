@@ -39,14 +39,11 @@
 @implementation ZGRegion
 @end
 
-@interface ZGTaggedResults : NSObject
-
-@property (nonatomic, readwrite) NSUInteger tag;
+@interface ZGResultsWrapper : NSObject
 @property (nonatomic, strong) NSArray *results;
-
 @end
 
-@implementation ZGTaggedResults
+@implementation ZGResultsWrapper
 @end
 
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
@@ -356,7 +353,7 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
-void ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block)
+NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t searchForDataBlock, search_for_data_update_progress_t updateProgressBlock)
 {
 	ZGInitializeSearch(searchData);
 	
@@ -365,10 +362,20 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unret
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	
-	int currentRegionNumber = 0;
-	
-	for (ZGRegion *region in searchData.savedData)
+	NSMutableArray *resultsWrapperArray = [[NSMutableArray alloc] init];
+	for (NSUInteger regionIndex = 0; regionIndex < searchData.savedData.count; regionIndex++)
 	{
+		[resultsWrapperArray addObject:[[ZGResultsWrapper alloc] init]];
+	}
+	
+	__block ZGMemorySize numberOfRegionsProcessed = 0;
+	
+	dispatch_apply(searchData.savedData.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
+		ZGRegion *region = [searchData.savedData objectAtIndex:regionIndex];
+		
+		ZGResultsWrapper *resultsWrapper = [resultsWrapperArray objectAtIndex:regionIndex];
+		NSMutableArray *localResults = [[NSMutableArray alloc] init];
+		
 		ZGMemoryAddress offset = 0;
 		char *currentData = NULL;
 		ZGMemorySize size = region.size;
@@ -385,7 +392,7 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unret
 				if (dataBeginAddress <= regionAddress + offset &&
 					dataEndAddress >= regionAddress + offset + dataSize)
 				{
-					block(searchData, &currentData[offset], regionBytes + offset, regionAddress + offset, currentRegionNumber, nil);
+					searchForDataBlock(searchData, &currentData[offset], regionBytes + offset, regionAddress + offset, localResults);
 				}
 				offset += dataAlignment;
 			}
@@ -394,17 +401,30 @@ void ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unret
 			ZGFreeBytes(processTask, currentData, size);
 		}
 		
+		resultsWrapper.results = localResults;
+		
 		if (searchData->_shouldCancelSearch)
 		{
 			searchData.searchDidCancel = YES;
-			return;
 		}
 		
-		currentRegionNumber++;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			numberOfRegionsProcessed++;
+			updateProgressBlock(localResults, numberOfRegionsProcessed);
+		});
+	});
+	
+	NSMutableArray *allResults = [[NSMutableArray alloc] init];
+	
+	for (ZGResultsWrapper *taggedResults in resultsWrapperArray)
+	{
+		[allResults addObjectsFromArray:taggedResults.results];
 	}
+	
+	return allResults;
 }
 
-NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t searchForDataBlock, search_for_data_update_interface_t updateInterfaceBlock)
+NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t searchForDataBlock, search_for_data_update_progress_t updateProgressBlock)
 {
 	ZGInitializeSearch(searchData);
 	
@@ -417,19 +437,13 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	
 	NSArray *regions = ZGRegionsForProcessTask(processTask);
 	
-	NSMutableArray *taggedResultsArray = [[NSMutableArray alloc] init];
-	NSUInteger regionIndex = 0;
-	for (ZGRegion *region in regions)
+	NSMutableArray *resultsWrapperArray = [[NSMutableArray alloc] init];
+	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
 	{
-		ZGTaggedResults *taggedResults = [[ZGTaggedResults alloc] init];
-		taggedResults.tag = regionIndex;
-		[taggedResultsArray addObject:taggedResults];
-		regionIndex++;
+		[resultsWrapperArray addObject:[[ZGResultsWrapper alloc] init]];
 	}
 	
 	__block ZGMemorySize numberOfRegionsProcessed = 0;
-	
-	NSDate *beginDate = [NSDate date];
 	
 	dispatch_apply(regions.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
 		ZGRegion *region = [regions objectAtIndex:regionIndex];
@@ -437,7 +451,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 		ZGMemorySize size = region.size;
 		ZGMemoryProtection protection = region.protection;
 		
-		ZGTaggedResults *taggedResults = [taggedResultsArray objectAtIndex:regionIndex];
+		ZGResultsWrapper *resultsWrapper = [resultsWrapperArray objectAtIndex:regionIndex];
 		NSMutableArray *localResults = [[NSMutableArray alloc] init];
 		
 		if (address < dataEndAddress &&
@@ -453,7 +467,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 					if (dataBeginAddress <= address + dataIndex &&
 						dataEndAddress >= address + dataIndex + dataSize)
 					{
-						searchForDataBlock(searchData, &bytes[dataIndex], NULL, address + dataIndex, 0, localResults);
+						searchForDataBlock(searchData, &bytes[dataIndex], NULL, address + dataIndex, localResults);
 					}
 					dataIndex += dataAlignment;
 				}
@@ -470,22 +484,20 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 			}
 		}
 		
-		taggedResults.results = localResults;
+		resultsWrapper.results = localResults;
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			numberOfRegionsProcessed++;
-			updateInterfaceBlock(localResults, numberOfRegionsProcessed);
+			updateProgressBlock(localResults, numberOfRegionsProcessed);
 		});
 	});
 	
 	NSMutableArray *allResults = [[NSMutableArray alloc] init];
 	
-	for (ZGTaggedResults *taggedResults in [taggedResultsArray sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"tag" ascending:YES]]])
+	for (ZGResultsWrapper *resultsWrapper in resultsWrapperArray)
 	{
-		[allResults addObjectsFromArray:taggedResults.results];
+		[allResults addObjectsFromArray:resultsWrapper.results];
 	}
-	
-	NSLog(@"Time has been %f", [[NSDate date] timeIntervalSinceDate:beginDate]);
 	
 	return allResults;
 }

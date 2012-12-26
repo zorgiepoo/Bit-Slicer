@@ -54,9 +54,9 @@
 @class ZGSearchData;
 @class ZGProcess;
 
-typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, ZGMemorySize currentRegionNumber, NSMutableArray *results);
+typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableArray *results);
 
-typedef void (^search_for_data_update_interface_t)(NSArray *newResults, ZGMemorySize currentRegionNumber);
+typedef void (^search_for_data_update_progress_t)(NSArray *newResults, ZGMemorySize currentRegionNumber);
 
 typedef void (^search_for_data_completion_t)(NSArray *results);
 
@@ -86,8 +86,8 @@ BOOL ZGSearchDidCancel(ZGSearchData * __unsafe_unretained searchData);
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
 // Avoid using the autoreleasepool in the callback for these search functions, otherwise memory usage may grow
-void ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t block);
-NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t searchForDataBlock, search_for_data_update_interface_t updateInterfaceBlock);
+NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t searchForDataBlock, search_for_data_update_progress_t updateProgressBlock);
+NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t searchForDataBlock, search_for_data_update_progress_t updateProgressBlock);
 
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize);
 
