@@ -38,6 +38,7 @@
 #import "ZGDocumentTableController.h"
 #import "ZGMemoryDumpController.h"
 #import "ZGMemoryProtectionController.h"
+#import "ZGDocumentBreakPointController.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVariable.h"
@@ -1194,6 +1195,14 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
+	else if (menuItem.action == @selector(watchVariable:))
+	{
+		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		{
+			return NO;
+		}
+	}
+	
 	return [super validateMenuItem:menuItem];
 }
 
@@ -1273,6 +1282,13 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)changeMemoryProtection:(id)sender
 {
 	[self.memoryProtectionController changeMemoryProtectionRequest];
+}
+
+#pragma mark Variable Watching Handling
+
+- (IBAction)watchVariable:(id)sender
+{
+	[self.documentBreakPointController requestVariableWatch];
 }
 
 #pragma mark Pausing and Unpausing Processes

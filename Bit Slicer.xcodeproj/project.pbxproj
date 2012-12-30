@@ -22,6 +22,16 @@
 		7714D3F211B87C7E0028E6B2 /* ZGVirtualMemory.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */; };
 		772AACD415E1CCFA00E1F788 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 772AACD315E1CCFA00E1F788 /* HexFiend.framework */; };
 		772AACD515E1D01F00E1F788 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 772AACD315E1CCFA00E1F788 /* HexFiend.framework */; };
+		77329B58168CFE6C007DCAE2 /* ZGDissemblerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77329B56168CFE6C007DCAE2 /* ZGDissemblerController.m */; };
+		77329B59168CFE6C007DCAE2 /* ZGDissemblerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77329B57168CFE6C007DCAE2 /* ZGDissemblerController.xib */; };
+		77329B6D168D0DF9007DCAE2 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B60168D0DF4007DCAE2 /* decode.c */; };
+		77329B6E168D0DF9007DCAE2 /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B63168D0DF4007DCAE2 /* input.c */; };
+		77329B6F168D0DF9007DCAE2 /* itab.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B65168D0DF5007DCAE2 /* itab.c */; };
+		77329B70168D0DF9007DCAE2 /* syn-att.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B67168D0DF6007DCAE2 /* syn-att.c */; };
+		77329B71168D0DF9007DCAE2 /* syn-intel.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B68168D0DF6007DCAE2 /* syn-intel.c */; };
+		77329B72168D0DF9007DCAE2 /* syn.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B69168D0DF7007DCAE2 /* syn.c */; };
+		77329B73168D0DF9007DCAE2 /* udis86.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B6C168D0DF8007DCAE2 /* udis86.c */; };
+		77329B77168D14CB007DCAE2 /* ZGInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 77329B76168D14CB007DCAE2 /* ZGInstruction.m */; };
 		775FCB1B11719DF6000054FB /* ZGAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1111719DF6000054FB /* ZGAppController.m */; };
 		775FCB1D11719DF6000054FB /* ZGPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1511719DF6000054FB /* ZGPreferencesController.m */; };
 		775FCB1E11719DF6000054FB /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1711719DF6000054FB /* ZGProcess.m */; };
@@ -38,6 +48,12 @@
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
 		77D037371224334E0083E057 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D037361224334E0083E057 /* ZGCalculator.m */; };
 		77D5AEB5137C84D300026388 /* ZGVerticalScrollerRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		77E6529F168E3A1200D84A7F /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 77E6529C168E3A1200D84A7F /* mach_excUser.c */; };
+		77E652A0168E3A1200D84A7F /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 77E6529D168E3A1200D84A7F /* mach_excServer.c */; };
+		77E652B3168F889C00D84A7F /* ZGBreakPointController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652B2168F889C00D84A7F /* ZGBreakPointController.m */; };
+		77E652B6168F8C7700D84A7F /* ZGDocumentBreakPointController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */; };
+		77E652B9168FD49300D84A7F /* ZGBreakPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652B8168FD49300D84A7F /* ZGBreakPoint.m */; };
+		77E652BC168FD59500D84A7F /* ZGDebugThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652BB168FD59500D84A7F /* ZGDebugThread.m */; };
 		77F6096F13DBCDD300FD5D92 /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */; };
 		77F6097013DBCE2000FD5D92 /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */; };
 		77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FC461F12237F71003CB09B /* NSStringAdditions.m */; };
@@ -93,6 +109,25 @@
 		7714D3F011B87C7E0028E6B2 /* ZGVirtualMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVirtualMemory.h; sourceTree = "<group>"; };
 		7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVirtualMemory.m; sourceTree = "<group>"; };
 		772AACD315E1CCFA00E1F788 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HexFiend.framework; sourceTree = "<group>"; };
+		77329B55168CFE6B007DCAE2 /* ZGDissemblerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDissemblerController.h; sourceTree = "<group>"; };
+		77329B56168CFE6C007DCAE2 /* ZGDissemblerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDissemblerController.m; sourceTree = "<group>"; };
+		77329B57168CFE6C007DCAE2 /* ZGDissemblerController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ZGDissemblerController.xib; sourceTree = "<group>"; };
+		77329B5D168D0841007DCAE2 /* udis86.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = udis86.h; sourceTree = "<group>"; };
+		77329B60168D0DF4007DCAE2 /* decode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decode.c; path = libudis86/decode.c; sourceTree = "<group>"; };
+		77329B61168D0DF4007DCAE2 /* decode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decode.h; path = libudis86/decode.h; sourceTree = "<group>"; };
+		77329B62168D0DF4007DCAE2 /* extern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = extern.h; path = libudis86/extern.h; sourceTree = "<group>"; };
+		77329B63168D0DF4007DCAE2 /* input.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = input.c; path = libudis86/input.c; sourceTree = "<group>"; };
+		77329B64168D0DF5007DCAE2 /* input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = input.h; path = libudis86/input.h; sourceTree = "<group>"; };
+		77329B65168D0DF5007DCAE2 /* itab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = itab.c; path = libudis86/itab.c; sourceTree = "<group>"; };
+		77329B66168D0DF5007DCAE2 /* itab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = itab.h; path = libudis86/itab.h; sourceTree = "<group>"; };
+		77329B67168D0DF6007DCAE2 /* syn-att.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "syn-att.c"; path = "libudis86/syn-att.c"; sourceTree = "<group>"; };
+		77329B68168D0DF6007DCAE2 /* syn-intel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "syn-intel.c"; path = "libudis86/syn-intel.c"; sourceTree = "<group>"; };
+		77329B69168D0DF7007DCAE2 /* syn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = syn.c; path = libudis86/syn.c; sourceTree = "<group>"; };
+		77329B6A168D0DF7007DCAE2 /* syn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syn.h; path = libudis86/syn.h; sourceTree = "<group>"; };
+		77329B6B168D0DF8007DCAE2 /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = libudis86/types.h; sourceTree = "<group>"; };
+		77329B6C168D0DF8007DCAE2 /* udis86.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = udis86.c; path = libudis86/udis86.c; sourceTree = "<group>"; };
+		77329B75168D14CB007DCAE2 /* ZGInstruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGInstruction.h; sourceTree = "<group>"; };
+		77329B76168D14CB007DCAE2 /* ZGInstruction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGInstruction.m; sourceTree = "<group>"; };
 		775FCB1011719DF6000054FB /* ZGAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGAppController.h; sourceTree = "<group>"; };
 		775FCB1111719DF6000054FB /* ZGAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGAppController.m; sourceTree = "<group>"; };
 		775FCB1411719DF6000054FB /* ZGPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGPreferencesController.h; sourceTree = "<group>"; };
@@ -122,6 +157,17 @@
 		77D037361224334E0083E057 /* ZGCalculator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGCalculator.m; sourceTree = "<group>"; };
 		77D5AEB3137C84CE00026388 /* ZGVerticalScrollerRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVerticalScrollerRepresenter.h; sourceTree = "<group>"; };
 		77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVerticalScrollerRepresenter.m; sourceTree = "<group>"; };
+		77E6529C168E3A1200D84A7F /* mach_excUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mach_excUser.c; sourceTree = "<group>"; };
+		77E6529D168E3A1200D84A7F /* mach_excServer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mach_excServer.c; sourceTree = "<group>"; };
+		77E6529E168E3A1200D84A7F /* mach_exc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mach_exc.h; sourceTree = "<group>"; };
+		77E652B1168F889C00D84A7F /* ZGBreakPointController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBreakPointController.h; sourceTree = "<group>"; };
+		77E652B2168F889C00D84A7F /* ZGBreakPointController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGBreakPointController.m; sourceTree = "<group>"; };
+		77E652B4168F8C7700D84A7F /* ZGDocumentBreakPointController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDocumentBreakPointController.h; sourceTree = "<group>"; };
+		77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDocumentBreakPointController.m; sourceTree = "<group>"; };
+		77E652B7168FD49300D84A7F /* ZGBreakPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBreakPoint.h; sourceTree = "<group>"; };
+		77E652B8168FD49300D84A7F /* ZGBreakPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGBreakPoint.m; sourceTree = "<group>"; };
+		77E652BA168FD59500D84A7F /* ZGDebugThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDebugThread.h; sourceTree = "<group>"; };
+		77E652BB168FD59500D84A7F /* ZGDebugThread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDebugThread.m; sourceTree = "<group>"; };
 		77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ShortcutRecorder.framework; sourceTree = "<group>"; };
 		77FC461E12237F71003CB09B /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringAdditions.h; sourceTree = "<group>"; };
 		77FC461F12237F71003CB09B /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSStringAdditions.m; sourceTree = "<group>"; };
@@ -190,6 +236,7 @@
 		2A37F4ABFDCFA73011CA2CEA /* Code */ = {
 			isa = PBXGroup;
 			children = (
+				77329B5A168D07B6007DCAE2 /* Debugger */,
 				77D5AEAC137C6FC000026388 /* Memory Viewer */,
 				775FCB1011719DF6000054FB /* ZGAppController.h */,
 				775FCB1111719DF6000054FB /* ZGAppController.m */,
@@ -201,6 +248,8 @@
 				770930BA15BA9060009705A6 /* ZGDocumentSearchController.m */,
 				770930B615BA7635009705A6 /* ZGDocumentTableController.h */,
 				770930B715BA7635009705A6 /* ZGDocumentTableController.m */,
+				77E652B4168F8C7700D84A7F /* ZGDocumentBreakPointController.h */,
+				77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */,
 				770930B315B92203009705A6 /* ZGVariableController.h */,
 				770930B415B92203009705A6 /* ZGVariableController.m */,
 				770930AA15B8F72F009705A6 /* ZGMemoryDumpController.h */,
@@ -248,6 +297,7 @@
 				775FCB2811719E4A000054FB /* Preferences.xib */,
 				770EA822137B6FDE007FB85A /* MemoryViewer.xib */,
 				7763470316881165003D01C9 /* DataInspectorView.xib */,
+				77329B57168CFE6C007DCAE2 /* ZGDissemblerController.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -259,6 +309,48 @@
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		77329B5A168D07B6007DCAE2 /* Debugger */ = {
+			isa = PBXGroup;
+			children = (
+				77329B74168D0E16007DCAE2 /* libudis86 */,
+				77E6529C168E3A1200D84A7F /* mach_excUser.c */,
+				77E6529D168E3A1200D84A7F /* mach_excServer.c */,
+				77E6529E168E3A1200D84A7F /* mach_exc.h */,
+				77329B55168CFE6B007DCAE2 /* ZGDissemblerController.h */,
+				77329B56168CFE6C007DCAE2 /* ZGDissemblerController.m */,
+				77E652B1168F889C00D84A7F /* ZGBreakPointController.h */,
+				77E652B2168F889C00D84A7F /* ZGBreakPointController.m */,
+				77E652B7168FD49300D84A7F /* ZGBreakPoint.h */,
+				77E652B8168FD49300D84A7F /* ZGBreakPoint.m */,
+				77E652BA168FD59500D84A7F /* ZGDebugThread.h */,
+				77E652BB168FD59500D84A7F /* ZGDebugThread.m */,
+				77329B75168D14CB007DCAE2 /* ZGInstruction.h */,
+				77329B76168D14CB007DCAE2 /* ZGInstruction.m */,
+			);
+			name = Debugger;
+			sourceTree = "<group>";
+		};
+		77329B74168D0E16007DCAE2 /* libudis86 */ = {
+			isa = PBXGroup;
+			children = (
+				77329B60168D0DF4007DCAE2 /* decode.c */,
+				77329B61168D0DF4007DCAE2 /* decode.h */,
+				77329B62168D0DF4007DCAE2 /* extern.h */,
+				77329B63168D0DF4007DCAE2 /* input.c */,
+				77329B64168D0DF5007DCAE2 /* input.h */,
+				77329B65168D0DF5007DCAE2 /* itab.c */,
+				77329B66168D0DF5007DCAE2 /* itab.h */,
+				77329B67168D0DF6007DCAE2 /* syn-att.c */,
+				77329B68168D0DF6007DCAE2 /* syn-intel.c */,
+				77329B69168D0DF7007DCAE2 /* syn.c */,
+				77329B6A168D0DF7007DCAE2 /* syn.h */,
+				77329B6B168D0DF8007DCAE2 /* types.h */,
+				77329B6C168D0DF8007DCAE2 /* udis86.c */,
+				77329B5D168D0841007DCAE2 /* udis86.h */,
+			);
+			name = libudis86;
 			sourceTree = "<group>";
 		};
 		77D5AEAC137C6FC000026388 /* Memory Viewer */ = {
@@ -342,6 +434,7 @@
 				77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */,
 				770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */,
 				7763470416881166003D01C9 /* DataInspectorView.xib in Resources */,
+				77329B59168CFE6C007DCAE2 /* ZGDissemblerController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,6 +468,21 @@
 				770930BB15BA9060009705A6 /* ZGDocumentSearchController.m in Sources */,
 				770930BE15BA97B4009705A6 /* ZGSearchData.m in Sources */,
 				776346FE16880E68003D01C9 /* DataInspectorRepresenter.m in Sources */,
+				77329B58168CFE6C007DCAE2 /* ZGDissemblerController.m in Sources */,
+				77329B6D168D0DF9007DCAE2 /* decode.c in Sources */,
+				77329B6E168D0DF9007DCAE2 /* input.c in Sources */,
+				77329B6F168D0DF9007DCAE2 /* itab.c in Sources */,
+				77329B70168D0DF9007DCAE2 /* syn-att.c in Sources */,
+				77329B71168D0DF9007DCAE2 /* syn-intel.c in Sources */,
+				77329B72168D0DF9007DCAE2 /* syn.c in Sources */,
+				77329B73168D0DF9007DCAE2 /* udis86.c in Sources */,
+				77329B77168D14CB007DCAE2 /* ZGInstruction.m in Sources */,
+				77E6529F168E3A1200D84A7F /* mach_excUser.c in Sources */,
+				77E652A0168E3A1200D84A7F /* mach_excServer.c in Sources */,
+				77E652B3168F889C00D84A7F /* ZGBreakPointController.m in Sources */,
+				77E652B6168F8C7700D84A7F /* ZGDocumentBreakPointController.m in Sources */,
+				77E652B9168FD49300D84A7F /* ZGBreakPoint.m in Sources */,
+				77E652BC168FD59500D84A7F /* ZGDebugThread.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -447,6 +555,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SDKROOT)/usr/lib/system\"",
 				);
 				OTHER_CFLAGS = "-D_DEBUG";
 				PRODUCT_NAME = "Bit Slicer";
@@ -484,6 +593,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SDKROOT)/usr/lib/system\"",
 				);
 				PRODUCT_NAME = "Bit Slicer";
 				RUN_CLANG_STATIC_ANALYZER = YES;

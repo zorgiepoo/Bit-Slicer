@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 2/5/10.
+ * Created by Mayur Pawashe on 12/29/12.
  *
  * Copyright (c) 2012 zgcoder
  * All rights reserved.
@@ -32,29 +32,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import <Carbon/Carbon.h>
+#import <Foundation/Foundation.h>
 
-@class ZGPreferencesController;
-@class ZGMemoryViewer;
-@class ZGDissemblerController;
-@class ZGBreakPointController;
+@interface ZGDocumentBreakPointController : NSObject
 
-#define BIT_SLICER_VERSION_FILE @"https://dl.dropbox.com/u/10108199/bit_slicer/bit_slicer_version.plist"
-
-@interface ZGAppController : NSObject
-
-@property (readonly, strong, nonatomic) ZGPreferencesController *preferencesController;
-@property (readonly, strong, nonatomic) ZGMemoryViewer *memoryViewer;
-@property (readonly, strong, nonatomic) ZGDissemblerController *dissemblerController;
-@property (readonly, strong, nonatomic) ZGBreakPointController *breakPointController;
-// lastSelectedProcessName keeps track of the last targeted process in a document
-@property (readwrite, copy, nonatomic) NSString *lastSelectedProcessName;
-
-+ (id)sharedController;
-
-+ (BOOL)isRunningLaterThanLion;
-
-+ (void)registerPauseAndUnpauseHotKey;
+- (void)requestVariableWatch;
+- (void)cancelTask;
 
 @end

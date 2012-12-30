@@ -36,6 +36,7 @@
 #import "ZGDocument.h"
 #import "ZGProcess.h"
 #import "ZGDocumentTableController.h"
+#import "ZGDocumentBreakPointController.h"
 #import "ZGVariableController.h"
 #import "ZGVirtualMemory.h"
 #import "ZGSearchData.h"
@@ -706,6 +707,11 @@
 		// Cancel memory store
 		self.document.currentProcess.isStoringAllData = NO;
 		self.document.generalStatusTextField.stringValue = @"Canceling Memory Store...";
+	}
+	else if (self.document.currentProcess.isWatchingBreakPoint)
+	{
+		// Cancel break point watching
+		[self.document.documentBreakPointController cancelTask];
 	}
 	else
 	{

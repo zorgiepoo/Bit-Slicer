@@ -1,0 +1,1 @@
+syn.lo syn.o: syn.c

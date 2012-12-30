@@ -51,6 +51,7 @@
 @property (readwrite, nonatomic) int numberOfVariablesFound;
 @property (readwrite, nonatomic) BOOL isDoingMemoryDump;
 @property (readwrite, nonatomic) BOOL isStoringAllData;
+@property (readwrite, nonatomic) BOOL isWatchingBreakPoint;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 

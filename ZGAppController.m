@@ -35,12 +35,16 @@
 #import "ZGAppController.h"
 #import "ZGPreferencesController.h"
 #import "ZGMemoryViewer.h"
+#import "ZGDissemblerController.h"
+#import "ZGBreakPointController.h"
 #import "ZGProcess.h"
 
 @interface ZGAppController ()
 
 @property (readwrite, strong, nonatomic) ZGPreferencesController *preferencesController;
 @property (readwrite, strong, nonatomic) ZGMemoryViewer *memoryViewer;
+@property (readwrite, strong, nonatomic) ZGDissemblerController *dissemblerController;
+@property (readwrite, strong, nonatomic) ZGBreakPointController *breakPointController;
 
 @end
 
@@ -70,6 +74,16 @@ static id sharedInstance;
 + (id)sharedController
 {
 	return sharedInstance;
+}
+
+- (ZGBreakPointController *)breakPointController
+{
+	if (!_breakPointController)
+	{
+		self.breakPointController = [[ZGBreakPointController alloc] init];
+	}
+	
+	return _breakPointController;
 }
 
 - (id)init
@@ -281,6 +295,20 @@ static BOOL didRegisteredHotKey;
 - (IBAction)openMemoryViewer:(id)sender
 {
 	[self openMemoryViewer:sender showWindow:YES];
+}
+
+- (ZGDissemblerController *)dissemblerController
+{
+	if (!_dissemblerController)
+	{
+		_dissemblerController = [[ZGDissemblerController alloc] init];
+	}
+	return _dissemblerController;
+}
+
+- (IBAction)openDebugger:(id)sender
+{
+	[self.dissemblerController showWindow:nil];
 }
 
 #define FAQ_URL @"http://portingteam.com/index.php/topic/4454-faq-information/"

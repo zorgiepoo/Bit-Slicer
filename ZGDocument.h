@@ -38,6 +38,7 @@
 @class ZGVariableController;
 @class ZGDocumentSearchController;
 @class ZGDocumentTableController;
+@class ZGDocumentBreakPointController;
 
 #define NON_EXISTENT_PID_NUMBER -1
 
@@ -66,6 +67,7 @@
 @property (strong) IBOutlet ZGDocumentTableController *tableController;
 @property (strong) IBOutlet ZGVariableController *variableController;
 @property (strong) IBOutlet ZGDocumentSearchController *searchController;
+@property (assign) IBOutlet ZGDocumentBreakPointController *documentBreakPointController;
 
 @property (readwrite, strong, nonatomic) NSArray *watchVariablesArray;
 @property (readwrite, strong, nonatomic) ZGProcess *currentProcess;
