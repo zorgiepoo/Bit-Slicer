@@ -221,11 +221,6 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			debugThread.thread = threadList[threadIndex];
 			
 #define WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(type) \
-	if (debugRegisterIndex == 0) { debugState.uds.type.__dr0 = (uint32_t)variable.address; } \
-	else if (debugRegisterIndex == 1) { debugState.uds.type.__dr1 = (uint32_t)variable.address; } \
-	else if (debugRegisterIndex == 2) { debugState.uds.type.__dr2 = (uint32_t)variable.address; } \
-	else if (debugRegisterIndex == 3) { debugState.uds.type.__dr3 = (uint32_t)variable.address; } \
-	\
 	debugState.uds.type.__dr7 |= (1 << 2*debugRegisterIndex); \
 	debugState.uds.type.__dr7 &= ~(1 << 2*debugRegisterIndex+1); \
 	\
@@ -239,10 +234,20 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			
 			if (process.is64Bit)
 			{
+				if (debugRegisterIndex == 0) { debugState.uds.ds64.__dr0 = (uint64_t)variable.address; }
+				else if (debugRegisterIndex == 1) { debugState.uds.ds64.__dr1 = (uint64_t)variable.address; }
+				else if (debugRegisterIndex == 2) { debugState.uds.ds64.__dr2 = (uint64_t)variable.address; }
+				else if (debugRegisterIndex == 3) { debugState.uds.ds64.__dr3 = (uint64_t)variable.address; }
+				
 				WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(ds64);
 			}
 			else
 			{
+				if (debugRegisterIndex == 0) { debugState.uds.ds32.__dr0 = (uint32_t)variable.address; }
+				else if (debugRegisterIndex == 1) { debugState.uds.ds32.__dr1 = (uint32_t)variable.address; }
+				else if (debugRegisterIndex == 2) { debugState.uds.ds32.__dr2 = (uint32_t)variable.address; }
+				else if (debugRegisterIndex == 3) { debugState.uds.ds32.__dr3 = (uint32_t)variable.address; }
+				
 				WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(ds32);
 			}
 			
