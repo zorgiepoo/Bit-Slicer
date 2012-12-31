@@ -35,6 +35,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
 #import "ZGSearchData.h"
+#import "NSArrayAdditions.h"
 
 @implementation ZGRegion
 @end
@@ -437,43 +438,43 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	
 	NSArray *regions = ZGRegionsForProcessTask(processTask);
 	
+	__block ZGMemorySize numberOfRegionsProcessed = regions.count;
+	
+	regions = [regions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
+		return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
+	}];
+	
+	numberOfRegionsProcessed -= regions.count;
+	
 	NSMutableArray *resultsWrapperArray = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
 	{
 		[resultsWrapperArray addObject:[[ZGResultsWrapper alloc] init]];
 	}
 	
-	__block ZGMemorySize numberOfRegionsProcessed = 0;
-	
 	dispatch_apply(regions.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
 		ZGRegion *region = [regions objectAtIndex:regionIndex];
 		ZGMemoryAddress address = region.address;
 		ZGMemorySize size = region.size;
-		ZGMemoryProtection protection = region.protection;
 		
 		ZGResultsWrapper *resultsWrapper = [resultsWrapperArray objectAtIndex:regionIndex];
 		NSMutableArray *localResults = [[NSMutableArray alloc] init];
 		
-		if (address < dataEndAddress &&
-			address + size > dataBeginAddress &&
-			protection & VM_PROT_READ && (shouldScanUnwritableValues || (protection & VM_PROT_WRITE)))
+		char *bytes = NULL;
+		if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
 		{
-			char *bytes = NULL;
-			if (ZGReadBytes(processTask, address, (void **)&bytes, &size))
+			ZGMemorySize dataIndex = 0;
+			while (dataIndex + dataSize <= size && !searchData->_shouldCancelSearch)
 			{
-				ZGMemorySize dataIndex = 0;
-				while (dataIndex + dataSize <= size && !searchData->_shouldCancelSearch)
+				if (dataBeginAddress <= address + dataIndex &&
+					dataEndAddress >= address + dataIndex + dataSize)
 				{
-					if (dataBeginAddress <= address + dataIndex &&
-						dataEndAddress >= address + dataIndex + dataSize)
-					{
-						searchForDataBlock(searchData, &bytes[dataIndex], NULL, address + dataIndex, localResults);
-					}
-					dataIndex += dataAlignment;
+					searchForDataBlock(searchData, &bytes[dataIndex], NULL, address + dataIndex, localResults);
 				}
-				
-				ZGFreeBytes(processTask, bytes, size);
+				dataIndex += dataAlignment;
 			}
+			
+			ZGFreeBytes(processTask, bytes, size);
 		}
 		
 		if (searchData->_shouldCancelSearch)
