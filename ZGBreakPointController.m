@@ -119,10 +119,10 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 }
 
 #define GET_DEBUG_REGISTER_ADDRESS(type) \
-	if (debugRegisterIndex == 0 && debugState.uds.type.__dr7 & (1 << 2*0)) { debugAddress = debugState.uds.type.__dr0; } \
-	else if (debugRegisterIndex == 1 && debugState.uds.type.__dr7 & (1 << 2*1)) { debugAddress = debugState.uds.type.__dr1; } \
-	else if (debugRegisterIndex == 2 && debugState.uds.type.__dr7 & (1 << 2*2)) { debugAddress = debugState.uds.type.__dr2; } \
-	else if (debugRegisterIndex == 3 && debugState.uds.type.__dr7 & (1 << 2*3)) { debugAddress = debugState.uds.type.__dr3; } \
+	if (debugRegisterIndex == 0 && debugState.uds.type.__dr6 & (1 << 0) && debugState.uds.type.__dr7 & (1 << 2*0)) { debugAddress = debugState.uds.type.__dr0; } \
+	else if (debugRegisterIndex == 1 && debugState.uds.type.__dr6 & (1 << 1) && debugState.uds.type.__dr7 & (1 << 2*1)) { debugAddress = debugState.uds.type.__dr1; } \
+	else if (debugRegisterIndex == 2 && debugState.uds.type.__dr6 & (1 << 2) && debugState.uds.type.__dr7 & (1 << 2*2)) { debugAddress = debugState.uds.type.__dr2; } \
+	else if (debugRegisterIndex == 3 && debugState.uds.type.__dr6 & (1 << 3) && debugState.uds.type.__dr7 & (1 << 2*3)) { debugAddress = debugState.uds.type.__dr3; } \
 
 kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
 {
