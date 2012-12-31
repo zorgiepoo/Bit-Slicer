@@ -36,17 +36,17 @@
 
 @implementation NSString (NSStringAdditions)
 
-- (unsigned int)unsignedIntValue
+- (unsigned int)zgUnsignedIntValue
 {
 	return (unsigned int)strtoul(self.UTF8String, NULL, 10);
 }
 
-- (unsigned long long)unsignedLongLongValue
+- (unsigned long long)zgUnsignedLongLongValue
 {
 	return strtoull(self.UTF8String, NULL, 10);
 }
 
-- (BOOL)isHexRepresentation
+- (BOOL)zgIsHexRepresentation
 {
 	return (self.length > 2 && ([[self substringToIndex:2] caseInsensitiveCompare:@"0x"] == NSOrderedSame || [[self substringToIndex:3] caseInsensitiveCompare:@"-0x"] == NSOrderedSame));
 }
