@@ -40,5 +40,6 @@
 @interface ZGBreakPointController : NSObject
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process delegate:(id)delegate;
+- (void)removeWatchObserver:(id)observer;
 
 @end

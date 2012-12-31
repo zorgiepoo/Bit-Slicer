@@ -44,15 +44,43 @@
 @interface ZGDocumentBreakPointController ()
 
 @property (assign) IBOutlet ZGDocument *document;
-@property (strong, nonatomic) ZGVariable *breakPointVariable;
+@property (strong, nonatomic) ZGProcess *watchProcess;
 
 @end
 
 @implementation ZGDocumentBreakPointController
 
+- (id)init
+{
+	self = [super init];
+	if (self)
+	{
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(applicationWillTerminate:)
+		 name:NSApplicationWillTerminateNotification
+		 object : nil];
+	}
+	return self;
+}
+
 - (void)dealloc
 {
-	// TODO, remove delegate breakpoints
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+	[self stopWatchingBreakPoints];
+}
+
+- (void)stopWatchingBreakPoints
+{
+	if (self.watchProcess)
+	{
+		[[[ZGAppController sharedController] breakPointController] removeWatchObserver:self];
+		self.watchProcess = nil;
+	}
 }
 
 - (void)cancelTask
@@ -62,9 +90,35 @@
 	[self.document.searchingProgressIndicator stopAnimation:nil];
 	self.document.searchingProgressIndicator.indeterminate = NO;
 	
+	[self stopWatchingBreakPoints];
+	
 	self.document.currentProcess.isWatchingBreakPoint = NO;
 	
 	[self.document.searchController resumeFromTask];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if (object == self.watchProcess)
+	{
+		NSNumber *newProcessID = [change objectForKey:NSKeyValueChangeNewKey];
+		NSNumber *oldProcessID = [change objectForKey:NSKeyValueChangeOldKey];
+		
+		if (![newProcessID isEqualToNumber:oldProcessID])
+		{
+			[self cancelTask];
+		}
+	}
+}
+
+- (void)setWatchProcess:(ZGProcess *)watchProcess
+{
+	NSString *keyPath = @"processID";
+	[self.watchProcess removeObserver:self forKeyPath:keyPath];
+	
+	_watchProcess = watchProcess;
+	
+	[self.watchProcess addObserver:self forKeyPath:keyPath options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:NULL];
 }
 
 - (void)breakPointDidHit:(NSNumber *)address
@@ -77,20 +131,22 @@
 		ZGMemoryAddress instructionAddress = [[[ZGAppController sharedController] dissemblerController] findInstructionAddressFromBreakPointAddress:memoryAddress inProcess:self.document.currentProcess];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			NSLog(@"Instruction address is 0x%llX", instructionAddress);
-			[self cancelTask];
+			// Make sure nothing bad happened when we were busy decoding
+			if (self.watchProcess)
+			{
+				NSLog(@"Instruction address is 0x%llX", instructionAddress);
+				[self cancelTask];
+			}
 		});
 	});
 }
 
 - (void)requestVariableWatch
 {
-	ZGVariable *variable = [[self.document selectedVariables] objectAtIndex:0];
+	ZGVariable *variable = [[[self.document selectedVariables] objectAtIndex:0] copy];
 	
 	if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self.document.currentProcess delegate:self])
-	{
-		self.breakPointVariable = variable;
-		
+	{		
 		[self.document.searchController prepareTask];
 		
 		self.document.currentProcess.isWatchingBreakPoint = YES;
@@ -98,6 +154,8 @@
 		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until %@ (%lld bytes) is hit...", [variable addressStringValue], variable.size];
 		self.document.searchingProgressIndicator.indeterminate = YES;
 		[self.document.searchingProgressIndicator startAnimation:nil];
+		
+		self.watchProcess = self.document.currentProcess;
 	}
 }
 

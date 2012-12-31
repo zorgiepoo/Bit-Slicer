@@ -67,7 +67,7 @@
 @property (strong) IBOutlet ZGDocumentTableController *tableController;
 @property (strong) IBOutlet ZGVariableController *variableController;
 @property (strong) IBOutlet ZGDocumentSearchController *searchController;
-@property (assign) IBOutlet ZGDocumentBreakPointController *documentBreakPointController;
+@property (strong) IBOutlet ZGDocumentBreakPointController *documentBreakPointController;
 
 @property (readwrite, strong, nonatomic) NSArray *watchVariablesArray;
 @property (readwrite, strong, nonatomic) ZGProcess *currentProcess;

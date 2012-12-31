@@ -38,5 +38,6 @@
 
 - (void)requestVariableWatch;
 - (void)cancelTask;
+- (void)stopWatchingBreakPoints;
 
 @end

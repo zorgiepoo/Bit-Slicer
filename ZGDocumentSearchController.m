@@ -76,6 +76,7 @@
 	ZGCancelSearchImmediately(self.searchData);
 	self.document.currentProcess.isDoingMemoryDump = NO;
 	self.document.currentProcess.isStoringAllData = NO;
+	[self.document.documentBreakPointController stopWatchingBreakPoints];
 	
 	self.searchData = nil;
 	self.document = nil;

@@ -154,6 +154,12 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone
+{
+	NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:self];
+	return [NSKeyedUnarchiver unarchiveObjectWithData:archivedData];
+}
+
 + (ZGMemorySize)sizeFromType:(ZGVariableType)type pointerSize:(ZGMemorySize)pointerSize
 {
 	ZGMemorySize size = 0;

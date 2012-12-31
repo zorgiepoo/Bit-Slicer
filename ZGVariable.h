@@ -57,7 +57,7 @@ typedef enum
 	ZGUnsigned,
 } ZGVariableQualifier;
 
-@interface ZGVariable : NSObject <NSCoding>
+@interface ZGVariable : NSObject <NSCoding, NSCopying>
 {
 	NSString *_addressStringValue;
 }

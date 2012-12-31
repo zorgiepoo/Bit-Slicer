@@ -43,7 +43,7 @@
 @interface ZGBreakPointController ()
 
 @property (readwrite, nonatomic) mach_port_t exceptionPort;
-@property (strong, nonatomic) NSArray *breakPoints;
+@property (strong) NSArray *breakPoints;
 
 @end
 
@@ -61,49 +61,6 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	return KERN_SUCCESS;
 }
 
-kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
-{
-	NSArray *breakPoints = [[[ZGAppController sharedController] breakPointController] breakPoints];
-	
-	ZGBreakPoint *targetBreakPoint = nil;
-	ZGDebugThread *targetDebugThread = nil;
-	for (ZGBreakPoint *breakPoint in breakPoints)
-	{
-		if (breakPoint.task == task)
-		{
-			for (ZGDebugThread *debugThread in breakPoint.debugThreads)
-			{
-				if (debugThread.thread == thread)
-				{
-					targetBreakPoint = breakPoint;
-					targetDebugThread = debugThread;
-					break;
-				}
-			}
-			if (targetBreakPoint) break;
-		}
-	}
-	
-	if (targetBreakPoint)
-	{
-		x86_thread_state_t threadState;
-		mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-		if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
-		{
-			NSLog(@"ERROR: Grabbing thread state failed from catch exception");
-		}
-		else
-		{
-			x86_debug_state_t debugState;
-			mach_msg_type_number_t stateCount = x86_DEBUG_STATE_COUNT;
-			if (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount) != KERN_SUCCESS)
-			{
-				NSLog(@"ERROR: Grabbing debug state failed from catch exception");
-			}
-			else
-			{
-				int debugRegisterIndex = targetDebugThread.registerNumber;
-				
 #define RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(type) \
 	if (debugRegisterIndex == 0) { debugState.uds.type.__dr0 = 0x0; } \
 	else if (debugRegisterIndex == 1) { debugState.uds.type.__dr1 = 0x0; } \
@@ -121,34 +78,146 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); \
 	debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); \
 
-				if (targetBreakPoint.process.is64Bit)
+- (ZGMemoryAddress)removeBreakPoint:(ZGBreakPoint *)breakPoint
+{
+	ZGMemoryAddress instructionAddress = 0x0;
+	
+	for (ZGDebugThread *debugThread in breakPoint.debugThreads)
+	{		
+		x86_debug_state_t debugState;
+		mach_msg_type_number_t stateCount = x86_DEBUG_STATE_COUNT;
+		if (thread_get_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount) != KERN_SUCCESS)
+		{
+			NSLog(@"ERROR: Grabbing debug state failed in removeBreakPoint:, continuing...");
+			continue;
+		}
+		
+		int debugRegisterIndex = debugThread.registerNumber;
+		
+		if (breakPoint.process.is64Bit)
+		{
+			RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds64);
+		}
+		else
+		{
+			RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds32);
+		}
+		
+		if (thread_set_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, stateCount) != KERN_SUCCESS)
+		{
+			NSLog(@"ERROR: Failure in setting thread state registers in removeBreakPoint:");
+		}
+	}
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		NSMutableArray *newBreakPoints = [[NSMutableArray alloc] initWithArray:self.breakPoints];
+		[newBreakPoints removeObject:breakPoint];
+		[[[ZGAppController sharedController] breakPointController] setBreakPoints:newBreakPoints];
+	});
+	
+	return instructionAddress;
+}
+
+#define GET_DEBUG_REGISTER_ADDRESS(type) \
+	if (debugRegisterIndex == 0 && debugState.uds.type.__dr7 & (1 << 2*0)) { debugAddress = debugState.uds.type.__dr0; } \
+	else if (debugRegisterIndex == 1 && debugState.uds.type.__dr7 & (1 << 2*1)) { debugAddress = debugState.uds.type.__dr1; } \
+	else if (debugRegisterIndex == 2 && debugState.uds.type.__dr7 & (1 << 2*2)) { debugAddress = debugState.uds.type.__dr2; } \
+	else if (debugRegisterIndex == 3 && debugState.uds.type.__dr7 & (1 << 2*3)) { debugAddress = debugState.uds.type.__dr3; } \
+
+kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
+{
+	NSArray *breakPoints = [[[ZGAppController sharedController] breakPointController] breakPoints];
+	for (ZGBreakPoint *breakPoint in breakPoints)
+	{
+		if (breakPoint.task == task)
+		{
+			ZGSuspendTask(task);
+			
+			for (ZGDebugThread *debugThread in breakPoint.debugThreads)
+			{
+				if (debugThread.thread == thread)
 				{
-					RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds64);
-				}
-				else
-				{
-					RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds32);
-				}
-				
-				if (thread_set_state(thread, x86_DEBUG_STATE, (thread_state_t)&debugState, stateCount) != KERN_SUCCESS)
-				{
-					NSLog(@"ERROR: Failure in setting thread state registers from catch exception");
-				}
-				
-				dispatch_async(dispatch_get_main_queue(), ^{
-					NSMutableArray *newBreakPoints = [[NSMutableArray alloc] initWithArray:breakPoints];
-					[newBreakPoints removeObject:targetBreakPoint];
+					x86_debug_state_t debugState;
+					mach_msg_type_number_t stateCount = x86_DEBUG_STATE_COUNT;
+					if (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount) != KERN_SUCCESS)
+					{
+						NSLog(@"ERROR: Grabbing debug state failed when checking for breakpoint existance");
+						continue;
+					}
 					
-					[[[ZGAppController sharedController] breakPointController] setBreakPoints:newBreakPoints];
+					ZGMemoryAddress debugAddress = 0x0;
+					int debugRegisterIndex = debugThread.registerNumber;
 					
-					[targetBreakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:@((uint64_t)(targetBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip))];
-				});
+					if (breakPoint.process.is64Bit)
+					{
+						GET_DEBUG_REGISTER_ADDRESS(ds64);
+					}
+					else
+					{
+						GET_DEBUG_REGISTER_ADDRESS(ds32);
+					}
+					
+					if (debugAddress == breakPoint.variable.address)
+					{
+						x86_thread_state_t threadState;
+						mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
+						if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+						{
+							NSLog(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping.");
+							continue;
+						}
+						
+						ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
+						
+						dispatch_async(dispatch_get_main_queue(), ^{
+							[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:@(instructionAddress)];
+						});
+						
+						[[[ZGAppController sharedController] breakPointController] removeBreakPoint:breakPoint];
+						
+						break;
+					}
+				}
 			}
+			
+			ZGResumeTask(task);
 		}
 	}
 	
 	return KERN_SUCCESS;
 }
+
+- (void)removeWatchObserver:(id)observer
+{
+	for (ZGBreakPoint *breakPoint in self.breakPoints)
+	{
+		if (breakPoint.delegate == observer)
+		{
+			ZGSuspendTask(breakPoint.task);
+			[self removeBreakPoint:breakPoint];
+			ZGResumeTask(breakPoint.task);
+		}
+	}
+}
+
+#define IS_REGISTER_AVAILABLE(type) (!(debugState.uds.type.__dr7 & (1 << 2*registerIndex)) && !(debugState.uds.type.__dr7 & (1 << 2*registerIndex+1)))
+
+#define WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(type, typecast) \
+	if (debugRegisterIndex == 0) { debugState.uds.type.__dr0 = (typecast)variable.address; } \
+	else if (debugRegisterIndex == 1) { debugState.uds.type.__dr1 = (typecast)variable.address; } \
+	else if (debugRegisterIndex == 2) { debugState.uds.type.__dr2 = (typecast)variable.address; } \
+	else if (debugRegisterIndex == 3) { debugState.uds.type.__dr3 = (typecast)variable.address; } \
+	\
+	debugState.uds.type.__dr7 |= (1 << 2*debugRegisterIndex); \
+	debugState.uds.type.__dr7 &= ~(1 << 2*debugRegisterIndex+1); \
+	\
+	debugState.uds.type.__dr7 |= (1 << 16 + 2*debugRegisterIndex); \
+	debugState.uds.type.__dr7 &= ~(1 << 16 + 2*debugRegisterIndex+1); \
+	\
+	if (variable.size <= 1) { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1);} \
+	else if (variable.size <= 2) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); } \
+	else if (variable.size <= 4) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); } \
+	else { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); }
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process delegate:(id)delegate
 {
@@ -206,7 +275,6 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		
 		for (int registerIndex = 0; registerIndex < 4; registerIndex++)
 		{
-#define IS_REGISTER_AVAILABLE(type) (!(debugState.uds.type.__dr7 & (1 << 2*registerIndex)) && !(debugState.uds.type.__dr7 & (1 << 2*registerIndex+1)))
 			if ((process.is64Bit && IS_REGISTER_AVAILABLE(ds64)) || (!process.is64Bit && IS_REGISTER_AVAILABLE(ds32)))
 			{
 				debugRegisterIndex = registerIndex;
@@ -220,35 +288,13 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			debugThread.registerNumber = debugRegisterIndex;
 			debugThread.thread = threadList[threadIndex];
 			
-#define WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(type) \
-	debugState.uds.type.__dr7 |= (1 << 2*debugRegisterIndex); \
-	debugState.uds.type.__dr7 &= ~(1 << 2*debugRegisterIndex+1); \
-	\
-	debugState.uds.type.__dr7 |= (1 << 16 + 2*debugRegisterIndex); \
-	debugState.uds.type.__dr7 &= ~(1 << 16 + 2*debugRegisterIndex+1); \
-	\
-	if (variable.size <= 1) { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1);} \
-	else if (variable.size <= 2) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); } \
-	else if (variable.size <= 4) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); } \
-	else { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); } \
-			
 			if (process.is64Bit)
-			{
-				if (debugRegisterIndex == 0) { debugState.uds.ds64.__dr0 = (uint64_t)variable.address; }
-				else if (debugRegisterIndex == 1) { debugState.uds.ds64.__dr1 = (uint64_t)variable.address; }
-				else if (debugRegisterIndex == 2) { debugState.uds.ds64.__dr2 = (uint64_t)variable.address; }
-				else if (debugRegisterIndex == 3) { debugState.uds.ds64.__dr3 = (uint64_t)variable.address; }
-				
-				WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(ds64);
+			{	
+				WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(ds64, uint64_t);
 			}
 			else
 			{
-				if (debugRegisterIndex == 0) { debugState.uds.ds32.__dr0 = (uint32_t)variable.address; }
-				else if (debugRegisterIndex == 1) { debugState.uds.ds32.__dr1 = (uint32_t)variable.address; }
-				else if (debugRegisterIndex == 2) { debugState.uds.ds32.__dr2 = (uint32_t)variable.address; }
-				else if (debugRegisterIndex == 3) { debugState.uds.ds32.__dr3 = (uint32_t)variable.address; }
-				
-				WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(ds32);
+				WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(ds32, uint32_t);
 			}
 			
 			if (thread_set_state(threadList[threadIndex], x86_DEBUG_STATE, (thread_state_t)&debugState, stateCount) != KERN_SUCCESS)
