@@ -238,7 +238,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 {
 	if (newAddressString)
 	{
-		if ([newAddressString isHexRepresentation])
+		if ([newAddressString zgIsHexRepresentation])
 		{
 			[[NSScanner scannerWithString:newAddressString] scanHexLongLong:&_address];
 		}

@@ -116,7 +116,7 @@
 						 process:process];
 					
 					ZGMemoryAddress address;
-					if ([addressExpression isHexRepresentation])
+					if ([addressExpression zgIsHexRepresentation])
 					{
 						[[NSScanner scannerWithString:addressExpression] scanHexLongLong:&address];
 					}

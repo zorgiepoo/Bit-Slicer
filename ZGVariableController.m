@@ -317,7 +317,7 @@
 		stringObject = [ZGCalculator evaluateExpression:stringObject];
 	}
 	
-	BOOL stringIsAHexRepresentation = stringObject.isHexRepresentation;
+	BOOL stringIsAHexRepresentation = stringObject.zgIsHexRepresentation;
 	
 	switch (variable.type)
 	{
@@ -770,13 +770,13 @@
 	NSString *sizeExpression = [ZGCalculator evaluateExpression:self.editVariablesSizeTextField.stringValue];
 	
 	ZGMemorySize requestedSize = 0;
-	if (sizeExpression.isHexRepresentation)
+	if (sizeExpression.zgIsHexRepresentation)
 	{
 		[[NSScanner scannerWithString:sizeExpression] scanHexLongLong:&requestedSize];
 	}
 	else
 	{
-		requestedSize = sizeExpression.unsignedLongLongValue;
+		requestedSize = sizeExpression.zgUnsignedLongLongValue;
 	}
 	
 	if (!isValidNumber(sizeExpression))

@@ -36,8 +36,8 @@
 
 @interface NSString (NSStringAdditions)
 
-- (unsigned int)unsignedIntValue;
-- (unsigned long long)unsignedLongLongValue;
-- (BOOL)isHexRepresentation;
+- (unsigned int)zgUnsignedIntValue;
+- (unsigned long long)zgUnsignedLongLongValue;
+- (BOOL)zgIsHexRepresentation;
 
 @end

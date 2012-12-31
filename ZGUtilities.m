@@ -39,13 +39,13 @@
 ZGMemoryAddress memoryAddressFromExpression(NSString *expression)
 {
 	ZGMemoryAddress address;
-	if (expression.isHexRepresentation)
+	if (expression.zgIsHexRepresentation)
 	{
 		[[NSScanner scannerWithString:expression] scanHexLongLong:&address];
 	}
 	else
 	{
-		address = expression.unsignedLongLongValue;
+		address = expression.zgUnsignedLongLongValue;
 	}
 	
 	return address;
@@ -56,7 +56,7 @@ BOOL isValidNumber(NSString *expression)
 	BOOL result = YES;
 	
 	// If it's in hex, then we assume it's valid
-	if (![expression isHexRepresentation])
+	if (![expression zgIsHexRepresentation])
 	{
 		NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
 		NSNumber *number = [numberFormatter numberFromString:expression];
@@ -69,7 +69,7 @@ BOOL isValidNumber(NSString *expression)
 void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
 {
 	void *value = NULL;
-	BOOL searchValueIsAHexRepresentation = stringValue.isHexRepresentation;
+	BOOL searchValueIsAHexRepresentation = stringValue.zgIsHexRepresentation;
 	
 	if (dataType == ZGInt8)
 	{
@@ -121,7 +121,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		}
 		else
 		{
-			variableValue = stringValue.unsignedIntValue;
+			variableValue = stringValue.zgUnsignedIntValue;
 		}
 		
 		*dataSize = 4;
@@ -157,7 +157,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		}
 		else
 		{
-			variableValue = stringValue.unsignedLongLongValue;
+			variableValue = stringValue.zgUnsignedLongLongValue;
 		}
 		
 		*dataSize = 8;

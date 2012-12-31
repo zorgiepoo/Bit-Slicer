@@ -99,7 +99,7 @@
 					 evaluateAddress:[NSMutableString stringWithString:variable.addressFormula]
 					 process:self.document.currentProcess];
 				 
-				 if (variable.address != newAddressString.unsignedLongLongValue)
+				 if (variable.address != newAddressString.zgUnsignedLongLongValue)
 				 {
 					 variable.addressStringValue = newAddressString;
 					 [self.watchVariablesTableView reloadData];
