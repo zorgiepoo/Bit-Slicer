@@ -64,7 +64,7 @@
 			<object class="NSCustomObject" id="1060826008">
 				<string key="NSClassName">ZGDocumentTableController</string>
 			</object>
-			<object class="NSCustomObject" id="722391249">
+			<object class="NSCustomObject" id="1049826756">
 				<string key="NSClassName">ZGDocumentBreakPointController</string>
 			</object>
 			<object class="NSWindowTemplate" id="275939982">
@@ -1621,7 +1621,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									<reference key="NSNextKeyView" ref="849671193"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="1052922599">
-										<int key="NSCellFlags">-2080374784</int>
+										<int key="NSCellFlags">67108864</int>
 										<int key="NSCellFlags2">131072</int>
 										<string key="NSContents">Scan Unwritable Values</string>
 										<reference key="NSSupport" ref="26"/>
@@ -2897,7 +2897,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">documentBreakPointController</string>
 						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="722391249"/>
+						<reference key="destination" ref="1049826756"/>
 					</object>
 					<int key="connectionID">100774</int>
 				</object>
@@ -3312,7 +3312,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">document</string>
-						<reference key="source" ref="722391249"/>
+						<reference key="source" ref="1049826756"/>
 						<reference key="destination" ref="512844837"/>
 					</object>
 					<int key="connectionID">100775</int>
@@ -4677,7 +4677,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100773</int>
-						<reference key="object" ref="722391249"/>
+						<reference key="object" ref="1049826756"/>
 						<reference key="parent" ref="0"/>
 					</object>
 				</object>
