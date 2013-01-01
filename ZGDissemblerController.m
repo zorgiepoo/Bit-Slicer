@@ -37,6 +37,8 @@
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
+#import "ZGProcessList.h"
+#import "ZGRunningProcess.h"
 #import "ZGInstruction.h"
 #import "udis86.h"
 
@@ -92,72 +94,51 @@
     [super windowDidLoad];
     
 	// Add processes to popup button,
-	[self updateRunningApplicationProcesses:[[ZGAppController sharedController] lastSelectedProcessName]];
+	[self updateRunningProcesses:[[ZGAppController sharedController] lastSelectedProcessName]];
 	
-	[[NSWorkspace sharedWorkspace]
+	[[ZGProcessList sharedProcessList]
 	 addObserver:self
-	 forKeyPath:@"runningApplications"
+	 forKeyPath:@"runningProcesses"
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	 context:NULL];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (object == NSWorkspace.sharedWorkspace)
+	if (object == [ZGProcessList sharedProcessList])
 	{
-		[self updateRunningApplicationProcesses:nil];
+		[self updateRunningProcesses:nil];
 	}
 }
 
-- (void)updateRunningApplicationProcesses:(NSString *)desiredProcessName
+- (void)updateRunningProcesses:(NSString *)desiredProcessName
 {
 	[self.runningApplicationsPopUpButton removeAllItems];
 	
-	NSMenuItem *firstRegularApplicationMenuItem = nil;
-	
-	BOOL foundTargettedProcess = NO;
 	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
-	for (NSRunningApplication *runningApplication in  [NSWorkspace.sharedWorkspace.runningApplications sortedArrayUsingDescriptors:@[sortDescriptor]])
+	for (ZGRunningProcess *runningProcess in  [[[ZGProcessList sharedProcessList] runningProcesses] sortedArrayUsingDescriptors:@[sortDescriptor]])
 	{
-		if (runningApplication.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
+		if (runningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
 		{
 			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-			menuItem.title = [NSString stringWithFormat:@"%@ (%d)", runningApplication.localizedName, runningApplication.processIdentifier];
-			NSImage *iconImage = runningApplication.icon;
+			menuItem.title = [NSString stringWithFormat:@"%@ (%d)", runningProcess.name, runningProcess.processIdentifier];
+			NSImage *iconImage = [runningProcess.icon copy];
 			iconImage.size = NSMakeSize(16, 16);
 			menuItem.image = iconImage;
 			ZGProcess *representedProcess =
-			[[ZGProcess alloc]
-			 initWithName:runningApplication.localizedName
-			 processID:runningApplication.processIdentifier
-			 set64Bit:(runningApplication.executableArchitecture == NSBundleExecutableArchitectureX86_64)];
+				[[ZGProcess alloc]
+				 initWithName:runningProcess.name
+				 processID:runningProcess.processIdentifier
+				 set64Bit:runningProcess.is64Bit];
 			
 			menuItem.representedObject = representedProcess;
 			
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
-			if (!firstRegularApplicationMenuItem && runningApplication.activationPolicy == NSApplicationActivationPolicyRegular)
-			{
-				firstRegularApplicationMenuItem = menuItem;
-			}
-			
-			if (self.currentProcess.processID == runningApplication.processIdentifier || [desiredProcessName isEqualToString:runningApplication.localizedName])
+			if (self.currentProcess.processID == runningProcess.processIdentifier || [desiredProcessName isEqualToString:runningProcess.name])
 			{
 				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
-				foundTargettedProcess = YES;
 			}
-		}
-	}
-	
-	if (!foundTargettedProcess)
-	{
-		if (firstRegularApplicationMenuItem)
-		{
-			[self.runningApplicationsPopUpButton selectItem:firstRegularApplicationMenuItem];
-		}
-		else if ([self.runningApplicationsPopUpButton indexOfSelectedItem] >= 0)
-		{
-			[self.runningApplicationsPopUpButton selectItemAtIndex:0];
 		}
 	}
 	
