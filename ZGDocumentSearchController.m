@@ -234,7 +234,7 @@
 	
 	if (self.document.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 	{
-		[self.document removeRunningApplicationFromPopupButton:nil];
+		[self.document removeRunningProcessFromPopupButton:nil];
 	}
 }
 

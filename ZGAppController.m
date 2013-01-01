@@ -38,6 +38,7 @@
 #import "ZGDissemblerController.h"
 #import "ZGBreakPointController.h"
 #import "ZGProcess.h"
+#import "ZGProcessList.h"
 
 @interface ZGAppController ()
 

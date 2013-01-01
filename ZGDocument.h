@@ -39,6 +39,7 @@
 @class ZGDocumentSearchController;
 @class ZGDocumentTableController;
 @class ZGDocumentBreakPointController;
+@class ZGRunningProcess;
 
 #define NON_EXISTENT_PID_NUMBER -1
 
@@ -86,6 +87,6 @@
 
 - (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray;
 
-- (void)removeRunningApplicationFromPopupButton:(NSRunningApplication *)oldRunningApplication;
+- (void)removeRunningProcessFromPopupButton:(ZGRunningProcess *)oldRunningProcess;
 
 @end

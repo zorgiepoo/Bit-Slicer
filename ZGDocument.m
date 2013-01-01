@@ -51,6 +51,8 @@
 #import "ZGUtilities.h"
 #import "ZGSearchData.h"
 #import "ZGComparisonFunctions.h"
+#import "ZGProcessList.h"
+#import "ZGRunningProcess.h"
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
 #define ZGProcessNameKey @"ZGProcessNameKey"
@@ -125,9 +127,9 @@
 	self = [super init];
 	if (self)
 	{
-		[NSWorkspace.sharedWorkspace
+		[[ZGProcessList sharedProcessList]
 		 addObserver:self
-		 forKeyPath:@"runningApplications"
+		 forKeyPath:@"runningProcesses"
 		 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 		 context:NULL];
 	}
@@ -138,9 +140,9 @@
 {
 	[NSNotificationCenter.defaultCenter removeObserver:self];
 	
-	[NSWorkspace.sharedWorkspace
+	[[ZGProcessList sharedProcessList]
 	 removeObserver:self
-	 forKeyPath:@"runningApplications"];
+	 forKeyPath:@"runningProcesses"];
 	
 	[self.searchController cleanUp];
 	[self.tableController cleanUp];
@@ -182,7 +184,7 @@
 		self.generalStatusTextField.stringValue = @"";
 	}
 	
-	[self addApplicationsToPopupButton];
+	[self addProcessesToPopupButton];
 	
 	self.currentSearchDataType = (ZGVariableType)self.dataTypesPopUpButton.selectedItem.tag;
 	
@@ -454,9 +456,11 @@
 	NSMutableArray *itemsToRemove = [[NSMutableArray alloc] init];
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
 	{
+		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] init];
+		runningProcess.processIdentifier = [[menuItem representedObject] processID];
 		if (menuItem != self.runningApplicationsPopUpButton.selectedItem &&
 			([menuItem.representedObject processID] == NON_EXISTENT_PID_NUMBER ||
-			 ![NSWorkspace.sharedWorkspace.runningApplications containsObject:[NSRunningApplication runningApplicationWithProcessIdentifier:[menuItem.representedObject processID]]]))
+			 ![[[ZGProcessList sharedProcessList] runningProcesses] containsObject:runningProcess]))
 		{
 			[itemsToRemove addObject:menuItem];
 		}
@@ -471,13 +475,13 @@
 	self.searchButton.enabled = (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.currentProcess.hasGrantedAccess);
 }
 
-- (void)addApplicationsToPopupButton
+- (void)addProcessesToPopupButton
 {
 	// Add running applications to popup button ; we want activiation policy for NSApplicationActivationPolicyRegular to appear first, since they're more likely to be targetted and more likely to have sufficient privillages for accessing virtual memory
 	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
-	for (NSRunningApplication *runningApplication in [NSWorkspace.sharedWorkspace.runningApplications sortedArrayUsingDescriptors:@[sortDescriptor]])
+	for (ZGRunningProcess *runningProcess in [[[ZGProcessList sharedProcessList] runningProcesses] sortedArrayUsingDescriptors:@[sortDescriptor]])
 	{
-		[self addRunningApplicationToPopupButton:runningApplication];
+		[self addRunningProcessToPopupButton:runningProcess];
 	}
 	
 	if (self.desiredProcessName && ![self.currentProcess.name isEqualToString:self.desiredProcessName])
@@ -497,7 +501,7 @@
 		[self.runningApplicationsPopUpButton selectItem:menuItem];
 		
 		[self runningApplicationsPopUpButtonRequest:nil];
-		[self removeRunningApplicationFromPopupButton:nil];
+		[self removeRunningProcessFromPopupButton:nil];
 	}
 	else
 	{
@@ -505,39 +509,13 @@
 	}
 }
 
-- (void)removeRunningApplicationFromPopupButton:(NSRunningApplication *)oldRunningApplication
-{
-	// Great, a process terminated, but we don't know which one
-	if (oldRunningApplication.processIdentifier == -1)
-	{
-		NSMutableArray *menuItemsToRemove = [[NSMutableArray alloc] init];
-		for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
-		{
-			NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:[menuItem.representedObject processID]];
-			if (runningApplication.processIdentifier == -1 || ![NSWorkspace.sharedWorkspace.runningApplications containsObject:runningApplication])
-			{
-				if ([menuItem.representedObject processID] == self.currentProcess.processID)
-				{
-					oldRunningApplication = nil;
-				}
-				else
-				{
-					[menuItemsToRemove addObject:menuItem];
-				}
-			}
-		}
-		
-		for (id menuItem in menuItemsToRemove)
-		{
-			[self.runningApplicationsPopUpButton removeItemAtIndex:[self.runningApplicationsPopUpButton indexOfItem:menuItem]];
-		}
-	}
-	
+- (void)removeRunningProcessFromPopupButton:(ZGRunningProcess *)oldRunningProcess
+{	
 	// Just to be sure
-	if (oldRunningApplication.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
+	if (oldRunningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
 	{
-		// oldRunningApplication == nil, means remove 'current process'
-		if (self.currentProcess.processID == oldRunningApplication.processIdentifier || !oldRunningApplication)
+		// oldRunningProcess == nil, means remove 'current process'
+		if (self.currentProcess.processID == oldRunningProcess.processIdentifier || !oldRunningProcess)
 		{
 			// Don't remove the item, just indicate it's terminated
 			NSAttributedString *status =
@@ -559,13 +537,13 @@
 				self.runningApplicationsPopUpButton.selectedItem.image = regularAppIcon;
 			}
 		}
-		else if (oldRunningApplication.processIdentifier != -1)
+		else if (oldRunningProcess.processIdentifier != -1)
 		{
 			// Find the menu item, and remove it
 			NSMenuItem *itemToRemove = nil;
 			for (NSMenuItem *item in self.runningApplicationsPopUpButton.itemArray)
 			{
-				if ([item.representedObject processID] == oldRunningApplication.processIdentifier)
+				if ([item.representedObject processID] == oldRunningProcess.processIdentifier)
 				{
 					itemToRemove = item;
 					break;
@@ -580,10 +558,10 @@
 	}
 }
 
-- (void)addRunningApplicationToPopupButton:(NSRunningApplication *)newRunningApplication
+- (void)addRunningProcessToPopupButton:(ZGRunningProcess *)newRunningProcess
 {
 	// Don't add ourselves
-	if (newRunningApplication.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
+	if (newRunningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
 	{
 		// Check if a dead application can be 'revived'
 		for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
@@ -591,13 +569,13 @@
 			ZGProcess *process = menuItem.representedObject;
 			if (process == self.currentProcess &&
 				self.currentProcess.processID == NON_EXISTENT_PID_NUMBER &&
-				[self.currentProcess.name isEqualToString:newRunningApplication.localizedName])
+				[self.currentProcess.name isEqualToString:newRunningProcess.name])
 			{
-				self.currentProcess.processID = newRunningApplication.processIdentifier;
-				self.currentProcess.is64Bit = (newRunningApplication.executableArchitecture == NSBundleExecutableArchitectureX86_64);
+				self.currentProcess.processID = newRunningProcess.processIdentifier;
+				self.currentProcess.is64Bit = newRunningProcess.is64Bit;
 				menuItem.title = [NSString stringWithFormat:@"%@ (%d)", self.currentProcess.name, self.currentProcess.processID];
 				
-				NSImage *iconImage = [[newRunningApplication icon] copy];
+				NSImage *iconImage = [[newRunningProcess icon] copy];
 				iconImage.size = NSMakeSize(16, 16);
 				menuItem.image = iconImage;
 				
@@ -609,17 +587,17 @@
 		
 		// Otherwise add the new application
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (%d)", newRunningApplication.localizedName, newRunningApplication.processIdentifier];
+		menuItem.title = [NSString stringWithFormat:@"%@ (%d)", newRunningProcess.name, newRunningProcess.processIdentifier];
 		
-		NSImage *iconImage = [[newRunningApplication icon] copy];
+		NSImage *iconImage = [[newRunningProcess icon] copy];
 		iconImage.size = NSMakeSize(16, 16);
 		menuItem.image = iconImage;
 		
 		ZGProcess *representedProcess =
 			[[ZGProcess alloc]
-			 initWithName:newRunningApplication.localizedName
-			 processID:newRunningApplication.processIdentifier
-			 set64Bit:(newRunningApplication.executableArchitecture == NSBundleExecutableArchitectureX86_64)];
+			 initWithName:newRunningProcess.name
+			 processID:newRunningProcess.processIdentifier
+			 set64Bit:newRunningProcess.is64Bit];
 		
 		menuItem.representedObject = representedProcess;
 		
@@ -627,7 +605,7 @@
 		
 		// If we found desired process name, select it
 		if (![self.currentProcess.name isEqualToString:self.desiredProcessName] &&
-			[self.desiredProcessName isEqualToString:newRunningApplication.localizedName])
+			[self.desiredProcessName isEqualToString:newRunningProcess.name])
 		{
 			[self.runningApplicationsPopUpButton selectItem:menuItem];
 			[self runningApplicationsPopUpButtonRequest:nil];
@@ -637,24 +615,24 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (object == NSWorkspace.sharedWorkspace && self.runningApplicationsPopUpButton.itemArray.count > 0)
+	if (object == [ZGProcessList sharedProcessList] && self.runningApplicationsPopUpButton.itemArray.count > 0)
 	{
-		NSArray *newRunningApplications = [change objectForKey:NSKeyValueChangeNewKey];
-		NSArray *oldRunningApplications = [change objectForKey:NSKeyValueChangeOldKey];
+		NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
+		NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
 		
-		if (newRunningApplications)
+		if (newRunningProcesses)
 		{
-			for (NSRunningApplication *runningApplication in newRunningApplications)
+			for (ZGRunningProcess *runningProcess in newRunningProcesses)
 			{
-				[self addRunningApplicationToPopupButton:runningApplication];
+				[self addRunningProcessToPopupButton:runningProcess];
 			}
 		}
 		
-		if (oldRunningApplications)
+		if (oldRunningProcesses)
 		{
-			for (NSRunningApplication *runningApplication in oldRunningApplications)
+			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
 			{
-				[self removeRunningApplicationFromPopupButton:runningApplication];
+				[self removeRunningProcessFromPopupButton:runningProcess];
 			}
 		}
 	}
