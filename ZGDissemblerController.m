@@ -56,6 +56,7 @@
 @property (nonatomic, strong) NSArray *instructions;
 
 @property (readwrite, strong, nonatomic) NSTimer *updateInstructionsTimer;
+@property (readwrite, nonatomic) BOOL dissembling;
 
 @end
 
@@ -318,7 +319,8 @@
 
 - (IBAction)stopDissembling:(id)sender
 {
-	// TODO: implement me
+	self.dissembling = NO;
+	[self.stopButton setEnabled:NO];
 }
 
 - (void)updateDissemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)theSize selectionAddress:(ZGMemoryAddress)selectionAddress
@@ -329,7 +331,13 @@
 	[self.dissemblyProgressIndicator setHidden:NO];
 	[self.addressTextField setEnabled:NO];
 	[self.runningApplicationsPopUpButton setEnabled:NO];
+	[self.stopButton setEnabled:YES];
 	[self.stopButton setHidden:NO];
+	
+	self.currentMemoryAddress = address;
+	self.currentMemorySize = 0;
+	
+	self.dissembling = YES;
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		//NSLog(@"Trying to do of size %lld", theSize);
@@ -363,6 +371,7 @@
 					}
 					self.instructions = [NSArray arrayWithArray:appendedInstructions];
 					[self.instructionsTableView noteNumberOfRowsChanged];
+					self.currentMemorySize = self.instructions.count;
 					
 					if (foundSelection)
 					{
@@ -389,6 +398,11 @@
 					}
 				});
 				
+				if (!self.dissembling)
+				{
+					break;
+				}
+				
 				totalInstructionCount++;
 				
 				if (totalInstructionCount >= thresholdCount)
@@ -403,6 +417,7 @@
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				//NSLog(@"Done %ld, %ld", totalInstructionCount, self.instructions.count);
+				self.dissembling = NO;
 				[self.dissemblyProgressIndicator setHidden:YES];
 				[self.addressTextField setEnabled:YES];
 				[self.runningApplicationsPopUpButton setEnabled:YES];
@@ -468,10 +483,7 @@
 			goto END_DEBUGGER_CHANGE;
 		}
 		
-		self.currentMemoryAddress = chosenRegion.address;
-		self.currentMemorySize = chosenRegion.size;
-		
-		[self updateDissemblerWithAddress:self.currentMemoryAddress size:self.currentMemorySize selectionAddress:calculatedMemoryAddress];
+		[self updateDissemblerWithAddress:chosenRegion.address size:chosenRegion.size selectionAddress:calculatedMemoryAddress];
 		
 		success = YES;
 	}
