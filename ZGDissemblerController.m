@@ -135,11 +135,31 @@
 			
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
+			// Revive process
+			if (self.currentProcess.processID == NON_EXISTENT_PID_NUMBER && [self.currentProcess.name isEqualToString:runningProcess.name])
+			{
+				self.currentProcess.processID = runningProcess.processIdentifier;
+			}
+			
 			if (self.currentProcess.processID == runningProcess.processIdentifier || [desiredProcessName isEqualToString:runningProcess.name])
 			{
 				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 			}
 		}
+	}
+	
+	// Handle dead process
+	if (self.currentProcess && self.currentProcess.processID != [self.runningApplicationsPopUpButton.selectedItem.representedObject processID])
+	{
+		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.name];
+		NSImage *iconImage = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
+		iconImage.size = NSMakeSize(16, 16);
+		menuItem.image = iconImage;
+		menuItem.representedObject = self.currentProcess;
+		self.currentProcess.processID = NON_EXISTENT_PID_NUMBER;
+		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
+		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;

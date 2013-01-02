@@ -41,8 +41,6 @@
 @class ZGDocumentBreakPointController;
 @class ZGRunningProcess;
 
-#define NON_EXISTENT_PID_NUMBER -1
-
 @interface ZGDocument : NSDocument
 
 @property (assign) IBOutlet NSWindow *watchWindow;

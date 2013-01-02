@@ -36,6 +36,8 @@
 #import "ZGVirtualMemory.h"
 #import <sys/sysctl.h>
 
+#define NON_EXISTENT_PID_NUMBER -1
+
 @interface ZGProcess : NSObject
 {
 @public
