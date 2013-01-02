@@ -127,13 +127,7 @@
 - (void)breakPointDidHit:(NSNumber *)address
 {
 	ZGMemoryAddress breakPointAddress = [address unsignedLongLongValue];
-	
-	//ZGMemoryAddress instructionAddress = [[[ZGAppController sharedController] dissemblerController] findInstructionAddressFromBreakPointAddress:breakPointAddress inProcess:self.document.currentProcess];
-	
 	ZGInstruction *instruction = [[[ZGAppController sharedController] dissemblerController] findInstructionBeforeAddress:breakPointAddress inProcess:self.watchProcess];
-	
-	//ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:breakPointAddress - instructionAddress address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.watchProcess.pointerSize];
-	//[variable setShouldBeSearched:NO];
 	
 	// No need to watch process anymore as break point controller removed the breakpoint for us
 	self.watchProcess = nil;
