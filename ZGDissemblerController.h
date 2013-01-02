@@ -36,11 +36,12 @@
 #import "ZGMemoryTypes.h"
 
 @class ZGProcess;
+@class ZGInstruction;
 
 @interface ZGDissemblerController : NSWindowController <NSTableViewDataSource>
 
 @property (readonly) ZGProcess *currentProcess;
 
-- (ZGMemoryAddress)findInstructionAddressFromBreakPointAddress:(ZGMemoryAddress)breakPointAddress inProcess:(ZGProcess *)process;
+- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process;
 
 @end

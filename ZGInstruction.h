@@ -38,7 +38,7 @@
 
 @interface ZGInstruction : NSObject
 
-@property (nonatomic, strong) NSString *text;
+@property (nonatomic, copy) NSString *text;
 @property (nonatomic, strong) ZGVariable *variable;
 
 @end

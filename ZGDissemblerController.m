@@ -267,25 +267,25 @@
 	}
 }
 
-- (ZGMemoryAddress)findInstructionAddressFromBreakPointAddress:(ZGMemoryAddress)breakPointAddress inProcess:(ZGProcess *)process
+- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
-	ZGMemoryAddress instructionAddress = 0x0;
+	ZGInstruction *instruction = nil;
 	
 	for (ZGRegion *region in ZGRegionsForProcessTask(process.processTask))
 	{
-		if (breakPointAddress >= region.address && breakPointAddress < region.address + region.size)
+		if (address >= region.address && address < region.address + region.size)
 		{
-			// Start an arbitrary number of bytes before our break point address and decode the instructions
+			// Start an arbitrary number of bytes before our address and decode the instructions
 			// Eventually they will converge into correct offsets
-			// So retrieve the offset to the last instruction while decoding
-			// We do this instead of starting at region.address due to performance
-			
-			ZGMemoryAddress startAddress = breakPointAddress - 1024;
+			// So retrieve the offset and size to the last instruction while decoding
+			// We do this instead of starting at region.address due to better performance
+			ZGMemoryAddress startAddress = address - 1024;
 			if (startAddress < region.address)
 			{
 				startAddress = region.address;
 			}
-			ZGMemorySize size = breakPointAddress - startAddress;
+			
+			ZGMemorySize size = address - startAddress;
 			
 			void *bytes = NULL;
 			if (ZGReadBytes(process.processTask, startAddress, &bytes, &size))
@@ -296,16 +296,24 @@
 				ud_set_mode(&object, process.pointerSize * 8);
 				ud_set_syntax(&object, UD_SYN_INTEL);
 				
-				ZGMemorySize memoryOffset = 0;
+				ZGMemoryAddress memoryOffset = 0;
+				ZGMemorySize memorySize = 0;
+				NSString *instructionText = nil;
 				while (ud_disassemble(&object) > 0)
 				{
-					if (memoryOffset + ud_insn_len(&object) < size)
+					if (ud_insn_off(&object) + ud_insn_len(&object) >= size)
 					{
-						memoryOffset += ud_insn_len(&object);
+						memoryOffset = ud_insn_off(&object);
+						memorySize = ud_insn_len(&object);
+						instructionText = @(ud_insn_asm(&object));
 					}
 				}
 				
-				instructionAddress = startAddress + memoryOffset;
+				instruction = [[ZGInstruction alloc] init];
+				ZGVariable *variable = [[ZGVariable alloc] initWithValue:bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+				[variable setShouldBeSearched:NO];
+				instruction.variable = variable;
+				instruction.text = instructionText;
 				
 				ZGFreeBytes(process.processTask, bytes, size);
 			}
@@ -314,7 +322,7 @@
 		}
 	}
 	
-	return instructionAddress;
+	return instruction;
 }
 
 - (IBAction)stopDissembling:(id)sender
@@ -333,6 +341,8 @@
 	[self.runningApplicationsPopUpButton setEnabled:NO];
 	[self.stopButton setEnabled:YES];
 	[self.stopButton setHidden:NO];
+	
+	self.instructions = @[];
 	
 	self.currentMemoryAddress = address;
 	self.currentMemorySize = 0;
@@ -385,6 +395,7 @@
 			while (ud_disassemble(&object) > 0)
 			{
 				ZGInstruction *instruction = [[ZGInstruction alloc] init];
+				instruction.text = @(ud_insn_asm(&object));
 				instruction.variable = [[ZGVariable alloc] initWithValue:bytes + ud_insn_off(&object) size:ud_insn_len(&object) address:address + ud_insn_off(&object) type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
 				
 				[newInstructions addObject:instruction];
@@ -476,14 +487,38 @@
 			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
 		}
 		
-		if (self.instructions.count > 0 && calculatedMemoryAddress >= self.currentMemoryAddress && calculatedMemoryAddress < self.currentMemoryAddress + self.currentMemorySize)
+		// Dissemble within a range from +- 50000 from selection address
+		const NSUInteger WINDOW_SIZE = 50000;
+		
+		ZGMemoryAddress lowBoundAddress = calculatedMemoryAddress - WINDOW_SIZE;
+		if (lowBoundAddress <= chosenRegion.address)
 		{
-			[self selectAddress:calculatedMemoryAddress];
-			success = YES;
-			goto END_DEBUGGER_CHANGE;
+			lowBoundAddress = chosenRegion.address;
+		}
+		else
+		{
+			lowBoundAddress = [self findInstructionBeforeAddress:lowBoundAddress inProcess:self.currentProcess].variable.address;
+			if (lowBoundAddress < chosenRegion.address)
+			{
+				lowBoundAddress = chosenRegion.address;
+			}
 		}
 		
-		[self updateDissemblerWithAddress:chosenRegion.address size:chosenRegion.size selectionAddress:calculatedMemoryAddress];
+		ZGMemoryAddress highBoundAddress = calculatedMemoryAddress + WINDOW_SIZE;
+		if (highBoundAddress >= chosenRegion.address + chosenRegion.size)
+		{
+			highBoundAddress = chosenRegion.address + chosenRegion.size;
+		}
+		else
+		{
+			highBoundAddress = [self findInstructionBeforeAddress:highBoundAddress inProcess:self.currentProcess].variable.address;
+			if (highBoundAddress <= chosenRegion.address || highBoundAddress > chosenRegion.address + chosenRegion.size)
+			{
+				highBoundAddress = chosenRegion.address + chosenRegion.size;
+			}
+		}
+		
+		[self updateDissemblerWithAddress:lowBoundAddress size:highBoundAddress - lowBoundAddress selectionAddress:calculatedMemoryAddress];
 		
 		success = YES;
 	}
