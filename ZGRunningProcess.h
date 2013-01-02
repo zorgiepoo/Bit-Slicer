@@ -39,7 +39,7 @@
 @property (assign) pid_t processIdentifier;
 @property (copy, nonatomic) NSString *name;
 @property (readonly, nonatomic) NSImage *icon;
-@property (readonly, nonatomic) BOOL is64Bit;
+@property (readwrite, nonatomic) BOOL is64Bit;
 @property (assign, nonatomic) NSApplicationActivationPolicy activationPolicy;
 
 @end

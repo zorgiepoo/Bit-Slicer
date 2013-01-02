@@ -36,13 +36,6 @@
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
-@interface ZGRunningProcess ()
-
-@property (assign, nonatomic) BOOL is64Bit;
-@property (assign, nonatomic) BOOL hasCachedArchitecture;
-
-@end
-
 @implementation ZGRunningProcess
 
 #pragma mark Comparisons
@@ -70,46 +63,6 @@
 {
 	NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier];
 	return runningApplication ? runningApplication.icon : [NSImage imageNamed:@"NSDefaultApplicationIcon"];
-}
-
-// http://stackoverflow.com/questions/1350181/determine-a-processs-architecture
-- (BOOL)is64Bit
-{
-	BOOL is64Bit = YES; // as we're migrating to 64-bit it's probably safer to default to this
-	if (!self.hasCachedArchitecture)
-	{
-		BOOL error = NO;
-		size_t mibLen = CTL_MAXNAME;
-		int mib[mibLen];
-		
-		if (!(error = (sysctlnametomib("sysctl.proc_cputype", mib, &mibLen) != 0)))
-		{
-			mib[mibLen] = self.processIdentifier;
-			mibLen++;
-			
-			cpu_type_t cpuType;
-			size_t cpuTypeSize;
-			cpuTypeSize = sizeof(cpuType);
-			
-			if (!(error = (sysctl(mib, (u_int)mibLen, &cpuType, &cpuTypeSize, 0, 0) != 0)))
-			{
-				is64Bit = (cpuType & CPU_ARCH_ABI64);
-				self.is64Bit = is64Bit;
-				self.hasCachedArchitecture = YES;
-			}
-		}
-		
-		if (error)
-		{
-			NSLog(@"ERROR obtaining architecture from process %d, %@.. Assuming 64-bit.", self.processIdentifier, self.name);
-		}
-	}
-	else
-	{
-		is64Bit = _is64Bit;
-	}
-	
-	return is64Bit;
 }
 
 @end

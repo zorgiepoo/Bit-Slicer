@@ -35,8 +35,10 @@
 #import "ZGDocumentBreakPointController.h"
 #import "ZGDocument.h"
 #import "ZGBreakPointController.h"
+#import "ZGVariableController.h"
 #import "ZGAppController.h"
 #import "ZGDocumentSearchController.h"
+#import "ZGDocumentTableController.h"
 #import "ZGDissemblerController.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
@@ -123,22 +125,22 @@
 
 - (void)breakPointDidHit:(NSNumber *)address
 {
-	ZGMemoryAddress memoryAddress = [address unsignedLongLongValue];
+	ZGMemoryAddress breakPointAddress = [address unsignedLongLongValue];
 	
-	self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Decoding instruction..."];
+	ZGMemoryAddress instructionAddress = [[[ZGAppController sharedController] dissemblerController] findInstructionAddressFromBreakPointAddress:breakPointAddress inProcess:self.document.currentProcess];
 	
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		ZGMemoryAddress instructionAddress = [[[ZGAppController sharedController] dissemblerController] findInstructionAddressFromBreakPointAddress:memoryAddress inProcess:self.document.currentProcess];
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			// Make sure nothing bad happened when we were busy decoding
-			if (self.watchProcess)
-			{
-				NSLog(@"Instruction address is 0x%llX", instructionAddress);
-				[self cancelTask];
-			}
-		});
-	});
+	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:breakPointAddress - instructionAddress address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.watchProcess.pointerSize];
+	[variable setShouldBeSearched:NO];
+	
+	// No need to watch process anymore as break point controller removed the breakpoint for us
+	self.watchProcess = nil;
+	[self cancelTask];
+	
+	[self.document.variableController addVariables:@[variable] atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
+	[self.document.tableController.watchVariablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+	[self.document.tableController.watchVariablesTableView scrollRowToVisible:0];
+	[self.document.watchWindow makeFirstResponder:self.document.tableController.watchVariablesTableView];
+	self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", variable.sizeStringValue, variable.addressStringValue];
 }
 
 - (void)requestVariableWatch
@@ -151,7 +153,7 @@
 		
 		self.document.currentProcess.isWatchingBreakPoint = YES;
 		
-		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until %@ (%lld bytes) is hit...", [variable addressStringValue], variable.size];
+		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until %@ byte%@ at %@ is written into...", variable.sizeStringValue, variable.size != 1 ? @"s" : @"", variable.addressStringValue];
 		self.document.searchingProgressIndicator.indeterminate = YES;
 		[self.document.searchingProgressIndicator startAnimation:nil];
 		

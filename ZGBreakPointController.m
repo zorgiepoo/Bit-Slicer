@@ -86,9 +86,10 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	{		
 		x86_debug_state_t debugState;
 		mach_msg_type_number_t stateCount = x86_DEBUG_STATE_COUNT;
-		if (thread_get_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount) != KERN_SUCCESS)
+		kern_return_t error = 0;
+		if ((error = thread_get_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount)) != KERN_SUCCESS)
 		{
-			NSLog(@"ERROR: Grabbing debug state failed in removeBreakPoint:, continuing...");
+			NSLog(@"ERROR: Grabbing debug state failed in removeBreakPoint:, %d, continuing...", error);
 			continue;
 		}
 		
@@ -103,9 +104,9 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 			RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds32);
 		}
 		
-		if (thread_set_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, stateCount) != KERN_SUCCESS)
+		if ((error = thread_set_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, stateCount)) != KERN_SUCCESS)
 		{
-			NSLog(@"ERROR: Failure in setting thread state registers in removeBreakPoint:");
+			NSLog(@"ERROR: Failure in setting thread state registers, %d, in removeBreakPoint:", error);
 		}
 	}
 	

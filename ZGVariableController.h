@@ -47,6 +47,7 @@
 
 - (void)removeSelectedSearchValues;
 - (void)addVariable:(id)sender;
+- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
 
 - (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName;
 - (void)changeVariable:(ZGVariable *)variable newAddress:(NSString *)newAddress;

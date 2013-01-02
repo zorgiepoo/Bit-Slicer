@@ -47,11 +47,14 @@
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSTextField *addressTextField;
 @property (assign) IBOutlet NSTableView *instructionsTableView;
+@property (assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
 
 @property (readwrite) ZGMemoryAddress currentMemoryAddress;
 @property (readwrite) ZGMemorySize currentMemorySize;
 
 @property (nonatomic, strong) NSArray *instructions;
+
+@property (readwrite, strong, nonatomic) NSTimer *updateInstructionsTimer;
 
 @end
 
@@ -101,6 +104,72 @@
 	 forKeyPath:@"runningProcesses"
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	 context:NULL];
+}
+
+- (IBAction)showWindow:(id)sender
+{
+	[super showWindow:sender];
+	
+	if (!self.updateInstructionsTimer)
+	{
+		self.updateInstructionsTimer =
+			[NSTimer
+			 scheduledTimerWithTimeInterval:0.5
+			 target:self
+			 selector:@selector(updateInstructionsTimer:)
+			 userInfo:nil
+			 repeats:YES];
+	}
+}
+
+- (void)windowWillClose:(NSNotification *)notification
+{
+	[self.updateInstructionsTimer invalidate];
+	self.updateInstructionsTimer = nil;
+}
+
+- (void)updateInstructionsTimer:(NSTimer *)timer
+{
+	if (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.instructionsTableView.editedRow == -1)
+	{
+		NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+		if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
+		{
+			[[self.instructions subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGInstruction *instruction, NSUInteger index, BOOL *stop)
+			 {
+				 void *bytes = NULL;
+				 ZGMemorySize size = instruction.variable.size;
+				 if (ZGReadBytes(self.currentProcess.processTask, instruction.variable.address, &bytes, &size))
+				 {
+					 BOOL shouldUpdateText = (instruction.text == nil);
+					 if (memcmp(bytes, instruction.variable.value, size) != 0)
+					 {
+						 instruction.variable.value = bytes;
+						 [instruction.variable updateStringValue];
+						 shouldUpdateText = YES;
+					 }
+					 
+					 if (shouldUpdateText)
+					 {
+						 ud_t object;
+						 ud_init(&object);
+						 ud_set_input_buffer(&object, bytes, size);
+						 ud_set_mode(&object, self.currentProcess.pointerSize * 8);
+						 ud_set_syntax(&object, UD_SYN_INTEL);
+						 
+						 while (ud_disassemble(&object) > 0)
+						 {
+							 instruction.text = @(ud_insn_asm(&object));
+						 }
+						 
+						 [self.instructionsTableView reloadData];
+					 }
+					 
+					 ZGFreeBytes(self.currentProcess.processTask, bytes, size);
+				 }
+			 }];
+		}
+	}
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -176,18 +245,24 @@
 - (void)selectAddress:(ZGMemoryAddress)address
 {
 	NSUInteger selectionIndex = 0;
+	BOOL foundSelection = NO;
+	
 	for (ZGInstruction *instruction in self.instructions)
 	{
 		if (instruction.variable.address >= address)
 		{
+			foundSelection = YES;
 			break;
 		}
 		selectionIndex++;
 	}
 	
-	[self.instructionsTableView scrollRowToVisible:selectionIndex];
-	[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionIndex] byExtendingSelection:NO];
-	[self.window makeFirstResponder:self.instructionsTableView];
+	if (foundSelection)
+	{
+		[self.instructionsTableView scrollRowToVisible:selectionIndex];
+		[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionIndex] byExtendingSelection:NO];
+		[self.window makeFirstResponder:self.instructionsTableView];
+	}
 }
 
 - (ZGMemoryAddress)findInstructionAddressFromBreakPointAddress:(ZGMemoryAddress)breakPointAddress inProcess:(ZGProcess *)process
@@ -198,9 +273,20 @@
 	{
 		if (breakPointAddress >= region.address && breakPointAddress < region.address + region.size)
 		{
-			void *bytes;
-			ZGMemorySize size = region.size;
-			if (ZGReadBytes(process.processTask, region.address, &bytes, &size))
+			// Start an arbitrary number of bytes before our break point address and decode the instructions
+			// Eventually they will converge into correct offsets
+			// So retrieve the offset to the last instruction while decoding
+			// We do this instead of starting at region.address due to performance
+			
+			ZGMemoryAddress startAddress = breakPointAddress - 1024;
+			if (startAddress < region.address)
+			{
+				startAddress = region.address;
+			}
+			ZGMemorySize size = breakPointAddress - startAddress;
+			
+			void *bytes = NULL;
+			if (ZGReadBytes(process.processTask, startAddress, &bytes, &size))
 			{
 				ud_t object;
 				ud_init(&object);
@@ -208,23 +294,16 @@
 				ud_set_mode(&object, process.pointerSize * 8);
 				ud_set_syntax(&object, UD_SYN_INTEL);
 				
-				ZGMemoryAddress previousOffset = 0;
-				BOOL foundAddress = NO;
+				ZGMemorySize memoryOffset = 0;
 				while (ud_disassemble(&object) > 0)
 				{
-					if (region.address + ud_insn_off(&object) >= breakPointAddress)
+					if (memoryOffset + ud_insn_len(&object) < size)
 					{
-						foundAddress = YES;
-						break;
+						memoryOffset += ud_insn_len(&object);
 					}
-					
-					previousOffset = ud_insn_off(&object);
 				}
 				
-				if (foundAddress)
-				{
-					instructionAddress = region.address + previousOffset;
-				}
+				instructionAddress = startAddress + memoryOffset;
 				
 				ZGFreeBytes(process.processTask, bytes, size);
 			}
@@ -236,37 +315,91 @@
 	return instructionAddress;
 }
 
-- (BOOL)updateDissemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size
+- (void)updateDissemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)theSize selectionAddress:(ZGMemoryAddress)selectionAddress
 {
-	BOOL success = NO;
-	void *bytes;
-	if ((success = ZGReadBytes(self.currentProcess.processTask, address, &bytes, &size)))
-	{
-		ud_t object;
-		ud_init(&object);
-		ud_set_input_buffer(&object, bytes, size);
-		ud_set_mode(&object, self.currentProcess.pointerSize * 8);
-		ud_set_syntax(&object, UD_SYN_INTEL);
-		
-		NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
-		
-		while (ud_disassemble(&object) > 0)
-		{
-			ZGInstruction *instruction = [[ZGInstruction alloc] init];
-			instruction.text = @(ud_insn_asm(&object));
-			instruction.variable = [[ZGVariable alloc] initWithValue:bytes + ud_insn_off(&object) size:ud_insn_len(&object) address:address + ud_insn_off(&object) type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
-			
-			[newInstructions addObject:instruction];
-		}
-		
-		self.instructions = [NSArray arrayWithArray:newInstructions];
-		
-		[self.instructionsTableView reloadData];
-		
-		ZGFreeBytes(self.currentProcess.processTask, bytes, size);
-	}
+	[self.dissemblyProgressIndicator setMinValue:0];
+	[self.dissemblyProgressIndicator setMaxValue:theSize];
+	[self.dissemblyProgressIndicator setDoubleValue:0];
+	[self.dissemblyProgressIndicator setHidden:NO];
 	
-	return success;
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		//NSLog(@"Trying to do of size %lld", theSize);
+		void *bytes;
+		ZGMemorySize size = theSize;
+		if (ZGReadBytes(self.currentProcess.processTask, address, &bytes, &size))
+		{
+			ud_t object;
+			ud_init(&object);
+			ud_set_input_buffer(&object, bytes, size);
+			ud_set_mode(&object, self.currentProcess.pointerSize * 8);
+			ud_set_syntax(&object, UD_SYN_INTEL);
+			
+			__block NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
+			
+			NSUInteger thresholdCount = 1000;
+			NSUInteger totalInstructionCount = 0;
+			__block NSUInteger selectionRow = 0;
+			__block BOOL foundSelection = NO;
+			
+			void (^addBatchOfInstructions)(void) = ^{
+				NSArray *currentBatch = newInstructions;
+				
+				dispatch_async(dispatch_get_main_queue(), ^{
+					NSMutableArray *appendedInstructions = [[NSMutableArray alloc] initWithArray:self.instructions];
+					[appendedInstructions addObjectsFromArray:currentBatch];
+					
+					if (self.instructions.count == 0)
+					{
+						[self.window makeFirstResponder:self.instructionsTableView];
+					}
+					self.instructions = [NSArray arrayWithArray:appendedInstructions];
+					[self.instructionsTableView noteNumberOfRowsChanged];
+					
+					if (foundSelection)
+					{
+						[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionRow] byExtendingSelection:NO];
+						[self.instructionsTableView scrollRowToVisible:selectionRow];
+						foundSelection = NO;
+					}
+				});
+			};
+			
+			while (ud_disassemble(&object) > 0)
+			{
+				ZGInstruction *instruction = [[ZGInstruction alloc] init];
+				instruction.variable = [[ZGVariable alloc] initWithValue:bytes + ud_insn_off(&object) size:ud_insn_len(&object) address:address + ud_insn_off(&object) type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+				
+				[newInstructions addObject:instruction];
+				
+				dispatch_async(dispatch_get_main_queue(), ^{
+					self.dissemblyProgressIndicator.doubleValue += instruction.variable.size;
+					if (selectionAddress >= instruction.variable.address && selectionAddress < instruction.variable.address + instruction.variable.size)
+					{
+						selectionRow = totalInstructionCount;
+						foundSelection = YES;
+					}
+				});
+				
+				totalInstructionCount++;
+				
+				if (totalInstructionCount >= thresholdCount)
+				{
+					addBatchOfInstructions();
+					newInstructions = [[NSMutableArray alloc] init];
+					thresholdCount *= 2;
+				}
+			}
+			
+			addBatchOfInstructions();
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				//NSLog(@"Done %ld, %ld", totalInstructionCount, self.instructions.count);
+				[self.dissemblyProgressIndicator setHidden:YES];
+			});
+			
+			ZGFreeBytes(self.currentProcess.processTask, bytes, size);
+		}
+	});
 }
 
 - (IBAction)readMemory:(id)sender
@@ -303,27 +436,12 @@
 		}
 		
 		ZGRegion *chosenRegion = nil;
-		if (calculatedMemoryAddress != 0)
+		for (ZGRegion *region in memoryRegions)
 		{
-			for (ZGRegion *region in memoryRegions)
+			if ((region.protection & VM_PROT_READ && region.protection & VM_PROT_EXECUTE) && (calculatedMemoryAddress <= 0 || (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size)))
 			{
-				if ((region.protection & VM_PROT_READ && region.protection & VM_PROT_EXECUTE) && calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size)
-				{
-					chosenRegion = region;
-					break;
-				}
-			}
-		}
-		else
-		{
-			for (ZGRegion *region in memoryRegions)
-			{
-				if (region.protection & VM_PROT_READ && region.protection & VM_PROT_EXECUTE)
-				{
-					chosenRegion = region;
-					calculatedMemoryAddress = region.address;
-					break;
-				}
+				chosenRegion = region;
+				break;
 			}
 		}
 		
@@ -335,16 +453,12 @@
 		self.currentMemorySize = chosenRegion.size;
 		self.currentMemoryAddress = chosenRegion.address;
 		
-		NSLog(@"Trying to do of size %lld", self.currentMemorySize);
-		[self updateDissemblerWithAddress:self.currentMemoryAddress size:self.currentMemorySize];
-		if (calculatedMemoryAddress > 0)
+		if (calculatedMemoryAddress <= 0)
 		{
-			[self selectAddress:calculatedMemoryAddress];
+			calculatedMemoryAddress = self.currentMemoryAddress;
 		}
-		else
-		{
-			[self selectAddress:self.currentMemoryAddress];
-		}
+		
+		[self updateDissemblerWithAddress:self.currentMemoryAddress size:self.currentMemorySize selectionAddress:calculatedMemoryAddress];
 		
 		success = YES;
 	}

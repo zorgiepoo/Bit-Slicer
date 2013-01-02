@@ -145,11 +145,31 @@
 		// I want user processes and I don't want zombies!
 		// Also don't get a process if it's still being created by fork() or if the pid is -1
 		if (processID != -1 && uid == getuid() && !(processList[processIndex].kp_proc.p_stat & SZOMB) && !(processList[processIndex].kp_proc.p_stat & SIDL))
-		{	
-			ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] init];
-			runningProcess.name = @(processList[processIndex].kp_proc.p_comm);
-			runningProcess.processIdentifier = processID;
-			[newRunningProcesses addObject:runningProcess];
+		{
+			// Get CPU type
+			// http://stackoverflow.com/questions/1350181/determine-a-processs-architecture
+			
+			size_t mibLen = CTL_MAXNAME;
+			int mib[mibLen];
+			
+			if (sysctlnametomib("sysctl.proc_cputype", mib, &mibLen) == 0)
+			{
+				mib[mibLen] = processID;
+				mibLen++;
+				
+				cpu_type_t cpuType;
+				size_t cpuTypeSize;
+				cpuTypeSize = sizeof(cpuType);
+				
+				if (sysctl(mib, (u_int)mibLen, &cpuType, &cpuTypeSize, 0, 0) == 0)
+				{
+					ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] init];
+					runningProcess.name = @(processList[processIndex].kp_proc.p_comm);
+					runningProcess.processIdentifier = processID;
+					runningProcess.is64Bit = (cpuType & CPU_ARCH_ABI64);
+					[newRunningProcesses addObject:runningProcess];
+				}
+			}
 		}
     }
 	
