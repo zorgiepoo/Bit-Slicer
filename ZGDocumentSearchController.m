@@ -331,7 +331,7 @@
 	[self resumeFromTask];
 }
 
-- (void)retrieveSearchData
+- (BOOL)retrieveSearchData
 {
 	ZGVariableType dataType = (ZGVariableType)self.document.dataTypesPopUpButton.selectedItem.tag;
 	
@@ -358,7 +358,7 @@
 	if (inputErrorMessage)
 	{
 		NSRunAlertPanel(@"Invalid Input", inputErrorMessage, nil, nil, nil);
-		return;
+		return NO;
 	}
 	
 	// get search value and data size
@@ -411,7 +411,7 @@
 				? @"Epsilon"
 				: ((functionType == ZGGreaterThan || functionType == ZGGreaterThanStored) ? @"Below" : @"Above");
 			NSRunAlertPanel(@"Invalid Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
-			return;
+			return NO;
 		}
 		else /* if (!inputErrorMessage || flagsFieldIsBlank) */
 		{
@@ -470,7 +470,7 @@
 		if ([self testSearchComponent:calculatedBeginAddress])
 		{
 			NSRunAlertPanel(@"Invalid Input", @"The expression in the beginning address field is not valid.", nil, nil, nil, nil);
-			return;
+			return NO;
 		}
 		
 		self.searchData.beginAddress = memoryAddressFromExpression(calculatedBeginAddress);
@@ -485,7 +485,7 @@
 		if ([self testSearchComponent:calculatedEndAddress])
 		{
 			NSRunAlertPanel(@"Invalid Input", @"The expression in the ending address field is not valid.", nil, nil, nil, nil);
-			return;
+			return NO;
 		}
 		
 		self.searchData.endAddress = memoryAddressFromExpression(calculatedEndAddress);
@@ -498,7 +498,7 @@
 	if (self.searchData.beginAddress >= self.searchData.endAddress)
 	{
 		NSRunAlertPanel(@"Invalid Input", @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted.", nil, nil, nil, nil);
-		return;
+		return NO;
 	}
 	
 	if (dataType == ZGByteArray)
@@ -510,6 +510,8 @@
 	{
 		self.searchData.compareOffset = self.searchData.searchValue;
 	}
+	
+	return YES;
 }
 
 - (void)search
@@ -533,7 +535,10 @@
 	// Re-display in case we set variables to not be searched
 	self.document.tableController.watchVariablesTableView.needsDisplay = YES;
 	
-	[self retrieveSearchData];
+	if (![self retrieveSearchData])
+	{
+		return;
+	}
 	
 	NSMutableArray *temporaryVariablesArray = [[NSMutableArray alloc] init];
 	
