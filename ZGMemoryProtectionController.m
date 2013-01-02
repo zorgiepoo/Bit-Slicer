@@ -68,7 +68,7 @@
 	{
 		// First check if we can find the memory region the address resides in
 		ZGMemoryAddress memoryAddress = address;
-		ZGMemorySize memorySize;
+		ZGMemorySize memorySize = size;
 		ZGMemoryProtection memoryProtection;
 		if (!ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 		{

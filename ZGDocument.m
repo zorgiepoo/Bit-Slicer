@@ -1179,6 +1179,21 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			return NO;
 		}
+		
+		ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
+		ZGMemoryAddress memoryAddress = selectedVariable.address;
+		ZGMemorySize memorySize = selectedVariable.size;
+		ZGMemoryProtection memoryProtection;
+		
+		if (!ZGMemoryProtectionInRegion(self.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+		{
+			return NO;
+		}
+		
+		if (memoryProtection & VM_PROT_EXECUTE)
+		{
+			return NO;
+		}
 	}
 	
 	return [super validateMenuItem:menuItem];

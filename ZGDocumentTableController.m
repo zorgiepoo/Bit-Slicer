@@ -354,7 +354,7 @@
 			
 			ZGMemoryProtection memoryProtection = 0;
 			ZGMemoryAddress memoryAddress = [variable address];
-			ZGMemorySize memorySize = 0;
+			ZGMemorySize memorySize = [variable size];
 			
 			if (ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 			{

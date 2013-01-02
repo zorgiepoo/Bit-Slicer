@@ -619,7 +619,7 @@
 	{
 		ZGMemoryProtection memoryProtection;
 		ZGMemoryAddress memoryAddress = variable.address;
-		ZGMemorySize memorySize;
+		ZGMemorySize memorySize = variable.size;
 		
 		if (ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 		{
