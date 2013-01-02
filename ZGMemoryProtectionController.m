@@ -56,6 +56,27 @@
 
 #pragma mark Memory Protection
 
+- (BOOL)changeProtectionAtAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size oldProtection:(ZGMemoryProtection)oldProtection newProtection:(ZGMemoryProtection)newProtection
+{
+	BOOL success = ZGProtect(self.document.currentProcess.processTask, address, size, newProtection);
+	
+	if (!success)
+	{
+		NSRunAlertPanel(
+						@"Memory Protection Change Failed",
+						@"The memory's protection could not be changed to the specified permissions.",
+						@"OK", nil, nil);
+	}
+	else
+	{
+		self.document.undoManager.actionName = @"Protection Change";
+		[[self.document.undoManager prepareWithInvocationTarget:self]
+		 changeProtectionAtAddress:address size:size oldProtection:newProtection newProtection:oldProtection	];
+	}
+	
+	return success;
+}
+
 - (IBAction)changeProtectionOkayButton:(id)sender
 {
 	NSString *addressExpression = [ZGCalculator evaluateExpression:self.changeProtectionAddressTextField.stringValue];
@@ -69,8 +90,8 @@
 		// First check if we can find the memory region the address resides in
 		ZGMemoryAddress memoryAddress = address;
 		ZGMemorySize memorySize = size;
-		ZGMemoryProtection memoryProtection;
-		if (!ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+		ZGMemoryProtection oldProtection;
+		if (!ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &oldProtection))
 		{
 			NSRunAlertPanel(
 							@"Memory Protection Change Failed",
@@ -96,14 +117,7 @@
 				protection |= VM_PROT_EXECUTE;
 			}
 			
-			if (!ZGProtect(self.document.currentProcess.processTask, address, size, protection))
-			{
-				NSRunAlertPanel(
-								@"Memory Protection Change Failed",
-								@"The memory's protection could not be changed to the specified permissions.",
-								@"OK", nil, nil);
-			}
-			else
+			if ([self changeProtectionAtAddress:address size:size oldProtection:oldProtection newProtection:protection])
 			{
 				[NSApp endSheet:self.changeProtectionWindow];
 				[self.changeProtectionWindow close];
