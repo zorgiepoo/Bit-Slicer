@@ -321,6 +321,8 @@
 	[self.dissemblyProgressIndicator setMaxValue:theSize];
 	[self.dissemblyProgressIndicator setDoubleValue:0];
 	[self.dissemblyProgressIndicator setHidden:NO];
+	[self.addressTextField setEnabled:NO];
+	[self.runningApplicationsPopUpButton setEnabled:NO];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		//NSLog(@"Trying to do of size %lld", theSize);
@@ -395,6 +397,8 @@
 			dispatch_async(dispatch_get_main_queue(), ^{
 				//NSLog(@"Done %ld, %ld", totalInstructionCount, self.instructions.count);
 				[self.dissemblyProgressIndicator setHidden:YES];
+				[self.addressTextField setEnabled:YES];
+				[self.runningApplicationsPopUpButton setEnabled:YES];
 			});
 			
 			ZGFreeBytes(self.currentProcess.processTask, bytes, size);
@@ -428,13 +432,6 @@
 			goto END_DEBUGGER_CHANGE;
 		}
 		
-		if (calculatedMemoryAddress >= self.currentMemoryAddress && calculatedMemoryAddress < self.currentMemoryAddress + self.currentMemorySize)
-		{
-			[self selectAddress:calculatedMemoryAddress];
-			success = YES;
-			goto END_DEBUGGER_CHANGE;
-		}
-		
 		ZGRegion *chosenRegion = nil;
 		for (ZGRegion *region in memoryRegions)
 		{
@@ -450,13 +447,21 @@
 			goto END_DEBUGGER_CHANGE;
 		}
 		
-		self.currentMemorySize = chosenRegion.size;
-		self.currentMemoryAddress = chosenRegion.address;
-		
 		if (calculatedMemoryAddress <= 0)
 		{
-			calculatedMemoryAddress = self.currentMemoryAddress;
+			calculatedMemoryAddress = chosenRegion.address;
+			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
 		}
+		
+		if (self.instructions.count > 0 && calculatedMemoryAddress >= self.currentMemoryAddress && calculatedMemoryAddress < self.currentMemoryAddress + self.currentMemorySize)
+		{
+			[self selectAddress:calculatedMemoryAddress];
+			success = YES;
+			goto END_DEBUGGER_CHANGE;
+		}
+		
+		self.currentMemoryAddress = chosenRegion.address;
+		self.currentMemorySize = chosenRegion.size;
 		
 		[self updateDissemblerWithAddress:self.currentMemoryAddress size:self.currentMemorySize selectionAddress:calculatedMemoryAddress];
 		
