@@ -156,6 +156,13 @@
 		
 		self.watchProcess = self.document.currentProcess;
 	}
+	else
+	{
+		NSRunAlertPanel(
+						@"Failed to Watch Variable",
+						@"A watchpoint could not be added for this variable.",
+						@"OK", nil, nil);
+	}
 }
 
 @end
