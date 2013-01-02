@@ -48,6 +48,7 @@
 @property (assign) IBOutlet NSTextField *addressTextField;
 @property (assign) IBOutlet NSTableView *instructionsTableView;
 @property (assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
+@property (assign) IBOutlet NSButton *stopButton;
 
 @property (readwrite) ZGMemoryAddress currentMemoryAddress;
 @property (readwrite) ZGMemorySize currentMemorySize;
@@ -315,6 +316,11 @@
 	return instructionAddress;
 }
 
+- (IBAction)stopDissembling:(id)sender
+{
+	// TODO: implement me
+}
+
 - (void)updateDissemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)theSize selectionAddress:(ZGMemoryAddress)selectionAddress
 {
 	[self.dissemblyProgressIndicator setMinValue:0];
@@ -323,6 +329,7 @@
 	[self.dissemblyProgressIndicator setHidden:NO];
 	[self.addressTextField setEnabled:NO];
 	[self.runningApplicationsPopUpButton setEnabled:NO];
+	[self.stopButton setHidden:NO];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		//NSLog(@"Trying to do of size %lld", theSize);
@@ -399,6 +406,7 @@
 				[self.dissemblyProgressIndicator setHidden:YES];
 				[self.addressTextField setEnabled:YES];
 				[self.runningApplicationsPopUpButton setEnabled:YES];
+				[self.stopButton setHidden:YES];
 			});
 			
 			ZGFreeBytes(self.currentProcess.processTask, bytes, size);

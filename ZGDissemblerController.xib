@@ -12,6 +12,8 @@
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
+			<string>NSButton</string>
+			<string>NSButtonCell</string>
 			<string>NSCustomObject</string>
 			<string>NSMenu</string>
 			<string>NSPopUpButton</string>
@@ -136,7 +138,7 @@
 							<string key="NSFrame">{{62, 390}, {143, 22}}</string>
 							<reference key="NSSuperview" ref="351304596"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="636236275"/>
+							<reference key="NSNextKeyView" ref="481839892"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSPopUpButtonCell" key="NSCell" id="156061031">
 								<int key="NSCellFlags">-2076180416</int>
@@ -223,10 +225,11 @@
 										<object class="NSTableView" id="461663476">
 											<reference key="NSNextResponder" ref="781794399"/>
 											<int key="NSvFlags">256</int>
+											<array class="NSMutableArray" key="NSSubviews"/>
 											<string key="NSFrameSize">{505, 342}</string>
 											<reference key="NSSuperview" ref="781794399"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="48000623"/>
+											<reference key="NSNextKeyView" ref="1043616540"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -402,6 +405,7 @@
 									<string key="NSFrame">{{1, 343}, {505, 16}}</string>
 									<reference key="NSSuperview" ref="375143939"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView"/>
 									<string key="NSReuseIdentifierKey">_NS:60</string>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
@@ -428,7 +432,7 @@
 							<string key="NSFrame">{{20, 18}, {507, 360}}</string>
 							<reference key="NSSuperview" ref="351304596"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="781794399"/>
+							<reference key="NSNextKeyView" ref="48000623"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="1043616540"/>
@@ -440,16 +444,46 @@
 							<double key="NSMaxMagnification">4</double>
 							<double key="NSMagnification">1</double>
 						</object>
-						<object class="NSProgressIndicator" id="373973778">
+						<object class="NSProgressIndicator" id="481839892">
 							<reference key="NSNextResponder" ref="351304596"/>
 							<int key="NSvFlags">-2147483382</int>
-							<string key="NSFrame">{{210, 396}, {142, 12}}</string>
+							<string key="NSFrame">{{210, 396}, {126, 12}}</string>
 							<reference key="NSSuperview" ref="351304596"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="532731890"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<string key="NSHuggingPriority">{250, 250}</string>
 							<int key="NSpiFlags">16653</int>
 							<double key="NSMaxValue">100</double>
+						</object>
+						<object class="NSButton" id="532731890">
+							<reference key="NSNextResponder" ref="351304596"/>
+							<int key="NSvFlags">-2147483383</int>
+							<string key="NSFrame">{{337, 396}, {17, 12}}</string>
+							<reference key="NSSuperview" ref="351304596"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="636236275"/>
+							<string key="NSReuseIdentifierKey">_NS:9</string>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="34446153">
+								<int key="NSCellFlags">67108864</int>
+								<int key="NSCellFlags2">134217728</int>
+								<string key="NSContents"/>
+								<reference key="NSSupport" ref="881501546"/>
+								<string key="NSCellIdentifier">_NS:9</string>
+								<reference key="NSControlView" ref="532731890"/>
+								<int key="NSButtonFlags">-2041823232</int>
+								<int key="NSButtonFlags2">130</int>
+								<object class="NSCustomResource" key="NSNormalImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">NSStopProgressFreestandingTemplate</string>
+								</object>
+								<string key="NSAlternateContents"/>
+								<string key="NSKeyEquivalent"/>
+								<int key="NSPeriodicDelay">200</int>
+								<int key="NSPeriodicInterval">25</int>
+							</object>
+							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 					</array>
 					<string key="NSFrameSize">{547, 417}</string>
@@ -499,12 +533,20 @@
 					<int key="connectionID">70</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">runningApplicationsPopUpButton:</string>
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">dissemblyProgressIndicator</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="603594933"/>
+						<reference key="destination" ref="481839892"/>
 					</object>
-					<int key="connectionID">71</int>
+					<int key="connectionID">75</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">stopButton</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="532731890"/>
+					</object>
+					<int key="connectionID">95</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -512,15 +554,23 @@
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="778492882"/>
 					</object>
-					<int key="connectionID">73</int>
+					<int key="connectionID">96</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">dissemblyProgressIndicator</string>
+					<object class="IBActionConnection" key="connection">
+						<string key="label">runningApplicationsPopUpButton:</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="373973778"/>
+						<reference key="destination" ref="603594933"/>
 					</object>
-					<int key="connectionID">75</int>
+					<int key="connectionID">97</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">stopDissembling:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="532731890"/>
+					</object>
+					<int key="connectionID">98</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -583,7 +633,8 @@
 							<reference ref="778492882"/>
 							<reference ref="636236275"/>
 							<reference ref="375143939"/>
-							<reference ref="373973778"/>
+							<reference ref="481839892"/>
+							<reference ref="532731890"/>
 						</array>
 						<reference key="parent" ref="821333839"/>
 					</object>
@@ -729,8 +780,21 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">74</int>
-						<reference key="object" ref="373973778"/>
+						<reference key="object" ref="481839892"/>
 						<reference key="parent" ref="351304596"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">93</int>
+						<reference key="object" ref="532731890"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="34446153"/>
+						</array>
+						<reference key="parent" ref="351304596"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">94</int>
+						<reference key="object" ref="34446153"/>
+						<reference key="parent" ref="532731890"/>
 					</object>
 				</array>
 			</object>
@@ -764,23 +828,40 @@
 				<string key="74.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="8.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="93.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="94.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">76</int>
+			<int key="maxID">98</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDissemblerController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="readMemory:">id</string>
+						<string key="runningApplicationsPopUpButton:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="readMemory:">
+							<string key="name">readMemory:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="runningApplicationsPopUpButton:">
+							<string key="name">runningApplicationsPopUpButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressTextField">NSTextField</string>
 						<string key="dissemblyProgressIndicator">NSProgressIndicator</string>
 						<string key="instructionsTableView">NSTableView</string>
 						<string key="runningApplicationsPopUpButton">NSPopUpButton</string>
+						<string key="stopButton">NSButton</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
 						<object class="IBToOneOutletInfo" key="addressTextField">
@@ -798,6 +879,10 @@
 						<object class="IBToOneOutletInfo" key="runningApplicationsPopUpButton">
 							<string key="name">runningApplicationsPopUpButton</string>
 							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="stopButton">
+							<string key="name">stopButton</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -819,5 +904,9 @@
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<string key="NS.key.0">NSStopProgressFreestandingTemplate</string>
+			<string key="NS.object.0">{83, 83}</string>
+		</object>
 	</data>
 </archive>
