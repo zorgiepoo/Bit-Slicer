@@ -195,39 +195,98 @@
 		NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
 		if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
 		{
+			__block BOOL needsToUpdateWindow = NO;
 			[[self.instructions subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGInstruction *instruction, NSUInteger index, BOOL *stop)
 			 {
 				 void *bytes = NULL;
 				 ZGMemorySize size = instruction.variable.size;
 				 if (ZGReadBytes(self.currentProcess.processTask, instruction.variable.address, &bytes, &size))
 				 {
-					 BOOL shouldUpdateText = (instruction.text == nil);
 					 if (memcmp(bytes, instruction.variable.value, size) != 0)
 					 {
-						 instruction.variable.value = bytes;
-						 [instruction.variable updateStringValue];
-						 shouldUpdateText = YES;
-					 }
-					 
-					 if (shouldUpdateText)
-					 {
-						 ud_t object;
-						 ud_init(&object);
-						 ud_set_input_buffer(&object, bytes, size);
-						 ud_set_mode(&object, self.currentProcess.pointerSize * 8);
-						 ud_set_syntax(&object, UD_SYN_INTEL);
-						 
-						 while (ud_disassemble(&object) > 0)
-						 {
-							 instruction.text = @(ud_insn_asm(&object));
-						 }
-						 
-						 [self.instructionsTableView reloadData];
+						 needsToUpdateWindow = YES;
+						 *stop = YES;
 					 }
 					 
 					 ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 				 }
 			 }];
+			
+			if (needsToUpdateWindow)
+			{
+				NSUInteger startRow = visibleRowsRange.location;
+				
+				do
+				{
+					ZGInstruction *instruction = [self.instructions objectAtIndex:startRow];
+					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess];
+					
+					startRow--;
+					
+					if (searchedInstruction.variable.address + searchedInstruction.variable.size == instruction.variable.address)
+					{
+						break;
+					}
+					
+					if (startRow == 0) break;
+				}
+				while (YES);
+				
+				NSUInteger endRow = visibleRowsRange.location + visibleRowsRange.length - 1;
+				
+				do
+				{
+					ZGInstruction *instruction = [self.instructions objectAtIndex:endRow];
+					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess];
+					
+					endRow++;
+					
+					if (searchedInstruction.variable.address == instruction.variable.address)
+					{
+						break;
+					}
+					
+					if (endRow >= self.instructions.count) break;
+				}
+				while (YES);
+				
+				//NSLog(@"Start row: %lu, End row: %lu", startRow, endRow);
+				
+				ZGInstruction *startInstruction = [self.instructions objectAtIndex:startRow];
+				ZGInstruction *endInstruction = [self.instructions objectAtIndex:endRow-1];
+				
+				void *bytes = NULL;
+				ZGMemoryAddress startAddress = startInstruction.variable.address;
+				ZGMemorySize size = endInstruction.variable.address + endInstruction.variable.size - startAddress;
+				
+				if (ZGReadBytes(self.currentProcess.processTask, startAddress, &bytes, &size))
+				{
+					ud_t object;
+					ud_init(&object);
+					ud_set_input_buffer(&object, bytes, size);
+					ud_set_mode(&object, self.currentProcess.pointerSize * 8);
+					ud_set_syntax(&object, UD_SYN_INTEL);
+					
+					NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
+					
+					while (ud_disassemble(&object) > 0)
+					{
+						ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
+						newInstruction.text = @(ud_insn_asm(&object));
+						newInstruction.variable = [[ZGVariable alloc] initWithValue:bytes + ud_insn_off(&object) size:ud_insn_len(&object) address:startAddress + ud_insn_off(&object) type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+						
+						[instructionsToReplace addObject:newInstruction];
+					}
+					
+					NSMutableArray *newInstructions = [[NSMutableArray alloc] initWithArray:self.instructions];
+					[newInstructions replaceObjectsInRange:NSMakeRange(startRow, endRow - startRow) withObjectsFromArray:instructionsToReplace];
+					self.instructions = [NSArray arrayWithArray:newInstructions];
+					
+					[self.instructionsTableView reloadData];
+					
+					ZGFreeBytes(self.currentProcess.processTask, bytes, size);
+				}
+			}
 		}
 	}
 }
