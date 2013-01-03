@@ -41,6 +41,7 @@
 #import "ZGRunningProcess.h"
 #import "ZGInstruction.h"
 #import "udis86.h"
+#import "ZGUtilities.h"
 
 @interface ZGDisassemblerController ()
 
@@ -719,6 +720,41 @@ END_DEBUGGER_CHANGE:
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+	if ([tableColumn.identifier isEqualToString:@"bytes"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
+	{
+		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
+		ZGMemorySize size = 0;
+		void *newValue = valueFromString(self.currentProcess, object, instruction.variable.type, &size);
+		
+		if (newValue)
+		{
+			ZGMemoryAddress protectionAddress = instruction.variable.address;
+			ZGMemorySize protectionSize = instruction.variable.size;
+			ZGMemoryProtection oldProtection = 0;
+			
+			if (ZGMemoryProtectionInRegion(self.currentProcess.processTask, &protectionAddress, &protectionSize, &oldProtection))
+			{
+				BOOL canWrite = oldProtection & VM_PROT_WRITE;
+				if (!canWrite)
+				{
+					canWrite = ZGProtect(self.currentProcess.processTask, protectionAddress, protectionSize, oldProtection | VM_PROT_WRITE);
+				}
+				
+				if (canWrite)
+				{
+					ZGWriteBytes(self.currentProcess.processTask, instruction.variable.address, newValue, size);
+					
+					// Re-protect the region back to the way it was
+					if (!(oldProtection & VM_PROT_WRITE))
+					{
+						ZGProtect(self.currentProcess.processTask, protectionAddress, protectionSize, oldProtection);
+					}
+				}
+			}
+			
+			free(newValue);
+		}
+	}
 }
 
 @end
