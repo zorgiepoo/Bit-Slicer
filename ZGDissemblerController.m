@@ -93,7 +93,7 @@
 	
 	[self updateRunningProcesses:[coder decodeObjectForKey:ZGDissemblerProcessName]];
 	
-	[self windowDidShow];
+	[self windowDidShow:nil];
 }
 
 - (void)markChanges
@@ -108,7 +108,7 @@
 {
 	BOOL shouldUpdate = NO;
 	
-	if (_currentProcess.processID != newProcess.processID)
+	if (_currentProcess && _currentProcess.processID != newProcess.processID)
 	{
 		shouldUpdate = YES;
 	}
@@ -152,7 +152,7 @@
 	 context:NULL];
 }
 
-- (void)windowDidShow
+- (void)windowDidShow:(id)sender
 {
 	if (!self.updateInstructionsTimer)
 	{
@@ -168,7 +168,10 @@
 	if (!self.windowDidAppear)
 	{
 		self.windowDidAppear = YES;
-		[self readMemory:nil];
+		if (!sender)
+		{
+			[self readMemory:nil];
+		}
 	}
 }
 
@@ -176,7 +179,7 @@
 {
 	[super showWindow:sender];
 	
-	[self windowDidShow];
+	[self windowDidShow:sender];
 }
 
 - (void)windowWillClose:(NSNotification *)notification
@@ -303,29 +306,6 @@
 	}
 }
 
-- (void)selectAddress:(ZGMemoryAddress)address
-{
-	NSUInteger selectionIndex = 0;
-	BOOL foundSelection = NO;
-	
-	for (ZGInstruction *instruction in self.instructions)
-	{
-		if (instruction.variable.address >= address)
-		{
-			foundSelection = YES;
-			break;
-		}
-		selectionIndex++;
-	}
-	
-	if (foundSelection)
-	{
-		[self.instructionsTableView scrollRowToVisible:selectionIndex];
-		[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionIndex] byExtendingSelection:NO];
-		[self.window makeFirstResponder:self.instructionsTableView];
-	}
-}
-
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
 	ZGInstruction *instruction = nil;
@@ -402,6 +382,7 @@
 	[self.stopButton setHidden:NO];
 	
 	self.instructions = @[];
+	[self.instructionsTableView reloadData];
 	
 	self.currentMemoryAddress = address;
 	self.currentMemorySize = 0;
@@ -586,6 +567,42 @@ END_DEBUGGER_CHANGE:
 		// clear data
 		self.instructions = [NSArray array];
 		[self.instructionsTableView reloadData];
+	}
+}
+
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess
+{
+	self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", address];
+	
+	self.currentProcess = nil;
+	[self updateRunningProcesses:requestedProcess.name];
+	
+	NSMenuItem *targetMenuItem = nil;
+	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.menu.itemArray)
+	{
+		ZGProcess *process = menuItem.representedObject;
+		if ([process processID] == requestedProcess.processID)
+		{
+			targetMenuItem = menuItem;
+			break;
+		}
+	}
+	
+	if (targetMenuItem)
+	{
+		if ([targetMenuItem.representedObject processID] != requestedProcess.processID)
+		{
+			[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
+			self.instructions = @[];
+			[self.instructionsTableView reloadData];
+			[self runningApplicationsPopUpButton:nil];
+		}
+		
+		[self readMemory:nil];
+	}
+	else
+	{
+		NSLog(@"Could not find target process!");
 	}
 }
 

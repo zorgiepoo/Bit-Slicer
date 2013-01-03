@@ -326,7 +326,7 @@ static BOOL didRegisteredHotKey;
 	return _dissemblerController;
 }
 
-- (IBAction)openDebugger:(id)sender
+- (IBAction)openDissembler:(id)sender
 {
 	[self openDissembler:sender showWindow:YES];
 }

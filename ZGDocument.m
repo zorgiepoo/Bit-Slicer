@@ -44,6 +44,7 @@
 #import "ZGVariable.h"
 #import "ZGAppController.h"
 #import "ZGMemoryViewer.h"
+#import "ZGDissemblerController.h"
 #import "ZGComparisonFunctions.h"
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
@@ -1204,7 +1205,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(nopVariables:))
 	{	
-		[menuItem setTitle:self.selectedVariables.count == 1 ? @"NOP Instruction" : @"NOP Instructions"];
+		[menuItem setTitle:self.selectedVariables.count == 1 ? @"NOP Variable" : @"NOP Variables"];
 		
 		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
@@ -1233,6 +1234,30 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
 		if (!variable.value)
+		{
+			return NO;
+		}
+	}
+	
+	else if (menuItem.action == @selector(showDissembler:))
+	{
+		if (self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		{
+			return NO;
+		}
+		
+		ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
+		
+		ZGMemoryAddress memoryAddress = selectedVariable.address;
+		ZGMemorySize memorySize = selectedVariable.size;
+		ZGMemoryProtection memoryProtection;
+		
+		if (!ZGMemoryProtectionInRegion(self.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+		{
+			return NO;
+		}
+		
+		if (!(memoryProtection & VM_PROT_EXECUTE))
 		{
 			return NO;
 		}
@@ -1342,8 +1367,15 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)showMemoryViewer:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[[[ZGAppController sharedController] memoryViewer] showWindow:nil];
+	[[[ZGAppController sharedController] memoryViewer] showWindow:self];
 	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
+}
+
+- (IBAction)showDissembler:(id)sender
+{
+	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
+	[[[ZGAppController sharedController] dissemblerController] showWindow:self];
+	[[[ZGAppController sharedController] dissemblerController] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
 }
 
 #pragma mark Pausing and Unpausing Processes
