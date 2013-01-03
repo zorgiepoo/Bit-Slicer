@@ -215,12 +215,12 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	debugState.uds.type.__dr7 |= (1 << 16 + 2*debugRegisterIndex); \
 	debugState.uds.type.__dr7 &= ~(1 << 16 + 2*debugRegisterIndex+1); \
 	\
-	if (variable.size <= 1) { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1);} \
-	else if (variable.size <= 2) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); } \
-	else if (variable.size <= 4) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); } \
-	else { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); }
+	if (watchSize == 1) { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); } \
+	else if (watchSize == 2) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); } \
+	else if (watchSize == 4) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); } \
+	else if (watchSize == 8) { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); }
 
-- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process delegate:(id)delegate
+- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
 {
 	if (self.exceptionPort == MACH_PORT_NULL)
 	{
@@ -247,6 +247,24 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	{
 		NSLog(@"ERROR: task_set_exception_ports failed on adding watchpoint");
 		return NO;
+	}
+	
+	ZGMemorySize watchSize = 0;
+	if (variable.size == 1)
+	{
+		watchSize = 1;
+	}
+	else if (variable.size == 2)
+	{
+		watchSize = 2;
+	}
+	else if (variable.size <= 4 || !process.is64Bit)
+	{
+		watchSize = 4;
+	}
+	else
+	{
+		watchSize = 8;
 	}
 	
 	ZGSuspendTask(process.processTask);
@@ -325,11 +343,17 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	breakPoint.delegate = delegate;
 	breakPoint.debugThreads = [NSArray arrayWithArray:debugThreads];
 	breakPoint.variable = variable;
+	breakPoint.watchSize = watchSize;
 	breakPoint.process = process;
 	
 	NSMutableArray *currentBreakPoints = [[NSMutableArray alloc] initWithArray:self.breakPoints];
 	[currentBreakPoints addObject:breakPoint];
 	self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+	
+	if (returnedBreakPoint)
+	{
+		*returnedBreakPoint = breakPoint;
+	}
 	
 	static dispatch_once_t once = 0;
 	dispatch_once(&once, ^{

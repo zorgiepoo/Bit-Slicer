@@ -43,6 +43,7 @@
 #import "ZGVariable.h"
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
+#import "ZGBreakPoint.h"
 
 @interface ZGDocumentBreakPointController ()
 
@@ -143,14 +144,15 @@
 - (void)requestVariableWatch
 {
 	ZGVariable *variable = [[[self.document selectedVariables] objectAtIndex:0] copy];
+	ZGBreakPoint *breakPoint = nil;
 	
-	if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self.document.currentProcess delegate:self])
+	if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self.document.currentProcess delegate:self getBreakPoint:&breakPoint])
 	{		
 		[self.document.searchController prepareTask];
 		
 		self.document.currentProcess.isWatchingBreakPoint = YES;
 		
-		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until %@ byte%@ at %@ is written into...", variable.sizeStringValue, variable.size != 1 ? @"s" : @"", variable.addressStringValue];
+		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until %@ byte%@ at %@ is written into...", variable.sizeStringValue, breakPoint.watchSize != 1 ? @"s" : @"", variable.addressStringValue];
 		self.document.searchingProgressIndicator.indeterminate = YES;
 		[self.document.searchingProgressIndicator startAnimation:nil];
 		

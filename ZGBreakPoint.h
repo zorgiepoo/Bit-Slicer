@@ -17,6 +17,7 @@
 @property (assign, nonatomic) id delegate;
 @property (readwrite, nonatomic) ZGMemoryMap task;
 @property (strong, nonatomic) ZGVariable *variable;
+@property (readwrite) ZGMemorySize watchSize;
 @property (strong, nonatomic) ZGProcess *process;
 @property (strong, nonatomic) NSArray *debugThreads;
 
