@@ -260,12 +260,6 @@ static BOOL didRegisteredHotKey;
 		
 		completionHandler([[[self sharedController] dissemblerController] window], nil);
 	}
-	else if ([identifier isEqualToString:ZGDissemblerIdentifier])
-	{
-		[self.sharedController
-		 openDissembler:nil
-		 showWindow:NO];
-	}
 }
 
 - (ZGPreferencesController *)preferencesController
