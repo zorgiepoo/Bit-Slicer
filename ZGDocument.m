@@ -1255,6 +1255,12 @@ static NSSize *expandedWindowMinSize = nil;
 	[self.variableController pasteVariables];
 }
 
+- (IBAction)cut:(id)sender
+{
+	[self.variableController copyVariables];
+	[self removeSelectedSearchValues:nil];
+}
+
 - (IBAction)removeSelectedSearchValues:(id)sender
 {
 	[self.variableController removeSelectedSearchValues];
