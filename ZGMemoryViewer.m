@@ -154,6 +154,8 @@
 	{
 		[self toggleDataInspector:nil];
 	}
+	
+	[self showWindow:self];
 }
 
 - (void)markChanges
@@ -232,7 +234,10 @@
 
 - (IBAction)showWindow:(id)sender
 {
-	[super showWindow:sender];
+	if (sender != self)
+	{
+		[super showWindow:sender];
+	}
 	
 	if (!self.checkMemoryTimer)
 	{
