@@ -162,7 +162,7 @@
 	{
 		NSRunAlertPanel(
 						@"Failed to Watch Variable",
-						@"A watchpoint could not be added for this variable.",
+						@"A watchpoint could not be added for this variable at this time.",
 						@"OK", nil, nil);
 	}
 }

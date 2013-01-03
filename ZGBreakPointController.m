@@ -267,6 +267,15 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		watchSize = 8;
 	}
 	
+	for (ZGBreakPoint *breakPoint in self.breakPoints)
+	{
+		if (variable.address + watchSize > breakPoint.variable.address && variable.address < breakPoint.variable.address + breakPoint.watchSize)
+		{
+			NSLog(@"A watchpoint is already watching around this area");
+			return NO;
+		}
+	}
+	
 	ZGSuspendTask(process.processTask);
 
 	thread_act_array_t threadList = NULL;
