@@ -1175,7 +1175,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(watchVariable:))
 	{
-		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.tableController.watchVariablesTableView.selectedRowIndexes.count > 1)
 		{
 			return NO;
 		}
@@ -1194,6 +1194,28 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			return NO;
 		}
+	}
+	
+	else if (menuItem.action == @selector(nopVariables:))
+	{	
+		[menuItem setTitle:self.selectedVariables.count == 1 ? @"NOP Instruction" : @"NOP Instructions"];
+		
+		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		{
+			return NO;
+		}
+		
+		BOOL isValid = YES;
+		for (ZGVariable *variable in [self selectedVariables])
+		{
+			if (variable.type != ZGByteArray)
+			{
+				isValid = NO;
+				break;
+			}
+		}
+		
+		return isValid;
 	}
 	
 	return [super validateMenuItem:menuItem];
@@ -1241,6 +1263,11 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)addVariable:(id)sender
 {
 	[self.variableController addVariable:sender];
+}
+
+- (IBAction)nopVariables:(id)sender
+{
+	[self.variableController nopVariables:[self selectedVariables]];
 }
 
 - (IBAction)editVariablesValue:(id)sender

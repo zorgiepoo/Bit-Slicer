@@ -49,6 +49,8 @@
 - (void)addVariable:(id)sender;
 - (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
 
+- (void)nopVariables:(NSArray *)variables;
+
 - (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName;
 - (void)changeVariable:(ZGVariable *)variable newAddress:(NSString *)newAddress;
 - (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size;

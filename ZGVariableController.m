@@ -249,6 +249,82 @@
 
 #pragma mark Changing Variables
 
+- (BOOL)nopVariables:(NSArray *)variables withNewValues:(NSArray *)newValues
+{
+	BOOL completeSuccess = YES;
+	
+	NSMutableArray *oldValues = [[NSMutableArray alloc] init];
+	for (ZGVariable *variable in variables)
+	{
+		[oldValues addObject:variable.stringValue];
+	}
+	
+	for (NSUInteger variableIndex = 0; variableIndex < variables.count; variableIndex++)
+	{
+		ZGVariable *variable = [variables objectAtIndex:variableIndex];
+		
+		ZGMemoryAddress memoryAddress = variable.address;
+		ZGMemorySize memorySize = variable.size;
+		ZGMemoryProtection oldProtection;
+		if (!ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &oldProtection))
+		{
+			NSLog(@"Protect lookup error!");
+			completeSuccess = NO;
+			continue;
+		}
+		
+		if (!(oldProtection & VM_PROT_WRITE))
+		{
+			ZGMemoryProtection newProtection = oldProtection | VM_PROT_WRITE;
+			if (!ZGProtect(self.document.currentProcess.processTask, memoryAddress, memorySize, newProtection))
+			{
+				NSLog(@"Protect error!");
+				completeSuccess = NO;
+				continue;
+			}
+		}
+		
+		[self changeVariable:variable newValue:[newValues objectAtIndex:variableIndex] shouldRecordUndo:NO];
+		
+		if (!(oldProtection & VM_PROT_WRITE))
+		{
+			if (!ZGProtect(self.document.currentProcess.processTask, memoryAddress, memorySize, oldProtection))
+			{
+				NSLog(@"Re-Protect error!");
+				completeSuccess = NO;
+				continue;
+			}
+		}
+	}
+	
+	self.document.undoManager.actionName = @"NOP Change";
+	[[self.document.undoManager prepareWithInvocationTarget:self]
+	 nopVariables:variables
+	 withNewValues:oldValues];
+	
+	return completeSuccess;
+}
+
+- (void)nopVariables:(NSArray *)variables
+{
+	NSMutableArray *nopValues = [[NSMutableArray alloc] init];
+	
+	for (ZGVariable *variable in variables)
+	{
+		NSMutableArray *nopComponents = [[NSMutableArray alloc] init];
+		for (NSUInteger index = 0; index < variable.size; index++)
+		{
+			[nopComponents addObject:@"90"];
+		}
+		[nopValues addObject:[nopComponents componentsJoinedByString:@" "]];
+	}
+	
+	if (![self nopVariables:variables withNewValues:nopValues])
+	{
+		NSRunAlertPanel(@"NOP Error", @"An error may have occured with nopping the instruction%@", nil, nil, nil, variables.count != 1 ? @"s" : @"");
+	}
+}
+
 - (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName
 {
 	self.document.undoManager.actionName = @"Name Change";
