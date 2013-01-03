@@ -57,6 +57,7 @@
 
 @property (readwrite, strong, nonatomic) NSTimer *updateInstructionsTimer;
 @property (readwrite, nonatomic) BOOL dissembling;
+@property (readwrite, nonatomic) BOOL windowDidAppear;
 
 @end
 
@@ -91,6 +92,8 @@
 	}
 	
 	[self updateRunningProcesses:[coder decodeObjectForKey:ZGDissemblerProcessName]];
+	
+	[self windowDidShow];
 }
 
 - (void)markChanges
@@ -119,10 +122,9 @@
 		}
 	}
 	
-	if (shouldUpdate)
+	if (shouldUpdate && self.windowDidAppear)
 	{
-		self.instructions = @[];
-		[self.instructionsTableView reloadData];
+		[self readMemory:nil];
 	}
 }
 
@@ -150,10 +152,8 @@
 	 context:NULL];
 }
 
-- (IBAction)showWindow:(id)sender
+- (void)windowDidShow
 {
-	[super showWindow:sender];
-	
 	if (!self.updateInstructionsTimer)
 	{
 		self.updateInstructionsTimer =
@@ -164,6 +164,19 @@
 			 userInfo:nil
 			 repeats:YES];
 	}
+	
+	if (!self.windowDidAppear)
+	{
+		self.windowDidAppear = YES;
+		[self readMemory:nil];
+	}
+}
+
+- (IBAction)showWindow:(id)sender
+{
+	[super showWindow:sender];
+	
+	[self windowDidShow];
 }
 
 - (void)windowWillClose:(NSNotification *)notification
@@ -282,6 +295,10 @@
 {
 	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
 	{
+		if (self.instructions.count > 0)
+		{
+			self.addressTextField.stringValue = @"0x0";
+		}
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 	}
 }
@@ -392,7 +409,6 @@
 	self.dissembling = YES;
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		//NSLog(@"Trying to do of size %lld", theSize);
 		void *bytes;
 		ZGMemorySize size = theSize;
 		if (ZGReadBytes(self.currentProcess.processTask, address, &bytes, &size))
@@ -469,7 +485,6 @@
 			addBatchOfInstructions();
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				//NSLog(@"Done %ld, %ld", totalInstructionCount, self.instructions.count);
 				self.dissembling = NO;
 				[self.dissemblyProgressIndicator setHidden:YES];
 				[self.addressTextField setEnabled:YES];

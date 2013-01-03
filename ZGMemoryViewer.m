@@ -155,7 +155,7 @@
 		[self toggleDataInspector:nil];
 	}
 	
-	[self showWindow:self];
+	[self windowDidShow];
 }
 
 - (void)markChanges
@@ -232,13 +232,8 @@
 	 context:NULL];
 }
 
-- (IBAction)showWindow:(id)sender
+- (void)windowDidShow
 {
-	if (sender != self)
-	{
-		[super showWindow:sender];
-	}
-	
 	if (!self.checkMemoryTimer)
 	{
 		self.checkMemoryTimer =
@@ -249,6 +244,13 @@
 		 userInfo:nil
 		 repeats:YES];
 	}
+}
+
+- (IBAction)showWindow:(id)sender
+{
+	[super showWindow:sender];
+	
+	[self windowDidShow];
 }
 
 - (void)windowWillClose:(NSNotification *)notification

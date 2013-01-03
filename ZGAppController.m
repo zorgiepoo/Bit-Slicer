@@ -265,6 +265,8 @@ static BOOL didRegisteredHotKey;
 		[self.sharedController
 		 openDissembler:nil
 		 showWindow:NO];
+		
+		completionHandler([[[self sharedController] dissemblerController] window], nil);
 	}
 }
 
@@ -297,9 +299,8 @@ static BOOL didRegisteredHotKey;
 
 - (void)openMemoryViewer:(id)sender showWindow:(BOOL)shouldShowWindow
 {
-	self.memoryViewer;
-	
-	if (shouldShowWindow)
+	// Testing for memoryViewer will ensure it'll be allocated
+	if (self.memoryViewer && shouldShowWindow)
 	{
 		[self.memoryViewer showWindow:nil];
 	}
@@ -308,6 +309,15 @@ static BOOL didRegisteredHotKey;
 - (IBAction)openMemoryViewer:(id)sender
 {
 	[self openMemoryViewer:sender showWindow:YES];
+}
+
+- (void)openDissembler:(id)sender showWindow:(BOOL)shouldShowWindow
+{
+	// Testing for dissemblerController will ensure it'll be allocated
+	if (self.dissemblerController && shouldShowWindow)
+	{
+		[self.dissemblerController showWindow:nil];
+	}
 }
 
 - (ZGDissemblerController *)dissemblerController
@@ -321,7 +331,7 @@ static BOOL didRegisteredHotKey;
 
 - (IBAction)openDebugger:(id)sender
 {
-	[self.dissemblerController showWindow:nil];
+	[self openDissembler:sender showWindow:YES];
 }
 
 #define FAQ_URL @"http://portingteam.com/index.php/topic/4454-faq-information/"
