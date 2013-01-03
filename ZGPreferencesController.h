@@ -41,7 +41,6 @@
 #define ZG_HOT_KEY @"ZG_HOT_KEY_CODE"
 #define ZG_CHECK_FOR_UPDATES @"ZG_CHECK_FOR_UPDATES_2"
 #define ZG_CHECK_FOR_ALPHA_UPDATES @"ZG_CHECK_FOR_ALPHA_UPDATES_2"
-#define ZGPreferencesIdentifier @"ZGPreferencesID"
 
 @interface ZGPreferencesController : NSWindowController
 

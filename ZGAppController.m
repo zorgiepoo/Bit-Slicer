@@ -252,14 +252,6 @@ static BOOL didRegisteredHotKey;
         
 		completionHandler([[[self sharedController] memoryViewer] window], nil);
 	}
-	else if ([identifier isEqualToString:ZGPreferencesIdentifier])
-	{
-		[[self sharedController]
-		 openPreferences:nil
-		 showWindow:NO];
-		
-		completionHandler([[[self sharedController] preferencesController] window], nil);
-	}
 	else if ([identifier isEqualToString:ZGDissemblerIdentifier])
 	{
 		[self.sharedController
@@ -270,14 +262,19 @@ static BOOL didRegisteredHotKey;
 	}
 }
 
+- (ZGPreferencesController *)preferencesController
+{
+	if (!_preferencesController)
+	{
+		_preferencesController = [[ZGPreferencesController alloc] init];
+	}
+	return _preferencesController;
+}
+
 - (void)openPreferences:(id)sender showWindow:(BOOL)shouldShowWindow
 {
-	if (!self.preferencesController)
-	{
-		self.preferencesController = [[ZGPreferencesController alloc] init];
-	}
-	
-	if (shouldShowWindow)
+	// Testing for preferencesController will ensure it'll be allocated
+	if (self.preferencesController && shouldShowWindow)
 	{
 		[self.preferencesController showWindow:nil];
 	}

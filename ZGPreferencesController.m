@@ -67,15 +67,7 @@
 }
 
 - (void)windowDidLoad
-{
-	if ([self.window respondsToSelector:@selector(setRestorable:)] && [self.window respondsToSelector:@selector(setRestorationClass:)])
-	{
-		self.window.restorable = YES;
-		self.window.restorationClass = ZGAppController.class;
-		self.window.identifier = ZGPreferencesIdentifier;
-		[self invalidateRestorableState];
-	}
-	
+{	
 	[self.hotkeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
 	
 	NSInteger hotkeyCode = [NSUserDefaults.standardUserDefaults integerForKey:ZG_HOT_KEY];
