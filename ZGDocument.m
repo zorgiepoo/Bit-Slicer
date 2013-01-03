@@ -1317,6 +1317,15 @@ static NSSize *expandedWindowMinSize = nil;
 	[self.documentBreakPointController requestVariableWatch];
 }
 
+#pragma mark Showing Other Controllers
+
+- (IBAction)showMemoryViewer:(id)sender
+{
+	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
+	[[[ZGAppController sharedController] memoryViewer] showWindow:nil];
+	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
+}
+
 #pragma mark Pausing and Unpausing Processes
 
 - (IBAction)pauseOrUnpauseProcess:(id)sender

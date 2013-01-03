@@ -666,4 +666,29 @@ END_MEMORY_VIEW_CHANGE:
 	}
 }
 
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress inProcess:(ZGProcess *)requestedProcess
+{
+	NSMenuItem *targetMenuItem = nil;
+	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.menu.itemArray)
+	{
+		ZGProcess *process = menuItem.representedObject;
+		if (process.processID == requestedProcess.processID)
+		{
+			targetMenuItem = menuItem;
+			break;
+		}
+	}
+	
+	if (targetMenuItem)
+	{
+		if (targetMenuItem.representedObject != self.currentProcess)
+		{
+			[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
+			[self runningApplicationsPopUpButton:nil];
+		}
+		
+		[self jumpToMemoryAddress:memoryAddress shouldMakeSelection:YES];
+	}
+}
+
 @end

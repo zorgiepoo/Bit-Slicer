@@ -46,6 +46,8 @@
 
 - (ZGMemoryAddress)selectedAddress;
 
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress inProcess:(ZGProcess *)requestedProcess;
+
 - (IBAction)toggleDataInspector:(id)sender;
 
 @end

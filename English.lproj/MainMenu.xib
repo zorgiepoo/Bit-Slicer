@@ -714,16 +714,26 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
+								<object class="NSMenuItem" id="355188775">
+									<reference key="NSMenu" ref="477738828"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="1033313550"/>
+									<reference key="NSMixedImage" ref="310636482"/>
+								</object>
 								<object class="NSMenuItem" id="110508552">
 									<reference key="NSMenu" ref="477738828"/>
-									<string key="NSTitle">Watch Variable</string>
+									<string key="NSTitle">Watch Variable Changes</string>
 									<string key="NSKeyEquiv">w</string>
 									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
-								<object class="NSMenuItem" id="991666434">
+								<object class="NSMenuItem" id="509544214">
 									<reference key="NSMenu" ref="477738828"/>
 									<string key="NSTitle">NOP Instructions</string>
 									<string key="NSKeyEquiv">n</string>
@@ -1290,7 +1300,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">nopVariables:</string>
 						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="991666434"/>
+						<reference key="destination" ref="509544214"/>
 					</object>
 					<int key="connectionID">859</int>
 				</object>
@@ -1726,7 +1736,8 @@
 							<reference ref="271236109"/>
 							<reference ref="424445454"/>
 							<reference ref="110508552"/>
-							<reference ref="991666434"/>
+							<reference ref="509544214"/>
+							<reference ref="355188775"/>
 						</object>
 						<reference key="parent" ref="179297160"/>
 					</object>
@@ -1986,7 +1997,12 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">857</int>
-						<reference key="object" ref="991666434"/>
+						<reference key="object" ref="509544214"/>
+						<reference key="parent" ref="477738828"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">861</int>
+						<reference key="object" ref="355188775"/>
 						<reference key="parent" ref="477738828"/>
 					</object>
 				</object>
@@ -2092,10 +2108,12 @@
 					<string>854.IBPluginDependency</string>
 					<string>855.IBPluginDependency</string>
 					<string>857.IBPluginDependency</string>
+					<string>861.IBPluginDependency</string>
 					<string>92.IBPluginDependency</string>
 				</object>
 				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2208,7 +2226,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">860</int>
+			<int key="maxID">861</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2309,154 +2327,14 @@
 					<string key="className">ZGDocument</string>
 					<string key="superclassName">NSDocument</string>
 					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>addVariable:</string>
-							<string>changeMemoryProtection:</string>
-							<string>cut:</string>
-							<string>dataTypePopUpButtonRequest:</string>
-							<string>editVariablesAddress:</string>
-							<string>editVariablesValue:</string>
-							<string>freezeVariables:</string>
-							<string>memoryDumpAllRequest:</string>
-							<string>memoryDumpRangeRequest:</string>
-							<string>nopVariables:</string>
-							<string>optionsDisclosureButton:</string>
-							<string>paste:</string>
-							<string>pauseOrUnpauseProcess:</string>
-							<string>qualifierMatrixButtonRequest:</string>
-							<string>removeSelectedSearchValues:</string>
-							<string>runningApplicationsPopUpButtonRequest:</string>
-							<string>searchValue:</string>
-							<string>storeAllValues:</string>
-							<string>watchVariable:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
+						<string key="NS.key.0">editVariablesAddress:</string>
+						<string key="NS.object.0">id</string>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>addVariable:</string>
-							<string>changeMemoryProtection:</string>
-							<string>cut:</string>
-							<string>dataTypePopUpButtonRequest:</string>
-							<string>editVariablesAddress:</string>
-							<string>editVariablesValue:</string>
-							<string>freezeVariables:</string>
-							<string>memoryDumpAllRequest:</string>
-							<string>memoryDumpRangeRequest:</string>
-							<string>nopVariables:</string>
-							<string>optionsDisclosureButton:</string>
-							<string>paste:</string>
-							<string>pauseOrUnpauseProcess:</string>
-							<string>qualifierMatrixButtonRequest:</string>
-							<string>removeSelectedSearchValues:</string>
-							<string>runningApplicationsPopUpButtonRequest:</string>
-							<string>searchValue:</string>
-							<string>storeAllValues:</string>
-							<string>watchVariable:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">addVariable:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">changeMemoryProtection:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">cut:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">dataTypePopUpButtonRequest:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesAddress:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesValue:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">freezeVariables:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">memoryDumpAllRequest:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">memoryDumpRangeRequest:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">nopVariables:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">optionsDisclosureButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">paste:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">pauseOrUnpauseProcess:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">qualifierMatrixButtonRequest:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">removeSelectedSearchValues:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">runningApplicationsPopUpButtonRequest:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">searchValue:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">storeAllValues:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">watchVariable:</string>
-								<string key="candidateClassName">id</string>
-							</object>
+						<string key="NS.key.0">editVariablesAddress:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">editVariablesAddress:</string>
+							<string key="candidateClassName">id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">

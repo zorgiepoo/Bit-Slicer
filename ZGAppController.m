@@ -280,13 +280,17 @@ static BOOL didRegisteredHotKey;
 	[self openPreferences:sender showWindow:YES];
 }
 
+- (ZGMemoryViewer *)memoryViewer
+{
+	if (!_memoryViewer)
+	{
+		_memoryViewer = [[ZGMemoryViewer alloc] init];
+	}
+	return _memoryViewer;
+}
+
 - (void)openMemoryViewer:(id)sender showWindow:(BOOL)shouldShowWindow
 {
-	if (!self.memoryViewer)
-	{
-		self.memoryViewer = [[ZGMemoryViewer alloc] init];
-	}
-	
 	if (shouldShowWindow)
 	{
 		[self.memoryViewer showWindow:nil];
