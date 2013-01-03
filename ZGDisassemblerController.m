@@ -125,6 +125,7 @@
 	
 	if (shouldUpdate && self.windowDidAppear)
 	{
+		self.addressTextField.stringValue = @"0x0";
 		[self readMemory:nil];
 	}
 }
@@ -380,10 +381,6 @@
 {
 	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
 	{
-		if (self.instructions.count > 0)
-		{
-			self.addressTextField.stringValue = @"0x0";
-		}
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 	}
 }
