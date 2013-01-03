@@ -456,7 +456,7 @@
 								</object>
 								<object class="NSMenuItem" id="195518581">
 									<reference key="NSMenu" ref="741161439"/>
-									<string key="NSTitle">Show Dissembler</string>
+									<string key="NSTitle">Show Disassembler</string>
 									<string key="NSKeyEquiv">t</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -714,7 +714,7 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
-								<object class="NSMenuItem" id="424919156">
+								<object class="NSMenuItem" id="486907922">
 									<reference key="NSMenu" ref="477738828"/>
 									<string key="NSTitle">Show Variable in</string>
 									<string key="NSKeyEquiv"/>
@@ -722,12 +722,12 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 									<string key="NSAction">submenuAction:</string>
-									<object class="NSMenu" key="NSSubmenu" id="671930396">
+									<object class="NSMenu" key="NSSubmenu" id="576218067">
 										<string key="NSTitle">Show Variable in</string>
 										<object class="NSMutableArray" key="NSMenuItems">
 											<bool key="EncodedWithXMLCoder">YES</bool>
-											<object class="NSMenuItem" id="984433677">
-												<reference key="NSMenu" ref="671930396"/>
+											<object class="NSMenuItem" id="8010561">
+												<reference key="NSMenu" ref="576218067"/>
 												<string key="NSTitle">Memory Viewer</string>
 												<string key="NSKeyEquiv">1</string>
 												<int key="NSKeyEquivModMask">1572864</int>
@@ -735,9 +735,9 @@
 												<reference key="NSOnImage" ref="1033313550"/>
 												<reference key="NSMixedImage" ref="310636482"/>
 											</object>
-											<object class="NSMenuItem" id="996997826">
-												<reference key="NSMenu" ref="671930396"/>
-												<string key="NSTitle">Dissembler</string>
+											<object class="NSMenuItem" id="810323823">
+												<reference key="NSMenu" ref="576218067"/>
+												<string key="NSTitle">Disassembler</string>
 												<string key="NSKeyEquiv">2</string>
 												<int key="NSKeyEquivModMask">1572864</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1341,17 +1341,17 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">showMemoryViewer:</string>
 						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="984433677"/>
+						<reference key="destination" ref="8010561"/>
 					</object>
 					<int key="connectionID">867</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">showDissembler:</string>
+						<string key="label">showDisassembler:</string>
 						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="996997826"/>
+						<reference key="destination" ref="810323823"/>
 					</object>
-					<int key="connectionID">868</int>
+					<int key="connectionID">870</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1379,11 +1379,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">openDissembler:</string>
+						<string key="label">openDisassembler:</string>
 						<reference key="source" ref="187132439"/>
 						<reference key="destination" ref="195518581"/>
 					</object>
-					<int key="connectionID">862</int>
+					<int key="connectionID">869</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1787,7 +1787,7 @@
 							<reference ref="110508552"/>
 							<reference ref="509544214"/>
 							<reference ref="355188775"/>
-							<reference ref="424919156"/>
+							<reference ref="486907922"/>
 						</object>
 						<reference key="parent" ref="179297160"/>
 					</object>
@@ -2057,32 +2057,32 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">863</int>
-						<reference key="object" ref="424919156"/>
+						<reference key="object" ref="486907922"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="671930396"/>
+							<reference ref="576218067"/>
 						</object>
 						<reference key="parent" ref="477738828"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">864</int>
-						<reference key="object" ref="671930396"/>
+						<reference key="object" ref="576218067"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="984433677"/>
-							<reference ref="996997826"/>
+							<reference ref="8010561"/>
+							<reference ref="810323823"/>
 						</object>
-						<reference key="parent" ref="424919156"/>
+						<reference key="parent" ref="486907922"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">865</int>
-						<reference key="object" ref="984433677"/>
-						<reference key="parent" ref="671930396"/>
+						<reference key="object" ref="8010561"/>
+						<reference key="parent" ref="576218067"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">866</int>
-						<reference key="object" ref="996997826"/>
-						<reference key="parent" ref="671930396"/>
+						<reference key="object" ref="810323823"/>
+						<reference key="parent" ref="576218067"/>
 					</object>
 				</object>
 			</object>
@@ -2313,7 +2313,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">868</int>
+			<int key="maxID">870</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

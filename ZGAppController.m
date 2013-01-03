@@ -35,7 +35,7 @@
 #import "ZGAppController.h"
 #import "ZGPreferencesController.h"
 #import "ZGMemoryViewer.h"
-#import "ZGDissemblerController.h"
+#import "ZGDisassemblerController.h"
 #import "ZGBreakPointController.h"
 #import "ZGProcess.h"
 #import "ZGProcessList.h"
@@ -44,7 +44,7 @@
 
 @property (readwrite, strong, nonatomic) ZGPreferencesController *preferencesController;
 @property (readwrite, strong, nonatomic) ZGMemoryViewer *memoryViewer;
-@property (readwrite, strong, nonatomic) ZGDissemblerController *dissemblerController;
+@property (readwrite, strong, nonatomic) ZGDisassemblerController *disassemblerController;
 @property (readwrite, strong, nonatomic) ZGBreakPointController *breakPointController;
 
 @end
@@ -252,13 +252,13 @@ static BOOL didRegisteredHotKey;
         
 		completionHandler([[[self sharedController] memoryViewer] window], nil);
 	}
-	else if ([identifier isEqualToString:ZGDissemblerIdentifier])
+	else if ([identifier isEqualToString:ZGDisassemblerIdentifier])
 	{
 		[self.sharedController
-		 openDissembler:nil
+		 openDisassembler:nil
 		 showWindow:NO];
 		
-		completionHandler([[[self sharedController] dissemblerController] window], nil);
+		completionHandler([[[self sharedController] disassemblerController] window], nil);
 	}
 }
 
@@ -308,27 +308,27 @@ static BOOL didRegisteredHotKey;
 	[self openMemoryViewer:sender showWindow:YES];
 }
 
-- (void)openDissembler:(id)sender showWindow:(BOOL)shouldShowWindow
+- (void)openDisassembler:(id)sender showWindow:(BOOL)shouldShowWindow
 {
-	// Testing for dissemblerController will ensure it'll be allocated
-	if (self.dissemblerController && shouldShowWindow)
+	// Testing for disassemblerController will ensure it'll be allocated
+	if (self.disassemblerController && shouldShowWindow)
 	{
-		[self.dissemblerController showWindow:nil];
+		[self.disassemblerController showWindow:nil];
 	}
 }
 
-- (ZGDissemblerController *)dissemblerController
+- (ZGDisassemblerController *)disassemblerController
 {
-	if (!_dissemblerController)
+	if (!_disassemblerController)
 	{
-		_dissemblerController = [[ZGDissemblerController alloc] init];
+		_disassemblerController = [[ZGDisassemblerController alloc] init];
 	}
-	return _dissemblerController;
+	return _disassemblerController;
 }
 
-- (IBAction)openDissembler:(id)sender
+- (IBAction)openDisassembler:(id)sender
 {
-	[self openDissembler:sender showWindow:YES];
+	[self openDisassembler:sender showWindow:YES];
 }
 
 #define FAQ_URL @"http://portingteam.com/index.php/topic/4454-faq-information/"

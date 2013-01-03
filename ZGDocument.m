@@ -44,7 +44,7 @@
 #import "ZGVariable.h"
 #import "ZGAppController.h"
 #import "ZGMemoryViewer.h"
-#import "ZGDissemblerController.h"
+#import "ZGDisassemblerController.h"
 #import "ZGComparisonFunctions.h"
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
@@ -1239,7 +1239,7 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
-	else if (menuItem.action == @selector(showDissembler:))
+	else if (menuItem.action == @selector(showDisassembler:))
 	{
 		if (self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
@@ -1371,11 +1371,11 @@ static NSSize *expandedWindowMinSize = nil;
 	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
 }
 
-- (IBAction)showDissembler:(id)sender
+- (IBAction)showDisassembler:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[[[ZGAppController sharedController] dissemblerController] showWindow:self];
-	[[[ZGAppController sharedController] dissemblerController] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
+	[[[ZGAppController sharedController] disassemblerController] showWindow:self];
+	[[[ZGAppController sharedController] disassemblerController] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
 }
 
 #pragma mark Pausing and Unpausing Processes
