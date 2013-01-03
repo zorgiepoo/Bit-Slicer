@@ -192,6 +192,7 @@
 {
 	if (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.instructionsTableView.editedRow == -1)
 	{
+		// Check to see if anything in the window needs to be updated
 		NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
 		if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
 		{
@@ -214,10 +215,15 @@
 			
 			if (needsToUpdateWindow)
 			{
+				// Find a [start, end) range that we are allowed to remove from the table and insert in again with new instructions
+				// Pick start and end such that they are aligned with the assembly instructions
+				
 				NSUInteger startRow = visibleRowsRange.location;
 				
 				do
 				{
+					if (startRow == 0) break;
+					
 					ZGInstruction *instruction = [self.instructions objectAtIndex:startRow];
 					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess];
 					
@@ -227,15 +233,27 @@
 					{
 						break;
 					}
-					
-					if (startRow == 0) break;
 				}
 				while (YES);
+				
+				ZGInstruction *startInstruction = [self.instructions objectAtIndex:startRow];
+				ZGMemoryAddress startAddress = startInstruction.variable.address;
+				
+				if (startRow == 0)
+				{
+					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess];
+					if (searchedInstruction.variable.address + searchedInstruction.variable.size != startAddress)
+					{
+						startAddress = searchedInstruction.variable.address;
+					}
+				}
 				
 				NSUInteger endRow = visibleRowsRange.location + visibleRowsRange.length - 1;
 				
 				do
 				{
+					if (endRow >= self.instructions.count) break;
+					
 					ZGInstruction *instruction = [self.instructions objectAtIndex:endRow];
 					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess];
 					
@@ -245,19 +263,23 @@
 					{
 						break;
 					}
-					
-					if (endRow >= self.instructions.count) break;
 				}
 				while (YES);
 				
-				//NSLog(@"Start row: %lu, End row: %lu", startRow, endRow);
-				
-				ZGInstruction *startInstruction = [self.instructions objectAtIndex:startRow];
 				ZGInstruction *endInstruction = [self.instructions objectAtIndex:endRow-1];
+				ZGMemoryAddress endAddress = endInstruction.variable.address + endInstruction.variable.size;
+				
+				if (endRow >= self.instructions.count)
+				{
+					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address + endInstruction.variable.size inProcess:self.currentProcess];
+					if (endInstruction.variable.address != searchedInstruction.variable.address)
+					{
+						endAddress = searchedInstruction.variable.address + searchedInstruction.variable.size;
+					}
+				}
 				
 				void *bytes = NULL;
-				ZGMemoryAddress startAddress = startInstruction.variable.address;
-				ZGMemorySize size = endInstruction.variable.address + endInstruction.variable.size - startAddress;
+				ZGMemorySize size = endAddress - startAddress;
 				
 				if (ZGReadBytes(self.currentProcess.processTask, startAddress, &bytes, &size))
 				{
