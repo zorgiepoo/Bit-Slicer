@@ -51,7 +51,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{196, 120}, {547, 417}}</string>
 				<int key="NSWTFlags">1618477056</int>
-				<string key="NSWindowTitle">Dissembler</string>
+				<string key="NSWindowTitle">Disassembler</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
@@ -492,7 +492,7 @@
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{547, 439}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
-				<string key="NSFrameAutosaveName">ZGDissemblerWindow</string>
+				<string key="NSFrameAutosaveName">ZGDisassemblerWindow</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
 			</object>
 		</array>
