@@ -726,7 +726,7 @@
 								</object>
 								<object class="NSMenuItem" id="110508552">
 									<reference key="NSMenu" ref="477738828"/>
-									<string key="NSTitle">Watch Variable Changes</string>
+									<string key="NSTitle">Watch for Variable Changes</string>
 									<string key="NSKeyEquiv">w</string>
 									<int key="NSKeyEquivModMask">1572864</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -2327,14 +2327,182 @@
 					<string key="className">ZGDocument</string>
 					<string key="superclassName">NSDocument</string>
 					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">editVariablesAddress:</string>
-						<string key="NS.object.0">id</string>
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>addVariable:</string>
+							<string>changeMemoryProtection:</string>
+							<string>clearSearchValues:</string>
+							<string>copy:</string>
+							<string>cut:</string>
+							<string>dataTypePopUpButtonRequest:</string>
+							<string>editVariablesAddress:</string>
+							<string>editVariablesSize:</string>
+							<string>editVariablesValue:</string>
+							<string>freezeVariables:</string>
+							<string>memoryDumpAllRequest:</string>
+							<string>memoryDumpRangeRequest:</string>
+							<string>nopVariables:</string>
+							<string>optionsDisclosureButton:</string>
+							<string>paste:</string>
+							<string>pauseOrUnpauseProcess:</string>
+							<string>qualifierMatrixButtonRequest:</string>
+							<string>removeSelectedSearchValues:</string>
+							<string>runningApplicationsPopUpButtonRequest:</string>
+							<string>searchValue:</string>
+							<string>showMemoryViewer:</string>
+							<string>storeAllValues:</string>
+							<string>watchVariable:</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">editVariablesAddress:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">editVariablesAddress:</string>
-							<string key="candidateClassName">id</string>
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>addVariable:</string>
+							<string>changeMemoryProtection:</string>
+							<string>clearSearchValues:</string>
+							<string>copy:</string>
+							<string>cut:</string>
+							<string>dataTypePopUpButtonRequest:</string>
+							<string>editVariablesAddress:</string>
+							<string>editVariablesSize:</string>
+							<string>editVariablesValue:</string>
+							<string>freezeVariables:</string>
+							<string>memoryDumpAllRequest:</string>
+							<string>memoryDumpRangeRequest:</string>
+							<string>nopVariables:</string>
+							<string>optionsDisclosureButton:</string>
+							<string>paste:</string>
+							<string>pauseOrUnpauseProcess:</string>
+							<string>qualifierMatrixButtonRequest:</string>
+							<string>removeSelectedSearchValues:</string>
+							<string>runningApplicationsPopUpButtonRequest:</string>
+							<string>searchValue:</string>
+							<string>showMemoryViewer:</string>
+							<string>storeAllValues:</string>
+							<string>watchVariable:</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">addVariable:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">changeMemoryProtection:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">clearSearchValues:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">copy:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">cut:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">dataTypePopUpButtonRequest:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">editVariablesAddress:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">editVariablesSize:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">editVariablesValue:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">freezeVariables:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">memoryDumpAllRequest:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">memoryDumpRangeRequest:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">nopVariables:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">optionsDisclosureButton:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">paste:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">pauseOrUnpauseProcess:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">qualifierMatrixButtonRequest:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">removeSelectedSearchValues:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">runningApplicationsPopUpButtonRequest:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">searchValue:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">showMemoryViewer:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">storeAllValues:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">watchVariable:</string>
+								<string key="candidateClassName">id</string>
+							</object>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">

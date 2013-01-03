@@ -1175,12 +1175,18 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(watchVariable:))
 	{
-		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.tableController.watchVariablesTableView.selectedRowIndexes.count > 1)
+		if ([self.searchController canCancelTask] || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1)
 		{
 			return NO;
 		}
 		
 		ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
+		
+		if (!selectedVariable.value)
+		{
+			return NO;
+		}
+		
 		ZGMemoryAddress memoryAddress = selectedVariable.address;
 		ZGMemorySize memorySize = selectedVariable.size;
 		ZGMemoryProtection memoryProtection;
@@ -1208,7 +1214,7 @@ static NSSize *expandedWindowMinSize = nil;
 		BOOL isValid = YES;
 		for (ZGVariable *variable in [self selectedVariables])
 		{
-			if (variable.type != ZGByteArray)
+			if (variable.type != ZGByteArray || !variable.value)
 			{
 				isValid = NO;
 				break;
@@ -1216,6 +1222,20 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		
 		return isValid;
+	}
+	
+	else if (menuItem.action == @selector(showMemoryViewer:))
+	{
+		if (self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		{
+			return NO;
+		}
+		
+		ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
+		if (!variable.value)
+		{
+			return NO;
+		}
 	}
 	
 	return [super validateMenuItem:menuItem];

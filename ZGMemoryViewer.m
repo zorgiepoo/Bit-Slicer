@@ -681,13 +681,10 @@ END_MEMORY_VIEW_CHANGE:
 	
 	if (targetMenuItem)
 	{
-		if (targetMenuItem.representedObject != self.currentProcess)
-		{
-			[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
-			[self runningApplicationsPopUpButton:nil];
-		}
-		
-		[self jumpToMemoryAddress:memoryAddress shouldMakeSelection:YES];
+		[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
+		[self runningApplicationsPopUpButton:nil];
+		[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", memoryAddress]];
+		[self changeMemoryView:nil];
 	}
 }
 
