@@ -644,8 +644,8 @@
 		ZGMemoryAddress endingAddress = self.searchData.endAddress;
 		
 		__block ZGSearchData *searchData = self.searchData;
-		dispatch_block_t searchBlock = ^
-		{
+		ZGInitializeSearch(self.searchData);
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 			for (ZGVariable *variable in self.document.watchVariablesArray)
 			{
 				if (variable.shouldBeSearched)
@@ -682,9 +682,7 @@
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
-		};
-		ZGInitializeSearch(self.searchData);
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchBlock);
+		});
 	}
 }
 
@@ -752,34 +750,29 @@
 	
 	self.document.generalStatusTextField.stringValue = @"Storing All Values...";
 	
-	dispatch_block_t searchForDataCompleteBlock = ^
-	{
-		self.userInterfaceTimer = nil;
-		
-		if (!self.document.currentProcess.isStoringAllData)
-		{
-			self.document.generalStatusTextField.stringValue = @"Canceled Memory Store";
-		}
-		else
-		{
-			self.document.currentProcess.isStoringAllData = NO;
-			
-			self.searchData.savedData = self.searchData.tempSavedData;
-			self.searchData.tempSavedData = nil;
-			
-			self.document.generalStatusTextField.stringValue = @"Finished Memory Store";
-		}
-		self.document.searchingProgressIndicator.doubleValue = 0;
-		[self resumeFromTask];
-	};
-	
-	dispatch_block_t searchForDataBlock = ^
-	{
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		self.searchData.tempSavedData = ZGGetAllData(self.document.currentProcess, self.document.scanUnwritableValuesCheckBox.state);
 		
-		dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
-	};
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchForDataBlock);
+		dispatch_async(dispatch_get_main_queue(), ^{
+			self.userInterfaceTimer = nil;
+			
+			if (!self.document.currentProcess.isStoringAllData)
+			{
+				self.document.generalStatusTextField.stringValue = @"Canceled Memory Store";
+			}
+			else
+			{
+				self.document.currentProcess.isStoringAllData = NO;
+				
+				self.searchData.savedData = self.searchData.tempSavedData;
+				self.searchData.tempSavedData = nil;
+				
+				self.document.generalStatusTextField.stringValue = @"Finished Memory Store";
+			}
+			self.document.searchingProgressIndicator.doubleValue = 0;
+			[self resumeFromTask];
+		});
+	});
 }
 
 @end

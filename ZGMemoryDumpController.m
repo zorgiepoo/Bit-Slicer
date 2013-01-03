@@ -171,11 +171,6 @@
 
 - (void)updateMemoryDumpProgress:(NSTimer *)timer
 {
-	if (self.document.searchController.canStartTask)
-	{
-		[self.document.searchController prepareTask];
-	}
-	
 	self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress;
 }
 
@@ -190,65 +185,60 @@
 	 {
 		 if (result == NSFileHandlingPanelOKButton)
 		 {
-			 if ([NSFileManager.defaultManager fileExistsAtPath:savePanel.URL.relativePath])
-			 {
+			 dispatch_async(dispatch_get_main_queue(), ^{
+				 if ([NSFileManager.defaultManager fileExistsAtPath:savePanel.URL.relativePath])
+				 {
+					 [NSFileManager.defaultManager
+					  removeItemAtPath:savePanel.URL.relativePath
+					  error:NULL];
+				 }
+				 
 				 [NSFileManager.defaultManager
-				  removeItemAtPath:savePanel.URL.relativePath
+				  createDirectoryAtPath:savePanel.URL.relativePath
+				  withIntermediateDirectories:NO
+				  attributes:nil
 				  error:NULL];
-			 }
-			 
-			 [NSFileManager.defaultManager
-			  createDirectoryAtPath:savePanel.URL.relativePath
-			  withIntermediateDirectories:NO
-			  attributes:nil
-			  error:NULL];
-			 
-			 self.document.searchingProgressIndicator.maxValue = self.document.currentProcess.numberOfRegions;
-			 
-			 self.progressTimer =
-				[NSTimer
-				 scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-				 target:self
-				 selector:@selector(updateMemoryDumpProgress:)
-				 userInfo:nil
-				 repeats:YES];
-			 
-			 //not doing this here, there's a bug with setKeyEquivalent, instead i'm going to do this in the timer
-			 //[self.document.searchController prepareTask];
-			 self.document.generalStatusTextField.stringValue = @"Writing Memory Dump...";
-			 
-			 dispatch_block_t searchForDataCompleteBlock = ^
-			 {
-				 [self.progressTimer invalidate];
-				 self.progressTimer = nil;
 				 
-				 if (!self.document.currentProcess.isDoingMemoryDump)
-				 {
-					 self.document.generalStatusTextField.stringValue = @"Canceled Memory Dump";
-				 }
-				 else
-				 {
-					 self.document.currentProcess.isDoingMemoryDump = NO;
-					 self.document.generalStatusTextField.stringValue = @"Finished Memory Dump";
-				 }
-				 self.document.searchingProgressIndicator.doubleValue = 0.0;
-				 [self.document.searchController resumeFromTask];
-			 };
-			 
-			 dispatch_block_t searchForDataBlock = ^
-			 {
-				 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.document.currentProcess))
-				 {
-					 NSRunAlertPanel(
-									 @"The Memory Dump failed",
-									 @"An error resulted in writing the memory dump.",
-									 @"OK", nil, nil);
-				 }
+				 self.document.searchingProgressIndicator.maxValue = self.document.currentProcess.numberOfRegions;
 				 
-				 dispatch_async(dispatch_get_main_queue(), searchForDataCompleteBlock);
-			 };
-			 
-			 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), searchForDataBlock);
+				 self.progressTimer =
+				 [NSTimer
+				  scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+				  target:self
+				  selector:@selector(updateMemoryDumpProgress:)
+				  userInfo:nil
+				  repeats:YES];
+				 
+				 [self.document.searchController prepareTask];
+				 self.document.generalStatusTextField.stringValue = @"Writing Memory Dump...";
+				 
+				 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+					 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.document.currentProcess))
+					 {
+						 NSRunAlertPanel(
+										 @"The Memory Dump failed",
+										 @"An error resulted in writing the memory dump.",
+										 @"OK", nil, nil);
+					 }
+					 
+					 dispatch_async(dispatch_get_main_queue(), ^{
+						 [self.progressTimer invalidate];
+						 self.progressTimer = nil;
+						 
+						 if (!self.document.currentProcess.isDoingMemoryDump)
+						 {
+							 self.document.generalStatusTextField.stringValue = @"Canceled Memory Dump";
+						 }
+						 else
+						 {
+							 self.document.currentProcess.isDoingMemoryDump = NO;
+							 self.document.generalStatusTextField.stringValue = @"Finished Memory Dump";
+						 }
+						 self.document.searchingProgressIndicator.doubleValue = 0.0;
+						 [self.document.searchController resumeFromTask];
+					 });
+				 });
+			 });
 		 }
 	 }];
 }
