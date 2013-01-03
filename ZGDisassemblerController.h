@@ -35,12 +35,12 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
-#define ZGDissemblerIdentifier @"ZGDissemblerIdentifier"
+#define ZGDisassemblerIdentifier @"ZGDisassemblerIdentifier"
 
 @class ZGProcess;
 @class ZGInstruction;
 
-@interface ZGDissemblerController : NSWindowController <NSTableViewDataSource>
+@interface ZGDisassemblerController : NSWindowController <NSTableViewDataSource>
 
 @property (readonly) ZGProcess *currentProcess;
 

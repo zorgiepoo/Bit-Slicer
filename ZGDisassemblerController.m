@@ -32,7 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGDissemblerController.h"
+#import "ZGDisassemblerController.h"
 #import "ZGAppController.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
@@ -42,7 +42,7 @@
 #import "ZGInstruction.h"
 #import "udis86.h"
 
-@interface ZGDissemblerController ()
+@interface ZGDisassemblerController ()
 
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSTextField *addressTextField;
@@ -56,15 +56,15 @@
 @property (nonatomic, strong) NSArray *instructions;
 
 @property (readwrite, strong, nonatomic) NSTimer *updateInstructionsTimer;
-@property (readwrite, nonatomic) BOOL dissembling;
+@property (readwrite, nonatomic) BOOL disassembling;
 @property (readwrite, nonatomic) BOOL windowDidAppear;
 
 @end
 
-#define ZGDissemblerAddressField @"ZGDissemblerAddressField"
-#define ZGDissemblerProcessName @"ZGDissemblerProcessName"
+#define ZGDisassemblerAddressField @"ZGDisassemblerAddressField"
+#define ZGDisassemblerProcessName @"ZGDisassemblerProcessName"
 
-@implementation ZGDissemblerController
+@implementation ZGDisassemblerController
 
 - (id)init
 {
@@ -77,21 +77,21 @@
 {
     [super encodeRestorableStateWithCoder:coder];
 	
-	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDissemblerAddressField];
-	[coder encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject name] forKey:ZGDissemblerProcessName];
+	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDisassemblerAddressField];
+	[coder encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject name] forKey:ZGDisassemblerProcessName];
 }
 
 - (void)restoreStateWithCoder:(NSCoder *)coder
 {
 	[super restoreStateWithCoder:coder];
 	
-	NSString *dissemblerAddressField = [coder decodeObjectForKey:ZGDissemblerAddressField];
-	if (dissemblerAddressField)
+	NSString *disassemblerAddressField = [coder decodeObjectForKey:ZGDisassemblerAddressField];
+	if (disassemblerAddressField)
 	{
-		self.addressTextField.stringValue = dissemblerAddressField;
+		self.addressTextField.stringValue = disassemblerAddressField;
 	}
 	
-	[self updateRunningProcesses:[coder decodeObjectForKey:ZGDissemblerProcessName]];
+	[self updateRunningProcesses:[coder decodeObjectForKey:ZGDisassemblerProcessName]];
 	
 	[self windowDidShow:nil];
 }
@@ -138,7 +138,7 @@
 	{
 		self.window.restorable = YES;
 		self.window.restorationClass = ZGAppController.class;
-		self.window.identifier = ZGDissemblerIdentifier;
+		self.window.identifier = ZGDisassemblerIdentifier;
 		[self markChanges];
 	}
     
@@ -445,13 +445,13 @@
 	return instruction;
 }
 
-- (IBAction)stopDissembling:(id)sender
+- (IBAction)stopDisassembling:(id)sender
 {
-	self.dissembling = NO;
+	self.disassembling = NO;
 	[self.stopButton setEnabled:NO];
 }
 
-- (void)updateDissemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)theSize selectionAddress:(ZGMemoryAddress)selectionAddress
+- (void)updateDisassemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)theSize selectionAddress:(ZGMemoryAddress)selectionAddress
 {
 	[self.dissemblyProgressIndicator setMinValue:0];
 	[self.dissemblyProgressIndicator setMaxValue:theSize];
@@ -468,7 +468,7 @@
 	self.currentMemoryAddress = address;
 	self.currentMemorySize = 0;
 	
-	self.dissembling = YES;
+	self.disassembling = YES;
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		void *bytes;
@@ -505,8 +505,10 @@
 					
 					if (foundSelection)
 					{
+						// Scroll such that the selected row is centered
 						[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionRow] byExtendingSelection:NO];
-						[self.instructionsTableView scrollRowToVisible:selectionRow];
+						NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+						[self.instructionsTableView scrollRowToVisible:MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
 						foundSelection = NO;
 					}
 				});
@@ -529,7 +531,7 @@
 					}
 				});
 				
-				if (!self.dissembling)
+				if (!self.disassembling)
 				{
 					break;
 				}
@@ -547,7 +549,7 @@
 			addBatchOfInstructions();
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				self.dissembling = NO;
+				self.disassembling = NO;
 				[self.dissemblyProgressIndicator setHidden:YES];
 				[self.addressTextField setEnabled:YES];
 				[self.runningApplicationsPopUpButton setEnabled:YES];
@@ -637,7 +639,7 @@
 			}
 		}
 		
-		[self updateDissemblerWithAddress:lowBoundAddress size:highBoundAddress - lowBoundAddress selectionAddress:calculatedMemoryAddress];
+		[self updateDisassemblerWithAddress:lowBoundAddress size:highBoundAddress - lowBoundAddress selectionAddress:calculatedMemoryAddress];
 		
 		success = YES;
 	}

@@ -38,7 +38,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">ZGDissemblerController</string>
+				<string key="NSClassName">ZGDisassemblerController</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
@@ -229,7 +229,7 @@
 											<string key="NSFrameSize">{505, 342}</string>
 											<reference key="NSSuperview" ref="781794399"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="1043616540"/>
+											<reference key="NSNextKeyView" ref="48000623"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -403,7 +403,6 @@
 									<string key="NSFrame">{{1, 343}, {505, 16}}</string>
 									<reference key="NSSuperview" ref="375143939"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView"/>
 									<string key="NSReuseIdentifierKey">_NS:60</string>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
@@ -430,7 +429,7 @@
 							<string key="NSFrame">{{20, 18}, {507, 360}}</string>
 							<reference key="NSSuperview" ref="351304596"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="48000623"/>
+							<reference key="NSNextKeyView" ref="781794399"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="1043616540"/>
@@ -564,11 +563,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">stopDissembling:</string>
+						<string key="label">stopDisassembling:</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="532731890"/>
 					</object>
-					<int key="connectionID">98</int>
+					<int key="connectionID">99</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -833,13 +832,37 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">98</int>
+			<int key="maxID">99</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
-					<string key="className">ZGDissemblerController</string>
+					<string key="className">ZGDisassemblerController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="readMemory:">id</string>
+						<string key="runningApplicationsPopUpButton:">id</string>
+						<string key="showWindow:">id</string>
+						<string key="stopDisassembling:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="readMemory:">
+							<string key="name">readMemory:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="runningApplicationsPopUpButton:">
+							<string key="name">runningApplicationsPopUpButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showWindow:">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stopDisassembling:">
+							<string key="name">stopDisassembling:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressTextField">NSTextField</string>
 						<string key="dissemblyProgressIndicator">NSProgressIndicator</string>
@@ -871,7 +894,7 @@
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ZGDissemblerController.h</string>
+						<string key="minorKey">./Classes/ZGDisassemblerController.h</string>
 					</object>
 				</object>
 			</array>
