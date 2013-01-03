@@ -35,6 +35,8 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
+#define ZGDissemblerIdentifier @"ZGDissemblerIdentifier"
+
 @class ZGProcess;
 @class ZGInstruction;
 
