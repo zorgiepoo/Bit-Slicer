@@ -260,6 +260,12 @@ static BOOL didRegisteredHotKey;
 		
 		completionHandler([[[self sharedController] preferencesController] window], nil);
 	}
+	else if ([identifier isEqualToString:ZGDissemblerIdentifier])
+	{
+		[self.sharedController
+		 openDissembler:nil
+		 showWindow:NO];
+	}
 }
 
 - (void)openPreferences:(id)sender showWindow:(BOOL)shouldShowWindow
@@ -291,6 +297,8 @@ static BOOL didRegisteredHotKey;
 
 - (void)openMemoryViewer:(id)sender showWindow:(BOOL)shouldShowWindow
 {
+	self.memoryViewer;
+	
 	if (shouldShowWindow)
 	{
 		[self.memoryViewer showWindow:nil];

@@ -60,6 +60,9 @@
 
 @end
 
+#define ZGDissemblerAddressField @"ZGDissemblerAddressField"
+#define ZGDissemblerProcessName @"ZGDissemblerProcessName"
+
 @implementation ZGDissemblerController
 
 - (id)init
@@ -67,6 +70,35 @@
 	self = [super initWithWindowNibName:NSStringFromClass([self class])];
 	
 	return self;
+}
+
+- (void)encodeRestorableStateWithCoder:(NSCoder *)coder
+{
+    [super encodeRestorableStateWithCoder:coder];
+	
+	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDissemblerAddressField];
+	[coder encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject name] forKey:ZGDissemblerProcessName];
+}
+
+- (void)restoreStateWithCoder:(NSCoder *)coder
+{
+	[super restoreStateWithCoder:coder];
+	
+	NSString *dissemblerAddressField = [coder decodeObjectForKey:ZGDissemblerAddressField];
+	if (dissemblerAddressField)
+	{
+		self.addressTextField.stringValue = dissemblerAddressField;
+	}
+	
+	[self updateRunningProcesses:[coder decodeObjectForKey:ZGDissemblerProcessName]];
+}
+
+- (void)markChanges
+{
+	if ([self respondsToSelector:@selector(invalidateRestorableState)])
+	{
+		[self invalidateRestorableState];
+	}
 }
 
 - (void)setCurrentProcess:(ZGProcess *)newProcess
@@ -97,6 +129,16 @@
 - (void)windowDidLoad
 {
     [super windowDidLoad];
+	
+	self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
+	
+	if ([self.window respondsToSelector:@selector(setRestorable:)] && [self.window respondsToSelector:@selector(setRestorationClass:)])
+	{
+		self.window.restorable = YES;
+		self.window.restorationClass = ZGAppController.class;
+		self.window.identifier = ZGDissemblerIdentifier;
+		[self markChanges];
+	}
     
 	// Add processes to popup button,
 	[self updateRunningProcesses:[[ZGAppController sharedController] lastSelectedProcessName]];
