@@ -150,7 +150,7 @@
 			// http://stackoverflow.com/questions/1350181/determine-a-processs-architecture
 			
 			size_t mibLen = CTL_MAXNAME;
-			int mib[mibLen];
+			int mib[CTL_MAXNAME];
 			
 			if (sysctlnametomib("sysctl.proc_cputype", mib, &mibLen) == 0)
 			{
@@ -166,7 +166,7 @@
 					ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] init];
 					runningProcess.name = @(processList[processIndex].kp_proc.p_comm);
 					runningProcess.processIdentifier = processID;
-					runningProcess.is64Bit = (cpuType & CPU_ARCH_ABI64);
+					runningProcess.is64Bit = ((cpuType & CPU_ARCH_ABI64) != 0);
 					[newRunningProcesses addObject:runningProcess];
 				}
 			}
