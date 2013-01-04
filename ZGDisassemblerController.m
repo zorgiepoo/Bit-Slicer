@@ -735,6 +735,20 @@ END_DEBUGGER_CHANGE:
 	return result;
 }
 
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+	if (menuItem.action == @selector(nopVariables:))
+	{
+		[menuItem setTitle:@"NOP Instruction"];
+		if (self.instructionsTableView.selectedRowIndexes.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.instructionsTableView.editedRow != -1)
+		{
+			return NO;
+		}
+	}
+	
+	return YES;
+}
+
 - (NSUndoManager *)windowWillReturnUndoManager:(id)sender
 {
 	return self.undoManager;
@@ -777,6 +791,18 @@ END_DEBUGGER_CHANGE:
 		
 		free(newValue);
 	}
+}
+
+- (IBAction)nopVariables:(id)sender
+{
+	ZGInstruction *instruction = [self.instructions objectAtIndex:[self.instructionsTableView selectedRow]];
+	NSMutableArray *nopComponents = [[NSMutableArray alloc] init];
+	for (NSUInteger nopIndex = 0; nopIndex < instruction.variable.size; nopIndex++)
+	{
+		[nopComponents addObject:@"90"];
+	}
+	
+	[self replaceOldStringValue:instruction.variable.stringValue withNewStringValue:[nopComponents componentsJoinedByString:@" "] atAddress:instruction.variable.address];
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex

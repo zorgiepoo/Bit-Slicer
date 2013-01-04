@@ -714,7 +714,7 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
-								<object class="NSMenuItem" id="11491559">
+								<object class="NSMenuItem" id="27757665">
 									<reference key="NSMenu" ref="477738828"/>
 									<string key="NSTitle">Show Variable in</string>
 									<string key="NSKeyEquiv"/>
@@ -722,12 +722,12 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 									<string key="NSAction">submenuAction:</string>
-									<object class="NSMenu" key="NSSubmenu" id="742941111">
+									<object class="NSMenu" key="NSSubmenu" id="648880631">
 										<string key="NSTitle">Show Variable in</string>
 										<object class="NSMutableArray" key="NSMenuItems">
 											<bool key="EncodedWithXMLCoder">YES</bool>
-											<object class="NSMenuItem" id="789422741">
-												<reference key="NSMenu" ref="742941111"/>
+											<object class="NSMenuItem" id="69024405">
+												<reference key="NSMenu" ref="648880631"/>
 												<string key="NSTitle">Memory Viewer</string>
 												<string key="NSKeyEquiv">Y</string>
 												<int key="NSKeyEquivModMask">1048576</int>
@@ -735,8 +735,8 @@
 												<reference key="NSOnImage" ref="1033313550"/>
 												<reference key="NSMixedImage" ref="310636482"/>
 											</object>
-											<object class="NSMenuItem" id="856460102">
-												<reference key="NSMenu" ref="742941111"/>
+											<object class="NSMenuItem" id="676378580">
+												<reference key="NSMenu" ref="648880631"/>
 												<string key="NSTitle">Disassembler</string>
 												<string key="NSKeyEquiv">T</string>
 												<int key="NSKeyEquivModMask">1048576</int>
@@ -1341,7 +1341,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">showMemoryViewer:</string>
 						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="789422741"/>
+						<reference key="destination" ref="69024405"/>
 					</object>
 					<int key="connectionID">867</int>
 				</object>
@@ -1349,7 +1349,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">showDisassembler:</string>
 						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="856460102"/>
+						<reference key="destination" ref="676378580"/>
 					</object>
 					<int key="connectionID">870</int>
 				</object>
@@ -1787,7 +1787,7 @@
 							<reference ref="110508552"/>
 							<reference ref="509544214"/>
 							<reference ref="355188775"/>
-							<reference ref="11491559"/>
+							<reference ref="27757665"/>
 						</object>
 						<reference key="parent" ref="179297160"/>
 					</object>
@@ -2057,32 +2057,32 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">863</int>
-						<reference key="object" ref="11491559"/>
+						<reference key="object" ref="27757665"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="742941111"/>
+							<reference ref="648880631"/>
 						</object>
 						<reference key="parent" ref="477738828"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">864</int>
-						<reference key="object" ref="742941111"/>
+						<reference key="object" ref="648880631"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="789422741"/>
-							<reference ref="856460102"/>
+							<reference ref="69024405"/>
+							<reference ref="676378580"/>
 						</object>
-						<reference key="parent" ref="11491559"/>
+						<reference key="parent" ref="27757665"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">865</int>
-						<reference key="object" ref="789422741"/>
-						<reference key="parent" ref="742941111"/>
+						<reference key="object" ref="69024405"/>
+						<reference key="parent" ref="648880631"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">866</int>
-						<reference key="object" ref="856460102"/>
-						<reference key="parent" ref="742941111"/>
+						<reference key="object" ref="676378580"/>
+						<reference key="parent" ref="648880631"/>
 					</object>
 				</object>
 			</object>
@@ -2918,66 +2918,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGVariableController</string>
 					<string key="superclassName">NSObject</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>editVariablesAddressCancelButton:</string>
-							<string>editVariablesAddressOkayButton:</string>
-							<string>editVariablesSizeCancelButton:</string>
-							<string>editVariablesSizeOkayButton:</string>
-							<string>editVariablesValueCancelButton:</string>
-							<string>editVariablesValueOkayButton:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>editVariablesAddressCancelButton:</string>
-							<string>editVariablesAddressOkayButton:</string>
-							<string>editVariablesSizeCancelButton:</string>
-							<string>editVariablesSizeOkayButton:</string>
-							<string>editVariablesValueCancelButton:</string>
-							<string>editVariablesValueOkayButton:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesAddressCancelButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesAddressOkayButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesSizeCancelButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesSizeOkayButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesValueCancelButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editVariablesValueOkayButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
