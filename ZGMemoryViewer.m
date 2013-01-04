@@ -71,6 +71,8 @@
 @property (assign) IBOutlet NSTextField *addressTextField;
 @property (assign) IBOutlet HFTextView *textView;
 
+@property (copy, nonatomic) NSString *desiredProcessName;
+
 @end
 
 @implementation ZGMemoryViewer
@@ -93,7 +95,7 @@
 		shouldUpdateMemoryView = YES;
 	}
 	_currentProcess = newProcess;
-	if (_currentProcess && ![_currentProcess hasGrantedAccess])
+	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.processID != NON_EXISTENT_PID_NUMBER)
 	{
 		if (![_currentProcess grantUsAccess])
 		{
@@ -130,7 +132,7 @@
 		 forKey:ZGMemoryViewerAddress];
     
     [coder
-		 encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject name]
+		 encodeObject:self.desiredProcessName
 		 forKey:ZGMemoryViewerProcessName];
 	
 	[coder encodeBool:self.showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
@@ -148,7 +150,8 @@
 	
 	self.currentMemoryAddress = [coder decodeInt64ForKey:ZGMemoryViewerAddress];
 	
-	[self updateRunningProcesses:[coder decodeObjectForKey:ZGMemoryViewerProcessName]];
+	self.desiredProcessName = [coder decodeObjectForKey:ZGMemoryViewerProcessName];
+	[self updateRunningProcesses];
 	
 	if ([coder decodeBoolForKey:ZGMemoryViewerShowsDataInspector])
 	{
@@ -222,8 +225,9 @@
 	// It's important to set frame autosave name after we initiate the data inspector, otherwise the data inspector's frame will not be correct for some reason
 	[[self window] setFrameAutosaveName: @"ZGMemoryViewer"];
 	
-	// Add processes to popup button,
-	[self updateRunningProcesses:[[ZGAppController sharedController] lastSelectedProcessName]];
+	// Add processes to popup button
+	self.desiredProcessName = [[ZGAppController sharedController] lastSelectedProcessName];
+	[self updateRunningProcesses];
 	
 	[[ZGProcessList sharedProcessList]
 	 addObserver:self
@@ -344,7 +348,7 @@
 {
 	if (object == [ZGProcessList sharedProcessList])
 	{
-		[self updateRunningProcesses:nil];
+		[self updateRunningProcesses];
 	}
 }
 
@@ -357,7 +361,7 @@
 	self.textView.data = [NSData data];
 }
 
-- (void)updateRunningProcesses:(NSString *)desiredProcessName
+- (void)updateRunningProcesses
 {
 	[self.runningApplicationsPopUpButton removeAllItems];
 	
@@ -381,13 +385,7 @@
 			
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
-			// Revive process
-			if (self.currentProcess.processID == NON_EXISTENT_PID_NUMBER && [self.currentProcess.name isEqualToString:runningProcess.name])
-			{
-				self.currentProcess.processID = runningProcess.processIdentifier;
-			}
-			
-			if (self.currentProcess.processID == runningProcess.processIdentifier || [desiredProcessName isEqualToString:runningProcess.name])
+			if (self.currentProcess.processID == runningProcess.processIdentifier || [self.desiredProcessName isEqualToString:runningProcess.name])
 			{
 				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 			}
@@ -395,15 +393,14 @@
 	}
 	
 	// Handle dead process
-	if (self.currentProcess && self.currentProcess.processID != [self.runningApplicationsPopUpButton.selectedItem.representedObject processID])
+	if (self.desiredProcessName && ![self.desiredProcessName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject name]])
 	{
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.name];
+		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.desiredProcessName];
 		NSImage *iconImage = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
 		iconImage.size = NSMakeSize(16, 16);
 		menuItem.image = iconImage;
-		menuItem.representedObject = self.currentProcess;
-		self.currentProcess.processID = NON_EXISTENT_PID_NUMBER;
+		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName processID:NON_EXISTENT_PID_NUMBER set64Bit:YES];
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 	}
@@ -415,6 +412,7 @@
 {
 	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
 	{
+		self.desiredProcessName = [self.runningApplicationsPopUpButton.selectedItem.representedObject name];
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 	}
 }
