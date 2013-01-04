@@ -739,8 +739,8 @@ END_DEBUGGER_CHANGE:
 {
 	if (menuItem.action == @selector(nopVariables:))
 	{
-		[menuItem setTitle:@"NOP Instruction"];
-		if (self.instructionsTableView.selectedRowIndexes.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.instructionsTableView.editedRow != -1)
+		[menuItem setTitle:[NSString stringWithFormat:@"NOP Instruction%@", self.instructionsTableView.selectedRowIndexes.count == 1 ? @"" : @"s"]];
+		if (self.instructionsTableView.selectedRowIndexes.count <= 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.instructionsTableView.editedRow != -1)
 		{
 			return NO;
 		}
@@ -754,10 +754,23 @@ END_DEBUGGER_CHANGE:
 	return self.undoManager;
 }
 
-- (void)replaceOldStringValue:(NSString *)oldStringValue withNewStringValue:(NSString *)newStringValue atAddress:(ZGMemoryAddress)address
+- (void)replaceInstructions:(NSArray *)instructions fromOldStringValues:(NSArray *)oldStringValues toNewStringValues:(NSArray *)newStringValues actionName:(NSString *)actionName
+{
+	for (NSUInteger index = 0; index < instructions.count; index++)
+	{
+		ZGInstruction *instruction = [instructions objectAtIndex:index];
+		[self writeStringValue:[newStringValues objectAtIndex:index] atAddress:instruction.variable.address];
+	}
+	
+	[self.undoManager setActionName:[actionName stringByAppendingFormat:@"%@", instructions.count == 1 ? @"" : @"s"]];
+	
+	[[self.undoManager prepareWithInvocationTarget:self] replaceInstructions:instructions fromOldStringValues:newStringValues toNewStringValues:oldStringValues actionName:actionName];
+}
+
+- (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address
 {
 	ZGMemorySize newSize = 0;
-	void *newValue = valueFromString(self.currentProcess, newStringValue, ZGByteArray, &newSize);
+	void *newValue = valueFromString(self.currentProcess, stringValue, ZGByteArray, &newSize);
 	
 	if (newValue)
 	{
@@ -775,11 +788,7 @@ END_DEBUGGER_CHANGE:
 			
 			if (canWrite)
 			{
-				if (ZGWriteBytes(self.currentProcess.processTask, address, newValue, newSize))
-				{
-					[self.undoManager setActionName:@"Instruction Change"];
-					[[self.undoManager prepareWithInvocationTarget:self] replaceOldStringValue:newStringValue withNewStringValue:oldStringValue atAddress:address];
-				}
+				ZGWriteBytes(self.currentProcess.processTask, address, newValue, newSize);
 				
 				// Re-protect the region back to the way it was
 				if (!(oldProtection & VM_PROT_WRITE))
@@ -795,14 +804,25 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)nopVariables:(id)sender
 {
-	ZGInstruction *instruction = [self.instructions objectAtIndex:[self.instructionsTableView selectedRow]];
-	NSMutableArray *nopComponents = [[NSMutableArray alloc] init];
-	for (NSUInteger nopIndex = 0; nopIndex < instruction.variable.size; nopIndex++)
+	NSArray *selectedInstructions = [self.instructions objectsAtIndexes:[self.instructionsTableView selectedRowIndexes]];
+	NSMutableArray *newStringValues = [[NSMutableArray alloc] init];
+	NSMutableArray *oldStringValues = [[NSMutableArray alloc] init];
+	
+	for (NSUInteger instructionIndex = 0; instructionIndex < selectedInstructions.count; instructionIndex++)
 	{
-		[nopComponents addObject:@"90"];
+		ZGInstruction *instruction = [selectedInstructions objectAtIndex:instructionIndex];
+		[oldStringValues addObject:instruction.variable.stringValue];
+		
+		NSMutableArray *nopComponents = [[NSMutableArray alloc] init];
+		for (NSUInteger nopIndex = 0; nopIndex < instruction.variable.size; nopIndex++)
+		{
+			[nopComponents addObject:@"90"];
+		}
+		
+		[newStringValues addObject:[nopComponents componentsJoinedByString:@" "]];
 	}
 	
-	[self replaceOldStringValue:instruction.variable.stringValue withNewStringValue:[nopComponents componentsJoinedByString:@" "] atAddress:instruction.variable.address];
+	[self replaceInstructions:selectedInstructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues actionName:@"NOP Change"];
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
@@ -810,7 +830,7 @@ END_DEBUGGER_CHANGE:
 	if ([tableColumn.identifier isEqualToString:@"bytes"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
-		[self replaceOldStringValue:instruction.variable.stringValue withNewStringValue:object atAddress:instruction.variable.address];
+		[self replaceInstructions:@[instruction] fromOldStringValues:@[instruction.variable.stringValue] toNewStringValues:@[object] actionName:@"Instruction Change"];
 	}
 }
 
