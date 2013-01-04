@@ -610,7 +610,7 @@
 			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
 		}
 		
-		// Dissemble within a range from +- 50000 from selection address
+		// Dissemble within a range from +- WINDOW_SIZE from selection address
 		const NSUInteger WINDOW_SIZE = 50000;
 		
 		ZGMemoryAddress lowBoundAddress = calculatedMemoryAddress - WINDOW_SIZE;
