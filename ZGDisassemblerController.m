@@ -655,6 +655,18 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
+- (ZGInstruction *)selectedInstruction
+{
+	ZGInstruction *instruction = nil;
+	
+	if (self.instructionsTableView.selectedRow >= 0 && (NSUInteger)self.instructionsTableView.selectedRow < self.instructions.count)
+	{
+		instruction = [self.instructions objectAtIndex:self.instructionsTableView.selectedRow];
+	}
+	
+	return instruction;
+}
+
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess
 {	
 	NSMenuItem *targetMenuItem = nil;

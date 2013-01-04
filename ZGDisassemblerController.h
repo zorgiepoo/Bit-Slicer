@@ -44,6 +44,8 @@
 
 @property (readonly) ZGProcess *currentProcess;
 
+- (ZGInstruction *)selectedInstruction;
+
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
 

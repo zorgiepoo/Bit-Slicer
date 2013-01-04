@@ -42,6 +42,8 @@
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
+#import "ZGDisassemblerController.h"
+#import "ZGInstruction.h"
 
 @interface ZGVariableController ()
 
@@ -217,9 +219,19 @@
 {
 	ZGVariableQualifier qualifier = [[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
 	
-	// Try to get an initial address from the memory viewer's selection
+	ZGVariableType variableType = (ZGVariableType)[sender tag];
+	
+	// Try to get an initial address from the disassembler or the memory viewer's selection
 	ZGMemoryAddress initialAddress = 0x0;
-	if ([[ZGAppController sharedController] memoryViewer] && [[[[ZGAppController sharedController] memoryViewer] currentProcess] processID] == self.document.currentProcess.processID)
+	ZGMemorySize initialSize = 0;
+	
+	if (variableType == ZGByteArray && [[[[ZGAppController sharedController] disassemblerController] currentProcess] processID] == self.document.currentProcess.processID)
+	{
+		ZGInstruction *selectedInstruction = [[[ZGAppController sharedController] disassemblerController] selectedInstruction];
+		initialAddress = selectedInstruction.variable.address;
+		initialSize = selectedInstruction.variable.size;
+	}
+	else if ([[[[ZGAppController sharedController] memoryViewer] currentProcess] processID] == self.document.currentProcess.processID)
 	{
 		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddress];
 	}
@@ -227,9 +239,9 @@
 	ZGVariable *variable =
 		[[ZGVariable alloc]
 		 initWithValue:NULL
-		 size:0
+		 size:initialSize
 		 address:initialAddress
-		 type:(ZGVariableType)[sender tag]
+		 type:variableType
 		 qualifier:qualifier
 		 pointerSize:self.document.currentProcess.pointerSize];
 	
