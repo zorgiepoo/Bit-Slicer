@@ -121,7 +121,7 @@
 	
 	for (ZGVariable *variable in variablesArray)
 	{
-		[linesToWrite addObject:[NSString stringWithFormat:@"%@ %@ %@", variable.name, variable.addressStringValue, variable.stringValue]];
+		[linesToWrite addObject:[@[variable.name, variable.addressStringValue, variable.stringValue] componentsJoinedByString:@"\t"]];
 	}
 	
 	[NSPasteboard.generalPasteboard
