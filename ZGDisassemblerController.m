@@ -60,6 +60,8 @@
 @property (readwrite, nonatomic) BOOL disassembling;
 @property (readwrite, nonatomic) BOOL windowDidAppear;
 
+@property (nonatomic, copy) NSString *desiredProcessName;
+
 @end
 
 #define ZGDisassemblerAddressField @"ZGDisassemblerAddressField"
@@ -92,7 +94,9 @@
 		self.addressTextField.stringValue = disassemblerAddressField;
 	}
 	
-	[self updateRunningProcesses:[coder decodeObjectForKey:ZGDisassemblerProcessName]];
+	self.desiredProcessName = [coder decodeObjectForKey:ZGDisassemblerProcessName];
+	
+	[self updateRunningProcesses];
 	
 	[self windowDidShow:nil];
 }
@@ -114,7 +118,7 @@
 		shouldUpdate = YES;
 	}
 	_currentProcess = newProcess;
-	if (_currentProcess && ![_currentProcess hasGrantedAccess])
+	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.processID != NON_EXISTENT_PID_NUMBER)
 	{
 		if (![_currentProcess grantUsAccess])
 		{
@@ -125,7 +129,6 @@
 	
 	if (shouldUpdate && self.windowDidAppear)
 	{
-		self.addressTextField.stringValue = @"0x0";
 		[self readMemory:nil];
 	}
 }
@@ -144,8 +147,9 @@
 		[self markChanges];
 	}
     
-	// Add processes to popup button,
-	[self updateRunningProcesses:[[ZGAppController sharedController] lastSelectedProcessName]];
+	// Add processes to popup button
+	self.desiredProcessName = [[ZGAppController sharedController] lastSelectedProcessName];
+	[self updateRunningProcesses];
 	
 	[[ZGProcessList sharedProcessList]
 	 addObserver:self
@@ -319,11 +323,11 @@
 {
 	if (object == [ZGProcessList sharedProcessList])
 	{
-		[self updateRunningProcesses:nil];
+		[self updateRunningProcesses];
 	}
 }
 
-- (void)updateRunningProcesses:(NSString *)desiredProcessName
+- (void)updateRunningProcesses
 {
 	[self.runningApplicationsPopUpButton removeAllItems];
 	
@@ -347,13 +351,7 @@
 			
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
-			// Revive process
-			if (self.currentProcess.processID == NON_EXISTENT_PID_NUMBER && [self.currentProcess.name isEqualToString:runningProcess.name])
-			{
-				self.currentProcess.processID = runningProcess.processIdentifier;
-			}
-			
-			if (self.currentProcess.processID == runningProcess.processIdentifier || [desiredProcessName isEqualToString:runningProcess.name])
+			if (self.currentProcess.processID == runningProcess.processIdentifier || [self.desiredProcessName isEqualToString:runningProcess.name])
 			{
 				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 			}
@@ -361,15 +359,14 @@
 	}
 	
 	// Handle dead process
-	if (self.currentProcess && self.currentProcess.processID != [self.runningApplicationsPopUpButton.selectedItem.representedObject processID])
+	if (self.desiredProcessName && ![self.desiredProcessName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject name]])
 	{
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.name];
+		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.desiredProcessName];
 		NSImage *iconImage = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
 		iconImage.size = NSMakeSize(16, 16);
 		menuItem.image = iconImage;
-		menuItem.representedObject = self.currentProcess;
-		self.currentProcess.processID = NON_EXISTENT_PID_NUMBER;
+		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName processID:NON_EXISTENT_PID_NUMBER set64Bit:YES];
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 	}
@@ -377,12 +374,19 @@
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 }
 
-- (IBAction)runningApplicationsPopUpButton:(id)sender
+- (void)switchProcessMenuItemAndSelectAddress:(ZGMemoryAddress)address
 {
 	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
 	{
+		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", address];
+		self.desiredProcessName = [self.runningApplicationsPopUpButton.selectedItem.representedObject name];
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 	}
+}
+
+- (IBAction)runningApplicationsPopUpButton:(id)sender
+{
+	[self switchProcessMenuItemAndSelectAddress:0x0];
 }
 
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
@@ -563,7 +567,7 @@
 {
 	BOOL success = NO;
 	
-	if (![self.currentProcess hasGrantedAccess])
+	if (self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || ![self.currentProcess hasGrantedAccess])
 	{
 		goto END_DEBUGGER_CHANGE;
 	}
@@ -652,12 +656,7 @@ END_DEBUGGER_CHANGE:
 }
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess
-{
-	self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", address];
-	
-	self.currentProcess = nil;
-	[self updateRunningProcesses:requestedProcess.name];
-	
+{	
 	NSMenuItem *targetMenuItem = nil;
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.menu.itemArray)
 	{
@@ -671,15 +670,19 @@ END_DEBUGGER_CHANGE:
 	
 	if (targetMenuItem)
 	{
-		if ([targetMenuItem.representedObject processID] != requestedProcess.processID)
+		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", address];
+		
+		if ([targetMenuItem.representedObject processID] != self.currentProcess.processID)
 		{
 			[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
+			[self switchProcessMenuItemAndSelectAddress:address];
 			self.instructions = @[];
 			[self.instructionsTableView reloadData];
-			[self runningApplicationsPopUpButton:nil];
 		}
-		
-		[self readMemory:nil];
+		else
+		{
+			[self readMemory:nil];
+		}
 	}
 	else
 	{
