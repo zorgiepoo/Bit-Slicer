@@ -72,6 +72,7 @@
 @property (assign) IBOutlet HFTextView *textView;
 
 @property (copy, nonatomic) NSString *desiredProcessName;
+@property (readwrite, nonatomic) BOOL windowDidAppear;
 
 @end
 
@@ -158,7 +159,7 @@
 		[self toggleDataInspector:nil];
 	}
 	
-	[self windowDidShow];
+	[self windowDidShow:nil];
 }
 
 - (void)markChanges
@@ -236,7 +237,7 @@
 	 context:NULL];
 }
 
-- (void)windowDidShow
+- (void)windowDidShow:(id)sender
 {
 	if (!self.checkMemoryTimer)
 	{
@@ -248,13 +249,19 @@
 		 userInfo:nil
 		 repeats:YES];
 	}
+	
+	if (!self.windowDidAppear)
+	{
+		[self changeMemoryView:nil];
+		self.windowDidAppear = YES;
+	}
 }
 
 - (IBAction)showWindow:(id)sender
 {
 	[super showWindow:sender];
 	
-	[self windowDidShow];
+	[self windowDidShow:nil];
 }
 
 - (void)windowWillClose:(NSNotification *)notification
