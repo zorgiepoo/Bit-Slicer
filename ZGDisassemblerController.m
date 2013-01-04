@@ -745,6 +745,13 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
+	else if (menuItem.action == @selector(copy:))
+	{
+		if (self.instructionsTableView.selectedRowIndexes.count <= 0)
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
 }
@@ -832,6 +839,19 @@ END_DEBUGGER_CHANGE:
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
 		[self replaceInstructions:@[instruction] fromOldStringValues:@[instruction.variable.stringValue] toNewStringValues:@[object] actionName:@"Instruction Change"];
 	}
+}
+
+- (IBAction)copy:(id)sender
+{
+	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
+	NSArray *instructions = [self.instructions objectsAtIndexes:[self.instructionsTableView selectedRowIndexes]];
+	for (ZGInstruction *instruction in instructions)
+	{
+		[descriptionComponents addObject:[@[instruction.variable.addressStringValue, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
+	}
+	
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
 }
 
 @end
