@@ -116,6 +116,16 @@
 		 {
 			 if (variable.isFrozen && variable.freezeValue)
 			 {
+				 ZGMemoryAddress protectionAddress = variable.address;
+				 ZGMemorySize protectionSize = variable.size;
+				 ZGMemoryProtection oldProtection = 0;
+				 
+				 BOOL protectionSuccess = ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &protectionAddress, &protectionSize, &oldProtection);
+				 if (protectionSuccess && !(oldProtection & VM_PROT_WRITE))
+				 {
+					 protectionSuccess = ZGProtect(self.document.currentProcess.processTask, variable.address, variable.size, oldProtection | VM_PROT_WRITE);
+				 }
+				 
 				 if (variable.size)
 				 {
 					 ZGWriteBytes(self.document.currentProcess.processTask, variable.address, variable.freezeValue, variable.size);
@@ -125,6 +135,11 @@
 				 {
 					 unichar terminatorValue = 0;
 					 ZGWriteBytes(self.document.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));
+				 }
+				 
+				 if (protectionSuccess && !(oldProtection & VM_PROT_WRITE))
+				 {
+					 ZGProtect(self.document.currentProcess.processTask, variable.address, variable.size, oldProtection);
 				 }
 			 }
 		 }];
