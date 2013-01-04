@@ -1073,7 +1073,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(addVariable:))
 	{
-		if (![self.searchController canStartTask])
+		if (![self.searchController canStartTask] && !self.currentProcess.isWatchingBreakPoint)
 		{
 			return NO;
 		}
@@ -1125,7 +1125,7 @@ static NSSize *expandedWindowMinSize = nil;
 	{
 		menuItem.title = self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1 ? @"Edit Variable Values…" : @"Edit Variable Value…";
 		
-		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -1133,7 +1133,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(editVariablesAddress:))
 	{
-		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -1143,7 +1143,7 @@ static NSSize *expandedWindowMinSize = nil;
     {
 		menuItem.title = self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1 ? @"Edit Variable Sizes…" : @"Edit Variable Size…";
 		
-		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -1207,7 +1207,7 @@ static NSSize *expandedWindowMinSize = nil;
 	{	
 		[menuItem setTitle:self.selectedVariables.count == 1 ? @"NOP Variable" : @"NOP Variables"];
 		
-		if ([self.searchController canCancelTask] || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}

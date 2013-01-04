@@ -338,7 +338,7 @@
 {
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
-		if (![self.document.searchController canStartTask] || self.document.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if ((![self.document.searchController canStartTask] && !self.document.currentProcess.isWatchingBreakPoint) || self.document.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			NSBeep();
 			return NO;
