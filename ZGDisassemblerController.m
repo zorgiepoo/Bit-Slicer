@@ -200,7 +200,7 @@
 
 - (void)updateInstructionsTimer:(NSTimer *)timer
 {
-	if (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.instructionsTableView.editedRow == -1)
+	if (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.instructionsTableView.editedRow == -1 && !self.disassembling)
 	{
 		// Check to see if anything in the window needs to be updated
 		NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
