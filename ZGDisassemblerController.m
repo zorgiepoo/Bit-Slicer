@@ -62,6 +62,8 @@
 
 @property (nonatomic, copy) NSString *desiredProcessName;
 
+@property (nonatomic, strong) NSUndoManager *undoManager;
+
 @end
 
 #define ZGDisassemblerAddressField @"ZGDisassemblerAddressField"
@@ -72,6 +74,8 @@
 - (id)init
 {
 	self = [super initWithWindowNibName:NSStringFromClass([self class])];
+	
+	self.undoManager = [[NSUndoManager alloc] init];
 	
 	return self;
 }
@@ -641,6 +645,7 @@
 			}
 		}
 		
+		[self.undoManager removeAllActions];
 		[self updateDisassemblerWithAddress:lowBoundAddress size:highBoundAddress - lowBoundAddress selectionAddress:calculatedMemoryAddress];
 		
 		success = YES;
@@ -730,42 +735,56 @@ END_DEBUGGER_CHANGE:
 	return result;
 }
 
+- (NSUndoManager *)windowWillReturnUndoManager:(id)sender
+{
+	return self.undoManager;
+}
+
+- (void)replaceOldStringValue:(NSString *)oldStringValue withNewStringValue:(NSString *)newStringValue atAddress:(ZGMemoryAddress)address
+{
+	ZGMemorySize newSize = 0;
+	void *newValue = valueFromString(self.currentProcess, newStringValue, ZGByteArray, &newSize);
+	
+	if (newValue)
+	{
+		ZGMemoryAddress protectionAddress = address;
+		ZGMemorySize protectionSize = newSize;
+		ZGMemoryProtection oldProtection = 0;
+		
+		if (ZGMemoryProtectionInRegion(self.currentProcess.processTask, &protectionAddress, &protectionSize, &oldProtection))
+		{
+			BOOL canWrite = oldProtection & VM_PROT_WRITE;
+			if (!canWrite)
+			{
+				canWrite = ZGProtect(self.currentProcess.processTask, protectionAddress, protectionSize, oldProtection | VM_PROT_WRITE);
+			}
+			
+			if (canWrite)
+			{
+				if (ZGWriteBytes(self.currentProcess.processTask, address, newValue, newSize))
+				{
+					[self.undoManager setActionName:@"Instruction Change"];
+					[[self.undoManager prepareWithInvocationTarget:self] replaceOldStringValue:newStringValue withNewStringValue:oldStringValue atAddress:address];
+				}
+				
+				// Re-protect the region back to the way it was
+				if (!(oldProtection & VM_PROT_WRITE))
+				{
+					ZGProtect(self.currentProcess.processTask, protectionAddress, protectionSize, oldProtection);
+				}
+			}
+		}
+		
+		free(newValue);
+	}
+}
+
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if ([tableColumn.identifier isEqualToString:@"bytes"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
-		ZGMemorySize size = 0;
-		void *newValue = valueFromString(self.currentProcess, object, instruction.variable.type, &size);
-		
-		if (newValue)
-		{
-			ZGMemoryAddress protectionAddress = instruction.variable.address;
-			ZGMemorySize protectionSize = instruction.variable.size;
-			ZGMemoryProtection oldProtection = 0;
-			
-			if (ZGMemoryProtectionInRegion(self.currentProcess.processTask, &protectionAddress, &protectionSize, &oldProtection))
-			{
-				BOOL canWrite = oldProtection & VM_PROT_WRITE;
-				if (!canWrite)
-				{
-					canWrite = ZGProtect(self.currentProcess.processTask, protectionAddress, protectionSize, oldProtection | VM_PROT_WRITE);
-				}
-				
-				if (canWrite)
-				{
-					ZGWriteBytes(self.currentProcess.processTask, instruction.variable.address, newValue, size);
-					
-					// Re-protect the region back to the way it was
-					if (!(oldProtection & VM_PROT_WRITE))
-					{
-						ZGProtect(self.currentProcess.processTask, protectionAddress, protectionSize, oldProtection);
-					}
-				}
-			}
-			
-			free(newValue);
-		}
+		[self replaceOldStringValue:instruction.variable.stringValue withNewStringValue:object atAddress:instruction.variable.address];
 	}
 }
 
