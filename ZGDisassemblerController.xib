@@ -47,11 +47,11 @@
 			<object class="NSCustomObject" id="1004">
 				<string key="NSClassName">NSApplication</string>
 			</object>
-			<object class="NSMenu" id="994848445">
+			<object class="NSMenu" id="606350970">
 				<string key="NSTitle"/>
 				<array class="NSMutableArray" key="NSMenuItems">
-					<object class="NSMenuItem" id="165738687">
-						<reference key="NSMenu" ref="994848445"/>
+					<object class="NSMenuItem" id="440779842">
+						<reference key="NSMenu" ref="606350970"/>
 						<string key="NSTitle">NOP Instruction</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -594,7 +594,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">nopVariables:</string>
 						<reference key="source" ref="1003"/>
-						<reference key="destination" ref="165738687"/>
+						<reference key="destination" ref="440779842"/>
 					</object>
 					<int key="connectionID">104</int>
 				</object>
@@ -618,7 +618,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">menu</string>
 						<reference key="source" ref="461663476"/>
-						<reference key="destination" ref="994848445"/>
+						<reference key="destination" ref="606350970"/>
 					</object>
 					<int key="connectionID">105</int>
 				</object>
@@ -832,17 +832,17 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100</int>
-						<reference key="object" ref="994848445"/>
+						<reference key="object" ref="606350970"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="165738687"/>
+							<reference ref="440779842"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Right Click Menu</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">101</int>
-						<reference key="object" ref="165738687"/>
-						<reference key="parent" ref="994848445"/>
+						<reference key="object" ref="440779842"/>
+						<reference key="parent" ref="606350970"/>
 					</object>
 				</array>
 			</object>
@@ -892,35 +892,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDisassemblerController</string>
 					<string key="superclassName">NSWindowController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="nopVariables:">id</string>
-						<string key="readMemory:">id</string>
-						<string key="runningApplicationsPopUpButton:">id</string>
-						<string key="showWindow:">id</string>
-						<string key="stopDisassembling:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="nopVariables:">
-							<string key="name">nopVariables:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="readMemory:">
-							<string key="name">readMemory:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="runningApplicationsPopUpButton:">
-							<string key="name">runningApplicationsPopUpButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="showWindow:">
-							<string key="name">showWindow:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="stopDisassembling:">
-							<string key="name">stopDisassembling:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressTextField">NSTextField</string>
 						<string key="dissemblyProgressIndicator">NSProgressIndicator</string>

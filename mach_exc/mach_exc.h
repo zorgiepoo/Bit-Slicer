@@ -1,3 +1,7 @@
+// These files were generated using: mig -v mach_exc.defs
+// mach_exc.defs can be found in /usr somewhere or in the Kernel.framework
+// After you import the files into your project, you need to implement the 3 exception handler functions
+
 #ifndef	_mach_exc_user_
 #define	_mach_exc_user_
 

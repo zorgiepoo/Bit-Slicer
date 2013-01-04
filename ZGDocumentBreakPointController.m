@@ -54,6 +54,8 @@
 
 @implementation ZGDocumentBreakPointController
 
+#pragma mark Birth & Death
+
 - (id)init
 {
 	self = [super init];
@@ -77,6 +79,8 @@
 {
 	[self stopWatchingBreakPoints];
 }
+
+#pragma mark When to Stop? Stop?
 
 - (void)stopWatchingBreakPoints
 {
@@ -124,6 +128,8 @@
 	
 	[self.watchProcess addObserver:self forKeyPath:keyPath options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:NULL];
 }
+
+#pragma mark Handling Break Points
 
 - (void)breakPointDidHit:(NSNumber *)address
 {

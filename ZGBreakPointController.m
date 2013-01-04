@@ -32,6 +32,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// For information about x86 debug registers, see:
+// http://en.wikipedia.org/wiki/X86_debug_register
+
+// General summary:
+// We set up an exception handler for catching breakpoint's and run a server that listens for exceptions coming in
+// We add a hardware watchpoint when the user requests it.
+// Determine number of bytes we want to watch: 1, 2, 4, 8 (note: 32-bit processes cannot use byte-size of 8)
+// Iterate through each thread's registers, and:
+//		Checking for availability and enabling our breakpoint in dr7 (we always add a local breakpoint to every thread of a process).
+//		Modifying bits in dr7 indicating our watchpoint byte length (again: 1, 2, 4, or 8)
+//		Modifying dr0 - dr3 with our memory address of interest
+// Any time we obtain or set thread information, we suspend the task before doing so and resume it when we're done (I suppose we could just only suspend the thread instead)
+// We catch a breakpoint exception, make sure it matches with one of our breakpoints, restore what we've written to registers in all threads, and clear the dr6 status register
+// Also grab the EIP (for 32-bit processes) or RIP (for 64-bit processes) program counters, this is the address of the instruction *after* the one we're interested in
+
 #import "ZGBreakPointController.h"
 #import "ZGAppController.h"
 #import "ZGVirtualMemory.h"
@@ -51,11 +66,13 @@
 
 extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *OutHeadP);
 
+// Unused
 kern_return_t  catch_mach_exception_raise_state(mach_port_t exception_port, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
 {
 	return KERN_SUCCESS;
 }
 
+// Unused
 kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
 {
 	return KERN_SUCCESS;
@@ -171,7 +188,10 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 						ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 						
 						dispatch_async(dispatch_get_main_queue(), ^{
-							[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:@(instructionAddress)];
+							if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+							{
+								[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:@(instructionAddress)];
+							}
 						});
 						
 						[[[ZGAppController sharedController] breakPointController] removeBreakPoint:breakPoint];

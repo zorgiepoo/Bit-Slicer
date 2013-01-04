@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		1DDD582C0DA1D0D100B32029 /* MyDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* MyDocument.xib */; };
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
+		7701EF3F1696A28500877373 /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 7701EF3D1696A28500877373 /* mach_excServer.c */; };
+		7701EF401696A28500877373 /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 7701EF3E1696A28500877373 /* mach_excUser.c */; };
 		770930AC15B8F72F009705A6 /* ZGMemoryDumpController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */; };
 		770930AF15B9003D009705A6 /* ZGMemoryProtectionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930AE15B9003D009705A6 /* ZGMemoryProtectionController.m */; };
 		770930B215B9070B009705A6 /* ZGDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930B115B9070B009705A6 /* ZGDocument.m */; };
@@ -48,8 +50,6 @@
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
 		77D037371224334E0083E057 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D037361224334E0083E057 /* ZGCalculator.m */; };
 		77D5AEB5137C84D300026388 /* ZGVerticalScrollerRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		77E6529F168E3A1200D84A7F /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 77E6529C168E3A1200D84A7F /* mach_excUser.c */; };
-		77E652A0168E3A1200D84A7F /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 77E6529D168E3A1200D84A7F /* mach_excServer.c */; };
 		77E652B3168F889C00D84A7F /* ZGBreakPointController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652B2168F889C00D84A7F /* ZGBreakPointController.m */; };
 		77E652B6168F8C7700D84A7F /* ZGDocumentBreakPointController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */; };
 		77E652B9168FD49300D84A7F /* ZGBreakPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652B8168FD49300D84A7F /* ZGBreakPoint.m */; };
@@ -90,6 +90,9 @@
 		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		7701EF3C1696A28500877373 /* mach_exc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mach_exc.h; path = mach_exc/mach_exc.h; sourceTree = "<group>"; };
+		7701EF3D1696A28500877373 /* mach_excServer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excServer.c; path = mach_exc/mach_excServer.c; sourceTree = "<group>"; };
+		7701EF3E1696A28500877373 /* mach_excUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excUser.c; path = mach_exc/mach_excUser.c; sourceTree = "<group>"; };
 		770930AA15B8F72F009705A6 /* ZGMemoryDumpController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryDumpController.h; sourceTree = "<group>"; };
 		770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryDumpController.m; sourceTree = "<group>"; };
 		770930AD15B9003D009705A6 /* ZGMemoryProtectionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryProtectionController.h; sourceTree = "<group>"; };
@@ -160,9 +163,6 @@
 		77D037361224334E0083E057 /* ZGCalculator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGCalculator.m; sourceTree = "<group>"; };
 		77D5AEB3137C84CE00026388 /* ZGVerticalScrollerRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVerticalScrollerRepresenter.h; sourceTree = "<group>"; };
 		77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVerticalScrollerRepresenter.m; sourceTree = "<group>"; };
-		77E6529C168E3A1200D84A7F /* mach_excUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mach_excUser.c; sourceTree = "<group>"; };
-		77E6529D168E3A1200D84A7F /* mach_excServer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mach_excServer.c; sourceTree = "<group>"; };
-		77E6529E168E3A1200D84A7F /* mach_exc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mach_exc.h; sourceTree = "<group>"; };
 		77E652B1168F889C00D84A7F /* ZGBreakPointController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBreakPointController.h; sourceTree = "<group>"; };
 		77E652B2168F889C00D84A7F /* ZGBreakPointController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGBreakPointController.m; sourceTree = "<group>"; };
 		77E652B4168F8C7700D84A7F /* ZGDocumentBreakPointController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDocumentBreakPointController.h; sourceTree = "<group>"; };
@@ -326,13 +326,21 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7701EF411696A29100877373 /* mach_exc */ = {
+			isa = PBXGroup;
+			children = (
+				7701EF3C1696A28500877373 /* mach_exc.h */,
+				7701EF3D1696A28500877373 /* mach_excServer.c */,
+				7701EF3E1696A28500877373 /* mach_excUser.c */,
+			);
+			name = mach_exc;
+			sourceTree = "<group>";
+		};
 		77329B5A168D07B6007DCAE2 /* Debugger */ = {
 			isa = PBXGroup;
 			children = (
+				7701EF411696A29100877373 /* mach_exc */,
 				77329B74168D0E16007DCAE2 /* libudis86 */,
-				77E6529C168E3A1200D84A7F /* mach_excUser.c */,
-				77E6529D168E3A1200D84A7F /* mach_excServer.c */,
-				77E6529E168E3A1200D84A7F /* mach_exc.h */,
 				77329B55168CFE6B007DCAE2 /* ZGDisassemblerController.h */,
 				77329B56168CFE6C007DCAE2 /* ZGDisassemblerController.m */,
 				77E652B1168F889C00D84A7F /* ZGBreakPointController.h */,
@@ -492,8 +500,6 @@
 				77329B72168D0DF9007DCAE2 /* syn.c in Sources */,
 				77329B73168D0DF9007DCAE2 /* udis86.c in Sources */,
 				77329B77168D14CB007DCAE2 /* ZGInstruction.m in Sources */,
-				77E6529F168E3A1200D84A7F /* mach_excUser.c in Sources */,
-				77E652A0168E3A1200D84A7F /* mach_excServer.c in Sources */,
 				77E652B3168F889C00D84A7F /* ZGBreakPointController.m in Sources */,
 				77E652B6168F8C7700D84A7F /* ZGDocumentBreakPointController.m in Sources */,
 				77E652B9168FD49300D84A7F /* ZGBreakPoint.m in Sources */,
@@ -501,6 +507,8 @@
 				77E652EF16915B5700D84A7F /* NSArrayAdditions.m in Sources */,
 				77E652FC1692515400D84A7F /* ZGProcessList.m in Sources */,
 				77E652FF1692E77A00D84A7F /* ZGRunningProcess.m in Sources */,
+				7701EF3F1696A28500877373 /* mach_excServer.c in Sources */,
+				7701EF401696A28500877373 /* mach_excUser.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
