@@ -47,11 +47,11 @@
 			<object class="NSCustomObject" id="1004">
 				<string key="NSClassName">NSApplication</string>
 			</object>
-			<object class="NSMenu" id="1040650206">
+			<object class="NSMenu" id="881434806">
 				<string key="NSTitle"/>
 				<array class="NSMutableArray" key="NSMenuItems">
-					<object class="NSMenuItem" id="131318035">
-						<reference key="NSMenu" ref="1040650206"/>
+					<object class="NSMenuItem" id="561060768">
+						<reference key="NSMenu" ref="881434806"/>
 						<string key="NSTitle">NOP Instruction</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -383,10 +383,9 @@
 												</object>
 											</object>
 											<double key="NSRowHeight">17</double>
-											<int key="NSTvFlags">1598029824</int>
+											<int key="NSTvFlags">1581252608</int>
 											<reference key="NSDelegate"/>
 											<reference key="NSDataSource"/>
-											<string key="NSAutosaveName">ZGDisassemblerTable</string>
 											<int key="NSColumnAutoresizingStyle">4</int>
 											<int key="NSDraggingSourceMaskForLocal">15</int>
 											<int key="NSDraggingSourceMaskForNonLocal">0</int>
@@ -424,7 +423,6 @@
 									<string key="NSFrame">{{1, 343}, {505, 16}}</string>
 									<reference key="NSSuperview" ref="375143939"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView"/>
 									<string key="NSReuseIdentifierKey">_NS:60</string>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
@@ -595,7 +593,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">nopVariables:</string>
 						<reference key="source" ref="1003"/>
-						<reference key="destination" ref="131318035"/>
+						<reference key="destination" ref="561060768"/>
 					</object>
 					<int key="connectionID">104</int>
 				</object>
@@ -619,7 +617,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">menu</string>
 						<reference key="source" ref="461663476"/>
-						<reference key="destination" ref="1040650206"/>
+						<reference key="destination" ref="881434806"/>
 					</object>
 					<int key="connectionID">105</int>
 				</object>
@@ -833,17 +831,17 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100</int>
-						<reference key="object" ref="1040650206"/>
+						<reference key="object" ref="881434806"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="131318035"/>
+							<reference ref="561060768"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Right Click Menu</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">101</int>
-						<reference key="object" ref="131318035"/>
-						<reference key="parent" ref="1040650206"/>
+						<reference key="object" ref="561060768"/>
+						<reference key="parent" ref="881434806"/>
 					</object>
 				</array>
 			</object>
