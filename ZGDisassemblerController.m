@@ -203,11 +203,11 @@
 
 #pragma mark Disassembling
 
-- (void)initializeDisassemblerObject:(ud_t *)object withBytes:(void *)bytes size:(ZGMemorySize)size
+- (void)initializeDisassemblerObject:(ud_t *)object inProcess:(ZGProcess *)process withBytes:(void *)bytes size:(ZGMemorySize)size
 {
 	ud_init(object);
 	ud_set_input_buffer(object, bytes, size);
-	ud_set_mode(object, self.currentProcess.pointerSize * 8);
+	ud_set_mode(object, process.pointerSize * 8);
 	ud_set_syntax(object, UD_SYN_INTEL);
 }
 
@@ -236,7 +236,7 @@
 			if (ZGReadBytes(process.processTask, startAddress, &bytes, &size))
 			{
 				ud_t object;
-				[self initializeDisassemblerObject:&object withBytes:bytes size:size];
+				[self initializeDisassemblerObject:&object inProcess:process withBytes:bytes size:size];
 				
 				ZGMemoryAddress memoryOffset = 0;
 				ZGMemorySize memorySize = 0;
@@ -365,7 +365,7 @@
 				if (ZGReadBytes(self.currentProcess.processTask, startAddress, &bytes, &size))
 				{
 					ud_t object;
-					[self initializeDisassemblerObject:&object withBytes:bytes size:size];
+					[self initializeDisassemblerObject:&object inProcess:self.currentProcess withBytes:bytes size:size];
 					
 					NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
 					
@@ -423,7 +423,7 @@
 		if (ZGReadBytes(self.currentProcess.processTask, address, &bytes, &size))
 		{
 			ud_t object;
-			[self initializeDisassemblerObject:&object withBytes:bytes size:size];
+			[self initializeDisassemblerObject:&object inProcess:self.currentProcess withBytes:bytes size:size];
 			
 			__block NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 			
