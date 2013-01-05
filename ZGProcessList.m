@@ -144,7 +144,7 @@
 		
 		// I want user processes and I don't want zombies!
 		// Also don't get a process if it's still being created by fork() or if the pid is -1
-		if (processID != -1 && uid == getuid() && !(processList[processIndex].kp_proc.p_stat & SZOMB) && !(processList[processIndex].kp_proc.p_stat & SIDL) && processList[processIndex].kp_proc.p_stat & SRUN)
+		if (processID != -1 && uid == getuid() && !(processList[processIndex].kp_proc.p_stat & SIDL))
 		{
 			// Get CPU type
 			// http://stackoverflow.com/questions/1350181/determine-a-processs-architecture
