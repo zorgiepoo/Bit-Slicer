@@ -203,12 +203,23 @@
 
 #pragma mark Disassembling
 
-- (void)initializeDisassemblerObject:(ud_t *)object inProcess:(ZGProcess *)process withBytes:(void *)bytes size:(ZGMemorySize)size
+- (void)initializeDisassemblerObject:(ud_t *)object inProcess:(ZGProcess *)process atAddress:(ZGMemoryAddress)address withBytes:(void *)bytes size:(ZGMemorySize)size
 {
 	ud_init(object);
 	ud_set_input_buffer(object, bytes, size);
 	ud_set_mode(object, process.pointerSize * 8);
 	ud_set_syntax(object, UD_SYN_INTEL);
+	ud_set_pc(object, address);
+}
+
+- (void)enumerateDisassemblerObject:(ud_t *)object withBlock:(void (^)(ZGMemoryAddress, ZGMemorySize, NSString *, BOOL *)) callback
+{
+	BOOL stop = NO;
+	while (ud_disassemble(object) > 0)
+	{
+		callback(ud_insn_off(object), ud_insn_len(object), @(ud_insn_asm(object)), &stop);
+		if (stop) break;
+	}
 }
 
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
@@ -236,20 +247,20 @@
 			if (ZGReadBytes(process.processTask, startAddress, &bytes, &size))
 			{
 				ud_t object;
-				[self initializeDisassemblerObject:&object inProcess:process withBytes:bytes size:size];
+				[self initializeDisassemblerObject:&object inProcess:process atAddress:startAddress withBytes:bytes size:size];
 				
-				ZGMemoryAddress memoryOffset = 0;
-				ZGMemorySize memorySize = 0;
-				NSString *instructionText = nil;
-				while (ud_disassemble(&object) > 0)
-				{
-					if (ud_insn_off(&object) + ud_insn_len(&object) >= size)
+				__block ZGMemoryAddress memoryOffset = 0;
+				__block ZGMemorySize memorySize = 0;
+				__block NSString *instructionText = nil;
+				
+				[self enumerateDisassemblerObject:&object withBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop) {
+					if ((instructionAddress - startAddress) + instructionSize >= size)
 					{
-						memoryOffset = ud_insn_off(&object);
-						memorySize = ud_insn_len(&object);
-						instructionText = @(ud_insn_asm(&object));
+						memoryOffset = instructionAddress - startAddress;
+						memorySize = instructionSize;
+						instructionText = disassembledText;
 					}
-				}
+				}];
 				
 				instruction = [[ZGInstruction alloc] init];
 				ZGVariable *variable = [[ZGVariable alloc] initWithValue:bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
@@ -365,18 +376,17 @@
 				if (ZGReadBytes(self.currentProcess.processTask, startAddress, &bytes, &size))
 				{
 					ud_t object;
-					[self initializeDisassemblerObject:&object inProcess:self.currentProcess withBytes:bytes size:size];
+					[self initializeDisassemblerObject:&object inProcess:self.currentProcess atAddress:startAddress withBytes:bytes size:size];
 					
 					NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
 					
-					while (ud_disassemble(&object) > 0)
-					{
+					[self enumerateDisassemblerObject:&object withBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop)  {
 						ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
-						newInstruction.text = @(ud_insn_asm(&object));
-						newInstruction.variable = [[ZGVariable alloc] initWithValue:bytes + ud_insn_off(&object) size:ud_insn_len(&object) address:startAddress + ud_insn_off(&object) type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+						newInstruction.text = disassembledText;
+						newInstruction.variable = [[ZGVariable alloc] initWithValue:bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
 						
 						[instructionsToReplace addObject:newInstruction];
-					}
+					}];
 					
 					// Replace the visible instructions
 					NSMutableArray *newInstructions = [[NSMutableArray alloc] initWithArray:self.instructions];
@@ -423,14 +433,14 @@
 		if (ZGReadBytes(self.currentProcess.processTask, address, &bytes, &size))
 		{
 			ud_t object;
-			[self initializeDisassemblerObject:&object inProcess:self.currentProcess withBytes:bytes size:size];
+			[self initializeDisassemblerObject:&object inProcess:self.currentProcess atAddress:address withBytes:bytes size:size];
 			
 			__block NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 			
 			// We add instructions to table in batches. First time 1000 variables will be added, 2nd time 1000*2, third time 1000*2*2, etc.
-			NSUInteger thresholdCount = 1000;
+			__block NSUInteger thresholdCount = 1000;
 			
-			NSUInteger totalInstructionCount = 0;
+			__block NSUInteger totalInstructionCount = 0;
 			
 			// used for finding the instruction  theuser wants us to select
 			__block NSUInteger selectionRow = 0;
@@ -464,37 +474,39 @@
 				});
 			};
 			
-			while (ud_disassemble(&object) > 0)
-			{
+			[self enumerateDisassemblerObject:&object withBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *instruction = [[ZGInstruction alloc] init];
-				instruction.text = @(ud_insn_asm(&object));
-				instruction.variable = [[ZGVariable alloc] initWithValue:bytes + ud_insn_off(&object) size:ud_insn_len(&object) address:address + ud_insn_off(&object) type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+				instruction.text = disassembledText;
+				instruction.variable = [[ZGVariable alloc] initWithValue:bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
 				
 				[newInstructions addObject:instruction];
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					self.dissemblyProgressIndicator.doubleValue += instruction.variable.size;
-					if (selectionAddress >= instruction.variable.address && selectionAddress < instruction.variable.address + instruction.variable.size)
-					{
-						selectionRow = totalInstructionCount;
-						foundSelection = YES;
-					}
 				});
+				
+				if (selectionAddress >= instruction.variable.address && selectionAddress < instruction.variable.address + instruction.variable.size)
+				{
+					selectionRow = totalInstructionCount;
+					foundSelection = YES;
+				}
 				
 				if (!self.disassembling)
 				{
-					break;
+					*stop = YES;
 				}
-				
-				totalInstructionCount++;
-				
-				if (totalInstructionCount >= thresholdCount)
+				else
 				{
-					addBatchOfInstructions();
-					newInstructions = [[NSMutableArray alloc] init];
-					thresholdCount *= 2;
+					totalInstructionCount++;
+					
+					if (totalInstructionCount >= thresholdCount)
+					{
+						addBatchOfInstructions();
+						newInstructions = [[NSMutableArray alloc] init];
+						thresholdCount *= 2;
+					}
 				}
-			}
+			}];
 			
 			// Add the leftover batch
 			addBatchOfInstructions();
