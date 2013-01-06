@@ -134,7 +134,6 @@
 - (void)breakPointDidHit:(NSNumber *)address
 {
 	ZGMemoryAddress breakPointAddress = [address unsignedLongLongValue];
-	NSLog(@"Breakpoint address is 0x%llX", breakPointAddress);
 	ZGInstruction *instruction = [[[ZGAppController sharedController] disassemblerController] findInstructionBeforeAddress:breakPointAddress inProcess:self.watchProcess];
 	
 	// No need to watch process anymore as break point controller removed the breakpoint for us
