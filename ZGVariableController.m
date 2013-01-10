@@ -274,39 +274,7 @@
 	for (NSUInteger variableIndex = 0; variableIndex < variables.count; variableIndex++)
 	{
 		ZGVariable *variable = [variables objectAtIndex:variableIndex];
-		
-		ZGMemoryAddress memoryAddress = variable.address;
-		ZGMemorySize memorySize = variable.size;
-		ZGMemoryProtection oldProtection;
-		if (!ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &oldProtection))
-		{
-			NSLog(@"Protect lookup error!");
-			completeSuccess = NO;
-			continue;
-		}
-		
-		if (!(oldProtection & VM_PROT_WRITE))
-		{
-			ZGMemoryProtection newProtection = oldProtection | VM_PROT_WRITE;
-			if (!ZGProtect(self.document.currentProcess.processTask, memoryAddress, memorySize, newProtection))
-			{
-				NSLog(@"Protect error!");
-				completeSuccess = NO;
-				continue;
-			}
-		}
-		
 		[self changeVariable:variable newValue:[newValues objectAtIndex:variableIndex] shouldRecordUndo:NO];
-		
-		if (!(oldProtection & VM_PROT_WRITE))
-		{
-			if (!ZGProtect(self.document.currentProcess.processTask, memoryAddress, memorySize, oldProtection))
-			{
-				NSLog(@"Re-Protect error!");
-				completeSuccess = NO;
-				continue;
-			}
-		}
 	}
 	
 	self.document.undoManager.actionName = @"NOP Change";
@@ -384,7 +352,7 @@
 }
 
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag
-{
+{	
 	void *newValue = NULL;
 	ZGMemorySize writeSize = variable.size; // specifically needed for byte arrays
 	
@@ -570,6 +538,26 @@
 	
 	if (newValue)
 	{
+		BOOL completeProtectionSuccess = YES;
+		ZGMemoryAddress protectionMemoryAddress = variable.address;
+		ZGMemorySize protectionMemorySize = writeSize;
+		ZGMemoryProtection oldProtection;
+		if (!ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &protectionMemoryAddress, &protectionMemorySize, &oldProtection))
+		{
+			NSLog(@"Protect lookup error!");
+			completeProtectionSuccess = NO;
+		}
+		
+		if (completeProtectionSuccess && !(oldProtection & VM_PROT_WRITE))
+		{
+			ZGMemoryProtection newProtection = oldProtection | VM_PROT_WRITE;
+			if (!ZGProtect(self.document.currentProcess.processTask, protectionMemoryAddress, protectionMemorySize, newProtection))
+			{
+				NSLog(@"Protect error!");
+				completeProtectionSuccess = NO;
+			}
+		}
+		
 		if (variable.isFrozen)
 		{
 			variable.freezeValue = newValue;
@@ -626,6 +614,14 @@
 				{
 					[self.document.tableController.watchVariablesTableView reloadData];
 				}
+			}
+		}
+		
+		if (completeProtectionSuccess && !(oldProtection & VM_PROT_WRITE))
+		{
+			if (!ZGProtect(self.document.currentProcess.processTask, protectionMemoryAddress, protectionMemorySize, oldProtection))
+			{
+				NSLog(@"Re-Protect error!");
 			}
 		}
 	}

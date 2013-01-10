@@ -373,8 +373,9 @@
 			
 			if (ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 			{
-				// if the variable is within a single memory region and the memory region is not writable, then the variable is not editable
-				if (memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_WRITE))
+				// if the variable is within a single memory region and the memory region is not readable, then don't allow the variable to be writable
+				// if it is not writable, our value changing methods will try to change the protection attributes before modifying the data
+				if (memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_READ))
 				{
 					NSBeep();
 					return NO;
