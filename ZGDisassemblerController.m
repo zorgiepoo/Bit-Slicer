@@ -693,16 +693,14 @@ END_DEBUGGER_CHANGE:
 
 #pragma mark Useful methods for the world
 
-- (ZGInstruction *)selectedInstruction
+- (NSArray *)selectedInstructions
 {
-	ZGInstruction *instruction = nil;
+	NSIndexSet *tableIndexSet = self.instructionsTableView.selectedRowIndexes;
+	NSInteger clickedRow = self.instructionsTableView.clickedRow;
 	
-	if (self.instructionsTableView.selectedRow >= 0 && (NSUInteger)self.instructionsTableView.selectedRow < self.instructions.count)
-	{
-		instruction = [self.instructions objectAtIndex:self.instructionsTableView.selectedRow];
-	}
+	NSIndexSet *selectionIndexSet = (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
 	
-	return instruction;
+	return [self.instructions objectsAtIndexes:selectionIndexSet];
 }
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess
@@ -741,20 +739,18 @@ END_DEBUGGER_CHANGE:
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
-{
-	NSIndexSet *rowIndexes = self.instructionsTableView.clickedRow != -1 ? [NSIndexSet indexSetWithIndex:self.instructionsTableView.clickedRow] : self.instructionsTableView.selectedRowIndexes;
-	
+{	
 	if (menuItem.action == @selector(nopVariables:))
 	{
-		[menuItem setTitle:[NSString stringWithFormat:@"NOP Instruction%@", rowIndexes.count == 1 ? @"" : @"s"]];
-		if (rowIndexes.count <= 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.instructionsTableView.editedRow != -1)
+		[menuItem setTitle:[NSString stringWithFormat:@"NOP Instruction%@", self.selectedInstructions.count == 1 ? @"" : @"s"]];
+		if (self.selectedInstructions.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.instructionsTableView.editedRow != -1)
 		{
 			return NO;
 		}
 	}
 	else if (menuItem.action == @selector(copy:))
 	{
-		if (rowIndexes.count <= 0)
+		if (self.selectedInstructions.count == 0)
 		{
 			return NO;
 		}
@@ -770,11 +766,8 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)copy:(id)sender
 {
-	NSIndexSet *rowIndexes = self.instructionsTableView.clickedRow != -1 ? [NSIndexSet indexSetWithIndex:self.instructionsTableView.clickedRow] : self.instructionsTableView.selectedRowIndexes;
-	
 	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
-	NSArray *instructions = [self.instructions objectsAtIndexes:rowIndexes];
-	for (ZGInstruction *instruction in instructions)
+	for (ZGInstruction *instruction in self.selectedInstructions)
 	{
 		[descriptionComponents addObject:[@[instruction.variable.addressStringValue, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
 	}
@@ -874,9 +867,7 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)nopVariables:(id)sender
 {
-	NSIndexSet *rowIndexes = self.instructionsTableView.clickedRow != -1 ? [NSIndexSet indexSetWithIndex:self.instructionsTableView.clickedRow] : self.instructionsTableView.selectedRowIndexes;
-	
-	NSArray *selectedInstructions = [self.instructions objectsAtIndexes:rowIndexes];
+	NSArray *selectedInstructions = [self selectedInstructions];
 	NSMutableArray *newStringValues = [[NSMutableArray alloc] init];
 	NSMutableArray *oldStringValues = [[NSMutableArray alloc] init];
 	
