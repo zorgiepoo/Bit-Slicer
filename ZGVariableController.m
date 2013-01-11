@@ -227,9 +227,13 @@
 	
 	if (variableType == ZGByteArray && [[[[ZGAppController sharedController] disassemblerController] currentProcess] processID] == self.document.currentProcess.processID)
 	{
-		ZGInstruction *selectedInstruction = [[[ZGAppController sharedController] disassemblerController] selectedInstruction];
-		initialAddress = selectedInstruction.variable.address;
-		initialSize = selectedInstruction.variable.size;
+		NSArray *selectedInstructions = [[[ZGAppController sharedController] disassemblerController] selectedInstructions];
+		if (selectedInstructions.count > 0)
+		{
+			ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
+			initialAddress = selectedInstruction.variable.address;
+			initialSize = selectedInstruction.variable.size;
+		}
 	}
 	else if ([[[[ZGAppController sharedController] memoryViewer] currentProcess] processID] == self.document.currentProcess.processID)
 	{
