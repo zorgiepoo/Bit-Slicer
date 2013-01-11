@@ -541,27 +541,7 @@
 	}
 	
 	if (newValue)
-	{
-		BOOL completeProtectionSuccess = YES;
-		ZGMemoryAddress protectionMemoryAddress = variable.address;
-		ZGMemorySize protectionMemorySize = writeSize;
-		ZGMemoryProtection oldProtection;
-		if (!ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &protectionMemoryAddress, &protectionMemorySize, &oldProtection))
-		{
-			NSLog(@"Protect lookup error!");
-			completeProtectionSuccess = NO;
-		}
-		
-		if (completeProtectionSuccess && !(oldProtection & VM_PROT_WRITE))
-		{
-			ZGMemoryProtection newProtection = oldProtection | VM_PROT_WRITE;
-			if (!ZGProtect(self.document.currentProcess.processTask, protectionMemoryAddress, protectionMemorySize, newProtection))
-			{
-				NSLog(@"Protect error!");
-				completeProtectionSuccess = NO;
-			}
-		}
-		
+	{	
 		if (variable.isFrozen)
 		{
 			variable.freezeValue = newValue;
@@ -586,7 +566,7 @@
 			
 			if (writeSize)
 			{
-				if (!ZGWriteBytes(self.document.currentProcess.processTask, variable.address, newValue, writeSize))
+				if (!ZGWriteBytesIgnoringProtection(self.document.currentProcess.processTask, variable.address, newValue, writeSize))
 				{
 					successfulWrite = NO;
 				}
@@ -600,7 +580,7 @@
 			{
 				// Don't forget to write the null terminator
 				unichar nullTerminator = 0;
-				if (!ZGWriteBytes(self.document.currentProcess.processTask, variable.address + writeSize, &nullTerminator, sizeof(unichar)))
+				if (!ZGWriteBytesIgnoringProtection(self.document.currentProcess.processTask, variable.address + writeSize, &nullTerminator, sizeof(unichar)))
 				{
 					successfulWrite = NO;
 				}
@@ -618,14 +598,6 @@
 				{
 					[self.document.tableController.watchVariablesTableView reloadData];
 				}
-			}
-		}
-		
-		if (completeProtectionSuccess && !(oldProtection & VM_PROT_WRITE))
-		{
-			if (!ZGProtect(self.document.currentProcess.processTask, protectionMemoryAddress, protectionMemorySize, oldProtection))
-			{
-				NSLog(@"Re-Protect error!");
 			}
 		}
 	}

@@ -40,6 +40,8 @@
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 #import "ZGInstruction.h"
+#import "ZGBreakPoint.h"
+#import "ZGBreakPointController.h"
 #import "udis86.h"
 #import "ZGUtilities.h"
 
@@ -55,6 +57,7 @@
 @property (readwrite) ZGMemorySize currentMemorySize;
 
 @property (nonatomic, strong) NSArray *instructions;
+@property (nonatomic, strong) NSArray *breakPoints;
 
 @property (readwrite, strong, nonatomic) NSTimer *updateInstructionsTimer;
 @property (readwrite, nonatomic) BOOL disassembling;
@@ -63,6 +66,8 @@
 @property (nonatomic, copy) NSString *desiredProcessName;
 
 @property (nonatomic, strong) NSUndoManager *undoManager;
+
+@property (nonatomic, assign) void *temporaryBuffer;
 
 @end
 
@@ -78,6 +83,7 @@
 	self = [super initWithWindowNibName:NSStringFromClass([self class])];
 	
 	self.undoManager = [[NSUndoManager alloc] init];
+	self.breakPoints = @[];
 	
 	return self;
 }
@@ -205,8 +211,21 @@
 
 - (void)initializeDisassemblerObject:(ud_t *)object inProcess:(ZGProcess *)process atAddress:(ZGMemoryAddress)address withBytes:(void *)bytes size:(ZGMemorySize)size
 {
+	// Our breakpoints actually overwrite the 1st byte of an instruction
+	// Fake this so that the user does not notice
+	self.temporaryBuffer = malloc(size);
+	memcpy(_temporaryBuffer, bytes, size);
+	
+	for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
+	{
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address >= address && breakPoint.variable.address + breakPoint.variable.size <= address + size)
+		{
+			memcpy(self.temporaryBuffer + (breakPoint.variable.address - address), breakPoint.variable.value, breakPoint.variable.size);
+		}
+	}
+	
 	ud_init(object);
-	ud_set_input_buffer(object, bytes, size);
+	ud_set_input_buffer(object, self.temporaryBuffer, size);
 	ud_set_mode(object, process.pointerSize * 8);
 	ud_set_syntax(object, UD_SYN_INTEL);
 	ud_set_pc(object, address);
@@ -220,6 +239,9 @@
 		callback(ud_insn_off(object), ud_insn_len(object), @(ud_insn_asm(object)), &stop);
 		if (stop) break;
 	}
+	
+	free(self.temporaryBuffer);
+	self.temporaryBuffer = NULL;
 }
 
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
@@ -295,8 +317,25 @@
 				 {
 					 if (memcmp(bytes, instruction.variable.value, size) != 0)
 					 {
-						 needsToUpdateWindow = YES;
-						 *stop = YES;
+						 // Ignore breakpoint changes
+						 BOOL foundBreakPoint = NO;
+						 if (*(uint8_t *)bytes == INSTRUCTION_BREAKPOINT_OPCODE)
+						 {
+							 for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
+							 {
+								 if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address)
+								 {
+									 foundBreakPoint = YES;
+									 break;
+								 }
+							 }
+						 }
+						 
+						 if (!foundBreakPoint)
+						 {
+							 needsToUpdateWindow = YES;
+							 *stop = YES;
+						 }
 					 }
 					 
 					 ZGFreeBytes(self.currentProcess.processTask, bytes, size);
@@ -837,29 +876,7 @@ END_DEBUGGER_CHANGE:
 	
 	if (newValue)
 	{
-		ZGMemoryAddress protectionAddress = address;
-		ZGMemorySize protectionSize = newSize;
-		ZGMemoryProtection oldProtection = 0;
-		
-		if (ZGMemoryProtectionInRegion(self.currentProcess.processTask, &protectionAddress, &protectionSize, &oldProtection))
-		{
-			BOOL canWrite = oldProtection & VM_PROT_WRITE;
-			if (!canWrite)
-			{
-				canWrite = ZGProtect(self.currentProcess.processTask, protectionAddress, protectionSize, oldProtection | VM_PROT_WRITE);
-			}
-			
-			if (canWrite)
-			{
-				ZGWriteBytes(self.currentProcess.processTask, address, newValue, newSize);
-				
-				// Re-protect the region back to the way it was
-				if (!(oldProtection & VM_PROT_WRITE))
-				{
-					ZGProtect(self.currentProcess.processTask, protectionAddress, protectionSize, oldProtection);
-				}
-			}
-		}
+		ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newValue, newSize);
 		
 		free(newValue);
 	}
@@ -886,6 +903,16 @@ END_DEBUGGER_CHANGE:
 	}
 	
 	[self replaceInstructions:selectedInstructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues actionName:@"NOP Change"];
+}
+
+#pragma mark Break Points
+
+- (IBAction)addBreakPoints:(id)sender
+{
+	for (ZGInstruction *instruction in self.selectedInstructions)
+	{
+		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess delegate:self getBreakPoint:nil];
+	}
 }
 
 @end

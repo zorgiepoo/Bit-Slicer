@@ -124,6 +124,36 @@ BOOL ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *
 	return (mach_vm_write(processTask, address, (vm_offset_t)bytes, (mach_msg_type_number_t)size) == KERN_SUCCESS);
 }
 
+BOOL ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)
+{
+	ZGMemoryAddress protectionAddress = address;
+	ZGMemorySize protectionSize = size;
+	ZGMemoryProtection oldProtection = 0;
+	
+	if (!ZGMemoryProtectionInRegion(processTask, &protectionAddress, &protectionSize, &oldProtection))
+	{
+		return NO;
+	}
+	
+	if (!(oldProtection & VM_PROT_WRITE))
+	{
+		if (!ZGProtect(processTask, protectionAddress, protectionSize, oldProtection | VM_PROT_WRITE))
+		{
+			return NO;
+		}
+	}
+	
+	BOOL success = ZGWriteBytes(processTask, address, bytes, size);
+	
+	// Re-protect the region back to the way it was
+	if (!(oldProtection & VM_PROT_WRITE))
+	{
+		ZGProtect(processTask, protectionAddress, protectionSize, oldProtection);
+	}
+	
+	return success;
+}
+
 BOOL ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection)
 {
 	BOOL success = NO;

@@ -54,11 +54,12 @@
 #import "ZGProcess.h"
 #import "ZGDebugThread.h"
 #import "ZGBreakPoint.h"
+#import "ZGInstruction.h"
+#import "ZGDisassemblerController.h"
 
 @interface ZGBreakPointController ()
 
 @property (readwrite, nonatomic) mach_port_t exceptionPort;
-@property (strong) NSArray *breakPoints;
 
 @end
 
@@ -142,11 +143,15 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	else if (debugRegisterIndex == 2 && debugState.uds.type.__dr6 & (1 << 2) && debugState.uds.type.__dr7 & (1 << 2*2)) { debugAddress = debugState.uds.type.__dr2; } \
 	else if (debugRegisterIndex == 3 && debugState.uds.type.__dr6 & (1 << 3) && debugState.uds.type.__dr7 & (1 << 2*3)) { debugAddress = debugState.uds.type.__dr3; } \
 
-kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
+- (void)handleWatchPointsWithTask:(mach_port_t) task inThread:(mach_port_t)thread
 {
-	NSArray *breakPoints = [[[ZGAppController sharedController] breakPointController] breakPoints];
-	for (ZGBreakPoint *breakPoint in breakPoints)
+	for (ZGBreakPoint *breakPoint in self.breakPoints)
 	{
+		if (breakPoint.type != ZGBreakPointWatchDataWrite)
+		{
+			continue;
+		}
+		
 		if (breakPoint.task == task)
 		{
 			ZGSuspendTask(task);
@@ -204,6 +209,105 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			ZGResumeTask(task);
 		}
 	}
+}
+
+- (void)handleInstructionBreakPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
+{
+	ZGSuspendTask(task);
+	
+	for (ZGBreakPoint *breakPoint in self.breakPoints)
+	{
+		if (breakPoint.type != ZGBreakPointInstruction)
+		{
+			continue;
+		}
+		
+		if (breakPoint.task == task)
+		{
+			x86_thread_state_t threadState;
+			mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
+			if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+			{
+				NSLog(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping.");
+				continue;
+			}
+			
+			ZGInstruction *foundInstruction = [[[ZGAppController sharedController] disassemblerController] findInstructionBeforeAddress:(breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) inProcess:breakPoint.process];
+			
+			NSLog(@"Instruction address: 0x%llX", foundInstruction.variable.address);
+			
+			if (foundInstruction.variable.address == breakPoint.variable.address)
+			{
+				uint8_t *opcode = NULL;
+				ZGMemorySize size = 0x1;
+				
+				if (ZGReadBytes(breakPoint.process.processTask, foundInstruction.variable.address, (void **)&opcode, &size))
+				{
+					if (*opcode == INSTRUCTION_BREAKPOINT_OPCODE)
+					{
+						NSLog(@"Suspending task...");
+						ZGSuspendTask(task);
+						
+						// Restore program counter and get ready to single-step
+						if (breakPoint.process.is64Bit)
+						{
+							threadState.uts.ts64.__rip = foundInstruction.variable.address;
+							threadState.uts.ts64.__rflags |= (1 << 8);
+						}
+						else
+						{
+							threadState.uts.ts32.__eip = (uint32_t)foundInstruction.variable.address;
+							threadState.uts.ts32.__eflags |= (1 << 8);
+						}
+						
+						ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, foundInstruction.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+						
+						dispatch_async(dispatch_get_main_queue(), ^{
+							if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+							{
+								[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:@(foundInstruction.variable.address)];
+							}
+						});
+					}
+					else
+					{
+						NSLog(@"Single-stepped");
+						
+						// Remove single-stepping
+						if (breakPoint.process.is64Bit)
+						{
+							threadState.uts.ts64.__rflags &= ~(1 << 8);
+						}
+						else
+						{
+							threadState.uts.ts32.__eflags &= ~(1 << 8);
+						}
+						
+						// Restore our breakpoint
+						uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
+						ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, foundInstruction.variable.address, &writeOpcode, sizeof(uint8_t));
+					}
+					
+					if (thread_set_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+					{
+						NSLog(@"Failure in setting registers thread state for catching breakpoint for thread %d", thread);
+					}
+					
+					ZGFreeBytes(breakPoint.process.processTask, opcode, size);
+				}
+			}
+		}
+	}
+	
+	ZGResumeTask(task);
+}
+
+kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
+{
+	NSLog(@"Did exception get called?");
+	
+	[[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
+	[[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread];
 	
 	return KERN_SUCCESS;
 }
@@ -219,6 +323,48 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			ZGResumeTask(breakPoint.task);
 		}
 	}
+}
+
+- (BOOL)setUpExceptionPortForProcess:(ZGProcess *)process
+{
+	if (self.exceptionPort == MACH_PORT_NULL)
+	{
+		if (mach_port_allocate(current_task(), MACH_PORT_RIGHT_RECEIVE, &_exceptionPort) != KERN_SUCCESS)
+		{
+			NSLog(@"ERROR: Could not allocate mach port for adding breakpoint");
+			self.exceptionPort = MACH_PORT_NULL;
+			return NO;
+		}
+		
+		if (mach_port_insert_right(current_task(), self.exceptionPort, self.exceptionPort, MACH_MSG_TYPE_MAKE_SEND) != KERN_SUCCESS)
+		{
+			NSLog(@"ERROR: Could not insert send right for watchpoint");
+			if (mach_port_deallocate(current_task(), self.exceptionPort) != KERN_SUCCESS)
+			{
+				NSLog(@"ERROR: Could not deallocate exception port in adding breakpoint");
+			}
+			self.exceptionPort = MACH_PORT_NULL;
+			return NO;
+		}
+	}
+	
+	if (task_set_exception_ports(process.processTask, EXC_MASK_BREAKPOINT, self.exceptionPort, EXCEPTION_DEFAULT | MACH_EXCEPTION_CODES, MACHINE_THREAD_STATE) != KERN_SUCCESS)
+	{
+		NSLog(@"ERROR: task_set_exception_ports failed on adding breakpoint");
+		return NO;
+	}
+	
+	static dispatch_once_t once = 0;
+	dispatch_once(&once, ^{
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			if (mach_msg_server(mach_exc_server, 2048, self.exceptionPort, MACH_MSG_TIMEOUT_NONE) != MACH_MSG_SUCCESS)
+			{
+				NSLog(@"mach_msg_server_once() returned on error!");
+			}
+		});
+    });
+	
+	return YES;
 }
 
 #define IS_REGISTER_AVAILABLE(type) (!(debugState.uds.type.__dr7 & (1 << 2*registerIndex)) && !(debugState.uds.type.__dr7 & (1 << 2*registerIndex+1)))
@@ -242,30 +388,8 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
 {
-	if (self.exceptionPort == MACH_PORT_NULL)
+	if (![self setUpExceptionPortForProcess:process])
 	{
-		if (mach_port_allocate(current_task(), MACH_PORT_RIGHT_RECEIVE, &_exceptionPort) != KERN_SUCCESS)
-		{
-			NSLog(@"ERROR: Could not allocate mach port for watchpoint");
-			self.exceptionPort = MACH_PORT_NULL;
-			return NO;
-		}
-		
-		if (mach_port_insert_right(current_task(), self.exceptionPort, self.exceptionPort, MACH_MSG_TYPE_MAKE_SEND) != KERN_SUCCESS)
-		{
-			NSLog(@"ERROR: Could not insert send right for watchpoint");
-			if (mach_port_deallocate(current_task(), self.exceptionPort) != KERN_SUCCESS)
-			{
-				NSLog(@"ERROR: Could not deallocate exception port in watchpoint");
-			}
-			self.exceptionPort = MACH_PORT_NULL;
-			return NO;
-		}
-	}
-	
-	if (task_set_exception_ports(process.processTask, EXC_MASK_BREAKPOINT, self.exceptionPort, EXCEPTION_DEFAULT | MACH_EXCEPTION_CODES, MACHINE_THREAD_STATE) != KERN_SUCCESS)
-	{
-		NSLog(@"ERROR: task_set_exception_ports failed on adding watchpoint");
 		return NO;
 	}
 	
@@ -374,6 +498,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	breakPoint.variable = variable;
 	breakPoint.watchSize = watchSize;
 	breakPoint.process = process;
+	breakPoint.type = ZGBreakPointWatchDataWrite;
 	
 	NSMutableArray *currentBreakPoints = [[NSMutableArray alloc] initWithArray:self.breakPoints];
 	[currentBreakPoints addObject:breakPoint];
@@ -384,17 +509,41 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		*returnedBreakPoint = breakPoint;
 	}
 	
-	static dispatch_once_t once = 0;
-	dispatch_once(&once, ^{
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			if (mach_msg_server(mach_exc_server, 2048, self.exceptionPort, MACH_MSG_TIMEOUT_NONE) != MACH_MSG_SUCCESS)
-			{
-				NSLog(@"mach_msg_server_once() returned on error!");
-			}
-		});
-    });
-	
 	return YES;
+}
+
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
+{
+	if (![self setUpExceptionPortForProcess:process])
+	{
+		return NO;
+	}
+	
+	ZGVariable *variable = [instruction.variable copy];
+	
+	uint8_t breakPointOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
+	BOOL success = ZGWriteBytesIgnoringProtection(process.processTask, variable.address, &breakPointOpcode, sizeof(uint8_t));
+	if (success)
+	{
+		NSLog(@"Adding new breakpoint!");
+		ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] init];
+		breakPoint.delegate = delegate;
+		breakPoint.task = process.processTask;
+		breakPoint.variable = variable;
+		breakPoint.process = process;
+		breakPoint.type = ZGBreakPointInstruction;
+		
+		if (returnedBreakPoint)
+		{
+			*returnedBreakPoint = breakPoint;
+		}
+		
+		NSMutableArray *currentBreakPoints = [[NSMutableArray alloc] initWithArray:self.breakPoints];
+		[currentBreakPoints addObject:breakPoint];
+		self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+	}
+	
+	return success;
 }
 
 @end

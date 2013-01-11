@@ -34,11 +34,18 @@
 
 #import <Foundation/Foundation.h>
 
+#define INSTRUCTION_BREAKPOINT_OPCODE 0xCC
+
 @class ZGVariable;
 @class ZGProcess;
 @class ZGBreakPoint;
+@class ZGInstruction;
 
 @interface ZGBreakPointController : NSObject
+
+@property (strong) NSArray *breakPoints;
+
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
 - (void)removeWatchObserver:(id)observer;
