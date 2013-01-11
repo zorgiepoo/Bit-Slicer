@@ -146,7 +146,7 @@
 {
 	// guess what the user may want if nothing is in the text fields
 	NSArray *selectedVariables = self.document.selectedVariables;
-	if (selectedVariables && [self.memoryDumpFromAddressTextField.stringValue isEqualToString:@""] && [self.memoryDumpToAddressTextField.stringValue isEqualToString:@""])
+	if (selectedVariables.count > 0 && [self.memoryDumpFromAddressTextField.stringValue isEqualToString:@""] && [self.memoryDumpToAddressTextField.stringValue isEqualToString:@""])
 	{
 		ZGVariable *firstVariable = [selectedVariables objectAtIndex:0];
 		ZGVariable *lastVariable = [selectedVariables lastObject];

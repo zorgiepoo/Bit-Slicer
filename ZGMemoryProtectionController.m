@@ -143,7 +143,7 @@
 {
 	// guess what the user may want based on the selected variables
 	NSArray *selectedVariables = self.document.selectedVariables;
-	if (selectedVariables)
+	if (selectedVariables.count > 0)
 	{
 		ZGVariable *firstVariable = [selectedVariables objectAtIndex:0];
 		

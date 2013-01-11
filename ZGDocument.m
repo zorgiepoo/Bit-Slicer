@@ -113,7 +113,12 @@
 
 - (NSArray *)selectedVariables
 {
-	return (self.tableController.watchVariablesTableView.selectedRow == -1) ? nil : [self.watchVariablesArray objectsAtIndexes:self.tableController.watchVariablesTableView.selectedRowIndexes];
+	NSIndexSet *tableIndexSet = self.tableController.watchVariablesTableView.selectedRowIndexes;
+	NSInteger clickedRow = self.tableController.watchVariablesTableView.clickedRow;
+	
+	NSIndexSet *selectionIndexSet = (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
+	
+	return [self.watchVariablesArray objectsAtIndexes:selectionIndexSet];
 }
 
 #pragma mark Document stuff
@@ -1023,7 +1028,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(removeSelectedSearchValues:))
 	{
-		if (self.tableController.watchVariablesTableView.selectedRow < 0 || self.watchWindow.firstResponder != self.tableController.watchVariablesTableView)
+		if (self.selectedVariables.count == 0 || self.watchWindow.firstResponder != self.tableController.watchVariablesTableView)
 		{
 			return NO;
 		}
@@ -1031,33 +1036,22 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(freezeVariables:))
 	{
-		if (self.watchVariablesArray.count > 0)
+		if (self.selectedVariables.count > 0)
 		{
 			// All the variables selected need to either be all unfrozen or all frozen
-			BOOL isFrozen = [[self.watchVariablesArray objectAtIndex:self.tableController.watchVariablesTableView.selectedRow] isFrozen];
+			BOOL isFrozen = [[self.selectedVariables objectAtIndex:0] isFrozen];
 			BOOL isInconsistent = NO;
 			
-			NSUInteger currentIndex = self.tableController.watchVariablesTableView.selectedRowIndexes.firstIndex;
-			while (currentIndex != NSNotFound)
+			for (ZGVariable *variable in [self.selectedVariables subarrayWithRange:NSMakeRange(1, self.selectedVariables.count-1)])
 			{
-				ZGVariable *variable = [self.watchVariablesArray objectAtIndex:currentIndex];
-				// we should also check if the variable has an existing value at all
-				if (variable && (variable.isFrozen != isFrozen || !variable.value))
+				if (variable.isFrozen != isFrozen || !variable.value)
 				{
 					isInconsistent = YES;
 					break;
 				}
-				currentIndex = [self.tableController.watchVariablesTableView.selectedRowIndexes indexGreaterThanIndex:currentIndex];
 			}
 			
-			NSString *title = isFrozen ? @"Unfreeze Variable" : @"Freeze Variable";
-			
-			if ([[self.tableController.watchVariablesTableView selectedRowIndexes] count] > 1)
-			{
-				title = [title stringByAppendingString:@"s"];
-			}
-			
-			menuItem.title = title;
+			menuItem.title = [NSString stringWithFormat:@"%@ Variable%@", isFrozen ? @"Unfreeze" : @"Freeze", self.selectedVariables.count != 1 ? @"s" : @""];
 			
 			if (isInconsistent || !self.clearButton.isEnabled)
 			{
@@ -1089,7 +1083,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(copy:))
 	{
-		if (self.tableController.watchVariablesTableView.selectedRowIndexes.count == 0)
+		if (self.selectedVariables.count == 0)
 		{
 			return NO;
 		}
@@ -1117,15 +1111,15 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 		else
 		{
-			menuItem.title = suspendCount > 0 ? @"Unpause Target" : @"Pause Target";
+			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
 		}
 	}
 	
 	else if (menuItem.action == @selector(editVariablesValue:))
 	{
-		menuItem.title = self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1 ? @"Edit Variable Values…" : @"Edit Variable Value…";
+		menuItem.title = [NSString stringWithFormat:@"Edit Variable Value%@…", self.selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -1133,7 +1127,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(editVariablesAddress:))
 	{
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -1141,15 +1135,15 @@ static NSSize *expandedWindowMinSize = nil;
     
     else if (menuItem.action == @selector(editVariablesSize:))
     {
-		menuItem.title = self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1 ? @"Edit Variable Sizes…" : @"Edit Variable Size…";
+		NSArray *selectedVariables = [self selectedVariables];
+		menuItem.title = [NSString stringWithFormat:@"Edit Variable Size%@…", selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || selectedVariables.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
 		
 		// All selected variables must be Byte Array's
-		NSArray *selectedVariables = [self.watchVariablesArray objectsAtIndexes:self.tableController.watchVariablesTableView.selectedRowIndexes];
 		for (ZGVariable *variable in selectedVariables)
 		{
 			if (variable.type != ZGByteArray)
@@ -1176,7 +1170,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(watchVariable:))
 	{
-		if ([self.searchController canCancelTask] || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1)
+		if ([self.searchController canCancelTask] || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.selectedVariables.count != 1)
 		{
 			return NO;
 		}
@@ -1204,16 +1198,16 @@ static NSSize *expandedWindowMinSize = nil;
 	}
 	
 	else if (menuItem.action == @selector(nopVariables:))
-	{	
-		[menuItem setTitle:self.selectedVariables.count == 1 ? @"NOP Variable" : @"NOP Variables"];
+	{
+		menuItem.title = [NSString stringWithFormat:@"NOP Variable%@", self.selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.tableController.watchVariablesTableView.selectedRow == -1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
 		
 		BOOL isValid = YES;
-		for (ZGVariable *variable in [self selectedVariables])
+		for (ZGVariable *variable in self.selectedVariables)
 		{
 			if (variable.type != ZGByteArray || !variable.value)
 			{
@@ -1227,7 +1221,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(showMemoryViewer:))
 	{
-		if (self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (self.selectedVariables.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
@@ -1241,7 +1235,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(showDisassembler:))
 	{
-		if (self.tableController.watchVariablesTableView.selectedRowIndexes.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (self.selectedVariables.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
 		{
 			return NO;
 		}
