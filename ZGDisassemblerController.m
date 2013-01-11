@@ -481,9 +481,7 @@
 			
 			__block NSUInteger totalInstructionCount = 0;
 			
-			// used for finding the instruction  theuser wants us to select
 			__block NSUInteger selectionRow = 0;
-			__block BOOL foundSelection = NO;
 			
 			// Block for adding a batch of instructions which will be used for later
 			void (^addBatchOfInstructions)(void) = ^{
@@ -500,16 +498,6 @@
 					self.instructions = [NSArray arrayWithArray:appendedInstructions];
 					[self.instructionsTableView noteNumberOfRowsChanged];
 					self.currentMemorySize = self.instructions.count;
-					
-					if (foundSelection)
-					{
-						// Scroll such that the selected row is centered
-						[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionRow] byExtendingSelection:NO];
-						NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
-						[self.instructionsTableView scrollRowToVisible:MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
-						// we won't want to do this again
-						foundSelection = NO;
-					}
 				});
 			};
 			
@@ -527,7 +515,6 @@
 				if (selectionAddress >= instruction.variable.address && selectionAddress < instruction.variable.address + instruction.variable.size)
 				{
 					selectionRow = totalInstructionCount;
-					foundSelection = YES;
 				}
 				
 				if (!self.disassembling)
@@ -551,6 +538,11 @@
 			addBatchOfInstructions();
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
+				// Scroll such that the selected row is centered
+				[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionRow] byExtendingSelection:NO];
+				NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+				[self.instructionsTableView scrollRowToVisible:MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
+				
 				self.disassembling = NO;
 				[self.dissemblyProgressIndicator setHidden:YES];
 				[self.addressTextField setEnabled:YES];
