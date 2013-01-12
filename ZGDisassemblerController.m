@@ -293,7 +293,7 @@
 						 {
 							 for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
 							 {
-								 if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address)
+								 if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.value == *(uint8_t *)instruction.variable.value)
 								 {
 									 foundBreakPoint = YES;
 									 break;
@@ -860,24 +860,6 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
-{
-	ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
-	
-	if ([tableColumn.identifier isEqualToString:@"bytes"])
-	{
-		for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
-		{
-			if (instruction.variable.address == breakPoint.variable.address)
-			{
-				return NO;
-			}
-		}
-	}
-	
-	return YES;
-}
-
 #pragma mark Modifying instructions
 
 - (void)replaceInstructions:(NSArray *)instructions fromOldStringValues:(NSArray *)oldStringValues toNewStringValues:(NSArray *)newStringValues actionName:(NSString *)actionName
@@ -900,7 +882,29 @@ END_DEBUGGER_CHANGE:
 	
 	if (newValue)
 	{
-		ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newValue, newSize);
+		ZGBreakPoint *targetBreakPoint = nil;
+		for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
+		{
+			if (address == breakPoint.variable.address)
+			{
+				targetBreakPoint = breakPoint;
+				break;
+			}
+		}
+		
+		if (!targetBreakPoint)
+		{
+			ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newValue, newSize);
+		}
+		else
+		{
+			if (newSize > 1)
+			{
+				ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address+sizeof(uint8_t), newValue+sizeof(uint8_t), newSize-sizeof(uint8_t));
+			}
+			
+			*(uint8_t *)targetBreakPoint.variable.value = *(uint8_t *)newValue;
+		}
 		
 		free(newValue);
 	}
