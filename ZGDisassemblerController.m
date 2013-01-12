@@ -42,7 +42,7 @@
 #import "ZGInstruction.h"
 #import "ZGBreakPoint.h"
 #import "ZGBreakPointController.h"
-#import "udis86.h"
+#import "ZGDisassemblerObject.h"
 #import "ZGUtilities.h"
 
 @interface ZGDisassemblerController ()
@@ -65,8 +65,6 @@
 @property (nonatomic, copy) NSString *desiredProcessName;
 
 @property (nonatomic, strong) NSUndoManager *undoManager;
-
-@property (nonatomic, assign) void *temporaryBuffer;
 
 @property (nonatomic, strong) ZGBreakPoint *currentBreakPoint;
 
@@ -217,53 +215,6 @@
 
 #pragma mark Disassembling
 
-- (void)initializeDisassemblerObject:(ud_t *)object inProcess:(ZGProcess *)process atAddress:(ZGMemoryAddress)address withBytes:(void *)bytes size:(ZGMemorySize)size getDisassembledBytes:(void **)disassembledBytes
-{
-	// Our breakpoints actually overwrite the 1st byte of an instruction
-	// Fake this so that the user does not notice
-	[self cleanupDisassembler];
-	self.temporaryBuffer = malloc(size);
-	memcpy(self.temporaryBuffer, bytes, size);
-	
-	for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
-	{	
-		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address >= address && breakPoint.variable.address + breakPoint.variable.size <= address + size)
-		{
-			memcpy(self.temporaryBuffer + (breakPoint.variable.address - address), breakPoint.variable.value, sizeof(uint8_t));
-		}
-	}
-	
-	if (disassembledBytes)
-	{
-		*disassembledBytes = self.temporaryBuffer;
-	}
-	
-	ud_init(object);
-	ud_set_input_buffer(object, self.temporaryBuffer, size);
-	ud_set_mode(object, process.pointerSize * 8);
-	ud_set_syntax(object, UD_SYN_INTEL);
-	ud_set_pc(object, address);
-}
-
-- (void)enumerateDisassemblerObject:(ud_t *)object withBlock:(void (^)(ZGMemoryAddress, ZGMemorySize, NSString *, BOOL *)) callback
-{
-	BOOL stop = NO;
-	while (ud_disassemble(object) > 0)
-	{
-		callback(ud_insn_off(object), ud_insn_len(object), @(ud_insn_asm(object)), &stop);
-		if (stop) break;
-	}
-}
-
-- (void)cleanupDisassembler
-{
-	if (self.temporaryBuffer)
-	{
-		free(self.temporaryBuffer);
-		self.temporaryBuffer = NULL;
-	}
-}
-
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
 	ZGInstruction *instruction = nil;
@@ -288,15 +239,13 @@
 			void *bytes = NULL;
 			if (ZGReadBytes(process.processTask, startAddress, &bytes, &size))
 			{
-				ud_t object;
-				void *disassembledBytes = NULL;
-				[self initializeDisassemblerObject:&object inProcess:process atAddress:startAddress withBytes:bytes size:size getDisassembledBytes:&disassembledBytes];
+				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:process address:startAddress size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 				
 				__block ZGMemoryAddress memoryOffset = 0;
 				__block ZGMemorySize memorySize = 0;
 				__block NSString *instructionText = nil;
 				
-				[self enumerateDisassemblerObject:&object withBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop) {
+				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop) {
 					if ((instructionAddress - startAddress) + instructionSize >= size)
 					{
 						memoryOffset = instructionAddress - startAddress;
@@ -306,12 +255,11 @@
 				}];
 				
 				instruction = [[ZGInstruction alloc] init];
-				ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassembledBytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+				ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
 				[variable setShouldBeSearched:NO];
 				instruction.variable = variable;
 				instruction.text = instructionText;
 				
-				[self cleanupDisassembler];
 				ZGFreeBytes(process.processTask, bytes, size);
 			}
 			
@@ -436,16 +384,14 @@
 				
 				if (ZGReadBytes(self.currentProcess.processTask, startAddress, &bytes, &size))
 				{
-					ud_t object;
-					void *disassembledBytes = NULL;
-					[self initializeDisassemblerObject:&object inProcess:self.currentProcess atAddress:startAddress withBytes:bytes size:size getDisassembledBytes:&disassembledBytes];
+					ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:startAddress size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 					
 					NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
 					
-					[self enumerateDisassemblerObject:&object withBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop)  {
+					[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop)  {
 						ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 						newInstruction.text = disassembledText;
-						newInstruction.variable = [[ZGVariable alloc] initWithValue:disassembledBytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+						newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
 						
 						[instructionsToReplace addObject:newInstruction];
 					}];
@@ -457,7 +403,6 @@
 					
 					[self.instructionsTableView reloadData];
 					
-					[self cleanupDisassembler];
 					ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 				}
 			}
@@ -495,9 +440,7 @@
 		ZGMemorySize size = theSize;
 		if (ZGReadBytes(self.currentProcess.processTask, address, &bytes, &size))
 		{
-			ud_t object;
-			void *disassembledBytes = NULL;
-			[self initializeDisassemblerObject:&object inProcess:self.currentProcess atAddress:address withBytes:bytes size:size getDisassembledBytes:&disassembledBytes];
+			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 			
 			__block NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 			
@@ -526,10 +469,10 @@
 				});
 			};
 			
-			[self enumerateDisassemblerObject:&object withBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop)  {
+			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *instruction = [[ZGInstruction alloc] init];
 				instruction.text = disassembledText;
-				instruction.variable = [[ZGVariable alloc] initWithValue:disassembledBytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
 				
 				[newInstructions addObject:instruction];
 				
@@ -575,7 +518,6 @@
 				[self.stopButton setHidden:YES];
 			});
 			
-			[self cleanupDisassembler];
 			ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 		}
 	});
