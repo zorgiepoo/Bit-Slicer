@@ -885,7 +885,7 @@ END_DEBUGGER_CHANGE:
 		ZGBreakPoint *targetBreakPoint = nil;
 		for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
 		{
-			if (address == breakPoint.variable.address)
+			if (breakPoint.variable.address >= address && breakPoint.variable.address < address + newSize)
 			{
 				targetBreakPoint = breakPoint;
 				break;
@@ -898,12 +898,17 @@ END_DEBUGGER_CHANGE:
 		}
 		else
 		{
-			if (newSize > 1)
+			if (targetBreakPoint.variable.address - address > 0)
 			{
-				ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address+sizeof(uint8_t), newValue+sizeof(uint8_t), newSize-sizeof(uint8_t));
+				ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newValue, targetBreakPoint.variable.address - address);
 			}
 			
-			*(uint8_t *)targetBreakPoint.variable.value = *(uint8_t *)newValue;
+			if (address + newSize - targetBreakPoint.variable.address - 1 > 0)
+			{
+				ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, targetBreakPoint.variable.address + 1, newValue + (targetBreakPoint.variable.address + 1 - address), address + newSize - targetBreakPoint.variable.address - 1);
+			}
+			
+			*(uint8_t *)targetBreakPoint.variable.value = *(uint8_t *)(newValue + targetBreakPoint.variable.address - address);
 		}
 		
 		free(newValue);
