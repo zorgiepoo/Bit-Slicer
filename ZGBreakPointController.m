@@ -96,7 +96,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); \
 	debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); \
 
-- (ZGMemoryAddress)removeBreakPoint:(ZGBreakPoint *)breakPoint
+- (ZGMemoryAddress)removeWatchPoint:(ZGBreakPoint *)breakPoint
 {
 	ZGMemoryAddress instructionAddress = 0x0;
 	
@@ -107,7 +107,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 		kern_return_t error = 0;
 		if ((error = thread_get_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount)) != KERN_SUCCESS)
 		{
-			NSLog(@"ERROR: Grabbing debug state failed in removeBreakPoint:, %d, continuing...", error);
+			NSLog(@"ERROR: Grabbing debug state failed in removeWatchPoint:, %d, continuing...", error);
 			continue;
 		}
 		
@@ -124,7 +124,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 		
 		if ((error = thread_set_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, stateCount)) != KERN_SUCCESS)
 		{
-			NSLog(@"ERROR: Failure in setting thread state registers, %d, in removeBreakPoint:", error);
+			NSLog(@"ERROR: Failure in setting thread state registers, %d, in removeWatchPoint:", error);
 		}
 	}
 	
@@ -199,7 +199,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 							}
 						});
 						
-						[[[ZGAppController sharedController] breakPointController] removeBreakPoint:breakPoint];
+						[[[ZGAppController sharedController] breakPointController] removeWatchPoint:breakPoint];
 						
 						break;
 					}
@@ -208,6 +208,82 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 			
 			ZGResumeTask(task);
 		}
+	}
+}
+
+- (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint
+{
+	x86_thread_state_t threadState;
+	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
+	if (thread_get_state(breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+	{
+		NSLog(@"ERROR: Grabbing thread state failed in resumeFromBreakPoint:");
+	}
+	
+	// Check if breakpoint still exists
+	if ([self.breakPoints containsObject:breakPoint])
+	{
+		// Restore our instruction
+		ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+		
+		// Ensure single-stepping
+		if (breakPoint.process.is64Bit)
+		{
+			threadState.uts.ts64.__rflags |= (1 << 8);
+		}
+		else
+		{
+			threadState.uts.ts32.__eflags |= (1 << 8);
+		}
+		
+		breakPoint.needsToRestore = YES;
+	}
+	else
+	{
+		// Remove single-stepping
+		if (breakPoint.process.is64Bit)
+		{
+			threadState.uts.ts64.__rflags &= ~(1 << 8);
+		}
+		else
+		{
+			threadState.uts.ts32.__eflags &= ~(1 << 8);
+		}
+	}
+	
+	if (thread_set_state(breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+	{
+		NSLog(@"Failure in setting registers thread state for resumeFromBreakPoint: for thread %d", breakPoint.thread);
+	}
+	
+	ZGResumeTask(breakPoint.process.processTask);
+}
+
+- (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint
+{
+	// Restore our instruction
+	ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+	
+	NSMutableArray *newBreakPoints = [NSMutableArray arrayWithArray:self.breakPoints];
+	[newBreakPoints removeObject:breakPoint];
+	self.breakPoints = [NSArray arrayWithArray:newBreakPoints];
+}
+
+- (void)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process
+{
+	ZGBreakPoint *targetBreakPoint = nil;
+	for (ZGBreakPoint *breakPoint in self.breakPoints)
+	{
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.process.processTask == process.processTask	&& breakPoint.variable.address == instruction.variable.address)
+		{
+			targetBreakPoint = breakPoint;
+			break;
+		}
+	}
+	
+	if (targetBreakPoint)
+	{
+		[self removeInstructionBreakPoint:targetBreakPoint];
 	}
 }
 
@@ -224,6 +300,8 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 		
 		if (breakPoint.task == task)
 		{
+			breakPoint.thread = thread;
+			
 			x86_thread_state_t threadState;
 			mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
 			if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
@@ -234,67 +312,63 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 			
 			ZGInstruction *foundInstruction = [[[ZGAppController sharedController] disassemblerController] findInstructionBeforeAddress:(breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) inProcess:breakPoint.process];
 			
-			NSLog(@"Instruction address: 0x%llX", foundInstruction.variable.address);
-			
 			if (foundInstruction.variable.address == breakPoint.variable.address)
 			{
 				uint8_t *opcode = NULL;
-				ZGMemorySize size = 0x1;
+				ZGMemorySize opcodeSize = 0x1;
 				
-				if (ZGReadBytes(breakPoint.process.processTask, foundInstruction.variable.address, (void **)&opcode, &size))
+				if (ZGReadBytes(breakPoint.process.processTask, foundInstruction.variable.address, (void **)&opcode, &opcodeSize) && *opcode == INSTRUCTION_BREAKPOINT_OPCODE)
 				{
-					if (*opcode == INSTRUCTION_BREAKPOINT_OPCODE)
+					ZGSuspendTask(task);
+					
+					// Restore program counter
+					if (breakPoint.process.is64Bit)
 					{
-						NSLog(@"Suspending task...");
-						ZGSuspendTask(task);
-						
-						// Restore program counter and get ready to single-step
-						if (breakPoint.process.is64Bit)
-						{
-							threadState.uts.ts64.__rip = foundInstruction.variable.address;
-							threadState.uts.ts64.__rflags |= (1 << 8);
-						}
-						else
-						{
-							threadState.uts.ts32.__eip = (uint32_t)foundInstruction.variable.address;
-							threadState.uts.ts32.__eflags |= (1 << 8);
-						}
-						
-						ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, foundInstruction.variable.address, breakPoint.variable.value, sizeof(uint8_t));
-						
-						dispatch_async(dispatch_get_main_queue(), ^{
-							if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
-							{
-								[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:@(foundInstruction.variable.address)];
-							}
-						});
+						threadState.uts.ts64.__rip = breakPoint.variable.address;
 					}
 					else
 					{
-						NSLog(@"Single-stepped");
-						
-						// Remove single-stepping
-						if (breakPoint.process.is64Bit)
-						{
-							threadState.uts.ts64.__rflags &= ~(1 << 8);
-						}
-						else
-						{
-							threadState.uts.ts32.__eflags &= ~(1 << 8);
-						}
-						
-						// Restore our breakpoint
-						uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
-						ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, foundInstruction.variable.address, &writeOpcode, sizeof(uint8_t));
+						threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
 					}
 					
 					if (thread_set_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
 					{
-						NSLog(@"Failure in setting registers thread state for catching breakpoint for thread %d", thread);
+						NSLog(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d", thread);
 					}
 					
-					ZGFreeBytes(breakPoint.process.processTask, opcode, size);
+					dispatch_async(dispatch_get_main_queue(), ^{
+						if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+						{
+							[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
+						}
+					});
 				}
+				
+				ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
+			}
+			
+			if (breakPoint.needsToRestore)
+			{
+				// Remove single-stepping
+				if (breakPoint.process.is64Bit)
+				{
+					threadState.uts.ts64.__rflags &= ~(1 << 8);
+				}
+				else
+				{
+					threadState.uts.ts32.__eflags &= ~(1 << 8);
+				}
+				
+				// Restore our breakpoint
+				uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
+				ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
+				
+				if (thread_set_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+				{
+					NSLog(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d", thread);
+				}
+				
+				breakPoint.needsToRestore = NO;
 			}
 		}
 	}
@@ -304,23 +378,28 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 
 kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
 {
-	NSLog(@"Did exception get called?");
-	
 	[[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
 	[[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread];
 	
 	return KERN_SUCCESS;
 }
 
-- (void)removeWatchObserver:(id)observer
+- (void)removeObserver:(id)observer
 {
 	for (ZGBreakPoint *breakPoint in self.breakPoints)
 	{
 		if (breakPoint.delegate == observer)
 		{
-			ZGSuspendTask(breakPoint.task);
-			[self removeBreakPoint:breakPoint];
-			ZGResumeTask(breakPoint.task);
+			if (breakPoint.type == ZGBreakPointWatchDataWrite)
+			{
+				ZGSuspendTask(breakPoint.task);
+				[self removeWatchPoint:breakPoint];
+				ZGResumeTask(breakPoint.task);
+			}
+			else if (breakPoint.type == ZGBreakPointInstruction)
+			{
+				[self removeInstructionBreakPoint:breakPoint];
+			}
 		}
 	}
 }
@@ -512,7 +591,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return YES;
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{
@@ -525,18 +604,12 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	BOOL success = ZGWriteBytesIgnoringProtection(process.processTask, variable.address, &breakPointOpcode, sizeof(uint8_t));
 	if (success)
 	{
-		NSLog(@"Adding new breakpoint!");
 		ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] init];
 		breakPoint.delegate = delegate;
 		breakPoint.task = process.processTask;
 		breakPoint.variable = variable;
 		breakPoint.process = process;
 		breakPoint.type = ZGBreakPointInstruction;
-		
-		if (returnedBreakPoint)
-		{
-			*returnedBreakPoint = breakPoint;
-		}
 		
 		NSMutableArray *currentBreakPoints = [[NSMutableArray alloc] initWithArray:self.breakPoints];
 		[currentBreakPoints addObject:breakPoint];

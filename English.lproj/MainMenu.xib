@@ -491,15 +491,15 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
-								<object class="NSMenuItem" id="367739028">
+								<object class="NSMenuItem" id="1048201033">
 									<reference key="NSMenu" ref="741161439"/>
-									<string key="NSTitle">Add Breakpoints</string>
+									<string key="NSTitle">Continue</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
-								<object class="NSMenuItem" id="906667155">
+								<object class="NSMenuItem" id="171732587">
 									<reference key="NSMenu" ref="741161439"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<bool key="NSIsSeparator">YES</bool>
@@ -1373,11 +1373,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">addBreakPoints:</string>
+						<string key="label">continueFromBreakPoint:</string>
 						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="367739028"/>
+						<reference key="destination" ref="1048201033"/>
 					</object>
-					<int key="connectionID">881</int>
+					<int key="connectionID">883</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1983,8 +1983,8 @@
 							<reference ref="966121689"/>
 							<reference ref="262824305"/>
 							<reference ref="57258135"/>
-							<reference ref="906667155"/>
-							<reference ref="367739028"/>
+							<reference ref="171732587"/>
+							<reference ref="1048201033"/>
 						</object>
 						<reference key="parent" ref="83731579"/>
 					</object>
@@ -2114,12 +2114,12 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">879</int>
-						<reference key="object" ref="906667155"/>
+						<reference key="object" ref="171732587"/>
 						<reference key="parent" ref="741161439"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">880</int>
-						<reference key="object" ref="367739028"/>
+						<int key="objectID">882</int>
+						<reference key="object" ref="1048201033"/>
 						<reference key="parent" ref="741161439"/>
 					</object>
 				</object>
@@ -2231,7 +2231,7 @@
 					<string>875.IBPluginDependency</string>
 					<string>878.IBPluginDependency</string>
 					<string>879.IBPluginDependency</string>
-					<string>880.IBPluginDependency</string>
+					<string>882.IBPluginDependency</string>
 					<string>92.IBPluginDependency</string>
 				</object>
 				<object class="NSArray" key="dict.values">
@@ -2355,7 +2355,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">881</int>
+			<int key="maxID">883</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

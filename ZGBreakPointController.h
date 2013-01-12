@@ -45,9 +45,12 @@
 
 @property (strong) NSArray *breakPoints;
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate;
+- (void)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process;
+- (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint;
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
-- (void)removeWatchObserver:(id)observer;
+
+- (void)removeObserver:(id)observer;
 
 @end

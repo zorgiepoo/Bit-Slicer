@@ -65,7 +65,7 @@
 		 addObserver:self
 		 selector:@selector(applicationWillTerminate:)
 		 name:NSApplicationWillTerminateNotification
-		 object : nil];
+		 object:nil];
 	}
 	return self;
 }
@@ -86,7 +86,7 @@
 {
 	if (self.watchProcess)
 	{
-		[[[ZGAppController sharedController] breakPointController] removeWatchObserver:self];
+		[[[ZGAppController sharedController] breakPointController] removeObserver:self];
 		self.watchProcess = nil;
 	}
 }

@@ -22,10 +22,12 @@ typedef enum
 
 @property (assign, nonatomic) id delegate;
 @property (readwrite, nonatomic) ZGMemoryMap task;
+@property (readwrite, nonatomic) thread_act_t thread;
 @property (strong, nonatomic) ZGVariable *variable;
 @property (readwrite) ZGMemorySize watchSize;
 @property (strong, nonatomic) ZGProcess *process;
 @property (strong, nonatomic) NSArray *debugThreads;
 @property (assign) ZGBreakPointType type;
+@property (assign) BOOL needsToRestore;
 
 @end
