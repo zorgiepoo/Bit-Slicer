@@ -766,22 +766,9 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(continueFromBreakPoint:) || menuItem.action == @selector(stepInto:))
+	else if (menuItem.action == @selector(continueFromBreakPoint:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:))
 	{
 		if (!self.currentBreakPoint || self.disassembling)
-		{
-			return NO;
-		}
-	}
-	else if (menuItem.action == @selector(stepOver:))
-	{
-		if (!self.currentBreakPoint || self.disassembling)
-		{
-			return NO;
-		}
-		
-		ZGInstruction *instruction = [self findInstructionBeforeAddress:self.currentBreakPoint.variable.address+1 inProcess:self.currentProcess];
-		if (![instruction isCallMnemonic])
 		{
 			return NO;
 		}
@@ -993,10 +980,17 @@ END_DEBUGGER_CHANGE:
 - (IBAction)stepOver:(id)sender
 {
 	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.currentBreakPoint.variable.address + 1 inProcess:self.currentProcess];
-	ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
-	
-	[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess oneShot:YES delegate:self];
-	[self continueFromBreakPoint:nil];
+	if ([currentInstruction isCallMnemonic])
+	{
+		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
+		
+		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess oneShot:YES delegate:self];
+		[self continueFromBreakPoint:nil];
+	}
+	else
+	{
+		[self stepInto:nil];
+	}
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
