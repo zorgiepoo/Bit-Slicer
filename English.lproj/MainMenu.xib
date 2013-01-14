@@ -507,6 +507,14 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
+								<object class="NSMenuItem" id="905722693">
+									<reference key="NSMenu" ref="741161439"/>
+									<string key="NSTitle">Step Over</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="1033313550"/>
+									<reference key="NSMixedImage" ref="310636482"/>
+								</object>
 								<object class="NSMenuItem" id="171732587">
 									<reference key="NSMenu" ref="741161439"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -1397,6 +1405,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">stepOver:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="905722693"/>
+					</object>
+					<int key="connectionID">889</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">openPreferences:</string>
 						<reference key="source" ref="187132439"/>
 						<reference key="destination" ref="609285721"/>
@@ -2002,6 +2018,7 @@
 							<reference ref="171732587"/>
 							<reference ref="1048201033"/>
 							<reference ref="936512427"/>
+							<reference ref="905722693"/>
 						</object>
 						<reference key="parent" ref="83731579"/>
 					</object>
@@ -2144,6 +2161,11 @@
 						<reference key="object" ref="936512427"/>
 						<reference key="parent" ref="741161439"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">887</int>
+						<reference key="object" ref="905722693"/>
+						<reference key="parent" ref="741161439"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -2255,10 +2277,12 @@
 					<string>879.IBPluginDependency</string>
 					<string>882.IBPluginDependency</string>
 					<string>884.IBPluginDependency</string>
+					<string>887.IBPluginDependency</string>
 					<string>92.IBPluginDependency</string>
 				</object>
 				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2379,7 +2403,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">886</int>
+			<int key="maxID">889</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

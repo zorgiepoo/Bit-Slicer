@@ -36,7 +36,6 @@
 #import "ZGVariable.h"
 #import "ZGBreakPoint.h"
 #import "ZGProcess.h"
-#import "udis86.h"
 
 @interface ZGDisassemblerObject ()
 
@@ -57,7 +56,7 @@
 		
 		for (ZGBreakPoint *breakPoint in breakPoints)
 		{
-			if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address >= address && breakPoint.variable.address + breakPoint.variable.size <= address + size)
+			if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
 			{
 				memcpy(self.bytes + (breakPoint.variable.address - address), breakPoint.variable.value, sizeof(uint8_t));
 			}
@@ -79,12 +78,12 @@
 	free(self.bytes); self.bytes = NULL;
 }
 
-- (void)enumerateWithBlock:(void (^)(ZGMemoryAddress, ZGMemorySize, NSString *, BOOL *))callback
+- (void)enumerateWithBlock:(void (^)(ZGMemoryAddress, ZGMemorySize, ud_mnemonic_code_t, NSString *, BOOL *))callback
 {
 	BOOL stop = NO;
 	while (ud_disassemble(self.object) > 0)
 	{
-		callback(ud_insn_off(self.object), ud_insn_len(self.object), @(ud_insn_asm(self.object)), &stop);
+		callback(ud_insn_off(self.object), ud_insn_len(self.object), self.object->mnemonic, @(ud_insn_asm(self.object)), &stop);
 		if (stop) break;
 	}
 }

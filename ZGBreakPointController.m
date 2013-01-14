@@ -383,6 +383,11 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 							[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
 						}
 					});
+					
+					if (breakPoint.oneShot)
+					{
+						[self removeInstructionBreakPoint:breakPoint];
+					}
 				}
 				
 				ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
@@ -469,6 +474,10 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			else if (breakPoint.type == ZGBreakPointInstruction)
 			{
 				[self removeInstructionBreakPoint:breakPoint];
+			}
+			else if (breakPoint.type == ZGBreakPointSingleStepInstruction)
+			{
+				[self removeBreakPoint:breakPoint];
 			}
 		}
 	}
@@ -659,9 +668,24 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return YES;
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process oneShot:(BOOL)oneShot delegate:(id)delegate
 {
 	if (![self setUpExceptionPortForProcess:process])
+	{
+		return NO;
+	}
+	
+	BOOL breakPointAlreadyExists = NO;
+	for (ZGBreakPoint *breakPoint in self.breakPoints)
+	{
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address == instruction.variable.address)
+		{
+			breakPointAlreadyExists = YES;
+			break;
+		}
+	}
+	
+	if (breakPointAlreadyExists)
 	{
 		return NO;
 	}
@@ -678,6 +702,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		breakPoint.variable = variable;
 		breakPoint.process = process;
 		breakPoint.type = ZGBreakPointInstruction;
+		breakPoint.oneShot = oneShot;
 		
 		[self addBreakPoint:breakPoint];
 	}

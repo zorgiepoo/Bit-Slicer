@@ -34,6 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "udis86.h"
 
 @class ZGProcess;
 
@@ -44,6 +45,6 @@
 // Bytes passed in may differ from bytes disassembled due to breakpoints, so use this instance's bytes property for obtaining values
 - (id)initWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address size:(ZGMemorySize)size bytes:(const void *)bytes breakPoints:(NSArray *)breakPoints;
 
-- (void)enumerateWithBlock:(void (^)(ZGMemoryAddress, ZGMemorySize, NSString *, BOOL *))callback;
+- (void)enumerateWithBlock:(void (^)(ZGMemoryAddress, ZGMemorySize, ud_mnemonic_code_t, NSString *, BOOL *))callback;
 
 @end

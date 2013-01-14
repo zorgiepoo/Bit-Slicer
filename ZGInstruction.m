@@ -36,4 +36,10 @@
 
 @implementation ZGInstruction
 
+// Possible candidates: UD_Isyscall, UD_Ivmcall, UD_Ivmmcall ??
+- (BOOL)isCallMnemonic
+{
+	return self.mnemonic == UD_Icall;
+}
+
 @end

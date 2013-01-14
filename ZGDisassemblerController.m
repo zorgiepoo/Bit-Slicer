@@ -221,7 +221,7 @@
 	
 	for (ZGRegion *region in ZGRegionsForProcessTask(process.processTask))
 	{
-		if (address >= region.address && address < region.address + region.size)
+		if (address >= region.address && address <= region.address + region.size)
 		{
 			// Start an arbitrary number of bytes before our address and decode the instructions
 			// Eventually they will converge into correct offsets
@@ -235,22 +235,31 @@
 			}
 			
 			ZGMemorySize size = address - startAddress;
+			// Read in more bytes to ensure we return the whole instruction
+			ZGMemorySize readSize = size + 30;
+			if (startAddress + readSize > region.address + region.size)
+			{
+				readSize = region.address + region.size - startAddress;
+			}
 			
 			void *bytes = NULL;
-			if (ZGReadBytes(process.processTask, startAddress, &bytes, &size))
+			if (ZGReadBytes(process.processTask, startAddress, &bytes, &readSize))
 			{
-				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:process address:startAddress size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
+				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:process address:startAddress size:readSize bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 				
 				__block ZGMemoryAddress memoryOffset = 0;
 				__block ZGMemorySize memorySize = 0;
 				__block NSString *instructionText = nil;
+				__block ud_mnemonic_code_t instructionMnemonic = 0;
 				
-				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop) {
+				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop) {
 					if ((instructionAddress - startAddress) + instructionSize >= size)
 					{
 						memoryOffset = instructionAddress - startAddress;
 						memorySize = instructionSize;
 						instructionText = disassembledText;
+						instructionMnemonic = mnemonic;
+						*stop = YES;
 					}
 				}];
 				
@@ -259,8 +268,9 @@
 				[variable setShouldBeSearched:NO];
 				instruction.variable = variable;
 				instruction.text = instructionText;
+				instruction.mnemonic = instructionMnemonic;
 				
-				ZGFreeBytes(process.processTask, bytes, size);
+				ZGFreeBytes(process.processTask, bytes, readSize);
 			}
 			
 			break;
@@ -388,10 +398,11 @@
 					
 					NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
 					
-					[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop)  {
+					[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 						ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 						newInstruction.text = disassembledText;
 						newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+						newInstruction.mnemonic = mnemonic;
 						
 						[instructionsToReplace addObject:newInstruction];
 					}];
@@ -469,10 +480,11 @@
 				});
 			};
 			
-			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString *disassembledText, BOOL *stop)  {
+			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *instruction = [[ZGInstruction alloc] init];
 				instruction.text = disassembledText;
 				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+				instruction.mnemonic = mnemonic;
 				
 				[newInstructions addObject:instruction];
 				
@@ -742,7 +754,7 @@ END_DEBUGGER_CHANGE:
 	if (menuItem.action == @selector(nopVariables:))
 	{
 		[menuItem setTitle:[NSString stringWithFormat:@"NOP Instruction%@", self.selectedInstructions.count == 1 ? @"" : @"s"]];
-		if (self.selectedInstructions.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.instructionsTableView.editedRow != -1)
+		if (self.selectedInstructions.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.instructionsTableView.editedRow != -1 || self.disassembling)
 		{
 			return NO;
 		}
@@ -756,7 +768,20 @@ END_DEBUGGER_CHANGE:
 	}
 	else if (menuItem.action == @selector(continueFromBreakPoint:) || menuItem.action == @selector(stepInto:))
 	{
-		if (!self.currentBreakPoint)
+		if (!self.currentBreakPoint || self.disassembling)
+		{
+			return NO;
+		}
+	}
+	else if (menuItem.action == @selector(stepOver:))
+	{
+		if (!self.currentBreakPoint || self.disassembling)
+		{
+			return NO;
+		}
+		
+		ZGInstruction *instruction = [self findInstructionBeforeAddress:self.currentBreakPoint.variable.address+1 inProcess:self.currentProcess];
+		if (![instruction isCallMnemonic])
 		{
 			return NO;
 		}
@@ -813,7 +838,7 @@ END_DEBUGGER_CHANGE:
 			
 			for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
 			{
-				if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address)
+				if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.oneShot)
 				{
 					result = @(YES);
 					break;
@@ -839,7 +864,7 @@ END_DEBUGGER_CHANGE:
 		{
 			if ([object boolValue])
 			{
-				[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess delegate:self];
+				[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess oneShot:NO delegate:self];
 			}
 			else
 			{
@@ -851,7 +876,7 @@ END_DEBUGGER_CHANGE:
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if ([@[@"address", @"instruction", @"bytes"] containsObject:tableColumn.identifier] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
+	if ([tableColumn.identifier isEqualToString:@"address"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
 		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.currentBreakPoint.variable.address == instruction.variable.address);
@@ -963,6 +988,15 @@ END_DEBUGGER_CHANGE:
 	[[[ZGAppController sharedController] breakPointController] addSingleStepBreakPointFromBreakPoint:self.currentBreakPoint];
 	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.currentBreakPoint];
 	self.currentBreakPoint = nil;
+}
+
+- (IBAction)stepOver:(id)sender
+{
+	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.currentBreakPoint.variable.address + 1 inProcess:self.currentProcess];
+	ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
+	
+	[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess oneShot:YES delegate:self];
+	[self continueFromBreakPoint:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
