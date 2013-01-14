@@ -129,9 +129,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	}
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		NSMutableArray *newBreakPoints = [[NSMutableArray alloc] initWithArray:self.breakPoints];
-		[newBreakPoints removeObject:breakPoint];
-		[[[ZGAppController sharedController] breakPointController] setBreakPoints:newBreakPoints];
+		[[[ZGAppController sharedController] breakPointController] removeBreakPoint:breakPoint];
 	});
 	
 	return instructionAddress;
@@ -217,9 +215,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	{
 		if (candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.task == breakPoint.task && candidateBreakPoint.thread == breakPoint.thread)
 		{
-			NSMutableArray *currentBreakPoints = [[NSMutableArray alloc] initWithArray:self.breakPoints];
-			[currentBreakPoints removeObject:candidateBreakPoint];
-			self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+			[self removeBreakPoint:candidateBreakPoint];
 		}
 	}
 }
@@ -283,9 +279,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	// Restore our instruction
 	ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
 	
-	NSMutableArray *newBreakPoints = [NSMutableArray arrayWithArray:self.breakPoints];
-	[newBreakPoints removeObject:breakPoint];
-	self.breakPoints = [NSArray arrayWithArray:newBreakPoints];
+	[self removeBreakPoint:breakPoint];
 }
 
 - (void)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process
@@ -440,9 +434,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 				hitBreakPoint = YES;
 			}
 			
-			NSMutableArray *currentBreakPoints = [NSMutableArray arrayWithArray:self.breakPoints];
-			[currentBreakPoints removeObject:candidateBreakPoint];
-			self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+			[self removeBreakPoint:candidateBreakPoint];
 		}
 	}
 	
@@ -657,9 +649,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	breakPoint.process = process;
 	breakPoint.type = ZGBreakPointWatchDataWrite;
 	
-	NSMutableArray *currentBreakPoints = [[NSMutableArray alloc] initWithArray:self.breakPoints];
-	[currentBreakPoints addObject:breakPoint];
-	self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+	[self addBreakPoint:breakPoint];
 	
 	if (returnedBreakPoint)
 	{
@@ -689,9 +679,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		breakPoint.process = process;
 		breakPoint.type = ZGBreakPointInstruction;
 		
-		NSMutableArray *currentBreakPoints = [[NSMutableArray alloc] initWithArray:self.breakPoints];
-		[currentBreakPoints addObject:breakPoint];
-		self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+		[self addBreakPoint:breakPoint];
 	}
 	
 	return success;
@@ -706,8 +694,20 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	singleStepBreakPoint.thread = breakPoint.thread;
 	singleStepBreakPoint.type = ZGBreakPointSingleStepInstruction;
 	
+	[self addBreakPoint:singleStepBreakPoint];
+}
+
+- (void)addBreakPoint:(ZGBreakPoint *)breakPoint
+{
 	NSMutableArray *currentBreakPoints = [NSMutableArray arrayWithArray:self.breakPoints];
-	[currentBreakPoints addObject:singleStepBreakPoint];
+	[currentBreakPoints addObject:breakPoint];
+	self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+}
+
+- (void)removeBreakPoint:(ZGBreakPoint *)breakPoint
+{
+	NSMutableArray *currentBreakPoints = [NSMutableArray arrayWithArray:self.breakPoints];
+	[currentBreakPoints removeObject:breakPoint];
 	self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
 }
 
