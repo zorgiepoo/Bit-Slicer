@@ -754,7 +754,7 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(continueFromBreakPoint:))
+	else if (menuItem.action == @selector(continueFromBreakPoint:) || menuItem.action == @selector(stepInto:))
 	{
 		if (!self.currentBreakPoint)
 		{
@@ -953,6 +953,14 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)continueFromBreakPoint:(id)sender
 {
+	[[[ZGAppController sharedController] breakPointController] removeSingleStepBreakPointsFromBreakPoint:self.currentBreakPoint];
+	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.currentBreakPoint];
+	self.currentBreakPoint = nil;
+}
+
+- (IBAction)stepInto:(id)sender
+{
+	[[[ZGAppController sharedController] breakPointController] addSingleStepBreakPointFromBreakPoint:self.currentBreakPoint];
 	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.currentBreakPoint];
 	self.currentBreakPoint = nil;
 }

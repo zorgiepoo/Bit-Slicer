@@ -15,7 +15,8 @@
 typedef enum
 {
 	ZGBreakPointWatchDataWrite,
-	ZGBreakPointInstruction
+	ZGBreakPointInstruction,
+	ZGBreakPointSingleStepInstruction,
 } ZGBreakPointType;
 
 @interface ZGBreakPoint : NSObject
