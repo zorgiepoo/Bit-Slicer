@@ -60,11 +60,13 @@ BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 
 void ZGFreeTask(ZGMemoryMap task)
 {
+	/*
 	kern_return_t result;
 	if ((result = mach_port_deallocate(current_task(), task)) != KERN_SUCCESS)
 	{
 		NSLog(@"Failed to deallocate mach port: %s", mach_error_string(result));
 	}
+	 */
 }
 
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
