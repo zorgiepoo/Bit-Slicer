@@ -420,6 +420,7 @@
 	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
 	{
 		self.desiredProcessName = [self.runningApplicationsPopUpButton.selectedItem.representedObject name];
+		[[ZGAppController sharedController] setLastSelectedProcessName:self.desiredProcessName];
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 	}
 }

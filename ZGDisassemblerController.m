@@ -598,6 +598,7 @@
 	{
 		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", address];
 		self.desiredProcessName = [self.runningApplicationsPopUpButton.selectedItem.representedObject name];
+		[[ZGAppController sharedController] setLastSelectedProcessName:self.desiredProcessName];
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 	}
 }
