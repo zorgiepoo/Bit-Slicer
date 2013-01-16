@@ -112,8 +112,6 @@ OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef th
 			if (ZGGetTaskForProcess(runningApplication.processIdentifier, &processTask))
 			{
 				[ZGProcess pauseOrUnpauseProcessTask:processTask];
-			
-				ZGFreeTask(processTask);
 			}
 			else
 			{

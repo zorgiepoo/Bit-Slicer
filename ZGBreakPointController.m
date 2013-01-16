@@ -56,6 +56,8 @@
 #import "ZGBreakPoint.h"
 #import "ZGInstruction.h"
 #import "ZGDisassemblerController.h"
+#import "ZGProcessList.h"
+#import "ZGRunningProcess.h"
 
 @interface ZGBreakPointController ()
 
@@ -465,7 +467,22 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	{
 		if (breakPoint.delegate == observer)
 		{
-			if (breakPoint.type == ZGBreakPointWatchDataWrite)
+			BOOL isDead = YES;
+			
+			for (ZGRunningProcess *runningProcess in [[ZGProcessList sharedProcessList] runningProcesses])
+			{
+				if (runningProcess.processIdentifier == breakPoint.process.processID)
+				{
+					isDead = NO;
+					break;
+				}
+			}
+			
+			if (isDead || breakPoint.type == ZGBreakPointSingleStepInstruction)
+			{
+				[self removeBreakPoint:breakPoint];
+			}
+			else if (breakPoint.type == ZGBreakPointWatchDataWrite)
 			{
 				ZGSuspendTask(breakPoint.task);
 				[self removeWatchPoint:breakPoint];
@@ -474,10 +491,6 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			else if (breakPoint.type == ZGBreakPointInstruction)
 			{
 				[self removeInstructionBreakPoint:breakPoint];
-			}
-			else if (breakPoint.type == ZGBreakPointSingleStepInstruction)
-			{
-				[self removeBreakPoint:breakPoint];
 			}
 		}
 	}

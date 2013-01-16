@@ -64,11 +64,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	self.processTask = MACH_PORT_NULL;
-}
-
 - (void)setProcessTask:(ZGMemoryMap)newProcessTask
 {
 	if (_processTask)
@@ -88,7 +83,7 @@
 {
 	ZGMemoryMap newProcessTask = MACH_PORT_NULL;
 	BOOL success = ZGGetTaskForProcess(self.processID, &newProcessTask);
-	if (success)
+	if (success && newProcessTask != self.processTask)
 	{
 		self.processTask = newProcessTask;
 	}

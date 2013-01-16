@@ -47,26 +47,64 @@
 @implementation ZGResultsWrapper
 @end
 
+static NSDictionary *gTasksDictionary = nil;
+
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 {
+	if (!gTasksDictionary)
+	{
+		gTasksDictionary = [[NSDictionary alloc] init];
+	}
+	
+	id currentTask = [gTasksDictionary objectForKey:@(process)];
+	if (currentTask)
+	{
+		*task = [currentTask unsignedIntValue];
+		return YES;
+	}
+	
 	kern_return_t result = task_for_pid(current_task(), process, task);
 	if (result != KERN_SUCCESS)
 	{
 		*task = MACH_PORT_NULL;
 		NSLog(@"Failed to get task for process %d: %s", process, mach_error_string(result));
 	}
+	else
+	{
+		NSMutableDictionary *newTasksDictionary = [[NSMutableDictionary alloc] initWithDictionary:gTasksDictionary];
+		[newTasksDictionary setObject:@(*task) forKey:@(process)];
+		gTasksDictionary = [NSDictionary dictionaryWithDictionary:newTasksDictionary];
+	}
+	
 	return (result == KERN_SUCCESS);
 }
 
 void ZGFreeTask(ZGMemoryMap task)
 {
-	/*
-	kern_return_t result;
-	if ((result = mach_port_deallocate(current_task(), task)) != KERN_SUCCESS)
+	id foundProcess = nil;
+	for (id process in gTasksDictionary.allKeys)
 	{
-		NSLog(@"Failed to deallocate mach port: %s", mach_error_string(result));
+		if ([[gTasksDictionary objectForKey:process] unsignedIntValue] == task)
+		{
+			foundProcess = process;
+			break;
+		}
 	}
-	 */
+	
+	if (foundProcess)
+	{
+		/*
+		kern_return_t result;
+		if ((result = mach_port_deallocate(current_task(), task)) != KERN_SUCCESS)
+		{
+			NSLog(@"Failed to deallocate mach port: %s", mach_error_string(result));
+		}
+		 */
+		
+		NSMutableDictionary *newTasksDictionary = [[NSMutableDictionary alloc] initWithDictionary:gTasksDictionary];
+		[newTasksDictionary removeObjectForKey:foundProcess];
+		gTasksDictionary = [NSDictionary dictionaryWithDictionary:newTasksDictionary];
+	}
 }
 
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
