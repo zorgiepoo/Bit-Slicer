@@ -77,7 +77,7 @@
 	return characterCount;
 }
 
-- (NSString *)createLineStringForRange:(HFRange)range
+- (NSString *)createLineStringForRange:(HFRange)range NS_RETURNS_RETAINED
 {
 	//HFASSERT(range.length <= NSUIntegerMax);
 	NSUInteger lineCount = ll2l(range.length);
