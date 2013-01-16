@@ -495,7 +495,6 @@
 		ZGProcess *deadProcess =
 			[[ZGProcess alloc]
 			 initWithName:self.desiredProcessName
-			 processID:NON_EXISTENT_PID_NUMBER
 			 set64Bit:YES];
 		
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
@@ -532,7 +531,7 @@
 			self.generalStatusTextField.attributedStringValue = status;
 			
 			self.searchButton.enabled = NO;
-			self.currentProcess.processID = NON_EXISTENT_PID_NUMBER;
+			[self.currentProcess markInvalid];
 			self.runningApplicationsPopUpButton.selectedItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.name];
 			
 			// Set the icon to the standard one

@@ -407,7 +407,7 @@
 		NSImage *iconImage = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
 		iconImage.size = NSMakeSize(16, 16);
 		menuItem.image = iconImage;
-		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName processID:NON_EXISTENT_PID_NUMBER set64Bit:YES];
+		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName set64Bit:YES];
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 	}
@@ -430,7 +430,7 @@
 {
 	BOOL success = NO;
 	
-	if (![self.currentProcess hasGrantedAccess])
+	if (!self.currentProcess.valid || ![self.currentProcess hasGrantedAccess])
 	{
 		goto END_MEMORY_VIEW_CHANGE;
 	}

@@ -66,14 +66,25 @@
 	return self;
 }
 
-- (BOOL)valid
+- (id)initWithName:(NSString *)processName set64Bit:(BOOL)flag64Bit
 {
-	return self.processID != NON_EXISTENT_PID_NUMBER;
+	return [self initWithName:processName processID:NON_EXISTENT_PID_NUMBER set64Bit:flag64Bit];
 }
 
 - (NSUInteger)numberOfRegions
 {
 	return ZGNumberOfRegionsForProcessTask(self.processTask);
+}
+
+- (BOOL)valid
+{
+	return self.processID != NON_EXISTENT_PID_NUMBER;
+}
+
+- (void)markInvalid
+{
+	self.processID = NON_EXISTENT_PID_NUMBER;
+	self.processTask = MACH_PORT_NULL;
 }
 
 - (BOOL)grantUsAccess

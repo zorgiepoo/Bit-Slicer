@@ -59,6 +59,8 @@
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
 - (id)initWithName:(NSString *)processName processID:(pid_t)aProcessID set64Bit:(BOOL)flag64Bit;
+- (id)initWithName:(NSString *)processName set64Bit:(BOOL)flag64Bit;
+- (void)markInvalid;
 - (BOOL)grantUsAccess;
 - (BOOL)hasGrantedAccess;
 
