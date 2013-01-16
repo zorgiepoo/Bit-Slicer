@@ -88,7 +88,7 @@
     
 	// First, update all the variable's addresses that are pointers
 	// We don't want to update this when the user is editing something in the table
-	if (self.document.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.watchVariablesTableView.editedRow == -1)
+	if (self.document.currentProcess.valid && self.watchVariablesTableView.editedRow == -1)
 	{
 		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 		 {
@@ -109,7 +109,7 @@
 	}
 	
 	// Then check that the process is alive
-	if (self.document.currentProcess.processID != NON_EXISTENT_PID_NUMBER)
+	if (self.document.currentProcess.valid)
 	{
 		// Freeze all variables that need be frozen!
 		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
@@ -132,7 +132,7 @@
 	
 	// if any variables are changing, that means that we'll have to reload the table, and that'd be very bad
 	// if the user is in the process of editing a variable's value, so don't do it then
-	if (self.document.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.watchVariablesTableView.editedRow == -1)
+	if (self.document.currentProcess.valid && self.watchVariablesTableView.editedRow == -1)
 	{
 		// Read all the variables and update them in the table view if needed
 		NSRange visibleRowsRange = [self.watchVariablesTableView rowsInRect:self.watchVariablesTableView.visibleRect];
@@ -338,7 +338,7 @@
 {
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
-		if ((![self.document.searchController canStartTask] && !self.document.currentProcess.isWatchingBreakPoint) || self.document.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if ((![self.document.searchController canStartTask] && !self.document.currentProcess.isWatchingBreakPoint) || !self.document.currentProcess.valid)
 		{
 			NSBeep();
 			return NO;

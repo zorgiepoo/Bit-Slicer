@@ -134,7 +134,7 @@
 		shouldUpdate = YES;
 	}
 	_currentProcess = newProcess;
-	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.processID != NON_EXISTENT_PID_NUMBER)
+	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.valid)
 	{
 		if (![_currentProcess grantUsAccess])
 		{
@@ -282,7 +282,7 @@
 
 - (void)updateInstructionsTimer:(NSTimer *)timer
 {
-	if (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.instructionsTableView.editedRow == -1 && !self.disassembling)
+	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && !self.disassembling)
 	{
 		// Check to see if anything in the window needs to be updated
 		NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
@@ -613,7 +613,7 @@
 {
 	BOOL success = NO;
 	
-	if (self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || ![self.currentProcess hasGrantedAccess])
+	if (!self.currentProcess.valid || ![self.currentProcess hasGrantedAccess])
 	{
 		goto END_DEBUGGER_CHANGE;
 	}
@@ -754,7 +754,7 @@ END_DEBUGGER_CHANGE:
 	if (menuItem.action == @selector(nopVariables:))
 	{
 		[menuItem setTitle:[NSString stringWithFormat:@"NOP Instruction%@", self.selectedInstructions.count == 1 ? @"" : @"s"]];
-		if (self.selectedInstructions.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.instructionsTableView.editedRow != -1 || self.disassembling)
+		if (self.selectedInstructions.count == 0 || !self.currentProcess.valid || self.instructionsTableView.editedRow != -1 || self.disassembling)
 		{
 			return NO;
 		}

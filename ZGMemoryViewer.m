@@ -96,7 +96,7 @@
 		shouldUpdateMemoryView = YES;
 	}
 	_currentProcess = newProcess;
-	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.processID != NON_EXISTENT_PID_NUMBER)
+	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.valid)
 	{
 		if (![_currentProcess grantUsAccess])
 		{

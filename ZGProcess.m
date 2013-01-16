@@ -33,11 +33,13 @@
  */
 
 #import "ZGProcess.h"
+#import "ZGProcessList.h"
+#import "ZGRunningProcess.h"
 
 @implementation ZGProcess
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask
-{	
+{
 	integer_t suspendCount;
 	if (ZGSuspendCount(processTask, &suspendCount))
 	{
@@ -64,14 +66,9 @@
 	return self;
 }
 
-- (void)setProcessTask:(ZGMemoryMap)newProcessTask
+- (BOOL)valid
 {
-	if (_processTask)
-	{
-		ZGFreeTask(_processTask);
-	}
-	
-	_processTask = newProcessTask;
+	return self.processID != NON_EXISTENT_PID_NUMBER;
 }
 
 - (NSUInteger)numberOfRegions
@@ -80,20 +77,13 @@
 }
 
 - (BOOL)grantUsAccess
-{
-	ZGMemoryMap newProcessTask = MACH_PORT_NULL;
-	BOOL success = ZGGetTaskForProcess(self.processID, &newProcessTask);
-	if (success && newProcessTask != self.processTask)
-	{
-		self.processTask = newProcessTask;
-	}
-	
-	return success;
+{	
+	return ZGGetTaskForProcess(self.processID, &_processTask);
 }
 
 - (BOOL)hasGrantedAccess
 {
-    return (self.processTask != MACH_PORT_NULL);
+    return MACH_PORT_VALID(self.processTask);
 }
 
 - (ZGMemorySize)pointerSize

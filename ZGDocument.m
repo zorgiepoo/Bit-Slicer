@@ -440,7 +440,7 @@
 		[self markDocumentChange];
 	}
 	
-	if (self.currentProcess && self.currentProcess.processID != NON_EXISTENT_PID_NUMBER)
+	if (self.currentProcess && self.currentProcess.valid)
 	{
 		if (![self.currentProcess grantUsAccess])
 		{
@@ -465,7 +465,7 @@
 		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] init];
 		runningProcess.processIdentifier = [[menuItem representedObject] processID];
 		if (menuItem != self.runningApplicationsPopUpButton.selectedItem &&
-			([menuItem.representedObject processID] == NON_EXISTENT_PID_NUMBER ||
+			(![menuItem.representedObject valid] ||
 			 ![[[ZGProcessList sharedProcessList] runningProcesses] containsObject:runningProcess]))
 		{
 			[itemsToRemove addObject:menuItem];
@@ -478,7 +478,7 @@
 	}
 	
 	// If we're switching to a process, search button should be enabled if it's alive and if we have access to it
-	self.searchButton.enabled = (self.currentProcess.processID != NON_EXISTENT_PID_NUMBER && self.currentProcess.hasGrantedAccess);
+	self.searchButton.enabled = (self.currentProcess.valid && self.currentProcess.hasGrantedAccess);
 }
 
 - (void)addProcessesToPopupButton
@@ -574,7 +574,7 @@
 		{
 			ZGProcess *process = menuItem.representedObject;
 			if (process == self.currentProcess &&
-				self.currentProcess.processID == NON_EXISTENT_PID_NUMBER &&
+				!self.currentProcess.valid &&
 				[self.currentProcess.name isEqualToString:newRunningProcess.name])
 			{
 				self.currentProcess.processID = newRunningProcess.processIdentifier;
@@ -1099,7 +1099,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(pauseOrUnpauseProcess:))
 	{
-		if (!self.currentProcess || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (!self.currentProcess || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1119,7 +1119,7 @@ static NSSize *expandedWindowMinSize = nil;
 	{
 		menuItem.title = [NSString stringWithFormat:@"Edit Variable Value%@…", self.selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1127,7 +1127,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(editVariablesAddress:))
 	{
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1138,7 +1138,7 @@ static NSSize *expandedWindowMinSize = nil;
 		NSArray *selectedVariables = [self selectedVariables];
 		menuItem.title = [NSString stringWithFormat:@"Edit Variable Size%@…", selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || selectedVariables.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1155,7 +1155,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(memoryDumpRangeRequest:) || menuItem.action == @selector(memoryDumpAllRequest:) || menuItem.action == @selector(storeAllValues:) || menuItem.action == @selector(changeMemoryProtection:))
 	{
-		if ([self.searchController canCancelTask] || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if ([self.searchController canCancelTask] || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1170,7 +1170,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(watchVariable:))
 	{
-		if ([self.searchController canCancelTask] || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER || self.selectedVariables.count != 1)
+		if ([self.searchController canCancelTask] || !self.currentProcess.valid || self.selectedVariables.count != 1)
 		{
 			return NO;
 		}
@@ -1201,7 +1201,7 @@ static NSSize *expandedWindowMinSize = nil;
 	{
 		menuItem.title = [NSString stringWithFormat:@"NOP Variable%@", self.selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1221,7 +1221,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(showMemoryViewer:))
 	{
-		if (self.selectedVariables.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (self.selectedVariables.count != 1 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1235,7 +1235,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(showDisassembler:))
 	{
-		if (self.selectedVariables.count != 1 || self.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+		if (self.selectedVariables.count != 1 || !self.currentProcess.valid)
 		{
 			return NO;
 		}

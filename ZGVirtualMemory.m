@@ -49,6 +49,16 @@
 
 static NSDictionary *gTasksDictionary = nil;
 
+BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task)
+{
+	*task = MACH_PORT_NULL;
+	if (gTasksDictionary)
+	{
+		*task = [[gTasksDictionary objectForKey:@(process)] unsignedIntValue];
+	}
+	return MACH_PORT_VALID(*task);
+}
+
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 {
 	if (!gTasksDictionary)
@@ -56,54 +66,54 @@ BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 		gTasksDictionary = [[NSDictionary alloc] init];
 	}
 	
-	id currentTask = [gTasksDictionary objectForKey:@(process)];
-	if (currentTask)
+	BOOL success = YES;
+	
+	if (!ZGTaskExistsForProcess(process, task))
 	{
-		*task = [currentTask unsignedIntValue];
-		return YES;
+		kern_return_t result = task_for_pid(current_task(), process, task);
+		if (result != KERN_SUCCESS)
+		{
+			*task = MACH_PORT_NULL;
+			NSLog(@"Failed to get task for process %d: %s", process, mach_error_string(result));
+			success = NO;
+		}
+		else if (!MACH_PORT_VALID(*task))
+		{
+			*task = MACH_PORT_NULL;
+			NSLog(@"Mach port is not valid for process %d", process);
+			success = NO;
+		}
+		else
+		{
+			NSMutableDictionary *newTasksDictionary = [[NSMutableDictionary alloc] initWithDictionary:gTasksDictionary];
+			[newTasksDictionary setObject:@(*task) forKey:@(process)];
+			gTasksDictionary = [NSDictionary dictionaryWithDictionary:newTasksDictionary];
+		}
 	}
 	
-	kern_return_t result = task_for_pid(current_task(), process, task);
-	if (result != KERN_SUCCESS)
-	{
-		*task = MACH_PORT_NULL;
-		NSLog(@"Failed to get task for process %d: %s", process, mach_error_string(result));
-	}
-	else
-	{
-		NSMutableDictionary *newTasksDictionary = [[NSMutableDictionary alloc] initWithDictionary:gTasksDictionary];
-		[newTasksDictionary setObject:@(*task) forKey:@(process)];
-		gTasksDictionary = [NSDictionary dictionaryWithDictionary:newTasksDictionary];
-	}
-	
-	return (result == KERN_SUCCESS);
+	return success;
 }
 
 void ZGFreeTask(ZGMemoryMap task)
 {
-	id foundProcess = nil;
 	for (id process in gTasksDictionary.allKeys)
 	{
-		if ([[gTasksDictionary objectForKey:process] unsignedIntValue] == task)
+		if ([@(task) isEqualToNumber:[gTasksDictionary objectForKey:process]])
 		{
-			foundProcess = process;
+			/*
+			 kern_return_t result;
+			 if ((result = mach_port_deallocate(current_task(), task)) != KERN_SUCCESS)
+			 {
+			 NSLog(@"Failed to deallocate mach port: %s", mach_error_string(result));
+			 }
+			 */
+			
+			NSMutableDictionary *newTasksDictionary = [[NSMutableDictionary alloc] initWithDictionary:gTasksDictionary];
+			[newTasksDictionary removeObjectForKey:process];
+			gTasksDictionary = [NSDictionary dictionaryWithDictionary:newTasksDictionary];
+			
 			break;
 		}
-	}
-	
-	if (foundProcess)
-	{
-		/*
-		kern_return_t result;
-		if ((result = mach_port_deallocate(current_task(), task)) != KERN_SUCCESS)
-		{
-			NSLog(@"Failed to deallocate mach port: %s", mach_error_string(result));
-		}
-		 */
-		
-		NSMutableDictionary *newTasksDictionary = [[NSMutableDictionary alloc] initWithDictionary:gTasksDictionary];
-		[newTasksDictionary removeObjectForKey:foundProcess];
-		gTasksDictionary = [NSDictionary dictionaryWithDictionary:newTasksDictionary];
 	}
 }
 

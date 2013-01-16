@@ -46,6 +46,7 @@
 
 @property (readwrite, nonatomic) pid_t processID;
 @property (readwrite, nonatomic) ZGMemoryMap processTask;
+@property (readonly, nonatomic) BOOL valid;
 @property (readwrite, copy, nonatomic) NSString *name;
 @property (readonly, nonatomic) NSUInteger numberOfRegions;
 @property (readwrite, nonatomic) BOOL is64Bit;

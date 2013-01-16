@@ -39,6 +39,7 @@
 #import "ZGBreakPointController.h"
 #import "ZGProcess.h"
 #import "ZGProcessList.h"
+#import "ZGRunningProcess.h"
 
 @interface ZGAppController ()
 
@@ -94,9 +95,34 @@ static id sharedInstance;
 	if (self)
 	{
 		sharedInstance = self;
+		[[ZGProcessList sharedProcessList]
+		 addObserver:self
+		 forKeyPath:@"runningProcesses"
+		 options:NSKeyValueObservingOptionOld
+		 context:NULL];
 	}
 	
 	return self;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if (object == [ZGProcessList sharedProcessList])
+	{
+		NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
+		
+		if (oldRunningProcesses)
+		{
+			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
+			{
+				ZGMemoryMap task;
+				if (ZGTaskExistsForProcess(runningProcess.processIdentifier, &task))
+				{
+					ZGFreeTask(task);
+				}
+			}
+		}
+	}
 }
 
 #pragma mark Pausing and Unpausing processes
@@ -108,7 +134,6 @@ OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef th
 		if (runningApplication.isActive && runningApplication.processIdentifier != getpid())
 		{
 			ZGMemoryMap processTask = 0;
-			
 			if (ZGGetTaskForProcess(runningApplication.processIdentifier, &processTask))
 			{
 				[ZGProcess pauseOrUnpauseProcessTask:processTask];

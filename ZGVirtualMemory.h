@@ -60,6 +60,7 @@ typedef void (^search_for_data_update_progress_t)(NSArray *newResults, ZGMemoryS
 
 typedef void (^search_for_data_completion_t)(NSArray *results);
 
+BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task);
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
 

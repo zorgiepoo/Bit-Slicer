@@ -232,7 +232,7 @@
 	
 	[self.document.watchWindow makeFirstResponder:self.document.searchValueTextField];
 	
-	if (self.document.currentProcess.processID == NON_EXISTENT_PID_NUMBER)
+	if (!self.document.currentProcess.valid)
 	{
 		[self.document removeRunningProcessFromPopupButton:nil];
 	}
@@ -281,7 +281,7 @@
 	self.document.dataTypesPopUpButton.enabled = YES;
 	self.document.variableQualifierMatrix.enabled = YES;
 	
-	if (self.document.currentProcess.processID != NON_EXISTENT_PID_NUMBER)
+	if (self.document.currentProcess.valid)
 	{
 		self.document.searchButton.enabled = YES;
 	}
@@ -296,7 +296,7 @@
 	
 	self.document.clearButton.enabled = NO;
 	
-	if (self.document.currentProcess.processID != NON_EXISTENT_PID_NUMBER)
+	if (self.document.currentProcess.valid)
 	{
 		self.document.generalStatusTextField.stringValue = @"Cleared search.";
 	}
