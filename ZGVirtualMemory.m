@@ -100,14 +100,6 @@ void ZGFreeTask(ZGMemoryMap task)
 	{
 		if ([@(task) isEqualToNumber:[gTasksDictionary objectForKey:process]])
 		{
-			/*
-			 kern_return_t result;
-			 if ((result = mach_port_deallocate(current_task(), task)) != KERN_SUCCESS)
-			 {
-			 NSLog(@"Failed to deallocate mach port: %s", mach_error_string(result));
-			 }
-			 */
-			
 			NSMutableDictionary *newTasksDictionary = [[NSMutableDictionary alloc] initWithDictionary:gTasksDictionary];
 			[newTasksDictionary removeObjectForKey:process];
 			gTasksDictionary = [NSDictionary dictionaryWithDictionary:newTasksDictionary];
