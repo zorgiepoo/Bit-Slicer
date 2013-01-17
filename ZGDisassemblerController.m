@@ -44,6 +44,7 @@
 #import "ZGBreakPointController.h"
 #import "ZGDisassemblerObject.h"
 #import "ZGUtilities.h"
+#import "ZGRegistersWindowController.h"
 
 @interface ZGDisassemblerController ()
 
@@ -67,6 +68,8 @@
 @property (nonatomic, strong) NSUndoManager *undoManager;
 
 @property (nonatomic, strong) ZGBreakPoint *currentBreakPoint;
+
+@property (nonatomic, strong) ZGRegistersWindowController *registersWindowController;
 
 @end
 
@@ -123,6 +126,15 @@
 	{
 		[self invalidateRestorableState];
 	}
+}
+
+- (ZGRegistersWindowController *)registersWindowController
+{
+	if (!_registersWindowController)
+	{
+		_registersWindowController = [[ZGRegistersWindowController alloc] init];
+	}
+	return _registersWindowController;
 }
 
 - (void)setCurrentProcess:(ZGProcess *)newProcess
@@ -198,6 +210,11 @@
 			[self readMemory:nil];
 		}
 	}
+	
+	if (self.currentBreakPoint)
+	{
+		[self.registersWindowController showWindow:nil];
+	}
 }
 
 - (IBAction)showWindow:(id)sender
@@ -209,8 +226,12 @@
 
 - (void)windowWillClose:(NSNotification *)notification
 {
-	[self.updateInstructionsTimer invalidate];
-	self.updateInstructionsTimer = nil;
+	if ([notification object] == self.window)
+	{
+		[self.updateInstructionsTimer invalidate];
+		self.updateInstructionsTimer = nil;
+		[self.registersWindowController close];
+	}
 }
 
 #pragma mark Disassembling
@@ -962,20 +983,27 @@ END_DEBUGGER_CHANGE:
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
 {
 	self.currentBreakPoint = breakPoint;
+	[self.registersWindowController showWindow:nil];
+	[self.registersWindowController updateRegistersFromBreakPoint:self.currentBreakPoint];
+}
+
+- (void)resumeBreakPoint
+{
+	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.currentBreakPoint];
+	self.currentBreakPoint = nil;
+	[self.registersWindowController close];
 }
 
 - (IBAction)continueFromBreakPoint:(id)sender
 {
 	[[[ZGAppController sharedController] breakPointController] removeSingleStepBreakPointsFromBreakPoint:self.currentBreakPoint];
-	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.currentBreakPoint];
-	self.currentBreakPoint = nil;
+	[self resumeBreakPoint];
 }
 
 - (IBAction)stepInto:(id)sender
 {
 	[[[ZGAppController sharedController] breakPointController] addSingleStepBreakPointFromBreakPoint:self.currentBreakPoint];
-	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.currentBreakPoint];
-	self.currentBreakPoint = nil;
+	[self resumeBreakPoint];
 }
 
 - (IBAction)stepOver:(id)sender
