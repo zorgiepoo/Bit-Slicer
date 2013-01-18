@@ -42,6 +42,11 @@
 	NSMutableArray *_runningProcesses;
 }
 
+@property (assign) NSUInteger pollRequestCount;
+@property (nonatomic, strong) NSArray *priorityProcesses;
+@property (nonatomic, strong) NSArray *pollObservers;
+@property (nonatomic, strong) NSTimer *pollTimer;
+
 @end
 
 @implementation ZGProcessList
@@ -102,9 +107,7 @@
 	if (self)
 	{
 		_runningProcesses = [[NSMutableArray alloc] init];
-		[self receiveList:nil];
-		NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(receiveList:) userInfo:nil repeats:YES];
-		[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+		[self retrieveList];
 	}
 	return self;
 }
@@ -113,9 +116,9 @@
 
 // http://stackoverflow.com/questions/7729245/can-i-use-sysctl-to-retrieve-a-process-list-with-the-user
 // http://www.nightproductions.net/dsprocessesinfo_m.html
-- (void)receiveList:(NSTimer *)timer
+- (void)retrieveList
 {
-    struct kinfo_proc *processList = NULL;
+	struct kinfo_proc *processList = NULL;
     size_t length = 0;
 	
     static const int name[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
@@ -205,6 +208,114 @@
 	}
 	
 	free(processList);
+}
+
+#pragma mark Polling
+
+- (void)createPollTimer
+{
+	self.pollTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(poll:) userInfo:nil repeats:YES];
+}
+
+- (void)destroyPollTimer
+{
+	[self.pollTimer invalidate];
+	self.pollTimer = nil;
+}
+
+- (void)poll:(NSTimer *)timer
+{
+	if (self.pollRequestCount > 0)
+	{
+		[self retrieveList];
+	}
+	else if (self.priorityProcesses)
+	{
+		[self watchPriorityProcesses];
+	}
+}
+
+- (void)requestPollingWithObserver:(id)observer
+{
+	if (![self.pollObservers containsObject:observer])
+	{
+		NSMutableArray *newObservers = self.pollObservers ? [NSMutableArray arrayWithArray:self.pollObservers] : [NSMutableArray array];
+		
+		[newObservers addObject:observer];
+		self.pollObservers = [NSArray arrayWithArray:newObservers];
+		
+		if (self.pollRequestCount == 0 && !self.pollTimer)
+		{
+			[self createPollTimer];
+		}
+		
+		self.pollRequestCount++;
+	}
+}
+
+- (void)unrequestPollingWithObserver:(id)observer
+{
+	if ([self.pollObservers containsObject:observer])
+	{
+		NSMutableArray *newObservers = [NSMutableArray arrayWithArray:self.pollObservers];
+		[newObservers removeObject:observer];
+		self.pollObservers = [NSArray arrayWithArray:newObservers];
+		
+		self.pollRequestCount--;
+		if (self.pollRequestCount == 0 && self.priorityProcesses	.count == 0)
+		{
+			[self destroyPollTimer];
+		}
+	}
+}
+
+#pragma mark Watching Specific Processes Termination
+
+- (void)watchPriorityProcesses
+{
+	BOOL shouldRetrieveList = NO;
+	
+	for (NSNumber *processNumber in self.priorityProcesses)
+	{
+		if (kill(processNumber.intValue, 0) != 0 && errno != EPERM)
+		{
+			[self removePriorityToProcessIdentifier:processNumber.intValue];
+			shouldRetrieveList = YES;
+		}
+	}
+	
+	if (shouldRetrieveList)
+	{
+		[self retrieveList];
+	}
+}
+
+- (void)addPriorityToProcessIdentifier:(pid_t)processIdentifier
+{
+	if (![self.priorityProcesses containsObject:@(processIdentifier)])
+	{
+		NSMutableArray *newPriorityProcesses = self.priorityProcesses ? [NSMutableArray arrayWithArray:self.priorityProcesses] : [NSMutableArray array];
+		[newPriorityProcesses addObject:@(processIdentifier)];
+		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
+		if (!self.pollTimer)
+		{
+			[self createPollTimer];
+		}
+	}
+}
+
+- (void)removePriorityToProcessIdentifier:(pid_t)processIdentifier
+{
+	if ([self.priorityProcesses containsObject:@(processIdentifier)])
+	{
+		NSMutableArray *newPriorityProcesses = [NSMutableArray arrayWithArray:self.priorityProcesses];
+		[newPriorityProcesses removeObject:@(processIdentifier)];
+		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
+		if (self.priorityProcesses.count == 0 && self.pollRequestCount == 0)
+		{
+			[self destroyPollTimer];
+		}
+	}
 }
 
 @end

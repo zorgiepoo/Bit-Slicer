@@ -41,4 +41,16 @@
 
 + (id)sharedProcessList;
 
+// Forces to fetch all process information
+- (void)retrieveList;
+
+// Request or unrequest if changes should be polled and checked frequently
+// Not so efficient, but sometimes necessary
+- (void)requestPollingWithObserver:(id)observer;
+- (void)unrequestPollingWithObserver:(id)observer;
+
+// Add or remove priority to a process id. Even if we aren't polling, we will make sure to let you know when a specific running process ID terminates. This is efficient.
+- (void)addPriorityToProcessIdentifier:(pid_t)processIdentifier;
+- (void)removePriorityToProcessIdentifier:(pid_t)processIdentifier;
+
 @end

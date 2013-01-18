@@ -155,6 +155,19 @@
 	[self.memoryDumpController cleanUp];
 }
 
+- (void)windowWillClose:(NSNotification *)notification
+{
+	if ([notification object] == self.watchWindow)
+	{
+		if (self.currentProcess.valid)
+		{
+			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
+		}
+		
+		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+	}
+}
+
 - (NSString *)windowNibName
 {
 	return @"MyDocument";
@@ -270,6 +283,12 @@
 		 name:NSWindowWillExitFullScreenNotification
 		 object:self.watchWindow];
 	}
+	
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
+	 name:NSPopUpButtonWillPopUpNotification
+	 object:self.runningApplicationsPopUpButton];
 	
 	[self loadDocumentUserInterface];
 }
@@ -400,6 +419,11 @@
 
 #pragma mark Watching other applications
 
+- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
+{
+	[[ZGProcessList sharedProcessList] retrieveList];
+}
+
 - (IBAction)runningApplicationsPopUpButtonRequest:(id)sender
 {
 	BOOL pointerSizeChanged = YES;
@@ -413,6 +437,11 @@
 		
 		// this is about as far as we go when it comes to undo/redos...
 		[self.undoManager removeAllActions];
+	}
+	
+	if (self.currentProcess)
+	{
+		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
@@ -442,6 +471,8 @@
 	
 	if (self.currentProcess && self.currentProcess.valid)
 	{
+		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID];
+		
 		if (![self.currentProcess grantUsAccess])
 		{
 			NSAttributedString *errorMessage =
@@ -531,6 +562,9 @@
 			self.generalStatusTextField.attributedStringValue = status;
 			
 			self.searchButton.enabled = NO;
+			
+			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
+			
 			[self.currentProcess markInvalid];
 			self.runningApplicationsPopUpButton.selectedItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.name];
 			
@@ -541,6 +575,8 @@
 				regularAppIcon.size = NSMakeSize(16, 16);
 				self.runningApplicationsPopUpButton.selectedItem.image = regularAppIcon;
 			}
+			
+			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
 		}
 		else if (oldRunningProcess.processIdentifier != -1)
 		{
@@ -586,6 +622,9 @@
 				
 				[self runningApplicationsPopUpButtonRequest:nil];
 				self.searchButton.enabled = YES;
+				
+				[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+				
 				return;
 			}
 		}

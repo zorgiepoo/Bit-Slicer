@@ -93,6 +93,12 @@
 	
 	if (_currentProcess.processID != newProcess.processID)
 	{
+		if (_currentProcess)
+		{
+			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
+		}
+		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
+		
 		shouldUpdateMemoryView = YES;
 	}
 	_currentProcess = newProcess;
@@ -235,6 +241,12 @@
 	 forKeyPath:@"runningProcesses"
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	 context:NULL];
+	
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
+	 name:NSPopUpButtonWillPopUpNotification
+	 object:self.runningApplicationsPopUpButton];
 }
 
 - (void)windowDidShow:(id)sender
@@ -255,6 +267,18 @@
 		[self changeMemoryView:nil];
 		self.windowDidAppear = YES;
 	}
+	
+	if (self.currentProcess)
+	{
+		if (self.currentProcess.valid)
+		{
+			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID];
+		}
+		else
+		{
+			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+		}
+	}
 }
 
 - (IBAction)showWindow:(id)sender
@@ -268,6 +292,13 @@
 {
 	[self.checkMemoryTimer invalidate];
 	self.checkMemoryTimer = nil;
+	
+	if (self.currentProcess.valid)
+	{
+		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
+	}
+	
+	[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
 }
 
 #pragma mark Data Inspector
@@ -410,9 +441,20 @@
 		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName set64Bit:YES];
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
+		
+		[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+	}
+	else
+	{
+		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
+}
+
+- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
+{
+	[[ZGProcessList sharedProcessList] retrieveList];
 }
 
 - (IBAction)runningApplicationsPopUpButton:(id)sender

@@ -143,6 +143,9 @@
 	
 	if (_currentProcess && _currentProcess.processID != newProcess.processID)
 	{
+		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
+		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
+		
 		shouldUpdate = YES;
 	}
 	_currentProcess = newProcess;
@@ -186,6 +189,12 @@
 	 forKeyPath:@"runningProcesses"
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	 context:NULL];
+	
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
+	 name:NSPopUpButtonWillPopUpNotification
+	 object:self.runningApplicationsPopUpButton];
 }
 
 // This is intended to be called when the window shows up - either from showWindow: or from window restoration
@@ -215,6 +224,18 @@
 	{
 		[self.registersWindowController showWindow:nil];
 	}
+	
+	if (self.currentProcess)
+	{
+		if (self.currentProcess.valid)
+		{
+			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID];
+		}
+		else
+		{
+			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+		}
+	}
 }
 
 - (IBAction)showWindow:(id)sender
@@ -230,6 +251,14 @@
 	{
 		[self.updateInstructionsTimer invalidate];
 		self.updateInstructionsTimer = nil;
+		
+		if (self.currentProcess.valid)
+		{
+			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
+		}
+		
+		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+		
 		[self.registersWindowController close];
 	}
 }
@@ -608,6 +637,12 @@
 		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName set64Bit:YES];
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
+		
+		[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+	}
+	else
+	{
+		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
@@ -622,6 +657,11 @@
 		[[ZGAppController sharedController] setLastSelectedProcessName:self.desiredProcessName];
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 	}
+}
+
+- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
+{
+	[[ZGProcessList sharedProcessList] retrieveList];
 }
 
 - (IBAction)runningApplicationsPopUpButton:(id)sender
