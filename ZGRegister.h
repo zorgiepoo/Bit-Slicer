@@ -33,6 +33,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGVirtualMemory.h"
 
 @class ZGVariable;
 
@@ -40,6 +41,7 @@
 
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, strong) ZGVariable *variable;
+@property (nonatomic, readonly) void *value;
 
 - (id)initWithName:(NSString *)name variable:(ZGVariable *)variable;
 

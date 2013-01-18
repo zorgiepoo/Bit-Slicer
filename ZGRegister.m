@@ -35,6 +35,12 @@
 #import "ZGRegister.h"
 #import "ZGVariable.h"
 
+@interface ZGRegister ()
+
+@property (nonatomic, assign) void *value;
+
+@end
+
 @implementation ZGRegister
 
 - (id)initWithName:(NSString *)name variable:(ZGVariable *)variable
@@ -44,8 +50,15 @@
 	{
 		self.name = name;
 		self.variable = variable;
+		self.value = malloc(self.variable.size);
+		memcpy(self.value, self.variable.value, self.variable.size);
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	free(self.value);
 }
 
 @end

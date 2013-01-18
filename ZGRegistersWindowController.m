@@ -38,11 +38,14 @@
 #import "ZGRegister.h"
 #import "ZGProcess.h"
 #import "ZGVariable.h"
+#import "ZGUtilities.h"
 
 @interface ZGRegistersWindowController ()
 
 @property (assign) IBOutlet NSTableView *tableView;
 @property (nonatomic, strong) NSArray *registers;
+@property (nonatomic, strong) ZGBreakPoint *breakPoint;
+@property (nonatomic, strong) NSUndoManager *undoManager;
 
 @end
 
@@ -52,7 +55,14 @@
 {
 	self = [super initWithWindowNibName:NSStringFromClass([self class])];
 	
+	self.undoManager = [[NSUndoManager alloc] init];
+	
 	return self;
+}
+
+- (NSUndoManager *)windowWillReturnUndoManager:(id)sender
+{
+	return self.undoManager;
 }
 
 - (void)showWindow:(id)sender
@@ -70,9 +80,11 @@
 {
 	NSMutableArray *newRegisters = [[NSMutableArray alloc] init];
 	
+	self.breakPoint = breakPoint;
+	
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-	if (thread_get_state(breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) == KERN_SUCCESS)
+	if (thread_get_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) == KERN_SUCCESS)
 	{
 		ZGMemorySize registerSize = breakPoint.process.pointerSize;
 		
@@ -144,7 +156,72 @@
 	}
 	
 	self.registers = [NSArray arrayWithArray:newRegisters];
+	[self.undoManager removeAllActions];
 	[self.tableView reloadData];
+}
+
+- (void)changeRegister:(ZGRegister *)theRegister oldType:(ZGVariableType)oldType newType:(ZGVariableType)newType
+{
+	[theRegister.variable
+	 setType:newType
+	 requestedSize:self.breakPoint.process.pointerSize
+	 pointerSize:self.breakPoint.process.pointerSize];
+	
+	if (self.breakPoint.process.pointerSize >= theRegister.variable.size)
+	{
+		[theRegister.variable setValue:theRegister.value];
+	}
+	
+	[[self.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
+	[self.undoManager setActionName:@"Type Change"];
+	
+	[self.tableView reloadData];
+}
+
+- (void)changeRegister:(ZGRegister *)theRegister oldVariable:(ZGVariable *)oldVariable newVariable:(ZGVariable *)newVariable
+{
+	x86_thread_state_t threadState;
+	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
+	if (thread_get_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) == KERN_SUCCESS)
+	{
+		BOOL shouldWriteRegister = NO;
+		if (self.breakPoint.process.is64Bit)
+		{
+			NSArray *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
+			if ([registers64 containsObject:theRegister.name])
+			{
+				*((uint64_t *)&threadState.uts.ts64 + [registers64 indexOfObject:theRegister.name]) = *(uint64_t *)newVariable.value;
+				shouldWriteRegister = YES;
+			}
+		}
+		else
+		{
+			NSArray *registers32 = @[@"eax", @"ebx", @"ecx", @"edx", @"edi", @"esi", @"ebp", @"esp", @"ss", @"eflags", @"eip", @"cs", @"ds", @"es", @"fs", @"gs"];
+			if ([registers32 containsObject:theRegister.name])
+			{
+				*((uint32_t *)&threadState.uts.ts32 + [registers32 indexOfObject:theRegister.name]) = *(uint32_t *)newVariable.value;
+				shouldWriteRegister = YES;
+			}
+		}
+		
+		if (shouldWriteRegister)
+		{
+			if (thread_set_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+			{
+				NSLog(@"Failure in setting registers thread state for writing register value: %d", self.breakPoint.thread);
+			}
+			else
+			{
+				theRegister.variable = newVariable;
+				memcpy(theRegister.value, theRegister.variable.value, theRegister.variable.size);
+				
+				[[self.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
+				[self.undoManager setActionName:@"Value Change"];
+				
+				[self.tableView reloadData];
+			}
+		}
+	}
 }
 
 #pragma mark TableView Methods
@@ -181,19 +258,34 @@
 {
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.registers.count)
 	{
-		//ZGRegister *theRegister = [self.registers objectAtIndex:rowIndex];
+		ZGRegister *theRegister = [self.registers objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"value"])
 		{
+			ZGMemorySize size;
+			void *newValue = valueFromString(self.breakPoint.process, object, theRegister.variable.type, &size);
+			if (newValue)
+			{
+				if (size <= self.breakPoint.process.pointerSize)
+				{
+					[self
+					 changeRegister:theRegister
+					 oldVariable:theRegister.variable
+					 newVariable:
+						[[ZGVariable alloc]
+						 initWithValue:newValue
+						 size:size
+						 address:theRegister.variable.address
+						 type:theRegister.variable.type
+						 qualifier:theRegister.variable.qualifier
+						 pointerSize:self.breakPoint.process.pointerSize]];
+				}
+				free(newValue);
+			}
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
-			//ZGVariableType newType =(ZGVariableType)[tableColumn.dataCell indexOfItemWithTag:[object integerValue]];
-			/*
-			 [theRegister.variable
-			 setType:newType
-			 requestedSize:theRegister.variable.size
-			 pointerSize:4];
-			 */
+			ZGVariableType newType = (ZGVariableType)[[[tableColumn.dataCell itemArray] objectAtIndex:[object unsignedIntegerValue]] tag];
+			[self changeRegister:theRegister oldType:theRegister.variable.type newType:newType];
 		}
 	}
 }
