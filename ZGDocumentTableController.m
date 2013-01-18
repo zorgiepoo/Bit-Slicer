@@ -310,7 +310,7 @@
 		{
 			[self.document.variableController
 			 changeVariable:[self.document.watchVariablesArray objectAtIndex:rowIndex]
-			 newType:(ZGVariableType)[tableColumn.dataCell indexOfItemWithTag:[object integerValue]]
+			 newType:(ZGVariableType)[[[tableColumn.dataCell itemArray] objectAtIndex:[object unsignedIntegerValue]] tag]
 			 newSize:[(ZGVariable *)[self.document.watchVariablesArray objectAtIndex:rowIndex] size]];
 		}
 	}
