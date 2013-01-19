@@ -274,8 +274,12 @@
 		
 		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
 		
-		self.closingRegistersWindow = YES;
-		[self.registersWindowController close];
+		// Check to see if the window controller has been allocated yet
+		if (_registersWindowController)
+		{
+			self.closingRegistersWindow = YES;
+			[self.registersWindowController close];
+		}
 	}
 	else if ([notification object] == self.registersWindowController.window)
 	{
