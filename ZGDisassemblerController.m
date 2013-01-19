@@ -846,7 +846,7 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:))
+	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:) || menuItem.action == @selector(showRegisters:))
 	{
 		if (!self.currentBreakPoint || self.disassembling)
 		{
@@ -1131,6 +1131,11 @@ END_DEBUGGER_CHANGE:
 	{
 		[self stepInto:nil];
 	}
+}
+
+- (IBAction)showRegisters:(id)sender
+{
+	[self showOrCloseRegistersWindow];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification

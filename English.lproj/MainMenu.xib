@@ -455,6 +455,14 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
+								<object class="NSMenuItem" id="376817296">
+									<reference key="NSMenu" ref="79774020"/>
+									<string key="NSTitle">Show Registers</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="1033313550"/>
+									<reference key="NSMixedImage" ref="310636482"/>
+								</object>
 								<object class="NSMenuItem" id="636971240">
 									<reference key="NSMenu" ref="79774020"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -1423,6 +1431,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">showRegisters:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="376817296"/>
+					</object>
+					<int key="connectionID">961</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">openPreferences:</string>
 						<reference key="source" ref="187132439"/>
 						<reference key="destination" ref="609285721"/>
@@ -2160,6 +2176,7 @@
 							<reference ref="133973915"/>
 							<reference ref="973998386"/>
 							<reference ref="822998079"/>
+							<reference ref="376817296"/>
 						</object>
 						<reference key="parent" ref="278865230"/>
 					</object>
@@ -2186,6 +2203,11 @@
 					<object class="IBObjectRecord">
 						<int key="objectID">957</int>
 						<reference key="object" ref="822998079"/>
+						<reference key="parent" ref="79774020"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">960</int>
+						<reference key="object" ref="376817296"/>
 						<reference key="parent" ref="79774020"/>
 					</object>
 				</object>
@@ -2302,9 +2324,11 @@
 					<string>953.IBPluginDependency</string>
 					<string>955.IBPluginDependency</string>
 					<string>957.IBPluginDependency</string>
+					<string>960.IBPluginDependency</string>
 				</object>
 				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2427,7 +2451,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">959</int>
+			<int key="maxID">961</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
