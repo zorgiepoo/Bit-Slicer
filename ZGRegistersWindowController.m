@@ -47,6 +47,7 @@
 @property (nonatomic, strong) NSArray *registers;
 @property (nonatomic, strong) ZGBreakPoint *breakPoint;
 @property (nonatomic, strong) NSUndoManager *undoManager;
+@property (nonatomic, assign) ZGVariableType qualifier;
 
 @end
 
@@ -57,6 +58,7 @@
 	self = [super initWithWindowNibName:NSStringFromClass([self class])];
 	
 	self.undoManager = [[NSUndoManager alloc] init];
+	self.qualifier = [[[NSUserDefaults standardUserDefaults] objectForKey:ZG_DEBUG_QUALIFIER] intValue];
 	
 	return self;
 }
@@ -74,7 +76,7 @@
 #define REGISTER_DEFAULT_TYPE(registerName) [[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES] objectForKey:@(#registerName)]
 
 #define ADD_REGISTER(registerName, variableType, structureType) \
-	[newRegisters addObject:[[ZGRegister alloc] initWithVariable:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:REGISTER_DEFAULT_TYPE(registerName) ? [REGISTER_DEFAULT_TYPE(registerName) intValue] : variableType qualifier:ZGSigned pointerSize:registerSize name:@(#registerName)]]]
+	[newRegisters addObject:[[ZGRegister alloc] initWithVariable:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:REGISTER_DEFAULT_TYPE(registerName) ? [REGISTER_DEFAULT_TYPE(registerName) intValue] : variableType qualifier:self.qualifier pointerSize:registerSize name:@(#registerName)]]]
 
 #define ADD_REGISTER_32(registerName, variableType) ADD_REGISTER(registerName, variableType, ts32)
 #define ADD_REGISTER_64(registerName, variableType) ADD_REGISTER(registerName, variableType, ts64)
@@ -311,6 +313,33 @@
 			[self changeRegister:theRegister oldType:theRegister.variable.type newType:newType];
 		}
 	}
+}
+
+#pragma mark Menu Items
+
+- (IBAction)changeQualifier:(id)sender
+{
+	if (self.qualifier != [sender tag])
+	{
+		self.qualifier = [sender tag];
+		[[NSUserDefaults standardUserDefaults] setInteger:self.qualifier forKey:ZG_DEBUG_QUALIFIER];
+		for (ZGRegister *theRegister in self.registers)
+		{
+			theRegister.variable.qualifier = self.qualifier;
+		}
+		
+		[self.tableView reloadData];
+	}
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+	if (menuItem.action == @selector(changeQualifier:))
+	{
+		[menuItem setState:self.qualifier == [menuItem tag]];
+	}
+	
+	return YES;
 }
 
 @end

@@ -876,8 +876,20 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
+	else if (menuItem.action == @selector(changeQualifier:))
+	{
+		if (!_registersWindowController || !self.registersWindowController.window.isVisible || ![self.registersWindowController validateMenuItem:menuItem])
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
+}
+
+- (IBAction)changeQualifier:(id)sender
+{
+	[self.registersWindowController changeQualifier:sender];
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(id)sender

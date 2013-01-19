@@ -40,4 +40,6 @@
 
 - (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint;
 
+- (IBAction)changeQualifier:(id)sender;
+
 @end
