@@ -45,6 +45,7 @@
 #import "ZGDisassemblerObject.h"
 #import "ZGUtilities.h"
 #import "ZGRegistersWindowController.h"
+#import "ZGPreferencesController.h"
 
 @interface ZGDisassemblerController ()
 
@@ -71,6 +72,7 @@
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
 
 @property (nonatomic, strong) ZGRegistersWindowController *registersWindowController;
+@property (nonatomic, assign) BOOL closingRegistersWindow;
 
 @end
 
@@ -135,6 +137,11 @@
 	if (!_registersWindowController)
 	{
 		_registersWindowController = [[ZGRegistersWindowController alloc] init];
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(windowWillClose:)
+		 name:NSWindowWillCloseNotification
+		 object:_registersWindowController.window];
 	}
 	return _registersWindowController;
 }
@@ -267,7 +274,19 @@
 		
 		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
 		
+		self.closingRegistersWindow = YES;
 		[self.registersWindowController close];
+	}
+	else if ([notification object] == self.registersWindowController.window)
+	{
+		if (!self.closingRegistersWindow)
+		{
+			[[NSUserDefaults standardUserDefaults] setBool:NO forKey:ZG_AUTOMATICALLY_SHOW_REGISTERS];
+		}
+		else
+		{
+			self.closingRegistersWindow = NO;
+		}
 	}
 }
 
@@ -1076,11 +1095,15 @@ END_DEBUGGER_CHANGE:
 {
 	if (self.currentBreakPoint)
 	{
-		[self.registersWindowController showWindow:nil];
+		if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_AUTOMATICALLY_SHOW_REGISTERS])
+		{
+			[self.registersWindowController showWindow:nil];
+		}
 		[self.registersWindowController updateRegistersFromBreakPoint:self.currentBreakPoint];
 	}
 	else
 	{
+		self.closingRegistersWindow = YES;
 		[self.registersWindowController close];
 	}
 }
@@ -1135,6 +1158,7 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)showRegisters:(id)sender
 {
+	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:ZG_AUTOMATICALLY_SHOW_REGISTERS];
 	[self showOrCloseRegistersWindow];
 }
 
