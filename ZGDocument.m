@@ -54,6 +54,7 @@
 #import "ZGComparisonFunctions.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
+#import "ZGPreferencesController.h"
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
 #define ZGProcessNameKey @"ZGProcessNameKey"
@@ -107,8 +108,6 @@
 
 @end
 
-#define ZG_EXPAND_OPTIONS @"ZG_EXPAND_OPTIONS"
-
 @implementation ZGDocument
 
 - (NSArray *)selectedVariables
@@ -122,11 +121,6 @@
 }
 
 #pragma mark Document stuff
-
-+ (void)initialize
-{
-	[NSUserDefaults.standardUserDefaults registerDefaults:@{ZG_EXPAND_OPTIONS : @(NO)}];
-}
 
 - (id)init
 {
@@ -262,7 +256,7 @@
 {
 	[super windowControllerDidLoadNib:aController];
 	
-	if (![NSUserDefaults.standardUserDefaults boolForKey:ZG_EXPAND_OPTIONS])
+	if (![NSUserDefaults.standardUserDefaults boolForKey:ZG_EXPAND_DOCUMENT_OPTIONS])
 	{
 		[self optionsDisclosureButton:nil];
 	}
@@ -881,7 +875,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	[NSUserDefaults.standardUserDefaults
 	 setBool:self.optionsDisclosureButton.state
-	 forKey:ZG_EXPAND_OPTIONS];
+	 forKey:ZG_EXPAND_DOCUMENT_OPTIONS];
 }
 
 - (void)watchWindowWillExitFullScreen:(NSNotificationCenter *)notification

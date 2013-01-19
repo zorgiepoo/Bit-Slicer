@@ -97,8 +97,8 @@
 			ADD_REGISTER_64(rdx, ZGInt64);
 			
 			// Index and pointers
-			ADD_REGISTER_64(rdi, ZGByteArray);
-			ADD_REGISTER_64(rsi, ZGByteArray);
+			ADD_REGISTER_64(rdi, ZGPointer);
+			ADD_REGISTER_64(rsi, ZGPointer);
 			ADD_REGISTER_64(rbp, ZGPointer);
 			ADD_REGISTER_64(rsp, ZGPointer);
 			
@@ -132,8 +132,8 @@
 			ADD_REGISTER_32(edx, ZGInt32);
 			
 			// Index and pointers
-			ADD_REGISTER_32(edi, ZGByteArray);
-			ADD_REGISTER_32(esi, ZGByteArray);
+			ADD_REGISTER_32(edi, ZGPointer);
+			ADD_REGISTER_32(esi, ZGPointer);
 			ADD_REGISTER_32(ebp, ZGPointer);
 			ADD_REGISTER_32(esp, ZGPointer);
 			

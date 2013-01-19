@@ -88,6 +88,12 @@ static id sharedInstance;
 	return _breakPointController;
 }
 
++ (void)initialize
+{
+	// ensure user defaults are initialized
+	[ZGPreferencesController class];
+}
+
 - (id)init
 {
 	self = [super init];
