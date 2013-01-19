@@ -429,7 +429,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 			{
 				ZGSuspendTask(task);
 				
-				candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.is64Bit];
+				candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					if ([candidateBreakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])

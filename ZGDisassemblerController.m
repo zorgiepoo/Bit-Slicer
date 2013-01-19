@@ -146,6 +146,8 @@
 		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
 		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
 		
+		[self cleanupBreakPoints];
+		
 		shouldUpdate = YES;
 	}
 	_currentProcess = newProcess;
@@ -160,8 +162,6 @@
 	
 	if (shouldUpdate && self.windowDidAppear)
 	{
-		[[[ZGAppController sharedController] breakPointController] removeObserver:self];
-		self.currentBreakPoint = nil;
 		[self readMemory:nil];
 	}
 }
@@ -1062,7 +1062,7 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (void)applicationWillTerminate:(NSNotification *)notification
+- (void)cleanupBreakPoints
 {
 	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
 	
@@ -1070,6 +1070,13 @@ END_DEBUGGER_CHANGE:
 	{
 		[self continueFromBreakPoint:nil];
 	}
+	
+	self.currentBreakPoint = nil;
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+	[self cleanupBreakPoints];
 }
 
 @end
