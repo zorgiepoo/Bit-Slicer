@@ -158,6 +158,21 @@
 	self.registers = [NSArray arrayWithArray:newRegisters];
 	[self.undoManager removeAllActions];
 	[self.tableView reloadData];
+	
+	// 64-bit processes have 21 registers, 32-bit ones have 16 registers
+	// Change window max size and resize the window if necessary
+	if (self.breakPoint.process.is64Bit)
+	{
+		[self.window setMaxSize:NSMakeSize(self.window.maxSize.width, 368)];
+	}
+	else
+	{
+		[self.window setMaxSize:NSMakeSize(self.window.maxSize.width, 288)];
+		if (self.window.maxSize.height < self.window.frame.size.height)
+		{
+			[self.window setFrame:NSMakeRect(self.window.frame.origin.x, self.window.frame.origin.y + (self.window.frame.size.height - self.window.maxSize.height), self.window.frame.size.width, self.window.maxSize.height) display:YES animate:NO];
+		}
+	}
 }
 
 - (void)changeRegister:(ZGRegister *)theRegister oldType:(ZGVariableType)oldType newType:(ZGVariableType)newType
