@@ -43,12 +43,11 @@
 
 @implementation ZGRegister
 
-- (id)initWithName:(NSString *)name variable:(ZGVariable *)variable
+- (id)initWithVariable:(ZGVariable *)variable
 {
 	self = [super init];
 	if (self)
 	{
-		self.name = name;
 		self.variable = variable;
 		self.value = malloc(self.variable.size);
 		memcpy(self.value, self.variable.value, self.variable.size);

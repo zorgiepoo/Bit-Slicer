@@ -72,13 +72,15 @@ typedef enum
 @property (readwrite, nonatomic) ZGMemorySize lastUpdatedSize;
 @property (readwrite, nonatomic) BOOL isPointer;
 @property (readwrite, nonatomic) void *value;
-@property (readwrite, copy, nonatomic) NSString *addressStringValue;
-@property (readwrite, copy, nonatomic) NSString *stringValue;
+@property (copy, nonatomic) NSString *addressStringValue;
+@property (copy, nonatomic) NSString *stringValue;
 @property (readwrite, nonatomic) void *freezeValue;
 @property (readonly, nonatomic) NSString *sizeStringValue;
-@property (readwrite, copy, nonatomic) NSString *name;
+@property (copy, nonatomic) NSString *name;
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize;
+
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name;
 
 - (void)updateStringValue;
 

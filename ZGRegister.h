@@ -39,10 +39,9 @@
 
 @interface ZGRegister : NSObject
 
-@property (nonatomic, copy) NSString *name;
 @property (nonatomic, strong) ZGVariable *variable;
 @property (nonatomic, readonly) void *value;
 
-- (id)initWithName:(NSString *)name variable:(ZGVariable *)variable;
+- (id)initWithVariable:(ZGVariable *)variable;
 
 @end

@@ -33,6 +33,7 @@
  */
 
 #import "ZGRegistersWindowController.h"
+#import "ZGPreferencesController.h"
 #import "ZGBreakPoint.h"
 #import "ZGVirtualMemory.h"
 #import "ZGRegister.h"
@@ -70,8 +71,10 @@
 	[self.window orderFront:nil];
 }
 
+#define REGISTER_DEFAULT_TYPE(registerName) [[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES] objectForKey:@(#registerName)]
+
 #define ADD_REGISTER(registerName, variableType, structureType) \
-	[newRegisters addObject:[[ZGRegister alloc] initWithName:[NSString stringWithUTF8String:#registerName] variable:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:variableType qualifier:ZGSigned pointerSize:registerSize]]]
+	[newRegisters addObject:[[ZGRegister alloc] initWithVariable:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:REGISTER_DEFAULT_TYPE(registerName) ? [REGISTER_DEFAULT_TYPE(registerName) intValue] : variableType qualifier:ZGSigned pointerSize:registerSize name:@(#registerName)]]]
 
 #define ADD_REGISTER_32(registerName, variableType) ADD_REGISTER(registerName, variableType, ts32)
 #define ADD_REGISTER_64(registerName, variableType) ADD_REGISTER(registerName, variableType, ts64)
@@ -187,6 +190,10 @@
 		[theRegister.variable setValue:theRegister.value];
 	}
 	
+	NSMutableDictionary *registerTypesDictionary = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES]];
+	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.name];
+	[[NSUserDefaults standardUserDefaults] setObject:registerTypesDictionary forKey:ZG_REGISTER_TYPES];
+	
 	[[self.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
 	[self.undoManager setActionName:@"Type Change"];
 	
@@ -203,18 +210,18 @@
 		if (self.breakPoint.process.is64Bit)
 		{
 			NSArray *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
-			if ([registers64 containsObject:theRegister.name])
+			if ([registers64 containsObject:theRegister.variable.name])
 			{
-				*((uint64_t *)&threadState.uts.ts64 + [registers64 indexOfObject:theRegister.name]) = *(uint64_t *)newVariable.value;
+				*((uint64_t *)&threadState.uts.ts64 + [registers64 indexOfObject:theRegister.variable.name]) = *(uint64_t *)newVariable.value;
 				shouldWriteRegister = YES;
 			}
 		}
 		else
 		{
 			NSArray *registers32 = @[@"eax", @"ebx", @"ecx", @"edx", @"edi", @"esi", @"ebp", @"esp", @"ss", @"eflags", @"eip", @"cs", @"ds", @"es", @"fs", @"gs"];
-			if ([registers32 containsObject:theRegister.name])
+			if ([registers32 containsObject:theRegister.variable.name])
 			{
-				*((uint32_t *)&threadState.uts.ts32 + [registers32 indexOfObject:theRegister.name]) = *(uint32_t *)newVariable.value;
+				*((uint32_t *)&threadState.uts.ts32 + [registers32 indexOfObject:theRegister.variable.name]) = *(uint32_t *)newVariable.value;
 				shouldWriteRegister = YES;
 			}
 		}
@@ -254,7 +261,7 @@
 		ZGRegister *theRegister = [self.registers objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
-			result = theRegister.name;
+			result = theRegister.variable.name;
 		}
 		else if ([tableColumn.identifier isEqualToString:@"value"])
 		{
@@ -292,7 +299,8 @@
 						 address:theRegister.variable.address
 						 type:theRegister.variable.type
 						 qualifier:theRegister.variable.qualifier
-						 pointerSize:self.breakPoint.process.pointerSize]];
+						 pointerSize:self.breakPoint.process.pointerSize
+						 name:theRegister.variable.name]];
 				}
 				free(newValue);
 			}

@@ -194,7 +194,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return size;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name
 {
 	if ((self = [super init]))
 	{
@@ -218,10 +218,15 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			self.value = value;
 		}
 		
-		self.name = @"";
+		self.name = name;
 	}
 	
 	return self;
+}
+
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize
+{
+	return [self initWithValue:value size:size address:address type:aType qualifier:qualifier pointerSize:pointerSize name:@""];
 }
 
 - (void)dealloc
