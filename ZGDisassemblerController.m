@@ -1107,7 +1107,7 @@ END_DEBUGGER_CHANGE:
 	}
 	else
 	{
-		if (_registersWindowController)
+		if (self.registersWindowController)
 		{
 			self.closingRegistersWindow = YES;
 			[self.registersWindowController close];
