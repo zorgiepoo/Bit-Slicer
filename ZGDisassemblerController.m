@@ -67,7 +67,8 @@
 
 @property (nonatomic, strong) NSUndoManager *undoManager;
 
-@property (nonatomic, strong) ZGBreakPoint *currentBreakPoint;
+@property (nonatomic, strong) NSArray *haltedBreakPoints;
+@property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
 
 @property (nonatomic, strong) ZGRegistersWindowController *registersWindowController;
 
@@ -85,6 +86,7 @@
 	self = [super initWithWindowNibName:NSStringFromClass([self class])];
 	
 	self.undoManager = [[NSUndoManager alloc] init];
+	self.haltedBreakPoints = [[NSArray alloc] init];
 	
 	[[NSNotificationCenter defaultCenter]
 	 addObserver:self
@@ -146,8 +148,6 @@
 		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
 		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
 		
-		[self cleanupBreakPoints];
-		
 		shouldUpdate = YES;
 	}
 	_currentProcess = newProcess;
@@ -162,7 +162,15 @@
 	
 	if (shouldUpdate && self.windowDidAppear)
 	{
-		[self readMemory:nil];
+		[self showOrCloseRegistersWindow];
+		if (self.currentBreakPoint)
+		{
+			[self jumpToMemoryAddress:self.currentBreakPoint.variable.address inProcess:self.currentProcess];
+		}
+		else
+		{
+			[self readMemory:nil];
+		}
 	}
 }
 
@@ -592,6 +600,16 @@
 	if (object == [ZGProcessList sharedProcessList])
 	{
 		[self updateRunningProcesses];
+		
+		NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
+		
+		if (oldRunningProcesses)
+		{
+			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
+			{
+				[[[ZGAppController sharedController] breakPointController] removeObserver:self runningProcess:runningProcess];
+			}
+		}
 	}
 }
 
@@ -828,7 +846,7 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(continueFromBreakPoint:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:))
+	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:))
 	{
 		if (!self.currentBreakPoint || self.disassembling)
 		{
@@ -1014,36 +1032,89 @@ END_DEBUGGER_CHANGE:
 
 #pragma mark Break Points
 
-- (void)setCurrentBreakPoint:(ZGBreakPoint *)currentBreakPoint
+- (void)addHaltedBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	_currentBreakPoint = currentBreakPoint;
-	[self.instructionsTableView reloadData];
+	NSMutableArray *newBreakPoints = [[NSMutableArray alloc] initWithArray:self.haltedBreakPoints];
+	[newBreakPoints addObject:breakPoint];
+	self.haltedBreakPoints = [NSArray arrayWithArray:newBreakPoints];
+	
+	if (breakPoint.process.processID == self.currentProcess.processID)
+	{
+		[self.instructionsTableView reloadData];
+	}
+}
+
+- (void)removeHaltedBreakPoint:(ZGBreakPoint *)breakPoint
+{
+	NSMutableArray *newBreakPoints = [[NSMutableArray alloc] initWithArray:self.haltedBreakPoints];
+	[newBreakPoints removeObject:breakPoint];
+	self.haltedBreakPoints = [NSArray arrayWithArray:newBreakPoints];
+	
+	if (breakPoint.process.processID == self.currentProcess.processID)
+	{
+		[self.instructionsTableView reloadData];
+	}
+}
+
+- (ZGBreakPoint *)currentBreakPoint
+{
+	ZGBreakPoint *currentBreakPoint = nil;
+	
+	for (ZGBreakPoint *breakPoint in self.haltedBreakPoints)
+	{
+		if (breakPoint.process.processID == self.currentProcess.processID)
+		{
+			currentBreakPoint = breakPoint;
+			break;
+		}
+	}
+	
+	return currentBreakPoint;
+}
+
+- (void)showOrCloseRegistersWindow
+{
+	if (self.currentBreakPoint)
+	{
+		[self.registersWindowController showWindow:nil];
+		[self.registersWindowController updateRegistersFromBreakPoint:self.currentBreakPoint];
+	}
+	else
+	{
+		[self.registersWindowController close];
+	}
 }
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
-{
-	self.currentBreakPoint = breakPoint;
-	[self.registersWindowController showWindow:nil];
-	[self.registersWindowController updateRegistersFromBreakPoint:self.currentBreakPoint];
+{	
+	[self removeHaltedBreakPoint:self.currentBreakPoint];
+	[self addHaltedBreakPoint:breakPoint];
+	
+	[self showOrCloseRegistersWindow];
 }
 
-- (void)resumeBreakPoint
+- (void)resumeBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.currentBreakPoint];
-	self.currentBreakPoint = nil;
-	[self.registersWindowController close];
+	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:breakPoint];
+	[self removeHaltedBreakPoint:breakPoint];
+	[self showOrCloseRegistersWindow];
 }
 
-- (IBAction)continueFromBreakPoint:(id)sender
+- (void)continueFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	[[[ZGAppController sharedController] breakPointController] removeSingleStepBreakPointsFromBreakPoint:self.currentBreakPoint];
-	[self resumeBreakPoint];
+	[[[ZGAppController sharedController] breakPointController] removeSingleStepBreakPointsFromBreakPoint:breakPoint];
+	[self resumeBreakPoint:breakPoint];
+}
+
+- (IBAction)continueExecution:(id)sender
+{
+	[self continueFromBreakPoint:self.currentBreakPoint];
 }
 
 - (IBAction)stepInto:(id)sender
 {
 	[[[ZGAppController sharedController] breakPointController] addSingleStepBreakPointFromBreakPoint:self.currentBreakPoint];
-	[self resumeBreakPoint];
+	[self resumeBreakPoint:self.currentBreakPoint];
 }
 
 - (IBAction)stepOver:(id)sender
@@ -1054,7 +1125,7 @@ END_DEBUGGER_CHANGE:
 		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		
 		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess oneShot:YES delegate:self];
-		[self continueFromBreakPoint:nil];
+		[self continueExecution:nil];
 	}
 	else
 	{
@@ -1062,21 +1133,14 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (void)cleanupBreakPoints
+- (void)applicationWillTerminate:(NSNotification *)notification
 {
 	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
 	
-	if (self.currentBreakPoint)
+	for (ZGBreakPoint *breakPoint in self.haltedBreakPoints)
 	{
-		[self continueFromBreakPoint:nil];
+		[self continueFromBreakPoint:breakPoint];
 	}
-	
-	self.currentBreakPoint = nil;
-}
-
-- (void)applicationWillTerminate:(NSNotification *)notification
-{
-	[self cleanupBreakPoints];
 }
 
 @end

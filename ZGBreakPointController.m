@@ -463,9 +463,14 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 
 - (void)removeObserver:(id)observer
 {
+	[self removeObserver:observer runningProcess:nil];
+}
+
+- (void)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process
+{
 	for (ZGBreakPoint *breakPoint in self.breakPoints)
 	{
-		if (breakPoint.delegate == observer)
+		if (breakPoint.delegate == observer && (!process || breakPoint.process.processID == process.processIdentifier))
 		{
 			BOOL isDead = YES;
 			
