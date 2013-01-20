@@ -90,7 +90,7 @@
 	// We don't want to update this when the user is editing something in the table
 	if (self.document.currentProcess.valid && self.watchVariablesTableView.editedRow == -1)
 	{
-		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
 		 {
 			 if (variable.isPointer)
 			 {
@@ -112,7 +112,7 @@
 	if (self.document.currentProcess.valid)
 	{
 		// Freeze all variables that need be frozen!
-		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
 		 {
 			 if (variable.isFrozen && variable.freezeValue)
 			 {
