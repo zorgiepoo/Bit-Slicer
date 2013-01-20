@@ -72,13 +72,13 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 // Unused
 kern_return_t  catch_mach_exception_raise_state(mach_port_t exception_port, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
 {
-	return KERN_SUCCESS;
+	return KERN_FAILURE;
 }
 
 // Unused
 kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
 {
-	return KERN_SUCCESS;
+	return KERN_FAILURE;
 }
 
 #define RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(type) \
@@ -143,8 +143,9 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	else if (debugRegisterIndex == 2 && debugState.uds.type.__dr6 & (1 << 2) && debugState.uds.type.__dr7 & (1 << 2*2)) { debugAddress = debugState.uds.type.__dr2; } \
 	else if (debugRegisterIndex == 3 && debugState.uds.type.__dr6 & (1 << 3) && debugState.uds.type.__dr7 & (1 << 2*3)) { debugAddress = debugState.uds.type.__dr3; } \
 
-- (void)handleWatchPointsWithTask:(mach_port_t) task inThread:(mach_port_t)thread
+- (BOOL)handleWatchPointsWithTask:(mach_port_t) task inThread:(mach_port_t)thread
 {
+	BOOL handledWatchPoint = NO;
 	for (ZGBreakPoint *breakPoint in self.breakPoints)
 	{
 		if (breakPoint.type != ZGBreakPointWatchDataWrite)
@@ -201,6 +202,8 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 						
 						[[[ZGAppController sharedController] breakPointController] removeWatchPoint:breakPoint];
 						
+						handledWatchPoint = YES;
+						
 						break;
 					}
 				}
@@ -209,6 +212,8 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 			ZGResumeTask(task);
 		}
 	}
+	
+	return handledWatchPoint;
 }
 
 - (void)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint
@@ -302,8 +307,10 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	}
 }
 
-- (void)handleInstructionBreakPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
+- (BOOL)handleInstructionBreakPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
 {
+	BOOL handledInstructionBreakPoint = NO;
+	
 	ZGSuspendTask(task);
 	
 	x86_thread_state_t threadState;
@@ -364,35 +371,40 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 				uint8_t *opcode = NULL;
 				ZGMemorySize opcodeSize = 0x1;
 				
-				if (ZGReadBytes(breakPoint.process.processTask, foundInstructionAddress, (void **)&opcode, &opcodeSize) && *opcode == INSTRUCTION_BREAKPOINT_OPCODE)
+				if (ZGReadBytes(breakPoint.process.processTask, foundInstructionAddress, (void **)&opcode, &opcodeSize))
 				{
-					hitBreakPoint = YES;
-					ZGSuspendTask(task);
-					
-					// Restore program counter
-					if (breakPoint.process.is64Bit)
+					if (*opcode == INSTRUCTION_BREAKPOINT_OPCODE)
 					{
-						threadState.uts.ts64.__rip = breakPoint.variable.address;
-					}
-					else
-					{
-						threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
-					}
-					
-					dispatch_async(dispatch_get_main_queue(), ^{
-						if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+						hitBreakPoint = YES;
+						ZGSuspendTask(task);
+						
+						// Restore program counter
+						if (breakPoint.process.is64Bit)
 						{
-							[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
+							threadState.uts.ts64.__rip = breakPoint.variable.address;
 						}
-					});
-					
-					if (breakPoint.oneShot)
-					{
-						[self removeInstructionBreakPoint:breakPoint];
+						else
+						{
+							threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
+						}
+						
+						dispatch_async(dispatch_get_main_queue(), ^{
+							if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+							{
+								[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
+							}
+						});
+						
+						if (breakPoint.oneShot)
+						{
+							[self removeInstructionBreakPoint:breakPoint];
+						}
 					}
+					
+					ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
 				}
 				
-				ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
+				handledInstructionBreakPoint = YES;
 			}
 			
 			if (breakPoint.needsToRestore)
@@ -402,6 +414,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 				ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
 				
 				breakPoint.needsToRestore = NO;
+				handledInstructionBreakPoint = YES;
 			}
 		}
 	}
@@ -442,23 +455,30 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 			}
 			
 			[self removeBreakPoint:candidateBreakPoint];
+			
+			handledInstructionBreakPoint = YES;
 		}
 	}
 	
-	if (thread_set_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+	if (handledInstructionBreakPoint)
 	{
-		NSLog(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d", thread);
+		if (thread_set_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+		{
+			NSLog(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d", thread);
+		}
 	}
 	
 	ZGResumeTask(task);
+	
+	return handledInstructionBreakPoint;
 }
 
 kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
 {
-	[[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
-	[[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread];
+	BOOL handledBreakPoint = [[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
+	handledBreakPoint = [[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread] || handledBreakPoint;
 	
-	return KERN_SUCCESS;
+	return handledBreakPoint ? KERN_SUCCESS : KERN_FAILURE;
 }
 
 - (void)removeObserver:(id)observer
