@@ -475,10 +475,10 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 
 kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
 {
-	BOOL handledBreakPoint = [[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
-	handledBreakPoint = [[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread] || handledBreakPoint;
+	BOOL handledWatchPoint = [[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
+	BOOL handledInstructionBreakPoint = [[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread];
 	
-	return handledBreakPoint ? KERN_SUCCESS : KERN_FAILURE;
+	return (handledWatchPoint || handledInstructionBreakPoint) ? KERN_SUCCESS : KERN_FAILURE;
 }
 
 - (void)removeObserver:(id)observer
