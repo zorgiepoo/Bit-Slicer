@@ -43,6 +43,7 @@
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
 #import "ZGComparisonFunctions.h"
+#import "NSArrayAdditions.h"
 
 @interface ZGDocumentSearchController ()
 
@@ -564,6 +565,9 @@
 	ZGMemorySize dataSize = self.searchData.dataSize;
 	void *searchValue = self.searchData.searchValue;
 	
+	ZGVariableQualifier qualifier = [[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
+	ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
+	
 	dispatch_block_t completeSearchBlock = ^
 	{
 		if (self.searchData.searchValue)
@@ -585,12 +589,6 @@
 		self.document.currentProcess.searchProgress = 0;
 		
 		[self createUserInterfaceTimer];
-		
-		ZGVariableQualifier qualifier =
-			[[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState
-			? ZGSigned
-			: ZGUnsigned;
-		ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
 		
 		ZGProcess *currentProcess = self.document.currentProcess;
 		search_for_data_t searchForDataCallback = ^(ZGSearchData * __unsafe_unretained searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableArray * __unsafe_unretained results)
@@ -645,40 +643,111 @@
 		
 		__block ZGSearchData *searchData = self.searchData;
 		ZGInitializeSearch(self.searchData);
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			for (ZGVariable *variable in self.document.watchVariablesArray)
+		
+		// Get all relevant regions
+		NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
+			return !(region.address < endingAddress && region.address + region.size > beginningAddress && region.protection & VM_PROT_READ && (self.searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
+		}];
+		
+		// Store all regions memory locally
+		for (ZGRegion *region in regions)
+		{
+			void *bytes = NULL;
+			ZGMemorySize outputSize = region.size;
+			if (ZGReadBytes(currentProcess.processTask	, region.address, &bytes, &outputSize))
 			{
-				if (variable.shouldBeSearched)
+				region.bytes = bytes;
+				region.size = outputSize;
+			}
+		}
+		
+		// Filter out any regions we could not read
+		regions = [regions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
+			return !(region.bytes);
+		}];
+		
+		// Start using multiple tasks for narrowing down our search
+		// batchSize indicates the number of elements that each task will handle at most
+		// Not sure what the best number to put in for this, but it appears to work well
+		NSUInteger batchSize = 50;
+		NSUInteger totalCount = self.document.watchVariablesArray.count;
+		NSUInteger numberOfBatches = (NSUInteger)ceil(totalCount / (batchSize * 1.0));
+		
+		NSMutableArray *batches = [[NSMutableArray alloc] init];
+		for (NSUInteger batchIndex = 0; batchIndex < numberOfBatches; batchIndex++)
+		{
+			[batches addObject:[[NSMutableArray alloc] init]];
+		}
+		
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			dispatch_apply(numberOfBatches, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t batchIndex) {
+				NSArray *variables = [self.document.watchVariablesArray subarrayWithRange:NSMakeRange(batchIndex*batchSize, MIN(batchSize, totalCount - batchIndex*batchSize))];
+				NSMutableArray *batch = [batches objectAtIndex:batchIndex];
+				for (ZGVariable *variable in variables)
 				{
 					ZGMemoryAddress variableAddress = variable.address;
 					
-					if (variable.size > 0 && dataSize > 0 &&
-						(beginningAddress <= variableAddress) &&
-						(endingAddress >= variableAddress + dataSize))
-					{
-						ZGMemorySize outputSize = dataSize;
-						void *variableValue = NULL;
-						if (ZGReadBytes(processTask, variableAddress, &variableValue, &outputSize))
+					if (variable.shouldBeSearched && variable.size > 0 && dataSize > 0 && beginningAddress <= variableAddress && endingAddress >= variableAddress + dataSize)
+					{	
+						// Find which region the variable is in. Binary search time! Super fast!
+						NSUInteger maxRegionIndex = regions.count - 1;
+						NSUInteger minRegionIndex = 0;
+						while (maxRegionIndex >= minRegionIndex)
 						{
-							void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue;
+							int middleRegionIndex = (minRegionIndex + maxRegionIndex) / 2;
+							ZGRegion *region = [regions objectAtIndex:middleRegionIndex];
+							ZGMemoryAddress regionAddress = region.address;
 							
-							if (compareValue && compareFunction(searchData, variableValue, compareValue, dataSize))
+							if (variableAddress + dataSize <= regionAddress)
 							{
-								[temporaryVariablesArray addObject:variable];
-								currentProcess.numberOfVariablesFound++;
+								maxRegionIndex = middleRegionIndex - 1;
 							}
-							
-							ZGFreeBytes(processTask, variableValue, outputSize);
+							else if (variableAddress >= regionAddress + region.size)
+							{
+								minRegionIndex = middleRegionIndex + 1;
+							}
+							else
+							{
+								// Found the region, see if we should add the variable
+								ZGMemoryAddress variableAddress = variable.address;
+								if (variableAddress >= regionAddress && variableAddress + dataSize <= regionAddress + region.size)
+								{
+									void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue;
+									
+									if (compareValue && compareFunction(searchData, region.bytes + (variableAddress - regionAddress), compareValue, dataSize))
+									{
+										[batch addObject:variable];
+									}
+								}
+								
+								break;
+							}
 						}
+					}
+					
+					if (ZGSearchDidCancel(searchData))
+					{
+						break;
 					}
 				}
 				
-				if (ZGSearchDidCancel(searchData))
+				dispatch_async(dispatch_get_main_queue(), ^{
+					currentProcess.searchProgress += variables.count;
+					currentProcess.numberOfVariablesFound += batch.count;
+				});
+			});
+			
+			for (ZGRegion *region in regions)
+			{
+				if (region.bytes)
 				{
-					break;
+					ZGFreeBytes(processTask, region.bytes, region.size);
 				}
-				
-				currentProcess.searchProgress++;
+			}
+			
+			for (NSMutableArray *batch in batches)
+			{
+				[temporaryVariablesArray addObjectsFromArray:batch];
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
