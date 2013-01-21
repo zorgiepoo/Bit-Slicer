@@ -738,7 +738,7 @@
 		ZGRegion *chosenRegion = nil;
 		for (ZGRegion *region in memoryRegions)
 		{
-			if ((region.protection & VM_PROT_READ && region.protection & VM_PROT_EXECUTE) && (calculatedMemoryAddress <= 0 || (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size)))
+			if ((region.protection & VM_PROT_READ) && (calculatedMemoryAddress <= 0 || (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size)))
 			{
 				chosenRegion = region;
 				break;
