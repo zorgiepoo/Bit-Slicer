@@ -281,7 +281,7 @@
 			[self.registersWindowController close];
 		}
 	}
-	else if ([notification object] == self.registersWindowController.window)
+	else if (_registersWindowController && [notification object] == self.registersWindowController.window)
 	{
 		if (!self.closingRegistersWindow)
 		{
@@ -1166,7 +1166,7 @@ END_DEBUGGER_CHANGE:
 	}
 	else
 	{
-		if (self.registersWindowController)
+		if (_registersWindowController)
 		{
 			self.closingRegistersWindow = YES;
 			[self.registersWindowController close];
@@ -1182,9 +1182,8 @@ END_DEBUGGER_CHANGE:
 	if (self.currentBreakPoint == breakPoint)
 	{
 		[self goToCurrentBreakPoint];
+		[self showOrCloseRegistersWindow];
 	}
-	
-	[self showOrCloseRegistersWindow];
 }
 
 - (void)resumeBreakPoint:(ZGBreakPoint *)breakPoint

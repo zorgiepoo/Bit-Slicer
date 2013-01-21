@@ -70,7 +70,7 @@
 											<string key="NSFrameSize">{229, 272}</string>
 											<reference key="NSSuperview" ref="729272990"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="306158784"/>
+											<reference key="NSNextKeyView" ref="572363995"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -404,7 +404,7 @@
 							<string key="NSFrame">{{-1, -1}, {231, 290}}</string>
 							<reference key="NSSuperview" ref="187336761"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="572363995"/>
+							<reference key="NSNextKeyView" ref="729272990"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="306158784"/>
@@ -647,7 +647,7 @@
 				<string key="-2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="-3.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="29.NSWindowTemplate.visibleAtLaunch"/>
+				<boolean value="NO" key="29.NSWindowTemplate.visibleAtLaunch"/>
 				<string key="30.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="35.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="36.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -682,13 +682,13 @@
 					<string key="className">ZGRegistersWindowController</string>
 					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">showWindow:</string>
+						<string key="NS.key.0">changeQualifier:</string>
 						<string key="NS.object.0">id</string>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">showWindow:</string>
+						<string key="NS.key.0">changeQualifier:</string>
 						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">showWindow:</string>
+							<string key="name">changeQualifier:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</object>
