@@ -344,6 +344,25 @@
 	}
 }
 
+- (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+{
+	if ([tableColumn.identifier isEqualToString:@"value"])
+	{
+		if (rowIndex < 0 || (NSUInteger)rowIndex >= self.registers.count)
+		{
+			return NO;
+		}
+		
+		ZGRegister *theRegister = [self.registers objectAtIndex:rowIndex];
+		if (!theRegister.variable.value)
+		{
+			return NO;
+		}
+	}
+	
+	return YES;
+}
+
 #pragma mark Menu Items
 
 - (IBAction)changeQualifier:(id)sender
