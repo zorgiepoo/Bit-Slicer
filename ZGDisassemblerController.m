@@ -599,10 +599,7 @@
 			addBatchOfInstructions();
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				// Scroll such that the selected row is centered
-				[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionRow] byExtendingSelection:NO];
-				NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
-				[self.instructionsTableView scrollRowToVisible:MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
+				[self scrollAndSelectRow:selectionRow];
 				
 				self.disassembling = NO;
 				[self.dissemblyProgressIndicator setHidden:YES];
@@ -909,6 +906,14 @@ END_DEBUGGER_CHANGE:
 	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
 }
 
+- (void)scrollAndSelectRow:(NSUInteger)selectionRow
+{
+	// Scroll such that the selected row is centered
+	[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionRow] byExtendingSelection:NO];
+	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+	[self.instructionsTableView scrollRowToVisible:MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
+}
+
 #pragma mark TableView Methods
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -1107,6 +1112,48 @@ END_DEBUGGER_CHANGE:
 	return currentBreakPoint;
 }
 
+- (void)goToCurrentBreakPoint
+{
+	// Try to find the instruction in the table first, using a binary search
+	BOOL foundInstruction = NO;
+	NSUInteger maxInstructionIndex = self.instructions.count-1;
+	NSUInteger minInstructionIndex = 0;
+	
+	while (maxInstructionIndex >= minInstructionIndex && !foundInstruction)
+	{
+		NSUInteger middleInstructionIndex = (minInstructionIndex + maxInstructionIndex) / 2;
+		ZGInstruction *instruction = [self.instructions objectAtIndex:middleInstructionIndex];
+		
+		if (instruction.variable.address + instruction.variable.size <= self.currentBreakPoint.variable.address)
+		{
+			if (middleInstructionIndex >= self.instructions.count-1) break;
+			minInstructionIndex = middleInstructionIndex + 1;
+		}
+		else if (instruction.variable.address >= self.currentBreakPoint.variable.address + self.currentBreakPoint.variable.size)
+		{
+			if (middleInstructionIndex == 0) break;
+			maxInstructionIndex = middleInstructionIndex - 1;
+		}
+		else
+		{
+			if (instruction.variable.address == self.currentBreakPoint.variable.address)
+			{
+				[self scrollAndSelectRow:middleInstructionIndex];
+				foundInstruction = YES;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	
+	if (!foundInstruction)
+	{
+		[self jumpToMemoryAddress:self.currentBreakPoint.variable.address inProcess:self.currentProcess];
+	}
+}
+
 - (void)showOrCloseRegistersWindow
 {
 	if (self.currentBreakPoint)
@@ -1131,6 +1178,11 @@ END_DEBUGGER_CHANGE:
 {	
 	[self removeHaltedBreakPoint:self.currentBreakPoint];
 	[self addHaltedBreakPoint:breakPoint];
+	
+	if (self.currentBreakPoint == breakPoint)
+	{
+		[self goToCurrentBreakPoint];
+	}
 	
 	[self showOrCloseRegistersWindow];
 }
