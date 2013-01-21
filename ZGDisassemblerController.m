@@ -911,7 +911,22 @@ END_DEBUGGER_CHANGE:
 	// Scroll such that the selected row is centered
 	[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectionRow] byExtendingSelection:NO];
 	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
-	[self.instructionsTableView scrollRowToVisible:MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
+	if (visibleRowsRange.location + visibleRowsRange.length / 2 < selectionRow)
+	{
+		[self.instructionsTableView scrollRowToVisible:MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
+	}
+	else if (visibleRowsRange.location + visibleRowsRange.length / 2 > selectionRow)
+	{
+		// Make sure we don't go below 0 in unsigned arithmetic
+		if (visibleRowsRange.length / 2 > selectionRow)
+		{
+			[self.instructionsTableView scrollRowToVisible:0];
+		}
+		else
+		{
+			[self.instructionsTableView scrollRowToVisible:selectionRow - visibleRowsRange.length / 2];
+		}
+	}
 }
 
 #pragma mark TableView Methods
