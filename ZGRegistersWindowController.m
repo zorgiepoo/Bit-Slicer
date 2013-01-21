@@ -73,6 +73,18 @@
 	[self.window orderFront:nil];
 }
 
+- (void)setProgramCounter:(ZGMemoryAddress)programCounter
+{
+	if (_programCounter != programCounter)
+	{
+		_programCounter = programCounter;
+		if (self.programCounterChangeBlock)
+		{
+			self.programCounterChangeBlock();
+		}
+	}
+}
+
 #define REGISTER_DEFAULT_TYPE(registerName) [[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES] objectForKey:@(#registerName)]
 
 #define ADD_REGISTER(registerName, variableType, structureType) \
@@ -81,11 +93,13 @@
 #define ADD_REGISTER_32(registerName, variableType) ADD_REGISTER(registerName, variableType, ts32)
 #define ADD_REGISTER_64(registerName, variableType) ADD_REGISTER(registerName, variableType, ts64)
 
-- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint
+- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock
 {
 	NSMutableArray *newRegisters = [[NSMutableArray alloc] init];
 	
 	self.breakPoint = breakPoint;
+	// initialize program counter with a sane value
+	self.programCounter = self.breakPoint.variable.address;
 	
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
@@ -127,6 +141,8 @@
 			ADD_REGISTER_64(cs, ZGByteArray);
 			ADD_REGISTER_64(fs, ZGByteArray);
 			ADD_REGISTER_64(gs, ZGByteArray);
+			
+			self.programCounter = threadState.uts.ts64.__rip;
 		}
 		else
 		{
@@ -157,8 +173,12 @@
 			ADD_REGISTER_32(es, ZGByteArray);
 			ADD_REGISTER_32(fs, ZGByteArray);
 			ADD_REGISTER_32(gs, ZGByteArray);
+			
+			self.programCounter = threadState.uts.ts32.__eip;
 		}
 	}
+	
+	self.programCounterChangeBlock = programCounterChangeBlock;
 	
 	self.registers = [NSArray arrayWithArray:newRegisters];
 	[self.undoManager removeAllActions];
@@ -214,7 +234,7 @@
 			NSArray *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
 			if ([registers64 containsObject:theRegister.variable.name])
 			{
-				*((uint64_t *)&threadState.uts.ts64 + [registers64 indexOfObject:theRegister.variable.name]) = *(uint64_t *)newVariable.value;
+				memcpy((uint64_t *)&threadState.uts.ts64 + [registers64 indexOfObject:theRegister.variable.name], newVariable.value, newVariable.size);
 				shouldWriteRegister = YES;
 			}
 		}
@@ -223,7 +243,7 @@
 			NSArray *registers32 = @[@"eax", @"ebx", @"ecx", @"edx", @"edi", @"esi", @"ebp", @"esp", @"ss", @"eflags", @"eip", @"cs", @"ds", @"es", @"fs", @"gs"];
 			if ([registers32 containsObject:theRegister.variable.name])
 			{
-				*((uint32_t *)&threadState.uts.ts32 + [registers32 indexOfObject:theRegister.variable.name]) = *(uint32_t *)newVariable.value;
+				memcpy((uint32_t *)&threadState.uts.ts32 + [registers32 indexOfObject:theRegister.variable.name], newVariable.value, newVariable.size);
 				shouldWriteRegister = YES;
 			}
 		}
@@ -238,6 +258,15 @@
 			{
 				theRegister.variable = newVariable;
 				memcpy(theRegister.value, theRegister.variable.value, theRegister.variable.size);
+				
+				if ([theRegister.variable.name isEqualToString:@"rip"])
+				{
+					self.programCounter = *(uint64_t *)theRegister.value;
+				}
+				else if ([theRegister.variable.name isEqualToString:@"eip"])
+				{
+					self.programCounter = *(uint32_t *)theRegister.value;
+				}
 				
 				[[self.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
 				[self.undoManager setActionName:@"Value Change"];

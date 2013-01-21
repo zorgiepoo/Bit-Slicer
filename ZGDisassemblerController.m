@@ -172,7 +172,7 @@
 		[self showOrCloseRegistersWindow];
 		if (self.currentBreakPoint)
 		{
-			[self jumpToMemoryAddress:self.currentBreakPoint.variable.address inProcess:self.currentProcess];
+			[self jumpToMemoryAddress:self.registersWindowController.programCounter inProcess:self.currentProcess];
 		}
 		else
 		{
@@ -1001,7 +1001,7 @@ END_DEBUGGER_CHANGE:
 	if ([tableColumn.identifier isEqualToString:@"address"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
-		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.currentBreakPoint.variable.address == instruction.variable.address);
+		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.registersWindowController.programCounter == instruction.variable.address);
 		
 		[cell setTextColor:isInstructionBreakPoint ? NSColor.redColor : NSColor.textColor];
 	}
@@ -1130,6 +1130,7 @@ END_DEBUGGER_CHANGE:
 - (void)goToCurrentBreakPoint
 {
 	// Try to find the instruction in the table first, using a binary search
+	ZGMemoryAddress programCounter = self.registersWindowController.programCounter;
 	BOOL foundInstruction = NO;
 	NSUInteger maxInstructionIndex = self.instructions.count-1;
 	NSUInteger minInstructionIndex = 0;
@@ -1139,19 +1140,19 @@ END_DEBUGGER_CHANGE:
 		NSUInteger middleInstructionIndex = (minInstructionIndex + maxInstructionIndex) / 2;
 		ZGInstruction *instruction = [self.instructions objectAtIndex:middleInstructionIndex];
 		
-		if (instruction.variable.address + instruction.variable.size <= self.currentBreakPoint.variable.address)
+		if (instruction.variable.address + instruction.variable.size <= programCounter)
 		{
 			if (middleInstructionIndex >= self.instructions.count-1) break;
 			minInstructionIndex = middleInstructionIndex + 1;
 		}
-		else if (instruction.variable.address >= self.currentBreakPoint.variable.address + self.currentBreakPoint.variable.size)
+		else if (instruction.variable.address >= programCounter + self.currentBreakPoint.variable.size)
 		{
 			if (middleInstructionIndex == 0) break;
 			maxInstructionIndex = middleInstructionIndex - 1;
 		}
 		else
 		{
-			if (instruction.variable.address == self.currentBreakPoint.variable.address)
+			if (instruction.variable.address == programCounter)
 			{
 				[self scrollAndSelectRow:middleInstructionIndex];
 				foundInstruction = YES;
@@ -1165,7 +1166,7 @@ END_DEBUGGER_CHANGE:
 	
 	if (!foundInstruction)
 	{
-		[self jumpToMemoryAddress:self.currentBreakPoint.variable.address inProcess:self.currentProcess];
+		[self jumpToMemoryAddress:programCounter inProcess:self.currentProcess];
 	}
 }
 
@@ -1177,7 +1178,12 @@ END_DEBUGGER_CHANGE:
 		{
 			[self.registersWindowController showWindow:nil];
 		}
-		[self.registersWindowController updateRegistersFromBreakPoint:self.currentBreakPoint];
+		[self.registersWindowController updateRegistersFromBreakPoint:self.currentBreakPoint programCounterChange:^{
+			if (self.currentBreakPoint)
+			{
+				[self.instructionsTableView reloadData];
+			}
+		}];
 	}
 	else
 	{
@@ -1194,10 +1200,10 @@ END_DEBUGGER_CHANGE:
 	[self removeHaltedBreakPoint:self.currentBreakPoint];
 	[self addHaltedBreakPoint:breakPoint];
 	
-	if (self.currentBreakPoint == breakPoint)
+	if (self.currentBreakPoint)
 	{
-		[self goToCurrentBreakPoint];
 		[self showOrCloseRegistersWindow];
+		[self goToCurrentBreakPoint];
 	}
 }
 
@@ -1227,7 +1233,7 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)stepOver:(id)sender
 {
-	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.currentBreakPoint.variable.address + 1 inProcess:self.currentProcess];
+	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersWindowController.programCounter + 1 inProcess:self.currentProcess];
 	if ([currentInstruction isCallMnemonic])
 	{
 		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
