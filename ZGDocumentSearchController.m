@@ -683,44 +683,56 @@
 			dispatch_apply(numberOfBatches, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t batchIndex) {
 				NSArray *variables = [self.document.watchVariablesArray subarrayWithRange:NSMakeRange(batchIndex*batchSize, MIN(batchSize, totalCount - batchIndex*batchSize))];
 				NSMutableArray *batch = [batches objectAtIndex:batchIndex];
+				ZGRegion *lastUsedRegion = nil;
+				
+				#define ADD_VARIABLE_SNIPPET \
+				void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue; \
+				if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variableAddress - lastUsedRegion.address), compareValue, dataSize)) \
+				{ \
+					[batch addObject:variable]; \
+				}
+				
 				for (ZGVariable *variable in variables)
 				{
 					ZGMemoryAddress variableAddress = variable.address;
 					
 					if (variable.shouldBeSearched && variable.size > 0 && dataSize > 0 && beginningAddress <= variableAddress && endingAddress >= variableAddress + dataSize)
-					{	
-						// Find which region the variable is in. Binary search time! Super fast!
-						NSUInteger maxRegionIndex = regions.count - 1;
-						NSUInteger minRegionIndex = 0;
-						while (maxRegionIndex >= minRegionIndex)
+					{
+						// Check if the variable is in the last region we scanned
+						if (lastUsedRegion && variableAddress >= lastUsedRegion.address && variableAddress + dataSize <= lastUsedRegion.address + lastUsedRegion.size)
 						{
-							int middleRegionIndex = (minRegionIndex + maxRegionIndex) / 2;
-							ZGRegion *region = [regions objectAtIndex:middleRegionIndex];
-							ZGMemoryAddress regionAddress = region.address;
-							
-							if (variableAddress + dataSize <= regionAddress)
+							ADD_VARIABLE_SNIPPET
+						}
+						else
+						{
+							// Find which region the variable is in. Binary search time! Super fast!
+							NSUInteger maxRegionIndex = regions.count - 1;
+							NSUInteger minRegionIndex = 0;
+							while (maxRegionIndex >= minRegionIndex)
 							{
-								maxRegionIndex = middleRegionIndex - 1;
-							}
-							else if (variableAddress >= regionAddress + region.size)
-							{
-								minRegionIndex = middleRegionIndex + 1;
-							}
-							else
-							{
-								// Found the region, see if we should add the variable
-								ZGMemoryAddress variableAddress = variable.address;
-								if (variableAddress >= regionAddress && variableAddress + dataSize <= regionAddress + region.size)
-								{
-									void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue;
-									
-									if (compareValue && compareFunction(searchData, region.bytes + (variableAddress - regionAddress), compareValue, dataSize))
-									{
-										[batch addObject:variable];
-									}
-								}
+								int middleRegionIndex = (minRegionIndex + maxRegionIndex) / 2;
+								ZGRegion *region = [regions objectAtIndex:middleRegionIndex];
+								ZGMemoryAddress regionAddress = region.address;
 								
-								break;
+								if (variableAddress + dataSize <= regionAddress)
+								{
+									maxRegionIndex = middleRegionIndex - 1;
+								}
+								else if (variableAddress >= regionAddress + region.size)
+								{
+									minRegionIndex = middleRegionIndex + 1;
+								}
+								else
+								{
+									// Found the region, see if we should add the variable
+									lastUsedRegion = region;
+									if (variableAddress >= regionAddress && variableAddress + dataSize <= regionAddress + region.size)
+									{
+										ADD_VARIABLE_SNIPPET
+									}
+									
+									break;
+								}
 							}
 						}
 					}
