@@ -74,6 +74,8 @@
 @property (nonatomic, strong) ZGRegistersWindowController *registersWindowController;
 @property (nonatomic, assign) BOOL closingRegistersWindow;
 
+@property (nonatomic, assign) BOOL shouldIgnoreTableViewSelectionChange;
+
 @end
 
 #define ZGDisassemblerAddressField @"ZGDisassemblerAddressField"
@@ -880,6 +882,56 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
+	else if (menuItem.action == @selector(toggleBreakPoints:))
+	{
+		if (self.disassembling || self.selectedInstructions.count == 0)
+		{
+			return NO;
+		}
+		
+		BOOL shouldValidate = YES;
+		BOOL isBreakPoint = [self isBreakPointAtInstruction:[self.selectedInstructions objectAtIndex:0]];
+		BOOL didSkipFirstInstruction = NO;
+		for (ZGInstruction *instruction in self.selectedInstructions)
+		{
+			if (!didSkipFirstInstruction)
+			{
+				didSkipFirstInstruction = YES;
+			}
+			else
+			{
+				if ([self isBreakPointAtInstruction:instruction] != isBreakPoint)
+				{
+					shouldValidate = NO;
+					break;
+				}
+			}
+		}
+		
+		[menuItem setTitle:[NSString stringWithFormat:@"%@ Breakpoint%@", isBreakPoint ? @"Remove" : @"Add", self.selectedInstructions.count != 1 ? @"s" : @""]];
+		
+		return shouldValidate;
+	}
+	else if (menuItem.action == @selector(removeAllBreakPoints:))
+	{
+		if (self.disassembling)
+		{
+			return NO;
+		}
+		
+		BOOL shouldValidate = NO;
+		
+		for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
+		{
+			if (breakPoint.delegate == self)
+			{
+				shouldValidate = YES;
+				break;
+			}
+		}
+		
+		return shouldValidate;
+	}
 	
 	return YES;
 }
@@ -931,6 +983,33 @@ END_DEBUGGER_CHANGE:
 
 #pragma mark TableView Methods
 
+- (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
+{
+	if (self.shouldIgnoreTableViewSelectionChange)
+	{
+		self.shouldIgnoreTableViewSelectionChange = NO;
+		return NO;
+	}
+	
+	return YES;
+}
+
+- (BOOL)isBreakPointAtInstruction:(ZGInstruction *)instruction
+{
+	BOOL answer = NO;
+	
+	for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
+	{
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.oneShot)
+		{
+			answer = YES;
+			break;
+		}
+	}
+	
+	return answer;
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return self.instructions.count;
@@ -956,16 +1035,7 @@ END_DEBUGGER_CHANGE:
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
-			result = @(NO);
-			
-			for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
-			{
-				if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.oneShot)
-				{
-					result = @(YES);
-					break;
-				}
-			}
+			result = @([self isBreakPointAtInstruction:instruction]);
 		}
 	}
 	
@@ -984,13 +1054,18 @@ END_DEBUGGER_CHANGE:
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
+			if (self.selectedInstructions.count > 1)
+			{
+				self.shouldIgnoreTableViewSelectionChange = YES;
+			}
+			
 			if ([object boolValue])
 			{
-				[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess oneShot:NO delegate:self];
+				[self addBreakPointsToInstructions:self.selectedInstructions];
 			}
 			else
 			{
-				[[[ZGAppController sharedController] breakPointController] removeBreakPointOnInstruction:instruction inProcess:self.currentProcess];
+				[self removeBreakPointsToInstructions:self.selectedInstructions];
 			}
 		}
 	}
@@ -1086,6 +1161,63 @@ END_DEBUGGER_CHANGE:
 }
 
 #pragma mark Break Points
+
+- (void)removeBreakPointsToInstructions:(NSArray *)instructions
+{
+	NSMutableArray *changedInstructions = [[NSMutableArray alloc] init];
+	
+	for (ZGInstruction *instruction in instructions)
+	{
+		if ([self isBreakPointAtInstruction:instruction])
+		{
+			[changedInstructions addObject:instruction];
+			[[[ZGAppController sharedController] breakPointController] removeBreakPointOnInstruction:instruction inProcess:self.currentProcess];
+		}
+	}
+	
+	[self.undoManager setActionName:[NSString stringWithFormat:@"Add Breakpoint%@", changedInstructions.count != 1 ? @"s" : @""]];
+	[[self.undoManager prepareWithInvocationTarget:self] addBreakPointsToInstructions:changedInstructions];
+	
+	[self.instructionsTableView reloadData];
+}
+
+- (void)addBreakPointsToInstructions:(NSArray *)instructions
+{
+	NSMutableArray *changedInstructions = [[NSMutableArray alloc] init];
+	
+	for (ZGInstruction *instruction in instructions)
+	{
+		if (![self isBreakPointAtInstruction:instruction])
+		{
+			[changedInstructions addObject:instruction];
+			[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess oneShot:NO delegate:self];
+		}
+	}
+	
+	[self.undoManager setActionName:[NSString stringWithFormat:@"Remove Breakpoint%@", changedInstructions.count != 1 ? @"s" : @""]];
+	[[self.undoManager prepareWithInvocationTarget:self] removeBreakPointsToInstructions:changedInstructions];
+	
+	[self.instructionsTableView reloadData];
+}
+
+- (IBAction)toggleBreakPoints:(id)sender
+{
+	if ([self isBreakPointAtInstruction:[self.selectedInstructions objectAtIndex:0]])
+	{
+		[self removeBreakPointsToInstructions:self.selectedInstructions];
+	}
+	else
+	{
+		[self addBreakPointsToInstructions:self.selectedInstructions];
+	}
+}
+
+- (IBAction)removeAllBreakPoints:(id)sender
+{
+	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
+	[self.undoManager removeAllActions];
+	[self.instructionsTableView reloadData];
+}
 
 - (void)addHaltedBreakPoint:(ZGBreakPoint *)breakPoint
 {
