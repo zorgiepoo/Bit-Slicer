@@ -533,7 +533,7 @@
 		self.currentMemoryAddress = chosenRegion.address;
 		self.currentMemorySize = chosenRegion.size;
 		
-#define MEMORY_VIEW_THRESHOLD 268435456
+#define MEMORY_VIEW_THRESHOLD 26843545
 		// Bound the upper and lower half by a threshold so that we will never view too much data that we won't be able to handle, in the rarer cases
 		if (calculatedMemoryAddress > 0)
 		{
