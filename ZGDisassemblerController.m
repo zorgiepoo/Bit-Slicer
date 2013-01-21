@@ -1332,7 +1332,12 @@ END_DEBUGGER_CHANGE:
 }
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
-{	
+{
+	if (!self.window.isVisible)
+	{
+		[self showWindow:nil];
+	}
+	
 	[self removeHaltedBreakPoint:self.currentBreakPoint];
 	[self addHaltedBreakPoint:breakPoint];
 	
