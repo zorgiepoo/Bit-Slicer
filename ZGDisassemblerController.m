@@ -1128,44 +1128,48 @@ END_DEBUGGER_CHANGE:
 }
 
 - (void)goToCurrentBreakPoint
-{
-	// Try to find the instruction in the table first, using a binary search
-	ZGMemoryAddress programCounter = self.registersWindowController.programCounter;
+{	
 	BOOL foundInstruction = NO;
-	NSUInteger maxInstructionIndex = self.instructions.count-1;
-	NSUInteger minInstructionIndex = 0;
+	ZGMemoryAddress programCounter = self.registersWindowController.programCounter;
 	
-	while (maxInstructionIndex >= minInstructionIndex && !foundInstruction)
+	if (self.instructions.count > 0)
 	{
-		NSUInteger middleInstructionIndex = (minInstructionIndex + maxInstructionIndex) / 2;
-		ZGInstruction *instruction = [self.instructions objectAtIndex:middleInstructionIndex];
+		// Try to find the instruction in the table first, using a binary search
+		NSUInteger maxInstructionIndex = self.instructions.count-1;
+		NSUInteger minInstructionIndex = 0;
 		
-		if (instruction.variable.address + instruction.variable.size <= programCounter)
+		while (maxInstructionIndex >= minInstructionIndex && !foundInstruction)
 		{
-			if (middleInstructionIndex >= self.instructions.count-1) break;
-			minInstructionIndex = middleInstructionIndex + 1;
-		}
-		else if (instruction.variable.address >= programCounter + self.currentBreakPoint.variable.size)
-		{
-			if (middleInstructionIndex == 0) break;
-			maxInstructionIndex = middleInstructionIndex - 1;
-		}
-		else
-		{
-			if (instruction.variable.address == programCounter)
+			NSUInteger middleInstructionIndex = (minInstructionIndex + maxInstructionIndex) / 2;
+			ZGInstruction *instruction = [self.instructions objectAtIndex:middleInstructionIndex];
+			
+			if (instruction.variable.address < programCounter)
 			{
-				[self scrollAndSelectRow:middleInstructionIndex];
-				foundInstruction = YES;
+				if (middleInstructionIndex >= self.instructions.count-1) break;
+				minInstructionIndex = middleInstructionIndex + 1;
+			}
+			else if (instruction.variable.address > programCounter)
+			{
+				if (middleInstructionIndex == 0) break;
+				maxInstructionIndex = middleInstructionIndex - 1;
 			}
 			else
 			{
-				break;
+				if (instruction.variable.address == programCounter)
+				{
+					[self scrollAndSelectRow:middleInstructionIndex];
+					foundInstruction = YES;
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 	}
 	
 	if (!foundInstruction)
-	{
+	{	
 		[self jumpToMemoryAddress:programCounter inProcess:self.currentProcess];
 	}
 }
