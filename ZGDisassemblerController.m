@@ -932,7 +932,7 @@ END_DEBUGGER_CHANGE:
 		
 		return shouldValidate;
 	}
-	else if (menuItem.action == @selector(jumpToInstruction:))
+	else if (menuItem.action == @selector(jump:))
 	{
 		if (self.disassembling || !self.currentBreakPoint || self.selectedInstructions.count != 1)
 		{

@@ -50,45 +50,45 @@
 			<object class="NSMenu" id="881434806">
 				<string key="NSTitle"/>
 				<array class="NSMutableArray" key="NSMenuItems">
-					<object class="NSMenuItem" id="290063055">
+					<object class="NSMenuItem" id="709184363">
 						<reference key="NSMenu" ref="881434806"/>
 						<string key="NSTitle">Copy</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
-						<object class="NSCustomResource" key="NSOnImage" id="419243504">
+						<object class="NSCustomResource" key="NSOnImage" id="1004182597">
 							<string key="NSClassName">NSImage</string>
 							<string key="NSResourceName">NSMenuCheckmark</string>
 						</object>
-						<object class="NSCustomResource" key="NSMixedImage" id="228625216">
+						<object class="NSCustomResource" key="NSMixedImage" id="972028515">
 							<string key="NSClassName">NSImage</string>
 							<string key="NSResourceName">NSMenuMixedState</string>
 						</object>
 					</object>
-					<object class="NSMenuItem" id="345931707">
+					<object class="NSMenuItem" id="255524390">
 						<reference key="NSMenu" ref="881434806"/>
 						<bool key="NSIsDisabled">YES</bool>
 						<bool key="NSIsSeparator">YES</bool>
 						<string key="NSTitle"/>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
-						<reference key="NSOnImage" ref="419243504"/>
-						<reference key="NSMixedImage" ref="228625216"/>
+						<reference key="NSOnImage" ref="1004182597"/>
+						<reference key="NSMixedImage" ref="972028515"/>
 					</object>
 					<object class="NSMenuItem" id="561060768">
 						<reference key="NSMenu" ref="881434806"/>
 						<string key="NSTitle">NOP Instruction</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
-						<reference key="NSOnImage" ref="419243504"/>
-						<reference key="NSMixedImage" ref="228625216"/>
+						<reference key="NSOnImage" ref="1004182597"/>
+						<reference key="NSMixedImage" ref="972028515"/>
 					</object>
-					<object class="NSMenuItem" id="999472996">
+					<object class="NSMenuItem" id="208862838">
 						<reference key="NSMenu" ref="881434806"/>
 						<string key="NSTitle">Jump to Instruction</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
-						<reference key="NSOnImage" ref="419243504"/>
-						<reference key="NSMixedImage" ref="228625216"/>
+						<reference key="NSOnImage" ref="1004182597"/>
+						<reference key="NSMixedImage" ref="972028515"/>
 					</object>
 				</array>
 			</object>
@@ -666,19 +666,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">jumpToInstruction:</string>
+						<string key="label">copy:</string>
 						<reference key="source" ref="1003"/>
-						<reference key="destination" ref="999472996"/>
+						<reference key="destination" ref="709184363"/>
 					</object>
-					<int key="connectionID">129</int>
+					<int key="connectionID">130</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">copy:</string>
+						<string key="label">jump:</string>
 						<reference key="source" ref="1003"/>
-						<reference key="destination" ref="290063055"/>
+						<reference key="destination" ref="208862838"/>
 					</object>
-					<int key="connectionID">130</int>
+					<int key="connectionID">131</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -926,9 +926,9 @@
 						<reference key="object" ref="881434806"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="561060768"/>
-							<reference ref="999472996"/>
-							<reference ref="290063055"/>
-							<reference ref="345931707"/>
+							<reference ref="208862838"/>
+							<reference ref="709184363"/>
+							<reference ref="255524390"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Right Click Menu</string>
@@ -953,17 +953,17 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">126</int>
-						<reference key="object" ref="999472996"/>
+						<reference key="object" ref="208862838"/>
 						<reference key="parent" ref="881434806"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">127</int>
-						<reference key="object" ref="290063055"/>
+						<reference key="object" ref="709184363"/>
 						<reference key="parent" ref="881434806"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">128</int>
-						<reference key="object" ref="345931707"/>
+						<reference key="object" ref="255524390"/>
 						<reference key="parent" ref="881434806"/>
 					</object>
 				</array>
@@ -1012,13 +1012,87 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">130</int>
+			<int key="maxID">131</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDisassemblerController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="changeQualifier:">id</string>
+						<string key="continueExecution:">id</string>
+						<string key="copy:">id</string>
+						<string key="jump:">id</string>
+						<string key="nopVariables:">id</string>
+						<string key="readMemory:">id</string>
+						<string key="removeAllBreakPoints:">id</string>
+						<string key="runningApplicationsPopUpButton:">id</string>
+						<string key="showRegisters:">id</string>
+						<string key="showWindow:">id</string>
+						<string key="stepInto:">id</string>
+						<string key="stepOver:">id</string>
+						<string key="stopDisassembling:">id</string>
+						<string key="toggleBreakPoints:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="changeQualifier:">
+							<string key="name">changeQualifier:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="continueExecution:">
+							<string key="name">continueExecution:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="jump:">
+							<string key="name">jump:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="nopVariables:">
+							<string key="name">nopVariables:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="readMemory:">
+							<string key="name">readMemory:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="removeAllBreakPoints:">
+							<string key="name">removeAllBreakPoints:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="runningApplicationsPopUpButton:">
+							<string key="name">runningApplicationsPopUpButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showRegisters:">
+							<string key="name">showRegisters:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showWindow:">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stepInto:">
+							<string key="name">stepInto:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stepOver:">
+							<string key="name">stepOver:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stopDisassembling:">
+							<string key="name">stopDisassembling:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleBreakPoints:">
+							<string key="name">toggleBreakPoints:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressTextField">NSTextField</string>
 						<string key="dissemblyProgressIndicator">NSProgressIndicator</string>
