@@ -157,7 +157,8 @@
 		
 		self.document.currentProcess.isWatchingBreakPoint = YES;
 		
-		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until %@ byte%@ at %@ is written into...", variable.sizeStringValue, breakPoint.watchSize != 1 ? @"s" : @"", variable.addressStringValue];
+		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until instruction %@ %@ (%lld byte%@)", watchPointType == ZGWatchPointWrite ? @"writes" : @"reads or writes", variable.addressStringValue, breakPoint.watchSize, breakPoint.watchSize != 1 ? @"s" : @""];
+		
 		self.document.searchingProgressIndicator.indeterminate = YES;
 		[self.document.searchingProgressIndicator startAnimation:nil];
 		
