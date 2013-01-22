@@ -105,7 +105,7 @@
 
 - (void)freezeVariables
 {
-	[self freezeOrUnfreezeVariablesAtRoxIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
+	[self freezeOrUnfreezeVariablesAtRoxIndexes:self.document.selectedVariableIndexes];
 }
 
 #pragma mark Copying & Pasting
@@ -203,7 +203,7 @@
 
 - (void)removeSelectedSearchValues
 {
-	[self removeVariablesAtRowIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
+	[self removeVariablesAtRowIndexes:self.document.selectedVariableIndexes];
 	self.document.generalStatusTextField.stringValue = @"";
 }
 
@@ -664,7 +664,7 @@
 	[NSApp endSheet:self.editVariablesValueWindow];
 	[self.editVariablesValueWindow close];
 	
-	NSArray *variables = [self.document.watchVariablesArray objectsAtIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
+	NSArray *variables = [self.document selectedVariables];
 	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
 	
 	for (ZGVariable *variable in variables)
@@ -844,7 +844,7 @@
 		[NSApp endSheet:self.editVariablesSizeWindow];
 		[self.editVariablesSizeWindow close];
 		
-		NSArray *variables = [self.document.watchVariablesArray objectsAtIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
+		NSArray *variables = [self.document selectedVariables];
 		NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
 		
 		NSUInteger variableIndex;

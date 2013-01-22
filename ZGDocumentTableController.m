@@ -304,7 +304,7 @@
 		{
 			[self.document.variableController
 			 changeVariableShouldBeSearched:[object boolValue]
-			 rowIndexes:self.watchVariablesTableView.selectedRowIndexes];
+			 rowIndexes:self.document.selectedVariableIndexes];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
