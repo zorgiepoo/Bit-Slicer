@@ -110,14 +110,17 @@
 
 @implementation ZGDocument
 
-- (NSArray *)selectedVariables
+- (NSIndexSet *)selectedVariableIndexes
 {
 	NSIndexSet *tableIndexSet = self.tableController.watchVariablesTableView.selectedRowIndexes;
 	NSInteger clickedRow = self.tableController.watchVariablesTableView.clickedRow;
 	
-	NSIndexSet *selectionIndexSet = (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
-	
-	return [self.watchVariablesArray objectsAtIndexes:selectionIndexSet];
+	return (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
+}
+
+- (NSArray *)selectedVariables
+{	
+	return [self.watchVariablesArray objectsAtIndexes:[self selectedVariableIndexes]];
 }
 
 #pragma mark Document stuff

@@ -117,7 +117,7 @@
 	 owner:self];
 	
 	NSMutableArray *linesToWrite = [[NSMutableArray alloc] init];
-	NSArray *variablesArray = [self.document.watchVariablesArray objectsAtIndexes:self.document.tableController.watchVariablesTableView.selectedRowIndexes];
+	NSArray *variablesArray = [self.document selectedVariables];
 	
 	for (ZGVariable *variable in variablesArray)
 	{
@@ -139,15 +139,7 @@
 	if (pasteboardData)
 	{
 		NSArray *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
-		NSInteger currentIndex = self.document.tableController.watchVariablesTableView.selectedRow;
-		if (currentIndex == -1)
-		{
-			currentIndex = 0;
-		}
-		else
-		{
-			currentIndex++;
-		}
+		NSUInteger currentIndex = self.document.selectedVariableIndexes.count == 0 ? 0 : self.document.selectedVariableIndexes.firstIndex + 1;
 		
 		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, variablesToInsertArray.count)];
 		

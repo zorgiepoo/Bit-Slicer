@@ -74,6 +74,7 @@
 
 - (IBAction)editVariablesAddress:(id)sender;
 
+- (NSIndexSet *)selectedVariableIndexes;
 - (NSArray *)selectedVariables;
 - (void)markDocumentChange;
 
