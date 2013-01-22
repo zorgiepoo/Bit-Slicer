@@ -194,7 +194,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return size;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name shouldBeSearched:(BOOL)shouldBeSearched
 {
 	if ((self = [super init]))
 	{
@@ -204,14 +204,14 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		if (!self.size)
 		{
 			self.size =
-				[ZGVariable
-				 sizeFromType:self.type
-				 pointerSize:pointerSize];
+			[ZGVariable
+			 sizeFromType:self.type
+			 pointerSize:pointerSize];
 		}
-		 
+		
 		self.address = address;
 		self.qualifier = qualifier;
-		self.shouldBeSearched = YES;
+		self.shouldBeSearched = shouldBeSearched;
 		
 		if (value)
 		{
@@ -222,6 +222,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	}
 	
 	return self;
+}
+
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name
+{
+	return [self initWithValue:value size:size address:address type:aType qualifier:qualifier pointerSize:pointerSize name:name shouldBeSearched:YES];
 }
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize

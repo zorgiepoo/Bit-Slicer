@@ -115,7 +115,7 @@
 #define REGISTER_DEFAULT_TYPE(registerName) [[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES] objectForKey:@(#registerName)]
 
 #define ADD_REGISTER(registerName, variableType, structureType) \
-	[newRegisters addObject:[[ZGRegister alloc] initWithVariable:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:REGISTER_DEFAULT_TYPE(registerName) ? [REGISTER_DEFAULT_TYPE(registerName) intValue] : variableType qualifier:self.qualifier pointerSize:registerSize name:@(#registerName)]]]
+	[newRegisters addObject:[[ZGRegister alloc] initWithVariable:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:REGISTER_DEFAULT_TYPE(registerName) ? [REGISTER_DEFAULT_TYPE(registerName) intValue] : variableType qualifier:self.qualifier pointerSize:registerSize name:@(#registerName) shouldBeSearched:NO]]]
 
 #define ADD_REGISTER_32(registerName, variableType) ADD_REGISTER(registerName, variableType, ts32)
 #define ADD_REGISTER_64(registerName, variableType) ADD_REGISTER(registerName, variableType, ts64)
@@ -358,7 +358,8 @@
 						 type:theRegister.variable.type
 						 qualifier:theRegister.variable.qualifier
 						 pointerSize:self.breakPoint.process.pointerSize
-						 name:theRegister.variable.name]];
+						 name:theRegister.variable.name
+						 shouldBeSearched:NO]];
 				}
 				free(newValue);
 			}
@@ -413,8 +414,43 @@
 	{
 		[menuItem setState:self.qualifier == [menuItem tag]];
 	}
+	else if (menuItem.action == @selector(copy:))
+	{
+		if (self.selectedRegisters.count == 0)
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
+}
+
+#pragma mark Copy
+
+- (NSArray *)selectedRegisters
+{
+	NSIndexSet *tableIndexSet = self.tableView.selectedRowIndexes;
+	NSInteger clickedRow = self.tableView.clickedRow;
+	
+	NSIndexSet *selectionIndexSet = (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
+	
+	return [self.registers objectsAtIndexes:selectionIndexSet];
+}
+
+- (IBAction)copy:(id)sender
+{
+	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
+	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
+	
+	for (ZGRegister *theRegister in self.selectedRegisters)
+	{
+		[descriptionComponents addObject:[@[theRegister.variable.name, theRegister.variable.stringValue] componentsJoinedByString:@"\t"]];
+		[variablesArray addObject:theRegister.variable];
+	}
+	
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 }
 
 @end
