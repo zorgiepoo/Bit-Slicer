@@ -49,6 +49,8 @@
 @property (nonatomic, strong) NSUndoManager *undoManager;
 @property (nonatomic, assign) ZGVariableType qualifier;
 
+@property (nonatomic, copy) program_counter_change_t programCounterChangeBlock;
+
 @end
 
 @implementation ZGRegistersWindowController

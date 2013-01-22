@@ -42,7 +42,6 @@
 typedef void(^program_counter_change_t)(void);
 
 @property (nonatomic, assign) ZGMemoryAddress programCounter;
-@property (nonatomic, copy) program_counter_change_t programCounterChangeBlock;
 
 - (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock;
 
