@@ -485,6 +485,7 @@
 						ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 						newInstruction.text = disassembledText;
 						newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+						newInstruction.variable.shouldBeSearched = NO;
 						newInstruction.mnemonic = mnemonic;
 						
 						[instructionsToReplace addObject:newInstruction];
@@ -567,6 +568,7 @@
 				ZGInstruction *instruction = [[ZGInstruction alloc] init];
 				instruction.text = disassembledText;
 				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+				instruction.variable.shouldBeSearched = NO;
 				instruction.mnemonic = mnemonic;
 				
 				[newInstructions addObject:instruction];
@@ -956,13 +958,17 @@ END_DEBUGGER_CHANGE:
 - (IBAction)copy:(id)sender
 {
 	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
+	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
+	
 	for (ZGInstruction *instruction in self.selectedInstructions)
 	{
 		[descriptionComponents addObject:[@[instruction.variable.addressStringValue, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
+		[variablesArray addObject:instruction.variable];
 	}
 	
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 }
 
 - (void)scrollAndSelectRow:(NSUInteger)selectionRow
