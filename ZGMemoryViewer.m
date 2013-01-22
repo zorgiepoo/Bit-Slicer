@@ -55,6 +55,8 @@
 #define ZGMemoryViewerProcessName @"ZGMemoryViewerProcessName"
 #define ZGMemoryViewerShowsDataInspector @"ZGMemoryViewerShowsDataInspector"
 
+#define DEFAULT_SELECTION_LENGTH 4
+
 @interface ZGMemoryViewer ()
 
 @property (readwrite, strong) NSTimer *checkMemoryTimer;
@@ -122,6 +124,8 @@
 - (id)init
 {
 	self = [super initWithWindowNibName:@"MemoryViewer"];
+	
+	self.selectionLength = DEFAULT_SELECTION_LENGTH;
 	
 	return self;
 }
@@ -664,7 +668,10 @@ END_MEMORY_VIEW_CHANGE:
 	if (shouldMakeSelection)
 	{
 		// Select a few bytes from the offset
-		self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN((ZGMemoryAddress)4, self.currentMemoryAddress + self.currentMemorySize - memoryAddress))]];
+		self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN(self.selectionLength, self.currentMemoryAddress + self.currentMemorySize - memoryAddress))]];
+		
+		// Restore default selection length
+		self.selectionLength = DEFAULT_SELECTION_LENGTH;
 		
 		[self.textView.controller pulseSelection];
 	}
