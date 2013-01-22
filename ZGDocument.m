@@ -1388,7 +1388,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (IBAction)watchVariable:(id)sender
 {
-	[self.documentBreakPointController requestVariableWatch];
+	[self.documentBreakPointController requestVariableWatch:(ZGWatchPointType)[sender tag]];
 }
 
 #pragma mark Showing Other Controllers

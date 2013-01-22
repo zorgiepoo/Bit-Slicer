@@ -44,6 +44,12 @@
 
 @interface ZGBreakPointController : NSObject
 
+typedef enum
+{
+	ZGWatchPointWrite,
+	ZGWatchPointReadOrWrite,
+} ZGWatchPointType;
+
 @property (strong) NSArray *breakPoints;
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process oneShot:(BOOL)oneShot delegate:(id)delegate;
@@ -52,7 +58,7 @@
 - (void)addSingleStepBreakPointFromBreakPoint:(ZGBreakPoint *)breakPoint;
 - (void)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint;
 
-- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
+- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
 
 - (void)removeObserver:(id)observer;
 - (void)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;

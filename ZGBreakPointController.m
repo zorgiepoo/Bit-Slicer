@@ -35,7 +35,7 @@
 // For information about x86 debug registers, see:
 // http://en.wikipedia.org/wiki/X86_debug_register
 
-// General summary:
+// General summary of watchpoints:
 // We set up an exception handler for catching breakpoint's and run a server that listens for exceptions coming in
 // We add a hardware watchpoint when the user requests it.
 // Determine number of bytes we want to watch: 1, 2, 4, 8 (note: 32-bit processes cannot use byte-size of 8)
@@ -46,6 +46,11 @@
 // Any time we obtain or set thread information, we suspend the task before doing so and resume it when we're done (I suppose we could just only suspend the thread instead)
 // We catch a breakpoint exception, make sure it matches with one of our breakpoints, restore what we've written to registers in all threads, and clear the dr6 status register
 // Also grab the EIP (for 32-bit processes) or RIP (for 64-bit processes) program counters, this is the address of the instruction *after* the one we're interested in
+
+// For instruction breakpoints, we modify the instruction's first byte to 0xCC, fake the disassembler values to the user.
+// When a breakpoint hits, we suspend the task, and let the user decide to continue when he wants
+// At continuation, we restore the breakpoint's first byte, turn on single-stepping by modifying flags register, and at the next step we restore our breakpoint and continue like usual
+// Note: There are some trick cases if the user decides to jump to an address or manually single-step or step-over
 
 #import "ZGBreakPointController.h"
 #import "ZGAppController.h"
@@ -109,7 +114,8 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 		kern_return_t error = 0;
 		if ((error = thread_get_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount)) != KERN_SUCCESS)
 		{
-			NSLog(@"ERROR: Grabbing debug state failed in removeWatchPoint:, %d, continuing...", error);
+			// it's not very odd and abnormal for this to fail, so commenting this out
+			//NSLog(@"ERROR: Grabbing debug state failed in removeWatchPoint:, %d, continuing...", error);
 			continue;
 		}
 		
@@ -575,14 +581,15 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	debugState.uds.type.__dr7 &= ~(1 << 2*debugRegisterIndex+1); \
 	\
 	debugState.uds.type.__dr7 |= (1 << 16 + 2*debugRegisterIndex); \
-	debugState.uds.type.__dr7 &= ~(1 << 16 + 2*debugRegisterIndex+1); \
+	if (watchPointType == ZGWatchPointWrite) { debugState.uds.type.__dr7 &= ~(1 << 16 + 2*debugRegisterIndex+1); } \
+	else if (watchPointType == ZGWatchPointReadOrWrite) { debugState.uds.type.__dr7 |= (1 << 16 + 2*debugRegisterIndex+1); } \
 	\
 	if (watchSize == 1) { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); } \
 	else if (watchSize == 2) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); } \
 	else if (watchSize == 4) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); } \
 	else if (watchSize == 8) { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); }
 
-- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
+- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{

@@ -34,7 +34,6 @@
 
 #import "ZGDocumentBreakPointController.h"
 #import "ZGDocument.h"
-#import "ZGBreakPointController.h"
 #import "ZGVariableController.h"
 #import "ZGAppController.h"
 #import "ZGDocumentSearchController.h"
@@ -147,12 +146,12 @@
 	self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", instruction.variable.sizeStringValue, instruction.variable.addressStringValue];
 }
 
-- (void)requestVariableWatch
+- (void)requestVariableWatch:(ZGWatchPointType)watchPointType
 {
 	ZGVariable *variable = [[[self.document selectedVariables] objectAtIndex:0] copy];
 	ZGBreakPoint *breakPoint = nil;
 	
-	if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self.document.currentProcess delegate:self getBreakPoint:&breakPoint])
+	if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self.document.currentProcess watchPointType:watchPointType delegate:self getBreakPoint:&breakPoint])
 	{		
 		[self.document.searchController prepareTask];
 		

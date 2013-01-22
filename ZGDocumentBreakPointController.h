@@ -33,10 +33,11 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGBreakPointController.h"
 
 @interface ZGDocumentBreakPointController : NSObject
 
-- (void)requestVariableWatch;
+- (void)requestVariableWatch:(ZGWatchPointType)watchPointType;
 - (void)cancelTask;
 - (void)stopWatchingBreakPoints;
 
