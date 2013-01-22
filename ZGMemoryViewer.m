@@ -111,7 +111,7 @@
 		}
 	}
 	
-	if (shouldUpdateMemoryView)
+	if (shouldUpdateMemoryView && self.windowDidAppear)
 	{
 		[self changeMemoryView:nil];
 	}
