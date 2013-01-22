@@ -43,6 +43,8 @@ typedef void(^program_counter_change_t)(void);
 
 @property (nonatomic, assign) ZGMemoryAddress programCounter;
 
+- (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
+
 - (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock;
 
 - (IBAction)changeQualifier:(id)sender;

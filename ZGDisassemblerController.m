@@ -932,6 +932,13 @@ END_DEBUGGER_CHANGE:
 		
 		return shouldValidate;
 	}
+	else if (menuItem.action == @selector(jumpToInstruction:))
+	{
+		if (self.disassembling || !self.currentBreakPoint || self.selectedInstructions.count != 1)
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
 }
@@ -1304,6 +1311,23 @@ END_DEBUGGER_CHANGE:
 	{	
 		[self jumpToMemoryAddress:programCounter inProcess:self.currentProcess];
 	}
+}
+
+- (void)jumpToAddress:(ZGMemoryAddress)newAddress
+{
+	if (self.currentBreakPoint && !self.disassembling)
+	{
+		ZGMemoryAddress currentAddress = [self.registersWindowController programCounter];
+		[self.registersWindowController changeProgramCounter:newAddress];
+		[[self.undoManager prepareWithInvocationTarget:self] jumpToAddress:currentAddress];
+		[self.undoManager setActionName:@"Jump"];
+	}
+}
+
+- (IBAction)jump:(id)sender
+{
+	ZGInstruction *instruction = [self.selectedInstructions objectAtIndex:0];
+	[self jumpToAddress:instruction.variable.address];
 }
 
 - (void)showOrCloseRegistersWindow

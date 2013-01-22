@@ -87,6 +87,31 @@
 	}
 }
 
+- (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter
+{
+	if (_programCounter != newProgramCounter)
+	{
+		x86_thread_state_t threadState;
+		mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
+		if (thread_get_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) == KERN_SUCCESS)
+		{
+			if (self.breakPoint.process.is64Bit)
+			{
+				threadState.uts.ts64.__rip = newProgramCounter;
+			}
+			else
+			{
+				threadState.uts.ts32.__eip = (uint32_t)newProgramCounter;
+			}
+			
+			if (thread_set_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) == KERN_SUCCESS)
+			{
+				self.programCounter = newProgramCounter;
+			}
+		}
+	}
+}
+
 #define REGISTER_DEFAULT_TYPE(registerName) [[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES] objectForKey:@(#registerName)]
 
 #define ADD_REGISTER(registerName, variableType, structureType) \
