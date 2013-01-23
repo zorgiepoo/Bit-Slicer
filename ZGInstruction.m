@@ -42,10 +42,4 @@
 	return self.mnemonic == UD_Icall;
 }
 
-- (NSString *)shortDescription
-{
-	NSArray *components = [self.text componentsSeparatedByString:@" "];
-	return components.count > 0 ? [components objectAtIndex:0] : @"";
-}
-
 @end

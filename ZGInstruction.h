@@ -42,7 +42,6 @@
 @property (nonatomic, copy) NSString *text;
 @property (nonatomic, strong) ZGVariable *variable;
 @property (nonatomic, readwrite) ud_mnemonic_code_t mnemonic;
-@property (nonatomic, readonly) NSString *shortDescription;
 
 - (BOOL)isCallMnemonic;
 
