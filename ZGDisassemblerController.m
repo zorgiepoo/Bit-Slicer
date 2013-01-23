@@ -349,11 +349,10 @@
 				}];
 				
 				instruction = [[ZGInstruction alloc] init];
-				ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
-				[variable setShouldBeSearched:NO];
-				instruction.variable = variable;
 				instruction.text = instructionText;
 				instruction.mnemonic = instructionMnemonic;
+				ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize name:instruction.shortDescription shouldBeSearched:NO];
+				instruction.variable = variable;
 				
 				ZGFreeBytes(process.processTask, bytes, readSize);
 			}
@@ -486,8 +485,7 @@
 					[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 						ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 						newInstruction.text = disassembledText;
-						newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
-						newInstruction.variable.shouldBeSearched = NO;
+						newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.shortDescription shouldBeSearched:NO];
 						newInstruction.mnemonic = mnemonic;
 						
 						[instructionsToReplace addObject:newInstruction];
@@ -569,8 +567,7 @@
 			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *instruction = [[ZGInstruction alloc] init];
 				instruction.text = disassembledText;
-				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
-				instruction.variable.shouldBeSearched = NO;
+				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:instruction.shortDescription shouldBeSearched:NO];
 				instruction.mnemonic = mnemonic;
 				
 				[newInstructions addObject:instruction];
