@@ -997,12 +997,8 @@ END_DEBUGGER_CHANGE:
 
 - (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-	NSMutableArray *newVariables = [[NSMutableArray alloc] init];
-	for (ZGInstruction *instruction in [self.instructions objectsAtIndexes:rowIndexes])
-	{
-		[newVariables addObject:[instruction.variable copy]];
-	}
-	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:newVariables] forType:ZGVariablePboardType];
+	NSArray *variables = [[self.instructions objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
