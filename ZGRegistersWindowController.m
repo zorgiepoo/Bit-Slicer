@@ -70,6 +70,11 @@
 	return self.undoManager;
 }
 
+- (void)windowDidLoad
+{
+	[self.tableView registerForDraggedTypes:@[ZGVariablePboardType]];
+}
+
 - (void)showWindow:(id)sender
 {
 	[self.window orderFront:nil];
@@ -305,6 +310,12 @@
 }
 
 #pragma mark TableView Methods
+
+- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+{
+	NSArray *variables = [[self.registers objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
+}
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {

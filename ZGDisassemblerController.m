@@ -212,6 +212,8 @@
 	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
 	 name:NSPopUpButtonWillPopUpNotification
 	 object:self.runningApplicationsPopUpButton];
+	
+	[self.instructionsTableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
 
 // This is intended to be called when the window shows up - either from showWindow: or from window restoration
@@ -995,6 +997,12 @@ END_DEBUGGER_CHANGE:
 }
 
 #pragma mark TableView Methods
+
+- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+{
+	NSArray *variables = [[self.instructions objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
+}
 
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
 {

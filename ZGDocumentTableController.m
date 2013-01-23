@@ -58,7 +58,7 @@
 
 - (void)awakeFromNib
 {
-	[self.watchVariablesTableView registerForDraggedTypes:@[ZGVariableReorderType]];
+	[self.watchVariablesTableView registerForDraggedTypes:@[ZGVariableReorderType, ZGVariablePboardType]];
 	self.watchVariablesTimer =
 		[NSTimer
 		 scheduledTimerWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
@@ -188,6 +188,10 @@
 	{
 		return NSDragOperationMove;
 	}
+	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType] && operation != NSTableViewDropOn)
+	{
+		return NSDragOperationCopy;
+	}
 	
 	return NSDragOperationNone;
 }
@@ -203,33 +207,48 @@
 }
 
 - (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo  row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
-{	
-	NSMutableArray *variables = [NSMutableArray arrayWithArray:self.document.watchVariablesArray];
-	NSArray *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableReorderType];
-	
-	// Fill in the current rows with null objects
-	for (NSNumber *row in rows)
+{
+	if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType])
 	{
-		[variables
-		 replaceObjectAtIndex:row.integerValue
-		 withObject:NSNull.null];
-	}
-	
-	// Insert the objects to the new position
-	for (NSNumber *row in rows)
-	{
-		[variables
-		 insertObject:[self.document.watchVariablesArray objectAtIndex:row.integerValue]
-		 atIndex:newRow];
+		NSMutableArray *variables = [NSMutableArray arrayWithArray:self.document.watchVariablesArray];
+		NSArray *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableReorderType];
 		
-		newRow++;
+		// Fill in the current rows with null objects
+		for (NSNumber *row in rows)
+		{
+			[variables
+			 replaceObjectAtIndex:row.integerValue
+			 withObject:NSNull.null];
+		}
+		
+		// Insert the objects to the new position
+		for (NSNumber *row in rows)
+		{
+			[variables
+			 insertObject:[self.document.watchVariablesArray objectAtIndex:row.integerValue]
+			 atIndex:newRow];
+			
+			newRow++;
+		}
+		
+		// Remove all the old objects
+		[variables removeObject:NSNull.null];
+		
+		// Set the new variables
+		[self reorderVariables:variables];
 	}
-	
-	// Remove all the old objects
-	[variables removeObject:NSNull.null];
-	
-	// Set the new variables
-	[self reorderVariables:variables];
+	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType])
+	{
+		NSArray *variables = [NSKeyedUnarchiver unarchiveObjectWithData:[[draggingInfo draggingPasteboard] dataForType:ZGVariablePboardType]];
+		
+		NSMutableIndexSet *rowIndexes = [NSMutableIndexSet indexSet];
+		for (NSUInteger rowIndex = 0; rowIndex < variables.count; rowIndex++)
+		{
+			[rowIndexes addIndex:newRow + rowIndex];
+		}
+		
+		[self.document.variableController addVariables:variables atRowIndexes:rowIndexes];
+	}
 	
 	return YES;
 }
