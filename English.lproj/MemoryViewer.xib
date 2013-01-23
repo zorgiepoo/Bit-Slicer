@@ -47,7 +47,7 @@
 			<object class="NSWindowTemplate" id="1005">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{196, 120}, {547, 417}}</string>
+				<string key="NSWindowRect">{{831, 352}, {547, 417}}</string>
 				<int key="NSWTFlags">1618477056</int>
 				<string key="NSWindowTitle">Memory Viewer</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -725,49 +725,14 @@
 					<string key="className">ZGMemoryViewer</string>
 					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>changeMemoryView:</string>
-							<string>runningApplicationsPopUpButton:</string>
-							<string>showWindow:</string>
-							<string>toggleDataInspector:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
+						<string key="NS.key.0">toggleDataInspector:</string>
+						<string key="NS.object.0">id</string>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>changeMemoryView:</string>
-							<string>runningApplicationsPopUpButton:</string>
-							<string>showWindow:</string>
-							<string>toggleDataInspector:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">changeMemoryView:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">runningApplicationsPopUpButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">showWindow:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">toggleDataInspector:</string>
-								<string key="candidateClassName">id</string>
-							</object>
+						<string key="NS.key.0">toggleDataInspector:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">toggleDataInspector:</string>
+							<string key="candidateClassName">id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
