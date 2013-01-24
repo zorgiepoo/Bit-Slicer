@@ -276,7 +276,12 @@
 
 - (void)clear
 {
-	[self.document.undoManager removeAllActions];
+	// Remove undo actions in another task as it may be somewhat of an expensive operation
+	NSUndoManager *oldUndoManager = self.document.undoManager;
+	self.document.undoManager = [[NSUndoManager alloc] init];
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		[oldUndoManager removeAllActions];
+	});
 	
 	self.document.runningApplicationsPopUpButton.enabled = YES;
 	self.document.dataTypesPopUpButton.enabled = YES;
