@@ -106,7 +106,7 @@
 				 }
 			 }
 			 
-			 if (index >= MAX_TABLE_VIEW_ITEMS)
+			 if (index >= MAX_TABLE_VIEW_ITEMS - 1)
 			 {
 				 *stop = YES;
 			 }
@@ -133,7 +133,7 @@
 				 }
 			 }
 			 
-			 if (index >= MAX_TABLE_VIEW_ITEMS)
+			 if (index >= MAX_TABLE_VIEW_ITEMS - 1)
 			 {
 				 *stop = YES;
 			 }
