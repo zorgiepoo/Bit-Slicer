@@ -689,9 +689,10 @@
 				NSArray *variables = [self.document.watchVariablesArray subarrayWithRange:NSMakeRange(batchIndex*batchSize, MIN(batchSize, totalCount - batchIndex*batchSize))];
 				NSMutableArray *batch = [batches objectAtIndex:batchIndex];
 				ZGRegion *lastUsedRegion = nil;
+				ZGRegion *lastUsedSavedRegion = nil;
 				
 				#define ADD_VARIABLE_SNIPPET \
-				void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, dataSize) : searchValue; \
+				void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue; \
 				if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variableAddress - lastUsedRegion.address), compareValue, dataSize)) \
 				{ \
 					[batch addObject:variable]; \

@@ -271,17 +271,54 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 	return dataArray;
 }
 
-void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataSize)
+void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGRegion **hintedRegionReference, ZGMemorySize dataSize)
 {
+	// Use a binary search
+	
 	void *value = NULL;
 	
-	for (ZGRegion *region in searchData.savedData)
+	ZGRegion *hintedRegion = (hintedRegionReference && *hintedRegionReference) ? *hintedRegionReference : nil;
+	if (hintedRegion && address >= hintedRegion.address && address + dataSize <= hintedRegion.address + hintedRegion.size)
 	{
-		ZGMemoryAddress regionAddress = region.address;
-		if (address >= regionAddress && address + dataSize <= regionAddress + region.size)
+		value = hintedRegion.bytes + (address - hintedRegion.address);
+	}
+	else
+	{
+		NSArray *regions = searchData.savedData;
+		
+		NSUInteger maxIndex = regions.count - 1;
+		NSUInteger minIndex = 0;
+		
+		while (maxIndex >= minIndex)
 		{
-			value = region.bytes + (address - regionAddress);
-			break;
+			NSUInteger midIndex = (maxIndex + minIndex) / 2;
+			ZGRegion *region = [regions objectAtIndex:midIndex];
+			
+			ZGMemoryAddress regionAddress = region.address;
+			ZGMemorySize regionSize = region.size;
+			
+			if (address >= regionAddress + regionSize)
+			{
+				minIndex = midIndex + 1;
+			}
+			else if (address + dataSize <= regionAddress)
+			{
+				if (midIndex == 0) break;
+				maxIndex = midIndex - 1;
+			}
+			else
+			{
+				// Found match
+				if (address >= regionAddress && address + dataSize <= regionAddress + regionSize)
+				{
+					value = region.bytes + (address - regionAddress);
+					if (hintedRegionReference)
+					{
+						*hintedRegionReference = region;
+					}
+					break;
+				}
+			}
 		}
 	}
 	

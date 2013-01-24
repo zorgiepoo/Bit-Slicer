@@ -77,7 +77,7 @@ BOOL ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize si
 
 void ZGFreeData(NSArray *dataArray);
 NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues);
-void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataSize);
+void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGRegion **hintedRegionReference, ZGMemorySize dataSize);
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process);
 
 void ZGInitializeSearch(ZGSearchData *searchData);
