@@ -497,7 +497,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 			regionAddress + size > dataBeginAddress &&
 			ZGReadBytes(processTask, regionAddress, (void **)&currentData, &size))
 		{
-			while (offset + dataSize <= size && !searchData->_shouldCancelSearch);
+			while (offset + dataSize <= size && !searchData->_shouldCancelSearch)
 			{
 				if (dataBeginAddress <= regionAddress + offset &&
 					dataEndAddress >= regionAddress + offset + dataSize)
