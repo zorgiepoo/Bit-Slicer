@@ -105,6 +105,11 @@
 					 [self.watchVariablesTableView reloadData];
 				 }
 			 }
+			 
+			 if (index >= MAX_TABLE_VIEW_ITEMS)
+			 {
+				 *stop = YES;
+			 }
 		 }];
 	}
 	
@@ -126,6 +131,11 @@
 					 unichar terminatorValue = 0;
 					 ZGWriteBytesIgnoringProtection(self.document.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));
 				 }
+			 }
+			 
+			 if (index >= MAX_TABLE_VIEW_ITEMS)
+			 {
+				 *stop = YES;
 			 }
 		 }];
 	}
