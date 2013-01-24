@@ -722,6 +722,7 @@
 								
 								if (variableAddress + dataSize <= regionAddress)
 								{
+									if (middleRegionIndex == 0) break;
 									maxRegionIndex = middleRegionIndex - 1;
 								}
 								else if (variableAddress >= regionAddress + region.size)
