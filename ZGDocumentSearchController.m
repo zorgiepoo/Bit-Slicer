@@ -677,7 +677,7 @@
 		// Start using multiple tasks for narrowing down our search
 		// batchSize indicates the number of elements that each task will handle at most
 		// Not sure what the best number to put in for this, but it appears to work well
-		NSUInteger batchSize = 50;
+		NSUInteger batchSize = 5000;
 		NSUInteger totalCount = self.document.watchVariablesArray.count;
 		NSUInteger numberOfBatches = (NSUInteger)ceil(totalCount / (batchSize * 1.0));
 		
