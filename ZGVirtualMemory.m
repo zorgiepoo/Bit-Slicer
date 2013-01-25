@@ -472,7 +472,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	
-	NSMutableArray *resultsWrapperArray = [[NSMutableArray alloc] init];
+	__block NSMutableArray *resultsWrapperArray = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < searchData.savedData.count; regionIndex++)
 	{
 		[resultsWrapperArray addObject:[[ZGResultsWrapper alloc] init]];
@@ -512,7 +512,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 		
 		resultsWrapper.results = localResults;
 		
-		if (searchData->_shouldCancelSearch)
+		if (searchData->_shouldCancelSearch && !searchData.searchDidCancel)
 		{
 			searchData.searchDidCancel = YES;
 		}
@@ -525,9 +525,18 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 	
 	NSMutableArray *allResults = [[NSMutableArray alloc] init];
 	
-	for (ZGResultsWrapper *taggedResults in resultsWrapperArray)
+	if (!searchData->_shouldCancelSearch)
 	{
-		[allResults addObjectsFromArray:taggedResults.results];
+		for (ZGResultsWrapper *taggedResults in resultsWrapperArray)
+		{
+			[allResults addObjectsFromArray:taggedResults.results];
+		}
+	}
+	else
+	{
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			resultsWrapperArray = nil;
+		});
 	}
 	
 	return allResults;
@@ -554,7 +563,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	
 	numberOfRegionsProcessed -= regions.count;
 	
-	NSMutableArray *resultsWrapperArray = [[NSMutableArray alloc] init];
+	__block NSMutableArray *resultsWrapperArray = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
 	{
 		[resultsWrapperArray addObject:[[ZGResultsWrapper alloc] init]];
@@ -585,12 +594,9 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 			ZGFreeBytes(processTask, bytes, size);
 		}
 		
-		if (searchData->_shouldCancelSearch)
+		if (searchData->_shouldCancelSearch && !searchData.searchDidCancel)
 		{
-			if (!searchData->_searchDidCancel)
-			{
-				searchData.searchDidCancel = YES;
-			}
+			searchData.searchDidCancel = YES;
 		}
 		
 		resultsWrapper.results = localResults;
@@ -603,9 +609,18 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	
 	NSMutableArray *allResults = [[NSMutableArray alloc] init];
 	
-	for (ZGResultsWrapper *resultsWrapper in resultsWrapperArray)
+	if (!searchData->_shouldCancelSearch)
 	{
-		[allResults addObjectsFromArray:resultsWrapper.results];
+		for (ZGResultsWrapper *resultsWrapper in resultsWrapperArray)
+		{
+			[allResults addObjectsFromArray:resultsWrapper.results];
+		}
+	}
+	else
+	{
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			resultsWrapperArray = nil;
+		});
 	}
 	
 	return allResults;
