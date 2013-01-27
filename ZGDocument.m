@@ -688,7 +688,7 @@
 
 - (void)updateClearButton
 {
-	self.clearButton.enabled = (self.watchVariablesArray.count > 0);
+	self.clearButton.enabled = (self.watchVariablesArray.count > 0 && [self.searchController canStartTask]);
 }
 
 - (IBAction)qualifierMatrixButtonRequest:(id)sender
