@@ -206,8 +206,6 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 							}
 						});
 						
-						[[[ZGAppController sharedController] breakPointController] removeWatchPoint:breakPoint];
-						
 						handledWatchPoint = YES;
 						
 						break;

@@ -48,6 +48,7 @@
 
 @property (assign) IBOutlet ZGDocument *document;
 @property (strong, nonatomic) ZGProcess *watchProcess;
+@property (strong, nonatomic) NSMutableArray *foundInstructions;
 
 @end
 
@@ -65,6 +66,8 @@
 		 selector:@selector(applicationWillTerminate:)
 		 name:NSApplicationWillTerminateNotification
 		 object:nil];
+		
+		self.foundInstructions = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -135,15 +138,16 @@
 	ZGMemoryAddress breakPointAddress = [address unsignedLongLongValue];
 	ZGInstruction *instruction = [[[ZGAppController sharedController] disassemblerController] findInstructionBeforeAddress:breakPointAddress inProcess:self.watchProcess];
 	
-	// No need to watch process anymore as break point controller removed the breakpoint for us
-	self.watchProcess = nil;
-	[self cancelTask];
-	
-	[self.document.variableController addVariables:@[instruction.variable] atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
-	[self.document.tableController.watchVariablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
-	[self.document.tableController.watchVariablesTableView scrollRowToVisible:0];
-	[self.document.watchWindow makeFirstResponder:self.document.tableController.watchVariablesTableView];
-	self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", instruction.variable.sizeStringValue, instruction.variable.addressStringValue];
+	if (![self.foundInstructions containsObject:instruction])
+	{
+		[self.foundInstructions addObject:instruction];
+		
+		[self.document.variableController addVariables:@[instruction.variable] atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
+		[self.document.tableController.watchVariablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+		[self.document.tableController.watchVariablesTableView scrollRowToVisible:0];
+		[self.document.watchWindow makeFirstResponder:self.document.tableController.watchVariablesTableView];
+		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", instruction.variable.sizeStringValue, instruction.variable.addressStringValue];
+	}
 }
 
 - (void)requestVariableWatch:(ZGWatchPointType)watchPointType

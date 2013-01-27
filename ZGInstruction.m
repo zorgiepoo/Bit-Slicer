@@ -33,6 +33,7 @@
  */
 
 #import "ZGInstruction.h"
+#import "ZGVariable.h"
 
 @implementation ZGInstruction
 
@@ -40,6 +41,23 @@
 - (BOOL)isCallMnemonic
 {
 	return self.mnemonic == UD_Icall;
+}
+
+- (BOOL)isEqual:(id)object
+{
+	if (![object isKindOfClass:[ZGInstruction class]])
+	{
+		return NO;
+	}
+	
+	ZGInstruction *instruction = object;
+	
+	if (self.variable.address == instruction.variable.address && (self.variable.value == instruction.variable.value || (self.variable.size == instruction.variable.size && memcmp(self.variable.value, instruction.variable.value, self.variable.size) == 0)))
+	{
+		return YES;
+	}
+	
+	return NO;
 }
 
 @end
