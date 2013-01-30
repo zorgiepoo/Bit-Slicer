@@ -719,7 +719,7 @@
 							NSUInteger minRegionIndex = 0;
 							while (maxRegionIndex >= minRegionIndex)
 							{
-								int middleRegionIndex = (minRegionIndex + maxRegionIndex) / 2;
+								NSUInteger middleRegionIndex = (minRegionIndex + maxRegionIndex) / 2;
 								ZGRegion *region = [regions objectAtIndex:middleRegionIndex];
 								ZGMemoryAddress regionAddress = region.address;
 								

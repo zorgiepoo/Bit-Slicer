@@ -139,7 +139,7 @@
 	
 	NSMutableArray *newRunningProcesses = [[NSMutableArray alloc] init];
 	
-    int processCount = length / sizeof(struct kinfo_proc);
+    int processCount = (int)(length / sizeof(struct kinfo_proc));
     for (int processIndex = 0; processIndex < processCount; processIndex++)
 	{
         uid_t uid = processList[processIndex].kp_eproc.e_ucred.cr_uid;

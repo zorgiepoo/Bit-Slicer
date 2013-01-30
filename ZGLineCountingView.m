@@ -84,6 +84,11 @@
 	const NSUInteger stride = bytesPerLine;
 	unsigned long long lineValue = HFProductULL(range.location, bytesPerLine) + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
 	NSUInteger characterCount = [self characterCountForLineRange:range];
+	if (characterCount == 0)
+	{
+		NSLog(@"ERROR: Couldn't create line string for range");
+		return nil;
+	}
 	char *buffer = check_malloc(characterCount);
 	NSUInteger bufferIndex = 0;
 
