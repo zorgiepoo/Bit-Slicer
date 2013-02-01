@@ -631,6 +631,13 @@
 			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
 			{
 				[[[ZGAppController sharedController] breakPointController] removeObserver:self runningProcess:runningProcess];
+				for (ZGBreakPoint *haltedBreakPoint in self.haltedBreakPoints)
+				{
+					if (haltedBreakPoint.process.processID == runningProcess.processIdentifier)
+					{
+						[self removeHaltedBreakPoint:haltedBreakPoint];
+					}
+				}
 			}
 		}
 	}
