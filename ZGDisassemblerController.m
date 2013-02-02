@@ -683,6 +683,7 @@
 		iconImage.size = NSMakeSize(16, 16);
 		menuItem.image = iconImage;
 		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName set64Bit:YES];
+		[menuItem.representedObject markInvalid];
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 		
