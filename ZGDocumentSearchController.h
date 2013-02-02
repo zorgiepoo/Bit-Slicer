@@ -45,6 +45,7 @@
 - (BOOL)canStartTask;
 - (BOOL)canCancelTask;
 - (void)cancelTask;
+- (void)prepareTaskWithEscapeTitle:(NSString *)escapeTitle;
 - (void)prepareTask;
 - (void)resumeFromTask;
 

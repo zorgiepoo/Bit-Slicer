@@ -50,6 +50,7 @@
 @property (assign) IBOutlet ZGDocument *document;
 @property (strong, nonatomic, readwrite) NSTimer *userInterfaceTimer;
 @property (readwrite, strong, nonatomic) ZGSearchData *searchData;
+@property (assign) BOOL isBusy;
 
 @end
 
@@ -159,17 +160,22 @@
 
 - (BOOL)canStartTask
 {
-	return [self.document.searchButton.title isEqualToString:@"Search"];
+	return !self.isBusy;
 }
 
 - (BOOL)canCancelTask
 {
-	return [self.document.searchButton.title isEqualToString:@"Cancel"];
+	return self.isBusy;
 }
 
 #pragma mark Preparing and resuming from tasks
 
 - (void)prepareTask
+{
+	[self prepareTaskWithEscapeTitle:@"Cancel"];
+}
+
+- (void)prepareTaskWithEscapeTitle:(NSString *)escapeTitle
 {
 	self.document.runningApplicationsPopUpButton.enabled = NO;
 	self.document.dataTypesPopUpButton.enabled = NO;
@@ -178,7 +184,7 @@
 	self.document.flagsTextField.enabled = NO;
 	self.document.functionPopUpButton.enabled = NO;
 	self.document.clearButton.enabled = NO;
-	self.document.searchButton.title = @"Cancel";
+	self.document.searchButton.title = escapeTitle;
 	self.document.searchButton.keyEquivalent = @"\e";
 	self.document.scanUnwritableValuesCheckBox.enabled = NO;
 	self.document.ignoreDataAlignmentCheckBox.enabled = NO;
@@ -188,6 +194,8 @@
 	self.document.endingAddressTextField.enabled = NO;
 	self.document.beginningAddressLabel.textColor = NSColor.disabledControlTextColor;
 	self.document.endingAddressLabel.textColor = NSColor.disabledControlTextColor;
+	
+	self.isBusy = YES;
 }
 
 - (void)resumeFromTask
@@ -203,6 +211,8 @@
 	self.document.searchButton.enabled = YES;
 	self.document.searchButton.title = @"Search";
 	self.document.searchButton.keyEquivalent = @"\r";
+	
+	self.isBusy = NO;
 	
 	[self.document updateFlags];
 	

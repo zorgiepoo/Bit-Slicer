@@ -157,7 +157,7 @@
 	
 	if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self.document.currentProcess watchPointType:watchPointType delegate:self getBreakPoint:&breakPoint])
 	{		
-		[self.document.searchController prepareTask];
+		[self.document.searchController prepareTaskWithEscapeTitle:@"Stop"];
 		
 		self.document.currentProcess.isWatchingBreakPoint = YES;
 		
