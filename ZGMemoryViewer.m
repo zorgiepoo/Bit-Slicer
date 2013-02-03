@@ -46,6 +46,7 @@
 #import "ZGRunningProcess.h"
 #import "ZGMemoryProtectionController.h"
 #import "ZGMemoryDumpController.h"
+#import "ZGDisassemblerController.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -343,7 +344,29 @@
 	}
 	else if (menuItem.action == @selector(dumpMemoryInRange:) || menuItem.action == @selector(dumpAllMemory:))
 	{
-		if (!self.currentProcess.valid || !self.window.isVisible || self.currentProcess.isDoingMemoryDump)
+		if (!self.currentProcess.valid || self.currentProcess.isDoingMemoryDump)
+		{
+			return NO;
+		}
+	}
+	else if (menuItem.action == @selector(pauseOrUnpauseProcess:))
+	{
+		if (!self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		integer_t suspendCount;
+		if (!ZGSuspendCount(self.currentProcess.processTask, &suspendCount))
+		{
+			return NO;
+		}
+		else
+		{
+			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
+		}
+		
+		if ([[[ZGAppController sharedController] disassemblerController] isProcessHalted:self.currentProcess])
 		{
 			return NO;
 		}
@@ -751,6 +774,13 @@ END_MEMORY_VIEW_CHANGE:
 - (IBAction)dumpAllMemory:(id)sender
 {
 	[self.memoryDumpController memoryDumpAllRequest];
+}
+
+#pragma mark Pausing
+
+- (IBAction)pauseOrUnpauseProcess:(id)sender
+{
+	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }
 
 @end

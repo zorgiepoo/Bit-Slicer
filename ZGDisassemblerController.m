@@ -947,6 +947,28 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
+	else if (menuItem.action == @selector(pauseOrUnpauseProcess:))
+	{
+		if (!self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		integer_t suspendCount;
+		if (!ZGSuspendCount(self.currentProcess.processTask, &suspendCount))
+		{
+			return NO;
+		}
+		else
+		{
+			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
+		}
+		
+		if ([self isProcessHalted:self.currentProcess])
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
 }
@@ -1456,6 +1478,27 @@ END_DEBUGGER_CHANGE:
 	{
 		[self continueFromBreakPoint:breakPoint];
 	}
+}
+
+- (BOOL)isProcessHalted:(ZGProcess *)process
+{
+	BOOL foundProcess = NO;
+	for (ZGBreakPoint *breakPoint in self.haltedBreakPoints)
+	{
+		if (breakPoint.process.processID == process.processID)
+		{
+			foundProcess = YES;
+			break;
+		}
+	}
+	return foundProcess;
+}
+
+#pragma mark Pausing
+
+- (IBAction)pauseOrUnpauseProcess:(id)sender
+{
+	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }
 
 @end

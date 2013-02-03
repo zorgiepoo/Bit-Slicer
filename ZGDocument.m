@@ -1150,6 +1150,11 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
 		}
+		
+		if ([[[ZGAppController sharedController] disassemblerController] isProcessHalted:self.currentProcess])
+		{
+			return NO;
+		}
 	}
 	
 	else if (menuItem.action == @selector(editVariablesValue:))
