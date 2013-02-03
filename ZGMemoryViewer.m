@@ -44,6 +44,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
+#import "ZGMemoryProtectionController.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -76,15 +77,25 @@
 @property (copy, nonatomic) NSString *desiredProcessName;
 @property (readwrite, nonatomic) BOOL windowDidAppear;
 
+@property (nonatomic, strong) NSUndoManager *undoManager;
+
+@property (assign, nonatomic) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
+
 @end
 
 @implementation ZGMemoryViewer
 
 #pragma mark Accessors
 
-- (ZGMemoryAddress)selectedAddress
+- (HFRange)selectedAddressRange
 {
-	return (self.currentMemorySize > 0) ? ((ZGMemoryAddress)([[self.textView.controller.selectedContentsRanges objectAtIndex:0] HFRange].location) + self.currentMemoryAddress) : 0x0;
+	HFRange selectedRange = {.location = 0, .length = 0};
+	if (self.currentMemorySize > 0)
+	{
+		selectedRange = [[self.textView.controller.selectedContentsRanges objectAtIndex:0] HFRange];
+		selectedRange.location += self.currentMemoryAddress;
+	}
+	return selectedRange;
 }
 
 #pragma mark Setters
@@ -95,6 +106,8 @@
 	
 	if (_currentProcess.processID != newProcess.processID)
 	{
+		[self.undoManager removeAllActions];
+		
 		if (_currentProcess)
 		{
 			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
@@ -126,8 +139,14 @@
 	self = [super initWithWindowNibName:@"MemoryViewer"];
 	
 	self.selectionLength = DEFAULT_SELECTION_LENGTH;
+	self.undoManager = [[NSUndoManager alloc] init];
 	
 	return self;
+}
+
+- (NSUndoManager *)windowWillReturnUndoManager:(id)sender
+{
+	return self.undoManager;
 }
 
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder
@@ -312,6 +331,13 @@
 	if (menuItem.action == @selector(toggleDataInspector:))
 	{
 		[menuItem setState:self.showsDataInspector];
+	}
+	else if (menuItem.action == @selector(changeMemoryProtection:))
+	{
+		if (!self.currentProcess.valid || !self.window.isVisible)
+		{
+			return NO;
+		}
 	}
 	
 	return YES;
@@ -697,6 +723,13 @@ END_MEMORY_VIEW_CHANGE:
 		[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", memoryAddress]];
 		[self changeMemoryView:nil];
 	}
+}
+
+#pragma mark Memory Protection
+
+- (IBAction)changeMemoryProtection:(id)sender
+{
+	[self.memoryProtectionController changeMemoryProtectionRequest];
 }
 
 @end

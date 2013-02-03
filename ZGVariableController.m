@@ -229,7 +229,7 @@
 	}
 	else if ([[[[ZGAppController sharedController] memoryViewer] currentProcess] processID] == self.document.currentProcess.processID)
 	{
-		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddress];
+		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddressRange].location;
 	}
 	
 	ZGVariable *variable =

@@ -37,7 +37,6 @@
 #import "ZGDocumentSearchController.h"
 #import "ZGDocumentTableController.h"
 #import "ZGMemoryDumpController.h"
-#import "ZGMemoryProtectionController.h"
 #import "ZGDocumentBreakPointController.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
@@ -99,7 +98,6 @@
 @property (readwrite, strong) ZGDocumentInfo *documentState;
 
 @property (strong) IBOutlet ZGMemoryDumpController *memoryDumpController;
-@property (assign) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
 
 @property (assign) IBOutlet NSTextField *searchValueLabel;
 @property (assign) IBOutlet NSTextField *flagsLabel;
@@ -1188,7 +1186,7 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
-	else if (menuItem.action == @selector(memoryDumpRangeRequest:) || menuItem.action == @selector(memoryDumpAllRequest:) || menuItem.action == @selector(storeAllValues:) || menuItem.action == @selector(changeMemoryProtection:))
+	else if (menuItem.action == @selector(memoryDumpRangeRequest:) || menuItem.action == @selector(memoryDumpAllRequest:) || menuItem.action == @selector(storeAllValues:))
 	{
 		if ([self.searchController canCancelTask] || !self.currentProcess.valid)
 		{
@@ -1375,13 +1373,6 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)memoryDumpAllRequest:(id)sender
 {
 	[self.memoryDumpController memoryDumpAllRequest];
-}
-
-#pragma mark Memory Protection Handling
-
-- (IBAction)changeMemoryProtection:(id)sender
-{
-	[self.memoryProtectionController changeMemoryProtectionRequest];
 }
 
 #pragma mark Variable Watching Handling

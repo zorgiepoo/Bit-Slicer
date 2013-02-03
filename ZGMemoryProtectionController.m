@@ -33,7 +33,7 @@
  */
 
 #import "ZGMemoryProtectionController.h"
-#import "ZGDocument.h"
+#import "ZGMemoryViewer.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
@@ -42,7 +42,7 @@
 
 @interface ZGMemoryProtectionController ()
 
-@property (assign) IBOutlet ZGDocument *document;
+@property (assign) IBOutlet ZGMemoryViewer *memoryViewer;
 @property (assign) IBOutlet NSWindow *changeProtectionWindow;
 @property (assign) IBOutlet NSTextField *changeProtectionAddressTextField;
 @property (assign) IBOutlet NSTextField *changeProtectionSizeTextField;
@@ -58,7 +58,7 @@
 
 - (BOOL)changeProtectionAtAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size oldProtection:(ZGMemoryProtection)oldProtection newProtection:(ZGMemoryProtection)newProtection
 {
-	BOOL success = ZGProtect(self.document.currentProcess.processTask, address, size, newProtection);
+	BOOL success = ZGProtect(self.memoryViewer.currentProcess.processTask, address, size, newProtection);
 	
 	if (!success)
 	{
@@ -69,8 +69,8 @@
 	}
 	else
 	{
-		self.document.undoManager.actionName = @"Protection Change";
-		[[self.document.undoManager prepareWithInvocationTarget:self]
+		self.memoryViewer.undoManager.actionName = @"Protection Change";
+		[[self.memoryViewer.undoManager prepareWithInvocationTarget:self]
 		 changeProtectionAtAddress:address size:size oldProtection:newProtection newProtection:oldProtection	];
 	}
 	
@@ -91,7 +91,7 @@
 		ZGMemoryAddress memoryAddress = address;
 		ZGMemorySize memorySize = size;
 		ZGMemoryProtection oldProtection;
-		if (!ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &oldProtection))
+		if (!ZGMemoryProtectionInRegion(self.memoryViewer.currentProcess.processTask, &memoryAddress, &memorySize, &oldProtection))
 		{
 			NSRunAlertPanel(
 							@"Memory Protection Change Failed",
@@ -141,22 +141,21 @@
 
 - (void)changeMemoryProtectionRequest
 {
-	// guess what the user may want based on the selected variables
-	NSArray *selectedVariables = self.document.selectedVariables;
-	if (selectedVariables.count > 0)
+	// guess what the user may want based on selection
+	HFRange selectedRange = self.memoryViewer.selectedAddressRange;
+	
+	if (selectedRange.length > 0)
 	{
-		ZGVariable *firstVariable = [selectedVariables objectAtIndex:0];
-		
-		self.changeProtectionAddressTextField.stringValue = firstVariable.addressStringValue;
-		self.changeProtectionSizeTextField.stringValue = [NSString stringWithFormat:@"%lld", firstVariable.size];
+		self.changeProtectionAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", selectedRange.location];
+		self.changeProtectionSizeTextField.stringValue = [NSString stringWithFormat:@"%llu", selectedRange.length];
 		
 		ZGMemoryProtection memoryProtection;
-		ZGMemoryAddress memoryAddress = firstVariable.address;
+		ZGMemoryAddress memoryAddress = selectedRange.location;
 		ZGMemorySize memorySize;
 		
-		// Tell the user what the current memory protection is set as for the variable
-		if (ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection) &&
-            memoryAddress <= firstVariable.address && memoryAddress + memorySize >= firstVariable.address + firstVariable.size)
+		// Tell the user what the current memory protection is set as
+		if (ZGMemoryProtectionInRegion(self.memoryViewer.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection) &&
+            memoryAddress <= selectedRange.location && memoryAddress + memorySize >= selectedRange.location + selectedRange.length)
 		{
 			self.changeProtectionReadButton.state = memoryProtection & VM_PROT_READ;
 			self.changeProtectionWriteButton.state = memoryProtection & VM_PROT_WRITE;
@@ -173,7 +172,7 @@
 	
 	[NSApp
 	 beginSheet:self.changeProtectionWindow
-	 modalForWindow:self.document.watchWindow
+	 modalForWindow:self.memoryViewer.window
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
