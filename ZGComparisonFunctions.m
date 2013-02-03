@@ -641,6 +641,8 @@ comparison_function_t getComparisonFunction(ZGFunctionType functionType, ZGVaria
 		case ZGNotEqualsStoredPlus:
 			comparisonFunction = getNotEqualsStoredPlusComparisonFunction(dataType, is64Bit);
 			break;
+		case ZGStoreAllValues:
+			break;
 	}
 	
 	return comparisonFunction;

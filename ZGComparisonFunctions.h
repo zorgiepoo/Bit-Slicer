@@ -55,6 +55,8 @@ typedef enum
 	// Special Stored comparisons
 	ZGEqualsStoredPlus,
 	ZGNotEqualsStoredPlus,
+	
+	ZGStoreAllValues,
 } ZGFunctionType;
 
 typedef BOOL (*comparison_function_t)(COMPARISON_PARAMETERS);

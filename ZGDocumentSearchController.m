@@ -792,7 +792,14 @@
 {
 	if (self.canStartTask)
 	{
-		[self search];
+		if ([self.document.functionPopUpButton selectedTag] == ZGStoreAllValues)
+		{
+			[self storeAllValues];
+		}
+		else
+		{
+			[self search];
+		}
 	}
 	else
 	{

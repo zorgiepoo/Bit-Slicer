@@ -747,7 +747,7 @@
 	ZGVariableType dataType = (ZGVariableType)self.dataTypesPopUpButton.selectedItem.tag;
 	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
 	
-	if (dataType == ZGUTF8String || dataType == ZGUTF16String)
+	if (dataType == ZGUTF8String || dataType == ZGUTF16String || functionType == ZGStoreAllValues)
 	{
 		self.flagsTextField.enabled = NO;
 		self.flagsTextField.stringValue = @"";
