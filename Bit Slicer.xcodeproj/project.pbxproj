@@ -616,7 +616,7 @@
 				OTHER_CFLAGS = "-D_DEBUG";
 				PRODUCT_NAME = "Bit Slicer";
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx10.8;
 				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -653,7 +653,7 @@
 				);
 				PRODUCT_NAME = "Bit Slicer";
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx10.8;
 				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -678,7 +678,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx10.8;
 			};
 			name = Debug;
 		};
@@ -693,7 +693,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx10.8;
 			};
 			name = Release;
 		};

@@ -252,11 +252,11 @@
 
 #pragma mark Update UI
 
-- (void)updateNumberOfVariablesFoundDisplay
+- (NSString *)numberOfVariablesFoundDescription
 {
 	NSNumberFormatter *numberOfVariablesFoundFormatter = [[NSNumberFormatter alloc] init];
 	numberOfVariablesFoundFormatter.format = @"#,###";
-	self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Found %@ value%@...", [numberOfVariablesFoundFormatter stringFromNumber:@(self.document.currentProcess.numberOfVariablesFound)], self.document.currentProcess.numberOfVariablesFound != 1 ? @"s" : @""];
+	return [NSString stringWithFormat:@"Found %@ value%@...", [numberOfVariablesFoundFormatter stringFromNumber:@(self.document.currentProcess.numberOfVariablesFound)], self.document.currentProcess.numberOfVariablesFound != 1 ? @"s" : @""];
 }
 
 - (void)updateSearchUserInterface:(NSTimer *)timer
@@ -266,7 +266,7 @@
 		if (!ZGSearchIsCancelling(self.searchData))
 		{
 			self.document.searchingProgressIndicator.doubleValue = (double)self.document.currentProcess.searchProgress;
-			[self updateNumberOfVariablesFoundDisplay];
+			self.document.generalStatusTextField.stringValue = [self numberOfVariablesFoundDescription];
 		}
 		else
 		{
@@ -342,6 +342,15 @@
 	{
 		ZGInitializeSearch(self.searchData);
 		[self updateSearchUserInterface:nil];
+		
+		if (NSClassFromString(@"NSUserNotification"))
+		{
+			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+			userNotification.title = @"Search Finished";
+			userNotification.subtitle = self.document.currentProcess.name;
+			userNotification.informativeText = [self numberOfVariablesFoundDescription];
+			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+		}
 		
 		self.document.watchVariablesArray = [NSArray arrayWithArray:newVariablesArray];
 		

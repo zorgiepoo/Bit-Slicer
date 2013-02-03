@@ -147,6 +147,15 @@
 		[self.document.tableController.watchVariablesTableView scrollRowToVisible:0];
 		[self.document.watchWindow makeFirstResponder:self.document.tableController.watchVariablesTableView];
 		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", instruction.variable.sizeStringValue, instruction.variable.addressStringValue];
+		
+		if (NSClassFromString(@"NSUserNotification"))
+		{
+			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+			userNotification.title = @"Found Instruction";
+			userNotification.subtitle = self.document.currentProcess.name;
+			userNotification.informativeText = self.document.generalStatusTextField.stringValue;
+			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+		}
 	}
 }
 
