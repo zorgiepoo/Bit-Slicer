@@ -177,13 +177,16 @@
 
 - (void)prepareTaskWithEscapeTitle:(NSString *)escapeTitle
 {
+	self.isBusy = YES;
+	
+	[self.document updateClearButton];
+	
 	self.document.runningApplicationsPopUpButton.enabled = NO;
 	self.document.dataTypesPopUpButton.enabled = NO;
 	self.document.variableQualifierMatrix.enabled = NO;
 	self.document.searchValueTextField.enabled = NO;
 	self.document.flagsTextField.enabled = NO;
 	self.document.functionPopUpButton.enabled = NO;
-	self.document.clearButton.enabled = NO;
 	self.document.searchButton.title = escapeTitle;
 	self.document.searchButton.keyEquivalent = @"\e";
 	self.document.scanUnwritableValuesCheckBox.enabled = NO;
@@ -194,13 +197,13 @@
 	self.document.endingAddressTextField.enabled = NO;
 	self.document.beginningAddressLabel.textColor = NSColor.disabledControlTextColor;
 	self.document.endingAddressLabel.textColor = NSColor.disabledControlTextColor;
-	
-	self.isBusy = YES;
 }
 
 - (void)resumeFromTask
 {
-	self.document.clearButton.enabled = YES;
+	self.isBusy = NO;
+	
+	[self.document updateClearButton];
 	
 	self.document.dataTypesPopUpButton.enabled = YES;
     
@@ -211,8 +214,6 @@
 	self.document.searchButton.enabled = YES;
 	self.document.searchButton.title = @"Search";
 	self.document.searchButton.keyEquivalent = @"\r";
-	
-	self.isBusy = NO;
 	
 	[self.document updateFlags];
 	
