@@ -107,15 +107,37 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 {
 	ZGMemoryAddress instructionAddress = 0x0;
 	
+	thread_act_array_t threadList = NULL;
+	mach_msg_type_number_t threadListCount = 0;
+	if (task_threads(breakPoint.process.processTask, &threadList, &threadListCount) != KERN_SUCCESS)
+	{
+		NSLog(@"ERROR: task_threads failed on removing watchpoint");
+		return instructionAddress;
+	}
+	
 	for (ZGDebugThread *debugThread in breakPoint.debugThreads)
-	{		
+	{
+		BOOL foundDebugThread = NO;
+		for (mach_msg_type_number_t threadIndex = 0; threadIndex < threadListCount; threadIndex++)
+		{
+			if (threadIndex == debugThread.thread)
+			{
+				foundDebugThread = YES;
+				break;
+			}
+		}
+		
+		if (!foundDebugThread)
+		{
+			continue;
+		}
+		
 		x86_debug_state_t debugState;
 		mach_msg_type_number_t stateCount = x86_DEBUG_STATE_COUNT;
 		kern_return_t error = 0;
 		if ((error = thread_get_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount)) != KERN_SUCCESS)
 		{
-			// it's not very odd and abnormal for this to fail, so commenting this out
-			//NSLog(@"ERROR: Grabbing debug state failed in removeWatchPoint:, %d, continuing...", error);
+			NSLog(@"ERROR: Grabbing debug state failed in removeWatchPoint:, %d, continuing...", error);
 			continue;
 		}
 		
