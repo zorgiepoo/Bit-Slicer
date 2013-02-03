@@ -1055,6 +1055,14 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
+	else if (menuItem.action == @selector(storeAllValues:))
+	{
+		if (!self.currentProcess.valid || ![self.searchController canStartTask])
+		{
+			return NO;
+		}
+	}
+	
 	else if (menuItem.action == @selector(removeSelectedSearchValues:))
 	{
 		if (self.selectedVariables.count == 0 || self.watchWindow.firstResponder != self.tableController.watchVariablesTableView)
