@@ -49,6 +49,7 @@
 @property (assign) IBOutlet ZGDocument *document;
 @property (strong, nonatomic) ZGProcess *watchProcess;
 @property (strong, nonatomic) NSMutableArray *foundInstructions;
+@property (assign, nonatomic) NSUInteger variableInsertionIndex;
 
 @end
 
@@ -142,10 +143,17 @@
 	{
 		[self.foundInstructions addObject:instruction];
 		
-		[self.document.variableController addVariables:@[instruction.variable] atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
-		[self.document.tableController.watchVariablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
-		[self.document.tableController.watchVariablesTableView scrollRowToVisible:0];
+		if (self.variableInsertionIndex >= self.document.watchVariablesArray.count)
+		{
+			self.variableInsertionIndex = 0;
+		}
+		
+		[self.document.variableController addVariables:@[instruction.variable] atRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex]];
+		[self.document.tableController.watchVariablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex] byExtendingSelection:NO];
+		[self.document.tableController.watchVariablesTableView scrollRowToVisible:self.variableInsertionIndex];
 		[self.document.watchWindow makeFirstResponder:self.document.tableController.watchVariablesTableView];
+		
+		self.variableInsertionIndex++;
 		
 		NSString *addedInstructionStatus = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", instruction.variable.sizeStringValue, instruction.variable.addressStringValue];
 		self.document.generalStatusTextField.stringValue = [addedInstructionStatus stringByAppendingString:@" Stop when done."];
@@ -167,7 +175,9 @@
 	ZGBreakPoint *breakPoint = nil;
 	
 	if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self.document.currentProcess watchPointType:watchPointType delegate:self getBreakPoint:&breakPoint])
-	{		
+	{
+		self.variableInsertionIndex = 0;
+		
 		[self.document.searchController prepareTaskWithEscapeTitle:@"Stop"];
 		
 		self.document.currentProcess.isWatchingBreakPoint = YES;
