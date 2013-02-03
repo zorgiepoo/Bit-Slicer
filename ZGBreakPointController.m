@@ -120,7 +120,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 		BOOL foundDebugThread = NO;
 		for (mach_msg_type_number_t threadIndex = 0; threadIndex < threadListCount; threadIndex++)
 		{
-			if (threadIndex == debugThread.thread)
+			if (threadList[threadIndex] == debugThread.thread)
 			{
 				foundDebugThread = YES;
 				break;
