@@ -137,7 +137,7 @@ OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef th
 {
 	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
 	{
-		if (runningApplication.isActive && runningApplication.processIdentifier != getpid())
+		if (runningApplication.isActive && runningApplication.processIdentifier != getpid() && ![[[ZGAppController sharedController] disassemblerController] isProcessIdentifierHalted:runningApplication.processIdentifier])
 		{
 			ZGMemoryMap processTask = 0;
 			if (ZGGetTaskForProcess(runningApplication.processIdentifier, &processTask))

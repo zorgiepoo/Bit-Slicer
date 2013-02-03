@@ -44,7 +44,7 @@
 
 @property (readonly) ZGProcess *currentProcess;
 
-- (BOOL)isProcessHalted:(ZGProcess *)process;
+- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
 
 - (NSArray *)selectedInstructions;
 

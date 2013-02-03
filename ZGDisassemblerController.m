@@ -964,7 +964,7 @@ END_DEBUGGER_CHANGE:
 			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
 		}
 		
-		if ([self isProcessHalted:self.currentProcess])
+		if ([self isProcessIdentifierHalted:self.currentProcess.processID])
 		{
 			return NO;
 		}
@@ -1492,12 +1492,12 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (BOOL)isProcessHalted:(ZGProcess *)process
+- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier
 {
 	BOOL foundProcess = NO;
 	for (ZGBreakPoint *breakPoint in self.haltedBreakPoints)
 	{
-		if (breakPoint.process.processID == process.processID)
+		if (breakPoint.process.processID == processIdentifier)
 		{
 			foundProcess = YES;
 			break;

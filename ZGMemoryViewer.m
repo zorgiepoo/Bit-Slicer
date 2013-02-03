@@ -366,7 +366,7 @@
 			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
 		}
 		
-		if ([[[ZGAppController sharedController] disassemblerController] isProcessHalted:self.currentProcess])
+		if ([[[ZGAppController sharedController] disassemblerController] isProcessIdentifierHalted:self.currentProcess.processID])
 		{
 			return NO;
 		}
