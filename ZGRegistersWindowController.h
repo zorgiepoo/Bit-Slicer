@@ -45,6 +45,8 @@ typedef void(^program_counter_change_t)(void);
 
 - (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
 
+- (ZGMemoryAddress)basePointer;
+
 - (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock;
 
 - (IBAction)changeQualifier:(id)sender;

@@ -117,6 +117,27 @@
 	}
 }
 
+- (ZGMemoryAddress)basePointer
+{
+	ZGMemoryAddress basePointer = 0x0;
+	
+	x86_thread_state_t threadState;
+	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
+	if (thread_get_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) == KERN_SUCCESS)
+	{
+		if (self.breakPoint.process.is64Bit)
+		{
+			basePointer = threadState.uts.ts64.__rbp;
+		}
+		else
+		{
+			basePointer = threadState.uts.ts32.__ebp;
+		}
+	}
+	
+	return basePointer;
+}
+
 #define REGISTER_DEFAULT_TYPE(registerName) [[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES] objectForKey:@(#registerName)]
 
 #define ADD_REGISTER(registerName, variableType, structureType) \

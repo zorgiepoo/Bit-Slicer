@@ -1025,7 +1025,7 @@ END_DEBUGGER_CHANGE:
 	
 	for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
 	{
-		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.oneShot)
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.steppingOver)
 		{
 			answer = YES;
 			break;
@@ -1215,7 +1215,7 @@ END_DEBUGGER_CHANGE:
 		if (![self isBreakPointAtInstruction:instruction])
 		{
 			[changedInstructions addObject:instruction];
-			[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess oneShot:NO delegate:self];
+			[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess steppingOver:NO delegate:self];
 		}
 	}
 	
@@ -1374,19 +1374,31 @@ END_DEBUGGER_CHANGE:
 }
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
-{
-	if (!self.window.isVisible)
-	{
-		[self showWindow:nil];
-	}
-	
+{	
 	[self removeHaltedBreakPoint:self.currentBreakPoint];
 	[self addHaltedBreakPoint:breakPoint];
 	
 	if (self.currentBreakPoint)
 	{
+		if (!self.window.isVisible)
+		{
+			[self showWindow:nil];
+		}
+		
 		[self showOrCloseRegistersWindow];
 		[self goToCurrentBreakPoint];
+		
+		if (self.currentBreakPoint.steppingOver)
+		{
+			if (breakPoint.basePointer == self.registersWindowController.basePointer)
+			{
+				[[[ZGAppController sharedController] breakPointController] removeInstructionBreakPoint:breakPoint];
+			}
+			else
+			{
+				[self continueFromBreakPoint:self.currentBreakPoint];
+			}
+		}
 	}
 }
 
@@ -1421,7 +1433,7 @@ END_DEBUGGER_CHANGE:
 	{
 		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		
-		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess oneShot:YES delegate:self];
+		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread steppingOver:YES delegate:self];
 		[self continueExecution:nil];
 	}
 	else

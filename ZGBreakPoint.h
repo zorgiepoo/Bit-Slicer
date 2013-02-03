@@ -30,6 +30,7 @@ typedef enum
 @property (strong, nonatomic) NSArray *debugThreads;
 @property (assign) ZGBreakPointType type;
 @property (assign) BOOL needsToRestore;
-@property (assign) BOOL oneShot;
+@property (assign) BOOL steppingOver;
+@property (assign) ZGMemoryAddress basePointer;
 
 @end

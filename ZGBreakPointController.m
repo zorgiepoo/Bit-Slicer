@@ -398,11 +398,6 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 								[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
 							}
 						});
-						
-						if (breakPoint.oneShot)
-						{
-							[self removeInstructionBreakPoint:breakPoint];
-						}
 					}
 					
 					ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
@@ -711,7 +706,12 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return YES;
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process oneShot:(BOOL)oneShot delegate:(id)delegate
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process steppingOver:(BOOL)steppingOver delegate:(id)delegate
+{
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 steppingOver:steppingOver delegate:delegate];
+}
+
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread steppingOver:(BOOL)steppingOver delegate:(id)delegate
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{
@@ -745,7 +745,23 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		breakPoint.variable = variable;
 		breakPoint.process = process;
 		breakPoint.type = ZGBreakPointInstruction;
-		breakPoint.oneShot = oneShot;
+		breakPoint.steppingOver = steppingOver;
+		
+		if (breakPoint.steppingOver)
+		{
+			breakPoint.thread = thread;
+			
+			x86_thread_state_t threadState;
+			mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
+			if (thread_get_state(breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+			{
+				NSLog(@"ERROR: Grabbing thread state failed in addBreakPointOnInstruction:");
+			}
+			else
+			{
+				breakPoint.basePointer = breakPoint.process.is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+			}
+		}
 		
 		[self addBreakPoint:breakPoint];
 	}
