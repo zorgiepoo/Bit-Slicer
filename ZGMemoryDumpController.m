@@ -217,6 +217,14 @@
 						 [self.progressTimer invalidate];
 						 self.progressTimer = nil;
 						 
+						 if (self.memoryViewer.currentProcess.isDoingMemoryDump && NSClassFromString(@"NSUserNotification"))
+						 {
+							 NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+							 userNotification.title = @"Finished Dumping Memory";
+							 userNotification.informativeText = [NSString stringWithFormat:@"Dumped all memory for %@", self.memoryViewer.currentProcess.name];
+							 [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+						 }
+						 
 						 self.progressIndicator.doubleValue = 0.0;
 						 self.memoryViewer.currentProcess.isDoingMemoryDump = NO;
 						 
