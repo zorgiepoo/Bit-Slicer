@@ -428,26 +428,72 @@
 
 - (NSString *)tableView:(NSTableView *)aTableView toolTipForCell:(NSCell *)aCell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
 {
-	NSString *displayString = nil;
+	NSMutableArray *displayComponents = [[NSMutableArray alloc] init];
+	
+	if (row >= 0 && (NSUInteger)row < self.document.watchVariablesArray.count)
+	{
+		ZGVariable *variable = [self.document.watchVariablesArray objectAtIndex:row];
+		
+		if (variable.name && ![variable.name isEqualToString:@""])
+		{
+			[displayComponents addObject:[NSString stringWithFormat:@"Name: %@", variable.name]];
+		}
+		if (variable.value)
+		{
+			[displayComponents addObject:[NSString stringWithFormat:@"Value: %@", variable.stringValue]];
+		}
+		[displayComponents addObject:[NSString stringWithFormat:@"Address: %@", variable.addressFormula]];
+		[displayComponents addObject:[NSString stringWithFormat:@"Bytes: %@", variable.sizeStringValue]];
+		
+		if (self.document.currentProcess.valid)
+		{
+			ZGMemoryAddress memoryProtectionAddress = variable.address;
+			ZGMemorySize memoryProtectionSize = variable.size;
+			ZGMemoryProtection memoryProtection;
+			if (ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryProtectionAddress, &memoryProtectionSize, &memoryProtection))
+			{
+				if (variable.address >= memoryProtectionAddress && variable.address + variable.size <= memoryProtectionAddress + memoryProtectionSize)
+				{
+					NSMutableArray *protectionComponents = [[NSMutableArray alloc] init];
+					if (memoryProtection & VM_PROT_READ) [protectionComponents addObject:@"Read"];
+					if (memoryProtection & VM_PROT_WRITE) [protectionComponents addObject:@"Write"];
+					if (memoryProtection & VM_PROT_EXECUTE) [protectionComponents addObject:@"Execute"];
+					
+					if (protectionComponents.count > 0)
+					{
+						[displayComponents addObject:[NSString stringWithFormat:@"Protection: %@", [protectionComponents componentsJoinedByString:@" | "]]];
+					}
+				}
+			}
+		}
+	}
+	
+	NSString *valuesDisplayedString = @"";
 	
 	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
 	numberOfVariablesFormatter.format = @"#,###";
 	
 	if (self.document.watchVariablesArray.count <= MAX_TABLE_VIEW_ITEMS)
 	{
-		displayString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(self.document.watchVariablesArray.count)]];
+		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(self.document.watchVariablesArray.count)]];
 	}
 	else
 	{
-		displayString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(MAX_TABLE_VIEW_ITEMS)],[numberOfVariablesFormatter stringFromNumber:@(self.document.watchVariablesArray.count)]];
+		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(MAX_TABLE_VIEW_ITEMS)],[numberOfVariablesFormatter stringFromNumber:@(self.document.watchVariablesArray.count)]];
 	}
 	
-	if (displayString && self.document.watchVariablesArray.count != 1)
+	if (valuesDisplayedString && self.document.watchVariablesArray.count != 1)
 	{
-		displayString = [displayString stringByAppendingString:@"s"];
+		valuesDisplayedString = [valuesDisplayedString stringByAppendingString:@"s"];
 	}
 	
-	return displayString;
+	if (displayComponents.count > 0)
+	{
+		[displayComponents addObject:@""];
+	}
+	[displayComponents addObject:valuesDisplayedString];
+	
+	return [displayComponents componentsJoinedByString:@"\n"];
 }
 
 @end
