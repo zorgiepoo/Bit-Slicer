@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
 		<string key="IBDocument.SystemVersion">12C60</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2844</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
 		<string key="IBDocument.AppKitVersion">1187.34</string>
 		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2844</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1502,22 +1502,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">memoryDumpRangeRequest:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="966121689"/>
-					</object>
-					<int key="connectionID">876</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">memoryDumpAllRequest:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="262824305"/>
-					</object>
-					<int key="connectionID">877</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">stepOver:</string>
 						<reference key="source" ref="1014"/>
 						<reference key="destination" ref="647451106"/>
@@ -1603,6 +1587,22 @@
 						<reference key="destination" ref="603946032"/>
 					</object>
 					<int key="connectionID">1053</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">dumpMemoryInRange:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="966121689"/>
+					</object>
+					<int key="connectionID">1055</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">dumpAllMemory:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="262824305"/>
+					</object>
+					<int key="connectionID">1056</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -2748,7 +2748,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1054</int>
+			<int key="maxID">1056</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2877,8 +2877,6 @@
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
-							<string>memoryDumpController</string>
-							<string>memoryProtectionController</string>
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
@@ -2909,8 +2907,6 @@
 							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
-							<string>ZGMemoryDumpController</string>
-							<string>ZGMemoryProtectionController</string>
 							<string>NSButton</string>
 							<string>NSView</string>
 							<string>NSPopUpButton</string>
@@ -2944,8 +2940,6 @@
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
-							<string>memoryDumpController</string>
-							<string>memoryProtectionController</string>
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
@@ -3017,14 +3011,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">includeNullTerminatorCheckBox</string>
 								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryDumpController</string>
-								<string key="candidateClassName">ZGMemoryDumpController</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryProtectionController</string>
-								<string key="candidateClassName">ZGMemoryProtectionController</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">optionsDisclosureButton</string>
@@ -3170,34 +3156,30 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>document</string>
 							<string>memoryDumpFromAddressTextField</string>
 							<string>memoryDumpToAddressTextField</string>
 							<string>memoryDumpWindow</string>
+							<string>memoryViewer</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ZGDocument</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSWindow</string>
+							<string>ZGMemoryViewer</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>document</string>
 							<string>memoryDumpFromAddressTextField</string>
 							<string>memoryDumpToAddressTextField</string>
 							<string>memoryDumpWindow</string>
+							<string>memoryViewer</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">document</string>
-								<string key="candidateClassName">ZGDocument</string>
-							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">memoryDumpFromAddressTextField</string>
 								<string key="candidateClassName">NSTextField</string>
@@ -3209,6 +3191,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">memoryDumpWindow</string>
 								<string key="candidateClassName">NSWindow</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">memoryViewer</string>
+								<string key="candidateClassName">ZGMemoryViewer</string>
 							</object>
 						</object>
 					</object>
@@ -3230,7 +3216,7 @@
 							<string>changeProtectionSizeTextField</string>
 							<string>changeProtectionWindow</string>
 							<string>changeProtectionWriteButton</string>
-							<string>document</string>
+							<string>memoryViewer</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3240,7 +3226,7 @@
 							<string>NSTextField</string>
 							<string>NSWindow</string>
 							<string>NSButton</string>
-							<string>ZGDocument</string>
+							<string>ZGMemoryViewer</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -3253,7 +3239,7 @@
 							<string>changeProtectionSizeTextField</string>
 							<string>changeProtectionWindow</string>
 							<string>changeProtectionWriteButton</string>
-							<string>document</string>
+							<string>memoryViewer</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3282,8 +3268,8 @@
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">document</string>
-								<string key="candidateClassName">ZGDocument</string>
+								<string key="name">memoryViewer</string>
+								<string key="candidateClassName">ZGMemoryViewer</string>
 							</object>
 						</object>
 					</object>
@@ -3311,12 +3297,16 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>addressTextField</string>
+							<string>memoryDumpController</string>
+							<string>memoryProtectionController</string>
 							<string>runningApplicationsPopUpButton</string>
 							<string>textView</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSTextField</string>
+							<string>ZGMemoryDumpController</string>
+							<string>ZGMemoryProtectionController</string>
 							<string>NSPopUpButton</string>
 							<string>HFTextView</string>
 						</object>
@@ -3326,6 +3316,8 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>addressTextField</string>
+							<string>memoryDumpController</string>
+							<string>memoryProtectionController</string>
 							<string>runningApplicationsPopUpButton</string>
 							<string>textView</string>
 						</object>
@@ -3334,6 +3326,14 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">addressTextField</string>
 								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">memoryDumpController</string>
+								<string key="candidateClassName">ZGMemoryDumpController</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">memoryProtectionController</string>
+								<string key="candidateClassName">ZGMemoryProtectionController</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">runningApplicationsPopUpButton</string>

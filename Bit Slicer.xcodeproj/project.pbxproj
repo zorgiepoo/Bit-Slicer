@@ -276,10 +276,6 @@
 				77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */,
 				770930B315B92203009705A6 /* ZGVariableController.h */,
 				770930B415B92203009705A6 /* ZGVariableController.m */,
-				770930AA15B8F72F009705A6 /* ZGMemoryDumpController.h */,
-				770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */,
-				770930AD15B9003D009705A6 /* ZGMemoryProtectionController.h */,
-				770930AE15B9003D009705A6 /* ZGMemoryProtectionController.m */,
 				770930BC15BA97B3009705A6 /* ZGSearchData.h */,
 				770930BD15BA97B4009705A6 /* ZGSearchData.m */,
 				77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */,
@@ -348,6 +344,17 @@
 			name = mach_exc;
 			sourceTree = "<group>";
 		};
+		7728EE0C16BE3DDA00F9E1AD /* Misc. */ = {
+			isa = PBXGroup;
+			children = (
+				770930AA15B8F72F009705A6 /* ZGMemoryDumpController.h */,
+				770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */,
+				770930AD15B9003D009705A6 /* ZGMemoryProtectionController.h */,
+				770930AE15B9003D009705A6 /* ZGMemoryProtectionController.m */,
+			);
+			name = Misc.;
+			sourceTree = "<group>";
+		};
 		77329B5A168D07B6007DCAE2 /* Debugger */ = {
 			isa = PBXGroup;
 			children = (
@@ -410,6 +417,7 @@
 				7787C4EF137C55C300BFF606 /* HFLineCountingView.h */,
 				7787C4EC137C555F00BFF606 /* ZGLineCountingView.h */,
 				7787C4ED137C556000BFF606 /* ZGLineCountingView.m */,
+				7728EE0C16BE3DDA00F9E1AD /* Misc. */,
 			);
 			name = "Memory Viewer";
 			sourceTree = "<group>";

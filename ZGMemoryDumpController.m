@@ -33,7 +33,7 @@
  */
 
 #import "ZGMemoryDumpController.h"
-#import "ZGDocument.h"
+#import "ZGMemoryViewer.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGMemoryTypes.h"
@@ -43,29 +43,22 @@
 
 @interface ZGMemoryDumpController ()
 
-@property (assign) IBOutlet ZGDocument *document;
+@property (assign, nonatomic) IBOutlet ZGMemoryViewer *memoryViewer;
+
 @property (assign) IBOutlet NSWindow *memoryDumpWindow;
 @property (assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;
 @property (assign) IBOutlet NSTextField *memoryDumpToAddressTextField;
+
+@property (assign) IBOutlet NSWindow *memoryDumpProgressWindow;
+@property (assign) IBOutlet NSButton *memoryDumpProgressCancelButton;
+
+@property (assign) IBOutlet NSProgressIndicator *progressIndicator;
 
 @property (readwrite, strong, nonatomic) NSTimer *progressTimer;
 
 @end
 
 @implementation ZGMemoryDumpController
-
-#pragma mark Death
-
-- (void)cleanUp
-{
-	[self.progressTimer invalidate];
-	self.progressTimer = nil;
-	
-	self.document = nil;
-	self.memoryDumpWindow = nil;
-	self.memoryDumpFromAddressTextField = nil;
-	self.memoryDumpToAddressTextField = nil;
-}
 
 #pragma mark Memory Dump in Range
 
@@ -84,7 +77,7 @@
 		
 		NSSavePanel *savePanel = NSSavePanel.savePanel;
 		[savePanel
-		 beginSheetModalForWindow:self.document.watchWindow
+		 beginSheetModalForWindow:self.memoryViewer.window
 		 completionHandler:^(NSInteger result)
 		 {
 			 if (result == NSFileHandlingPanelOKButton)
@@ -96,12 +89,12 @@
 					 ZGMemorySize size = toAddress - fromAddress;
 					 void *bytes = NULL;
 					 
-					 if (ZGReadBytes(self.document.currentProcess.processTask, fromAddress, &bytes, &size))
+					 if (ZGReadBytes(self.memoryViewer.currentProcess.processTask, fromAddress, &bytes, &size))
 					 {
 						 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
 						 success = [data writeToURL:savePanel.URL atomically:NO];
 						 
-						 ZGFreeBytes(self.document.currentProcess.processTask, bytes, size);
+						 ZGFreeBytes(self.memoryViewer.currentProcess.processTask, bytes, size);
 					 }
 					 else
 					 {
@@ -145,23 +138,16 @@
 - (void)memoryDumpRangeRequest
 {
 	// guess what the user may want if nothing is in the text fields
-	NSArray *selectedVariables = self.document.selectedVariables;
-	if (selectedVariables.count > 0 && [self.memoryDumpFromAddressTextField.stringValue isEqualToString:@""] && [self.memoryDumpToAddressTextField.stringValue isEqualToString:@""])
+	HFRange selectedRange = self.memoryViewer.selectedAddressRange;
+	if (selectedRange.length > 0)
 	{
-		ZGVariable *firstVariable = [selectedVariables objectAtIndex:0];
-		ZGVariable *lastVariable = [selectedVariables lastObject];
-		
-		self.memoryDumpFromAddressTextField.stringValue = firstVariable.addressStringValue;
-		
-		if (firstVariable != lastVariable)
-		{
-			self.memoryDumpToAddressTextField.stringValue = lastVariable.addressStringValue;
-		}
+		self.memoryDumpFromAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", selectedRange.location];
+		self.memoryDumpToAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", selectedRange.location + selectedRange.length];
 	}
 	
 	[NSApp
 	 beginSheet:self.memoryDumpWindow
-	 modalForWindow:self.document.watchWindow
+	 modalForWindow:self.memoryViewer.window
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
@@ -171,7 +157,7 @@
 
 - (void)updateMemoryDumpProgress:(NSTimer *)timer
 {
-	self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress;
+	self.progressIndicator.doubleValue = self.memoryViewer.currentProcess.searchProgress;
 }
 
 - (void)memoryDumpAllRequest
@@ -180,7 +166,7 @@
 	savePanel.message = @"Choose a folder name to save the memory dump files. This may take a while.";
 	
 	[savePanel
-	 beginSheetModalForWindow:self.document.watchWindow
+	 beginSheetModalForWindow:self.memoryViewer.window
 	 completionHandler:^(NSInteger result)
 	 {
 		 if (result == NSFileHandlingPanelOKButton)
@@ -199,7 +185,16 @@
 				  attributes:nil
 				  error:NULL];
 				 
-				 self.document.searchingProgressIndicator.maxValue = self.document.currentProcess.numberOfRegions;
+				 [NSApp
+				  beginSheet:self.memoryDumpProgressWindow
+				  modalForWindow:self.memoryViewer.window
+				  modalDelegate:self
+				  didEndSelector:nil
+				  contextInfo:NULL];
+				 
+				 [self.memoryDumpProgressCancelButton setEnabled:YES];
+				 
+				 self.progressIndicator.maxValue = self.memoryViewer.currentProcess.numberOfRegions;
 				 
 				 self.progressTimer =
 				 [NSTimer
@@ -209,11 +204,8 @@
 				  userInfo:nil
 				  repeats:YES];
 				 
-				 [self.document.searchController prepareTask];
-				 self.document.generalStatusTextField.stringValue = @"Writing Memory Dump...";
-				 
 				 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-					 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.document.currentProcess))
+					 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.memoryViewer.currentProcess))
 					 {
 						 NSRunAlertPanel(
 										 @"The Memory Dump failed",
@@ -225,22 +217,22 @@
 						 [self.progressTimer invalidate];
 						 self.progressTimer = nil;
 						 
-						 if (!self.document.currentProcess.isDoingMemoryDump)
-						 {
-							 self.document.generalStatusTextField.stringValue = @"Canceled Memory Dump";
-						 }
-						 else
-						 {
-							 self.document.currentProcess.isDoingMemoryDump = NO;
-							 self.document.generalStatusTextField.stringValue = @"Finished Memory Dump";
-						 }
-						 self.document.searchingProgressIndicator.doubleValue = 0.0;
-						 [self.document.searchController resumeFromTask];
+						 self.progressIndicator.doubleValue = 0.0;
+						 self.memoryViewer.currentProcess.isDoingMemoryDump = NO;
+						 
+						 [NSApp endSheet:self.memoryDumpProgressWindow];
+						 [self.memoryDumpProgressWindow close];
 					 });
 				 });
 			 });
 		 }
 	 }];
+}
+
+- (IBAction)cancelDumpingAllMemory:(id)sender
+{
+	self.memoryViewer.currentProcess.isDoingMemoryDump = NO;
+	[self.memoryDumpProgressCancelButton setEnabled:NO];
 }
 
 @end

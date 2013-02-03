@@ -45,6 +45,7 @@
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 #import "ZGMemoryProtectionController.h"
+#import "ZGMemoryDumpController.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -80,6 +81,7 @@
 @property (nonatomic, strong) NSUndoManager *undoManager;
 
 @property (assign, nonatomic) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
+@property (assign, nonatomic) IBOutlet ZGMemoryDumpController *memoryDumpController;
 
 @end
 
@@ -335,6 +337,13 @@
 	else if (menuItem.action == @selector(changeMemoryProtection:))
 	{
 		if (!self.currentProcess.valid || !self.window.isVisible)
+		{
+			return NO;
+		}
+	}
+	else if (menuItem.action == @selector(dumpMemoryInRange:) || menuItem.action == @selector(dumpAllMemory:))
+	{
+		if (!self.currentProcess.valid || !self.window.isVisible || self.currentProcess.isDoingMemoryDump)
 		{
 			return NO;
 		}
@@ -730,6 +739,18 @@ END_MEMORY_VIEW_CHANGE:
 - (IBAction)changeMemoryProtection:(id)sender
 {
 	[self.memoryProtectionController changeMemoryProtectionRequest];
+}
+
+#pragma mark Dumping Memory
+
+- (IBAction)dumpMemoryInRange:(id)sender
+{
+	[self.memoryDumpController memoryDumpRangeRequest];
+}
+
+- (IBAction)dumpAllMemory:(id)sender
+{
+	[self.memoryDumpController memoryDumpAllRequest];
 }
 
 @end

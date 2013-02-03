@@ -49,9 +49,6 @@
 			<object class="NSCustomObject" id="613418571">
 				<string key="NSClassName">FirstResponder</string>
 			</object>
-			<object class="NSCustomObject" id="591168910">
-				<string key="NSClassName">ZGMemoryDumpController</string>
-			</object>
 			<object class="NSCustomObject" id="169821404">
 				<string key="NSClassName">ZGDocumentSearchController</string>
 			</object>
@@ -2508,153 +2505,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
-			<object class="NSWindowTemplate" id="950678212">
-				<int key="NSWindowStyleMask">3</int>
-				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{162, 359}, {263, 120}}</string>
-				<int key="NSWTFlags">-1535639552</int>
-				<string key="NSWindowTitle">MemoryDump</string>
-				<string key="NSWindowClass">NSPanel</string>
-				<nil key="NSViewClass"/>
-				<nil key="NSUserInterfaceItemIdentifier"/>
-				<object class="NSView" key="NSWindowView" id="476101922">
-					<reference key="NSNextResponder"/>
-					<int key="NSvFlags">256</int>
-					<object class="NSMutableArray" key="NSSubviews">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSButton" id="226990590">
-							<reference key="NSNextResponder" ref="476101922"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{153, 12}, {96, 32}}</string>
-							<reference key="NSSuperview" ref="476101922"/>
-							<reference key="NSWindow"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="509465659">
-								<int key="NSCellFlags">67108864</int>
-								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">OK</string>
-								<reference key="NSSupport" ref="394785352"/>
-								<reference key="NSControlView" ref="226990590"/>
-								<int key="NSButtonFlags">-2038284288</int>
-								<int key="NSButtonFlags2">129</int>
-								<string key="NSAlternateContents"/>
-								<string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
-								<int key="NSPeriodicDelay">200</int>
-								<int key="NSPeriodicInterval">25</int>
-							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						</object>
-						<object class="NSButton" id="388629809">
-							<reference key="NSNextResponder" ref="476101922"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{57, 12}, {96, 32}}</string>
-							<reference key="NSSuperview" ref="476101922"/>
-							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="226990590"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="551859589">
-								<int key="NSCellFlags">67108864</int>
-								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Cancel</string>
-								<reference key="NSSupport" ref="394785352"/>
-								<reference key="NSControlView" ref="388629809"/>
-								<int key="NSButtonFlags">-2038284288</int>
-								<int key="NSButtonFlags2">129</int>
-								<string key="NSAlternateContents"/>
-								<string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
-								<int key="NSPeriodicDelay">200</int>
-								<int key="NSPeriodicInterval">25</int>
-							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						</object>
-						<object class="NSTextField" id="473196414">
-							<reference key="NSNextResponder" ref="476101922"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{63, 80}, {180, 22}}</string>
-							<reference key="NSSuperview" ref="476101922"/>
-							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="613741932"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSTextFieldCell" key="NSCell" id="382804365">
-								<int key="NSCellFlags">-1804599231</int>
-								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents"/>
-								<reference key="NSSupport" ref="394785352"/>
-								<reference key="NSControlView" ref="473196414"/>
-								<bool key="NSDrawsBackground">YES</bool>
-								<reference key="NSBackgroundColor" ref="86043161"/>
-								<reference key="NSTextColor" ref="308199467"/>
-							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						</object>
-						<object class="NSTextField" id="676518540">
-							<reference key="NSNextResponder" ref="476101922"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 82}, {41, 17}}</string>
-							<reference key="NSSuperview" ref="476101922"/>
-							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="473196414"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSTextFieldCell" key="NSCell" id="975219224">
-								<int key="NSCellFlags">68157504</int>
-								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents">From:</string>
-								<reference key="NSSupport" ref="394785352"/>
-								<reference key="NSControlView" ref="676518540"/>
-								<reference key="NSBackgroundColor" ref="552807508"/>
-								<reference key="NSTextColor" ref="168795161"/>
-							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						</object>
-						<object class="NSTextField" id="613741932">
-							<reference key="NSNextResponder" ref="476101922"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{33, 50}, {25, 17}}</string>
-							<reference key="NSSuperview" ref="476101922"/>
-							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="602512066"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSTextFieldCell" key="NSCell" id="877962406">
-								<int key="NSCellFlags">68157504</int>
-								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents">To:</string>
-								<reference key="NSSupport" ref="394785352"/>
-								<reference key="NSControlView" ref="613741932"/>
-								<reference key="NSBackgroundColor" ref="552807508"/>
-								<reference key="NSTextColor" ref="168795161"/>
-							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						</object>
-						<object class="NSTextField" id="602512066">
-							<reference key="NSNextResponder" ref="476101922"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{63, 48}, {180, 22}}</string>
-							<reference key="NSSuperview" ref="476101922"/>
-							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="388629809"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSTextFieldCell" key="NSCell" id="398857985">
-								<int key="NSCellFlags">-1804599231</int>
-								<int key="NSCellFlags2">272630784</int>
-								<string key="NSContents"/>
-								<reference key="NSSupport" ref="394785352"/>
-								<reference key="NSControlView" ref="602512066"/>
-								<bool key="NSDrawsBackground">YES</bool>
-								<reference key="NSBackgroundColor" ref="86043161"/>
-								<reference key="NSTextColor" ref="308199467"/>
-							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						</object>
-					</object>
-					<string key="NSFrameSize">{263, 120}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
-					<reference key="NSNextKeyView" ref="676518540"/>
-				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
-				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
-				<bool key="NSWindowIsRestorable">YES</bool>
-			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<object class="NSMutableArray" key="connectionRecords">
@@ -2906,14 +2756,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="destination" ref="544391650"/>
 					</object>
 					<int key="connectionID">100764</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">memoryDumpController</string>
-						<reference key="source" ref="512844837"/>
-						<reference key="destination" ref="591168910"/>
-					</object>
-					<int key="connectionID">100766</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -3290,54 +3132,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="destination" ref="528526329"/>
 					</object>
 					<int key="connectionID">100580</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">memoryDumpOkayButton:</string>
-						<reference key="source" ref="591168910"/>
-						<reference key="destination" ref="226990590"/>
-					</object>
-					<int key="connectionID">100706</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">memoryDumpCancelButton:</string>
-						<reference key="source" ref="591168910"/>
-						<reference key="destination" ref="388629809"/>
-					</object>
-					<int key="connectionID">100707</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">memoryDumpFromAddressTextField</string>
-						<reference key="source" ref="591168910"/>
-						<reference key="destination" ref="473196414"/>
-					</object>
-					<int key="connectionID">100708</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">memoryDumpToAddressTextField</string>
-						<reference key="source" ref="591168910"/>
-						<reference key="destination" ref="602512066"/>
-					</object>
-					<int key="connectionID">100709</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">document</string>
-						<reference key="source" ref="591168910"/>
-						<reference key="destination" ref="512844837"/>
-					</object>
-					<int key="connectionID">100710</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">memoryDumpWindow</string>
-						<reference key="source" ref="591168910"/>
-						<reference key="destination" ref="950678212"/>
-					</object>
-					<int key="connectionID">100765</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -3919,113 +3713,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<int key="objectID">100263</int>
 						<reference key="object" ref="347596770"/>
 						<reference key="parent" ref="321408267"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100268</int>
-						<reference key="object" ref="950678212"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="476101922"/>
-						</object>
-						<reference key="parent" ref="0"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100269</int>
-						<reference key="object" ref="476101922"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="473196414"/>
-							<reference ref="602512066"/>
-							<reference ref="613741932"/>
-							<reference ref="676518540"/>
-							<reference ref="226990590"/>
-							<reference ref="388629809"/>
-						</object>
-						<reference key="parent" ref="950678212"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100270</int>
-						<reference key="object" ref="388629809"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="551859589"/>
-						</object>
-						<reference key="parent" ref="476101922"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100271</int>
-						<reference key="object" ref="226990590"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="509465659"/>
-						</object>
-						<reference key="parent" ref="476101922"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100276</int>
-						<reference key="object" ref="509465659"/>
-						<reference key="parent" ref="226990590"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100277</int>
-						<reference key="object" ref="551859589"/>
-						<reference key="parent" ref="388629809"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100280</int>
-						<reference key="object" ref="473196414"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="382804365"/>
-						</object>
-						<reference key="parent" ref="476101922"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100281</int>
-						<reference key="object" ref="382804365"/>
-						<reference key="parent" ref="473196414"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100282</int>
-						<reference key="object" ref="676518540"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="975219224"/>
-						</object>
-						<reference key="parent" ref="476101922"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100283</int>
-						<reference key="object" ref="975219224"/>
-						<reference key="parent" ref="676518540"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100284</int>
-						<reference key="object" ref="613741932"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="877962406"/>
-						</object>
-						<reference key="parent" ref="476101922"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100285</int>
-						<reference key="object" ref="877962406"/>
-						<reference key="parent" ref="613741932"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100286</int>
-						<reference key="object" ref="602512066"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="398857985"/>
-						</object>
-						<reference key="parent" ref="476101922"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100287</int>
-						<reference key="object" ref="398857985"/>
-						<reference key="parent" ref="602512066"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">100406</int>
@@ -4871,11 +4558,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="object" ref="544676705"/>
 						<reference key="parent" ref="695330791"/>
 					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">100705</int>
-						<reference key="object" ref="591168910"/>
-						<reference key="parent" ref="0"/>
-					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -4951,22 +4633,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>100261.IBPluginDependency</string>
 					<string>100262.IBPluginDependency</string>
 					<string>100263.IBPluginDependency</string>
-					<string>100268.IBPluginDependency</string>
-					<string>100268.IBWindowTemplateEditedContentRect</string>
-					<string>100268.NSWindowTemplate.visibleAtLaunch</string>
-					<string>100269.IBPluginDependency</string>
-					<string>100270.IBPluginDependency</string>
-					<string>100271.IBPluginDependency</string>
-					<string>100276.IBPluginDependency</string>
-					<string>100277.IBPluginDependency</string>
-					<string>100280.IBPluginDependency</string>
-					<string>100281.IBPluginDependency</string>
-					<string>100282.IBPluginDependency</string>
-					<string>100283.IBPluginDependency</string>
-					<string>100284.IBPluginDependency</string>
-					<string>100285.IBPluginDependency</string>
-					<string>100286.IBPluginDependency</string>
-					<string>100287.IBPluginDependency</string>
 					<string>100406.IBPluginDependency</string>
 					<string>100407.IBPluginDependency</string>
 					<string>100408.IBPluginDependency</string>
@@ -5049,7 +4715,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>100694.IBPluginDependency</string>
 					<string>100695.IBPluginDependency</string>
 					<string>100696.IBPluginDependency</string>
-					<string>100705.IBPluginDependency</string>
 					<string>100727.IBPluginDependency</string>
 					<string>100744.IBPluginDependency</string>
 					<string>100753.IBPluginDependency</string>
@@ -5151,22 +4816,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{-1722, 704}, {361, 90}}</string>
 					<boolean value="NO"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{-1581, 512}, {263, 120}}</string>
-					<boolean value="NO"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -5294,7 +4943,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{340, 315}, {631, 533}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
@@ -5348,8 +4996,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
-							<string>memoryDumpController</string>
-							<string>memoryProtectionController</string>
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
@@ -5380,8 +5026,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
-							<string>ZGMemoryDumpController</string>
-							<string>ZGMemoryProtectionController</string>
 							<string>NSButton</string>
 							<string>NSView</string>
 							<string>NSPopUpButton</string>
@@ -5415,8 +5059,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<string>ignoreCaseCheckBox</string>
 							<string>ignoreDataAlignmentCheckBox</string>
 							<string>includeNullTerminatorCheckBox</string>
-							<string>memoryDumpController</string>
-							<string>memoryProtectionController</string>
 							<string>optionsDisclosureButton</string>
 							<string>optionsView</string>
 							<string>runningApplicationsPopUpButton</string>
@@ -5488,14 +5130,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<object class="IBToOneOutletInfo">
 								<string key="name">includeNullTerminatorCheckBox</string>
 								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryDumpController</string>
-								<string key="candidateClassName">ZGMemoryDumpController</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryProtectionController</string>
-								<string key="candidateClassName">ZGMemoryProtectionController</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">optionsDisclosureButton</string>
@@ -5632,135 +5266,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/ZGDocumentTableController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ZGMemoryDumpController</string>
-					<string key="superclassName">NSObject</string>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>document</string>
-							<string>memoryDumpFromAddressTextField</string>
-							<string>memoryDumpToAddressTextField</string>
-							<string>memoryDumpWindow</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ZGDocument</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSWindow</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>document</string>
-							<string>memoryDumpFromAddressTextField</string>
-							<string>memoryDumpToAddressTextField</string>
-							<string>memoryDumpWindow</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">document</string>
-								<string key="candidateClassName">ZGDocument</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryDumpFromAddressTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryDumpToAddressTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">memoryDumpWindow</string>
-								<string key="candidateClassName">NSWindow</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ZGMemoryDumpController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">ZGMemoryProtectionController</string>
-					<string key="superclassName">NSObject</string>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>changeProtectionAddressTextField</string>
-							<string>changeProtectionExecuteButton</string>
-							<string>changeProtectionReadButton</string>
-							<string>changeProtectionSizeTextField</string>
-							<string>changeProtectionWindow</string>
-							<string>changeProtectionWriteButton</string>
-							<string>document</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSTextField</string>
-							<string>NSButton</string>
-							<string>NSButton</string>
-							<string>NSTextField</string>
-							<string>NSWindow</string>
-							<string>NSButton</string>
-							<string>ZGDocument</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>changeProtectionAddressTextField</string>
-							<string>changeProtectionExecuteButton</string>
-							<string>changeProtectionReadButton</string>
-							<string>changeProtectionSizeTextField</string>
-							<string>changeProtectionWindow</string>
-							<string>changeProtectionWriteButton</string>
-							<string>document</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">changeProtectionAddressTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">changeProtectionExecuteButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">changeProtectionReadButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">changeProtectionSizeTextField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">changeProtectionWindow</string>
-								<string key="candidateClassName">NSWindow</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">changeProtectionWriteButton</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">document</string>
-								<string key="candidateClassName">ZGDocument</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ZGMemoryProtectionController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

@@ -36,7 +36,6 @@
 #import "ZGVariableController.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGDocumentTableController.h"
-#import "ZGMemoryDumpController.h"
 #import "ZGDocumentBreakPointController.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
@@ -97,8 +96,6 @@
 @property (readwrite) ZGVariableType currentSearchDataType;
 @property (readwrite, strong) ZGDocumentInfo *documentState;
 
-@property (strong) IBOutlet ZGMemoryDumpController *memoryDumpController;
-
 @property (assign) IBOutlet NSTextField *searchValueLabel;
 @property (assign) IBOutlet NSTextField *flagsLabel;
 @property (assign) IBOutlet NSButton *optionsDisclosureButton;
@@ -147,7 +144,6 @@
 	
 	[self.searchController cleanUp];
 	[self.tableController cleanUp];
-	[self.memoryDumpController cleanUp];
 }
 
 - (void)windowWillClose:(NSNotification *)notification
@@ -1186,13 +1182,6 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
-	else if (menuItem.action == @selector(memoryDumpRangeRequest:) || menuItem.action == @selector(memoryDumpAllRequest:) || menuItem.action == @selector(storeAllValues:))
-	{
-		if ([self.searchController canCancelTask] || !self.currentProcess.valid)
-		{
-			return NO;
-		}
-	}
 	else if (menuItem.action == @selector(functionTypePopUpButtonRequest:))
 	{
 		if ([self isFunctionTypeStore:menuItem.tag] && !self.searchController.searchData.savedData)
@@ -1361,18 +1350,6 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)editVariablesSize:(id)sender
 {
 	[self.variableController editVariablesSizeRequest];
-}
-
-#pragma mark Memory Dump Handling
-
-- (IBAction)memoryDumpRangeRequest:(id)sender
-{
-	[self.memoryDumpController memoryDumpRangeRequest];
-}
-
-- (IBAction)memoryDumpAllRequest:(id)sender
-{
-	[self.memoryDumpController memoryDumpAllRequest];
 }
 
 #pragma mark Variable Watching Handling
