@@ -1410,6 +1410,8 @@ END_DEBUGGER_CHANGE:
 		[self showOrCloseRegistersWindow];
 		[self goToCurrentBreakPoint];
 		
+		BOOL shouldShowNotification = YES;
+		
 		if (self.currentBreakPoint.steppingOver)
 		{
 			if (breakPoint.basePointer == self.registersWindowController.basePointer)
@@ -1419,7 +1421,17 @@ END_DEBUGGER_CHANGE:
 			else
 			{
 				[self continueFromBreakPoint:self.currentBreakPoint];
+				shouldShowNotification = NO;
 			}
+		}
+		
+		if (shouldShowNotification && NSClassFromString(@"NSUserNotification"))
+		{
+			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+			userNotification.title = @"Hit Breakpoint";
+			userNotification.subtitle = self.currentProcess.name;
+			userNotification.informativeText = [NSString stringWithFormat:@"Stopped at breakpoint %@", self.currentBreakPoint.variable.addressStringValue];
+			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 		}
 	}
 }
