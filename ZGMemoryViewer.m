@@ -291,6 +291,7 @@
 	if (!self.windowDidAppear)
 	{
 		[self changeMemoryView:nil];
+		[self relayoutAndResizeWindowPreservingBytesPerLine];
 		self.windowDidAppear = YES;
 	}
 	
@@ -411,6 +412,18 @@
     return resultSize;
 }
 
+- (void)relayoutAndResizeWindowPreservingBytesPerLine
+{
+	NSUInteger bytesPerLine = ceil(self.textView.controller.bytesPerLine / 4.0) * 4;
+    NSWindow *window = [self window];
+    NSRect windowFrame = [window frame];
+    NSView *layoutView = [self.textView.layoutRepresenter view];
+    CGFloat minViewWidth = [self.textView.layoutRepresenter minimumViewWidthForBytesPerLine:bytesPerLine];
+    CGFloat minWindowWidth = [layoutView convertSize:NSMakeSize(minViewWidth, 1) toView:nil].width;
+    windowFrame.size.width = minWindowWidth;
+    [window setFrame:windowFrame display:YES];
+}
+
 // Relayout the window without increasing its window frame size
 - (void)relayoutAndResizeWindowPreservingFrame
 {
@@ -440,6 +453,11 @@
 	[dataInspectorView setFrameSize:size];
 	
 	[self.textView.layoutRepresenter performLayout];
+}
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	[self relayoutAndResizeWindowPreservingBytesPerLine];
 }
 
 #pragma mark Updating running applications
