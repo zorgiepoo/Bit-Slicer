@@ -291,7 +291,6 @@
 	if (!self.windowDidAppear)
 	{
 		[self changeMemoryView:nil];
-		[self relayoutAndResizeWindowPreservingBytesPerLine];
 		self.windowDidAppear = YES;
 	}
 	
@@ -683,6 +682,8 @@
 			}
 			
 			[self jumpToMemoryAddress:calculatedMemoryAddress shouldMakeSelection:shouldMakeSelection];
+			
+			[self relayoutAndResizeWindowPreservingBytesPerLine];
 		}
 	}
 	
