@@ -152,7 +152,7 @@
 			[[self.document.watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 			 {
 				 NSString *oldStringValue = [variable.stringValue copy];
-				 if (variable.type == ZGUTF8String || variable.type == ZGUTF16String)
+				 if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGUTF8String || variable.type == ZGUTF16String))
 				 {
 					 variable.size = ZGGetStringSize(self.document.currentProcess.processTask, variable.address, variable.type, variable.size);
 				 }
