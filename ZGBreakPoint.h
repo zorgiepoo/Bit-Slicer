@@ -31,6 +31,7 @@ typedef enum
 @property (assign) ZGBreakPointType type;
 @property (assign) BOOL needsToRestore;
 @property (assign) BOOL steppingOver;
+@property (assign) BOOL oneShot;
 @property (assign) ZGMemoryAddress basePointer;
 
 @end

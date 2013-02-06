@@ -108,6 +108,16 @@
 						<reference key="NSOnImage" ref="536638327"/>
 						<reference key="NSMixedImage" ref="576841443"/>
 					</object>
+					<object class="NSMenuItem" id="542098413">
+						<reference key="NSMenu" ref="881434806"/>
+						<bool key="NSIsDisabled">YES</bool>
+						<bool key="NSIsSeparator">YES</bool>
+						<string key="NSTitle"/>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="536638327"/>
+						<reference key="NSMixedImage" ref="576841443"/>
+					</object>
 					<object class="NSMenuItem" id="690364956">
 						<reference key="NSMenu" ref="881434806"/>
 						<string key="NSTitle">Step Into</string>
@@ -119,6 +129,14 @@
 					<object class="NSMenuItem" id="668622755">
 						<reference key="NSMenu" ref="881434806"/>
 						<string key="NSTitle">Step Over</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="536638327"/>
+						<reference key="NSMixedImage" ref="576841443"/>
+					</object>
+					<object class="NSMenuItem" id="262774687">
+						<reference key="NSMenu" ref="881434806"/>
+						<string key="NSTitle">Step Out</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="536638327"/>
@@ -309,7 +327,7 @@
 											<string key="NSFrameSize">{572, 342}</string>
 											<reference key="NSSuperview" ref="781794399"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="48000623"/>
+											<reference key="NSNextKeyView" ref="1043616540"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -523,6 +541,7 @@
 									<string key="NSFrame">{{1, 343}, {572, 16}}</string>
 									<reference key="NSSuperview" ref="375143939"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView"/>
 									<string key="NSReuseIdentifierKey">_NS:60</string>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
@@ -549,7 +568,7 @@
 							<string key="NSFrame">{{20, 20}, {574, 360}}</string>
 							<reference key="NSSuperview" ref="351304596"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="781794399"/>
+							<reference key="NSNextKeyView" ref="48000623"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="1043616540"/>
@@ -736,6 +755,14 @@
 						<reference key="destination" ref="273598383"/>
 					</object>
 					<int key="connectionID">158</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">stepOut:</string>
+						<reference key="source" ref="1003"/>
+						<reference key="destination" ref="262774687"/>
+					</object>
+					<int key="connectionID">162</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -990,6 +1017,8 @@
 							<reference ref="893456076"/>
 							<reference ref="273598383"/>
 							<reference ref="39450400"/>
+							<reference ref="262774687"/>
+							<reference ref="542098413"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Right Click Menu</string>
@@ -1047,6 +1076,16 @@
 						<reference key="object" ref="39450400"/>
 						<reference key="parent" ref="881434806"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">160</int>
+						<reference key="object" ref="262774687"/>
+						<reference key="parent" ref="881434806"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">163</int>
+						<reference key="object" ref="542098413"/>
+						<reference key="parent" ref="881434806"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -1070,6 +1109,8 @@
 				<string key="156.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="159.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="16.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="160.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="163.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="17.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="41.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="42.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1097,87 +1138,13 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">159</int>
+			<int key="maxID">163</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDisassemblerController</string>
 					<string key="superclassName">NSWindowController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="changeQualifier:">id</string>
-						<string key="continueExecution:">id</string>
-						<string key="copy:">id</string>
-						<string key="jump:">id</string>
-						<string key="nopVariables:">id</string>
-						<string key="readMemory:">id</string>
-						<string key="removeAllBreakPoints:">id</string>
-						<string key="runningApplicationsPopUpButton:">id</string>
-						<string key="showRegisters:">id</string>
-						<string key="showWindow:">id</string>
-						<string key="stepInto:">id</string>
-						<string key="stepOver:">id</string>
-						<string key="stopDisassembling:">id</string>
-						<string key="toggleBreakPoints:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="changeQualifier:">
-							<string key="name">changeQualifier:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="continueExecution:">
-							<string key="name">continueExecution:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="copy:">
-							<string key="name">copy:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="jump:">
-							<string key="name">jump:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="nopVariables:">
-							<string key="name">nopVariables:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="readMemory:">
-							<string key="name">readMemory:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="removeAllBreakPoints:">
-							<string key="name">removeAllBreakPoints:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="runningApplicationsPopUpButton:">
-							<string key="name">runningApplicationsPopUpButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="showRegisters:">
-							<string key="name">showRegisters:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="showWindow:">
-							<string key="name">showWindow:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="stepInto:">
-							<string key="name">stepInto:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="stepOver:">
-							<string key="name">stepOver:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="stopDisassembling:">
-							<string key="name">stopDisassembling:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="toggleBreakPoints:">
-							<string key="name">toggleBreakPoints:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressTextField">NSTextField</string>
 						<string key="dissemblyProgressIndicator">NSProgressIndicator</string>
@@ -1222,7 +1189,7 @@
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1070" key="NS.object.0"/>
+			<real value="1080" key="NS.object.0"/>
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>

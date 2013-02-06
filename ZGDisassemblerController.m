@@ -1047,7 +1047,7 @@ END_DEBUGGER_CHANGE:
 	
 	for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
 	{
-		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.steppingOver)
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.oneShot && !breakPoint.steppingOver)
 		{
 			answer = YES;
 			break;
@@ -1237,7 +1237,7 @@ END_DEBUGGER_CHANGE:
 		if (![self isBreakPointAtInstruction:instruction])
 		{
 			[changedInstructions addObject:instruction];
-			[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess steppingOver:NO delegate:self];
+			[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess steppingOver:NO oneShot:NO delegate:self];
 		}
 	}
 	
@@ -1424,6 +1424,10 @@ END_DEBUGGER_CHANGE:
 				shouldShowNotification = NO;
 			}
 		}
+		else if (self.currentBreakPoint.oneShot)
+		{
+			[[[ZGAppController sharedController] breakPointController] removeInstructionBreakPoint:breakPoint];
+		}
 		
 		if (shouldShowNotification && NSClassFromString(@"NSUserNotification"))
 		{
@@ -1467,12 +1471,33 @@ END_DEBUGGER_CHANGE:
 	{
 		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		
-		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread steppingOver:YES delegate:self];
+		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread steppingOver:YES oneShot:NO delegate:self];
 		[self continueExecution:nil];
 	}
 	else
 	{
 		[self stepInto:nil];
+	}
+}
+
+- (IBAction)stepOut:(id)sender
+{
+	ZGMemoryAddress returnAddressPointer = self.registersWindowController.basePointer + self.currentBreakPoint.process.pointerSize;
+	
+	ZGMemorySize readSize = self.currentBreakPoint.process.pointerSize;
+	void *bytes = NULL;
+	if (ZGReadBytes(self.currentProcess.processTask, returnAddressPointer, &bytes, &readSize))
+	{
+		ZGMemoryAddress returnAddress = 0x0;
+		memcpy(&returnAddress, bytes, readSize);
+		
+		ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:returnAddress + 1 inProcess:self.currentProcess];
+		
+		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread steppingOver:NO oneShot:YES delegate:self];
+		
+		[self continueExecution:nil];
+		
+		ZGFreeBytes(self.currentProcess.processTask, bytes, readSize);
 	}
 }
 

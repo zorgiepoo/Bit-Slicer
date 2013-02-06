@@ -728,12 +728,12 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return YES;
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process steppingOver:(BOOL)steppingOver delegate:(id)delegate
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process steppingOver:(BOOL)steppingOver oneShot:(BOOL)oneShot delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 steppingOver:steppingOver delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 steppingOver:steppingOver oneShot:oneShot delegate:delegate];
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread steppingOver:(BOOL)steppingOver delegate:(id)delegate
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread steppingOver:(BOOL)steppingOver oneShot:(BOOL)oneShot delegate:(id)delegate
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{
@@ -768,6 +768,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		breakPoint.process = process;
 		breakPoint.type = ZGBreakPointInstruction;
 		breakPoint.steppingOver = steppingOver;
+		breakPoint.oneShot = oneShot;
 		
 		if (breakPoint.steppingOver)
 		{
