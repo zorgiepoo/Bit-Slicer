@@ -876,7 +876,7 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:) || menuItem.action == @selector(showRegisters:))
+	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:) || menuItem.action == @selector(stepOut:) || menuItem.action == @selector(showRegisters:))
 	{
 		if (!self.currentBreakPoint || self.disassembling)
 		{
