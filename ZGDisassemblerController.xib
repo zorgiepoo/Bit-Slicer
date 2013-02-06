@@ -76,7 +76,7 @@
 					</object>
 					<object class="NSMenuItem" id="893456076">
 						<reference key="NSMenu" ref="881434806"/>
-						<string key="NSTitle">NOP Instruction</string>
+						<string key="NSTitle">NOP</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="536638327"/>
@@ -84,7 +84,7 @@
 					</object>
 					<object class="NSMenuItem" id="273598383">
 						<reference key="NSMenu" ref="881434806"/>
-						<string key="NSTitle">Jump to Instruction</string>
+						<string key="NSTitle">Jump</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="536638327"/>
@@ -108,7 +108,7 @@
 						<reference key="NSOnImage" ref="536638327"/>
 						<reference key="NSMixedImage" ref="576841443"/>
 					</object>
-					<object class="NSMenuItem" id="542098413">
+					<object class="NSMenuItem" id="488989615">
 						<reference key="NSMenu" ref="881434806"/>
 						<bool key="NSIsDisabled">YES</bool>
 						<bool key="NSIsSeparator">YES</bool>
@@ -134,7 +134,7 @@
 						<reference key="NSOnImage" ref="536638327"/>
 						<reference key="NSMixedImage" ref="576841443"/>
 					</object>
-					<object class="NSMenuItem" id="262774687">
+					<object class="NSMenuItem" id="480258753">
 						<reference key="NSMenu" ref="881434806"/>
 						<string key="NSTitle">Step Out</string>
 						<string key="NSKeyEquiv"/>
@@ -760,7 +760,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">stepOut:</string>
 						<reference key="source" ref="1003"/>
-						<reference key="destination" ref="262774687"/>
+						<reference key="destination" ref="480258753"/>
 					</object>
 					<int key="connectionID">162</int>
 				</object>
@@ -1017,8 +1017,8 @@
 							<reference ref="893456076"/>
 							<reference ref="273598383"/>
 							<reference ref="39450400"/>
-							<reference ref="262774687"/>
-							<reference ref="542098413"/>
+							<reference ref="480258753"/>
+							<reference ref="488989615"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Right Click Menu</string>
@@ -1078,12 +1078,12 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">160</int>
-						<reference key="object" ref="262774687"/>
+						<reference key="object" ref="480258753"/>
 						<reference key="parent" ref="881434806"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">163</int>
-						<reference key="object" ref="542098413"/>
+						<reference key="object" ref="488989615"/>
 						<reference key="parent" ref="881434806"/>
 					</object>
 				</array>
