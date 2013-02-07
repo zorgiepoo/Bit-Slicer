@@ -46,6 +46,7 @@
 #import "ZGUtilities.h"
 #import "ZGRegistersWindowController.h"
 #import "ZGPreferencesController.h"
+#import "ZGBacktraceController.h"
 
 @interface ZGDisassemblerController ()
 
@@ -54,6 +55,9 @@
 @property (assign) IBOutlet NSTableView *instructionsTableView;
 @property (assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
 @property (assign) IBOutlet NSButton *stopButton;
+@property (assign) IBOutlet NSSplitView *splitView;
+
+@property (assign) IBOutlet ZGBacktraceController *backtraceController;
 
 @property (readwrite) ZGMemoryAddress currentMemoryAddress;
 @property (readwrite) ZGMemorySize currentMemorySize;
@@ -216,6 +220,35 @@
 	[self.instructionsTableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
 
+- (void)toggleBacktraceView:(NSCellStateValue)state
+{
+	static CGFloat lastPosition = 0;
+	CGFloat currentPosition = [[[self.splitView subviews] objectAtIndex:0] frame].size.width;
+	
+	if (currentPosition > 0)
+	{
+		lastPosition = currentPosition;
+	}
+	
+	switch (state)
+	{
+		case NSOnState:
+			if (currentPosition == 0)
+			{
+				[self.splitView setPosition:lastPosition ofDividerAtIndex:0];
+			}
+			break;
+		case NSOffState:
+			if (currentPosition > 0)
+			{
+				[self.splitView setPosition:0 ofDividerAtIndex:0];
+			}
+			break;
+		default:
+			break;
+	}
+}
+
 // This is intended to be called when the window shows up - either from showWindow: or from window restoration
 - (void)windowDidShow:(id)sender
 {
@@ -237,6 +270,8 @@
 		{
 			[self readMemory:nil];
 		}
+		
+		[self toggleBacktraceView:NSOffState];
 	}
 	
 	if (self.currentBreakPoint)
@@ -521,6 +556,7 @@
 	[self.runningApplicationsPopUpButton setEnabled:NO];
 	[self.stopButton setEnabled:YES];
 	[self.stopButton setHidden:NO];
+	[self.backtraceController.tableView setEnabled:NO];
 	
 	self.instructions = @[];
 	[self.instructionsTableView reloadData];
@@ -609,6 +645,7 @@
 				[self.addressTextField setEnabled:YES];
 				[self.runningApplicationsPopUpButton setEnabled:YES];
 				[self.stopButton setHidden:YES];
+				[self.backtraceController.tableView setEnabled:YES];
 			});
 			
 			ZGFreeBytes(self.currentProcess.processTask, bytes, size);
@@ -1410,6 +1447,9 @@ END_DEBUGGER_CHANGE:
 		[self showOrCloseRegistersWindow];
 		[self goToCurrentBreakPoint];
 		
+		[self toggleBacktraceView:NSOnState];
+		[self.backtraceController	updateBacktraceWithBasePointer:self.registersWindowController.basePointer instructionPointer:self.registersWindowController.programCounter inProcess:self.currentProcess];
+		
 		BOOL shouldShowNotification = YES;
 		
 		if (self.currentBreakPoint.steppingOver)
@@ -1451,6 +1491,7 @@ END_DEBUGGER_CHANGE:
 {
 	[[[ZGAppController sharedController] breakPointController] removeSingleStepBreakPointsFromBreakPoint:breakPoint];
 	[self resumeBreakPoint:breakPoint];
+	[self toggleBacktraceView:NSOffState];
 }
 
 - (IBAction)continueExecution:(id)sender
