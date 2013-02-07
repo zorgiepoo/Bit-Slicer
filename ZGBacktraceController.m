@@ -102,7 +102,10 @@
 	self.instructions = [NSArray arrayWithArray:newInstructions];
 	
 	[self.tableView reloadData];
-	[self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+	if (self.instructions.count > 0)
+	{
+		[self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+	}
 }
 
 #pragma mark Table View
