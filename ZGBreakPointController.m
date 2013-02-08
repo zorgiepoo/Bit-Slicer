@@ -728,12 +728,17 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return YES;
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process steppingOver:(BOOL)steppingOver oneShot:(BOOL)oneShot delegate:(id)delegate
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 steppingOver:steppingOver oneShot:oneShot delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO delegate:delegate];
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread steppingOver:(BOOL)steppingOver oneShot:(BOOL)oneShot delegate:(id)delegate
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer delegate:(id)delegate
+{
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES delegate:delegate];
+}
+
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer hidden:(BOOL)isHidden delegate:(id)delegate
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{
@@ -767,24 +772,9 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		breakPoint.variable = variable;
 		breakPoint.process = process;
 		breakPoint.type = ZGBreakPointInstruction;
-		breakPoint.steppingOver = steppingOver;
-		breakPoint.oneShot = oneShot;
-		
-		if (breakPoint.steppingOver)
-		{
-			breakPoint.thread = thread;
-			
-			x86_thread_state_t threadState;
-			mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-			if (thread_get_state(breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
-			{
-				NSLog(@"ERROR: Grabbing thread state failed in addBreakPointOnInstruction:");
-			}
-			else
-			{
-				breakPoint.basePointer = breakPoint.process.is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
-			}
-		}
+		breakPoint.hidden = isHidden;
+		breakPoint.thread = thread;
+		breakPoint.basePointer = basePointer;
 		
 		[self addBreakPoint:breakPoint];
 	}

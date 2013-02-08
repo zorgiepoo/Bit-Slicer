@@ -963,7 +963,7 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 		
-		if (self.backtraceController.instructions.count <= 1)
+		if (self.backtraceController.instructions.count <= 1 || self.backtraceController.basePointers.count <= 1)
 		{
 			return NO;
 		}
@@ -1120,7 +1120,7 @@ END_DEBUGGER_CHANGE:
 	
 	for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
 	{
-		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.oneShot && !breakPoint.steppingOver)
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.hidden)
 		{
 			answer = YES;
 			break;
@@ -1314,7 +1314,7 @@ END_DEBUGGER_CHANGE:
 		if (![self isBreakPointAtInstruction:instruction])
 		{
 			[changedInstructions addObject:instruction];
-			[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess steppingOver:NO oneShot:NO delegate:self];
+			[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess delegate:self];
 		}
 	}
 	
@@ -1480,7 +1480,7 @@ END_DEBUGGER_CHANGE:
 		
 		BOOL shouldShowNotification = YES;
 		
-		if (self.currentBreakPoint.steppingOver)
+		if (self.currentBreakPoint.hidden)
 		{
 			if (breakPoint.basePointer == self.registersController.basePointer)
 			{
@@ -1491,10 +1491,6 @@ END_DEBUGGER_CHANGE:
 				[self continueFromBreakPoint:self.currentBreakPoint];
 				shouldShowNotification = NO;
 			}
-		}
-		else if (self.currentBreakPoint.oneShot)
-		{
-			[[[ZGAppController sharedController] breakPointController] removeInstructionBreakPoint:breakPoint];
 		}
 		
 		if (shouldShowNotification && NSClassFromString(@"NSUserNotification"))
@@ -1539,7 +1535,7 @@ END_DEBUGGER_CHANGE:
 	{
 		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		
-		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread steppingOver:YES oneShot:NO delegate:self];
+		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:self.registersController.basePointer delegate:self];
 		[self continueExecution:nil];
 	}
 	else
@@ -1553,7 +1549,7 @@ END_DEBUGGER_CHANGE:
 	ZGInstruction *outterInstruction = [self.backtraceController.instructions objectAtIndex:1];
 	ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 	
-	[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread steppingOver:NO oneShot:YES delegate:self];
+	[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceController.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self];
 	
 	[self continueExecution:nil];
 }

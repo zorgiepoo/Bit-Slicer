@@ -41,6 +41,7 @@
 
 @property (assign) IBOutlet NSTableView *tableView;
 @property (strong) NSArray *instructions;
+@property (strong) NSArray *basePointers;
 
 - (void)updateBacktraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer inProcess:(ZGProcess *)process;
 

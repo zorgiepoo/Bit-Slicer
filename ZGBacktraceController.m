@@ -52,14 +52,17 @@
 - (void)updateBacktraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer inProcess:(ZGProcess *)process
 {
 	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
+	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
 	
 	ZGInstruction *currentInstruction = [self.disassemblerController findInstructionBeforeAddress:instructionPointer+1 inProcess:process];
 	if (currentInstruction)
 	{
 		[newInstructions addObject:currentInstruction];
+		[newBasePointers addObject:@(basePointer)];
 		
 		while (basePointer > 0)
 		{
+			// Read return address
 			void *bytes = NULL;
 			ZGMemorySize size = process.pointerSize;
 			if (ZGReadBytes(process.processTask, basePointer + process.pointerSize, &bytes, &size))
@@ -74,12 +77,16 @@
 				{
 					[newInstructions addObject:instruction];
 					
+					// Read base pointer
 					bytes = NULL;
 					size = process.pointerSize;
 					if (ZGReadBytes(process.processTask, basePointer, &bytes, &size))
 					{
 						basePointer = 0;
 						memcpy(&basePointer, bytes, size);
+						
+						[newBasePointers addObject:@(basePointer)];
+						
 						ZGFreeBytes(process.processTask, bytes, size);
 					}
 					else
@@ -100,6 +107,7 @@
 	}
 	
 	self.instructions = [NSArray arrayWithArray:newInstructions];
+	self.basePointers = [NSArray arrayWithArray:newBasePointers];
 	
 	[self.tableView reloadData];
 	if (self.instructions.count > 0)

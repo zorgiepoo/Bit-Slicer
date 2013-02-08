@@ -33,6 +33,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGMemoryTypes.h"
 
 #define INSTRUCTION_BREAKPOINT_OPCODE 0xCC
 
@@ -52,8 +53,8 @@ typedef enum
 
 @property (strong) NSArray *breakPoints;
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process steppingOver:(BOOL)steppingOver oneShot:(BOOL)oneShot delegate:(id)delegate;
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread steppingOver:(BOOL)steppingOver oneShot:(BOOL)oneShot delegate:(id)delegate;
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate;
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer delegate:(id)delegate;
 - (void)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process;
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint;
 - (void)addSingleStepBreakPointFromBreakPoint:(ZGBreakPoint *)breakPoint;
