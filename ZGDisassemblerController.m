@@ -44,7 +44,7 @@
 #import "ZGBreakPointController.h"
 #import "ZGDisassemblerObject.h"
 #import "ZGUtilities.h"
-#import "ZGRegistersWindowController.h"
+#import "ZGRegistersController.h"
 #import "ZGPreferencesController.h"
 #import "ZGBacktraceController.h"
 
@@ -58,6 +58,7 @@
 @property (assign) IBOutlet NSSplitView *splitView;
 
 @property (assign) IBOutlet ZGBacktraceController *backtraceController;
+@property (assign) IBOutlet ZGRegistersController *registersController;
 
 @property (readwrite) ZGMemoryAddress currentMemoryAddress;
 @property (readwrite) ZGMemorySize currentMemorySize;
@@ -74,9 +75,6 @@
 
 @property (nonatomic, strong) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
-
-@property (nonatomic, strong) ZGRegistersWindowController *registersWindowController;
-@property (nonatomic, assign) BOOL closingRegistersWindow;
 
 @property (nonatomic, assign) BOOL shouldIgnoreTableViewSelectionChange;
 
@@ -138,20 +136,6 @@
 	}
 }
 
-- (ZGRegistersWindowController *)registersWindowController
-{
-	if (!_registersWindowController)
-	{
-		_registersWindowController = [[ZGRegistersWindowController alloc] init];
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(windowWillClose:)
-		 name:NSWindowWillCloseNotification
-		 object:_registersWindowController.window];
-	}
-	return _registersWindowController;
-}
-
 - (void)setCurrentProcess:(ZGProcess *)newProcess
 {
 	BOOL shouldUpdate = NO;
@@ -175,10 +159,10 @@
 	
 	if (shouldUpdate && self.windowDidAppear)
 	{
-		[self showOrCloseRegistersWindow];
+		[self updateRegisters];
 		if (self.currentBreakPoint)
 		{
-			[self jumpToMemoryAddress:self.registersWindowController.programCounter inProcess:self.currentProcess];
+			[self jumpToMemoryAddress:self.registersController.programCounter inProcess:self.currentProcess];
 		}
 		else
 		{
@@ -274,11 +258,6 @@
 		[self toggleBacktraceView:NSOffState];
 	}
 	
-	if (self.currentBreakPoint)
-	{
-		[self.registersWindowController showWindow:nil];
-	}
-	
 	if (self.currentProcess)
 	{
 		if (self.currentProcess.valid)
@@ -312,24 +291,6 @@
 		}
 		
 		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
-		
-		// Check to see if the window controller has been allocated yet
-		if (_registersWindowController)
-		{
-			self.closingRegistersWindow = YES;
-			[self.registersWindowController close];
-		}
-	}
-	else if (_registersWindowController && [notification object] == self.registersWindowController.window)
-	{
-		if (!self.closingRegistersWindow)
-		{
-			[[NSUserDefaults standardUserDefaults] setBool:NO forKey:ZG_AUTOMATICALLY_SHOW_REGISTERS];
-		}
-		else
-		{
-			self.closingRegistersWindow = NO;
-		}
 	}
 }
 
@@ -995,13 +956,6 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(changeQualifier:))
-	{
-		if (!_registersWindowController || !self.registersWindowController.window.isVisible || ![self.registersWindowController validateMenuItem:menuItem])
-		{
-			return NO;
-		}
-	}
 	else if (menuItem.action == @selector(toggleBreakPoints:))
 	{
 		if (self.disassembling || self.selectedInstructions.count == 0)
@@ -1083,11 +1037,6 @@ END_DEBUGGER_CHANGE:
 	}
 	
 	return YES;
-}
-
-- (IBAction)changeQualifier:(id)sender
-{
-	[self.registersWindowController changeQualifier:sender];
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(id)sender
@@ -1239,7 +1188,7 @@ END_DEBUGGER_CHANGE:
 	if ([tableColumn.identifier isEqualToString:@"address"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
-		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.registersWindowController.programCounter == instruction.variable.address);
+		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.registersController.programCounter == instruction.variable.address);
 		
 		[cell setTextColor:isInstructionBreakPoint ? NSColor.redColor : NSColor.textColor];
 	}
@@ -1425,7 +1374,7 @@ END_DEBUGGER_CHANGE:
 - (void)goToCurrentBreakPoint
 {	
 	BOOL foundInstruction = NO;
-	ZGMemoryAddress programCounter = self.registersWindowController.programCounter;
+	ZGMemoryAddress programCounter = self.registersController.programCounter;
 	
 	if (self.instructions.count > 0)
 	{
@@ -1473,8 +1422,8 @@ END_DEBUGGER_CHANGE:
 {
 	if (self.currentBreakPoint && !self.disassembling)
 	{
-		ZGMemoryAddress currentAddress = [self.registersWindowController programCounter];
-		[self.registersWindowController changeProgramCounter:newAddress];
+		ZGMemoryAddress currentAddress = [self.registersController programCounter];
+		[self.registersController changeProgramCounter:newAddress];
 		[[self.undoManager prepareWithInvocationTarget:self] jumpToAddress:currentAddress];
 		[self.undoManager setActionName:@"Jump"];
 	}
@@ -1486,28 +1435,16 @@ END_DEBUGGER_CHANGE:
 	[self jumpToAddress:instruction.variable.address];
 }
 
-- (void)showOrCloseRegistersWindow
+- (void)updateRegisters
 {
 	if (self.currentBreakPoint)
 	{
-		if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_AUTOMATICALLY_SHOW_REGISTERS])
-		{
-			[self.registersWindowController showWindow:nil];
-		}
-		[self.registersWindowController updateRegistersFromBreakPoint:self.currentBreakPoint programCounterChange:^{
+		[self.registersController updateRegistersFromBreakPoint:self.currentBreakPoint programCounterChange:^{
 			if (self.currentBreakPoint)
 			{
 				[self.instructionsTableView reloadData];
 			}
 		}];
-	}
-	else
-	{
-		if (_registersWindowController)
-		{
-			self.closingRegistersWindow = YES;
-			[self.registersWindowController close];
-		}
 	}
 }
 
@@ -1523,17 +1460,17 @@ END_DEBUGGER_CHANGE:
 			[self showWindow:nil];
 		}
 		
-		[self showOrCloseRegistersWindow];
+		[self updateRegisters];
 		[self goToCurrentBreakPoint];
 		
 		[self toggleBacktraceView:NSOnState];
-		[self.backtraceController	updateBacktraceWithBasePointer:self.registersWindowController.basePointer instructionPointer:self.registersWindowController.programCounter inProcess:self.currentProcess];
+		[self.backtraceController	updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
 		
 		BOOL shouldShowNotification = YES;
 		
 		if (self.currentBreakPoint.steppingOver)
 		{
-			if (breakPoint.basePointer == self.registersWindowController.basePointer)
+			if (breakPoint.basePointer == self.registersController.basePointer)
 			{
 				[[[ZGAppController sharedController] breakPointController] removeInstructionBreakPoint:breakPoint];
 			}
@@ -1563,7 +1500,6 @@ END_DEBUGGER_CHANGE:
 {
 	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:breakPoint];
 	[self removeHaltedBreakPoint:breakPoint];
-	[self showOrCloseRegistersWindow];
 }
 
 - (void)continueFromBreakPoint:(ZGBreakPoint *)breakPoint
@@ -1586,7 +1522,7 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)stepOver:(id)sender
 {
-	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersWindowController.programCounter + 1 inProcess:self.currentProcess];
+	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersController.programCounter + 1 inProcess:self.currentProcess];
 	if ([currentInstruction isCallMnemonic])
 	{
 		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
@@ -1602,7 +1538,7 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)stepOut:(id)sender
 {
-	ZGMemoryAddress returnAddressPointer = self.registersWindowController.basePointer + self.currentBreakPoint.process.pointerSize;
+	ZGMemoryAddress returnAddressPointer = self.registersController.basePointer + self.currentBreakPoint.process.pointerSize;
 	
 	ZGMemorySize readSize = self.currentBreakPoint.process.pointerSize;
 	void *bytes = NULL;
@@ -1619,12 +1555,6 @@ END_DEBUGGER_CHANGE:
 		
 		ZGFreeBytes(self.currentProcess.processTask, bytes, readSize);
 	}
-}
-
-- (IBAction)showRegisters:(id)sender
-{
-	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:ZG_AUTOMATICALLY_SHOW_REGISTERS];
-	[self showOrCloseRegistersWindow];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification

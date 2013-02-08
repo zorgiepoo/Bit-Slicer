@@ -47,8 +47,6 @@
 		7787C4F2137C5A8300BFF606 /* ZGLineCountingRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		778BA6611363E972008ACD6B /* Ruby.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 778BA6601363E972008ACD6B /* Ruby.framework */; };
 		77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 77A8689711FA95730062EEAE /* bitslicericon.icns */; };
-		77CA284A16A6818400F3B54B /* ZGRegistersWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CA284816A6818400F3B54B /* ZGRegistersWindowController.m */; };
-		77CA284B16A6818400F3B54B /* ZGRegistersWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77CA284916A6818400F3B54B /* ZGRegistersWindowController.xib */; };
 		77CA284E16A7B5D500F3B54B /* ZGRegister.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CA284D16A7B5D500F3B54B /* ZGRegister.m */; };
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
 		77D037371224334E0083E057 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D037361224334E0083E057 /* ZGCalculator.m */; };
@@ -64,6 +62,7 @@
 		77F6096F13DBCDD300FD5D92 /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */; };
 		77F6097013DBCE2000FD5D92 /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */; };
 		77F8D8CB16C3531D00C52CE2 /* ZGBacktraceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F8D8CA16C3531D00C52CE2 /* ZGBacktraceController.m */; };
+		77F8D8D216C4A12600C52CE2 /* ZGRegistersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F8D8D116C4A12600C52CE2 /* ZGRegistersController.m */; };
 		77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FC461F12237F71003CB09B /* NSStringAdditions.m */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -162,9 +161,6 @@
 		778939221334308300B6AACB /* ZGMemoryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryTypes.h; sourceTree = "<group>"; };
 		778BA6601363E972008ACD6B /* Ruby.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ruby.framework; path = System/Library/Frameworks/Ruby.framework; sourceTree = SDKROOT; };
 		77A8689711FA95730062EEAE /* bitslicericon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = bitslicericon.icns; sourceTree = "<group>"; };
-		77CA284716A6818400F3B54B /* ZGRegistersWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRegistersWindowController.h; sourceTree = "<group>"; };
-		77CA284816A6818400F3B54B /* ZGRegistersWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRegistersWindowController.m; sourceTree = "<group>"; };
-		77CA284916A6818400F3B54B /* ZGRegistersWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ZGRegistersWindowController.xib; sourceTree = "<group>"; };
 		77CA284C16A7B5D500F3B54B /* ZGRegister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRegister.h; sourceTree = "<group>"; };
 		77CA284D16A7B5D500F3B54B /* ZGRegister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRegister.m; sourceTree = "<group>"; };
 		77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGComparisonFunctions.h; sourceTree = "<group>"; };
@@ -192,6 +188,8 @@
 		77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ShortcutRecorder.framework; sourceTree = "<group>"; };
 		77F8D8C916C3531D00C52CE2 /* ZGBacktraceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBacktraceController.h; sourceTree = "<group>"; };
 		77F8D8CA16C3531D00C52CE2 /* ZGBacktraceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGBacktraceController.m; sourceTree = "<group>"; };
+		77F8D8D016C4A12500C52CE2 /* ZGRegistersController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRegistersController.h; sourceTree = "<group>"; };
+		77F8D8D116C4A12600C52CE2 /* ZGRegistersController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRegistersController.m; sourceTree = "<group>"; };
 		77FC461E12237F71003CB09B /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringAdditions.h; sourceTree = "<group>"; };
 		77FC461F12237F71003CB09B /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSStringAdditions.m; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bit_Slicer-Info.plist"; sourceTree = "<group>"; };
@@ -323,7 +321,6 @@
 				770EA822137B6FDE007FB85A /* MemoryViewer.xib */,
 				7763470316881165003D01C9 /* DataInspectorView.xib */,
 				77329B57168CFE6C007DCAE2 /* ZGDisassemblerController.xib */,
-				77CA284916A6818400F3B54B /* ZGRegistersWindowController.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -377,8 +374,8 @@
 				77329B76168D14CB007DCAE2 /* ZGInstruction.m */,
 				77F8D8C916C3531D00C52CE2 /* ZGBacktraceController.h */,
 				77F8D8CA16C3531D00C52CE2 /* ZGBacktraceController.m */,
-				77CA284716A6818400F3B54B /* ZGRegistersWindowController.h */,
-				77CA284816A6818400F3B54B /* ZGRegistersWindowController.m */,
+				77F8D8D016C4A12500C52CE2 /* ZGRegistersController.h */,
+				77F8D8D116C4A12600C52CE2 /* ZGRegistersController.m */,
 				77CA284C16A7B5D500F3B54B /* ZGRegister.h */,
 				77CA284D16A7B5D500F3B54B /* ZGRegister.m */,
 			);
@@ -489,7 +486,6 @@
 				770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */,
 				7763470416881166003D01C9 /* DataInspectorView.xib in Resources */,
 				77329B59168CFE6C007DCAE2 /* ZGDisassemblerController.xib in Resources */,
-				77CA284B16A6818400F3B54B /* ZGRegistersWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -542,9 +538,9 @@
 				7701EF3F1696A28500877373 /* mach_excServer.c in Sources */,
 				7701EF401696A28500877373 /* mach_excUser.c in Sources */,
 				77D38D4216A1FA5A00D2446A /* ZGDisassemblerObject.m in Sources */,
-				77CA284A16A6818400F3B54B /* ZGRegistersWindowController.m in Sources */,
 				77CA284E16A7B5D500F3B54B /* ZGRegister.m in Sources */,
 				77F8D8CB16C3531D00C52CE2 /* ZGBacktraceController.m in Sources */,
+				77F8D8D216C4A12600C52CE2 /* ZGRegistersController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
