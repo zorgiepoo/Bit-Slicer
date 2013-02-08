@@ -48,6 +48,8 @@
 
 - (NSArray *)selectedInstructions;
 
+- (void)updateSymbolsForInstructions:(NSArray *)instructions;
+
 // This function is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
 

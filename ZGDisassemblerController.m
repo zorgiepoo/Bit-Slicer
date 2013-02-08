@@ -333,6 +333,70 @@
 	}
 }
 
+#pragma mark Symbols
+
+- (void)updateSymbolsForInstructions:(NSArray *)instructions
+{
+	NSString *atosPath = @"/usr/bin/atos";
+	if ([[NSFileManager defaultManager] fileExistsAtPath:atosPath])
+	{
+		NSTask *atosTask = [[NSTask alloc] init];
+		[atosTask setLaunchPath:atosPath];
+		[atosTask setArguments:@[@"-p", [NSString stringWithFormat:@"%d", self.currentProcess.processID]]];
+		
+		NSPipe *inputPipe = [NSPipe pipe];
+		[atosTask setStandardInput:inputPipe];
+		
+		NSPipe *outputPipe = [NSPipe pipe];
+		[atosTask setStandardOutput:outputPipe];
+		
+		// Ignore error message saying that atos has RESTRICT section thus DYLD environment variables being ignored
+		[atosTask setStandardError:[NSPipe pipe]];
+		
+		[atosTask launch];
+		
+		for (ZGInstruction *instruction in instructions)
+		{
+			[[inputPipe fileHandleForWriting] writeData:[[instruction.variable.addressStringValue stringByAppendingString:@"\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+		}
+		
+		[[inputPipe fileHandleForWriting] closeFile];
+		
+		NSData *data = [[outputPipe fileHandleForReading] readDataToEndOfFile];
+		if (data)
+		{
+			NSUInteger instructionIndex = 0;
+			NSString *contents = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+			for (NSString *line in [contents componentsSeparatedByString:@"\n"])
+			{
+				if ([line length] > 0 && ![line isEqualToString:@""] && ![line isEqualToString:@"\n"] && instructionIndex < instructions.count)
+				{
+					ZGInstruction *instruction = [instructions objectAtIndex:instructionIndex];
+					instruction.symbols = line;
+				}
+				
+				instructionIndex++;
+			}
+		}
+	}
+}
+
+- (BOOL)shouldUpdateSymbolsForInstructions:(NSArray *)instructions
+{
+	BOOL shouldUpdateSymbols = NO;
+	
+	for (ZGInstruction *instruction in instructions)
+	{
+		if (!instruction.symbols)
+		{
+			shouldUpdateSymbols = YES;
+			break;
+		}
+	}
+	
+	return shouldUpdateSymbols;
+}
+
 #pragma mark Disassembling
 
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
@@ -535,6 +599,17 @@
 					
 					ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 				}
+			}
+		}
+		
+		visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+		if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
+		{
+			NSArray *instructions = [self.instructions subarrayWithRange:visibleRowsRange];
+			if ([self shouldUpdateSymbolsForInstructions:instructions])
+			{
+				[self updateSymbolsForInstructions:instructions];
+				[self.instructionsTableView reloadData];
 			}
 		}
 	}
@@ -1112,6 +1187,10 @@ END_DEBUGGER_CHANGE:
 		else if ([tableColumn.identifier isEqualToString:@"instruction"])
 		{
 			result = instruction.text;
+		}
+		else if ([tableColumn.identifier isEqualToString:@"symbols"])
+		{
+			result = instruction.symbols;
 		}
 		else if ([tableColumn.identifier isEqualToString:@"bytes"])
 		{

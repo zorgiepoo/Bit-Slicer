@@ -106,6 +106,8 @@
 	{
 		[self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 	}
+	
+	[self.disassemblerController updateSymbolsForInstructions:self.instructions];
 }
 
 #pragma mark Table View
@@ -123,7 +125,14 @@
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"backtrace"])
 		{
-			result = instruction.variable.addressStringValue;
+			if (instruction.symbols && ![instruction.symbols isEqualToString:@""])
+			{
+				result = instruction.symbols;
+			}
+			else
+			{
+				result = instruction.variable.addressStringValue;
+			}
 		}
 	}
 	
