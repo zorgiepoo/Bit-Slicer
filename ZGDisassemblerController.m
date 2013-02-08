@@ -949,9 +949,21 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:) || menuItem.action == @selector(stepOut:) || menuItem.action == @selector(showRegisters:))
+	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:) || menuItem.action == @selector(showRegisters:))
 	{
 		if (!self.currentBreakPoint || self.disassembling)
+		{
+			return NO;
+		}
+	}
+	else if (menuItem.action == @selector(stepOut:))
+	{
+		if (!self.currentBreakPoint || self.disassembling)
+		{
+			return NO;
+		}
+		
+		if (self.backtraceController.instructions.count <= 1)
 		{
 			return NO;
 		}
@@ -1538,23 +1550,12 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)stepOut:(id)sender
 {
-	ZGMemoryAddress returnAddressPointer = self.registersController.basePointer + self.currentBreakPoint.process.pointerSize;
+	ZGInstruction *outterInstruction = [self.backtraceController.instructions objectAtIndex:1];
+	ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 	
-	ZGMemorySize readSize = self.currentBreakPoint.process.pointerSize;
-	void *bytes = NULL;
-	if (ZGReadBytes(self.currentProcess.processTask, returnAddressPointer, &bytes, &readSize))
-	{
-		ZGMemoryAddress returnAddress = 0x0;
-		memcpy(&returnAddress, bytes, readSize);
-		
-		ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:returnAddress + 1 inProcess:self.currentProcess];
-		
-		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread steppingOver:NO oneShot:YES delegate:self];
-		
-		[self continueExecution:nil];
-		
-		ZGFreeBytes(self.currentProcess.processTask, bytes, readSize);
-	}
+	[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread steppingOver:NO oneShot:YES delegate:self];
+	
+	[self continueExecution:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
