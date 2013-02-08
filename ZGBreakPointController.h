@@ -53,6 +53,8 @@ typedef enum
 
 @property (strong) NSArray *breakPoints;
 
+- (BOOL)isInstructionExecutable:(ZGInstruction *)instruction inProcess:(ZGProcess *)process;
+
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate;
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer delegate:(id)delegate;
 - (void)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process;

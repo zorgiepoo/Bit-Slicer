@@ -949,11 +949,38 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:) || menuItem.action == @selector(stepOver:) || menuItem.action == @selector(showRegisters:))
+	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:))
 	{
 		if (!self.currentBreakPoint || self.disassembling)
 		{
 			return NO;
+		}
+	}
+	else if (menuItem.action == @selector(stepOver:))
+	{
+		if (!self.currentBreakPoint || self.disassembling)
+		{
+			return NO;
+		}
+		
+		ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersController.programCounter + 1 inProcess:self.currentProcess];
+		if (!currentInstruction)
+		{
+			return NO;
+		}
+		
+		if ([currentInstruction isCallMnemonic])
+		{
+			ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
+			if (!nextInstruction)
+			{
+				return NO;
+			}
+			
+			if (![[[ZGAppController sharedController] breakPointController] isInstructionExecutable:nextInstruction inProcess:self.currentProcess])
+			{
+				return NO;
+			}
 		}
 	}
 	else if (menuItem.action == @selector(stepOut:))
@@ -964,6 +991,19 @@ END_DEBUGGER_CHANGE:
 		}
 		
 		if (self.backtraceController.instructions.count <= 1 || self.backtraceController.basePointers.count <= 1)
+		{
+			return NO;
+		}
+		
+		ZGInstruction *outterInstruction = [self.backtraceController.instructions objectAtIndex:1];
+		ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
+		
+		if (!returnInstruction)
+		{
+			return NO;
+		}
+		
+		if (![[[ZGAppController sharedController] breakPointController] isInstructionExecutable:returnInstruction inProcess:self.currentProcess])
 		{
 			return NO;
 		}
@@ -1309,19 +1349,23 @@ END_DEBUGGER_CHANGE:
 {
 	NSMutableArray *changedInstructions = [[NSMutableArray alloc] init];
 	
+	BOOL addedAtLeastOneBreakPoint = NO;
+	
 	for (ZGInstruction *instruction in instructions)
 	{
 		if (![self isBreakPointAtInstruction:instruction])
 		{
 			[changedInstructions addObject:instruction];
-			[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess delegate:self];
+			addedAtLeastOneBreakPoint = [[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess delegate:self] || addedAtLeastOneBreakPoint;
 		}
 	}
 	
-	[self.undoManager setActionName:[NSString stringWithFormat:@"Remove Breakpoint%@", changedInstructions.count != 1 ? @"s" : @""]];
-	[[self.undoManager prepareWithInvocationTarget:self] removeBreakPointsToInstructions:changedInstructions];
-	
-	[self.instructionsTableView reloadData];
+	if (addedAtLeastOneBreakPoint)
+	{
+		[self.undoManager setActionName:[NSString stringWithFormat:@"Remove Breakpoint%@", changedInstructions.count != 1 ? @"s" : @""]];
+		[[self.undoManager prepareWithInvocationTarget:self] removeBreakPointsToInstructions:changedInstructions];
+		[self.instructionsTableView reloadData];
+	}
 }
 
 - (IBAction)toggleBreakPoints:(id)sender
