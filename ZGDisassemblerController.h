@@ -44,6 +44,7 @@
 
 @property (readonly) ZGProcess *currentProcess;
 @property (readwrite, nonatomic) BOOL disassembling;
+@property (nonatomic, strong) NSUndoManager *undoManager;
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
 

@@ -70,8 +70,6 @@
 
 @property (nonatomic, copy) NSString *desiredProcessName;
 
-@property (nonatomic, strong) NSUndoManager *undoManager;
-
 @property (nonatomic, strong) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
 
@@ -260,6 +258,7 @@
 			[self uncollapseBottomSubview];
 			break;
 		case NSOffState:
+			[self.undoManager removeAllActionsWithTarget:self.registersController];
 			[self collapseBottomSubview];
 			break;
 		default:
