@@ -454,155 +454,164 @@
 	return instruction;
 }
 
+- (void)updateInstructionValues
+{
+	// Check to see if anything in the window needs to be updated
+	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+	if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
+	{
+		__block BOOL needsToUpdateWindow = NO;
+		[[self.instructions subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGInstruction *instruction, NSUInteger index, BOOL *stop)
+		 {
+			 void *bytes = NULL;
+			 ZGMemorySize size = instruction.variable.size;
+			 if (ZGReadBytes(self.currentProcess.processTask, instruction.variable.address, &bytes, &size))
+			 {
+				 if (memcmp(bytes, instruction.variable.value, size) != 0)
+				 {
+					 // Ignore trivial breakpoint changes
+					 BOOL foundBreakPoint = NO;
+					 if (*(uint8_t *)bytes == INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp(bytes+sizeof(uint8_t), instruction.variable.value+sizeof(uint8_t), size-sizeof(uint8_t)) == 0))
+					 {
+						 for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
+						 {
+							 if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.value == *(uint8_t *)instruction.variable.value)
+							 {
+								 foundBreakPoint = YES;
+								 break;
+							 }
+						 }
+					 }
+					 
+					 if (!foundBreakPoint)
+					 {
+						 needsToUpdateWindow = YES;
+						 *stop = YES;
+					 }
+				 }
+				 
+				 ZGFreeBytes(self.currentProcess.processTask, bytes, size);
+			 }
+		 }];
+		
+		if (needsToUpdateWindow)
+		{
+			// Find a [start, end) range that we are allowed to remove from the table and insert in again with new instructions
+			// Pick start and end such that they are aligned with the assembly instructions
+			
+			NSUInteger startRow = visibleRowsRange.location;
+			
+			do
+			{
+				if (startRow == 0) break;
+				
+				ZGInstruction *instruction = [self.instructions objectAtIndex:startRow];
+				ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess];
+				
+				startRow--;
+				
+				if (searchedInstruction.variable.address + searchedInstruction.variable.size == instruction.variable.address)
+				{
+					break;
+				}
+			}
+			while (YES);
+			
+			ZGInstruction *startInstruction = [self.instructions objectAtIndex:startRow];
+			ZGMemoryAddress startAddress = startInstruction.variable.address;
+			
+			// Extend past first row if necessary
+			if (startRow == 0)
+			{
+				ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess];
+				if (searchedInstruction.variable.address + searchedInstruction.variable.size != startAddress)
+				{
+					startAddress = searchedInstruction.variable.address;
+				}
+			}
+			
+			NSUInteger endRow = visibleRowsRange.location + visibleRowsRange.length - 1;
+			
+			do
+			{
+				if (endRow >= self.instructions.count) break;
+				
+				ZGInstruction *instruction = [self.instructions objectAtIndex:endRow];
+				ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess];
+				
+				endRow++;
+				
+				if (searchedInstruction.variable.address == instruction.variable.address)
+				{
+					break;
+				}
+			}
+			while (YES);
+			
+			ZGInstruction *endInstruction = [self.instructions objectAtIndex:endRow-1];
+			ZGMemoryAddress endAddress = endInstruction.variable.address + endInstruction.variable.size;
+			
+			// Extend past last row if necessary
+			if (endRow >= self.instructions.count)
+			{
+				ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address + endInstruction.variable.size inProcess:self.currentProcess];
+				if (endInstruction.variable.address != searchedInstruction.variable.address)
+				{
+					endAddress = searchedInstruction.variable.address + searchedInstruction.variable.size;
+				}
+			}
+			
+			void *bytes = NULL;
+			ZGMemorySize size = endAddress - startAddress;
+			
+			if (ZGReadBytes(self.currentProcess.processTask, startAddress, &bytes, &size))
+			{
+				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:startAddress size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
+				
+				NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
+				
+				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
+					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
+					newInstruction.text = disassembledText;
+					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text shouldBeSearched:NO];
+					newInstruction.mnemonic = mnemonic;
+					
+					[instructionsToReplace addObject:newInstruction];
+				}];
+				
+				// Replace the visible instructions
+				NSMutableArray *newInstructions = [[NSMutableArray alloc] initWithArray:self.instructions];
+				[newInstructions replaceObjectsInRange:NSMakeRange(startRow, endRow - startRow) withObjectsFromArray:instructionsToReplace];
+				self.instructions = [NSArray arrayWithArray:newInstructions];
+				
+				[self.instructionsTableView reloadData];
+				
+				ZGFreeBytes(self.currentProcess.processTask, bytes, size);
+			}
+		}
+	}
+}
+
+- (void)updateInstructionSymbols
+{
+	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+	if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
+	{
+		NSArray *instructions = [self.instructions subarrayWithRange:visibleRowsRange];
+		if ([self shouldUpdateSymbolsForInstructions:instructions])
+		{
+			[self updateSymbolsForInstructions:instructions];
+			[self.instructionsTableView reloadData];
+		}
+	}
+}
+
 - (void)updateInstructionsTimer:(NSTimer *)timer
 {
 	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && !self.disassembling)
 	{
-		// Check to see if anything in the window needs to be updated
-		NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
-		if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
-		{
-			__block BOOL needsToUpdateWindow = NO;
-			[[self.instructions subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGInstruction *instruction, NSUInteger index, BOOL *stop)
-			 {
-				 void *bytes = NULL;
-				 ZGMemorySize size = instruction.variable.size;
-				 if (ZGReadBytes(self.currentProcess.processTask, instruction.variable.address, &bytes, &size))
-				 {
-					 if (memcmp(bytes, instruction.variable.value, size) != 0)
-					 {
-						 // Ignore trivial breakpoint changes
-						 BOOL foundBreakPoint = NO;
-						 if (*(uint8_t *)bytes == INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp(bytes+sizeof(uint8_t), instruction.variable.value+sizeof(uint8_t), size-sizeof(uint8_t)) == 0))
-						 {
-							 for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
-							 {
-								 if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.value == *(uint8_t *)instruction.variable.value)
-								 {
-									 foundBreakPoint = YES;
-									 break;
-								 }
-							 }
-						 }
-						 
-						 if (!foundBreakPoint)
-						 {
-							 needsToUpdateWindow = YES;
-							 *stop = YES;
-						 }
-					 }
-					 
-					 ZGFreeBytes(self.currentProcess.processTask, bytes, size);
-				 }
-			 }];
-			
-			if (needsToUpdateWindow)
-			{
-				// Find a [start, end) range that we are allowed to remove from the table and insert in again with new instructions
-				// Pick start and end such that they are aligned with the assembly instructions
-				
-				NSUInteger startRow = visibleRowsRange.location;
-				
-				do
-				{
-					if (startRow == 0) break;
-					
-					ZGInstruction *instruction = [self.instructions objectAtIndex:startRow];
-					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess];
-					
-					startRow--;
-					
-					if (searchedInstruction.variable.address + searchedInstruction.variable.size == instruction.variable.address)
-					{
-						break;
-					}
-				}
-				while (YES);
-				
-				ZGInstruction *startInstruction = [self.instructions objectAtIndex:startRow];
-				ZGMemoryAddress startAddress = startInstruction.variable.address;
-				
-				// Extend past first row if necessary
-				if (startRow == 0)
-				{
-					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess];
-					if (searchedInstruction.variable.address + searchedInstruction.variable.size != startAddress)
-					{
-						startAddress = searchedInstruction.variable.address;
-					}
-				}
-				
-				NSUInteger endRow = visibleRowsRange.location + visibleRowsRange.length - 1;
-				
-				do
-				{
-					if (endRow >= self.instructions.count) break;
-					
-					ZGInstruction *instruction = [self.instructions objectAtIndex:endRow];
-					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess];
-					
-					endRow++;
-					
-					if (searchedInstruction.variable.address == instruction.variable.address)
-					{
-						break;
-					}
-				}
-				while (YES);
-				
-				ZGInstruction *endInstruction = [self.instructions objectAtIndex:endRow-1];
-				ZGMemoryAddress endAddress = endInstruction.variable.address + endInstruction.variable.size;
-				
-				// Extend past last row if necessary
-				if (endRow >= self.instructions.count)
-				{
-					ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address + endInstruction.variable.size inProcess:self.currentProcess];
-					if (endInstruction.variable.address != searchedInstruction.variable.address)
-					{
-						endAddress = searchedInstruction.variable.address + searchedInstruction.variable.size;
-					}
-				}
-				
-				void *bytes = NULL;
-				ZGMemorySize size = endAddress - startAddress;
-				
-				if (ZGReadBytes(self.currentProcess.processTask, startAddress, &bytes, &size))
-				{
-					ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:startAddress size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
-					
-					NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
-					
-					[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
-						ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
-						newInstruction.text = disassembledText;
-						newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text shouldBeSearched:NO];
-						newInstruction.mnemonic = mnemonic;
-						
-						[instructionsToReplace addObject:newInstruction];
-					}];
-					
-					// Replace the visible instructions
-					NSMutableArray *newInstructions = [[NSMutableArray alloc] initWithArray:self.instructions];
-					[newInstructions replaceObjectsInRange:NSMakeRange(startRow, endRow - startRow) withObjectsFromArray:instructionsToReplace];
-					self.instructions = [NSArray arrayWithArray:newInstructions];
-					
-					[self.instructionsTableView reloadData];
-					
-					ZGFreeBytes(self.currentProcess.processTask, bytes, size);
-				}
-			}
-		}
-		
-		visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
-		if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
-		{
-			NSArray *instructions = [self.instructions subarrayWithRange:visibleRowsRange];
-			if ([self shouldUpdateSymbolsForInstructions:instructions])
-			{
-				[self updateSymbolsForInstructions:instructions];
-				[self.instructionsTableView reloadData];
-			}
-		}
+		[self updateInstructionValues];
+		[self updateInstructionSymbols];
 	}
 }
 
