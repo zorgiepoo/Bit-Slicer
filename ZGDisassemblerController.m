@@ -204,29 +204,59 @@
 	[self.instructionsTableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
 
-- (void)toggleBacktraceView:(NSCellStateValue)state
+- (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
 {
-	static CGFloat lastPosition = 0;
-	CGFloat currentPosition = [[[self.splitView subviews] objectAtIndex:0] frame].size.width;
-	
-	if (currentPosition > 0)
+	if ([splitView.subviews objectAtIndex:1] == subview)
 	{
-		lastPosition = currentPosition;
+		return YES;
 	}
 	
+	return NO;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldHideDividerAtIndex:(NSInteger)dividerIndex
+{
+	return (self.currentBreakPoint == nil);
+}
+
+// For collapsing and uncollapsing, useful info: http://manicwave.com/blog/2009/12/31/unraveling-the-mysteries-of-nssplitview-part-2/
+- (void)uncollapseBottomSubview
+{
+	NSView *topSubview = [self.splitView.subviews objectAtIndex:0];
+	NSView *bottomSubview = [self.splitView.subviews objectAtIndex:1];
+	
+	[bottomSubview setHidden:NO];
+	
+	NSRect topFrame = topSubview.frame;
+	NSRect bottomFrame = bottomSubview.frame;
+	
+	topFrame.size.height = topFrame.size.height - bottomFrame.size.height - self.splitView.dividerThickness;
+	bottomFrame.origin.y = topFrame.size.height + self.splitView.dividerThickness;
+	
+	topSubview.frameSize = topFrame.size;
+	bottomSubview.frame = bottomFrame;
+	[self.splitView display];
+}
+
+- (void)collapseBottomSubview
+{
+	NSView *topSubview = [self.splitView.subviews objectAtIndex:0];
+	NSView *bottomSubview = [self.splitView.subviews objectAtIndex:1];
+	
+	[bottomSubview setHidden:YES];
+	[topSubview setFrameSize:NSMakeSize(topSubview.frame.size.width, self.splitView.frame.size.height)];
+	[self.splitView display];
+}
+
+- (void)toggleBacktraceView:(NSCellStateValue)state
+{	
 	switch (state)
 	{
 		case NSOnState:
-			if (currentPosition == 0)
-			{
-				[self.splitView setPosition:lastPosition ofDividerAtIndex:0];
-			}
+			[self uncollapseBottomSubview];
 			break;
 		case NSOffState:
-			if (currentPosition > 0)
-			{
-				[self.splitView setPosition:0 ofDividerAtIndex:0];
-			}
+			[self collapseBottomSubview];
 			break;
 		default:
 			break;
