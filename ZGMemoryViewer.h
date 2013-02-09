@@ -43,11 +43,10 @@
 @interface ZGMemoryViewer : NSWindowController <NSWindowDelegate>
 
 @property (readonly) ZGProcess *currentProcess;
-@property (assign, nonatomic) ZGMemorySize selectionLength;
 
 - (HFRange)selectedAddressRange;
 
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress inProcess:(ZGProcess *)requestedProcess;
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength inProcess:(ZGProcess *)requestedProcess;
 
 - (IBAction)toggleDataInspector:(id)sender;
 

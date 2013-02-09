@@ -141,7 +141,6 @@
 {
 	self = [super initWithWindowNibName:@"MemoryViewer"];
 	
-	self.selectionLength = DEFAULT_SELECTION_LENGTH;
 	self.undoManager = [[NSUndoManager alloc] init];
 	
 	return self;
@@ -548,7 +547,7 @@
 
 #pragma mark Reading from Memory
 
-- (IBAction)changeMemoryView:(id)sender
+- (void)updateMemoryViewerAtAddress:(ZGMemoryAddress)desiredMemoryAddress withSelectionLength:(ZGMemorySize)selectionLength
 {
 	BOOL success = NO;
 	
@@ -558,16 +557,7 @@
 	}
 	
 	// create scope block to allow for goto
-	{
-		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue];
-		
-		ZGMemoryAddress calculatedMemoryAddress = 0;
-		
-		if (isValidNumber(calculatedMemoryAddressExpression))
-		{
-			calculatedMemoryAddress = memoryAddressFromExpression(calculatedMemoryAddressExpression);
-		}
-		
+	{	
 		NSArray *memoryRegions = ZGRegionsForProcessTask(self.currentProcess.processTask);
 		if (memoryRegions.count == 0)
 		{
@@ -575,19 +565,17 @@
 		}
 		
 		ZGRegion *chosenRegion = nil;
-		if (calculatedMemoryAddress != 0)
+		if (desiredMemoryAddress != 0)
 		{
 			for (ZGRegion *region in memoryRegions)
 			{
-				if ((region.protection & VM_PROT_READ) && calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size)
+				if ((region.protection & VM_PROT_READ) && desiredMemoryAddress >= region.address && desiredMemoryAddress < region.address + region.size)
 				{
 					chosenRegion = region;
 					break;
 				}
 			}
 		}
-		
-		BOOL shouldMakeSelection = YES;
 		
 		if (!chosenRegion)
 		{
@@ -605,8 +593,8 @@
 				goto END_MEMORY_VIEW_CHANGE;
 			}
 			
-			calculatedMemoryAddress = 0;
-			shouldMakeSelection = NO;
+			desiredMemoryAddress = 0;
+			selectionLength = 0;
 		}
 		
 		self.currentMemoryAddress = chosenRegion.address;
@@ -614,18 +602,18 @@
 		
 #define MEMORY_VIEW_THRESHOLD 26843545
 		// Bound the upper and lower half by a threshold so that we will never view too much data that we won't be able to handle, in the rarer cases
-		if (calculatedMemoryAddress > 0)
+		if (desiredMemoryAddress > 0)
 		{
-			if (calculatedMemoryAddress >= MEMORY_VIEW_THRESHOLD && calculatedMemoryAddress - MEMORY_VIEW_THRESHOLD > self.currentMemoryAddress)
+			if (desiredMemoryAddress >= MEMORY_VIEW_THRESHOLD && desiredMemoryAddress - MEMORY_VIEW_THRESHOLD > self.currentMemoryAddress)
 			{
-				ZGMemoryAddress newMemoryAddress = calculatedMemoryAddress - MEMORY_VIEW_THRESHOLD;
+				ZGMemoryAddress newMemoryAddress = desiredMemoryAddress - MEMORY_VIEW_THRESHOLD;
 				self.currentMemorySize -= newMemoryAddress - self.currentMemoryAddress;
 				self.currentMemoryAddress = newMemoryAddress;
 			}
 			
-			if (calculatedMemoryAddress + MEMORY_VIEW_THRESHOLD < self.currentMemoryAddress + self.currentMemorySize)
+			if (desiredMemoryAddress + MEMORY_VIEW_THRESHOLD < self.currentMemoryAddress + self.currentMemorySize)
 			{
-				self.currentMemorySize -= self.currentMemoryAddress + self.currentMemorySize - (calculatedMemoryAddress + MEMORY_VIEW_THRESHOLD);
+				self.currentMemorySize -= self.currentMemoryAddress + self.currentMemorySize - (desiredMemoryAddress + MEMORY_VIEW_THRESHOLD);
 			}
 		}
 		else
@@ -665,10 +653,10 @@
 			
 			ZGFreeBytes(self.currentProcess.processTask, bytes, memorySize);
 			
-			if (!calculatedMemoryAddress)
+			if (!desiredMemoryAddress)
 			{
 				self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", memoryAddress];
-				calculatedMemoryAddress = memoryAddress;
+				desiredMemoryAddress = memoryAddress;
 			}
 			
 			// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
@@ -681,9 +669,9 @@
 				}
 			}
 			
-			[self jumpToMemoryAddress:calculatedMemoryAddress shouldMakeSelection:shouldMakeSelection];
-			
 			[self relayoutAndResizeWindowPreservingBytesPerLine];
+			
+			[self jumpToMemoryAddress:desiredMemoryAddress withSelectionLength:selectionLength];
 		}
 	}
 	
@@ -695,6 +683,20 @@ END_MEMORY_VIEW_CHANGE:
 	{
 		[self clearData];
 	}
+}
+
+- (IBAction)changeMemoryView:(id)sender
+{
+	NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue];
+	
+	ZGMemoryAddress calculatedMemoryAddress = 0;
+	
+	if (isValidNumber(calculatedMemoryAddressExpression))
+	{
+		calculatedMemoryAddress = memoryAddressFromExpression(calculatedMemoryAddressExpression);
+	}
+	
+	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:DEFAULT_SELECTION_LENGTH];
 }
 
 - (void)readMemory:(NSTimer *)timer
@@ -731,7 +733,7 @@ END_MEMORY_VIEW_CHANGE:
 }
 
 // memoryAddress is assumed to be within bounds of current memory region being viewed
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress shouldMakeSelection:(BOOL)shouldMakeSelection
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength
 {
 	long double offset = (long double)(memoryAddress - self.currentMemoryAddress);
 	
@@ -742,19 +744,16 @@ END_MEMORY_VIEW_CHANGE:
 	// the line we want to jump to should be in the middle of the view
 	[self.textView.controller scrollByLines:offsetLine - displayedLineRange.location - displayedLineRange.length / 2.0];
 	
-	if (shouldMakeSelection)
+	if (selectionLength > 0)
 	{
 		// Select a few bytes from the offset
-		self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN(self.selectionLength, self.currentMemoryAddress + self.currentMemorySize - memoryAddress))]];
-		
-		// Restore default selection length
-		self.selectionLength = DEFAULT_SELECTION_LENGTH;
+		self.textView.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(offset, MIN(selectionLength, self.currentMemoryAddress + self.currentMemorySize - memoryAddress))]];
 		
 		[self.textView.controller pulseSelection];
 	}
 }
 
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress inProcess:(ZGProcess *)requestedProcess
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength inProcess:(ZGProcess *)requestedProcess
 {
 	NSMenuItem *targetMenuItem = nil;
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.menu.itemArray)
@@ -772,7 +771,7 @@ END_MEMORY_VIEW_CHANGE:
 		[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
 		[self runningApplicationsPopUpButton:nil];
 		[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", memoryAddress]];
-		[self changeMemoryView:nil];
+		[self updateMemoryViewerAtAddress:memoryAddress withSelectionLength:selectionLength];
 	}
 }
 

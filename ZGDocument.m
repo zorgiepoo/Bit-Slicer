@@ -1378,8 +1378,7 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
 	[[[ZGAppController sharedController] memoryViewer] showWindow:self];
-	[[[ZGAppController sharedController] memoryViewer] setSelectionLength:selectedVariable.size];
-	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
+	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size inProcess:self.currentProcess];
 }
 
 - (IBAction)showDisassembler:(id)sender
