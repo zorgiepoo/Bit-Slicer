@@ -117,13 +117,13 @@
 	self.instructions = [NSArray arrayWithArray:newInstructions];
 	self.basePointers = [NSArray arrayWithArray:newBasePointers];
 	
+	[self.disassemblerController updateSymbolsForInstructions:self.instructions];
+	
 	[self.tableView reloadData];
 	if (self.instructions.count > 0)
 	{
 		[self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 	}
-	
-	[self.disassemblerController updateSymbolsForInstructions:self.instructions];
 }
 
 - (IBAction)jumpToSelectedInstruction:(id)sender
