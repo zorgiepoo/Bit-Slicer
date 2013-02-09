@@ -43,6 +43,7 @@
 @interface ZGDisassemblerController : NSWindowController <NSTableViewDataSource>
 
 @property (readonly) ZGProcess *currentProcess;
+@property (readwrite, nonatomic) BOOL disassembling;
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
 

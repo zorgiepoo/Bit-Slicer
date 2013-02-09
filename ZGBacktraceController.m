@@ -156,4 +156,9 @@
 	}
 }
 
+- (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
+{
+	return !self.disassemblerController.disassembling;
+}
+
 @end

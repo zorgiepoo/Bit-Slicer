@@ -66,7 +66,6 @@
 @property (nonatomic, strong) NSArray *instructions;
 
 @property (readwrite, strong, nonatomic) NSTimer *updateInstructionsTimer;
-@property (readwrite, nonatomic) BOOL disassembling;
 @property (readwrite, nonatomic) BOOL windowDidAppear;
 
 @property (nonatomic, copy) NSString *desiredProcessName;
@@ -631,7 +630,6 @@
 	[self.runningApplicationsPopUpButton setEnabled:NO];
 	[self.stopButton setEnabled:YES];
 	[self.stopButton setHidden:NO];
-	[self.backtraceController.tableView setEnabled:NO];
 	
 	self.instructions = @[];
 	[self.instructionsTableView reloadData];
@@ -720,7 +718,6 @@
 				[self.addressTextField setEnabled:YES];
 				[self.runningApplicationsPopUpButton setEnabled:YES];
 				[self.stopButton setHidden:YES];
-				[self.backtraceController.tableView setEnabled:YES];
 			});
 			
 			ZGFreeBytes(self.currentProcess.processTask, bytes, size);
