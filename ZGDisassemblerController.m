@@ -331,47 +331,79 @@
 
 - (void)updateSymbolsForInstructions:(NSArray *)instructions
 {
-	NSString *atosPath = @"/usr/bin/atos";
-	if ([[NSFileManager defaultManager] fileExistsAtPath:atosPath])
-	{
-		NSTask *atosTask = [[NSTask alloc] init];
-		[atosTask setLaunchPath:atosPath];
-		[atosTask setArguments:@[@"-p", [NSString stringWithFormat:@"%d", self.currentProcess.processID]]];
-		
-		NSPipe *inputPipe = [NSPipe pipe];
-		[atosTask setStandardInput:inputPipe];
-		
-		NSPipe *outputPipe = [NSPipe pipe];
-		[atosTask setStandardOutput:outputPipe];
-		
-		// Ignore error message saying that atos has RESTRICT section thus DYLD environment variables being ignored
-		[atosTask setStandardError:[NSPipe pipe]];
-		
-		[atosTask launch];
-		
-		for (ZGInstruction *instruction in instructions)
+	[self updateSymbolsForInstructions:instructions asynchronously:NO completionHandler:^{}];
+}
+
+- (void)updateSymbolsForInstructions:(NSArray *)instructions asynchronously:(BOOL)isAsynchronous completionHandler:(void (^)(void))completionHandler
+{
+	void (^updateSymbolsBlock)(void) = ^{
+		NSString *atosPath = @"/usr/bin/atos";
+		if ([[NSFileManager defaultManager] fileExistsAtPath:atosPath])
 		{
-			[[inputPipe fileHandleForWriting] writeData:[[instruction.variable.addressStringValue stringByAppendingString:@"\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-		}
-		
-		[[inputPipe fileHandleForWriting] closeFile];
-		
-		NSData *data = [[outputPipe fileHandleForReading] readDataToEndOfFile];
-		if (data)
-		{
-			NSUInteger instructionIndex = 0;
-			NSString *contents = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-			for (NSString *line in [contents componentsSeparatedByString:@"\n"])
+			NSTask *atosTask = [[NSTask alloc] init];
+			[atosTask setLaunchPath:atosPath];
+			[atosTask setArguments:@[@"-p", [NSString stringWithFormat:@"%d", self.currentProcess.processID]]];
+			
+			NSPipe *inputPipe = [NSPipe pipe];
+			[atosTask setStandardInput:inputPipe];
+			
+			NSPipe *outputPipe = [NSPipe pipe];
+			[atosTask setStandardOutput:outputPipe];
+			
+			// Ignore error message saying that atos has RESTRICT section thus DYLD environment variables being ignored
+			[atosTask setStandardError:[NSPipe pipe]];
+			
+			[atosTask launch];
+			
+			for (ZGInstruction *instruction in instructions)
 			{
-				if ([line length] > 0 && ![line isEqualToString:@""] && ![line isEqualToString:@"\n"] && instructionIndex < instructions.count)
+				[[inputPipe fileHandleForWriting] writeData:[[instruction.variable.addressStringValue stringByAppendingString:@"\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+			}
+			
+			[[inputPipe fileHandleForWriting] closeFile];
+			
+			NSData *data = [[outputPipe fileHandleForReading] readDataToEndOfFile];
+			if (data)
+			{
+				NSUInteger instructionIndex = 0;
+				NSString *contents = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+				for (NSString *line in [contents componentsSeparatedByString:@"\n"])
 				{
-					ZGInstruction *instruction = [instructions objectAtIndex:instructionIndex];
-					instruction.symbols = line;
+					if ([line length] > 0 && ![line isEqualToString:@""] && ![line isEqualToString:@"\n"] && instructionIndex < instructions.count)
+					{
+						ZGInstruction *instruction = [instructions objectAtIndex:instructionIndex];
+						
+						if (isAsynchronous)
+						{
+							dispatch_async(dispatch_get_main_queue(), ^{
+								instruction.symbols = line;
+							});
+						}
+						else
+						{
+							instruction.symbols = line;
+						}
+					}
+					
+					instructionIndex++;
 				}
-				
-				instructionIndex++;
 			}
 		}
+	};
+	
+	if (isAsynchronous)
+	{
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			updateSymbolsBlock();
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				completionHandler();
+			});
+		});
+	}
+	else
+	{
+		updateSymbolsBlock();
 	}
 }
 
@@ -597,14 +629,19 @@
 
 - (void)updateInstructionSymbols
 {
+	static BOOL isUpdatingSymbols = NO;
+	
 	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
 	if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
 	{
 		NSArray *instructions = [self.instructions subarrayWithRange:visibleRowsRange];
-		if ([self shouldUpdateSymbolsForInstructions:instructions])
+		if ([self shouldUpdateSymbolsForInstructions:instructions] && !isUpdatingSymbols)
 		{
-			[self updateSymbolsForInstructions:instructions];
-			[self.instructionsTableView reloadData];
+			isUpdatingSymbols = YES;
+			[self updateSymbolsForInstructions:instructions asynchronously:YES completionHandler:^{
+				[self.instructionsTableView reloadData];
+				isUpdatingSymbols = NO;
+			}];
 		}
 	}
 }
