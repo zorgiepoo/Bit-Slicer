@@ -445,7 +445,7 @@
 		[variablesArray addObject:theRegister.variable];
 	}
 	
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
 	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 }

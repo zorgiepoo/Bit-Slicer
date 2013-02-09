@@ -53,6 +53,8 @@
 {
 	self.tableView.target = self;
 	self.tableView.doubleAction = @selector(jumpToSelectedInstruction:);
+	
+	[self.tableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
 
 #pragma mark Updating Backtrace
@@ -119,6 +121,19 @@
 	
 	[self.disassemblerController updateSymbolsForInstructions:self.instructions];
 	
+	for (ZGInstruction *instruction in self.instructions)
+	{
+		if (!instruction.symbols)
+		{
+			instruction.symbols = @"";
+			instruction.variable.name = instruction.text;
+		}
+		else
+		{
+			instruction.variable.name = instruction.symbols;
+		}
+	}
+	
 	[self.tableView reloadData];
 	if (self.instructions.count > 0)
 	{
@@ -137,6 +152,12 @@
 
 #pragma mark Table View
 
+- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+{
+	NSArray *variables = [[self.instructions objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return self.instructions.count;
@@ -150,14 +171,7 @@
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"backtrace"])
 		{
-			if (instruction.symbols && ![instruction.symbols isEqualToString:@""])
-			{
-				result = instruction.symbols;
-			}
-			else
-			{
-				result = instruction.variable.addressStringValue;
-			}
+			result = instruction.variable.name;
 		}
 	}
 	
@@ -172,6 +186,34 @@
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
 {
 	return !self.disassemblerController.disassembling;
+}
+
+#pragma mark Copy
+
+- (NSArray *)selectedInstructions
+{
+	NSIndexSet *tableIndexSet = self.tableView.selectedRowIndexes;
+	NSInteger clickedRow = self.tableView.clickedRow;
+	
+	NSIndexSet *selectionIndexSet = (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
+	
+	return [self.instructions objectsAtIndexes:selectionIndexSet];
+}
+
+- (IBAction)copy:(id)sender
+{
+	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
+	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
+	
+	for (ZGInstruction *instruction in self.selectedInstructions)
+	{
+		[descriptionComponents addObject:[@[instruction.text, instruction.symbols, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
+		[variablesArray addObject:instruction.variable];
+	}
+	
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 }
 
 @end
