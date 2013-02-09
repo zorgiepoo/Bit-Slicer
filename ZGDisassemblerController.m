@@ -665,7 +665,7 @@
 					NSMutableArray *appendedInstructions = [[NSMutableArray alloc] initWithArray:self.instructions];
 					[appendedInstructions addObjectsFromArray:currentBatch];
 					
-					if (self.instructions.count == 0)
+					if (self.instructions.count == 0 && self.window.firstResponder != self.backtraceController.tableView)
 					{
 						[self.window makeFirstResponder:self.instructionsTableView];
 					}
