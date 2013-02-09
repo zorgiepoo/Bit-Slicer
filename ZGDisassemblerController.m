@@ -1594,9 +1594,11 @@ END_DEBUGGER_CHANGE:
 		}
 		
 		[self updateRegisters];
-		[self goToCurrentBreakPoint];
 		
 		[self toggleBacktraceView:NSOnState];
+		
+		[self goToCurrentBreakPoint];
+		
 		[self.backtraceController	updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
 		
 		BOOL shouldShowNotification = YES;
