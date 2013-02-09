@@ -345,7 +345,7 @@
 									<array class="NSMutableArray" key="NSSubviews">
 										<object class="NSScrollView" id="375143939">
 											<reference key="NSNextResponder" ref="965675663"/>
-											<int key="NSvFlags">274</int>
+											<int key="NSvFlags">314</int>
 											<array class="NSMutableArray" key="NSSubviews">
 												<object class="NSClipView" id="781794399">
 													<reference key="NSNextResponder" ref="375143939"/>
@@ -811,7 +811,7 @@
 															<array class="NSMutableArray" key="NSSubviews">
 																<object class="NSTableView" id="1066170089">
 																	<reference key="NSNextResponder" ref="740030204"/>
-																	<int key="NSvFlags">256</int>
+																	<int key="NSvFlags">4352</int>
 																	<string key="NSFrameSize">{263, 191}</string>
 																	<reference key="NSSuperview" ref="740030204"/>
 																	<reference key="NSWindow"/>
@@ -1076,6 +1076,7 @@
 															<string key="NSFrame">{{1, 197}, {101, 16}}</string>
 															<reference key="NSSuperview" ref="291824815"/>
 															<reference key="NSWindow"/>
+															<reference key="NSNextKeyView"/>
 															<string key="NSReuseIdentifierKey">_NS:60</string>
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 															<int key="NSsFlags">1</int>
@@ -2077,80 +2078,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDisassemblerController</string>
 					<string key="superclassName">NSWindowController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="continueExecution:">id</string>
-						<string key="copy:">id</string>
-						<string key="jump:">id</string>
-						<string key="nopVariables:">id</string>
-						<string key="pauseOrUnpauseProcess:">id</string>
-						<string key="readMemory:">id</string>
-						<string key="removeAllBreakPoints:">id</string>
-						<string key="runningApplicationsPopUpButton:">id</string>
-						<string key="showWindow:">id</string>
-						<string key="stepInto:">id</string>
-						<string key="stepOut:">id</string>
-						<string key="stepOver:">id</string>
-						<string key="stopDisassembling:">id</string>
-						<string key="toggleBreakPoints:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="continueExecution:">
-							<string key="name">continueExecution:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="copy:">
-							<string key="name">copy:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="jump:">
-							<string key="name">jump:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="nopVariables:">
-							<string key="name">nopVariables:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="pauseOrUnpauseProcess:">
-							<string key="name">pauseOrUnpauseProcess:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="readMemory:">
-							<string key="name">readMemory:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="removeAllBreakPoints:">
-							<string key="name">removeAllBreakPoints:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="runningApplicationsPopUpButton:">
-							<string key="name">runningApplicationsPopUpButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="showWindow:">
-							<string key="name">showWindow:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="stepInto:">
-							<string key="name">stepInto:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="stepOut:">
-							<string key="name">stepOut:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="stepOver:">
-							<string key="name">stepOver:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="stopDisassembling:">
-							<string key="name">stopDisassembling:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="toggleBreakPoints:">
-							<string key="name">toggleBreakPoints:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressTextField">NSTextField</string>
 						<string key="backtraceController">ZGBacktraceController</string>
