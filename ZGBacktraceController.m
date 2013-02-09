@@ -47,6 +47,14 @@
 
 @implementation ZGBacktraceController
 
+#pragma mark Birth
+
+- (void)awakeFromNib
+{
+	self.tableView.target = self;
+	self.tableView.doubleAction = @selector(jumpToSelectedInstruction:);
+}
+
 #pragma mark Updating Backtrace
 
 - (void)updateBacktraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer inProcess:(ZGProcess *)process
@@ -118,6 +126,15 @@
 	[self.disassemblerController updateSymbolsForInstructions:self.instructions];
 }
 
+- (IBAction)jumpToSelectedInstruction:(id)sender
+{
+	if (self.tableView.selectedRowIndexes.count > 0 && (NSUInteger)self.tableView.selectedRow < self.instructions.count)
+	{
+		ZGInstruction *selectedInstruction = [self.instructions objectAtIndex:(NSUInteger)self.tableView.selectedRow];
+		[self.disassemblerController jumpToMemoryAddress:selectedInstruction.variable.address inProcess:self.disassemblerController.currentProcess];
+	}
+}
+
 #pragma mark Table View
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -149,11 +166,7 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-	if (self.tableView.selectedRowIndexes.count > 0 && (NSUInteger)self.tableView.selectedRow < self.instructions.count)
-	{
-		ZGInstruction *selectedInstruction = [self.instructions objectAtIndex:(NSUInteger)self.tableView.selectedRow];
-		[self.disassemblerController jumpToMemoryAddress:selectedInstruction.variable.address inProcess:self.disassemblerController.currentProcess];
-	}
+	[self jumpToSelectedInstruction:nil];
 }
 
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
