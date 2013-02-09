@@ -203,6 +203,11 @@
 	[self.instructionsTableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
 
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
+{
+	return proposedMinimumPosition + 60;
+}
+
 - (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
 {
 	if ([splitView.subviews objectAtIndex:1] == subview)
