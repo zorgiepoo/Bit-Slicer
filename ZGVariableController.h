@@ -43,6 +43,7 @@
 - (void)freezeVariables;
 
 - (void)copyVariables;
+- (void)copyAddress;
 - (void)pasteVariables;
 
 - (void)removeSelectedSearchValues;

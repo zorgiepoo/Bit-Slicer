@@ -1126,6 +1126,14 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
+	else if (menuItem.action == @selector(copyAddress:))
+	{
+		if (self.selectedVariables.count != 1)
+		{
+			return NO;
+		}
+	}
+	
 	else if (menuItem.action == @selector(paste:))
 	{
 		if ([self.searchController canCancelTask] || ![NSPasteboard.generalPasteboard dataForType:ZGVariablePboardType])
@@ -1322,6 +1330,11 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)copy:(id)sender
 {
 	[self.variableController copyVariables];
+}
+
+- (IBAction)copyAddress:(id)sender
+{
+	[self.variableController copyAddress];
 }
 
 - (IBAction)paste:(id)sender

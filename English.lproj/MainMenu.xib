@@ -344,6 +344,15 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
+								<object class="NSMenuItem" id="846964730">
+									<reference key="NSMenu" ref="789758025"/>
+									<string key="NSTitle">Copy Address</string>
+									<string key="NSKeyEquiv">c</string>
+									<int key="NSKeyEquivModMask">1310720</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="1033313550"/>
+									<reference key="NSMixedImage" ref="310636482"/>
+								</object>
 								<object class="NSMenuItem" id="29853731">
 									<reference key="NSMenu" ref="789758025"/>
 									<string key="NSTitle">Paste</string>
@@ -1635,6 +1644,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">copyAddress:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="846964730"/>
+					</object>
+					<int key="connectionID">1089</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">openPreferences:</string>
 						<reference key="source" ref="187132439"/>
 						<reference key="destination" ref="609285721"/>
@@ -1836,6 +1853,7 @@
 							<reference ref="1040322652"/>
 							<reference ref="790794224"/>
 							<reference ref="763435172"/>
+							<reference ref="846964730"/>
 						</object>
 						<reference key="parent" ref="952259628"/>
 					</object>
@@ -2522,6 +2540,11 @@
 						<reference key="object" ref="220646600"/>
 						<reference key="parent" ref="578875147"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1087</int>
+						<reference key="object" ref="846964730"/>
+						<reference key="parent" ref="789758025"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -2554,6 +2577,7 @@
 					<string>1073.IBPluginDependency</string>
 					<string>1083.IBPluginDependency</string>
 					<string>1084.IBPluginDependency</string>
+					<string>1087.IBPluginDependency</string>
 					<string>112.IBPluginDependency</string>
 					<string>124.IBPluginDependency</string>
 					<string>125.IBPluginDependency</string>
@@ -2781,6 +2805,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -2795,7 +2820,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1086</int>
+			<int key="maxID">1089</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2894,7 +2919,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGBacktraceController</string>
-					<string key="superclassName">NSObject</string>
+					<string key="superclassName">NSResponder</string>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
@@ -3542,7 +3567,7 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGRegistersController</string>
-					<string key="superclassName">NSObject</string>
+					<string key="superclassName">NSResponder</string>
 					<object class="NSMutableDictionary" key="actions">
 						<string key="NS.key.0">changeQualifier:</string>
 						<string key="NS.object.0">id</string>

@@ -110,6 +110,18 @@
 
 #pragma mark Copying & Pasting
 
+- (void)copyAddress
+{
+	ZGVariable *selectedVariable = [[self.document selectedVariables] objectAtIndex:0];
+	[NSPasteboard.generalPasteboard
+	 declareTypes:@[NSStringPboardType]
+	 owner:self];
+	
+	[NSPasteboard.generalPasteboard
+	 setString:selectedVariable.addressStringValue
+	 forType:NSStringPboardType];
+}
+
 - (void)copyVariables
 {
 	[NSPasteboard.generalPasteboard

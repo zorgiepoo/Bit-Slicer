@@ -1027,6 +1027,13 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
+	else if (menuItem.action == @selector(copyAddress:))
+	{
+		if (self.selectedInstructions.count != 1)
+		{
+			return NO;
+		}
+	}
 	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:))
 	{
 		if (!self.currentBreakPoint || self.disassembling)
@@ -1192,9 +1199,16 @@ END_DEBUGGER_CHANGE:
 		[variablesArray addObject:instruction.variable];
 	}
 	
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
 	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
+}
+
+- (IBAction)copyAddress:(id)sender
+{
+	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
 }
 
 - (void)scrollAndSelectRow:(NSUInteger)selectionRow

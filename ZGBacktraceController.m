@@ -203,6 +203,20 @@
 			return NO;
 		}
 	}
+	else if ([menuItem action] == @selector(copy:))
+	{
+		if ([[self selectedInstructions] count] == 0)
+		{
+			return NO;
+		}
+	}
+	else if ([menuItem action] == @selector(copyAddress:))
+	{
+		if ([[self selectedInstructions] count] != 1)
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
 }
@@ -233,6 +247,13 @@
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
 	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
+}
+
+- (IBAction)copyAddress:(id)sender
+{
+	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
 }
 
 #pragma mark Memory Viewer
