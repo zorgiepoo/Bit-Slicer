@@ -370,6 +370,18 @@
 			return NO;
 		}
 	}
+	else if (menuItem.action == @selector(copyAddress:))
+	{
+		if (!self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		if ([self selectedAddressRange].location < self.currentMemoryAddress)
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
 }
@@ -773,6 +785,14 @@ END_MEMORY_VIEW_CHANGE:
 		[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", memoryAddress]];
 		[self updateMemoryViewerAtAddress:memoryAddress withSelectionLength:selectionLength];
 	}
+}
+
+#pragma mark Copying
+
+- (IBAction)copyAddress:(id)sender
+{
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:[NSString stringWithFormat:@"0x%llX", [self selectedAddressRange].location] forType:NSStringPboardType];
 }
 
 #pragma mark Memory Protection
