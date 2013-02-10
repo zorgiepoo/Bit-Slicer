@@ -37,7 +37,7 @@
 
 @class ZGProcess;
 
-@interface ZGBacktraceController : NSObject
+@interface ZGBacktraceController : NSResponder
 
 @property (assign) IBOutlet NSTableView *tableView;
 @property (strong) NSArray *instructions;

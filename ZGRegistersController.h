@@ -37,7 +37,7 @@
 
 @class ZGBreakPoint;
 
-@interface ZGRegistersController : NSObject
+@interface ZGRegistersController : NSResponder
 
 typedef void(^program_counter_change_t)(void);
 
