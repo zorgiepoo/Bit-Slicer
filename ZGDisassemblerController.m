@@ -47,6 +47,7 @@
 #import "ZGRegistersController.h"
 #import "ZGPreferencesController.h"
 #import "ZGBacktraceController.h"
+#import "ZGMemoryViewer.h"
 
 @interface ZGDisassemblerController ()
 
@@ -1164,6 +1165,13 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
+	else if (menuItem.action == @selector(showMemoryViewer:))
+	{
+		if ([[self selectedInstructions] count] == 0)
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
 }
@@ -1706,6 +1714,15 @@ END_DEBUGGER_CHANGE:
 - (IBAction)pauseOrUnpauseProcess:(id)sender
 {
 	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
+}
+
+#pragma mark Memory Viewer
+
+- (IBAction)showMemoryViewer:(id)sender
+{
+	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+	[[[ZGAppController sharedController] memoryViewer] showWindow:self];
+	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedInstruction.variable.address withSelectionLength:selectedInstruction.variable.size inProcess:self.currentProcess];
 }
 
 @end

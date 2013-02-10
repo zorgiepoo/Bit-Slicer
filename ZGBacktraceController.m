@@ -38,6 +38,8 @@
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
+#import "ZGAppController.h"
+#import "ZGMemoryViewer.h"
 
 @interface ZGBacktraceController ()
 
@@ -188,6 +190,21 @@
 	return !self.disassemblerController.disassembling;
 }
 
+#pragma mark Menu Item Validation
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+	if ([menuItem action] == @selector(showMemoryViewer:))
+	{
+		if ([[self selectedInstructions] count] == 0)
+		{
+			return NO;
+		}
+	}
+	
+	return YES;
+}
+
 #pragma mark Copy
 
 - (NSArray *)selectedInstructions
@@ -214,6 +231,15 @@
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
 	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
+}
+
+#pragma mark Memory Viewer
+
+- (IBAction)showMemoryViewer:(id)sender
+{
+	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+	[[[ZGAppController sharedController] memoryViewer] showWindow:self];
+	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedInstruction.variable.address withSelectionLength:selectedInstruction.variable.size inProcess:self.disassemblerController.currentProcess];
 }
 
 @end
