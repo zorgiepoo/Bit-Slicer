@@ -417,7 +417,7 @@
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if ([tableColumn.identifier isEqualToString:@"address"])
+	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
 		if (rowIndex >= 0 && (NSUInteger)rowIndex < self.document.watchVariablesArray.count)
 		{
