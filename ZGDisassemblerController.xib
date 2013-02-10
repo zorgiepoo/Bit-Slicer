@@ -375,7 +375,7 @@
 									<array class="NSMutableArray" key="NSSubviews">
 										<object class="NSScrollView" id="375143939">
 											<reference key="NSNextResponder" ref="965675663"/>
-											<int key="NSvFlags">314</int>
+											<int key="NSvFlags">274</int>
 											<array class="NSMutableArray" key="NSSubviews">
 												<object class="NSClipView" id="781794399">
 													<reference key="NSNextResponder" ref="375143939"/>
@@ -388,7 +388,7 @@
 															<string key="NSFrameSize">{816, 278}</string>
 															<reference key="NSSuperview" ref="781794399"/>
 															<reference key="NSWindow"/>
-															<reference key="NSNextKeyView" ref="1043616540"/>
+															<reference key="NSNextKeyView" ref="48000623"/>
 															<string key="NSReuseIdentifierKey">_NS:13</string>
 															<bool key="NSEnabled">YES</bool>
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -654,7 +654,7 @@
 											<string key="NSFrameSize">{818, 296}</string>
 											<reference key="NSSuperview" ref="965675663"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="48000623"/>
+											<reference key="NSNextKeyView" ref="781794399"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<int key="NSsFlags">133682</int>
 											<reference key="NSVScroller" ref="1043616540"/>
@@ -697,7 +697,7 @@
 																	<string key="NSFrameSize">{550, 191}</string>
 																	<reference key="NSSuperview" ref="313400987"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="49433778"/>
+																	<reference key="NSNextKeyView" ref="437389912"/>
 																	<string key="NSReuseIdentifierKey">_NS:13</string>
 																	<bool key="NSEnabled">YES</bool>
 																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -819,7 +819,7 @@
 													<string key="NSFrameSize">{552, 209}</string>
 													<reference key="NSSuperview" ref="315342891"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="437389912"/>
+													<reference key="NSNextKeyView" ref="313400987"/>
 													<string key="NSReuseIdentifierKey">_NS:9</string>
 													<int key="NSsFlags">133682</int>
 													<reference key="NSVScroller" ref="49433778"/>
@@ -845,7 +845,7 @@
 																	<string key="NSFrameSize">{263, 191}</string>
 																	<reference key="NSSuperview" ref="740030204"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="59921309"/>
+																	<reference key="NSNextKeyView" ref="504488663"/>
 																	<string key="NSReuseIdentifierKey">_NS:13</string>
 																	<bool key="NSEnabled">YES</bool>
 																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -1106,7 +1106,6 @@
 															<string key="NSFrame">{{1, 197}, {101, 16}}</string>
 															<reference key="NSSuperview" ref="291824815"/>
 															<reference key="NSWindow"/>
-															<reference key="NSNextKeyView"/>
 															<string key="NSReuseIdentifierKey">_NS:60</string>
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 															<int key="NSsFlags">1</int>
@@ -1133,7 +1132,7 @@
 													<string key="NSFrame">{{553, 0}, {265, 209}}</string>
 													<reference key="NSSuperview" ref="315342891"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="504488663"/>
+													<reference key="NSNextKeyView" ref="740030204"/>
 													<string key="NSReuseIdentifierKey">_NS:9</string>
 													<int key="NSsFlags">133682</int>
 													<reference key="NSVScroller" ref="59921309"/>
@@ -2280,6 +2279,90 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDisassemblerController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="continueExecution:">id</string>
+						<string key="copy:">id</string>
+						<string key="copyAddress:">id</string>
+						<string key="jump:">id</string>
+						<string key="nopVariables:">id</string>
+						<string key="pauseOrUnpauseProcess:">id</string>
+						<string key="readMemory:">id</string>
+						<string key="removeAllBreakPoints:">id</string>
+						<string key="runningApplicationsPopUpButton:">id</string>
+						<string key="showMemoryViewer:">id</string>
+						<string key="showWindow:">id</string>
+						<string key="stepInto:">id</string>
+						<string key="stepOut:">id</string>
+						<string key="stepOver:">id</string>
+						<string key="stopDisassembling:">id</string>
+						<string key="toggleBreakPoints:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="continueExecution:">
+							<string key="name">continueExecution:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copyAddress:">
+							<string key="name">copyAddress:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="jump:">
+							<string key="name">jump:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="nopVariables:">
+							<string key="name">nopVariables:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="pauseOrUnpauseProcess:">
+							<string key="name">pauseOrUnpauseProcess:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="readMemory:">
+							<string key="name">readMemory:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="removeAllBreakPoints:">
+							<string key="name">removeAllBreakPoints:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="runningApplicationsPopUpButton:">
+							<string key="name">runningApplicationsPopUpButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showMemoryViewer:">
+							<string key="name">showMemoryViewer:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showWindow:">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stepInto:">
+							<string key="name">stepInto:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stepOut:">
+							<string key="name">stepOut:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stepOver:">
+							<string key="name">stepOver:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stopDisassembling:">
+							<string key="name">stopDisassembling:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleBreakPoints:">
+							<string key="name">toggleBreakPoints:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressTextField">NSTextField</string>
 						<string key="backtraceController">ZGBacktraceController</string>
@@ -2332,17 +2415,20 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGRegistersController</string>
 					<string key="superclassName">NSResponder</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">changeQualifier:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">changeQualifier:</string>
-						<object class="IBActionInfo" key="NS.object.0">
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="changeQualifier:">id</string>
+						<string key="copy:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="changeQualifier:">
 							<string key="name">changeQualifier:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-					</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="disassemblerController">ZGDisassemblerController</string>
 						<string key="tableView">NSTableView</string>

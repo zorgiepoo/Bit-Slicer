@@ -56,6 +56,7 @@
 	self.tableView.target = self;
 	self.tableView.doubleAction = @selector(jumpToSelectedInstruction:);
 	
+	[self setNextResponder:[self.tableView nextResponder]];
 	[self.tableView setNextResponder:self];
 	
 	[self.tableView registerForDraggedTypes:@[ZGVariablePboardType]];

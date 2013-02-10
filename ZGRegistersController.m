@@ -58,7 +58,9 @@
 
 - (void)awakeFromNib
 {
+	[self setNextResponder:[self.tableView nextResponder]];
 	[self.tableView setNextResponder:self];
+	
 	[self.tableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
 
