@@ -1465,6 +1465,10 @@ END_DEBUGGER_CHANGE:
 		[[self.undoManager prepareWithInvocationTarget:self] removeBreakPointsToInstructions:changedInstructions];
 		[self.instructionsTableView reloadData];
 	}
+	else
+	{
+		NSRunAlertPanel(@"Failed to Add Breakpoint", @"A breakpoint could not be added most likely because the instruction's memory protection is not executable.", @"OK", nil, nil);
+	}
 }
 
 - (IBAction)toggleBreakPoints:(id)sender
