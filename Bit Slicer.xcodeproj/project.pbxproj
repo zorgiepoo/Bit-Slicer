@@ -46,12 +46,12 @@
 		7787C4EE137C556000BFF606 /* ZGLineCountingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4ED137C556000BFF606 /* ZGLineCountingView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7787C4F2137C5A8300BFF606 /* ZGLineCountingRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		778BA6611363E972008ACD6B /* Ruby.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 778BA6601363E972008ACD6B /* Ruby.framework */; };
-		77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 77A8689711FA95730062EEAE /* bitslicericon.icns */; };
 		77CA284E16A7B5D500F3B54B /* ZGRegister.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CA284D16A7B5D500F3B54B /* ZGRegister.m */; };
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
 		77D037371224334E0083E057 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D037361224334E0083E057 /* ZGCalculator.m */; };
 		77D38D4216A1FA5A00D2446A /* ZGDisassemblerObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D38D4116A1FA5A00D2446A /* ZGDisassemblerObject.m */; };
 		77D5AEB5137C84D300026388 /* ZGVerticalScrollerRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		77DEA41216C974C700A16D57 /* bitslicericon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77DEA41116C974C700A16D57 /* bitslicericon.iconset */; };
 		77E652B3168F889C00D84A7F /* ZGBreakPointController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652B2168F889C00D84A7F /* ZGBreakPointController.m */; };
 		77E652B6168F8C7700D84A7F /* ZGDocumentBreakPointController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */; };
 		77E652B9168FD49300D84A7F /* ZGBreakPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652B8168FD49300D84A7F /* ZGBreakPoint.m */; };
@@ -160,7 +160,6 @@
 		7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGLineCountingRepresenter.m; sourceTree = "<group>"; };
 		778939221334308300B6AACB /* ZGMemoryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryTypes.h; sourceTree = "<group>"; };
 		778BA6601363E972008ACD6B /* Ruby.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ruby.framework; path = System/Library/Frameworks/Ruby.framework; sourceTree = SDKROOT; };
-		77A8689711FA95730062EEAE /* bitslicericon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = bitslicericon.icns; sourceTree = "<group>"; };
 		77CA284C16A7B5D500F3B54B /* ZGRegister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRegister.h; sourceTree = "<group>"; };
 		77CA284D16A7B5D500F3B54B /* ZGRegister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRegister.m; sourceTree = "<group>"; };
 		77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGComparisonFunctions.h; sourceTree = "<group>"; };
@@ -171,6 +170,7 @@
 		77D38D4116A1FA5A00D2446A /* ZGDisassemblerObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDisassemblerObject.m; sourceTree = "<group>"; };
 		77D5AEB3137C84CE00026388 /* ZGVerticalScrollerRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVerticalScrollerRepresenter.h; sourceTree = "<group>"; };
 		77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVerticalScrollerRepresenter.m; sourceTree = "<group>"; };
+		77DEA41116C974C700A16D57 /* bitslicericon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = bitslicericon.iconset; sourceTree = "<group>"; };
 		77E652B1168F889C00D84A7F /* ZGBreakPointController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBreakPointController.h; sourceTree = "<group>"; };
 		77E652B2168F889C00D84A7F /* ZGBreakPointController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGBreakPointController.m; sourceTree = "<group>"; };
 		77E652B4168F8C7700D84A7F /* ZGDocumentBreakPointController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDocumentBreakPointController.h; sourceTree = "<group>"; };
@@ -312,7 +312,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				77A8689711FA95730062EEAE /* bitslicericon.icns */,
+				77DEA41116C974C700A16D57 /* bitslicericon.iconset */,
 				8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
 				1DDD58280DA1D0D100B32029 /* MyDocument.xib */,
@@ -482,10 +482,10 @@
 				1DDD582C0DA1D0D100B32029 /* MyDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
 				775FCB2A11719E4A000054FB /* Preferences.xib in Resources */,
-				77A8689811FA95730062EEAE /* bitslicericon.icns in Resources */,
 				770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */,
 				7763470416881166003D01C9 /* DataInspectorView.xib in Resources */,
 				77329B59168CFE6C007DCAE2 /* ZGDisassemblerController.xib in Resources */,
+				77DEA41216C974C700A16D57 /* bitslicericon.iconset in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
