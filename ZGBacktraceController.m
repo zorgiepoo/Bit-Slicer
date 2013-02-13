@@ -130,10 +130,10 @@
 	
 	for (ZGInstruction *instruction in self.instructions)
 	{
-		if (!instruction.symbols)
+		if (!instruction.symbols || [instruction.symbols isEqualToString:@""])
 		{
 			instruction.symbols = @"";
-			instruction.variable.name = instruction.text;
+			instruction.variable.name = instruction.variable.addressStringValue;
 		}
 		else
 		{
