@@ -195,6 +195,12 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
+	// we should only ignore selection on the first row
+	if (self.shouldIgnoreTableSelection && ![[self.tableView selectedRowIndexes] isEqualToIndexSet:[NSIndexSet indexSetWithIndex:0]])
+	{
+		self.shouldIgnoreTableSelection = NO;
+	}
+	
 	if (!self.shouldIgnoreTableSelection)
 	{
 		[self jumpToSelectedInstruction:nil];
