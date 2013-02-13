@@ -347,7 +347,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	}
 	
 	BOOL hitBreakPoint = NO;
-	void (^notifyBreakPointBlock)(void) = NULL;
+	NSMutableArray *breakPointsToNotify = [[NSMutableArray alloc] init];
 	
 	for (ZGBreakPoint *breakPoint in self.breakPoints)
 	{
@@ -415,14 +415,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 							threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
 						}
 						
-						notifyBreakPointBlock = ^{
-							dispatch_async(dispatch_get_main_queue(), ^{
-								if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
-								{
-									[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
-								}
-							});
-						};
+						[breakPointsToNotify addObject:breakPoint];
 					}
 					
 					ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
@@ -468,14 +461,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 				
 				candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
 				
-				notifyBreakPointBlock = ^{
-					dispatch_async(dispatch_get_main_queue(), ^{
-						if ([candidateBreakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
-						{
-							[candidateBreakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:candidateBreakPoint];
-						}
-					});
-				};
+				[breakPointsToNotify addObject:candidateBreakPoint];
 				
 				hitBreakPoint = YES;
 			}
@@ -495,9 +481,17 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	}
 	
 	// We should notify delegates if a breakpoint hits after we modify thread states
-	if (notifyBreakPointBlock)
+	if (breakPointsToNotify.count > 0)
 	{
-		notifyBreakPointBlock();
+		dispatch_async(dispatch_get_main_queue(), ^{
+			for (ZGBreakPoint *breakPoint in breakPointsToNotify)
+			{
+				if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+				{
+					[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
+				}
+			}
+		});
 	}
 	
 	ZGResumeTask(task);
