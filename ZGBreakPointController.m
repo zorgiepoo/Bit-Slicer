@@ -347,6 +347,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	}
 	
 	BOOL hitBreakPoint = NO;
+	void (^notifyBreakPointBlock)(void) = NULL;
 	
 	for (ZGBreakPoint *breakPoint in self.breakPoints)
 	{
@@ -414,12 +415,14 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 							threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
 						}
 						
-						dispatch_async(dispatch_get_main_queue(), ^{
-							if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
-							{
-								[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
-							}
-						});
+						notifyBreakPointBlock = ^{
+							dispatch_async(dispatch_get_main_queue(), ^{
+								if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+								{
+									[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
+								}
+							});
+						};
 					}
 					
 					ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
@@ -465,12 +468,14 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 				
 				candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
 				
-				dispatch_async(dispatch_get_main_queue(), ^{
-					if ([candidateBreakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
-					{
-						[candidateBreakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:candidateBreakPoint];
-					}
-				});
+				notifyBreakPointBlock = ^{
+					dispatch_async(dispatch_get_main_queue(), ^{
+						if ([candidateBreakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+						{
+							[candidateBreakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:candidateBreakPoint];
+						}
+					});
+				};
 				
 				hitBreakPoint = YES;
 			}
@@ -487,6 +492,12 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 		{
 			NSLog(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d", thread);
 		}
+	}
+	
+	// We should notify delegates if a breakpoint hits after we modify thread states
+	if (notifyBreakPointBlock)
+	{
+		notifyBreakPointBlock();
 	}
 	
 	ZGResumeTask(task);
