@@ -157,13 +157,17 @@
 	
 	if (shouldUpdate && self.windowDidAppear)
 	{
-		[self updateRegisters];
 		if (self.currentBreakPoint)
 		{
+			[self toggleBacktraceView:NSOnState];
+			[self updateRegisters];
+			[self.backtraceController updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
+			
 			[self jumpToMemoryAddress:self.registersController.programCounter inProcess:self.currentProcess];
 		}
 		else
 		{
+			[self toggleBacktraceView:NSOffState];
 			[self readMemory:nil];
 		}
 	}
@@ -256,11 +260,17 @@
 	switch (state)
 	{
 		case NSOnState:
-			[self uncollapseBottomSubview];
+			if ([self.splitView isSubviewCollapsed:[self.splitView.subviews objectAtIndex:1]])
+			{
+				[self uncollapseBottomSubview];
+			}
 			break;
 		case NSOffState:
-			[self.undoManager removeAllActionsWithTarget:self.registersController];
-			[self collapseBottomSubview];
+			if (![self.splitView isSubviewCollapsed:[self.splitView.subviews objectAtIndex:1]])
+			{
+				[self.undoManager removeAllActionsWithTarget:self.registersController];
+				[self collapseBottomSubview];
+			}
 			break;
 		default:
 			break;
@@ -1596,15 +1606,12 @@ END_DEBUGGER_CHANGE:
 
 - (void)updateRegisters
 {
-	if (self.currentBreakPoint)
-	{
-		[self.registersController updateRegistersFromBreakPoint:self.currentBreakPoint programCounterChange:^{
-			if (self.currentBreakPoint)
-			{
-				[self.instructionsTableView reloadData];
-			}
-		}];
-	}
+	[self.registersController updateRegistersFromBreakPoint:self.currentBreakPoint programCounterChange:^{
+		if (self.currentBreakPoint)
+		{
+			[self.instructionsTableView reloadData];
+		}
+	}];
 }
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint

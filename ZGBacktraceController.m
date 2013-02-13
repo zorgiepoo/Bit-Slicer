@@ -45,6 +45,8 @@
 
 @property (assign) IBOutlet ZGDisassemblerController *disassemblerController;
 
+@property (assign, nonatomic) BOOL shouldIgnoreTableSelection;
+
 @end
 
 @implementation ZGBacktraceController
@@ -142,6 +144,7 @@
 	[self.tableView reloadData];
 	if (self.instructions.count > 0)
 	{
+		self.shouldIgnoreTableSelection = YES;
 		[self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 	}
 }
@@ -150,8 +153,15 @@
 {
 	if (self.tableView.selectedRowIndexes.count > 0 && (NSUInteger)self.tableView.selectedRow < self.instructions.count)
 	{
-		ZGInstruction *selectedInstruction = [self.instructions objectAtIndex:(NSUInteger)self.tableView.selectedRow];
-		[self.disassemblerController jumpToMemoryAddress:selectedInstruction.variable.address inProcess:self.disassemblerController.currentProcess];
+		if (self.disassemblerController.disassembling)
+		{
+			NSBeep();
+		}
+		else
+		{
+			ZGInstruction *selectedInstruction = [self.instructions objectAtIndex:(NSUInteger)self.tableView.selectedRow];
+			[self.disassemblerController jumpToMemoryAddress:selectedInstruction.variable.address inProcess:self.disassemblerController.currentProcess];
+		}
 	}
 }
 
@@ -185,7 +195,14 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-	[self jumpToSelectedInstruction:nil];
+	if (!self.shouldIgnoreTableSelection)
+	{
+		[self jumpToSelectedInstruction:nil];
+	}
+	else
+	{
+		self.shouldIgnoreTableSelection = NO;
+	}
 }
 
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
