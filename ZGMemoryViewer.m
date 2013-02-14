@@ -115,7 +115,10 @@
 		{
 			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
 		}
-		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
+		if (newProcess.valid)
+		{
+			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
+		}
 		
 		shouldUpdateMemoryView = YES;
 	}

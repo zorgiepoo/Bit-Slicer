@@ -141,7 +141,10 @@
 	if (_currentProcess && _currentProcess.processID != newProcess.processID)
 	{
 		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
-		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
+		if (newProcess.valid)
+		{
+			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
+		}
 		
 		shouldUpdate = YES;
 	}

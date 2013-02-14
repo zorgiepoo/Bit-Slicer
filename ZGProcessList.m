@@ -277,10 +277,16 @@
 	
 	for (NSNumber *processNumber in self.priorityProcesses)
 	{
+		NSLog(@"Process number is %d", [processNumber intValue]);
 		if (kill(processNumber.intValue, 0) != 0 && errno != EPERM)
 		{
+			NSLog(@"Removing priority");
 			[self removePriorityToProcessIdentifier:processNumber.intValue];
 			shouldRetrieveList = YES;
+		}
+		else
+		{
+			NSLog(@"Failed to detect");
 		}
 	}
 	
@@ -294,6 +300,7 @@
 {
 	if (![self.priorityProcesses containsObject:@(processIdentifier)])
 	{
+		NSLog(@"Added priority to %d", processIdentifier);
 		NSMutableArray *newPriorityProcesses = self.priorityProcesses ? [NSMutableArray arrayWithArray:self.priorityProcesses] : [NSMutableArray array];
 		[newPriorityProcesses addObject:@(processIdentifier)];
 		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
@@ -308,6 +315,7 @@
 {
 	if ([self.priorityProcesses containsObject:@(processIdentifier)])
 	{
+		NSLog(@"Removed priority to %d", processIdentifier);
 		NSMutableArray *newPriorityProcesses = [NSMutableArray arrayWithArray:self.priorityProcesses];
 		[newPriorityProcesses removeObject:@(processIdentifier)];
 		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
