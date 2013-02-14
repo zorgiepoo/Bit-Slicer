@@ -56,7 +56,7 @@ BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task)
 	{
 		*task = [[gTasksDictionary objectForKey:@(process)] unsignedIntValue];
 	}
-	return MACH_PORT_VALID(*task);
+	return *task != MACH_PORT_NULL;
 }
 
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
@@ -73,12 +73,20 @@ BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 		kern_return_t result = task_for_pid(current_task(), process, task);
 		if (result != KERN_SUCCESS)
 		{
+			if (*task != MACH_PORT_NULL)
+			{
+				mach_port_deallocate(mach_task_self(), *task);
+			}
 			*task = MACH_PORT_NULL;
 			NSLog(@"Failed to get task for process %d: %s", process, mach_error_string(result));
 			success = NO;
 		}
 		else if (!MACH_PORT_VALID(*task))
 		{
+			if (*task != MACH_PORT_NULL)
+			{
+				mach_port_deallocate(mach_task_self(), *task);
+			}
 			*task = MACH_PORT_NULL;
 			NSLog(@"Mach port is not valid for process %d", process);
 			success = NO;
@@ -103,6 +111,8 @@ void ZGFreeTask(ZGMemoryMap task)
 			NSMutableDictionary *newTasksDictionary = [[NSMutableDictionary alloc] initWithDictionary:gTasksDictionary];
 			[newTasksDictionary removeObjectForKey:process];
 			gTasksDictionary = [NSDictionary dictionaryWithDictionary:newTasksDictionary];
+			
+			mach_port_deallocate(mach_task_self(), task);
 			
 			break;
 		}

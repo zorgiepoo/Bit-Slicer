@@ -34,6 +34,7 @@
 
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
+#import "ZGVirtualMemory.h"
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
@@ -277,16 +278,18 @@
 	
 	for (NSNumber *processNumber in self.priorityProcesses)
 	{
-		NSLog(@"Process number is %d", [processNumber intValue]);
-		if (kill(processNumber.intValue, 0) != 0 && errno != EPERM)
+		mach_port_name_t task = MACH_PORT_NULL;
+		kern_return_t result = task_for_pid(current_task(), processNumber.intValue, &task);
+		
+		if (result != KERN_SUCCESS || !MACH_PORT_VALID(task))
 		{
-			NSLog(@"Removing priority");
-			[self removePriorityToProcessIdentifier:processNumber.intValue];
 			shouldRetrieveList = YES;
+			[self removePriorityToProcessIdentifier:processNumber.intValue];
 		}
-		else
+		
+		if (task != MACH_PORT_NULL)
 		{
-			NSLog(@"Failed to detect");
+			mach_port_deallocate(mach_task_self(), task);
 		}
 	}
 	
@@ -300,7 +303,6 @@
 {
 	if (![self.priorityProcesses containsObject:@(processIdentifier)])
 	{
-		NSLog(@"Added priority to %d", processIdentifier);
 		NSMutableArray *newPriorityProcesses = self.priorityProcesses ? [NSMutableArray arrayWithArray:self.priorityProcesses] : [NSMutableArray array];
 		[newPriorityProcesses addObject:@(processIdentifier)];
 		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
@@ -315,7 +317,6 @@
 {
 	if ([self.priorityProcesses containsObject:@(processIdentifier)])
 	{
-		NSLog(@"Removed priority to %d", processIdentifier);
 		NSMutableArray *newPriorityProcesses = [NSMutableArray arrayWithArray:self.priorityProcesses];
 		[newPriorityProcesses removeObject:@(processIdentifier)];
 		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
