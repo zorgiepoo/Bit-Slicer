@@ -58,8 +58,6 @@
 #define ZGMemoryViewerProcessName @"ZGMemoryViewerProcessName"
 #define ZGMemoryViewerShowsDataInspector @"ZGMemoryViewerShowsDataInspector"
 
-#define DEFAULT_SELECTION_LENGTH 4
-
 @interface ZGMemoryViewer ()
 
 @property (readwrite, strong) NSTimer *checkMemoryTimer;
@@ -711,7 +709,7 @@ END_MEMORY_VIEW_CHANGE:
 		calculatedMemoryAddress = memoryAddressFromExpression(calculatedMemoryAddressExpression);
 	}
 	
-	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:DEFAULT_SELECTION_LENGTH];
+	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
 }
 
 - (void)readMemory:(NSTimer *)timer

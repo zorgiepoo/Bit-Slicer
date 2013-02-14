@@ -38,6 +38,8 @@
 
 @class ZGProcess;
 
+#define DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH 4
+
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
 
 @interface ZGMemoryViewer : NSWindowController <NSWindowDelegate>

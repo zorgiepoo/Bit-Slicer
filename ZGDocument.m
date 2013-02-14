@@ -1268,12 +1268,6 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			return NO;
 		}
-		
-		ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
-		if (!variable.value)
-		{
-			return NO;
-		}
 	}
 	
 	else if (menuItem.action == @selector(showDisassembler:))
@@ -1391,7 +1385,7 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
 	[[[ZGAppController sharedController] memoryViewer] showWindow:self];
-	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size inProcess:self.currentProcess];
+	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH inProcess:self.currentProcess];
 }
 
 - (IBAction)showDisassembler:(id)sender
