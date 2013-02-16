@@ -39,12 +39,12 @@
 #import "ZGRegister.h"
 #import "ZGPreferencesController.h"
 #import "ZGUtilities.h"
-#import "ZGDisassemblerController.h"
+#import "ZGDebuggerController.h"
 
 @interface ZGRegistersController ()
 
 @property (assign) IBOutlet NSTableView *tableView;
-@property (assign) IBOutlet ZGDisassemblerController *disassemblerController;
+@property (assign) IBOutlet ZGDebuggerController *debuggerController;
 
 @property (nonatomic, strong) NSArray *registers;
 @property (nonatomic, strong) ZGBreakPoint *breakPoint;
@@ -237,8 +237,8 @@
 	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.name];
 	[[NSUserDefaults standardUserDefaults] setObject:registerTypesDictionary forKey:ZG_REGISTER_TYPES];
 	
-	[[self.disassemblerController.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
-	[self.disassemblerController.undoManager setActionName:@"Register Type Change"];
+	[[self.debuggerController.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
+	[self.debuggerController.undoManager setActionName:@"Register Type Change"];
 	
 	[self.tableView reloadData];
 }
@@ -289,8 +289,8 @@
 					self.programCounter = *(uint32_t *)theRegister.value;
 				}
 				
-				[[self.disassemblerController.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
-				[self.disassemblerController.undoManager setActionName:@"Register Value Change"];
+				[[self.debuggerController.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
+				[self.debuggerController.undoManager setActionName:@"Register Value Change"];
 				
 				[self.tableView reloadData];
 			}

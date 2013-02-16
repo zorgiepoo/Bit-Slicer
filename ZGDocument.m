@@ -42,7 +42,7 @@
 #import "ZGVariable.h"
 #import "ZGAppController.h"
 #import "ZGMemoryViewer.h"
-#import "ZGDisassemblerController.h"
+#import "ZGDebuggerController.h"
 #import "ZGComparisonFunctions.h"
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
@@ -1159,7 +1159,7 @@ static NSSize *expandedWindowMinSize = nil;
 			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
 		}
 		
-		if ([[[ZGAppController sharedController] disassemblerController] isProcessIdentifierHalted:self.currentProcess.processID])
+		if ([[[ZGAppController sharedController] debuggerController] isProcessIdentifierHalted:self.currentProcess.processID])
 		{
 			return NO;
 		}
@@ -1270,7 +1270,7 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
-	else if (menuItem.action == @selector(showDisassembler:))
+	else if (menuItem.action == @selector(showDebugger:))
 	{
 		if (self.selectedVariables.count != 1 || !self.currentProcess.valid)
 		{
@@ -1388,11 +1388,11 @@ static NSSize *expandedWindowMinSize = nil;
 	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH inProcess:self.currentProcess];
 }
 
-- (IBAction)showDisassembler:(id)sender
+- (IBAction)showDebugger:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[[[ZGAppController sharedController] disassemblerController] showWindow:self];
-	[[[ZGAppController sharedController] disassemblerController] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
+	[[[ZGAppController sharedController] debuggerController] showWindow:self];
+	[[[ZGAppController sharedController] debuggerController] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
 }
 
 #pragma mark Pausing and Unpausing Processes

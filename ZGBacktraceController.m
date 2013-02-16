@@ -33,7 +33,7 @@
  */
 
 #import "ZGBacktraceController.h"
-#import "ZGDisassemblerController.h"
+#import "ZGDebuggerController.h"
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
@@ -43,7 +43,7 @@
 
 @interface ZGBacktraceController ()
 
-@property (assign) IBOutlet ZGDisassemblerController *disassemblerController;
+@property (assign) IBOutlet ZGDebuggerController *debuggerController;
 
 @property (assign, nonatomic) BOOL shouldIgnoreTableSelection;
 
@@ -71,7 +71,7 @@
 	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
 	
-	ZGInstruction *currentInstruction = [self.disassemblerController findInstructionBeforeAddress:instructionPointer+1 inProcess:process];
+	ZGInstruction *currentInstruction = [self.debuggerController findInstructionBeforeAddress:instructionPointer+1 inProcess:process];
 	if (currentInstruction)
 	{
 		[newInstructions addObject:currentInstruction];
@@ -89,7 +89,7 @@
 				
 				ZGFreeBytes(process.processTask, bytes, size);
 				
-				ZGInstruction *instruction = [self.disassemblerController findInstructionBeforeAddress:returnAddress inProcess:process];
+				ZGInstruction *instruction = [self.debuggerController findInstructionBeforeAddress:returnAddress inProcess:process];
 				if (instruction)
 				{
 					[newInstructions addObject:instruction];
@@ -126,7 +126,7 @@
 	self.instructions = [NSArray arrayWithArray:newInstructions];
 	self.basePointers = [NSArray arrayWithArray:newBasePointers];
 	
-	[self.disassemblerController updateSymbolsForInstructions:self.instructions];
+	[self.debuggerController updateSymbolsForInstructions:self.instructions];
 	
 	for (ZGInstruction *instruction in self.instructions)
 	{
@@ -153,14 +153,14 @@
 {
 	if (self.tableView.selectedRowIndexes.count > 0 && (NSUInteger)self.tableView.selectedRow < self.instructions.count)
 	{
-		if (self.disassemblerController.disassembling)
+		if (self.debuggerController.disassembling)
 		{
 			NSBeep();
 		}
 		else
 		{
 			ZGInstruction *selectedInstruction = [self.instructions objectAtIndex:(NSUInteger)self.tableView.selectedRow];
-			[self.disassemblerController jumpToMemoryAddress:selectedInstruction.variable.address inProcess:self.disassemblerController.currentProcess];
+			[self.debuggerController jumpToMemoryAddress:selectedInstruction.variable.address inProcess:self.debuggerController.currentProcess];
 		}
 	}
 }
@@ -213,7 +213,7 @@
 
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
 {
-	return !self.disassemblerController.disassembling;
+	return !self.debuggerController.disassembling;
 }
 
 #pragma mark Menu Item Validation
@@ -286,7 +286,7 @@
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
 	[[[ZGAppController sharedController] memoryViewer] showWindow:self];
-	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedInstruction.variable.address withSelectionLength:selectedInstruction.variable.size inProcess:self.disassemblerController.currentProcess];
+	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedInstruction.variable.address withSelectionLength:selectedInstruction.variable.size inProcess:self.debuggerController.currentProcess];
 }
 
 @end

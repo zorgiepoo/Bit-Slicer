@@ -60,7 +60,7 @@
 #import "ZGDebugThread.h"
 #import "ZGBreakPoint.h"
 #import "ZGInstruction.h"
-#import "ZGDisassemblerController.h"
+#import "ZGDebuggerController.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 
@@ -389,7 +389,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 			}
 			else
 			{
-				ZGInstruction *foundInstruction = [[[ZGAppController sharedController] disassemblerController] findInstructionBeforeAddress:(breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) inProcess:breakPoint.process];
+				ZGInstruction *foundInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:(breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) inProcess:breakPoint.process];
 				foundInstructionAddress = foundInstruction.variable.address;
 			}
 			

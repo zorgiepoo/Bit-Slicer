@@ -46,7 +46,7 @@
 #import "ZGRunningProcess.h"
 #import "ZGMemoryProtectionController.h"
 #import "ZGMemoryDumpController.h"
-#import "ZGDisassemblerController.h"
+#import "ZGDebuggerController.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -366,7 +366,7 @@
 			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
 		}
 		
-		if ([[[ZGAppController sharedController] disassemblerController] isProcessIdentifierHalted:self.currentProcess.processID])
+		if ([[[ZGAppController sharedController] debuggerController] isProcessIdentifierHalted:self.currentProcess.processID])
 		{
 			return NO;
 		}

@@ -12,8 +12,6 @@
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<string>NSButton</string>
-			<string>NSButtonCell</string>
 			<string>NSCustomObject</string>
 			<string>NSMenu</string>
 			<string>NSMenuItem</string>
@@ -459,7 +457,7 @@
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="277655075">
 									<reference key="NSMenu" ref="79774020"/>
-									<string key="NSTitle">Show Disassembler</string>
+									<string key="NSTitle">Show Debugger</string>
 									<string key="NSKeyEquiv">t</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -995,7 +993,7 @@
 											</object>
 											<object class="NSMenuItem" id="112049564">
 												<reference key="NSMenu" ref="512051932"/>
-												<string key="NSTitle">Disassembler</string>
+												<string key="NSTitle">Debugger</string>
 												<string key="NSKeyEquiv">T</string>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -1115,32 +1113,6 @@
 			</object>
 			<object class="NSCustomObject" id="187132439">
 				<string key="NSClassName">ZGAppController</string>
-			</object>
-			<object class="NSButton" id="143803963">
-				<nil key="NSNextResponder"/>
-				<int key="NSvFlags">268</int>
-				<string key="NSFrameSize">{82, 32}</string>
-				<string key="NSReuseIdentifierKey">_NS:9</string>
-				<bool key="NSEnabled">YES</bool>
-				<object class="NSButtonCell" key="NSCell" id="412500413">
-					<int key="NSCellFlags">67108864</int>
-					<int key="NSCellFlags2">134217728</int>
-					<string key="NSContents">Button</string>
-					<object class="NSFont" key="NSSupport">
-						<string key="NSName">LucidaGrande</string>
-						<double key="NSSize">13</double>
-						<int key="NSfFlags">1044</int>
-					</object>
-					<string key="NSCellIdentifier">_NS:9</string>
-					<reference key="NSControlView" ref="143803963"/>
-					<int key="NSButtonFlags">-2038284288</int>
-					<int key="NSButtonFlags2">129</int>
-					<string key="NSAlternateContents"/>
-					<string key="NSKeyEquivalent"/>
-					<int key="NSPeriodicDelay">200</int>
-					<int key="NSPeriodicInterval">25</int>
-				</object>
-				<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -1524,14 +1496,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">showDisassembler:</string>
-						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="112049564"/>
-					</object>
-					<int key="connectionID">870</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">changeMemoryProtection:</string>
 						<reference key="source" ref="1014"/>
 						<reference key="destination" ref="344560795"/>
@@ -1652,6 +1616,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">showDebugger:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="112049564"/>
+					</object>
+					<int key="connectionID">1091</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">openPreferences:</string>
 						<reference key="source" ref="187132439"/>
 						<reference key="destination" ref="609285721"/>
@@ -1676,11 +1648,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">openDisassembler:</string>
+						<string key="label">openDebugger:</string>
 						<reference key="source" ref="187132439"/>
 						<reference key="destination" ref="277655075"/>
 					</object>
-					<int key="connectionID">951</int>
+					<int key="connectionID">1090</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2482,20 +2454,6 @@
 						<reference key="parent" ref="79774020"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">1066</int>
-						<reference key="object" ref="143803963"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="412500413"/>
-						</object>
-						<reference key="parent" ref="0"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1067</int>
-						<reference key="object" ref="412500413"/>
-						<reference key="parent" ref="143803963"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">1068</int>
 						<reference key="object" ref="771488431"/>
 						<object class="NSMutableArray" key="children">
@@ -2568,8 +2526,6 @@
 					<string>1054.IBPluginDependency</string>
 					<string>1061.IBPluginDependency</string>
 					<string>1062.IBPluginDependency</string>
-					<string>1066.IBPluginDependency</string>
-					<string>1067.IBPluginDependency</string>
 					<string>1068.IBPluginDependency</string>
 					<string>1069.IBPluginDependency</string>
 					<string>1071.IBPluginDependency</string>
@@ -2804,8 +2760,6 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -2820,7 +2774,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1089</int>
+			<int key="maxID">1091</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2924,12 +2878,12 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>disassemblerController</string>
+							<string>debuggerController</string>
 							<string>tableView</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ZGDisassemblerController</string>
+							<string>ZGDebuggerController</string>
 							<string>NSTableView</string>
 						</object>
 					</object>
@@ -2937,14 +2891,14 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>disassemblerController</string>
+							<string>debuggerController</string>
 							<string>tableView</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">disassemblerController</string>
-								<string key="candidateClassName">ZGDisassemblerController</string>
+								<string key="name">debuggerController</string>
+								<string key="candidateClassName">ZGDebuggerController</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">tableView</string>
@@ -2958,7 +2912,7 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">ZGDisassemblerController</string>
+					<string key="className">ZGDebuggerController</string>
 					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3036,7 +2990,7 @@
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ZGDisassemblerController.h</string>
+						<string key="minorKey">./Classes/ZGDebuggerController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -3583,12 +3537,12 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>disassemblerController</string>
+							<string>debuggerController</string>
 							<string>tableView</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ZGDisassemblerController</string>
+							<string>ZGDebuggerController</string>
 							<string>NSTableView</string>
 						</object>
 					</object>
@@ -3596,14 +3550,14 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>disassemblerController</string>
+							<string>debuggerController</string>
 							<string>tableView</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">disassemblerController</string>
-								<string key="candidateClassName">ZGDisassemblerController</string>
+								<string key="name">debuggerController</string>
+								<string key="candidateClassName">ZGDebuggerController</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">tableView</string>

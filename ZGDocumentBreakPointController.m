@@ -38,7 +38,7 @@
 #import "ZGAppController.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGDocumentTableController.h"
-#import "ZGDisassemblerController.h"
+#import "ZGDebuggerController.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
@@ -137,7 +137,7 @@
 - (void)breakPointDidHit:(NSNumber *)address
 {
 	ZGMemoryAddress breakPointAddress = [address unsignedLongLongValue];
-	ZGInstruction *instruction = [[[ZGAppController sharedController] disassemblerController] findInstructionBeforeAddress:breakPointAddress inProcess:self.watchProcess];
+	ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:breakPointAddress inProcess:self.watchProcess];
 	
 	if (![self.foundInstructions containsObject:instruction])
 	{

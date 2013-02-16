@@ -336,7 +336,7 @@
 					</object>
 					<object class="NSMenuItem" id="209564508">
 						<reference key="NSMenu" ref="695330791"/>
-						<string key="NSTitle">Show in Disassembler</string>
+						<string key="NSTitle">Show in Debugger</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="1013634953"/>
@@ -2920,14 +2920,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">showDisassembler:</string>
-						<reference key="source" ref="613418571"/>
-						<reference key="destination" ref="209564508"/>
-					</object>
-					<int key="connectionID">100801</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">copy:</string>
 						<reference key="source" ref="613418571"/>
 						<reference key="destination" ref="739385263"/>
@@ -3069,6 +3061,14 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<reference key="destination" ref="103040148"/>
 					</object>
 					<int key="connectionID">100891</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">showDebugger:</string>
+						<reference key="source" ref="613418571"/>
+						<reference key="destination" ref="209564508"/>
+					</object>
+					<int key="connectionID">100892</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -5024,7 +5024,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">100891</int>
+			<int key="maxID">100892</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

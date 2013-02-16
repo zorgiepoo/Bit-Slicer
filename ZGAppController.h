@@ -37,7 +37,7 @@
 
 @class ZGPreferencesController;
 @class ZGMemoryViewer;
-@class ZGDisassemblerController;
+@class ZGDebuggerController;
 @class ZGBreakPointController;
 
 #define BIT_SLICER_VERSION_FILE @"https://dl.dropbox.com/u/10108199/bit_slicer/bit_slicer_version.plist"
@@ -46,7 +46,7 @@
 
 @property (readonly, strong, nonatomic) ZGPreferencesController *preferencesController;
 @property (readonly, strong, nonatomic) ZGMemoryViewer *memoryViewer;
-@property (readonly, strong, nonatomic) ZGDisassemblerController *disassemblerController;
+@property (readonly, strong, nonatomic) ZGDebuggerController *debuggerController;
 @property (readonly, strong, nonatomic) ZGBreakPointController *breakPointController;
 // lastSelectedProcessName keeps track of the last targeted process in a document
 @property (readwrite, copy, nonatomic) NSString *lastSelectedProcessName;

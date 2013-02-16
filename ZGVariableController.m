@@ -42,7 +42,7 @@
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
-#import "ZGDisassemblerController.h"
+#import "ZGDebuggerController.h"
 #import "ZGInstruction.h"
 
 @interface ZGVariableController ()
@@ -225,13 +225,13 @@
 	
 	ZGVariableType variableType = (ZGVariableType)[sender tag];
 	
-	// Try to get an initial address from the disassembler or the memory viewer's selection
+	// Try to get an initial address from the debugger or the memory viewer's selection
 	ZGMemoryAddress initialAddress = 0x0;
 	ZGMemorySize initialSize = 0;
 	
-	if (variableType == ZGByteArray && [[[[ZGAppController sharedController] disassemblerController] currentProcess] processID] == self.document.currentProcess.processID)
+	if (variableType == ZGByteArray && [[[[ZGAppController sharedController] debuggerController] currentProcess] processID] == self.document.currentProcess.processID)
 	{
-		NSArray *selectedInstructions = [[[ZGAppController sharedController] disassemblerController] selectedInstructions];
+		NSArray *selectedInstructions = [[[ZGAppController sharedController] debuggerController] selectedInstructions];
 		if (selectedInstructions.count > 0)
 		{
 			ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];

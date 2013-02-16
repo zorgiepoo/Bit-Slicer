@@ -35,7 +35,7 @@
 #import "ZGAppController.h"
 #import "ZGPreferencesController.h"
 #import "ZGMemoryViewer.h"
-#import "ZGDisassemblerController.h"
+#import "ZGDebuggerController.h"
 #import "ZGBreakPointController.h"
 #import "ZGProcess.h"
 #import "ZGProcessList.h"
@@ -45,7 +45,7 @@
 
 @property (readwrite, strong, nonatomic) ZGPreferencesController *preferencesController;
 @property (readwrite, strong, nonatomic) ZGMemoryViewer *memoryViewer;
-@property (readwrite, strong, nonatomic) ZGDisassemblerController *disassemblerController;
+@property (readwrite, strong, nonatomic) ZGDebuggerController *debuggerController;
 @property (readwrite, strong, nonatomic) ZGBreakPointController *breakPointController;
 
 @end
@@ -137,7 +137,7 @@ OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef th
 {
 	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
 	{
-		if (runningApplication.isActive && runningApplication.processIdentifier != getpid() && ![[[ZGAppController sharedController] disassemblerController] isProcessIdentifierHalted:runningApplication.processIdentifier])
+		if (runningApplication.isActive && runningApplication.processIdentifier != getpid() && ![[[ZGAppController sharedController] debuggerController] isProcessIdentifierHalted:runningApplication.processIdentifier])
 		{
 			ZGMemoryMap processTask = 0;
 			if (ZGGetTaskForProcess(runningApplication.processIdentifier, &processTask))
@@ -281,13 +281,13 @@ static BOOL didRegisteredHotKey;
         
 		completionHandler([[[self sharedController] memoryViewer] window], nil);
 	}
-	else if ([identifier isEqualToString:ZGDisassemblerIdentifier])
+	else if ([identifier isEqualToString:ZGDebuggerIdentifier])
 	{
 		[self.sharedController
-		 openDisassembler:nil
+		 openDebugger:nil
 		 showWindow:NO];
 		
-		completionHandler([[[self sharedController] disassemblerController] window], nil);
+		completionHandler([[[self sharedController] debuggerController] window], nil);
 	}
 }
 
@@ -337,27 +337,27 @@ static BOOL didRegisteredHotKey;
 	[self openMemoryViewer:sender showWindow:YES];
 }
 
-- (void)openDisassembler:(id)sender showWindow:(BOOL)shouldShowWindow
+- (void)openDebugger:(id)sender showWindow:(BOOL)shouldShowWindow
 {
-	// Testing for disassemblerController will ensure it'll be allocated
-	if (self.disassemblerController && shouldShowWindow)
+	// Testing for debuggerController will ensure it'll be allocated
+	if (self.debuggerController && shouldShowWindow)
 	{
-		[self.disassemblerController showWindow:nil];
+		[self.debuggerController showWindow:nil];
 	}
 }
 
-- (ZGDisassemblerController *)disassemblerController
+- (ZGDebuggerController *)debuggerController
 {
-	if (!_disassemblerController)
+	if (!_debuggerController)
 	{
-		_disassemblerController = [[ZGDisassemblerController alloc] init];
+		_debuggerController = [[ZGDebuggerController alloc] init];
 	}
-	return _disassemblerController;
+	return _debuggerController;
 }
 
-- (IBAction)openDisassembler:(id)sender
+- (IBAction)openDebugger:(id)sender
 {
-	[self openDisassembler:sender showWindow:YES];
+	[self openDebugger:sender showWindow:YES];
 }
 
 #define FAQ_URL @"http://portingteam.com/index.php/topic/4454-faq-information/"
