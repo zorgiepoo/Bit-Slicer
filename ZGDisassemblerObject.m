@@ -87,7 +87,6 @@ static void disassemblerTranslator(ud_t *object)
 		ud_set_input_buffer(self.object, self.bytes, size);
 		ud_set_mode(self.object, process.pointerSize * 8);
 		ud_set_syntax(self.object, disassemblerTranslator);
-		//ud_set_syntax(self.object, UD_SYN_INTEL);
 		ud_set_pc(self.object, address);
 	}
 	return self;
