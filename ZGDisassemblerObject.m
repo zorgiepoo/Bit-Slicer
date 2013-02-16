@@ -46,6 +46,26 @@
 
 @implementation ZGDisassemblerObject
 
+// Put "short" in short jump instructions to be less ambiguous
+static void disassemblerTranslator(ud_t *object)
+{
+	UD_SYN_INTEL(object);
+	if (ud_insn_len(object) == 2 && object->mnemonic >= UD_Ijo && object->mnemonic <= UD_Ijmp)
+	{
+		char *originalText = ud_insn_asm(object);
+		if (strstr(originalText, "short") == NULL)
+		{
+			NSMutableArray *textComponents = [NSMutableArray arrayWithArray:[@(originalText) componentsSeparatedByString:@" "]];
+			[textComponents insertObject:@"short" atIndex:1];
+			const char *text = [[textComponents componentsJoinedByString:@" "] UTF8String];
+			if (strlen(text)+1 <= sizeof(object->insn_buffer))
+			{
+				strncpy(object->insn_buffer, text, strlen(text)+1);
+			}
+		}
+	}
+}
+
 - (id)initWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address size:(ZGMemorySize)size bytes:(const void *)bytes breakPoints:(NSArray *)breakPoints
 {
 	self = [super init];
@@ -66,7 +86,8 @@
 		ud_init(self.object);
 		ud_set_input_buffer(self.object, self.bytes, size);
 		ud_set_mode(self.object, process.pointerSize * 8);
-		ud_set_syntax(self.object, UD_SYN_INTEL);
+		ud_set_syntax(self.object, disassemblerTranslator);
+		//ud_set_syntax(self.object, UD_SYN_INTEL);
 		ud_set_pc(self.object, address);
 	}
 	return self;
