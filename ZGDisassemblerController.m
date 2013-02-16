@@ -1322,11 +1322,9 @@ END_DEBUGGER_CHANGE:
 {
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
-		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
-		
 		if ([tableColumn.identifier isEqualToString:@"bytes"])
 		{
-			[self replaceInstructions:@[instruction] fromOldStringValues:@[instruction.variable.stringValue] toNewStringValues:@[object] actionName:@"Instruction Change"];
+			[self writeStringValue:object atInstructionFromIndex:(NSUInteger)rowIndex];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
@@ -1359,6 +1357,51 @@ END_DEBUGGER_CHANGE:
 }
 
 #pragma mark Modifying instructions
+
+- (void)writeStringValue:(NSString *)stringValue atInstructionFromIndex:(NSUInteger)initialInstructionIndex
+{
+	ZGInstruction *instruction = [self.instructions objectAtIndex:initialInstructionIndex];
+	
+	// Make sure the old and new value that we are writing have the same size in bytes, so that undo/redo will work correctly for different sizes
+	
+	ZGMemorySize newWriteSize = 0;
+	void *newWriteValue = valueFromString(self.currentProcess, stringValue, ZGByteArray, &newWriteSize);
+	if (newWriteValue)
+	{
+		if (newWriteSize > 0)
+		{
+			void *oldValue = calloc(1, newWriteSize);
+			if (oldValue)
+			{
+				NSUInteger instructionIndex = initialInstructionIndex;
+				ZGMemorySize writeIndex = 0;
+				while (writeIndex < newWriteSize && instructionIndex < self.instructions.count)
+				{
+					ZGInstruction *currentInstruction = [self.instructions objectAtIndex:instructionIndex];
+					for (ZGMemorySize valueIndex = 0; (writeIndex < newWriteSize) && (valueIndex < currentInstruction.variable.size); valueIndex++, writeIndex++)
+					{
+						*(char *)(oldValue + writeIndex) = *(char *)(currentInstruction.variable.value + valueIndex);
+					}
+					
+					instructionIndex++;
+				}
+				
+				if (writeIndex >= newWriteSize)
+				{
+					ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:newWriteValue size:newWriteSize address:instruction.variable.address type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+					
+					ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldValue size:newWriteSize address:instruction.variable.address type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+					
+					[self replaceInstructions:@[instruction] fromOldStringValues:@[oldVariable.stringValue] toNewStringValues:@[newVariable.stringValue] actionName:@"Instruction Change"];
+				}
+				
+				free(oldValue);
+			}
+		}
+		
+		free(newWriteValue);
+	}
+}
 
 - (void)replaceInstructions:(NSArray *)instructions fromOldStringValues:(NSArray *)oldStringValues toNewStringValues:(NSArray *)newStringValues actionName:(NSString *)actionName
 {
