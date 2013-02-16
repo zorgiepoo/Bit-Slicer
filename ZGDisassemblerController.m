@@ -1299,7 +1299,7 @@ END_DEBUGGER_CHANGE:
 		}
 		else if ([tableColumn.identifier isEqualToString:@"instruction"])
 		{
-			if ([tableView editedRow] == rowIndex)
+			if ([tableView editedRow] == rowIndex && (NSUInteger)[tableView editedColumn] == [[tableView tableColumns] indexOfObject:tableColumn])
 			{
 				// Show the instruction disassembled as if the instruction pointer wasn't involved (that is, address starting at 0)
 				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:0 size:instruction.variable.size bytes:instruction.variable.value breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
