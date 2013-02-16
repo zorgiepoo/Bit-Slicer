@@ -1299,7 +1299,23 @@ END_DEBUGGER_CHANGE:
 		}
 		else if ([tableColumn.identifier isEqualToString:@"instruction"])
 		{
-			result = instruction.text;
+			if ([tableView editedRow] == rowIndex)
+			{
+				// Show the instruction disassembled as if the instruction pointer wasn't involved (that is, address starting at 0)
+				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:0 size:instruction.variable.size bytes:instruction.variable.value breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
+				
+				__block id localResult = nil;
+				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop) {
+					localResult = disassembledText;
+					*stop = YES;
+				}];
+				
+				result = localResult;
+			}
+			else
+			{
+				result = instruction.text;
+			}
 		}
 		else if ([tableColumn.identifier isEqualToString:@"symbols"])
 		{
@@ -1325,6 +1341,10 @@ END_DEBUGGER_CHANGE:
 		if ([tableColumn.identifier isEqualToString:@"bytes"])
 		{
 			[self writeStringValue:object atInstructionFromIndex:(NSUInteger)rowIndex];
+		}
+		else if ([tableColumn.identifier isEqualToString:@"instruction"])
+		{
+			[self writeInstructionText:object atInstructionFromIndex:(NSUInteger)rowIndex];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
@@ -1357,6 +1377,55 @@ END_DEBUGGER_CHANGE:
 }
 
 #pragma mark Modifying instructions
+
+- (void)writeInstructionText:(NSString *)instructionText atInstructionFromIndex:(NSUInteger)instructionIndex
+{
+	NSString *outputFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"assembler_output.XXXXXX"];
+	const char *tempFileTemplateCString = [outputFileTemplate fileSystemRepresentation];
+	char *tempFileNameCString = malloc(strlen(tempFileTemplateCString) + 1);
+	strcpy(tempFileNameCString, tempFileTemplateCString);
+	int fileDescriptor = mkstemp(tempFileNameCString);
+	
+	if (fileDescriptor != -1)
+	{
+		close(fileDescriptor);
+		NSString *outputFilePath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:tempFileNameCString length:strlen(tempFileNameCString)];
+		
+		NSTask *task = [[NSTask alloc] init];
+		[task setLaunchPath:[[NSBundle mainBundle] pathForResource:@"yasm" ofType:nil]];
+		[task setArguments:@[@"--arch=x86", @"-", @"-o", outputFilePath]];
+		
+		NSPipe *inputPipe = [NSPipe pipe];
+		[task setStandardInput:inputPipe];
+		
+		[task launch];
+		
+		NSData *inputData = [[NSString stringWithFormat:@"BITS %lld\n%@\n", self.currentProcess.pointerSize * 8, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
+		
+		[[inputPipe fileHandleForWriting] writeData:inputData];
+		[[inputPipe fileHandleForWriting] closeFile];
+		
+		[task waitUntilExit];
+		
+		if ([task terminationStatus] == EXIT_SUCCESS)
+		{	
+			NSData *outputData = [NSData dataWithContentsOfFile:outputFilePath];
+			if (outputData)
+			{
+				ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)[outputData bytes] size:[outputData length] address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+				
+				[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
+			}
+		}
+		
+		if ([[NSFileManager defaultManager] fileExistsAtPath:outputFilePath])
+		{
+			[[NSFileManager defaultManager] removeItemAtPath:outputFilePath error:NULL];
+		}
+	}
+	
+	free(tempFileNameCString);
+}
 
 - (void)writeStringValue:(NSString *)stringValue atInstructionFromIndex:(NSUInteger)initialInstructionIndex
 {

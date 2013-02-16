@@ -519,6 +519,7 @@
 																	</object>
 																	<int key="NSResizingMask">3</int>
 																	<bool key="NSIsResizeable">YES</bool>
+																	<bool key="NSIsEditable">YES</bool>
 																	<reference key="NSTableView" ref="461663476"/>
 																</object>
 																<object class="NSTableColumn" id="271135630">
@@ -2415,20 +2416,17 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGRegistersController</string>
 					<string key="superclassName">NSResponder</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="changeQualifier:">id</string>
-						<string key="copy:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="changeQualifier:">
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">changeQualifier:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">changeQualifier:</string>
+						<object class="IBActionInfo" key="NS.object.0">
 							<string key="name">changeQualifier:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="copy:">
-							<string key="name">copy:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
+					</object>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="disassemblerController">ZGDisassemblerController</string>
 						<string key="tableView">NSTableView</string>

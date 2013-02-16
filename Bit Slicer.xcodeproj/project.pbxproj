@@ -61,6 +61,7 @@
 		77E652FF1692E77A00D84A7F /* ZGRunningProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652FE1692E77900D84A7F /* ZGRunningProcess.m */; };
 		77F6096F13DBCDD300FD5D92 /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */; };
 		77F6097013DBCE2000FD5D92 /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */; };
+		77F82C1F16CF6FC10038AC0A /* yasm in Resources */ = {isa = PBXBuildFile; fileRef = 77F82C1E16CF6FC10038AC0A /* yasm */; };
 		77F8D8CB16C3531D00C52CE2 /* ZGBacktraceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F8D8CA16C3531D00C52CE2 /* ZGBacktraceController.m */; };
 		77F8D8D216C4A12600C52CE2 /* ZGRegistersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F8D8D116C4A12600C52CE2 /* ZGRegistersController.m */; };
 		77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FC461F12237F71003CB09B /* NSStringAdditions.m */; };
@@ -186,6 +187,7 @@
 		77E652FD1692E77900D84A7F /* ZGRunningProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRunningProcess.h; sourceTree = "<group>"; };
 		77E652FE1692E77900D84A7F /* ZGRunningProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRunningProcess.m; sourceTree = "<group>"; };
 		77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ShortcutRecorder.framework; sourceTree = "<group>"; };
+		77F82C1E16CF6FC10038AC0A /* yasm */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = yasm; sourceTree = "<group>"; };
 		77F8D8C916C3531D00C52CE2 /* ZGBacktraceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBacktraceController.h; sourceTree = "<group>"; };
 		77F8D8CA16C3531D00C52CE2 /* ZGBacktraceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGBacktraceController.m; sourceTree = "<group>"; };
 		77F8D8D016C4A12500C52CE2 /* ZGRegistersController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRegistersController.h; sourceTree = "<group>"; };
@@ -312,6 +314,7 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				77F82C1E16CF6FC10038AC0A /* yasm */,
 				77DEA41116C974C700A16D57 /* bitslicericon.iconset */,
 				8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
@@ -486,6 +489,7 @@
 				7763470416881166003D01C9 /* DataInspectorView.xib in Resources */,
 				77329B59168CFE6C007DCAE2 /* ZGDisassemblerController.xib in Resources */,
 				77DEA41216C974C700A16D57 /* bitslicericon.iconset in Resources */,
+				77F82C1F16CF6FC10038AC0A /* yasm in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
