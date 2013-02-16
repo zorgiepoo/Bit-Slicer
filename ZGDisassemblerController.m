@@ -1398,6 +1398,9 @@ END_DEBUGGER_CHANGE:
 		NSPipe *inputPipe = [NSPipe pipe];
 		[task setStandardInput:inputPipe];
 		
+		NSPipe *errorPipe = [NSPipe pipe];
+		[task setStandardError:errorPipe];
+		
 		[task launch];
 		
 		NSData *inputData = [[NSString stringWithFormat:@"BITS %lld\n%@\n", self.currentProcess.pointerSize * 8, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
@@ -1416,6 +1419,16 @@ END_DEBUGGER_CHANGE:
 				
 				[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
 			}
+		}
+		else
+		{
+			NSData *errorData = [[errorPipe fileHandleForReading] readDataToEndOfFile];
+			NSString *errorString = nil;
+			if (errorData)
+			{
+				errorString = [[[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] objectAtIndex:0];
+			}
+			NSRunAlertPanel(@"Failed to Modify Instruction", @"An error (%@) occured trying to assemble %@.", @"OK", nil, nil, errorString, instructionText);
 		}
 		
 		if ([[NSFileManager defaultManager] fileExistsAtPath:outputFilePath])
