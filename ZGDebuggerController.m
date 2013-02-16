@@ -32,7 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGDisassemblerController.h"
+#import "ZGDebuggerController.h"
 #import "ZGAppController.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
@@ -49,7 +49,7 @@
 #import "ZGBacktraceController.h"
 #import "ZGMemoryViewer.h"
 
-@interface ZGDisassemblerController ()
+@interface ZGDebuggerController ()
 
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSTextField *addressTextField;
@@ -78,10 +78,10 @@
 
 @end
 
-#define ZGDisassemblerAddressField @"ZGDisassemblerAddressField"
-#define ZGDisassemblerProcessName @"ZGDisassemblerProcessName"
+#define ZGDebuggerAddressField @"ZGDisassemblerAddressField"
+#define ZGDebuggerProcessName @"ZGDisassemblerProcessName"
 
-@implementation ZGDisassemblerController
+@implementation ZGDebuggerController
 
 #pragma mark Birth & Death
 
@@ -105,21 +105,21 @@
 {
     [super encodeRestorableStateWithCoder:coder];
 	
-	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDisassemblerAddressField];
-	[coder encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject name] forKey:ZGDisassemblerProcessName];
+	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDebuggerAddressField];
+	[coder encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject name] forKey:ZGDebuggerProcessName];
 }
 
 - (void)restoreStateWithCoder:(NSCoder *)coder
 {
 	[super restoreStateWithCoder:coder];
 	
-	NSString *disassemblerAddressField = [coder decodeObjectForKey:ZGDisassemblerAddressField];
-	if (disassemblerAddressField)
+	NSString *addressField = [coder decodeObjectForKey:ZGDebuggerAddressField];
+	if (addressField)
 	{
-		self.addressTextField.stringValue = disassemblerAddressField;
+		self.addressTextField.stringValue = addressField;
 	}
 	
-	self.desiredProcessName = [coder decodeObjectForKey:ZGDisassemblerProcessName];
+	self.desiredProcessName = [coder decodeObjectForKey:ZGDebuggerProcessName];
 	
 	[self updateRunningProcesses];
 	
@@ -186,7 +186,7 @@
 	{
 		self.window.restorable = YES;
 		self.window.restorationClass = ZGAppController.class;
-		self.window.identifier = ZGDisassemblerIdentifier;
+		self.window.identifier = ZGDebuggerIdentifier;
 		[self markChanges];
 	}
     

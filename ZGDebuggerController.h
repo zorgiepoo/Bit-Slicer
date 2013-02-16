@@ -35,12 +35,12 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
-#define ZGDisassemblerIdentifier @"ZGDisassemblerIdentifier"
+#define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
 
 @class ZGProcess;
 @class ZGInstruction;
 
-@interface ZGDisassemblerController : NSWindowController <NSTableViewDataSource>
+@interface ZGDebuggerController : NSWindowController <NSTableViewDataSource>
 
 @property (readonly) ZGProcess *currentProcess;
 @property (readwrite, nonatomic) BOOL disassembling;

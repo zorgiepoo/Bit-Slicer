@@ -40,7 +40,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">ZGDisassemblerController</string>
+				<string key="NSClassName">ZGDebuggerController</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
@@ -190,7 +190,7 @@
 				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
-				<string key="NSWindowContentMinSize">{614, 419}</string>
+				<string key="NSWindowContentMinSize">{700, 419}</string>
 				<object class="NSView" key="NSWindowView" id="351304596">
 					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
@@ -388,7 +388,7 @@
 															<string key="NSFrameSize">{816, 278}</string>
 															<reference key="NSSuperview" ref="781794399"/>
 															<reference key="NSWindow"/>
-															<reference key="NSNextKeyView" ref="48000623"/>
+															<reference key="NSNextKeyView" ref="1043616540"/>
 															<string key="NSReuseIdentifierKey">_NS:13</string>
 															<bool key="NSEnabled">YES</bool>
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -497,7 +497,7 @@
 																</object>
 																<object class="NSTableColumn" id="1033942422">
 																	<string key="NSIdentifier">instruction</string>
-																	<double key="NSWidth">196.19921875</double>
+																	<double key="NSWidth">269.9453125</double>
 																	<double key="NSMinWidth">40</double>
 																	<double key="NSMaxWidth">10000</double>
 																	<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -524,7 +524,7 @@
 																</object>
 																<object class="NSTableColumn" id="271135630">
 																	<string key="NSIdentifier">symbols</string>
-																	<double key="NSWidth">232</double>
+																	<double key="NSWidth">158</double>
 																	<double key="NSMinWidth">10</double>
 																	<double key="NSMaxWidth">3.4028234663852886e+38</double>
 																	<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -544,7 +544,7 @@
 																		<reference key="NSBackgroundColor" ref="463359550"/>
 																		<reference key="NSTextColor" ref="752346256"/>
 																	</object>
-																	<int key="NSResizingMask">2</int>
+																	<int key="NSResizingMask">3</int>
 																	<bool key="NSIsResizeable">YES</bool>
 																	<reference key="NSTableView" ref="461663476"/>
 																</object>
@@ -655,7 +655,7 @@
 											<string key="NSFrameSize">{818, 296}</string>
 											<reference key="NSSuperview" ref="965675663"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="781794399"/>
+											<reference key="NSNextKeyView" ref="48000623"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<int key="NSsFlags">133682</int>
 											<reference key="NSVScroller" ref="1043616540"/>
@@ -698,7 +698,7 @@
 																	<string key="NSFrameSize">{550, 191}</string>
 																	<reference key="NSSuperview" ref="313400987"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="437389912"/>
+																	<reference key="NSNextKeyView" ref="49433778"/>
 																	<string key="NSReuseIdentifierKey">_NS:13</string>
 																	<bool key="NSEnabled">YES</bool>
 																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -820,7 +820,7 @@
 													<string key="NSFrameSize">{552, 209}</string>
 													<reference key="NSSuperview" ref="315342891"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="313400987"/>
+													<reference key="NSNextKeyView" ref="437389912"/>
 													<string key="NSReuseIdentifierKey">_NS:9</string>
 													<int key="NSsFlags">133682</int>
 													<reference key="NSVScroller" ref="49433778"/>
@@ -846,7 +846,7 @@
 																	<string key="NSFrameSize">{263, 191}</string>
 																	<reference key="NSSuperview" ref="740030204"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="504488663"/>
+																	<reference key="NSNextKeyView" ref="59921309"/>
 																	<string key="NSReuseIdentifierKey">_NS:13</string>
 																	<bool key="NSEnabled">YES</bool>
 																	<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -1107,6 +1107,7 @@
 															<string key="NSFrame">{{1, 197}, {101, 16}}</string>
 															<reference key="NSSuperview" ref="291824815"/>
 															<reference key="NSWindow"/>
+															<reference key="NSNextKeyView"/>
 															<string key="NSReuseIdentifierKey">_NS:60</string>
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 															<int key="NSsFlags">1</int>
@@ -1133,7 +1134,7 @@
 													<string key="NSFrame">{{553, 0}, {265, 209}}</string>
 													<reference key="NSSuperview" ref="315342891"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="740030204"/>
+													<reference key="NSNextKeyView" ref="504488663"/>
 													<string key="NSReuseIdentifierKey">_NS:9</string>
 													<int key="NSsFlags">133682</int>
 													<reference key="NSVScroller" ref="59921309"/>
@@ -1178,7 +1179,7 @@
 					<reference key="NSNextKeyView" ref="560007448"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
-				<string key="NSMinSize">{614, 441}</string>
+				<string key="NSMinSize">{700, 441}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">ZGDisassemblerWindow</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
@@ -1496,19 +1497,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">disassemblerController</string>
-						<reference key="source" ref="133985102"/>
-						<reference key="destination" ref="1001"/>
-					</object>
-					<int key="connectionID">204</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">tableView</string>
 						<reference key="source" ref="133985102"/>
 						<reference key="destination" ref="799590185"/>
 					</object>
 					<int key="connectionID">201</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">debuggerController</string>
+						<reference key="source" ref="133985102"/>
+						<reference key="destination" ref="1001"/>
+					</object>
+					<int key="connectionID">289</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1544,11 +1545,11 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">disassemblerController</string>
+						<string key="label">debuggerController</string>
 						<reference key="source" ref="832662652"/>
 						<reference key="destination" ref="1001"/>
 					</object>
-					<int key="connectionID">249</int>
+					<int key="connectionID">290</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -2251,7 +2252,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">288</int>
+			<int key="maxID">290</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2259,13 +2260,13 @@
 					<string key="className">ZGBacktraceController</string>
 					<string key="superclassName">NSResponder</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="disassemblerController">ZGDisassemblerController</string>
+						<string key="debuggerController">ZGDebuggerController</string>
 						<string key="tableView">NSTableView</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="disassemblerController">
-							<string key="name">disassemblerController</string>
-							<string key="candidateClassName">ZGDisassemblerController</string>
+						<object class="IBToOneOutletInfo" key="debuggerController">
+							<string key="name">debuggerController</string>
+							<string key="candidateClassName">ZGDebuggerController</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="tableView">
 							<string key="name">tableView</string>
@@ -2278,7 +2279,7 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">ZGDisassemblerController</string>
+					<string key="className">ZGDebuggerController</string>
 					<string key="superclassName">NSWindowController</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressTextField">NSTextField</string>
@@ -2326,7 +2327,7 @@
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/ZGDisassemblerController.h</string>
+						<string key="minorKey">./Classes/ZGDebuggerController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -2344,13 +2345,13 @@
 						</object>
 					</object>
 					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="disassemblerController">ZGDisassemblerController</string>
+						<string key="debuggerController">ZGDebuggerController</string>
 						<string key="tableView">NSTableView</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="disassemblerController">
-							<string key="name">disassemblerController</string>
-							<string key="candidateClassName">ZGDisassemblerController</string>
+						<object class="IBToOneOutletInfo" key="debuggerController">
+							<string key="name">debuggerController</string>
+							<string key="candidateClassName">ZGDebuggerController</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="tableView">
 							<string key="name">tableView</string>
