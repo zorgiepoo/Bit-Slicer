@@ -352,7 +352,14 @@
 {
 	void (^updateSymbolsBlock)(void) = ^{
 		NSString *atosPath = @"/usr/bin/atos";
-		if ([[NSFileManager defaultManager] fileExistsAtPath:atosPath])
+		if (![[NSFileManager defaultManager] fileExistsAtPath:atosPath])
+		{
+			static dispatch_once_t reportAtosNotFound = 0;
+			dispatch_once(&reportAtosNotFound, ^{
+				NSLog(@"ERROR: /usr/bin/atos was not found.. Failed to retrieve debug symbols");
+			});
+		}
+		else
 		{
 			NSTask *atosTask = [[NSTask alloc] init];
 			[atosTask setLaunchPath:atosPath];
