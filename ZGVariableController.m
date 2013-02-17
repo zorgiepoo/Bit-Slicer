@@ -508,8 +508,24 @@
 		{
 			NSArray *bytesArray = [stringObject componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
 			
-			// this is the size the user wants
-			variable.size = bytesArray.count;
+			if (variable.size != bytesArray.count)
+			{
+				// this is the size the user wants
+				[self editVariables:@[variable] requestedSizes:@[@(bytesArray.count)]];
+			}
+			
+			// Update old string value to be the same size as new string value, so that undo/redo's from one size to another will work more nicely
+			void *oldData = NULL;
+			ZGMemorySize oldSize = variable.size;
+			
+			if (ZGReadBytes(self.document.currentProcess.processTask, variable.address, &oldData, &oldSize))
+			{
+				ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldData size:oldSize address:variable.address type:ZGByteArray qualifier:ZGSigned pointerSize:self.document.currentProcess.pointerSize];
+				
+				oldStringValue = oldVariable.stringValue;
+				
+				ZGFreeBytes(self.document.currentProcess.processTask, oldData, oldSize);
+			}
 			
 			// this is the maximum size allocated needed
 			byteArrayValue = malloc((size_t)variable.size);
