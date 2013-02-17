@@ -105,7 +105,7 @@
 	
 	self.document.currentProcess.isWatchingBreakPoint = NO;
 	
-	[self.document.searchController resumeFromTask];
+	[self.document.searchController resumeFromTaskAndMakeSearchFieldFirstResponder:NO];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context

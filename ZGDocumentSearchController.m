@@ -199,7 +199,7 @@
 	self.document.endingAddressLabel.textColor = NSColor.disabledControlTextColor;
 }
 
-- (void)resumeFromTask
+- (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder
 {
 	self.isBusy = NO;
 	
@@ -242,12 +242,20 @@
 	
 	self.document.runningApplicationsPopUpButton.enabled = YES;
 	
-	[self.document.watchWindow makeFirstResponder:self.document.searchValueTextField];
+	if (shouldMakeSearchFieldFirstResponder)
+	{
+		[self.document.watchWindow makeFirstResponder:self.document.searchValueTextField];
+	}
 	
 	if (!self.document.currentProcess.valid)
 	{
 		[self.document removeRunningProcessFromPopupButton:nil];
 	}
+}
+
+- (void)resumeFromTask
+{
+	[self resumeFromTaskAndMakeSearchFieldFirstResponder:YES];
 }
 
 #pragma mark Update UI

@@ -47,6 +47,7 @@
 - (void)cancelTask;
 - (void)prepareTaskWithEscapeTitle:(NSString *)escapeTitle;
 - (void)prepareTask;
+- (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder;
 - (void)resumeFromTask;
 
 - (void)clear;
