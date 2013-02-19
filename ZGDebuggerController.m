@@ -306,9 +306,10 @@
 		
 		[self toggleBacktraceView:NSOffState];
 		
+		// ATOS_PATH may not exist if user is on SL unlesss he has developer tools installed, it should if user is on ML. Not sure about Lion.
 		if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_SHOWED_ATOS_WARNING] && ![[NSFileManager defaultManager] fileExistsAtPath:ATOS_PATH])
 		{
-			NSLog(@"ERROR: /usr/bin/atos was not found.. Failed to retrieve debug symbols");
+			NSLog(@"ERROR: %@ was not found.. Failed to retrieve debug symbols", ATOS_PATH);
 			
 			NSRunAlertPanel(@"Debug Symbols won't be Retrieved", @"In order to retrieve debug symbols, you may have to install the Xcode developer tools, which includes the atos tool that is needed.", @"OK", nil, nil, nil);
 			
