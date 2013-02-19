@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		1DDD582C0DA1D0D100B32029 /* MyDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58280DA1D0D100B32029 /* MyDocument.xib */; };
 		1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD582A0DA1D0D100B32029 /* MainMenu.xib */; };
+		77004FA616D35032008ED2C8 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77004FA516D35032008ED2C8 /* Sparkle.framework */; };
+		77004FA716D35049008ED2C8 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 77004FA516D35032008ED2C8 /* Sparkle.framework */; };
 		7701EF3F1696A28500877373 /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 7701EF3D1696A28500877373 /* mach_excServer.c */; };
 		7701EF401696A28500877373 /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 7701EF3E1696A28500877373 /* mach_excUser.c */; };
 		770930AC15B8F72F009705A6 /* ZGMemoryDumpController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930AB15B8F72F009705A6 /* ZGMemoryDumpController.m */; };
@@ -80,6 +82,7 @@
 			files = (
 				77F6097013DBCE2000FD5D92 /* ShortcutRecorder.framework in Copy Frameworks */,
 				772AACD515E1D01F00E1F788 /* HexFiend.framework in Copy Frameworks */,
+				77004FA716D35049008ED2C8 /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -96,6 +99,7 @@
 		2A37F4B0FDCFA73011CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		77004FA516D35032008ED2C8 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		7701EF3C1696A28500877373 /* mach_exc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mach_exc.h; path = mach_exc/mach_exc.h; sourceTree = "<group>"; };
 		7701EF3D1696A28500877373 /* mach_excServer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excServer.c; path = mach_exc/mach_excServer.c; sourceTree = "<group>"; };
 		7701EF3E1696A28500877373 /* mach_excUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excUser.c; path = mach_exc/mach_excUser.c; sourceTree = "<group>"; };
@@ -210,6 +214,7 @@
 				778BA6611363E972008ACD6B /* Ruby.framework in Frameworks */,
 				77F6096F13DBCDD300FD5D92 /* ShortcutRecorder.framework in Frameworks */,
 				772AACD415E1CCFA00E1F788 /* HexFiend.framework in Frameworks */,
+				77004FA616D35032008ED2C8 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +224,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				77004FA516D35032008ED2C8 /* Sparkle.framework */,
 				772AACD315E1CCFA00E1F788 /* HexFiend.framework */,
 				77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */,
 				778BA6601363E972008ACD6B /* Ruby.framework */,

@@ -35,6 +35,13 @@
 #import "ZGPreferencesController.h"
 #import "ZGAppController.h"
 
+#import <Sparkle/Sparkle.h>
+
+#define SU_FEED_URL_KEY @"SUFeedURL"
+
+#define APPCAST_URL @"http://zorg.tejat.net/bitslicer/appcast.xml"
+#define ALPHA_APPCAST_URL @"http://zorg.tejat.net/bitslicer/appcast_alpha.xml"
+
 @interface ZGPreferencesController ()
 
 @property (assign) IBOutlet SRRecorderControl *hotkeyRecorder;
@@ -52,12 +59,12 @@
 		@{
 			ZG_HOT_KEY : @((NSInteger)INVALID_KEY_CODE),
 			ZG_HOT_KEY_MODIFIER : @((NSInteger)0),
-			ZG_CHECK_FOR_UPDATES : @(YES),
 			ZG_CHECK_FOR_ALPHA_UPDATES : @(NO),
 			ZG_EXPAND_DOCUMENT_OPTIONS : @(NO),
 			ZG_REGISTER_TYPES : @{},
 			ZG_DEBUG_QUALIFIER : @(0),
 			ZG_SHOWED_ATOS_WARNING : @(NO),
+			SU_FEED_URL_KEY : APPCAST_URL,
 		}];
 }
 
@@ -70,8 +77,22 @@
 	return self;
 }
 
+- (void)updateFeedURL
+{
+	if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
+	{
+		[NSUserDefaults.standardUserDefaults setObject:ALPHA_APPCAST_URL forKey:SU_FEED_URL_KEY];
+		[[SUUpdater sharedUpdater] setFeedURL:[NSURL URLWithString:ALPHA_APPCAST_URL]];
+	}
+	else
+	{
+		[NSUserDefaults.standardUserDefaults setObject:APPCAST_URL forKey:SU_FEED_URL_KEY];
+		[[SUUpdater sharedUpdater] setFeedURL:[NSURL URLWithString:APPCAST_URL]];
+	}
+}
+
 - (void)windowDidLoad
-{	
+{
 	[self.hotkeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
 	
 	NSInteger hotkeyCode = [NSUserDefaults.standardUserDefaults integerForKey:ZG_HOT_KEY];
@@ -93,6 +114,7 @@
 		if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
 		{
 			self.checkForAlphaUpdatesButton.state = NSOnState;
+			[[SUUpdater sharedUpdater] setFeedURL:[NSURL URLWithString:ALPHA_APPCAST_URL]];
 		}
 	}
 	else
@@ -100,6 +122,8 @@
 		self.checkForAlphaUpdatesButton.enabled = NO;
 		self.checkForUpdatesButton.state = NSOffState;
 	}
+	
+	[self updateFeedURL];
 }
 
 - (void)shortcutRecorder:(SRRecorderControl *)aRecorder keyComboDidChange:(KeyCombo)newKeyCombo
@@ -133,6 +157,8 @@
 	[NSUserDefaults.standardUserDefaults
 	 setBool:(self.checkForUpdatesButton.state == NSOnState)
 	 forKey:ZG_CHECK_FOR_UPDATES];
+	
+	[self updateFeedURL];
 }
 
 - (IBAction)checkForAlphaUpdatesButton:(id)sender
@@ -140,11 +166,8 @@
 	[NSUserDefaults.standardUserDefaults
 	 setBool:self.checkForAlphaUpdatesButton.state == NSOnState
 	 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
-}
-
-- (void)updateAlphaUpdatesUI
-{
-	self.checkForAlphaUpdatesButton.state = [NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+	
+	[self updateFeedURL];
 }
 
 @end

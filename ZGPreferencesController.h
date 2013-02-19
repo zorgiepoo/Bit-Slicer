@@ -39,7 +39,7 @@
 #define INVALID_KEY_CODE -1
 #define ZG_HOT_KEY_MODIFIER @"ZG_HOT_KEY_MODIFIER"
 #define ZG_HOT_KEY @"ZG_HOT_KEY_CODE"
-#define ZG_CHECK_FOR_UPDATES @"ZG_CHECK_FOR_UPDATES_2"
+#define ZG_CHECK_FOR_UPDATES @"SUEnableAutomaticChecks"
 #define ZG_CHECK_FOR_ALPHA_UPDATES @"ZG_CHECK_FOR_ALPHA_UPDATES_2"
 #define ZG_EXPAND_DOCUMENT_OPTIONS @"ZG_EXPAND_OPTIONS"
 #define ZG_REGISTER_TYPES @"ZG_REGISTER_TYPES"
@@ -47,7 +47,5 @@
 #define ZG_SHOWED_ATOS_WARNING @"ZG_SHOWED_ATOS_WARNING"
 
 @interface ZGPreferencesController : NSWindowController
-
-- (void)updateAlphaUpdatesUI;
 
 @end
