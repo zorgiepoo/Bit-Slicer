@@ -81,7 +81,7 @@
 #define ZGDebuggerAddressField @"ZGDisassemblerAddressField"
 #define ZGDebuggerProcessName @"ZGDisassemblerProcessName"
 
-#define ATOS_PATH @"/usr/bin/atfos"
+#define ATOS_PATH @"/usr/bin/atos"
 
 @implementation ZGDebuggerController
 
