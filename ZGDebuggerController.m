@@ -81,6 +81,8 @@
 #define ZGDebuggerAddressField @"ZGDisassemblerAddressField"
 #define ZGDebuggerProcessName @"ZGDisassemblerProcessName"
 
+#define ATOS_PATH @"/usr/bin/atfos"
+
 @implementation ZGDebuggerController
 
 #pragma mark Birth & Death
@@ -303,6 +305,15 @@
 		}
 		
 		[self toggleBacktraceView:NSOffState];
+		
+		if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_SHOWED_ATOS_WARNING] && ![[NSFileManager defaultManager] fileExistsAtPath:ATOS_PATH])
+		{
+			NSLog(@"ERROR: /usr/bin/atos was not found.. Failed to retrieve debug symbols");
+			
+			NSRunAlertPanel(@"Debug Symbols won't be Retrieved", @"In order to retrieve debug symbols, you may have to install the Xcode developer tools, which includes the atos tool that is needed.", @"OK", nil, nil, nil);
+			
+			[[NSUserDefaults standardUserDefaults] setBool:YES forKey:ZG_SHOWED_ATOS_WARNING];
+		}
 	}
 	
 	if (self.currentProcess)
@@ -351,18 +362,10 @@
 - (void)updateSymbolsForInstructions:(NSArray *)instructions asynchronously:(BOOL)isAsynchronous completionHandler:(void (^)(void))completionHandler
 {
 	void (^updateSymbolsBlock)(void) = ^{
-		NSString *atosPath = @"/usr/bin/atos";
-		if (![[NSFileManager defaultManager] fileExistsAtPath:atosPath])
-		{
-			static dispatch_once_t reportAtosNotFound = 0;
-			dispatch_once(&reportAtosNotFound, ^{
-				NSLog(@"ERROR: /usr/bin/atos was not found.. Failed to retrieve debug symbols");
-			});
-		}
-		else
+		if ([[NSFileManager defaultManager] fileExistsAtPath:ATOS_PATH])
 		{
 			NSTask *atosTask = [[NSTask alloc] init];
-			[atosTask setLaunchPath:atosPath];
+			[atosTask setLaunchPath:ATOS_PATH];
 			[atosTask setArguments:@[@"-p", [NSString stringWithFormat:@"%d", self.currentProcess.processID]]];
 			
 			NSPipe *inputPipe = [NSPipe pipe];
