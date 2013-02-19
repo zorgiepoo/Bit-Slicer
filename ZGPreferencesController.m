@@ -91,6 +91,27 @@
 	}
 }
 
+- (IBAction)showWindow:(id)sender
+{
+	[super showWindow:nil];
+	
+	if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_UPDATES])
+	{
+		if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
+		{
+			self.checkForAlphaUpdatesButton.state = NSOnState;
+			[[SUUpdater sharedUpdater] setFeedURL:[NSURL URLWithString:ALPHA_APPCAST_URL]];
+		}
+	}
+	else
+	{
+		self.checkForAlphaUpdatesButton.enabled = NO;
+		self.checkForUpdatesButton.state = NSOffState;
+	}
+	
+	[self updateFeedURL];
+}
+
 - (void)windowDidLoad
 {
 	[self.hotkeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
@@ -108,22 +129,6 @@
 	hotkeyCombo.flags = SRCarbonToCocoaFlags([[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY_MODIFIER]);
 	
 	self.hotkeyRecorder.keyCombo = hotkeyCombo;
-	
-	if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_UPDATES])
-	{
-		if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
-		{
-			self.checkForAlphaUpdatesButton.state = NSOnState;
-			[[SUUpdater sharedUpdater] setFeedURL:[NSURL URLWithString:ALPHA_APPCAST_URL]];
-		}
-	}
-	else
-	{
-		self.checkForAlphaUpdatesButton.enabled = NO;
-		self.checkForUpdatesButton.state = NSOffState;
-	}
-	
-	[self updateFeedURL];
 }
 
 - (void)shortcutRecorder:(SRRecorderControl *)aRecorder keyComboDidChange:(KeyCombo)newKeyCombo
