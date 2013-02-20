@@ -158,6 +158,11 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 		}
 	}
 	
+	if (mach_vm_deallocate(current_task(), (mach_vm_address_t)threadList, threadListCount * sizeof(thread_act_t)) != KERN_SUCCESS)
+	{
+		NSLog(@"Failed to deallocate thread list in removeWatchPoint...");
+	}
+	
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[[[ZGAppController sharedController] breakPointController] removeBreakPoint:breakPoint];
 	});
@@ -704,6 +709,11 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		{
 			NSLog(@"Failed to find available debug register for thread %d", threadList[threadIndex]);
 		}
+	}
+	
+	if (mach_vm_deallocate(current_task(), (mach_vm_address_t)threadList, threadListCount * sizeof(thread_act_t)) != KERN_SUCCESS)
+	{
+		NSLog(@"Failed to deallocate thread list in addWatchpointOnVariable...");
 	}
 	
 	ZGResumeTask(process.processTask);
