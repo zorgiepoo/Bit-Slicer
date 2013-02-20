@@ -1423,10 +1423,18 @@ END_DEBUGGER_CHANGE:
 		
 		if ([task terminationStatus] == EXIT_SUCCESS)
 		{	
-			NSData *outputData = [NSData dataWithContentsOfFile:outputFilePath];
+			NSMutableData *outputData = [NSMutableData dataWithContentsOfFile:outputFilePath];
 			if (outputData)
 			{
-				ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)[outputData bytes] size:[outputData length] address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+				// If we are modifying the instruction to make it smaller, fill the rest unused space with NOP's
+				ZGInstruction *firstInstruction = [self.instructions objectAtIndex:instructionIndex];
+				for (ZGMemorySize remainingDataIndex = outputData.length; remainingDataIndex < firstInstruction.variable.size; remainingDataIndex++)
+				{
+					int8_t nopValue = 0x90;
+					[outputData appendBytes:&nopValue length:sizeof(int8_t)];
+				}
+				
+				ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
 				
 				[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
 			}
