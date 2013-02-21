@@ -1426,12 +1426,25 @@ END_DEBUGGER_CHANGE:
 			NSMutableData *outputData = [NSMutableData dataWithContentsOfFile:outputFilePath];
 			if (outputData)
 			{
-				// If we are modifying the instruction to make it smaller, fill the rest unused space with NOP's
+				// Fill leftover bytes with NOP's so that the instructions won't 'slide'
 				ZGInstruction *firstInstruction = [self.instructions objectAtIndex:instructionIndex];
-				for (ZGMemorySize remainingDataIndex = outputData.length; remainingDataIndex < firstInstruction.variable.size; remainingDataIndex++)
+				NSUInteger originalOutputLength = outputData.length;
+				
+				for (ZGMemorySize currentInstructionIndex = instructionIndex; currentInstructionIndex < self.instructions.count; currentInstructionIndex++)
 				{
-					int8_t nopValue = 0x90;
-					[outputData appendBytes:&nopValue length:sizeof(int8_t)];
+					ZGInstruction *currentInstruction = [self.instructions objectAtIndex:currentInstructionIndex];
+					if (currentInstruction.variable.address - firstInstruction.variable.address >= originalOutputLength)
+					{
+						break;
+					}
+					else
+					{
+						const int8_t nopValue = 0x90;
+						for (ZGMemorySize byteIndex = originalOutputLength - (currentInstruction.variable.address - firstInstruction.variable.address); byteIndex < currentInstruction.variable.size; byteIndex++)
+						{
+							[outputData appendBytes:&nopValue length:sizeof(int8_t)];
+						}
+					}
 				}
 				
 				ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
