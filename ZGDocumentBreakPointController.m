@@ -101,6 +101,8 @@
 	[self.document.searchingProgressIndicator stopAnimation:nil];
 	self.document.searchingProgressIndicator.indeterminate = NO;
 	
+	[self.foundInstructions removeAllObjects];
+	
 	[self stopWatchingBreakPoints];
 	
 	self.document.currentProcess.isWatchingBreakPoint = NO;
