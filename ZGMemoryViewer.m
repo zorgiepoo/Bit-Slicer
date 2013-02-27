@@ -425,7 +425,14 @@
 
 - (void)relayoutAndResizeWindowPreservingBytesPerLine
 {
-	NSUInteger bytesPerLine = ceil(self.textView.controller.bytesPerLine / 4.0) * 4;
+	const int bytesMultiple = 4;
+	int remainder = self.textView.controller.bytesPerLine % bytesMultiple;
+	NSUInteger bytesPerLineRoundedUp = (remainder == 0) ? (self.textView.controller.bytesPerLine) : (self.textView.controller.bytesPerLine + bytesMultiple - remainder);
+	NSUInteger bytesPerLineRoundedDown = (remainder == 0) ? (self.textView.controller.bytesPerLine) : (self.textView.controller.bytesPerLine - bytesMultiple + (bytesMultiple - remainder));
+	
+	// Pick bytes per line that is closest to what we already have and is multiple of bytesMultiple
+	NSUInteger bytesPerLine = labs(self.textView.controller.bytesPerLine - bytesPerLineRoundedUp) > labs(self.textView.controller.bytesPerLine - bytesPerLineRoundedDown) ? bytesPerLineRoundedDown : bytesPerLineRoundedUp;
+	
     NSWindow *window = [self window];
     NSRect windowFrame = [window frame];
     NSView *layoutView = [self.textView.layoutRepresenter view];
