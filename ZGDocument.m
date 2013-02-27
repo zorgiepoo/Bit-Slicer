@@ -1262,15 +1262,7 @@ static NSSize *expandedWindowMinSize = nil;
 		return isValid;
 	}
 	
-	else if (menuItem.action == @selector(showMemoryViewer:))
-	{
-		if (self.selectedVariables.count != 1 || !self.currentProcess.valid)
-		{
-			return NO;
-		}
-	}
-	
-	else if (menuItem.action == @selector(showDebugger:))
+	else if (menuItem.action == @selector(showMemoryViewer:) || menuItem.action == @selector(showDebugger:))
 	{
 		if (self.selectedVariables.count != 1 || !self.currentProcess.valid)
 		{
@@ -1288,7 +1280,12 @@ static NSSize *expandedWindowMinSize = nil;
 			return NO;
 		}
 		
-		if (!(memoryProtection & VM_PROT_EXECUTE))
+		if (memoryAddress > selectedVariable.address || memoryAddress + memorySize < selectedVariable.address + selectedVariable.size)
+		{
+			return NO;
+		}
+		
+		if ((menuItem.action == @selector(showMemoryViewer:) && !(memoryProtection & VM_PROT_READ)) || (menuItem.action == @selector(showDebugger:) && !(memoryProtection & VM_PROT_EXECUTE)))
 		{
 			return NO;
 		}
