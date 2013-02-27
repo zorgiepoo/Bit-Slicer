@@ -1427,29 +1427,38 @@ END_DEBUGGER_CHANGE:
 			if (outputData)
 			{
 				// Fill leftover bytes with NOP's so that the instructions won't 'slide'
-				ZGInstruction *firstInstruction = [self.instructions objectAtIndex:instructionIndex];
 				NSUInteger originalOutputLength = outputData.length;
+				NSUInteger bytesRead = 0;
+				NSUInteger numberOfInstructionsOverwritten = 0;
 				
-				for (ZGMemorySize currentInstructionIndex = instructionIndex; currentInstructionIndex < self.instructions.count; currentInstructionIndex++)
+				for (ZGMemorySize currentInstructionIndex = instructionIndex; (bytesRead < originalOutputLength) && (currentInstructionIndex < self.instructions.count); currentInstructionIndex++)
 				{
 					ZGInstruction *currentInstruction = [self.instructions objectAtIndex:currentInstructionIndex];
-					if (currentInstruction.variable.address - firstInstruction.variable.address >= originalOutputLength)
-					{
-						break;
-					}
-					else
+					bytesRead += currentInstruction.variable.size;
+					numberOfInstructionsOverwritten++;
+					
+					if (bytesRead > originalOutputLength)
 					{
 						const int8_t nopValue = 0x90;
-						for (ZGMemorySize byteIndex = originalOutputLength - (currentInstruction.variable.address - firstInstruction.variable.address); byteIndex < currentInstruction.variable.size; byteIndex++)
+						for (ZGMemorySize byteIndex = currentInstruction.variable.address + currentInstruction.variable.size - (bytesRead - originalOutputLength); byteIndex < currentInstruction.variable.address + currentInstruction.variable.size; byteIndex++)
 						{
 							[outputData appendBytes:&nopValue length:sizeof(int8_t)];
 						}
 					}
 				}
 				
-				ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+				BOOL shouldOverwriteInstructions = YES;
+				if (numberOfInstructionsOverwritten > 1 && NSRunAlertPanel(@"Overwrite Instructions", @"This modification will overwrite %ld instructions? Are you sure you want to continue?", @"Overwrite", @"Don't Overwrite", nil, numberOfInstructionsOverwritten) != NSAlertDefaultReturn)
+				{
+					shouldOverwriteInstructions = NO;
+				}
 				
-				[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
+				if (shouldOverwriteInstructions)
+				{
+					ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+					
+					[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
+				}
 			}
 		}
 		else
