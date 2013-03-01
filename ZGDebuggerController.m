@@ -671,12 +671,62 @@
 	}
 }
 
+- (void)updateInstructionsBeyondTableView
+{
+	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+	if (visibleRowsRange.location == 0)
+	{
+		// We're at the top, try to load more instructions above us
+		ZGInstruction *endInstruction = [self.instructions objectAtIndex:0];
+		ZGInstruction *startInstruction = nil;
+		NSUInteger bytesBehind = 1024;
+		while (!startInstruction && bytesBehind > 0)
+		{
+			startInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address inProcess:self.currentProcess];
+			bytesBehind /= 2;
+		}
+		
+		if (startInstruction)
+		{
+			void *bytes = NULL;
+			ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
+			
+			if (ZGReadBytes(self.currentProcess.processTask, startInstruction.variable.address, &bytes, &size))
+			{
+				NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
+				
+				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:startInstruction.variable.address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
+				
+				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
+					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
+					newInstruction.text = disassembledText;
+					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text shouldBeSearched:NO];
+					newInstruction.mnemonic = mnemonic;
+					
+					[instructionsToAdd addObject:newInstruction];
+				}];
+				
+				[instructionsToAdd addObjectsFromArray:self.instructions];
+				self.instructions = [NSArray arrayWithArray:instructionsToAdd];
+				
+				NSLog(@"Adding %ld instructions", instructionsToAdd.count);
+				
+				[self.instructionsTableView reloadData];
+				[self.instructionsTableView scrollRowToVisible:instructionsToAdd.count];
+				
+				ZGFreeBytes(self.currentProcess.processTask, bytes, size);
+			}
+		}
+	}
+}
+
 - (void)updateInstructionsTimer:(NSTimer *)timer
 {
 	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && !self.disassembling)
 	{
 		[self updateInstructionValues];
 		[self updateInstructionSymbols];
+		[self updateInstructionsBeyondTableView];
 	}
 }
 
