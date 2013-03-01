@@ -1026,6 +1026,20 @@
 			calculatedMemoryAddress = memoryAddressFromExpression(calculatedMemoryAddressExpression);
 		}
 		
+		// See if the instruction is already in the table, if so, just go to it
+		ZGInstruction *foundInstructionInTable = [self findInstructionInTableAtAddress:calculatedMemoryAddress];
+		if (foundInstructionInTable)
+		{
+			[self scrollAndSelectRow:[self.instructions indexOfObject:foundInstructionInTable]];
+			if (self.window.firstResponder != self.backtraceController.tableView)
+			{
+				[self.window makeFirstResponder:self.instructionsTableView];
+			}
+			
+			success = YES;
+			goto END_DEBUGGER_CHANGE;
+		}
+		
 		NSArray *memoryRegions = ZGRegionsForProcessTask(self.currentProcess.processTask);
 		if (memoryRegions.count == 0)
 		{
@@ -1828,10 +1842,9 @@ END_DEBUGGER_CHANGE:
 	return currentBreakPoint;
 }
 
-- (void)goToCurrentBreakPoint
-{	
-	BOOL foundInstruction = NO;
-	ZGMemoryAddress programCounter = self.registersController.programCounter;
+- (ZGInstruction *)findInstructionInTableAtAddress:(ZGMemoryAddress)targetAddress
+{
+	ZGInstruction *foundInstruction = nil;
 	
 	if (self.instructions.count > 0)
 	{
@@ -1844,22 +1857,21 @@ END_DEBUGGER_CHANGE:
 			NSUInteger middleInstructionIndex = (minInstructionIndex + maxInstructionIndex) / 2;
 			ZGInstruction *instruction = [self.instructions objectAtIndex:middleInstructionIndex];
 			
-			if (instruction.variable.address < programCounter)
+			if (instruction.variable.address < targetAddress)
 			{
 				if (middleInstructionIndex >= self.instructions.count-1) break;
 				minInstructionIndex = middleInstructionIndex + 1;
 			}
-			else if (instruction.variable.address > programCounter)
+			else if (instruction.variable.address > targetAddress)
 			{
 				if (middleInstructionIndex == 0) break;
 				maxInstructionIndex = middleInstructionIndex - 1;
 			}
 			else
 			{
-				if (instruction.variable.address == programCounter)
+				if (instruction.variable.address == targetAddress)
 				{
-					[self scrollAndSelectRow:middleInstructionIndex];
-					foundInstruction = YES;
+					foundInstruction = instruction;
 				}
 				else
 				{
@@ -1869,10 +1881,7 @@ END_DEBUGGER_CHANGE:
 		}
 	}
 	
-	if (!foundInstruction)
-	{	
-		[self jumpToMemoryAddress:programCounter inProcess:self.currentProcess];
-	}
+	return foundInstruction;
 }
 
 - (void)jumpToAddress:(ZGMemoryAddress)newAddress
@@ -1918,7 +1927,7 @@ END_DEBUGGER_CHANGE:
 		
 		[self toggleBacktraceView:NSOnState];
 		
-		[self goToCurrentBreakPoint];
+		[self jumpToMemoryAddress:self.registersController.programCounter inProcess:self.currentProcess];
 		
 		[self.backtraceController	updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
 		
