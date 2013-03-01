@@ -127,7 +127,7 @@
 	else
 	{
 		NSRunAlertPanel(
-						@"Invalid range",
+						@"Invalid Range",
 						@"Please make sure you typed in the addresses correctly.",
 						@"OK", nil, nil);
 	}

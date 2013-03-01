@@ -1580,7 +1580,7 @@ END_DEBUGGER_CHANGE:
 				else
 				{
 					BOOL shouldOverwriteInstructions = YES;
-					if (numberOfInstructionsOverwritten > 1 && NSRunAlertPanel(@"Overwrite Instructions", @"This modification will overwrite %ld instructions? Are you sure you want to continue?", @"Overwrite", @"Don't Overwrite", nil, numberOfInstructionsOverwritten) != NSAlertDefaultReturn)
+					if (numberOfInstructionsOverwritten > 1 && NSRunAlertPanel(@"Overwrite Instructions", @"This modification will overwrite %ld instructions? Are you sure you want to continue?", @"Overwrite", @"Cancel", nil, numberOfInstructionsOverwritten) != NSAlertDefaultReturn)
 					{
 						shouldOverwriteInstructions = NO;
 					}

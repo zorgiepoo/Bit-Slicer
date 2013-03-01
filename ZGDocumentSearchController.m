@@ -397,7 +397,7 @@
 	
 	if (inputErrorMessage)
 	{
-		NSRunAlertPanel(@"Invalid Input", inputErrorMessage, nil, nil, nil);
+		NSRunAlertPanel(@"Invalid Search Input", inputErrorMessage, nil, nil, nil);
 		return NO;
 	}
 	
@@ -450,7 +450,7 @@
 				(functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored)
 				? @"Epsilon"
 				: ((functionType == ZGGreaterThan || functionType == ZGGreaterThanStored) ? @"Below" : @"Above");
-			NSRunAlertPanel(@"Invalid Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
+			NSRunAlertPanel(@"Invalid Search Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
 			return NO;
 		}
 		else /* if (!inputErrorMessage || flagsFieldIsBlank) */
@@ -509,7 +509,7 @@
 	{
 		if ([self testSearchComponent:calculatedBeginAddress])
 		{
-			NSRunAlertPanel(@"Invalid Input", @"The expression in the beginning address field is not valid.", nil, nil, nil, nil);
+			NSRunAlertPanel(@"Invalid Search Input", @"The expression in the beginning address field is not valid.", nil, nil, nil, nil);
 			return NO;
 		}
 		
@@ -524,7 +524,7 @@
 	{
 		if ([self testSearchComponent:calculatedEndAddress])
 		{
-			NSRunAlertPanel(@"Invalid Input", @"The expression in the ending address field is not valid.", nil, nil, nil, nil);
+			NSRunAlertPanel(@"Invalid Search Input", @"The expression in the ending address field is not valid.", nil, nil, nil, nil);
 			return NO;
 		}
 		
@@ -537,7 +537,7 @@
 	
 	if (self.searchData.beginAddress >= self.searchData.endAddress)
 	{
-		NSRunAlertPanel(@"Invalid Input", @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted.", nil, nil, nil, nil);
+		NSRunAlertPanel(@"Invalid Search Input", @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted.", nil, nil, nil, nil);
 		return NO;
 	}
 	
