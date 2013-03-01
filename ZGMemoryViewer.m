@@ -391,14 +391,8 @@
 {
 	self.dataInspectorRepresenter = [[DataInspectorRepresenter alloc] init];
 	
-	// Add representers for data inspector, then remove them here. We do this otherwise if we try to add the representers some later point, they may not autoresize correctly.
-	
-	[@[self.textView.controller, self.textView.layoutRepresenter] makeObjectsPerformSelector:@selector(addRepresenter:) withObject:self.dataInspectorRepresenter];
-	
 	[self.dataInspectorRepresenter resizeTableViewAfterChangingRowCount];
 	[self relayoutAndResizeWindowPreservingFrame];
-	
-	[@[self.textView.controller, self.textView.layoutRepresenter] makeObjectsPerformSelector:@selector(removeRepresenter:) withObject:self.dataInspectorRepresenter];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataInspectorChangedRowCount:) name:DataInspectorDidChangeRowCount object:self.dataInspectorRepresenter];
 	
@@ -468,6 +462,7 @@
 	NSView *dataInspectorView = [inspector view];
 	NSSize size = [dataInspectorView frame].size;
 	size.height = newHeight;
+	size.width = 1; // this is a hack that makes the data inspector's width actually resize..
 	[dataInspectorView setFrameSize:size];
 	
 	[self.textView.layoutRepresenter performLayout];
