@@ -1447,17 +1447,24 @@ END_DEBUGGER_CHANGE:
 					}
 				}
 				
-				BOOL shouldOverwriteInstructions = YES;
-				if (numberOfInstructionsOverwritten > 1 && NSRunAlertPanel(@"Overwrite Instructions", @"This modification will overwrite %ld instructions? Are you sure you want to continue?", @"Overwrite", @"Don't Overwrite", nil, numberOfInstructionsOverwritten) != NSAlertDefaultReturn)
+				if (bytesRead < originalOutputLength)
 				{
-					shouldOverwriteInstructions = NO;
+					NSRunAlertPanel(@"Failed to Overwrite Instructions", @"This modification exceeds the boundary of instructions displayed.", @"OK", nil, nil);
 				}
-				
-				if (shouldOverwriteInstructions)
+				else
 				{
-					ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+					BOOL shouldOverwriteInstructions = YES;
+					if (numberOfInstructionsOverwritten > 1 && NSRunAlertPanel(@"Overwrite Instructions", @"This modification will overwrite %ld instructions? Are you sure you want to continue?", @"Overwrite", @"Don't Overwrite", nil, numberOfInstructionsOverwritten) != NSAlertDefaultReturn)
+					{
+						shouldOverwriteInstructions = NO;
+					}
 					
-					[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
+					if (shouldOverwriteInstructions)
+					{
+						ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+						
+						[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
+					}
 				}
 			}
 		}
