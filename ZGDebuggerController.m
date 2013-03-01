@@ -679,10 +679,10 @@
 		// We're at the top, try to load more instructions above us
 		ZGInstruction *endInstruction = [self.instructions objectAtIndex:0];
 		ZGInstruction *startInstruction = nil;
-		NSUInteger bytesBehind = 1024;
+		NSUInteger bytesBehind = 10000;
 		while (!startInstruction && bytesBehind > 0)
 		{
-			startInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address inProcess:self.currentProcess];
+			startInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address - bytesBehind inProcess:self.currentProcess];
 			bytesBehind /= 2;
 		}
 		
@@ -706,13 +706,18 @@
 					[instructionsToAdd addObject:newInstruction];
 				}];
 				
+				NSUInteger numberOfInstructionsAdded = instructionsToAdd.count;
+				
 				[instructionsToAdd addObjectsFromArray:self.instructions];
 				self.instructions = [NSArray arrayWithArray:instructionsToAdd];
 				
-				NSLog(@"Adding %ld instructions", instructionsToAdd.count);
-				
-				[self.instructionsTableView reloadData];
-				[self.instructionsTableView scrollRowToVisible:instructionsToAdd.count];
+				NSInteger previousSelectedRow = [self.instructionsTableView selectedRow];
+				[self.instructionsTableView noteNumberOfRowsChanged];
+				[self.instructionsTableView scrollRowToVisible:numberOfInstructionsAdded];
+				if (previousSelectedRow >= 0)
+				{
+					[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:previousSelectedRow + numberOfInstructionsAdded] byExtendingSelection:NO];
+				}
 				
 				ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 			}
@@ -722,7 +727,7 @@
 
 - (void)updateInstructionsTimer:(NSTimer *)timer
 {
-	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && !self.disassembling)
+	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && !self.disassembling && self.instructions.count > 0)
 	{
 		[self updateInstructionValues];
 		[self updateInstructionSymbols];
