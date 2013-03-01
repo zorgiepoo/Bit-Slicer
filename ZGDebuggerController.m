@@ -1211,11 +1211,6 @@ END_DEBUGGER_CHANGE:
 			{
 				return NO;
 			}
-			
-			if (![[[ZGAppController sharedController] breakPointController] isInstructionExecutable:nextInstruction inProcess:self.currentProcess])
-			{
-				return NO;
-			}
 		}
 	}
 	else if (menuItem.action == @selector(stepOut:))
@@ -1234,11 +1229,6 @@ END_DEBUGGER_CHANGE:
 		ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 		
 		if (!returnInstruction)
-		{
-			return NO;
-		}
-		
-		if (![[[ZGAppController sharedController] breakPointController] isInstructionExecutable:returnInstruction inProcess:self.currentProcess])
 		{
 			return NO;
 		}

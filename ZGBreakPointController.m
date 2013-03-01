@@ -743,24 +743,6 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return YES;
 }
 
-- (BOOL)isInstructionExecutable:(ZGInstruction *)instruction inProcess:(ZGProcess *)process
-{
-	ZGMemoryAddress protectionAddress = instruction.variable.address;
-	ZGMemorySize protectionSize = instruction.variable.size;
-	ZGMemoryProtection memoryProtection = 0;
-	if (!ZGMemoryProtectionInRegion(process.processTask, &protectionAddress, &protectionSize, &memoryProtection))
-	{
-		return NO;
-	}
-	
-	if (!(memoryProtection & VM_PROT_EXECUTE))
-	{
-		return NO;
-	}
-	
-	return YES;
-}
-
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process delegate:(id)delegate
 {
 	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO delegate:delegate];
@@ -793,9 +775,27 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		return NO;
 	}
 	
-	if (![self isInstructionExecutable:instruction inProcess:process])
+	// Find memory protection of instruction. If it's not executable, make it executable
+	ZGMemoryAddress protectionAddress = instruction.variable.address;
+	ZGMemorySize protectionSize = instruction.variable.size;
+	ZGMemoryProtection memoryProtection = 0;
+	if (!ZGMemoryProtectionInRegion(process.processTask, &protectionAddress, &protectionSize, &memoryProtection))
 	{
 		return NO;
+	}
+	
+	if (protectionAddress > instruction.variable.address || protectionAddress + protectionSize < instruction.variable.address + instruction.variable.size)
+	{
+		return NO;
+	}
+	
+	if (!(memoryProtection & VM_PROT_EXECUTE))
+	{
+		memoryProtection |= VM_PROT_EXECUTE;
+		if (!ZGProtect(process.processTask, protectionAddress, protectionSize, memoryProtection))
+		{
+			return NO;
+		}
 	}
 	
 	ZGVariable *variable = [instruction.variable copy];
