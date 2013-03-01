@@ -295,41 +295,44 @@
 
 - (void)clear
 {
-	// Remove undo actions in another task as it may be somewhat of an expensive operation
-	NSUndoManager *oldUndoManager = self.document.undoManager;
-	self.document.undoManager = [[NSUndoManager alloc] init];
-	
-	__block NSArray *oldVariables = self.document.watchVariablesArray;
-	self.document.watchVariablesArray = [NSArray array];
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		[oldUndoManager removeAllActions];
-		oldVariables = nil;
-	});
-	
-	self.document.runningApplicationsPopUpButton.enabled = YES;
-	self.document.dataTypesPopUpButton.enabled = YES;
-	self.document.variableQualifierMatrix.enabled = YES;
-	
-	if (self.document.currentProcess.valid)
+	if (NSRunAlertPanel(@"Clear Search", @"Are you sure you want to clear your search? You will not be able to undo this action.", @"Clear", @"Cancel", nil) == NSAlertDefaultReturn)
 	{
-		self.document.searchButton.enabled = YES;
+		// Remove undo actions in another task as it may be somewhat of an expensive operation
+		NSUndoManager *oldUndoManager = self.document.undoManager;
+		self.document.undoManager = [[NSUndoManager alloc] init];
+		
+		__block NSArray *oldVariables = self.document.watchVariablesArray;
+		self.document.watchVariablesArray = [NSArray array];
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			[oldUndoManager removeAllActions];
+			oldVariables = nil;
+		});
+		
+		self.document.runningApplicationsPopUpButton.enabled = YES;
+		self.document.dataTypesPopUpButton.enabled = YES;
+		self.document.variableQualifierMatrix.enabled = YES;
+		
+		if (self.document.currentProcess.valid)
+		{
+			self.document.searchButton.enabled = YES;
+		}
+		
+		[self.document.tableController.watchVariablesTableView reloadData];
+		
+		if ([self.document doesFunctionTypeAllowSearchInput])
+		{
+			self.document.searchValueTextField.enabled = YES;
+		}
+		
+		self.document.clearButton.enabled = NO;
+		
+		if (self.document.currentProcess.valid)
+		{
+			self.document.generalStatusTextField.stringValue = @"Cleared search.";
+		}
+		
+		[self.document markDocumentChange];
 	}
-	
-	[self.document.tableController.watchVariablesTableView reloadData];
-	
-	if ([self.document doesFunctionTypeAllowSearchInput])
-	{
-		self.document.searchValueTextField.enabled = YES;
-	}
-	
-	self.document.clearButton.enabled = NO;
-	
-	if (self.document.currentProcess.valid)
-	{
-		self.document.generalStatusTextField.stringValue = @"Cleared search.";
-	}
-	
-	[self.document markDocumentChange];
 }
 
 - (void)searchCleanUp:(NSArray *)newVariablesArray
