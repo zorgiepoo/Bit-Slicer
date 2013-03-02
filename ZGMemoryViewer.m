@@ -78,6 +78,7 @@
 @property (readwrite, nonatomic) BOOL windowDidAppear;
 
 @property (nonatomic, strong) NSUndoManager *undoManager;
+@property (strong, nonatomic) NSUndoManager *navigationManager;
 
 @property (assign, nonatomic) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
 @property (assign, nonatomic) IBOutlet ZGMemoryDumpController *memoryDumpController;
@@ -143,6 +144,7 @@
 	self = [super initWithWindowNibName:@"MemoryViewer"];
 	
 	self.undoManager = [[NSUndoManager alloc] init];
+	self.navigationManager = [[NSUndoManager alloc] init];
 	
 	return self;
 }
@@ -383,6 +385,18 @@
 			return NO;
 		}
 	}
+	else if (menuItem.action == @selector(goBack:) || menuItem.action == @selector(goForward:))
+	{
+		if (!self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		if ((menuItem.action == @selector(goBack:) && !self.navigationManager.canUndo) || (menuItem.action == @selector(goForward:) && !self.navigationManager.canRedo))
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
 }
@@ -557,7 +571,20 @@
 		self.desiredProcessName = [self.runningApplicationsPopUpButton.selectedItem.representedObject name];
 		[[ZGAppController sharedController] setLastSelectedProcessName:self.desiredProcessName];
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
+		[self.navigationManager removeAllActions];
 	}
+}
+
+#pragma mark Navigation
+
+- (IBAction)goBack:(id)sender
+{
+	[self.navigationManager undo];
+}
+
+- (IBAction)goForward:(id)sender
+{
+	[self.navigationManager redo];
 }
 
 #pragma mark Reading from Memory
@@ -646,6 +673,13 @@
 		
 		if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize) && memorySize > 0)
 		{
+			if (self.textView.data && ![self.textView.data isEqualToData:[NSData data]])
+			{
+				HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
+				HFRangeWrapper *selectionRange = [self.textView.controller.selectedContentsRanges objectAtIndex:0];
+				[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:self.currentMemoryAddress + (displayedLineRange.location + displayedLineRange.length / 2) * self.textView.controller.bytesPerLine withSelectionLength:[selectionRange HFRange].length];
+			}
+			
 			// Replace all the contents of the self.textView
 			self.textView.data = [NSData dataWithBytes:bytes length:(NSUInteger)memorySize];
 			self.currentMemoryAddress = memoryAddress;
