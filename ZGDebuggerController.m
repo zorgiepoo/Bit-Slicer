@@ -1027,6 +1027,12 @@
 	[self.navigationManager redo];
 }
 
+- (IBAction)goToCallAddress:(id)sender
+{
+	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+	[self jumpToMemoryAddress:selectedInstruction.callAddress];
+}
+
 - (void)prepareNavigation
 {
 	if (self.instructions.count > 0)
@@ -1341,6 +1347,24 @@ END_DEBUGGER_CHANGE:
 		}
 		
 		if ((menuItem.action == @selector(goBack:) && !self.navigationManager.canUndo) || (menuItem.action == @selector(goForward:) && !self.navigationManager.canRedo))
+		{
+			return NO;
+		}
+	}
+	else if (menuItem.action == @selector(goToCallAddress:))
+	{
+		if (self.disassembling || !self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		if (self.selectedInstructions.count != 1)
+		{
+			return NO;
+		}
+		
+		ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
+		if (!selectedInstruction.isCallMnemonic)
 		{
 			return NO;
 		}

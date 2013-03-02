@@ -34,6 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "udis86.h"
+#import "ZGMemoryTypes.h"
 
 @class ZGVariable;
 
@@ -45,5 +46,6 @@
 @property (nonatomic, copy) NSString *symbols;
 
 - (BOOL)isCallMnemonic;
+- (ZGMemoryAddress)callAddress;
 
 @end

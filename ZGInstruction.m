@@ -34,6 +34,7 @@
 
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
+#import "ZGUtilities.h"
 
 @implementation ZGInstruction
 
@@ -90,6 +91,19 @@
 - (BOOL)isCallMnemonic
 {
 	return self.mnemonic == UD_Icall;
+}
+
+// This should be a call mnemonic (check against isCallMnemonic)
+- (ZGMemoryAddress)callAddress
+{
+	ZGMemoryAddress callAddress = 0;
+	NSArray *callComponents = [self.text componentsSeparatedByString:@" "];
+	if ([callComponents count] > 1)
+	{
+		callAddress = memoryAddressFromExpression([callComponents objectAtIndex:1]);
+	}
+	
+	return callAddress;
 }
 
 - (BOOL)isEqual:(id)object
