@@ -61,6 +61,8 @@
 @property (assign) IBOutlet ZGBacktraceController *backtraceController;
 @property (assign) IBOutlet ZGRegistersController *registersController;
 
+@property (strong, nonatomic) NSUndoManager *navigationManager;
+
 @property (readwrite) ZGMemoryAddress currentMemoryAddress;
 @property (readwrite) ZGMemorySize currentMemorySize;
 
@@ -92,6 +94,7 @@
 	self = [super initWithWindowNibName:NSStringFromClass([self class])];
 	
 	self.undoManager = [[NSUndoManager alloc] init];
+	self.navigationManager = [[NSUndoManager alloc] init];
 	self.haltedBreakPoints = [[NSArray alloc] init];
 	
 	[[NSNotificationCenter defaultCenter]
@@ -150,7 +153,9 @@
 		
 		shouldUpdate = YES;
 	}
+	
 	_currentProcess = newProcess;
+	
 	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.valid)
 	{
 		if (![_currentProcess grantUsAccess])
@@ -168,7 +173,7 @@
 			[self updateRegisters];
 			[self.backtraceController updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
 			
-			[self jumpToMemoryAddress:self.registersController.programCounter inProcess:self.currentProcess];
+			[self jumpToMemoryAddress:self.registersController.programCounter];
 		}
 		else
 		{
@@ -812,6 +817,8 @@
 	[self.stopButton setEnabled:YES];
 	[self.stopButton setHidden:NO];
 	
+	[self prepareNavigation];
+	
 	self.instructions = @[];
 	[self.instructionsTableView reloadData];
 	
@@ -994,6 +1001,7 @@
 		self.desiredProcessName = [self.runningApplicationsPopUpButton.selectedItem.representedObject name];
 		[[ZGAppController sharedController] setLastSelectedProcessName:self.desiredProcessName];
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
+		[self.navigationManager removeAllActions];
 	}
 }
 
@@ -1008,6 +1016,30 @@
 }
 
 #pragma mark Changing disassembler view
+
+- (IBAction)goBack:(id)sender
+{
+	[self.navigationManager undo];
+}
+
+- (IBAction)goForward:(id)sender
+{
+	[self.navigationManager redo];
+}
+
+- (void)prepareNavigation
+{
+	if (self.instructions.count > 0)
+	{
+		NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+		NSUInteger centeredInstructionIndex = visibleRowsRange.location + visibleRowsRange.length / 2;
+		if (centeredInstructionIndex < self.instructions.count)
+		{
+			ZGInstruction *centeredInstruction = [self.instructions objectAtIndex:centeredInstructionIndex];
+			[[self.navigationManager prepareWithInvocationTarget:self] jumpToMemoryAddress:centeredInstruction.variable.address];
+		}
+	}
+}
 
 - (IBAction)readMemory:(id)sender
 {
@@ -1033,6 +1065,7 @@
 		ZGInstruction *foundInstructionInTable = [self findInstructionInTableAtAddress:calculatedMemoryAddress];
 		if (foundInstructionInTable)
 		{
+			[self prepareNavigation];
 			[self scrollAndSelectRow:[self.instructions indexOfObject:foundInstructionInTable]];
 			if (self.window.firstResponder != self.backtraceController.tableView)
 			{
@@ -1128,8 +1161,13 @@ END_DEBUGGER_CHANGE:
 	return [self.instructions objectsAtIndexes:selectionIndexSet];
 }
 
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)address
+{
+	[self jumpToMemoryAddress:address inProcess:self.currentProcess];
+}
+
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess
-{	
+{
 	NSMenuItem *targetMenuItem = nil;
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.menu.itemArray)
 	{
@@ -1166,7 +1204,7 @@ END_DEBUGGER_CHANGE:
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
-{	
+{
 	if (menuItem.action == @selector(nopVariables:))
 	{
 		[menuItem setTitle:[NSString stringWithFormat:@"NOP Instruction%@", self.selectedInstructions.count == 1 ? @"" : @"s"]];
@@ -1291,6 +1329,18 @@ END_DEBUGGER_CHANGE:
 	else if (menuItem.action == @selector(jump:))
 	{
 		if (self.disassembling || !self.currentBreakPoint || self.selectedInstructions.count != 1)
+		{
+			return NO;
+		}
+	}
+	else if (menuItem.action == @selector(goBack:) || menuItem.action == @selector(goForward:))
+	{
+		if (self.disassembling || !self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		if ((menuItem.action == @selector(goBack:) && !self.navigationManager.canUndo) || (menuItem.action == @selector(goForward:) && !self.navigationManager.canRedo))
 		{
 			return NO;
 		}
@@ -1879,13 +1929,13 @@ END_DEBUGGER_CHANGE:
 	return foundInstruction;
 }
 
-- (void)jumpToAddress:(ZGMemoryAddress)newAddress
+- (void)jumpProgramCounterToAddress:(ZGMemoryAddress)newAddress
 {
 	if (self.currentBreakPoint && !self.disassembling)
 	{
 		ZGMemoryAddress currentAddress = [self.registersController programCounter];
 		[self.registersController changeProgramCounter:newAddress];
-		[[self.undoManager prepareWithInvocationTarget:self] jumpToAddress:currentAddress];
+		[[self.undoManager prepareWithInvocationTarget:self] jumpProgramCounterToAddress:currentAddress];
 		[self.undoManager setActionName:@"Jump"];
 	}
 }
@@ -1893,7 +1943,7 @@ END_DEBUGGER_CHANGE:
 - (IBAction)jump:(id)sender
 {
 	ZGInstruction *instruction = [self.selectedInstructions objectAtIndex:0];
-	[self jumpToAddress:instruction.variable.address];
+	[self jumpProgramCounterToAddress:instruction.variable.address];
 }
 
 - (void)updateRegisters
@@ -1922,7 +1972,7 @@ END_DEBUGGER_CHANGE:
 		
 		[self toggleBacktraceView:NSOnState];
 		
-		[self jumpToMemoryAddress:self.registersController.programCounter inProcess:self.currentProcess];
+		[self jumpToMemoryAddress:self.registersController.programCounter];
 		
 		[self.backtraceController	updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
 		
