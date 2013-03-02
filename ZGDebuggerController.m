@@ -705,13 +705,16 @@
 			}];
 			
 			NSUInteger numberOfInstructionsAdded = instructionsToAdd.count;
+			NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
 			
 			[instructionsToAdd addObjectsFromArray:self.instructions];
 			self.instructions = [NSArray arrayWithArray:instructionsToAdd];
 			
 			NSInteger previousSelectedRow = [self.instructionsTableView selectedRow];
 			[self.instructionsTableView noteNumberOfRowsChanged];
-			[self.instructionsTableView scrollRowToVisible:numberOfInstructionsAdded];
+			
+			[self.instructionsTableView scrollRowToVisible:MIN(numberOfInstructionsAdded + visibleRowsRange.length - 1, self.instructions.count)];
+			
 			if (previousSelectedRow >= 0)
 			{
 				[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:previousSelectedRow + numberOfInstructionsAdded] byExtendingSelection:NO];
