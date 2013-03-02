@@ -438,6 +438,34 @@
 									<reference key="NSOnImage" ref="1033313550"/>
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
+								<object class="NSMenuItem" id="557687710">
+									<reference key="NSMenu" ref="466310130"/>
+									<string key="NSTitle">Back</string>
+									<string key="NSKeyEquiv">[</string>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="1033313550"/>
+									<reference key="NSMixedImage" ref="310636482"/>
+								</object>
+								<object class="NSMenuItem" id="76088206">
+									<reference key="NSMenu" ref="466310130"/>
+									<string key="NSTitle">Forward</string>
+									<string key="NSKeyEquiv">]</string>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="1033313550"/>
+									<reference key="NSMixedImage" ref="310636482"/>
+								</object>
+								<object class="NSMenuItem" id="317446031">
+									<reference key="NSMenu" ref="466310130"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="1033313550"/>
+									<reference key="NSMixedImage" ref="310636482"/>
+								</object>
 								<object class="NSMenuItem" id="1059119054">
 									<reference key="NSMenu" ref="466310130"/>
 									<string key="NSTitle">Enter Full Screen</string>
@@ -571,34 +599,6 @@
 									<reference key="NSMixedImage" ref="310636482"/>
 								</object>
 								<object class="NSMenuItem" id="59828545">
-									<reference key="NSMenu" ref="79774020"/>
-									<bool key="NSIsDisabled">YES</bool>
-									<bool key="NSIsSeparator">YES</bool>
-									<string key="NSTitle"/>
-									<string key="NSKeyEquiv"/>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="1033313550"/>
-									<reference key="NSMixedImage" ref="310636482"/>
-								</object>
-								<object class="NSMenuItem" id="727087044">
-									<reference key="NSMenu" ref="79774020"/>
-									<string key="NSTitle">Back</string>
-									<string key="NSKeyEquiv">[</string>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="1033313550"/>
-									<reference key="NSMixedImage" ref="310636482"/>
-								</object>
-								<object class="NSMenuItem" id="545566143">
-									<reference key="NSMenu" ref="79774020"/>
-									<string key="NSTitle">Forward</string>
-									<string key="NSKeyEquiv">]</string>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="1033313550"/>
-									<reference key="NSMixedImage" ref="310636482"/>
-								</object>
-								<object class="NSMenuItem" id="957994959">
 									<reference key="NSMenu" ref="79774020"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<bool key="NSIsSeparator">YES</bool>
@@ -1665,17 +1665,17 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">goBack:</string>
 						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="727087044"/>
+						<reference key="destination" ref="557687710"/>
 					</object>
-					<int key="connectionID">1099</int>
+					<int key="connectionID">1103</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">goForward:</string>
 						<reference key="source" ref="1014"/>
-						<reference key="destination" ref="545566143"/>
+						<reference key="destination" ref="76088206"/>
 					</object>
-					<int key="connectionID">1100</int>
+					<int key="connectionID">1104</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -2374,6 +2374,9 @@
 							<reference ref="237841660"/>
 							<reference ref="745154508"/>
 							<reference ref="1059119054"/>
+							<reference ref="557687710"/>
+							<reference ref="76088206"/>
+							<reference ref="317446031"/>
 						</object>
 						<reference key="parent" ref="586577488"/>
 					</object>
@@ -2421,9 +2424,6 @@
 							<reference ref="1040277066"/>
 							<reference ref="866506523"/>
 							<reference ref="771488431"/>
-							<reference ref="957994959"/>
-							<reference ref="727087044"/>
-							<reference ref="545566143"/>
 						</object>
 						<reference key="parent" ref="278865230"/>
 					</object>
@@ -2582,19 +2582,19 @@
 						<reference key="parent" ref="110575045"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">1095</int>
-						<reference key="object" ref="957994959"/>
-						<reference key="parent" ref="79774020"/>
+						<int key="objectID">1101</int>
+						<reference key="object" ref="557687710"/>
+						<reference key="parent" ref="466310130"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">1096</int>
-						<reference key="object" ref="727087044"/>
-						<reference key="parent" ref="79774020"/>
+						<int key="objectID">1102</int>
+						<reference key="object" ref="76088206"/>
+						<reference key="parent" ref="466310130"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">1098</int>
-						<reference key="object" ref="545566143"/>
-						<reference key="parent" ref="79774020"/>
+						<int key="objectID">1105</int>
+						<reference key="object" ref="317446031"/>
+						<reference key="parent" ref="466310130"/>
 					</object>
 				</object>
 			</object>
@@ -2629,9 +2629,9 @@
 					<string>1087.IBPluginDependency</string>
 					<string>1092.IBPluginDependency</string>
 					<string>1093.IBPluginDependency</string>
-					<string>1095.IBPluginDependency</string>
-					<string>1096.IBPluginDependency</string>
-					<string>1098.IBPluginDependency</string>
+					<string>1101.IBPluginDependency</string>
+					<string>1102.IBPluginDependency</string>
+					<string>1105.IBPluginDependency</string>
 					<string>112.IBPluginDependency</string>
 					<string>124.IBPluginDependency</string>
 					<string>125.IBPluginDependency</string>
@@ -2877,7 +2877,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">1100</int>
+			<int key="maxID">1105</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3584,14 +3584,98 @@
 					<string key="className">ZGMemoryViewer</string>
 					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">toggleDataInspector:</string>
-						<string key="NS.object.0">id</string>
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>changeMemoryProtection:</string>
+							<string>changeMemoryView:</string>
+							<string>copyAddress:</string>
+							<string>dumpAllMemory:</string>
+							<string>dumpMemoryInRange:</string>
+							<string>goBack:</string>
+							<string>goForward:</string>
+							<string>pauseOrUnpauseProcess:</string>
+							<string>runningApplicationsPopUpButton:</string>
+							<string>showWindow:</string>
+							<string>toggleDataInspector:</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+							<string>id</string>
+						</object>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">toggleDataInspector:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">toggleDataInspector:</string>
-							<string key="candidateClassName">id</string>
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>changeMemoryProtection:</string>
+							<string>changeMemoryView:</string>
+							<string>copyAddress:</string>
+							<string>dumpAllMemory:</string>
+							<string>dumpMemoryInRange:</string>
+							<string>goBack:</string>
+							<string>goForward:</string>
+							<string>pauseOrUnpauseProcess:</string>
+							<string>runningApplicationsPopUpButton:</string>
+							<string>showWindow:</string>
+							<string>toggleDataInspector:</string>
+						</object>
+						<object class="NSArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">changeMemoryProtection:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">changeMemoryView:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">copyAddress:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">dumpAllMemory:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">dumpMemoryInRange:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">goBack:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">goForward:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">pauseOrUnpauseProcess:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">runningApplicationsPopUpButton:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">showWindow:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">toggleDataInspector:</string>
+								<string key="candidateClassName">id</string>
+							</object>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
