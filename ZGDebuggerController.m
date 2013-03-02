@@ -1148,9 +1148,11 @@ END_DEBUGGER_CHANGE:
 		if ([targetMenuItem.representedObject processID] != self.currentProcess.processID)
 		{
 			[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
-			[self switchProcessMenuItemAndSelectAddress:address];
+			
 			self.instructions = @[];
 			[self.instructionsTableView reloadData];
+			
+			[self switchProcessMenuItemAndSelectAddress:address];
 		}
 		else
 		{
