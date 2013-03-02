@@ -67,9 +67,6 @@
 @property (readwrite, strong) DataInspectorRepresenter *dataInspectorRepresenter;
 @property (readwrite) BOOL showsDataInspector;
 
-@property (readwrite) ZGMemoryAddress currentMemoryAddress;
-@property (readwrite) ZGMemorySize currentMemorySize;
-
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSTextField *addressTextField;
 @property (assign) IBOutlet HFTextView *textView;

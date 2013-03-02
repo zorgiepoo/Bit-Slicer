@@ -46,6 +46,9 @@
 
 @property (readonly) ZGProcess *currentProcess;
 
+@property (readwrite) ZGMemoryAddress currentMemoryAddress;
+@property (readwrite) ZGMemorySize currentMemorySize;
+
 - (HFRange)selectedAddressRange;
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength inProcess:(ZGProcess *)requestedProcess;

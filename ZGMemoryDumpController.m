@@ -144,6 +144,11 @@
 		self.memoryDumpFromAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", selectedRange.location];
 		self.memoryDumpToAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", selectedRange.location + selectedRange.length];
 	}
+	else
+	{
+		self.memoryDumpFromAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", self.memoryViewer.currentMemoryAddress];
+		self.memoryDumpToAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", self.memoryViewer.currentMemoryAddress + self.memoryViewer.currentMemorySize];
+	}
 	
 	[NSApp
 	 beginSheet:self.memoryDumpWindow
