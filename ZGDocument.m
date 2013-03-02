@@ -1381,7 +1381,6 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)showMemoryViewer:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[[[ZGAppController sharedController] memoryViewer] showWindow:nil];
 	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH inProcess:self.currentProcess];
 }
 

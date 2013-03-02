@@ -804,6 +804,10 @@ END_MEMORY_VIEW_CHANGE:
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength inProcess:(ZGProcess *)requestedProcess
 {
+	BOOL firstTimeMakingWindowVisible = !self.windowDidAppear;
+	
+	[self showWindow:nil];
+	
 	NSMenuItem *targetMenuItem = nil;
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.menu.itemArray)
 	{
@@ -821,6 +825,12 @@ END_MEMORY_VIEW_CHANGE:
 		[self runningApplicationsPopUpButton:nil];
 		[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", memoryAddress]];
 		[self updateMemoryViewerAtAddress:memoryAddress withSelectionLength:selectionLength];
+		
+		// When the window is first loaded, it tries to read in memory from wherever it can manage to.. However, if we are loading memory for the first time by being requested to jump somewhere, remove the history of navigating back to the first load that the user won't see anyway
+		if (firstTimeMakingWindowVisible)
+		{
+			[self.navigationManager removeAllActions];
+		}
 	}
 }
 

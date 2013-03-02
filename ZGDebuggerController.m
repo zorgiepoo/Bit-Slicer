@@ -2088,7 +2088,6 @@ END_DEBUGGER_CHANGE:
 - (IBAction)showMemoryViewer:(id)sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
-	[[[ZGAppController sharedController] memoryViewer] showWindow:self];
 	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedInstruction.variable.address withSelectionLength:selectedInstruction.variable.size inProcess:self.currentProcess];
 }
 
