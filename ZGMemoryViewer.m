@@ -75,7 +75,7 @@
 @property (copy, nonatomic) NSString *desiredProcessName;
 @property (readwrite, nonatomic) BOOL windowDidAppear;
 
-@property (nonatomic, strong) NSUndoManager *undoManager;
+@property (nonatomic, strong) NSUndoManager *undoManager; // Used by memory protection controller
 @property (strong, nonatomic) NSUndoManager *navigationManager;
 
 @property (assign, nonatomic) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
