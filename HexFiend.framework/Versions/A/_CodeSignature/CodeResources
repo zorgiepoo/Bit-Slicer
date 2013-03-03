@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>files</key>
+	<dict>
+		<key>Resources/HFCancelOff.tiff</key>
+		<data>
+		8XT91MlQaucSwr4AkNfu6GgE0XY=
+		</data>
+		<key>Resources/HFCancelOn.tiff</key>
+		<data>
+		++TYz3GjENrrQLFwilLzx3mKpEA=
+		</data>
+		<key>Resources/HFModalProgress.nib</key>
+		<data>
+		5FYmX6S9zJZKNp9EEE8rJ8Jk0Ig=
+		</data>
+		<key>Resources/Info.plist</key>
+		<data>
+		Gv9EyDQg6aKQWuOBjbaOel3tX74=
+		</data>
+	</dict>
+	<key>rules</key>
+	<dict>
+		<key>^Resources/</key>
+		<true/>
+		<key>^Resources/.*\.lproj/</key>
+		<dict>
+			<key>optional</key>
+			<true/>
+			<key>weight</key>
+			<real>1000</real>
+		</dict>
+		<key>^Resources/.*\.lproj/locversion.plist$</key>
+		<dict>
+			<key>omit</key>
+			<true/>
+			<key>weight</key>
+			<real>1100</real>
+		</dict>
+		<key>^version.plist$</key>
+		<true/>
+	</dict>
+</dict>
+</plist>
