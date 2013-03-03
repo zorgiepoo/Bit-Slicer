@@ -133,6 +133,8 @@
 	{
 		[self changeMemoryView:nil];
 	}
+	
+	[self updateNavigationButtons];
 }
 
 #pragma mark Initialization

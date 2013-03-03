@@ -182,6 +182,8 @@
 			[self readMemory:nil];
 		}
 	}
+	
+	[self updateNavigationButtons];
 }
 
 - (void)windowDidLoad
