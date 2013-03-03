@@ -449,7 +449,7 @@ BOOL ZGSearchIsCancelling(ZGSearchData *searchData)
 
 BOOL ZGSearchDidCancel(ZGSearchData * __unsafe_unretained searchData)
 {
-	return searchData->_searchDidCancel;
+	return searchData.searchDidCancel;
 }
 
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
@@ -522,7 +522,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 		
 		resultsWrapper.results = localResults;
 		
-		if (searchData->_shouldCancelSearch && !searchData.searchDidCancel)
+		if (searchData->_shouldCancelSearch && !ZGSearchDidCancel(searchData))
 		{
 			searchData.searchDidCancel = YES;
 		}
@@ -604,7 +604,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 			ZGFreeBytes(processTask, bytes, size);
 		}
 		
-		if (searchData->_shouldCancelSearch && !searchData.searchDidCancel)
+		if (searchData->_shouldCancelSearch && !ZGSearchDidCancel(searchData))
 		{
 			searchData.searchDidCancel = YES;
 		}
