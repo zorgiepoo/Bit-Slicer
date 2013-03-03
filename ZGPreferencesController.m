@@ -74,6 +74,8 @@
 	
 	[self setWindowFrameAutosaveName:@"ZGPreferencesWindow"];
 	
+	[self updateFeedURL];
+	
 	return self;
 }
 
