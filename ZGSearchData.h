@@ -48,8 +48,6 @@
 	void *_compareOffset;
 	CollatorRef _collator; // For comparing unicode strings
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
-	
-	BOOL _shouldCancelSearch;
 }
 
 @property (readwrite, nonatomic) void *searchValue;
@@ -72,7 +70,7 @@
 @property (readwrite, assign, nonatomic) void *compareOffset;
 @property (readwrite, nonatomic) unsigned char *byteArrayFlags;
 
-@property (readwrite, nonatomic) BOOL shouldCancelSearch;
+@property (readwrite) BOOL shouldCancelSearch;
 @property (readwrite) BOOL searchDidCancel;
 
 @end
