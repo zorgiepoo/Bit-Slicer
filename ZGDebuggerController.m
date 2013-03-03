@@ -57,6 +57,7 @@
 @property (assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
 @property (assign) IBOutlet NSButton *stopButton;
 @property (assign) IBOutlet NSSplitView *splitView;
+@property (assign) IBOutlet NSSegmentedControl *navigationSegmentedControl;
 
 @property (assign) IBOutlet ZGBacktraceController *backtraceController;
 @property (assign) IBOutlet ZGRegistersController *registersController;
@@ -333,6 +334,8 @@
 			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
 		}
 	}
+	
+	[self updateNavigationButtons];
 }
 
 - (IBAction)showWindow:(id)sender
@@ -906,6 +909,8 @@
 				[self.addressTextField setEnabled:YES];
 				[self.runningApplicationsPopUpButton setEnabled:YES];
 				[self.stopButton setHidden:YES];
+				
+				[self updateNavigationButtons];
 			});
 			
 			ZGFreeBytes(self.currentProcess.processTask, bytes, size);
@@ -1002,6 +1007,7 @@
 		[[ZGAppController sharedController] setLastSelectedProcessName:self.desiredProcessName];
 		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 		[self.navigationManager removeAllActions];
+		[self updateNavigationButtons];
 	}
 }
 
@@ -1020,11 +1026,40 @@
 - (IBAction)goBack:(id)sender
 {
 	[self.navigationManager undo];
+	[self updateNavigationButtons];
 }
 
 - (IBAction)goForward:(id)sender
 {
 	[self.navigationManager redo];
+	[self updateNavigationButtons];
+}
+
+- (IBAction)navigate:(id)sender
+{	
+	switch ([sender selectedSegment])
+	{
+		case ZGNavigationBack:
+			[self goBack:nil];
+			break;
+		case ZGNavigationForward:
+			[self goForward:nil];
+			break;
+	}
+}
+
+- (void)updateNavigationButtons
+{
+	if (self.disassembling || !self.currentProcess.valid)
+	{
+		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationBack];
+		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationForward];
+	}
+	else
+	{
+		[self.navigationSegmentedControl setEnabled:self.navigationManager.canUndo forSegment:ZGNavigationBack];
+		[self.navigationSegmentedControl setEnabled:self.navigationManager.canRedo forSegment:ZGNavigationForward];
+	}
 }
 
 - (IBAction)goToCallAddress:(id)sender
@@ -1077,6 +1112,8 @@
 			{
 				[self.window makeFirstResponder:self.instructionsTableView];
 			}
+			
+			[self updateNavigationButtons];
 			
 			success = YES;
 			goto END_DEBUGGER_CHANGE;

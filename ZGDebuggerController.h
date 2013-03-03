@@ -42,6 +42,12 @@
 
 @interface ZGDebuggerController : NSWindowController <NSTableViewDataSource>
 
+enum ZGNavigation
+{
+	ZGNavigationBack,
+	ZGNavigationForward
+};
+
 @property (readonly) ZGProcess *currentProcess;
 @property (readwrite, nonatomic) BOOL disassembling;
 @property (nonatomic, strong) NSUndoManager *undoManager;

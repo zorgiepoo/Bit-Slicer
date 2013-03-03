@@ -22,6 +22,8 @@
 			<string>NSProgressIndicator</string>
 			<string>NSScrollView</string>
 			<string>NSScroller</string>
+			<string>NSSegmentedCell</string>
+			<string>NSSegmentedControl</string>
 			<string>NSSplitView</string>
 			<string>NSTableColumn</string>
 			<string>NSTableHeaderView</string>
@@ -171,7 +173,7 @@
 						<reference key="NSOnImage" ref="536638327"/>
 						<reference key="NSMixedImage" ref="576841443"/>
 					</object>
-					<object class="NSMenuItem" id="610671398">
+					<object class="NSMenuItem" id="323181272">
 						<reference key="NSMenu" ref="881434806"/>
 						<string key="NSTitle">Go to Function</string>
 						<string key="NSKeyEquiv"/>
@@ -179,7 +181,7 @@
 						<reference key="NSOnImage" ref="536638327"/>
 						<reference key="NSMixedImage" ref="576841443"/>
 					</object>
-					<object class="NSMenuItem" id="284931099">
+					<object class="NSMenuItem" id="983364269">
 						<reference key="NSMenu" ref="881434806"/>
 						<bool key="NSIsDisabled">YES</bool>
 						<bool key="NSIsSeparator">YES</bool>
@@ -231,7 +233,7 @@
 									<int key="NSfFlags">3100</int>
 								</object>
 								<reference key="NSControlView" ref="636236275"/>
-								<object class="NSColor" key="NSBackgroundColor" id="710946188">
+								<object class="NSColor" key="NSBackgroundColor">
 									<int key="NSColorSpace">6</int>
 									<string key="NSCatalogName">System</string>
 									<string key="NSColorName">controlColor</string>
@@ -288,7 +290,7 @@
 						<object class="NSPopUpButton" id="603594933">
 							<reference key="NSNextResponder" ref="351304596"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{62, 511}, {143, 22}}</string>
+							<string key="NSFrame">{{56, 511}, {143, 22}}</string>
 							<reference key="NSSuperview" ref="351304596"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="481839892"/>
@@ -323,29 +325,10 @@
 							</object>
 							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
-						<object class="NSTextField" id="560007448">
-							<reference key="NSNextResponder" ref="351304596"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 516}, {43, 14}}</string>
-							<reference key="NSSuperview" ref="351304596"/>
-							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="603594933"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSTextFieldCell" key="NSCell" id="845756175">
-								<int key="NSCellFlags">68157504</int>
-								<int key="NSCellFlags2">272761856</int>
-								<string key="NSContents">Target:</string>
-								<reference key="NSSupport" ref="26"/>
-								<reference key="NSControlView" ref="560007448"/>
-								<reference key="NSBackgroundColor" ref="710946188"/>
-								<reference key="NSTextColor" ref="752346256"/>
-							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-						</object>
 						<object class="NSProgressIndicator" id="481839892">
 							<reference key="NSNextResponder" ref="351304596"/>
 							<int key="NSvFlags">-2147483382</int>
-							<string key="NSFrame">{{210, 517}, {367, 12}}</string>
+							<string key="NSFrame">{{204, 517}, {373, 12}}</string>
 							<reference key="NSSuperview" ref="351304596"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="532731890"/>
@@ -1125,7 +1108,6 @@
 															<string key="NSFrame">{{1, 197}, {101, 16}}</string>
 															<reference key="NSSuperview" ref="291824815"/>
 															<reference key="NSWindow"/>
-															<reference key="NSNextKeyView"/>
 															<string key="NSReuseIdentifierKey">_NS:60</string>
 															<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 															<int key="NSsFlags">1</int>
@@ -1190,11 +1172,51 @@
 							<int key="NSDividerStyle">2</int>
 							<string key="NSAutosaveName">ZGDisassemblerHorizontalSplitter</string>
 						</object>
+						<object class="NSSegmentedControl" id="1027665523">
+							<reference key="NSNextResponder" ref="351304596"/>
+							<int key="NSvFlags">268</int>
+							<string key="NSFrame">{{3, 512}, {50, 20}}</string>
+							<reference key="NSSuperview" ref="351304596"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="603594933"/>
+							<string key="NSReuseIdentifierKey">_NS:9</string>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSSegmentedCell" key="NSCell" id="1024727965">
+								<int key="NSCellFlags">67108864</int>
+								<int key="NSCellFlags2">131072</int>
+								<reference key="NSSupport" ref="26"/>
+								<string key="NSCellIdentifier">_NS:9</string>
+								<reference key="NSControlView" ref="1027665523"/>
+								<array class="NSMutableArray" key="NSSegmentImages">
+									<object class="NSSegmentItem">
+										<double key="NSSegmentItemWidth">20</double>
+										<object class="NSCustomResource" key="NSSegmentItemImage">
+											<string key="NSClassName">NSImage</string>
+											<string key="NSResourceName">NSLeftFacingTriangleTemplate</string>
+										</object>
+										<int key="NSSegmentItemImageScaling">0</int>
+									</object>
+									<object class="NSSegmentItem">
+										<double key="NSSegmentItemWidth">23</double>
+										<object class="NSCustomResource" key="NSSegmentItemImage">
+											<string key="NSClassName">NSImage</string>
+											<string key="NSResourceName">NSRightFacingTriangleTemplate</string>
+										</object>
+										<int key="NSSegmentItemTag">1</int>
+										<int key="NSSegmentItemImageScaling">0</int>
+									</object>
+								</array>
+								<int key="NSSelectedSegment">1</int>
+								<int key="NSTrackingMode">2</int>
+								<int key="NSSegmentStyle">1</int>
+							</object>
+							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+						</object>
 					</array>
 					<string key="NSFrameSize">{818, 538}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
-					<reference key="NSNextKeyView" ref="560007448"/>
+					<reference key="NSNextKeyView" ref="1027665523"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{700, 441}</string>
@@ -1357,9 +1379,17 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">goToCallAddress:</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="610671398"/>
+						<reference key="destination" ref="323181272"/>
 					</object>
 					<int key="connectionID">294</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">navigationSegmentedControl</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="1027665523"/>
+					</object>
+					<int key="connectionID">298</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1464,6 +1494,14 @@
 						<reference key="destination" ref="219791290"/>
 					</object>
 					<int key="connectionID">288</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">navigate:</string>
+						<reference key="source" ref="1003"/>
+						<reference key="destination" ref="1027665523"/>
+					</object>
+					<int key="connectionID">297</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -1625,13 +1663,13 @@
 						<int key="objectID">6</int>
 						<reference key="object" ref="351304596"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="603594933"/>
-							<reference ref="560007448"/>
 							<reference ref="481839892"/>
 							<reference ref="370336159"/>
 							<reference ref="532731890"/>
 							<reference ref="636236275"/>
 							<reference ref="778492882"/>
+							<reference ref="1027665523"/>
+							<reference ref="603594933"/>
 						</array>
 						<reference key="parent" ref="821333839"/>
 					</object>
@@ -1640,14 +1678,6 @@
 						<reference key="object" ref="603594933"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="156061031"/>
-						</array>
-						<reference key="parent" ref="351304596"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">9</int>
-						<reference key="object" ref="560007448"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="845756175"/>
 						</array>
 						<reference key="parent" ref="351304596"/>
 					</object>
@@ -1676,11 +1706,6 @@
 						<int key="objectID">14</int>
 						<reference key="object" ref="299061031"/>
 						<reference key="parent" ref="778492882"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">15</int>
-						<reference key="object" ref="845756175"/>
-						<reference key="parent" ref="560007448"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">16</int>
@@ -1727,8 +1752,8 @@
 							<reference ref="488989615"/>
 							<reference ref="563802881"/>
 							<reference ref="219791290"/>
-							<reference ref="284931099"/>
-							<reference ref="610671398"/>
+							<reference ref="983364269"/>
+							<reference ref="323181272"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Debugger Right Click Menu</string>
@@ -2186,13 +2211,26 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">291</int>
-						<reference key="object" ref="284931099"/>
+						<reference key="object" ref="983364269"/>
 						<reference key="parent" ref="881434806"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">292</int>
-						<reference key="object" ref="610671398"/>
+						<reference key="object" ref="323181272"/>
 						<reference key="parent" ref="881434806"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">295</int>
+						<reference key="object" ref="1027665523"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="1024727965"/>
+						</array>
+						<reference key="parent" ref="351304596"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">296</int>
+						<reference key="object" ref="1024727965"/>
+						<reference key="parent" ref="1027665523"/>
 					</object>
 				</array>
 			</object>
@@ -2210,7 +2248,6 @@
 				<string key="13.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="133.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="14.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="15.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="155.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="156.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="159.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2268,6 +2305,9 @@
 				<string key="286.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="291.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="292.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="295.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<integer value="0" key="296.IBNSSegmentedControlInspectorSelectedSegmentMetadataKey"/>
+				<string key="296.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="41.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="42.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="43.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2285,7 +2325,6 @@
 				<string key="68.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="74.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="8.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="93.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="94.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
@@ -2293,7 +2332,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">294</int>
+			<int key="maxID">298</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2322,11 +2361,116 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDebuggerController</string>
 					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="continueExecution:">id</string>
+						<string key="copy:">id</string>
+						<string key="copyAddress:">id</string>
+						<string key="goBack:">id</string>
+						<string key="goForward:">id</string>
+						<string key="goToCallAddress:">id</string>
+						<string key="jump:">id</string>
+						<string key="navigate:">id</string>
+						<string key="nopVariables:">id</string>
+						<string key="pauseOrUnpauseProcess:">id</string>
+						<string key="readMemory:">id</string>
+						<string key="removeAllBreakPoints:">id</string>
+						<string key="runningApplicationsPopUpButton:">id</string>
+						<string key="showMemoryViewer:">id</string>
+						<string key="showWindow:">id</string>
+						<string key="stepInto:">id</string>
+						<string key="stepOut:">id</string>
+						<string key="stepOver:">id</string>
+						<string key="stopDisassembling:">id</string>
+						<string key="toggleBreakPoints:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="continueExecution:">
+							<string key="name">continueExecution:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copyAddress:">
+							<string key="name">copyAddress:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="goBack:">
+							<string key="name">goBack:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="goForward:">
+							<string key="name">goForward:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="goToCallAddress:">
+							<string key="name">goToCallAddress:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="jump:">
+							<string key="name">jump:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="navigate:">
+							<string key="name">navigate:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="nopVariables:">
+							<string key="name">nopVariables:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="pauseOrUnpauseProcess:">
+							<string key="name">pauseOrUnpauseProcess:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="readMemory:">
+							<string key="name">readMemory:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="removeAllBreakPoints:">
+							<string key="name">removeAllBreakPoints:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="runningApplicationsPopUpButton:">
+							<string key="name">runningApplicationsPopUpButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showMemoryViewer:">
+							<string key="name">showMemoryViewer:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showWindow:">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stepInto:">
+							<string key="name">stepInto:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stepOut:">
+							<string key="name">stepOut:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stepOver:">
+							<string key="name">stepOver:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="stopDisassembling:">
+							<string key="name">stopDisassembling:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleBreakPoints:">
+							<string key="name">toggleBreakPoints:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressTextField">NSTextField</string>
 						<string key="backtraceController">ZGBacktraceController</string>
 						<string key="dissemblyProgressIndicator">NSProgressIndicator</string>
 						<string key="instructionsTableView">NSTableView</string>
+						<string key="navigationSegmentedControl">NSSegmentedControl</string>
 						<string key="registersController">ZGRegistersController</string>
 						<string key="runningApplicationsPopUpButton">NSPopUpButton</string>
 						<string key="splitView">NSSplitView</string>
@@ -2348,6 +2492,10 @@
 						<object class="IBToOneOutletInfo" key="instructionsTableView">
 							<string key="name">instructionsTableView</string>
 							<string key="candidateClassName">NSTableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="navigationSegmentedControl">
+							<string key="name">navigationSegmentedControl</string>
+							<string key="candidateClassName">NSSegmentedControl</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="registersController">
 							<string key="name">registersController</string>
@@ -2419,8 +2567,10 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<string key="NSLeftFacingTriangleTemplate">{9, 9}</string>
 			<string key="NSMenuCheckmark">{11, 11}</string>
 			<string key="NSMenuMixedState">{10, 3}</string>
+			<string key="NSRightFacingTriangleTemplate">{9, 9}</string>
 			<string key="NSStopProgressFreestandingTemplate">{83, 83}</string>
 			<string key="NSSwitch">{15, 15}</string>
 		</dictionary>
