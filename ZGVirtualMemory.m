@@ -425,24 +425,24 @@ EXIT_ON_CANCEL:
 	return success;
 }
 
-void ZGInitializeSearch(ZGSearchData *searchData)
+void ZGInitializeSearch(ZGSearchData * __unsafe_unretained searchData)
 {
 	searchData.shouldCancelSearch = NO;
 	searchData.searchDidCancel = NO;
 }
 
-void ZGCancelSearchImmediately(ZGSearchData *searchData)
+void ZGCancelSearchImmediately(ZGSearchData * __unsafe_unretained searchData)
 {
 	searchData.shouldCancelSearch = YES;
 	searchData.searchDidCancel = YES;
 }
 
-void ZGCancelSearch(ZGSearchData *searchData)
+void ZGCancelSearch(ZGSearchData * __unsafe_unretained searchData)
 {
 	searchData.shouldCancelSearch = YES;
 }
 
-BOOL ZGSearchIsCancelling(ZGSearchData *searchData)
+BOOL ZGSearchIsCancelling(ZGSearchData * __unsafe_unretained searchData)
 {
 	return searchData.shouldCancelSearch;
 }
