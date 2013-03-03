@@ -71,7 +71,7 @@
 						<object class="NSTextField" id="743703027">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">265</int>
-							<string key="NSFrame">{{387, 432}, {51, 14}}</string>
+							<string key="NSFrame">{{387, 431}, {51, 14}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="655593949"/>
@@ -110,7 +110,7 @@
 						<object class="NSTextField" id="655593949">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">265</int>
-							<string key="NSFrame">{{443, 430}, {114, 19}}</string>
+							<string key="NSFrame">{{443, 429}, {114, 19}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="492394730"/>
@@ -186,7 +186,6 @@
 							<string key="NSFrameSize">{577, 424}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSClassName">HFTextView</string>
 						</object>
 						<object class="NSBox" id="492394730">
@@ -1005,10 +1004,10 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="551258685"/>
 							<reference ref="492394730"/>
-							<reference ref="743703027"/>
-							<reference ref="655593949"/>
 							<reference ref="974260530"/>
 							<reference ref="277782818"/>
+							<reference ref="655593949"/>
+							<reference ref="743703027"/>
 						</object>
 						<reference key="parent" ref="1005"/>
 					</object>
