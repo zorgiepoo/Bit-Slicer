@@ -40,13 +40,6 @@
 @implementation ZGRegion
 @end
 
-@interface ZGResultsWrapper : NSObject
-@property (nonatomic, strong) NSArray *results;
-@end
-
-@implementation ZGResultsWrapper
-@end
-
 static NSDictionary *gTasksDictionary = nil;
 
 BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task)
@@ -496,10 +489,10 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 	
 	ZGMemorySize pageSize = ZGPageSize(processTask);
 	
-	__block NSMutableArray *resultsWrapperArray = [[NSMutableArray alloc] init];
+	__block NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < searchData.savedData.count; regionIndex++)
 	{
-		[resultsWrapperArray addObject:[[ZGResultsWrapper alloc] init]];
+		[allResultSets addObject:[[NSMutableArray alloc] init]];
 	}
 	
 	__block ZGMemorySize numberOfRegionsProcessed = 0;
@@ -507,8 +500,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 	dispatch_apply(searchData.savedData.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
 		ZGRegion *region = [searchData.savedData objectAtIndex:regionIndex];
 		
-		ZGResultsWrapper *resultsWrapper = [resultsWrapperArray objectAtIndex:regionIndex];
-		NSMutableArray *localResults = [[NSMutableArray alloc] init];
+		NSMutableArray *resultSet = [allResultSets objectAtIndex:regionIndex];
 		
 		ZGMemoryAddress offset = 0;
 		char *currentData = NULL;
@@ -532,15 +524,13 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 				if (dataBeginAddress <= regionAddress + offset &&
 					dataEndAddress >= regionAddress + offset + dataSize)
 				{
-					searchForDataBlock(searchData, &currentData[offset], regionBytes + offset, regionAddress + offset, localResults);
+					searchForDataBlock(searchData, &currentData[offset], regionBytes + offset, regionAddress + offset, resultSet);
 				}
 				offset += dataAlignment;
 			}
 			
 			ZGFreeBytes(processTask, currentData, size);
 		}
-		
-		resultsWrapper.results = localResults;
 		
 		if (ZGSearchIsCancelling(searchData) && !ZGSearchDidCancel(searchData))
 		{
@@ -549,7 +539,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			numberOfRegionsProcessed++;
-			updateProgressBlock(localResults, numberOfRegionsProcessed);
+			updateProgressBlock(resultSet, numberOfRegionsProcessed);
 		});
 	});
 	
@@ -557,15 +547,15 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 	
 	if (!ZGSearchIsCancelling(searchData))
 	{
-		for (ZGResultsWrapper *taggedResults in resultsWrapperArray)
+		for (NSMutableArray *resultSet in allResultSets)
 		{
-			[allResults addObjectsFromArray:taggedResults.results];
+			[allResults addObjectsFromArray:resultSet];
 		}
 	}
 	else
 	{
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			resultsWrapperArray = nil;
+			allResultSets = nil;
 		});
 	}
 	
@@ -595,10 +585,10 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	
 	numberOfRegionsProcessed -= regions.count;
 	
-	__block NSMutableArray *resultsWrapperArray = [[NSMutableArray alloc] init];
+	__block NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
 	{
-		[resultsWrapperArray addObject:[[ZGResultsWrapper alloc] init]];
+		[allResultSets addObject:[[NSMutableArray alloc] init]];
 	}
 	
 	dispatch_apply(regions.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
@@ -606,8 +596,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 		ZGMemoryAddress address = region.address;
 		ZGMemorySize size = region.size;
 		
-		ZGResultsWrapper *resultsWrapper = [resultsWrapperArray objectAtIndex:regionIndex];
-		NSMutableArray *localResults = [[NSMutableArray alloc] init];
+		NSMutableArray *resultSet = [allResultSets objectAtIndex:regionIndex];
 		
 		char *bytes = NULL;
 		if (!ZGSearchIsCancelling(searchData) && ZGReadBytes(processTask, address, (void **)&bytes, &size))
@@ -623,7 +612,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 				if (dataBeginAddress <= address + dataIndex &&
 					dataEndAddress >= address + dataIndex + dataSize)
 				{
-					searchForDataBlock(searchData, &bytes[dataIndex], NULL, address + dataIndex, localResults);
+					searchForDataBlock(searchData, &bytes[dataIndex], NULL, address + dataIndex, resultSet);
 				}
 				dataIndex += dataAlignment;
 			}
@@ -636,11 +625,9 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 			searchData.searchDidCancel = YES;
 		}
 		
-		resultsWrapper.results = localResults;
-		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			numberOfRegionsProcessed++;
-			updateProgressBlock(localResults, numberOfRegionsProcessed);
+			updateProgressBlock(resultSet, numberOfRegionsProcessed);
 		});
 	});
 	
@@ -648,15 +635,15 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	
 	if (!ZGSearchIsCancelling(searchData))
 	{
-		for (ZGResultsWrapper *resultsWrapper in resultsWrapperArray)
+		for (NSMutableArray *resultSet in allResultSets)
 		{
-			[allResults addObjectsFromArray:resultsWrapper.results];
+			[allResults addObjectsFromArray:resultSet];
 		}
 	}
 	else
 	{
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			resultsWrapperArray = nil;
+			allResultSets = nil;
 		});
 	}
 	
