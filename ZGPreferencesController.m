@@ -52,6 +52,11 @@
 
 @implementation ZGPreferencesController
 
++ (BOOL)runningAlpha
+{
+	return [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] rangeOfString:@"a"].location != NSNotFound;
+}
+
 + (void)initialize
 {
 	[NSUserDefaults.standardUserDefaults
@@ -59,24 +64,14 @@
 		@{
 			ZG_HOT_KEY : @((NSInteger)INVALID_KEY_CODE),
 			ZG_HOT_KEY_MODIFIER : @((NSInteger)0),
-			ZG_CHECK_FOR_ALPHA_UPDATES : @(NO),
+			// If user is running an alpha version, we should set this to YES
+			ZG_CHECK_FOR_ALPHA_UPDATES : @([self runningAlpha]),
 			ZG_EXPAND_DOCUMENT_OPTIONS : @(NO),
 			ZG_REGISTER_TYPES : @{},
 			ZG_DEBUG_QUALIFIER : @(0),
 			ZG_SHOWED_ATOS_WARNING : @(NO),
-			SU_FEED_URL_KEY : APPCAST_URL,
+			SU_FEED_URL_KEY : ([self runningAlpha] ? ALPHA_APPCAST_URL : APPCAST_URL),
 		}];
-}
-
-- (id)init
-{
-	self = [super initWithWindowNibName:@"Preferences"];
-	
-	[self setWindowFrameAutosaveName:@"ZGPreferencesWindow"];
-	
-	[self updateFeedURL];
-	
-	return self;
 }
 
 - (void)updateFeedURL
@@ -93,16 +88,24 @@
 	}
 }
 
-- (IBAction)showWindow:(id)sender
+- (id)init
 {
-	[super showWindow:nil];
+	self = [super initWithWindowNibName:@"Preferences"];
 	
+	[self setWindowFrameAutosaveName:@"ZGPreferencesWindow"];
+	
+	[self updateFeedURL];
+	
+	return self;
+}
+
+- (void)updateCheckingForUpdateButtons
+{
 	if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_UPDATES])
 	{
 		if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
 		{
 			self.checkForAlphaUpdatesButton.state = NSOnState;
-			[[SUUpdater sharedUpdater] setFeedURL:[NSURL URLWithString:ALPHA_APPCAST_URL]];
 		}
 	}
 	else
@@ -110,8 +113,19 @@
 		self.checkForAlphaUpdatesButton.enabled = NO;
 		self.checkForUpdatesButton.state = NSOffState;
 	}
+}
+
+- (void)awakeFromNib
+{
+	[self updateCheckingForUpdateButtons];
+}
+
+- (IBAction)showWindow:(id)sender
+{
+	[super showWindow:nil];
 	
-	[self updateFeedURL];
+	// These states could change, for example, when the user has to make Sparkle pick between checking for automatic updates or not checking for them
+	[self updateCheckingForUpdateButtons];
 }
 
 - (void)windowDidLoad
@@ -152,13 +166,16 @@
 	{
 		self.checkForAlphaUpdatesButton.enabled = NO;
 		self.checkForAlphaUpdatesButton.state = NSOffState;
-		[[NSUserDefaults standardUserDefaults]
-		 setBool:NO
-		 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+		[[NSUserDefaults standardUserDefaults] setBool:NO forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 	}
 	else
 	{
 		self.checkForAlphaUpdatesButton.enabled = YES;
+		if ([[self class] runningAlpha])
+		{
+			self.checkForAlphaUpdatesButton.state = NSOnState;
+			[[NSUserDefaults standardUserDefaults] setBool:YES forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+		}
 	}
 	
 	[NSUserDefaults.standardUserDefaults

@@ -47,6 +47,8 @@
 	<array>
 		<string>allowed</string>
 	</array>
+	<key>SUFeedURL</key>
+	<string>http://zorg.tejat.net/bitslicer/appcast.xml</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
 	<key>NSMainNibFile</key>
