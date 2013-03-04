@@ -10,24 +10,24 @@ It allows you to cheat in video games by modifying your score, lives, money, amm
 
 ## Features
 * Memory Scanner
-	* Search & narrow down values by integers, floating-points, strings, byte arrays, and pointers
+	* Search & narrow down values of several types: integers, floating-points, strings, byte arrays, and pointers
 	* Add, delete, and modify variables with ease
 	* Freeze variable's values
-	* Store a process' entire virtual memory space and comparing how values have changed at a later time
+	* Store a process' entire virtual memory space and search for values based on changes
 	* Manipulate pointers by variable address dereferencing
 * Memory Viewer
-	* View live memory in a hex editor style window
-	* Dump memory to fileson disk for inspection by hand
+	* View memory live in a hex editor style window
+	* Dump memory to files on disk for inspection by hand
 	* Modify memory protection attributes
 * Debugger
 	* View live disassembly of instructions
 	* Modify instruction's bytes directly, or instructions themselves via an assembler (including nopping)
 	* Set breakpoints, resume from them when they're hit, view backtrace, manipulate thread registers, and step into/out/over instructions
-	* Find what instructions write to an address by watching for variable accesses in a document
+	* Watch for what instructions access a variable's address in a document
 * Save slice documents so that you can send cheats to your friends
 * Pause and un-pause current process
 * Undo & Redo many kinds of changes, including searches
-* Run as a normal user, not as a superuser (root)!
+* Run as a normal user, not as the superuser (root)!
 * Enjoy OS level features such as auto-saving, document versioning, window restoration, notification center, etc.
 
 *Note: Many of the features listed are only available in 1.6, which hasn't been publicly released yet, and is still in its alpha stages.*
@@ -44,13 +44,13 @@ It allows you to cheat in video games by modifying your score, lives, money, amm
 
 ## Source Code
 ### Licensing
-Bit Slicer is licensed under the 3-clause BSD license. However, versions prior to 1.6 are licensed under the GPL version 3 license.
+Bit Slicer is licensed under the 3-clause BSD license. Versions prior to 1.6, however, are licensed under the GPL version 3 license.
 
 ### Code Signing
-In order to build Bit Slicer, you will need to code-sign it. By code-signing, you can gain privileges to *task_for_pid()* without adding procmod group permissions or becoming a superuser.
+In order to build Bit Slicer, you will need to code-sign it. By code-signing, you can gain privileges to *task_for_pid()* without adding procmod group permissions or becoming the superuser.
 
 Unfortunately, unless you have purchased a Developer ID from Apple, this could prove to be challenging. Theoretically, it should be possible to sign the code using a self-signed certificate. However, I have not been able to get this work, which is a shame because I would really like to set up using a self-signed certificate for debug builds.
 
 If you are interested in setting up a self-signed certificate, you may want to check out this [llvm document on code-signing](https://llvm.org/svn/llvm-project/lldb/trunk/docs/code-signing.txt). If you are able to figure it out, I'd appreciate if you let me know how to do it.
 
-Versions prior to 1.6 are not code-signed, and consequently, the user authorizes the application to run as a superuser.
+Versions prior to 1.6 are not code-signed, and consequently, the user is required to authorize the application to run as the superuser.
