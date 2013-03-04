@@ -49,7 +49,7 @@ Bit Slicer is licensed under the 3-clause BSD license. Versions prior to 1.6, ho
 ### Code Signing
 In order to build Bit Slicer, you will need to code-sign it. By code-signing, you can gain privileges to *task_for_pid()* without adding procmod group permissions or becoming the superuser.
 
-Unfortunately, unless you have purchased a Developer ID from Apple, this could prove to be challenging. Theoretically, it should be possible to sign the code using a self-signed certificate. However, I have not been able to get this work, which is a shame because I would really like to set up using a self-signed certificate for debug builds.
+Unfortunately, unless you have purchased a Developer ID from Apple, this could prove to be challenging. Theoretically, it should be possible to sign the code using a self-signed certificate. However, I have not been able to get this work, which is a shame because I would really like to set one up for debug builds.
 
 If you are interested in setting up a self-signed certificate, you may want to check out this [lldb document on code-signing](https://llvm.org/svn/llvm-project/lldb/trunk/docs/code-signing.txt). If you are able to figure it out, I'd appreciate if you let me know how to do it.
 
