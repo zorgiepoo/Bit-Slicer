@@ -39,10 +39,6 @@
 #define NON_EXISTENT_PID_NUMBER -1
 
 @interface ZGProcess : NSObject
-{
-@public
-	ZGMemorySize _searchProgress;
-}
 
 @property (readwrite, nonatomic) pid_t processID;
 @property (readwrite, nonatomic) ZGMemoryMap processTask;

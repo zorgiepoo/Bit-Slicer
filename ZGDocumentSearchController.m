@@ -649,7 +649,7 @@
 		search_for_data_update_progress_t searchForDataUpdateInterfaceCallback = ^(NSUInteger newResultsCount, ZGMemorySize currentRegionNumber)
 		{
 			currentProcess.numberOfVariablesFound += newResultsCount;
-			currentProcess->_searchProgress = currentRegionNumber;
+			currentProcess.searchProgress = currentRegionNumber;
 		};
 		
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
