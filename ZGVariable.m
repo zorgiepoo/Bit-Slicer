@@ -234,7 +234,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize
 {
-	return [self initWithValue:value size:size address:address type:aType qualifier:qualifier pointerSize:pointerSize name:nil];
+	return [self initWithValue:value size:size address:address type:aType qualifier:qualifier pointerSize:pointerSize name:@""];
 }
 
 - (void)dealloc
