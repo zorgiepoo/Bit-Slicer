@@ -194,7 +194,7 @@
 
 - (NSDragOperation)tableView:(NSTableView *)tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
 {
-	if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
+	if ([draggingInfo draggingSource] == self.watchVariablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
 	{
 		return NSDragOperationMove;
 	}
@@ -218,7 +218,7 @@
 
 - (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo  row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
 {
-	if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType])
+	if ([draggingInfo draggingSource] == self.watchVariablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType])
 	{
 		NSMutableArray *variables = [NSMutableArray arrayWithArray:self.document.watchVariablesArray];
 		NSArray *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableReorderType];
@@ -263,13 +263,18 @@
 	return YES;
 }
 
-- (BOOL)tableView:(NSTableView *)view writeRows:(NSArray *)rows toPasteboard:(NSPasteboard *)pasteboard
+- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pasteboard
 {
-	[pasteboard declareTypes:@[ZGVariableReorderType] owner:self];
+	[pasteboard declareTypes:@[ZGVariableReorderType, ZGVariablePboardType] owner:self];
 	
-	[pasteboard
-	 setPropertyList:rows
-	 forType:ZGVariableReorderType];
+	NSMutableArray *rows = [[NSMutableArray alloc] init];
+	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
+		[rows addObject:@(index)];
+	}];
+	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableReorderType];
+	
+	NSArray *variables = [self.document.watchVariablesArray objectsAtIndexes:rowIndexes];
+	[pasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 	
 	return YES;
 }
