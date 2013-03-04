@@ -532,7 +532,6 @@
 	}
 	else
 	{
-		NSLog(@"Adding?");
 		[self runningApplicationsPopUpButtonRequest:nil];
 	}
 }
