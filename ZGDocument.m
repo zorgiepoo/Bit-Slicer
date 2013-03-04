@@ -464,7 +464,7 @@
 	{
 		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID];
 		
-		if (![self.currentProcess grantUsAccess])
+		if (!self.currentProcess.hasGrantedAccess && ![self.currentProcess grantUsAccess])
 		{
 			NSAttributedString *errorMessage =
 				[[NSAttributedString alloc]
@@ -532,6 +532,7 @@
 	}
 	else
 	{
+		NSLog(@"Adding?");
 		[self runningApplicationsPopUpButtonRequest:nil];
 	}
 }
