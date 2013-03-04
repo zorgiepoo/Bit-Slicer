@@ -42,7 +42,6 @@ It allows you to cheat in video games by searching and modifying values such as 
 * Visit the [forums](http://portingteam.com/forum/157-bit-slicer/)
 * Read [how to use Bit Slicer](http://portingteam.com/topic/4454-faq-information/)
 * Send an email to zorgiepoo (at) gmail (dot) com
-* [&#122;&#111;&#114;&#103;&#105;&#101;&#112;&#111;&#111;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;](&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#122;&#111;&#114;&#103;&#105;&#101;&#112;&#111;&#111;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;)
 
 ## Source Code
 ### Licensing
