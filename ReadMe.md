@@ -2,31 +2,32 @@
 ![Bit Slicer icon](https://dl.dropbox.com/u/10108199/bit_slicer/web_icon.png)
 
 ## Introduction
-Bit Slicer is an open-source generic game trainer application for OS X, written using Cocoa and Mach kernel APIs.
+Bit Slicer is an open-source universal game trainer for OS X, written using Cocoa and Mach kernel APIs.
 
-It allows you to cheat in video games by modifying your score, lives, money, ammunition, and much more.
+It allows you to cheat in video games by searching and modifying values such as your score, lives, money, ammunition, and much more.
 
-*Disclaimer: Use at your own risk. I'm not responsible for any damage that could occur.*
+*Disclaimer: Use this software at your own risk. I'm not responsible for any damage that could occur.*
 
 ## Features
 * Memory Scanner
 	* Search & narrow down values of several types: integers, floating-points, strings, byte arrays, and pointers
 	* Add, delete, and modify variables with ease
 	* Freeze variable's values
-	* Store a process' entire virtual memory space and search for values based on changes
-	* Manipulate pointers by variable address dereferencing
+	* Store a process' entire virtual memory space and search for values based on incremental changes
+	* Manipulate pointers by dereferencing variable addresses
 * Memory Viewer
 	* View memory live in a hex editor style window
-	* Dump memory to files on disk for inspection by hand
+	* Dump memory to files on disk for manual inspection
 	* Modify memory protection attributes
 * Debugger
 	* View live disassembly of instructions
-	* Modify instruction's bytes directly, or instructions themselves via an assembler (including nopping)
-	* Set breakpoints, resume from them when they're hit, view backtrace, manipulate thread registers, and step into/out/over instructions
-	* Watch for what instructions access a variable's address in a document
+	* Modify instruction's bytes directly, or by assembling instructions (including nopping)
+	* Set breakpoints, resume from them when they're hit, view backtraces, manipulate thread registers, and step into/out/over instructions
+	* Watch for what instructions access a variable in a document
 * Save slice documents so that you can send cheats to your friends
 * Pause and un-pause current process
 * Undo & Redo many kinds of changes, including searches
+* Evaluate mathematical expressions automatically (eg: in a flash game, search for 58 * 8)
 * Run as a normal user, not as the superuser (root)!
 * Enjoy OS level features such as auto-saving, document versioning, window restoration, notification center, etc.
 
@@ -34,13 +35,13 @@ It allows you to cheat in video games by modifying your score, lives, money, amm
 
 
 ## System Requirements
-* **Bit Slicer 1.6 or later**: OS X 10.6.8 or newer on a 64-bit processor
-* Bit Slicer 1.5.2 and older: Same as above, except also runs on 32-bit processors.
+* [Bit Slicer 1.6 Alphas](http://portingteam.com/topic/7976-16-alphas/) or later: OS X 10.6.8 or newer on a 64-bit processor
+* [Bit Slicer 1.5.2](http://dl.dropbox.com/u/10108199/Bit%20Slicer.zip) and older: Same as above, except also runs on 32-bit processors.
 
 ## Support & Feedback
 * Visit the [forums](http://portingteam.com/forum/157-bit-slicer/)
-* Check [how to use Bit Slicer](http://portingteam.com/topic/4454-faq-information/)
-* Send an email to zorgiepoo (at) gmail (dot) com.
+* Read [how to use Bit Slicer](http://portingteam.com/topic/4454-faq-information/)
+* Send an email to <a href='&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#122;&#111;&#114;&#103;&#105;&#101;&#112;&#111;&#111;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;'>&#122;&#111;&#114;&#103;&#105;&#101;&#112;&#111;&#111;&#64;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;</a>
 
 ## Source Code
 ### Licensing
@@ -49,7 +50,7 @@ Bit Slicer is licensed under the 3-clause BSD license. Versions prior to 1.6, ho
 ### Code Signing
 In order to build Bit Slicer, you will need to code-sign it. By code-signing, you can gain privileges to *task_for_pid()* without adding procmod group permissions or becoming the superuser.
 
-Unfortunately, unless you have purchased a Developer ID from Apple, this could prove to be challenging. Theoretically, it should be possible to sign the code using a self-signed certificate. However, I have not been able to get this work, which is a shame because I would really like to set one up for debug builds.
+Unfortunately, unless you have purchased a Developer ID from Apple, this could prove to be challenging. Theoretically, it should be possible to sign the code using a self-signed certificate. However, I have not been able to get this to work, which is a shame because I really want to set one up for debug builds.
 
 If you are interested in setting up a self-signed certificate, you may want to check out this [lldb document on code-signing](https://llvm.org/svn/llvm-project/lldb/trunk/docs/code-signing.txt). If you are able to figure it out, I'd appreciate if you let me know how to do it.
 
