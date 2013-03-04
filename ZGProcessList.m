@@ -117,6 +117,7 @@
 
 // http://stackoverflow.com/questions/7729245/can-i-use-sysctl-to-retrieve-a-process-list-with-the-user
 // http://www.nightproductions.net/dsprocessesinfo_m.html
+// Apparently I could use proc_listpids instead of sysctl.. Although we are already using sysctl for obtaining CPU architecture, and I'm unsure if this would actually be a better choice
 - (void)retrieveList
 {
 	struct kinfo_proc *processList = NULL;
