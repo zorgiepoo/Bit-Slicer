@@ -35,8 +35,8 @@ It allows you to cheat in video games by searching and modifying values such as 
 
 
 ## System Requirements
-* [Bit Slicer 1.6 Alphas](http://portingteam.com/topic/7976-16-alphas/) or later: OS X 10.6.8 or newer on a 64-bit processor
-* [Bit Slicer 1.5.2](http://dl.dropbox.com/u/10108199/Bit%20Slicer.zip) and older: Same as above, except also runs on 32-bit processors.
+* [Bit Slicer 1.6 Alphas](http://portingteam.com/topic/7976-16-alphas/) or later: OS X 10.6.8 or newer on a 64-bit Mac
+* [Bit Slicer 1.5.2](http://dl.dropbox.com/u/10108199/Bit%20Slicer.zip) and older: Same as above, except also runs on 32-bit Macs.
 
 ## Support & Feedback
 * Visit the [forums](http://portingteam.com/forum/157-bit-slicer/)
