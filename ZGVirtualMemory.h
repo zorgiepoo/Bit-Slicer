@@ -56,7 +56,7 @@
 
 typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableArray *results);
 
-typedef void (^search_for_data_update_progress_t)(NSArray *newResults, ZGMemorySize currentRegionNumber);
+typedef void (^search_for_data_update_progress_t)(NSUInteger newResultsCount, ZGMemorySize currentRegionNumber);
 
 typedef void (^search_for_data_completion_t)(NSArray *results);
 

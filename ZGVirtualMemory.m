@@ -539,7 +539,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			numberOfRegionsProcessed++;
-			updateProgressBlock(resultSet, numberOfRegionsProcessed);
+			updateProgressBlock(resultSet.count, numberOfRegionsProcessed);
 		});
 	});
 	
@@ -627,7 +627,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			numberOfRegionsProcessed++;
-			updateProgressBlock(resultSet, numberOfRegionsProcessed);
+			updateProgressBlock(resultSet.count, numberOfRegionsProcessed);
 		});
 	});
 	

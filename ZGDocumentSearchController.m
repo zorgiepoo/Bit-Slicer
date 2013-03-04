@@ -646,9 +646,9 @@
 			}
 		};
 		
-		search_for_data_update_progress_t searchForDataUpdateInterfaceCallback = ^(NSArray * __unsafe_unretained newResults, ZGMemorySize currentRegionNumber)
+		search_for_data_update_progress_t searchForDataUpdateInterfaceCallback = ^(NSUInteger newResultsCount, ZGMemorySize currentRegionNumber)
 		{
-			currentProcess.numberOfVariablesFound += newResults.count;
+			currentProcess.numberOfVariablesFound += newResultsCount;
 			currentProcess->_searchProgress = currentRegionNumber;
 		};
 		
