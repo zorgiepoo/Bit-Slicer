@@ -79,7 +79,7 @@
 - (void)markDocumentChange;
 
 - (void)updateClearButton;
-- (void)updateFlags;
+- (void)updateFlagsAndSearchButtonTitle;
 
 - (BOOL)doesFunctionTypeAllowSearchInput;
 - (BOOL)isFunctionTypeStore;

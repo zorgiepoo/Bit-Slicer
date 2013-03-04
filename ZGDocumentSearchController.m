@@ -212,10 +212,9 @@
 		self.document.searchValueTextField.enabled = YES;
 	}
 	self.document.searchButton.enabled = YES;
-	self.document.searchButton.title = @"Search";
 	self.document.searchButton.keyEquivalent = @"\r";
 	
-	[self.document updateFlags];
+	[self.document updateFlagsAndSearchButtonTitle];
 	
 	self.document.variableQualifierMatrix.enabled = YES;
 	self.document.functionPopUpButton.enabled = YES;

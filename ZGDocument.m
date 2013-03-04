@@ -742,7 +742,7 @@
 	}	
 }
 
-- (void)updateFlags
+- (void)updateFlagsAndSearchButtonTitle
 {
 	ZGVariableType dataType = (ZGVariableType)self.dataTypesPopUpButton.selectedItem.tag;
 	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
@@ -795,6 +795,15 @@
 			self.flagsTextField.enabled = YES;
 			self.flagsLabel.textColor = NSColor.controlTextColor;
 		}
+	}
+	
+	if (functionType == ZGStoreAllValues)
+	{
+		self.searchButton.title = @"Store";
+	}
+	else
+	{
+		self.searchButton.title = @"Search";
 	}
 }
 
@@ -921,7 +930,7 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		self.ignoreDataAlignmentCheckBox.enabled = (newTag != ZGUTF8String && newTag != ZGInt8);
 
-		[self updateFlags];
+		[self updateFlagsAndSearchButtonTitle];
 
 		if (recordUndo)
 		{
@@ -991,7 +1000,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (void)functionTypePopUpButtonRequest:(id)sender markChanges:(BOOL)shouldMarkChanges
 {
-	[self updateFlags];
+	[self updateFlagsAndSearchButtonTitle];
 	
 	if (![self doesFunctionTypeAllowSearchInput])
 	{
