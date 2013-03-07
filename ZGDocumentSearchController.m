@@ -586,7 +586,7 @@
 	
 	for (ZGVariable *variable in self.document.watchVariablesArray)
 	{
-		if (variable.isFrozen || variable.type != self.document.dataTypesPopUpButton.selectedItem.tag)
+		if (variable.isFrozen || variable.type != dataType)
 		{
 			variable.shouldBeSearched = NO;
 		}
