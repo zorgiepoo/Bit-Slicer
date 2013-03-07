@@ -840,7 +840,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 			}
 			
 			// Update UI progress every 5%
-			if (tempProgress / maxProgress >= 0.05)
+			if (tempProgress / maxProgress >= 0.05 || currentProgress == maxProgress-1)
 			{
 				currentProcess.searchProgress.progress = currentProgress;
 				currentProcess.searchProgress.numberOfVariablesFound = numberOfVariablesFound;
@@ -850,9 +850,6 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 			currentProgress++;
 			tempProgress++;
 		}
-		
-		currentProcess.searchProgress.progress = currentProgress;
-		currentProcess.searchProgress.numberOfVariablesFound = numberOfVariablesFound;
 		
 		for (ZGRegion *region in regions)
 		{
