@@ -483,49 +483,52 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 	}
 	
 	dispatch_apply(searchData.savedData.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
-		ZGRegion *region = [searchData.savedData objectAtIndex:regionIndex];
-		
-		NSMutableArray *resultSet = [allResultSets objectAtIndex:regionIndex];
-		
-		ZGMemoryAddress offset = 0;
-		char *currentData = NULL;
-		ZGMemorySize size = region.size;
-		ZGMemoryAddress regionAddress = region.address;
-		void *regionBytes = region.bytes;
-		
-		// Skipping an entire region will provide significant performance benefits
-		if (!ZGSearchIsCancelling(searchData) &&
-			regionAddress < dataEndAddress &&
-			regionAddress + size > dataBeginAddress &&
-			ZGReadBytes(processTask, regionAddress, (void **)&currentData, &size))
+		@autoreleasepool
 		{
-			while (offset + dataSize <= size)
+			ZGRegion *region = [searchData.savedData objectAtIndex:regionIndex];
+			
+			NSMutableArray *resultSet = [allResultSets objectAtIndex:regionIndex];
+			
+			ZGMemoryAddress offset = 0;
+			char *currentData = NULL;
+			ZGMemorySize size = region.size;
+			ZGMemoryAddress regionAddress = region.address;
+			void *regionBytes = region.bytes;
+			
+			// Skipping an entire region will provide significant performance benefits
+			if (!ZGSearchIsCancelling(searchData) &&
+				regionAddress < dataEndAddress &&
+				regionAddress + size > dataBeginAddress &&
+				ZGReadBytes(processTask, regionAddress, (void **)&currentData, &size))
 			{
-				if (offset % pageSize == 0 && ZGSearchIsCancelling(searchData))
+				while (offset + dataSize <= size)
 				{
-					break;
+					if (offset % pageSize == 0 && ZGSearchIsCancelling(searchData))
+					{
+						break;
+					}
+					
+					if (dataBeginAddress <= regionAddress + offset &&
+						dataEndAddress >= regionAddress + offset + dataSize)
+					{
+						searchForDataBlock(searchData, &currentData[offset], regionBytes + offset, regionAddress + offset, resultSet);
+					}
+					offset += dataAlignment;
 				}
 				
-				if (dataBeginAddress <= regionAddress + offset &&
-					dataEndAddress >= regionAddress + offset + dataSize)
-				{
-					searchForDataBlock(searchData, &currentData[offset], regionBytes + offset, regionAddress + offset, resultSet);
-				}
-				offset += dataAlignment;
+				ZGFreeBytes(processTask, currentData, size);
 			}
 			
-			ZGFreeBytes(processTask, currentData, size);
+			if (ZGSearchIsCancelling(searchData) && !ZGSearchDidCancel(searchData))
+			{
+				searchData.searchDidCancel = YES;
+			}
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				searchProgress.numberOfVariablesFound += resultSet.count;
+				searchProgress.progress++;
+			});
 		}
-		
-		if (ZGSearchIsCancelling(searchData) && !ZGSearchDidCancel(searchData))
-		{
-			searchData.searchDidCancel = YES;
-		}
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			searchProgress.numberOfVariablesFound += resultSet.count;
-			searchProgress.progress++;
-		});
 	});
 	
 	NSMutableArray *allResults = [[NSMutableArray alloc] init];
