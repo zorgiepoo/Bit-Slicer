@@ -37,8 +37,8 @@
 
 @interface ZGSearchProgress : NSObject
 
-@property (readwrite, nonatomic) ZGMemorySize progress;
-@property (readwrite, nonatomic) NSUInteger numberOfVariablesFound;
+@property (readwrite) ZGMemorySize progress;
+@property (readwrite) NSUInteger numberOfVariablesFound;
 
 @property (readwrite, nonatomic) BOOL isDoingMemoryDump;
 @property (readwrite, nonatomic) BOOL isStoringAllData;
