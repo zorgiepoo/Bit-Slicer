@@ -279,7 +279,7 @@ void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained s
 {
 	void *value = NULL;
 	
-	ZGRegion *hintedRegion = (hintedRegionReference && *hintedRegionReference) ? *hintedRegionReference : nil;
+	ZGRegion * __unsafe_unretained hintedRegion = (hintedRegionReference && *hintedRegionReference) ? *hintedRegionReference : nil;
 	if (hintedRegion && address >= hintedRegion.address && address + dataSize <= hintedRegion.address + hintedRegion.size)
 	{
 		value = hintedRegion.bytes + (address - hintedRegion.address);
