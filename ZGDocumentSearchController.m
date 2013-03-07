@@ -647,21 +647,12 @@
 			}
 		};
 		
-		search_for_data_update_progress_t searchForDataUpdateInterfaceCallback = ^(NSUInteger newResultsCount)
-		{
-			currentProcess.searchProgress.numberOfVariablesFound += newResultsCount;
-			currentProcess.searchProgress.progress++;
-		};
-		
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			if (self.searchData.shouldCompareStoredValues)
-			{
-				[temporaryVariablesArray addObjectsFromArray:ZGSearchForSavedData(currentProcess.processTask, self.searchData, searchForDataCallback, searchForDataUpdateInterfaceCallback)];
-			}
-			else
-			{
-				[temporaryVariablesArray addObjectsFromArray:ZGSearchForData(currentProcess.processTask, self.searchData, searchForDataCallback, searchForDataUpdateInterfaceCallback)];
-			}
+			search_for_data_function_t searchFunction = self.searchData.shouldCompareStoredValues ? ZGSearchForSavedData : ZGSearchForData;
+			
+			NSArray *results = searchFunction(currentProcess.processTask, self.searchData, currentProcess.searchProgress, searchForDataCallback);
+			
+			[temporaryVariablesArray addObjectsFromArray:results];
 			
 			dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
 		});

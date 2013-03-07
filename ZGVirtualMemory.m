@@ -479,7 +479,7 @@ static ZGMemorySize ZGPageSize(ZGMemoryMap processTask)
 	return pageSize;
 }
 
-NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t searchForDataBlock, search_for_data_update_progress_t updateProgressBlock)
+NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
 {
 	ZGInitializeSearch(searchData);
 	
@@ -490,7 +490,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 	
 	ZGMemorySize pageSize = ZGPageSize(processTask);
 	
-	__block NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
+	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < searchData.savedData.count; regionIndex++)
 	{
 		[allResultSets addObject:[[NSMutableArray alloc] init]];
@@ -537,7 +537,8 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 		}
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			updateProgressBlock(resultSet.count);
+			searchProgress.numberOfVariablesFound += resultSet.count;
+			searchProgress.progress++;
 		});
 	});
 	
@@ -552,15 +553,18 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 	}
 	else
 	{
+		// Deallocate allResultSets on a separate task since this could take some time if we allocated a lot of data
+		__block NSMutableArray *allResultSetsReference = allResultSets;
+		allResultSets = nil;
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			allResultSets = nil;
+			allResultSetsReference = nil;
 		});
 	}
 	
 	return allResults;
 }
 
-NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, search_for_data_t searchForDataBlock, search_for_data_update_progress_t updateProgressBlock)
+NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
 {
 	ZGInitializeSearch(searchData);
 	
@@ -575,13 +579,13 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	
 	NSArray *regions = ZGRegionsForProcessTask(processTask);
 	
-	//__block ZGMemorySize numberOfRegionsProcessed = regions.count;
+	searchProgress.progress = regions.count;
 	
 	regions = [regions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
 		return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
 	
-	//numberOfRegionsProcessed -= regions.count;
+	searchProgress.progress -= regions.count;
 	
 	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
@@ -626,7 +630,8 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				updateProgressBlock(resultSet.count);
+				searchProgress.numberOfVariablesFound += resultSet.count;
+				searchProgress.progress++;
 			});
 		}
 	});
@@ -642,7 +647,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	}
 	else
 	{
-		// Deallocate allResultSets on a separate task since this could take some time in some scenarios
+		// Deallocate allResultSets on a separate task since this could take some time if we allocated a lot of data
 		__block NSMutableArray *allResultSetsReference = allResultSets;
 		allResultSets = nil;
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
