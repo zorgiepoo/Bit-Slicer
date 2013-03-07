@@ -585,7 +585,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	
 	numberOfRegionsProcessed -= regions.count;
 	
-	__block NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
+	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
 	{
 		[allResultSets addObject:[[NSMutableArray alloc] init]];
@@ -642,8 +642,10 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	}
 	else
 	{
+		__block NSMutableArray *allResultSetsReference = allResultSets;
+		allResultSets = nil;
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			allResultSets = nil;
+			allResultSetsReference = nil;
 		});
 	}
 	
