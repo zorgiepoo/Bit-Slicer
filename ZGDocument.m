@@ -1295,7 +1295,7 @@ static NSSize *expandedWindowMinSize = nil;
 			return NO;
 		}
 		
-		if ((menuItem.action == @selector(showMemoryViewer:) && !(memoryProtection & VM_PROT_READ)) || (menuItem.action == @selector(showDebugger:) && !(memoryProtection & VM_PROT_EXECUTE)))
+		if (!(memoryProtection & VM_PROT_READ))
 		{
 			return NO;
 		}
