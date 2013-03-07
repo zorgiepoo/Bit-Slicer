@@ -711,67 +711,70 @@
 		
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 			dispatch_apply(numberOfBatches, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t batchIndex) {
-				NSArray *variables = [self.document.watchVariablesArray subarrayWithRange:NSMakeRange(batchIndex*batchSize, MIN(batchSize, totalCount - batchIndex*batchSize))];
-				NSMutableArray *batch = [batches objectAtIndex:batchIndex];
-				ZGRegion *lastUsedRegion = nil;
-				ZGRegion *lastUsedSavedRegion = nil;
-				
-				#define ADD_VARIABLE_SNIPPET \
-				void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue; \
-				if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variableAddress - lastUsedRegion.address), compareValue, dataSize)) \
-				{ \
-					[batch addObject:variable]; \
-				}
-				
-				for (ZGVariable *variable in variables)
+				@autoreleasepool
 				{
-					ZGMemoryAddress variableAddress = variable.address;
+					NSArray *variables = [self.document.watchVariablesArray subarrayWithRange:NSMakeRange(batchIndex*batchSize, MIN(batchSize, totalCount - batchIndex*batchSize))];
+					NSMutableArray *batch = [batches objectAtIndex:batchIndex];
+					ZGRegion *lastUsedRegion = nil;
+					ZGRegion *lastUsedSavedRegion = nil;
 					
-					if (variable.shouldBeSearched && variable.size > 0 && dataSize > 0 && beginningAddress <= variableAddress && endingAddress >= variableAddress + dataSize)
+					#define ADD_VARIABLE_SNIPPET \
+					void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue; \
+					if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variableAddress - lastUsedRegion.address), compareValue, dataSize)) \
+					{ \
+						[batch addObject:variable]; \
+					}
+					
+					for (ZGVariable *variable in variables)
 					{
-						// Check if the variable is in the last region we scanned
-						if (lastUsedRegion && variableAddress >= lastUsedRegion.address && variableAddress + dataSize <= lastUsedRegion.address + lastUsedRegion.size)
+						ZGMemoryAddress variableAddress = variable.address;
+						
+						if (variable.shouldBeSearched && variable.size > 0 && dataSize > 0 && beginningAddress <= variableAddress && endingAddress >= variableAddress + dataSize)
 						{
-							ADD_VARIABLE_SNIPPET
-						}
-						else
-						{
-							ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
-								if (region.address + region.size <= variableAddress)
-								{
-									return NSOrderedAscending;
-								}
-								else if (region.address >= variableAddress + dataSize)
-								{
-									return NSOrderedDescending;
-								}
-								else
-								{
-									return NSOrderedSame;
-								}
-							}];
-							
-							if (targetRegion)
+							// Check if the variable is in the last region we scanned
+							if (lastUsedRegion && variableAddress >= lastUsedRegion.address && variableAddress + dataSize <= lastUsedRegion.address + lastUsedRegion.size)
 							{
-								lastUsedRegion = targetRegion;
-								if (variableAddress >= targetRegion.address && variableAddress + dataSize <= targetRegion.address + targetRegion.size)
+								ADD_VARIABLE_SNIPPET
+							}
+							else
+							{
+								ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
+									if (region.address + region.size <= variableAddress)
+									{
+										return NSOrderedAscending;
+									}
+									else if (region.address >= variableAddress + dataSize)
+									{
+										return NSOrderedDescending;
+									}
+									else
+									{
+										return NSOrderedSame;
+									}
+								}];
+								
+								if (targetRegion)
 								{
-									ADD_VARIABLE_SNIPPET
+									lastUsedRegion = targetRegion;
+									if (variableAddress >= targetRegion.address && variableAddress + dataSize <= targetRegion.address + targetRegion.size)
+									{
+										ADD_VARIABLE_SNIPPET
+									}
 								}
 							}
 						}
+						
+						if (ZGSearchDidCancel(searchData))
+						{
+							break;
+						}
 					}
 					
-					if (ZGSearchDidCancel(searchData))
-					{
-						break;
-					}
+					dispatch_async(dispatch_get_main_queue(), ^{
+						currentProcess.searchProgress.progress += variables.count;
+						currentProcess.searchProgress.numberOfVariablesFound += batch.count;
+					});
 				}
-				
-				dispatch_async(dispatch_get_main_queue(), ^{
-					currentProcess.searchProgress.progress += variables.count;
-					currentProcess.searchProgress.numberOfVariablesFound += batch.count;
-				});
 			});
 			
 			for (ZGRegion *region in regions)
