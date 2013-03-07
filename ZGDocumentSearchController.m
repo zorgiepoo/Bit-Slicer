@@ -762,6 +762,11 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		ZGRegion *lastUsedRegion = nil;
 		ZGRegion *lastUsedSavedRegion = nil;
 		
+		NSUInteger numberOfVariablesFound = 0;
+		NSUInteger currentProgress = 0;
+		NSUInteger maxProgress = self.document.watchVariablesArray.count;
+		double tempProgress = 0.0;
+		
 		for (ZGVariable *variable in self.document.watchVariablesArray)
 		{
 			ZGMemoryAddress variableAddress = variable.address;
@@ -772,7 +777,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 				if (lastUsedRegion && variableAddress >= lastUsedRegion.address && variableAddress + dataSize <= lastUsedRegion.address + lastUsedRegion.size)
 				{
 					ADD_VARIABLE(temporaryVariablesArray);
-					currentProcess.searchProgress.numberOfVariablesFound++;
+					numberOfVariablesFound++;
 				}
 				else
 				{
@@ -806,13 +811,13 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 									targetRegion.size = size;
 									
 									ADD_VARIABLE(temporaryVariablesArray);
-									currentProcess.searchProgress.numberOfVariablesFound++;
+									numberOfVariablesFound++;
 								}
 							}
 							else
 							{
 								ADD_VARIABLE(temporaryVariablesArray);
-								currentProcess.searchProgress.numberOfVariablesFound++;
+								numberOfVariablesFound++;
 							}
 						}
 					}
@@ -824,7 +829,16 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 				break;
 			}
 			
-			currentProcess.searchProgress.progress++;
+			// Update UI progress every 5%
+			if (tempProgress / maxProgress >= 0.05)
+			{
+				currentProcess.searchProgress.progress = currentProgress;
+				currentProcess.searchProgress.numberOfVariablesFound = numberOfVariablesFound;
+				tempProgress = 0;
+			}
+			
+			currentProgress++;
+			tempProgress++;
 		}
 		
 		for (ZGRegion *region in regions)
