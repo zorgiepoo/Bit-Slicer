@@ -642,7 +642,7 @@
 					 qualifier:qualifier
 					 pointerSize:pointerSize];
 				
-				[results addObject:newVariable];
+				//[results addObject:newVariable];
 			}
 		};
 		
