@@ -51,4 +51,39 @@
 	return [NSArray arrayWithArray:newResults];
 }
 
+// our's first, their's later
+- (id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator
+{
+	id targetObject = nil;
+	
+	if (self.count > 0)
+	{
+		NSUInteger maxIndex = self.count - 1;
+		NSUInteger minIndex = 0;
+		while (maxIndex >= minIndex)
+		{
+			NSUInteger middleIndex = (minIndex + maxIndex) / 2;
+			id object = [self objectAtIndex:middleIndex];
+			
+			switch (comparator(object))
+			{
+				case NSOrderedAscending:
+					minIndex = middleIndex + 1;
+					break;
+				case NSOrderedDescending:
+					if (middleIndex == 0) goto ZG_BINARY_SEARCH_FINISHED;
+					maxIndex = middleIndex - 1;
+					break;
+				case NSOrderedSame:
+					targetObject = object;
+					goto ZG_BINARY_SEARCH_FINISHED;
+			}
+		}
+	}
+	
+ZG_BINARY_SEARCH_FINISHED:
+	
+	return targetObject;
+}
+
 @end

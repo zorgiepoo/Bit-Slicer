@@ -48,6 +48,7 @@
 #import "ZGPreferencesController.h"
 #import "ZGBacktraceController.h"
 #import "ZGMemoryViewer.h"
+#import "NSArrayAdditions.h"
 
 @interface ZGDebuggerController ()
 
@@ -465,89 +466,71 @@
 	ZGInstruction *instruction = nil;
 	
 	NSArray *regions = ZGRegionsForProcessTask(process.processTask);
-	ZGRegion *targetRegion = nil;
 	
-	// Binary search
-	NSUInteger maxRegionIndex = regions.count - 1;
-	NSUInteger minRegionIndex = 0;
-	while (maxRegionIndex >= minRegionIndex)
-	{
-		NSUInteger middleRegionIndex = (minRegionIndex + maxRegionIndex) / 2;
-		ZGRegion *region = [regions objectAtIndex:middleRegionIndex];
-		ZGMemoryAddress regionAddress = region.address;
-		
-		if (address < regionAddress)
+	ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
+		if (region.address + region.size <= address)
 		{
-			if (middleRegionIndex == 0) break;
-			maxRegionIndex = middleRegionIndex - 1;
+			return NSOrderedAscending;
 		}
-		else if (address >= regionAddress + region.size)
+		else if (region.address > address)
 		{
-			minRegionIndex = middleRegionIndex + 1;
+			return NSOrderedDescending;
 		}
 		else
 		{
-			if (address >= regionAddress && address <= regionAddress + region.size)
-			{
-				targetRegion = region;
-			}
-			
-			break;
+			return NSOrderedSame;
 		}
-	}
+	}];
 	
-	if (targetRegion)
+	if (targetRegion && address >= targetRegion.address && address <= targetRegion.address + targetRegion.size)
 	{
-		if (address >= targetRegion.address && address <= targetRegion.address + targetRegion.size)
+		// Start an arbitrary number of bytes before our address and decode the instructions
+		// Eventually they will converge into correct offsets
+		// So retrieve the offset and size to the last instruction while decoding
+		// We do this instead of starting at region.address due to this leading to better performance
+		
+		ZGMemoryAddress startAddress = address - 1024;
+		if (startAddress < targetRegion.address)
 		{
-			// Start an arbitrary number of bytes before our address and decode the instructions
-			// Eventually they will converge into correct offsets
-			// So retrieve the offset and size to the last instruction while decoding
-			// We do this instead of starting at region.address due to this leading to better performance
+			startAddress = targetRegion.address;
+		}
+		
+		ZGMemorySize size = address - startAddress;
+		// Read in more bytes to ensure we return the whole instruction
+		ZGMemorySize readSize = size + 30;
+		if (startAddress + readSize > targetRegion.address + targetRegion.size)
+		{
+			readSize = targetRegion.address + targetRegion.size - startAddress;
+		}
+		
+		void *bytes = NULL;
+		if (ZGReadBytes(process.processTask, startAddress, &bytes, &readSize))
+		{
+			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:process address:startAddress size:readSize bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 			
-			ZGMemoryAddress startAddress = address - 1024;
-			if (startAddress < targetRegion.address)
-			{
-				startAddress = targetRegion.address;
-			}
+			__block ZGMemoryAddress memoryOffset = 0;
+			__block ZGMemorySize memorySize = 0;
+			__block NSString *instructionText = nil;
+			__block ud_mnemonic_code_t instructionMnemonic = 0;
 			
-			ZGMemorySize size = address - startAddress;
-			// Read in more bytes to ensure we return the whole instruction
-			ZGMemorySize readSize = size + 30;
-			if (startAddress + readSize > targetRegion.address + targetRegion.size)
-			{
-				readSize = targetRegion.address + targetRegion.size - startAddress;
-			}
+			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop) {
+				if ((instructionAddress - startAddress) + instructionSize >= size)
+				{
+					memoryOffset = instructionAddress - startAddress;
+					memorySize = instructionSize;
+					instructionText = disassembledText;
+					instructionMnemonic = mnemonic;
+					*stop = YES;
+				}
+			}];
 			
-			void *bytes = NULL;
-			if (ZGReadBytes(process.processTask, startAddress, &bytes, &readSize))
-			{
-				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:process address:startAddress size:readSize bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
-				
-				__block ZGMemoryAddress memoryOffset = 0;
-				__block ZGMemorySize memorySize = 0;
-				__block NSString *instructionText = nil;
-				__block ud_mnemonic_code_t instructionMnemonic = 0;
-				
-				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop) {
-					if ((instructionAddress - startAddress) + instructionSize >= size)
-					{
-						memoryOffset = instructionAddress - startAddress;
-						memorySize = instructionSize;
-						instructionText = disassembledText;
-						instructionMnemonic = mnemonic;
-						*stop = YES;
-					}
-				}];
-				
-				instruction = [[ZGInstruction alloc] init];
-				instruction.text = instructionText;
-				instruction.mnemonic = instructionMnemonic;
-				ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize name:instruction.text shouldBeSearched:NO];
-				instruction.variable = variable;
-				
-				ZGFreeBytes(process.processTask, bytes, readSize);
-			}
+			instruction = [[ZGInstruction alloc] init];
+			instruction.text = instructionText;
+			instruction.mnemonic = instructionMnemonic;
+			ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize name:instruction.text shouldBeSearched:NO];
+			instruction.variable = variable;
+			
+			ZGFreeBytes(process.processTask, bytes, readSize);
 		}
 	}
 	
@@ -1982,42 +1965,20 @@ END_DEBUGGER_CHANGE:
 
 - (ZGInstruction *)findInstructionInTableAtAddress:(ZGMemoryAddress)targetAddress
 {
-	ZGInstruction *foundInstruction = nil;
-	
-	if (self.instructions.count > 0)
-	{
-		// Try to find the instruction in the table first, using a binary search
-		NSUInteger maxInstructionIndex = self.instructions.count-1;
-		NSUInteger minInstructionIndex = 0;
-		
-		while (maxInstructionIndex >= minInstructionIndex && !foundInstruction)
+	ZGInstruction *foundInstruction = [self.instructions zgBinarySearchUsingBlock:^NSComparisonResult(__unsafe_unretained ZGInstruction *instruction) {
+		if (instruction.variable.address < targetAddress)
 		{
-			NSUInteger middleInstructionIndex = (minInstructionIndex + maxInstructionIndex) / 2;
-			ZGInstruction *instruction = [self.instructions objectAtIndex:middleInstructionIndex];
-			
-			if (instruction.variable.address < targetAddress)
-			{
-				if (middleInstructionIndex >= self.instructions.count-1) break;
-				minInstructionIndex = middleInstructionIndex + 1;
-			}
-			else if (instruction.variable.address > targetAddress)
-			{
-				if (middleInstructionIndex == 0) break;
-				maxInstructionIndex = middleInstructionIndex - 1;
-			}
-			else
-			{
-				if (instruction.variable.address == targetAddress)
-				{
-					foundInstruction = instruction;
-				}
-				else
-				{
-					break;
-				}
-			}
+			return NSOrderedAscending;
 		}
-	}
+		else if (instruction.variable.address > targetAddress)
+		{
+			return NSOrderedDescending;
+		}
+		else
+		{
+			return NSOrderedSame;
+		}
+	}];
 	
 	return foundInstruction;
 }

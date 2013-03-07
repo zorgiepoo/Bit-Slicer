@@ -736,34 +736,27 @@
 						}
 						else
 						{
-							// Find which region the variable is in. Binary search time! Super fast!
-							NSUInteger maxRegionIndex = regions.count - 1;
-							NSUInteger minRegionIndex = 0;
-							while (maxRegionIndex >= minRegionIndex)
-							{
-								NSUInteger middleRegionIndex = (minRegionIndex + maxRegionIndex) / 2;
-								ZGRegion *region = [regions objectAtIndex:middleRegionIndex];
-								ZGMemoryAddress regionAddress = region.address;
-								
-								if (variableAddress + dataSize <= regionAddress)
+							ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
+								if (region.address + region.size <= variableAddress)
 								{
-									if (middleRegionIndex == 0) break;
-									maxRegionIndex = middleRegionIndex - 1;
+									return NSOrderedAscending;
 								}
-								else if (variableAddress >= regionAddress + region.size)
+								else if (region.address >= variableAddress + dataSize)
 								{
-									minRegionIndex = middleRegionIndex + 1;
+									return NSOrderedDescending;
 								}
 								else
 								{
-									// Found the region, see if we should add the variable
-									lastUsedRegion = region;
-									if (variableAddress >= regionAddress && variableAddress + dataSize <= regionAddress + region.size)
-									{
-										ADD_VARIABLE_SNIPPET
-									}
-									
-									break;
+									return NSOrderedSame;
+								}
+							}];
+							
+							if (targetRegion)
+							{
+								lastUsedRegion = targetRegion;
+								if (variableAddress >= targetRegion.address && variableAddress + dataSize <= targetRegion.address + targetRegion.size)
+								{
+									ADD_VARIABLE_SNIPPET
 								}
 							}
 						}

@@ -277,8 +277,6 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 
 void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGRegion **hintedRegionReference, ZGMemorySize dataSize)
 {
-	// Use a binary search
-	
 	void *value = NULL;
 	
 	ZGRegion *hintedRegion = (hintedRegionReference && *hintedRegionReference) ? *hintedRegionReference : nil;
@@ -289,39 +287,27 @@ void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained s
 	else
 	{
 		NSArray *regions = searchData.savedData;
-		
-		NSUInteger maxIndex = regions.count - 1;
-		NSUInteger minIndex = 0;
-		
-		while (maxIndex >= minIndex)
-		{
-			NSUInteger midIndex = (maxIndex + minIndex) / 2;
-			ZGRegion *region = [regions objectAtIndex:midIndex];
-			
-			ZGMemoryAddress regionAddress = region.address;
-			ZGMemorySize regionSize = region.size;
-			
-			if (address >= regionAddress + regionSize)
+		ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
+			if (region.address + region.size <= address)
 			{
-				minIndex = midIndex + 1;
+				return NSOrderedAscending;
 			}
-			else if (address + dataSize <= regionAddress)
+			else if (region.address >= address + dataSize)
 			{
-				if (midIndex == 0) break;
-				maxIndex = midIndex - 1;
+				return NSOrderedDescending;
 			}
 			else
 			{
-				// Found match
-				if (address >= regionAddress && address + dataSize <= regionAddress + regionSize)
-				{
-					value = region.bytes + (address - regionAddress);
-					if (hintedRegionReference)
-					{
-						*hintedRegionReference = region;
-					}
-					break;
-				}
+				return NSOrderedSame;
+			}
+		}];
+		
+		if (targetRegion && address >= targetRegion.address && address + dataSize <= targetRegion.address + targetRegion.size)
+		{
+			value = targetRegion.bytes + (address - targetRegion.address);
+			if (hintedRegionReference)
+			{
+				*hintedRegionReference = targetRegion;
 			}
 		}
 	}
