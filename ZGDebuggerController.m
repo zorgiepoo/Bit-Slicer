@@ -464,9 +464,41 @@
 {
 	ZGInstruction *instruction = nil;
 	
-	for (ZGRegion *region in ZGRegionsForProcessTask(process.processTask))
+	NSArray *regions = ZGRegionsForProcessTask(process.processTask);
+	ZGRegion *targetRegion = nil;
+	
+	// Binary search
+	NSUInteger maxRegionIndex = regions.count - 1;
+	NSUInteger minRegionIndex = 0;
+	while (maxRegionIndex >= minRegionIndex)
 	{
-		if (address >= region.address && address <= region.address + region.size)
+		NSUInteger middleRegionIndex = (minRegionIndex + maxRegionIndex) / 2;
+		ZGRegion *region = [regions objectAtIndex:middleRegionIndex];
+		ZGMemoryAddress regionAddress = region.address;
+		
+		if (address < regionAddress)
+		{
+			if (middleRegionIndex == 0) break;
+			maxRegionIndex = middleRegionIndex - 1;
+		}
+		else if (address >= regionAddress + region.size)
+		{
+			minRegionIndex = middleRegionIndex + 1;
+		}
+		else
+		{
+			if (address >= regionAddress && address <= regionAddress + region.size)
+			{
+				targetRegion = region;
+			}
+			
+			break;
+		}
+	}
+	
+	if (targetRegion)
+	{
+		if (address >= targetRegion.address && address <= targetRegion.address + targetRegion.size)
 		{
 			// Start an arbitrary number of bytes before our address and decode the instructions
 			// Eventually they will converge into correct offsets
@@ -474,17 +506,17 @@
 			// We do this instead of starting at region.address due to this leading to better performance
 			
 			ZGMemoryAddress startAddress = address - 1024;
-			if (startAddress < region.address)
+			if (startAddress < targetRegion.address)
 			{
-				startAddress = region.address;
+				startAddress = targetRegion.address;
 			}
 			
 			ZGMemorySize size = address - startAddress;
 			// Read in more bytes to ensure we return the whole instruction
 			ZGMemorySize readSize = size + 30;
-			if (startAddress + readSize > region.address + region.size)
+			if (startAddress + readSize > targetRegion.address + targetRegion.size)
 			{
-				readSize = region.address + region.size - startAddress;
+				readSize = targetRegion.address + targetRegion.size - startAddress;
 			}
 			
 			void *bytes = NULL;
@@ -516,8 +548,6 @@
 				
 				ZGFreeBytes(process.processTask, bytes, readSize);
 			}
-			
-			break;
 		}
 	}
 	
