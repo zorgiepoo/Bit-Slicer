@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 10/28/09.
+ * Created by Mayur Pawashe on 3/7/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,32 +32,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "ZGVirtualMemory.h"
-#import <sys/sysctl.h>
+#import <Foundation/Foundation.h>
+#import "ZGMemoryTypes.h"
 
-#define NON_EXISTENT_PID_NUMBER -1
+@interface ZGSearchProgress : NSObject
 
-@class ZGSearchProgress;
+@property (readwrite, nonatomic) ZGMemorySize progress;
+@property (readwrite, nonatomic) NSUInteger numberOfVariablesFound;
 
-@interface ZGProcess : NSObject
-
-@property (readwrite, nonatomic) pid_t processID;
-@property (readwrite, nonatomic) ZGMemoryMap processTask;
-@property (readonly, nonatomic) BOOL valid;
-@property (readwrite, copy, nonatomic) NSString *name;
-@property (readonly, nonatomic) NSUInteger numberOfRegions;
-@property (readwrite, nonatomic) BOOL is64Bit;
-@property (readwrite, nonatomic) ZGSearchProgress *searchProgress;
-
-+ (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
-
-- (id)initWithName:(NSString *)processName processID:(pid_t)aProcessID set64Bit:(BOOL)flag64Bit;
-- (id)initWithName:(NSString *)processName set64Bit:(BOOL)flag64Bit;
-- (void)markInvalid;
-- (BOOL)grantUsAccess;
-- (BOOL)hasGrantedAccess;
-
-- (ZGMemorySize)pointerSize;
+@property (readwrite, nonatomic) BOOL isDoingMemoryDump;
+@property (readwrite, nonatomic) BOOL isStoringAllData;
+@property (readwrite, nonatomic) BOOL isWatchingBreakPoint;
 
 @end

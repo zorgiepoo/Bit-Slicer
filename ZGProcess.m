@@ -35,6 +35,7 @@
 #import "ZGProcess.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
+#import "ZGSearchProgress.h"
 
 @implementation ZGProcess
 
@@ -61,6 +62,7 @@
 		self.name = processName;
 		self.processID = aProcessID;
 		self.is64Bit = flag64Bit;
+		self.searchProgress = [[ZGSearchProgress alloc] init];
 	}
 	
 	return self;

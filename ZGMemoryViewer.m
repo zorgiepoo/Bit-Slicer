@@ -38,6 +38,7 @@
 #import "ZGVerticalScrollerRepresenter.h"
 #import "DataInspectorRepresenter.h"
 #import "ZGProcess.h"
+#import "ZGSearchProgress.h"
 #import "ZGAppController.h"
 #import "ZGUtilities.h"
 #import "ZGCalculator.h"
@@ -348,7 +349,7 @@
 	}
 	else if (menuItem.action == @selector(dumpMemoryInRange:) || menuItem.action == @selector(dumpAllMemory:))
 	{
-		if (!self.currentProcess.valid || self.currentProcess.isDoingMemoryDump)
+		if (!self.currentProcess.valid || self.currentProcess.searchProgress.isDoingMemoryDump)
 		{
 			return NO;
 		}

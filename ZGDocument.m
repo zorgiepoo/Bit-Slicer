@@ -49,6 +49,7 @@
 #import "ZGVariable.h"
 #import "ZGUtilities.h"
 #import "ZGSearchData.h"
+#import "ZGSearchProgress.h"
 #import "ZGComparisonFunctions.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
@@ -1113,7 +1114,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(addVariable:))
 	{
-		if (![self.searchController canStartTask] && !self.currentProcess.isWatchingBreakPoint)
+		if (![self.searchController canStartTask] && !self.currentProcess.searchProgress.isWatchingBreakPoint)
 		{
 			return NO;
 		}
@@ -1178,7 +1179,7 @@ static NSSize *expandedWindowMinSize = nil;
 	{
 		menuItem.title = [NSString stringWithFormat:@"Edit Variable Value%@…", self.selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if (([self.searchController canCancelTask] && !self.currentProcess.searchProgress.isWatchingBreakPoint) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1186,7 +1187,7 @@ static NSSize *expandedWindowMinSize = nil;
 	
 	else if (menuItem.action == @selector(editVariablesAddress:))
 	{
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if (([self.searchController canCancelTask] && !self.currentProcess.searchProgress.isWatchingBreakPoint) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1197,7 +1198,7 @@ static NSSize *expandedWindowMinSize = nil;
 		NSArray *selectedVariables = [self selectedVariables];
 		menuItem.title = [NSString stringWithFormat:@"Edit Variable Size%@…", selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || selectedVariables.count == 0 || !self.currentProcess.valid)
+		if (([self.searchController canCancelTask] && !self.currentProcess.searchProgress.isWatchingBreakPoint) || selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1253,7 +1254,7 @@ static NSSize *expandedWindowMinSize = nil;
 	{
 		menuItem.title = [NSString stringWithFormat:@"NOP Variable%@", self.selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && !self.currentProcess.isWatchingBreakPoint) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if (([self.searchController canCancelTask] && !self.currentProcess.searchProgress.isWatchingBreakPoint) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}

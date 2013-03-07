@@ -40,6 +40,7 @@
 #import "ZGVariableController.h"
 #import "ZGVirtualMemory.h"
 #import "ZGSearchData.h"
+#import "ZGSearchProgress.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
 #import "ZGComparisonFunctions.h"
@@ -76,8 +77,8 @@
 	
 	// Force canceling
 	ZGCancelSearchImmediately(self.searchData);
-	self.document.currentProcess.isDoingMemoryDump = NO;
-	self.document.currentProcess.isStoringAllData = NO;
+	self.document.currentProcess.searchProgress.isDoingMemoryDump = NO;
+	self.document.currentProcess.searchProgress.isStoringAllData = NO;
 	[self.document.documentBreakPointController stopWatchingBreakPoints];
 	
 	self.searchData = nil;
@@ -263,7 +264,7 @@
 {
 	NSNumberFormatter *numberOfVariablesFoundFormatter = [[NSNumberFormatter alloc] init];
 	numberOfVariablesFoundFormatter.format = @"#,###";
-	return [NSString stringWithFormat:@"Found %@ value%@...", [numberOfVariablesFoundFormatter stringFromNumber:@(self.document.currentProcess.numberOfVariablesFound)], self.document.currentProcess.numberOfVariablesFound != 1 ? @"s" : @""];
+	return [NSString stringWithFormat:@"Found %@ value%@...", [numberOfVariablesFoundFormatter stringFromNumber:@(self.document.currentProcess.searchProgress.numberOfVariablesFound)], self.document.currentProcess.searchProgress.numberOfVariablesFound != 1 ? @"s" : @""];
 }
 
 - (void)updateSearchUserInterface:(NSTimer *)timer
@@ -272,7 +273,7 @@
 	{
 		if (!ZGSearchIsCancelling(self.searchData))
 		{
-			self.document.searchingProgressIndicator.doubleValue = (double)self.document.currentProcess.searchProgress;
+			self.document.searchingProgressIndicator.doubleValue = (double)self.document.currentProcess.searchProgress.progress;
 			self.document.generalStatusTextField.stringValue = [self numberOfVariablesFoundDescription];
 		}
 		else
@@ -286,7 +287,7 @@
 {
 	if (self.document.windowForSheet.isVisible)
 	{
-		self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress;
+		self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress.progress;
 	}
 }
 
@@ -342,10 +343,10 @@
 		[[self.document.undoManager prepareWithInvocationTarget:self.document] setWatchVariablesArrayAndUpdateInterface:self.document.watchVariablesArray];
 	}
 	
-	self.document.currentProcess.searchProgress = 0;
+	self.document.currentProcess.searchProgress.progress = 0;
 	if (ZGSearchDidCancel(self.searchData))
 	{
-		self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress;
+		self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress.progress;
 		self.document.generalStatusTextField.stringValue = @"Canceled search.";
 	}
 	else
@@ -623,8 +624,8 @@
 		NSUInteger numberOfRegions = self.document.currentProcess.numberOfRegions;
 		
 		self.document.searchingProgressIndicator.maxValue = numberOfRegions;
-		self.document.currentProcess.numberOfVariablesFound = 0;
-		self.document.currentProcess.searchProgress = 0;
+		self.document.currentProcess.searchProgress.numberOfVariablesFound = 0;
+		self.document.currentProcess.searchProgress.progress = 0;
 		
 		[self createUserInterfaceTimer];
 		
@@ -642,14 +643,14 @@
 					 qualifier:qualifier
 					 pointerSize:pointerSize];
 				
-				//[results addObject:newVariable];
+				[results addObject:newVariable];
 			}
 		};
 		
-		search_for_data_update_progress_t searchForDataUpdateInterfaceCallback = ^(NSUInteger newResultsCount, ZGMemorySize currentRegionNumber)
+		search_for_data_update_progress_t searchForDataUpdateInterfaceCallback = ^(NSUInteger newResultsCount)
 		{
-			currentProcess.numberOfVariablesFound += newResultsCount;
-			currentProcess.searchProgress = currentRegionNumber;
+			currentProcess.searchProgress.numberOfVariablesFound += newResultsCount;
+			currentProcess.searchProgress.progress++;
 		};
 		
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -670,8 +671,8 @@
 		ZGMemoryMap processTask = self.document.currentProcess.processTask;
 		
 		self.document.searchingProgressIndicator.maxValue = self.document.watchVariablesArray.count;
-		self.document.currentProcess.searchProgress = 0;
-		self.document.currentProcess.numberOfVariablesFound = 0;
+		self.document.currentProcess.searchProgress.progress = 0;
+		self.document.currentProcess.searchProgress.numberOfVariablesFound = 0;
 		
 		[self createUserInterfaceTimer];
 		
@@ -784,8 +785,8 @@
 				}
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
-					currentProcess.searchProgress += variables.count;
-					currentProcess.numberOfVariablesFound += batch.count;
+					currentProcess.searchProgress.progress += variables.count;
+					currentProcess.searchProgress.numberOfVariablesFound += batch.count;
 				});
 			});
 			
@@ -828,19 +829,19 @@
 
 - (void)cancelTask
 {
-	if (self.document.currentProcess.isDoingMemoryDump)
+	if (self.document.currentProcess.searchProgress.isDoingMemoryDump)
 	{
 		// Cancel memory dump
-		self.document.currentProcess.isDoingMemoryDump = NO;
+		self.document.currentProcess.searchProgress.isDoingMemoryDump = NO;
 		self.document.generalStatusTextField.stringValue = @"Canceling Memory Dump...";
 	}
-	else if (self.document.currentProcess.isStoringAllData)
+	else if (self.document.currentProcess.searchProgress.isStoringAllData)
 	{
 		// Cancel memory store
-		self.document.currentProcess.isStoringAllData = NO;
+		self.document.currentProcess.searchProgress.isStoringAllData = NO;
 		self.document.generalStatusTextField.stringValue = @"Canceling Memory Store...";
 	}
-	else if (self.document.currentProcess.isWatchingBreakPoint)
+	else if (self.document.currentProcess.searchProgress.isWatchingBreakPoint)
 	{
 		// Cancel break point watching
 		[self.document.documentBreakPointController cancelTask];
@@ -865,7 +866,7 @@
 
 - (void)storeAllValues
 {
-	if (self.document.currentProcess.isStoringAllData)
+	if (self.document.currentProcess.searchProgress.isStoringAllData)
 	{
 		return;
 	}
@@ -884,13 +885,13 @@
 		dispatch_async(dispatch_get_main_queue(), ^{
 			self.userInterfaceTimer = nil;
 			
-			if (!self.document.currentProcess.isStoringAllData)
+			if (!self.document.currentProcess.searchProgress.isStoringAllData)
 			{
 				self.document.generalStatusTextField.stringValue = @"Canceled Memory Store";
 			}
 			else
 			{
-				self.document.currentProcess.isStoringAllData = NO;
+				self.document.currentProcess.searchProgress.isStoringAllData = NO;
 				
 				self.searchData.savedData = self.searchData.tempSavedData;
 				self.searchData.tempSavedData = nil;

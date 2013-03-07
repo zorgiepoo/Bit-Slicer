@@ -68,6 +68,7 @@
 		77F8D8CB16C3531D00C52CE2 /* ZGBacktraceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F8D8CA16C3531D00C52CE2 /* ZGBacktraceController.m */; };
 		77F8D8D216C4A12600C52CE2 /* ZGRegistersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F8D8D116C4A12600C52CE2 /* ZGRegistersController.m */; };
 		77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FC461F12237F71003CB09B /* NSStringAdditions.m */; };
+		77FF507116E867FB0005915D /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FF507016E867FB0005915D /* ZGSearchProgress.m */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
@@ -200,6 +201,8 @@
 		77F8D8D116C4A12600C52CE2 /* ZGRegistersController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRegistersController.m; sourceTree = "<group>"; };
 		77FC461E12237F71003CB09B /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringAdditions.h; sourceTree = "<group>"; };
 		77FC461F12237F71003CB09B /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSStringAdditions.m; sourceTree = "<group>"; };
+		77FF506F16E867FB0005915D /* ZGSearchProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGSearchProgress.h; sourceTree = "<group>"; };
+		77FF507016E867FB0005915D /* ZGSearchProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGSearchProgress.m; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bit_Slicer-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Bit Slicer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bit Slicer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -289,6 +292,8 @@
 				770930B415B92203009705A6 /* ZGVariableController.m */,
 				770930BC15BA97B3009705A6 /* ZGSearchData.h */,
 				770930BD15BA97B4009705A6 /* ZGSearchData.m */,
+				77FF506F16E867FB0005915D /* ZGSearchProgress.h */,
+				77FF507016E867FB0005915D /* ZGSearchProgress.m */,
 				77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */,
 				77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */,
 				770EA82A137BA8E3007FB85A /* ZGUtilities.h */,
@@ -555,6 +560,7 @@
 				77CA284E16A7B5D500F3B54B /* ZGRegister.m in Sources */,
 				77F8D8CB16C3531D00C52CE2 /* ZGBacktraceController.m in Sources */,
 				77F8D8D216C4A12600C52CE2 /* ZGRegistersController.m in Sources */,
+				77FF507116E867FB0005915D /* ZGSearchProgress.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

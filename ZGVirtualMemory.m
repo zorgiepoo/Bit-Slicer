@@ -35,6 +35,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
 #import "ZGSearchData.h"
+#import "ZGSearchProgress.h"
 #import "NSArrayAdditions.h"
 
 @implementation ZGRegion
@@ -239,8 +240,8 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 	mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
 	mach_port_t objectName = MACH_PORT_NULL;
 	
-	process.isStoringAllData = YES;
-	process.searchProgress = 0;
+	process.searchProgress.isStoringAllData = YES;
+	process.searchProgress.progress = 0;
 	
 	while (mach_vm_region(process.processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
@@ -261,9 +262,9 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 		
 		address += size;
 		
-		process.searchProgress++;
+		process.searchProgress.progress++;
 		
-		if (!process.isStoringAllData)
+		if (!process.searchProgress.isStoringAllData)
 		{
 			ZGFreeData(dataArray);
 			dataArray = nil;
@@ -363,8 +364,8 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 	
 	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
 	
-	process.isDoingMemoryDump = YES;
-	process.searchProgress = 0;
+	process.searchProgress.isDoingMemoryDump = YES;
+	process.searchProgress.progress = 0;
     
 	while (mach_vm_region(process.processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
@@ -396,9 +397,9 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 		address += size;
 		lastAddress = address;
 		
-		process.searchProgress++;
+		process.searchProgress.progress++;
   	    
-		if (!process.isDoingMemoryDump)
+		if (!process.searchProgress.isDoingMemoryDump)
 		{
 			goto EXIT_ON_CANCEL;
 		}
@@ -495,8 +496,6 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 		[allResultSets addObject:[[NSMutableArray alloc] init]];
 	}
 	
-	__block ZGMemorySize numberOfRegionsProcessed = 0;
-	
 	dispatch_apply(searchData.savedData.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
 		ZGRegion *region = [searchData.savedData objectAtIndex:regionIndex];
 		
@@ -538,8 +537,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * __unsafe_u
 		}
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			numberOfRegionsProcessed++;
-			updateProgressBlock(resultSet.count, numberOfRegionsProcessed);
+			updateProgressBlock(resultSet.count);
 		});
 	});
 	
@@ -577,13 +575,13 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 	
 	NSArray *regions = ZGRegionsForProcessTask(processTask);
 	
-	__block ZGMemorySize numberOfRegionsProcessed = regions.count;
+	//__block ZGMemorySize numberOfRegionsProcessed = regions.count;
 	
 	regions = [regions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
 		return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
 	
-	numberOfRegionsProcessed -= regions.count;
+	//numberOfRegionsProcessed -= regions.count;
 	
 	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
@@ -628,8 +626,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData * __unsafe_unreta
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				numberOfRegionsProcessed++;
-				updateProgressBlock(resultSet.count, numberOfRegionsProcessed);
+				updateProgressBlock(resultSet.count);
 			});
 		}
 	});
