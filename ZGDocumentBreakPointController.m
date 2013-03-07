@@ -48,7 +48,7 @@
 
 @property (assign) IBOutlet ZGDocument *document;
 @property (strong, nonatomic) ZGProcess *watchProcess;
-@property (strong, nonatomic) NSMutableArray *foundInstructions;
+@property (strong, nonatomic) NSMutableArray *foundBreakPointAddresses;
 @property (assign, nonatomic) NSUInteger variableInsertionIndex;
 
 @end
@@ -68,7 +68,7 @@
 		 name:NSApplicationWillTerminateNotification
 		 object:nil];
 		
-		self.foundInstructions = [[NSMutableArray alloc] init];
+		self.foundBreakPointAddresses = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -101,7 +101,7 @@
 	[self.document.searchingProgressIndicator stopAnimation:nil];
 	self.document.searchingProgressIndicator.indeterminate = NO;
 	
-	[self.foundInstructions removeAllObjects];
+	[self.foundBreakPointAddresses removeAllObjects];
 	
 	[self stopWatchingBreakPoints];
 	
@@ -138,12 +138,11 @@
 
 - (void)breakPointDidHit:(NSNumber *)address
 {
-	ZGMemoryAddress breakPointAddress = [address unsignedLongLongValue];
-	ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:breakPointAddress inProcess:self.watchProcess];
-	
-	if (![self.foundInstructions containsObject:instruction])
+	if (![self.foundBreakPointAddresses containsObject:address])
 	{
-		[self.foundInstructions addObject:instruction];
+		[self.foundBreakPointAddresses addObject:address];
+		
+		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[address unsignedLongLongValue] inProcess:self.watchProcess];
 		
 		if (self.variableInsertionIndex >= self.document.watchVariablesArray.count)
 		{
