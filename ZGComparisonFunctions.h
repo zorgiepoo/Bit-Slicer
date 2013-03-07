@@ -37,6 +37,7 @@
 #import "ZGSearchData.h"
 
 #define COMPARISON_PARAMETERS ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGMemorySize size
+typedef BOOL (*comparison_function_t)(COMPARISON_PARAMETERS);
 
 @class ZGSearchData;
 
@@ -58,8 +59,6 @@ typedef enum
 	
 	ZGStoreAllValues,
 } ZGFunctionType;
-
-typedef BOOL (*comparison_function_t)(COMPARISON_PARAMETERS);
 
 comparison_function_t getComparisonFunction(ZGFunctionType functionType, ZGVariableType dataType, BOOL is64Bit);
 
