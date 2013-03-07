@@ -524,8 +524,10 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 				searchData.searchDidCancel = YES;
 			}
 			
-			searchProgress.numberOfVariablesFound += resultSet.count;
-			searchProgress.progress++;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				searchProgress.numberOfVariablesFound += resultSet.count;
+				searchProgress.progress++;
+			});
 		}
 	});
 	
@@ -616,8 +618,10 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 				searchData.searchDidCancel = YES;
 			}
 			
-			searchProgress.numberOfVariablesFound += resultSet.count;
-			searchProgress.progress++;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				searchProgress.numberOfVariablesFound += resultSet.count;
+				searchProgress.progress++;
+			});
 		}
 	});
 	

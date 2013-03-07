@@ -842,8 +842,10 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 			// Update UI progress every 5%
 			if (tempProgress / maxProgress >= 0.05 || currentProgress == maxProgress-1)
 			{
-				currentProcess.searchProgress.progress = currentProgress;
-				currentProcess.searchProgress.numberOfVariablesFound = numberOfVariablesFound;
+				dispatch_async(dispatch_get_main_queue(), ^{
+					currentProcess.searchProgress.progress = currentProgress;
+					currentProcess.searchProgress.numberOfVariablesFound = numberOfVariablesFound;
+				});
 				tempProgress = 0;
 			}
 			
