@@ -167,7 +167,8 @@
 
 + (BOOL)autosavesInPlace
 {
-    return YES;
+	// If user is running as root for some reason, disable autosaving
+    return geteuid() != 0;
 }
 
 - (void)loadDocumentUserInterface
