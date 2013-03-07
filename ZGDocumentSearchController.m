@@ -607,6 +607,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 } \
 \
 } while (0) 
+
 - (void)narrowDownVariablesWithComparisonFunction:(comparison_function_t)compareFunction andAddResultsToArray:(NSMutableArray *)temporaryVariablesArray usingCompletionBlock:(void(^)(void))completeSearchBlock
 {
 	ZGMemoryMap processTask = self.document.currentProcess.processTask;
@@ -737,6 +738,18 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 	});
 }
 
+
+#define ADD_VARIABLE_SINGLE(array) \
+do { \
+\
+void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue; \
+if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variableAddress - lastUsedRegion.address), compareValue, dataSize)) \
+{ \
+	[array addObject:variable]; \
+	numberOfVariablesFound++; \
+} \
+\
+} while (0)
 - (void)narrowDownVariablesSingleThreadedWithComparisonFunction:(comparison_function_t)compareFunction andAddResultsToArray:(NSMutableArray *)temporaryVariablesArray usingCompletionBlock:(void(^)(void))completeSearchBlock
 {
 	ZGMemoryMap processTask = self.document.currentProcess.processTask;
@@ -776,8 +789,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 				// Check if the variable is in the last region we scanned
 				if (lastUsedRegion && variableAddress >= lastUsedRegion.address && variableAddress + dataSize <= lastUsedRegion.address + lastUsedRegion.size)
 				{
-					ADD_VARIABLE(temporaryVariablesArray);
-					numberOfVariablesFound++;
+					ADD_VARIABLE_SINGLE(temporaryVariablesArray);
 				}
 				else
 				{
@@ -810,14 +822,12 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 									targetRegion.bytes = bytes;
 									targetRegion.size = size;
 									
-									ADD_VARIABLE(temporaryVariablesArray);
-									numberOfVariablesFound++;
+									ADD_VARIABLE_SINGLE(temporaryVariablesArray);
 								}
 							}
 							else
 							{
-								ADD_VARIABLE(temporaryVariablesArray);
-								numberOfVariablesFound++;
+								ADD_VARIABLE_SINGLE(temporaryVariablesArray);
 							}
 						}
 					}
@@ -840,6 +850,9 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 			currentProgress++;
 			tempProgress++;
 		}
+		
+		currentProcess.searchProgress.progress = currentProgress;
+		currentProcess.searchProgress.numberOfVariablesFound = numberOfVariablesFound;
 		
 		for (ZGRegion *region in regions)
 		{
