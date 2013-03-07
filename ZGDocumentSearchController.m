@@ -671,7 +671,7 @@
 		ZGMemoryAddress beginningAddress = self.searchData.beginAddress;
 		ZGMemoryAddress endingAddress = self.searchData.endAddress;
 		
-		__block ZGSearchData *searchData = self.searchData;
+		ZGSearchData *searchData = self.searchData;
 		ZGInitializeSearch(self.searchData);
 		
 		// Get all relevant regions
