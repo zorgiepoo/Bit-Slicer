@@ -137,7 +137,7 @@
 
 - (void)breakPointDidHit:(NSNumber *)address
 {
-	if (![self.foundBreakPointAddresses containsObject:address])
+	if (self.watchProcess && ![self.foundBreakPointAddresses containsObject:address])
 	{
 		[self.foundBreakPointAddresses addObject:address];
 		
