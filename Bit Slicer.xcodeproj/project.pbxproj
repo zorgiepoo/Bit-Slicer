@@ -69,6 +69,7 @@
 		77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FC461F12237F71003CB09B /* NSStringAdditions.m */; };
 		77FF507116E867FB0005915D /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FF507016E867FB0005915D /* ZGSearchProgress.m */; };
 		77FF507716E9A4250005915D /* ZGDebuggerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77FF507516E9A4250005915D /* ZGDebuggerController.xib */; };
+		77FF507A16E9B71C0005915D /* ZGMemoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FF507916E9B71A0005915D /* ZGMemoryWindowController.m */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
@@ -203,6 +204,8 @@
 		77FF506F16E867FB0005915D /* ZGSearchProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGSearchProgress.h; sourceTree = "<group>"; };
 		77FF507016E867FB0005915D /* ZGSearchProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGSearchProgress.m; sourceTree = "<group>"; };
 		77FF507616E9A4250005915D /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ZGDebuggerController.xib; sourceTree = "<group>"; };
+		77FF507816E9B7180005915D /* ZGMemoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryWindowController.h; sourceTree = "<group>"; };
+		77FF507916E9B71A0005915D /* ZGMemoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryWindowController.m; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bit_Slicer-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Bit Slicer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bit Slicer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -270,8 +273,7 @@
 		2A37F4ABFDCFA73011CA2CEA /* Code */ = {
 			isa = PBXGroup;
 			children = (
-				77329B5A168D07B6007DCAE2 /* Debugger */,
-				77D5AEAC137C6FC000026388 /* Memory Viewer */,
+				77FF507B16E9B7D40005915D /* Memory Window Controllers */,
 				775FCB1011719DF6000054FB /* ZGAppController.h */,
 				775FCB1111719DF6000054FB /* ZGAppController.m */,
 				775FCB1411719DF6000054FB /* ZGPreferencesController.h */,
@@ -377,18 +379,18 @@
 			children = (
 				7701EF411696A29100877373 /* mach_exc */,
 				77329B74168D0E16007DCAE2 /* libudis86 */,
-				77E652B1168F889C00D84A7F /* ZGBreakPointController.h */,
-				77E652B2168F889C00D84A7F /* ZGBreakPointController.m */,
-				77E652B7168FD49300D84A7F /* ZGBreakPoint.h */,
-				77E652B8168FD49300D84A7F /* ZGBreakPoint.m */,
-				77E652BA168FD59500D84A7F /* ZGDebugThread.h */,
-				77E652BB168FD59500D84A7F /* ZGDebugThread.m */,
 				77329B55168CFE6B007DCAE2 /* ZGDebuggerController.h */,
 				77329B56168CFE6C007DCAE2 /* ZGDebuggerController.m */,
 				77D38D4016A1FA5A00D2446A /* ZGDisassemblerObject.h */,
 				77D38D4116A1FA5A00D2446A /* ZGDisassemblerObject.m */,
 				77329B75168D14CB007DCAE2 /* ZGInstruction.h */,
 				77329B76168D14CB007DCAE2 /* ZGInstruction.m */,
+				77E652B1168F889C00D84A7F /* ZGBreakPointController.h */,
+				77E652B2168F889C00D84A7F /* ZGBreakPointController.m */,
+				77E652B7168FD49300D84A7F /* ZGBreakPoint.h */,
+				77E652B8168FD49300D84A7F /* ZGBreakPoint.m */,
+				77E652BA168FD59500D84A7F /* ZGDebugThread.h */,
+				77E652BB168FD59500D84A7F /* ZGDebugThread.m */,
 				77F8D8C916C3531D00C52CE2 /* ZGBacktraceController.h */,
 				77F8D8CA16C3531D00C52CE2 /* ZGBacktraceController.m */,
 				77F8D8D016C4A12500C52CE2 /* ZGRegistersController.h */,
@@ -439,6 +441,17 @@
 				7728EE0C16BE3DDA00F9E1AD /* Misc. */,
 			);
 			name = "Memory Viewer";
+			sourceTree = "<group>";
+		};
+		77FF507B16E9B7D40005915D /* Memory Window Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				77FF507816E9B7180005915D /* ZGMemoryWindowController.h */,
+				77FF507916E9B71A0005915D /* ZGMemoryWindowController.m */,
+				77329B5A168D07B6007DCAE2 /* Debugger */,
+				77D5AEAC137C6FC000026388 /* Memory Viewer */,
+			);
+			name = "Memory Window Controllers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -561,6 +574,7 @@
 				77F8D8CB16C3531D00C52CE2 /* ZGBacktraceController.m in Sources */,
 				77F8D8D216C4A12600C52CE2 /* ZGRegistersController.m in Sources */,
 				77FF507116E867FB0005915D /* ZGSearchProgress.m in Sources */,
+				77FF507A16E9B71C0005915D /* ZGMemoryWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

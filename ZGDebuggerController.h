@@ -34,23 +34,16 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
+#import "ZGMemoryWindowController.h"
 
 #define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
 
 @class ZGProcess;
 @class ZGInstruction;
 
-@interface ZGDebuggerController : NSWindowController <NSTableViewDataSource>
+@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource>
 
-enum ZGNavigation
-{
-	ZGNavigationBack,
-	ZGNavigationForward
-};
-
-@property (readonly) ZGProcess *currentProcess;
 @property (readwrite, nonatomic) BOOL disassembling;
-@property (nonatomic, strong) NSUndoManager *undoManager;
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
 

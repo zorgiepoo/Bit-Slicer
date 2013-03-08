@@ -36,8 +36,6 @@
 #import "ZGAppController.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
-#import "ZGUtilities.h"
-#import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 #import "ZGInstruction.h"
 #import "ZGBreakPoint.h"
@@ -52,28 +50,15 @@
 
 @interface ZGDebuggerController ()
 
-@property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
-@property (assign) IBOutlet NSTextField *addressTextField;
 @property (assign) IBOutlet NSTableView *instructionsTableView;
 @property (assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
 @property (assign) IBOutlet NSButton *stopButton;
 @property (assign) IBOutlet NSSplitView *splitView;
-@property (assign) IBOutlet NSSegmentedControl *navigationSegmentedControl;
 
 @property (assign) IBOutlet ZGBacktraceController *backtraceController;
 @property (assign) IBOutlet ZGRegistersController *registersController;
 
-@property (strong, nonatomic) NSUndoManager *navigationManager;
-
-@property (readwrite) ZGMemoryAddress currentMemoryAddress;
-@property (readwrite) ZGMemorySize currentMemorySize;
-
 @property (nonatomic, strong) NSArray *instructions;
-
-@property (readwrite, strong, nonatomic) NSTimer *updateInstructionsTimer;
-@property (readwrite, nonatomic) BOOL windowDidAppear;
-
-@property (nonatomic, copy) NSString *desiredProcessName;
 
 @property (nonatomic, strong) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
@@ -93,17 +78,18 @@
 
 - (id)init
 {
-	self = [super initWithWindowNibName:NSStringFromClass([self class])];
+	self = [super init];
 	
-	self.undoManager = [[NSUndoManager alloc] init];
-	self.navigationManager = [[NSUndoManager alloc] init];
-	self.haltedBreakPoints = [[NSArray alloc] init];
-	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(applicationWillTerminate:)
-	 name:NSApplicationWillTerminateNotification
-	 object:nil];
+	if (self)
+	{
+		self.haltedBreakPoints = [[NSArray alloc] init];
+		
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(applicationWillTerminate:)
+		 name:NSApplicationWillTerminateNotification
+		 object:nil];
+	}
 	
 	return self;
 }
@@ -133,92 +119,57 @@
 	[self windowDidShow:nil];
 }
 
-- (void)markChanges
-{
-	if ([self respondsToSelector:@selector(invalidateRestorableState)])
-	{
-		[self invalidateRestorableState];
-	}
-}
-
-- (void)setCurrentProcess:(ZGProcess *)newProcess
-{
-	BOOL shouldUpdate = NO;
-	
-	if (_currentProcess && _currentProcess.processID != newProcess.processID)
-	{
-		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
-		if (newProcess.valid)
-		{
-			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
-		}
-		
-		shouldUpdate = YES;
-	}
-	
-	_currentProcess = newProcess;
-	
-	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.valid)
-	{
-		if (![_currentProcess grantUsAccess])
-		{
-			shouldUpdate = YES;
-			//NSLog(@"Debugger failed to grant access to PID %d", _currentProcess.processID);
-		}
-	}
-	
-	if (shouldUpdate && self.windowDidAppear)
-	{
-		if (self.currentBreakPoint)
-		{
-			[self toggleBacktraceView:NSOnState];
-			[self updateRegisters];
-			[self.backtraceController updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
-			
-			[self jumpToMemoryAddress:self.registersController.programCounter];
-		}
-		else
-		{
-			[self toggleBacktraceView:NSOffState];
-			[self readMemory:nil];
-		}
-	}
-	
-	[self updateNavigationButtons];
-}
-
 - (void)windowDidLoad
 {
     [super windowDidLoad];
 	
-	self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
+	[self setWindowAttributesWithIdentifier:ZGDebuggerIdentifier];
 	
-	if ([self.window respondsToSelector:@selector(setRestorable:)] && [self.window respondsToSelector:@selector(setRestorationClass:)])
-	{
-		self.window.restorable = YES;
-		self.window.restorationClass = ZGAppController.class;
-		self.window.identifier = ZGDebuggerIdentifier;
-		[self markChanges];
-	}
-    
-	// Add processes to popup button
-	self.desiredProcessName = [[ZGAppController sharedController] lastSelectedProcessName];
-	[self updateRunningProcesses];
-	
-	[[ZGProcessList sharedProcessList]
-	 addObserver:self
-	 forKeyPath:@"runningProcesses"
-	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-	 context:NULL];
-	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
-	 name:NSPopUpButtonWillPopUpNotification
-	 object:self.runningApplicationsPopUpButton];
+	[self setupProcessListNotificationsAndPopUpButton];
 	
 	[self.instructionsTableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
+
+- (void)windowDidAppearForFirstTime:(id)sender
+{
+	if (!sender)
+	{
+		[self readMemory:nil];
+	}
+	
+	[self toggleBacktraceView:NSOffState];
+	
+	// ATOS_PATH may not exist if user is on SL unlesss he has developer tools installed, it should if user is on ML. Not sure about Lion.
+	if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_SHOWED_ATOS_WARNING] && ![[NSFileManager defaultManager] fileExistsAtPath:ATOS_PATH])
+	{
+		NSLog(@"ERROR: %@ was not found.. Failed to retrieve debug symbols", ATOS_PATH);
+		
+		NSRunAlertPanel(@"Debug Symbols won't be Retrieved", @"In order to retrieve debug symbols, you may have to install the Xcode developer tools, which includes the atos tool that is needed.", @"OK", nil, nil, nil);
+		
+		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:ZG_SHOWED_ATOS_WARNING];
+	}
+}
+
+#pragma mark Current Process Changed
+
+- (void)currentProcessChanged
+{
+	if (self.currentBreakPoint)
+	{
+		[self toggleBacktraceView:NSOnState];
+		[self updateRegisters];
+		[self.backtraceController updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
+		
+		[self jumpToMemoryAddress:self.registersController.programCounter];
+	}
+	else
+	{
+		[self toggleBacktraceView:NSOffState];
+		[self readMemory:nil];
+	}
+}
+
+#pragma mark Split Views
 
 - (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
 {
@@ -288,79 +239,6 @@
 			break;
 		default:
 			break;
-	}
-}
-
-// This is intended to be called when the window shows up - either from showWindow: or from window restoration
-- (void)windowDidShow:(id)sender
-{
-	if (!self.updateInstructionsTimer)
-	{
-		self.updateInstructionsTimer =
-			[NSTimer
-			 scheduledTimerWithTimeInterval:0.5
-			 target:self
-			 selector:@selector(updateInstructionsTimer:)
-			 userInfo:nil
-			 repeats:YES];
-	}
-	
-	if (!self.windowDidAppear)
-	{
-		self.windowDidAppear = YES;
-		if (!sender)
-		{
-			[self readMemory:nil];
-		}
-		
-		[self toggleBacktraceView:NSOffState];
-		
-		// ATOS_PATH may not exist if user is on SL unlesss he has developer tools installed, it should if user is on ML. Not sure about Lion.
-		if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_SHOWED_ATOS_WARNING] && ![[NSFileManager defaultManager] fileExistsAtPath:ATOS_PATH])
-		{
-			NSLog(@"ERROR: %@ was not found.. Failed to retrieve debug symbols", ATOS_PATH);
-			
-			NSRunAlertPanel(@"Debug Symbols won't be Retrieved", @"In order to retrieve debug symbols, you may have to install the Xcode developer tools, which includes the atos tool that is needed.", @"OK", nil, nil, nil);
-			
-			[[NSUserDefaults standardUserDefaults] setBool:YES forKey:ZG_SHOWED_ATOS_WARNING];
-		}
-	}
-	
-	if (self.currentProcess)
-	{
-		if (self.currentProcess.valid)
-		{
-			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID];
-		}
-		else
-		{
-			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
-		}
-	}
-	
-	[self updateNavigationButtons];
-}
-
-- (IBAction)showWindow:(id)sender
-{
-	[super showWindow:sender];
-	
-	[self windowDidShow:sender];
-}
-
-- (void)windowWillClose:(NSNotification *)notification
-{
-	if ([notification object] == self.window)
-	{
-		[self.updateInstructionsTimer invalidate];
-		self.updateInstructionsTimer = nil;
-		
-		if (self.currentProcess.valid)
-		{
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
-		}
-		
-		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
 	}
 }
 
@@ -808,7 +686,7 @@
 	}
 }
 
-- (void)updateInstructionsTimer:(NSTimer *)timer
+- (void)updateDisplayTimer:(NSTimer *)timer
 {
 	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && !self.disassembling && self.instructions.count > 0)
 	{
@@ -935,82 +813,23 @@
 
 #pragma mark Handling Processes
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void)processListChanged:(NSDictionary *)change
 {
-	if (object == [ZGProcessList sharedProcessList])
+	NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
+	if (oldRunningProcesses)
 	{
-		[self updateRunningProcesses];
-		
-		NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
-		
-		if (oldRunningProcesses)
+		for (ZGRunningProcess *runningProcess in oldRunningProcesses)
 		{
-			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
+			[[[ZGAppController sharedController] breakPointController] removeObserver:self runningProcess:runningProcess];
+			for (ZGBreakPoint *haltedBreakPoint in self.haltedBreakPoints)
 			{
-				[[[ZGAppController sharedController] breakPointController] removeObserver:self runningProcess:runningProcess];
-				for (ZGBreakPoint *haltedBreakPoint in self.haltedBreakPoints)
+				if (haltedBreakPoint.process.processID == runningProcess.processIdentifier)
 				{
-					if (haltedBreakPoint.process.processID == runningProcess.processIdentifier)
-					{
-						[self removeHaltedBreakPoint:haltedBreakPoint];
-					}
+					[self removeHaltedBreakPoint:haltedBreakPoint];
 				}
 			}
 		}
 	}
-}
-
-- (void)updateRunningProcesses
-{
-	[self.runningApplicationsPopUpButton removeAllItems];
-	
-	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
-	for (ZGRunningProcess *runningProcess in  [[[ZGProcessList sharedProcessList] runningProcesses] sortedArrayUsingDescriptors:@[sortDescriptor]])
-	{
-		if (runningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
-		{
-			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-			menuItem.title = [NSString stringWithFormat:@"%@ (%d)", runningProcess.name, runningProcess.processIdentifier];
-			NSImage *iconImage = [runningProcess.icon copy];
-			iconImage.size = NSMakeSize(16, 16);
-			menuItem.image = iconImage;
-			ZGProcess *representedProcess =
-				[[ZGProcess alloc]
-				 initWithName:runningProcess.name
-				 processID:runningProcess.processIdentifier
-				 set64Bit:runningProcess.is64Bit];
-			
-			menuItem.representedObject = representedProcess;
-			
-			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
-			
-			if (self.currentProcess.processID == runningProcess.processIdentifier || [self.desiredProcessName isEqualToString:runningProcess.name])
-			{
-				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
-			}
-		}
-	}
-	
-	// Handle dead process
-	if (self.desiredProcessName && ![self.desiredProcessName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject name]])
-	{
-		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.desiredProcessName];
-		NSImage *iconImage = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
-		iconImage.size = NSMakeSize(16, 16);
-		menuItem.image = iconImage;
-		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName set64Bit:YES];
-		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
-		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
-		
-		[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
-	}
-	else
-	{
-		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
-	}
-	
-	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 }
 
 - (void)switchProcessMenuItemAndSelectAddress:(ZGMemoryAddress)address
@@ -1018,17 +837,8 @@
 	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
 	{
 		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", address];
-		self.desiredProcessName = [self.runningApplicationsPopUpButton.selectedItem.representedObject name];
-		[[ZGAppController sharedController] setLastSelectedProcessName:self.desiredProcessName];
-		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
-		[self.navigationManager removeAllActions];
-		[self updateNavigationButtons];
+		[self switchProcess];
 	}
-}
-
-- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
-{
-	[[ZGProcessList sharedProcessList] retrieveList];
 }
 
 - (IBAction)runningApplicationsPopUpButton:(id)sender
@@ -1038,43 +848,9 @@
 
 #pragma mark Changing disassembler view
 
-- (IBAction)goBack:(id)sender
+- (BOOL)canEnableNavigationButtons
 {
-	[self.navigationManager undo];
-	[self updateNavigationButtons];
-}
-
-- (IBAction)goForward:(id)sender
-{
-	[self.navigationManager redo];
-	[self updateNavigationButtons];
-}
-
-- (IBAction)navigate:(id)sender
-{	
-	switch ([sender selectedSegment])
-	{
-		case ZGNavigationBack:
-			[self goBack:nil];
-			break;
-		case ZGNavigationForward:
-			[self goForward:nil];
-			break;
-	}
-}
-
-- (void)updateNavigationButtons
-{
-	if (self.disassembling || !self.currentProcess.valid)
-	{
-		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationBack];
-		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationForward];
-	}
-	else
-	{
-		[self.navigationSegmentedControl setEnabled:self.navigationManager.canUndo forSegment:ZGNavigationBack];
-		[self.navigationSegmentedControl setEnabled:self.navigationManager.canRedo forSegment:ZGNavigationForward];
-	}
+	return !self.disassembling && [super canEnableNavigationButtons];
 }
 
 - (IBAction)goToCallAddress:(id)sender
@@ -1161,7 +937,7 @@
 			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
 		}
 		
-		// Dissemble within a range from +- WINDOW_SIZE from selection address
+		// Disassemble within a range from +- WINDOW_SIZE from selection address
 		const NSUInteger WINDOW_SIZE = 50000;
 		
 		ZGMemoryAddress lowBoundAddress = calculatedMemoryAddress - WINDOW_SIZE;
@@ -1391,18 +1167,6 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(goBack:) || menuItem.action == @selector(goForward:))
-	{
-		if (self.disassembling || !self.currentProcess.valid)
-		{
-			return NO;
-		}
-		
-		if ((menuItem.action == @selector(goBack:) && !self.navigationManager.canUndo) || (menuItem.action == @selector(goForward:) && !self.navigationManager.canRedo))
-		{
-			return NO;
-		}
-	}
 	else if (menuItem.action == @selector(goToCallAddress:))
 	{
 		if (self.disassembling || !self.currentProcess.valid)
@@ -1421,28 +1185,6 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(pauseOrUnpauseProcess:))
-	{
-		if (!self.currentProcess.valid)
-		{
-			return NO;
-		}
-		
-		integer_t suspendCount;
-		if (!ZGSuspendCount(self.currentProcess.processTask, &suspendCount))
-		{
-			return NO;
-		}
-		else
-		{
-			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
-		}
-		
-		if ([self isProcessIdentifierHalted:self.currentProcess.processID])
-		{
-			return NO;
-		}
-	}
 	else if (menuItem.action == @selector(showMemoryViewer:))
 	{
 		if ([[self selectedInstructions] count] == 0)
@@ -1451,12 +1193,7 @@ END_DEBUGGER_CHANGE:
 		}
 	}
 	
-	return YES;
-}
-
-- (NSUndoManager *)windowWillReturnUndoManager:(id)sender
-{
-	return self.undoManager;
+	return [super validateMenuItem:menuItem];
 }
 
 - (IBAction)copy:(id)sender
@@ -2128,13 +1865,6 @@ END_DEBUGGER_CHANGE:
 		}
 	}
 	return foundProcess;
-}
-
-#pragma mark Pausing
-
-- (IBAction)pauseOrUnpauseProcess:(id)sender
-{
-	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }
 
 #pragma mark Memory Viewer

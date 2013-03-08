@@ -35,6 +35,7 @@
 #import <Cocoa/Cocoa.h>
 #import <HexFiend/HexFiend.h>
 #import "ZGMemoryTypes.h"
+#import "ZGMemoryWindowController.h"
 
 @class ZGProcess;
 
@@ -42,12 +43,7 @@
 
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
 
-@interface ZGMemoryViewerController : NSWindowController <NSWindowDelegate>
-
-@property (readonly) ZGProcess *currentProcess;
-
-@property (readwrite) ZGMemoryAddress currentMemoryAddress;
-@property (readwrite) ZGMemorySize currentMemorySize;
+@interface ZGMemoryViewerController : ZGMemoryWindowController <NSWindowDelegate>
 
 - (HFRange)selectedAddressRange;
 

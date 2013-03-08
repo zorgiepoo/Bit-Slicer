@@ -43,11 +43,8 @@
 #import "ZGUtilities.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
-#import "ZGProcessList.h"
-#import "ZGRunningProcess.h"
 #import "ZGMemoryProtectionController.h"
 #import "ZGMemoryDumpController.h"
-#import "ZGDebuggerController.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -61,23 +58,12 @@
 
 @interface ZGMemoryViewerController ()
 
-@property (readwrite, strong) NSTimer *checkMemoryTimer;
-
 @property (readwrite, strong) ZGStatusBarRepresenter *statusBarRepresenter;
 @property (readwrite, strong) ZGLineCountingRepresenter *lineCountingRepresenter;
 @property (readwrite, strong) DataInspectorRepresenter *dataInspectorRepresenter;
 @property (readwrite) BOOL showsDataInspector;
 
-@property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
-@property (assign) IBOutlet NSTextField *addressTextField;
 @property (assign) IBOutlet HFTextView *textView;
-@property (assign) IBOutlet NSSegmentedControl *navigationSegmentedControl;
-
-@property (copy, nonatomic) NSString *desiredProcessName;
-@property (readwrite, nonatomic) BOOL windowDidAppear;
-
-@property (nonatomic, strong) NSUndoManager *undoManager; // Used by memory protection controller
-@property (strong, nonatomic) NSUndoManager *navigationManager;
 
 @property (assign, nonatomic) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
 @property (assign, nonatomic) IBOutlet ZGMemoryDumpController *memoryDumpController;
@@ -99,61 +85,14 @@
 	return selectedRange;
 }
 
-#pragma mark Setters
+#pragma mark Current Process Changed
 
-- (void)setCurrentProcess:(ZGProcess *)newProcess
+- (void)currentProcessChanged
 {
-	BOOL shouldUpdateMemoryView = NO;
-	
-	if (_currentProcess.processID != newProcess.processID)
-	{
-		[self.undoManager removeAllActions];
-		
-		if (_currentProcess)
-		{
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
-		}
-		if (newProcess.valid)
-		{
-			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
-		}
-		
-		shouldUpdateMemoryView = YES;
-	}
-	_currentProcess = newProcess;
-	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.valid)
-	{
-		if (![_currentProcess grantUsAccess])
-		{
-			shouldUpdateMemoryView = YES;
-			NSLog(@"Memory viewer failed to grant access to PID %d", _currentProcess.processID);
-		}
-	}
-	
-	if (shouldUpdateMemoryView && self.windowDidAppear)
-	{
-		[self changeMemoryView:nil];
-	}
-	
-	[self updateNavigationButtons];
+	[self changeMemoryView:nil];
 }
 
 #pragma mark Initialization
-
-- (id)init
-{
-	self = [super initWithWindowNibName:NSStringFromClass([self class])];
-	
-	self.undoManager = [[NSUndoManager alloc] init];
-	self.navigationManager = [[NSUndoManager alloc] init];
-	
-	return self;
-}
-
-- (NSUndoManager *)windowWillReturnUndoManager:(id)sender
-{
-	return self.undoManager;
-}
 
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder
 {
@@ -197,25 +136,9 @@
 	[self windowDidShow:nil];
 }
 
-- (void)markChanges
-{
-	if ([self respondsToSelector:@selector(invalidateRestorableState)])
-	{
-		[self invalidateRestorableState];
-	}
-}
-
 - (void)windowDidLoad
-{
-	self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
-	
-	if ([self.window respondsToSelector:@selector(setRestorable:)] && [self.window respondsToSelector:@selector(setRestorationClass:)])
-	{
-		self.window.restorable = YES;
-		self.window.restorationClass = ZGAppController.class;
-		self.window.identifier = ZGMemoryViewerIdentifier;
-		[self markChanges];
-	}
+{	
+	[self setWindowAttributesWithIdentifier:ZGMemoryViewerIdentifier];
 	
 	self.textView.controller.editable = NO;
 	
@@ -259,80 +182,22 @@
 	[self initiateDataInspector];
 	
 	// It's important to set frame autosave name after we initiate the data inspector, otherwise the data inspector's frame will not be correct for some reason
-	[[self window] setFrameAutosaveName: @"ZGMemoryViewerController"];
+	[[self window] setFrameAutosaveName: NSStringFromClass([self class])];
 	
-	// Add processes to popup button
-	self.desiredProcessName = [[ZGAppController sharedController] lastSelectedProcessName];
-	[self updateRunningProcesses];
-	
-	[[ZGProcessList sharedProcessList]
-	 addObserver:self
-	 forKeyPath:@"runningProcesses"
-	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-	 context:NULL];
-	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
-	 name:NSPopUpButtonWillPopUpNotification
-	 object:self.runningApplicationsPopUpButton];
+	[self setupProcessListNotificationsAndPopUpButton];
 }
 
-- (void)windowDidShow:(id)sender
+- (void)windowDidAppearForFirstTime:(id)sender
 {
-	if (!self.checkMemoryTimer)
-	{
-		self.checkMemoryTimer =
-		[NSTimer
-		 scheduledTimerWithTimeInterval:READ_MEMORY_INTERVAL
-		 target:self
-		 selector:@selector(readMemory:)
-		 userInfo:nil
-		 repeats:YES];
-	}
-	
-	if (!self.windowDidAppear)
-	{
-		[self changeMemoryView:nil];
-		self.windowDidAppear = YES;
-	}
-	
-	if (self.currentProcess)
-	{
-		if (self.currentProcess.valid)
-		{
-			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID];
-		}
-		else
-		{
-			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
-		}
-	}
-	
-	[self updateNavigationButtons];
+	[self changeMemoryView:nil];
 }
 
-- (IBAction)showWindow:(id)sender
+- (double)displayMemoryTimeInterval
 {
-	[super showWindow:sender];
-	
-	[self windowDidShow:nil];
+	return READ_MEMORY_INTERVAL;
 }
 
-- (void)windowWillClose:(NSNotification *)notification
-{
-	[self.checkMemoryTimer invalidate];
-	self.checkMemoryTimer = nil;
-	
-	if (self.currentProcess.valid)
-	{
-		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
-	}
-	
-	[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
-}
-
-#pragma mark Data Inspector
+#pragma mark Menu Item Validation
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
@@ -354,28 +219,6 @@
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(pauseOrUnpauseProcess:))
-	{
-		if (!self.currentProcess.valid)
-		{
-			return NO;
-		}
-		
-		integer_t suspendCount;
-		if (!ZGSuspendCount(self.currentProcess.processTask, &suspendCount))
-		{
-			return NO;
-		}
-		else
-		{
-			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
-		}
-		
-		if ([[[ZGAppController sharedController] debuggerController] isProcessIdentifierHalted:self.currentProcess.processID])
-		{
-			return NO;
-		}
-	}
 	else if (menuItem.action == @selector(copyAddress:))
 	{
 		if (!self.currentProcess.valid)
@@ -388,21 +231,11 @@
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(goBack:) || menuItem.action == @selector(goForward:))
-	{
-		if (!self.currentProcess.valid)
-		{
-			return NO;
-		}
-		
-		if ((menuItem.action == @selector(goBack:) && !self.navigationManager.canUndo) || (menuItem.action == @selector(goForward:) && !self.navigationManager.canRedo))
-		{
-			return NO;
-		}
-	}
 	
-	return YES;
+	return [super validateMenuItem:menuItem];
 }
+
+#pragma mark Data Inspector
 
 - (void)initiateDataInspector
 {
@@ -492,14 +325,6 @@
 
 #pragma mark Updating running applications
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-	if (object == [ZGProcessList sharedProcessList])
-	{
-		[self updateRunningProcesses];
-	}
-}
-
 - (void)clearData
 {
 	self.currentMemoryAddress = 0;
@@ -509,114 +334,11 @@
 	self.textView.data = [NSData data];
 }
 
-- (void)updateRunningProcesses
-{
-	[self.runningApplicationsPopUpButton removeAllItems];
-	
-	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
-	for (ZGRunningProcess *runningProcess in  [[[ZGProcessList sharedProcessList] runningProcesses] sortedArrayUsingDescriptors:@[sortDescriptor]])
-	{
-		if (runningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
-		{
-			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-			menuItem.title = [NSString stringWithFormat:@"%@ (%d)", runningProcess.name, runningProcess.processIdentifier];
-			NSImage *iconImage = [runningProcess.icon copy];
-			iconImage.size = NSMakeSize(16, 16);
-			menuItem.image = iconImage;
-			ZGProcess *representedProcess =
-				[[ZGProcess alloc]
-				 initWithName:runningProcess.name
-				 processID:runningProcess.processIdentifier
-				 set64Bit:runningProcess.is64Bit];
-			
-			menuItem.representedObject = representedProcess;
-			
-			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
-			
-			if (self.currentProcess.processID == runningProcess.processIdentifier || [self.desiredProcessName isEqualToString:runningProcess.name])
-			{
-				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
-			}
-		}
-	}
-	
-	// Handle dead process
-	if (self.desiredProcessName && ![self.desiredProcessName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject name]])
-	{
-		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.desiredProcessName];
-		NSImage *iconImage = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
-		iconImage.size = NSMakeSize(16, 16);
-		menuItem.image = iconImage;
-		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName set64Bit:YES];
-		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
-		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
-		
-		[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
-	}
-	else
-	{
-		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
-	}
-	
-	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
-}
-
-- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
-{
-	[[ZGProcessList sharedProcessList] retrieveList];
-}
-
 - (IBAction)runningApplicationsPopUpButton:(id)sender
 {
 	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
 	{
-		self.desiredProcessName = [self.runningApplicationsPopUpButton.selectedItem.representedObject name];
-		[[ZGAppController sharedController] setLastSelectedProcessName:self.desiredProcessName];
-		self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
-		[self.navigationManager removeAllActions];
-		[self updateNavigationButtons];
-	}
-}
-
-#pragma mark Navigation
-
-- (IBAction)goBack:(id)sender
-{
-	[self.navigationManager undo];
-	[self updateNavigationButtons];
-}
-
-- (IBAction)goForward:(id)sender
-{
-	[self.navigationManager redo];
-	[self updateNavigationButtons];
-}
-
-- (IBAction)navigate:(id)sender
-{
-	switch ([sender selectedSegment])
-	{
-		case ZGNavigationBack:
-			[self goBack:nil];
-			break;
-		case ZGNavigationForward:
-			[self goForward:nil];
-			break;
-	}
-}
-
-- (void)updateNavigationButtons
-{
-	if (!self.currentProcess.valid)
-	{
-		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationBack];
-		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationForward];
-	}
-	else
-	{
-		[self.navigationSegmentedControl setEnabled:self.navigationManager.canUndo forSegment:ZGNavigationBack];
-		[self.navigationSegmentedControl setEnabled:self.navigationManager.canRedo forSegment:ZGNavigationForward];
+		[self switchProcess];
 	}
 }
 
@@ -784,7 +506,7 @@ END_MEMORY_VIEW_CHANGE:
 	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
 }
 
-- (void)readMemory:(NSTimer *)timer
+- (void)updateDisplayTimer:(NSTimer *)timer
 {
 	if (self.currentMemorySize > 0)
 	{
@@ -896,13 +618,6 @@ END_MEMORY_VIEW_CHANGE:
 - (IBAction)dumpAllMemory:(id)sender
 {
 	[self.memoryDumpController memoryDumpAllRequest];
-}
-
-#pragma mark Pausing
-
-- (IBAction)pauseOrUnpauseProcess:(id)sender
-{
-	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }
 
 @end
