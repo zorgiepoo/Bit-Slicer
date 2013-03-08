@@ -40,8 +40,6 @@
 @class ZGDebuggerController;
 @class ZGBreakPointController;
 
-#define BIT_SLICER_VERSION_FILE @"https://dl.dropbox.com/u/10108199/bit_slicer/bit_slicer_version.plist"
-
 @interface ZGAppController : NSObject
 
 @property (readonly, strong, nonatomic) ZGPreferencesController *preferencesController;
