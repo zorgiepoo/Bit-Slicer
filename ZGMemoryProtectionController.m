@@ -33,7 +33,7 @@
  */
 
 #import "ZGMemoryProtectionController.h"
-#import "ZGMemoryViewer.h"
+#import "ZGMemoryViewerController.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
@@ -42,7 +42,7 @@
 
 @interface ZGMemoryProtectionController ()
 
-@property (assign) IBOutlet ZGMemoryViewer *memoryViewer;
+@property (assign) IBOutlet ZGMemoryViewerController *memoryViewer;
 @property (assign) IBOutlet NSWindow *changeProtectionWindow;
 @property (assign) IBOutlet NSTextField *changeProtectionAddressTextField;
 @property (assign) IBOutlet NSTextField *changeProtectionSizeTextField;

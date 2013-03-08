@@ -47,7 +47,7 @@
 #import "ZGRegistersController.h"
 #import "ZGPreferencesController.h"
 #import "ZGBacktraceController.h"
-#import "ZGMemoryViewer.h"
+#import "ZGMemoryViewerController.h"
 #import "NSArrayAdditions.h"
 
 @interface ZGDebuggerController ()

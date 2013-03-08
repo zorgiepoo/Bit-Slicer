@@ -32,7 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGMemoryViewer.h"
+#import "ZGMemoryViewerController.h"
 #import "ZGStatusBarRepresenter.h"
 #import "ZGLineCountingRepresenter.h"
 #import "ZGVerticalScrollerRepresenter.h"
@@ -59,7 +59,7 @@
 #define ZGMemoryViewerProcessName @"ZGMemoryViewerProcessName"
 #define ZGMemoryViewerShowsDataInspector @"ZGMemoryViewerShowsDataInspector"
 
-@interface ZGMemoryViewer ()
+@interface ZGMemoryViewerController ()
 
 @property (readwrite, strong) NSTimer *checkMemoryTimer;
 
@@ -84,7 +84,7 @@
 
 @end
 
-@implementation ZGMemoryViewer
+@implementation ZGMemoryViewerController
 
 #pragma mark Accessors
 
@@ -142,7 +142,7 @@
 
 - (id)init
 {
-	self = [super initWithWindowNibName:@"MemoryViewer"];
+	self = [super initWithWindowNibName:NSStringFromClass([self class])];
 	
 	self.undoManager = [[NSUndoManager alloc] init];
 	self.navigationManager = [[NSUndoManager alloc] init];
@@ -259,7 +259,7 @@
 	[self initiateDataInspector];
 	
 	// It's important to set frame autosave name after we initiate the data inspector, otherwise the data inspector's frame will not be correct for some reason
-	[[self window] setFrameAutosaveName: @"ZGMemoryViewer"];
+	[[self window] setFrameAutosaveName: @"ZGMemoryViewerController"];
 	
 	// Add processes to popup button
 	self.desiredProcessName = [[ZGAppController sharedController] lastSelectedProcessName];

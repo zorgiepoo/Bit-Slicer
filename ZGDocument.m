@@ -41,7 +41,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVariable.h"
 #import "ZGAppController.h"
-#import "ZGMemoryViewer.h"
+#import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
 #import "ZGComparisonFunctions.h"
 #import "NSStringAdditions.h"

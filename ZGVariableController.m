@@ -36,7 +36,7 @@
 #import "ZGDocument.h"
 #import "ZGDocumentTableController.h"
 #import "ZGAppController.h"
-#import "ZGMemoryViewer.h"
+#import "ZGMemoryViewerController.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
 #import "NSStringAdditions.h"

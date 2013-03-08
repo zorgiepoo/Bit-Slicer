@@ -34,7 +34,7 @@
 
 #import "ZGAppController.h"
 #import "ZGPreferencesController.h"
-#import "ZGMemoryViewer.h"
+#import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
 #import "ZGBreakPointController.h"
 #import "ZGProcess.h"
@@ -44,7 +44,7 @@
 @interface ZGAppController ()
 
 @property (readwrite, strong, nonatomic) ZGPreferencesController *preferencesController;
-@property (readwrite, strong, nonatomic) ZGMemoryViewer *memoryViewer;
+@property (readwrite, strong, nonatomic) ZGMemoryViewerController *memoryViewer;
 @property (readwrite, strong, nonatomic) ZGDebuggerController *debuggerController;
 @property (readwrite, strong, nonatomic) ZGBreakPointController *breakPointController;
 
@@ -239,11 +239,11 @@ static BOOL didRegisteredHotKey;
 	[self openPreferences:sender showWindow:YES];
 }
 
-- (ZGMemoryViewer *)memoryViewer
+- (ZGMemoryViewerController *)memoryViewer
 {
 	if (!_memoryViewer)
 	{
-		_memoryViewer = [[ZGMemoryViewer alloc] init];
+		_memoryViewer = [[ZGMemoryViewerController alloc] init];
 	}
 	return _memoryViewer;
 }

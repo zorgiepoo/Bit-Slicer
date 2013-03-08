@@ -42,7 +42,7 @@
 
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
 
-@interface ZGMemoryViewer : NSWindowController <NSWindowDelegate>
+@interface ZGMemoryViewerController : NSWindowController <NSWindowDelegate>
 
 @property (readonly) ZGProcess *currentProcess;
 

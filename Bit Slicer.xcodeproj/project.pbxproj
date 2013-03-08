@@ -20,14 +20,13 @@
 		770930B815BA7635009705A6 /* ZGDocumentTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930B715BA7635009705A6 /* ZGDocumentTableController.m */; };
 		770930BB15BA9060009705A6 /* ZGDocumentSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930BA15BA9060009705A6 /* ZGDocumentSearchController.m */; };
 		770930BE15BA97B4009705A6 /* ZGSearchData.m in Sources */ = {isa = PBXBuildFile; fileRef = 770930BD15BA97B4009705A6 /* ZGSearchData.m */; };
-		770EA821137B6E6D007FB85A /* ZGMemoryViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */; };
-		770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770EA822137B6FDE007FB85A /* MemoryViewer.xib */; };
+		770EA821137B6E6D007FB85A /* ZGMemoryViewerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA820137B6E6D007FB85A /* ZGMemoryViewerController.m */; };
+		770EA824137B6FDE007FB85A /* ZGMemoryViewerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770EA822137B6FDE007FB85A /* ZGMemoryViewerController.xib */; };
 		770EA82B137BA8E5007FB85A /* ZGUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA829137BA8E1007FB85A /* ZGUtilities.m */; };
 		7714D3F211B87C7E0028E6B2 /* ZGVirtualMemory.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */; };
 		772AACD415E1CCFA00E1F788 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 772AACD315E1CCFA00E1F788 /* HexFiend.framework */; };
 		772AACD515E1D01F00E1F788 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 772AACD315E1CCFA00E1F788 /* HexFiend.framework */; };
 		77329B58168CFE6C007DCAE2 /* ZGDebuggerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77329B56168CFE6C007DCAE2 /* ZGDebuggerController.m */; };
-		77329B59168CFE6C007DCAE2 /* ZGDebuggerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77329B57168CFE6C007DCAE2 /* ZGDebuggerController.xib */; };
 		77329B6D168D0DF9007DCAE2 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B60168D0DF4007DCAE2 /* decode.c */; };
 		77329B6E168D0DF9007DCAE2 /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B63168D0DF4007DCAE2 /* input.c */; };
 		77329B6F168D0DF9007DCAE2 /* itab.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B65168D0DF5007DCAE2 /* itab.c */; };
@@ -69,6 +68,7 @@
 		77F8D8D216C4A12600C52CE2 /* ZGRegistersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F8D8D116C4A12600C52CE2 /* ZGRegistersController.m */; };
 		77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FC461F12237F71003CB09B /* NSStringAdditions.m */; };
 		77FF507116E867FB0005915D /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FF507016E867FB0005915D /* ZGSearchProgress.m */; };
+		77FF507716E9A4250005915D /* ZGDebuggerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77FF507516E9A4250005915D /* ZGDebuggerController.xib */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
@@ -118,9 +118,9 @@
 		770930BA15BA9060009705A6 /* ZGDocumentSearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDocumentSearchController.m; sourceTree = "<group>"; };
 		770930BC15BA97B3009705A6 /* ZGSearchData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGSearchData.h; sourceTree = "<group>"; };
 		770930BD15BA97B4009705A6 /* ZGSearchData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGSearchData.m; sourceTree = "<group>"; };
-		770EA81F137B6E6D007FB85A /* ZGMemoryViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryViewer.h; sourceTree = "<group>"; };
-		770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryViewer.m; sourceTree = "<group>"; };
-		770EA823137B6FDE007FB85A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MemoryViewer.xib; sourceTree = "<group>"; };
+		770EA81F137B6E6D007FB85A /* ZGMemoryViewerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryViewerController.h; sourceTree = "<group>"; };
+		770EA820137B6E6D007FB85A /* ZGMemoryViewerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryViewerController.m; sourceTree = "<group>"; };
+		770EA823137B6FDE007FB85A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ZGMemoryViewerController.xib; sourceTree = "<group>"; };
 		770EA829137BA8E1007FB85A /* ZGUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGUtilities.m; sourceTree = "<group>"; };
 		770EA82A137BA8E3007FB85A /* ZGUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGUtilities.h; sourceTree = "<group>"; };
 		7714D3F011B87C7E0028E6B2 /* ZGVirtualMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVirtualMemory.h; sourceTree = "<group>"; };
@@ -128,7 +128,6 @@
 		772AACD315E1CCFA00E1F788 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HexFiend.framework; sourceTree = "<group>"; };
 		77329B55168CFE6B007DCAE2 /* ZGDebuggerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDebuggerController.h; sourceTree = "<group>"; };
 		77329B56168CFE6C007DCAE2 /* ZGDebuggerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDebuggerController.m; sourceTree = "<group>"; };
-		77329B57168CFE6C007DCAE2 /* ZGDebuggerController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ZGDebuggerController.xib; sourceTree = "<group>"; };
 		77329B5D168D0841007DCAE2 /* udis86.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = udis86.h; sourceTree = "<group>"; };
 		77329B60168D0DF4007DCAE2 /* decode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decode.c; path = libudis86/decode.c; sourceTree = "<group>"; };
 		77329B61168D0DF4007DCAE2 /* decode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decode.h; path = libudis86/decode.h; sourceTree = "<group>"; };
@@ -203,6 +202,7 @@
 		77FC461F12237F71003CB09B /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSStringAdditions.m; sourceTree = "<group>"; };
 		77FF506F16E867FB0005915D /* ZGSearchProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGSearchProgress.h; sourceTree = "<group>"; };
 		77FF507016E867FB0005915D /* ZGSearchProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGSearchProgress.m; sourceTree = "<group>"; };
+		77FF507616E9A4250005915D /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ZGDebuggerController.xib; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bit_Slicer-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Bit Slicer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bit Slicer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -335,9 +335,9 @@
 				1DDD58280DA1D0D100B32029 /* MyDocument.xib */,
 				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 				775FCB2811719E4A000054FB /* Preferences.xib */,
-				770EA822137B6FDE007FB85A /* MemoryViewer.xib */,
+				770EA822137B6FDE007FB85A /* ZGMemoryViewerController.xib */,
 				7763470316881165003D01C9 /* DataInspectorView.xib */,
-				77329B57168CFE6C007DCAE2 /* ZGDebuggerController.xib */,
+				77FF507516E9A4250005915D /* ZGDebuggerController.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -423,8 +423,8 @@
 		77D5AEAC137C6FC000026388 /* Memory Viewer */ = {
 			isa = PBXGroup;
 			children = (
-				770EA81F137B6E6D007FB85A /* ZGMemoryViewer.h */,
-				770EA820137B6E6D007FB85A /* ZGMemoryViewer.m */,
+				770EA81F137B6E6D007FB85A /* ZGMemoryViewerController.h */,
+				770EA820137B6E6D007FB85A /* ZGMemoryViewerController.m */,
 				77D5AEB3137C84CE00026388 /* ZGVerticalScrollerRepresenter.h */,
 				77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */,
 				7787C4D7137BB59100BFF606 /* ZGStatusBarRepresenter.h */,
@@ -499,12 +499,12 @@
 				1DDD582C0DA1D0D100B32029 /* MyDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
 				775FCB2A11719E4A000054FB /* Preferences.xib in Resources */,
-				770EA824137B6FDE007FB85A /* MemoryViewer.xib in Resources */,
+				770EA824137B6FDE007FB85A /* ZGMemoryViewerController.xib in Resources */,
 				7763470416881166003D01C9 /* DataInspectorView.xib in Resources */,
-				77329B59168CFE6C007DCAE2 /* ZGDebuggerController.xib in Resources */,
 				77DEA41216C974C700A16D57 /* bitslicericon.iconset in Resources */,
 				77F82C1F16CF6FC10038AC0A /* yasm in Resources */,
 				77F82C2D16D0837B0038AC0A /* Credits.rtf in Resources */,
+				77FF507716E9A4250005915D /* ZGDebuggerController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -524,7 +524,7 @@
 				77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */,
 				77FC462012237F71003CB09B /* NSStringAdditions.m in Sources */,
 				77D037371224334E0083E057 /* ZGCalculator.m in Sources */,
-				770EA821137B6E6D007FB85A /* ZGMemoryViewer.m in Sources */,
+				770EA821137B6E6D007FB85A /* ZGMemoryViewerController.m in Sources */,
 				770EA82B137BA8E5007FB85A /* ZGUtilities.m in Sources */,
 				7787C4D9137BB59200BFF606 /* ZGStatusBarRepresenter.m in Sources */,
 				7787C4EE137C556000BFF606 /* ZGLineCountingView.m in Sources */,
@@ -591,12 +591,12 @@
 			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
-		770EA822137B6FDE007FB85A /* MemoryViewer.xib */ = {
+		770EA822137B6FDE007FB85A /* ZGMemoryViewerController.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				770EA823137B6FDE007FB85A /* English */,
 			);
-			name = MemoryViewer.xib;
+			name = ZGMemoryViewerController.xib;
 			sourceTree = "<group>";
 		};
 		775FCB2811719E4A000054FB /* Preferences.xib */ = {
@@ -605,6 +605,14 @@
 				775FCB2911719E4A000054FB /* English */,
 			);
 			name = Preferences.xib;
+			sourceTree = "<group>";
+		};
+		77FF507516E9A4250005915D /* ZGDebuggerController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				77FF507616E9A4250005915D /* English */,
+			);
+			name = ZGDebuggerController.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

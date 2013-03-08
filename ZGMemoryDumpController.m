@@ -33,7 +33,7 @@
  */
 
 #import "ZGMemoryDumpController.h"
-#import "ZGMemoryViewer.h"
+#import "ZGMemoryViewerController.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGMemoryTypes.h"
@@ -44,7 +44,7 @@
 
 @interface ZGMemoryDumpController ()
 
-@property (assign, nonatomic) IBOutlet ZGMemoryViewer *memoryViewer;
+@property (assign, nonatomic) IBOutlet ZGMemoryViewerController *memoryViewer;
 
 @property (assign) IBOutlet NSWindow *memoryDumpWindow;
 @property (assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;

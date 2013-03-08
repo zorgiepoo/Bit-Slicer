@@ -39,7 +39,7 @@
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
 #import "ZGAppController.h"
-#import "ZGMemoryViewer.h"
+#import "ZGMemoryViewerController.h"
 
 @interface ZGBacktraceController ()
 

@@ -36,7 +36,7 @@
 #import <Carbon/Carbon.h>
 
 @class ZGPreferencesController;
-@class ZGMemoryViewer;
+@class ZGMemoryViewerController;
 @class ZGDebuggerController;
 @class ZGBreakPointController;
 
@@ -45,7 +45,7 @@
 @interface ZGAppController : NSObject
 
 @property (readonly, strong, nonatomic) ZGPreferencesController *preferencesController;
-@property (readonly, strong, nonatomic) ZGMemoryViewer *memoryViewer;
+@property (readonly, strong, nonatomic) ZGMemoryViewerController *memoryViewer;
 @property (readonly, strong, nonatomic) ZGDebuggerController *debuggerController;
 @property (readonly, strong, nonatomic) ZGBreakPointController *breakPointController;
 // lastSelectedProcessName keeps track of the last targeted process in a document
