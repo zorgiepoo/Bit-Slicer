@@ -80,7 +80,6 @@
 	
 	// Force canceling
 	self.searchProgress.shouldCancelSearch = YES;
-	self.searchProgress.isStoringAllData = NO;
 	[self.document.documentBreakPointController stopWatchingBreakPoints];
 	
 	self.searchData = nil;
@@ -269,14 +268,19 @@
 	return [NSString stringWithFormat:@"Found %@ value%@...", [numberOfVariablesFoundFormatter stringFromNumber:@(self.searchProgress.numberOfVariablesFound)], self.searchProgress.numberOfVariablesFound != 1 ? @"s" : @""];
 }
 
+- (void)updateVariablesFound
+{
+	self.document.searchingProgressIndicator.doubleValue = (double)self.searchProgress.progress;
+	self.document.generalStatusTextField.stringValue = [self numberOfVariablesFoundDescription];
+}
+
 - (void)updateSearchUserInterface:(NSTimer *)timer
 {
 	if (self.document.windowForSheet.isVisible)
 	{
 		if (!self.searchProgress.shouldCancelSearch)
 		{
-			self.document.searchingProgressIndicator.doubleValue = (double)self.searchProgress.progress;
-			self.document.generalStatusTextField.stringValue = [self numberOfVariablesFoundDescription];
+			[self updateVariablesFound];
 		}
 		else
 		{
@@ -353,8 +357,7 @@
 	}
 	else
 	{
-		self.searchProgress.shouldCancelSearch = NO;
-		[self updateSearchUserInterface:nil];
+		[self updateVariablesFound];
 		
 		if (NSClassFromString(@"NSUserNotification"))
 		{
@@ -629,6 +632,9 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		return !(region.address < endingAddress && region.address + region.size > beginningAddress && region.protection & VM_PROT_READ && (self.searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
 	
+	[self.searchProgress clear];
+	self.searchProgress.progressType = ZGSearchProgressMemoryScanning;
+	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		ZGRegion *lastUsedRegion = nil;
 		ZGRegion *lastUsedSavedRegion = nil;
@@ -778,10 +784,6 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 			[self searchCleanUp:temporaryVariablesArray];
 		};
 		
-		self.searchProgress.progress = 0;
-		self.searchProgress.numberOfVariablesFound = 0;
-		self.searchProgress.shouldCancelSearch = NO;
-		
 		if (!goingToNarrowDownSearches)
 		{
 			[self searchVariablesWithComparisonFunction:compareFunction andAddResultsToArray:temporaryVariablesArray usingCompletionBlock:completeSearchBlock];
@@ -814,13 +816,12 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 
 - (void)cancelTask
 {
-	if (self.searchProgress.isStoringAllData)
+	if (self.searchProgress.progressType == ZGSearchProgressMemoryStoring)
 	{
 		// Cancel memory store
-		self.searchProgress.isStoringAllData = NO;
 		self.document.generalStatusTextField.stringValue = @"Canceling Memory Store...";
 	}
-	else if (self.searchProgress.isWatchingBreakPoint)
+	else if (self.searchProgress.progressType == ZGSearchProgressMemoryWatching)
 	{
 		// Cancel break point watching
 		[self.document.documentBreakPointController cancelTask];
@@ -829,19 +830,15 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 	{
 		// Cancel the search
 		self.document.searchButton.enabled = NO;
-		self.searchProgress.shouldCancelSearch = YES;
 	}
+	
+	self.searchProgress.shouldCancelSearch = YES;
 }
 
 #pragma mark Storing all values
 
 - (void)storeAllValues
 {
-	if (self.searchProgress.isStoringAllData)
-	{
-		return;
-	}
-	
 	[self prepareTask];
 	
 	self.document.searchingProgressIndicator.maxValue = self.document.currentProcess.numberOfRegions;
@@ -857,20 +854,20 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		dispatch_async(dispatch_get_main_queue(), ^{
 			self.userInterfaceTimer = nil;
 			
-			if (!self.searchProgress.isStoringAllData)
+			if (self.searchProgress.shouldCancelSearch)
 			{
 				self.document.generalStatusTextField.stringValue = @"Canceled Memory Store";
 			}
 			else
 			{
-				self.searchProgress.isStoringAllData = NO;
-				
 				self.searchData.savedData = self.searchData.tempSavedData;
 				self.searchData.tempSavedData = nil;
 				
 				self.document.generalStatusTextField.stringValue = @"Finished Memory Store";
 			}
+			
 			self.document.searchingProgressIndicator.doubleValue = 0;
+			
 			[self resumeFromTask];
 		});
 	});

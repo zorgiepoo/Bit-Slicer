@@ -39,6 +39,7 @@
 @interface ZGMemoryDumpController : NSObject
 
 @property (strong, nonatomic) ZGSearchProgress *searchProgress;
+@property (readwrite, nonatomic) BOOL isBusy;
 
 - (void)memoryDumpRangeRequest;
 - (void)memoryDumpAllRequest;

@@ -349,7 +349,7 @@
 	}
 	else if (menuItem.action == @selector(dumpMemoryInRange:) || menuItem.action == @selector(dumpAllMemory:))
 	{
-		if (!self.currentProcess.valid || self.memoryDumpController.searchProgress.isDoingMemoryDump)
+		if (!self.currentProcess.valid || self.memoryDumpController.isBusy)
 		{
 			return NO;
 		}

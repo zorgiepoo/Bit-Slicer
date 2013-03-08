@@ -213,12 +213,14 @@
 				 self.progressIndicator.maxValue = self.memoryViewer.currentProcess.numberOfRegions;
 				 
 				 self.progressTimer =
-				 [NSTimer
-				  scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-				  target:self
-				  selector:@selector(updateMemoryDumpProgress:)
-				  userInfo:nil
-				  repeats:YES];
+					[NSTimer
+					 scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
+					 target:self
+					 selector:@selector(updateMemoryDumpProgress:)
+					 userInfo:nil
+					 repeats:YES];
+				 
+				 self.isBusy = YES;
 				 
 				 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 					 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.memoryViewer.currentProcess.processTask, self.searchProgress))
@@ -233,7 +235,7 @@
 						 [self.progressTimer invalidate];
 						 self.progressTimer = nil;
 						 
-						 if (self.searchProgress.isDoingMemoryDump && NSClassFromString(@"NSUserNotification"))
+						 if (!self.searchProgress.shouldCancelSearch && NSClassFromString(@"NSUserNotification"))
 						 {
 							 NSUserNotification *userNotification = [[NSUserNotification alloc] init];
 							 userNotification.title = @"Finished Dumping Memory";
@@ -242,10 +244,11 @@
 						 }
 						 
 						 self.progressIndicator.doubleValue = 0.0;
-						 self.searchProgress.isDoingMemoryDump = NO;
 						 
 						 [NSApp endSheet:self.memoryDumpProgressWindow];
 						 [self.memoryDumpProgressWindow close];
+						 
+						 self.isBusy = NO;
 					 });
 				 });
 			 });
@@ -255,7 +258,7 @@
 
 - (IBAction)cancelDumpingAllMemory:(id)sender
 {
-	self.searchProgress.isDoingMemoryDump = NO;
+	self.searchProgress.shouldCancelSearch = YES;
 	[self.memoryDumpProgressCancelButton setEnabled:NO];
 }
 

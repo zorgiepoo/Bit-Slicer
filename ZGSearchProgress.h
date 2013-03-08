@@ -42,8 +42,16 @@
 
 @property (readwrite) BOOL shouldCancelSearch;
 
-@property (readwrite, nonatomic) BOOL isDoingMemoryDump;
-@property (readwrite, nonatomic) BOOL isStoringAllData;
-@property (readwrite, nonatomic) BOOL isWatchingBreakPoint;
+typedef enum
+{
+	ZGSearchProgressMemoryScanning,
+	ZGSearchProgressMemoryStoring,
+	ZGSearchProgressMemoryDumping,
+	ZGSearchProgressMemoryWatching
+} ZGSearchProgressType;
+
+@property (readwrite, nonatomic) ZGSearchProgressType progressType;
+
+- (void)clear;
 
 @end

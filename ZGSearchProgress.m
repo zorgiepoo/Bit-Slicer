@@ -36,4 +36,11 @@
 
 @implementation ZGSearchProgress
 
+- (void)clear
+{
+	self.progress = 0;
+	self.numberOfVariablesFound = 0;
+	self.shouldCancelSearch = NO;
+}
+
 @end

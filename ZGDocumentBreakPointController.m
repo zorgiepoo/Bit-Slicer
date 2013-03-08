@@ -106,8 +106,6 @@
 	
 	[self.foundBreakPointAddresses removeAllObjects];
 	
-	self.document.searchController.searchProgress.isWatchingBreakPoint = NO;
-	
 	[self.document.searchController resumeFromTaskAndMakeSearchFieldFirstResponder:NO];
 }
 
@@ -181,8 +179,8 @@
 		self.variableInsertionIndex = 0;
 		
 		[self.document.searchController prepareTaskWithEscapeTitle:@"Stop"];
-		
-		self.document.searchController.searchProgress.isWatchingBreakPoint = YES;
+		[self.document.searchController.searchProgress clear];
+		self.document.searchController.searchProgress.progressType = ZGSearchProgressMemoryWatching;
 		
 		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until instruction %@ %@ (%lld byte%@)", watchPointType == ZGWatchPointWrite ? @"writes" : @"reads or writes", variable.addressStringValue, breakPoint.watchSize, breakPoint.watchSize != 1 ? @"s" : @""];
 		

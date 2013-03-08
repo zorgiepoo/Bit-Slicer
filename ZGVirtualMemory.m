@@ -242,8 +242,8 @@ NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearc
 	
 	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
 	
-	searchProgress.progress = 0;
-	searchProgress.isStoringAllData = YES;
+	[searchProgress clear];
+	searchProgress.progressType = ZGSearchProgressMemoryStoring;
 	
 	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
@@ -268,7 +268,7 @@ NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearc
 			searchProgress.progress++;
 		});
 		
-		if (!searchProgress.isStoringAllData)
+		if (searchProgress.shouldCancelSearch)
 		{
 			ZGFreeData(dataArray);
 			dataArray = nil;
@@ -354,8 +354,8 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSe
 	
 	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
 	
-	searchProgress.isDoingMemoryDump = YES;
-	searchProgress.progress = 0;
+	[searchProgress clear];
+	searchProgress.progressType = ZGSearchProgressMemoryDumping;
     
 	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
@@ -391,7 +391,7 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSe
 			searchProgress.progress++;
 		});
   	    
-		if (!searchProgress.isDoingMemoryDump)
+		if (searchProgress.shouldCancelSearch)
 		{
 			goto EXIT_ON_CANCEL;
 		}
@@ -452,6 +452,9 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	
 	ZGMemorySize pageSize = ZGPageSize(processTask);
+	
+	[searchProgress clear];
+	searchProgress.progressType = ZGSearchProgressMemoryScanning;
 	
 	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < searchData.savedData.count; regionIndex++)
@@ -538,6 +541,8 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 	
 	NSArray *regions = ZGRegionsForProcessTask(processTask);
 	
+	[searchProgress clear];
+	searchProgress.progressType = ZGSearchProgressMemoryScanning;
 	searchProgress.progress = regions.count;
 	
 	regions = [regions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {

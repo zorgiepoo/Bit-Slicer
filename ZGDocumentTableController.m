@@ -374,7 +374,7 @@
 {
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
-		if ((![self.document.searchController canStartTask] && !self.document.searchController.searchProgress.isWatchingBreakPoint) || !self.document.currentProcess.valid)
+		if ((![self.document.searchController canStartTask] && !self.document.searchController.searchProgress.progressType == ZGSearchProgressMemoryWatching) || !self.document.currentProcess.valid)
 		{
 			NSBeep();
 			return NO;
