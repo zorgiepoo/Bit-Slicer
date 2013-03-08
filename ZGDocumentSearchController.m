@@ -604,158 +604,11 @@ void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variabl
 if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variableAddress - lastUsedRegion.address), compareValue, dataSize)) \
 { \
 	[array addObject:variable]; \
-} \
-\
-} while (0) 
-
-- (void)narrowDownVariablesWithComparisonFunction:(comparison_function_t)compareFunction andAddResultsToArray:(NSMutableArray *)temporaryVariablesArray usingCompletionBlock:(void(^)(void))completeSearchBlock
-{
-	ZGMemoryMap processTask = self.document.currentProcess.processTask;
-	ZGMemorySize dataSize = self.searchData.dataSize;
-	void *searchValue = self.searchData.searchValue;
-	
-	self.document.searchingProgressIndicator.maxValue = self.document.watchVariablesArray.count;
-	
-	[self createUserInterfaceTimer];
-	
-	ZGProcess *currentProcess = self.document.currentProcess;
-	ZGMemoryAddress beginningAddress = self.searchData.beginAddress;
-	ZGMemoryAddress endingAddress = self.searchData.endAddress;
-	
-	ZGSearchData *searchData = self.searchData;
-	ZGInitializeSearch(self.searchData);
-	
-	// Get all relevant regions
-	NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-		return !(region.address < endingAddress && region.address + region.size > beginningAddress && region.protection & VM_PROT_READ && (self.searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
-	}];
-	
-	// Store all regions memory locally
-	for (ZGRegion *region in regions)
-	{
-		void *bytes = NULL;
-		ZGMemorySize outputSize = region.size;
-		if (ZGReadBytes(currentProcess.processTask	, region.address, &bytes, &outputSize))
-		{
-			region.bytes = bytes;
-			region.size = outputSize;
-		}
-	}
-	
-	// Filter out any regions we could not read
-	regions = [regions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-		return !(region.bytes);
-	}];
-	
-	// Start using multiple tasks for narrowing down our search
-	// batchSize indicates the number of elements that each task will handle at most
-	// Not sure what the best number to put in for this, but it appears to work well
-	NSUInteger batchSize = 50000;
-	NSUInteger totalCount = self.document.watchVariablesArray.count;
-	NSUInteger numberOfBatches = (NSUInteger)ceil(totalCount / (batchSize * 1.0));
-	
-	NSMutableArray *batches = [[NSMutableArray alloc] init];
-	for (NSUInteger batchIndex = 0; batchIndex < numberOfBatches; batchIndex++)
-	{
-		[batches addObject:[[NSMutableArray alloc] init]];
-	}
-	
-	NSArray *variables = self.document.watchVariablesArray;
-	
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		dispatch_apply(numberOfBatches, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t batchIndex) {
-			@autoreleasepool
-			{
-				NSUInteger firstVariableIndex = batchIndex*batchSize;
-				NSUInteger batchLength = MIN(batchSize, totalCount - batchIndex*batchSize);
-				
-				NSMutableArray *batch = [batches objectAtIndex:batchIndex];
-				ZGRegion *lastUsedRegion = nil;
-				ZGRegion *lastUsedSavedRegion = nil;
-				
-				for (NSUInteger variableIndex = 0; variableIndex < batchLength; variableIndex++)
-				{
-					ZGVariable *variable = [variables objectAtIndex:variableIndex + firstVariableIndex];
-					ZGMemoryAddress variableAddress = variable.address;
-					
-					if (variable.shouldBeSearched && variable.size > 0 && dataSize > 0 && beginningAddress <= variableAddress && endingAddress >= variableAddress + dataSize)
-					{
-						// Check if the variable is in the last region we scanned
-						if (lastUsedRegion && variableAddress >= lastUsedRegion.address && variableAddress + dataSize <= lastUsedRegion.address + lastUsedRegion.size)
-						{
-							ADD_VARIABLE(batch);
-						}
-						else
-						{
-							ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
-								if (region.address + region.size <= variableAddress)
-								{
-									return NSOrderedAscending;
-								}
-								else if (region.address >= variableAddress + dataSize)
-								{
-									return NSOrderedDescending;
-								}
-								else
-								{
-									return NSOrderedSame;
-								}
-							}];
-							
-							if (targetRegion)
-							{
-								lastUsedRegion = targetRegion;
-								if (variableAddress >= targetRegion.address && variableAddress + dataSize <= targetRegion.address + targetRegion.size)
-								{
-									ADD_VARIABLE(batch);
-								}
-							}
-						}
-					}
-					
-					if (ZGSearchDidCancel(searchData))
-					{
-						break;
-					}
-				}
-				
-				dispatch_async(dispatch_get_main_queue(), ^{
-					currentProcess.searchProgress.progress += variables.count;
-					currentProcess.searchProgress.numberOfVariablesFound += batch.count;
-				});
-			}
-		});
-		
-		for (ZGRegion *region in regions)
-		{
-			if (region.bytes)
-			{
-				ZGFreeBytes(processTask, region.bytes, region.size);
-			}
-		}
-		
-		for (NSMutableArray *batch in batches)
-		{
-			[temporaryVariablesArray addObjectsFromArray:batch];
-		}
-		
-		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
-	});
-}
-
-
-#define ADD_VARIABLE_SINGLE(array) \
-do { \
-\
-void *compareValue = searchData.shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue; \
-if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variableAddress - lastUsedRegion.address), compareValue, dataSize)) \
-{ \
-	[array addObject:variable]; \
 	numberOfVariablesFound++; \
 } \
 \
 } while (0)
-- (void)narrowDownVariablesSingleThreadedWithComparisonFunction:(comparison_function_t)compareFunction andAddResultsToArray:(NSMutableArray *)temporaryVariablesArray usingCompletionBlock:(void(^)(void))completeSearchBlock
+- (void)narrowDownVariablesWithComparisonFunction:(comparison_function_t)compareFunction andAddResultsToArray:(NSMutableArray *)temporaryVariablesArray usingCompletionBlock:(void(^)(void))completeSearchBlock
 {
 	ZGMemoryMap processTask = self.document.currentProcess.processTask;
 	ZGMemorySize dataSize = self.searchData.dataSize;
@@ -794,7 +647,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 				// Check if the variable is in the last region we scanned
 				if (lastUsedRegion && variableAddress >= lastUsedRegion.address && variableAddress + dataSize <= lastUsedRegion.address + lastUsedRegion.size)
 				{
-					ADD_VARIABLE_SINGLE(temporaryVariablesArray);
+					ADD_VARIABLE(temporaryVariablesArray);
 				}
 				else
 				{
@@ -827,12 +680,12 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 									targetRegion.bytes = bytes;
 									targetRegion.size = size;
 									
-									ADD_VARIABLE_SINGLE(temporaryVariablesArray);
+									ADD_VARIABLE(temporaryVariablesArray);
 								}
 							}
 							else
 							{
-								ADD_VARIABLE_SINGLE(temporaryVariablesArray);
+								ADD_VARIABLE(temporaryVariablesArray);
 							}
 						}
 					}
@@ -912,12 +765,8 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		
 		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.document.currentProcess.is64Bit);
 		
-		NSDate *currentDate = [NSDate date];
-		
 		dispatch_block_t completeSearchBlock = ^
 		{
-			NSLog(@"Time it took %f", [[NSDate date] timeIntervalSinceDate:currentDate]);
-			
 			if (self.searchData.searchValue)
 			{
 				free(self.searchData.searchValue);
@@ -938,19 +787,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		}
 		else
 		{
-			static BOOL which = NO;
-			if (!which)
-			{
-				[self narrowDownVariablesSingleThreadedWithComparisonFunction:compareFunction andAddResultsToArray:temporaryVariablesArray usingCompletionBlock:completeSearchBlock];
-				which = YES;
-				NSLog(@"Single");
-			}
-			else
-			{
-				[self narrowDownVariablesWithComparisonFunction:compareFunction andAddResultsToArray:temporaryVariablesArray usingCompletionBlock:completeSearchBlock];
-				which = NO;
-				NSLog(@"Multi");
-			}
+			[self narrowDownVariablesWithComparisonFunction:compareFunction andAddResultsToArray:temporaryVariablesArray usingCompletionBlock:completeSearchBlock];
 		}
 	}
 }
