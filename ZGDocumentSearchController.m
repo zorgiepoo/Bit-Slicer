@@ -650,7 +650,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 	// Start using multiple tasks for narrowing down our search
 	// batchSize indicates the number of elements that each task will handle at most
 	// Not sure what the best number to put in for this, but it appears to work well
-	NSUInteger batchSize = 5000;
+	NSUInteger batchSize = 50000;
 	NSUInteger totalCount = self.document.watchVariablesArray.count;
 	NSUInteger numberOfBatches = (NSUInteger)ceil(totalCount / (batchSize * 1.0));
 	
@@ -660,17 +660,22 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		[batches addObject:[[NSMutableArray alloc] init]];
 	}
 	
+	NSArray *variables = self.document.watchVariablesArray;
+	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		dispatch_apply(numberOfBatches, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t batchIndex) {
 			@autoreleasepool
 			{
-				NSArray *variables = [self.document.watchVariablesArray subarrayWithRange:NSMakeRange(batchIndex*batchSize, MIN(batchSize, totalCount - batchIndex*batchSize))];
+				NSUInteger firstVariableIndex = batchIndex*batchSize;
+				NSUInteger batchLength = MIN(batchSize, totalCount - batchIndex*batchSize);
+				
 				NSMutableArray *batch = [batches objectAtIndex:batchIndex];
 				ZGRegion *lastUsedRegion = nil;
 				ZGRegion *lastUsedSavedRegion = nil;
 				
-				for (ZGVariable *variable in variables)
+				for (NSUInteger variableIndex = 0; variableIndex < batchLength; variableIndex++)
 				{
+					ZGVariable *variable = [variables objectAtIndex:variableIndex + firstVariableIndex];
 					ZGMemoryAddress variableAddress = variable.address;
 					
 					if (variable.shouldBeSearched && variable.size > 0 && dataSize > 0 && beginningAddress <= variableAddress && endingAddress >= variableAddress + dataSize)
@@ -905,10 +910,14 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		
 		[self prepareTask];
 		
-		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.document.currentProcess.is64Bit);;
+		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.document.currentProcess.is64Bit);
+		
+		NSDate *currentDate = [NSDate date];
 		
 		dispatch_block_t completeSearchBlock = ^
 		{
+			NSLog(@"Time it took %f", [[NSDate date] timeIntervalSinceDate:currentDate]);
+			
 			if (self.searchData.searchValue)
 			{
 				free(self.searchData.searchValue);
@@ -929,7 +938,19 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		}
 		else
 		{
-			[self narrowDownVariablesSingleThreadedWithComparisonFunction:compareFunction andAddResultsToArray:temporaryVariablesArray usingCompletionBlock:completeSearchBlock];
+			static BOOL which = NO;
+			if (!which)
+			{
+				[self narrowDownVariablesSingleThreadedWithComparisonFunction:compareFunction andAddResultsToArray:temporaryVariablesArray usingCompletionBlock:completeSearchBlock];
+				which = YES;
+				NSLog(@"Single");
+			}
+			else
+			{
+				[self narrowDownVariablesWithComparisonFunction:compareFunction andAddResultsToArray:temporaryVariablesArray usingCompletionBlock:completeSearchBlock];
+				which = NO;
+				NSLog(@"Multi");
+			}
 		}
 	}
 }
