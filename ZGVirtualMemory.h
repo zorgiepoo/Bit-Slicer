@@ -79,11 +79,6 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues);
 void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGRegion **hintedRegionReference, ZGMemorySize dataSize);
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process);
 
-void ZGInitializeSearch(ZGSearchData *searchData);
-void ZGCancelSearch(ZGSearchData *searchData);
-BOOL ZGSearchIsCancelling(ZGSearchData *searchData);
-void ZGCancelSearchImmediately(ZGSearchData *searchData);
-BOOL ZGSearchDidCancel(ZGSearchData * __unsafe_unretained searchData);
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
 NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData * searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock);

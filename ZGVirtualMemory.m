@@ -405,33 +405,6 @@ EXIT_ON_CANCEL:
 	return success;
 }
 
-void ZGInitializeSearch(ZGSearchData * __unsafe_unretained searchData)
-{
-	searchData.shouldCancelSearch = NO;
-	searchData.searchDidCancel = NO;
-}
-
-void ZGCancelSearchImmediately(ZGSearchData * __unsafe_unretained searchData)
-{
-	searchData.shouldCancelSearch = YES;
-	searchData.searchDidCancel = YES;
-}
-
-void ZGCancelSearch(ZGSearchData * __unsafe_unretained searchData)
-{
-	searchData.shouldCancelSearch = YES;
-}
-
-BOOL ZGSearchIsCancelling(ZGSearchData * __unsafe_unretained searchData)
-{
-	return searchData.shouldCancelSearch;
-}
-
-BOOL ZGSearchDidCancel(ZGSearchData * __unsafe_unretained searchData)
-{
-	return searchData.searchDidCancel;
-}
-
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
 {
 	ZGMemorySize dataAlignment;
@@ -467,8 +440,6 @@ static ZGMemorySize ZGPageSize(ZGMemoryMap processTask)
 
 NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
 {
-	ZGInitializeSearch(searchData);
-	
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
@@ -496,14 +467,14 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 			void *regionBytes = region.bytes;
 			
 			// Skipping an entire region will provide significant performance benefits
-			if (!ZGSearchIsCancelling(searchData) &&
+			if (!searchData.shouldCancelSearch &&
 				regionAddress < dataEndAddress &&
 				regionAddress + size > dataBeginAddress &&
 				ZGReadBytes(processTask, regionAddress, (void **)&currentData, &size))
 			{
 				while (offset + dataSize <= size)
 				{
-					if (offset % pageSize == 0 && ZGSearchIsCancelling(searchData))
+					if (offset % pageSize == 0 && searchData.shouldCancelSearch)
 					{
 						break;
 					}
@@ -519,11 +490,6 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 				ZGFreeBytes(processTask, currentData, size);
 			}
 			
-			if (ZGSearchIsCancelling(searchData) && !ZGSearchDidCancel(searchData))
-			{
-				searchData.searchDidCancel = YES;
-			}
-			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				searchProgress.numberOfVariablesFound += resultSet.count;
 				searchProgress.progress++;
@@ -533,7 +499,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 	
 	NSMutableArray *allResults = [[NSMutableArray alloc] init];
 	
-	if (!ZGSearchIsCancelling(searchData))
+	if (!searchData.shouldCancelSearch)
 	{
 		for (NSMutableArray *resultSet in allResultSets)
 		{
@@ -555,8 +521,6 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 
 NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
 {
-	ZGInitializeSearch(searchData);
-	
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
 	
@@ -592,12 +556,12 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 			NSMutableArray *resultSet = [allResultSets objectAtIndex:regionIndex];
 			
 			char *bytes = NULL;
-			if (!ZGSearchIsCancelling(searchData) && ZGReadBytes(processTask, address, (void **)&bytes, &size))
+			if (!searchData.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
 			{
 				ZGMemorySize dataIndex = 0;
 				while (dataIndex + dataSize <= size)
 				{
-					if (dataIndex % pageSize == 0 && ZGSearchIsCancelling(searchData))
+					if (dataIndex % pageSize == 0 && searchData.shouldCancelSearch)
 					{
 						break;
 					}
@@ -613,11 +577,6 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 				ZGFreeBytes(processTask, bytes, size);
 			}
 			
-			if (ZGSearchIsCancelling(searchData) && !ZGSearchDidCancel(searchData))
-			{
-				searchData.searchDidCancel = YES;
-			}
-			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				searchProgress.numberOfVariablesFound += resultSet.count;
 				searchProgress.progress++;
@@ -627,7 +586,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 	
 	NSMutableArray *allResults = [[NSMutableArray alloc] init];
 	
-	if (!ZGSearchIsCancelling(searchData))
+	if (!searchData.shouldCancelSearch)
 	{
 		for (NSMutableArray *resultSet in allResultSets)
 		{

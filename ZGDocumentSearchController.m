@@ -76,7 +76,7 @@
 	self.userInterfaceTimer = nil;
 	
 	// Force canceling
-	ZGCancelSearchImmediately(self.searchData);
+	self.searchData.shouldCancelSearch = YES;
 	self.document.currentProcess.searchProgress.isDoingMemoryDump = NO;
 	self.document.currentProcess.searchProgress.isStoringAllData = NO;
 	[self.document.documentBreakPointController stopWatchingBreakPoints];
@@ -271,7 +271,7 @@
 {
 	if (self.document.windowForSheet.isVisible)
 	{
-		if (!ZGSearchIsCancelling(self.searchData))
+		if (!self.searchData.shouldCancelSearch)
 		{
 			self.document.searchingProgressIndicator.doubleValue = (double)self.document.currentProcess.searchProgress.progress;
 			self.document.generalStatusTextField.stringValue = [self numberOfVariablesFoundDescription];
@@ -344,14 +344,14 @@
 	}
 	
 	self.document.currentProcess.searchProgress.progress = 0;
-	if (ZGSearchDidCancel(self.searchData))
+	if (self.searchData.shouldCancelSearch)
 	{
 		self.document.searchingProgressIndicator.doubleValue = self.document.currentProcess.searchProgress.progress;
 		self.document.generalStatusTextField.stringValue = @"Canceled search.";
 	}
 	else
 	{
-		ZGInitializeSearch(self.searchData);
+		self.searchData.shouldCancelSearch = NO;
 		[self updateSearchUserInterface:nil];
 		
 		if (NSClassFromString(@"NSUserNotification"))
@@ -622,7 +622,6 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 	ZGMemoryAddress endingAddress = self.searchData.endAddress;
 	
 	ZGSearchData *searchData = self.searchData;
-	ZGInitializeSearch(self.searchData);
 	
 	// Get all relevant regions
 	NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
@@ -692,7 +691,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 				}
 			}
 			
-			if (ZGSearchDidCancel(searchData))
+			if (searchData.shouldCancelSearch)
 			{
 				break;
 			}
@@ -780,6 +779,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		
 		self.document.currentProcess.searchProgress.progress = 0;
 		self.document.currentProcess.searchProgress.numberOfVariablesFound = 0;
+		self.searchData.shouldCancelSearch = NO;
 		
 		if (!goingToNarrowDownSearches)
 		{
@@ -834,15 +834,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 	{
 		// Cancel the search
 		self.document.searchButton.enabled = NO;
-		
-		if (self.isInNarrowSearchMode)
-		{
-			ZGCancelSearchImmediately(self.searchData);
-		}
-		else
-		{
-			ZGCancelSearch(self.searchData);
-		}
+		self.searchData.shouldCancelSearch = YES;
 	}
 }
 
