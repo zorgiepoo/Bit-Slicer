@@ -37,10 +37,12 @@
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	 0.33
 
 @class ZGSearchData;
+@class ZGSearchProgress;
 
 @interface ZGDocumentSearchController : NSObject
 
 @property (readonly, strong, nonatomic) ZGSearchData *searchData;
+@property (readonly, strong, nonatomic) ZGSearchProgress *searchProgress;
 
 - (BOOL)canStartTask;
 - (BOOL)canCancelTask;

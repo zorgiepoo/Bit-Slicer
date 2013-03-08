@@ -75,9 +75,9 @@ BOOL ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *addres
 BOOL ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection);
 
 void ZGFreeData(NSArray *dataArray);
-NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues);
+NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress);
 void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGRegion **hintedRegionReference, ZGMemorySize dataSize);
-BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process);
+BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSearchProgress *searchProgress);
 
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 

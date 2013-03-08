@@ -70,7 +70,4 @@
 @property (readwrite, assign, nonatomic) void *compareOffset;
 @property (readwrite, nonatomic) unsigned char *byteArrayFlags;
 
-@property (readwrite) BOOL shouldCancelSearch;
-@property (readwrite) BOOL searchDidCancel;
-
 @end

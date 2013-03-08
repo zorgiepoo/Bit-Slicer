@@ -40,6 +40,8 @@
 @property (readwrite, nonatomic) ZGMemorySize progress;
 @property (readwrite, nonatomic) NSUInteger numberOfVariablesFound;
 
+@property (readwrite) BOOL shouldCancelSearch;
+
 @property (readwrite, nonatomic) BOOL isDoingMemoryDump;
 @property (readwrite, nonatomic) BOOL isStoringAllData;
 @property (readwrite, nonatomic) BOOL isWatchingBreakPoint;

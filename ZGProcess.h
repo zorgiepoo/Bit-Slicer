@@ -48,7 +48,6 @@
 @property (readwrite, copy, nonatomic) NSString *name;
 @property (readonly, nonatomic) NSUInteger numberOfRegions;
 @property (readwrite, nonatomic) BOOL is64Bit;
-@property (readwrite, nonatomic) ZGSearchProgress *searchProgress;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 

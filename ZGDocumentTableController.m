@@ -41,6 +41,7 @@
 #import "ZGCalculator.h"
 #import "ZGVariable.h"
 #import "NSStringAdditions.h"
+#import "ZGSearchProgress.h"
 
 @interface ZGDocumentTableController ()
 
@@ -373,7 +374,7 @@
 {
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
-		if ((![self.document.searchController canStartTask] && !self.document.currentProcess.searchProgress.isWatchingBreakPoint) || !self.document.currentProcess.valid)
+		if ((![self.document.searchController canStartTask] && !self.document.searchController.searchProgress.isWatchingBreakPoint) || !self.document.currentProcess.valid)
 		{
 			NSBeep();
 			return NO;

@@ -34,7 +34,11 @@
 
 #import <Foundation/Foundation.h>
 
+@class ZGSearchProgress;
+
 @interface ZGMemoryDumpController : NSObject
+
+@property (strong, nonatomic) ZGSearchProgress *searchProgress;
 
 - (void)memoryDumpRangeRequest;
 - (void)memoryDumpAllRequest;

@@ -230,7 +230,7 @@ void ZGFreeData(NSArray *dataArray)
 	}
 }
 
-NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
+NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)
 {
 	NSMutableArray *dataArray = [[NSMutableArray alloc] init];
     
@@ -240,18 +240,20 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 	mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
 	mach_port_t objectName = MACH_PORT_NULL;
 	
-	process.searchProgress.isStoringAllData = YES;
-	process.searchProgress.progress = 0;
+	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
 	
-	while (mach_vm_region(process.processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
+	searchProgress.progress = 0;
+	searchProgress.isStoringAllData = YES;
+	
+	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
 		if ((regionInfo.protection & VM_PROT_READ) && (shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
 		{
 			void *bytes = NULL;
-			if (ZGReadBytes(process.processTask, address, &bytes, &size))
+			if (ZGReadBytes(processTask, address, &bytes, &size))
 			{
 				ZGRegion *memoryRegion = [[ZGRegion alloc] init];
-				memoryRegion.processTask = process.processTask;
+				memoryRegion.processTask = processTask;
 				memoryRegion.bytes = bytes;
 				memoryRegion.address = address;
 				memoryRegion.size = size;
@@ -262,9 +264,11 @@ NSArray *ZGGetAllData(ZGProcess *process, BOOL shouldScanUnwritableValues)
 		
 		address += size;
 		
-		process.searchProgress.progress++;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			searchProgress.progress++;
+		});
 		
-		if (!process.searchProgress.isStoringAllData)
+		if (!searchProgress.isStoringAllData)
 		{
 			ZGFreeData(dataArray);
 			dataArray = nil;
@@ -333,7 +337,7 @@ static void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress curren
 	}
 }
 
-BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
+BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSearchProgress *searchProgress)
 {
 	BOOL success = NO;
 	
@@ -350,10 +354,10 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 	
 	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
 	
-	process.searchProgress.isDoingMemoryDump = YES;
-	process.searchProgress.progress = 0;
+	searchProgress.isDoingMemoryDump = YES;
+	searchProgress.progress = 0;
     
-	while (mach_vm_region(process.processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
+	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
 	{
 		if (lastAddress != address || !(regionInfo.protection & VM_PROT_READ))
 		{
@@ -373,19 +377,21 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGProcess *process)
 			// outputSize should not differ from size
 			ZGMemorySize outputSize = size;
 			void *bytes = NULL;
-			if (ZGReadBytes(process.processTask, address, &bytes, &outputSize))
+			if (ZGReadBytes(processTask, address, &bytes, &outputSize))
 			{
 				[currentData appendBytes:bytes length:(NSUInteger)size];
-				ZGFreeBytes(process.processTask, bytes, outputSize);
+				ZGFreeBytes(processTask, bytes, outputSize);
 			}
 		}
 		
 		address += size;
 		lastAddress = address;
 		
-		process.searchProgress.progress++;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			searchProgress.progress++;
+		});
   	    
-		if (!process.searchProgress.isDoingMemoryDump)
+		if (!searchProgress.isDoingMemoryDump)
 		{
 			goto EXIT_ON_CANCEL;
 		}
@@ -467,14 +473,14 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 			void *regionBytes = region.bytes;
 			
 			// Skipping an entire region will provide significant performance benefits
-			if (!searchData.shouldCancelSearch &&
+			if (!searchProgress.shouldCancelSearch &&
 				regionAddress < dataEndAddress &&
 				regionAddress + size > dataBeginAddress &&
 				ZGReadBytes(processTask, regionAddress, (void **)&currentData, &size))
 			{
 				while (offset + dataSize <= size)
 				{
-					if (offset % pageSize == 0 && searchData.shouldCancelSearch)
+					if (offset % pageSize == 0 && searchProgress.shouldCancelSearch)
 					{
 						break;
 					}
@@ -499,7 +505,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 	
 	NSMutableArray *allResults = [[NSMutableArray alloc] init];
 	
-	if (!searchData.shouldCancelSearch)
+	if (!searchProgress.shouldCancelSearch)
 	{
 		for (NSMutableArray *resultSet in allResultSets)
 		{
@@ -556,12 +562,12 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 			NSMutableArray *resultSet = [allResultSets objectAtIndex:regionIndex];
 			
 			char *bytes = NULL;
-			if (!searchData.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
+			if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
 			{
 				ZGMemorySize dataIndex = 0;
 				while (dataIndex + dataSize <= size)
 				{
-					if (dataIndex % pageSize == 0 && searchData.shouldCancelSearch)
+					if (dataIndex % pageSize == 0 && searchProgress.shouldCancelSearch)
 					{
 						break;
 					}
@@ -586,7 +592,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 	
 	NSMutableArray *allResults = [[NSMutableArray alloc] init];
 	
-	if (!searchData.shouldCancelSearch)
+	if (!searchProgress.shouldCancelSearch)
 	{
 		for (NSMutableArray *resultSet in allResultSets)
 		{

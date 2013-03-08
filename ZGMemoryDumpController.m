@@ -61,6 +61,16 @@
 
 @implementation ZGMemoryDumpController
 
+- (id)init
+{
+	self = [super init];
+	if (self)
+	{
+		self.searchProgress = [[ZGSearchProgress alloc] init];
+	}
+	return self;
+}
+
 #pragma mark Memory Dump in Range
 
 - (IBAction)memoryDumpOkayButton:(id)sender
@@ -163,7 +173,7 @@
 
 - (void)updateMemoryDumpProgress:(NSTimer *)timer
 {
-	self.progressIndicator.doubleValue = self.memoryViewer.currentProcess.searchProgress.progress;
+	self.progressIndicator.doubleValue = self.searchProgress.progress;
 }
 
 - (void)memoryDumpAllRequest
@@ -211,7 +221,7 @@
 				  repeats:YES];
 				 
 				 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-					 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.memoryViewer.currentProcess))
+					 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.memoryViewer.currentProcess.processTask, self.searchProgress))
 					 {
 						 NSRunAlertPanel(
 										 @"The Memory Dump failed",
@@ -223,7 +233,7 @@
 						 [self.progressTimer invalidate];
 						 self.progressTimer = nil;
 						 
-						 if (self.memoryViewer.currentProcess.searchProgress.isDoingMemoryDump && NSClassFromString(@"NSUserNotification"))
+						 if (self.searchProgress.isDoingMemoryDump && NSClassFromString(@"NSUserNotification"))
 						 {
 							 NSUserNotification *userNotification = [[NSUserNotification alloc] init];
 							 userNotification.title = @"Finished Dumping Memory";
@@ -232,7 +242,7 @@
 						 }
 						 
 						 self.progressIndicator.doubleValue = 0.0;
-						 self.memoryViewer.currentProcess.searchProgress.isDoingMemoryDump = NO;
+						 self.searchProgress.isDoingMemoryDump = NO;
 						 
 						 [NSApp endSheet:self.memoryDumpProgressWindow];
 						 [self.memoryDumpProgressWindow close];
@@ -245,7 +255,7 @@
 
 - (IBAction)cancelDumpingAllMemory:(id)sender
 {
-	self.memoryViewer.currentProcess.searchProgress.isDoingMemoryDump = NO;
+	self.searchProgress.isDoingMemoryDump = NO;
 	[self.memoryDumpProgressCancelButton setEnabled:NO];
 }
 

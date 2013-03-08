@@ -97,6 +97,8 @@
 
 - (void)cancelTask
 {
+	[self stopWatchingBreakPoints];
+	
 	self.document.generalStatusTextField.stringValue = @"";
 	
 	[self.document.searchingProgressIndicator stopAnimation:nil];
@@ -104,9 +106,7 @@
 	
 	[self.foundBreakPointAddresses removeAllObjects];
 	
-	[self stopWatchingBreakPoints];
-	
-	self.document.currentProcess.searchProgress.isWatchingBreakPoint = NO;
+	self.document.searchController.searchProgress.isWatchingBreakPoint = NO;
 	
 	[self.document.searchController resumeFromTaskAndMakeSearchFieldFirstResponder:NO];
 }
@@ -182,7 +182,7 @@
 		
 		[self.document.searchController prepareTaskWithEscapeTitle:@"Stop"];
 		
-		self.document.currentProcess.searchProgress.isWatchingBreakPoint = YES;
+		self.document.searchController.searchProgress.isWatchingBreakPoint = YES;
 		
 		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until instruction %@ %@ (%lld byte%@)", watchPointType == ZGWatchPointWrite ? @"writes" : @"reads or writes", variable.addressStringValue, breakPoint.watchSize, breakPoint.watchSize != 1 ? @"s" : @""];
 		
