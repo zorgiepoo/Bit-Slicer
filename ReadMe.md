@@ -4,7 +4,7 @@
 ## Introduction
 Bit Slicer is an open-source universal game trainer for OS X, written using Cocoa and Mach kernel APIs.
 
-It allows you to cheat in video games by searching and modifying values such as your score, lives, money, ammunition, and much more.
+It allows you to cheat in video games by searching and modifying values such as your score, lives, ammunition, and much more.
 
 *Disclaimer: Use this software at your own risk. I'm not responsible for any damage that could occur.*
 
