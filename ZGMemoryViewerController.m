@@ -394,6 +394,8 @@
 			selectionLength = 0;
 		}
 		
+		ZGMemoryAddress oldMemoryAddress = self.currentMemoryAddress;
+		
 		self.currentMemoryAddress = chosenRegion.address;
 		self.currentMemorySize = chosenRegion.size;
 		
@@ -429,10 +431,11 @@
 		if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize) && memorySize > 0)
 		{
 			if (self.textView.data && ![self.textView.data isEqualToData:[NSData data]])
-			{
+			{	
 				HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
 				HFRangeWrapper *selectionRange = [self.textView.controller.selectedContentsRanges objectAtIndex:0];
-				[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:self.currentMemoryAddress + (displayedLineRange.location + displayedLineRange.length / 2) * self.textView.controller.bytesPerLine withSelectionLength:[selectionRange HFRange].length];
+				ZGMemoryAddress navigationAddress = oldMemoryAddress + (displayedLineRange.location + displayedLineRange.length / 2) * self.textView.controller.bytesPerLine;
+				[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:[selectionRange HFRange].length];
 			}
 			
 			// Replace all the contents of the self.textView
