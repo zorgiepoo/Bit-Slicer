@@ -285,10 +285,10 @@ static BOOL didRegisteredHotKey;
 	[self openDebugger:sender showWindow:YES];
 }
 
-#define FAQ_URL @"http://portingteam.com/index.php/topic/4454-faq-information/"
+#define WIKI_URL @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki"
 - (IBAction)help:(id)sender
 {	
-	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:FAQ_URL]];
+	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:WIKI_URL]];
 }
 
 @end
