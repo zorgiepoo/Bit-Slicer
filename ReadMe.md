@@ -39,7 +39,7 @@ It allows you to cheat in video games by searching and modifying values such as 
 * [Bit Slicer 1.5.2](http://dl.dropbox.com/u/10108199/Bit%20Slicer.zip) and older: Same as above, except also runs on 32-bit Macs.
 
 ## Support & Feedback
-* Check the [wiki](wiki)
+* Check the [wiki](/wiki)
 * Visit the [forums](http://portingteam.com/forum/157-bit-slicer/)
 * Send an email to zorgiepoo (at) gmail (dot) com
 
