@@ -90,7 +90,7 @@
 {
 	[super showWindow:sender];
 	
-	[self windowDidShow:nil];
+	[self windowDidShow:sender];
 }
 
 - (void)windowDidAppearForFirstTime:(id)sender
