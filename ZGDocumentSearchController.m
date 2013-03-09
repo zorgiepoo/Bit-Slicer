@@ -376,7 +376,7 @@
 	BOOL shouldMakeSearchFieldFirstResponder = YES;
 	
 	// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what he was looking for.
-	if (self.document.watchVariablesArray.count <= MAX_TABLE_VIEW_ITEMS)
+	if (!self.searchProgress.shouldCancelSearch && self.document.watchVariablesArray.count <= MAX_TABLE_VIEW_ITEMS)
 	{
 		NSArray *filteredVariables = [self.document.watchVariablesArray zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
 			return !variable.shouldBeSearched;
