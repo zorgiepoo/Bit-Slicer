@@ -274,45 +274,14 @@
 			isa = PBXGroup;
 			children = (
 				77FF507B16E9B7D40005915D /* Memory Window Controllers */,
-				775FCB1011719DF6000054FB /* ZGAppController.h */,
-				775FCB1111719DF6000054FB /* ZGAppController.m */,
-				775FCB1411719DF6000054FB /* ZGPreferencesController.h */,
-				775FCB1511719DF6000054FB /* ZGPreferencesController.m */,
-				77E652FA1692515400D84A7F /* ZGProcessList.h */,
-				77E652FB1692515400D84A7F /* ZGProcessList.m */,
-				77E652FD1692E77900D84A7F /* ZGRunningProcess.h */,
-				77E652FE1692E77900D84A7F /* ZGRunningProcess.m */,
-				770930B015B9070B009705A6 /* ZGDocument.h */,
-				770930B115B9070B009705A6 /* ZGDocument.m */,
-				770930B915BA905F009705A6 /* ZGDocumentSearchController.h */,
-				770930BA15BA9060009705A6 /* ZGDocumentSearchController.m */,
-				770930B615BA7635009705A6 /* ZGDocumentTableController.h */,
-				770930B715BA7635009705A6 /* ZGDocumentTableController.m */,
-				77E652B4168F8C7700D84A7F /* ZGDocumentBreakPointController.h */,
-				77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */,
-				770930B315B92203009705A6 /* ZGVariableController.h */,
-				770930B415B92203009705A6 /* ZGVariableController.m */,
-				770930BC15BA97B3009705A6 /* ZGSearchData.h */,
-				770930BD15BA97B4009705A6 /* ZGSearchData.m */,
-				77FF506F16E867FB0005915D /* ZGSearchProgress.h */,
-				77FF507016E867FB0005915D /* ZGSearchProgress.m */,
-				77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */,
-				77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */,
-				770EA82A137BA8E3007FB85A /* ZGUtilities.h */,
-				770EA829137BA8E1007FB85A /* ZGUtilities.m */,
-				775FCB1611719DF6000054FB /* ZGProcess.h */,
-				775FCB1711719DF6000054FB /* ZGProcess.m */,
-				775FCB1811719DF6000054FB /* ZGVariable.h */,
-				775FCB1911719DF6000054FB /* ZGVariable.m */,
-				778939221334308300B6AACB /* ZGMemoryTypes.h */,
-				7714D3F011B87C7E0028E6B2 /* ZGVirtualMemory.h */,
-				7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */,
-				77D037351224334E0083E057 /* ZGCalculator.h */,
-				77D037361224334E0083E057 /* ZGCalculator.m */,
-				77FC461E12237F71003CB09B /* NSStringAdditions.h */,
-				77FC461F12237F71003CB09B /* NSStringAdditions.m */,
-				77E652ED16915B5400D84A7F /* NSArrayAdditions.h */,
-				77E652EE16915B5600D84A7F /* NSArrayAdditions.m */,
+				77FF508216EAD0630005915D /* Controllers */,
+				77FF507C16EACF380005915D /* Process List */,
+				77FF507D16EACF520005915D /* Documents */,
+				77FF507E16EACF6E0005915D /* Searching */,
+				77FF508016EACFF20005915D /* Virtual Memory */,
+				77FF508316EAD0B00005915D /* Models */,
+				77FF508116EAD0260005915D /* Utilities */,
+				77FF507F16EACF8F0005915D /* NSAdditions */,
 			);
 			name = Code;
 			sourceTree = "<group>";
@@ -452,6 +421,101 @@
 				77D5AEAC137C6FC000026388 /* Memory Viewer */,
 			);
 			name = "Memory Window Controllers";
+			sourceTree = "<group>";
+		};
+		77FF507C16EACF380005915D /* Process List */ = {
+			isa = PBXGroup;
+			children = (
+				77E652FA1692515400D84A7F /* ZGProcessList.h */,
+				77E652FB1692515400D84A7F /* ZGProcessList.m */,
+				77E652FD1692E77900D84A7F /* ZGRunningProcess.h */,
+				77E652FE1692E77900D84A7F /* ZGRunningProcess.m */,
+			);
+			name = "Process List";
+			sourceTree = "<group>";
+		};
+		77FF507D16EACF520005915D /* Documents */ = {
+			isa = PBXGroup;
+			children = (
+				770930B015B9070B009705A6 /* ZGDocument.h */,
+				770930B115B9070B009705A6 /* ZGDocument.m */,
+				770930B915BA905F009705A6 /* ZGDocumentSearchController.h */,
+				770930BA15BA9060009705A6 /* ZGDocumentSearchController.m */,
+				770930B615BA7635009705A6 /* ZGDocumentTableController.h */,
+				770930B715BA7635009705A6 /* ZGDocumentTableController.m */,
+				77E652B4168F8C7700D84A7F /* ZGDocumentBreakPointController.h */,
+				77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */,
+				770930B315B92203009705A6 /* ZGVariableController.h */,
+				770930B415B92203009705A6 /* ZGVariableController.m */,
+			);
+			name = Documents;
+			sourceTree = "<group>";
+		};
+		77FF507E16EACF6E0005915D /* Searching */ = {
+			isa = PBXGroup;
+			children = (
+				770930BC15BA97B3009705A6 /* ZGSearchData.h */,
+				770930BD15BA97B4009705A6 /* ZGSearchData.m */,
+				77FF506F16E867FB0005915D /* ZGSearchProgress.h */,
+				77FF507016E867FB0005915D /* ZGSearchProgress.m */,
+				77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */,
+				77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */,
+			);
+			name = Searching;
+			sourceTree = "<group>";
+		};
+		77FF507F16EACF8F0005915D /* NSAdditions */ = {
+			isa = PBXGroup;
+			children = (
+				77FC461E12237F71003CB09B /* NSStringAdditions.h */,
+				77FC461F12237F71003CB09B /* NSStringAdditions.m */,
+				77E652ED16915B5400D84A7F /* NSArrayAdditions.h */,
+				77E652EE16915B5600D84A7F /* NSArrayAdditions.m */,
+			);
+			name = NSAdditions;
+			sourceTree = "<group>";
+		};
+		77FF508016EACFF20005915D /* Virtual Memory */ = {
+			isa = PBXGroup;
+			children = (
+				778939221334308300B6AACB /* ZGMemoryTypes.h */,
+				7714D3F011B87C7E0028E6B2 /* ZGVirtualMemory.h */,
+				7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */,
+			);
+			name = "Virtual Memory";
+			sourceTree = "<group>";
+		};
+		77FF508116EAD0260005915D /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				770EA82A137BA8E3007FB85A /* ZGUtilities.h */,
+				770EA829137BA8E1007FB85A /* ZGUtilities.m */,
+				77D037351224334E0083E057 /* ZGCalculator.h */,
+				77D037361224334E0083E057 /* ZGCalculator.m */,
+			);
+			name = Utilities;
+			sourceTree = "<group>";
+		};
+		77FF508216EAD0630005915D /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				775FCB1011719DF6000054FB /* ZGAppController.h */,
+				775FCB1111719DF6000054FB /* ZGAppController.m */,
+				775FCB1411719DF6000054FB /* ZGPreferencesController.h */,
+				775FCB1511719DF6000054FB /* ZGPreferencesController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		77FF508316EAD0B00005915D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				775FCB1611719DF6000054FB /* ZGProcess.h */,
+				775FCB1711719DF6000054FB /* ZGProcess.m */,
+				775FCB1811719DF6000054FB /* ZGVariable.h */,
+				775FCB1911719DF6000054FB /* ZGVariable.m */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
