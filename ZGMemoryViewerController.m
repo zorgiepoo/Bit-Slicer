@@ -433,9 +433,25 @@
 			if (self.textView.data && ![self.textView.data isEqualToData:[NSData data]])
 			{	
 				HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
-				HFRangeWrapper *selectionRange = [self.textView.controller.selectedContentsRanges objectAtIndex:0];
-				ZGMemoryAddress navigationAddress = oldMemoryAddress + (displayedLineRange.location + displayedLineRange.length / 2) * self.textView.controller.bytesPerLine;
-				[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:[selectionRange HFRange].length];
+				HFRange selectionRange = [[self.textView.controller.selectedContentsRanges objectAtIndex:0] HFRange];
+				
+				ZGMemorySize selectionLength;
+				ZGMemoryAddress navigationAddress;
+				
+				if (selectionRange.length > 0 && selectionRange.location >= displayedLineRange.location * self.textView.controller.bytesPerLine && selectionRange.location + selectionRange.length <= (displayedLineRange.location + displayedLineRange.length) * self.textView.controller.bytesPerLine)
+				{
+					// Selection is completely within the user's sight
+					navigationAddress = oldMemoryAddress + selectionRange.location;
+					selectionLength = selectionRange.length;
+				}
+				else
+				{
+					// Selection not completely within user's sight, use middle of viewer as the point to navigate
+					navigationAddress = oldMemoryAddress + (displayedLineRange.location + displayedLineRange.length / 2) * self.textView.controller.bytesPerLine;
+					selectionLength = 0;
+				}
+								
+				[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:selectionLength];
 			}
 			
 			// Replace all the contents of the self.textView
