@@ -373,7 +373,23 @@
 		[self.document.tableController.watchVariablesTableView reloadData];
 	}
 	
-	[self resumeFromTask];
+	BOOL shouldMakeSearchFieldFirstResponder = YES;
+	
+	// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what he was looking for.
+	if (self.document.watchVariablesArray.count <= MAX_TABLE_VIEW_ITEMS)
+	{
+		NSArray *filteredVariables = [self.document.watchVariablesArray zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
+			return !variable.shouldBeSearched;
+		}];
+		
+		if (filteredVariables.count == 1)
+		{
+			[self.document.watchWindow makeFirstResponder:self.document.tableController.watchVariablesTableView];
+			shouldMakeSearchFieldFirstResponder = NO;
+		}
+	}
+	
+	[self resumeFromTaskAndMakeSearchFieldFirstResponder:shouldMakeSearchFieldFirstResponder];
 }
 
 - (BOOL)retrieveSearchData
