@@ -209,6 +209,7 @@
 		77FF507916E9B71A0005915D /* ZGMemoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGMemoryWindowController.m; sourceTree = "<group>"; };
 		77FF509416EC0F7C0005915D /* ZGRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRegion.h; sourceTree = "<group>"; };
 		77FF509516EC0F7C0005915D /* ZGRegion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRegion.m; sourceTree = "<group>"; };
+		77FF509716EC12A20005915D /* ZGVariableTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVariableTypes.h; sourceTree = "<group>"; };
 		8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bit_Slicer-Info.plist"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Bit Slicer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bit Slicer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -517,6 +518,7 @@
 			children = (
 				775FCB1611719DF6000054FB /* ZGProcess.h */,
 				775FCB1711719DF6000054FB /* ZGProcess.m */,
+				77FF509716EC12A20005915D /* ZGVariableTypes.h */,
 				775FCB1811719DF6000054FB /* ZGVariable.h */,
 				775FCB1911719DF6000054FB /* ZGVariable.m */,
 			);

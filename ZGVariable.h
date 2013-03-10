@@ -34,6 +34,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
 
 extern NSString *ZGVariablePboardType;
 

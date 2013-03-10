@@ -32,15 +32,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
+typedef enum
+{
+	ZGInt8 = 0,
+	ZGInt16,
+	ZGInt32,
+	ZGInt64,
+	ZGFloat,
+	ZGDouble,
+	ZGUTF8String,
+	ZGUTF16String,
+	ZGPointer,
+    ZGByteArray
+} ZGVariableType;
 
-@interface ZGRegion : NSObject
-
-@property (assign, nonatomic) ZGMemoryMap processTask;
-@property (assign, nonatomic) ZGMemoryAddress address;
-@property (assign, nonatomic) ZGMemorySize size;
-@property (assign, nonatomic) ZGMemoryProtection protection;
-@property (assign, nonatomic) void *bytes;
-
-@end
+typedef enum
+{
+	ZGSigned = 0,
+	ZGUnsigned,
+} ZGVariableQualifier;

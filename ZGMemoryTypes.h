@@ -40,23 +40,3 @@ typedef vm_prot_t ZGMemoryProtection;
 typedef vm_map_t ZGMemoryMap;
 
 #define MAX_MEMORY_ADDRESS ((ZGMemoryAddress)MACH_VM_MAX_ADDRESS)
-
-typedef enum
-{
-	ZGInt8 = 0,
-	ZGInt16,
-	ZGInt32,
-	ZGInt64,
-	ZGFloat,
-	ZGDouble,
-	ZGUTF8String,
-	ZGUTF16String,
-	ZGPointer,
-    ZGByteArray
-} ZGVariableType;
-
-typedef enum
-{
-	ZGSigned = 0,
-	ZGUnsigned,
-} ZGVariableQualifier;

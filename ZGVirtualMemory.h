@@ -33,6 +33,7 @@
  */
 
 #import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
 #import <mach/mach_traps.h>
 #import <signal.h>
 #import <mach/mach_init.h>
