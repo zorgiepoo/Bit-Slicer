@@ -52,7 +52,6 @@
 @end
 
 @class ZGSearchData;
-@class ZGProcess;
 @class ZGSearchProgress;
 
 typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableArray *results);

@@ -33,7 +33,6 @@
  */
 
 #import "ZGVirtualMemory.h"
-#import "ZGProcess.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "NSArrayAdditions.h"
