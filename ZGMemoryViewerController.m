@@ -43,6 +43,7 @@
 #import "ZGUtilities.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
+#import "ZGRegion.h"
 #import "ZGMemoryProtectionController.h"
 #import "ZGMemoryDumpController.h"
 

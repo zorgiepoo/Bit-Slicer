@@ -39,6 +39,7 @@
 #import "ZGDocumentBreakPointController.h"
 #import "ZGVariableController.h"
 #import "ZGVirtualMemory.h"
+#import "ZGRegion.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "ZGSearchProgress.h"

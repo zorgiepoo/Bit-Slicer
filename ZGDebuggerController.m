@@ -35,6 +35,7 @@
 #import "ZGDebuggerController.h"
 #import "ZGAppController.h"
 #import "ZGProcess.h"
+#import "ZGRegion.h"
 #import "ZGCalculator.h"
 #import "ZGRunningProcess.h"
 #import "ZGInstruction.h"

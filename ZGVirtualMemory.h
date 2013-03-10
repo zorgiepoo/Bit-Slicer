@@ -41,18 +41,9 @@
 #import <mach/mach_vm.h>
 #import <mach/mach.h>
 
-@interface ZGRegion : NSObject
-
-@property (assign, nonatomic) ZGMemoryMap processTask;
-@property (assign, nonatomic) ZGMemoryAddress address;
-@property (assign, nonatomic) ZGMemorySize size;
-@property (assign, nonatomic) ZGMemoryProtection protection;
-@property (assign, nonatomic) void *bytes;
-
-@end
-
 @class ZGSearchData;
 @class ZGSearchProgress;
+@class ZGRegion;
 
 typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableArray *results);
 

@@ -36,9 +36,7 @@
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "NSArrayAdditions.h"
-
-@implementation ZGRegion
-@end
+#import "ZGRegion.h"
 
 static NSDictionary *gTasksDictionary = nil;
 
