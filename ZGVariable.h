@@ -37,26 +37,6 @@
 
 extern NSString *ZGVariablePboardType;
 
-typedef enum
-{
-	ZGInt8 = 0,
-	ZGInt16,
-	ZGInt32,
-	ZGInt64,
-	ZGFloat,
-	ZGDouble,
-	ZGUTF8String,
-	ZGUTF16String,
-	ZGPointer,
-    ZGByteArray
-} ZGVariableType;
-
-typedef enum
-{
-	ZGSigned = 0,
-	ZGUnsigned,
-} ZGVariableQualifier;
-
 @interface ZGVariable : NSObject <NSCoding, NSCopying>
 {
 	NSString *_addressStringValue;
