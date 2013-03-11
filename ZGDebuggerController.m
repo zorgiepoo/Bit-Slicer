@@ -865,11 +865,20 @@
 	if (self.instructions.count > 0)
 	{
 		NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
-		NSUInteger centeredInstructionIndex = visibleRowsRange.location + visibleRowsRange.length / 2;
-		if (centeredInstructionIndex < self.instructions.count)
+		
+		if (self.instructionsTableView.selectedRowIndexes.count > 0 && self.instructionsTableView.selectedRowIndexes.firstIndex >= visibleRowsRange.location && self.instructionsTableView.selectedRowIndexes.firstIndex < visibleRowsRange.location + visibleRowsRange.length && self.instructionsTableView.selectedRowIndexes.firstIndex < self.instructions.count)
 		{
-			ZGInstruction *centeredInstruction = [self.instructions objectAtIndex:centeredInstructionIndex];
-			[[self.navigationManager prepareWithInvocationTarget:self] jumpToMemoryAddress:centeredInstruction.variable.address];
+			ZGInstruction *selectedInstruction = [self.instructions objectAtIndex:self.instructionsTableView.selectedRowIndexes.firstIndex];
+			[[self.navigationManager prepareWithInvocationTarget:self] jumpToMemoryAddress:selectedInstruction.variable.address];
+		}
+		else
+		{
+			NSUInteger centeredInstructionIndex = visibleRowsRange.location + visibleRowsRange.length / 2;
+			if (centeredInstructionIndex < self.instructions.count)
+			{
+				ZGInstruction *centeredInstruction = [self.instructions objectAtIndex:centeredInstructionIndex];
+				[[self.navigationManager prepareWithInvocationTarget:self] jumpToMemoryAddress:centeredInstruction.variable.address];
+			}
 		}
 	}
 }
