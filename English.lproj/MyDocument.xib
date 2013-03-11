@@ -1365,6 +1365,7 @@
 							<string key="NSFrame">{{12, 16}, {618, 20}}</string>
 							<reference key="NSSuperview" ref="568628114"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<int key="NSpiFlags">16392</int>
 							<double key="NSMaxValue">100</double>
 						</object>
@@ -1915,7 +1916,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 									<reference key="NSNextKeyView" ref="849671193"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="1052922599">
-										<int key="NSCellFlags">67108864</int>
+										<int key="NSCellFlags">-2080374784</int>
 										<int key="NSCellFlags2">131072</int>
 										<string key="NSContents">Scan Unwritable Values</string>
 										<reference key="NSSupport" ref="26"/>
