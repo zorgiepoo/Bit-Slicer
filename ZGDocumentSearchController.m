@@ -717,14 +717,14 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 				}
 			}
 			
-			if (self.searchProgress.shouldCancelSearch)
-			{
-				break;
-			}
-			
 			// Update UI progress every 5%
 			if (tempProgress / maxProgress >= 0.05 || currentProgress == maxProgress-1)
 			{
+				if (self.searchProgress.shouldCancelSearch)
+				{
+					break;
+				}
+				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					self.searchProgress.progress = currentProgress;
 					self.searchProgress.numberOfVariablesFound = numberOfVariablesFound;
