@@ -56,6 +56,11 @@
 	return [[expression componentsSeparatedByCharactersInSet:disallowedCharacterSet] count] <= 1;
 }
 
+static VALUE toStringWrapper(VALUE argument)
+{
+	return rb_funcall(argument, rb_intern("to_s"), 0);
+}
+
 + (NSString *)evaluateExpression:(NSString *)expression
 {
 	NSString *newExpression = expression;
@@ -65,16 +70,19 @@
 		newExpression = nil;
 	}
 	
-	if (newExpression)
+	if (newExpression && [newExpression UTF8String])
 	{
-		int resultState;
-		VALUE result = rb_funcall(rb_eval_string_protect([newExpression UTF8String], &resultState), rb_intern("to_s"), 0);
-		if (resultState == 0 && result != Qnil && TYPE(result) == T_STRING)
+		int resultState = 0;
+		VALUE numericalResult = rb_eval_string_protect([newExpression UTF8String], &resultState);
+		if (resultState == 0 && numericalResult != Qnil && (TYPE(numericalResult) == T_FIXNUM || TYPE(numericalResult) == T_BIGNUM || TYPE(numericalResult) == T_FLOAT))
 		{
-			newExpression =
-				[NSString
-				 stringWithCString:((struct RString *)result)->ptr
-				 encoding:NSUTF8StringEncoding];
+			resultState = 0;
+			VALUE result = rb_protect(toStringWrapper, numericalResult, &resultState);
+			
+			if (resultState == 0 && result != Qnil && TYPE(result) == T_STRING && ((struct RString *)result)->ptr)
+			{
+				newExpression = [NSString stringWithCString:((struct RString *)result)->ptr encoding:NSUTF8StringEncoding];
+			}
 		}
 	}
 	
