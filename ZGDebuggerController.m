@@ -252,8 +252,9 @@
 
 - (void)updateSymbolsForInstructions:(NSArray *)instructions asynchronously:(BOOL)isAsynchronous completionHandler:(void (^)(void))completionHandler
 {
+	static BOOL shouldFindSymbols = YES;
 	void (^updateSymbolsBlock)(void) = ^{
-		if ([[NSFileManager defaultManager] fileExistsAtPath:ATOS_PATH])
+		if (shouldFindSymbols && [[NSFileManager defaultManager] fileExistsAtPath:ATOS_PATH])
 		{
 			NSTask *atosTask = [[NSTask alloc] init];
 			[atosTask setLaunchPath:ATOS_PATH];
@@ -268,7 +269,17 @@
 			// Ignore error message saying that atos has RESTRICT section thus DYLD environment variables being ignored
 			[atosTask setStandardError:[NSPipe pipe]];
 			
-			[atosTask launch];
+			@try
+			{
+				[atosTask launch];
+			}
+			@catch (NSException *exception)
+			{
+				NSLog(@"Atos task failed: Name: %@, Reason: %@", exception.name, exception.reason);
+				NSLog(@"Stopping atos from being called for this run...");
+				shouldFindSymbols = NO;
+				return;
+			}
 			
 			for (ZGInstruction *instruction in instructions)
 			{
@@ -1406,7 +1417,16 @@ END_DEBUGGER_CHANGE:
 		NSPipe *errorPipe = [NSPipe pipe];
 		[task setStandardError:errorPipe];
 		
-		[task launch];
+		@try
+		{
+			[task launch];
+		}
+		@catch (NSException *exception)
+		{
+			NSLog(@"Yasm task could not start: Name: %@, Reason: %@", exception.name, exception.reason);
+			free(tempFileNameCString);
+			return;
+		}
 		
 		NSData *inputData = [[NSString stringWithFormat:@"BITS %lld\n%@\n", self.currentProcess.pointerSize * 8, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
 		
