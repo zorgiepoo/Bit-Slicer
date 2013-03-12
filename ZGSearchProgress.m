@@ -39,8 +39,10 @@
 - (void)clear
 {
 	self.progress = 0;
+	self.maxProgress = 0;
 	self.numberOfVariablesFound = 0;
 	self.shouldCancelSearch = NO;
+	self.initiatedSearch = NO;
 }
 
 @end

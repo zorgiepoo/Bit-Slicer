@@ -271,8 +271,12 @@
 
 - (void)updateVariablesFound
 {
-	self.document.searchingProgressIndicator.doubleValue = (double)self.searchProgress.progress;
-	self.document.generalStatusTextField.stringValue = [self numberOfVariablesFoundDescription];
+	if (self.searchProgress.initiatedSearch)
+	{
+		self.document.searchingProgressIndicator.maxValue = (double)self.searchProgress.maxProgress;
+		self.document.searchingProgressIndicator.doubleValue = (double)self.searchProgress.progress;
+		self.document.generalStatusTextField.stringValue = [self numberOfVariablesFoundDescription];
+	}
 }
 
 - (void)updateSearchUserInterface:(NSTimer *)timer
@@ -582,9 +586,6 @@
 	ZGVariableQualifier qualifier = [[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
 	ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
 	
-	NSUInteger numberOfRegions = self.document.currentProcess.numberOfRegions;
-	self.document.searchingProgressIndicator.maxValue = numberOfRegions;
-	
 	ZGMemorySize dataSize = self.searchData.dataSize;
 	void *searchValue = self.searchData.searchValue;
 	
@@ -636,9 +637,6 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 	ZGMemorySize dataSize = self.searchData.dataSize;
 	void *searchValue = self.searchData.searchValue;
 	
-	self.document.searchingProgressIndicator.maxValue = self.document.watchVariablesArray.count;
-	[self createUserInterfaceTimer];
-	
 	ZGMemoryAddress beginningAddress = self.searchData.beginAddress;
 	ZGMemoryAddress endingAddress = self.searchData.endAddress;
 	
@@ -649,8 +647,11 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		return !(region.address < endingAddress && region.address + region.size > beginningAddress && region.protection & VM_PROT_READ && (self.searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
 	
-	[self.searchProgress clear];
+	self.searchProgress.initiatedSearch = YES;
 	self.searchProgress.progressType = ZGSearchProgressMemoryScanning;
+	self.searchProgress.maxProgress = regions.count;
+	
+	[self createUserInterfaceTimer];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		ZGRegion *lastUsedRegion = nil;
@@ -691,25 +692,26 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 					
 					if (targetRegion)
 					{
-						lastUsedRegion = targetRegion;
-						if (variableAddress >= targetRegion.address && variableAddress + dataSize <= targetRegion.address + targetRegion.size)
+						if (!targetRegion.bytes)
 						{
-							if (!targetRegion.bytes)
+							void *bytes = NULL;
+							ZGMemorySize size = targetRegion.size;
+							
+							if (ZGReadBytes(self.document.currentProcess.processTask, targetRegion.address, &bytes, &size))
 							{
-								void *bytes = NULL;
-								ZGMemorySize size = targetRegion.size;
-								if (ZGReadBytes(self.document.currentProcess.processTask, targetRegion.address, &bytes, &size))
-								{
-									targetRegion.bytes = bytes;
-									targetRegion.size = size;
-									
-									ADD_VARIABLE(temporaryVariablesArray);
-								}
+								targetRegion.bytes = bytes;
+								targetRegion.size = size;
+								lastUsedRegion = targetRegion;
 							}
-							else
-							{
-								ADD_VARIABLE(temporaryVariablesArray);
-							}
+						}
+						else
+						{
+							lastUsedRegion = targetRegion;
+						}
+						
+						if (lastUsedRegion == targetRegion && variableAddress >= targetRegion.address && variableAddress + dataSize <= targetRegion.address + targetRegion.size)
+						{
+							ADD_VARIABLE(temporaryVariablesArray);
 						}
 					}
 				}
@@ -785,6 +787,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 		}
 		
 		[self prepareTask];
+		[self.searchProgress clear];
 		
 		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.document.currentProcess.is64Bit);
 		
@@ -858,12 +861,11 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 {
 	[self prepareTask];
 	
-	self.document.searchingProgressIndicator.maxValue = self.document.currentProcess.numberOfRegions;
-	
-	[self createUserInterfaceTimer];
-	
 	self.document.generalStatusTextField.stringValue = @"Storing All Values...";
 	self.searchData.shouldScanUnwritableValues = self.document.scanUnwritableValuesCheckBox.state;
+	[self.searchProgress clear];
+	
+	[self createUserInterfaceTimer];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		self.searchData.tempSavedData = ZGGetAllData(self.document.currentProcess.processTask, self.searchData, self.searchProgress);

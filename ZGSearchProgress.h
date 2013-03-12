@@ -37,7 +37,9 @@
 
 @interface ZGSearchProgress : NSObject
 
+@property (readwrite, nonatomic) BOOL initiatedSearch;
 @property (readwrite, nonatomic) ZGMemorySize progress;
+@property (readwrite, nonatomic) ZGMemorySize maxProgress;
 @property (readwrite, nonatomic) NSUInteger numberOfVariablesFound;
 
 @property (readwrite) BOOL shouldCancelSearch;

@@ -230,40 +230,30 @@ void ZGFreeData(NSArray *dataArray)
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)
 {
 	NSMutableArray *dataArray = [[NSMutableArray alloc] init];
-    
-	ZGMemoryAddress address = 0x0;
-	ZGMemorySize size;
-	vm_region_basic_info_data_64_t regionInfo;
-	mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
-	mach_port_t objectName = MACH_PORT_NULL;
-	
 	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
 	
-	[searchProgress clear];
-	searchProgress.progressType = ZGSearchProgressMemoryStoring;
+	NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
+		return !(region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
+	}];
 	
-	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
+	dispatch_async(dispatch_get_main_queue(), ^{
+		searchProgress.initiatedSearch = YES;
+		searchProgress.progressType = ZGSearchProgressMemoryStoring;
+		searchProgress.maxProgress = regions.count;
+	});
+	
+	for (ZGRegion *region in regions)
 	{
-		if ((regionInfo.protection & VM_PROT_READ) && (shouldScanUnwritableValues || (regionInfo.protection & VM_PROT_WRITE)))
+		void *bytes = NULL;
+		ZGMemorySize size = region.size;
+		
+		if (ZGReadBytes(processTask, region.address, &bytes, &size))
 		{
-			void *bytes = NULL;
-			if (ZGReadBytes(processTask, address, &bytes, &size))
-			{
-				ZGRegion *memoryRegion = [[ZGRegion alloc] init];
-				memoryRegion.processTask = processTask;
-				memoryRegion.bytes = bytes;
-				memoryRegion.address = address;
-				memoryRegion.size = size;
-				
-				[dataArray addObject:memoryRegion];
-			}
+			region.bytes = bytes;
+			region.size = size;
+			
+			[dataArray addObject:region];
 		}
-		
-		address += size;
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			searchProgress.progress++;
-		});
 		
 		if (searchProgress.shouldCancelSearch)
 		{
@@ -271,6 +261,10 @@ NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearc
 			dataArray = nil;
 			break;
 		}
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			searchProgress.progress++;
+		});
 	}
 	
 	return dataArray;
@@ -338,51 +332,49 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSe
 {
 	BOOL success = NO;
 	
-	ZGMemoryAddress address = 0x0;
-	ZGMemoryAddress lastAddress = address;
-	ZGMemorySize size;
-	vm_region_basic_info_data_64_t regionInfo;
-	mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
-	mach_port_t objectName = MACH_PORT_NULL;
-	
 	NSMutableData *currentData = nil;
-	ZGMemoryAddress currentStartingAddress = address;
+	ZGMemoryAddress currentStartingAddress = 0;
+	ZGMemoryAddress lastAddress = currentStartingAddress;
 	int fileNumber = 0;
 	
 	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
 	
-	[searchProgress clear];
-	searchProgress.progressType = ZGSearchProgressMemoryDumping;
-    
-	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &infoCount, &objectName) == KERN_SUCCESS)
+	NSArray *regions = ZGRegionsForProcessTask(processTask);
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		searchProgress.initiatedSearch = YES;
+		searchProgress.progressType = ZGSearchProgressMemoryDumping;
+		searchProgress.maxProgress = regions.count;
+	});
+	
+	for (ZGRegion *region in regions)
 	{
-		if (lastAddress != address || !(regionInfo.protection & VM_PROT_READ))
+		if (lastAddress != region.address || !(region.protection & VM_PROT_READ))
 		{
 			// We're done with this piece of data
 			ZGSavePieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
 			currentData = nil;
 		}
 		
-		if (regionInfo.protection & VM_PROT_READ)
+		if (region.protection & VM_PROT_READ)
 		{
 			if (!currentData)
 			{
 				currentData = [[NSMutableData alloc] init];
-				currentStartingAddress = address;
+				currentStartingAddress = region.address;
 			}
 			
 			// outputSize should not differ from size
-			ZGMemorySize outputSize = size;
+			ZGMemorySize outputSize = region.size;
 			void *bytes = NULL;
-			if (ZGReadBytes(processTask, address, &bytes, &outputSize))
+			if (ZGReadBytes(processTask, region.address, &bytes, &outputSize))
 			{
-				[currentData appendBytes:bytes length:(NSUInteger)size];
+				[currentData appendBytes:bytes length:(NSUInteger)outputSize];
 				ZGFreeBytes(processTask, bytes, outputSize);
 			}
 		}
 		
-		address += size;
-		lastAddress = address;
+		lastAddress = region.address;
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			searchProgress.progress++;
@@ -450,8 +442,11 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 	
 	ZGMemorySize pageSize = ZGPageSize(processTask);
 	
-	[searchProgress clear];
-	searchProgress.progressType = ZGSearchProgressMemoryScanning;
+	dispatch_async(dispatch_get_main_queue(), ^{
+		searchProgress.initiatedSearch = YES;
+		searchProgress.progressType = ZGSearchProgressMemoryScanning;
+		searchProgress.maxProgress = searchData.savedData.count;
+	});
 	
 	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < searchData.savedData.count; regionIndex++)
@@ -536,17 +531,15 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 	
 	ZGMemorySize pageSize = ZGPageSize(processTask);
 	
-	NSArray *regions = ZGRegionsForProcessTask(processTask);
-	
-	[searchProgress clear];
-	searchProgress.progressType = ZGSearchProgressMemoryScanning;
-	searchProgress.progress = regions.count;
-	
-	regions = [regions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
+	NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
 		return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
 	
-	searchProgress.progress -= regions.count;
+	dispatch_async(dispatch_get_main_queue(), ^{
+		searchProgress.initiatedSearch = YES;
+		searchProgress.progressType = ZGSearchProgressMemoryScanning;
+		searchProgress.maxProgress = regions.count;
+	});
 	
 	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)

@@ -173,7 +173,11 @@
 
 - (void)updateMemoryDumpProgress:(NSTimer *)timer
 {
-	self.progressIndicator.doubleValue = self.searchProgress.progress;
+	if (self.searchProgress.initiatedSearch)
+	{
+		self.progressIndicator.maxValue = self.searchProgress.maxProgress;
+		self.progressIndicator.doubleValue = self.searchProgress.progress;
+	}
 }
 
 - (void)memoryDumpAllRequest
@@ -210,7 +214,7 @@
 				 
 				 [self.memoryDumpProgressCancelButton setEnabled:YES];
 				 
-				 self.progressIndicator.maxValue = self.memoryViewer.currentProcess.numberOfRegions;
+				 [self.searchProgress clear];
 				 
 				 self.progressTimer =
 					[NSTimer
