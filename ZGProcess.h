@@ -33,7 +33,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "ZGVirtualMemory.h"
+#import "ZGMemoryTypes.h"
 #import <sys/sysctl.h>
 
 #define NON_EXISTENT_PID_NUMBER -1
@@ -46,7 +46,6 @@
 @property (readwrite, nonatomic) ZGMemoryMap processTask;
 @property (readonly, nonatomic) BOOL valid;
 @property (readwrite, copy, nonatomic) NSString *name;
-@property (readonly, nonatomic) NSUInteger numberOfRegions;
 @property (readwrite, nonatomic) BOOL is64Bit;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;

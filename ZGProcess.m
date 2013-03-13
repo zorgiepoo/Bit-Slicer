@@ -33,9 +33,7 @@
  */
 
 #import "ZGProcess.h"
-#import "ZGProcessList.h"
-#import "ZGRunningProcess.h"
-#import "ZGSearchProgress.h"
+#import "ZGVirtualMemory.h"
 
 @implementation ZGProcess
 
@@ -70,11 +68,6 @@
 - (id)initWithName:(NSString *)processName set64Bit:(BOOL)flag64Bit
 {
 	return [self initWithName:processName processID:NON_EXISTENT_PID_NUMBER set64Bit:flag64Bit];
-}
-
-- (NSUInteger)numberOfRegions
-{
-	return ZGNumberOfRegionsForProcessTask(self.processTask);
 }
 
 - (BOOL)valid

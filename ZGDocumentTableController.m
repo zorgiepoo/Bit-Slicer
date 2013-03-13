@@ -42,6 +42,7 @@
 #import "ZGVariable.h"
 #import "NSStringAdditions.h"
 #import "ZGSearchProgress.h"
+#import "ZGVirtualMemory.h"
 
 @interface ZGDocumentTableController ()
 

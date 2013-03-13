@@ -40,6 +40,7 @@
 #import "ZGProcess.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
+#import "ZGVirtualMemory.h"
 
 @interface ZGAppController ()
 

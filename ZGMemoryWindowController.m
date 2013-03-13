@@ -38,6 +38,7 @@
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 #import "ZGProcess.h"
+#import "ZGVirtualMemory.h"
 
 @interface ZGMemoryWindowController ()
 
