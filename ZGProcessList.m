@@ -38,6 +38,12 @@
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
+#ifdef _DEBUG
+	#define ZG_LOG(format, ...) NSLog(format, __VA_ARGS__)
+#else
+	#define ZG_LOG(format, ...) do { } while (0)
+#endif
+
 @interface ZGProcessList ()
 {
 	NSMutableArray *_runningProcesses;
@@ -249,9 +255,11 @@
 		if (self.pollRequestCount == 0 && !self.pollTimer)
 		{
 			[self createPollTimer];
+			ZG_LOG(@"Creating Poll Timer with observer %@", observer);
 		}
 		
 		self.pollRequestCount++;
+		ZG_LOG(@"Increasing poll request count to %ld", self.pollRequestCount);
 	}
 }
 
@@ -264,9 +272,12 @@
 		self.pollObservers = [NSArray arrayWithArray:newObservers];
 		
 		self.pollRequestCount--;
+		ZG_LOG(@"Decreasing poll request count to %ld", self.pollRequestCount);
+		
 		if (self.pollRequestCount == 0 && self.priorityProcesses	.count == 0)
 		{
 			[self destroyPollTimer];
+			ZG_LOG(@"Destroying Poll Timer with observer %@", observer);
 		}
 	}
 }
@@ -286,6 +297,7 @@
 		{
 			shouldRetrieveList = YES;
 			[self removePriorityToProcessIdentifier:processNumber.intValue];
+			ZG_LOG(@"Forcing retrieval list: process died at watch, pid %d", processNumber.intValue);
 		}
 		
 		if (task != MACH_PORT_NULL)
@@ -310,6 +322,7 @@
 		if (!self.pollTimer)
 		{
 			[self createPollTimer];
+			ZG_LOG(@"Creating Poll Timer for add priority on pid %d", processIdentifier);
 		}
 	}
 }
@@ -324,6 +337,7 @@
 		if (self.priorityProcesses.count == 0 && self.pollRequestCount == 0)
 		{
 			[self destroyPollTimer];
+			ZG_LOG(@"Destroying Poll Timer for remove priority on pid %d", processIdentifier);
 		}
 	}
 }
