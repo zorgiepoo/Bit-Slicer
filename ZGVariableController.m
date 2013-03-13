@@ -44,6 +44,7 @@
 #import "ZGUtilities.h"
 #import "ZGDebuggerController.h"
 #import "ZGInstruction.h"
+#import "ZGVirtualMemory.h"
 
 @interface ZGVariableController ()
 
