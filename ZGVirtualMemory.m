@@ -421,26 +421,12 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
-static ZGMemorySize ZGPageSize(ZGMemoryMap processTask)
-{
-	ZGMemorySize pageSize = 4096; // use as default in case we can't retrieve page size properly
-	vm_size_t tempPageSize = 0;
-	if (host_page_size(processTask, &tempPageSize) == KERN_SUCCESS)
-	{
-		pageSize = tempPageSize;
-	}
-	
-	return pageSize;
-}
-
 NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
 {
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
-	
-	ZGMemorySize pageSize = ZGPageSize(processTask);
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
 		searchProgress.initiatedSearch = YES;
@@ -475,7 +461,7 @@ NSArray *ZGSearchForSavedData(ZGMemoryMap processTask, ZGSearchData *searchData,
 			{
 				while (offset + dataSize <= size)
 				{
-					if (offset % pageSize == 0 && searchProgress.shouldCancelSearch)
+					if (searchProgress.shouldCancelSearch)
 					{
 						break;
 					}
@@ -529,8 +515,6 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
 	
-	ZGMemorySize pageSize = ZGPageSize(processTask);
-	
 	NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
 		return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
@@ -562,7 +546,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 				ZGMemorySize dataIndex = 0;
 				while (dataIndex + dataSize <= size)
 				{
-					if (dataIndex % pageSize == 0 && searchProgress.shouldCancelSearch)
+					if (searchProgress.shouldCancelSearch)
 					{
 						break;
 					}
