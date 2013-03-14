@@ -556,7 +556,7 @@
 			
 			self.searchButton.enabled = NO;
 			
-			if (self.searchController.canCancelTask)
+			if (self.searchController.canCancelTask && !self.searchController.searchProgress.shouldCancelSearch)
 			{
 				[self.searchController cancelTask];
 			}
