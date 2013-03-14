@@ -556,6 +556,11 @@
 			
 			self.searchButton.enabled = NO;
 			
+			if (self.searchController.canCancelTask)
+			{
+				[self.searchController cancelTask];
+			}
+			
 			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 			
 			[self.currentProcess markInvalid];
