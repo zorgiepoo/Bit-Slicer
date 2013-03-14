@@ -36,6 +36,12 @@
 #import "ZGMemoryTypes.h"
 #import "ZGVariable.h"
 
+#ifdef _DEBUG
+	#define ZG_LOG(format, ...) NSLog(format, __VA_ARGS__)
+#else
+	#define ZG_LOG(format, ...) do { } while (0)
+#endif
+
 @class ZGProcess;
 
 ZGMemoryAddress memoryAddressFromExpression(NSString *expression);

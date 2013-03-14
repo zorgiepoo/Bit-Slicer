@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/31/12.
+ * Created by Mayur Pawashe on 3/14/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,25 +32,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+#import "ZGRunningProcessObserver.h"
+#import "ZGRunningProcess.h"
 
-@interface ZGProcessList : NSObject
+@implementation ZGRunningProcessObserver
 
-// Observable for new and old changes via KVO
-@property (nonatomic, readonly) NSArray *runningProcesses;
+- (id)initWithProcessIdentifier:(pid_t)processIdentifier observer:(id)observer
+{
+	self = [super init];
+	if (self)
+	{
+		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] init];
+		runningProcess.processIdentifier = processIdentifier;
+		
+		self.runningProcess = runningProcess;
+		self.observer = observer;
+	}
+	return self;
+}
 
-+ (id)sharedProcessList;
-
-// Forces to fetch all process information
-- (void)retrieveList;
-
-// Request or unrequest if changes should be polled and checked frequently
-// Not so efficient, but sometimes necessary
-- (void)requestPollingWithObserver:(id)observer;
-- (void)unrequestPollingWithObserver:(id)observer;
-
-// Add or remove priority to a process id. Even if we aren't polling, we will make sure to let you know when a specific running process ID terminates. This is efficient.
-- (void)addPriorityToProcessIdentifier:(pid_t)processIdentifier withObserver:(id)observer;
-- (void)removePriorityToProcessIdentifier:(pid_t)processIdentifier withObserver:(id)observer;
+- (BOOL)isEqual:(id)object
+{
+	return [self.runningProcess isEqual:[object runningProcess]] && self.observer == [object observer];
+}
 
 @end

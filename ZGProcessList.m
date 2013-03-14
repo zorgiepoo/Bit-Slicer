@@ -34,15 +34,11 @@
 
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
+#import "ZGRunningProcessObserver.h"
 #import "ZGVirtualMemory.h"
+#import "ZGUtilities.h"
 #import <sys/types.h>
 #import <sys/sysctl.h>
-
-#ifdef _DEBUG
-	#define ZG_LOG(format, ...) NSLog(format, __VA_ARGS__)
-#else
-	#define ZG_LOG(format, ...) do { } while (0)
-#endif
 
 @interface ZGProcessList ()
 {
@@ -288,16 +284,16 @@
 {
 	BOOL shouldRetrieveList = NO;
 	
-	for (NSNumber *processNumber in self.priorityProcesses)
-	{
+	for (ZGRunningProcessObserver *runningProcessObserver in self.priorityProcesses)
+	{	
 		mach_port_name_t task = MACH_PORT_NULL;
-		kern_return_t result = task_for_pid(current_task(), processNumber.intValue, &task);
+		kern_return_t result = task_for_pid(current_task(), runningProcessObserver.runningProcess.processIdentifier, &task);
 		
 		if (result != KERN_SUCCESS || !MACH_PORT_VALID(task))
 		{
 			shouldRetrieveList = YES;
-			[self removePriorityToProcessIdentifier:processNumber.intValue];
-			ZG_LOG(@"Forcing retrieval list: process died at watch, pid %d", processNumber.intValue);
+			[self removePriorityToProcessIdentifier:runningProcessObserver.runningProcess.processIdentifier withObserver:runningProcessObserver.observer];
+			ZG_LOG(@"Forcing retrieval list: process died at watch, pid %d with observer: %@", runningProcessObserver.runningProcess.processIdentifier, runningProcessObserver.observer);
 		}
 		
 		if (task != MACH_PORT_NULL)
@@ -312,32 +308,36 @@
 	}
 }
 
-- (void)addPriorityToProcessIdentifier:(pid_t)processIdentifier
+- (void)addPriorityToProcessIdentifier:(pid_t)processIdentifier withObserver:(id)observer
 {
-	if (![self.priorityProcesses containsObject:@(processIdentifier)])
+	ZGRunningProcessObserver *runningProcessObserver = [[ZGRunningProcessObserver alloc] initWithProcessIdentifier:processIdentifier observer:observer];
+	
+	if (![self.priorityProcesses containsObject:runningProcessObserver])
 	{
 		NSMutableArray *newPriorityProcesses = self.priorityProcesses ? [NSMutableArray arrayWithArray:self.priorityProcesses] : [NSMutableArray array];
-		[newPriorityProcesses addObject:@(processIdentifier)];
+		[newPriorityProcesses addObject:runningProcessObserver];
 		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
 		if (!self.pollTimer)
 		{
 			[self createPollTimer];
-			ZG_LOG(@"Creating Poll Timer for add priority on pid %d", processIdentifier);
+			ZG_LOG(@"Creating Poll Timer for add priority on pid %d with observer: %@", processIdentifier, observer);
 		}
 	}
 }
 
-- (void)removePriorityToProcessIdentifier:(pid_t)processIdentifier
+- (void)removePriorityToProcessIdentifier:(pid_t)processIdentifier withObserver:(id)observer
 {
-	if ([self.priorityProcesses containsObject:@(processIdentifier)])
+	ZGRunningProcessObserver *runningProcessObserver = [[ZGRunningProcessObserver alloc] initWithProcessIdentifier:processIdentifier observer:observer];
+	
+	if ([self.priorityProcesses containsObject:runningProcessObserver])
 	{
 		NSMutableArray *newPriorityProcesses = [NSMutableArray arrayWithArray:self.priorityProcesses];
-		[newPriorityProcesses removeObject:@(processIdentifier)];
+		[newPriorityProcesses removeObject:runningProcessObserver];
 		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
 		if (self.priorityProcesses.count == 0 && self.pollRequestCount == 0)
 		{
 			[self destroyPollTimer];
-			ZG_LOG(@"Destroying Poll Timer for remove priority on pid %d", processIdentifier);
+			ZG_LOG(@"Destroying Poll Timer for remove priority on pid %d with observer: %@", processIdentifier, observer);
 		}
 	}
 }

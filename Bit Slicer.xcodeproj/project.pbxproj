@@ -23,6 +23,7 @@
 		770EA821137B6E6D007FB85A /* ZGMemoryViewerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA820137B6E6D007FB85A /* ZGMemoryViewerController.m */; };
 		770EA824137B6FDE007FB85A /* ZGMemoryViewerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770EA822137B6FDE007FB85A /* ZGMemoryViewerController.xib */; };
 		770EA82B137BA8E5007FB85A /* ZGUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 770EA829137BA8E1007FB85A /* ZGUtilities.m */; };
+		7710477316F197B300F5BC2A /* ZGRunningProcessObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7710477216F197B300F5BC2A /* ZGRunningProcessObserver.m */; };
 		7714D3F211B87C7E0028E6B2 /* ZGVirtualMemory.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */; };
 		772AACD415E1CCFA00E1F788 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 772AACD315E1CCFA00E1F788 /* HexFiend.framework */; };
 		772AACD515E1D01F00E1F788 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 772AACD315E1CCFA00E1F788 /* HexFiend.framework */; };
@@ -125,6 +126,8 @@
 		770EA823137B6FDE007FB85A /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ZGMemoryViewerController.xib; sourceTree = "<group>"; };
 		770EA829137BA8E1007FB85A /* ZGUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGUtilities.m; sourceTree = "<group>"; };
 		770EA82A137BA8E3007FB85A /* ZGUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGUtilities.h; sourceTree = "<group>"; };
+		7710477116F197B300F5BC2A /* ZGRunningProcessObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRunningProcessObserver.h; sourceTree = "<group>"; };
+		7710477216F197B300F5BC2A /* ZGRunningProcessObserver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRunningProcessObserver.m; sourceTree = "<group>"; };
 		7714D3F011B87C7E0028E6B2 /* ZGVirtualMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVirtualMemory.h; sourceTree = "<group>"; };
 		7714D3F111B87C7E0028E6B2 /* ZGVirtualMemory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGVirtualMemory.m; sourceTree = "<group>"; };
 		772AACD315E1CCFA00E1F788 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HexFiend.framework; sourceTree = "<group>"; };
@@ -434,6 +437,8 @@
 				77E652FB1692515400D84A7F /* ZGProcessList.m */,
 				77E652FD1692E77900D84A7F /* ZGRunningProcess.h */,
 				77E652FE1692E77900D84A7F /* ZGRunningProcess.m */,
+				7710477116F197B300F5BC2A /* ZGRunningProcessObserver.h */,
+				7710477216F197B300F5BC2A /* ZGRunningProcessObserver.m */,
 			);
 			name = "Process List";
 			sourceTree = "<group>";
@@ -647,6 +652,7 @@
 				77FF507116E867FB0005915D /* ZGSearchProgress.m in Sources */,
 				77FF507A16E9B71C0005915D /* ZGMemoryWindowController.m in Sources */,
 				77FF509616EC0F7C0005915D /* ZGRegion.m in Sources */,
+				7710477316F197B300F5BC2A /* ZGRunningProcessObserver.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

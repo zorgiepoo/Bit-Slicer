@@ -127,7 +127,7 @@
 	{
 		if (self.currentProcess.valid)
 		{
-			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID];
+			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 		}
 		else
 		{
@@ -149,7 +149,7 @@
 		
 		if (self.currentProcess.valid)
 		{
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
+			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 		}
 		
 		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
@@ -204,11 +204,11 @@
 		
 		if (_currentProcess)
 		{
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID];
+			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID withObserver:self];
 		}
 		if (newProcess.valid)
 		{
-			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID];
+			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID withObserver:self];
 		}
 		
 		shouldUpdateDisplay = YES;

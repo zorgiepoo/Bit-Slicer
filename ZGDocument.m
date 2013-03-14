@@ -153,7 +153,7 @@
 	{
 		if (self.currentProcess.valid)
 		{
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
+			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 		}
 		
 		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
@@ -434,7 +434,7 @@
 	
 	if (self.currentProcess)
 	{
-		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
+		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
@@ -464,7 +464,7 @@
 	
 	if (self.currentProcess && self.currentProcess.valid)
 	{
-		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID];
+		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 		
 		if (!self.currentProcess.hasGrantedAccess && ![self.currentProcess grantUsAccess])
 		{
@@ -556,7 +556,7 @@
 			
 			self.searchButton.enabled = NO;
 			
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID];
+			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 			
 			[self.currentProcess markInvalid];
 			self.runningApplicationsPopUpButton.selectedItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.name];
