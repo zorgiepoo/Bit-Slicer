@@ -962,7 +962,6 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	BOOL isSafe;
 	ZGVariableType dataType = (ZGVariableType)self.dataTypesPopUpButton.selectedItem.tag;
-	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
 	
 	switch (dataType)
 	{
@@ -979,8 +978,6 @@ static NSSize *expandedWindowMinSize = nil;
 			isSafe = YES;
 			break;
 	}
-	
-	isSafe = isSafe || (functionType != ZGEquals);
 	
 	return isSafe;
 }
