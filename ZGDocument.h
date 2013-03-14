@@ -81,7 +81,8 @@
 - (void)updateClearButton;
 - (void)updateFlagsAndSearchButtonTitle;
 
-- (BOOL)doesFunctionTypeAllowSearchInput;
+- (BOOL)safeFromZero;
+- (BOOL)functionTypeAllowsSearchInput;
 - (BOOL)isFunctionTypeStore;
 
 - (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray;

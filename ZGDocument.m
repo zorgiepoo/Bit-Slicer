@@ -953,7 +953,32 @@ static NSSize *expandedWindowMinSize = nil;
 	 recordUndo:YES];
 }
 
-- (BOOL)doesFunctionTypeAllowSearchInput
+- (BOOL)safeFromZero
+{
+	BOOL isSafe;
+	ZGVariableType dataType = (ZGVariableType)self.dataTypesPopUpButton.selectedItem.tag;
+	switch (dataType)
+	{
+		case ZGInt8:
+		case ZGInt16:
+		case ZGInt32:
+		case ZGInt64:
+		case ZGFloat:
+		case ZGDouble:
+		case ZGPointer:
+			isSafe = NO;
+			break;
+		default:
+			isSafe = YES;
+			break;
+	}
+	
+	isSafe = isSafe && [self functionTypeAllowsSearchInput];
+	
+	return isSafe;
+}
+
+- (BOOL)functionTypeAllowsSearchInput
 {
 	BOOL allows;
 	switch (self.functionPopUpButton.selectedItem.tag)
@@ -1004,7 +1029,7 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	[self updateFlagsAndSearchButtonTitle];
 	
-	if (![self doesFunctionTypeAllowSearchInput])
+	if (![self functionTypeAllowsSearchInput])
 	{
 		self.searchValueTextField.enabled = NO;
 		self.searchValueLabel.textColor = NSColor.disabledControlTextColor;
@@ -1045,7 +1070,7 @@ static NSSize *expandedWindowMinSize = nil;
 	[self.tableController.watchVariablesTableView reloadData];
 	
 	// Make sure the search value field is enabled if we aren't doing a store comparison
-	if ([self doesFunctionTypeAllowSearchInput])
+	if ([self functionTypeAllowsSearchInput])
 	{
 		self.searchValueTextField.enabled = YES;
 		self.searchValueLabel.textColor = [NSColor controlTextColor];

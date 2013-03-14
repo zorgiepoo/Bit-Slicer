@@ -119,7 +119,7 @@
 	if (dataType != ZGUTF8String && dataType != ZGUTF16String && dataType != ZGByteArray)
 	{
 		// This doesn't matter if the search is comparing stored values or if it's a regular function type
-		if ([self.document doesFunctionTypeAllowSearchInput])
+		if ([self.document functionTypeAllowsSearchInput])
 		{
 			NSString *inputError = [self testSearchComponent:expression];
 			
@@ -210,7 +210,7 @@
 	
 	self.document.dataTypesPopUpButton.enabled = YES;
     
-	if ([self.document doesFunctionTypeAllowSearchInput])
+	if ([self.document functionTypeAllowsSearchInput])
 	{
 		self.document.searchValueTextField.enabled = YES;
 	}
@@ -330,7 +330,7 @@
 		
 		[self.document.tableController.watchVariablesTableView reloadData];
 		
-		if ([self.document doesFunctionTypeAllowSearchInput])
+		if ([self.document functionTypeAllowsSearchInput])
 		{
 			self.document.searchValueTextField.enabled = YES;
 		}
@@ -448,7 +448,7 @@
 	
 	ZGFunctionType functionType = (ZGFunctionType)self.document.functionPopUpButton.selectedItem.tag;
 	
-	if (self.searchData.searchValue && ![self.document doesFunctionTypeAllowSearchInput])
+	if (self.searchData.searchValue && ![self.document functionTypeAllowsSearchInput])
 	{
 		free(self.searchData.searchValue);
 		self.searchData.searchValue = NULL;
@@ -575,6 +575,22 @@
 	if (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
 	{
 		self.searchData.compareOffset = self.searchData.searchValue;
+	}
+	
+	if (!self.document.safeFromZero && !self.isInNarrowSearchMode && self.searchData.searchValue && self.searchData.beginAddress == 0 && self.searchData.endAddress == MAX_MEMORY_ADDRESS)
+	{
+		void *zeroValue = calloc(1, self.searchData.dataSize);
+		
+		if (zeroValue)
+		{
+			if (memcmp(zeroValue, self.searchData.searchValue, self.searchData.dataSize) == 0 && NSRunAlertPanel(@"First Search for Zero", @"Because there are many zero's in memory, searching for them in the first scan can consume lots of time and RAM. Do you really want to continue?", @"Cancel", @"Search", nil, nil) == NSAlertDefaultReturn)
+			{
+				free(zeroValue);
+				return NO;
+			}
+			
+			free(zeroValue);
+		}
 	}
 	
 	return YES;
