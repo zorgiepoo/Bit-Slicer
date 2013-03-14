@@ -33,6 +33,7 @@
  */
 
 #import <stdint.h>
+#import <mach/std_types.h>
 
 typedef mach_vm_address_t ZGMemoryAddress;
 typedef mach_vm_size_t ZGMemorySize;
