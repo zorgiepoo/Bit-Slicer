@@ -769,8 +769,6 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 	ZGVariableType dataType = (ZGVariableType)self.document.dataTypesPopUpButton.selectedItem.tag;
 	ZGFunctionType functionType = (ZGFunctionType)self.document.functionPopUpButton.selectedItem.tag;
 	
-	BOOL goingToNarrowDownSearches = self.isInNarrowSearchMode;
-	
 	// Find all variables that are set to be searched, but shouldn't be.
 	// This is if the variable's data type does not match, or if the variable is frozen
 	for (ZGVariable *variable in self.document.watchVariablesArray)
@@ -820,7 +818,7 @@ if (compareValue && compareFunction(searchData, lastUsedRegion.bytes + (variable
 			[self searchCleanUp:temporaryVariablesArray];
 		};
 		
-		if (!goingToNarrowDownSearches)
+		if (!self.isInNarrowSearchMode)
 		{
 			[self searchVariablesWithComparisonFunction:compareFunction andAddResultsToArray:temporaryVariablesArray usingCompletionBlock:completeSearchBlock];
 		}
