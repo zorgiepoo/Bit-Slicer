@@ -957,6 +957,8 @@ static NSSize *expandedWindowMinSize = nil;
 {
 	BOOL isSafe;
 	ZGVariableType dataType = (ZGVariableType)self.dataTypesPopUpButton.selectedItem.tag;
+	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
+	
 	switch (dataType)
 	{
 		case ZGInt8:
@@ -973,7 +975,7 @@ static NSSize *expandedWindowMinSize = nil;
 			break;
 	}
 	
-	isSafe = isSafe && [self functionTypeAllowsSearchInput];
+	isSafe = isSafe || (functionType != ZGEquals);
 	
 	return isSafe;
 }

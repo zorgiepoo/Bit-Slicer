@@ -583,7 +583,8 @@
 		
 		if (zeroValue)
 		{
-			if (memcmp(zeroValue, self.searchData.searchValue, self.searchData.dataSize) == 0 && NSRunAlertPanel(@"First Search for Zero", @"Because there are many zero's in memory, searching for them in the first scan can consume lots of time and RAM. Do you really want to continue?", @"Cancel", @"Search", nil, nil) == NSAlertDefaultReturn)
+			comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.document.currentProcess.is64Bit);
+			if (compareFunction(self.searchData, self.searchData.searchValue, zeroValue, self.searchData.dataSize) && NSRunAlertPanel(@"First Search for Zero", @"Because there are many zero's in memory, searching for them in the first scan can consume lots of time and RAM. Do you really want to continue?", @"Cancel", @"Search", nil, nil) == NSAlertDefaultReturn)
 			{
 				free(zeroValue);
 				return NO;
