@@ -195,8 +195,8 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 				if (debugThread.thread == thread)
 				{
 					x86_debug_state_t debugState;
-					mach_msg_type_number_t stateCount = x86_DEBUG_STATE_COUNT;
-					if (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount) != KERN_SUCCESS)
+					mach_msg_type_number_t debugStateCount = x86_DEBUG_STATE_COUNT;
+					if (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &debugStateCount) != KERN_SUCCESS)
 					{
 						NSLog(@"ERROR: Grabbing debug state failed when checking for breakpoint existance");
 						continue;
@@ -234,6 +234,21 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 						});
 						
 						handledWatchPoint = YES;
+						
+						// Clear dr6 debug status
+						if (breakPoint.process.is64Bit)
+						{
+							debugState.uds.ds64.__dr6 &= ~(1 << debugRegisterIndex);
+						}
+						else
+						{
+							debugState.uds.ds32.__dr6 &= ~(1 << debugRegisterIndex);
+						}
+						
+						if (thread_set_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, debugStateCount) != KERN_SUCCESS)
+						{
+							NSLog(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint");
+						}
 						
 						break;
 					}
