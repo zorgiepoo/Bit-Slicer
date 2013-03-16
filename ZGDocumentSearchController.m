@@ -604,14 +604,13 @@
 	ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
 	
 	ZGMemorySize dataSize = self.searchData.dataSize;
-	void *searchValue = self.searchData.searchValue;
 	
 	[self createUserInterfaceTimer];
 	
 	ZGProcess *currentProcess = self.document.currentProcess;
 	search_for_data_t searchForDataCallback = ^(ZGSearchData * __unsafe_unretained searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableArray * __unsafe_unretained results)
 	{
-		if (compareFunction(searchData, variableData, (compareData != NULL) ? compareData : searchValue, dataSize))
+		if (compareFunction(searchData, variableData, compareData, dataSize))
 		{
 			ZGVariable *newVariable =
 			[[ZGVariable alloc]

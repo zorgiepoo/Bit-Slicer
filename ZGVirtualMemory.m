@@ -511,6 +511,8 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
 	
+	void *searchValue = searchData.searchValue;
+	
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
@@ -554,7 +556,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 					if (dataBeginAddress <= address + dataIndex &&
 						dataEndAddress >= address + dataIndex + dataSize)
 					{
-						searchForDataBlock(searchData, &bytes[dataIndex], NULL, address + dataIndex, resultSet);
+						searchForDataBlock(searchData, &bytes[dataIndex], searchValue, address + dataIndex, resultSet);
 					}
 					dataIndex += dataAlignment;
 				}
