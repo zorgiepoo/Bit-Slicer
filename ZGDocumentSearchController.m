@@ -626,9 +626,7 @@
 	};
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		search_for_data_function_t searchFunction = self.searchData.shouldCompareStoredValues ? ZGSearchForSavedData : ZGSearchForData;
-		
-		NSArray *results = searchFunction(currentProcess.processTask, self.searchData, self.searchProgress, searchForDataCallback);
+		NSArray *results = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, searchForDataCallback);
 		
 		[temporaryVariablesArray addObjectsFromArray:results];
 		
