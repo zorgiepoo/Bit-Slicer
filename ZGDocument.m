@@ -959,30 +959,6 @@ static NSSize *expandedWindowMinSize = nil;
 	 recordUndo:YES];
 }
 
-- (BOOL)safeFromZero
-{
-	BOOL isSafe;
-	ZGVariableType dataType = (ZGVariableType)self.dataTypesPopUpButton.selectedItem.tag;
-	
-	switch (dataType)
-	{
-		case ZGInt8:
-		case ZGInt16:
-		case ZGInt32:
-		case ZGInt64:
-		case ZGFloat:
-		case ZGDouble:
-		case ZGPointer:
-			isSafe = NO;
-			break;
-		default:
-			isSafe = YES;
-			break;
-	}
-	
-	return isSafe;
-}
-
 - (BOOL)functionTypeAllowsSearchInput
 {
 	BOOL allows;

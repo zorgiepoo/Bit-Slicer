@@ -82,7 +82,6 @@
 - (void)updateClearButton;
 - (void)updateFlagsAndSearchButtonTitle;
 
-- (BOOL)safeFromZero;
 - (BOOL)functionTypeAllowsSearchInput;
 - (BOOL)isFunctionTypeStore;
 
