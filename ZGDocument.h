@@ -40,6 +40,7 @@
 @class ZGDocumentTableController;
 @class ZGDocumentBreakPointController;
 @class ZGRunningProcess;
+@class ZGSearchResults;
 
 @interface ZGDocument : NSDocument
 
@@ -85,7 +86,7 @@
 - (BOOL)functionTypeAllowsSearchInput;
 - (BOOL)isFunctionTypeStore;
 
-- (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray;
+- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;
 
 - (void)removeRunningProcessFromPopupButton:(ZGRunningProcess *)oldRunningProcess;
 

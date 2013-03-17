@@ -36,6 +36,12 @@
 #import "ZGMemoryTypes.h"
 
 @interface ZGRegion : NSObject
+{
+@public
+	ZGMemoryAddress _address;
+	ZGMemorySize _size;
+	void *_bytes;
+}
 
 @property (assign, nonatomic) ZGMemoryMap processTask;
 @property (assign, nonatomic) ZGMemoryAddress address;

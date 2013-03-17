@@ -45,7 +45,7 @@
 @class ZGSearchProgress;
 @class ZGRegion;
 
-typedef void (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableArray *results);
+typedef BOOL (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableData *results);
 
 BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task);
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
@@ -69,7 +69,7 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSe
 
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
-NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock);
+NSData *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock);
 
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize);
 

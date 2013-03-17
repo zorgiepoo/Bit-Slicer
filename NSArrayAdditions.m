@@ -54,6 +54,7 @@
 // our's first, their's later
 - (id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator
 {
+	CFArrayRef selfReference = (__bridge CFArrayRef)(self);
 	id __unsafe_unretained targetObject = nil;
 	
 	if (self.count > 0)
@@ -63,7 +64,7 @@
 		while (maxIndex >= minIndex)
 		{
 			NSUInteger middleIndex = (minIndex + maxIndex) / 2;
-			id __unsafe_unretained object = [self objectAtIndex:middleIndex];
+			id __unsafe_unretained object = CFArrayGetValueAtIndex(selfReference, middleIndex);
 			
 			switch (comparator(object))
 			{

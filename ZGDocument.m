@@ -54,6 +54,7 @@
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 #import "ZGPreferencesController.h"
+#import "ZGSearchResults.h"
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
 #define ZGProcessNameKey @"ZGProcessNameKey"
@@ -202,7 +203,7 @@
 	
 	if (self.documentState.loadedFromSave)
 	{
-		[self setWatchVariablesArrayAndUpdateInterface:self.documentState.watchVariablesArray];
+		[self updateVariables:self.documentState.watchVariablesArray searchResults:nil];
 		self.documentState.watchVariablesArray = nil;
         
 		[self
@@ -246,7 +247,7 @@
 	}
 	else
 	{
-		[self setWatchVariablesArrayAndUpdateInterface:[NSArray array]];
+		[self updateVariables:[NSArray array] searchResults:nil];
 		self.flagsLabel.textColor = [NSColor disabledControlTextColor];
 	}
 }
@@ -1060,17 +1061,19 @@ static NSSize *expandedWindowMinSize = nil;
 
 #pragma mark Useful Methods
 
-- (void)setWatchVariablesArrayAndUpdateInterface:(NSArray *)newWatchVariablesArray
+- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults
 {
 	if (self.undoManager.isUndoing || self.undoManager.isRedoing)
 	{
 		// Clear the status
 		self.generalStatusTextField.stringValue = @"";
 		
-		[[self.undoManager prepareWithInvocationTarget:self] setWatchVariablesArrayAndUpdateInterface:self.watchVariablesArray];
+		[[self.undoManager prepareWithInvocationTarget:self] updateVariables:self.watchVariablesArray searchResults:searchResults];
 	}
 	
 	self.watchVariablesArray = newWatchVariablesArray;
+	self.searchController.searchResults = searchResults;
+	
 	[self.tableController.watchVariablesTableView reloadData];
 	
 	// Make sure the search value field is enabled if we aren't doing a store comparison

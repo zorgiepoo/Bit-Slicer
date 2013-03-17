@@ -275,19 +275,19 @@ void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained s
 	void *value = NULL;
 	
 	ZGRegion * __unsafe_unretained hintedRegion = (hintedRegionReference && *hintedRegionReference) ? *hintedRegionReference : nil;
-	if (hintedRegion && address >= hintedRegion.address && address + dataSize <= hintedRegion.address + hintedRegion.size)
+	if (hintedRegion && address >= hintedRegion->_address && address + dataSize <= hintedRegion->_address + hintedRegion->_size)
 	{
-		value = hintedRegion.bytes + (address - hintedRegion.address);
+		value = hintedRegion->_bytes + (address - hintedRegion->_address);
 	}
 	else
 	{
 		NSArray *regions = searchData.savedData;
 		ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
-			if (region.address + region.size <= address)
+			if (region->_address + region->_size <= address)
 			{
 				return NSOrderedAscending;
 			}
-			else if (region.address >= address + dataSize)
+			else if (region->_address >= address + dataSize)
 			{
 				return NSOrderedDescending;
 			}
@@ -297,9 +297,9 @@ void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained s
 			}
 		}];
 		
-		if (targetRegion && address >= targetRegion.address && address + dataSize <= targetRegion.address + targetRegion.size)
+		if (targetRegion && address >= targetRegion->_address && address + dataSize <= targetRegion->_address + targetRegion->_size)
 		{
-			value = targetRegion.bytes + (address - targetRegion.address);
+			value = targetRegion->_bytes + (address - targetRegion->_address);
 			if (hintedRegionReference)
 			{
 				*hintedRegionReference = targetRegion;
@@ -421,19 +421,32 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
-NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
+NSData *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
 {
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
 	
 	void *searchValue = searchData.searchValue;
+	BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
 	
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
 	
+	// Page size will probably be 4096
+	ZGMemorySize pageSize;
+	vm_size_t tempPageSize = 0;
+	if (host_page_size(processTask, &tempPageSize) == KERN_SUCCESS)
+	{
+		pageSize = tempPageSize;
+	}
+	else
+	{
+		pageSize = NSPageSize();
+	}
+	
 	NSArray *regions;
-	if (searchValue)
+	if (!shouldCompareStoredValues)
 	{
 		regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
 			return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
@@ -453,7 +466,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
 	{
-		[allResultSets addObject:[[NSMutableArray alloc] init]];
+		[allResultSets addObject:[[NSMutableData alloc] init]];
 	}
 	
 	dispatch_apply(regions.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
@@ -464,7 +477,9 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 			ZGMemorySize size = region.size;
 			void *regionBytes = region.bytes;
 			
-			NSMutableArray *resultSet = [allResultSets objectAtIndex:regionIndex];
+			ZGMemorySize variablesFound = 0;
+			
+			NSMutableData *resultSet = [allResultSets objectAtIndex:regionIndex];
 			
 			char *bytes = NULL;
 			if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
@@ -472,7 +487,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 				ZGMemorySize dataIndex = 0;
 				while (dataIndex + dataSize <= size)
 				{
-					if (searchProgress.shouldCancelSearch)
+					if (dataIndex % pageSize == 0 && searchProgress.shouldCancelSearch)
 					{
 						break;
 					}
@@ -480,7 +495,10 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 					if (dataBeginAddress <= address + dataIndex &&
 						dataEndAddress >= address + dataIndex + dataSize)
 					{
-						searchForDataBlock(searchData, &bytes[dataIndex], searchValue != NULL ? (searchValue) : (regionBytes + dataIndex), address + dataIndex, resultSet);
+						if (searchForDataBlock(searchData, &bytes[dataIndex], !shouldCompareStoredValues ? (searchValue) : (regionBytes + dataIndex), address + dataIndex, resultSet))
+						{
+							variablesFound++;
+						}
 					}
 					dataIndex += dataAlignment;
 				}
@@ -489,23 +507,31 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				searchProgress.numberOfVariablesFound += resultSet.count;
+				searchProgress.numberOfVariablesFound += variablesFound;
 				searchProgress.progress++;
 			});
 		}
 	});
 	
-	NSMutableArray *allResults = [[NSMutableArray alloc] init];
+	NSData *allData;
 	
-	if (!searchProgress.shouldCancelSearch)
+	if (allResultSets.count > 0 && !searchProgress.shouldCancelSearch)
 	{
-		for (NSMutableArray *resultSet in allResultSets)
+		NSMutableData *mutableData = [allResultSets objectAtIndex:0];
+		for (id data in allResultSets)
 		{
-			[allResults addObjectsFromArray:resultSet];
+			if (data != allData)
+			{
+				[mutableData appendData:data];
+			}
 		}
+		
+		allData = mutableData;
 	}
 	else
 	{
+		allData = [[NSData alloc] init];
+		
 		// Deallocate allResultSets on a separate task since this could take some time if we allocated a lot of data
 		__block NSMutableArray *allResultSetsReference = allResultSets;
 		allResultSets = nil;
@@ -514,7 +540,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 		});
 	}
 	
-	return allResults;
+	return allData;
 }
 
 #define MAX_STRING_SIZE 1024

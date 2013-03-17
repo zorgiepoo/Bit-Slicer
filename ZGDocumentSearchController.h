@@ -38,10 +38,12 @@
 
 @class ZGSearchData;
 @class ZGSearchProgress;
+@class ZGSearchResults;
 
 @interface ZGDocumentSearchController : NSObject
 
 @property (readonly, strong, nonatomic) ZGSearchData *searchData;
+@property (strong, nonatomic) ZGSearchResults *searchResults;
 @property (readonly, strong, nonatomic) ZGSearchProgress *searchProgress;
 
 - (BOOL)canStartTask;
@@ -51,6 +53,8 @@
 - (void)prepareTask;
 - (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder;
 - (void)resumeFromTask;
+
+- (void)fetchVariablesFromResults;
 
 - (void)clear;
 - (void)searchOrCancel;

@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/21/12.
+ * Created by Mayur Pawashe on 3/16/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,17 +32,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+#import "ZGSearchResults.h"
 
-#define MAX_TABLE_VIEW_ITEMS ((NSUInteger)1000)
-
-@interface ZGDocumentTableController : NSObject <NSTableViewDelegate>
-
-@property (assign) IBOutlet NSTableView *watchVariablesTableView;
-@property (readwrite, nonatomic) BOOL shouldIgnoreTableViewSelectionChange;
-
-- (void)updateVariableValuesInRange:(NSRange)variableRange;
-
-- (void)cleanUp;
+@implementation ZGSearchResults
 
 @end

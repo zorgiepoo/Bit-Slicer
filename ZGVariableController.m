@@ -45,6 +45,8 @@
 #import "ZGDebuggerController.h"
 #import "ZGInstruction.h"
 #import "ZGVirtualMemory.h"
+#import "ZGDocumentSearchController.h"
+#import "ZGSearchResults.h"
 
 @interface ZGVariableController ()
 
@@ -184,6 +186,7 @@
 	[temporaryArray removeObjectsAtIndexes:rowIndexes];
 	
 	self.document.watchVariablesArray = [NSArray arrayWithArray:temporaryArray];
+	[self.document.searchController fetchVariablesFromResults];
 	
 	[self.document.tableController.watchVariablesTableView reloadData];
 	

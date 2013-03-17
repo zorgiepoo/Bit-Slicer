@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/21/12.
+ * Created by Mayur Pawashe on 3/16/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,16 +33,15 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGVariableTypes.h"
+#import "ZGMemoryTypes.h"
 
-#define MAX_TABLE_VIEW_ITEMS ((NSUInteger)1000)
+@interface ZGSearchResults : NSObject
 
-@interface ZGDocumentTableController : NSObject <NSTableViewDelegate>
-
-@property (assign) IBOutlet NSTableView *watchVariablesTableView;
-@property (readwrite, nonatomic) BOOL shouldIgnoreTableViewSelectionChange;
-
-- (void)updateVariableValuesInRange:(NSRange)variableRange;
-
-- (void)cleanUp;
+@property (readwrite, nonatomic) ZGVariableType dataType;
+@property (readwrite, nonatomic) ZGMemorySize dataSize;
+@property (readwrite, nonatomic) ZGMemorySize addressIndex;
+@property (readwrite, nonatomic) ZGMemorySize addressCount;
+@property (strong, nonatomic) NSData *results;
 
 @end

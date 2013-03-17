@@ -42,6 +42,7 @@
 #import "ZGVariable.h"
 #import "NSStringAdditions.h"
 #import "ZGSearchProgress.h"
+#import "ZGSearchResults.h"
 #import "ZGVirtualMemory.h"
 
 @interface ZGDocumentTableController ()
@@ -81,6 +82,56 @@
 }
 
 #pragma mark Updating Table
+
+- (void)updateVariableValuesInRange:(NSRange)variableRange
+{
+	if (variableRange.location + variableRange.length <= self.document.watchVariablesArray.count)
+	{
+		__block BOOL needsToReloadTable = NO;
+		[[self.document.watchVariablesArray subarrayWithRange:variableRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+		 {
+			 NSString *oldStringValue = [variable.stringValue copy];
+			 if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGUTF8String || variable.type == ZGUTF16String))
+			 {
+				 variable.size = ZGGetStringSize(self.document.currentProcess.processTask, variable.address, variable.type, variable.size);
+			 }
+			 
+			 if (variable.size)
+			 {
+				 ZGMemorySize outputSize = variable.size;
+				 void *value = NULL;
+				 
+				 if (ZGReadBytes(self.document.currentProcess.processTask, variable.address, &value, &outputSize))
+				 {
+					 variable.value = value;
+					 if (![variable.stringValue isEqualToString:oldStringValue])
+					 {
+						 needsToReloadTable = YES;
+					 }
+					 
+					 ZGFreeBytes(self.document.currentProcess.processTask, value, outputSize);
+				 }
+				 else if (variable.value)
+				 {
+					 variable.value = NULL;
+					 needsToReloadTable = YES;
+				 }
+			 }
+			 else if (variable.lastUpdatedSize)
+			 {
+				 variable.value = NULL;
+				 needsToReloadTable = YES;
+			 }
+			 
+			 variable.lastUpdatedSize = variable.size;
+		 }];
+		
+		if (needsToReloadTable)
+		{
+			[self.watchVariablesTableView reloadData];
+		}
+	}
+}
 
 - (void)updateWatchVariablesTable:(NSTimer *)timer
 {
@@ -149,47 +200,7 @@
 	{
 		// Read all the variables and update them in the table view if needed
 		NSRange visibleRowsRange = [self.watchVariablesTableView rowsInRect:self.watchVariablesTableView.visibleRect];
-		
-		if (visibleRowsRange.location + visibleRowsRange.length <= self.document.watchVariablesArray.count)
-		{
-			[[self.document.watchVariablesArray subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
-			 {
-				 NSString *oldStringValue = [variable.stringValue copy];
-				 if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGUTF8String || variable.type == ZGUTF16String))
-				 {
-					 variable.size = ZGGetStringSize(self.document.currentProcess.processTask, variable.address, variable.type, variable.size);
-				 }
-				 
-				 if (variable.size)
-				 {
-					 ZGMemorySize outputSize = variable.size;
-					 void *value = NULL;
-					 
-					 if (ZGReadBytes(self.document.currentProcess.processTask, variable.address, &value, &outputSize))
-					 {
-						 variable.value = value;
-						 if (![variable.stringValue isEqualToString:oldStringValue])
-						 {
-							 [self.watchVariablesTableView reloadData];
-						 }
-						 
-						 ZGFreeBytes(self.document.currentProcess.processTask, value, outputSize);
-					 }
-					 else if (variable.value)
-					 {
-						 variable.value = NULL;
-						 [self.watchVariablesTableView reloadData];
-					 }
-				 }
-				 else if (variable.lastUpdatedSize)
-				 {
-					 variable.value = NULL;
-					 [self.watchVariablesTableView reloadData];
-				 }
-				 
-				 variable.lastUpdatedSize = variable.size;
-			 }];
-		}
+		[self updateVariableValuesInRange:visibleRowsRange];
 	}
 }
 
@@ -481,16 +492,18 @@
 	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
 	numberOfVariablesFormatter.format = @"#,###";
 	
-	if (self.document.watchVariablesArray.count <= MAX_TABLE_VIEW_ITEMS)
+	NSUInteger variableCount = self.document.watchVariablesArray.count + self.document.searchController.searchResults.addressCount;
+	
+	if (variableCount <= MAX_TABLE_VIEW_ITEMS)
 	{
-		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(self.document.watchVariablesArray.count)]];
+		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
 	}
 	else
 	{
-		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(MAX_TABLE_VIEW_ITEMS)],[numberOfVariablesFormatter stringFromNumber:@(self.document.watchVariablesArray.count)]];
+		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(MAX_TABLE_VIEW_ITEMS)],[numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
 	}
 	
-	if (valuesDisplayedString && self.document.watchVariablesArray.count != 1)
+	if (valuesDisplayedString && variableCount != 1)
 	{
 		valuesDisplayedString = [valuesDisplayedString stringByAppendingString:@"s"];
 	}
