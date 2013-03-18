@@ -143,28 +143,35 @@
 		
 		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[address unsignedLongLongValue] inProcess:self.watchProcess];
 		
-		if (self.variableInsertionIndex >= self.document.watchVariablesArray.count)
+		if (instruction)
 		{
-			self.variableInsertionIndex = 0;
+			if (self.variableInsertionIndex >= self.document.watchVariablesArray.count)
+			{
+				self.variableInsertionIndex = 0;
+			}
+			
+			[self.document.variableController addVariables:@[instruction.variable] atRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex]];
+			[self.document.tableController.watchVariablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex] byExtendingSelection:NO];
+			[self.document.tableController.watchVariablesTableView scrollRowToVisible:self.variableInsertionIndex];
+			[self.document.watchWindow makeFirstResponder:self.document.tableController.watchVariablesTableView];
+			
+			self.variableInsertionIndex++;
+			
+			NSString *addedInstructionStatus = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", instruction.variable.sizeStringValue, instruction.variable.addressStringValue];
+			self.document.generalStatusTextField.stringValue = [addedInstructionStatus stringByAppendingString:@" Stop when done."];
+			
+			if (NSClassFromString(@"NSUserNotification"))
+			{
+				NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+				userNotification.title = @"Found Instruction";
+				userNotification.subtitle = self.document.currentProcess.name;
+				userNotification.informativeText = addedInstructionStatus;
+				[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+			}
 		}
-		
-		[self.document.variableController addVariables:@[instruction.variable] atRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex]];
-		[self.document.tableController.watchVariablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex] byExtendingSelection:NO];
-		[self.document.tableController.watchVariablesTableView scrollRowToVisible:self.variableInsertionIndex];
-		[self.document.watchWindow makeFirstResponder:self.document.tableController.watchVariablesTableView];
-		
-		self.variableInsertionIndex++;
-		
-		NSString *addedInstructionStatus = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", instruction.variable.sizeStringValue, instruction.variable.addressStringValue];
-		self.document.generalStatusTextField.stringValue = [addedInstructionStatus stringByAppendingString:@" Stop when done."];
-		
-		if (NSClassFromString(@"NSUserNotification"))
+		else
 		{
-			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
-			userNotification.title = @"Found Instruction";
-			userNotification.subtitle = self.document.currentProcess.name;
-			userNotification.informativeText = addedInstructionStatus;
-			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+			NSLog(@"ERROR: Couldn't parse instruction at is %@", address);
 		}
 	}
 }
