@@ -601,7 +601,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 			if (mach_msg_server(mach_exc_server, 2048, self.exceptionPort, MACH_MSG_TIMEOUT_NONE) != MACH_MSG_SUCCESS)
 			{
-				NSLog(@"mach_msg_server_once() returned on error!");
+				NSLog(@"mach_msg_server() returned on error!");
 			}
 		});
     });
