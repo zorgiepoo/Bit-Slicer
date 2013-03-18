@@ -54,7 +54,7 @@
 @property (strong, nonatomic, readwrite) NSTimer *userInterfaceTimer;
 @property (readwrite, strong, nonatomic) ZGSearchData *searchData;
 @property (readwrite, strong, nonatomic) ZGSearchProgress *searchProgress;
-@property (strong, nonatomic) NSData *temporaryResults;
+@property (strong, nonatomic) NSArray *temporaryResultSets;
 @property (assign) BOOL isBusy;
 
 @end
@@ -350,9 +350,66 @@
 	}
 }
 
+- (void)enumerateSearchResultsInRange:(NSRange)range usingBlock:(void (^)(ZGMemoryAddress, BOOL *))addressCallback
+{
+	ZGMemoryAddress absoluteLocation = range.location * sizeof(ZGMemoryAddress);
+	ZGMemoryAddress absoluteLength = range.length * sizeof(ZGMemoryAddress);
+	
+	BOOL setBeginOffset = NO;
+	BOOL setEndOffset = NO;
+	ZGMemoryAddress beginOffset = 0;
+	ZGMemoryAddress endOffset = 0;
+	ZGMemoryAddress accumulator = 0;
+	
+	BOOL shouldStopEnumerating = NO;
+	
+	for (NSData *resultSet in self.searchResults.resultSets)
+	{
+		accumulator += resultSet.length;
+		
+		if (!setBeginOffset && accumulator > absoluteLocation)
+		{
+			beginOffset = resultSet.length - (accumulator - absoluteLocation);
+			setBeginOffset = YES;
+		}
+		else if (setBeginOffset)
+		{
+			beginOffset = 0;
+		}
+		
+		if (!setEndOffset && accumulator >= absoluteLocation + absoluteLength)
+		{
+			endOffset = resultSet.length - (accumulator - (absoluteLocation + absoluteLength));
+			setEndOffset = YES;
+		}
+		else
+		{
+			endOffset = resultSet.length;
+		}
+		
+		if (setBeginOffset)
+		{
+			const void *resultBytes = resultSet.bytes;
+			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += sizeof(ZGMemoryAddress))
+			{
+				addressCallback(*(ZGMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+				if (shouldStopEnumerating)
+				{
+					break;
+				}
+			}
+			
+			if (setEndOffset || shouldStopEnumerating)
+			{
+				break;
+			}
+		}
+	}
+}
+
 - (void)fetchVariablesFromResults
 {	
-	if (self.searchResults.results && self.document.watchVariablesArray.count < MAX_TABLE_VIEW_ITEMS && self.searchResults.addressCount > 0)
+	if (self.searchResults.resultSets && self.document.watchVariablesArray.count < MAX_TABLE_VIEW_ITEMS && self.searchResults.addressCount > 0)
 	{
 		NSMutableArray *newVariables = [[NSMutableArray alloc] initWithArray:self.document.watchVariablesArray];
 		
@@ -365,26 +422,25 @@
 		ZGVariableQualifier qualifier = [[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
 		ZGMemorySize pointerSize = self.document.currentProcess.pointerSize;
 		
-		for (ZGMemorySize variableIndex = self.searchResults.addressIndex; variableIndex < self.searchResults.addressIndex + numberOfVariables; variableIndex++)
-		{
+		[self enumerateSearchResultsInRange:NSMakeRange(self.searchResults.addressIndex, numberOfVariables) usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
 			ZGVariable *newVariable =
 				[[ZGVariable alloc]
 				 initWithValue:NULL
 				 size:self.searchResults.dataSize
-				 address:*((ZGMemoryAddress *)self.searchResults.results.bytes + variableIndex)
+				 address:variableAddress
 				 type:self.searchResults.dataType
 				 qualifier:qualifier
 				 pointerSize:pointerSize];
 			
 			[newVariables addObject:newVariable];
-		}
+		}];
 		
 		self.searchResults.addressIndex += numberOfVariables;
 		self.searchResults.addressCount -= numberOfVariables;
 		
 		if (self.searchResults.addressCount == 0)
 		{
-			self.searchResults.results = nil;
+			self.searchResults.resultSets = nil;
 		}
 		
 		self.document.watchVariablesArray = [NSArray arrayWithArray:newVariables];
@@ -422,7 +478,7 @@
 		newSearchResults.addressCount = self.searchProgress.numberOfVariablesFound;
 		newSearchResults.dataType = (ZGVariableType)self.document.dataTypesPopUpButton.selectedItem.tag;
 		newSearchResults.dataSize = self.searchData.dataSize;
-		newSearchResults.results = self.temporaryResults;
+		newSearchResults.resultSets = self.temporaryResultSets;
 		
 		if (notSearchedVariables.count + newSearchResults.addressCount != self.document.watchVariablesArray.count)
 		{
@@ -436,7 +492,7 @@
 		}
 	}
 	
-	self.temporaryResults = nil;
+	self.temporaryResultSets = nil;
 	
 	BOOL shouldMakeSearchFieldFirstResponder = YES;
 	
@@ -659,7 +715,7 @@
 	};
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		self.temporaryResults = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, searchForDataCallback);
+		self.temporaryResultSets = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, searchForDataCallback);
 		
 		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
 	});
@@ -790,28 +846,26 @@
 			tempProgress++;
 		};
 		
-		BOOL shouldStop = NO;
+		BOOL shouldStopFirstIteration = NO;
 		for (ZGVariable *variable in searchedVariables)
 		{
-			searchVariableAddress(variable.address, &shouldStop);
-			if (shouldStop)
+			searchVariableAddress(variable.address, &shouldStopFirstIteration);
+			if (shouldStopFirstIteration)
 			{
 				break;
 			}
 		}
 		
-		if (!shouldStop && self.searchResults.results && self.searchResults.addressCount > 0)
-		{
-			const void *currentSearchResultsBytes = self.searchResults.results.bytes;
-			ZGMemorySize addressCount = self.searchResults.addressCount;
-			for (ZGMemorySize variableIndex = self.searchResults.addressIndex; variableIndex < addressCount; variableIndex++)
-			{
-				searchVariableAddress(*((ZGMemorySize *)currentSearchResultsBytes + variableIndex), &shouldStop);
-				if (shouldStop)
+		if (!shouldStopFirstIteration && self.searchResults.resultSets && self.searchResults.addressCount > 0)
+		{	
+			__block BOOL shouldStopSecondIteration = NO;
+			[self enumerateSearchResultsInRange:NSMakeRange(self.searchResults.addressIndex, self.searchResults.addressCount) usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
+				searchVariableAddress(variableAddress, &shouldStopSecondIteration);
+				if (shouldStopSecondIteration)
 				{
-					break;
+					*stop = shouldStopSecondIteration;
 				}
-			}
+			}];
 		}
 		
 		for (ZGRegion *region in regions)
@@ -822,7 +876,7 @@
 			}
 		}
 		
-		self.temporaryResults = newResultsData;
+		self.temporaryResultSets = @[newResultsData];
 		
 		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
 	});

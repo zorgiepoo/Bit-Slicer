@@ -421,7 +421,7 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
-NSData *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
+NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
 {
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
@@ -513,24 +513,11 @@ NSData *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSea
 		}
 	});
 	
-	NSData *allData;
+	NSArray *returnedResults;
 	
-	if (allResultSets.count > 0 && !searchProgress.shouldCancelSearch)
+	if (searchProgress.shouldCancelSearch)
 	{
-		NSMutableData *mutableData = [allResultSets objectAtIndex:0];
-		for (id data in allResultSets)
-		{
-			if (data != allData)
-			{
-				[mutableData appendData:data];
-			}
-		}
-		
-		allData = mutableData;
-	}
-	else
-	{
-		allData = [[NSData alloc] init];
+		returnedResults = [NSArray array];
 		
 		// Deallocate allResultSets on a separate task since this could take some time if we allocated a lot of data
 		__block NSMutableArray *allResultSetsReference = allResultSets;
@@ -539,8 +526,14 @@ NSData *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSea
 			allResultSetsReference = nil;
 		});
 	}
+	else
+	{
+		returnedResults = [allResultSets zgFilterUsingBlock:(zg_array_filter_t)^(NSMutableData *resultSet) {
+			return resultSet.length == 0;
+		}];
+	}
 	
-	return allData;
+	return returnedResults;
 }
 
 #define MAX_STRING_SIZE 1024

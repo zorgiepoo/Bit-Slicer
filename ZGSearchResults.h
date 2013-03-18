@@ -42,6 +42,6 @@
 @property (readwrite, nonatomic) ZGMemorySize dataSize;
 @property (readwrite, nonatomic) ZGMemorySize addressIndex;
 @property (readwrite, nonatomic) ZGMemorySize addressCount;
-@property (strong, nonatomic) NSData *results;
+@property (strong, nonatomic) NSArray *resultSets;
 
 @end
