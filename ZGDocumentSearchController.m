@@ -828,7 +828,7 @@
 			}
 			
 			// Update UI
-			if (currentProgress % numberOfVariablesRequiredToUpdateProgress == 0 || currentProgress + 1 == maxProgress)
+			if ((numberOfVariablesRequiredToUpdateProgress != 0 && currentProgress % numberOfVariablesRequiredToUpdateProgress == 0) || currentProgress + 1 == maxProgress)
 			{
 				if (self.searchProgress.shouldCancelSearch)
 				{
