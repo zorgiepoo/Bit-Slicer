@@ -1044,7 +1044,7 @@ static NSSize *expandedWindowMinSize = nil;
 		// Clear the status
 		self.generalStatusTextField.stringValue = @"";
 		
-		[[self.undoManager prepareWithInvocationTarget:self] updateVariables:self.watchVariablesArray searchResults:searchResults];
+		[[self.undoManager prepareWithInvocationTarget:self] updateVariables:self.watchVariablesArray searchResults:self.searchController.searchResults];
 	}
 	
 	self.watchVariablesArray = newWatchVariablesArray;
