@@ -722,9 +722,7 @@
 }
 
 - (void)narrowDownVariablesWithComparisonFunction:(comparison_function_t)compareFunction usingCompletionBlock:(dispatch_block_t)completeSearchBlock
-{
-	NSMutableData *newResultsData = [[NSMutableData alloc] init];
-	
+{	
 	ZGMemoryMap processTask = self.document.currentProcess.processTask;
 	ZGMemorySize dataSize = self.searchData.dataSize;
 	void *searchValue = self.searchData.searchValue;
@@ -750,6 +748,8 @@
 	[self createUserInterfaceTimer];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		NSMutableData *newResultsData = [[NSMutableData alloc] init];
+		
 		__block ZGRegion *lastUsedRegion = nil;
 		__block ZGRegion *lastUsedSavedRegion = nil;
 		
@@ -876,7 +876,19 @@
 			}
 		}
 		
-		self.temporaryResultSets = @[newResultsData];
+		if (!self.searchProgress.shouldCancelSearch)
+		{
+			self.temporaryResultSets = @[newResultsData];
+		}
+		else
+		{
+			// Deallocate results into another task since it may take some time
+			__block NSMutableData *newResultsDataReference = newResultsData;
+			newResultsData = nil;
+			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+				newResultsDataReference = nil;
+			});
+		}
 		
 		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
 	});
