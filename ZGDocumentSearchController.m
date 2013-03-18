@@ -683,9 +683,13 @@
 		return !(region.address < endingAddress && region.address + region.size > beginningAddress && region.protection & VM_PROT_READ && (self.searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
 	
+	NSArray *searchedVariables = [self.document.watchVariablesArray zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable){
+		return !variable.shouldBeSearched;
+	}];
+	
 	self.searchProgress.initiatedSearch = YES;
 	self.searchProgress.progressType = ZGSearchProgressMemoryScanning;
-	self.searchProgress.maxProgress = regions.count;
+	self.searchProgress.maxProgress = searchedVariables.count + self.searchResults.addressCount;
 	
 	[self createUserInterfaceTimer];
 	
@@ -697,11 +701,7 @@
 		__block ZGMemorySize currentProgress = 0;
 		__block double tempProgress = 0.0;
 		
-		NSArray *searchedVariables = [self.document.watchVariablesArray zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable){
-			return !variable.shouldBeSearched;
-		}];
-		
-		ZGMemorySize maxProgress = searchedVariables.count + self.searchResults.addressCount;
+		ZGMemorySize maxProgress = self.searchProgress.maxProgress;
 		
 		BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
 		
