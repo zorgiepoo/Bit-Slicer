@@ -755,9 +755,11 @@
 		
 		__block NSUInteger numberOfVariablesFound = 0;
 		__block ZGMemorySize currentProgress = 0;
-		__block double tempProgress = 0.0;
 		
 		ZGMemorySize maxProgress = self.searchProgress.maxProgress;
+		
+		// We'll update the progress at 5% intervals during our search
+		ZGMemorySize numberOfVariablesRequiredToUpdateProgress = (ZGMemorySize)(maxProgress * 0.05);
 		
 		BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
 		
@@ -825,8 +827,8 @@
 				}
 			}
 			
-			// Update UI progress every 5%
-			if (tempProgress / (double)maxProgress >= 0.05 || currentProgress == maxProgress-1)
+			// Update UI
+			if (currentProgress % numberOfVariablesRequiredToUpdateProgress == 0 || currentProgress + 1 == maxProgress)
 			{
 				if (self.searchProgress.shouldCancelSearch)
 				{
@@ -838,12 +840,10 @@
 						self.searchProgress.progress = currentProgress;
 						self.searchProgress.numberOfVariablesFound = numberOfVariablesFound;
 					});
-					tempProgress = 0;
 				}
 			}
 			
 			currentProgress++;
-			tempProgress++;
 		};
 		
 		BOOL shouldStopFirstIteration = NO;
