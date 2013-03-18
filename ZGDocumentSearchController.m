@@ -803,7 +803,8 @@
 		if (!shouldStop && self.searchResults.results && self.searchResults.addressCount > 0)
 		{
 			const void *currentSearchResultsBytes = self.searchResults.results.bytes;
-			for (ZGMemorySize variableIndex = self.searchResults.addressIndex; variableIndex < maxProgress; variableIndex++)
+			ZGMemorySize addressCount = self.searchResults.addressCount;
+			for (ZGMemorySize variableIndex = self.searchResults.addressIndex; variableIndex < addressCount; variableIndex++)
 			{
 				searchVariableAddress(*((ZGMemorySize *)currentSearchResultsBytes + variableIndex), &shouldStop);
 				if (shouldStop)
