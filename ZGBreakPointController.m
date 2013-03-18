@@ -181,7 +181,7 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	BOOL handledWatchPoint = NO;
 	for (ZGBreakPoint *breakPoint in self.breakPoints)
 	{
-		if (breakPoint.type != ZGBreakPointWatchDataWrite)
+		if (breakPoint.type != ZGBreakPointWatchData)
 		{
 			continue;
 		}
@@ -553,7 +553,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			{
 				[self removeBreakPoint:breakPoint];
 			}
-			else if (breakPoint.type == ZGBreakPointWatchDataWrite)
+			else if (breakPoint.type == ZGBreakPointWatchData)
 			{
 				ZGSuspendTask(breakPoint.task);
 				[self removeWatchPoint:breakPoint];
@@ -746,7 +746,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	breakPoint.variable = variable;
 	breakPoint.watchSize = watchSize;
 	breakPoint.process = process;
-	breakPoint.type = ZGBreakPointWatchDataWrite;
+	breakPoint.type = ZGBreakPointWatchData;
 	
 	[self addBreakPoint:breakPoint];
 	

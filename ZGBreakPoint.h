@@ -40,7 +40,7 @@
 
 typedef enum
 {
-	ZGBreakPointWatchDataWrite,
+	ZGBreakPointWatchData,
 	ZGBreakPointInstruction,
 	ZGBreakPointSingleStepInstruction,
 } ZGBreakPointType;
