@@ -98,7 +98,6 @@
 - (void)cancelTask
 {
 	[self stopWatchingBreakPoints];
-	
 	self.document.generalStatusTextField.stringValue = @"";
 	
 	[self.document.searchingProgressIndicator stopAnimation:nil];
@@ -137,7 +136,7 @@
 
 - (void)breakPointDidHit:(NSNumber *)address
 {
-	if (self.watchProcess && ![self.foundBreakPointAddresses containsObject:address])
+	if (self.watchProcess.valid && ![self.foundBreakPointAddresses containsObject:address])
 	{
 		[self.foundBreakPointAddresses addObject:address];
 		
@@ -171,7 +170,7 @@
 		}
 		else
 		{
-			NSLog(@"ERROR: Couldn't parse instruction at is %@", address);
+			NSLog(@"ERROR: Couldn't parse instruction before 0x%llX", [address unsignedLongLongValue]);
 		}
 	}
 }

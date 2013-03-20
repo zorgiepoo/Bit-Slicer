@@ -74,18 +74,6 @@
 
 extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *OutHeadP);
 
-// Unused
-kern_return_t  catch_mach_exception_raise_state(mach_port_t exception_port, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
-{
-	return KERN_FAILURE;
-}
-
-// Unused
-kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
-{
-	return KERN_FAILURE;
-}
-
 #define RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(type) \
 	if (debugRegisterIndex == 0) { debugState.uds.type.__dr0 = 0x0; } \
 	else if (debugRegisterIndex == 1) { debugState.uds.type.__dr1 = 0x0; } \
@@ -170,11 +158,8 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	return instructionAddress;
 }
 
-#define GET_DEBUG_REGISTER_ADDRESS(type) \
-	if (debugRegisterIndex == 0 && debugState.uds.type.__dr6 & (1 << 0) && debugState.uds.type.__dr7 & (1 << 2*0)) { debugAddress = debugState.uds.type.__dr0; } \
-	else if (debugRegisterIndex == 1 && debugState.uds.type.__dr6 & (1 << 1) && debugState.uds.type.__dr7 & (1 << 2*1)) { debugAddress = debugState.uds.type.__dr1; } \
-	else if (debugRegisterIndex == 2 && debugState.uds.type.__dr6 & (1 << 2) && debugState.uds.type.__dr7 & (1 << 2*2)) { debugAddress = debugState.uds.type.__dr2; } \
-	else if (debugRegisterIndex == 3 && debugState.uds.type.__dr6 & (1 << 3) && debugState.uds.type.__dr7 & (1 << 2*3)) { debugAddress = debugState.uds.type.__dr3; } \
+#define IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, type) \
+	(((debugState.uds.type.__dr6 & (1 << debugRegisterIndex)) != 0) && ((debugState.uds.type.__dr7 & (1 << 2*debugRegisterIndex)) != 0))
 
 - (BOOL)handleWatchPointsWithTask:(mach_port_t) task inThread:(mach_port_t)thread
 {
@@ -194,6 +179,9 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 			{
 				if (debugThread.thread == thread)
 				{
+					// Normally I'd set this to YES if we branch into isWatchPointAvailable below, however, a user reported this handler being called without the debug status being set. To be safe, I we will just pretend we handled the watchpoint so that we don't crash the target process
+					handledWatchPoint = YES;
+					
 					x86_debug_state_t debugState;
 					mach_msg_type_number_t debugStateCount = x86_DEBUG_STATE_COUNT;
 					if (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &debugStateCount) != KERN_SUCCESS)
@@ -202,39 +190,12 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 						continue;
 					}
 					
-					ZGMemoryAddress debugAddress = 0x0;
 					int debugRegisterIndex = debugThread.registerNumber;
 					
-					if (breakPoint.process.is64Bit)
-					{
-						GET_DEBUG_REGISTER_ADDRESS(ds64);
-					}
-					else
-					{
-						GET_DEBUG_REGISTER_ADDRESS(ds32);
-					}
+					BOOL isWatchPointAvailable = breakPoint.process.is64Bit ? IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds64) : IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds32);
 					
-					if (debugAddress == breakPoint.variable.address)
-					{
-						x86_thread_state_t threadState;
-						mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-						if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
-						{
-							NSLog(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping.");
-							continue;
-						}
-						
-						ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
-						
-						dispatch_async(dispatch_get_main_queue(), ^{
-							if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
-							{
-								[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:@(instructionAddress)];
-							}
-						});
-						
-						handledWatchPoint = YES;
-						
+					if (isWatchPointAvailable)
+					{	
 						// Clear dr6 debug status
 						if (breakPoint.process.is64Bit)
 						{
@@ -247,11 +208,29 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 						
 						if (thread_set_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, debugStateCount) != KERN_SUCCESS)
 						{
-							NSLog(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint");
+							NSLog(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint...Not good.");
 						}
 						
-						break;
+						x86_thread_state_t threadState;
+						mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
+						if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+						{
+							NSLog(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping.");
+						}
+						else
+						{
+							ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
+							
+							dispatch_async(dispatch_get_main_queue(), ^{
+								if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+								{
+									[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:[NSNumber numberWithUnsignedLongLong:instructionAddress]];
+								}
+							});
+						}
 					}
+					
+					break;
 				}
 			}
 			
@@ -519,12 +498,27 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 	return handledInstructionBreakPoint;
 }
 
-kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
+static kern_return_t catchMachException(mach_port_t thread, mach_port_t task)
 {
 	BOOL handledWatchPoint = [[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
 	BOOL handledInstructionBreakPoint = [[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread];
 	
 	return (handledWatchPoint || handledInstructionBreakPoint) ? KERN_SUCCESS : KERN_FAILURE;
+}
+
+kern_return_t  catch_mach_exception_raise_state(mach_port_t exception_port, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
+{
+	return KERN_FAILURE;
+}
+
+kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
+{
+	return KERN_FAILURE;
+}
+
+kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
+{
+	return catchMachException(thread, task);
 }
 
 - (void)removeObserver:(id)observer
@@ -704,7 +698,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			debugThread.thread = threadList[threadIndex];
 			
 			if (process.is64Bit)
-			{	
+			{
 				WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(ds64, uint64_t);
 			}
 			else
