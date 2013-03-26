@@ -286,10 +286,30 @@ static BOOL didRegisteredHotKey;
 	[self openDebugger:sender showWindow:YES];
 }
 
+#pragma mark Help
+
 #define WIKI_URL @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki"
 - (IBAction)help:(id)sender
 {	
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:WIKI_URL]];
+}
+
+#define ISSUES_TRACKER_URL @"https://bitbucket.org/zorgiepoo/bit-slicer/issues"
+- (IBAction)reportABug:(id)sender
+{
+	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:ISSUES_TRACKER_URL]];
+}
+
+#define FORUMS_URL @"http://portingteam.com/forum/157-bit-slicer/"
+- (IBAction)visitForums:(id)sender
+{
+	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:FORUMS_URL]];
+}
+
+#define FEEDBACK_EMAIL @"zorgiepoo@gmail.com"
+- (IBAction)sendFeedback:(id)sender
+{
+	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:[@"mailto:" stringByAppendingString:FEEDBACK_EMAIL]]];
 }
 
 @end
