@@ -31,11 +31,9 @@ It allows you to cheat in video games by searching and modifying values such as 
 * Run as a normal user, not as the superuser (root)!
 * Enjoy OS level features such as auto-saving, document versioning, window restoration, notification center, etc.
 
-*Note: Many of the features listed are only available in 1.6, which hasn't been publicly released yet, and is still in its alpha stages.*
-
 
 ## System Requirements
-* [Bit Slicer 1.6 Alphas](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/) or later: OS X 10.6.8 or newer on a 64-bit Mac
+* [Bit Slicer 1.6](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.6.zip) or later: OS X 10.6.8 or newer on a 64-bit Mac
 * [Bit Slicer 1.5.2](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.5.2.zip) and older: Same as above, except also runs on 32-bit Macs.
 
 ## Support & Feedback
