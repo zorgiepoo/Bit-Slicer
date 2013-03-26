@@ -12,7 +12,7 @@
 				<string>slice</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string></string>
+			<string>bitslicerdocicon.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Bit Slicer Document</string>
 			<key>CFBundleTypeOSTypes</key>
@@ -38,11 +38,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.6a37</string>
+	<string>1.6a38</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1046</string>
+	<string>1047</string>
 	<key>SecTaskAccess</key>
 	<array>
 		<string>allowed</string>
