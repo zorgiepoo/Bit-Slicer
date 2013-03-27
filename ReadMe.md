@@ -35,8 +35,8 @@ It allows you to cheat in video games by searching and modifying values such as 
 
 
 ## System Requirements
-* **Bit Slicer 1.6 or later**: OS X 10.6.8 or newer, a 64-bit Mac
-* [Bit Slicer 1.5.2](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.5.2.zip): OS X 10.6.8 or newer
+* **Bit Slicer 1.6 or later**: OS X 10.6.8 or newer, a 64-bit intel Mac
+* [Bit Slicer 1.5.2](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.5.2.zip): OS X 10.6.8
 
 ## Support & Feedback
 * Check the [wiki](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/)
@@ -48,10 +48,8 @@ It allows you to cheat in video games by searching and modifying values such as 
 Bit Slicer is licensed under the 3-clause BSD license. Versions prior to 1.6, however, are licensed under the GPL version 3 license.
 
 ### Code Signing
-In order to build Bit Slicer, you will need to code-sign it. By code-signing, you can gain privileges to *task_for_pid()* without adding procmod group permissions or becoming the superuser.
+In order to build Bit Slicer, code signing is required to gain sufficient privilleges to using *task_for_pid()*. Building with the Debug scheme uses a self-signed certificate (which only works locally) and building with the Release scheme uses my purchased Developer ID certificate (which works for distribution).
 
-Unfortunately, unless you have purchased a Developer ID from Apple, this could prove to be challenging. Theoretically, it should be possible to sign the code using a self-signed certificate. However, I have not been able to get this to work, which is a shame because I really want to set one up for debug builds.
-
-If you are interested in setting up a self-signed certificate, you may want to check out this [lldb document on code-signing](https://llvm.org/svn/llvm-project/lldb/trunk/docs/code-signing.txt). If you are able to figure it out, I'd appreciate if you let me know how to do it.
+In order to build Bit Slicer in Debug mode using a self-signed certificate, please follow [these instructions](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Code%20Signing). Note that this involves more steps than code-signing typical applications.
 
 Versions prior to 1.6 are not code-signed, and consequently, the user is required to authorize the application to run as the superuser.
