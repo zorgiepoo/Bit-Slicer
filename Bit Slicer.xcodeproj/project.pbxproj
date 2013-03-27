@@ -725,6 +725,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_IDENTITY = bitslicer_codesign;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -747,6 +748,7 @@
 				);
 				OTHER_CFLAGS = "-D_DEBUG";
 				PRODUCT_NAME = "Bit Slicer";
+				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx10.8;
 				VALID_ARCHS = x86_64;
