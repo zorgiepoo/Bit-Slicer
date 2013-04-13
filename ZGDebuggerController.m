@@ -1059,7 +1059,7 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+- (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
 {
 	if (menuItem.action == @selector(nopVariables:))
 	{
@@ -1215,7 +1215,7 @@ END_DEBUGGER_CHANGE:
 		}
 	}
 	
-	return [super validateMenuItem:menuItem];
+	return [super validateUserInterfaceItem:menuItem];
 }
 
 - (IBAction)copy:(id)sender

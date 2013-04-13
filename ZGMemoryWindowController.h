@@ -91,4 +91,6 @@ enum ZGNavigation
 - (BOOL)canEnableNavigationButtons;
 - (void)updateNavigationButtons;
 
+- (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem;
+
 @end

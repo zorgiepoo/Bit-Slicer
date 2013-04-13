@@ -408,7 +408,7 @@
 	}
 }
 
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+- (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
 {
 	if (menuItem.action == @selector(changeQualifier:))
 	{

@@ -200,7 +200,7 @@
 
 #pragma mark Menu Item Validation
 
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+- (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
 {
 	if (menuItem.action == @selector(toggleDataInspector:))
 	{
@@ -233,7 +233,7 @@
 		}
 	}
 	
-	return [super validateMenuItem:menuItem];
+	return [super validateUserInterfaceItem:menuItem];
 }
 
 #pragma mark Data Inspector

@@ -1064,7 +1064,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 #pragma mark Menu item validation
 
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+- (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
 {
 	if (menuItem.action == @selector(clearSearchValues:))
 	{
@@ -1310,7 +1310,7 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
-	return [super validateMenuItem:menuItem];
+	return [super validateUserInterfaceItem:menuItem];
 }
 
 #pragma mark Search Handling
