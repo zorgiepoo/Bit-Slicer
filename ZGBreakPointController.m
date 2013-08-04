@@ -82,14 +82,14 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	\
 	debugState.uds.type.__dr6 &= ~(1 << debugRegisterIndex); \
 	\
-	debugState.uds.type.__dr7 &= ~(1 << 2*debugRegisterIndex); \
-	debugState.uds.type.__dr7 &= ~(1 << 2*debugRegisterIndex+1); \
+	debugState.uds.type.__dr7 &= ~(1 << (2*debugRegisterIndex)); \
+	debugState.uds.type.__dr7 &= ~(1 << (2*debugRegisterIndex+1)); \
 	\
-	debugState.uds.type.__dr7 &= ~(1 << 16 + 2*debugRegisterIndex); \
-	debugState.uds.type.__dr7 &= ~(1 << 16 + 2*debugRegisterIndex+1); \
+	debugState.uds.type.__dr7 &= ~(1 << (16 + 2*debugRegisterIndex)); \
+	debugState.uds.type.__dr7 &= ~(1 << (16 + 2*debugRegisterIndex+1)); \
 	\
-	debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); \
-	debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); \
+	debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex)); \
+	debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex+1)); \
 
 - (ZGMemoryAddress)removeWatchPoint:(ZGBreakPoint *)breakPoint
 {
@@ -603,7 +603,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return YES;
 }
 
-#define IS_REGISTER_AVAILABLE(type) (!(debugState.uds.type.__dr7 & (1 << 2*registerIndex)) && !(debugState.uds.type.__dr7 & (1 << 2*registerIndex+1)))
+#define IS_REGISTER_AVAILABLE(type) (!(debugState.uds.type.__dr7 & (1 << (2*registerIndex))) && !(debugState.uds.type.__dr7 & (1 << (2*registerIndex+1))))
 
 #define WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(type, typecast) \
 	if (debugRegisterIndex == 0) { debugState.uds.type.__dr0 = (typecast)variable.address; } \
@@ -611,17 +611,17 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	else if (debugRegisterIndex == 2) { debugState.uds.type.__dr2 = (typecast)variable.address; } \
 	else if (debugRegisterIndex == 3) { debugState.uds.type.__dr3 = (typecast)variable.address; } \
 	\
-	debugState.uds.type.__dr7 |= (1 << 2*debugRegisterIndex); \
-	debugState.uds.type.__dr7 &= ~(1 << 2*debugRegisterIndex+1); \
+	debugState.uds.type.__dr7 |= (1 << (2*debugRegisterIndex)); \
+	debugState.uds.type.__dr7 &= ~(1 << (2*debugRegisterIndex+1)); \
 	\
-	debugState.uds.type.__dr7 |= (1 << 16 + 2*debugRegisterIndex); \
-	if (watchPointType == ZGWatchPointWrite) { debugState.uds.type.__dr7 &= ~(1 << 16 + 2*debugRegisterIndex+1); } \
-	else if (watchPointType == ZGWatchPointReadOrWrite) { debugState.uds.type.__dr7 |= (1 << 16 + 2*debugRegisterIndex+1); } \
+	debugState.uds.type.__dr7 |= (1 << (16 + 2*debugRegisterIndex)); \
+	if (watchPointType == ZGWatchPointWrite) { debugState.uds.type.__dr7 &= ~(1 << (16 + 2*debugRegisterIndex+1)); } \
+	else if (watchPointType == ZGWatchPointReadOrWrite) { debugState.uds.type.__dr7 |= (1 << (16 + 2*debugRegisterIndex+1)); } \
 	\
-	if (watchSize == 1) { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); } \
-	else if (watchSize == 2) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex+1); } \
-	else if (watchSize == 4) { debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); } \
-	else if (watchSize == 8) { debugState.uds.type.__dr7 &= ~(1 << 18 + 2*debugRegisterIndex); debugState.uds.type.__dr7 |= (1 << 18 + 2*debugRegisterIndex+1); }
+	if (watchSize == 1) { debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex)); debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex+1)); } \
+	else if (watchSize == 2) { debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex)); debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex+1)); } \
+	else if (watchSize == 4) { debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex+1)); } \
+	else if (watchSize == 8) { debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex+1)); }
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
 {

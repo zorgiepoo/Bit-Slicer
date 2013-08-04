@@ -512,7 +512,10 @@
 	{
 		[displayComponents addObject:@""];
 	}
-	[displayComponents addObject:valuesDisplayedString];
+	if (valuesDisplayedString != nil)
+	{
+		[displayComponents addObject:valuesDisplayedString];
+	}
 	
 	return [displayComponents componentsJoinedByString:@"\n"];
 }
