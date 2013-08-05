@@ -36,57 +36,23 @@
 #import "NSStringAdditions.h"
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
-#import <unistd.h>
-
-#import <Ruby/ruby.h>
+#import "NSString+DDMathParsing.h"
 
 @implementation ZGCalculator
 
-+ (void)initialize
-{
-	ruby_init();
-	ruby_init_loadpath();
-}
-
 + (BOOL)isValidExpression:(NSString *)expression
 {
-	NSMutableCharacterSet *disallowedCharacterSet = [NSMutableCharacterSet letterCharacterSet];
-	// keep characters for hexadecimal notations
-	[disallowedCharacterSet removeCharactersInString:@"xXaAbBcCdDeEfF"];
-	return [[expression componentsSeparatedByCharactersInSet:disallowedCharacterSet] count] <= 1;
-}
-
-static VALUE toStringWrapper(VALUE argument)
-{
-	return rb_funcall(argument, rb_intern("to_s"), 0);
+	return [[expression stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0;
 }
 
 + (NSString *)evaluateExpression:(NSString *)expression
 {
-	NSString *newExpression = expression;
-	
-	if (![self isValidExpression:newExpression])
+	if (![self isValidExpression:expression])
 	{
-		newExpression = nil;
+		return nil;
 	}
 	
-	if (newExpression && [newExpression UTF8String])
-	{
-		int resultState = 0;
-		VALUE numericalResult = rb_eval_string_protect([newExpression UTF8String], &resultState);
-		if (resultState == 0 && numericalResult != Qnil && (TYPE(numericalResult) == T_FIXNUM || TYPE(numericalResult) == T_BIGNUM || TYPE(numericalResult) == T_FLOAT))
-		{
-			resultState = 0;
-			VALUE result = rb_protect(toStringWrapper, numericalResult, &resultState);
-			
-			if (resultState == 0 && result != Qnil && TYPE(result) == T_STRING && ((struct RString *)result)->ptr)
-			{
-				newExpression = [NSString stringWithCString:((struct RString *)result)->ptr encoding:NSUTF8StringEncoding];
-			}
-		}
-	}
-	
-	return newExpression;
+	return [[expression ddNumberByEvaluatingString] stringValue];
 }
 
 // Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
