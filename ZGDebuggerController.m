@@ -1659,7 +1659,7 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)nopVariables:(id)sender
 {
-	[self nopVariables:[self selectedInstructions]];
+	[self nopInstructions:[self selectedInstructions]];
 }
 
 - (IBAction)injectCode:(id)sender
