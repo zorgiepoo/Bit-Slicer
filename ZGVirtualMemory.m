@@ -140,6 +140,16 @@ NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
 	return [ZGRegionsForProcessTask(processTask) count];
 }
 
+BOOL ZGAllocateMemory(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize size)
+{
+	return (mach_vm_allocate(processTask, address, size, VM_FLAGS_ANYWHERE) == KERN_SUCCESS);
+}
+
+BOOL ZGDeallocateMemory(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size)
+{
+	return (mach_vm_deallocate(processTask, address, size) == KERN_SUCCESS);
+}
+
 // ZGReadBytes allocates memory, the caller is responsible for deallocating it using ZGFreeBytes(...)
 BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size)
 {
