@@ -1395,8 +1395,10 @@ END_DEBUGGER_CHANGE:
 
 #pragma mark Modifying instructions
 
-- (void)writeInstructionText:(NSString *)instructionText atInstructionFromIndex:(NSUInteger)instructionIndex
+#define ASSEMBLER_ERROR_DOMAIN @"Assembling Failed"
+- (NSData *)assembleInstructionText:(NSString *)instructionText usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error
 {
+	NSData *data = nil;
 	NSString *outputFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"assembler_output.XXXXXX"];
 	const char *tempFileTemplateCString = [outputFileTemplate fileSystemRepresentation];
 	char *tempFileNameCString = malloc(strlen(tempFileTemplateCString) + 1);
@@ -1406,6 +1408,7 @@ END_DEBUGGER_CHANGE:
 	if (fileDescriptor != -1)
 	{
 		close(fileDescriptor);
+		
 		NSString *outputFilePath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:tempFileNameCString length:strlen(tempFileNameCString)];
 		
 		NSTask *task = [[NSTask alloc] init];
@@ -1418,89 +1421,115 @@ END_DEBUGGER_CHANGE:
 		NSPipe *errorPipe = [NSPipe pipe];
 		[task setStandardError:errorPipe];
 		
+		BOOL failedToLaunchTask = NO;
+		
 		@try
 		{
 			[task launch];
 		}
 		@catch (NSException *exception)
 		{
-			NSLog(@"Yasm task could not start: Name: %@, Reason: %@", exception.name, exception.reason);
-			free(tempFileNameCString);
-			return;
+			failedToLaunchTask = YES;
+			*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"Yasm task could not start: Name: %@, Reason: %@", exception.name, exception.reason]}];
 		}
 		
-		NSData *inputData = [[NSString stringWithFormat:@"BITS %lld\n%@\n", self.currentProcess.pointerSize * 8, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
-		
-		[[inputPipe fileHandleForWriting] writeData:inputData];
-		[[inputPipe fileHandleForWriting] closeFile];
-		
-		[task waitUntilExit];
-		
-		if ([task terminationStatus] == EXIT_SUCCESS)
-		{	
-			NSMutableData *outputData = [NSMutableData dataWithContentsOfFile:outputFilePath];
-			if (outputData)
+		if (!failedToLaunchTask)
+		{
+			NSData *inputData = [[NSString stringWithFormat:@"BITS %lld\n%@\n", numberOfBits, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
+			
+			[[inputPipe fileHandleForWriting] writeData:inputData];
+			[[inputPipe fileHandleForWriting] closeFile];
+			
+			[task waitUntilExit];
+			
+			if ([task terminationStatus] == EXIT_SUCCESS)
 			{
-				// Fill leftover bytes with NOP's so that the instructions won't 'slide'
-				NSUInteger originalOutputLength = outputData.length;
-				NSUInteger bytesRead = 0;
-				NSUInteger numberOfInstructionsOverwritten = 0;
-				
-				for (ZGMemorySize currentInstructionIndex = instructionIndex; (bytesRead < originalOutputLength) && (currentInstructionIndex < self.instructions.count); currentInstructionIndex++)
+				data = [NSData dataWithContentsOfFile:outputFilePath];
+			}
+			else
+			{
+				NSData *errorData = [[errorPipe fileHandleForReading] readDataToEndOfFile];
+				if (errorData)
 				{
-					ZGInstruction *currentInstruction = [self.instructions objectAtIndex:currentInstructionIndex];
-					bytesRead += currentInstruction.variable.size;
-					numberOfInstructionsOverwritten++;
+					NSString *errorString = [[[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] objectAtIndex:0];
 					
-					if (bytesRead > originalOutputLength)
-					{
-						const int8_t nopValue = 0x90;
-						for (ZGMemorySize byteIndex = currentInstruction.variable.address + currentInstruction.variable.size - (bytesRead - originalOutputLength); byteIndex < currentInstruction.variable.address + currentInstruction.variable.size; byteIndex++)
-						{
-							[outputData appendBytes:&nopValue length:sizeof(int8_t)];
-						}
-					}
-				}
-				
-				if (bytesRead < originalOutputLength)
-				{
-					NSRunAlertPanel(@"Failed to Overwrite Instructions", @"This modification exceeds the boundary of instructions displayed.", @"OK", nil, nil);
-				}
-				else
-				{
-					BOOL shouldOverwriteInstructions = YES;
-					if (numberOfInstructionsOverwritten > 1 && NSRunAlertPanel(@"Overwrite Instructions", @"This modification will overwrite %ld instructions. Are you sure you want to overwrite them?", @"Cancel", @"Overwrite", nil, numberOfInstructionsOverwritten) != NSAlertAlternateReturn)
-					{
-						shouldOverwriteInstructions = NO;
-					}
-					
-					if (shouldOverwriteInstructions)
-					{
-						ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
-						
-						[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
-					}
+					*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : errorString}];
 				}
 			}
-		}
-		else
-		{
-			NSData *errorData = [[errorPipe fileHandleForReading] readDataToEndOfFile];
-			NSString *errorString = nil;
-			if (errorData)
+			
+			if ([[NSFileManager defaultManager] fileExistsAtPath:outputFilePath])
 			{
-				errorString = [[[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] objectAtIndex:0];
+				[[NSFileManager defaultManager] removeItemAtPath:outputFilePath error:NULL];
 			}
-			NSRunAlertPanel(@"Failed to Modify Instruction", @"An error (%@) occured trying to assemble %@.", @"OK", nil, nil, errorString, instructionText);
 		}
-		
-		if ([[NSFileManager defaultManager] fileExistsAtPath:outputFilePath])
-		{
-			[[NSFileManager defaultManager] removeItemAtPath:outputFilePath error:NULL];
-		}
+	}
+	else
+	{
+		*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"Could not open file descriptor to %s", tempFileNameCString]}];
 	}
 	
 	free(tempFileNameCString);
+	
+	return data;
+}
+
+- (void)writeInstructionText:(NSString *)instructionText atInstructionFromIndex:(NSUInteger)instructionIndex
+{
+	NSError *error = nil;
+	NSData *data = [self assembleInstructionText:instructionText usingArchitectureBits:self.currentProcess.pointerSize * 8 error:&error];
+	if (data == nil)
+	{
+		if (error != nil)
+		{
+			NSLog(@"%@", error);
+			NSRunAlertPanel(@"Failed to Modify Instruction", @"An error (%@) occured trying to assemble %@.", @"OK", nil, nil, [error.userInfo objectForKey:@"description"], instructionText);
+		}
+	}
+	else
+	{
+		NSMutableData *outputData = [NSMutableData dataWithData:data];
+		
+		// Fill leftover bytes with NOP's so that the instructions won't 'slide'
+		NSUInteger originalOutputLength = outputData.length;
+		NSUInteger bytesRead = 0;
+		NSUInteger numberOfInstructionsOverwritten = 0;
+		
+		for (ZGMemorySize currentInstructionIndex = instructionIndex; (bytesRead < originalOutputLength) && (currentInstructionIndex < self.instructions.count); currentInstructionIndex++)
+		{
+			ZGInstruction *currentInstruction = [self.instructions objectAtIndex:currentInstructionIndex];
+			bytesRead += currentInstruction.variable.size;
+			numberOfInstructionsOverwritten++;
+			
+			if (bytesRead > originalOutputLength)
+			{
+				const int8_t nopValue = 0x90;
+				for (ZGMemorySize byteIndex = currentInstruction.variable.address + currentInstruction.variable.size - (bytesRead - originalOutputLength); byteIndex < currentInstruction.variable.address + currentInstruction.variable.size; byteIndex++)
+				{
+					[outputData appendBytes:&nopValue length:sizeof(int8_t)];
+				}
+			}
+		}
+		
+		if (bytesRead < originalOutputLength)
+		{
+			NSRunAlertPanel(@"Failed to Overwrite Instructions", @"This modification exceeds the boundary of instructions displayed.", @"OK", nil, nil);
+		}
+		else
+		{
+			BOOL shouldOverwriteInstructions = YES;
+			if (numberOfInstructionsOverwritten > 1 && NSRunAlertPanel(@"Overwrite Instructions", @"This modification will overwrite %ld instructions. Are you sure you want to overwrite them?", @"Cancel", @"Overwrite", nil, numberOfInstructionsOverwritten) != NSAlertAlternateReturn)
+			{
+				shouldOverwriteInstructions = NO;
+			}
+			
+			if (shouldOverwriteInstructions)
+			{
+				ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+				
+				[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
+			}
+		}
+	}
 }
 
 - (void)writeStringValue:(NSString *)stringValue atInstructionFromIndex:(NSUInteger)initialInstructionIndex
