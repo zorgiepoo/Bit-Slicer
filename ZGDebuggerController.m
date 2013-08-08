@@ -1435,7 +1435,7 @@ END_DEBUGGER_CHANGE:
 			failedToLaunchTask = YES;
 			if (error != nil)
 			{
-				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"Yasm task could not start: Name: %@, Reason: %@", exception.name, exception.reason]}];
+				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"yasm task failed to launch: Name: %@, Reason: %@", exception.name, exception.reason]}];
 			}
 		}
 		
@@ -1451,6 +1451,15 @@ END_DEBUGGER_CHANGE:
 			if ([task terminationStatus] == EXIT_SUCCESS)
 			{
 				data = [NSData dataWithContentsOfFile:outputFilePath];
+				
+				if (data.length == 0)
+				{
+					data = nil;
+					if (error != nil)
+					{
+						*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"the instruction failed assembling."}];
+					}
+				}
 			}
 			else
 			{
@@ -1458,7 +1467,7 @@ END_DEBUGGER_CHANGE:
 				if (errorData && error != nil)
 				{
 					NSString *errorString = [[[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] objectAtIndex:0];
-					*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : errorString}];
+					*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : errorString}];
 				}
 			}
 			
@@ -1470,7 +1479,7 @@ END_DEBUGGER_CHANGE:
 	}
 	else if (error != nil)
 	{
-		*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"Could not open file descriptor to %s", tempFileNameCString]}];
+		*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : [NSString stringWithFormat:@"Failed to open file descriptor on %s.", tempFileNameCString]}];
 	}
 	
 	free(tempFileNameCString);
@@ -1487,7 +1496,7 @@ END_DEBUGGER_CHANGE:
 		if (error != nil)
 		{
 			NSLog(@"%@", error);
-			NSRunAlertPanel(@"Failed to Modify Instruction", @"An error (%@) occured trying to assemble %@.", @"OK", nil, nil, [error.userInfo objectForKey:@"description"], instructionText);
+			NSRunAlertPanel(@"Failed to Modify Instruction", @"An error occured trying to assemble \"%@\": %@", @"OK", nil, nil, instructionText, [error.userInfo objectForKey:@"reason"]);
 		}
 	}
 	else
