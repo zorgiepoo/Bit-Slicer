@@ -184,7 +184,7 @@
 - (void)memoryDumpAllRequest
 {
 	NSSavePanel *savePanel = NSSavePanel.savePanel;
-	savePanel.message = @"Choose a folder name to save the memory dump files. This may take a while.";
+	savePanel.message = @"Choose a folder name to save the memory dump files to.";
 	
 	[savePanel
 	 beginSheetModalForWindow:self.memoryViewer.window
