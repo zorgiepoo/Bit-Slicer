@@ -32,8 +32,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <stdint.h>
-#import <mach/std_types.h>
+#ifndef _ZG_MEMORY_TYPES_H
+#define _ZG_MEMORY_TYPES_H
+
+#include <mach/std_types.h>
+#include <mach/vm_prot.h>
 
 typedef mach_vm_address_t ZGMemoryAddress;
 typedef mach_vm_size_t ZGMemorySize;
@@ -41,3 +44,5 @@ typedef vm_prot_t ZGMemoryProtection;
 typedef vm_map_t ZGMemoryMap;
 
 #define MAX_MEMORY_ADDRESS ((ZGMemoryAddress)MACH_VM_MAX_ADDRESS)
+
+#endif

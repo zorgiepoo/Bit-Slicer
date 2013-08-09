@@ -292,7 +292,7 @@
 		
 		if (task != MACH_PORT_NULL)
 		{
-			mach_port_deallocate(mach_task_self(), task);
+			ZGDeallocatePort(task);
 		}
 	}
 	

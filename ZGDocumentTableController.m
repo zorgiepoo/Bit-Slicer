@@ -44,6 +44,7 @@
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
 
 @interface ZGDocumentTableController ()
 

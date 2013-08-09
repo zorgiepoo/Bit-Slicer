@@ -49,6 +49,7 @@
 #import "ZGMemoryViewerController.h"
 #import "NSArrayAdditions.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
 
 @interface ZGDebuggerController ()
 

@@ -41,6 +41,8 @@
 #import "ZGUtilities.h"
 #import "ZGDebuggerController.h"
 
+#import <mach/thread_act.h>
+
 @interface ZGRegistersController ()
 
 @property (assign) IBOutlet NSTableView *tableView;

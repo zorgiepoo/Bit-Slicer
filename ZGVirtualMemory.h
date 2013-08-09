@@ -32,51 +32,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGMemoryTypes.h"
-#import "ZGVariableTypes.h"
-#import <mach/mach_traps.h>
-#import <signal.h>
-#import <mach/mach_init.h>
-#import <mach/vm_map.h>
-#import <mach/mach_vm.h>
-#import <mach/mach.h>
+#ifndef _ZG_VIRTUAL_MEMORY_H
+#define _ZG_VIRTUAL_MEMORY_H
 
-@class ZGSearchData;
-@class ZGSearchProgress;
-@class ZGRegion;
+#include "ZGMemoryTypes.h"
+#include <stdbool.h>
 
-typedef BOOL (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableData *results);
+// Caller for ZGTaskPortForPID is responsible for using ZGDeallocatePort
+bool ZGTaskPortForPID(int processID, ZGMemoryMap *processTask);
+bool ZGDeallocatePort(ZGMemoryMap processTask);
 
-BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task);
-BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
-void ZGFreeTask(ZGMemoryMap task);
+bool ZGAllocateMemory(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize size);
+bool ZGDeallocateMemory(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
 
-NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
-NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
-
-BOOL ZGAllocateMemory(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize size);
-BOOL ZGDeallocateMemory(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
-
-BOOL ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size);
+// ZGReadBytes allocates memory, the caller is responsible for deallocating it using ZGFreeBytes(...)
+bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size);
 void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size);
-BOOL ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
-BOOL ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
 
-BOOL ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection);
-BOOL ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection);
+bool ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
+bool ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
 
-void ZGFreeData(NSArray *dataArray);
-NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress);
-void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGRegion **hintedRegionReference, ZGMemorySize dataSize);
-BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSearchProgress *searchProgress);
+bool ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection);
+bool ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection);
 
-ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
+bool ZGSuspendCount(ZGMemoryMap processTask, integer_t *suspendCount);
 
-NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock);
+bool ZGSuspendTask(ZGMemoryMap processTask);
+bool ZGResumeTask(ZGMemoryMap processTask);
 
-ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize);
-
-BOOL ZGSuspendCount(ZGMemoryMap processTask, integer_t *suspendCount);
-
-BOOL ZGSuspendTask(ZGMemoryMap processTask);
-BOOL ZGResumeTask(ZGMemoryMap processTask);
+#endif

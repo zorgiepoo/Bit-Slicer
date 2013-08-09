@@ -34,6 +34,7 @@
 
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
 
 @implementation ZGProcess
 

@@ -39,6 +39,7 @@
 #import "ZGMemoryTypes.h"
 #import "ZGUtilities.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGSearchProgress.h"
 

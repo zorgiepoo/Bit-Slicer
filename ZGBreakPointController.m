@@ -64,6 +64,11 @@
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 
+#import <mach/task.h>
+#import <mach/thread_act.h>
+#import <mach/mach_port.h>
+#import <mach/mach.h>
+
 @interface ZGBreakPointController ()
 
 @property (readwrite, nonatomic) mach_port_t exceptionPort;
@@ -146,7 +151,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		}
 	}
 	
-	if (mach_vm_deallocate(current_task(), (mach_vm_address_t)threadList, threadListCount * sizeof(thread_act_t)) != KERN_SUCCESS)
+	if (!ZGDeallocateMemory(current_task(), (mach_vm_address_t)threadList, threadListCount * sizeof(thread_act_t)))
 	{
 		NSLog(@"Failed to deallocate thread list in removeWatchPoint...");
 	}
@@ -575,7 +580,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		if (mach_port_insert_right(current_task(), self.exceptionPort, self.exceptionPort, MACH_MSG_TYPE_MAKE_SEND) != KERN_SUCCESS)
 		{
 			NSLog(@"ERROR: Could not insert send right for watchpoint");
-			if (mach_port_deallocate(current_task(), self.exceptionPort) != KERN_SUCCESS)
+			if (!ZGDeallocatePort(self.exceptionPort))
 			{
 				NSLog(@"ERROR: Could not deallocate exception port in adding breakpoint");
 			}
@@ -720,7 +725,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		}
 	}
 	
-	if (mach_vm_deallocate(current_task(), (mach_vm_address_t)threadList, threadListCount * sizeof(thread_act_t)) != KERN_SUCCESS)
+	if (!ZGDeallocateMemory(current_task(), (mach_vm_address_t)threadList, threadListCount * sizeof(thread_act_t)))
 	{
 		NSLog(@"Failed to deallocate thread list in addWatchpointOnVariable...");
 	}

@@ -39,6 +39,7 @@
 #import "ZGDocumentBreakPointController.h"
 #import "ZGVariableController.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
 #import "ZGRegion.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
@@ -56,6 +57,8 @@
 @property (readwrite, strong, nonatomic) ZGSearchProgress *searchProgress;
 @property (strong, nonatomic) NSArray *temporaryResultSets;
 @property (assign) BOOL isBusy;
+
+typedef BOOL (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableData *results);
 
 @end
 
@@ -696,6 +699,27 @@
 	return YES;
 }
 
+ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
+{
+	ZGMemorySize dataAlignment;
+	
+	if (dataType == ZGUTF8String || dataType == ZGByteArray)
+	{
+		dataAlignment = sizeof(int8_t);
+	}
+	else if (dataType == ZGUTF16String)
+	{
+		dataAlignment = sizeof(int16_t);
+	}
+	else
+	{
+		// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while every other integral type is on its own size of boundary
+		dataAlignment = (!isProcess64Bit && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
+	}
+	
+	return dataAlignment;
+}
+
 - (void)searchVariablesWithComparisonFunction:(comparison_function_t)compareFunction usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGMemorySize dataSize = self.searchData.dataSize;
@@ -719,6 +743,121 @@
 		
 		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
 	});
+}
+
+NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
+{
+	ZGMemorySize dataAlignment = searchData.dataAlignment;
+	ZGMemorySize dataSize = searchData.dataSize;
+	
+	void *searchValue = searchData.searchValue;
+	BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
+	
+	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
+	ZGMemoryAddress dataEndAddress = searchData.endAddress;
+	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
+	
+	// Page size will probably be 4096
+	ZGMemorySize pageSize;
+	vm_size_t tempPageSize = 0;
+	if (host_page_size(processTask, &tempPageSize) == KERN_SUCCESS)
+	{
+		pageSize = tempPageSize;
+	}
+	else
+	{
+		pageSize = NSPageSize();
+	}
+	
+	NSArray *regions;
+	if (!shouldCompareStoredValues)
+	{
+		regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
+			return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
+		}];
+	}
+	else
+	{
+		regions = searchData.savedData;
+	}
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		searchProgress.initiatedSearch = YES;
+		searchProgress.progressType = ZGSearchProgressMemoryScanning;
+		searchProgress.maxProgress = regions.count;
+	});
+	
+	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
+	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
+	{
+		[allResultSets addObject:[[NSMutableData alloc] init]];
+	}
+	
+	dispatch_apply(regions.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
+		@autoreleasepool
+		{
+			ZGRegion *region = [regions objectAtIndex:regionIndex];
+			ZGMemoryAddress address = region.address;
+			ZGMemorySize size = region.size;
+			void *regionBytes = region.bytes;
+			
+			ZGMemorySize variablesFound = 0;
+			
+			NSMutableData *resultSet = [allResultSets objectAtIndex:regionIndex];
+			
+			char *bytes = NULL;
+			if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
+			{
+				ZGMemorySize dataIndex = 0;
+				while (dataIndex + dataSize <= size)
+				{
+					if (dataIndex % pageSize == 0 && searchProgress.shouldCancelSearch)
+					{
+						break;
+					}
+					
+					if (dataBeginAddress <= address + dataIndex &&
+						dataEndAddress >= address + dataIndex + dataSize)
+					{
+						if (searchForDataBlock(searchData, &bytes[dataIndex], !shouldCompareStoredValues ? (searchValue) : (regionBytes + dataIndex), address + dataIndex, resultSet))
+						{
+							variablesFound++;
+						}
+					}
+					dataIndex += dataAlignment;
+				}
+				
+				ZGFreeBytes(processTask, bytes, size);
+			}
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				searchProgress.numberOfVariablesFound += variablesFound;
+				searchProgress.progress++;
+			});
+		}
+	});
+	
+	NSArray *returnedResults;
+	
+	if (searchProgress.shouldCancelSearch)
+	{
+		returnedResults = [NSArray array];
+		
+		// Deallocate allResultSets on a separate task since this could take some time if we allocated a lot of data
+		__block NSMutableArray *allResultSetsReference = allResultSets;
+		allResultSets = nil;
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			allResultSetsReference = nil;
+		});
+	}
+	else
+	{
+		returnedResults = [allResultSets zgFilterUsingBlock:(zg_array_filter_t)^(NSMutableData *resultSet) {
+			return resultSet.length == 0;
+		}];
+	}
+	
+	return returnedResults;
 }
 
 - (void)narrowDownVariablesWithComparisonFunction:(comparison_function_t)compareFunction usingCompletionBlock:(dispatch_block_t)completeSearchBlock
