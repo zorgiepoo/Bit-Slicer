@@ -33,7 +33,6 @@
  */
 
 #import "ZGDocumentTableController.h"
-#import "ZGDocument.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGVariableController.h"
 #import "ZGProcess.h"
@@ -45,10 +44,13 @@
 #import "ZGSearchResults.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGDocumentData.h"
+#import "ZGDocumentWindowController.h"
 
 @interface ZGDocumentTableController ()
 
-@property (assign) IBOutlet ZGDocument *document;
+@property (assign) ZGDocumentWindowController *windowController;
+@property (assign) ZGDocumentData *documentData;
 @property (readwrite, strong, nonatomic) NSTimer *watchVariablesTimer;
 
 @end
@@ -61,16 +63,32 @@
 
 #pragma mark Birth & Death
 
-- (void)awakeFromNib
+- (id)initWithWindowController:(ZGDocumentWindowController *)windowController
 {
-	[self.watchVariablesTableView registerForDraggedTypes:@[ZGVariableReorderType, ZGVariablePboardType]];
-	self.watchVariablesTimer =
-		[NSTimer
-		 scheduledTimerWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
-		 target:self
-		 selector:@selector(updateWatchVariablesTable:)
-		 userInfo:nil
-		 repeats:YES];
+	self = [super init];
+	if (self)
+	{
+		self.windowController = windowController;
+		self.documentData = windowController.documentData;
+		
+		self.watchVariablesTimer =
+			[NSTimer
+			 scheduledTimerWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
+			 target:self
+			 selector:@selector(updateWatchVariablesTable:)
+			 userInfo:nil
+			 repeats:YES];
+	}
+	return self;
+}
+
+- (void)setVariablesTableView:(NSTableView *)tableView
+{
+	_variablesTableView = tableView;
+	__unsafe_unretained id selfReference = self;
+	[_variablesTableView setDataSource:selfReference];
+	[_variablesTableView setDelegate:selfReference];
+	[_variablesTableView registerForDraggedTypes:@[ZGVariableReorderType, ZGVariablePboardType]];
 }
 
 - (void)cleanUp
@@ -78,23 +96,23 @@
 	[self.watchVariablesTimer invalidate];
 	self.watchVariablesTimer = nil;
 	
-	self.document = nil;
-	self.watchVariablesTableView = nil;
+	self.windowController = nil;
+	self.variablesTableView = nil;
 }
 
 #pragma mark Updating Table
 
 - (void)updateVariableValuesInRange:(NSRange)variableRange
 {
-	if (variableRange.location + variableRange.length <= self.document.watchVariablesArray.count)
+	if (variableRange.location + variableRange.length <= self.documentData.variables.count)
 	{
 		__block BOOL needsToReloadTable = NO;
-		[[self.document.watchVariablesArray subarrayWithRange:variableRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+		[[self.documentData.variables subarrayWithRange:variableRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 		 {
 			 NSString *oldStringValue = [variable.stringValue copy];
 			 if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGUTF8String || variable.type == ZGUTF16String))
 			 {
-				 variable.size = ZGGetStringSize(self.document.currentProcess.processTask, variable.address, variable.type, variable.size);
+				 variable.size = ZGGetStringSize(self.windowController.currentProcess.processTask, variable.address, variable.type, variable.size);
 			 }
 			 
 			 if (variable.size)
@@ -102,7 +120,7 @@
 				 ZGMemorySize outputSize = variable.size;
 				 void *value = NULL;
 				 
-				 if (ZGReadBytes(self.document.currentProcess.processTask, variable.address, &value, &outputSize))
+				 if (ZGReadBytes(self.windowController.currentProcess.processTask, variable.address, &value, &outputSize))
 				 {
 					 variable.value = value;
 					 if (![variable.stringValue isEqualToString:oldStringValue])
@@ -110,7 +128,7 @@
 						 needsToReloadTable = YES;
 					 }
 					 
-					 ZGFreeBytes(self.document.currentProcess.processTask, value, outputSize);
+					 ZGFreeBytes(self.windowController.currentProcess.processTask, value, outputSize);
 				 }
 				 else if (variable.value)
 				 {
@@ -129,35 +147,30 @@
 		
 		if (needsToReloadTable)
 		{
-			[self.watchVariablesTableView reloadData];
+			[self.variablesTableView reloadData];
 		}
 	}
 }
 
 - (void)updateWatchVariablesTable:(NSTimer *)timer
 {
-	if (!self.document.windowForSheet.isVisible)
-	{
-		return;
-	}
-    
 	// First, update all the variable's addresses that are pointers
 	// We don't want to update this when the user is editing something in the table
-	if (self.document.currentProcess.valid && self.watchVariablesTableView.editedRow == -1)
+	if (self.windowController.currentProcess.valid && self.variablesTableView.editedRow == -1)
 	{
-		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
+		[self.documentData.variables enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
 		 {
 			 if (variable.isPointer)
 			 {
 				 NSString *newAddressString =
 					[ZGCalculator
 					 evaluateAddress:[NSMutableString stringWithString:variable.addressFormula]
-					 process:self.document.currentProcess];
+					 process:self.windowController.currentProcess];
 				 
 				 if (variable.address != newAddressString.zgUnsignedLongLongValue)
 				 {
 					 variable.addressStringValue = newAddressString;
-					 [self.watchVariablesTableView reloadData];
+					 [self.variablesTableView reloadData];
 				 }
 			 }
 			 
@@ -169,22 +182,22 @@
 	}
 	
 	// Then check that the process is alive
-	if (self.document.currentProcess.valid)
+	if (self.windowController.currentProcess.valid)
 	{
 		// Freeze all variables that need be frozen!
-		[self.document.watchVariablesArray enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
+		[self.documentData.variables enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
 		 {
 			 if (variable.isFrozen && variable.freezeValue)
 			 {
 				 if (variable.size)
 				 {
-					 ZGWriteBytesIgnoringProtection(self.document.currentProcess.processTask, variable.address, variable.freezeValue, variable.size);
+					 ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address, variable.freezeValue, variable.size);
 				 }
 				 
 				 if (variable.type == ZGUTF16String)
 				 {
 					 unichar terminatorValue = 0;
-					 ZGWriteBytesIgnoringProtection(self.document.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));
+					 ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));
 				 }
 			 }
 			 
@@ -197,10 +210,10 @@
 	
 	// if any variables are changing, that means that we'll have to reload the table, and that'd be very bad
 	// if the user is in the process of editing a variable's value, so don't do it then
-	if (self.document.currentProcess.valid && self.watchVariablesTableView.editedRow == -1)
+	if (self.windowController.currentProcess.valid && self.variablesTableView.editedRow == -1)
 	{
 		// Read all the variables and update them in the table view if needed
-		NSRange visibleRowsRange = [self.watchVariablesTableView rowsInRect:self.watchVariablesTableView.visibleRect];
+		NSRange visibleRowsRange = [self.variablesTableView rowsInRect:self.variablesTableView.visibleRect];
 		[self updateVariableValuesInRange:visibleRowsRange];
 	}
 }
@@ -209,7 +222,7 @@
 
 - (NSDragOperation)tableView:(NSTableView *)tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
 {
-	if ([draggingInfo draggingSource] == self.watchVariablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
+	if ([draggingInfo draggingSource] == self.variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
 	{
 		return NSDragOperationMove;
 	}
@@ -223,19 +236,19 @@
 
 - (void)reorderVariables:(NSArray *)newVariables
 {
-	self.document.undoManager.actionName = @"Move";
-	[[self.document.undoManager prepareWithInvocationTarget:self] reorderVariables:self.document.watchVariablesArray];
+	self.windowController.undoManager.actionName = @"Move";
+	[[self.windowController.undoManager prepareWithInvocationTarget:self] reorderVariables:self.documentData.variables];
 	
-	self.document.watchVariablesArray = [NSArray arrayWithArray:newVariables];
+	self.documentData.variables = [NSArray arrayWithArray:newVariables];
 	
-	[self.watchVariablesTableView reloadData];
+	[self.variablesTableView reloadData];
 }
 
 - (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo  row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
 {
-	if ([draggingInfo draggingSource] == self.watchVariablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType])
+	if ([draggingInfo draggingSource] == self.variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType])
 	{
-		NSMutableArray *variables = [NSMutableArray arrayWithArray:self.document.watchVariablesArray];
+		NSMutableArray *variables = [NSMutableArray arrayWithArray:self.documentData.variables];
 		NSArray *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableReorderType];
 		
 		// Fill in the current rows with null objects
@@ -250,7 +263,7 @@
 		for (NSNumber *row in rows)
 		{
 			[variables
-			 insertObject:[self.document.watchVariablesArray objectAtIndex:row.integerValue]
+			 insertObject:[self.documentData.variables objectAtIndex:row.integerValue]
 			 atIndex:newRow];
 			
 			newRow++;
@@ -272,7 +285,7 @@
 			[rowIndexes addIndex:newRow + rowIndex];
 		}
 		
-		[self.document.variableController addVariables:variables atRowIndexes:rowIndexes];
+		[self.windowController.variableController addVariables:variables atRowIndexes:rowIndexes];
 	}
 	
 	return YES;
@@ -288,7 +301,7 @@
 	}];
 	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableReorderType];
 	
-	NSArray *variables = [self.document.watchVariablesArray objectsAtIndexes:rowIndexes];
+	NSArray *variables = [self.documentData.variables objectsAtIndexes:rowIndexes];
 	[pasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 	
 	return YES;
@@ -298,27 +311,27 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if (tableView == self.watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < self.document.watchVariablesArray.count)
+	if (tableView == self.variablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
 	{
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
-			return [[[self.document watchVariablesArray] objectAtIndex:rowIndex] name];
+			return [[self.documentData.variables objectAtIndex:rowIndex] name];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"address"])
 		{
-			return [[[self.document watchVariablesArray] objectAtIndex:rowIndex] addressStringValue];
+			return [[self.documentData.variables objectAtIndex:rowIndex] addressStringValue];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"value"])
 		{
-			return [[[self.document watchVariablesArray] objectAtIndex:rowIndex] stringValue];
+			return [[self.documentData.variables objectAtIndex:rowIndex] stringValue];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"shouldBeSearched"])
 		{
-			return @([[self.document.watchVariablesArray objectAtIndex:rowIndex] shouldBeSearched]);
+			return @([[self.documentData.variables objectAtIndex:rowIndex] shouldBeSearched]);
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
-			ZGVariableType type = [(ZGVariable *)[self.document.watchVariablesArray objectAtIndex:rowIndex] type];
+			ZGVariableType type = [(ZGVariable *)[self.documentData.variables objectAtIndex:rowIndex] type];
 			return @([[tableColumn dataCell] indexOfItemWithTag:type]);
 		}
 	}
@@ -328,46 +341,46 @@
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if (tableView == self.watchVariablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < self.document.watchVariablesArray.count)
+	if (tableView == self.variablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
 	{
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
-			[self.document.variableController
-			 changeVariable:[self.document.watchVariablesArray objectAtIndex:rowIndex]
+			[self.windowController.variableController
+			 changeVariable:[self.documentData.variables objectAtIndex:rowIndex]
 			 newName:object];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"address"])
 		{
-			[self.document.variableController
-			 changeVariable:[self.document.watchVariablesArray objectAtIndex:rowIndex]
+			[self.windowController.variableController
+			 changeVariable:[self.documentData.variables objectAtIndex:rowIndex]
 			 newAddress:object];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"value"])
 		{
-			[self.document.variableController
-			 changeVariable:[self.document.watchVariablesArray objectAtIndex:rowIndex]
+			[self.windowController.variableController
+			 changeVariable:[self.documentData.variables objectAtIndex:rowIndex]
 			 newValue:object
 			 shouldRecordUndo:YES];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"shouldBeSearched"])
 		{
-			[self.document.variableController
+			[self.windowController.variableController
 			 changeVariableShouldBeSearched:[object boolValue]
-			 rowIndexes:self.document.selectedVariableIndexes];
+			 rowIndexes:self.windowController.selectedVariableIndexes];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
-			[self.document.variableController
-			 changeVariable:[self.document.watchVariablesArray objectAtIndex:rowIndex]
+			[self.windowController.variableController
+			 changeVariable:[self.documentData.variables objectAtIndex:rowIndex]
 			 newType:(ZGVariableType)[[[tableColumn.dataCell itemArray] objectAtIndex:[object unsignedIntegerValue]] tag]
-			 newSize:[(ZGVariable *)[self.document.watchVariablesArray objectAtIndex:rowIndex] size]];
+			 newSize:[(ZGVariable *)[self.documentData.variables objectAtIndex:rowIndex] size]];
 		}
 	}
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return MIN(MAX_TABLE_VIEW_ITEMS, self.document.watchVariablesArray.count);
+	return MIN(MAX_TABLE_VIEW_ITEMS, self.documentData.variables.count);
 }
 
 #pragma mark Table View Delegate Methods
@@ -387,15 +400,15 @@
 {
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
-		if ((![self.document.searchController canStartTask] && self.document.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || !self.document.currentProcess.valid)
+		if ((![self.windowController.searchController canStartTask] && self.windowController.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || !self.windowController.currentProcess.valid)
 		{
 			NSBeep();
 			return NO;
 		}
         
-		if (rowIndex >= 0 && (NSUInteger)rowIndex < self.document.watchVariablesArray.count)
+		if (rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
 		{
-			ZGVariable *variable = [self.document.watchVariablesArray objectAtIndex:rowIndex];
+			ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
 			if (!variable)
 			{
 				return NO;
@@ -405,7 +418,7 @@
 			ZGMemoryAddress memoryAddress = [variable address];
 			ZGMemorySize memorySize = [variable size];
 			
-			if (ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+			if (ZGMemoryProtectionInRegion(self.windowController.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 			{
 				// if the variable is within a single memory region and the memory region is not readable, then don't allow the variable to be writable
 				// if it is not writable, our value changing methods will try to change the protection attributes before modifying the data
@@ -419,15 +432,15 @@
 	}
 	else if ([tableColumn.identifier isEqualToString:@"address"])
 	{
-		if (rowIndex < 0 || (NSUInteger)rowIndex >= self.document.watchVariablesArray.count)
+		if (rowIndex < 0 || (NSUInteger)rowIndex >= self.documentData.variables.count)
 		{
 			return NO;
 		}
 		
-		ZGVariable *variable = [self.document.watchVariablesArray objectAtIndex:rowIndex];
+		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
 		if (variable.isPointer)
 		{
-			[self.document editVariablesAddress:nil];
+			[self.windowController editVariablesAddress:nil];
 			return NO;
 		}
 	}
@@ -439,9 +452,9 @@
 {
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
-		if (rowIndex >= 0 && (NSUInteger)rowIndex < self.document.watchVariablesArray.count)
+		if (rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
 		{
-			[cell setTextColor:[[self.document.watchVariablesArray objectAtIndex:rowIndex] isFrozen] ? NSColor.redColor : NSColor.textColor];
+			[cell setTextColor:[[self.documentData.variables objectAtIndex:rowIndex] isFrozen] ? NSColor.redColor : NSColor.textColor];
 		}
 	}
 }
@@ -450,9 +463,9 @@
 {
 	NSMutableArray *displayComponents = [[NSMutableArray alloc] init];
 	
-	if (row >= 0 && (NSUInteger)row < self.document.watchVariablesArray.count)
+	if (row >= 0 && (NSUInteger)row < self.documentData.variables.count)
 	{
-		ZGVariable *variable = [self.document.watchVariablesArray objectAtIndex:row];
+		ZGVariable *variable = [self.documentData.variables objectAtIndex:row];
 		
 		if (variable.name && ![variable.name isEqualToString:@""])
 		{
@@ -465,12 +478,12 @@
 		[displayComponents addObject:[NSString stringWithFormat:@"Address: %@", variable.addressFormula]];
 		[displayComponents addObject:[NSString stringWithFormat:@"Bytes: %@", variable.sizeStringValue]];
 		
-		if (self.document.currentProcess.valid)
+		if (self.windowController.currentProcess.valid)
 		{
 			ZGMemoryAddress memoryProtectionAddress = variable.address;
 			ZGMemorySize memoryProtectionSize = variable.size;
 			ZGMemoryProtection memoryProtection;
-			if (ZGMemoryProtectionInRegion(self.document.currentProcess.processTask, &memoryProtectionAddress, &memoryProtectionSize, &memoryProtection))
+			if (ZGMemoryProtectionInRegion(self.windowController.currentProcess.processTask, &memoryProtectionAddress, &memoryProtectionSize, &memoryProtection))
 			{
 				if (variable.address >= memoryProtectionAddress && variable.address + variable.size <= memoryProtectionAddress + memoryProtectionSize)
 				{
@@ -493,7 +506,7 @@
 	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
 	numberOfVariablesFormatter.format = @"#,###";
 	
-	NSUInteger variableCount = self.document.watchVariablesArray.count + self.document.searchController.searchResults.addressCount;
+	NSUInteger variableCount = self.documentData.variables.count + self.windowController.searchController.searchResults.addressCount;
 	
 	if (variableCount <= MAX_TABLE_VIEW_ITEMS)
 	{

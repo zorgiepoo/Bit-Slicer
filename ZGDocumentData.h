@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/29/12.
+ * Created by Mayur Pawashe on 8/10/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,16 +33,34 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGBreakPointController.h"
 
-@class ZGDocumentWindowController;
+#define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
+#define ZGProcessNameKey @"ZGProcessNameKey"
 
-@interface ZGDocumentBreakPointController : NSObject
+#define ZGSelectedDataTypeTag @"ZGSelectedDataTypeTag"
+#define ZGQualifierTagKey @"ZGQualifierKey"
+#define ZGFunctionTypeTagKey @"ZGFunctionTypeTagKey"
+#define ZGScanUnwritableValuesKey @"ZGScanUnwritableValuesKey"
+#define ZGIgnoreDataAlignmentKey @"ZGIgnoreDataAlignmentKey"
+#define ZGExactStringLengthKey @"ZGExactStringLengthKey"
+#define ZGIgnoreStringCaseKey @"ZGIgnoreStringCaseKey"
+#define ZGBeginningAddressKey @"ZGBeginningAddressKey"
+#define ZGEndingAddressKey @"ZGEndingAddressKey"
+#define ZGEpsilonKey @"ZGEpsilonKey"
+#define ZGAboveValueKey @"ZGAboveValueKey"
+#define ZGBelowValueKey @"ZGBelowValueKey"
+#define ZGSearchStringValueKey @"ZGSearchStringValueKey"
 
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
+@interface ZGDocumentData : NSObject
 
-- (void)requestVariableWatch:(ZGWatchPointType)watchPointType;
-- (void)cancelTask;
-- (void)stopWatchingBreakPoints;
+@property (readwrite, nonatomic) NSInteger selectedDatatypeTag;
+@property (readwrite, nonatomic) NSInteger qualifierTag;
+@property (readwrite, nonatomic) NSInteger functionTypeTag;
+@property (readwrite, nonatomic) BOOL ignoreDataAlignment;
+@property (copy, nonatomic) NSString *beginningAddressStringValue;
+@property (copy, nonatomic) NSString *endingAddressStringValue;
+@property (copy, nonatomic) NSString *searchValueString;
+@property (strong, nonatomic) NSArray *variables;
+@property (strong, nonatomic) NSString *desiredProcessName;
 
 @end

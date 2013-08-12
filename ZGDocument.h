@@ -34,59 +34,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class ZGProcess;
-@class ZGVariableController;
-@class ZGDocumentSearchController;
-@class ZGDocumentTableController;
-@class ZGDocumentBreakPointController;
-@class ZGRunningProcess;
-@class ZGSearchResults;
+@class ZGDocumentData;
+@class ZGSearchData;
 
 @interface ZGDocument : NSDocument
 
-@property (assign) IBOutlet NSWindow *watchWindow;
-@property (assign) IBOutlet NSProgressIndicator *searchingProgressIndicator;
-@property (assign) IBOutlet NSTextField *generalStatusTextField;
-@property (assign) IBOutlet NSMatrix *variableQualifierMatrix;
-@property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
-@property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
-@property (assign) IBOutlet NSButton *searchButton;
-@property (assign) IBOutlet NSButton *clearButton;
-@property (assign) IBOutlet NSTextField *searchValueTextField;
-@property (assign) IBOutlet NSTextField *flagsTextField;
-@property (assign) IBOutlet NSPopUpButton *functionPopUpButton;
-@property (assign) IBOutlet NSButton *scanUnwritableValuesCheckBox;
-@property (assign) IBOutlet NSButton *ignoreDataAlignmentCheckBox;
-@property (assign) IBOutlet NSButton *ignoreCaseCheckBox;
-@property (assign) IBOutlet NSButton *includeNullTerminatorCheckBox;
-@property (assign) IBOutlet NSTextField *beginningAddressTextField;
-@property (assign) IBOutlet NSTextField *endingAddressTextField;
-@property (assign) IBOutlet NSTextField *beginningAddressLabel;
-@property (assign) IBOutlet NSTextField *endingAddressLabel;
-
-@property (strong) IBOutlet ZGDocumentTableController *tableController;
-@property (strong) IBOutlet ZGVariableController *variableController;
-@property (strong) IBOutlet ZGDocumentSearchController *searchController;
-@property (strong) IBOutlet ZGDocumentBreakPointController *documentBreakPointController;
-
-@property (readwrite, strong, nonatomic) NSArray *watchVariablesArray;
-@property (readwrite, strong, nonatomic) ZGProcess *currentProcess;
-@property (readwrite, copy, nonatomic) NSString *desiredProcessName;
-
-- (IBAction)editVariablesAddress:(id)sender;
-
-- (NSIndexSet *)selectedVariableIndexes;
-- (NSArray *)selectedVariables;
-- (void)markDocumentChange;
-
-- (void)updateClearButton;
-- (void)updateFlagsAndSearchButtonTitle;
-
-- (BOOL)functionTypeAllowsSearchInput;
-- (BOOL)isFunctionTypeStore;
-
-- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;
-
-- (void)removeRunningProcessFromPopupButton:(ZGRunningProcess *)oldRunningProcess;
+@property (strong, nonatomic) ZGDocumentData *data;
+@property (strong, nonatomic) ZGSearchData *searchData;
 
 @end

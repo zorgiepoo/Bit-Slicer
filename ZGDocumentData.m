@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/29/12.
+ * Created by Mayur Pawashe on 8/10/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,17 +32,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "ZGBreakPointController.h"
+#import "ZGDocumentData.h"
+#import "ZGVariableTypes.h"
+#import "ZGComparisonFunctions.h"
 
-@class ZGDocumentWindowController;
+@implementation ZGDocumentData
 
-@interface ZGDocumentBreakPointController : NSObject
-
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
-
-- (void)requestVariableWatch:(ZGWatchPointType)watchPointType;
-- (void)cancelTask;
-- (void)stopWatchingBreakPoints;
+- (id)init
+{
+	self = [super init];
+	if (self != nil)
+	{
+		self.variables = [[NSArray alloc] init];
+		self.beginningAddressStringValue = @"";
+		self.endingAddressStringValue = @"";
+		self.searchValueString = @"";
+		self.functionTypeTag = ZGEquals;
+		self.selectedDatatypeTag = ZGInt32;
+	}
+	return self;
+}
 
 @end

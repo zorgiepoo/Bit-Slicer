@@ -47,6 +47,8 @@
 		7787C4D9137BB59200BFF606 /* ZGStatusBarRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4D8137BB59100BFF606 /* ZGStatusBarRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7787C4EE137C556000BFF606 /* ZGLineCountingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4ED137C556000BFF606 /* ZGLineCountingView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7787C4F2137C5A8300BFF606 /* ZGLineCountingRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		7795F5AB17B5DDC10094E334 /* ZGDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7795F5AA17B5DDC10094E334 /* ZGDocumentWindowController.m */; };
+		7795F5AE17B5F3C90094E334 /* ZGDocumentData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7795F5AD17B5F3C90094E334 /* ZGDocumentData.m */; };
 		77A52D7F16F54F1F00347F8E /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77A52D7E16F54F1F00347F8E /* ZGSearchResults.m */; };
 		77CA284E16A7B5D500F3B54B /* ZGRegister.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CA284D16A7B5D500F3B54B /* ZGRegister.m */; };
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
@@ -193,6 +195,10 @@
 		7787C4F0137C5A8200BFF606 /* ZGLineCountingRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGLineCountingRepresenter.h; sourceTree = "<group>"; };
 		7787C4F1137C5A8200BFF606 /* ZGLineCountingRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGLineCountingRepresenter.m; sourceTree = "<group>"; };
 		778939221334308300B6AACB /* ZGMemoryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGMemoryTypes.h; sourceTree = "<group>"; };
+		7795F5A917B5DDC10094E334 /* ZGDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDocumentWindowController.h; sourceTree = "<group>"; };
+		7795F5AA17B5DDC10094E334 /* ZGDocumentWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDocumentWindowController.m; sourceTree = "<group>"; };
+		7795F5AC17B5F3C90094E334 /* ZGDocumentData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDocumentData.h; sourceTree = "<group>"; };
+		7795F5AD17B5F3C90094E334 /* ZGDocumentData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDocumentData.m; sourceTree = "<group>"; };
 		77A52D7D16F54F1F00347F8E /* ZGSearchResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGSearchResults.h; sourceTree = "<group>"; };
 		77A52D7E16F54F1F00347F8E /* ZGSearchResults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGSearchResults.m; sourceTree = "<group>"; };
 		77CA284C16A7B5D500F3B54B /* ZGRegister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRegister.h; sourceTree = "<group>"; };
@@ -571,6 +577,10 @@
 			children = (
 				770930B015B9070B009705A6 /* ZGDocument.h */,
 				770930B115B9070B009705A6 /* ZGDocument.m */,
+				7795F5AC17B5F3C90094E334 /* ZGDocumentData.h */,
+				7795F5AD17B5F3C90094E334 /* ZGDocumentData.m */,
+				7795F5A917B5DDC10094E334 /* ZGDocumentWindowController.h */,
+				7795F5AA17B5DDC10094E334 /* ZGDocumentWindowController.m */,
 				770930B915BA905F009705A6 /* ZGDocumentSearchController.h */,
 				770930BA15BA9060009705A6 /* ZGDocumentSearchController.m */,
 				770930B615BA7635009705A6 /* ZGDocumentTableController.h */,
@@ -766,6 +776,7 @@
 				776346FE16880E68003D01C9 /* DataInspectorRepresenter.m in Sources */,
 				77DC413217AF219E000626A2 /* _DDVariableExpression.m in Sources */,
 				77329B58168CFE6C007DCAE2 /* ZGDebuggerController.m in Sources */,
+				7795F5AE17B5F3C90094E334 /* ZGDocumentData.m in Sources */,
 				77329B6D168D0DF9007DCAE2 /* decode.c in Sources */,
 				77329B6E168D0DF9007DCAE2 /* input.c in Sources */,
 				77DC413417AF219E000626A2 /* DDExpression.m in Sources */,
@@ -803,6 +814,7 @@
 				77DC412917AF219E000626A2 /* _DDFunctionTerm.m in Sources */,
 				77FF509616EC0F7C0005915D /* ZGRegion.m in Sources */,
 				7710477316F197B300F5BC2A /* ZGRunningProcessObserver.m in Sources */,
+				7795F5AB17B5DDC10094E334 /* ZGDocumentWindowController.m in Sources */,
 				77A52D7F16F54F1F00347F8E /* ZGSearchResults.m in Sources */,
 				77DC413B17AF219E000626A2 /* NSString+DDMathParsing.m in Sources */,
 			);

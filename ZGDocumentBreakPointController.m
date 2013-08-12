@@ -33,24 +33,25 @@
  */
 
 #import "ZGDocumentBreakPointController.h"
-#import "ZGDocument.h"
 #import "ZGVariableController.h"
 #import "ZGAppController.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGDocumentTableController.h"
+#import "ZGDocumentWindowController.h"
 #import "ZGDebuggerController.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
 #import "ZGSearchProgress.h"
 #import "ZGInstruction.h"
 #import "ZGBreakPoint.h"
+#import "ZGDocumentData.h"
 
 @interface ZGDocumentBreakPointController ()
 
-@property (assign) IBOutlet ZGDocument *document;
 @property (strong, nonatomic) ZGProcess *watchProcess;
 @property (strong, nonatomic) NSMutableArray *foundBreakPointAddresses;
 @property (assign, nonatomic) NSUInteger variableInsertionIndex;
+@property (assign, nonatomic) ZGDocumentWindowController *windowController;
 
 @end
 
@@ -58,7 +59,7 @@
 
 #pragma mark Birth & Death
 
-- (id)init
+- (id)initWithWindowController:(ZGDocumentWindowController *)windowController
 {
 	self = [super init];
 	if (self)
@@ -69,6 +70,7 @@
 		 name:NSApplicationWillTerminateNotification
 		 object:nil];
 		
+		self.windowController = windowController;
 		self.foundBreakPointAddresses = [[NSMutableArray alloc] init];
 	}
 	return self;
@@ -98,14 +100,14 @@
 - (void)cancelTask
 {
 	[self stopWatchingBreakPoints];
-	self.document.generalStatusTextField.stringValue = @"";
+	self.windowController.generalStatusTextField.stringValue = @"";
 	
-	[self.document.searchingProgressIndicator stopAnimation:nil];
-	self.document.searchingProgressIndicator.indeterminate = NO;
+	[self.windowController.searchingProgressIndicator stopAnimation:nil];
+	self.windowController.searchingProgressIndicator.indeterminate = NO;
 	
 	[self.foundBreakPointAddresses removeAllObjects];
 	
-	[self.document.searchController resumeFromTaskAndMakeSearchFieldFirstResponder:NO];
+	[self.windowController.searchController resumeFromTaskAndMakeSearchFieldFirstResponder:NO];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -144,26 +146,26 @@
 		
 		if (instruction)
 		{
-			if (self.variableInsertionIndex >= self.document.watchVariablesArray.count)
+			if (self.variableInsertionIndex >= self.windowController.documentData.variables.count)
 			{
 				self.variableInsertionIndex = 0;
 			}
 			
-			[self.document.variableController addVariables:@[instruction.variable] atRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex]];
-			[self.document.tableController.watchVariablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex] byExtendingSelection:NO];
-			[self.document.tableController.watchVariablesTableView scrollRowToVisible:self.variableInsertionIndex];
-			[self.document.watchWindow makeFirstResponder:self.document.tableController.watchVariablesTableView];
+			[self.windowController.variableController addVariables:@[instruction.variable] atRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex]];
+			[self.windowController.tableController.variablesTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:self.variableInsertionIndex] byExtendingSelection:NO];
+			[self.windowController.tableController.variablesTableView scrollRowToVisible:self.variableInsertionIndex];
+			[self.windowController.window makeFirstResponder:self.windowController.tableController.variablesTableView];
 			
 			self.variableInsertionIndex++;
 			
 			NSString *addedInstructionStatus = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", instruction.variable.sizeStringValue, instruction.variable.addressStringValue];
-			self.document.generalStatusTextField.stringValue = [addedInstructionStatus stringByAppendingString:@" Stop when done."];
+			self.windowController.generalStatusTextField.stringValue = [addedInstructionStatus stringByAppendingString:@" Stop when done."];
 			
 			if (NSClassFromString(@"NSUserNotification"))
 			{
 				NSUserNotification *userNotification = [[NSUserNotification alloc] init];
 				userNotification.title = @"Found Instruction";
-				userNotification.subtitle = self.document.currentProcess.name;
+				userNotification.subtitle = self.windowController.currentProcess.name;
 				userNotification.informativeText = addedInstructionStatus;
 				[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 			}
@@ -177,23 +179,23 @@
 
 - (void)requestVariableWatch:(ZGWatchPointType)watchPointType
 {
-	ZGVariable *variable = [[[self.document selectedVariables] objectAtIndex:0] copy];
+	ZGVariable *variable = [[[self.windowController selectedVariables] objectAtIndex:0] copy];
 	ZGBreakPoint *breakPoint = nil;
 	
-	if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self.document.currentProcess watchPointType:watchPointType delegate:self getBreakPoint:&breakPoint])
+	if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self.windowController.currentProcess watchPointType:watchPointType delegate:self getBreakPoint:&breakPoint])
 	{
 		self.variableInsertionIndex = 0;
 		
-		[self.document.searchController prepareTaskWithEscapeTitle:@"Stop"];
-		[self.document.searchController.searchProgress clear];
-		self.document.searchController.searchProgress.progressType = ZGSearchProgressMemoryWatching;
+		[self.windowController.searchController prepareTaskWithEscapeTitle:@"Stop"];
+		[self.windowController.searchController.searchProgress clear];
+		self.windowController.searchController.searchProgress.progressType = ZGSearchProgressMemoryWatching;
 		
-		self.document.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until instruction %@ %@ (%lld byte%@)", watchPointType == ZGWatchPointWrite ? @"writes" : @"reads or writes", variable.addressStringValue, breakPoint.watchSize, breakPoint.watchSize != 1 ? @"s" : @""];
+		self.windowController.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until instruction %@ %@ (%lld byte%@)", watchPointType == ZGWatchPointWrite ? @"writes" : @"reads or writes", variable.addressStringValue, breakPoint.watchSize, breakPoint.watchSize != 1 ? @"s" : @""];
 		
-		self.document.searchingProgressIndicator.indeterminate = YES;
-		[self.document.searchingProgressIndicator startAnimation:nil];
+		self.windowController.searchingProgressIndicator.indeterminate = YES;
+		[self.windowController.searchingProgressIndicator startAnimation:nil];
 		
-		self.watchProcess = self.document.currentProcess;
+		self.watchProcess = self.windowController.currentProcess;
 	}
 	else
 	{

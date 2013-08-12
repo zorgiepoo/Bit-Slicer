@@ -39,12 +39,17 @@
 @class ZGSearchData;
 @class ZGSearchProgress;
 @class ZGSearchResults;
+@class ZGDocumentWindowController;
+@class ZGDocumentData;
 
 @interface ZGDocumentSearchController : NSObject
 
-@property (readonly, strong, nonatomic) ZGSearchData *searchData;
+@property (assign, nonatomic) ZGDocumentData *documentData;
+@property (assign, nonatomic) ZGSearchData *searchData;
 @property (strong, nonatomic) ZGSearchResults *searchResults;
 @property (readonly, strong, nonatomic) ZGSearchProgress *searchProgress;
+
+- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
 - (BOOL)canStartTask;
 - (BOOL)canCancelTask;

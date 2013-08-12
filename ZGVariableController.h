@@ -38,7 +38,11 @@
 
 #define SIGNED_BUTTON_CELL_TAG 0
 
+@class ZGDocumentWindowController;
+
 @interface ZGVariableController : NSObject
+
+- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
 - (void)freezeVariables;
 
@@ -61,5 +65,15 @@
 - (void)editVariablesValueRequest;
 - (void)editVariablesAddressRequest;
 - (void)editVariablesSizeRequest;
+
+- (void)editVariablesValueCancelButton;
+- (void)editVariablesValueOkayButton;
+
+- (void)editVariablesAddressCancelButton;
+- (void)editVariablesAddressOkayButton;
+
+- (void)editVariablesSizeCancelButton;
+- (void)editVariablesSizeOkayButton;
+
 
 @end

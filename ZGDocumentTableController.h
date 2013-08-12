@@ -36,10 +36,14 @@
 
 #define MAX_TABLE_VIEW_ITEMS ((NSUInteger)1000)
 
+@class ZGDocumentWindowController;
+
 @interface ZGDocumentTableController : NSObject <NSTableViewDelegate>
 
-@property (assign) IBOutlet NSTableView *watchVariablesTableView;
 @property (readwrite, nonatomic) BOOL shouldIgnoreTableViewSelectionChange;
+@property (assign, nonatomic) NSTableView *variablesTableView;
+
+- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
 - (void)updateVariableValuesInRange:(NSRange)variableRange;
 
