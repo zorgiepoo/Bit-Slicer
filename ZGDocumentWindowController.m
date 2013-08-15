@@ -370,6 +370,10 @@
 			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 			
 			[self.currentProcess markInvalid];
+			[[NSNotificationCenter defaultCenter]
+			 postNotificationName:ZGTargetProcessDiedNotification
+			 object:self.currentProcess];
+			
 			self.runningApplicationsPopUpButton.selectedItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.name];
 			
 			// Set the icon to the standard one
@@ -417,6 +421,7 @@
 				[self.currentProcess.name isEqualToString:newRunningProcess.name])
 			{
 				self.currentProcess.processID = newRunningProcess.processIdentifier;
+				
 				self.currentProcess.is64Bit = newRunningProcess.is64Bit;
 				menuItem.title = [NSString stringWithFormat:@"%@ (%d)", self.currentProcess.name, self.currentProcess.processID];
 				

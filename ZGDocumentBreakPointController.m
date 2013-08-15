@@ -86,11 +86,11 @@
 	[self stopWatchingBreakPoints];
 }
 
-#pragma mark When to Stop? Stop?
+#pragma mark When to Stop?
 
 - (void)stopWatchingBreakPoints
 {
-	if (self.watchProcess)
+	if (self.watchProcess != nil)
 	{
 		[[[ZGAppController sharedController] breakPointController] removeObserver:self];
 		self.watchProcess = nil;
@@ -110,28 +110,31 @@
 	[self.windowController.searchController resumeFromTaskAndMakeSearchFieldFirstResponder:NO];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void)watchProcessDied:(NSNotification *)notification
 {
-	if (object == self.watchProcess)
-	{
-		NSNumber *newProcessID = [change objectForKey:NSKeyValueChangeNewKey];
-		NSNumber *oldProcessID = [change objectForKey:NSKeyValueChangeOldKey];
-		
-		if (![newProcessID isEqualToNumber:oldProcessID])
-		{
-			[self cancelTask];
-		}
-	}
+	[self cancelTask];
 }
 
 - (void)setWatchProcess:(ZGProcess *)watchProcess
 {
-	NSString *keyPath = @"processID";
-	[self.watchProcess removeObserver:self forKeyPath:keyPath];
+	if (_watchProcess != nil)
+	{
+		[[NSNotificationCenter defaultCenter]
+		 removeObserver:self
+		 name:ZGTargetProcessDiedNotification
+		 object:watchProcess];
+	}
 	
 	_watchProcess = watchProcess;
 	
-	[self.watchProcess addObserver:self forKeyPath:keyPath options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew context:NULL];
+	if (_watchProcess != nil)
+	{
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(watchProcessDied:)
+		 name:ZGTargetProcessDiedNotification
+		 object:watchProcess];
+	}
 }
 
 #pragma mark Handling Break Points

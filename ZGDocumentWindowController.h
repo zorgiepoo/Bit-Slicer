@@ -44,6 +44,8 @@
 @class ZGDocumentData;
 @class ZGSearchData;
 
+#define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
+
 @interface ZGDocumentWindowController : NSWindowController
 
 @property (assign) IBOutlet NSTableView *variablesTableView;
