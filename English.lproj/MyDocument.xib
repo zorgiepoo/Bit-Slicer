@@ -371,7 +371,7 @@ DQ
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                             </tableHeaderCell>
-                                            <popUpButtonCell key="dataCell" type="bevel" title="Byte Array" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="bezel" tag="9" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="100677" id="100435">
+                                            <popUpButtonCell key="dataCell" type="bevel" title="Script" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="bezel" tag="10" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="zHe-98-zKT" id="100435">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <menu key="menu" title="OtherViews" id="100436">
@@ -384,14 +384,15 @@ DQ
                                                         <menuItem title="Double" tag="5" id="100442"/>
                                                         <menuItem title="UTF8" tag="6" id="100443"/>
                                                         <menuItem title="UTF16" tag="7" id="100444"/>
-                                                        <menuItem title="Byte Array" state="on" tag="9" id="100677"/>
+                                                        <menuItem title="Byte Array" tag="9" id="100677"/>
                                                         <menuItem title="Pointer" tag="8" id="100483"/>
+                                                        <menuItem title="Script" state="on" tag="10" id="zHe-98-zKT"/>
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
                                         </tableColumn>
-                                        <tableColumn identifier="shouldBeSearched" width="50" minWidth="50" maxWidth="50" id="100125">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Search">
+                                        <tableColumn identifier="enabled" width="50" minWidth="50" maxWidth="50" id="100125">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Enabled">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>

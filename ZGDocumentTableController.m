@@ -313,26 +313,29 @@
 {
 	if (tableView == self.variablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
 	{
+		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
-			return [[self.documentData.variables objectAtIndex:rowIndex] name];
+			return variable.name;
 		}
 		else if ([tableColumn.identifier isEqualToString:@"address"])
 		{
-			return [[self.documentData.variables objectAtIndex:rowIndex] addressStringValue];
+			if (variable.type != ZGScript)
+			{
+				return variable.addressStringValue;
+			}
 		}
 		else if ([tableColumn.identifier isEqualToString:@"value"])
 		{
-			return [[self.documentData.variables objectAtIndex:rowIndex] stringValue];
+			return variable.stringValue;
 		}
-		else if ([tableColumn.identifier isEqualToString:@"shouldBeSearched"])
+		else if ([tableColumn.identifier isEqualToString:@"enabled"])
 		{
-			return @([[self.documentData.variables objectAtIndex:rowIndex] shouldBeSearched]);
+			return @(variable.enabled);
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
-			ZGVariableType type = [(ZGVariable *)[self.documentData.variables objectAtIndex:rowIndex] type];
-			return @([[tableColumn dataCell] indexOfItemWithTag:type]);
+			return @([tableColumn.dataCell indexOfItemWithTag:variable.type]);
 		}
 	}
 	
@@ -343,37 +346,38 @@
 {
 	if (tableView == self.variablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
 	{
+		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
 			[self.windowController.variableController
-			 changeVariable:[self.documentData.variables objectAtIndex:rowIndex]
+			 changeVariable:variable
 			 newName:object];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"address"])
 		{
 			[self.windowController.variableController
-			 changeVariable:[self.documentData.variables objectAtIndex:rowIndex]
+			 changeVariable:variable
 			 newAddress:object];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"value"])
 		{
 			[self.windowController.variableController
-			 changeVariable:[self.documentData.variables objectAtIndex:rowIndex]
+			 changeVariable:variable
 			 newValue:object
 			 shouldRecordUndo:YES];
 		}
-		else if ([tableColumn.identifier isEqualToString:@"shouldBeSearched"])
+		else if ([tableColumn.identifier isEqualToString:@"enabled"])
 		{
 			[self.windowController.variableController
-			 changeVariableShouldBeSearched:[object boolValue]
+			 changeVariableEnabled:[object boolValue]
 			 rowIndexes:self.windowController.selectedVariableIndexes];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
 			[self.windowController.variableController
-			 changeVariable:[self.documentData.variables objectAtIndex:rowIndex]
+			 changeVariable:variable
 			 newType:(ZGVariableType)[[[tableColumn.dataCell itemArray] objectAtIndex:[object unsignedIntegerValue]] tag]
-			 newSize:[(ZGVariable *)[self.documentData.variables objectAtIndex:rowIndex] size]];
+			 newSize:variable.size];
 		}
 	}
 }
@@ -398,47 +402,54 @@
 
 - (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+	if (rowIndex < 0 || (NSUInteger)rowIndex >= self.documentData.variables.count)
+	{
+		return NO;
+	}
+	
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
+		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
+		
+		if (variable == nil)
+		{
+			return NO;
+		}
+		
+		if (variable.type == ZGScript)
+		{
+			return NO;
+		}
+		
 		if ((![self.windowController.searchController canStartTask] && self.windowController.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || !self.windowController.currentProcess.valid)
 		{
 			NSBeep();
 			return NO;
 		}
-        
-		if (rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
+		
+		ZGMemoryProtection memoryProtection = 0;
+		ZGMemoryAddress memoryAddress = variable.address;
+		ZGMemorySize memorySize = variable.size;
+		
+		if (ZGMemoryProtectionInRegion(self.windowController.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 		{
-			ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
-			if (!variable)
+			// if the variable is within a single memory region and the memory region is not readable, then don't allow the variable to be writable
+			// if it is not writable, our value changing methods will try to change the protection attributes before modifying the data
+			if (memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_READ))
 			{
+				NSBeep();
 				return NO;
-			}
-			
-			ZGMemoryProtection memoryProtection = 0;
-			ZGMemoryAddress memoryAddress = [variable address];
-			ZGMemorySize memorySize = [variable size];
-			
-			if (ZGMemoryProtectionInRegion(self.windowController.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
-			{
-				// if the variable is within a single memory region and the memory region is not readable, then don't allow the variable to be writable
-				// if it is not writable, our value changing methods will try to change the protection attributes before modifying the data
-				if (memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_READ))
-				{
-					NSBeep();
-					return NO;
-				}
 			}
 		}
 	}
 	else if ([tableColumn.identifier isEqualToString:@"address"])
 	{
-		if (rowIndex < 0 || (NSUInteger)rowIndex >= self.documentData.variables.count)
+		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
+		if (variable.type == ZGScript)
 		{
 			return NO;
 		}
-		
-		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
-		if (variable.isPointer)
+		else if (variable.isPointer)
 		{
 			[self.windowController editVariablesAddress:nil];
 			return NO;

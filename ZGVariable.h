@@ -43,7 +43,7 @@ extern NSString *ZGVariablePboardType;
 	NSString *_addressStringValue;
 }
 
-@property (assign, nonatomic) BOOL shouldBeSearched;
+@property (assign, nonatomic) BOOL enabled;
 @property (copy, nonatomic) NSString *addressFormula;
 @property (readwrite, nonatomic) ZGVariableType type;
 @property (readwrite, nonatomic) BOOL isFrozen;
@@ -63,7 +63,7 @@ extern NSString *ZGVariablePboardType;
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name;
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name shouldBeSearched:(BOOL)shouldBeSearched;
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name enabled:(BOOL)enabled;
 
 - (void)updateStringValue;
 

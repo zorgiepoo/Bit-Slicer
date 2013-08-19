@@ -156,7 +156,7 @@ typedef BOOL (^search_for_data_t)(ZGSearchData *searchData, void *variableData, 
 	BOOL goingToNarrowDownSearches = NO;
 	for (ZGVariable *variable in self.documentData.variables)
 	{
-		if (variable.shouldBeSearched && variable.type == dataType)
+		if (variable.enabled && variable.type == dataType)
 		{
 			goingToNarrowDownSearches = YES;
 			break;
@@ -489,7 +489,7 @@ typedef BOOL (^search_for_data_t)(ZGSearchData *searchData, void *variableData, 
 	if (!self.searchProgress.shouldCancelSearch && self.documentData.variables.count <= MAX_TABLE_VIEW_ITEMS)
 	{
 		NSArray *filteredVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
-			return !variable.shouldBeSearched;
+			return !variable.enabled;
 		}];
 		
 		if (filteredVariables.count == 1)
@@ -857,7 +857,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 	}];
 	
 	NSArray *searchedVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable){
-		return !variable.shouldBeSearched;
+		return !variable.enabled;
 	}];
 	
 	self.searchProgress.initiatedSearch = YES;
@@ -1022,9 +1022,9 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 	// This is if the variable's data type does not match, or if the variable is frozen
 	for (ZGVariable *variable in self.documentData.variables)
 	{
-		if (variable.shouldBeSearched && (variable.type != dataType || variable.isFrozen))
+		if (variable.enabled && (variable.type != dataType || variable.isFrozen))
 		{
-			variable.shouldBeSearched = NO;
+			variable.enabled = NO;
 		}
 	}
 	
@@ -1040,10 +1040,10 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 		{
 			if (variable.isFrozen || variable.type != dataType)
 			{
-				variable.shouldBeSearched = NO;
+				variable.enabled = NO;
 			}
 			
-			if (!variable.shouldBeSearched)
+			if (!variable.enabled)
 			{
 				[notSearchedVariables addObject:variable];
 			}

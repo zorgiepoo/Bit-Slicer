@@ -43,7 +43,8 @@ typedef enum
 	ZGUTF8String,
 	ZGUTF16String,
 	ZGPointer,
-    ZGByteArray
+    ZGByteArray,
+	ZGScript
 } ZGVariableType;
 
 typedef enum

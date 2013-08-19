@@ -47,7 +47,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 #define ZGAddressKey @"ZGAddressKey"
 #define ZGSizeKey	 @"ZGSizeKey"
-#define ZGShouldBeSearchedKey @"ZGShouldBeSearchedKey"
+#define ZGEnabledKey @"ZGShouldBeSearchedKey" // for backwards compatibility
 #define ZGIsFrozenKey @"ZGIsFrozenKey"
 #define ZGTypeKey @"ZGTypeKey"
 #define ZGQualifierKey @"ZGQualifierKey"
@@ -68,8 +68,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	 forKey:ZGSizeKey];
 	
 	[coder
-	 encodeBool:self.shouldBeSearched
-	 forKey:ZGShouldBeSearchedKey];
+	 encodeBool:self.enabled
+	 forKey:ZGEnabledKey];
 	
 	[coder
 	 encodeBool:self.isFrozen
@@ -95,7 +95,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	 encodeObject:self.addressFormula
 	 forKey:ZGAddressFormulaKey];
 	
-	if (self.value)
+	if (self.value != nil)
 	{
 		[coder
 		 encodeBytes:self.value
@@ -103,7 +103,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		 forKey:ZGValueKey];
 	}
 	
-	if (self.freezeValue)
+	if (self.freezeValue != nil)
 	{
 		[coder
 		 encodeBytes:self.freezeValue
@@ -118,7 +118,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	[self setAddressStringValue:nil];
 	
 	self.size = [coder decodeInt64ForKey:ZGSizeKey];
-	self.shouldBeSearched = [coder decodeBoolForKey:ZGShouldBeSearchedKey];
+	self.enabled = [coder decodeBoolForKey:ZGEnabledKey];
 	self.isFrozen = [coder decodeBoolForKey:ZGIsFrozenKey];
 	self.type = [coder decodeInt32ForKey:ZGTypeKey];
 	self.qualifier = [coder decodeInt32ForKey:ZGQualifierKey];
@@ -127,7 +127,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	[self setAddressFormula:[coder decodeObjectForKey:ZGAddressFormulaKey]];
 	
 	NSString *variableName = [coder decodeObjectForKey:ZGNameKey];
-	[self setName:variableName ? variableName : @""];
+	[self setName:variableName != nil ? variableName : @""];
 	
 	NSUInteger returnedLength = 0;
 	const uint8_t *buffer =
@@ -181,6 +181,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			size = 8;
 			break;
 		case ZGByteArray:
+		case ZGScript:
 			// Use an arbitrary size, anything is better than 0
 			size = 4;
 			break;
@@ -194,7 +195,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return size;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name shouldBeSearched:(BOOL)shouldBeSearched
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name enabled:(BOOL)enabled
 {
 	if ((self = [super init]))
 	{
@@ -211,14 +212,14 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		
 		self.address = address;
 		self.qualifier = qualifier;
-		self.shouldBeSearched = shouldBeSearched;
+		self.enabled = enabled;
 		
-		if (value)
+		if (value != nil)
 		{
 			self.value = value;
 		}
 		
-		if (name)
+		if (name != nil)
 		{
 			self.name = name;
 		}
@@ -229,7 +230,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name
 {
-	return [self initWithValue:value size:size address:address type:aType qualifier:qualifier pointerSize:pointerSize name:name shouldBeSearched:YES];
+	return [self initWithValue:value size:size address:address type:aType qualifier:qualifier pointerSize:pointerSize name:name enabled:YES];
 }
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize
@@ -412,6 +413,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				self.stringValue = byteString;
 				break;
 			}
+			case ZGScript:
+				break;
 		}
 	}
 	else

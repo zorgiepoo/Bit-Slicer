@@ -60,7 +60,7 @@
 - (void)changeVariable:(ZGVariable *)variable newAddress:(NSString *)newAddress;
 - (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size;
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag;
-- (void)changeVariableShouldBeSearched:(BOOL)shouldBeSearched rowIndexes:(NSIndexSet *)rowIndexes;
+- (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
 
 - (void)editVariablesValueRequest;
 - (void)editVariablesAddressRequest;

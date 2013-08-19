@@ -127,7 +127,7 @@
 #define REGISTER_DEFAULT_TYPE(registerName) [[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES] objectForKey:@(#registerName)]
 
 #define ADD_REGISTER(registerName, variableType, structureType) \
-[newRegisters addObject:[[ZGRegister alloc] initWithVariable:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:REGISTER_DEFAULT_TYPE(registerName) ? [REGISTER_DEFAULT_TYPE(registerName) intValue] : variableType qualifier:self.qualifier pointerSize:registerSize name:@(#registerName) shouldBeSearched:NO]]]
+[newRegisters addObject:[[ZGRegister alloc] initWithVariable:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:REGISTER_DEFAULT_TYPE(registerName) ? [REGISTER_DEFAULT_TYPE(registerName) intValue] : variableType qualifier:self.qualifier pointerSize:registerSize name:@(#registerName) enabled:NO]]]
 
 #define ADD_REGISTER_32(registerName, variableType) ADD_REGISTER(registerName, variableType, ts32)
 #define ADD_REGISTER_64(registerName, variableType) ADD_REGISTER(registerName, variableType, ts64)
@@ -361,7 +361,7 @@
 						 qualifier:theRegister.variable.qualifier
 						 pointerSize:self.breakPoint.process.pointerSize
 						 name:theRegister.variable.name
-						 shouldBeSearched:NO]];
+						 enabled:NO]];
 				}
 				free(newValue);
 			}

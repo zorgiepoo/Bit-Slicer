@@ -263,7 +263,7 @@
 		 qualifier:qualifier
 		 pointerSize:self.windowController.currentProcess.pointerSize
 		 name:@""
-		 shouldBeSearched:NO];
+		 enabled:NO];
 	
 	[self
 	 addVariables:@[variable]
@@ -491,7 +491,7 @@
 			variable.size = [stringObject length] * sizeof(unichar);
 			writeSize = variable.size;
 			
-			if (variable.size)
+			if (variable.size > 0)
 			{
 				utf16Value = malloc((size_t)variable.size);
 				newValue = utf16Value;
@@ -541,7 +541,7 @@
 			byteArrayValue = malloc((size_t)variable.size);
 			newValue = byteArrayValue;
 			
-			if (newValue)
+			if (newValue != nil)
 			{
 				unsigned char *valuePtr = newValue;
 				writeSize = 0;
@@ -568,9 +568,11 @@
 			
 			break;
 		}
+		case ZGScript:
+			break;
 	}
 	
-	if (newValue)
+	if (newValue != nil)
 	{	
 		if (variable.isFrozen)
 		{
@@ -642,12 +644,12 @@
 	free(byteArrayValue);
 }
 
-- (void)changeVariableShouldBeSearched:(BOOL)shouldBeSearched rowIndexes:(NSIndexSet *)rowIndexes
+- (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes
 {
 	NSUInteger currentIndex = rowIndexes.firstIndex;
 	while (currentIndex != NSNotFound)
 	{
-		[[self.documentData.variables objectAtIndex:currentIndex] setShouldBeSearched:shouldBeSearched];
+		[[self.documentData.variables objectAtIndex:currentIndex] setEnabled:enabled];
 		currentIndex = [rowIndexes indexGreaterThanIndex:currentIndex];
 	}
 	
@@ -661,7 +663,7 @@
 	
 	self.windowController.undoManager.actionName = [NSString stringWithFormat:@"Search Variable%@ Change", (rowIndexes.count > 1) ? @"s" : @""];
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
-	 changeVariableShouldBeSearched:!shouldBeSearched
+	 changeVariableEnabled:!enabled
 	 rowIndexes:rowIndexes];
 }
 

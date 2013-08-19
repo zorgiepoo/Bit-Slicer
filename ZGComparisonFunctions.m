@@ -415,6 +415,8 @@ comparison_function_t getEqualsComparisonFunction(ZGVariableType dataType, BOOL 
 		case ZGPointer:
 			comparisonFunction = is64Bit ? ZGInt64Equals : ZGInt32Equals;
 			break;
+		case ZGScript:
+			break;
 	}
 	
 	return comparisonFunction;
@@ -456,6 +458,8 @@ comparison_function_t getNotEqualsComparisonFunction(ZGVariableType dataType, BO
 		case ZGPointer:
 			comparisonFunction = is64Bit ? ZGInt64NotEquals : ZGInt32NotEquals;
 			break;
+		case ZGScript:
+			break;
 	}
 	
 	return comparisonFunction;
@@ -493,6 +497,8 @@ comparison_function_t getLessThanComparisonFunction(ZGVariableType dataType, BOO
 			break;
 		case ZGPointer:
 			comparisonFunction = is64Bit ? ZGInt64LessThan : ZGInt32LessThan;
+			break;
+		case ZGScript:
 			break;
 	}
 	
@@ -532,6 +538,8 @@ comparison_function_t getGreaterThanComparisonFunction(ZGVariableType dataType, 
 		case ZGPointer:
 			comparisonFunction = is64Bit ? ZGInt64GreaterThan : ZGInt32GreaterThan;
 			break;
+		case ZGScript:
+			break;
 	}
 	
 	return comparisonFunction;
@@ -570,6 +578,8 @@ comparison_function_t getEqualsStoredPlusComparisonFunction(ZGVariableType dataT
 		case ZGPointer:
 			comparisonFunction = is64Bit ? ZGInt64EqualsPlus : ZGInt32EqualsPlus;
 			break;
+		case ZGScript:
+			break;
 	}
 	
 	return comparisonFunction;
@@ -607,6 +617,8 @@ comparison_function_t getNotEqualsStoredPlusComparisonFunction(ZGVariableType da
 			break;
 		case ZGPointer:
 			comparisonFunction = is64Bit ? ZGInt64NotEqualsPlus : ZGInt32NotEqualsPlus;
+			break;
+		case ZGScript:
 			break;
 	}
 	

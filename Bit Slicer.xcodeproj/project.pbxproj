@@ -387,12 +387,6 @@
 				8D15AC360486D014006FF6A4 /* Bit_Slicer-Info.plist */,
 				77F82C2C16D0837B0038AC0A /* Credits.rtf */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
-				1DDD58280DA1D0D100B32029 /* MyDocument.xib */,
-				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
-				775FCB2811719E4A000054FB /* Preferences.xib */,
-				770EA822137B6FDE007FB85A /* ZGMemoryViewerController.xib */,
-				7763470316881165003D01C9 /* DataInspectorView.xib */,
-				77FF507516E9A4250005915D /* ZGDebuggerController.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -434,6 +428,7 @@
 				77329B74168D0E16007DCAE2 /* libudis86 */,
 				77329B55168CFE6B007DCAE2 /* ZGDebuggerController.h */,
 				77329B56168CFE6C007DCAE2 /* ZGDebuggerController.m */,
+				77FF507516E9A4250005915D /* ZGDebuggerController.xib */,
 				77D38D4016A1FA5A00D2446A /* ZGDisassemblerObject.h */,
 				77D38D4116A1FA5A00D2446A /* ZGDisassemblerObject.m */,
 				77329B75168D14CB007DCAE2 /* ZGInstruction.h */,
@@ -480,6 +475,8 @@
 			children = (
 				770EA81F137B6E6D007FB85A /* ZGMemoryViewerController.h */,
 				770EA820137B6E6D007FB85A /* ZGMemoryViewerController.m */,
+				770EA822137B6FDE007FB85A /* ZGMemoryViewerController.xib */,
+				7763470316881165003D01C9 /* DataInspectorView.xib */,
 				77D5AEB3137C84CE00026388 /* ZGVerticalScrollerRepresenter.h */,
 				77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */,
 				7787C4D7137BB59100BFF606 /* ZGStatusBarRepresenter.h */,
@@ -577,6 +574,7 @@
 			children = (
 				770930B015B9070B009705A6 /* ZGDocument.h */,
 				770930B115B9070B009705A6 /* ZGDocument.m */,
+				1DDD58280DA1D0D100B32029 /* MyDocument.xib */,
 				7795F5AC17B5F3C90094E334 /* ZGDocumentData.h */,
 				7795F5AD17B5F3C90094E334 /* ZGDocumentData.m */,
 				7795F5A917B5DDC10094E334 /* ZGDocumentWindowController.h */,
@@ -650,8 +648,10 @@
 			children = (
 				775FCB1011719DF6000054FB /* ZGAppController.h */,
 				775FCB1111719DF6000054FB /* ZGAppController.m */,
+				1DDD582A0DA1D0D100B32029 /* MainMenu.xib */,
 				775FCB1411719DF6000054FB /* ZGPreferencesController.h */,
 				775FCB1511719DF6000054FB /* ZGPreferencesController.m */,
+				775FCB2811719E4A000054FB /* Preferences.xib */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
