@@ -75,6 +75,8 @@
 
 #define ATOS_PATH @"/usr/bin/atos"
 
+#define JUMP_REL32_INSTRUCTION_LENGTH 5
+
 @implementation ZGDebuggerController
 
 #pragma mark Birth & Death
@@ -374,7 +376,7 @@
 		}
 	}];
 	
-	if (targetRegion && address >= targetRegion.address && address <= targetRegion.address + targetRegion.size)
+	if (targetRegion != nil && address >= targetRegion.address && address <= targetRegion.address + targetRegion.size)
 	{
 		// Start an arbitrary number of bytes before our address and decode the instructions
 		// Eventually they will converge into correct offsets
@@ -419,7 +421,7 @@
 			instruction = [[ZGInstruction alloc] init];
 			instruction.text = instructionText;
 			instruction.mnemonic = instructionMnemonic;
-			ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize name:instruction.text shouldBeSearched:NO];
+			ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize name:instruction.text enabled:NO];
 			instruction.variable = variable;
 			
 			ZGFreeBytes(process.processTask, bytes, readSize);
@@ -548,7 +550,7 @@
 				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 					newInstruction.text = disassembledText;
-					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text shouldBeSearched:NO];
+					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text enabled:NO];
 					newInstruction.mnemonic = mnemonic;
 					
 					[instructionsToReplace addObject:newInstruction];
@@ -613,7 +615,7 @@
 			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 				newInstruction.text = disassembledText;
-				newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text shouldBeSearched:NO];
+				newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text enabled:NO];
 				newInstruction.mnemonic = mnemonic;
 				
 				[instructionsToAdd addObject:newInstruction];
@@ -668,7 +670,7 @@
 				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 					newInstruction.text = disassembledText;
-					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text shouldBeSearched:NO];
+					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text enabled:NO];
 					newInstruction.mnemonic = mnemonic;
 					
 					[instructionsToAdd addObject:newInstruction];
@@ -774,7 +776,7 @@
 			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *instruction = [[ZGInstruction alloc] init];
 				instruction.text = disassembledText;
-				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:instruction.text shouldBeSearched:NO];
+				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:instruction.text enabled:NO];
 				instruction.mnemonic = mnemonic;
 				
 				[newInstructions addObject:instruction];
@@ -1672,112 +1674,114 @@ END_DEBUGGER_CHANGE:
 	[self nopInstructions:[self selectedInstructions]];
 }
 
-- (IBAction)injectCode:(id)sender
+- (void)injectCode:(NSString *)codeString hookingIntoInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process
 {
-	ZGSuspendTask(self.currentProcess.processTask);
+	ZGSuspendTask(process.processTask);
 	
 	ZGMemoryAddress allocatedAddress = 0;
 	ZGMemorySize numberOfBytes = 4096;
-	if (ZGAllocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfBytes))
+	if (ZGAllocateMemory(process.processTask, &allocatedAddress, numberOfBytes))
 	{
-		//NSLog(@"Successfully allocated memory at 0x%llX", allocatedAddress);
-		
 		void *nopBuffer = malloc(numberOfBytes);
 		memset(nopBuffer, 0x90, numberOfBytes);
 		
-		if (!ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, allocatedAddress, nopBuffer, numberOfBytes))
+		if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfBytes))
 		{
 			NSLog(@"Failed to write nop buffer..");
 		}
 		
 		free(nopBuffer);
 		
-		if (!ZGProtect(self.currentProcess.processTask, allocatedAddress, numberOfBytes, VM_PROT_READ | VM_PROT_EXECUTE))
+		if (!ZGProtect(process.processTask, allocatedAddress, numberOfBytes, VM_PROT_READ | VM_PROT_EXECUTE))
 		{
 			NSLog(@"Failed to protect memory..");
 		}
 		
-		const NSUInteger JUMP_INSTRUCTION_LENGTH = 5; // JMP rel32
+		[self nopInstructions:hookedInstructions];
 		
-		NSMutableArray *instructionsToMoveOver = [[NSMutableArray alloc] init];
-		NSUInteger lengthConsumed = 0;
-		NSUInteger firstInstructionIndex = [[self selectedInstructionIndexes] firstIndex];
-		for (NSUInteger instructionIndex = firstInstructionIndex; lengthConsumed < JUMP_INSTRUCTION_LENGTH && instructionIndex < self.instructions.count; instructionIndex++)
-		{
-			ZGInstruction *instruction = [self.instructions objectAtIndex:instructionIndex];
-			[instructionsToMoveOver addObject:instruction];
-			lengthConsumed += instruction.variable.size;
-		}
+		ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
+		ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
 		
-		if (lengthConsumed >= JUMP_INSTRUCTION_LENGTH)
+		NSError *error = nil;
+		NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] usingArchitectureBits:process.pointerSize*8 error:&error];
+		
+		NSMutableData *newInstructionsData = [NSMutableData data];
+		
+		if (jumpToIslandData != nil)
 		{
-			NSMutableData *movedOverData = [[NSMutableData alloc] init];
-			for (ZGInstruction *instruction in instructionsToMoveOver)
+			ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+			
+			[self writeStringValue:variable.stringValue atAddress:firstInstruction.variable.address];
+			
+			// Make the island
+			if ([[codeString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
 			{
-				[movedOverData appendBytes:instruction.variable.value length:instruction.variable.size];
+				[newInstructionsData appendData:[self assembleInstructionText:codeString usingArchitectureBits:process.pointerSize*8 error:&error]];
 			}
 			
-			[self nopInstructions:instructionsToMoveOver];
-			
-			ZGInstruction *firstInstruction = [self.selectedInstructions objectAtIndex:0];
-			ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
-			
-			NSError *error = nil;
-			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] usingArchitectureBits:self.currentProcess.pointerSize*8 error:&error];
-			
-			if (jumpToIslandData != nil)
+			if ([newInstructionsData length] > 0)
 			{
-				ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize];
+				ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH) - (allocatedAddress + newInstructionsData.length);
 				
-				[self writeStringValue:[variable stringValue] atInstructionFromIndex:firstInstructionIndex];
-				
-				// Make the island
-				//NSString *newInstructionsText = @"sub byte [0x400625AA], 0x1";
-				NSString *newInstructionsText = @""; // TODO, allow user to inject code to his liking
-				
-				if ([[newInstructionsText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
+				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] usingArchitectureBits:process.pointerSize*8 error:&error];
+				if (jumpFromIslandData != nil)
 				{
-					NSData *newInstructionsData = [self assembleInstructionText:newInstructionsText usingArchitectureBits:self.currentProcess.pointerSize*8 error:&error];
-					if (newInstructionsData != nil)
-					{
-						[movedOverData appendData:newInstructionsData];
-					}
-					else
-					{
-						movedOverData = nil;
-						NSLog(@"Error with making new instructions from user input: %@", error);
-					}
-				}
-				
-				if (movedOverData != nil)
-				{
-					ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_INSTRUCTION_LENGTH) - (allocatedAddress + movedOverData.length);
+					[newInstructionsData appendData:jumpFromIslandData];
 					
-					NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] usingArchitectureBits:self.currentProcess.pointerSize*8 error:&error];
-					if (jumpFromIslandData != nil)
-					{
-						[movedOverData appendData:jumpFromIslandData];
-						
-						ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, allocatedAddress, movedOverData.bytes, movedOverData.length	);
-					}
-					else
-					{
-						NSLog(@"Error with jumping back from island: %@", error);
-					}
+					ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
+				}
+				else
+				{
+					NSLog(@"Error with jumping back from island: %@", error);
 				}
 			}
 			else
 			{
-				NSLog(@"Error with jumping to island: %@", error);
+				NSLog(@"Error with assembling new data (length 0)");
 			}
 		}
 		else
 		{
-			NSLog(@"Error: something went wrong with length consumed..");
+			NSLog(@"Error with jumping to island: %@", error);
 		}
 	}
 	
-	ZGResumeTask(self.currentProcess.processTask);
+	ZGResumeTask(process.processTask);
+}
+
+- (NSArray *)instructionsAtMemoryAddress:(ZGMemoryAddress)address consumingLength:(NSInteger)consumedLength inProcess:(ZGProcess *)process
+{
+	NSMutableArray *instructions = [[NSMutableArray alloc] init];
+	
+	while (consumedLength > 0)
+	{
+		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inProcess:process];
+		if (newInstruction == nil)
+		{
+			instructions = nil;
+			break;
+		}
+		[instructions addObject:newInstruction];
+		consumedLength -= newInstruction.variable.size;
+		address += newInstruction.variable.size;
+	}
+	
+	return [instructions copy];
+}
+
+- (IBAction)injectCode:(id)sender
+{
+	ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
+	NSArray *instructions = [self instructionsAtMemoryAddress:firstInstruction.variable.address consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inProcess:self.currentProcess];
+	if (instructions != nil)
+	{
+		NSString *injectedCode = [[instructions valueForKey:@"text"] componentsJoinedByString:@"\n"];
+		[self injectCode:injectedCode hookingIntoInstructions:instructions inProcess:self.currentProcess];
+	}
+	else
+	{
+		NSLog(@"Error: not enough instructions to override!");
+	}
 }
 
 #pragma mark Break Points
