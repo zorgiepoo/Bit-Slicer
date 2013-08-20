@@ -888,6 +888,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CODE_SIGN_IDENTITY = bitslicer_codesign;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -913,7 +914,7 @@
 				PRODUCT_NAME = "Bit Slicer";
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.8;
 				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -929,6 +930,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -950,7 +952,7 @@
 				);
 				PRODUCT_NAME = "Bit Slicer";
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.8;
 				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -975,6 +977,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.8;
+				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -989,6 +992,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx10.8;
+				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};
