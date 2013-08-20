@@ -1686,51 +1686,55 @@ END_DEBUGGER_CHANGE:
 
 - (void)injectCode:(NSString *)codeString hookingIntoInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process
 {
-	ZGSuspendTask(process.processTask);
+	NSMutableData *newInstructionsData = [NSMutableData data];
+	NSError *error = nil;
 	
-	ZGMemoryAddress allocatedAddress = 0;
-	ZGMemorySize numberOfBytes = 4096;
-	if (ZGAllocateMemory(process.processTask, &allocatedAddress, numberOfBytes))
+	// Assemble the new code
+	if ([[codeString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
 	{
-		void *nopBuffer = malloc(numberOfBytes);
-		memset(nopBuffer, NOP_VALUE, numberOfBytes);
+		[newInstructionsData appendData:[self assembleInstructionText:codeString usingArchitectureBits:process.pointerSize*8 error:&error]];
+	}
+	
+	if (error != nil || newInstructionsData.length == 0)
+	{
+		NSLog(@"An error occured with assembling the new instructions: %@", error);
+	}
+	else
+	{
+		ZGSuspendTask(process.processTask);
 		
-		if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfBytes))
+		ZGMemoryAddress allocatedAddress = 0;
+		ZGMemorySize numberOfBytes = 4096;
+		if (ZGAllocateMemory(process.processTask, &allocatedAddress, numberOfBytes))
 		{
-			NSLog(@"Error: Failed to write nop buffer..");
-		}
-		
-		free(nopBuffer);
-		
-		if (!ZGProtect(process.processTask, allocatedAddress, numberOfBytes, VM_PROT_READ | VM_PROT_EXECUTE))
-		{
-			NSLog(@"Error: Failed to protect memory..");
-		}
-		
-		[self nopInstructions:hookedInstructions];
-		
-		ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
-		ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
-		
-		NSError *error = nil;
-		NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] usingArchitectureBits:process.pointerSize*8 error:&error];
-		
-		NSMutableData *newInstructionsData = [NSMutableData data];
-		
-		if (jumpToIslandData != nil)
-		{
-			ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+			void *nopBuffer = malloc(numberOfBytes);
+			memset(nopBuffer, NOP_VALUE, numberOfBytes);
 			
-			[self writeStringValue:variable.stringValue atAddress:firstInstruction.variable.address];
-			
-			// Make the island
-			if ([[codeString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
+			if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfBytes))
 			{
-				[newInstructionsData appendData:[self assembleInstructionText:codeString usingArchitectureBits:process.pointerSize*8 error:&error]];
+				NSLog(@"Error: Failed to write nop buffer..");
 			}
 			
-			if ([newInstructionsData length] > 0)
+			free(nopBuffer);
+			
+			if (!ZGProtect(process.processTask, allocatedAddress, numberOfBytes, VM_PROT_READ | VM_PROT_EXECUTE))
 			{
+				NSLog(@"Error: Failed to protect memory..");
+			}
+			
+			[self nopInstructions:hookedInstructions];
+			
+			ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
+			ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
+			
+			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] usingArchitectureBits:process.pointerSize*8 error:&error];
+			
+			if (jumpToIslandData != nil)
+			{
+				ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+				
+				[self writeStringValue:variable.stringValue atAddress:firstInstruction.variable.address];
+				
 				ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH) - (allocatedAddress + newInstructionsData.length);
 				
 				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] usingArchitectureBits:process.pointerSize*8 error:&error];
@@ -1747,16 +1751,12 @@ END_DEBUGGER_CHANGE:
 			}
 			else
 			{
-				NSLog(@"Error with assembling new data (length 0)");
+				NSLog(@"Error with jumping to island: %@", error);
 			}
 		}
-		else
-		{
-			NSLog(@"Error with jumping to island: %@", error);
-		}
+		
+		ZGResumeTask(process.processTask);
 	}
-	
-	ZGResumeTask(process.processTask);
 }
 
 - (NSArray *)instructionsAtMemoryAddress:(ZGMemoryAddress)address consumingLength:(NSInteger)consumedLength inProcess:(ZGProcess *)process
