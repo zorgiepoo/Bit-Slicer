@@ -44,7 +44,6 @@
                 <action selector="goToCallAddress:" destination="1106" id="1109"/>
                 <action selector="hide:" destination="134" id="367"/>
                 <action selector="hideOtherApplications:" destination="145" id="368"/>
-                <action selector="injectCode:" destination="bRt-cV-8Ks" id="pU6-hV-bLx"/>
                 <action selector="jump:" destination="1062" id="1063"/>
                 <action selector="newDocument:" destination="82" id="371"/>
                 <action selector="nopVariables:" destination="857" id="859"/>
@@ -58,6 +57,7 @@
                 <action selector="redo:" destination="215" id="231"/>
                 <action selector="removeAllBreakPoints:" destination="1020" id="1036"/>
                 <action selector="removeSelectedSearchValues:" destination="202" id="658"/>
+                <action selector="requestCodeInjection:" destination="bRt-cV-8Ks" id="YEG-hq-xn6"/>
                 <action selector="revertDocumentToSaved:" destination="112" id="364"/>
                 <action selector="runToolbarCustomizationPalette:" destination="298" id="365"/>
                 <action selector="saveDocument:" destination="75" id="362"/>

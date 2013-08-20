@@ -36,6 +36,8 @@
 		77329B72168D0DF9007DCAE2 /* syn.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B69168D0DF7007DCAE2 /* syn.c */; };
 		77329B73168D0DF9007DCAE2 /* udis86.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B6C168D0DF8007DCAE2 /* udis86.c */; };
 		77329B77168D14CB007DCAE2 /* ZGInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 77329B76168D14CB007DCAE2 /* ZGInstruction.m */; };
+		775B868617C2E39A0019CD37 /* ZGCodeInjectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775B868417C2E39A0019CD37 /* ZGCodeInjectionWindowController.m */; };
+		775B868717C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 775B868517C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib */; };
 		775FCB1B11719DF6000054FB /* ZGAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1111719DF6000054FB /* ZGAppController.m */; };
 		775FCB1D11719DF6000054FB /* ZGPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1511719DF6000054FB /* ZGPreferencesController.m */; };
 		775FCB1E11719DF6000054FB /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1711719DF6000054FB /* ZGProcess.m */; };
@@ -174,6 +176,9 @@
 		77329B6C168D0DF8007DCAE2 /* udis86.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = udis86.c; path = libudis86/udis86.c; sourceTree = "<group>"; };
 		77329B75168D14CB007DCAE2 /* ZGInstruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGInstruction.h; sourceTree = "<group>"; };
 		77329B76168D14CB007DCAE2 /* ZGInstruction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGInstruction.m; sourceTree = "<group>"; };
+		775B868317C2E39A0019CD37 /* ZGCodeInjectionWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGCodeInjectionWindowController.h; sourceTree = "<group>"; };
+		775B868417C2E39A0019CD37 /* ZGCodeInjectionWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGCodeInjectionWindowController.m; sourceTree = "<group>"; };
+		775B868517C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ZGCodeInjectionWindowController.xib; sourceTree = "<group>"; };
 		775FCB1011719DF6000054FB /* ZGAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGAppController.h; sourceTree = "<group>"; };
 		775FCB1111719DF6000054FB /* ZGAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGAppController.m; sourceTree = "<group>"; };
 		775FCB1411719DF6000054FB /* ZGPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGPreferencesController.h; sourceTree = "<group>"; };
@@ -445,6 +450,9 @@
 				77F8D8D116C4A12600C52CE2 /* ZGRegistersController.m */,
 				77CA284C16A7B5D500F3B54B /* ZGRegister.h */,
 				77CA284D16A7B5D500F3B54B /* ZGRegister.m */,
+				775B868317C2E39A0019CD37 /* ZGCodeInjectionWindowController.h */,
+				775B868417C2E39A0019CD37 /* ZGCodeInjectionWindowController.m */,
+				775B868517C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib */,
 			);
 			name = Debugger;
 			sourceTree = "<group>";
@@ -725,6 +733,7 @@
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
 				1DDD582C0DA1D0D100B32029 /* MyDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
+				775B868717C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib in Resources */,
 				775FCB2A11719E4A000054FB /* Preferences.xib in Resources */,
 				770EA824137B6FDE007FB85A /* ZGMemoryViewerController.xib in Resources */,
 				7763470416881166003D01C9 /* DataInspectorView.xib in Resources */,
@@ -744,6 +753,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				77DC412C17AF219E000626A2 /* _DDNumberExpression.m in Sources */,
+				775B868617C2E39A0019CD37 /* ZGCodeInjectionWindowController.m in Sources */,
 				8D15AC320486D014006FF6A4 /* main.m in Sources */,
 				775FCB1B11719DF6000054FB /* ZGAppController.m in Sources */,
 				775FCB1D11719DF6000054FB /* ZGPreferencesController.m in Sources */,

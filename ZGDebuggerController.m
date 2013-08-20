@@ -61,9 +61,11 @@
 @property (assign) IBOutlet ZGBacktraceController *backtraceController;
 @property (assign) IBOutlet ZGRegistersController *registersController;
 
-@property (nonatomic, strong) NSArray *instructions;
+@property (nonatomic) NSArray *instructions;
 
-@property (nonatomic, strong) NSArray *haltedBreakPoints;
+@property (nonatomic) ZGCodeInjectionWindowController *codeInjectionController;
+
+@property (nonatomic) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
 
 @property (nonatomic, assign) BOOL shouldIgnoreTableViewSelectionChange;
@@ -76,6 +78,7 @@
 #define ATOS_PATH @"/usr/bin/atos"
 
 #define JUMP_REL32_INSTRUCTION_LENGTH 5
+#define NOP_VALUE 0x90
 
 @implementation ZGDebuggerController
 
@@ -1519,7 +1522,7 @@ END_DEBUGGER_CHANGE:
 			
 			if (bytesRead > originalOutputLength)
 			{
-				const int8_t nopValue = 0x90;
+				const int8_t nopValue = NOP_VALUE;
 				for (ZGMemorySize byteIndex = currentInstruction.variable.address + currentInstruction.variable.size - (bytesRead - originalOutputLength); byteIndex < currentInstruction.variable.address + currentInstruction.variable.size; byteIndex++)
 				{
 					[outputData appendBytes:&nopValue length:sizeof(int8_t)];
@@ -1683,18 +1686,18 @@ END_DEBUGGER_CHANGE:
 	if (ZGAllocateMemory(process.processTask, &allocatedAddress, numberOfBytes))
 	{
 		void *nopBuffer = malloc(numberOfBytes);
-		memset(nopBuffer, 0x90, numberOfBytes);
+		memset(nopBuffer, NOP_VALUE, numberOfBytes);
 		
 		if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfBytes))
 		{
-			NSLog(@"Failed to write nop buffer..");
+			NSLog(@"Error: Failed to write nop buffer..");
 		}
 		
 		free(nopBuffer);
 		
 		if (!ZGProtect(process.processTask, allocatedAddress, numberOfBytes, VM_PROT_READ | VM_PROT_EXECUTE))
 		{
-			NSLog(@"Failed to protect memory..");
+			NSLog(@"Error: Failed to protect memory..");
 		}
 		
 		[self nopInstructions:hookedInstructions];
@@ -1769,14 +1772,27 @@ END_DEBUGGER_CHANGE:
 	return [instructions copy];
 }
 
-- (IBAction)injectCode:(id)sender
+- (IBAction)requestCodeInjection:(id)sender
 {
 	ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
 	NSArray *instructions = [self instructionsAtMemoryAddress:firstInstruction.variable.address consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inProcess:self.currentProcess];
 	if (instructions != nil)
 	{
-		NSString *injectedCode = [[instructions valueForKey:@"text"] componentsJoinedByString:@"\n"];
-		[self injectCode:injectedCode hookingIntoInstructions:instructions inProcess:self.currentProcess];
+		NSString *suggestedCode = [[[instructions valueForKey:@"text"] componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"];
+		
+		if (self.codeInjectionController == nil)
+		{
+			self.codeInjectionController = [[ZGCodeInjectionWindowController alloc] init];
+		}
+		
+		[self.codeInjectionController attachToWindow:self.window completionHandler:^(NSString *injectedCode, BOOL canceled) {
+			if (!canceled)
+			{
+				[self injectCode:injectedCode hookingIntoInstructions:instructions inProcess:self.currentProcess];
+			}
+		}];
+		
+		[self.codeInjectionController setSuggestedCode:suggestedCode];
 	}
 	else
 	{

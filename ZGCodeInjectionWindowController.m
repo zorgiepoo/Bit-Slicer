@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/27/12.
+ * Created by Mayur Pawashe on 8/19/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,29 +32,55 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "ZGMemoryTypes.h"
-#import "ZGMemoryWindowController.h"
 #import "ZGCodeInjectionWindowController.h"
 
-#define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
+@interface ZGCodeInjectionWindowController ()
 
-@class ZGProcess;
-@class ZGInstruction;
+@property (copy, nonatomic) code_injection_completion_t completionHandler;
 
-@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource>
+@end
 
-@property (readwrite, nonatomic) BOOL disassembling;
+@implementation ZGCodeInjectionWindowController
 
-- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
+- (NSString *)windowNibName
+{
+	return NSStringFromClass([self class]);
+}
 
-- (NSArray *)selectedInstructions;
+- (void)windowDidLoad
+{
+    [super windowDidLoad];
+}
 
-- (void)updateSymbolsForInstructions:(NSArray *)instructions;
+- (void)attachToWindow:(NSWindow *)parentWindow completionHandler:(code_injection_completion_t)completionHandler
+{
+	self.completionHandler = completionHandler;
+	
+	[NSApp
+	 beginSheet:self.window
+	 modalForWindow:parentWindow
+	 modalDelegate:nil
+	 didEndSelector:nil
+	 contextInfo:NULL];
+}
 
-// This function is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
+- (void)setSuggestedCode:(NSString *)suggestedCode
+{
+	[self.textView.textStorage.mutableString setString:suggestedCode];
+}
 
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
+- (IBAction)injectCode:(id)sender
+{
+	self.completionHandler([self.textView.textStorage.mutableString copy], NO);
+	[NSApp endSheet:self.window];
+	[self.window close];
+}
+
+- (IBAction)cancel:(id)sender
+{
+	self.completionHandler(nil, YES);
+	[NSApp endSheet:self.window];
+	[self.window close];
+}
 
 @end

@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/27/12.
+ * Created by Mayur Pawashe on 8/19/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,28 +33,14 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "ZGMemoryTypes.h"
-#import "ZGMemoryWindowController.h"
-#import "ZGCodeInjectionWindowController.h"
 
-#define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
+@interface ZGCodeInjectionWindowController : NSWindowController
 
-@class ZGProcess;
-@class ZGInstruction;
+@property (assign, nonatomic) IBOutlet NSTextView *textView;
 
-@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource>
+typedef void (^code_injection_completion_t)(NSString *codeInjected, BOOL canceled);
 
-@property (readwrite, nonatomic) BOOL disassembling;
-
-- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
-
-- (NSArray *)selectedInstructions;
-
-- (void)updateSymbolsForInstructions:(NSArray *)instructions;
-
-// This function is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
-
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
+- (void)attachToWindow:(NSWindow *)parentWindow completionHandler:(code_injection_completion_t)completionHandler;
+- (void)setSuggestedCode:(NSString *)suggestedCode;
 
 @end
