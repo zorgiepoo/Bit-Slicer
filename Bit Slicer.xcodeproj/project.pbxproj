@@ -37,7 +37,6 @@
 		77329B73168D0DF9007DCAE2 /* udis86.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B6C168D0DF8007DCAE2 /* udis86.c */; };
 		77329B77168D14CB007DCAE2 /* ZGInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 77329B76168D14CB007DCAE2 /* ZGInstruction.m */; };
 		775B868617C2E39A0019CD37 /* ZGCodeInjectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775B868417C2E39A0019CD37 /* ZGCodeInjectionWindowController.m */; };
-		775B868717C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 775B868517C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib */; };
 		775FCB1B11719DF6000054FB /* ZGAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1111719DF6000054FB /* ZGAppController.m */; };
 		775FCB1D11719DF6000054FB /* ZGPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1511719DF6000054FB /* ZGPreferencesController.m */; };
 		775FCB1E11719DF6000054FB /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1711719DF6000054FB /* ZGProcess.m */; };
@@ -87,6 +86,7 @@
 		77E652EF16915B5700D84A7F /* NSArrayAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652EE16915B5600D84A7F /* NSArrayAdditions.m */; };
 		77E652FC1692515400D84A7F /* ZGProcessList.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652FB1692515400D84A7F /* ZGProcessList.m */; };
 		77E652FF1692E77A00D84A7F /* ZGRunningProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E652FE1692E77900D84A7F /* ZGRunningProcess.m */; };
+		77F389EB17C41E6700531ACB /* ZGCodeInjectionWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77F389E917C41E6700531ACB /* ZGCodeInjectionWindowController.xib */; };
 		77F39F1D16FEACA900292FED /* bitslicerdocicon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77F39F1C16FEACA900292FED /* bitslicerdocicon.iconset */; };
 		77F6096F13DBCDD300FD5D92 /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */; };
 		77F6097013DBCE2000FD5D92 /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */; };
@@ -178,7 +178,6 @@
 		77329B76168D14CB007DCAE2 /* ZGInstruction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGInstruction.m; sourceTree = "<group>"; };
 		775B868317C2E39A0019CD37 /* ZGCodeInjectionWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGCodeInjectionWindowController.h; sourceTree = "<group>"; };
 		775B868417C2E39A0019CD37 /* ZGCodeInjectionWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGCodeInjectionWindowController.m; sourceTree = "<group>"; };
-		775B868517C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ZGCodeInjectionWindowController.xib; sourceTree = "<group>"; };
 		775FCB1011719DF6000054FB /* ZGAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGAppController.h; sourceTree = "<group>"; };
 		775FCB1111719DF6000054FB /* ZGAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGAppController.m; sourceTree = "<group>"; };
 		775FCB1411719DF6000054FB /* ZGPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGPreferencesController.h; sourceTree = "<group>"; };
@@ -278,6 +277,7 @@
 		77E652FB1692515400D84A7F /* ZGProcessList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGProcessList.m; sourceTree = "<group>"; };
 		77E652FD1692E77900D84A7F /* ZGRunningProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRunningProcess.h; sourceTree = "<group>"; };
 		77E652FE1692E77900D84A7F /* ZGRunningProcess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRunningProcess.m; sourceTree = "<group>"; };
+		77F389EA17C41E6700531ACB /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ZGCodeInjectionWindowController.xib; sourceTree = "<group>"; };
 		77F39F1C16FEACA900292FED /* bitslicerdocicon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; path = bitslicerdocicon.iconset; sourceTree = "<group>"; };
 		77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ShortcutRecorder.framework; sourceTree = "<group>"; };
 		77F82C1E16CF6FC10038AC0A /* yasm */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = yasm; sourceTree = "<group>"; };
@@ -452,7 +452,7 @@
 				77CA284D16A7B5D500F3B54B /* ZGRegister.m */,
 				775B868317C2E39A0019CD37 /* ZGCodeInjectionWindowController.h */,
 				775B868417C2E39A0019CD37 /* ZGCodeInjectionWindowController.m */,
-				775B868517C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib */,
+				77F389E917C41E6700531ACB /* ZGCodeInjectionWindowController.xib */,
 			);
 			name = Debugger;
 			sourceTree = "<group>";
@@ -733,7 +733,6 @@
 				8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */,
 				1DDD582C0DA1D0D100B32029 /* MyDocument.xib in Resources */,
 				1DDD582D0DA1D0D100B32029 /* MainMenu.xib in Resources */,
-				775B868717C2E39A0019CD37 /* ZGCodeInjectionWindowController.xib in Resources */,
 				775FCB2A11719E4A000054FB /* Preferences.xib in Resources */,
 				770EA824137B6FDE007FB85A /* ZGMemoryViewerController.xib in Resources */,
 				7763470416881166003D01C9 /* DataInspectorView.xib in Resources */,
@@ -742,6 +741,7 @@
 				77F82C2D16D0837B0038AC0A /* Credits.rtf in Resources */,
 				77FF507716E9A4250005915D /* ZGDebuggerController.xib in Resources */,
 				77F39F1D16FEACA900292FED /* bitslicerdocicon.iconset in Resources */,
+				77F389EB17C41E6700531ACB /* ZGCodeInjectionWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -871,6 +871,14 @@
 				775FCB2911719E4A000054FB /* English */,
 			);
 			name = Preferences.xib;
+			sourceTree = "<group>";
+		};
+		77F389E917C41E6700531ACB /* ZGCodeInjectionWindowController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				77F389EA17C41E6700531ACB /* English */,
+			);
+			name = ZGCodeInjectionWindowController.xib;
 			sourceTree = "<group>";
 		};
 		77FF507516E9A4250005915D /* ZGDebuggerController.xib */ = {
