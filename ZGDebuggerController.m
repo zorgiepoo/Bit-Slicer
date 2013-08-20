@@ -1223,6 +1223,13 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
+	else if (menuItem.action == @selector(requestCodeInjection:))
+	{
+		if ([[self selectedInstructions] count] != 1)
+		{
+			return NO;
+		}
+	}
 	
 	return [super validateUserInterfaceItem:menuItem];
 }
@@ -1785,14 +1792,13 @@ END_DEBUGGER_CHANGE:
 			self.codeInjectionController = [[ZGCodeInjectionWindowController alloc] init];
 		}
 		
+		[self.codeInjectionController setSuggestedCode:suggestedCode];
 		[self.codeInjectionController attachToWindow:self.window completionHandler:^(NSString *injectedCode, BOOL canceled) {
 			if (!canceled)
 			{
 				[self injectCode:injectedCode hookingIntoInstructions:instructions inProcess:self.currentProcess];
 			}
 		}];
-		
-		[self.codeInjectionController setSuggestedCode:suggestedCode];
 	}
 	else
 	{

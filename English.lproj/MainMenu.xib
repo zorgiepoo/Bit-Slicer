@@ -217,9 +217,7 @@ CA
                             </menuItem>
                             <menuItem title="Jump to Instruction" keyEquivalent="j" id="1062"/>
                             <menuItem isSeparatorItem="YES" id="1108"/>
-                            <menuItem title="Inject Code" id="bRt-cV-8Ks">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                            </menuItem>
+                            <menuItem title="Inject Code…" keyEquivalent="i" id="bRt-cV-8Ks"/>
                             <menuItem title="Go to Function" keyEquivalent="F" id="1106"/>
                             <menuItem isSeparatorItem="YES" id="1026"/>
                             <menuItem title="Registers Qualifier" id="1027">

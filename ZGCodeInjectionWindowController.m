@@ -47,14 +47,13 @@
 	return NSStringFromClass([self class]);
 }
 
-- (void)windowDidLoad
-{
-    [super windowDidLoad];
-}
-
 - (void)attachToWindow:(NSWindow *)parentWindow completionHandler:(code_injection_completion_t)completionHandler
 {
 	self.completionHandler = completionHandler;
+	
+	[self window]; // Ensure window is loaded
+	
+	[self.textView.textStorage.mutableString setString:self.suggestedCode];
 	
 	[NSApp
 	 beginSheet:self.window
@@ -62,11 +61,6 @@
 	 modalDelegate:nil
 	 didEndSelector:nil
 	 contextInfo:NULL];
-}
-
-- (void)setSuggestedCode:(NSString *)suggestedCode
-{
-	[self.textView.textStorage.mutableString setString:suggestedCode];
 }
 
 - (IBAction)injectCode:(id)sender
