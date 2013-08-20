@@ -196,12 +196,12 @@
                     <popUpButton verticalHuggingPriority="750" id="100066">
                         <rect key="frame" x="91" y="140" width="143" height="26"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
-                        <popUpButtonCell key="cell" type="push" title="= Value" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="100069" id="100067">
+                        <popUpButtonCell key="cell" type="push" title="= Value" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="100069" id="100067">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="100068">
                                 <items>
-                                    <menuItem title="= Value" state="on" id="100069"/>
+                                    <menuItem title="= Value" id="100069"/>
                                     <menuItem title="≠ Value" tag="1" id="100070"/>
                                     <menuItem title="> Value" tag="2" id="100071"/>
                                     <menuItem title="&lt; Value" tag="3" id="100140"/>

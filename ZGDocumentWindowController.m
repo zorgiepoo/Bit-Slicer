@@ -834,7 +834,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (IBAction)functionTypePopUpButtonRequest:(id)sender
 {
-	self.documentData.functionTypeTag = [sender tag];
+	self.documentData.functionTypeTag = [sender selectedTag];
 	[self functionTypePopUpButtonRequest:sender markChanges:YES];
 }
 
