@@ -1414,7 +1414,7 @@ END_DEBUGGER_CHANGE:
 #define ASSEMBLER_ERROR_DOMAIN @"Assembling Failed"
 - (NSData *)assembleInstructionText:(NSString *)instructionText usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error
 {
-	NSData *data = nil;
+	NSData *data = [NSData data];
 	NSString *outputFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"assembler_output.XXXXXX"];
 	const char *tempFileTemplateCString = [outputFileTemplate fileSystemRepresentation];
 	char *tempFileNameCString = malloc(strlen(tempFileTemplateCString) + 1);
@@ -1467,7 +1467,6 @@ END_DEBUGGER_CHANGE:
 				
 				if (data.length == 0)
 				{
-					data = nil;
 					if (error != nil)
 					{
 						*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"the instruction failed assembling."}];
@@ -1477,7 +1476,7 @@ END_DEBUGGER_CHANGE:
 			else
 			{
 				NSData *errorData = [[errorPipe fileHandleForReading] readDataToEndOfFile];
-				if (errorData && error != nil)
+				if (errorData != nil && error != nil)
 				{
 					NSString *errorString = [[[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] objectAtIndex:0];
 					*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : errorString}];
@@ -1504,7 +1503,7 @@ END_DEBUGGER_CHANGE:
 {
 	NSError *error = nil;
 	NSData *data = [self assembleInstructionText:instructionText usingArchitectureBits:self.currentProcess.pointerSize * 8 error:&error];
-	if (data == nil)
+	if (data.length == 0)
 	{
 		if (error != nil)
 		{
@@ -1684,22 +1683,15 @@ END_DEBUGGER_CHANGE:
 	[self nopInstructions:[self selectedInstructions]];
 }
 
-- (void)injectCode:(NSString *)codeString hookingIntoInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process
+- (BOOL)injectCode:(NSString *)codeString hookingIntoInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process error:(NSError **)error
 {
 	NSMutableData *newInstructionsData = [NSMutableData data];
-	NSError *error = nil;
+	BOOL success = NO;
 	
 	// Assemble the new code
-	if ([[codeString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
-	{
-		[newInstructionsData appendData:[self assembleInstructionText:codeString usingArchitectureBits:process.pointerSize*8 error:&error]];
-	}
+	[newInstructionsData appendData:[self assembleInstructionText:codeString usingArchitectureBits:process.pointerSize*8 error:error]];
 	
-	if (error != nil || newInstructionsData.length == 0)
-	{
-		NSLog(@"An error occured with assembling the new instructions: %@", error);
-	}
-	else
+	if (newInstructionsData.length > 0)
 	{
 		ZGSuspendTask(process.processTask);
 		
@@ -1727,9 +1719,9 @@ END_DEBUGGER_CHANGE:
 			ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
 			ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
 			
-			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] usingArchitectureBits:process.pointerSize*8 error:&error];
+			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] usingArchitectureBits:process.pointerSize*8 error:error];
 			
-			if (jumpToIslandData != nil)
+			if (jumpToIslandData.length > 0)
 			{
 				ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
 				
@@ -1737,26 +1729,22 @@ END_DEBUGGER_CHANGE:
 				
 				ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH) - (allocatedAddress + newInstructionsData.length);
 				
-				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] usingArchitectureBits:process.pointerSize*8 error:&error];
-				if (jumpFromIslandData != nil)
+				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] usingArchitectureBits:process.pointerSize*8 error:error];
+				if (jumpFromIslandData.length > 0)
 				{
 					[newInstructionsData appendData:jumpFromIslandData];
 					
 					ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
+					
+					success = YES;
 				}
-				else
-				{
-					NSLog(@"Error with jumping back from island: %@", error);
-				}
-			}
-			else
-			{
-				NSLog(@"Error with jumping to island: %@", error);
 			}
 		}
 		
 		ZGResumeTask(process.processTask);
 	}
+	
+	return success;
 }
 
 - (NSArray *)instructionsAtMemoryAddress:(ZGMemoryAddress)address consumingLength:(NSInteger)consumedLength inProcess:(ZGProcess *)process
@@ -1793,16 +1781,22 @@ END_DEBUGGER_CHANGE:
 		}
 		
 		[self.codeInjectionController setSuggestedCode:suggestedCode];
-		[self.codeInjectionController attachToWindow:self.window completionHandler:^(NSString *injectedCode, BOOL canceled) {
+		[self.codeInjectionController attachToWindow:self.window completionHandler:^(NSString *injectedCode, BOOL canceled, BOOL *succeeded) {
 			if (!canceled)
 			{
-				[self injectCode:injectedCode hookingIntoInstructions:instructions inProcess:self.currentProcess];
+				NSError *error = nil;
+				if (![self injectCode:injectedCode hookingIntoInstructions:instructions inProcess:self.currentProcess error:&error])
+				{
+					*succeeded = NO;
+					NSRunAlertPanel(@"Failed to Inject Code", @"An error occured assembling the new code: %@", @"OK", nil, nil, [error.userInfo objectForKey:@"reason"]);
+				}
 			}
 		}];
 	}
 	else
 	{
 		NSLog(@"Error: not enough instructions to override!");
+		NSRunAlertPanel(@"Failed to Inject Code", @"There was not enough space to override this instruction.", @"OK", nil, nil);
 	}
 }
 
