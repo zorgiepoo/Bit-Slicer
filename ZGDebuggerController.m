@@ -1448,7 +1448,7 @@ END_DEBUGGER_CHANGE:
 			failedToLaunchTask = YES;
 			if (error != nil)
 			{
-				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"yasm task failed to launch: Name: %@, Reason: %@", exception.name, exception.reason]}];
+				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"yasm task failed to launch: Name: %@, Reason: %@", exception.name, exception.reason], @"reason" : exception.reason}];
 			}
 		}
 		
@@ -1469,7 +1469,7 @@ END_DEBUGGER_CHANGE:
 				{
 					if (error != nil)
 					{
-						*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"the instruction failed assembling."}];
+						*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"nothing was assembled (0 bytes)."}];
 					}
 				}
 			}
@@ -1491,7 +1491,7 @@ END_DEBUGGER_CHANGE:
 	}
 	else if (error != nil)
 	{
-		*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : [NSString stringWithFormat:@"Failed to open file descriptor on %s.", tempFileNameCString]}];
+		*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : [NSString stringWithFormat:@"failed to open file descriptor on %s.", tempFileNameCString]}];
 	}
 	
 	free(tempFileNameCString);
@@ -1683,6 +1683,7 @@ END_DEBUGGER_CHANGE:
 	[self nopInstructions:[self selectedInstructions]];
 }
 
+#define INJECT_ERROR_DOMAIN @"INJECT_CODE_FAILED"
 - (BOOL)injectCode:(NSString *)codeString hookingIntoInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process error:(NSError **)error
 {
 	NSMutableData *newInstructionsData = [NSMutableData data];
@@ -1705,40 +1706,52 @@ END_DEBUGGER_CHANGE:
 			if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfBytes))
 			{
 				NSLog(@"Error: Failed to write nop buffer..");
+				if (error != nil)
+				{
+					*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to NOP current instructions"}];
+				}
+			}
+			else
+			{
+				if (!ZGProtect(process.processTask, allocatedAddress, numberOfBytes, VM_PROT_READ | VM_PROT_EXECUTE))
+				{
+					NSLog(@"Error: Failed to protect memory..");
+					if (error != nil)
+					{
+						*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to change memory protection on new instructions"}];
+					}
+				}
+				else
+				{
+					[self nopInstructions:hookedInstructions];
+					
+					ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
+					ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
+					
+					NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] usingArchitectureBits:process.pointerSize*8 error:error];
+					
+					if (jumpToIslandData.length > 0)
+					{
+						ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+						
+						[self writeStringValue:variable.stringValue atAddress:firstInstruction.variable.address];
+						
+						ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH) - (allocatedAddress + newInstructionsData.length);
+						
+						NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] usingArchitectureBits:process.pointerSize*8 error:error];
+						if (jumpFromIslandData.length > 0)
+						{
+							[newInstructionsData appendData:jumpFromIslandData];
+							
+							ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
+							
+							success = YES;
+						}
+					}
+				}
 			}
 			
 			free(nopBuffer);
-			
-			if (!ZGProtect(process.processTask, allocatedAddress, numberOfBytes, VM_PROT_READ | VM_PROT_EXECUTE))
-			{
-				NSLog(@"Error: Failed to protect memory..");
-			}
-			
-			[self nopInstructions:hookedInstructions];
-			
-			ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
-			ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
-			
-			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] usingArchitectureBits:process.pointerSize*8 error:error];
-			
-			if (jumpToIslandData.length > 0)
-			{
-				ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
-				
-				[self writeStringValue:variable.stringValue atAddress:firstInstruction.variable.address];
-				
-				ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH) - (allocatedAddress + newInstructionsData.length);
-				
-				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] usingArchitectureBits:process.pointerSize*8 error:error];
-				if (jumpFromIslandData.length > 0)
-				{
-					[newInstructionsData appendData:jumpFromIslandData];
-					
-					ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
-					
-					success = YES;
-				}
-			}
 		}
 		
 		ZGResumeTask(process.processTask);
