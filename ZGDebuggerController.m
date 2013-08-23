@@ -1692,6 +1692,9 @@ END_DEBUGGER_CHANGE:
 	NSMutableData *newInstructionsData = [NSMutableData data];
 	BOOL success = NO;
 	
+	ZGMemoryAddress allocatedAddress = 0;
+	const ZGMemorySize numberOfAllocatedBytes = 4096;
+	
 	// Assemble the new code
 	[newInstructionsData appendData:[self assembleInstructionText:codeString usingArchitectureBits:process.pointerSize*8 error:error]];
 	
@@ -1699,14 +1702,12 @@ END_DEBUGGER_CHANGE:
 	{
 		ZGSuspendTask(process.processTask);
 		
-		ZGMemoryAddress allocatedAddress = 0;
-		ZGMemorySize numberOfBytes = 4096;
-		if (ZGAllocateMemory(process.processTask, &allocatedAddress, numberOfBytes))
+		if (ZGAllocateMemory(process.processTask, &allocatedAddress, numberOfAllocatedBytes))
 		{
-			void *nopBuffer = malloc(numberOfBytes);
-			memset(nopBuffer, NOP_VALUE, numberOfBytes);
+			void *nopBuffer = malloc(numberOfAllocatedBytes);
+			memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
 			
-			if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfBytes))
+			if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
 			{
 				NSLog(@"Error: Failed to write nop buffer..");
 				if (error != nil)
@@ -1716,7 +1717,7 @@ END_DEBUGGER_CHANGE:
 			}
 			else
 			{
-				if (!ZGProtect(process.processTask, allocatedAddress, numberOfBytes, VM_PROT_READ | VM_PROT_EXECUTE))
+				if (!ZGProtect(process.processTask, allocatedAddress, numberOfAllocatedBytes, VM_PROT_READ | VM_PROT_EXECUTE))
 				{
 					NSLog(@"Error: Failed to protect memory..");
 					if (error != nil)
@@ -1758,6 +1759,14 @@ END_DEBUGGER_CHANGE:
 		}
 		
 		ZGResumeTask(process.processTask);
+	}
+	
+	if (!success && allocatedAddress != 0)
+	{
+		if (!ZGDeallocateMemory(process.processTask, allocatedAddress, numberOfAllocatedBytes))
+		{
+			NSLog(@"Error: Failed to deallocate VM memory when failing to inject code..");
+		}
 	}
 	
 	return success;
