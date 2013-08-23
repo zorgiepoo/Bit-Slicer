@@ -1592,7 +1592,7 @@ END_DEBUGGER_CHANGE:
 					
 					ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldValue size:newWriteSize address:instruction.variable.address type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
 					
-					[self replaceInstructions:@[instruction] fromOldStringValues:@[oldVariable.stringValue] toNewStringValues:@[newVariable.stringValue] actionName:@"Instruction Change"];
+					[self replaceInstructions:@[instruction] fromOldStringValues:@[oldVariable.stringValue] toNewStringValues:@[newVariable.stringValue] inProcess:self.currentProcess recordUndo:YES actionName:@"Instruction Change"];
 				}
 				
 				free(oldValue);
@@ -1603,50 +1603,53 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (void)replaceInstructions:(NSArray *)instructions fromOldStringValues:(NSArray *)oldStringValues toNewStringValues:(NSArray *)newStringValues actionName:(NSString *)actionName
+- (void)replaceInstructions:(NSArray *)instructions fromOldStringValues:(NSArray *)oldStringValues toNewStringValues:(NSArray *)newStringValues inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo actionName:(NSString *)actionName
 {
 	for (NSUInteger index = 0; index < instructions.count; index++)
 	{
 		ZGInstruction *instruction = [instructions objectAtIndex:index];
-		[self writeStringValue:[newStringValues objectAtIndex:index] atAddress:instruction.variable.address];
+		[self writeStringValue:[newStringValues objectAtIndex:index] atAddress:instruction.variable.address inProcess:process];
 	}
 	
-	[self.undoManager setActionName:[actionName stringByAppendingFormat:@"%@", instructions.count == 1 ? @"" : @"s"]];
-	
-	[[self.undoManager prepareWithInvocationTarget:self] replaceInstructions:instructions fromOldStringValues:newStringValues toNewStringValues:oldStringValues actionName:actionName];
+	if (shouldRecordUndo)
+	{
+		[self.undoManager setActionName:[actionName stringByAppendingFormat:@"%@", instructions.count == 1 ? @"" : @"s"]];
+		
+		[[self.undoManager prepareWithInvocationTarget:self] replaceInstructions:instructions fromOldStringValues:newStringValues toNewStringValues:oldStringValues inProcess:process recordUndo:shouldRecordUndo actionName:actionName];
+	}
 }
 
-- (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address
+- (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
 	ZGMemorySize newSize = 0;
-	void *newValue = valueFromString(self.currentProcess, stringValue, ZGByteArray, &newSize);
+	void *newValue = valueFromString(process, stringValue, ZGByteArray, &newSize);
 	
 	if (newValue)
 	{
 		ZGBreakPoint *targetBreakPoint = nil;
 		for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
 		{
-			if (breakPoint.variable.address >= address && breakPoint.variable.address < address + newSize)
+			if (breakPoint.process.processID == process.processID && breakPoint.variable.address >= address && breakPoint.variable.address < address + newSize)
 			{
 				targetBreakPoint = breakPoint;
 				break;
 			}
 		}
 		
-		if (!targetBreakPoint)
+		if (targetBreakPoint == nil)
 		{
-			ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newValue, newSize);
+			ZGWriteBytesIgnoringProtection(process.processTask, address, newValue, newSize);
 		}
 		else
 		{
 			if (targetBreakPoint.variable.address - address > 0)
 			{
-				ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newValue, targetBreakPoint.variable.address - address);
+				ZGWriteBytesIgnoringProtection(process.processTask, address, newValue, targetBreakPoint.variable.address - address);
 			}
 			
 			if (address + newSize - targetBreakPoint.variable.address - 1 > 0)
 			{
-				ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, targetBreakPoint.variable.address + 1, newValue + (targetBreakPoint.variable.address + 1 - address), address + newSize - targetBreakPoint.variable.address - 1);
+				ZGWriteBytesIgnoringProtection(process.processTask, targetBreakPoint.variable.address + 1, newValue + (targetBreakPoint.variable.address + 1 - address), address + newSize - targetBreakPoint.variable.address - 1);
 			}
 			
 			*(uint8_t *)targetBreakPoint.variable.value = *(uint8_t *)(newValue + targetBreakPoint.variable.address - address);
@@ -1656,7 +1659,7 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (void)nopInstructions:(NSArray *)instructions
+- (void)nopInstructions:(NSArray *)instructions inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo
 {
 	NSMutableArray *newStringValues = [[NSMutableArray alloc] init];
 	NSMutableArray *oldStringValues = [[NSMutableArray alloc] init];
@@ -1675,12 +1678,12 @@ END_DEBUGGER_CHANGE:
 		[newStringValues addObject:[nopComponents componentsJoinedByString:@" "]];
 	}
 	
-	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues actionName:@"NOP Change"];
+	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues inProcess:process recordUndo:shouldRecordUndo actionName:@"NOP Change"];
 }
 
 - (IBAction)nopVariables:(id)sender
 {
-	[self nopInstructions:[self selectedInstructions]];
+	[self nopInstructions:[self selectedInstructions] inProcess:self.currentProcess recordUndo:YES];
 }
 
 #define INJECT_ERROR_DOMAIN @"INJECT_CODE_FAILED"
@@ -1723,7 +1726,7 @@ END_DEBUGGER_CHANGE:
 				}
 				else
 				{
-					[self nopInstructions:hookedInstructions];
+					[self nopInstructions:hookedInstructions inProcess:process recordUndo:NO];
 					
 					ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
 					ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
@@ -1734,7 +1737,7 @@ END_DEBUGGER_CHANGE:
 					{
 						ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
 						
-						[self writeStringValue:variable.stringValue atAddress:firstInstruction.variable.address];
+						[self writeStringValue:variable.stringValue atAddress:firstInstruction.variable.address inProcess:process];
 						
 						ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH) - (allocatedAddress + newInstructionsData.length);
 						
