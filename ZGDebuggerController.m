@@ -1613,7 +1613,10 @@ END_DEBUGGER_CHANGE:
 	
 	if (shouldRecordUndo)
 	{
-		[self.undoManager setActionName:[actionName stringByAppendingFormat:@"%@", instructions.count == 1 ? @"" : @"s"]];
+		if (actionName != nil)
+		{
+			[self.undoManager setActionName:[actionName stringByAppendingFormat:@"%@", instructions.count == 1 ? @"" : @"s"]];
+		}
 		
 		[[self.undoManager prepareWithInvocationTarget:self] replaceInstructions:instructions fromOldStringValues:newStringValues toNewStringValues:oldStringValues inProcess:process recordUndo:shouldRecordUndo actionName:actionName];
 	}
@@ -1659,7 +1662,7 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (void)nopInstructions:(NSArray *)instructions inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo
+- (void)nopInstructions:(NSArray *)instructions inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo actionName:(NSString *)actionName
 {
 	NSMutableArray *newStringValues = [[NSMutableArray alloc] init];
 	NSMutableArray *oldStringValues = [[NSMutableArray alloc] init];
@@ -1678,16 +1681,16 @@ END_DEBUGGER_CHANGE:
 		[newStringValues addObject:[nopComponents componentsJoinedByString:@" "]];
 	}
 	
-	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues inProcess:process recordUndo:shouldRecordUndo actionName:@"NOP Change"];
+	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues inProcess:process recordUndo:shouldRecordUndo actionName:actionName];
 }
 
 - (IBAction)nopVariables:(id)sender
 {
-	[self nopInstructions:[self selectedInstructions] inProcess:self.currentProcess recordUndo:YES];
+	[self nopInstructions:[self selectedInstructions] inProcess:self.currentProcess recordUndo:YES actionName:@"NOP Change"];
 }
 
 #define INJECT_ERROR_DOMAIN @"INJECT_CODE_FAILED"
-- (BOOL)injectCode:(NSString *)codeString hookingIntoInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process error:(NSError **)error
+- (BOOL)injectCode:(NSString *)codeString hookingIntoInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo error:(NSError **)error
 {
 	NSMutableData *newInstructionsData = [NSMutableData data];
 	BOOL success = NO;
@@ -1727,7 +1730,9 @@ END_DEBUGGER_CHANGE:
 				}
 				else
 				{
-					[self nopInstructions:hookedInstructions inProcess:process recordUndo:NO];
+					[self.undoManager setActionName:@"Inject code"];
+					
+					[self nopInstructions:hookedInstructions inProcess:process recordUndo:shouldRecordUndo actionName:nil];
 					
 					ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
 					ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
@@ -1738,7 +1743,7 @@ END_DEBUGGER_CHANGE:
 					{
 						ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
 						
-						[self writeStringValue:variable.stringValue atAddress:firstInstruction.variable.address inProcess:process];
+						[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] inProcess:process recordUndo:shouldRecordUndo actionName:nil];
 						
 						ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH) - (allocatedAddress + newInstructionsData.length);
 						
@@ -1810,7 +1815,7 @@ END_DEBUGGER_CHANGE:
 			if (!canceled)
 			{
 				NSError *error = nil;
-				if (![self injectCode:injectedCode hookingIntoInstructions:instructions inProcess:self.currentProcess error:&error])
+				if (![self injectCode:injectedCode hookingIntoInstructions:instructions inProcess:self.currentProcess recordUndo:YES error:&error])
 				{
 					*succeeded = NO;
 					NSRunAlertPanel(@"Failed to Inject Code", @"An error occured assembling the new code: %@", @"OK", nil, nil, [error.userInfo objectForKey:@"reason"]);
