@@ -227,10 +227,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 							ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
 							
 							dispatch_async(dispatch_get_main_queue(), ^{
-								if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
-								{
-									[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:[NSNumber numberWithUnsignedLongLong:instructionAddress]];
-								}
+								[breakPoint.delegate breakPointDidHit:[NSNumber numberWithUnsignedLongLong:instructionAddress]];
 							});
 						}
 					}
