@@ -34,6 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGBreakPointWatchDelegate.h"
 
 #define INSTRUCTION_BREAKPOINT_OPCODE 0xCC
 
@@ -61,7 +62,7 @@ typedef enum
 - (void)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint;
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint;
 
-- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
+- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointWatchDelegate>)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
 
 - (void)removeObserver:(id)observer;
 - (void)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;

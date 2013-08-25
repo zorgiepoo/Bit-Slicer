@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/27/12.
+ * Created by Mayur Pawashe on 8/24/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,30 +32,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "ZGMemoryTypes.h"
-#import "ZGMemoryWindowController.h"
-#import "ZGCodeInjectionWindowController.h"
-#import "ZGBreakPointWatchDelegate.h"
+@protocol ZGBreakPointWatchDelegate <NSObject>
 
-#define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
-
-@class ZGProcess;
-@class ZGInstruction;
-
-@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource, ZGBreakPointWatchDelegate>
-
-@property (readwrite, nonatomic) BOOL disassembling;
-
-- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
-
-- (NSArray *)selectedInstructions;
-
-- (void)updateSymbolsForInstructions:(NSArray *)instructions;
-
-// This function is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
-
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
+- (void)breakPointDidHit:(NSNumber *)address;
 
 @end

@@ -628,7 +628,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	else if (watchSize == 4) { debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex+1)); } \
 	else if (watchSize == 8) { debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex+1)); }
 
-- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
+- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointWatchDelegate>)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{
