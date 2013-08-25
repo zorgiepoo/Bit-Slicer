@@ -430,11 +430,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (void)setValue:(void *)newValue
 {
-	if (_value)
-	{
-		free(_value);
-		_value = NULL;
-	}
+	free(_value);
+	_value = NULL;
 
 	if (newValue && self.size > 0)
 	{
@@ -448,11 +445,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (void)setFreezeValue:(void *)newFreezeValue
 {
-	if (_freezeValue)
-	{
-		free(_freezeValue);
-		_freezeValue = NULL;
-	}
+	free(_freezeValue);
+	_freezeValue = NULL;
 	
 	if (newFreezeValue)
 	{
