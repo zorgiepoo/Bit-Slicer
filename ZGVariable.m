@@ -56,6 +56,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGNameKey @"ZGNameKey"
 #define ZGIsPointerKey @"ZGIsPointerKey"
 #define ZGAddressFormulaKey @"ZGAddressFormulaKey"
+#define ZGScriptKey @"ZGScriptKey"
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {	
@@ -110,6 +111,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		 length:(NSUInteger)self.size
 		 forKey:ZGFreezeValueKey];
 	}
+	
+	if (self.scriptValue != nil)
+	{
+		[coder encodeObject:self.scriptValue forKey:ZGScriptKey];
+	}
 }
 
 - (id)initWithCoder:(NSCoder *)coder
@@ -150,6 +156,9 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		self.freezeValue = (void *)buffer;
 	}
+	
+	NSString *scriptValue = [coder decodeObjectForKey:ZGScriptKey];
+	self.scriptValue = scriptValue != nil ? scriptValue : @"";
 	
 	return self;
 }

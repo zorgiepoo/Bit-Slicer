@@ -36,6 +36,9 @@
 		77329B72168D0DF9007DCAE2 /* syn.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B69168D0DF7007DCAE2 /* syn.c */; };
 		77329B73168D0DF9007DCAE2 /* udis86.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B6C168D0DF8007DCAE2 /* udis86.c */; };
 		77329B77168D14CB007DCAE2 /* ZGInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 77329B76168D14CB007DCAE2 /* ZGInstruction.m */; };
+		774EF6A217C9C895005ABB20 /* ZGScriptManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 774EF6A117C9C895005ABB20 /* ZGScriptManager.m */; };
+		774EF6A517C9E82B005ABB20 /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 774EF6A417C9E82B005ABB20 /* VDKQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		774EF6A717CA892D005ABB20 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 774EF6A617CA892C005ABB20 /* Python.framework */; };
 		775B868617C2E39A0019CD37 /* ZGCodeInjectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775B868417C2E39A0019CD37 /* ZGCodeInjectionWindowController.m */; };
 		775FCB1B11719DF6000054FB /* ZGAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1111719DF6000054FB /* ZGAppController.m */; };
 		775FCB1D11719DF6000054FB /* ZGPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 775FCB1511719DF6000054FB /* ZGPreferencesController.m */; };
@@ -51,8 +54,10 @@
 		7795F5AB17B5DDC10094E334 /* ZGDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7795F5AA17B5DDC10094E334 /* ZGDocumentWindowController.m */; };
 		7795F5AE17B5F3C90094E334 /* ZGDocumentData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7795F5AD17B5F3C90094E334 /* ZGDocumentData.m */; };
 		77A52D7F16F54F1F00347F8E /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77A52D7E16F54F1F00347F8E /* ZGSearchResults.m */; };
+		77C24DDE17CC329000CA6A5E /* ZGPyVirtualMemory.m in Sources */ = {isa = PBXBuildFile; fileRef = 77C24DDD17CC329000CA6A5E /* ZGPyVirtualMemory.m */; };
 		77CA284E16A7B5D500F3B54B /* ZGRegister.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CA284D16A7B5D500F3B54B /* ZGRegister.m */; };
 		77CB9741121CD7DE000A91DE /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */; };
+		77CF8ABF17CA9D2200258AC5 /* ZGPyScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CF8ABE17CA9D2200258AC5 /* ZGPyScript.m */; };
 		77D037371224334E0083E057 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D037361224334E0083E057 /* ZGCalculator.m */; };
 		77D38D4216A1FA5A00D2446A /* ZGDisassemblerObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D38D4116A1FA5A00D2446A /* ZGDisassemblerObject.m */; };
 		77D5AEB5137C84D300026388 /* ZGVerticalScrollerRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 77D5AEB4137C84D100026388 /* ZGVerticalScrollerRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -177,6 +182,11 @@
 		77329B75168D14CB007DCAE2 /* ZGInstruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGInstruction.h; sourceTree = "<group>"; };
 		77329B76168D14CB007DCAE2 /* ZGInstruction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGInstruction.m; sourceTree = "<group>"; };
 		774EF69D17C9AA98005ABB20 /* ZGBreakPointWatchDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBreakPointWatchDelegate.h; sourceTree = "<group>"; };
+		774EF6A017C9C895005ABB20 /* ZGScriptManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGScriptManager.h; sourceTree = "<group>"; };
+		774EF6A117C9C895005ABB20 /* ZGScriptManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGScriptManager.m; sourceTree = "<group>"; };
+		774EF6A317C9E82B005ABB20 /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
+		774EF6A417C9E82B005ABB20 /* VDKQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VDKQueue.m; sourceTree = "<group>"; };
+		774EF6A617CA892C005ABB20 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		775B868317C2E39A0019CD37 /* ZGCodeInjectionWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGCodeInjectionWindowController.h; sourceTree = "<group>"; };
 		775B868417C2E39A0019CD37 /* ZGCodeInjectionWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGCodeInjectionWindowController.m; sourceTree = "<group>"; };
 		775FCB1011719DF6000054FB /* ZGAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGAppController.h; sourceTree = "<group>"; };
@@ -206,10 +216,14 @@
 		7795F5AD17B5F3C90094E334 /* ZGDocumentData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGDocumentData.m; sourceTree = "<group>"; };
 		77A52D7D16F54F1F00347F8E /* ZGSearchResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGSearchResults.h; sourceTree = "<group>"; };
 		77A52D7E16F54F1F00347F8E /* ZGSearchResults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGSearchResults.m; sourceTree = "<group>"; };
+		77C24DDC17CC329000CA6A5E /* ZGPyVirtualMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGPyVirtualMemory.h; sourceTree = "<group>"; };
+		77C24DDD17CC329000CA6A5E /* ZGPyVirtualMemory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGPyVirtualMemory.m; sourceTree = "<group>"; };
 		77CA284C16A7B5D500F3B54B /* ZGRegister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGRegister.h; sourceTree = "<group>"; };
 		77CA284D16A7B5D500F3B54B /* ZGRegister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGRegister.m; sourceTree = "<group>"; };
 		77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGComparisonFunctions.h; sourceTree = "<group>"; };
 		77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGComparisonFunctions.m; sourceTree = "<group>"; };
+		77CF8ABD17CA9D2200258AC5 /* ZGPyScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGPyScript.h; sourceTree = "<group>"; };
+		77CF8ABE17CA9D2200258AC5 /* ZGPyScript.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGPyScript.m; sourceTree = "<group>"; };
 		77D037351224334E0083E057 /* ZGCalculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGCalculator.h; sourceTree = "<group>"; };
 		77D037361224334E0083E057 /* ZGCalculator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGCalculator.m; sourceTree = "<group>"; };
 		77D38D4016A1FA5A00D2446A /* ZGDisassemblerObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGDisassemblerObject.h; sourceTree = "<group>"; };
@@ -306,6 +320,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				774EF6A717CA892D005ABB20 /* Python.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 				775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */,
 				77F6096F13DBCDD300FD5D92 /* ShortcutRecorder.framework in Frameworks */,
@@ -320,6 +335,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				774EF6A617CA892C005ABB20 /* Python.framework */,
 				77004FA516D35032008ED2C8 /* Sparkle.framework */,
 				772AACD315E1CCFA00E1F788 /* HexFiend.framework */,
 				77F6096E13DBCDD300FD5D92 /* ShortcutRecorder.framework */,
@@ -595,6 +611,12 @@
 				770930B715BA7635009705A6 /* ZGDocumentTableController.m */,
 				77E652B4168F8C7700D84A7F /* ZGDocumentBreakPointController.h */,
 				77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */,
+				774EF6A017C9C895005ABB20 /* ZGScriptManager.h */,
+				774EF6A117C9C895005ABB20 /* ZGScriptManager.m */,
+				77C24DDC17CC329000CA6A5E /* ZGPyVirtualMemory.h */,
+				77C24DDD17CC329000CA6A5E /* ZGPyVirtualMemory.m */,
+				77CF8ABD17CA9D2200258AC5 /* ZGPyScript.h */,
+				77CF8ABE17CA9D2200258AC5 /* ZGPyScript.m */,
 				770930B315B92203009705A6 /* ZGVariableController.h */,
 				770930B415B92203009705A6 /* ZGVariableController.m */,
 			);
@@ -648,6 +670,8 @@
 				770EA829137BA8E1007FB85A /* ZGUtilities.m */,
 				77D037351224334E0083E057 /* ZGCalculator.h */,
 				77D037361224334E0083E057 /* ZGCalculator.m */,
+				774EF6A317C9E82B005ABB20 /* VDKQueue.h */,
+				774EF6A417C9E82B005ABB20 /* VDKQueue.m */,
 				77DC40F917AF218E000626A2 /* DDMathParser */,
 			);
 			name = Utilities;
@@ -829,6 +853,10 @@
 				7795F5AB17B5DDC10094E334 /* ZGDocumentWindowController.m in Sources */,
 				77A52D7F16F54F1F00347F8E /* ZGSearchResults.m in Sources */,
 				77DC413B17AF219E000626A2 /* NSString+DDMathParsing.m in Sources */,
+				774EF6A217C9C895005ABB20 /* ZGScriptManager.m in Sources */,
+				774EF6A517C9E82B005ABB20 /* VDKQueue.m in Sources */,
+				77CF8ABF17CA9D2200258AC5 /* ZGPyScript.m in Sources */,
+				77C24DDE17CC329000CA6A5E /* ZGPyVirtualMemory.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

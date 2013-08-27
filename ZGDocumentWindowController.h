@@ -43,6 +43,7 @@
 @class ZGRunningProcess;
 @class ZGDocumentData;
 @class ZGSearchData;
+@class ZGScriptManager;
 
 #define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
 
@@ -83,6 +84,7 @@
 @property (strong) ZGVariableController *variableController;
 @property (strong) ZGDocumentSearchController *searchController;
 @property (strong) ZGDocumentBreakPointController *documentBreakPointController;
+@property (strong) ZGScriptManager *scriptManager;
 
 @property (strong, nonatomic) ZGProcess *currentProcess;
 

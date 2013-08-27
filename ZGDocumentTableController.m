@@ -46,6 +46,7 @@
 #import "ZGVirtualMemoryHelpers.h"
 #import "ZGDocumentData.h"
 #import "ZGDocumentWindowController.h"
+#import "ZGScriptManager.h"
 
 @interface ZGDocumentTableController ()
 
@@ -327,7 +328,7 @@
 		}
 		else if ([tableColumn.identifier isEqualToString:@"value"])
 		{
-			return variable.stringValue;
+			return variable.type == ZGScript ? variable.scriptValue : variable.stringValue;
 		}
 		else if ([tableColumn.identifier isEqualToString:@"enabled"])
 		{
@@ -407,17 +408,13 @@
 		return NO;
 	}
 	
+	ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
+	
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
-		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
-		
-		if (variable == nil)
-		{
-			return NO;
-		}
-		
 		if (variable.type == ZGScript)
 		{
+			[self.windowController.scriptManager openScriptForVariable:variable];
 			return NO;
 		}
 		
@@ -444,7 +441,6 @@
 	}
 	else if ([tableColumn.identifier isEqualToString:@"address"])
 	{
-		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
 		if (variable.type == ZGScript)
 		{
 			return NO;

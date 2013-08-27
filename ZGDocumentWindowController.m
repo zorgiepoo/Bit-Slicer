@@ -37,6 +37,7 @@
 #import "ZGDocumentSearchController.h"
 #import "ZGDocumentBreakPointController.h"
 #import "ZGVariableController.h"
+#import "ZGScriptManager.h"
 #import "ZGProcessList.h"
 #import "ZGProcess.h"
 #import "ZGVariableTypes.h"
@@ -91,6 +92,7 @@
 	self.variableController = [[ZGVariableController alloc] initWithWindowController:self];
 	self.searchController = [[ZGDocumentSearchController alloc] initWithWindowController:self];
 	self.documentBreakPointController = [[ZGDocumentBreakPointController alloc] initWithWindowController:self];
+	self.scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
 	
 	self.tableController.variablesTableView = self.variablesTableView;
     

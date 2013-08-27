@@ -48,6 +48,7 @@
 #import "ZGSearchResults.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGDocumentData.h"
+#import "ZGScriptManager.h"
 
 @interface ZGVariableController ()
 
@@ -646,14 +647,35 @@
 
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes
 {
+	NSMutableIndexSet *undoableRowIndexes = [[NSMutableIndexSet alloc] init];
 	NSUInteger currentIndex = rowIndexes.firstIndex;
+	
+	BOOL needsToMarkChange = NO; // we may have to mark a document change even if we don't have any un-doable actions, i.e, scripts
 	while (currentIndex != NSNotFound)
 	{
-		[[self.documentData.variables objectAtIndex:currentIndex] setEnabled:enabled];
+		ZGVariable *variable = [self.documentData.variables objectAtIndex:currentIndex];
+		variable.enabled = enabled;
+		if (variable.type == ZGScript)
+		{
+			if (variable.enabled)
+			{
+				[self.windowController.scriptManager runScriptForVariable:variable];
+			}
+			else
+			{
+				[self.windowController.scriptManager stopScriptForVariable:variable];
+			}
+			needsToMarkChange = YES;
+		}
+		else
+		{
+			[undoableRowIndexes addIndex:currentIndex];
+		}
+		
 		currentIndex = [rowIndexes indexGreaterThanIndex:currentIndex];
 	}
 	
-	if (!self.windowController.undoManager.isUndoing && !self.windowController.undoManager.isRedoing && rowIndexes.count > 1)
+	if (!self.windowController.undoManager.isUndoing && !self.windowController.undoManager.isRedoing && undoableRowIndexes.count > 1)
 	{
 		self.windowController.tableController.shouldIgnoreTableViewSelectionChange = YES;
 	}
@@ -661,10 +683,17 @@
 	// the table view always needs to be reloaded because of being able to select multiple indexes
 	[self.windowController.tableController.variablesTableView reloadData];
 	
-	self.windowController.undoManager.actionName = [NSString stringWithFormat:@"Search Variable%@ Change", (rowIndexes.count > 1) ? @"s" : @""];
-	[[self.windowController.undoManager prepareWithInvocationTarget:self]
-	 changeVariableEnabled:!enabled
-	 rowIndexes:rowIndexes];
+	if (undoableRowIndexes.count > 0)
+	{
+		self.windowController.undoManager.actionName = [NSString stringWithFormat:@"Enabled Variable%@ Change", (rowIndexes.count > 1) ? @"s" : @""];
+		[[self.windowController.undoManager prepareWithInvocationTarget:self]
+		 changeVariableEnabled:!enabled
+		 rowIndexes:undoableRowIndexes];
+	}
+	else if (needsToMarkChange)
+	{
+		[self.windowController markDocumentChange];
+	}
 }
 
 #pragma mark Edit Variables Values
@@ -709,16 +738,19 @@
 	
 	for (ZGVariable *variable in variables)
 	{
-		ZGMemoryProtection memoryProtection;
-		ZGMemoryAddress memoryAddress = variable.address;
-		ZGMemorySize memorySize = variable.size;
-		
-		if (ZGMemoryProtectionInRegion(self.windowController.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+		if (variable.type != ZGScript)
 		{
-			// if !(the variable is within a single memory region and the memory region is not writable), then the variable is editable
-			if (!(memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_WRITE)))
+			ZGMemoryProtection memoryProtection;
+			ZGMemoryAddress memoryAddress = variable.address;
+			ZGMemorySize memorySize = variable.size;
+			
+			if (ZGMemoryProtectionInRegion(self.windowController.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 			{
-				[validVariables addObject:variable];
+				// if !(the variable is within a single memory region and the memory region is not writable), then the variable is editable
+				if (!(memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_WRITE)))
+				{
+					[validVariables addObject:variable];
+				}
 			}
 		}
 	}
@@ -745,14 +777,31 @@
 
 - (void)editVariablesValueRequest
 {
-	self.windowController.editVariablesValueTextField.stringValue = [[self.documentData.variables objectAtIndex:self.windowController.tableController.variablesTableView.selectedRow] stringValue];
+	NSArray *selectedVariables = [self.windowController selectedVariables];
+	ZGVariable *firstNonScriptVariable = nil;
+	for (ZGVariable *variable in selectedVariables)
+	{
+		if (variable.type == ZGScript)
+		{
+			[self.windowController.scriptManager openScriptForVariable:variable];
+		}
+		else if (firstNonScriptVariable == nil)
+		{
+			firstNonScriptVariable = variable;
+		}
+	}
 	
-	[NSApp
-	 beginSheet:self.windowController.editVariablesValueWindow
-	 modalForWindow:self.windowController.window
-	 modalDelegate:self
-	 didEndSelector:nil
-	 contextInfo:NULL];
+	if (firstNonScriptVariable != nil)
+	{
+		self.windowController.editVariablesValueTextField.stringValue = firstNonScriptVariable.stringValue;
+		
+		[NSApp
+		 beginSheet:self.windowController.editVariablesValueWindow
+		 modalForWindow:self.windowController.window
+		 modalDelegate:self
+		 didEndSelector:nil
+		 contextInfo:NULL];
+	}
 }
 
 #pragma mark Edit Variables Address
