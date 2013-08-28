@@ -48,6 +48,11 @@ bool ZGDeallocatePort(ZGMemoryMap processTask)
 	return (mach_port_deallocate(mach_task_self(), processTask) == KERN_SUCCESS);
 }
 
+bool ZGPIDForTaskPort(ZGMemoryMap processTask, int *processID)
+{
+	return (pid_for_task(processTask, processID) == KERN_SUCCESS);
+}
+
 bool ZGAllocateMemory(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize size)
 {
 	return (mach_vm_allocate(processTask, address, size, VM_FLAGS_ANYWHERE) == KERN_SUCCESS);

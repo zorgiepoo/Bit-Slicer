@@ -40,11 +40,12 @@ typedef struct
 {
 	PyObject_HEAD
 	unsigned int processTask;
+	int32_t processIdentifier;
 } VirtualMemory;
 
 static PyMemberDef VirtualMemory_members[] =
 {
-	{"processTask", T_UINT, offsetof(VirtualMemory, processTask), 0, "process task"},
+	{"pid", T_INT, offsetof(VirtualMemory, processIdentifier), 0, "process identifier"},
 	{NULL, 0, 0, 0, NULL}
 };
 
@@ -186,6 +187,11 @@ static PyObject *virtualMemoryModule;
 			return nil;
 		}
 		((VirtualMemory *)self.vmObject)->processTask = processTask;
+		((VirtualMemory *)self.vmObject)->processIdentifier = 0;
+		if (!ZGPIDForTaskPort(processTask, &(((VirtualMemory *)self.vmObject)->processIdentifier)))
+		{
+			NSLog(@"Script Error: Failed to access PID for process task");
+		}
 	}
 	return self;
 }
