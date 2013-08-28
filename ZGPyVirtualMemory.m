@@ -222,10 +222,6 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 			ZGFreeBytes(self->processTask, bytes, size); \
 		} \
 	} \
-	else \
-	{ \
-		return NULL; \
-	} \
 	return retValue; \
 }
 
@@ -253,10 +249,6 @@ static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 			retValue =  Py_BuildValue("s#", bytes, numberOfBytesToRead);
 			ZGFreeBytes(self->processTask, bytes, numberOfBytesToRead);
 		}
-	}
-	else
-	{
-		return NULL;
 	}
 	return retValue;
 }
