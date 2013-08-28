@@ -224,7 +224,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 }
 
 VirtualMemory_read(int8_t, "b", readInt8)
-VirtualMemory_read(int8_t, "B", readUInt8)
+VirtualMemory_read(uint8_t, "B", readUInt8)
 VirtualMemory_read(int16_t, "h", readInt16)
 VirtualMemory_read(uint16_t, "H", readUInt16)
 VirtualMemory_read(int32_t, "i", readInt32)
@@ -275,7 +275,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 }
 
 VirtualMemory_write(int8_t, "b", writeInt8)
-VirtualMemory_write(int8_t, "B", writeUInt8)
+VirtualMemory_write(uint8_t, "B", writeUInt8)
 VirtualMemory_write(int16_t, "h", writeInt16)
 VirtualMemory_write(uint16_t, "H", writeUInt16)
 VirtualMemory_write(int32_t, "i", writeInt32)
