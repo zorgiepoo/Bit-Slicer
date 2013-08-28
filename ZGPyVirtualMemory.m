@@ -48,15 +48,61 @@ static PyMemberDef VirtualMemory_members[] =
 	{NULL, 0, 0, 0, NULL}
 };
 
-static PyObject *VirtualMemory_readInt16(VirtualMemory *self, PyObject *args);
-static PyObject *VirtualMemory_readFloat(VirtualMemory *self, PyObject *args);
+#define declarePrototypeMethod(name) static PyObject *VirtualMemory_##name(VirtualMemory *self, PyObject *args);
+
+declarePrototypeMethod(readInt8)
+declarePrototypeMethod(readUInt8)
+declarePrototypeMethod(readInt16)
+declarePrototypeMethod(readUInt16)
+declarePrototypeMethod(readInt32)
+declarePrototypeMethod(readUInt32)
+declarePrototypeMethod(readInt64)
+declarePrototypeMethod(readUInt64)
+declarePrototypeMethod(readFloat)
+declarePrototypeMethod(readDouble)
+declarePrototypeMethod(readBytes)
+
+declarePrototypeMethod(writeInt8)
+declarePrototypeMethod(writeUInt8)
+declarePrototypeMethod(writeInt16)
+declarePrototypeMethod(writeUInt16)
+declarePrototypeMethod(writeInt32)
+declarePrototypeMethod(writeUInt32)
+declarePrototypeMethod(writeInt64)
+declarePrototypeMethod(writeUInt64)
+declarePrototypeMethod(writeFloat)
+declarePrototypeMethod(writeDouble)
+declarePrototypeMethod(writeBytes)
+
 static PyObject *VirtualMemory_writeFloat(VirtualMemory *self, PyObject *args);
+
+#define declareMethod(name) {#name"", (PyCFunction)VirtualMemory_##name, METH_VARARGS, NULL},
 
 static PyMethodDef VirtualMemory_methods[] =
 {
-	{"readInt16", (PyCFunction)VirtualMemory_readInt16, METH_VARARGS, NULL},
-	{"readFloat", (PyCFunction)VirtualMemory_readFloat, METH_VARARGS, NULL},
-	{"writeFloat", (PyCFunction)VirtualMemory_writeFloat, METH_VARARGS, NULL},
+	declareMethod(readInt8)
+	declareMethod(readUInt8)
+	declareMethod(readInt16)
+	declareMethod(readUInt16)
+	declareMethod(readInt32)
+	declareMethod(readUInt32)
+	declareMethod(readInt64)
+	declareMethod(readUInt64)
+	declareMethod(readFloat)
+	declareMethod(readDouble)
+	declareMethod(readBytes)
+
+	declareMethod(writeInt8)
+	declareMethod(writeUInt8)
+	declareMethod(writeInt16)
+	declareMethod(writeUInt16)
+	declareMethod(writeInt32)
+	declareMethod(writeUInt32)
+	declareMethod(writeInt64)
+	declareMethod(writeUInt64)
+	declareMethod(writeFloat)
+	declareMethod(writeDouble)
+	declareMethod(writeBytes)
 	{NULL, NULL, 0, NULL}
 };
 
@@ -155,51 +201,106 @@ static PyObject *virtualMemoryModule;
 	self.vmObject = NULL;
 }
 
-static PyObject *VirtualMemory_readInt16(VirtualMemory *self, PyObject *args)
+#define VirtualMemory_read(type, typeFormat, functionName) \
+static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *args) \
+{ \
+	PyObject *retValue = NULL; \
+	ZGMemoryAddress memoryAddress = 0x0; \
+	if (PyArg_ParseTuple(args, "K", &memoryAddress)) \
+	{ \
+		void *bytes = NULL; \
+		ZGMemorySize size = sizeof(type); \
+		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &size)) \
+		{ \
+			retValue =  Py_BuildValue(typeFormat, *(type *)bytes); \
+			ZGFreeBytes(self->processTask, bytes, size); \
+		} \
+	} \
+	else \
+	{ \
+		return NULL; \
+	} \
+	return retValue; \
+}
+
+VirtualMemory_read(int8_t, "b", readInt8)
+VirtualMemory_read(int8_t, "B", readUInt8)
+VirtualMemory_read(int16_t, "h", readInt16)
+VirtualMemory_read(uint16_t, "H", readUInt16)
+VirtualMemory_read(int32_t, "i", readInt32)
+VirtualMemory_read(uint32_t, "I", readUInt32)
+VirtualMemory_read(int64_t, "L", readInt64)
+VirtualMemory_read(uint64_t, "K", readUInt64)
+VirtualMemory_read(float, "f", readFloat)
+VirtualMemory_read(double, "d", readDouble)
+
+static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
-	
 	ZGMemoryAddress memoryAddress = 0x0;
-	if (PyArg_ParseTuple(args, "K", &memoryAddress))
+	ZGMemorySize numberOfBytesToRead = 0;
+	if (PyArg_ParseTuple(args, "KK", &memoryAddress, &numberOfBytesToRead))
 	{
 		void *bytes = NULL;
-		ZGMemorySize size = sizeof(int16_t);
-		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &size))
+		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &numberOfBytesToRead))
 		{
-			retValue =  Py_BuildValue("i", *(int16_t *)bytes);
-			ZGFreeBytes(self->processTask, bytes, size);
+			retValue =  Py_BuildValue("s#", bytes, numberOfBytesToRead);
+			ZGFreeBytes(self->processTask, bytes, numberOfBytesToRead);
 		}
 	}
-	
+	else
+	{
+		return NULL;
+	}
 	return retValue;
 }
 
-static PyObject *VirtualMemory_readFloat(VirtualMemory *self, PyObject *args)
-{
-	PyObject *retValue = NULL;
-	
-	ZGMemoryAddress memoryAddress = 0x0;
-	if (PyArg_ParseTuple(args, "K", &memoryAddress))
-	{
-		void *bytes = NULL;
-		ZGMemorySize size = sizeof(float);
-		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &size))
-		{
-			retValue =  Py_BuildValue("f", *(float *)bytes);
-			ZGFreeBytes(self->processTask, bytes, size);
-		}
-	}
-	
-	return retValue;
+#define VirtualMemory_write(type, typeFormat, functionName) \
+static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *args) \
+{ \
+	ZGMemoryAddress memoryAddress = 0x0; \
+	type value = 0; \
+	if (PyArg_ParseTuple(args, "K"typeFormat, &memoryAddress, &value)) \
+	{ \
+		if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &value, sizeof(type))) \
+		{ \
+			return NULL; \
+		} \
+	} \
+	else \
+	{ \
+		return NULL; \
+	} \
+	return Py_BuildValue("i", 1); \
 }
 
-static PyObject *VirtualMemory_writeFloat(VirtualMemory *self, PyObject *args)
+VirtualMemory_write(int8_t, "b", writeInt8)
+VirtualMemory_write(int8_t, "B", writeUInt8)
+VirtualMemory_write(int16_t, "h", writeInt16)
+VirtualMemory_write(uint16_t, "H", writeUInt16)
+VirtualMemory_write(int32_t, "i", writeInt32)
+VirtualMemory_write(uint32_t, "I", writeUInt32)
+VirtualMemory_write(int64_t, "L", writeInt64)
+VirtualMemory_write(uint64_t, "K", writeUInt64)
+VirtualMemory_write(float, "f", writeFloat)
+VirtualMemory_write(double, "d", writeDouble)
+
+static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 {
 	ZGMemoryAddress memoryAddress = 0x0;
-	float value = 0;
-	if (PyArg_ParseTuple(args, "Kf", &memoryAddress, &value))
+	Py_buffer buffer;
+	if (PyArg_ParseTuple(args, "Ks*", &memoryAddress, &buffer))
 	{
-		ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &value, sizeof(float));
+		if (!PyBuffer_IsContiguous(&buffer, 'C') || !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, buffer.len))
+		{
+			PyBuffer_Release(&buffer);
+			return NULL;
+		}
+		PyBuffer_Release(&buffer);
+	}
+	else
+	{
+		return NULL;
 	}
 	return Py_BuildValue("");
 }
