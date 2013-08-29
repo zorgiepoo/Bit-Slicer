@@ -40,7 +40,7 @@
 typedef struct
 {
 	PyObject_HEAD
-	unsigned int processTask;
+	uint32_t processTask;
 	int32_t processIdentifier;
 } VirtualMemory;
 
