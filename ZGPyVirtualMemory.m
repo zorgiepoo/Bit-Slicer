@@ -80,8 +80,6 @@ declarePrototypeMethod(writeString8)
 declarePrototypeMethod(writeString16)
 declarePrototypeMethod(writeBytes)
 
-static PyObject *VirtualMemory_writeFloat(VirtualMemory *self, PyObject *args);
-
 #define declareMethod(name) {#name"", (PyCFunction)VirtualMemory_##name, METH_VARARGS, NULL},
 
 static PyMethodDef VirtualMemory_methods[] =
