@@ -96,16 +96,14 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex)); \
 	debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex+1)); \
 
-- (ZGMemoryAddress)removeWatchPoint:(ZGBreakPoint *)breakPoint
+- (void)removeWatchPoint:(ZGBreakPoint *)breakPoint
 {
-	ZGMemoryAddress instructionAddress = 0x0;
-	
 	thread_act_array_t threadList = NULL;
 	mach_msg_type_number_t threadListCount = 0;
 	if (task_threads(breakPoint.process.processTask, &threadList, &threadListCount) != KERN_SUCCESS)
 	{
 		NSLog(@"ERROR: task_threads failed on removing watchpoint");
-		return instructionAddress;
+		return;
 	}
 	
 	for (ZGDebugThread *debugThread in breakPoint.debugThreads)
@@ -156,11 +154,11 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		NSLog(@"Failed to deallocate thread list in removeWatchPoint...");
 	}
 	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		[[[ZGAppController sharedController] breakPointController] removeBreakPoint:breakPoint];
+	// we may still catch exceptions momentarily for our breakpoint if the data is being acccessed frequently, so do not remove it immediately
+	breakPoint.delegate = nil;
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
+		[self removeBreakPoint:breakPoint];
 	});
-	
-	return instructionAddress;
 }
 
 #define IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, type) \
@@ -226,9 +224,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 						{
 							ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
 							
-							dispatch_async(dispatch_get_main_queue(), ^{
-								[breakPoint.delegate breakPointDidHit:[NSNumber numberWithUnsignedLongLong:instructionAddress]];
-							});
+							[breakPoint.delegate breakPointDidHit:[NSNumber numberWithUnsignedLongLong:instructionAddress]];
 						}
 					}
 					
@@ -376,7 +372,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			for (ZGBreakPoint *candidateBreakPoint in self.breakPoints)
 			{
 				if (candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread)
-				{
+				{	
 					foundSingleStepBreakPoint = YES;
 					break;
 				}
@@ -482,17 +478,12 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	}
 	
 	// We should notify delegates if a breakpoint hits after we modify thread states
-	if (breakPointsToNotify.count > 0)
+	for (ZGBreakPoint *breakPoint in breakPointsToNotify)
 	{
-		dispatch_async(dispatch_get_main_queue(), ^{
-			for (ZGBreakPoint *breakPoint in breakPointsToNotify)
-			{
-				if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
-				{
-					[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
-				}
-			}
-		});
+		if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
+		{
+			[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
+		}
 	}
 	
 	ZGResumeTask(task);
@@ -520,7 +511,13 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 
 kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
 {
-	return catchMachException(thread, task);
+	__block kern_return_t retValue;
+	
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		retValue = catchMachException(thread, task);
+	});
+	
+	return retValue;
 }
 
 - (void)removeObserver:(id)observer
