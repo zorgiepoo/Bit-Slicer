@@ -323,8 +323,7 @@ EXIT_ON_CANCEL:
 	return success;
 }
 
-#define MAX_STRING_SIZE 1024
-ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize)
+ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize, ZGMemorySize maxStringSizeLimit)
 {
 	ZGMemorySize totalSize = 0;
 	
@@ -377,9 +376,9 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 				outputtedSize = numberOfCharacters * characterSize;
 			}
 			
-			if (totalSize >= MAX_STRING_SIZE)
+			if (maxStringSizeLimit > 0 && totalSize >= maxStringSizeLimit)
 			{
-				totalSize = MAX_STRING_SIZE;
+				totalSize = maxStringSizeLimit;
 				shouldBreak = YES;
 			}
 		}

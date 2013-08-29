@@ -34,6 +34,7 @@
 
 #import "ZGPyVirtualMemory.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
 #import <Python/structmember.h>
 
 typedef struct
@@ -61,6 +62,8 @@ declarePrototypeMethod(readInt64)
 declarePrototypeMethod(readUInt64)
 declarePrototypeMethod(readFloat)
 declarePrototypeMethod(readDouble)
+declarePrototypeMethod(readString8)
+declarePrototypeMethod(readString16)
 declarePrototypeMethod(readBytes)
 
 declarePrototypeMethod(writeInt8)
@@ -73,6 +76,8 @@ declarePrototypeMethod(writeInt64)
 declarePrototypeMethod(writeUInt64)
 declarePrototypeMethod(writeFloat)
 declarePrototypeMethod(writeDouble)
+declarePrototypeMethod(writeString8)
+declarePrototypeMethod(writeString16)
 declarePrototypeMethod(writeBytes)
 
 static PyObject *VirtualMemory_writeFloat(VirtualMemory *self, PyObject *args);
@@ -91,6 +96,8 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareMethod(readUInt64)
 	declareMethod(readFloat)
 	declareMethod(readDouble)
+	declareMethod(readString8)
+	declareMethod(readString16)
 	declareMethod(readBytes)
 
 	declareMethod(writeInt8)
@@ -103,6 +110,8 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareMethod(writeUInt64)
 	declareMethod(writeFloat)
 	declareMethod(writeDouble)
+	declareMethod(writeString8)
+	declareMethod(writeString16)
 	declareMethod(writeBytes)
 	{NULL, NULL, 0, NULL}
 };
@@ -110,45 +119,45 @@ static PyMethodDef VirtualMemory_methods[] =
 static PyTypeObject VirtualMemoryType =
 {
 	PyObject_HEAD_INIT(NULL)
-	0,                         /*ob_size*/
-	"virtualmemory.VirtualMemory", /*tp_name*/
-	sizeof(VirtualMemory), /*tp_basicsize*/
-	0,                         /*tp_itemsize*/
-	0,                         /*tp_dealloc*/
-	0,                         /*tp_print*/
-	0,                         /*tp_getattr*/
-	0,                         /*tp_setattr*/
-	0,                         /*tp_compare*/
-	0,                         /*tp_repr*/
-	0,                         /*tp_as_number*/
-	0,                         /*tp_as_sequence*/
-	0,                         /*tp_as_mapping*/
-	0,                         /*tp_hash */
-	0,                         /*tp_call*/
-	0,                         /*tp_str*/
-	0,                         /*tp_getattro*/
-	0,                         /*tp_setattro*/
-	0,                         /*tp_as_buffer*/
-	Py_TPFLAGS_DEFAULT, /*tp_flags*/
-	"VirtualMemory objects", /* tp_doc */
-	0,		               /* tp_traverse */
-	0,		               /* tp_clear */
-	0,		               /* tp_richcompare */
-	0,		               /* tp_weaklistoffset */
-	0,		               /* tp_iter */
-	0,		               /* tp_iternext */
-	VirtualMemory_methods, /* tp_methods */
-	VirtualMemory_members, /* tp_members */
-	0,                         /* tp_getset */
-	0,                         /* tp_base */
-	0,                         /* tp_dict */
-	0,                         /* tp_descr_get */
-	0,                         /* tp_descr_set */
-	0,                         /* tp_dictoffset */
-	0,      /* tp_init */
-	0,                         /* tp_alloc */
-	0,                 /* tp_new */
-	0, 0, 0, 0, 0, 0, 0, 0, 0 /* the rest */
+	0, // ob_size
+	"virtualmemory.VirtualMemory", // tp_name
+	sizeof(VirtualMemory), // tp_basicsize
+	0, // tp_itemsize
+	0, // tp_dealloc
+	0, // tp_print
+	0, // tp_getattr
+	0, // tp_setattr
+	0, // tp_compare
+	0, // tp_repr
+	0, // tp_as_number
+	0, // tp_as_sequence
+	0, // tp_as_mapping
+	0, // tp_hash 
+	0, // tp_call
+	0, // tp_str
+	0, // tp_getattro
+	0, // tp_setattro
+	0, // tp_as_buffer
+	Py_TPFLAGS_DEFAULT, // tp_flags
+	"VirtualMemory objects", // tp_doc
+	0,	// tp_traverse
+	0,	// tp_clear
+	0, // tp_richcompare
+	0,	// tp_weaklistoffset
+	0,	// tp_iter
+	0,	// tp_iternext
+	VirtualMemory_methods, // tp_methods
+	VirtualMemory_members, // tp_members
+	0, // tp_getset
+	0, // tp_base
+	0, // tp_dict
+	0, // tp_descr_get
+	0, // tp_descr_set
+	0, // tp_dictoffset
+	0, // tp_init
+	0, // tp_alloc
+	0, // tp_new
+	0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
 @implementation ZGPyVirtualMemory
@@ -236,21 +245,55 @@ VirtualMemory_read(uint64_t, "K", readUInt64)
 VirtualMemory_read(float, "f", readFloat)
 VirtualMemory_read(double, "d", readDouble)
 
+static void readBytes(PyObject **retValue, VirtualMemory *self, ZGMemoryAddress memoryAddress, ZGMemorySize *numberOfBytes)
+{
+	void *bytes = NULL;
+	if (ZGReadBytes(self->processTask, memoryAddress, &bytes, numberOfBytes))
+	{
+		*retValue = Py_BuildValue("s#", bytes, *numberOfBytes);
+		ZGFreeBytes(self->processTask, bytes, *numberOfBytes);
+	}
+}
+
 static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress memoryAddress = 0x0;
-	ZGMemorySize numberOfBytesToRead = 0;
-	if (PyArg_ParseTuple(args, "KK", &memoryAddress, &numberOfBytesToRead))
+	ZGMemorySize numberOfBytes = 0;
+	if (PyArg_ParseTuple(args, "KK", &memoryAddress, &numberOfBytes))
 	{
-		void *bytes = NULL;
-		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &numberOfBytesToRead))
+		readBytes(&retValue, self, memoryAddress, &numberOfBytes);
+	}
+	return retValue;
+}
+
+static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, ZGVariableType variableType)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0x0;
+	if (PyArg_ParseTuple(args, "K", &memoryAddress))
+	{
+		ZGMemorySize numberOfBytes = ZGGetStringSize(self->processTask, memoryAddress, variableType, 0, 0);
+		if (numberOfBytes == 0)
 		{
-			retValue =  Py_BuildValue("s#", bytes, numberOfBytesToRead);
-			ZGFreeBytes(self->processTask, bytes, numberOfBytesToRead);
+			retValue = PyString_FromString("");
+		}
+		else
+		{
+			readBytes(&retValue, self, memoryAddress, &numberOfBytes);
 		}
 	}
 	return retValue;
+}
+
+static PyObject *VirtualMemory_readString8(VirtualMemory *self, PyObject *args)
+{
+	return VirtualMemory_readString(self, args, ZGUTF8String);
+}
+
+static PyObject *VirtualMemory_readString16(VirtualMemory *self, PyObject *args)
+{
+	return VirtualMemory_readString(self, args, ZGUTF16String);
 }
 
 #define VirtualMemory_write(type, typeFormat, functionName) \
@@ -289,11 +332,18 @@ static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 	Py_buffer buffer;
 	if (PyArg_ParseTuple(args, "Ks*", &memoryAddress, &buffer))
 	{
-		if (!PyBuffer_IsContiguous(&buffer, 'C') || !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, buffer.len))
+		if (!PyBuffer_IsContiguous(&buffer, 'C'))
 		{
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
+		
+		if (buffer.len > 0 && !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, buffer.len))
+		{
+			PyBuffer_Release(&buffer);
+			return NULL;
+		}
+		
 		PyBuffer_Release(&buffer);
 	}
 	else
@@ -301,6 +351,48 @@ static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 		return NULL;
 	}
 	return Py_BuildValue("");
+}
+
+static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuffer, size_t nullSize)
+{
+	ZGMemoryAddress memoryAddress = 0x0;
+	Py_buffer buffer;
+	if (PyArg_ParseTuple(args, "Ks*", &memoryAddress, &buffer))
+	{
+		if (!PyBuffer_IsContiguous(&buffer, 'C'))
+		{
+			PyBuffer_Release(&buffer);
+			return NULL;
+		}
+		
+		if (buffer.len > 0)
+		{
+			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, buffer.len) || !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress+buffer.len, nullBuffer, nullSize))
+			{
+				PyBuffer_Release(&buffer);
+				return NULL;
+			}
+		}
+		
+		PyBuffer_Release(&buffer);
+	}
+	else
+	{
+		return NULL;
+	}
+	return Py_BuildValue("");
+}
+
+static PyObject *VirtualMemory_writeString8(VirtualMemory *self, PyObject *args)
+{
+	int8_t nullByte = 0;
+	return writeString(self, args, &nullByte, sizeof(nullByte));
+}
+
+static PyObject *VirtualMemory_writeString16(VirtualMemory *self, PyObject *args)
+{
+	int16_t nullByte = 0;
+	return writeString(self, args, &nullByte, sizeof(nullByte));
 }
 
 @end

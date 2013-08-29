@@ -113,7 +113,7 @@
 			 NSString *oldStringValue = [variable.stringValue copy];
 			 if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGUTF8String || variable.type == ZGUTF16String))
 			 {
-				 variable.size = ZGGetStringSize(self.windowController.currentProcess.processTask, variable.address, variable.type, variable.size);
+				 variable.size = ZGGetStringSize(self.windowController.currentProcess.processTask, variable.address, variable.type, variable.size, 1024);
 			 }
 			 
 			 if (variable.size)
