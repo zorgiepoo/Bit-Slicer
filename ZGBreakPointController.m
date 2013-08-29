@@ -480,10 +480,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	// We should notify delegates if a breakpoint hits after we modify thread states
 	for (ZGBreakPoint *breakPoint in breakPointsToNotify)
 	{
-		if ([breakPoint.delegate respondsToSelector:@selector(breakPointDidHit:)])
-		{
-			[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
-		}
+		[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
 	}
 	
 	ZGResumeTask(task);
@@ -622,7 +619,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	else if (watchSize == 4) { debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex+1)); } \
 	else if (watchSize == 8) { debugState.uds.type.__dr7 &= ~(1 << (18 + 2*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 2*debugRegisterIndex+1)); }
 
-- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointWatchDelegate>)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
+- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointDelegate>)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{

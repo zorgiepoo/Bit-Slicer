@@ -181,7 +181,7 @@
 		77329B6C168D0DF8007DCAE2 /* udis86.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = udis86.c; path = libudis86/udis86.c; sourceTree = "<group>"; };
 		77329B75168D14CB007DCAE2 /* ZGInstruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGInstruction.h; sourceTree = "<group>"; };
 		77329B76168D14CB007DCAE2 /* ZGInstruction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGInstruction.m; sourceTree = "<group>"; };
-		774EF69D17C9AA98005ABB20 /* ZGBreakPointWatchDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBreakPointWatchDelegate.h; sourceTree = "<group>"; };
+		7739727717CFB06D00B958EE /* ZGBreakPointDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBreakPointDelegate.h; sourceTree = "<group>"; };
 		774EF6A017C9C895005ABB20 /* ZGScriptManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGScriptManager.h; sourceTree = "<group>"; };
 		774EF6A117C9C895005ABB20 /* ZGScriptManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGScriptManager.m; sourceTree = "<group>"; };
 		774EF6A317C9E82B005ABB20 /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -457,7 +457,7 @@
 				77329B76168D14CB007DCAE2 /* ZGInstruction.m */,
 				77E652B1168F889C00D84A7F /* ZGBreakPointController.h */,
 				77E652B2168F889C00D84A7F /* ZGBreakPointController.m */,
-				774EF69D17C9AA98005ABB20 /* ZGBreakPointWatchDelegate.h */,
+				7739727717CFB06D00B958EE /* ZGBreakPointDelegate.h */,
 				77E652B7168FD49300D84A7F /* ZGBreakPoint.h */,
 				77E652B8168FD49300D84A7F /* ZGBreakPoint.m */,
 				77E652BA168FD59500D84A7F /* ZGDebugThread.h */,

@@ -32,7 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@protocol ZGBreakPointWatchDelegate <NSObject>
+@protocol ZGBreakPointDelegate <NSObject>
 
 - (void)breakPointDidHit:(NSNumber *)address;
 

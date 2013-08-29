@@ -34,11 +34,11 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGBreakPointController.h"
-#import "ZGBreakPointWatchDelegate.h"
+#import "ZGBreakPointDelegate.h"
 
 @class ZGDocumentWindowController;
 
-@interface ZGDocumentBreakPointController : NSObject <ZGBreakPointWatchDelegate>
+@interface ZGDocumentBreakPointController : NSObject <ZGBreakPointDelegate>
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 

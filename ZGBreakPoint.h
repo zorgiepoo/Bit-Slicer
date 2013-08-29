@@ -34,7 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
-#import "ZGBreakPointWatchDelegate.h"
+#import "ZGBreakPointDelegate.h"
 
 @class ZGVariable;
 @class ZGProcess;
@@ -48,7 +48,7 @@ typedef enum
 
 @interface ZGBreakPoint : NSObject
 
-@property (assign, nonatomic) id <ZGBreakPointWatchDelegate> delegate;
+@property (assign, nonatomic) id <ZGBreakPointDelegate> delegate;
 @property (readwrite, nonatomic) ZGMemoryMap task;
 @property (readwrite, nonatomic) thread_act_t thread;
 @property (strong, nonatomic) ZGVariable *variable;
