@@ -35,11 +35,10 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
-#import "ZGVariableProtocol.h"
 
 extern NSString *ZGVariablePboardType;
 
-@interface ZGVariable : NSObject <NSCoding, NSCopying, ZGVariableProtocol>
+@interface ZGVariable : NSObject <NSCoding, NSCopying>
 {
 	NSString *_addressStringValue;
 }
