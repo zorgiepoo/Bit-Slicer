@@ -52,6 +52,7 @@
 #import "ZGDebuggerController.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGDocument.h"
+#import "ZGVirtualMemory.h"
 
 @implementation ZGDocumentWindowController
 

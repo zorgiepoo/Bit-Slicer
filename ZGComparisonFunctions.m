@@ -33,6 +33,9 @@
  */
 
 #import "ZGComparisonFunctions.h"
+#import "ZGSearchData.h"
+
+#define COMPARISON_PARAMETERS ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGMemorySize size
 
 #define NOT_EQUALS_CALLER_ARGUMENTS searchData, variableValue, compareValue, size
 

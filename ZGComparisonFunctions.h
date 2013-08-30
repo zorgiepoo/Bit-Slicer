@@ -32,12 +32,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGVariable.h"
-#import "ZGVirtualMemory.h"
-#import "ZGSearchData.h"
+#import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
 
-#define COMPARISON_PARAMETERS ZGSearchData * __unsafe_unretained searchData, const void *variableValue, const void *compareValue, ZGMemorySize size
-typedef BOOL (*comparison_function_t)(COMPARISON_PARAMETERS);
+// takes ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGMemorySize size 
+typedef BOOL (*comparison_function_t)();
 
 @class ZGSearchData;
 
