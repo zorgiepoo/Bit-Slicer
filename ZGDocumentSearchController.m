@@ -487,7 +487,7 @@
 	self.searchData.dataAlignment =
 		self.documentData.ignoreDataAlignment
 		? sizeof(int8_t)
-		: ZGDataAlignment(self.windowController.currentProcess.is64Bit, dataType, self.searchData.dataSize);
+		: dataAlignment(self.windowController.currentProcess.is64Bit, dataType, self.searchData.dataSize);
 	
 	BOOL flagsFieldIsBlank = [[self.windowController.flagsTextField.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] isEqualToString:@""];
 	
@@ -608,27 +608,6 @@
 	}
 	
 	return YES;
-}
-
-ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
-{
-	ZGMemorySize dataAlignment;
-	
-	if (dataType == ZGUTF8String || dataType == ZGByteArray)
-	{
-		dataAlignment = sizeof(int8_t);
-	}
-	else if (dataType == ZGUTF16String)
-	{
-		dataAlignment = sizeof(int16_t);
-	}
-	else
-	{
-		// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while every other integral type is on its own size of boundary
-		dataAlignment = (!isProcess64Bit && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
-	}
-	
-	return dataAlignment;
 }
 
 - (void)searchVariablesWithComparisonFunction:(comparison_function_t)compareFunction byNarrowing:(BOOL)isNarrowing usingCompletionBlock:(dispatch_block_t)completeSearchBlock

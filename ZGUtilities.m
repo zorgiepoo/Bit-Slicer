@@ -231,6 +231,27 @@ void *valueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType
 	return value;
 }
 
+ZGMemorySize dataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
+{
+	ZGMemorySize dataAlignment;
+	
+	if (dataType == ZGUTF8String || dataType == ZGByteArray)
+	{
+		dataAlignment = sizeof(int8_t);
+	}
+	else if (dataType == ZGUTF16String)
+	{
+		dataAlignment = sizeof(int16_t);
+	}
+	else
+	{
+		// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while every other integral type is on its own size of boundary
+		dataAlignment = (!isProcess64Bit && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
+	}
+	
+	return dataAlignment;
+}
+
 unsigned char *allocateFlagsForByteArrayWildcards(NSString *searchValue)
 {
 	NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
