@@ -44,6 +44,8 @@ bool ZGDeallocatePort(ZGMemoryMap processTask);
 
 bool ZGPIDForTaskPort(ZGMemoryMap processTask, int *processID);
 
+bool ZGPageSize(ZGMemoryMap processTask, ZGMemorySize *pageSize);
+
 bool ZGAllocateMemory(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize size);
 bool ZGDeallocateMemory(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
 

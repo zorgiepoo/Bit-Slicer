@@ -53,6 +53,17 @@ bool ZGPIDForTaskPort(ZGMemoryMap processTask, int *processID)
 	return (pid_for_task(processTask, processID) == KERN_SUCCESS);
 }
 
+bool ZGPageSize(ZGMemoryMap processTask, ZGMemorySize *pageSize)
+{
+	vm_size_t tempPageSize;
+	kern_return_t retValue = host_page_size(processTask, &tempPageSize);
+	if (retValue == KERN_SUCCESS)
+	{
+		*pageSize = tempPageSize;
+	}
+	return (retValue == KERN_SUCCESS);
+}
+
 bool ZGAllocateMemory(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize size)
 {
 	return (mach_vm_allocate(processTask, address, size, VM_FLAGS_ANYWHERE) == KERN_SUCCESS);

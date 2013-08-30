@@ -32,13 +32,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
+#import "ZGVariableProtocol.h"
 
 extern NSString *ZGVariablePboardType;
 
-@interface ZGVariable : NSObject <NSCoding, NSCopying>
+@interface ZGVariable : NSObject <NSCoding, NSCopying, ZGVariableProtocol>
 {
 	NSString *_addressStringValue;
 }

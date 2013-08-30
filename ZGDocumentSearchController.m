@@ -49,16 +49,15 @@
 #import "ZGComparisonFunctions.h"
 #import "NSArrayAdditions.h"
 #import "ZGDocumentData.h"
+#import "ZGSearchFunctions.h"
 
 @interface ZGDocumentSearchController ()
 
 @property (assign) ZGDocumentWindowController *windowController;
 @property (strong, nonatomic, readwrite) NSTimer *userInterfaceTimer;
 @property (readwrite, strong, nonatomic) ZGSearchProgress *searchProgress;
-@property (strong, nonatomic) NSArray *temporaryResultSets;
+@property (nonatomic) ZGSearchResults *temporarySearchResults;
 @property (assign) BOOL isBusy;
-
-typedef BOOL (^search_for_data_t)(ZGSearchData *searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableData *results);
 
 @end
 
@@ -339,66 +338,9 @@ typedef BOOL (^search_for_data_t)(ZGSearchData *searchData, void *variableData, 
 	}
 }
 
-- (void)enumerateSearchResultsInRange:(NSRange)range usingBlock:(void (^)(ZGMemoryAddress, BOOL *))addressCallback
-{
-	ZGMemoryAddress absoluteLocation = range.location * sizeof(ZGMemoryAddress);
-	ZGMemoryAddress absoluteLength = range.length * sizeof(ZGMemoryAddress);
-	
-	BOOL setBeginOffset = NO;
-	BOOL setEndOffset = NO;
-	ZGMemoryAddress beginOffset = 0;
-	ZGMemoryAddress endOffset = 0;
-	ZGMemoryAddress accumulator = 0;
-	
-	BOOL shouldStopEnumerating = NO;
-	
-	for (NSData *resultSet in self.searchResults.resultSets)
-	{
-		accumulator += resultSet.length;
-		
-		if (!setBeginOffset && accumulator > absoluteLocation)
-		{
-			beginOffset = resultSet.length - (accumulator - absoluteLocation);
-			setBeginOffset = YES;
-		}
-		else if (setBeginOffset)
-		{
-			beginOffset = 0;
-		}
-		
-		if (!setEndOffset && accumulator >= absoluteLocation + absoluteLength)
-		{
-			endOffset = resultSet.length - (accumulator - (absoluteLocation + absoluteLength));
-			setEndOffset = YES;
-		}
-		else
-		{
-			endOffset = resultSet.length;
-		}
-		
-		if (setBeginOffset)
-		{
-			const void *resultBytes = resultSet.bytes;
-			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += sizeof(ZGMemoryAddress))
-			{
-				addressCallback(*(ZGMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
-				if (shouldStopEnumerating)
-				{
-					break;
-				}
-			}
-			
-			if (setEndOffset || shouldStopEnumerating)
-			{
-				break;
-			}
-		}
-	}
-}
-
 - (void)fetchVariablesFromResults
 {	
-	if (self.searchResults.resultSets && self.documentData.variables.count < MAX_TABLE_VIEW_ITEMS && self.searchResults.addressCount > 0)
+	if (self.documentData.variables.count < MAX_TABLE_VIEW_ITEMS && self.searchResults.addressCount > 0)
 	{
 		NSMutableArray *newVariables = [[NSMutableArray alloc] initWithArray:self.documentData.variables];
 		
@@ -411,26 +353,20 @@ typedef BOOL (^search_for_data_t)(ZGSearchData *searchData, void *variableData, 
 		ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
 		ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
 		
-		[self enumerateSearchResultsInRange:NSMakeRange(self.searchResults.addressIndex, numberOfVariables) usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
+		[self.searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
 			ZGVariable *newVariable =
 				[[ZGVariable alloc]
 				 initWithValue:NULL
 				 size:self.searchResults.dataSize
 				 address:variableAddress
-				 type:self.searchResults.dataType
+				 type:(ZGVariableType)self.searchResults.tag
 				 qualifier:qualifier
 				 pointerSize:pointerSize];
 			
 			[newVariables addObject:newVariable];
 		}];
 		
-		self.searchResults.addressIndex += numberOfVariables;
-		self.searchResults.addressCount -= numberOfVariables;
-		
-		if (self.searchResults.addressCount == 0)
-		{
-			self.searchResults.resultSets = nil;
-		}
+		[self.searchResults removeNumberOfAddresses:numberOfVariables];
 		
 		self.documentData.variables = [NSArray arrayWithArray:newVariables];
 		if (self.documentData.variables.count > 0)
@@ -461,27 +397,19 @@ typedef BOOL (^search_for_data_t)(ZGSearchData *searchData, void *variableData, 
 			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 		}
 		
-		ZGSearchResults *newSearchResults = [[ZGSearchResults alloc] init];
-		
-		newSearchResults.addressIndex = 0;
-		newSearchResults.addressCount = self.searchProgress.numberOfVariablesFound;
-		newSearchResults.dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
-		newSearchResults.dataSize = self.searchData.dataSize;
-		newSearchResults.resultSets = self.temporaryResultSets;
-		
-		if (notSearchedVariables.count + newSearchResults.addressCount != self.documentData.variables.count)
+		if (notSearchedVariables.count + self.temporarySearchResults.addressCount != self.documentData.variables.count)
 		{
 			self.windowController.undoManager.actionName = @"Search";
 			[[self.windowController.undoManager prepareWithInvocationTarget:self.windowController] updateVariables:self.documentData.variables searchResults:self.searchResults];
 			
 			self.documentData.variables = [NSArray arrayWithArray:notSearchedVariables];
-			self.searchResults = newSearchResults;
+			self.searchResults = self.temporarySearchResults;
 			[self fetchVariablesFromResults];
 			[self.windowController.tableController.variablesTableView reloadData];
 		}
 	}
 	
-	self.temporaryResultSets = nil;
+	self.temporarySearchResults = nil;
 	
 	BOOL shouldMakeSearchFieldFirstResponder = YES;
 	
@@ -700,314 +628,28 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
-- (void)searchVariablesWithComparisonFunction:(comparison_function_t)compareFunction usingCompletionBlock:(dispatch_block_t)completeSearchBlock
+- (void)searchVariablesWithComparisonFunction:(comparison_function_t)compareFunction byNarrowing:(BOOL)isNarrowing usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
-	ZGMemorySize dataSize = self.searchData.dataSize;
-	
-	[self createUserInterfaceTimer];
-	
 	ZGProcess *currentProcess = self.windowController.currentProcess;
-	search_for_data_t searchForDataCallback = ^(ZGSearchData * __unsafe_unretained searchData, void *variableData, void *compareData, ZGMemoryAddress address, NSMutableData * __unsafe_unretained results)
+	NSArray *searchedVariables = nil;
+	if (isNarrowing)
 	{
-		BOOL foundVariable = NO;
-		if (compareFunction(searchData, variableData, compareData, dataSize))
-		{
-			CFDataAppendBytes((__bridge CFMutableDataRef)results, (const UInt8 *)&address, sizeof(ZGMemorySize));
-			foundVariable = YES;
-		}
-		return foundVariable;
-	};
-	
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		self.temporaryResultSets = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, searchForDataCallback);
-		
-		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
-	});
-}
-
-NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, search_for_data_t searchForDataBlock)
-{
-	ZGMemorySize dataAlignment = searchData.dataAlignment;
-	ZGMemorySize dataSize = searchData.dataSize;
-	
-	void *searchValue = searchData.searchValue;
-	BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
-	
-	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
-	ZGMemoryAddress dataEndAddress = searchData.endAddress;
-	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
-	
-	// Page size will probably be 4096
-	ZGMemorySize pageSize;
-	vm_size_t tempPageSize = 0;
-	if (host_page_size(processTask, &tempPageSize) == KERN_SUCCESS)
-	{
-		pageSize = tempPageSize;
-	}
-	else
-	{
-		pageSize = NSPageSize();
-	}
-	
-	NSArray *regions;
-	if (!shouldCompareStoredValues)
-	{
-		regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-			return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
-		}];
-	}
-	else
-	{
-		regions = searchData.savedData;
-	}
-	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		searchProgress.initiatedSearch = YES;
-		searchProgress.progressType = ZGSearchProgressMemoryScanning;
-		searchProgress.maxProgress = regions.count;
-	});
-	
-	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
-	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
-	{
-		[allResultSets addObject:[[NSMutableData alloc] init]];
-	}
-	
-	dispatch_apply(regions.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
-		@autoreleasepool
-		{
-			ZGRegion *region = [regions objectAtIndex:regionIndex];
-			ZGMemoryAddress address = region.address;
-			ZGMemorySize size = region.size;
-			void *regionBytes = region.bytes;
-			
-			ZGMemorySize variablesFound = 0;
-			
-			NSMutableData *resultSet = [allResultSets objectAtIndex:regionIndex];
-			
-			char *bytes = NULL;
-			if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
-			{
-				ZGMemorySize dataIndex = 0;
-				while (dataIndex + dataSize <= size)
-				{
-					if (dataIndex % pageSize == 0 && searchProgress.shouldCancelSearch)
-					{
-						break;
-					}
-					
-					if (dataBeginAddress <= address + dataIndex &&
-						dataEndAddress >= address + dataIndex + dataSize)
-					{
-						if (searchForDataBlock(searchData, &bytes[dataIndex], !shouldCompareStoredValues ? (searchValue) : (regionBytes + dataIndex), address + dataIndex, resultSet))
-						{
-							variablesFound++;
-						}
-					}
-					dataIndex += dataAlignment;
-				}
-				
-				ZGFreeBytes(processTask, bytes, size);
-			}
-			
-			dispatch_async(dispatch_get_main_queue(), ^{
-				searchProgress.numberOfVariablesFound += variablesFound;
-				searchProgress.progress++;
-			});
-		}
-	});
-	
-	NSArray *returnedResults;
-	
-	if (searchProgress.shouldCancelSearch)
-	{
-		returnedResults = [NSArray array];
-		
-		// Deallocate allResultSets on a separate task since this could take some time if we allocated a lot of data
-		__block NSMutableArray *allResultSetsReference = allResultSets;
-		allResultSets = nil;
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			allResultSetsReference = nil;
-		});
-	}
-	else
-	{
-		returnedResults = [allResultSets zgFilterUsingBlock:(zg_array_filter_t)^(NSMutableData *resultSet) {
-			return resultSet.length == 0;
+		searchedVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable){
+			return !variable.enabled;
 		}];
 	}
 	
-	return returnedResults;
-}
-
-- (void)narrowDownVariablesWithComparisonFunction:(comparison_function_t)compareFunction usingCompletionBlock:(dispatch_block_t)completeSearchBlock
-{	
-	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
-	ZGMemorySize dataSize = self.searchData.dataSize;
-	void *searchValue = self.searchData.searchValue;
-	
-	ZGMemoryAddress beginningAddress = self.searchData.beginAddress;
-	ZGMemoryAddress endingAddress = self.searchData.endAddress;
-	
-	ZGSearchData *searchData = self.searchData;
-	
-	// Get all relevant regions
-	NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-		return !(region.address < endingAddress && region.address + region.size > beginningAddress && region.protection & VM_PROT_READ && (self.searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
-	}];
-	
-	NSArray *searchedVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable){
-		return !variable.enabled;
-	}];
-	
-	self.searchProgress.initiatedSearch = YES;
-	self.searchProgress.progressType = ZGSearchProgressMemoryScanning;
-	self.searchProgress.maxProgress = searchedVariables.count + self.searchResults.addressCount;
-	
-	[self createUserInterfaceTimer];
-	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		NSMutableData *newResultsData = [[NSMutableData alloc] init];
-		
-		__block ZGRegion *lastUsedRegion = nil;
-		__block ZGRegion *lastUsedSavedRegion = nil;
-		
-		__block NSUInteger numberOfVariablesFound = 0;
-		__block ZGMemorySize currentProgress = 0;
-		
-		ZGMemorySize maxProgress = self.searchProgress.maxProgress;
-		
-		// We'll update the progress at 5% intervals during our search
-		ZGMemorySize numberOfVariablesRequiredToUpdateProgress = (ZGMemorySize)(maxProgress * 0.05);
-		
-		BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
-		
-		CFMutableDataRef newResultsDataRef = (__bridge CFMutableDataRef)newResultsData;
-		
-		void (^searchVariableAddress)(ZGMemoryAddress, BOOL *) = ^(ZGMemoryAddress variableAddress, BOOL *stop) {
-			if (beginningAddress <= variableAddress && endingAddress >= variableAddress + dataSize)
-			{
-				// Check if the variable is in the last region we scanned
-				if (lastUsedRegion && variableAddress >= lastUsedRegion->_address && variableAddress + dataSize <= lastUsedRegion->_address + lastUsedRegion->_size)
-				{
-					void *compareValue = shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue;
-					if (compareValue && compareFunction(searchData, lastUsedRegion->_bytes + (variableAddress - lastUsedRegion->_address), compareValue, dataSize))
-					{
-						CFDataAppendBytes(newResultsDataRef, (const UInt8 *)&variableAddress, sizeof(ZGMemorySize));
-						numberOfVariablesFound++;
-					}
-				}
-				else
-				{
-					ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
-						if (region->_address + region->_size <= variableAddress)
-						{
-							return NSOrderedAscending;
-						}
-						else if (region->_address >= variableAddress + dataSize)
-						{
-							return NSOrderedDescending;
-						}
-						else
-						{
-							return NSOrderedSame;
-						}
-					}];
-					
-					if (targetRegion)
-					{
-						if (!targetRegion->_bytes)
-						{
-							void *bytes = NULL;
-							ZGMemorySize size = targetRegion->_size;
-							
-							if (ZGReadBytes(processTask, targetRegion->_address, &bytes, &size))
-							{
-								targetRegion->_bytes = bytes;
-								targetRegion->_size = size;
-								lastUsedRegion = targetRegion;
-							}
-						}
-						else
-						{
-							lastUsedRegion = targetRegion;
-						}
-						
-						if (lastUsedRegion == targetRegion && variableAddress >= targetRegion->_address && variableAddress + dataSize <= targetRegion->_address + targetRegion->_size)
-						{
-							void *compareValue = shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue;
-							if (compareValue && compareFunction(searchData, lastUsedRegion->_bytes + (variableAddress - lastUsedRegion->_address), compareValue, dataSize))
-							{
-								CFDataAppendBytes(newResultsDataRef, (const UInt8 *)&variableAddress, sizeof(ZGMemorySize));
-								numberOfVariablesFound++;
-							}
-						}
-					}
-				}
-			}
-			
-			// Update UI
-			if ((numberOfVariablesRequiredToUpdateProgress != 0 && currentProgress % numberOfVariablesRequiredToUpdateProgress == 0) || currentProgress + 1 == maxProgress)
-			{
-				if (self.searchProgress.shouldCancelSearch)
-				{
-					*stop = YES;
-				}
-				else
-				{
-					dispatch_async(dispatch_get_main_queue(), ^{
-						self.searchProgress.progress = currentProgress;
-						self.searchProgress.numberOfVariablesFound = numberOfVariablesFound;
-					});
-				}
-			}
-			
-			currentProgress++;
-		};
-		
-		BOOL shouldStopFirstIteration = NO;
-		for (ZGVariable *variable in searchedVariables)
+		if (!isNarrowing)
 		{
-			searchVariableAddress(variable.address, &shouldStopFirstIteration);
-			if (shouldStopFirstIteration)
-			{
-				break;
-			}
-		}
-		
-		if (!shouldStopFirstIteration && self.searchResults.resultSets && self.searchResults.addressCount > 0)
-		{	
-			__block BOOL shouldStopSecondIteration = NO;
-			[self enumerateSearchResultsInRange:NSMakeRange(self.searchResults.addressIndex, self.searchResults.addressCount) usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
-				searchVariableAddress(variableAddress, &shouldStopSecondIteration);
-				if (shouldStopSecondIteration)
-				{
-					*stop = shouldStopSecondIteration;
-				}
-			}];
-		}
-		
-		for (ZGRegion *region in regions)
-		{
-			if (region.bytes)
-			{
-				ZGFreeBytes(processTask, region.bytes, region.size);
-			}
-		}
-		
-		if (!self.searchProgress.shouldCancelSearch)
-		{
-			self.temporaryResultSets = @[newResultsData];
+			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction);
 		}
 		else
 		{
-			// Deallocate results into another task since it may take some time
-			__block NSMutableData *newResultsDataReference = newResultsData;
-			newResultsData = nil;
-			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-				newResultsDataReference = nil;
-			});
+			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction, searchedVariables, self.searchResults);
 		}
+		
+		self.temporarySearchResults.tag = self.documentData.selectedDatatypeTag;
 		
 		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
 	});
@@ -1052,10 +694,11 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 		[self prepareTask];
 		[self.searchProgress clear];
 		
+		[self createUserInterfaceTimer];
+		
 		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.windowController.currentProcess.is64Bit);
 		
-		dispatch_block_t completeSearchBlock = ^
-		{
+		[self searchVariablesWithComparisonFunction:compareFunction byNarrowing:self.isInNarrowSearchMode usingCompletionBlock:^ {
 			if (self.searchData.searchValue)
 			{
 				free(self.searchData.searchValue);
@@ -1065,16 +708,7 @@ NSArray *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSe
 			self.userInterfaceTimer = nil;
 			
 			[self finalizeSearchWithNotSearchedVariables:notSearchedVariables];
-		};
-		
-		if (!self.isInNarrowSearchMode)
-		{
-			[self searchVariablesWithComparisonFunction:compareFunction usingCompletionBlock:completeSearchBlock];
-		}
-		else
-		{
-			[self narrowDownVariablesWithComparisonFunction:compareFunction usingCompletionBlock:completeSearchBlock];
-		}
+		}];
 	}
 }
 

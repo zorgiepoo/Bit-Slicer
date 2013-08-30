@@ -36,6 +36,7 @@
 		77329B72168D0DF9007DCAE2 /* syn.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B69168D0DF7007DCAE2 /* syn.c */; };
 		77329B73168D0DF9007DCAE2 /* udis86.c in Sources */ = {isa = PBXBuildFile; fileRef = 77329B6C168D0DF8007DCAE2 /* udis86.c */; };
 		77329B77168D14CB007DCAE2 /* ZGInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 77329B76168D14CB007DCAE2 /* ZGInstruction.m */; };
+		7739727A17CFF5E600B958EE /* ZGSearchFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739727917CFF5E600B958EE /* ZGSearchFunctions.m */; };
 		774EF6A217C9C895005ABB20 /* ZGScriptManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 774EF6A117C9C895005ABB20 /* ZGScriptManager.m */; };
 		774EF6A517C9E82B005ABB20 /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 774EF6A417C9E82B005ABB20 /* VDKQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		774EF6A717CA892D005ABB20 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 774EF6A617CA892C005ABB20 /* Python.framework */; };
@@ -182,6 +183,9 @@
 		77329B75168D14CB007DCAE2 /* ZGInstruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGInstruction.h; sourceTree = "<group>"; };
 		77329B76168D14CB007DCAE2 /* ZGInstruction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGInstruction.m; sourceTree = "<group>"; };
 		7739727717CFB06D00B958EE /* ZGBreakPointDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGBreakPointDelegate.h; sourceTree = "<group>"; };
+		7739727817CFF5E500B958EE /* ZGSearchFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGSearchFunctions.h; sourceTree = "<group>"; };
+		7739727917CFF5E600B958EE /* ZGSearchFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGSearchFunctions.m; sourceTree = "<group>"; };
+		7739727B17D04A6700B958EE /* ZGVariableProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGVariableProtocol.h; sourceTree = "<group>"; };
 		774EF6A017C9C895005ABB20 /* ZGScriptManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZGScriptManager.h; sourceTree = "<group>"; };
 		774EF6A117C9C895005ABB20 /* ZGScriptManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZGScriptManager.m; sourceTree = "<group>"; };
 		774EF6A317C9E82B005ABB20 /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VDKQueue.h; sourceTree = "<group>"; };
@@ -632,6 +636,8 @@
 				77FF507016E867FB0005915D /* ZGSearchProgress.m */,
 				77A52D7D16F54F1F00347F8E /* ZGSearchResults.h */,
 				77A52D7E16F54F1F00347F8E /* ZGSearchResults.m */,
+				7739727817CFF5E500B958EE /* ZGSearchFunctions.h */,
+				7739727917CFF5E600B958EE /* ZGSearchFunctions.m */,
 				77CB973F121CD7DE000A91DE /* ZGComparisonFunctions.h */,
 				77CB9740121CD7DE000A91DE /* ZGComparisonFunctions.m */,
 			);
@@ -696,6 +702,7 @@
 				775FCB1611719DF6000054FB /* ZGProcess.h */,
 				775FCB1711719DF6000054FB /* ZGProcess.m */,
 				77FF509716EC12A20005915D /* ZGVariableTypes.h */,
+				7739727B17D04A6700B958EE /* ZGVariableProtocol.h */,
 				775FCB1811719DF6000054FB /* ZGVariable.h */,
 				775FCB1911719DF6000054FB /* ZGVariable.m */,
 			);
@@ -857,6 +864,7 @@
 				774EF6A517C9E82B005ABB20 /* VDKQueue.m in Sources */,
 				77CF8ABF17CA9D2200258AC5 /* ZGPyScript.m in Sources */,
 				77C24DDE17CC329000CA6A5E /* ZGPyVirtualMemory.m in Sources */,
+				7739727A17CFF5E600B958EE /* ZGSearchFunctions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

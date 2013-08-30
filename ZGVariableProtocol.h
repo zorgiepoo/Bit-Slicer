@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 3/9/13.
+ * Created by Mayur Pawashe on 8/29/13.
  *
  * Copyright (c) 2013 zgcoder
  * All rights reserved.
@@ -32,28 +32,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _ZG_VARIABLE_TYPES_H
-#define _ZG_VARIABLE_TYPES_H
+#import <Foundation/Foundation.h>
+#import "ZGMemoryTypes.h"
 
-typedef enum
-{
-	ZGInt8 = 0,
-	ZGInt16,
-	ZGInt32,
-	ZGInt64,
-	ZGFloat,
-	ZGDouble,
-	ZGUTF8String,
-	ZGUTF16String,
-	ZGPointer,
-    ZGByteArray,
-	ZGScript
-} ZGVariableType;
+@protocol ZGVariableProtocol <NSObject>
 
-typedef enum
-{
-	ZGSigned = 0,
-	ZGUnsigned,
-} ZGVariableQualifier;
+- (ZGMemoryAddress)address;
 
-#endif
+@end

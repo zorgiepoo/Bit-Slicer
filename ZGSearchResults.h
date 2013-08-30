@@ -33,15 +33,21 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGVariableTypes.h"
 #import "ZGMemoryTypes.h"
 
 @interface ZGSearchResults : NSObject
 
-@property (readwrite, nonatomic) ZGVariableType dataType;
-@property (readwrite, nonatomic) ZGMemorySize dataSize;
-@property (readwrite, nonatomic) ZGMemorySize addressIndex;
-@property (readwrite, nonatomic) ZGMemorySize addressCount;
-@property (strong, nonatomic) NSArray *resultSets;
+@property (nonatomic, readonly) ZGMemorySize addressCount;
+@property (nonatomic) ZGMemorySize dataSize;
+@property (nonatomic) NSInteger tag;
+
+typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
+
+- (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize;
+
+- (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses;
+
+- (void)enumerateWithCount:(ZGMemorySize)addressCount usingBlock:(zg_enumerate_search_results_t)addressCallback;
+- (void)enumerateUsingBlock:(zg_enumerate_search_results_t)addressCallback;
 
 @end

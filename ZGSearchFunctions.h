@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 3/9/13.
+ * Created by Mayur Pawashe on 8/29/13.
  *
  * Copyright (c) 2013 zgcoder
  * All rights reserved.
@@ -32,28 +32,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _ZG_VARIABLE_TYPES_H
-#define _ZG_VARIABLE_TYPES_H
+#import <Foundation/Foundation.h>
+#import "ZGMemoryTypes.h"
+#import "ZGComparisonFunctions.h"
 
-typedef enum
-{
-	ZGInt8 = 0,
-	ZGInt16,
-	ZGInt32,
-	ZGInt64,
-	ZGFloat,
-	ZGDouble,
-	ZGUTF8String,
-	ZGUTF16String,
-	ZGPointer,
-    ZGByteArray,
-	ZGScript
-} ZGVariableType;
+@class ZGSearchData;
+@class ZGSearchProgress;
+@class ZGSearchResults;
 
-typedef enum
-{
-	ZGSigned = 0,
-	ZGUnsigned,
-} ZGVariableQualifier;
+ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction);
 
-#endif
+// variablesToSearchFirst is an array of objects conforming to ZGVariableProtocol protocol -- these variables are searched and narrowed down on first.
+// Then the previous search results are searched and narrowed down on.
+ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, NSArray *variablesToSearchFirst, ZGSearchResults *previousSearchResults);

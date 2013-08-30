@@ -34,6 +34,107 @@
 
 #import "ZGSearchResults.h"
 
+@interface ZGSearchResults ()
+
+@property (nonatomic) ZGMemorySize addressIndex;
+@property (nonatomic) NSArray *resultSets;
+@property (nonatomic) ZGMemorySize addressCount;
+
+@end
+
 @implementation ZGSearchResults
+
+- (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize
+{
+	self = [super init];
+	if (self != nil)
+	{
+		self.resultSets = resultSets;
+		for (NSData *result in self.resultSets)
+		{
+			self.addressCount += result.length / sizeof(ZGMemoryAddress);
+		}
+		self.dataSize = dataSize;
+	}
+	return self;
+}
+
+- (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses
+{
+	self.addressIndex += numberOfAddresses;
+	self.addressCount -= numberOfAddresses;
+	
+	if (self.addressCount == 0)
+	{
+		self.resultSets = nil;
+	}
+}
+
+- (void)enumerateInRange:(NSRange)range usingBlock:(zg_enumerate_search_results_t)addressCallback
+{
+	ZGMemoryAddress absoluteLocation = range.location * sizeof(ZGMemoryAddress);
+	ZGMemoryAddress absoluteLength = range.length * sizeof(ZGMemoryAddress);
+	
+	BOOL setBeginOffset = NO;
+	BOOL setEndOffset = NO;
+	ZGMemoryAddress beginOffset = 0;
+	ZGMemoryAddress endOffset = 0;
+	ZGMemoryAddress accumulator = 0;
+	
+	BOOL shouldStopEnumerating = NO;
+	
+	for (NSData *resultSet in self.resultSets)
+	{
+		accumulator += resultSet.length;
+		
+		if (!setBeginOffset && accumulator > absoluteLocation)
+		{
+			beginOffset = resultSet.length - (accumulator - absoluteLocation);
+			setBeginOffset = YES;
+		}
+		else if (setBeginOffset)
+		{
+			beginOffset = 0;
+		}
+		
+		if (!setEndOffset && accumulator >= absoluteLocation + absoluteLength)
+		{
+			endOffset = resultSet.length - (accumulator - (absoluteLocation + absoluteLength));
+			setEndOffset = YES;
+		}
+		else
+		{
+			endOffset = resultSet.length;
+		}
+		
+		if (setBeginOffset)
+		{
+			const void *resultBytes = resultSet.bytes;
+			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += sizeof(ZGMemoryAddress))
+			{
+				addressCallback(*(ZGMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+				if (shouldStopEnumerating)
+				{
+					break;
+				}
+			}
+			
+			if (setEndOffset || shouldStopEnumerating)
+			{
+				break;
+			}
+		}
+	}
+}
+
+- (void)enumerateWithCount:(ZGMemorySize)addressCount usingBlock:(zg_enumerate_search_results_t)addressCallback
+{
+	[self enumerateInRange:NSMakeRange(self.addressIndex, addressCount) usingBlock:addressCallback];
+}
+
+- (void)enumerateUsingBlock:(zg_enumerate_search_results_t)addressCallback
+{
+	[self enumerateWithCount:self.addressCount usingBlock:addressCallback];
+}
 
 @end
