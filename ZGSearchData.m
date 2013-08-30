@@ -56,6 +56,7 @@
 	self.rangeValue = NULL;
 	self.byteArrayFlags = NULL;
 	self.searchValue = NULL;
+	self.savedData = nil;
 }
 
 - (void)setSearchValue:(void *)searchValue
@@ -72,7 +73,7 @@
 
 - (void)setSavedData:(NSArray *)newSavedData
 {
-	if (_savedData)
+	if (_savedData != NULL)
 	{
 		ZGFreeData(_savedData);
 	}
