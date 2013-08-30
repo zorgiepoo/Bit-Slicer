@@ -53,14 +53,14 @@
 
 @interface ZGDocumentData : NSObject
 
-@property (readwrite, nonatomic) NSInteger selectedDatatypeTag;
-@property (readwrite, nonatomic) NSInteger qualifierTag;
-@property (readwrite, nonatomic) NSInteger functionTypeTag;
-@property (readwrite, nonatomic) BOOL ignoreDataAlignment;
+@property (nonatomic) NSInteger selectedDatatypeTag;
+@property (nonatomic) NSInteger qualifierTag;
+@property (nonatomic) NSInteger functionTypeTag;
+@property (nonatomic) BOOL ignoreDataAlignment;
 @property (copy, nonatomic) NSString *beginningAddressStringValue;
 @property (copy, nonatomic) NSString *endingAddressStringValue;
 @property (copy, nonatomic) NSString *searchValueString;
-@property (strong, nonatomic) NSArray *variables;
+@property (nonatomic) NSArray *variables;
 @property (copy, nonatomic) NSString *desiredProcessName;
 @property (copy, nonatomic) NSString *lastEpsilonValue;
 @property (copy, nonatomic) NSString *lastAboveRangeValue;
