@@ -478,9 +478,8 @@
 	
 	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
 	
-	if (self.searchData.searchValue && ![self.windowController functionTypeAllowsSearchInput])
+	if (![self.windowController functionTypeAllowsSearchInput])
 	{
-		free(self.searchData.searchValue);
 		self.searchData.searchValue = NULL;
 	}
 	
@@ -681,12 +680,7 @@
 		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.windowController.currentProcess.is64Bit, (ZGVariableQualifier)self.documentData.qualifierTag);
 		
 		[self searchVariablesWithComparisonFunction:compareFunction byNarrowing:self.isInNarrowSearchMode usingCompletionBlock:^ {
-			if (self.searchData.searchValue)
-			{
-				free(self.searchData.searchValue);
-				self.searchData.searchValue = NULL;
-			}
-			
+			self.searchData.searchValue = NULL;
 			self.userInterfaceTimer = nil;
 			
 			[self finalizeSearchWithNotSearchedVariables:notSearchedVariables];

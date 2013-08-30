@@ -55,6 +55,13 @@
 	
 	self.rangeValue = NULL;
 	self.byteArrayFlags = NULL;
+	self.searchValue = NULL;
+}
+
+- (void)setSearchValue:(void *)searchValue
+{
+	free(_searchValue);
+	_searchValue = searchValue;
 }
 
 - (void)setRangeValue:(void *)newRangeValue
