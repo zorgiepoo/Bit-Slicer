@@ -1128,6 +1128,11 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (IBAction)searchValue:(id)sender
 {
+	// Make sure our fields are up to date
+	[self changeBeginningAddressString:self.beginningAddressTextField];
+	[self changeEndingAddressString:self.endingAddressTextField];
+	[self changeSearchValueString:self.searchValueTextField];
+	
 	[self.searchController searchOrCancel];
 }
 
