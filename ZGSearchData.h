@@ -50,24 +50,24 @@
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
 }
 
-@property (readwrite, nonatomic) void *searchValue;
-@property (readwrite, nonatomic) ZGMemorySize dataSize;
-@property (readwrite, nonatomic) ZGMemorySize dataAlignment;
+@property (nonatomic) void *searchValue;
+@property (nonatomic) ZGMemorySize dataSize;
+@property (nonatomic) ZGMemorySize dataAlignment;
 
-@property (readwrite, nonatomic) void *rangeValue;
-@property (readwrite, copy, nonatomic) NSString *lastEpsilonValue;
-@property (readwrite, copy, nonatomic) NSString *lastAboveRangeValue;
-@property (readwrite, copy, nonatomic) NSString *lastBelowRangeValue;
-@property (readwrite, strong, nonatomic) NSArray *savedData;
-@property (readwrite, strong, nonatomic) NSArray *tempSavedData;
-@property (readwrite, nonatomic) BOOL shouldCompareStoredValues;
-@property (readwrite, nonatomic) double epsilon;
-@property (readwrite, nonatomic) BOOL shouldIgnoreStringCase;
-@property (readwrite, nonatomic) BOOL shouldIncludeNullTerminator;
-@property (readwrite, nonatomic) ZGMemoryAddress beginAddress;
-@property (readwrite, nonatomic) ZGMemoryAddress endAddress;
-@property (readwrite, nonatomic) BOOL shouldScanUnwritableValues;
-@property (readwrite, assign, nonatomic) void *compareOffset;
-@property (readwrite, nonatomic) unsigned char *byteArrayFlags;
+@property (nonatomic) void *rangeValue;
+@property (copy, nonatomic) NSString *lastEpsilonValue;
+@property (copy, nonatomic) NSString *lastAboveRangeValue;
+@property (copy, nonatomic) NSString *lastBelowRangeValue;
+@property (nonatomic) NSArray *savedData;
+@property (nonatomic) NSArray *tempSavedData;
+@property (nonatomic) BOOL shouldCompareStoredValues;
+@property (nonatomic) double epsilon;
+@property (nonatomic) BOOL shouldIgnoreStringCase;
+@property (nonatomic) BOOL shouldIncludeNullTerminator;
+@property (nonatomic) ZGMemoryAddress beginAddress;
+@property (nonatomic) ZGMemoryAddress endAddress;
+@property (nonatomic) BOOL shouldScanUnwritableValues;
+@property (nonatomic) void *compareOffset;
+@property (nonatomic) unsigned char *byteArrayFlags;
 
 @end
