@@ -612,12 +612,27 @@
 - (void)searchVariablesWithComparisonFunction:(comparison_function_t)compareFunction byNarrowing:(BOOL)isNarrowing usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGProcess *currentProcess = self.windowController.currentProcess;
-	NSArray *searchedVariables = nil;
+	ZGSearchResults *firstSearchResults = nil;
 	if (isNarrowing)
 	{
-		searchedVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable){
-			return !variable.enabled;
-		}];
+		NSMutableData *firstResultSets = [NSMutableData data];
+		for (ZGVariable *variable in self.documentData.variables)
+		{
+			if (variable.enabled)
+			{
+				if (self.searchData.pointerSize == sizeof(ZGMemoryAddress))
+				{
+					ZGMemoryAddress variableAddress = variable.address;
+					[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
+				}
+				else
+				{
+					ZG32BitMemoryAddress variableAddress = (ZG32BitMemoryAddress)variable.address;
+					[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
+				}
+			}
+		}
+		firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
 	}
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -627,7 +642,7 @@
 		}
 		else
 		{
-			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction, searchedVariables, self.searchResults);
+			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction, firstSearchResults, self.searchResults);
 		}
 		
 		self.temporarySearchResults.tag = self.documentData.selectedDatatypeTag;

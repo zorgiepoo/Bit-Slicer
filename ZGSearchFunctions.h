@@ -43,6 +43,4 @@ typedef BOOL (*comparison_function_t)(ZGSearchData *searchData, const void *vari
 
 ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction);
 
-// variablesToSearchFirst is an array of objects conforming to ZGVariableProtocol protocol -- these variables are searched and narrowed down on first.
-// Then the previous search results are searched and narrowed down on.
-ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, NSArray *variablesToSearchFirst, ZGSearchResults *previousSearchResults);
+ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults);

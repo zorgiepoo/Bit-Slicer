@@ -40,7 +40,6 @@
 #import "ZGVirtualMemoryHelpers.h"
 #import "NSArrayAdditions.h"
 #import "ZGSearchResults.h"
-#import "ZGVariableProtocol.h"
 
 ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction)
 {
@@ -149,7 +148,7 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 	return [[ZGSearchResults alloc] initWithResultSets:resultSets dataSize:dataSize pointerSize:pointerSize];
 }
 
-ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, NSArray *variablesToSearchFirst, ZGSearchResults *previousSearchResults)
+ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, ZGSearchResults *firstSearchResults, ZGSearchResults *previousSearchResults)
 {
 	ZGMemorySize dataSize = searchData.dataSize;
 	void *searchValue = searchData.searchValue;
@@ -164,11 +163,9 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 		return !(region.address < endingAddress && region.address + region.size > beginningAddress && region.protection & VM_PROT_READ && (searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
 	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		searchProgress.initiatedSearch = YES;
-		searchProgress.progressType = ZGSearchProgressMemoryScanning;
-		searchProgress.maxProgress = variablesToSearchFirst.count + previousSearchResults.addressCount;
-	});
+	searchProgress.initiatedSearch = YES;
+	searchProgress.progressType = ZGSearchProgressMemoryScanning;
+	searchProgress.maxProgress = firstSearchResults.addressCount + previousSearchResults.addressCount;
 	
 	NSMutableData *newResultsData = [[NSMutableData alloc] init];
 	
@@ -273,15 +270,14 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 		currentProgress++;
 	};
 	
-	BOOL shouldStopFirstIteration = NO;
-	for (id <ZGVariableProtocol> variable in variablesToSearchFirst)
-	{
-		searchVariableAddress(variable.address, &shouldStopFirstIteration);
+	__block BOOL shouldStopFirstIteration = NO;
+	[firstSearchResults enumerateUsingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
+		searchVariableAddress(variableAddress, &shouldStopFirstIteration);
 		if (shouldStopFirstIteration)
 		{
-			break;
+			*stop = shouldStopFirstIteration;
 		}
-	}
+	}];
 	
 	if (!shouldStopFirstIteration && previousSearchResults.addressCount > 0)
 	{
