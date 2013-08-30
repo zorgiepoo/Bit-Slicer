@@ -39,6 +39,7 @@
 @property (nonatomic) ZGMemorySize addressIndex;
 @property (nonatomic) NSArray *resultSets;
 @property (nonatomic) ZGMemorySize addressCount;
+@property (nonatomic) ZGMemorySize dataSize;
 @property (nonatomic) ZGMemorySize pointerSize;
 
 @end

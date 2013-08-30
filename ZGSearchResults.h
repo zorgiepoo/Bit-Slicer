@@ -38,7 +38,7 @@
 @interface ZGSearchResults : NSObject
 
 @property (nonatomic, readonly) ZGMemorySize addressCount;
-@property (nonatomic) ZGMemorySize dataSize;
+@property (nonatomic, readonly) ZGMemorySize dataSize;
 @property (nonatomic) NSInteger tag;
 
 typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
