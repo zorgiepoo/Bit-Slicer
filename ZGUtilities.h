@@ -42,10 +42,8 @@
 	#define ZG_LOG(format, ...) do { } while (0)
 #endif
 
-@class ZGProcess;
-
 ZGMemoryAddress memoryAddressFromExpression(NSString *expression);
 BOOL isValidNumber(NSString *expression);
 
-void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
+void *valueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
 unsigned char *allocateFlagsForByteArrayWildcards(NSString *searchValue);

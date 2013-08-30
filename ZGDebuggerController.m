@@ -1565,7 +1565,7 @@ END_DEBUGGER_CHANGE:
 	// Make sure the old and new value that we are writing have the same size in bytes, so that undo/redo will work correctly for different sizes
 	
 	ZGMemorySize newWriteSize = 0;
-	void *newWriteValue = valueFromString(self.currentProcess, stringValue, ZGByteArray, &newWriteSize);
+	void *newWriteValue = valueFromString(self.currentProcess.is64Bit, stringValue, ZGByteArray, &newWriteSize);
 	if (newWriteValue)
 	{
 		if (newWriteSize > 0)
@@ -1625,7 +1625,7 @@ END_DEBUGGER_CHANGE:
 - (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
 	ZGMemorySize newSize = 0;
-	void *newValue = valueFromString(process, stringValue, ZGByteArray, &newSize);
+	void *newValue = valueFromString(process.is64Bit, stringValue, ZGByteArray, &newSize);
 	
 	if (newValue)
 	{

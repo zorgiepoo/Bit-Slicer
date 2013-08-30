@@ -344,7 +344,7 @@
 		if ([tableColumn.identifier isEqualToString:@"value"])
 		{
 			ZGMemorySize size;
-			void *newValue = valueFromString(self.breakPoint.process, object, theRegister.variable.type, &size);
+			void *newValue = valueFromString(self.breakPoint.process.is64Bit, object, theRegister.variable.type, &size);
 			if (newValue)
 			{
 				if (size <= self.breakPoint.process.pointerSize)

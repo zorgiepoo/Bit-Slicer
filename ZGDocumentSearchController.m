@@ -459,7 +459,7 @@
 	
 	// get search value and data size
 	ZGMemorySize tempDataSize = 0;
-	self.searchData.searchValue = valueFromString(self.windowController.currentProcess, evaluatedSearchExpression, dataType, &tempDataSize);
+	self.searchData.searchValue = valueFromString(self.windowController.currentProcess.is64Bit, evaluatedSearchExpression, dataType, &tempDataSize);
 	self.searchData.dataSize = tempDataSize;
 	
 	// We want to read the null terminator in this case... even though we normally don't store the terminator
@@ -517,7 +517,7 @@
 				{
 					// Clearly a range type of search
 					ZGMemorySize rangeDataSize;
-					self.searchData.rangeValue = valueFromString(self.windowController.currentProcess, flagsExpression, dataType, &rangeDataSize);
+					self.searchData.rangeValue = valueFromString(self.windowController.currentProcess.is64Bit, flagsExpression, dataType, &rangeDataSize);
 				}
 				else
 				{
@@ -539,7 +539,7 @@
 				{
 					// Clearly an epsilon flag
 					ZGMemorySize epsilonDataSize;
-					void *epsilon = valueFromString(self.windowController.currentProcess, flagsExpression, ZGDouble, &epsilonDataSize);
+					void *epsilon = valueFromString(self.windowController.currentProcess.is64Bit, flagsExpression, ZGDouble, &epsilonDataSize);
 					if (epsilon)
 					{
 						self.searchData.epsilon = *((double *)epsilon);

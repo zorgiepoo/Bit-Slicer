@@ -34,7 +34,6 @@
 
 #import "ZGUtilities.h"
 #import "NSStringAdditions.h"
-#import "ZGProcess.h"
 
 ZGMemoryAddress memoryAddressFromExpression(NSString *expression)
 {
@@ -66,7 +65,7 @@ BOOL isValidNumber(NSString *expression)
 	return result;
 }
 
-void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
+void *valueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
 {
 	void *value = NULL;
 	BOOL searchValueIsAHexRepresentation = stringValue.zgIsHexRepresentation;
@@ -109,7 +108,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		value = malloc((size_t)*dataSize);
 		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
-	else if (dataType == ZGInt32 || (dataType == ZGPointer && !process.is64Bit))
+	else if (dataType == ZGInt32 || (dataType == ZGPointer && !isProcess64Bit))
 	{
 		int32_t variableValue = 0;
 		
@@ -145,7 +144,7 @@ void *valueFromString(ZGProcess *process, NSString *stringValue, ZGVariableType 
 		value = malloc((size_t)*dataSize);
 		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
-	else if (dataType == ZGInt64 || (dataType == ZGPointer && process.is64Bit))
+	else if (dataType == ZGInt64 || (dataType == ZGPointer && isProcess64Bit))
 	{
 		int64_t variableValue = 0;
 		
