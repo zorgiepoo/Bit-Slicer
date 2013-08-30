@@ -62,5 +62,8 @@
 @property (copy, nonatomic) NSString *searchValueString;
 @property (strong, nonatomic) NSArray *variables;
 @property (strong, nonatomic) NSString *desiredProcessName;
+@property (copy, nonatomic) NSString *lastEpsilonValue;
+@property (copy, nonatomic) NSString *lastAboveRangeValue;
+@property (copy, nonatomic) NSString *lastBelowRangeValue;
 
 @end

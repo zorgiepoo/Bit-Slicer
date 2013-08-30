@@ -535,9 +535,9 @@
 	{
 		self.flagsLabel.stringValue = @"Below:";
 		
-		if (self.searchController.searchData.lastBelowRangeValue)
+		if (self.documentData.lastBelowRangeValue)
 		{
-			self.flagsTextField.stringValue = self.searchController.searchData.lastBelowRangeValue;
+			self.flagsTextField.stringValue = self.documentData.lastBelowRangeValue;
 		}
 		else
 		{
@@ -548,9 +548,9 @@
 	{
 		self.flagsLabel.stringValue = @"Above:";
 		
-		if (self.searchController.searchData.lastAboveRangeValue)
+		if (self.documentData.lastAboveRangeValue)
 		{
-			self.flagsTextField.stringValue = self.searchController.searchData.lastAboveRangeValue;
+			self.flagsTextField.stringValue = self.documentData.lastAboveRangeValue;
 		}
 		else
 		{
@@ -580,9 +580,9 @@
 		{
 			// epsilon
 			self.flagsLabel.stringValue = @"Epsilon:";
-			if (self.searchController.searchData.lastEpsilonValue)
+			if (self.documentData.lastEpsilonValue)
 			{
-				self.flagsTextField.stringValue = self.searchController.searchData.lastEpsilonValue;
+				self.flagsTextField.stringValue = self.documentData.lastEpsilonValue;
 			}
 			else
 			{

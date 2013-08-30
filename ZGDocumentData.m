@@ -35,6 +35,7 @@
 #import "ZGDocumentData.h"
 #import "ZGVariableTypes.h"
 #import "ZGComparisonFunctions.h"
+#import "ZGSearchData.h"
 
 @implementation ZGDocumentData
 
@@ -49,6 +50,7 @@
 		self.searchValueString = @"";
 		self.functionTypeTag = ZGEquals;
 		self.selectedDatatypeTag = ZGInt32;
+		self.lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];
 	}
 	return self;
 }

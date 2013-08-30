@@ -133,15 +133,15 @@
 	 forKey:ZGEndingAddressKey];
     
 	[keyedArchiver
-	 encodeObject:self.searchData.lastEpsilonValue
+	 encodeObject:self.data.lastEpsilonValue
 	 forKey:ZGEpsilonKey];
     
 	[keyedArchiver
-	 encodeObject:self.searchData.lastAboveRangeValue
+	 encodeObject:self.data.lastAboveRangeValue
 	 forKey:ZGAboveValueKey];
     
 	[keyedArchiver
-	 encodeObject:self.searchData.lastBelowRangeValue
+	 encodeObject:self.data.lastBelowRangeValue
 	 forKey:ZGBelowValueKey];
     
 	[keyedArchiver
@@ -191,9 +191,9 @@
 	
 	self.data.searchValueString = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey]];
 	
-	self.searchData.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
-	self.searchData.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];
-	self.searchData.lastBelowRangeValue = [keyedUnarchiver decodeObjectForKey:ZGBelowValueKey];
+	self.data.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
+	self.data.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];
+	self.data.lastBelowRangeValue = [keyedUnarchiver decodeObjectForKey:ZGBelowValueKey];
 	
 	// For reverting, the window controller may have already been loaded
 	if (self.windowController != nil)

@@ -44,7 +44,6 @@
 	{
 		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &_collator);
 		self.endAddress = MAX_MEMORY_ADDRESS;
-		self.lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];
 		self.shouldScanUnwritableValues = YES;
 	}
 	return self;

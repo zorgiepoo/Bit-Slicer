@@ -523,11 +523,11 @@
 				
 				if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored)
 				{
-					self.searchData.lastBelowRangeValue = self.windowController.flagsTextField.stringValue;
+					self.documentData.lastBelowRangeValue = self.windowController.flagsTextField.stringValue;
 				}
 				else if (functionType == ZGLessThan || functionType == ZGLessThanStored)
 				{
-					self.searchData.lastAboveRangeValue = self.windowController.flagsTextField.stringValue;
+					self.documentData.lastAboveRangeValue = self.windowController.flagsTextField.stringValue;
 				}
 			}
 			else
@@ -548,7 +548,7 @@
 					self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
 				}
 				
-				self.searchData.lastEpsilonValue = self.windowController.flagsTextField.stringValue;
+				self.documentData.lastEpsilonValue = self.windowController.flagsTextField.stringValue;
 			}
 		}
 	}

@@ -55,9 +55,6 @@
 @property (nonatomic) ZGMemorySize dataAlignment;
 
 @property (nonatomic) void *rangeValue;
-@property (copy, nonatomic) NSString *lastEpsilonValue;
-@property (copy, nonatomic) NSString *lastAboveRangeValue;
-@property (copy, nonatomic) NSString *lastBelowRangeValue;
 @property (nonatomic) NSArray *savedData;
 @property (nonatomic) NSArray *tempSavedData;
 @property (nonatomic) BOOL shouldCompareStoredValues;
