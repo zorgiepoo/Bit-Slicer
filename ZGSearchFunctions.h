@@ -34,11 +34,12 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
-#import "ZGComparisonFunctions.h"
 
 @class ZGSearchData;
 @class ZGSearchProgress;
 @class ZGSearchResults;
+
+typedef BOOL (*comparison_function_t)(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGMemorySize size);
 
 ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction);
 

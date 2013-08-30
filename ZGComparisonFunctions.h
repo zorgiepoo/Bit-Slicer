@@ -34,11 +34,7 @@
 
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
-
-// takes ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGMemorySize size 
-typedef BOOL (*comparison_function_t)();
-
-@class ZGSearchData;
+#import "ZGSearchFunctions.h"
 
 typedef enum
 {
