@@ -148,7 +148,7 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 	return [[ZGSearchResults alloc] initWithResultSets:resultSets dataSize:dataSize pointerSize:pointerSize];
 }
 
-ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, ZGSearchResults *firstSearchResults, ZGSearchResults *previousSearchResults)
+ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults)
 {
 	ZGMemorySize dataSize = searchData.dataSize;
 	void *searchValue = searchData.searchValue;
@@ -165,7 +165,7 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 	
 	searchProgress.initiatedSearch = YES;
 	searchProgress.progressType = ZGSearchProgressMemoryScanning;
-	searchProgress.maxProgress = firstSearchResults.addressCount + previousSearchResults.addressCount;
+	searchProgress.maxProgress = firstSearchResults.addressCount + laterSearchResults.addressCount;
 	
 	NSMutableData *newResultsData = [[NSMutableData alloc] init];
 	
@@ -279,10 +279,10 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 		}
 	}];
 	
-	if (!shouldStopFirstIteration && previousSearchResults.addressCount > 0)
+	if (!shouldStopFirstIteration && laterSearchResults.addressCount > 0)
 	{
 		__block BOOL shouldStopSecondIteration = NO;
-		[previousSearchResults enumerateUsingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
+		[laterSearchResults enumerateUsingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
 			searchVariableAddress(variableAddress, &shouldStopSecondIteration);
 			if (shouldStopSecondIteration)
 			{
