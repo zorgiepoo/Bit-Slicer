@@ -60,11 +60,7 @@
 
 - (void)setRangeValue:(void *)newRangeValue
 {
-	if (_rangeValue)
-	{
-		free(_rangeValue);
-	}
-	
+	free(_rangeValue);
 	_rangeValue = newRangeValue;
 }
 
@@ -80,11 +76,7 @@
 
 - (void)setByteArrayFlags:(unsigned char *)newByteArrayFlags
 {
-	if (_byteArrayFlags)
-	{
-		free(_byteArrayFlags);
-	}
-	
+	free(_byteArrayFlags);
 	_byteArrayFlags = newByteArrayFlags;
 }
 
