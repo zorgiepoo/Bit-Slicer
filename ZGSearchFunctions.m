@@ -164,9 +164,11 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 		return !(region.address < endingAddress && region.address + region.size > beginningAddress && region.protection & VM_PROT_READ && (searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
 	
-	searchProgress.initiatedSearch = YES;
-	searchProgress.progressType = ZGSearchProgressMemoryScanning;
-	searchProgress.maxProgress = variablesToSearchFirst.count + previousSearchResults.addressCount;
+	dispatch_async(dispatch_get_main_queue(), ^{
+		searchProgress.initiatedSearch = YES;
+		searchProgress.progressType = ZGSearchProgressMemoryScanning;
+		searchProgress.maxProgress = variablesToSearchFirst.count + previousSearchResults.addressCount;
+	});
 	
 	NSMutableData *newResultsData = [[NSMutableData alloc] init];
 	
