@@ -524,6 +524,8 @@
 		
 		[self.tableController.variablesTableView reloadData];
 		[self markDocumentChange];
+		
+		self.documentData.qualifierTag = newQualifier;
 	}
 }
 
