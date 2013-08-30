@@ -699,7 +699,7 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 		
 		[self createUserInterfaceTimer];
 		
-		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.windowController.currentProcess.is64Bit);
+		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.windowController.currentProcess.is64Bit, (ZGVariableQualifier)self.documentData.qualifierTag);
 		
 		[self searchVariablesWithComparisonFunction:compareFunction byNarrowing:self.isInNarrowSearchMode usingCompletionBlock:^ {
 			if (self.searchData.searchValue)

@@ -151,12 +151,32 @@ BOOL ZGInt8LessThan(COMPARISON_PARAMETERS)
 	return isLessThan;
 }
 
+BOOL ZGUInt8LessThan(COMPARISON_PARAMETERS)
+{
+	BOOL isLessThan = *((uint8_t *)variableValue) < *((uint8_t *)compareValue);
+	if (searchData->_rangeValue && isLessThan)
+	{
+		isLessThan = *((uint8_t *)variableValue) > *((uint8_t *)searchData->_rangeValue);
+	}
+	return isLessThan;
+}
+
 BOOL ZGInt16LessThan(COMPARISON_PARAMETERS)
 {
 	BOOL isLessThan = *((int16_t *)variableValue) < *((int16_t *)compareValue);
 	if (searchData->_rangeValue && isLessThan)
 	{
 		isLessThan = *((int16_t *)variableValue) > *((int16_t *)searchData->_rangeValue);
+	}
+	return isLessThan;
+}
+
+BOOL ZGUInt16LessThan(COMPARISON_PARAMETERS)
+{
+	BOOL isLessThan = *((uint16_t *)variableValue) < *((uint16_t *)compareValue);
+	if (searchData->_rangeValue && isLessThan)
+	{
+		isLessThan = *((uint16_t *)variableValue) > *((uint16_t *)searchData->_rangeValue);
 	}
 	return isLessThan;
 }
@@ -171,12 +191,32 @@ BOOL ZGInt32LessThan(COMPARISON_PARAMETERS)
 	return isLessThan;
 }
 
+BOOL ZGUInt32LessThan(COMPARISON_PARAMETERS)
+{
+	BOOL isLessThan = *((uint32_t *)variableValue) < *((uint32_t *)compareValue);
+	if (searchData->_rangeValue && isLessThan)
+	{
+		isLessThan = *((uint32_t *)variableValue) > *((uint32_t *)searchData->_rangeValue);
+	}
+	return isLessThan;
+}
+
 BOOL ZGInt64LessThan(COMPARISON_PARAMETERS)
 {
 	BOOL isLessThan = *((int64_t *)variableValue) < *((int64_t *)compareValue);
 	if (searchData->_rangeValue && isLessThan)
 	{
 		isLessThan = *((int64_t *)variableValue) > *((int64_t *)searchData->_rangeValue);
+	}
+	return isLessThan;
+}
+
+BOOL ZGUInt64LessThan(COMPARISON_PARAMETERS)
+{
+	BOOL isLessThan = *((uint64_t *)variableValue) < *((uint64_t *)compareValue);
+	if (searchData->_rangeValue && isLessThan)
+	{
+		isLessThan = *((uint64_t *)variableValue) > *((uint64_t *)searchData->_rangeValue);
 	}
 	return isLessThan;
 }
@@ -213,12 +253,32 @@ BOOL ZGInt8GreaterThan(COMPARISON_PARAMETERS)
 	return isGreaterThan;
 }
 
+BOOL ZGUInt8GreaterThan(COMPARISON_PARAMETERS)
+{
+	BOOL isGreaterThan = *((uint8_t *)variableValue) > *((uint8_t *)compareValue);
+	if (searchData->_rangeValue && isGreaterThan)
+	{
+		isGreaterThan = *((uint8_t *)variableValue) < *((uint8_t *)searchData->_rangeValue);
+	}
+	return isGreaterThan;
+}
+
 BOOL ZGInt16GreaterThan(COMPARISON_PARAMETERS)
 {
 	BOOL isGreaterThan = *((int16_t *)variableValue) > *((int16_t *)compareValue);
 	if (searchData->_rangeValue && isGreaterThan)
 	{
 		isGreaterThan = *((int16_t *)variableValue) < *((int16_t *)searchData->_rangeValue);
+	}
+	return isGreaterThan;
+}
+
+BOOL ZGUInt16GreaterThan(COMPARISON_PARAMETERS)
+{
+	BOOL isGreaterThan = *((uint16_t *)variableValue) > *((uint16_t *)compareValue);
+	if (searchData->_rangeValue && isGreaterThan)
+	{
+		isGreaterThan = *((uint16_t *)variableValue) < *((uint16_t *)searchData->_rangeValue);
 	}
 	return isGreaterThan;
 }
@@ -233,12 +293,32 @@ BOOL ZGInt32GreaterThan(COMPARISON_PARAMETERS)
 	return isGreaterThan;
 }
 
+BOOL ZGUInt32GreaterThan(COMPARISON_PARAMETERS)
+{
+	BOOL isGreaterThan = *((uint32_t *)variableValue) > *((uint32_t *)compareValue);
+	if (searchData->_rangeValue && isGreaterThan)
+	{
+		isGreaterThan = *((uint32_t *)variableValue) < *((uint32_t *)searchData->_rangeValue);
+	}
+	return isGreaterThan;
+}
+
 BOOL ZGInt64GreaterThan(COMPARISON_PARAMETERS)
 {
 	BOOL isGreaterThan = *((int64_t *)variableValue) > *((int64_t *)compareValue);
 	if (searchData->_rangeValue && isGreaterThan)
 	{
 		isGreaterThan = *((int64_t *)variableValue) < *((int64_t *)searchData->_rangeValue);
+	}
+	return isGreaterThan;
+}
+
+BOOL ZGUInt64GreaterThan(COMPARISON_PARAMETERS)
+{
+	BOOL isGreaterThan = *((uint64_t *)variableValue) > *((uint64_t *)compareValue);
+	if (searchData->_rangeValue && isGreaterThan)
+	{
+		isGreaterThan = *((uint64_t *)variableValue) < *((uint64_t *)searchData->_rangeValue);
 	}
 	return isGreaterThan;
 }
@@ -468,23 +548,57 @@ comparison_function_t getNotEqualsComparisonFunction(ZGVariableType dataType, BO
 	return comparisonFunction;
 }
 
-comparison_function_t getLessThanComparisonFunction(ZGVariableType dataType, BOOL is64Bit)
+comparison_function_t getLessThanComparisonFunction(ZGVariableType dataType, BOOL is64Bit, ZGVariableQualifier qualifier)
 {
 	comparison_function_t comparisonFunction = NULL;
 	
 	switch (dataType)
 	{
 		case ZGInt8:
-			comparisonFunction = ZGInt8LessThan;
+			if (qualifier == ZGSigned)
+			{
+				comparisonFunction = ZGInt8LessThan;
+			}
+			else
+			{
+				comparisonFunction = ZGUInt8LessThan;
+			}
 			break;
 		case ZGInt16:
-			comparisonFunction = ZGInt16LessThan;
+			if (qualifier == ZGSigned)
+			{
+				comparisonFunction = ZGInt16LessThan;
+			}
+			else
+			{
+				comparisonFunction = ZGUInt16LessThan;
+			}
 			break;
+		case ZGPointer:
+			if (is64Bit)
+			{
+				goto ZG_64_BIT_LESS_THAN_LABEL;
+			}
 		case ZGInt32:
-			comparisonFunction = ZGInt32LessThan;
+			if (qualifier == ZGSigned)
+			{
+				comparisonFunction = ZGInt32LessThan;
+			}
+			else
+			{
+				comparisonFunction = ZGUInt32LessThan;
+			}
 			break;
+		ZG_64_BIT_LESS_THAN_LABEL:
 		case ZGInt64:
-			comparisonFunction = ZGInt64LessThan;
+			if (qualifier == ZGSigned)
+			{
+				comparisonFunction = ZGInt64LessThan;
+			}
+			else
+			{
+				comparisonFunction = ZGUInt64LessThan;
+			}
 			break;
 		case ZGFloat:
 			comparisonFunction = ZGFloatLessThan;
@@ -498,9 +612,6 @@ comparison_function_t getLessThanComparisonFunction(ZGVariableType dataType, BOO
 			break;
 		case ZGByteArray:
 			break;
-		case ZGPointer:
-			comparisonFunction = is64Bit ? ZGInt64LessThan : ZGInt32LessThan;
-			break;
 		case ZGScript:
 			break;
 	}
@@ -508,23 +619,57 @@ comparison_function_t getLessThanComparisonFunction(ZGVariableType dataType, BOO
 	return comparisonFunction;
 }
 
-comparison_function_t getGreaterThanComparisonFunction(ZGVariableType dataType, BOOL is64Bit)
+comparison_function_t getGreaterThanComparisonFunction(ZGVariableType dataType, BOOL is64Bit, ZGVariableQualifier qualifier)
 {
 	comparison_function_t comparisonFunction = NULL;
 	
 	switch (dataType)
 	{
 		case ZGInt8:
-			comparisonFunction = ZGInt8GreaterThan;
+			if (qualifier == ZGSigned)
+			{
+				comparisonFunction = ZGInt8GreaterThan;
+			}
+			else
+			{
+				comparisonFunction = ZGUInt8GreaterThan;
+			}
 			break;
 		case ZGInt16:
-			comparisonFunction = ZGInt16GreaterThan;
+			if (qualifier == ZGSigned)
+			{
+				comparisonFunction = ZGInt16GreaterThan;
+			}
+			else
+			{
+				comparisonFunction = ZGUInt16GreaterThan;
+			}
 			break;
+		case ZGPointer:
+			if (is64Bit)
+			{
+				goto ZG_64_BIT_GREATER_THAN_LABEL;
+			}
 		case ZGInt32:
-			comparisonFunction = ZGInt32GreaterThan;
+			if (qualifier == ZGSigned)
+			{
+				comparisonFunction = ZGInt32GreaterThan;
+			}
+			else
+			{
+				comparisonFunction = ZGUInt32GreaterThan;
+			}
 			break;
+		ZG_64_BIT_GREATER_THAN_LABEL:
 		case ZGInt64:
-			comparisonFunction = ZGInt64GreaterThan;
+			if (qualifier == ZGSigned)
+			{
+				comparisonFunction = ZGInt64GreaterThan;
+			}
+			else
+			{
+				comparisonFunction = ZGUInt64GreaterThan;
+			}
 			break;
 		case ZGFloat:
 			comparisonFunction = ZGFloatGreaterThan;
@@ -537,9 +682,6 @@ comparison_function_t getGreaterThanComparisonFunction(ZGVariableType dataType, 
 		case ZGUTF16String:
 			break;
 		case ZGByteArray:
-			break;
-		case ZGPointer:
-			comparisonFunction = is64Bit ? ZGInt64GreaterThan : ZGInt32GreaterThan;
 			break;
 		case ZGScript:
 			break;
@@ -628,7 +770,7 @@ comparison_function_t getNotEqualsStoredPlusComparisonFunction(ZGVariableType da
 	return comparisonFunction;
 }
 
-comparison_function_t getComparisonFunction(ZGFunctionType functionType, ZGVariableType dataType, BOOL is64Bit)
+comparison_function_t getComparisonFunction(ZGFunctionType functionType, ZGVariableType dataType, BOOL is64Bit, ZGVariableQualifier qualifier)
 {
 	comparison_function_t comparisonFunction = NULL;
 	
@@ -644,11 +786,11 @@ comparison_function_t getComparisonFunction(ZGFunctionType functionType, ZGVaria
 			break;
 		case ZGLessThan:
 		case ZGLessThanStored:
-			comparisonFunction = getLessThanComparisonFunction(dataType, is64Bit);
+			comparisonFunction = getLessThanComparisonFunction(dataType, is64Bit, qualifier);
 			break;
 		case ZGGreaterThan:
 		case ZGGreaterThanStored:
-			comparisonFunction = getGreaterThanComparisonFunction(dataType, is64Bit);
+			comparisonFunction = getGreaterThanComparisonFunction(dataType, is64Bit, qualifier);
 			break;
 		case ZGEqualsStoredPlus:
 			comparisonFunction = getEqualsStoredPlusComparisonFunction(dataType, is64Bit);

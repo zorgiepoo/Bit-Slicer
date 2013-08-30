@@ -59,5 +59,5 @@ typedef enum
 	ZGStoreAllValues,
 } ZGFunctionType;
 
-comparison_function_t getComparisonFunction(ZGFunctionType functionType, ZGVariableType dataType, BOOL is64Bit);
+comparison_function_t getComparisonFunction(ZGFunctionType functionType, ZGVariableType dataType, BOOL is64Bit, ZGVariableQualifier qualifier);
 
