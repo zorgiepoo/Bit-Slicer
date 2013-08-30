@@ -434,6 +434,8 @@
 {
 	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
 	
+	self.searchData.pointerSize = self.windowController.currentProcess.pointerSize;
+	
 	// Set default search arguments
 	self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
 	self.searchData.rangeValue = NULL;

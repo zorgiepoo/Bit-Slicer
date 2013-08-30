@@ -53,6 +53,7 @@
 @property (nonatomic) void *searchValue;
 @property (nonatomic) ZGMemorySize dataSize;
 @property (nonatomic) ZGMemorySize dataAlignment;
+@property (nonatomic) ZGMemorySize pointerSize;
 
 @property (nonatomic) void *rangeValue;
 @property (nonatomic) NSArray *savedData;

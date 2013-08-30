@@ -39,20 +39,22 @@
 @property (nonatomic) ZGMemorySize addressIndex;
 @property (nonatomic) NSArray *resultSets;
 @property (nonatomic) ZGMemorySize addressCount;
+@property (nonatomic) ZGMemorySize pointerSize;
 
 @end
 
 @implementation ZGSearchResults
 
-- (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize
+- (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize
 {
 	self = [super init];
 	if (self != nil)
 	{
 		self.resultSets = resultSets;
+		self.pointerSize = pointerSize;
 		for (NSData *result in self.resultSets)
 		{
-			self.addressCount += result.length / sizeof(ZGMemoryAddress);
+			self.addressCount += result.length / self.pointerSize;
 		}
 		self.dataSize = dataSize;
 	}
@@ -72,8 +74,8 @@
 
 - (void)enumerateInRange:(NSRange)range usingBlock:(zg_enumerate_search_results_t)addressCallback
 {
-	ZGMemoryAddress absoluteLocation = range.location * sizeof(ZGMemoryAddress);
-	ZGMemoryAddress absoluteLength = range.length * sizeof(ZGMemoryAddress);
+	ZGMemoryAddress absoluteLocation = range.location * self.pointerSize;
+	ZGMemoryAddress absoluteLength = range.length * self.pointerSize;
 	
 	BOOL setBeginOffset = NO;
 	BOOL setEndOffset = NO;
@@ -110,9 +112,17 @@
 		if (setBeginOffset)
 		{
 			const void *resultBytes = resultSet.bytes;
-			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += sizeof(ZGMemoryAddress))
+			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += self.pointerSize)
 			{
-				addressCallback(*(ZGMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+				if (self.pointerSize == sizeof(ZGMemoryAddress))
+				{
+					addressCallback(*(ZGMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+				}
+				else
+				{
+					addressCallback(*(ZG32BitMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+				}
+				
 				if (shouldStopEnumerating)
 				{
 					break;

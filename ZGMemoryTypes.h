@@ -39,6 +39,7 @@
 #include <mach/vm_prot.h>
 
 typedef mach_vm_address_t ZGMemoryAddress;
+typedef uint32_t ZG32BitMemoryAddress;
 typedef mach_vm_size_t ZGMemorySize;
 typedef vm_prot_t ZGMemoryProtection;
 typedef vm_map_t ZGMemoryMap;

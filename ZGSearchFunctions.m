@@ -46,6 +46,7 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 {
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
+	ZGMemorySize pointerSize = searchData.pointerSize;
 	
 	void *searchValue = searchData.searchValue;
 	BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
@@ -107,8 +108,16 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 					{	
 						if (comparisonFunction(searchData, &bytes[dataIndex], !shouldCompareStoredValues ? (searchValue) : (regionBytes + dataIndex), dataSize))
 						{
-							ZGMemoryAddress variableAddress = address + dataIndex;
-							[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
+							if (pointerSize == sizeof(ZGMemoryAddress))
+							{
+								ZGMemoryAddress variableAddress = address + dataIndex;
+								[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
+							}
+							else
+							{
+								ZG32BitMemoryAddress variableAddress = (ZG32BitMemoryAddress)(address + dataIndex);
+								[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
+							}
 						}
 					}
 					dataIndex += dataAlignment;
@@ -118,7 +127,7 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				searchProgress.numberOfVariablesFound += resultSet.length / sizeof(ZGMemoryAddress);
+				searchProgress.numberOfVariablesFound += resultSet.length / pointerSize;
 				searchProgress.progress++;
 			});
 		}
@@ -137,13 +146,15 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 		}];
 	}
 	
-	return [[ZGSearchResults alloc] initWithResultSets:resultSets dataSize:dataSize];
+	return [[ZGSearchResults alloc] initWithResultSets:resultSets dataSize:dataSize pointerSize:pointerSize];
 }
 
 ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, NSArray *variablesToSearchFirst, ZGSearchResults *previousSearchResults)
 {
 	ZGMemorySize dataSize = searchData.dataSize;
 	void *searchValue = searchData.searchValue;
+	
+	ZGMemorySize pointerSize = searchData.pointerSize;
 	
 	ZGMemoryAddress beginningAddress = searchData.beginAddress;
 	ZGMemoryAddress endingAddress = searchData.endAddress;
@@ -177,7 +188,15 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 			void *compareValue = shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue;
 			if (compareValue && comparisonFunction(searchData, lastUsedRegion->_bytes + (variableAddress - lastUsedRegion->_address), compareValue, dataSize))
 			{
-				[newResultsData appendBytes:&variableAddress length:sizeof(variableAddress)];
+				if (pointerSize == sizeof(ZGMemoryAddress))
+				{
+					[newResultsData appendBytes:&variableAddress length:sizeof(variableAddress)];
+				}
+				else
+				{
+					ZG32BitMemoryAddress lesserAddress = (ZG32BitMemoryAddress)(variableAddress);
+					[newResultsData appendBytes:&lesserAddress length:sizeof(lesserAddress)];
+				}
 				numberOfVariablesFound++;
 			}
 		};
@@ -287,5 +306,5 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 		newResultsData = [NSData data];
 	}
 	
-	return [[ZGSearchResults alloc] initWithResultSets:@[newResultsData] dataSize:dataSize];
+	return [[ZGSearchResults alloc] initWithResultSets:@[newResultsData] dataSize:dataSize pointerSize:pointerSize];
 }

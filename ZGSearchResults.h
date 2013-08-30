@@ -43,7 +43,7 @@
 
 typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
 
-- (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize;
+- (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize;
 
 - (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses;
 
