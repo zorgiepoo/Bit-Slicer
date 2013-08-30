@@ -57,7 +57,6 @@
 
 @property (nonatomic) void *rangeValue;
 @property (nonatomic) NSArray *savedData;
-@property (nonatomic) NSArray *tempSavedData;
 @property (nonatomic) BOOL shouldCompareStoredValues;
 @property (nonatomic) double epsilon;
 @property (nonatomic) BOOL shouldIgnoreStringCase;

@@ -57,6 +57,7 @@
 @property (strong, nonatomic, readwrite) NSTimer *userInterfaceTimer;
 @property (readwrite, strong, nonatomic) ZGSearchProgress *searchProgress;
 @property (nonatomic) ZGSearchResults *temporarySearchResults;
+@property (nonatomic) NSArray *tempSavedData;
 @property (assign) BOOL isBusy;
 
 @end
@@ -766,7 +767,7 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	[self createUserInterfaceTimer];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		self.searchData.tempSavedData = ZGGetAllData(self.windowController.currentProcess.processTask, self.searchData, self.searchProgress);
+		self.tempSavedData = ZGGetAllData(self.windowController.currentProcess.processTask, self.searchData, self.searchProgress);
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			self.userInterfaceTimer = nil;
@@ -777,8 +778,8 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 			}
 			else
 			{
-				self.searchData.savedData = self.searchData.tempSavedData;
-				self.searchData.tempSavedData = nil;
+				self.searchData.savedData = self.tempSavedData;
+				self.tempSavedData = nil;
 				
 				self.windowController.generalStatusTextField.stringValue = @"Finished Memory Store";
 			}
