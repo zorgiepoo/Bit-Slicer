@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
 		<string key="IBDocument.SystemVersion">12E55</string>
-		<string key="IBDocument.InterfaceBuilderVersion">4471.1</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
 		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">4471.1</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -338,7 +338,7 @@
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<string key="NSWindowContentMinSize">{650, 499}</string>
 				<object class="NSView" key="NSWindowView" id="564653584">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">1792</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSPopUpButton" id="976123424">
@@ -347,6 +347,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{91, 455}, {143, 26}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="145091704"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSPopUpButtonCell" key="NSCell" id="86893715">
 								<int key="NSCellFlags">71303232</int>
@@ -388,6 +390,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{91, 140}, {143, 26}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="930888201"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSPopUpButtonCell" key="NSCell" id="778401594">
 								<int key="NSCellFlags">71303232</int>
@@ -583,6 +587,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{91, 414}, {143, 26}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="456121492"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSPopUpButtonCell" key="NSCell" id="740017402">
 								<int key="NSCellFlags">-2076180416</int>
@@ -786,6 +792,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{14, 421}, {72, 17}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="163876785"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="985019222">
 								<int key="NSCellFlags">68157504</int>
@@ -824,6 +832,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{94, 81}, {137, 22}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="61979785"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="367543477">
 								<int key="NSCellFlags">-1804599231</int>
@@ -856,6 +866,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{43, 86}, {43, 17}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="856215563"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="274159192">
 								<int key="NSCellFlags">68157504</int>
@@ -874,6 +886,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{144, 45}, {91, 32}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="163994611"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="1071911938">
@@ -898,6 +912,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{53, 45}, {91, 32}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="444817851"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="862069611">
@@ -930,6 +946,8 @@
 											<object class="NSPSMatrix" key="NSFrameMatrix"/>
 											<string key="NSFrameSize">{381, 368}</string>
 											<reference key="NSSuperview" ref="368221251"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView" ref="587801537"/>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -939,6 +957,8 @@
 												<object class="NSPSMatrix" key="NSFrameMatrix"/>
 												<string key="NSFrameSize">{381, 17}</string>
 												<reference key="NSSuperview" ref="1019910359"/>
+												<reference key="NSWindow"/>
+												<reference key="NSNextKeyView" ref="368221251"/>
 												<reference key="NSTableView" ref="241843858"/>
 											</object>
 											<object class="_NSCornerView" key="NSCornerView">
@@ -1238,7 +1258,7 @@
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
 														<int key="NSCellFlags">75497536</int>
 														<int key="NSCellFlags2">134219776</int>
-														<string key="NSContents">Enabled</string>
+														<string key="NSContents">Active</string>
 														<reference key="NSSupport" ref="26"/>
 														<reference key="NSBackgroundColor" ref="380387243"/>
 														<reference key="NSTextColor" ref="544324601"/>
@@ -1293,6 +1313,7 @@
 									</array>
 									<string key="NSFrame">{{1, 17}, {381, 368}}</string>
 									<reference key="NSSuperview" ref="163994611"/>
+									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="241843858"/>
 									<reference key="NSDocView" ref="241843858"/>
 									<reference key="NSBGColor" ref="278104056"/>
@@ -1306,6 +1327,7 @@
 									</array>
 									<string key="NSFrame">{{1, 0}, {381, 17}}</string>
 									<reference key="NSSuperview" ref="163994611"/>
+									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="440433933"/>
 									<reference key="NSDocView" ref="440433933"/>
 									<reference key="NSBGColor" ref="278104056"/>
@@ -1317,6 +1339,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{1, 369}, {376, 16}}</string>
 									<reference key="NSSuperview" ref="163994611"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="173675126"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="163994611"/>
@@ -1328,6 +1352,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{232, 17}, {15, 110}}</string>
 									<reference key="NSSuperview" ref="163994611"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="292245707"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<reference key="NSTarget" ref="163994611"/>
 									<string key="NSAction">_doScroller:</string>
@@ -1337,7 +1363,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{247, 52}, {383, 386}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
-							<reference key="NSNextKeyView" ref="368221251"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="1019910359"/>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="587801537"/>
 							<reference key="NSHScroller" ref="292245707"/>
@@ -1354,6 +1381,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{12, 16}, {618, 20}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<int key="NSpiFlags">16396</int>
 							<double key="NSMaxValue">100</double>
 						</object>
@@ -1363,6 +1392,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{244, 462}, {389, 17}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="1071235958"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="395165142">
 								<int key="NSCellFlags">68157504</int>
@@ -1666,6 +1697,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{12, 41}, {618, 5}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="938492434"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
@@ -1690,6 +1723,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{94, 387}, {145, 18}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="289350899"/>
 							<bool key="NSEnabled">YES</bool>
 							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 							<int key="NSNumRows">1</int>
@@ -1761,6 +1796,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{12, 444}, {618, 5}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="764381128"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
@@ -1785,6 +1822,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{94, 113}, {137, 22}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="579283322"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="1009496259">
 								<int key="NSCellFlags">-1267728319</int>
@@ -1804,6 +1843,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{33, 118}, {53, 17}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="389427477"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="267439385">
 								<int key="NSCellFlags">605028416</int>
@@ -1826,6 +1867,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{9, 168}, {156, 18}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="721653573"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="945181755">
 										<int key="NSCellFlags">-2080374784</int>
@@ -1850,6 +1893,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{9, 27}, {140, 17}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="23359784"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSTextFieldCell" key="NSCell" id="552815407">
 										<int key="NSCellFlags">68157504</int>
@@ -1868,6 +1913,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{11, 0}, {137, 19}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="669737142"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSTextFieldCell" key="NSCell" id="293658622">
 										<int key="NSCellFlags">-1804599231</int>
@@ -1887,6 +1934,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{9, 79}, {141, 14}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="1035357674"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSTextFieldCell" key="NSCell" id="179769100">
 										<int key="NSCellFlags">68157504</int>
@@ -1905,6 +1954,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{11, 52}, {137, 19}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="667137423"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSTextFieldCell" key="NSCell" id="182747665">
 										<int key="NSCellFlags">-1804599231</int>
@@ -1925,6 +1976,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{12, 99}, {136, 5}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="9882273"/>
 									<string key="NSHuggingPriority">{250, 750}</string>
 									<string key="NSOffsets">{0, 0}</string>
 									<object class="NSTextFieldCell" key="NSTitleCell">
@@ -1949,6 +2002,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{9, 128}, {126, 18}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="251725131"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="472261541">
 										<int key="NSCellFlags">603979776</int>
@@ -1973,6 +2028,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{9, 108}, {141, 18}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="741768211"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="280301122">
 										<int key="NSCellFlags">603979776</int>
@@ -1997,6 +2054,8 @@
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
 									<string key="NSFrame">{{9, 148}, {149, 18}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
+									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="1043267145"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="354938665">
 										<int key="NSCellFlags">67108864</int>
@@ -2019,6 +2078,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{82, 172}, {163, 184}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="222322569"/>
 							<string key="NSClassName">NSView</string>
 						</object>
 						<object class="NSButton" id="289350899">
@@ -2027,6 +2088,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{92, 364}, {13, 13}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="796048733"/>
 							<string key="NSHuggingPriority">{750, 750}</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="987241425">
@@ -2051,6 +2114,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{111, 363}, {46, 14}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="1072437571"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="525963853">
 								<int key="NSCellFlags">67108864</int>
@@ -2074,6 +2139,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{23, 147}, {63, 17}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="671421116"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="724075528">
 								<int key="NSCellFlags">605028416</int>
@@ -2092,6 +2159,8 @@
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{36, 462}, {50, 17}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="976123424"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="829839528">
 								<int key="NSCellFlags">605028416</int>
@@ -2107,6 +2176,9 @@
 					</array>
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{650, 499}</string>
+					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="369816348"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{650, 521}</string>
@@ -4793,7 +4865,178 @@
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes"/>
+		<object class="IBClassDescriber" key="IBDocument.Classes">
+			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGDocumentWindowController</string>
+					<string key="superclassName">NSWindowController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">editVariablesAddress:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">editVariablesAddress:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">editVariablesAddress:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="beginningAddressLabel">NSTextField</string>
+						<string key="beginningAddressTextField">NSTextField</string>
+						<string key="clearButton">NSButton</string>
+						<string key="dataTypesPopUpButton">NSPopUpButton</string>
+						<string key="editVariablesAddressTextField">NSTextField</string>
+						<string key="editVariablesAddressWindow">NSWindow</string>
+						<string key="editVariablesSizeTextField">NSTextField</string>
+						<string key="editVariablesSizeWindow">NSWindow</string>
+						<string key="editVariablesValueTextField">NSTextField</string>
+						<string key="editVariablesValueWindow">NSWindow</string>
+						<string key="endingAddressLabel">NSTextField</string>
+						<string key="endingAddressTextField">NSTextField</string>
+						<string key="flagsLabel">NSTextField</string>
+						<string key="flagsTextField">NSTextField</string>
+						<string key="functionPopUpButton">NSPopUpButton</string>
+						<string key="generalStatusTextField">NSTextField</string>
+						<string key="ignoreCaseCheckBox">NSButton</string>
+						<string key="ignoreDataAlignmentCheckBox">NSButton</string>
+						<string key="includeNullTerminatorCheckBox">NSButton</string>
+						<string key="optionsDisclosureButton">NSButton</string>
+						<string key="optionsView">NSView</string>
+						<string key="runningApplicationsPopUpButton">NSPopUpButton</string>
+						<string key="scanUnwritableValuesCheckBox">NSButton</string>
+						<string key="searchButton">NSButton</string>
+						<string key="searchValueLabel">NSTextField</string>
+						<string key="searchValueTextField">NSTextField</string>
+						<string key="searchingProgressIndicator">NSProgressIndicator</string>
+						<string key="variableQualifierMatrix">NSMatrix</string>
+						<string key="variablesTableView">NSTableView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="beginningAddressLabel">
+							<string key="name">beginningAddressLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="beginningAddressTextField">
+							<string key="name">beginningAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="clearButton">
+							<string key="name">clearButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dataTypesPopUpButton">
+							<string key="name">dataTypesPopUpButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesAddressTextField">
+							<string key="name">editVariablesAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesAddressWindow">
+							<string key="name">editVariablesAddressWindow</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesSizeTextField">
+							<string key="name">editVariablesSizeTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesSizeWindow">
+							<string key="name">editVariablesSizeWindow</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesValueTextField">
+							<string key="name">editVariablesValueTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesValueWindow">
+							<string key="name">editVariablesValueWindow</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="endingAddressLabel">
+							<string key="name">endingAddressLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="endingAddressTextField">
+							<string key="name">endingAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="flagsLabel">
+							<string key="name">flagsLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="flagsTextField">
+							<string key="name">flagsTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="functionPopUpButton">
+							<string key="name">functionPopUpButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="generalStatusTextField">
+							<string key="name">generalStatusTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ignoreCaseCheckBox">
+							<string key="name">ignoreCaseCheckBox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ignoreDataAlignmentCheckBox">
+							<string key="name">ignoreDataAlignmentCheckBox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="includeNullTerminatorCheckBox">
+							<string key="name">includeNullTerminatorCheckBox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="optionsDisclosureButton">
+							<string key="name">optionsDisclosureButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="optionsView">
+							<string key="name">optionsView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="runningApplicationsPopUpButton">
+							<string key="name">runningApplicationsPopUpButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="scanUnwritableValuesCheckBox">
+							<string key="name">scanUnwritableValuesCheckBox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchButton">
+							<string key="name">searchButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchValueLabel">
+							<string key="name">searchValueLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchValueTextField">
+							<string key="name">searchValueTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchingProgressIndicator">
+							<string key="name">searchingProgressIndicator</string>
+							<string key="candidateClassName">NSProgressIndicator</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="variableQualifierMatrix">
+							<string key="name">variableQualifierMatrix</string>
+							<string key="candidateClassName">NSMatrix</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="variablesTableView">
+							<string key="name">variablesTableView</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGDocumentWindowController.h</string>
+					</object>
+				</object>
+			</array>
+		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
@@ -4802,7 +5045,7 @@
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1060" key="NS.object.0"/>
+			<real value="1080" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>
