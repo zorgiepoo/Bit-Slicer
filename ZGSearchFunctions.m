@@ -191,30 +191,30 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 	
 	BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
 	
-	void (^searchVariableAddress)(ZGMemoryAddress, BOOL *) = ^(ZGMemoryAddress variableAddress, BOOL *stop) {
-		void (^compareAndAddValue)(void)  = ^{
-			void *compareValue = shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue;
-			if (compareValue && comparisonFunction(searchData, lastUsedRegion->_bytes + (variableAddress - lastUsedRegion->_address), compareValue, dataSize))
+	void (^compareAndAddValue)(ZGMemoryAddress)  = ^(ZGMemoryAddress variableAddress) {
+		void *compareValue = shouldCompareStoredValues ? ZGSavedValue(variableAddress, searchData, &lastUsedSavedRegion, dataSize) : searchValue;
+		if (compareValue && comparisonFunction(searchData, lastUsedRegion->_bytes + (variableAddress - lastUsedRegion->_address), compareValue, dataSize))
+		{
+			if (pointerSize == sizeof(ZGMemoryAddress))
 			{
-				if (pointerSize == sizeof(ZGMemoryAddress))
-				{
-					[newResultsData appendBytes:&variableAddress length:sizeof(variableAddress)];
-				}
-				else
-				{
-					ZG32BitMemoryAddress lesserAddress = (ZG32BitMemoryAddress)(variableAddress);
-					[newResultsData appendBytes:&lesserAddress length:sizeof(lesserAddress)];
-				}
-				numberOfVariablesFound++;
+				[newResultsData appendBytes:&variableAddress length:sizeof(variableAddress)];
 			}
-		};
-		
+			else
+			{
+				ZG32BitMemoryAddress lesserAddress = (ZG32BitMemoryAddress)(variableAddress);
+				[newResultsData appendBytes:&lesserAddress length:sizeof(lesserAddress)];
+			}
+			numberOfVariablesFound++;
+		}
+	};
+	
+	void (^searchVariableAddress)(ZGMemoryAddress, BOOL *) = ^(ZGMemoryAddress variableAddress, BOOL *stop) {
 		if (beginningAddress <= variableAddress && endingAddress >= variableAddress + dataSize)
 		{
 			// Check if the variable is in the last region we scanned
 			if (lastUsedRegion && variableAddress >= lastUsedRegion->_address && variableAddress + dataSize <= lastUsedRegion->_address + lastUsedRegion->_size)
 			{
-				compareAndAddValue();
+				compareAndAddValue(variableAddress);
 			}
 			else
 			{
@@ -254,7 +254,7 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 					
 					if (lastUsedRegion == targetRegion && variableAddress >= targetRegion->_address && variableAddress + dataSize <= targetRegion->_address + targetRegion->_size)
 					{
-						compareAndAddValue();
+						compareAndAddValue(variableAddress);
 					}
 				}
 			}
