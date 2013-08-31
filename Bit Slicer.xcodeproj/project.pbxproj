@@ -499,6 +499,19 @@
 			name = libudis86;
 			sourceTree = "<group>";
 		};
+		7739728017D26A1600B958EE /* Scripting */ = {
+			isa = PBXGroup;
+			children = (
+				774EF6A017C9C895005ABB20 /* ZGScriptManager.h */,
+				774EF6A117C9C895005ABB20 /* ZGScriptManager.m */,
+				77C24DDC17CC329000CA6A5E /* ZGPyVirtualMemory.h */,
+				77C24DDD17CC329000CA6A5E /* ZGPyVirtualMemory.m */,
+				77CF8ABD17CA9D2200258AC5 /* ZGPyScript.h */,
+				77CF8ABE17CA9D2200258AC5 /* ZGPyScript.m */,
+			);
+			name = Scripting;
+			sourceTree = "<group>";
+		};
 		77D5AEAC137C6FC000026388 /* Memory Viewer */ = {
 			isa = PBXGroup;
 			children = (
@@ -614,12 +627,7 @@
 				770930B715BA7635009705A6 /* ZGDocumentTableController.m */,
 				77E652B4168F8C7700D84A7F /* ZGDocumentBreakPointController.h */,
 				77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */,
-				774EF6A017C9C895005ABB20 /* ZGScriptManager.h */,
-				774EF6A117C9C895005ABB20 /* ZGScriptManager.m */,
-				77C24DDC17CC329000CA6A5E /* ZGPyVirtualMemory.h */,
-				77C24DDD17CC329000CA6A5E /* ZGPyVirtualMemory.m */,
-				77CF8ABD17CA9D2200258AC5 /* ZGPyScript.h */,
-				77CF8ABE17CA9D2200258AC5 /* ZGPyScript.m */,
+				7739728017D26A1600B958EE /* Scripting */,
 				770930B315B92203009705A6 /* ZGVariableController.h */,
 				770930B415B92203009705A6 /* ZGVariableController.m */,
 			);
