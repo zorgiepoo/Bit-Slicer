@@ -332,14 +332,7 @@
 		}
 		else if ([tableColumn.identifier isEqualToString:@"enabled"])
 		{
-			if (variable.type == ZGScript)
-			{
-				[[tableColumn dataCellForRow:rowIndex] setEnabled:self.windowController.currentProcess.valid];
-			}
-			else
-			{
-				[[tableColumn dataCellForRow:rowIndex] setEnabled:YES];
-			}
+			[[tableColumn dataCellForRow:rowIndex] setEnabled:self.windowController.currentProcess.valid];
 			return @(variable.enabled);
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
