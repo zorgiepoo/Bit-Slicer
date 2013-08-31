@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
-		<int key="IBDocument.SystemTarget">1060</int>
+		<int key="IBDocument.SystemTarget">1080</int>
 		<string key="IBDocument.SystemVersion">12E55</string>
-		<string key="IBDocument.InterfaceBuilderVersion">4471.1</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
 		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">4471.1</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSCustomObject</string>
@@ -274,6 +274,26 @@
 									<reference key="NSMenu" ref="16658802"/>
 									<string key="NSTitle">Revert to Saved</string>
 									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="518338580"/>
+									<reference key="NSMixedImage" ref="627749667"/>
+								</object>
+								<object class="NSMenuItem" id="540907053">
+									<reference key="NSMenu" ref="16658802"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="518338580"/>
+									<reference key="NSMixedImage" ref="627749667"/>
+								</object>
+								<object class="NSMenuItem" id="589350656">
+									<reference key="NSMenu" ref="16658802"/>
+									<string key="NSTitle">Pause Target</string>
+									<string key="NSKeyEquiv">p</string>
+									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="518338580"/>
 									<reference key="NSMixedImage" ref="627749667"/>
@@ -738,28 +758,19 @@
 					</object>
 					<object class="NSMenuItem" id="518132111">
 						<reference key="NSMenu" ref="223418498"/>
-						<string key="NSTitle">Tools</string>
+						<string key="NSTitle">Variable</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="518338580"/>
 						<reference key="NSMixedImage" ref="627749667"/>
 						<string key="NSAction">submenuAction:</string>
 						<object class="NSMenu" key="NSSubmenu" id="774349132">
-							<string key="NSTitle">Tools</string>
+							<string key="NSTitle">Variable</string>
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="117144880">
 									<reference key="NSMenu" ref="774349132"/>
-									<string key="NSTitle">Clear Search</string>
+									<string key="NSTitle">Clear Variables</string>
 									<string key="NSKeyEquiv">r</string>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="518338580"/>
-									<reference key="NSMixedImage" ref="627749667"/>
-								</object>
-								<object class="NSMenuItem" id="589350656">
-									<reference key="NSMenu" ref="774349132"/>
-									<string key="NSTitle">Pause Target</string>
-									<string key="NSKeyEquiv">p</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="518338580"/>
@@ -1521,14 +1532,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">pauseOrUnpauseProcess:</string>
-						<reference key="source" ref="719403863"/>
-						<reference key="destination" ref="589350656"/>
-					</object>
-					<string key="id">690</string>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">performClose:</string>
 						<reference key="source" ref="719403863"/>
 						<reference key="destination" ref="767071388"/>
@@ -1734,6 +1737,14 @@
 						<reference key="destination" ref="215944"/>
 					</object>
 					<string key="id">1053</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">pauseOrUnpauseProcess:</string>
+						<reference key="source" ref="719403863"/>
+						<reference key="destination" ref="589350656"/>
+					</object>
+					<string key="id">690</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -1957,6 +1968,8 @@
 							<reference ref="833328193"/>
 							<reference ref="45336514"/>
 							<reference ref="145807920"/>
+							<reference ref="589350656"/>
+							<reference ref="540907053"/>
 						</array>
 						<reference key="parent" ref="319295679"/>
 					</object>
@@ -2361,7 +2374,6 @@
 						<reference key="object" ref="774349132"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="117144880"/>
-							<reference ref="589350656"/>
 							<reference ref="163922592"/>
 							<reference ref="992373788"/>
 							<reference ref="694292326"/>
@@ -2380,11 +2392,6 @@
 					<object class="IBObjectRecord">
 						<string key="id">655</string>
 						<reference key="object" ref="117144880"/>
-						<reference key="parent" ref="774349132"/>
-					</object>
-					<object class="IBObjectRecord">
-						<string key="id">689</string>
-						<reference key="object" ref="589350656"/>
 						<reference key="parent" ref="774349132"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -2685,6 +2692,16 @@
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Sparkle Updater</string>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">689</string>
+						<reference key="object" ref="589350656"/>
+						<reference key="parent" ref="16658802"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">MBD-kp-IpS</string>
+						<reference key="object" ref="540907053"/>
+						<reference key="parent" ref="16658802"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -2958,6 +2975,8 @@
 				<boolean value="NO" key="931.showNotes"/>
 				<string key="950.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="950.showNotes"/>
+				<string key="MBD-kp-IpS.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="MBD-kp-IpS.showNotes"/>
 				<string key="bRt-cV-8Ks.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="bRt-cV-8Ks.showNotes"/>
 			</dictionary>
@@ -2966,12 +2985,539 @@
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes"/>
+		<object class="IBClassDescriber" key="IBDocument.Classes">
+			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
+				<object class="IBPartialClassDescription">
+					<string key="className">HFController</string>
+					<string key="superclassName">NSObject</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">selectAll:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">selectAll:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">selectAll:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/HFController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">HFTextView</string>
+					<string key="superclassName">NSControl</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">delegate</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">delegate</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">delegate</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/HFTextView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">SUUpdater</string>
+					<string key="superclassName">NSObject</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">checkForUpdates:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">checkForUpdates:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">checkForUpdates:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">delegate</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">delegate</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">delegate</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/SUUpdater.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGAppController</string>
+					<string key="superclassName">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGAppController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGBacktraceController</string>
+					<string key="superclassName">NSResponder</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="debuggerController">ZGDebuggerController</string>
+						<string key="tableView">NSTableView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="debuggerController">
+							<string key="name">debuggerController</string>
+							<string key="candidateClassName">ZGDebuggerController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="tableView">
+							<string key="name">tableView</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGBacktraceController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGDebuggerController</string>
+					<string key="superclassName">ZGMemoryWindowController</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="backtraceController">ZGBacktraceController</string>
+						<string key="dissemblyProgressIndicator">NSProgressIndicator</string>
+						<string key="instructionsTableView">NSTableView</string>
+						<string key="registersController">ZGRegistersController</string>
+						<string key="splitView">NSSplitView</string>
+						<string key="stopButton">NSButton</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="backtraceController">
+							<string key="name">backtraceController</string>
+							<string key="candidateClassName">ZGBacktraceController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dissemblyProgressIndicator">
+							<string key="name">dissemblyProgressIndicator</string>
+							<string key="candidateClassName">NSProgressIndicator</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="instructionsTableView">
+							<string key="name">instructionsTableView</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="registersController">
+							<string key="name">registersController</string>
+							<string key="candidateClassName">ZGRegistersController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="splitView">
+							<string key="name">splitView</string>
+							<string key="candidateClassName">NSSplitView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="stopButton">
+							<string key="name">stopButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGDebuggerController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGDocumentWindowController</string>
+					<string key="superclassName">NSWindowController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">editVariablesAddress:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">editVariablesAddress:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">editVariablesAddress:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="beginningAddressLabel">NSTextField</string>
+						<string key="beginningAddressTextField">NSTextField</string>
+						<string key="clearButton">NSButton</string>
+						<string key="dataTypesPopUpButton">NSPopUpButton</string>
+						<string key="editVariablesAddressTextField">NSTextField</string>
+						<string key="editVariablesAddressWindow">NSWindow</string>
+						<string key="editVariablesSizeTextField">NSTextField</string>
+						<string key="editVariablesSizeWindow">NSWindow</string>
+						<string key="editVariablesValueTextField">NSTextField</string>
+						<string key="editVariablesValueWindow">NSWindow</string>
+						<string key="endingAddressLabel">NSTextField</string>
+						<string key="endingAddressTextField">NSTextField</string>
+						<string key="flagsLabel">NSTextField</string>
+						<string key="flagsTextField">NSTextField</string>
+						<string key="functionPopUpButton">NSPopUpButton</string>
+						<string key="generalStatusTextField">NSTextField</string>
+						<string key="ignoreCaseCheckBox">NSButton</string>
+						<string key="ignoreDataAlignmentCheckBox">NSButton</string>
+						<string key="includeNullTerminatorCheckBox">NSButton</string>
+						<string key="optionsDisclosureButton">NSButton</string>
+						<string key="optionsView">NSView</string>
+						<string key="runningApplicationsPopUpButton">NSPopUpButton</string>
+						<string key="scanUnwritableValuesCheckBox">NSButton</string>
+						<string key="searchButton">NSButton</string>
+						<string key="searchValueLabel">NSTextField</string>
+						<string key="searchValueTextField">NSTextField</string>
+						<string key="searchingProgressIndicator">NSProgressIndicator</string>
+						<string key="variableQualifierMatrix">NSMatrix</string>
+						<string key="variablesTableView">NSTableView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="beginningAddressLabel">
+							<string key="name">beginningAddressLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="beginningAddressTextField">
+							<string key="name">beginningAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="clearButton">
+							<string key="name">clearButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="dataTypesPopUpButton">
+							<string key="name">dataTypesPopUpButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesAddressTextField">
+							<string key="name">editVariablesAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesAddressWindow">
+							<string key="name">editVariablesAddressWindow</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesSizeTextField">
+							<string key="name">editVariablesSizeTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesSizeWindow">
+							<string key="name">editVariablesSizeWindow</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesValueTextField">
+							<string key="name">editVariablesValueTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="editVariablesValueWindow">
+							<string key="name">editVariablesValueWindow</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="endingAddressLabel">
+							<string key="name">endingAddressLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="endingAddressTextField">
+							<string key="name">endingAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="flagsLabel">
+							<string key="name">flagsLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="flagsTextField">
+							<string key="name">flagsTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="functionPopUpButton">
+							<string key="name">functionPopUpButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="generalStatusTextField">
+							<string key="name">generalStatusTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ignoreCaseCheckBox">
+							<string key="name">ignoreCaseCheckBox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="ignoreDataAlignmentCheckBox">
+							<string key="name">ignoreDataAlignmentCheckBox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="includeNullTerminatorCheckBox">
+							<string key="name">includeNullTerminatorCheckBox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="optionsDisclosureButton">
+							<string key="name">optionsDisclosureButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="optionsView">
+							<string key="name">optionsView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="runningApplicationsPopUpButton">
+							<string key="name">runningApplicationsPopUpButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="scanUnwritableValuesCheckBox">
+							<string key="name">scanUnwritableValuesCheckBox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchButton">
+							<string key="name">searchButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchValueLabel">
+							<string key="name">searchValueLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchValueTextField">
+							<string key="name">searchValueTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchingProgressIndicator">
+							<string key="name">searchingProgressIndicator</string>
+							<string key="candidateClassName">NSProgressIndicator</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="variableQualifierMatrix">
+							<string key="name">variableQualifierMatrix</string>
+							<string key="candidateClassName">NSMatrix</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="variablesTableView">
+							<string key="name">variablesTableView</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGDocumentWindowController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGMemoryDumpController</string>
+					<string key="superclassName">NSObject</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="memoryDumpFromAddressTextField">NSTextField</string>
+						<string key="memoryDumpProgressCancelButton">NSButton</string>
+						<string key="memoryDumpProgressWindow">NSWindow</string>
+						<string key="memoryDumpToAddressTextField">NSTextField</string>
+						<string key="memoryDumpWindow">NSWindow</string>
+						<string key="memoryViewer">ZGMemoryViewerController</string>
+						<string key="progressIndicator">NSProgressIndicator</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="memoryDumpFromAddressTextField">
+							<string key="name">memoryDumpFromAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="memoryDumpProgressCancelButton">
+							<string key="name">memoryDumpProgressCancelButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="memoryDumpProgressWindow">
+							<string key="name">memoryDumpProgressWindow</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="memoryDumpToAddressTextField">
+							<string key="name">memoryDumpToAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="memoryDumpWindow">
+							<string key="name">memoryDumpWindow</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="memoryViewer">
+							<string key="name">memoryViewer</string>
+							<string key="candidateClassName">ZGMemoryViewerController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="progressIndicator">
+							<string key="name">progressIndicator</string>
+							<string key="candidateClassName">NSProgressIndicator</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGMemoryDumpController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGMemoryProtectionController</string>
+					<string key="superclassName">NSObject</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="changeProtectionAddressTextField">NSTextField</string>
+						<string key="changeProtectionExecuteButton">NSButton</string>
+						<string key="changeProtectionReadButton">NSButton</string>
+						<string key="changeProtectionSizeTextField">NSTextField</string>
+						<string key="changeProtectionWindow">NSWindow</string>
+						<string key="changeProtectionWriteButton">NSButton</string>
+						<string key="memoryViewer">ZGMemoryViewerController</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="changeProtectionAddressTextField">
+							<string key="name">changeProtectionAddressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="changeProtectionExecuteButton">
+							<string key="name">changeProtectionExecuteButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="changeProtectionReadButton">
+							<string key="name">changeProtectionReadButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="changeProtectionSizeTextField">
+							<string key="name">changeProtectionSizeTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="changeProtectionWindow">
+							<string key="name">changeProtectionWindow</string>
+							<string key="candidateClassName">NSWindow</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="changeProtectionWriteButton">
+							<string key="name">changeProtectionWriteButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="memoryViewer">
+							<string key="name">memoryViewer</string>
+							<string key="candidateClassName">ZGMemoryViewerController</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGMemoryProtectionController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGMemoryViewerController</string>
+					<string key="superclassName">ZGMemoryWindowController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">toggleDataInspector:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">toggleDataInspector:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">toggleDataInspector:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="memoryDumpController">ZGMemoryDumpController</string>
+						<string key="memoryProtectionController">ZGMemoryProtectionController</string>
+						<string key="textView">HFTextView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="memoryDumpController">
+							<string key="name">memoryDumpController</string>
+							<string key="candidateClassName">ZGMemoryDumpController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="memoryProtectionController">
+							<string key="name">memoryProtectionController</string>
+							<string key="candidateClassName">ZGMemoryProtectionController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="textView">
+							<string key="name">textView</string>
+							<string key="candidateClassName">HFTextView</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGMemoryViewerController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGMemoryWindowController</string>
+					<string key="superclassName">NSWindowController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="goBack:">id</string>
+						<string key="goForward:">id</string>
+						<string key="navigate:">id</string>
+						<string key="pauseOrUnpauseProcess:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="goBack:">
+							<string key="name">goBack:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="goForward:">
+							<string key="name">goForward:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="navigate:">
+							<string key="name">navigate:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="pauseOrUnpauseProcess:">
+							<string key="name">pauseOrUnpauseProcess:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="addressTextField">NSTextField</string>
+						<string key="navigationSegmentedControl">NSSegmentedControl</string>
+						<string key="runningApplicationsPopUpButton">NSPopUpButton</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="addressTextField">
+							<string key="name">addressTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="navigationSegmentedControl">
+							<string key="name">navigationSegmentedControl</string>
+							<string key="candidateClassName">NSSegmentedControl</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="runningApplicationsPopUpButton">
+							<string key="name">runningApplicationsPopUpButton</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGMemoryWindowController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">ZGRegistersController</string>
+					<string key="superclassName">NSResponder</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">changeQualifier:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">changeQualifier:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">changeQualifier:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="debuggerController">ZGDebuggerController</string>
+						<string key="tableView">NSTableView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="debuggerController">
+							<string key="name">debuggerController</string>
+							<string key="candidateClassName">ZGDebuggerController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="tableView">
+							<string key="name">tableView</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/ZGRegistersController.h</string>
+					</object>
+				</object>
+			</array>
+		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1060" key="NS.object.0"/>
+			<real value="1080" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>
