@@ -198,6 +198,7 @@ static PyObject *virtualMemoryModule;
 		if (!ZGPIDForTaskPort(processTask, &(((VirtualMemory *)self.vmObject)->processIdentifier)))
 		{
 			NSLog(@"Script Error: Failed to access PID for process task");
+			return nil;
 		}
 	}
 	return self;
