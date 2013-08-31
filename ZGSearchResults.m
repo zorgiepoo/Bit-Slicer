@@ -86,13 +86,16 @@
 	
 	BOOL shouldStopEnumerating = NO;
 	
+	ZGMemorySize pointerSize = self.pointerSize;
+	
 	for (NSData *resultSet in self.resultSets)
 	{
-		accumulator += resultSet.length;
+		NSUInteger resultSetLength = resultSet.length;
+		accumulator += resultSetLength;
 		
 		if (!setBeginOffset && accumulator > absoluteLocation)
 		{
-			beginOffset = resultSet.length - (accumulator - absoluteLocation);
+			beginOffset = resultSetLength - (accumulator - absoluteLocation);
 			setBeginOffset = YES;
 		}
 		else if (setBeginOffset)
@@ -102,26 +105,28 @@
 		
 		if (!setEndOffset && accumulator >= absoluteLocation + absoluteLength)
 		{
-			endOffset = resultSet.length - (accumulator - (absoluteLocation + absoluteLength));
+			endOffset = resultSetLength - (accumulator - (absoluteLocation + absoluteLength));
 			setEndOffset = YES;
 		}
 		else
 		{
-			endOffset = resultSet.length;
+			endOffset = resultSetLength;
 		}
 		
 		if (setBeginOffset)
 		{
 			const void *resultBytes = resultSet.bytes;
-			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += self.pointerSize)
+			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += pointerSize)
 			{
-				if (self.pointerSize == sizeof(ZGMemoryAddress))
+				switch (pointerSize)
 				{
-					addressCallback(*(ZGMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
-				}
-				else
-				{
-					addressCallback(*(ZG32BitMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+					case sizeof(ZGMemoryAddress):
+						addressCallback(*(ZGMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+						break;
+					default:
+						addressCallback(*(ZG32BitMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+						break;
+						
 				}
 				
 				if (shouldStopEnumerating)
