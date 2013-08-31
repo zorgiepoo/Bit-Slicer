@@ -138,7 +138,7 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 	{
 		resultSets = [NSArray array];
 		
-		// Deallocate results into separate queue
+		// Deallocate results into separate queue since this could take some time
 		__block id oldResultSets = allResultSets;
 		allResultSets = nil;
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -310,7 +310,7 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 	
 	if (searchProgress.shouldCancelSearch)
 	{
-		// Deallocate results into separate queue
+		// Deallocate results into separate queue since this could take some time
 		__block id oldResultSets = newResultsData;
 		newResultsData = [NSData data];
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
