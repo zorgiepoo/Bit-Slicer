@@ -264,7 +264,6 @@
 					 selector:@selector(watchProcessDied:)
 					 name:ZGTargetProcessDiedNotification
 					 object:self.windowController.currentProcess];
-					NSLog(@"Added observer");
 				}
 			}
 		}
