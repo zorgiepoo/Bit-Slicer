@@ -214,6 +214,13 @@
 	}
 }
 
+- (void)watchProcessDied:(NSNotification *)notification
+{
+	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+		[self stopScriptForVariable:[variableValue pointerValue]];
+	}];
+}
+
 - (void)runScriptForVariable:(ZGVariable *)variable
 {
 	ZGPyScript *script = [self scriptForVariable:variable];
@@ -251,6 +258,13 @@
 					self.scriptTimer = [NSTimer scheduledTimerWithTimeInterval:0.03 target:self selector:@selector(executeScripts:) userInfo:nil repeats:YES];
 					[[NSRunLoop currentRunLoop] addTimer:self.scriptTimer forMode:NSEventTrackingRunLoopMode];
 					[[NSRunLoop currentRunLoop] addTimer:self.scriptTimer forMode:NSModalPanelRunLoopMode];
+					
+					[[NSNotificationCenter defaultCenter]
+					 addObserver:self
+					 selector:@selector(watchProcessDied:)
+					 name:ZGTargetProcessDiedNotification
+					 object:self.windowController.currentProcess];
+					NSLog(@"Added observer");
 				}
 			}
 		}
@@ -269,6 +283,7 @@
 	{
 		variable.enabled = NO;
 		[self.windowController.variablesTableView reloadData];
+		[self.windowController markDocumentChange];
 	}
 	
 	ZGPyScript *script = [self scriptForVariable:variable];
@@ -280,12 +295,14 @@
 		{
 			[self.scriptTimer invalidate];
 			self.scriptTimer = nil;
+			
+			[[NSNotificationCenter defaultCenter] removeObserver:self];
 		}
 	}
 	
 	script.executeFunction = NULL;
 	
-	if (script.timeElapsed > 0)
+	if (script.timeElapsed > 0 && self.windowController.currentProcess.valid)
 	{
 		PyObject *finishFunction = PyObject_GetAttrString(script.module, "finish");
 		if (finishFunction != NULL && PyCallable_Check(finishFunction))
@@ -300,6 +317,7 @@
 		Py_XDECREF(finishFunction);
 	}
 	
+	script.timeElapsed = 0;
 	script.virtualMemoryInstance = nil;
 }
 
