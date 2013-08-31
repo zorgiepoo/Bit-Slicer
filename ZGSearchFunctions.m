@@ -69,7 +69,7 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 		regions = searchData.savedData;
 	}
 	
-	dispatch_sync(dispatch_get_main_queue(), ^{
+	dispatch_async(dispatch_get_main_queue(), ^{
 		searchProgress.initiatedSearch = YES;
 		searchProgress.progressType = ZGSearchProgressMemoryScanning;
 		searchProgress.maxProgress = regions.count;
@@ -170,10 +170,12 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 		return !(region.address < endingAddress && region.address + region.size > beginningAddress && region.protection & VM_PROT_READ && (searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
 	}];
 	
-	dispatch_sync(dispatch_get_main_queue(), ^{
+	ZGMemorySize maxProgress = firstSearchResults.addressCount + laterSearchResults.addressCount;
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
 		searchProgress.initiatedSearch = YES;
 		searchProgress.progressType = ZGSearchProgressMemoryScanning;
-		searchProgress.maxProgress = firstSearchResults.addressCount + laterSearchResults.addressCount;
+		searchProgress.maxProgress = maxProgress;
 	});
 	
 	NSMutableData *newResultsData = [[NSMutableData alloc] init];
@@ -183,8 +185,6 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 	
 	__block NSUInteger numberOfVariablesFound = 0;
 	__block ZGMemorySize currentProgress = 0;
-	
-	ZGMemorySize maxProgress = searchProgress.maxProgress;
 	
 	// We'll update the progress at 5% intervals during our search
 	ZGMemorySize numberOfVariablesRequiredToUpdateProgress = (ZGMemorySize)(maxProgress * 0.05);
