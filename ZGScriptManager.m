@@ -349,6 +349,11 @@ static dispatch_queue_t gPythonQueue;
 	}
 }
 
+- (void)removeScriptForVariable:(ZGVariable *)variable
+{
+	[self.scriptsDictionary removeObjectForKey:[NSValue valueWithNonretainedObject:variable]];
+}
+
 - (void)stopScriptForVariable:(ZGVariable *)variable
 {
 	[self disableVariable:variable];

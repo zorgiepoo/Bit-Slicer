@@ -627,9 +627,9 @@
 				770930B715BA7635009705A6 /* ZGDocumentTableController.m */,
 				77E652B4168F8C7700D84A7F /* ZGDocumentBreakPointController.h */,
 				77E652B5168F8C7700D84A7F /* ZGDocumentBreakPointController.m */,
-				7739728017D26A1600B958EE /* Scripting */,
 				770930B315B92203009705A6 /* ZGVariableController.h */,
 				770930B415B92203009705A6 /* ZGVariableController.m */,
+				7739728017D26A1600B958EE /* Scripting */,
 			);
 			name = Documents;
 			sourceTree = "<group>";

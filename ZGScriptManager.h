@@ -46,5 +46,6 @@
 
 - (void)runScriptForVariable:(ZGVariable *)variable;
 - (void)stopScriptForVariable:(ZGVariable *)variable;
+- (void)removeScriptForVariable:(ZGVariable *)variable;
 
 @end

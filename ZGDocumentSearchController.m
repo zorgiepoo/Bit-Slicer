@@ -303,41 +303,6 @@
 
 #pragma mark Searching
 
-- (void)clear
-{
-	if (NSRunAlertPanel(@"Clear Search", @"Are you sure you want to clear your search? You will not be able to undo this action.", @"Clear", @"Cancel", nil) == NSAlertDefaultReturn)
-	{
-		self.searchResults = nil;
-		[self.windowController.variableController removeVariablesAtRowIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.documentData.variables.count)]];
-		[self.windowController.undoManager removeAllActions];
-		
-		self.windowController.runningApplicationsPopUpButton.enabled = YES;
-		self.windowController.dataTypesPopUpButton.enabled = YES;
-		self.windowController.variableQualifierMatrix.enabled = YES;
-		
-		if (self.windowController.currentProcess.valid)
-		{
-			self.windowController.searchButton.enabled = YES;
-		}
-		
-		[self.windowController.tableController.variablesTableView reloadData];
-		
-		if ([self.windowController functionTypeAllowsSearchInput])
-		{
-			self.windowController.searchValueTextField.enabled = YES;
-		}
-		
-		self.windowController.clearButton.enabled = NO;
-		
-		if (self.windowController.currentProcess.valid)
-		{
-			self.windowController.generalStatusTextField.stringValue = @"Cleared search.";
-		}
-		
-		[self.windowController markDocumentChange];
-	}
-}
-
 - (void)fetchVariablesFromResults
 {	
 	if (self.documentData.variables.count < MAX_TABLE_VIEW_ITEMS && self.searchResults.addressCount > 0)

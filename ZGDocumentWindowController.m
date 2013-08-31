@@ -1127,7 +1127,7 @@ static NSSize *expandedWindowMinSize = nil;
 
 - (IBAction)clearSearchValues:(id)sender
 {
-	[self.searchController clear];
+	[self.variableController clear];
 }
 
 - (IBAction)searchValue:(id)sender
