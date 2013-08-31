@@ -55,10 +55,26 @@
 @implementation ZGScriptManager
 
 static dispatch_queue_t gPythonQueue;
+
++ (void)initializePythonInterpreter
+{	
+	dispatch_async(gPythonQueue, ^{
+		Py_Initialize();
+		PyObject *sys = PyImport_ImportModule("sys");
+		PyObject *path = PyObject_GetAttrString(sys, "path");
+		PyList_Append(path, PyString_FromString((char *)[SCRIPT_CACHES_PATH UTF8String]));
+		
+		Py_XDECREF(sys);
+		Py_XDECREF(path);
+		
+		[ZGPyVirtualMemory loadModule];
+	});
+}
+
 + (void)initialize
 {
-	if (self == [self class])
-	{
+	static dispatch_once_t onceToken = 0;
+	dispatch_once(&onceToken, ^{
 		srand((unsigned)time(NULL));
 		
 		if ([[NSFileManager defaultManager] fileExistsAtPath:SCRIPT_CACHES_PATH])
@@ -68,22 +84,12 @@ static dispatch_queue_t gPythonQueue;
 		
 		[[NSFileManager defaultManager] createDirectoryAtPath:SCRIPT_CACHES_PATH withIntermediateDirectories:YES attributes:nil error:nil];
 		
-		setenv("PYTHONDONTWRITEBYTECODE", "1", 1);
-		
 		gPythonQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
 		
-		dispatch_async(gPythonQueue, ^{
-			Py_Initialize();
-			PyObject *sys = PyImport_ImportModule("sys");
-			PyObject *path = PyObject_GetAttrString(sys, "path");
-			PyList_Append(path, PyString_FromString((char *)[SCRIPT_CACHES_PATH UTF8String]));
-			
-			Py_XDECREF(sys);
-			Py_XDECREF(path);
-			
-			[ZGPyVirtualMemory loadModule];
-		});
-	}
+		setenv("PYTHONDONTWRITEBYTECODE", "1", 1);
+		
+		[self initializePythonInterpreter];
+	});
 }
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController
@@ -191,11 +197,19 @@ static dispatch_queue_t gPythonQueue;
 
 - (BOOL)executeScript:(ZGPyScript *)script
 {	
-	PyObject *retValue = PyObject_CallFunction(script.executeFunction, "d", script.timeElapsed);
+	PyObject *retValue = NULL;
+	
+	if (Py_IsInitialized())
+	{
+		retValue = PyObject_CallFunction(script.executeFunction, "d", script.timeElapsed);
+	}
 	
 	if (retValue == NULL)
 	{
-		PyErr_Print();
+		if (Py_IsInitialized())
+		{
+			PyErr_Print();
+		}
 		
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
 			if (pyScript == script)
@@ -208,7 +222,10 @@ static dispatch_queue_t gPythonQueue;
 		}];
 	}
 	
-	Py_XDECREF(retValue);
+	if (Py_IsInitialized())
+	{
+		Py_XDECREF(retValue);
+	}
 	
 	return retValue != NULL;
 }
@@ -271,7 +288,6 @@ static dispatch_queue_t gPythonQueue;
 							{
 								dispatch_async(dispatch_get_main_queue(), ^{
 									[self disableVariable:variable];
-									NSLog(@"Error: failed to create dispatch timer");
 								});
 							}
 							else
@@ -357,26 +373,43 @@ static dispatch_queue_t gPythonQueue;
 		}
 	}
 	
+	NSUInteger scriptFinishedCount = script.finishedCount;
+	
 	dispatch_async(gPythonQueue, ^{
-		script.executeFunction = NULL;
-		
-		if (script.timeElapsed > 0 && self.windowController.currentProcess.valid)
+		if (script.finishedCount == scriptFinishedCount)
 		{
-			PyObject *finishFunction = PyObject_GetAttrString(script.module, "finish");
-			if (finishFunction != NULL && PyCallable_Check(finishFunction))
+			script.executeFunction = NULL;
+			
+			if (Py_IsInitialized() && script.timeElapsed > 0 && self.windowController.currentProcess.valid)
 			{
-				PyObject *retValue = PyObject_CallFunction(finishFunction, NULL);
-				if (retValue == NULL)
+				PyObject *finishFunction = PyObject_GetAttrString(script.module, "finish");
+				if (finishFunction != NULL && PyCallable_Check(finishFunction))
 				{
-					PyErr_Print();
+					PyObject *retValue = PyObject_CallFunction(finishFunction, NULL);
+					if (retValue == NULL)
+					{
+						PyErr_Print();
+					}
+					Py_XDECREF(retValue);
 				}
-				Py_XDECREF(retValue);
+				Py_XDECREF(finishFunction);
 			}
-			Py_XDECREF(finishFunction);
+			
+			script.timeElapsed = 0;
+			script.virtualMemoryInstance = nil;
+			script.finishedCount++;
 		}
-		
-		script.timeElapsed = 0;
-		script.virtualMemoryInstance = nil;
+	});
+	
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
+		if (scriptFinishedCount == script.finishedCount)
+		{
+			// Give up
+			Py_Finalize();
+			dispatch_async(gPythonQueue, ^{
+				[[self class] initializePythonInterpreter];
+			});
+		}
 	});
 }
 

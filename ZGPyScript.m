@@ -53,13 +53,19 @@
 
 - (void)setModule:(PyObject *)module
 {
-	Py_XDECREF(_module);
+	if (Py_IsInitialized())
+	{
+		Py_XDECREF(_module);
+	}
 	_module = module;
 }
 
 - (void)setExecuteFunction:(PyObject *)executeFunction
 {
-	Py_XDECREF(_executeFunction);
+	if (Py_IsInitialized())
+	{
+		Py_XDECREF(_executeFunction);
+	}
 	_executeFunction = executeFunction;
 }
 

@@ -45,6 +45,7 @@
 @property (nonatomic) NSTimeInterval lastTime;
 @property (nonatomic) NSTimeInterval timeElapsed;
 @property (nonatomic) ZGPyVirtualMemory *virtualMemoryInstance;
+@property (atomic) NSUInteger finishedCount;
 
 - (id)initWithPath:(NSString *)path;
 - (NSString *)moduleName;

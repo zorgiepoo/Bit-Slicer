@@ -206,7 +206,10 @@ static PyObject *virtualMemoryModule;
 
 - (void)setVmObject:(PyObject *)vmObject
 {
-	Py_XDECREF(_vmObject);
+	if (Py_IsInitialized())
+	{
+		Py_XDECREF(_vmObject);
+	}
 	_vmObject = vmObject;
 }
 
