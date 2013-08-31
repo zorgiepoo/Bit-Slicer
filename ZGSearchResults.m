@@ -126,7 +126,6 @@
 					default:
 						addressCallback(*(ZG32BitMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
 						break;
-						
 				}
 				
 				if (shouldStopEnumerating)
