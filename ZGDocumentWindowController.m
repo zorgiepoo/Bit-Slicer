@@ -373,6 +373,8 @@
 			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 			
 			[self.currentProcess markInvalid];
+			[self.variablesTableView reloadData];
+			
 			[[NSNotificationCenter defaultCenter]
 			 postNotificationName:ZGTargetProcessDiedNotification
 			 object:self.currentProcess];
