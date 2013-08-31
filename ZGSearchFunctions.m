@@ -137,6 +137,13 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 	if (searchProgress.shouldCancelSearch)
 	{
 		resultSets = [NSArray array];
+		
+		// Deallocate results into separate queue
+		__block id oldResultSets = allResultSets;
+		allResultSets = nil;
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			oldResultSets = nil;
+		});
 	}
 	else
 	{
@@ -303,7 +310,12 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 	
 	if (searchProgress.shouldCancelSearch)
 	{
+		// Deallocate results into separate queue
+		__block id oldResultSets = newResultsData;
 		newResultsData = [NSData data];
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			oldResultSets = nil;
+		});
 	}
 	
 	return [[ZGSearchResults alloc] initWithResultSets:@[newResultsData] dataSize:dataSize pointerSize:pointerSize];
