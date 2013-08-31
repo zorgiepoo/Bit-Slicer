@@ -230,56 +230,63 @@
 	
 	BOOL failedToRun = NO;
 	
-	if (script.module == NULL)
+	if (!self.windowController.currentProcess.valid)
 	{
 		failedToRun = YES;
-		PyErr_Print();
 	}
 	else
 	{
-		script.executeFunction = PyObject_GetAttrString(script.module, "execute");
-		if (script.executeFunction != NULL && PyCallable_Check(script.executeFunction))
+		if (script.module == NULL)
 		{
-			script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask];
-			if (script.virtualMemoryInstance != nil)
+			failedToRun = YES;
+			PyErr_Print();
+		}
+		else
+		{
+			script.executeFunction = PyObject_GetAttrString(script.module, "execute");
+			if (script.executeFunction != NULL && PyCallable_Check(script.executeFunction))
 			{
-				PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);
-				
-				script.timeElapsed = 0.0;
-				script.lastTime = [NSDate timeIntervalSinceReferenceDate];
-				if ([self executeScript:script])
+				script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask];
+				if (script.virtualMemoryInstance != nil)
 				{
-					if (self.runningScripts == nil)
-					{
-						self.runningScripts = [[NSMutableArray alloc] init];
-					}
+					PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);
 					
-					[self.runningScripts addObject:script];
-					
-					if (self.scriptTimer == nil)
+					script.timeElapsed = 0.0;
+					script.lastTime = [NSDate timeIntervalSinceReferenceDate];
+					if ([self executeScript:script])
 					{
-						self.scriptTimer = [NSTimer scheduledTimerWithTimeInterval:0.03 target:self selector:@selector(executeScripts:) userInfo:nil repeats:YES];
-						[[NSRunLoop currentRunLoop] addTimer:self.scriptTimer forMode:NSEventTrackingRunLoopMode];
-						[[NSRunLoop currentRunLoop] addTimer:self.scriptTimer forMode:NSModalPanelRunLoopMode];
+						if (self.runningScripts == nil)
+						{
+							self.runningScripts = [[NSMutableArray alloc] init];
+						}
 						
-						[[NSNotificationCenter defaultCenter]
-						 addObserver:self
-						 selector:@selector(watchProcessDied:)
-						 name:ZGTargetProcessDiedNotification
-						 object:self.windowController.currentProcess];
+						[self.runningScripts addObject:script];
+						
+						if (self.scriptTimer == nil)
+						{
+							self.scriptTimer = [NSTimer scheduledTimerWithTimeInterval:0.03 target:self selector:@selector(executeScripts:) userInfo:nil repeats:YES];
+							[[NSRunLoop currentRunLoop] addTimer:self.scriptTimer forMode:NSEventTrackingRunLoopMode];
+							[[NSRunLoop currentRunLoop] addTimer:self.scriptTimer forMode:NSModalPanelRunLoopMode];
+							
+							[[NSNotificationCenter defaultCenter]
+							 addObserver:self
+							 selector:@selector(watchProcessDied:)
+							 name:ZGTargetProcessDiedNotification
+							 object:self.windowController.currentProcess];
+						}
 					}
+				}
+				else
+				{
+					failedToRun = YES;
+					NSLog(@"Error: Couldn't create ZGPyVirtualMemory instance");
 				}
 			}
 			else
 			{
 				failedToRun = YES;
-				NSLog(@"Error: Couldn't create ZGPyVirtualMemory instance");
+				NSLog(@"Error: Couldn't pick up execute() function");
 			}
-		}
-		else
-		{
-			failedToRun = YES;
-			NSLog(@"Error: Couldn't pick up execute() function");
 		}
 	}
 	
