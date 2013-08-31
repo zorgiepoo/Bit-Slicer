@@ -186,9 +186,20 @@
 	{
 		self.windowController.undoManager.actionName = [NSString stringWithFormat:@"Delete Variable%@", rowIndexes.count > 1 ? @"s" : @""];
 	}
+	
+	NSArray *variablesToRemove = [self.documentData.variables objectsAtIndexes:rowIndexes];
+	
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
-	 addVariables:[self.documentData.variables objectsAtIndexes:rowIndexes]
+	 addVariables:variablesToRemove
 	 atRowIndexes:rowIndexes];
+	
+	for (ZGVariable *variable in variablesToRemove)
+	{
+		if (variable.type == ZGScript && variable.enabled)
+		{
+			[self.windowController.scriptManager stopScriptForVariable:variable];
+		}
+	}
 	
 	[temporaryArray addObjectsFromArray:self.documentData.variables];
 	[temporaryArray removeObjectsAtIndexes:rowIndexes];

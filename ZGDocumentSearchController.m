@@ -307,10 +307,9 @@
 {
 	if (NSRunAlertPanel(@"Clear Search", @"Are you sure you want to clear your search? You will not be able to undo this action.", @"Clear", @"Cancel", nil) == NSAlertDefaultReturn)
 	{
-		[self.windowController.undoManager removeAllActions];
-		
 		self.searchResults = nil;
-		self.documentData.variables = [NSArray array];
+		[self.windowController.variableController removeVariablesAtRowIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.documentData.variables.count)]];
+		[self.windowController.undoManager removeAllActions];
 		
 		self.windowController.runningApplicationsPopUpButton.enabled = YES;
 		self.windowController.dataTypesPopUpButton.enabled = YES;

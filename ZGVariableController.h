@@ -50,6 +50,7 @@
 - (void)copyAddress;
 - (void)pasteVariables;
 
+- (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes;
 - (void)removeSelectedSearchValues;
 - (void)addVariable:(id)sender;
 - (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
