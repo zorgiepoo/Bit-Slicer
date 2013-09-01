@@ -573,7 +573,7 @@
 	return YES;
 }
 
-- (void)searchVariablesWithComparisonFunction:(comparison_function_t)compareFunction byNarrowing:(BOOL)isNarrowing usingCompletionBlock:(dispatch_block_t)completeSearchBlock
+- (void)searchVariablesWithComparisonFunction:(comparison_function_t)compareFunction byNarrowing:(BOOL)isNarrowing withVariables:(NSArray *)narrowVariables usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGProcess *currentProcess = self.windowController.currentProcess;
 	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
@@ -581,20 +581,17 @@
 	if (isNarrowing)
 	{
 		NSMutableData *firstResultSets = [NSMutableData data];
-		for (ZGVariable *variable in self.documentData.variables)
+		for (ZGVariable *variable in narrowVariables)
 		{
-			if (variable.enabled)
+			if (self.searchData.pointerSize == sizeof(ZGMemoryAddress))
 			{
-				if (self.searchData.pointerSize == sizeof(ZGMemoryAddress))
-				{
-					ZGMemoryAddress variableAddress = variable.address;
-					[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
-				}
-				else
-				{
-					ZG32BitMemoryAddress variableAddress = (ZG32BitMemoryAddress)variable.address;
-					[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
-				}
+				ZGMemoryAddress variableAddress = variable.address;
+				[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
+			}
+			else
+			{
+				ZG32BitMemoryAddress variableAddress = (ZG32BitMemoryAddress)variable.address;
+				[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
 			}
 		}
 		firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
@@ -624,6 +621,7 @@
 	if ([self retrieveSearchData])
 	{
 		NSMutableArray *notSearchedVariables = [[NSMutableArray alloc] init];
+		NSMutableArray *searchedVariables = [[NSMutableArray alloc] init];
 		
 		// Add all variables whose value should not be searched for, first
 		for (ZGVariable *variable in self.documentData.variables)
@@ -631,6 +629,10 @@
 			if (variable.isFrozen || variable.type != dataType || !variable.enabled)
 			{
 				[notSearchedVariables addObject:variable];
+			}
+			else
+			{
+				[searchedVariables addObject:variable];
 			}
 		}
 		
@@ -641,7 +643,7 @@
 		
 		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.windowController.currentProcess.is64Bit, (ZGVariableQualifier)self.documentData.qualifierTag);
 		
-		[self searchVariablesWithComparisonFunction:compareFunction byNarrowing:self.isInNarrowSearchMode usingCompletionBlock:^ {
+		[self searchVariablesWithComparisonFunction:compareFunction byNarrowing:self.isInNarrowSearchMode withVariables:searchedVariables usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
 			self.userInterfaceTimer = nil;
 			
