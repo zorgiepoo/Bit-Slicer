@@ -156,7 +156,7 @@
 	BOOL goingToNarrowDownSearches = NO;
 	for (ZGVariable *variable in self.documentData.variables)
 	{
-		if (variable.enabled && variable.type == dataType)
+		if (variable.enabled && variable.type == dataType && !variable.isFrozen)
 		{
 			goingToNarrowDownSearches = YES;
 			break;
@@ -576,6 +576,7 @@
 - (void)searchVariablesWithComparisonFunction:(comparison_function_t)compareFunction byNarrowing:(BOOL)isNarrowing usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGProcess *currentProcess = self.windowController.currentProcess;
+	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
 	ZGSearchResults *firstSearchResults = nil;
 	if (isNarrowing)
 	{
@@ -606,10 +607,10 @@
 		}
 		else
 		{
-			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction, firstSearchResults, self.searchResults);
+			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction, firstSearchResults, self.searchResults.tag == dataType ? self.searchResults : nil);
 		}
 		
-		self.temporarySearchResults.tag = self.documentData.selectedDatatypeTag;
+		self.temporarySearchResults.tag = dataType;
 		
 		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
 	});
