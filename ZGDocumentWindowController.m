@@ -234,6 +234,21 @@
 			pointerSizeChanged = YES;
 		}
 		
+		for (ZGVariable *variable in self.documentData.variables)
+		{
+			if (variable.enabled)
+			{
+				if (variable.type == ZGScript)
+				{
+					[self.scriptManager stopScriptForVariable:variable];
+				}
+				else if (variable.isFrozen)
+				{
+					variable.enabled = NO;
+				}
+			}
+		}
+		
 		// this is about as far as we go when it comes to undo/redos...
 		[self.undoManager removeAllActions];
 	}
