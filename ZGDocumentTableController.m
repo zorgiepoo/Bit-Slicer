@@ -188,7 +188,7 @@
 		// Freeze all variables that need be frozen!
 		[self.documentData.variables enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
 		 {
-			 if (variable.isFrozen && variable.freezeValue)
+			 if (variable.enabled && variable.isFrozen && variable.freezeValue != NULL)
 			 {
 				 if (variable.size)
 				 {

@@ -53,6 +53,7 @@
 - (void)clear;
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes;
 - (void)removeSelectedSearchValues;
+- (void)disableHarmfulVariables:(NSArray *)variables;
 - (void)addVariable:(id)sender;
 - (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
 

@@ -620,19 +620,6 @@
 	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
 	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
 	
-	// Find all variables that are set to be searched, but shouldn't be.
-	// This is if the variable's data type does not match, or if the variable is frozen
-	for (ZGVariable *variable in self.documentData.variables)
-	{
-		if (variable.enabled && (variable.type != dataType || variable.isFrozen))
-		{
-			variable.enabled = NO;
-		}
-	}
-	
-	// Re-display in case we set variables to not be searched
-	[self.windowController.tableController.variablesTableView reloadData];
-	
 	if ([self retrieveSearchData])
 	{
 		NSMutableArray *notSearchedVariables = [[NSMutableArray alloc] init];
@@ -640,12 +627,7 @@
 		// Add all variables whose value should not be searched for, first
 		for (ZGVariable *variable in self.documentData.variables)
 		{
-			if (variable.isFrozen || variable.type != dataType)
-			{
-				variable.enabled = NO;
-			}
-			
-			if (!variable.enabled)
+			if (variable.isFrozen || variable.type != dataType || !variable.enabled)
 			{
 				[notSearchedVariables addObject:variable];
 			}

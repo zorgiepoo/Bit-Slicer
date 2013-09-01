@@ -164,6 +164,7 @@
 	
 	[self addProcessesToPopupButton];
 	
+	[self.variableController disableHarmfulVariables:self.documentData.variables];
 	[self updateVariables:self.documentData.variables searchResults:nil];
 	
 	[self.variableQualifierMatrix selectCellWithTag:self.documentData.qualifierTag];

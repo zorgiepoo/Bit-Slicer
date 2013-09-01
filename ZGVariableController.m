@@ -258,10 +258,23 @@
 	[self.windowController updateClearButton];
 }
 
+- (void)disableHarmfulVariables:(NSArray *)variables
+{
+	for (ZGVariable *variable in variables)
+	{
+		if ((variable.type == ZGScript || variable.isFrozen) && variable.enabled)
+		{
+			variable.enabled = NO;
+		}
+	}
+}
+
 - (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes
 {
 	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithArray:self.documentData.variables];
 	[temporaryArray insertObjects:variables atIndexes:rowIndexes];
+	
+	[self disableHarmfulVariables:variables];
 	
 	self.documentData.variables = [NSArray arrayWithArray:temporaryArray];
 	
