@@ -884,7 +884,7 @@
 							<reference key="NSNextResponder" ref="564653584"/>
 							<int key="NSvFlags">1828</int>
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
-							<string key="NSFrame">{{144, 45}, {91, 32}}</string>
+							<string key="NSFrame">{{146, 45}, {91, 32}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="163994611"/>
@@ -910,7 +910,7 @@
 							<reference key="NSNextResponder" ref="564653584"/>
 							<int key="NSvFlags">1828</int>
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
-							<string key="NSFrame">{{53, 45}, {91, 32}}</string>
+							<string key="NSFrame">{{55, 45}, {91, 32}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="444817851"/>
@@ -1891,7 +1891,7 @@
 									<reference key="NSNextResponder" ref="1072437571"/>
 									<int key="NSvFlags">1804</int>
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
-									<string key="NSFrame">{{9, 27}, {140, 17}}</string>
+									<string key="NSFrame">{{9, 30}, {140, 14}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="23359784"/>
@@ -1911,7 +1911,7 @@
 									<reference key="NSNextResponder" ref="1072437571"/>
 									<int key="NSvFlags">1804</int>
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
-									<string key="NSFrame">{{11, 0}, {137, 19}}</string>
+									<string key="NSFrame">{{11, 3}, {137, 19}}</string>
 									<reference key="NSSuperview" ref="1072437571"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="669737142"/>
@@ -2199,7 +2199,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="768769447">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">1792</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSTextField" id="952502986">
@@ -2290,6 +2290,7 @@
 					</array>
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{361, 90}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
@@ -2305,7 +2306,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="677515478">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">1792</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSTextField" id="280550262">
@@ -2396,6 +2397,7 @@
 					</array>
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{352, 90}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
@@ -2411,7 +2413,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="781280972">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">1792</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSButton" id="134565786">
@@ -2520,6 +2522,7 @@
 					</array>
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{348, 126}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
@@ -3447,8 +3450,6 @@
 							<reference ref="764381128"/>
 							<reference ref="856215563"/>
 							<reference ref="579283322"/>
-							<reference ref="444817851"/>
-							<reference ref="938492434"/>
 							<reference ref="163994611"/>
 							<reference ref="173675126"/>
 							<reference ref="145091704"/>
@@ -3461,7 +3462,9 @@
 							<reference ref="289350899"/>
 							<reference ref="796048733"/>
 							<reference ref="669737142"/>
+							<reference ref="938492434"/>
 							<reference ref="369816348"/>
+							<reference ref="444817851"/>
 						</array>
 						<reference key="parent" ref="149485773"/>
 					</object>
@@ -4870,17 +4873,185 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDocumentWindowController</string>
 					<string key="superclassName">NSWindowController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">editVariablesAddress:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">editVariablesAddress:</string>
-						<object class="IBActionInfo" key="NS.object.0">
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="addVariable:">id</string>
+						<string key="changeBeginningAddressString:">id</string>
+						<string key="changeEndingAddressString:">id</string>
+						<string key="changeNullTerminatorInclusion:">id</string>
+						<string key="changeSearchValueString:">id</string>
+						<string key="changeStringCaseOption:">id</string>
+						<string key="changeUnwritableValuesOption:">id</string>
+						<string key="clearSearchValues:">id</string>
+						<string key="copy:">id</string>
+						<string key="copyAddress:">id</string>
+						<string key="cut:">id</string>
+						<string key="dataTypePopUpButtonRequest:">id</string>
+						<string key="editVariablesAddress:">id</string>
+						<string key="editVariablesAddressCancelButton:">id</string>
+						<string key="editVariablesAddressOKButton:">id</string>
+						<string key="editVariablesSize:">id</string>
+						<string key="editVariablesSizeCancelButton:">id</string>
+						<string key="editVariablesSizeOKButton:">id</string>
+						<string key="editVariablesValue:">id</string>
+						<string key="editVariablesValueCancelButton:">id</string>
+						<string key="editVariablesValueOKButton:">id</string>
+						<string key="freezeVariables:">id</string>
+						<string key="functionTypePopUpButtonRequest:">id</string>
+						<string key="nopVariables:">id</string>
+						<string key="optionsDisclosureButton:">id</string>
+						<string key="paste:">id</string>
+						<string key="pauseOrUnpauseProcess:">id</string>
+						<string key="qualifierMatrixButtonRequest:">id</string>
+						<string key="removeSelectedSearchValues:">id</string>
+						<string key="runningApplicationsPopUpButtonRequest:">id</string>
+						<string key="searchValue:">id</string>
+						<string key="showDebugger:">id</string>
+						<string key="showMemoryViewer:">id</string>
+						<string key="storeAllValues:">id</string>
+						<string key="watchVariable:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="addVariable:">
+							<string key="name">addVariable:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeBeginningAddressString:">
+							<string key="name">changeBeginningAddressString:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeEndingAddressString:">
+							<string key="name">changeEndingAddressString:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeNullTerminatorInclusion:">
+							<string key="name">changeNullTerminatorInclusion:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeSearchValueString:">
+							<string key="name">changeSearchValueString:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeStringCaseOption:">
+							<string key="name">changeStringCaseOption:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeUnwritableValuesOption:">
+							<string key="name">changeUnwritableValuesOption:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="clearSearchValues:">
+							<string key="name">clearSearchValues:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copyAddress:">
+							<string key="name">copyAddress:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="cut:">
+							<string key="name">cut:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="dataTypePopUpButtonRequest:">
+							<string key="name">dataTypePopUpButtonRequest:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesAddress:">
 							<string key="name">editVariablesAddress:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-					</object>
+						<object class="IBActionInfo" key="editVariablesAddressCancelButton:">
+							<string key="name">editVariablesAddressCancelButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesAddressOKButton:">
+							<string key="name">editVariablesAddressOKButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesSize:">
+							<string key="name">editVariablesSize:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesSizeCancelButton:">
+							<string key="name">editVariablesSizeCancelButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesSizeOKButton:">
+							<string key="name">editVariablesSizeOKButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesValue:">
+							<string key="name">editVariablesValue:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesValueCancelButton:">
+							<string key="name">editVariablesValueCancelButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesValueOKButton:">
+							<string key="name">editVariablesValueOKButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="freezeVariables:">
+							<string key="name">freezeVariables:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="functionTypePopUpButtonRequest:">
+							<string key="name">functionTypePopUpButtonRequest:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="nopVariables:">
+							<string key="name">nopVariables:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="optionsDisclosureButton:">
+							<string key="name">optionsDisclosureButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="paste:">
+							<string key="name">paste:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="pauseOrUnpauseProcess:">
+							<string key="name">pauseOrUnpauseProcess:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="qualifierMatrixButtonRequest:">
+							<string key="name">qualifierMatrixButtonRequest:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="removeSelectedSearchValues:">
+							<string key="name">removeSelectedSearchValues:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="runningApplicationsPopUpButtonRequest:">
+							<string key="name">runningApplicationsPopUpButtonRequest:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="searchValue:">
+							<string key="name">searchValue:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showDebugger:">
+							<string key="name">showDebugger:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showMemoryViewer:">
+							<string key="name">showMemoryViewer:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="storeAllValues:">
+							<string key="name">storeAllValues:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="watchVariable:">
+							<string key="name">watchVariable:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="beginningAddressLabel">NSTextField</string>
 						<string key="beginningAddressTextField">NSTextField</string>
