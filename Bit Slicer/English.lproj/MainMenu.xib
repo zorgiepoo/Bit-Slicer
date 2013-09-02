@@ -878,7 +878,7 @@
 											</object>
 											<object class="NSMenuItem" id="33972132">
 												<reference key="NSMenu" ref="465679096"/>
-												<string key="NSTitle">UTF-8 String</string>
+												<string key="NSTitle">08-bit String</string>
 												<string key="NSKeyEquiv">7</string>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -888,7 +888,7 @@
 											</object>
 											<object class="NSMenuItem" id="25228111">
 												<reference key="NSMenu" ref="465679096"/>
-												<string key="NSTitle">UTF-16 String</string>
+												<string key="NSTitle">16-bit String</string>
 												<string key="NSKeyEquiv">8</string>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
