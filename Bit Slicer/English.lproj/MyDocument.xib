@@ -603,19 +603,7 @@
 								<string key="NSKeyEquivalent"/>
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
-								<object class="NSMenuItem" key="NSMenuItem" id="692293971">
-									<reference key="NSMenu" ref="553699467"/>
-									<string key="NSTitle">32-bit Integer</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<int key="NSState">1</int>
-									<reference key="NSOnImage" ref="591808157"/>
-									<reference key="NSMixedImage" ref="60562664"/>
-									<string key="NSAction">_popUpItemAction:</string>
-									<int key="NSTag">2</int>
-									<reference key="NSTarget" ref="740017402"/>
-								</object>
+								<nil key="NSMenuItem"/>
 								<bool key="NSMenuItemRespectAlignment">YES</bool>
 								<object class="NSMenu" key="NSMenu" id="553699467">
 									<string key="NSTitle">OtherViews</string>
@@ -643,7 +631,18 @@
 											<int key="NSTag">1</int>
 											<reference key="NSTarget" ref="740017402"/>
 										</object>
-										<reference ref="692293971"/>
+										<object class="NSMenuItem" id="692293971">
+											<reference key="NSMenu" ref="553699467"/>
+											<string key="NSTitle">32-bit Integer</string>
+											<string key="NSKeyEquiv"/>
+											<int key="NSKeyEquivModMask">1048576</int>
+											<int key="NSMnemonicLoc">2147483647</int>
+											<reference key="NSOnImage" ref="591808157"/>
+											<reference key="NSMixedImage" ref="60562664"/>
+											<string key="NSAction">_popUpItemAction:</string>
+											<int key="NSTag">2</int>
+											<reference key="NSTarget" ref="740017402"/>
+										</object>
 										<object class="NSMenuItem" id="1046892269">
 											<reference key="NSMenu" ref="553699467"/>
 											<string key="NSTitle">64-bit Integer</string>
@@ -706,7 +705,7 @@
 										</object>
 										<object class="NSMenuItem" id="711998015">
 											<reference key="NSMenu" ref="553699467"/>
-											<string key="NSTitle">UTF-8 String</string>
+											<string key="NSTitle">08-bit String</string>
 											<string key="NSKeyEquiv"/>
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
@@ -718,7 +717,7 @@
 										</object>
 										<object class="NSMenuItem" id="386785353">
 											<reference key="NSMenu" ref="553699467"/>
-											<string key="NSTitle">UTF-16 String</string>
+											<string key="NSTitle">16-bit String</string>
 											<string key="NSKeyEquiv"/>
 											<int key="NSKeyEquivModMask">1048576</int>
 											<int key="NSMnemonicLoc">2147483647</int>
@@ -778,7 +777,7 @@
 										</object>
 									</array>
 								</object>
-								<int key="NSSelectedIndex">2</int>
+								<int key="NSSelectedIndex">-1</int>
 								<int key="NSPreferredEdge">1</int>
 								<bool key="NSUsesItemFromMenu">YES</bool>
 								<bool key="NSAltersState">YES</bool>
@@ -947,7 +946,7 @@
 											<string key="NSFrameSize">{381, 368}</string>
 											<reference key="NSSuperview" ref="368221251"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="587801537"/>
+											<reference key="NSNextKeyView" ref="1019910359"/>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1103,9 +1102,9 @@
 														<string key="NSKeyEquivalent"/>
 														<int key="NSPeriodicDelay">400</int>
 														<int key="NSPeriodicInterval">75</int>
-														<object class="NSMenuItem" key="NSMenuItem" id="282766844">
+														<object class="NSMenuItem" key="NSMenuItem" id="511060073">
 															<reference key="NSMenu" ref="647511438"/>
-															<string key="NSTitle">Script</string>
+															<string key="NSTitle">String8</string>
 															<string key="NSKeyEquiv"/>
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
@@ -1113,7 +1112,7 @@
 															<reference key="NSOnImage" ref="591808157"/>
 															<reference key="NSMixedImage" ref="60562664"/>
 															<string key="NSAction">_popUpItemAction:</string>
-															<int key="NSTag">10</int>
+															<int key="NSTag">6</int>
 															<reference key="NSTarget" ref="842756640"/>
 														</object>
 														<bool key="NSMenuItemRespectAlignment">YES</bool>
@@ -1191,21 +1190,10 @@
 																	<int key="NSTag">5</int>
 																	<reference key="NSTarget" ref="842756640"/>
 																</object>
-																<object class="NSMenuItem" id="511060073">
-																	<reference key="NSMenu" ref="647511438"/>
-																	<string key="NSTitle">UTF8</string>
-																	<string key="NSKeyEquiv"/>
-																	<int key="NSKeyEquivModMask">1048576</int>
-																	<int key="NSMnemonicLoc">2147483647</int>
-																	<reference key="NSOnImage" ref="591808157"/>
-																	<reference key="NSMixedImage" ref="60562664"/>
-																	<string key="NSAction">_popUpItemAction:</string>
-																	<int key="NSTag">6</int>
-																	<reference key="NSTarget" ref="842756640"/>
-																</object>
+																<reference ref="511060073"/>
 																<object class="NSMenuItem" id="315297010">
 																	<reference key="NSMenu" ref="647511438"/>
-																	<string key="NSTitle">UTF16</string>
+																	<string key="NSTitle">String16</string>
 																	<string key="NSKeyEquiv"/>
 																	<int key="NSKeyEquivModMask">1048576</int>
 																	<int key="NSMnemonicLoc">2147483647</int>
@@ -1239,10 +1227,21 @@
 																	<int key="NSTag">8</int>
 																	<reference key="NSTarget" ref="842756640"/>
 																</object>
-																<reference ref="282766844"/>
+																<object class="NSMenuItem" id="282766844">
+																	<reference key="NSMenu" ref="647511438"/>
+																	<string key="NSTitle">Script</string>
+																	<string key="NSKeyEquiv"/>
+																	<int key="NSKeyEquivModMask">1048576</int>
+																	<int key="NSMnemonicLoc">2147483647</int>
+																	<reference key="NSOnImage" ref="591808157"/>
+																	<reference key="NSMixedImage" ref="60562664"/>
+																	<string key="NSAction">_popUpItemAction:</string>
+																	<int key="NSTag">10</int>
+																	<reference key="NSTarget" ref="842756640"/>
+																</object>
 															</array>
 														</object>
-														<int key="NSSelectedIndex">10</int>
+														<int key="NSSelectedIndex">6</int>
 														<int key="NSPreferredEdge">3</int>
 														<bool key="NSUsesItemFromMenu">YES</bool>
 														<bool key="NSAltersState">YES</bool>
@@ -1364,7 +1363,7 @@
 							<string key="NSFrame">{{247, 52}, {383, 386}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="1019910359"/>
+							<reference key="NSNextKeyView" ref="368221251"/>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="587801537"/>
 							<reference key="NSHScroller" ref="292245707"/>
@@ -1382,7 +1381,6 @@
 							<string key="NSFrame">{{12, 16}, {618, 20}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<int key="NSpiFlags">16396</int>
 							<double key="NSMaxValue">100</double>
 						</object>
@@ -2199,7 +2197,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="768769447">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">1792</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSTextField" id="952502986">
@@ -2290,7 +2288,6 @@
 					</array>
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{361, 90}</string>
-					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
@@ -2306,7 +2303,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="677515478">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">1792</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSTextField" id="280550262">
@@ -2397,7 +2394,6 @@
 					</array>
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{352, 90}</string>
-					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
@@ -2413,7 +2409,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="781280972">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">1792</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="NSButton" id="134565786">
@@ -2522,7 +2518,6 @@
 					</array>
 					<object class="NSPSMatrix" key="NSFrameMatrix"/>
 					<string key="NSFrameSize">{348, 126}</string>
-					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
@@ -4873,185 +4868,17 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDocumentWindowController</string>
 					<string key="superclassName">NSWindowController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="addVariable:">id</string>
-						<string key="changeBeginningAddressString:">id</string>
-						<string key="changeEndingAddressString:">id</string>
-						<string key="changeNullTerminatorInclusion:">id</string>
-						<string key="changeSearchValueString:">id</string>
-						<string key="changeStringCaseOption:">id</string>
-						<string key="changeUnwritableValuesOption:">id</string>
-						<string key="clearSearchValues:">id</string>
-						<string key="copy:">id</string>
-						<string key="copyAddress:">id</string>
-						<string key="cut:">id</string>
-						<string key="dataTypePopUpButtonRequest:">id</string>
-						<string key="editVariablesAddress:">id</string>
-						<string key="editVariablesAddressCancelButton:">id</string>
-						<string key="editVariablesAddressOKButton:">id</string>
-						<string key="editVariablesSize:">id</string>
-						<string key="editVariablesSizeCancelButton:">id</string>
-						<string key="editVariablesSizeOKButton:">id</string>
-						<string key="editVariablesValue:">id</string>
-						<string key="editVariablesValueCancelButton:">id</string>
-						<string key="editVariablesValueOKButton:">id</string>
-						<string key="freezeVariables:">id</string>
-						<string key="functionTypePopUpButtonRequest:">id</string>
-						<string key="nopVariables:">id</string>
-						<string key="optionsDisclosureButton:">id</string>
-						<string key="paste:">id</string>
-						<string key="pauseOrUnpauseProcess:">id</string>
-						<string key="qualifierMatrixButtonRequest:">id</string>
-						<string key="removeSelectedSearchValues:">id</string>
-						<string key="runningApplicationsPopUpButtonRequest:">id</string>
-						<string key="searchValue:">id</string>
-						<string key="showDebugger:">id</string>
-						<string key="showMemoryViewer:">id</string>
-						<string key="storeAllValues:">id</string>
-						<string key="watchVariable:">id</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="addVariable:">
-							<string key="name">addVariable:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="changeBeginningAddressString:">
-							<string key="name">changeBeginningAddressString:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="changeEndingAddressString:">
-							<string key="name">changeEndingAddressString:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="changeNullTerminatorInclusion:">
-							<string key="name">changeNullTerminatorInclusion:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="changeSearchValueString:">
-							<string key="name">changeSearchValueString:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="changeStringCaseOption:">
-							<string key="name">changeStringCaseOption:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="changeUnwritableValuesOption:">
-							<string key="name">changeUnwritableValuesOption:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="clearSearchValues:">
-							<string key="name">clearSearchValues:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="copy:">
-							<string key="name">copy:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="copyAddress:">
-							<string key="name">copyAddress:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="cut:">
-							<string key="name">cut:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="dataTypePopUpButtonRequest:">
-							<string key="name">dataTypePopUpButtonRequest:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="editVariablesAddress:">
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">editVariablesAddress:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">editVariablesAddress:</string>
+						<object class="IBActionInfo" key="NS.object.0">
 							<string key="name">editVariablesAddress:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-						<object class="IBActionInfo" key="editVariablesAddressCancelButton:">
-							<string key="name">editVariablesAddressCancelButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="editVariablesAddressOKButton:">
-							<string key="name">editVariablesAddressOKButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="editVariablesSize:">
-							<string key="name">editVariablesSize:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="editVariablesSizeCancelButton:">
-							<string key="name">editVariablesSizeCancelButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="editVariablesSizeOKButton:">
-							<string key="name">editVariablesSizeOKButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="editVariablesValue:">
-							<string key="name">editVariablesValue:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="editVariablesValueCancelButton:">
-							<string key="name">editVariablesValueCancelButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="editVariablesValueOKButton:">
-							<string key="name">editVariablesValueOKButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="freezeVariables:">
-							<string key="name">freezeVariables:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="functionTypePopUpButtonRequest:">
-							<string key="name">functionTypePopUpButtonRequest:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="nopVariables:">
-							<string key="name">nopVariables:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="optionsDisclosureButton:">
-							<string key="name">optionsDisclosureButton:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="paste:">
-							<string key="name">paste:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="pauseOrUnpauseProcess:">
-							<string key="name">pauseOrUnpauseProcess:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="qualifierMatrixButtonRequest:">
-							<string key="name">qualifierMatrixButtonRequest:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="removeSelectedSearchValues:">
-							<string key="name">removeSelectedSearchValues:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="runningApplicationsPopUpButtonRequest:">
-							<string key="name">runningApplicationsPopUpButtonRequest:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="searchValue:">
-							<string key="name">searchValue:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="showDebugger:">
-							<string key="name">showDebugger:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="showMemoryViewer:">
-							<string key="name">showMemoryViewer:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="storeAllValues:">
-							<string key="name">storeAllValues:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="watchVariable:">
-							<string key="name">watchVariable:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</dictionary>
+					</object>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="beginningAddressLabel">NSTextField</string>
 						<string key="beginningAddressTextField">NSTextField</string>
