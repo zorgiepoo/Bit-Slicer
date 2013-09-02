@@ -936,6 +936,26 @@
 												<reference key="NSMixedImage" ref="627749667"/>
 												<int key="NSTag">8</int>
 											</object>
+											<object class="NSMenuItem" id="590375389">
+												<reference key="NSMenu" ref="465679096"/>
+												<bool key="NSIsDisabled">YES</bool>
+												<bool key="NSIsSeparator">YES</bool>
+												<string key="NSTitle"/>
+												<string key="NSKeyEquiv"/>
+												<int key="NSMnemonicLoc">2147483647</int>
+												<reference key="NSOnImage" ref="518338580"/>
+												<reference key="NSMixedImage" ref="627749667"/>
+											</object>
+											<object class="NSMenuItem" id="122444259">
+												<reference key="NSMenu" ref="465679096"/>
+												<string key="NSTitle">Script</string>
+												<string key="NSKeyEquiv">\</string>
+												<int key="NSKeyEquivModMask">1048576</int>
+												<int key="NSMnemonicLoc">2147483647</int>
+												<reference key="NSOnImage" ref="518338580"/>
+												<reference key="NSMixedImage" ref="627749667"/>
+												<int key="NSTag">10</int>
+											</object>
 										</array>
 									</object>
 								</object>
@@ -1748,6 +1768,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">addVariable:</string>
+						<reference key="source" ref="719403863"/>
+						<reference key="destination" ref="122444259"/>
+					</object>
+					<string key="id">2uG-Vo-wFd</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">help:</string>
 						<reference key="source" ref="319791235"/>
 						<reference key="destination" ref="102474849"/>
@@ -2425,6 +2453,8 @@
 							<reference ref="552307714"/>
 							<reference ref="81418924"/>
 							<reference ref="235704338"/>
+							<reference ref="590375389"/>
+							<reference ref="122444259"/>
 						</array>
 						<reference key="parent" ref="992373788"/>
 					</object>
@@ -2702,6 +2732,16 @@
 						<reference key="object" ref="540907053"/>
 						<reference key="parent" ref="16658802"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">VFS-NZ-scG</string>
+						<reference key="object" ref="590375389"/>
+						<reference key="parent" ref="465679096"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">24i-VE-23z</string>
+						<reference key="object" ref="122444259"/>
+						<reference key="parent" ref="465679096"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -2835,6 +2875,8 @@
 				<boolean value="NO" key="239.showNotes"/>
 				<string key="24.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="24.showNotes"/>
+				<string key="24i-VE-23z.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="24i-VE-23z.showNotes"/>
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="29.showNotes"/>
 				<string key="295.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2977,6 +3019,8 @@
 				<boolean value="NO" key="950.showNotes"/>
 				<string key="MBD-kp-IpS.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="MBD-kp-IpS.showNotes"/>
+				<string key="VFS-NZ-scG.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="VFS-NZ-scG.showNotes"/>
 				<string key="bRt-cV-8Ks.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="bRt-cV-8Ks.showNotes"/>
 			</dictionary>
