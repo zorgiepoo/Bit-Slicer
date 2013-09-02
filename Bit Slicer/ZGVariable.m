@@ -482,6 +482,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 {
 	self.type = newType;
 	
+	if (self.type == ZGScript)
+	{
+		self.enabled = NO;
+	}
+	
 	[self cleanState];
 	
 	self.size = (newType == ZGByteArray) ? requestedSize : [ZGVariable sizeFromType:newType pointerSize:pointerSize];
