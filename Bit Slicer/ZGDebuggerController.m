@@ -1332,23 +1332,7 @@ END_DEBUGGER_CHANGE:
 		}
 		else if ([tableColumn.identifier isEqualToString:@"instruction"])
 		{
-			if ([tableView editedRow] == rowIndex && (NSUInteger)[tableView editedColumn] == [[tableView tableColumns] indexOfObject:tableColumn])
-			{
-				// Show the instruction disassembled as if the instruction pointer wasn't involved (that is, address starting at 0)
-				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:0 size:instruction.variable.size bytes:instruction.variable.value breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
-				
-				__block id localResult = nil;
-				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop) {
-					localResult = disassembledText;
-					*stop = YES;
-				}];
-				
-				result = localResult;
-			}
-			else
-			{
-				result = instruction.text;
-			}
+			result = instruction.text;
 		}
 		else if ([tableColumn.identifier isEqualToString:@"symbols"])
 		{
@@ -1412,7 +1396,7 @@ END_DEBUGGER_CHANGE:
 #pragma mark Modifying instructions
 
 #define ASSEMBLER_ERROR_DOMAIN @"Assembling Failed"
-- (NSData *)assembleInstructionText:(NSString *)instructionText usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error
+- (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error
 {
 	NSData *data = [NSData data];
 	NSString *outputFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"assembler_output.XXXXXX"];
@@ -1454,7 +1438,15 @@ END_DEBUGGER_CHANGE:
 		
 		if (!failedToLaunchTask)
 		{
-			NSData *inputData = [[NSString stringWithFormat:@"BITS %lld\n%@\n", numberOfBits, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
+			// yasm likes to be fed in an aligned instruction pointer for its org specifier, so we'll comply with that
+			ZGMemoryAddress alignedInstructionPointer = instructionPointer - (instructionPointer % 4);
+			NSUInteger numberOfNoppedInstructions = instructionPointer - alignedInstructionPointer;
+			
+			// clever way of @"nop" * numberOfNoppedInstructions, if it existed
+			NSString *nopLine = @"nop\n";
+			NSString *nopsString = [@"" stringByPaddingToLength:numberOfNoppedInstructions * nopLine.length withString:nopLine startingAtIndex:0];
+			
+			NSData *inputData = [[NSString stringWithFormat:@"BITS %lld\norg %lld\n%@%@\n", numberOfBits, alignedInstructionPointer, nopsString, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
 			
 			[[inputPipe fileHandleForWriting] writeData:inputData];
 			[[inputPipe fileHandleForWriting] closeFile];
@@ -1463,14 +1455,18 @@ END_DEBUGGER_CHANGE:
 			
 			if ([task terminationStatus] == EXIT_SUCCESS)
 			{
-				data = [NSData dataWithContentsOfFile:outputFilePath];
+				NSData *tempData = [NSData dataWithContentsOfFile:outputFilePath];
 				
-				if (data.length == 0)
+				if (tempData.length <= numberOfNoppedInstructions)
 				{
 					if (error != nil)
 					{
 						*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"nothing was assembled (0 bytes)."}];
 					}
+				}
+				else
+				{
+					data = [NSData dataWithBytes:tempData.bytes + numberOfNoppedInstructions length:tempData.length - numberOfNoppedInstructions];
 				}
 			}
 			else
@@ -1502,7 +1498,8 @@ END_DEBUGGER_CHANGE:
 - (void)writeInstructionText:(NSString *)instructionText atInstructionFromIndex:(NSUInteger)instructionIndex
 {
 	NSError *error = nil;
-	NSData *data = [self assembleInstructionText:instructionText usingArchitectureBits:self.currentProcess.pointerSize * 8 error:&error];
+	ZGInstruction *firstInstruction = [self.instructions objectAtIndex:instructionIndex];
+	NSData *data = [self assembleInstructionText:instructionText atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:self.currentProcess.pointerSize * 8 error:&error];
 	if (data.length == 0)
 	{
 		if (error != nil)
@@ -1696,7 +1693,7 @@ END_DEBUGGER_CHANGE:
 	BOOL success = NO;
 	
 	// Assemble the new code
-	[newInstructionsData appendData:[self assembleInstructionText:codeString usingArchitectureBits:process.pointerSize*8 error:error]];
+	[newInstructionsData appendData:[self assembleInstructionText:codeString atInstructionPointer:allocatedAddress usingArchitectureBits:process.pointerSize*8 error:error]];
 	
 	if (newInstructionsData.length > 0)
 	{
@@ -1732,7 +1729,7 @@ END_DEBUGGER_CHANGE:
 				ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
 				ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
 				
-				NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] usingArchitectureBits:process.pointerSize*8 error:error];
+				NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] atInstructionPointer:0 usingArchitectureBits:process.pointerSize*8 error:error];
 				
 				if (jumpToIslandData.length > 0)
 				{
@@ -1742,7 +1739,7 @@ END_DEBUGGER_CHANGE:
 					
 					ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH) - (allocatedAddress + newInstructionsData.length);
 					
-					NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] usingArchitectureBits:process.pointerSize*8 error:error];
+					NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] atInstructionPointer:0 usingArchitectureBits:process.pointerSize*8 error:error];
 					if (jumpFromIslandData.length > 0)
 					{
 						[newInstructionsData appendData:jumpFromIslandData];
