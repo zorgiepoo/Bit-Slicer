@@ -168,6 +168,14 @@ static dispatch_queue_t gPythonQueue;
 		{
 			[scriptData appendData:[variable.scriptValue dataUsingEncoding:NSUTF8StringEncoding]];
 		}
+		else
+		{
+			NSString *scriptTemplateLines =
+				@"#Written by <author>\n\n"
+				@"def execute(timeElapsed): pass\n\n"
+				@"def finish(): pass\n";
+			[scriptData appendData:[scriptTemplateLines dataUsingEncoding:NSUTF8StringEncoding]];
+		}
 		
 		NSString *scriptPath = [SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename];
 		script = [[ZGPyScript alloc] initWithPath:scriptPath];
