@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 2/5/10.
+ * Created by Mayur Pawashe on 9/2/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,28 +33,9 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import <Carbon/Carbon.h>
 
-@class ZGPreferencesController;
-@class ZGMemoryViewerController;
-@class ZGDebuggerController;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
+@interface ZGLoggerWindowController : NSWindowController
 
-@interface ZGAppController : NSObject
-
-@property (readonly, nonatomic) ZGPreferencesController *preferencesController;
-@property (readonly, nonatomic) ZGMemoryViewerController *memoryViewer;
-@property (readonly, nonatomic) ZGDebuggerController *debuggerController;
-@property (readonly, nonatomic) ZGBreakPointController *breakPointController;
-@property (readonly, nonatomic) ZGLoggerWindowController *loggerController;
-// lastSelectedProcessName keeps track of the last targeted process in a document
-@property (readwrite, copy, nonatomic) NSString *lastSelectedProcessName;
-
-+ (id)sharedController;
-
-+ (BOOL)isRunningLaterThanLion;
-
-+ (void)registerPauseAndUnpauseHotKey;
+- (void)writeLine:(NSString *)text;
 
 @end

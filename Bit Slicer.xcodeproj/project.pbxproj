@@ -44,6 +44,8 @@
 		773972FA17D2E80F00B958EE /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
 		774EF6A717CA892D005ABB20 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 774EF6A617CA892C005ABB20 /* Python.framework */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
+		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
+		77CE28B817D538E300998F28 /* ZGLoggerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */; };
 		77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
 		77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
 		77F115A817D2E87E009E002A /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115A717D2E87E009E002A /* VDKQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -200,6 +202,9 @@
 		773972F817D2E80F00B958EE /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = deps/Sparkle.framework; sourceTree = "<group>"; };
 		774EF6A617CA892C005ABB20 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLoggerWindowController.h; path = "Bit Slicer/ZGLoggerWindowController.h"; sourceTree = "<group>"; };
+		77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLoggerWindowController.m; path = "Bit Slicer/ZGLoggerWindowController.m"; sourceTree = "<group>"; };
+		77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGLoggerWindowController.xib; path = "Bit Slicer/ZGLoggerWindowController.xib"; sourceTree = "<group>"; };
 		77F115A517D2E865009E002A /* HFLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HFLineCountingView.h; sourceTree = "<group>"; };
 		77F115A617D2E87E009E002A /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VDKQueue.h; path = deps/VDKQueue.h; sourceTree = "<group>"; };
 		77F115A717D2E87E009E002A /* VDKQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VDKQueue.m; path = deps/VDKQueue.m; sourceTree = "<group>"; };
@@ -699,6 +704,9 @@
 				77F115E317D2EDCD009E002A /* ZGPreferencesController.h */,
 				77F115E417D2EDCD009E002A /* ZGPreferencesController.m */,
 				77F115BA17D2EBD7009E002A /* Preferences.xib */,
+				77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */,
+				77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */,
+				77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -781,6 +789,7 @@
 				77F115C517D2EBF3009E002A /* ZGCodeInjectionWindowController.xib in Resources */,
 				77F115C817D2EBFA009E002A /* ZGMemoryViewerController.xib in Resources */,
 				77F115CA17D2ECEE009E002A /* DataInspectorView.xib in Resources */,
+				77CE28B817D538E300998F28 /* ZGLoggerWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -871,6 +880,7 @@
 				77F1165617D2EFF5009E002A /* ZGRegistersController.m in Sources */,
 				77F1165917D2F001009E002A /* ZGRegister.m in Sources */,
 				77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */,
+				77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

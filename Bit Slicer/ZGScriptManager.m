@@ -32,6 +32,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "ZGLoggerWindowController.h"
+#import "ZGAppController.h"
 #import "ZGScriptManager.h"
 #import "ZGVariable.h"
 #import "ZGDocumentWindowController.h"
@@ -203,6 +205,36 @@ static dispatch_queue_t gPythonQueue;
 	[[NSWorkspace sharedWorkspace] openFile:script.path];
 }
 
+- (void)logPythonString:(PyObject *)pythonString
+{
+	if (pythonString != NULL)
+	{
+		const char *pythonCString = PyString_AsString(pythonString);
+		if (pythonCString != NULL)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[[[ZGAppController sharedController] loggerController] writeLine:@(pythonCString)];
+			});
+		}
+	}
+	
+	Py_XDECREF(pythonString);
+}
+
+- (void)logPythonError
+{
+	PyObject *type, *value, *traceback;
+	PyErr_Fetch(&type, &value, &traceback);
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[[[ZGAppController sharedController] loggerController] writeLine:@"An error occured with running a script."];
+	});
+	
+	[self logPythonString:type];
+	[self logPythonString:value];
+	[self logPythonString:traceback];
+}
+
 - (BOOL)executeScript:(ZGPyScript *)script
 {	
 	PyObject *retValue = NULL;
@@ -216,7 +248,7 @@ static dispatch_queue_t gPythonQueue;
 	{
 		if (Py_IsInitialized())
 		{
-			PyErr_Print();
+			[self logPythonError];
 		}
 		
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
@@ -274,7 +306,7 @@ static dispatch_queue_t gPythonQueue;
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[self disableVariable:variable];
 				});
-				PyErr_Print();
+				[self logPythonError];
 			}
 			else
 			{
@@ -401,7 +433,7 @@ static dispatch_queue_t gPythonQueue;
 					PyObject *retValue = PyObject_CallFunction(finishFunction, NULL);
 					if (retValue == NULL)
 					{
-						PyErr_Print();
+						[self logPythonError];
 					}
 					Py_XDECREF(retValue);
 				}

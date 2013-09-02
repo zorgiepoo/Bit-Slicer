@@ -508,6 +508,14 @@
 									<reference key="NSOnImage" ref="518338580"/>
 									<reference key="NSMixedImage" ref="627749667"/>
 								</object>
+								<object class="NSMenuItem" id="659173887">
+									<reference key="NSMenu" ref="539237191"/>
+									<string key="NSTitle">Show Logs</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="518338580"/>
+									<reference key="NSMixedImage" ref="627749667"/>
+								</object>
 								<object class="NSMenuItem" id="106983476">
 									<reference key="NSMenu" ref="539237191"/>
 									<bool key="NSIsDisabled">YES</bool>
@@ -936,7 +944,7 @@
 												<reference key="NSMixedImage" ref="627749667"/>
 												<int key="NSTag">8</int>
 											</object>
-											<object class="NSMenuItem" id="590375389">
+											<object class="NSMenuItem" id="328042163">
 												<reference key="NSMenu" ref="465679096"/>
 												<bool key="NSIsDisabled">YES</bool>
 												<bool key="NSIsSeparator">YES</bool>
@@ -946,7 +954,7 @@
 												<reference key="NSOnImage" ref="518338580"/>
 												<reference key="NSMixedImage" ref="627749667"/>
 											</object>
-											<object class="NSMenuItem" id="122444259">
+											<object class="NSMenuItem" id="757885171">
 												<reference key="NSMenu" ref="465679096"/>
 												<string key="NSTitle">Script</string>
 												<string key="NSKeyEquiv">\</string>
@@ -1770,7 +1778,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">addVariable:</string>
 						<reference key="source" ref="719403863"/>
-						<reference key="destination" ref="122444259"/>
+						<reference key="destination" ref="757885171"/>
 					</object>
 					<string key="id">2uG-Vo-wFd</string>
 				</object>
@@ -1829,6 +1837,14 @@
 						<reference key="destination" ref="56418971"/>
 					</object>
 					<string key="id">1116</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">openLogger:</string>
+						<reference key="source" ref="319791235"/>
+						<reference key="destination" ref="659173887"/>
+					</object>
+					<string key="id">b7r-Gm-Tzp</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -2214,6 +2230,7 @@
 							<reference ref="961724279"/>
 							<reference ref="1003594594"/>
 							<reference ref="528418185"/>
+							<reference ref="659173887"/>
 						</array>
 						<reference key="parent" ref="78880049"/>
 					</object>
@@ -2453,8 +2470,8 @@
 							<reference ref="552307714"/>
 							<reference ref="81418924"/>
 							<reference ref="235704338"/>
-							<reference ref="590375389"/>
-							<reference ref="122444259"/>
+							<reference ref="328042163"/>
+							<reference ref="757885171"/>
 						</array>
 						<reference key="parent" ref="992373788"/>
 					</object>
@@ -2734,13 +2751,18 @@
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">VFS-NZ-scG</string>
-						<reference key="object" ref="590375389"/>
+						<reference key="object" ref="328042163"/>
 						<reference key="parent" ref="465679096"/>
 					</object>
 					<object class="IBObjectRecord">
 						<string key="id">24i-VE-23z</string>
-						<reference key="object" ref="122444259"/>
+						<reference key="object" ref="757885171"/>
 						<reference key="parent" ref="465679096"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">HuH-Wa-MAW</string>
+						<reference key="object" ref="659173887"/>
+						<reference key="parent" ref="539237191"/>
 					</object>
 				</array>
 			</object>
@@ -3017,6 +3039,8 @@
 				<boolean value="NO" key="931.showNotes"/>
 				<string key="950.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="950.showNotes"/>
+				<string key="HuH-Wa-MAW.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="HuH-Wa-MAW.showNotes"/>
 				<string key="MBD-kp-IpS.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="MBD-kp-IpS.showNotes"/>
 				<string key="VFS-NZ-scG.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

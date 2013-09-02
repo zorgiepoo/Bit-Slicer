@@ -37,6 +37,7 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
 #import "ZGBreakPointController.h"
+#import "ZGLoggerWindowController.h"
 #import "ZGProcess.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
@@ -45,10 +46,11 @@
 
 @interface ZGAppController ()
 
-@property (readwrite, strong, nonatomic) ZGPreferencesController *preferencesController;
-@property (readwrite, strong, nonatomic) ZGMemoryViewerController *memoryViewer;
-@property (readwrite, strong, nonatomic) ZGDebuggerController *debuggerController;
-@property (readwrite, strong, nonatomic) ZGBreakPointController *breakPointController;
+@property (nonatomic) ZGPreferencesController *preferencesController;
+@property (nonatomic) ZGMemoryViewerController *memoryViewer;
+@property (nonatomic) ZGDebuggerController *debuggerController;
+@property (nonatomic) ZGBreakPointController *breakPointController;
+@property (nonatomic) ZGLoggerWindowController *loggerController;
 
 @end
 
@@ -285,6 +287,21 @@ static BOOL didRegisteredHotKey;
 - (IBAction)openDebugger:(id)sender
 {
 	[self openDebugger:sender showWindow:YES];
+}
+
+- (ZGLoggerWindowController *)loggerController
+{
+	if (!_loggerController)
+	{
+		self.loggerController = [[ZGLoggerWindowController alloc] init];
+	}
+	
+	return _loggerController;
+}
+
+- (IBAction)openLogger:(id)sender
+{
+	[self.loggerController showWindow:self];
 }
 
 #pragma mark Help
