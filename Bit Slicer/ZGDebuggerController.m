@@ -1727,9 +1727,8 @@ END_DEBUGGER_CHANGE:
 				[self nopInstructions:hookedInstructions inProcess:process recordUndo:shouldRecordUndo actionName:nil];
 				
 				ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
-				ZGMemorySize offsetToIsland = allocatedAddress - firstInstruction.variable.address;
 				
-				NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetToIsland] atInstructionPointer:0 usingArchitectureBits:process.pointerSize*8 error:error];
+				NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:process.pointerSize*8 error:error];
 				
 				if (jumpToIslandData.length > 0)
 				{
@@ -1737,9 +1736,7 @@ END_DEBUGGER_CHANGE:
 					
 					[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] inProcess:process recordUndo:shouldRecordUndo actionName:nil];
 					
-					ZGMemorySize offsetFromIsland = (firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH) - (allocatedAddress + newInstructionsData.length);
-					
-					NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", offsetFromIsland] atInstructionPointer:0 usingArchitectureBits:process.pointerSize*8 error:error];
+					NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:process.pointerSize*8 error:error];
 					if (jumpFromIslandData.length > 0)
 					{
 						[newInstructionsData appendData:jumpFromIslandData];
