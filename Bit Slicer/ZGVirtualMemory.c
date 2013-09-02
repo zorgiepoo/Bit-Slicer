@@ -130,21 +130,24 @@ bool ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress add
 	return success;
 }
 
-bool ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection)
+bool ZGRegionInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, vm_region_basic_info_data_64_t *regionInfo)
 {
-	bool success = false;
-	
 	mach_port_t objectName = MACH_PORT_NULL;
-	vm_region_basic_info_data_64_t regionInfo;
 	mach_msg_type_number_t regionInfoSize = VM_REGION_BASIC_INFO_COUNT_64;
 	
-	success = mach_vm_region(processTask, address, size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS;
-	
-	if (success)
+	return mach_vm_region(processTask, address, size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS;
+}
+
+bool ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection)
+{
+	vm_region_basic_info_data_64_t regionInfo;
+	if (ZGRegionInfo(processTask, address, size, &regionInfo))
 	{
 		*memoryProtection = regionInfo.protection;
+		return true;
 	}
-	return success;
+	
+	return false;
 }
 
 bool ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection)

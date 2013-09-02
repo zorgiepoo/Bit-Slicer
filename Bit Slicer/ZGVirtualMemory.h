@@ -36,6 +36,7 @@
 #define _ZG_VIRTUAL_MEMORY_H
 
 #include "ZGMemoryTypes.h"
+#include <mach/vm_region.h>
 #include <stdbool.h>
 
 // Caller for ZGTaskPortForPID is responsible for using ZGDeallocatePort
@@ -55,6 +56,8 @@ void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size);
 
 bool ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
 bool ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
+
+bool ZGRegionInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, vm_region_basic_info_data_64_t *regionInfo);
 
 bool ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection);
 bool ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection);

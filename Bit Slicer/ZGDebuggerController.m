@@ -440,6 +440,10 @@
 	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
 	if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
 	{
+		__block ZGMemoryAddress regionAddress = 0x0;
+		__block ZGMemorySize regionSize = 0x0;
+		__block BOOL foundRegion = NO;
+		
 		__block BOOL needsToUpdateWindow = NO;
 		[[self.instructions subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGInstruction *instruction, NSUInteger index, BOOL *stop)
 		 {
@@ -465,6 +469,11 @@
 					 
 					 if (!foundBreakPoint)
 					 {
+						 // Find the region our instruction is in
+						 vm_region_basic_info_data_64_t unusedInfo;
+						 regionAddress = instruction.variable.address;
+						 regionSize = instruction.variable.size;
+						 foundRegion = ZGRegionInfo(self.currentProcess.processTask, &regionAddress, &regionSize, &unusedInfo);
 						 needsToUpdateWindow = YES;
 						 *stop = YES;
 					 }
@@ -476,6 +485,29 @@
 		
 		if (needsToUpdateWindow)
 		{
+			// Set up a limit on low and high boundaries so that we don't overlap regions
+			// note this is not perfect, in particular, if two regions are visible (say in a branch island after a code injection) this needsToUpdateWindow branch may be called frequently afterwards,
+			// until the user scrolls around a bit, or so. This is better than the disassembler completely messing up on the instructions though
+			BOOL foundRegionLowIndex = NO;
+			NSUInteger regionLowIndex = 0;
+			NSUInteger regionHighIndex = 0;
+			for (NSUInteger instructionIndex = visibleRowsRange.location; instructionIndex < visibleRowsRange.location + visibleRowsRange.length; instructionIndex++)
+			{
+				ZGInstruction *instruction = [self.instructions objectAtIndex:instructionIndex];
+				if (instruction.variable.address >= regionAddress && instruction.variable.address + instruction.variable.size <= regionAddress + regionSize)
+				{
+					if (!foundRegionLowIndex)
+					{
+						foundRegionLowIndex = YES;
+						regionLowIndex = instructionIndex;
+					}
+					
+					regionHighIndex = instructionIndex + 1;
+				}
+				
+				instructionIndex++;
+			}
+			
 			// Find a [start, end) range that we are allowed to remove from the table and insert in again with new instructions
 			// Pick start and end such that they are aligned with the assembly instructions
 			
@@ -496,6 +528,8 @@
 				}
 			}
 			while (YES);
+			
+			startRow = MAX(startRow, regionLowIndex);
 			
 			ZGInstruction *startInstruction = [self.instructions objectAtIndex:startRow];
 			ZGMemoryAddress startAddress = startInstruction.variable.address;
@@ -527,6 +561,8 @@
 				}
 			}
 			while (YES);
+			
+			endRow = MIN(endRow, regionHighIndex);
 			
 			ZGInstruction *endInstruction = [self.instructions objectAtIndex:endRow-1];
 			ZGMemoryAddress endAddress = endInstruction.variable.address + endInstruction.variable.size;
