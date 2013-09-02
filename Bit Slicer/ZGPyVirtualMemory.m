@@ -80,6 +80,9 @@ declarePrototypeMethod(writeString8)
 declarePrototypeMethod(writeString16)
 declarePrototypeMethod(writeBytes)
 
+declarePrototypeMethod(suspend)
+declarePrototypeMethod(resume)
+
 #define declareMethod(name) {#name"", (PyCFunction)VirtualMemory_##name, METH_VARARGS, NULL},
 
 static PyMethodDef VirtualMemory_methods[] =
@@ -111,6 +114,9 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareMethod(writeString8)
 	declareMethod(writeString16)
 	declareMethod(writeBytes)
+	
+	declareMethod(suspend)
+	declareMethod(resume)
 	{NULL, NULL, 0, NULL}
 };
 
@@ -396,5 +402,24 @@ static PyObject *VirtualMemory_writeString16(VirtualMemory *self, PyObject *args
 	int16_t nullByte = 0;
 	return writeString(self, args, &nullByte, sizeof(nullByte));
 }
+
+static PyObject *VirtualMemory_suspend(VirtualMemory *self, PyObject *args)
+{
+	if (!ZGSuspendTask(self->processTask))
+	{
+		return NULL;
+	}
+	return Py_BuildValue("");
+}
+
+static PyObject *VirtualMemory_resume(VirtualMemory *self, PyObject *args)
+{
+	if (!ZGResumeTask(self->processTask))
+	{
+		return NULL;
+	}
+	return Py_BuildValue("");
+}
+
 
 @end
