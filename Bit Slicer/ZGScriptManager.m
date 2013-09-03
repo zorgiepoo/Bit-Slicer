@@ -227,7 +227,17 @@ static dispatch_queue_t gPythonQueue;
 	PyErr_Fetch(&type, &value, &traceback);
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[[[ZGAppController sharedController] loggerController] writeLine:@"An error occured with running a script."];
+		NSString *errorMessage = [NSString stringWithFormat:@"An error occured trying to run the script on %@", self.windowController.currentProcess.name];
+		ZGLoggerWindowController *loggerController = [[ZGAppController sharedController] loggerController];
+		[loggerController writeLine:errorMessage];
+		
+		if (![NSApp isActive] && NSClassFromString(@"NSUserNotification") != nil)
+		{
+			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+			userNotification.title = @"Script Failed";
+			userNotification.informativeText = errorMessage;
+			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+		}
 	});
 	
 	[self logPythonString:type];
