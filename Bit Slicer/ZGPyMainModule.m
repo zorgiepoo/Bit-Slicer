@@ -52,14 +52,21 @@ PyObject *loadMainPythonModule(void)
 
 static PyObject *Main_writeLog(PyObject *self, PyObject *args)
 {
-	char *stringToLog = NULL;
-	if (!PyArg_ParseTuple(args, "s", &stringToLog))
+	PyObject *objectToLog;
+	if (!PyArg_ParseTuple(args, "O", &objectToLog))
 	{
 		return NULL;
 	}
 	
+	PyObject *objectToLogString = PyObject_Str(objectToLog);
+	
+	char *stringToLog = PyString_AsString(objectToLogString);
+	NSString *objcStringToLog = [[NSString alloc] initWithCString:stringToLog encoding:NSUTF8StringEncoding];
+	
+	Py_XDECREF(objectToLogString);
+	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[[[ZGAppController sharedController] loggerController] writeLine:@(stringToLog)];
+		[[[ZGAppController sharedController] loggerController] writeLine:objcStringToLog];
 	});
 	
 	return Py_BuildValue("");
