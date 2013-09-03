@@ -42,6 +42,7 @@
 #import "ZGPyVirtualMemory.h"
 #import "ZGProcess.h"
 #import "ZGPyMainModule.h"
+#import "ZGSearchProgress.h"
 
 #define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
 
@@ -58,6 +59,7 @@
 @implementation ZGScriptManager
 
 static dispatch_queue_t gPythonQueue;
+NSMutableArray *gScriptObjectsPool;
 
 + (void)initializePythonInterpreter
 {	
@@ -72,6 +74,11 @@ static dispatch_queue_t gPythonQueue;
 		
 		PyObject *mainModule = loadMainPythonModule();
 		[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
+		
+		@synchronized(gScriptObjectsPool)
+		{
+			gScriptObjectsPool = [[NSMutableArray alloc] init];
+		}
 	});
 }
 
@@ -459,12 +466,27 @@ static dispatch_queue_t gPythonQueue;
 		}
 	});
 	
+	@synchronized(gScriptObjectsPool)
+	{
+		for (id object in gScriptObjectsPool)
+		{
+			if ([object isKindOfClass:[ZGSearchProgress class]])
+			{
+				[object setShouldCancelSearch:YES];
+			}
+		}
+	}
+	
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
 		if (scriptFinishedCount == script.finishedCount)
 		{
 			// Give up
 			Py_Finalize();
 			dispatch_async(gPythonQueue, ^{
+				@synchronized(gScriptObjectsPool)
+				{
+					[gScriptObjectsPool removeAllObjects];
+				}
 				[[self class] initializePythonInterpreter];
 			});
 		}

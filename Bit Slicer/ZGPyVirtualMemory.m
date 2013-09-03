@@ -40,6 +40,7 @@
 #import "ZGSearchFunctions.h"
 #import "ZGComparisonFunctions.h"
 #import "ZGSearchResults.h"
+#import "ZGSearchProgress.h"
 #import <Python/structmember.h>
 
 typedef struct
@@ -448,7 +449,20 @@ static PyObject *VirtualMemory_scanByteArray(VirtualMemory *self, PyObject *args
 		if (searchData.dataSize > 0)
 		{
 			comparison_function_t comparisonFunction = getComparisonFunction(ZGEquals, ZGByteArray, self->is64Bit, 0);
-			ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, nil, comparisonFunction);
+			ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] init];
+			extern NSMutableArray *gScriptObjectsPool;
+			
+			@synchronized(gScriptObjectsPool)
+			{
+				[gScriptObjectsPool addObject:searchProgress];
+			}
+			
+			ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, searchProgress, comparisonFunction);
+			
+			@synchronized(gScriptObjectsPool)
+			{
+				[gScriptObjectsPool removeObject:searchProgress];
+			}
 			
 			Py_ssize_t numberOfEntries = MIN(MAX_VALUES_SCANNED, (Py_ssize_t)results.addressCount);
 			PyObject *pythonResults = PyList_New(numberOfEntries);
