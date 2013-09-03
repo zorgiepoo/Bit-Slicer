@@ -74,11 +74,6 @@ NSMutableArray *gScriptObjectsPool;
 		
 		PyObject *mainModule = loadMainPythonModule();
 		[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
-		
-		@synchronized(gScriptObjectsPool)
-		{
-			gScriptObjectsPool = [[NSMutableArray alloc] init];
-		}
 	});
 }
 
@@ -99,6 +94,7 @@ NSMutableArray *gScriptObjectsPool;
 		
 		setenv("PYTHONDONTWRITEBYTECODE", "1", 1);
 		
+		gScriptObjectsPool = [[NSMutableArray alloc] init];
 		[self initializePythonInterpreter];
 	});
 }
