@@ -40,7 +40,7 @@
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask;
+- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit;
 
 @property (nonatomic, assign) PyObject *vmObject;
 

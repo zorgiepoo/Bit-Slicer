@@ -326,7 +326,7 @@ static dispatch_queue_t gPythonQueue;
 				script.executeFunction = PyObject_GetAttrString(script.module, "execute");
 				if (script.executeFunction != NULL && PyCallable_Check(script.executeFunction))
 				{
-					script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask];
+					script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit];
 					if (script.virtualMemoryInstance != nil)
 					{
 						PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);

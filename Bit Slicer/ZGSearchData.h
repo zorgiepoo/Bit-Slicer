@@ -67,4 +67,6 @@
 @property (nonatomic) void *compareOffset;
 @property (nonatomic) unsigned char *byteArrayFlags;
 
+- (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
+
 @end

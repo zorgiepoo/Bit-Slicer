@@ -35,6 +35,11 @@
 #import "ZGPyVirtualMemory.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGUtilities.h"
+#import "ZGSearchData.h"
+#import "ZGSearchFunctions.h"
+#import "ZGComparisonFunctions.h"
+#import "ZGSearchResults.h"
 #import <Python/structmember.h>
 
 typedef struct
@@ -42,11 +47,13 @@ typedef struct
 	PyObject_HEAD
 	uint32_t processTask;
 	int32_t processIdentifier;
+	char is64Bit;
 } VirtualMemory;
 
 static PyMemberDef VirtualMemory_members[] =
 {
 	{"pid", T_INT, offsetof(VirtualMemory, processIdentifier), 0, "process identifier"},
+	{"is64Bit", T_BOOL, offsetof(VirtualMemory, is64Bit), 0, "is process 64-bit"},
 	{NULL, 0, 0, 0, NULL}
 };
 
@@ -83,6 +90,8 @@ declarePrototypeMethod(writeBytes)
 declarePrototypeMethod(suspend)
 declarePrototypeMethod(resume)
 
+declarePrototypeMethod(scanByteArray)
+
 #define declareMethod(name) {#name"", (PyCFunction)VirtualMemory_##name, METH_VARARGS, NULL},
 
 static PyMethodDef VirtualMemory_methods[] =
@@ -117,6 +126,8 @@ static PyMethodDef VirtualMemory_methods[] =
 	
 	declareMethod(suspend)
 	declareMethod(resume)
+	
+	declareMethod(scanByteArray)
 	{NULL, NULL, 0, NULL}
 };
 
@@ -181,7 +192,7 @@ static PyTypeObject VirtualMemoryType =
 	}
 }
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask
+- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit
 {
 	self = [super init];
 	if (self != nil)
@@ -199,6 +210,7 @@ static PyTypeObject VirtualMemoryType =
 			NSLog(@"Script Error: Failed to access PID for process task");
 			return nil;
 		}
+		((VirtualMemory *)self.vmObject)->is64Bit = is64Bit;
 	}
 	return self;
 }
@@ -414,5 +426,42 @@ static PyObject *VirtualMemory_resume(VirtualMemory *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
+#define MAX_VALUES_SCANNED 1000
+static PyObject *VirtualMemory_scanByteArray(VirtualMemory *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	char *byteArrayString = NULL;
+	if (PyArg_ParseTuple(args, "s", &byteArrayString))
+	{
+		ZGMemorySize dataSize = 0;
+		void *searchValue = valueFromString(self->is64Bit, @(byteArrayString), ZGByteArray, &dataSize);
+		
+		ZGSearchData *searchData =
+		[[ZGSearchData alloc]
+		 initWithSearchValue:searchValue
+		 dataSize:dataSize
+		 dataAlignment:dataAlignment(self->is64Bit, ZGByteArray, dataSize)
+		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		
+		searchData.byteArrayFlags = allocateFlagsForByteArrayWildcards(@(byteArrayString));
+		
+		if (searchData.dataSize > 0)
+		{
+			comparison_function_t comparisonFunction = getComparisonFunction(ZGEquals, ZGByteArray, self->is64Bit, 0);
+			ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, nil, comparisonFunction);
+			
+			Py_ssize_t numberOfEntries = MIN(MAX_VALUES_SCANNED, (Py_ssize_t)results.addressCount);
+			PyObject *pythonResults = PyList_New(numberOfEntries);
+			__block Py_ssize_t addressIndex = 0;
+			[results enumerateWithCount:numberOfEntries usingBlock:^(ZGMemoryAddress address, BOOL *stop) {
+				PyList_SET_ITEM(pythonResults, addressIndex, Py_BuildValue("K", address));
+				addressIndex++;
+			}];
+			retValue = pythonResults;
+		}
+	}
+	
+	return retValue;
+}
 
 @end

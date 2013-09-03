@@ -39,13 +39,23 @@
 
 - (id)init
 {
+	return [self initWithSearchValue:NULL dataSize:0 dataAlignment:1 pointerSize:0];
+}
+
+- (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize
+{
 	self = [super init];
-	if (self)
+	if (self != nil)
 	{
 		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &_collator);
 		self.endAddress = MAX_MEMORY_ADDRESS;
 		self.shouldScanUnwritableValues = YES;
 		self.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
+		
+		self.searchValue = searchValue;
+		self.dataSize = dataSize;
+		self.dataAlignment = dataAlignment;
+		self.pointerSize = pointerSize;
 	}
 	return self;
 }
