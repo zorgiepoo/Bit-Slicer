@@ -511,7 +511,8 @@
 								<object class="NSMenuItem" id="659173887">
 									<reference key="NSMenu" ref="539237191"/>
 									<string key="NSTitle">Show Logs</string>
-									<string key="NSKeyEquiv"/>
+									<string key="NSKeyEquiv">'</string>
+									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="518338580"/>
 									<reference key="NSMixedImage" ref="627749667"/>
