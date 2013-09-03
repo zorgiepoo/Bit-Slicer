@@ -76,10 +76,9 @@
 	return (majorVersion == 10 && minorVersion >= 7) || majorVersion > 10;
 }
 
-static id sharedInstance;
 + (id)sharedController
 {
-	return sharedInstance;
+	return [NSApp delegate];
 }
 
 - (ZGBreakPointController *)breakPointController
@@ -104,7 +103,6 @@ static id sharedInstance;
 	
 	if (self)
 	{
-		sharedInstance = self;
 		[[ZGProcessList sharedProcessList]
 		 addObserver:self
 		 forKeyPath:@"runningProcesses"
