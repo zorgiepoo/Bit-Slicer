@@ -1825,8 +1825,7 @@ END_DEBUGGER_CHANGE:
 		
 		if (ZGAllocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
 		{
-			NSString *allocationComment = [NSString stringWithFormat:@"; New memory will be allocated at 0x%llX", allocatedAddress];
-			NSString *suggestedCode = [[[@[allocationComment] arrayByAddingObjectsFromArray:[instructions valueForKey:@"text"]] componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"];
+			NSString *suggestedCode = [[[instructions valueForKey:@"text"] componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"];
 			
 			if (self.codeInjectionController == nil)
 			{
