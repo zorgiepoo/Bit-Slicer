@@ -45,6 +45,7 @@
 		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &_collator);
 		self.endAddress = MAX_MEMORY_ADDRESS;
 		self.shouldScanUnwritableValues = YES;
+		self.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
 	}
 	return self;
 }
