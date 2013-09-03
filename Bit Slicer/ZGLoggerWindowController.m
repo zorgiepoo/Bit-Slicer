@@ -103,7 +103,9 @@
 	}
 	
 	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
-	[dateFormatter setDateFormat:@"HH:MM:SS"];
+	[dateFormatter setDateStyle:NSDateFormatterNoStyle];
+	[dateFormatter setTimeStyle:kCFDateFormatterMediumStyle];
+	
 	NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
 	
 	NSMutableString *newText = [[NSMutableString alloc] init];
