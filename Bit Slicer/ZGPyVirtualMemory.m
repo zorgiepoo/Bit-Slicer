@@ -124,7 +124,7 @@ static PyTypeObject VirtualMemoryType =
 {
 	PyObject_HEAD_INIT(NULL)
 	0, // ob_size
-	"virtualmemory.VirtualMemory", // tp_name
+	"bitslicer.VirtualMemory", // tp_name
 	sizeof(VirtualMemory), // tp_basicsize
 	0, // tp_itemsize
 	0, // tp_dealloc
@@ -166,21 +166,14 @@ static PyTypeObject VirtualMemoryType =
 
 @implementation ZGPyVirtualMemory
 
-static PyObject *virtualMemoryModule;
-+ (void)loadModule
-{
-	static PyMethodDef moduleMethods[] =
-	{
-		{NULL, NULL, 0, NULL}
-	};
-	
++ (void)loadPythonClassInMainModule:(PyObject *)module
+{	
 	VirtualMemoryType.tp_new = PyType_GenericNew;
 	if (PyType_Ready(&VirtualMemoryType) >= 0)
 	{
 		Py_INCREF(&VirtualMemoryType);
 		
-		virtualMemoryModule = Py_InitModule("virtualmemory", moduleMethods);
-		PyModule_AddObject(virtualMemoryModule, "VirtualMemory", (PyObject *)&VirtualMemoryType);
+		PyModule_AddObject(module, "VirtualMemory", (PyObject *)&VirtualMemoryType);
 	}
 	else
 	{

@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 8/26/13.
+ * Created by Mayur Pawashe on 9/2/13.
  *
  * Copyright (c) 2013 zgcoder
  * All rights reserved.
@@ -32,16 +32,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
 #import <Python/Python.h>
-#import "ZGMemoryTypes.h"
 
-@interface ZGPyVirtualMemory : NSObject
-
-+ (void)loadPythonClassInMainModule:(PyObject *)module;
-
-- (id)initWithProcessTask:(ZGMemoryMap)processTask;
-
-@property (nonatomic, assign) PyObject *vmObject;
-
-@end
+PyObject *loadMainPythonModule(void);

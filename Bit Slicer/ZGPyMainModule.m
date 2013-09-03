@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 8/26/13.
+ * Created by Mayur Pawashe on 9/2/13.
  *
  * Copyright (c) 2013 zgcoder
  * All rights reserved.
@@ -32,16 +32,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "ZGPyMainModule.h"
 #import <Foundation/Foundation.h>
-#import <Python/Python.h>
-#import "ZGMemoryTypes.h"
+#import "ZGAppController.h"
+#import "ZGLoggerWindowController.h"
 
-@interface ZGPyVirtualMemory : NSObject
+static PyObject *Main_writeLog(PyObject *self, PyObject *args);
 
-+ (void)loadPythonClassInMainModule:(PyObject *)module;
+static PyMethodDef moduleMethods[] =
+{
+	{"writeLog", (PyCFunction)Main_writeLog, METH_VARARGS, NULL},
+	{NULL, NULL, NULL, NULL}
+};
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask;
+PyObject *loadMainPythonModule(void)
+{
+	return Py_InitModule("bitslicer", moduleMethods);
+}
 
-@property (nonatomic, assign) PyObject *vmObject;
-
-@end
+static PyObject *Main_writeLog(PyObject *self, PyObject *args)
+{
+	char *stringToLog = NULL;
+	if (!PyArg_ParseTuple(args, "s", &stringToLog))
+	{
+		return NULL;
+	}
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[[[ZGAppController sharedController] loggerController] writeLine:@(stringToLog)];
+	});
+	
+	return Py_BuildValue("");
+}

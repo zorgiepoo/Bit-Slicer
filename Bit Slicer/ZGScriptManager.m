@@ -41,6 +41,7 @@
 #import <Python/Python.h>
 #import "ZGPyVirtualMemory.h"
 #import "ZGProcess.h"
+#import "ZGPyMainModule.h"
 
 #define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
 
@@ -69,7 +70,8 @@ static dispatch_queue_t gPythonQueue;
 		Py_XDECREF(sys);
 		Py_XDECREF(path);
 		
-		[ZGPyVirtualMemory loadModule];
+		PyObject *mainModule = loadMainPythonModule();
+		[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
 	});
 }
 
@@ -173,7 +175,8 @@ static dispatch_queue_t gPythonQueue;
 		else
 		{
 			NSString *scriptTemplateLines =
-				@"#Written by <author>\n\n"
+				@"#Written by <author>\n"
+				@"from bitslicer import *\n\n"
 				@"def execute(timeElapsed): pass\n\n"
 				@"def finish(): pass\n";
 			[scriptData appendData:[scriptTemplateLines dataUsingEncoding:NSUTF8StringEncoding]];
