@@ -49,6 +49,7 @@ typedef struct
 	uint32_t processTask;
 	int32_t processIdentifier;
 	char is64Bit;
+	__unsafe_unretained NSMutableArray *objectsPool;
 } VirtualMemory;
 
 static PyMemberDef VirtualMemory_members[] =
@@ -193,7 +194,7 @@ static PyTypeObject VirtualMemoryType =
 	}
 }
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit
+- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit objectsPool:(NSMutableArray *)objectsPool
 {
 	self = [super init];
 	if (self != nil)
@@ -204,14 +205,16 @@ static PyTypeObject VirtualMemoryType =
 		{
 			return nil;
 		}
-		((VirtualMemory *)self.vmObject)->processTask = processTask;
-		((VirtualMemory *)self.vmObject)->processIdentifier = 0;
-		if (!ZGPIDForTaskPort(processTask, &(((VirtualMemory *)self.vmObject)->processIdentifier)))
+		VirtualMemory *vmObject = (VirtualMemory *)self.vmObject;
+		vmObject->processTask = processTask;
+		vmObject->processIdentifier = 0;
+		if (!ZGPIDForTaskPort(processTask, &(vmObject->processIdentifier)))
 		{
 			NSLog(@"Script Error: Failed to access PID for process task");
 			return nil;
 		}
-		((VirtualMemory *)self.vmObject)->is64Bit = is64Bit;
+		vmObject->is64Bit = is64Bit;
+		vmObject->objectsPool = objectsPool;
 	}
 	return self;
 }
@@ -450,18 +453,17 @@ static PyObject *VirtualMemory_scanByteArray(VirtualMemory *self, PyObject *args
 		{
 			comparison_function_t comparisonFunction = getComparisonFunction(ZGEquals, ZGByteArray, self->is64Bit, 0);
 			ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] init];
-			extern NSMutableArray *gScriptObjectsPool;
 			
-			@synchronized(gScriptObjectsPool)
+			@synchronized(self->objectsPool)
 			{
-				[gScriptObjectsPool addObject:searchProgress];
+				[self->objectsPool addObject:searchProgress];
 			}
 			
 			ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, searchProgress, comparisonFunction);
 			
-			@synchronized(gScriptObjectsPool)
+			@synchronized(self->objectsPool)
 			{
-				[gScriptObjectsPool removeObject:searchProgress];
+				[self->objectsPool removeObject:searchProgress];
 			}
 			
 			Py_ssize_t numberOfEntries = MIN(MAX_VALUES_SCANNED, (Py_ssize_t)results.addressCount);

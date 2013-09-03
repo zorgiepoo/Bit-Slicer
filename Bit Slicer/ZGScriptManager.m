@@ -53,13 +53,13 @@
 @property (nonatomic, assign) ZGDocumentWindowController *windowController;
 @property dispatch_source_t scriptTimer;
 @property NSMutableArray *runningScripts;
+@property (nonatomic) NSMutableArray *objectsPool;
 
 @end
 
 @implementation ZGScriptManager
 
 static dispatch_queue_t gPythonQueue;
-NSMutableArray *gScriptObjectsPool;
 
 + (void)initializePythonInterpreter
 {	
@@ -94,7 +94,6 @@ NSMutableArray *gScriptObjectsPool;
 		
 		setenv("PYTHONDONTWRITEBYTECODE", "1", 1);
 		
-		gScriptObjectsPool = [[NSMutableArray alloc] init];
 		[self initializePythonInterpreter];
 	});
 }
@@ -108,6 +107,7 @@ NSMutableArray *gScriptObjectsPool;
 		self.fileWatchingQueue = [[VDKQueue alloc] init];
 		self.fileWatchingQueue.delegate = self;
 		self.windowController = windowController;
+		self.objectsPool = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -329,7 +329,7 @@ NSMutableArray *gScriptObjectsPool;
 				script.executeFunction = PyObject_GetAttrString(script.module, "execute");
 				if (script.executeFunction != NULL && PyCallable_Check(script.executeFunction))
 				{
-					script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit];
+					script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit objectsPool:self.objectsPool];
 					if (script.virtualMemoryInstance != nil)
 					{
 						PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);
@@ -462,9 +462,9 @@ NSMutableArray *gScriptObjectsPool;
 		}
 	});
 	
-	@synchronized(gScriptObjectsPool)
+	@synchronized(self.objectsPool)
 	{
-		for (id object in gScriptObjectsPool)
+		for (id object in self.objectsPool)
 		{
 			if ([object isKindOfClass:[ZGSearchProgress class]])
 			{
@@ -479,9 +479,9 @@ NSMutableArray *gScriptObjectsPool;
 			// Give up
 			Py_Finalize();
 			dispatch_async(gPythonQueue, ^{
-				@synchronized(gScriptObjectsPool)
+				@synchronized(self.objectsPool)
 				{
-					[gScriptObjectsPool removeAllObjects];
+					[self.objectsPool removeAllObjects];
 				}
 				[[self class] initializePythonInterpreter];
 			});
