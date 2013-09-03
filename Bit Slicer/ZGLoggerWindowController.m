@@ -97,6 +97,11 @@
 
 - (void)writeLine:(NSString *)text
 {
+	if (text == nil)
+	{
+		text = @"(null)";
+	}
+	
 	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
 	[dateFormatter setDateFormat:@"HH:MM:SS"];
 	NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
