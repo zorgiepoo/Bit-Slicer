@@ -41,7 +41,7 @@
 
 @property (nonatomic, copy) NSString *path;
 @property (nonatomic) PyObject *module;
-@property (nonatomic) PyObject *executeFunction;
+@property (nonatomic) PyObject *scriptObject;
 @property (nonatomic) NSTimeInterval lastTime;
 @property (nonatomic) NSTimeInterval timeElapsed;
 @property (nonatomic) ZGPyVirtualMemory *virtualMemoryInstance;

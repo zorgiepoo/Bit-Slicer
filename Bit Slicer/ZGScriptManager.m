@@ -44,6 +44,8 @@
 #import "ZGPyMainModule.h"
 #import "ZGSearchProgress.h"
 
+#import <Python/structmember.h>
+
 #define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
 
 @interface ZGScriptManager ()
@@ -178,10 +180,15 @@ static dispatch_queue_t gPythonQueue;
 		else
 		{
 			NSString *scriptTemplateLines =
-				@"#Written by <author>\n"
+				@"#Script Template\n"
 				@"from bitslicer import *\n\n"
-				@"def execute(timeElapsed): pass\n\n"
-				@"def finish(): pass\n";
+				@"class Script(object):\n"
+				@"    def __init__(self):\n"
+				@"        writeLog('Initialization goes here')\n"
+				@"    def execute(self, timeElapsed):\n"
+				@"        writeLog('Execution goes here')\n"
+				@"    def finish(self):\n"
+				@"        writeLog('Cleaning up goes here')\n";
 			[scriptData appendData:[scriptTemplateLines dataUsingEncoding:NSUTF8StringEncoding]];
 		}
 		
@@ -257,7 +264,7 @@ static dispatch_queue_t gPythonQueue;
 	
 	if (Py_IsInitialized())
 	{
-		retValue = PyObject_CallFunction(script.executeFunction, "d", script.timeElapsed);
+		retValue = PyObject_CallMethod(script.scriptObject, "execute", "d", script.timeElapsed);
 	}
 	
 	if (retValue == NULL)
@@ -266,6 +273,8 @@ static dispatch_queue_t gPythonQueue;
 		{
 			[self logPythonError];
 		}
+		
+		script.scriptObject = NULL;
 		
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
 			if (pyScript == script)
@@ -326,79 +335,85 @@ static dispatch_queue_t gPythonQueue;
 			}
 			else
 			{
-				script.executeFunction = PyObject_GetAttrString(script.module, "execute");
-				if (script.executeFunction != NULL && PyCallable_Check(script.executeFunction))
-				{
-					script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit objectsPool:self.objectsPool];
-					if (script.virtualMemoryInstance != nil)
-					{
-						PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);
-						
-						script.timeElapsed = 0;
-						script.lastTime = 0;
-						
-						if (self.scriptTimer == NULL)
-						{
-							self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue);
-							if (self.scriptTimer == NULL)
-							{
-								dispatch_async(dispatch_get_main_queue(), ^{
-									[self disableVariable:variable];
-								});
-							}
-							else
-							{
-								if (self.runningScripts == nil)
-								{
-									self.runningScripts = [[NSMutableArray alloc] init];
-								}
-								
-								[self.runningScripts addObject:script];
-								
-								dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
-								dispatch_source_set_event_handler(self.scriptTimer, ^{
-									for (ZGPyScript *script in self.runningScripts)
-									{
-										if (script.lastTime == 0 && script.timeElapsed == 0)
-										{
-											[self executeScript:script];
-											script.lastTime = [NSDate timeIntervalSinceReferenceDate];
-										}
-										else
-										{
-											NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
-											script.timeElapsed += currentTime - script.lastTime;
-											script.lastTime = currentTime;
-											[self executeScript:script];
-										}
-									}
-								});
-								dispatch_resume(self.scriptTimer);
-								
-								dispatch_async(dispatch_get_main_queue(), ^{
-									[[NSNotificationCenter defaultCenter]
-									 addObserver:self
-									 selector:@selector(watchProcessDied:)
-									 name:ZGTargetProcessDiedNotification
-									 object:self.windowController.currentProcess];
-								});
-							}
-						}
-					}
-					else
-					{
-						dispatch_async(dispatch_get_main_queue(), ^{
-							[self disableVariable:variable];
-							NSLog(@"Error: Couldn't create ZGPyVirtualMemory instance");
-						});
-					}
-				}
-				else
+				
+				PyTypeObject *scriptClassType = (PyTypeObject *)PyObject_GetAttrString(script.module, "Script");
+				script.scriptObject = scriptClassType->tp_alloc(scriptClassType, 0);
+				
+				Py_XDECREF(scriptClassType);
+				
+				script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit objectsPool:self.objectsPool];
+				
+				if (script.virtualMemoryInstance == nil)
 				{
 					dispatch_async(dispatch_get_main_queue(), ^{
 						[self disableVariable:variable];
-						NSLog(@"Error: Couldn't pick up execute() function");
+						NSLog(@"Error: Couldn't create VM instance");
 					});
+				}
+				else
+				{
+					PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);
+					
+					PyObject *initMethodResult = PyObject_CallMethod(script.scriptObject, "__init__", NULL);
+					BOOL stillInitialized = Py_IsInitialized();
+					if (initMethodResult == NULL || !stillInitialized)
+					{
+						if (stillInitialized)
+						{
+							[self logPythonError];
+						}
+						
+						script.scriptObject = NULL;
+						
+						dispatch_async(dispatch_get_main_queue(), ^{
+							[self disableVariable:variable];
+						});
+					}
+					else
+					{
+						script.lastTime = [NSDate timeIntervalSinceReferenceDate];
+						script.timeElapsed = 0;
+						
+						self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue);
+						
+						if (self.scriptTimer == NULL)
+						{
+							dispatch_async(dispatch_get_main_queue(), ^{
+								[self disableVariable:variable];
+							});
+						}
+						else
+						{
+							if (self.runningScripts == nil)
+							{
+								self.runningScripts = [[NSMutableArray alloc] init];
+							}
+							
+							[self.runningScripts addObject:script];
+							
+							dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
+							dispatch_source_set_event_handler(self.scriptTimer, ^{
+								for (ZGPyScript *script in self.runningScripts)
+								{
+									NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
+									script.timeElapsed += currentTime - script.lastTime;
+									script.lastTime = currentTime;
+									[self executeScript:script];
+								}
+							});
+							dispatch_resume(self.scriptTimer);
+							
+							dispatch_async(dispatch_get_main_queue(), ^{
+								[[NSNotificationCenter defaultCenter]
+								 addObserver:self
+								 selector:@selector(watchProcessDied:)
+								 name:ZGTargetProcessDiedNotification
+								 object:self.windowController.currentProcess];
+							});
+						}
+					}
+					
+					Py_XDECREF(initMethodResult);
 				}
 			}
 		});
@@ -439,25 +454,22 @@ static dispatch_queue_t gPythonQueue;
 	dispatch_async(gPythonQueue, ^{
 		if (script.finishedCount == scriptFinishedCount)
 		{
-			script.executeFunction = NULL;
-			
-			if (Py_IsInitialized() && script.timeElapsed > 0 && self.windowController.currentProcess.valid)
+			if (Py_IsInitialized() && script.timeElapsed > 0 && self.windowController.currentProcess.valid && script.scriptObject != NULL)
 			{
-				PyObject *finishFunction = PyObject_GetAttrString(script.module, "finish");
-				if (finishFunction != NULL && PyCallable_Check(finishFunction))
+				PyObject *retValue = PyObject_CallMethod(script.scriptObject, "finish", NULL);
+				if (Py_IsInitialized())
 				{
-					PyObject *retValue = PyObject_CallFunction(finishFunction, NULL);
 					if (retValue == NULL)
 					{
 						[self logPythonError];
 					}
 					Py_XDECREF(retValue);
 				}
-				Py_XDECREF(finishFunction);
 			}
 			
 			script.timeElapsed = 0;
 			script.virtualMemoryInstance = nil;
+			script.scriptObject = NULL;
 			script.finishedCount++;
 		}
 	});

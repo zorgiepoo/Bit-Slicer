@@ -60,13 +60,13 @@
 	_module = module;
 }
 
-- (void)setExecuteFunction:(PyObject *)executeFunction
+- (void)setScriptObject:(PyObject *)scriptObject
 {
 	if (Py_IsInitialized())
 	{
-		Py_XDECREF(_executeFunction);
+		Py_XDECREF(_scriptObject);
 	}
-	_executeFunction = executeFunction;
+	_scriptObject = scriptObject;
 }
 
 @end
