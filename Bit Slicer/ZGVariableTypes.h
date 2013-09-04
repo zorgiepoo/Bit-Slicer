@@ -43,8 +43,8 @@ typedef enum
 	ZGInt64,
 	ZGFloat,
 	ZGDouble,
-	ZGUTF8String,
-	ZGUTF16String,
+	ZGString8,
+	ZGString16,
 	ZGPointer,
     ZGByteArray,
 	ZGScript

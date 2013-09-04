@@ -460,7 +460,7 @@
 	void *utf16Value = NULL;
 	void *byteArrayValue = NULL;
 	
-	if (variable.type != ZGUTF8String && variable.type != ZGUTF16String && variable.type != ZGByteArray)
+	if (variable.type != ZGString8 && variable.type != ZGString16 && variable.type != ZGByteArray)
 	{
 		stringObject = [ZGCalculator evaluateExpression:stringObject];
 	}
@@ -556,12 +556,12 @@
 			
 			newValue = doubleValue;
 			break;
-		case ZGUTF8String:
+		case ZGString8:
 			newValue = (void *)[stringObject cStringUsingEncoding:NSUTF8StringEncoding];
 			variable.size = strlen(newValue) + 1;
 			writeSize = variable.size;
 			break;
-		case ZGUTF16String:
+		case ZGString16:
 			variable.size = [stringObject length] * sizeof(unichar);
 			writeSize = variable.size;
 			
@@ -682,7 +682,7 @@
 				successfulWrite = NO;
 			}
 			
-			if (successfulWrite && variable.type == ZGUTF16String)
+			if (successfulWrite && variable.type == ZGString16)
 			{
 				// Don't forget to write the null terminator
 				unichar nullTerminator = 0;

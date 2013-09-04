@@ -327,10 +327,10 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 {
 	ZGMemorySize totalSize = 0;
 	
-	ZGMemorySize characterSize = (dataType == ZGUTF8String) ? sizeof(char) : sizeof(unichar);
+	ZGMemorySize characterSize = (dataType == ZGString8) ? sizeof(char) : sizeof(unichar);
 	void *buffer = NULL;
 	
-	if (dataType == ZGUTF16String && oldSize % 2 != 0)
+	if (dataType == ZGString16 && oldSize % 2 != 0)
 	{
 		oldSize--;
 	}
@@ -352,7 +352,7 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 		if (couldReadBytes)
 		{
 			ZGMemorySize numberOfCharacters = outputtedSize / characterSize;
-			if (dataType == ZGUTF16String && outputtedSize % 2 != 0 && numberOfCharacters > 0)
+			if (dataType == ZGString16 && outputtedSize % 2 != 0 && numberOfCharacters > 0)
 			{
 				numberOfCharacters--;
 				shouldBreak = YES;
@@ -360,7 +360,7 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 			
 			for (ZGMemorySize characterCounter = 0; characterCounter < numberOfCharacters; characterCounter++)
 			{
-				if ((dataType == ZGUTF8String && ((char *)buffer)[characterCounter] == 0) || (dataType == ZGUTF16String && ((unichar *)buffer)[characterCounter] == 0))
+				if ((dataType == ZGString8 && ((char *)buffer)[characterCounter] == 0) || (dataType == ZGString16 && ((unichar *)buffer)[characterCounter] == 0))
 				{
 					shouldBreak = YES;
 					break;
@@ -371,7 +371,7 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 			
 			ZGFreeBytes(processTask, buffer, outputtedSize);
 			
-			if (dataType == ZGUTF16String)
+			if (dataType == ZGString16)
 			{
 				outputtedSize = numberOfCharacters * characterSize;
 			}

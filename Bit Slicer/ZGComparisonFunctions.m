@@ -73,12 +73,12 @@ BOOL ZGDoubleEquals(COMPARISON_PARAMETERS)
 	return ABS(*((double *)variableValue) - *((double *)compareValue)) <= searchData->_epsilon;
 }
 
-BOOL ZGUTF8StringEquals(COMPARISON_PARAMETERS)
+BOOL ZGString8Equals(COMPARISON_PARAMETERS)
 {
 	return (searchData->_shouldIgnoreStringCase) ? (strncasecmp(variableValue, compareValue, (size_t)size) == 0) : (memcmp(variableValue, compareValue, (size_t)size) == 0);
 }
 
-BOOL ZGUTF16StringEquals(COMPARISON_PARAMETERS)
+BOOL ZGString16Equals(COMPARISON_PARAMETERS)
 {
 	BOOL isEqual = NO;
 	
@@ -375,14 +375,14 @@ BOOL ZGDoubleNotEquals(COMPARISON_PARAMETERS)
 	return !ZGDoubleEquals(NOT_EQUALS_CALLER_ARGUMENTS);
 }
 
-BOOL ZGUTF8StringNotEquals(COMPARISON_PARAMETERS)
+BOOL ZGString8NotEquals(COMPARISON_PARAMETERS)
 {
-	return !ZGUTF8StringEquals(NOT_EQUALS_CALLER_ARGUMENTS);
+	return !ZGString8Equals(NOT_EQUALS_CALLER_ARGUMENTS);
 }
 
-BOOL ZGUTF16StringNotEquals(COMPARISON_PARAMETERS)
+BOOL ZGString16NotEquals(COMPARISON_PARAMETERS)
 {
-	return !ZGUTF16StringEquals(NOT_EQUALS_CALLER_ARGUMENTS);
+	return !ZGString16Equals(NOT_EQUALS_CALLER_ARGUMENTS);
 }
 
 BOOL ZGByteArrayNotEquals(COMPARISON_PARAMETERS)
@@ -486,11 +486,11 @@ comparison_function_t getEqualsComparisonFunction(ZGVariableType dataType, BOOL 
 		case ZGDouble:
 			comparisonFunction = ZGDoubleEquals;
 			break;
-		case ZGUTF8String:
-			comparisonFunction = ZGUTF8StringEquals;
+		case ZGString8:
+			comparisonFunction = ZGString8Equals;
 			break;
-		case ZGUTF16String:
-			comparisonFunction = ZGUTF16StringEquals;
+		case ZGString16:
+			comparisonFunction = ZGString16Equals;
 			break;
 		case ZGByteArray:
 			comparisonFunction = ZGByteArrayEquals;
@@ -529,11 +529,11 @@ comparison_function_t getNotEqualsComparisonFunction(ZGVariableType dataType, BO
 		case ZGDouble:
 			comparisonFunction = ZGDoubleNotEquals;
 			break;
-		case ZGUTF8String:
-			comparisonFunction = ZGUTF8StringNotEquals;
+		case ZGString8:
+			comparisonFunction = ZGString8NotEquals;
 			break;
-		case ZGUTF16String:
-			comparisonFunction = ZGUTF16StringNotEquals;
+		case ZGString16:
+			comparisonFunction = ZGString16NotEquals;
 			break;
 		case ZGByteArray:
 			comparisonFunction = ZGByteArrayNotEquals;
@@ -600,9 +600,9 @@ comparison_function_t getLessThanComparisonFunction(ZGVariableType dataType, BOO
 		case ZGDouble:
 			comparisonFunction = ZGDoubleLessThan;
 			break;
-		case ZGUTF8String:
+		case ZGString8:
 			break;
-		case ZGUTF16String:
+		case ZGString16:
 			break;
 		case ZGPointer:
 			comparisonFunction = is64Bit ? ZGUInt64LessThan : ZGUInt32LessThan;
@@ -668,9 +668,9 @@ comparison_function_t getGreaterThanComparisonFunction(ZGVariableType dataType, 
 		case ZGDouble:
 			comparisonFunction = ZGDoubleGreaterThan;
 			break;
-		case ZGUTF8String:
+		case ZGString8:
 			break;
-		case ZGUTF16String:
+		case ZGString16:
 			break;
 		case ZGPointer:
 			comparisonFunction = is64Bit ? ZGUInt64GreaterThan : ZGUInt32GreaterThan;
@@ -708,9 +708,9 @@ comparison_function_t getEqualsStoredPlusComparisonFunction(ZGVariableType dataT
 		case ZGDouble:
 			comparisonFunction = ZGDoubleEqualsPlus;
 			break;
-		case ZGUTF8String:
+		case ZGString8:
 			break;
-		case ZGUTF16String:
+		case ZGString16:
 			break;
 		case ZGByteArray:
 			break;
@@ -748,9 +748,9 @@ comparison_function_t getNotEqualsStoredPlusComparisonFunction(ZGVariableType da
 		case ZGDouble:
 			comparisonFunction = ZGDoubleNotEqualsPlus;
 			break;
-		case ZGUTF8String:
+		case ZGString8:
 			break;
-		case ZGUTF16String:
+		case ZGString16:
 			break;
 		case ZGByteArray:
 			break;

@@ -180,14 +180,14 @@ void *valueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType
 		value = malloc((size_t)*dataSize);
 		memcpy(value, &variableValue, (size_t)*dataSize);
 	}
-	else if (dataType == ZGUTF8String)
+	else if (dataType == ZGString8)
 	{
 		const char *variableValue = [stringValue cStringUsingEncoding:NSUTF8StringEncoding];
 		*dataSize = strlen(variableValue);
 		value = malloc((size_t)*dataSize);
 		strncpy(value, variableValue, (size_t)*dataSize);
 	}
-	else if (dataType == ZGUTF16String)
+	else if (dataType == ZGString16)
 	{
 		*dataSize = stringValue.length * sizeof(unichar);
 		value = malloc((size_t)*dataSize);
@@ -235,11 +235,11 @@ ZGMemorySize dataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemor
 {
 	ZGMemorySize dataAlignment;
 	
-	if (dataType == ZGUTF8String || dataType == ZGByteArray)
+	if (dataType == ZGString8 || dataType == ZGByteArray)
 	{
 		dataAlignment = sizeof(int8_t);
 	}
-	else if (dataType == ZGUTF16String)
+	else if (dataType == ZGString16)
 	{
 		dataAlignment = sizeof(int16_t);
 	}

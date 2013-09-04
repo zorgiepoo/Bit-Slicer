@@ -111,7 +111,7 @@
 		[[self.documentData.variables subarrayWithRange:variableRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
 		 {
 			 NSString *oldStringValue = [variable.stringValue copy];
-			 if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGUTF8String || variable.type == ZGUTF16String))
+			 if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGString8 || variable.type == ZGString16))
 			 {
 				 variable.size = ZGGetStringSize(self.windowController.currentProcess.processTask, variable.address, variable.type, variable.size, 1024);
 			 }
@@ -195,7 +195,7 @@
 					 ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address, variable.freezeValue, variable.size);
 				 }
 				 
-				 if (variable.type == ZGUTF16String)
+				 if (variable.type == ZGString16)
 				 {
 					 unichar terminatorValue = 0;
 					 ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));

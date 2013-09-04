@@ -318,12 +318,12 @@ static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, Z
 
 static PyObject *VirtualMemory_readString8(VirtualMemory *self, PyObject *args)
 {
-	return VirtualMemory_readString(self, args, ZGUTF8String);
+	return VirtualMemory_readString(self, args, ZGString8);
 }
 
 static PyObject *VirtualMemory_readString16(VirtualMemory *self, PyObject *args)
 {
-	return VirtualMemory_readString(self, args, ZGUTF16String);
+	return VirtualMemory_readString(self, args, ZGString16);
 }
 
 #define VirtualMemory_write(type, typeFormat, functionName) \

@@ -379,7 +379,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			case ZGDouble:
 				self.stringValue = [NSString stringWithFormat:@"%lf", *((double *)self.value)];
 				break;
-			case ZGUTF8String:
+			case ZGString8:
 				self.stringValue =
 					[[NSString alloc]
 					 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)self.size]
@@ -402,7 +402,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				}
 				
 				break;
-			case ZGUTF16String:
+			case ZGString16:
 				newStringValue =
 					[[NSString alloc]
 					 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)self.size]

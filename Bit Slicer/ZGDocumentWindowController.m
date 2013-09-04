@@ -584,7 +584,7 @@
 	ZGVariableType dataType = (ZGVariableType)self.dataTypesPopUpButton.selectedItem.tag;
 	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
 	
-	if (dataType == ZGUTF8String || dataType == ZGUTF16String || functionType == ZGStoreAllValues)
+	if (dataType == ZGString8 || dataType == ZGString16 || functionType == ZGStoreAllValues)
 	{
 		self.flagsTextField.enabled = NO;
 		self.flagsTextField.stringValue = @"";
@@ -752,7 +752,7 @@ static NSSize *expandedWindowMinSize = nil;
 	self.functionPopUpButton.enabled = YES;
 	self.variableQualifierMatrix.enabled = YES;
 	
-	if (newTag == ZGUTF8String || newTag == ZGUTF16String)
+	if (newTag == ZGString8 || newTag == ZGString16)
 	{
 		self.ignoreCaseCheckBox.enabled = YES;
 		self.includeNullTerminatorCheckBox.enabled = YES;
@@ -766,7 +766,7 @@ static NSSize *expandedWindowMinSize = nil;
 		self.includeNullTerminatorCheckBox.state = NSOffState;
 	}
 	
-	self.ignoreDataAlignmentCheckBox.enabled = (newTag != ZGUTF8String && newTag != ZGInt8);
+	self.ignoreDataAlignmentCheckBox.enabled = (newTag != ZGString8 && newTag != ZGInt8);
 	
 	[self updateFlagsAndSearchButtonTitle];
 	

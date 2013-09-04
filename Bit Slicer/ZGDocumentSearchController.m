@@ -121,7 +121,7 @@
 	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
 	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
 	
-	if (dataType != ZGUTF8String && dataType != ZGUTF16String && dataType != ZGByteArray)
+	if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
 	{
 		// This doesn't matter if the search is comparing stored values or if it's a regular function type
 		if ([self.windowController functionTypeAllowsSearchInput])
@@ -139,7 +139,7 @@
 		return [NSString stringWithFormat:@"The function you are using does not support %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
 	}
 	
-	if ((dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray) && [self.searchData shouldCompareStoredValues])
+	if ((dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray) && [self.searchData shouldCompareStoredValues])
 	{
 		return [NSString stringWithFormat:@"Comparing Stored Values is not supported for %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
 	}
@@ -231,12 +231,12 @@
 	
 	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
 	
-	if (dataType != ZGUTF8String && dataType != ZGInt8)
+	if (dataType != ZGString8 && dataType != ZGInt8)
 	{
 		self.windowController.ignoreDataAlignmentCheckBox.enabled = YES;
 	}
 	
-	if (dataType == ZGUTF8String || dataType == ZGUTF16String)
+	if (dataType == ZGString8 || dataType == ZGString16)
 	{
 		self.windowController.ignoreCaseCheckBox.enabled = YES;
 		self.windowController.includeNullTerminatorCheckBox.enabled = YES;
@@ -409,7 +409,7 @@
 	NSString *evaluatedSearchExpression = nil;
 	
 	evaluatedSearchExpression =
-		(dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
+		(dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray)
 		? self.documentData.searchValueString
 		: [ZGCalculator evaluateExpression:self.documentData.searchValueString];
 	
@@ -430,11 +430,11 @@
 	// internally for UTF-16 strings. Lame hack, I know.
 	if (self.searchData.shouldIncludeNullTerminator)
 	{
-		if (dataType == ZGUTF16String)
+		if (dataType == ZGString16)
 		{
 			self.searchData.dataSize += sizeof(unichar);
 		}
-		else if (dataType == ZGUTF8String)
+		else if (dataType == ZGString8)
 		{
 			self.searchData.dataSize += sizeof(char);
 		}
@@ -457,7 +457,7 @@
 	if (self.windowController.flagsTextField.isEnabled)
 	{
 		NSString *flagsExpression =
-			(dataType == ZGUTF8String || dataType == ZGUTF16String || dataType == ZGByteArray)
+			(dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray)
 			? self.windowController.flagsTextField.stringValue
 			: [ZGCalculator evaluateExpression:self.windowController.flagsTextField.stringValue];
 		
