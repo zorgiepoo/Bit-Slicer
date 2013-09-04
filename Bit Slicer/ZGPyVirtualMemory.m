@@ -98,7 +98,8 @@ declareVMPrototypeMethod(scanByteArray)
 declareVMPrototypeMethod(allocate)
 declareVMPrototypeMethod(deallocate)
 
-#define declareVMMethod(name) {#name"", (PyCFunction)VirtualMemory_##name, METH_VARARGS, NULL},
+#define declareVMMethod2(name, argsType) {#name"", (PyCFunction)VirtualMemory_##name, argsType, NULL},
+#define declareVMMethod(name) declareVMMethod2(name, METH_VARARGS)
 
 static PyMethodDef VirtualMemory_methods[] =
 {
@@ -130,8 +131,8 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareVMMethod(writeString16)
 	declareVMMethod(writeBytes)
 	
-	declareVMMethod(suspend)
-	declareVMMethod(resume)
+	declareVMMethod2(suspend, METH_NOARGS)
+	declareVMMethod2(resume, METH_NOARGS)
 	
 	declareVMMethod(allocate)
 	declareVMMethod(deallocate)
