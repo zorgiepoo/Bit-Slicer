@@ -522,6 +522,7 @@ static PyObject *VirtualMemory_deallocate(VirtualMemory *self, PyObject *args)
 			if (ZGDeallocateMemory(self->processTask, memoryAddress, numberOfBytes))
 			{
 				retValue = Py_BuildValue("");
+				[self->allocationSizeTable removeObjectForKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
 			}
 		}
 	}
