@@ -297,6 +297,24 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return _stringValue;
 }
 
+- (NSString *)scriptValue
+{
+	if (_scriptValue == nil)
+	{
+		_scriptValue =
+			@"#Edit Me!\n"
+			@"from bitslicer import *\n\n"
+			@"class Script(object):\n"
+			@"    def __init__(self):\n"
+			@"        writeLog('Initialization goes here')\n"
+			@"    def execute(self, timeElapsed):\n"
+			@"        writeLog('Execution goes here')\n"
+			@"    def finish(self):\n"
+			@"        writeLog('Cleaning up goes here')\n";
+	}
+	return _scriptValue;
+}
+
 - (void)updateStringValue
 {
 	if (self.size > 0 && self.value)

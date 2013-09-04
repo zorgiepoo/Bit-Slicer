@@ -173,24 +173,7 @@ static dispatch_queue_t gPythonQueue;
 		
 		NSMutableData *scriptData = [NSMutableData data];
 		
-		if (variable.scriptValue != nil)
-		{
-			[scriptData appendData:[variable.scriptValue dataUsingEncoding:NSUTF8StringEncoding]];
-		}
-		else
-		{
-			NSString *scriptTemplateLines =
-				@"#Script Template\n"
-				@"from bitslicer import *\n\n"
-				@"class Script(object):\n"
-				@"    def __init__(self):\n"
-				@"        writeLog('Initialization goes here')\n"
-				@"    def execute(self, timeElapsed):\n"
-				@"        writeLog('Execution goes here')\n"
-				@"    def finish(self):\n"
-				@"        writeLog('Cleaning up goes here')\n";
-			[scriptData appendData:[scriptTemplateLines dataUsingEncoding:NSUTF8StringEncoding]];
-		}
+		[scriptData appendData:[variable.scriptValue dataUsingEncoding:NSUTF8StringEncoding]];
 		
 		NSString *scriptPath = [SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename];
 		script = [[ZGPyScript alloc] initWithPath:scriptPath];
