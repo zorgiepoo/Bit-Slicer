@@ -50,6 +50,7 @@ typedef struct
 	int32_t processIdentifier;
 	char is64Bit;
 	__unsafe_unretained NSMutableArray *objectsPool;
+	__unsafe_unretained NSMutableDictionary *allocationSizeTable;
 } VirtualMemory;
 
 static PyMemberDef VirtualMemory_members[] =
@@ -94,6 +95,9 @@ declarePrototypeMethod(resume)
 
 declarePrototypeMethod(scanByteArray)
 
+declarePrototypeMethod(allocate)
+declarePrototypeMethod(deallocate)
+
 #define declareMethod(name) {#name"", (PyCFunction)VirtualMemory_##name, METH_VARARGS, NULL},
 
 static PyMethodDef VirtualMemory_methods[] =
@@ -128,6 +132,9 @@ static PyMethodDef VirtualMemory_methods[] =
 	
 	declareMethod(suspend)
 	declareMethod(resume)
+	
+	declareMethod(allocate)
+	declareMethod(deallocate)
 	
 	declareMethod(scanByteArray)
 	{NULL, NULL, 0, NULL}
@@ -214,6 +221,12 @@ static PyTypeObject VirtualMemoryType =
 			return nil;
 		}
 		vmObject->is64Bit = is64Bit;
+		NSMutableDictionary *allocationSizeTable = [[NSMutableDictionary alloc] init];
+		vmObject->allocationSizeTable = allocationSizeTable;
+		@synchronized(objectsPool)
+		{
+			[objectsPool addObject:allocationSizeTable];
+		}
 		vmObject->objectsPool = objectsPool;
 	}
 	return self;
@@ -477,6 +490,41 @@ static PyObject *VirtualMemory_scanByteArray(VirtualMemory *self, PyObject *args
 		}
 	}
 	
+	return retValue;
+}
+
+static PyObject *VirtualMemory_allocate(VirtualMemory *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemorySize numberOfBytes = 0;
+	if (PyArg_ParseTuple(args, "K", &numberOfBytes))
+	{
+		ZGMemoryAddress memoryAddress = 0;
+		if (ZGAllocateMemory(self->processTask, &memoryAddress, numberOfBytes))
+		{
+			[self->allocationSizeTable setObject:@(numberOfBytes) forKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
+			retValue = Py_BuildValue("K", memoryAddress);
+		}
+	}
+	return retValue;
+}
+
+static PyObject *VirtualMemory_deallocate(VirtualMemory *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0;
+	if (PyArg_ParseTuple(args, "K", &memoryAddress))
+	{
+		NSNumber *bytesNumber = [self->allocationSizeTable objectForKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
+		if (bytesNumber != nil)
+		{
+			ZGMemorySize numberOfBytes = [bytesNumber unsignedLongLongValue];
+			if (ZGDeallocateMemory(self->processTask, memoryAddress, numberOfBytes))
+			{
+				retValue = Py_BuildValue("");
+			}
+		}
+	}
 	return retValue;
 }
 
