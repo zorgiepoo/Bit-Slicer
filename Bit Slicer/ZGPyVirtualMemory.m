@@ -90,8 +90,8 @@ declareVMPrototypeMethod(writeString8)
 declareVMPrototypeMethod(writeString16)
 declareVMPrototypeMethod(writeBytes)
 
-declareVMPrototypeMethod(suspend)
-declareVMPrototypeMethod(resume)
+declareVMPrototypeMethod(pause)
+declareVMPrototypeMethod(unpause)
 
 declareVMPrototypeMethod(scanByteArray)
 
@@ -131,8 +131,8 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareVMMethod(writeString16)
 	declareVMMethod(writeBytes)
 	
-	declareVMMethod2(suspend, METH_NOARGS)
-	declareVMMethod2(resume, METH_NOARGS)
+	declareVMMethod2(pause, METH_NOARGS)
+	declareVMMethod2(unpause, METH_NOARGS)
 	
 	declareVMMethod(allocate)
 	declareVMMethod(deallocate)
@@ -426,7 +426,7 @@ static PyObject *VirtualMemory_writeString16(VirtualMemory *self, PyObject *args
 	return writeString(self, args, &nullByte, sizeof(nullByte));
 }
 
-static PyObject *VirtualMemory_suspend(VirtualMemory *self, PyObject *args)
+static PyObject *VirtualMemory_pause(VirtualMemory *self, PyObject *args)
 {
 	if (!ZGSuspendTask(self->processTask))
 	{
@@ -435,7 +435,7 @@ static PyObject *VirtualMemory_suspend(VirtualMemory *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject *VirtualMemory_resume(VirtualMemory *self, PyObject *args)
+static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject *args)
 {
 	if (!ZGResumeTask(self->processTask))
 	{
