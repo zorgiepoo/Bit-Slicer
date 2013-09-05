@@ -911,7 +911,7 @@
 																		</object>
 																		<object class="NSTableColumn" id="16231998">
 																			<string key="NSIdentifier">value</string>
-																			<double key="NSWidth">127</double>
+																			<double key="NSWidth">106</double>
 																			<double key="NSMinWidth">40</double>
 																			<double key="NSMaxWidth">1000</double>
 																			<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -938,9 +938,9 @@
 																		</object>
 																		<object class="NSTableColumn" id="621301721">
 																			<string key="NSIdentifier">type</string>
-																			<double key="NSWidth">75</double>
+																			<double key="NSWidth">96</double>
 																			<double key="NSMinWidth">75</double>
-																			<double key="NSMaxWidth">75</double>
+																			<double key="NSMaxWidth">100</double>
 																			<object class="NSTableHeaderCell" key="NSHeaderCell">
 																				<int key="NSCellFlags">75497536</int>
 																				<int key="NSCellFlags2">2048</int>
@@ -1231,7 +1231,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="1027665523"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 900}}</string>
 				<string key="NSMinSize">{700, 441}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">ZGDebuggerWindow</string>
