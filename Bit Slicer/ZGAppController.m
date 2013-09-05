@@ -93,8 +93,11 @@
 
 + (void)initialize
 {
-	// ensure user defaults are initialized
-	[ZGPreferencesController class];
+	static dispatch_once_t onceToken = 0;
+	dispatch_once(&onceToken, ^{
+		// ensure user defaults are initialized
+		[ZGPreferencesController class];
+	});
 }
 
 - (id)init
