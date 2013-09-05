@@ -1723,72 +1723,66 @@ END_DEBUGGER_CHANGE:
 }
 
 #define INJECT_ERROR_DOMAIN @"INJECT_CODE_FAILED"
-- (BOOL)injectCode:(NSString *)codeString intoAddress:(ZGMemoryAddress)allocatedAddress length:(ZGMemorySize)numberOfAllocatedBytes hookingIntoOriginalInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo error:(NSError **)error
+- (BOOL)injectCode:(NSData *)codeData intoAddress:(ZGMemoryAddress)allocatedAddress length:(ZGMemorySize)numberOfAllocatedBytes hookingIntoOriginalInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo error:(NSError **)error
 {
-	NSMutableData *newInstructionsData = [NSMutableData data];
+	NSMutableData *newInstructionsData = [NSMutableData dataWithData:codeData];
 	BOOL success = NO;
 	
-	// Assemble the new code
-	[newInstructionsData appendData:[self assembleInstructionText:codeString atInstructionPointer:allocatedAddress usingArchitectureBits:process.pointerSize*8 error:error]];
+	ZGSuspendTask(process.processTask);
 	
-	if (newInstructionsData.length > 0)
+	void *nopBuffer = malloc(numberOfAllocatedBytes);
+	memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
+	
+	if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
 	{
-		ZGSuspendTask(process.processTask);
-		
-		void *nopBuffer = malloc(numberOfAllocatedBytes);
-		memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
-		
-		if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
+		NSLog(@"Error: Failed to write nop buffer..");
+		if (error != nil)
 		{
-			NSLog(@"Error: Failed to write nop buffer..");
+			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to NOP current instructions"}];
+		}
+	}
+	else
+	{
+		if (!ZGProtect(process.processTask, allocatedAddress, numberOfAllocatedBytes, VM_PROT_READ | VM_PROT_EXECUTE))
+		{
+			NSLog(@"Error: Failed to protect memory..");
 			if (error != nil)
 			{
-				*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to NOP current instructions"}];
+				*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to change memory protection on new instructions"}];
 			}
 		}
 		else
 		{
-			if (!ZGProtect(process.processTask, allocatedAddress, numberOfAllocatedBytes, VM_PROT_READ | VM_PROT_EXECUTE))
+			[self.undoManager setActionName:@"Inject code"];
+			
+			[self nopInstructions:hookedInstructions inProcess:process recordUndo:shouldRecordUndo actionName:nil];
+			
+			ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
+			
+			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:process.pointerSize*8 error:error];
+			
+			if (jumpToIslandData.length > 0)
 			{
-				NSLog(@"Error: Failed to protect memory..");
-				if (error != nil)
+				ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+				
+				[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] inProcess:process recordUndo:shouldRecordUndo actionName:nil];
+				
+				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:process.pointerSize*8 error:error];
+				if (jumpFromIslandData.length > 0)
 				{
-					*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to change memory protection on new instructions"}];
-				}
-			}
-			else
-			{
-				[self.undoManager setActionName:@"Inject code"];
-				
-				[self nopInstructions:hookedInstructions inProcess:process recordUndo:shouldRecordUndo actionName:nil];
-				
-				ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
-				
-				NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:process.pointerSize*8 error:error];
-				
-				if (jumpToIslandData.length > 0)
-				{
-					ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+					[newInstructionsData appendData:jumpFromIslandData];
 					
-					[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] inProcess:process recordUndo:shouldRecordUndo actionName:nil];
+					ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
 					
-					NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:process.pointerSize*8 error:error];
-					if (jumpFromIslandData.length > 0)
-					{
-						[newInstructionsData appendData:jumpFromIslandData];
-						
-						ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
-						
-						success = YES;
-					}
+					success = YES;
 				}
 			}
 		}
-		
-		free(nopBuffer);
-		
-		ZGResumeTask(process.processTask);
 	}
+	
+	free(nopBuffer);
+	
+	ZGResumeTask(process.processTask);
 	
 	return success;
 }
@@ -1833,12 +1827,17 @@ END_DEBUGGER_CHANGE:
 			}
 			
 			[self.codeInjectionController setSuggestedCode:suggestedCode];
-			[self.codeInjectionController attachToWindow:self.window completionHandler:^(NSString *injectedCode, BOOL canceled, BOOL *succeeded) {
+			[self.codeInjectionController attachToWindow:self.window completionHandler:^(NSString *injectedCodeString, BOOL canceled, BOOL *succeeded) {
 				if (!canceled)
 				{
 					NSError *error = nil;
-					if (![self injectCode:injectedCode intoAddress:allocatedAddress length:numberOfAllocatedBytes hookingIntoOriginalInstructions:instructions inProcess:self.currentProcess recordUndo:YES error:&error])
+					NSData *injectedCode = [self assembleInstructionText:injectedCodeString atInstructionPointer:allocatedAddress usingArchitectureBits:self.currentProcess.pointerSize*8 error:&error];
+					
+					if (injectedCode.length == 0 || error != nil || ![self injectCode:injectedCode intoAddress:allocatedAddress length:numberOfAllocatedBytes hookingIntoOriginalInstructions:instructions inProcess:self.currentProcess recordUndo:YES error:&error])
 					{
+						NSLog(@"Error while injecting code");
+						NSLog(@"%@", error);
+						
 						if (!ZGDeallocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
 						{
 							NSLog(@"Error: Failed to deallocate VM memory after failing to inject code..");
