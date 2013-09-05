@@ -61,9 +61,9 @@
 									<reference key="NSOnImage" ref="518338580"/>
 									<reference key="NSMixedImage" ref="627749667"/>
 								</object>
-								<object class="NSMenuItem" id="781690129">
+								<object class="NSMenuItem" id="851796113">
 									<reference key="NSMenu" ref="455093051"/>
-									<string key="NSTitle">Check for Updates…</string>
+									<string key="NSTitle">Donate…</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="518338580"/>
@@ -85,6 +85,14 @@
 									<string key="NSTitle">Preferences…</string>
 									<string key="NSKeyEquiv">,</string>
 									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="518338580"/>
+									<reference key="NSMixedImage" ref="627749667"/>
+								</object>
+								<object class="NSMenuItem" id="781690129">
+									<reference key="NSMenu" ref="455093051"/>
+									<string key="NSTitle">Check for Updates…</string>
+									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="518338580"/>
 									<reference key="NSMixedImage" ref="627749667"/>
@@ -1849,6 +1857,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">openDonationURL:</string>
+						<reference key="source" ref="319791235"/>
+						<reference key="destination" ref="851796113"/>
+					</object>
+					<string key="id">DH1-Qm-Def</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">checkForUpdates:</string>
 						<reference key="source" ref="709248229"/>
 						<reference key="destination" ref="781690129"/>
@@ -1911,10 +1927,8 @@
 						<reference key="object" ref="455093051"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="775492804"/>
-							<reference ref="781690129"/>
 							<reference ref="292243116"/>
 							<reference ref="498465653"/>
-							<reference ref="224632497"/>
 							<reference ref="199991685"/>
 							<reference ref="760645447"/>
 							<reference ref="361070362"/>
@@ -1922,6 +1936,9 @@
 							<reference ref="560838154"/>
 							<reference ref="874447918"/>
 							<reference ref="720244718"/>
+							<reference ref="851796113"/>
+							<reference ref="781690129"/>
+							<reference ref="224632497"/>
 						</array>
 						<reference key="parent" ref="355071464"/>
 					</object>
@@ -1943,11 +1960,6 @@
 					<object class="IBObjectRecord">
 						<string key="id">129</string>
 						<reference key="object" ref="498465653"/>
-						<reference key="parent" ref="455093051"/>
-					</object>
-					<object class="IBObjectRecord">
-						<string key="id">143</string>
-						<reference key="object" ref="224632497"/>
 						<reference key="parent" ref="455093051"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -2765,6 +2777,16 @@
 						<reference key="object" ref="659173887"/>
 						<reference key="parent" ref="539237191"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">sUz-q6-lOh</string>
+						<reference key="object" ref="851796113"/>
+						<reference key="parent" ref="455093051"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">sBq-te-pN3</string>
+						<reference key="object" ref="224632497"/>
+						<reference key="parent" ref="455093051"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -2858,8 +2880,6 @@
 				<boolean value="NO" key="134.showNotes"/>
 				<string key="136.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="136.showNotes"/>
-				<string key="143.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="NO" key="143.showNotes"/>
 				<string key="144.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="144.showNotes"/>
 				<string key="145.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3048,6 +3068,10 @@
 				<boolean value="NO" key="VFS-NZ-scG.showNotes"/>
 				<string key="bRt-cV-8Ks.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="bRt-cV-8Ks.showNotes"/>
+				<string key="sBq-te-pN3.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="sBq-te-pN3.showNotes"/>
+				<string key="sUz-q6-lOh.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="sUz-q6-lOh.showNotes"/>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>
