@@ -36,6 +36,7 @@
 #import <Python/Python.h>
 
 @class ZGPyVirtualMemory;
+@class ZGPyDebugger;
 
 @interface ZGPyScript : NSObject
 
@@ -45,6 +46,7 @@
 @property (nonatomic) NSTimeInterval lastTime;
 @property (nonatomic) NSTimeInterval timeElapsed;
 @property (nonatomic) ZGPyVirtualMemory *virtualMemoryInstance;
+@property (nonatomic) ZGPyDebugger *debuggerInstance;
 @property (atomic) NSUInteger finishedCount;
 
 - (id)initWithPath:(NSString *)path;

@@ -44,6 +44,7 @@
 		773972FA17D2E80F00B958EE /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
 		774EF6A717CA892D005ABB20 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 774EF6A617CA892C005ABB20 /* Python.framework */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
+		777AD8C717D96F30003A5317 /* ZGPyDebugger.m in Sources */ = {isa = PBXBuildFile; fileRef = 777AD8C617D96F30003A5317 /* ZGPyDebugger.m */; };
 		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
 		77CE28B817D538E300998F28 /* ZGLoggerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */; };
 		77CE28BA17D580AD00998F28 /* ZGPyMainModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B917D580AD00998F28 /* ZGPyMainModule.m */; };
@@ -203,6 +204,8 @@
 		773972F817D2E80F00B958EE /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = deps/Sparkle.framework; sourceTree = "<group>"; };
 		774EF6A617CA892C005ABB20 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		777AD8C517D96F30003A5317 /* ZGPyDebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyDebugger.h; path = "Bit Slicer/ZGPyDebugger.h"; sourceTree = "<group>"; };
+		777AD8C617D96F30003A5317 /* ZGPyDebugger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyDebugger.m; path = "Bit Slicer/ZGPyDebugger.m"; sourceTree = "<group>"; };
 		77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLoggerWindowController.h; path = "Bit Slicer/ZGLoggerWindowController.h"; sourceTree = "<group>"; };
 		77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLoggerWindowController.m; path = "Bit Slicer/ZGLoggerWindowController.m"; sourceTree = "<group>"; };
 		77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGLoggerWindowController.xib; path = "Bit Slicer/ZGLoggerWindowController.xib"; sourceTree = "<group>"; };
@@ -516,6 +519,8 @@
 				77CE28B917D580AD00998F28 /* ZGPyMainModule.m */,
 				77F1160717D2EEC0009E002A /* ZGPyVirtualMemory.h */,
 				77F1160817D2EEC0009E002A /* ZGPyVirtualMemory.m */,
+				777AD8C517D96F30003A5317 /* ZGPyDebugger.h */,
+				777AD8C617D96F30003A5317 /* ZGPyDebugger.m */,
 				77F1160A17D2EECA009E002A /* ZGPyScript.h */,
 				77F1160B17D2EECA009E002A /* ZGPyScript.m */,
 			);
@@ -887,6 +892,7 @@
 				77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */,
 				77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */,
 				77CE28BA17D580AD00998F28 /* ZGPyMainModule.m in Sources */,
+				777AD8C717D96F30003A5317 /* ZGPyDebugger.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

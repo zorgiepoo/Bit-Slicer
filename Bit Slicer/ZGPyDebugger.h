@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/27/12.
+ * Created by Mayur Pawashe on 9/5/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,32 +32,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#import <Python/Python.h>
 #import "ZGMemoryTypes.h"
-#import "ZGMemoryWindowController.h"
-#import "ZGCodeInjectionWindowController.h"
-#import "ZGBreakPointDelegate.h"
 
-#define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
+@interface ZGPyDebugger : NSObject
 
-@class ZGProcess;
-@class ZGInstruction;
++ (void)loadPythonClassInMainModule:(PyObject *)module;
 
-@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource, ZGBreakPointDelegate>
+- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit;
 
-@property (readwrite, nonatomic) BOOL disassembling;
-
-- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
-
-- (NSArray *)selectedInstructions;
-
-- (void)updateSymbolsForInstructions:(NSArray *)instructions;
-
-// This function is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
-
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
-
-- (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error;
+@property (nonatomic, assign) PyObject *object;
 
 @end

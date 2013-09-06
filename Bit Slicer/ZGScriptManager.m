@@ -40,6 +40,7 @@
 #import "ZGPyScript.h"
 #import <Python/Python.h>
 #import "ZGPyVirtualMemory.h"
+#import "ZGPyDebugger.h"
 #import "ZGProcess.h"
 #import "ZGPyMainModule.h"
 #import "ZGSearchProgress.h"
@@ -76,6 +77,7 @@ static dispatch_queue_t gPythonQueue;
 		
 		PyObject *mainModule = loadMainPythonModule();
 		[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
+		[ZGPyDebugger loadPythonClassInMainModule:mainModule];
 	});
 }
 
@@ -326,16 +328,19 @@ static dispatch_queue_t gPythonQueue;
 				
 				script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit objectsPool:self.objectsPool];
 				
-				if (script.virtualMemoryInstance == nil)
+				script.debuggerInstance = [[ZGPyDebugger alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit];
+				
+				if (script.virtualMemoryInstance == nil || script.debuggerInstance == nil)
 				{
 					dispatch_async(dispatch_get_main_queue(), ^{
 						[self disableVariable:variable];
-						NSLog(@"Error: Couldn't create VM instance");
+						NSLog(@"Error: Couldn't create VM or Debug instance");
 					});
 				}
 				else
 				{
 					PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);
+					PyObject_SetAttrString(script.module, "debug", script.debuggerInstance.object);
 					
 					PyObject *initMethodResult = PyObject_CallMethod(script.scriptObject, "__init__", NULL);
 					BOOL stillInitialized = Py_IsInitialized();
@@ -452,6 +457,7 @@ static dispatch_queue_t gPythonQueue;
 			
 			script.timeElapsed = 0;
 			script.virtualMemoryInstance = nil;
+			script.debuggerInstance = nil;
 			script.scriptObject = NULL;
 			script.finishedCount++;
 		}
