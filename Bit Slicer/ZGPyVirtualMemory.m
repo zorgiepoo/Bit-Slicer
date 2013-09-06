@@ -93,7 +93,8 @@ declareVMPrototypeMethod(writeBytes)
 declareVMPrototypeMethod(pause)
 declareVMPrototypeMethod(unpause)
 
-declareVMPrototypeMethod(scanByteArray)
+declareVMPrototypeMethod(scanBytes)
+declareVMPrototypeMethod(scanByteString)
 
 declareVMPrototypeMethod(allocate)
 declareVMPrototypeMethod(deallocate)
@@ -137,7 +138,8 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareVMMethod(allocate)
 	declareVMMethod(deallocate)
 	
-	declareVMMethod(scanByteArray)
+	declareVMMethod(scanBytes)
+	declareVMMethod(scanByteString)
 	{NULL, NULL, 0, NULL}
 };
 
@@ -445,10 +447,44 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject *args)
 }
 
 #define MAX_VALUES_SCANNED 1000
-static PyObject *VirtualMemory_scanByteArray(VirtualMemory *self, PyObject *args)
+
+static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData)
+{
+	PyObject *retValue = NULL;
+	if (searchData.dataSize > 0)
+	{
+		comparison_function_t comparisonFunction = getComparisonFunction(ZGEquals, ZGByteArray, self->is64Bit, 0);
+		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] init];
+		
+		@synchronized(self->objectsPool)
+		{
+			[self->objectsPool addObject:searchProgress];
+		}
+		
+		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, searchProgress, comparisonFunction);
+		
+		@synchronized(self->objectsPool)
+		{
+			[self->objectsPool removeObject:searchProgress];
+		}
+		
+		Py_ssize_t numberOfEntries = MIN(MAX_VALUES_SCANNED, (Py_ssize_t)results.addressCount);
+		PyObject *pythonResults = PyList_New(numberOfEntries);
+		__block Py_ssize_t addressIndex = 0;
+		[results enumerateWithCount:numberOfEntries usingBlock:^(ZGMemoryAddress address, BOOL *stop) {
+			PyList_SET_ITEM(pythonResults, addressIndex, Py_BuildValue("K", address));
+			addressIndex++;
+		}];
+		retValue = pythonResults;
+	}
+	return retValue;
+}
+
+static PyObject *VirtualMemory_scanByteString(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
 	char *byteArrayString = NULL;
+	
 	if (PyArg_ParseTuple(args, "s", &byteArrayString))
 	{
 		ZGMemorySize dataSize = 0;
@@ -463,34 +499,38 @@ static PyObject *VirtualMemory_scanByteArray(VirtualMemory *self, PyObject *args
 		
 		searchData.byteArrayFlags = allocateFlagsForByteArrayWildcards(@(byteArrayString));
 		
-		if (searchData.dataSize > 0)
-		{
-			comparison_function_t comparisonFunction = getComparisonFunction(ZGEquals, ZGByteArray, self->is64Bit, 0);
-			ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] init];
-			
-			@synchronized(self->objectsPool)
-			{
-				[self->objectsPool addObject:searchProgress];
-			}
-			
-			ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, searchProgress, comparisonFunction);
-			
-			@synchronized(self->objectsPool)
-			{
-				[self->objectsPool removeObject:searchProgress];
-			}
-			
-			Py_ssize_t numberOfEntries = MIN(MAX_VALUES_SCANNED, (Py_ssize_t)results.addressCount);
-			PyObject *pythonResults = PyList_New(numberOfEntries);
-			__block Py_ssize_t addressIndex = 0;
-			[results enumerateWithCount:numberOfEntries usingBlock:^(ZGMemoryAddress address, BOOL *stop) {
-				PyList_SET_ITEM(pythonResults, addressIndex, Py_BuildValue("K", address));
-				addressIndex++;
-			}];
-			retValue = pythonResults;
-		}
+		retValue = scanSearchData(self, searchData);
 	}
 	
+	return retValue;
+}
+
+static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	Py_buffer buffer;
+	if (PyArg_ParseTuple(args, "s*", &buffer))
+	{
+		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
+		{
+			PyBuffer_Release(&buffer);
+			return NULL;
+		}
+		
+		void *data = malloc(buffer.len);
+		memcpy(data, buffer.buf, buffer.len);
+		
+		ZGSearchData *searchData =
+		[[ZGSearchData alloc]
+		 initWithSearchValue:data
+		 dataSize:buffer.len
+		 dataAlignment:dataAlignment(self->is64Bit, ZGByteArray, buffer.len)
+		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		
+		retValue = scanSearchData(self, searchData);
+		
+		PyBuffer_Release(&buffer);
+	}
 	return retValue;
 }
 
