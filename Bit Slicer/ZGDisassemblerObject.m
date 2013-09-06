@@ -66,7 +66,7 @@ static void disassemblerTranslator(ud_t *object)
 	}
 }
 
-- (id)initWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address size:(ZGMemorySize)size bytes:(const void *)bytes breakPoints:(NSArray *)breakPoints
+- (id)initWithTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size bytes:(const void *)bytes breakPoints:(NSArray *)breakPoints
 {
 	self = [super init];
 	if (self)
@@ -76,7 +76,7 @@ static void disassemblerTranslator(ud_t *object)
 		
 		for (ZGBreakPoint *breakPoint in breakPoints)
 		{
-			if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
+			if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == taskPort && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
 			{
 				memcpy(self.bytes + (breakPoint.variable.address - address), breakPoint.variable.value, sizeof(uint8_t));
 			}
@@ -85,7 +85,7 @@ static void disassemblerTranslator(ud_t *object)
 		self.object = malloc(sizeof(ud_t));
 		ud_init(self.object);
 		ud_set_input_buffer(self.object, self.bytes, size);
-		ud_set_mode(self.object, process.pointerSize * 8);
+		ud_set_mode(self.object, pointerSize * 8);
 		ud_set_syntax(self.object, disassemblerTranslator);
 		ud_set_pc(self.object, address);
 	}

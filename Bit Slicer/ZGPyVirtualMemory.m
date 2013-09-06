@@ -542,7 +542,7 @@ static PyObject *VirtualMemory_allocate(VirtualMemory *self, PyObject *args)
 	{
 		ZGMemoryAddress memoryAddress = 0;
 		if (ZGAllocateMemory(self->processTask, &memoryAddress, numberOfBytes))
-		{
+		{	
 			[self->allocationSizeTable setObject:@(numberOfBytes) forKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
 			retValue = Py_BuildValue("K", memoryAddress);
 		}

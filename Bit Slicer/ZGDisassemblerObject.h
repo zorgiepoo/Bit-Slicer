@@ -36,14 +36,12 @@
 #import "ZGMemoryTypes.h"
 #import "udis86.h"
 
-@class ZGProcess;
-
 @interface ZGDisassemblerObject : NSObject
 
 @property (readonly, nonatomic) void *bytes;
 
 // Bytes passed in may differ from bytes disassembled due to breakpoints, so use this instance's bytes property for obtaining values
-- (id)initWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address size:(ZGMemorySize)size bytes:(const void *)bytes breakPoints:(NSArray *)breakPoints;
+- (id)initWithTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size bytes:(const void *)bytes breakPoints:(NSArray *)breakPoints;
 
 - (void)enumerateWithBlock:(void (^)(ZGMemoryAddress, ZGMemorySize, ud_mnemonic_code_t, NSString *, BOOL *))callback;
 

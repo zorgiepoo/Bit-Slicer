@@ -77,7 +77,6 @@
 
 #define ATOS_PATH @"/usr/bin/atos"
 
-#define JUMP_REL32_INSTRUCTION_LENGTH 5
 #define NOP_VALUE 0x90
 
 @implementation ZGDebuggerController
@@ -360,9 +359,14 @@
 
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
+	return [self findInstructionBeforeAddress:address inTaskPort:process.processTask pointerSize:process.pointerSize];
+}
+
+- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize
+{
 	ZGInstruction *instruction = nil;
 	
-	NSArray *regions = ZGRegionsForProcessTask(process.processTask);
+	NSArray *regions = ZGRegionsForProcessTask(taskPort);
 	
 	ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
 		if (region.address + region.size <= address)
@@ -401,9 +405,9 @@
 		}
 		
 		void *bytes = NULL;
-		if (ZGReadBytes(process.processTask, startAddress, &bytes, &readSize))
+		if (ZGReadBytes(taskPort, startAddress, &bytes, &readSize))
 		{
-			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:process address:startAddress size:readSize bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
+			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:taskPort pointerSize:pointerSize address:startAddress size:readSize bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 			
 			__block ZGMemoryAddress memoryOffset = 0;
 			__block ZGMemorySize memorySize = 0;
@@ -424,10 +428,10 @@
 			instruction = [[ZGInstruction alloc] init];
 			instruction.text = instructionText;
 			instruction.mnemonic = instructionMnemonic;
-			ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:process.pointerSize name:instruction.text enabled:NO];
+			ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:pointerSize name:instruction.text enabled:NO];
 			instruction.variable = variable;
 			
-			ZGFreeBytes(process.processTask, bytes, readSize);
+			ZGFreeBytes(taskPort, bytes, readSize);
 		}
 	}
 	
@@ -582,7 +586,7 @@
 			
 			if (ZGReadBytes(self.currentProcess.processTask, startAddress, &bytes, &size))
 			{
-				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:startAddress size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
+				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 				
 				NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
 				
@@ -649,7 +653,7 @@
 		{
 			NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
 			
-			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:startInstruction.variable.address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
+			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 			
 			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
@@ -704,7 +708,7 @@
 			{
 				NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
 				
-				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:startInstruction.variable.address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
+				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 				
 				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
@@ -783,7 +787,7 @@
 		ZGMemorySize size = theSize;
 		if (ZGReadBytes(self.currentProcess.processTask, address, &bytes, &size))
 		{
-			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithProcess:self.currentProcess address:address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
+			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
 			
 			__block NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 			
@@ -1636,12 +1640,30 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (void)replaceInstructions:(NSArray *)instructions fromOldStringValues:(NSArray *)oldStringValues toNewStringValues:(NSArray *)newStringValues inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo actionName:(NSString *)actionName
+- (void)
+	replaceInstructions:(NSArray *)instructions
+	fromOldStringValues:(NSArray *)oldStringValues
+	toNewStringValues:(NSArray *)newStringValues
+	inProcess:(ZGProcess *)process
+	recordUndo:(BOOL)shouldRecordUndo
+	actionName:(NSString *)actionName
+{
+	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues inTaskPort:process.processTask is64Bit:process.is64Bit recordUndo:shouldRecordUndo actionName:actionName];
+}
+
+- (void)
+	replaceInstructions:(NSArray *)instructions
+	fromOldStringValues:(NSArray *)oldStringValues
+	toNewStringValues:(NSArray *)newStringValues
+	inTaskPort:(ZGMemoryMap)taskPort
+	is64Bit:(BOOL)is64Bit
+	recordUndo:(BOOL)shouldRecordUndo
+	actionName:(NSString *)actionName
 {
 	for (NSUInteger index = 0; index < instructions.count; index++)
 	{
 		ZGInstruction *instruction = [instructions objectAtIndex:index];
-		[self writeStringValue:[newStringValues objectAtIndex:index] atAddress:instruction.variable.address inProcess:process];
+		[self writeStringValue:[newStringValues objectAtIndex:index] atAddress:instruction.variable.address inTaskPort:taskPort is64Bit:is64Bit];
 	}
 	
 	if (shouldRecordUndo)
@@ -1651,21 +1673,31 @@ END_DEBUGGER_CHANGE:
 			[self.undoManager setActionName:[actionName stringByAppendingFormat:@"%@", instructions.count == 1 ? @"" : @"s"]];
 		}
 		
-		[[self.undoManager prepareWithInvocationTarget:self] replaceInstructions:instructions fromOldStringValues:newStringValues toNewStringValues:oldStringValues inProcess:process recordUndo:shouldRecordUndo actionName:actionName];
+		[[self.undoManager prepareWithInvocationTarget:self] replaceInstructions:instructions fromOldStringValues:newStringValues toNewStringValues:oldStringValues inTaskPort:taskPort is64Bit:is64Bit recordUndo:shouldRecordUndo actionName:actionName];
 	}
 }
 
 - (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
+	[self writeStringValue:stringValue atAddress:address inTaskPort:process.processTask is64Bit:process.is64Bit];
+}
+
+- (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort is64Bit:(BOOL)is64Bit
+{
 	ZGMemorySize newSize = 0;
-	void *newValue = valueFromString(process.is64Bit, stringValue, ZGByteArray, &newSize);
+	void *newValue = valueFromString(is64Bit, stringValue, ZGByteArray, &newSize);
 	
 	if (newValue)
 	{
+		pid_t processID = 0;
+		if (!ZGPIDForTaskPort(taskPort, &processID))
+		{
+			NSLog(@"Error in writeStringValue: method for retrieving process ID");
+		}
 		ZGBreakPoint *targetBreakPoint = nil;
 		for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
 		{
-			if (breakPoint.process.processID == process.processID && breakPoint.variable.address >= address && breakPoint.variable.address < address + newSize)
+			if (breakPoint.process.processID == processID && breakPoint.variable.address >= address && breakPoint.variable.address < address + newSize)
 			{
 				targetBreakPoint = breakPoint;
 				break;
@@ -1674,18 +1706,18 @@ END_DEBUGGER_CHANGE:
 		
 		if (targetBreakPoint == nil)
 		{
-			ZGWriteBytesIgnoringProtection(process.processTask, address, newValue, newSize);
+			ZGWriteBytesIgnoringProtection(taskPort, address, newValue, newSize);
 		}
 		else
 		{
 			if (targetBreakPoint.variable.address - address > 0)
 			{
-				ZGWriteBytesIgnoringProtection(process.processTask, address, newValue, targetBreakPoint.variable.address - address);
+				ZGWriteBytesIgnoringProtection(taskPort, address, newValue, targetBreakPoint.variable.address - address);
 			}
 			
 			if (address + newSize - targetBreakPoint.variable.address - 1 > 0)
 			{
-				ZGWriteBytesIgnoringProtection(process.processTask, targetBreakPoint.variable.address + 1, newValue + (targetBreakPoint.variable.address + 1 - address), address + newSize - targetBreakPoint.variable.address - 1);
+				ZGWriteBytesIgnoringProtection(taskPort, targetBreakPoint.variable.address + 1, newValue + (targetBreakPoint.variable.address + 1 - address), address + newSize - targetBreakPoint.variable.address - 1);
 			}
 			
 			*(uint8_t *)targetBreakPoint.variable.value = *(uint8_t *)(newValue + targetBreakPoint.variable.address - address);
@@ -1696,6 +1728,11 @@ END_DEBUGGER_CHANGE:
 }
 
 - (void)nopInstructions:(NSArray *)instructions inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo actionName:(NSString *)actionName
+{
+	[self nopInstructions:instructions inTaskPort:process.processTask is64Bit:process.is64Bit recordUndo:shouldRecordUndo actionName:actionName];
+}
+
+- (void)nopInstructions:(NSArray *)instructions inTaskPort:(ZGMemoryMap)taskPort is64Bit:(BOOL)is64Bit recordUndo:(BOOL)shouldRecordUndo actionName:(NSString *)actionName
 {
 	NSMutableArray *newStringValues = [[NSMutableArray alloc] init];
 	NSMutableArray *oldStringValues = [[NSMutableArray alloc] init];
@@ -1714,7 +1751,7 @@ END_DEBUGGER_CHANGE:
 		[newStringValues addObject:[nopComponents componentsJoinedByString:@" "]];
 	}
 	
-	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues inProcess:process recordUndo:shouldRecordUndo actionName:actionName];
+	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues inTaskPort:taskPort is64Bit:is64Bit recordUndo:shouldRecordUndo actionName:actionName];
 }
 
 - (IBAction)nopVariables:(id)sender
@@ -1723,17 +1760,24 @@ END_DEBUGGER_CHANGE:
 }
 
 #define INJECT_ERROR_DOMAIN @"INJECT_CODE_FAILED"
-- (BOOL)injectCode:(NSData *)codeData intoAddress:(ZGMemoryAddress)allocatedAddress length:(ZGMemorySize)numberOfAllocatedBytes hookingIntoOriginalInstructions:(NSArray *)hookedInstructions inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo error:(NSError **)error
+- (BOOL)
+	injectCode:(NSData *)codeData
+	intoAddress:(ZGMemoryAddress)allocatedAddress
+	hookingIntoOriginalInstructions:(NSArray *)hookedInstructions
+	inTaskPort:(ZGMemoryMap)taskPort
+	pointerSize:(ZGMemorySize)pointerSize
+	recordUndo:(BOOL)shouldRecordUndo
+	error:(NSError **)error
 {
 	NSMutableData *newInstructionsData = [NSMutableData dataWithData:codeData];
 	BOOL success = NO;
 	
-	ZGSuspendTask(process.processTask);
+	ZGSuspendTask(taskPort);
 	
-	void *nopBuffer = malloc(numberOfAllocatedBytes);
-	memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
+	void *nopBuffer = malloc(codeData.length);
+	memset(nopBuffer, NOP_VALUE, codeData.length);
 	
-	if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
+	if (!ZGWriteBytesIgnoringProtection(taskPort, allocatedAddress, nopBuffer, codeData.length))
 	{
 		NSLog(@"Error: Failed to write nop buffer..");
 		if (error != nil)
@@ -1743,7 +1787,7 @@ END_DEBUGGER_CHANGE:
 	}
 	else
 	{
-		if (!ZGProtect(process.processTask, allocatedAddress, numberOfAllocatedBytes, VM_PROT_READ | VM_PROT_EXECUTE))
+		if (!ZGProtect(taskPort, allocatedAddress, codeData.length, VM_PROT_READ | VM_PROT_EXECUTE))
 		{
 			NSLog(@"Error: Failed to protect memory..");
 			if (error != nil)
@@ -1755,24 +1799,24 @@ END_DEBUGGER_CHANGE:
 		{
 			[self.undoManager setActionName:@"Inject code"];
 			
-			[self nopInstructions:hookedInstructions inProcess:process recordUndo:shouldRecordUndo actionName:nil];
+			[self nopInstructions:hookedInstructions inTaskPort:taskPort is64Bit:pointerSize == sizeof(int64_t) recordUndo:shouldRecordUndo actionName:nil];
 			
 			ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
 			
-			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:process.pointerSize*8 error:error];
+			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:pointerSize*8 error:error];
 			
 			if (jumpToIslandData.length > 0)
 			{
-				ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+				ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:pointerSize];
 				
-				[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] inProcess:process recordUndo:shouldRecordUndo actionName:nil];
+				[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] inTaskPort:taskPort is64Bit:(pointerSize == sizeof(int64_t)) recordUndo:shouldRecordUndo actionName:nil];
 				
-				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:process.pointerSize*8 error:error];
+				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:pointerSize*8 error:error];
 				if (jumpFromIslandData.length > 0)
 				{
 					[newInstructionsData appendData:jumpFromIslandData];
 					
-					ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
+					ZGWriteBytesIgnoringProtection(taskPort, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
 					
 					success = YES;
 				}
@@ -1782,18 +1826,18 @@ END_DEBUGGER_CHANGE:
 	
 	free(nopBuffer);
 	
-	ZGResumeTask(process.processTask);
+	ZGResumeTask(taskPort);
 	
 	return success;
 }
 
-- (NSArray *)instructionsAtMemoryAddress:(ZGMemoryAddress)address consumingLength:(NSInteger)consumedLength inProcess:(ZGProcess *)process
+- (NSArray *)instructionsAtMemoryAddress:(ZGMemoryAddress)address consumingLength:(NSInteger)consumedLength inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize
 {
 	NSMutableArray *instructions = [[NSMutableArray alloc] init];
 	
 	while (consumedLength > 0)
 	{
-		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inProcess:process];
+		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inTaskPort:taskPort pointerSize:pointerSize];
 		if (newInstruction == nil)
 		{
 			instructions = nil;
@@ -1810,7 +1854,7 @@ END_DEBUGGER_CHANGE:
 - (IBAction)requestCodeInjection:(id)sender
 {
 	ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
-	NSArray *instructions = [self instructionsAtMemoryAddress:firstInstruction.variable.address consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inProcess:self.currentProcess];
+	NSArray *instructions = [self instructionsAtMemoryAddress:firstInstruction.variable.address consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize];
 	if (instructions != nil)
 	{
 		ZGMemoryAddress allocatedAddress = 0;
@@ -1819,6 +1863,14 @@ END_DEBUGGER_CHANGE:
 		
 		if (ZGAllocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
 		{
+			void *nopBuffer = malloc(numberOfAllocatedBytes);
+			memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
+			if (!ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
+			{
+				NSLog(@"Failed to nop allocated memory for code injection");
+			}
+			free(nopBuffer);
+			
 			NSString *suggestedCode = [[[instructions valueForKey:@"text"] componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"];
 			
 			if (self.codeInjectionController == nil)
@@ -1833,7 +1885,7 @@ END_DEBUGGER_CHANGE:
 					NSError *error = nil;
 					NSData *injectedCode = [self assembleInstructionText:injectedCodeString atInstructionPointer:allocatedAddress usingArchitectureBits:self.currentProcess.pointerSize*8 error:&error];
 					
-					if (injectedCode.length == 0 || error != nil || ![self injectCode:injectedCode intoAddress:allocatedAddress length:numberOfAllocatedBytes hookingIntoOriginalInstructions:instructions inProcess:self.currentProcess recordUndo:YES error:&error])
+					if (injectedCode.length == 0 || error != nil || ![self injectCode:injectedCode intoAddress:allocatedAddress hookingIntoOriginalInstructions:instructions inTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize recordUndo:YES error:&error])
 					{
 						NSLog(@"Error while injecting code");
 						NSLog(@"%@", error);
