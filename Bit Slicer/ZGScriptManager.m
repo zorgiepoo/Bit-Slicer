@@ -203,10 +203,11 @@ static dispatch_queue_t gPythonQueue;
 	[[NSWorkspace sharedWorkspace] openFile:script.path];
 }
 
-- (void)logPythonString:(PyObject *)pythonString
+- (void)logPythonObject:(PyObject *)pythonObject
 {
-	if (pythonString != NULL)
+	if (pythonObject != NULL)
 	{
+		PyObject *pythonString = PyObject_Str(pythonObject);
 		const char *pythonCString = PyString_AsString(pythonString);
 		if (pythonCString != NULL)
 		{
@@ -214,9 +215,11 @@ static dispatch_queue_t gPythonQueue;
 				[[[ZGAppController sharedController] loggerController] writeLine:@(pythonCString)];
 			});
 		}
+		
+		Py_XDECREF(pythonString);
 	}
 	
-	Py_XDECREF(pythonString);
+	Py_XDECREF(pythonObject);
 }
 
 - (void)logPythonError
@@ -238,9 +241,9 @@ static dispatch_queue_t gPythonQueue;
 		}
 	});
 	
-	[self logPythonString:type];
-	[self logPythonString:value];
-	[self logPythonString:traceback];
+	[self logPythonObject:type];
+	[self logPythonObject:value];
+	[self logPythonObject:traceback];
 }
 
 - (BOOL)executeScript:(ZGPyScript *)script
