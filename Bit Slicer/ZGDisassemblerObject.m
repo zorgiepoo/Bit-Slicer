@@ -33,9 +33,6 @@
  */
 
 #import "ZGDisassemblerObject.h"
-#import "ZGVariable.h"
-#import "ZGBreakPoint.h"
-#import "ZGProcess.h"
 
 @interface ZGDisassemblerObject ()
 
@@ -66,21 +63,13 @@ static void disassemblerTranslator(ud_t *object)
 	}
 }
 
-- (id)initWithTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size bytes:(const void *)bytes breakPoints:(NSArray *)breakPoints
+- (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize
 {
 	self = [super init];
 	if (self)
 	{
 		self.bytes = malloc(size);
 		memcpy(self.bytes, bytes, size);
-		
-		for (ZGBreakPoint *breakPoint in breakPoints)
-		{
-			if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == taskPort && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
-			{
-				memcpy(self.bytes + (breakPoint.variable.address - address), breakPoint.variable.value, sizeof(uint8_t));
-			}
-		}
 		
 		self.object = malloc(sizeof(ud_t));
 		ud_init(self.object);

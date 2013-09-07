@@ -40,8 +40,8 @@
 
 @property (readonly, nonatomic) void *bytes;
 
-// Bytes passed in may differ from bytes disassembled due to breakpoints, so use this instance's bytes property for obtaining values
-- (id)initWithTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size bytes:(const void *)bytes breakPoints:(NSArray *)breakPoints;
+// pointerSize is in bytes
+- (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize;
 
 - (void)enumerateWithBlock:(void (^)(ZGMemoryAddress, ZGMemorySize, ud_mnemonic_code_t, NSString *, BOOL *))callback;
 

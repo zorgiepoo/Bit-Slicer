@@ -357,6 +357,43 @@
 
 #pragma mark Disassembling
 
+- (NSData *)readDataWithTaskPort:(ZGMemoryMap)taskPort address:(ZGMemoryAddress)address size:(ZGMemorySize)size
+{
+	void *originalBytes = NULL;
+	if (!ZGReadBytes(taskPort, address, &originalBytes, &size))
+	{
+		NSLog(@"Failed reading data in debugger..");
+		return nil;
+	}
+	
+	NSArray *breakPoints = [[[ZGAppController sharedController] breakPointController] breakPoints];
+	void *newBytes = malloc(size);
+	memcpy(newBytes, originalBytes, size);
+	
+	ZGFreeBytes(taskPort, originalBytes, size);
+	
+	for (ZGBreakPoint *breakPoint in breakPoints)
+	{
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == taskPort && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
+		{
+			memcpy(newBytes + (breakPoint.variable.address - address), breakPoint.variable.value, sizeof(uint8_t));
+		}
+	}
+	
+	return [NSData dataWithBytesNoCopy:newBytes length:size];
+}
+
+- (ZGDisassemblerObject *)disassemblerObjectWithTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size
+{
+	ZGDisassemblerObject *newObject = nil;
+	NSData *data = [self readDataWithTaskPort:taskPort address:address size:size];
+	if (data != nil)
+	{
+		newObject = [[ZGDisassemblerObject alloc] initWithBytes:data.bytes address:address size:data.length pointerSize:pointerSize];
+	}
+	return newObject;
+}
+
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
 	return [self findInstructionBeforeAddress:address inTaskPort:process.processTask pointerSize:process.pointerSize];
@@ -404,11 +441,9 @@
 			readSize = targetRegion.address + targetRegion.size - startAddress;
 		}
 		
-		void *bytes = NULL;
-		if (ZGReadBytes(taskPort, startAddress, &bytes, &readSize))
+		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithTaskPort:taskPort pointerSize:pointerSize address:startAddress size:readSize];
+		if (disassemblerObject != nil)
 		{
-			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:taskPort pointerSize:pointerSize address:startAddress size:readSize bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
-			
 			__block ZGMemoryAddress memoryOffset = 0;
 			__block ZGMemorySize memorySize = 0;
 			__block NSString *instructionText = nil;
@@ -430,8 +465,6 @@
 			instruction.mnemonic = instructionMnemonic;
 			ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:pointerSize name:instruction.text enabled:NO];
 			instruction.variable = variable;
-			
-			ZGFreeBytes(taskPort, bytes, readSize);
 		}
 	}
 	
@@ -581,13 +614,11 @@
 				}
 			}
 			
-			void *bytes = NULL;
 			ZGMemorySize size = endAddress - startAddress;
 			
-			if (ZGReadBytes(self.currentProcess.processTask, startAddress, &bytes, &size))
+			ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size];
+			if (disassemblerObject != nil)
 			{
-				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
-				
 				NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
 				
 				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
@@ -605,8 +636,6 @@
 				self.instructions = [NSArray arrayWithArray:newInstructions];
 				
 				[self.instructionsTableView reloadData];
-				
-				ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 			}
 		}
 	}
@@ -646,15 +675,14 @@
 	
 	if (startInstruction)
 	{
-		void *bytes = NULL;
 		ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 		
-		if (ZGReadBytes(self.currentProcess.processTask, startInstruction.variable.address, &bytes, &size))
+		NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
+		
+		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable size:size];
+		
+		if (disassemblerObject != nil)
 		{
-			NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
-			
-			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
-			
 			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 				newInstruction.text = disassembledText;
@@ -679,8 +707,6 @@
 			{
 				[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:previousSelectedRow + numberOfInstructionsAdded] byExtendingSelection:NO];
 			}
-			
-			ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 		}
 	}
 }
@@ -701,15 +727,14 @@
 		
 		if (endInstruction)
 		{
-			void *bytes = NULL;
 			ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 			
-			if (ZGReadBytes(self.currentProcess.processTask, startInstruction.variable.address, &bytes, &size))
+			NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
+			
+			ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size];
+			
+			if (disassemblerObject != nil)
 			{
-				NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
-				
-				ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
-				
 				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 					newInstruction.text = disassembledText;
@@ -725,8 +750,6 @@
 				self.instructions = [NSArray arrayWithArray:appendedInstructions];
 				
 				[self.instructionsTableView noteNumberOfRowsChanged];
-				
-				ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 			}
 		}
 	}
@@ -783,12 +806,11 @@
 	self.disassembling = YES;
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		void *bytes;
 		ZGMemorySize size = theSize;
-		if (ZGReadBytes(self.currentProcess.processTask, address, &bytes, &size))
+		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size];
+		
+		if (disassemblerObject != nil)
 		{
-			ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size bytes:bytes breakPoints:[[[ZGAppController sharedController] breakPointController] breakPoints]];
-			
 			__block NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 			
 			// We add instructions to table in batches. First time 1000 variables will be added, 2nd time 1000*2, third time 1000*2*2, etc.
@@ -864,8 +886,6 @@
 				
 				[self updateNavigationButtons];
 			});
-			
-			ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 		}
 	});
 }
