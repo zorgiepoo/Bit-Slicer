@@ -55,6 +55,7 @@ static PyMemberDef Debugger_members[] =
 #define declareDebugPrototypeMethod(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args);
 
 declareDebugPrototypeMethod(assemble)
+declareDebugPrototypeMethod(readBytes)
 declareDebugPrototypeMethod(writeBytes)
 declareDebugPrototypeMethod(bytesBeforeInjection)
 declareDebugPrototypeMethod(injectCode)
@@ -65,6 +66,7 @@ declareDebugPrototypeMethod(injectCode)
 static PyMethodDef Debugger_methods[] =
 {
 	declareDebugMethod(assemble)
+	declareDebugMethod(readBytes)
 	declareDebugMethod(writeBytes)
 	declareDebugMethod(bytesBeforeInjection)
 	declareDebugMethod(injectCode)
@@ -193,6 +195,30 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 		}
 	}
 	
+	return retValue;
+}
+
+static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress address = 0x0;
+	ZGMemorySize size = 0x0;
+	if (PyArg_ParseTuple(args, "KK", &address, &size))
+	{
+		NSData *readData = [[[ZGAppController sharedController] debuggerController] readDataWithTaskPort:self->processTask	address:address size:size];
+		if (readData != nil)
+		{
+			retValue = Py_BuildValue("s#", readData.bytes, readData.length);
+		}
+		else
+		{
+			NSString *errorMessage = @"Error: Failed to read bytes using debug object";
+			NSLog(@"%@", errorMessage);
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[[[ZGAppController sharedController] loggerController] writeLine:errorMessage];
+			});
+		}
+	}
 	return retValue;
 }
 

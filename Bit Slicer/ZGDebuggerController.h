@@ -73,6 +73,7 @@
 	recordUndo:(BOOL)shouldRecordUndo
 	error:(NSError **)error;
 
+- (NSData *)readDataWithTaskPort:(ZGMemoryMap)taskPort address:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 - (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort is64Bit:(BOOL)is64Bit;
 
 @end
