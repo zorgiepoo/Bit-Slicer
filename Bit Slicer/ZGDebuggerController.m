@@ -1687,17 +1687,24 @@ END_DEBUGGER_CHANGE:
 	ZGMemorySize newSize = 0;
 	void *newValue = valueFromString(is64Bit, stringValue, ZGByteArray, &newSize);
 	
-	if (newValue)
+	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] atAddress:address inTaskPort:taskPort is64Bit:is64Bit];
+}
+
+- (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort is64Bit:(BOOL)is64Bit
+{
+	BOOL success = YES;
+	pid_t processID = 0;
+	if (!ZGPIDForTaskPort(taskPort, &processID))
 	{
-		pid_t processID = 0;
-		if (!ZGPIDForTaskPort(taskPort, &processID))
-		{
-			NSLog(@"Error in writeStringValue: method for retrieving process ID");
-		}
+		NSLog(@"Error in writeStringValue: method for retrieving process ID");
+		success = NO;
+	}
+	else
+	{
 		ZGBreakPoint *targetBreakPoint = nil;
 		for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
 		{
-			if (breakPoint.process.processID == processID && breakPoint.variable.address >= address && breakPoint.variable.address < address + newSize)
+			if (breakPoint.process.processID == processID && breakPoint.variable.address >= address && breakPoint.variable.address < address + data.length)
 			{
 				targetBreakPoint = breakPoint;
 				break;
@@ -1706,25 +1713,34 @@ END_DEBUGGER_CHANGE:
 		
 		if (targetBreakPoint == nil)
 		{
-			ZGWriteBytesIgnoringProtection(taskPort, address, newValue, newSize);
+			if (!ZGWriteBytesIgnoringProtection(taskPort, address, data.bytes, data.length))
+			{
+				success = NO;
+			}
 		}
 		else
 		{
 			if (targetBreakPoint.variable.address - address > 0)
 			{
-				ZGWriteBytesIgnoringProtection(taskPort, address, newValue, targetBreakPoint.variable.address - address);
+				if (!ZGWriteBytesIgnoringProtection(taskPort, address, data.bytes, targetBreakPoint.variable.address - address))
+				{
+					success = NO;
+				}
 			}
 			
-			if (address + newSize - targetBreakPoint.variable.address - 1 > 0)
+			if (address + data.length - targetBreakPoint.variable.address - 1 > 0)
 			{
-				ZGWriteBytesIgnoringProtection(taskPort, targetBreakPoint.variable.address + 1, newValue + (targetBreakPoint.variable.address + 1 - address), address + newSize - targetBreakPoint.variable.address - 1);
+				if (!ZGWriteBytesIgnoringProtection(taskPort, targetBreakPoint.variable.address + 1, data.bytes + (targetBreakPoint.variable.address + 1 - address), address + data.length - targetBreakPoint.variable.address - 1))
+				{
+					success = NO;
+				}
 			}
 			
-			*(uint8_t *)targetBreakPoint.variable.value = *(uint8_t *)(newValue + targetBreakPoint.variable.address - address);
+			*(uint8_t *)targetBreakPoint.variable.value = *(uint8_t *)(data.bytes + targetBreakPoint.variable.address - address);
 		}
-		
-		free(newValue);
 	}
+	
+	return success;
 }
 
 - (void)nopInstructions:(NSArray *)instructions inProcess:(ZGProcess *)process recordUndo:(BOOL)shouldRecordUndo actionName:(NSString *)actionName

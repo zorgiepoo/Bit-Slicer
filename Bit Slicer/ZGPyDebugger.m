@@ -55,6 +55,7 @@ static PyMemberDef Debugger_members[] =
 #define declareDebugPrototypeMethod(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args);
 
 declareDebugPrototypeMethod(assemble)
+declareDebugPrototypeMethod(writeBytes)
 declareDebugPrototypeMethod(bytesBeforeInjection)
 declareDebugPrototypeMethod(injectCode)
 
@@ -64,6 +65,7 @@ declareDebugPrototypeMethod(injectCode)
 static PyMethodDef Debugger_methods[] =
 {
 	declareDebugMethod(assemble)
+	declareDebugMethod(writeBytes)
 	declareDebugMethod(bytesBeforeInjection)
 	declareDebugMethod(injectCode)
 	{NULL, NULL, 0, NULL}
@@ -192,6 +194,39 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 	}
 	
 	return retValue;
+}
+
+static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0x0;
+	if (PyArg_ParseTuple(args, "K", &memoryAddress))
+	{
+		
+	}
+	return retValue;
+}
+
+static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
+{
+	ZGMemoryAddress memoryAddress = 0x0;
+	Py_buffer buffer;
+	BOOL success = NO;
+	
+	if (PyArg_ParseTuple(args, "Ks*", &memoryAddress, &buffer))
+	{
+		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
+		{
+			PyBuffer_Release(&buffer);
+			return NULL;
+		}
+		
+		success = [[[ZGAppController sharedController] debuggerController] writeData:[NSData dataWithBytes:buffer.buf length:buffer.len] atAddress:memoryAddress inTaskPort:self->processTask is64Bit:self->is64Bit];
+		
+		PyBuffer_Release(&buffer);
+	}
+	
+	return success ? Py_BuildValue("") : NULL;
 }
 
 static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *args)

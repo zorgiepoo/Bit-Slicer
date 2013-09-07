@@ -73,4 +73,6 @@
 	recordUndo:(BOOL)shouldRecordUndo
 	error:(NSError **)error;
 
+- (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort is64Bit:(BOOL)is64Bit;
+
 @end
