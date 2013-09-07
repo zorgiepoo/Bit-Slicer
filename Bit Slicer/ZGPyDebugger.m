@@ -196,17 +196,6 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 	return retValue;
 }
 
-static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
-{
-	PyObject *retValue = NULL;
-	ZGMemoryAddress memoryAddress = 0x0;
-	if (PyArg_ParseTuple(args, "K", &memoryAddress))
-	{
-		
-	}
-	return retValue;
-}
-
 static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 {
 	ZGMemoryAddress memoryAddress = 0x0;
