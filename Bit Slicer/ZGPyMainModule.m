@@ -54,7 +54,7 @@ PyObject *loadMainPythonModule(void)
 static PyObject *Main_writeLog(PyObject *self, PyObject *args)
 {
 	PyObject *objectToLog;
-	if (!PyArg_ParseTuple(args, "O", &objectToLog))
+	if (!PyArg_ParseTuple(args, "O:writeLog", &objectToLog))
 	{
 		return NULL;
 	}
