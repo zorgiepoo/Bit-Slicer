@@ -38,6 +38,7 @@
 #import "ZGLoggerWindowController.h"
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
+#import "ZGDisassemblerObject.h"
 #import <Python/structmember.h>
 
 typedef struct
@@ -55,6 +56,7 @@ static PyMemberDef Debugger_members[] =
 #define declareDebugPrototypeMethod(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args);
 
 declareDebugPrototypeMethod(assemble)
+declareDebugPrototypeMethod(disassemble)
 declareDebugPrototypeMethod(readBytes)
 declareDebugPrototypeMethod(writeBytes)
 declareDebugPrototypeMethod(bytesBeforeInjection)
@@ -66,6 +68,7 @@ declareDebugPrototypeMethod(injectCode)
 static PyMethodDef Debugger_methods[] =
 {
 	declareDebugMethod(assemble)
+	declareDebugMethod(disassemble)
 	declareDebugMethod(readBytes)
 	declareDebugMethod(writeBytes)
 	declareDebugMethod(bytesBeforeInjection)
@@ -193,6 +196,36 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 				}
 			});
 		}
+	}
+	
+	return retValue;
+}
+
+static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	Py_buffer buffer;
+	ZGMemoryAddress instructionPointer = 0;
+	
+	if (PyArg_ParseTuple(args, "s*K", &buffer, &instructionPointer))
+	{
+		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
+		{
+			PyBuffer_Release(&buffer);
+			return NULL;
+		}
+		
+		ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithBytes:buffer.buf address:instructionPointer size:buffer.len pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		
+		NSMutableArray *disassembledTexts = [[NSMutableArray alloc] init];
+		[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop) {
+			[disassembledTexts addObject:disassembledText];
+		}];
+		
+		NSString *disassembledString = [disassembledTexts componentsJoinedByString:@"\n"];
+		retValue = Py_BuildValue("s", [disassembledString UTF8String]);
+		
+		PyBuffer_Release(&buffer);
 	}
 	
 	return retValue;
