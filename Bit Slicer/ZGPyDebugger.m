@@ -175,7 +175,7 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 	ZGMemoryAddress instructionPointer = 0;
 	char *codeString = NULL;
 	
-	if (PyArg_ParseTuple(args, "sK", &codeString, &instructionPointer))
+	if (PyArg_ParseTuple(args, "s|K", &codeString, &instructionPointer))
 	{
 		NSError *error = nil;
 		NSData *assembledData = [[[ZGAppController sharedController] debuggerController] assembleInstructionText:@(codeString) atInstructionPointer:instructionPointer usingArchitectureBits:self->is64Bit ? sizeof(int64_t)*8 : sizeof(int32_t)*8 error:&error];
@@ -207,7 +207,7 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 	Py_buffer buffer;
 	ZGMemoryAddress instructionPointer = 0;
 	
-	if (PyArg_ParseTuple(args, "s*K", &buffer, &instructionPointer))
+	if (PyArg_ParseTuple(args, "s*|K", &buffer, &instructionPointer))
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{

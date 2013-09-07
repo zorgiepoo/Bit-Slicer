@@ -537,12 +537,13 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 static PyObject *VirtualMemory_allocate(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
-	ZGMemorySize numberOfBytes = 0;
-	if (PyArg_ParseTuple(args, "K", &numberOfBytes))
+	ZGMemorySize numberOfBytes = NSPageSize(); // sane default
+	ZGPageSize(self->processTask, &numberOfBytes);
+	if (PyArg_ParseTuple(args, "|K", &numberOfBytes))
 	{
 		ZGMemoryAddress memoryAddress = 0;
 		if (ZGAllocateMemory(self->processTask, &memoryAddress, numberOfBytes))
-		{	
+		{
 			[self->allocationSizeTable setObject:@(numberOfBytes) forKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
 			retValue = Py_BuildValue("K", memoryAddress);
 		}
