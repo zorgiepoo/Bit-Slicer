@@ -34,6 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "VDKQueue.h"
+#import "ZGMemoryTypes.h"
 
 @class ZGDocumentWindowController;
 @class ZGVariable;
@@ -47,5 +48,7 @@
 - (void)runScriptForVariable:(ZGVariable *)variable;
 - (void)stopScriptForVariable:(ZGVariable *)variable;
 - (void)removeScriptForVariable:(ZGVariable *)variable;
+
+- (void)handleBreakPointDataAddress:(ZGMemoryAddress)dataAddress instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender;
 
 @end

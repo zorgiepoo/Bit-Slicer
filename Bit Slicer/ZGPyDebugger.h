@@ -35,12 +35,17 @@
 #import <Foundation/Foundation.h>
 #import <Python/Python.h>
 #import "ZGMemoryTypes.h"
+#import "ZGBreakPointDelegate.h"
 
-@interface ZGPyDebugger : NSObject
+@class ZGScriptManager;
+
+@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate>
+
+@property (nonatomic) ZGScriptManager *scriptManager;
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit;
+- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit scriptManager:(ZGScriptManager *)scriptManager;
 
 @property (nonatomic, assign) PyObject *object;
 

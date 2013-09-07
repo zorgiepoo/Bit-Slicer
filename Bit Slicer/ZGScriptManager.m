@@ -65,7 +65,7 @@
 static dispatch_queue_t gPythonQueue;
 
 + (void)initializePythonInterpreter
-{	
+{
 	dispatch_async(gPythonQueue, ^{
 		Py_Initialize();
 		PyObject *sys = PyImport_ImportModule("sys");
@@ -323,7 +323,6 @@ static dispatch_queue_t gPythonQueue;
 			}
 			else
 			{
-				
 				PyTypeObject *scriptClassType = (PyTypeObject *)PyObject_GetAttrString(script.module, "Script");
 				script.scriptObject = scriptClassType->tp_alloc(scriptClassType, 0);
 				
@@ -331,7 +330,7 @@ static dispatch_queue_t gPythonQueue;
 				
 				script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit objectsPool:self.objectsPool];
 				
-				script.debuggerInstance = [[ZGPyDebugger alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit];
+				script.debuggerInstance = [[ZGPyDebugger alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit scriptManager:self];
 				
 				if (script.virtualMemoryInstance == nil || script.debuggerInstance == nil)
 				{
@@ -491,6 +490,34 @@ static dispatch_queue_t gPythonQueue;
 			});
 		}
 	});
+}
+
+- (void)handleBreakPointDataAddress:(ZGMemoryAddress)dataAddress instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender
+{
+	for (ZGPyScript *script in self.runningScripts)
+	{
+		if (script.debuggerInstance == sender)
+		{
+			dispatch_async(gPythonQueue, ^{
+				if (Py_IsInitialized())
+				{
+					PyObject *result = PyObject_CallMethod(script.scriptObject, "dataAccessed", "KK", dataAddress, instructionAddress);
+					if (result == NULL)
+					{
+						[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+							if (script == pyScript)
+							{
+								[self stopScriptForVariable:[variableValue pointerValue]];
+								*stop = YES;
+							}
+						}];
+					}
+					Py_XDECREF(result);
+				}
+			});
+			break;
+		}
+	}
 }
 
 @end

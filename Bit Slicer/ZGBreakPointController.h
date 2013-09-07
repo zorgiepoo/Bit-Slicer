@@ -66,5 +66,6 @@ typedef enum
 
 - (void)removeObserver:(id)observer;
 - (void)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;
+- (void)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address;
 
 @end

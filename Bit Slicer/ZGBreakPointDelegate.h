@@ -34,6 +34,6 @@
 
 @protocol ZGBreakPointDelegate <NSObject>
 
-- (void)breakPointDidHit:(NSNumber *)address;
+- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(NSNumber *)instructionAddress;
 
 @end

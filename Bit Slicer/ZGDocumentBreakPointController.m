@@ -139,13 +139,13 @@
 
 #pragma mark Handling Break Points
 
-- (void)breakPointDidHit:(NSNumber *)address
+- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(NSNumber *)instructionAddress
 {
-	if (self.watchProcess.valid && ![self.foundBreakPointAddresses containsObject:address])
+	if (self.watchProcess.valid && ![self.foundBreakPointAddresses containsObject:instructionAddress])
 	{
-		[self.foundBreakPointAddresses addObject:address];
+		[self.foundBreakPointAddresses addObject:instructionAddress];
 		
-		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[address unsignedLongLongValue] inTaskPort:self.watchProcess.processTask pointerSize:self.watchProcess.pointerSize];
+		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionAddress unsignedLongLongValue] inTaskPort:self.watchProcess.processTask pointerSize:self.watchProcess.pointerSize];
 		
 		if (instruction)
 		{
@@ -175,7 +175,7 @@
 		}
 		else
 		{
-			NSLog(@"ERROR: Couldn't parse instruction before 0x%llX", [address unsignedLongLongValue]);
+			NSLog(@"ERROR: Couldn't parse instruction before 0x%llX", [instructionAddress unsignedLongLongValue]);
 		}
 	}
 }

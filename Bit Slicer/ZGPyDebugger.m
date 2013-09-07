@@ -39,13 +39,22 @@
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
 #import "ZGDisassemblerObject.h"
+#import "ZGVirtualMemory.h"
+#import "ZGProcess.h"
+#import "ZGScriptManager.h"
+#import "ZGBreakPointController.h"
+#import "ZGInstruction.h"
 #import <Python/structmember.h>
+
+@class ZGPyDebugger;
 
 typedef struct
 {
 	PyObject_HEAD
 	uint32_t processTask;
+	int32_t processIdentifier;
 	char is64Bit;
+	__unsafe_unretained id <ZGBreakPointDelegate> breakPointDelegate;
 } DebuggerClass;
 
 static PyMemberDef Debugger_members[] =
@@ -61,6 +70,9 @@ declareDebugPrototypeMethod(readBytes)
 declareDebugPrototypeMethod(writeBytes)
 declareDebugPrototypeMethod(bytesBeforeInjection)
 declareDebugPrototypeMethod(injectCode)
+declareDebugPrototypeMethod(watchWriteAccesses)
+declareDebugPrototypeMethod(watchReadAndWriteAccesses)
+declareDebugPrototypeMethod(removeWatchAccesses)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
 #define declareDebugMethod(name) declareDebugMethod2(name, METH_VARARGS)
@@ -73,6 +85,9 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(writeBytes)
 	declareDebugMethod(bytesBeforeInjection)
 	declareDebugMethod(injectCode)
+	declareDebugMethod(watchWriteAccesses)
+	declareDebugMethod(watchReadAndWriteAccesses)
+	declareDebugMethod(removeWatchAccesses)
 	{NULL, NULL, 0, NULL}
 };
 
@@ -120,6 +135,12 @@ static PyTypeObject DebuggerType =
 	0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
+@interface ZGPyDebugger ()
+
+@property (nonatomic) NSMutableDictionary *cachedInstructionPointers;
+
+@end
+
 @implementation ZGPyDebugger
 
 + (void)loadPythonClassInMainModule:(PyObject *)module
@@ -137,20 +158,34 @@ static PyTypeObject DebuggerType =
 	}
 }
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit
+- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit scriptManager:(ZGScriptManager *)scriptManager
 {
 	self = [super init];
 	if (self != nil)
 	{
+		pid_t processID = 0;
+		if (!ZGPIDForTaskPort(processTask, &processID))
+		{
+			NSLog(@"Script Error: Failed to access PID for process task");
+			return nil;
+		}
+		
 		PyTypeObject *type = &DebuggerType;
 		self.object = (PyObject *)((DebuggerClass *)type->tp_alloc(type, 0));
 		if (self.object == NULL)
 		{
 			return nil;
 		}
+		
+		self.scriptManager = scriptManager;
+		
 		DebuggerClass *debuggerObject = (DebuggerClass *)self.object;
 		debuggerObject->processTask = processTask;
 		debuggerObject->is64Bit = is64Bit;
+		debuggerObject->processIdentifier = processID;
+		debuggerObject->breakPointDelegate = self;
+		
+		self.cachedInstructionPointers = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
@@ -166,6 +201,7 @@ static PyTypeObject DebuggerType =
 
 - (void)dealloc
 {
+	[[[ZGAppController sharedController] breakPointController] removeObserver:((DebuggerClass *)self.object)->breakPointDelegate];
 	self.object = NULL;
 }
 
@@ -349,6 +385,79 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		PyBuffer_Release(&newCode);
 	}
 	return Py_BuildValue("");
+}
+
+- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(NSNumber *)instructionPointer
+{
+	ZGMemoryAddress instructionAddress = 0;
+	NSNumber *cachedInstructionAddress = [self.cachedInstructionPointers objectForKey:instructionPointer];
+	if (cachedInstructionAddress == nil)
+	{
+		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue] inTaskPort:((DebuggerClass *)self.object)->processTask pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+	
+		instructionAddress = instruction.variable.address;
+		[self.cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointer];
+	}
+	else
+	{
+		instructionAddress = [[self.cachedInstructionPointers objectForKey:instructionPointer] unsignedLongLongValue];
+	}
+	
+	[self.scriptManager handleBreakPointDataAddress:[dataAddress unsignedLongLongValue] instructionAddress:instructionAddress sender:self];
+}
+
+static PyObject *watchAccess(DebuggerClass *self, PyObject *args, NSString *functionName, ZGWatchPointType watchPointType)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0;
+	ZGMemorySize numberOfBytes = 0;
+	if (PyArg_ParseTuple(args, [[NSString stringWithFormat:@"KK:%@", functionName] UTF8String], &memoryAddress, &numberOfBytes))
+	{
+		void *value = NULL;
+		if (ZGReadBytes(self->processTask, memoryAddress, &value, &numberOfBytes))
+		{
+			ZGProcess *process = [[ZGProcess alloc] init];
+			process.processTask = self->processTask;
+			process.is64Bit = self->is64Bit;
+			process.processID = self->processIdentifier;
+			
+			ZGVariable *variable = [[ZGVariable alloc] initWithValue:value size:numberOfBytes address:memoryAddress type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
+			
+			if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:process watchPointType:watchPointType delegate:self->breakPointDelegate getBreakPoint:NULL])
+			{
+				retValue = Py_BuildValue("");
+			}
+			else
+			{
+				NSLog(@"Failed to add breakpoint in %@...", functionName);
+			}
+			
+			ZGFreeBytes(self->processTask, value, numberOfBytes);
+		}
+	}
+	return retValue;
+}
+
+static PyObject *Debugger_watchWriteAccesses(DebuggerClass *self, PyObject *args)
+{
+	return watchAccess(self, args, @"watchWriteAccesses", ZGWatchPointWrite	);
+}
+
+static PyObject *Debugger_watchReadAndWriteAccesses(DebuggerClass *self, PyObject *args)
+{
+	return watchAccess(self, args, @"watchReadAndWriteAccesses", ZGWatchPointReadOrWrite);
+}
+
+static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0;
+	if (PyArg_ParseTuple(args, "K:removeWatchAccesses", &memoryAddress))
+	{
+		[[[ZGAppController sharedController] breakPointController] removeObserver:self->breakPointDelegate withProcessID:self->processIdentifier atAddress:memoryAddress];
+		retValue = Py_BuildValue("");
+	}
+	return retValue;
 }
 
 @end
