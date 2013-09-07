@@ -254,7 +254,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 { \
 	PyObject *retValue = NULL; \
 	ZGMemoryAddress memoryAddress = 0x0; \
-	if (PyArg_ParseTuple(args, "K", &memoryAddress)) \
+	if (PyArg_ParseTuple(args, "K:"#functionName, &memoryAddress)) \
 	{ \
 		void *bytes = NULL; \
 		ZGMemorySize size = sizeof(type); \
@@ -293,18 +293,18 @@ static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 	PyObject *retValue = NULL;
 	ZGMemoryAddress memoryAddress = 0x0;
 	ZGMemorySize numberOfBytes = 0;
-	if (PyArg_ParseTuple(args, "KK", &memoryAddress, &numberOfBytes))
+	if (PyArg_ParseTuple(args, "KK:readBytes", &memoryAddress, &numberOfBytes))
 	{
 		readBytes(&retValue, self, memoryAddress, &numberOfBytes);
 	}
 	return retValue;
 }
 
-static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, ZGVariableType variableType)
+static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, ZGVariableType variableType, const char *functionName)
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress memoryAddress = 0x0;
-	if (PyArg_ParseTuple(args, "K", &memoryAddress))
+	if (PyArg_ParseTuple(args, [[NSString stringWithFormat:@"K:%s", functionName] UTF8String], &memoryAddress))
 	{
 		ZGMemorySize numberOfBytes = ZGGetStringSize(self->processTask, memoryAddress, variableType, 0, 0);
 		if (numberOfBytes == 0)
@@ -321,12 +321,12 @@ static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, Z
 
 static PyObject *VirtualMemory_readString8(VirtualMemory *self, PyObject *args)
 {
-	return VirtualMemory_readString(self, args, ZGString8);
+	return VirtualMemory_readString(self, args, ZGString8, "readString8");
 }
 
 static PyObject *VirtualMemory_readString16(VirtualMemory *self, PyObject *args)
 {
-	return VirtualMemory_readString(self, args, ZGString16);
+	return VirtualMemory_readString(self, args, ZGString16, "readString16");
 }
 
 #define VirtualMemory_write(type, typeFormat, functionName) \
@@ -334,7 +334,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 { \
 	ZGMemoryAddress memoryAddress = 0x0; \
 	type value = 0; \
-	if (PyArg_ParseTuple(args, "K"typeFormat, &memoryAddress, &value)) \
+	if (PyArg_ParseTuple(args, "K"typeFormat":"#functionName, &memoryAddress, &value)) \
 	{ \
 		if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &value, sizeof(type))) \
 		{ \
@@ -363,7 +363,7 @@ static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 {
 	ZGMemoryAddress memoryAddress = 0x0;
 	Py_buffer buffer;
-	if (PyArg_ParseTuple(args, "Ks*", &memoryAddress, &buffer))
+	if (PyArg_ParseTuple(args, "Ks*:writeBytes", &memoryAddress, &buffer))
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C'))
 		{
@@ -386,11 +386,11 @@ static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuffer, size_t nullSize)
+static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuffer, size_t nullSize, const char *functionName)
 {
 	ZGMemoryAddress memoryAddress = 0x0;
 	Py_buffer buffer;
-	if (PyArg_ParseTuple(args, "Ks*", &memoryAddress, &buffer))
+	if (PyArg_ParseTuple(args, [[NSString stringWithFormat:@"Ks*:%s", functionName] UTF8String], &memoryAddress, &buffer))
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C'))
 		{
@@ -419,13 +419,13 @@ static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuff
 static PyObject *VirtualMemory_writeString8(VirtualMemory *self, PyObject *args)
 {
 	int8_t nullByte = 0;
-	return writeString(self, args, &nullByte, sizeof(nullByte));
+	return writeString(self, args, &nullByte, sizeof(nullByte), "writeString8");
 }
 
 static PyObject *VirtualMemory_writeString16(VirtualMemory *self, PyObject *args)
 {
 	int16_t nullByte = 0;
-	return writeString(self, args, &nullByte, sizeof(nullByte));
+	return writeString(self, args, &nullByte, sizeof(nullByte), "writeString16");
 }
 
 static PyObject *VirtualMemory_pause(VirtualMemory *self, PyObject *args)
@@ -485,7 +485,7 @@ static PyObject *VirtualMemory_scanByteString(VirtualMemory *self, PyObject *arg
 	PyObject *retValue = NULL;
 	char *byteArrayString = NULL;
 	
-	if (PyArg_ParseTuple(args, "s", &byteArrayString))
+	if (PyArg_ParseTuple(args, "s:scanByteString", &byteArrayString))
 	{
 		ZGMemorySize dataSize = 0;
 		void *searchValue = valueFromString(self->is64Bit, @(byteArrayString), ZGByteArray, &dataSize);
@@ -509,7 +509,7 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
 	Py_buffer buffer;
-	if (PyArg_ParseTuple(args, "s*", &buffer))
+	if (PyArg_ParseTuple(args, "s*:scanBytes", &buffer))
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{
@@ -539,7 +539,7 @@ static PyObject *VirtualMemory_allocate(VirtualMemory *self, PyObject *args)
 	PyObject *retValue = NULL;
 	ZGMemorySize numberOfBytes = NSPageSize(); // sane default
 	ZGPageSize(self->processTask, &numberOfBytes);
-	if (PyArg_ParseTuple(args, "|K", &numberOfBytes))
+	if (PyArg_ParseTuple(args, "|K:allocate", &numberOfBytes))
 	{
 		ZGMemoryAddress memoryAddress = 0;
 		if (ZGAllocateMemory(self->processTask, &memoryAddress, numberOfBytes))
@@ -555,7 +555,7 @@ static PyObject *VirtualMemory_deallocate(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress memoryAddress = 0;
-	if (PyArg_ParseTuple(args, "K", &memoryAddress))
+	if (PyArg_ParseTuple(args, "K:deallocate", &memoryAddress))
 	{
 		NSNumber *bytesNumber = [self->allocationSizeTable objectForKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
 		if (bytesNumber != nil)

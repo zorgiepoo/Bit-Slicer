@@ -175,7 +175,7 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 	ZGMemoryAddress instructionPointer = 0;
 	char *codeString = NULL;
 	
-	if (PyArg_ParseTuple(args, "s|K", &codeString, &instructionPointer))
+	if (PyArg_ParseTuple(args, "s|K:assemble", &codeString, &instructionPointer))
 	{
 		NSError *error = nil;
 		NSData *assembledData = [[[ZGAppController sharedController] debuggerController] assembleInstructionText:@(codeString) atInstructionPointer:instructionPointer usingArchitectureBits:self->is64Bit ? sizeof(int64_t)*8 : sizeof(int32_t)*8 error:&error];
@@ -207,7 +207,7 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 	Py_buffer buffer;
 	ZGMemoryAddress instructionPointer = 0;
 	
-	if (PyArg_ParseTuple(args, "s*|K", &buffer, &instructionPointer))
+	if (PyArg_ParseTuple(args, "s*|K:disassemble", &buffer, &instructionPointer))
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{
@@ -241,7 +241,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 		NSData *readData = [[[ZGAppController sharedController] debuggerController] readDataWithTaskPort:self->processTask	address:address size:size];
 		if (readData != nil)
 		{
-			retValue = Py_BuildValue("s#", readData.bytes, readData.length);
+			retValue = Py_BuildValue("s#:readBytes", readData.bytes, readData.length);
 		}
 		else
 		{
@@ -261,7 +261,7 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 	Py_buffer buffer;
 	BOOL success = NO;
 	
-	if (PyArg_ParseTuple(args, "Ks*", &memoryAddress, &buffer))
+	if (PyArg_ParseTuple(args, "Ks*:writeBytes", &memoryAddress, &buffer))
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{
@@ -281,7 +281,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress memoryAddress = 0x0;
-	if (PyArg_ParseTuple(args, "K", &memoryAddress))
+	if (PyArg_ParseTuple(args, "K:bytesBeforeInjection", &memoryAddress))
 	{
 		NSArray *instructions = [[[ZGAppController sharedController] debuggerController] instructionsAtMemoryAddress:memoryAddress consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inTaskPort:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		ZGMemorySize bufferLength = 0;
@@ -313,7 +313,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	ZGMemoryAddress sourceAddress = 0x0;
 	ZGMemoryAddress destinationAddress = 0x0;
 	Py_buffer newCode;
-	if (PyArg_ParseTuple(args, "KKs*", &sourceAddress, &destinationAddress, &newCode))
+	if (PyArg_ParseTuple(args, "KKs*:injectCode", &sourceAddress, &destinationAddress, &newCode))
 	{
 		if (!PyBuffer_IsContiguous(&newCode, 'C') || newCode.len <= 0)
 		{
