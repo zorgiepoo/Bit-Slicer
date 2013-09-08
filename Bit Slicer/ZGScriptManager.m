@@ -348,7 +348,7 @@ static dispatch_queue_t gPythonQueue;
 				
 				script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit objectsPool:self.objectsPool];
 				
-				script.debuggerInstance = [[ZGPyDebugger alloc] initWithProcessTask:self.windowController.currentProcess.processTask is64Bit:self.windowController.currentProcess.is64Bit scriptManager:self];
+				script.debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:self.windowController.currentProcess scriptManager:self];
 				
 				if (script.virtualMemoryInstance == nil || script.debuggerInstance == nil)
 				{

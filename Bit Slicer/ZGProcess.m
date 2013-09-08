@@ -84,7 +84,14 @@
 
 - (BOOL)grantUsAccess
 {	
-	return ZGGetTaskForProcess(self.processID, &_processTask);
+	BOOL success = ZGGetTaskForProcess(self.processID, &_processTask);
+	
+	if (success)
+	{
+		_mainAddress = ZGMainEntryAddress(_processTask, &_slideOffset);
+	}
+	
+	return success;
 }
 
 - (BOOL)hasGrantedAccess

@@ -395,10 +395,10 @@
 
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
-	return [self findInstructionBeforeAddress:address inTaskPort:process.processTask pointerSize:process.pointerSize];
+	return [self findInstructionBeforeAddress:address inTaskPort:process.processTask pointerSize:process.pointerSize mainEntryAddress:process.mainAddress];
 }
 
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize
+- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize mainEntryAddress:(ZGMemoryAddress)mainEntryAddress
 {
 	ZGInstruction *instruction = nil;
 	
@@ -430,6 +430,15 @@
 		if (startAddress < targetRegion.address)
 		{
 			startAddress = targetRegion.address;
+		}
+		
+		if (mainEntryAddress != 0 && startAddress < mainEntryAddress)
+		{
+			startAddress = mainEntryAddress;
+			if (address < startAddress)
+			{
+				return instruction;
+			}
 		}
 		
 		ZGMemorySize size = address - startAddress;
@@ -678,7 +687,7 @@
 		
 		NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
 		
-		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable size:size];
+		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size];
 		
 		if (disassemblerObject != nil)
 		{
@@ -714,7 +723,7 @@
 {
 	ZGInstruction *lastInstruction = self.instructions.lastObject;
 	ZGInstruction *startInstruction = [self findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess];
-	if (startInstruction)
+	if (startInstruction != nil)
 	{
 		ZGInstruction *endInstruction = nil;
 		NSUInteger bytesAhead = DESIRED_BYTES_TO_ADD_OFFSET;
@@ -1039,6 +1048,11 @@
 			{
 				lowBoundAddress = chosenRegion.address;
 			}
+		}
+		
+		if (lowBoundAddress < self.currentProcess.mainAddress)
+		{
+			lowBoundAddress = self.currentProcess.mainAddress;
 		}
 		
 		ZGMemoryAddress highBoundAddress = calculatedMemoryAddress + WINDOW_SIZE;
@@ -1387,7 +1401,8 @@ END_DEBUGGER_CHANGE:
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"address"])
 		{
-			result = instruction.variable.addressStringValue;
+			ZGMemoryAddress relativeAddress = instruction.variable.address - self.currentProcess.slideOffset;
+			result = [NSString stringWithFormat:@"start+0x%llX", relativeAddress];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"instruction"])
 		{
@@ -1866,13 +1881,13 @@ END_DEBUGGER_CHANGE:
 	return success;
 }
 
-- (NSArray *)instructionsAtMemoryAddress:(ZGMemoryAddress)address consumingLength:(NSInteger)consumedLength inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize
+- (NSArray *)instructionsAtMemoryAddress:(ZGMemoryAddress)address consumingLength:(NSInteger)consumedLength inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize mainEntryAddress:(ZGMemoryAddress)mainEntryAddress
 {
 	NSMutableArray *instructions = [[NSMutableArray alloc] init];
 	
 	while (consumedLength > 0)
 	{
-		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inTaskPort:taskPort pointerSize:pointerSize];
+		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inTaskPort:taskPort pointerSize:pointerSize mainEntryAddress:mainEntryAddress];
 		if (newInstruction == nil)
 		{
 			instructions = nil;
@@ -1889,7 +1904,7 @@ END_DEBUGGER_CHANGE:
 - (IBAction)requestCodeInjection:(id)sender
 {
 	ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
-	NSArray *instructions = [self instructionsAtMemoryAddress:firstInstruction.variable.address consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize];
+	NSArray *instructions = [self instructionsAtMemoryAddress:firstInstruction.variable.address consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize mainEntryAddress:self.currentProcess.mainAddress];
 	if (instructions != nil)
 	{
 		ZGMemoryAddress allocatedAddress = 0;

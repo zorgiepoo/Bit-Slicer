@@ -42,6 +42,8 @@
 #import <mach/mach_error.h>
 #import <mach/mach_vm.h>
 
+#import <mach-o/loader.h>
+
 static NSDictionary *gTasksDictionary = nil;
 
 BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task)
@@ -140,6 +142,76 @@ NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
 NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
 {
 	return [ZGRegionsForProcessTask(processTask) count];
+}
+
+ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
+{
+	ZGRegion *firstReadableRegion = nil;
+	NSArray *regions = ZGRegionsForProcessTask(taskPort);
+	for (ZGRegion *region in regions)
+	{
+		if (region.protection & VM_PROT_READ)
+		{
+			firstReadableRegion = region;
+			break;
+		}
+	}
+	
+	ZGMemoryAddress mainAddress = firstReadableRegion.address; // sane default, beginning of __TEXT
+	void *regionBytes = NULL;
+	ZGMemorySize regionSize = firstReadableRegion.size;
+	
+	if (ZGReadBytes(taskPort, firstReadableRegion.address, &regionBytes, &regionSize))
+	{
+		void *bytes = regionBytes;
+		struct mach_header_64 *machHeader = bytes;
+		if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
+		{
+			bytes += (machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64);
+			
+			if ((bytes - regionBytes) + (ZGMemorySize)machHeader->sizeofcmds <= regionSize)
+			{
+				for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
+				{
+					struct load_command *loadCommand = bytes;
+					if (loadCommand->cmd == LC_SEGMENT_64)
+					{
+						struct segment_command_64 *segmentCommand = bytes;
+						if (strcmp(segmentCommand->segname, "__TEXT") == 0)
+						{
+							*slide = firstReadableRegion.address - segmentCommand->vmaddr;
+						}
+					}
+					// For versions linked before 10.8
+					else if (loadCommand->cmd == LC_UNIXTHREAD)
+					{
+						if (machHeader->magic == MH_MAGIC_64)
+						{
+							x86_thread_state64_t *threadState = bytes + sizeof(uint32_t) * 4; // skip to thread state (see struct thread_command)
+							mainAddress = threadState->__rip + *slide;
+						}
+						else
+						{
+							x86_thread_state32_t *threadState = bytes + sizeof(uint32_t) * 4; // skip to thread state (see struct thread_command)
+							mainAddress = threadState->__eip + *slide;
+						}
+					}
+					// For versions linked after 10.8
+					else if (loadCommand->cmd == LC_MAIN)
+					{
+						struct entry_point_command *entryPointCommand = bytes;
+						mainAddress += entryPointCommand->entryoff;
+					}
+					
+					bytes += loadCommand->cmdsize;
+				}
+			}
+		}
+		
+		ZGFreeBytes(taskPort, regionBytes, regionSize);
+	}
+	
+	return mainAddress;
 }
 
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)

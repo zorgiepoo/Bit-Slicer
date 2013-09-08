@@ -71,7 +71,7 @@
 	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
 	
-	ZGInstruction *currentInstruction = [self.debuggerController findInstructionBeforeAddress:instructionPointer+1 inTaskPort:process.processTask pointerSize:process.pointerSize];
+	ZGInstruction *currentInstruction = [self.debuggerController findInstructionBeforeAddress:instructionPointer+1 inTaskPort:process.processTask pointerSize:process.pointerSize mainEntryAddress:process.mainAddress];
 	if (currentInstruction)
 	{
 		[newInstructions addObject:currentInstruction];
@@ -89,7 +89,7 @@
 				
 				ZGFreeBytes(process.processTask, bytes, size);
 				
-				ZGInstruction *instruction = [self.debuggerController findInstructionBeforeAddress:returnAddress inTaskPort:process.processTask pointerSize:process.pointerSize];
+				ZGInstruction *instruction = [self.debuggerController findInstructionBeforeAddress:returnAddress inTaskPort:process.processTask pointerSize:process.pointerSize mainEntryAddress:process.mainAddress];
 				if (instruction)
 				{
 					[newInstructions addObject:instruction];

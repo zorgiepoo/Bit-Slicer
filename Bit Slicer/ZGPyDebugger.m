@@ -54,6 +54,7 @@ typedef struct
 	uint32_t processTask;
 	int32_t processIdentifier;
 	char is64Bit;
+	ZGMemoryAddress mainAddress;
 	__unsafe_unretained id <ZGBreakPointDelegate> breakPointDelegate;
 } DebuggerClass;
 
@@ -158,18 +159,11 @@ static PyTypeObject DebuggerType =
 	}
 }
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit scriptManager:(ZGScriptManager *)scriptManager
+- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager
 {
 	self = [super init];
 	if (self != nil)
 	{
-		pid_t processID = 0;
-		if (!ZGPIDForTaskPort(processTask, &processID))
-		{
-			NSLog(@"Script Error: Failed to access PID for process task");
-			return nil;
-		}
-		
 		PyTypeObject *type = &DebuggerType;
 		self.object = (PyObject *)((DebuggerClass *)type->tp_alloc(type, 0));
 		if (self.object == NULL)
@@ -180,9 +174,10 @@ static PyTypeObject DebuggerType =
 		self.scriptManager = scriptManager;
 		
 		DebuggerClass *debuggerObject = (DebuggerClass *)self.object;
-		debuggerObject->processTask = processTask;
-		debuggerObject->is64Bit = is64Bit;
-		debuggerObject->processIdentifier = processID;
+		debuggerObject->processIdentifier = process.processID;
+		debuggerObject->processTask = process.processTask;
+		debuggerObject->is64Bit = process.is64Bit;
+		debuggerObject->mainAddress = process.mainAddress;
 		debuggerObject->breakPointDelegate = self;
 		
 		self.cachedInstructionPointers = [[NSMutableDictionary alloc] init];
@@ -319,7 +314,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 	ZGMemoryAddress memoryAddress = 0x0;
 	if (PyArg_ParseTuple(args, "K:bytesBeforeInjection", &memoryAddress))
 	{
-		NSArray *instructions = [[[ZGAppController sharedController] debuggerController] instructionsAtMemoryAddress:memoryAddress consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inTaskPort:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		NSArray *instructions = [[[ZGAppController sharedController] debuggerController] instructionsAtMemoryAddress:memoryAddress consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inTaskPort:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t) mainEntryAddress:self->mainAddress];
 		ZGMemorySize bufferLength = 0;
 		for (ZGInstruction *instruction in instructions)
 		{
@@ -361,7 +356,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		if (![[[ZGAppController sharedController] debuggerController]
 		 injectCode:[NSData dataWithBytes:newCode.buf length:newCode.len]
 		 intoAddress:destinationAddress
-		 hookingIntoOriginalInstructions:[[[ZGAppController sharedController] debuggerController] instructionsAtMemoryAddress:sourceAddress consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inTaskPort:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)]
+		 hookingIntoOriginalInstructions:[[[ZGAppController sharedController] debuggerController] instructionsAtMemoryAddress:sourceAddress consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inTaskPort:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t) mainEntryAddress:self->mainAddress]
 		 inTaskPort:self->processTask
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)
 		 recordUndo:NO
@@ -393,7 +388,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	NSNumber *cachedInstructionAddress = [self.cachedInstructionPointers objectForKey:instructionPointer];
 	if (cachedInstructionAddress == nil)
 	{
-		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue] inTaskPort:((DebuggerClass *)self.object)->processTask pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue] inTaskPort:((DebuggerClass *)self.object)->processTask pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t) mainEntryAddress:0];
 	
 		instructionAddress = instruction.variable.address;
 		[self.cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointer];

@@ -42,11 +42,13 @@
 
 @interface ZGProcess : NSObject
 
-@property (readwrite, nonatomic) pid_t processID;
-@property (readwrite, nonatomic) ZGMemoryMap processTask;
+@property (nonatomic) pid_t processID;
+@property (nonatomic) ZGMemoryMap processTask;
 @property (readonly, nonatomic) BOOL valid;
-@property (readwrite, copy, nonatomic) NSString *name;
-@property (readwrite, nonatomic) BOOL is64Bit;
+@property (copy, nonatomic) NSString *name;
+@property (nonatomic) BOOL is64Bit;
+@property (nonatomic, readonly) ZGMemoryAddress slideOffset;
+@property (nonatomic, readonly) ZGMemoryAddress mainAddress;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 

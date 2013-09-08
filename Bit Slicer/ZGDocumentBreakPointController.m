@@ -145,7 +145,7 @@
 	{
 		[self.foundBreakPointAddresses addObject:instructionAddress];
 		
-		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionAddress unsignedLongLongValue] inTaskPort:self.watchProcess.processTask pointerSize:self.watchProcess.pointerSize];
+		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionAddress unsignedLongLongValue] inTaskPort:self.watchProcess.processTask pointerSize:self.watchProcess.pointerSize mainEntryAddress:self.watchProcess.mainAddress];
 		
 		if (instruction)
 		{

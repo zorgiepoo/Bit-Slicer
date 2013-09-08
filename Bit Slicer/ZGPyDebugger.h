@@ -38,6 +38,7 @@
 #import "ZGBreakPointDelegate.h"
 
 @class ZGScriptManager;
+@class ZGProcess;
 
 @interface ZGPyDebugger : NSObject <ZGBreakPointDelegate>
 
@@ -45,7 +46,7 @@
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit scriptManager:(ZGScriptManager *)scriptManager;
+- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager;
 
 @property (nonatomic, assign) PyObject *object;
 
