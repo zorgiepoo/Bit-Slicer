@@ -32,8 +32,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+@class ZGBreakPoint;
+
 @protocol ZGBreakPointDelegate <NSObject>
 
+@optional
 - (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(NSNumber *)instructionAddress;
+- (void)breakPointDidHit:(ZGBreakPoint *)breakPoint;
 
 @end
