@@ -250,7 +250,7 @@ static dispatch_queue_t gPythonQueue;
 		ZGLoggerWindowController *loggerController = [[ZGAppController sharedController] loggerController];
 		[loggerController writeLine:errorMessage];
 		
-		if (![NSApp isActive] && NSClassFromString(@"NSUserNotification") != nil)
+		if ((![NSApp isActive] || ![loggerController.window isVisible]) && NSClassFromString(@"NSUserNotification") != nil)
 		{
 			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
 			userNotification.title = @"Script Failed";
