@@ -174,7 +174,7 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 				for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
 				{
 					struct load_command *loadCommand = bytes;
-					if (loadCommand->cmd == LC_SEGMENT_64)
+					if (loadCommand->cmd == LC_SEGMENT_64 || loadCommand->cmd == LC_SEGMENT)
 					{
 						struct segment_command_64 *segmentCommand = bytes;
 						if (strcmp(segmentCommand->segname, "__TEXT") == 0)
