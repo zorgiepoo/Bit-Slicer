@@ -480,8 +480,6 @@ static dispatch_queue_t gPythonQueue;
 			script.debuggerInstance = nil;
 			script.scriptObject = NULL;
 			script.finishedCount++;
-			
-			NSLog(@"Finishing up...");
 		}
 	});
 	
@@ -499,7 +497,6 @@ static dispatch_queue_t gPythonQueue;
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
 		if (scriptFinishedCount == script.finishedCount)
 		{
-			NSLog(@"Force finishing up...");
 			// Give up
 			Py_Finalize();
 			dispatch_async(gPythonQueue, ^{
@@ -515,30 +512,18 @@ static dispatch_queue_t gPythonQueue;
 
 - (void)handleBreakPointDataAddress:(ZGMemoryAddress)dataAddress instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender
 {
-	for (ZGPyScript *script in self.runningScripts)
-	{
-		if (script.debuggerInstance == sender)
+	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+		if (pyScript.debuggerInstance == sender)
 		{
-			dispatch_async(gPythonQueue, ^{
-				if (Py_IsInitialized())
-				{
-					PyObject *result = PyObject_CallMethod(script.scriptObject, "dataAccessed", "KK", dataAddress, instructionAddress);
-					if (result == NULL)
-					{
-						[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
-							if (script == pyScript)
-							{
-								[self stopScriptForVariable:[variableValue pointerValue]];
-								*stop = YES;
-							}
-						}];
-					}
-					Py_XDECREF(result);
-				}
-			});
-			break;
+			PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "dataAccessed", "KK", dataAddress, instructionAddress);
+			if (result == NULL)
+			{
+				[self stopScriptForVariable:[variableValue pointerValue]];
+				*stop = YES;
+			}
+			Py_XDECREF(result);
 		}
-	}
+	}];
 }
 
 @end
