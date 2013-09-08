@@ -193,16 +193,16 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 					// For versions linked before 10.8
 					else if (loadCommand->cmd == LC_UNIXTHREAD)
 					{
+						void *threadState = bytes + sizeof(uint32_t) * 4; // skip to thread state (see struct thread_command);
 						if (machHeader->magic == MH_MAGIC_64)
 						{
-							x86_thread_state64_t *threadState = bytes + sizeof(uint32_t) * 4; // skip to thread state (see struct thread_command)
-							mainAddress = threadState->__rip + *slide;
+							mainAddress = ((x86_thread_state64_t *)threadState)->__rip;
 						}
 						else
 						{
-							x86_thread_state32_t *threadState = bytes + sizeof(uint32_t) * 4; // skip to thread state (see struct thread_command)
-							mainAddress = threadState->__eip + *slide;
+							mainAddress = ((x86_thread_state32_t *)threadState)->__eip;
 						}
+						mainAddress += *slide;
 					}
 					// For versions linked after 10.8
 					else if (loadCommand->cmd == LC_MAIN)
