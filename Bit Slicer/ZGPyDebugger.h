@@ -41,7 +41,7 @@
 
 @interface ZGPyDebugger : NSObject <ZGBreakPointDelegate>
 
-@property (nonatomic) ZGScriptManager *scriptManager;
+@property (nonatomic, assign) ZGScriptManager *scriptManager;
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 

@@ -80,6 +80,7 @@
 	
 	[self.searchController cleanUp];
 	[self.tableController cleanUp];
+	[self.scriptManager cleanup];
 }
 
 - (void)windowDidLoad

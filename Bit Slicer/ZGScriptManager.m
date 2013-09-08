@@ -116,6 +116,16 @@ static dispatch_queue_t gPythonQueue;
 	return self;
 }
 
+- (void)cleanup
+{
+	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+		if ([self.runningScripts containsObject:pyScript])
+		{
+			[self stopScriptForVariable:[variableValue pointerValue]];
+		}
+	}];
+}
+
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString *)noteName forPath:(NSString *)fullPath
 {
 	__block BOOL assignedNewScript = NO;
@@ -470,6 +480,8 @@ static dispatch_queue_t gPythonQueue;
 			script.debuggerInstance = nil;
 			script.scriptObject = NULL;
 			script.finishedCount++;
+			
+			NSLog(@"Finishing up...");
 		}
 	});
 	
@@ -487,6 +499,7 @@ static dispatch_queue_t gPythonQueue;
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
 		if (scriptFinishedCount == script.finishedCount)
 		{
+			NSLog(@"Force finishing up...");
 			// Give up
 			Py_Finalize();
 			dispatch_async(gPythonQueue, ^{

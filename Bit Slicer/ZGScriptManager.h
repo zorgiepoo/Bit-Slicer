@@ -43,6 +43,8 @@
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
+- (void)cleanup;
+
 - (void)openScriptForVariable:(ZGVariable *)variable;
 
 - (void)runScriptForVariable:(ZGVariable *)variable;
