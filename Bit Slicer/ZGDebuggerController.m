@@ -362,7 +362,6 @@
 	void *originalBytes = NULL;
 	if (!ZGReadBytes(taskPort, address, &originalBytes, &size))
 	{
-		NSLog(@"Failed reading data in debugger..");
 		return nil;
 	}
 	
