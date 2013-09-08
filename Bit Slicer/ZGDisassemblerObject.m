@@ -49,15 +49,15 @@ static void disassemblerTranslator(ud_t *object)
 	UD_SYN_INTEL(object);
 	if (ud_insn_len(object) == 2 && object->mnemonic >= UD_Ijo && object->mnemonic <= UD_Ijmp)
 	{
-		char *originalText = ud_insn_asm(object);
+		const char *originalText = ud_insn_asm(object);
 		if (strstr(originalText, "short") == NULL)
 		{
 			NSMutableArray *textComponents = [NSMutableArray arrayWithArray:[@(originalText) componentsSeparatedByString:@" "]];
 			[textComponents insertObject:@"short" atIndex:1];
 			const char *text = [[textComponents componentsJoinedByString:@" "] UTF8String];
-			if (strlen(text)+1 <= sizeof(object->insn_buffer))
+			if (strlen(text)+1 <= object->asm_buf_size)
 			{
-				strncpy(object->insn_buffer, text, strlen(text)+1);
+				strncpy(object->asm_buf, text, strlen(text)+1);
 			}
 		}
 	}

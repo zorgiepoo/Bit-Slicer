@@ -30,13 +30,6 @@
 		773972C317D2E61200B958EE /* DDParserTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972AC17D2E61200B958EE /* DDParserTypes.m */; };
 		773972C417D2E61200B958EE /* DDTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972AE17D2E61200B958EE /* DDTypes.m */; };
 		773972C517D2E61200B958EE /* NSString+DDMathParsing.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972B017D2E61200B958EE /* NSString+DDMathParsing.m */; };
-		773972E717D2E67D00B958EE /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972DA17D2E67D00B958EE /* decode.c */; };
-		773972E817D2E67D00B958EE /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972DD17D2E67D00B958EE /* input.c */; };
-		773972E917D2E67D00B958EE /* itab.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972DF17D2E67D00B958EE /* itab.c */; };
-		773972EA17D2E67D00B958EE /* syn-att.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972E117D2E67D00B958EE /* syn-att.c */; };
-		773972EB17D2E67D00B958EE /* syn-intel.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972E217D2E67D00B958EE /* syn-intel.c */; };
-		773972EC17D2E67D00B958EE /* syn.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972E317D2E67D00B958EE /* syn.c */; };
-		773972ED17D2E67D00B958EE /* udis86.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972E617D2E67D00B958EE /* udis86.c */; };
 		773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972EF17D2E6AE00B958EE /* mach_excServer.c */; };
 		773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972F017D2E6AE00B958EE /* mach_excUser.c */; };
 		773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -111,6 +104,7 @@
 		77F1165617D2EFF5009E002A /* ZGRegistersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165517D2EFF5009E002A /* ZGRegistersController.m */; };
 		77F1165917D2F001009E002A /* ZGRegister.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165817D2F001009E002A /* ZGRegister.m */; };
 		77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */; };
+		77FA155B17DCEC5500B024A7 /* libudis86.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 77FA155A17DCEC5500B024A7 /* libudis86.a */; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -181,19 +175,9 @@
 		773972AE17D2E61200B958EE /* DDTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDTypes.m; path = deps/DDMathParser/DDTypes.m; sourceTree = "<group>"; };
 		773972AF17D2E61200B958EE /* NSString+DDMathParsing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+DDMathParsing.h"; path = "deps/DDMathParser/NSString+DDMathParsing.h"; sourceTree = "<group>"; };
 		773972B017D2E61200B958EE /* NSString+DDMathParsing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+DDMathParsing.m"; path = "deps/DDMathParser/NSString+DDMathParsing.m"; sourceTree = "<group>"; };
-		773972DA17D2E67D00B958EE /* decode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decode.c; path = deps/libudis86/decode.c; sourceTree = "<group>"; };
-		773972DB17D2E67D00B958EE /* decode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decode.h; path = deps/libudis86/decode.h; sourceTree = "<group>"; };
 		773972DC17D2E67D00B958EE /* extern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = extern.h; path = deps/libudis86/extern.h; sourceTree = "<group>"; };
-		773972DD17D2E67D00B958EE /* input.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = input.c; path = deps/libudis86/input.c; sourceTree = "<group>"; };
-		773972DE17D2E67D00B958EE /* input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = input.h; path = deps/libudis86/input.h; sourceTree = "<group>"; };
-		773972DF17D2E67D00B958EE /* itab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = itab.c; path = deps/libudis86/itab.c; sourceTree = "<group>"; };
 		773972E017D2E67D00B958EE /* itab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = itab.h; path = deps/libudis86/itab.h; sourceTree = "<group>"; };
-		773972E117D2E67D00B958EE /* syn-att.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "syn-att.c"; path = "deps/libudis86/syn-att.c"; sourceTree = "<group>"; };
-		773972E217D2E67D00B958EE /* syn-intel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "syn-intel.c"; path = "deps/libudis86/syn-intel.c"; sourceTree = "<group>"; };
-		773972E317D2E67D00B958EE /* syn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = syn.c; path = deps/libudis86/syn.c; sourceTree = "<group>"; };
-		773972E417D2E67D00B958EE /* syn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syn.h; path = deps/libudis86/syn.h; sourceTree = "<group>"; };
 		773972E517D2E67D00B958EE /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = deps/libudis86/types.h; sourceTree = "<group>"; };
-		773972E617D2E67D00B958EE /* udis86.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = udis86.c; path = deps/libudis86/udis86.c; sourceTree = "<group>"; };
 		773972EE17D2E6AE00B958EE /* mach_exc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mach_exc.h; path = deps/mach_exc/mach_exc.h; sourceTree = "<group>"; };
 		773972EF17D2E6AE00B958EE /* mach_excServer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excServer.c; path = deps/mach_exc/mach_excServer.c; sourceTree = "<group>"; };
 		773972F017D2E6AE00B958EE /* mach_excUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excUser.c; path = deps/mach_exc/mach_excUser.c; sourceTree = "<group>"; };
@@ -326,6 +310,7 @@
 		77F1165817D2F001009E002A /* ZGRegister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegister.m; path = "Bit Slicer/ZGRegister.m"; sourceTree = "<group>"; };
 		77F1165A17D2F00A009E002A /* ZGCodeInjectionWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGCodeInjectionWindowController.h; path = "Bit Slicer/ZGCodeInjectionWindowController.h"; sourceTree = "<group>"; };
 		77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGCodeInjectionWindowController.m; path = "Bit Slicer/ZGCodeInjectionWindowController.m"; sourceTree = "<group>"; };
+		77FA155A17DCEC5500B024A7 /* libudis86.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libudis86.a; path = deps/libudis86.a; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Bit Slicer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bit Slicer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -340,6 +325,7 @@
 				7739728217D2E4DA00B958EE /* HexFiend.framework in Frameworks */,
 				773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */,
 				773972FA17D2E80F00B958EE /* Sparkle.framework in Frameworks */,
+				77FA155B17DCEC5500B024A7 /* libudis86.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -492,20 +478,11 @@
 		77329B74168D0E16007DCAE2 /* libudis86 */ = {
 			isa = PBXGroup;
 			children = (
+				77FA155A17DCEC5500B024A7 /* libudis86.a */,
 				773972F317D2E70400B958EE /* udis86.h */,
-				773972DA17D2E67D00B958EE /* decode.c */,
-				773972DB17D2E67D00B958EE /* decode.h */,
 				773972DC17D2E67D00B958EE /* extern.h */,
-				773972DD17D2E67D00B958EE /* input.c */,
-				773972DE17D2E67D00B958EE /* input.h */,
-				773972DF17D2E67D00B958EE /* itab.c */,
 				773972E017D2E67D00B958EE /* itab.h */,
-				773972E117D2E67D00B958EE /* syn-att.c */,
-				773972E217D2E67D00B958EE /* syn-intel.c */,
-				773972E317D2E67D00B958EE /* syn.c */,
-				773972E417D2E67D00B958EE /* syn.h */,
 				773972E517D2E67D00B958EE /* types.h */,
-				773972E617D2E67D00B958EE /* udis86.c */,
 			);
 			name = libudis86;
 			sourceTree = "<group>";
@@ -831,13 +808,6 @@
 				773972C317D2E61200B958EE /* DDParserTypes.m in Sources */,
 				773972C417D2E61200B958EE /* DDTypes.m in Sources */,
 				773972C517D2E61200B958EE /* NSString+DDMathParsing.m in Sources */,
-				773972E717D2E67D00B958EE /* decode.c in Sources */,
-				773972E817D2E67D00B958EE /* input.c in Sources */,
-				773972E917D2E67D00B958EE /* itab.c in Sources */,
-				773972EA17D2E67D00B958EE /* syn-att.c in Sources */,
-				773972EB17D2E67D00B958EE /* syn-intel.c in Sources */,
-				773972EC17D2E67D00B958EE /* syn.c in Sources */,
-				773972ED17D2E67D00B958EE /* udis86.c in Sources */,
 				773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */,
 				773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */,
 				773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */,
@@ -984,6 +954,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
+					"\"$(SRCROOT)/deps\"",
 				);
 				OTHER_CFLAGS = "-D_DEBUG";
 				PRODUCT_NAME = "Bit Slicer";
@@ -1025,6 +996,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
 					"\"$(SDKROOT)/usr/lib/system\"",
+					"\"$(SRCROOT)/deps\"",
 				);
 				PRODUCT_NAME = "Bit Slicer";
 				RUN_CLANG_STATIC_ANALYZER = YES;
