@@ -519,6 +519,7 @@ static dispatch_queue_t gPythonQueue;
 				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "dataAccessed", "KK", dataAddress, instructionAddress);
 				if (result == NULL)
 				{
+					[self logPythonError];
 					[self stopScriptForVariable:[variableValue pointerValue]];
 					*stop = YES;
 				}
