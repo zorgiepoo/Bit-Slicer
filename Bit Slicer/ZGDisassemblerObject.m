@@ -92,7 +92,7 @@ static void disassemblerTranslator(ud_t *object)
 	BOOL stop = NO;
 	while (ud_disassemble(self.object) > 0)
 	{
-		callback(ud_insn_off(self.object), ud_insn_len(self.object), self.object->mnemonic, @(ud_insn_asm(self.object)), &stop);
+		callback(ud_insn_off(self.object), ud_insn_len(self.object), ud_insn_mnemonic(self.object), @(ud_insn_asm(self.object)), &stop);
 		if (stop) break;
 	}
 }
