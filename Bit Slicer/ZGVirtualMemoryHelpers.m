@@ -202,7 +202,6 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 						{
 							x86_thread_state32_t *threadState = bytes + sizeof(uint32_t) * 4; // skip to thread state (see struct thread_command)
 							mainAddress = threadState->__eip + *slide;
-							NSLog(@"Instruction pointer is 0x%X", threadState->__eip);
 						}
 					}
 					// For versions linked after 10.8
