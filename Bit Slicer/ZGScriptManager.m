@@ -513,16 +513,18 @@ static dispatch_queue_t gPythonQueue;
 - (void)handleBreakPointDataAddress:(ZGMemoryAddress)dataAddress instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender
 {
 	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
-		if (pyScript.debuggerInstance == sender)
-		{
-			PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "dataAccessed", "KK", dataAddress, instructionAddress);
-			if (result == NULL)
+		dispatch_async(gPythonQueue, ^{
+			if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 			{
-				[self stopScriptForVariable:[variableValue pointerValue]];
-				*stop = YES;
+				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "dataAccessed", "KK", dataAddress, instructionAddress);
+				if (result == NULL)
+				{
+					[self stopScriptForVariable:[variableValue pointerValue]];
+					*stop = YES;
+				}
+				Py_XDECREF(result);
 			}
-			Py_XDECREF(result);
-		}
+		});
 	}];
 }
 
