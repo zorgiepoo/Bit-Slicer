@@ -305,12 +305,12 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			@"#Edit Me!\n"
 			@"from bitslicer import *\n\n"
 			@"class Script(object):\n"
-			@"    def __init__(self):\n"
-			@"        writeLog('Initialization goes here')\n"
-			@"    def execute(self, timeElapsed):\n"
-			@"        writeLog('Execution goes here')\n"
-			@"    def finish(self):\n"
-			@"        writeLog('Cleaning up goes here')\n";
+			@"\tdef __init__(self):\n"
+			@"\t\twriteLog('Initialization goes here')\n"
+			@"\tdef execute(self, timeElapsed):\n"
+			@"\t\twriteLog('Execution goes here')\n"
+			@"\tdef finish(self):\n"
+			@"\t\twriteLog('Cleaning up goes here')\n";
 	}
 	return _scriptValue;
 }
