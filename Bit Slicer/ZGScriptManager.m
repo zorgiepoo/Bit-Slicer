@@ -200,7 +200,15 @@ static dispatch_queue_t gPythonQueue;
 - (void)openScriptForVariable:(ZGVariable *)variable
 {
 	ZGPyScript *script = [self scriptForVariable:variable];
-	[[NSWorkspace sharedWorkspace] openFile:script.path];
+	NSArray *items = CFBridgingRelease(LSCopyApplicationURLsForURL((__bridge CFURLRef)([NSURL fileURLWithPath:script.path]), kLSRolesEditor));
+	if (items.count == 0)
+	{
+		[[NSWorkspace sharedWorkspace] openFile:script.path withApplication:@"TextEdit"];
+	}
+	else
+	{
+		[[NSWorkspace sharedWorkspace] openFile:script.path];
+	}
 }
 
 - (void)logPythonObject:(PyObject *)pythonObject
