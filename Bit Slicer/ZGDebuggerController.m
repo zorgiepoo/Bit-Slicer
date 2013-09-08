@@ -989,6 +989,12 @@
 			calculatedMemoryAddress = memoryAddressFromExpression(calculatedMemoryAddressExpression);
 		}
 		
+		if (calculatedMemoryAddress < self.currentProcess.mainAddress)
+		{
+			calculatedMemoryAddress = self.currentProcess.mainAddress;
+			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
+		}
+		
 		// See if the instruction is already in the table, if so, just go to it
 		ZGInstruction *foundInstructionInTable = [self findInstructionInTableAtAddress:calculatedMemoryAddress];
 		if (foundInstructionInTable)
@@ -1025,12 +1031,6 @@
 		if (!chosenRegion)
 		{
 			goto END_DEBUGGER_CHANGE;
-		}
-		
-		if (calculatedMemoryAddress <= 0)
-		{
-			calculatedMemoryAddress = chosenRegion.address;
-			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
 		}
 		
 		// Disassemble within a range from +- WINDOW_SIZE from selection address
