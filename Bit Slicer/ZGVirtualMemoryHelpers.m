@@ -174,9 +174,17 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 				for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
 				{
 					struct load_command *loadCommand = bytes;
-					if (loadCommand->cmd == LC_SEGMENT_64 || loadCommand->cmd == LC_SEGMENT)
+					if (loadCommand->cmd == LC_SEGMENT_64)
 					{
 						struct segment_command_64 *segmentCommand = bytes;
+						if (strcmp(segmentCommand->segname, "__TEXT") == 0)
+						{
+							*slide = firstReadableRegion.address - segmentCommand->vmaddr;
+						}
+					}
+					else if (loadCommand->cmd == LC_SEGMENT)
+					{
+						struct segment_command *segmentCommand = bytes;
 						if (strcmp(segmentCommand->segname, "__TEXT") == 0)
 						{
 							*slide = firstReadableRegion.address - segmentCommand->vmaddr;
@@ -194,6 +202,7 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 						{
 							x86_thread_state32_t *threadState = bytes + sizeof(uint32_t) * 4; // skip to thread state (see struct thread_command)
 							mainAddress = threadState->__eip + *slide;
+							NSLog(@"Instruction pointer is 0x%X", threadState->__eip);
 						}
 					}
 					// For versions linked after 10.8
