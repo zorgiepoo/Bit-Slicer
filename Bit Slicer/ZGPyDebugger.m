@@ -65,6 +65,8 @@ static PyMemberDef Debugger_members[] =
 
 #define declareDebugPrototypeMethod(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args);
 
+declareDebugPrototypeMethod(log)
+
 declareDebugPrototypeMethod(assemble)
 declareDebugPrototypeMethod(disassemble)
 declareDebugPrototypeMethod(readBytes)
@@ -80,6 +82,7 @@ declareDebugPrototypeMethod(removeWatchAccesses)
 
 static PyMethodDef Debugger_methods[] =
 {
+	declareDebugMethod(log)
 	declareDebugMethod(assemble)
 	declareDebugMethod(disassemble)
 	declareDebugMethod(readBytes)
@@ -198,6 +201,44 @@ static PyTypeObject DebuggerType =
 {
 	[[[ZGAppController sharedController] breakPointController] removeObserver:((DebuggerClass *)self.object)->breakPointDelegate];
 	self.object = NULL;
+}
+
+static PyObject *Debugger_log(DebuggerClass *self, PyObject *args)
+{
+	PyObject *objectToLog;
+	if (!PyArg_ParseTuple(args, "O:log", &objectToLog))
+	{
+		return NULL;
+	}
+	
+	PyObject *objectToLogString = PyObject_Str(objectToLog);
+	
+	char *stringToLog = PyString_AsString(objectToLogString);
+	NSString *objcStringToLog = nil;
+	if (stringToLog != NULL)
+	{
+		// Try a couple encodings..
+		objcStringToLog = [[NSString alloc] initWithCString:stringToLog encoding:NSUTF8StringEncoding];
+		
+		if (objcStringToLog == nil)
+		{
+			objcStringToLog = [[NSString alloc] initWithCString:stringToLog encoding:NSASCIIStringEncoding];
+		}
+		
+		if (objcStringToLog == nil)
+		{
+			ZGVariable *variable = [[ZGVariable alloc] initWithValue:stringToLog size:strlen(stringToLog)-1 address:0 type:ZGByteArray qualifier:0 pointerSize:0];
+			objcStringToLog = [NSString stringWithFormat:@"<%@>", [[variable stringValue] copy]];
+		}
+	}
+	
+	Py_XDECREF(objectToLogString);
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[[[ZGAppController sharedController] loggerController] writeLine:objcStringToLog];
+	});
+	
+	return Py_BuildValue("");
 }
 
 static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)

@@ -33,58 +33,13 @@
  */
 
 #import "ZGPyMainModule.h"
-#import <Foundation/Foundation.h>
-#import "ZGAppController.h"
-#import "ZGLoggerWindowController.h"
-#import "ZGVariable.h"
-
-static PyObject *Main_writeLog(PyObject *self, PyObject *args);
 
 static PyMethodDef moduleMethods[] =
 {
-	{"writeLog", (PyCFunction)Main_writeLog, METH_VARARGS, NULL},
 	{NULL, NULL, NULL, NULL}
 };
 
 PyObject *loadMainPythonModule(void)
 {
 	return Py_InitModule("bitslicer", moduleMethods);
-}
-
-static PyObject *Main_writeLog(PyObject *self, PyObject *args)
-{
-	PyObject *objectToLog;
-	if (!PyArg_ParseTuple(args, "O:writeLog", &objectToLog))
-	{
-		return NULL;
-	}
-	
-	PyObject *objectToLogString = PyObject_Str(objectToLog);
-	
-	char *stringToLog = PyString_AsString(objectToLogString);
-	NSString *objcStringToLog = nil;
-	if (stringToLog != NULL)
-	{
-		// Try a couple encodings..
-		objcStringToLog = [[NSString alloc] initWithCString:stringToLog encoding:NSUTF8StringEncoding];
-		
-		if (objcStringToLog == nil)
-		{
-			objcStringToLog = [[NSString alloc] initWithCString:stringToLog encoding:NSASCIIStringEncoding];
-		}
-		
-		if (objcStringToLog == nil)
-		{
-			ZGVariable *variable = [[ZGVariable alloc] initWithValue:stringToLog size:strlen(stringToLog)-1 address:0 type:ZGByteArray qualifier:0 pointerSize:0];
-			objcStringToLog = [NSString stringWithFormat:@"<%@>", [[variable stringValue] copy]];
-		}
-	}
-	
-	Py_XDECREF(objectToLogString);
-	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		[[[ZGAppController sharedController] loggerController] writeLine:objcStringToLog];
-	});
-	
-	return Py_BuildValue("");
 }
