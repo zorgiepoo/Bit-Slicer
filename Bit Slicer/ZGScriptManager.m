@@ -304,7 +304,10 @@ static dispatch_queue_t gPythonQueue;
 - (void)watchProcessDied:(NSNotification *)notification
 {
 	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
-		[self stopScriptForVariable:[variableValue pointerValue]];
+		if ([self.runningScripts containsObject:pyScript])
+		{
+			[self stopScriptForVariable:[variableValue pointerValue]];
+		}
 	}];
 }
 
@@ -359,6 +362,21 @@ static dispatch_queue_t gPythonQueue;
 				}
 				else
 				{
+					if (self.runningScripts == nil)
+					{
+						self.runningScripts = [[NSMutableArray alloc] init];
+					}
+					
+					[self.runningScripts addObject:script];
+					
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[[NSNotificationCenter defaultCenter]
+						 addObserver:self
+						 selector:@selector(watchProcessDied:)
+						 name:ZGTargetProcessDiedNotification
+						 object:self.windowController.currentProcess];
+					});
+					
 					PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);
 					PyObject_SetAttrString(script.module, "debug", script.debuggerInstance.object);
 					
@@ -374,7 +392,7 @@ static dispatch_queue_t gPythonQueue;
 						script.scriptObject = NULL;
 						
 						dispatch_async(dispatch_get_main_queue(), ^{
-							[self disableVariable:variable];
+							[self stopScriptForVariable:variable];
 						});
 					}
 					else
@@ -400,24 +418,7 @@ static dispatch_queue_t gPythonQueue;
 						if (self.scriptTimer == NULL)
 						{
 							dispatch_async(dispatch_get_main_queue(), ^{
-								[self disableVariable:variable];
-							});
-						}
-						else
-						{
-							if (self.runningScripts == nil)
-							{
-								self.runningScripts = [[NSMutableArray alloc] init];
-							}
-							
-							[self.runningScripts addObject:script];
-							
-							dispatch_async(dispatch_get_main_queue(), ^{
-								[[NSNotificationCenter defaultCenter]
-								 addObserver:self
-								 selector:@selector(watchProcessDied:)
-								 name:ZGTargetProcessDiedNotification
-								 object:self.windowController.currentProcess];
+								[self stopScriptForVariable:variable];
 							});
 						}
 					}
@@ -456,59 +457,59 @@ static dispatch_queue_t gPythonQueue;
 			
 			[[NSNotificationCenter defaultCenter] removeObserver:self];
 		}
-	}
-	
-	NSUInteger scriptFinishedCount = script.finishedCount;
-	
-	dispatch_async(gPythonQueue, ^{
-		if (script.finishedCount == scriptFinishedCount)
-		{
-			if (Py_IsInitialized() && self.windowController.currentProcess.valid && script.scriptObject != NULL)
+		
+		NSUInteger scriptFinishedCount = script.finishedCount;
+		
+		dispatch_async(gPythonQueue, ^{
+			if (script.finishedCount == scriptFinishedCount)
 			{
-				PyObject *retValue = PyObject_CallMethod(script.scriptObject, "finish", NULL);
-				if (Py_IsInitialized())
+				if (Py_IsInitialized() && self.windowController.currentProcess.valid && script.scriptObject != NULL)
 				{
-					if (retValue == NULL)
+					PyObject *retValue = PyObject_CallMethod(script.scriptObject, "finish", NULL);
+					if (Py_IsInitialized())
 					{
-						[self logPythonError];
+						if (retValue == NULL)
+						{
+							[self logPythonError];
+						}
+						Py_XDECREF(retValue);
 					}
-					Py_XDECREF(retValue);
 				}
+				
+				script.deltaTime = 0;
+				script.virtualMemoryInstance = nil;
+				script.debuggerInstance = nil;
+				script.scriptObject = NULL;
+				script.finishedCount++;
 			}
-			
-			script.deltaTime = 0;
-			script.virtualMemoryInstance = nil;
-			script.debuggerInstance = nil;
-			script.scriptObject = NULL;
-			script.finishedCount++;
-		}
-	});
-	
-	@synchronized(self.objectsPool)
-	{
-		for (id object in self.objectsPool)
+		});
+		
+		@synchronized(self.objectsPool)
 		{
-			if ([object isKindOfClass:[ZGSearchProgress class]])
+			for (id object in self.objectsPool)
 			{
-				[object setShouldCancelSearch:YES];
+				if ([object isKindOfClass:[ZGSearchProgress class]])
+				{
+					[object setShouldCancelSearch:YES];
+				}
 			}
 		}
+		
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+			if (scriptFinishedCount == script.finishedCount)
+			{
+				// Give up
+				Py_Finalize();
+				dispatch_async(gPythonQueue, ^{
+					@synchronized(self.objectsPool)
+					{
+						[self.objectsPool removeAllObjects];
+					}
+					[[self class] initializePythonInterpreter];
+				});
+			}
+		});
 	}
-	
-	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_current_queue(), ^{
-		if (scriptFinishedCount == script.finishedCount)
-		{
-			// Give up
-			Py_Finalize();
-			dispatch_async(gPythonQueue, ^{
-				@synchronized(self.objectsPool)
-				{
-					[self.objectsPool removeAllObjects];
-				}
-				[[self class] initializePythonInterpreter];
-			});
-		}
-	});
 }
 
 - (void)handleBreakPointDataAddress:(ZGMemoryAddress)dataAddress instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender
@@ -521,7 +522,9 @@ static dispatch_queue_t gPythonQueue;
 				if (result == NULL)
 				{
 					[self logPythonError];
-					[self stopScriptForVariable:[variableValue pointerValue]];
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[self stopScriptForVariable:[variableValue pointerValue]];
+					});
 					*stop = YES;
 				}
 				Py_XDECREF(result);
