@@ -1401,15 +1401,7 @@ END_DEBUGGER_CHANGE:
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"address"])
 		{
-			if (self.currentProcess.slideOffset != 0)
-			{
-				ZGMemoryAddress relativeAddress = instruction.variable.address - self.currentProcess.slideOffset;
-				result = [NSString stringWithFormat:@"start+0x%llX", relativeAddress];
-			}
-			else
-			{
-				result = instruction.variable.addressStringValue;
-			}
+			result = instruction.variable.addressStringValue;
 		}
 		else if ([tableColumn.identifier isEqualToString:@"instruction"])
 		{
