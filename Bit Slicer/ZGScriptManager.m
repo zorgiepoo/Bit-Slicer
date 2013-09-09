@@ -521,6 +521,9 @@ static dispatch_queue_t gPythonQueue;
 				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "dataAccessed", "KK", dataAddress, instructionAddress);
 				if (result == NULL)
 				{
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[[[ZGAppController sharedController] loggerController] writeLine:@"Exception raised in dataAccessed callback"];
+					});
 					[self logPythonError];
 					dispatch_async(dispatch_get_main_queue(), ^{
 						[self stopScriptForVariable:[variableValue pointerValue]];
