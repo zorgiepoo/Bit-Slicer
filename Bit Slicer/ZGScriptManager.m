@@ -270,7 +270,7 @@ static dispatch_queue_t gPythonQueue;
 	
 	if (Py_IsInitialized())
 	{
-		retValue = PyObject_CallMethod(script.scriptObject, "execute", "d", script.timeElapsed);
+		retValue = PyObject_CallMethod(script.scriptObject, "execute", "d", script.deltaTime);
 	}
 	
 	if (retValue == NULL)
@@ -380,9 +380,22 @@ static dispatch_queue_t gPythonQueue;
 					else
 					{
 						script.lastTime = [NSDate timeIntervalSinceReferenceDate];
-						script.timeElapsed = 0;
+						script.deltaTime = 0;
 						
-						self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue);
+						if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue)) != NULL)
+						{
+							dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
+							dispatch_source_set_event_handler(self.scriptTimer, ^{
+								for (ZGPyScript *script in self.runningScripts)
+								{
+									NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
+									script.deltaTime = currentTime - script.lastTime;
+									script.lastTime = currentTime;
+									[self executeScript:script];
+								}
+							});
+							dispatch_resume(self.scriptTimer);
+						}
 						
 						if (self.scriptTimer == NULL)
 						{
@@ -398,18 +411,6 @@ static dispatch_queue_t gPythonQueue;
 							}
 							
 							[self.runningScripts addObject:script];
-							
-							dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
-							dispatch_source_set_event_handler(self.scriptTimer, ^{
-								for (ZGPyScript *script in self.runningScripts)
-								{
-									NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
-									script.timeElapsed += currentTime - script.lastTime;
-									script.lastTime = currentTime;
-									[self executeScript:script];
-								}
-							});
-							dispatch_resume(self.scriptTimer);
 							
 							dispatch_async(dispatch_get_main_queue(), ^{
 								[[NSNotificationCenter defaultCenter]
@@ -462,7 +463,7 @@ static dispatch_queue_t gPythonQueue;
 	dispatch_async(gPythonQueue, ^{
 		if (script.finishedCount == scriptFinishedCount)
 		{
-			if (Py_IsInitialized() && script.timeElapsed > 0 && self.windowController.currentProcess.valid && script.scriptObject != NULL)
+			if (Py_IsInitialized() && self.windowController.currentProcess.valid && script.scriptObject != NULL)
 			{
 				PyObject *retValue = PyObject_CallMethod(script.scriptObject, "finish", NULL);
 				if (Py_IsInitialized())
@@ -475,7 +476,7 @@ static dispatch_queue_t gPythonQueue;
 				}
 			}
 			
-			script.timeElapsed = 0;
+			script.deltaTime = 0;
 			script.virtualMemoryInstance = nil;
 			script.debuggerInstance = nil;
 			script.scriptObject = NULL;
