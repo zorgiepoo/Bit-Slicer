@@ -303,6 +303,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		_scriptValue =
 			@"#Edit Me!\n"
+			@"#Documentation for scripting: https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Scripting\n"
 			@"from bitslicer import *\n\n"
 			@"class Script(object):\n"
 			@"\tdef __init__(self):\n"
