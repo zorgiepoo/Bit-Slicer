@@ -308,12 +308,12 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 	PyObject *retValue = NULL;
 	ZGMemoryAddress address = 0x0;
 	ZGMemorySize size = 0x0;
-	if (PyArg_ParseTuple(args, "KK", &address, &size))
+	if (PyArg_ParseTuple(args, "KK:readBytes", &address, &size))
 	{
 		NSData *readData = [[[ZGAppController sharedController] debuggerController] readDataWithTaskPort:self->processTask	address:address size:size];
 		if (readData != nil)
 		{
-			retValue = Py_BuildValue("s#:readBytes", readData.bytes, readData.length);
+			retValue = Py_BuildValue("s#", readData.bytes, readData.length);
 		}
 		else
 		{
