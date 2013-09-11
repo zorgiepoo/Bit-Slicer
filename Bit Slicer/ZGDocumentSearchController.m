@@ -570,7 +570,7 @@
 		self.searchData.compareOffset = self.searchData.searchValue;
 	}
 	
-	self.searchData.shouldUseBoyer = ZGCanUseBoyer(dataType, self.searchData.byteArrayFlags);
+	self.searchData.shouldUseBoyer = ZGCanUseBoyer(dataType, self.searchData);
 	
 	return YES;
 }

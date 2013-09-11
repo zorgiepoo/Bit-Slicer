@@ -35,6 +35,7 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 #import "ZGVariable.h"
+#import "ZGSearchData.h"
 
 #ifdef _DEBUG
 	#define ZG_LOG(format, ...) NSLog(format, __VA_ARGS__)
@@ -48,6 +49,6 @@ BOOL ZGIsValidNumber(NSString *expression);
 void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
-BOOL ZGCanUseBoyer(ZGVariableType dataType, unsigned char *byteArrayFlags);
+BOOL ZGCanUseBoyer(ZGVariableType dataType, ZGSearchData *searchData);
 
 unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);

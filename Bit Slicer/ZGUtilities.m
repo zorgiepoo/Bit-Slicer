@@ -252,9 +252,9 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
-BOOL ZGCanUseBoyer(ZGVariableType dataType, unsigned char *byteArrayFlags)
+BOOL ZGCanUseBoyer(ZGVariableType dataType, ZGSearchData *searchData)
 {
-	return ((dataType == ZGByteArray && byteArrayFlags == NULL) || dataType == ZGString8 || dataType == ZGString16);
+	return ((dataType == ZGByteArray && searchData.byteArrayFlags == NULL) || ((dataType == ZGString8 || dataType == ZGString16) && !searchData.shouldIgnoreStringCase)) && !searchData.shouldCompareStoredValues;
 }
 
 unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue)
