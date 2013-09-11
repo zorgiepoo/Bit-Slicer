@@ -227,9 +227,6 @@ ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask,
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
 	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
 	
-	ZGMemorySize pageSize = NSPageSize(); // sane default value in case ZGPageSize fails
-	ZGPageSize(processTask, &pageSize);
-	
 	NSArray *regions;
 	if (!shouldCompareStoredValues)
 	{
@@ -285,11 +282,6 @@ ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask,
 				{
 					while (dataIndex + dataSize <= size)
 					{
-						if (dataIndex % pageSize == 0 && searchProgress.shouldCancelSearch)
-						{
-							break;
-						}
-						
 						if (comparisonFunction(searchData, &bytes[dataIndex], !shouldCompareStoredValues ? (searchValue) : (regionBytes + dataIndex), dataSize))
 						{
 							if (pointerSize == sizeof(ZGMemoryAddress))
