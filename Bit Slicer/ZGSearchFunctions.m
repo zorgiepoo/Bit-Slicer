@@ -264,20 +264,32 @@ ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask,
 			
 			NSMutableData *resultSet = [allResultSets objectAtIndex:regionIndex];
 			
+			ZGMemorySize dataIndex = 0;
 			char *bytes = NULL;
-			if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
+			if (dataBeginAddress < address + size && dataEndAddress > address)
 			{
-				ZGMemorySize dataIndex = 0;
-				while (dataIndex + dataSize <= size)
+				if (dataBeginAddress > address)
 				{
-					if (dataIndex % pageSize == 0 && searchProgress.shouldCancelSearch)
+					dataIndex = (dataBeginAddress - address);
+					if (dataIndex % dataAlignment > 0)
 					{
-						break;
+						dataIndex += dataAlignment - (dataIndex % dataAlignment);
 					}
-					
-					if (dataBeginAddress <= address + dataIndex &&
-						dataEndAddress >= address + dataIndex + dataSize)
-					{	
+				}
+				if (dataEndAddress < address + size)
+				{
+					size = dataEndAddress - address;
+				}
+				
+				if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
+				{
+					while (dataIndex + dataSize <= size)
+					{
+						if (dataIndex % pageSize == 0 && searchProgress.shouldCancelSearch)
+						{
+							break;
+						}
+						
 						if (comparisonFunction(searchData, &bytes[dataIndex], !shouldCompareStoredValues ? (searchValue) : (regionBytes + dataIndex), dataSize))
 						{
 							if (pointerSize == sizeof(ZGMemoryAddress))
@@ -291,11 +303,11 @@ ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask,
 								[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
 							}
 						}
+						dataIndex += dataAlignment;
 					}
-					dataIndex += dataAlignment;
+					
+					ZGFreeBytes(processTask, bytes, size);
 				}
-				
-				ZGFreeBytes(processTask, bytes, size);
 			}
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
