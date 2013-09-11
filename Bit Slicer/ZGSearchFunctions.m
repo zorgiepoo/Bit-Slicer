@@ -44,6 +44,63 @@
 // Fast string-searching function from HexFiend's framework
 extern unsigned char* boyer_moore_helper(const unsigned char * restrict haystack, const unsigned char * restrict needle, unsigned long haystack_length, unsigned long needle_length, const unsigned long * restrict char_jump, const unsigned long * restrict match_jump);
 
+// This portion of code is mostly stripped from a function in Hex Fiend's framework; it's wicked fast.
+void ZGPrepareBoyerSearch(const unsigned char *needle, const unsigned long needle_length, const unsigned char *haystack, unsigned long haystack_length, unsigned long *char_jump, unsigned long *match_jump)
+{
+	unsigned long *backup;
+	unsigned long u, ua, ub;
+	backup = match_jump + needle_length + 1;
+	
+	// heuristic #1 setup, simple text search
+	for (u=0; u < sizeof char_jump / sizeof *char_jump; u++)
+	{
+		char_jump[u] = needle_length;
+	}
+	
+	for (u = 0; u < needle_length; u++)
+	{
+		char_jump[((unsigned char) needle[u])] = needle_length - u - 1;
+	}
+	
+	// heuristic #2 setup, repeating pattern search
+	for (u = 1; u <= needle_length; u++)
+	{
+		match_jump[u] = 2 * needle_length - u;
+	}
+	
+	u = needle_length;
+	ua = needle_length + 1;
+	while (u > 0)
+	{
+		backup[u] = ua;
+		while (ua <= needle_length && needle[u - 1] != needle[ua - 1])
+		{
+			if (match_jump[ua] > needle_length - u) match_jump[ua] = needle_length - u;
+			ua = backup[ua];
+		}
+		u--; ua--;
+	}
+	
+	for (u = 1; u <= ua; u++)
+	{
+		if (match_jump[u] > needle_length + ua - u) match_jump[u] = needle_length + ua - u;
+	}
+	
+	ub = backup[ua];
+	while (ua <= needle_length)
+	{
+		while (ua <= ub)
+		{
+			if (match_jump[ua] > ub - ua + needle_length)
+			{
+				match_jump[ua] = ub - ua + needle_length;
+			}
+			ua++;
+		}
+		ub = backup[ub];
+	}
+}
+
 ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)
 {
 	ZGMemorySize dataSize = searchData.dataSize;
@@ -89,98 +146,40 @@ ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchD
 			
 			NSMutableData *resultSet = [allResultSets objectAtIndex:regionIndex];
 			
-			char *bytes = NULL;
+			void *bytes = NULL;
 			if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
 			{
-				// This portion of code is mostly stripped from Hex Fiend's framework; it's wicked fast.
-				// ---------------------------------------------------------------------------------------------
-				unsigned char *needle = searchValue;
-				unsigned long needle_length = dataSize;
-				unsigned char *haystack = (unsigned char *)bytes;
-				unsigned long haystack_length = size;
-				
 				// generate the two Boyer-Moore auxiliary buffers
-				unsigned long char_jump[UCHAR_MAX + 1] = {0};
-				unsigned long *match_jump = malloc(2 * (needle_length + 1) * sizeof(*match_jump));
+				unsigned long charJump[UCHAR_MAX + 1] = {0};
+				unsigned long *matchJump = malloc(2 * (dataSize + 1) * sizeof(*matchJump));
 				
-				unsigned long *backup;
-				unsigned long u, ua, ub;
-				backup = match_jump + needle_length + 1;
-				
-				// heuristic #1 setup, simple text search
-				for (u=0; u < sizeof char_jump / sizeof *char_jump; u++)
-				{
-					char_jump[u] = needle_length;
-				}
-				
-				for (u = 0; u < needle_length; u++)
-				{
-					char_jump[((unsigned char) needle[u])] = needle_length - u - 1;
-				}
-				
-				// heuristic #2 setup, repeating pattern search
-				for (u = 1; u <= needle_length; u++)
-				{
-					match_jump[u] = 2 * needle_length - u;
-				}
-				
-				u = needle_length;
-				ua = needle_length + 1;
-				while (u > 0)
-				{
-					backup[u] = ua;
-					while (ua <= needle_length && needle[u - 1] != needle[ua - 1])
-					{
-						if (match_jump[ua] > needle_length - u) match_jump[ua] = needle_length - u;
-						ua = backup[ua];
-					}
-					u--; ua--;
-				}
-				
-				for (u = 1; u <= ua; u++)
-				{
-					if (match_jump[u] > needle_length + ua - u) match_jump[u] = needle_length + ua - u;
-				}
-				
-				ub = backup[ua];
-				while (ua <= needle_length)
-				{
-					while (ua <= ub)
-					{
-						if (match_jump[ua] > ub - ua + needle_length)
-						{
-							match_jump[ua] = ub - ua + needle_length;
-						}
-						ua++;
-					}
-					ub = backup[ub];
-				}
-				// ---------------------------------------------------------------------------------------------
+				ZGPrepareBoyerSearch(searchValue, dataSize, bytes, size, charJump, matchJump);
 				
 				unsigned char *foundSubstring = NULL;
-				unsigned char *beginningHaystack = haystack;
+				unsigned char *haystackPivot = bytes;
+				unsigned long haystackLengthLeft = size;
 				
-				while (haystack_length >= needle_length)
+				while (haystackLengthLeft >= dataSize)
 				{
-					foundSubstring = boyer_moore_helper(beginningHaystack, needle, haystack_length, needle_length, char_jump, match_jump);
+					foundSubstring = boyer_moore_helper(haystackPivot, searchValue, haystackLengthLeft, dataSize, charJump, matchJump);
 					if (foundSubstring == NULL) break;
 					
 					if (pointerSize == sizeof(ZGMemoryAddress))
 					{
-						ZGMemoryAddress variableAddress = foundSubstring - haystack + address;
+						ZGMemoryAddress variableAddress = foundSubstring - (unsigned char *)bytes + address;
 						[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
 					}
 					else
 					{
-						ZG32BitMemoryAddress variableAddress = (ZG32BitMemoryAddress)(foundSubstring - haystack + address);
+						ZG32BitMemoryAddress variableAddress = (ZG32BitMemoryAddress)(foundSubstring - (unsigned char *)bytes + address);
 						[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
 					}
 					
-					beginningHaystack = foundSubstring + 1;
-					haystack_length = haystack + size - beginningHaystack;
+					haystackPivot = foundSubstring + 1;
+					haystackLengthLeft = (unsigned char *)bytes + size - haystackPivot;
 				}
 				
-				free(match_jump);
+				free(matchJump);
 				
 				ZGFreeBytes(processTask, bytes, size);
 			}
