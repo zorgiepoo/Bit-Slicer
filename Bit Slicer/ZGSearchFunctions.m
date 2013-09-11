@@ -280,7 +280,8 @@ ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask,
 				
 				if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
 				{
-					while (dataIndex + dataSize <= size)
+					ZGMemorySize endLimit = size - dataSize;
+					while (dataIndex <= endLimit)
 					{
 						if (comparisonFunction(searchData, &bytes[dataIndex], !shouldCompareStoredValues ? (searchValue) : (regionBytes + dataIndex), dataSize))
 						{
