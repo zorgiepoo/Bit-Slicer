@@ -570,6 +570,8 @@
 		self.searchData.compareOffset = self.searchData.searchValue;
 	}
 	
+	self.searchData.shouldUseBoyer = canUseBoyer(dataType, self.searchData.byteArrayFlags);
+	
 	return YES;
 }
 

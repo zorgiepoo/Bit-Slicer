@@ -41,7 +41,181 @@
 #import "NSArrayAdditions.h"
 #import "ZGSearchResults.h"
 
-ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction)
+// Fast string-searching function from HexFiend's framework
+extern unsigned char* boyer_moore_helper(const unsigned char * restrict haystack, const unsigned char * restrict needle, unsigned long haystack_length, unsigned long needle_length, const unsigned long * restrict char_jump, const unsigned long * restrict match_jump);
+
+ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)
+{
+	ZGMemorySize dataSize = searchData.dataSize;
+	ZGMemorySize pointerSize = searchData.pointerSize;
+	
+	void *searchValue = searchData.searchValue;
+	BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
+	
+	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
+	ZGMemoryAddress dataEndAddress = searchData.endAddress;
+	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
+	
+	NSArray *regions;
+	if (!shouldCompareStoredValues)
+	{
+		regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
+			return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
+		}];
+	}
+	else
+	{
+		regions = searchData.savedData;
+	}
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		searchProgress.initiatedSearch = YES;
+		searchProgress.progressType = ZGSearchProgressMemoryScanning;
+		searchProgress.maxProgress = regions.count;
+	});
+	
+	NSMutableArray *allResultSets = [[NSMutableArray alloc] init];
+	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
+	{
+		[allResultSets addObject:[[NSMutableData alloc] init]];
+	}
+	
+	dispatch_apply(regions.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
+		@autoreleasepool
+		{
+			ZGRegion *region = [regions objectAtIndex:regionIndex];
+			ZGMemoryAddress address = region.address;
+			ZGMemorySize size = region.size;
+			
+			NSMutableData *resultSet = [allResultSets objectAtIndex:regionIndex];
+			
+			char *bytes = NULL;
+			if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
+			{
+				// This portion of code is mostly stripped from Hex Fiend's framework; it's wicked fast.
+				// ---------------------------------------------------------------------------------------------
+				unsigned char *needle = searchValue;
+				unsigned long needle_length = dataSize;
+				unsigned char *haystack = (unsigned char *)bytes;
+				unsigned long haystack_length = size;
+				
+				// generate the two Boyer-Moore auxiliary buffers
+				unsigned long char_jump[UCHAR_MAX + 1] = {0};
+				unsigned long *match_jump = malloc(2 * (needle_length + 1) * sizeof(*match_jump));
+				
+				unsigned long *backup;
+				unsigned long u, ua, ub;
+				backup = match_jump + needle_length + 1;
+				
+				// heuristic #1 setup, simple text search
+				for (u=0; u < sizeof char_jump / sizeof *char_jump; u++)
+				{
+					char_jump[u] = needle_length;
+				}
+				
+				for (u = 0; u < needle_length; u++)
+				{
+					char_jump[((unsigned char) needle[u])] = needle_length - u - 1;
+				}
+				
+				// heuristic #2 setup, repeating pattern search
+				for (u = 1; u <= needle_length; u++)
+				{
+					match_jump[u] = 2 * needle_length - u;
+				}
+				
+				u = needle_length;
+				ua = needle_length + 1;
+				while (u > 0)
+				{
+					backup[u] = ua;
+					while (ua <= needle_length && needle[u - 1] != needle[ua - 1])
+					{
+						if (match_jump[ua] > needle_length - u) match_jump[ua] = needle_length - u;
+						ua = backup[ua];
+					}
+					u--; ua--;
+				}
+				
+				for (u = 1; u <= ua; u++)
+				{
+					if (match_jump[u] > needle_length + ua - u) match_jump[u] = needle_length + ua - u;
+				}
+				
+				ub = backup[ua];
+				while (ua <= needle_length)
+				{
+					while (ua <= ub)
+					{
+						if (match_jump[ua] > ub - ua + needle_length)
+						{
+							match_jump[ua] = ub - ua + needle_length;
+						}
+						ua++;
+					}
+					ub = backup[ub];
+				}
+				// ---------------------------------------------------------------------------------------------
+				
+				unsigned char *foundSubstring = NULL;
+				unsigned char *beginningHaystack = haystack;
+				
+				while (haystack_length >= needle_length)
+				{
+					foundSubstring = boyer_moore_helper(beginningHaystack, needle, haystack_length, needle_length, char_jump, match_jump);
+					if (foundSubstring == NULL) break;
+					
+					if (pointerSize == sizeof(ZGMemoryAddress))
+					{
+						ZGMemoryAddress variableAddress = foundSubstring - haystack + address;
+						[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
+					}
+					else
+					{
+						ZG32BitMemoryAddress variableAddress = (ZG32BitMemoryAddress)(foundSubstring - haystack + address);
+						[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
+					}
+					
+					beginningHaystack = foundSubstring + 1;
+					haystack_length = haystack + size - beginningHaystack;
+				}
+				
+				free(match_jump);
+				
+				ZGFreeBytes(processTask, bytes, size);
+			}
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				searchProgress.numberOfVariablesFound += resultSet.length / pointerSize;
+				searchProgress.progress++;
+			});
+		}
+	});
+	
+	NSArray *resultSets;
+	
+	if (searchProgress.shouldCancelSearch)
+	{
+		resultSets = [NSArray array];
+		
+		// Deallocate results into separate queue since this could take some time
+		__block id oldResultSets = allResultSets;
+		allResultSets = nil;
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			oldResultSets = nil;
+		});
+	}
+	else
+	{
+		resultSets = [allResultSets zgFilterUsingBlock:(zg_array_filter_t)^(NSMutableData *resultSet) {
+			return resultSet.length == 0;
+		}];
+	}
+	
+	return [[ZGSearchResults alloc] initWithResultSets:resultSets dataSize:dataSize pointerSize:pointerSize];
+}
+
+ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction)
 {
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	ZGMemorySize dataSize = searchData.dataSize;
@@ -153,6 +327,11 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 	}
 	
 	return [[ZGSearchResults alloc] initWithResultSets:resultSets dataSize:dataSize pointerSize:pointerSize];
+}
+
+ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction)
+{
+	return (searchData.shouldUseBoyer ? ZGSearchForBytes(processTask, searchData, searchProgress) : ZGSearchForDataUsingComparisonFunction(processTask, searchData, searchProgress, comparisonFunction));
 }
 
 ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults)

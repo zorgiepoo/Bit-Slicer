@@ -48,4 +48,6 @@ BOOL isValidNumber(NSString *expression);
 void *valueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
 ZGMemorySize dataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
+BOOL canUseBoyer(ZGVariableType dataType, unsigned char *byteArrayFlags);
+
 unsigned char *allocateFlagsForByteArrayWildcards(NSString *searchValue);

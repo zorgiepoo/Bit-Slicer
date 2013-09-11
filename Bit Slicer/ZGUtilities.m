@@ -252,6 +252,11 @@ ZGMemorySize dataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemor
 	return dataAlignment;
 }
 
+BOOL canUseBoyer(ZGVariableType dataType, unsigned char *byteArrayFlags)
+{
+	return ((dataType == ZGByteArray && byteArrayFlags == NULL) || dataType == ZGString8 || dataType == ZGString16);
+}
+
 unsigned char *allocateFlagsForByteArrayWildcards(NSString *searchValue)
 {
 	NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
