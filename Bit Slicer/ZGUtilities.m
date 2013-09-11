@@ -252,7 +252,7 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	return dataAlignment;
 }
 
-BOOL ZGCanUseBoyer(ZGVariableType dataType, ZGSearchData *searchData)
+BOOL ZGCanUseBoyerMoore(ZGVariableType dataType, ZGSearchData *searchData)
 {
 	return ((dataType == ZGByteArray && searchData.byteArrayFlags == NULL) || ((dataType == ZGString8 || dataType == ZGString16) && !searchData.shouldIgnoreStringCase)) && !searchData.shouldCompareStoredValues;
 }

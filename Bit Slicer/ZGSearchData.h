@@ -66,7 +66,7 @@
 @property (nonatomic) BOOL shouldScanUnwritableValues;
 @property (nonatomic) void *compareOffset;
 @property (nonatomic) unsigned char *byteArrayFlags;
-@property (nonatomic) BOOL shouldUseBoyer;
+@property (nonatomic) BOOL shouldUseBoyerMoore;
 
 - (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
 

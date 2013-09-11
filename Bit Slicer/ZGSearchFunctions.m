@@ -45,7 +45,7 @@
 extern unsigned char* boyer_moore_helper(const unsigned char * restrict haystack, const unsigned char * restrict needle, unsigned long haystack_length, unsigned long needle_length, const unsigned long * restrict char_jump, const unsigned long * restrict match_jump);
 
 // This portion of code is mostly stripped from a function in Hex Fiend's framework; it's wicked fast.
-void ZGPrepareBoyerSearch(const unsigned char *needle, const unsigned long needle_length, const unsigned char *haystack, unsigned long haystack_length, unsigned long *char_jump, unsigned long *match_jump)
+void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long needle_length, const unsigned char *haystack, unsigned long haystack_length, unsigned long *char_jump, unsigned long *match_jump)
 {
 	unsigned long *backup;
 	unsigned long u, ua, ub;
@@ -153,7 +153,7 @@ ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchD
 				unsigned long charJump[UCHAR_MAX + 1] = {0};
 				unsigned long *matchJump = malloc(2 * (dataSize + 1) * sizeof(*matchJump));
 				
-				ZGPrepareBoyerSearch(searchValue, dataSize, bytes, size, charJump, matchJump);
+				ZGPrepareBoyerMooreSearch(searchValue, dataSize, bytes, size, charJump, matchJump);
 				
 				unsigned char *foundSubstring = NULL;
 				unsigned char *haystackPivot = bytes;
@@ -330,7 +330,7 @@ ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask,
 
 ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction)
 {
-	return (searchData.shouldUseBoyer ? ZGSearchForBytes(processTask, searchData, searchProgress) : ZGSearchForDataUsingComparisonFunction(processTask, searchData, searchProgress, comparisonFunction));
+	return (searchData.shouldUseBoyerMoore ? ZGSearchForBytes(processTask, searchData, searchProgress) : ZGSearchForDataUsingComparisonFunction(processTask, searchData, searchProgress, comparisonFunction));
 }
 
 ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults)

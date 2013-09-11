@@ -498,7 +498,7 @@ static PyObject *VirtualMemory_scanByteString(VirtualMemory *self, PyObject *arg
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		
 		searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(@(byteArrayString));
-		searchData.shouldUseBoyer = ZGCanUseBoyer(ZGByteArray, searchData);
+		searchData.shouldUseBoyerMoore = ZGCanUseBoyerMoore(ZGByteArray, searchData);
 		
 		retValue = scanSearchData(self, searchData);
 	}
@@ -527,7 +527,7 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 		 dataSize:buffer.len
 		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, buffer.len)
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
-		searchData.shouldUseBoyer = YES;
+		searchData.shouldUseBoyerMoore = YES;
 		
 		retValue = scanSearchData(self, searchData);
 		
