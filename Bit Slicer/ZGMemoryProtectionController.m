@@ -80,10 +80,10 @@
 - (IBAction)changeProtectionOkayButton:(id)sender
 {
 	NSString *addressExpression = [ZGCalculator evaluateExpression:self.changeProtectionAddressTextField.stringValue];
-	ZGMemoryAddress address = memoryAddressFromExpression(addressExpression);
+	ZGMemoryAddress address = ZGMemoryAddressFromExpression(addressExpression);
 	
 	NSString *sizeExpression = [ZGCalculator evaluateExpression:self.changeProtectionSizeTextField.stringValue];
-	ZGMemorySize size = (ZGMemorySize)memoryAddressFromExpression(sizeExpression);
+	ZGMemorySize size = (ZGMemorySize)ZGMemoryAddressFromExpression(sizeExpression);
 	
 	if (size > 0 && ![addressExpression isEqualToString:@""] && ![sizeExpression isEqualToString:@""])
 	{

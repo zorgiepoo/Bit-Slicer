@@ -113,7 +113,7 @@
 
 - (NSString *)testSearchComponent:(NSString *)searchComponent
 {
-	return isValidNumber(searchComponent) ? nil : @"The function you are using requires the search value to be a valid expression."; 
+	return ZGIsValidNumber(searchComponent) ? nil : @"The function you are using requires the search value to be a valid expression.";
 }
 
 - (NSString *)confirmSearchInput:(NSString *)expression
@@ -423,7 +423,7 @@
 	
 	// get search value and data size
 	ZGMemorySize tempDataSize = 0;
-	self.searchData.searchValue = valueFromString(self.windowController.currentProcess.is64Bit, evaluatedSearchExpression, dataType, &tempDataSize);
+	self.searchData.searchValue = ZGValueFromString(self.windowController.currentProcess.is64Bit, evaluatedSearchExpression, dataType, &tempDataSize);
 	self.searchData.dataSize = tempDataSize;
 	
 	// We want to read the null terminator in this case... even though we normally don't store the terminator
@@ -450,7 +450,7 @@
 	self.searchData.dataAlignment =
 		self.documentData.ignoreDataAlignment
 		? sizeof(int8_t)
-		: dataAlignment(self.windowController.currentProcess.is64Bit, dataType, self.searchData.dataSize);
+		: ZGDataAlignment(self.windowController.currentProcess.is64Bit, dataType, self.searchData.dataSize);
 	
 	BOOL flagsFieldIsBlank = [[self.windowController.flagsTextField.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] isEqualToString:@""];
 	
@@ -480,7 +480,7 @@
 				{
 					// Clearly a range type of search
 					ZGMemorySize rangeDataSize;
-					self.searchData.rangeValue = valueFromString(self.windowController.currentProcess.is64Bit, flagsExpression, dataType, &rangeDataSize);
+					self.searchData.rangeValue = ZGValueFromString(self.windowController.currentProcess.is64Bit, flagsExpression, dataType, &rangeDataSize);
 				}
 				else
 				{
@@ -502,7 +502,7 @@
 				{
 					// Clearly an epsilon flag
 					ZGMemorySize epsilonDataSize;
-					void *epsilon = valueFromString(self.windowController.currentProcess.is64Bit, flagsExpression, ZGDouble, &epsilonDataSize);
+					void *epsilon = ZGValueFromString(self.windowController.currentProcess.is64Bit, flagsExpression, ZGDouble, &epsilonDataSize);
 					if (epsilon)
 					{
 						self.searchData.epsilon = *((double *)epsilon);
@@ -532,7 +532,7 @@
 			return NO;
 		}
 		
-		self.searchData.beginAddress = memoryAddressFromExpression(calculatedBeginAddress);
+		self.searchData.beginAddress = ZGMemoryAddressFromExpression(calculatedBeginAddress);
 	}
 	else
 	{
@@ -547,7 +547,7 @@
 			return NO;
 		}
 		
-		self.searchData.endAddress = memoryAddressFromExpression(calculatedEndAddress);
+		self.searchData.endAddress = ZGMemoryAddressFromExpression(calculatedEndAddress);
 	}
 	else
 	{
@@ -562,7 +562,7 @@
 	
 	if (dataType == ZGByteArray)
 	{
-		self.searchData.byteArrayFlags = allocateFlagsForByteArrayWildcards(evaluatedSearchExpression);
+		self.searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(evaluatedSearchExpression);
 	}
 	
 	if (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
@@ -570,7 +570,7 @@
 		self.searchData.compareOffset = self.searchData.searchValue;
 	}
 	
-	self.searchData.shouldUseBoyer = canUseBoyer(dataType, self.searchData.byteArrayFlags);
+	self.searchData.shouldUseBoyer = ZGCanUseBoyer(dataType, self.searchData.byteArrayFlags);
 	
 	return YES;
 }

@@ -42,12 +42,12 @@
 	#define ZG_LOG(format, ...) do { } while (0)
 #endif
 
-ZGMemoryAddress memoryAddressFromExpression(NSString *expression);
-BOOL isValidNumber(NSString *expression);
+ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression);
+BOOL ZGIsValidNumber(NSString *expression);
 
-void *valueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
-ZGMemorySize dataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
+void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
+ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
-BOOL canUseBoyer(ZGVariableType dataType, unsigned char *byteArrayFlags);
+BOOL ZGCanUseBoyer(ZGVariableType dataType, unsigned char *byteArrayFlags);
 
-unsigned char *allocateFlagsForByteArrayWildcards(NSString *searchValue);
+unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);

@@ -488,17 +488,17 @@ static PyObject *VirtualMemory_scanByteString(VirtualMemory *self, PyObject *arg
 	if (PyArg_ParseTuple(args, "s:scanByteString", &byteArrayString))
 	{
 		ZGMemorySize dataSize = 0;
-		void *searchValue = valueFromString(self->is64Bit, @(byteArrayString), ZGByteArray, &dataSize);
+		void *searchValue = ZGValueFromString(self->is64Bit, @(byteArrayString), ZGByteArray, &dataSize);
 		
 		ZGSearchData *searchData =
 		[[ZGSearchData alloc]
 		 initWithSearchValue:searchValue
 		 dataSize:dataSize
-		 dataAlignment:dataAlignment(self->is64Bit, ZGByteArray, dataSize)
+		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, dataSize)
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		
-		searchData.byteArrayFlags = allocateFlagsForByteArrayWildcards(@(byteArrayString));
-		searchData.shouldUseBoyer = canUseBoyer(ZGByteArray, searchData.byteArrayFlags);
+		searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(@(byteArrayString));
+		searchData.shouldUseBoyer = ZGCanUseBoyer(ZGByteArray, searchData.byteArrayFlags);
 		
 		retValue = scanSearchData(self, searchData);
 	}
@@ -525,7 +525,7 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 		[[ZGSearchData alloc]
 		 initWithSearchValue:data
 		 dataSize:buffer.len
-		 dataAlignment:dataAlignment(self->is64Bit, ZGByteArray, buffer.len)
+		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, buffer.len)
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		searchData.shouldUseBoyer = YES;
 		

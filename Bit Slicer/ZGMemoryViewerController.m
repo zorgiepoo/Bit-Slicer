@@ -519,9 +519,9 @@ END_MEMORY_VIEW_CHANGE:
 	
 	ZGMemoryAddress calculatedMemoryAddress = 0;
 	
-	if (isValidNumber(calculatedMemoryAddressExpression))
+	if (ZGIsValidNumber(calculatedMemoryAddressExpression))
 	{
-		calculatedMemoryAddress = memoryAddressFromExpression(calculatedMemoryAddressExpression);
+		calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
 	}
 	
 	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];

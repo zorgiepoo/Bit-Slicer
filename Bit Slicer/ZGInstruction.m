@@ -100,7 +100,7 @@
 	NSArray *callComponents = [self.text componentsSeparatedByString:@" "];
 	if ([callComponents count] > 1)
 	{
-		callAddress = memoryAddressFromExpression([callComponents objectAtIndex:1]);
+		callAddress = ZGMemoryAddressFromExpression([callComponents objectAtIndex:1]);
 	}
 	
 	return callAddress;

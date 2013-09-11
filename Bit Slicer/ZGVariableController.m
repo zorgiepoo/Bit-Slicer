@@ -993,7 +993,7 @@
 		requestedSize = sizeExpression.zgUnsignedLongLongValue;
 	}
 	
-	if (!isValidNumber(sizeExpression))
+	if (!ZGIsValidNumber(sizeExpression))
 	{
 		NSRunAlertPanel(@"Invalid size", @"The size you have supplied is not valid.", nil, nil, nil);
 	}

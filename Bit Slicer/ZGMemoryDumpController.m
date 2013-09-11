@@ -77,10 +77,10 @@
 - (IBAction)memoryDumpOkayButton:(id)sender
 {
 	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:self.memoryDumpFromAddressTextField.stringValue];
-	ZGMemoryAddress fromAddress = memoryAddressFromExpression(fromAddressExpression);
+	ZGMemoryAddress fromAddress = ZGMemoryAddressFromExpression(fromAddressExpression);
 	
 	NSString *toAddressExpression = [ZGCalculator evaluateExpression:self.memoryDumpToAddressTextField.stringValue];
-	ZGMemoryAddress toAddress = memoryAddressFromExpression(toAddressExpression);
+	ZGMemoryAddress toAddress = ZGMemoryAddressFromExpression(toAddressExpression);
 	
 	if (toAddress > fromAddress && ![fromAddressExpression isEqualToString:@""] && ![toAddressExpression isEqualToString:@""])
 	{

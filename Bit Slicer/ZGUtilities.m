@@ -35,7 +35,7 @@
 #import "ZGUtilities.h"
 #import "NSStringAdditions.h"
 
-ZGMemoryAddress memoryAddressFromExpression(NSString *expression)
+ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression)
 {
 	ZGMemoryAddress address;
 	if (expression.zgIsHexRepresentation)
@@ -50,7 +50,7 @@ ZGMemoryAddress memoryAddressFromExpression(NSString *expression)
 	return address;
 }
 
-BOOL isValidNumber(NSString *expression)
+BOOL ZGIsValidNumber(NSString *expression)
 {
 	BOOL result = YES;
 	
@@ -65,7 +65,7 @@ BOOL isValidNumber(NSString *expression)
 	return result;
 }
 
-void *valueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
+void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
 {
 	void *value = NULL;
 	BOOL searchValueIsAHexRepresentation = stringValue.zgIsHexRepresentation;
@@ -231,7 +231,7 @@ void *valueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType
 	return value;
 }
 
-ZGMemorySize dataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
+ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
 {
 	ZGMemorySize dataAlignment;
 	
@@ -252,12 +252,12 @@ ZGMemorySize dataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemor
 	return dataAlignment;
 }
 
-BOOL canUseBoyer(ZGVariableType dataType, unsigned char *byteArrayFlags)
+BOOL ZGCanUseBoyer(ZGVariableType dataType, unsigned char *byteArrayFlags)
 {
 	return ((dataType == ZGByteArray && byteArrayFlags == NULL) || dataType == ZGString8 || dataType == ZGString16);
 }
 
-unsigned char *allocateFlagsForByteArrayWildcards(NSString *searchValue)
+unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue)
 {
 	NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
 	

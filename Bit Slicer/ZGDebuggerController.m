@@ -984,9 +984,9 @@
 		
 		ZGMemoryAddress calculatedMemoryAddress = 0;
 		
-		if (isValidNumber(calculatedMemoryAddressExpression))
+		if (ZGIsValidNumber(calculatedMemoryAddressExpression))
 		{
-			calculatedMemoryAddress = memoryAddressFromExpression(calculatedMemoryAddressExpression);
+			calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
 		}
 		
 		if (calculatedMemoryAddress < self.currentProcess.mainAddress)
@@ -1635,7 +1635,7 @@ END_DEBUGGER_CHANGE:
 	// Make sure the old and new value that we are writing have the same size in bytes, so that undo/redo will work correctly for different sizes
 	
 	ZGMemorySize newWriteSize = 0;
-	void *newWriteValue = valueFromString(self.currentProcess.is64Bit, stringValue, ZGByteArray, &newWriteSize);
+	void *newWriteValue = ZGValueFromString(self.currentProcess.is64Bit, stringValue, ZGByteArray, &newWriteSize);
 	if (newWriteValue)
 	{
 		if (newWriteSize > 0)
@@ -1718,7 +1718,7 @@ END_DEBUGGER_CHANGE:
 - (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort is64Bit:(BOOL)is64Bit
 {
 	ZGMemorySize newSize = 0;
-	void *newValue = valueFromString(is64Bit, stringValue, ZGByteArray, &newSize);
+	void *newValue = ZGValueFromString(is64Bit, stringValue, ZGByteArray, &newSize);
 	
 	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] atAddress:address inTaskPort:taskPort is64Bit:is64Bit];
 }
