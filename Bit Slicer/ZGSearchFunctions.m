@@ -280,9 +280,6 @@ ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask,
 				
 				if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
 				{
-					void *addressTable = malloc(pointerSize * size / dataAlignment);
-					ZGMemoryAddress numberOfVariablesFound = 0;
-					
 					ZGMemorySize endLimit = size - dataSize;
 					while (dataIndex <= endLimit)
 					{
@@ -291,19 +288,22 @@ ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask,
 							switch (pointerSize)
 							{
 								case sizeof(ZGMemoryAddress):
-									((ZGMemoryAddress *)addressTable)[numberOfVariablesFound++] = address + dataIndex;
+								{
+									ZGMemoryAddress memoryAddress = address + dataIndex;
+									[resultSet appendBytes:&memoryAddress length:sizeof(memoryAddress)];
 									break;
+								}
 								case sizeof(ZG32BitMemoryAddress):
-									((ZG32BitMemoryAddress *)addressTable)[numberOfVariablesFound++] = (ZG32BitMemoryAddress)(address + dataIndex);
+								{
+									ZG32BitMemoryAddress memoryAddress = (ZG32BitMemoryAddress)(address + dataIndex);
+									[resultSet appendBytes:&memoryAddress length:sizeof(memoryAddress)];
 									break;
+								}
 							}
 						}
+						
 						dataIndex += dataAlignment;
 					}
-					
-					[resultSet appendBytes:addressTable length:numberOfVariablesFound * pointerSize];
-					
-					free(addressTable);
 					
 					ZGFreeBytes(processTask, bytes, size);
 				}
