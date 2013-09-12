@@ -570,7 +570,7 @@
 		self.searchData.compareOffset = self.searchData.searchValue;
 	}
 	
-	self.searchData.shouldUseBoyerMoore = ZGCanUseBoyerMoore(dataType, self.searchData);
+	self.searchData.shouldUseBoyerMoore = ZGCanUseBoyerMoore(dataType, functionType, self.searchData);
 	
 	return YES;
 }
