@@ -1170,6 +1170,11 @@ static NSSize *expandedWindowMinSize = nil;
 	self.searchData.shouldIgnoreStringCase = [sender state];
 }
 
+- (IBAction)ignoreDataAlignment:(id)sender
+{
+	self.documentData.ignoreDataAlignment = [sender state];
+}
+
 - (IBAction)changeNullTerminatorInclusion:(id)sender
 {
 	self.searchData.shouldIncludeNullTerminator = [sender state];

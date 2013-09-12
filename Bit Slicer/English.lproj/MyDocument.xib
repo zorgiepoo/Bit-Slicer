@@ -966,7 +966,7 @@
 											<string key="NSFrameSize">{381, 368}</string>
 											<reference key="NSSuperview" ref="368221251"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="587801537"/>
+											<reference key="NSNextKeyView" ref="1019910359"/>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1383,7 +1383,7 @@
 							<string key="NSFrame">{{247, 52}, {383, 386}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="1019910359"/>
+							<reference key="NSNextKeyView" ref="368221251"/>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="587801537"/>
 							<reference key="NSHScroller" ref="292245707"/>
@@ -1401,7 +1401,6 @@
 							<string key="NSFrame">{{12, 16}, {618, 20}}</string>
 							<reference key="NSSuperview" ref="564653584"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<int key="NSpiFlags">16396</int>
 							<double key="NSMaxValue">100</double>
 						</object>
@@ -2950,6 +2949,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">ignoreDataAlignment:</string>
+						<reference key="source" ref="646639791"/>
+						<reference key="destination" ref="721653573"/>
+					</object>
+					<string key="id">1wa-bx-mcV</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">addVariable:</string>
 						<reference key="source" ref="201649241"/>
 						<reference key="destination" ref="143200447"/>
@@ -3075,14 +3082,6 @@
 						<reference key="destination" ref="90906749"/>
 					</object>
 					<string key="id">100828</string>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">markDocumentChange:</string>
-						<reference key="source" ref="201649241"/>
-						<reference key="destination" ref="721653573"/>
-					</object>
-					<string key="id">100698</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -4913,17 +4912,185 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">ZGDocumentWindowController</string>
 					<string key="superclassName">NSWindowController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">editVariablesAddress:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">editVariablesAddress:</string>
-						<object class="IBActionInfo" key="NS.object.0">
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="addVariable:">id</string>
+						<string key="changeBeginningAddressString:">id</string>
+						<string key="changeEndingAddressString:">id</string>
+						<string key="changeNullTerminatorInclusion:">id</string>
+						<string key="changeSearchValueString:">id</string>
+						<string key="changeStringCaseOption:">id</string>
+						<string key="changeUnwritableValuesOption:">id</string>
+						<string key="clearSearchValues:">id</string>
+						<string key="copy:">id</string>
+						<string key="copyAddress:">id</string>
+						<string key="cut:">id</string>
+						<string key="dataTypePopUpButtonRequest:">id</string>
+						<string key="editVariablesAddress:">id</string>
+						<string key="editVariablesAddressCancelButton:">id</string>
+						<string key="editVariablesAddressOKButton:">id</string>
+						<string key="editVariablesSize:">id</string>
+						<string key="editVariablesSizeCancelButton:">id</string>
+						<string key="editVariablesSizeOKButton:">id</string>
+						<string key="editVariablesValue:">id</string>
+						<string key="editVariablesValueCancelButton:">id</string>
+						<string key="editVariablesValueOKButton:">id</string>
+						<string key="freezeVariables:">id</string>
+						<string key="functionTypePopUpButtonRequest:">id</string>
+						<string key="ignoreDataAlignment:">id</string>
+						<string key="nopVariables:">id</string>
+						<string key="optionsDisclosureButton:">id</string>
+						<string key="paste:">id</string>
+						<string key="pauseOrUnpauseProcess:">id</string>
+						<string key="removeSelectedSearchValues:">id</string>
+						<string key="runningApplicationsPopUpButtonRequest:">id</string>
+						<string key="searchValue:">id</string>
+						<string key="showDebugger:">id</string>
+						<string key="showMemoryViewer:">id</string>
+						<string key="storeAllValues:">id</string>
+						<string key="watchVariable:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="addVariable:">
+							<string key="name">addVariable:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeBeginningAddressString:">
+							<string key="name">changeBeginningAddressString:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeEndingAddressString:">
+							<string key="name">changeEndingAddressString:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeNullTerminatorInclusion:">
+							<string key="name">changeNullTerminatorInclusion:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeSearchValueString:">
+							<string key="name">changeSearchValueString:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeStringCaseOption:">
+							<string key="name">changeStringCaseOption:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeUnwritableValuesOption:">
+							<string key="name">changeUnwritableValuesOption:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="clearSearchValues:">
+							<string key="name">clearSearchValues:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copyAddress:">
+							<string key="name">copyAddress:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="cut:">
+							<string key="name">cut:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="dataTypePopUpButtonRequest:">
+							<string key="name">dataTypePopUpButtonRequest:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesAddress:">
 							<string key="name">editVariablesAddress:</string>
 							<string key="candidateClassName">id</string>
 						</object>
-					</object>
+						<object class="IBActionInfo" key="editVariablesAddressCancelButton:">
+							<string key="name">editVariablesAddressCancelButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesAddressOKButton:">
+							<string key="name">editVariablesAddressOKButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesSize:">
+							<string key="name">editVariablesSize:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesSizeCancelButton:">
+							<string key="name">editVariablesSizeCancelButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesSizeOKButton:">
+							<string key="name">editVariablesSizeOKButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesValue:">
+							<string key="name">editVariablesValue:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesValueCancelButton:">
+							<string key="name">editVariablesValueCancelButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="editVariablesValueOKButton:">
+							<string key="name">editVariablesValueOKButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="freezeVariables:">
+							<string key="name">freezeVariables:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="functionTypePopUpButtonRequest:">
+							<string key="name">functionTypePopUpButtonRequest:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="ignoreDataAlignment:">
+							<string key="name">ignoreDataAlignment:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="nopVariables:">
+							<string key="name">nopVariables:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="optionsDisclosureButton:">
+							<string key="name">optionsDisclosureButton:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="paste:">
+							<string key="name">paste:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="pauseOrUnpauseProcess:">
+							<string key="name">pauseOrUnpauseProcess:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="removeSelectedSearchValues:">
+							<string key="name">removeSelectedSearchValues:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="runningApplicationsPopUpButtonRequest:">
+							<string key="name">runningApplicationsPopUpButtonRequest:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="searchValue:">
+							<string key="name">searchValue:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showDebugger:">
+							<string key="name">showDebugger:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showMemoryViewer:">
+							<string key="name">showMemoryViewer:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="storeAllValues:">
+							<string key="name">storeAllValues:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="watchVariable:">
+							<string key="name">watchVariable:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="beginningAddressLabel">NSTextField</string>
 						<string key="beginningAddressTextField">NSTextField</string>
