@@ -280,24 +280,30 @@ ZGSearchResults *ZGSearchForDataUsingComparisonFunction(ZGMemoryMap processTask,
 				
 				if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, (void **)&bytes, &size))
 				{
+					void *addressTable = malloc(pointerSize * size / dataAlignment);
+					ZGMemoryAddress numberOfVariablesFound = 0;
+					
 					ZGMemorySize endLimit = size - dataSize;
 					while (dataIndex <= endLimit)
 					{
 						if (comparisonFunction(searchData, &bytes[dataIndex], !shouldCompareStoredValues ? (searchValue) : (regionBytes + dataIndex), dataSize))
 						{
-							if (pointerSize == sizeof(ZGMemoryAddress))
+							switch (pointerSize)
 							{
-								ZGMemoryAddress variableAddress = address + dataIndex;
-								[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
-							}
-							else
-							{
-								ZG32BitMemoryAddress variableAddress = (ZG32BitMemoryAddress)(address + dataIndex);
-								[resultSet appendBytes:&variableAddress length:sizeof(variableAddress)];
+								case sizeof(ZGMemoryAddress):
+									((ZGMemoryAddress *)addressTable)[numberOfVariablesFound++] = address + dataIndex;
+									break;
+								case sizeof(ZG32BitMemoryAddress):
+									((ZG32BitMemoryAddress *)addressTable)[numberOfVariablesFound++] = (ZG32BitMemoryAddress)(address + dataIndex);
+									break;
 							}
 						}
 						dataIndex += dataAlignment;
 					}
+					
+					[resultSet appendBytes:addressTable length:numberOfVariablesFound * pointerSize];
+					
+					free(addressTable);
 					
 					ZGFreeBytes(processTask, bytes, size);
 				}
