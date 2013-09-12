@@ -767,7 +767,7 @@ static NSSize *expandedWindowMinSize = nil;
 		self.includeNullTerminatorCheckBox.state = NSOffState;
 	}
 	
-	self.ignoreDataAlignmentCheckBox.enabled = (newTag != ZGString8 && newTag != ZGInt8);
+	self.ignoreDataAlignmentCheckBox.enabled = (newTag != ZGString8 && newTag != ZGInt8 && newTag != ZGByteArray);
 	
 	[self updateFlagsAndSearchButtonTitle];
 	
