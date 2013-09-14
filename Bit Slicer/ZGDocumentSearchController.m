@@ -602,7 +602,7 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		if (!isNarrowing)
 		{
-			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction);
+			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, dataType, self.documentData.qualifierTag, self.documentData.functionTypeTag);
 		}
 		else
 		{

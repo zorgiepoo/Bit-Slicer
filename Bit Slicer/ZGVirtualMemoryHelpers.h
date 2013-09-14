@@ -35,6 +35,10 @@
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 @class ZGSearchData;
 @class ZGSearchProgress;
 @class ZGRegion;
@@ -54,3 +58,7 @@ void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained s
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSearchProgress *searchProgress);
 
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize, ZGMemorySize maxStringSizeLimit);
+	
+#ifdef __cplusplus
+}
+#endif

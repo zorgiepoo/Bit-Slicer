@@ -36,24 +36,5 @@
 #import "ZGVariableTypes.h"
 #import "ZGSearchFunctions.h"
 
-typedef enum
-{
-	// Regular comparisons
-	ZGEquals = 0,
-	ZGNotEquals,
-	ZGGreaterThan,
-	ZGLessThan,
-	// Stored comparisons
-	ZGEqualsStored,
-	ZGNotEqualsStored,
-	ZGGreaterThanStored,
-	ZGLessThanStored,
-	// Special Stored comparisons
-	ZGEqualsStoredPlus,
-	ZGNotEqualsStoredPlus,
-	
-	ZGStoreAllValues,
-} ZGFunctionType;
-
 comparison_function_t getComparisonFunction(ZGFunctionType functionType, ZGVariableType dataType, BOOL is64Bit, ZGVariableQualifier qualifier);
 

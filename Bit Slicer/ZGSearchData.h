@@ -41,6 +41,7 @@
 {
 @public
 	// All for fast access, for comparison functions
+	ZGMemorySize _dataSize;
 	void *_rangeValue;
 	double _epsilon;
 	BOOL _shouldIgnoreStringCase;

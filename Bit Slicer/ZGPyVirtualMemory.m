@@ -453,7 +453,6 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData)
 	PyObject *retValue = NULL;
 	if (searchData.dataSize > 0)
 	{
-		comparison_function_t comparisonFunction = getComparisonFunction(ZGEquals, ZGByteArray, self->is64Bit, 0);
 		ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] init];
 		
 		@synchronized(self->objectsPool)
@@ -461,7 +460,7 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData)
 			[self->objectsPool addObject:searchProgress];
 		}
 		
-		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, searchProgress, comparisonFunction);
+		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, searchProgress, ZGByteArray, 0, ZGEquals);
 		
 		@synchronized(self->objectsPool)
 		{

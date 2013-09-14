@@ -35,6 +35,10 @@
 #ifndef _ZG_VIRTUAL_MEMORY_H
 #define _ZG_VIRTUAL_MEMORY_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "ZGMemoryTypes.h"
 #include <mach/vm_region.h>
 #include <stdbool.h>
@@ -66,5 +70,9 @@ bool ZGSuspendCount(ZGMemoryMap processTask, integer_t *suspendCount);
 
 bool ZGSuspendTask(ZGMemoryMap processTask);
 bool ZGResumeTask(ZGMemoryMap processTask);
+	
+#ifdef __cplusplus
+}
+#endif
 
 #endif

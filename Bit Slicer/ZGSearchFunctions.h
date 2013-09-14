@@ -34,13 +34,42 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
 
 @class ZGSearchData;
 @class ZGSearchProgress;
 @class ZGSearchResults;
 
+typedef enum
+{
+	// Regular comparisons
+	ZGEquals = 0,
+	ZGNotEquals,
+	ZGGreaterThan,
+	ZGLessThan,
+	// Stored comparisons
+	ZGEqualsStored,
+	ZGNotEqualsStored,
+	ZGGreaterThanStored,
+	ZGLessThanStored,
+	// Special Stored comparisons
+	ZGEqualsStoredPlus,
+	ZGNotEqualsStoredPlus,
+	
+	ZGStoreAllValues,
+} ZGFunctionType;
+
 typedef BOOL (*comparison_function_t)(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGMemorySize size);
 
-ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction);
+#ifdef __cplusplus
+extern "C"
+#endif
+ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType);
 
+#ifdef __cplusplus
+extern "C"
+#endif
 ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults);
+
+typedef void (^zg_search_for_data_helper_t)(ZGMemorySize dataIndex, ZGMemoryAddress address, ZGMemorySize size, NSMutableData * __unsafe_unretained resultSet, void *bytes, void *regionBytes);
+

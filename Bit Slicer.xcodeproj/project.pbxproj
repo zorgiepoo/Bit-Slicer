@@ -81,7 +81,7 @@
 		77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160E17D2EED6009E002A /* ZGSearchData.m */; };
 		77F1161217D2EEE1009E002A /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161117D2EEE1009E002A /* ZGSearchProgress.m */; };
 		77F1161517D2EEEC009E002A /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGSearchResults.m */; };
-		77F1161817D2EEF6009E002A /* ZGSearchFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161717D2EEF6009E002A /* ZGSearchFunctions.m */; };
+		77F1161817D2EEF6009E002A /* ZGSearchFunctions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */; };
 		77F1161B17D2EEFF009E002A /* ZGComparisonFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161A17D2EEFF009E002A /* ZGComparisonFunctions.m */; };
 		77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161D17D2EF14009E002A /* ZGVirtualMemory.c */; };
 		77F1162217D2EF28009E002A /* ZGVirtualMemoryHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */; };
@@ -263,7 +263,7 @@
 		77F1161317D2EEEC009E002A /* ZGSearchResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchResults.h; path = "Bit Slicer/ZGSearchResults.h"; sourceTree = "<group>"; };
 		77F1161417D2EEEC009E002A /* ZGSearchResults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchResults.m; path = "Bit Slicer/ZGSearchResults.m"; sourceTree = "<group>"; };
 		77F1161617D2EEF6009E002A /* ZGSearchFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchFunctions.h; path = "Bit Slicer/ZGSearchFunctions.h"; sourceTree = "<group>"; };
-		77F1161717D2EEF6009E002A /* ZGSearchFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchFunctions.m; path = "Bit Slicer/ZGSearchFunctions.m"; sourceTree = "<group>"; };
+		77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ZGSearchFunctions.mm; path = "Bit Slicer/ZGSearchFunctions.mm"; sourceTree = "<group>"; };
 		77F1161917D2EEFF009E002A /* ZGComparisonFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGComparisonFunctions.h; path = "Bit Slicer/ZGComparisonFunctions.h"; sourceTree = "<group>"; };
 		77F1161A17D2EEFF009E002A /* ZGComparisonFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGComparisonFunctions.m; path = "Bit Slicer/ZGComparisonFunctions.m"; sourceTree = "<group>"; };
 		77F1161C17D2EF09009E002A /* ZGMemoryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryTypes.h; path = "Bit Slicer/ZGMemoryTypes.h"; sourceTree = "<group>"; };
@@ -636,7 +636,7 @@
 				77F1161317D2EEEC009E002A /* ZGSearchResults.h */,
 				77F1161417D2EEEC009E002A /* ZGSearchResults.m */,
 				77F1161617D2EEF6009E002A /* ZGSearchFunctions.h */,
-				77F1161717D2EEF6009E002A /* ZGSearchFunctions.m */,
+				77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */,
 				77F1161917D2EEFF009E002A /* ZGComparisonFunctions.h */,
 				77F1161A17D2EEFF009E002A /* ZGComparisonFunctions.m */,
 			);
@@ -837,7 +837,7 @@
 				77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */,
 				77F1161217D2EEE1009E002A /* ZGSearchProgress.m in Sources */,
 				77F1161517D2EEEC009E002A /* ZGSearchResults.m in Sources */,
-				77F1161817D2EEF6009E002A /* ZGSearchFunctions.m in Sources */,
+				77F1161817D2EEF6009E002A /* ZGSearchFunctions.mm in Sources */,
 				77F1161B17D2EEFF009E002A /* ZGComparisonFunctions.m in Sources */,
 				77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */,
 				77F1162217D2EF28009E002A /* ZGVirtualMemoryHelpers.m in Sources */,
