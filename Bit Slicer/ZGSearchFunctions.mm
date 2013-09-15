@@ -621,7 +621,7 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 
 #pragma mark Generic Narrowing Searching
 
-typedef void (^zg_narrow_search_for_data_helper_t)(NSArray * __unsafe_unretained relevantRegions, NSData * __unsafe_unretained oldResultSet, NSMutableData * __unsafe_unretained newResultSet);
+typedef void (^zg_narrow_search_for_data_helper_t)(NSArray * __unsafe_unretained relevantRegions, NSUInteger oldResultSetStartIndex, NSData * __unsafe_unretained oldResultSet, NSMutableData * __unsafe_unretained newResultSet);
 
 ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults, zg_narrow_search_for_data_helper_t helper)
 {
@@ -645,10 +645,18 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDa
 		searchProgress.maxProgress = newResultSetCount;
 	});
 	
+	ZGMemorySize *laterResultSetsAbsoluteIndexes = (ZGMemorySize *)malloc(sizeof(*laterResultSetsAbsoluteIndexes) * laterSearchResults.resultSets.count);
+	ZGMemorySize laterResultSetsAbsoluteIndexAccumulator = 0;
+	
 	NSMutableArray *newResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < newResultSetCount; regionIndex++)
 	{
 		[newResultSets addObject:[[NSMutableData alloc] init]];
+		if (regionIndex >= firstSearchResults.resultSets.count)
+		{
+			laterResultSetsAbsoluteIndexes[regionIndex - firstSearchResults.resultSets.count] = laterResultSetsAbsoluteIndexAccumulator;
+			laterResultSetsAbsoluteIndexAccumulator += [[laterSearchResults.resultSets objectAtIndex:regionIndex - firstSearchResults.resultSets.count] length];
+		}
 	}
 	
 	dispatch_apply(newResultSetCount, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t resultSetIndex) {
@@ -656,10 +664,21 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDa
 		{
 			if (!searchProgress.shouldCancelSearch)
 			{
-				NSData *oldResultSet = resultSetIndex < firstSearchResults.resultSets.count ? [firstSearchResults.resultSets objectAtIndex:resultSetIndex] : [laterSearchResults.resultSets objectAtIndex:resultSetIndex - firstSearchResults.resultSets.count];
 				NSMutableData *newResultSet = [newResultSets objectAtIndex:resultSetIndex];
+				NSData *oldResultSet = resultSetIndex < firstSearchResults.resultSets.count ? [firstSearchResults.resultSets objectAtIndex:resultSetIndex] : [laterSearchResults.resultSets objectAtIndex:resultSetIndex - firstSearchResults.resultSets.count];
 				
-				helper(regions, oldResultSet, newResultSet);
+				// Don't scan addresses that have been popped out from laterSearchResults
+				NSUInteger startIndex = 0;
+				if (resultSetIndex >= firstSearchResults.resultSets.count)
+				{
+					ZGMemorySize absoluteIndex = laterResultSetsAbsoluteIndexes[resultSetIndex - firstSearchResults.resultSets.count];
+					if (absoluteIndex < laterSearchResults.addressIndex)
+					{
+						startIndex = laterSearchResults.addressIndex - absoluteIndex;
+					}
+				}
+				
+				helper(regions, startIndex, oldResultSet, newResultSet);
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					searchProgress.numberOfVariablesFound += newResultSet.length / pointerSize;
@@ -668,6 +687,8 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDa
 			}
 		}
 	});
+	
+	free(laterResultSetsAbsoluteIndexes);
 	
 	NSArray *resultSets;
 	
@@ -715,14 +736,14 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 		}
 	}
 	
-	return ZGNarrowSearchForDataHelper(processTask, searchData, searchProgress, firstSearchResults, laterSearchResults, ^(NSArray * __unsafe_unretained relevantRegions, NSData * __unsafe_unretained oldResultSet, NSMutableData * __unsafe_unretained newResultSet) {
+	return ZGNarrowSearchForDataHelper(processTask, searchData, searchProgress, firstSearchResults, laterSearchResults, ^(NSArray * __unsafe_unretained relevantRegions, NSUInteger oldResultSetStartIndex, NSData * __unsafe_unretained oldResultSet, NSMutableData * __unsafe_unretained newResultSet) {
 		ZGRegion *lastUsedRegion = nil;
 		ZGRegion *lastUsedSavedRegion = nil;
 		
 		ZGMemorySize oldDataLength = oldResultSet.length;
 		const int8_t *oldResultSetBytes = (const int8_t *)oldResultSet.bytes;
 		
-		for (ZGMemoryAddress dataIndex = 0; dataIndex < oldDataLength; dataIndex += pointerSize)
+		for (ZGMemoryAddress dataIndex = oldResultSetStartIndex; dataIndex < oldDataLength; dataIndex += pointerSize)
 		{
 			ZGMemoryAddress variableAddress = 0;
 			switch (pointerSize)

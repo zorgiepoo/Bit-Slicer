@@ -37,7 +37,9 @@
 
 @interface ZGSearchResults : NSObject
 
+@property (nonatomic, readonly) ZGMemorySize addressIndex;
 @property (nonatomic, readonly) ZGMemorySize addressCount;
+@property (nonatomic, readonly) ZGMemorySize pointerSize;
 @property (nonatomic, readonly) ZGMemorySize dataSize;
 @property (nonatomic, readonly) NSArray *resultSets;
 @property (nonatomic) NSInteger tag;
