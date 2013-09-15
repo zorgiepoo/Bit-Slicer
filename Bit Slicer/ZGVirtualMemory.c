@@ -130,7 +130,7 @@ bool ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress add
 	return success;
 }
 
-bool ZGRegionInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, vm_region_basic_info_data_64_t *regionInfo)
+bool ZGRegionInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryBasicInfo *regionInfo)
 {
 	mach_port_t objectName = MACH_PORT_NULL;
 	mach_msg_type_number_t regionInfoSize = VM_REGION_BASIC_INFO_COUNT_64;
@@ -140,7 +140,7 @@ bool ZGRegionInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySiz
 
 bool ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection)
 {
-	vm_region_basic_info_data_64_t regionInfo;
+	ZGMemoryBasicInfo regionInfo;
 	if (ZGRegionInfo(processTask, address, size, &regionInfo))
 	{
 		*memoryProtection = regionInfo.protection;

@@ -515,7 +515,7 @@
 					 if (!foundBreakPoint)
 					 {
 						 // Find the region our instruction is in
-						 vm_region_basic_info_data_64_t unusedInfo;
+						 ZGMemoryBasicInfo unusedInfo;
 						 regionAddress = instruction.variable.address;
 						 regionSize = instruction.variable.size;
 						 foundRegion = ZGRegionInfo(self.currentProcess.processTask, &regionAddress, &regionSize, &unusedInfo);

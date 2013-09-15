@@ -37,12 +37,14 @@
 
 #include <mach/std_types.h>
 #include <mach/vm_prot.h>
+#include <mach/vm_region.h>
 
 typedef mach_vm_address_t ZGMemoryAddress;
 typedef uint32_t ZG32BitMemoryAddress;
 typedef mach_vm_size_t ZGMemorySize;
 typedef vm_prot_t ZGMemoryProtection;
 typedef vm_map_t ZGMemoryMap;
+typedef vm_region_basic_info_data_64_t ZGMemoryBasicInfo;
 
 #define MAX_MEMORY_ADDRESS ((ZGMemoryAddress)MACH_VM_MAX_ADDRESS)
 

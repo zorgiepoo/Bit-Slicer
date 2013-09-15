@@ -606,7 +606,8 @@
 		}
 		else
 		{
-			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction, firstSearchResults, self.searchResults.tag == dataType ? self.searchResults : nil);
+			//self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction, firstSearchResults, self.searchResults.tag == dataType ? self.searchResults : nil);
+			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, dataType, self.documentData.qualifierTag, self.documentData.functionTypeTag, firstSearchResults, self.searchResults.tag == dataType ? self.searchResults : nil);
 		}
 		
 		self.temporarySearchResults.tag = dataType;
