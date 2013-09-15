@@ -47,7 +47,7 @@
 #import "ZGDocumentData.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
-#import "ZGComparisonFunctions.h"
+#import "ZGSearchFunctions.h"
 #import "ZGAppController.h"
 #import "ZGDebuggerController.h"
 #import "ZGMemoryViewerController.h"

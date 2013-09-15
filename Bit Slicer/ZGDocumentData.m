@@ -34,8 +34,8 @@
 
 #import "ZGDocumentData.h"
 #import "ZGVariableTypes.h"
-#import "ZGComparisonFunctions.h"
 #import "ZGSearchData.h"
+#import "ZGSearchFunctions.h"
 
 @implementation ZGDocumentData
 

@@ -46,7 +46,6 @@
 #import "ZGSearchResults.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
-#import "ZGComparisonFunctions.h"
 #import "NSArrayAdditions.h"
 #import "ZGDocumentData.h"
 #import "ZGSearchFunctions.h"
@@ -575,7 +574,7 @@
 	return YES;
 }
 
-- (void)searchVariablesWithComparisonFunction:(comparison_function_t)compareFunction byNarrowing:(BOOL)isNarrowing withVariables:(NSArray *)narrowVariables usingCompletionBlock:(dispatch_block_t)completeSearchBlock
+- (void)searchVariablesByNarrowing:(BOOL)isNarrowing withVariables:(NSArray *)narrowVariables usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGProcess *currentProcess = self.windowController.currentProcess;
 	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
@@ -606,7 +605,6 @@
 		}
 		else
 		{
-			//self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, compareFunction, firstSearchResults, self.searchResults.tag == dataType ? self.searchResults : nil);
 			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, dataType, self.documentData.qualifierTag, self.documentData.functionTypeTag, firstSearchResults, self.searchResults.tag == dataType ? self.searchResults : nil);
 		}
 		
@@ -619,7 +617,6 @@
 - (void)search
 {
 	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
-	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
 	
 	if ([self retrieveSearchData])
 	{
@@ -644,9 +641,7 @@
 		
 		[self createUserInterfaceTimer];
 		
-		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.windowController.currentProcess.is64Bit, (ZGVariableQualifier)self.documentData.qualifierTag);
-		
-		[self searchVariablesWithComparisonFunction:compareFunction byNarrowing:self.isInNarrowSearchMode withVariables:searchedVariables usingCompletionBlock:^ {
+		[self searchVariablesByNarrowing:self.isInNarrowSearchMode withVariables:searchedVariables usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
 			self.userInterfaceTimer = nil;
 			

@@ -38,7 +38,6 @@
 #import "ZGUtilities.h"
 #import "ZGSearchData.h"
 #import "ZGSearchFunctions.h"
-#import "ZGComparisonFunctions.h"
 #import "ZGSearchResults.h"
 #import "ZGSearchProgress.h"
 #import <Python/structmember.h>

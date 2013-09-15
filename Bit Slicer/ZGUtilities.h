@@ -36,7 +36,7 @@
 #import "ZGMemoryTypes.h"
 #import "ZGVariable.h"
 #import "ZGSearchData.h"
-#import "ZGComparisonFunctions.h"
+#import "ZGSearchFunctions.h"
 
 #ifdef _DEBUG
 	#define ZG_LOG(format, ...) NSLog(format, __VA_ARGS__)

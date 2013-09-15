@@ -59,8 +59,6 @@ typedef enum
 	ZGStoreAllValues,
 } ZGFunctionType;
 
-typedef BOOL (*comparison_function_t)(ZGSearchData *searchData, const void *variableValue, const void *compareValue, ZGMemorySize size);
-
 #ifdef __cplusplus
 extern "C"
 #endif
@@ -69,6 +67,5 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 #ifdef __cplusplus
 extern "C"
 #endif
-//ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, comparison_function_t comparisonFunction, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults);
 ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults);
 
