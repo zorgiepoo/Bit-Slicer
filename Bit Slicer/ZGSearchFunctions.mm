@@ -672,9 +672,9 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDa
 				if (resultSetIndex >= firstSearchResults.resultSets.count)
 				{
 					ZGMemorySize absoluteIndex = laterResultSetsAbsoluteIndexes[resultSetIndex - firstSearchResults.resultSets.count];
-					if (absoluteIndex < laterSearchResults.addressIndex)
+					if (absoluteIndex < laterSearchResults.addressIndex * pointerSize)
 					{
-						startIndex = laterSearchResults.addressIndex - absoluteIndex;
+						startIndex = (laterSearchResults.addressIndex * pointerSize - absoluteIndex);
 					}
 				}
 				
