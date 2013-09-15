@@ -50,6 +50,4 @@ BOOL ZGIsValidNumber(NSString *expression);
 void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
-BOOL ZGCanUseBoyerMoore(ZGVariableType dataType, ZGFunctionType functionType, ZGSearchData *searchData);
-
 unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);

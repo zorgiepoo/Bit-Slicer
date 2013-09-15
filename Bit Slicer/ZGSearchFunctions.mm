@@ -590,8 +590,9 @@ ZGSearchResults *ZGSearchForByteArraysWithWildcards(ZGMemoryMap processTask, ZGS
 ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType)
 {
 	id retValue = nil;
-	if (searchData.shouldUseBoyerMoore)
+	if (((dataType == ZGByteArray && searchData.byteArrayFlags == NULL) || ((dataType == ZGString8 || dataType == ZGString16) && !searchData.shouldIgnoreStringCase)) && !searchData.shouldCompareStoredValues && functionType == ZGEquals)
 	{
+		// use fast boyer moore
 		retValue = ZGSearchForBytes(processTask, searchData, searchProgress);
 	}
 	else if ([@[@(ZGInt8), @(ZGInt16), @(ZGInt32), @(ZGInt64), @(ZGPointer)] containsObject:@(dataType)])
