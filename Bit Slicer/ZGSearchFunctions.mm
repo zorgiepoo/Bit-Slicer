@@ -261,6 +261,7 @@ ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchD
 	const unsigned long dataSize = searchData.dataSize;
 	const unsigned char *searchValue = (const unsigned char *)searchData.searchValue;
 	ZGMemorySize pointerSize = searchData.pointerSize;
+	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	
 	return ZGSearchForDataHelper(processTask, searchData, searchProgress, ^(ZGMemorySize dataIndex, ZGMemoryAddress address, ZGMemorySize size, NSMutableData * __unsafe_unretained resultSet, void *bytes, void *regionBytes) {
 		// generate the two Boyer-Moore auxiliary buffers
@@ -277,7 +278,11 @@ ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchD
 			foundSubstring = boyer_moore_helper((const unsigned char *)foundSubstring, searchValue, haystackLengthLeft, (unsigned long)dataSize, (const unsigned long *)charJump, (const unsigned long *)matchJump);
 			if (foundSubstring == NULL) break;
 			
-			ADD_VARIABLE_ADDRESS(foundSubstring - (unsigned char *)bytes + address, pointerSize, resultSet);
+			ZGMemoryAddress foundAddress = foundSubstring - (unsigned char *)bytes + address;
+			if (foundAddress % dataAlignment == 0)
+			{
+				ADD_VARIABLE_ADDRESS(foundAddress, pointerSize, resultSet);
+			}
 			
 			foundSubstring++;
 			haystackLengthLeft = (unsigned char *)bytes + size - foundSubstring;
