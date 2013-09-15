@@ -89,9 +89,10 @@ void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long 
 		if (match_jump[u] > needle_length + ua - u) match_jump[u] = needle_length + ua - u;
 	}
 	
-	ub = backup[ua];
+	ub = ua;
 	while (ua <= needle_length)
 	{
+		ub = backup[ub];
 		while (ua <= ub)
 		{
 			if (match_jump[ua] > ub - ua + needle_length)
@@ -100,7 +101,6 @@ void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long 
 			}
 			ua++;
 		}
-		ub = backup[ub];
 	}
 }
 
