@@ -273,46 +273,6 @@ void ZGFreeData(NSArray *dataArray)
 	}
 }
 
-void *ZGSavedValue(ZGMemoryAddress address, ZGSearchData * __unsafe_unretained searchData, ZGRegion **hintedRegionReference, ZGMemorySize dataSize)
-{
-	void *value = NULL;
-	
-	ZGRegion * __unsafe_unretained hintedRegion = (hintedRegionReference && *hintedRegionReference) ? *hintedRegionReference : nil;
-	if (hintedRegion && address >= hintedRegion->_address && address + dataSize <= hintedRegion->_address + hintedRegion->_size)
-	{
-		value = hintedRegion->_bytes + (address - hintedRegion->_address);
-	}
-	else
-	{
-		NSArray *regions = searchData.savedData;
-		ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
-			if (region->_address + region->_size <= address)
-			{
-				return NSOrderedAscending;
-			}
-			else if (region->_address >= address + dataSize)
-			{
-				return NSOrderedDescending;
-			}
-			else
-			{
-				return NSOrderedSame;
-			}
-		}];
-		
-		if (targetRegion && address >= targetRegion->_address && address + dataSize <= targetRegion->_address + targetRegion->_size)
-		{
-			value = targetRegion->_bytes + (address - targetRegion->_address);
-			if (hintedRegionReference)
-			{
-				*hintedRegionReference = targetRegion;
-			}
-		}
-	}
-	
-	return value;
-}
-
 // helper function for ZGSaveAllDataToDirectory
 static void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
 {
