@@ -402,22 +402,14 @@
 {
 	ZGInstruction *instruction = nil;
 	
-	NSArray *regions = ZGRegionsForProcessTask(taskPort);
-	
-	ZGRegion *targetRegion = [regions zgBinarySearchUsingBlock:(zg_binary_search_t)^(ZGRegion * __unsafe_unretained region) {
-		if (region.address + region.size <= address)
-		{
-			return NSOrderedAscending;
-		}
-		else if (region.address > address)
-		{
-			return NSOrderedDescending;
-		}
-		else
-		{
-			return NSOrderedSame;
-		}
-	}];
+	ZGMemoryBasicInfo regionInfo;
+	ZGRegion *targetRegion = [[ZGRegion alloc] init];
+	targetRegion.address = address;
+	targetRegion.size = 1;
+	if (!ZGRegionInfo(taskPort, &targetRegion->_address, &targetRegion->_size, &regionInfo))
+	{
+		targetRegion = nil;
+	}
 	
 	if (targetRegion != nil && address >= targetRegion.address && address <= targetRegion.address + targetRegion.size)
 	{
