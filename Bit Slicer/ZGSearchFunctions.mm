@@ -336,7 +336,8 @@ ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchD
 			if (foundSubstring == NULL) break;
 			
 			ZGMemoryAddress foundAddress = foundSubstring - (unsigned char *)bytes + address;
-			if (foundAddress % dataAlignment == 0)
+			// boyer_moore_helper is only checking 0 .. dataSize-1 characters, so make a check to see if the last characters are equal
+			if (foundAddress % dataAlignment == 0 && foundSubstring[dataSize-1] == searchValue[dataSize-1])
 			{
 				ADD_VARIABLE_ADDRESS(foundAddress, pointerSize, resultSet);
 			}
