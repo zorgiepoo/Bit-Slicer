@@ -446,6 +446,8 @@
 		self.searchData.searchValue = NULL;
 	}
 	
+	NSLog(@"%hhd", self.documentData.ignoreDataAlignment);
+	
 	self.searchData.dataAlignment =
 		self.documentData.ignoreDataAlignment
 		? sizeof(int8_t)

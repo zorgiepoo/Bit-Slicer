@@ -767,8 +767,16 @@ static NSSize *expandedWindowMinSize = nil;
 		self.includeNullTerminatorCheckBox.state = NSOffState;
 	}
 	
-	self.documentData.ignoreDataAlignment = (newTag != ZGString8 && newTag != ZGInt8 && newTag != ZGByteArray);
-	self.ignoreDataAlignmentCheckBox.enabled = self.documentData.ignoreDataAlignment;
+	if (newTag == ZGString8 || newTag == ZGInt8 || newTag == ZGByteArray)
+	{
+		self.ignoreDataAlignmentCheckBox.enabled = NO;
+		self.ignoreDataAlignmentCheckBox.state = NSOffState;
+	}
+	else
+	{
+		self.ignoreDataAlignmentCheckBox.enabled = YES;
+		self.ignoreDataAlignmentCheckBox.state = self.documentData.ignoreDataAlignment;
+	}
 	
 	[self updateFlagsAndSearchButtonTitle];
 	
@@ -1168,36 +1176,43 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)changeStringCaseOption:(id)sender
 {
 	self.searchData.shouldIgnoreStringCase = [sender state];
+	[self markDocumentChange];
 }
 
 - (IBAction)ignoreDataAlignment:(id)sender
 {
 	self.documentData.ignoreDataAlignment = [sender state];
+	[self markDocumentChange];
 }
 
 - (IBAction)changeNullTerminatorInclusion:(id)sender
 {
 	self.searchData.shouldIncludeNullTerminator = [sender state];
+	[self markDocumentChange];
 }
 
 - (IBAction)changeSearchValueString:(id)sender
 {
 	self.documentData.searchValueString = [sender stringValue];
+	[self markDocumentChange];
 }
 
 - (IBAction)changeBeginningAddressString:(id)sender
 {
 	self.documentData.beginningAddressStringValue = [sender stringValue];
+	[self markDocumentChange];
 }
 
 - (IBAction)changeEndingAddressString:(id)sender
 {
 	self.documentData.endingAddressStringValue = [sender stringValue];
+	[self markDocumentChange];
 }
 
 - (IBAction)changeUnwritableValuesOption:(id)sender
 {
 	self.searchData.shouldScanUnwritableValues = [sender state];
+	[self markDocumentChange];
 }
 
 #pragma mark Variables Handling
