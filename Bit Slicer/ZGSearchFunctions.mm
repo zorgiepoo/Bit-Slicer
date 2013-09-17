@@ -229,14 +229,14 @@ case sizeof(ZG32BitMemoryAddress): \
 template <typename T, typename P>
 void ZGSearchWithFunctionHelperRegular(T *searchValue, bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, P pointerSize, NSMutableData * __unsafe_unretained resultSet, ZGMemoryAddress address, void *bytes)
 {
-	// Hold an arbitrary number of results on the stack before copying them to our resultSet to save some performance
-	// Ideally I'd like to pick maxSteps such that I do not have to verify "dataIndex <= endLimit" in the inner loop, but I have not figured how to do that
-	ZGMemorySize maxSteps = 4096;
+	const ZGMemorySize maxSteps = 4096;
 	while (dataIndex <= endLimit)
 	{
 		ZGMemorySize numberOfVariablesFound = 0;
 		P memoryAddresses[maxSteps];
-		for (ZGMemorySize stepIndex = 0; stepIndex < maxSteps && dataIndex <= endLimit; stepIndex++)
+		
+		ZGMemorySize numberOfStepsToTake = MIN(maxSteps, (endLimit + dataAlignment - dataIndex) / dataAlignment);
+		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			if (comparisonFunction(searchData, (T *)((int8_t *)bytes + dataIndex), searchValue))
 			{
@@ -255,12 +255,14 @@ void ZGSearchWithFunctionHelperRegular(T *searchValue, bool (*comparisonFunction
 template <typename T, typename P>
 void ZGSearchWithFunctionHelperStored(T *regionBytes, bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, P pointerSize, NSMutableData * __unsafe_unretained resultSet, ZGMemoryAddress address, void *bytes)
 {
-	ZGMemorySize maxSteps = 4096;
+	const ZGMemorySize maxSteps = 4096;
 	while (dataIndex <= endLimit)
 	{
 		ZGMemorySize numberOfVariablesFound = 0;
 		P memoryAddresses[maxSteps];
-		for (ZGMemorySize stepIndex = 0; stepIndex < maxSteps && dataIndex <= endLimit; stepIndex++)
+		
+		ZGMemorySize numberOfStepsToTake = MIN(maxSteps, (endLimit + dataAlignment - dataIndex) / dataAlignment);
+		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			if (comparisonFunction(searchData, (T *)((int8_t *)bytes + dataIndex), (T *)((int8_t *)regionBytes + dataIndex)))
 			{
