@@ -234,6 +234,55 @@ while (dataIndex <= endLimit) { \
 	dataIndex += dataAlignment; \
 }
 
+template <typename T, typename P>
+void ZGSearchWithFunctionHelperRegular(T *searchValue, bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, P pointerSize, NSMutableData * __unsafe_unretained resultSet, ZGMemoryAddress address, void *bytes)
+{
+	// Hold an arbitrary number of results on the stack before copying them to our resultSet to save some performance
+	// Ideally I'd like to pick maxSteps such that I do not have to verify "dataIndex <= endLimit" in the inner loop, but I have not figured how to do that
+	ZGMemorySize maxSteps = 4096;
+	while (dataIndex <= endLimit)
+	{
+		ZGMemorySize numberOfVariablesFound = 0;
+		P memoryAddresses[maxSteps];
+		for (ZGMemorySize stepIndex = 0; stepIndex < maxSteps && dataIndex <= endLimit; stepIndex++)
+		{
+			if (comparisonFunction(searchData, (T *)((int8_t *)bytes + dataIndex), searchValue))
+			{
+				memoryAddresses[numberOfVariablesFound] = (P)(address + dataIndex);
+				numberOfVariablesFound++;
+			}
+			
+			dataIndex += dataAlignment;
+		}
+		
+		[resultSet appendBytes:memoryAddresses length:sizeof(P) * numberOfVariablesFound];
+	}
+}
+
+// like ZGSearchWithFunctionHelperRegular above except against stored values
+template <typename T, typename P>
+void ZGSearchWithFunctionHelperStored(T *regionBytes, bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, P pointerSize, NSMutableData * __unsafe_unretained resultSet, ZGMemoryAddress address, void *bytes)
+{
+	ZGMemorySize maxSteps = 4096;
+	while (dataIndex <= endLimit)
+	{
+		ZGMemorySize numberOfVariablesFound = 0;
+		P memoryAddresses[maxSteps];
+		for (ZGMemorySize stepIndex = 0; stepIndex < maxSteps && dataIndex <= endLimit; stepIndex++)
+		{
+			if (comparisonFunction(searchData, (T *)((int8_t *)bytes + dataIndex), (T *)((int8_t *)regionBytes + dataIndex)))
+			{
+				memoryAddresses[numberOfVariablesFound] = (P)(address + dataIndex);
+				numberOfVariablesFound++;
+			}
+			
+			dataIndex += dataAlignment;
+		}
+		
+		[resultSet appendBytes:memoryAddresses length:sizeof(P) * numberOfVariablesFound];
+	}
+}
+
 template <typename T>
 ZGSearchResults *ZGSearchWithFunction(bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGMemoryMap processTask, T *searchValue, ZGSearchData * __unsafe_unretained searchData, ZGSearchProgress * __unsafe_unretained searchProgress)
 {
@@ -247,11 +296,25 @@ ZGSearchResults *ZGSearchWithFunction(bool (*comparisonFunction)(ZGSearchData *,
 		
 		if (!shouldCompareStoredValues)
 		{
-			ZGSearchWithFunctionHelper(searchValue);
+			if (pointerSize == sizeof(ZGMemoryAddress))
+			{
+				ZGSearchWithFunctionHelperRegular(searchValue, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, pointerSize, resultSet, address, bytes);
+			}
+			else
+			{
+				ZGSearchWithFunctionHelperRegular(searchValue, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, (ZG32BitMemoryAddress)pointerSize, resultSet, address, bytes);
+			}
 		}
 		else
 		{
-			ZGSearchWithFunctionHelper((T *)((int8_t *)regionBytes + dataIndex));
+			if (pointerSize == sizeof(ZGMemoryAddress))
+			{
+				ZGSearchWithFunctionHelperStored((T *)regionBytes, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, pointerSize, resultSet, address, bytes);
+			}
+			else
+			{
+				ZGSearchWithFunctionHelperStored((T *)regionBytes, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, (ZG32BitMemoryAddress)pointerSize, resultSet, address, bytes);
+			}
 		}
 	});
 }
