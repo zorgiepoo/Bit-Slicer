@@ -226,14 +226,6 @@ case sizeof(ZG32BitMemoryAddress): \
 	} \
 }
 
-#define ZGSearchWithFunctionHelper(compareValueExpression) \
-while (dataIndex <= endLimit) { \
-	if (comparisonFunction(searchData, (T *)((int8_t *)bytes + dataIndex), (compareValueExpression))) { \
-		ADD_VARIABLE_ADDRESS(address + dataIndex, pointerSize, resultSet); \
-	}\
-	dataIndex += dataAlignment; \
-}
-
 template <typename T, typename P>
 void ZGSearchWithFunctionHelperRegular(T *searchValue, bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, P pointerSize, NSMutableData * __unsafe_unretained resultSet, ZGMemoryAddress address, void *bytes)
 {
