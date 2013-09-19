@@ -1004,8 +1004,9 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 	return ZGNarrowSearchForDataHelper(processTask, searchData, searchProgress, firstSearchResults, laterSearchResults, ^(size_t resultSetIndex, NSUInteger oldResultSetStartIndex, NSData * __unsafe_unretained oldResultSet, NSMutableData * __unsafe_unretained newResultSet) {
 		NSMutableDictionary *pageToRegionTable = nil;
 		
-		ZGMemoryAddress firstAddress = 0;
-		ZGMemoryAddress lastAddress = 0;
+		// Adding __block only so clang's analyzer won't complain about values being unused
+		__block ZGMemoryAddress firstAddress = 0;
+		__block ZGMemoryAddress lastAddress = 0;
 		
 		if (resultSetIndex >= firstSearchResults.resultSets.count)
 		{
