@@ -931,15 +931,25 @@ void ZGNarrowSearchWithFunctionStored(bool (*comparisonFunction)(ZGSearchData *,
 					}
 					else
 					{
-						for (ZGRegion *region in savedRegions)
+						NSUInteger maxIndex = savedRegions.count - 1;
+						NSUInteger minIndex = 0;
+						
+						while (maxIndex >= minIndex)
 						{
-							if (variableAddress >= region.address && variableAddress + dataSize <= region.address + region.size)
+							NSUInteger middleIndex = (minIndex + maxIndex) / 2;
+							ZGRegion *region = [savedRegions objectAtIndex:middleIndex];
+							if (variableAddress < region.address)
+							{
+								if (middleIndex == 0) break;
+								maxIndex = middleIndex - 1;
+							}
+							else if (variableAddress >= region.address + region.size)
+							{
+								minIndex = middleIndex + 1;
+							}
+							else
 							{
 								newRegion = region;
-								break;
-							}
-							else if (variableAddress + dataSize < region.address)
-							{
 								break;
 							}
 						}
