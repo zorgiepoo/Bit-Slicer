@@ -40,7 +40,7 @@ typedef BOOL (^zg_array_filter_t)(id item);
 
 typedef NSComparisonResult (^zg_binary_search_t)(id __unsafe_unretained currentObject);
 
-- (NSArray *)zgFilterUsingBlock:(zg_array_filter_t)shouldFilter;
+- (NSArray *)zgFilterUsingBlock:(zg_array_filter_t)shouldKeep;
 
 - (id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator;
 

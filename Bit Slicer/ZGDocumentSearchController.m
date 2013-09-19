@@ -381,7 +381,7 @@
 	if (!self.searchProgress.shouldCancelSearch && self.documentData.variables.count <= MAX_TABLE_VIEW_ITEMS)
 	{
 		NSArray *filteredVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
-			return !variable.enabled;
+			return variable.enabled;
 		}];
 		
 		if (filteredVariables.count == 1)

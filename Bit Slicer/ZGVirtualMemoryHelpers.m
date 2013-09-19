@@ -228,7 +228,7 @@ NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearc
 	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
 	
 	NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-		return !(region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
+		return region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE));
 	}];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{

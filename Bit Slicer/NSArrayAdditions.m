@@ -36,13 +36,13 @@
 
 @implementation NSArray (NSArrayAdditions)
 
-- (NSArray *)zgFilterUsingBlock:(zg_array_filter_t)shouldFilter
+- (NSArray *)zgFilterUsingBlock:(zg_array_filter_t)shouldKeep
 {
 	NSMutableArray *newResults = [[NSMutableArray alloc] init];
 	
 	for (id item in self)
 	{
-		if (!shouldFilter(item))
+		if (shouldKeep(item))
 		{
 			[newResults addObject:item];
 		}

@@ -124,7 +124,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	if (!shouldCompareStoredValues)
 	{
 		regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-			return !(region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
+			return region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE));
 		}];
 	}
 	else
@@ -202,7 +202,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	else
 	{
 		resultSets = [allResultSets zgFilterUsingBlock:(zg_array_filter_t)^(NSMutableData *resultSet) {
-			return resultSet.length == 0;
+			return resultSet.length != 0;
 		}];
 	}
 	
@@ -756,7 +756,7 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDa
 	else
 	{
 		resultSets = [newResultSets zgFilterUsingBlock:(zg_array_filter_t)^(NSMutableData *resultSet) {
-			return resultSet.length == 0;
+			return resultSet.length != 0;
 		}];
 	}
 	
@@ -1023,7 +1023,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 			}
 			
 			NSArray *regions = [allRegions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-				return !(region.address < lastAddress && region.address + region.size > firstAddress && region.protection & VM_PROT_READ && (searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
+				return region.address < lastAddress && region.address + region.size > firstAddress && region.protection & VM_PROT_READ && (searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE));
 			}];
 			
 			for (ZGRegion *region in regions)
@@ -1059,7 +1059,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 				pageToSavedRegionTable = [[NSMutableDictionary alloc] init];
 				
 				NSArray *regions = [savedData zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-					return !(region.address < lastAddress && region.address + region.size > firstAddress && region.protection & VM_PROT_READ && (searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE)));
+					return region.address < lastAddress && region.address + region.size > firstAddress && region.protection & VM_PROT_READ && (searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE));
 				}];
 				
 				for (ZGRegion *region in regions)
