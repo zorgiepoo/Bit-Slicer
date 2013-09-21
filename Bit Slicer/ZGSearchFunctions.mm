@@ -764,96 +764,78 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDa
 }
 
 template <typename T, typename P>
-void ZGNarrowSearchWithFunctionRegular(bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGMemoryMap processTask, T *searchValue, ZGSearchData * __unsafe_unretained searchData, P pointerSize, ZGMemorySize dataSize, NSUInteger oldResultSetStartIndex, NSData * __unsafe_unretained oldResultSet, NSMutableData * __unsafe_unretained newResultSet, NSDictionary * __unsafe_unretained pageToRegionTable, ZGMemorySize pageSize)
+void ZGNarrowSearchWithFunctionRegularCompare(ZGRegion **lastUsedSavedRegionReference, ZGRegion * __unsafe_unretained lastUsedRegion, P variableAddress, ZGMemorySize dataSize, NSDictionary * __unsafe_unretained savedPageToRegionTable, NSArray * __unsafe_unretained savedRegions, ZGMemorySize pageSize, bool (*comparisonFunction)(ZGSearchData *, T *, T *), P *memoryAddresses, ZGMemorySize &numberOfVariablesFound, ZGSearchData * __unsafe_unretained searchData, T *searchValue)
 {
-	ZGRegion *lastUsedRegion = nil;
-	
-	ZGMemorySize oldDataLength = oldResultSet.length;
-	const int8_t *oldResultSetBytes = (const int8_t *)oldResultSet.bytes;
-	
-	const ZGMemorySize maxSteps = 4096;
-	ZGMemoryAddress dataIndex = oldResultSetStartIndex;
-	while (dataIndex < oldDataLength)
+	T *currentValue = (T *)((int8_t *)lastUsedRegion->_bytes + (variableAddress - lastUsedRegion->_address));
+	if (comparisonFunction(searchData, currentValue, searchValue))
 	{
-		P memoryAddresses[maxSteps];
-		ZGMemorySize numberOfVariablesFound = 0;
-		ZGMemorySize numberOfStepsToTake = MIN(maxSteps, (oldDataLength - dataIndex) / sizeof(P));
-		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
-		{
-			P variableAddress = *(P *)(oldResultSetBytes + dataIndex);
-			
-			if (lastUsedRegion == nil || (variableAddress < lastUsedRegion->_address || variableAddress + dataSize > lastUsedRegion->_address + lastUsedRegion->_size))
-			{
-				if (lastUsedRegion != nil)
-				{
-					ZGFreeBytes(processTask, lastUsedRegion->_bytes, lastUsedRegion->_size);
-				}
-				
-				ZGRegion *newRegion = nil;
-
-				if (pageToRegionTable == nil)
-				{
-					ZGMemoryAddress regionAddress = variableAddress;
-					ZGMemorySize regionSize = dataSize;
-					ZGMemoryBasicInfo basicInfo;
-					if (ZGRegionInfo(processTask, &regionAddress, &regionSize, &basicInfo))
-					{
-						newRegion = [[ZGRegion alloc] init];
-						newRegion.address = regionAddress;
-						newRegion.size = regionSize;
-					}
-				}
-				else
-				{
-					newRegion = [pageToRegionTable objectForKey:@(variableAddress - (variableAddress % pageSize))];
-				}
-				
-				if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
-				{
-					lastUsedRegion = [[ZGRegion alloc] init];
-					lastUsedRegion->_address = newRegion->_address;
-					lastUsedRegion->_size = newRegion->_size;
-					
-					void *bytes = NULL;
-					if (ZGReadBytes(processTask, lastUsedRegion->_address, &bytes, &lastUsedRegion->_size))
-					{
-						lastUsedRegion->_bytes = bytes;
-					}
-					else
-					{
-						lastUsedRegion = nil;
-					}
-				}
-				else
-				{
-					lastUsedRegion = nil;
-				}
-			}
-			
-			if (lastUsedRegion != nil)
-			{
-				T *currentValue = (T *)((int8_t *)lastUsedRegion->_bytes + (variableAddress - lastUsedRegion->_address));
-				if (comparisonFunction(searchData, currentValue, searchValue))
-				{
-					memoryAddresses[numberOfVariablesFound] = (P)(variableAddress);
-					numberOfVariablesFound++;
-				}
-			}
-			
-			dataIndex += sizeof(P);
-		}
-		
-		[newResultSet appendBytes:memoryAddresses length:sizeof(P) * numberOfVariablesFound];
-	}
-	
-	if (lastUsedRegion != nil)
-	{
-		ZGFreeBytes(processTask, lastUsedRegion->_bytes, lastUsedRegion->_size);
+		memoryAddresses[numberOfVariablesFound] = variableAddress;
+		numberOfVariablesFound++;
 	}
 }
 
 template <typename T, typename P>
-void ZGNarrowSearchWithFunctionStored(bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGMemoryMap processTask, ZGSearchData * __unsafe_unretained searchData, P pointerSize, ZGMemorySize dataSize, NSUInteger oldResultSetStartIndex, NSData * __unsafe_unretained oldResultSet, NSMutableData * __unsafe_unretained newResultSet, NSDictionary * __unsafe_unretained pageToRegionTable, NSDictionary * __unsafe_unretained savedPageToRegionTable, NSArray * __unsafe_unretained savedRegions, ZGMemorySize pageSize)
+void ZGNarrowSearchWithFunctionStoredCompare(ZGRegion **lastUsedSavedRegionReference, ZGRegion * __unsafe_unretained lastUsedRegion, P variableAddress, ZGMemorySize dataSize, NSDictionary * __unsafe_unretained savedPageToRegionTable, NSArray * __unsafe_unretained savedRegions, ZGMemorySize pageSize, bool (*comparisonFunction)(ZGSearchData *, T *, T *), P *memoryAddresses, ZGMemorySize &numberOfVariablesFound, ZGSearchData * __unsafe_unretained searchData, T *searchValue)
+{
+	if (*lastUsedSavedRegionReference == nil || (variableAddress < (*lastUsedSavedRegionReference)->_address || variableAddress + dataSize > (*lastUsedSavedRegionReference)->_address + (*lastUsedSavedRegionReference)->_size))
+	{
+		ZGRegion *newRegion = nil;
+		if (savedPageToRegionTable != nil)
+		{
+			newRegion = [savedPageToRegionTable objectForKey:@(variableAddress - (variableAddress % pageSize))];
+		}
+		else
+		{
+			NSUInteger maxIndex = savedRegions.count - 1;
+			NSUInteger minIndex = 0;
+			
+			while (maxIndex >= minIndex)
+			{
+				NSUInteger middleIndex = (minIndex + maxIndex) / 2;
+				ZGRegion *region = [savedRegions objectAtIndex:middleIndex];
+				if (variableAddress < region.address)
+				{
+					if (middleIndex == 0) break;
+					maxIndex = middleIndex - 1;
+				}
+				else if (variableAddress >= region.address + region.size)
+				{
+					minIndex = middleIndex + 1;
+				}
+				else
+				{
+					newRegion = region;
+					break;
+				}
+			}
+		}
+		
+		if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
+		{
+			*lastUsedSavedRegionReference = newRegion;
+		}
+		else
+		{
+			*lastUsedSavedRegionReference = nil;
+		}
+	}
+	
+	if (*lastUsedSavedRegionReference != nil)
+	{
+		T *currentValue = (T *)((int8_t *)lastUsedRegion->_bytes + (variableAddress - lastUsedRegion->_address));
+		T *compareValue = (T *)((int8_t *)(*lastUsedSavedRegionReference)->_bytes + (variableAddress - (*lastUsedSavedRegionReference)->_address));
+		if (comparisonFunction(searchData, currentValue, compareValue))
+		{
+			memoryAddresses[numberOfVariablesFound] = variableAddress;
+			numberOfVariablesFound++;
+		}
+	}
+}
+
+#define zg_define_compare_function(name) void (*name)(ZGRegion **, ZGRegion *, P, ZGMemorySize, NSDictionary *, NSArray *, ZGMemorySize, bool (*)(ZGSearchData *, T *, T *), P *, ZGMemorySize &, ZGSearchData *, T *)
+
+template <typename T, typename P>
+void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGMemoryMap processTask, T *searchValue, ZGSearchData * __unsafe_unretained searchData, P pointerSize, ZGMemorySize dataSize, NSUInteger oldResultSetStartIndex, NSData * __unsafe_unretained oldResultSet, NSMutableData * __unsafe_unretained newResultSet, NSDictionary * __unsafe_unretained pageToRegionTable, NSDictionary * __unsafe_unretained savedPageToRegionTable, NSArray * __unsafe_unretained savedRegions, ZGMemorySize pageSize, zg_define_compare_function(compareHelperFunction))
 {
 	ZGRegion *lastUsedRegion = nil;
 	ZGRegion *lastUsedSavedRegion = nil;
@@ -880,7 +862,7 @@ void ZGNarrowSearchWithFunctionStored(bool (*comparisonFunction)(ZGSearchData *,
 				}
 				
 				ZGRegion *newRegion = nil;
-				
+
 				if (pageToRegionTable == nil)
 				{
 					ZGMemoryAddress regionAddress = variableAddress;
@@ -922,59 +904,7 @@ void ZGNarrowSearchWithFunctionStored(bool (*comparisonFunction)(ZGSearchData *,
 			
 			if (lastUsedRegion != nil)
 			{
-				if (lastUsedSavedRegion == nil || (variableAddress < lastUsedSavedRegion->_address || variableAddress + dataSize > lastUsedSavedRegion->_address + lastUsedSavedRegion->_size))
-				{
-					ZGRegion *newRegion = nil;
-					if (savedPageToRegionTable != nil)
-					{
-						newRegion = [savedPageToRegionTable objectForKey:@(variableAddress - (variableAddress % pageSize))];
-					}
-					else
-					{
-						NSUInteger maxIndex = savedRegions.count - 1;
-						NSUInteger minIndex = 0;
-						
-						while (maxIndex >= minIndex)
-						{
-							NSUInteger middleIndex = (minIndex + maxIndex) / 2;
-							ZGRegion *region = [savedRegions objectAtIndex:middleIndex];
-							if (variableAddress < region.address)
-							{
-								if (middleIndex == 0) break;
-								maxIndex = middleIndex - 1;
-							}
-							else if (variableAddress >= region.address + region.size)
-							{
-								minIndex = middleIndex + 1;
-							}
-							else
-							{
-								newRegion = region;
-								break;
-							}
-						}
-					}
-					
-					if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
-					{
-						lastUsedSavedRegion = newRegion;
-					}
-					else
-					{
-						lastUsedSavedRegion = nil;
-					}
-				}
-				
-				if (lastUsedSavedRegion != nil)
-				{
-					T *currentValue = (T *)((int8_t *)lastUsedRegion->_bytes + (variableAddress - lastUsedRegion->_address));
-					T *compareValue = (T *)((int8_t *)lastUsedSavedRegion->_bytes + (variableAddress - lastUsedSavedRegion->_address));
-					if (comparisonFunction(searchData, currentValue, compareValue))
-					{
-						memoryAddresses[numberOfVariablesFound] = (P)(variableAddress);
-						numberOfVariablesFound++;
-					}
-				}
+				compareHelperFunction(&lastUsedSavedRegion, lastUsedRegion, variableAddress, dataSize, savedPageToRegionTable, savedRegions, pageSize, comparisonFunction, memoryAddresses, numberOfVariablesFound, searchData, searchValue);
 			}
 			
 			dataIndex += sizeof(P);
@@ -1042,11 +972,11 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 		{
 			if (pointerSize == sizeof(ZGMemoryAddress))
 			{
-				ZGNarrowSearchWithFunctionRegular(comparisonFunction, processTask, searchValue, searchData, (ZGMemoryAddress)pointerSize, dataSize, oldResultSetStartIndex, oldResultSet, newResultSet, pageToRegionTable, pageSize);
+				ZGNarrowSearchWithFunctionType(comparisonFunction, processTask, searchValue, searchData, (ZGMemoryAddress)pointerSize, dataSize, oldResultSetStartIndex, oldResultSet, newResultSet, pageToRegionTable, nil, nil, pageSize, ZGNarrowSearchWithFunctionRegularCompare);
 			}
 			else
 			{
-				ZGNarrowSearchWithFunctionRegular(comparisonFunction, processTask, searchValue, searchData, (ZG32BitMemoryAddress)pointerSize, dataSize, oldResultSetStartIndex, oldResultSet, newResultSet, pageToRegionTable, pageSize);
+				ZGNarrowSearchWithFunctionType(comparisonFunction, processTask, searchValue, searchData, (ZG32BitMemoryAddress)pointerSize, dataSize, oldResultSetStartIndex, oldResultSet, newResultSet, pageToRegionTable, nil, nil, pageSize, ZGNarrowSearchWithFunctionRegularCompare);
 			}
 		}
 		else
@@ -1076,11 +1006,11 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 			
 			if (pointerSize == sizeof(ZGMemoryAddress))
 			{
-				ZGNarrowSearchWithFunctionStored(comparisonFunction, processTask, searchData, (ZGMemoryAddress)pointerSize, dataSize, oldResultSetStartIndex, oldResultSet, newResultSet, pageToRegionTable, pageToSavedRegionTable, savedData, pageSize);
+				ZGNarrowSearchWithFunctionType(comparisonFunction, processTask, searchValue, searchData, (ZGMemoryAddress)pointerSize, dataSize, oldResultSetStartIndex, oldResultSet, newResultSet, pageToRegionTable, pageToSavedRegionTable, savedData, pageSize, ZGNarrowSearchWithFunctionStoredCompare);
 			}
 			else
 			{
-				ZGNarrowSearchWithFunctionStored(comparisonFunction, processTask, searchData, (ZG32BitMemoryAddress)pointerSize, dataSize, oldResultSetStartIndex, oldResultSet, newResultSet, pageToRegionTable, pageToSavedRegionTable, savedData, pageSize);
+				ZGNarrowSearchWithFunctionType(comparisonFunction, processTask, searchValue, searchData, (ZG32BitMemoryAddress)pointerSize, dataSize, oldResultSetStartIndex, oldResultSet, newResultSet, pageToRegionTable, pageToSavedRegionTable, savedData, pageSize, ZGNarrowSearchWithFunctionStoredCompare);
 			}
 		}
 	});
