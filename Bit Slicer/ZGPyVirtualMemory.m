@@ -73,6 +73,7 @@ declareVMPrototypeMethod(readFloat)
 declareVMPrototypeMethod(readDouble)
 declareVMPrototypeMethod(readString8)
 declareVMPrototypeMethod(readString16)
+declareVMPrototypeMethod(readPointer)
 declareVMPrototypeMethod(readBytes)
 
 declareVMPrototypeMethod(writeInt8)
@@ -87,6 +88,7 @@ declareVMPrototypeMethod(writeFloat)
 declareVMPrototypeMethod(writeDouble)
 declareVMPrototypeMethod(writeString8)
 declareVMPrototypeMethod(writeString16)
+declareVMPrototypeMethod(writePointer)
 declareVMPrototypeMethod(writeBytes)
 
 declareVMPrototypeMethod(pause)
@@ -115,6 +117,7 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareVMMethod(readDouble)
 	declareVMMethod(readString8)
 	declareVMMethod(readString16)
+	declareVMMethod(readPointer)
 	declareVMMethod(readBytes)
 
 	declareVMMethod(writeInt8)
@@ -129,6 +132,7 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareVMMethod(writeDouble)
 	declareVMMethod(writeString8)
 	declareVMMethod(writeString16)
+	declareVMMethod(writePointer)
 	declareVMMethod(writeBytes)
 	
 	declareVMMethod2(pause, METH_NOARGS)
@@ -277,6 +281,25 @@ VirtualMemory_read(uint64_t, "K", readUInt64)
 VirtualMemory_read(float, "f", readFloat)
 VirtualMemory_read(double, "d", readDouble)
 
+static PyObject *VirtualMemory_readPointer(VirtualMemory *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0x0;
+	if (PyArg_ParseTuple(args, "K:readPointer", &memoryAddress))
+	{
+		void *bytes = NULL;
+		ZGMemorySize size = self->is64Bit ? sizeof(ZGMemoryAddress) : sizeof(ZG32BitMemoryAddress);
+		
+		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &size))
+		{
+			ZGMemoryAddress pointer = self->is64Bit ? *(ZGMemoryAddress *)bytes : *(ZG32BitMemoryAddress *)bytes;
+			retValue = Py_BuildValue("K", pointer);
+			ZGFreeBytes(self->processTask, bytes, size);
+		}
+	}
+	return retValue;
+}
+
 static void readBytes(PyObject **retValue, VirtualMemory *self, ZGMemoryAddress memoryAddress, ZGMemorySize *numberOfBytes)
 {
 	void *bytes = NULL;
@@ -357,6 +380,31 @@ VirtualMemory_write(int64_t, "L", writeInt64)
 VirtualMemory_write(uint64_t, "K", writeUInt64)
 VirtualMemory_write(float, "f", writeFloat)
 VirtualMemory_write(double, "d", writeDouble)
+
+static PyObject *VirtualMemory_writePointer(VirtualMemory *self, PyObject *args)
+{
+	ZGMemoryAddress memoryAddress = 0x0;
+	ZGMemoryAddress pointer = 0x0;
+	if (PyArg_ParseTuple(args, "KK:writePointer", &memoryAddress, &pointer))
+	{
+		if (self->is64Bit)
+		{
+			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &pointer, sizeof(pointer)))
+			{
+				return NULL;
+			}
+		}
+		else
+		{
+			ZG32BitMemoryAddress pointerRead = (ZG32BitMemoryAddress)pointer;
+			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &pointerRead, sizeof(pointerRead)))
+			{
+				return NULL;
+			}
+		}
+	}
+	return Py_BuildValue("");
+}
 
 static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 {
