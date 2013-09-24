@@ -548,45 +548,42 @@ END_MEMORY_VIEW_CHANGE:
 
 - (void)hexTextView:(HFTextView *)representer didChangeProperties:(HFControllerPropertyBits)properties
 {
-	if (properties & HFControllerContentValue && self.currentMemorySize > 0)
+	if (properties & HFControllerContentValue && self.currentMemorySize > 0 && self.lastUpdateCount <= 0 && self.lastUpdatedData != nil)
 	{
-		if (self.lastUpdateCount <= 0)
+		ZGMemorySize length = self.lastUpdatedRange.length;
+		const unsigned char *oldBytes = self.lastUpdatedData.bytes;
+		unsigned char *newBytes = malloc(length);
+		[self.textView.controller.byteArray copyBytes:newBytes range:self.lastUpdatedRange];
+		
+		BOOL foundDifference = NO;
+		ZGMemorySize beginDifferenceIndex = 0;
+		ZGMemorySize endDifferenceIndex = 0;
+		
+		// Find the smallest difference to overwrite
+		for (ZGMemorySize byteIndex = 0; byteIndex < length; byteIndex++)
 		{
-			ZGMemorySize length = self.lastUpdatedRange.length;
-			const unsigned char *oldBytes = self.lastUpdatedData.bytes;
-			unsigned char *newBytes = malloc(length);
-			[self.textView.controller.byteArray copyBytes:newBytes range:self.lastUpdatedRange];
-			
-			BOOL foundDifference = NO;
-			ZGMemorySize beginDifferenceIndex = 0;
-			ZGMemorySize endDifferenceIndex = 0;
-			
-			// Find the smallest difference to overwrite
-			for (ZGMemorySize byteIndex = 0; byteIndex < length; byteIndex++)
+			if (oldBytes[byteIndex] != newBytes[byteIndex])
 			{
-				if (oldBytes[byteIndex] != newBytes[byteIndex])
+				if (!foundDifference)
 				{
-					if (!foundDifference)
-					{
-						beginDifferenceIndex = byteIndex;
-					}
-					endDifferenceIndex = byteIndex + 1;
-					
-					foundDifference = YES;
+					beginDifferenceIndex = byteIndex;
 				}
+				endDifferenceIndex = byteIndex + 1;
+				
+				foundDifference = YES;
 			}
-			
-			if (foundDifference)
-			{
-				ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, beginDifferenceIndex + self.lastUpdatedRange.location + self.currentMemoryAddress, &newBytes[beginDifferenceIndex], endDifferenceIndex - beginDifferenceIndex);
-			}
-			
-			free(newBytes);
-			
-			// Give user a moment to be able to make changes before we can re-enable live-updating
-			self.lastUpdateCount--;
-			[self performSelector:@selector(revertUpdateCount) withObject:nil afterDelay:1.5];
 		}
+		
+		if (foundDifference)
+		{
+			ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, beginDifferenceIndex + self.lastUpdatedRange.location + self.currentMemoryAddress, &newBytes[beginDifferenceIndex], endDifferenceIndex - beginDifferenceIndex);
+		}
+		
+		free(newBytes);
+		
+		// Give user a moment to be able to make changes before we can re-enable live-updating
+		self.lastUpdateCount--;
+		[self performSelector:@selector(revertUpdateCount) withObject:nil afterDelay:1.5];
 	}
 }
 
