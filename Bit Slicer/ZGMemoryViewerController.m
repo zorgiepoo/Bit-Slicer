@@ -608,13 +608,13 @@ END_MEMORY_VIEW_CHANGE:
 				// Second argument to HFRangeMake should be 0 instead of readSize since we're in overwrite mode
 				[newByteArray insertByteSlice:byteSlice inRange:HFRangeMake(overwriteLocation, 0)];
 				
+				self.lastUpdatedData = data;
+				self.lastUpdatedRange = HFRangeMake(overwriteLocation, readSize);
+				
 				self.lastUpdateCount++;
 				// Check if we're allowed to live-update
 				if (self.lastUpdateCount > 0)
 				{
-					self.lastUpdatedData = data;
-					self.lastUpdatedRange = HFRangeMake(overwriteLocation, readSize);
-					
 					[self.textView.controller setByteArray:newByteArray];
 				}
 				self.lastUpdateCount--;
