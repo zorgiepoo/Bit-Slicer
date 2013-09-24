@@ -557,16 +557,28 @@ END_MEMORY_VIEW_CHANGE:
 			unsigned char *newBytes = malloc(length);
 			[self.textView.controller.byteArray copyBytes:newBytes range:self.lastUpdatedRange];
 			
+			BOOL foundDifference = NO;
+			ZGMemorySize beginDifferenceIndex = 0;
+			ZGMemorySize endDifferenceIndex = 0;
+			
+			// Find the smallest difference to overwrite
 			for (ZGMemorySize byteIndex = 0; byteIndex < length; byteIndex++)
 			{
 				if (oldBytes[byteIndex] != newBytes[byteIndex])
 				{
-					ZGMemoryAddress modifiedAddress = byteIndex + self.lastUpdatedRange.location + self.currentMemoryAddress;
+					if (!foundDifference)
+					{
+						beginDifferenceIndex = byteIndex;
+					}
+					endDifferenceIndex = byteIndex + 1;
 					
-					ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, modifiedAddress, &newBytes[byteIndex], 0x1);
-					
-					break;
+					foundDifference = YES;
 				}
+			}
+			
+			if (foundDifference)
+			{
+				ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, beginDifferenceIndex + self.lastUpdatedRange.location + self.currentMemoryAddress, &newBytes[beginDifferenceIndex], endDifferenceIndex - beginDifferenceIndex);
 			}
 			
 			free(newBytes);
