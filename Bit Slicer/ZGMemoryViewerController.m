@@ -353,6 +353,8 @@
 	BOOL success = NO;
 	self.lastUpdateCount++;
 	
+	self.lastUpdatedData = nil;
+	
 	// When filling or clearing the memory viewer, make sure we aren't in overwrite mode
 	// If we are, filling the memory viewer will take too long, or clearing it will fail
 	self.textView.controller.editable = NO;
