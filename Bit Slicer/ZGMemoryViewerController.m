@@ -60,10 +60,14 @@
 
 @interface ZGMemoryViewerController ()
 
-@property (readwrite, strong) ZGStatusBarRepresenter *statusBarRepresenter;
-@property (readwrite, strong) ZGLineCountingRepresenter *lineCountingRepresenter;
-@property (readwrite, strong) DataInspectorRepresenter *dataInspectorRepresenter;
-@property (readwrite) BOOL showsDataInspector;
+@property (strong) ZGStatusBarRepresenter *statusBarRepresenter;
+@property (strong) ZGLineCountingRepresenter *lineCountingRepresenter;
+@property (strong) DataInspectorRepresenter *dataInspectorRepresenter;
+@property BOOL showsDataInspector;
+
+@property (strong, nonatomic) NSData *lastUpdatedData;
+@property (nonatomic) HFRange lastUpdatedRange;
+@property (nonatomic) int lastUpdateCount;
 
 @property (assign) IBOutlet HFTextView *textView;
 
@@ -141,8 +145,6 @@
 - (void)windowDidLoad
 {	
 	[self setWindowAttributesWithIdentifier:ZGMemoryViewerIdentifier];
-	
-	self.textView.controller.editable = NO;
 	
 	// So, I've no idea what HFTextView does by default, remove any type of representer that it might have and that we want to add
 	NSMutableArray *representersToRemove = [[NSMutableArray alloc] init];
@@ -349,6 +351,12 @@
 - (void)updateMemoryViewerAtAddress:(ZGMemoryAddress)desiredMemoryAddress withSelectionLength:(ZGMemorySize)selectionLength
 {
 	BOOL success = NO;
+	self.lastUpdateCount++;
+	
+	// When filling or clearing the memory viewer, make sure we aren't in overwrite mode
+	// If we are, filling the memory viewer will take too long, or clearing it will fail
+	self.textView.controller.editable = NO;
+	[self.textView.controller setInOverwriteMode:NO];
 	
 	if (!self.currentProcess.valid || ![self.currentProcess hasGrantedAccess])
 	{
@@ -511,6 +519,12 @@ END_MEMORY_VIEW_CHANGE:
 	{
 		[self clearData];
 	}
+	
+	// Revert back to overwrite mode
+	self.textView.controller.editable = YES;
+	[self.textView.controller setInOverwriteMode:YES];
+	
+	self.lastUpdateCount--;
 }
 
 - (IBAction)changeMemoryView:(id)sender
@@ -525,6 +539,43 @@ END_MEMORY_VIEW_CHANGE:
 	}
 	
 	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
+}
+
+- (void)revertUpdateCount
+{
+	self.lastUpdateCount++;
+}
+
+- (void)hexTextView:(HFTextView *)representer didChangeProperties:(HFControllerPropertyBits)properties
+{
+	if (properties & HFControllerContentValue && self.currentMemorySize > 0)
+	{
+		if (self.lastUpdateCount <= 0)
+		{
+			ZGMemorySize length = self.lastUpdatedRange.length;
+			const unsigned char *oldBytes = self.lastUpdatedData.bytes;
+			unsigned char *newBytes = malloc(length);
+			[self.textView.controller.byteArray copyBytes:newBytes range:self.lastUpdatedRange];
+			
+			for (ZGMemorySize byteIndex = 0; byteIndex < length; byteIndex++)
+			{
+				if (oldBytes[byteIndex] != newBytes[byteIndex])
+				{
+					ZGMemoryAddress modifiedAddress = byteIndex + self.lastUpdatedRange.location + self.currentMemoryAddress;
+					
+					ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, modifiedAddress, &newBytes[byteIndex], 0x1);
+					
+					break;
+				}
+			}
+			
+			free(newBytes);
+			
+			// Give user a moment to be able to make changes before we can re-enable live-updating
+			self.lastUpdateCount--;
+			[self performSelector:@selector(revertUpdateCount) withObject:nil afterDelay:1.5];
+		}
+	}
 }
 
 - (void)updateDisplayTimer:(NSTimer *)timer
@@ -548,11 +599,25 @@ END_MEMORY_VIEW_CHANGE:
 			void *bytes = NULL;
 			if (ZGReadBytes(self.currentProcess.processTask, readAddress, &bytes, &readSize) && readSize > 0)
 			{
-				HFFullMemoryByteSlice *byteSlice = [[HFFullMemoryByteSlice alloc] initWithData:[NSData dataWithBytes:bytes length:(NSUInteger)readSize]];
+				NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)readSize];
+				HFFullMemoryByteSlice *byteSlice = [[HFFullMemoryByteSlice alloc] initWithData:data];
 				HFByteArray *newByteArray = self.textView.controller.byteArray;
 				
-				[newByteArray insertByteSlice:byteSlice inRange:HFRangeMake((ZGMemoryAddress)(displayedLineRange.location * self.textView.controller.bytesPerLine), readSize)];
-				[self.textView.controller setByteArray:newByteArray];
+				unsigned long long overwriteLocation = (ZGMemoryAddress)(displayedLineRange.location * self.textView.controller.bytesPerLine);
+				
+				// Second argument to HFRangeMake should be 0 instead of readSize since we're in overwrite mode
+				[newByteArray insertByteSlice:byteSlice inRange:HFRangeMake(overwriteLocation, 0)];
+				
+				self.lastUpdateCount++;
+				// Check if we're allowed to live-update
+				if (self.lastUpdateCount > 0)
+				{
+					self.lastUpdatedData = data;
+					self.lastUpdatedRange = HFRangeMake(overwriteLocation, readSize);
+					
+					[self.textView.controller setByteArray:newByteArray];
+				}
+				self.lastUpdateCount--;
 				
 				ZGFreeBytes(self.currentProcess.processTask, bytes, readSize);
 			}
