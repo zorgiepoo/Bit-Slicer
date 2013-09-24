@@ -80,6 +80,11 @@
 
 #pragma mark Accessors
 
+- (NSUndoManager *)undoManager
+{
+	return self.textView.controller.undoManager;
+}
+
 - (HFRange)selectedAddressRange
 {
 	HFRange selectedRange = {.location = 0, .length = 0};
@@ -182,6 +187,8 @@
 	
 	[self.textView.controller addRepresenter:verticalScrollerRepresenter];
 	[self.textView.layoutRepresenter addRepresenter:verticalScrollerRepresenter];
+	
+	self.textView.controller.undoManager = [[NSUndoManager alloc] init];
 	
 	[self initiateDataInspector];
 	
@@ -354,6 +361,7 @@
 	self.lastUpdateCount++;
 	
 	self.lastUpdatedData = nil;
+	[self.textView.controller.undoManager removeAllActions];
 	
 	// When filling or clearing the memory viewer, make sure we aren't in overwrite mode
 	// If we are, filling the memory viewer will take too long, or clearing it will fail
@@ -548,6 +556,15 @@ END_MEMORY_VIEW_CHANGE:
 	self.lastUpdateCount++;
 }
 
+- (void)writeNewData:(NSData *)newData oldData:(NSData *)oldData address:(ZGMemoryAddress)address size:(ZGMemorySize)size
+{
+	if (ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newData.bytes, size))
+	{
+		[self.textView.controller.undoManager setActionName:@"Write Change"];
+		[[self.textView.controller.undoManager prepareWithInvocationTarget:self] writeNewData:oldData oldData:newData address:address size:size];
+	}
+}
+
 - (void)hexTextView:(HFTextView *)representer didChangeProperties:(HFControllerPropertyBits)properties
 {
 	if (properties & HFControllerContentValue && self.currentMemorySize > 0 && self.lastUpdateCount <= 0 && self.lastUpdatedData != nil)
@@ -578,7 +595,11 @@ END_MEMORY_VIEW_CHANGE:
 		
 		if (foundDifference)
 		{
-			ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, beginDifferenceIndex + self.lastUpdatedRange.location + self.currentMemoryAddress, &newBytes[beginDifferenceIndex], endDifferenceIndex - beginDifferenceIndex);
+			[self
+			 writeNewData:[NSData dataWithBytes:&newBytes[beginDifferenceIndex] length:endDifferenceIndex - beginDifferenceIndex]
+			 oldData:[NSData dataWithBytes:&oldBytes[beginDifferenceIndex] length:endDifferenceIndex - beginDifferenceIndex]
+			 address:beginDifferenceIndex + self.lastUpdatedRange.location + self.currentMemoryAddress
+			 size:endDifferenceIndex - beginDifferenceIndex];
 		}
 		
 		free(newBytes);
