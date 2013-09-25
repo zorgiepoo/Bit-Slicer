@@ -361,7 +361,6 @@
 	self.lastUpdateCount++;
 	
 	self.lastUpdatedData = nil;
-	[self.textView.controller.undoManager removeAllActions];
 	
 	// When filling or clearing the memory viewer, make sure we aren't in overwrite mode
 	// If we are, filling the memory viewer will take too long, or clearing it will fail
@@ -533,6 +532,8 @@ END_MEMORY_VIEW_CHANGE:
 	// Revert back to overwrite mode
 	self.textView.controller.editable = YES;
 	[self.textView.controller setInOverwriteMode:YES];
+	
+	[self.textView.controller.undoManager removeAllActions];
 	
 	self.lastUpdateCount--;
 }
