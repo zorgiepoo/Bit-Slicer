@@ -88,7 +88,11 @@
 	
 	if (success)
 	{
-		_mainAddress = ZGMainEntryAddress(_processTask, &_slideOffset);
+		ZGMemoryAddress regionAddress = 0;
+		ZGMemorySize regionSize = 0;
+		ZGMemoryBasicInfo regionInfo;
+		ZGRegionInfo(_processTask, &regionAddress, &regionSize, &regionInfo);
+		_mainAddress = ZGMainEntryAddress(_processTask, regionAddress, regionSize, &_slideOffset);
 	}
 	
 	return success;

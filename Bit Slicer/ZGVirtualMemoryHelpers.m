@@ -144,24 +144,12 @@ NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
 	return [ZGRegionsForProcessTask(processTask) count];
 }
 
-ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
+ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress regionAddress, ZGMemorySize regionSize, ZGMemoryAddress *slide)
 {
-	ZGRegion *firstReadableRegion = nil;
-	NSArray *regions = ZGRegionsForProcessTask(taskPort);
-	for (ZGRegion *region in regions)
-	{
-		if (region.protection & VM_PROT_READ)
-		{
-			firstReadableRegion = region;
-			break;
-		}
-	}
-	
-	ZGMemoryAddress mainAddress = firstReadableRegion.address; // sane default, beginning of __TEXT
+	ZGMemoryAddress mainAddress = regionAddress; // sane default, beginning of __TEXT
 	void *regionBytes = NULL;
-	ZGMemorySize regionSize = firstReadableRegion.size;
 	
-	if (ZGReadBytes(taskPort, firstReadableRegion.address, &regionBytes, &regionSize))
+	if (ZGReadBytes(taskPort, regionAddress, &regionBytes, &regionSize))
 	{
 		void *bytes = regionBytes;
 		struct mach_header_64 *machHeader = bytes;
@@ -179,7 +167,7 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 						struct segment_command_64 *segmentCommand = bytes;
 						if (strcmp(segmentCommand->segname, "__TEXT") == 0)
 						{
-							*slide = firstReadableRegion.address - segmentCommand->vmaddr;
+							*slide = regionAddress - segmentCommand->vmaddr;
 						}
 					}
 					else if (loadCommand->cmd == LC_SEGMENT)
@@ -187,7 +175,7 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 						struct segment_command *segmentCommand = bytes;
 						if (strcmp(segmentCommand->segname, "__TEXT") == 0)
 						{
-							*slide = firstReadableRegion.address - segmentCommand->vmaddr;
+							*slide = regionAddress - segmentCommand->vmaddr;
 						}
 					}
 					// For versions linked before 10.8
