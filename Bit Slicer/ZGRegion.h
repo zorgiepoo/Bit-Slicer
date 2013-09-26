@@ -43,10 +43,10 @@
 	void *_bytes;
 }
 
-@property (assign, nonatomic) ZGMemoryMap processTask;
-@property (assign, nonatomic) ZGMemoryAddress address;
-@property (assign, nonatomic) ZGMemorySize size;
-@property (assign, nonatomic) ZGMemoryProtection protection;
-@property (assign, nonatomic) void *bytes;
+@property (nonatomic) ZGMemoryMap processTask;
+@property (nonatomic) ZGMemoryAddress address;
+@property (nonatomic) ZGMemorySize size;
+@property (nonatomic) ZGMemoryProtection protection;
+@property (nonatomic) void *bytes;
 
 @end
