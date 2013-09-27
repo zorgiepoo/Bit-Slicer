@@ -146,16 +146,24 @@ NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
 
 ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 {
-	// Obtain 1st __TEXT region
-	ZGMemoryAddress regionAddress = 0;
-	ZGMemorySize regionSize = 0;
-	ZGMemoryBasicInfo regionInfo;
-	ZGRegionInfo(taskPort, &regionAddress, &regionSize, &regionInfo);
+	// Obtain first __TEXT region
+	ZGRegion *chosenRegion = nil;
+	for (ZGRegion *region in ZGRegionsForProcessTask(taskPort))
+	{
+		if (region.protection & VM_PROT_READ && region.protection & VM_PROT_EXECUTE)
+		{
+			chosenRegion = region;
+			break;
+		}
+	}
+	
+	ZGMemoryAddress regionAddress = chosenRegion.address;
+	ZGMemorySize regionSize = chosenRegion.size;
 	
 	ZGMemoryAddress mainAddress = regionAddress; // sane default, beginning of __TEXT
 	void *regionBytes = NULL;
 	
-	if (ZGReadBytes(taskPort, regionAddress, &regionBytes, &regionSize))
+	if (regionAddress > 0 && ZGReadBytes(taskPort, regionAddress, &regionBytes, &regionSize))
 	{
 		void *bytes = regionBytes;
 		struct mach_header_64 *machHeader = bytes;
