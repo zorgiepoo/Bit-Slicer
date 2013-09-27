@@ -522,29 +522,6 @@
 		
 		if (needsToUpdateWindow)
 		{
-			// Set up a limit on low and high boundaries so that we don't overlap regions
-			// note this is not perfect, in particular, if two regions are visible (say in a branch island after a code injection) this needsToUpdateWindow branch may be called frequently afterwards,
-			// until the user scrolls around a bit, or so. This is better than the disassembler completely messing up on the instructions though
-			BOOL foundRegionLowIndex = NO;
-			NSUInteger regionLowIndex = 0;
-			NSUInteger regionHighIndex = 0;
-			for (NSUInteger instructionIndex = visibleRowsRange.location; instructionIndex < visibleRowsRange.location + visibleRowsRange.length; instructionIndex++)
-			{
-				ZGInstruction *instruction = [self.instructions objectAtIndex:instructionIndex];
-				if (instruction.variable.address >= regionAddress && instruction.variable.address + instruction.variable.size <= regionAddress + regionSize)
-				{
-					if (!foundRegionLowIndex)
-					{
-						foundRegionLowIndex = YES;
-						regionLowIndex = instructionIndex;
-					}
-					
-					regionHighIndex = instructionIndex + 1;
-				}
-				
-				instructionIndex++;
-			}
-			
 			// Find a [start, end) range that we are allowed to remove from the table and insert in again with new instructions
 			// Pick start and end such that they are aligned with the assembly instructions
 			
@@ -565,8 +542,6 @@
 				}
 			}
 			while (YES);
-			
-			startRow = MAX(startRow, regionLowIndex);
 			
 			ZGInstruction *startInstruction = [self.instructions objectAtIndex:startRow];
 			ZGMemoryAddress startAddress = startInstruction.variable.address;
@@ -598,8 +573,6 @@
 				}
 			}
 			while (YES);
-			
-			endRow = MIN(endRow, regionHighIndex);
 			
 			ZGInstruction *endInstruction = [self.instructions objectAtIndex:endRow-1];
 			ZGMemoryAddress endAddress = endInstruction.variable.address + endInstruction.variable.size;
@@ -667,13 +640,33 @@
 	ZGInstruction *endInstruction = [self.instructions objectAtIndex:0];
 	ZGInstruction *startInstruction = nil;
 	NSUInteger bytesBehind = DESIRED_BYTES_TO_ADD_OFFSET;
-	while (!startInstruction && bytesBehind > 0)
+	
+	ZGRegion *endRegion = [[ZGRegion alloc] init];
+	endRegion.address = endInstruction.variable.address;
+	endRegion.size = 1;
+	
+	ZGMemoryBasicInfo unusedInfo;
+	
+	ZGRegionInfo(self.currentProcess.processTask, &endRegion->_address, &endRegion->_size, &unusedInfo);
+	
+	while (startInstruction == nil && bytesBehind > 0)
 	{
 		startInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address - bytesBehind inProcess:self.currentProcess];
+		
+		ZGRegion *startRegion = [[ZGRegion alloc] init];
+		startRegion.address = startInstruction.variable.address;
+		startRegion.size = 1;
+		
+		if (!ZGRegionInfo(self.currentProcess.processTask, &startRegion->_address, &startRegion->_size, &unusedInfo) || startRegion.address != endRegion.address)
+		{
+			// Try again
+			startInstruction = nil;
+		}
+		
 		bytesBehind /= 2;
 	}
 	
-	if (startInstruction)
+	if (startInstruction != nil)
 	{
 		ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 		
@@ -715,17 +708,37 @@
 {
 	ZGInstruction *lastInstruction = self.instructions.lastObject;
 	ZGInstruction *startInstruction = [self findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess];
+	
 	if (startInstruction != nil)
 	{
+		ZGRegion *startRegion = [[ZGRegion alloc] init];
+		startRegion.address = lastInstruction.variable.address;
+		startRegion.size = 1;
+		
+		ZGMemoryBasicInfo unusedInfo;
+		
+		ZGRegionInfo(self.currentProcess.processTask, &startRegion->_address, &startRegion->_size, &unusedInfo);
+		
 		ZGInstruction *endInstruction = nil;
 		NSUInteger bytesAhead = DESIRED_BYTES_TO_ADD_OFFSET;
-		while (!endInstruction && bytesAhead > 0)
+		while (endInstruction == nil && bytesAhead > 0)
 		{
 			endInstruction = [self findInstructionBeforeAddress:(startInstruction.variable.address + startInstruction.variable.size + bytesAhead) inProcess:self.currentProcess];
+			
+			ZGRegion *endRegion = [[ZGRegion alloc] init];
+			endRegion.address = endInstruction.variable.address + endInstruction.variable.size - 1;
+			endRegion.size = 1;
+			
+			if (!ZGRegionInfo(self.currentProcess.processTask, &endRegion->_address, &endRegion->_size, &unusedInfo) || endRegion.address != startRegion.address)
+			{
+				// Try again
+				endInstruction = nil;
+			}
+			
 			bytesAhead /= 2;
 		}
 		
-		if (endInstruction)
+		if (endInstruction != nil)
 		{
 			ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 			
