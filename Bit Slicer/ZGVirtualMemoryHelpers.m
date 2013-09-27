@@ -144,8 +144,14 @@ NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
 	return [ZGRegionsForProcessTask(processTask) count];
 }
 
-ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress regionAddress, ZGMemorySize regionSize, ZGMemoryAddress *slide)
+ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 {
+	// Obtain 1st __TEXT region
+	ZGMemoryAddress regionAddress = 0;
+	ZGMemorySize regionSize = 0;
+	ZGMemoryBasicInfo regionInfo;
+	ZGRegionInfo(taskPort, &regionAddress, &regionSize, &regionInfo);
+	
 	ZGMemoryAddress mainAddress = regionAddress; // sane default, beginning of __TEXT
 	void *regionBytes = NULL;
 	
