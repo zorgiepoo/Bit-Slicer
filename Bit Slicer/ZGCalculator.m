@@ -52,7 +52,8 @@
 		return nil;
 	}
 	
-	return [[expression ddNumberByEvaluatingString] stringValue];
+	NSError *unusedError = nil;
+	return [[expression ddNumberByEvaluatingStringWithSubstitutions:nil error:&unusedError] stringValue];
 }
 
 // Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
