@@ -49,6 +49,7 @@
 @property (nonatomic) BOOL is64Bit;
 @property (nonatomic, readonly) ZGMemoryAddress slideOffset;
 @property (nonatomic, readonly) ZGMemoryAddress mainAddress;
+@property (nonatomic, readonly) ZGMemoryAddress baseExecutableAddress;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 

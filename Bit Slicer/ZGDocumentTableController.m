@@ -155,13 +155,13 @@
 
 - (void)updateWatchVariablesTable:(NSTimer *)timer
 {
-	// First, update all the variable's addresses that are pointers
+	// First, update all the variables that have dynamic addresses
 	// We don't want to update this when the user is editing something in the table
 	if (self.windowController.currentProcess.valid && self.variablesTableView.editedRow == -1)
 	{
 		[self.documentData.variables enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
 		 {
-			 if (variable.isPointer)
+			 if (variable.usesDynamicAddress)
 			 {
 				 NSString *newAddressString =
 					[ZGCalculator
@@ -173,11 +173,6 @@
 					 variable.addressStringValue = newAddressString;
 					 [self.variablesTableView reloadData];
 				 }
-			 }
-			 
-			 if (index >= MAX_TABLE_VIEW_ITEMS - 1)
-			 {
-				 *stop = YES;
 			 }
 		 }];
 	}
@@ -200,11 +195,6 @@
 					 unichar terminatorValue = 0;
 					 ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));
 				 }
-			 }
-			 
-			 if (index >= MAX_TABLE_VIEW_ITEMS - 1)
-			 {
-				 *stop = YES;
 			 }
 		 }];
 	}
@@ -446,7 +436,7 @@
 		{
 			return NO;
 		}
-		else if (variable.isPointer)
+		else if (variable.usesDynamicAddress)
 		{
 			[self.windowController editVariablesAddress:nil];
 			return NO;

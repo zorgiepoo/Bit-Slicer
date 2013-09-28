@@ -35,6 +35,8 @@
 #import <Foundation/Foundation.h>
 @class ZGProcess;
 
+#define BASE_EXEC_VARIABLE @"BASE_EXEC"
+
 @interface ZGCalculator : NSObject
 
 + (NSString *)evaluateExpression:(NSString *)expression;

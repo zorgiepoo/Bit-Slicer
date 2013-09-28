@@ -47,6 +47,7 @@ BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task);
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
 
+ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort);
 ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide);
 
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);

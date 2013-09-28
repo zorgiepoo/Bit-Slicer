@@ -893,13 +893,13 @@
 	 addressFormula:variable.addressFormula];
 	
 	variable.addressFormula = newAddressFormula;
-	if ([newAddressFormula rangeOfString:@"["].location != NSNotFound && [newAddressFormula rangeOfString:@"]"].location != NSNotFound)
+	if (([newAddressFormula rangeOfString:@"["].location != NSNotFound && [newAddressFormula rangeOfString:@"]"].location != NSNotFound) || [newAddressFormula rangeOfString:BASE_EXEC_VARIABLE].location != NSNotFound)
 	{
-		variable.isPointer = YES;
+		variable.usesDynamicAddress = YES;
 	}
 	else
 	{
-		variable.isPointer = NO;
+		variable.usesDynamicAddress = NO;
 		variable.addressStringValue = [ZGCalculator evaluateExpression:newAddressFormula];
 		[self.windowController.tableController.variablesTableView reloadData];
 	}

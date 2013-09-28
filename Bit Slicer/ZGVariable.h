@@ -43,19 +43,19 @@ extern NSString *ZGVariablePboardType;
 	NSString *_addressStringValue;
 }
 
-@property (assign, nonatomic) BOOL enabled;
+@property (nonatomic) BOOL enabled;
 @property (copy, nonatomic) NSString *addressFormula;
-@property (readwrite, nonatomic) ZGVariableType type;
-@property (readwrite, nonatomic) BOOL isFrozen;
-@property (readwrite, nonatomic) ZGVariableQualifier qualifier;
+@property (nonatomic) ZGVariableType type;
+@property (nonatomic) BOOL isFrozen;
+@property (nonatomic) ZGVariableQualifier qualifier;
 @property (readonly, nonatomic) ZGMemoryAddress address;
-@property (readwrite, nonatomic) ZGMemorySize size;
-@property (readwrite, nonatomic) ZGMemorySize lastUpdatedSize;
-@property (readwrite, nonatomic) BOOL isPointer;
-@property (readwrite, nonatomic) void *value;
+@property (nonatomic) ZGMemorySize size;
+@property (nonatomic) ZGMemorySize lastUpdatedSize;
+@property (nonatomic) BOOL usesDynamicAddress;
+@property (nonatomic) void *value;
 @property (copy, nonatomic) NSString *addressStringValue;
 @property (copy, nonatomic) NSString *stringValue;
-@property (readwrite, nonatomic) void *freezeValue;
+@property (nonatomic) void *freezeValue;
 @property (copy, nonatomic) NSString *scriptValue;
 @property (readonly, nonatomic) NSString *sizeStringValue;
 @property (copy, nonatomic) NSString *name;

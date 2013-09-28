@@ -144,7 +144,7 @@ NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
 	return [ZGRegionsForProcessTask(processTask) count];
 }
 
-ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
+ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap taskPort)
 {
 	// Obtain first __TEXT region
 	ZGRegion *chosenRegion = nil;
@@ -156,9 +156,20 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 			break;
 		}
 	}
+	return chosenRegion;
+}
+
+ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort)
+{
+	return [ZGBaseExecutableRegion(taskPort) address];
+}
+
+ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
+{
+	ZGRegion *baseRegion = ZGBaseExecutableRegion(taskPort);
 	
-	ZGMemoryAddress regionAddress = chosenRegion.address;
-	ZGMemorySize regionSize = chosenRegion.size;
+	ZGMemoryAddress regionAddress = baseRegion.address;
+	ZGMemorySize regionSize = baseRegion.size;
 	
 	ZGMemoryAddress mainAddress = regionAddress; // sane default, beginning of __TEXT
 	void *regionBytes = NULL;

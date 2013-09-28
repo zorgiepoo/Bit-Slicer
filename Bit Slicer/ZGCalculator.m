@@ -45,7 +45,7 @@
 	return [[expression stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0;
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression
++ (NSString *)evaluateExpression:(NSString *)expression substitutions:(NSDictionary *)substitutions
 {
 	if (![self isValidExpression:expression])
 	{
@@ -53,17 +53,24 @@
 	}
 	
 	NSError *unusedError = nil;
-	return [[expression ddNumberByEvaluatingStringWithSubstitutions:nil error:&unusedError] stringValue];
+	return [[expression ddNumberByEvaluatingStringWithSubstitutions:substitutions error:&unusedError] stringValue];
+}
+
++ (NSString *)evaluateExpression:(NSString *)expression
+{
+	return [self evaluateExpression:expression substitutions:nil];
 }
 
 // Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
-+ (NSString *)evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process
++ (NSString *)_evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process
 {
 	NSUInteger addressFormulaIndex;
 	NSInteger numberOfOpenBrackets = 0;
 	NSInteger numberOfClosedBrackets = 0;
 	NSInteger firstOpenBracket = -1;
 	NSInteger matchingClosedBracket = -1;
+	
+	NSDictionary *substitutions = @{@"BASE_EXEC" : @(process.baseExecutableAddress)};
 	
 	for (addressFormulaIndex = 0; addressFormulaIndex < [addressFormula length]; addressFormulaIndex++)
 	{
@@ -85,10 +92,7 @@
 				if (firstOpenBracket != -1 && matchingClosedBracket != -1)
 				{
 					NSString *innerExpression = [addressFormula substringWithRange:NSMakeRange(firstOpenBracket + 1, matchingClosedBracket - firstOpenBracket - 1)];
-					NSString *addressExpression =
-						[self
-						 evaluateAddress:[NSMutableString stringWithString:innerExpression]
-						 process:process];
+					NSString *addressExpression = [self evaluateAddress:[NSMutableString stringWithString:innerExpression] process:process];
 					
 					ZGMemoryAddress address;
 					if ([addressExpression zgIsHexRepresentation])
@@ -130,7 +134,7 @@
 				else
 				{
 					// just a plain simple expression
-					addressFormula = [NSMutableString stringWithString:[[self class] evaluateExpression:addressFormula]];
+					addressFormula = [NSMutableString stringWithString:[[self class] evaluateExpression:addressFormula substitutions:substitutions]];
 				}
 				
 				firstOpenBracket = -1;
@@ -143,7 +147,15 @@
 		}
 	}
 	
-	return [[self class] evaluateExpression:addressFormula];
+	return [[self class] evaluateExpression:addressFormula substitutions:substitutions];
+}
+
++ (NSString *)evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process
+{
+	NSMutableString	 *newAddressFormula = [[NSMutableString alloc] initWithString:addressFormula];
+	[newAddressFormula replaceOccurrencesOfString:BASE_EXEC_VARIABLE withString:@"$"BASE_EXEC_VARIABLE options:NSCaseInsensitiveSearch | NSLiteralSearch range:NSMakeRange(0, addressFormula.length)];
+	
+	return [self _evaluateAddress:newAddressFormula process:process];
 }
 
 @end

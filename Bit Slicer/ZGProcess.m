@@ -89,6 +89,7 @@
 	if (success)
 	{
 		_mainAddress = ZGMainEntryAddress(_processTask, &_slideOffset);
+		_baseExecutableAddress = ZGBaseExecutableAddress(_processTask);
 	}
 	
 	return success;

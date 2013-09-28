@@ -47,14 +47,14 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 #define ZGAddressKey @"ZGAddressKey"
 #define ZGSizeKey	 @"ZGSizeKey"
-#define ZGEnabledKey @"ZGShouldBeSearchedKey" // for backwards compatibility
+#define ZGEnabledKey @"ZGShouldBeSearchedKey" // value is for backwards compatibility
 #define ZGIsFrozenKey @"ZGIsFrozenKey"
 #define ZGTypeKey @"ZGTypeKey"
 #define ZGQualifierKey @"ZGQualifierKey"
 #define ZGValueKey @"ZGValueKey"
 #define ZGFreezeValueKey @"ZGFreezeValueKey"
 #define ZGNameKey @"ZGNameKey"
-#define ZGIsPointerKey @"ZGIsPointerKey"
+#define ZGDynamicAddressKey @"ZGIsPointerKey" // value is for backwards compatibility
 #define ZGAddressFormulaKey @"ZGAddressFormulaKey"
 #define ZGScriptKey @"ZGScriptKey"
 
@@ -89,8 +89,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	 forKey:ZGNameKey];
 	
 	[coder
-	 encodeBool:self.isPointer
-	 forKey:ZGIsPointerKey];
+	 encodeBool:self.usesDynamicAddress
+	 forKey:ZGDynamicAddressKey];
 	
 	[coder
 	 encodeObject:self.addressFormula
@@ -129,7 +129,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	self.type = [coder decodeInt32ForKey:ZGTypeKey];
 	self.qualifier = [coder decodeInt32ForKey:ZGQualifierKey];
 	
-	self.isPointer = [coder decodeBoolForKey:ZGIsPointerKey];
+	self.usesDynamicAddress = [coder decodeBoolForKey:ZGDynamicAddressKey];
 	[self setAddressFormula:[coder decodeObjectForKey:ZGAddressFormulaKey]];
 	
 	NSString *variableName = [coder decodeObjectForKey:ZGNameKey];
