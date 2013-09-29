@@ -281,7 +281,7 @@
 	
 	for (ZGRunningProcessObserver *runningProcessObserver in self.priorityProcesses)
 	{	
-		mach_port_name_t task = MACH_PORT_NULL;
+		ZGMemoryMap task = MACH_PORT_NULL;
 		BOOL success = ZGTaskPortForPID(runningProcessObserver.runningProcess.processIdentifier, &task);
 		
 		if (!success || !MACH_PORT_VALID(task))
