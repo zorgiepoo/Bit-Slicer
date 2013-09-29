@@ -282,9 +282,9 @@
 	for (ZGRunningProcessObserver *runningProcessObserver in self.priorityProcesses)
 	{	
 		mach_port_name_t task = MACH_PORT_NULL;
-		kern_return_t result = task_for_pid(current_task(), runningProcessObserver.runningProcess.processIdentifier, &task);
+		BOOL success = ZGTaskPortForPID(runningProcessObserver.runningProcess.processIdentifier, &task);
 		
-		if (result != KERN_SUCCESS || !MACH_PORT_VALID(task))
+		if (!success || !MACH_PORT_VALID(task))
 		{
 			shouldRetrieveList = YES;
 			[self removePriorityToProcessIdentifier:runningProcessObserver.runningProcess.processIdentifier withObserver:runningProcessObserver.observer];
