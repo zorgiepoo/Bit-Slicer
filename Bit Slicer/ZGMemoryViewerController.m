@@ -637,12 +637,12 @@ END_MEMORY_VIEW_CHANGE:
 				HFByteArray *newByteArray = self.textView.controller.byteArray;
 				
 				unsigned long long overwriteLocation = (ZGMemoryAddress)(displayedLineRange.location * self.textView.controller.bytesPerLine);
+				HFRange replaceRange = HFRangeMake(overwriteLocation, readSize);
 				
-				// Second argument to HFRangeMake should be 0 instead of readSize since we're in overwrite mode
-				[newByteArray insertByteSlice:byteSlice inRange:HFRangeMake(overwriteLocation, 0)];
+				[newByteArray insertByteSlice:byteSlice inRange:replaceRange];
 				
 				self.lastUpdatedData = data;
-				self.lastUpdatedRange = HFRangeMake(overwriteLocation, readSize);
+				self.lastUpdatedRange = replaceRange;
 				
 				self.lastUpdateCount++;
 				// Check if we're allowed to live-update
