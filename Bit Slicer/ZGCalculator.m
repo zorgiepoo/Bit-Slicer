@@ -36,9 +36,59 @@
 #import "NSStringAdditions.h"
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
+#import "DDMathEvaluator.h"
 #import "NSString+DDMathParsing.h"
+#import "DDExpression.h"
+
+#define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"
+#define ZGProcessTaskVariable @"ZGProcessTaskVariable"
+#define ZGPointerSizeVariable @"ZGPointerSizeVariable"
 
 @implementation ZGCalculator
+
++ (void)initialize
+{
+	static dispatch_once_t once;
+	dispatch_once(&once, ^{
+		DDMathEvaluator *evaluator = [DDMathEvaluator sharedMathEvaluator];
+		[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+			ZGMemoryAddress pointer = 0x0;
+			if (args.count == 1)
+			{
+				NSError *unusedError = nil;
+				NSNumber *memoryAddressNumber = [[args objectAtIndex:0] evaluateWithSubstitutions:vars evaluator:eval error:&unusedError];
+				
+				ZGMemoryAddress memoryAddress = [memoryAddressNumber unsignedLongLongValue];
+				ZGMemoryMap processTask = [[vars objectForKey:ZGProcessTaskVariable] unsignedIntValue];
+				ZGMemorySize pointerSize = [[vars objectForKey:ZGPointerSizeVariable] unsignedLongLongValue];
+				
+				void *bytes = NULL;
+				ZGMemorySize sizeRead = pointerSize;
+				if (ZGReadBytes(processTask, memoryAddress, &bytes, &sizeRead))
+				{
+					if (sizeRead == pointerSize)
+					{
+						pointer = (pointerSize == sizeof(ZGMemoryAddress)) ? *(ZGMemoryAddress *)bytes : *(ZG32BitMemoryAddress *)bytes;
+					}
+					else if (error != NULL)
+					{
+						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" didn't read sufficient number of bytes"}];
+					}
+					ZGFreeBytes(processTask, bytes, sizeRead);
+				}
+				else if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" failed to read bytes"}];
+				}
+			}
+			else if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" expects 1 argument"}];
+			}
+			return [DDExpression numberExpressionWithNumber:@(pointer)];
+		} forName:ZGCalculatePointerFunction];
+	});
+}
 
 + (BOOL)isValidExpression:(NSString *)expression
 {
@@ -61,101 +111,21 @@
 	return [self evaluateExpression:expression substitutions:nil];
 }
 
-// Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
-+ (NSString *)_evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process
-{
-	NSUInteger addressFormulaIndex;
-	NSInteger numberOfOpenBrackets = 0;
-	NSInteger numberOfClosedBrackets = 0;
-	NSInteger firstOpenBracket = -1;
-	NSInteger matchingClosedBracket = -1;
-	
-	NSDictionary *substitutions = @{@"BASE_EXEC" : @(process.baseExecutableAddress)};
-	
-	for (addressFormulaIndex = 0; addressFormulaIndex < [addressFormula length]; addressFormulaIndex++)
-	{
-		if ([addressFormula characterAtIndex:addressFormulaIndex] == '[')
-		{
-			numberOfOpenBrackets++;
-			if (firstOpenBracket == -1)
-			{
-				firstOpenBracket = addressFormulaIndex;
-			}
-		}
-		else if ([addressFormula characterAtIndex:addressFormulaIndex] == ']')
-		{
-			numberOfClosedBrackets++;
-			if (numberOfClosedBrackets == numberOfOpenBrackets)
-			{
-				matchingClosedBracket = addressFormulaIndex;
-				
-				if (firstOpenBracket != -1 && matchingClosedBracket != -1)
-				{
-					NSString *innerExpression = [addressFormula substringWithRange:NSMakeRange(firstOpenBracket + 1, matchingClosedBracket - firstOpenBracket - 1)];
-					NSString *addressExpression = [self evaluateAddress:[NSMutableString stringWithString:innerExpression] process:process];
-					
-					ZGMemoryAddress address;
-					if ([addressExpression zgIsHexRepresentation])
-					{
-						[[NSScanner scannerWithString:addressExpression] scanHexLongLong:&address];
-					}
-					else
-					{
-						[[NSScanner scannerWithString:addressExpression] scanLongLong:(long long *)&address];
-					}
-					
-					ZGMemorySize size = process.pointerSize;
-					void *value = NULL;
-					
-					NSMutableString *newExpression;
-					
-					if (ZGReadBytes([process processTask], address, &value, &size))
-					{
-						if ([process is64Bit])
-						{
-							newExpression = [NSMutableString stringWithFormat:@"%llu", *((int64_t *)value)];
-						}
-						else
-						{
-							newExpression = [NSMutableString stringWithFormat:@"%u", *((int32_t *)value)];
-						}
-                        
-						ZGFreeBytes([process processTask], value, size);
-					}
-					else
-					{
-						newExpression = [NSMutableString stringWithString:@"0x0"];
-					}
-					
-					[addressFormula
-					 replaceCharactersInRange:NSMakeRange(firstOpenBracket, matchingClosedBracket - firstOpenBracket + 1)
-					 withString:newExpression];
-				}
-				else
-				{
-					// just a plain simple expression
-					addressFormula = [NSMutableString stringWithString:[[self class] evaluateExpression:addressFormula substitutions:substitutions]];
-				}
-				
-				firstOpenBracket = -1;
-				numberOfClosedBrackets = 0;
-				numberOfOpenBrackets = 0;
-				// Go back to 0 to scan the whole string again
-				// We can't just continue from where we just were if a string replacement occurred
-				addressFormulaIndex = -1;
-			}
-		}
-	}
-	
-	return [[self class] evaluateExpression:addressFormula substitutions:substitutions];
-}
-
 + (NSString *)evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process
 {
 	NSMutableString	 *newAddressFormula = [[NSMutableString alloc] initWithString:addressFormula];
+	
+	// Prepend $ for BASE_EXEC
 	[newAddressFormula replaceOccurrencesOfString:BASE_EXEC_VARIABLE withString:@"$"BASE_EXEC_VARIABLE options:NSCaseInsensitiveSearch | NSLiteralSearch range:NSMakeRange(0, addressFormula.length)];
 	
-	return [self _evaluateAddress:newAddressFormula process:process];
+	// Handle [expression] by renaming it as a function
+	[newAddressFormula replaceOccurrencesOfString:@"[" withString:ZGCalculatePointerFunction@"(" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
+	[newAddressFormula replaceOccurrencesOfString:@"]" withString:@")" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
+	
+	// Pass BASE_EXEC, process task, and pointer size
+	NSDictionary *substitutions = @{BASE_EXEC_VARIABLE : @(process.baseExecutableAddress), ZGProcessTaskVariable : @(process.processTask), ZGPointerSizeVariable : @(process.pointerSize)};
+	
+	return [self evaluateExpression:newAddressFormula substitutions:substitutions];
 }
 
 @end

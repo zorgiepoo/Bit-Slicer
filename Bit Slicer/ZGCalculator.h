@@ -40,6 +40,7 @@
 @interface ZGCalculator : NSObject
 
 + (NSString *)evaluateExpression:(NSString *)expression;
+// Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc... and can also take BASE_EXEC variable
 + (NSString *)evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process;
 
 @end
