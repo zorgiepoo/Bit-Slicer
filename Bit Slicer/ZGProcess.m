@@ -36,6 +36,9 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 
+#import "ZGRegion.h"
+#include <libproc.h>
+
 @implementation ZGProcess
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask
@@ -88,7 +91,6 @@
 	
 	if (success)
 	{
-		_mainAddress = ZGMainEntryAddress(_processTask, &_slideOffset);
 		_baseExecutableAddress = ZGBaseExecutableAddress(_processTask);
 	}
 	

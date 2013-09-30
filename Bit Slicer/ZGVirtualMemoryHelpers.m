@@ -159,21 +159,29 @@ ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap taskPort)
 	return chosenRegion;
 }
 
-ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort)
-{
-	return [ZGBaseExecutableRegion(taskPort) address];
+#define ZGFindTextAddressInSegment(segment_type, section_type, bail_label, bytes, textAddress) \
+struct segment_type *segmentCommand = bytes; \
+if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
+{ \
+	void *sectionBytes = bytes + sizeof(*segmentCommand); \
+	for (struct section_type *section = sectionBytes; (void *)section < sectionBytes + segmentCommand->cmdsize; section++) \
+	{ \
+		if (strcmp("__text", section->sectname) == 0) \
+		{ \
+			textAddress += section->offset; \
+			goto bail_label; \
+		} \
+	} \
 }
 
-ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
+ZGMemoryAddress ZGFirstInstructionAddress(ZGMemoryMap taskPort, ZGRegion *region)
 {
-	ZGRegion *baseRegion = ZGBaseExecutableRegion(taskPort);
+	ZGMemoryAddress regionAddress = region.address;
+	ZGMemorySize regionSize = region.size;
 	
-	ZGMemoryAddress regionAddress = baseRegion.address;
-	ZGMemorySize regionSize = baseRegion.size;
+	ZGMemoryAddress textAddress = regionAddress;
 	
-	ZGMemoryAddress mainAddress = regionAddress; // sane default, beginning of __TEXT
 	void *regionBytes = NULL;
-	
 	if (regionAddress > 0 && ZGReadBytes(taskPort, regionAddress, &regionBytes, &regionSize))
 	{
 		void *bytes = regionBytes;
@@ -189,39 +197,11 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 					struct load_command *loadCommand = bytes;
 					if (loadCommand->cmd == LC_SEGMENT_64)
 					{
-						struct segment_command_64 *segmentCommand = bytes;
-						if (strcmp(segmentCommand->segname, "__TEXT") == 0)
-						{
-							*slide = regionAddress - segmentCommand->vmaddr;
-						}
+						ZGFindTextAddressInSegment(segment_command_64, section_64, ZGFirstInstructionAddressBail, bytes, textAddress);
 					}
 					else if (loadCommand->cmd == LC_SEGMENT)
 					{
-						struct segment_command *segmentCommand = bytes;
-						if (strcmp(segmentCommand->segname, "__TEXT") == 0)
-						{
-							*slide = regionAddress - segmentCommand->vmaddr;
-						}
-					}
-					// For versions linked before 10.8
-					else if (loadCommand->cmd == LC_UNIXTHREAD)
-					{
-						void *threadState = bytes + sizeof(uint32_t) * 4; // skip to thread state (see struct thread_command);
-						if (machHeader->magic == MH_MAGIC_64)
-						{
-							mainAddress = ((x86_thread_state64_t *)threadState)->__rip;
-						}
-						else
-						{
-							mainAddress = ((x86_thread_state32_t *)threadState)->__eip;
-						}
-						mainAddress += *slide;
-					}
-					// For versions linked after 10.8
-					else if (loadCommand->cmd == LC_MAIN)
-					{
-						struct entry_point_command *entryPointCommand = bytes;
-						mainAddress += entryPointCommand->entryoff;
+						ZGFindTextAddressInSegment(segment_command, section, ZGFirstInstructionAddressBail, bytes, textAddress);
 					}
 					
 					bytes += loadCommand->cmdsize;
@@ -229,10 +209,16 @@ ZGMemoryAddress ZGMainEntryAddress(ZGMemoryMap taskPort, ZGMemoryAddress *slide)
 			}
 		}
 		
+	ZGFirstInstructionAddressBail:
 		ZGFreeBytes(taskPort, regionBytes, regionSize);
 	}
 	
-	return mainAddress;
+	return textAddress;
+}
+
+ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort)
+{
+	return [ZGBaseExecutableRegion(taskPort) address];
 }
 
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)
