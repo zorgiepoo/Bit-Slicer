@@ -447,7 +447,7 @@
 		
 		void *bytes = NULL;
 		
-		if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize) && memorySize > 0)
+		if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize))
 		{
 			if (self.textView.data && ![self.textView.data isEqualToData:[NSData data]])
 			{	
