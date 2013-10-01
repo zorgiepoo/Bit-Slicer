@@ -54,6 +54,8 @@ ZGMemoryAddress ZGFirstInstructionAddress(ZGMemoryMap taskPort, ZGRegion *region
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
 NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
 
+NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask);
+
 void ZGFreeData(NSArray *dataArray);
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress);
 

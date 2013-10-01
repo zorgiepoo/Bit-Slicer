@@ -121,11 +121,17 @@ NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
 	ZGMemoryAddress address = 0x0;
 	ZGMemorySize size;
 	vm_region_basic_info_data_64_t info;
-	mach_msg_type_number_t infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+	mach_msg_type_number_t infoCount;
 	mach_port_t objectName = MACH_PORT_NULL;
 	
-	while (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &infoCount, &objectName) == KERN_SUCCESS)
+	while (1)
 	{
+		infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+		if (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &infoCount, &objectName) != KERN_SUCCESS)
+		{
+			break;
+		}
+		
 		ZGRegion *region = [[ZGRegion alloc] init];
 		region.address = address;
 		region.size = size;
@@ -134,6 +140,37 @@ NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
 		[regions addObject:region];
 		
 		address += size;
+	}
+	
+	return [NSArray arrayWithArray:regions];
+}
+
+NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask)
+{
+	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	
+	ZGMemoryAddress address = 0x0;
+	ZGMemorySize size;
+	vm_region_submap_info_data_64_t info;
+	mach_msg_type_number_t infoCount;
+	natural_t depth = 0;
+	
+	while (1)
+	{
+		infoCount = VM_REGION_SUBMAP_INFO_COUNT_64;
+		if (mach_vm_region_recurse(processTask, &address, &size, &depth, (vm_region_recurse_info_t)&info, &infoCount) != KERN_SUCCESS)
+		{
+			break;
+		}
+		
+		if (info.is_submap)
+		{
+			depth++;
+		}
+		else
+		{
+			address += size;
+		}
 	}
 	
 	return [NSArray arrayWithArray:regions];
