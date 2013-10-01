@@ -92,7 +92,6 @@
 	if (success)
 	{
 		_baseExecutableAddress = ZGBaseExecutableAddress(_processTask);
-		ZGRegionsForProcessTaskRecursively(_processTask);
 	}
 	
 	return success;
