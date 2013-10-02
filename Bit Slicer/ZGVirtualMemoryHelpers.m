@@ -45,6 +45,7 @@
 #import <libproc.h>
 
 #import <mach-o/loader.h>
+#import <mach-o/dyld_images.h>
 
 static NSDictionary *gTasksDictionary = nil;
 
@@ -190,6 +191,84 @@ NSString *ZGFilePathForRegion(ZGMemoryMap processTask, ZGRegion *region)
 	return ZGFilePathForRegionHelper(YES, processTask, region);
 }
 
+ZGRegion *ZGDylinkerRegion(ZGMemoryMap processTask, uint32_t *dyldAllImageInfosOffset, ZGMemorySize *pointerSize)
+{
+	ZGRegion *foundRegion = nil;
+	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
+	{
+		ZGMemoryAddress regionAddress = region.address;
+		ZGMemorySize regionSize = region.size;
+		void *regionBytes = NULL;
+		if (ZGReadBytes(processTask, regionAddress, &regionBytes, &regionSize))
+		{
+			struct mach_header_64 *machHeader = regionBytes;
+			if ((machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64) && machHeader->filetype == MH_DYLINKER)
+			{
+				if (pointerSize != NULL)
+				{
+					*pointerSize = machHeader->magic == MH_MAGIC_64 ? sizeof(uint64_t) : sizeof(uint32_t);
+				}
+				foundRegion = region;
+				if (dyldAllImageInfosOffset != NULL)
+				{
+					memcpy(dyldAllImageInfosOffset, regionBytes + DYLD_ALL_IMAGE_INFOS_OFFSET_OFFSET, sizeof(uint32_t));
+				}
+			}
+			ZGFreeBytes(processTask, regionBytes, regionSize);
+		}
+		if (foundRegion != nil)
+		{
+			break;
+		}
+	}
+	return foundRegion;
+}
+
+void ZGMachHeadersAndMappedPaths(ZGMemoryMap processTask)
+{
+	ZGMemorySize pointerSize = 0;
+	uint32_t dyldAllImageInfosOffset = 0;
+	ZGRegion *dylinkerRegion = ZGDylinkerRegion(processTask, &dyldAllImageInfosOffset, &pointerSize);
+	if (dylinkerRegion != nil)
+	{
+		ZGMemoryAddress allImageInfosAddress = dylinkerRegion.address + dyldAllImageInfosOffset;
+		ZGMemorySize allImageInfosSize = sizeof(uint32_t) * 2 + pointerSize; // Just interested in first three fields of struct dyld_all_image_infos
+		struct dyld_all_image_infos *allImageInfos = NULL;
+		if (ZGReadBytes(processTask, allImageInfosAddress, (void **)&allImageInfos, &allImageInfosSize))
+		{
+			ZGMemoryAddress infoArrayAddress = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)&allImageInfos->infoArray : *(ZGMemoryAddress *)&allImageInfos->infoArray;
+			const ZGMemorySize imageInfoSize = pointerSize * 3;
+			
+			void *infoArrayBytes = NULL;
+			ZGMemorySize infoArraySize = imageInfoSize * allImageInfos->infoArrayCount;
+			if (ZGReadBytes(processTask, infoArrayAddress, &infoArrayBytes, &infoArraySize))
+			{
+				for (uint32_t infoIndex = 0; infoIndex < allImageInfos->infoArrayCount; infoIndex++)
+				{
+					void *infoImage = infoArrayBytes + imageInfoSize * infoIndex;
+					
+					ZGMemoryAddress machHeaderPointer = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)infoImage : *(ZGMemoryAddress *)infoImage;
+					
+					ZGMemoryAddress imageFilePathPointer = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)(infoImage + pointerSize) : *(ZGMemoryAddress *)(infoImage + pointerSize);
+					
+					NSString *filePath = nil;
+					ZGMemorySize pathSize = ZGGetStringSize(processTask, imageFilePathPointer, ZGString8, 1, PATH_MAX) + 1;
+					void *filePathBytes = NULL;
+					if (ZGReadBytes(processTask, imageFilePathPointer, &filePathBytes, &pathSize))
+					{
+						filePath = [NSString stringWithUTF8String:filePathBytes];
+						ZGFreeBytes(processTask, filePathBytes, pathSize);
+					}
+					
+					NSLog(@"0x%llX: %@", machHeaderPointer, filePath);
+				}
+				ZGFreeBytes(processTask, infoArrayBytes, infoArraySize);
+			}
+			ZGFreeBytes(processTask, allImageInfos, allImageInfosSize);
+		}
+	}
+}
+
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
 {
 	NSMutableArray *regions = [[NSMutableArray alloc] init];
@@ -248,6 +327,7 @@ NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask)
 			ZGRegion *region = [[ZGRegion alloc] init];
 			region.address = address;
 			region.size = size;
+			region.protection = info.protection;
 			
 			address += size;
 		}
