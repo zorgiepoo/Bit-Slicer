@@ -117,80 +117,6 @@ void ZGFreeTask(ZGMemoryMap task)
 	}
 }
 
-// proc_regionfilename is not quite perfect
-// In particular if you have a few regions like so:
-// __TEXT 0x1000 - 0x2000
-// __TEXT 0x2000 - 0x3000
-// __DATA 0x3000 - 0x4000
-// __LINKEDIT 0x4000 - 0x5000
-// __LINKEDIT 0x5000 - 0x6000
-// From observation, only the *first* unique type of segment listed will return a filepath
-// That is, the 2nd __TEXT and 2nd __LINKEDIT using proc_regionfilename won't give same path
-// We can't make an assumption on protection (initial or not) attributes (following regions don't have to be same)
-// And I do not know how to get the segment type (it's not user_tag or object_id).. So, I am just going to fill in gaps for regions where paths before and after are defined
-// This is not perfect since it may not retrieve the path of the last trailing regions
-// However for our purposes this may be good enough since I am primarily interested in __TEXT and __DATA for now, and hope that __LINKEDIT will usually follow after
-NSString *ZGFilePathForRegionHelper(BOOL canRedeemSelf, ZGMemoryMap processTask, ZGRegion *region)
-{
-	NSString *result = nil;
-	int processID = 0;
-	if (ZGPIDForTaskPort(processTask, &processID))
-	{
-		ZGPIDForTaskPort(processTask, &processID);
-		void *filePath = calloc(1, PATH_MAX);
-		if (proc_regionfilename(processID, region.address, filePath, PATH_MAX) > 0) // Returns # of bytes read
-		{
-			result = [NSString stringWithUTF8String:filePath];
-		}
-		else if (canRedeemSelf)
-		{
-			ZGMemoryAddress regionAddress = region.address - 1;
-			ZGMemorySize regionSize = 1;
-			ZGMemoryBasicInfo unusedInfo;
-			
-			ZGRegion *previousRegion = nil;
-			ZGRegion *nextRegion = nil;
-			
-			if (!ZGRegionInfo(processTask, &regionAddress, &regionSize, &unusedInfo) || regionAddress + regionSize != region.address)
-			{
-				goto SKIP_NEXT_AND_PREVIOUS_REGIONS;
-			}
-			
-			previousRegion = [[ZGRegion alloc] init];
-			previousRegion.address	 = regionAddress;
-			previousRegion.size = regionSize;
-			
-			regionAddress = region.address + region.size;
-			regionSize = 1;
-			if (!ZGRegionInfo(processTask, &regionAddress, &regionSize, &unusedInfo) || region.address + region.size != regionAddress)
-			{
-				goto SKIP_NEXT_AND_PREVIOUS_REGIONS;
-			}
-			
-			nextRegion = [[ZGRegion alloc] init];
-			nextRegion.address = regionAddress;
-			nextRegion.size = regionSize;
-			
-			NSString *previousRegionFilePath = ZGFilePathForRegionHelper(NO, processTask, previousRegion);
-			if (previousRegionFilePath == nil) goto SKIP_NEXT_AND_PREVIOUS_REGIONS;
-			
-			NSString *nextRegionFilePath = ZGFilePathForRegionHelper(NO, processTask, nextRegion);
-			if ([nextRegionFilePath isEqualToString:previousRegionFilePath])
-			{
-				result = nextRegionFilePath;
-			}
-		}
-	SKIP_NEXT_AND_PREVIOUS_REGIONS:
-		free(filePath);
-	}
-	return result;
-}
-
-NSString *ZGFilePathForRegion(ZGMemoryMap processTask, ZGRegion *region)
-{
-	return ZGFilePathForRegionHelper(YES, processTask, region);
-}
-
 ZGRegion *ZGDylinkerRegion(ZGMemoryMap processTask, uint32_t *dyldAllImageInfosOffset, ZGMemorySize *pointerSize)
 {
 	ZGRegion *foundRegion = nil;
@@ -224,8 +150,11 @@ ZGRegion *ZGDylinkerRegion(ZGMemoryMap processTask, uint32_t *dyldAllImageInfosO
 	return foundRegion;
 }
 
-void ZGMachHeadersAndMappedPaths(ZGMemoryMap processTask)
+#define ZGMachHeaderAddressKey @"ZGMachHeaderAddressKey"
+#define ZGMappedFilePathKey @"ZGMappedFilePathKey"
+NSArray *ZGMachHeadersAndMappedPaths(ZGMemoryMap processTask)
 {
+	NSMutableArray *results = [[NSMutableArray alloc] init];
 	ZGMemorySize pointerSize = 0;
 	uint32_t dyldAllImageInfosOffset = 0;
 	ZGRegion *dylinkerRegion = ZGDylinkerRegion(processTask, &dyldAllImageInfosOffset, &pointerSize);
@@ -260,13 +189,14 @@ void ZGMachHeadersAndMappedPaths(ZGMemoryMap processTask)
 						ZGFreeBytes(processTask, filePathBytes, pathSize);
 					}
 					
-					NSLog(@"0x%llX: %@", machHeaderPointer, filePath);
+					[results addObject:@{ZGMachHeaderAddressKey : @(machHeaderPointer), ZGMappedFilePathKey : filePath != nil ? filePath : [NSNull null]}];
 				}
 				ZGFreeBytes(processTask, infoArrayBytes, infoArraySize);
 			}
 			ZGFreeBytes(processTask, allImageInfos, allImageInfosSize);
 		}
 	}
+	return results;
 }
 
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
@@ -356,6 +286,92 @@ ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap taskPort)
 	return chosenRegion;
 }
 
+#define ZGFindTextAddressAndTotalSegmentSize(segment_type, section_type, bytes, machHeaderAddress, textAddress, totalSize, numberOfSegmentsToFind) \
+struct segment_type *segmentCommand = bytes; \
+void *sectionBytes = bytes + sizeof(*segmentCommand); \
+if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
+{ \
+	for (struct section_type *section = sectionBytes; (void *)section < sectionBytes + segmentCommand->cmdsize; section++) \
+	{ \
+		if (strcmp("__text", section->sectname) == 0) \
+		{ \
+			*textAddress = machHeaderAddress + section->offset; \
+			break; \
+		} \
+	} \
+	*totalSize += segmentCommand->vmsize; \
+	numberOfSegmentsToFind--; \
+} \
+else if (strcmp(segmentCommand->segname, "__DATA") == 0) \
+{ \
+	*totalSize += segmentCommand->vmsize; \
+	numberOfSegmentsToFind--; \
+} \
+else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
+{ \
+	*totalSize += segmentCommand->vmsize; \
+	numberOfSegmentsToFind--; \
+}
+
+void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemorySize *totalSize)
+{
+	ZGMemoryAddress regionAddress = machHeaderAddress;
+	ZGMemorySize regionSize = 1;
+	ZGMemoryBasicInfo unusedInfo;
+	if (ZGRegionInfo(processTask, &regionAddress, &regionSize, &unusedInfo) && machHeaderAddress >= regionAddress && machHeaderAddress < regionAddress + regionSize)
+	{
+		void *regionBytes = NULL;
+		if (ZGReadBytes(processTask, regionAddress, &regionBytes, &regionSize))
+		{
+			struct mach_header_64 *machHeader = regionBytes + regionAddress - machHeaderAddress;
+			if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
+			{
+				void *segmentBytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
+				if ((segmentBytes - regionBytes) + (ZGMemorySize)machHeader->sizeofcmds <= regionSize)
+				{
+					int numberOfSegmentsToFind = 3;
+					for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
+					{
+						struct load_command *loadCommand = segmentBytes;
+						
+						if (loadCommand->cmd == LC_SEGMENT_64)
+						{
+							ZGFindTextAddressAndTotalSegmentSize(segment_command_64, section_64, segmentBytes, machHeaderAddress, firstInstructionAddress, totalSize, numberOfSegmentsToFind);
+						}
+						else if (loadCommand->cmd == LC_SEGMENT)
+						{
+							ZGFindTextAddressAndTotalSegmentSize(segment_command, section, segmentBytes, machHeaderAddress, firstInstructionAddress, totalSize, numberOfSegmentsToFind);
+						}
+						
+						if (numberOfSegmentsToFind <= 0)
+						{
+							break;
+						}
+						
+						segmentBytes += loadCommand->cmdsize;
+					}
+				}
+			}
+			ZGFreeBytes(processTask, regionBytes, regionSize);
+		}
+	}
+}
+
+void ZGIterateThroghBinaries(ZGMemoryMap processTask)
+{
+	for (NSDictionary *item in ZGMachHeadersAndMappedPaths(processTask))
+	{
+		ZGMemoryAddress textAddress = 0;
+		ZGMemorySize totalSize = 0;
+		ZGGetMachBinaryInfo(processTask, [[item objectForKey:ZGMachHeaderAddressKey] unsignedLongLongValue], &textAddress, &totalSize);
+		
+		if (totalSize > 0)
+		{
+			//NSLog(@"Address for %@ is 0x%llX; mach header = 0x%llX", [item objectForKey:ZGMappedFilePathKey], textAddress, [[item objectForKey:ZGMachHeaderAddressKey] unsignedLongLongValue]);
+		}
+	}
+}
+
 #define ZGFindTextAddressInSegment(segment_type, section_type, bail_label, bytes, textAddress) \
 struct segment_type *segmentCommand = bytes; \
 if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
@@ -375,21 +391,6 @@ ZGMemoryAddress ZGFirstInstructionAddress(ZGMemoryMap taskPort, ZGRegion *region
 {
 	ZGMemoryAddress regionAddress = region.address;
 	ZGMemorySize regionSize = region.size;
-	
-	// Find first __TEXT region by using the mapped file path
-	NSString *filePathMappedToRegion = ZGFilePathForRegion(taskPort, region);
-	if (filePathMappedToRegion != nil)
-	{
-		for (ZGRegion *theRegion in ZGRegionsForProcessTask(taskPort))
-		{
-			if ([ZGFilePathForRegionHelper(NO, taskPort, theRegion) isEqualToString:filePathMappedToRegion])
-			{
-				regionAddress = theRegion.address;
-				regionSize = theRegion.size;
-				break;
-			}
-		}
-	}
 	
 	ZGMemoryAddress textAddress = regionAddress; // good default
 	
