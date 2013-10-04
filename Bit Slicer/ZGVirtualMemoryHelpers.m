@@ -295,21 +295,21 @@ if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
 	{ \
 		if (strcmp("__text", section->sectname) == 0) \
 		{ \
-			*textAddress = machHeaderAddress + section->offset; \
+			if (textAddress != NULL) *textAddress = machHeaderAddress + section->offset; \
 			break; \
 		} \
 	} \
-	*totalSize += segmentCommand->vmsize; \
+	if (totalSize != NULL) *totalSize += segmentCommand->vmsize; \
 	numberOfSegmentsToFind--; \
 } \
 else if (strcmp(segmentCommand->segname, "__DATA") == 0) \
 { \
-	*totalSize += segmentCommand->vmsize; \
+	if (totalSize != NULL) *totalSize += segmentCommand->vmsize; \
 	numberOfSegmentsToFind--; \
 } \
 else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
 { \
-	*totalSize += segmentCommand->vmsize; \
+	if (totalSize != NULL) *totalSize += segmentCommand->vmsize; \
 	numberOfSegmentsToFind--; \
 }
 
@@ -357,75 +357,32 @@ void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddr
 	}
 }
 
-void ZGIterateThroghBinaries(ZGMemoryMap processTask)
+ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegion *targetRegion)
 {
-	for (NSDictionary *item in ZGMachHeadersAndMappedPaths(processTask))
+	ZGMemoryAddress previousHeaderAddress = 0;
+	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
 	{
-		ZGMemoryAddress textAddress = 0;
-		ZGMemorySize totalSize = 0;
-		ZGGetMachBinaryInfo(processTask, [[item objectForKey:ZGMachHeaderAddressKey] unsignedLongLongValue], &textAddress, &totalSize);
+		if (region.address > targetRegion.address) break;
 		
-		if (totalSize > 0)
+		ZGMemorySize regionSize = region.size;
+		void *regionBytes = NULL;
+		if (ZGReadBytes(processTask, region.address, &regionBytes, &regionSize))
 		{
-			//NSLog(@"Address for %@ is 0x%llX; mach header = 0x%llX", [item objectForKey:ZGMappedFilePathKey], textAddress, [[item objectForKey:ZGMachHeaderAddressKey] unsignedLongLongValue]);
-		}
-	}
-}
-
-#define ZGFindTextAddressInSegment(segment_type, section_type, bail_label, bytes, textAddress) \
-struct segment_type *segmentCommand = bytes; \
-if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
-{ \
-	void *sectionBytes = bytes + sizeof(*segmentCommand); \
-	for (struct section_type *section = sectionBytes; (void *)section < sectionBytes + segmentCommand->cmdsize; section++) \
-	{ \
-		if (strcmp("__text", section->sectname) == 0) \
-		{ \
-			textAddress += section->offset; \
-			goto bail_label; \
-		} \
-	} \
-}
-
-ZGMemoryAddress ZGFirstInstructionAddress(ZGMemoryMap taskPort, ZGRegion *region)
-{
-	ZGMemoryAddress regionAddress = region.address;
-	ZGMemorySize regionSize = region.size;
-	
-	ZGMemoryAddress textAddress = regionAddress; // good default
-	
-	void *regionBytes = NULL;
-	if (regionAddress > 0 && ZGReadBytes(taskPort, regionAddress, &regionBytes, &regionSize))
-	{
-		void *bytes = regionBytes;
-		struct mach_header_64 *machHeader = bytes;
-		if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
-		{
-			bytes += (machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64);
-			
-			if ((bytes - regionBytes) + (ZGMemorySize)machHeader->sizeofcmds <= regionSize)
+			struct mach_header_64 *header = regionBytes;
+			if (header->magic == MH_MAGIC || header->magic == MH_MAGIC_64)
 			{
-				for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
-				{
-					struct load_command *loadCommand = bytes;
-					if (loadCommand->cmd == LC_SEGMENT_64)
-					{
-						ZGFindTextAddressInSegment(segment_command_64, section_64, ZGFirstInstructionAddressBail, bytes, textAddress);
-					}
-					else if (loadCommand->cmd == LC_SEGMENT)
-					{
-						ZGFindTextAddressInSegment(segment_command, section, ZGFirstInstructionAddressBail, bytes, textAddress);
-					}
-					
-					bytes += loadCommand->cmdsize;
-				}
+				previousHeaderAddress = region.address;
 			}
+			ZGFreeBytes(processTask, regionBytes, regionSize);
 		}
-		
-	ZGFirstInstructionAddressBail:
-		ZGFreeBytes(taskPort, regionBytes, regionSize);
 	}
-	
+	return previousHeaderAddress;
+}
+
+ZGMemoryAddress ZGFirstInstructionAddress(ZGMemoryMap processTask, ZGRegion *region)
+{
+	ZGMemoryAddress textAddress = 0;
+	ZGGetMachBinaryInfo(processTask, ZGNearestMachHeaderBeforeRegion(processTask, region), &textAddress, NULL);
 	return textAddress;
 }
 
