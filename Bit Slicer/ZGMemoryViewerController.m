@@ -210,27 +210,29 @@
 
 #pragma mark Menu Item Validation
 
-- (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
 {
-	if (menuItem.action == @selector(toggleDataInspector:))
+	NSMenuItem *menuItem = [[(NSObject *)userInterfaceItem class] isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
+	
+	if (userInterfaceItem.action == @selector(toggleDataInspector:))
 	{
 		[menuItem setState:self.showsDataInspector];
 	}
-	else if (menuItem.action == @selector(changeMemoryProtection:))
+	else if (userInterfaceItem.action == @selector(changeMemoryProtection:))
 	{
 		if (!self.currentProcess.valid || !self.window.isVisible)
 		{
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(dumpMemoryInRange:) || menuItem.action == @selector(dumpAllMemory:))
+	else if (userInterfaceItem.action == @selector(dumpMemoryInRange:) || userInterfaceItem.action == @selector(dumpAllMemory:))
 	{
 		if (!self.currentProcess.valid || self.memoryDumpController.isBusy)
 		{
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(copyAddress:))
+	else if (userInterfaceItem.action == @selector(copyAddress:))
 	{
 		if (!self.currentProcess.valid)
 		{
@@ -243,7 +245,7 @@
 		}
 	}
 	
-	return [super validateUserInterfaceItem:menuItem];
+	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
 #pragma mark Data Inspector

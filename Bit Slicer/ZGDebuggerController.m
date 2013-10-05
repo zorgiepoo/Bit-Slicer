@@ -61,7 +61,8 @@
 @property (assign) IBOutlet ZGBacktraceController *backtraceController;
 @property (assign) IBOutlet ZGRegistersController *registersController;
 
-@property (assign) IBOutlet NSToolbar *toolbar;
+@property (assign) IBOutlet NSButton *continueButton;
+@property (assign) IBOutlet NSSegmentedControl *stepExecutionSegmentedControl;
 
 @property (nonatomic) NSArray *instructions;
 
@@ -82,6 +83,13 @@
 #define ATOS_PATH @"/usr/bin/atos"
 
 #define NOP_VALUE 0x90
+
+enum ZGStepExecution
+{
+	ZGStepIntoExecution,
+	ZGStepOverExecution,
+	ZGStepOutExecution
+};
 
 @implementation ZGDebuggerController
 
@@ -139,6 +147,8 @@
 	[self setupProcessListNotificationsAndPopUpButton];
 	
 	[self.instructionsTableView registerForDraggedTypes:@[ZGVariablePboardType]];
+	
+	[self updateExecutionButtons];
 }
 
 - (void)windowDidAppearForFirstTime:(id)sender
@@ -165,6 +175,8 @@
 
 - (void)currentProcessChanged
 {
+	[self updateExecutionButtons];
+	
 	if (self.currentBreakPoint)
 	{
 		[self toggleBacktraceView:NSOnState];
@@ -912,6 +924,7 @@
 			[self.stopButton setHidden:YES];
 			
 			[self updateNavigationButtons];
+			[self updateExecutionButtons];
 		});
 	});
 }
@@ -1181,80 +1194,117 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
+- (BOOL)canContinueOrStepIntoExecution
 {
-	if (menuItem.action == @selector(nopVariables:))
+	return self.currentBreakPoint != nil && !self.disassembling;
+}
+
+- (BOOL)canStepOverExecution
+{
+	if (!self.currentBreakPoint || self.disassembling)
+	{
+		return NO;
+	}
+	
+	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersController.programCounter + 1 inProcess:self.currentProcess];
+	if (!currentInstruction)
+	{
+		return NO;
+	}
+	
+	if ([currentInstruction isCallMnemonic])
+	{
+		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
+		if (!nextInstruction)
+		{
+			return NO;
+		}
+	}
+	
+	return YES;
+}
+
+- (BOOL)canStepOutOfExecution
+{
+	if (!self.currentBreakPoint || self.disassembling)
+	{
+		return NO;
+	}
+	
+	if (self.backtraceController.instructions.count <= 1 || self.backtraceController.basePointers.count <= 1)
+	{
+		return NO;
+	}
+	
+	ZGInstruction *outterInstruction = [self.backtraceController.instructions objectAtIndex:1];
+	ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
+	
+	if (!returnInstruction)
+	{
+		return NO;
+	}
+	
+	return YES;
+}
+
+- (void)updateExecutionButtons
+{
+	[self.continueButton setEnabled:[self canContinueOrStepIntoExecution]];
+	
+	[self.stepExecutionSegmentedControl setEnabled:[self canContinueOrStepIntoExecution] forSegment:ZGStepIntoExecution];
+	[self.stepExecutionSegmentedControl setEnabled:[self canStepOverExecution] forSegment:ZGStepOverExecution];
+	[self.stepExecutionSegmentedControl setEnabled:[self canStepOutOfExecution] forSegment:ZGStepOutExecution];
+}
+
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
+{
+	NSMenuItem *menuItem = [[(NSObject *)userInterfaceItem class] isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
+	
+	if (userInterfaceItem.action == @selector(nopVariables:))
 	{
 		[menuItem setTitle:[NSString stringWithFormat:@"NOP Instruction%@", self.selectedInstructions.count == 1 ? @"" : @"s"]];
+		
 		if (self.selectedInstructions.count == 0 || !self.currentProcess.valid || self.instructionsTableView.editedRow != -1 || self.disassembling)
 		{
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(copy:))
+	else if (userInterfaceItem.action == @selector(copy:))
 	{
 		if (self.selectedInstructions.count == 0)
 		{
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(copyAddress:))
+	else if (userInterfaceItem.action == @selector(copyAddress:))
 	{
 		if (self.selectedInstructions.count != 1)
 		{
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(continueExecution:) || menuItem.action == @selector(stepInto:))
+	else if (userInterfaceItem.action == @selector(continueExecution:) || userInterfaceItem.action == @selector(stepInto:))
 	{
-		if (!self.currentBreakPoint || self.disassembling)
+		if (![self canContinueOrStepIntoExecution])
 		{
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(stepOver:))
+	else if (userInterfaceItem.action == @selector(stepOver:))
 	{
-		if (!self.currentBreakPoint || self.disassembling)
-		{
-			return NO;
-		}
-		
-		ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersController.programCounter + 1 inProcess:self.currentProcess];
-		if (!currentInstruction)
-		{
-			return NO;
-		}
-		
-		if ([currentInstruction isCallMnemonic])
-		{
-			ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
-			if (!nextInstruction)
-			{
-				return NO;
-			}
-		}
-	}
-	else if (menuItem.action == @selector(stepOut:))
-	{
-		if (!self.currentBreakPoint || self.disassembling)
-		{
-			return NO;
-		}
-		
-		if (self.backtraceController.instructions.count <= 1 || self.backtraceController.basePointers.count <= 1)
-		{
-			return NO;
-		}
-		
-		ZGInstruction *outterInstruction = [self.backtraceController.instructions objectAtIndex:1];
-		ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
-		
-		if (!returnInstruction)
+		if (![self canStepOverExecution])
 		{
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(toggleBreakPoints:))
+	else if (userInterfaceItem.action == @selector(stepOut:))
+	{
+		if (![self canStepOutOfExecution])
+		{
+			return NO;
+		}
+	}
+	else if (userInterfaceItem.action == @selector(toggleBreakPoints:))
 	{
 		if (self.disassembling || self.selectedInstructions.count == 0)
 		{
@@ -1284,7 +1334,7 @@ END_DEBUGGER_CHANGE:
 		
 		return shouldValidate;
 	}
-	else if (menuItem.action == @selector(removeAllBreakPoints:))
+	else if (userInterfaceItem.action == @selector(removeAllBreakPoints:))
 	{
 		if (self.disassembling)
 		{
@@ -1304,14 +1354,14 @@ END_DEBUGGER_CHANGE:
 		
 		return shouldValidate;
 	}
-	else if (menuItem.action == @selector(jump:))
+	else if (userInterfaceItem.action == @selector(jump:))
 	{
 		if (self.disassembling || !self.currentBreakPoint || self.selectedInstructions.count != 1)
 		{
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(goToCallAddress:))
+	else if (userInterfaceItem.action == @selector(goToCallAddress:))
 	{
 		if (self.disassembling || !self.currentProcess.valid)
 		{
@@ -1329,14 +1379,14 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(showMemoryViewer:))
+	else if (userInterfaceItem.action == @selector(showMemoryViewer:))
 	{
 		if ([[self selectedInstructions] count] == 0)
 		{
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(requestCodeInjection:))
+	else if (userInterfaceItem.action == @selector(requestCodeInjection:))
 	{
 		if ([[self selectedInstructions] count] != 1)
 		{
@@ -1344,7 +1394,7 @@ END_DEBUGGER_CHANGE:
 		}
 	}
 	
-	return [super validateUserInterfaceItem:menuItem];
+	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
 - (IBAction)copy:(id)sender
@@ -2199,7 +2249,7 @@ END_DEBUGGER_CHANGE:
 			}
 		}
 		
-		[self.toolbar validateVisibleItems];
+		[self updateExecutionButtons];
 		
 		if (shouldShowNotification && NSClassFromString(@"NSUserNotification"))
 		{
@@ -2217,7 +2267,7 @@ END_DEBUGGER_CHANGE:
 	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:breakPoint];
 	[self removeHaltedBreakPoint:breakPoint];
 	
-	[self.toolbar validateVisibleItems];
+	[self updateExecutionButtons];
 }
 
 - (void)continueFromBreakPoint:(ZGBreakPoint *)breakPoint
@@ -2262,6 +2312,22 @@ END_DEBUGGER_CHANGE:
 	[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceController.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self];
 	
 	[self continueExecution:nil];
+}
+
+- (IBAction)stepExecution:(id)sender
+{
+	switch ((enum ZGStepExecution)[sender selectedSegment])
+	{
+		case ZGStepIntoExecution:
+			[self stepInto:nil];
+			break;
+		case ZGStepOverExecution:
+			[self stepOver:nil];
+			break;
+		case ZGStepOutExecution:
+			[self stepOut:nil];
+			break;
+	}
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification

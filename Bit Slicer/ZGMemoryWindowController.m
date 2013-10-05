@@ -353,9 +353,11 @@
 
 #pragma mark Menu Item Validation
 
-- (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
 {
-	if (menuItem.action == @selector(pauseOrUnpauseProcess:))
+	NSMenuItem *menuItem = [[(NSObject *)userInterfaceItem class] isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
+	
+	if (userInterfaceItem.action == @selector(pauseOrUnpauseProcess:))
 	{
 		if (!self.currentProcess.valid)
 		{
@@ -369,7 +371,7 @@
 		}
 		else
 		{
-			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
+			[menuItem setTitle:[NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"]];
 		}
 		
 		if ([[[ZGAppController sharedController] debuggerController] isProcessIdentifierHalted:self.currentProcess.processID])
@@ -377,14 +379,14 @@
 			return NO;
 		}
 	}
-	else if (menuItem.action == @selector(goBack:) || menuItem.action == @selector(goForward:))
+	else if (userInterfaceItem.action == @selector(goBack:) || userInterfaceItem.action == @selector(goForward:))
 	{
 		if (![self canEnableNavigationButtons])
 		{
 			return NO;
 		}
 		
-		if ((menuItem.action == @selector(goBack:) && !self.navigationManager.canUndo) || (menuItem.action == @selector(goForward:) && !self.navigationManager.canRedo))
+		if ((userInterfaceItem.action == @selector(goBack:) && !self.navigationManager.canUndo) || (userInterfaceItem.action == @selector(goForward:) && !self.navigationManager.canRedo))
 		{
 			return NO;
 		}

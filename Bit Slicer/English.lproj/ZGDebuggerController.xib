@@ -9,11 +9,13 @@
             <connections>
                 <outlet property="addressTextField" destination="ztk-ei-XwG" id="HE9-HV-rHU"/>
                 <outlet property="backtraceController" destination="199" id="200"/>
+                <outlet property="continueButton" destination="2Xc-JX-DhY" id="dr8-aT-zNo"/>
                 <outlet property="instructionsTableView" destination="Ksp-7e-9HA" id="xuY-up-g0Y"/>
                 <outlet property="navigationSegmentedControl" destination="vkH-Yd-fy0" id="Ky9-Xf-TmK"/>
                 <outlet property="registersController" destination="234" id="238"/>
                 <outlet property="runningApplicationsPopUpButton" destination="fpR-fU-ajG" id="98g-ZN-oRL"/>
                 <outlet property="splitView" destination="239" id="247"/>
+                <outlet property="stepExecutionSegmentedControl" destination="hed-Ji-GwK" id="6XI-Fz-1zt"/>
                 <outlet property="toolbar" destination="BPq-cf-Fjg" id="VbF-ag-Co8"/>
                 <outlet property="window" destination="5" id="37"/>
             </connections>
@@ -439,27 +441,47 @@
                             </connections>
                         </popUpButton>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="gez-eo-N4r"/>
-                    <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="e3V-8d-LIG"/>
-                    <toolbarItem implicitItemIdentifier="1722555B-919A-4BA1-8CDC-01F8F3B63641" label="Continue" paletteLabel="Continue" tag="-1" image="continue" id="mdv-cu-oXj">
-                        <connections>
-                            <action selector="continueExecution:" target="-2" id="sD4-5b-va3"/>
-                        </connections>
+                    <toolbarItem implicitItemIdentifier="1A9DCB4E-799C-4634-B1F6-CB15382E7DF9" label="Continue" paletteLabel="Continue" image="continue" id="KQE-fj-qqG">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="39" height="25"/>
+                        <size key="maxSize" width="39" height="25"/>
+                        <button key="view" verticalHuggingPriority="750" id="2Xc-JX-DhY">
+                            <rect key="frame" x="9" y="14" width="39" height="25"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="continue" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pHW-hV-Whn">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="continueExecution:" target="-2" id="0XD-ex-h6i"/>
+                            </connections>
+                        </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="470A0F2E-A345-4668-97FD-E3EC87F6011B" label="Step In" paletteLabel="Step In" tag="-1" image="stepin" id="wTs-ES-JMI">
-                        <connections>
-                            <action selector="stepInto:" target="-2" id="dNJ-vb-PiJ"/>
-                        </connections>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="5409F2B8-96A3-4ABA-884E-B916C3B120FD" label="Step Over" paletteLabel="Step Over" tag="-1" image="stepover" id="OtP-Da-E3Q">
-                        <connections>
-                            <action selector="stepOver:" target="-2" id="dI1-Za-8S9"/>
-                        </connections>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="57242D51-E367-4F08-BF33-69AE3F5693E1" label="Step Out" paletteLabel="Step Out" tag="-1" image="stepout" id="PLq-ga-Esq">
-                        <connections>
-                            <action selector="stepOut:" target="-2" id="ZHm-fx-xLK"/>
-                        </connections>
+                    <toolbarItem implicitItemIdentifier="F91B22CB-7E27-4BA1-A2E8-AD190222BAAF" label="Step Execution" paletteLabel="Step Execution" id="yIQ-3L-cfP">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="104" height="25"/>
+                        <size key="maxSize" width="104" height="25"/>
+                        <segmentedControl key="view" verticalHuggingPriority="750" id="hed-Ji-GwK">
+                            <rect key="frame" x="0.0" y="14" width="104" height="25"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <segmentedCell key="cell" alignment="left" style="texturedRounded" trackingMode="momentary" id="AnD-9c-1f5">
+                                <font key="font" metaFont="system"/>
+                                <segments>
+                                    <segment image="stepin" width="32">
+                                        <nil key="label"/>
+                                    </segment>
+                                    <segment image="stepover" width="32" tag="1">
+                                        <nil key="label"/>
+                                    </segment>
+                                    <segment image="stepout" width="32">
+                                        <nil key="label"/>
+                                    </segment>
+                                </segments>
+                            </segmentedCell>
+                            <connections>
+                                <action selector="stepExecution:" target="-2" id="v8d-Vh-UWd"/>
+                            </connections>
+                        </segmentedControl>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="306F877D-325E-4A4F-9705-FC98ED04464E" label="Address" paletteLabel="Address" id="u3o-PN-adL">
                         <nil key="toolTip"/>
@@ -478,13 +500,20 @@
                             </connections>
                         </textField>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="gez-eo-N4r"/>
+                    <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="e3V-8d-LIG"/>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="saO-Gp-UGR"/>
                     <toolbarItem reference="V6x-9g-MBo"/>
+                    <toolbarItem reference="KQE-fj-qqG"/>
+                    <toolbarItem reference="yIQ-3L-cfP"/>
                     <toolbarItem reference="e3V-8d-LIG"/>
                     <toolbarItem reference="u3o-PN-adL"/>
                 </defaultToolbarItems>
+                <connections>
+                    <outlet property="delegate" destination="-2" id="VTQ-HO-QQB"/>
+                </connections>
             </toolbar>
             <connections>
                 <outlet property="delegate" destination="-2" id="76"/>
@@ -523,13 +552,31 @@
                 </menuItem>
             </items>
         </menu>
+        <segmentedControl verticalHuggingPriority="750" id="mM2-9f-OST">
+            <rect key="frame" x="0.0" y="0.0" width="104" height="25"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <segmentedCell key="cell" alignment="left" style="texturedRounded" trackingMode="momentary" id="j3E-rK-I49">
+                <font key="font" metaFont="system"/>
+                <segments>
+                    <segment image="stepin" width="32">
+                        <nil key="label"/>
+                    </segment>
+                    <segment image="stepover" width="32" tag="1">
+                        <nil key="label"/>
+                    </segment>
+                    <segment image="stepout" width="32">
+                        <nil key="label"/>
+                    </segment>
+                </segments>
+            </segmentedCell>
+        </segmentedControl>
     </objects>
     <resources>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
         <image name="NSRightFacingTriangleTemplate" width="9" height="9"/>
-        <image name="continue" width="256" height="256"/>
-        <image name="stepin" width="256" height="256"/>
-        <image name="stepout" width="256" height="256"/>
-        <image name="stepover" width="256" height="256"/>
+        <image name="continue" width="19" height="19"/>
+        <image name="stepin" width="19" height="19"/>
+        <image name="stepout" width="19" height="19"/>
+        <image name="stepover" width="19" height="19"/>
     </resources>
 </document>
