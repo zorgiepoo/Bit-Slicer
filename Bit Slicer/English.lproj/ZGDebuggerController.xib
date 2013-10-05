@@ -14,6 +14,7 @@
                 <outlet property="registersController" destination="234" id="238"/>
                 <outlet property="runningApplicationsPopUpButton" destination="8" id="38"/>
                 <outlet property="splitView" destination="239" id="247"/>
+                <outlet property="toolbar" destination="BPq-cf-Fjg" id="VbF-ag-Co8"/>
                 <outlet property="window" destination="5" id="37"/>
             </connections>
         </customObject>
@@ -212,6 +213,7 @@
                                                     <connections>
                                                         <outlet property="dataSource" destination="-2" id="FdW-ZX-SVT"/>
                                                         <outlet property="delegate" destination="-2" id="dTp-2T-vqd"/>
+                                                        <outlet property="menu" destination="100" id="Yua-OC-D5o"/>
                                                     </connections>
                                                 </tableView>
                                             </subviews>
@@ -456,10 +458,35 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="gez-eo-N4r"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="e3V-8d-LIG"/>
+                    <toolbarItem implicitItemIdentifier="1722555B-919A-4BA1-8CDC-01F8F3B63641" label="Continue" paletteLabel="Continue" tag="-1" image="continue" id="mdv-cu-oXj">
+                        <connections>
+                            <action selector="continueExecution:" target="-2" id="sD4-5b-va3"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="470A0F2E-A345-4668-97FD-E3EC87F6011B" label="Step In" paletteLabel="Step In" tag="-1" image="stepin" id="wTs-ES-JMI">
+                        <connections>
+                            <action selector="stepInto:" target="-2" id="dNJ-vb-PiJ"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="5409F2B8-96A3-4ABA-884E-B916C3B120FD" label="Step Over" paletteLabel="Step Over" tag="-1" image="stepover" id="OtP-Da-E3Q">
+                        <connections>
+                            <action selector="stepOver:" target="-2" id="dI1-Za-8S9"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="57242D51-E367-4F08-BF33-69AE3F5693E1" label="Step Out" paletteLabel="Step Out" tag="-1" image="stepout" id="PLq-ga-Esq">
+                        <connections>
+                            <action selector="stepOut:" target="-2" id="ZHm-fx-xLK"/>
+                        </connections>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="xcU-Ud-cdO"/>
                     <toolbarItem reference="7Qg-LQ-YWq"/>
+                    <toolbarItem reference="gez-eo-N4r"/>
+                    <toolbarItem reference="mdv-cu-oXj"/>
+                    <toolbarItem reference="wTs-ES-JMI"/>
+                    <toolbarItem reference="OtP-Da-E3Q"/>
+                    <toolbarItem reference="PLq-ga-Esq"/>
                     <toolbarItem reference="e3V-8d-LIG"/>
                     <toolbarItem reference="poh-BL-Je9"/>
                 </defaultToolbarItems>
@@ -505,5 +532,9 @@
     <resources>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
         <image name="NSRightFacingTriangleTemplate" width="9" height="9"/>
+        <image name="continue" width="256" height="256"/>
+        <image name="stepin" width="256" height="256"/>
+        <image name="stepout" width="256" height="256"/>
+        <image name="stepover" width="256" height="256"/>
     </resources>
 </document>

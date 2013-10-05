@@ -61,6 +61,8 @@
 @property (assign) IBOutlet ZGBacktraceController *backtraceController;
 @property (assign) IBOutlet ZGRegistersController *registersController;
 
+@property (assign) IBOutlet NSToolbar *toolbar;
+
 @property (nonatomic) NSArray *instructions;
 
 @property (nonatomic) ZGMemoryAddress lowestBoundAddress;
@@ -2197,6 +2199,8 @@ END_DEBUGGER_CHANGE:
 			}
 		}
 		
+		[self.toolbar validateVisibleItems];
+		
 		if (shouldShowNotification && NSClassFromString(@"NSUserNotification"))
 		{
 			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
@@ -2212,6 +2216,8 @@ END_DEBUGGER_CHANGE:
 {
 	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:breakPoint];
 	[self removeHaltedBreakPoint:breakPoint];
+	
+	[self.toolbar validateVisibleItems];
 }
 
 - (void)continueFromBreakPoint:(ZGBreakPoint *)breakPoint
