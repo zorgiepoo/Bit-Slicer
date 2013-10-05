@@ -7,12 +7,12 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDebuggerController">
             <connections>
-                <outlet property="addressTextField" destination="10" id="39"/>
+                <outlet property="addressTextField" destination="ztk-ei-XwG" id="HE9-HV-rHU"/>
                 <outlet property="backtraceController" destination="199" id="200"/>
                 <outlet property="instructionsTableView" destination="Ksp-7e-9HA" id="xuY-up-g0Y"/>
-                <outlet property="navigationSegmentedControl" destination="295" id="298"/>
+                <outlet property="navigationSegmentedControl" destination="vkH-Yd-fy0" id="Ky9-Xf-TmK"/>
                 <outlet property="registersController" destination="234" id="238"/>
-                <outlet property="runningApplicationsPopUpButton" destination="8" id="38"/>
+                <outlet property="runningApplicationsPopUpButton" destination="fpR-fU-ajG" id="98g-ZN-oRL"/>
                 <outlet property="splitView" destination="239" id="247"/>
                 <outlet property="toolbar" destination="BPq-cf-Fjg" id="VbF-ag-Co8"/>
                 <outlet property="window" destination="5" id="37"/>
@@ -399,62 +399,45 @@
             </view>
             <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" displayMode="iconOnly" sizeMode="regular" id="BPq-cf-Fjg">
                 <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="30D615A3-43FE-42D3-BC94-90DC71E61159" label="Address" paletteLabel="Address" id="poh-BL-Je9">
+                    <toolbarItem implicitItemIdentifier="31B40B1D-066A-465E-9326-51493CC4C4EB" label="Back" paletteLabel="Back" id="saO-Gp-UGR">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="116" height="19"/>
-                        <size key="maxSize" width="155" height="19"/>
-                        <textField key="view" verticalHuggingPriority="750" id="10">
-                            <rect key="frame" x="0.0" y="14" width="155" height="19"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" title="0x0" drawsBackground="YES" id="14">
-                                <font key="font" metaFont="smallSystem"/>
-                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
-                            <connections>
-                                <action selector="readMemory:" target="-2" id="96"/>
-                            </connections>
-                        </textField>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="1732E674-3096-4336-8809-65A270D88852" label="Target" paletteLabel="Target" id="7Qg-LQ-YWq">
-                        <nil key="toolTip"/>
-                        <size key="minSize" width="143" height="22"/>
-                        <size key="maxSize" width="143" height="22"/>
-                        <popUpButton key="view" verticalHuggingPriority="750" id="8">
-                            <rect key="frame" x="0.0" y="14" width="143" height="22"/>
+                        <size key="minSize" width="57" height="25"/>
+                        <size key="maxSize" width="57" height="25"/>
+                        <segmentedControl key="view" verticalHuggingPriority="750" id="vkH-Yd-fy0">
+                            <rect key="frame" x="0.0" y="14" width="57" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="16">
-                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                <font key="font" metaFont="smallSystem"/>
-                                <menu key="menu" title="OtherViews" id="17"/>
-                            </popUpButtonCell>
-                            <connections>
-                                <action selector="runningApplicationsPopUpButton:" target="-2" id="97"/>
-                            </connections>
-                        </popUpButton>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="62674F6C-FCCD-4C9C-86C0-BDA6D0552A55" label="Back" paletteLabel="Back" id="xcU-Ud-cdO">
-                        <nil key="toolTip"/>
-                        <size key="minSize" width="50" height="20"/>
-                        <size key="maxSize" width="50" height="20"/>
-                        <segmentedControl key="view" verticalHuggingPriority="750" id="295">
-                            <rect key="frame" x="0.0" y="14" width="50" height="20"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <segmentedCell key="cell" controlSize="small" alignment="left" style="rounded" trackingMode="momentary" id="296">
-                                <font key="font" metaFont="smallSystem"/>
+                            <segmentedCell key="cell" alignment="left" style="texturedRounded" trackingMode="momentary" id="4Gz-L1-umm">
+                                <font key="font" metaFont="system"/>
                                 <segments>
-                                    <segment image="NSLeftFacingTriangleTemplate" width="20">
+                                    <segment image="NSLeftFacingTriangleTemplate" width="25">
                                         <nil key="label"/>
                                     </segment>
-                                    <segment image="NSRightFacingTriangleTemplate" width="23" tag="1">
+                                    <segment image="NSRightFacingTriangleTemplate" width="25" tag="1">
                                         <nil key="label"/>
                                     </segment>
                                 </segments>
                             </segmentedCell>
                             <connections>
-                                <action selector="navigate:" target="-1" id="297"/>
+                                <action selector="navigate:" target="-2" id="lXV-8B-FWl"/>
                             </connections>
                         </segmentedControl>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" id="V6x-9g-MBo">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="81" height="25"/>
+                        <size key="maxSize" width="195" height="25"/>
+                        <popUpButton key="view" verticalHuggingPriority="750" id="fpR-fU-ajG">
+                            <rect key="frame" x="0.0" y="14" width="145" height="25"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ohg-Gh-2fU">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="menu"/>
+                                <menu key="menu" title="OtherViews" id="Quq-lP-8lz"/>
+                            </popUpButtonCell>
+                            <connections>
+                                <action selector="runningApplicationsPopUpButton:" target="-2" id="44z-bJ-smY"/>
+                            </connections>
+                        </popUpButton>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="gez-eo-N4r"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="e3V-8d-LIG"/>
@@ -478,17 +461,29 @@
                             <action selector="stepOut:" target="-2" id="ZHm-fx-xLK"/>
                         </connections>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="306F877D-325E-4A4F-9705-FC98ED04464E" label="Address" paletteLabel="Address" id="u3o-PN-adL">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="96" height="22"/>
+                        <size key="maxSize" width="150" height="22"/>
+                        <textField key="view" verticalHuggingPriority="750" id="ztk-ei-XwG">
+                            <rect key="frame" x="0.0" y="14" width="150" height="22"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="0x0" drawsBackground="YES" id="mHS-Rp-HdH">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                            <connections>
+                                <action selector="readMemory:" target="-2" id="TZ7-hI-kO0"/>
+                            </connections>
+                        </textField>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
-                    <toolbarItem reference="xcU-Ud-cdO"/>
-                    <toolbarItem reference="7Qg-LQ-YWq"/>
-                    <toolbarItem reference="gez-eo-N4r"/>
-                    <toolbarItem reference="mdv-cu-oXj"/>
-                    <toolbarItem reference="wTs-ES-JMI"/>
-                    <toolbarItem reference="OtP-Da-E3Q"/>
-                    <toolbarItem reference="PLq-ga-Esq"/>
+                    <toolbarItem reference="saO-Gp-UGR"/>
+                    <toolbarItem reference="V6x-9g-MBo"/>
                     <toolbarItem reference="e3V-8d-LIG"/>
-                    <toolbarItem reference="poh-BL-Je9"/>
+                    <toolbarItem reference="u3o-PN-adL"/>
                 </defaultToolbarItems>
             </toolbar>
             <connections>
