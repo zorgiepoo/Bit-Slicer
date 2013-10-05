@@ -552,24 +552,6 @@
                 </menuItem>
             </items>
         </menu>
-        <segmentedControl verticalHuggingPriority="750" id="mM2-9f-OST">
-            <rect key="frame" x="0.0" y="0.0" width="104" height="25"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-            <segmentedCell key="cell" alignment="left" style="texturedRounded" trackingMode="momentary" id="j3E-rK-I49">
-                <font key="font" metaFont="system"/>
-                <segments>
-                    <segment image="stepin" width="32">
-                        <nil key="label"/>
-                    </segment>
-                    <segment image="stepover" width="32" tag="1">
-                        <nil key="label"/>
-                    </segment>
-                    <segment image="stepout" width="32">
-                        <nil key="label"/>
-                    </segment>
-                </segments>
-            </segmentedCell>
-        </segmentedControl>
     </objects>
     <resources>
         <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
