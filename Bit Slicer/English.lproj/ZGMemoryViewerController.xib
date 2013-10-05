@@ -7,11 +7,11 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGMemoryViewerController">
             <connections>
-                <outlet property="addressTextField" destination="17" id="42"/>
+                <outlet property="addressTextField" destination="DkB-mV-Rmo" id="jtW-nS-lSw"/>
                 <outlet property="memoryDumpController" destination="113" id="144"/>
                 <outlet property="memoryProtectionController" destination="102" id="103"/>
-                <outlet property="navigationSegmentedControl" destination="162" id="166"/>
-                <outlet property="runningApplicationsPopUpButton" destination="33" id="41"/>
+                <outlet property="navigationSegmentedControl" destination="w6k-bm-Myo" id="vdd-e0-SYx"/>
+                <outlet property="runningApplicationsPopUpButton" destination="fPm-5I-zjY" id="AhB-Uk-bxX"/>
                 <outlet property="textView" destination="70" id="71"/>
                 <outlet property="window" destination="1" id="3"/>
             </connections>
@@ -43,82 +43,91 @@
         <window title="Memory Viewer" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" wantsToBeColor="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="1">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="831" y="352" width="577" height="454"/>
+            <rect key="contentRect" x="831" y="352" width="577" height="424"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <value key="minSize" type="size" width="577" height="454"/>
             <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="577" height="454"/>
+                <rect key="frame" x="0.0" y="0.0" width="577" height="424"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" id="15">
-                        <rect key="frame" x="387" y="431" width="51" height="14"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Address:" id="16">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" id="17">
-                        <rect key="frame" x="443" y="429" width="114" height="19"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" title="0x0" drawsBackground="YES" id="18">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                        <connections>
-                            <action selector="changeMemoryView:" target="-2" id="44"/>
-                            <outlet property="nextKeyView" destination="70" id="79"/>
-                        </connections>
-                    </textField>
-                    <popUpButton verticalHuggingPriority="750" id="33">
-                        <rect key="frame" x="56" y="427" width="143" height="22"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="36">
-                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
-                            <menu key="menu" title="OtherViews" id="37"/>
-                        </popUpButtonCell>
-                        <connections>
-                            <action selector="runningApplicationsPopUpButton:" target="-2" id="49"/>
-                        </connections>
-                    </popUpButton>
                     <customView id="70" customClass="HFTextView">
                         <rect key="frame" x="0.0" y="0.0" width="577" height="424"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <connections>
                             <outlet property="delegate" destination="-2" id="iNM-Rx-cNE"/>
-                            <outlet property="nextKeyView" destination="17" id="80"/>
                         </connections>
                     </customView>
-                    <box autoresizesSubviews="NO" verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="72">
-                        <rect key="frame" x="0.0" y="421" width="577" height="5"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <font key="titleFont" metaFont="system"/>
-                    </box>
-                    <segmentedControl verticalHuggingPriority="750" id="162">
-                        <rect key="frame" x="3" y="428" width="50" height="20"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <segmentedCell key="cell" controlSize="small" alignment="left" style="rounded" trackingMode="momentary" id="163">
-                            <font key="font" metaFont="smallSystem"/>
-                            <segments>
-                                <segment image="NSLeftFacingTriangleTemplate" width="20">
-                                    <nil key="label"/>
-                                </segment>
-                                <segment image="NSRightFacingTriangleTemplate" width="23" tag="1">
-                                    <nil key="label"/>
-                                </segment>
-                            </segments>
-                        </segmentedCell>
-                        <connections>
-                            <action selector="navigate:" target="-1" id="167"/>
-                        </connections>
-                    </segmentedControl>
                 </subviews>
             </view>
+            <toolbar key="toolbar" implicitIdentifier="A3F7BBA1-DD73-4795-995D-C645138A3DBB" displayMode="iconOnly" sizeMode="regular" id="6tO-t8-wkk">
+                <allowedToolbarItems>
+                    <toolbarItem implicitItemIdentifier="A7558654-1EA6-4021-982D-10521377C75E" label="Back" paletteLabel="Back" id="Z6W-2O-OWd">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="57" height="25"/>
+                        <size key="maxSize" width="57" height="25"/>
+                        <segmentedControl key="view" verticalHuggingPriority="750" id="w6k-bm-Myo">
+                            <rect key="frame" x="0.0" y="14" width="57" height="25"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <segmentedCell key="cell" alignment="left" style="texturedRounded" trackingMode="momentary" id="KIW-ls-ljL">
+                                <font key="font" metaFont="system"/>
+                                <segments>
+                                    <segment image="NSLeftFacingTriangleTemplate" width="25">
+                                        <nil key="label"/>
+                                    </segment>
+                                    <segment image="NSRightFacingTriangleTemplate" width="25" tag="1">
+                                        <nil key="label"/>
+                                    </segment>
+                                </segments>
+                            </segmentedCell>
+                            <connections>
+                                <action selector="navigate:" target="-2" id="jAx-5M-EF2"/>
+                            </connections>
+                        </segmentedControl>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="7AD14AA0-A832-40BF-890E-22C1420E5869" label="Target" paletteLabel="Target" id="2oH-t9-bYi">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="145" height="25"/>
+                        <size key="maxSize" width="145" height="25"/>
+                        <popUpButton key="view" verticalHuggingPriority="750" id="fPm-5I-zjY">
+                            <rect key="frame" x="0.0" y="14" width="145" height="25"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6D0-9L-tIs">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="menu"/>
+                                <menu key="menu" title="OtherViews" id="a0O-5N-OUy"/>
+                            </popUpButtonCell>
+                            <connections>
+                                <action selector="runningApplicationsPopUpButton:" target="-2" id="ikj-x5-Zyv"/>
+                            </connections>
+                        </popUpButton>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="4317D272-6BC6-4B90-B1BD-AEEBC90B4775" label="Address" paletteLabel="Address" id="dKv-kA-cOR">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="150" height="22"/>
+                        <size key="maxSize" width="150" height="22"/>
+                        <textField key="view" verticalHuggingPriority="750" id="DkB-mV-Rmo">
+                            <rect key="frame" x="0.0" y="14" width="150" height="22"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="0x0" drawsBackground="YES" id="o8x-c0-Kha">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                            <connections>
+                                <action selector="changeMemoryView:" target="-2" id="EPn-1y-gST"/>
+                            </connections>
+                        </textField>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="CLf-08-CjH"/>
+                    <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="IFP-3c-2Ch"/>
+                </allowedToolbarItems>
+                <defaultToolbarItems>
+                    <toolbarItem reference="Z6W-2O-OWd"/>
+                    <toolbarItem reference="2oH-t9-bYi"/>
+                    <toolbarItem reference="IFP-3c-2Ch"/>
+                    <toolbarItem reference="dKv-kA-cOR"/>
+                </defaultToolbarItems>
+            </toolbar>
             <connections>
                 <outlet property="delegate" destination="-2" id="81"/>
             </connections>
