@@ -1082,7 +1082,6 @@ enum ZGStepExecution
 		
 		if (!shouldUseFirstInstruction)
 		{
-			ZGMemoryAddress baseAddress = 0;
 			NSRange textRange = ZGTextRange(self.currentProcess.processTask, chosenRegion, &mappedFilePath, &baseAddress);
 			firstInstructionAddress = textRange.location;
 			maxInstructionsSize = textRange.length;
