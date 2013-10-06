@@ -66,6 +66,7 @@
 
 @property (nonatomic, assign) IBOutlet NSTextField *statusTextField;
 @property (nonatomic) NSString *mappedFilePath;
+@property (nonatomic) ZGMemoryAddress baseAddress;
 
 @property (nonatomic) NSArray *instructions;
 
@@ -450,7 +451,7 @@ enum ZGStepExecution
 			startAddress = targetRegion.address;
 		}
 		
-		ZGMemoryAddress firstInstructionAddress = ZGTextRangeAndMappedFilePath(taskPort, targetRegion, NULL).location;
+		ZGMemoryAddress firstInstructionAddress = ZGTextRange(taskPort, targetRegion, NULL, NULL).location;
 		
 		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
 		{
@@ -998,8 +999,8 @@ enum ZGStepExecution
 	}
 	else
 	{
-		ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
-		[self.statusTextField setStringValue:[NSString stringWithFormat:@"%@ + 0x%llX", self.mappedFilePath, firstInstruction.variable.address - self.instructionBoundary.location]];
+		ZGInstruction *firstSelectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+		[self.statusTextField setStringValue:[NSString stringWithFormat:@"%@ + 0x%llX", self.mappedFilePath, firstSelectedInstruction.variable.address - self.baseAddress]];
 	}
 }
 
@@ -1026,7 +1027,8 @@ enum ZGStepExecution
 		BOOL shouldUseFirstInstruction = NO;
 		
 		NSString *firstMappedFilePath = @"";
-		NSRange firstTextRange = ZGTextRangeAndMappedFilePath(self.currentProcess.processTask, ZGBaseExecutableRegion(self.currentProcess.processTask), &firstMappedFilePath);
+		ZGMemoryAddress firstBaseAddress = 0;
+		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, ZGBaseExecutableRegion(self.currentProcess.processTask), &firstMappedFilePath, &firstBaseAddress);
 		
 		if (calculatedMemoryAddress == 0)
 		{
@@ -1076,10 +1078,12 @@ enum ZGStepExecution
 		ZGMemoryAddress firstInstructionAddress = 0;
 		ZGMemorySize maxInstructionsSize = 0;
 		NSString *mappedFilePath = @"";
+		ZGMemoryAddress baseAddress = 0;
 		
 		if (!shouldUseFirstInstruction)
 		{
-			NSRange textRange = ZGTextRangeAndMappedFilePath(self.currentProcess.processTask, chosenRegion, &mappedFilePath);
+			ZGMemoryAddress baseAddress = 0;
+			NSRange textRange = ZGTextRange(self.currentProcess.processTask, chosenRegion, &mappedFilePath, &baseAddress);
 			firstInstructionAddress = textRange.location;
 			maxInstructionsSize = textRange.length;
 			if (firstInstructionAddress + maxInstructionsSize < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
@@ -1088,6 +1092,7 @@ enum ZGStepExecution
 				firstInstructionAddress = chosenRegion.address;
 				maxInstructionsSize = chosenRegion.size;
 				mappedFilePath = @"";
+				baseAddress = 0;
 			}
 			else if (calculatedMemoryAddress < firstInstructionAddress)
 			{
@@ -1100,9 +1105,11 @@ enum ZGStepExecution
 			firstInstructionAddress = calculatedMemoryAddress;
 			maxInstructionsSize = firstTextRange.length;
 			mappedFilePath = firstMappedFilePath;
+			baseAddress = firstBaseAddress;
 		}
 		
 		self.mappedFilePath = mappedFilePath;
+		self.baseAddress = baseAddress;
 		
 		// Make sure disassembler won't show anything before this address
 		self.instructionBoundary = NSMakeRange(firstInstructionAddress, maxInstructionsSize);

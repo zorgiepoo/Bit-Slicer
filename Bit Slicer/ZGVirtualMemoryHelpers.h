@@ -49,7 +49,7 @@ void ZGFreeTask(ZGMemoryMap task);
 
 ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap taskPort);
 ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort);
-NSRange ZGTextRangeAndMappedFilePath(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath);
+NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress);
 
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
 NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);

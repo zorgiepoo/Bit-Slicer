@@ -297,11 +297,12 @@ ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegio
 	return previousHeaderAddress;
 }
 
-NSRange ZGTextRangeAndMappedFilePath(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath)
+NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress)
 {
 	ZGMemoryAddress textAddress = 0;
 	ZGMemorySize textSize = 0;
 	ZGMemoryAddress nearestMachHeaderAddress = ZGNearestMachHeaderBeforeRegion(processTask, region);
+	if (machHeaderAddress != NULL) *machHeaderAddress = nearestMachHeaderAddress;
 	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, &textAddress, &textSize, NULL, NULL);
 	
 	int processID = 0;
