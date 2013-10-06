@@ -153,6 +153,11 @@ enum ZGStepExecution
 	
 	[self.statusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	
+	[self.continueButton.image setTemplate:YES];
+	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepIntoExecution] setTemplate:YES];
+	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepOverExecution] setTemplate:YES];
+	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepOutExecution] setTemplate:YES];
+	
 	[self updateExecutionButtons];
 }
 
