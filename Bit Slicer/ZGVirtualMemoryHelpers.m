@@ -204,7 +204,7 @@ ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap taskPort)
 	return chosenRegion;
 }
 
-#define ZGFindTextAddressAndTotalSegmentSize(segment_type, section_type, bytes, machHeaderAddress, textAddress, totalSize, numberOfSegmentsToFind) \
+#define ZGFindTextAddressAndTotalSegmentSize(segment_type, section_type, bytes, machHeaderAddress, textAddress, textSize, dataSize, linkEditSize, numberOfSegmentsToFind) \
 struct segment_type *segmentCommand = bytes; \
 void *sectionBytes = bytes + sizeof(*segmentCommand); \
 if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
@@ -217,21 +217,21 @@ if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
 			break; \
 		} \
 	} \
-	if (totalSize != NULL) *totalSize += segmentCommand->vmsize; \
+	if (textSize != NULL) *textSize = segmentCommand->vmsize; \
 	numberOfSegmentsToFind--; \
 } \
 else if (strcmp(segmentCommand->segname, "__DATA") == 0) \
 { \
-	if (totalSize != NULL) *totalSize += segmentCommand->vmsize; \
+	if (dataSize != NULL) *dataSize = segmentCommand->vmsize; \
 	numberOfSegmentsToFind--; \
 } \
 else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
 { \
-	if (totalSize != NULL) *totalSize += segmentCommand->vmsize; \
+	if (linkEditSize != NULL) *linkEditSize = segmentCommand->vmsize; \
 	numberOfSegmentsToFind--; \
 }
 
-void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemorySize *totalSize)
+void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
 {
 	ZGMemoryAddress regionAddress = machHeaderAddress;
 	ZGMemorySize regionSize = 1;
@@ -254,11 +254,11 @@ void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddr
 						
 						if (loadCommand->cmd == LC_SEGMENT_64)
 						{
-							ZGFindTextAddressAndTotalSegmentSize(segment_command_64, section_64, segmentBytes, machHeaderAddress, firstInstructionAddress, totalSize, numberOfSegmentsToFind);
+							ZGFindTextAddressAndTotalSegmentSize(segment_command_64, section_64, segmentBytes, machHeaderAddress, firstInstructionAddress, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
 						}
 						else if (loadCommand->cmd == LC_SEGMENT)
 						{
-							ZGFindTextAddressAndTotalSegmentSize(segment_command, section, segmentBytes, machHeaderAddress, firstInstructionAddress, totalSize, numberOfSegmentsToFind);
+							ZGFindTextAddressAndTotalSegmentSize(segment_command, section, segmentBytes, machHeaderAddress, firstInstructionAddress, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
 						}
 						
 						if (numberOfSegmentsToFind <= 0)
@@ -297,11 +297,26 @@ ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegio
 	return previousHeaderAddress;
 }
 
-ZGMemoryAddress ZGFirstInstructionAddress(ZGMemoryMap processTask, ZGRegion *region)
+NSRange ZGTextRangeAndMappedFilePath(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath)
 {
 	ZGMemoryAddress textAddress = 0;
-	ZGGetMachBinaryInfo(processTask, ZGNearestMachHeaderBeforeRegion(processTask, region), &textAddress, NULL);
-	return textAddress;
+	ZGMemorySize textSize = 0;
+	ZGMemoryAddress nearestMachHeaderAddress = ZGNearestMachHeaderBeforeRegion(processTask, region);
+	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, &textAddress, &textSize, NULL, NULL);
+	
+	int processID = 0;
+	if (mappedFilePath != NULL && ZGPIDForTaskPort(processTask, &processID))
+	{
+		void *buffer = calloc(1, PATH_MAX);
+		int numberOfBytesReturned = proc_regionfilename(processID, nearestMachHeaderAddress, buffer, PATH_MAX);
+		if (numberOfBytesReturned > 0 && numberOfBytesReturned <= PATH_MAX)
+		{
+			*mappedFilePath = [[NSString alloc] initWithBytes:buffer length:numberOfBytesReturned encoding:NSUTF8StringEncoding];
+		}
+		free(buffer);
+	}
+	
+	return NSMakeRange(textAddress, textSize);
 }
 
 ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort)

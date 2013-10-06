@@ -15,6 +15,7 @@
                 <outlet property="registersController" destination="234" id="238"/>
                 <outlet property="runningApplicationsPopUpButton" destination="fpR-fU-ajG" id="98g-ZN-oRL"/>
                 <outlet property="splitView" destination="239" id="247"/>
+                <outlet property="statusTextField" destination="QFr-ST-Ct0" id="t5w-EZ-lIx"/>
                 <outlet property="stepExecutionSegmentedControl" destination="hed-Ji-GwK" id="6XI-Fz-1zt"/>
                 <outlet property="toolbar" destination="BPq-cf-Fjg" id="VbF-ag-Co8"/>
                 <outlet property="window" destination="5" id="37"/>
@@ -126,22 +127,22 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <splitView autosaveName="ZGDisassemblerHorizontalSplitter" dividerStyle="thin" id="239">
-                        <rect key="frame" x="0.0" y="0.0" width="818" height="506"/>
+                        <rect key="frame" x="0.0" y="22" width="818" height="484"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <customView id="240">
-                                <rect key="frame" x="0.0" y="0.0" width="818" height="296"/>
+                                <rect key="frame" x="0.0" y="0.0" width="818" height="283"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="cFD-3I-ALg">
-                                        <rect key="frame" x="0.0" y="0.0" width="818" height="296"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="818" height="283"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <clipView key="contentView" id="QCs-yF-iGW">
-                                            <rect key="frame" x="1" y="17" width="816" height="278"/>
+                                            <rect key="frame" x="1" y="17" width="816" height="265"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA">
-                                                    <rect key="frame" x="0.0" y="0.0" width="816" height="278"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="816" height="265"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -237,22 +238,22 @@
                                 </subviews>
                             </customView>
                             <customView id="241">
-                                <rect key="frame" x="0.0" y="297" width="818" height="209"/>
+                                <rect key="frame" x="0.0" y="284" width="818" height="200"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <splitView autosaveName="ZGDisassemblerVerticalSplitter" dividerStyle="thin" vertical="YES" id="246">
-                                        <rect key="frame" x="0.0" y="0.0" width="818" height="209"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="818" height="200"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="164">
-                                                <rect key="frame" x="0.0" y="0.0" width="552" height="209"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="552" height="200"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <clipView key="contentView" id="5C7-LD-NYc">
-                                                    <rect key="frame" x="1" y="17" width="550" height="191"/>
+                                                    <rect key="frame" x="1" y="17" width="550" height="182"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="198" id="165">
-                                                            <rect key="frame" x="0.0" y="0.0" width="550" height="191"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="550" height="182"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                             <size key="intercellSpacing" width="3" height="2"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -295,14 +296,14 @@
                                                 </tableHeaderView>
                                             </scrollView>
                                             <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="211">
-                                                <rect key="frame" x="553" y="0.0" width="265" height="209"/>
+                                                <rect key="frame" x="553" y="0.0" width="265" height="200"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <clipView key="contentView" id="uPf-cf-8J6">
-                                                    <rect key="frame" x="1" y="17" width="263" height="191"/>
+                                                    <rect key="frame" x="1" y="17" width="263" height="182"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="213" id="215">
-                                                            <rect key="frame" x="0.0" y="0.0" width="263" height="191"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="263" height="182"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                             <size key="intercellSpacing" width="3" height="2"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -397,6 +398,15 @@
                             <outlet property="delegate" destination="-2" id="248"/>
                         </connections>
                     </splitView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="QFr-ST-Ct0">
+                        <rect key="frame" x="-3" y="2" width="824" height="17"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="36G-7f-7uB">
+                            <font key="font" metaFont="cellTitle"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
             </view>
             <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" displayMode="iconOnly" sizeMode="regular" id="BPq-cf-Fjg">
@@ -515,6 +525,7 @@
                     <outlet property="delegate" destination="-2" id="VTQ-HO-QQB"/>
                 </connections>
             </toolbar>
+            <contentBorderThickness minY="22"/>
             <connections>
                 <outlet property="delegate" destination="-2" id="76"/>
             </connections>

@@ -53,20 +53,23 @@
 
 @interface ZGDebuggerController ()
 
-@property (assign) IBOutlet NSTableView *instructionsTableView;
-@property (assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
-@property (assign) IBOutlet NSButton *stopButton;
-@property (assign) IBOutlet NSSplitView *splitView;
+@property (nonatomic, assign) IBOutlet NSTableView *instructionsTableView;
+@property (nonatomic, assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
+@property (nonatomic, assign) IBOutlet NSButton *stopButton;
+@property (nonatomic, assign) IBOutlet NSSplitView *splitView;
 
-@property (assign) IBOutlet ZGBacktraceController *backtraceController;
-@property (assign) IBOutlet ZGRegistersController *registersController;
+@property (nonatomic, assign) IBOutlet ZGBacktraceController *backtraceController;
+@property (nonatomic, assign) IBOutlet ZGRegistersController *registersController;
 
-@property (assign) IBOutlet NSButton *continueButton;
-@property (assign) IBOutlet NSSegmentedControl *stepExecutionSegmentedControl;
+@property (nonatomic, assign) IBOutlet NSButton *continueButton;
+@property (nonatomic, assign) IBOutlet NSSegmentedControl *stepExecutionSegmentedControl;
+
+@property (nonatomic, assign) IBOutlet NSTextField *statusTextField;
+@property (nonatomic) NSString *mappedFilePath;
 
 @property (nonatomic) NSArray *instructions;
 
-@property (nonatomic) ZGMemoryAddress lowestBoundAddress;
+@property (nonatomic) NSRange instructionBoundary;
 
 @property (nonatomic) ZGCodeInjectionWindowController *codeInjectionController;
 
@@ -147,6 +150,8 @@ enum ZGStepExecution
 	[self setupProcessListNotificationsAndPopUpButton];
 	
 	[self.instructionsTableView registerForDraggedTypes:@[ZGVariablePboardType]];
+	
+	[self.statusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	
 	[self updateExecutionButtons];
 }
@@ -440,7 +445,7 @@ enum ZGStepExecution
 			startAddress = targetRegion.address;
 		}
 		
-		ZGMemoryAddress firstInstructionAddress = ZGFirstInstructionAddress(taskPort, targetRegion);
+		ZGMemoryAddress firstInstructionAddress = ZGTextRangeAndMappedFilePath(taskPort, targetRegion, NULL).location;
 		
 		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
 		{
@@ -659,28 +664,15 @@ enum ZGStepExecution
 	ZGInstruction *startInstruction = nil;
 	NSUInteger bytesBehind = DESIRED_BYTES_TO_ADD_OFFSET;
 	
-	if (endInstruction.variable.address == self.lowestBoundAddress)
+	if (endInstruction.variable.address <= self.instructionBoundary.location)
 	{
 		return;
 	}
 	
-	ZGRegion *endRegion = [[ZGRegion alloc] init];
-	endRegion.address = endInstruction.variable.address;
-	endRegion.size = 1;
-	
-	ZGMemoryBasicInfo unusedInfo;
-	
-	ZGRegionInfo(self.currentProcess.processTask, &endRegion->_address, &endRegion->_size, &unusedInfo);
-	
 	while (startInstruction == nil && bytesBehind > 0)
 	{
 		startInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address - bytesBehind inProcess:self.currentProcess];
-		
-		ZGRegion *startRegion = [[ZGRegion alloc] init];
-		startRegion.address = startInstruction.variable.address;
-		startRegion.size = 1;
-		
-		if (!ZGRegionInfo(self.currentProcess.processTask, &startRegion->_address, &startRegion->_size, &unusedInfo) || startRegion.address != endRegion.address)
+		if (startInstruction.variable.address < self.instructionBoundary.location)
 		{
 			// Try again
 			startInstruction = nil;
@@ -732,27 +724,19 @@ enum ZGStepExecution
 	ZGInstruction *lastInstruction = self.instructions.lastObject;
 	ZGInstruction *startInstruction = [self findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess];
 	
+	if (startInstruction.variable.address + startInstruction.variable.size >= self.instructionBoundary.location +  self.instructionBoundary.length)
+	{
+		return;
+	}
+	
 	if (startInstruction != nil)
 	{
-		ZGRegion *startRegion = [[ZGRegion alloc] init];
-		startRegion.address = lastInstruction.variable.address;
-		startRegion.size = 1;
-		
-		ZGMemoryBasicInfo unusedInfo;
-		
-		ZGRegionInfo(self.currentProcess.processTask, &startRegion->_address, &startRegion->_size, &unusedInfo);
-		
 		ZGInstruction *endInstruction = nil;
 		NSUInteger bytesAhead = DESIRED_BYTES_TO_ADD_OFFSET;
 		while (endInstruction == nil && bytesAhead > 0)
 		{
 			endInstruction = [self findInstructionBeforeAddress:(startInstruction.variable.address + startInstruction.variable.size + bytesAhead) inProcess:self.currentProcess];
-			
-			ZGRegion *endRegion = [[ZGRegion alloc] init];
-			endRegion.address = endInstruction.variable.address + endInstruction.variable.size - 1;
-			endRegion.size = 1;
-			
-			if (!ZGRegionInfo(self.currentProcess.processTask, &endRegion->_address, &endRegion->_size, &unusedInfo) || endRegion.address != startRegion.address)
+			if (endInstruction.variable.address + endInstruction.variable.size > self.instructionBoundary.location +  self.instructionBoundary.length)
 			{
 				// Try again
 				endInstruction = nil;
@@ -925,6 +909,7 @@ enum ZGStepExecution
 			
 			[self updateNavigationButtons];
 			[self updateExecutionButtons];
+			[self updateStatusBar];
 		});
 	});
 }
@@ -1000,6 +985,19 @@ enum ZGStepExecution
 	}
 }
 
+- (void)updateStatusBar
+{
+	if (self.instructions.count == 0 || self.mappedFilePath.length == 0)
+	{
+		[self.statusTextField setStringValue:@""];
+	}
+	else
+	{
+		ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
+		[self.statusTextField setStringValue:[NSString stringWithFormat:@"%@ + 0x%llX", self.mappedFilePath, firstInstruction.variable.address - self.instructionBoundary.location]];
+	}
+}
+
 - (IBAction)readMemory:(id)sender
 {
 	BOOL success = NO;
@@ -1022,9 +1020,12 @@ enum ZGStepExecution
 		
 		BOOL shouldUseFirstInstruction = NO;
 		
+		NSString *firstMappedFilePath = @"";
+		NSRange firstTextRange = ZGTextRangeAndMappedFilePath(self.currentProcess.processTask, ZGBaseExecutableRegion(self.currentProcess.processTask), &firstMappedFilePath);
+		
 		if (calculatedMemoryAddress == 0)
 		{
-			calculatedMemoryAddress = ZGFirstInstructionAddress(self.currentProcess.processTask, ZGBaseExecutableRegion(self.currentProcess.processTask));
+			calculatedMemoryAddress = firstTextRange.location;
 			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
 			shouldUseFirstInstruction = YES;
 		}
@@ -1068,14 +1069,20 @@ enum ZGStepExecution
 		}
 		
 		ZGMemoryAddress firstInstructionAddress = 0;
+		ZGMemorySize maxInstructionsSize = 0;
+		NSString *mappedFilePath = @"";
 		
 		if (!shouldUseFirstInstruction)
 		{
-			firstInstructionAddress = ZGFirstInstructionAddress(self.currentProcess.processTask, chosenRegion);
-			if (firstInstructionAddress < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
+			NSRange textRange = ZGTextRangeAndMappedFilePath(self.currentProcess.processTask, chosenRegion, &mappedFilePath);
+			firstInstructionAddress = textRange.location;
+			maxInstructionsSize = textRange.length;
+			if (firstInstructionAddress + maxInstructionsSize < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
 			{
-				// If first instruction is not within the region, let's pretend it starts at the beginning of it
+				// let's use the chosen region if the text section doesn't intersect with it
 				firstInstructionAddress = chosenRegion.address;
+				maxInstructionsSize = chosenRegion.size;
+				mappedFilePath = @"";
 			}
 			else if (calculatedMemoryAddress < firstInstructionAddress)
 			{
@@ -1086,10 +1093,14 @@ enum ZGStepExecution
 		else
 		{
 			firstInstructionAddress = calculatedMemoryAddress;
+			maxInstructionsSize = firstTextRange.length;
+			mappedFilePath = firstMappedFilePath;
 		}
 		
+		self.mappedFilePath = mappedFilePath;
+		
 		// Make sure disassembler won't show anything before this address
-		self.lowestBoundAddress = firstInstructionAddress;
+		self.instructionBoundary = NSMakeRange(firstInstructionAddress, maxInstructionsSize);
 		
 		// Disassemble within a range from +- WINDOW_SIZE from selection address
 		const NSUInteger WINDOW_SIZE = 50000;
@@ -1134,6 +1145,7 @@ END_DEBUGGER_CHANGE:
 		// clear data
 		self.instructions = [NSArray array];
 		[self.instructionsTableView reloadData];
+		[self updateStatusBar];
 	}
 }
 
@@ -1460,6 +1472,11 @@ END_DEBUGGER_CHANGE:
 	}
 	
 	return YES;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+{
+	[self updateStatusBar];
 }
 
 - (BOOL)isBreakPointAtInstruction:(ZGInstruction *)instruction
