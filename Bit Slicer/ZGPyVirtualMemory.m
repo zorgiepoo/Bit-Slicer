@@ -148,8 +148,7 @@ static PyMethodDef VirtualMemory_methods[] =
 
 static PyTypeObject VirtualMemoryType =
 {
-	PyObject_HEAD_INIT(NULL)
-	0, // ob_size
+	PyVarObject_HEAD_INIT(NULL, 0)
 	"bitslicer.VirtualMemory", // tp_name
 	sizeof(VirtualMemory), // tp_basicsize
 	0, // tp_itemsize
@@ -305,7 +304,7 @@ static void readBytes(PyObject **retValue, VirtualMemory *self, ZGMemoryAddress 
 	void *bytes = NULL;
 	if (ZGReadBytes(self->processTask, memoryAddress, &bytes, numberOfBytes))
 	{
-		*retValue = Py_BuildValue("s#", bytes, *numberOfBytes);
+		*retValue = Py_BuildValue("y#", bytes, *numberOfBytes);
 		ZGFreeBytes(self->processTask, bytes, *numberOfBytes);
 	}
 }
@@ -331,7 +330,7 @@ static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, Z
 		ZGMemorySize numberOfBytes = ZGGetStringSize(self->processTask, memoryAddress, variableType, 0, 0);
 		if (numberOfBytes == 0)
 		{
-			retValue = PyString_FromString("");
+			retValue = PyBytes_FromString("");
 		}
 		else
 		{

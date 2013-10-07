@@ -66,22 +66,28 @@ static dispatch_queue_t gPythonQueue;
 
 + (void)initializePythonInterpreter
 {
-	NSString *pythonDirectory = [[NSBundle mainBundle] pathForResource:@"python2.7" ofType:nil];
+	NSString *pythonDirectory = [[NSBundle mainBundle] pathForResource:@"python3.3" ofType:nil];
 	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
 	setenv("PYTHONPATH", [pythonDirectory UTF8String], 1);
 	dispatch_async(gPythonQueue, ^{
 		Py_Initialize();
 		PyObject *sys = PyImport_ImportModule("sys");
 		PyObject *path = PyObject_GetAttrString(sys, "path");
-		PyList_Append(path, PyString_FromString((char *)[[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] UTF8String]));
-		PyList_Append(path, PyString_FromString((char *)[SCRIPT_CACHES_PATH UTF8String]));
 		
-		Py_XDECREF(sys);
+		PyObject *scriptCacheUnicodeObject = PyUnicode_FromString([SCRIPT_CACHES_PATH UTF8String]);
+		if (PyList_Append(path, scriptCacheUnicodeObject) != 0)
+		{
+			NSLog(@"Error on appending %@", SCRIPT_CACHES_PATH);
+		}
+		Py_XDECREF(scriptCacheUnicodeObject);
+		
 		Py_XDECREF(path);
 		
-		PyObject *mainModule = loadMainPythonModule();
+		PyObject *mainModule = loadMainPythonModule(sys);
 		[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
 		[ZGPyDebugger loadPythonClassInMainModule:mainModule];
+		
+		Py_XDECREF(sys);
 	});
 }
 
@@ -230,14 +236,17 @@ static dispatch_queue_t gPythonQueue;
 	if (pythonObject != NULL)
 	{
 		PyObject *pythonString = PyObject_Str(pythonObject);
-		const char *pythonCString = PyString_AsString(pythonString);
+		PyObject *unicodeString = PyUnicode_AsUTF8String(pythonString);
+		const char *pythonCString = PyBytes_AsString(unicodeString);
 		if (pythonCString != NULL)
 		{
+			NSString *line = @(pythonCString);
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[[[ZGAppController sharedController] loggerController] writeLine:@(pythonCString)];
+				[[[ZGAppController sharedController] loggerController] writeLine:line];
 			});
 		}
 		
+		Py_XDECREF(unicodeString);
 		Py_XDECREF(pythonString);
 	}
 	

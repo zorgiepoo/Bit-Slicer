@@ -96,8 +96,7 @@ static PyMethodDef Debugger_methods[] =
 
 static PyTypeObject DebuggerType =
 {
-	PyObject_HEAD_INIT(NULL)
-	0, // ob_size
+	PyVarObject_HEAD_INIT(NULL, 0)
 	"bitslicer.Debugger", // tp_name
 	sizeof(DebuggerClass), // tp_basicsize
 	0, // tp_itemsize
@@ -210,8 +209,8 @@ static PyObject *Debugger_log(DebuggerClass *self, PyObject *args)
 	}
 	
 	PyObject *objectToLogString = PyObject_Str(objectToLog);
-	
-	char *stringToLog = PyString_AsString(objectToLogString);
+	PyObject *unicodeObject = PyUnicode_AsUTF8String(objectToLogString);
+	char *stringToLog = PyBytes_AsString(unicodeObject);
 	NSString *objcStringToLog = nil;
 	if (stringToLog != NULL)
 	{
@@ -230,6 +229,7 @@ static PyObject *Debugger_log(DebuggerClass *self, PyObject *args)
 		}
 	}
 	
+	Py_XDECREF(unicodeObject);
 	Py_XDECREF(objectToLogString);
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
@@ -252,7 +252,7 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 		
 		if (error == nil)
 		{
-			retValue = Py_BuildValue("s#", assembledData.bytes, assembledData.length);
+			retValue = Py_BuildValue("y#", assembledData.bytes, assembledData.length);
 		}
 		else
 		{
@@ -311,7 +311,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 		NSData *readData = [[[ZGAppController sharedController] debuggerController] readDataWithTaskPort:self->processTask	address:address size:size];
 		if (readData != nil)
 		{
-			retValue = Py_BuildValue("s#", readData.bytes, readData.length);
+			retValue = Py_BuildValue("y#", readData.bytes, readData.length);
 		}
 		else
 		{
@@ -370,7 +370,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 				bufferIterator += instruction.variable.size;
 			}
 			
-			retValue = Py_BuildValue("s#", buffer, bufferLength);
+			retValue = Py_BuildValue("y#", buffer, bufferLength);
 			
 			free(buffer);
 		}

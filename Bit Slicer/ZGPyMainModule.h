@@ -34,4 +34,4 @@
 
 #import "Python.h"
 
-PyObject *loadMainPythonModule(void);
+PyObject *loadMainPythonModule(PyObject *sysModule);

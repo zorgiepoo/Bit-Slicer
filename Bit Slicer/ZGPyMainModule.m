@@ -34,12 +34,29 @@
 
 #import "ZGPyMainModule.h"
 
-static PyMethodDef moduleMethods[] =
+#define MAIN_MODULE_NAME "bitslicer"
+
+static struct PyModuleDef mainModuleDefinition =
 {
-	{NULL, NULL, NULL, NULL}
+	PyModuleDef_HEAD_INIT,
+	MAIN_MODULE_NAME,
+	"Main Bit Slicer Module",
+	-1,
+	NULL, NULL, NULL, NULL, NULL
 };
 
-PyObject *loadMainPythonModule(void)
+PyObject *loadMainPythonModule(PyObject *sysModule)
 {
-	return Py_InitModule("bitslicer", moduleMethods);
+	PyObject *mainModule = PyModule_Create(&mainModuleDefinition);
+	
+	// PyModule_Create won't add the module to sys.modules like Py_InitModule would in 2.x
+	// We have to do that manually
+	PyObject *modules = PyObject_GetAttrString(sysModule, "modules");
+	if (PyDict_SetItem(modules, PyUnicode_FromString(MAIN_MODULE_NAME), mainModule) != 0)
+	{
+		NSLog(@"Failed to add bitslicer module to sys.modules!");
+	}
+	Py_XDECREF(modules);
+	
+	return mainModule;
 }
