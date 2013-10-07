@@ -38,7 +38,7 @@
 #import "ZGVariable.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGPyScript.h"
-#import <Python/Python.h>
+#import "Python.h"
 #import "ZGPyVirtualMemory.h"
 #import "ZGPyDebugger.h"
 #import "ZGProcess.h"
@@ -66,10 +66,14 @@ static dispatch_queue_t gPythonQueue;
 
 + (void)initializePythonInterpreter
 {
+	NSString *pythonDirectory = [[NSBundle mainBundle] pathForResource:@"python2.7" ofType:nil];
+	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
+	setenv("PYTHONPATH", [pythonDirectory UTF8String], 1);
 	dispatch_async(gPythonQueue, ^{
 		Py_Initialize();
 		PyObject *sys = PyImport_ImportModule("sys");
 		PyObject *path = PyObject_GetAttrString(sys, "path");
+		PyList_Append(path, PyString_FromString((char *)[[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] UTF8String]));
 		PyList_Append(path, PyString_FromString((char *)[SCRIPT_CACHES_PATH UTF8String]));
 		
 		Py_XDECREF(sys);

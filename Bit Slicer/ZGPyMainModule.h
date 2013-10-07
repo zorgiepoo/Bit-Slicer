@@ -32,6 +32,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Python/Python.h>
+#import "Python.h"
 
 PyObject *loadMainPythonModule(void);

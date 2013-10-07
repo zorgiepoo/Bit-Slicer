@@ -33,7 +33,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Python/Python.h>
+#import "Python.h"
 #import "ZGMemoryTypes.h"
 
 @interface ZGPyVirtualMemory : NSObject
