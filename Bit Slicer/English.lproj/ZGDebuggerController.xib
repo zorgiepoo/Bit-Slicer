@@ -56,49 +56,17 @@
                         <action selector="nopVariables:" target="-1" id="157"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="159"/>
-                <menuItem title="Continue Execution" id="133">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="continueExecution:" target="-1" id="152"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Step Execution" id="250">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Step Execution" id="251">
-                        <items>
-                            <menuItem title="Into Instruction" id="253">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="stepInto:" target="-1" id="256"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Over Instruction" id="254">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="stepOver:" target="-1" id="258"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Out of Function" id="255">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="stepOut:" target="-1" id="257"/>
-                                </connections>
-                            </menuItem>
-                        </items>
-                    </menu>
-                </menuItem>
-                <menuItem title="Jump to Instruction" id="156">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="jump:" target="-1" id="158"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="260"/>
                 <menuItem title="Inject Code…" id="sc9-6G-u0H">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="requestCodeInjection:" target="-1" id="k5a-L9-kvV"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="260"/>
+                <menuItem title="Jump to Instruction" id="156">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="jump:" target="-1" id="158"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Go to Function" id="292">
