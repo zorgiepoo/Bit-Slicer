@@ -111,7 +111,7 @@
 				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" expects 1 argument"}];
 			}
 			return [DDExpression numberExpressionWithNumber:@(foundAddress)];
-		} forName:@"base"];
+		} forName:ZGBaseAddressFunction];
 	});
 }
 
