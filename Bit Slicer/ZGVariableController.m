@@ -893,7 +893,7 @@
 	 addressFormula:variable.addressFormula];
 	
 	variable.addressFormula = newAddressFormula;
-	if (([newAddressFormula rangeOfString:@"["].location != NSNotFound && [newAddressFormula rangeOfString:@"]"].location != NSNotFound) || [newAddressFormula rangeOfString:BASE_EXEC_VARIABLE].location != NSNotFound)
+	if (([newAddressFormula rangeOfString:@"["].location != NSNotFound && [newAddressFormula rangeOfString:@"]"].location != NSNotFound) || [newAddressFormula rangeOfString:ZGBaseAddressFunction].location != NSNotFound)
 	{
 		variable.usesDynamicAddress = YES;
 	}

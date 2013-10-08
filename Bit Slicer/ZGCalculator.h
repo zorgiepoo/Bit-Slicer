@@ -35,12 +35,14 @@
 #import <Foundation/Foundation.h>
 @class ZGProcess;
 
-#define BASE_EXEC_VARIABLE @"BASE_EXEC"
+#define ZGBaseAddressFunction @"base"
 
 @interface ZGCalculator : NSObject
 
 + (NSString *)evaluateExpression:(NSString *)expression;
-// Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc... and can also take BASE_EXEC variable
+
+// Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
+// And also has a base() function that takes in a string, and returns the first address to a region such that the passed string partially matches the end of the corresponding region's mapped path
 + (NSString *)evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process;
 
 @end

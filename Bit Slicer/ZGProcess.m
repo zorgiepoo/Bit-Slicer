@@ -86,15 +86,8 @@
 }
 
 - (BOOL)grantUsAccess
-{	
-	BOOL success = ZGGetTaskForProcess(self.processID, &_processTask);
-	
-	if (success)
-	{
-		_baseExecutableAddress = ZGBaseExecutableAddress(_processTask);
-	}
-	
-	return success;
+{
+	return ZGGetTaskForProcess(self.processID, &_processTask);
 }
 
 - (BOOL)hasGrantedAccess

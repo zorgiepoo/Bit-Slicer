@@ -297,6 +297,25 @@ ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegio
 	return previousHeaderAddress;
 }
 
+NSString *ZGMappedFilePath(ZGMemoryMap processTask, ZGMemoryAddress regionAddress)
+{
+	NSString *mappedFilePath = nil;
+	
+	int processID = 0;
+	if (ZGPIDForTaskPort(processTask, &processID))
+	{
+		void *buffer = calloc(1, PATH_MAX);
+		int numberOfBytesReturned = proc_regionfilename(processID, regionAddress, buffer, PATH_MAX);
+		if (numberOfBytesReturned > 0 && numberOfBytesReturned <= PATH_MAX)
+		{
+			mappedFilePath = [[NSString alloc] initWithBytes:buffer length:numberOfBytesReturned encoding:NSUTF8StringEncoding];
+		}
+		free(buffer);
+	}
+	
+	return mappedFilePath;
+}
+
 NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress)
 {
 	ZGMemoryAddress textAddress = 0;
@@ -305,16 +324,13 @@ NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mapped
 	if (machHeaderAddress != NULL) *machHeaderAddress = nearestMachHeaderAddress;
 	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, &textAddress, &textSize, NULL, NULL);
 	
-	int processID = 0;
-	if (mappedFilePath != NULL && ZGPIDForTaskPort(processTask, &processID))
+	if (mappedFilePath != NULL)
 	{
-		void *buffer = calloc(1, PATH_MAX);
-		int numberOfBytesReturned = proc_regionfilename(processID, nearestMachHeaderAddress, buffer, PATH_MAX);
-		if (numberOfBytesReturned > 0 && numberOfBytesReturned <= PATH_MAX)
+		NSString *tempFilePath = ZGMappedFilePath(processTask, nearestMachHeaderAddress);
+		if (tempFilePath != nil)
 		{
-			*mappedFilePath = [[NSString alloc] initWithBytes:buffer length:numberOfBytesReturned encoding:NSUTF8StringEncoding];
+			*mappedFilePath = [tempFilePath copy];
 		}
-		free(buffer);
 	}
 	
 	return NSMakeRange(textAddress, textSize);
@@ -323,6 +339,19 @@ NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mapped
 ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort)
 {
 	return [ZGBaseExecutableRegion(taskPort) address];
+}
+
+ZGRegion *ZGFindExecutableImage(ZGMemoryMap processTask, NSString *partialImageName)
+{
+	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
+	{
+		NSString *mappedFilePath = ZGMappedFilePath(processTask, region.address);
+		if ([mappedFilePath hasSuffix:partialImageName])
+		{
+			return region;
+		}
+	}
+	return nil;
 }
 
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)

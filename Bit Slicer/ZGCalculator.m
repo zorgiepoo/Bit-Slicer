@@ -35,6 +35,8 @@
 #import "ZGCalculator.h"
 #import "NSStringAdditions.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
+#import "ZGRegion.h"
 #import "ZGProcess.h"
 #import "DDMathEvaluator.h"
 #import "NSString+DDMathParsing.h"
@@ -72,13 +74,13 @@
 					}
 					else if (error != NULL)
 					{
-						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" didn't read sufficient number of bytes"}];
+						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumber userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" didn't read sufficient number of bytes"}];
 					}
 					ZGFreeBytes(processTask, bytes, sizeRead);
 				}
 				else if (error != NULL)
 				{
-					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" failed to read bytes"}];
+					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumber userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" failed to read bytes"}];
 				}
 			}
 			else if (error != NULL)
@@ -87,6 +89,29 @@
 			}
 			return [DDExpression numberExpressionWithNumber:@(pointer)];
 		} forName:ZGCalculatePointerFunction];
+		
+		[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+			ZGMemoryAddress foundAddress = 0x0;
+			if (args.count == 1)
+			{
+				ZGMemoryMap processTask = [[vars objectForKey:ZGProcessTaskVariable] unsignedIntValue];
+				
+				DDExpression *expression = [args objectAtIndex:0];
+				if (expression.expressionType == DDExpressionTypeVariable)
+				{
+					foundAddress = [ZGFindExecutableImage(processTask, expression.variable) address];
+				}
+				else if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" expects argument to be a variable"}];
+				}
+			}
+			else if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" expects 1 argument"}];
+			}
+			return [DDExpression numberExpressionWithNumber:@(foundAddress)];
+		} forName:@"base"];
 	});
 }
 
@@ -115,15 +140,12 @@
 {
 	NSMutableString	 *newAddressFormula = [[NSMutableString alloc] initWithString:addressFormula];
 	
-	// Prepend $ for BASE_EXEC
-	[newAddressFormula replaceOccurrencesOfString:BASE_EXEC_VARIABLE withString:@"$"BASE_EXEC_VARIABLE options:NSCaseInsensitiveSearch | NSLiteralSearch range:NSMakeRange(0, addressFormula.length)];
-	
 	// Handle [expression] by renaming it as a function
 	[newAddressFormula replaceOccurrencesOfString:@"[" withString:ZGCalculatePointerFunction@"(" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
 	[newAddressFormula replaceOccurrencesOfString:@"]" withString:@")" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
 	
-	// Pass BASE_EXEC, process task, and pointer size
-	NSDictionary *substitutions = @{BASE_EXEC_VARIABLE : @(process.baseExecutableAddress), ZGProcessTaskVariable : @(process.processTask), ZGPointerSizeVariable : @(process.pointerSize)};
+	// Pass process task, and pointer size
+	NSDictionary *substitutions = @{ZGProcessTaskVariable : @(process.processTask), ZGPointerSizeVariable : @(process.pointerSize)};
 	
 	return [self evaluateExpression:newAddressFormula substitutions:substitutions];
 }

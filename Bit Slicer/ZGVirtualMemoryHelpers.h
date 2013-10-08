@@ -55,6 +55,8 @@ NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
 NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
 
 NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask);
+	
+ZGRegion *ZGFindExecutableImage(ZGMemoryMap processTask, NSString *partialImageName);
 
 void ZGFreeData(NSArray *dataArray);
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress);
