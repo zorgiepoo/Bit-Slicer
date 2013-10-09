@@ -43,8 +43,7 @@
 #import "DDExpression.h"
 
 #define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"
-#define ZGProcessTaskVariable @"ZGProcessTaskVariable"
-#define ZGPointerSizeVariable @"ZGPointerSizeVariable"
+#define ZGProcessVariable @"ZGProcessVariable"
 
 @implementation ZGCalculator
 
@@ -61,22 +60,21 @@
 				NSNumber *memoryAddressNumber = [[args objectAtIndex:0] evaluateWithSubstitutions:vars evaluator:eval error:&unusedError];
 				
 				ZGMemoryAddress memoryAddress = [memoryAddressNumber unsignedLongLongValue];
-				ZGMemoryMap processTask = [[vars objectForKey:ZGProcessTaskVariable] unsignedIntValue];
-				ZGMemorySize pointerSize = [[vars objectForKey:ZGPointerSizeVariable] unsignedLongLongValue];
+				ZGProcess *process = [vars objectForKey:ZGProcessVariable];
 				
 				void *bytes = NULL;
-				ZGMemorySize sizeRead = pointerSize;
-				if (ZGReadBytes(processTask, memoryAddress, &bytes, &sizeRead))
+				ZGMemorySize sizeRead = process.pointerSize;
+				if (ZGReadBytes(process.processTask, memoryAddress, &bytes, &sizeRead))
 				{
-					if (sizeRead == pointerSize)
+					if (sizeRead == process.pointerSize)
 					{
-						pointer = (pointerSize == sizeof(ZGMemoryAddress)) ? *(ZGMemoryAddress *)bytes : *(ZG32BitMemoryAddress *)bytes;
+						pointer = (process.pointerSize == sizeof(ZGMemoryAddress)) ? *(ZGMemoryAddress *)bytes : *(ZG32BitMemoryAddress *)bytes;
 					}
 					else if (error != NULL)
 					{
 						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumber userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" didn't read sufficient number of bytes"}];
 					}
-					ZGFreeBytes(processTask, bytes, sizeRead);
+					ZGFreeBytes(process.processTask, bytes, sizeRead);
 				}
 				else if (error != NULL)
 				{
@@ -94,12 +92,12 @@
 			ZGMemoryAddress foundAddress = 0x0;
 			if (args.count == 1)
 			{
-				ZGMemoryMap processTask = [[vars objectForKey:ZGProcessTaskVariable] unsignedIntValue];
+				ZGProcess *process = [vars objectForKey:ZGProcessVariable];
 				
 				DDExpression *expression = [args objectAtIndex:0];
 				if (expression.expressionType == DDExpressionTypeVariable)
 				{
-					foundAddress = [ZGFindExecutableImage(processTask, expression.variable) address];
+					foundAddress = ZGFindExecutableImageWithCache(process.processTask, expression.variable, process.cacheDictionary);
 				}
 				else if (error != NULL)
 				{
@@ -144,10 +142,7 @@
 	[newAddressFormula replaceOccurrencesOfString:@"[" withString:ZGCalculatePointerFunction@"(" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
 	[newAddressFormula replaceOccurrencesOfString:@"]" withString:@")" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
 	
-	// Pass process task, and pointer size
-	NSDictionary *substitutions = @{ZGProcessTaskVariable : @(process.processTask), ZGPointerSizeVariable : @(process.pointerSize)};
-	
-	return [self evaluateExpression:newAddressFormula substitutions:substitutions];
+	return [self evaluateExpression:newAddressFormula substitutions:@{ZGProcessVariable : process}];
 }
 
 @end

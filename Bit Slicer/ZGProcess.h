@@ -47,6 +47,7 @@
 @property (readonly, nonatomic) BOOL valid;
 @property (copy, nonatomic) NSString *name;
 @property (nonatomic) BOOL is64Bit;
+@property NSMutableDictionary *cacheDictionary;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 

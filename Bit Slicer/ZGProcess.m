@@ -83,11 +83,17 @@
 {
 	self.processID = NON_EXISTENT_PID_NUMBER;
 	self.processTask = MACH_PORT_NULL;
+	self.cacheDictionary = nil;
 }
 
 - (BOOL)grantUsAccess
 {
-	return ZGGetTaskForProcess(self.processID, &_processTask);
+	BOOL success = ZGGetTaskForProcess(self.processID, &_processTask);
+	if (success)
+	{
+		self.cacheDictionary = [[NSMutableDictionary alloc] init];
+	}
+	return success;
 }
 
 - (BOOL)hasGrantedAccess

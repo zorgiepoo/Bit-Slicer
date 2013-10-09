@@ -341,6 +341,26 @@ ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort)
 	return [ZGBaseExecutableRegion(taskPort) address];
 }
 
+ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString *partialImageName, NSMutableDictionary *cacheDictionary)
+{
+	ZGMemoryAddress foundAddress = 0x0;
+	NSNumber *addressNumber = [cacheDictionary objectForKey:partialImageName];
+	if (addressNumber == nil)
+	{
+		ZGRegion *foundRegion = ZGFindExecutableImage(processTask, partialImageName);
+		if (foundRegion != nil)
+		{
+			foundAddress = foundRegion.address;
+			[cacheDictionary setObject:@(foundAddress) forKey:partialImageName];
+		}
+	}
+	else
+	{
+		foundAddress = [addressNumber unsignedLongLongValue];
+	}
+	return foundAddress;
+}
+
 ZGRegion *ZGFindExecutableImage(ZGMemoryMap processTask, NSString *partialImageName)
 {
 	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
