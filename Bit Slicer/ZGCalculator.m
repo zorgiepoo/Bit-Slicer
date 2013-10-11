@@ -97,7 +97,7 @@
 				DDExpression *expression = [args objectAtIndex:0];
 				if (expression.expressionType == DDExpressionTypeVariable)
 				{
-					foundAddress = ZGFindExecutableImageWithCache(process.processTask, expression.variable, process.cacheDictionary);
+					foundAddress = ZGFindExecutableImageWithCache(process.processTask, expression.variable, process.cacheDictionary, error);
 				}
 				else if (error != NULL)
 				{
@@ -118,20 +118,20 @@
 	return [[expression stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0;
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression substitutions:(NSDictionary *)substitutions
++ (NSString *)evaluateExpression:(NSString *)expression substitutions:(NSDictionary *)substitutions error:(NSError **)error
 {
 	if (![self isValidExpression:expression])
 	{
 		return nil;
 	}
 	
-	NSError *unusedError = nil;
-	return [[expression ddNumberByEvaluatingStringWithSubstitutions:substitutions error:&unusedError] stringValue];
+	return [[expression ddNumberByEvaluatingStringWithSubstitutions:substitutions error:error] stringValue];
 }
 
 + (NSString *)evaluateExpression:(NSString *)expression
 {
-	return [self evaluateExpression:expression substitutions:nil];
+	NSError *unusedError = nil;
+	return [self evaluateExpression:expression substitutions:nil error:&unusedError];
 }
 
 + (NSString *)evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process
@@ -142,7 +142,18 @@
 	[newAddressFormula replaceOccurrencesOfString:@"[" withString:ZGCalculatePointerFunction@"(" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
 	[newAddressFormula replaceOccurrencesOfString:@"]" withString:@")" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
 	
-	return [self evaluateExpression:newAddressFormula substitutions:@{ZGProcessVariable : process}];
+	// Evaluate and cache expressions if possible (only if no dereferencing is being involved and no errors occured)
+	NSString *expression = [process.cacheDictionary objectForKey:newAddressFormula];
+	if (expression == nil)
+	{
+		NSError *error = nil;
+		expression = [self evaluateExpression:newAddressFormula substitutions:@{ZGProcessVariable : process} error:&error];
+		if (error == nil && [newAddressFormula rangeOfString:ZGCalculatePointerFunction].location == NSNotFound)
+		{
+			[process.cacheDictionary setObject:expression forKey:newAddressFormula];
+		}
+	}
+	return expression;
 }
 
 @end

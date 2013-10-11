@@ -341,7 +341,7 @@ ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort)
 	return [ZGBaseExecutableRegion(taskPort) address];
 }
 
-ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString *partialImageName, NSMutableDictionary *cacheDictionary)
+ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error)
 {
 	ZGMemoryAddress foundAddress = 0x0;
 	NSNumber *addressNumber = [cacheDictionary objectForKey:partialImageName];
@@ -352,6 +352,10 @@ ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString
 		{
 			foundAddress = foundRegion.address;
 			[cacheDictionary setObject:@(foundAddress) forKey:partialImageName];
+		}
+		else if (error != NULL)
+		{
+			*error = [NSError errorWithDomain:@"ZGFindExecutableImageFailed" code:1 userInfo:nil];
 		}
 	}
 	else
