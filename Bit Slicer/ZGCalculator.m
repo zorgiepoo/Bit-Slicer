@@ -134,26 +134,26 @@
 	return [self evaluateExpression:expression substitutions:nil error:&unusedError];
 }
 
-+ (NSString *)evaluateAddress:(NSString *)addressFormula process:(ZGProcess *)process
++ (NSString *)evaluateExpression:(NSString *)expression withProcess:(ZGProcess *)process
 {
-	NSMutableString	 *newAddressFormula = [[NSMutableString alloc] initWithString:addressFormula];
+	NSMutableString	 *newExpression = [[NSMutableString alloc] initWithString:expression];
 	
 	// Handle [expression] by renaming it as a function
-	[newAddressFormula replaceOccurrencesOfString:@"[" withString:ZGCalculatePointerFunction@"(" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
-	[newAddressFormula replaceOccurrencesOfString:@"]" withString:@")" options:NSLiteralSearch range:NSMakeRange(0, newAddressFormula.length)];
+	[newExpression replaceOccurrencesOfString:@"[" withString:ZGCalculatePointerFunction@"(" options:NSLiteralSearch range:NSMakeRange(0, newExpression.length)];
+	[newExpression replaceOccurrencesOfString:@"]" withString:@")" options:NSLiteralSearch range:NSMakeRange(0, newExpression.length)];
 	
 	// Evaluate and cache expressions if possible (only if no dereferencing is being involved and no errors occured)
-	NSString *expression = [process.cacheDictionary objectForKey:newAddressFormula];
-	if (expression == nil)
+	NSString *resultExpression = [process.cacheDictionary objectForKey:newExpression];
+	if (resultExpression == nil)
 	{
 		NSError *error = nil;
-		expression = [self evaluateExpression:newAddressFormula substitutions:@{ZGProcessVariable : process} error:&error];
-		if (expression != nil && error == nil && [newAddressFormula rangeOfString:ZGCalculatePointerFunction].location == NSNotFound)
+		resultExpression = [self evaluateExpression:newExpression substitutions:@{ZGProcessVariable : process} error:&error];
+		if (resultExpression != nil && error == nil && [newExpression rangeOfString:ZGCalculatePointerFunction].location == NSNotFound)
 		{
-			[process.cacheDictionary setObject:expression forKey:newAddressFormula];
+			[process.cacheDictionary setObject:resultExpression forKey:newExpression];
 		}
 	}
-	return expression;
+	return resultExpression;
 }
 
 @end

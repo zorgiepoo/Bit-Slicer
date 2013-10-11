@@ -165,8 +165,8 @@
 			 {
 				 NSString *newAddressString =
 					[ZGCalculator
-					 evaluateAddress:[NSMutableString stringWithString:variable.addressFormula]
-					 process:self.windowController.currentProcess];
+					 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
+					 withProcess:self.windowController.currentProcess];
 				 
 				 if (variable.address != newAddressString.zgUnsignedLongLongValue)
 				 {

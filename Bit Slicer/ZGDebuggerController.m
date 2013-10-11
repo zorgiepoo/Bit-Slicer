@@ -1040,7 +1040,7 @@ enum ZGStepExecution
 		}
 		else
 		{
-			NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAddress:self.addressTextField.stringValue process:self.currentProcess];
+			NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue withProcess:self.currentProcess];
 			if (ZGIsValidNumber(calculatedMemoryAddressExpression))
 			{
 				calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
