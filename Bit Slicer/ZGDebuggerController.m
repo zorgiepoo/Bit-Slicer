@@ -67,6 +67,7 @@
 @property (nonatomic, assign) IBOutlet NSTextField *statusTextField;
 @property (nonatomic) NSString *mappedFilePath;
 @property (nonatomic) ZGMemoryAddress baseAddress;
+@property (nonatomic) ZGMemoryAddress offsetFromBase;
 
 @property (nonatomic) NSArray *instructions;
 
@@ -83,6 +84,8 @@
 
 #define ZGDebuggerAddressField @"ZGDisassemblerAddressField"
 #define ZGDebuggerProcessName @"ZGDisassemblerProcessName"
+#define ZGDebuggerOffsetFromBase @"ZGDebuggerOffsetFromBase"
+#define ZGDebuggerMappedFilePath @"ZGDebuggerMappedFilePath"
 
 #define ATOS_PATH @"/usr/bin/atos"
 
@@ -123,6 +126,8 @@ enum ZGStepExecution
 	
 	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDebuggerAddressField];
 	[coder encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject name] forKey:ZGDebuggerProcessName];
+	[coder encodeObject:@(self.offsetFromBase) forKey:ZGDebuggerOffsetFromBase];
+	[coder encodeObject:self.mappedFilePath == nil ? [NSNull null] : self.mappedFilePath forKey:ZGDebuggerMappedFilePath];
 }
 
 - (void)restoreStateWithCoder:(NSCoder *)coder
@@ -133,6 +138,13 @@ enum ZGStepExecution
 	if (addressField)
 	{
 		self.addressTextField.stringValue = addressField;
+	}
+	
+	self.offsetFromBase = [[coder decodeObjectForKey:ZGDebuggerOffsetFromBase] unsignedLongLongValue];
+	self.mappedFilePath = [coder decodeObjectForKey:ZGDebuggerMappedFilePath];
+	if ((id)self.mappedFilePath == [NSNull null])
+	{
+		self.mappedFilePath = nil;
 	}
 	
 	self.desiredProcessName = [coder decodeObjectForKey:ZGDebuggerProcessName];
@@ -166,7 +178,7 @@ enum ZGStepExecution
 {
 	if (!sender)
 	{
-		[self readMemory:nil];
+		[self readMemory:self];
 	}
 	
 	[self toggleBacktraceView:NSOffState];
@@ -1015,13 +1027,24 @@ enum ZGStepExecution
 	
 	// create scope block to allow for goto
 	{
-		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue];
-		
 		ZGMemoryAddress calculatedMemoryAddress = 0;
-		
-		if (ZGIsValidNumber(calculatedMemoryAddressExpression))
+		if (self.mappedFilePath != nil && sender == nil)
 		{
-			calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
+			NSError *error = nil;
+			ZGMemoryAddress guessAddress = ZGFindExecutableImageWithCache(self.currentProcess.processTask, self.mappedFilePath, self.currentProcess.cacheDictionary, &error) + self.offsetFromBase;
+			if (error == nil)
+			{
+				calculatedMemoryAddress = guessAddress;
+				[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
+			}
+		}
+		else
+		{
+			NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAddress:self.addressTextField.stringValue process:self.currentProcess];
+			if (ZGIsValidNumber(calculatedMemoryAddressExpression))
+			{
+				calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
+			}
 		}
 		
 		BOOL shouldUseFirstInstruction = NO;
@@ -1041,6 +1064,7 @@ enum ZGStepExecution
 		ZGInstruction *foundInstructionInTable = [self findInstructionInTableAtAddress:calculatedMemoryAddress];
 		if (foundInstructionInTable != nil)
 		{
+			self.offsetFromBase = calculatedMemoryAddress - self.baseAddress;
 			[self prepareNavigation];
 			[self scrollAndSelectRow:[self.instructions indexOfObject:foundInstructionInTable]];
 			if (self.window.firstResponder != self.backtraceController.tableView)
@@ -1109,6 +1133,7 @@ enum ZGStepExecution
 		
 		self.mappedFilePath = mappedFilePath;
 		self.baseAddress = baseAddress;
+		self.offsetFromBase = calculatedMemoryAddress - baseAddress;
 		
 		// Make sure disassembler won't show anything before this address
 		self.instructionBoundary = NSMakeRange(firstInstructionAddress, maxInstructionsSize);
@@ -1208,7 +1233,7 @@ END_DEBUGGER_CHANGE:
 		}
 		else
 		{
-			[self readMemory:nil];
+			[self readMemory:self];
 		}
 	}
 	else

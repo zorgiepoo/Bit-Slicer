@@ -134,7 +134,7 @@
 	return [self evaluateExpression:expression substitutions:nil error:&unusedError];
 }
 
-+ (NSString *)evaluateAddress:(NSMutableString *)addressFormula process:(ZGProcess *)process
++ (NSString *)evaluateAddress:(NSString *)addressFormula process:(ZGProcess *)process
 {
 	NSMutableString	 *newAddressFormula = [[NSMutableString alloc] initWithString:addressFormula];
 	
@@ -148,7 +148,7 @@
 	{
 		NSError *error = nil;
 		expression = [self evaluateExpression:newAddressFormula substitutions:@{ZGProcessVariable : process} error:&error];
-		if (error == nil && [newAddressFormula rangeOfString:ZGCalculatePointerFunction].location == NSNotFound)
+		if (expression != nil && error == nil && [newAddressFormula rangeOfString:ZGCalculatePointerFunction].location == NSNotFound)
 		{
 			[process.cacheDictionary setObject:expression forKey:newAddressFormula];
 		}
