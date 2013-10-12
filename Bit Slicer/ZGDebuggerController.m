@@ -442,9 +442,7 @@ enum ZGStepExecution
 	ZGInstruction *instruction = nil;
 	
 	ZGMemoryBasicInfo regionInfo;
-	ZGRegion *targetRegion = [[ZGRegion alloc] init];
-	targetRegion.address = address;
-	targetRegion.size = 1;
+	ZGRegion *targetRegion = [[ZGRegion alloc] initWithAddress:address size:1];
 	if (!ZGRegionInfo(taskPort, &targetRegion->_address, &targetRegion->_size, &regionInfo))
 	{
 		targetRegion = nil;

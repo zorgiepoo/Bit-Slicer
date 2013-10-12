@@ -43,6 +43,8 @@
 	void *_bytes;
 }
 
+- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;
+
 @property (nonatomic) ZGMemoryMap processTask;
 @property (nonatomic) ZGMemoryAddress address;
 @property (nonatomic) ZGMemorySize size;

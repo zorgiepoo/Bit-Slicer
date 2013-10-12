@@ -135,9 +135,7 @@ NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
 			break;
 		}
 		
-		ZGRegion *region = [[ZGRegion alloc] init];
-		region.address = address;
-		region.size = size;
+		ZGRegion *region = [[ZGRegion alloc] initWithAddress:address size:size];
 		region.protection = info.protection;
 		
 		[regions addObject:region];
@@ -172,9 +170,7 @@ NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask)
 		}
 		else
 		{
-			ZGRegion *region = [[ZGRegion alloc] init];
-			region.address = address;
-			region.size = size;
+			ZGRegion *region = [[ZGRegion alloc] initWithAddress:address size:size];
 			region.protection = info.protection;
 			
 			address += size;

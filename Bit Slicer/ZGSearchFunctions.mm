@@ -870,9 +870,7 @@ void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T
 					ZGMemoryBasicInfo basicInfo;
 					if (ZGRegionInfo(processTask, &regionAddress, &regionSize, &basicInfo))
 					{
-						newRegion = [[ZGRegion alloc] init];
-						newRegion.address = regionAddress;
-						newRegion.size = regionSize;
+						newRegion = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize];
 					}
 				}
 				else
@@ -882,9 +880,7 @@ void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T
 				
 				if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
 				{
-					lastUsedRegion = [[ZGRegion alloc] init];
-					lastUsedRegion->_address = newRegion->_address;
-					lastUsedRegion->_size = newRegion->_size;
+					lastUsedRegion = [[ZGRegion alloc] initWithAddress:newRegion->_address size:newRegion->_size];
 					
 					void *bytes = NULL;
 					if (ZGReadBytes(processTask, lastUsedRegion->_address, &bytes, &lastUsedRegion->_size))

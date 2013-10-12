@@ -158,9 +158,7 @@
 			ZGMemoryBasicInfo unusedInfo;
 			if (ZGRegionInfo(self.watchProcess.processTask, &regionAddress, &regionSize, &unusedInfo) && regionAddress <= instruction.variable.address && regionAddress + regionSize >= instruction.variable.address + instruction.variable.size)
 			{
-				ZGRegion *region = [[ZGRegion alloc] init];
-				region.address = regionAddress;
-				region.size = regionSize;
+				ZGRegion *region = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize];
 				NSString *mappedFilePath = nil;
 				ZGMemoryAddress machHeaderAddress = 0x0;
 				NSRange textRange = ZGTextRange(self.watchProcess.processTask, region, &mappedFilePath, &machHeaderAddress);

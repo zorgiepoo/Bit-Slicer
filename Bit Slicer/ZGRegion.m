@@ -36,4 +36,15 @@
 
 @implementation ZGRegion
 
+- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size
+{
+	self = [super init];
+	if (self != nil)
+	{
+		_address = address;
+		_size = size;
+	}
+	return self;
+}
+
 @end
