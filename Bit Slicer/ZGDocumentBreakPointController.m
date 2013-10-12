@@ -45,6 +45,10 @@
 #import "ZGInstruction.h"
 #import "ZGBreakPoint.h"
 #import "ZGDocumentData.h"
+#import "ZGRegion.h"
+#import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
+#import "ZGCalculator.h"
 
 @interface ZGDocumentBreakPointController ()
 
@@ -147,8 +151,26 @@
 		
 		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionAddress unsignedLongLongValue] inTaskPort:self.watchProcess.processTask pointerSize:self.watchProcess.pointerSize];
 		
-		if (instruction)
+		if (instruction != nil)
 		{
+			ZGMemoryAddress regionAddress = instruction.variable.address;
+			ZGMemorySize regionSize = instruction.variable.size;
+			ZGMemoryBasicInfo unusedInfo;
+			if (ZGRegionInfo(self.watchProcess.processTask, &regionAddress, &regionSize, &unusedInfo) && regionAddress <= instruction.variable.address && regionAddress + regionSize >= instruction.variable.address + instruction.variable.size)
+			{
+				ZGRegion *region = [[ZGRegion alloc] init];
+				region.address = regionAddress;
+				region.size = regionSize;
+				NSString *mappedFilePath = nil;
+				ZGMemoryAddress machHeaderAddress = 0x0;
+				NSRange textRange = ZGTextRange(self.watchProcess.processTask, region, &mappedFilePath, &machHeaderAddress);
+				if (textRange.location <= instruction.variable.address && textRange.location + textRange.length >= instruction.variable.address + instruction.variable.size && mappedFilePath != nil)
+				{
+					instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", instruction.variable.address - machHeaderAddress, mappedFilePath];
+					instruction.variable.usesDynamicAddress = YES;
+				}
+			}
+			
 			if (self.variableInsertionIndex >= self.windowController.documentData.variables.count)
 			{
 				self.variableInsertionIndex = 0;
