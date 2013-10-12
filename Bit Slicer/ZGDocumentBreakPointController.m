@@ -166,8 +166,15 @@
 				NSRange textRange = ZGTextRange(self.watchProcess.processTask, region, &mappedFilePath, &machHeaderAddress);
 				if (textRange.location <= instruction.variable.address && textRange.location + textRange.length >= instruction.variable.address + instruction.variable.size && mappedFilePath != nil)
 				{
-					instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", instruction.variable.address - machHeaderAddress, mappedFilePath];
-					instruction.variable.usesDynamicAddress = YES;
+					NSError *error = nil;
+					NSString *partialPath = [mappedFilePath lastPathComponent];
+					// Make sure base address with our partial path matches with base address at full path
+					ZGMemoryAddress baseVerificationAddress = ZGFindExecutableImageWithCache(self.watchProcess.processTask, partialPath, self.watchProcess.cacheDictionary, &error);
+					if (error == nil && baseVerificationAddress == machHeaderAddress)
+					{
+						instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", instruction.variable.address - machHeaderAddress, partialPath];
+						instruction.variable.usesDynamicAddress = YES;
+					}
 				}
 			}
 			
