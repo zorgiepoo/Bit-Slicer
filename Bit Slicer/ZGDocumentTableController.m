@@ -496,6 +496,12 @@
 					}
 				}
 			}
+			
+			NSString *userTagDescription = ZGUserTagDescription(self.windowController.currentProcess.processTask, variable.address, variable.size);
+			if (userTagDescription != nil)
+			{
+				[displayComponents addObject:[NSString stringWithFormat:@"Tag: %@", userTagDescription]];
+			}
 		}
 	}
 	

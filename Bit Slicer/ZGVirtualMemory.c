@@ -138,6 +138,25 @@ bool ZGRegionInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySiz
 	return mach_vm_region(processTask, address, size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)regionInfo, &regionInfoSize, &objectName) == KERN_SUCCESS;
 }
 
+bool ZGRegionSubmapInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemorySubmapInfo *regionInfo)
+{
+	bool success = true;
+	mach_msg_type_number_t infoCount;
+	natural_t depth = 0;
+	
+	while (true)
+	{
+		infoCount = VM_REGION_SUBMAP_INFO_COUNT_64;
+		success = success && mach_vm_region_recurse(processTask, address, size, &depth, (vm_region_recurse_info_t)regionInfo, &infoCount) == KERN_SUCCESS;
+		if (!success || !regionInfo->is_submap)
+		{
+			break;
+		}
+		depth++;
+	}
+	return success;
+}
+
 bool ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection)
 {
 	ZGMemoryBasicInfo regionInfo;
