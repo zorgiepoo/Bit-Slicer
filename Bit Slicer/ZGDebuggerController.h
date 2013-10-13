@@ -40,8 +40,6 @@
 
 #define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
 
-#define JUMP_REL32_INSTRUCTION_LENGTH 5
-
 @class ZGProcess;
 @class ZGInstruction;
 
@@ -62,7 +60,7 @@
 
 - (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error;
 
-- (NSArray *)instructionsAtMemoryAddress:(ZGMemoryAddress)address consumingLength:(NSInteger)consumedLength inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize;
+- (NSArray *)instructionsBeforeInjectingIntoAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize;
 
 - (BOOL)
 	injectCode:(NSData *)codeData

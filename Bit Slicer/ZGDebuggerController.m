@@ -90,6 +90,7 @@
 #define ATOS_PATH @"/usr/bin/atos"
 
 #define NOP_VALUE 0x90
+#define JUMP_REL32_INSTRUCTION_LENGTH 5
 
 enum ZGStepExecution
 {
@@ -2003,6 +2004,11 @@ END_DEBUGGER_CHANGE:
 			
 			[self nopInstructions:hookedInstructions inTaskPort:taskPort is64Bit:pointerSize == sizeof(int64_t) recordUndo:shouldRecordUndo actionName:nil];
 			
+			ZGMemorySize hookedInstructionsLength = 0;
+			for (ZGInstruction *instruction in hookedInstructions)
+			{
+				hookedInstructionsLength += instruction.variable.size;
+			}
 			ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
 			
 			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:pointerSize*8 error:error];
@@ -2013,7 +2019,7 @@ END_DEBUGGER_CHANGE:
 				
 				[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] inTaskPort:taskPort is64Bit:(pointerSize == sizeof(int64_t)) recordUndo:shouldRecordUndo actionName:nil];
 				
-				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + JUMP_REL32_INSTRUCTION_LENGTH] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:pointerSize*8 error:error];
+				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:pointerSize*8 error:error];
 				if (jumpFromIslandData.length > 0)
 				{
 					[newInstructionsData appendData:jumpFromIslandData];
@@ -2033,10 +2039,10 @@ END_DEBUGGER_CHANGE:
 	return success;
 }
 
-- (NSArray *)instructionsAtMemoryAddress:(ZGMemoryAddress)address consumingLength:(NSInteger)consumedLength inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize
+- (NSArray *)instructionsBeforeInjectingIntoAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize
 {
 	NSMutableArray *instructions = [[NSMutableArray alloc] init];
-	
+	int consumedLength = JUMP_REL32_INSTRUCTION_LENGTH;
 	while (consumedLength > 0)
 	{
 		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inTaskPort:taskPort pointerSize:pointerSize];
@@ -2055,24 +2061,25 @@ END_DEBUGGER_CHANGE:
 
 - (IBAction)requestCodeInjection:(id)sender
 {
-	ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
-	NSArray *instructions = [self instructionsAtMemoryAddress:firstInstruction.variable.address consumingLength:JUMP_REL32_INSTRUCTION_LENGTH inTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize];
-	if (instructions != nil)
+	ZGMemoryAddress allocatedAddress = 0;
+	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
+	ZGPageSize(self.currentProcess.processTask, &numberOfAllocatedBytes);
+	
+	if (ZGAllocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
 	{
-		ZGMemoryAddress allocatedAddress = 0;
-		ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
-		ZGPageSize(self.currentProcess.processTask, &numberOfAllocatedBytes);
-		
-		if (ZGAllocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
+		void *nopBuffer = malloc(numberOfAllocatedBytes);
+		memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
+		if (!ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
 		{
-			void *nopBuffer = malloc(numberOfAllocatedBytes);
-			memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
-			if (!ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
-			{
-				NSLog(@"Failed to nop allocated memory for code injection");
-			}
-			free(nopBuffer);
-			
+			NSLog(@"Failed to nop allocated memory for code injection");
+		}
+		free(nopBuffer);
+		
+		ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
+		NSArray *instructions = [self instructionsBeforeInjectingIntoAddress:firstInstruction.variable.address inTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize];
+		
+		if (instructions != nil)
+		{
 			NSString *suggestedCode = [[[instructions valueForKey:@"text"] componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"];
 			
 			if (self.codeInjectionController == nil)
@@ -2112,14 +2119,19 @@ END_DEBUGGER_CHANGE:
 		}
 		else
 		{
-			NSLog(@"Failed to allocate code for code injection");
-			NSRunAlertPanel(@"Failed to Allocate Memory", @"An error occured trying to allocate new memory into the process", @"OK", nil, nil);
+			if (!ZGDeallocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
+			{
+				NSLog(@"Error: Failed to deallocate VM memory after failing to fetch enough instructions..");
+			}
+			
+			NSLog(@"Error: not enough instructions to override!");
+			NSRunAlertPanel(@"Failed to Inject Code", @"There was not enough space to override this instruction.", @"OK", nil, nil);
 		}
 	}
 	else
 	{
-		NSLog(@"Error: not enough instructions to override!");
-		NSRunAlertPanel(@"Failed to Inject Code", @"There was not enough space to override this instruction.", @"OK", nil, nil);
+		NSLog(@"Failed to allocate code for code injection");
+		NSRunAlertPanel(@"Failed to Allocate Memory", @"An error occured trying to allocate new memory into the process", @"OK", nil, nil);
 	}
 }
 
