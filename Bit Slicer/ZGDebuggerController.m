@@ -2039,7 +2039,7 @@ END_DEBUGGER_CHANGE:
 	return success;
 }
 
-- (NSArray *)instructionsBeforeInjectingIntoAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize
+- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize
 {
 	NSMutableArray *instructions = [[NSMutableArray alloc] init];
 	int consumedLength = JUMP_REL32_INSTRUCTION_LENGTH;
@@ -2076,7 +2076,7 @@ END_DEBUGGER_CHANGE:
 		free(nopBuffer);
 		
 		ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
-		NSArray *instructions = [self instructionsBeforeInjectingIntoAddress:firstInstruction.variable.address inTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize];
+		NSArray *instructions = [self instructionsBeforeHookingIntoAddress:firstInstruction.variable.address injectingIntoDestination:allocatedAddress inTaskPort:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize];
 		
 		if (instructions != nil)
 		{

@@ -60,7 +60,7 @@
 
 - (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error;
 
-- (NSArray *)instructionsBeforeInjectingIntoAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize;
+- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize;
 
 - (BOOL)
 	injectCode:(NSData *)codeData
