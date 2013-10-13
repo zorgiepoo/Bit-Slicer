@@ -2080,7 +2080,27 @@ END_DEBUGGER_CHANGE:
 		
 		if (instructions != nil)
 		{
-			NSString *suggestedCode = [[[instructions valueForKey:@"text"] componentsJoinedByString:@"\n"] stringByAppendingString:@"\n"];
+			NSMutableString *suggestedCode = [NSMutableString stringWithFormat:@"; Injected code will be allocated at 0x%llX\n", allocatedAddress];
+			for (ZGInstruction *instruction in instructions)
+			{
+				NSMutableString *instructionText = [NSMutableString stringWithString:[instruction text]];
+				if (self.currentProcess.is64Bit && [instructionText rangeOfString:@"rip"].location != NSNotFound)
+				{
+					NSString *ripReplacement = nil;
+					if (allocatedAddress > firstInstruction.variable.address)
+					{
+						ripReplacement = [NSString stringWithFormat:@"rip-0x%llX", allocatedAddress + (instruction.variable.address - firstInstruction.variable.address) - instruction.variable.address];
+					}
+					else
+					{
+						ripReplacement = [NSString stringWithFormat:@"rip+0x%llX", instruction.variable.address + (instruction.variable.address - firstInstruction.variable.address) - allocatedAddress];
+					}
+					
+					[instructionText replaceOccurrencesOfString:@"rip" withString:ripReplacement options:NSLiteralSearch range:NSMakeRange(0, instructionText.length)];
+				}
+				[suggestedCode appendString:instructionText];
+				[suggestedCode appendString:@"\n"];
+			}
 			
 			if (self.codeInjectionController == nil)
 			{
