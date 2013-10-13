@@ -332,6 +332,36 @@ NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mapped
 	return NSMakeRange(textAddress, textSize);
 }
 
+ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString **partialImageName)
+{
+	ZGMemoryAddress offset = 0x0;
+	
+	ZGMemoryAddress regionAddress = instructionAddress;
+	ZGMemorySize regionSize = instructionSize;
+	ZGMemoryBasicInfo unusedInfo;
+	if (ZGRegionInfo(processTask, &regionAddress, &regionSize, &unusedInfo) && regionAddress <= instructionAddress && regionAddress + regionSize >= instructionAddress + instructionSize)
+	{
+		ZGRegion *region = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize];
+		NSString *mappedFilePath = nil;
+		ZGMemoryAddress machHeaderAddress = 0x0;
+		NSRange textRange = ZGTextRange(processTask, region, &mappedFilePath, &machHeaderAddress);
+		if (textRange.location <= instructionAddress && textRange.location + textRange.length >= instructionAddress + instructionSize && mappedFilePath != nil)
+		{
+			NSError *error = nil;
+			NSString *partialPath = [mappedFilePath lastPathComponent];
+			// Make sure base address with our partial path matches with base address at full path
+			ZGMemoryAddress baseVerificationAddress = ZGFindExecutableImageWithCache(processTask, partialPath, cacheDictionary, &error);
+			if (error == nil && baseVerificationAddress == machHeaderAddress)
+			{
+				offset = instructionAddress - machHeaderAddress;
+				if (partialImageName != NULL) *partialImageName = [partialPath copy];
+			}
+		}
+	}
+	
+	return offset;
+}
+
 ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort)
 {
 	return [ZGBaseExecutableRegion(taskPort) address];

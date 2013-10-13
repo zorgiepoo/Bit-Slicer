@@ -1451,6 +1451,18 @@ END_DEBUGGER_CHANGE:
 	for (ZGInstruction *instruction in self.selectedInstructions)
 	{
 		[descriptionComponents addObject:[@[instruction.variable.addressStringValue, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
+		
+		if (!instruction.variable.usesDynamicAddress)
+		{
+			NSString *partialPath = nil;
+			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.currentProcess.processTask, self.currentProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &partialPath);
+			if (partialPath != nil)
+			{
+				instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, partialPath];
+				instruction.variable.usesDynamicAddress = YES;
+			}
+		}
+		
 		[variablesArray addObject:instruction.variable];
 	}
 	

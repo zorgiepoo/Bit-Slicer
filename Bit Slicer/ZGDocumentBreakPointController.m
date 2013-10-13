@@ -153,27 +153,13 @@
 		
 		if (instruction != nil)
 		{
-			ZGMemoryAddress regionAddress = instruction.variable.address;
-			ZGMemorySize regionSize = instruction.variable.size;
-			ZGMemoryBasicInfo unusedInfo;
-			if (ZGRegionInfo(self.watchProcess.processTask, &regionAddress, &regionSize, &unusedInfo) && regionAddress <= instruction.variable.address && regionAddress + regionSize >= instruction.variable.address + instruction.variable.size)
+			NSString *partialPath = nil;
+			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.watchProcess.processTask, self.watchProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &partialPath);
+			
+			if (partialPath != nil)
 			{
-				ZGRegion *region = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize];
-				NSString *mappedFilePath = nil;
-				ZGMemoryAddress machHeaderAddress = 0x0;
-				NSRange textRange = ZGTextRange(self.watchProcess.processTask, region, &mappedFilePath, &machHeaderAddress);
-				if (textRange.location <= instruction.variable.address && textRange.location + textRange.length >= instruction.variable.address + instruction.variable.size && mappedFilePath != nil)
-				{
-					NSError *error = nil;
-					NSString *partialPath = [mappedFilePath lastPathComponent];
-					// Make sure base address with our partial path matches with base address at full path
-					ZGMemoryAddress baseVerificationAddress = ZGFindExecutableImageWithCache(self.watchProcess.processTask, partialPath, self.watchProcess.cacheDictionary, &error);
-					if (error == nil && baseVerificationAddress == machHeaderAddress)
-					{
-						instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", instruction.variable.address - machHeaderAddress, partialPath];
-						instruction.variable.usesDynamicAddress = YES;
-					}
-				}
+				instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, partialPath];
+				instruction.variable.usesDynamicAddress = YES;
 			}
 			
 			if (self.variableInsertionIndex >= self.windowController.documentData.variables.count)
