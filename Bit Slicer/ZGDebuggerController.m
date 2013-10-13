@@ -1972,88 +1972,97 @@ END_DEBUGGER_CHANGE:
 	recordUndo:(BOOL)shouldRecordUndo
 	error:(NSError **)error
 {
-	NSMutableData *newInstructionsData = [NSMutableData dataWithData:codeData];
 	BOOL success = NO;
 	
-	ZGSuspendTask(taskPort);
-	
-	void *nopBuffer = malloc(codeData.length);
-	memset(nopBuffer, NOP_VALUE, codeData.length);
-	
-	if (!ZGWriteBytesIgnoringProtection(taskPort, allocatedAddress, nopBuffer, codeData.length))
+	if (hookedInstructions != nil)
 	{
-		NSLog(@"Error: Failed to write nop buffer..");
-		if (error != nil)
+		NSMutableData *newInstructionsData = [NSMutableData dataWithData:codeData];
+		
+		ZGSuspendTask(taskPort);
+		
+		void *nopBuffer = malloc(codeData.length);
+		memset(nopBuffer, NOP_VALUE, codeData.length);
+		
+		if (!ZGWriteBytesIgnoringProtection(taskPort, allocatedAddress, nopBuffer, codeData.length))
 		{
-			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to NOP current instructions"}];
-		}
-	}
-	else
-	{
-		if (!ZGProtect(taskPort, allocatedAddress, codeData.length, VM_PROT_READ | VM_PROT_EXECUTE))
-		{
-			NSLog(@"Error: Failed to protect memory..");
+			NSLog(@"Error: Failed to write nop buffer..");
 			if (error != nil)
 			{
-				*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to change memory protection on new instructions"}];
+				*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to NOP current instructions"}];
 			}
 		}
 		else
 		{
-			[self.undoManager setActionName:@"Inject code"];
-			
-			[self nopInstructions:hookedInstructions inTaskPort:taskPort is64Bit:pointerSize == sizeof(int64_t) recordUndo:shouldRecordUndo actionName:nil];
-			
-			ZGMemorySize hookedInstructionsLength = 0;
-			for (ZGInstruction *instruction in hookedInstructions)
+			if (!ZGProtect(taskPort, allocatedAddress, codeData.length, VM_PROT_READ | VM_PROT_EXECUTE))
 			{
-				hookedInstructionsLength += instruction.variable.size;
-			}
-			ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
-			
-			NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:pointerSize*8 error:error];
-			
-			if (jumpToIslandData.length > 0)
-			{
-				ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:pointerSize];
-				
-				[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] inTaskPort:taskPort is64Bit:(pointerSize == sizeof(int64_t)) recordUndo:shouldRecordUndo actionName:nil];
-				
-				NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:pointerSize*8 error:error];
-				if (jumpFromIslandData.length > 0)
+				NSLog(@"Error: Failed to protect memory..");
+				if (error != nil)
 				{
-					[newInstructionsData appendData:jumpFromIslandData];
+					*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to change memory protection on new instructions"}];
+				}
+			}
+			else
+			{
+				[self.undoManager setActionName:@"Inject code"];
+				
+				[self nopInstructions:hookedInstructions inTaskPort:taskPort is64Bit:pointerSize == sizeof(int64_t) recordUndo:shouldRecordUndo actionName:nil];
+				
+				ZGMemorySize hookedInstructionsLength = 0;
+				for (ZGInstruction *instruction in hookedInstructions)
+				{
+					hookedInstructionsLength += instruction.variable.size;
+				}
+				ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
+				
+				NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:pointerSize*8 error:error];
+				
+				if (jumpToIslandData.length > 0)
+				{
+					ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:pointerSize];
 					
-					ZGWriteBytesIgnoringProtection(taskPort, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
+					[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] inTaskPort:taskPort is64Bit:(pointerSize == sizeof(int64_t)) recordUndo:shouldRecordUndo actionName:nil];
 					
-					success = YES;
+					NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:pointerSize*8 error:error];
+					if (jumpFromIslandData.length > 0)
+					{
+						[newInstructionsData appendData:jumpFromIslandData];
+						
+						ZGWriteBytesIgnoringProtection(taskPort, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
+						
+						success = YES;
+					}
 				}
 			}
 		}
+		
+		free(nopBuffer);
+		
+		ZGResumeTask(taskPort);
 	}
-	
-	free(nopBuffer);
-	
-	ZGResumeTask(taskPort);
 	
 	return success;
 }
 
 - (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize
 {
-	NSMutableArray *instructions = [[NSMutableArray alloc] init];
-	int consumedLength = JUMP_REL32_INSTRUCTION_LENGTH;
-	while (consumedLength > 0)
+	NSMutableArray *instructions = nil;
+	
+	if (!((destinationAddress > address && destinationAddress - address > INT_MAX) || (address > destinationAddress && address - destinationAddress > INT_MAX)))
 	{
-		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inTaskPort:taskPort pointerSize:pointerSize];
-		if (newInstruction == nil)
+		instructions = [[NSMutableArray alloc] init];
+		int consumedLength = JUMP_REL32_INSTRUCTION_LENGTH;
+		while (consumedLength > 0)
 		{
-			instructions = nil;
-			break;
+			ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inTaskPort:taskPort pointerSize:pointerSize];
+			if (newInstruction == nil)
+			{
+				instructions = nil;
+				break;
+			}
+			[instructions addObject:newInstruction];
+			consumedLength -= newInstruction.variable.size;
+			address += newInstruction.variable.size;
 		}
-		[instructions addObject:newInstruction];
-		consumedLength -= newInstruction.variable.size;
-		address += newInstruction.variable.size;
 	}
 	
 	return [instructions copy];
@@ -2144,8 +2153,8 @@ END_DEBUGGER_CHANGE:
 				NSLog(@"Error: Failed to deallocate VM memory after failing to fetch enough instructions..");
 			}
 			
-			NSLog(@"Error: not enough instructions to override!");
-			NSRunAlertPanel(@"Failed to Inject Code", @"There was not enough space to override this instruction.", @"OK", nil, nil);
+			NSLog(@"Error: not enough instructions to override, or allocated memory address was too far away. Source: 0x%llX, destination: 0x%llX", firstInstruction.variable.address, allocatedAddress);
+			NSRunAlertPanel(@"Failed to Inject Code", @"There was not enough space to override this instruction, or the newly allocated address was too far away", @"OK", nil, nil);
 		}
 	}
 	else
