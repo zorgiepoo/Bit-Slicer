@@ -393,7 +393,7 @@ void ZGGetMappedRegionInfo(ZGMemoryMap processTask, ZGRegion *region, NSString *
 	}
 }
 
-NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset)
+NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide)
 {
 	NSString *sectionName = nil;
 	ZGMemoryBasicInfo unusedInfo;
@@ -405,7 +405,7 @@ NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemo
 		ZGMemorySize dataSize = 0;
 		ZGMemorySize linkEditSize = 0;
 		
-		ZGGetMappedRegionInfo(processTask, region, mappedFilePath, &machHeaderAddress, NULL, NULL, &textSize, &dataSize, &linkEditSize);
+		ZGGetMappedRegionInfo(processTask, region, mappedFilePath, &machHeaderAddress, NULL, slide, &textSize, &dataSize, &linkEditSize);
 		if (relativeOffset != NULL) *relativeOffset = address - machHeaderAddress;
 		
 		if (address >= machHeaderAddress)

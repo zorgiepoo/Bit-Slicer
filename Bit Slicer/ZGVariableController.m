@@ -949,7 +949,7 @@
 	{
 		NSString *mappedFilePath = nil;
 		ZGMemorySize relativeOffset = 0;
-		if (ZGSectionName(self.windowController.currentProcess.processTask, variable.address, variable.size, &mappedFilePath, &relativeOffset) != nil)
+		if (ZGSectionName(self.windowController.currentProcess.processTask, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL) != nil)
 		{
 			NSString *partialPath = [mappedFilePath lastPathComponent];
 			NSError *error = nil;

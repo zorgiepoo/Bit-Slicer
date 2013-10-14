@@ -1071,7 +1071,9 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		for (ZGVariable *variable in selectedVariables)
 		{
-			if (variable.usesDynamicAddress || ZGSectionName(self.currentProcess.processTask, variable.address, variable.size, NULL, NULL) == nil)
+			ZGMemoryAddress relativeOffset = 0;
+			ZGMemoryAddress slide = 0;
+			if (variable.usesDynamicAddress || ZGSectionName(self.currentProcess.processTask, variable.address, variable.size, NULL, &relativeOffset, &slide) == nil || slide == 0)
 			{
 				return NO;
 			}
