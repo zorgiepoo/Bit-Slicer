@@ -49,7 +49,7 @@ void ZGFreeTask(ZGMemoryMap task);
 
 ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap taskPort);
 ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort);
-NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress);
+NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide);
 
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
 NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
@@ -61,7 +61,7 @@ NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address,
 ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error);
 ZGRegion *ZGFindExecutableImage(ZGMemoryMap processTask, NSString *partialImageName);
 	
-ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString **partialImageName);
+ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName);
 
 NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset);
 

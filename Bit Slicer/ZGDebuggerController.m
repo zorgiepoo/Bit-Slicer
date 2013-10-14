@@ -462,7 +462,7 @@ enum ZGStepExecution
 			startAddress = targetRegion.address;
 		}
 		
-		ZGMemoryAddress firstInstructionAddress = ZGTextRange(taskPort, targetRegion, NULL, NULL).location;
+		ZGMemoryAddress firstInstructionAddress = ZGTextRange(taskPort, targetRegion, NULL, NULL, NULL).location;
 		
 		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
 		{
@@ -1050,7 +1050,7 @@ enum ZGStepExecution
 		
 		NSString *firstMappedFilePath = @"";
 		ZGMemoryAddress firstBaseAddress = 0;
-		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, ZGBaseExecutableRegion(self.currentProcess.processTask), &firstMappedFilePath, &firstBaseAddress);
+		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, ZGBaseExecutableRegion(self.currentProcess.processTask), &firstMappedFilePath, &firstBaseAddress, NULL);
 		
 		if (calculatedMemoryAddress == 0)
 		{
@@ -1105,7 +1105,7 @@ enum ZGStepExecution
 		
 		if (!shouldUseFirstInstruction)
 		{
-			NSRange textRange = ZGTextRange(self.currentProcess.processTask, chosenRegion, &mappedFilePath, &baseAddress);
+			NSRange textRange = ZGTextRange(self.currentProcess.processTask, chosenRegion, &mappedFilePath, &baseAddress, NULL);
 			firstInstructionAddress = textRange.location;
 			maxInstructionsSize = textRange.length;
 			if (firstInstructionAddress + maxInstructionsSize < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
@@ -1456,8 +1456,9 @@ END_DEBUGGER_CHANGE:
 		if (!instruction.variable.usesDynamicAddress)
 		{
 			NSString *partialPath = nil;
-			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.currentProcess.processTask, self.currentProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &partialPath);
-			if (partialPath != nil)
+			ZGMemoryAddress slide = 0;
+			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.currentProcess.processTask, self.currentProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
+			if (partialPath != nil && slide > 0)
 			{
 				instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, partialPath];
 				instruction.variable.usesDynamicAddress = YES;

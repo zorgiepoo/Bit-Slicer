@@ -265,7 +265,7 @@ ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap taskPort)
 	return chosenRegion;
 }
 
-#define ZGFindTextAddressAndTotalSegmentSize(segment_type, section_type, bytes, machHeaderAddress, textAddress, textSize, dataSize, linkEditSize, numberOfSegmentsToFind) \
+#define ZGFindTextAddressAndTotalSegmentSize(segment_type, section_type, bytes, machHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind) \
 struct segment_type *segmentCommand = bytes; \
 void *sectionBytes = bytes + sizeof(*segmentCommand); \
 if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
@@ -275,6 +275,7 @@ if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
 		if (strcmp("__text", section->sectname) == 0) \
 		{ \
 			if (textAddress != NULL) *textAddress = machHeaderAddress + section->offset; \
+			if (slide != NULL) *slide = machHeaderAddress + section->offset - section->addr; \
 			break; \
 		} \
 	} \
@@ -292,7 +293,7 @@ else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
 	numberOfSegmentsToFind--; \
 }
 
-void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
 {
 	ZGMemoryAddress regionAddress = machHeaderAddress;
 	ZGMemorySize regionSize = 1;
@@ -315,11 +316,11 @@ void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddr
 						
 						if (loadCommand->cmd == LC_SEGMENT_64)
 						{
-							ZGFindTextAddressAndTotalSegmentSize(segment_command_64, section_64, segmentBytes, machHeaderAddress, firstInstructionAddress, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
+							ZGFindTextAddressAndTotalSegmentSize(segment_command_64, section_64, segmentBytes, machHeaderAddress, firstInstructionAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
 						}
 						else if (loadCommand->cmd == LC_SEGMENT)
 						{
-							ZGFindTextAddressAndTotalSegmentSize(segment_command, section, segmentBytes, machHeaderAddress, firstInstructionAddress, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
+							ZGFindTextAddressAndTotalSegmentSize(segment_command, section, segmentBytes, machHeaderAddress, firstInstructionAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
 						}
 						
 						if (numberOfSegmentsToFind <= 0)
@@ -377,11 +378,11 @@ NSString *ZGMappedFilePath(ZGMemoryMap processTask, ZGMemoryAddress regionAddres
 	return mappedFilePath;
 }
 
-void ZGGetMappedRegionInfo(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+void ZGGetMappedRegionInfo(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
 {
 	ZGMemoryAddress nearestMachHeaderAddress = ZGNearestMachHeaderBeforeRegion(processTask, region);
 	if (machHeaderAddress != NULL) *machHeaderAddress = nearestMachHeaderAddress;
-	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, textAddress, textSize, dataSize, linkEditSize);
+	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize);
 	if (mappedFilePath != NULL)
 	{
 		NSString *tempFilePath = ZGMappedFilePath(processTask, nearestMachHeaderAddress);
@@ -404,7 +405,7 @@ NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemo
 		ZGMemorySize dataSize = 0;
 		ZGMemorySize linkEditSize = 0;
 		
-		ZGGetMappedRegionInfo(processTask, region, mappedFilePath, &machHeaderAddress, NULL, &textSize, &dataSize, &linkEditSize);
+		ZGGetMappedRegionInfo(processTask, region, mappedFilePath, &machHeaderAddress, NULL, NULL, &textSize, &dataSize, &linkEditSize);
 		if (relativeOffset != NULL) *relativeOffset = address - machHeaderAddress;
 		
 		if (address >= machHeaderAddress)
@@ -431,16 +432,16 @@ NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemo
 	return sectionName;
 }
 
-NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress)
+NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide)
 {
 	ZGMemoryAddress textAddress = 0;
 	ZGMemorySize textSize = 0;
-	ZGGetMappedRegionInfo(processTask, region, mappedFilePath, machHeaderAddress, &textAddress, &textSize, NULL, NULL);
+	ZGGetMappedRegionInfo(processTask, region, mappedFilePath, machHeaderAddress, &textAddress, slide, &textSize, NULL, NULL);
 	
 	return NSMakeRange(textAddress, textSize);
 }
 
-ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, NSString **partialImageName)
+ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName)
 {
 	ZGMemoryAddress offset = 0x0;
 	
@@ -452,7 +453,7 @@ ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary
 		ZGRegion *region = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize];
 		NSString *mappedFilePath = nil;
 		ZGMemoryAddress machHeaderAddress = 0x0;
-		NSRange textRange = ZGTextRange(processTask, region, &mappedFilePath, &machHeaderAddress);
+		NSRange textRange = ZGTextRange(processTask, region, &mappedFilePath, &machHeaderAddress, slide);
 		if (textRange.location <= instructionAddress && textRange.location + textRange.length >= instructionAddress + instructionSize && mappedFilePath != nil)
 		{
 			NSError *error = nil;

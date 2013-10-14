@@ -154,9 +154,10 @@
 		if (instruction != nil)
 		{
 			NSString *partialPath = nil;
-			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.watchProcess.processTask, self.watchProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &partialPath);
+			ZGMemoryAddress slide = 0;
+			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.watchProcess.processTask, self.watchProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
 			
-			if (partialPath != nil)
+			if (partialPath != nil && slide > 0)
 			{
 				instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, partialPath];
 				instruction.variable.usesDynamicAddress = YES;
