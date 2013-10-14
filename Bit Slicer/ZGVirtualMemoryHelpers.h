@@ -47,8 +47,8 @@ BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task);
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
 
-ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap taskPort);
-ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort);
+ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap processTask);
+ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap processTask);
 NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide);
 
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);

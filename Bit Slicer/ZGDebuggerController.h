@@ -54,24 +54,24 @@
 - (void)updateSymbolsForInstructions:(NSArray *)instructions;
 
 // This function is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize;
+- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize;
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
 
 - (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error;
 
-- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inTaskPort:(ZGMemoryMap)taskPort pointerSize:(ZGMemorySize)pointerSize;
+- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress processTask:(ZGMemoryMap)processTasks pointerSize:(ZGMemorySize)pointerSize;
 
 - (BOOL)
 	injectCode:(NSData *)codeData
 	intoAddress:(ZGMemoryAddress)allocatedAddress
 	hookingIntoOriginalInstructions:(NSArray *)hookedInstructions
-	inTaskPort:(ZGMemoryMap)taskPort
+	processTask:(ZGMemoryMap)processTask
 	pointerSize:(ZGMemorySize)pointerSize
 	recordUndo:(BOOL)shouldRecordUndo
 	error:(NSError **)error;
 
-- (NSData *)readDataWithTaskPort:(ZGMemoryMap)taskPort address:(ZGMemoryAddress)address size:(ZGMemorySize)size;
-- (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address inTaskPort:(ZGMemoryMap)taskPort is64Bit:(BOOL)is64Bit;
+- (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size;
+- (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit;
 
 @end

@@ -70,7 +70,7 @@ BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task)
 	
 	if (!ZGTaskExistsForProcess(process, task))
 	{
-		if (!ZGTaskPortForPID(process, task))
+		if (!ZGTaskForPID(process, task))
 		{
 			if (*task != MACH_PORT_NULL)
 			{
@@ -250,11 +250,11 @@ NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address,
 	return userTag;
 }
 
-ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap taskPort)
+ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap processTask)
 {
 	// Obtain first __TEXT region
 	ZGRegion *chosenRegion = nil;
-	for (ZGRegion *region in ZGRegionsForProcessTask(taskPort))
+	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
 	{
 		if (region.protection & VM_PROT_READ && region.protection & VM_PROT_EXECUTE)
 		{
@@ -364,7 +364,7 @@ NSString *ZGMappedFilePath(ZGMemoryMap processTask, ZGMemoryAddress regionAddres
 	NSString *mappedFilePath = nil;
 	
 	int processID = 0;
-	if (ZGPIDForTaskPort(processTask, &processID))
+	if (ZGPIDForTask(processTask, &processID))
 	{
 		void *buffer = calloc(1, PATH_MAX);
 		int numberOfBytesReturned = proc_regionfilename(processID, regionAddress, buffer, PATH_MAX);
@@ -471,9 +471,9 @@ ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary
 	return offset;
 }
 
-ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap taskPort)
+ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap processTask)
 {
-	return [ZGBaseExecutableRegion(taskPort) address];
+	return [ZGBaseExecutableRegion(processTask) address];
 }
 
 ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error)

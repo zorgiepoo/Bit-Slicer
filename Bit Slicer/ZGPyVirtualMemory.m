@@ -225,7 +225,7 @@ static PyTypeObject VirtualMemoryType =
 		VirtualMemory *vmObject = (VirtualMemory *)self.vmObject;
 		vmObject->processTask = processTask;
 		vmObject->processIdentifier = 0;
-		if (!ZGPIDForTaskPort(processTask, &(vmObject->processIdentifier)))
+		if (!ZGPIDForTask(processTask, &(vmObject->processIdentifier)))
 		{
 			NSLog(@"Script Error: Failed to access PID for process task");
 			return nil;

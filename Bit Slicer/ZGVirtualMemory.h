@@ -43,11 +43,11 @@ extern "C" {
 #include <mach/vm_region.h>
 #include <stdbool.h>
 
-// Caller for ZGTaskPortForPID is responsible for using ZGDeallocatePort
-bool ZGTaskPortForPID(int processID, ZGMemoryMap *processTask);
+// Caller for ZGTaskForPID is responsible for using ZGDeallocatePort
+bool ZGTaskForPID(int processID, ZGMemoryMap *processTask);
 bool ZGDeallocatePort(ZGMemoryMap processTask);
 
-bool ZGPIDForTaskPort(ZGMemoryMap processTask, int *processID);
+bool ZGPIDForTask(ZGMemoryMap processTask, int *processID);
 
 bool ZGPageSize(ZGMemoryMap processTask, ZGMemorySize *pageSize);
 

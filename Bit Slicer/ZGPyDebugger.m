@@ -308,7 +308,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 	ZGMemorySize size = 0x0;
 	if (PyArg_ParseTuple(args, "KK:readBytes", &address, &size))
 	{
-		NSData *readData = [[[ZGAppController sharedController] debuggerController] readDataWithTaskPort:self->processTask	address:address size:size];
+		NSData *readData = [[[ZGAppController sharedController] debuggerController] readDataWithProcessTask:self->processTask	address:address size:size];
 		if (readData != nil)
 		{
 			retValue = Py_BuildValue("y#", readData.bytes, readData.length);
@@ -339,7 +339,7 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		success = [[[ZGAppController sharedController] debuggerController] writeData:[NSData dataWithBytes:buffer.buf length:buffer.len] atAddress:memoryAddress inTaskPort:self->processTask is64Bit:self->is64Bit];
+		success = [[[ZGAppController sharedController] debuggerController] writeData:[NSData dataWithBytes:buffer.buf length:buffer.len] atAddress:memoryAddress processTask:self->processTask is64Bit:self->is64Bit];
 		
 		PyBuffer_Release(&buffer);
 	}
@@ -354,7 +354,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 	ZGMemoryAddress destinationAddress = 0x0;
 	if (PyArg_ParseTuple(args, "KK:bytesBeforeInjection", &sourceAddress, &destinationAddress))
 	{
-		NSArray *instructions = [[[ZGAppController sharedController] debuggerController] instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inTaskPort:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		NSArray *instructions = [[[ZGAppController sharedController] debuggerController] instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress processTask:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		ZGMemorySize bufferLength = 0;
 		for (ZGInstruction *instruction in instructions)
 		{
@@ -396,8 +396,8 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		if (![[[ZGAppController sharedController] debuggerController]
 		 injectCode:[NSData dataWithBytes:newCode.buf length:newCode.len]
 		 intoAddress:destinationAddress
-		 hookingIntoOriginalInstructions:[[[ZGAppController sharedController] debuggerController] instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inTaskPort:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)]
-		 inTaskPort:self->processTask
+		 hookingIntoOriginalInstructions:[[[ZGAppController sharedController] debuggerController] instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress processTask:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)]
+		 processTask:self->processTask
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)
 		 recordUndo:NO
 		 error:&error])
@@ -428,7 +428,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	NSNumber *cachedInstructionAddress = [self.cachedInstructionPointers objectForKey:instructionPointer];
 	if (cachedInstructionAddress == nil)
 	{
-		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue] inTaskPort:((DebuggerClass *)self.object)->processTask pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue] processTask:((DebuggerClass *)self.object)->processTask pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 	
 		instructionAddress = instruction.variable.address;
 		[self.cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointer];

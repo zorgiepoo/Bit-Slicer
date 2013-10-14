@@ -38,7 +38,7 @@
 #include <mach/task.h>
 #include <mach/mach_port.h>
 
-bool ZGTaskPortForPID(int processID, ZGMemoryMap *processTask)
+bool ZGTaskForPID(int processID, ZGMemoryMap *processTask)
 {
 	return (task_for_pid(current_task(), processID, processTask) == KERN_SUCCESS);
 }
@@ -48,7 +48,7 @@ bool ZGDeallocatePort(ZGMemoryMap processTask)
 	return (mach_port_deallocate(mach_task_self(), processTask) == KERN_SUCCESS);
 }
 
-bool ZGPIDForTaskPort(ZGMemoryMap processTask, int *processID)
+bool ZGPIDForTask(ZGMemoryMap processTask, int *processID)
 {
 	return (pid_for_task(processTask, processID) == KERN_SUCCESS);
 }
