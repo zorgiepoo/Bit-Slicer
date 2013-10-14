@@ -498,9 +498,25 @@
 			}
 			
 			NSString *userTagDescription = ZGUserTagDescription(self.windowController.currentProcess.processTask, variable.address, variable.size);
+			NSString *mappedFilePath = nil;
+			ZGMemorySize relativeOffset = 0;
+			NSString *sectionName = ZGSectionName(self.windowController.currentProcess.processTask, variable.address, variable.size, &mappedFilePath, &relativeOffset);
+			
+			if (userTagDescription != nil || sectionName != nil)
+			{
+				[displayComponents addObject:@""];
+			}
+			
 			if (userTagDescription != nil)
 			{
 				[displayComponents addObject:[NSString stringWithFormat:@"Tag: %@", userTagDescription]];
+			}
+			
+			if (sectionName != nil)
+			{
+				[displayComponents addObject:[NSString stringWithFormat:@"Mapped: %@", mappedFilePath]];
+				[displayComponents addObject:[NSString stringWithFormat:@"Offset: 0x%llX", relativeOffset]];
+				[displayComponents addObject:[NSString stringWithFormat:@"Section: %@", sectionName]];
 			}
 		}
 	}

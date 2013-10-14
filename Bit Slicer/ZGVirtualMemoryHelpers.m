@@ -377,13 +377,11 @@ NSString *ZGMappedFilePath(ZGMemoryMap processTask, ZGMemoryAddress regionAddres
 	return mappedFilePath;
 }
 
-NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress)
+void ZGGetMappedRegionInfo(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
 {
-	ZGMemoryAddress textAddress = 0;
-	ZGMemorySize textSize = 0;
 	ZGMemoryAddress nearestMachHeaderAddress = ZGNearestMachHeaderBeforeRegion(processTask, region);
 	if (machHeaderAddress != NULL) *machHeaderAddress = nearestMachHeaderAddress;
-	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, &textAddress, &textSize, NULL, NULL);
+	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, textAddress, textSize, dataSize, linkEditSize);
 	if (mappedFilePath != NULL)
 	{
 		NSString *tempFilePath = ZGMappedFilePath(processTask, nearestMachHeaderAddress);
@@ -392,6 +390,52 @@ NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mapped
 			*mappedFilePath = [tempFilePath copy];
 		}
 	}
+}
+
+NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset)
+{
+	NSString *sectionName = nil;
+	ZGMemoryBasicInfo unusedInfo;
+	ZGRegion *region = [[ZGRegion alloc] initWithAddress:address size:size];
+	if (ZGRegionInfo(processTask, &region->_address, &region->_size, &unusedInfo) && region.address <= address && address + size <= region.address + region.size)
+	{
+		ZGMemoryAddress machHeaderAddress = 0;
+		ZGMemorySize textSize = 0;
+		ZGMemorySize dataSize = 0;
+		ZGMemorySize linkEditSize = 0;
+		
+		ZGGetMappedRegionInfo(processTask, region, mappedFilePath, &machHeaderAddress, NULL, &textSize, &dataSize, &linkEditSize);
+		if (relativeOffset != NULL) *relativeOffset = address - machHeaderAddress;
+		
+		if (address >= machHeaderAddress)
+		{
+			if (address + size <= machHeaderAddress + textSize)
+			{
+				sectionName = @"__TEXT";
+			}
+			else if (address + size <= machHeaderAddress + textSize + dataSize)
+			{
+				sectionName = @"__DATA";
+			}
+			else if (address + size <= machHeaderAddress + textSize + dataSize + linkEditSize)
+			{
+				sectionName = @"__LINKEDIT";
+			}
+			else
+			{
+				// Can't prove anything
+				if (mappedFilePath != NULL) *mappedFilePath = nil;
+			}
+		}
+	}
+	return sectionName;
+}
+
+NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress)
+{
+	ZGMemoryAddress textAddress = 0;
+	ZGMemorySize textSize = 0;
+	ZGGetMappedRegionInfo(processTask, region, mappedFilePath, machHeaderAddress, &textAddress, &textSize, NULL, NULL);
 	
 	return NSMakeRange(textAddress, textSize);
 }
