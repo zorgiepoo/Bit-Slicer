@@ -60,7 +60,7 @@ NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address,
 
 ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error);
 ZGRegion *ZGFindExecutableImage(ZGMemoryMap processTask, NSString *partialImageName);
-	
+
 ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName);
 
 NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset);

@@ -50,6 +50,7 @@ typedef struct
 	char is64Bit;
 	__unsafe_unretained NSMutableArray *objectsPool;
 	__unsafe_unretained NSMutableDictionary *allocationSizeTable;
+	__unsafe_unretained NSMutableDictionary *processCacheDictionary;
 } VirtualMemory;
 
 static PyMemberDef VirtualMemory_members[] =
@@ -97,6 +98,8 @@ declareVMPrototypeMethod(unpause)
 declareVMPrototypeMethod(scanBytes)
 declareVMPrototypeMethod(scanByteString)
 
+declareVMPrototypeMethod(base)
+
 declareVMPrototypeMethod(allocate)
 declareVMPrototypeMethod(deallocate)
 
@@ -143,6 +146,8 @@ static PyMethodDef VirtualMemory_methods[] =
 	
 	declareVMMethod(scanBytes)
 	declareVMMethod(scanByteString)
+	
+	declareVMMethod(base)
 	{NULL, NULL, 0, NULL}
 };
 
@@ -228,9 +233,12 @@ static PyTypeObject VirtualMemoryType =
 		vmObject->is64Bit = is64Bit;
 		NSMutableDictionary *allocationSizeTable = [[NSMutableDictionary alloc] init];
 		vmObject->allocationSizeTable = allocationSizeTable;
+		NSMutableDictionary *processCacheDictionary = [[NSMutableDictionary alloc] init];
+		vmObject->processCacheDictionary = processCacheDictionary;
 		@synchronized(objectsPool)
 		{
 			[objectsPool addObject:allocationSizeTable];
+			[objectsPool addObject:processCacheDictionary];
 		}
 		vmObject->objectsPool = objectsPool;
 	}
@@ -577,6 +585,22 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 		PyBuffer_Release(&buffer);
 	}
 	return retValue;
+}
+
+static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
+{
+	PyObject *result = NULL;
+	const char *partialPath = NULL;
+	if (PyArg_ParseTuple(args, "s:base", &partialPath))
+	{
+		NSError *error = nil;
+		ZGMemoryAddress imageAddress = ZGFindExecutableImageWithCache(self->processTask, [NSString stringWithUTF8String:partialPath], self->processCacheDictionary, &error);
+		if (error == nil)
+		{
+			result = Py_BuildValue("K", imageAddress);
+		}
+	}
+	return result;
 }
 
 static PyObject *VirtualMemory_allocate(VirtualMemory *self, PyObject *args)
