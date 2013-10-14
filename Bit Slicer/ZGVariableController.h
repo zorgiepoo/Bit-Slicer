@@ -65,6 +65,8 @@
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag;
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
 
+- (void)relativizeVariables:(NSArray *)variables;
+
 - (void)editVariablesValueRequest;
 - (void)editVariablesAddressRequest;
 - (void)editVariablesSizeRequest;

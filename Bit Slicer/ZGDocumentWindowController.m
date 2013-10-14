@@ -53,6 +53,7 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGDocument.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
 
 @implementation ZGDocumentWindowController
 
@@ -1058,6 +1059,25 @@ static NSSize *expandedWindowMinSize = nil;
 		}
 	}
 	
+	else if (menuItem.action == @selector(relativizeVariablesAddress:))
+	{
+		if (([self.searchController canCancelTask] && self.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		NSArray *selectedVariables = [self selectedVariables];
+		menuItem.title = [NSString stringWithFormat:@"Relativize Variable%@", selectedVariables.count != 1 ? @"s" : @""];
+		
+		for (ZGVariable *variable in selectedVariables)
+		{
+			if (variable.usesDynamicAddress || ZGSectionName(self.currentProcess.processTask, variable.address, variable.size, NULL, NULL) == nil)
+			{
+				return NO;
+			}
+		}
+	}
+	
 	else if (menuItem.action == @selector(functionTypePopUpButtonRequest:))
 	{
 		if ([self isFunctionTypeStore:menuItem.tag] && !self.searchController.searchData.savedData)
@@ -1301,6 +1321,11 @@ static NSSize *expandedWindowMinSize = nil;
 - (IBAction)editVariablesSizeCancelButton:(id)sender
 {
 	[self.variableController editVariablesSizeCancelButton];
+}
+
+- (IBAction)relativizeVariablesAddress:(id)sender
+{
+	[self.variableController relativizeVariables:[self selectedVariables]];
 }
 
 #pragma mark Variable Watching Handling

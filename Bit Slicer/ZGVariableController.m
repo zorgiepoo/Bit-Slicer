@@ -44,6 +44,7 @@
 #import "ZGDebuggerController.h"
 #import "ZGInstruction.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGSearchResults.h"
 #import "ZGDocumentWindowController.h"
@@ -926,6 +927,41 @@
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
+}
+
+#pragma mark Relativizing Variable Addresses
+
+- (void)unrelativizeVariables:(NSArray *)variables
+{
+	for (ZGVariable *variable in variables)
+	{
+		variable.addressFormula = variable.addressStringValue;
+		variable.usesDynamicAddress = NO;
+	}
+	
+	self.windowController.undoManager.actionName = [NSString stringWithFormat:@"Unrelativize Variable%@", variables.count == 1 ? @"" : @"s"];
+	[[self.windowController.undoManager prepareWithInvocationTarget:self] relativizeVariables:variables];
+}
+
+- (void)relativizeVariables:(NSArray *)variables
+{
+	for (ZGVariable *variable in variables)
+	{
+		NSString *mappedFilePath = nil;
+		ZGMemorySize relativeOffset = 0;
+		if (ZGSectionName(self.windowController.currentProcess.processTask, variable.address, variable.size, &mappedFilePath, &relativeOffset) != nil)
+		{
+			NSString *partialPath = [mappedFilePath lastPathComponent];
+			NSError *error = nil;
+			ZGMemoryAddress baseAddress = ZGFindExecutableImageWithCache(self.windowController.currentProcess.processTask, partialPath, self.windowController.currentProcess.cacheDictionary, &error);
+			NSString *pathToUse = (error == nil && baseAddress == variable.address - relativeOffset) ? partialPath : mappedFilePath;
+			variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, pathToUse];
+			variable.usesDynamicAddress = YES;
+		}
+	}
+	
+	self.windowController.undoManager.actionName = [NSString stringWithFormat:@"Relativize Variable%@", variables.count == 1 ? @"" : @"s"];
+	[[self.windowController.undoManager prepareWithInvocationTarget:self] unrelativizeVariables:variables];
 }
 
 #pragma mark Edit Variables Sizes (Byte Arrays)
