@@ -2048,7 +2048,7 @@ END_DEBUGGER_CHANGE:
 {
 	NSMutableArray *instructions = nil;
 	
-	if (!((destinationAddress > address && destinationAddress - address > INT_MAX) || (address > destinationAddress && address - destinationAddress > INT_MAX)))
+	if (pointerSize == sizeof(ZG32BitMemoryAddress) || !((destinationAddress > address && destinationAddress - address > INT_MAX) || (address > destinationAddress && address - destinationAddress > INT_MAX)))
 	{
 		instructions = [[NSMutableArray alloc] init];
 		int consumedLength = JUMP_REL32_INSTRUCTION_LENGTH;
