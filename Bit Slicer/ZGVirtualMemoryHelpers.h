@@ -63,6 +63,7 @@ ZGRegion *ZGFindExecutableImage(ZGMemoryMap processTask, NSString *partialImageN
 
 ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName);
 
+NSArray *ZGMachBinaryRegions(ZGMemoryMap processTask);
 NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide);
 
 void ZGFreeData(NSArray *dataArray);

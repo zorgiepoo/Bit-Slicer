@@ -37,7 +37,6 @@
 #import "ZGProcess.h"
 #import "ZGDocumentTableController.h"
 #import "ZGDocumentBreakPointController.h"
-#import "ZGVariableController.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 #import "ZGRegion.h"
@@ -302,8 +301,68 @@
 
 #pragma mark Searching
 
+- (void)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaryRegions:(NSArray * __unsafe_unretained)machBinaryRegions lastFoundRegion:(ZGRegion **)lastFoundRegionPointer
+{
+	ZGMemoryAddress variableAddress = variable.address;
+	ZGMemorySize dataSize = variable.size;
+	ZGRegion *foundRegion = nil;
+	ZGRegion *lastFoundRegion = *lastFoundRegionPointer;
+	if (lastFoundRegion != nil && lastFoundRegion.address <= variableAddress && lastFoundRegion.address + lastFoundRegion.size >= variableAddress + dataSize)
+	{
+		foundRegion = lastFoundRegion;
+	}
+	else
+	{
+		int maxIndex = (int)machBinaryRegions.count - 1;
+		int minIndex = 0;
+		while (maxIndex >= minIndex)
+		{
+			int middleIndex = (maxIndex + minIndex) / 2;
+			ZGRegion *middleRegion = [machBinaryRegions objectAtIndex:middleIndex];
+			
+			if (middleRegion.address + middleRegion.size < variableAddress)
+			{
+				minIndex = middleIndex + 1;
+			}
+			else if (middleRegion.address >= variableAddress + dataSize)
+			{
+				maxIndex = middleIndex - 1;
+			}
+			else
+			{
+				if (middleRegion.address <= variableAddress && middleRegion.address + middleRegion.size >= variableAddress + dataSize)
+				{
+					foundRegion = middleRegion;
+					*lastFoundRegionPointer = foundRegion;
+				}
+				break;
+			}
+		}
+	}
+	
+	if (foundRegion != nil && foundRegion.slide > 0)
+	{
+		NSString *partialPath = [foundRegion.mappedPath lastPathComponent];
+		int numberOfMatchingPaths = 0;
+		for (ZGRegion *machRegion in machBinaryRegions)
+		{
+			if ([machRegion.mappedPath hasSuffix:partialPath])
+			{
+				numberOfMatchingPaths++;
+				if (numberOfMatchingPaths > 1) break;
+			}
+		}
+		
+		NSString *pathToUse = numberOfMatchingPaths > 1 ? foundRegion.mappedPath : partialPath;
+		
+		variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", variableAddress - foundRegion.address, pathToUse];
+		variable.usesDynamicAddress = YES;
+		variable.name = @"static";
+	}
+}
+
 - (void)fetchVariablesFromResults
-{	
+{
 	if (self.documentData.variables.count < MAX_TABLE_VIEW_ITEMS && self.searchResults.addressCount > 0)
 	{
 		NSMutableArray *newVariables = [[NSMutableArray alloc] initWithArray:self.documentData.variables];
@@ -317,15 +376,21 @@
 		ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
 		ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
 		
+		NSArray *machBinaryRegions = ZGMachBinaryRegions(self.windowController.currentProcess.processTask);
+		__block ZGRegion *lastFoundRegion = nil;
+		
+		ZGMemorySize dataSize = self.searchResults.dataSize;
 		[self.searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
 			ZGVariable *newVariable =
 				[[ZGVariable alloc]
 				 initWithValue:NULL
-				 size:self.searchResults.dataSize
+				 size:dataSize
 				 address:variableAddress
 				 type:(ZGVariableType)self.searchResults.tag
 				 qualifier:qualifier
 				 pointerSize:pointerSize];
+			
+			[self relativizeVariable:newVariable withMachBinaryRegions:machBinaryRegions lastFoundRegion:&lastFoundRegion];
 			
 			[newVariables addObject:newVariable];
 		}];

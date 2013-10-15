@@ -356,6 +356,31 @@ NSString *ZGMappedFilePath(ZGMemoryMap processTask, ZGMemoryAddress regionAddres
 	return mappedFilePath;
 }
 
+NSArray *ZGMachBinaryRegions(ZGMemoryMap processTask)
+{
+	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	NSString *lastVisitedFilePath = nil;
+	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
+	{
+		NSString *mappedFilePath = ZGMappedFilePath(processTask, region.address);
+		if (mappedFilePath != nil && ![lastVisitedFilePath isEqualToString:mappedFilePath])
+		{
+			ZGMemorySize textSize = 0;
+			ZGMemorySize dataSize = 0;
+			ZGMemorySize linkEditSize = 0;
+			ZGMemorySize slide = 0;
+			ZGGetMachBinaryInfo(processTask, region.address, NULL, &slide, &textSize, &dataSize, &linkEditSize);
+			
+			region.mappedPath = mappedFilePath;
+			region.size = textSize + dataSize + linkEditSize;
+			region.slide = slide;
+			[regions addObject:region];
+			lastVisitedFilePath = mappedFilePath;
+		}
+	}
+	return regions;
+}
+
 ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegion *targetRegion, NSString **mappedFilePath)
 {
 	NSString *lastVisitedFilePath = nil;
