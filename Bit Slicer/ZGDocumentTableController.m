@@ -155,11 +155,13 @@
 
 - (void)updateWatchVariablesTable:(NSTimer *)timer
 {
+	NSRange visibleRowsRange = [self.variablesTableView rowsInRect:self.variablesTableView.visibleRect];
+	
 	// First, update all the variables that have dynamic addresses
 	// We don't want to update this when the user is editing something in the table
 	if (self.windowController.currentProcess.valid && self.variablesTableView.editedRow == -1)
 	{
-		[self.documentData.variables enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
+		[[self.documentData.variables subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
 		 {
 			 if (variable.usesDynamicAddress)
 			 {
@@ -204,7 +206,6 @@
 	if (self.windowController.currentProcess.valid && self.variablesTableView.editedRow == -1)
 	{
 		// Read all the variables and update them in the table view if needed
-		NSRange visibleRowsRange = [self.variablesTableView rowsInRect:self.variablesTableView.visibleRect];
 		[self updateVariableValuesInRange:visibleRowsRange];
 	}
 }
