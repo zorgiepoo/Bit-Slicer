@@ -359,6 +359,12 @@
 			
 			variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", variableAddress - foundRegion.address, pathToUse];
 			variable.usesDynamicAddress = YES;
+			
+			// Cache the path
+			if ([self.windowController.currentProcess.cacheDictionary objectForKey:pathToUse] == nil)
+			{
+				[self.windowController.currentProcess.cacheDictionary setObject:@(foundRegion.address) forKey:pathToUse];
+			}
 		}
 		variable.name = @"static";
 	}
