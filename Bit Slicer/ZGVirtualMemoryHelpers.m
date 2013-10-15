@@ -340,9 +340,21 @@ void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddr
 ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegion *targetRegion)
 {
 	ZGMemoryAddress previousHeaderAddress = 0;
-	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
+	NSArray *regions = ZGRegionsForProcessTask(processTask);
+	NSUInteger regionStartIndex = 0;
+	for (ZGRegion *region in regions)
 	{
-		if (region.address > targetRegion.address) break;
+		if (region.address == targetRegion.address)
+		{
+			break;
+		}
+		regionStartIndex++;
+	}
+	
+	BOOL foundRegion = NO;
+	for (NSUInteger regionIndex = regionStartIndex; !foundRegion; regionIndex--)
+	{
+		ZGRegion *region = [regions objectAtIndex:regionIndex];
 		
 		// We just have to read the first magic field
 		const ZGMemorySize originalSize = sizeof(int32_t);
@@ -356,10 +368,13 @@ ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegio
 				if (header->magic == MH_MAGIC || header->magic == MH_MAGIC_64)
 				{
 					previousHeaderAddress = region.address;
+					foundRegion = YES;
 				}
 			}
 			ZGFreeBytes(processTask, regionBytes, readSize);
 		}
+		
+		if (regionIndex == 0) break;
 	}
 	return previousHeaderAddress;
 }
