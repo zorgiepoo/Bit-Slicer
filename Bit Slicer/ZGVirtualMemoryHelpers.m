@@ -337,48 +337,6 @@ void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddr
 	}
 }
 
-ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegion *targetRegion)
-{
-	ZGMemoryAddress previousHeaderAddress = 0;
-	NSArray *regions = ZGRegionsForProcessTask(processTask);
-	NSUInteger regionStartIndex = 0;
-	for (ZGRegion *region in regions)
-	{
-		if (region.address == targetRegion.address)
-		{
-			break;
-		}
-		regionStartIndex++;
-	}
-	
-	BOOL foundRegion = NO;
-	for (NSUInteger regionIndex = regionStartIndex; !foundRegion; regionIndex--)
-	{
-		ZGRegion *region = [regions objectAtIndex:regionIndex];
-		
-		// We just have to read the first magic field
-		const ZGMemorySize originalSize = sizeof(int32_t);
-		ZGMemorySize readSize = originalSize;
-		void *regionBytes = NULL;
-		if (ZGReadBytes(processTask, region.address, &regionBytes, &readSize))
-		{
-			if (readSize >= originalSize)
-			{
-				struct mach_header_64 *header = regionBytes;
-				if (header->magic == MH_MAGIC || header->magic == MH_MAGIC_64)
-				{
-					previousHeaderAddress = region.address;
-					foundRegion = YES;
-				}
-			}
-			ZGFreeBytes(processTask, regionBytes, readSize);
-		}
-		
-		if (regionIndex == 0) break;
-	}
-	return previousHeaderAddress;
-}
-
 NSString *ZGMappedFilePath(ZGMemoryMap processTask, ZGMemoryAddress regionAddress)
 {
 	NSString *mappedFilePath = nil;
@@ -398,19 +356,49 @@ NSString *ZGMappedFilePath(ZGMemoryMap processTask, ZGMemoryAddress regionAddres
 	return mappedFilePath;
 }
 
-void ZGGetMappedRegionInfo(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegion *targetRegion, NSString **mappedFilePath)
 {
-	ZGMemoryAddress nearestMachHeaderAddress = ZGNearestMachHeaderBeforeRegion(processTask, region);
-	if (machHeaderAddress != NULL) *machHeaderAddress = nearestMachHeaderAddress;
-	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize);
-	if (mappedFilePath != NULL)
+	NSString *lastVisitedFilePath = nil;
+	ZGMemoryAddress previousHeaderAddress = 0;
+	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
 	{
-		NSString *tempFilePath = ZGMappedFilePath(processTask, nearestMachHeaderAddress);
-		if (tempFilePath != nil)
+		if (region.address > targetRegion.address) break;
+		
+		NSString *mappedFilePath = ZGMappedFilePath(processTask, region.address);
+		if (mappedFilePath == nil) continue;
+		
+		if ([mappedFilePath isEqualToString:lastVisitedFilePath]) continue;
+		
+		lastVisitedFilePath = mappedFilePath;
+		
+		// We just have to read the first magic field
+		const ZGMemorySize originalSize = sizeof(int32_t);
+		ZGMemorySize readSize = originalSize;
+		void *regionBytes = NULL;
+		if (ZGReadBytes(processTask, region.address, &regionBytes, &readSize))
 		{
-			*mappedFilePath = [tempFilePath copy];
+			if (readSize >= originalSize)
+			{
+				struct mach_header_64 *header = regionBytes;
+				if (header->magic == MH_MAGIC || header->magic == MH_MAGIC_64)
+				{
+					previousHeaderAddress = region.address;
+				}
+			}
+			ZGFreeBytes(processTask, regionBytes, readSize);
 		}
 	}
+	
+	if (mappedFilePath != NULL) *mappedFilePath = lastVisitedFilePath;
+	
+	return previousHeaderAddress;
+}
+
+void ZGGetMappedRegionInfo(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+{
+	ZGMemoryAddress nearestMachHeaderAddress = ZGNearestMachHeaderBeforeRegion(processTask, region, mappedFilePath);
+	if (machHeaderAddress != NULL) *machHeaderAddress = nearestMachHeaderAddress;
+	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize);
 }
 
 NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide)
