@@ -340,23 +340,26 @@
 		}
 	}
 	
-	if (foundRegion != nil && foundRegion.slide > 0)
+	if (foundRegion != nil)
 	{
-		NSString *partialPath = [foundRegion.mappedPath lastPathComponent];
-		int numberOfMatchingPaths = 0;
-		for (ZGRegion *machRegion in machBinaryRegions)
+		if (foundRegion.slide > 0)
 		{
-			if ([machRegion.mappedPath hasSuffix:partialPath])
+			NSString *partialPath = [foundRegion.mappedPath lastPathComponent];
+			int numberOfMatchingPaths = 0;
+			for (ZGRegion *machRegion in machBinaryRegions)
 			{
-				numberOfMatchingPaths++;
-				if (numberOfMatchingPaths > 1) break;
+				if ([machRegion.mappedPath hasSuffix:partialPath])
+				{
+					numberOfMatchingPaths++;
+					if (numberOfMatchingPaths > 1) break;
+				}
 			}
+			
+			NSString *pathToUse = numberOfMatchingPaths > 1 ? foundRegion.mappedPath : partialPath;
+			
+			variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", variableAddress - foundRegion.address, pathToUse];
+			variable.usesDynamicAddress = YES;
 		}
-		
-		NSString *pathToUse = numberOfMatchingPaths > 1 ? foundRegion.mappedPath : partialPath;
-		
-		variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", variableAddress - foundRegion.address, pathToUse];
-		variable.usesDynamicAddress = YES;
 		variable.name = @"static";
 	}
 }
