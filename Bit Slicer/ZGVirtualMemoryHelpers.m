@@ -344,16 +344,21 @@ ZGMemoryAddress ZGNearestMachHeaderBeforeRegion(ZGMemoryMap processTask, ZGRegio
 	{
 		if (region.address > targetRegion.address) break;
 		
-		ZGMemorySize regionSize = region.size;
+		// We just have to read the first magic field
+		const ZGMemorySize originalSize = sizeof(int32_t);
+		ZGMemorySize readSize = originalSize;
 		void *regionBytes = NULL;
-		if (ZGReadBytes(processTask, region.address, &regionBytes, &regionSize))
+		if (ZGReadBytes(processTask, region.address, &regionBytes, &readSize))
 		{
-			struct mach_header_64 *header = regionBytes;
-			if (header->magic == MH_MAGIC || header->magic == MH_MAGIC_64)
+			if (readSize >= originalSize)
 			{
-				previousHeaderAddress = region.address;
+				struct mach_header_64 *header = regionBytes;
+				if (header->magic == MH_MAGIC || header->magic == MH_MAGIC_64)
+				{
+					previousHeaderAddress = region.address;
+				}
 			}
-			ZGFreeBytes(processTask, regionBytes, regionSize);
+			ZGFreeBytes(processTask, regionBytes, readSize);
 		}
 	}
 	return previousHeaderAddress;
