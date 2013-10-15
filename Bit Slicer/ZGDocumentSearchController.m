@@ -342,7 +342,8 @@
 	
 	if (foundRegion != nil)
 	{
-		if (foundRegion.slide > 0)
+		ZGRegion *firstRegion = [machBinaryRegions objectAtIndex:0];
+		if (foundRegion.slide > 0 || foundRegion != firstRegion)
 		{
 			NSString *partialPath = [foundRegion.mappedPath lastPathComponent];
 			if ([[foundRegion.mappedPath stringByDeletingLastPathComponent] length] > 0)
@@ -404,7 +405,10 @@
 				 qualifier:qualifier
 				 pointerSize:pointerSize];
 			
-			[self relativizeVariable:newVariable withMachBinaryRegions:machBinaryRegions lastFoundRegion:&lastFoundRegion];
+			if (machBinaryRegions.count > 0)
+			{
+				[self relativizeVariable:newVariable withMachBinaryRegions:machBinaryRegions lastFoundRegion:&lastFoundRegion];
+			}
 			
 			[newVariables addObject:newVariable];
 		}];
