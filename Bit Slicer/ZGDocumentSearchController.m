@@ -345,6 +345,11 @@
 		if (foundRegion.slide > 0)
 		{
 			NSString *partialPath = [foundRegion.mappedPath lastPathComponent];
+			if ([[foundRegion.mappedPath stringByDeletingLastPathComponent] length] > 0)
+			{
+				partialPath = [@"/" stringByAppendingString:partialPath];
+			}
+			
 			int numberOfMatchingPaths = 0;
 			for (ZGRegion *machRegion in machBinaryRegions)
 			{
