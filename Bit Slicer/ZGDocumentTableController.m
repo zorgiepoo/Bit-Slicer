@@ -52,7 +52,9 @@
 
 @property (assign) ZGDocumentWindowController *windowController;
 @property (assign) ZGDocumentData *documentData;
-@property (readwrite, strong, nonatomic) NSTimer *watchVariablesTimer;
+@property (nonatomic) NSTimer *watchVariablesTimer;
+@property (nonatomic) NSMutableArray *failedExecutableImages;
+@property (nonatomic) NSDate *lastUpdatedDate;
 
 @end
 
@@ -71,6 +73,8 @@
 	{
 		self.windowController = windowController;
 		self.documentData = windowController.documentData;
+		
+		self.failedExecutableImages = [[NSMutableArray alloc] init];
 		
 		self.watchVariablesTimer =
 			[NSTimer
@@ -103,102 +107,137 @@
 
 #pragma mark Updating Table
 
-- (void)updateVariableValuesInRange:(NSRange)variableRange
+- (BOOL)updateVariableValuesInRange:(NSRange)variableRange
 {
+	BOOL needsToReloadTable = NO;
 	if (variableRange.location + variableRange.length <= self.documentData.variables.count)
 	{
-		__block BOOL needsToReloadTable = NO;
-		[[self.documentData.variables subarrayWithRange:variableRange] enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
-		 {
-			 NSString *oldStringValue = [variable.stringValue copy];
-			 if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGString8 || variable.type == ZGString16))
-			 {
-				 variable.size = ZGGetStringSize(self.windowController.currentProcess.processTask, variable.address, variable.type, variable.size, 1024);
-			 }
-			 
-			 if (variable.size)
-			 {
-				 ZGMemorySize outputSize = variable.size;
-				 void *value = NULL;
-				 
-				 if (ZGReadBytes(self.windowController.currentProcess.processTask, variable.address, &value, &outputSize))
-				 {
-					 variable.value = value;
-					 if (![variable.stringValue isEqualToString:oldStringValue])
-					 {
-						 needsToReloadTable = YES;
-					 }
-					 
-					 ZGFreeBytes(self.windowController.currentProcess.processTask, value, outputSize);
-				 }
-				 else if (variable.value)
-				 {
-					 variable.value = NULL;
-					 needsToReloadTable = YES;
-				 }
-			 }
-			 else if (variable.lastUpdatedSize)
-			 {
-				 variable.value = NULL;
-				 needsToReloadTable = YES;
-			 }
-			 
-			 variable.lastUpdatedSize = variable.size;
-		 }];
+		for (ZGVariable *variable in [self.documentData.variables subarrayWithRange:variableRange])
+		{
+			NSString *oldStringValue = [variable.stringValue copy];
+			if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGString8 || variable.type == ZGString16))
+			{
+				variable.size = ZGGetStringSize(self.windowController.currentProcess.processTask, variable.address, variable.type, variable.size, 1024);
+			}
+			
+			if (variable.size)
+			{
+				ZGMemorySize outputSize = variable.size;
+				void *value = NULL;
+				
+				if (ZGReadBytes(self.windowController.currentProcess.processTask, variable.address, &value, &outputSize))
+				{
+					variable.value = value;
+					if (![variable.stringValue isEqualToString:oldStringValue])
+					{
+						needsToReloadTable = YES;
+					}
+					
+					ZGFreeBytes(self.windowController.currentProcess.processTask, value, outputSize);
+				}
+				else if (variable.value)
+				{
+					variable.value = NULL;
+					needsToReloadTable = YES;
+				}
+			}
+			else if (variable.lastUpdatedSize)
+			{
+				variable.value = NULL;
+				needsToReloadTable = YES;
+			}
+			
+			variable.lastUpdatedSize = variable.size;
+		}
 		
 		if (needsToReloadTable)
 		{
 			[self.variablesTableView reloadData];
 		}
 	}
+	return needsToReloadTable;
+}
+
+- (void)clearCache
+{
+	[self.failedExecutableImages removeAllObjects];
+	self.lastUpdatedDate = [NSDate date];
+}
+
+- (BOOL)updateDynamicVariableAddress:(ZGVariable *)variable
+{
+	BOOL needsToReload = NO;
+	if (variable.usesDynamicAddress && !variable.finishedEvaluatingDynamicAddress)
+	{
+		NSError *error = nil;
+		NSString *newAddressString =
+			[ZGCalculator
+			 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
+			 process:self.windowController.currentProcess
+			 failedImages:self.failedExecutableImages
+			 error:&error];
+		
+		if (variable.address != newAddressString.zgUnsignedLongLongValue)
+		{
+			variable.addressStringValue = newAddressString;
+			needsToReload = YES;
+		}
+		
+		// We don't have to evaluate it more than once if we're not doing any pointer calculations
+		if (error == nil && ([variable.addressFormula rangeOfString:@"["].location == NSNotFound && [variable.addressFormula rangeOfString:@"]"].location == NSNotFound))
+		{
+			variable.finishedEvaluatingDynamicAddress = YES;
+		}
+	}
+	return needsToReload;
 }
 
 - (void)updateWatchVariablesTable:(NSTimer *)timer
 {
+	BOOL needsToReloadTable = NO;
 	NSRange visibleRowsRange = [self.variablesTableView rowsInRect:self.variablesTableView.visibleRect];
+	
+	// Don't look up executable images that have been known to fail frequently, otherwise it'd be a serious penalty cost
+	if (self.lastUpdatedDate == nil || [[NSDate date] timeIntervalSinceDate:self.lastUpdatedDate] > 5.0)
+	{
+		[self clearCache];
+	}
 	
 	// First, update all the variables that have dynamic addresses
 	// We don't want to update this when the user is editing something in the table
 	if (self.windowController.currentProcess.valid && self.variablesTableView.editedRow == -1)
 	{
-		[[self.documentData.variables subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
-		 {
-			 if (variable.usesDynamicAddress)
-			 {
-				 NSString *newAddressString =
-					[ZGCalculator
-					 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
-					 withProcess:self.windowController.currentProcess];
-				 
-				 if (variable.address != newAddressString.zgUnsignedLongLongValue)
-				 {
-					 variable.addressStringValue = newAddressString;
-					 [self.variablesTableView reloadData];
-				 }
-			 }
-		 }];
+		for (ZGVariable *variable in [self.documentData.variables subarrayWithRange:visibleRowsRange])
+		{
+			needsToReloadTable = [self updateDynamicVariableAddress:variable] || needsToReloadTable;
+		}
 	}
 	
 	// Then check that the process is alive
 	if (self.windowController.currentProcess.valid)
 	{
 		// Freeze all variables that need be frozen!
-		[self.documentData.variables enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop)
-		 {
-			 if (variable.enabled && variable.isFrozen && variable.freezeValue != NULL)
-			 {
-				 if (variable.size)
-				 {
-					 ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address, variable.freezeValue, variable.size);
-				 }
-				 
-				 if (variable.type == ZGString16)
-				 {
-					 unichar terminatorValue = 0;
-					 ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));
-				 }
-			 }
-		 }];
+		[self.documentData.variables enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop) {
+			if (variable.enabled && variable.isFrozen && variable.freezeValue != NULL)
+			{
+				// We have to make sure variable's address is up to date before proceeding
+				if (index < visibleRowsRange.location || index >= visibleRowsRange.location + visibleRowsRange.length)
+				{
+					[self updateDynamicVariableAddress:variable];
+				}
+				
+				if (variable.size)
+				{
+					ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address, variable.freezeValue, variable.size);
+				}
+				
+				if (variable.type == ZGString16)
+				{
+					unichar terminatorValue = 0;
+					ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));
+				}
+			}
+		}];
 	}
 	
 	// if any variables are changing, that means that we'll have to reload the table, and that'd be very bad
@@ -206,7 +245,12 @@
 	if (self.windowController.currentProcess.valid && self.variablesTableView.editedRow == -1)
 	{
 		// Read all the variables and update them in the table view if needed
-		[self updateVariableValuesInRange:visibleRowsRange];
+		needsToReloadTable = [self updateVariableValuesInRange:visibleRowsRange] || needsToReloadTable;
+	}
+	
+	if (needsToReloadTable)
+	{
+		[self.variablesTableView reloadData];
 	}
 }
 

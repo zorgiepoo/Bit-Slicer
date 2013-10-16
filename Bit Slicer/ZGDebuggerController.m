@@ -1039,7 +1039,13 @@ enum ZGStepExecution
 		}
 		else
 		{
-			NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue withProcess:self.currentProcess];
+			NSError *error = nil;
+			NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue process:self.currentProcess failedImages:nil error:&error];
+			if (error != nil)
+			{
+				NSLog(@"Encountered error when reading memory from debugger:");
+				NSLog(@"%@", error);
+			}
 			if (ZGIsValidNumber(calculatedMemoryAddressExpression))
 			{
 				calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);

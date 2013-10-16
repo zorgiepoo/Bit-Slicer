@@ -52,6 +52,7 @@ extern NSString *ZGVariablePboardType;
 @property (nonatomic) ZGMemorySize size;
 @property (nonatomic) ZGMemorySize lastUpdatedSize;
 @property (nonatomic) BOOL usesDynamicAddress;
+@property (nonatomic) BOOL finishedEvaluatingDynamicAddress;
 @property (nonatomic) void *value;
 @property (copy, nonatomic) NSString *addressStringValue;
 @property (copy, nonatomic) NSString *stringValue;

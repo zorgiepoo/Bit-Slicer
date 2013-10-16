@@ -365,6 +365,7 @@
 			
 			variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", variableAddress - foundRegion.address, pathToUse];
 			variable.usesDynamicAddress = YES;
+			variable.finishedEvaluatingDynamicAddress = YES;
 			
 			// Cache the path
 			if ([self.windowController.currentProcess.cacheDictionary objectForKey:pathToUse] == nil)
@@ -418,7 +419,10 @@
 		self.documentData.variables = [NSArray arrayWithArray:newVariables];
 		if (self.documentData.variables.count > 0)
 		{
-			[self.windowController.tableController updateVariableValuesInRange:NSMakeRange(0, self.documentData.variables.count)];
+			if ([self.windowController.tableController updateVariableValuesInRange:NSMakeRange(0, self.documentData.variables.count)])
+			{
+				[self.windowController.tableController.variablesTableView reloadData];
+			}
 		}
 	}
 }

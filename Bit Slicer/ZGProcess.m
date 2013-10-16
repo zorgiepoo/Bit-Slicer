@@ -92,6 +92,17 @@
 	if (success)
 	{
 		self.cacheDictionary = [[NSMutableDictionary alloc] init];
+		// Set up initial cache for full paths, partial paths, and partial paths prepended with forward slashes
+		for (ZGRegion *region in ZGMachBinaryRegions(_processTask))
+		{
+			NSString *lastPathComponent = [region.mappedPath lastPathComponent];
+			[self.cacheDictionary setObject:@(region.address) forKey:region.mappedPath];
+			[self.cacheDictionary setObject:@(region.address) forKey:lastPathComponent];
+			if ([[region.mappedPath stringByDeletingLastPathComponent] length] > 0)
+			{
+				[self.cacheDictionary setObject:@(region.address) forKey:[@"/" stringByAppendingString:lastPathComponent]];
+			}
+		}
 	}
 	return success;
 }

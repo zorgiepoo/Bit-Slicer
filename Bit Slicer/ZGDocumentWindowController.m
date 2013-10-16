@@ -249,10 +249,14 @@
 					variable.enabled = NO;
 				}
 			}
+			
+			variable.finishedEvaluatingDynamicAddress = NO;
 		}
 		
 		// this is about as far as we go when it comes to undo/redos...
 		[self.undoManager removeAllActions];
+		
+		[self.tableController clearCache];
 	}
 	
 	if (self.currentProcess)
@@ -389,6 +393,12 @@
 			}
 			
 			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+			
+			[self.tableController clearCache];
+			for (ZGVariable *variable in self.documentData.variables)
+			{
+				variable.finishedEvaluatingDynamicAddress = NO;
+			}
 			
 			[self.currentProcess markInvalid];
 			[self.variablesTableView reloadData];

@@ -45,7 +45,9 @@
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
-- (void)updateVariableValuesInRange:(NSRange)variableRange;
+- (BOOL)updateVariableValuesInRange:(NSRange)variableRange;
+
+- (void)clearCache;
 
 - (void)cleanUp;
 

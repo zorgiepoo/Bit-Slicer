@@ -43,6 +43,6 @@
 
 // Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
 // And also has a base() function that takes in a string, and returns the first address to a region such that the passed string partially matches the end of the corresponding region's mapped path
-+ (NSString *)evaluateExpression:(NSString *)expression withProcess:(ZGProcess *)process;
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess *)process failedImages:(NSMutableArray *)failedImages error:(NSError **)error;
 
 @end

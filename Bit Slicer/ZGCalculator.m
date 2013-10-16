@@ -44,6 +44,7 @@
 
 #define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"
 #define ZGProcessVariable @"ZGProcessVariable"
+#define ZGFailedImagesVariable @"ZGFailedImagesVariable"
 
 @implementation ZGCalculator
 
@@ -93,11 +94,27 @@
 			if (args.count == 1)
 			{
 				ZGProcess *process = [vars objectForKey:ZGProcessVariable];
+				NSMutableArray *failedImages = [vars objectForKey:ZGFailedImagesVariable];
 				
 				DDExpression *expression = [args objectAtIndex:0];
 				if (expression.expressionType == DDExpressionTypeVariable)
 				{
-					foundAddress = ZGFindExecutableImageWithCache(process.processTask, expression.variable, process.cacheDictionary, error);
+					if ([failedImages containsObject:expression.variable])
+					{
+						if (error != NULL)
+						{
+							*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" is ignoring image"}];
+						}
+					}
+					else
+					{
+						foundAddress = ZGFindExecutableImageWithCache(process.processTask, expression.variable, process.cacheDictionary, error);
+						if (error != NULL && *error != nil)
+						{
+							NSError *imageError = *error;
+							[failedImages addObject:[imageError.userInfo objectForKey:ZGImageName]];
+						}
+					}
 				}
 				else if (error != NULL)
 				{
@@ -134,7 +151,7 @@
 	return [self evaluateExpression:expression substitutions:nil error:&unusedError];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression withProcess:(ZGProcess *)process
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages error:(NSError **)error
 {
 	NSMutableString	 *newExpression = [[NSMutableString alloc] initWithString:expression];
 	
@@ -142,18 +159,12 @@
 	[newExpression replaceOccurrencesOfString:@"[" withString:ZGCalculatePointerFunction@"(" options:NSLiteralSearch range:NSMakeRange(0, newExpression.length)];
 	[newExpression replaceOccurrencesOfString:@"]" withString:@")" options:NSLiteralSearch range:NSMakeRange(0, newExpression.length)];
 	
-	// Evaluate and cache expressions if possible (only if no dereferencing is being involved and no errors occured)
-	NSString *resultExpression = [process.cacheDictionary objectForKey:newExpression];
-	if (resultExpression == nil)
+	NSMutableDictionary *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process}];
+	if (failedImages != nil)
 	{
-		NSError *error = nil;
-		resultExpression = [self evaluateExpression:newExpression substitutions:@{ZGProcessVariable : process} error:&error];
-		if (resultExpression != nil && error == nil && [newExpression rangeOfString:ZGCalculatePointerFunction].location == NSNotFound)
-		{
-			[process.cacheDictionary setObject:resultExpression forKey:newExpression];
-		}
+		[substitutions setObject:failedImages forKey:ZGFailedImagesVariable];
 	}
-	return resultExpression;
+	return [self evaluateExpression:newExpression substitutions:substitutions error:error];
 }
 
 @end

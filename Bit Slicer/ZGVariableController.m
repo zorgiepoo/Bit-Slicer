@@ -904,6 +904,7 @@
 		variable.addressStringValue = [ZGCalculator evaluateExpression:newAddressFormula];
 		[self.windowController.tableController.variablesTableView reloadData];
 	}
+	variable.finishedEvaluatingDynamicAddress = NO;
 }
 
 - (void)editVariablesAddressOkayButton

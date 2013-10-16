@@ -38,6 +38,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+	
+#define ZGImageName @"ZGImageName"
 
 @class ZGSearchData;
 @class ZGSearchProgress;

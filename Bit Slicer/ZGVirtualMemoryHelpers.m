@@ -523,7 +523,7 @@ ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString
 		}
 		else if (error != NULL)
 		{
-			*error = [NSError errorWithDomain:@"ZGFindExecutableImageFailed" code:1 userInfo:nil];
+			*error = [NSError errorWithDomain:@"ZGFindExecutableImageFailed" code:1 userInfo:@{ZGImageName : partialImageName}];
 		}
 	}
 	else
