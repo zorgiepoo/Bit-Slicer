@@ -198,7 +198,7 @@
 	NSRange visibleRowsRange = [self.variablesTableView rowsInRect:self.variablesTableView.visibleRect];
 	
 	// Don't look up executable images that have been known to fail frequently, otherwise it'd be a serious penalty cost
-	if (self.lastUpdatedDate == nil || [[NSDate date] timeIntervalSinceDate:self.lastUpdatedDate] > 5.0)
+	if (self.windowController.currentProcess.valid && (self.lastUpdatedDate == nil || [[NSDate date] timeIntervalSinceDate:self.lastUpdatedDate] > 5.0))
 	{
 		[self clearCache];
 	}
