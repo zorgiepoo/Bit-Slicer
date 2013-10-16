@@ -101,11 +101,22 @@
 			for (ZGRegion *region in binaryRegions)
 			{
 				NSString *lastPathComponent = [region.mappedPath lastPathComponent];
-				[self.cacheDictionary setObject:@(region.address) forKey:region.mappedPath];
-				[self.cacheDictionary setObject:@(region.address) forKey:lastPathComponent];
+				
+				if ([self.cacheDictionary objectForKey:region.mappedPath] == nil)
+				{
+					[self.cacheDictionary setObject:@(region.address) forKey:region.mappedPath];
+				}
+				if ([self.cacheDictionary objectForKey:lastPathComponent] == nil)
+				{
+					[self.cacheDictionary setObject:@(region.address) forKey:lastPathComponent];
+				}
 				if ([[region.mappedPath stringByDeletingLastPathComponent] length] > 0)
 				{
-					[self.cacheDictionary setObject:@(region.address) forKey:[@"/" stringByAppendingString:lastPathComponent]];
+					NSString *forwardSlashedPrependedPath = [@"/" stringByAppendingString:lastPathComponent];
+					if ([self.cacheDictionary objectForKey:forwardSlashedPrependedPath] == nil)
+					{
+						[self.cacheDictionary setObject:@(region.address) forKey:forwardSlashedPrependedPath];
+					}
 				}
 			}
 		}
