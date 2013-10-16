@@ -36,11 +36,13 @@
 #import "Python.h"
 #import "ZGMemoryTypes.h"
 
+@class ZGProcess;
+
 @interface ZGPyVirtualMemory : NSObject
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit objectsPool:(NSMutableArray *)objectsPool;
+- (id)initWithProcess:(ZGProcess *)process objectsPool:(NSMutableArray *)objectsPool;
 
 @property (nonatomic, assign) PyObject *vmObject;
 

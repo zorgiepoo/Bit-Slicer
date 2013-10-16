@@ -346,22 +346,32 @@
 		if (foundRegion.slide > 0 || foundRegion != firstRegion)
 		{
 			NSString *partialPath = [foundRegion.mappedPath lastPathComponent];
-			if ([[foundRegion.mappedPath stringByDeletingLastPathComponent] length] > 0)
-			{
-				partialPath = [@"/" stringByAppendingString:partialPath];
-			}
+			NSString *pathToUse = nil;
 			
-			int numberOfMatchingPaths = 0;
-			for (ZGRegion *machRegion in machBinaryRegions)
+			// we are gauranteed that partial path of main executable will match up
+			if (foundRegion == firstRegion)
 			{
-				if ([machRegion.mappedPath hasSuffix:partialPath])
+				pathToUse = partialPath;
+			}
+			else
+			{
+				if ([[foundRegion.mappedPath stringByDeletingLastPathComponent] length] > 0)
 				{
-					numberOfMatchingPaths++;
-					if (numberOfMatchingPaths > 1) break;
+					partialPath = [@"/" stringByAppendingString:partialPath];
 				}
+				
+				int numberOfMatchingPaths = 0;
+				for (ZGRegion *machRegion in machBinaryRegions)
+				{
+					if ([machRegion.mappedPath hasSuffix:partialPath])
+					{
+						numberOfMatchingPaths++;
+						if (numberOfMatchingPaths > 1) break;
+					}
+				}
+				
+				pathToUse = numberOfMatchingPaths > 1 ? foundRegion.mappedPath : partialPath;
 			}
-			
-			NSString *pathToUse = numberOfMatchingPaths > 1 ? foundRegion.mappedPath : partialPath;
 			
 			variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", variableAddress - foundRegion.address, pathToUse];
 			variable.usesDynamicAddress = YES;

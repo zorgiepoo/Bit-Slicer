@@ -40,6 +40,7 @@
 #import "ZGSearchFunctions.h"
 #import "ZGSearchResults.h"
 #import "ZGSearchProgress.h"
+#import "ZGProcess.h"
 #import <Python/structmember.h>
 
 typedef struct
@@ -211,7 +212,7 @@ static PyTypeObject VirtualMemoryType =
 	}
 }
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit objectsPool:(NSMutableArray *)objectsPool
+- (id)initWithProcess:(ZGProcess *)process objectsPool:(NSMutableArray *)objectsPool
 {
 	self = [super init];
 	if (self != nil)
@@ -223,17 +224,13 @@ static PyTypeObject VirtualMemoryType =
 			return nil;
 		}
 		VirtualMemory *vmObject = (VirtualMemory *)self.vmObject;
-		vmObject->processTask = processTask;
-		vmObject->processIdentifier = 0;
-		if (!ZGPIDForTask(processTask, &(vmObject->processIdentifier)))
-		{
-			NSLog(@"Script Error: Failed to access PID for process task");
-			return nil;
-		}
-		vmObject->is64Bit = is64Bit;
+		vmObject->processTask = process.processTask;
+		vmObject->processIdentifier = process.processID;
+		vmObject->is64Bit = process.is64Bit;
+		
 		NSMutableDictionary *allocationSizeTable = [[NSMutableDictionary alloc] init];
 		vmObject->allocationSizeTable = allocationSizeTable;
-		NSMutableDictionary *processCacheDictionary = [[NSMutableDictionary alloc] init];
+		NSMutableDictionary *processCacheDictionary = [process.cacheDictionary mutableCopy];
 		vmObject->processCacheDictionary = processCacheDictionary;
 		@synchronized(objectsPool)
 		{
