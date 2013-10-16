@@ -92,15 +92,21 @@
 	if (success)
 	{
 		self.cacheDictionary = [[NSMutableDictionary alloc] init];
-		// Set up initial cache for full paths, partial paths, and partial paths prepended with forward slashes
-		for (ZGRegion *region in ZGMachBinaryRegions(_processTask))
+		
+		NSArray *binaryRegions = ZGMachBinaryRegions(_processTask);
+		if (binaryRegions.count > 0)
 		{
-			NSString *lastPathComponent = [region.mappedPath lastPathComponent];
-			[self.cacheDictionary setObject:@(region.address) forKey:region.mappedPath];
-			[self.cacheDictionary setObject:@(region.address) forKey:lastPathComponent];
-			if ([[region.mappedPath stringByDeletingLastPathComponent] length] > 0)
+			self.baseAddress = [(ZGRegion *)[binaryRegions objectAtIndex:0] address];
+			// Set up initial cache for full paths, partial paths, and partial paths prepended with forward slashes
+			for (ZGRegion *region in binaryRegions)
 			{
-				[self.cacheDictionary setObject:@(region.address) forKey:[@"/" stringByAppendingString:lastPathComponent]];
+				NSString *lastPathComponent = [region.mappedPath lastPathComponent];
+				[self.cacheDictionary setObject:@(region.address) forKey:region.mappedPath];
+				[self.cacheDictionary setObject:@(region.address) forKey:lastPathComponent];
+				if ([[region.mappedPath stringByDeletingLastPathComponent] length] > 0)
+				{
+					[self.cacheDictionary setObject:@(region.address) forKey:[@"/" stringByAppendingString:lastPathComponent]];
+				}
 			}
 		}
 	}

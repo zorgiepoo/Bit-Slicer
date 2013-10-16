@@ -1464,7 +1464,7 @@ END_DEBUGGER_CHANGE:
 			NSString *partialPath = nil;
 			ZGMemoryAddress slide = 0;
 			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.currentProcess.processTask, self.currentProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
-			if (partialPath != nil && slide > 0)
+			if (partialPath != nil && (slide > 0 || instruction.variable.address - relativeOffset > self.currentProcess.baseAddress))
 			{
 				instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, partialPath];
 				instruction.variable.usesDynamicAddress = YES;
