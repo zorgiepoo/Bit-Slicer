@@ -256,6 +256,8 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 		}
 		else
 		{
+			PyErr_SetString(PyExc_ValueError, [[NSString stringWithFormat:@"debug.assemble failed to assemble:\n%s", codeString] UTF8String]);
+			
 			NSLog(@"Error: couldn't assemble data");
 			NSLog(@"%@", error);
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -281,6 +283,8 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{
+			PyErr_SetString(PyExc_BufferError, "debug.disassemble can't take in non-contiguous or 0-length buffer");
+			
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
@@ -315,6 +319,8 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 		}
 		else
 		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.readBytes failed to read %llu byte(s) at 0x%llX", size, address] UTF8String]);
+			
 			NSString *errorMessage = @"Error: Failed to read bytes using debug object";
 			NSLog(@"%@", errorMessage);
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -335,11 +341,18 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{
+			PyErr_SetString(PyExc_BufferError, "debug.writeBytes can't take in non-contiguous or 0-length buffer");
+			
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
 		
 		success = [[[ZGAppController sharedController] debuggerController] writeData:[NSData dataWithBytes:buffer.buf length:buffer.len] atAddress:memoryAddress processTask:self->processTask is64Bit:self->is64Bit];
+		
+		if (!success)
+		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
+		}
 		
 		PyBuffer_Release(&buffer);
 	}
@@ -375,6 +388,10 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 			
 			free(buffer);
 		}
+		else
+		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.bytesBeforeInjection failed with source address: 0x%llX, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
+		}
 	}
 	return retValue;
 }
@@ -388,6 +405,8 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	{
 		if (!PyBuffer_IsContiguous(&newCode, 'C') || newCode.len <= 0)
 		{
+			PyErr_SetString(PyExc_BufferError, "debug.injectCode can't take in non-contiguous or 0-length buffer");
+			
 			PyBuffer_Release(&newCode);
 			return NULL;
 		}
@@ -402,6 +421,8 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		 recordUndo:NO
 		 error:&error])
 		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.injectCode failed with source address: 0x%llx, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
+			
 			NSLog(@"Failed to inject code from script...");
 			NSLog(@"%@", error);
 			
@@ -464,7 +485,7 @@ static PyObject *watchAccess(DebuggerClass *self, PyObject *args, NSString *func
 			}
 			else
 			{
-				NSLog(@"Failed to add breakpoint in %@...", functionName);
+				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.%@ failed adding watchpoint at 0x%llX (%llu byte(s))", functionName, memoryAddress, numberOfBytes] UTF8String]);
 			}
 			
 			ZGFreeBytes(self->processTask, value, numberOfBytes);

@@ -270,6 +270,10 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 			retValue =  Py_BuildValue(typeFormat, *(type *)bytes); \
 			ZGFreeBytes(self->processTask, bytes, size); \
 		} \
+		else \
+		{ \
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.%s failed to read %lu byte(s) at 0x%llX", #functionName, sizeof(type), memoryAddress] UTF8String]); \
+		} \
 	} \
 	return retValue; \
 }
@@ -289,28 +293,35 @@ static PyObject *VirtualMemory_readPointer(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress memoryAddress = 0x0;
+	ZGMemorySize size = self->is64Bit ? sizeof(ZGMemoryAddress) : sizeof(ZG32BitMemoryAddress);
 	if (PyArg_ParseTuple(args, "K:readPointer", &memoryAddress))
 	{
 		void *bytes = NULL;
-		ZGMemorySize size = self->is64Bit ? sizeof(ZGMemoryAddress) : sizeof(ZG32BitMemoryAddress);
-		
 		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &size))
 		{
 			ZGMemoryAddress pointer = self->is64Bit ? *(ZGMemoryAddress *)bytes : *(ZG32BitMemoryAddress *)bytes;
 			retValue = Py_BuildValue("K", pointer);
 			ZGFreeBytes(self->processTask, bytes, size);
 		}
+		else
+		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.readPointer failed to read %llu byte(s) at 0x%llX", size, memoryAddress] UTF8String]);
+		}
 	}
 	return retValue;
 }
 
-static void readBytes(PyObject **retValue, VirtualMemory *self, ZGMemoryAddress memoryAddress, ZGMemorySize *numberOfBytes)
+static void readBytes(PyObject **retValue, VirtualMemory *self, ZGMemoryAddress memoryAddress, ZGMemorySize *numberOfBytes, const char *functionName)
 {
 	void *bytes = NULL;
 	if (ZGReadBytes(self->processTask, memoryAddress, &bytes, numberOfBytes))
 	{
 		*retValue = Py_BuildValue("y#", bytes, *numberOfBytes);
 		ZGFreeBytes(self->processTask, bytes, *numberOfBytes);
+	}
+	else
+	{
+		PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.%s failed to read %llu byte(s) at 0x%llX", functionName, *numberOfBytes, memoryAddress] UTF8String]);
 	}
 }
 
@@ -321,7 +332,7 @@ static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 	ZGMemorySize numberOfBytes = 0;
 	if (PyArg_ParseTuple(args, "KK:readBytes", &memoryAddress, &numberOfBytes))
 	{
-		readBytes(&retValue, self, memoryAddress, &numberOfBytes);
+		readBytes(&retValue, self, memoryAddress, &numberOfBytes, "readBytes");
 	}
 	return retValue;
 }
@@ -339,7 +350,7 @@ static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, Z
 		}
 		else
 		{
-			readBytes(&retValue, self, memoryAddress, &numberOfBytes);
+			readBytes(&retValue, self, memoryAddress, &numberOfBytes, functionName);
 		}
 	}
 	return retValue;
@@ -364,6 +375,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 	{ \
 		if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &value, sizeof(type))) \
 		{ \
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.%s failed to write %lu byte(s) at 0x%llX", #functionName, sizeof(type), memoryAddress] UTF8String]); \
 			return NULL; \
 		} \
 	} \
@@ -395,6 +407,8 @@ static PyObject *VirtualMemory_writePointer(VirtualMemory *self, PyObject *args)
 		{
 			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &pointer, sizeof(pointer)))
 			{
+				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.writePointer failed to write %lu byte(s) at 0x%llX", sizeof(pointer), memoryAddress] UTF8String]);
+				
 				return NULL;
 			}
 		}
@@ -403,6 +417,8 @@ static PyObject *VirtualMemory_writePointer(VirtualMemory *self, PyObject *args)
 			ZG32BitMemoryAddress pointerRead = (ZG32BitMemoryAddress)pointer;
 			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &pointerRead, sizeof(pointerRead)))
 			{
+				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.writePointer failed to write %lu byte(s) at 0x%llX", sizeof(pointerRead), memoryAddress] UTF8String]);
+				
 				return NULL;
 			}
 		}
@@ -418,12 +434,16 @@ static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C'))
 		{
+			PyErr_SetString(PyExc_BufferError, "vm.writeBytes can't write non-contiguous buffer");
+			
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
 		
 		if (buffer.len > 0 && !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, buffer.len))
 		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
+			
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
@@ -445,6 +465,8 @@ static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuff
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C'))
 		{
+			PyErr_SetString(PyExc_BufferError, [[NSString stringWithFormat:@"vm.%s can't write non-contiguous buffer", functionName] UTF8String]);
+			
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
@@ -453,6 +475,8 @@ static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuff
 		{
 			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, buffer.len) || !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress+buffer.len, nullBuffer, nullSize))
 			{
+				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.%s failed to write %lu byte(s) at 0x%llX", functionName, buffer.len, memoryAddress] UTF8String]);
+				
 				PyBuffer_Release(&buffer);
 				return NULL;
 			}
@@ -483,6 +507,8 @@ static PyObject *VirtualMemory_pause(VirtualMemory *self, PyObject *args)
 {
 	if (!ZGSuspendTask(self->processTask))
 	{
+		PyErr_SetString(PyExc_Exception, "vm.pause failed to pause process");
+		
 		return NULL;
 	}
 	return Py_BuildValue("");
@@ -492,6 +518,8 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject *args)
 {
 	if (!ZGResumeTask(self->processTask))
 	{
+		PyErr_SetString(PyExc_Exception, "vm.unpause failed to unpause process");
+		
 		return NULL;
 	}
 	return Py_BuildValue("");
@@ -499,7 +527,7 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject *args)
 
 #define MAX_VALUES_SCANNED 1000
 
-static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData)
+static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, const char *functionName)
 {
 	PyObject *retValue = NULL;
 	if (searchData.dataSize > 0)
@@ -527,6 +555,10 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData)
 		}];
 		retValue = pythonResults;
 	}
+	else
+	{
+		PyErr_SetString(PyExc_BufferError, [[NSString stringWithFormat:@"vm.%s can't scan for 0-length data", functionName] UTF8String]);
+	}
 	return retValue;
 }
 
@@ -549,7 +581,7 @@ static PyObject *VirtualMemory_scanByteString(VirtualMemory *self, PyObject *arg
 		
 		searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(@(byteArrayString));
 		
-		retValue = scanSearchData(self, searchData);
+		retValue = scanSearchData(self, searchData, "scanByteString");
 	}
 	
 	return retValue;
@@ -563,6 +595,8 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{
+			PyErr_SetString(PyExc_BufferError, "vm.scanBytes can't scan non-contiguous buffer");
+			
 			PyBuffer_Release(&buffer);
 			return NULL;
 		}
@@ -577,7 +611,7 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, buffer.len)
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		
-		retValue = scanSearchData(self, searchData);
+		retValue = scanSearchData(self, searchData, "scanBytes");
 		
 		PyBuffer_Release(&buffer);
 	}
@@ -596,6 +630,10 @@ static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
 		{
 			result = Py_BuildValue("K", imageAddress);
 		}
+		else
+		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.base failed to find image matching with %s", partialPath] UTF8String]);
+		}
 	}
 	return result;
 }
@@ -612,6 +650,10 @@ static PyObject *VirtualMemory_allocate(VirtualMemory *self, PyObject *args)
 		{
 			[self->allocationSizeTable setObject:@(numberOfBytes) forKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
 			retValue = Py_BuildValue("K", memoryAddress);
+		}
+		else
+		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.allocate failed to allocate %llu byte(s)", numberOfBytes] UTF8String]);
 		}
 	}
 	return retValue;
@@ -631,6 +673,10 @@ static PyObject *VirtualMemory_deallocate(VirtualMemory *self, PyObject *args)
 			{
 				retValue = Py_BuildValue("");
 				[self->allocationSizeTable removeObjectForKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
+			}
+			else
+			{
+				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.deallocate failed to deallocate %llu byte(s) at 0x%llX", numberOfBytes, memoryAddress] UTF8String]);
 			}
 		}
 	}
