@@ -1120,11 +1120,6 @@ static NSSize *expandedWindowMinSize = nil;
 		{
 			return NO;
 		}
-		
-		if (memoryProtection & VM_PROT_EXECUTE)
-		{
-			return NO;
-		}
 	}
 	
 	else if (menuItem.action == @selector(nopVariables:))
