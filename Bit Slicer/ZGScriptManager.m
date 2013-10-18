@@ -45,7 +45,7 @@
 #import "ZGPyMainModule.h"
 #import "ZGSearchProgress.h"
 
-#import <Python/structmember.h>
+#import "structmember.h"
 
 #define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
 

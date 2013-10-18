@@ -41,7 +41,7 @@
 #import "ZGSearchResults.h"
 #import "ZGSearchProgress.h"
 #import "ZGProcess.h"
-#import <Python/structmember.h>
+#import "structmember.h"
 
 typedef struct
 {

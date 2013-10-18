@@ -44,7 +44,7 @@
 #import "ZGScriptManager.h"
 #import "ZGBreakPointController.h"
 #import "ZGInstruction.h"
-#import <Python/structmember.h>
+#import "structmember.h"
 
 @class ZGPyDebugger;
 
