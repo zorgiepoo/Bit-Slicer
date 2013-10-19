@@ -90,6 +90,8 @@
 
 - (void)cleanUp
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
 	[self.watchVariablesTimer invalidate];
 	self.watchVariablesTimer = nil;
 	
@@ -101,20 +103,41 @@
 
 - (void)updateWatchVariablesTimer
 {
-	BOOL shouldKeepTimer = NO;
+	BOOL shouldHaveTimer = NO;
+	
+	BOOL hasVariablesThatNeedUpdating = NO;
 	if (self.windowController.currentProcess.valid && self.windowController.currentProcess.hasGrantedAccess)
 	{
 		for (ZGVariable *variable in self.documentData.variables)
 		{
 			if (variable.type != ZGScript)
 			{
-				shouldKeepTimer = YES;
+				hasVariablesThatNeedUpdating = YES;
 				break;
 			}
 		}
 	}
 	
-	if (shouldKeepTimer && self.watchVariablesTimer == nil)
+	if (hasVariablesThatNeedUpdating)
+	{
+		if (!self.windowController.isOccluded)
+		{
+			shouldHaveTimer = YES;
+		}
+		else
+		{
+			for (ZGVariable *variable in self.documentData.variables)
+			{
+				if (variable.isFrozen && variable.enabled)
+				{
+					shouldHaveTimer = YES;
+					break;
+				}
+			}
+		}
+	}
+	
+	if (shouldHaveTimer && self.watchVariablesTimer == nil)
 	{
 		self.watchVariablesTimer =
 		[NSTimer
@@ -124,7 +147,7 @@
 		 userInfo:nil
 		 repeats:YES];
 	}
-	else if (!shouldKeepTimer && self.watchVariablesTimer != nil)
+	else if (!shouldHaveTimer && self.watchVariablesTimer != nil)
 	{
 		[self.watchVariablesTimer invalidate];
 		self.watchVariablesTimer = nil;
@@ -214,17 +237,23 @@
 - (void)updateWatchVariablesTable:(NSTimer *)timer
 {
 	BOOL needsToReloadTable = NO;
-	NSRange visibleRowsRange = [self.variablesTableView rowsInRect:self.variablesTableView.visibleRect];
+	BOOL isOccluded = self.windowController.isOccluded;
+	NSRange visibleRowsRange;
+	
+	if (!isOccluded)
+	{
+		visibleRowsRange = [self.variablesTableView rowsInRect:self.variablesTableView.visibleRect];
+	}
 	
 	// Don't look up executable images that have been known to fail frequently, otherwise it'd be a serious penalty cost
-	if (self.windowController.currentProcess.valid && (self.lastUpdatedDate == nil || [[NSDate date] timeIntervalSinceDate:self.lastUpdatedDate] > 5.0))
+	if (self.windowController.currentProcess.hasGrantedAccess && self.failedExecutableImages.count > 0 && (self.lastUpdatedDate == nil || [[NSDate date] timeIntervalSinceDate:self.lastUpdatedDate] > 5.0))
 	{
 		[self clearCache];
 	}
 	
 	// First, update all the variables that have dynamic addresses
 	// We don't want to update this when the user is editing something in the table
-	if (self.windowController.currentProcess.valid && self.variablesTableView.editedRow == -1)
+	if (!isOccluded && self.windowController.currentProcess.hasGrantedAccess && self.variablesTableView.editedRow == -1)
 	{
 		for (ZGVariable *variable in [self.documentData.variables subarrayWithRange:visibleRowsRange])
 		{
@@ -233,14 +262,14 @@
 	}
 	
 	// Then check that the process is alive
-	if (self.windowController.currentProcess.valid)
+	if (self.windowController.currentProcess.hasGrantedAccess)
 	{
 		// Freeze all variables that need be frozen!
 		[self.documentData.variables enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop) {
 			if (variable.enabled && variable.isFrozen && variable.freezeValue != NULL)
 			{
 				// We have to make sure variable's address is up to date before proceeding
-				if (index < visibleRowsRange.location || index >= visibleRowsRange.location + visibleRowsRange.length)
+				if (self.windowController.isOccluded || index < visibleRowsRange.location || index >= visibleRowsRange.location + visibleRowsRange.length)
 				{
 					[self updateDynamicVariableAddress:variable];
 				}
@@ -259,17 +288,20 @@
 		}];
 	}
 	
-	// if any variables are changing, that means that we'll have to reload the table, and that'd be very bad
-	// if the user is in the process of editing a variable's value, so don't do it then
-	if (self.windowController.currentProcess.valid && self.variablesTableView.editedRow == -1)
+	if (!isOccluded)
 	{
-		// Read all the variables and update them in the table view if needed
-		needsToReloadTable = [self updateVariableValuesInRange:visibleRowsRange] || needsToReloadTable;
-	}
-	
-	if (needsToReloadTable)
-	{
-		[self.variablesTableView reloadData];
+		// if any variables are changing, that means that we'll have to reload the table, and that'd be very bad
+		// if the user is in the process of editing a variable's value, so don't do it then
+		if (self.windowController.currentProcess.hasGrantedAccess && self.variablesTableView.editedRow == -1)
+		{
+			// Read all the variables and update them in the table view if needed
+			needsToReloadTable = [self updateVariableValuesInRange:visibleRowsRange] || needsToReloadTable;
+		}
+		
+		if (needsToReloadTable)
+		{
+			[self.variablesTableView reloadData];
+		}
 	}
 }
 

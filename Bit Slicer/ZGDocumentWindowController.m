@@ -106,7 +106,7 @@
 	
 	[self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 	
-	if ([ZGAppController isRunningLaterThanLion])
+	if ([ZGAppController isRunningOnLionOrLater])
 	{
 		[NSNotificationCenter.defaultCenter
 		 addObserver:self
@@ -121,6 +121,15 @@
 		 object:self.window];
 	}
 	
+	if ([ZGAppController isRunningOnMavericksOrLater])
+	{
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(applicationDidChangeOcclusionState:)
+		 name:NSApplicationDidChangeOcclusionStateNotification
+		 object:nil];
+	}
+	
 	[[NSNotificationCenter defaultCenter]
 	 addObserver:self
 	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
@@ -128,6 +137,12 @@
 	 object:self.runningApplicationsPopUpButton];
 	
 	[self loadDocumentUserInterface];
+}
+
+- (void)applicationDidChangeOcclusionState:(NSNotification *)notification
+{
+	self.isOccluded = ([self.window occlusionState] & NSWindowOcclusionStateVisible) != 0;
+	[self.tableController updateWatchVariablesTimer];
 }
 
 - (void)windowWillClose:(NSNotification *)notification

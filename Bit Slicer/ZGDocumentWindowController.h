@@ -86,6 +86,8 @@
 @property (strong) ZGDocumentBreakPointController *documentBreakPointController;
 @property (strong) ZGScriptManager *scriptManager;
 
+@property (nonatomic) BOOL isOccluded;
+
 @property (strong, nonatomic) ZGProcess *currentProcess;
 
 @property (assign, nonatomic) ZGDocumentData *documentData;
