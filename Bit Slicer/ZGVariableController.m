@@ -56,6 +56,8 @@
 @property (assign) ZGDocumentWindowController *windowController;
 @property (assign) ZGDocumentData *documentData;
 
+@property (nonatomic) id frozenActivity;
+
 @end
 
 @implementation ZGVariableController
@@ -73,19 +75,42 @@
 
 #pragma mark Freezing variables
 
+- (void)updateFrozenActivity
+{
+	BOOL hasFrozenVariable = NO;
+	for (ZGVariable *variable in self.documentData.variables)
+	{
+		if (variable.isFrozen && variable.enabled)
+		{
+			hasFrozenVariable = YES;
+			break;
+		}
+	}
+	
+	if (hasFrozenVariable && self.frozenActivity == nil && [[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)]	)
+	{
+		self.frozenActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Freezing Variables"];
+	}
+	else if (!hasFrozenVariable && self.frozenActivity != nil)
+	{
+		[[NSProcessInfo processInfo] endActivity:self.frozenActivity];
+		self.frozenActivity = nil;
+	}
+}
+
 - (void)freezeOrUnfreezeVariablesAtRoxIndexes:(NSIndexSet *)rowIndexes
 {
-	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger rowIndex, BOOL *stop)
-	 {
-		 ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
-		 variable.isFrozen = !variable.isFrozen;
-		 
-		 if (variable.isFrozen)
-		 {
-			 variable.freezeValue = variable.value;
-		 }
-	 }];
+	for (ZGVariable *variable in [self.documentData.variables objectsAtIndexes:rowIndexes])
+	{
+		variable.isFrozen = !variable.isFrozen;
+		
+		if (variable.isFrozen)
+		{
+			variable.freezeValue = variable.value;
+		}
+	}
 	
+	[self updateFrozenActivity];
 	[self.windowController.tableController.variablesTableView reloadData];
 	
 	// check whether we want to use "Undo Freeze" or "Redo Freeze" or "Undo Unfreeze" or "Redo Unfreeze"
@@ -240,9 +265,17 @@
 	
 	for (ZGVariable *variable in variablesToRemove)
 	{
-		if (variable.type == ZGScript && variable.enabled)
+		if (variable.enabled)
 		{
-			[self.windowController.scriptManager stopScriptForVariable:variable];
+			if (variable.type == ZGScript)
+			{
+				[self.windowController.scriptManager stopScriptForVariable:variable];
+			}
+			else if (variable.isFrozen)
+			{
+				// If the user undos this remove, the variable won't automatically rewrite values
+				variable.isFrozen = NO;
+			}
 		}
 	}
 	
@@ -252,6 +285,7 @@
 	self.documentData.variables = [NSArray arrayWithArray:temporaryArray];
 	[self.windowController.searchController fetchVariablesFromResults];
 	
+	[self updateFrozenActivity];
 	[self.windowController.tableController updateWatchVariablesTimer];
 	[self.windowController.tableController.variablesTableView reloadData];
 	
@@ -267,6 +301,8 @@
 			variable.enabled = NO;
 		}
 	}
+	
+	[self updateFrozenActivity];
 }
 
 - (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes
@@ -754,6 +790,8 @@
 	{
 		self.windowController.tableController.shouldIgnoreTableViewSelectionChange = YES;
 	}
+	
+	[self updateFrozenActivity];
 	
 	// the table view always needs to be reloaded because of being able to select multiple indexes
 	[self.windowController.tableController.variablesTableView reloadData];
