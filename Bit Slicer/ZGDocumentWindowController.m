@@ -400,6 +400,7 @@
 			for (ZGVariable *variable in self.documentData.variables)
 			{
 				variable.finishedEvaluatingDynamicAddress = NO;
+				variable.value = NULL;
 			}
 			
 			[self.currentProcess markInvalid];
