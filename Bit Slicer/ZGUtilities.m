@@ -58,6 +58,9 @@ BOOL ZGIsValidNumber(NSString *expression)
 	if (![expression zgIsHexRepresentation])
 	{
 		NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+		// We have to use en_US locale since we don't want commas to be used for decimal points
+		// Also DDMathParser won't handle a comma as decimal point for evaluating expressions either due to ambiguity
+		[numberFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
 		NSNumber *number = [numberFormatter numberFromString:expression];
 		result = (number != nil);
 	}
