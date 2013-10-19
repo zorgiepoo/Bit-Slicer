@@ -78,7 +78,9 @@
 @property (nonatomic) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
 
-@property (nonatomic, assign) BOOL shouldIgnoreTableViewSelectionChange;
+@property (nonatomic) BOOL shouldIgnoreTableViewSelectionChange;
+
+@property (nonatomic) id breakPointActivity;
 
 @end
 
@@ -842,6 +844,12 @@ enum ZGStepExecution
 	
 	self.disassembling = YES;
 	
+	id disassemblingActivity = nil;
+	if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+	{
+		disassemblingActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Disassembling Data"];
+	}
+	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		ZGMemorySize size = theSize;
 		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size];
@@ -919,6 +927,10 @@ enum ZGStepExecution
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			self.disassembling = NO;
+			if (disassemblingActivity != nil)
+			{
+				[[NSProcessInfo processInfo] endActivity:disassemblingActivity];
+			}
 			[self.dissemblyProgressIndicator setHidden:YES];
 			[self.addressTextField setEnabled:YES];
 			[self.runningApplicationsPopUpButton setEnabled:YES];
@@ -948,6 +960,8 @@ enum ZGStepExecution
 					[self removeHaltedBreakPoint:haltedBreakPoint];
 				}
 			}
+			
+			[self stopBreakPointActivity];
 		}
 	}
 }
@@ -1394,18 +1408,10 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 		
-		BOOL shouldValidate = NO;
-		
-		for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
+		if (![self hasBreakPoint])
 		{
-			if (breakPoint.delegate == self)
-			{
-				shouldValidate = YES;
-				break;
-			}
+			return NO;
 		}
-		
-		return shouldValidate;
 	}
 	else if (userInterfaceItem.action == @selector(jump:))
 	{
@@ -2173,6 +2179,37 @@ END_DEBUGGER_CHANGE:
 
 #pragma mark Break Points
 
+- (BOOL)hasBreakPoint
+{
+	BOOL hasBreakPoint = NO;
+	for (ZGBreakPoint *breakPoint in [[[ZGAppController sharedController] breakPointController] breakPoints])
+	{
+		if (breakPoint.delegate == self)
+		{
+			hasBreakPoint = YES;
+			break;
+		}
+	}
+	return hasBreakPoint;
+}
+
+- (void)startBreakPointActivity
+{
+	if (self.breakPointActivity == nil && [[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)]	)
+	{
+		self.breakPointActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityBackground reason:@"Software Breakpoint"];
+	}
+}
+
+- (void)stopBreakPointActivity
+{
+	if (self.breakPointActivity != nil)
+	{
+		[[NSProcessInfo processInfo] endActivity:self.breakPointActivity];
+		self.breakPointActivity = nil;
+	}
+}
+
 - (void)removeBreakPointsToInstructions:(NSArray *)instructions
 {
 	NSMutableArray *changedInstructions = [[NSMutableArray alloc] init];
@@ -2184,6 +2221,11 @@ END_DEBUGGER_CHANGE:
 			[changedInstructions addObject:instruction];
 			[[[ZGAppController sharedController] breakPointController] removeBreakPointOnInstruction:instruction inProcess:self.currentProcess];
 		}
+	}
+	
+	if (![self hasBreakPoint])
+	{
+		[self stopBreakPointActivity];
 	}
 	
 	[self.undoManager setActionName:[NSString stringWithFormat:@"Add Breakpoint%@", changedInstructions.count != 1 ? @"s" : @""]];
@@ -2209,6 +2251,7 @@ END_DEBUGGER_CHANGE:
 	
 	if (addedAtLeastOneBreakPoint)
 	{
+		[self startBreakPointActivity];
 		[self.undoManager setActionName:[NSString stringWithFormat:@"Remove Breakpoint%@", changedInstructions.count != 1 ? @"s" : @""]];
 		[[self.undoManager prepareWithInvocationTarget:self] removeBreakPointsToInstructions:changedInstructions];
 		[self.instructionsTableView reloadData];
@@ -2234,6 +2277,7 @@ END_DEBUGGER_CHANGE:
 - (IBAction)removeAllBreakPoints:(id)sender
 {
 	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
+	[self stopBreakPointActivity];
 	[self.undoManager removeAllActions];
 	[self.instructionsTableView reloadData];
 }

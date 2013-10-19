@@ -732,12 +732,22 @@
 		[self prepareTask];
 		[self.searchProgress clear];
 		
+		id searchDataActivity = nil;
+		if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+		{
+			searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
+		}
+		
 		[self createUserInterfaceTimer];
 		
 		[self searchVariablesByNarrowing:self.isInNarrowSearchMode withVariables:searchedVariables usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
 			self.userInterfaceTimer = nil;
 			
+			if (searchDataActivity != nil)
+			{
+				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
+			}
 			[self finalizeSearchWithNotSearchedVariables:notSearchedVariables];
 		}];
 	}

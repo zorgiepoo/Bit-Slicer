@@ -57,6 +57,7 @@
 @property dispatch_source_t scriptTimer;
 @property NSMutableArray *runningScripts;
 @property (nonatomic) NSMutableArray *objectsPool;
+@property (nonatomic) id scriptActivity;
 
 @end
 
@@ -415,6 +416,13 @@ static dispatch_queue_t gPythonQueue;
 						
 						if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue)) != NULL)
 						{
+							dispatch_async(dispatch_get_main_queue(), ^{
+								if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+								{
+									self.scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Running Scripts"];
+								}
+							});
+							
 							dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
 							dispatch_source_set_event_handler(self.scriptTimer, ^{
 								for (ZGPyScript *script in self.runningScripts)
@@ -465,6 +473,13 @@ static dispatch_queue_t gPythonQueue;
 					dispatch_source_cancel(self.scriptTimer);
 					dispatch_release(self.scriptTimer);
 					self.scriptTimer = NULL;
+					dispatch_async(dispatch_get_main_queue(), ^{
+						if (self.scriptActivity != nil)
+						{
+							[[NSProcessInfo processInfo] endActivity:self.scriptActivity];
+							self.scriptActivity = nil;
+						}
+					});
 				}
 			});
 			

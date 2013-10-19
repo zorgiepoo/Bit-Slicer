@@ -313,6 +313,8 @@
 		}
 	}
 	
+	[self.tableController updateWatchVariablesTimer];
+	
 	// Trash all other menu items if they're dead
 	NSMutableArray *itemsToRemove = [[NSMutableArray alloc] init];
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
@@ -401,6 +403,7 @@
 			}
 			
 			[self.currentProcess markInvalid];
+			[self.tableController updateWatchVariablesTimer];
 			[self.variablesTableView reloadData];
 			
 			[[NSNotificationCenter defaultCenter]

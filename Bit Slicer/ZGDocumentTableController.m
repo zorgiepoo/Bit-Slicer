@@ -102,12 +102,15 @@
 - (void)updateWatchVariablesTimer
 {
 	BOOL shouldKeepTimer = NO;
-	for (ZGVariable *variable in self.documentData.variables)
+	if (self.windowController.currentProcess.valid && self.windowController.currentProcess.hasGrantedAccess)
 	{
-		if (variable.type != ZGScript)
+		for (ZGVariable *variable in self.documentData.variables)
 		{
-			shouldKeepTimer = YES;
-			break;
+			if (variable.type != ZGScript)
+			{
+				shouldKeepTimer = YES;
+				break;
+			}
 		}
 	}
 	
