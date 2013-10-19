@@ -41,6 +41,8 @@ extern NSString *ZGVariablePboardType;
 @interface ZGVariable : NSObject <NSCoding, NSCopying>
 {
 	NSString *_addressStringValue;
+@public
+	NSString *_addressFormula;
 }
 
 @property (nonatomic) BOOL enabled;

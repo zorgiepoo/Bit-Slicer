@@ -894,7 +894,7 @@
 	 addressFormula:variable.addressFormula];
 	
 	variable.addressFormula = newAddressFormula;
-	if (([newAddressFormula rangeOfString:@"["].location != NSNotFound && [newAddressFormula rangeOfString:@"]"].location != NSNotFound) || [newAddressFormula rangeOfString:ZGBaseAddressFunction].location != NSNotFound)
+	if (variable.usesDynamicPointerAddress || variable.usesDynamicBaseAddress)
 	{
 		variable.usesDynamicAddress = YES;
 	}

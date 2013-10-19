@@ -46,6 +46,20 @@
 #define ZGProcessVariable @"ZGProcessVariable"
 #define ZGFailedImagesVariable @"ZGFailedImagesVariable"
 
+@implementation ZGVariable (ZGCalculatorAdditions)
+
+- (BOOL)usesDynamicPointerAddress
+{
+	return _addressFormula != nil && [_addressFormula rangeOfString:@"["].location != NSNotFound && [_addressFormula rangeOfString:@"]"].location != NSNotFound;
+}
+
+- (BOOL)usesDynamicBaseAddress
+{
+	return _addressFormula != nil && [_addressFormula rangeOfString:ZGBaseAddressFunction].location != NSNotFound;
+}
+
+@end
+
 @implementation ZGCalculator
 
 + (void)initialize

@@ -33,9 +33,17 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGVariable.h"
 @class ZGProcess;
 
 #define ZGBaseAddressFunction @"base"
+
+@interface ZGVariable (ZGCalculatorAdditions)
+
+@property (nonatomic, readonly) BOOL usesDynamicPointerAddress;
+@property (nonatomic, readonly) BOOL usesDynamicBaseAddress;
+
+@end
 
 @interface ZGCalculator : NSObject
 

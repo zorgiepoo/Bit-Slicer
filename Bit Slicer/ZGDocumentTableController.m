@@ -184,7 +184,7 @@
 		}
 		
 		// We don't have to evaluate it more than once if we're not doing any pointer calculations
-		if (error == nil && ([variable.addressFormula rangeOfString:@"["].location == NSNotFound && [variable.addressFormula rangeOfString:@"]"].location == NSNotFound))
+		if (error == nil && !variable.usesDynamicPointerAddress)
 		{
 			variable.finishedEvaluatingDynamicAddress = YES;
 		}
