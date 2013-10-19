@@ -897,6 +897,7 @@ static NSSize *expandedWindowMinSize = nil;
 	self.documentData.variables = newWatchVariablesArray;
 	self.searchController.searchResults = searchResults;
 	
+	[self.tableController updateWatchVariablesTimer];
 	[self.tableController.variablesTableView reloadData];
 	
 	// Make sure the search value field is enabled if we aren't doing a store comparison

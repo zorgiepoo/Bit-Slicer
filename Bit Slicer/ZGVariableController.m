@@ -203,8 +203,6 @@
 			self.windowController.searchButton.enabled = YES;
 		}
 		
-		[self.windowController.tableController.variablesTableView reloadData];
-		
 		if ([self.windowController functionTypeAllowsSearchInput])
 		{
 			self.windowController.searchValueTextField.enabled = YES;
@@ -254,6 +252,7 @@
 	self.documentData.variables = [NSArray arrayWithArray:temporaryArray];
 	[self.windowController.searchController fetchVariablesFromResults];
 	
+	[self.windowController.tableController updateWatchVariablesTimer];
 	[self.windowController.tableController.variablesTableView reloadData];
 	
 	[self.windowController updateClearButton];
@@ -279,6 +278,7 @@
 	
 	self.documentData.variables = [NSArray arrayWithArray:temporaryArray];
 	
+	[self.windowController.tableController updateWatchVariablesTimer];
 	[self.windowController.tableController.variablesTableView reloadData];
 	
 	if (self.windowController.undoManager.isUndoing)
@@ -441,6 +441,7 @@
 	 requestedSize:size
 	 pointerSize:self.windowController.currentProcess.pointerSize];
 	
+	[self.windowController.tableController updateWatchVariablesTimer];
 	[self.windowController.tableController.variablesTableView reloadData];
 }
 

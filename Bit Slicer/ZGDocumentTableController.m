@@ -75,14 +75,6 @@
 		self.documentData = windowController.documentData;
 		
 		self.failedExecutableImages = [[NSMutableArray alloc] init];
-		
-		self.watchVariablesTimer =
-			[NSTimer
-			 scheduledTimerWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
-			 target:self
-			 selector:@selector(updateWatchVariablesTable:)
-			 userInfo:nil
-			 repeats:YES];
 	}
 	return self;
 }
@@ -106,6 +98,35 @@
 }
 
 #pragma mark Updating Table
+
+- (void)updateWatchVariablesTimer
+{
+	BOOL shouldKeepTimer = NO;
+	for (ZGVariable *variable in self.documentData.variables)
+	{
+		if (variable.type != ZGScript)
+		{
+			shouldKeepTimer = YES;
+			break;
+		}
+	}
+	
+	if (shouldKeepTimer && self.watchVariablesTimer == nil)
+	{
+		self.watchVariablesTimer =
+		[NSTimer
+		 scheduledTimerWithTimeInterval:WATCH_VARIABLES_UPDATE_TIME_INTERVAL
+		 target:self
+		 selector:@selector(updateWatchVariablesTable:)
+		 userInfo:nil
+		 repeats:YES];
+	}
+	else if (!shouldKeepTimer && self.watchVariablesTimer != nil)
+	{
+		[self.watchVariablesTimer invalidate];
+		self.watchVariablesTimer = nil;
+	}
+}
 
 - (BOOL)updateVariableValuesInRange:(NSRange)variableRange
 {
@@ -148,11 +169,6 @@
 			}
 			
 			variable.lastUpdatedSize = variable.size;
-		}
-		
-		if (needsToReloadTable)
-		{
-			[self.variablesTableView reloadData];
 		}
 	}
 	return needsToReloadTable;

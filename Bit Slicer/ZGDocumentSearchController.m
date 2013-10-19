@@ -429,10 +429,7 @@
 		self.documentData.variables = [NSArray arrayWithArray:newVariables];
 		if (self.documentData.variables.count > 0)
 		{
-			if ([self.windowController.tableController updateVariableValuesInRange:NSMakeRange(0, self.documentData.variables.count)])
-			{
-				[self.windowController.tableController.variablesTableView reloadData];
-			}
+			[self.windowController.tableController updateVariableValuesInRange:NSMakeRange(0, self.documentData.variables.count)];
 		}
 	}
 }
@@ -466,6 +463,7 @@
 			self.documentData.variables = [NSArray arrayWithArray:notSearchedVariables];
 			self.searchResults = self.temporarySearchResults;
 			[self fetchVariablesFromResults];
+			[self.windowController.tableController updateWatchVariablesTimer];
 			[self.windowController.tableController.variablesTableView reloadData];
 		}
 	}

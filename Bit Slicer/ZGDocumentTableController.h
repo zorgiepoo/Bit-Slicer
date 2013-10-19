@@ -45,6 +45,7 @@
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
+- (void)updateWatchVariablesTimer;
 - (BOOL)updateVariableValuesInRange:(NSRange)variableRange;
 
 - (void)clearCache;
