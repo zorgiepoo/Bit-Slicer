@@ -79,14 +79,7 @@
 	
 	NSArray *watchVariablesArrayToSave = nil;
 	
-	if (self.data.variables.count > MAX_TABLE_VIEW_ITEMS)
-	{
-		watchVariablesArrayToSave = [self.data.variables subarrayWithRange:NSMakeRange(0, MAX_TABLE_VIEW_ITEMS)];
-	}
-	else
-	{
-		watchVariablesArrayToSave = self.data.variables;
-	}
+	watchVariablesArrayToSave = self.data.variables;
 	
 	[keyedArchiver
 	 encodeObject:watchVariablesArrayToSave

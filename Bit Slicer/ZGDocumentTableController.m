@@ -472,7 +472,7 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-	return MIN(MAX_TABLE_VIEW_ITEMS, self.documentData.variables.count);
+	return self.documentData.variables.count;
 }
 
 #pragma mark Table View Delegate Methods
@@ -624,13 +624,13 @@
 	
 	NSUInteger variableCount = self.documentData.variables.count + self.windowController.searchController.searchResults.addressCount;
 	
-	if (variableCount <= MAX_TABLE_VIEW_ITEMS)
+	if (variableCount <= self.documentData.variables.count)
 	{
 		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
 	}
 	else
 	{
-		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(MAX_TABLE_VIEW_ITEMS)],[numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
+		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(self.documentData.variables.count)],[numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
 	}
 	
 	if (valuesDisplayedString && variableCount != 1)
