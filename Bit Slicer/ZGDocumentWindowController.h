@@ -110,6 +110,8 @@
 
 - (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;
 
+- (void)updateObservingProcessOcclusionState;
+
 - (void)removeRunningProcessFromPopupButton:(ZGRunningProcess *)oldRunningProcess;
 
 @end

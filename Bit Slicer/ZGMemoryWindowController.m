@@ -121,12 +121,24 @@
 	if (([self.window occlusionState] & NSWindowOcclusionStateVisible) == 0)
 	{
 		[self destroyUpdateDisplayTimer];
+		
+		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
 	}
 	else
 	{
 		if (self.updateDisplayTimer == nil)
 		{
 			[self makeUpdateDisplayTimer];
+		}
+		
+		if (self.currentProcess.valid)
+		{
+			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+		}
+		else
+		{
+			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
 		}
 	}
 }

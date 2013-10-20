@@ -139,10 +139,51 @@
 	[self loadDocumentUserInterface];
 }
 
+- (void)updateObservingProcessOcclusionState
+{
+	if ([self.window respondsToSelector:@selector(occlusionState)])
+	{
+		BOOL shouldKeepWatchVariablesTimer = [self.tableController updateWatchVariablesTimer];
+		if (self.isOccluded && !shouldKeepWatchVariablesTimer && !self.searchController.canCancelTask)
+		{
+			BOOL foundRunningScript = NO;
+			for (ZGVariable *variable in self.documentData.variables)
+			{
+				if (variable.enabled && variable.type == ZGScript)
+				{
+					foundRunningScript = YES;
+					break;
+				}
+			}
+			
+			if (!foundRunningScript)
+			{
+				if (self.currentProcess.valid)
+				{
+					[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+				}
+				
+				[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+			}
+		}
+		else if (!self.isOccluded)
+		{
+			if (self.currentProcess.valid)
+			{
+				[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+			}
+			else
+			{
+				[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+			}
+		}
+	}
+}
+
 - (void)windowDidChangeOcclusionState:(NSNotification *)notification
 {
 	self.isOccluded = (self.window.occlusionState & NSWindowOcclusionStateVisible) == 0;
-	[self.tableController updateWatchVariablesTimer];
+	[self updateObservingProcessOcclusionState];
 }
 
 - (void)windowWillClose:(NSNotification *)notification

@@ -479,6 +479,8 @@ static dispatch_queue_t gPythonQueue;
 							[[NSProcessInfo processInfo] endActivity:self.scriptActivity];
 							self.scriptActivity = nil;
 						}
+						
+						[self.windowController updateObservingProcessOcclusionState];
 					});
 				}
 			});

@@ -465,10 +465,11 @@
 			self.documentData.variables = [NSArray arrayWithArray:notSearchedVariables];
 			self.searchResults = self.temporarySearchResults;
 			[self fetchVariablesFromResults];
-			[self.windowController.tableController updateWatchVariablesTimer];
 			[self.windowController.tableController.variablesTableView reloadData];
 		}
 	}
+	
+	[self.windowController updateObservingProcessOcclusionState];
 	
 	self.temporarySearchResults = nil;
 	
@@ -750,6 +751,7 @@
 			{
 				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
 			}
+			
 			[self finalizeSearchWithNotSearchedVariables:notSearchedVariables];
 		}];
 	}

@@ -101,7 +101,7 @@
 
 #pragma mark Updating Table
 
-- (void)updateWatchVariablesTimer
+- (BOOL)updateWatchVariablesTimer
 {
 	BOOL shouldHaveTimer = NO;
 	
@@ -152,6 +152,8 @@
 		[self.watchVariablesTimer invalidate];
 		self.watchVariablesTimer = nil;
 	}
+	
+	return shouldHaveTimer;
 }
 
 - (BOOL)updateVariableValuesInRange:(NSRange)variableRange

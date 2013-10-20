@@ -119,6 +119,8 @@
 		[[NSProcessInfo processInfo] endActivity:self.watchActivity];
 		self.watchActivity = nil;
 	}
+	
+	[self.windowController updateObservingProcessOcclusionState];
 }
 
 - (void)watchProcessDied:(NSNotification *)notification
