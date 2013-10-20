@@ -40,10 +40,6 @@
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
 
-@interface ZGMemoryWindowController ()
-
-@end
-
 @implementation ZGMemoryWindowController
 
 #pragma mark Birth
@@ -103,18 +99,56 @@
 	return 0.5;
 }
 
+- (void)makeUpdateDisplayTimer
+{
+	self.updateDisplayTimer =
+	[NSTimer
+	 scheduledTimerWithTimeInterval:[self displayMemoryTimeInterval]
+	 target:self
+	 selector:@selector(updateDisplayTimer:)
+	 userInfo:nil
+	 repeats:YES];
+}
+
+- (void)destroyUpdateDisplayTimer
+{
+	[self.updateDisplayTimer invalidate];
+	self.updateDisplayTimer = nil;
+}
+
+- (void)windowDidChangeOcclusionState:(NSNotification *)notification
+{
+	if (([self.window occlusionState] & NSWindowOcclusionStateVisible) == 0)
+	{
+		[self destroyUpdateDisplayTimer];
+	}
+	else
+	{
+		if (self.updateDisplayTimer == nil)
+		{
+			[self makeUpdateDisplayTimer];
+		}
+	}
+}
+
+- (void)windowDidLoad
+{
+	if ([self.window respondsToSelector:@selector(occlusionState)])
+	{
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(windowDidChangeOcclusionState:)
+		 name:NSWindowDidChangeOcclusionStateNotification
+		 object:self.window];
+	}
+}
+
 // This is intended to be called when the window shows up - either from showWindow: or from window restoration
 - (void)windowDidShow:(id)sender
 {
-	if (!self.updateDisplayTimer)
+	if (self.updateDisplayTimer == nil)
 	{
-		self.updateDisplayTimer =
-		[NSTimer
-		 scheduledTimerWithTimeInterval:[self displayMemoryTimeInterval]
-		 target:self
-		 selector:@selector(updateDisplayTimer:)
-		 userInfo:nil
-		 repeats:YES];
+		[self makeUpdateDisplayTimer];
 	}
 	
 	if (!self.windowDidAppear)
@@ -144,8 +178,7 @@
 {
 	if ([notification object] == self.window)
 	{
-		[self.updateDisplayTimer invalidate];
-		self.updateDisplayTimer = nil;
+		[self destroyUpdateDisplayTimer];
 		
 		if (self.currentProcess.valid)
 		{

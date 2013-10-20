@@ -121,13 +121,13 @@
 		 object:self.window];
 	}
 	
-	if ([ZGAppController isRunningOnMavericksOrLater])
+	if ([self.window respondsToSelector:@selector(occlusionState)])
 	{
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
-		 selector:@selector(applicationDidChangeOcclusionState:)
-		 name:NSApplicationDidChangeOcclusionStateNotification
-		 object:nil];
+		 selector:@selector(windowDidChangeOcclusionState:)
+		 name:NSWindowDidChangeOcclusionStateNotification
+		 object:self.window];
 	}
 	
 	[[NSNotificationCenter defaultCenter]
@@ -139,9 +139,9 @@
 	[self loadDocumentUserInterface];
 }
 
-- (void)applicationDidChangeOcclusionState:(NSNotification *)notification
+- (void)windowDidChangeOcclusionState:(NSNotification *)notification
 {
-	self.isOccluded = ([self.window occlusionState] & NSWindowOcclusionStateVisible) != 0;
+	self.isOccluded = (self.window.occlusionState & NSWindowOcclusionStateVisible) == 0;
 	[self.tableController updateWatchVariablesTimer];
 }
 

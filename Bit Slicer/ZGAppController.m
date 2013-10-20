@@ -76,11 +76,6 @@
 	return actualMajorVersion > majorVersion || (actualMajorVersion == majorVersion && actualMinorVersion >= minorVersion);
 }
 
-+ (BOOL)isRunningOnMavericksOrLater
-{
-	return [self isRunningOnAtLeastMajorVersion:10 minorVersion:9];
-}
-
 + (BOOL)isRunningOnLionOrLater
 {
 	return [self isRunningOnAtLeastMajorVersion:10 minorVersion:7];

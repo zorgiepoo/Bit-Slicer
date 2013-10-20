@@ -53,7 +53,6 @@
 
 + (id)sharedController;
 
-+ (BOOL)isRunningOnMavericksOrLater;
 + (BOOL)isRunningOnLionOrLater;
 
 + (void)registerPauseAndUnpauseHotKey;
