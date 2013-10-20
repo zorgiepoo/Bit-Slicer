@@ -266,7 +266,7 @@
 		
 		self.pollRequestCount--;
 		
-		if (self.pollRequestCount == 0 && self.priorityProcesses	.count == 0)
+		if (self.pollRequestCount == 0 && self.priorityProcesses.count == 0)
 		{
 			[self destroyPollTimer];
 		}

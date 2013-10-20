@@ -34,8 +34,6 @@
 
 #import <Foundation/Foundation.h>
 
-#define MAX_TABLE_VIEW_ITEMS ((NSUInteger)1000)
-
 @class ZGDocumentWindowController;
 
 @interface ZGDocumentTableController : NSObject <NSTableViewDelegate>
@@ -45,6 +43,7 @@
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
+- (BOOL)updateWatchVariablesTimer;
 - (BOOL)updateVariableValuesInRange:(NSRange)variableRange;
 
 - (void)clearCache;

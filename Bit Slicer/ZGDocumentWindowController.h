@@ -86,6 +86,8 @@
 @property (strong) ZGDocumentBreakPointController *documentBreakPointController;
 @property (strong) ZGScriptManager *scriptManager;
 
+@property (nonatomic) BOOL isOccluded;
+
 @property (strong, nonatomic) ZGProcess *currentProcess;
 
 @property (assign, nonatomic) ZGDocumentData *documentData;
@@ -107,6 +109,8 @@
 - (BOOL)isFunctionTypeStore;
 
 - (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;
+
+- (void)updateObservingProcessOcclusionState;
 
 - (void)removeRunningProcessFromPopupButton:(ZGRunningProcess *)oldRunningProcess;
 

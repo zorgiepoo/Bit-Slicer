@@ -52,10 +52,11 @@
 
 @interface ZGDocumentBreakPointController ()
 
-@property (strong, nonatomic) ZGProcess *watchProcess;
-@property (strong, nonatomic) NSMutableArray *foundBreakPointAddresses;
+@property (nonatomic) ZGProcess *watchProcess;
+@property (nonatomic) NSMutableArray *foundBreakPointAddresses;
 @property (assign, nonatomic) NSUInteger variableInsertionIndex;
 @property (assign, nonatomic) ZGDocumentWindowController *windowController;
+@property (nonatomic) id watchActivity;
 
 @end
 
@@ -112,6 +113,14 @@
 	[self.foundBreakPointAddresses removeAllObjects];
 	
 	[self.windowController.searchController resumeFromTaskAndMakeSearchFieldFirstResponder:NO];
+	
+	if (self.watchActivity != nil)
+	{
+		[[NSProcessInfo processInfo] endActivity:self.watchActivity];
+		self.watchActivity = nil;
+	}
+	
+	[self.windowController updateObservingProcessOcclusionState];
 }
 
 - (void)watchProcessDied:(NSNotification *)notification
@@ -214,6 +223,11 @@
 		[self.windowController.searchingProgressIndicator startAnimation:nil];
 		
 		self.watchProcess = self.windowController.currentProcess;
+		
+		if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+		{
+			self.watchActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Watching Data Accesses"];
+		}
 	}
 	else
 	{

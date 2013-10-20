@@ -49,6 +49,8 @@
 #import "ZGDocumentData.h"
 #import "ZGSearchFunctions.h"
 
+#define MAX_NUMBER_OF_VARIABLES_TO_FETCH ((NSUInteger)1000)
+
 @interface ZGDocumentSearchController ()
 
 @property (assign) ZGDocumentWindowController *windowController;
@@ -389,11 +391,11 @@
 
 - (void)fetchVariablesFromResults
 {
-	if (self.documentData.variables.count < MAX_TABLE_VIEW_ITEMS && self.searchResults.addressCount > 0)
+	if (self.documentData.variables.count < MAX_NUMBER_OF_VARIABLES_TO_FETCH && self.searchResults.addressCount > 0)
 	{
 		NSMutableArray *newVariables = [[NSMutableArray alloc] initWithArray:self.documentData.variables];
 		
-		NSUInteger numberOfVariables = MAX_TABLE_VIEW_ITEMS - self.documentData.variables.count;
+		NSUInteger numberOfVariables = MAX_NUMBER_OF_VARIABLES_TO_FETCH - self.documentData.variables.count;
 		if (numberOfVariables > self.searchResults.addressCount)
 		{
 			numberOfVariables = self.searchResults.addressCount;
@@ -429,10 +431,7 @@
 		self.documentData.variables = [NSArray arrayWithArray:newVariables];
 		if (self.documentData.variables.count > 0)
 		{
-			if ([self.windowController.tableController updateVariableValuesInRange:NSMakeRange(0, self.documentData.variables.count)])
-			{
-				[self.windowController.tableController.variablesTableView reloadData];
-			}
+			[self.windowController.tableController updateVariableValuesInRange:NSMakeRange(0, self.documentData.variables.count)];
 		}
 	}
 }
@@ -470,12 +469,14 @@
 		}
 	}
 	
+	[self.windowController updateObservingProcessOcclusionState];
+	
 	self.temporarySearchResults = nil;
 	
 	BOOL shouldMakeSearchFieldFirstResponder = YES;
 	
 	// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what he was looking for.
-	if (!self.searchProgress.shouldCancelSearch && self.documentData.variables.count <= MAX_TABLE_VIEW_ITEMS)
+	if (!self.searchProgress.shouldCancelSearch && self.documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
 	{
 		NSArray *filteredVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
 			return variable.enabled;
@@ -734,11 +735,22 @@
 		[self prepareTask];
 		[self.searchProgress clear];
 		
+		id searchDataActivity = nil;
+		if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+		{
+			searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
+		}
+		
 		[self createUserInterfaceTimer];
 		
 		[self searchVariablesByNarrowing:self.isInNarrowSearchMode withVariables:searchedVariables usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
 			self.userInterfaceTimer = nil;
+			
+			if (searchDataActivity != nil)
+			{
+				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
+			}
 			
 			[self finalizeSearchWithNotSearchedVariables:notSearchedVariables];
 		}];

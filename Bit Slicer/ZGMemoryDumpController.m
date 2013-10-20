@@ -227,6 +227,12 @@
 				 
 				 self.isBusy = YES;
 				 
+				 id dumpMemoryActivity = nil;
+				 if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+				 {
+					 dumpMemoryActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Dumping All Memory"];
+				 }
+				 
 				 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 					 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.memoryViewer.currentProcess.processTask, self.searchProgress))
 					 {
@@ -254,6 +260,11 @@
 						 [self.memoryDumpProgressWindow close];
 						 
 						 self.isBusy = NO;
+						 
+						 if (dumpMemoryActivity != nil)
+						 {
+							 [[NSProcessInfo processInfo] endActivity:dumpMemoryActivity];
+						 }
 					 });
 				 });
 			 });
