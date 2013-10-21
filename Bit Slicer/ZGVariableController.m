@@ -859,8 +859,7 @@
 			
 			if (ZGMemoryProtectionInRegion(self.windowController.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
 			{
-				// if !(the variable is within a single memory region and the memory region is not writable), then the variable is editable
-				if (!(memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_WRITE)))
+				if (variable.address >= memoryAddress && variable.address + variable.size <= memoryAddress + memorySize)
 				{
 					[validVariables addObject:variable];
 				}
@@ -870,7 +869,7 @@
 	
 	if (validVariables.count == 0)
 	{
-		NSRunAlertPanel(@"Writing Variables Failed", @"The selected variables could not be overwritten. Perhaps try to change the memory protection on the variable?", nil, nil, nil);
+		NSRunAlertPanel(@"Writing Variables Failed", @"The selected variables could not be overwritten.", nil, nil, nil);
 	}
 	else
 	{
