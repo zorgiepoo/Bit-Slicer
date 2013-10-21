@@ -426,9 +426,10 @@ static dispatch_queue_t gPythonQueue;
 						script.lastTime = [NSDate timeIntervalSinceReferenceDate];
 						script.deltaTime = 0;
 						
-						if (PyObject_HasAttrString(script.scriptObject, "execute"))
+						const char *executeFunctionName = "execute";
+						if (PyObject_HasAttrString(script.scriptObject, executeFunctionName))
 						{
-							script.executeFunction = PyObject_GetAttrString(script.scriptObject, "execute");
+							script.executeFunction = PyObject_GetAttrString(script.scriptObject, executeFunctionName);
 							
 							if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue)) != NULL)
 							{
