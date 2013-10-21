@@ -394,7 +394,19 @@ static dispatch_queue_t gPythonQueue;
 					PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);
 					PyObject_SetAttrString(script.module, "debug", script.debuggerInstance.object);
 					
+					id scriptInitActivity = nil;
+					if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+					{
+						scriptInitActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script initializer"];
+					}
+					
 					PyObject *initMethodResult = PyObject_CallMethod(script.scriptObject, "__init__", NULL);
+					
+					if (scriptInitActivity != nil)
+					{
+						[[NSProcessInfo processInfo] endActivity:scriptInitActivity];
+					}
+					
 					BOOL stillInitialized = Py_IsInitialized();
 					if (initMethodResult == NULL || !stillInitialized)
 					{
