@@ -511,9 +511,10 @@ static dispatch_queue_t gPythonQueue;
 		dispatch_async(gPythonQueue, ^{
 			if (script.finishedCount == scriptFinishedCount)
 			{
-				if (Py_IsInitialized() && self.windowController.currentProcess.valid && script.scriptObject != NULL)
+				const char *finishFunctionName = "finish";
+				if (Py_IsInitialized() && self.windowController.currentProcess.valid && script.scriptObject != NULL && PyObject_HasAttrString(script.scriptObject, finishFunctionName))
 				{
-					PyObject *retValue = PyObject_CallMethod(script.scriptObject, "finish", NULL);
+					PyObject *retValue = PyObject_CallMethod(script.scriptObject, (char *)finishFunctionName, NULL);
 					if (Py_IsInitialized())
 					{
 						if (retValue == NULL)
