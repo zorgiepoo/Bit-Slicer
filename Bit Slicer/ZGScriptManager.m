@@ -284,7 +284,7 @@ static dispatch_queue_t gPythonQueue;
 	
 	if (Py_IsInitialized())
 	{
-		retValue = PyObject_CallMethod(script.scriptObject, "execute", "d", script.deltaTime);
+		retValue = PyObject_CallFunction(script.executeFunction, "d", script.deltaTime);
 	}
 	
 	if (retValue == NULL)
@@ -414,33 +414,38 @@ static dispatch_queue_t gPythonQueue;
 						script.lastTime = [NSDate timeIntervalSinceReferenceDate];
 						script.deltaTime = 0;
 						
-						if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue)) != NULL)
+						if (PyObject_HasAttrString(script.scriptObject, "execute"))
 						{
-							dispatch_async(dispatch_get_main_queue(), ^{
-								if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
-								{
-									self.scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Running Scripts"];
-								}
-							});
+							script.executeFunction = PyObject_GetAttrString(script.scriptObject, "execute");
 							
-							dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
-							dispatch_source_set_event_handler(self.scriptTimer, ^{
-								for (ZGPyScript *script in self.runningScripts)
-								{
-									NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
-									script.deltaTime = currentTime - script.lastTime;
-									script.lastTime = currentTime;
-									[self executeScript:script];
-								}
-							});
-							dispatch_resume(self.scriptTimer);
-						}
-						
-						if (self.scriptTimer == NULL)
-						{
-							dispatch_async(dispatch_get_main_queue(), ^{
-								[self stopScriptForVariable:variable];
-							});
+							if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue)) != NULL)
+							{
+								dispatch_async(dispatch_get_main_queue(), ^{
+									if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+									{
+										self.scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Running Scripts"];
+									}
+								});
+								
+								dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
+								dispatch_source_set_event_handler(self.scriptTimer, ^{
+									for (ZGPyScript *script in self.runningScripts)
+									{
+										NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
+										script.deltaTime = currentTime - script.lastTime;
+										script.lastTime = currentTime;
+										[self executeScript:script];
+									}
+								});
+								dispatch_resume(self.scriptTimer);
+							}
+							
+							if (self.scriptTimer == NULL)
+							{
+								dispatch_async(dispatch_get_main_queue(), ^{
+									[self stopScriptForVariable:variable];
+								});
+							}
 						}
 					}
 					
@@ -510,6 +515,7 @@ static dispatch_queue_t gPythonQueue;
 				script.virtualMemoryInstance = nil;
 				script.debuggerInstance = nil;
 				script.scriptObject = NULL;
+				script.executeFunction = NULL;
 				script.finishedCount++;
 			}
 		});

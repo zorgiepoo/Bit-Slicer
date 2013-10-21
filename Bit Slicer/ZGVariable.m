@@ -308,8 +308,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			@"class Script(object):\n"
 			@"\tdef __init__(self):\n"
 			@"\t\tdebug.log('Initialization goes here')\n"
-			@"\tdef execute(self, deltaTime):\n"
-			@"\t\tpass\n"
+			@"\t#def execute(self, deltaTime):\n"
+			@"\t\t#write some interesting code, or don't implement me\n"
 			@"\tdef finish(self):\n"
 			@"\t\tdebug.log('Cleaning up goes here')\n";
 	}

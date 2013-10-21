@@ -46,6 +46,16 @@
 	return self;
 }
 
+- (void)setExecuteFunction:(PyObject *)executeFunction
+{
+	if (Py_IsInitialized())
+	{
+		Py_XDECREF(_executeFunction);
+	}
+	
+	_executeFunction = executeFunction;
+}
+
 - (NSString *)moduleName
 {
 	return [[self.path lastPathComponent] stringByDeletingPathExtension];
