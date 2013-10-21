@@ -435,7 +435,7 @@ static dispatch_queue_t gPythonQueue;
 								dispatch_async(dispatch_get_main_queue(), ^{
 									if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
 									{
-										self.scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Running Scripts"];
+										self.scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script execute timer"];
 									}
 								});
 								
