@@ -387,7 +387,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			}
 			else
 			{
-				ZGInstruction *foundInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:(breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) processTask:breakPoint.process.processTask pointerSize:breakPoint.process.pointerSize];
+				ZGInstruction *foundInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:(breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) inProcess:breakPoint.process];
 				foundInstructionAddress = foundInstruction.variable.address;
 			}
 			
