@@ -183,6 +183,10 @@
 - (void)windowDidChangeOcclusionState:(NSNotification *)notification
 {
 	self.isOccluded = (self.window.occlusionState & NSWindowOcclusionStateVisible) == 0;
+	if (!self.isOccluded)
+	{
+		[[ZGProcessList sharedProcessList] retrieveList];
+	}
 	[self updateObservingProcessOcclusionState];
 }
 

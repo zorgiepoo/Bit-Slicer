@@ -132,6 +132,8 @@
 			[self makeUpdateDisplayTimer];
 		}
 		
+		[[ZGProcessList sharedProcessList] retrieveList];
+		
 		if (self.currentProcess.valid)
 		{
 			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
