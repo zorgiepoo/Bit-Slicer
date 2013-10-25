@@ -55,6 +55,7 @@ typedef struct
 	int32_t processIdentifier;
 	char is64Bit;
 	__unsafe_unretained id <ZGBreakPointDelegate> breakPointDelegate;
+	__unsafe_unretained NSMutableDictionary *processCacheDictionary;
 } DebuggerClass;
 
 static PyMemberDef Debugger_members[] =
@@ -140,6 +141,7 @@ static PyTypeObject DebuggerType =
 @interface ZGPyDebugger ()
 
 @property (nonatomic) NSMutableDictionary *cachedInstructionPointers;
+@property (nonatomic) NSMutableDictionary *processCacheDictionary;
 
 @end
 
@@ -181,6 +183,8 @@ static PyTypeObject DebuggerType =
 		debuggerObject->breakPointDelegate = self;
 		
 		self.cachedInstructionPointers = [[NSMutableDictionary alloc] init];
+		
+		self.processCacheDictionary = [process.cacheDictionary mutableCopy];
 	}
 	return self;
 }
@@ -449,7 +453,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	NSNumber *cachedInstructionAddress = [self.cachedInstructionPointers objectForKey:instructionPointer];
 	if (cachedInstructionAddress == nil)
 	{
-		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue] processTask:((DebuggerClass *)self.object)->processTask pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue] processTask:((DebuggerClass *)self.object)->processTask pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t) cacheDictionary:self.processCacheDictionary];
 	
 		instructionAddress = instruction.variable.address;
 		[self.cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointer];

@@ -92,6 +92,10 @@
 	if (success)
 	{
 		self.cacheDictionary = [[NSMutableDictionary alloc] init];
+		NSMutableDictionary *mappedPathDictionary = [[NSMutableDictionary alloc] init];
+		NSMutableDictionary *mappedBinaryDictionary = [[NSMutableDictionary alloc] init];
+		[self.cacheDictionary setObject:mappedPathDictionary forKey:ZGMappedPathDictionary];
+		[self.cacheDictionary setObject:mappedBinaryDictionary forKey:ZGMappedBinaryDictionary];
 		
 		NSArray *binaryRegions = ZGMachBinaryRegions(_processTask);
 		if (binaryRegions.count > 0)
@@ -102,22 +106,25 @@
 			{
 				NSString *lastPathComponent = [region.mappedPath lastPathComponent];
 				
-				if ([self.cacheDictionary objectForKey:region.mappedPath] == nil)
+				if ([mappedPathDictionary objectForKey:region.mappedPath] == nil)
 				{
-					[self.cacheDictionary setObject:@(region.address) forKey:region.mappedPath];
+					[mappedPathDictionary setObject:@(region.address) forKey:region.mappedPath];
 				}
-				if ([self.cacheDictionary objectForKey:lastPathComponent] == nil)
+				if ([mappedPathDictionary objectForKey:lastPathComponent] == nil)
 				{
-					[self.cacheDictionary setObject:@(region.address) forKey:lastPathComponent];
+					[mappedPathDictionary setObject:@(region.address) forKey:lastPathComponent];
 				}
 				if ([[region.mappedPath stringByDeletingLastPathComponent] length] > 0)
 				{
 					NSString *forwardSlashedPrependedPath = [@"/" stringByAppendingString:lastPathComponent];
-					if ([self.cacheDictionary objectForKey:forwardSlashedPrependedPath] == nil)
+					if ([mappedPathDictionary objectForKey:forwardSlashedPrependedPath] == nil)
 					{
-						[self.cacheDictionary setObject:@(region.address) forKey:forwardSlashedPrependedPath];
+						[mappedPathDictionary setObject:@(region.address) forKey:forwardSlashedPrependedPath];
 					}
 				}
+				
+				// Region address -> mach binary address
+				[mappedBinaryDictionary setObject:@(region.address) forKey:@(region.address)];
 			}
 		}
 	}

@@ -437,10 +437,10 @@ enum ZGStepExecution
 
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
-	return [self findInstructionBeforeAddress:address processTask:process.processTask pointerSize:process.pointerSize];
+	return [self findInstructionBeforeAddress:address processTask:process.processTask pointerSize:process.pointerSize cacheDictionary:process.cacheDictionary];
 }
 
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize
+- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize cacheDictionary:(NSMutableDictionary *)cacheDictionary
 {
 	ZGInstruction *instruction = nil;
 	
@@ -464,7 +464,7 @@ enum ZGStepExecution
 			startAddress = targetRegion.address;
 		}
 		
-		ZGMemoryAddress firstInstructionAddress = ZGTextRange(processTask, targetRegion, NULL, NULL, NULL).location;
+		ZGMemoryAddress firstInstructionAddress = ZGTextRange(processTask, targetRegion, NULL, NULL, NULL, cacheDictionary).location;
 		
 		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
 		{
@@ -1070,7 +1070,7 @@ enum ZGStepExecution
 		
 		NSString *firstMappedFilePath = @"";
 		ZGMemoryAddress firstBaseAddress = 0;
-		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, ZGBaseExecutableRegion(self.currentProcess.processTask), &firstMappedFilePath, &firstBaseAddress, NULL);
+		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, ZGBaseExecutableRegion(self.currentProcess.processTask), &firstMappedFilePath, &firstBaseAddress, NULL, self.currentProcess.cacheDictionary);
 		
 		if (calculatedMemoryAddress == 0)
 		{
@@ -1125,7 +1125,7 @@ enum ZGStepExecution
 		
 		if (!shouldUseFirstInstruction)
 		{
-			NSRange textRange = ZGTextRange(self.currentProcess.processTask, chosenRegion, &mappedFilePath, &baseAddress, NULL);
+			NSRange textRange = ZGTextRange(self.currentProcess.processTask, chosenRegion, &mappedFilePath, &baseAddress, NULL, self.currentProcess.cacheDictionary);
 			firstInstructionAddress = textRange.location;
 			maxInstructionsSize = textRange.length;
 			if (firstInstructionAddress + maxInstructionsSize < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
@@ -2066,7 +2066,7 @@ END_DEBUGGER_CHANGE:
 		int consumedLength = JUMP_REL32_INSTRUCTION_LENGTH;
 		while (consumedLength > 0)
 		{
-			ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 processTask:processTask pointerSize:pointerSize];
+			ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 processTask:processTask pointerSize:pointerSize cacheDictionary:nil];
 			if (newInstruction == nil)
 			{
 				instructions = nil;

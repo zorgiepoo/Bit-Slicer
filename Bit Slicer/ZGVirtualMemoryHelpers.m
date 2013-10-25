@@ -465,11 +465,27 @@ NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemo
 	return sectionName;
 }
 
-NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide)
+NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary)
 {
 	ZGMemoryAddress textAddress = 0;
 	ZGMemorySize textSize = 0;
-	ZGGetMappedRegionInfo(processTask, region, mappedFilePath, machHeaderAddress, &textAddress, slide, &textSize, NULL, NULL);
+	ZGMemoryAddress machHeaderAddressReturned = 0;
+	
+	NSMutableDictionary *mappedBinaryDictionary = [cacheDictionary objectForKey:ZGMappedBinaryDictionary];
+	NSNumber *cachedMachHeaderAddress = [mappedBinaryDictionary objectForKey:@(region.address)];
+	if (cachedMachHeaderAddress != nil)
+	{
+		machHeaderAddressReturned = [cachedMachHeaderAddress unsignedLongLongValue];
+		ZGGetMachBinaryInfo(processTask, machHeaderAddressReturned, &textAddress, slide, &textSize, NULL, NULL);
+		if (mappedFilePath != NULL) *mappedFilePath = ZGMappedFilePath(processTask, region.address);
+	}
+	else
+	{
+		ZGGetMappedRegionInfo(processTask, region, mappedFilePath, &machHeaderAddressReturned, &textAddress, slide, &textSize, NULL, NULL);
+		[mappedBinaryDictionary setObject:@(machHeaderAddressReturned) forKey:@(region.address)];
+	}
+	
+	if (machHeaderAddress != NULL) *machHeaderAddress = machHeaderAddressReturned;
 	
 	return NSMakeRange(textAddress, textSize);
 }
@@ -486,7 +502,7 @@ ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary
 		ZGRegion *region = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize];
 		NSString *mappedFilePath = nil;
 		ZGMemoryAddress machHeaderAddress = 0x0;
-		NSRange textRange = ZGTextRange(processTask, region, &mappedFilePath, &machHeaderAddress, slide);
+		NSRange textRange = ZGTextRange(processTask, region, &mappedFilePath, &machHeaderAddress, slide, cacheDictionary);
 		if (textRange.location <= instructionAddress && textRange.location + textRange.length >= instructionAddress + instructionSize && mappedFilePath != nil)
 		{
 			NSError *error = nil;
@@ -512,14 +528,15 @@ ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap processTask)
 ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error)
 {
 	ZGMemoryAddress foundAddress = 0x0;
-	NSNumber *addressNumber = [cacheDictionary objectForKey:partialImageName];
+	NSMutableDictionary *mappedPathDictionary = [cacheDictionary objectForKey:ZGMappedPathDictionary];
+	NSNumber *addressNumber = [mappedPathDictionary objectForKey:partialImageName];
 	if (addressNumber == nil)
 	{
 		ZGRegion *foundRegion = ZGFindExecutableImage(processTask, partialImageName);
 		if (foundRegion != nil)
 		{
 			foundAddress = foundRegion.address;
-			[cacheDictionary setObject:@(foundAddress) forKey:partialImageName];
+			[mappedPathDictionary setObject:@(foundAddress) forKey:partialImageName];
 		}
 		else if (error != NULL)
 		{

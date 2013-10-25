@@ -40,6 +40,8 @@ extern "C" {
 #endif
 	
 #define ZGImageName @"ZGImageName"
+#define ZGMappedPathDictionary @"ZGMappedPathDictionary"
+#define ZGMappedBinaryDictionary @"ZGMappedBinaryDictionary"
 
 @class ZGSearchData;
 @class ZGSearchProgress;
@@ -51,7 +53,7 @@ void ZGFreeTask(ZGMemoryMap task);
 
 ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap processTask);
 ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap processTask);
-NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide);
+NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary);
 
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
 NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
