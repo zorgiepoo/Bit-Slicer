@@ -122,19 +122,19 @@
 - (void)retrieveList
 {
 	struct kinfo_proc *processList = NULL;
-    size_t length = 0;
-	
-    static const int name[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
-	
-    // Call sysctl with a NULL buffer to get proper length
-    if (sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1, NULL, &length, NULL, 0) != 0) return;
-	
-    // Allocate buffer
-    processList = malloc(length);
-    if (!processList) return;
-	
-    // Get the actual process list
-    if (sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1, processList, &length, NULL, 0) != 0)
+	size_t length = 0;
+
+	static const int name[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
+
+	// Call sysctl with a NULL buffer to get proper length
+	if (sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1, NULL, &length, NULL, 0) != 0) return;
+
+	// Allocate buffer
+	processList = malloc(length);
+	if (!processList) return;
+
+	// Get the actual process list
+	if (sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1, processList, &length, NULL, 0) != 0)
 	{
 		free(processList);
 		return;
@@ -142,10 +142,10 @@
 	
 	NSMutableArray *newRunningProcesses = [[NSMutableArray alloc] init];
 	
-    int processCount = (int)(length / sizeof(struct kinfo_proc));
-    for (int processIndex = 0; processIndex < processCount; processIndex++)
+	int processCount = (int)(length / sizeof(struct kinfo_proc));
+	for (int processIndex = 0; processIndex < processCount; processIndex++)
 	{
-        uid_t uid = processList[processIndex].kp_eproc.e_ucred.cr_uid;
+		uid_t uid = processList[processIndex].kp_eproc.e_ucred.cr_uid;
 		pid_t processID = processList[processIndex].kp_proc.p_pid;
 		
 		// I want user processes and I don't want zombies!
@@ -177,7 +177,7 @@
 				}
 			}
 		}
-    }
+	}
 	
 	NSMutableArray *currentProcesses = [self mutableArrayValueForKey:@"runningProcesses"];
 	
