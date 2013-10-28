@@ -598,7 +598,7 @@
 			NSString *userTagDescription = ZGUserTagDescription(self.windowController.currentProcess.processTask, variable.address, variable.size);
 			NSString *mappedFilePath = nil;
 			ZGMemorySize relativeOffset = 0;
-			NSString *sectionName = ZGSectionName(self.windowController.currentProcess.processTask, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL);
+			NSString *sectionName = ZGSectionName(self.windowController.currentProcess.processTask, self.windowController.currentProcess.pointerSize, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL);
 			
 			if (userTagDescription != nil || sectionName != nil)
 			{

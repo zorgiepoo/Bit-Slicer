@@ -122,7 +122,7 @@
 					}
 					else
 					{
-						foundAddress = ZGFindExecutableImageWithCache(process.processTask, expression.variable, process.cacheDictionary, error);
+						foundAddress = ZGFindExecutableImageWithCache(process.processTask, process.pointerSize, expression.variable, process.cacheDictionary, error);
 						if (error != NULL && *error != nil)
 						{
 							NSError *imageError = *error;

@@ -464,7 +464,7 @@ enum ZGStepExecution
 			startAddress = targetRegion.address;
 		}
 		
-		ZGMemoryAddress firstInstructionAddress = ZGTextRange(processTask, targetRegion, NULL, NULL, NULL, cacheDictionary).location;
+		ZGMemoryAddress firstInstructionAddress = ZGTextRange(processTask, pointerSize, address, NULL, NULL, NULL, cacheDictionary).location;
 		
 		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
 		{
@@ -1044,7 +1044,7 @@ enum ZGStepExecution
 		if (self.mappedFilePath != nil && sender == nil)
 		{
 			NSError *error = nil;
-			ZGMemoryAddress guessAddress = ZGFindExecutableImageWithCache(self.currentProcess.processTask, self.mappedFilePath, self.currentProcess.cacheDictionary, &error) + self.offsetFromBase;
+			ZGMemoryAddress guessAddress = ZGFindExecutableImageWithCache(self.currentProcess.processTask, self.currentProcess.pointerSize, self.mappedFilePath, self.currentProcess.cacheDictionary, &error) + self.offsetFromBase;
 			if (error == nil)
 			{
 				calculatedMemoryAddress = guessAddress;
@@ -1070,7 +1070,7 @@ enum ZGStepExecution
 		
 		NSString *firstMappedFilePath = @"";
 		ZGMemoryAddress firstBaseAddress = 0;
-		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, ZGBaseExecutableRegion(self.currentProcess.processTask), &firstMappedFilePath, &firstBaseAddress, NULL, self.currentProcess.cacheDictionary);
+		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, ZGBaseExecutableRegion(self.currentProcess.processTask).address, &firstMappedFilePath, &firstBaseAddress, NULL, self.currentProcess.cacheDictionary);
 		
 		if (calculatedMemoryAddress == 0)
 		{
@@ -1125,9 +1125,20 @@ enum ZGStepExecution
 		
 		if (!shouldUseFirstInstruction)
 		{
-			NSRange textRange = ZGTextRange(self.currentProcess.processTask, chosenRegion, &mappedFilePath, &baseAddress, NULL, self.currentProcess.cacheDictionary);
-			firstInstructionAddress = textRange.location;
-			maxInstructionsSize = textRange.length;
+			NSRange textRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, calculatedMemoryAddress, &mappedFilePath, &baseAddress, NULL, self.currentProcess.cacheDictionary);
+			
+			if (textRange.length > 0)
+			{
+				firstInstructionAddress = textRange.location;
+				maxInstructionsSize = textRange.length;
+			}
+			else if (mappedFilePath.length > 0)
+			{
+				// TODO: actually try to directly read mach header from file
+				firstInstructionAddress = baseAddress;
+				maxInstructionsSize = (ZGMemorySize)-1;
+			}
+			
 			if (firstInstructionAddress + maxInstructionsSize < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
 			{
 				// let's use the chosen region if the text section doesn't intersect with it
@@ -1469,7 +1480,7 @@ END_DEBUGGER_CHANGE:
 		{
 			NSString *partialPath = nil;
 			ZGMemoryAddress slide = 0;
-			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.currentProcess.processTask, self.currentProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
+			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
 			if (partialPath != nil && (slide > 0 || instruction.variable.address - relativeOffset > self.currentProcess.baseAddress))
 			{
 				instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, partialPath];

@@ -39,6 +39,7 @@
 #define NON_EXISTENT_PID_NUMBER -1
 
 @class ZGSearchProgress;
+@class ZGRegion;
 
 @interface ZGProcess : NSObject
 

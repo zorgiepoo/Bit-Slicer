@@ -53,7 +53,6 @@ void ZGFreeTask(ZGMemoryMap task);
 
 ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap processTask);
 ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap processTask);
-NSRange ZGTextRange(ZGMemoryMap processTask, ZGRegion *region, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary);
 
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
 NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
@@ -62,13 +61,15 @@ NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask);
 	
 NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
 
-ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error);
-ZGRegion *ZGFindExecutableImage(ZGMemoryMap processTask, NSString *partialImageName);
+ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error);
 
-ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName);
+NSArray *ZGMachBinaryRegions(ZGMemoryMap processTask, ZGMemoryAddress pointerSize);
+	
+NSRange ZGTextRange(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary);
 
-NSArray *ZGMachBinaryRegions(ZGMemoryMap processTask);
-NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide);
+ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName);
+	
+NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide);
 
 void ZGFreeData(NSArray *dataArray);
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress);

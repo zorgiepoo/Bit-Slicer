@@ -403,9 +403,10 @@
 		}
 		
 		ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
-		ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
+		ZGProcess *currentProcess = self.windowController.currentProcess;
+		ZGMemorySize pointerSize = currentProcess.pointerSize;
 		
-		NSArray *machBinaryRegions = ZGMachBinaryRegions(self.windowController.currentProcess.processTask);
+		NSArray *machBinaryRegions = ZGMachBinaryRegions(currentProcess.processTask, pointerSize);
 		__block ZGRegion *lastFoundRegion = nil;
 		
 		ZGMemorySize dataSize = self.searchResults.dataSize;

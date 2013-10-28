@@ -625,7 +625,7 @@ static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
 	if (PyArg_ParseTuple(args, "s:base", &partialPath))
 	{
 		NSError *error = nil;
-		ZGMemoryAddress imageAddress = ZGFindExecutableImageWithCache(self->processTask, [NSString stringWithUTF8String:partialPath], self->processCacheDictionary, &error);
+		ZGMemoryAddress imageAddress = ZGFindExecutableImageWithCache(self->processTask, self->is64Bit ? sizeof(ZGMemoryAddress) : sizeof(ZG32BitMemoryAddress), [NSString stringWithUTF8String:partialPath], self->processCacheDictionary, &error);
 		if (error == nil)
 		{
 			result = Py_BuildValue("K", imageAddress);

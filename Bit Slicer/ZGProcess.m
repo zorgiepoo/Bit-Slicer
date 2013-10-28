@@ -90,14 +90,14 @@
 {
 	BOOL success = ZGGetTaskForProcess(self.processID, &_processTask);
 	if (success)
-	{
+	{	
 		self.cacheDictionary = [[NSMutableDictionary alloc] init];
 		NSMutableDictionary *mappedPathDictionary = [[NSMutableDictionary alloc] init];
 		NSMutableDictionary *mappedBinaryDictionary = [[NSMutableDictionary alloc] init];
 		[self.cacheDictionary setObject:mappedPathDictionary forKey:ZGMappedPathDictionary];
 		[self.cacheDictionary setObject:mappedBinaryDictionary forKey:ZGMappedBinaryDictionary];
 		
-		NSArray *binaryRegions = ZGMachBinaryRegions(_processTask);
+		NSArray *binaryRegions = ZGMachBinaryRegions(_processTask, self.pointerSize);
 		if (binaryRegions.count > 0)
 		{
 			self.baseAddress = [(ZGRegion *)[binaryRegions objectAtIndex:0] address];
