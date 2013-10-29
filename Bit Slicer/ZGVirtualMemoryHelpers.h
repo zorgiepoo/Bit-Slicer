@@ -46,6 +46,7 @@ extern "C" {
 @class ZGSearchData;
 @class ZGSearchProgress;
 @class ZGRegion;
+@class ZGMachBinary;
 
 BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task);
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
@@ -63,12 +64,10 @@ NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address,
 
 ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error);
 
-#define ZGMachHeaderAddress @"ZGMachHeaderAddress"
-#define ZGMachFilePathAddress @"ZGMachFilePathAddress"
-NSArray *ZGMachBinaryAddressesAndFilePaths(ZGMemoryMap processTask, ZGMemoryAddress pointerSize);
+NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize);
 NSString *ZGFilePathAtAddress(ZGMemoryMap processTask, ZGMemoryAddress filePathAddress);
-	
-NSDictionary *ZGNearestMachHeader(NSArray *machBinaries, ZGMemoryAddress targetAddress);
+
+ZGMachBinary *ZGNearestMachBinary(NSArray *machBinaries, ZGMemoryAddress targetAddress);
 	
 void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, NSString *mappedFilePath, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize);
 	

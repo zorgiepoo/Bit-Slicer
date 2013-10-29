@@ -47,6 +47,7 @@
 		77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D081800639E00549A37 /* stepin.pdf */; };
 		77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D091800639E00549A37 /* stepout.pdf */; };
 		77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D0A1800639E00549A37 /* stepover.pdf */; };
+		77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E9DBCD181F812E009F4982 /* ZGMachBinary.m */; };
 		77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
 		77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
 		77F115A817D2E87E009E002A /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115A717D2E87E009E002A /* VDKQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -299,6 +300,8 @@
 		77DA9D081800639E00549A37 /* stepin.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepin.pdf; path = "Bit Slicer/debuggericons/stepin.pdf"; sourceTree = "<group>"; };
 		77DA9D091800639E00549A37 /* stepout.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepout.pdf; path = "Bit Slicer/debuggericons/stepout.pdf"; sourceTree = "<group>"; };
 		77DA9D0A1800639E00549A37 /* stepover.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepover.pdf; path = "Bit Slicer/debuggericons/stepover.pdf"; sourceTree = "<group>"; };
+		77E9DBCC181F812E009F4982 /* ZGMachBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMachBinary.h; path = "Bit Slicer/ZGMachBinary.h"; sourceTree = "<group>"; };
+		77E9DBCD181F812E009F4982 /* ZGMachBinary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMachBinary.m; path = "Bit Slicer/ZGMachBinary.m"; sourceTree = "<group>"; };
 		77F115A517D2E865009E002A /* HFLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HFLineCountingView.h; sourceTree = "<group>"; };
 		77F115A617D2E87E009E002A /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VDKQueue.h; path = deps/VDKQueue.h; sourceTree = "<group>"; };
 		77F115A717D2E87E009E002A /* VDKQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VDKQueue.m; path = deps/VDKQueue.m; sourceTree = "<group>"; };
@@ -878,6 +881,8 @@
 				77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */,
 				77F1162317D2EF31009E002A /* ZGRegion.h */,
 				77F1162417D2EF31009E002A /* ZGRegion.m */,
+				77E9DBCC181F812E009F4982 /* ZGMachBinary.h */,
+				77E9DBCD181F812E009F4982 /* ZGMachBinary.m */,
 			);
 			name = "Virtual Memory";
 			sourceTree = "<group>";
@@ -1074,6 +1079,7 @@
 				77F1164917D2EFC8009E002A /* ZGBreakPointController.m in Sources */,
 				77F1164D17D2EFDA009E002A /* ZGBreakPoint.m in Sources */,
 				77F1165017D2EFE4009E002A /* ZGDebugThread.m in Sources */,
+				77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */,
 				77F1165317D2EFED009E002A /* ZGBacktraceController.m in Sources */,
 				77F1165617D2EFF5009E002A /* ZGRegistersController.m in Sources */,
 				77F1165917D2F001009E002A /* ZGRegister.m in Sources */,

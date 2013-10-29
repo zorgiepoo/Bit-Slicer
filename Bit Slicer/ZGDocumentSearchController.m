@@ -40,6 +40,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 #import "ZGRegion.h"
+#import "ZGMachBinary.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
@@ -308,11 +309,10 @@
 	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
 	ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
 	
-	NSDictionary *machBinary = ZGNearestMachHeader(machBinaries, variable.address);
+	ZGMachBinary *machBinary = ZGNearestMachBinary(machBinaries, variable.address);
+	ZGMemoryAddress machHeaderAddress = machBinary.headerAddress;
 	
-	ZGMemoryAddress machHeaderAddress = [[machBinary objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
-	
-	NSString *machFilePath = [machFilePathDictionary objectForKey:[machBinary objectForKey:ZGMachFilePathAddress]];
+	NSString *machFilePath = [machFilePathDictionary objectForKey:@(machBinary.filePathAddress)];
 	
 	if (machFilePath != nil)
 	{
@@ -343,9 +343,9 @@
 					}
 					
 					int numberOfMatchingPaths = 0;
-					for (NSDictionary *machBinary in machBinaries)
+					for (ZGMachBinary *binaryImage in machBinaries)
 					{
-						NSString *mappedPath = [machFilePathDictionary objectForKey:[machBinary objectForKey:ZGMachFilePathAddress]];
+						NSString *mappedPath = [machFilePathDictionary objectForKey:@(binaryImage.filePathAddress)];
 						if ([mappedPath hasSuffix:partialPath])
 						{
 							numberOfMatchingPaths++;
@@ -389,15 +389,14 @@
 		ZGProcess *currentProcess = self.windowController.currentProcess;
 		ZGMemorySize pointerSize = currentProcess.pointerSize;
 		
-		NSArray *machBinaries = ZGMachBinaryAddressesAndFilePaths(currentProcess.processTask, pointerSize);
+		NSArray *machBinaries = ZGMachBinaries(currentProcess.processTask, pointerSize);
 		NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
-		for (NSDictionary *machBinary in machBinaries)
+		for (ZGMachBinary *machBinary in machBinaries)
 		{
-			ZGMemoryAddress filePathAddress = [[machBinary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue];
-			NSString *filePath = ZGFilePathAtAddress(currentProcess.processTask, filePathAddress);
+			NSString *filePath = ZGFilePathAtAddress(currentProcess.processTask, machBinary.filePathAddress);
 			if (filePath != nil)
 			{
-				[machFilePathDictionary setObject:filePath forKey:@(filePathAddress)];
+				[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
 			}
 		}
 		

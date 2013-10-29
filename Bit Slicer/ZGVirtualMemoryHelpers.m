@@ -37,6 +37,7 @@
 #import "ZGRegion.h"
 #import "ZGSearchProgress.h"
 #import "ZGSearchData.h"
+#import "ZGMachBinary.h"
 #import "NSArrayAdditions.h"
 
 #import <mach/mach_error.h>
@@ -386,7 +387,7 @@ void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMe
 	}
 }
 
-NSArray *ZGMachBinaryAddressesAndFilePaths(ZGMemoryMap processTask, ZGMemoryAddress pointerSize)
+NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize)
 {
 	NSMutableArray *results = [[NSMutableArray alloc] init];
 	
@@ -414,7 +415,7 @@ NSArray *ZGMachBinaryAddressesAndFilePaths(ZGMemoryMap processTask, ZGMemoryAddr
 					
 					ZGMemoryAddress imageFilePathPointer = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)(infoImage + pointerSize) : *(ZGMemoryAddress *)(infoImage + pointerSize);
 					
-					[results addObject:@{ZGMachHeaderAddress : @(machHeaderPointer), ZGMachFilePathAddress : @(imageFilePathPointer)}];
+					[results addObject:[[ZGMachBinary alloc] initWithHeaderAddress:machHeaderPointer filePathAddress:imageFilePathPointer]];
 				}
 				ZGFreeBytes(processTask, infoArrayBytes, infoArraySize);
 			}
@@ -438,17 +439,15 @@ NSString *ZGFilePathAtAddress(ZGMemoryMap processTask, ZGMemoryAddress filePathA
 	return filePath;
 }
 
-NSDictionary *ZGNearestMachHeader(NSArray *machBinaries, ZGMemoryAddress targetAddress)
+ZGMachBinary *ZGNearestMachBinary(NSArray *machBinaries, ZGMemoryAddress targetAddress)
 {
 	id previousMachBinary = nil;
 	
-	for (NSDictionary *machHeader in machBinaries)
+	for (ZGMachBinary *machBinary in machBinaries)
 	{
-		ZGMemoryAddress machHeaderPointer = [[machHeader objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
+		if (machBinary.headerAddress > targetAddress) break;
 		
-		if (machHeaderPointer > targetAddress) break;
-		
-		previousMachBinary = machHeader;
+		previousMachBinary = machBinary;
 	}
 	
 	return previousMachBinary;
@@ -456,11 +455,11 @@ NSDictionary *ZGNearestMachHeader(NSArray *machBinaries, ZGMemoryAddress targetA
 
 void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
 {
-	NSDictionary *machBinary = ZGNearestMachHeader(ZGMachBinaryAddressesAndFilePaths(processTask, pointerSize), targetAddress);
+	ZGMachBinary *machBinary = ZGNearestMachBinary(ZGMachBinaries(processTask, pointerSize), targetAddress);
 	if (machBinary != nil)
 	{
-		ZGMemoryAddress returnedMachHeaderAddress = [[machBinary objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
-		ZGMemoryAddress returnedMachFilePathAddress = [[machBinary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue];
+		ZGMemoryAddress returnedMachHeaderAddress = machBinary.headerAddress;
+		ZGMemoryAddress returnedMachFilePathAddress = machBinary.filePathAddress;
 		
 		NSString *returnedFilePath = ZGFilePathAtAddress(processTask, returnedMachFilePathAddress);
 		
@@ -553,13 +552,12 @@ ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap processTask)
 ZGMemoryAddress ZGFindExecutableImage(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSString *partialImageName)
 {
 	ZGMemoryAddress foundAddress = 0;
-	for (NSDictionary *machBinaryDictionary in ZGMachBinaryAddressesAndFilePaths(processTask, pointerSize))
+	for (ZGMachBinary *machBinary in ZGMachBinaries(processTask, pointerSize))
 	{
-		ZGMemoryAddress machBinaryFilePathPointer = [[machBinaryDictionary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue];
-		NSString *mappedFilePath = ZGFilePathAtAddress(processTask, machBinaryFilePathPointer);
+		NSString *mappedFilePath = ZGFilePathAtAddress(processTask, machBinary.filePathAddress);
 		if ([mappedFilePath hasSuffix:partialImageName])
 		{
-			foundAddress = [[machBinaryDictionary objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
+			foundAddress = machBinary.headerAddress;
 			break;
 		}
 	}

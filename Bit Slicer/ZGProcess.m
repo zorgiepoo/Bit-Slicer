@@ -33,6 +33,7 @@
  */
 
 #import "ZGProcess.h"
+#import "ZGMachBinary.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 
@@ -96,15 +97,16 @@
 		[self.cacheDictionary setObject:mappedPathDictionary forKey:ZGMappedPathDictionary];
 		[self.cacheDictionary setObject:mappedBinaryDictionary forKey:ZGMappedBinaryDictionary];
 		
-		NSArray *machBinaries = ZGMachBinaryAddressesAndFilePaths(_processTask, self.pointerSize);
+		NSArray *machBinaries = ZGMachBinaries(_processTask, self.pointerSize);
 		if (machBinaries.count > 0)
 		{
-			self.baseAddress = [[[machBinaries objectAtIndex:0] objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
+			self.baseAddress = [[machBinaries objectAtIndex:0] headerAddress];
+			
 			// Set up initial cache for full paths, partial paths, and partial paths prepended with forward slashes
-			for (NSDictionary *machBinary in machBinaries)
+			for (ZGMachBinary *machBinary in machBinaries)
 			{
-				ZGMemoryAddress machAddress = [[machBinary objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
-				NSString *mappedPath = ZGFilePathAtAddress(_processTask, [[machBinary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue]);
+				ZGMemoryAddress machAddress = machBinary.headerAddress;
+				NSString *mappedPath = ZGFilePathAtAddress(_processTask, machBinary.filePathAddress);
 				NSString *lastPathComponent = [mappedPath lastPathComponent];
 				
 				if ([mappedPathDictionary objectForKey:mappedPath] == nil)
