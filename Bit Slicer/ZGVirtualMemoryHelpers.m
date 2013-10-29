@@ -304,7 +304,7 @@ else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
 void ZGParseMachHeader(ZGMemoryAddress machHeaderAddress, ZGMemorySize pointerSize, const void *machHeaderBytes, const void *minimumBoundaryPointer, ZGMemorySize maximumBoundarySize, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
 {
 	const struct mach_header_64 *machHeader = machHeaderBytes;
-	if (machHeader->magic == FAT_CIGAM)
+	if (machHeader->magic == FAT_CIGAM) // only interested in little endian
 	{
 		uint32_t numberOfArchitectures = CFSwapInt32BigToHost(((struct fat_header *)machHeader)->nfat_arch);
 		for (uint32_t architectureIndex = 0; architectureIndex < numberOfArchitectures; architectureIndex++)
@@ -408,7 +408,7 @@ NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize)
 		if (ZGReadBytes(processTask, allImageInfosAddress, (void **)&allImageInfos, &allImageInfosSize))
 		{
 			ZGMemoryAddress infoArrayAddress = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)&allImageInfos->infoArray : *(ZGMemoryAddress *)&allImageInfos->infoArray;
-			const ZGMemorySize imageInfoSize = pointerSize * 3;
+			const ZGMemorySize imageInfoSize = pointerSize * 3; // sizeof struct dyld_image_info
 			
 			void *infoArrayBytes = NULL;
 			ZGMemorySize infoArraySize = imageInfoSize * allImageInfos->infoArrayCount;
@@ -418,11 +418,11 @@ NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize)
 				{
 					void *infoImage = infoArrayBytes + imageInfoSize * infoIndex;
 					
-					ZGMemoryAddress machHeaderPointer = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)infoImage : *(ZGMemoryAddress *)infoImage;
+					ZGMemoryAddress machHeaderAddress = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)infoImage : *(ZGMemoryAddress *)infoImage;
 					
-					ZGMemoryAddress imageFilePathPointer = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)(infoImage + pointerSize) : *(ZGMemoryAddress *)(infoImage + pointerSize);
+					ZGMemoryAddress imageFilePathAddress = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)(infoImage + pointerSize) : *(ZGMemoryAddress *)(infoImage + pointerSize);
 					
-					[results addObject:[[ZGMachBinary alloc] initWithHeaderAddress:machHeaderPointer filePathAddress:imageFilePathPointer]];
+					[results addObject:[[ZGMachBinary alloc] initWithHeaderAddress:machHeaderAddress filePathAddress:imageFilePathAddress]];
 				}
 				ZGFreeBytes(processTask, infoArrayBytes, infoArraySize);
 			}

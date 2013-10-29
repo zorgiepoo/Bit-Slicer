@@ -42,4 +42,6 @@
 
 - (id)initWithHeaderAddress:(ZGMemoryAddress)headerAddress filePathAddress:(ZGMemoryAddress)filePathAddress;
 
+- (NSComparisonResult)compare:(ZGMachBinary *)binaryImage;
+
 @end
