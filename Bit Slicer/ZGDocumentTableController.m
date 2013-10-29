@@ -281,10 +281,10 @@
 					ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address, variable.freezeValue, variable.size);
 				}
 				
-				if (variable.type == ZGString16)
+				if (variable.type == ZGString8 || variable.type == ZGString16)
 				{
 					unichar terminatorValue = 0;
-					ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address + variable.size, &terminatorValue, sizeof(unichar));
+					ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address + variable.size, &terminatorValue, variable.type == ZGString8 ? sizeof(char) : sizeof(unichar));
 				}
 			}
 		}];
