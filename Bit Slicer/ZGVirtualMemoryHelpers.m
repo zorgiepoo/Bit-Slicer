@@ -212,6 +212,7 @@ NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address,
 			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_LARGE_REUSABLE)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_LARGE_REUSED)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_ANALYSIS_TOOL)
+			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_NANO)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_MACH_MSG)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_IOKIT)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_STACK)
@@ -225,6 +226,8 @@ NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address,
 			ZGHandleUserTagCase(userTag, VM_MEMORY_COREGRAPHICS)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_CORESERVICES)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_JAVA)
+			ZGHandleUserTagCase(userTag, VM_MEMORY_COREDATA)
+			ZGHandleUserTagCase(userTag, VM_MEMORY_COREDATA_OBJECTIDS)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_ATS)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_LAYERKIT)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_CGIMAGE)
@@ -246,6 +249,10 @@ NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address,
 			ZGHandleUserTagCase(userTag, VM_MEMORY_IMAGEIO)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_COREPROFILE)
 			ZGHandleUserTagCase(userTag, VM_MEMORY_ASSETSD)
+			ZGHandleUserTagCase(userTag, VM_MEMORY_OS_ALLOC_ONCE)
+			ZGHandleUserTagCase(userTag, VM_MEMORY_LIBDISPATCH)
+			ZGHandleUserTagCase(userTag, VM_MEMORY_ACCELERATE)
+			ZGHandleUserTagCase(userTag, VM_MEMORY_COREUI)
 		}
 	}
 	return userTag;
