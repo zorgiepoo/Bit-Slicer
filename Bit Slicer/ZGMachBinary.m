@@ -47,4 +47,9 @@
 	return self;
 }
 
+- (NSComparisonResult)compare:(ZGMachBinary *)binaryImage
+{
+	return [@(self.headerAddress) compare:@(binaryImage.headerAddress)];
+}
+
 @end

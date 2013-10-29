@@ -423,7 +423,7 @@ NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize)
 		}
 	}
 	
-	return results;
+	return [results sortedArrayUsingSelector:@selector(compare:)];
 }
 
 NSString *ZGFilePathAtAddress(ZGMemoryMap processTask, ZGMemoryAddress filePathAddress)
