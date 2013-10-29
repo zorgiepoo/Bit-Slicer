@@ -63,7 +63,14 @@ NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address,
 
 ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error);
 
-NSArray *ZGMachBinaryRegions(ZGMemoryMap processTask, ZGMemoryAddress pointerSize);
+#define ZGMachHeaderAddress @"ZGMachHeaderAddress"
+#define ZGMachFilePathAddress @"ZGMachFilePathAddress"
+NSArray *ZGMachBinaryAddressesAndFilePaths(ZGMemoryMap processTask, ZGMemoryAddress pointerSize);
+NSString *ZGFilePathAtAddress(ZGMemoryMap processTask, ZGMemoryAddress filePathAddress);
+	
+NSDictionary *ZGNearestMachHeader(NSArray *machBinaries, ZGMemoryAddress targetAddress);
+	
+void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, NSString *mappedFilePath, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize);
 	
 NSRange ZGTextRange(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary);
 

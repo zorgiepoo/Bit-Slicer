@@ -303,90 +303,73 @@
 
 #pragma mark Searching
 
-- (void)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaryRegions:(NSArray * __unsafe_unretained)machBinaryRegions lastFoundRegion:(ZGRegion **)lastFoundRegionPointer
+- (void)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray *)machBinaries filePathDictionary:(NSDictionary *)machFilePathDictionary
 {
-	ZGMemoryAddress variableAddress = variable.address;
-	ZGMemorySize dataSize = variable.size;
-	ZGRegion *foundRegion = nil;
-	ZGRegion *lastFoundRegion = *lastFoundRegionPointer;
-	if (lastFoundRegion != nil && lastFoundRegion.address <= variableAddress && lastFoundRegion.address + lastFoundRegion.size >= variableAddress + dataSize)
-	{
-		foundRegion = lastFoundRegion;
-	}
-	else
-	{
-		int maxIndex = (int)machBinaryRegions.count - 1;
-		int minIndex = 0;
-		while (maxIndex >= minIndex)
-		{
-			int middleIndex = (maxIndex + minIndex) / 2;
-			ZGRegion *middleRegion = [machBinaryRegions objectAtIndex:middleIndex];
-			
-			if (middleRegion.address + middleRegion.size < variableAddress)
-			{
-				minIndex = middleIndex + 1;
-			}
-			else if (middleRegion.address >= variableAddress + dataSize)
-			{
-				maxIndex = middleIndex - 1;
-			}
-			else
-			{
-				if (middleRegion.address <= variableAddress && middleRegion.address + middleRegion.size >= variableAddress + dataSize)
-				{
-					foundRegion = middleRegion;
-					*lastFoundRegionPointer = foundRegion;
-				}
-				break;
-			}
-		}
-	}
+	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
+	ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
 	
-	if (foundRegion != nil)
+	NSDictionary *machBinary = ZGNearestMachHeader(machBinaries, variable.address);
+	
+	ZGMemoryAddress machHeaderAddress = [[machBinary objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
+	
+	NSString *machFilePath = [machFilePathDictionary objectForKey:[machBinary objectForKey:ZGMachFilePathAddress]];
+	
+	if (machFilePath != nil)
 	{
-		ZGRegion *firstRegion = [machBinaryRegions objectAtIndex:0];
-		if (foundRegion.slide > 0 || foundRegion != firstRegion)
+		ZGMemorySize slide = 0;
+		ZGMemorySize textSize = 0;
+		ZGMemorySize dataSize = 0;
+		ZGMemorySize linkEditSize = 0;
+		
+		ZGGetMachBinaryInfo(processTask, pointerSize, machHeaderAddress, machFilePath, NULL, &slide, &textSize, &dataSize, &linkEditSize);
+		
+		if (variable.address >= machHeaderAddress && variable.address + variable.size <= machHeaderAddress + textSize + dataSize + linkEditSize)
 		{
-			NSString *partialPath = [foundRegion.mappedPath lastPathComponent];
-			NSString *pathToUse = nil;
-			
-			// we are gauranteed that partial path of main executable will match up
-			if (foundRegion == firstRegion)
+			if (slide > 0)
 			{
-				pathToUse = partialPath;
-			}
-			else
-			{
-				if ([[foundRegion.mappedPath stringByDeletingLastPathComponent] length] > 0)
-				{
-					partialPath = [@"/" stringByAppendingString:partialPath];
-				}
+				NSString *partialPath = [machFilePath lastPathComponent];
+				NSString *pathToUse = nil;
 				
-				int numberOfMatchingPaths = 0;
-				for (ZGRegion *machRegion in machBinaryRegions)
+				// we are gauranteed that partial path of main executable will match up
+				if (machBinary == [machBinaries objectAtIndex:0])
 				{
-					if ([machRegion.mappedPath hasSuffix:partialPath])
+					pathToUse = partialPath;
+				}
+				else
+				{
+					if ([[machFilePath stringByDeletingLastPathComponent] length] > 0)
 					{
-						numberOfMatchingPaths++;
-						if (numberOfMatchingPaths > 1) break;
+						partialPath = [@"/" stringByAppendingString:partialPath];
 					}
+					
+					int numberOfMatchingPaths = 0;
+					for (NSDictionary *machBinary in machBinaries)
+					{
+						NSString *mappedPath = [machFilePathDictionary objectForKey:[machBinary objectForKey:ZGMachFilePathAddress]];
+						if ([mappedPath hasSuffix:partialPath])
+						{
+							numberOfMatchingPaths++;
+							if (numberOfMatchingPaths > 1) break;
+						}
+					}
+					
+					pathToUse = numberOfMatchingPaths > 1 ? machFilePath : partialPath;
 				}
 				
-				pathToUse = numberOfMatchingPaths > 1 ? foundRegion.mappedPath : partialPath;
+				variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", variable.address - machHeaderAddress, pathToUse];
+				variable.usesDynamicAddress = YES;
+				variable.finishedEvaluatingDynamicAddress = YES;
+				
+				// Cache the path
+				NSMutableDictionary *mappedPathDictionary = [self.windowController.currentProcess.cacheDictionary objectForKey:ZGMappedPathDictionary];
+				if ([mappedPathDictionary objectForKey:pathToUse] == nil)
+				{
+					[mappedPathDictionary setObject:@(machHeaderAddress) forKey:pathToUse];
+				}
 			}
 			
-			variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", variableAddress - foundRegion.address, pathToUse];
-			variable.usesDynamicAddress = YES;
-			variable.finishedEvaluatingDynamicAddress = YES;
-			
-			// Cache the path
-			NSMutableDictionary *mappedPathDictionary = [self.windowController.currentProcess.cacheDictionary objectForKey:ZGMappedPathDictionary];
-			if ([mappedPathDictionary objectForKey:pathToUse] == nil)
-			{
-				[mappedPathDictionary setObject:@(foundRegion.address) forKey:pathToUse];
-			}
+			variable.name = @"static";
 		}
-		variable.name = @"static";
 	}
 }
 
@@ -406,24 +389,30 @@
 		ZGProcess *currentProcess = self.windowController.currentProcess;
 		ZGMemorySize pointerSize = currentProcess.pointerSize;
 		
-		NSArray *machBinaryRegions = ZGMachBinaryRegions(currentProcess.processTask, pointerSize);
-		__block ZGRegion *lastFoundRegion = nil;
+		NSArray *machBinaries = ZGMachBinaryAddressesAndFilePaths(currentProcess.processTask, pointerSize);
+		NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
+		for (NSDictionary *machBinary in machBinaries)
+		{
+			ZGMemoryAddress filePathAddress = [[machBinary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue];
+			NSString *filePath = ZGFilePathAtAddress(currentProcess.processTask, filePathAddress);
+			if (filePath != nil)
+			{
+				[machFilePathDictionary setObject:filePath forKey:@(filePathAddress)];
+			}
+		}
 		
 		ZGMemorySize dataSize = self.searchResults.dataSize;
 		[self.searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
 			ZGVariable *newVariable =
-				[[ZGVariable alloc]
-				 initWithValue:NULL
-				 size:dataSize
-				 address:variableAddress
-				 type:(ZGVariableType)self.searchResults.tag
-				 qualifier:qualifier
-				 pointerSize:pointerSize];
+			[[ZGVariable alloc]
+			 initWithValue:NULL
+			 size:dataSize
+			 address:variableAddress
+			 type:(ZGVariableType)self.searchResults.tag
+			 qualifier:qualifier
+			 pointerSize:pointerSize];
 			
-			if (machBinaryRegions.count > 0)
-			{
-				[self relativizeVariable:newVariable withMachBinaryRegions:machBinaryRegions lastFoundRegion:&lastFoundRegion];
-			}
+			[self relativizeVariable:newVariable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
 			
 			[newVariables addObject:newVariable];
 		}];

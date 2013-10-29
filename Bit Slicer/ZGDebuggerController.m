@@ -1127,17 +1127,8 @@ enum ZGStepExecution
 		{
 			NSRange textRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, calculatedMemoryAddress, &mappedFilePath, &baseAddress, NULL, self.currentProcess.cacheDictionary);
 			
-			if (textRange.length > 0)
-			{
-				firstInstructionAddress = textRange.location;
-				maxInstructionsSize = textRange.length;
-			}
-			else if (mappedFilePath.length > 0)
-			{
-				// TODO: actually try to directly read mach header from file
-				firstInstructionAddress = baseAddress;
-				maxInstructionsSize = (ZGMemorySize)-1;
-			}
+			firstInstructionAddress = textRange.location;
+			maxInstructionsSize = textRange.length;
 			
 			if (firstInstructionAddress + maxInstructionsSize < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
 			{

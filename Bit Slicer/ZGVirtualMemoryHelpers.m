@@ -45,6 +45,8 @@
 #import <mach-o/loader.h>
 #import <mach-o/dyld_images.h>
 
+#import <mach-o/fat.h>
+
 static NSDictionary *gTasksDictionary = nil;
 
 BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task)
@@ -291,7 +293,62 @@ else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
 	numberOfSegmentsToFind--; \
 }
 
-void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+void ZGParseMachHeader(ZGMemoryAddress machHeaderAddress, ZGMemorySize pointerSize, const void *machHeaderBytes, const void *minimumBoundaryPointer, ZGMemorySize maximumBoundarySize, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+{
+	const struct mach_header_64 *machHeader = machHeaderBytes;
+	if (machHeader->magic == FAT_CIGAM)
+	{
+		uint32_t numberOfArchitectures = CFSwapInt32BigToHost(((struct fat_header *)machHeader)->nfat_arch);
+		for (uint32_t architectureIndex = 0; architectureIndex < numberOfArchitectures; architectureIndex++)
+		{
+			struct fat_arch *fatArchitecture = (void *)machHeader + sizeof(struct fat_header) + sizeof(struct fat_arch) * architectureIndex;
+			if ((pointerSize == sizeof(ZGMemoryAddress) && fatArchitecture->cputype & CPU_TYPE_X86_64) || (pointerSize == sizeof(ZG32BitMemoryAddress) && fatArchitecture->cputype & CPU_TYPE_I386))
+			{
+				machHeader = (void *)machHeader + CFSwapInt32BigToHost(fatArchitecture->offset);
+				break;
+			}
+		}
+	}
+	if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
+	{
+		void *segmentBytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
+		if ((segmentBytes - minimumBoundaryPointer) + (ZGMemorySize)machHeader->sizeofcmds <= maximumBoundarySize)
+		{
+			int numberOfSegmentsToFind = 3;
+			for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
+			{
+				struct load_command *loadCommand = segmentBytes;
+				
+				if (loadCommand->cmd == LC_SEGMENT_64)
+				{
+					ZGFindTextAddressAndTotalSegmentSize(segment_command_64, section_64, segmentBytes, machHeaderAddress, firstInstructionAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
+				}
+				else if (loadCommand->cmd == LC_SEGMENT)
+				{
+					ZGFindTextAddressAndTotalSegmentSize(segment_command, section, segmentBytes, machHeaderAddress, firstInstructionAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
+				}
+				
+				if (numberOfSegmentsToFind <= 0)
+				{
+					break;
+				}
+				
+				segmentBytes += loadCommand->cmdsize;
+			}
+		}
+	}
+}
+
+void ZGGetMachBinaryInfoFromFilePath(NSString *mappedFilePath, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+{
+	NSData *machFileData = [NSData dataWithContentsOfFile:mappedFilePath];
+	if (machFileData != nil)
+	{
+		ZGParseMachHeader(machHeaderAddress, pointerSize, machFileData.bytes, machFileData.bytes, machFileData.length, firstInstructionAddress, slide, textSize, dataSize, linkEditSize);
+	}
+}
+
+void ZGGetMachBinaryInfoFromMemory(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
 {
 	ZGMemoryAddress regionAddress = machHeaderAddress;
 	ZGMemorySize regionSize = 1;
@@ -301,42 +358,34 @@ void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemoryAddress machHeaderAddr
 		void *regionBytes = NULL;
 		if (ZGReadBytes(processTask, regionAddress, &regionBytes, &regionSize))
 		{
-			struct mach_header_64 *machHeader = regionBytes + machHeaderAddress - regionAddress;
-			if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
-			{
-				void *segmentBytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
-				if ((segmentBytes - regionBytes) + (ZGMemorySize)machHeader->sizeofcmds <= regionSize)
-				{
-					int numberOfSegmentsToFind = 3;
-					for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
-					{
-						struct load_command *loadCommand = segmentBytes;
-						
-						if (loadCommand->cmd == LC_SEGMENT_64)
-						{
-							ZGFindTextAddressAndTotalSegmentSize(segment_command_64, section_64, segmentBytes, machHeaderAddress, firstInstructionAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
-						}
-						else if (loadCommand->cmd == LC_SEGMENT)
-						{
-							ZGFindTextAddressAndTotalSegmentSize(segment_command, section, segmentBytes, machHeaderAddress, firstInstructionAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
-						}
-						
-						if (numberOfSegmentsToFind <= 0)
-						{
-							break;
-						}
-						
-						segmentBytes += loadCommand->cmdsize;
-					}
-				}
-			}
+			const struct mach_header_64 *machHeader = regionBytes + machHeaderAddress - regionAddress;
+			ZGParseMachHeader(machHeaderAddress, pointerSize, machHeader, regionBytes, regionSize, firstInstructionAddress, slide, textSize, dataSize, linkEditSize);
+			
 			ZGFreeBytes(processTask, regionBytes, regionSize);
 		}
 	}
 }
 
-#define ZGMachHeaderAddress @"ZGMachHeaderAddress"
-#define ZGMachFilePathAddress @"ZGMachFilePathAddress"
+void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, NSString *mappedFilePath, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+{
+	ZGMemorySize textSizeReturned = 0;
+	ZGMemorySize dataSizeReturned = 0;
+	ZGMemorySize linkEditSizeReturned = 0;
+	
+	ZGGetMachBinaryInfoFromMemory(processTask, pointerSize, machHeaderAddress, firstInstructionAddress, slide, &textSizeReturned, &dataSizeReturned, &linkEditSizeReturned);
+	
+	if (textSizeReturned + dataSizeReturned + linkEditSizeReturned > 0)
+	{
+		if (textSize != NULL) *textSize = textSizeReturned;
+		if (dataSize != NULL) *dataSize = dataSizeReturned;
+		if (linkEditSize != NULL) *linkEditSize = linkEditSizeReturned;
+	}
+	else if (mappedFilePath.length > 0)
+	{
+		ZGGetMachBinaryInfoFromFilePath(mappedFilePath, pointerSize, machHeaderAddress, firstInstructionAddress, slide, textSize, dataSize, linkEditSize);
+	}
+}
+
 NSArray *ZGMachBinaryAddressesAndFilePaths(ZGMemoryMap processTask, ZGMemoryAddress pointerSize)
 {
 	NSMutableArray *results = [[NSMutableArray alloc] init];
@@ -389,62 +438,37 @@ NSString *ZGFilePathAtAddress(ZGMemoryMap processTask, ZGMemoryAddress filePathA
 	return filePath;
 }
 
-NSArray *ZGMachBinaryRegions(ZGMemoryMap processTask, ZGMemoryAddress pointerSize)
+NSDictionary *ZGNearestMachHeader(NSArray *machBinaries, ZGMemoryAddress targetAddress)
 {
-	NSMutableArray *binaryRegions = [[NSMutableArray alloc] init];
+	id previousMachBinary = nil;
 	
-	for (NSDictionary *machHeaderDictionary in ZGMachBinaryAddressesAndFilePaths(processTask, pointerSize))
+	for (NSDictionary *machHeader in machBinaries)
 	{
-		ZGMemoryAddress machHeaderPointer = [[machHeaderDictionary objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
-		ZGMemoryAddress machFilePathPointer = [[machHeaderDictionary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue];
-		
-		ZGRegion *region = [[ZGRegion alloc] initWithAddress:machHeaderPointer size:0];
-		
-		ZGMemorySize textSize = 0;
-		ZGMemorySize dataSize = 0;
-		ZGMemorySize linkEditSize = 0;
-		ZGMemorySize slide = 0;
-		ZGGetMachBinaryInfo(processTask, machHeaderPointer, NULL, &slide, &textSize, &dataSize, &linkEditSize);
-		
-		region.size = textSize + dataSize + linkEditSize;
-		region.slide = slide;
-		region.mappedPath = ZGFilePathAtAddress(processTask, machFilePathPointer);
-		
-		[binaryRegions addObject:region];
-	}
-	
-	return binaryRegions;
-}
-
-ZGMemoryAddress ZGNearestMachHeader(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress targetAddress, NSString **mappedFilePath)
-{
-	ZGMemoryAddress previousHeaderAddress = 0;
-	ZGMemoryAddress previousFilePathAddress = 0;
-	
-	for (NSDictionary *machHeaderDictionary in ZGMachBinaryAddressesAndFilePaths(processTask, pointerSize))
-	{
-		ZGMemoryAddress machHeaderPointer = [[machHeaderDictionary objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
-		ZGMemoryAddress machFilePathPointer = [[machHeaderDictionary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue];
+		ZGMemoryAddress machHeaderPointer = [[machHeader objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
 		
 		if (machHeaderPointer > targetAddress) break;
 		
-		previousHeaderAddress = machHeaderPointer;
-		previousFilePathAddress = machFilePathPointer;
+		previousMachBinary = machHeader;
 	}
 	
-	if (previousFilePathAddress != 0 && mappedFilePath != NULL)
-	{
-		*mappedFilePath = ZGFilePathAtAddress(processTask, previousFilePathAddress);
-	}
-	
-	return previousHeaderAddress;
+	return previousMachBinary;
 }
 
 void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
 {
-	ZGMemoryAddress nearestMachHeaderAddress = ZGNearestMachHeader(processTask, pointerSize, targetAddress, mappedFilePath);
-	if (machHeaderAddress != NULL) *machHeaderAddress = nearestMachHeaderAddress;
-	ZGGetMachBinaryInfo(processTask, nearestMachHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize);
+	NSDictionary *machBinary = ZGNearestMachHeader(ZGMachBinaryAddressesAndFilePaths(processTask, pointerSize), targetAddress);
+	if (machBinary != nil)
+	{
+		ZGMemoryAddress returnedMachHeaderAddress = [[machBinary objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
+		ZGMemoryAddress returnedMachFilePathAddress = [[machBinary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue];
+		
+		NSString *returnedFilePath = ZGFilePathAtAddress(processTask, returnedMachFilePathAddress);
+		
+		if (machHeaderAddress != NULL) *machHeaderAddress = returnedMachHeaderAddress;
+		if (mappedFilePath != NULL) *mappedFilePath = returnedFilePath;
+		
+		ZGGetMachBinaryInfo(processTask, pointerSize, returnedMachHeaderAddress, returnedFilePath, textAddress, slide, textSize, dataSize, linkEditSize);
+	}
 }
 
 NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide)
@@ -529,7 +553,7 @@ ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap processTask)
 ZGMemoryAddress ZGFindExecutableImage(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSString *partialImageName)
 {
 	ZGMemoryAddress foundAddress = 0;
-	for (NSDictionary *machBinaryDictionary in ZGMachBinaryRegions(processTask, pointerSize))
+	for (NSDictionary *machBinaryDictionary in ZGMachBinaryAddressesAndFilePaths(processTask, pointerSize))
 	{
 		ZGMemoryAddress machBinaryFilePathPointer = [[machBinaryDictionary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue];
 		NSString *mappedFilePath = ZGFilePathAtAddress(processTask, machBinaryFilePathPointer);

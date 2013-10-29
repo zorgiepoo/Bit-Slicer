@@ -36,7 +36,6 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 
-#import "ZGRegion.h"
 #include <libproc.h>
 
 @implementation ZGProcess
@@ -97,34 +96,36 @@
 		[self.cacheDictionary setObject:mappedPathDictionary forKey:ZGMappedPathDictionary];
 		[self.cacheDictionary setObject:mappedBinaryDictionary forKey:ZGMappedBinaryDictionary];
 		
-		NSArray *binaryRegions = ZGMachBinaryRegions(_processTask, self.pointerSize);
-		if (binaryRegions.count > 0)
+		NSArray *machBinaries = ZGMachBinaryAddressesAndFilePaths(_processTask, self.pointerSize);
+		if (machBinaries.count > 0)
 		{
-			self.baseAddress = [(ZGRegion *)[binaryRegions objectAtIndex:0] address];
+			self.baseAddress = [[[machBinaries objectAtIndex:0] objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
 			// Set up initial cache for full paths, partial paths, and partial paths prepended with forward slashes
-			for (ZGRegion *region in binaryRegions)
+			for (NSDictionary *machBinary in machBinaries)
 			{
-				NSString *lastPathComponent = [region.mappedPath lastPathComponent];
+				ZGMemoryAddress machAddress = [[machBinary objectForKey:ZGMachHeaderAddress] unsignedLongLongValue];
+				NSString *mappedPath = ZGFilePathAtAddress(_processTask, [[machBinary objectForKey:ZGMachFilePathAddress] unsignedLongLongValue]);
+				NSString *lastPathComponent = [mappedPath lastPathComponent];
 				
-				if ([mappedPathDictionary objectForKey:region.mappedPath] == nil)
+				if ([mappedPathDictionary objectForKey:mappedPath] == nil)
 				{
-					[mappedPathDictionary setObject:@(region.address) forKey:region.mappedPath];
+					[mappedPathDictionary setObject:@(machAddress) forKey:mappedPath];
 				}
 				if ([mappedPathDictionary objectForKey:lastPathComponent] == nil)
 				{
-					[mappedPathDictionary setObject:@(region.address) forKey:lastPathComponent];
+					[mappedPathDictionary setObject:@(machAddress) forKey:lastPathComponent];
 				}
-				if ([[region.mappedPath stringByDeletingLastPathComponent] length] > 0)
+				if ([[mappedPath stringByDeletingLastPathComponent] length] > 0)
 				{
 					NSString *forwardSlashedPrependedPath = [@"/" stringByAppendingString:lastPathComponent];
 					if ([mappedPathDictionary objectForKey:forwardSlashedPrependedPath] == nil)
 					{
-						[mappedPathDictionary setObject:@(region.address) forKey:forwardSlashedPrependedPath];
+						[mappedPathDictionary setObject:@(machAddress) forKey:forwardSlashedPrependedPath];
 					}
 				}
 				
 				// Region address -> mach binary address
-				[mappedBinaryDictionary setObject:@(region.address) forKey:@(region.address)];
+				[mappedBinaryDictionary setObject:@(machAddress) forKey:@(machAddress)];
 			}
 		}
 	}

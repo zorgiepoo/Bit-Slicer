@@ -50,7 +50,5 @@
 @property (nonatomic) ZGMemorySize size;
 @property (nonatomic) ZGMemoryProtection protection;
 @property (nonatomic) void *bytes;
-@property (nonatomic, copy) NSString *mappedPath;
-@property (nonatomic) ZGMemorySize slide;
 
 @end
