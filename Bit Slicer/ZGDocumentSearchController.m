@@ -329,13 +329,9 @@
 			{
 				NSString *partialPath = [machFilePath lastPathComponent];
 				NSString *pathToUse = nil;
+				NSString *baseArgument = @"";
 				
-				// we are gauranteed that partial path of main executable will match up
-				if (machBinary == [machBinaries objectAtIndex:0])
-				{
-					pathToUse = partialPath;
-				}
-				else
+				if (machBinary != [machBinaries objectAtIndex:0])
 				{
 					if ([[machFilePath stringByDeletingLastPathComponent] length] > 0)
 					{
@@ -354,17 +350,21 @@
 					}
 					
 					pathToUse = numberOfMatchingPaths > 1 ? machFilePath : partialPath;
+					baseArgument = [NSString stringWithFormat:@"\"%@\"", pathToUse];
 				}
 				
-				variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", variable.address - machHeaderAddress, pathToUse];
+				variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(%@)", variable.address - machHeaderAddress, baseArgument];
 				variable.usesDynamicAddress = YES;
 				variable.finishedEvaluatingDynamicAddress = YES;
 				
 				// Cache the path
-				NSMutableDictionary *mappedPathDictionary = [self.windowController.currentProcess.cacheDictionary objectForKey:ZGMappedPathDictionary];
-				if ([mappedPathDictionary objectForKey:pathToUse] == nil)
+				if (pathToUse != nil)
 				{
-					[mappedPathDictionary setObject:@(machHeaderAddress) forKey:pathToUse];
+					NSMutableDictionary *mappedPathDictionary = [self.windowController.currentProcess.cacheDictionary objectForKey:ZGMappedPathDictionary];
+					if ([mappedPathDictionary objectForKey:pathToUse] == nil)
+					{
+						[mappedPathDictionary setObject:@(machHeaderAddress) forKey:pathToUse];
+					}
 				}
 			}
 			

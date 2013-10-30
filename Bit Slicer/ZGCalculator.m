@@ -104,10 +104,14 @@
 		} forName:ZGCalculatePointerFunction];
 		
 		[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+			ZGProcess *process = [vars objectForKey:ZGProcessVariable];
 			ZGMemoryAddress foundAddress = 0x0;
-			if (args.count == 1)
+			if (args.count == 0)
 			{
-				ZGProcess *process = [vars objectForKey:ZGProcessVariable];
+				foundAddress = process.baseAddress;
+			}
+			else if (args.count == 1)
+			{
 				NSMutableArray *failedImages = [vars objectForKey:ZGFailedImagesVariable];
 				
 				DDExpression *expression = [args objectAtIndex:0];
@@ -137,7 +141,7 @@
 			}
 			else if (error != NULL)
 			{
-				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" expects 1 argument"}];
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" expects 1 or 0 arguments"}];
 			}
 			return [DDExpression numberExpressionWithNumber:@(foundAddress)];
 		} forName:ZGBaseAddressFunction];
