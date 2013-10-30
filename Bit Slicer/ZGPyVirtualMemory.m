@@ -49,6 +49,7 @@ typedef struct
 	uint32_t processTask;
 	int32_t processIdentifier;
 	char is64Bit;
+	ZGMemoryAddress baseAddress;
 	__unsafe_unretained NSMutableArray *objectsPool;
 	__unsafe_unretained NSMutableDictionary *allocationSizeTable;
 	__unsafe_unretained NSMutableDictionary *processCacheDictionary;
@@ -227,6 +228,7 @@ static PyTypeObject VirtualMemoryType =
 		vmObject->processTask = process.processTask;
 		vmObject->processIdentifier = process.processID;
 		vmObject->is64Bit = process.is64Bit;
+		vmObject->baseAddress = process.baseAddress;
 		
 		NSMutableDictionary *allocationSizeTable = [[NSMutableDictionary alloc] init];
 		vmObject->allocationSizeTable = allocationSizeTable;
@@ -622,10 +624,16 @@ static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
 {
 	PyObject *result = NULL;
 	const char *partialPath = NULL;
-	if (PyArg_ParseTuple(args, "s:base", &partialPath))
+	if (PyArg_ParseTuple(args, "|s:base", &partialPath))
 	{
 		NSError *error = nil;
-		ZGMemoryAddress imageAddress = ZGFindExecutableImageWithCache(self->processTask, self->is64Bit ? sizeof(ZGMemoryAddress) : sizeof(ZG32BitMemoryAddress), [NSString stringWithUTF8String:partialPath], self->processCacheDictionary, &error);
+		ZGMemoryAddress imageAddress = self->baseAddress;
+		
+		if (partialPath != NULL)
+		{
+			imageAddress = ZGFindExecutableImageWithCache(self->processTask, self->is64Bit ? sizeof(ZGMemoryAddress) : sizeof(ZG32BitMemoryAddress), [NSString stringWithUTF8String:partialPath], self->processCacheDictionary, &error);
+		}
+		
 		if (error == nil)
 		{
 			result = Py_BuildValue("K", imageAddress);
