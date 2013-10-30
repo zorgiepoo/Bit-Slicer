@@ -259,7 +259,10 @@
 	{
 		for (ZGVariable *variable in [self.documentData.variables subarrayWithRange:visibleRowsRange])
 		{
-			needsToReloadTable = [self updateDynamicVariableAddress:variable] || needsToReloadTable;
+			if ([self updateDynamicVariableAddress:variable])
+			{
+				needsToReloadTable = YES;
+			}
 		}
 	}
 	
@@ -267,13 +270,18 @@
 	if (self.windowController.currentProcess.hasGrantedAccess)
 	{
 		// Freeze all variables that need be frozen!
-		[self.documentData.variables enumerateObjectsUsingBlock:^(ZGVariable * __unsafe_unretained variable, NSUInteger index, BOOL *stop) {
+		NSUInteger variableIndex = 0;
+		for (ZGVariable *variable in self.documentData.variables)
+		{
 			if (variable.enabled && variable.isFrozen && variable.freezeValue != NULL)
 			{
 				// We have to make sure variable's address is up to date before proceeding
-				if (self.windowController.isOccluded || index < visibleRowsRange.location || index >= visibleRowsRange.location + visibleRowsRange.length)
+				if (isOccluded || variableIndex < visibleRowsRange.location || variableIndex >= visibleRowsRange.location + visibleRowsRange.length)
 				{
-					[self updateDynamicVariableAddress:variable];
+					if ([self updateDynamicVariableAddress:variable])
+					{
+						needsToReloadTable = YES;
+					}
 				}
 				
 				if (variable.size)
@@ -287,7 +295,9 @@
 					ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address + variable.size, &terminatorValue, variable.type == ZGString8 ? sizeof(char) : sizeof(unichar));
 				}
 			}
-		}];
+			
+			variableIndex++;
+		}
 	}
 	
 	if (!isOccluded)
@@ -297,7 +307,10 @@
 		if (self.windowController.currentProcess.hasGrantedAccess && self.variablesTableView.editedRow == -1)
 		{
 			// Read all the variables and update them in the table view if needed
-			needsToReloadTable = [self updateVariableValuesInRange:visibleRowsRange] || needsToReloadTable;
+			if ([self updateVariableValuesInRange:visibleRowsRange])
+			{
+				needsToReloadTable = YES;
+			}
 		}
 		
 		if (needsToReloadTable)

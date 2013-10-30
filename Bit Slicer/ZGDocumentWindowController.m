@@ -186,6 +186,7 @@
 	if (!self.isOccluded)
 	{
 		[[ZGProcessList sharedProcessList] retrieveList];
+		[self.tableController.variablesTableView reloadData];
 	}
 	[self updateObservingProcessOcclusionState];
 }
