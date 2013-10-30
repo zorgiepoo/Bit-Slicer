@@ -1070,7 +1070,7 @@ enum ZGStepExecution
 		
 		NSString *firstMappedFilePath = @"";
 		ZGMemoryAddress firstBaseAddress = 0;
-		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, ZGBaseExecutableRegion(self.currentProcess.processTask).address, &firstMappedFilePath, &firstBaseAddress, NULL, self.currentProcess.cacheDictionary);
+		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.baseAddress, &firstMappedFilePath, &firstBaseAddress, NULL, self.currentProcess.cacheDictionary);
 		
 		if (calculatedMemoryAddress == 0)
 		{

@@ -258,21 +258,6 @@ NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address,
 	return userTag;
 }
 
-ZGRegion *ZGBaseExecutableRegion(ZGMemoryMap processTask)
-{
-	// Obtain first __TEXT region
-	ZGRegion *chosenRegion = nil;
-	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
-	{
-		if (region.protection & VM_PROT_READ && region.protection & VM_PROT_EXECUTE)
-		{
-			chosenRegion = region;
-			break;
-		}
-	}
-	return chosenRegion;
-}
-
 #define ZGFindTextAddressAndTotalSegmentSize(segment_type, section_type, bytes, machHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind) \
 struct segment_type *segmentCommand = bytes; \
 void *sectionBytes = bytes + sizeof(*segmentCommand); \
@@ -549,11 +534,6 @@ ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, ZGMemorySize pointe
 	}
 	
 	return offset;
-}
-
-ZGMemoryAddress ZGBaseExecutableAddress(ZGMemoryMap processTask)
-{
-	return [ZGBaseExecutableRegion(processTask) address];
 }
 
 ZGMemoryAddress ZGFindExecutableImage(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSString *partialImageName)
