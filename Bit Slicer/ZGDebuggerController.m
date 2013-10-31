@@ -180,13 +180,18 @@ enum ZGStepExecution
 
 - (void)createSymbolicator
 {
-	if (!CSIsNull(self.symbolicator))
+	if (!CSIsNull(self.symbolicator) && self.currentProcess.valid)
 	{
 		CSRelease(self.symbolicator);
 	}
+	
 	if (self.currentProcess.valid)
 	{
 		self.symbolicator = CSSymbolicatorCreateWithTask(self.currentProcess.processTask);
+	}
+	else
+	{
+		self.symbolicator = kCSNull;
 	}
 }
 
