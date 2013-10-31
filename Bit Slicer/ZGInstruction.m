@@ -38,55 +38,6 @@
 
 @implementation ZGInstruction
 
-- (void)setSymbols:(NSString *)symbols
-{
-	NSMutableString *newSymbols = [[NSMutableString alloc] initWithString:[symbols stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
-	
-	// Remove anything that looks like " (in some process)" from atos' output
-	NSRange parenthesesRange = [newSymbols rangeOfString:@" (in "];
-	if (parenthesesRange.location != NSNotFound)
-	{
-		NSUInteger parenthesesCount = 1;
-		NSUInteger symbolsIndex;
-		for (symbolsIndex = parenthesesRange.location + parenthesesRange.length; symbolsIndex < newSymbols.length && parenthesesCount > 0; symbolsIndex++)
-		{
-			unichar character = [newSymbols characterAtIndex:symbolsIndex];
-			if (character == '(')
-			{
-				parenthesesCount++;
-			}
-			else if (character == ')')
-			{
-				parenthesesCount--;
-			}
-		}
-		
-		if (parenthesesCount == 0)
-		{
-			[newSymbols deleteCharactersInRange:NSMakeRange(parenthesesRange.location, symbolsIndex - parenthesesRange.location)];
-		}
-	}
-	
-	NSRange dyldStubRange = [newSymbols rangeOfString:@"DYLD-STUB$$"];
-	if (dyldStubRange.location != NSNotFound)
-	{
-		[newSymbols deleteCharactersInRange:dyldStubRange];
-	}
-	
-	NSArray *symbolComponents = [newSymbols componentsSeparatedByString:@" "];
-	NSMutableArray *newSymbolComponents = [[NSMutableArray alloc] init];
-	
-	for (NSString *symbolComponent in symbolComponents)
-	{
-		if (![symbolComponent hasPrefix:@"0x"])
-		{
-			[newSymbolComponents addObject:symbolComponent];
-		}
-	}
-	
-	_symbols = [newSymbolComponents componentsJoinedByString:@" "];
-}
-
 // Possible candidates: UD_Isyscall, UD_Ivmcall, UD_Ivmmcall ??
 - (BOOL)isCallMnemonic
 {

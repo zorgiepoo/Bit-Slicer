@@ -126,7 +126,10 @@
 	self.instructions = [NSArray arrayWithArray:newInstructions];
 	self.basePointers = [NSArray arrayWithArray:newBasePointers];
 	
-	[self.debuggerController updateSymbolsForInstructions:self.instructions];
+	if ([self.debuggerController shouldUpdateSymbolsForInstructions:self.instructions])
+	{
+		[self.debuggerController updateSymbolsForInstructions:self.instructions];
+	}
 	
 	for (ZGInstruction *instruction in self.instructions)
 	{

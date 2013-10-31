@@ -50,6 +50,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "CoreSymbolication.h"
 
 @interface ZGDebuggerController ()
 
@@ -82,14 +83,14 @@
 
 @property (nonatomic) id breakPointActivity;
 
+@property (nonatomic) CSSymbolicatorRef symbolicator;
+
 @end
 
 #define ZGDebuggerAddressField @"ZGDisassemblerAddressField"
 #define ZGDebuggerProcessName @"ZGDisassemblerProcessName"
 #define ZGDebuggerOffsetFromBase @"ZGDebuggerOffsetFromBase"
 #define ZGDebuggerMappedFilePath @"ZGDebuggerMappedFilePath"
-
-#define ATOS_PATH @"/usr/bin/atos"
 
 #define NOP_VALUE 0x90
 #define JUMP_REL32_INSTRUCTION_LENGTH 5
@@ -177,6 +178,18 @@ enum ZGStepExecution
 	[self updateExecutionButtons];
 }
 
+- (void)createSymbolicator
+{
+	if (!CSIsNull(self.symbolicator))
+	{
+		CSRelease(self.symbolicator);
+	}
+	if (self.currentProcess.valid)
+	{
+		self.symbolicator = CSSymbolicatorCreateWithTask(self.currentProcess.processTask);
+	}
+}
+
 - (void)windowDidAppearForFirstTime:(id)sender
 {
 	if (!sender)
@@ -186,15 +199,7 @@ enum ZGStepExecution
 	
 	[self toggleBacktraceView:NSOffState];
 	
-	// ATOS_PATH may not exist if user is on SL unlesss he has developer tools installed, it should if user is on ML. Not sure about Lion.
-	if (![[NSUserDefaults standardUserDefaults] boolForKey:ZG_SHOWED_ATOS_WARNING] && ![[NSFileManager defaultManager] fileExistsAtPath:ATOS_PATH])
-	{
-		NSLog(@"ERROR: %@ was not found.. Failed to retrieve debug symbols", ATOS_PATH);
-		
-		NSRunAlertPanel(@"Debug Symbols won't be Retrieved", @"In order to retrieve debug symbols, you may have to install the Xcode developer tools, which includes the atos tool that is needed.", @"OK", nil, nil, nil);
-		
-		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:ZG_SHOWED_ATOS_WARNING];
-	}
+	[self createSymbolicator];
 }
 
 #pragma mark Current Process Changed
@@ -216,6 +221,8 @@ enum ZGStepExecution
 		[self toggleBacktraceView:NSOffState];
 		[self readMemory:nil];
 	}
+	
+	[self createSymbolicator];
 }
 
 #pragma mark Split Views
@@ -293,91 +300,27 @@ enum ZGStepExecution
 
 #pragma mark Symbols
 
+// prerequisite: should call shouldUpdateSymbolsForInstructions: beforehand
 - (void)updateSymbolsForInstructions:(NSArray *)instructions
 {
-	[self updateSymbolsForInstructions:instructions asynchronously:NO completionHandler:^{}];
-}
-
-- (void)updateSymbolsForInstructions:(NSArray *)instructions asynchronously:(BOOL)isAsynchronous completionHandler:(void (^)(void))completionHandler
-{
-	static BOOL shouldFindSymbols = YES;
-	void (^updateSymbolsBlock)(void) = ^{
-		if (shouldFindSymbols && [[NSFileManager defaultManager] fileExistsAtPath:ATOS_PATH])
+	for (ZGInstruction *instruction in instructions)
+	{
+		CSSymbolRef symbol = CSSymbolicatorGetSymbolWithAddressAtTime(self.symbolicator, instruction.variable.address, kCSNow);
+		if (!CSIsNull(symbol))
 		{
-			NSTask *atosTask = [[NSTask alloc] init];
-			[atosTask setLaunchPath:ATOS_PATH];
-			[atosTask setArguments:@[@"-p", [NSString stringWithFormat:@"%d", self.currentProcess.processID]]];
+			NSMutableString *symbolName = [NSMutableString string];
 			
-			NSPipe *inputPipe = [NSPipe pipe];
-			[atosTask setStandardInput:inputPipe];
-			
-			NSPipe *outputPipe = [NSPipe pipe];
-			[atosTask setStandardOutput:outputPipe];
-			
-			// Ignore error message saying that atos has RESTRICT section thus DYLD environment variables being ignored
-			[atosTask setStandardError:[NSPipe pipe]];
-			
-			@try
+			const char *symbolNameCString = CSSymbolGetName(symbol);
+			if (symbolNameCString != NULL)
 			{
-				[atosTask launch];
-			}
-			@catch (NSException *exception)
-			{
-				NSLog(@"Atos task failed: Name: %@, Reason: %@", exception.name, exception.reason);
-				NSLog(@"Stopping atos from being called for this run...");
-				shouldFindSymbols = NO;
-				return;
+				[symbolName setString:@(symbolNameCString)];
 			}
 			
-			for (ZGInstruction *instruction in instructions)
-			{
-				[[inputPipe fileHandleForWriting] writeData:[[instruction.variable.addressStringValue stringByAppendingString:@"\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-			}
+			CSRange symbolRange = CSSymbolGetRange(symbol);
+			[symbolName appendFormat:@" + %llu", instruction.variable.address - symbolRange.location];
 			
-			[[inputPipe fileHandleForWriting] closeFile];
-			
-			NSData *data = [[outputPipe fileHandleForReading] readDataToEndOfFile];
-			if (data)
-			{
-				NSUInteger instructionIndex = 0;
-				NSString *contents = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-				for (NSString *line in [contents componentsSeparatedByString:@"\n"])
-				{
-					if ([line length] > 0 && ![line isEqualToString:@""] && ![line isEqualToString:@"\n"] && instructionIndex < instructions.count)
-					{
-						ZGInstruction *instruction = [instructions objectAtIndex:instructionIndex];
-						
-						if (isAsynchronous)
-						{
-							dispatch_async(dispatch_get_main_queue(), ^{
-								instruction.symbols = line;
-							});
-						}
-						else
-						{
-							instruction.symbols = line;
-						}
-					}
-					
-					instructionIndex++;
-				}
-			}
+			instruction.symbols = symbolName;
 		}
-	};
-	
-	if (isAsynchronous)
-	{
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			updateSymbolsBlock();
-			
-			dispatch_async(dispatch_get_main_queue(), ^{
-				completionHandler();
-			});
-		});
-	}
-	else
-	{
-		updateSymbolsBlock();
 	}
 }
 
@@ -385,12 +328,15 @@ enum ZGStepExecution
 {
 	BOOL shouldUpdateSymbols = NO;
 	
-	for (ZGInstruction *instruction in instructions)
+	if (!CSIsNull(self.symbolicator))
 	{
-		if (!instruction.symbols)
+		for (ZGInstruction *instruction in instructions)
 		{
-			shouldUpdateSymbols = YES;
-			break;
+			if (instruction.symbols == nil)
+			{
+				shouldUpdateSymbols = YES;
+				break;
+			}
 		}
 	}
 	
@@ -667,10 +613,9 @@ enum ZGStepExecution
 		if ([self shouldUpdateSymbolsForInstructions:instructions] && !isUpdatingSymbols)
 		{
 			isUpdatingSymbols = YES;
-			[self updateSymbolsForInstructions:instructions asynchronously:YES completionHandler:^{
-				[self.instructionsTableView reloadData];
-				isUpdatingSymbols = NO;
-			}];
+			[self updateSymbolsForInstructions:instructions];
+			[self.instructionsTableView reloadData];
+			isUpdatingSymbols = NO;
 		}
 	}
 }
