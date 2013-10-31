@@ -587,12 +587,13 @@
 		[displayComponents addObject:[NSString stringWithFormat:@"Address: %@", variable.addressFormula]];
 		[displayComponents addObject:[NSString stringWithFormat:@"Bytes: %@", variable.sizeStringValue]];
 		
-		if (self.windowController.currentProcess.valid)
+		ZGProcess *currentProcess = self.windowController.currentProcess;
+		if (currentProcess.valid)
 		{
 			ZGMemoryAddress memoryProtectionAddress = variable.address;
 			ZGMemorySize memoryProtectionSize = variable.size;
 			ZGMemoryProtection memoryProtection;
-			if (ZGMemoryProtectionInRegion(self.windowController.currentProcess.processTask, &memoryProtectionAddress, &memoryProtectionSize, &memoryProtection))
+			if (ZGMemoryProtectionInRegion(currentProcess.processTask, &memoryProtectionAddress, &memoryProtectionSize, &memoryProtection))
 			{
 				if (variable.address >= memoryProtectionAddress && variable.address + variable.size <= memoryProtectionAddress + memoryProtectionSize)
 				{
@@ -608,10 +609,10 @@
 				}
 			}
 			
-			NSString *userTagDescription = ZGUserTagDescription(self.windowController.currentProcess.processTask, variable.address, variable.size);
+			NSString *userTagDescription = ZGUserTagDescription(currentProcess.processTask, variable.address, variable.size);
 			NSString *mappedFilePath = nil;
 			ZGMemorySize relativeOffset = 0;
-			NSString *sectionName = ZGSectionName(self.windowController.currentProcess.processTask, self.windowController.currentProcess.pointerSize, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL);
+			NSString *sectionName = ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL);
 			
 			if (userTagDescription != nil || sectionName != nil)
 			{

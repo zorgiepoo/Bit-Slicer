@@ -42,6 +42,7 @@
 
 @class ZGProcess;
 @class ZGInstruction;
+@class ZGMachBinary;
 
 @interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource, ZGBreakPointDelegate>
 
@@ -55,14 +56,14 @@
 - (void)updateSymbolsForInstructions:(NSArray *)instructions;
 
 // This function is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize cacheDictionary:(NSMutableDictionary *)cacheDictionary;
+- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize dylinkerBinary:(ZGMachBinary *)dylinkerBinary cacheDictionary:(NSMutableDictionary *)cacheDictionary;
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process;
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
 
 - (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error;
 
-- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress processTask:(ZGMemoryMap)processTasks pointerSize:(ZGMemorySize)pointerSize;
+- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress processTask:(ZGMemoryMap)processTasks pointerSize:(ZGMemorySize)pointerSize dylinkerBinary:(ZGMachBinary *)dylinkerBinary;
 
 - (BOOL)
 	injectCode:(NSData *)codeData

@@ -389,7 +389,7 @@
 		ZGProcess *currentProcess = self.windowController.currentProcess;
 		ZGMemorySize pointerSize = currentProcess.pointerSize;
 		
-		NSArray *machBinaries = ZGMachBinaries(currentProcess.processTask, pointerSize);
+		NSArray *machBinaries = ZGMachBinaries(currentProcess.processTask, pointerSize, currentProcess.dylinkerBinary);
 		NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
 		for (ZGMachBinary *machBinary in machBinaries)
 		{

@@ -164,7 +164,7 @@
 		{
 			NSString *partialPath = nil;
 			ZGMemoryAddress slide = 0;
-			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.watchProcess.processTask, self.watchProcess.pointerSize, self.watchProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
+			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.watchProcess.processTask, self.watchProcess.pointerSize, self.watchProcess.dylinkerBinary, self.watchProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
 			
 			if (partialPath != nil && (slide > 0 || instruction.variable.address - relativeOffset > self.watchProcess.baseAddress))
 			{

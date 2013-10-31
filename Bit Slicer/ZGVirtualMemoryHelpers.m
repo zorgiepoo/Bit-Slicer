@@ -379,7 +379,43 @@ void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMe
 	}
 }
 
-NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize)
+ZGMachBinary *ZGDylinkerBinary(ZGMemoryMap processTask)
+{
+	ZGMachBinary *dylinkerBinary = nil;
+	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
+	{
+		ZGMemoryAddress regionAddress = region.address;
+		ZGMemorySize regionSize = region.size;
+		void *regionBytes = NULL;
+		if (ZGReadBytes(processTask, regionAddress, &regionBytes, &regionSize))
+		{
+			struct mach_header_64 *machHeader = regionBytes;
+			if ((machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64) && machHeader->filetype == MH_DYLINKER)
+			{
+				void *bytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
+				for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
+				{
+					struct dylinker_command *dylinkerCommand = bytes;
+					
+					if (dylinkerCommand->cmd == LC_ID_DYLINKER || dylinkerCommand->cmd == LC_LOAD_DYLINKER)
+					{
+						dylinkerBinary = [[ZGMachBinary alloc] initWithHeaderAddress:regionAddress filePathAddress:dylinkerCommand->name.offset + (void *)dylinkerCommand - regionBytes + regionAddress];
+					}
+					
+					bytes += dylinkerCommand->cmdsize;
+				}
+			}
+			ZGFreeBytes(processTask, regionBytes, regionSize);
+		}
+		if (dylinkerBinary != nil)
+		{
+			break;
+		}
+	}
+	return dylinkerBinary;
+}
+
+NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize, ZGMachBinary *dylinkerBinary)
 {
 	NSMutableArray *results = [[NSMutableArray alloc] init];
 	
@@ -413,6 +449,8 @@ NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize)
 			}
 			ZGFreeBytes(processTask, allImageInfos, allImageInfosSize);
 		}
+		
+		[results addObject:dylinkerBinary];
 	}
 	
 	return [results sortedArrayUsingSelector:@selector(compare:)];
@@ -445,9 +483,9 @@ ZGMachBinary *ZGNearestMachBinary(NSArray *machBinaries, ZGMemoryAddress targetA
 	return previousMachBinary;
 }
 
-void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
 {
-	ZGMachBinary *machBinary = ZGNearestMachBinary(ZGMachBinaries(processTask, pointerSize), targetAddress);
+	ZGMachBinary *machBinary = ZGNearestMachBinary(ZGMachBinaries(processTask, pointerSize, dylinkerBinary), targetAddress);
 	if (machBinary != nil)
 	{
 		ZGMemoryAddress returnedMachHeaderAddress = machBinary.headerAddress;
@@ -462,7 +500,7 @@ void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSiz
 	}
 }
 
-NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide)
+NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide)
 {
 	NSString *sectionName = nil;
 	
@@ -471,7 +509,7 @@ NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMem
 	ZGMemorySize dataSize = 0;
 	ZGMemorySize linkEditSize = 0;
 	
-	ZGGetNearestMachBinaryInfo(processTask, pointerSize, address, mappedFilePath, &machHeaderAddress, NULL, slide, &textSize, &dataSize, &linkEditSize);
+	ZGGetNearestMachBinaryInfo(processTask, pointerSize, dylinkerBinary, address, mappedFilePath, &machHeaderAddress, NULL, slide, &textSize, &dataSize, &linkEditSize);
 	
 	if (relativeOffset != NULL) *relativeOffset = address - machHeaderAddress;
 	
@@ -499,33 +537,33 @@ NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMem
 	return sectionName;
 }
 
-NSRange ZGTextRange(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary)
+NSRange ZGTextRange(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary)
 {
 	ZGMemoryAddress textAddress = 0;
 	ZGMemorySize textSize = 0;
 	ZGMemoryAddress machHeaderAddressReturned = 0;
 	
-	ZGGetNearestMachBinaryInfo(processTask, pointerSize, targetAddress, mappedFilePath, &machHeaderAddressReturned, &textAddress, slide, &textSize, NULL, NULL);
+	ZGGetNearestMachBinaryInfo(processTask, pointerSize, dylinkerBinary, targetAddress, mappedFilePath, &machHeaderAddressReturned, &textAddress, slide, &textSize, NULL, NULL);
 	
 	if (machHeaderAddress != NULL) *machHeaderAddress = machHeaderAddressReturned;
 	
 	return NSMakeRange(textAddress, textSize);
 }
 
-ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName)
+ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName)
 {
 	ZGMemoryAddress offset = 0x0;
 	
 	NSString *mappedFilePath = nil;
 	ZGMemoryAddress machHeaderAddress = 0x0;
 	
-	NSRange textRange = ZGTextRange(processTask, pointerSize, instructionAddress, &mappedFilePath, &machHeaderAddress, slide, cacheDictionary);
+	NSRange textRange = ZGTextRange(processTask, pointerSize, dylinkerBinary, instructionAddress, &mappedFilePath, &machHeaderAddress, slide, cacheDictionary);
 	if (textRange.location <= instructionAddress && textRange.location + textRange.length >= instructionAddress + instructionSize && mappedFilePath != nil)
 	{
 		NSError *error = nil;
 		NSString *partialPath = [mappedFilePath lastPathComponent];
 		// Make sure base address with our partial path matches with base address at full path
-		ZGMemoryAddress baseVerificationAddress = ZGFindExecutableImageWithCache(processTask, pointerSize, partialPath, cacheDictionary, &error);
+		ZGMemoryAddress baseVerificationAddress = ZGFindExecutableImageWithCache(processTask, pointerSize, dylinkerBinary, partialPath, cacheDictionary, &error);
 		if (error == nil && baseVerificationAddress == machHeaderAddress)
 		{
 			offset = instructionAddress - machHeaderAddress;
@@ -536,10 +574,10 @@ ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, ZGMemorySize pointe
 	return offset;
 }
 
-ZGMemoryAddress ZGFindExecutableImage(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSString *partialImageName)
+ZGMemoryAddress ZGFindExecutableImage(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSString *partialImageName)
 {
 	ZGMemoryAddress foundAddress = 0;
-	for (ZGMachBinary *machBinary in ZGMachBinaries(processTask, pointerSize))
+	for (ZGMachBinary *machBinary in ZGMachBinaries(processTask, pointerSize, dylinkerBinary))
 	{
 		NSString *mappedFilePath = ZGFilePathAtAddress(processTask, machBinary.filePathAddress);
 		if ([mappedFilePath hasSuffix:partialImageName])
@@ -551,14 +589,14 @@ ZGMemoryAddress ZGFindExecutableImage(ZGMemoryMap processTask, ZGMemorySize poin
 	return foundAddress;
 }
 
-ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemorySize pointerSize, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error)
+ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error)
 {
 	ZGMemoryAddress foundAddress = 0x0;
 	NSMutableDictionary *mappedPathDictionary = [cacheDictionary objectForKey:ZGMappedPathDictionary];
 	NSNumber *addressNumber = [mappedPathDictionary objectForKey:partialImageName];
 	if (addressNumber == nil)
 	{
-		ZGMemoryAddress foundAddress = ZGFindExecutableImage(processTask, pointerSize, partialImageName);
+		ZGMemoryAddress foundAddress = ZGFindExecutableImage(processTask, pointerSize, dylinkerBinary, partialImageName);
 		if (foundAddress != 0)
 		{
 			[mappedPathDictionary setObject:@(foundAddress) forKey:partialImageName];

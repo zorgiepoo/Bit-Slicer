@@ -44,6 +44,7 @@
 #import "ZGScriptManager.h"
 #import "ZGBreakPointController.h"
 #import "ZGInstruction.h"
+#import "ZGMachBinary.h"
 #import "structmember.h"
 
 @class ZGPyDebugger;
@@ -54,8 +55,9 @@ typedef struct
 	uint32_t processTask;
 	int32_t processIdentifier;
 	char is64Bit;
+	ZGMemoryAddress dylinkerHeaderAddress;
+	ZGMemoryAddress dylinkerFilePathAddress;
 	__unsafe_unretained id <ZGBreakPointDelegate> breakPointDelegate;
-	__unsafe_unretained NSMutableDictionary *processCacheDictionary;
 } DebuggerClass;
 
 static PyMemberDef Debugger_members[] =
@@ -181,6 +183,8 @@ static PyTypeObject DebuggerType =
 		debuggerObject->processTask = process.processTask;
 		debuggerObject->is64Bit = process.is64Bit;
 		debuggerObject->breakPointDelegate = self;
+		debuggerObject->dylinkerHeaderAddress = process.dylinkerBinary.headerAddress;
+		debuggerObject->dylinkerFilePathAddress = process.dylinkerBinary.filePathAddress;
 		
 		self.cachedInstructionPointers = [[NSMutableDictionary alloc] init];
 		
@@ -371,7 +375,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 	ZGMemoryAddress destinationAddress = 0x0;
 	if (PyArg_ParseTuple(args, "KK:bytesBeforeInjection", &sourceAddress, &destinationAddress))
 	{
-		NSArray *instructions = [[[ZGAppController sharedController] debuggerController] instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress processTask:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		NSArray *instructions = [[[ZGAppController sharedController] debuggerController] instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress processTask:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t) dylinkerBinary:[[ZGMachBinary alloc] initWithHeaderAddress:self->dylinkerHeaderAddress filePathAddress:self->dylinkerFilePathAddress]];
 		ZGMemorySize bufferLength = 0;
 		for (ZGInstruction *instruction in instructions)
 		{
@@ -419,7 +423,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		if (![[[ZGAppController sharedController] debuggerController]
 		 injectCode:[NSData dataWithBytes:newCode.buf length:newCode.len]
 		 intoAddress:destinationAddress
-		 hookingIntoOriginalInstructions:[[[ZGAppController sharedController] debuggerController] instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress processTask:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)]
+		 hookingIntoOriginalInstructions:[[[ZGAppController sharedController] debuggerController] instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress processTask:self->processTask pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t) dylinkerBinary:[[ZGMachBinary alloc] initWithHeaderAddress:self->dylinkerHeaderAddress filePathAddress:self->dylinkerFilePathAddress]]
 		 processTask:self->processTask
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)
 		 recordUndo:NO
@@ -453,7 +457,13 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	NSNumber *cachedInstructionAddress = [self.cachedInstructionPointers objectForKey:instructionPointer];
 	if (cachedInstructionAddress == nil)
 	{
-		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue] processTask:((DebuggerClass *)self.object)->processTask pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t) cacheDictionary:self.processCacheDictionary];
+		ZGInstruction *instruction =
+		[[[ZGAppController sharedController] debuggerController]
+		 findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue]
+		 processTask:((DebuggerClass *)self.object)->processTask
+		 pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t)
+		 dylinkerBinary:[[ZGMachBinary alloc] initWithHeaderAddress:((DebuggerClass *)self.object)->dylinkerHeaderAddress filePathAddress:((DebuggerClass *)self.object)->dylinkerFilePathAddress]
+		 cacheDictionary:self.processCacheDictionary];
 	
 		instructionAddress = instruction.variable.address;
 		[self.cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointer];

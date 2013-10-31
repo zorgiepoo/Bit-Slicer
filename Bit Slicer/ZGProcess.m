@@ -97,7 +97,8 @@
 		[self.cacheDictionary setObject:mappedPathDictionary forKey:ZGMappedPathDictionary];
 		[self.cacheDictionary setObject:mappedBinaryDictionary forKey:ZGMappedBinaryDictionary];
 		
-		NSArray *machBinaries = ZGMachBinaries(_processTask, self.pointerSize);
+		_dylinkerBinary = ZGDylinkerBinary(_processTask);
+		NSArray *machBinaries = ZGMachBinaries(_processTask, self.pointerSize, _dylinkerBinary);
 		if (machBinaries.count > 0)
 		{
 			self.baseAddress = [[machBinaries objectAtIndex:0] headerAddress];

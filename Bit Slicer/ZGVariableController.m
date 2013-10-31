@@ -989,11 +989,11 @@
 	{
 		NSString *mappedFilePath = nil;
 		ZGMemorySize relativeOffset = 0;
-		if (ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL) != nil)
+		if (ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL) != nil)
 		{
 			NSString *partialPath = [mappedFilePath lastPathComponent];
 			NSError *error = nil;
-			ZGMemoryAddress baseAddress = ZGFindExecutableImageWithCache(currentProcess.processTask, currentProcess.pointerSize, partialPath, self.windowController.currentProcess.cacheDictionary, &error);
+			ZGMemoryAddress baseAddress = ZGFindExecutableImageWithCache(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, partialPath, self.windowController.currentProcess.cacheDictionary, &error);
 			NSString *pathToUse = (error == nil && baseAddress == variable.address - relativeOffset) ? partialPath : mappedFilePath;
 			variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, pathToUse];
 			variable.usesDynamicAddress = YES;

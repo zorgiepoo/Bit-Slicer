@@ -39,6 +39,7 @@
 #define NON_EXISTENT_PID_NUMBER -1
 
 @class ZGSearchProgress;
+@class ZGMachBinary;
 
 @interface ZGProcess : NSObject
 
@@ -48,6 +49,7 @@
 @property (copy, nonatomic) NSString *name;
 @property (nonatomic) BOOL is64Bit;
 @property (nonatomic) ZGMemoryAddress baseAddress;
+@property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
 @property NSMutableDictionary *cacheDictionary;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;

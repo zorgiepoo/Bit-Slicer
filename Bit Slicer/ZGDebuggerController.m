@@ -388,10 +388,10 @@ enum ZGStepExecution
 
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
-	return [self findInstructionBeforeAddress:address processTask:process.processTask pointerSize:process.pointerSize cacheDictionary:process.cacheDictionary];
+	return [self findInstructionBeforeAddress:address processTask:process.processTask pointerSize:process.pointerSize dylinkerBinary:process.dylinkerBinary cacheDictionary:process.cacheDictionary];
 }
 
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize cacheDictionary:(NSMutableDictionary *)cacheDictionary
+- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize dylinkerBinary:(ZGMachBinary *)dylinkerBinary cacheDictionary:(NSMutableDictionary *)cacheDictionary
 {
 	ZGInstruction *instruction = nil;
 	
@@ -415,7 +415,7 @@ enum ZGStepExecution
 			startAddress = targetRegion.address;
 		}
 		
-		ZGMemoryAddress firstInstructionAddress = ZGTextRange(processTask, pointerSize, address, NULL, NULL, NULL, cacheDictionary).location;
+		ZGMemoryAddress firstInstructionAddress = ZGTextRange(processTask, pointerSize, dylinkerBinary, address, NULL, NULL, NULL, cacheDictionary).location;
 		
 		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
 		{
@@ -994,7 +994,7 @@ enum ZGStepExecution
 		if (self.mappedFilePath != nil && sender == nil)
 		{
 			NSError *error = nil;
-			ZGMemoryAddress guessAddress = ZGFindExecutableImageWithCache(self.currentProcess.processTask, self.currentProcess.pointerSize, self.mappedFilePath, self.currentProcess.cacheDictionary, &error) + self.offsetFromBase;
+			ZGMemoryAddress guessAddress = ZGFindExecutableImageWithCache(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, self.mappedFilePath, self.currentProcess.cacheDictionary, &error) + self.offsetFromBase;
 			if (error == nil)
 			{
 				calculatedMemoryAddress = guessAddress;
@@ -1020,7 +1020,7 @@ enum ZGStepExecution
 		
 		NSString *firstMappedFilePath = @"";
 		ZGMemoryAddress firstBaseAddress = 0;
-		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.baseAddress, &firstMappedFilePath, &firstBaseAddress, NULL, self.currentProcess.cacheDictionary);
+		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, self.currentProcess.baseAddress, &firstMappedFilePath, &firstBaseAddress, NULL, self.currentProcess.cacheDictionary);
 		
 		if (calculatedMemoryAddress == 0)
 		{
@@ -1075,7 +1075,7 @@ enum ZGStepExecution
 		
 		if (!shouldUseFirstInstruction)
 		{
-			NSRange textRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, calculatedMemoryAddress, &mappedFilePath, &baseAddress, NULL, self.currentProcess.cacheDictionary);
+			NSRange textRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, calculatedMemoryAddress, &mappedFilePath, &baseAddress, NULL, self.currentProcess.cacheDictionary);
 			
 			firstInstructionAddress = textRange.location;
 			maxInstructionsSize = textRange.length;
@@ -1421,7 +1421,7 @@ END_DEBUGGER_CHANGE:
 		{
 			NSString *partialPath = nil;
 			ZGMemoryAddress slide = 0;
-			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
+			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, self.currentProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
 			if (partialPath != nil && (slide > 0 || instruction.variable.address - relativeOffset > self.currentProcess.baseAddress))
 			{
 				instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, partialPath];
@@ -2008,7 +2008,7 @@ END_DEBUGGER_CHANGE:
 	return success;
 }
 
-- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize
+- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize dylinkerBinary:(ZGMachBinary *)dylinkerBinary
 {
 	NSMutableArray *instructions = nil;
 	
@@ -2018,7 +2018,7 @@ END_DEBUGGER_CHANGE:
 		int consumedLength = JUMP_REL32_INSTRUCTION_LENGTH;
 		while (consumedLength > 0)
 		{
-			ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 processTask:processTask pointerSize:pointerSize cacheDictionary:nil];
+			ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 processTask:processTask pointerSize:pointerSize dylinkerBinary:dylinkerBinary cacheDictionary:nil];
 			if (newInstruction == nil)
 			{
 				instructions = nil;
@@ -2050,7 +2050,7 @@ END_DEBUGGER_CHANGE:
 		free(nopBuffer);
 		
 		ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
-		NSArray *instructions = [self instructionsBeforeHookingIntoAddress:firstInstruction.variable.address injectingIntoDestination:allocatedAddress processTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize];
+		NSArray *instructions = [self instructionsBeforeHookingIntoAddress:firstInstruction.variable.address injectingIntoDestination:allocatedAddress processTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize dylinkerBinary:self.currentProcess.dylinkerBinary];
 		
 		if (instructions != nil)
 		{
