@@ -972,9 +972,9 @@ enum ZGStepExecution
 	{
 		[self.statusTextField setStringValue:@""];
 	}
-	else
+	else if (self.selectedInstructions.count > 0)
 	{
-		ZGInstruction *firstSelectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+		ZGInstruction *firstSelectedInstruction = [self.selectedInstructions objectAtIndex:0];
 		[self.statusTextField setStringValue:[NSString stringWithFormat:@"%@ + 0x%llX", self.mappedFilePath, firstSelectedInstruction.variable.address - self.baseAddress]];
 	}
 }
