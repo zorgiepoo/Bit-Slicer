@@ -197,20 +197,22 @@ enum ZGStepExecution
 
 - (void)windowDidAppearForFirstTime:(id)sender
 {
+	[self createSymbolicator];
+	
 	if (!sender)
 	{
 		[self readMemory:self];
 	}
 	
 	[self toggleBacktraceView:NSOffState];
-	
-	[self createSymbolicator];
 }
 
 #pragma mark Current Process Changed
 
 - (void)currentProcessChanged
 {
+	[self createSymbolicator];
+	
 	[self updateExecutionButtons];
 	
 	if (self.currentBreakPoint)
@@ -226,8 +228,6 @@ enum ZGStepExecution
 		[self toggleBacktraceView:NSOffState];
 		[self readMemory:nil];
 	}
-	
-	[self createSymbolicator];
 }
 
 #pragma mark Split Views
@@ -1004,7 +1004,7 @@ enum ZGStepExecution
 		else
 		{
 			NSError *error = nil;
-			NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue process:self.currentProcess failedImages:nil error:&error];
+			NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue process:self.currentProcess failedImages:nil symbolicator:self.symbolicator error:&error];
 			if (error != nil)
 			{
 				NSLog(@"Encountered error when reading memory from debugger:");

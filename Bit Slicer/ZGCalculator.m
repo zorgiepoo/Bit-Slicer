@@ -43,8 +43,10 @@
 #import "DDExpression.h"
 
 #define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"
+#define ZGFindSymbolFunction @"symbol"
 #define ZGProcessVariable @"ZGProcessVariable"
 #define ZGFailedImagesVariable @"ZGFailedImagesVariable"
+#define ZGSymbolicatorVariable @"ZGSymbolicatorVariable"
 
 @implementation ZGVariable (ZGCalculatorAdditions)
 
@@ -145,6 +147,76 @@
 			}
 			return [DDExpression numberExpressionWithNumber:@(foundAddress)];
 		} forName:ZGBaseAddressFunction];
+		
+		[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+			NSValue *symbolicatorValue = [vars objectForKey:ZGSymbolicatorVariable];
+			__block NSNumber *symbolAddressNumber = nil;
+			if (args.count == 0 || args.count > 2)
+			{
+				if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects 1 or 2 arguments"}];
+				}
+			}
+			else if (symbolicatorValue == nil)
+			{
+				if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects symbolicator variable"}];
+				}
+			}
+			else
+			{
+				DDExpression *symbolExpression = [args objectAtIndex:0];
+				if (symbolExpression.expressionType != DDExpressionTypeVariable)
+				{
+					if (error != NULL)
+					{
+						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects first argument to be a variable"}];
+					}
+				}
+				else
+				{
+					NSString *symbolString = symbolExpression.variable;
+					NSString *targetOwnerNameSuffix = nil;
+					
+					if (args.count == 2)
+					{
+						DDExpression *targetOwnerExpression = [args objectAtIndex:1];
+						if (targetOwnerExpression.expressionType == DDExpressionTypeVariable)
+						{
+							targetOwnerNameSuffix = targetOwnerExpression.variable;
+						}
+					}
+					
+					CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
+					CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
+						const char *symbolOwnerName = CSSymbolOwnerGetName(owner);
+						if (targetOwnerNameSuffix == nil || (symbolOwnerName != NULL && [@(symbolOwnerName) hasSuffix:targetOwnerNameSuffix]))
+						{
+							CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
+								if (symbolAddressNumber == nil)
+								{
+									const char *symbolName = CSSymbolGetName(symbol);
+									if (symbolName != NULL && [@(symbolName) isEqualToString:symbolString])
+									{
+										symbolAddressNumber = @(CSSymbolGetRange(symbol).location);
+									}
+								}
+							});
+						}
+					});
+				}
+			}
+			
+			if (symbolAddressNumber == nil)
+			{
+				return nil;
+			}
+			
+			return [DDExpression numberExpressionWithNumber:symbolAddressNumber];
+		}
+		forName:ZGFindSymbolFunction];
 	});
 }
 
@@ -169,7 +241,7 @@
 	return [self evaluateExpression:expression substitutions:nil error:&unusedError];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages error:(NSError **)error
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages symbolicator:(CSSymbolicatorRef)symbolicator error:(NSError **)error
 {
 	NSMutableString	 *newExpression = [[NSMutableString alloc] initWithString:expression];
 	
@@ -181,6 +253,10 @@
 	if (failedImages != nil)
 	{
 		[substitutions setObject:failedImages forKey:ZGFailedImagesVariable];
+	}
+	if (!CSIsNull(symbolicator))
+	{
+		[substitutions setObject:[NSValue valueWithPointer:&symbolicator] forKey:ZGSymbolicatorVariable];
 	}
 	return [self evaluateExpression:newExpression substitutions:substitutions error:error];
 }

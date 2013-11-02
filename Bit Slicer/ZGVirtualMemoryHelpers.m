@@ -302,6 +302,7 @@ void ZGParseMachHeader(ZGMemoryAddress machHeaderAddress, ZGMemorySize pointerSi
 			}
 		}
 	}
+	
 	if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
 	{
 		void *segmentBytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));

@@ -219,6 +219,7 @@
 			 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
 			 process:self.windowController.currentProcess
 			 failedImages:self.failedExecutableImages
+			 symbolicator:kCSNull
 			 error:&error];
 		
 		if (variable.address != newAddressString.zgUnsignedLongLongValue)
