@@ -150,7 +150,7 @@
 		
 		[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
 			NSValue *symbolicatorValue = [vars objectForKey:ZGSymbolicatorVariable];
-			__block NSNumber *symbolAddressNumber = nil;
+			__block NSNumber *symbolAddressNumber = @(0);
 			if (args.count == 0 || args.count > 2)
 			{
 				if (error != NULL)
@@ -172,13 +172,15 @@
 				{
 					if (error != NULL)
 					{
-						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects first argument to be a variable"}];
+						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects first argument to be a string variable"}];
 					}
 				}
 				else
 				{
 					NSString *symbolString = symbolExpression.variable;
 					NSString *targetOwnerNameSuffix = nil;
+					
+					BOOL encounteredError = NO;
 					
 					if (args.count == 2)
 					{
@@ -187,20 +189,33 @@
 						{
 							targetOwnerNameSuffix = targetOwnerExpression.variable;
 						}
+						else
+						{
+							encounteredError = YES;
+							if (error != NULL)
+							{
+								*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects second argument to be a string variable"}];
+							}
+						}
 					}
 					
-					CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
-					CSSymbolRef symbolFound = ZGFindFirstSymbol(symbolicator, symbolString, targetOwnerNameSuffix);
-					if (!CSIsNull(symbolFound))
+					if (!encounteredError)
 					{
-						symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
+						CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
+						CSSymbolRef symbolFound = ZGFindFirstSymbol(symbolicator, symbolString, targetOwnerNameSuffix);
+						if (!CSIsNull(symbolFound))
+						{
+							symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
+						}
+						else
+						{
+							if (error != NULL)
+							{
+								*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" could not find requested symbol"}];
+							}
+						}
 					}
 				}
-			}
-			
-			if (symbolAddressNumber == nil)
-			{
-				return nil;
 			}
 			
 			return [DDExpression numberExpressionWithNumber:symbolAddressNumber];

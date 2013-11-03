@@ -1009,6 +1009,7 @@ enum ZGStepExecution
 			{
 				NSLog(@"Encountered error when reading memory from debugger:");
 				NSLog(@"%@", error);
+				return;
 			}
 			if (ZGIsValidNumber(calculatedMemoryAddressExpression))
 			{
