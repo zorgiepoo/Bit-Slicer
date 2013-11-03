@@ -620,8 +620,8 @@ CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, N
 	const char *symbolCString = [symbolName UTF8String];
 	
 	CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
-		const char *symbolOwnerName = CSSymbolOwnerGetName(owner);
-		if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [@(symbolOwnerName) hasSuffix:partialSymbolOwnerName]))
+		const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
+		if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [partialSymbolOwnerName hasSuffix:@(symbolOwnerName)]))
 		{
 			CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
 				if (CSIsNull(resultSymbol))
