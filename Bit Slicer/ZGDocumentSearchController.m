@@ -353,7 +353,7 @@
 					baseArgument = [NSString stringWithFormat:@"\"%@\"", pathToUse];
 				}
 				
-				variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(%@)", variable.address - machHeaderAddress, baseArgument];
+				variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variable.address - machHeaderAddress];
 				variable.usesDynamicAddress = YES;
 				variable.finishedEvaluatingDynamicAddress = YES;
 				

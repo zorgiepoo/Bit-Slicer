@@ -168,7 +168,7 @@
 			
 			if (partialPath != nil && (slide > 0 || instruction.variable.address - relativeOffset > self.watchProcess.baseAddress))
 			{
-				instruction.variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, partialPath];
+				instruction.variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(\"%@\") + 0x%llX", partialPath, relativeOffset];
 				instruction.variable.usesDynamicAddress = YES;
 				instruction.variable.finishedEvaluatingDynamicAddress = YES;
 			}

@@ -995,7 +995,7 @@
 			NSError *error = nil;
 			ZGMemoryAddress baseAddress = ZGFindExecutableImageWithCache(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, partialPath, self.windowController.currentProcess.cacheDictionary, &error);
 			NSString *pathToUse = (error == nil && baseAddress == variable.address - relativeOffset) ? partialPath : mappedFilePath;
-			variable.addressFormula = [NSString stringWithFormat:@"0x%llX + "ZGBaseAddressFunction@"(\"%@\")", relativeOffset, pathToUse];
+			variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(\"%@\") + 0x%llX", pathToUse, relativeOffset];
 			variable.usesDynamicAddress = YES;
 		}
 	}
