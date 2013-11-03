@@ -190,22 +190,11 @@
 					}
 					
 					CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
-					CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
-						const char *symbolOwnerName = CSSymbolOwnerGetName(owner);
-						if (targetOwnerNameSuffix == nil || (symbolOwnerName != NULL && [@(symbolOwnerName) hasSuffix:targetOwnerNameSuffix]))
-						{
-							CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
-								if (symbolAddressNumber == nil)
-								{
-									const char *symbolName = CSSymbolGetName(symbol);
-									if (symbolName != NULL && [@(symbolName) isEqualToString:symbolString])
-									{
-										symbolAddressNumber = @(CSSymbolGetRange(symbol).location);
-									}
-								}
-							});
-						}
-					});
+					CSSymbolRef symbolFound = ZGFindFirstSymbol(symbolicator, symbolString, targetOwnerNameSuffix);
+					if (!CSIsNull(symbolFound))
+					{
+						symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
+					}
 				}
 			}
 			

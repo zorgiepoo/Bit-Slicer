@@ -614,6 +614,30 @@ ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemory
 	return foundAddress;
 }
 
+CSSymbolRef ZGFindFirstSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName)
+{
+	__block CSSymbolRef resultSymbol = kCSNull;
+	const char *symbolCString = [symbolName UTF8String];
+	
+	CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
+		const char *symbolOwnerName = CSSymbolOwnerGetName(owner);
+		if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [@(symbolOwnerName) hasSuffix:partialSymbolOwnerName]))
+		{
+			CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
+				if (CSIsNull(resultSymbol))
+				{
+					const char *symbolFound = CSSymbolGetName(symbol);
+					if (symbolFound != NULL && strcmp(symbolCString, symbolFound) == 0)
+					{
+						resultSymbol = symbol;
+					}
+				}
+			});
+		}
+	});
+	return resultSymbol;
+}
+
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)
 {
 	NSMutableArray *dataArray = [[NSMutableArray alloc] init];

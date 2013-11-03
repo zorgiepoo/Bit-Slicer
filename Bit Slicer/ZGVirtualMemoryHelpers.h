@@ -34,6 +34,7 @@
 
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
+#import "CoreSymbolication.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,6 +75,8 @@ NSRange ZGTextRange(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBin
 ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName);
 	
 NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide);
+
+CSSymbolRef ZGFindFirstSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName);
 
 void ZGFreeData(NSArray *dataArray);
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress);
