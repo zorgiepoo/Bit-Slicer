@@ -614,9 +614,10 @@ ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemory
 	return foundAddress;
 }
 
-CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName)
+CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName, BOOL requiresExactMatch)
 {
 	__block CSSymbolRef resultSymbol = kCSNull;
+	__block CSSymbolRef partialResultSymbol = kCSNull;
 	const char *symbolCString = [symbolName UTF8String];
 	
 	CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
@@ -627,14 +628,27 @@ CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, N
 				if (CSIsNull(resultSymbol))
 				{
 					const char *symbolFound = CSSymbolGetName(symbol);
-					if (symbolFound != NULL && strcmp(symbolCString, symbolFound) == 0)
+					if (symbolFound != NULL)
 					{
-						resultSymbol = symbol;
+						if (strcmp(symbolCString, symbolFound) == 0)
+						{
+							resultSymbol = symbol;
+						}
+						else if (!requiresExactMatch && CSIsNull(partialResultSymbol) && [@(symbolFound) rangeOfString:symbolName].location != NSNotFound)
+						{
+							partialResultSymbol = symbol;
+						}
 					}
 				}
 			});
 		}
 	});
+	
+	if (!requiresExactMatch && CSIsNull(resultSymbol))
+	{
+		resultSymbol = partialResultSymbol;
+	}
+	
 	return resultSymbol;
 }
 

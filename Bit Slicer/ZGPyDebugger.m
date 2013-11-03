@@ -382,7 +382,7 @@ static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
 		CSSymbolicatorRef symbolicator = CSSymbolicatorCreateWithTask(self->processTask);
 		if (!CSIsNull(symbolicator))
 		{
-			CSSymbolRef symbol = ZGFindSymbol(symbolicator, @(symbolName), symbolOwner == NULL ? nil : @(symbolOwner));
+			CSSymbolRef symbol = ZGFindSymbol(symbolicator, @(symbolName), symbolOwner == NULL ? nil : @(symbolOwner), YES);
 			if (CSIsNull(symbol))
 			{
 				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.findSymbol failed to find symbol %s", symbolName] UTF8String]);

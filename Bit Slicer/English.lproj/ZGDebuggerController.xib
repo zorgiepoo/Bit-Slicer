@@ -464,9 +464,9 @@
                     <toolbarItem implicitItemIdentifier="306F877D-325E-4A4F-9705-FC98ED04464E" label="Address/Symbol" paletteLabel="Address/Symbol" id="u3o-PN-adL">
                         <nil key="toolTip"/>
                         <size key="minSize" width="96" height="22"/>
-                        <size key="maxSize" width="150" height="22"/>
+                        <size key="maxSize" width="171" height="22"/>
                         <textField key="view" verticalHuggingPriority="750" id="ztk-ei-XwG">
-                            <rect key="frame" x="0.0" y="14" width="150" height="22"/>
+                            <rect key="frame" x="0.0" y="14" width="171" height="22"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="0x0" drawsBackground="YES" id="mHS-Rp-HdH">
                                 <font key="font" metaFont="system"/>
