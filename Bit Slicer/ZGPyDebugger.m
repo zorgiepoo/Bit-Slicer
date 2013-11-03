@@ -40,12 +40,14 @@
 #import "ZGVariable.h"
 #import "ZGDisassemblerObject.h"
 #import "ZGVirtualMemory.h"
+#import "ZGVirtualMemoryHelpers.h"
 #import "ZGProcess.h"
 #import "ZGScriptManager.h"
 #import "ZGBreakPointController.h"
 #import "ZGInstruction.h"
 #import "ZGMachBinary.h"
 #import "structmember.h"
+#import "CoreSymbolication.h"
 
 @class ZGPyDebugger;
 
@@ -73,6 +75,7 @@ declareDebugPrototypeMethod(assemble)
 declareDebugPrototypeMethod(disassemble)
 declareDebugPrototypeMethod(readBytes)
 declareDebugPrototypeMethod(writeBytes)
+declareDebugPrototypeMethod(findSymbol)
 declareDebugPrototypeMethod(bytesBeforeInjection)
 declareDebugPrototypeMethod(injectCode)
 declareDebugPrototypeMethod(watchWriteAccesses)
@@ -87,6 +90,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(log)
 	declareDebugMethod(assemble)
 	declareDebugMethod(disassemble)
+	declareDebugMethod(findSymbol)
 	declareDebugMethod(readBytes)
 	declareDebugMethod(writeBytes)
 	declareDebugMethod(bytesBeforeInjection)
@@ -366,6 +370,32 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 	}
 	
 	return success ? Py_BuildValue("") : NULL;
+}
+
+static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	char *symbolName = NULL;
+	char *symbolOwner = NULL;
+	if (PyArg_ParseTuple(args, "s|s:findSymbol", &symbolName, &symbolOwner))
+	{
+		CSSymbolicatorRef symbolicator = CSSymbolicatorCreateWithTask(self->processTask);
+		if (!CSIsNull(symbolicator))
+		{
+			CSSymbolRef symbol = ZGFindSymbol(symbolicator, @(symbolName), symbolOwner == NULL ? nil : @(symbolOwner));
+			if (CSIsNull(symbol))
+			{
+				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.findSymbol failed to find symbol %s", symbolName] UTF8String]);
+			}
+			else
+			{
+				retValue = Py_BuildValue("K", CSSymbolGetRange(symbol).location);
+			}
+			CSRelease(symbolicator);
+		}
+	}
+	
+	return retValue;
 }
 
 static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *args)

@@ -614,7 +614,7 @@ ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemory
 	return foundAddress;
 }
 
-CSSymbolRef ZGFindFirstSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName)
+CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName)
 {
 	__block CSSymbolRef resultSymbol = kCSNull;
 	const char *symbolCString = [symbolName UTF8String];

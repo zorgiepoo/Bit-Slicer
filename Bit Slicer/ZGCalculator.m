@@ -202,7 +202,7 @@
 					if (!encounteredError)
 					{
 						CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
-						CSSymbolRef symbolFound = ZGFindFirstSymbol(symbolicator, symbolString, targetOwnerNameSuffix);
+						CSSymbolRef symbolFound = ZGFindSymbol(symbolicator, symbolString, targetOwnerNameSuffix);
 						if (!CSIsNull(symbolFound))
 						{
 							symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
