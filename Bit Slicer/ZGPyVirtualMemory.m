@@ -318,20 +318,6 @@ static PyObject *VirtualMemory_readPointer(VirtualMemory *self, PyObject *args)
 	return retValue;
 }
 
-static void readBytes(PyObject **retValue, VirtualMemory *self, ZGMemoryAddress memoryAddress, ZGMemorySize *numberOfBytes, const char *functionName)
-{
-	void *bytes = NULL;
-	if (ZGReadBytes(self->processTask, memoryAddress, &bytes, numberOfBytes))
-	{
-		*retValue = Py_BuildValue("y#", bytes, *numberOfBytes);
-		ZGFreeBytes(self->processTask, bytes, *numberOfBytes);
-	}
-	else
-	{
-		PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.%s failed to read %llu byte(s) at 0x%llX", functionName, *numberOfBytes, memoryAddress] UTF8String]);
-	}
-}
-
 static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
@@ -339,25 +325,48 @@ static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 	ZGMemorySize numberOfBytes = 0;
 	if (PyArg_ParseTuple(args, "KK:readBytes", &memoryAddress, &numberOfBytes))
 	{
-		readBytes(&retValue, self, memoryAddress, &numberOfBytes, "readBytes");
+		void *bytes = NULL;
+		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, numberOfBytes))
+		{
+			retValue = Py_BuildValue("y#", bytes, numberOfBytes);
+			ZGFreeBytes(self->processTask, bytes, numberOfBytes);
+		}
+		else
+		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.readBytes failed to read %llu byte(s) at 0x%llX", numberOfBytes, memoryAddress] UTF8String]);
+		}
 	}
 	return retValue;
 }
 
-static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, ZGVariableType variableType, const char *functionName)
+static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, ZGVariableType variableType, const char *functionName, char *defaultEncoding)
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress memoryAddress = 0x0;
-	if (PyArg_ParseTuple(args, [[NSString stringWithFormat:@"K:%s", functionName] UTF8String], &memoryAddress))
+	char *encoding = defaultEncoding;
+	if (PyArg_ParseTuple(args, [[NSString stringWithFormat:@"K|s:%s", functionName] UTF8String], &memoryAddress, &encoding))
 	{
 		ZGMemorySize numberOfBytes = ZGGetStringSize(self->processTask, memoryAddress, variableType, 0, 0);
 		if (numberOfBytes == 0)
 		{
-			retValue = PyBytes_FromString("");
+			retValue = PyUnicode_FromString("");
 		}
 		else
 		{
-			readBytes(&retValue, self, memoryAddress, &numberOfBytes, functionName);
+			void *bytes = NULL;
+			if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &numberOfBytes))
+			{
+				retValue = PyUnicode_Decode(bytes, numberOfBytes, encoding, NULL);
+				if (retValue == NULL)
+				{
+					PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.%s failed to convert string to encoding %s (read %llu byte(s) from 0x%llX)", functionName, encoding, numberOfBytes, memoryAddress] UTF8String]);
+				}
+				ZGFreeBytes(self->processTask, bytes, numberOfBytes);
+			}
+			else
+			{
+				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"vm.%s failed to read %llu byte(s) at 0x%llX", functionName, numberOfBytes, memoryAddress] UTF8String]);
+			}
 		}
 	}
 	return retValue;
@@ -365,12 +374,12 @@ static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, Z
 
 static PyObject *VirtualMemory_readString8(VirtualMemory *self, PyObject *args)
 {
-	return VirtualMemory_readString(self, args, ZGString8, "readString8");
+	return VirtualMemory_readString(self, args, ZGString8, "readString8", "utf-8");
 }
 
 static PyObject *VirtualMemory_readString16(VirtualMemory *self, PyObject *args)
 {
-	return VirtualMemory_readString(self, args, ZGString16, "readString16");
+	return VirtualMemory_readString(self, args, ZGString16, "readString16", "utf-16");
 }
 
 #define VirtualMemory_write(type, typeFormat, functionName) \
