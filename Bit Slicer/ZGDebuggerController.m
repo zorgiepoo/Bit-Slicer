@@ -201,7 +201,7 @@ enum ZGStepExecution
 	
 	if (!sender)
 	{
-		[self readMemory:self];
+		[self readMemory:nil];
 	}
 	
 	[self toggleBacktraceView:NSOffState];
