@@ -64,82 +64,6 @@
 
 @implementation ZGCalculator
 
-+ (void)registerFindSymbolFunctionWithEvaluator:(DDMathEvaluator *)evaluator
-{
-	[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
-		NSValue *symbolicatorValue = [vars objectForKey:ZGSymbolicatorVariable];
-		__block NSNumber *symbolAddressNumber = @(0);
-		if (args.count == 0 || args.count > 2)
-		{
-			if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects 1 or 2 arguments"}];
-			}
-		}
-		else if (symbolicatorValue == nil)
-		{
-			if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects symbolicator variable"}];
-			}
-		}
-		else
-		{
-			DDExpression *symbolExpression = [args objectAtIndex:0];
-			if (symbolExpression.expressionType != DDExpressionTypeVariable)
-			{
-				if (error != NULL)
-				{
-					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects first argument to be a string variable"}];
-				}
-			}
-			else
-			{
-				NSString *symbolString = symbolExpression.variable;
-				NSString *targetOwnerNameSuffix = nil;
-				
-				BOOL encounteredError = NO;
-				
-				if (args.count == 2)
-				{
-					DDExpression *targetOwnerExpression = [args objectAtIndex:1];
-					if (targetOwnerExpression.expressionType == DDExpressionTypeVariable)
-					{
-						targetOwnerNameSuffix = targetOwnerExpression.variable;
-					}
-					else
-					{
-						encounteredError = YES;
-						if (error != NULL)
-						{
-							*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects second argument to be a string variable"}];
-						}
-					}
-				}
-				
-				if (!encounteredError)
-				{
-					CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
-					CSSymbolRef symbolFound = ZGFindSymbol(symbolicator, symbolString, targetOwnerNameSuffix);
-					if (!CSIsNull(symbolFound))
-					{
-						symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
-					}
-					else
-					{
-						if (error != NULL)
-						{
-							*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" could not find requested symbol"}];
-						}
-					}
-				}
-			}
-		}
-		
-		return [DDExpression numberExpressionWithNumber:symbolAddressNumber];
-	} forName:ZGFindSymbolFunction];
-}
-
 + (void)registerBaseAddressFunctionWithEvaluator:(DDMathEvaluator *)evaluator
 {
 	[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
@@ -225,6 +149,100 @@
 	} forName:ZGCalculatePointerFunction];
 }
 
++ (DDMathFunction)registerFindSymbolFunctionWithEvaluator:(DDMathEvaluator *)evaluator
+{
+	DDMathFunction findSymbolFunction = ^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+		NSValue *symbolicatorValue = [vars objectForKey:ZGSymbolicatorVariable];
+		__block NSNumber *symbolAddressNumber = @(0);
+		if (args.count == 0 || args.count > 2)
+		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects 1 or 2 arguments"}];
+			}
+		}
+		else if (symbolicatorValue == nil)
+		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects symbolicator variable"}];
+			}
+		}
+		else
+		{
+			DDExpression *symbolExpression = [args objectAtIndex:0];
+			if (symbolExpression.expressionType != DDExpressionTypeVariable)
+			{
+				if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects first argument to be a string variable"}];
+				}
+			}
+			else
+			{
+				NSString *symbolString = symbolExpression.variable;
+				NSString *targetOwnerNameSuffix = nil;
+				
+				BOOL encounteredError = NO;
+				
+				if (args.count == 2)
+				{
+					DDExpression *targetOwnerExpression = [args objectAtIndex:1];
+					if (targetOwnerExpression.expressionType == DDExpressionTypeVariable)
+					{
+						targetOwnerNameSuffix = targetOwnerExpression.variable;
+					}
+					else
+					{
+						encounteredError = YES;
+						if (error != NULL)
+						{
+							*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects second argument to be a string variable"}];
+						}
+					}
+				}
+				
+				if (!encounteredError)
+				{
+					CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
+					CSSymbolRef symbolFound = ZGFindSymbol(symbolicator, symbolString, targetOwnerNameSuffix);
+					if (!CSIsNull(symbolFound))
+					{
+						symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
+					}
+					else
+					{
+						if (error != NULL)
+						{
+							*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" could not find requested symbol"}];
+						}
+					}
+				}
+			}
+		}
+		
+		return [DDExpression numberExpressionWithNumber:symbolAddressNumber];
+	};
+	
+	[evaluator registerFunction:findSymbolFunction forName:ZGFindSymbolFunction];
+	
+	return findSymbolFunction;
+}
+
++ (void)registerFunctionResolverWithEvaluator:(DDMathEvaluator *)evaluator findSymbolFunction:(DDMathFunction)findSymbolFunction
+{
+	evaluator.functionResolver = (DDFunctionResolver)^(NSString *name) {
+		return (DDMathFunction)^(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError **error) {
+			id result = nil;
+			if ([vars objectForKey:ZGSymbolicatorVariable] != nil && args.count == 0)
+			{
+				result = findSymbolFunction(@[[DDExpression variableExpressionWithVariable:name]], vars, eval, error);
+			}
+			return result;
+		};
+	};
+}
+
 + (void)initialize
 {
 	static dispatch_once_t once;
@@ -232,7 +250,8 @@
 		DDMathEvaluator *evaluator = [DDMathEvaluator sharedMathEvaluator];
 		[self registerCalculatePointerFunctionWithEvaluator:evaluator];
 		[self registerBaseAddressFunctionWithEvaluator:evaluator];
-		[self registerFindSymbolFunctionWithEvaluator:evaluator];
+		DDMathFunction findSymbolFunction = [self registerFindSymbolFunctionWithEvaluator:evaluator];
+		[self registerFunctionResolverWithEvaluator:evaluator findSymbolFunction:findSymbolFunction];
 	});
 }
 
