@@ -65,7 +65,7 @@
 
 - (DDExpressionType) expressionType { return DDExpressionTypeFunction; }
 
-- (NSString *) function { return [function lowercaseString]; }
+- (NSString *) function { return function; }
 - (NSArray *) arguments { return arguments; }
 
 - (DDExpression *) simplifiedExpressionWithEvaluator:(DDMathEvaluator *)evaluator error:(NSError **)error {
