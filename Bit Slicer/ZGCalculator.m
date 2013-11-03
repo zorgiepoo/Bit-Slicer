@@ -64,163 +64,175 @@
 
 @implementation ZGCalculator
 
++ (void)registerFindSymbolFunctionWithEvaluator:(DDMathEvaluator *)evaluator
+{
+	[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+		NSValue *symbolicatorValue = [vars objectForKey:ZGSymbolicatorVariable];
+		__block NSNumber *symbolAddressNumber = @(0);
+		if (args.count == 0 || args.count > 2)
+		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects 1 or 2 arguments"}];
+			}
+		}
+		else if (symbolicatorValue == nil)
+		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects symbolicator variable"}];
+			}
+		}
+		else
+		{
+			DDExpression *symbolExpression = [args objectAtIndex:0];
+			if (symbolExpression.expressionType != DDExpressionTypeVariable)
+			{
+				if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects first argument to be a string variable"}];
+				}
+			}
+			else
+			{
+				NSString *symbolString = symbolExpression.variable;
+				NSString *targetOwnerNameSuffix = nil;
+				
+				BOOL encounteredError = NO;
+				
+				if (args.count == 2)
+				{
+					DDExpression *targetOwnerExpression = [args objectAtIndex:1];
+					if (targetOwnerExpression.expressionType == DDExpressionTypeVariable)
+					{
+						targetOwnerNameSuffix = targetOwnerExpression.variable;
+					}
+					else
+					{
+						encounteredError = YES;
+						if (error != NULL)
+						{
+							*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects second argument to be a string variable"}];
+						}
+					}
+				}
+				
+				if (!encounteredError)
+				{
+					CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
+					CSSymbolRef symbolFound = ZGFindSymbol(symbolicator, symbolString, targetOwnerNameSuffix);
+					if (!CSIsNull(symbolFound))
+					{
+						symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
+					}
+					else
+					{
+						if (error != NULL)
+						{
+							*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" could not find requested symbol"}];
+						}
+					}
+				}
+			}
+		}
+		
+		return [DDExpression numberExpressionWithNumber:symbolAddressNumber];
+	} forName:ZGFindSymbolFunction];
+}
+
++ (void)registerBaseAddressFunctionWithEvaluator:(DDMathEvaluator *)evaluator
+{
+	[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+		ZGProcess *process = [vars objectForKey:ZGProcessVariable];
+		ZGMemoryAddress foundAddress = 0x0;
+		if (args.count == 0)
+		{
+			foundAddress = process.baseAddress;
+		}
+		else if (args.count == 1)
+		{
+			NSMutableArray *failedImages = [vars objectForKey:ZGFailedImagesVariable];
+			
+			DDExpression *expression = [args objectAtIndex:0];
+			if (expression.expressionType == DDExpressionTypeVariable)
+			{
+				if ([failedImages containsObject:expression.variable])
+				{
+					if (error != NULL)
+					{
+						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" is ignoring image"}];
+					}
+				}
+				else
+				{
+					foundAddress = ZGFindExecutableImageWithCache(process.processTask, process.pointerSize, process.dylinkerBinary, expression.variable, process.cacheDictionary, error);
+					if (error != NULL && *error != nil)
+					{
+						NSError *imageError = *error;
+						[failedImages addObject:[imageError.userInfo objectForKey:ZGImageName]];
+					}
+				}
+			}
+			else if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" expects argument to be a variable"}];
+			}
+		}
+		else if (error != NULL)
+		{
+			*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" expects 1 or 0 arguments"}];
+		}
+		return [DDExpression numberExpressionWithNumber:@(foundAddress)];
+	} forName:ZGBaseAddressFunction];
+}
+
++ (void)registerCalculatePointerFunctionWithEvaluator:(DDMathEvaluator *)evaluator
+{
+	[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+		ZGMemoryAddress pointer = 0x0;
+		if (args.count == 1)
+		{
+			NSError *unusedError = nil;
+			NSNumber *memoryAddressNumber = [[args objectAtIndex:0] evaluateWithSubstitutions:vars evaluator:eval error:&unusedError];
+			
+			ZGMemoryAddress memoryAddress = [memoryAddressNumber unsignedLongLongValue];
+			ZGProcess *process = [vars objectForKey:ZGProcessVariable];
+			
+			void *bytes = NULL;
+			ZGMemorySize sizeRead = process.pointerSize;
+			if (ZGReadBytes(process.processTask, memoryAddress, &bytes, &sizeRead))
+			{
+				if (sizeRead == process.pointerSize)
+				{
+					pointer = (process.pointerSize == sizeof(ZGMemoryAddress)) ? *(ZGMemoryAddress *)bytes : *(ZG32BitMemoryAddress *)bytes;
+				}
+				else if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumber userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" didn't read sufficient number of bytes"}];
+				}
+				ZGFreeBytes(process.processTask, bytes, sizeRead);
+			}
+			else if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumber userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" failed to read bytes"}];
+			}
+		}
+		else if (error != NULL)
+		{
+			*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" expects 1 argument"}];
+		}
+		return [DDExpression numberExpressionWithNumber:@(pointer)];
+	} forName:ZGCalculatePointerFunction];
+}
+
 + (void)initialize
 {
 	static dispatch_once_t once;
 	dispatch_once(&once, ^{
 		DDMathEvaluator *evaluator = [DDMathEvaluator sharedMathEvaluator];
-		[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
-			ZGMemoryAddress pointer = 0x0;
-			if (args.count == 1)
-			{
-				NSError *unusedError = nil;
-				NSNumber *memoryAddressNumber = [[args objectAtIndex:0] evaluateWithSubstitutions:vars evaluator:eval error:&unusedError];
-				
-				ZGMemoryAddress memoryAddress = [memoryAddressNumber unsignedLongLongValue];
-				ZGProcess *process = [vars objectForKey:ZGProcessVariable];
-				
-				void *bytes = NULL;
-				ZGMemorySize sizeRead = process.pointerSize;
-				if (ZGReadBytes(process.processTask, memoryAddress, &bytes, &sizeRead))
-				{
-					if (sizeRead == process.pointerSize)
-					{
-						pointer = (process.pointerSize == sizeof(ZGMemoryAddress)) ? *(ZGMemoryAddress *)bytes : *(ZG32BitMemoryAddress *)bytes;
-					}
-					else if (error != NULL)
-					{
-						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumber userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" didn't read sufficient number of bytes"}];
-					}
-					ZGFreeBytes(process.processTask, bytes, sizeRead);
-				}
-				else if (error != NULL)
-				{
-					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumber userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" failed to read bytes"}];
-				}
-			}
-			else if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" expects 1 argument"}];
-			}
-			return [DDExpression numberExpressionWithNumber:@(pointer)];
-		} forName:ZGCalculatePointerFunction];
-		
-		[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
-			ZGProcess *process = [vars objectForKey:ZGProcessVariable];
-			ZGMemoryAddress foundAddress = 0x0;
-			if (args.count == 0)
-			{
-				foundAddress = process.baseAddress;
-			}
-			else if (args.count == 1)
-			{
-				NSMutableArray *failedImages = [vars objectForKey:ZGFailedImagesVariable];
-				
-				DDExpression *expression = [args objectAtIndex:0];
-				if (expression.expressionType == DDExpressionTypeVariable)
-				{
-					if ([failedImages containsObject:expression.variable])
-					{
-						if (error != NULL)
-						{
-							*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" is ignoring image"}];
-						}
-					}
-					else
-					{
-						foundAddress = ZGFindExecutableImageWithCache(process.processTask, process.pointerSize, process.dylinkerBinary, expression.variable, process.cacheDictionary, error);
-						if (error != NULL && *error != nil)
-						{
-							NSError *imageError = *error;
-							[failedImages addObject:[imageError.userInfo objectForKey:ZGImageName]];
-						}
-					}
-				}
-				else if (error != NULL)
-				{
-					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" expects argument to be a variable"}];
-				}
-			}
-			else if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGBaseAddressFunction @" expects 1 or 0 arguments"}];
-			}
-			return [DDExpression numberExpressionWithNumber:@(foundAddress)];
-		} forName:ZGBaseAddressFunction];
-		
-		[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
-			NSValue *symbolicatorValue = [vars objectForKey:ZGSymbolicatorVariable];
-			__block NSNumber *symbolAddressNumber = @(0);
-			if (args.count == 0 || args.count > 2)
-			{
-				if (error != NULL)
-				{
-					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects 1 or 2 arguments"}];
-				}
-			}
-			else if (symbolicatorValue == nil)
-			{
-				if (error != NULL)
-				{
-					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects symbolicator variable"}];
-				}
-			}
-			else
-			{
-				DDExpression *symbolExpression = [args objectAtIndex:0];
-				if (symbolExpression.expressionType != DDExpressionTypeVariable)
-				{
-					if (error != NULL)
-					{
-						*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects first argument to be a string variable"}];
-					}
-				}
-				else
-				{
-					NSString *symbolString = symbolExpression.variable;
-					NSString *targetOwnerNameSuffix = nil;
-					
-					BOOL encounteredError = NO;
-					
-					if (args.count == 2)
-					{
-						DDExpression *targetOwnerExpression = [args objectAtIndex:1];
-						if (targetOwnerExpression.expressionType == DDExpressionTypeVariable)
-						{
-							targetOwnerNameSuffix = targetOwnerExpression.variable;
-						}
-						else
-						{
-							encounteredError = YES;
-							if (error != NULL)
-							{
-								*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeUnresolvedVariable userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects second argument to be a string variable"}];
-							}
-						}
-					}
-					
-					if (!encounteredError)
-					{
-						CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
-						CSSymbolRef symbolFound = ZGFindSymbol(symbolicator, symbolString, targetOwnerNameSuffix);
-						if (!CSIsNull(symbolFound))
-						{
-							symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
-						}
-						else
-						{
-							if (error != NULL)
-							{
-								*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidArgument userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" could not find requested symbol"}];
-							}
-						}
-					}
-				}
-			}
-			
-			return [DDExpression numberExpressionWithNumber:symbolAddressNumber];
-		}
-		forName:ZGFindSymbolFunction];
+		[self registerCalculatePointerFunctionWithEvaluator:evaluator];
+		[self registerBaseAddressFunctionWithEvaluator:evaluator];
+		[self registerFindSymbolFunctionWithEvaluator:evaluator];
 	});
 }
 
