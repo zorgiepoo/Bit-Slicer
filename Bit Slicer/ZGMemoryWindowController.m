@@ -303,7 +303,7 @@
 			
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
-			if (self.currentProcess.processID == runningProcess.processIdentifier || (!foundTargetProcess && [self.desiredProcessName isEqualToString:runningProcess.name]))
+			if ((self.currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [self.desiredProcessName isEqualToString:runningProcess.name])
 			{
 				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 				foundTargetProcess = YES;
@@ -312,7 +312,7 @@
 	}
 	
 	// Handle dead process
-	if (self.desiredProcessName && ![self.desiredProcessName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject name]])
+	if (self.desiredProcessName != nil && ![self.desiredProcessName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject name]])
 	{
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
 		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.desiredProcessName];
