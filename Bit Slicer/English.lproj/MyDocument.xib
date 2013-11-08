@@ -1148,12 +1148,12 @@ base("program") will be substituted with the address of program.</string>
                     <popUpButton verticalHuggingPriority="750" id="wMv-KV-nmE">
                         <rect key="frame" x="110" y="184" width="143" height="26"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="push" title="08-bit Integer" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="9Kh-lP-68f">
+                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="9Kh-lP-68f">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="UJa-HE-MpN">
                                 <items>
-                                    <menuItem title="08-bit Integer" state="on" id="XYq-IR-3Gw"/>
+                                    <menuItem title="08-bit Integer" id="XYq-IR-3Gw"/>
                                     <menuItem title="16-bit Integer" tag="1" id="DZX-8q-NsT"/>
                                     <menuItem title="32-bit Integer" tag="2" id="YPf-99-vvE"/>
                                     <menuItem title="64-bit Integer" tag="3" id="36Y-12-hRf"/>
@@ -1780,6 +1780,9 @@ DQ
                 </defaultToolbarItems>
             </toolbar>
             <contentBorderThickness minY="26"/>
+            <connections>
+                <outlet property="delegate" destination="-2" id="6az-i4-Aaj"/>
+            </connections>
         </window>
     </objects>
 </document>
