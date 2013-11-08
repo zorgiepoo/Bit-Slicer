@@ -312,4 +312,9 @@ static BOOL didRegisteredHotKey;
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:[@"mailto:" stringByAppendingString:FEEDBACK_EMAIL]]];
 }
 
+- (IBAction)openDonationURL:(id)sender
+{
+	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:@"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A3DTDV2F3VE5G&lc=US&item_name=Bit%20Slicer%20App&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"]];
+}
+
 @end
