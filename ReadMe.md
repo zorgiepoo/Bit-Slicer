@@ -39,12 +39,9 @@ It allows you to cheat in video games by searching and modifying values such as 
 * [Bit Slicer 1.5.2](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.5.2.zip): OS X 10.6.8
 
 ## Support & Feedback
-* Check the [wiki](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/) for how to use features
-* Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for getting help
-* Or send an email to zorgiepoo (at) gmail (dot) com
-
-## Donations
-If this project has served you well as a user or developer, or you want to support development or the costs required to maintain this project, consider making a friendly [donation](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A3DTDV2F3VE5G&lc=US&item_name=Bit%20Slicer%20App&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted).
+* Check the [wiki](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/)
+* Visit the [forums](http://portingteam.com/forum/157-bit-slicer/)
+* Send an email to zorgiepoo (at) gmail (dot) com
 
 ## Source Code
 ### Licensing
