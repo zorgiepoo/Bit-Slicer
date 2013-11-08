@@ -256,7 +256,7 @@
 			
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
-			if (self.currentProcess.processID == runningProcess.processIdentifier || (!foundTargetProcess && [self.desiredProcessName isEqualToString:runningProcess.name]))
+			if ((self.currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [self.desiredProcessName isEqualToString:runningProcess.name])
 			{
 				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 				foundTargetProcess = YES;
