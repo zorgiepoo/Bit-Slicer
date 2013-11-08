@@ -1239,16 +1239,16 @@ static NSSize *expandedWindowMinSize = nil;
 		
 		ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
 		
-		if (!selectedVariable.value)
-		{
-			return NO;
-		}
-		
 		ZGMemoryAddress memoryAddress = selectedVariable.address;
 		ZGMemorySize memorySize = selectedVariable.size;
 		ZGMemoryProtection memoryProtection;
 		
 		if (!ZGMemoryProtectionInRegion(self.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+		{
+			return NO;
+		}
+		
+		if (memoryAddress + memorySize < selectedVariable.address || memoryAddress > selectedVariable.address + selectedVariable.size)
 		{
 			return NO;
 		}

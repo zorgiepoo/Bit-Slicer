@@ -631,7 +631,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	}
 	
 	ZGMemorySize watchSize = 0;
-	if (variable.size == 1)
+	if (variable.size <= 1)
 	{
 		watchSize = 1;
 	}
