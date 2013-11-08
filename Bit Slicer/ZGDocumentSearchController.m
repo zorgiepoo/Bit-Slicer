@@ -190,6 +190,7 @@
 	
 	[self.windowController updateClearButton];
 	
+	[self.windowController.searchingProgressIndicator setHidden:NO];
 	self.windowController.runningApplicationsPopUpButton.enabled = NO;
 	self.windowController.dataTypesPopUpButton.enabled = NO;
 	self.windowController.variableQualifierMatrix.enabled = NO;
@@ -213,6 +214,8 @@
 	self.isBusy = NO;
 	
 	[self.windowController updateClearButton];
+	
+	[self.windowController.searchingProgressIndicator setHidden:YES];
 	
 	self.windowController.dataTypesPopUpButton.enabled = YES;
     

@@ -98,28 +98,9 @@
 	self.scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
 	
 	self.tableController.variablesTableView = self.variablesTableView;
-    
-	if (![NSUserDefaults.standardUserDefaults boolForKey:ZG_EXPAND_DOCUMENT_OPTIONS])
-	{
-		[self optionsDisclosureButton:nil];
-	}
 	
+	[self.generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	[self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
-	
-	if ([ZGAppController isRunningOnLionOrLater])
-	{
-		[NSNotificationCenter.defaultCenter
-		 addObserver:self
-		 selector:@selector(watchWindowDidExitFullScreen:)
-		 name:NSWindowDidExitFullScreenNotification
-		 object:self.window];
-        
-		[NSNotificationCenter.defaultCenter
-		 addObserver:self
-		 selector:@selector(watchWindowWillExitFullScreen:)
-		 name:NSWindowWillExitFullScreenNotification
-		 object:self.window];
-	}
 	
 	if ([self.window respondsToSelector:@selector(occlusionState)])
 	{
@@ -665,7 +646,7 @@
 	{
 		self.flagsTextField.enabled = NO;
 		self.flagsTextField.stringValue = @"";
-		self.flagsLabel.stringValue = @"Flags:";
+		self.flagsLabel.stringValue = @"";
 		self.flagsLabel.textColor = NSColor.disabledControlTextColor;
 	}
 	else if (dataType == ZGFloat || dataType == ZGDouble)
@@ -698,7 +679,7 @@
 		{
 			self.flagsTextField.enabled = NO;
 			self.flagsTextField.stringValue = @"";
-			self.flagsLabel.stringValue = @"Flags:";
+			self.flagsLabel.stringValue = @"";
 			self.flagsLabel.textColor = NSColor.disabledControlTextColor;
 		}
 		else
@@ -718,104 +699,6 @@
 	else
 	{
 		self.searchButton.title = @"Search";
-	}
-}
-
-static NSSize *expandedWindowMinSize = nil;
-- (IBAction)optionsDisclosureButton:(id)sender
-{
-    NSRect windowFrame = self.window.frame;
-	
-	// The first time this method is called, the disclosure triangle is expanded
-	// Record the minimize size of the window before we expand the content
-	// This will make it easy to keep track of the minimum window size when expanded,
-	// and will make it easy to calculate the minimum window size when contracted.
-	if (!expandedWindowMinSize)
-	{
-		expandedWindowMinSize = malloc(sizeof(NSSize));
-		if (!expandedWindowMinSize)
-		{
-			NSLog(@"optionsDisclosureButton: Not enough memory");
-			return;
-		}
-		
-		*expandedWindowMinSize = self.window.minSize;
-	}
-	
-	// This occurs when sender is nil (when we call it in code), or when
-	// it's called by another action (eg: the "Options" label button)
-	if (sender != self.optionsDisclosureButton)
-	{
-		self.optionsDisclosureButton.state = (self.optionsDisclosureButton.state == NSOnState ? NSOffState : NSOnState);
-	}
-	
-	switch (self.optionsDisclosureButton.state)
-	{
-		case NSOnState:
-			// Check if we need to resize based on the relative position between the functionPopUpButton and the optionsView
-			// If so, this means that the functionPopUpButton's y origin > optionsView y origin
-			if (self.optionsView.frame.origin.y < self.functionPopUpButton.frame.origin.y + self.functionPopUpButton.frame.size.height + 6)
-			{
-				// Resize the window to its the minimum size when the disclosure triangle is expanded
-				windowFrame.size.height += (self.functionPopUpButton.frame.origin.y + self.functionPopUpButton.frame.size.height + 6) - self.optionsView.frame.origin.y;
-				windowFrame.origin.y -= (self.functionPopUpButton.frame.origin.y + self.functionPopUpButton.frame.size.height + 6) - self.optionsView.frame.origin.y;
-				
-				[self.window
-				 setFrame:windowFrame
-				 display:YES
-				 animate:YES];
-			}
-			
-			self.optionsView.hidden = NO;
-			
-			self.window.minSize = *expandedWindowMinSize;
-			break;
-		case NSOffState:
-			self.optionsView.hidden = YES;
-			
-			// Only resize when the window is at the minimum size
-			if (windowFrame.size.height == [self.window minSize].height)
-			{
-				windowFrame.size.height -= self.optionsView.frame.size.height + 6;
-				windowFrame.origin.y += self.optionsView.frame.size.height + 6;
-				
-				[self.window
-				 setFrame:windowFrame
-				 display:YES
-				 animate:YES];
-			}
-			
-			NSSize minSize = *expandedWindowMinSize;
-			minSize.height -= self.optionsView.frame.size.height + 6;
-			self.window.minSize = minSize;
-			break;
-		default:
-			break;
-	}
-	
-	[NSUserDefaults.standardUserDefaults
-	 setBool:self.optionsDisclosureButton.state
-	 forKey:ZG_EXPAND_DOCUMENT_OPTIONS];
-}
-
-- (void)watchWindowWillExitFullScreen:(NSNotificationCenter *)notification
-{
-	self.optionsView.hidden = YES;
-}
-
-- (void)watchWindowDidExitFullScreen:(NSNotification *)notification
-{
-	if (expandedWindowMinSize && self.window.minSize.height == expandedWindowMinSize->height)
-	{
-		if (self.window.frame.size.height < expandedWindowMinSize->height)
-		{
-			self.optionsDisclosureButton.state = NSOffState;
-			[self optionsDisclosureButton:nil];
-		}
-		else
-		{
-			self.optionsView.hidden = NO;
-		}
 	}
 }
 

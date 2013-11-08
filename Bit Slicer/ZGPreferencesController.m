@@ -66,7 +66,6 @@
 			ZG_HOT_KEY_MODIFIER : @((NSInteger)0),
 			// If user is running an alpha version, we should set this to YES
 			ZG_CHECK_FOR_ALPHA_UPDATES : @([self runningAlpha]),
-			ZG_EXPAND_DOCUMENT_OPTIONS : @(NO),
 			ZG_REGISTER_TYPES : @{},
 			ZG_DEBUG_QUALIFIER : @(0),
 			SU_FEED_URL_KEY : ([self runningAlpha] ? ALPHA_APPCAST_URL : APPCAST_URL),
