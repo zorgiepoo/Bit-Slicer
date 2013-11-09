@@ -38,6 +38,7 @@
 #import <Sparkle/Sparkle.h>
 
 #define SU_FEED_URL_KEY @"SUFeedURL"
+#define SU_SEND_PROFILE_INFO_KEY @"SUSendProfileInfo"
 
 #define APPCAST_URL @"http://zorg.tejat.net/bitslicer/update.php"
 #define ALPHA_APPCAST_URL @"http://zorg.tejat.net/bitslicer/update_alpha.php"
@@ -47,6 +48,7 @@
 @property (assign) IBOutlet SRRecorderControl *hotkeyRecorder;
 @property (assign) IBOutlet NSButton *checkForUpdatesButton;
 @property (assign) IBOutlet NSButton *checkForAlphaUpdatesButton;
+@property (assign) IBOutlet NSButton *sendProfileInfoButton;
 
 @end
 
@@ -105,11 +107,17 @@
 		{
 			self.checkForAlphaUpdatesButton.state = NSOnState;
 		}
+		
+		if ([NSUserDefaults.standardUserDefaults boolForKey:SU_SEND_PROFILE_INFO_KEY])
+		{
+			self.sendProfileInfoButton.state = NSOnState;
+		}
 	}
 	else
 	{
 		self.checkForAlphaUpdatesButton.enabled = NO;
 		self.checkForUpdatesButton.state = NSOffState;
+		self.sendProfileInfoButton.state = NSOffState;
 	}
 }
 
@@ -190,6 +198,13 @@
 	 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 	
 	[self updateFeedURL];
+}
+
+- (IBAction)changeSendProfileInformation:(id)sender
+{
+	[NSUserDefaults.standardUserDefaults
+	 setBool:self.sendProfileInfoButton.state == NSOnState
+	 forKey:SU_SEND_PROFILE_INFO_KEY];
 }
 
 @end
