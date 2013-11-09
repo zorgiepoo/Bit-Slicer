@@ -809,18 +809,20 @@
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[self scrollAndSelectRow:selectionRow];
-				
-				self.disassembling = NO;
-				[self.dissemblyProgressIndicator setHidden:YES];
-				[self.addressTextField setEnabled:YES];
-				[self.runningApplicationsPopUpButton setEnabled:YES];
-				[self.stopButton setHidden:YES];
-				
-				[self updateNavigationButtons];
 			});
 			
 			ZGFreeBytes(self.currentProcess.processTask, bytes, size);
 		}
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			self.disassembling = NO;
+			[self.dissemblyProgressIndicator setHidden:YES];
+			[self.addressTextField setEnabled:YES];
+			[self.runningApplicationsPopUpButton setEnabled:YES];
+			[self.stopButton setHidden:YES];
+			
+			[self updateNavigationButtons];
+		});
 	});
 }
 
