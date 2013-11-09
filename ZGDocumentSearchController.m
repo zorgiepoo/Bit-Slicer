@@ -933,7 +933,8 @@
 		[self prepareTask];
 		[self.searchProgress clear];
 		
-		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.document.currentProcess.is64Bit);
+		ZGVariableQualifier qualifier = [[self.document.variableQualifierMatrix cellWithTag:SIGNED_BUTTON_CELL_TAG] state] == NSOnState ? ZGSigned : ZGUnsigned;
+		comparison_function_t compareFunction = getComparisonFunction(functionType, dataType, self.document.currentProcess.is64Bit, qualifier);
 		
 		dispatch_block_t completeSearchBlock = ^
 		{
