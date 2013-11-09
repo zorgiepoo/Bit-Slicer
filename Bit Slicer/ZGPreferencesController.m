@@ -39,8 +39,8 @@
 
 #define SU_FEED_URL_KEY @"SUFeedURL"
 
-#define APPCAST_URL @"http://zorg.tejat.net/bitslicer/appcast.xml"
-#define ALPHA_APPCAST_URL @"http://zorg.tejat.net/bitslicer/appcast_alpha.xml"
+#define APPCAST_URL @"http://zorg.tejat.net/bitslicer/update.php"
+#define ALPHA_APPCAST_URL @"http://zorg.tejat.net/bitslicer/update_alpha.php"
 
 @interface ZGPreferencesController ()
 
