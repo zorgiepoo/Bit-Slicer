@@ -567,11 +567,6 @@ comparison_function_t getLessThanComparisonFunction(ZGVariableType dataType, BOO
 				comparisonFunction = ZGUInt16LessThan;
 			}
 			break;
-		case ZGPointer:
-			if (is64Bit)
-			{
-				goto ZG_64_BIT_LESS_THAN_LABEL;
-			}
 		case ZGInt32:
 			if (qualifier == ZGSigned)
 			{
@@ -582,7 +577,6 @@ comparison_function_t getLessThanComparisonFunction(ZGVariableType dataType, BOO
 				comparisonFunction = ZGUInt32LessThan;
 			}
 			break;
-		ZG_64_BIT_LESS_THAN_LABEL:
 		case ZGInt64:
 			if (qualifier == ZGSigned)
 			{
@@ -602,6 +596,9 @@ comparison_function_t getLessThanComparisonFunction(ZGVariableType dataType, BOO
 		case ZGUTF8String:
 			break;
 		case ZGUTF16String:
+			break;
+		case ZGPointer:
+			comparisonFunction = is64Bit ? ZGUInt64LessThan : ZGUInt32LessThan;
 			break;
 		case ZGByteArray:
 			break;
@@ -636,11 +633,6 @@ comparison_function_t getGreaterThanComparisonFunction(ZGVariableType dataType, 
 				comparisonFunction = ZGUInt16GreaterThan;
 			}
 			break;
-		case ZGPointer:
-			if (is64Bit)
-			{
-				goto ZG_64_BIT_GREATER_THAN_LABEL;
-			}
 		case ZGInt32:
 			if (qualifier == ZGSigned)
 			{
@@ -651,7 +643,6 @@ comparison_function_t getGreaterThanComparisonFunction(ZGVariableType dataType, 
 				comparisonFunction = ZGUInt32GreaterThan;
 			}
 			break;
-		ZG_64_BIT_GREATER_THAN_LABEL:
 		case ZGInt64:
 			if (qualifier == ZGSigned)
 			{
@@ -671,6 +662,9 @@ comparison_function_t getGreaterThanComparisonFunction(ZGVariableType dataType, 
 		case ZGUTF8String:
 			break;
 		case ZGUTF16String:
+			break;
+		case ZGPointer:
+			comparisonFunction = is64Bit ? ZGUInt64GreaterThan : ZGUInt32GreaterThan;
 			break;
 		case ZGByteArray:
 			break;
