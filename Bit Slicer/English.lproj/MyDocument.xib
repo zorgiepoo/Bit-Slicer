@@ -256,7 +256,7 @@ Gw
         <window title="EditSizes" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" visibleAtLaunch="NO" animationBehavior="default" id="100678" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="162" y="389" width="352" height="90.087000000000003"/>
+            <rect key="contentRect" x="162" y="389" width="352" height="90"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <view key="contentView" id="100679">
                 <rect key="frame" x="0.0" y="0.0" width="352" height="90"/>
@@ -385,7 +385,6 @@ base("program") will be substituted with the address of program.</string>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="159" width="679" height="259"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
-            <value key="minSize" type="size" width="679" height="269"/>
             <view key="contentView" id="aTX-qN-msi">
                 <rect key="frame" x="0.0" y="0.0" width="679" height="259"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1018,7 +1017,6 @@ DQ
                     <constraint firstAttribute="bottom" secondItem="wPd-Sp-9md" secondAttribute="bottom" constant="65" id="AUu-PO-vO9"/>
                     <constraint firstItem="ddt-Ka-ZBK" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="57" id="Bkr-Eq-N5c"/>
                     <constraint firstItem="Vpc-Jb-WRb" firstAttribute="leading" secondItem="sKl-Ls-IQO" secondAttribute="trailing" constant="9" id="D0K-MR-Cex"/>
-                    <constraint firstItem="dsF-9S-fhS" firstAttribute="top" secondItem="Vpc-Jb-WRb" secondAttribute="bottom" constant="8" id="ECb-au-iCx"/>
                     <constraint firstItem="gqN-Y1-YpN" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="61" id="FRE-rR-7Sa"/>
                     <constraint firstItem="1ts-DF-nZQ" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="20" id="GTP-yo-Ywo"/>
                     <constraint firstItem="8dg-I8-jgu" firstAttribute="leading" secondItem="DEd-C2-YEZ" secondAttribute="trailing" constant="8" id="HYs-yr-TI5"/>
@@ -1037,6 +1035,7 @@ DQ
                     <constraint firstItem="wPd-Sp-9md" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="64" id="UxK-gN-0hz"/>
                     <constraint firstItem="3Lr-cw-4av" firstAttribute="leading" secondItem="wPd-Sp-9md" secondAttribute="trailing" constant="9" id="VUi-2z-mMo"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="dh4-mG-a7G" secondAttribute="trailing" constant="16" id="YQV-cB-C3Q"/>
+                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Vpc-Jb-WRb" secondAttribute="trailing" constant="429" id="YVY-uy-KKV"/>
                     <constraint firstAttribute="bottom" secondItem="dh4-mG-a7G" secondAttribute="bottom" constant="31" id="ZEA-47-Qln"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="7e1-hy-OZw" secondAttribute="trailing" constant="8" id="ZO2-2i-Lhs"/>
                     <constraint firstItem="gqN-Y1-YpN" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="35" id="Zfl-VY-eW0"/>
