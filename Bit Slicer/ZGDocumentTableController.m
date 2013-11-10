@@ -634,36 +634,6 @@
 		}
 	}
 	
-	NSString *valuesDisplayedString = @"";
-	
-	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
-	numberOfVariablesFormatter.format = @"#,###";
-	
-	NSUInteger variableCount = self.documentData.variables.count + self.windowController.searchController.searchResults.addressCount;
-	
-	if (variableCount <= self.documentData.variables.count)
-	{
-		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
-	}
-	else
-	{
-		valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(self.documentData.variables.count)],[numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
-	}
-	
-	if (valuesDisplayedString && variableCount != 1)
-	{
-		valuesDisplayedString = [valuesDisplayedString stringByAppendingString:@"s"];
-	}
-	
-	if (displayComponents.count > 0)
-	{
-		[displayComponents addObject:@""];
-	}
-	if (valuesDisplayedString != nil)
-	{
-		[displayComponents addObject:valuesDisplayedString];
-	}
-	
 	return [displayComponents componentsJoinedByString:@"\n"];
 }
 

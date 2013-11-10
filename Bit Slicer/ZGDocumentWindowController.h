@@ -51,7 +51,6 @@
 
 @property (assign) IBOutlet NSTableView *variablesTableView;
 @property (assign) IBOutlet NSProgressIndicator *searchingProgressIndicator;
-@property (assign) IBOutlet NSTextField *generalStatusTextField;
 @property (assign) IBOutlet NSMatrix *variableQualifierMatrix;
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
@@ -96,6 +95,8 @@
 - (void)loadDocumentUserInterface;
 
 - (void)markDocumentChange;
+
+- (void)setStatus:(id)status;
 
 - (IBAction)editVariablesAddress:(id)sender;
 

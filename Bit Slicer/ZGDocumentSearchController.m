@@ -284,7 +284,7 @@
 	{
 		self.windowController.searchingProgressIndicator.maxValue = (double)self.searchProgress.maxProgress;
 		self.windowController.searchingProgressIndicator.doubleValue = (double)self.searchProgress.progress;
-		self.windowController.generalStatusTextField.stringValue = [self numberOfVariablesFoundDescription];
+		[self.windowController setStatus:[self numberOfVariablesFoundDescription]];
 	}
 }
 
@@ -296,7 +296,7 @@
 	}
 	else
 	{
-		self.windowController.generalStatusTextField.stringValue = @"Cancelling search...";
+		[self.windowController setStatus:@"Cancelling search..."];
 	}
 }
 
@@ -435,7 +435,6 @@
 	if (self.searchProgress.shouldCancelSearch)
 	{
 		self.windowController.searchingProgressIndicator.doubleValue = self.searchProgress.progress;
-		self.windowController.generalStatusTextField.stringValue = @"Canceled search.";
 	}
 	else
 	{
@@ -465,6 +464,8 @@
 	[self.windowController updateObservingProcessOcclusionState];
 	
 	self.temporarySearchResults = nil;
+	
+	[self.windowController setStatus:nil];
 	
 	BOOL shouldMakeSearchFieldFirstResponder = YES;
 	
@@ -774,7 +775,7 @@
 	if (self.searchProgress.progressType == ZGSearchProgressMemoryStoring)
 	{
 		// Cancel memory store
-		self.windowController.generalStatusTextField.stringValue = @"Canceling Memory Store...";
+		[self.windowController setStatus:@"Canceling Memory Store..."];
 	}
 	else if (self.searchProgress.progressType == ZGSearchProgressMemoryWatching)
 	{
@@ -796,7 +797,7 @@
 {
 	[self prepareTask];
 	
-	self.windowController.generalStatusTextField.stringValue = @"Storing All Values...";
+	[self.windowController setStatus:@"Storing All Values..."];
 	[self.searchProgress clear];
 	
 	[self createUserInterfaceTimer];
@@ -809,14 +810,14 @@
 			
 			if (self.searchProgress.shouldCancelSearch)
 			{
-				self.windowController.generalStatusTextField.stringValue = @"Canceled Memory Store";
+				[self.windowController setStatus:@"Canceled Memory Store"];
 			}
 			else
 			{
 				self.searchData.savedData = self.tempSavedData;
 				self.tempSavedData = nil;
 				
-				self.windowController.generalStatusTextField.stringValue = @"Finished Memory Store";
+				[self.windowController setStatus:@"Finished Memory Store"];
 			}
 			
 			self.windowController.searchingProgressIndicator.doubleValue = 0;

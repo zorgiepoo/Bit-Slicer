@@ -237,7 +237,7 @@
 		
 		if (self.windowController.currentProcess.valid)
 		{
-			self.windowController.generalStatusTextField.stringValue = @"Cleared variables.";
+			[self.windowController setStatus:nil];
 		}
 		
 		[self.windowController markDocumentChange];
@@ -327,7 +327,7 @@
 	}
 	[[self.windowController.undoManager prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
 	
-	self.windowController.generalStatusTextField.stringValue = @"";
+	[self.windowController setStatus:nil];
 	
 	[self.windowController updateClearButton];
 }
@@ -335,7 +335,7 @@
 - (void)removeSelectedSearchValues
 {
 	[self removeVariablesAtRowIndexes:self.windowController.selectedVariableIndexes];
-	self.windowController.generalStatusTextField.stringValue = @"";
+	[self.windowController setStatus:nil];
 }
 
 - (void)addVariable:(id)sender

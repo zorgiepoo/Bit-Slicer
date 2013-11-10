@@ -48,12 +48,19 @@
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "ZGSearchFunctions.h"
+#import "ZGSearchResults.h"
 #import "ZGAppController.h"
 #import "ZGDebuggerController.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGDocument.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+
+@interface ZGDocumentWindowController ()
+
+@property (assign) IBOutlet NSTextField *generalStatusTextField;
+
+@end
 
 @implementation ZGDocumentWindowController
 
@@ -185,6 +192,42 @@
 	}
 }
 
+- (void)setStatus:(id)status
+{
+	if (status == nil)
+	{
+		NSUInteger variableCount = self.documentData.variables.count + self.searchController.searchResults.addressCount;
+		
+		NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
+		numberOfVariablesFormatter.format = @"#,###";
+		
+		NSString *valuesDisplayedString;
+		if (variableCount <= self.documentData.variables.count)
+		{
+			valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
+		}
+		else
+		{
+			valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(self.documentData.variables.count)], [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
+		}
+		
+		if (variableCount != 1)
+		{
+			valuesDisplayedString = [valuesDisplayedString stringByAppendingString:@"s"];
+		}
+		
+		[self.generalStatusTextField setStringValue:valuesDisplayedString];
+	}
+	else if ([status isKindOfClass:[NSString class]])
+	{
+		[self.generalStatusTextField setStringValue:status];
+	}
+	else if ([status isKindOfClass:[NSAttributedString class]])
+	{
+		[self.generalStatusTextField setAttributedStringValue:status];
+	}
+}
+
 - (void)loadDocumentUserInterface
 {
 	// don't use the last selected process name if the corresponding process isn't alive
@@ -204,7 +247,7 @@
 		}
 	}
     
-	self.generalStatusTextField.stringValue = @"";
+	[self setStatus:nil];
 	
 	[self addProcessesToPopupButton];
 	
@@ -346,12 +389,11 @@
 			 initWithString:[NSString stringWithFormat:@"Failed accessing %@", self.currentProcess.name]
 			 attributes:@{NSForegroundColorAttributeName : NSColor.redColor}];
 			
-			self.generalStatusTextField.attributedStringValue = errorMessage;
+			[self setStatus:errorMessage];
 		}
 		else
 		{
-			// clear the status
-			[self.generalStatusTextField setStringValue:@""];
+			[self setStatus:nil];
 		}
 	}
 	
@@ -427,7 +469,7 @@
 			 initWithString:[NSString stringWithFormat:@"%@ is not running.", self.currentProcess.name]
 			 attributes:@{NSForegroundColorAttributeName : NSColor.redColor}];
 			
-			self.generalStatusTextField.attributedStringValue = status;
+			[self setStatus:status];
 			
 			self.searchButton.enabled = NO;
 			
@@ -836,9 +878,6 @@
 {
 	if (self.undoManager.isUndoing || self.undoManager.isRedoing)
 	{
-		// Clear the status
-		self.generalStatusTextField.stringValue = @"";
-		
 		[[self.undoManager prepareWithInvocationTarget:self] updateVariables:self.documentData.variables searchResults:self.searchController.searchResults];
 	}
 	
@@ -847,6 +886,8 @@
 	
 	[self.tableController updateWatchVariablesTimer];
 	[self.tableController.variablesTableView reloadData];
+	
+	[self setStatus:nil];
 	
 	// Make sure the search value field is enabled if we aren't doing a store comparison
 	if ([self functionTypeAllowsSearchInput])
@@ -1135,8 +1176,6 @@
 - (IBAction)searchValue:(id)sender
 {
 	// Make sure our fields are up to date
-	[self changeBeginningAddressString:self.beginningAddressTextField];
-	[self changeEndingAddressString:self.endingAddressTextField];
 	[self changeSearchValueString:self.searchValueTextField];
 	
 	[self.searchController searchOrCancel];

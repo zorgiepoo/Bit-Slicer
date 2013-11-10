@@ -105,7 +105,7 @@
 - (void)cancelTask
 {
 	[self stopWatchingBreakPoints];
-	self.windowController.generalStatusTextField.stringValue = @"";
+	[self.windowController setStatus:nil];
 	
 	[self.windowController.searchingProgressIndicator stopAnimation:nil];
 	self.windowController.searchingProgressIndicator.indeterminate = NO;
@@ -186,7 +186,7 @@
 			self.variableInsertionIndex++;
 			
 			NSString *addedInstructionStatus = [NSString stringWithFormat:@"Added %@-byte instruction at %@...", instruction.variable.sizeStringValue, instruction.variable.addressStringValue];
-			self.windowController.generalStatusTextField.stringValue = [addedInstructionStatus stringByAppendingString:@" Stop when done."];
+			[self.windowController setStatus:[addedInstructionStatus stringByAppendingString:@" Stop when done."]];
 			
 			if (NSClassFromString(@"NSUserNotification"))
 			{
@@ -217,7 +217,7 @@
 		[self.windowController.searchController.searchProgress clear];
 		self.windowController.searchController.searchProgress.progressType = ZGSearchProgressMemoryWatching;
 		
-		self.windowController.generalStatusTextField.stringValue = [NSString stringWithFormat:@"Waiting until instruction %@ %@ (%lld byte%@)", watchPointType == ZGWatchPointWrite ? @"writes" : @"reads or writes", variable.addressStringValue, breakPoint.watchSize, breakPoint.watchSize != 1 ? @"s" : @""];
+		[self.windowController setStatus:[NSString stringWithFormat:@"Waiting until instruction %@ %@ (%lld byte%@)", watchPointType == ZGWatchPointWrite ? @"writes" : @"reads or writes", variable.addressStringValue, breakPoint.watchSize, breakPoint.watchSize != 1 ? @"s" : @""]];
 		
 		self.windowController.searchingProgressIndicator.indeterminate = YES;
 		[self.windowController.searchingProgressIndicator startAnimation:nil];
