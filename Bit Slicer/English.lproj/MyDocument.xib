@@ -23,7 +23,7 @@
                 <outlet property="searchButton" destination="dh4-mG-a7G" id="1hq-AX-Hnd"/>
                 <outlet property="searchValueLabel" destination="wPd-Sp-9md" id="sgi-lO-DrS"/>
                 <outlet property="searchValueTextField" destination="3Lr-cw-4av" id="lnP-W0-0nY"/>
-                <outlet property="searchingProgressIndicator" destination="DEd-C2-YEZ" id="eA5-GI-vhQ"/>
+                <outlet property="searchingProgressIndicator" destination="XIO-8r-Dm9" id="72t-xR-lZj"/>
                 <outlet property="variableQualifierMatrix" destination="7e1-hy-OZw" id="Tjq-0s-dxa"/>
                 <outlet property="variablesTableView" destination="HbN-z0-Vcf" id="a1I-Pk-xWi"/>
                 <outlet property="window" destination="d6e-L4-aaf" id="NIk-dD-o77"/>
@@ -689,14 +689,10 @@ DQ
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <progressIndicator hidden="YES" verticalHuggingPriority="750" maxValue="100" bezeled="NO" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="DEd-C2-YEZ">
-                        <rect key="frame" x="20" y="4" width="537" height="12"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    </progressIndicator>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8dg-I8-jgu">
-                        <rect key="frame" x="563" y="3" width="98" height="14"/>
+                        <rect key="frame" x="290" y="3" width="98" height="14"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
-                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Found 3 variables" id="6Kr-rx-QwW">
+                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="justified" title="Found 3 variables" id="6Kr-rx-QwW">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1007,6 +1003,10 @@ DQ
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <progressIndicator hidden="YES" maxValue="100" controlSize="small" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="XIO-8r-Dm9">
+                        <rect key="frame" x="20" y="4" width="264" height="12"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    </progressIndicator>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="dLn-LQ-VPC" secondAttribute="bottom" constant="95" id="0SM-eb-LLl"/>
@@ -1019,18 +1019,18 @@ DQ
                     <constraint firstItem="Vpc-Jb-WRb" firstAttribute="leading" secondItem="sKl-Ls-IQO" secondAttribute="trailing" constant="9" id="D0K-MR-Cex"/>
                     <constraint firstItem="gqN-Y1-YpN" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="61" id="FRE-rR-7Sa"/>
                     <constraint firstItem="1ts-DF-nZQ" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="20" id="GTP-yo-Ywo"/>
-                    <constraint firstItem="8dg-I8-jgu" firstAttribute="leading" secondItem="DEd-C2-YEZ" secondAttribute="trailing" constant="8" id="HYs-yr-TI5"/>
+                    <constraint firstAttribute="centerX" secondItem="8dg-I8-jgu" secondAttribute="centerX" constant="0.5" id="HYf-FK-IhD"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="dsF-9S-fhS" secondAttribute="trailing" constant="16" id="HfX-rD-sMB"/>
                     <constraint firstItem="dh4-mG-a7G" firstAttribute="top" secondItem="3Lr-cw-4av" secondAttribute="bottom" constant="8" id="HzE-cA-RAn"/>
-                    <constraint firstAttribute="bottom" secondItem="DEd-C2-YEZ" secondAttribute="bottom" constant="4" id="IJq-sW-GwV"/>
                     <constraint firstItem="dh4-mG-a7G" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="171" id="NFg-Us-Q8e"/>
+                    <constraint firstItem="8dg-I8-jgu" firstAttribute="leading" secondItem="XIO-8r-Dm9" secondAttribute="trailing" constant="8" id="Nga-R8-vFa"/>
                     <constraint firstItem="sKl-Ls-IQO" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="44" id="Ngd-8N-BKV"/>
                     <constraint firstItem="7e1-hy-OZw" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="113" id="OJk-KE-Pz6"/>
                     <constraint firstItem="wMv-KV-nmE" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="61" id="P71-Fu-c17"/>
+                    <constraint firstItem="XIO-8r-Dm9" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="20" id="QQK-4L-cp4"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="3Lr-cw-4av" secondAttribute="trailing" constant="16" id="QXC-bb-8Ut"/>
                     <constraint firstAttribute="trailing" secondItem="Iy4-iu-99I" secondAttribute="trailing" constant="20" id="TGI-BJ-UZz"/>
                     <constraint firstItem="dsF-9S-fhS" firstAttribute="leading" secondItem="dLn-LQ-VPC" secondAttribute="trailing" constant="9" id="Te9-lN-PIE"/>
-                    <constraint firstItem="DEd-C2-YEZ" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="20" id="Tvv-tq-jga"/>
                     <constraint firstAttribute="bottom" secondItem="GTm-c8-TQa" secondAttribute="bottom" constant="31" id="UVt-3g-8bv"/>
                     <constraint firstItem="wPd-Sp-9md" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="64" id="UxK-gN-0hz"/>
                     <constraint firstItem="3Lr-cw-4av" firstAttribute="leading" secondItem="wPd-Sp-9md" secondAttribute="trailing" constant="9" id="VUi-2z-mMo"/>
@@ -1040,9 +1040,9 @@ DQ
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="7e1-hy-OZw" secondAttribute="trailing" constant="8" id="ZO2-2i-Lhs"/>
                     <constraint firstItem="gqN-Y1-YpN" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="35" id="Zfl-VY-eW0"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="20" id="ayE-5q-akW"/>
+                    <constraint firstAttribute="bottom" secondItem="XIO-8r-Dm9" secondAttribute="bottom" constant="4" id="bE3-kE-I0u"/>
                     <constraint firstAttribute="bottom" secondItem="Iy4-iu-99I" secondAttribute="bottom" constant="31" id="c6D-li-Hyv"/>
                     <constraint firstAttribute="bottom" secondItem="8dg-I8-jgu" secondAttribute="bottom" constant="3" id="cDY-QQ-TOr"/>
-                    <constraint firstItem="8dg-I8-jgu" firstAttribute="leading" secondItem="DEd-C2-YEZ" secondAttribute="trailing" constant="8" id="d7e-sd-OVj"/>
                     <constraint firstItem="dsF-9S-fhS" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="112" id="e1o-DL-8oT"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="wMv-KV-nmE" secondAttribute="trailing" constant="16" id="f7I-XD-U4a"/>
                     <constraint firstAttribute="bottom" secondItem="sKl-Ls-IQO" secondAttribute="bottom" constant="124" id="f9c-hE-cM6"/>
@@ -1053,7 +1053,6 @@ DQ
                     <constraint firstItem="Vpc-Jb-WRb" firstAttribute="top" relation="greaterThanOrEqual" secondItem="7e1-hy-OZw" secondAttribute="bottom" constant="8" id="hY4-EE-EfK"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="1ts-DF-nZQ" secondAttribute="trailing" constant="16" id="i13-TF-pzR"/>
                     <constraint firstAttribute="bottom" secondItem="Vpc-Jb-WRb" secondAttribute="bottom" constant="120" id="lYf-sq-5QF"/>
-                    <constraint firstAttribute="trailing" secondItem="8dg-I8-jgu" secondAttribute="trailing" constant="20" id="pIt-TB-YGO"/>
                     <constraint firstItem="dLn-LQ-VPC" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="54" id="rNC-dV-aoE"/>
                     <constraint firstItem="GTm-c8-TQa" firstAttribute="top" secondItem="3Lr-cw-4av" secondAttribute="bottom" constant="8" id="ux6-lc-H6B"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="Vpc-Jb-WRb" secondAttribute="trailing" constant="16" id="y8A-gf-Vbh"/>
