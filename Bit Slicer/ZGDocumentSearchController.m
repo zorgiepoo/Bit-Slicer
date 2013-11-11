@@ -181,16 +181,24 @@
 
 - (void)prepareTask
 {
-	[self prepareTaskWithEscapeTitle:@"Cancel"];
+	[self prepareTaskWithEscapeTitle:@"Cancel" deterministic:YES];
 }
 
-- (void)prepareTaskWithEscapeTitle:(NSString *)escapeTitle
+- (void)prepareTaskWithEscapeTitle:(NSString *)escapeTitle deterministic:(BOOL)isDeterminisic
 {
 	self.isBusy = YES;
 	
 	[self.windowController updateClearButton];
 	
-	[self.windowController.searchingProgressIndicator setHidden:NO];
+	if (isDeterminisic)
+	{
+		[self.windowController.deterministicProgressIndicator setHidden:NO];
+	}
+	else
+	{
+		[self.windowController.indeterministicProgressIndicator setHidden:NO];
+	}
+	
 	self.windowController.runningApplicationsPopUpButton.enabled = NO;
 	self.windowController.dataTypesPopUpButton.enabled = NO;
 	self.windowController.variableQualifierMatrix.enabled = NO;
@@ -215,7 +223,8 @@
 	
 	[self.windowController updateClearButton];
 	
-	[self.windowController.searchingProgressIndicator setHidden:YES];
+	[self.windowController.deterministicProgressIndicator setHidden:YES];
+	[self.windowController.indeterministicProgressIndicator setHidden:YES];
 	
 	self.windowController.dataTypesPopUpButton.enabled = YES;
     
@@ -282,8 +291,8 @@
 {
 	if (self.searchProgress.initiatedSearch)
 	{
-		self.windowController.searchingProgressIndicator.maxValue = (double)self.searchProgress.maxProgress;
-		self.windowController.searchingProgressIndicator.doubleValue = (double)self.searchProgress.progress;
+		self.windowController.deterministicProgressIndicator.maxValue = (double)self.searchProgress.maxProgress;
+		self.windowController.deterministicProgressIndicator.doubleValue = (double)self.searchProgress.progress;
 		[self.windowController setStatus:[self numberOfVariablesFoundDescription]];
 	}
 }
@@ -302,7 +311,7 @@
 
 - (void)updateMemoryStoreUserInterface:(NSTimer *)timer
 {
-	self.windowController.searchingProgressIndicator.doubleValue = self.searchProgress.progress;
+	self.windowController.deterministicProgressIndicator.doubleValue = self.searchProgress.progress;
 }
 
 #pragma mark Searching
@@ -434,7 +443,7 @@
 	self.searchProgress.progress = 0;
 	if (self.searchProgress.shouldCancelSearch)
 	{
-		self.windowController.searchingProgressIndicator.doubleValue = self.searchProgress.progress;
+		self.windowController.deterministicProgressIndicator.doubleValue = self.searchProgress.progress;
 	}
 	else
 	{
@@ -820,7 +829,7 @@
 				[self.windowController setStatus:@"Finished Memory Store"];
 			}
 			
-			self.windowController.searchingProgressIndicator.doubleValue = 0;
+			self.windowController.deterministicProgressIndicator.doubleValue = 0;
 			
 			[self resumeFromTask];
 		});

@@ -50,7 +50,8 @@
 @interface ZGDocumentWindowController : NSWindowController
 
 @property (assign) IBOutlet NSTableView *variablesTableView;
-@property (assign) IBOutlet NSProgressIndicator *searchingProgressIndicator;
+@property (assign) IBOutlet NSProgressIndicator *deterministicProgressIndicator;
+@property (assign) IBOutlet NSProgressIndicator *indeterministicProgressIndicator;
 @property (assign) IBOutlet NSMatrix *variableQualifierMatrix;
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;

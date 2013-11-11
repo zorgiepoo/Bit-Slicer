@@ -466,7 +466,7 @@
 			// Don't remove the item, just indicate it's terminated
 			NSAttributedString *status =
 			[[NSAttributedString alloc]
-			 initWithString:[NSString stringWithFormat:@"%@ is not running.", self.currentProcess.name]
+			 initWithString:[NSString stringWithFormat:@"%@ is not running", self.currentProcess.name]
 			 attributes:@{NSForegroundColorAttributeName : NSColor.redColor}];
 			
 			[self setStatus:status];
