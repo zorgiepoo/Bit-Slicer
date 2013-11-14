@@ -25,9 +25,9 @@
                 <outlet property="searchButton" destination="dh4-mG-a7G" id="1hq-AX-Hnd"/>
                 <outlet property="searchValueLabel" destination="wPd-Sp-9md" id="sgi-lO-DrS"/>
                 <outlet property="searchValueTextField" destination="3Lr-cw-4av" id="lnP-W0-0nY"/>
-                <outlet property="searchingProgressIndicator" destination="EFn-6A-2Bc" id="BBX-tQ-HzW"/>
                 <outlet property="variableQualifierMatrix" destination="7e1-hy-OZw" id="Tjq-0s-dxa"/>
                 <outlet property="variablesTableView" destination="HbN-z0-Vcf" id="a1I-Pk-xWi"/>
+                <outlet property="variablesTableViewToBottomConstraint" destination="c6D-li-Hyv" id="BaM-hf-evF"/>
                 <outlet property="window" destination="d6e-L4-aaf" id="NIk-dD-o77"/>
             </connections>
         </customObject>
@@ -387,6 +387,7 @@ base("program") will be substituted with the address of program.</string>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="131" y="159" width="679" height="259"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <value key="minSize" type="size" width="679" height="259"/>
             <view key="contentView" id="aTX-qN-msi">
                 <rect key="frame" x="0.0" y="0.0" width="679" height="259"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1006,21 +1007,22 @@ DQ
                         </textFieldCell>
                     </textField>
                     <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="EFn-6A-2Bc" userLabel="Determinate Indicator">
-                        <rect key="frame" x="60" y="33" width="16" height="16"/>
+                        <rect key="frame" x="56" y="33" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
                     <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="nqo-NK-0hh" userLabel="Indeterminate Indicator">
-                        <rect key="frame" x="60" y="33" width="16" height="16"/>
+                        <rect key="frame" x="56" y="33" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="bottom" secondItem="dLn-LQ-VPC" secondAttribute="bottom" constant="95" id="0SM-eb-LLl"/>
+                    <constraint firstItem="GTm-c8-TQa" firstAttribute="top" secondItem="wPd-Sp-9md" secondAttribute="bottom" constant="13" id="0jI-67-eoe"/>
+                    <constraint firstItem="wPd-Sp-9md" firstAttribute="top" secondItem="sKl-Ls-IQO" secondAttribute="bottom" constant="42" id="3iI-ee-kwB"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="266" id="4Ml-Bh-AwW"/>
                     <constraint firstItem="wMv-KV-nmE" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="112" id="5UP-Ud-fkH"/>
                     <constraint firstItem="ddt-Ka-ZBK" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="20" id="6Sy-3y-XgN"/>
                     <constraint firstItem="GTm-c8-TQa" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="80" id="8pK-ha-twK"/>
-                    <constraint firstAttribute="bottom" secondItem="wPd-Sp-9md" secondAttribute="bottom" constant="65" id="AUu-PO-vO9"/>
+                    <constraint firstItem="wPd-Sp-9md" firstAttribute="top" secondItem="dLn-LQ-VPC" secondAttribute="bottom" constant="13" id="B19-er-1HA"/>
                     <constraint firstItem="ddt-Ka-ZBK" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="57" id="Bkr-Eq-N5c"/>
                     <constraint firstItem="Vpc-Jb-WRb" firstAttribute="leading" secondItem="sKl-Ls-IQO" secondAttribute="trailing" constant="9" id="D0K-MR-Cex"/>
                     <constraint firstItem="gqN-Y1-YpN" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="61" id="FRE-rR-7Sa"/>
@@ -1034,7 +1036,7 @@ DQ
                     <constraint firstItem="7e1-hy-OZw" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="113" id="OJk-KE-Pz6"/>
                     <constraint firstItem="wMv-KV-nmE" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="61" id="P71-Fu-c17"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="3Lr-cw-4av" secondAttribute="trailing" constant="16" id="QXC-bb-8Ut"/>
-                    <constraint firstItem="GTm-c8-TQa" firstAttribute="leading" secondItem="EFn-6A-2Bc" secondAttribute="trailing" constant="4" id="Qwd-rE-Qj0"/>
+                    <constraint firstItem="GTm-c8-TQa" firstAttribute="leading" secondItem="EFn-6A-2Bc" secondAttribute="trailing" constant="8" symbolic="YES" id="Qwd-rE-Qj0"/>
                     <constraint firstAttribute="trailing" secondItem="Iy4-iu-99I" secondAttribute="trailing" constant="20" id="TGI-BJ-UZz"/>
                     <constraint firstItem="dsF-9S-fhS" firstAttribute="leading" secondItem="dLn-LQ-VPC" secondAttribute="trailing" constant="9" id="Te9-lN-PIE"/>
                     <constraint firstAttribute="bottom" secondItem="GTm-c8-TQa" secondAttribute="bottom" constant="31" id="UVt-3g-8bv"/>
@@ -1042,7 +1044,6 @@ DQ
                     <constraint firstItem="3Lr-cw-4av" firstAttribute="leading" secondItem="wPd-Sp-9md" secondAttribute="trailing" constant="9" id="VUi-2z-mMo"/>
                     <constraint firstAttribute="bottom" secondItem="nqo-NK-0hh" secondAttribute="bottom" constant="33" id="YF9-Q3-bZ7"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="dh4-mG-a7G" secondAttribute="trailing" constant="16" id="YQV-cB-C3Q"/>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Vpc-Jb-WRb" secondAttribute="trailing" constant="429" id="YVY-uy-KKV"/>
                     <constraint firstAttribute="bottom" secondItem="dh4-mG-a7G" secondAttribute="bottom" constant="31" id="ZEA-47-Qln"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="7e1-hy-OZw" secondAttribute="trailing" constant="8" id="ZO2-2i-Lhs"/>
                     <constraint firstItem="gqN-Y1-YpN" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="35" id="Zfl-VY-eW0"/>
@@ -1053,18 +1054,28 @@ DQ
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="wMv-KV-nmE" secondAttribute="trailing" constant="16" id="f7I-XD-U4a"/>
                     <constraint firstItem="1ts-DF-nZQ" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="112" id="fOY-GL-DiP"/>
                     <constraint firstItem="3Lr-cw-4av" firstAttribute="top" secondItem="dsF-9S-fhS" secondAttribute="bottom" constant="8" id="fwA-xi-W09"/>
-                    <constraint firstItem="dh4-mG-a7G" firstAttribute="leading" secondItem="GTm-c8-TQa" secondAttribute="trailing" constant="12" id="fwc-S8-8zy"/>
-                    <constraint firstItem="GTm-c8-TQa" firstAttribute="leading" secondItem="nqo-NK-0hh" secondAttribute="trailing" constant="4" id="fx2-KE-Qbl"/>
+                    <constraint firstItem="dh4-mG-a7G" firstAttribute="leading" secondItem="GTm-c8-TQa" secondAttribute="trailing" constant="12" symbolic="YES" id="fwc-S8-8zy"/>
+                    <constraint firstItem="GTm-c8-TQa" firstAttribute="leading" secondItem="nqo-NK-0hh" secondAttribute="trailing" constant="8" symbolic="YES" id="fx2-KE-Qbl"/>
                     <constraint firstItem="7e1-hy-OZw" firstAttribute="top" secondItem="aTX-qN-msi" secondAttribute="top" constant="92" id="gPt-pI-feT"/>
-                    <constraint firstItem="Vpc-Jb-WRb" firstAttribute="top" relation="greaterThanOrEqual" secondItem="7e1-hy-OZw" secondAttribute="bottom" constant="8" id="hY4-EE-EfK"/>
-                    <constraint firstItem="dsF-9S-fhS" firstAttribute="top" secondItem="sKl-Ls-IQO" secondAttribute="bottom" constant="12" id="haA-30-BLF"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="1ts-DF-nZQ" secondAttribute="trailing" constant="16" id="i13-TF-pzR"/>
-                    <constraint firstItem="dsF-9S-fhS" firstAttribute="top" secondItem="Vpc-Jb-WRb" secondAttribute="bottom" constant="8" id="o7D-0o-65q"/>
+                    <constraint firstItem="dh4-mG-a7G" firstAttribute="top" secondItem="wPd-Sp-9md" secondAttribute="bottom" constant="13" id="ooq-Vs-Lxx"/>
                     <constraint firstItem="dLn-LQ-VPC" firstAttribute="leading" secondItem="aTX-qN-msi" secondAttribute="leading" constant="54" id="rNC-dV-aoE"/>
                     <constraint firstItem="GTm-c8-TQa" firstAttribute="top" secondItem="3Lr-cw-4av" secondAttribute="bottom" constant="8" id="ux6-lc-H6B"/>
                     <constraint firstItem="Iy4-iu-99I" firstAttribute="leading" secondItem="Vpc-Jb-WRb" secondAttribute="trailing" constant="16" id="y8A-gf-Vbh"/>
+                    <constraint firstItem="3Lr-cw-4av" firstAttribute="top" secondItem="Vpc-Jb-WRb" secondAttribute="bottom" constant="38" id="zdR-3O-GRt"/>
                 </constraints>
             </view>
+            <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" displayMode="iconOnly" sizeMode="regular" id="UZg-mb-r8g">
+                <allowedToolbarItems>
+                    <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="AUv-ym-Pvh"/>
+                    <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="cbr-z0-cak"/>
+                </allowedToolbarItems>
+                <defaultToolbarItems>
+                    <toolbarItem reference="cbr-z0-cak"/>
+                    <toolbarItem reference="cbr-z0-cak"/>
+                    <toolbarItem reference="AUv-ym-Pvh"/>
+                </defaultToolbarItems>
+            </toolbar>
             <contentBorderThickness minY="22"/>
             <connections>
                 <outlet property="delegate" destination="-2" id="6az-i4-Aaj"/>
