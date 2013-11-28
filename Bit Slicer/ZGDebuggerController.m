@@ -921,6 +921,7 @@ enum ZGStepExecution
 	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
 	{
 		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", address];
+		self.mappedFilePath = nil;
 		[self switchProcess];
 	}
 }
