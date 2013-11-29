@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		770FABAC1848354100C176B7 /* ZGEditValueWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABAA1848354100C176B7 /* ZGEditValueWindowController.m */; };
+		770FABAD1848354100C176B7 /* ZGEditValueWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770FABAB1848354100C176B7 /* ZGEditValueWindowController.xib */; };
+		770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABAF18490DB400C176B7 /* ZGEditAddressWindowController.m */; };
+		770FABB218490DB400C176B7 /* ZGEditAddressWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770FABB018490DB400C176B7 /* ZGEditAddressWindowController.xib */; };
+		770FABB71849160200C176B7 /* ZGEditSizeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */; };
+		770FABB81849160200C176B7 /* ZGEditSizeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770FABB61849160200C176B7 /* ZGEditSizeWindowController.xib */; };
 		773972B117D2E61200B958EE /* _DDFunctionContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728517D2E61200B958EE /* _DDFunctionContainer.m */; };
 		773972B217D2E61200B958EE /* _DDFunctionExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728717D2E61200B958EE /* _DDFunctionExpression.m */; };
 		773972B317D2E61200B958EE /* _DDFunctionTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728917D2E61200B958EE /* _DDFunctionTerm.m */; };
@@ -137,6 +143,15 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		770FABA91848354100C176B7 /* ZGEditValueWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGEditValueWindowController.h; path = "Bit Slicer/ZGEditValueWindowController.h"; sourceTree = "<group>"; };
+		770FABAA1848354100C176B7 /* ZGEditValueWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditValueWindowController.m; path = "Bit Slicer/ZGEditValueWindowController.m"; sourceTree = "<group>"; };
+		770FABAB1848354100C176B7 /* ZGEditValueWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGEditValueWindowController.xib; path = "Bit Slicer/ZGEditValueWindowController.xib"; sourceTree = "<group>"; };
+		770FABAE18490DB400C176B7 /* ZGEditAddressWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGEditAddressWindowController.h; path = "Bit Slicer/ZGEditAddressWindowController.h"; sourceTree = "<group>"; };
+		770FABAF18490DB400C176B7 /* ZGEditAddressWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditAddressWindowController.m; path = "Bit Slicer/ZGEditAddressWindowController.m"; sourceTree = "<group>"; };
+		770FABB018490DB400C176B7 /* ZGEditAddressWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGEditAddressWindowController.xib; path = "Bit Slicer/ZGEditAddressWindowController.xib"; sourceTree = "<group>"; };
+		770FABB41849160200C176B7 /* ZGEditSizeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGEditSizeWindowController.h; path = "Bit Slicer/ZGEditSizeWindowController.h"; sourceTree = "<group>"; };
+		770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditSizeWindowController.m; path = "Bit Slicer/ZGEditSizeWindowController.m"; sourceTree = "<group>"; };
+		770FABB61849160200C176B7 /* ZGEditSizeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGEditSizeWindowController.xib; path = "Bit Slicer/ZGEditSizeWindowController.xib"; sourceTree = "<group>"; };
 		7739728417D2E61200B958EE /* _DDFunctionContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionContainer.h; path = deps/DDMathParser/_DDFunctionContainer.h; sourceTree = "<group>"; };
 		7739728517D2E61200B958EE /* _DDFunctionContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDFunctionContainer.m; path = deps/DDMathParser/_DDFunctionContainer.m; sourceTree = "<group>"; };
 		7739728617D2E61200B958EE /* _DDFunctionExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionExpression.h; path = deps/DDMathParser/_DDFunctionExpression.h; sourceTree = "<group>"; };
@@ -551,6 +566,24 @@
 			name = mach_exc;
 			sourceTree = "<group>";
 		};
+		770FABB318490DDD00C176B7 /* Variable Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				77F1160117D2EEAA009E002A /* ZGVariableController.h */,
+				77F1160217D2EEAA009E002A /* ZGVariableController.m */,
+				770FABA91848354100C176B7 /* ZGEditValueWindowController.h */,
+				770FABAA1848354100C176B7 /* ZGEditValueWindowController.m */,
+				770FABAB1848354100C176B7 /* ZGEditValueWindowController.xib */,
+				770FABAE18490DB400C176B7 /* ZGEditAddressWindowController.h */,
+				770FABAF18490DB400C176B7 /* ZGEditAddressWindowController.m */,
+				770FABB018490DB400C176B7 /* ZGEditAddressWindowController.xib */,
+				770FABB41849160200C176B7 /* ZGEditSizeWindowController.h */,
+				770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */,
+				770FABB61849160200C176B7 /* ZGEditSizeWindowController.xib */,
+			);
+			name = "Variable Controllers";
+			sourceTree = "<group>";
+		};
 		7728EE0C16BE3DDA00F9E1AD /* Misc. */ = {
 			isa = PBXGroup;
 			children = (
@@ -847,6 +880,7 @@
 		77FF507D16EACF520005915D /* Documents */ = {
 			isa = PBXGroup;
 			children = (
+				770FABB318490DDD00C176B7 /* Variable Controllers */,
 				77F115EF17D2EDF9009E002A /* ZGDocument.h */,
 				77F115F017D2EDF9009E002A /* ZGDocument.m */,
 				77F115BD17D2EBE1009E002A /* MyDocument.xib */,
@@ -860,8 +894,6 @@
 				77F115FC17D2EE7E009E002A /* ZGDocumentTableController.m */,
 				77F115FE17D2EEA1009E002A /* ZGDocumentBreakPointController.h */,
 				77F115FF17D2EEA1009E002A /* ZGDocumentBreakPointController.m */,
-				77F1160117D2EEAA009E002A /* ZGVariableController.h */,
-				77F1160217D2EEAA009E002A /* ZGVariableController.m */,
 				7739728017D26A1600B958EE /* Scripting */,
 			);
 			name = Documents;
@@ -1006,9 +1038,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				77F115AA17D2E8AC009E002A /* yasm in Resources */,
+				770FABB218490DB400C176B7 /* ZGEditAddressWindowController.xib in Resources */,
 				77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */,
 				77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */,
 				77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */,
+				770FABAD1848354100C176B7 /* ZGEditValueWindowController.xib in Resources */,
 				77DA9D0B1800639E00549A37 /* continue.pdf in Resources */,
 				77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */,
 				77F115B317D2EAFE009E002A /* Credits.rtf in Resources */,
@@ -1020,6 +1054,7 @@
 				77F115BF17D2EBE1009E002A /* MyDocument.xib in Resources */,
 				77F115C217D2EBEC009E002A /* ZGDebuggerController.xib in Resources */,
 				77F115C517D2EBF3009E002A /* ZGCodeInjectionWindowController.xib in Resources */,
+				770FABB81849160200C176B7 /* ZGEditSizeWindowController.xib in Resources */,
 				77F115C817D2EBFA009E002A /* ZGMemoryViewerController.xib in Resources */,
 				77F115CA17D2ECEE009E002A /* DataInspectorView.xib in Resources */,
 				77CE28B817D538E300998F28 /* ZGLoggerWindowController.xib in Resources */,
@@ -1034,6 +1069,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				773972B117D2E61200B958EE /* _DDFunctionContainer.m in Sources */,
+				770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */,
 				773972B217D2E61200B958EE /* _DDFunctionExpression.m in Sources */,
 				773972B317D2E61200B958EE /* _DDFunctionTerm.m in Sources */,
 				773972B417D2E61200B958EE /* _DDFunctionUtilities.m in Sources */,
@@ -1076,6 +1112,7 @@
 				77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */,
 				77F115FD17D2EE7E009E002A /* ZGDocumentTableController.m in Sources */,
 				77F1160017D2EEA1009E002A /* ZGDocumentBreakPointController.m in Sources */,
+				770FABAC1848354100C176B7 /* ZGEditValueWindowController.m in Sources */,
 				77F1160317D2EEAA009E002A /* ZGVariableController.m in Sources */,
 				77F1160617D2EEB6009E002A /* ZGScriptManager.m in Sources */,
 				77F1160917D2EEC0009E002A /* ZGPyVirtualMemory.m in Sources */,
@@ -1087,6 +1124,7 @@
 				77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */,
 				77F1162217D2EF28009E002A /* ZGVirtualMemoryHelpers.m in Sources */,
 				77F1162517D2EF31009E002A /* ZGRegion.m in Sources */,
+				770FABB71849160200C176B7 /* ZGEditSizeWindowController.m in Sources */,
 				77F1162817D2EF3A009E002A /* ZGProcess.m in Sources */,
 				77F1162C17D2EF50009E002A /* ZGVariable.m in Sources */,
 				77F1162F17D2EF5A009E002A /* ZGUtilities.m in Sources */,

@@ -811,12 +811,6 @@
 
 #pragma mark Edit Variables Values
 
-- (void)editVariablesValueCancelButton
-{
-	[NSApp endSheet:self.windowController.editVariablesValueWindow];
-	[self.windowController.editVariablesValueWindow close];
-}
-
 - (void)editVariables:(NSArray *)variables newValues:(NSArray *)newValues
 {
 	NSMutableArray *oldValues = [[NSMutableArray alloc] init];
@@ -841,88 +835,7 @@
 	 newValues:oldValues];
 }
 
-- (void)editVariablesValueOkayButton
-{
-	[NSApp endSheet:self.windowController.editVariablesValueWindow];
-	[self.windowController.editVariablesValueWindow close];
-	
-	NSArray *variables = [self.windowController selectedVariables];
-	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
-	
-	for (ZGVariable *variable in variables)
-	{
-		if (variable.type != ZGScript)
-		{
-			ZGMemoryProtection memoryProtection;
-			ZGMemoryAddress memoryAddress = variable.address;
-			ZGMemorySize memorySize = variable.size;
-			
-			if (ZGMemoryProtectionInRegion(self.windowController.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
-			{
-				if (variable.address >= memoryAddress && variable.address + variable.size <= memoryAddress + memorySize)
-				{
-					[validVariables addObject:variable];
-				}
-			}
-		}
-	}
-	
-	if (validVariables.count == 0)
-	{
-		NSRunAlertPanel(@"Writing Variables Failed", @"The selected variables could not be overwritten.", nil, nil, nil);
-	}
-	else
-	{
-		NSMutableArray *valuesArray = [[NSMutableArray alloc] init];
-		
-		NSUInteger variableIndex;
-		for (variableIndex = 0; variableIndex < validVariables.count; variableIndex++)
-		{
-			[valuesArray addObject:self.windowController.editVariablesValueTextField.stringValue];
-		}
-		
-		[self
-		 editVariables:validVariables
-		 newValues:valuesArray];
-	}
-}
-
-- (void)editVariablesValueRequest
-{
-	NSArray *selectedVariables = [self.windowController selectedVariables];
-	ZGVariable *firstNonScriptVariable = nil;
-	for (ZGVariable *variable in selectedVariables)
-	{
-		if (variable.type == ZGScript)
-		{
-			[self.windowController.scriptManager openScriptForVariable:variable];
-		}
-		else if (firstNonScriptVariable == nil)
-		{
-			firstNonScriptVariable = variable;
-		}
-	}
-	
-	if (firstNonScriptVariable != nil)
-	{
-		self.windowController.editVariablesValueTextField.stringValue = firstNonScriptVariable.stringValue;
-		
-		[NSApp
-		 beginSheet:self.windowController.editVariablesValueWindow
-		 modalForWindow:self.windowController.window
-		 modalDelegate:self
-		 didEndSelector:nil
-		 contextInfo:NULL];
-	}
-}
-
 #pragma mark Edit Variables Address
-
-- (void)editVariablesAddressCancelButton
-{
-	[NSApp endSheet:self.windowController.editVariablesAddressWindow];
-	[self.windowController.editVariablesAddressWindow close];
-}
 
 - (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula
 {
@@ -943,29 +856,6 @@
 		[self.windowController.tableController.variablesTableView reloadData];
 	}
 	variable.finishedEvaluatingDynamicAddress = NO;
-}
-
-- (void)editVariablesAddressOkayButton
-{
-	[NSApp endSheet:self.windowController.editVariablesAddressWindow];
-	[self.windowController.editVariablesAddressWindow close];
-	
-	[self
-	 editVariable:[self.documentData.variables objectAtIndex:self.windowController.tableController.variablesTableView.selectedRow]
-	 addressFormula:self.windowController.editVariablesAddressTextField.stringValue];
-}
-
-- (void)editVariablesAddressRequest
-{
-	ZGVariable *variable = [self.documentData.variables objectAtIndex:self.windowController.tableController.variablesTableView.selectedRow];
-	self.windowController.editVariablesAddressTextField.stringValue = variable.addressFormula;
-	
-	[NSApp
-	 beginSheet:self.windowController.editVariablesAddressWindow
-	 modalForWindow:self.windowController.window
-	 modalDelegate:self
-	 didEndSelector:nil
-	 contextInfo:NULL];
 }
 
 #pragma mark Relativizing Variable Addresses
@@ -1005,12 +895,6 @@
 }
 
 #pragma mark Edit Variables Sizes (Byte Arrays)
-
-- (void)editVariablesSizeCancelButton
-{
-	[NSApp endSheet:self.windowController.editVariablesSizeWindow];
-	[self.windowController.editVariablesSizeWindow close];
-}
 
 - (void)editVariables:(NSArray *)variables requestedSizes:(NSArray *)requestedSizes
 {
@@ -1053,61 +937,6 @@
 	{
 		NSRunAlertPanel(@"Failed to change size", @"The size that you have requested could not be changed. Perhaps it is too big of a value?", nil, nil, nil);
 	}
-}
-
-- (void)editVariablesSizeOkayButton
-{
-	NSString *sizeExpression = [ZGCalculator evaluateExpression:self.windowController.editVariablesSizeTextField.stringValue];
-	
-	ZGMemorySize requestedSize = 0;
-	if (sizeExpression.zgIsHexRepresentation)
-	{
-		[[NSScanner scannerWithString:sizeExpression] scanHexLongLong:&requestedSize];
-	}
-	else
-	{
-		requestedSize = sizeExpression.zgUnsignedLongLongValue;
-	}
-	
-	if (!ZGIsValidNumber(sizeExpression))
-	{
-		NSRunAlertPanel(@"Invalid size", @"The size you have supplied is not valid.", nil, nil, nil);
-	}
-	else if (requestedSize <= 0)
-	{
-		NSRunAlertPanel(@"Failed to edit size", @"The size must be greater than 0.", nil, nil, nil);
-	}
-	else
-	{
-		[NSApp endSheet:self.windowController.editVariablesSizeWindow];
-		[self.windowController.editVariablesSizeWindow close];
-		
-		NSArray *variables = [self.windowController selectedVariables];
-		NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
-		
-		NSUInteger variableIndex;
-		for (variableIndex = 0; variableIndex < variables.count; variableIndex++)
-		{
-			[requestedSizes addObject:@(requestedSize)];
-		}
-		
-		[self
-		 editVariables:variables
-		 requestedSizes:requestedSizes];
-	}
-}
-
-- (void)editVariablesSizeRequest
-{
-	ZGVariable *firstVariable = [self.documentData.variables objectAtIndex:self.windowController.tableController.variablesTableView.selectedRow];
-	self.windowController.editVariablesSizeTextField.stringValue = firstVariable.sizeStringValue;
-	
-	[NSApp
-	 beginSheet:self.windowController.editVariablesSizeWindow
-	 modalForWindow:self.windowController.window
-	 modalDelegate:self
-	 didEndSelector:nil
-	 contextInfo:NULL];
 }
 
 @end

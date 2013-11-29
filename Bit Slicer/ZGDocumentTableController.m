@@ -550,7 +550,7 @@
 		}
 		else if (variable.usesDynamicAddress)
 		{
-			[self.windowController editVariablesAddress:nil];
+			[self.windowController requestEditingVariableAddress:nil];
 			return NO;
 		}
 	}

@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/20/12.
+ * Created by Mayur Pawashe on 11/28/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,43 +32,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
-#import "ZGVariable.h"
 
-#define SIGNED_BUTTON_CELL_TAG 0
+@class ZGVariableController;
+@class ZGScriptManager;
 
-@class ZGDocumentWindowController;
+@interface ZGEditValueWindowController : NSWindowController
 
-@interface ZGVariableController : NSObject
+- (id)initWithVariableController:(ZGVariableController *)variableController;
 
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
-
-- (void)freezeVariables;
-
-- (void)copyVariables;
-- (void)copyAddress;
-- (void)pasteVariables;
-
-- (void)clear;
-- (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes;
-- (void)removeSelectedSearchValues;
-- (void)disableHarmfulVariables:(NSArray *)variables;
-- (void)addVariable:(id)sender;
-- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
-
-- (void)nopVariables:(NSArray *)variables;
-
-- (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName;
-- (void)changeVariable:(ZGVariable *)variable newAddress:(NSString *)newAddress;
-- (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size;
-- (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag;
-- (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
-
-- (void)relativizeVariables:(NSArray *)variables;
-
-- (void)editVariables:(NSArray *)variables newValues:(NSArray *)newValues;
-- (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula;
-- (void)editVariables:(NSArray *)variables requestedSizes:(NSArray *)requestedSizes;
+- (void)requestEditingValuesFromVariables:(NSArray *)variables withProcessTask:(ZGMemoryMap)processTask attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager;
 
 @end

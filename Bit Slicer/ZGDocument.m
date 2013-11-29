@@ -36,7 +36,6 @@
 #import "ZGDocumentWindowController.h"
 #import "ZGDocumentData.h"
 #import "ZGSearchData.h"
-#import "ZGDocumentTableController.h"
 
 @interface ZGDocument ()
 

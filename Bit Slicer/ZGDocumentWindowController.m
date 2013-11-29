@@ -37,6 +37,9 @@
 #import "ZGDocumentSearchController.h"
 #import "ZGDocumentBreakPointController.h"
 #import "ZGVariableController.h"
+#import "ZGEditValueWindowController.h"
+#import "ZGEditAddressWindowController.h"
+#import "ZGEditSizeWindowController.h"
 #import "ZGScriptManager.h"
 #import "ZGProcessList.h"
 #import "ZGProcess.h"
@@ -57,6 +60,10 @@
 #import "ZGVirtualMemoryHelpers.h"
 
 @interface ZGDocumentWindowController ()
+
+@property (nonatomic) ZGEditValueWindowController *editValueWindowController;
+@property (nonatomic) ZGEditAddressWindowController *editAddressWindowController;
+@property (nonatomic) ZGEditSizeWindowController *editSizeWindowController;
 
 @property (assign) IBOutlet NSTextField *generalStatusTextField;
 
@@ -1051,7 +1058,7 @@
 		}
 	}
 	
-	else if (menuItem.action == @selector(editVariablesValue:))
+	else if (menuItem.action == @selector(requestEditingVariablesValue:))
 	{
 		menuItem.title = [NSString stringWithFormat:@"Edit Variable Value%@…", self.selectedVariables.count != 1 ? @"s" : @""];
 		
@@ -1061,7 +1068,7 @@
 		}
 	}
 	
-	else if (menuItem.action == @selector(editVariablesAddress:))
+	else if (menuItem.action == @selector(requestEditingVariableAddress:))
 	{
 		if (([self.searchController canCancelTask] && self.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
@@ -1069,7 +1076,7 @@
 		}
 	}
     
-    else if (menuItem.action == @selector(editVariablesSize:))
+    else if (menuItem.action == @selector(requestEditingVariablesSize:))
     {
 		NSArray *selectedVariables = [self selectedVariables];
 		menuItem.title = [NSString stringWithFormat:@"Edit Variable Size%@…", selectedVariables.count != 1 ? @"s" : @""];
@@ -1303,49 +1310,34 @@
 	[self.variableController nopVariables:[self selectedVariables]];
 }
 
-- (IBAction)editVariablesValue:(id)sender
+- (IBAction)requestEditingVariablesValue:(id)sender
 {
-	[self.variableController editVariablesValueRequest];
+	if (self.editValueWindowController == nil)
+	{
+		self.editValueWindowController = [[ZGEditValueWindowController alloc] initWithVariableController:self.variableController];
+	}
+	
+	[self.editValueWindowController requestEditingValuesFromVariables:self.selectedVariables withProcessTask:self.currentProcess.processTask attachedToWindow:self.window scriptManager:self.scriptManager];
 }
 
-- (IBAction)editVariablesValueOKButton:(id)sender
+- (IBAction)requestEditingVariableAddress:(id)sender
 {
-	[self.variableController editVariablesValueOkayButton];
+	if (self.editAddressWindowController == nil)
+	{
+		self.editAddressWindowController = [[ZGEditAddressWindowController alloc] initWithVariableController:self.variableController];
+	}
+	
+	[self.editAddressWindowController requestEditingAddressFromVariable:[self.selectedVariables objectAtIndex:0] attachedToWindow:self.window];
 }
 
-- (IBAction)editVariablesValueCancelButton:(id)sender
+- (IBAction)requestEditingVariablesSize:(id)sender
 {
-	[self.variableController editVariablesValueCancelButton];
-}
-
-- (IBAction)editVariablesAddress:(id)sender
-{
-	[self.variableController editVariablesAddressRequest];
-}
-
-- (IBAction)editVariablesAddressOKButton:(id)sender
-{
-	[self.variableController editVariablesAddressOkayButton];
-}
-
-- (IBAction)editVariablesAddressCancelButton:(id)sender
-{
-	[self.variableController editVariablesAddressCancelButton];
-}
-
-- (IBAction)editVariablesSize:(id)sender
-{
-	[self.variableController editVariablesSizeRequest];
-}
-
-- (IBAction)editVariablesSizeOKButton:(id)sender
-{
-	[self.variableController editVariablesSizeOkayButton];
-}
-
-- (IBAction)editVariablesSizeCancelButton:(id)sender
-{
-	[self.variableController editVariablesSizeCancelButton];
+	if (self.editSizeWindowController == nil)
+	{
+		self.editSizeWindowController = [[ZGEditSizeWindowController alloc] initWithVariableController:self.variableController];
+	}
+	
+	[self.editSizeWindowController requestEditingSizesFromVariables:self.selectedVariables attachedToWindow:self.window];
 }
 
 - (IBAction)relativizeVariablesAddress:(id)sender

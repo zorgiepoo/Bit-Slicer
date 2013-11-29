@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/20/12.
+ * Created by Mayur Pawashe on 11/29/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,43 +32,67 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
+#import "ZGEditAddressWindowController.h"
+#import "ZGVariableController.h"
 #import "ZGVariable.h"
 
-#define SIGNED_BUTTON_CELL_TAG 0
+@interface ZGEditAddressWindowController ()
 
-@class ZGDocumentWindowController;
+@property (nonatomic) ZGVariableController *variableController;
 
-@interface ZGVariableController : NSObject
+@property (assign) IBOutlet NSTextField *addressTextField;
+@property (nonatomic) ZGVariable *variable;
 
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
+@end
 
-- (void)freezeVariables;
+@implementation ZGEditAddressWindowController
 
-- (void)copyVariables;
-- (void)copyAddress;
-- (void)pasteVariables;
+- (NSString *)windowNibName
+{
+	return NSStringFromClass([self class]);
+}
 
-- (void)clear;
-- (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes;
-- (void)removeSelectedSearchValues;
-- (void)disableHarmfulVariables:(NSArray *)variables;
-- (void)addVariable:(id)sender;
-- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
+- (id)initWithVariableController:(ZGVariableController *)variableController
+{
+	self = [super init];
+	if (self != nil)
+	{
+		self.variableController = variableController;
+	}
+	return self;
+}
 
-- (void)nopVariables:(NSArray *)variables;
+- (void)requestEditingAddressFromVariable:(ZGVariable *)variable attachedToWindow:(NSWindow *)parentWindow
+{
+	[NSApp
+	 beginSheet:self.window
+	 modalForWindow:parentWindow
+	 modalDelegate:self
+	 didEndSelector:nil
+	 contextInfo:NULL];
+	
+	self.variable = variable;
+	self.addressTextField.stringValue = variable.addressFormula;
+}
 
-- (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName;
-- (void)changeVariable:(ZGVariable *)variable newAddress:(NSString *)newAddress;
-- (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size;
-- (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag;
-- (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
+- (IBAction)editAddress:(id)sender
+{
+	[NSApp endSheet:self.window];
+	[self.window close];
+	
+	[self.variableController
+	 editVariable:self.variable
+	 addressFormula:self.addressTextField.stringValue];
+	
+	self.variable = nil;
+}
 
-- (void)relativizeVariables:(NSArray *)variables;
-
-- (void)editVariables:(NSArray *)variables newValues:(NSArray *)newValues;
-- (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula;
-- (void)editVariables:(NSArray *)variables requestedSizes:(NSArray *)requestedSizes;
+- (IBAction)cancelEditingAddress:(id)sender
+{
+	[NSApp endSheet:self.window];
+	[self.window close];
+	
+	self.variable = nil;
+}
 
 @end

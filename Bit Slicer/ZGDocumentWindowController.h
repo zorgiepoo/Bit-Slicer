@@ -73,13 +73,6 @@
 @property (assign) IBOutlet NSButton *optionsDisclosureButton;
 @property (assign) IBOutlet NSView *optionsView;
 
-@property (assign) IBOutlet NSWindow *editVariablesValueWindow;
-@property (assign) IBOutlet NSTextField *editVariablesValueTextField;
-@property (assign) IBOutlet NSWindow *editVariablesAddressWindow;
-@property (assign) IBOutlet NSTextField *editVariablesAddressTextField;
-@property (assign) IBOutlet NSWindow *editVariablesSizeWindow;
-@property (assign) IBOutlet NSTextField *editVariablesSizeTextField;
-
 @property (strong) ZGDocumentTableController *tableController;
 @property (strong) ZGVariableController *variableController;
 @property (strong) ZGDocumentSearchController *searchController;
@@ -99,7 +92,7 @@
 
 - (void)setStatus:(id)status;
 
-- (IBAction)editVariablesAddress:(id)sender;
+- (IBAction)requestEditingVariableAddress:(id)sender;
 
 - (NSIndexSet *)selectedVariableIndexes;
 - (NSArray *)selectedVariables;
