@@ -649,9 +649,14 @@
 	}
 }
 
+- (BOOL)isClearable
+{
+	return (self.documentData.variables.count > 0 && [self.searchController canStartTask]);;
+}
+
 - (void)updateClearButton
 {
-	self.clearButton.enabled = (self.documentData.variables.count > 0 && [self.searchController canStartTask]);
+	self.clearButton.enabled = [self isClearable];
 }
 
 - (IBAction)qualifierMatrixButtonRequest:(id)sender
@@ -942,7 +947,7 @@
 {
 	if (menuItem.action == @selector(clearSearchValues:))
 	{
-		if (!self.clearButton.isEnabled)
+		if (!self.isClearable)
 		{
 			return NO;
 		}
@@ -983,7 +988,7 @@
 			
 			menuItem.title = [NSString stringWithFormat:@"%@ Variable%@", isFrozen ? @"Unfreeze" : @"Freeze", self.selectedVariables.count != 1 ? @"s" : @""];
 			
-			if (isInconsistent || !self.clearButton.isEnabled)
+			if (isInconsistent || !self.isClearable)
 			{
 				return NO;
 			}
