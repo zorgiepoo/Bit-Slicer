@@ -143,6 +143,9 @@
 	
 	self.tableController.variablesTableView = self.variablesTableView;
 	
+	[[self.searchValueTextField.cell cancelButtonCell] setAction:@selector(cancelSearch:)];
+	[[self.searchValueTextField.cell cancelButtonCell] setTarget:self];
+	
 	[self.generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	[self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 	
@@ -238,15 +241,7 @@
 		NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
 		numberOfVariablesFormatter.format = @"#,###";
 		
-		NSString *valuesDisplayedString;
-		if (variableCount <= self.documentData.variables.count)
-		{
-			valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
-		}
-		else
-		{
-			valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ of %@ value", [numberOfVariablesFormatter stringFromNumber:@(self.documentData.variables.count)], [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
-		}
+		NSString *valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
 		
 		if (variableCount != 1)
 		{
@@ -501,12 +496,7 @@
 		if (self.currentProcess.processID == oldRunningProcess.processIdentifier || !oldRunningProcess)
 		{
 			// Don't remove the item, just indicate it's terminated
-			NSAttributedString *status =
-			[[NSAttributedString alloc]
-			 initWithString:[NSString stringWithFormat:@"%@ is not running", self.currentProcess.name]
-			 attributes:@{NSForegroundColorAttributeName : NSColor.redColor}];
-			
-			[self setStatus:status];
+			[self setStatus:[NSString stringWithFormat:@"%@ is not running", self.currentProcess.name]];
 			
 			self.searchButton.enabled = NO;
 			
@@ -723,10 +713,10 @@
 
 - (void)updateFlagsAndSearchButtonTitle
 {
-	ZGVariableType dataType = (ZGVariableType)self.dataTypesPopUpButton.selectedItem.tag;
-	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
+	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
+	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
 	
-	if (dataType == ZGString8 || dataType == ZGString16 || functionType == ZGStoreAllValues)
+	if (dataType == ZGString8 || dataType == ZGString16)
 	{
 		self.flagsTextField.enabled = NO;
 		self.flagsTextField.stringValue = @"";
@@ -774,15 +764,6 @@
 			self.flagsTextField.enabled = YES;
 			self.flagsLabel.textColor = NSColor.controlTextColor;
 		}
-	}
-	
-	if (functionType == ZGStoreAllValues)
-	{
-		self.searchButton.title = @"Store";
-	}
-	else
-	{
-		self.searchButton.title = @"Search";
 	}
 }
 
@@ -890,12 +871,10 @@
 	
 	if (![self functionTypeAllowsSearchInput])
 	{
-		self.searchValueTextField.enabled = NO;
 		self.searchValueLabel.textColor = NSColor.disabledControlTextColor;
 	}
 	else
 	{
-		self.searchValueTextField.enabled = YES;
 		self.searchValueLabel.textColor = NSColor.controlTextColor;
 		[self.window makeFirstResponder:self.searchValueTextField];
 	}
@@ -930,13 +909,6 @@
 	[self.tableController.variablesTableView reloadData];
 	
 	[self setStatus:nil];
-	
-	// Make sure the search value field is enabled if we aren't doing a store comparison
-	if ([self functionTypeAllowsSearchInput])
-	{
-		self.searchValueTextField.enabled = YES;
-		self.searchValueLabel.textColor = [NSColor controlTextColor];
-	}
 	
 	[self updateClearButton];
 }
@@ -1217,10 +1189,30 @@
 
 - (IBAction)searchValue:(id)sender
 {
-	// Make sure our fields are up to date
-	[self changeSearchValueString:self.searchValueTextField];
+	if (![self.documentData.searchValueString isEqualToString:[sender stringValue]] && ![self isFunctionTypeStore])
+	{
+		self.documentData.searchValueString = [sender stringValue];
+		[self markDocumentChange];
+	}
 	
-	[self.searchController searchOrCancel];
+	if (self.documentData.searchValueString.length > 0)
+	{
+		[self.searchController search];
+	}
+}
+
+- (IBAction)cancelSearch:(id)sender
+{
+	if (self.searchController.canCancelTask)
+	{
+		[self.searchController cancelTask];
+	}
+	else
+	{
+		self.documentData.searchValueString = @"";
+		self.searchValueTextField.stringValue = self.documentData.searchValueString;
+		[self markDocumentChange];
+	}
 }
 
 - (IBAction)storeAllValues:(id)sender
@@ -1245,12 +1237,6 @@
 - (IBAction)changeNullTerminatorInclusion:(id)sender
 {
 	self.searchData.shouldIncludeNullTerminator = [sender state];
-	[self markDocumentChange];
-}
-
-- (IBAction)changeSearchValueString:(id)sender
-{
-	self.documentData.searchValueString = [sender stringValue];
 	[self markDocumentChange];
 }
 

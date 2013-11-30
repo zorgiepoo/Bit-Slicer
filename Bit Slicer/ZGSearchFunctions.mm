@@ -447,8 +447,6 @@ ZGSearchResults *ZGSearchForIntegers(ZGMemoryMap processTask, ZGSearchData *sear
 		case ZGNotEqualsStoredPlus:
 			ZGHandleIntegerCase(dataType, ZGIntegerNotEqualsPlus);
 			break;
-		case ZGStoreAllValues:
-			break;
 	}
 	
 	return retValue;
@@ -533,8 +531,6 @@ ZGSearchResults *ZGSearchForFloatingPoints(ZGMemoryMap processTask, ZGSearchData
 			break;
 		case ZGNotEqualsStoredPlus:
 			ZGHandleFloatingPointCase(dataType, ZGFloatingPointNotEqualsPlus);
-			break;
-		case ZGStoreAllValues:
 			break;
 	}
 	
@@ -1070,8 +1066,6 @@ ZGSearchResults *ZGNarrowSearchForIntegers(ZGMemoryMap processTask, ZGSearchData
 		case ZGNotEqualsStoredPlus:
 			ZGHandleNarrowIntegerCase(dataType, ZGIntegerNotEqualsPlus);
 			break;
-		case ZGStoreAllValues:
-			break;
 	}
 	return retValue;
 }
@@ -1116,8 +1110,6 @@ ZGSearchResults *ZGNarrowSearchForFloatingPoints(ZGMemoryMap processTask, ZGSear
 			break;
 		case ZGNotEqualsStoredPlus:
 			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointNotEqualsPlus);
-			break;
-		case ZGStoreAllValues:
 			break;
 	}
 	return retValue;

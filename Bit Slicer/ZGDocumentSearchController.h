@@ -61,7 +61,7 @@
 
 - (void)fetchVariablesFromResults;
 
-- (void)searchOrCancel;
+- (void)search;
 - (void)storeAllValues;
 
 - (void)cleanUp;

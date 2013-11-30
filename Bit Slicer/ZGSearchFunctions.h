@@ -54,9 +54,7 @@ typedef enum
 	ZGLessThanStored,
 	// Special Stored comparisons
 	ZGEqualsStoredPlus,
-	ZGNotEqualsStoredPlus,
-	
-	ZGStoreAllValues,
+	ZGNotEqualsStoredPlus
 } ZGFunctionType;
 
 #ifdef __cplusplus

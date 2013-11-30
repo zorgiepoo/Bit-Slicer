@@ -57,7 +57,7 @@
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
 @property (assign) IBOutlet NSButton *searchButton;
 @property (assign) IBOutlet NSButton *clearButton;
-@property (assign) IBOutlet NSTextField *searchValueTextField;
+@property (assign) IBOutlet NSSearchField *searchValueTextField;
 @property (assign) IBOutlet NSTextField *flagsTextField;
 @property (assign) IBOutlet NSPopUpButton *functionPopUpButton;
 @property (assign) IBOutlet NSButton *scanUnwritableValuesCheckBox;

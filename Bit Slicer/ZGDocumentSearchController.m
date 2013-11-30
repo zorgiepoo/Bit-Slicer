@@ -202,7 +202,6 @@
 	self.windowController.runningApplicationsPopUpButton.enabled = NO;
 	self.windowController.dataTypesPopUpButton.enabled = NO;
 	self.windowController.variableQualifierMatrix.enabled = NO;
-	self.windowController.searchValueTextField.enabled = NO;
 	self.windowController.flagsTextField.enabled = NO;
 	self.windowController.functionPopUpButton.enabled = NO;
 	self.windowController.searchButton.title = escapeTitle;
@@ -228,10 +227,6 @@
 	
 	self.windowController.dataTypesPopUpButton.enabled = YES;
     
-	if ([self.windowController functionTypeAllowsSearchInput])
-	{
-		self.windowController.searchValueTextField.enabled = YES;
-	}
 	self.windowController.searchButton.enabled = YES;
 	self.windowController.searchButton.keyEquivalent = @"\r";
 	
@@ -380,7 +375,7 @@
 				}
 			}
 			
-			variable.name = @"static";
+			variable.name = @"static address";
 		}
 	}
 }
@@ -412,6 +407,8 @@
 			}
 		}
 		
+		ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
+		
 		ZGMemorySize dataSize = self.searchResults.dataSize;
 		[self.searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
 			ZGVariable *newVariable =
@@ -424,6 +421,60 @@
 			 pointerSize:pointerSize];
 			
 			[self relativizeVariable:newVariable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
+			NSString *userTag = ZGUserTagDescription(processTask, newVariable.address, newVariable.size);
+			if (userTag != nil)
+			{
+				if (newVariable.name.length != 0)
+				{
+					newVariable.name = [newVariable.name stringByAppendingString:[NSString stringWithFormat:@"%@", userTag]];
+				}
+				else
+				{
+					newVariable.name = [NSString stringWithFormat:@"%@", userTag];
+				}
+			}
+			
+			ZGMemoryAddress protectionAddress = newVariable.address;
+			ZGMemorySize protectionSize = newVariable.size;
+			ZGMemoryProtection protection = 0;
+			
+			if (ZGMemoryProtectionInRegion(processTask, &protectionAddress, &protectionSize, &protection) && protectionAddress <= newVariable.address && protectionAddress + protectionSize >= newVariable.address + newVariable.size)
+			{
+				NSMutableArray *protectionAttributes = [NSMutableArray array];
+				if (protection & VM_PROT_READ)
+				{
+					[protectionAttributes addObject:@"r"];
+				}
+				else
+				{
+					[protectionAttributes addObject:@"-"];
+				}
+				if (protection & VM_PROT_WRITE)
+				{
+					[protectionAttributes addObject:@"w"];
+				}
+				else
+				{
+					[protectionAttributes addObject:@"-"];
+				}
+				if (protection & VM_PROT_EXECUTE)
+				{
+					[protectionAttributes addObject:@"x"];
+				}
+				else
+				{
+					[protectionAttributes addObject:@"-"];
+				}
+				
+				if (newVariable.name.length != 0)
+				{
+					newVariable.name = [newVariable.name stringByAppendingString:[NSString stringWithFormat:@" (%@)", [protectionAttributes componentsJoinedByString:@""]]];
+				}
+				else
+				{
+					newVariable.name = [NSString stringWithFormat:@"Protection %@", [protectionAttributes componentsJoinedByString:@""]];
+				}
+			}
 			
 			[newVariables addObject:newVariable];
 		}];
@@ -760,25 +811,6 @@
 	}
 }
 
-- (void)searchOrCancel
-{
-	if (self.canStartTask)
-	{
-		if (self.documentData.functionTypeTag == ZGStoreAllValues)
-		{
-			[self storeAllValues];
-		}
-		else
-		{
-			[self search];
-		}
-	}
-	else
-	{
-		[self cancelTask];
-	}
-}
-
 - (void)cancelTask
 {
 	if (self.searchProgress.progressType == ZGSearchProgressMemoryStoring)
@@ -817,17 +849,13 @@
 		dispatch_async(dispatch_get_main_queue(), ^{
 			self.userInterfaceTimer = nil;
 			
-			if (self.searchProgress.shouldCancelSearch)
-			{
-				[self.windowController setStatus:@"Canceled Memory Store"];
-			}
-			else
+			if (!self.searchProgress.shouldCancelSearch)
 			{
 				self.searchData.savedData = self.tempSavedData;
 				self.tempSavedData = nil;
-				
-				[self.windowController setStatus:@"Finished Memory Store"];
 			}
+			
+			[self.windowController setStatus:nil];
 			
 			self.windowController.deterministicProgressIndicator.doubleValue = 0;
 			
