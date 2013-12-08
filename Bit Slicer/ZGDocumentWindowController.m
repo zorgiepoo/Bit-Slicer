@@ -647,7 +647,7 @@
 
 - (BOOL)isClearable
 {
-	return (self.documentData.variables.count > 0 && [self.searchController canStartTask]);;
+	return (self.documentData.variables.count > 0 && [self.searchController canStartTask]);
 }
 
 - (void)updateClearButton
@@ -1288,7 +1288,11 @@
 	{
 		[self.searchController cancelTask];
 	}
-	else if (self.searchController.canStartTask)
+	else if ([self.searchValueTextField.objectValue count] == 0 && [self isClearable])
+	{
+		[self clearSearchValues:nil];
+	}
+	else if ([self.searchValueTextField.objectValue count] > 0 && self.searchController.canStartTask)
 	{
 		self.documentData.searchValue = self.searchValueTextField.objectValue;
 		self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
