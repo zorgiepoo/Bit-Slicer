@@ -8,6 +8,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDocumentWindowController">
             <connections>
                 <outlet property="dataTypesPopUpButton" destination="wMv-KV-nmE" id="ohz-17-Uj6"/>
+                <outlet property="deterministicProgressIndicator" destination="SfW-co-kf4" id="gG8-db-MbO"/>
                 <outlet property="flagsLabel" destination="dLn-LQ-VPC" id="mvx-zp-ra7"/>
                 <outlet property="functionPopUpButton" destination="Vpc-Jb-WRb" id="9wG-B2-0wl"/>
                 <outlet property="generalStatusTextField" destination="8dg-I8-jgu" id="Xth-G7-LMt"/>
@@ -606,6 +607,10 @@
                             </allowedInputSourceLocales>
                         </textFieldCell>
                     </textField>
+                    <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" controlSize="small" style="spinning" id="SfW-co-kf4">
+                        <rect key="frame" x="643" y="2" width="16" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    </progressIndicator>
                 </subviews>
             </view>
             <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" displayMode="iconOnly" sizeMode="regular" id="UZg-mb-r8g">
