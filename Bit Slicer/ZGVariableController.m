@@ -202,46 +202,43 @@
 
 - (void)clear
 {
-	if (NSRunAlertPanel(@"Clear Variables", @"Are you sure you want to clear all variables? You will not be able to undo this action.", @"Clear", @"Cancel", nil) == NSAlertDefaultReturn)
+	self.windowController.searchController.searchResults = nil;
+	NSIndexSet *variableRowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.documentData.variables.count)];
+	NSArray *variablesToRemove = [self.windowController.documentData.variables objectsAtIndexes:variableRowIndexes];
+	[self.windowController.variableController removeVariablesAtRowIndexes:variableRowIndexes];
+	
+	for (ZGVariable *variable in variablesToRemove)
 	{
-		self.windowController.searchController.searchResults = nil;
-		NSIndexSet *variableRowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.documentData.variables.count)];
-		NSArray *variablesToRemove = [self.windowController.documentData.variables objectsAtIndexes:variableRowIndexes];
-		[self.windowController.variableController removeVariablesAtRowIndexes:variableRowIndexes];
-		
-		for (ZGVariable *variable in variablesToRemove)
+		if (variable.type == ZGScript)
 		{
-			if (variable.type == ZGScript)
-			{
-				[self.windowController.scriptManager removeScriptForVariable:variable];
-			}
+			[self.windowController.scriptManager removeScriptForVariable:variable];
 		}
-		
-		[self.windowController.undoManager removeAllActions];
-		
-		self.windowController.runningApplicationsPopUpButton.enabled = YES;
-		self.windowController.dataTypesPopUpButton.enabled = YES;
-		self.windowController.variableQualifierMatrix.enabled = YES;
-		
-		if (self.windowController.currentProcess.valid)
-		{
-			self.windowController.searchButton.enabled = YES;
-		}
-		
-		if ([self.windowController functionTypeAllowsSearchInput])
-		{
-			//self.windowController.searchValueTextField.enabled = YES;
-		}
-		
-		self.windowController.clearButton.enabled = NO;
-		
-		if (self.windowController.currentProcess.valid)
-		{
-			[self.windowController setStatus:nil];
-		}
-		
-		[self.windowController markDocumentChange];
 	}
+	
+	[self.windowController.undoManager removeAllActions];
+	
+	self.windowController.runningApplicationsPopUpButton.enabled = YES;
+	self.windowController.dataTypesPopUpButton.enabled = YES;
+	self.windowController.variableQualifierMatrix.enabled = YES;
+	
+	if (self.windowController.currentProcess.valid)
+	{
+		self.windowController.searchButton.enabled = YES;
+	}
+	
+	if ([self.windowController functionTypeAllowsSearchInput])
+	{
+		//self.windowController.searchValueTextField.enabled = YES;
+	}
+	
+	self.windowController.clearButton.enabled = NO;
+	
+	if (self.windowController.currentProcess.valid)
+	{
+		[self.windowController setStatus:nil];
+	}
+	
+	[self.windowController markDocumentChange];
 }
 
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
