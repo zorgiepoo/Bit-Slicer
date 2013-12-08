@@ -47,7 +47,7 @@
 		self.variables = [[NSArray alloc] init];
 		self.beginningAddressStringValue = @"";
 		self.endingAddressStringValue = @"";
-		self.searchValueString = @"";
+		self.searchValue = @[@""];
 		self.functionTypeTag = ZGEquals;
 		self.selectedDatatypeTag = ZGInt32;
 		self.lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];

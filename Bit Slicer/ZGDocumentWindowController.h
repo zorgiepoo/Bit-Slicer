@@ -33,6 +33,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import "ZGSearchFunctions.h"
 
 @class ZGDocumentTableController;
 @class ZGVariableController;
@@ -101,6 +102,8 @@
 - (void)updateClearButton;
 - (void)updateFlagsAndSearchButtonTitle;
 
+- (ZGVariableType)selectedDataType;
+- (ZGFunctionType)selectedFunctionType;
 - (BOOL)functionTypeAllowsSearchInput;
 - (BOOL)isFunctionTypeStore;
 

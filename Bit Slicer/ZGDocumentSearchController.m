@@ -50,6 +50,7 @@
 #import "ZGDocumentData.h"
 #import "ZGSearchFunctions.h"
 #import "APTokenSearchField.h"
+#import "ZGSearchToken.h"
 
 #define MAX_NUMBER_OF_VARIABLES_TO_FETCH ((NSUInteger)1000)
 
@@ -120,10 +121,10 @@
 
 - (NSString *)confirmSearchInput:(NSString *)expression
 {
-	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
-	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
+	ZGVariableType dataType = [self.windowController selectedDataType];
+	ZGFunctionType functionType = [self.windowController selectedFunctionType];
 	
-	if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
+	if (ZGIsNumericalDataType(dataType))
 	{
 		// This doesn't matter if the search is comparing stored values or if it's a regular function type
 		if ([self.windowController functionTypeAllowsSearchInput])
@@ -153,7 +154,7 @@
 
 - (BOOL)isInNarrowSearchMode
 {
-	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
+	ZGVariableType dataType = [self.windowController selectedDataType];
 	
 	BOOL goingToNarrowDownSearches = NO;
 	for (ZGVariable *variable in self.documentData.variables)
@@ -238,7 +239,7 @@
 	
 	self.windowController.scanUnwritableValuesCheckBox.enabled = YES;
 	
-	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
+	ZGVariableType dataType = [self.windowController selectedDataType];
 	
 	if (dataType != ZGString8 && dataType != ZGInt8)
 	{
@@ -549,7 +550,7 @@
 
 - (BOOL)retrieveSearchData
 {
-	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
+	ZGVariableType dataType = [self.windowController selectedDataType];
 	
 	self.searchData.pointerSize = self.windowController.currentProcess.pointerSize;
 	
@@ -558,45 +559,57 @@
 	self.searchData.rangeValue = NULL;
 
 	NSString *inputErrorMessage = nil;
-	NSString *evaluatedSearchExpression = nil;
 	
-	evaluatedSearchExpression =
-		(dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray)
-		? self.documentData.searchValueString
-		: [ZGCalculator evaluateExpression:self.documentData.searchValueString];
+	ZGFunctionType functionType = [self.windowController selectedFunctionType];
 	
-	inputErrorMessage = [self confirmSearchInput:evaluatedSearchExpression];
-	
-	if (inputErrorMessage)
+	if ([self.windowController functionTypeAllowsSearchInput])
 	{
-		NSRunAlertPanel(@"Invalid Search Input", inputErrorMessage, nil, nil, nil);
-		return NO;
-	}
-	
-	// get search value and data size
-	ZGMemorySize tempDataSize = 0;
-	self.searchData.searchValue = ZGValueFromString(self.windowController.currentProcess.is64Bit, evaluatedSearchExpression, dataType, &tempDataSize);
-	self.searchData.dataSize = tempDataSize;
-	
-	// We want to read the null terminator in this case... even though we normally don't store the terminator
-	// internally for UTF-16 strings. Lame hack, I know.
-	if (self.searchData.shouldIncludeNullTerminator)
-	{
-		if (dataType == ZGString16)
+		NSString *searchValueInput = [self.documentData.searchValue objectAtIndex:0];
+		NSString *evaluatedSearchExpression = [ZGCalculator evaluateExpression:searchValueInput];
+		
+		inputErrorMessage = [self confirmSearchInput:evaluatedSearchExpression];
+		
+		if (inputErrorMessage != nil)
 		{
-			self.searchData.dataSize += sizeof(unichar);
+			NSRunAlertPanel(@"Invalid Search Input", inputErrorMessage, nil, nil, nil);
+			return NO;
 		}
-		else if (dataType == ZGString8)
+		
+		ZGMemorySize dataSize = 0;
+		void *inputValue = ZGValueFromString(self.windowController.currentProcess.is64Bit, evaluatedSearchExpression, dataType, &dataSize);
+		
+		if (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
 		{
-			self.searchData.dataSize += sizeof(char);
+			self.searchData.compareOffset = inputValue;
+		}
+		else
+		{
+			self.searchData.searchValue = inputValue;
+		}
+		
+		if (self.searchData.shouldIncludeNullTerminator)
+		{
+			if (dataType == ZGString16)
+			{
+				dataSize += sizeof(int16_t);
+			}
+			else if (dataType == ZGString8)
+			{
+				dataSize += sizeof(int8_t);
+			}
+		}
+		
+		self.searchData.dataSize = dataSize;
+		
+		if (dataType == ZGByteArray)
+		{
+			self.searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(evaluatedSearchExpression);
 		}
 	}
-	
-	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
-	
-	if (![self.windowController functionTypeAllowsSearchInput])
+	else
 	{
 		self.searchData.searchValue = NULL;
+		self.searchData.dataSize = ZGDataSizeFromNumericalDataType(self.windowController.currentProcess.is64Bit, dataType);
 	}
 	
 	self.searchData.dataAlignment =
@@ -609,7 +622,7 @@
 	if (self.windowController.flagsTextField.isEnabled)
 	{
 		NSString *flagsExpression =
-			(dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray)
+			!ZGIsNumericalDataType(dataType)
 			? self.windowController.flagsTextField.stringValue
 			: [ZGCalculator evaluateExpression:self.windowController.flagsTextField.stringValue];
 		
@@ -712,23 +725,13 @@
 		return NO;
 	}
 	
-	if (dataType == ZGByteArray)
-	{
-		self.searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(evaluatedSearchExpression);
-	}
-	
-	if (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
-	{
-		self.searchData.compareOffset = self.searchData.searchValue;
-	}
-	
 	return YES;
 }
 
 - (void)searchVariablesByNarrowing:(BOOL)isNarrowing withVariables:(NSArray *)narrowVariables usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGProcess *currentProcess = self.windowController.currentProcess;
-	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
+	ZGVariableType dataType = [self.windowController selectedDataType];
 	ZGSearchResults *firstSearchResults = nil;
 	if (isNarrowing)
 	{
@@ -752,11 +755,11 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		if (!isNarrowing)
 		{
-			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, dataType, self.documentData.qualifierTag, self.documentData.functionTypeTag);
+			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, dataType, self.documentData.qualifierTag, [self.windowController selectedFunctionType]);
 		}
 		else
 		{
-			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, dataType, self.documentData.qualifierTag, self.documentData.functionTypeTag, firstSearchResults, (self.searchResults.tag == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
+			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, dataType, self.documentData.qualifierTag, [self.windowController selectedFunctionType], firstSearchResults, (self.searchResults.tag == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
 		}
 		
 		self.temporarySearchResults.tag = dataType;
@@ -767,7 +770,7 @@
 
 - (void)search
 {
-	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
+	ZGVariableType dataType = [self.windowController selectedDataType];
 	
 	if ([self retrieveSearchData])
 	{

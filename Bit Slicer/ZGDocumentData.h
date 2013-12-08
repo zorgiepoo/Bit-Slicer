@@ -49,7 +49,7 @@
 #define ZGEpsilonKey @"ZGEpsilonKey"
 #define ZGAboveValueKey @"ZGAboveValueKey"
 #define ZGBelowValueKey @"ZGBelowValueKey"
-#define ZGSearchStringValueKey @"ZGSearchStringValueKey"
+#define ZGSearchValueKey @"ZGSearchValueKey"
 
 @interface ZGDocumentData : NSObject
 
@@ -59,7 +59,7 @@
 @property (nonatomic) BOOL ignoreDataAlignment;
 @property (copy, nonatomic) NSString *beginningAddressStringValue;
 @property (copy, nonatomic) NSString *endingAddressStringValue;
-@property (copy, nonatomic) NSString *searchValueString;
+@property (nonatomic) NSArray *searchValue;
 @property (nonatomic) NSArray *variables;
 @property (copy, nonatomic) NSString *desiredProcessName;
 @property (copy, nonatomic) NSString *lastEpsilonValue;

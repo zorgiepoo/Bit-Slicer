@@ -47,6 +47,9 @@
 ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression);
 BOOL ZGIsValidNumber(NSString *expression);
 
+BOOL ZGIsNumericalDataType(ZGVariableType dataType);
+ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType dataType);
+
 void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 

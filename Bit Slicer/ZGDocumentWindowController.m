@@ -50,7 +50,6 @@
 #import "ZGDocumentData.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
-#import "ZGSearchFunctions.h"
 #import "ZGSearchResults.h"
 #import "ZGAppController.h"
 #import "ZGDebuggerController.h"
@@ -309,7 +308,7 @@
 	self.ignoreCaseCheckBox.state = self.searchData.shouldIgnoreStringCase;
 	self.beginningAddressTextField.stringValue = self.documentData.beginningAddressStringValue;
 	self.endingAddressTextField.stringValue = self.documentData.endingAddressStringValue;
-	self.searchValueTextField.stringValue = self.documentData.searchValueString;
+	self.searchValueTextField.objectValue = self.documentData.searchValue;
 	
 	[self.dataTypesPopUpButton selectItemWithTag:self.documentData.selectedDatatypeTag];
 	[self selectDataTypeWithTag:(ZGVariableType)self.documentData.selectedDatatypeTag recordUndo:NO];
@@ -728,8 +727,8 @@
 
 - (void)updateFlagsAndSearchButtonTitle
 {
-	ZGVariableType dataType = (ZGVariableType)self.documentData.selectedDatatypeTag;
-	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
+	ZGVariableType dataType = [self selectedDataType];
+	ZGFunctionType functionType = [self selectedFunctionType];
 	
 	if (dataType == ZGString8 || dataType == ZGString16)
 	{
@@ -784,7 +783,7 @@
 
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo
 {
-	ZGVariableType oldVariableType = (ZGVariableType)self.documentData.selectedDatatypeTag;
+	ZGVariableType oldVariableTypeTag = (ZGVariableType)self.documentData.selectedDatatypeTag;
 	
 	self.documentData.selectedDatatypeTag = newTag;
 	[self.dataTypesPopUpButton selectItemWithTag:newTag];
@@ -819,11 +818,11 @@
 	
 	[self updateFlagsAndSearchButtonTitle];
 	
-	if (recordUndo && oldVariableType != newTag)
+	if (recordUndo && oldVariableTypeTag != newTag)
 	{
 		[self.undoManager setActionName:@"Data Type Change"];
 		[[self.undoManager prepareWithInvocationTarget:self]
-		 selectDataTypeWithTag:oldVariableType
+		 selectDataTypeWithTag:oldVariableTypeTag
 		 recordUndo:YES];
 	}
 }
@@ -833,10 +832,52 @@
 	[self selectDataTypeWithTag:(ZGVariableType)[[sender selectedItem] tag] recordUndo:YES];
 }
 
+- (ZGVariableType)selectedDataType
+{
+	return (ZGVariableType)self.documentData.selectedDatatypeTag;
+}
+
+- (ZGFunctionType)selectedFunctionType
+{
+	BOOL isStoringValues = NO;
+	for (id searchValueObject in self.documentData.searchValue)
+	{
+		if ([searchValueObject isKindOfClass:[ZGSearchToken class]])
+		{
+			isStoringValues = YES;
+			break;
+		}
+	}
+	
+	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
+	if (isStoringValues)
+	{
+		switch (functionType)
+		{
+			case ZGEquals:
+				functionType = ZGEqualsStored;
+				break;
+			case ZGNotEquals:
+				functionType = ZGNotEqualsStored;
+				break;
+			case ZGGreaterThan:
+				functionType = ZGGreaterThanStored;
+				break;
+			case ZGLessThan:
+				functionType = ZGLessThanStored;
+				break;
+			default:
+				break;
+		}
+	}
+	
+	return functionType;
+}
+
 - (BOOL)functionTypeAllowsSearchInput
 {
 	BOOL allows;
-	switch (self.documentData.functionTypeTag)
+	switch ([self selectedFunctionType])
 	{
 		case ZGEquals:
 		case ZGNotEquals:
@@ -877,7 +918,7 @@
 
 - (BOOL)isFunctionTypeStore
 {
-	return [self isFunctionTypeStore:self.documentData.functionTypeTag];
+	return [self isFunctionTypeStore:[self selectedFunctionType]];
 }
 
 - (void)functionTypePopUpButtonRequest:(id)sender markChanges:(BOOL)shouldMarkChanges
@@ -893,8 +934,6 @@
 		self.searchValueLabel.textColor = NSColor.controlTextColor;
 		[self.window makeFirstResponder:self.searchValueTextField];
 	}
-	
-	self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
 	
 	if (shouldMarkChanges)
 	{
@@ -1253,14 +1292,12 @@
 
 - (IBAction)searchValue:(id)sender
 {
-	if (![self.documentData.searchValueString isEqualToString:[sender stringValue]] && ![self isFunctionTypeStore])
+	if (self.searchController.canStartTask)
 	{
-		self.documentData.searchValueString = [sender stringValue];
+		self.documentData.searchValue = self.searchValueTextField.objectValue;
+		self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
 		[self markDocumentChange];
-	}
-	
-	if (self.documentData.searchValueString.length > 0)
-	{
+		
 		[self.searchController search];
 	}
 }
@@ -1270,12 +1307,6 @@
 	if (self.searchController.canCancelTask)
 	{
 		[self.searchController cancelTask];
-	}
-	else
-	{
-		self.documentData.searchValueString = @"";
-		self.searchValueTextField.stringValue = self.documentData.searchValueString;
-		[self markDocumentChange];
 	}
 }
 

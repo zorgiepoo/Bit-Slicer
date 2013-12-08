@@ -137,8 +137,8 @@
 	 forKey:ZGBelowValueKey];
     
 	[keyedArchiver
-	 encodeObject:self.data.searchValueString
-	 forKey:ZGSearchStringValueKey];
+	 encodeObject:self.data.searchValue
+	 forKey:ZGSearchValueKey];
 	
 	[keyedArchiver finishEncoding];
 	
@@ -181,7 +181,7 @@
 	self.data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey]];
 	self.data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
 	
-	self.data.searchValueString = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey]];
+	self.data.searchValue = [keyedUnarchiver decodeObjectForKey:ZGSearchValueKey];
 	
 	self.data.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
 	self.data.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];

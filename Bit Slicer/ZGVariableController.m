@@ -498,7 +498,7 @@
 	void *utf16Value = NULL;
 	void *byteArrayValue = NULL;
 	
-	if (variable.type != ZGString8 && variable.type != ZGString16 && variable.type != ZGByteArray)
+	if (ZGIsNumericalDataType(variable.type))
 	{
 		stringObject = [ZGCalculator evaluateExpression:stringObject];
 	}
