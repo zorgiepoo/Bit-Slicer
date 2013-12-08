@@ -1274,7 +1274,7 @@
 	{
 		[self clearSearchValues:nil];
 	}
-	else if ([self.searchValueTextField.objectValue count] > 0 && self.searchController.canStartTask)
+	else if ([self.searchValueTextField.objectValue count] > 0 && self.searchController.canStartTask && self.currentProcess.valid)
 	{
 		self.documentData.searchValue = self.searchValueTextField.objectValue;
 		self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
