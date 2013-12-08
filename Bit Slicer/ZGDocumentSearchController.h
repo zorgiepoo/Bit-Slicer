@@ -54,7 +54,7 @@
 - (BOOL)canStartTask;
 - (BOOL)canCancelTask;
 - (void)cancelTask;
-- (void)prepareTaskWithEscapeTitle:(NSString *)escapeTitle deterministic:(BOOL)isDeterminisic;
+- (void)prepareTaskWithDeterminism:(BOOL)isDeterminisic;
 - (void)prepareTask;
 - (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder;
 - (void)resumeFromTask;

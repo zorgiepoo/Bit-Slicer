@@ -183,14 +183,12 @@
 
 - (void)prepareTask
 {
-	[self prepareTaskWithEscapeTitle:@"Cancel" deterministic:YES];
+	[self prepareTaskWithDeterminism:YES];
 }
 
-- (void)prepareTaskWithEscapeTitle:(NSString *)escapeTitle deterministic:(BOOL)isDeterminisic
+- (void)prepareTaskWithDeterminism:(BOOL)isDeterminisic
 {
 	self.isBusy = YES;
-	
-	[self.windowController updateClearButton];
 	
 	if (isDeterminisic)
 	{
@@ -206,8 +204,6 @@
 	self.windowController.variableQualifierMatrix.enabled = NO;
 	self.windowController.flagsTextField.enabled = NO;
 	self.windowController.functionPopUpButton.enabled = NO;
-	self.windowController.searchButton.title = escapeTitle;
-	self.windowController.searchButton.keyEquivalent = @"\e";
 	self.windowController.scanUnwritableValuesCheckBox.enabled = NO;
 	self.windowController.ignoreDataAlignmentCheckBox.enabled = NO;
 	self.windowController.ignoreCaseCheckBox.enabled = NO;
@@ -222,15 +218,10 @@
 {
 	self.isBusy = NO;
 	
-	[self.windowController updateClearButton];
-	
 	[self.windowController.deterministicProgressIndicator setHidden:YES];
 	[self.windowController.indeterministicProgressIndicator setHidden:YES];
 	
 	self.windowController.dataTypesPopUpButton.enabled = YES;
-    
-	self.windowController.searchButton.enabled = YES;
-	self.windowController.searchButton.keyEquivalent = @"\r";
 	
 	[self.windowController updateFlagsAndSearchButtonTitle];
 	
@@ -826,11 +817,6 @@
 	{
 		// Cancel break point watching
 		[self.windowController.documentBreakPointController cancelTask];
-	}
-	else
-	{
-		// Cancel the search
-		self.windowController.searchButton.enabled = NO;
 	}
 	
 	self.searchProgress.shouldCancelSearch = YES;

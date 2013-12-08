@@ -223,18 +223,6 @@
 	
 	if (self.windowController.currentProcess.valid)
 	{
-		self.windowController.searchButton.enabled = YES;
-	}
-	
-	if ([self.windowController functionTypeAllowsSearchInput])
-	{
-		//self.windowController.searchValueTextField.enabled = YES;
-	}
-	
-	self.windowController.clearButton.enabled = NO;
-	
-	if (self.windowController.currentProcess.valid)
-	{
 		[self.windowController setStatus:nil];
 	}
 	
@@ -285,8 +273,6 @@
 	[self updateFrozenActivity];
 	[self.windowController.tableController updateWatchVariablesTimer];
 	[self.windowController.tableController.variablesTableView reloadData];
-	
-	[self.windowController updateClearButton];
 }
 
 - (void)disableHarmfulVariables:(NSArray *)variables
@@ -325,8 +311,6 @@
 	[[self.windowController.undoManager prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
 	
 	[self.windowController setStatus:nil];
-	
-	[self.windowController updateClearButton];
 }
 
 - (void)removeSelectedSearchValues

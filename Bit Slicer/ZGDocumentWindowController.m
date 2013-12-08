@@ -115,7 +115,7 @@
 	CGFloat distanceAffected = 11;
 	CGFloat directionAffected = shouldRemoveBorder ? -1 : 1;
 	
-	for (NSControl *control in @[self.searchButton, self.clearButton, self.deterministicProgressIndicator, self.indeterministicProgressIndicator])
+	for (NSControl *control in @[self.deterministicProgressIndicator, self.indeterministicProgressIndicator])
 	{
 		for (NSLayoutConstraint *constraint in [control constraintsAffectingLayoutForOrientation:NSLayoutConstraintOrientationVertical])
 		{
@@ -455,9 +455,6 @@
 	{
 		[self.runningApplicationsPopUpButton removeItemAtIndex:[self.runningApplicationsPopUpButton indexOfItem:item]];
 	}
-	
-	// If we're switching to a process, search button should be enabled if it's alive and if we have access to it
-	self.searchButton.enabled = (self.currentProcess.valid && self.currentProcess.hasGrantedAccess);
 }
 
 - (void)addProcessesToPopupButton
@@ -503,8 +500,6 @@
 		{
 			// Don't remove the item, just indicate it's terminated
 			[self setStatus:[NSString stringWithFormat:@"%@ is not running", self.currentProcess.name]];
-			
-			self.searchButton.enabled = NO;
 			
 			if (self.searchController.canCancelTask && !self.searchController.searchProgress.shouldCancelSearch)
 			{
@@ -584,7 +579,6 @@
 				menuItem.image = iconImage;
 				
 				[self runningApplicationsPopUpButtonRequest:nil];
-				self.searchButton.enabled = YES;
 				
 				[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
 				
@@ -648,11 +642,6 @@
 - (BOOL)isClearable
 {
 	return (self.documentData.variables.count > 0 && [self.searchController canStartTask]);
-}
-
-- (void)updateClearButton
-{
-	self.clearButton.enabled = [self isClearable];
 }
 
 - (IBAction)qualifierMatrixButtonRequest:(id)sender
@@ -917,13 +906,8 @@
 {
 	[self updateFlagsAndSearchButtonTitle];
 	
-	if (![self functionTypeAllowsSearchInput])
+	if ([self functionTypeAllowsSearchInput])
 	{
-		self.searchValueLabel.textColor = NSColor.disabledControlTextColor;
-	}
-	else
-	{
-		self.searchValueLabel.textColor = NSColor.controlTextColor;
 		[self.window makeFirstResponder:self.searchValueTextField];
 	}
 	
@@ -955,8 +939,6 @@
 	[self.tableController.variablesTableView reloadData];
 	
 	[self setStatus:nil];
-	
-	[self updateClearButton];
 }
 
 #pragma mark Menu item validation

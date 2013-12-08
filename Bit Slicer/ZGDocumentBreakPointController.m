@@ -212,7 +212,7 @@
 	{
 		self.variableInsertionIndex = 0;
 		
-		[self.windowController.searchController prepareTaskWithEscapeTitle:@"Stop" deterministic:NO];
+		[self.windowController.searchController prepareTaskWithDeterminism:NO];
 		[self.windowController.searchController.searchProgress clear];
 		self.windowController.searchController.searchProgress.progressType = ZGSearchProgressMemoryWatching;
 		

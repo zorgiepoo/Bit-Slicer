@@ -57,8 +57,6 @@
 @property (assign) IBOutlet NSMatrix *variableQualifierMatrix;
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
-@property (assign) IBOutlet NSButton *searchButton;
-@property (assign) IBOutlet NSButton *clearButton;
 @property (assign) IBOutlet APTokenSearchField *searchValueTextField;
 @property (assign) IBOutlet NSTextField *flagsTextField;
 @property (assign) IBOutlet NSPopUpButton *functionPopUpButton;
@@ -70,7 +68,6 @@
 @property (assign) IBOutlet NSTextField *endingAddressTextField;
 @property (assign) IBOutlet NSTextField *beginningAddressLabel;
 @property (assign) IBOutlet NSTextField *endingAddressLabel;
-@property (assign) IBOutlet NSTextField *searchValueLabel;
 @property (assign) IBOutlet NSTextField *flagsLabel;
 @property (assign) IBOutlet NSButton *optionsDisclosureButton;
 @property (assign) IBOutlet NSView *optionsView;
@@ -99,7 +96,6 @@
 - (NSIndexSet *)selectedVariableIndexes;
 - (NSArray *)selectedVariables;
 
-- (void)updateClearButton;
 - (void)updateFlagsAndSearchButtonTitle;
 
 - (ZGVariableType)selectedDataType;
