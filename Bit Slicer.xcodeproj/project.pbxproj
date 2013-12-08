@@ -590,6 +590,17 @@
 			name = "Variable Controllers";
 			sourceTree = "<group>";
 		};
+		770FAC4A1854EC9A00C176B7 /* Search Tokens */ = {
+			isa = PBXGroup;
+			children = (
+				770FAC011853C5D600C176B7 /* APTokenSearchField.h */,
+				770FAC021853C5D600C176B7 /* APTokenSearchField.m */,
+				770FAC0418542BFF00C176B7 /* ZGSearchToken.h */,
+				770FAC0518542BFF00C176B7 /* ZGSearchToken.m */,
+			);
+			name = "Search Tokens";
+			sourceTree = "<group>";
+		};
 		7728EE0C16BE3DDA00F9E1AD /* Misc. */ = {
 			isa = PBXGroup;
 			children = (
@@ -886,16 +897,13 @@
 		77FF507D16EACF520005915D /* Documents */ = {
 			isa = PBXGroup;
 			children = (
+				770FAC4A1854EC9A00C176B7 /* Search Tokens */,
 				770FABB318490DDD00C176B7 /* Variable Controllers */,
 				77F115EF17D2EDF9009E002A /* ZGDocument.h */,
 				77F115F017D2EDF9009E002A /* ZGDocument.m */,
 				77F115BD17D2EBE1009E002A /* MyDocument.xib */,
 				77F115F217D2EE0B009E002A /* ZGDocumentData.h */,
 				77F115F317D2EE0B009E002A /* ZGDocumentData.m */,
-				770FAC011853C5D600C176B7 /* APTokenSearchField.h */,
-				770FAC021853C5D600C176B7 /* APTokenSearchField.m */,
-				770FAC0418542BFF00C176B7 /* ZGSearchToken.h */,
-				770FAC0518542BFF00C176B7 /* ZGSearchToken.m */,
 				77F115F517D2EE28009E002A /* ZGDocumentWindowController.h */,
 				77F115F617D2EE28009E002A /* ZGDocumentWindowController.m */,
 				77F115F817D2EE6F009E002A /* ZGDocumentSearchController.h */,
