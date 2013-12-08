@@ -15,9 +15,6 @@
 @property (readwrite, assign) BOOL sendsSearchStringImmediately;
 @property (readwrite, assign) BOOL sendsSearchStringOnlyAfterReturn; // Added by Mayur
 
-@property (readonly) NSButtonCell *searchButtonCell;
-@property (readonly) NSButtonCell *cancelButtonCell;
-
 @end
 
 

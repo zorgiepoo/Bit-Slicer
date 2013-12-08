@@ -147,14 +147,6 @@
 	self.searchValueTextField.cell.sendsSearchStringImmediately = NO;
 	self.searchValueTextField.cell.sendsSearchStringOnlyAfterReturn = YES;
 	
-	// TODO: Does not really work, have to figure this out later.
-	[self.searchValueTextField.cell.searchButtonCell setAction:@selector(searchValue:)];
-	[self.searchValueTextField.cell.searchButtonCell setTarget:self];
-	
-	// TODO: Does not really work, have to figure this out later.
-	[self.searchValueTextField.cell.cancelButtonCell setAction:@selector(cancelSearch:)];
-	[self.searchValueTextField.cell.cancelButtonCell setTarget:self];
-	
 	NSMenu *searchMenu = [[NSMenu alloc] init];
 	NSMenuItem *storedValuesMenuItem = [[NSMenuItem alloc] initWithTitle:@"Stored Value" action:@selector(insertStoredValueToken:) keyEquivalent:@""];
 	[searchMenu addItem:storedValuesMenuItem];
@@ -1292,21 +1284,17 @@
 
 - (IBAction)searchValue:(id)sender
 {
-	if (self.searchController.canStartTask)
+	if ([self.searchValueTextField.objectValue count] == 0 && self.searchController.canCancelTask)
+	{
+		[self.searchController cancelTask];
+	}
+	else if (self.searchController.canStartTask)
 	{
 		self.documentData.searchValue = self.searchValueTextField.objectValue;
 		self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
 		[self markDocumentChange];
 		
 		[self.searchController search];
-	}
-}
-
-- (IBAction)cancelSearch:(id)sender
-{
-	if (self.searchController.canCancelTask)
-	{
-		[self.searchController cancelTask];
 	}
 }
 
