@@ -44,6 +44,7 @@
 @class ZGDocumentData;
 @class ZGSearchData;
 @class ZGScriptManager;
+@class APTokenSearchField;
 
 #define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
 
@@ -57,7 +58,7 @@
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
 @property (assign) IBOutlet NSButton *searchButton;
 @property (assign) IBOutlet NSButton *clearButton;
-@property (assign) IBOutlet NSSearchField *searchValueTextField;
+@property (assign) IBOutlet APTokenSearchField *searchValueTextField;
 @property (assign) IBOutlet NSTextField *flagsTextField;
 @property (assign) IBOutlet NSPopUpButton *functionPopUpButton;
 @property (assign) IBOutlet NSButton *scanUnwritableValuesCheckBox;

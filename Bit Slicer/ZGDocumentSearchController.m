@@ -49,6 +49,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGDocumentData.h"
 #import "ZGSearchFunctions.h"
+#import "APTokenSearchField.h"
 
 #define MAX_NUMBER_OF_VARIABLES_TO_FETCH ((NSUInteger)1000)
 

@@ -58,6 +58,8 @@
 #import "ZGDocument.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "APTokenSearchField.h"
+#import "ZGSearchToken.h"
 
 @interface ZGDocumentWindowController ()
 
@@ -143,8 +145,21 @@
 	
 	self.tableController.variablesTableView = self.variablesTableView;
 	
-	[[self.searchValueTextField.cell cancelButtonCell] setAction:@selector(cancelSearch:)];
-	[[self.searchValueTextField.cell cancelButtonCell] setTarget:self];
+	self.searchValueTextField.cell.sendsSearchStringImmediately = NO;
+	self.searchValueTextField.cell.sendsSearchStringOnlyAfterReturn = YES;
+	
+	// TODO: Does not really work, have to figure this out later.
+	[self.searchValueTextField.cell.searchButtonCell setAction:@selector(searchValue:)];
+	[self.searchValueTextField.cell.searchButtonCell setTarget:self];
+	
+	// TODO: Does not really work, have to figure this out later.
+	[self.searchValueTextField.cell.cancelButtonCell setAction:@selector(cancelSearch:)];
+	[self.searchValueTextField.cell.cancelButtonCell setTarget:self];
+	
+	NSMenu *searchMenu = [[NSMenu alloc] init];
+	NSMenuItem *storedValuesMenuItem = [[NSMenuItem alloc] initWithTitle:@"Stored Value" action:@selector(insertStoredValueToken:) keyEquivalent:@""];
+	[searchMenu addItem:storedValuesMenuItem];
+	self.searchValueTextField.cell.searchMenu = searchMenu;
 	
 	[self.generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	[self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
@@ -1178,6 +1193,55 @@
 	}
 	
 	return YES;
+}
+
+#pragma mark Search Field Tokens
+
+- (void)deselectSearchField
+{
+	NSText *fieldEditor = [self.searchValueTextField currentEditor];
+	if (fieldEditor != nil)
+	{
+		fieldEditor.selectedRange = NSMakeRange(fieldEditor.string.length, 0);
+		[fieldEditor setNeedsDisplay:YES];
+	}
+}
+
+- (IBAction)insertStoredValueToken:(id)sender
+{
+	[self.searchValueTextField setObjectValue:@[[[ZGSearchToken alloc] initWithName:@"Stored Value"]]];
+	[self deselectSearchField];
+}
+
+- (id)tokenField:(NSTokenField *)tokenField representedObjectForEditingString:(NSString *)editingString
+{
+	assert([editingString isKindOfClass:[NSString class]]);
+	return editingString;
+}
+
+- (NSString *)tokenField:(NSTokenField *)tokenField displayStringForRepresentedObject:(id)representedObject
+{
+	NSString *result = nil;
+	if ([representedObject isKindOfClass:[NSString class]])
+	{
+		result = representedObject;
+	}
+	else if ([representedObject isKindOfClass:[ZGSearchToken class]])
+	{
+		result = [representedObject name];
+	}
+	
+	return result;
+}
+
+- (NSTokenStyle)tokenField:(NSTokenField *)tokenField styleForRepresentedObject:(id)representedObject
+{
+	return ([representedObject isKindOfClass:[ZGSearchToken class]]) ? NSRoundedTokenStyle : NSPlainTextTokenStyle;
+}
+
+- (NSString *)tokenField:(NSTokenField *)tokenField editingStringForRepresentedObject:(id)representedObject
+{
+	return ([representedObject isKindOfClass:[ZGSearchToken class]]) ? nil : representedObject;
 }
 
 #pragma mark Search Handling

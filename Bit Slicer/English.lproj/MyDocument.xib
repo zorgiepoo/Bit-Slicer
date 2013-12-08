@@ -12,7 +12,7 @@
                 <outlet property="functionPopUpButton" destination="Vpc-Jb-WRb" id="9wG-B2-0wl"/>
                 <outlet property="generalStatusTextField" destination="8dg-I8-jgu" id="Xth-G7-LMt"/>
                 <outlet property="runningApplicationsPopUpButton" destination="1ts-DF-nZQ" id="rls-ER-d1b"/>
-                <outlet property="searchValueTextField" destination="PhS-LL-uJY" id="7XY-aH-uVE"/>
+                <outlet property="searchValueTextField" destination="obS-mO-KvZ" id="DrG-CI-hqA"/>
                 <outlet property="variablesTableView" destination="HbN-z0-Vcf" id="a1I-Pk-xWi"/>
                 <outlet property="window" destination="d6e-L4-aaf" id="NIk-dD-o77"/>
             </connections>
@@ -610,23 +610,6 @@
             </view>
             <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" displayMode="iconOnly" sizeMode="regular" id="UZg-mb-r8g">
                 <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="F88F5CC0-84CC-4991-AE50-0F04590B0D0A" label="Search" paletteLabel="Search" id="DxO-ix-gdp">
-                        <nil key="toolTip"/>
-                        <size key="minSize" width="96" height="22"/>
-                        <size key="maxSize" width="140" height="22"/>
-                        <searchField key="view" verticalHuggingPriority="750" id="PhS-LL-uJY">
-                            <rect key="frame" x="0.0" y="14" width="140" height="22"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="" usesSingleLineMode="YES" bezelStyle="round" sendsWholeSearchString="YES" recentsAutosaveName="ZGSearchValueField" id="ljL-Eb-e2s">
-                                <font key="font" metaFont="system"/>
-                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </searchFieldCell>
-                            <connections>
-                                <action selector="searchValue:" target="-2" id="nKY-ls-lwg"/>
-                            </connections>
-                        </searchField>
-                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
                         <size key="minSize" width="138" height="24"/>
@@ -678,42 +661,22 @@
                             </connections>
                         </popUpButton>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="A5AF15E6-88A9-4678-ACAF-0F6E1D87D554" label="Function" paletteLabel="Function" id="LxQ-Vs-KYQ">
+                    <toolbarItem implicitItemIdentifier="A5AF15E6-88A9-4678-ACAF-0F6E1D87D554" label="Operator" paletteLabel="Operator" id="LxQ-Vs-KYQ">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="113" height="25"/>
+                        <size key="minSize" width="88" height="25"/>
                         <size key="maxSize" width="143" height="26"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="Vpc-Jb-WRb">
-                            <rect key="frame" x="0.0" y="14" width="113" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="88" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
-                            <popUpButtonCell key="cell" type="roundTextured" title="= Value" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="6CU-bb-yky" id="TkL-8a-mN8">
+                            <popUpButtonCell key="cell" type="roundTextured" title="equals" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="6CU-bb-yky" id="TkL-8a-mN8">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
                                 <menu key="menu" title="OtherViews" id="cNT-1t-BfB">
                                     <items>
-                                        <menuItem title="= Value" id="6CU-bb-yky"/>
-                                        <menuItem title="≠ Value" tag="1" id="OXO-I7-Kw4"/>
-                                        <menuItem title="> Value" tag="2" id="Pgp-h0-doo"/>
-                                        <menuItem title="&lt; Value" tag="3" id="ISP-Or-I2T"/>
-                                        <menuItem isSeparatorItem="YES" id="8YW-lK-Itu"/>
-                                        <menuItem title="= Stored Value" tag="4" id="ELg-mI-pwU">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="≠ Stored Value" tag="5" id="VG2-XC-5jI">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="> Stored Value" tag="6" id="4Cf-lm-ZMf">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="&lt; Stored Value" tag="7" id="M8z-LM-X6p">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="hfV-1q-PMJ"/>
-                                        <menuItem title="= Stored Value +" tag="8" id="NHk-Ts-8Bo">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
-                                        <menuItem title="≠ Stored Value +" tag="9" id="BYX-Oj-sLl">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                        </menuItem>
+                                        <menuItem title="equals" state="on" id="6CU-bb-yky"/>
+                                        <menuItem title="is not" tag="1" id="OXO-I7-Kw4"/>
+                                        <menuItem title="is greater than" tag="2" id="Pgp-h0-doo"/>
+                                        <menuItem title="is less than" tag="3" id="ISP-Or-I2T"/>
                                     </items>
                                 </menu>
                             </popUpButtonCell>
@@ -724,13 +687,31 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="cbr-z0-cak"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="AUv-ym-Pvh"/>
+                    <toolbarItem implicitItemIdentifier="DF0FFDE5-A04C-4501-BFC4-CBADF0541044" label="Search" paletteLabel="Search" id="xlb-JZ-GJa">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="96" height="22"/>
+                        <size key="maxSize" width="180" height="22"/>
+                        <tokenField key="view" verticalHuggingPriority="750" id="obS-mO-KvZ" customClass="APTokenSearchField">
+                            <rect key="frame" x="0.0" y="14" width="180" height="22"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" allowsEditingTextAttributes="YES" bezelStyle="round" id="S2B-QJ-8Ge" customClass="APTokenSearchFieldCell">
+                                <font key="font" metaFont="titleBar" size="12"/>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </tokenFieldCell>
+                            <connections>
+                                <action selector="searchValue:" target="-1" id="B2W-3B-KGC"/>
+                                <outlet property="delegate" destination="-2" id="k1z-RK-9AL"/>
+                            </connections>
+                        </tokenField>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="jO3-Z2-Pv7"/>
                     <toolbarItem reference="70m-RL-vim"/>
                     <toolbarItem reference="LxQ-Vs-KYQ"/>
                     <toolbarItem reference="cbr-z0-cak"/>
-                    <toolbarItem reference="DxO-ix-gdp"/>
+                    <toolbarItem reference="xlb-JZ-GJa"/>
                 </defaultToolbarItems>
             </toolbar>
             <contentBorderThickness minY="22"/>

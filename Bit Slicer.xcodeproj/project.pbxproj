@@ -13,6 +13,8 @@
 		770FABB218490DB400C176B7 /* ZGEditAddressWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770FABB018490DB400C176B7 /* ZGEditAddressWindowController.xib */; };
 		770FABB71849160200C176B7 /* ZGEditSizeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */; };
 		770FABB81849160200C176B7 /* ZGEditSizeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770FABB61849160200C176B7 /* ZGEditSizeWindowController.xib */; };
+		770FAC031853C5D600C176B7 /* APTokenSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC021853C5D600C176B7 /* APTokenSearchField.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC0518542BFF00C176B7 /* ZGSearchToken.m */; };
 		773972B117D2E61200B958EE /* _DDFunctionContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728517D2E61200B958EE /* _DDFunctionContainer.m */; };
 		773972B217D2E61200B958EE /* _DDFunctionExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728717D2E61200B958EE /* _DDFunctionExpression.m */; };
 		773972B317D2E61200B958EE /* _DDFunctionTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728917D2E61200B958EE /* _DDFunctionTerm.m */; };
@@ -152,6 +154,10 @@
 		770FABB41849160200C176B7 /* ZGEditSizeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGEditSizeWindowController.h; path = "Bit Slicer/ZGEditSizeWindowController.h"; sourceTree = "<group>"; };
 		770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditSizeWindowController.m; path = "Bit Slicer/ZGEditSizeWindowController.m"; sourceTree = "<group>"; };
 		770FABB61849160200C176B7 /* ZGEditSizeWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGEditSizeWindowController.xib; path = "Bit Slicer/ZGEditSizeWindowController.xib"; sourceTree = "<group>"; };
+		770FAC011853C5D600C176B7 /* APTokenSearchField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APTokenSearchField.h; path = deps/APTokenSearchField.h; sourceTree = "<group>"; };
+		770FAC021853C5D600C176B7 /* APTokenSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APTokenSearchField.m; path = deps/APTokenSearchField.m; sourceTree = "<group>"; };
+		770FAC0418542BFF00C176B7 /* ZGSearchToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchToken.h; path = "Bit Slicer/ZGSearchToken.h"; sourceTree = "<group>"; };
+		770FAC0518542BFF00C176B7 /* ZGSearchToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchToken.m; path = "Bit Slicer/ZGSearchToken.m"; sourceTree = "<group>"; };
 		7739728417D2E61200B958EE /* _DDFunctionContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionContainer.h; path = deps/DDMathParser/_DDFunctionContainer.h; sourceTree = "<group>"; };
 		7739728517D2E61200B958EE /* _DDFunctionContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDFunctionContainer.m; path = deps/DDMathParser/_DDFunctionContainer.m; sourceTree = "<group>"; };
 		7739728617D2E61200B958EE /* _DDFunctionExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionExpression.h; path = deps/DDMathParser/_DDFunctionExpression.h; sourceTree = "<group>"; };
@@ -886,6 +892,10 @@
 				77F115BD17D2EBE1009E002A /* MyDocument.xib */,
 				77F115F217D2EE0B009E002A /* ZGDocumentData.h */,
 				77F115F317D2EE0B009E002A /* ZGDocumentData.m */,
+				770FAC011853C5D600C176B7 /* APTokenSearchField.h */,
+				770FAC021853C5D600C176B7 /* APTokenSearchField.m */,
+				770FAC0418542BFF00C176B7 /* ZGSearchToken.h */,
+				770FAC0518542BFF00C176B7 /* ZGSearchToken.m */,
 				77F115F517D2EE28009E002A /* ZGDocumentWindowController.h */,
 				77F115F617D2EE28009E002A /* ZGDocumentWindowController.m */,
 				77F115F817D2EE6F009E002A /* ZGDocumentSearchController.h */,
@@ -1079,6 +1089,7 @@
 				773972B817D2E61200B958EE /* _DDOperatorInfo.m in Sources */,
 				773972B917D2E61200B958EE /* _DDOperatorTerm.m in Sources */,
 				773972BA17D2E61200B958EE /* _DDParserTerm.m in Sources */,
+				770FAC031853C5D600C176B7 /* APTokenSearchField.m in Sources */,
 				773972BB17D2E61200B958EE /* _DDRewriteRule.m in Sources */,
 				773972BC17D2E61200B958EE /* _DDVariableExpression.m in Sources */,
 				773972BD17D2E61200B958EE /* _DDVariableTerm.m in Sources */,
@@ -1108,6 +1119,7 @@
 				77F115EE17D2EDEE009E002A /* ZGRunningProcessObserver.m in Sources */,
 				77F115F117D2EDF9009E002A /* ZGDocument.m in Sources */,
 				77F115F417D2EE0B009E002A /* ZGDocumentData.m in Sources */,
+				770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */,
 				77F115F717D2EE28009E002A /* ZGDocumentWindowController.m in Sources */,
 				77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */,
 				77F115FD17D2EE7E009E002A /* ZGDocumentTableController.m in Sources */,

@@ -230,7 +230,7 @@
 		
 		if ([self.windowController functionTypeAllowsSearchInput])
 		{
-			self.windowController.searchValueTextField.enabled = YES;
+			//self.windowController.searchValueTextField.enabled = YES;
 		}
 		
 		self.windowController.clearButton.enabled = NO;
