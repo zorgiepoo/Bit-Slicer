@@ -181,7 +181,19 @@
 	self.data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey]];
 	self.data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
 	
-	self.data.searchValue = [keyedUnarchiver decodeObjectForKey:ZGSearchValueKey];
+	id searchValue = [keyedUnarchiver decodeObjectForKey:ZGSearchValueKey];
+	if (searchValue == nil)
+	{
+		NSString *legacySearchStringValue = [keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey];
+		if (legacySearchStringValue != nil)
+		{
+			searchValue = @[legacySearchStringValue];
+		}
+	}
+	if (searchValue != nil)
+	{
+		self.data.searchValue = searchValue;
+	}
 	
 	self.data.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
 	self.data.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];

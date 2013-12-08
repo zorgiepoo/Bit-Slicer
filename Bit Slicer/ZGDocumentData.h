@@ -50,6 +50,7 @@
 #define ZGAboveValueKey @"ZGAboveValueKey"
 #define ZGBelowValueKey @"ZGBelowValueKey"
 #define ZGSearchValueKey @"ZGSearchValueKey"
+#define ZGSearchStringValueKey @"ZGSearchStringValueKey" // legacy
 
 @interface ZGDocumentData : NSObject
 
