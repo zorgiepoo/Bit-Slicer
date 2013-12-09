@@ -194,6 +194,10 @@
 	{
 		self.data.searchValue = searchValue;
 	}
+	else
+	{
+		self.data.searchValue = @[@""];
+	}
 	
 	self.data.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
 	self.data.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];
