@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4511" systemVersion="12F45" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4511" systemVersion="13A603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1060" identifier="macosx"/>
+        <deployment defaultVersion="1070" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4511"/>
     </dependencies>
     <objects>
@@ -63,12 +63,12 @@
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="A7558654-1EA6-4021-982D-10521377C75E" label="Back" paletteLabel="Back" id="Z6W-2O-OWd">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="57" height="25"/>
+                        <size key="minSize" width="53" height="25"/>
                         <size key="maxSize" width="57" height="25"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="w6k-bm-Myo">
-                            <rect key="frame" x="0.0" y="14" width="57" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="53" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <segmentedCell key="cell" alignment="left" style="texturedRounded" trackingMode="momentary" id="KIW-ls-ljL">
+                            <segmentedCell key="cell" alignment="left" style="texturedSquare" trackingMode="momentary" id="KIW-ls-ljL">
                                 <font key="font" metaFont="system"/>
                                 <segments>
                                     <segment image="NSLeftFacingTriangleTemplate" width="25">
