@@ -68,8 +68,6 @@
 
 @property (assign) IBOutlet NSTextField *generalStatusTextField;
 
-@property (assign) IBOutlet NSLayoutConstraint *variablesTableViewToBottomConstraint;
-
 @end
 
 @implementation ZGDocumentWindowController
@@ -99,34 +97,6 @@
 	[self.searchController cleanUp];
 	[self.tableController cleanUp];
 	[self.scriptManager cleanup];
-}
-
-- (void)changeBottomBorderByDeletion:(BOOL)shouldRemoveBorder
-{
-	static CGFloat borderLength;
-	if (borderLength == 0)
-	{
-		borderLength = [self.window contentBorderThicknessForEdge:NSMinYEdge];
-	}
-	
-	[self.window setContentBorderThickness:shouldRemoveBorder ? 0 : borderLength forEdge:NSMinYEdge];
-	[self.generalStatusTextField setHidden:shouldRemoveBorder];
-	
-	CGFloat distanceAffected = 11;
-	CGFloat directionAffected = shouldRemoveBorder ? -1 : 1;
-	
-	for (NSControl *control in @[self.deterministicProgressIndicator, self.indeterministicProgressIndicator])
-	{
-		for (NSLayoutConstraint *constraint in [control constraintsAffectingLayoutForOrientation:NSLayoutConstraintOrientationVertical])
-		{
-			if (constraint.firstItem == self.window.contentView)
-			{
-				constraint.constant += distanceAffected * directionAffected;
-				break;
-			}
-		}
-	}
-	self.variablesTableViewToBottomConstraint.constant += distanceAffected * directionAffected;
 }
 
 - (void)windowDidLoad
