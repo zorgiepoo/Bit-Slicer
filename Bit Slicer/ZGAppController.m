@@ -58,29 +58,6 @@
 
 #pragma mark Singleton & Accessors
 
-+ (BOOL)isRunningOnAtLeastMajorVersion:(SInt32)majorVersion minorVersion:(SInt32)minorVersion
-{
-	SInt32 actualMajorVersion;
-	SInt32 actualMinorVersion;
-	
-	if (Gestalt(gestaltSystemVersionMajor, &actualMajorVersion) != noErr)
-	{
-		return NO;
-	}
-	
-	if (Gestalt(gestaltSystemVersionMinor, &actualMinorVersion) != noErr)
-	{
-		return NO;
-	}
-	
-	return actualMajorVersion > majorVersion || (actualMajorVersion == majorVersion && actualMinorVersion >= minorVersion);
-}
-
-+ (BOOL)isRunningOnLionOrLater
-{
-	return [self isRunningOnAtLeastMajorVersion:10 minorVersion:7];
-}
-
 + (id)sharedController
 {
 	return [NSApp delegate];
