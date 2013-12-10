@@ -377,16 +377,16 @@ bool ZGIntegerLesserThan(ZGSearchData *__unsafe_unretained searchData, T *variab
 }
 
 template <typename T>
-bool ZGIntegerEqualsPlus(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+bool ZGIntegerEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = *((T *)compareValue) + *((T *)searchData->_compareOffset);
+	T newCompareValue = (T)(searchData->_multiplicativeConstant * *((T *)compareValue) + *((T *)searchData->_additiveConstant));
 	return ZGIntegerEquals(searchData, variableValue, &newCompareValue);
 }
 
 template <typename T>
-bool ZGIntegerNotEqualsPlus(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+bool ZGIntegerNotEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = *compareValue + *((T *)searchData->_compareOffset);
+	T newCompareValue = (T)(searchData->_multiplicativeConstant * *compareValue + *((T *)searchData->_additiveConstant));
 	return ZGIntegerNotEquals(searchData, variableValue, &newCompareValue);
 }
 
@@ -441,11 +441,11 @@ ZGSearchResults *ZGSearchForIntegers(ZGMemoryMap processTask, ZGSearchData *sear
 		case ZGLessThanStored:
 			ZGHandleIntegerCase(dataType, ZGIntegerLesserThan);
 			break;
-		case ZGEqualsStoredPlus:
-			ZGHandleIntegerCase(dataType, ZGIntegerEqualsPlus);
+		case ZGEqualsStoredLinear:
+			ZGHandleIntegerCase(dataType, ZGIntegerEqualsLinear);
 			break;
-		case ZGNotEqualsStoredPlus:
-			ZGHandleIntegerCase(dataType, ZGIntegerNotEqualsPlus);
+		case ZGNotEqualsStoredLinear:
+			ZGHandleIntegerCase(dataType, ZGIntegerNotEqualsLinear);
 			break;
 	}
 	
@@ -481,14 +481,14 @@ bool ZGFloatingPointLesserThan(ZGSearchData *__unsafe_unretained searchData, T *
 template <typename T>
 bool ZGFloatingPointEqualsPlus(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = *((T *)compareValue) + *((T *)searchData->_compareOffset);
+	T newCompareValue = (T)(searchData->_multiplicativeConstant * *((T *)compareValue) + *((T *)searchData->_additiveConstant));
 	return ZGFloatingPointEquals(searchData, variableValue, &newCompareValue);
 }
 
 template <typename T>
 bool ZGFloatingPointNotEqualsPlus(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = *((T *)compareValue) + *((T *)searchData->_compareOffset);
+	T newCompareValue = (T)(searchData->_multiplicativeConstant * *((T *)compareValue) + *((T *)searchData->_additiveConstant));
 	return ZGFloatingPointNotEquals(searchData, variableValue, &newCompareValue);
 }
 
@@ -526,10 +526,10 @@ ZGSearchResults *ZGSearchForFloatingPoints(ZGMemoryMap processTask, ZGSearchData
 		case ZGLessThanStored:
 			ZGHandleFloatingPointCase(dataType, ZGFloatingPointLesserThan);
 			break;
-		case ZGEqualsStoredPlus:
+		case ZGEqualsStoredLinear:
 			ZGHandleFloatingPointCase(dataType, ZGFloatingPointEqualsPlus);
 			break;
-		case ZGNotEqualsStoredPlus:
+		case ZGNotEqualsStoredLinear:
 			ZGHandleFloatingPointCase(dataType, ZGFloatingPointNotEqualsPlus);
 			break;
 	}
@@ -1060,11 +1060,11 @@ ZGSearchResults *ZGNarrowSearchForIntegers(ZGMemoryMap processTask, ZGSearchData
 		case ZGLessThanStored:
 			ZGHandleNarrowIntegerCase(dataType, ZGIntegerLesserThan);
 			break;
-		case ZGEqualsStoredPlus:
-			ZGHandleNarrowIntegerCase(dataType, ZGIntegerEqualsPlus);
+		case ZGEqualsStoredLinear:
+			ZGHandleNarrowIntegerCase(dataType, ZGIntegerEqualsLinear);
 			break;
-		case ZGNotEqualsStoredPlus:
-			ZGHandleNarrowIntegerCase(dataType, ZGIntegerNotEqualsPlus);
+		case ZGNotEqualsStoredLinear:
+			ZGHandleNarrowIntegerCase(dataType, ZGIntegerNotEqualsLinear);
 			break;
 	}
 	return retValue;
@@ -1105,10 +1105,10 @@ ZGSearchResults *ZGNarrowSearchForFloatingPoints(ZGMemoryMap processTask, ZGSear
 		case ZGLessThanStored:
 			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointLesserThan);
 			break;
-		case ZGEqualsStoredPlus:
+		case ZGEqualsStoredLinear:
 			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointEqualsPlus);
 			break;
-		case ZGNotEqualsStoredPlus:
+		case ZGNotEqualsStoredLinear:
 			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointNotEqualsPlus);
 			break;
 	}

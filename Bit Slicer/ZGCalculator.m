@@ -255,6 +255,139 @@
 	});
 }
 
++ (NSString *)multiplicativeConstantStringFromExpression:(DDExpression *)expression
+{
+	if (expression.arguments.count != 2)
+	{
+		return nil;
+	}
+	
+	NSString *multiplicativeConstantString = nil;
+	
+	DDExpression *firstExpression = [expression.arguments objectAtIndex:0];
+	DDExpression *secondExpression = [expression.arguments objectAtIndex:1];
+	if (firstExpression.expressionType == DDExpressionTypeVariable && secondExpression.expressionType == DDExpressionTypeNumber)
+	{
+		multiplicativeConstantString = secondExpression.number.stringValue;
+	}
+	else if (firstExpression.expressionType == DDExpressionTypeNumber && secondExpression.expressionType == DDExpressionTypeVariable)
+	{
+		multiplicativeConstantString = firstExpression.number.stringValue;
+	}
+	
+	return multiplicativeConstantString;
+}
+
++ (BOOL)parseLinearExpression:(NSString *)linearExpression andGetAdditiveConstant:(NSString **)additiveConstantString multiplicateConstant:(NSString **)multiplicativeConstantString
+{
+	NSError *error = nil;
+	DDMathEvaluator *evaluator = [[DDMathEvaluator alloc] init];
+	
+	[evaluator addRewriteRule:@"add(__exp1, negate(__exp2))" forExpressionsMatchingTemplate:@"subtract(__exp1, __exp2)" condition:nil];
+	
+	[evaluator addRewriteRule:@"add(add(__num1, __num2), __var1)" forExpressionsMatchingTemplate:@"add(__num1, add(__var1, __num2))" condition:nil];
+	[evaluator addRewriteRule:@"add(add(__num1, __num2), __var1)" forExpressionsMatchingTemplate:@"add(__num1, add(__num2, __var1))" condition:nil];
+	[evaluator addRewriteRule:@"add(add(__num1, __num2), __var1)" forExpressionsMatchingTemplate:@"add(add(__var1, __num2), __num1)" condition:nil];
+	[evaluator addRewriteRule:@"add(add(__num1, __num2), __var1)" forExpressionsMatchingTemplate:@"add(add(__num2, __var1), __num1)" condition:nil];
+	
+	[evaluator addRewriteRule:@"add(add(__num1, __num2), __func1)" forExpressionsMatchingTemplate:@"add(add(__num1, __func1), __num2)" condition:nil];
+	[evaluator addRewriteRule:@"add(add(__num1, __num2), __func1)" forExpressionsMatchingTemplate:@"add(add(__func1, __num1), __num2)" condition:nil];
+	[evaluator addRewriteRule:@"add(add(__num1, __num2), __func1)" forExpressionsMatchingTemplate:@"add(__num2, add(__num1, __func1))" condition:nil];
+	[evaluator addRewriteRule:@"add(add(__num1, __num2), __func1)" forExpressionsMatchingTemplate:@"add(__num2, add(__func1, __num1))" condition:nil];
+	
+	[evaluator addRewriteRule:@"multiply(__var1, divide(1, __num1))" forExpressionsMatchingTemplate:@"divide(__var1, __num1)" condition:nil];
+	[evaluator addRewriteRule:@"multiply(__var1, divide(1, __func1))" forExpressionsMatchingTemplate:@"divide(__var1, __func1)" condition:nil];
+	[evaluator addRewriteRule:@"multiply(__func1, divide(1, __num1))" forExpressionsMatchingTemplate:@"divide(__func1, __num1)" condition:nil];
+	
+	[evaluator addRewriteRule:@"multiply(multiply(__num1, __num2), __var1)" forExpressionsMatchingTemplate:@"multiply(multiply(__var1, __num1), __num2)" condition:nil];
+	[evaluator addRewriteRule:@"multiply(multiply(__num1, __num2), __var1)" forExpressionsMatchingTemplate:@"multiply(multiply(__num1, __var1), __num2)" condition:nil];
+	[evaluator addRewriteRule:@"multiply(multiply(__num1, __num2), __var1)" forExpressionsMatchingTemplate:@"multiply(__num2, multiply(__var1, __num1))" condition:nil];
+	[evaluator addRewriteRule:@"multiply(multiply(__num1, __num2), __var1)" forExpressionsMatchingTemplate:@"multiply(__num2, multiply(__num1, __var1))" condition:nil];
+	
+	[evaluator addRewriteRule:@"multiply(multiply(__num1, __num2), __func1)" forExpressionsMatchingTemplate:@"multiply(multiply(__func1, __num1), __num2)" condition:nil];
+	[evaluator addRewriteRule:@"multiply(multiply(__num1, __num2), __func1)" forExpressionsMatchingTemplate:@"multiply(multiply(__num1, __func1), __num2)" condition:nil];
+	[evaluator addRewriteRule:@"multiply(multiply(__num1, __num2), __func1)" forExpressionsMatchingTemplate:@"multiply(__num2, multiply(__func1, __num1))" condition:nil];
+	[evaluator addRewriteRule:@"multiply(multiply(__num1, __num2), __func1)" forExpressionsMatchingTemplate:@"multiply(__num2, multiply(__num1, __func1))" condition:nil];
+	
+	[evaluator addRewriteRule:@"add(multiply(__num2, __num1), multiply(__num2, __var1))" forExpressionsMatchingTemplate:@"multiply(__num2, add(__num1, __var1))" condition:nil];
+	[evaluator addRewriteRule:@"add(multiply(__num2, __num1), multiply(__num2, __var1))" forExpressionsMatchingTemplate:@"multiply(__num2, add(__var1, __num1))" condition:nil];
+	[evaluator addRewriteRule:@"add(multiply(__num2, __num1), multiply(__num2, __var1))" forExpressionsMatchingTemplate:@"multiply(add(__num1, __var1), __num2)" condition:nil];
+	[evaluator addRewriteRule:@"add(multiply(__num2, __num1), multiply(__num2, __var1))" forExpressionsMatchingTemplate:@"multiply(add(__var1, __num1), __num2)" condition:nil];
+	
+	[evaluator addRewriteRule:@"add(multiply(__exp2, __exp1), multiply(__exp2, __func1))" forExpressionsMatchingTemplate:@"multiply(__exp2, add(__exp1, __func1))" condition:nil];
+	[evaluator addRewriteRule:@"add(multiply(__exp2, __exp1), multiply(__exp2, __func1))" forExpressionsMatchingTemplate:@"multiply(__exp2, add(__func1, __exp1))" condition:nil];
+	[evaluator addRewriteRule:@"add(multiply(__exp2, __exp1), multiply(__exp2, __func1))" forExpressionsMatchingTemplate:@"multiply(add(__exp1, __func1), __exp2)" condition:nil];
+	[evaluator addRewriteRule:@"add(multiply(__exp2, __exp1), multiply(__exp2, __func1))" forExpressionsMatchingTemplate:@"multiply(add(__func1, __exp1), __exp2)" condition:nil];
+	
+	DDExpression *simplifiedExpression = [[DDExpression expressionFromString:linearExpression error:&error] simplifiedExpression];
+	if (simplifiedExpression == nil)
+	{
+		NSLog(@"Error simplifiying expression: %@", error);
+		return NO;
+	}
+	
+	DDExpression *rewrittenExpression = [[evaluator expressionByRewritingExpression:simplifiedExpression] simplifiedExpression];
+	if (rewrittenExpression == nil)
+	{
+		NSLog(@"Error: Failed to rewrite expression %@", simplifiedExpression);
+		return NO;
+	}
+	
+	if (rewrittenExpression.expressionType == DDExpressionTypeVariable)
+	{
+		*additiveConstantString = @"0";
+		*multiplicativeConstantString = @"1";
+	}
+	else if (rewrittenExpression.expressionType != DDExpressionTypeFunction)
+	{
+		NSLog(@"Error: Rewritten expression is not a function or variable");
+		return NO;
+	}
+	else if ([rewrittenExpression.function isEqualToString:@"multiply"])
+	{
+		*multiplicativeConstantString = [self multiplicativeConstantStringFromExpression:rewrittenExpression];
+		*additiveConstantString = @"0";
+	}
+	else if ([rewrittenExpression.function isEqualToString:@"add"])
+	{
+		if (rewrittenExpression.arguments.count != 2)
+		{
+			return NO;
+		}
+		
+		DDExpression *firstExpression = [rewrittenExpression.arguments objectAtIndex:0];
+		DDExpression *secondExpression = [rewrittenExpression.arguments objectAtIndex:1];
+		if (secondExpression.expressionType == DDExpressionTypeNumber)
+		{
+			if (firstExpression.expressionType == DDExpressionTypeVariable)
+			{
+				*multiplicativeConstantString = @"1";
+			}
+			else if (firstExpression.expressionType == DDExpressionTypeFunction && [firstExpression.function isEqualToString:@"multiply"])
+			{
+				*multiplicativeConstantString = [self multiplicativeConstantStringFromExpression:firstExpression];
+			}
+			
+			*additiveConstantString = secondExpression.number.stringValue;
+		}
+		else if (firstExpression.expressionType == DDExpressionTypeNumber)
+		{
+			if (secondExpression.expressionType == DDExpressionTypeVariable)
+			{
+				*multiplicativeConstantString = @"1";
+			}
+			else if (secondExpression.expressionType == DDExpressionTypeFunction && [secondExpression.function isEqualToString:@"multiply"])
+			{
+				*multiplicativeConstantString = [self multiplicativeConstantStringFromExpression:secondExpression];
+			}
+			
+			*additiveConstantString = firstExpression.number.stringValue;
+		}
+	}
+	
+	return (*additiveConstantString != nil && *multiplicativeConstantString != nil);
+}
+
 + (BOOL)isValidExpression:(NSString *)expression
 {
 	return [[expression stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0;

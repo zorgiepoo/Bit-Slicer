@@ -126,8 +126,7 @@
 	
 	if (ZGIsNumericalDataType(dataType))
 	{
-		// This doesn't matter if the search is comparing stored values or if it's a regular function type
-		if ([self.windowController functionTypeAllowsSearchInput])
+		if (![self.windowController isFunctionTypeStore])
 		{
 			NSString *inputError = [self testSearchComponent:expression];
 			
@@ -137,7 +136,7 @@
 			}
 		}
 	}
-	else if (functionType != ZGEquals && functionType != ZGNotEquals && functionType != ZGEqualsStored && functionType != ZGNotEqualsStored && functionType != ZGEqualsStoredPlus && functionType != ZGNotEqualsStoredPlus)
+	else if (functionType != ZGEquals && functionType != ZGNotEquals && functionType != ZGEqualsStored && functionType != ZGNotEqualsStored && functionType != ZGEqualsStoredLinear && functionType != ZGNotEqualsStoredLinear)
 	{
 		return [NSString stringWithFormat:@"The function you are using does not support %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
 	}
@@ -553,7 +552,7 @@
 	
 	ZGFunctionType functionType = [self.windowController selectedFunctionType];
 	
-	if ([self.windowController functionTypeAllowsSearchInput])
+	if (![self.windowController isFunctionTypeStore])
 	{
 		NSString *searchValueInput = [self.documentData.searchValue objectAtIndex:0];
 		NSString *evaluatedSearchExpression = [ZGCalculator evaluateExpression:searchValueInput];
@@ -567,16 +566,7 @@
 		}
 		
 		ZGMemorySize dataSize = 0;
-		void *inputValue = ZGValueFromString(self.windowController.currentProcess.is64Bit, evaluatedSearchExpression, dataType, &dataSize);
-		
-		if (functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
-		{
-			self.searchData.compareOffset = inputValue;
-		}
-		else
-		{
-			self.searchData.searchValue = inputValue;
-		}
+		self.searchData.searchValue = ZGValueFromString(self.windowController.currentProcess.is64Bit, evaluatedSearchExpression, dataType, &dataSize);
 		
 		if (self.searchData.shouldIncludeNullTerminator)
 		{
@@ -601,6 +591,42 @@
 	{
 		self.searchData.searchValue = NULL;
 		self.searchData.dataSize = ZGDataSizeFromNumericalDataType(self.windowController.currentProcess.is64Bit, dataType);
+		
+		if (functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)
+		{
+			NSMutableArray *stringComponents = [NSMutableArray array];
+			for (id object in self.documentData.searchValue)
+			{
+				if ([object isKindOfClass:[ZGSearchToken class]])
+				{
+					[stringComponents addObject:@"$StoredValue"];
+				}
+				else if ([object isKindOfClass:[NSString class]])
+				{
+					[stringComponents addObject:object];
+				}
+			}
+			NSString *linearExpression = [stringComponents componentsJoinedByString:@""];
+			NSString *additiveConstantString = nil;
+			NSString *multiplicativeConstantString = nil;
+			
+			if (![ZGCalculator parseLinearExpression:linearExpression andGetAdditiveConstant:&additiveConstantString multiplicateConstant:&multiplicativeConstantString])
+			{
+				NSLog(@"Error: Failed to parse linear expression %@", linearExpression);
+				NSRunAlertPanel(@"Invalid Search Input", @"The search expression could not be properly parsed. Try a simpler expression.", nil, nil, nil);
+				return NO;
+			}
+			
+			self.searchData.additiveConstant = ZGValueFromString(self.windowController.currentProcess.is64Bit, additiveConstantString, dataType, NULL);
+			self.searchData.multiplicativeConstant = [multiplicativeConstantString doubleValue];
+			
+			if (self.searchData.additiveConstant == NULL)
+			{
+				NSLog(@"Error: transformed additive is NULL");
+				NSRunAlertPanel(@"Invalid Search Input", @"The additive part of the search expression could not be properly parsed. Try a simpler expression", nil, nil, nil);
+				return NO;
+			}
+		}
 	}
 	
 	self.searchData.dataAlignment =

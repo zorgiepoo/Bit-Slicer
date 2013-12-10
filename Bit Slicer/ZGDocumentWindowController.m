@@ -693,7 +693,7 @@
 		self.flagsTextField.enabled = YES;
 		self.flagsLabel.textColor = NSColor.controlTextColor;
 		
-		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
+		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)
 		{
 			// epsilon
 			self.flagsLabel.stringValue = @"Epsilon:";
@@ -714,8 +714,7 @@
 	}
 	else /* if data type is an integer type */
 	{
-		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredPlus || functionType == ZGNotEqualsStoredPlus)
-		{
+		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)		{
 			self.flagsTextField.enabled = NO;
 			self.flagsTextField.stringValue = @"";
 			self.flagsLabel.stringValue = @"";
@@ -803,13 +802,28 @@
 	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
 	if (isStoringValues)
 	{
+		BOOL isLinearlyExpressedStoredValue = self.documentData.searchValue.count > 1;
 		switch (functionType)
 		{
 			case ZGEquals:
-				functionType = ZGEqualsStored;
+				if (!isLinearlyExpressedStoredValue)
+				{
+					functionType = ZGEqualsStored;
+				}
+				else
+				{
+					functionType = ZGEqualsStoredLinear;
+				}
 				break;
 			case ZGNotEquals:
-				functionType = ZGNotEqualsStored;
+				if (!isLinearlyExpressedStoredValue)
+				{
+					functionType = ZGNotEqualsStored;
+				}
+				else
+				{
+					functionType = ZGNotEqualsStoredLinear;
+				}
 				break;
 			case ZGGreaterThan:
 				functionType = ZGGreaterThanStored;
@@ -825,27 +839,6 @@
 	return functionType;
 }
 
-- (BOOL)functionTypeAllowsSearchInput
-{
-	BOOL allows;
-	switch ([self selectedFunctionType])
-	{
-		case ZGEquals:
-		case ZGNotEquals:
-		case ZGGreaterThan:
-		case ZGLessThan:
-		case ZGEqualsStoredPlus:
-		case ZGNotEqualsStoredPlus:
-			allows = YES;
-			break;
-		default:
-			allows = NO;
-			break;
-	}
-	
-	return allows;
-}
-
 - (BOOL)isFunctionTypeStore:(NSInteger)functionTypeTag
 {
 	BOOL isFunctionTypeStore;
@@ -856,8 +849,8 @@
 		case ZGNotEqualsStored:
 		case ZGGreaterThanStored:
 		case ZGLessThanStored:
-		case ZGEqualsStoredPlus:
-		case ZGNotEqualsStoredPlus:
+		case ZGEqualsStoredLinear:
+		case ZGNotEqualsStoredLinear:
 			isFunctionTypeStore = YES;
 			break;
 		default:
@@ -876,10 +869,7 @@
 {
 	[self updateFlagsAndSearchButtonTitle];
 	
-	if ([self functionTypeAllowsSearchInput])
-	{
-		[self.window makeFirstResponder:self.searchValueTextField];
-	}
+	[self.window makeFirstResponder:self.searchValueTextField];
 	
 	if (shouldMarkChanges)
 	{

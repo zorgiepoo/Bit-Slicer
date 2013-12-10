@@ -106,13 +106,14 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 {
 	void *value = NULL;
 	BOOL searchValueIsAHexRepresentation = stringValue.zgIsHexRepresentation;
+	ZGMemorySize tempDataSize = 0;
 	
 	if (ZGIsNumericalDataType(dataType))
 	{
-		*dataSize = ZGDataSizeFromNumericalDataType(isProcess64Bit, dataType);
+		tempDataSize = ZGDataSizeFromNumericalDataType(isProcess64Bit, dataType);
 	}
 	
-	if (dataType == ZGInt8)
+	if (dataType == ZGInt8 && tempDataSize > 0)
 	{
 		int8_t variableValue = 0;
 		
@@ -127,10 +128,10 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 			variableValue = stringValue.intValue;
 		}
 		
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
+		value = malloc((size_t)tempDataSize);
+		memcpy(value, &variableValue, (size_t)tempDataSize);
 	}
-	else if (dataType == ZGInt16)
+	else if (dataType == ZGInt16 && tempDataSize > 0)
 	{
 		int16_t variableValue = 0;
 		
@@ -145,10 +146,10 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 			variableValue = stringValue.intValue;
 		}
 		
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
+		value = malloc((size_t)tempDataSize);
+		memcpy(value, &variableValue, (size_t)tempDataSize);
 	}
-	else if (dataType == ZGInt32 || (dataType == ZGPointer && !isProcess64Bit))
+	else if ((dataType == ZGInt32 || (dataType == ZGPointer && !isProcess64Bit)) && tempDataSize > 0)
 	{
 		int32_t variableValue = 0;
 		
@@ -163,10 +164,10 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 			variableValue = stringValue.zgUnsignedIntValue;
 		}
 		
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
+		value = malloc((size_t)tempDataSize);
+		memcpy(value, &variableValue, (size_t)tempDataSize);
 	}
-	else if (dataType == ZGFloat)
+	else if (dataType == ZGFloat && tempDataSize > 0)
 	{
 		float variableValue = 0.0;
 		
@@ -179,10 +180,10 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 			variableValue = stringValue.floatValue;
 		}
 		
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
+		value = malloc((size_t)tempDataSize);
+		memcpy(value, &variableValue, (size_t)tempDataSize);
 	}
-	else if (dataType == ZGInt64 || (dataType == ZGPointer && isProcess64Bit))
+	else if ((dataType == ZGInt64 || (dataType == ZGPointer && isProcess64Bit)) && tempDataSize > 0)
 	{
 		int64_t variableValue = 0;
 		
@@ -197,10 +198,10 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 			variableValue = stringValue.zgUnsignedLongLongValue;
 		}
 		
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
+		value = malloc((size_t)tempDataSize);
+		memcpy(value, &variableValue, (size_t)tempDataSize);
 	}
-	else if (dataType == ZGDouble)
+	else if (dataType == ZGDouble && tempDataSize > 0)
 	{
 		double variableValue = 0.0;
 		
@@ -213,20 +214,20 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 			variableValue = stringValue.doubleValue;
 		}
 		
-		value = malloc((size_t)*dataSize);
-		memcpy(value, &variableValue, (size_t)*dataSize);
+		value = malloc((size_t)tempDataSize);
+		memcpy(value, &variableValue, (size_t)tempDataSize);
 	}
 	else if (dataType == ZGString8)
 	{
 		const char *variableValue = [stringValue cStringUsingEncoding:NSUTF8StringEncoding];
-		*dataSize = strlen(variableValue);
-		value = malloc((size_t)*dataSize);
-		strncpy(value, variableValue, (size_t)*dataSize);
+		tempDataSize = strlen(variableValue);
+		value = malloc((size_t)tempDataSize);
+		strncpy(value, variableValue, (size_t)tempDataSize);
 	}
 	else if (dataType == ZGString16)
 	{
-		*dataSize = stringValue.length * sizeof(unichar);
-		value = malloc((size_t)*dataSize);
+		tempDataSize = stringValue.length * sizeof(unichar);
+		value = malloc((size_t)tempDataSize);
 		[stringValue getCharacters:value range:NSMakeRange(0, stringValue.length)];
 	}
 	
@@ -234,8 +235,8 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 	{
 		NSArray *bytesArray = [stringValue componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
 		
-		*dataSize = bytesArray.count;
-		value = malloc((size_t)*dataSize);
+		tempDataSize = bytesArray.count;
+		value = malloc((size_t)tempDataSize);
 		
 		unsigned char *valuePtr = value;
 		
@@ -263,6 +264,8 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 			valuePtr++;
 		}
 	}
+	
+	if (dataSize != NULL) *dataSize = tempDataSize;
 	
 	return value;
 }

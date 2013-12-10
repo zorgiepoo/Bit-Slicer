@@ -68,6 +68,7 @@
 	self.byteArrayFlags = NULL;
 	self.searchValue = NULL;
 	self.savedData = nil;
+	self.additiveConstant = NULL;
 }
 
 - (void)setSearchValue:(void *)searchValue
@@ -96,6 +97,12 @@
 {
 	free(_byteArrayFlags);
 	_byteArrayFlags = newByteArrayFlags;
+}
+
+- (void)setAdditiveConstant:(void *)additiveConstant
+{
+	free(_additiveConstant);
+	_additiveConstant = additiveConstant;
 }
 
 @end

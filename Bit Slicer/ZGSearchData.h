@@ -41,12 +41,17 @@
 {
 @public
 	// All for fast access, for comparison functions
+	
 	ZGMemorySize _dataSize;
 	void *_rangeValue;
 	double _epsilon;
 	BOOL _shouldIgnoreStringCase;
 	BOOL _shouldIncludeNullTerminator;
-	void *_compareOffset;
+	
+	// For linearly express stored values
+	void *_additiveConstant;
+	double _multiplicativeConstant;
+	
 	CollatorRef _collator; // For comparing unicode strings
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
 }
@@ -65,7 +70,8 @@
 @property (nonatomic) ZGMemoryAddress beginAddress;
 @property (nonatomic) ZGMemoryAddress endAddress;
 @property (nonatomic) BOOL shouldScanUnwritableValues;
-@property (nonatomic) void *compareOffset;
+@property (nonatomic) void *additiveConstant;
+@property (nonatomic) double multiplicativeConstant;
 @property (nonatomic) unsigned char *byteArrayFlags;
 
 - (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;

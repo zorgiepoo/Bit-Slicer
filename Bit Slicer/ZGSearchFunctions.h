@@ -52,9 +52,9 @@ typedef enum
 	ZGNotEqualsStored,
 	ZGGreaterThanStored,
 	ZGLessThanStored,
-	// Special Stored comparisons
-	ZGEqualsStoredPlus,
-	ZGNotEqualsStoredPlus
+	// Linearly expressed stored comparisons
+	ZGEqualsStoredLinear,
+	ZGNotEqualsStoredLinear
 } ZGFunctionType;
 
 #ifdef __cplusplus

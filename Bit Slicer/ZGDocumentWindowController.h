@@ -100,7 +100,6 @@
 
 - (ZGVariableType)selectedDataType;
 - (ZGFunctionType)selectedFunctionType;
-- (BOOL)functionTypeAllowsSearchInput;
 - (BOOL)isFunctionTypeStore;
 
 - (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;

@@ -49,6 +49,8 @@
 
 @interface ZGCalculator : NSObject
 
++ (BOOL)parseLinearExpression:(NSString *)linearExpression andGetAdditiveConstant:(NSString **)additiveConstantString multiplicateConstant:(NSString **)multiplicativeConstantString;
+
 + (NSString *)evaluateExpression:(NSString *)expression;
 
 // Can evaluate [address] + [address2] + offset, [address + [address2 - [address3]]] + offset, etc...
