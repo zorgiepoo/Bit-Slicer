@@ -51,6 +51,8 @@
 		7743F9C618024CE400DBC19A /* python3.3 in Resources */ = {isa = PBXBuildFile; fileRef = 7743F9C518024CE400DBC19A /* python3.3 */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
 		777AD8C717D96F30003A5317 /* ZGPyDebugger.m in Sources */ = {isa = PBXBuildFile; fileRef = 777AD8C617D96F30003A5317 /* ZGPyDebugger.m */; };
+		77988F1A185803E800476A37 /* container.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F19185803E800476A37 /* container.pdf */; };
+		77988F1C185804AC00476A37 /* container_filled.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F1B185804AC00476A37 /* container_filled.pdf */; };
 		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
 		77CE28B817D538E300998F28 /* ZGLoggerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */; };
 		77CE28BA17D580AD00998F28 /* ZGPyMainModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B917D580AD00998F28 /* ZGPyMainModule.m */; };
@@ -319,6 +321,8 @@
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		777AD8C517D96F30003A5317 /* ZGPyDebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyDebugger.h; path = "Bit Slicer/ZGPyDebugger.h"; sourceTree = "<group>"; };
 		777AD8C617D96F30003A5317 /* ZGPyDebugger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyDebugger.m; path = "Bit Slicer/ZGPyDebugger.m"; sourceTree = "<group>"; };
+		77988F19185803E800476A37 /* container.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container.pdf; path = "Bit Slicer/docicons/container.pdf"; sourceTree = "<group>"; };
+		77988F1B185804AC00476A37 /* container_filled.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container_filled.pdf; path = "Bit Slicer/docicons/container_filled.pdf"; sourceTree = "<group>"; };
 		77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLoggerWindowController.h; path = "Bit Slicer/ZGLoggerWindowController.h"; sourceTree = "<group>"; };
 		77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLoggerWindowController.m; path = "Bit Slicer/ZGLoggerWindowController.m"; sourceTree = "<group>"; };
 		77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGLoggerWindowController.xib; path = "Bit Slicer/ZGLoggerWindowController.xib"; sourceTree = "<group>"; };
@@ -543,6 +547,7 @@
 			children = (
 				7743F9C518024CE400DBC19A /* python3.3 */,
 				77DA9D0F180063A600549A37 /* Debugger Icons */,
+				77988F18185803DA00476A37 /* Document Icons */,
 				77F115A917D2E8AC009E002A /* yasm */,
 				77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */,
 				77F115AD17D2EAE4009E002A /* bitslicericon.iconset */,
@@ -782,6 +787,15 @@
 				7743FA2718024D2A00DBC19A /* weakrefobject.h */,
 			);
 			name = Python;
+			sourceTree = "<group>";
+		};
+		77988F18185803DA00476A37 /* Document Icons */ = {
+			isa = PBXGroup;
+			children = (
+				77988F19185803E800476A37 /* container.pdf */,
+				77988F1B185804AC00476A37 /* container_filled.pdf */,
+			);
+			name = "Document Icons";
 			sourceTree = "<group>";
 		};
 		77D5AEAC137C6FC000026388 /* Memory Viewer */ = {
@@ -1064,7 +1078,9 @@
 				77DA9D0B1800639E00549A37 /* continue.pdf in Resources */,
 				77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */,
 				77F115B317D2EAFE009E002A /* Credits.rtf in Resources */,
+				77988F1C185804AC00476A37 /* container_filled.pdf in Resources */,
 				7743F9C618024CE400DBC19A /* python3.3 in Resources */,
+				77988F1A185803E800476A37 /* container.pdf in Resources */,
 				77F115B617D2EBAF009E002A /* InfoPlist.strings in Resources */,
 				77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */,
 				77F115B917D2EBCB009E002A /* MainMenu.xib in Resources */,

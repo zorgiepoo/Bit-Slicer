@@ -57,9 +57,12 @@
 @property (assign) IBOutlet NSMatrix *variableQualifierMatrix;
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
+@property (assign) IBOutlet NSButton *storeValuesButton;
 @property (assign) IBOutlet APTokenSearchField *searchValueTextField;
 @property (assign) IBOutlet NSTextField *flagsTextField;
 @property (assign) IBOutlet NSPopUpButton *functionPopUpButton;
+
+// TODO: Need to remove all these
 @property (assign) IBOutlet NSButton *scanUnwritableValuesCheckBox;
 @property (assign) IBOutlet NSButton *ignoreDataAlignmentCheckBox;
 @property (assign) IBOutlet NSButton *ignoreCaseCheckBox;
@@ -71,6 +74,7 @@
 @property (assign) IBOutlet NSTextField *flagsLabel;
 @property (assign) IBOutlet NSButton *optionsDisclosureButton;
 @property (assign) IBOutlet NSView *optionsView;
+// -----
 
 @property (strong) ZGDocumentTableController *tableController;
 @property (strong) ZGVariableController *variableController;

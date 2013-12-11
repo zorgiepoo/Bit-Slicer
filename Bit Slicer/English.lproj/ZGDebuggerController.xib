@@ -190,7 +190,7 @@
                                             </subviews>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </clipView>
-                                        <scroller key="horizontalScroller" verticalHuggingPriority="750" id="Uyj-zZ-YCW">
+                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="Uyj-zZ-YCW">
                                             <rect key="frame" x="1" y="268" width="818" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
@@ -336,7 +336,7 @@
                                                     </subviews>
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </clipView>
-                                                <scroller key="horizontalScroller" verticalHuggingPriority="750" id="214">
+                                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="214">
                                                     <rect key="frame" x="1" y="185" width="263" height="16"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>

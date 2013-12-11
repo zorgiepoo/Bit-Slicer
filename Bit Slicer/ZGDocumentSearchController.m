@@ -198,6 +198,7 @@
 		[self.windowController.indeterministicProgressIndicator setHidden:NO];
 	}
 	
+	self.windowController.storeValuesButton.enabled = NO;
 	self.windowController.runningApplicationsPopUpButton.enabled = NO;
 	self.windowController.dataTypesPopUpButton.enabled = NO;
 	self.windowController.variableQualifierMatrix.enabled = NO;
@@ -219,6 +220,8 @@
 	
 	[self.windowController.deterministicProgressIndicator setHidden:YES];
 	[self.windowController.indeterministicProgressIndicator setHidden:YES];
+	
+	self.windowController.storeValuesButton.enabled = YES;
 	
 	self.windowController.dataTypesPopUpButton.enabled = YES;
 	
@@ -869,6 +872,7 @@
 			{
 				self.searchData.savedData = self.tempSavedData;
 				self.tempSavedData = nil;
+				self.windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled"];
 			}
 			
 			[self.windowController setStatus:nil];

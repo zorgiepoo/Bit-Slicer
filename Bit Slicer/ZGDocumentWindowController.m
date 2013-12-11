@@ -117,6 +117,9 @@
 	self.searchValueTextField.cell.sendsSearchStringImmediately = NO;
 	self.searchValueTextField.cell.sendsSearchStringOnlyAfterReturn = YES;
 	
+	[self.storeValuesButton.image setTemplate:YES];
+	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
+	
 	NSMenu *searchMenu = [[NSMenu alloc] init];
 	NSMenuItem *storedValuesMenuItem = [[NSMenuItem alloc] initWithTitle:@"Stored Value" action:@selector(insertStoredValueToken:) keyEquivalent:@""];
 	[searchMenu addItem:storedValuesMenuItem];
@@ -402,6 +405,8 @@
 		else
 		{
 			[self setStatus:nil];
+			
+			self.storeValuesButton.enabled = YES;
 		}
 	}
 	
@@ -488,6 +493,8 @@
 			[self.currentProcess markInvalid];
 			[self.tableController updateWatchVariablesTimer];
 			[self.variablesTableView reloadData];
+			
+			self.storeValuesButton.enabled = NO;
 			
 			[[NSNotificationCenter defaultCenter]
 			 postNotificationName:ZGTargetProcessDiedNotification
