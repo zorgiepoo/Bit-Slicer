@@ -928,6 +928,23 @@
 		}
 	}
 	
+	else if (menuItem.action == @selector(insertStoredValueToken:))
+	{
+		if (self.searchData.savedData == nil)
+		{
+			return NO;
+		}
+		
+		// I'd like to use self.documentData.searchValue but we don't update it instantly
+		for (id object in self.searchValueTextField.objectValue)
+		{
+			if ([object isKindOfClass:[ZGSearchToken class]])
+			{
+				return NO;
+			}
+		}
+	}
+	
 	else if (menuItem.action == @selector(removeSelectedSearchValues:))
 	{
 		if (self.selectedVariables.count == 0 || self.window.firstResponder != self.tableController.variablesTableView)
@@ -1189,13 +1206,14 @@
 
 - (IBAction)insertStoredValueToken:(id)sender
 {
-	[self.searchValueTextField setObjectValue:@[[[ZGSearchToken alloc] initWithName:@"Stored Value"]]];
+	NSMutableArray *objectValue = [NSMutableArray arrayWithArray:self.searchValueTextField.objectValue];
+	[objectValue addObject:[[ZGSearchToken alloc] initWithName:@"Stored Value"]];
+	self.searchValueTextField.objectValue = [NSArray arrayWithArray:objectValue];
 	[self deselectSearchField];
 }
 
 - (id)tokenField:(NSTokenField *)tokenField representedObjectForEditingString:(NSString *)editingString
 {
-	assert([editingString isKindOfClass:[NSString class]]);
 	return editingString;
 }
 
