@@ -95,22 +95,22 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <splitView autosaveName="ZGDisassemblerHorizontalSplitter" dividerStyle="thin" id="239">
-                        <rect key="frame" x="0.0" y="21" width="818" height="485"/>
+                        <rect key="frame" x="0.0" y="22" width="818" height="484"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <customView id="240">
-                                <rect key="frame" x="0.0" y="0.0" width="818" height="284"/>
+                                <rect key="frame" x="0.0" y="0.0" width="818" height="283"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="cFD-3I-ALg">
-                                        <rect key="frame" x="-1" y="-1" width="820" height="286"/>
+                                        <rect key="frame" x="-1" y="-1" width="820" height="285"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <clipView key="contentView" id="QCs-yF-iGW">
-                                            <rect key="frame" x="1" y="17" width="818" height="268"/>
+                                            <rect key="frame" x="1" y="17" width="818" height="267"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA">
-                                                    <rect key="frame" x="0.0" y="0.0" width="818" height="268"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="818" height="267"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -190,8 +190,8 @@
                                             </subviews>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </clipView>
-                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="Uyj-zZ-YCW">
-                                            <rect key="frame" x="1" y="279" width="816" height="16"/>
+                                        <scroller key="horizontalScroller" verticalHuggingPriority="750" id="Uyj-zZ-YCW">
+                                            <rect key="frame" x="1" y="268" width="818" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
                                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" id="suw-GF-T35">
@@ -206,22 +206,22 @@
                                 </subviews>
                             </customView>
                             <customView id="241">
-                                <rect key="frame" x="0.0" y="285" width="818" height="200"/>
+                                <rect key="frame" x="0.0" y="284" width="818" height="200"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <splitView autosaveName="ZGDisassemblerVerticalSplitter" dividerStyle="thin" vertical="YES" id="246">
-                                        <rect key="frame" x="0.0" y="0.0" width="818" height="201"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="818" height="202"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="164">
-                                                <rect key="frame" x="0.0" y="0.0" width="552" height="201"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="552" height="202"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <clipView key="contentView" id="5C7-LD-NYc">
-                                                    <rect key="frame" x="1" y="17" width="550" height="183"/>
+                                                    <rect key="frame" x="1" y="17" width="550" height="184"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="198" id="165">
-                                                            <rect key="frame" x="0.0" y="0.0" width="550" height="183"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="550" height="184"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                             <size key="intercellSpacing" width="3" height="2"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -264,14 +264,14 @@
                                                 </tableHeaderView>
                                             </scrollView>
                                             <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="211">
-                                                <rect key="frame" x="553" y="0.0" width="265" height="201"/>
+                                                <rect key="frame" x="553" y="0.0" width="265" height="202"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <clipView key="contentView" id="uPf-cf-8J6">
-                                                    <rect key="frame" x="1" y="17" width="263" height="183"/>
+                                                    <rect key="frame" x="1" y="17" width="263" height="184"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="213" id="215">
-                                                            <rect key="frame" x="0.0" y="0.0" width="263" height="183"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="263" height="184"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                             <size key="intercellSpacing" width="3" height="2"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -336,8 +336,8 @@
                                                     </subviews>
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </clipView>
-                                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="214">
-                                                    <rect key="frame" x="1" y="197" width="101" height="16"/>
+                                                <scroller key="horizontalScroller" verticalHuggingPriority="750" id="214">
+                                                    <rect key="frame" x="1" y="185" width="263" height="16"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" id="212">
