@@ -1206,9 +1206,7 @@
 
 - (IBAction)insertStoredValueToken:(id)sender
 {
-	NSMutableArray *objectValue = [NSMutableArray arrayWithArray:self.searchValueTextField.objectValue];
-	[objectValue addObject:[[ZGSearchToken alloc] initWithName:@"Stored Value"]];
-	self.searchValueTextField.objectValue = [NSArray arrayWithArray:objectValue];
+	self.searchValueTextField.objectValue = @[[[ZGSearchToken alloc] initWithName:@"Stored Value"]];
 	[self deselectSearchField];
 }
 
