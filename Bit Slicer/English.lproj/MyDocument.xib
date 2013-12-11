@@ -695,9 +695,9 @@
                     <toolbarItem implicitItemIdentifier="DF0FFDE5-A04C-4501-BFC4-CBADF0541044" label="Search" paletteLabel="Search" id="xlb-JZ-GJa">
                         <nil key="toolTip"/>
                         <size key="minSize" width="96" height="22"/>
-                        <size key="maxSize" width="180" height="22"/>
+                        <size key="maxSize" width="200" height="22"/>
                         <tokenField key="view" verticalHuggingPriority="750" id="obS-mO-KvZ" customClass="APTokenSearchField">
-                            <rect key="frame" x="0.0" y="14" width="180" height="22"/>
+                            <rect key="frame" x="0.0" y="14" width="200" height="22"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <tokenFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" allowsEditingTextAttributes="YES" bezelStyle="round" id="S2B-QJ-8Ge" customClass="APTokenSearchFieldCell">
                                 <font key="font" metaFont="cellTitle"/>
