@@ -1261,11 +1261,18 @@
 	}
 	else if ([self.searchValueTextField.objectValue count] > 0 && self.searchController.canStartTask && self.currentProcess.valid)
 	{
-		self.documentData.searchValue = self.searchValueTextField.objectValue;
-		self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
-		[self markDocumentChange];
-		
-		[self.searchController search];
+		if (self.isFunctionTypeStore && self.searchData.savedData != nil)
+		{
+			self.documentData.searchValue = self.searchValueTextField.objectValue;
+			self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
+			[self markDocumentChange];
+			
+			[self.searchController search];
+		}
+		else
+		{
+			NSRunAlertPanel(@"No Stored Values Available", @"There are no stored values to compare against. Please store values first before proceeding.", nil, nil, nil);
+		}
 	}
 }
 
