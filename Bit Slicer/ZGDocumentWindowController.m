@@ -1251,27 +1251,28 @@
 
 - (IBAction)searchValue:(id)sender
 {
-	if ([self.searchValueTextField.objectValue count] == 0 && self.searchController.canCancelTask)
+	self.documentData.searchValue = self.searchValueTextField.objectValue;
+	
+	if (self.documentData.searchValue.count == 0 && self.searchController.canCancelTask)
 	{
 		[self.searchController cancelTask];
 	}
-	else if ([self.searchValueTextField.objectValue count] == 0 && [self isClearable])
+	else if (self.documentData.searchValue.count == 0 && [self isClearable])
 	{
 		[self clearSearchValues:nil];
 	}
-	else if ([self.searchValueTextField.objectValue count] > 0 && self.searchController.canStartTask && self.currentProcess.valid)
+	else if (self.documentData.searchValue.count > 0 && self.searchController.canStartTask && self.currentProcess.valid)
 	{
-		if (self.isFunctionTypeStore && self.searchData.savedData != nil)
+		if (self.isFunctionTypeStore && self.searchData.savedData == nil)
 		{
-			self.documentData.searchValue = self.searchValueTextField.objectValue;
+			NSRunAlertPanel(@"No Stored Values Available", @"There are no stored values to compare against. Please store values first before proceeding.", nil, nil, nil);
+		}
+		else
+		{
 			self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
 			[self markDocumentChange];
 			
 			[self.searchController search];
-		}
-		else
-		{
-			NSRunAlertPanel(@"No Stored Values Available", @"There are no stored values to compare against. Please store values first before proceeding.", nil, nil, nil);
 		}
 	}
 }
