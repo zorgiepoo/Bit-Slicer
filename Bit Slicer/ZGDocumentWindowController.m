@@ -121,7 +121,6 @@
 	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
 	
 	[self.generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
-	[self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 	
 	if ([self.window respondsToSelector:@selector(occlusionState)])
 	{
