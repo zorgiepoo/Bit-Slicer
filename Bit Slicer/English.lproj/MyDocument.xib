@@ -188,22 +188,22 @@
         <window title="Doc" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="d6e-L4-aaf" userLabel="Document Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="131" y="159" width="700" height="259"/>
+            <rect key="contentRect" x="131" y="159" width="720" height="259"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
-            <value key="minSize" type="size" width="700" height="259"/>
+            <value key="minSize" type="size" width="720" height="259"/>
             <view key="contentView" id="aTX-qN-msi">
-                <rect key="frame" x="0.0" y="0.0" width="700" height="259"/>
+                <rect key="frame" x="0.0" y="0.0" width="720" height="259"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="10" verticalLineScroll="16" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="Iy4-iu-99I">
-                        <rect key="frame" x="-1" y="21" width="702" height="239"/>
+                        <rect key="frame" x="-1" y="21" width="722" height="239"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="4wx-3S-yE8">
-                            <rect key="frame" x="1" y="17" width="700" height="221"/>
+                            <rect key="frame" x="1" y="17" width="720" height="221"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="14" headerView="FQj-2P-but" id="HbN-z0-Vcf">
-                                    <rect key="frame" x="0.0" y="0.0" width="700" height="221"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="720" height="221"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -235,7 +235,7 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="value" width="186.52734375" minWidth="76" maxWidth="20000" id="aom-rv-8rE">
+                                        <tableColumn identifier="value" width="187.109375" minWidth="76" maxWidth="20000" id="aom-rv-8rE">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Value">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -248,7 +248,7 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="type" editable="NO" width="100" minWidth="100" maxWidth="100" id="87D-Rg-AzL">
+                                        <tableColumn identifier="type" editable="NO" width="110" minWidth="110" maxWidth="110" id="87D-Rg-AzL">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Type">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -274,7 +274,7 @@
                                                 </menu>
                                             </popUpButtonCell>
                                         </tableColumn>
-                                        <tableColumn identifier="enabled" width="50" minWidth="50" maxWidth="50" id="trw-dN-JKj">
+                                        <tableColumn identifier="enabled" width="60" minWidth="60" maxWidth="60" id="trw-dN-JKj">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Active">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -294,7 +294,7 @@
                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="pdf-AY-ffZ">
-                            <rect key="frame" x="1" y="221" width="677" height="16"/>
+                            <rect key="frame" x="1" y="222" width="720" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" id="q9s-b7-KVu">
@@ -302,7 +302,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="FQj-2P-but">
-                            <rect key="frame" x="0.0" y="0.0" width="700" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="720" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -316,7 +316,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" id="8dg-I8-jgu">
-                        <rect key="frame" x="18" y="3" width="664" height="14"/>
+                        <rect key="frame" x="18" y="3" width="684" height="14"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Found 3 variables" id="6Kr-rx-QwW">
                             <font key="font" metaFont="smallSystem"/>
@@ -609,7 +609,7 @@
                         </textFieldCell>
                     </textField>
                     <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" controlSize="small" style="spinning" id="SfW-co-kf4">
-                        <rect key="frame" x="664" y="2" width="16" height="16"/>
+                        <rect key="frame" x="684" y="2" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                 </subviews>
