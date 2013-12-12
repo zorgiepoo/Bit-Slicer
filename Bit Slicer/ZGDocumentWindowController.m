@@ -796,6 +796,8 @@
 
 - (ZGFunctionType)selectedFunctionType
 {
+	self.documentData.searchValue = self.searchValueTextField.objectValue;
+	
 	BOOL isStoringValues = NO;
 	for (id searchValueObject in self.documentData.searchValue)
 	{
@@ -1277,6 +1279,7 @@
 
 - (IBAction)storeAllValues:(id)sender
 {
+	self.documentData.searchValue = self.searchValueTextField.objectValue;
 	[self.searchController storeAllValues];
 }
 

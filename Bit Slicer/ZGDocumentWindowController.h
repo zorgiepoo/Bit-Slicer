@@ -106,6 +106,9 @@
 - (ZGFunctionType)selectedFunctionType;
 - (BOOL)isFunctionTypeStore;
 
+- (void)deselectSearchField;
+- (IBAction)insertStoredValueToken:(id)sender;
+
 - (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;
 
 - (void)updateObservingProcessOcclusionState;

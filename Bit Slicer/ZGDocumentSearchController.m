@@ -255,6 +255,10 @@
 	if (shouldMakeSearchFieldFirstResponder)
 	{
 		[self.windowController.window makeFirstResponder:self.windowController.searchValueTextField];
+		if (self.windowController.isFunctionTypeStore)
+		{
+			[self.windowController deselectSearchField];
+		}
 	}
 	
 	if (!self.windowController.currentProcess.valid)
@@ -873,6 +877,11 @@
 				self.searchData.savedData = self.tempSavedData;
 				self.tempSavedData = nil;
 				self.windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled"];
+				
+				if (self.documentData.searchValue.count == 0)
+				{
+					[self.windowController insertStoredValueToken:nil];
+				}
 			}
 			
 			[self.windowController setStatus:nil];
