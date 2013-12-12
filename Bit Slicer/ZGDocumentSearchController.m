@@ -562,9 +562,9 @@
 	if (![self.windowController isFunctionTypeStore])
 	{
 		NSString *searchValueInput = [self.documentData.searchValue objectAtIndex:0];
-		NSString *evaluatedSearchExpression = [ZGCalculator evaluateExpression:searchValueInput];
+		NSString *finalSearchExpression = ZGIsNumericalDataType(dataType) ? [ZGCalculator evaluateExpression:searchValueInput] : searchValueInput;
 		
-		inputErrorMessage = [self confirmSearchInput:evaluatedSearchExpression];
+		inputErrorMessage = [self confirmSearchInput:finalSearchExpression];
 		
 		if (inputErrorMessage != nil)
 		{
@@ -573,7 +573,7 @@
 		}
 		
 		ZGMemorySize dataSize = 0;
-		self.searchData.searchValue = ZGValueFromString(self.windowController.currentProcess.is64Bit, evaluatedSearchExpression, dataType, &dataSize);
+		self.searchData.searchValue = ZGValueFromString(self.windowController.currentProcess.is64Bit, finalSearchExpression, dataType, &dataSize);
 		
 		if (self.searchData.shouldIncludeNullTerminator)
 		{
@@ -591,7 +591,7 @@
 		
 		if (dataType == ZGByteArray)
 		{
-			self.searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(evaluatedSearchExpression);
+			self.searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(finalSearchExpression);
 		}
 	}
 	else
