@@ -435,7 +435,7 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="F91B22CB-7E27-4BA1-A2E8-AD190222BAAF" label="Step Execution" paletteLabel="Step Execution" id="yIQ-3L-cfP">
+                    <toolbarItem implicitItemIdentifier="F91B22CB-7E27-4BA1-A2E8-AD190222BAAF" label="Step" paletteLabel="Step" id="yIQ-3L-cfP">
                         <nil key="toolTip"/>
                         <size key="minSize" width="100" height="25"/>
                         <size key="maxSize" width="104" height="25"/>
