@@ -874,6 +874,11 @@
 			
 			if (!self.searchProgress.shouldCancelSearch)
 			{
+				if (self.searchData.savedData == nil)
+				{
+					[self.windowController createSearchMenu];
+				}
+				
 				self.searchData.savedData = self.tempSavedData;
 				self.tempSavedData = nil;
 				self.windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled"];

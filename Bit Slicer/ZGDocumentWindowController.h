@@ -106,6 +106,7 @@
 - (ZGFunctionType)selectedFunctionType;
 - (BOOL)isFunctionTypeStore;
 
+- (void)createSearchMenu;
 - (void)deselectSearchField;
 - (IBAction)insertStoredValueToken:(id)sender;
 

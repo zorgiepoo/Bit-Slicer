@@ -120,11 +120,6 @@
 	[self.storeValuesButton.image setTemplate:YES];
 	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
 	
-	NSMenu *searchMenu = [[NSMenu alloc] init];
-	NSMenuItem *storedValuesMenuItem = [[NSMenuItem alloc] initWithTitle:@"Stored Value" action:@selector(insertStoredValueToken:) keyEquivalent:@""];
-	[searchMenu addItem:storedValuesMenuItem];
-	self.searchValueTextField.cell.searchMenu = searchMenu;
-	
 	[self.generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	[self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 	
@@ -1275,6 +1270,14 @@
 			[self.searchController search];
 		}
 	}
+}
+
+- (void)createSearchMenu
+{
+	NSMenu *searchMenu = [[NSMenu alloc] init];
+	NSMenuItem *storedValuesMenuItem = [[NSMenuItem alloc] initWithTitle:@"Stored Value" action:@selector(insertStoredValueToken:) keyEquivalent:@""];
+	[searchMenu addItem:storedValuesMenuItem];
+	self.searchValueTextField.cell.searchMenu = searchMenu;
 }
 
 - (IBAction)storeAllValues:(id)sender
