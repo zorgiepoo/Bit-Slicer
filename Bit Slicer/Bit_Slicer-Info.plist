@@ -42,7 +42,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1065</string>
+	<string>1066</string>
 	<key>SecTaskAccess</key>
 	<array>
 		<string>allowed</string>
