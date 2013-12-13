@@ -1260,7 +1260,7 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(SRCROOT)",
-					"/Users/mayur/Documents/Programming/bit-slicer/deps",
+					"$(SRCROOT)/deps",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_GC = unsupported;
@@ -1306,7 +1306,7 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(SRCROOT)",
-					"/Users/mayur/Documents/Programming/bit-slicer/deps",
+					"$(SRCROOT)/deps",
 				);
 				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
