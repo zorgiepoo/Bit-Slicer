@@ -378,7 +378,6 @@
 		[self.stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringNullTerminated];
 	}
 	
-	self.scanUnwritableValuesCheckBox.state = self.searchData.shouldScanUnwritableValues;
 	self.ignoreDataAlignmentCheckBox.state = self.documentData.ignoreDataAlignment;
 	self.beginningAddressTextField.stringValue = self.documentData.beginningAddressStringValue;
 	self.endingAddressTextField.stringValue = self.documentData.endingAddressStringValue;
@@ -1422,12 +1421,6 @@
 - (IBAction)changeEndingAddressString:(id)sender
 {
 	self.documentData.endingAddressStringValue = [sender stringValue];
-	[self markDocumentChange];
-}
-
-- (IBAction)changeUnwritableValuesOption:(id)sender
-{
-	self.searchData.shouldScanUnwritableValues = [sender state];
 	[self markDocumentChange];
 }
 

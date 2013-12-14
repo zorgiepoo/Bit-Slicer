@@ -99,10 +99,6 @@
 	[keyedArchiver
 	 encodeInt32:(int32_t)self.data.functionTypeTag
 	 forKey:ZGFunctionTypeTagKey];
-    
-	[keyedArchiver
-	 encodeBool:self.searchData.shouldScanUnwritableValues
-	 forKey:ZGScanUnwritableValuesKey];
 	
 	[keyedArchiver
 	 encodeInt32:self.searchData.protectionMode
@@ -178,7 +174,6 @@
 	self.data.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
 	self.data.qualifierTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey];
 	self.data.functionTypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey];
-	self.searchData.shouldScanUnwritableValues = [keyedUnarchiver decodeBoolForKey:ZGScanUnwritableValuesKey];
 	self.searchData.protectionMode = [keyedUnarchiver decodeInt32ForKey:ZGProtectionModeKey];
 	self.data.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
 	self.searchData.shouldIncludeNullTerminator = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];

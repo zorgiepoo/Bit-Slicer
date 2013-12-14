@@ -76,7 +76,6 @@ typedef enum
 @property (nonatomic) BOOL shouldIncludeNullTerminator;
 @property (nonatomic) ZGMemoryAddress beginAddress;
 @property (nonatomic) ZGMemoryAddress endAddress;
-@property (nonatomic) BOOL shouldScanUnwritableValues;
 @property (nonatomic) ZGProtectionMode protectionMode;
 @property (nonatomic) void *additiveConstant;
 @property (nonatomic) double multiplicativeConstant;

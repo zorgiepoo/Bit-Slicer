@@ -35,8 +35,8 @@
 #import "ZGVirtualMemoryHelpers.h"
 #import "ZGVirtualMemory.h"
 #import "ZGRegion.h"
-#import "ZGSearchProgress.h"
 #import "ZGSearchData.h"
+#import "ZGSearchProgress.h"
 #import "ZGMachBinary.h"
 #import "NSArrayAdditions.h"
 
@@ -655,10 +655,11 @@ CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, N
 NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)
 {
 	NSMutableArray *dataArray = [[NSMutableArray alloc] init];
-	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
+	ZGProtectionMode protectionMode = searchData.protectionMode;
 	
 	NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-		return region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE));
+		return region.protection & VM_PROT_READ &&
+			(protectionMode == ZGProtectionAll || (protectionMode == ZGProtectionWrite && region.protection & VM_PROT_WRITE) || (protectionMode == ZGProtectionExecute && region.protection & VM_PROT_EXECUTE));
 	}];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
