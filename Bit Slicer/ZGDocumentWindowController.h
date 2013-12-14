@@ -63,7 +63,6 @@
 @property (assign) IBOutlet NSPopUpButton *functionPopUpButton;
 
 // TODO: Need to remove all these
-@property (assign) IBOutlet NSButton *scanUnwritableValuesCheckBox;
 @property (assign) IBOutlet NSButton *ignoreDataAlignmentCheckBox;
 @property (assign) IBOutlet NSTextField *beginningAddressTextField;
 @property (assign) IBOutlet NSTextField *endingAddressTextField;

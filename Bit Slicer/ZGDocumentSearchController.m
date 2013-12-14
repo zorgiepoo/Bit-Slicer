@@ -202,7 +202,6 @@
 	self.windowController.runningApplicationsPopUpButton.enabled = NO;
 	self.windowController.dataTypesPopUpButton.enabled = NO;
 	self.windowController.functionPopUpButton.enabled = NO;
-	self.windowController.scanUnwritableValuesCheckBox.enabled = NO;
 	self.windowController.ignoreDataAlignmentCheckBox.enabled = NO;
 	self.windowController.beginningAddressTextField.enabled = NO;
 	self.windowController.endingAddressTextField.enabled = NO;
@@ -224,8 +223,6 @@
 	[self.windowController updateOptions];
 	
 	self.windowController.functionPopUpButton.enabled = YES;
-	
-	self.windowController.scanUnwritableValuesCheckBox.enabled = YES;
 	
 	ZGVariableType dataType = [self.windowController selectedDataType];
 	
