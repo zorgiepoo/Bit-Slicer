@@ -50,6 +50,7 @@
 		773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
 		7743F9C618024CE400DBC19A /* python3.3 in Resources */ = {isa = PBXBuildFile; fileRef = 7743F9C518024CE400DBC19A /* python3.3 */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
+		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		777AD8C717D96F30003A5317 /* ZGPyDebugger.m in Sources */ = {isa = PBXBuildFile; fileRef = 777AD8C617D96F30003A5317 /* ZGPyDebugger.m */; };
 		77988F1A185803E800476A37 /* container.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F19185803E800476A37 /* container.pdf */; };
 		77988F1C185804AC00476A37 /* container_filled.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F1B185804AC00476A37 /* container_filled.pdf */; };
@@ -319,6 +320,8 @@
 		7743FA2618024D2A00DBC19A /* warnings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = warnings.h; path = deps/python/include/warnings.h; sourceTree = "<group>"; };
 		7743FA2718024D2A00DBC19A /* weakrefobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = weakrefobject.h; path = deps/python/include/weakrefobject.h; sourceTree = "<group>"; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		77607AAF185CD50100AC532B /* AGScopeBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AGScopeBar.h; path = deps/AGScopeBar.h; sourceTree = "<group>"; };
+		77607AB0185CD50100AC532B /* AGScopeBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AGScopeBar.m; path = deps/AGScopeBar.m; sourceTree = "<group>"; };
 		777AD8C517D96F30003A5317 /* ZGPyDebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyDebugger.h; path = "Bit Slicer/ZGPyDebugger.h"; sourceTree = "<group>"; };
 		777AD8C617D96F30003A5317 /* ZGPyDebugger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyDebugger.m; path = "Bit Slicer/ZGPyDebugger.m"; sourceTree = "<group>"; };
 		77988F19185803E800476A37 /* container.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container.pdf; path = "Bit Slicer/docicons/container.pdf"; sourceTree = "<group>"; };
@@ -595,15 +598,17 @@
 			name = "Variable Controllers";
 			sourceTree = "<group>";
 		};
-		770FAC4A1854EC9A00C176B7 /* Search Tokens */ = {
+		770FAC4A1854EC9A00C176B7 /* Search Controls & Tokens */ = {
 			isa = PBXGroup;
 			children = (
+				77607AAF185CD50100AC532B /* AGScopeBar.h */,
+				77607AB0185CD50100AC532B /* AGScopeBar.m */,
 				770FAC011853C5D600C176B7 /* APTokenSearchField.h */,
 				770FAC021853C5D600C176B7 /* APTokenSearchField.m */,
 				770FAC0418542BFF00C176B7 /* ZGSearchToken.h */,
 				770FAC0518542BFF00C176B7 /* ZGSearchToken.m */,
 			);
-			name = "Search Tokens";
+			name = "Search Controls & Tokens";
 			sourceTree = "<group>";
 		};
 		7728EE0C16BE3DDA00F9E1AD /* Misc. */ = {
@@ -911,7 +916,7 @@
 		77FF507D16EACF520005915D /* Documents */ = {
 			isa = PBXGroup;
 			children = (
-				770FAC4A1854EC9A00C176B7 /* Search Tokens */,
+				770FAC4A1854EC9A00C176B7 /* Search Controls & Tokens */,
 				770FABB318490DDD00C176B7 /* Variable Controllers */,
 				77F115EF17D2EDF9009E002A /* ZGDocument.h */,
 				77F115F017D2EDF9009E002A /* ZGDocument.m */,
@@ -1134,6 +1139,7 @@
 				77F115D317D2ED82009E002A /* ZGStatusBarRepresenter.m in Sources */,
 				77F115D617D2ED8E009E002A /* ZGLineCountingRepresenter.m in Sources */,
 				77F115D917D2ED9D009E002A /* ZGLineCountingView.m in Sources */,
+				77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */,
 				77F115DE17D2EDB7009E002A /* ZGMemoryDumpController.m in Sources */,
 				77F115DF17D2EDB7009E002A /* ZGMemoryProtectionController.m in Sources */,
 				77F115E217D2EDC3009E002A /* ZGAppController.m in Sources */,

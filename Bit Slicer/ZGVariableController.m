@@ -219,7 +219,6 @@
 	
 	self.windowController.runningApplicationsPopUpButton.enabled = YES;
 	self.windowController.dataTypesPopUpButton.enabled = YES;
-	self.windowController.variableQualifierMatrix.enabled = YES;
 	
 	if (self.windowController.currentProcess.valid)
 	{

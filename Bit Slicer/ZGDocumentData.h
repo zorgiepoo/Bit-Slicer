@@ -41,6 +41,7 @@
 #define ZGQualifierTagKey @"ZGQualifierKey"
 #define ZGFunctionTypeTagKey @"ZGFunctionTypeTagKey"
 #define ZGScanUnwritableValuesKey @"ZGScanUnwritableValuesKey"
+#define ZGProtectionModeKey @"ZGProtectionModeKey"
 #define ZGIgnoreDataAlignmentKey @"ZGIgnoreDataAlignmentKey"
 #define ZGExactStringLengthKey @"ZGExactStringLengthKey"
 #define ZGIgnoreStringCaseKey @"ZGIgnoreStringCaseKey"

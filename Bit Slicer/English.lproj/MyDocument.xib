@@ -9,10 +9,13 @@
             <connections>
                 <outlet property="dataTypesPopUpButton" destination="wMv-KV-nmE" id="ohz-17-Uj6"/>
                 <outlet property="deterministicProgressIndicator" destination="SfW-co-kf4" id="gG8-db-MbO"/>
-                <outlet property="flagsLabel" destination="dLn-LQ-VPC" id="mvx-zp-ra7"/>
+                <outlet property="flagsLabel" destination="U3S-5O-0jn" id="oT3-ZN-NAD"/>
+                <outlet property="flagsTextField" destination="hY6-jr-dYH" id="NNB-3Q-ALg"/>
                 <outlet property="functionPopUpButton" destination="Vpc-Jb-WRb" id="9wG-B2-0wl"/>
                 <outlet property="generalStatusTextField" destination="8dg-I8-jgu" id="Xth-G7-LMt"/>
                 <outlet property="runningApplicationsPopUpButton" destination="1ts-DF-nZQ" id="rls-ER-d1b"/>
+                <outlet property="scopeBar" destination="fFc-9y-zR5" id="D3V-L4-ePc"/>
+                <outlet property="scopeBarFlagsView" destination="053-lf-ydX" id="Bn8-FX-fuZ"/>
                 <outlet property="searchValueTextField" destination="obS-mO-KvZ" id="DrG-CI-hqA"/>
                 <outlet property="storeValuesButton" destination="evf-rf-Ae5" id="hg1-ot-trk"/>
                 <outlet property="variablesTableView" destination="HbN-z0-Vcf" id="a1I-Pk-xWi"/>
@@ -196,14 +199,14 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="10" verticalLineScroll="16" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="Iy4-iu-99I">
-                        <rect key="frame" x="-1" y="21" width="742" height="239"/>
+                        <rect key="frame" x="-1" y="21" width="742" height="214"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="4wx-3S-yE8">
-                            <rect key="frame" x="1" y="17" width="740" height="221"/>
+                            <rect key="frame" x="1" y="17" width="740" height="196"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="14" headerView="FQj-2P-but" id="HbN-z0-Vcf">
-                                    <rect key="frame" x="0.0" y="0.0" width="740" height="221"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="740" height="196"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -612,6 +615,10 @@
                         <rect key="frame" x="704" y="2" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
+                    <customView id="fFc-9y-zR5" customClass="AGScopeBar">
+                        <rect key="frame" x="-1" y="234" width="742" height="25"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    </customView>
                 </subviews>
             </view>
             <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" displayMode="iconAndLabel" sizeMode="regular" id="UZg-mb-r8g">
@@ -742,6 +749,33 @@
                 <outlet property="delegate" destination="-2" id="6az-i4-Aaj"/>
             </connections>
         </window>
+        <customView id="053-lf-ydX" userLabel="Flags Accessory">
+            <rect key="frame" x="0.0" y="0.0" width="269" height="25"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField verticalHuggingPriority="750" id="hY6-jr-dYH">
+                    <rect key="frame" x="189" y="3" width="80" height="19"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="fbi-ow-T4X">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <outlet property="nextKeyView" destination="obS-mO-KvZ" id="xXl-k4-qF2"/>
+                    </connections>
+                </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="U3S-5O-0jn">
+                    <rect key="frame" x="18" y="5" width="165" height="14"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Flags:" id="AOM-F4-uKc">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+        </customView>
     </objects>
     <resources>
         <image name="container" width="19" height="19"/>

@@ -106,6 +106,15 @@ void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long 
 
 #pragma mark Generic Searching
 
+NSArray *ZGFilterRegions(NSArray *regions, ZGMemoryAddress beginAddress, ZGMemoryAddress endAddress, ZGProtectionMode protectionMode)
+{
+	return [regions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
+		return region.address < endAddress && region.address + region.size > beginAddress &&
+			region.protection & VM_PROT_READ &&
+			(protectionMode == ZGProtectionAll || (protectionMode == ZGProtectionWrite && region.protection & VM_PROT_WRITE) || (protectionMode == ZGProtectionExecute && region.protection & VM_PROT_EXECUTE));
+	}];
+}
+
 typedef void (^zg_search_for_data_helper_t)(ZGMemorySize dataIndex, ZGMemoryAddress address, ZGMemorySize size, NSMutableData * __unsafe_unretained resultSet, void *bytes, void *regionBytes);
 
 ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, zg_search_for_data_helper_t helper)
@@ -118,14 +127,11 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	
 	ZGMemoryAddress dataBeginAddress = searchData.beginAddress;
 	ZGMemoryAddress dataEndAddress = searchData.endAddress;
-	BOOL shouldScanUnwritableValues = searchData.shouldScanUnwritableValues;
 	
 	NSArray *regions;
 	if (!shouldCompareStoredValues)
 	{
-		regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-			return region.address < dataEndAddress && region.address + region.size > dataBeginAddress && region.protection & VM_PROT_READ && (shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE));
-		}];
+		regions = ZGFilterRegions(ZGRegionsForProcessTask(processTask), dataBeginAddress, dataEndAddress, searchData.protectionMode);
 	}
 	else
 	{
@@ -945,9 +951,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 				lastAddress = *(ZG32BitMemoryAddress *)((uint8_t *)oldResultSet.bytes + oldResultSet.length - sizeof(ZG32BitMemoryAddress)) + dataSize;
 			}
 			
-			NSArray *regions = [allRegions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-				return region.address < lastAddress && region.address + region.size > firstAddress && region.protection & VM_PROT_READ && (searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE));
-			}];
+			NSArray *regions = ZGFilterRegions(allRegions, firstAddress, lastAddress, searchData.protectionMode);
 			
 			for (ZGRegion *region in regions)
 			{
@@ -981,9 +985,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 			{
 				pageToSavedRegionTable = [[NSMutableDictionary alloc] init];
 				
-				NSArray *regions = [savedData zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-					return region.address < lastAddress && region.address + region.size > firstAddress && region.protection & VM_PROT_READ && (searchData.shouldScanUnwritableValues || (region.protection & VM_PROT_WRITE));
-				}];
+				NSArray *regions = ZGFilterRegions(savedData, firstAddress, lastAddress, searchData.protectionMode);
 				
 				for (ZGRegion *region in regions)
 				{

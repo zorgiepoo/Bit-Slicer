@@ -56,6 +56,13 @@
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
 }
 
+typedef enum
+{
+	ZGProtectionAll,
+	ZGProtectionWrite,
+	ZGProtectionExecute
+} ZGProtectionMode;
+
 @property (nonatomic) void *searchValue;
 @property (nonatomic) ZGMemorySize dataSize;
 @property (nonatomic) ZGMemorySize dataAlignment;
@@ -70,6 +77,7 @@
 @property (nonatomic) ZGMemoryAddress beginAddress;
 @property (nonatomic) ZGMemoryAddress endAddress;
 @property (nonatomic) BOOL shouldScanUnwritableValues;
+@property (nonatomic) ZGProtectionMode protectionMode;
 @property (nonatomic) void *additiveConstant;
 @property (nonatomic) double multiplicativeConstant;
 @property (nonatomic) unsigned char *byteArrayFlags;

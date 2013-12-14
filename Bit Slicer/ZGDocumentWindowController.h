@@ -34,6 +34,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ZGSearchFunctions.h"
+#import "AGScopeBar.h"
 
 @class ZGDocumentTableController;
 @class ZGVariableController;
@@ -49,12 +50,11 @@
 
 #define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
 
-@interface ZGDocumentWindowController : NSWindowController
+@interface ZGDocumentWindowController : NSWindowController <AGScopeBarDelegate>
 
 @property (assign) IBOutlet NSTableView *variablesTableView;
 @property (assign) IBOutlet NSProgressIndicator *deterministicProgressIndicator;
 @property (assign) IBOutlet NSProgressIndicator *indeterministicProgressIndicator;
-@property (assign) IBOutlet NSMatrix *variableQualifierMatrix;
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
 @property (assign) IBOutlet NSButton *storeValuesButton;
@@ -65,16 +65,15 @@
 // TODO: Need to remove all these
 @property (assign) IBOutlet NSButton *scanUnwritableValuesCheckBox;
 @property (assign) IBOutlet NSButton *ignoreDataAlignmentCheckBox;
-@property (assign) IBOutlet NSButton *ignoreCaseCheckBox;
-@property (assign) IBOutlet NSButton *includeNullTerminatorCheckBox;
 @property (assign) IBOutlet NSTextField *beginningAddressTextField;
 @property (assign) IBOutlet NSTextField *endingAddressTextField;
 @property (assign) IBOutlet NSTextField *beginningAddressLabel;
 @property (assign) IBOutlet NSTextField *endingAddressLabel;
 @property (assign) IBOutlet NSTextField *flagsLabel;
-@property (assign) IBOutlet NSButton *optionsDisclosureButton;
-@property (assign) IBOutlet NSView *optionsView;
 // -----
+
+@property (assign) IBOutlet AGScopeBar *scopeBar;
+@property (assign) IBOutlet NSView *scopeBarFlagsView;
 
 @property (strong) ZGDocumentTableController *tableController;
 @property (strong) ZGVariableController *variableController;
@@ -100,7 +99,7 @@
 - (NSIndexSet *)selectedVariableIndexes;
 - (NSArray *)selectedVariables;
 
-- (void)updateFlagsAndSearchButtonTitle;
+- (void)updateOptions;
 
 - (ZGVariableType)selectedDataType;
 - (ZGFunctionType)selectedFunctionType;

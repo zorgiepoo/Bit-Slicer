@@ -60,11 +60,28 @@
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
 
+#define ZGProtectionGroup @"ZGProtectionGroup"
+#define ZGProtectionItemAll @"ZGProtectionAll"
+#define ZGProtectionItemWrite @"ZGProtectionWrite"
+#define ZGProtectionItemExecute @"ZGProtectionExecute"
+
+#define ZGQualifierGroup @"ZGQualifierGroup"
+#define ZGQualifierSigned @"ZGQualifierSigned"
+#define ZGQualifierUnsigned @"ZGQualifierUnsigned"
+
+#define ZGStringMatchingGroup @"ZGStringMatchingGroup"
+#define ZGStringIgnoreCase @"ZGStringIgnoreCase"
+#define ZGStringNullTerminated @"ZGStringNullTerminated"
+
 @interface ZGDocumentWindowController ()
 
 @property (nonatomic) ZGEditValueWindowController *editValueWindowController;
 @property (nonatomic) ZGEditAddressWindowController *editAddressWindowController;
 @property (nonatomic) ZGEditSizeWindowController *editSizeWindowController;
+
+@property (nonatomic) AGScopeBarGroup *protectionGroup;
+@property (nonatomic) AGScopeBarGroup *qualifierGroup;
+@property (nonatomic) AGScopeBarGroup *stringMatchingGroup;
 
 @property (assign) IBOutlet NSTextField *generalStatusTextField;
 
@@ -99,6 +116,74 @@
 	[self.scriptManager cleanup];
 }
 
+- (void)setupScopeBar
+{
+	self.protectionGroup = [self.scopeBar addGroupWithIdentifier:ZGProtectionGroup label:@"Protection:" items:nil];
+	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemAll title:@"All"];
+	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemWrite title:@"Write"];
+	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemExecute title:@"Execute"];
+	self.protectionGroup.selectionMode = AGScopeBarGroupSelectOne;
+	
+	self.qualifierGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGQualifierGroup];
+	self.qualifierGroup.label = @"Qualifier:";
+	[self.qualifierGroup addItemWithIdentifier:ZGQualifierSigned title:@"Signed"];
+	[self.qualifierGroup addItemWithIdentifier:ZGQualifierUnsigned title:@"Unsigned"];
+	self.qualifierGroup.selectionMode = AGScopeBarGroupSelectOne;
+	
+	self.stringMatchingGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGStringMatchingGroup];
+	self.stringMatchingGroup.label = @"Matching:";
+	[self.stringMatchingGroup addItemWithIdentifier:ZGStringIgnoreCase title:@"Ignore Case"];
+	[self.stringMatchingGroup addItemWithIdentifier:ZGStringNullTerminated title:@"Null Terminated"];
+	self.stringMatchingGroup.selectionMode = AGScopeBarGroupSelectAny;
+	
+	// Set delegate after setting up scope bar so we won't receive initial selection events beforehand
+	self.scopeBar.delegate = self;
+}
+
+- (void)scopeBar:(AGScopeBar *)scopeBar item:(AGScopeBarItem *)item wasSelected:(BOOL)selected
+{
+	if ([item.group.identifier isEqualToString:ZGProtectionGroup])
+	{
+		if (selected)
+		{
+			if ([item.identifier isEqualToString:ZGProtectionItemAll])
+			{
+				self.searchData.protectionMode = ZGProtectionAll;
+			}
+			else if ([item.identifier isEqualToString:ZGProtectionItemWrite])
+			{
+				self.searchData.protectionMode = ZGProtectionWrite;
+			}
+			else if ([item.identifier isEqualToString:ZGProtectionItemExecute])
+			{
+				self.searchData.protectionMode = ZGProtectionExecute;
+			}
+			
+			[self markDocumentChange];
+		}
+	}
+	else if ([item.group.identifier isEqualToString:ZGQualifierGroup])
+	{
+		if (selected)
+		{
+			[self changeIntegerQualifier:[item.identifier isEqualToString:ZGQualifierSigned] ? ZGSigned : ZGUnsigned];
+		}
+	}
+	else if ([item.group.identifier isEqualToString:ZGStringMatchingGroup])
+	{
+		if ([item.identifier isEqualToString:ZGStringIgnoreCase])
+		{
+			self.searchData.shouldIgnoreStringCase = selected;
+		}
+		else if ([item.identifier isEqualToString:ZGStringNullTerminated])
+		{
+			self.searchData.shouldIncludeNullTerminator = selected;
+		}
+		
+		[self markDocumentChange];
+	}
+}
+
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
@@ -116,6 +201,8 @@
 	
 	self.searchValueTextField.cell.sendsSearchStringImmediately = NO;
 	self.searchValueTextField.cell.sendsSearchStringOnlyAfterReturn = YES;
+	
+	[self setupScopeBar];
 	
 	[self.storeValuesButton.image setTemplate:YES];
 	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
@@ -259,12 +346,40 @@
 	[self.variableController disableHarmfulVariables:self.documentData.variables];
 	[self updateVariables:self.documentData.variables searchResults:nil];
 	
-	[self.variableQualifierMatrix selectCellWithTag:self.documentData.qualifierTag];
+	switch (self.searchData.protectionMode)
+	{
+		case ZGProtectionAll:
+			[self.protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemAll];
+			break;
+		case ZGProtectionWrite:
+			[self.protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemWrite];
+			break;
+		case ZGProtectionExecute:
+			[self.protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemExecute];
+			break;
+	}
+	
+	if (self.documentData.qualifierTag == ZGSigned)
+	{
+		[self.qualifierGroup setSelected:YES forItemWithIdentifier:ZGQualifierSigned];
+	}
+	else
+	{
+		[self.qualifierGroup setSelected:YES forItemWithIdentifier:ZGQualifierUnsigned];
+	}
+	
+	if (self.searchData.shouldIgnoreStringCase)
+	{
+		[self.stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringIgnoreCase];
+	}
+	
+	if (self.searchData.shouldIncludeNullTerminator)
+	{
+		[self.stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringNullTerminated];
+	}
 	
 	self.scanUnwritableValuesCheckBox.state = self.searchData.shouldScanUnwritableValues;
 	self.ignoreDataAlignmentCheckBox.state = self.documentData.ignoreDataAlignment;
-	self.includeNullTerminatorCheckBox.state = self.searchData.shouldIncludeNullTerminator;
-	self.ignoreCaseCheckBox.state = self.searchData.shouldIgnoreStringCase;
 	self.beginningAddressTextField.stringValue = self.documentData.beginningAddressStringValue;
 	self.endingAddressTextField.stringValue = self.documentData.endingAddressStringValue;
 	self.searchValueTextField.objectValue = self.documentData.searchValue;
@@ -615,11 +730,9 @@
 	return (self.documentData.variables.count > 0 && [self.searchController canStartTask]);
 }
 
-- (IBAction)qualifierMatrixButtonRequest:(id)sender
+- (void)changeIntegerQualifier:(ZGVariableQualifier)newQualifier
 {
 	ZGVariableQualifier oldQualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
-	ZGVariableQualifier newQualifier = (ZGVariableQualifier)[self.variableQualifierMatrix.selectedCell tag];
-	
 	if (oldQualifier != newQualifier)
 	{
 		for (ZGVariable *variable in self.documentData.variables)
@@ -677,27 +790,40 @@
 	}
 }
 
-- (void)updateFlagsAndSearchButtonTitle
+- (void)changeScopeBarGroup:(AGScopeBarGroup *)group shouldExist:(BOOL)shouldExist
+{
+	BOOL alreadyExists = [self.scopeBar.groups containsObject:group];
+	if (!shouldExist)
+	{
+		if (alreadyExists)
+		{
+			[self.scopeBar removeGroupAtIndex:[self.scopeBar.groups indexOfObject:group]];
+		}
+	}
+	else
+	{
+		if (!alreadyExists)
+		{
+			[self.scopeBar insertGroup:group atIndex:1];
+		}
+	}
+}
+
+- (void)updateOptions
 {
 	ZGVariableType dataType = [self selectedDataType];
 	ZGFunctionType functionType = [self selectedFunctionType];
 	
-	if (dataType == ZGString8 || dataType == ZGString16)
+	BOOL needsFlags = NO;
+	BOOL needsQualifier = NO;
+	BOOL needsStringMatching = NO;
+	
+	if (dataType == ZGFloat || dataType == ZGDouble)
 	{
-		self.flagsTextField.enabled = NO;
-		self.flagsTextField.stringValue = @"";
-		self.flagsLabel.stringValue = @"";
-		self.flagsLabel.textColor = NSColor.disabledControlTextColor;
-	}
-	else if (dataType == ZGFloat || dataType == ZGDouble)
-	{
-		self.flagsTextField.enabled = YES;
-		self.flagsLabel.textColor = NSColor.controlTextColor;
-		
 		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)
 		{
 			// epsilon
-			self.flagsLabel.stringValue = @"Epsilon:";
+			self.flagsLabel.stringValue = @"Round Error:";
 			if (self.documentData.lastEpsilonValue)
 			{
 				self.flagsTextField.stringValue = self.documentData.lastEpsilonValue;
@@ -712,24 +838,33 @@
 			// range
 			[self updateFlagsRangeTextField];
 		}
+		
+		needsFlags = YES;
 	}
-	else /* if data type is an integer type */
+	else if (dataType == ZGString8 || dataType == ZGString16)
 	{
-		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)		{
-			self.flagsTextField.enabled = NO;
-			self.flagsTextField.stringValue = @"";
-			self.flagsLabel.stringValue = @"";
-			self.flagsLabel.textColor = NSColor.disabledControlTextColor;
-		}
-		else
+		needsStringMatching = YES;
+	}
+	else if (dataType != ZGByteArray)
+	{
+		if (functionType != ZGEquals && functionType != ZGNotEquals && functionType != ZGEqualsStored && functionType != ZGNotEqualsStored && functionType != ZGEqualsStoredLinear && functionType != ZGNotEqualsStoredLinear)
 		{
 			// range
 			[self updateFlagsRangeTextField];
 			
-			self.flagsTextField.enabled = YES;
-			self.flagsLabel.textColor = NSColor.controlTextColor;
+			needsFlags = YES;
+		}
+		
+		if (dataType != ZGPointer)
+		{
+			needsQualifier = YES;
 		}
 	}
+	
+	[self changeScopeBarGroup:self.qualifierGroup shouldExist:needsQualifier];
+	[self changeScopeBarGroup:self.stringMatchingGroup shouldExist:needsStringMatching];
+	
+	self.scopeBar.accessoryView = needsFlags ? self.scopeBarFlagsView : nil;
 }
 
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo
@@ -740,21 +875,6 @@
 	[self.dataTypesPopUpButton selectItemWithTag:newTag];
 	
 	self.functionPopUpButton.enabled = YES;
-	self.variableQualifierMatrix.enabled = YES;
-	
-	if (newTag == ZGString8 || newTag == ZGString16)
-	{
-		self.ignoreCaseCheckBox.enabled = YES;
-		self.includeNullTerminatorCheckBox.enabled = YES;
-	}
-	else
-	{
-		self.ignoreCaseCheckBox.enabled = NO;
-		self.ignoreCaseCheckBox.state = NSOffState;
-		
-		self.includeNullTerminatorCheckBox.enabled = NO;
-		self.includeNullTerminatorCheckBox.state = NSOffState;
-	}
 	
 	if (newTag == ZGString8 || newTag == ZGInt8 || newTag == ZGByteArray)
 	{
@@ -767,7 +887,7 @@
 		self.ignoreDataAlignmentCheckBox.state = self.documentData.ignoreDataAlignment;
 	}
 	
-	[self updateFlagsAndSearchButtonTitle];
+	[self updateOptions];
 	
 	if (recordUndo && oldVariableTypeTag != newTag)
 	{
@@ -870,7 +990,7 @@
 
 - (void)functionTypePopUpButtonRequest:(id)sender markChanges:(BOOL)shouldMarkChanges
 {
-	[self updateFlagsAndSearchButtonTitle];
+	[self updateOptions];
 	
 	[self.window makeFirstResponder:self.searchValueTextField];
 	
@@ -1287,21 +1407,9 @@
 
 #pragma mark Bindings
 
-- (IBAction)changeStringCaseOption:(id)sender
-{
-	self.searchData.shouldIgnoreStringCase = [sender state];
-	[self markDocumentChange];
-}
-
 - (IBAction)ignoreDataAlignment:(id)sender
 {
 	self.documentData.ignoreDataAlignment = [sender state];
-	[self markDocumentChange];
-}
-
-- (IBAction)changeNullTerminatorInclusion:(id)sender
-{
-	self.searchData.shouldIncludeNullTerminator = [sender state];
 	[self markDocumentChange];
 }
 
