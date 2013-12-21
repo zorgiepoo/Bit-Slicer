@@ -64,6 +64,11 @@
     return geteuid() != 0;
 }
 
+- (void)markChange
+{
+	[self updateChangeCount:NSChangeDone];
+}
+
 - (void)makeWindowControllers
 {
 	self.windowController = [[ZGDocumentWindowController alloc] init];

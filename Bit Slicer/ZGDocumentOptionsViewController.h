@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 10/25/09.
+ * Created by Mayur Pawashe on 12/21/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,14 +34,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class ZGDocumentData;
-@class ZGSearchData;
+@class ZGDocument;
 
-@interface ZGDocument : NSDocument
+@interface ZGDocumentOptionsViewController : NSViewController
 
-@property (strong, nonatomic) ZGDocumentData *data;
-@property (strong, nonatomic) ZGSearchData *searchData;
+- (id)initWithDocument:(ZGDocument *)document;
 
-- (void)markChange;
+- (void)reloadInterface;
 
 @end

@@ -62,14 +62,7 @@
 @property (assign) IBOutlet NSTextField *flagsTextField;
 @property (assign) IBOutlet NSPopUpButton *functionPopUpButton;
 
-// TODO: Need to remove all these
-@property (assign) IBOutlet NSButton *ignoreDataAlignmentCheckBox;
-@property (assign) IBOutlet NSTextField *beginningAddressTextField;
-@property (assign) IBOutlet NSTextField *endingAddressTextField;
-@property (assign) IBOutlet NSTextField *beginningAddressLabel;
-@property (assign) IBOutlet NSTextField *endingAddressLabel;
 @property (assign) IBOutlet NSTextField *flagsLabel;
-// -----
 
 @property (assign) IBOutlet AGScopeBar *scopeBar;
 @property (assign) IBOutlet NSView *scopeBarFlagsView;

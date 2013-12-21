@@ -15,6 +15,8 @@
 		770FABB81849160200C176B7 /* ZGEditSizeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770FABB61849160200C176B7 /* ZGEditSizeWindowController.xib */; };
 		770FAC031853C5D600C176B7 /* APTokenSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC021853C5D600C176B7 /* APTokenSearchField.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC0518542BFF00C176B7 /* ZGSearchToken.m */; };
+		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
+		7730999E18660A29008B71DA /* ZGDocumentOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */; };
 		773972B117D2E61200B958EE /* _DDFunctionContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728517D2E61200B958EE /* _DDFunctionContainer.m */; };
 		773972B217D2E61200B958EE /* _DDFunctionExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728717D2E61200B958EE /* _DDFunctionExpression.m */; };
 		773972B317D2E61200B958EE /* _DDFunctionTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728917D2E61200B958EE /* _DDFunctionTerm.m */; };
@@ -161,6 +163,9 @@
 		770FAC021853C5D600C176B7 /* APTokenSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APTokenSearchField.m; path = deps/APTokenSearchField.m; sourceTree = "<group>"; };
 		770FAC0418542BFF00C176B7 /* ZGSearchToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchToken.h; path = "Bit Slicer/ZGSearchToken.h"; sourceTree = "<group>"; };
 		770FAC0518542BFF00C176B7 /* ZGSearchToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchToken.m; path = "Bit Slicer/ZGSearchToken.m"; sourceTree = "<group>"; };
+		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; };
+		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; };
+		7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGDocumentOptionsViewController.xib; path = "Bit Slicer/ZGDocumentOptionsViewController.xib"; sourceTree = "<group>"; };
 		7739728417D2E61200B958EE /* _DDFunctionContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionContainer.h; path = deps/DDMathParser/_DDFunctionContainer.h; sourceTree = "<group>"; };
 		7739728517D2E61200B958EE /* _DDFunctionContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDFunctionContainer.m; path = deps/DDMathParser/_DDFunctionContainer.m; sourceTree = "<group>"; };
 		7739728617D2E61200B958EE /* _DDFunctionExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionExpression.h; path = deps/DDMathParser/_DDFunctionExpression.h; sourceTree = "<group>"; };
@@ -925,6 +930,9 @@
 				77F115F317D2EE0B009E002A /* ZGDocumentData.m */,
 				77F115F517D2EE28009E002A /* ZGDocumentWindowController.h */,
 				77F115F617D2EE28009E002A /* ZGDocumentWindowController.m */,
+				7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */,
+				7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */,
+				7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */,
 				77F115F817D2EE6F009E002A /* ZGDocumentSearchController.h */,
 				77F115F917D2EE6F009E002A /* ZGDocumentSearchController.m */,
 				77F115FB17D2EE7E009E002A /* ZGDocumentTableController.h */,
@@ -1089,6 +1097,7 @@
 				77F115B617D2EBAF009E002A /* InfoPlist.strings in Resources */,
 				77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */,
 				77F115B917D2EBCB009E002A /* MainMenu.xib in Resources */,
+				7730999E18660A29008B71DA /* ZGDocumentOptionsViewController.xib in Resources */,
 				77F115BC17D2EBD7009E002A /* Preferences.xib in Resources */,
 				77F115BF17D2EBE1009E002A /* MyDocument.xib in Resources */,
 				77F115C217D2EBEC009E002A /* ZGDebuggerController.xib in Resources */,
@@ -1162,6 +1171,7 @@
 				77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */,
 				77F1161217D2EEE1009E002A /* ZGSearchProgress.m in Sources */,
 				77F1161517D2EEEC009E002A /* ZGSearchResults.m in Sources */,
+				7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */,
 				77F1161817D2EEF6009E002A /* ZGSearchFunctions.mm in Sources */,
 				77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */,
 				77F1162217D2EF28009E002A /* ZGVirtualMemoryHelpers.m in Sources */,

@@ -202,11 +202,6 @@
 	self.windowController.runningApplicationsPopUpButton.enabled = NO;
 	self.windowController.dataTypesPopUpButton.enabled = NO;
 	self.windowController.functionPopUpButton.enabled = NO;
-	self.windowController.ignoreDataAlignmentCheckBox.enabled = NO;
-	self.windowController.beginningAddressTextField.enabled = NO;
-	self.windowController.endingAddressTextField.enabled = NO;
-	self.windowController.beginningAddressLabel.textColor = NSColor.disabledControlTextColor;
-	self.windowController.endingAddressLabel.textColor = NSColor.disabledControlTextColor;
 }
 
 - (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder
@@ -223,18 +218,6 @@
 	[self.windowController updateOptions];
 	
 	self.windowController.functionPopUpButton.enabled = YES;
-	
-	ZGVariableType dataType = [self.windowController selectedDataType];
-	
-	if (dataType != ZGString8 && dataType != ZGInt8)
-	{
-		self.windowController.ignoreDataAlignmentCheckBox.enabled = YES;
-	}
-	
-	self.windowController.beginningAddressTextField.enabled = YES;
-	self.windowController.endingAddressTextField.enabled = YES;
-	self.windowController.beginningAddressLabel.textColor = NSColor.controlTextColor;
-	self.windowController.endingAddressLabel.textColor = NSColor.controlTextColor;
 	
 	self.windowController.runningApplicationsPopUpButton.enabled = YES;
 	

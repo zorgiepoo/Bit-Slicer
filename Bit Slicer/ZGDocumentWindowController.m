@@ -59,6 +59,7 @@
 #import "ZGVirtualMemoryHelpers.h"
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
+#import "ZGDocumentOptionsViewController.h"
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
@@ -84,6 +85,8 @@
 @property (nonatomic) AGScopeBarGroup *stringMatchingGroup;
 
 @property (assign) IBOutlet NSTextField *generalStatusTextField;
+
+@property (nonatomic) NSPopover *advancedOptionsPopover;
 
 @end
 
@@ -378,9 +381,12 @@
 		[self.stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringNullTerminated];
 	}
 	
-	self.ignoreDataAlignmentCheckBox.state = self.documentData.ignoreDataAlignment;
-	self.beginningAddressTextField.stringValue = self.documentData.beginningAddressStringValue;
-	self.endingAddressTextField.stringValue = self.documentData.endingAddressStringValue;
+	if (self.advancedOptionsPopover != nil)
+	{
+		ZGDocumentOptionsViewController *optionsViewController = (id)self.advancedOptionsPopover.contentViewController;
+		[optionsViewController reloadInterface];
+	}
+	
 	self.searchValueTextField.objectValue = self.documentData.searchValue;
 	
 	[self.dataTypesPopUpButton selectItemWithTag:self.documentData.selectedDatatypeTag];
@@ -419,7 +425,7 @@
 
 - (void)markDocumentChange
 {
-	[self.document updateChangeCount:NSChangeDone];
+	[self.document markChange];
 }
 
 #pragma mark Watching other applications
@@ -874,17 +880,6 @@
 	[self.dataTypesPopUpButton selectItemWithTag:newTag];
 	
 	self.functionPopUpButton.enabled = YES;
-	
-	if (newTag == ZGString8 || newTag == ZGInt8 || newTag == ZGByteArray)
-	{
-		self.ignoreDataAlignmentCheckBox.enabled = NO;
-		self.ignoreDataAlignmentCheckBox.state = NSOffState;
-	}
-	else
-	{
-		self.ignoreDataAlignmentCheckBox.enabled = YES;
-		self.ignoreDataAlignmentCheckBox.state = self.documentData.ignoreDataAlignment;
-	}
 	
 	[self updateOptions];
 	
@@ -1402,6 +1397,18 @@
 {
 	self.documentData.searchValue = self.searchValueTextField.objectValue;
 	[self.searchController storeAllValues];
+}
+
+- (IBAction)showAdvancedOptions:(id)sender
+{
+	if (self.advancedOptionsPopover == nil)
+	{
+		self.advancedOptionsPopover = [[NSPopover alloc] init];
+		self.advancedOptionsPopover.contentViewController = [[ZGDocumentOptionsViewController alloc] initWithDocument:self.document];
+		self.advancedOptionsPopover.behavior = NSPopoverBehaviorTransient;
+	}
+	
+	[self.advancedOptionsPopover  showRelativeToRect:[sender bounds] ofView:sender preferredEdge:NSMaxYEdge];
 }
 
 #pragma mark Bindings
