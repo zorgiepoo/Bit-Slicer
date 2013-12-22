@@ -7,6 +7,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDocumentWindowController">
             <connections>
+                <outlet property="advancedOptionsButton" destination="zKb-Ip-63U" id="GTH-5Q-tTE"/>
                 <outlet property="dataTypesPopUpButton" destination="wMv-KV-nmE" id="ohz-17-Uj6"/>
                 <outlet property="deterministicProgressIndicator" destination="SfW-co-kf4" id="gG8-db-MbO"/>
                 <outlet property="flagsLabel" destination="U3S-5O-0jn" id="oT3-ZN-NAD"/>
