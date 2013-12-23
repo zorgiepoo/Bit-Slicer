@@ -693,17 +693,10 @@
                         <popUpButton key="view" verticalHuggingPriority="750" id="Vpc-Jb-WRb">
                             <rect key="frame" x="0.0" y="14" width="109" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
-                            <popUpButtonCell key="cell" type="roundTextured" title="equals" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="6CU-bb-yky" id="TkL-8a-mN8">
+                            <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TkL-8a-mN8">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
-                                <menu key="menu" title="OtherViews" id="cNT-1t-BfB">
-                                    <items>
-                                        <menuItem title="equals" state="on" id="6CU-bb-yky"/>
-                                        <menuItem title="is not" tag="1" id="OXO-I7-Kw4"/>
-                                        <menuItem title="is greater than" tag="2" id="Pgp-h0-doo"/>
-                                        <menuItem title="is less than" tag="3" id="ISP-Or-I2T"/>
-                                    </items>
-                                </menu>
+                                <menu key="menu" title="OtherViews" id="cNT-1t-BfB"/>
                             </popUpButtonCell>
                             <connections>
                                 <action selector="functionTypePopUpButtonRequest:" target="-2" id="vHM-nz-Hhc"/>

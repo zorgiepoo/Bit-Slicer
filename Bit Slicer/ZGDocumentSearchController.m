@@ -122,7 +122,6 @@
 - (NSString *)confirmSearchInput:(NSString *)expression
 {
 	ZGVariableType dataType = [self.windowController selectedDataType];
-	ZGFunctionType functionType = [self.windowController selectedFunctionType];
 	
 	if (ZGIsNumericalDataType(dataType))
 	{
@@ -135,10 +134,6 @@
 				return inputError;
 			}
 		}
-	}
-	else if (functionType != ZGEquals && functionType != ZGNotEquals && functionType != ZGEqualsStored && functionType != ZGNotEqualsStored && functionType != ZGEqualsStoredLinear && functionType != ZGNotEqualsStoredLinear)
-	{
-		return [NSString stringWithFormat:@"The function you are using does not support %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
 	}
 	
 	if ((dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray) && [self.searchData shouldCompareStoredValues])

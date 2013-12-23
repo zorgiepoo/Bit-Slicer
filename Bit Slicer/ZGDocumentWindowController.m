@@ -393,7 +393,7 @@
 	[self selectDataTypeWithTag:(ZGVariableType)self.documentData.selectedDatatypeTag recordUndo:NO];
 	
 	[self.functionPopUpButton selectItemWithTag:self.documentData.functionTypeTag];
-	[self functionTypePopUpButtonRequest:nil markChanges:NO];
+	[self updateOptions];
 }
 
 #pragma mark Selected Variables
@@ -866,6 +866,28 @@
 		}
 	}
 	
+	[self.functionPopUpButton removeAllItems];
+	
+	[self.functionPopUpButton insertItemWithTitle:@"equals" atIndex:0];
+	[[self.functionPopUpButton itemAtIndex:0] setTag:ZGEquals];
+	
+	[self.functionPopUpButton insertItemWithTitle:@"is not" atIndex:1];
+	[[self.functionPopUpButton itemAtIndex:1] setTag:ZGNotEquals];
+	
+	if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
+	{
+		[self.functionPopUpButton insertItemWithTitle:@"is greater than" atIndex:2];
+		[[self.functionPopUpButton itemAtIndex:2] setTag:ZGGreaterThan];
+		
+		[self.functionPopUpButton insertItemWithTitle:@"is less than" atIndex:3];
+		[[self.functionPopUpButton itemAtIndex:3] setTag:ZGLessThan];
+	}
+	
+	if (![self.functionPopUpButton selectItemWithTag:self.documentData.functionTypeTag])
+	{
+		self.documentData.functionTypeTag = self.functionPopUpButton.selectedTag;
+	}
+	
 	[self changeScopeBarGroup:self.qualifierGroup shouldExist:needsQualifier];
 	[self changeScopeBarGroup:self.stringMatchingGroup shouldExist:needsStringMatching];
 	
@@ -982,22 +1004,11 @@
 	return [self isFunctionTypeStore:[self selectedFunctionType]];
 }
 
-- (void)functionTypePopUpButtonRequest:(id)sender markChanges:(BOOL)shouldMarkChanges
-{
-	[self updateOptions];
-	
-	[self.window makeFirstResponder:self.searchValueTextField];
-	
-	if (shouldMarkChanges)
-	{
-		[self markDocumentChange];
-	}
-}
-
 - (IBAction)functionTypePopUpButtonRequest:(id)sender
 {
 	self.documentData.functionTypeTag = [sender selectedTag];
-	[self functionTypePopUpButtonRequest:sender markChanges:YES];
+	[self updateOptions];
+	[self markDocumentChange];
 }
 
 #pragma mark Useful Methods
@@ -1213,14 +1224,6 @@
 			{
 				return NO;
 			}
-		}
-	}
-	
-	else if (menuItem.action == @selector(functionTypePopUpButtonRequest:))
-	{
-		if ([self isFunctionTypeStore:menuItem.tag] && !self.searchController.searchData.savedData)
-		{
-			return NO;
 		}
 	}
 	
