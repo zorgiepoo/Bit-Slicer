@@ -116,7 +116,7 @@
 
 - (NSString *)testSearchComponent:(NSString *)searchComponent
 {
-	return ZGIsValidNumber(searchComponent) ? nil : @"The function you are using requires the search value to be a valid expression.";
+	return ZGIsValidNumber(searchComponent) ? nil : @"The operator you are using requires the search value to be a valid expression.";
 }
 
 - (NSString *)confirmSearchInput:(NSString *)expression
