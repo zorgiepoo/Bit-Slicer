@@ -555,7 +555,7 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, c
 			[self->objectsPool addObject:searchProgress];
 		}
 		
-		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, searchProgress, ZGByteArray, 0, ZGEquals);
+		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, nil, ZGByteArray, 0, ZGEquals);
 		
 		@synchronized(self->objectsPool)
 		{

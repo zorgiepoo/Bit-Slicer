@@ -163,6 +163,7 @@
 		770FAC021853C5D600C176B7 /* APTokenSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APTokenSearchField.m; path = deps/APTokenSearchField.m; sourceTree = "<group>"; };
 		770FAC0418542BFF00C176B7 /* ZGSearchToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchToken.h; path = "Bit Slicer/ZGSearchToken.h"; sourceTree = "<group>"; };
 		770FAC0518542BFF00C176B7 /* ZGSearchToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchToken.m; path = "Bit Slicer/ZGSearchToken.m"; sourceTree = "<group>"; };
+		772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchProgressDelegate.h; path = "Bit Slicer/ZGSearchProgressDelegate.h"; sourceTree = "<group>"; };
 		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; };
 		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; };
 		7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGDocumentOptionsViewController.xib; path = "Bit Slicer/ZGDocumentOptionsViewController.xib"; sourceTree = "<group>"; };
@@ -949,6 +950,7 @@
 			children = (
 				77F1160D17D2EED6009E002A /* ZGSearchData.h */,
 				77F1160E17D2EED6009E002A /* ZGSearchData.m */,
+				772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */,
 				77F1161017D2EEE1009E002A /* ZGSearchProgress.h */,
 				77F1161117D2EEE1009E002A /* ZGSearchProgress.m */,
 				77F1161317D2EEEC009E002A /* ZGSearchResults.h */,

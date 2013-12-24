@@ -238,38 +238,36 @@
 
 #pragma mark Update UI
 
-- (NSString *)numberOfVariablesFoundDescription
-{
-	NSNumberFormatter *numberOfVariablesFoundFormatter = [[NSNumberFormatter alloc] init];
-	numberOfVariablesFoundFormatter.format = @"#,###";
-	return [NSString stringWithFormat:@"Found %@ value%@...", [numberOfVariablesFoundFormatter stringFromNumber:@(self.searchProgress.numberOfVariablesFound)], self.searchProgress.numberOfVariablesFound != 1 ? @"s" : @""];
-}
-
-- (void)updateVariablesFound
-{
-	if (self.searchProgress.initiatedSearch)
-	{
-		self.windowController.deterministicProgressIndicator.maxValue = (double)self.searchProgress.maxProgress;
-		self.windowController.deterministicProgressIndicator.doubleValue = (double)self.searchProgress.progress;
-		[self.windowController setStatus:[self numberOfVariablesFoundDescription]];
-	}
-}
-
-- (void)updateSearchUserInterface:(NSTimer *)timer
-{
-	if (!self.searchProgress.shouldCancelSearch)
-	{
-		[self updateVariablesFound];
-	}
-	else
-	{
-		[self.windowController setStatus:@"Cancelling search..."];
-	}
-}
-
 - (void)updateMemoryStoreUserInterface:(NSTimer *)timer
 {
 	self.windowController.deterministicProgressIndicator.doubleValue = self.searchProgress.progress;
+}
+
+- (NSString *)numberOfVariablesFoundDescriptionFromProgress:(ZGSearchProgress *)searchProgress
+{
+	NSNumberFormatter *numberOfVariablesFoundFormatter = [[NSNumberFormatter alloc] init];
+	numberOfVariablesFoundFormatter.format = @"#,###";
+	return [NSString stringWithFormat:@"Found %@ value%@...", [numberOfVariablesFoundFormatter stringFromNumber:@(searchProgress.numberOfVariablesFound)], searchProgress.numberOfVariablesFound != 1 ? @"s" : @""];
+}
+
+- (void)updateProgressBarFromProgress:(ZGSearchProgress *)searchProgress
+{
+	self.windowController.deterministicProgressIndicator.maxValue = (double)searchProgress.maxProgress;
+	self.windowController.deterministicProgressIndicator.doubleValue = (double)searchProgress.progress;
+	
+	[self.windowController setStatus:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
+}
+
+- (void)progressDidAdvance:(ZGSearchProgress *)searchProgress
+{
+	[self updateProgressBarFromProgress:searchProgress];
+}
+
+- (void)progressWillBegin:(ZGSearchProgress *)searchProgress
+{
+	[self updateProgressBarFromProgress:searchProgress];
+	
+	self.searchProgress = searchProgress;
 }
 
 #pragma mark Searching
@@ -461,14 +459,12 @@
 	}
 	else
 	{
-		[self updateVariablesFound];
-		
 		if (NSClassFromString(@"NSUserNotification"))
 		{
 			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
 			userNotification.title = @"Search Finished";
 			userNotification.subtitle = self.windowController.currentProcess.name;
-			userNotification.informativeText = [self numberOfVariablesFoundDescription];
+			userNotification.informativeText = [self numberOfVariablesFoundDescriptionFromProgress:self.searchProgress];
 			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 		}
 		
@@ -743,11 +739,11 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		if (!isNarrowing)
 		{
-			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, dataType, self.documentData.qualifierTag, [self.windowController selectedFunctionType]);
+			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self, dataType, self.documentData.qualifierTag, [self.windowController selectedFunctionType]);
 		}
 		else
 		{
-			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self.searchProgress, dataType, self.documentData.qualifierTag, [self.windowController selectedFunctionType], firstSearchResults, (self.searchResults.tag == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
+			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self, dataType, self.documentData.qualifierTag, [self.windowController selectedFunctionType], firstSearchResults, (self.searchResults.tag == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
 		}
 		
 		self.temporarySearchResults.tag = dataType;
@@ -779,7 +775,6 @@
 		}
 		
 		[self prepareTask];
-		[self.searchProgress clear];
 		
 		id searchDataActivity = nil;
 		if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
@@ -787,11 +782,8 @@
 			searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
 		}
 		
-		[self createUserInterfaceTimer];
-		
 		[self searchVariablesByNarrowing:self.isInNarrowSearchMode withVariables:searchedVariables usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
-			self.userInterfaceTimer = nil;
 			
 			if (searchDataActivity != nil)
 			{
@@ -805,14 +797,16 @@
 
 - (void)cancelTask
 {
-	if (self.searchProgress.progressType == ZGSearchProgressMemoryStoring)
+	if (self.searchProgress.progressType == ZGSearchProgressMemoryScanning)
 	{
-		// Cancel memory store
+		[self.windowController setStatus:@"Cancelling search..."];
+	}
+	else if (self.searchProgress.progressType == ZGSearchProgressMemoryStoring)
+	{
 		[self.windowController setStatus:@"Canceling Memory Store..."];
 	}
 	else if (self.searchProgress.progressType == ZGSearchProgressMemoryWatching)
 	{
-		// Cancel break point watching
 		[self.windowController.documentBreakPointController cancelTask];
 	}
 	

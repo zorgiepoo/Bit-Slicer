@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/21/12.
+ * Created by Mayur Pawashe on 12/23/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,38 +33,12 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGSearchProgressDelegate.h"
 
-#define USER_INTERFACE_UPDATE_TIME_INTERVAL	 0.33
-
-@class ZGSearchData;
 @class ZGSearchProgress;
-@class ZGSearchResults;
-@class ZGDocumentWindowController;
-@class ZGDocumentData;
 
-@interface ZGDocumentSearchController : NSObject <ZGSearchProgressDelegate>
+@protocol ZGSearchProgressDelegate <NSObject>
 
-@property (assign, nonatomic) ZGDocumentData *documentData;
-@property (assign, nonatomic) ZGSearchData *searchData;
-@property (strong, nonatomic) ZGSearchResults *searchResults;
-@property (readonly, strong, nonatomic) ZGSearchProgress *searchProgress;
-
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
-
-- (BOOL)canStartTask;
-- (BOOL)canCancelTask;
-- (void)cancelTask;
-- (void)prepareTaskWithDeterminism:(BOOL)isDeterminisic;
-- (void)prepareTask;
-- (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder;
-- (void)resumeFromTask;
-
-- (void)fetchVariablesFromResults;
-
-- (void)search;
-- (void)storeAllValues;
-
-- (void)cleanUp;
+- (void)progressWillBegin:(ZGSearchProgress *)searchProgress;
+- (void)progressDidAdvance:(ZGSearchProgress *)searchProgress;
 
 @end

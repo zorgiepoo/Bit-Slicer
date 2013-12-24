@@ -35,9 +35,9 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
+#import "ZGSearchProgressDelegate.h"
 
 @class ZGSearchData;
-@class ZGSearchProgress;
 @class ZGSearchResults;
 
 typedef enum
@@ -60,10 +60,10 @@ typedef enum
 #ifdef __cplusplus
 extern "C"
 #endif
-ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType);
+ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType);
 
 #ifdef __cplusplus
 extern "C"
 #endif
-ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults);
+ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults);
 
