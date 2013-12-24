@@ -194,7 +194,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 				dispatch_async(dispatch_get_main_queue(), ^{
 					searchProgress.numberOfVariablesFound += resultSet.length / pointerSize;
 					searchProgress.progress++;
-					[delegate progress:searchProgress advancedWithResultSet:resultSet];
+					[delegate progressDidAdvance:searchProgress];
 				});
 			}
 		}
@@ -752,7 +752,7 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDa
 					dispatch_async(dispatch_get_main_queue(), ^{
 						searchProgress.numberOfVariablesFound += newResultSet.length / pointerSize;
 						searchProgress.progress++;
-						[delegate progress:searchProgress advancedWithResultSet:newResultSet];
+						[delegate progressDidAdvance:searchProgress];
 					});
 				}
 			}
