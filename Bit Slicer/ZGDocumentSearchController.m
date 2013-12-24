@@ -184,6 +184,8 @@
 {
 	self.isBusy = YES;
 	
+	self.windowController.deterministicProgressIndicator.doubleValue = 0;
+	
 	if (isDeterminisic)
 	{
 		[self.windowController.deterministicProgressIndicator setHidden:NO];
@@ -258,9 +260,17 @@
 	[self.windowController setStatus:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
 }
 
-- (void)progressDidAdvance:(ZGSearchProgress *)searchProgress
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
 {
 	[self updateProgressBarFromProgress:searchProgress];
+	
+	if (self.documentData.variables.count < MAX_NUMBER_OF_VARIABLES_TO_FETCH && resultSet.length > 0)
+	{
+		ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
+		searchResults.tag = self.documentData.selectedDatatypeTag;
+		[self fetchVariablesFromResults:searchResults];
+		[self.windowController.tableController.variablesTableView reloadData];
+	}
 }
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress
@@ -341,16 +351,16 @@
 	}
 }
 
-- (void)fetchVariablesFromResults
+- (void)fetchVariablesFromResults:(ZGSearchResults *)searchResults
 {
-	if (self.documentData.variables.count < MAX_NUMBER_OF_VARIABLES_TO_FETCH && self.searchResults.addressCount > 0)
+	if (self.documentData.variables.count < MAX_NUMBER_OF_VARIABLES_TO_FETCH && searchResults.addressCount > 0)
 	{
 		NSMutableArray *newVariables = [[NSMutableArray alloc] initWithArray:self.documentData.variables];
 		
 		NSUInteger numberOfVariables = MAX_NUMBER_OF_VARIABLES_TO_FETCH - self.documentData.variables.count;
-		if (numberOfVariables > self.searchResults.addressCount)
+		if (numberOfVariables > searchResults.addressCount)
 		{
-			numberOfVariables = self.searchResults.addressCount;
+			numberOfVariables = searchResults.addressCount;
 		}
 		
 		ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
@@ -370,14 +380,14 @@
 		
 		ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
 		
-		ZGMemorySize dataSize = self.searchResults.dataSize;
-		[self.searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
+		ZGMemorySize dataSize = searchResults.dataSize;
+		[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
 			ZGVariable *newVariable =
 			[[ZGVariable alloc]
 			 initWithValue:NULL
 			 size:dataSize
 			 address:variableAddress
-			 type:(ZGVariableType)self.searchResults.tag
+			 type:(ZGVariableType)searchResults.tag
 			 qualifier:qualifier
 			 pointerSize:pointerSize];
 			
@@ -440,9 +450,9 @@
 			[newVariables addObject:newVariable];
 		}];
 		
-		[self.searchResults removeNumberOfAddresses:numberOfVariables];
+		[searchResults removeNumberOfAddresses:numberOfVariables];
 		
-		self.documentData.variables = [NSArray arrayWithArray:newVariables];
+		self.documentData.variables = newVariables;
 		if (self.documentData.variables.count > 0)
 		{
 			[self.windowController.tableController updateVariableValuesInRange:NSMakeRange(0, self.documentData.variables.count)];
@@ -450,14 +460,14 @@
 	}
 }
 
-- (void)finalizeSearchWithNotSearchedVariables:(NSArray *)notSearchedVariables
+- (void)fetchVariablesFromResults
 {
-	self.searchProgress.progress = 0;
-	if (self.searchProgress.shouldCancelSearch)
-	{
-		self.windowController.deterministicProgressIndicator.doubleValue = self.searchProgress.progress;
-	}
-	else
+	[self fetchVariablesFromResults:self.searchResults];
+}
+
+- (void)finalizeSearchWithOldVariables:(NSArray *)oldVariables andNotSearchedVariables:(NSArray *)notSearchedVariables
+{
+	if (!self.searchProgress.shouldCancelSearch)
 	{
 		if (NSClassFromString(@"NSUserNotification"))
 		{
@@ -468,16 +478,21 @@
 			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 		}
 		
-		if (notSearchedVariables.count + self.temporarySearchResults.addressCount != self.documentData.variables.count)
+		if (notSearchedVariables.count + self.temporarySearchResults.addressCount != oldVariables.count)
 		{
 			self.windowController.undoManager.actionName = @"Search";
-			[[self.windowController.undoManager prepareWithInvocationTarget:self.windowController] updateVariables:self.documentData.variables searchResults:self.searchResults];
+			[[self.windowController.undoManager prepareWithInvocationTarget:self.windowController] updateVariables:oldVariables searchResults:self.searchResults];
 			
-			self.documentData.variables = [NSArray arrayWithArray:notSearchedVariables];
 			self.searchResults = self.temporarySearchResults;
+			self.documentData.variables = notSearchedVariables;
 			[self fetchVariablesFromResults];
 			[self.windowController.tableController.variablesTableView reloadData];
 		}
+	}
+	else
+	{
+		self.documentData.variables = oldVariables;
+		[self.windowController.tableController.variablesTableView reloadData];
 	}
 	
 	[self.windowController updateObservingProcessOcclusionState];
@@ -782,7 +797,13 @@
 			searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
 		}
 		
-		[self searchVariablesByNarrowing:self.isInNarrowSearchMode withVariables:searchedVariables usingCompletionBlock:^ {
+		BOOL isNarrowing = [self isInNarrowSearchMode];
+		NSArray *oldVariables = self.documentData.variables;
+		
+		self.documentData.variables = notSearchedVariables;
+		[self.windowController.tableController.variablesTableView reloadData];
+		
+		[self searchVariablesByNarrowing:isNarrowing withVariables:searchedVariables usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
 			
 			if (searchDataActivity != nil)
@@ -790,7 +811,7 @@
 				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
 			}
 			
-			[self finalizeSearchWithNotSearchedVariables:notSearchedVariables];
+			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
 		}];
 	}
 }
