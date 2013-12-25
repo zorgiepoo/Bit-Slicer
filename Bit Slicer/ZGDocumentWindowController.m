@@ -325,23 +325,6 @@
 
 - (void)loadDocumentUserInterface
 {
-	// don't use the last selected process name if the corresponding process isn't alive
-	NSString *lastSelectedProcessInternalName = [[ZGAppController sharedController] lastSelectedProcessInternalName];
-	if (self.documentData.desiredProcessInternalName == nil && lastSelectedProcessInternalName != nil)
-	{
-		BOOL foundApplication =
-		([NSWorkspace.sharedWorkspace.runningApplications
-		  indexOfObjectPassingTest:^BOOL (id object, NSUInteger index, BOOL *stop)
-		  {
-			  return [[object localizedName] isEqualToString:lastSelectedProcessInternalName];
-		  }] != NSNotFound);
-		
-		if (foundApplication)
-		{
-			self.documentData.desiredProcessInternalName = lastSelectedProcessInternalName;
-		}
-	}
-    
 	[self setStatus:nil];
 	
 	[self addProcessesToPopupButton];
@@ -547,10 +530,19 @@
 
 - (void)addProcessesToPopupButton
 {
+	NSString *lastSelectedProcessInternalName = [[ZGAppController sharedController] lastSelectedProcessInternalName];
+	BOOL foundLastSelectedProcessInternalName = NO;
+	
 	// Add running applications to popup button ; we want activiation policy for NSApplicationActivationPolicyRegular to appear first, since they're more likely to be targetted and more likely to have sufficient privillages for accessing virtual memory
 	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
 	for (ZGRunningProcess *runningProcess in [[[ZGProcessList sharedProcessList] runningProcesses] sortedArrayUsingDescriptors:@[sortDescriptor]])
 	{
+		// If there's no desired process, try to use the last selected process only if it exists
+		if (self.documentData.desiredProcessInternalName == nil && lastSelectedProcessInternalName != nil && !foundLastSelectedProcessInternalName && [runningProcess.internalName isEqualToString:lastSelectedProcessInternalName])
+		{
+			self.documentData.desiredProcessInternalName = lastSelectedProcessInternalName;
+			foundLastSelectedProcessInternalName = YES;
+		}
 		[self addRunningProcessToPopupButton:runningProcess];
 	}
 	
