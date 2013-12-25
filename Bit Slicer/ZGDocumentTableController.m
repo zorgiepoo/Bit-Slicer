@@ -246,6 +246,12 @@
 	if (!isOccluded)
 	{
 		visibleRowsRange = [self.variablesTableView rowsInRect:self.variablesTableView.visibleRect];
+		
+		if (self.windowController.searchController.canStartTask && self.windowController.searchController.searchResults.addressCount > 0 && visibleRowsRange.location + visibleRowsRange.length >= self.documentData.variables.count)
+		{
+			[self.windowController.searchController fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH];
+			needsToReloadTable = YES;
+		}
 	}
 	
 	// Don't look up executable images that have been known to fail frequently, otherwise it'd be a serious penalty cost
@@ -298,6 +304,9 @@
 			}
 			
 			variableIndex++;
+			
+			// Prevent iterating through many many variables
+			if (variableIndex >= MAX_NUMBER_OF_VARIABLES_TO_FETCH) break;
 		}
 	}
 	

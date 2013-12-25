@@ -43,6 +43,8 @@
 @class ZGDocumentWindowController;
 @class ZGDocumentData;
 
+#define MAX_NUMBER_OF_VARIABLES_TO_FETCH ((NSUInteger)1000)
+
 @interface ZGDocumentSearchController : NSObject <ZGSearchProgressDelegate>
 
 @property (assign, nonatomic) ZGDocumentData *documentData;
@@ -60,6 +62,7 @@
 - (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder;
 - (void)resumeFromTask;
 
+- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables;
 - (void)fetchVariablesFromResults;
 
 - (void)search;

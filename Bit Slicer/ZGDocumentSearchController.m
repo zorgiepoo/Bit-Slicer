@@ -52,8 +52,6 @@
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
 
-#define MAX_NUMBER_OF_VARIABLES_TO_FETCH ((NSUInteger)1000)
-
 @interface ZGDocumentSearchController ()
 
 @property (assign) ZGDocumentWindowController *windowController;
@@ -364,82 +362,90 @@
 	return staticVariableDescription;
 }
 
-- (void)fetchVariablesFromResults:(ZGSearchResults *)searchResults
+- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables fromResults:(ZGSearchResults *)searchResults
 {
-	if (self.documentData.variables.count < MAX_NUMBER_OF_VARIABLES_TO_FETCH && searchResults.addressCount > 0)
+	if (searchResults.addressCount == 0) return;
+	
+	if (numberOfVariables > searchResults.addressCount)
 	{
-		NSMutableArray *newVariables = [[NSMutableArray alloc] initWithArray:self.documentData.variables];
-		
-		NSUInteger numberOfVariables = MAX_NUMBER_OF_VARIABLES_TO_FETCH - self.documentData.variables.count;
-		if (numberOfVariables > searchResults.addressCount)
+		numberOfVariables = searchResults.addressCount;
+	}
+	
+	NSMutableArray *newVariables = [[NSMutableArray alloc] initWithArray:self.documentData.variables];
+	
+	ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
+	ZGProcess *currentProcess = self.windowController.currentProcess;
+	ZGMemorySize pointerSize = currentProcess.pointerSize;
+	
+	NSArray *machBinaries = ZGMachBinaries(currentProcess.processTask, pointerSize, currentProcess.dylinkerBinary);
+	NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
+	for (ZGMachBinary *machBinary in machBinaries)
+	{
+		NSString *filePath = ZGFilePathAtAddress(currentProcess.processTask, machBinary.filePathAddress);
+		if (filePath != nil)
 		{
-			numberOfVariables = searchResults.addressCount;
-		}
-		
-		ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
-		ZGProcess *currentProcess = self.windowController.currentProcess;
-		ZGMemorySize pointerSize = currentProcess.pointerSize;
-		
-		NSArray *machBinaries = ZGMachBinaries(currentProcess.processTask, pointerSize, currentProcess.dylinkerBinary);
-		NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
-		for (ZGMachBinary *machBinary in machBinaries)
-		{
-			NSString *filePath = ZGFilePathAtAddress(currentProcess.processTask, machBinary.filePathAddress);
-			if (filePath != nil)
-			{
-				[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
-			}
-		}
-		
-		ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
-		
-		ZGMemorySize dataSize = searchResults.dataSize;
-		[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
-			ZGVariable *newVariable =
-			[[ZGVariable alloc]
-			 initWithValue:NULL
-			 size:dataSize
-			 address:variableAddress
-			 type:(ZGVariableType)searchResults.tag
-			 qualifier:qualifier
-			 pointerSize:pointerSize];
-			
-			NSString *staticDescription = [self relativizeVariable:newVariable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
-			NSString *userTag = ZGUserTagDescription(processTask, newVariable.address, newVariable.size);
-			NSString *protectionDescription = nil;
-			
-			ZGMemoryAddress protectionAddress = newVariable.address;
-			ZGMemorySize protectionSize = newVariable.size;
-			ZGMemoryProtection protection = 0;
-			
-			if (ZGMemoryProtectionInRegion(processTask, &protectionAddress, &protectionSize, &protection) && protectionAddress <= newVariable.address && protectionAddress + protectionSize >= newVariable.address + newVariable.size)
-			{
-				protectionDescription = ZGProtectionDescription(protection);
-			}
-			
-			NSMutableArray *validNameComponents = [NSMutableArray array];
-			if (staticDescription != nil) [validNameComponents addObject:staticDescription];
-			if (userTag != nil) [validNameComponents addObject:userTag];
-			if (protectionDescription != nil) [validNameComponents addObject:protectionDescription];
-			
-			newVariable.name = [validNameComponents componentsJoinedByString:@", "];
-			
-			[newVariables addObject:newVariable];
-		}];
-		
-		[searchResults removeNumberOfAddresses:numberOfVariables];
-		
-		self.documentData.variables = newVariables;
-		if (self.documentData.variables.count > 0)
-		{
-			[self.windowController.tableController updateVariableValuesInRange:NSMakeRange(0, self.documentData.variables.count)];
+			[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
 		}
 	}
+	
+	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
+	
+	ZGMemorySize dataSize = searchResults.dataSize;
+	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
+		ZGVariable *newVariable =
+		[[ZGVariable alloc]
+		 initWithValue:NULL
+		 size:dataSize
+		 address:variableAddress
+		 type:(ZGVariableType)searchResults.tag
+		 qualifier:qualifier
+		 pointerSize:pointerSize];
+		
+		NSString *staticDescription = [self relativizeVariable:newVariable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
+		NSString *userTag = ZGUserTagDescription(processTask, newVariable.address, newVariable.size);
+		NSString *protectionDescription = nil;
+		
+		ZGMemoryAddress protectionAddress = newVariable.address;
+		ZGMemorySize protectionSize = newVariable.size;
+		ZGMemoryProtection protection = 0;
+		
+		if (ZGMemoryProtectionInRegion(processTask, &protectionAddress, &protectionSize, &protection) && protectionAddress <= newVariable.address && protectionAddress + protectionSize >= newVariable.address + newVariable.size)
+		{
+			protectionDescription = ZGProtectionDescription(protection);
+		}
+		
+		NSMutableArray *validNameComponents = [NSMutableArray array];
+		if (staticDescription != nil) [validNameComponents addObject:staticDescription];
+		if (userTag != nil) [validNameComponents addObject:userTag];
+		if (protectionDescription != nil) [validNameComponents addObject:protectionDescription];
+		
+		newVariable.name = [validNameComponents componentsJoinedByString:@", "];
+		
+		[newVariables addObject:newVariable];
+	}];
+	
+	[searchResults removeNumberOfAddresses:numberOfVariables];
+	
+	NSUInteger oldVariablesCount = self.documentData.variables.count;
+	self.documentData.variables = newVariables;
+	
+	if (self.documentData.variables.count > 0)
+	{
+		[self.windowController.tableController updateVariableValuesInRange:NSMakeRange(oldVariablesCount, newVariables.count - oldVariablesCount)];
+	}
+}
+
+- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables
+{
+	[self fetchNumberOfVariables:numberOfVariables fromResults:self.searchResults];
 }
 
 - (void)fetchVariablesFromResults
 {
-	[self fetchVariablesFromResults:self.searchResults];
+	if (self.documentData.variables.count < MAX_NUMBER_OF_VARIABLES_TO_FETCH)
+	{
+		[self fetchNumberOfVariables:(MAX_NUMBER_OF_VARIABLES_TO_FETCH - self.documentData.variables.count) fromResults:self.searchResults];
+	}
 }
 
 - (void)finalizeSearchWithNotSearchedVariables:(NSArray *)notSearchedVariables
