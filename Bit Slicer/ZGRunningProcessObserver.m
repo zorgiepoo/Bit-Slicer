@@ -42,8 +42,7 @@
 	self = [super init];
 	if (self)
 	{
-		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] init];
-		runningProcess.processIdentifier = processIdentifier;
+		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processIdentifier];
 		
 		self.runningProcess = runningProcess;
 		self.observer = observer;

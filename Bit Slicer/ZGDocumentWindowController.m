@@ -326,19 +326,19 @@
 - (void)loadDocumentUserInterface
 {
 	// don't use the last selected process name if the corresponding process isn't alive
-	NSString *lastSelectedProcessName = [[ZGAppController sharedController] lastSelectedProcessName];
-	if (!self.documentData.desiredProcessName && lastSelectedProcessName)
+	NSString *lastSelectedProcessInternalName = [[ZGAppController sharedController] lastSelectedProcessInternalName];
+	if (self.documentData.desiredProcessInternalName == nil && lastSelectedProcessInternalName != nil)
 	{
 		BOOL foundApplication =
 		([NSWorkspace.sharedWorkspace.runningApplications
 		  indexOfObjectPassingTest:^BOOL (id object, NSUInteger index, BOOL *stop)
 		  {
-			  return [[object localizedName] isEqualToString:lastSelectedProcessName];
+			  return [[object localizedName] isEqualToString:lastSelectedProcessInternalName];
 		  }] != NSNotFound);
 		
 		if (foundApplication)
 		{
-			self.documentData.desiredProcessName = lastSelectedProcessName;
+			self.documentData.desiredProcessInternalName = lastSelectedProcessInternalName;
 		}
 	}
     
@@ -491,16 +491,16 @@
 	}
 	
 	// keep track of the process the user targeted
-	[[ZGAppController sharedController] setLastSelectedProcessName:self.currentProcess.name];
+	[[ZGAppController sharedController] setLastSelectedProcessInternalName:self.currentProcess.internalName];
 	
-	if (sender && ![self.documentData.desiredProcessName isEqualToString:self.currentProcess.name])
+	if (sender != nil && ![self.documentData.desiredProcessInternalName isEqualToString:self.currentProcess.internalName])
 	{
-		self.documentData.desiredProcessName = self.currentProcess.name;
+		self.documentData.desiredProcessInternalName = self.currentProcess.internalName;
 		[self markDocumentChange];
 	}
-	else if (!self.documentData.desiredProcessName)
+	else if (self.documentData.desiredProcessInternalName == nil)
 	{
-		self.documentData.desiredProcessName = self.currentProcess.name;
+		self.documentData.desiredProcessInternalName = self.currentProcess.internalName;
 	}
 	
 	if (self.currentProcess && self.currentProcess.valid)
@@ -530,8 +530,7 @@
 	NSMutableArray *itemsToRemove = [[NSMutableArray alloc] init];
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
 	{
-		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] init];
-		runningProcess.processIdentifier = [[menuItem representedObject] processID];
+		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:[[menuItem representedObject] processID]];
 		if (menuItem != self.runningApplicationsPopUpButton.selectedItem &&
 			(![menuItem.representedObject valid] ||
 			 ![[[ZGProcessList sharedProcessList] runningProcesses] containsObject:runningProcess]))
@@ -555,15 +554,12 @@
 		[self addRunningProcessToPopupButton:runningProcess];
 	}
 	
-	if (self.documentData.desiredProcessName && ![self.currentProcess.name isEqualToString:self.documentData.desiredProcessName])
+	if (self.documentData.desiredProcessInternalName != nil && ![self.currentProcess.internalName isEqualToString:self.documentData.desiredProcessInternalName])
 	{
-		ZGProcess *deadProcess =
-		[[ZGProcess alloc]
-		 initWithName:self.documentData.desiredProcessName
-		 set64Bit:YES];
+		ZGProcess *deadProcess = [[ZGProcess alloc] initWithName:nil internalName:self.documentData.desiredProcessInternalName is64Bit:YES];
 		
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (none)", deadProcess.name];
+		menuItem.title = [NSString stringWithFormat:@"%@ (none)", deadProcess.internalName];
 		menuItem.representedObject = deadProcess;
 		
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
@@ -614,7 +610,7 @@
 			 postNotificationName:ZGTargetProcessDiedNotification
 			 object:self.currentProcess];
 			
-			self.runningApplicationsPopUpButton.selectedItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.name];
+			self.runningApplicationsPopUpButton.selectedItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.internalName];
 			
 			// Set the icon to the standard one
 			NSImage *regularAppIcon = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
@@ -658,9 +654,10 @@
 			ZGProcess *process = menuItem.representedObject;
 			if (process == self.currentProcess &&
 				!self.currentProcess.valid &&
-				[self.currentProcess.name isEqualToString:newRunningProcess.name])
+				[self.currentProcess.internalName isEqualToString:newRunningProcess.internalName])
 			{
 				self.currentProcess.processID = newRunningProcess.processIdentifier;
+				self.currentProcess.name = newRunningProcess.name;
 				
 				self.currentProcess.is64Bit = newRunningProcess.is64Bit;
 				menuItem.title = [NSString stringWithFormat:@"%@ (%d)", self.currentProcess.name, self.currentProcess.processID];
@@ -688,16 +685,17 @@
 		ZGProcess *representedProcess =
 		[[ZGProcess alloc]
 		 initWithName:newRunningProcess.name
+		 internalName:newRunningProcess.internalName
 		 processID:newRunningProcess.processIdentifier
-		 set64Bit:newRunningProcess.is64Bit];
+		 is64Bit:newRunningProcess.is64Bit];
 		
 		menuItem.representedObject = representedProcess;
 		
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		
 		// If we found desired process name, select it
-		if (![self.currentProcess.name isEqualToString:self.documentData.desiredProcessName] &&
-			[self.documentData.desiredProcessName isEqualToString:newRunningProcess.name])
+		if (![self.currentProcess.internalName isEqualToString:self.documentData.desiredProcessInternalName] &&
+			[self.documentData.desiredProcessInternalName isEqualToString:newRunningProcess.internalName])
 		{
 			[self.runningApplicationsPopUpButton selectItem:menuItem];
 			[self runningApplicationsPopUpButtonRequest:nil];

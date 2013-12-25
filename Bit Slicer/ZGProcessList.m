@@ -169,10 +169,7 @@
 				
 				if (sysctl(mib, (u_int)mibLen, &cpuType, &cpuTypeSize, 0, 0) == 0)
 				{
-					ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] init];
-					runningProcess.name = @(processList[processIndex].kp_proc.p_comm);
-					runningProcess.processIdentifier = processID;
-					runningProcess.is64Bit = ((cpuType & CPU_ARCH_ABI64) != 0);
+					ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processID is64Bit:((cpuType & CPU_ARCH_ABI64) != 0) internalName:@(processList[processIndex].kp_proc.p_comm)];
 					[newRunningProcesses addObject:runningProcess];
 				}
 			}

@@ -36,7 +36,33 @@
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
+@interface ZGRunningProcess ()
+
+@property (readwrite, nonatomic) pid_t processIdentifier;
+@property (readwrite, nonatomic) BOOL is64Bit;
+
+@end
+
 @implementation ZGRunningProcess
+
+#pragma mark Birth
+
+- (id)initWithProcessIdentifier:(pid_t)processIdentifier is64Bit:(BOOL)is64Bit internalName:(NSString *)name
+{
+	self = [super init];
+	if (self != nil)
+	{
+		self.processIdentifier = processIdentifier;
+		self.internalName = name;
+		self.is64Bit = is64Bit;
+	}
+	return self;
+}
+
+- (id)initWithProcessIdentifier:(pid_t)processIdentifier
+{
+	return [self initWithProcessIdentifier:processIdentifier is64Bit:YES internalName:nil];
+}
 
 #pragma mark Comparisons
 
@@ -49,20 +75,20 @@
 
 - (NSApplicationActivationPolicy)activationPolicy
 {
-	NSApplicationActivationPolicy activationPolicy = NSApplicationActivationPolicyProhibited;
 	NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier];
-	if (runningApplication)
-	{
-		activationPolicy = runningApplication.activationPolicy;
-	}
-	
-	return activationPolicy;
+	return runningApplication != nil ? runningApplication.activationPolicy : NSApplicationActivationPolicyProhibited;
 }
 
 - (NSImage *)icon
 {
 	NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier];
-	return runningApplication ? runningApplication.icon : [NSImage imageNamed:@"NSDefaultApplicationIcon"];
+	return runningApplication != nil ? runningApplication.icon : [NSImage imageNamed:@"NSDefaultApplicationIcon"];
+}
+
+- (NSString *)name
+{
+	NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier];
+	return runningApplication != nil ? runningApplication.localizedName : self.internalName;
 }
 
 @end

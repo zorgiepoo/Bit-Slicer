@@ -90,8 +90,8 @@
 	 forKey:ZGWatchVariablesArrayKey];
 	
 	[keyedArchiver
-	 encodeObject:self.data.desiredProcessName != nil ? self.data.desiredProcessName : [NSNull null]
-	 forKey:ZGProcessNameKey];
+	 encodeObject:self.data.desiredProcessInternalName != nil ? self.data.desiredProcessInternalName : [NSNull null]
+	 forKey:ZGProcessInternalNameKey];
     
 	[keyedArchiver
 	 encodeInt32:(int32_t)self.data.selectedDatatypeTag
@@ -170,10 +170,10 @@
 		self.data.variables = [NSArray array];
 	}
 	
-	self.data.desiredProcessName = [keyedUnarchiver decodeObjectForKey:ZGProcessNameKey];
-	if ((id)self.data.desiredProcessName == [NSNull null])
+	self.data.desiredProcessInternalName = [keyedUnarchiver decodeObjectForKey:ZGProcessInternalNameKey];
+	if ((id)self.data.desiredProcessInternalName == [NSNull null])
 	{
-		self.data.desiredProcessName = nil;
+		self.data.desiredProcessInternalName = nil;
 	}
 	
 	self.data.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];

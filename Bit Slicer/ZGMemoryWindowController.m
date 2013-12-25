@@ -208,7 +208,7 @@
 - (void)setupProcessListNotificationsAndPopUpButton
 {
 	// Add processes to popup button
-	self.desiredProcessName = [[ZGAppController sharedController] lastSelectedProcessName];
+	self.desiredProcessInternalName = [[ZGAppController sharedController] lastSelectedProcessInternalName];
 	[self updateRunningProcesses];
 	
 	[[ZGProcessList sharedProcessList]
@@ -296,14 +296,15 @@
 			ZGProcess *representedProcess =
 				[[ZGProcess alloc]
 				 initWithName:runningProcess.name
+				 internalName:runningProcess.internalName
 				 processID:runningProcess.processIdentifier
-				 set64Bit:runningProcess.is64Bit];
+				 is64Bit:runningProcess.is64Bit];
 			
 			menuItem.representedObject = representedProcess;
 			
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
-			if ((self.currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [self.desiredProcessName isEqualToString:runningProcess.name])
+			if ((self.currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [self.desiredProcessInternalName isEqualToString:runningProcess.internalName])
 			{
 				[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 				foundTargetProcess = YES;
@@ -312,14 +313,14 @@
 	}
 	
 	// Handle dead process
-	if (self.desiredProcessName != nil && ![self.desiredProcessName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject name]])
+	if (self.desiredProcessInternalName != nil && ![self.desiredProcessInternalName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject internalName]])
 	{
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.desiredProcessName];
+		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.desiredProcessInternalName];
 		NSImage *iconImage = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
 		iconImage.size = NSMakeSize(16, 16);
 		menuItem.image = iconImage;
-		menuItem.representedObject = [[ZGProcess alloc] initWithName:self.desiredProcessName set64Bit:YES];
+		menuItem.representedObject = [[ZGProcess alloc] initWithName:nil internalName:self.desiredProcessInternalName is64Bit:YES];
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 		
@@ -340,8 +341,8 @@
 
 - (void)switchProcess
 {
-	self.desiredProcessName = [self.runningApplicationsPopUpButton.selectedItem.representedObject name];
-	[[ZGAppController sharedController] setLastSelectedProcessName:self.desiredProcessName];
+	self.desiredProcessInternalName = [self.runningApplicationsPopUpButton.selectedItem.representedObject internalName];
+	[[ZGAppController sharedController] setLastSelectedProcessInternalName:self.desiredProcessInternalName];
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 	[self.navigationManager removeAllActions];
 	[self updateNavigationButtons];

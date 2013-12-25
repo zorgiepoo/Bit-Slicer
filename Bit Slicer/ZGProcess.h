@@ -47,6 +47,7 @@
 @property (nonatomic) ZGMemoryMap processTask;
 @property (readonly, nonatomic) BOOL valid;
 @property (copy, nonatomic) NSString *name;
+@property (copy, nonatomic) NSString *internalName;
 @property (nonatomic) BOOL is64Bit;
 @property (nonatomic) ZGMemoryAddress baseAddress;
 @property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
@@ -54,8 +55,8 @@
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
-- (id)initWithName:(NSString *)processName processID:(pid_t)aProcessID set64Bit:(BOOL)flag64Bit;
-- (id)initWithName:(NSString *)processName set64Bit:(BOOL)flag64Bit;
+- (id)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
+- (id)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
 - (void)markInvalid;
 - (BOOL)grantUsAccess;
 - (BOOL)hasGrantedAccess;

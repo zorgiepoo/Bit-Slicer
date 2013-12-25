@@ -88,7 +88,7 @@
 @end
 
 #define ZGDebuggerAddressField @"ZGDisassemblerAddressField"
-#define ZGDebuggerProcessName @"ZGDisassemblerProcessName"
+#define ZGDebuggerProcessInternalName @"ZGDisassemblerProcessName"
 #define ZGDebuggerOffsetFromBase @"ZGDebuggerOffsetFromBase"
 #define ZGDebuggerMappedFilePath @"ZGDebuggerMappedFilePath"
 
@@ -129,7 +129,7 @@ enum ZGStepExecution
     [super encodeRestorableStateWithCoder:coder];
 	
 	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDebuggerAddressField];
-	[coder encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject name] forKey:ZGDebuggerProcessName];
+	[coder encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject internalName] forKey:ZGDebuggerProcessInternalName];
 	[coder encodeObject:@(self.offsetFromBase) forKey:ZGDebuggerOffsetFromBase];
 	[coder encodeObject:self.mappedFilePath == nil ? [NSNull null] : self.mappedFilePath forKey:ZGDebuggerMappedFilePath];
 }
@@ -151,7 +151,7 @@ enum ZGStepExecution
 		self.mappedFilePath = nil;
 	}
 	
-	self.desiredProcessName = [coder decodeObjectForKey:ZGDebuggerProcessName];
+	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGDebuggerProcessInternalName];
 	
 	[self updateRunningProcesses];
 	

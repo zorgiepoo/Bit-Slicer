@@ -55,7 +55,7 @@
 #define ZGMemoryViewerSizeField @"ZGMemoryViewerSizeField"
 #define ZGMemoryViewerAddress @"ZGMemoryViewerAddress"
 #define ZGMemoryViewerSize @"ZGMemoryViewerSize"
-#define ZGMemoryViewerProcessName @"ZGMemoryViewerProcessName"
+#define ZGMemoryViewerProcessInternalName @"ZGMemoryViewerProcessName"
 #define ZGMemoryViewerShowsDataInspector @"ZGMemoryViewerShowsDataInspector"
 
 @interface ZGMemoryViewerController ()
@@ -118,8 +118,8 @@
 		 forKey:ZGMemoryViewerAddress];
     
     [coder
-		 encodeObject:self.desiredProcessName
-		 forKey:ZGMemoryViewerProcessName];
+		 encodeObject:self.desiredProcessInternalName
+		 forKey:ZGMemoryViewerProcessInternalName];
 	
 	[coder encodeBool:self.showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
 }
@@ -136,7 +136,7 @@
 	
 	self.currentMemoryAddress = [coder decodeInt64ForKey:ZGMemoryViewerAddress];
 	
-	self.desiredProcessName = [coder decodeObjectForKey:ZGMemoryViewerProcessName];
+	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGMemoryViewerProcessInternalName];
 	[self updateRunningProcesses];
 	
 	if ([coder decodeBoolForKey:ZGMemoryViewerShowsDataInspector])

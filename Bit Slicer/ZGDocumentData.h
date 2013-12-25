@@ -35,7 +35,7 @@
 #import <Foundation/Foundation.h>
 
 #define ZGWatchVariablesArrayKey @"ZGWatchVariablesArrayKey"
-#define ZGProcessNameKey @"ZGProcessNameKey"
+#define ZGProcessInternalNameKey @"ZGProcessNameKey"
 
 #define ZGSelectedDataTypeTag @"ZGSelectedDataTypeTag"
 #define ZGQualifierTagKey @"ZGQualifierKey"
@@ -62,7 +62,7 @@
 @property (copy, nonatomic) NSString *endingAddressStringValue;
 @property (nonatomic) NSArray *searchValue;
 @property (nonatomic) NSArray *variables;
-@property (copy, nonatomic) NSString *desiredProcessName;
+@property (copy, nonatomic) NSString *desiredProcessInternalName;
 @property (copy, nonatomic) NSString *lastEpsilonValue;
 @property (copy, nonatomic) NSString *lastAboveRangeValue;
 @property (copy, nonatomic) NSString *lastBelowRangeValue;

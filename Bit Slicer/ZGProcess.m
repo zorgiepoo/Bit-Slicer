@@ -57,11 +57,12 @@
 	}
 }
 
-- (id)initWithName:(NSString *)processName processID:(pid_t)aProcessID set64Bit:(BOOL)flag64Bit
+- (id)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit
 {
 	if ((self = [super init]))
 	{
 		self.name = processName;
+		self.internalName = internalName;
 		self.processID = aProcessID;
 		self.is64Bit = flag64Bit;
 	}
@@ -69,9 +70,9 @@
 	return self;
 }
 
-- (id)initWithName:(NSString *)processName set64Bit:(BOOL)flag64Bit
+- (id)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit
 {
-	return [self initWithName:processName processID:NON_EXISTENT_PID_NUMBER set64Bit:flag64Bit];
+	return [self initWithName:processName internalName:internalName processID:NON_EXISTENT_PID_NUMBER is64Bit:flag64Bit];
 }
 
 - (BOOL)valid

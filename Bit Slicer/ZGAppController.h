@@ -49,7 +49,7 @@
 @property (readonly, nonatomic) ZGBreakPointController *breakPointController;
 @property (readonly, nonatomic) ZGLoggerWindowController *loggerController;
 // lastSelectedProcessName keeps track of the last targeted process in a document
-@property (readwrite, copy, nonatomic) NSString *lastSelectedProcessName;
+@property (copy, nonatomic) NSString *lastSelectedProcessInternalName;
 
 + (id)sharedController;
 
