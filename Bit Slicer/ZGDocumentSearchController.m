@@ -277,8 +277,10 @@
 
 #pragma mark Searching
 
-- (void)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray *)machBinaries filePathDictionary:(NSDictionary *)machFilePathDictionary
+- (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray *)machBinaries filePathDictionary:(NSDictionary *)machFilePathDictionary
 {
+	NSString *staticVariableDescription = nil;
+	
 	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
 	ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
 	
@@ -341,9 +343,25 @@
 				}
 			}
 			
-			variable.name = @"static address";
+			NSString *sectionName = nil;
+			if (variable.address + variable.size <= machHeaderAddress + textSize)
+			{
+				sectionName = @"__TEXT";
+			}
+			else if (variable.address + variable.size <= machHeaderAddress + textSize + dataSize)
+			{
+				sectionName = @"__DATA";
+			}
+			else
+			{
+				sectionName = @"__LINKEDIT";
+			}
+			
+			staticVariableDescription = [NSString stringWithFormat:@"static address (%@)", sectionName];
 		}
 	}
+	
+	return staticVariableDescription;
 }
 
 - (void)fetchVariablesFromResults:(ZGSearchResults *)searchResults
@@ -386,19 +404,9 @@
 			 qualifier:qualifier
 			 pointerSize:pointerSize];
 			
-			[self relativizeVariable:newVariable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
+			NSString *staticDescription = [self relativizeVariable:newVariable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
 			NSString *userTag = ZGUserTagDescription(processTask, newVariable.address, newVariable.size);
-			if (userTag != nil)
-			{
-				if (newVariable.name.length != 0)
-				{
-					newVariable.name = [newVariable.name stringByAppendingString:[NSString stringWithFormat:@"%@", userTag]];
-				}
-				else
-				{
-					newVariable.name = [NSString stringWithFormat:@"%@", userTag];
-				}
-			}
+			NSString *protectionDescription = nil;
 			
 			ZGMemoryAddress protectionAddress = newVariable.address;
 			ZGMemorySize protectionSize = newVariable.size;
@@ -406,41 +414,15 @@
 			
 			if (ZGMemoryProtectionInRegion(processTask, &protectionAddress, &protectionSize, &protection) && protectionAddress <= newVariable.address && protectionAddress + protectionSize >= newVariable.address + newVariable.size)
 			{
-				NSMutableArray *protectionAttributes = [NSMutableArray array];
-				if (protection & VM_PROT_READ)
-				{
-					[protectionAttributes addObject:@"r"];
-				}
-				else
-				{
-					[protectionAttributes addObject:@"-"];
-				}
-				if (protection & VM_PROT_WRITE)
-				{
-					[protectionAttributes addObject:@"w"];
-				}
-				else
-				{
-					[protectionAttributes addObject:@"-"];
-				}
-				if (protection & VM_PROT_EXECUTE)
-				{
-					[protectionAttributes addObject:@"x"];
-				}
-				else
-				{
-					[protectionAttributes addObject:@"-"];
-				}
-				
-				if (newVariable.name.length != 0)
-				{
-					newVariable.name = [newVariable.name stringByAppendingString:[NSString stringWithFormat:@" (%@)", [protectionAttributes componentsJoinedByString:@""]]];
-				}
-				else
-				{
-					newVariable.name = [NSString stringWithFormat:@"Protection %@", [protectionAttributes componentsJoinedByString:@""]];
-				}
+				protectionDescription = ZGProtectionDescription(protection);
 			}
+			
+			NSMutableArray *validNameComponents = [NSMutableArray array];
+			if (staticDescription != nil) [validNameComponents addObject:staticDescription];
+			if (userTag != nil) [validNameComponents addObject:userTag];
+			if (protectionDescription != nil) [validNameComponents addObject:protectionDescription];
+			
+			newVariable.name = [validNameComponents componentsJoinedByString:@", "];
 			
 			[newVariables addObject:newVariable];
 		}];
