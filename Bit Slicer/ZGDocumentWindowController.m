@@ -372,6 +372,7 @@
 	}
 	
 	self.searchValueTextField.objectValue = self.documentData.searchValue;
+	[self.window makeFirstResponder:self.searchValueTextField];
 	
 	[self.dataTypesPopUpButton selectItemWithTag:self.documentData.selectedDatatypeTag];
 	[self selectDataTypeWithTag:(ZGVariableType)self.documentData.selectedDatatypeTag recordUndo:NO];
