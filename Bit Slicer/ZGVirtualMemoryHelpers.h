@@ -58,7 +58,8 @@ NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
 
 NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask);
 	
-NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
+NSString *ZGUserTagDescription(unsigned int userTag);
+NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
 
 ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error);
 

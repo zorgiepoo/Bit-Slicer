@@ -390,6 +390,10 @@
 	
 	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
 	
+	__block ZGMemoryAddress cachedSubmapRegionAddress = 0;
+	__block ZGMemorySize cachedSubmapRegionSize = 0;
+	__block ZGMemorySubmapInfo cachedSubmapInfo;
+	
 	ZGMemorySize dataSize = searchResults.dataSize;
 	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
 		ZGVariable *newVariable =
@@ -402,7 +406,23 @@
 		 pointerSize:pointerSize];
 		
 		NSString *staticDescription = [self relativizeVariable:newVariable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
-		NSString *userTag = ZGUserTagDescription(processTask, newVariable.address, newVariable.size);
+		
+		if (cachedSubmapRegionAddress >= newVariable.address + newVariable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= newVariable.address)
+		{
+			cachedSubmapRegionAddress = newVariable.address;
+			if (!ZGRegionSubmapInfo(processTask, &cachedSubmapRegionAddress, &cachedSubmapRegionSize, &cachedSubmapInfo))
+			{
+				cachedSubmapRegionAddress = 0;
+				cachedSubmapRegionSize = 0;
+			}
+		}
+		
+		NSString *userTagDescription = nil;
+		if (cachedSubmapRegionAddress <= newVariable.address && cachedSubmapRegionAddress + cachedSubmapRegionSize >= newVariable.address + newVariable.size)
+		{
+			userTagDescription = ZGUserTagDescription(cachedSubmapInfo.user_tag);
+		}
+		
 		NSString *protectionDescription = nil;
 		
 		ZGMemoryAddress protectionAddress = newVariable.address;
@@ -416,7 +436,7 @@
 		
 		NSMutableArray *validNameComponents = [NSMutableArray array];
 		if (staticDescription != nil) [validNameComponents addObject:staticDescription];
-		if (userTag != nil) [validNameComponents addObject:userTag];
+		if (userTagDescription != nil) [validNameComponents addObject:userTagDescription];
 		if (protectionDescription != nil) [validNameComponents addObject:protectionDescription];
 		
 		newVariable.name = [validNameComponents componentsJoinedByString:@", "];

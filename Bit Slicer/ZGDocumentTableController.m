@@ -619,7 +619,7 @@
 				}
 			}
 			
-			NSString *userTagDescription = ZGUserTagDescription(currentProcess.processTask, variable.address, variable.size);
+			NSString *userTagDescription = ZGUserTagDescriptionFromAddress(currentProcess.processTask, variable.address, variable.size);
 			NSString *mappedFilePath = nil;
 			ZGMemorySize relativeOffset = 0;
 			NSString *sectionName = ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL);

@@ -192,70 +192,79 @@ case value: \
 	result = ZGUserTagPretty(@(#value)); \
 	break;
 
-NSString *ZGUserTagDescription(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size)
+NSString *ZGUserTagDescription(unsigned int userTag)
 {
-	NSString *userTag = nil;
+	NSString *userTagDescription = nil;
+	
+	switch (userTag)
+	{
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_SMALL)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_LARGE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_HUGE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SBRK)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_REALLOC)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_TINY)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_LARGE_REUSABLE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_LARGE_REUSED)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ANALYSIS_TOOL)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MALLOC_NANO)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_MACH_MSG)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_IOKIT)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_STACK)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_GUARD)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SHARED_PMAP)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_DYLIB)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_OBJC_DISPATCHERS)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_UNSHARED_PMAP)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_APPKIT)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_FOUNDATION)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREGRAPHICS)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_CORESERVICES)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_JAVA)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREDATA)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREDATA_OBJECTIDS)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ATS)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_LAYERKIT)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_CGIMAGE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_TCMALLOC)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREGRAPHICS_DATA)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREGRAPHICS_SHARED)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREGRAPHICS_FRAMEBUFFERS)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREGRAPHICS_BACKINGSTORES)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_DYLD)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_DYLD_MALLOC)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SQLITE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_JAVASCRIPT_CORE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_JAVASCRIPT_JIT_EXECUTABLE_ALLOCATOR)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_JAVASCRIPT_JIT_REGISTER_FILE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_GLSL)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_OPENCL)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREIMAGE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_WEBCORE_PURGEABLE_BUFFERS)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_IMAGEIO)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREPROFILE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ASSETSD)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_OS_ALLOC_ONCE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_LIBDISPATCH)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ACCELERATE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_COREUI)
+	}
+	
+	return userTagDescription;
+}
+
+NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size)
+{
+	NSString *userTagDescription = nil;
 	ZGMemoryAddress regionAddress = address;
 	ZGMemorySize regionSize = size;
 	ZGMemorySubmapInfo submapInfo;
 	if (ZGRegionSubmapInfo(processTask, &regionAddress, &regionSize, &submapInfo) && regionAddress <= address && address + size <= regionAddress + regionSize)
 	{
-		switch (submapInfo.user_tag)
-		{
-			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_SMALL)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_LARGE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_HUGE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_SBRK)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_REALLOC)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_TINY)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_LARGE_REUSABLE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_LARGE_REUSED)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_ANALYSIS_TOOL)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_MALLOC_NANO)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_MACH_MSG)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_IOKIT)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_STACK)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_GUARD)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_SHARED_PMAP)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_DYLIB)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_OBJC_DISPATCHERS)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_UNSHARED_PMAP)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_APPKIT)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_FOUNDATION)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREGRAPHICS)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_CORESERVICES)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_JAVA)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREDATA)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREDATA_OBJECTIDS)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_ATS)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_LAYERKIT)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_CGIMAGE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_TCMALLOC)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREGRAPHICS_DATA)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREGRAPHICS_SHARED)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREGRAPHICS_FRAMEBUFFERS)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREGRAPHICS_BACKINGSTORES)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_DYLD)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_DYLD_MALLOC)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_SQLITE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_JAVASCRIPT_CORE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_JAVASCRIPT_JIT_EXECUTABLE_ALLOCATOR)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_JAVASCRIPT_JIT_REGISTER_FILE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_GLSL)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_OPENCL)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREIMAGE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_WEBCORE_PURGEABLE_BUFFERS)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_IMAGEIO)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREPROFILE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_ASSETSD)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_OS_ALLOC_ONCE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_LIBDISPATCH)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_ACCELERATE)
-			ZGHandleUserTagCase(userTag, VM_MEMORY_COREUI)
-		}
+		userTagDescription = ZGUserTagDescription(submapInfo.user_tag);
 	}
-	return userTag;
+	return userTagDescription;
 }
 
 #define ZGFindTextAddressAndTotalSegmentSize(segment_type, section_type, bytes, machHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind) \
