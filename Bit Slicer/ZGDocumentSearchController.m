@@ -175,9 +175,9 @@
 {
 	self.isBusy = YES;
 	
-	self.windowController.deterministicProgressIndicator.doubleValue = 0;
+	self.windowController.progressIndicator.doubleValue = 0;
 	
-	[self.windowController.deterministicProgressIndicator setHidden:NO];
+	[self.windowController.progressIndicator setHidden:NO];
 	
 	self.windowController.storeValuesButton.enabled = NO;
 	self.windowController.runningApplicationsPopUpButton.enabled = NO;
@@ -189,7 +189,7 @@
 {
 	self.isBusy = NO;
 	
-	[self.windowController.deterministicProgressIndicator setHidden:YES];
+	[self.windowController.progressIndicator setHidden:YES];
 	
 	self.windowController.storeValuesButton.enabled = YES;
 	
@@ -225,7 +225,7 @@
 
 - (void)updateMemoryStoreUserInterface:(NSTimer *)timer
 {
-	self.windowController.deterministicProgressIndicator.doubleValue = self.searchProgress.progress;
+	self.windowController.progressIndicator.doubleValue = self.searchProgress.progress;
 }
 
 - (NSString *)numberOfVariablesFoundDescriptionFromProgress:(ZGSearchProgress *)searchProgress
@@ -237,8 +237,8 @@
 
 - (void)updateProgressBarFromProgress:(ZGSearchProgress *)searchProgress
 {
-	self.windowController.deterministicProgressIndicator.maxValue = (double)searchProgress.maxProgress;
-	self.windowController.deterministicProgressIndicator.doubleValue = (double)searchProgress.progress;
+	self.windowController.progressIndicator.maxValue = (double)searchProgress.maxProgress;
+	self.windowController.progressIndicator.doubleValue = (double)searchProgress.progress;
 	
 	[self.windowController setStatus:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
 }
@@ -835,7 +835,7 @@
 			
 			[self.windowController setStatus:nil];
 			
-			self.windowController.deterministicProgressIndicator.doubleValue = 0;
+			self.windowController.progressIndicator.doubleValue = 0;
 			
 			[self resumeFromTask];
 		});

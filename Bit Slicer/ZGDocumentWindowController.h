@@ -52,7 +52,7 @@
 @interface ZGDocumentWindowController : NSWindowController <AGScopeBarDelegate>
 
 @property (assign) IBOutlet NSTableView *variablesTableView;
-@property (assign) IBOutlet NSProgressIndicator *deterministicProgressIndicator;
+@property (assign) IBOutlet NSProgressIndicator *progressIndicator;
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
 @property (assign) IBOutlet NSButton *storeValuesButton;

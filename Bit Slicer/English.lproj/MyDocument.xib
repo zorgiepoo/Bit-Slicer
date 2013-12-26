@@ -7,13 +7,12 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDocumentWindowController">
             <connections>
-                <outlet property="advancedOptionsButton" destination="zKb-Ip-63U" id="GTH-5Q-tTE"/>
                 <outlet property="dataTypesPopUpButton" destination="wMv-KV-nmE" id="ohz-17-Uj6"/>
-                <outlet property="deterministicProgressIndicator" destination="SfW-co-kf4" id="gG8-db-MbO"/>
                 <outlet property="flagsLabel" destination="U3S-5O-0jn" id="oT3-ZN-NAD"/>
                 <outlet property="flagsTextField" destination="hY6-jr-dYH" id="NNB-3Q-ALg"/>
                 <outlet property="functionPopUpButton" destination="Vpc-Jb-WRb" id="9wG-B2-0wl"/>
                 <outlet property="generalStatusTextField" destination="8dg-I8-jgu" id="Xth-G7-LMt"/>
+                <outlet property="progressIndicator" destination="SfW-co-kf4" id="T8e-Oe-5Fc"/>
                 <outlet property="runningApplicationsPopUpButton" destination="1ts-DF-nZQ" id="rls-ER-d1b"/>
                 <outlet property="scopeBar" destination="fFc-9y-zR5" id="D3V-L4-ePc"/>
                 <outlet property="scopeBarFlagsView" destination="053-lf-ydX" id="Bn8-FX-fuZ"/>
