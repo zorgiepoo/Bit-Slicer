@@ -124,18 +124,87 @@
 	return basePointer;
 }
 
-#define REGISTER_DEFAULT_TYPE(registerName) [[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES] objectForKey:@(#registerName)]
+#define ADD_GENERAL_REGISTER(array, threadState, registerSize, registerName, structureType) \
+[array addObject:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:ZGByteArray qualifier:0 pointerSize:registerSize name:@(#registerName) enabled:NO]]
 
-#define ADD_REGISTER(registerName, variableType, structureType) \
-[newRegisters addObject:[[ZGRegister alloc] initWithVariable:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:registerSize address:threadState.uts.structureType.__##registerName type:REGISTER_DEFAULT_TYPE(registerName) ? [REGISTER_DEFAULT_TYPE(registerName) intValue] : variableType qualifier:self.qualifier pointerSize:registerSize name:@(#registerName) enabled:NO]]]
+#define ADD_GENERAL_REGISTER_32(array, threadState, registerName) ADD_GENERAL_REGISTER(array, threadState, sizeof(int32_t), registerName, ts32)
+#define ADD_GENERAL_REGISTER_64(array, threadState, registerName) ADD_GENERAL_REGISTER(array, threadState, sizeof(int64_t), registerName, ts64)
 
-#define ADD_REGISTER_32(registerName, variableType) ADD_REGISTER(registerName, variableType, ts32)
-#define ADD_REGISTER_64(registerName, variableType) ADD_REGISTER(registerName, variableType, ts64)
++ (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
+{
+	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
+	
+	if (is64Bit)
+	{
+		// General registers
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rax);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rbx);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rcx);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rdx);
+		
+		// Index and pointers
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rdi);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rsi);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rbp);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rsp);
+		
+		// Extra registers
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, r8);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, r9);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, r10);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, r11);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, r12);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, r13);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, r14);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, r15);
+		
+		// Instruction pointer
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rip);
+		
+		// Flags indicator
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, rflags);
+		
+		// Segment registers
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, cs);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, fs);
+		ADD_GENERAL_REGISTER_64(registerVariables, threadState, gs);
+	}
+	else
+	{
+		// General registers
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, eax);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, ebx);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, ecx);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, edx);
+		
+		// Index and pointers
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, edi);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, esi);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, ebp);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, esp);
+		
+		// Segment register
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, ss);
+		
+		// Flags indicator
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, eflags);
+		
+		// Instruction pointer
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, eip);
+		
+		// Segment registers
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, cs);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, ds);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, es);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, fs);
+		ADD_GENERAL_REGISTER_32(registerVariables, threadState, gs);
+	}
+	
+	return registerVariables;
+}
 
 - (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock
 {
-	NSMutableArray *newRegisters = [[NSMutableArray alloc] init];
-	
 	self.breakPoint = breakPoint;
 	// initialize program counter with a sane value
 	self.programCounter = self.breakPoint.variable.address;
@@ -144,82 +213,49 @@
 	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
 	if (thread_get_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) == KERN_SUCCESS)
 	{
-		ZGMemorySize registerSize = breakPoint.process.pointerSize;
+		NSArray *registerVariables = [[self class] registerVariablesFromGeneralPurposeThreadState:threadState is64Bit:breakPoint.process.is64Bit];
+		NSMutableArray *registers = [[NSMutableArray alloc] init];
+		
+		ZGMemorySize pointerSize = breakPoint.process.pointerSize;
+		NSDictionary *registerDefaultsDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES];
+		for (ZGVariable *registerVariable in registerVariables)
+		{
+			ZGRegister *newRegister = [[ZGRegister alloc] initWithVariable:registerVariable];
+			
+			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
+			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
+			{
+				[registerVariable setType:[registerDefaultType intValue] requestedSize:pointerSize pointerSize:pointerSize];
+			}
+			
+			[registerVariable setQualifier:self.qualifier];
+			
+			if (pointerSize >= registerVariable.size)
+			{
+				[registerVariable setValue:newRegister.value];
+			}
+			
+			[registers addObject:newRegister];
+		}
+		
+		self.registers = [NSArray arrayWithArray:registers];
 		
 		if (breakPoint.process.is64Bit)
 		{
-			// General registers
-			ADD_REGISTER_64(rax, ZGInt64);
-			ADD_REGISTER_64(rbx, ZGInt64);
-			ADD_REGISTER_64(rcx, ZGInt64);
-			ADD_REGISTER_64(rdx, ZGInt64);
-			
-			// Index and pointers
-			ADD_REGISTER_64(rdi, ZGPointer);
-			ADD_REGISTER_64(rsi, ZGPointer);
-			ADD_REGISTER_64(rbp, ZGPointer);
-			ADD_REGISTER_64(rsp, ZGPointer);
-			
-			// Extra registers
-			ADD_REGISTER_64(r8, ZGInt64);
-			ADD_REGISTER_64(r9, ZGInt64);
-			ADD_REGISTER_64(r10, ZGInt64);
-			ADD_REGISTER_64(r11, ZGInt64);
-			ADD_REGISTER_64(r12, ZGInt64);
-			ADD_REGISTER_64(r13, ZGInt64);
-			ADD_REGISTER_64(r14, ZGInt64);
-			ADD_REGISTER_64(r15, ZGInt64);
-			
-			// Instruction pointer
-			ADD_REGISTER_64(rip, ZGPointer);
-			
-			// Flags indicator
-			ADD_REGISTER_64(rflags, ZGByteArray);
-			
-			// Segment registers
-			ADD_REGISTER_64(cs, ZGByteArray);
-			ADD_REGISTER_64(fs, ZGByteArray);
-			ADD_REGISTER_64(gs, ZGByteArray);
-			
 			self.programCounter = threadState.uts.ts64.__rip;
 		}
 		else
 		{
-			// General registers
-			ADD_REGISTER_32(eax, ZGInt32);
-			ADD_REGISTER_32(ebx, ZGInt32);
-			ADD_REGISTER_32(ecx, ZGInt32);
-			ADD_REGISTER_32(edx, ZGInt32);
-			
-			// Index and pointers
-			ADD_REGISTER_32(edi, ZGPointer);
-			ADD_REGISTER_32(esi, ZGPointer);
-			ADD_REGISTER_32(ebp, ZGPointer);
-			ADD_REGISTER_32(esp, ZGPointer);
-			
-			// Segment register
-			ADD_REGISTER_32(ss, ZGByteArray);
-			
-			// Flags indicator
-			ADD_REGISTER_32(eflags, ZGByteArray);
-			
-			// Instruction pointer
-			ADD_REGISTER_32(eip, ZGPointer);
-			
-			// Segment registers
-			ADD_REGISTER_32(cs, ZGByteArray);
-			ADD_REGISTER_32(ds, ZGByteArray);
-			ADD_REGISTER_32(es, ZGByteArray);
-			ADD_REGISTER_32(fs, ZGByteArray);
-			ADD_REGISTER_32(gs, ZGByteArray);
-			
 			self.programCounter = threadState.uts.ts32.__eip;
 		}
+	}
+	else
+	{
+		self.registers = nil;
 	}
 	
 	self.programCounterChangeBlock = programCounterChangeBlock;
 	
-	self.registers = [NSArray arrayWithArray:newRegisters];
 	[self.tableView reloadData];
 }
 
