@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4511" systemVersion="13C32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4511" systemVersion="13B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1070" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4511"/>
@@ -161,13 +161,13 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="100818"/>
-                <menuItem title="Watch Write Accesses" id="100787">
+                <menuItem title="Watch Write Accesses…" id="100787">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="watchVariable:" target="-1" id="100794"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Watch Read &amp; Write Accesses" tag="1" id="100885">
+                <menuItem title="Watch Read &amp; Write Accesses…" tag="1" id="100885">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="watchVariable:" target="-1" id="100886"/>

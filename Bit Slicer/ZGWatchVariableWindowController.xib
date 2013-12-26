@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4511" systemVersion="13B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment defaultVersion="1070" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4511"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="ZGWatchVariableWindowController">
+            <connections>
+                <outlet property="addressWatchedTextField" destination="Fqd-Of-gZ2" id="RgW-BO-C87"/>
+                <outlet property="lastInstructionAddedTextField" destination="Fqd-Of-gZ2" id="LEo-Lw-3gR"/>
+                <outlet property="progressIndicator" destination="VzN-Qp-l3Q" id="3ZH-py-dLl"/>
+                <outlet property="statusTextField" destination="Fqd-Of-gZ2" id="3JY-7p-IRQ"/>
+                <outlet property="window" destination="1" id="3"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application"/>
+        <window title="Watch Variable" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" wantsToBeColor="NO" visibleAtLaunch="NO" animationBehavior="default" id="1">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="240" width="235" height="85"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <view key="contentView" id="2">
+                <rect key="frame" x="0.0" y="0.0" width="235" height="85"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fqd-Of-gZ2">
+                        <rect key="frame" x="18" y="48" width="199" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Watching write accesses at 0x2" id="WtT-PG-TBK">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Wlf-lu-mTm">
+                        <rect key="frame" x="152" y="11" width="69" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Stop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wdf-l9-OcB">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="stopWatching:" target="-2" id="FQY-aB-BHa"/>
+                        </connections>
+                    </button>
+                    <progressIndicator maxValue="100" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="VzN-Qp-l3Q">
+                        <rect key="frame" x="20" y="18" width="130" height="20"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    </progressIndicator>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="VzN-Qp-l3Q" secondAttribute="bottom" constant="19" id="0Cc-dJ-fAi"/>
+                    <constraint firstAttribute="bottom" secondItem="Wlf-lu-mTm" secondAttribute="bottom" constant="18" id="6Xn-iC-o7n"/>
+                    <constraint firstItem="Fqd-Of-gZ2" firstAttribute="top" secondItem="2" secondAttribute="top" constant="20" id="MDy-YZ-Xo1"/>
+                    <constraint firstItem="Fqd-Of-gZ2" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" id="Nfj-fz-mPT"/>
+                    <constraint firstAttribute="trailing" secondItem="Wlf-lu-mTm" secondAttribute="trailing" constant="20" id="QGc-Vj-ZoD"/>
+                    <constraint firstItem="VzN-Qp-l3Q" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" id="dbU-Ls-RC6"/>
+                    <constraint firstAttribute="trailing" secondItem="Fqd-Of-gZ2" secondAttribute="trailing" constant="20" id="mi6-BE-xHk"/>
+                    <constraint firstAttribute="trailing" secondItem="VzN-Qp-l3Q" secondAttribute="trailing" constant="85" id="wbG-z5-VB8"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="4"/>
+            </connections>
+        </window>
+    </objects>
+</document>

@@ -88,7 +88,6 @@
 	
 	// Force canceling
 	self.searchProgress.shouldCancelSearch = YES;
-	[self.windowController.documentBreakPointController stopWatchingBreakPoints];
 	
 	self.windowController = nil;
 }
@@ -175,23 +174,11 @@
 
 - (void)prepareTask
 {
-	[self prepareTaskWithDeterminism:YES];
-}
-
-- (void)prepareTaskWithDeterminism:(BOOL)isDeterminisic
-{
 	self.isBusy = YES;
 	
 	self.windowController.deterministicProgressIndicator.doubleValue = 0;
 	
-	if (isDeterminisic)
-	{
-		[self.windowController.deterministicProgressIndicator setHidden:NO];
-	}
-	else
-	{
-		[self.windowController.indeterministicProgressIndicator setHidden:NO];
-	}
+	[self.windowController.deterministicProgressIndicator setHidden:NO];
 	
 	self.windowController.storeValuesButton.enabled = NO;
 	self.windowController.runningApplicationsPopUpButton.enabled = NO;
@@ -204,7 +191,6 @@
 	self.isBusy = NO;
 	
 	[self.windowController.deterministicProgressIndicator setHidden:YES];
-	[self.windowController.indeterministicProgressIndicator setHidden:YES];
 	
 	self.windowController.storeValuesButton.enabled = YES;
 	
@@ -809,10 +795,6 @@
 	else if (self.searchProgress.progressType == ZGSearchProgressMemoryStoring)
 	{
 		[self.windowController setStatus:@"Canceling Memory Store..."];
-	}
-	else if (self.searchProgress.progressType == ZGSearchProgressMemoryWatching)
-	{
-		[self.windowController.documentBreakPointController cancelTask];
 	}
 	
 	self.searchProgress.shouldCancelSearch = YES;

@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/29/12.
+ * Created by Mayur Pawashe on 12/25/13.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2013 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,18 +32,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 #import "ZGBreakPointController.h"
 #import "ZGBreakPointDelegate.h"
 
-@class ZGDocumentWindowController;
+@class ZGVariable;
+@class ZGProcess;
 
-@interface ZGDocumentBreakPointController : NSObject <ZGBreakPointDelegate>
+@interface ZGWatchVariableWindowController : NSWindowController <ZGBreakPointDelegate>
 
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
+typedef void (^watch_variable_completion_t)(NSArray *variablesFound);
 
-- (void)requestVariableWatch:(ZGWatchPointType)watchPointType;
-- (void)cancelTask;
-- (void)stopWatchingBreakPoints;
+- (void)watchVariable:(ZGVariable *)variable withWatchPointType:(ZGWatchPointType)watchPointType inProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow completionHandler:(watch_variable_completion_t)completionHandler;
 
 @end

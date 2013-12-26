@@ -530,7 +530,7 @@
 			return NO;
 		}
 		
-		if ((![self.windowController.searchController canStartTask] && self.windowController.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || !self.windowController.currentProcess.valid)
+		if (![self.windowController.searchController canStartTask] || !self.windowController.currentProcess.valid)
 		{
 			NSBeep();
 			return NO;

@@ -35,7 +35,6 @@
 #import "ZGDocumentWindowController.h"
 #import "ZGDocumentTableController.h"
 #import "ZGDocumentSearchController.h"
-#import "ZGDocumentBreakPointController.h"
 #import "ZGVariableController.h"
 #import "ZGEditValueWindowController.h"
 #import "ZGEditAddressWindowController.h"
@@ -60,6 +59,7 @@
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
 #import "ZGDocumentOptionsViewController.h"
+#import "ZGWatchVariableWindowController.h"
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
@@ -75,6 +75,8 @@
 #define ZGStringNullTerminated @"ZGStringNullTerminated"
 
 @interface ZGDocumentWindowController ()
+
+@property (nonatomic) ZGWatchVariableWindowController *watchVariableWindowController;
 
 @property (nonatomic) ZGEditValueWindowController *editValueWindowController;
 @property (nonatomic) ZGEditAddressWindowController *editAddressWindowController;
@@ -197,7 +199,6 @@
 	self.tableController = [[ZGDocumentTableController alloc] initWithWindowController:self];
 	self.variableController = [[ZGVariableController alloc] initWithWindowController:self];
 	self.searchController = [[ZGDocumentSearchController alloc] initWithWindowController:self];
-	self.documentBreakPointController = [[ZGDocumentBreakPointController alloc] initWithWindowController:self];
 	self.scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
 	
 	self.tableController.variablesTableView = self.variablesTableView;
@@ -1097,7 +1098,7 @@
 	
 	else if (menuItem.action == @selector(addVariable:))
 	{
-		if (![self.searchController canStartTask] && self.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching)
+		if (![self.searchController canStartTask])
 		{
 			return NO;
 		}
@@ -1162,7 +1163,7 @@
 	{
 		menuItem.title = [NSString stringWithFormat:@"Edit Variable Value%@…", self.selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && self.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1170,7 +1171,7 @@
 	
 	else if (menuItem.action == @selector(requestEditingVariableAddress:))
 	{
-		if (([self.searchController canCancelTask] && self.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1181,7 +1182,7 @@
 		NSArray *selectedVariables = [self selectedVariables];
 		menuItem.title = [NSString stringWithFormat:@"Edit Variable Size%@…", selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && self.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([self.searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1198,7 +1199,7 @@
 	
 	else if (menuItem.action == @selector(relativizeVariablesAddress:))
 	{
-		if (([self.searchController canCancelTask] && self.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1245,7 +1246,7 @@
 	{
 		menuItem.title = [NSString stringWithFormat:@"NOP Variable%@", self.selectedVariables.count != 1 ? @"s" : @""];
 		
-		if (([self.searchController canCancelTask] && self.searchController.searchProgress.progressType != ZGSearchProgressMemoryWatching) || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1506,7 +1507,20 @@
 
 - (IBAction)watchVariable:(id)sender
 {
-	[self.documentBreakPointController requestVariableWatch:(ZGWatchPointType)[sender tag]];
+	if (self.watchVariableWindowController == nil)
+	{
+		self.watchVariableWindowController = [[ZGWatchVariableWindowController alloc] init];
+	}
+	
+	[self.watchVariableWindowController watchVariable:[self.selectedVariables objectAtIndex:0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:self.window completionHandler:^(NSArray *foundVariables) {
+		if (foundVariables.count > 0)
+		{
+			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];
+			[self.variableController addVariables:foundVariables atRowIndexes:rowIndexes];
+			[self.tableController.variablesTableView selectRowIndexes:rowIndexes byExtendingSelection:NO];
+			[self.tableController.variablesTableView scrollRowToVisible:0];
+		}
+	}];
 }
 
 #pragma mark Showing Other Controllers

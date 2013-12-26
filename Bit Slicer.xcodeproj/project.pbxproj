@@ -96,7 +96,6 @@
 		77F115F717D2EE28009E002A /* ZGDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115F617D2EE28009E002A /* ZGDocumentWindowController.m */; };
 		77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115F917D2EE6F009E002A /* ZGDocumentSearchController.m */; };
 		77F115FD17D2EE7E009E002A /* ZGDocumentTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115FC17D2EE7E009E002A /* ZGDocumentTableController.m */; };
-		77F1160017D2EEA1009E002A /* ZGDocumentBreakPointController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115FF17D2EEA1009E002A /* ZGDocumentBreakPointController.m */; };
 		77F1160317D2EEAA009E002A /* ZGVariableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160217D2EEAA009E002A /* ZGVariableController.m */; };
 		77F1160617D2EEB6009E002A /* ZGScriptManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160517D2EEB6009E002A /* ZGScriptManager.m */; };
 		77F1160917D2EEC0009E002A /* ZGPyVirtualMemory.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160817D2EEC0009E002A /* ZGPyVirtualMemory.m */; };
@@ -126,6 +125,8 @@
 		77F1165617D2EFF5009E002A /* ZGRegistersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165517D2EFF5009E002A /* ZGRegistersController.m */; };
 		77F1165917D2F001009E002A /* ZGRegister.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165817D2F001009E002A /* ZGRegister.m */; };
 		77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */; };
+		77FFC107186BDA3600122357 /* ZGWatchVariableWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FFC105186BDA3600122357 /* ZGWatchVariableWindowController.m */; };
+		77FFC108186BDA3600122357 /* ZGWatchVariableWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77FFC106186BDA3600122357 /* ZGWatchVariableWindowController.xib */; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -394,8 +395,6 @@
 		77F115F917D2EE6F009E002A /* ZGDocumentSearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentSearchController.m; path = "Bit Slicer/ZGDocumentSearchController.m"; sourceTree = "<group>"; };
 		77F115FB17D2EE7E009E002A /* ZGDocumentTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentTableController.h; path = "Bit Slicer/ZGDocumentTableController.h"; sourceTree = "<group>"; };
 		77F115FC17D2EE7E009E002A /* ZGDocumentTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentTableController.m; path = "Bit Slicer/ZGDocumentTableController.m"; sourceTree = "<group>"; };
-		77F115FE17D2EEA1009E002A /* ZGDocumentBreakPointController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentBreakPointController.h; path = "Bit Slicer/ZGDocumentBreakPointController.h"; sourceTree = "<group>"; };
-		77F115FF17D2EEA1009E002A /* ZGDocumentBreakPointController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentBreakPointController.m; path = "Bit Slicer/ZGDocumentBreakPointController.m"; sourceTree = "<group>"; };
 		77F1160117D2EEAA009E002A /* ZGVariableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGVariableController.h; path = "Bit Slicer/ZGVariableController.h"; sourceTree = "<group>"; };
 		77F1160217D2EEAA009E002A /* ZGVariableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGVariableController.m; path = "Bit Slicer/ZGVariableController.m"; sourceTree = "<group>"; };
 		77F1160417D2EEB6009E002A /* ZGScriptManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptManager.h; path = "Bit Slicer/ZGScriptManager.h"; sourceTree = "<group>"; };
@@ -456,6 +455,9 @@
 		77F1165817D2F001009E002A /* ZGRegister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegister.m; path = "Bit Slicer/ZGRegister.m"; sourceTree = "<group>"; };
 		77F1165A17D2F00A009E002A /* ZGCodeInjectionWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGCodeInjectionWindowController.h; path = "Bit Slicer/ZGCodeInjectionWindowController.h"; sourceTree = "<group>"; };
 		77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGCodeInjectionWindowController.m; path = "Bit Slicer/ZGCodeInjectionWindowController.m"; sourceTree = "<group>"; };
+		77FFC104186BDA3600122357 /* ZGWatchVariableWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGWatchVariableWindowController.h; path = "Bit Slicer/ZGWatchVariableWindowController.h"; sourceTree = "<group>"; };
+		77FFC105186BDA3600122357 /* ZGWatchVariableWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGWatchVariableWindowController.m; path = "Bit Slicer/ZGWatchVariableWindowController.m"; sourceTree = "<group>"; };
+		77FFC106186BDA3600122357 /* ZGWatchVariableWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGWatchVariableWindowController.xib; path = "Bit Slicer/ZGWatchVariableWindowController.xib"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Bit Slicer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bit Slicer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -938,8 +940,9 @@
 				77F115F917D2EE6F009E002A /* ZGDocumentSearchController.m */,
 				77F115FB17D2EE7E009E002A /* ZGDocumentTableController.h */,
 				77F115FC17D2EE7E009E002A /* ZGDocumentTableController.m */,
-				77F115FE17D2EEA1009E002A /* ZGDocumentBreakPointController.h */,
-				77F115FF17D2EEA1009E002A /* ZGDocumentBreakPointController.m */,
+				77FFC104186BDA3600122357 /* ZGWatchVariableWindowController.h */,
+				77FFC105186BDA3600122357 /* ZGWatchVariableWindowController.m */,
+				77FFC106186BDA3600122357 /* ZGWatchVariableWindowController.xib */,
 				7739728017D26A1600B958EE /* Scripting */,
 			);
 			name = Documents;
@@ -1086,6 +1089,7 @@
 			files = (
 				77F115AA17D2E8AC009E002A /* yasm in Resources */,
 				770FABB218490DB400C176B7 /* ZGEditAddressWindowController.xib in Resources */,
+				77FFC108186BDA3600122357 /* ZGWatchVariableWindowController.xib in Resources */,
 				77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */,
 				77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */,
 				77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */,
@@ -1144,6 +1148,7 @@
 				773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */,
 				773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */,
 				773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */,
+				77FFC107186BDA3600122357 /* ZGWatchVariableWindowController.m in Sources */,
 				77F115A817D2E87E009E002A /* VDKQueue.m in Sources */,
 				77F115CD17D2ED64009E002A /* ZGMemoryViewerController.m in Sources */,
 				77F115D017D2ED74009E002A /* ZGVerticalScrollerRepresenter.m in Sources */,
@@ -1164,7 +1169,6 @@
 				77F115F717D2EE28009E002A /* ZGDocumentWindowController.m in Sources */,
 				77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */,
 				77F115FD17D2EE7E009E002A /* ZGDocumentTableController.m in Sources */,
-				77F1160017D2EEA1009E002A /* ZGDocumentBreakPointController.m in Sources */,
 				770FABAC1848354100C176B7 /* ZGEditValueWindowController.m in Sources */,
 				77F1160317D2EEAA009E002A /* ZGVariableController.m in Sources */,
 				77F1160617D2EEB6009E002A /* ZGScriptManager.m in Sources */,

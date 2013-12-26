@@ -57,7 +57,6 @@
 - (BOOL)canStartTask;
 - (BOOL)canCancelTask;
 - (void)cancelTask;
-- (void)prepareTaskWithDeterminism:(BOOL)isDeterminisic;
 - (void)prepareTask;
 - (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder;
 - (void)resumeFromTask;

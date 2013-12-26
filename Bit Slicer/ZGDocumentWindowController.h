@@ -39,7 +39,6 @@
 @class ZGDocumentTableController;
 @class ZGVariableController;
 @class ZGDocumentSearchController;
-@class ZGDocumentBreakPointController;
 @class ZGProcess;
 @class ZGSearchResults;
 @class ZGRunningProcess;
@@ -54,7 +53,6 @@
 
 @property (assign) IBOutlet NSTableView *variablesTableView;
 @property (assign) IBOutlet NSProgressIndicator *deterministicProgressIndicator;
-@property (assign) IBOutlet NSProgressIndicator *indeterministicProgressIndicator;
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
 @property (assign) IBOutlet NSButton *storeValuesButton;
@@ -70,7 +68,6 @@
 @property (strong) ZGDocumentTableController *tableController;
 @property (strong) ZGVariableController *variableController;
 @property (strong) ZGDocumentSearchController *searchController;
-@property (strong) ZGDocumentBreakPointController *documentBreakPointController;
 @property (strong) ZGScriptManager *scriptManager;
 
 @property (nonatomic) BOOL isOccluded;

@@ -48,8 +48,7 @@ typedef enum
 {
 	ZGSearchProgressMemoryScanning,
 	ZGSearchProgressMemoryStoring,
-	ZGSearchProgressMemoryDumping,
-	ZGSearchProgressMemoryWatching
+	ZGSearchProgressMemoryDumping
 } ZGSearchProgressType;
 
 @property (readwrite, nonatomic) ZGSearchProgressType progressType;
