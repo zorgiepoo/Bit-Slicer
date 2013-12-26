@@ -418,20 +418,12 @@
 		}
 		
 		NSString *userTagDescription = nil;
+		NSString *protectionDescription = nil;
+		
 		if (cachedSubmapRegionAddress <= newVariable.address && cachedSubmapRegionAddress + cachedSubmapRegionSize >= newVariable.address + newVariable.size)
 		{
 			userTagDescription = ZGUserTagDescription(cachedSubmapInfo.user_tag);
-		}
-		
-		NSString *protectionDescription = nil;
-		
-		ZGMemoryAddress protectionAddress = newVariable.address;
-		ZGMemorySize protectionSize = newVariable.size;
-		ZGMemoryProtection protection = 0;
-		
-		if (ZGMemoryProtectionInRegion(processTask, &protectionAddress, &protectionSize, &protection) && protectionAddress <= newVariable.address && protectionAddress + protectionSize >= newVariable.address + newVariable.size)
-		{
-			protectionDescription = ZGProtectionDescription(protection);
+			protectionDescription = ZGProtectionDescription(cachedSubmapInfo.protection);
 		}
 		
 		NSMutableArray *validNameComponents = [NSMutableArray array];
