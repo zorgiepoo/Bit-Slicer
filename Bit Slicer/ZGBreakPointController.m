@@ -223,8 +223,15 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 						{
 							ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
 							
+							x86_avx_state_t avxState;
+							mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
+							if (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) != KERN_SUCCESS)
+							{
+								NSLog(@"ERROR: Grabbing avx state failed from watch point handler");
+							}
+							
 							dispatch_async(dispatch_get_main_queue(), ^{
-								[breakPoint.delegate dataAddress:@(breakPoint.variable.address) accessedByInstructionPointer:instructionAddress];
+								[breakPoint.delegate dataAddress:breakPoint.variable.address accessedByInstructionPointer:instructionAddress threadState:threadState avxState:avxState];
 							});
 						}
 					}

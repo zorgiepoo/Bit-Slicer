@@ -97,6 +97,7 @@
 		NSMutableDictionary *mappedBinaryDictionary = [[NSMutableDictionary alloc] init];
 		[self.cacheDictionary setObject:mappedPathDictionary forKey:ZGMappedPathDictionary];
 		[self.cacheDictionary setObject:mappedBinaryDictionary forKey:ZGMappedBinaryDictionary];
+		[self.cacheDictionary setObject:[NSMutableDictionary dictionary] forKey:ZGMachFileDataDictionary];
 		
 		_dylinkerBinary = ZGDylinkerBinary(_processTask);
 		NSArray *machBinaries = ZGMachBinaries(_processTask, self.pointerSize, _dylinkerBinary);

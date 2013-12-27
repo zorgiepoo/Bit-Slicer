@@ -855,11 +855,12 @@
 - (void)relativizeVariables:(NSArray *)variables
 {
 	ZGProcess *currentProcess = self.windowController.currentProcess;
+	NSMutableDictionary *cacheDictionary = currentProcess.cacheDictionary;
 	for (ZGVariable *variable in variables)
 	{
 		NSString *mappedFilePath = nil;
 		ZGMemorySize relativeOffset = 0;
-		if (ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL) != nil)
+		if (ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL, cacheDictionary) != nil)
 		{
 			NSString *partialPath = [mappedFilePath lastPathComponent];
 			NSError *error = nil;

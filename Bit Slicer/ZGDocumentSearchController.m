@@ -264,6 +264,7 @@
 {
 	NSString *staticVariableDescription = nil;
 	
+	NSDictionary *cacheDictionary = self.windowController.currentProcess.cacheDictionary;
 	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
 	ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
 	
@@ -279,7 +280,7 @@
 		ZGMemorySize dataSize = 0;
 		ZGMemorySize linkEditSize = 0;
 		
-		ZGGetMachBinaryInfo(processTask, pointerSize, machHeaderAddress, machFilePath, NULL, &slide, &textSize, &dataSize, &linkEditSize);
+		ZGGetMachBinaryInfo(processTask, pointerSize, machHeaderAddress, machFilePath, NULL, &slide, &textSize, &dataSize, &linkEditSize, cacheDictionary);
 		
 		if (variable.address >= machHeaderAddress && variable.address + variable.size <= machHeaderAddress + textSize + dataSize + linkEditSize)
 		{

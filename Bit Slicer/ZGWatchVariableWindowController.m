@@ -44,11 +44,13 @@
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGRegistersController.h"
 
 @interface ZGWatchVariableWindowController ()
 
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
 @property (nonatomic, assign) IBOutlet NSTextField *statusTextField;
+@property (nonatomic, assign) IBOutlet NSButton *addButton;
 
 @property (nonatomic) ZGProcess *watchProcess;
 @property (nonatomic) id watchActivity;
@@ -141,7 +143,7 @@
 	}
 }
 
-- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionAddress
+- (void)dataAddress:(ZGMemoryAddress)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionAddress threadState:(x86_thread_state_t)threadState avxState:(x86_avx_state_t)avxState
 {
 	NSNumber *instructionAddressNumber = @(instructionAddress);
 	if (!self.watchProcess.valid || [self.foundBreakPointAddresses containsObject:instructionAddressNumber]) return;
@@ -156,22 +158,20 @@
 		return;
 	}
 	
-	NSString *partialPath = nil;
-	ZGMemoryAddress slide = 0;
-	ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.watchProcess.processTask, self.watchProcess.pointerSize, self.watchProcess.dylinkerBinary, self.watchProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
+	[self.addButton setEnabled:YES];
 	
-	if (partialPath != nil && (slide > 0 || instruction.variable.address - relativeOffset > self.watchProcess.baseAddress))
+	NSArray *registerVariables = [ZGRegistersController registerVariablesFromGeneralPurposeThreadState:threadState avxThreadState:avxState is64Bit:self.watchProcess.is64Bit];
+	NSMutableArray *registerDescriptions = [NSMutableArray array];
+	for (ZGVariable *variable in registerVariables)
 	{
-		instruction.variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(\"%@\") + 0x%llX", partialPath, relativeOffset];
-		instruction.variable.usesDynamicAddress = YES;
-		instruction.variable.finishedEvaluatingDynamicAddress = YES;
+		[registerDescriptions addObject:[NSString stringWithFormat:@"%@: %@", variable.name, variable.stringValue]];
 	}
+	
+	instruction.variable.name = [NSString stringWithFormat:@"%@\n%@", instruction.variable.name, [registerDescriptions componentsJoinedByString:@"\n"]];
 	
 	[self.foundVariables addObject:instruction.variable];
 	
 	NSString *foundInstructionStatus = [NSString stringWithFormat:@"Found instruction \"%@\"", instruction.text];
-	
-	self.statusTextField.stringValue = foundInstructionStatus;
 	
 	if (NSClassFromString(@"NSUserNotification"))
 	{
@@ -196,6 +196,8 @@
 	}
 	
 	[self window]; // ensure window is loaded
+	
+	[self.addButton setEnabled:NO];
 	
 	self.statusTextField.stringValue = [NSString stringWithFormat:@"Watching %@ accesses at %@ (%lld byte%@)", watchPointType == ZGWatchPointWrite ? @"write" : @"read or write", variable.addressStringValue, breakPoint.watchSize, breakPoint.watchSize != 1 ? @"s" : @""];
 	

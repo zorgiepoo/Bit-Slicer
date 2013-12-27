@@ -41,8 +41,6 @@
 #import "ZGUtilities.h"
 #import "ZGDebuggerController.h"
 
-#import <mach/thread_act.h>
-
 @interface ZGRegistersController ()
 
 @property (assign) IBOutlet NSTableView *tableView;
@@ -122,6 +120,15 @@
 	}
 	
 	return basePointer;
+}
+
+
++ (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState avxThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit
+{
+	NSMutableArray *registerVariables = [NSMutableArray array];
+	[registerVariables addObjectsFromArray:[self registerVariablesFromGeneralPurposeThreadState:threadState is64Bit:is64Bit]];
+	[registerVariables addObjectsFromArray:[self registerVariablesFromAVXThreadState:avxState is64Bit:is64Bit]];
+	return registerVariables;
 }
 
 #define ADD_AVX_REGISTER(array, avxState, pointerSize, registerName) \

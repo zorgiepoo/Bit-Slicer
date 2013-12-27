@@ -34,6 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import <mach/thread_act.h>
 
 @class ZGBreakPoint;
 
@@ -42,6 +43,8 @@
 typedef void(^program_counter_change_t)(void);
 
 @property (nonatomic, assign) ZGMemoryAddress programCounter;
+
++ (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState avxThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;
 
 - (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
 

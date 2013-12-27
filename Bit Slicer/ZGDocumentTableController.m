@@ -47,6 +47,7 @@
 #import "ZGDocumentData.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGScriptManager.h"
+#import "ZGUtilities.h"
 
 @interface ZGDocumentTableController ()
 
@@ -428,7 +429,15 @@
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
-			return variable.name;
+			NSArray *lines = [variable.name componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+			if (lines.count == 1)
+			{
+				return variable.name;
+			}
+			else
+			{
+				return [[lines objectAtIndex:0] stringByAppendingString:@"..."];
+			}
 		}
 		else if ([tableColumn.identifier isEqualToString:@"address"])
 		{
@@ -586,16 +595,8 @@
 	{
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:row];
 		
-		if (variable.name && ![variable.name isEqualToString:@""])
-		{
-			[displayComponents addObject:[NSString stringWithFormat:@"Name: %@", variable.name]];
-		}
-		if (variable.value)
-		{
-			[displayComponents addObject:[NSString stringWithFormat:@"Value: %@", variable.stringValue]];
-		}
-		[displayComponents addObject:[NSString stringWithFormat:@"Address: %@", variable.addressFormula]];
-		[displayComponents addObject:[NSString stringWithFormat:@"Bytes: %@", variable.sizeStringValue]];
+		[displayComponents addObject:[NSString stringWithFormat:@"Dynamic Address: %@", variable.addressFormula]];
+		[displayComponents addObject:[NSString stringWithFormat:@"Size in Bytes: %@", variable.sizeStringValue]];
 		
 		ZGProcess *currentProcess = self.windowController.currentProcess;
 		if (currentProcess.valid)
@@ -607,22 +608,14 @@
 			{
 				if (variable.address >= memoryProtectionAddress && variable.address + variable.size <= memoryProtectionAddress + memoryProtectionSize)
 				{
-					NSMutableArray *protectionComponents = [[NSMutableArray alloc] init];
-					if (memoryProtection & VM_PROT_READ) [protectionComponents addObject:@"Read"];
-					if (memoryProtection & VM_PROT_WRITE) [protectionComponents addObject:@"Write"];
-					if (memoryProtection & VM_PROT_EXECUTE) [protectionComponents addObject:@"Execute"];
-					
-					if (protectionComponents.count > 0)
-					{
-						[displayComponents addObject:[NSString stringWithFormat:@"Protection: %@", [protectionComponents componentsJoinedByString:@" | "]]];
-					}
+					[displayComponents addObject:[@"Protection: " stringByAppendingString:ZGProtectionDescription(memoryProtection)]];
 				}
 			}
 			
 			NSString *userTagDescription = ZGUserTagDescriptionFromAddress(currentProcess.processTask, variable.address, variable.size);
 			NSString *mappedFilePath = nil;
 			ZGMemorySize relativeOffset = 0;
-			NSString *sectionName = ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL);
+			NSString *sectionName = ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL, currentProcess.cacheDictionary);
 			
 			if (userTagDescription != nil || sectionName != nil)
 			{

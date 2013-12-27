@@ -342,9 +342,18 @@ void ZGParseMachHeader(ZGMemoryAddress machHeaderAddress, ZGMemorySize pointerSi
 	}
 }
 
-void ZGGetMachBinaryInfoFromFilePath(NSString *mappedFilePath, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+void ZGGetMachBinaryInfoFromFilePath(NSString *mappedFilePath, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize, NSMutableDictionary *cacheDictionary)
 {
-	NSData *machFileData = [NSData dataWithContentsOfFile:mappedFilePath];
+	NSMutableDictionary *machFileDataDictionary = [cacheDictionary objectForKey:ZGMachFileDataDictionary];
+	NSData *machFileData = [machFileDataDictionary objectForKey:mappedFilePath];
+	if (machFileData == nil)
+	{
+		machFileData = [NSData dataWithContentsOfFile:mappedFilePath];
+		if (machFileData != nil)
+		{
+			[machFileDataDictionary setObject:machFileData forKey:mappedFilePath];
+		}
+	}
 	if (machFileData != nil)
 	{
 		ZGParseMachHeader(machHeaderAddress, pointerSize, machFileData.bytes, machFileData.bytes, machFileData.length, firstInstructionAddress, slide, textSize, dataSize, linkEditSize);
@@ -369,7 +378,7 @@ void ZGGetMachBinaryInfoFromMemory(ZGMemoryMap processTask, ZGMemorySize pointer
 	}
 }
 
-void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, NSString *mappedFilePath, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, NSString *mappedFilePath, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize, NSMutableDictionary *cacheDictionary)
 {
 	ZGMemorySize textSizeReturned = 0;
 	ZGMemorySize dataSizeReturned = 0;
@@ -385,7 +394,7 @@ void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMe
 	}
 	else if (mappedFilePath.length > 0)
 	{
-		ZGGetMachBinaryInfoFromFilePath(mappedFilePath, pointerSize, machHeaderAddress, firstInstructionAddress, slide, textSize, dataSize, linkEditSize);
+		ZGGetMachBinaryInfoFromFilePath(mappedFilePath, pointerSize, machHeaderAddress, firstInstructionAddress, slide, textSize, dataSize, linkEditSize, cacheDictionary);
 	}
 }
 
@@ -493,7 +502,7 @@ ZGMachBinary *ZGNearestMachBinary(NSArray *machBinaries, ZGMemoryAddress targetA
 	return previousMachBinary;
 }
 
-void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize)
+void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize, NSMutableDictionary *cacheDictionary)
 {
 	ZGMachBinary *machBinary = ZGNearestMachBinary(ZGMachBinaries(processTask, pointerSize, dylinkerBinary), targetAddress);
 	if (machBinary != nil)
@@ -506,11 +515,11 @@ void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSiz
 		if (machHeaderAddress != NULL) *machHeaderAddress = returnedMachHeaderAddress;
 		if (mappedFilePath != NULL) *mappedFilePath = returnedFilePath;
 		
-		ZGGetMachBinaryInfo(processTask, pointerSize, returnedMachHeaderAddress, returnedFilePath, textAddress, slide, textSize, dataSize, linkEditSize);
+		ZGGetMachBinaryInfo(processTask, pointerSize, returnedMachHeaderAddress, returnedFilePath, textAddress, slide, textSize, dataSize, linkEditSize, cacheDictionary);
 	}
 }
 
-NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide)
+NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary)
 {
 	NSString *sectionName = nil;
 	
@@ -519,7 +528,7 @@ NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMac
 	ZGMemorySize dataSize = 0;
 	ZGMemorySize linkEditSize = 0;
 	
-	ZGGetNearestMachBinaryInfo(processTask, pointerSize, dylinkerBinary, address, mappedFilePath, &machHeaderAddress, NULL, slide, &textSize, &dataSize, &linkEditSize);
+	ZGGetNearestMachBinaryInfo(processTask, pointerSize, dylinkerBinary, address, mappedFilePath, &machHeaderAddress, NULL, slide, &textSize, &dataSize, &linkEditSize, cacheDictionary);
 	
 	if (relativeOffset != NULL) *relativeOffset = address - machHeaderAddress;
 	
@@ -553,7 +562,7 @@ NSRange ZGTextRange(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBin
 	ZGMemorySize textSize = 0;
 	ZGMemoryAddress machHeaderAddressReturned = 0;
 	
-	ZGGetNearestMachBinaryInfo(processTask, pointerSize, dylinkerBinary, targetAddress, mappedFilePath, &machHeaderAddressReturned, &textAddress, slide, &textSize, NULL, NULL);
+	ZGGetNearestMachBinaryInfo(processTask, pointerSize, dylinkerBinary, targetAddress, mappedFilePath, &machHeaderAddressReturned, &textAddress, slide, &textSize, NULL, NULL, cacheDictionary);
 	
 	if (machHeaderAddress != NULL) *machHeaderAddress = machHeaderAddressReturned;
 	

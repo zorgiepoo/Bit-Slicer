@@ -33,13 +33,14 @@
  */
 
 #import "ZGMemoryTypes.h"
+#import <mach/thread_act.h>
 
 @class ZGBreakPoint;
 
 @protocol ZGBreakPointDelegate <NSObject>
 
 @optional
-- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionAddress;
+- (void)dataAddress:(ZGMemoryAddress)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionAddress threadState:(x86_thread_state_t)threadState avxState:(x86_avx_state_t)avxState;
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint;
 
 @end
