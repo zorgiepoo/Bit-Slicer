@@ -481,26 +481,27 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(NSNumber *)instructionPointer
+- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionPointer
 {
+	NSNumber *instructionPointerNumber = @(instructionPointer);
 	ZGMemoryAddress instructionAddress = 0;
-	NSNumber *cachedInstructionAddress = [self.cachedInstructionPointers objectForKey:instructionPointer];
+	NSNumber *cachedInstructionAddress = [self.cachedInstructionPointers objectForKey:instructionPointerNumber];
 	if (cachedInstructionAddress == nil)
 	{
 		ZGInstruction *instruction =
 		[[[ZGAppController sharedController] debuggerController]
-		 findInstructionBeforeAddress:[instructionPointer unsignedLongLongValue]
+		 findInstructionBeforeAddress:[instructionPointerNumber unsignedLongLongValue]
 		 processTask:((DebuggerClass *)self.object)->processTask
 		 pointerSize:((DebuggerClass *)self.object)->is64Bit ? sizeof(int64_t) : sizeof(int32_t)
 		 dylinkerBinary:[[ZGMachBinary alloc] initWithHeaderAddress:((DebuggerClass *)self.object)->dylinkerHeaderAddress filePathAddress:((DebuggerClass *)self.object)->dylinkerFilePathAddress]
 		 cacheDictionary:self.processCacheDictionary];
 	
 		instructionAddress = instruction.variable.address;
-		[self.cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointer];
+		[self.cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointerNumber];
 	}
 	else
 	{
-		instructionAddress = [[self.cachedInstructionPointers objectForKey:instructionPointer] unsignedLongLongValue];
+		instructionAddress = [[self.cachedInstructionPointers objectForKey:instructionPointerNumber] unsignedLongLongValue];
 	}
 	
 	[self.scriptManager handleBreakPointDataAddress:[dataAddress unsignedLongLongValue] instructionAddress:instructionAddress sender:self];

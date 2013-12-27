@@ -32,12 +32,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import "ZGMemoryTypes.h"
+
 @class ZGBreakPoint;
 
 @protocol ZGBreakPointDelegate <NSObject>
 
 @optional
-- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(NSNumber *)instructionAddress;
+- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionAddress;
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint;
 
 @end

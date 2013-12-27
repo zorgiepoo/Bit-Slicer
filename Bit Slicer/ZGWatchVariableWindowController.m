@@ -141,17 +141,18 @@
 	}
 }
 
-- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(NSNumber *)instructionAddress
+- (void)dataAddress:(NSNumber *)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionAddress
 {
-	if (!self.watchProcess.valid || [self.foundBreakPointAddresses containsObject:instructionAddress]) return;
+	NSNumber *instructionAddressNumber = @(instructionAddress);
+	if (!self.watchProcess.valid || [self.foundBreakPointAddresses containsObject:instructionAddressNumber]) return;
 	
-	[self.foundBreakPointAddresses addObject:instructionAddress];
+	[self.foundBreakPointAddresses addObject:instructionAddressNumber];
 	
-	ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:[instructionAddress unsignedLongLongValue] inProcess:self.watchProcess];
+	ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:instructionAddress inProcess:self.watchProcess];
 	
 	if (instruction == nil)
 	{
-		NSLog(@"ERROR: Couldn't parse instruction before 0x%llX", [instructionAddress unsignedLongLongValue]);
+		NSLog(@"ERROR: Couldn't parse instruction before 0x%llX", instructionAddress);
 		return;
 	}
 	

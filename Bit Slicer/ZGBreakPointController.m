@@ -224,7 +224,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 							ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
 							
 							dispatch_async(dispatch_get_main_queue(), ^{
-								[breakPoint.delegate dataAddress:@(breakPoint.variable.address) accessedByInstructionPointer:@(instructionAddress)];
+								[breakPoint.delegate dataAddress:@(breakPoint.variable.address) accessedByInstructionPointer:instructionAddress];
 							});
 						}
 					}
