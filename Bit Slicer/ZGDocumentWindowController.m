@@ -494,12 +494,7 @@
 		
 		if (!self.currentProcess.hasGrantedAccess && ![self.currentProcess grantUsAccess])
 		{
-			NSAttributedString *errorMessage =
-			[[NSAttributedString alloc]
-			 initWithString:[NSString stringWithFormat:@"Failed accessing %@", self.currentProcess.name]
-			 attributes:@{NSForegroundColorAttributeName : NSColor.redColor}];
-			
-			[self setStatus:errorMessage];
+			[self setStatus:[NSString stringWithFormat:@"Failed accessing %@", self.currentProcess.name]];
 		}
 		else
 		{
