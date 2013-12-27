@@ -37,11 +37,21 @@
 
 @class ZGVariable;
 
+typedef enum
+{
+	ZGRegisterGeneralPurpose,
+	ZGRegisterFloatingPoint
+} ZGRegisterType;
+
 @interface ZGRegister : NSObject
 
 @property (nonatomic, strong) ZGVariable *variable;
 @property (nonatomic, readonly) void *value;
+@property (nonatomic, readonly) ZGMemorySize size;
+@property (nonatomic, readonly) ZGRegisterType registerType;
 
-- (id)initWithVariable:(ZGVariable *)variable;
+- (id)initWithRegisterType:(ZGRegisterType)registerType variable:(ZGVariable *)variable pointerSize:(ZGMemorySize)pointerSize;
+
+- (void *)copyOfValue;
 
 @end

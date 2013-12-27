@@ -38,26 +38,51 @@
 @interface ZGRegister ()
 
 @property (nonatomic, assign) void *value;
+@property (nonatomic, assign) ZGMemorySize size;
+@property (nonatomic, assign) ZGMemorySize internalSize;
+@property (nonatomic, assign) ZGRegisterType registerType;
 
 @end
 
 @implementation ZGRegister
 
-- (id)initWithVariable:(ZGVariable *)variable
+- (id)initWithRegisterType:(ZGRegisterType)registerType variable:(ZGVariable *)variable pointerSize:(ZGMemorySize)pointerSize
 {
 	self = [super init];
 	if (self)
 	{
+		self.registerType = registerType;
+		self.size = variable.size;
+		// If variable's type is changed, ensure there is enough space for pointer size
+		self.internalSize = MAX(pointerSize, self.size);
 		self.variable = variable;
-		self.value = malloc(self.variable.size);
-		memcpy(self.value, self.variable.value, self.variable.size);
 	}
 	return self;
 }
 
 - (void)dealloc
 {
+	self.variable = nil;
+}
+
+- (void)setVariable:(ZGVariable *)variable
+{
+	_variable = variable;
+	
 	free(self.value);
+	
+	if (_variable != nil)
+	{
+		self.value = calloc(1, self.internalSize);
+		memcpy(self.value, _variable.value, self.size);
+	}
+}
+
+- (void *)copyOfValue
+{
+	void *newValue = calloc(1, self.internalSize);
+	memcpy(newValue, self.value, self.size);
+	return newValue;
 }
 
 @end
