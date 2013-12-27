@@ -124,61 +124,84 @@
 	return basePointer;
 }
 
-#define ADD_FLOATING_POINT_REGISTER(array, floatState, pointerSize, registerName) \
-[array addObject:[[ZGVariable alloc] initWithValue:&floatState.ufs.fs64.__fpu_##registerName size:sizeof(floatState.ufs.fs64.__fpu_##registerName) address:0 type:ZGByteArray qualifier:0 pointerSize:pointerSize name:@(#registerName) enabled:NO]]
+#define ADD_AVX_REGISTER(array, avxState, pointerSize, registerName) \
+[array addObject:[[ZGVariable alloc] initWithValue:&avxState.ufs.as64.__fpu_##registerName size:sizeof(avxState.ufs.as64.__fpu_##registerName) address:0 type:ZGByteArray qualifier:0 pointerSize:pointerSize name:@(#registerName) enabled:NO]]
 
-+ (NSArray *)registerVariablesFromFloatingPointThreadState:(x86_float_state_t)floatState is64Bit:(BOOL)is64Bit
++ (NSArray *)registerVariablesFromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit
 {
 	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
 	ZGMemorySize pointerSize = is64Bit ? sizeof(int64_t) : sizeof(int32_t);
 	
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, fcw); // FPU control word
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, fsw); // FPU status word
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, ftw); // FPU tag word
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, fop); // FPU Opcode
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, fcw); // FPU control word
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, fsw); // FPU status word
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ftw); // FPU tag word
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, fop); // FPU Opcode
 	
 	// Instruction Pointer
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, ip); // offset
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, cs); // selector
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ip); // offset
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, cs); // selector
 	
 	// Instruction operand (data) pointer
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, dp); // offset
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, ds); // selector
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, dp); // offset
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ds); // selector
 	
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, mxcsr); // MXCSR Register state
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, mxcsrmask); // MXCSR mask
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, mxcsr); // MXCSR Register state
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, mxcsrmask); // MXCSR mask
 	
 	// STX/MMX
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, stmm0);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, stmm1);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, stmm2);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, stmm3);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, stmm4);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, stmm5);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, stmm6);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, stmm7);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, stmm0);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, stmm1);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, stmm2);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, stmm3);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, stmm4);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, stmm5);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, stmm6);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, stmm7);
 	
 	// XMM 0 through 7
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm0);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm1);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm2);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm3);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm4);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm5);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm6);
-	ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm7);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm0);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm1);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm2);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm3);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm4);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm5);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm6);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm7);
 	
 	if (is64Bit)
 	{
 		// XMM 8 through 15
-		ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm8);
-		ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm9);
-		ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm10);
-		ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm11);
-		ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm12);
-		ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm13);
-		ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm14);
-		ADD_FLOATING_POINT_REGISTER(registerVariables, floatState, pointerSize, xmm15);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm8);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm9);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm10);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm11);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm12);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm13);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm14);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, xmm15);
+	}
+	
+	// YMMH 0 through 7
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh0);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh1);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh2);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh3);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh4);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh5);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh6);
+	ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh7);
+	
+	if (is64Bit)
+	{
+		// YMMH 8 through 15
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh8);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh9);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh10);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh11);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh12);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh13);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh14);
+		ADD_AVX_REGISTER(registerVariables, avxState, pointerSize, ymmh15);
 	}
 	
 	return registerVariables;
@@ -306,15 +329,14 @@
 		}
 	}
 	
-	x86_float_state_t floatState;
-	mach_msg_type_number_t floatStateCount = x86_FLOAT_STATE_COUNT;
-	if (thread_get_state(self.breakPoint.thread, x86_FLOAT_STATE, (thread_state_t)&floatState, &floatStateCount) == KERN_SUCCESS)
+	x86_avx_state_t avxState;
+	mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
+	if (thread_get_state(self.breakPoint.thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS)
 	{
-		NSArray *registerVariables = [[self class] registerVariablesFromFloatingPointThreadState:floatState is64Bit:breakPoint.process.is64Bit];
-		
+		NSArray *registerVariables = [[self class] registerVariablesFromAVXThreadState:avxState is64Bit:breakPoint.process.is64Bit];
 		for (ZGVariable *registerVariable in registerVariables)
 		{
-			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterFloatingPoint variable:registerVariable pointerSize:pointerSize];
+			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterAVX variable:registerVariable pointerSize:pointerSize];
 			
 			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
 			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
@@ -349,13 +371,16 @@
 	[self.tableView reloadData];
 }
 
-#define WRITE_FLOAT_STATE(floatState, variable, registerName) memcpy(&floatState.ufs.fs64.__fpu_##registerName, variable.value, MIN(variable.size, sizeof(floatState.ufs.fs64.__fpu_##registerName)))
+#define WRITE_AVX_STATE(avxState, variable, registerName) memcpy(&avxState.ufs.as64.__fpu_##registerName, variable.value, MIN(variable.size, sizeof(avxState.ufs.as64.__fpu_##registerName)))
 
 - (BOOL)changeFloatingPointRegister:(ZGRegister *)theRegister oldVariable:(ZGVariable *)oldVariable newVariable:(ZGVariable *)newVariable
 {
-	x86_float_state_t floatState;
-	mach_msg_type_number_t floatStateCount = x86_FLOAT_STATE_COUNT;
-	if (thread_get_state(self.breakPoint.thread, x86_FLOAT_STATE, (thread_state_t)&floatState, &floatStateCount) != KERN_SUCCESS)
+	BOOL is64Bit = self.breakPoint.process.is64Bit;
+	
+	// For some bizarre reason, thread_set_state will not work later if I use x86_AVX_STATE, so I'm forced to explicitly use x86_AVX_STATE32 and x86_AVX_STATE64
+	x86_avx_state_t avxState;
+	mach_msg_type_number_t avxStateCount = is64Bit ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
+	if (thread_get_state(self.breakPoint.thread, is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, is64Bit ? (thread_state_t)&avxState.ufs.as64 : (thread_state_t)&avxState.ufs.as32, &avxStateCount) != KERN_SUCCESS)
 	{
 		return NO;
 	}
@@ -363,56 +388,61 @@
 	NSString *registerName = theRegister.variable.name;
 	if ([registerName isEqualToString:@"fcw"])
 	{
-		WRITE_FLOAT_STATE(floatState, newVariable, fcw);
+		WRITE_AVX_STATE(avxState, newVariable, fcw);
 	}
 	else if ([registerName isEqualToString:@"fsw"])
 	{
-		WRITE_FLOAT_STATE(floatState, newVariable, fsw);
+		WRITE_AVX_STATE(avxState, newVariable, fsw);
 	}
 	else if ([registerName isEqualToString:@"fop"])
 	{
-		WRITE_FLOAT_STATE(floatState, newVariable, fop);
+		WRITE_AVX_STATE(avxState, newVariable, fop);
 	}
 	else if ([registerName isEqualToString:@"ip"])
 	{
-		WRITE_FLOAT_STATE(floatState, newVariable, ip);
+		WRITE_AVX_STATE(avxState, newVariable, ip);
 	}
 	else if ([registerName isEqualToString:@"cs"])
 	{
-		WRITE_FLOAT_STATE(floatState, newVariable, cs);
+		WRITE_AVX_STATE(avxState, newVariable, cs);
 	}
 	else if ([registerName isEqualToString:@"dp"])
 	{
-		WRITE_FLOAT_STATE(floatState, newVariable, dp);
+		WRITE_AVX_STATE(avxState, newVariable, dp);
 	}
 	else if ([registerName isEqualToString:@"ds"])
 	{
-		WRITE_FLOAT_STATE(floatState, newVariable, ds);
+		WRITE_AVX_STATE(avxState, newVariable, ds);
 	}
 	else if ([registerName isEqualToString:@"mxcsr"])
 	{
-		WRITE_FLOAT_STATE(floatState, newVariable, mxcsr);
+		WRITE_AVX_STATE(avxState, newVariable, mxcsr);
 	}
 	else if ([registerName isEqualToString:@"mxcsrmask"])
 	{
-		WRITE_FLOAT_STATE(floatState, newVariable, mxcsrmask);
+		WRITE_AVX_STATE(avxState, newVariable, mxcsrmask);
 	}
 	else if ([registerName hasPrefix:@"stmm"])
 	{
 		int stmmIndexValue = [[registerName substringFromIndex:[@"stmm" length]] intValue];
-		memcpy((_STRUCT_MMST_REG *)&floatState.ufs.fs64.__fpu_stmm0 + stmmIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_MMST_REG)));
+		memcpy((_STRUCT_MMST_REG *)&avxState.ufs.as64.__fpu_stmm0 + stmmIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_MMST_REG)));
 	}
 	else if ([registerName hasPrefix:@"xmm"])
 	{
 		int xmmIndexValue = [[registerName substringFromIndex:[@"xmm" length]] intValue];
-		memcpy((_STRUCT_XMM_REG *)&floatState.ufs.fs64.__fpu_xmm0 + xmmIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_XMM_REG)));
+		memcpy((_STRUCT_XMM_REG *)&avxState.ufs.as64.__fpu_xmm0 + xmmIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_XMM_REG)));
+	}
+	else if ([registerName hasPrefix:@"ymmh"])
+	{
+		int ymmhIndexValue = [[registerName substringFromIndex:[@"ymmh" length]] intValue];
+		memcpy((_STRUCT_XMM_REG *)&avxState.ufs.as64.__fpu_ymmh0 + ymmhIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_XMM_REG)));
 	}
 	else
 	{
 		return NO;
 	}
 	
-	if (thread_set_state(self.breakPoint.thread, x86_FLOAT_STATE, (thread_state_t)&floatState, floatStateCount) != KERN_SUCCESS)
+	if (thread_set_state(self.breakPoint.thread, is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, is64Bit ? (thread_state_t)&avxState.ufs.as64 : (thread_state_t)&avxState.ufs.as32, avxStateCount) != KERN_SUCCESS)
 	{
 		NSLog(@"Failure in setting registers thread state for writing register value (floating point): %d", self.breakPoint.thread);
 		return NO;
@@ -482,7 +512,7 @@
 		case ZGRegisterGeneralPurpose:
 			success = [self changeGeneralPurposeRegister:theRegister oldVariable:oldVariable newVariable:newVariable];
 			break;
-		case ZGRegisterFloatingPoint:
+		case ZGRegisterAVX:
 			success = [self changeFloatingPointRegister:theRegister oldVariable:oldVariable newVariable:newVariable];
 			break;
 	}

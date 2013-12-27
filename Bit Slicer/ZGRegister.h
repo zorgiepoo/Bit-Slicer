@@ -40,7 +40,7 @@
 typedef enum
 {
 	ZGRegisterGeneralPurpose,
-	ZGRegisterFloatingPoint
+	ZGRegisterAVX
 } ZGRegisterType;
 
 @interface ZGRegister : NSObject
