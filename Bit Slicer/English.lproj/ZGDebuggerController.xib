@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4511" systemVersion="13B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4511" systemVersion="13C32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1070" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4511"/>
@@ -215,20 +215,20 @@
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="164">
-                                                <rect key="frame" x="0.0" y="0.0" width="552" height="202"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="510" height="202"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <clipView key="contentView" id="5C7-LD-NYc">
-                                                    <rect key="frame" x="1" y="17" width="550" height="184"/>
+                                                    <rect key="frame" x="1" y="17" width="508" height="184"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="198" id="165">
-                                                            <rect key="frame" x="0.0" y="0.0" width="550" height="184"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="508" height="184"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                             <size key="intercellSpacing" width="3" height="2"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                             <tableColumns>
-                                                                <tableColumn identifier="backtrace" editable="NO" width="546.79296875" minWidth="40" maxWidth="1000" id="169">
+                                                                <tableColumn identifier="backtrace" editable="NO" width="504.79296875" minWidth="40" maxWidth="1000" id="169">
                                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Backtrace">
                                                                         <font key="font" metaFont="smallSystem"/>
                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -260,25 +260,25 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <tableHeaderView key="headerView" id="198">
-                                                    <rect key="frame" x="0.0" y="0.0" width="550" height="17"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="508" height="17"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </tableHeaderView>
                                             </scrollView>
                                             <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="211">
-                                                <rect key="frame" x="553" y="0.0" width="265" height="202"/>
+                                                <rect key="frame" x="511" y="0.0" width="307" height="202"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <clipView key="contentView" id="uPf-cf-8J6">
-                                                    <rect key="frame" x="1" y="17" width="263" height="184"/>
+                                                    <rect key="frame" x="1" y="17" width="305" height="184"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="213" id="215">
-                                                            <rect key="frame" x="0.0" y="0.0" width="263" height="184"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="305" height="184"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                             <size key="intercellSpacing" width="3" height="2"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                             <tableColumns>
-                                                                <tableColumn identifier="name" editable="NO" width="52" minWidth="40" maxWidth="1000" id="218">
+                                                                <tableColumn identifier="name" editable="NO" width="68.70703125" minWidth="40" maxWidth="1000" id="218">
                                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Register">
                                                                         <font key="font" metaFont="smallSystem"/>
                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -291,7 +291,7 @@
                                                                     </textFieldCell>
                                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 </tableColumn>
-                                                                <tableColumn identifier="value" width="106" minWidth="40" maxWidth="1000" id="217">
+                                                                <tableColumn identifier="value" width="107.49267578125" minWidth="40" maxWidth="1000" id="217">
                                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Value">
                                                                         <font key="font" metaFont="smallSystem"/>
                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -304,24 +304,24 @@
                                                                     </textFieldCell>
                                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 </tableColumn>
-                                                                <tableColumn identifier="type" editable="NO" width="96" minWidth="75" maxWidth="100" id="216">
+                                                                <tableColumn identifier="type" editable="NO" width="120" minWidth="120" maxWidth="160" id="216">
                                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Type">
                                                                         <font key="font" metaFont="smallSystem"/>
                                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                     </tableHeaderCell>
-                                                                    <popUpButtonCell key="dataCell" type="bevel" title="Byte Array" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="bezel" tag="9" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="230" id="221">
+                                                                    <popUpButtonCell key="dataCell" type="bevel" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="bezel" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="221">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="menu"/>
                                                                         <menu key="menu" title="OtherViews" id="222">
                                                                             <items>
-                                                                                <menuItem title="Int8" id="223"/>
-                                                                                <menuItem title="Int16" tag="1" id="224"/>
-                                                                                <menuItem title="Int32" tag="2" id="225"/>
-                                                                                <menuItem title="Int64" tag="3" id="226"/>
+                                                                                <menuItem title="8-bit Integer" id="223"/>
+                                                                                <menuItem title="16-bit Integer" tag="1" id="224"/>
+                                                                                <menuItem title="32-bit Integer" tag="2" id="225"/>
+                                                                                <menuItem title="64-bit Integer" tag="3" id="226"/>
                                                                                 <menuItem title="Float" tag="4" id="227"/>
                                                                                 <menuItem title="Double" tag="5" id="228"/>
-                                                                                <menuItem title="Byte Array" state="on" tag="9" id="230"/>
+                                                                                <menuItem title="Byte Array" tag="9" id="230"/>
                                                                                 <menuItem title="Pointer" tag="8" id="229"/>
                                                                             </items>
                                                                         </menu>
@@ -338,7 +338,7 @@
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </clipView>
                                                 <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="214">
-                                                    <rect key="frame" x="1" y="185" width="263" height="16"/>
+                                                    <rect key="frame" x="1" y="185" width="305" height="16"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" id="212">
@@ -346,7 +346,7 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
                                                 <tableHeaderView key="headerView" id="213">
-                                                    <rect key="frame" x="0.0" y="0.0" width="263" height="17"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="305" height="17"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </tableHeaderView>
                                             </scrollView>
