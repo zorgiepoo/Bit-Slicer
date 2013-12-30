@@ -416,7 +416,7 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1021"/>
-                            <menuItem title="Continue Execution" keyEquivalent="e" id="1061">
+                            <menuItem title="Continue Execution" keyEquivalent="E" id="1061">
                                 <connections>
                                     <action selector="continueExecution:" target="-1" id="1064"/>
                                 </connections>
