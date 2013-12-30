@@ -41,7 +41,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FEU-4G-cDb">
-                        <rect key="frame" x="237" y="13" width="82" height="32"/>
+                        <rect key="frame" x="237" y="9" width="82" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ep5-ah-JWb">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -55,7 +55,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ixj-kn-tLy">
-                        <rect key="frame" x="155" y="13" width="82" height="32"/>
+                        <rect key="frame" x="155" y="9" width="82" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3cc-Z5-C9T">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -73,12 +73,12 @@ Gw
                     <constraint firstItem="FEU-4G-cDb" firstAttribute="width" secondItem="ixj-kn-tLy" secondAttribute="width" id="19C-hd-RkE"/>
                     <constraint firstAttribute="trailing" secondItem="FEU-4G-cDb" secondAttribute="trailing" constant="20" id="F7o-Wy-r9C"/>
                     <constraint firstItem="CiB-b8-3nD" firstAttribute="leading" secondItem="JWo-B3-gnk" secondAttribute="leading" constant="20" id="GhT-dR-IlD"/>
-                    <constraint firstAttribute="bottom" secondItem="ixj-kn-tLy" secondAttribute="bottom" constant="20" id="J9S-xt-OKe"/>
+                    <constraint firstAttribute="bottom" secondItem="ixj-kn-tLy" secondAttribute="bottom" constant="16" id="J9S-xt-OKe"/>
                     <constraint firstAttribute="trailing" secondItem="IUp-Ps-j87" secondAttribute="trailing" constant="20" id="JjY-WB-LjT"/>
                     <constraint firstItem="IUp-Ps-j87" firstAttribute="leading" secondItem="CiB-b8-3nD" secondAttribute="trailing" constant="8" id="UiM-dj-75e"/>
                     <constraint firstItem="FEU-4G-cDb" firstAttribute="leading" secondItem="ixj-kn-tLy" secondAttribute="trailing" constant="12" id="mnt-D2-ulJ"/>
                     <constraint firstItem="IUp-Ps-j87" firstAttribute="top" secondItem="JWo-B3-gnk" secondAttribute="top" constant="20" id="pNt-6M-d34"/>
-                    <constraint firstAttribute="bottom" secondItem="FEU-4G-cDb" secondAttribute="bottom" constant="20" id="sX2-LE-dYZ"/>
+                    <constraint firstAttribute="bottom" secondItem="FEU-4G-cDb" secondAttribute="bottom" constant="16" id="sX2-LE-dYZ"/>
                     <constraint firstItem="CiB-b8-3nD" firstAttribute="top" secondItem="JWo-B3-gnk" secondAttribute="top" constant="20" id="w7H-tn-90e"/>
                 </constraints>
             </view>

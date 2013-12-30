@@ -41,7 +41,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8">
-                        <rect key="frame" x="190" y="13" width="82" height="32"/>
+                        <rect key="frame" x="190" y="9" width="82" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="13">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -55,7 +55,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7">
-                        <rect key="frame" x="108" y="13" width="82" height="32"/>
+                        <rect key="frame" x="108" y="9" width="82" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="14">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -70,18 +70,18 @@ Gw
                     </button>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="8" firstAttribute="top" secondItem="10" secondAttribute="bottom" constant="8" id="81E-C4-OSY"/>
+                    <constraint firstItem="8" firstAttribute="top" secondItem="10" secondAttribute="bottom" constant="12" id="81E-C4-OSY"/>
                     <constraint firstItem="7" firstAttribute="width" secondItem="8" secondAttribute="width" id="LX7-yc-RR9"/>
                     <constraint firstAttribute="trailing" secondItem="10" secondAttribute="trailing" constant="20" id="ODg-gv-N5W"/>
                     <constraint firstItem="10" firstAttribute="leading" secondItem="9" secondAttribute="trailing" constant="8" id="OIV-Ar-R3Y"/>
                     <constraint firstAttribute="trailing" secondItem="8" secondAttribute="trailing" constant="20" id="PUH-Oz-q05"/>
                     <constraint firstItem="9" firstAttribute="top" secondItem="6" secondAttribute="top" constant="22" id="VOV-zf-Fyp"/>
                     <constraint firstItem="9" firstAttribute="leading" secondItem="6" secondAttribute="leading" constant="18" id="YzX-1O-gW4"/>
-                    <constraint firstAttribute="bottom" secondItem="7" secondAttribute="bottom" constant="20" id="abA-iW-Auq"/>
+                    <constraint firstAttribute="bottom" secondItem="7" secondAttribute="bottom" constant="16" id="abA-iW-Auq"/>
                     <constraint firstItem="8" firstAttribute="leading" secondItem="7" secondAttribute="trailing" constant="12" id="gHe-2Y-0OB"/>
                     <constraint firstItem="10" firstAttribute="top" secondItem="6" secondAttribute="top" constant="20" id="jS8-Uo-nGy"/>
-                    <constraint firstItem="7" firstAttribute="top" secondItem="10" secondAttribute="bottom" constant="8" id="nBt-HW-HCr"/>
-                    <constraint firstAttribute="bottom" secondItem="8" secondAttribute="bottom" constant="20" id="qan-xZ-EyM"/>
+                    <constraint firstItem="7" firstAttribute="top" secondItem="10" secondAttribute="bottom" constant="12" id="nBt-HW-HCr"/>
+                    <constraint firstAttribute="bottom" secondItem="8" secondAttribute="bottom" constant="16" id="qan-xZ-EyM"/>
                 </constraints>
             </view>
         </window>
