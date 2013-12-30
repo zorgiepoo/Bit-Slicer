@@ -50,6 +50,7 @@
 #import "ZGDocumentWindowController.h"
 #import "ZGDocumentData.h"
 #import "ZGScriptManager.h"
+#import "ZGMachBinary.h"
 
 @interface ZGVariableController ()
 
@@ -866,6 +867,154 @@
 	
 	self.windowController.undoManager.actionName = [NSString stringWithFormat:@"Relativize Variable%@", variables.count == 1 ? @"" : @"s"];
 	[[self.windowController.undoManager prepareWithInvocationTarget:self] unrelativizeVariables:variables];
+}
+
+- (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray *)machBinaries filePathDictionary:(NSDictionary *)machFilePathDictionary
+{
+	NSString *staticVariableDescription = nil;
+	
+	NSDictionary *cacheDictionary = self.windowController.currentProcess.cacheDictionary;
+	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
+	ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
+	
+	ZGMachBinary *machBinary = ZGNearestMachBinary(machBinaries, variable.address);
+	ZGMemoryAddress machHeaderAddress = machBinary.headerAddress;
+	
+	NSString *machFilePath = [machFilePathDictionary objectForKey:@(machBinary.filePathAddress)];
+	
+	if (machFilePath != nil)
+	{
+		ZGMemorySize slide = 0;
+		ZGMemorySize textSize = 0;
+		ZGMemorySize dataSize = 0;
+		ZGMemorySize linkEditSize = 0;
+		
+		ZGGetMachBinaryInfo(processTask, pointerSize, machHeaderAddress, machFilePath, NULL, &slide, &textSize, &dataSize, &linkEditSize, cacheDictionary);
+		
+		if (variable.address >= machHeaderAddress && variable.address + variable.size <= machHeaderAddress + textSize + dataSize + linkEditSize)
+		{
+			if (slide > 0)
+			{
+				NSString *partialPath = [machFilePath lastPathComponent];
+				NSString *pathToUse = nil;
+				NSString *baseArgument = @"";
+				
+				if (machBinary != [machBinaries objectAtIndex:0])
+				{
+					if ([[machFilePath stringByDeletingLastPathComponent] length] > 0)
+					{
+						partialPath = [@"/" stringByAppendingString:partialPath];
+					}
+					
+					int numberOfMatchingPaths = 0;
+					for (ZGMachBinary *binaryImage in machBinaries)
+					{
+						NSString *mappedPath = [machFilePathDictionary objectForKey:@(binaryImage.filePathAddress)];
+						if ([mappedPath hasSuffix:partialPath])
+						{
+							numberOfMatchingPaths++;
+							if (numberOfMatchingPaths > 1) break;
+						}
+					}
+					
+					pathToUse = numberOfMatchingPaths > 1 ? machFilePath : partialPath;
+					baseArgument = [NSString stringWithFormat:@"\"%@\"", pathToUse];
+				}
+				
+				variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variable.address - machHeaderAddress];
+				variable.usesDynamicAddress = YES;
+				variable.finishedEvaluatingDynamicAddress = YES;
+				
+				// Cache the path
+				if (pathToUse != nil)
+				{
+					NSMutableDictionary *mappedPathDictionary = [cacheDictionary objectForKey:ZGMappedPathDictionary];
+					if ([mappedPathDictionary objectForKey:pathToUse] == nil)
+					{
+						[mappedPathDictionary setObject:@(machHeaderAddress) forKey:pathToUse];
+					}
+				}
+			}
+			
+			NSString *sectionName = nil;
+			if (variable.address + variable.size <= machHeaderAddress + textSize)
+			{
+				sectionName = @"__TEXT";
+			}
+			else if (variable.address + variable.size <= machHeaderAddress + textSize + dataSize)
+			{
+				sectionName = @"__DATA";
+			}
+			else
+			{
+				sectionName = @"__LINKEDIT";
+			}
+			
+			staticVariableDescription = [NSString stringWithFormat:@"static address (%@)", sectionName];
+		}
+	}
+	
+	return staticVariableDescription;
+}
+
+- (void)annotateVariables:(NSArray *)variables
+{
+	ZGProcess *currentProcess = self.windowController.currentProcess;
+	ZGMemoryMap processTask = currentProcess.processTask;
+	NSArray *machBinaries = ZGMachBinaries(processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary);
+	NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
+	
+	for (ZGMachBinary *machBinary in machBinaries)
+	{
+		NSString *filePath = ZGFilePathAtAddress(processTask, machBinary.filePathAddress);
+		if (filePath != nil)
+		{
+			[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
+		}
+	}
+	
+	ZGMemoryAddress cachedSubmapRegionAddress = 0;
+	ZGMemorySize cachedSubmapRegionSize = 0;
+	ZGMemorySubmapInfo cachedSubmapInfo;
+	
+	for (ZGVariable *variable in variables)
+	{
+		NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
+		
+		if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
+		{
+			cachedSubmapRegionAddress = variable.address;
+			if (!ZGRegionSubmapInfo(processTask, &cachedSubmapRegionAddress, &cachedSubmapRegionSize, &cachedSubmapInfo))
+			{
+				cachedSubmapRegionAddress = 0;
+				cachedSubmapRegionSize = 0;
+			}
+		}
+		
+		NSString *userTagDescription = nil;
+		NSString *protectionDescription = nil;
+		
+		if (cachedSubmapRegionAddress <= variable.address && cachedSubmapRegionAddress + cachedSubmapRegionSize >= variable.address + variable.size)
+		{
+			userTagDescription = ZGUserTagDescription(cachedSubmapInfo.user_tag);
+			protectionDescription = ZGProtectionDescription(cachedSubmapInfo.protection);
+		}
+		
+		NSMutableArray *validDescriptionComponents = [NSMutableArray array];
+		if (staticDescription != nil) [validDescriptionComponents addObject:staticDescription];
+		if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];
+		if (protectionDescription != nil) [validDescriptionComponents addObject:protectionDescription];
+		
+		if ([variable.description length] == 0)
+		{
+			variable.description = [validDescriptionComponents componentsJoinedByString:@", "];
+		}
+		else
+		{
+			NSString *appendedString = [NSString stringWithFormat:@"\n\n%@", [validDescriptionComponents componentsJoinedByString:@"\n"]];
+			[variable.description appendAttributedString:[[NSAttributedString alloc] initWithString:appendedString]];
+		}
+	}
 }
 
 #pragma mark Edit Variables Sizes (Byte Arrays)

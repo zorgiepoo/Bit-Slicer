@@ -68,6 +68,7 @@
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
 
 - (void)relativizeVariables:(NSArray *)variables;
+- (void)annotateVariables:(NSArray *)variables;
 
 - (void)editVariables:(NSArray *)variables newValues:(NSArray *)newValues;
 - (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula;

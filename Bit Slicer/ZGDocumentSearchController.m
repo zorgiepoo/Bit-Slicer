@@ -39,7 +39,6 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 #import "ZGRegion.h"
-#import "ZGMachBinary.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
@@ -50,6 +49,7 @@
 #import "ZGSearchFunctions.h"
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
+#import "ZGVariableController.h"
 
 @interface ZGDocumentSearchController ()
 
@@ -260,94 +260,6 @@
 
 #pragma mark Searching
 
-- (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray *)machBinaries filePathDictionary:(NSDictionary *)machFilePathDictionary
-{
-	NSString *staticVariableDescription = nil;
-	
-	NSDictionary *cacheDictionary = self.windowController.currentProcess.cacheDictionary;
-	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
-	ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
-	
-	ZGMachBinary *machBinary = ZGNearestMachBinary(machBinaries, variable.address);
-	ZGMemoryAddress machHeaderAddress = machBinary.headerAddress;
-	
-	NSString *machFilePath = [machFilePathDictionary objectForKey:@(machBinary.filePathAddress)];
-	
-	if (machFilePath != nil)
-	{
-		ZGMemorySize slide = 0;
-		ZGMemorySize textSize = 0;
-		ZGMemorySize dataSize = 0;
-		ZGMemorySize linkEditSize = 0;
-		
-		ZGGetMachBinaryInfo(processTask, pointerSize, machHeaderAddress, machFilePath, NULL, &slide, &textSize, &dataSize, &linkEditSize, cacheDictionary);
-		
-		if (variable.address >= machHeaderAddress && variable.address + variable.size <= machHeaderAddress + textSize + dataSize + linkEditSize)
-		{
-			if (slide > 0)
-			{
-				NSString *partialPath = [machFilePath lastPathComponent];
-				NSString *pathToUse = nil;
-				NSString *baseArgument = @"";
-				
-				if (machBinary != [machBinaries objectAtIndex:0])
-				{
-					if ([[machFilePath stringByDeletingLastPathComponent] length] > 0)
-					{
-						partialPath = [@"/" stringByAppendingString:partialPath];
-					}
-					
-					int numberOfMatchingPaths = 0;
-					for (ZGMachBinary *binaryImage in machBinaries)
-					{
-						NSString *mappedPath = [machFilePathDictionary objectForKey:@(binaryImage.filePathAddress)];
-						if ([mappedPath hasSuffix:partialPath])
-						{
-							numberOfMatchingPaths++;
-							if (numberOfMatchingPaths > 1) break;
-						}
-					}
-					
-					pathToUse = numberOfMatchingPaths > 1 ? machFilePath : partialPath;
-					baseArgument = [NSString stringWithFormat:@"\"%@\"", pathToUse];
-				}
-				
-				variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variable.address - machHeaderAddress];
-				variable.usesDynamicAddress = YES;
-				variable.finishedEvaluatingDynamicAddress = YES;
-				
-				// Cache the path
-				if (pathToUse != nil)
-				{
-					NSMutableDictionary *mappedPathDictionary = [self.windowController.currentProcess.cacheDictionary objectForKey:ZGMappedPathDictionary];
-					if ([mappedPathDictionary objectForKey:pathToUse] == nil)
-					{
-						[mappedPathDictionary setObject:@(machHeaderAddress) forKey:pathToUse];
-					}
-				}
-			}
-			
-			NSString *sectionName = nil;
-			if (variable.address + variable.size <= machHeaderAddress + textSize)
-			{
-				sectionName = @"__TEXT";
-			}
-			else if (variable.address + variable.size <= machHeaderAddress + textSize + dataSize)
-			{
-				sectionName = @"__DATA";
-			}
-			else
-			{
-				sectionName = @"__LINKEDIT";
-			}
-			
-			staticVariableDescription = [NSString stringWithFormat:@"static address (%@)", sectionName];
-		}
-	}
-	
-	return staticVariableDescription;
-}
-
 - (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables fromResults:(ZGSearchResults *)searchResults
 {
 	if (searchResults.addressCount == 0) return;
@@ -357,28 +269,12 @@
 		numberOfVariables = searchResults.addressCount;
 	}
 	
-	NSMutableArray *newVariables = [[NSMutableArray alloc] initWithArray:self.documentData.variables];
+	NSMutableArray *allVariables = [[NSMutableArray alloc] initWithArray:self.documentData.variables];
+	NSMutableArray *newVariables = [NSMutableArray array];
 	
 	ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
 	ZGProcess *currentProcess = self.windowController.currentProcess;
 	ZGMemorySize pointerSize = currentProcess.pointerSize;
-	
-	NSArray *machBinaries = ZGMachBinaries(currentProcess.processTask, pointerSize, currentProcess.dylinkerBinary);
-	NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
-	for (ZGMachBinary *machBinary in machBinaries)
-	{
-		NSString *filePath = ZGFilePathAtAddress(currentProcess.processTask, machBinary.filePathAddress);
-		if (filePath != nil)
-		{
-			[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
-		}
-	}
-	
-	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
-	
-	__block ZGMemoryAddress cachedSubmapRegionAddress = 0;
-	__block ZGMemorySize cachedSubmapRegionSize = 0;
-	__block ZGMemorySubmapInfo cachedSubmapInfo;
 	
 	ZGMemorySize dataSize = searchResults.dataSize;
 	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
@@ -391,45 +287,19 @@
 		 qualifier:qualifier
 		 pointerSize:pointerSize];
 		
-		NSString *staticDescription = [self relativizeVariable:newVariable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
-		
-		if (cachedSubmapRegionAddress >= newVariable.address + newVariable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= newVariable.address)
-		{
-			cachedSubmapRegionAddress = newVariable.address;
-			if (!ZGRegionSubmapInfo(processTask, &cachedSubmapRegionAddress, &cachedSubmapRegionSize, &cachedSubmapInfo))
-			{
-				cachedSubmapRegionAddress = 0;
-				cachedSubmapRegionSize = 0;
-			}
-		}
-		
-		NSString *userTagDescription = nil;
-		NSString *protectionDescription = nil;
-		
-		if (cachedSubmapRegionAddress <= newVariable.address && cachedSubmapRegionAddress + cachedSubmapRegionSize >= newVariable.address + newVariable.size)
-		{
-			userTagDescription = ZGUserTagDescription(cachedSubmapInfo.user_tag);
-			protectionDescription = ZGProtectionDescription(cachedSubmapInfo.protection);
-		}
-		
-		NSMutableArray *validNameComponents = [NSMutableArray array];
-		if (staticDescription != nil) [validNameComponents addObject:staticDescription];
-		if (userTagDescription != nil) [validNameComponents addObject:userTagDescription];
-		if (protectionDescription != nil) [validNameComponents addObject:protectionDescription];
-		
-		newVariable.description = [validNameComponents componentsJoinedByString:@", "];
-		
 		[newVariables addObject:newVariable];
 	}];
 	
 	[searchResults removeNumberOfAddresses:numberOfVariables];
 	
-	NSUInteger oldVariablesCount = self.documentData.variables.count;
-	self.documentData.variables = newVariables;
+	[self.windowController.variableController annotateVariables:newVariables];
+	
+	[allVariables addObjectsFromArray:newVariables];
+	self.documentData.variables = [NSArray arrayWithArray:allVariables];
 	
 	if (self.documentData.variables.count > 0)
 	{
-		[self.windowController.tableController updateVariableValuesInRange:NSMakeRange(oldVariablesCount, newVariables.count - oldVariablesCount)];
+		[self.windowController.tableController updateVariableValuesInRange:NSMakeRange(allVariables.count - newVariables.count, newVariables.count)];
 	}
 }
 
