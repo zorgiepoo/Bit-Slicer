@@ -425,7 +425,7 @@
 
 - (void)changeVariable:(ZGVariable *)variable newDescription:(NSAttributedString *)newDescription
 {
-	self.windowController.undoManager.actionName = @"Name Change";
+	self.windowController.undoManager.actionName = @"Description Change";
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
 	 newDescription:variable.description];
