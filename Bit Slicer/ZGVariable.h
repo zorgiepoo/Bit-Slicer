@@ -62,6 +62,7 @@ extern NSString *ZGVariablePboardType;
 @property (copy, nonatomic) NSString *scriptValue;
 @property (readonly, nonatomic) NSString *sizeStringValue;
 @property (copy, nonatomic) NSString *name;
+@property (nonatomic, readonly) NSString *shortInfo;
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize;
 

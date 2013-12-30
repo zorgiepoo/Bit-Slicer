@@ -429,15 +429,7 @@
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
-			NSArray *lines = [variable.name componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-			if (lines.count == 1)
-			{
-				return variable.name;
-			}
-			else
-			{
-				return [[lines objectAtIndex:0] stringByAppendingString:@"..."];
-			}
+			return variable.shortInfo;
 		}
 		else if ([tableColumn.identifier isEqualToString:@"address"])
 		{

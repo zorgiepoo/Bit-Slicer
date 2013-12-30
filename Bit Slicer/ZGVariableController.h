@@ -46,6 +46,9 @@
 
 - (void)freezeVariables;
 
++ (void)copyVariablesToPasteboard:(NSArray *)variables;
++ (void)copyVariableAddress:(ZGVariable *)variable;
+
 - (void)copyVariables;
 - (void)copyAddress;
 - (void)pasteVariables;

@@ -39,7 +39,7 @@
 @class ZGVariable;
 @class ZGProcess;
 
-@interface ZGWatchVariableWindowController : NSWindowController <ZGBreakPointDelegate>
+@interface ZGWatchVariableWindowController : NSWindowController <ZGBreakPointDelegate, NSTableViewDataSource>
 
 typedef void (^watch_variable_completion_t)(NSArray *variablesFound);
 

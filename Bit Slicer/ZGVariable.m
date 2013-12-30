@@ -486,6 +486,14 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	}
 }
 
+- (NSString *)shortInfo
+{
+	NSArray *lines = [self.name componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+	if (lines.count <= 1) return self.name;
+	
+	return [[lines objectAtIndex:0] stringByAppendingString:@"…"];
+}
+
 // frees value, freezeValue, makes unfrozen
 - (void)cleanState
 {

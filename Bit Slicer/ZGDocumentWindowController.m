@@ -1513,7 +1513,6 @@
 		{
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];
 			[self.variableController addVariables:foundVariables atRowIndexes:rowIndexes];
-			[self.tableController.variablesTableView selectRowIndexes:rowIndexes byExtendingSelection:NO];
 			[self.tableController.variablesTableView scrollRowToVisible:0];
 		}
 	}];

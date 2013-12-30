@@ -147,30 +147,33 @@
 
 #pragma mark Copying & Pasting
 
-- (void)copyAddress
++ (void)copyVariableAddress:(ZGVariable *)variable
 {
-	ZGVariable *selectedVariable = [[self.windowController selectedVariables] objectAtIndex:0];
 	[NSPasteboard.generalPasteboard
 	 declareTypes:@[NSStringPboardType]
 	 owner:self];
 	
 	[NSPasteboard.generalPasteboard
-	 setString:selectedVariable.addressStringValue
+	 setString:variable.addressStringValue
 	 forType:NSStringPboardType];
 }
 
-- (void)copyVariables
+- (void)copyAddress
+{
+	[[self class] copyVariableAddress:[[self.windowController selectedVariables] objectAtIndex:0]];
+}
+
++ (void)copyVariablesToPasteboard:(NSArray *)variables
 {
 	[NSPasteboard.generalPasteboard
 	 declareTypes:@[NSStringPboardType, ZGVariablePboardType]
 	 owner:self];
 	
 	NSMutableArray *linesToWrite = [[NSMutableArray alloc] init];
-	NSArray *variablesArray = [self.windowController selectedVariables];
 	
-	for (ZGVariable *variable in variablesArray)
+	for (ZGVariable *variable in variables)
 	{
-		[linesToWrite addObject:[@[variable.name, variable.addressStringValue, variable.stringValue] componentsJoinedByString:@"\t"]];
+		[linesToWrite addObject:[@[variable.shortInfo, variable.addressStringValue, variable.stringValue] componentsJoinedByString:@"\t"]];
 	}
 	
 	[NSPasteboard.generalPasteboard
@@ -178,8 +181,13 @@
 	 forType:NSStringPboardType];
 	
 	[NSPasteboard.generalPasteboard
-	 setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray]
+	 setData:[NSKeyedArchiver archivedDataWithRootObject:variables]
 	 forType:ZGVariablePboardType];
+}
+
+- (void)copyVariables
+{
+	[[self class] copyVariablesToPasteboard:[self.windowController selectedVariables]];
 }
 
 - (void)pasteVariables
