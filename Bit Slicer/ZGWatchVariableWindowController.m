@@ -219,10 +219,10 @@
 	NSMutableArray *registerDescriptions = [NSMutableArray array];
 	for (ZGVariable *variable in registerVariables)
 	{
-		[registerDescriptions addObject:[NSString stringWithFormat:@"%@: %@", variable.name, variable.stringValue]];
+		[registerDescriptions addObject:[NSString stringWithFormat:@"%@: %@", variable.description, variable.stringValue]];
 	}
 	
-	instruction.variable.name = [NSString stringWithFormat:@"%@\n%@", instruction.variable.name, [registerDescriptions componentsJoinedByString:@"\n"]];
+	instruction.variable.description = [NSString stringWithFormat:@"%@\n%@", instruction.variable.description, [registerDescriptions componentsJoinedByString:@"\n"]];
 	instruction.variable.enabled = YES;
 	
 	[self.foundVariables addObject:instruction.variable];
@@ -323,7 +323,7 @@
 	}
 	else if ([tableColumn.identifier isEqualToString:@"instruction"])
 	{
-		NSArray *lines = [variable.name componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+		NSArray *lines = [variable.description componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 		if (lines.count > 0)
 		{
 			return [lines objectAtIndex:0];

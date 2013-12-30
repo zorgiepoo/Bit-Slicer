@@ -427,7 +427,7 @@
 	if (tableView == self.variablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
 	{
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
-		if ([tableColumn.identifier isEqualToString:@"name"])
+		if ([tableColumn.identifier isEqualToString:@"description"])
 		{
 			return variable.shortInfo;
 		}
@@ -548,7 +548,7 @@
 		}
 		return NO;
 	}
-	else if ([tableColumn.identifier isEqualToString:@"name"])
+	else if ([tableColumn.identifier isEqualToString:@"description"])
 	{
 		[self.windowController requestEditingVariableDescription:nil];
 		return NO;

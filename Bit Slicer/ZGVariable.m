@@ -85,7 +85,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	 forKey:ZGQualifierKey];
 	
 	[coder
-	 encodeObject:self.name
+	 encodeObject:self.description
 	 forKey:ZGNameKey];
 	
 	[coder
@@ -132,8 +132,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	self.usesDynamicAddress = [coder decodeBoolForKey:ZGDynamicAddressKey];
 	[self setAddressFormula:[coder decodeObjectForKey:ZGAddressFormulaKey]];
 	
-	NSString *variableName = [coder decodeObjectForKey:ZGNameKey];
-	[self setName:variableName != nil ? variableName : @""];
+	NSString *variableDescription = [coder decodeObjectForKey:ZGNameKey];
+	[self setDescription:variableDescription != nil ? variableDescription : @""];
 	
 	NSUInteger returnedLength = 0;
 	const uint8_t *buffer =
@@ -204,12 +204,12 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return size;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name enabled:(BOOL)enabled
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSString *)description enabled:(BOOL)enabled
 {
 	if ((self = [super init]))
 	{
 		self.size = size;
-		self.type = aType;
+		self.type = type;
 		
 		if (!self.size)
 		{
@@ -228,23 +228,23 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			self.value = value;
 		}
 		
-		if (name != nil)
+		if (description != nil)
 		{
-			self.name = name;
+			self.description = description;
 		}
 	}
 	
 	return self;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize name:(NSString *)name
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSString *)description
 {
-	return [self initWithValue:value size:size address:address type:aType qualifier:qualifier pointerSize:pointerSize name:name enabled:YES];
+	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:description enabled:YES];
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)aType qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize
 {
-	return [self initWithValue:value size:size address:address type:aType qualifier:qualifier pointerSize:pointerSize name:@""];
+	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:@""];
 }
 
 - (void)dealloc
@@ -488,8 +488,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (NSString *)shortInfo
 {
-	NSArray *lines = [self.name componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-	if (lines.count <= 1) return self.name;
+	NSArray *lines = [self.description componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+	if (lines.count <= 1) return self.description;
 	
 	return [[lines objectAtIndex:0] stringByAppendingString:@"…"];
 }

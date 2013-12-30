@@ -132,7 +132,7 @@
 }
 
 #define ADD_AVX_REGISTER(array, avxState, pointerSize, registerName) \
-[array addObject:[[ZGVariable alloc] initWithValue:&avxState.ufs.as64.__fpu_##registerName size:sizeof(avxState.ufs.as64.__fpu_##registerName) address:0 type:ZGByteArray qualifier:0 pointerSize:pointerSize name:@(#registerName) enabled:NO]]
+[array addObject:[[ZGVariable alloc] initWithValue:&avxState.ufs.as64.__fpu_##registerName size:sizeof(avxState.ufs.as64.__fpu_##registerName) address:0 type:ZGByteArray qualifier:0 pointerSize:pointerSize description:@(#registerName) enabled:NO]]
 
 + (NSArray *)registerVariablesFromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit
 {
@@ -215,7 +215,7 @@
 }
 
 #define ADD_GENERAL_REGISTER(array, threadState, _pointerSize, registerName, structureType) \
-[array addObject:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:sizeof(threadState.uts.structureType.__##registerName) address:threadState.uts.structureType.__##registerName type:ZGByteArray qualifier:0 pointerSize:_pointerSize name:@(#registerName) enabled:NO]]
+[array addObject:[[ZGVariable alloc] initWithValue:&threadState.uts.structureType.__##registerName size:sizeof(threadState.uts.structureType.__##registerName) address:threadState.uts.structureType.__##registerName type:ZGByteArray qualifier:0 pointerSize:_pointerSize description:@(#registerName) enabled:NO]]
 
 #define ADD_GENERAL_REGISTER_32(array, threadState, registerName) ADD_GENERAL_REGISTER(array, threadState, sizeof(int32_t), registerName, ts32)
 #define ADD_GENERAL_REGISTER_64(array, threadState, registerName) ADD_GENERAL_REGISTER(array, threadState, sizeof(int64_t), registerName, ts64)
@@ -316,7 +316,7 @@
 			
 			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterGeneralPurpose variable:registerVariable pointerSize:pointerSize];
 			
-			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
+			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.description];
 			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
 			{
 				[newRegister.variable setType:[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
@@ -345,7 +345,7 @@
 		{
 			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterAVX variable:registerVariable pointerSize:pointerSize];
 			
-			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
+			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.description];
 			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
 			{
 				[newRegister.variable setType:[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
@@ -369,7 +369,7 @@
 	[theRegister.variable setValue:[theRegister copyOfValue]];
 	
 	NSMutableDictionary *registerTypesDictionary = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES]];
-	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.name];
+	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.description];
 	[[NSUserDefaults standardUserDefaults] setObject:registerTypesDictionary forKey:ZG_REGISTER_TYPES];
 	
 	[[self.debuggerController.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
@@ -392,7 +392,7 @@
 		return NO;
 	}
 	
-	NSString *registerName = theRegister.variable.name;
+	NSString *registerName = theRegister.variable.description;
 	if ([registerName isEqualToString:@"fcw"])
 	{
 		WRITE_AVX_STATE(avxState, newVariable, fcw);
@@ -473,18 +473,18 @@
 	if (self.breakPoint.process.is64Bit)
 	{
 		NSArray *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
-		if ([registers64 containsObject:theRegister.variable.name])
+		if ([registers64 containsObject:theRegister.variable.description])
 		{
-			memcpy((uint64_t *)&threadState.uts.ts64 + [registers64 indexOfObject:theRegister.variable.name], newVariable.value, MIN(newVariable.size, sizeof(uint64_t)));
+			memcpy((uint64_t *)&threadState.uts.ts64 + [registers64 indexOfObject:theRegister.variable.description], newVariable.value, MIN(newVariable.size, sizeof(uint64_t)));
 			shouldWriteRegister = YES;
 		}
 	}
 	else
 	{
 		NSArray *registers32 = @[@"eax", @"ebx", @"ecx", @"edx", @"edi", @"esi", @"ebp", @"esp", @"ss", @"eflags", @"eip", @"cs", @"ds", @"es", @"fs", @"gs"];
-		if ([registers32 containsObject:theRegister.variable.name])
+		if ([registers32 containsObject:theRegister.variable.description])
 		{
-			memcpy((uint32_t *)&threadState.uts.ts32 + [registers32 indexOfObject:theRegister.variable.name], newVariable.value, MIN(newVariable.size, sizeof(uint32_t)));
+			memcpy((uint32_t *)&threadState.uts.ts32 + [registers32 indexOfObject:theRegister.variable.description], newVariable.value, MIN(newVariable.size, sizeof(uint32_t)));
 			shouldWriteRegister = YES;
 		}
 	}
@@ -499,11 +499,11 @@
 	
 	theRegister.variable = newVariable;
 	
-	if ([theRegister.variable.name isEqualToString:@"rip"])
+	if ([theRegister.variable.description isEqualToString:@"rip"])
 	{
 		self.programCounter = *(uint64_t *)theRegister.value;
 	}
-	else if ([theRegister.variable.name isEqualToString:@"eip"])
+	else if ([theRegister.variable.description isEqualToString:@"eip"])
 	{
 		self.programCounter = *(uint32_t *)theRegister.value;
 	}
@@ -554,7 +554,7 @@
 		ZGRegister *theRegister = [self.registers objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
-			result = theRegister.variable.name;
+			result = theRegister.variable.description;
 		}
 		else if ([tableColumn.identifier isEqualToString:@"value"])
 		{
@@ -591,7 +591,7 @@
 				  type:theRegister.variable.type
 				  qualifier:theRegister.variable.qualifier
 				  pointerSize:self.breakPoint.process.pointerSize
-				  name:theRegister.variable.name
+				  description:theRegister.variable.description
 				  enabled:NO]];
 				
 				free(newValue);
@@ -677,7 +677,7 @@
 	
 	for (ZGRegister *theRegister in self.selectedRegisters)
 	{
-		[descriptionComponents addObject:[@[theRegister.variable.name, theRegister.variable.stringValue] componentsJoinedByString:@"\t"]];
+		[descriptionComponents addObject:[@[theRegister.variable.description, theRegister.variable.stringValue] componentsJoinedByString:@"\t"]];
 		[variablesArray addObject:theRegister.variable];
 	}
 	

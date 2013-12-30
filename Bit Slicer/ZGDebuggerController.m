@@ -456,7 +456,7 @@ enum ZGStepExecution
 			instruction = [[ZGInstruction alloc] init];
 			instruction.text = instructionText;
 			instruction.mnemonic = instructionMnemonic;
-			ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:pointerSize name:instruction.text enabled:NO];
+			ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:pointerSize description:instruction.text enabled:NO];
 			instruction.variable = variable;
 		}
 	}
@@ -590,7 +590,7 @@ enum ZGStepExecution
 				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 					newInstruction.text = disassembledText;
-					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text enabled:NO];
+					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize description:newInstruction.text enabled:NO];
 					newInstruction.mnemonic = mnemonic;
 					
 					[instructionsToReplace addObject:newInstruction];
@@ -663,7 +663,7 @@ enum ZGStepExecution
 			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 				newInstruction.text = disassembledText;
-				newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text enabled:NO];
+				newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize description:newInstruction.text enabled:NO];
 				newInstruction.mnemonic = mnemonic;
 				
 				[instructionsToAdd addObject:newInstruction];
@@ -727,7 +727,7 @@ enum ZGStepExecution
 				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
 					newInstruction.text = disassembledText;
-					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:newInstruction.text enabled:NO];
+					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize description:newInstruction.text enabled:NO];
 					newInstruction.mnemonic = mnemonic;
 					
 					[instructionsToAdd addObject:newInstruction];
@@ -836,7 +836,7 @@ enum ZGStepExecution
 			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
 				ZGInstruction *instruction = [[ZGInstruction alloc] init];
 				instruction.text = disassembledText;
-				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize name:instruction.text enabled:NO];
+				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize description:instruction.text enabled:NO];
 				instruction.mnemonic = mnemonic;
 				
 				[newInstructions addObject:instruction];

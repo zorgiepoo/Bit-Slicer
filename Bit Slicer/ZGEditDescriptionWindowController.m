@@ -64,7 +64,7 @@
 {
 	[self window]; // ensure window is loaded
 	
-	[self.descriptionTextView.textStorage.mutableString setString:variable.name];
+	[self.descriptionTextView.textStorage.mutableString setString:variable.description];
 	self.variable = variable;
 	
 	[NSApp
@@ -77,7 +77,7 @@
 
 - (IBAction)editVariableDescription:(id)sender
 {
-	[self.variableController changeVariable:self.variable newName:self.descriptionTextView.textStorage.mutableString];
+	[self.variableController changeVariable:self.variable newDescription:self.descriptionTextView.textStorage.mutableString];
 	[NSApp endSheet:self.window];
 	[self.window close];
 }

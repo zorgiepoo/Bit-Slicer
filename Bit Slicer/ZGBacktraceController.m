@@ -136,11 +136,11 @@
 		if (!instruction.symbols || [instruction.symbols isEqualToString:@""])
 		{
 			instruction.symbols = @"";
-			instruction.variable.name = instruction.variable.addressStringValue;
+			instruction.variable.description = instruction.variable.addressStringValue;
 		}
 		else
 		{
-			instruction.variable.name = instruction.symbols;
+			instruction.variable.description = instruction.symbols;
 		}
 	}
 	
@@ -189,7 +189,7 @@
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"backtrace"])
 		{
-			result = instruction.variable.name;
+			result = instruction.variable.description;
 		}
 	}
 	

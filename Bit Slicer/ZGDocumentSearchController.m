@@ -417,7 +417,7 @@
 		if (userTagDescription != nil) [validNameComponents addObject:userTagDescription];
 		if (protectionDescription != nil) [validNameComponents addObject:protectionDescription];
 		
-		newVariable.name = [validNameComponents componentsJoinedByString:@", "];
+		newVariable.description = [validNameComponents componentsJoinedByString:@", "];
 		
 		[newVariables addObject:newVariable];
 	}];

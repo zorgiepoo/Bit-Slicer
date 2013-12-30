@@ -62,7 +62,7 @@
 
 - (void)nopVariables:(NSArray *)variables;
 
-- (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName;
+- (void)changeVariable:(ZGVariable *)variable newDescription:(NSString *)newDescription;
 - (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size;
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag;
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;

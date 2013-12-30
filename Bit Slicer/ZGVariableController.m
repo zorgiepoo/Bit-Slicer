@@ -358,7 +358,7 @@
 		 type:variableType
 		 qualifier:qualifier
 		 pointerSize:self.windowController.currentProcess.pointerSize
-		 name:@""
+		 description:@""
 		 enabled:NO];
 	
 	[self
@@ -422,14 +422,14 @@
 	}
 }
 
-- (void)changeVariable:(ZGVariable *)variable newName:(NSString *)newName
+- (void)changeVariable:(ZGVariable *)variable newDescription:(NSString *)newDescription
 {
 	self.windowController.undoManager.actionName = @"Name Change";
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
-	 newName:variable.name];
+	 newDescription:variable.description];
 	
-	variable.name = newName;
+	variable.description = newDescription;
 	
 	if (self.windowController.undoManager.isUndoing || self.windowController.undoManager.isRedoing)
 	{
