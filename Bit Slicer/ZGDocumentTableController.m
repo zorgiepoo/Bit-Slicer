@@ -554,15 +554,11 @@
 	}
 	else if ([tableColumn.identifier isEqualToString:@"address"])
 	{
-		if (variable.type == ZGScript)
-		{
-			return NO;
-		}
-		else if (variable.usesDynamicAddress)
+		if (variable.type != ZGScript)
 		{
 			[self.windowController requestEditingVariableAddress:nil];
-			return NO;
 		}
+		return NO;
 	}
 	
 	return YES;

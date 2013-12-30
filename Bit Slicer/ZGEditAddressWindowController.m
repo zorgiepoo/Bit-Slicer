@@ -64,15 +64,17 @@
 
 - (void)requestEditingAddressFromVariable:(ZGVariable *)variable attachedToWindow:(NSWindow *)parentWindow
 {
+	[self window]; // ensure window is loaded
+	
+	self.variable = variable;
+	self.addressTextField.stringValue = variable.addressFormula;
+	
 	[NSApp
 	 beginSheet:self.window
 	 modalForWindow:parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
-	
-	self.variable = variable;
-	self.addressTextField.stringValue = variable.addressFormula;
 }
 
 - (IBAction)editAddress:(id)sender
