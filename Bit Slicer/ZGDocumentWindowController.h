@@ -83,6 +83,7 @@
 
 - (void)setStatus:(id)status;
 
+- (IBAction)requestEditingVariableDescription:(id)sender;
 - (IBAction)requestEditingVariableAddress:(id)sender;
 
 - (NSIndexSet *)selectedVariableIndexes;

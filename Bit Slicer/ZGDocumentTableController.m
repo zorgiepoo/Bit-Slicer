@@ -461,19 +461,7 @@
 	if (tableView == self.variablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
 	{
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
-		if ([tableColumn.identifier isEqualToString:@"name"])
-		{
-			[self.windowController.variableController
-			 changeVariable:variable
-			 newName:object];
-		}
-		else if ([tableColumn.identifier isEqualToString:@"address"])
-		{
-			[self.windowController.variableController
-			 changeVariable:variable
-			 newAddress:object];
-		}
-		else if ([tableColumn.identifier isEqualToString:@"value"])
+		if ([tableColumn.identifier isEqualToString:@"value"])
 		{
 			[self.windowController.variableController
 			 changeVariable:variable
@@ -558,6 +546,11 @@
 		{
 			[self.windowController requestEditingVariableAddress:nil];
 		}
+		return NO;
+	}
+	else if ([tableColumn.identifier isEqualToString:@"name"])
+	{
+		[self.windowController requestEditingVariableDescription:nil];
 		return NO;
 	}
 	

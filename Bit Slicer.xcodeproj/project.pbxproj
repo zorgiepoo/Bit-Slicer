@@ -127,6 +127,8 @@
 		77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */; };
 		77FFC107186BDA3600122357 /* ZGWatchVariableWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FFC105186BDA3600122357 /* ZGWatchVariableWindowController.m */; };
 		77FFC108186BDA3600122357 /* ZGWatchVariableWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77FFC106186BDA3600122357 /* ZGWatchVariableWindowController.xib */; };
+		77FFC14C18711D2700122357 /* ZGEditDescriptionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77FFC14A18711D2700122357 /* ZGEditDescriptionWindowController.m */; };
+		77FFC14D18711D2700122357 /* ZGEditDescriptionWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77FFC14B18711D2700122357 /* ZGEditDescriptionWindowController.xib */; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -458,6 +460,9 @@
 		77FFC104186BDA3600122357 /* ZGWatchVariableWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGWatchVariableWindowController.h; path = "Bit Slicer/ZGWatchVariableWindowController.h"; sourceTree = "<group>"; };
 		77FFC105186BDA3600122357 /* ZGWatchVariableWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGWatchVariableWindowController.m; path = "Bit Slicer/ZGWatchVariableWindowController.m"; sourceTree = "<group>"; };
 		77FFC106186BDA3600122357 /* ZGWatchVariableWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGWatchVariableWindowController.xib; path = "Bit Slicer/ZGWatchVariableWindowController.xib"; sourceTree = "<group>"; };
+		77FFC14918711D2700122357 /* ZGEditDescriptionWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGEditDescriptionWindowController.h; path = "Bit Slicer/ZGEditDescriptionWindowController.h"; sourceTree = "<group>"; };
+		77FFC14A18711D2700122357 /* ZGEditDescriptionWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditDescriptionWindowController.m; path = "Bit Slicer/ZGEditDescriptionWindowController.m"; sourceTree = "<group>"; };
+		77FFC14B18711D2700122357 /* ZGEditDescriptionWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGEditDescriptionWindowController.xib; path = "Bit Slicer/ZGEditDescriptionWindowController.xib"; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Bit Slicer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bit Slicer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -602,6 +607,9 @@
 				770FABB41849160200C176B7 /* ZGEditSizeWindowController.h */,
 				770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */,
 				770FABB61849160200C176B7 /* ZGEditSizeWindowController.xib */,
+				77FFC14918711D2700122357 /* ZGEditDescriptionWindowController.h */,
+				77FFC14A18711D2700122357 /* ZGEditDescriptionWindowController.m */,
+				77FFC14B18711D2700122357 /* ZGEditDescriptionWindowController.xib */,
 			);
 			name = "Variable Controllers";
 			sourceTree = "<group>";
@@ -1096,6 +1104,7 @@
 				770FABAD1848354100C176B7 /* ZGEditValueWindowController.xib in Resources */,
 				77DA9D0B1800639E00549A37 /* continue.pdf in Resources */,
 				77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */,
+				77FFC14D18711D2700122357 /* ZGEditDescriptionWindowController.xib in Resources */,
 				77F115B317D2EAFE009E002A /* Credits.rtf in Resources */,
 				77988F1C185804AC00476A37 /* container_filled.pdf in Resources */,
 				7743F9C618024CE400DBC19A /* python3.3 in Resources */,
@@ -1127,6 +1136,7 @@
 				773972B217D2E61200B958EE /* _DDFunctionExpression.m in Sources */,
 				773972B317D2E61200B958EE /* _DDFunctionTerm.m in Sources */,
 				773972B417D2E61200B958EE /* _DDFunctionUtilities.m in Sources */,
+				77FFC14C18711D2700122357 /* ZGEditDescriptionWindowController.m in Sources */,
 				773972B517D2E61200B958EE /* _DDGroupTerm.m in Sources */,
 				773972B617D2E61200B958EE /* _DDNumberExpression.m in Sources */,
 				773972B717D2E61200B958EE /* _DDNumberTerm.m in Sources */,

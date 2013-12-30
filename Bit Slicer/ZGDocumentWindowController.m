@@ -38,6 +38,7 @@
 #import "ZGVariableController.h"
 #import "ZGEditValueWindowController.h"
 #import "ZGEditAddressWindowController.h"
+#import "ZGEditDescriptionWindowController.h"
 #import "ZGEditSizeWindowController.h"
 #import "ZGScriptManager.h"
 #import "ZGProcessList.h"
@@ -80,6 +81,7 @@
 
 @property (nonatomic) ZGEditValueWindowController *editValueWindowController;
 @property (nonatomic) ZGEditAddressWindowController *editAddressWindowController;
+@property (nonatomic) ZGEditDescriptionWindowController *editDescriptionWindowController;
 @property (nonatomic) ZGEditSizeWindowController *editSizeWindowController;
 
 @property (nonatomic) AGScopeBarGroup *protectionGroup;
@@ -1472,6 +1474,16 @@
 	}
 	
 	[self.editValueWindowController requestEditingValuesFromVariables:self.selectedVariables withProcessTask:self.currentProcess.processTask attachedToWindow:self.window scriptManager:self.scriptManager];
+}
+
+- (IBAction)requestEditingVariableDescription:(id)sender
+{
+	if (self.editDescriptionWindowController == nil)
+	{
+		self.editDescriptionWindowController = [[ZGEditDescriptionWindowController alloc] initWithVariableController:self.variableController];
+	}
+	
+	[self.editDescriptionWindowController requestEditingDescriptionFromVariable:[self.selectedVariables objectAtIndex:0] attachedToWindow:self.window];
 }
 
 - (IBAction)requestEditingVariableAddress:(id)sender

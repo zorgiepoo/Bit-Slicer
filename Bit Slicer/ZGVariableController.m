@@ -437,21 +437,6 @@
 	}
 }
 
-- (void)changeVariable:(ZGVariable *)variable newAddress:(NSString *)newAddress
-{
-	self.windowController.undoManager.actionName = @"Address Change";
-	[[self.windowController.undoManager prepareWithInvocationTarget:self]
-	 changeVariable:variable
-	 newAddress:variable.addressStringValue];
-	
-	variable.addressStringValue = [ZGCalculator evaluateExpression:newAddress];
-	
-	if (self.windowController.undoManager.isUndoing || self.windowController.undoManager.isRedoing)
-	{
-		[self.windowController.tableController.variablesTableView reloadData];
-	}
-}
-
 - (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size
 {
 	self.windowController.undoManager.actionName = @"Type Change";
