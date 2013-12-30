@@ -83,17 +83,19 @@
 	
 	if (firstNonScriptVariable != nil)
 	{
+		[self window]; // ensure window is loaded
+		
+		self.valueTextField.stringValue = firstNonScriptVariable.stringValue;
+		
+		self.variablesToEdit = variables;
+		self.processTask = processTask;
+		
 		[NSApp
 		 beginSheet:self.window
 		 modalForWindow:parentWindow
 		 modalDelegate:self
 		 didEndSelector:nil
 		 contextInfo:NULL];
-		
-		self.valueTextField.stringValue = firstNonScriptVariable.stringValue;
-		
-		self.variablesToEdit = variables;
-		self.processTask = processTask;
 	}
 }
 

@@ -66,17 +66,19 @@
 
 - (void)requestEditingSizesFromVariables:(NSArray *)variables attachedToWindow:(NSWindow *)parentWindow
 {
+	[self window]; // ensure window is loaded
+	
+	ZGVariable *firstVariable = [variables objectAtIndex:0];
+	self.sizeTextField.stringValue = firstVariable.sizeStringValue;
+	
+	self.variables = variables;
+	
 	[NSApp
 	 beginSheet:self.window
 	 modalForWindow:parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
-	
-	ZGVariable *firstVariable = [variables objectAtIndex:0];
-	self.sizeTextField.stringValue = firstVariable.sizeStringValue;
-	
-	self.variables = variables;
 }
 
 - (IBAction)editVariablesSizes:(id)sender
