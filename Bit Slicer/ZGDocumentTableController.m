@@ -576,6 +576,22 @@
 	{
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:row];
 		
+		if (variable.name.length < [[variable.description string] length])
+		{
+			NSArray *lines = [[variable.description string] componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+			NSArray *trimmedLines = [lines subarrayWithRange:NSMakeRange(0, MIN(lines.count, 6U))];
+			NSString *descriptionFromTrimmedLines = [trimmedLines componentsJoinedByString:@"\n"];
+			NSString *trimmedDescription = [descriptionFromTrimmedLines substringWithRange:NSMakeRange(0, MIN(descriptionFromTrimmedLines.length, 100U))];
+			if (trimmedDescription.length < [[variable.description string] length])
+			{
+				trimmedDescription = [trimmedDescription stringByAppendingString:@"…"];
+			}
+			
+			[displayComponents addObject:@"Description:"];
+			[displayComponents addObject:trimmedDescription];
+			[displayComponents addObject:@""];
+		}
+		
 		if (variable.usesDynamicAddress)
 		{
 			[displayComponents addObject:[NSString stringWithFormat:@"Address: %@", variable.addressFormula]];
@@ -632,7 +648,7 @@
 		}
 	}
 	
-	return [displayComponents componentsJoinedByString:@"\n"];
+	return [[displayComponents componentsJoinedByString:@"\n"] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 }
 
 @end
