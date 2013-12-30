@@ -44,7 +44,8 @@ typedef void(^program_counter_change_t)(void);
 
 @property (nonatomic, assign) ZGMemoryAddress programCounter;
 
-+ (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState avxThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;
++ (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
++ (NSArray *)registerVariablesFromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;
 
 - (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
 

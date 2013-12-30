@@ -64,7 +64,8 @@
 {
 	[self window]; // ensure window is loaded
 	
-	[self.descriptionTextView.textStorage.mutableString setString:variable.description];
+	[self.descriptionTextView.textStorage setAttributedString:variable.description];
+	[self.descriptionTextView scrollRangeToVisible:NSMakeRange(0, 0)];
 	self.variable = variable;
 	
 	[NSApp
@@ -77,7 +78,7 @@
 
 - (IBAction)editVariableDescription:(id)sender
 {
-	[self.variableController changeVariable:self.variable newDescription:self.descriptionTextView.textStorage.mutableString];
+	[self.variableController changeVariable:self.variable newDescription:[self.descriptionTextView.textStorage copy]];
 	[NSApp endSheet:self.window];
 	[self.window close];
 }

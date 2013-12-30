@@ -61,14 +61,15 @@ extern NSString *ZGVariablePboardType;
 @property (nonatomic) void *freezeValue;
 @property (copy, nonatomic) NSString *scriptValue;
 @property (readonly, nonatomic) NSString *sizeStringValue;
-@property (copy, nonatomic) NSString *description;
-@property (nonatomic, readonly) NSString *shortInfo;
+@property (copy, nonatomic) id description;
+@property (nonatomic, readonly) NSString *shortDescription;
+@property (nonatomic, readonly) NSString *name;
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize;
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSString *)description;
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description;
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSString *)description enabled:(BOOL)enabled;
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled;
 
 - (void)updateStringValue;
 

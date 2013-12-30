@@ -194,11 +194,26 @@
 
 - (void)updateAddButton
 {
-	BOOL variableCount = [[self.foundVariables zgFilterUsingBlock:^(ZGVariable *variable) { return variable.enabled; }] count];
+	NSUInteger variableCount = [[self.foundVariables zgFilterUsingBlock:^(ZGVariable *variable) { return variable.enabled; }] count];
 	[self.addButton setEnabled:variableCount > 0];
 }
 
 #pragma mark Watching
+
+- (void)appendDescription:(NSMutableAttributedString *)description withRegisters:(NSArray *)registerVariables registerLabel:(NSString *)registerLabel boldFont:(NSFont *)boldFont
+{
+	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n\n"]];
+	[description appendAttributedString:[[NSAttributedString alloc] initWithString:registerLabel attributes:@{NSFontAttributeName : boldFont}]];
+	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
+	
+	NSMutableArray *registerLines = [NSMutableArray array];
+	for (ZGVariable *variable in registerVariables)
+	{
+		[registerLines addObject:[NSString stringWithFormat:@"%@ = %@", variable.name, variable.stringValue]];
+	}
+	
+	[description appendAttributedString:[[NSAttributedString alloc] initWithString:[registerLines componentsJoinedByString:@"\n"]]];
+}
 
 - (void)dataAddress:(ZGMemoryAddress)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionAddress threadState:(x86_thread_state_t)threadState avxState:(x86_avx_state_t)avxState
 {
@@ -215,14 +230,25 @@
 		return;
 	}
 	
-	NSArray *registerVariables = [ZGRegistersController registerVariablesFromGeneralPurposeThreadState:threadState avxThreadState:avxState is64Bit:self.watchProcess.is64Bit];
-	NSMutableArray *registerDescriptions = [NSMutableArray array];
-	for (ZGVariable *variable in registerVariables)
-	{
-		[registerDescriptions addObject:[NSString stringWithFormat:@"%@: %@", variable.description, variable.stringValue]];
-	}
+	NSFont *userFont = [NSFont userFontOfSize:12];
+	NSFont *boldFont = [[NSFontManager sharedFontManager] fontWithFamily:userFont.familyName traits:NSBoldFontMask weight:0 size:userFont.pointSize];
 	
-	instruction.variable.description = [NSString stringWithFormat:@"%@\n%@", instruction.variable.description, [registerDescriptions componentsJoinedByString:@"\n"]];
+	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:instruction.variable.name];
+	
+	[self
+	 appendDescription:description
+	 withRegisters:[ZGRegistersController registerVariablesFromGeneralPurposeThreadState:threadState is64Bit:self.watchProcess.is64Bit]
+	 registerLabel:@"General Purpose Registers"
+	 boldFont:boldFont];
+	
+	[self
+	 appendDescription:description
+	 withRegisters:[ZGRegistersController registerVariablesFromAVXThreadState:avxState is64Bit:self.watchProcess.is64Bit]
+	 registerLabel:@"Advanced Vector Extension (AVX) Registers"
+	 boldFont:boldFont];
+	
+	instruction.variable.description = description;
+	
 	instruction.variable.enabled = YES;
 	
 	[self.foundVariables addObject:instruction.variable];
@@ -323,11 +349,7 @@
 	}
 	else if ([tableColumn.identifier isEqualToString:@"instruction"])
 	{
-		NSArray *lines = [variable.description componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-		if (lines.count > 0)
-		{
-			return [lines objectAtIndex:0];
-		}
+		return variable.name;
 	}
 	
 	return nil;

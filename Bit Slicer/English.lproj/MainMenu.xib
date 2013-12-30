@@ -392,30 +392,31 @@ CA
                 <menuItem title="Debug" id="930">
                     <menu key="submenu" title="Debug" systemMenu="apple" id="931">
                         <items>
-                            <menuItem title="Show Debugger" keyEquivalent="t" id="950">
+                            <menuItem title="Show Debugger" keyEquivalent="d" id="950">
                                 <connections>
                                     <action selector="openDebugger:" target="695" id="1090"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Show Logs" keyEquivalent="'" id="HuH-Wa-MAW">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="openLogger:" target="695" id="b7r-Gm-Tzp"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1043"/>
-                            <menuItem title="Add Breakpoint" keyEquivalent="b" id="1019">
+                            <menuItem title="Add Breakpoint" keyEquivalent="\" id="1019">
                                 <connections>
                                     <action selector="toggleBreakPoints:" target="-1" id="1038"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove All Breakpoints" keyEquivalent="b" id="1020">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                            <menuItem title="Remove All Breakpoints" keyEquivalent="\" id="1020">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="removeAllBreakPoints:" target="-1" id="1036"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1021"/>
-                            <menuItem title="Continue Execution" keyEquivalent="C" id="1061">
+                            <menuItem title="Continue Execution" keyEquivalent="e" id="1061">
                                 <connections>
                                     <action selector="continueExecution:" target="-1" id="1064"/>
                                 </connections>
@@ -504,12 +505,14 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="878"/>
-                            <menuItem title="Dump Memory in Range…" keyEquivalent="d" id="874">
+                            <menuItem title="Dump Memory in Range…" id="874">
+                                <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="dumpMemoryInRange:" target="-1" id="1055"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Dump All Memory…" keyEquivalent="D" id="875">
+                            <menuItem title="Dump All Memory…" id="875">
+                                <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="dumpAllMemory:" target="-1" id="1056"/>
                                 </connections>
@@ -586,7 +589,7 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VFS-NZ-scG"/>
-                                        <menuItem title="Script" tag="10" keyEquivalent="\" id="24i-VE-23z">
+                                        <menuItem title="Script" tag="10" keyEquivalent="'" id="24i-VE-23z">
                                             <connections>
                                                 <action selector="addVariable:" target="-1" id="2uG-Vo-wFd"/>
                                             </connections>
@@ -654,7 +657,7 @@ CA
                                                 <action selector="showMemoryViewer:" target="-1" id="867"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Debugger" keyEquivalent="T" id="866">
+                                        <menuItem title="Debugger" keyEquivalent="D" id="866">
                                             <connections>
                                                 <action selector="showDebugger:" target="-1" id="1091"/>
                                             </connections>

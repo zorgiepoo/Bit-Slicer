@@ -429,7 +429,7 @@
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"description"])
 		{
-			return variable.shortInfo;
+			return variable.shortDescription;
 		}
 		else if ([tableColumn.identifier isEqualToString:@"address"])
 		{

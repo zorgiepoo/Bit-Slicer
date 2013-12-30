@@ -173,7 +173,7 @@
 	
 	for (ZGVariable *variable in variables)
 	{
-		[linesToWrite addObject:[@[variable.shortInfo, variable.addressStringValue, variable.stringValue] componentsJoinedByString:@"\t"]];
+		[linesToWrite addObject:[@[variable.shortDescription, variable.addressStringValue, variable.stringValue] componentsJoinedByString:@"\t"]];
 	}
 	
 	[NSPasteboard.generalPasteboard
@@ -422,7 +422,7 @@
 	}
 }
 
-- (void)changeVariable:(ZGVariable *)variable newDescription:(NSString *)newDescription
+- (void)changeVariable:(ZGVariable *)variable newDescription:(NSAttributedString *)newDescription
 {
 	self.windowController.undoManager.actionName = @"Name Change";
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
