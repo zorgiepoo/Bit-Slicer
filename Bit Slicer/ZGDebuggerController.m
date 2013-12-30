@@ -1559,18 +1559,29 @@ END_DEBUGGER_CHANGE:
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
-			if (self.selectedInstructions.count > 1)
+			NSArray *targetInstructions = nil;
+			NSArray *selectedInstructions = [self selectedInstructions];
+			ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
+			if (![selectedInstructions containsObject:instruction])
 			{
-				self.shouldIgnoreTableViewSelectionChange = YES;
+				targetInstructions = @[instruction];
+			}
+			else
+			{
+				targetInstructions = selectedInstructions;
+				if (targetInstructions.count > 1)
+				{
+					self.shouldIgnoreTableViewSelectionChange = YES;
+				}
 			}
 			
 			if ([object boolValue])
 			{
-				[self addBreakPointsToInstructions:self.selectedInstructions];
+				[self addBreakPointsToInstructions:targetInstructions];
 			}
 			else
 			{
-				[self removeBreakPointsToInstructions:self.selectedInstructions];
+				[self removeBreakPointsToInstructions:targetInstructions];
 			}
 		}
 	}
