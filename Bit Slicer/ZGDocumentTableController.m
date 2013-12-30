@@ -576,8 +576,14 @@
 	{
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:row];
 		
-		[displayComponents addObject:[NSString stringWithFormat:@"Dynamic Address: %@", variable.addressFormula]];
-		[displayComponents addObject:[NSString stringWithFormat:@"Size in Bytes: %@", variable.sizeStringValue]];
+		if (variable.usesDynamicAddress)
+		{
+			[displayComponents addObject:[NSString stringWithFormat:@"Address: %@", variable.addressFormula]];
+		}
+		if (variable.type == ZGByteArray)
+		{
+			[displayComponents addObject:[NSString stringWithFormat:@"Byte Size: %@", variable.sizeStringValue]];
+		}
 		
 		ZGProcess *currentProcess = self.windowController.currentProcess;
 		if (currentProcess.valid)
@@ -589,7 +595,11 @@
 			{
 				if (variable.address >= memoryProtectionAddress && variable.address + variable.size <= memoryProtectionAddress + memoryProtectionSize)
 				{
-					[displayComponents addObject:[@"Protection: " stringByAppendingString:ZGProtectionDescription(memoryProtection)]];
+					NSString *protectionDescription = ZGProtectionDescription(memoryProtection);
+					if (protectionDescription != nil && [variable.name rangeOfString:protectionDescription].location == NSNotFound)
+					{
+						[displayComponents addObject:[@"Protection: " stringByAppendingString:protectionDescription]];
+					}
 				}
 			}
 			
@@ -598,20 +608,25 @@
 			ZGMemorySize relativeOffset = 0;
 			NSString *sectionName = ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL, currentProcess.cacheDictionary);
 			
-			if (userTagDescription != nil || sectionName != nil)
-			{
-				[displayComponents addObject:@""];
-			}
+			BOOL needsUserTag = userTagDescription != nil && [variable.name rangeOfString:userTagDescription].location == NSNotFound;
+			BOOL needsSectionName = sectionName != nil && [variable.name rangeOfString:sectionName].location == NSNotFound;
 			
-			if (userTagDescription != nil)
+			if (needsUserTag)
 			{
 				[displayComponents addObject:[NSString stringWithFormat:@"Tag: %@", userTagDescription]];
 			}
 			
-			if (sectionName != nil)
+			if (mappedFilePath != nil)
 			{
 				[displayComponents addObject:[NSString stringWithFormat:@"Mapped: %@", mappedFilePath]];
-				[displayComponents addObject:[NSString stringWithFormat:@"Offset: 0x%llX", relativeOffset]];
+				if (!variable.usesDynamicAddress)
+				{
+					[displayComponents addObject:[NSString stringWithFormat:@"Offset: 0x%llX", relativeOffset]];
+				}
+			}
+			
+			if (needsSectionName)
+			{
 				[displayComponents addObject:[NSString stringWithFormat:@"Section: %@", sectionName]];
 			}
 		}
