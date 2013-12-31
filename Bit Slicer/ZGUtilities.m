@@ -337,3 +337,19 @@ NSString *ZGProtectionDescription(ZGMemoryProtection protection)
 	return [protectionAttributes componentsJoinedByString:@""];
 }
 
+void ZGUpdateProcessMenuItem(NSMenuItem *menuItem, NSString *name, pid_t processIdentifier, NSImage *icon)
+{
+	BOOL isDead = (processIdentifier < 0);
+	if (isDead)
+	{
+		menuItem.title = [NSString stringWithFormat:@"%@ (none)", name];
+	}
+	else
+	{
+		menuItem.title = [NSString stringWithFormat:@"%@ (%d)", name, processIdentifier];
+	}
+	
+	NSImage *smallIcon = isDead ? [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy] : [icon copy];
+	smallIcon.size = NSMakeSize(16, 16);
+	menuItem.image = smallIcon;
+}

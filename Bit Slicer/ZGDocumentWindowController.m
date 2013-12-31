@@ -61,6 +61,7 @@
 #import "ZGSearchToken.h"
 #import "ZGDocumentOptionsViewController.h"
 #import "ZGWatchVariableWindowController.h"
+#import "ZGUtilities.h"
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
@@ -106,6 +107,13 @@
 		 forKeyPath:@"runningProcesses"
 		 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 		 context:NULL];
+		
+		// Still need to observe this for reliably fetching icon and localized name
+		[[NSWorkspace sharedWorkspace]
+		 addObserver:self
+		 forKeyPath:@"runningApplications"
+		 options:NSKeyValueObservingOptionNew
+		 context:NULL];
 	}
 	return self;
 }
@@ -117,6 +125,10 @@
 	[[ZGProcessList sharedProcessList]
 	 removeObserver:self
 	 forKeyPath:@"runningProcesses"];
+	
+	[[NSWorkspace sharedWorkspace]
+	 removeObserver:self
+	 forKeyPath:@"runningApplications"];
 	
 	[self.searchController cleanUp];
 	[self.tableController cleanUp];
@@ -601,15 +613,7 @@
 			 postNotificationName:ZGTargetProcessDiedNotification
 			 object:self.currentProcess];
 			
-			self.runningApplicationsPopUpButton.selectedItem.title = [NSString stringWithFormat:@"%@ (none)", self.currentProcess.internalName];
-			
-			// Set the icon to the standard one
-			NSImage *regularAppIcon = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
-			if (regularAppIcon)
-			{
-				regularAppIcon.size = NSMakeSize(16, 16);
-				self.runningApplicationsPopUpButton.selectedItem.image = regularAppIcon;
-			}
+			ZGUpdateProcessMenuItem(self.runningApplicationsPopUpButton.selectedItem, self.currentProcess.internalName, -1, nil);
 			
 			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
 		}
@@ -649,13 +653,9 @@
 			{
 				self.currentProcess.processID = newRunningProcess.processIdentifier;
 				self.currentProcess.name = newRunningProcess.name;
-				
 				self.currentProcess.is64Bit = newRunningProcess.is64Bit;
-				menuItem.title = [NSString stringWithFormat:@"%@ (%d)", self.currentProcess.name, self.currentProcess.processID];
 				
-				NSImage *iconImage = [[newRunningProcess icon] copy];
-				iconImage.size = NSMakeSize(16, 16);
-				menuItem.image = iconImage;
+				ZGUpdateProcessMenuItem(menuItem, newRunningProcess.name, newRunningProcess.processIdentifier, newRunningProcess.icon);
 				
 				[self runningApplicationsPopUpButtonRequest:nil];
 				
@@ -667,11 +667,8 @@
 		
 		// Otherwise add the new application
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (%d)", newRunningProcess.name, newRunningProcess.processIdentifier];
 		
-		NSImage *iconImage = [[newRunningProcess icon] copy];
-		iconImage.size = NSMakeSize(16, 16);
-		menuItem.image = iconImage;
+		ZGUpdateProcessMenuItem(menuItem, newRunningProcess.name, newRunningProcess.processIdentifier, newRunningProcess.icon);
 		
 		ZGProcess *representedProcess =
 		[[ZGProcess alloc]
@@ -696,24 +693,48 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (self.document != nil && object == [ZGProcessList sharedProcessList] && self.runningApplicationsPopUpButton.itemArray.count > 0)
+	if (self.document != nil)
 	{
 		NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
 		NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
 		
-		if (newRunningProcesses)
+		if (object == [ZGProcessList sharedProcessList] && self.runningApplicationsPopUpButton.itemArray.count > 0)
 		{
-			for (ZGRunningProcess *runningProcess in newRunningProcesses)
+			if (newRunningProcesses)
 			{
-				[self addRunningProcessToPopupButton:runningProcess];
+				for (ZGRunningProcess *runningProcess in newRunningProcesses)
+				{
+					[self addRunningProcessToPopupButton:runningProcess];
+				}
+			}
+			
+			if (oldRunningProcesses)
+			{
+				for (ZGRunningProcess *runningProcess in oldRunningProcesses)
+				{
+					[self removeRunningProcessFromPopupButton:runningProcess];
+				}
 			}
 		}
-		
-		if (oldRunningProcesses)
+		else if (object == [NSWorkspace sharedWorkspace] && self.runningApplicationsPopUpButton.itemArray.count > 0)
 		{
-			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
+			// ZGProcessList may report processes to us faster than NSRunningApplication can ocasionally
+			// So be sure to get updated localized name and icon
+			for (NSRunningApplication *runningApplication in newRunningProcesses)
 			{
-				[self removeRunningProcessFromPopupButton:runningProcess];
+				for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
+				{
+					ZGProcess *representedProcess = [menuItem representedObject];
+					
+					if (runningApplication.processIdentifier == representedProcess.processID)
+					{
+						representedProcess.name = runningApplication.localizedName;
+						
+						ZGUpdateProcessMenuItem(menuItem, runningApplication.localizedName, runningApplication.processIdentifier, runningApplication.icon);
+						
+						break;
+					}
+				}
 			}
 		}
 	}

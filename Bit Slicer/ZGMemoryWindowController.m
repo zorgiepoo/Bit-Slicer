@@ -39,6 +39,7 @@
 #import "ZGRunningProcess.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
+#import "ZGUtilities.h"
 
 @implementation ZGMemoryWindowController
 
@@ -217,6 +218,13 @@
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	 context:NULL];
 	
+	// Still need to observe this for reliably fetching icon and localized name
+	[[NSWorkspace sharedWorkspace]
+	 addObserver:self
+	 forKeyPath:@"runningApplications"
+	 options:NSKeyValueObservingOptionNew
+	 context:NULL];
+	
 	[[NSNotificationCenter defaultCenter]
 	 addObserver:self
 	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
@@ -230,6 +238,26 @@
 	{
 		[self updateRunningProcesses];
 		[self processListChanged:change];
+	}
+	else if (object == [NSWorkspace sharedWorkspace])
+	{
+		NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
+		
+		// ZGProcessList may report processes to us faster than NSRunningApplication can ocasionally
+		// So be sure to get updated localized name and icon
+		for (NSRunningApplication *runningApplication in newRunningProcesses)
+		{
+			for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
+			{
+				ZGProcess *representedProcess = [menuItem representedObject];
+				if (representedProcess.processID == runningApplication.processIdentifier)
+				{
+					representedProcess.name = runningApplication.localizedName;
+					ZGUpdateProcessMenuItem(menuItem, runningApplication.localizedName, runningApplication.processIdentifier, runningApplication.icon);
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -289,10 +317,8 @@
 		if (runningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
 		{
 			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-			menuItem.title = [NSString stringWithFormat:@"%@ (%d)", runningProcess.name, runningProcess.processIdentifier];
-			NSImage *iconImage = [runningProcess.icon copy];
-			iconImage.size = NSMakeSize(16, 16);
-			menuItem.image = iconImage;
+			ZGUpdateProcessMenuItem(menuItem, runningProcess.name, runningProcess.processIdentifier, runningProcess.icon);
+			
 			ZGProcess *representedProcess =
 				[[ZGProcess alloc]
 				 initWithName:runningProcess.name
@@ -316,10 +342,8 @@
 	if (self.desiredProcessInternalName != nil && ![self.desiredProcessInternalName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject internalName]])
 	{
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (none)", self.desiredProcessInternalName];
-		NSImage *iconImage = [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy];
-		iconImage.size = NSMakeSize(16, 16);
-		menuItem.image = iconImage;
+		ZGUpdateProcessMenuItem(menuItem, self.desiredProcessInternalName, -1, nil);
+		
 		menuItem.representedObject = [[ZGProcess alloc] initWithName:nil internalName:self.desiredProcessInternalName is64Bit:YES];
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];

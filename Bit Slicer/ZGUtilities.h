@@ -56,3 +56,5 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);
 
 NSString *ZGProtectionDescription(ZGMemoryProtection protection);
+
+void ZGUpdateProcessMenuItem(NSMenuItem *menuItem, NSString *name, pid_t processIdentifier, NSImage *icon);
