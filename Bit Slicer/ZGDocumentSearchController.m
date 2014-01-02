@@ -243,10 +243,20 @@
 	[self.windowController setStatus:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
 }
 
-- (void)progressDidAdvance:(ZGSearchProgress *)searchProgress
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
 {
 	if (!self.searchProgress.shouldCancelSearch)
 	{
+		NSUInteger currentVariableCount = self.documentData.variables.count;
+		
+		if (currentVariableCount < MAX_NUMBER_OF_VARIABLES_TO_FETCH && resultSet.length > 0)
+		{
+			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
+			searchResults.tag = self.documentData.selectedDatatypeTag;
+			[self fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH - currentVariableCount fromResults:searchResults];
+			[self.windowController.tableController.variablesTableView reloadData];
+		}
+		
 		[self updateProgressBarFromProgress:searchProgress];
 	}
 }
@@ -316,7 +326,7 @@
 	}
 }
 
-- (void)finalizeSearchWithNotSearchedVariables:(NSArray *)notSearchedVariables
+- (void)finalizeSearchWithOldVariables:(NSArray *)oldVariables andNotSearchedVariables:(NSArray *)notSearchedVariables
 {
 	if (!self.searchProgress.shouldCancelSearch)
 	{
@@ -329,16 +339,21 @@
 			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 		}
 		
-		if (notSearchedVariables.count + self.temporarySearchResults.addressCount != self.documentData.variables.count)
+		if (notSearchedVariables.count + self.temporarySearchResults.addressCount != oldVariables.count)
 		{
 			self.windowController.undoManager.actionName = @"Search";
-			[[self.windowController.undoManager prepareWithInvocationTarget:self.windowController] updateVariables:self.documentData.variables searchResults:self.searchResults];
+			[[self.windowController.undoManager prepareWithInvocationTarget:self.windowController] updateVariables:oldVariables searchResults:self.searchResults];
 			
 			self.searchResults = self.temporarySearchResults;
 			self.documentData.variables = notSearchedVariables;
 			[self fetchVariablesFromResults];
 			[self.windowController.tableController.variablesTableView reloadData];
 		}
+	}
+	else
+	{
+		self.documentData.variables = oldVariables;
+		[self.windowController.tableController.variablesTableView reloadData];
 	}
 	
 	[self.windowController updateObservingProcessOcclusionState];
@@ -643,7 +658,13 @@
 			searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
 		}
 		
-		[self searchVariablesByNarrowing:self.isInNarrowSearchMode withVariables:searchedVariables usingCompletionBlock:^ {
+		BOOL isNarrowing = [self isInNarrowSearchMode];
+		NSArray *oldVariables = self.documentData.variables;
+		
+		self.documentData.variables = notSearchedVariables;
+		[self.windowController.tableController.variablesTableView reloadData];
+		
+		[self searchVariablesByNarrowing:isNarrowing withVariables:searchedVariables usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
 			
 			if (searchDataActivity != nil)
@@ -651,7 +672,7 @@
 				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
 			}
 			
-			[self finalizeSearchWithNotSearchedVariables:notSearchedVariables];
+			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
 		}];
 	}
 }

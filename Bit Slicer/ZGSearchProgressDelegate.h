@@ -39,6 +39,6 @@
 @protocol ZGSearchProgressDelegate <NSObject>
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress;
-- (void)progressDidAdvance:(ZGSearchProgress *)searchProgress;
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet;
 
 @end
