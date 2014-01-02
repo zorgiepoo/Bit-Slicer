@@ -707,7 +707,7 @@
                     <toolbarItem implicitItemIdentifier="DF0FFDE5-A04C-4501-BFC4-CBADF0541044" label="Search" paletteLabel="Search" id="xlb-JZ-GJa">
                         <nil key="toolTip"/>
                         <size key="minSize" width="150" height="22"/>
-                        <size key="maxSize" width="200" height="22"/>
+                        <size key="maxSize" width="250" height="22"/>
                         <tokenField key="view" verticalHuggingPriority="750" id="obS-mO-KvZ" customClass="APTokenSearchField">
                             <rect key="frame" x="0.0" y="14" width="200" height="22"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
