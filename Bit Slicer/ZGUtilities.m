@@ -102,6 +102,29 @@ ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType
 	return dataSize;
 }
 
+static NSArray *ZGByteArrayComponentsFromString(NSString *searchString)
+{
+	NSArray *originalByteArray = [searchString componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+	NSMutableArray *transformedByteArray = [NSMutableArray array];
+	
+	for (NSString *byteString in originalByteArray)
+	{
+		for (NSUInteger byteIndex = 0; byteIndex < byteString.length; byteIndex++)
+		{
+			if (byteIndex % 2 == 1)
+			{
+				[transformedByteArray addObject:[byteString substringWithRange:NSMakeRange(byteIndex - 1, 2)]];
+			}
+			else if (byteIndex == byteString.length - 1)
+			{
+				[transformedByteArray addObject:[byteString substringWithRange:NSMakeRange(byteIndex, 1)]];
+			}
+		}
+	}
+	
+	return transformedByteArray;
+}
+
 void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
 {
 	void *value = NULL;
@@ -233,7 +256,7 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 	
 	else if (dataType == ZGByteArray)
 	{
-		NSArray *bytesArray = [stringValue componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+		NSArray *bytesArray = ZGByteArrayComponentsFromString(stringValue);
 		
 		tempDataSize = bytesArray.count;
 		value = malloc((size_t)tempDataSize);
@@ -293,7 +316,7 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 
 unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue)
 {
-	NSArray *bytesArray = [searchValue componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+	NSArray *bytesArray = ZGByteArrayComponentsFromString(searchValue);
 	
 	unsigned char *data = calloc(1, bytesArray.count * sizeof(unsigned char));
 	
