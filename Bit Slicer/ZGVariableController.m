@@ -211,12 +211,9 @@
 
 - (void)clear
 {
-	self.windowController.searchController.searchResults = nil;
-	NSIndexSet *variableRowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.documentData.variables.count)];
-	NSArray *variablesToRemove = [self.windowController.documentData.variables objectsAtIndexes:variableRowIndexes];
-	[self.windowController.variableController removeVariablesAtRowIndexes:variableRowIndexes];
+	[[self.windowController.undoManager prepareWithInvocationTarget:self.windowController] updateVariables:self.windowController.documentData.variables searchResults:self.windowController.searchController.searchResults];
 	
-	for (ZGVariable *variable in variablesToRemove)
+	for (ZGVariable *variable in self.documentData.variables)
 	{
 		if (variable.type == ZGScript)
 		{
@@ -224,7 +221,8 @@
 		}
 	}
 	
-	[self.windowController.undoManager removeAllActions];
+	self.windowController.documentData.variables = [NSArray array];
+	self.windowController.searchController.searchResults = nil;
 	
 	self.windowController.runningApplicationsPopUpButton.enabled = YES;
 	self.windowController.dataTypesPopUpButton.enabled = YES;
@@ -235,6 +233,10 @@
 	}
 	
 	[self.windowController markDocumentChange];
+	
+	[self.windowController.tableController.variablesTableView reloadData];
+	
+	[self.windowController.undoManager removeAllActions];
 }
 
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
