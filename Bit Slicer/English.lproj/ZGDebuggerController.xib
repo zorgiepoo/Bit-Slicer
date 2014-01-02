@@ -191,7 +191,7 @@
                                             </subviews>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </clipView>
-                                        <scroller key="horizontalScroller" verticalHuggingPriority="750" id="Uyj-zZ-YCW">
+                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="Uyj-zZ-YCW">
                                             <rect key="frame" x="1" y="268" width="818" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
@@ -337,7 +337,7 @@
                                                     </subviews>
                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </clipView>
-                                                <scroller key="horizontalScroller" verticalHuggingPriority="750" id="214">
+                                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="214">
                                                     <rect key="frame" x="1" y="185" width="305" height="16"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </scroller>
@@ -382,7 +382,7 @@
                     </progressIndicator>
                 </subviews>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" displayMode="iconOnly" sizeMode="regular" id="BPq-cf-Fjg">
+            <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" displayMode="iconOnly" sizeMode="regular" id="BPq-cf-Fjg" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="31B40B1D-066A-465E-9326-51493CC4C4EB" label="Back" paletteLabel="Back" id="saO-Gp-UGR">
                         <nil key="toolTip"/>

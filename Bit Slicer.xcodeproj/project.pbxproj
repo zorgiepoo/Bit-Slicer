@@ -54,6 +54,7 @@
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
 		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		777AD8C717D96F30003A5317 /* ZGPyDebugger.m in Sources */ = {isa = PBXBuildFile; fileRef = 777AD8C617D96F30003A5317 /* ZGPyDebugger.m */; };
+		777C34B5187523D0005E64E1 /* ZGNoSmallSizeToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */; };
 		77988F1A185803E800476A37 /* container.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F19185803E800476A37 /* container.pdf */; };
 		77988F1C185804AC00476A37 /* container_filled.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F1B185804AC00476A37 /* container_filled.pdf */; };
 		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
@@ -333,6 +334,8 @@
 		77607AB0185CD50100AC532B /* AGScopeBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AGScopeBar.m; path = deps/AGScopeBar.m; sourceTree = "<group>"; };
 		777AD8C517D96F30003A5317 /* ZGPyDebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyDebugger.h; path = "Bit Slicer/ZGPyDebugger.h"; sourceTree = "<group>"; };
 		777AD8C617D96F30003A5317 /* ZGPyDebugger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyDebugger.m; path = "Bit Slicer/ZGPyDebugger.m"; sourceTree = "<group>"; };
+		777C34B3187523D0005E64E1 /* ZGNoSmallSizeToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGNoSmallSizeToolbar.h; path = "Bit Slicer/ZGNoSmallSizeToolbar.h"; sourceTree = "<group>"; };
+		777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGNoSmallSizeToolbar.m; path = "Bit Slicer/ZGNoSmallSizeToolbar.m"; sourceTree = "<group>"; };
 		77988F19185803E800476A37 /* container.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container.pdf; path = "Bit Slicer/docicons/container.pdf"; sourceTree = "<group>"; };
 		77988F1B185804AC00476A37 /* container_filled.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container_filled.pdf; path = "Bit Slicer/docicons/container_filled.pdf"; sourceTree = "<group>"; };
 		77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLoggerWindowController.h; path = "Bit Slicer/ZGLoggerWindowController.h"; sourceTree = "<group>"; };
@@ -1008,6 +1011,8 @@
 				77F1163117D2EF62009E002A /* ZGCalculator.m */,
 				77F115A617D2E87E009E002A /* VDKQueue.h */,
 				77F115A717D2E87E009E002A /* VDKQueue.m */,
+				777C34B3187523D0005E64E1 /* ZGNoSmallSizeToolbar.h */,
+				777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */,
 				77DC40F917AF218E000626A2 /* DDMathParser */,
 			);
 			name = Utilities;
@@ -1154,6 +1159,7 @@
 				773972C217D2E61200B958EE /* DDParser.m in Sources */,
 				773972C317D2E61200B958EE /* DDParserTypes.m in Sources */,
 				773972C417D2E61200B958EE /* DDTypes.m in Sources */,
+				777C34B5187523D0005E64E1 /* ZGNoSmallSizeToolbar.m in Sources */,
 				773972C517D2E61200B958EE /* NSString+DDMathParsing.m in Sources */,
 				773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */,
 				773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */,

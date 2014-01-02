@@ -632,7 +632,7 @@
                     </button>
                 </subviews>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" displayMode="iconAndLabel" sizeMode="regular" id="UZg-mb-r8g">
+            <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" displayMode="iconAndLabel" sizeMode="regular" id="UZg-mb-r8g" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
