@@ -544,13 +544,27 @@
 	{
 		if (variable.type != ZGScript)
 		{
-			[self.windowController requestEditingVariableAddress:nil];
+			if (![self.windowController.searchController canStartTask])
+			{
+				NSBeep();
+			}
+			else
+			{
+				[self.windowController requestEditingVariableAddress:nil];
+			}
 		}
 		return NO;
 	}
 	else if ([tableColumn.identifier isEqualToString:@"description"])
 	{
-		[self.windowController requestEditingVariableDescription:nil];
+		if (![self.windowController.searchController canStartTask])
+		{
+			NSBeep();
+		}
+		else
+		{
+			[self.windowController requestEditingVariableDescription:nil];
+		}
 		return NO;
 	}
 	
