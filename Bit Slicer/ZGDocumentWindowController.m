@@ -1393,6 +1393,11 @@
 			self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
 			[self markDocumentChange];
 			
+			if (self.documentData.variables.count == 0)
+			{
+				[self.undoManager removeAllActions];
+			}
+			
 			[self.searchController search];
 		}
 	}

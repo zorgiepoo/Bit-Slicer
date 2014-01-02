@@ -235,8 +235,6 @@
 	[self.windowController markDocumentChange];
 	
 	[self.windowController.tableController.variablesTableView reloadData];
-	
-	[self.windowController.undoManager removeAllActions];
 }
 
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
