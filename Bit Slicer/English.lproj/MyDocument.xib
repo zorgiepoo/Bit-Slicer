@@ -128,12 +128,6 @@
                         <action selector="requestEditingVariablesValue:" target="-1" id="ne0-SG-W7g"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Edit Variable Address…" id="100821">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="requestEditingVariableAddress:" target="-1" id="PJF-hI-7uj"/>
-                    </connections>
-                </menuItem>
                 <menuItem title="Edit Variable Size…" id="100822">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
