@@ -1198,7 +1198,7 @@
 	
 	else if (menuItem.action == @selector(requestEditingVariableAddress:))
 	{
-		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([self.searchController canCancelTask] || self.selectedVariables.count != 1 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
