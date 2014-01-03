@@ -458,7 +458,7 @@
 		self.searchData.searchValue = NULL;
 		self.searchData.dataSize = ZGDataSizeFromNumericalDataType(self.windowController.currentProcess.is64Bit, dataType);
 		
-		if (functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)
+		if (functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear || functionType == ZGGreaterThanStoredLinear || functionType == ZGLessThanStoredLinear)
 		{
 			NSMutableArray *stringComponents = [NSMutableArray array];
 			for (id object in self.searchComponents)
@@ -514,15 +514,15 @@
 		if (inputErrorMessage && !flagsFieldIsBlank)
 		{
 			NSString *field =
-				(functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored)
+				(functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)
 				? @"Epsilon"
-				: ((functionType == ZGGreaterThan || functionType == ZGGreaterThanStored) ? @"Below" : @"Above");
+				: ((functionType == ZGGreaterThan || functionType == ZGGreaterThanStored || functionType == ZGGreaterThanStoredLinear) ? @"Below" : @"Above");
 			NSRunAlertPanel(@"Invalid Search Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
 			return NO;
 		}
 		else /* if (!inputErrorMessage || flagsFieldIsBlank) */
 		{
-			if (functionType == ZGGreaterThan || functionType == ZGLessThan || functionType == ZGGreaterThanStored || functionType == ZGLessThanStored)
+			if (functionType == ZGGreaterThan || functionType == ZGLessThan || functionType == ZGGreaterThanStored || functionType == ZGLessThanStored || functionType == ZGGreaterThanStoredLinear || functionType == ZGLessThanStoredLinear)
 			{
 				if (!flagsFieldIsBlank)
 				{
@@ -535,11 +535,11 @@
 					self.searchData.rangeValue = NULL;
 				}
 				
-				if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored)
+				if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored || functionType == ZGGreaterThanStoredLinear)
 				{
 					self.documentData.lastBelowRangeValue = self.windowController.flagsTextField.stringValue;
 				}
-				else if (functionType == ZGLessThan || functionType == ZGLessThanStored)
+				else if (functionType == ZGLessThan || functionType == ZGLessThanStored || functionType == ZGLessThanStoredLinear)
 				{
 					self.documentData.lastAboveRangeValue = self.windowController.flagsTextField.stringValue;
 				}

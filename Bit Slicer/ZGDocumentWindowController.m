@@ -777,7 +777,7 @@
 {
 	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
 	
-	if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored)
+	if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored || functionType == ZGGreaterThanStoredLinear)
 	{
 		self.flagsLabel.stringValue = @"Below:";
 		
@@ -790,7 +790,7 @@
 			self.flagsTextField.stringValue = @"";
 		}
 	}
-	else if (functionType == ZGLessThan || functionType == ZGLessThanStored)
+	else if (functionType == ZGLessThan || functionType == ZGLessThanStored || functionType == ZGLessThanStoredLinear)
 	{
 		self.flagsLabel.stringValue = @"Above:";
 		
@@ -955,30 +955,16 @@
 		switch (functionType)
 		{
 			case ZGEquals:
-				if (!isLinearlyExpressedStoredValue)
-				{
-					functionType = ZGEqualsStored;
-				}
-				else
-				{
-					functionType = ZGEqualsStoredLinear;
-				}
+				functionType = isLinearlyExpressedStoredValue ? ZGEqualsStoredLinear : ZGEqualsStored;
 				break;
 			case ZGNotEquals:
-				if (!isLinearlyExpressedStoredValue)
-				{
-					functionType = ZGNotEqualsStored;
-				}
-				else
-				{
-					functionType = ZGNotEqualsStoredLinear;
-				}
+				functionType = isLinearlyExpressedStoredValue ? ZGNotEqualsStoredLinear : ZGNotEqualsStored;
 				break;
 			case ZGGreaterThan:
-				functionType = ZGGreaterThanStored;
+				functionType = isLinearlyExpressedStoredValue ? ZGGreaterThanStoredLinear : ZGGreaterThanStored;
 				break;
 			case ZGLessThan:
-				functionType = ZGLessThanStored;
+				functionType = isLinearlyExpressedStoredValue ? ZGLessThanStoredLinear : ZGLessThanStored;
 				break;
 			default:
 				break;
@@ -1000,6 +986,8 @@
 		case ZGLessThanStored:
 		case ZGEqualsStoredLinear:
 		case ZGNotEqualsStoredLinear:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThanStoredLinear:
 			isFunctionTypeStore = YES;
 			break;
 		default:
