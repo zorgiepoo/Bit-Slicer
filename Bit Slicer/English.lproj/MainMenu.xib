@@ -671,7 +671,7 @@ CA
                                     <action selector="storeAllValues:" target="-1" id="847"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Search Variable Pointer" keyEquivalent="0" id="dr1-2H-Uqa">
+                            <menuItem title="Search Pointer to Variable" keyEquivalent="0" id="dr1-2H-Uqa">
                                 <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="searchPointerToSelectedVariable:" target="-1" id="0po-QD-OzA"/>

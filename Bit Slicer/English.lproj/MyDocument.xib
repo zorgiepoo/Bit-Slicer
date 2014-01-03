@@ -186,7 +186,7 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="l9Z-vY-NMb"/>
-                <menuItem title="Search Variable Pointer" id="JI2-jh-sbh">
+                <menuItem title="Search Pointer to Variable" id="JI2-jh-sbh">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="searchPointerToSelectedVariable:" target="-1" id="dt8-fE-svx"/>
