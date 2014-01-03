@@ -137,7 +137,7 @@
                 <menuItem title="Edit Variable Size…" id="100822">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="editVariablesSize:" target="-1" id="100827"/>
+                        <action selector="requestEditingVariablesSize:" target="-1" id="gxK-gJ-COt"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="wJr-Wl-pmf"/>
