@@ -334,7 +334,7 @@
 	}
 }
 
-- (void)finalizeSearchWithOldVariables:(NSArray *)oldVariables andNotSearchedVariables:(NSArray *)notSearchedVariables
+- (void)finalizeSearchWithOldVariables:(NSArray *)oldVariables andNotSearchedVariables:(NSArray *)notSearchedVariables allowsNarrowing:(BOOL)allowsNarrowing
 {
 	if (!self.searchProgress.shouldCancelSearch)
 	{
@@ -370,23 +370,30 @@
 	
 	[self.windowController setStatus:nil];
 	
-	BOOL shouldMakeSearchFieldFirstResponder = YES;
-	
-	// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what he was looking for.
-	if (!self.searchProgress.shouldCancelSearch && self.documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
+	if (allowsNarrowing)
 	{
-		NSArray *filteredVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
-			return variable.enabled;
-		}];
+		BOOL shouldMakeSearchFieldFirstResponder = YES;
 		
-		if (filteredVariables.count == 1)
+		// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what he was looking for.
+		if (!self.searchProgress.shouldCancelSearch && self.documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
 		{
-			[self.windowController.window makeFirstResponder:self.windowController.tableController.variablesTableView];
-			shouldMakeSearchFieldFirstResponder = NO;
+			NSArray *filteredVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
+				return variable.enabled;
+			}];
+			
+			if (filteredVariables.count == 1)
+			{
+				[self.windowController.window makeFirstResponder:self.windowController.tableController.variablesTableView];
+				shouldMakeSearchFieldFirstResponder = NO;
+			}
 		}
+		
+		[self resumeFromTaskAndMakeSearchFieldFirstResponder:shouldMakeSearchFieldFirstResponder];
 	}
-	
-	[self resumeFromTaskAndMakeSearchFieldFirstResponder:shouldMakeSearchFieldFirstResponder];
+	else
+	{
+		[self resumeFromTaskAndMakeSearchFieldFirstResponder:NO];
+	}
 }
 
 - (BOOL)retrieveSearchData
@@ -685,7 +692,7 @@
 				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
 			}
 			
-			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
+			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables allowsNarrowing:allowsNarrowing];
 		}];
 	}
 }
