@@ -42,6 +42,122 @@
 #import "ZGSearchResults.h"
 #import <stdint.h>
 
+#pragma mark Function Types
+
+BOOL ZGIsFunctionTypeStore(ZGFunctionType functionType)
+{
+	BOOL isFunctionTypeStore;
+	
+	switch (functionType)
+	{
+		case ZGEqualsStored:
+		case ZGNotEqualsStored:
+		case ZGGreaterThanStored:
+		case ZGLessThanStored:
+		case ZGEqualsStoredLinear:
+		case ZGNotEqualsStoredLinear:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThanStoredLinear:
+			isFunctionTypeStore = YES;
+			break;
+		default:
+			isFunctionTypeStore = NO;
+	}
+	
+	return isFunctionTypeStore;
+}
+
+BOOL ZGIsFunctionTypeLinear(ZGFunctionType functionType)
+{
+	BOOL isFunctionTypeLinear;
+	
+	switch (functionType)
+	{
+		case ZGEqualsStoredLinear:
+		case ZGNotEqualsStoredLinear:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThanStoredLinear:
+			isFunctionTypeLinear = YES;
+			break;
+		default:
+			isFunctionTypeLinear = NO;
+	}
+	
+	return isFunctionTypeLinear;
+}
+
+BOOL ZGIsFunctionTypeEquals(ZGFunctionType functionType)
+{
+	BOOL isFunctionTypeEquals;
+	
+	switch (functionType)
+	{
+		case ZGEquals:
+		case ZGEqualsStored:
+		case ZGEqualsStoredLinear:
+			isFunctionTypeEquals = YES;
+			break;
+		default:
+			isFunctionTypeEquals = NO;
+	}
+	
+	return isFunctionTypeEquals;
+}
+
+BOOL ZGIsFunctionTypeNotEquals(ZGFunctionType functionType)
+{
+	BOOL isFunctionTypeNotEquals;
+	
+	switch (functionType)
+	{
+		case ZGNotEquals:
+		case ZGNotEqualsStored:
+		case ZGNotEqualsStoredLinear:
+			isFunctionTypeNotEquals = YES;
+			break;
+		default:
+			isFunctionTypeNotEquals = NO;
+	}
+	
+	return isFunctionTypeNotEquals;
+}
+
+BOOL ZGIsFunctionTypeGreaterThan(ZGFunctionType functionType)
+{
+	BOOL isFunctionTypeGreaterThan;
+	
+	switch (functionType)
+	{
+		case ZGGreaterThan:
+		case ZGGreaterThanStored:
+		case ZGGreaterThanStoredLinear:
+			isFunctionTypeGreaterThan = YES;
+			break;
+		default:
+			isFunctionTypeGreaterThan = NO;
+	}
+	
+	return isFunctionTypeGreaterThan;
+}
+
+BOOL ZGIsFunctionTypeLessThan(ZGFunctionType functionType)
+{
+	BOOL isFunctionTypeLessThan;
+	
+	switch (functionType)
+	{
+		case ZGLessThan:
+		case ZGLessThanStored:
+		case ZGLessThanStoredLinear:
+			isFunctionTypeLessThan = YES;
+			break;
+		default:
+			isFunctionTypeLessThan = NO;
+	}
+	
+	return isFunctionTypeLessThan;
+}
+
 #pragma mark Boyer Moore Function
 
 // Fast string-searching function from HexFiend's framework

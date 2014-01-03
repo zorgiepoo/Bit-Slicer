@@ -93,8 +93,6 @@
 
 - (ZGVariableType)selectedDataType;
 - (ZGFunctionType)selectedFunctionType;
-- (BOOL)isFunctionTypeStore:(NSInteger)functionTypeTag;
-- (BOOL)isFunctionTypeStore;
 
 - (void)createSearchMenu;
 - (void)deselectSearchField;

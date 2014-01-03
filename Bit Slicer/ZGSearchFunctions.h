@@ -62,6 +62,36 @@ typedef enum
 #ifdef __cplusplus
 extern "C"
 #endif
+BOOL ZGIsFunctionTypeStore(ZGFunctionType functionType);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+BOOL ZGIsFunctionTypeLinear(ZGFunctionType functionType);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+BOOL ZGIsFunctionTypeEquals(ZGFunctionType functionType);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+BOOL ZGIsFunctionTypeNotEquals(ZGFunctionType functionType);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+BOOL ZGIsFunctionTypeGreaterThan(ZGFunctionType functionType);
+
+#ifdef __cplusplus
+extern "C"
+#endif
+BOOL ZGIsFunctionTypeLessThan(ZGFunctionType functionType);
+
+#ifdef __cplusplus
+extern "C"
+#endif
 ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType);
 
 #ifdef __cplusplus

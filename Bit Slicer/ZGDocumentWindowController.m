@@ -974,34 +974,6 @@
 	return functionType;
 }
 
-- (BOOL)isFunctionTypeStore:(NSInteger)functionTypeTag
-{
-	BOOL isFunctionTypeStore;
-	
-	switch (functionTypeTag)
-	{
-		case ZGEqualsStored:
-		case ZGNotEqualsStored:
-		case ZGGreaterThanStored:
-		case ZGLessThanStored:
-		case ZGEqualsStoredLinear:
-		case ZGNotEqualsStoredLinear:
-		case ZGGreaterThanStoredLinear:
-		case ZGLessThanStoredLinear:
-			isFunctionTypeStore = YES;
-			break;
-		default:
-			isFunctionTypeStore = NO;
-	}
-	
-	return isFunctionTypeStore;
-}
-
-- (BOOL)isFunctionTypeStore
-{
-	return [self isFunctionTypeStore:[self selectedFunctionType]];
-}
-
 - (IBAction)functionTypePopUpButtonRequest:(id)sender
 {
 	self.documentData.functionTypeTag = [sender selectedTag];
@@ -1380,7 +1352,7 @@
 	}
 	else if (self.documentData.searchValue.count > 0 && self.searchController.canStartTask && self.currentProcess.valid)
 	{
-		if (self.isFunctionTypeStore && self.searchData.savedData == nil)
+		if (ZGIsFunctionTypeStore([self selectedFunctionType]) && self.searchData.savedData == nil)
 		{
 			NSRunAlertPanel(@"No Stored Values Available", @"There are no stored values to compare against. Please store values first before proceeding.", nil, nil, nil);
 		}

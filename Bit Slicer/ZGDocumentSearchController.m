@@ -125,7 +125,7 @@
 	
 	if (ZGIsNumericalDataType(dataType))
 	{
-		if (![self.windowController isFunctionTypeStore:self.functionType])
+		if (!ZGIsFunctionTypeStore(self.functionType))
 		{
 			NSString *inputError = [self testSearchComponent:expression];
 			
@@ -213,7 +213,7 @@
 	if (shouldMakeSearchFieldFirstResponder)
 	{
 		[self.windowController.window makeFirstResponder:self.windowController.searchValueTextField];
-		if ([self.windowController isFunctionTypeStore:self.functionType])
+		if (ZGIsFunctionTypeStore(self.functionType))
 		{
 			[self.windowController deselectSearchField];
 		}
@@ -416,7 +416,7 @@
 	
 	ZGFunctionType functionType = self.functionType;
 	
-	self.searchData.shouldCompareStoredValues = [self.windowController isFunctionTypeStore:functionType];
+	self.searchData.shouldCompareStoredValues = ZGIsFunctionTypeStore(functionType);
 	
 	if (!self.searchData.shouldCompareStoredValues)
 	{
@@ -458,7 +458,7 @@
 		self.searchData.searchValue = NULL;
 		self.searchData.dataSize = ZGDataSizeFromNumericalDataType(self.windowController.currentProcess.is64Bit, dataType);
 		
-		if (functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear || functionType == ZGGreaterThanStoredLinear || functionType == ZGLessThanStoredLinear)
+		if (ZGIsFunctionTypeLinear(functionType))
 		{
 			NSMutableArray *stringComponents = [NSMutableArray array];
 			for (id object in self.searchComponents)
@@ -514,15 +514,15 @@
 		if (inputErrorMessage && !flagsFieldIsBlank)
 		{
 			NSString *field =
-				(functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)
+				(ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType))
 				? @"Epsilon"
-				: ((functionType == ZGGreaterThan || functionType == ZGGreaterThanStored || functionType == ZGGreaterThanStoredLinear) ? @"Below" : @"Above");
+				: (ZGIsFunctionTypeGreaterThan(functionType) ? @"Below" : @"Above");
 			NSRunAlertPanel(@"Invalid Search Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
 			return NO;
 		}
 		else /* if (!inputErrorMessage || flagsFieldIsBlank) */
 		{
-			if (functionType == ZGGreaterThan || functionType == ZGLessThan || functionType == ZGGreaterThanStored || functionType == ZGLessThanStored || functionType == ZGGreaterThanStoredLinear || functionType == ZGLessThanStoredLinear)
+			if (ZGIsFunctionTypeGreaterThan(functionType) ||  ZGIsFunctionTypeLessThan(functionType))
 			{
 				if (!flagsFieldIsBlank)
 				{
@@ -535,11 +535,11 @@
 					self.searchData.rangeValue = NULL;
 				}
 				
-				if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored || functionType == ZGGreaterThanStoredLinear)
+				if (ZGIsFunctionTypeGreaterThan(functionType))
 				{
 					self.documentData.lastBelowRangeValue = self.windowController.flagsTextField.stringValue;
 				}
-				else if (functionType == ZGLessThan || functionType == ZGLessThanStored || functionType == ZGLessThanStoredLinear)
+				else if (ZGIsFunctionTypeLessThan(functionType))
 				{
 					self.documentData.lastAboveRangeValue = self.windowController.flagsTextField.stringValue;
 				}
