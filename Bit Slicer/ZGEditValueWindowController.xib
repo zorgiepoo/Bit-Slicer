@@ -32,7 +32,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CiB-b8-3nD">
-                        <rect key="frame" x="18" y="54" width="43" height="17"/>
+                        <rect key="frame" x="18" y="52" width="43" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Value:" id="Hms-LA-Q98">
                             <font key="font" metaFont="system"/>
@@ -75,11 +75,11 @@ Gw
                     <constraint firstItem="CiB-b8-3nD" firstAttribute="leading" secondItem="JWo-B3-gnk" secondAttribute="leading" constant="20" id="GhT-dR-IlD"/>
                     <constraint firstAttribute="bottom" secondItem="ixj-kn-tLy" secondAttribute="bottom" constant="16" id="J9S-xt-OKe"/>
                     <constraint firstAttribute="trailing" secondItem="IUp-Ps-j87" secondAttribute="trailing" constant="20" id="JjY-WB-LjT"/>
+                    <constraint firstItem="CiB-b8-3nD" firstAttribute="top" secondItem="JWo-B3-gnk" secondAttribute="top" constant="22" id="PZO-QH-Dmy"/>
                     <constraint firstItem="IUp-Ps-j87" firstAttribute="leading" secondItem="CiB-b8-3nD" secondAttribute="trailing" constant="8" id="UiM-dj-75e"/>
                     <constraint firstItem="FEU-4G-cDb" firstAttribute="leading" secondItem="ixj-kn-tLy" secondAttribute="trailing" constant="12" id="mnt-D2-ulJ"/>
                     <constraint firstItem="IUp-Ps-j87" firstAttribute="top" secondItem="JWo-B3-gnk" secondAttribute="top" constant="20" id="pNt-6M-d34"/>
                     <constraint firstAttribute="bottom" secondItem="FEU-4G-cDb" secondAttribute="bottom" constant="16" id="sX2-LE-dYZ"/>
-                    <constraint firstItem="CiB-b8-3nD" firstAttribute="top" secondItem="JWo-B3-gnk" secondAttribute="top" constant="20" id="w7H-tn-90e"/>
                 </constraints>
             </view>
         </window>
