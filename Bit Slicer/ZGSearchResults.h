@@ -42,7 +42,10 @@
 @property (nonatomic, readonly) ZGMemorySize pointerSize;
 @property (nonatomic, readonly) ZGMemorySize dataSize;
 @property (nonatomic, readonly) NSArray *resultSets;
+
+// User data fields
 @property (nonatomic) NSInteger tag;
+@property (nonatomic) BOOL enabled;
 
 typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
 

@@ -1059,6 +1059,14 @@
 		}
 	}
 	
+	else if (menuItem.action == @selector(searchPointerToSelectedVariable:))
+	{
+		if (!self.currentProcess.valid || ![self.searchController canStartTask] || self.selectedVariables.count != 1)
+		{
+			return NO;
+		}
+	}
+	
 	else if (menuItem.action == @selector(insertStoredValueToken:))
 	{
 		if (self.searchData.savedData == nil)

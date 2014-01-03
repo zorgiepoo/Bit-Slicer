@@ -61,6 +61,7 @@
 
 @property (nonatomic) ZGVariableType dataType;
 @property (nonatomic) ZGFunctionType functionType;
+@property (nonatomic) BOOL allowsNarrowing;
 @property (nonatomic) NSArray *searchComponents;
 
 @end
@@ -261,6 +262,7 @@
 		{
 			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
 			searchResults.tag = self.dataType;
+			searchResults.enabled = self.allowsNarrowing;
 			[self fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH - currentVariableCount fromResults:searchResults];
 			[self.windowController.tableController.variablesTableView reloadData];
 		}
@@ -295,6 +297,7 @@
 	ZGMemorySize pointerSize = currentProcess.pointerSize;
 	
 	ZGMemorySize dataSize = searchResults.dataSize;
+	BOOL enabled = searchResults.enabled;
 	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
 		ZGVariable *newVariable =
 		[[ZGVariable alloc]
@@ -304,6 +307,8 @@
 		 type:(ZGVariableType)searchResults.tag
 		 qualifier:qualifier
 		 pointerSize:pointerSize];
+		
+		newVariable.enabled = enabled;
 		
 		[newVariables addObject:newVariable];
 	}];
@@ -334,7 +339,7 @@
 	}
 }
 
-- (void)finalizeSearchWithOldVariables:(NSArray *)oldVariables andNotSearchedVariables:(NSArray *)notSearchedVariables allowsNarrowing:(BOOL)allowsNarrowing
+- (void)finalizeSearchWithOldVariables:(NSArray *)oldVariables andNotSearchedVariables:(NSArray *)notSearchedVariables
 {
 	if (!self.searchProgress.shouldCancelSearch)
 	{
@@ -370,7 +375,7 @@
 	
 	[self.windowController setStatus:nil];
 	
-	if (allowsNarrowing)
+	if (self.allowsNarrowing)
 	{
 		BOOL shouldMakeSearchFieldFirstResponder = YES;
 		
@@ -605,7 +610,7 @@
 	return YES;
 }
 
-- (void)searchVariablesByNarrowing:(BOOL)isNarrowing withVariables:(NSArray *)narrowVariables usingCompletionBlock:(dispatch_block_t)completeSearchBlock
+- (void)searchVariables:(NSArray *)variables byNarrowing:(BOOL)isNarrowing usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGProcess *currentProcess = self.windowController.currentProcess;
 	ZGVariableType dataType = self.dataType;
@@ -613,7 +618,7 @@
 	if (isNarrowing)
 	{
 		NSMutableData *firstResultSets = [NSMutableData data];
-		for (ZGVariable *variable in narrowVariables)
+		for (ZGVariable *variable in variables)
 		{
 			if (self.searchData.pointerSize == sizeof(ZGMemoryAddress))
 			{
@@ -640,6 +645,7 @@
 		}
 		
 		self.temporarySearchResults.tag = dataType;
+		self.temporarySearchResults.enabled = self.allowsNarrowing;
 		
 		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
 	});
@@ -650,6 +656,7 @@
 	self.dataType = dataType;
 	self.functionType = functionType;
 	self.searchComponents = searchComponents;
+	self.allowsNarrowing = allowsNarrowing;
 	
 	if ([self retrieveSearchData])
 	{
@@ -684,7 +691,7 @@
 		self.documentData.variables = notSearchedVariables;
 		[self.windowController.tableController.variablesTableView reloadData];
 		
-		[self searchVariablesByNarrowing:isNarrowingSearch withVariables:searchedVariables usingCompletionBlock:^ {
+		[self searchVariables:searchedVariables byNarrowing:isNarrowingSearch usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
 			
 			if (searchDataActivity != nil)
@@ -692,7 +699,7 @@
 				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
 			}
 			
-			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables allowsNarrowing:allowsNarrowing];
+			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
 		}];
 	}
 }
