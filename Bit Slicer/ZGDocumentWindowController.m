@@ -1390,7 +1390,6 @@
 		}
 		else
 		{
-			self.searchData.shouldCompareStoredValues = self.isFunctionTypeStore;
 			[self markDocumentChange];
 			
 			if (self.documentData.variables.count == 0)
@@ -1398,9 +1397,17 @@
 				[self.undoManager removeAllActions];
 			}
 			
-			[self.searchController search];
+			[self.searchController searchComponents:self.documentData.searchValue withDataType:self.selectedDataType functionType:self.selectedFunctionType allowsNarrowing:YES];
 		}
 	}
+}
+
+- (IBAction)searchPointerToSelectedVariable:(id)sender
+{
+	ZGVariable *variable = [self.selectedVariables objectAtIndex:0];
+	
+	[self markDocumentChange];
+	[self.searchController searchComponents:@[variable.addressStringValue] withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO];
 }
 
 - (void)createSearchMenu

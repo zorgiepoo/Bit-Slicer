@@ -630,7 +630,7 @@ CA
                                     <action selector="relativizeVariablesAddress:" target="-1" id="Vo0-8B-DJA"/>
                                 </connections>
                             </menuItem>
-                            <menuItem isSeparatorItem="YES" id="1054"/>
+                            <menuItem isSeparatorItem="YES" id="MzU-P6-Yvq"/>
                             <menuItem title="Watch Variable" id="1047">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Watch Variable" id="1048">
@@ -669,6 +669,12 @@ CA
                             <menuItem title="Store All Values" keyEquivalent="g" id="811">
                                 <connections>
                                     <action selector="storeAllValues:" target="-1" id="847"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Search Pointer" id="dr1-2H-Uqa">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="searchPointerToSelectedVariable:" target="-1" id="0po-QD-OzA"/>
                                 </connections>
                             </menuItem>
                         </items>

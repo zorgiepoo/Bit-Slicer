@@ -46,7 +46,6 @@
 #import "ZGUtilities.h"
 #import "NSArrayAdditions.h"
 #import "ZGDocumentData.h"
-#import "ZGSearchFunctions.h"
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
 #import "ZGVariableController.h"
@@ -59,6 +58,10 @@
 @property (nonatomic) ZGSearchResults *temporarySearchResults;
 @property (nonatomic) NSArray *tempSavedData;
 @property (assign) BOOL isBusy;
+
+@property (nonatomic) ZGVariableType dataType;
+@property (nonatomic) ZGFunctionType functionType;
+@property (nonatomic) NSArray *searchComponents;
 
 @end
 
@@ -117,11 +120,11 @@
 
 - (NSString *)confirmSearchInput:(NSString *)expression
 {
-	ZGVariableType dataType = [self.windowController selectedDataType];
+	ZGVariableType dataType = self.dataType;
 	
 	if (ZGIsNumericalDataType(dataType))
 	{
-		if (![self.windowController isFunctionTypeStore])
+		if (![self.windowController isFunctionTypeStore:self.functionType])
 		{
 			NSString *inputError = [self testSearchComponent:expression];
 			
@@ -142,14 +145,19 @@
 
 #pragma mark Report information
 
+- (BOOL)isVariableNarrowable:(ZGVariable *)variable withDataType:(ZGVariableType)dataType
+{
+	return (variable.enabled && variable.type == dataType && !variable.isFrozen);
+}
+
 - (BOOL)isInNarrowSearchMode
 {
-	ZGVariableType dataType = [self.windowController selectedDataType];
+	ZGVariableType dataType = self.dataType;
 	
 	BOOL goingToNarrowDownSearches = NO;
 	for (ZGVariable *variable in self.documentData.variables)
 	{
-		if (variable.enabled && variable.type == dataType && !variable.isFrozen)
+		if ([self isVariableNarrowable:variable withDataType:dataType])
 		{
 			goingToNarrowDownSearches = YES;
 			break;
@@ -204,7 +212,7 @@
 	if (shouldMakeSearchFieldFirstResponder)
 	{
 		[self.windowController.window makeFirstResponder:self.windowController.searchValueTextField];
-		if (self.windowController.isFunctionTypeStore)
+		if ([self.windowController isFunctionTypeStore:self.functionType])
 		{
 			[self.windowController deselectSearchField];
 		}
@@ -252,7 +260,7 @@
 		if (currentVariableCount < MAX_NUMBER_OF_VARIABLES_TO_FETCH && resultSet.length > 0)
 		{
 			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
-			searchResults.tag = self.documentData.selectedDatatypeTag;
+			searchResults.tag = self.dataType;
 			[self fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH - currentVariableCount fromResults:searchResults];
 			[self.windowController.tableController.variablesTableView reloadData];
 		}
@@ -383,7 +391,7 @@
 
 - (BOOL)retrieveSearchData
 {
-	ZGVariableType dataType = [self.windowController selectedDataType];
+	ZGVariableType dataType = self.dataType;
 	
 	self.searchData.pointerSize = self.windowController.currentProcess.pointerSize;
 	
@@ -393,11 +401,13 @@
 
 	NSString *inputErrorMessage = nil;
 	
-	ZGFunctionType functionType = [self.windowController selectedFunctionType];
+	ZGFunctionType functionType = self.functionType;
 	
-	if (![self.windowController isFunctionTypeStore])
+	self.searchData.shouldCompareStoredValues = [self.windowController isFunctionTypeStore:functionType];
+	
+	if (!self.searchData.shouldCompareStoredValues)
 	{
-		NSString *searchValueInput = [self.documentData.searchValue objectAtIndex:0];
+		NSString *searchValueInput = [self.searchComponents objectAtIndex:0];
 		NSString *finalSearchExpression = ZGIsNumericalDataType(dataType) ? [ZGCalculator evaluateExpression:searchValueInput] : searchValueInput;
 		
 		inputErrorMessage = [self confirmSearchInput:finalSearchExpression];
@@ -438,7 +448,7 @@
 		if (functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)
 		{
 			NSMutableArray *stringComponents = [NSMutableArray array];
-			for (id object in self.documentData.searchValue)
+			for (id object in self.searchComponents)
 			{
 				if ([object isKindOfClass:[ZGSearchToken class]])
 				{
@@ -591,7 +601,7 @@
 - (void)searchVariablesByNarrowing:(BOOL)isNarrowing withVariables:(NSArray *)narrowVariables usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGProcess *currentProcess = self.windowController.currentProcess;
-	ZGVariableType dataType = [self.windowController selectedDataType];
+	ZGVariableType dataType = self.dataType;
 	ZGSearchResults *firstSearchResults = nil;
 	if (isNarrowing)
 	{
@@ -615,11 +625,11 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		if (!isNarrowing)
 		{
-			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self, dataType, self.documentData.qualifierTag, [self.windowController selectedFunctionType]);
+			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self, dataType, self.documentData.qualifierTag, self.functionType);
 		}
 		else
 		{
-			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self, dataType, self.documentData.qualifierTag, [self.windowController selectedFunctionType], firstSearchResults, (self.searchResults.tag == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
+			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self, dataType, self.documentData.qualifierTag, self.functionType, firstSearchResults, (self.searchResults.tag == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
 		}
 		
 		self.temporarySearchResults.tag = dataType;
@@ -628,19 +638,23 @@
 	});
 }
 
-- (void)search
+- (void)searchComponents:(NSArray *)searchComponents withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing
 {
-	ZGVariableType dataType = [self.windowController selectedDataType];
+	self.dataType = dataType;
+	self.functionType = functionType;
+	self.searchComponents = searchComponents;
 	
 	if ([self retrieveSearchData])
 	{
 		NSMutableArray *notSearchedVariables = [[NSMutableArray alloc] init];
 		NSMutableArray *searchedVariables = [[NSMutableArray alloc] init];
 		
+		BOOL isNarrowingSearch = allowsNarrowing && [self isInNarrowSearchMode];
+		
 		// Add all variables whose value should not be searched for, first
 		for (ZGVariable *variable in self.documentData.variables)
 		{
-			if (variable.isFrozen || variable.type != dataType || !variable.enabled)
+			if (!isNarrowingSearch || ![self isVariableNarrowable:variable withDataType:dataType])
 			{
 				[notSearchedVariables addObject:variable];
 			}
@@ -658,13 +672,12 @@
 			searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
 		}
 		
-		BOOL isNarrowing = [self isInNarrowSearchMode];
 		NSArray *oldVariables = self.documentData.variables;
 		
 		self.documentData.variables = notSearchedVariables;
 		[self.windowController.tableController.variablesTableView reloadData];
 		
-		[self searchVariablesByNarrowing:isNarrowing withVariables:searchedVariables usingCompletionBlock:^ {
+		[self searchVariablesByNarrowing:isNarrowingSearch withVariables:searchedVariables usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
 			
 			if (searchDataActivity != nil)

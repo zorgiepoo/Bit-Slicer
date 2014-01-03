@@ -34,6 +34,8 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGSearchProgressDelegate.h"
+#import "ZGVariableTypes.h"
+#import "ZGSearchFunctions.h"
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	 0.33
 
@@ -64,7 +66,7 @@
 - (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables;
 - (void)fetchVariablesFromResults;
 
-- (void)search;
+- (void)searchComponents:(NSArray *)searchComponents withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing;
 - (void)storeAllValues;
 
 - (void)cleanUp;
