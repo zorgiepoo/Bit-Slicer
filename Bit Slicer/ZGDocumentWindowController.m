@@ -1433,7 +1433,7 @@
 		self.advancedOptionsPopover.behavior = NSPopoverBehaviorTransient;
 	}
 	
-	[self.advancedOptionsPopover  showRelativeToRect:[sender bounds] ofView:sender preferredEdge:NSMaxYEdge];
+	[self.advancedOptionsPopover showRelativeToRect:[sender bounds] ofView:sender preferredEdge:NSMaxYEdge];
 }
 
 #pragma mark Variables Handling
