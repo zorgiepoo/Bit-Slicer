@@ -515,7 +515,7 @@
 		{
 			NSString *field =
 				(ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType))
-				? @"Epsilon"
+				? @"Round Error"
 				: (ZGIsFunctionTypeGreaterThan(functionType) ? @"Below" : @"Above");
 			NSRunAlertPanel(@"Invalid Search Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
 			return NO;
