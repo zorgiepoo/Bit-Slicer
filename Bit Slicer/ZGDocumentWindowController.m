@@ -1436,26 +1436,6 @@
 	[self.advancedOptionsPopover  showRelativeToRect:[sender bounds] ofView:sender preferredEdge:NSMaxYEdge];
 }
 
-#pragma mark Bindings
-
-- (IBAction)ignoreDataAlignment:(id)sender
-{
-	self.documentData.ignoreDataAlignment = [sender state];
-	[self markDocumentChange];
-}
-
-- (IBAction)changeBeginningAddressString:(id)sender
-{
-	self.documentData.beginningAddressStringValue = [sender stringValue];
-	[self markDocumentChange];
-}
-
-- (IBAction)changeEndingAddressString:(id)sender
-{
-	self.documentData.endingAddressStringValue = [sender stringValue];
-	[self markDocumentChange];
-}
-
 #pragma mark Variables Handling
 
 - (IBAction)freezeVariables:(id)sender
