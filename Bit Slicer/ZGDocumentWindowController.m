@@ -1398,8 +1398,6 @@
 		}
 		else
 		{
-			[self markDocumentChange];
-			
 			if (self.documentData.variables.count == 0)
 			{
 				[self.undoManager removeAllActions];
@@ -1414,7 +1412,6 @@
 {
 	ZGVariable *variable = [self.selectedVariables objectAtIndex:0];
 	
-	[self markDocumentChange];
 	[self.searchController searchComponents:@[variable.addressStringValue] withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO];
 }
 

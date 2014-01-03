@@ -361,6 +361,7 @@
 			self.documentData.variables = notSearchedVariables;
 			[self fetchVariablesFromResults];
 			[self.windowController.tableController.variablesTableView reloadData];
+			[self.windowController markDocumentChange];
 		}
 	}
 	else
