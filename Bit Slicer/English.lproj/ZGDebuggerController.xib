@@ -382,14 +382,14 @@
                     </progressIndicator>
                 </subviews>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" displayMode="iconOnly" sizeMode="regular" id="BPq-cf-Fjg" customClass="ZGNoSmallSizeToolbar">
+            <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" explicitIdentifier="ZGDebuggerToolbar" displayMode="iconAndLabel" sizeMode="regular" id="BPq-cf-Fjg" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="31B40B1D-066A-465E-9326-51493CC4C4EB" label="Back" paletteLabel="Back" id="saO-Gp-UGR">
+                    <toolbarItem implicitItemIdentifier="31B40B1D-066A-465E-9326-51493CC4C4EB" label="Back/Forward" paletteLabel="Back/Forward" id="saO-Gp-UGR">
                         <nil key="toolTip"/>
                         <size key="minSize" width="53" height="25"/>
                         <size key="maxSize" width="57" height="25"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="vkH-Yd-fy0">
-                            <rect key="frame" x="0.0" y="14" width="53" height="25"/>
+                            <rect key="frame" x="14" y="14" width="53" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <segmentedCell key="cell" alignment="left" style="texturedSquare" trackingMode="momentary" id="4Gz-L1-umm">
                                 <font key="font" metaFont="system"/>
