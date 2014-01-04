@@ -61,12 +61,12 @@
             </view>
             <toolbar key="toolbar" implicitIdentifier="A3F7BBA1-DD73-4795-995D-C645138A3DBB" displayMode="iconOnly" sizeMode="regular" id="6tO-t8-wkk" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="A7558654-1EA6-4021-982D-10521377C75E" label="Back" paletteLabel="Back" id="Z6W-2O-OWd">
+                    <toolbarItem implicitItemIdentifier="A7558654-1EA6-4021-982D-10521377C75E" label="Back/Forward" paletteLabel="Back/Forward" id="Z6W-2O-OWd">
                         <nil key="toolTip"/>
                         <size key="minSize" width="53" height="25"/>
                         <size key="maxSize" width="57" height="25"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="w6k-bm-Myo">
-                            <rect key="frame" x="0.0" y="14" width="53" height="25"/>
+                            <rect key="frame" x="14" y="14" width="53" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <segmentedCell key="cell" alignment="left" style="texturedSquare" trackingMode="momentary" id="KIW-ls-ljL">
                                 <font key="font" metaFont="system"/>
