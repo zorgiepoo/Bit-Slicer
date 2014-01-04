@@ -39,6 +39,7 @@
 
 #define ZGSelectedDataTypeTag @"ZGSelectedDataTypeTag"
 #define ZGQualifierTagKey @"ZGQualifierKey"
+#define ZGByteOrderTagKey @"ZGByteOrderTagKey"
 #define ZGFunctionTypeTagKey @"ZGFunctionTypeTagKey"
 #define ZGProtectionModeKey @"ZGProtectionModeKey"
 #define ZGIgnoreDataAlignmentKey @"ZGIgnoreDataAlignmentKey"

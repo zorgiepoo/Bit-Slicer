@@ -36,6 +36,7 @@
 #import "ZGDocumentWindowController.h"
 #import "ZGDocumentData.h"
 #import "ZGSearchData.h"
+#import "ZGVariable.h"
 
 @interface ZGDocument ()
 
@@ -100,6 +101,10 @@
 	[keyedArchiver
 	 encodeInt32:(int32_t)self.data.qualifierTag
 	 forKey:ZGQualifierTagKey];
+	
+	[keyedArchiver
+	 encodeInt32:(int32_t)self.data.byteOrderTag
+	 forKey:ZGByteOrderTagKey];
     
 	[keyedArchiver
 	 encodeInt32:(int32_t)self.data.functionTypeTag
@@ -185,6 +190,12 @@
 	self.searchData.shouldIgnoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
 	self.data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey]];
 	self.data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
+	
+	self.data.byteOrderTag = [keyedUnarchiver decodeInt32ForKey:ZGByteOrderTagKey];
+	if (self.data.byteOrderTag == ZGByteOrderUnknown)
+	{
+		self.data.byteOrderTag = [ZGVariable nativeByteOrder];
+	}
 	
 	id searchValue = [keyedUnarchiver decodeObjectForKey:ZGSearchValueKey];
 	if (searchValue == nil)

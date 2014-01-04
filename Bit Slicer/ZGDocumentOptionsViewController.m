@@ -103,7 +103,7 @@
 - (IBAction)changeByteOrder:(id)sender
 {
 	ZGByteOrder oldByteOrder = (ZGByteOrder)self.document.data.byteOrderTag;
-	ZGByteOrder newByteOrder = (ZGByteOrder)[(NSMatrix *)sender selectedTag];
+	ZGByteOrder newByteOrder = (ZGByteOrder)[sender selectedTag];
 	
 	if (oldByteOrder != newByteOrder)
 	{

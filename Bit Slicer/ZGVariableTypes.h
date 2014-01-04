@@ -58,7 +58,7 @@ typedef enum
 
 typedef enum
 {
-	ZGByteOrderUnknown,
+	ZGByteOrderUnknown = 0,
 	ZGByteOrderLittleEndian,
 	ZGByteOrderBigEndian
 } ZGByteOrder;
