@@ -473,6 +473,7 @@
 	double *doubleValue = malloc(sizeof(double));
 	void *utf16Value = NULL;
 	void *byteArrayValue = NULL;
+	void *swappedValue = NULL;
 	
 	if (ZGIsNumericalDataType(variable.type))
 	{
@@ -661,7 +662,13 @@
 	}
 	
 	if (newValue != nil)
-	{	
+	{
+		if (variable.byteOrder != [ZGVariable nativeByteOrder])
+		{
+			swappedValue = ZGSwappedValue(self.windowController.currentProcess.is64Bit, newValue, variable.type, writeSize);
+			newValue = swappedValue;
+		}
+		
 		if (variable.isFrozen)
 		{
 			variable.freezeValue = newValue;
@@ -730,6 +737,7 @@
 	free(doubleValue);
 	free(utf16Value);
 	free(byteArrayValue);
+	free(swappedValue);
 }
 
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes
