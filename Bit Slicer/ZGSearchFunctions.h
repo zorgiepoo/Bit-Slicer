@@ -92,6 +92,11 @@ BOOL ZGIsFunctionTypeLessThan(ZGFunctionType functionType);
 #ifdef __cplusplus
 extern "C"
 #endif
+BOOL ZGSupportsSwappingBeforeSearch(ZGFunctionType functionType, ZGVariableType dataType);
+
+#ifdef __cplusplus
+extern "C"
+#endif
 ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType);
 
 #ifdef __cplusplus

@@ -56,4 +56,11 @@ typedef enum
 	ZGUnsigned,
 } ZGVariableQualifier;
 
+typedef enum
+{
+	ZGByteOrderUnknown,
+	ZGByteOrderLittleEndian,
+	ZGByteOrderBigEndian
+} ZGByteOrder;
+
 #endif

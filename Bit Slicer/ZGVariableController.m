@@ -330,6 +330,7 @@
 - (void)addVariable:(id)sender
 {
 	ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
+	ZGByteOrder byteOrder = (ZGByteOrder)self.documentData.byteOrderTag;
 	ZGVariableType variableType = (ZGVariableType)[sender tag];
 	
 	// Try to get an initial address from the debugger or the memory viewer's selection
@@ -360,7 +361,8 @@
 		 qualifier:qualifier
 		 pointerSize:self.windowController.currentProcess.pointerSize
 		 description:@""
-		 enabled:NO];
+		 enabled:NO
+		 byteOrder:byteOrder];
 	
 	[self
 	 addVariables:@[variable]
@@ -602,7 +604,7 @@
 			
 		case ZGByteArray:
 		{
-			NSArray *bytesArray = [stringObject componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+			NSArray *bytesArray = ZGByteArrayComponentsFromString(stringObject);
 			
 			if (variable.size != bytesArray.count)
 			{
@@ -616,7 +618,7 @@
 			
 			if (ZGReadBytes(self.windowController.currentProcess.processTask, variable.address, &oldData, &oldSize))
 			{
-				ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldData size:oldSize address:variable.address type:ZGByteArray qualifier:ZGSigned pointerSize:self.windowController.currentProcess.pointerSize];
+				ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldData size:oldSize address:variable.address type:ZGByteArray qualifier:variable.qualifier pointerSize:self.windowController.currentProcess.pointerSize description:variable.description enabled:variable.enabled byteOrder:variable.byteOrder];
 				
 				oldStringValue = oldVariable.stringValue;
 				

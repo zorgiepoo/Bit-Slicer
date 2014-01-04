@@ -261,7 +261,7 @@
 		if (currentVariableCount < MAX_NUMBER_OF_VARIABLES_TO_FETCH && resultSet.length > 0)
 		{
 			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
-			searchResults.tag = self.dataType;
+			searchResults.dataType = self.dataType;
 			searchResults.enabled = self.allowsNarrowing;
 			[self fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH - currentVariableCount fromResults:searchResults];
 			[self.windowController.tableController.variablesTableView reloadData];
@@ -293,6 +293,7 @@
 	NSMutableArray *newVariables = [NSMutableArray array];
 	
 	ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
+	ZGByteOrder byteOrder = (ZGByteOrder)self.documentData.byteOrderTag;
 	ZGProcess *currentProcess = self.windowController.currentProcess;
 	ZGMemorySize pointerSize = currentProcess.pointerSize;
 	
@@ -304,11 +305,12 @@
 		 initWithValue:NULL
 		 size:dataSize
 		 address:variableAddress
-		 type:(ZGVariableType)searchResults.tag
+		 type:(ZGVariableType)searchResults.dataType
 		 qualifier:qualifier
-		 pointerSize:pointerSize];
-		
-		newVariable.enabled = enabled;
+		 pointerSize:pointerSize
+		 description:@""
+		 enabled:enabled
+		 byteOrder:byteOrder];
 		
 		[newVariables addObject:newVariable];
 	}];
@@ -416,6 +418,8 @@
 	
 	ZGFunctionType functionType = self.functionType;
 	
+	BOOL is64Bit = self.windowController.currentProcess.is64Bit;
+	
 	self.searchData.shouldCompareStoredValues = ZGIsFunctionTypeStore(functionType);
 	
 	if (!self.searchData.shouldCompareStoredValues)
@@ -432,7 +436,7 @@
 		}
 		
 		ZGMemorySize dataSize = 0;
-		self.searchData.searchValue = ZGValueFromString(self.windowController.currentProcess.is64Bit, finalSearchExpression, dataType, &dataSize);
+		self.searchData.searchValue = ZGValueFromString(is64Bit, finalSearchExpression, dataType, &dataSize);
 		
 		if (self.searchData.shouldIncludeNullTerminator)
 		{
@@ -456,7 +460,7 @@
 	else
 	{
 		self.searchData.searchValue = NULL;
-		self.searchData.dataSize = ZGDataSizeFromNumericalDataType(self.windowController.currentProcess.is64Bit, dataType);
+		self.searchData.dataSize = ZGDataSizeFromNumericalDataType(is64Bit, dataType);
 		
 		if (ZGIsFunctionTypeLinear(functionType))
 		{
@@ -493,6 +497,20 @@
 				return NO;
 			}
 		}
+	}
+	
+	if ([ZGVariable nativeByteOrder] != self.documentData.byteOrderTag)
+	{
+		self.searchData.bytesSwapped = YES;
+		if (ZGSupportsSwappingBeforeSearch(functionType, dataType))
+		{
+			self.searchData.swappedValue = ZGSwappedValue(is64Bit, self.searchData.searchValue, dataType, self.searchData.dataSize);
+		}
+	}
+	else
+	{
+		self.searchData.bytesSwapped = NO;
+		self.searchData.swappedValue = NULL;
 	}
 	
 	self.searchData.dataAlignment =
@@ -642,10 +660,10 @@
 		}
 		else
 		{
-			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self, dataType, self.documentData.qualifierTag, self.functionType, firstSearchResults, (self.searchResults.tag == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
+			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self, dataType, self.documentData.qualifierTag, self.functionType, firstSearchResults, (self.searchResults.dataType == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
 		}
 		
-		self.temporarySearchResults.tag = dataType;
+		self.temporarySearchResults.dataType = dataType;
 		self.temporarySearchResults.enabled = self.allowsNarrowing;
 		
 		dispatch_async(dispatch_get_main_queue(), completeSearchBlock);
@@ -694,6 +712,7 @@
 		
 		[self searchVariables:searchedVariables byNarrowing:isNarrowingSearch usingCompletionBlock:^ {
 			self.searchData.searchValue = NULL;
+			self.searchData.swappedValue = NULL;
 			
 			if (searchDataActivity != nil)
 			{

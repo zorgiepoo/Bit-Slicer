@@ -50,7 +50,11 @@ BOOL ZGIsValidNumber(NSString *expression);
 BOOL ZGIsNumericalDataType(ZGVariableType dataType);
 ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType dataType);
 
+NSArray *ZGByteArrayComponentsFromString(NSString *searchString);
+
 void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
+void *ZGSwappedValue(BOOL isProcess64Bit, void *value, ZGVariableType dataType, ZGMemorySize dataSize);
+
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
 unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);

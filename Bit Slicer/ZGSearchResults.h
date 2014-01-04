@@ -44,8 +44,9 @@
 @property (nonatomic, readonly) NSArray *resultSets;
 
 // User data fields
-@property (nonatomic) NSInteger tag;
+@property (nonatomic) int dataType;
 @property (nonatomic) BOOL enabled;
+@property (nonatomic) int byteOrder;
 
 typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
 

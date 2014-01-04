@@ -158,6 +158,77 @@ BOOL ZGIsFunctionTypeLessThan(ZGFunctionType functionType)
 	return isFunctionTypeLessThan;
 }
 
+BOOL ZGSupportsSwappingBeforeSearch(ZGFunctionType functionType, ZGVariableType dataType)
+{
+	return (functionType == ZGEquals || functionType == ZGNotEquals) && (dataType == ZGInt16 || dataType == ZGInt32 || dataType == ZGInt64 || dataType == ZGPointer || dataType == ZGString16);
+}
+
+#pragma mark Byte Order Swapping
+
+template<typename T> T ZGSwapBytes(T value);
+
+template<>
+int8_t ZGSwapBytes<int8_t>(int8_t value)
+{
+	return value;
+}
+
+template<>
+uint8_t ZGSwapBytes<uint8_t>(uint8_t value)
+{
+	return value;
+}
+
+template<>
+int16_t ZGSwapBytes<int16_t>(int16_t value)
+{
+	return CFSwapInt16(value);
+}
+
+template<>
+uint16_t ZGSwapBytes<uint16_t>(uint16_t value)
+{
+	return CFSwapInt16(value);
+}
+
+template<>
+int32_t ZGSwapBytes<int32_t>(int32_t value)
+{
+	return CFSwapInt32(value);
+}
+
+template<>
+uint32_t ZGSwapBytes<uint32_t>(uint32_t value)
+{
+	return CFSwapInt32(value);
+}
+
+template<>
+int64_t ZGSwapBytes<int64_t>(int64_t value)
+{
+	return CFSwapInt64(value);
+}
+
+template<>
+uint64_t ZGSwapBytes<uint64_t>(uint64_t value)
+{
+	return CFSwapInt64(value);
+}
+
+template<>
+float ZGSwapBytes<float>(float value)
+{
+	CFSwappedFloat32 swappedValue = *(CFSwappedFloat32 *)&value;
+	return CFConvertFloat32SwappedToHost(swappedValue);
+}
+
+template<>
+double ZGSwapBytes<double>(double value)
+{
+	CFSwappedFloat64 swappedValue = *(CFSwappedFloat64 *)&value;
+	return CFConvertFloat64SwappedToHost(swappedValue);
+}
+
 #pragma mark Boyer Moore Function
 
 // Fast string-searching function from HexFiend's framework
@@ -446,7 +517,7 @@ ZGSearchResults *ZGSearchWithFunction(bool (*comparisonFunction)(ZGSearchData *,
 ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, id <ZGSearchProgressDelegate> delegate)
 {
 	const unsigned long dataSize = searchData.dataSize;
-	const unsigned char *searchValue = (const unsigned char *)searchData.searchValue;
+	const unsigned char *searchValue = (searchData.bytesSwapped && searchData.swappedValue != NULL) ? (const unsigned char *)searchData.swappedValue : (const unsigned char *)searchData.searchValue;
 	ZGMemorySize pointerSize = searchData.pointerSize;
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	
@@ -489,9 +560,21 @@ bool ZGIntegerEquals(ZGSearchData *__unsafe_unretained searchData, T *variableVa
 }
 
 template <typename T>
+bool ZGIntegerFastSwappedEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	return ZGIntegerEquals(searchData, variableValue, (T *)(searchData->_swappedValue));
+}
+
+template <typename T>
 bool ZGIntegerNotEquals(ZGSearchData * __unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	return !ZGIntegerEquals(searchData, variableValue, compareValue);
+}
+
+template <typename T>
+bool ZGIntegerFastSwappedNotEquals(ZGSearchData * __unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	return !ZGIntegerFastSwappedEquals(searchData, variableValue, compareValue);
 }
 
 template <typename T>
@@ -501,16 +584,56 @@ bool ZGIntegerGreaterThan(ZGSearchData *__unsafe_unretained searchData, T *varia
 }
 
 template <typename T>
+bool ZGIntegerSwappedGreaterThan(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	return ZGIntegerGreaterThan(searchData, &swappedVariableValue, compareValue);
+}
+
+template <typename T>
+bool ZGIntegerSwappedGreaterThanStored(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	return ZGIntegerGreaterThan(searchData, &swappedVariableValue, &swappedCompareValue);
+}
+
+template <typename T>
 bool ZGIntegerLesserThan(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	return (*variableValue < *compareValue) && (searchData->_rangeValue == NULL || *variableValue > *(T *)(searchData->_rangeValue));
 }
 
 template <typename T>
+bool ZGIntegerSwappedLesserThan(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	return ZGIntegerLesserThan(searchData, &swappedVariableValue, compareValue);
+}
+
+template <typename T>
+bool ZGIntegerSwappedLesserThanStored(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	return ZGIntegerLesserThan(searchData, &swappedVariableValue, &swappedCompareValue);
+}
+
+template <typename T>
 bool ZGIntegerEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = (T)(searchData->_multiplicativeConstant * *((T *)compareValue) + *((T *)searchData->_additiveConstant));
+	T newCompareValue = (T)(searchData->_multiplicativeConstant * *compareValue + *((T *)searchData->_additiveConstant));
 	return ZGIntegerEquals(searchData, variableValue, &newCompareValue);
+}
+
+template <typename T>
+bool ZGIntegerSwappedEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T newCompareValue = (T)(searchData->_multiplicativeConstant * swappedCompareValue + *((T *)searchData->_additiveConstant));
+	
+	return ZGIntegerEquals(searchData, &swappedVariableValue, &newCompareValue);
 }
 
 template <typename T>
@@ -521,17 +644,41 @@ bool ZGIntegerNotEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *v
 }
 
 template <typename T>
+bool ZGIntegerSwappedNotEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	return ZGIntegerNotEqualsLinear(searchData, &swappedVariableValue, &swappedCompareValue);
+}
+
+template <typename T>
 bool ZGIntegerGreaterThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	T newCompareValue = (T)(searchData->_multiplicativeConstant * *compareValue + *((T *)searchData->_additiveConstant));
-	return (*variableValue > newCompareValue) && (searchData->_rangeValue == NULL || *variableValue < *(T *)(searchData->_rangeValue));
+	return ZGIntegerGreaterThan(searchData, variableValue, &newCompareValue);
+}
+
+template <typename T>
+bool ZGIntegerSwappedGreaterThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	return ZGIntegerGreaterThanLinear(searchData, &swappedVariableValue, &swappedCompareValue);
 }
 
 template <typename T>
 bool ZGIntegerLesserThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	T newCompareValue = (T)(searchData->_multiplicativeConstant * *compareValue + *((T *)searchData->_additiveConstant));
-	return (*variableValue < newCompareValue) && (searchData->_rangeValue == NULL || *variableValue > *(T *)(searchData->_rangeValue));
+	return ZGIntegerLesserThan(searchData, variableValue, &newCompareValue);
+}
+
+template <typename T>
+bool ZGIntegerSwappedLesserThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	return ZGIntegerLesserThanLinear(searchData, &swappedVariableValue, &swappedCompareValue);
 }
 
 #define ZGHandleIntegerType(functionType, type, integerQualifier, dataType, processTask, searchData, searchProgress, delegate) \
@@ -570,32 +717,110 @@ ZGSearchResults *ZGSearchForIntegers(ZGMemoryMap processTask, ZGSearchData *sear
 	switch (functionType)
 	{
 		case ZGEquals:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerFastSwappedEquals);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerEquals);
+			}
+			break;
 		case ZGEqualsStored:
 			ZGHandleIntegerCase(dataType, ZGIntegerEquals);
 			break;
 		case ZGNotEquals:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerFastSwappedNotEquals);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerNotEquals);
+			}
+			break;
 		case ZGNotEqualsStored:
 			ZGHandleIntegerCase(dataType, ZGIntegerNotEquals);
 			break;
 		case ZGGreaterThan:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerSwappedGreaterThan);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerGreaterThan);
+			}
+			break;
 		case ZGGreaterThanStored:
-			ZGHandleIntegerCase(dataType, ZGIntegerGreaterThan);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerSwappedGreaterThanStored);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerGreaterThan);
+			}
 			break;
 		case ZGLessThan:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerSwappedLesserThan);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerLesserThan);
+			}
+			break;
 		case ZGLessThanStored:
-			ZGHandleIntegerCase(dataType, ZGIntegerLesserThan);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerSwappedLesserThanStored);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerLesserThan);
+			}
 			break;
 		case ZGEqualsStoredLinear:
-			ZGHandleIntegerCase(dataType, ZGIntegerEqualsLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerSwappedEqualsLinear);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerEqualsLinear);
+			}
 			break;
 		case ZGNotEqualsStoredLinear:
-			ZGHandleIntegerCase(dataType, ZGIntegerNotEqualsLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerSwappedNotEqualsLinear);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerNotEqualsLinear);
+			}
 			break;
 		case ZGGreaterThanStoredLinear:
-			ZGHandleIntegerCase(dataType, ZGIntegerGreaterThanLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerSwappedGreaterThanLinear);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerGreaterThanLinear);
+			}
 			break;
 		case ZGLessThanStoredLinear:
-			ZGHandleIntegerCase(dataType, ZGIntegerLesserThanLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerSwappedLesserThanLinear);
+			}
+			else
+			{
+				ZGHandleIntegerCase(dataType, ZGIntegerLesserThanLinear);
+			}
 			break;
 	}
 	
@@ -611,9 +836,36 @@ bool ZGFloatingPointEquals(ZGSearchData *__unsafe_unretained searchData, T *vari
 }
 
 template <typename T>
+bool ZGFloatingPointSwappedEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	return ZGFloatingPointEquals(searchData, &swappedVariableValue, compareValue);
+}
+
+template <typename T>
+bool ZGFloatingPointSwappedEqualsStored(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	return ZGFloatingPointEquals(searchData, &swappedVariableValue, &swappedCompareValue);
+}
+
+template <typename T>
 bool ZGFloatingPointNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	return !ZGFloatingPointEquals(searchData, variableValue, compareValue);
+}
+
+template <typename T>
+bool ZGFloatingPointSwappedNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	return !ZGFloatingPointSwappedEquals(searchData, variableValue, compareValue);
+}
+
+template <typename T>
+bool ZGFloatingPointSwappedNotEqualsStored(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	return !ZGFloatingPointSwappedEqualsStored(searchData, variableValue, compareValue);
 }
 
 template <typename T>
@@ -623,9 +875,39 @@ bool ZGFloatingPointGreaterThan(ZGSearchData *__unsafe_unretained searchData, T 
 }
 
 template <typename T>
+bool ZGFloatingPointSwappedGreaterThan(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	return ZGFloatingPointGreaterThan(searchData, &swappedVariableValue, compareValue);
+}
+
+template <typename T>
+bool ZGFloatingPointSwappedGreaterThanStored(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	return ZGFloatingPointGreaterThan(searchData, &swappedVariableValue, &swappedCompareValue);
+}
+
+template <typename T>
 bool ZGFloatingPointLesserThan(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	return *variableValue < *compareValue && (searchData->_rangeValue == NULL || *variableValue > *(T *)(searchData->_rangeValue));
+}
+
+template <typename T>
+bool ZGFloatingPointSwappedLesserThan(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	return ZGFloatingPointLesserThan(searchData, &swappedVariableValue, compareValue);
+}
+
+template <typename T>
+bool ZGFloatingPointSwappedLesserThanStored(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	return ZGFloatingPointLesserThan(searchData, &swappedVariableValue, &swappedCompareValue);
 }
 
 template <typename T>
@@ -636,6 +918,14 @@ bool ZGFloatingPointEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T
 }
 
 template <typename T>
+bool ZGFloatingPointSwappedEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	return ZGFloatingPointEqualsLinear(searchData, &swappedVariableValue, &swappedCompareValue);
+}
+
+template <typename T>
 bool ZGFloatingPointNotEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	T newCompareValue = (T)(searchData->_multiplicativeConstant * *((T *)compareValue) + *((T *)searchData->_additiveConstant));
@@ -643,17 +933,41 @@ bool ZGFloatingPointNotEqualsLinear(ZGSearchData *__unsafe_unretained searchData
 }
 
 template <typename T>
+bool ZGFloatingPointSwappedNotEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	return ZGFloatingPointNotEqualsLinear(searchData, &swappedVariableValue, &swappedCompareValue);
+}
+
+template <typename T>
 bool ZGFloatingPointGreaterThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	T newCompareValue = (T)(searchData->_multiplicativeConstant * *((T *)compareValue) + *((T *)searchData->_additiveConstant));
-	return *variableValue > newCompareValue && (searchData->_rangeValue == NULL || *variableValue < *(T *)(searchData->_rangeValue));
+	return ZGFloatingPointGreaterThan(searchData, variableValue, &newCompareValue);
+}
+
+template <typename T>
+bool ZGFloatingPointSwappedGreaterThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	return ZGFloatingPointGreaterThan(searchData, &swappedVariableValue, &swappedCompareValue);
 }
 
 template <typename T>
 bool ZGFloatingPointLesserThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	T newCompareValue = (T)(searchData->_multiplicativeConstant * *((T *)compareValue) + *((T *)searchData->_additiveConstant));
-	return *variableValue < newCompareValue && (searchData->_rangeValue == NULL || *variableValue > *(T *)(searchData->_rangeValue));
+	return ZGFloatingPointLesserThan(searchData, variableValue, &newCompareValue);
+}
+
+template <typename T>
+bool ZGFloatingPointSwappedLesserThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	T swappedVariableValue = ZGSwapBytes(*variableValue);
+	T swappedCompareValue = ZGSwapBytes(*compareValue);
+	return ZGFloatingPointLesserThanLinear(searchData, &swappedVariableValue, &swappedCompareValue);
 }
 
 #define ZGHandleType(functionType, type, dataType, processTask, searchData, searchProgress, delegate) \
@@ -675,32 +989,124 @@ ZGSearchResults *ZGSearchForFloatingPoints(ZGMemoryMap processTask, ZGSearchData
 	switch (functionType)
 	{
 		case ZGEquals:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedEquals);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointEquals);
+			}
+			break;
 		case ZGEqualsStored:
-			ZGHandleFloatingPointCase(dataType, ZGFloatingPointEquals);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedEqualsStored);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointEquals);
+			}
 			break;
 		case ZGNotEquals:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedNotEquals);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointNotEquals);
+			}
+			break;
 		case ZGNotEqualsStored:
-			ZGHandleFloatingPointCase(dataType, ZGFloatingPointNotEquals);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedNotEqualsStored);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointNotEquals);
+			}
 			break;
 		case ZGGreaterThan:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedGreaterThan);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointGreaterThan);
+			}
+			break;
 		case ZGGreaterThanStored:
-			ZGHandleFloatingPointCase(dataType, ZGFloatingPointGreaterThan);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedGreaterThanStored);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointGreaterThan);
+			}
 			break;
 		case ZGLessThan:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedLesserThan);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointLesserThan);
+			}
+			break;
 		case ZGLessThanStored:
-			ZGHandleFloatingPointCase(dataType, ZGFloatingPointLesserThan);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedLesserThanStored);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointLesserThan);
+			}
 			break;
 		case ZGEqualsStoredLinear:
-			ZGHandleFloatingPointCase(dataType, ZGFloatingPointEqualsLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedEqualsLinear);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointEqualsLinear);
+			}
 			break;
 		case ZGNotEqualsStoredLinear:
-			ZGHandleFloatingPointCase(dataType, ZGFloatingPointNotEqualsLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedNotEqualsLinear);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointNotEqualsLinear);
+			}
 			break;
 		case ZGGreaterThanStoredLinear:
-			ZGHandleFloatingPointCase(dataType, ZGFloatingPointGreaterThanLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedGreaterThanLinear);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointGreaterThanLinear);
+			}
 			break;
 		case ZGLessThanStoredLinear:
-			ZGHandleFloatingPointCase(dataType, ZGFloatingPointLesserThanLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointSwappedLesserThanLinear);
+			}
+			else
+			{
+				ZGHandleFloatingPointCase(dataType, ZGFloatingPointLesserThanLinear);
+			}
 			break;
 	}
 	
@@ -716,11 +1122,23 @@ bool ZGString8CaseInsensitiveEquals(ZGSearchData *__unsafe_unretained searchData
 }
 
 template <typename T>
+bool ZGString16FastSwappedEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	return ZGByteArrayEquals(searchData, variableValue, searchData->_swappedValue);
+}
+
+template <typename T>
 bool ZGString16CaseInsensitiveEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	Boolean isEqual = false;
 	UCCompareText(searchData->_collator, variableValue, ((size_t)searchData->_dataSize) / sizeof(T), compareValue, ((size_t)searchData->_dataSize) / sizeof(T), (Boolean *)&isEqual, NULL);
 	return isEqual;
+}
+
+template <typename T>
+bool ZGString16FastSwappedCaseInsensitiveEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	return ZGString16CaseInsensitiveEquals(searchData, variableValue, (T *)(searchData->_swappedValue));
 }
 
 template <typename T>
@@ -730,9 +1148,21 @@ bool ZGString8CaseInsensitiveNotEquals(ZGSearchData *__unsafe_unretained searchD
 }
 
 template <typename T>
+bool ZGString16FastSwappedNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	return !ZGString16FastSwappedEquals(searchData, variableValue, compareValue);
+}
+
+template <typename T>
 bool ZGString16CaseInsensitiveNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
 	return !ZGString16CaseInsensitiveEquals(searchData, variableValue, compareValue);
+}
+
+template <typename T>
+bool ZGString16FastSwappedCaseInsensitiveNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
+{
+	return ZGString16CaseInsensitiveNotEquals(searchData, variableValue, (T *)(searchData->_swappedValue));
 }
 
 #define ZGHandleStringCase(case, function1, function2) \
@@ -749,10 +1179,24 @@ ZGSearchResults *ZGSearchForCaseInsensitiveStrings(ZGMemoryMap processTask, ZGSe
 	switch (functionType)
 	{
 		case ZGEquals:
-			ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16CaseInsensitiveEquals);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16FastSwappedCaseInsensitiveEquals);
+			}
+			else
+			{
+				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16CaseInsensitiveEquals);
+			}
 			break;
 		case ZGNotEquals:
-			ZGHandleStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16CaseInsensitiveNotEquals);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16FastSwappedCaseInsensitiveNotEquals);
+			}
+			else
+			{
+				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16CaseInsensitiveNotEquals);
+			}
 			break;
 		default:
 			break;
@@ -1222,32 +1666,110 @@ ZGSearchResults *ZGNarrowSearchForIntegers(ZGMemoryMap processTask, ZGSearchData
 	switch (functionType)
 	{
 		case ZGEquals:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerFastSwappedEquals);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerEquals);
+			}
+			break;
 		case ZGEqualsStored:
 			ZGHandleNarrowIntegerCase(dataType, ZGIntegerEquals);
 			break;
 		case ZGNotEquals:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerFastSwappedNotEquals);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerNotEquals);
+			}
+			break;
 		case ZGNotEqualsStored:
 			ZGHandleNarrowIntegerCase(dataType, ZGIntegerNotEquals);
 			break;
 		case ZGGreaterThan:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerSwappedGreaterThan);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerGreaterThan);
+			}
+			break;
 		case ZGGreaterThanStored:
-			ZGHandleNarrowIntegerCase(dataType, ZGIntegerGreaterThan);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerSwappedGreaterThanStored);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerGreaterThan);
+			}
 			break;
 		case ZGLessThan:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerSwappedLesserThan);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerLesserThan);
+			}
+			break;
 		case ZGLessThanStored:
-			ZGHandleNarrowIntegerCase(dataType, ZGIntegerLesserThan);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerSwappedLesserThanStored);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerLesserThan);
+			}
 			break;
 		case ZGEqualsStoredLinear:
-			ZGHandleNarrowIntegerCase(dataType, ZGIntegerEqualsLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerSwappedEqualsLinear);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerEqualsLinear);
+			}
 			break;
 		case ZGNotEqualsStoredLinear:
-			ZGHandleNarrowIntegerCase(dataType, ZGIntegerNotEqualsLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerSwappedNotEqualsLinear);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerNotEqualsLinear);
+			}
 			break;
 		case ZGGreaterThanStoredLinear:
-			ZGHandleNarrowIntegerCase(dataType, ZGIntegerGreaterThanLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerSwappedGreaterThanLinear);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerGreaterThanLinear);
+			}
 			break;
 		case ZGLessThanStoredLinear:
-			ZGHandleNarrowIntegerCase(dataType, ZGIntegerLesserThanLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerSwappedLesserThanLinear);
+			}
+			else
+			{
+				ZGHandleNarrowIntegerCase(dataType, ZGIntegerLesserThanLinear);
+			}
 			break;
 	}
 	return retValue;
@@ -1273,32 +1795,124 @@ ZGSearchResults *ZGNarrowSearchForFloatingPoints(ZGMemoryMap processTask, ZGSear
 	switch (functionType)
 	{
 		case ZGEquals:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedEquals);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointEquals);
+			}
+			break;
 		case ZGEqualsStored:
-			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointEquals);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedEqualsStored);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointEquals);
+			}
 			break;
 		case ZGNotEquals:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedNotEquals);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointNotEquals);
+			}
+			break;
 		case ZGNotEqualsStored:
-			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointNotEquals);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedNotEqualsStored);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointNotEquals);
+			}
 			break;
 		case ZGGreaterThan:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedGreaterThan);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointGreaterThan);
+			}
+			break;
 		case ZGGreaterThanStored:
-			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointGreaterThan);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedGreaterThanStored);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointGreaterThan);
+			}
 			break;
 		case ZGLessThan:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedLesserThan);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointLesserThan);
+			}
+			break;
 		case ZGLessThanStored:
-			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointLesserThan);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedLesserThanStored);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointLesserThan);
+			}
 			break;
 		case ZGEqualsStoredLinear:
-			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointEqualsLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedEqualsLinear);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointEqualsLinear);
+			}
 			break;
 		case ZGNotEqualsStoredLinear:
-			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointNotEqualsLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedNotEqualsLinear);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointNotEqualsLinear);
+			}
 			break;
 		case ZGGreaterThanStoredLinear:
-			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointGreaterThanLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedGreaterThanLinear);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointGreaterThanLinear);
+			}
 			break;
 		case ZGLessThanStoredLinear:
-			ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointLesserThanLinear);
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointSwappedLesserThanLinear);
+			}
+			else
+			{
+				ZGHandleNarrowFloatingPointCase(dataType, ZGFloatingPointLesserThanLinear);
+			}
 			break;
 	}
 	return retValue;
@@ -1369,10 +1983,24 @@ ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData 
 		switch (functionType)
 		{
 			case ZGEquals:
-				retValue = ZGNarrowSearchWithFunction(ZGByteArrayEquals, processTask, (void *)searchData.searchValue, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);
+				if (dataType == ZGString16 && searchData.bytesSwapped)
+				{
+					retValue = ZGNarrowSearchWithFunction(ZGString16FastSwappedEquals, processTask, (void *)searchData.searchValue, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);
+				}
+				else
+				{
+					retValue = ZGNarrowSearchWithFunction(ZGByteArrayEquals, processTask, (void *)searchData.searchValue, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);
+				}
 				break;
 			case ZGNotEquals:
-				retValue = ZGNarrowSearchWithFunction(ZGByteArrayNotEquals, processTask, (void *)searchData.searchValue, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);
+				if (dataType == ZGString16 && searchData.bytesSwapped)
+				{
+					retValue = ZGNarrowSearchWithFunction(ZGString16FastSwappedNotEquals, processTask, (void *)searchData.searchValue, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);
+				}
+				else
+				{
+					retValue = ZGNarrowSearchWithFunction(ZGByteArrayNotEquals, processTask, (void *)searchData.searchValue, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);
+				}
 				break;
 			default:
 				break;
@@ -1383,10 +2011,24 @@ ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData 
 		switch (functionType)
 		{
 			case ZGEquals:
-				ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16CaseInsensitiveEquals);
+				if (searchData.bytesSwapped)
+				{
+					ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16FastSwappedCaseInsensitiveEquals);
+				}
+				else
+				{
+					ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16CaseInsensitiveEquals);
+				}
 				break;
 			case ZGNotEquals:
-				ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16CaseInsensitiveNotEquals);
+				if (searchData.bytesSwapped)
+				{
+					ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16FastSwappedCaseInsensitiveNotEquals);
+				}
+				else
+				{
+					ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16CaseInsensitiveNotEquals);
+				}
 				break;
 			default:
 				break;

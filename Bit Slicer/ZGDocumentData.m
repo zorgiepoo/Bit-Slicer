@@ -36,6 +36,7 @@
 #import "ZGVariableTypes.h"
 #import "ZGSearchData.h"
 #import "ZGSearchFunctions.h"
+#import "ZGVariable.h"
 
 @implementation ZGDocumentData
 
@@ -51,6 +52,7 @@
 		self.functionTypeTag = ZGEquals;
 		self.selectedDatatypeTag = ZGInt32;
 		self.lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];
+		self.byteOrderTag = [ZGVariable nativeByteOrder];
 	}
 	return self;
 }

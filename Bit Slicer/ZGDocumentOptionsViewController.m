@@ -35,24 +35,28 @@
 #import "ZGDocumentOptionsViewController.h"
 #import "ZGDocument.h"
 #import "ZGDocumentData.h"
+#import "ZGVariable.h"
 
 @interface ZGDocumentOptionsViewController ()
 
 @property (nonatomic, assign) ZGDocument *document;
+@property (nonatomic, assign) NSTableView *tableView;
 @property (nonatomic, assign) IBOutlet NSButton *ignoreDataAlignmentCheckbox;
 @property (nonatomic, assign) IBOutlet NSTextField *beginningAddressTextField;
 @property (nonatomic, assign) IBOutlet NSTextField *endingAddressTextField;
+@property (nonatomic, assign) IBOutlet NSMatrix *byteOrderMatrix;
 
 @end
 
 @implementation ZGDocumentOptionsViewController
 
-- (id)initWithDocument:(ZGDocument *)document
+- (id)initWithDocument:(ZGDocument *)document tableView:(NSTableView *)tableView
 {
 	self = [self initWithNibName:NSStringFromClass([self class]) bundle:nil];
 	if (self != nil)
 	{
 		self.document = document;
+		self.tableView = tableView;
 	}
 	return self;
 }
@@ -62,6 +66,7 @@
 	[self.ignoreDataAlignmentCheckbox setState:self.document.data.ignoreDataAlignment];
 	self.beginningAddressTextField.stringValue = self.document.data.beginningAddressStringValue;
 	self.endingAddressTextField.stringValue = self.document.data.endingAddressStringValue;
+	[self.byteOrderMatrix selectCellWithTag:self.document.data.byteOrderTag];
 }
 
 - (void)loadView
@@ -92,6 +97,39 @@
 	{
 		self.document.data.endingAddressStringValue = self.endingAddressTextField.stringValue;
 		[self.document markChange];
+	}
+}
+
+- (IBAction)changeByteOrder:(id)sender
+{
+	ZGByteOrder oldByteOrder = (ZGByteOrder)self.document.data.byteOrderTag;
+	ZGByteOrder newByteOrder = (ZGByteOrder)[(NSMatrix *)sender selectedTag];
+	
+	if (oldByteOrder != newByteOrder)
+	{
+		self.document.data.byteOrderTag = newByteOrder;
+		
+		for (ZGVariable *variable in self.document.data.variables)
+		{
+			variable.byteOrder = newByteOrder;
+			switch (variable.type)
+			{
+				case ZGInt16:
+				case ZGInt32:
+				case ZGInt64:
+				case ZGFloat:
+				case ZGDouble:
+				case ZGPointer:
+				case ZGString16:
+					[variable updateStringValue];
+					break;
+				default:
+					break;
+			}
+		}
+		
+		[self.document markChange];
+		[self.tableView reloadData];
 	}
 }
 

@@ -65,6 +65,7 @@
 	UCDisposeCollator(&_collator);
 	
 	self.rangeValue = NULL;
+	self.swappedValue = NULL;
 	self.byteArrayFlags = NULL;
 	self.searchValue = NULL;
 	self.savedData = nil;
@@ -75,6 +76,12 @@
 {
 	free(_searchValue);
 	_searchValue = searchValue;
+}
+
+- (void)setSwappedValue:(void *)swappedValue
+{
+	free(_swappedValue);
+	_swappedValue = swappedValue;
 }
 
 - (void)setRangeValue:(void *)newRangeValue

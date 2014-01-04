@@ -51,6 +51,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGIsFrozenKey @"ZGIsFrozenKey"
 #define ZGTypeKey @"ZGTypeKey"
 #define ZGQualifierKey @"ZGQualifierKey"
+#define ZGByteOrderKey @"ZGByteOrderKey"
 #define ZGValueKey @"ZGValueKey"
 #define ZGFreezeValueKey @"ZGFreezeValueKey"
 #define ZGDescriptionKey @"ZGDescriptionKey"
@@ -58,6 +59,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGDynamicAddressKey @"ZGIsPointerKey" // value is for backwards compatibility
 #define ZGAddressFormulaKey @"ZGAddressFormulaKey"
 #define ZGScriptKey @"ZGScriptKey"
+
++ (ZGByteOrder)nativeByteOrder
+{
+	return (CFByteOrderGetCurrent() == CFByteOrderBigEndian ? ZGByteOrderBigEndian : ZGByteOrderLittleEndian);
+}
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {	
@@ -84,6 +90,10 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	[coder
 	 encodeInt32:self.qualifier
 	 forKey:ZGQualifierKey];
+	
+	[coder
+	 encodeInt32:self.byteOrder
+	 forKey:ZGByteOrderKey];
 	
 	[coder
 	 encodeObject:self.description
@@ -134,6 +144,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	self.isFrozen = [coder decodeBoolForKey:ZGIsFrozenKey];
 	self.type = [coder decodeInt32ForKey:ZGTypeKey];
 	self.qualifier = [coder decodeInt32ForKey:ZGQualifierKey];
+	self.byteOrder = [coder decodeInt32ForKey:ZGByteOrderKey];
+	if (self.byteOrder == ZGByteOrderUnknown)
+	{
+		self.byteOrder = [[self class] nativeByteOrder];
+	}
 	
 	self.usesDynamicAddress = [coder decodeBoolForKey:ZGDynamicAddressKey];
 	[self setAddressFormula:[coder decodeObjectForKey:ZGAddressFormulaKey]];
@@ -214,7 +229,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return size;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled byteOrder:(ZGByteOrder)byteOrder
 {
 	if ((self = [super init]))
 	{
@@ -233,6 +248,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		self.qualifier = qualifier;
 		self.enabled = enabled;
 		
+		self.byteOrder = byteOrder;
+		
 		if (value != nil)
 		{
 			self.value = value;
@@ -245,6 +262,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	}
 	
 	return self;
+}
+
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled
+{
+	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:description enabled:enabled byteOrder:[[self class] nativeByteOrder]];
 }
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description
@@ -344,6 +366,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		NSString *newStringValue = nil;
 		
+		BOOL needsByteSwapping = [[self class] nativeByteOrder] != self.byteOrder;
+		
 		switch (self.type)
 		{
 			case ZGInt8:
@@ -357,51 +381,68 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				}
 				break;
 			case ZGInt16:
+			{
+				uint16_t value = needsByteSwapping ? CFSwapInt16(*(uint16_t *)self.value) : *(uint16_t *)self.value;
 				if (self.qualifier == ZGSigned)
 				{
-					self.stringValue = [NSString stringWithFormat:@"%d", *((int16_t *)self.value)];
+					self.stringValue = [NSString stringWithFormat:@"%d", value];
 				}
 				else
 				{
-					self.stringValue = [NSString stringWithFormat:@"%u", *((uint16_t *)self.value)];
+					self.stringValue = [NSString stringWithFormat:@"%u", value];
 				}
 				break;
+			}
 			case ZGInt32:
+			{
+				uint32_t value = needsByteSwapping ? CFSwapInt32(*(uint32_t *)self.value) : *(uint32_t *)self.value;
 				if (self.qualifier == ZGSigned)
 				{
-					self.stringValue = [NSString stringWithFormat:@"%d", *((int32_t *)self.value)];
+					self.stringValue = [NSString stringWithFormat:@"%d", value];
 				}
 				else
 				{
-					self.stringValue = [NSString stringWithFormat:@"%u", *((uint32_t *)self.value)];
+					self.stringValue = [NSString stringWithFormat:@"%u", value];
 				}
 				break;
+			}
 			case ZGInt64:
+			{
+				uint64_t value = needsByteSwapping ? CFSwapInt64(*(uint64_t *)self.value) : *(uint64_t *)self.value;
 				if (self.qualifier == ZGSigned)
 				{
-					self.stringValue = [NSString stringWithFormat:@"%lld", *((int64_t *)self.value)];
+					self.stringValue = [NSString stringWithFormat:@"%lld", value];
 				}
 				else
 				{
-					self.stringValue = [NSString stringWithFormat:@"%llu", *((uint64_t *)self.value)];
+					self.stringValue = [NSString stringWithFormat:@"%llu", value];
 				}
 				break;
+			}
 			case ZGPointer:
 				if (self.size == sizeof(int32_t))
 				{
-					self.stringValue = [NSString stringWithFormat:@"0x%X", *((uint32_t *)self.value)];
+					uint32_t value = needsByteSwapping ? CFSwapInt32(*(uint32_t *)self.value) : *(uint32_t *)self.value;
+					self.stringValue = [NSString stringWithFormat:@"0x%X", value];
 				}
 				else if (self.size == sizeof(int64_t))
 				{
-					self.stringValue = [NSString stringWithFormat:@"0x%llX", *((uint64_t *)self.value)];
+					uint64_t value = needsByteSwapping ? CFSwapInt64(*(uint64_t *)self.value) : *(uint64_t *)self.value;
+					self.stringValue = [NSString stringWithFormat:@"0x%llX", value];
 				}
 				break;
 			case ZGFloat:
-				self.stringValue = [NSString stringWithFormat:@"%f", *((float *)self.value)];
+			{
+				float value = needsByteSwapping ? CFConvertFloat32SwappedToHost(*(CFSwappedFloat32 *)self.value) : *(float *)self.value;
+				self.stringValue = [NSString stringWithFormat:@"%f", value];
 				break;
+			}
 			case ZGDouble:
-				self.stringValue = [NSString stringWithFormat:@"%lf", *((double *)self.value)];
+			{
+				double value = needsByteSwapping ? CFConvertFloat64SwappedToHost(*(CFSwappedFloat64 *)self.value) : *(double *)self.value;
+				self.stringValue = [NSString stringWithFormat:@"%lf", value];
 				break;
+			}
 			case ZGString8:
 				self.stringValue =
 					[[NSString alloc]
@@ -429,7 +470,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				newStringValue =
 					[[NSString alloc]
 					 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)self.size]
-					 encoding:NSUTF16LittleEndianStringEncoding];
+					 encoding:self.byteOrder == ZGByteOrderLittleEndian ? NSUTF16LittleEndianStringEncoding : NSUTF16BigEndianStringEncoding];
 				
 				self.stringValue = newStringValue;
 				

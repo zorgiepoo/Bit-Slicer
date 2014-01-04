@@ -56,6 +56,7 @@
 
 @property (nonatomic) NSInteger selectedDatatypeTag;
 @property (nonatomic) NSInteger qualifierTag;
+@property (nonatomic) NSInteger byteOrderTag;
 @property (nonatomic) NSInteger functionTypeTag;
 @property (nonatomic) BOOL ignoreDataAlignment;
 @property (copy, nonatomic) NSString *beginningAddressStringValue;

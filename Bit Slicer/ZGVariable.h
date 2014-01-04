@@ -50,6 +50,7 @@ extern NSString *ZGVariablePboardType;
 @property (nonatomic) ZGVariableType type;
 @property (nonatomic) BOOL isFrozen;
 @property (nonatomic) ZGVariableQualifier qualifier;
+@property(nonatomic) ZGByteOrder byteOrder;
 @property (readonly, nonatomic) ZGMemoryAddress address;
 @property (nonatomic) ZGMemorySize size;
 @property (nonatomic) ZGMemorySize lastUpdatedSize;
@@ -65,11 +66,15 @@ extern NSString *ZGVariablePboardType;
 @property (nonatomic, readonly) NSString *shortDescription;
 @property (nonatomic, readonly) NSString *name;
 
++ (ZGByteOrder)nativeByteOrder;
+
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize;
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description;
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled;
+
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled byteOrder:(ZGByteOrder)byteOrder;
 
 - (void)updateStringValue;
 

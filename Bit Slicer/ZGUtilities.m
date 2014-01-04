@@ -102,7 +102,7 @@ ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType
 	return dataSize;
 }
 
-static NSArray *ZGByteArrayComponentsFromString(NSString *searchString)
+NSArray *ZGByteArrayComponentsFromString(NSString *searchString)
 {
 	NSArray *originalByteArray = [searchString componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 	NSMutableArray *transformedByteArray = [NSMutableArray array];
@@ -123,6 +123,69 @@ static NSArray *ZGByteArrayComponentsFromString(NSString *searchString)
 	}
 	
 	return transformedByteArray;
+}
+
+void *ZGSwappedValue(BOOL isProcess64Bit, void *value, ZGVariableType dataType, ZGMemorySize dataSize)
+{
+	void *swappedValue = malloc(dataSize);
+	
+	if (dataType == ZGPointer)
+	{
+		dataType = isProcess64Bit ? ZGInt64 : ZGInt32;
+	}
+	
+	switch (dataType)
+	{
+		case ZGInt16:
+		{
+			uint16_t tempValue = CFSwapInt16(*(uint16_t *)value);
+			memcpy(swappedValue, &tempValue, dataSize);
+			break;
+		}
+		
+		case ZGInt32:
+		{
+			uint32_t tempValue = CFSwapInt32(*(uint32_t *)value);
+			memcpy(swappedValue, &tempValue, dataSize);
+			break;
+		}
+			
+		case ZGInt64:
+		{
+			uint64_t tempValue = CFSwapInt64(*(uint64_t *)value);
+			memcpy(swappedValue, &tempValue, dataSize);
+			break;
+		}
+			
+		case ZGFloat:
+		{
+			CFSwappedFloat32 tempValue = CFConvertFloat32HostToSwapped(*(Float32 *)value);
+			memcpy(swappedValue, &tempValue, dataSize);
+			break;
+		}
+			
+		case ZGDouble:
+		{
+			CFSwappedFloat64 tempValue = CFConvertFloat64HostToSwapped(*(Float64 *)value);
+			memcpy(swappedValue, &tempValue, dataSize);
+			break;
+		}
+			
+		case ZGString16:
+		{
+			for (ZGMemorySize characterIndex = 0; characterIndex < dataSize / sizeof(uint16_t); characterIndex++)
+			{
+				((uint16_t *)swappedValue)[characterIndex] = CFSwapInt16(((uint16_t *)value)[characterIndex]);
+			}
+			break;
+		}
+		
+		default:
+			memcpy(swappedValue, value, dataSize);
+			break;
+	}
+	
+	return swappedValue;
 }
 
 void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)

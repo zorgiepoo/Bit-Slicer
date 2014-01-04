@@ -48,6 +48,10 @@
 	BOOL _shouldIgnoreStringCase;
 	BOOL _shouldIncludeNullTerminator;
 	
+	// For searching non-native byte order
+	void *_swappedValue;
+	BOOL _bytesSwapped;
+	
 	// For linearly express stored values
 	void *_additiveConstant;
 	double _multiplicativeConstant;
@@ -67,6 +71,9 @@ typedef enum
 @property (nonatomic) ZGMemorySize dataSize;
 @property (nonatomic) ZGMemorySize dataAlignment;
 @property (nonatomic) ZGMemorySize pointerSize;
+
+@property (nonatomic) void *swappedValue;
+@property (nonatomic) BOOL bytesSwapped;
 
 @property (nonatomic) void *rangeValue;
 @property (nonatomic) NSArray *savedData;

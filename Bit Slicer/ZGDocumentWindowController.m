@@ -137,6 +137,8 @@
 
 - (void)setupScopeBar
 {
+	self.scopeBar.smartResizeEnabled = NO;
+	
 	self.protectionGroup = [self.scopeBar addGroupWithIdentifier:ZGProtectionGroup label:@"Protection:" items:nil];
 	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemAll title:@"All"];
 	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemWrite title:@"Write"];
@@ -752,13 +754,13 @@
 	{
 		for (ZGVariable *variable in self.documentData.variables)
 		{
+			variable.qualifier = newQualifier;
 			switch (variable.type)
 			{
 				case ZGInt8:
 				case ZGInt16:
 				case ZGInt32:
 				case ZGInt64:
-					variable.qualifier = newQualifier;
 					[variable updateStringValue];
 					break;
 				default:
@@ -1394,7 +1396,7 @@
 	if (self.advancedOptionsPopover == nil)
 	{
 		self.advancedOptionsPopover = [[NSPopover alloc] init];
-		self.advancedOptionsPopover.contentViewController = [[ZGDocumentOptionsViewController alloc] initWithDocument:self.document];
+		self.advancedOptionsPopover.contentViewController = [[ZGDocumentOptionsViewController alloc] initWithDocument:self.document tableView:self.tableController.variablesTableView];
 		self.advancedOptionsPopover.behavior = NSPopoverBehaviorTransient;
 	}
 	
