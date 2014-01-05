@@ -1067,6 +1067,7 @@
 			// All the variables selected need to either be all unfrozen or all frozen
 			BOOL isFrozen = [[self.selectedVariables objectAtIndex:0] isFrozen];
 			BOOL isInconsistent = NO;
+			BOOL scriptExists = [(ZGVariable *)[self.selectedVariables objectAtIndex:0] type] == ZGScript;
 			
 			for (ZGVariable *variable in [self.selectedVariables subarrayWithRange:NSMakeRange(1, self.selectedVariables.count-1)])
 			{
@@ -1075,11 +1076,16 @@
 					isInconsistent = YES;
 					break;
 				}
+				else if (variable.type == ZGScript)
+				{
+					scriptExists = YES;
+					break;
+				}
 			}
 			
 			menuItem.title = [NSString stringWithFormat:@"%@ Variable%@", isFrozen ? @"Unfreeze" : @"Freeze", self.selectedVariables.count != 1 ? @"s" : @""];
 			
-			if (isInconsistent || !self.isClearable)
+			if (isInconsistent || scriptExists || !self.isClearable)
 			{
 				return NO;
 			}
@@ -1113,11 +1119,31 @@
 		{
 			return NO;
 		}
+		
+		BOOL isValid = NO;
+		for (ZGVariable *variable in self.selectedVariables)
+		{
+			if (variable.type != ZGScript)
+			{
+				isValid = YES;
+				break;
+			}
+		}
+		
+		if (!isValid)
+		{
+			return NO;
+		}
 	}
 	
 	else if (menuItem.action == @selector(copyAddress:))
 	{
 		if (self.selectedVariables.count != 1)
+		{
+			return NO;
+		}
+		
+		if ([(ZGVariable *)[self.selectedVariables objectAtIndex:0] type] == ZGScript)
 		{
 			return NO;
 		}
@@ -1162,11 +1188,24 @@
 		{
 			return NO;
 		}
+		
+		for (ZGVariable *variable in self.selectedVariables)
+		{
+			if (variable.type == ZGScript)
+			{
+				return NO;
+			}
+		}
 	}
 	
 	else if (menuItem.action == @selector(requestEditingVariableAddress:))
 	{
 		if ([self.searchController canCancelTask] || self.selectedVariables.count != 1 || !self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		if ([(ZGVariable *)[self.selectedVariables objectAtIndex:0] type] == ZGScript)
 		{
 			return NO;
 		}
@@ -1194,16 +1233,21 @@
 	
 	else if (menuItem.action == @selector(relativizeVariablesAddress:))
 	{
-		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		NSArray *selectedVariables = [self selectedVariables];
+		if ([self.searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
 		
-		NSArray *selectedVariables = [self selectedVariables];
 		menuItem.title = [NSString stringWithFormat:@"Relativize Variable%@", selectedVariables.count != 1 ? @"s" : @""];
 		
 		for (ZGVariable *variable in selectedVariables)
 		{
+			if (variable.type == ZGScript)
+			{
+				return NO;
+			}
+			
 			ZGMemoryAddress relativeOffset = 0;
 			ZGMemoryAddress slide = 0;
 			if (variable.usesDynamicAddress || ZGSectionName(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, variable.address, variable.size, NULL, &relativeOffset, &slide, self.currentProcess.cacheDictionary) == nil || (slide == 0 && variable.address - relativeOffset == self.currentProcess.baseAddress))
@@ -1221,6 +1265,11 @@
 		}
 		
 		ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
+		
+		if (selectedVariable.type == ZGScript)
+		{
+			return NO;
+		}
 		
 		ZGMemoryAddress memoryAddress = selectedVariable.address;
 		ZGMemorySize memorySize = selectedVariable.size;
@@ -1267,6 +1316,11 @@
 		}
 		
 		ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
+		
+		if (selectedVariable.type == ZGScript)
+		{
+			return NO;
+		}
 		
 		ZGMemoryAddress memoryAddress = selectedVariable.address;
 		ZGMemorySize memorySize = selectedVariable.size;

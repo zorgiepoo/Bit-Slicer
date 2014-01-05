@@ -174,7 +174,10 @@
 	
 	for (ZGVariable *variable in variables)
 	{
-		[linesToWrite addObject:[@[variable.shortDescription, variable.addressStringValue, variable.stringValue] componentsJoinedByString:@"\t"]];
+		if (variable.type != ZGScript)
+		{
+			[linesToWrite addObject:[@[variable.shortDescription, variable.addressStringValue, variable.stringValue] componentsJoinedByString:@"\t"]];
+		}
 	}
 	
 	[NSPasteboard.generalPasteboard
