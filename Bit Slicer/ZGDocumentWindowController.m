@@ -77,6 +77,10 @@
 #define ZGStringIgnoreCase @"ZGStringIgnoreCase"
 #define ZGStringNullTerminated @"ZGStringNullTerminated"
 
+#define ZGEndianGroup @"ZGEndianGroup"
+#define ZGEndianLittle @"ZGEndianLittle"
+#define ZGEndianBig @"ZGEndianBig"
+
 @interface ZGDocumentWindowController ()
 
 @property (nonatomic) ZGWatchVariableWindowController *watchVariableWindowController;
@@ -89,6 +93,7 @@
 @property (nonatomic) AGScopeBarGroup *protectionGroup;
 @property (nonatomic) AGScopeBarGroup *qualifierGroup;
 @property (nonatomic) AGScopeBarGroup *stringMatchingGroup;
+@property (nonatomic) AGScopeBarGroup *endianGroup;
 
 @property (assign) IBOutlet NSTextField *generalStatusTextField;
 
@@ -138,8 +143,6 @@
 
 - (void)setupScopeBar
 {
-	self.scopeBar.smartResizeEnabled = NO;
-	
 	self.protectionGroup = [self.scopeBar addGroupWithIdentifier:ZGProtectionGroup label:@"Protection:" items:nil];
 	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemAll title:@"All"];
 	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemWrite title:@"Write"];
@@ -157,6 +160,12 @@
 	[self.stringMatchingGroup addItemWithIdentifier:ZGStringIgnoreCase title:@"Ignore Case"];
 	[self.stringMatchingGroup addItemWithIdentifier:ZGStringNullTerminated title:@"Null Terminated"];
 	self.stringMatchingGroup.selectionMode = AGScopeBarGroupSelectAny;
+	
+	self.endianGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGEndianGroup];
+	self.endianGroup.label = @"Endianness";
+	[self.endianGroup addItemWithIdentifier:ZGEndianLittle title:@"Little"];
+	[self.endianGroup addItemWithIdentifier:ZGEndianBig title:@"Big"];
+	self.endianGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
 	// Set delegate after setting up scope bar so we won't receive initial selection events beforehand
 	self.scopeBar.delegate = self;
@@ -203,6 +212,37 @@
 		}
 		
 		[self markDocumentChange];
+	}
+	else if ([item.group.identifier isEqualToString:ZGEndianGroup])
+	{
+		ZGByteOrder newByteOrder = [item.identifier isEqualToString:ZGEndianLittle] ? ZGByteOrderLittleEndian : ZGByteOrderBigEndian;
+		
+		if (newByteOrder != self.documentData.byteOrderTag)
+		{
+			self.documentData.byteOrderTag = newByteOrder;
+			
+			for (ZGVariable *variable in self.documentData.variables)
+			{
+				variable.byteOrder = newByteOrder;
+				switch (variable.type)
+				{
+					case ZGInt16:
+					case ZGInt32:
+					case ZGInt64:
+					case ZGFloat:
+					case ZGDouble:
+					case ZGPointer:
+					case ZGString16:
+						[variable updateStringValue];
+						break;
+					default:
+						break;
+				}
+			}
+			
+			[self.variablesTableView reloadData];
+			[self markDocumentChange];
+		}
 	}
 }
 
@@ -381,6 +421,8 @@
 	{
 		[self.stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringNullTerminated];
 	}
+	
+	[self.endianGroup setSelected:YES forItemWithIdentifier:self.documentData.byteOrderTag == ZGByteOrderBigEndian ? ZGEndianBig : ZGEndianLittle];
 	
 	if (self.advancedOptionsPopover != nil)
 	{
@@ -811,19 +853,14 @@
 - (void)changeScopeBarGroup:(AGScopeBarGroup *)group shouldExist:(BOOL)shouldExist
 {
 	BOOL alreadyExists = [self.scopeBar.groups containsObject:group];
-	if (!shouldExist)
+	if (alreadyExists)
 	{
-		if (alreadyExists)
-		{
-			[self.scopeBar removeGroupAtIndex:[self.scopeBar.groups indexOfObject:group]];
-		}
+		[self.scopeBar removeGroupAtIndex:[self.scopeBar.groups indexOfObject:group]];
 	}
-	else
+	
+	if (shouldExist)
 	{
-		if (!alreadyExists)
-		{
-			[self.scopeBar insertGroup:group atIndex:1];
-		}
+		[self.scopeBar insertGroup:group atIndex:self.scopeBar.groups.count];
 	}
 }
 
@@ -901,8 +938,11 @@
 		self.documentData.functionTypeTag = self.functionPopUpButton.selectedTag;
 	}
 	
+	BOOL needsEndianness = dataType != ZGInt8 && dataType != ZGString8 && dataType != ZGByteArray;
+	
 	[self changeScopeBarGroup:self.qualifierGroup shouldExist:needsQualifier];
 	[self changeScopeBarGroup:self.stringMatchingGroup shouldExist:needsStringMatching];
+	[self changeScopeBarGroup:self.endianGroup shouldExist:needsEndianness];
 	
 	self.scopeBar.accessoryView = needsFlags ? self.scopeBarFlagsView : nil;
 }
@@ -1457,7 +1497,7 @@
 	if (self.advancedOptionsPopover == nil)
 	{
 		self.advancedOptionsPopover = [[NSPopover alloc] init];
-		self.advancedOptionsPopover.contentViewController = [[ZGDocumentOptionsViewController alloc] initWithDocument:self.document tableView:self.tableController.variablesTableView];
+		self.advancedOptionsPopover.contentViewController = [[ZGDocumentOptionsViewController alloc] initWithDocument:self.document];
 		self.advancedOptionsPopover.behavior = NSPopoverBehaviorTransient;
 	}
 	

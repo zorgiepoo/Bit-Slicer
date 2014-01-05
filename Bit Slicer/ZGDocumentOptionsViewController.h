@@ -38,7 +38,7 @@
 
 @interface ZGDocumentOptionsViewController : NSViewController
 
-- (id)initWithDocument:(ZGDocument *)document tableView:(NSTableView *)tableView;
+- (id)initWithDocument:(ZGDocument *)document;
 
 - (void)reloadInterface;
 
