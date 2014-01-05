@@ -535,12 +535,11 @@
 	mCollapsedLabelField.textColor = SCOPE_BAR_LABEL_COLOR;
 	mCollapsedLabelField.font = SCOPE_BAR_FONT;
 	
-	mGroupPopupButton = [[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO];
-	mGroupPopupButton.cell = [[[AGScopeBarPopupButtonCell alloc] initTextCell:@"" pullsDown:NO] autorelease];
-	mGroupPopupButton.menu.delegate = self;
+	mPopupButton = [[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO];
+	mPopupButton.cell = [[[AGScopeBarPopupButtonCell alloc] initTextCell:@"" pullsDown:NO] autorelease];
 	
 	[mCollapsedView addSubview:mCollapsedLabelField];
-	[mCollapsedView addSubview:mGroupPopupButton];
+	[mCollapsedView addSubview:mPopupButton];
 	
 	return self;
 }
@@ -567,8 +566,7 @@
 	[mView release];
 	[mLabelField release];
 	[mCollapsedView release];
-	[mGroupPopupButton release];
-	[mCollapsedLabelField release];
+	[mPopupButton release];
 	[super dealloc];
 }
 
@@ -683,11 +681,6 @@
 }
 
 
-- (NSArray *)selectedItemIdentifiers
-{
-	return [mSelectedItems valueForKeyPath:@"@unionOfObjects.identifier"];
-}
-
 
 
 #pragma mark -
@@ -749,31 +742,6 @@
 	return nil;
 }
 
-
-
-#pragma mark -
-#pragma mark Group Menu Delegate
-
-- (void)menuWillOpen:(NSMenu *)menu
-{
-	if (menu == mGroupPopupButton.menu) {
-		[mGroupPopupButton removeAllItems];
-		
-		for (AGScopeBarItem * item in self.items) {
-			[mGroupPopupButton.menu addItem:item.menuItem];
-		}
-		
-		[self _updatePopup];
-	}
-}
-
-
-- (void)menuDidClose:(NSMenu *)menu
-{
-	if (menu == mGroupPopupButton.menu) {
-		[mGroupPopupButton removeAllItems];
-	}
-}
 
 
 #pragma mark -
@@ -867,38 +835,37 @@
 		
 		// Popup
 		{
-			[mGroupPopupButton removeAllItems];
+			[mPopupButton removeAllItems];
 			
-			//for (AGScopeBarItem * item in self.items) {
-			//	[mGroupPopupButton.menu addItem:item.menuItem];
-			//}
-			
+			for (AGScopeBarItem * item in self.items) {
+				[mPopupButton.menu addItem:item.menuItem];
+			}
 			
 			if (YES) { //self.allowsMultipleSelection) {
-				NSPopUpButtonCell * cell = [mGroupPopupButton cell];
+				NSPopUpButtonCell * cell = [mPopupButton cell];
 				cell.usesItemFromMenu = NO;
 				cell.menuItem = [[[NSMenuItem alloc] init] autorelease];
 				[self _updatePopup];
 			}
 			
 			
-			[mGroupPopupButton.menu setFont:SCOPE_BAR_MENUITEM_FONT];
-			[mGroupPopupButton setFont:SCOPE_BAR_FONT];
-			[mGroupPopupButton setBezelStyle:NSRecessedBezelStyle];
-			[mGroupPopupButton setButtonType:NSPushOnPushOffButton];
-			[mGroupPopupButton.cell setHighlightsBy:NSCellIsBordered | NSCellIsInsetButton];
-			[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:YES];
-			[mGroupPopupButton.cell setAltersStateOfSelectedItem:NO];
-			[mGroupPopupButton.cell setArrowPosition:NSPopUpArrowAtBottom];
-			[mGroupPopupButton.cell setBackgroundStyle:NSBackgroundStyleRaised];
+			[mPopupButton.menu setFont:SCOPE_BAR_MENUITEM_FONT];
+			[mPopupButton setFont:SCOPE_BAR_FONT];
+			[mPopupButton setBezelStyle:NSRecessedBezelStyle];
+			[mPopupButton setButtonType:NSPushOnPushOffButton];
+			[mPopupButton.cell setHighlightsBy:NSCellIsBordered | NSCellIsInsetButton];
+			[mPopupButton setShowsBorderOnlyWhileMouseInside:YES];
+			[mPopupButton.cell setAltersStateOfSelectedItem:NO];
+			[mPopupButton.cell setArrowPosition:NSPopUpArrowAtBottom];
+			[mPopupButton.cell setBackgroundStyle:NSBackgroundStyleRaised];
 			
-			[mGroupPopupButton sizeToFit];
-			NSRect popFrame = mGroupPopupButton.frame;
+			[mPopupButton sizeToFit];
+			NSRect popFrame = mPopupButton.frame;
 			popFrame.origin.x = xOffset;
 			popFrame.origin.y = ceil((mCollapsedView.frame.size.height - popFrame.size.height) / 2.0);
-			popFrame.size.width = [self _widthForPopup:mGroupPopupButton];
-			mGroupPopupButton.frame = popFrame;
-			xOffset += mGroupPopupButton.frame.size.width;
+			popFrame.size.width = [self _widthForPopup:mPopupButton];
+			mPopupButton.frame = popFrame;
+			xOffset += mPopupButton.frame.size.width;
 		}
 		
 		viewFrame.size.width = xOffset;
@@ -943,19 +910,19 @@
 
 - (void)_updatePopup
 {
-	NSPopUpButtonCell * cell = [mGroupPopupButton cell];
+	NSPopUpButtonCell * cell = [mPopupButton cell];
 	NSArray * selectedItems = self.selectedItems;
 	
 	if (selectedItems.count == 0) {
-		[mGroupPopupButton setTitle:POPUP_TITLE_EMPTY_SELECTION];
+		[mPopupButton setTitle:POPUP_TITLE_EMPTY_SELECTION];
 		[cell.menuItem setTitle:POPUP_TITLE_EMPTY_SELECTION];
 	} else if (selectedItems.count == 1) {
 		NSString * title = [(AGScopeBarItem *)[selectedItems lastObject] title];
 		if (!title) title = @"";
-		[mGroupPopupButton setTitle:title];
+		[mPopupButton setTitle:title];
 		[cell.menuItem setTitle:title];
 	} else if (selectedItems.count > 1) {
-		[mGroupPopupButton setTitle:POPUP_TITLE_MULTIPLE_SELECTION];
+		[mPopupButton setTitle:POPUP_TITLE_MULTIPLE_SELECTION];
 		[cell.menuItem setTitle:POPUP_TITLE_MULTIPLE_SELECTION];
 	}
 	
@@ -964,14 +931,10 @@
 	}
 }
 
-
-
 - (void)setSelected:(BOOL)willBeSelected forItemWithIdentifier:(NSString *)identifier
 {
 	[self setSelected:willBeSelected forItem:[self itemWithIdentifier:identifier]];
 }
-
-
 
 - (void)setSelected:(BOOL)willBeSelected forItem:(AGScopeBarItem *)item
 {
@@ -1080,11 +1043,11 @@
 	// Show the border only on hover when no item are selected
 	// but always show it if one or more items is selected.
 	if (newSelectedItems.count == 0) {
-		[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:YES];
-		[mGroupPopupButton setBordered:YES];
+		[mPopupButton setShowsBorderOnlyWhileMouseInside:YES];
+		[mPopupButton setBordered:YES];
 	} else {
-		[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:NO];
-		[mGroupPopupButton setBordered:YES];
+		[mPopupButton setShowsBorderOnlyWhileMouseInside:NO];
+		[mPopupButton setBordered:YES];
 	}
 }
 
