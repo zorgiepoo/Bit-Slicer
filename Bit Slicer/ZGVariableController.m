@@ -360,7 +360,7 @@
 		 type:variableType
 		 qualifier:qualifier
 		 pointerSize:self.windowController.currentProcess.pointerSize
-		 description:@""
+		 description:variableType == ZGScript ? @"My Script" : @""
 		 enabled:NO
 		 byteOrder:byteOrder];
 	
