@@ -422,6 +422,21 @@
 
 #pragma mark Table View Data Source Methods
 
+- (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	if ([tableColumn.identifier isEqualToString:@"type"])
+	{
+		ZGVariable *variable = [self.documentData.variables objectAtIndex:row];
+		if (variable.type == ZGScript)
+		{
+			// value data cell will do since it's a NSTextFieldCell
+			return [[tableView tableColumnWithIdentifier:@"value"] dataCell];
+		}
+	}
+	
+	return [tableColumn dataCellForRow:row];
+}
+
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if (tableView == self.variablesTableView && rowIndex >= 0 && (NSUInteger)rowIndex < self.documentData.variables.count)
@@ -457,7 +472,8 @@
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
-			return @([tableColumn.dataCell indexOfItemWithTag:variable.type]);
+			// Using a space to align the text field cell with the popup button cell
+			return variable.type == ZGScript ? @" Script" : @([tableColumn.dataCell indexOfItemWithTag:variable.type]);
 		}
 	}
 	
