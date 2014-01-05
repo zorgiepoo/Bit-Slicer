@@ -44,6 +44,7 @@
 #import "ZGProcess.h"
 #import "ZGPyMainModule.h"
 #import "ZGSearchProgress.h"
+#import "ZGTableView.h"
 
 #import "structmember.h"
 

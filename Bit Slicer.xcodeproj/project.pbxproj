@@ -15,6 +15,7 @@
 		770FABB81849160200C176B7 /* ZGEditSizeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770FABB61849160200C176B7 /* ZGEditSizeWindowController.xib */; };
 		770FAC031853C5D600C176B7 /* APTokenSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC021853C5D600C176B7 /* APTokenSearchField.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC0518542BFF00C176B7 /* ZGSearchToken.m */; };
+		771A931D18791A8D0098511D /* ZGTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 771A931C18791A8D0098511D /* ZGTableView.m */; };
 		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
 		7730999E18660A29008B71DA /* ZGDocumentOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */; };
 		773972B117D2E61200B958EE /* _DDFunctionContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728517D2E61200B958EE /* _DDFunctionContainer.m */; };
@@ -167,6 +168,8 @@
 		770FAC021853C5D600C176B7 /* APTokenSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APTokenSearchField.m; path = deps/APTokenSearchField.m; sourceTree = "<group>"; };
 		770FAC0418542BFF00C176B7 /* ZGSearchToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchToken.h; path = "Bit Slicer/ZGSearchToken.h"; sourceTree = "<group>"; };
 		770FAC0518542BFF00C176B7 /* ZGSearchToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchToken.m; path = "Bit Slicer/ZGSearchToken.m"; sourceTree = "<group>"; };
+		771A931B18791A8D0098511D /* ZGTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGTableView.h; path = "Bit Slicer/ZGTableView.h"; sourceTree = "<group>"; };
+		771A931C18791A8D0098511D /* ZGTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGTableView.m; path = "Bit Slicer/ZGTableView.m"; sourceTree = "<group>"; };
 		772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchProgressDelegate.h; path = "Bit Slicer/ZGSearchProgressDelegate.h"; sourceTree = "<group>"; };
 		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; };
 		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; };
@@ -1013,6 +1016,8 @@
 				77F115A717D2E87E009E002A /* VDKQueue.m */,
 				777C34B3187523D0005E64E1 /* ZGNoSmallSizeToolbar.h */,
 				777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */,
+				771A931B18791A8D0098511D /* ZGTableView.h */,
+				771A931C18791A8D0098511D /* ZGTableView.m */,
 				77DC40F917AF218E000626A2 /* DDMathParser */,
 			);
 			name = Utilities;
@@ -1170,6 +1175,7 @@
 				77F115D017D2ED74009E002A /* ZGVerticalScrollerRepresenter.m in Sources */,
 				77F115D317D2ED82009E002A /* ZGStatusBarRepresenter.m in Sources */,
 				77F115D617D2ED8E009E002A /* ZGLineCountingRepresenter.m in Sources */,
+				771A931D18791A8D0098511D /* ZGTableView.m in Sources */,
 				77F115D917D2ED9D009E002A /* ZGLineCountingView.m in Sources */,
 				77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */,
 				77F115DE17D2EDB7009E002A /* ZGMemoryDumpController.m in Sources */,

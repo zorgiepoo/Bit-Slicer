@@ -46,12 +46,13 @@
 @class ZGSearchData;
 @class ZGScriptManager;
 @class APTokenSearchField;
+@class ZGTableView;
 
 #define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
 
 @interface ZGDocumentWindowController : NSWindowController <AGScopeBarDelegate>
 
-@property (assign) IBOutlet NSTableView *variablesTableView;
+@property (assign) IBOutlet ZGTableView *variablesTableView;
 @property (assign) IBOutlet NSProgressIndicator *progressIndicator;
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;

@@ -51,10 +51,11 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 #import "CoreSymbolication.h"
+#import "ZGTableView.h"
 
 @interface ZGDebuggerController ()
 
-@property (nonatomic, assign) IBOutlet NSTableView *instructionsTableView;
+@property (nonatomic, assign) IBOutlet ZGTableView *instructionsTableView;
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
 @property (nonatomic, assign) IBOutlet NSButton *stopButton;
 @property (nonatomic, assign) IBOutlet NSSplitView *splitView;
@@ -78,8 +79,6 @@
 
 @property (nonatomic) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
-
-@property (nonatomic) BOOL shouldIgnoreTableViewSelectionChange;
 
 @property (nonatomic) id breakPointActivity;
 
@@ -1477,17 +1476,6 @@ END_DEBUGGER_CHANGE:
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
-- (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
-{
-	if (self.shouldIgnoreTableViewSelectionChange)
-	{
-		self.shouldIgnoreTableViewSelectionChange = NO;
-		return NO;
-	}
-	
-	return YES;
-}
-
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
 	[self updateStatusBar];
@@ -1571,7 +1559,7 @@ END_DEBUGGER_CHANGE:
 				targetInstructions = selectedInstructions;
 				if (targetInstructions.count > 1)
 				{
-					self.shouldIgnoreTableViewSelectionChange = YES;
+					self.instructionsTableView.shouldIgnoreNextSelection = YES;
 				}
 			}
 			

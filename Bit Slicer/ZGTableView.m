@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/21/12.
+ * Created by Mayur Pawashe on 1/4/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,22 +32,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+#import "ZGTableView.h"
 
-@class ZGDocumentWindowController;
-@class ZGTableView;
+@interface NSTableView (Private)
 
-@interface ZGDocumentTableController : NSObject <NSTableViewDelegate>
+- (BOOL)_userCanChangeSelection;
 
-@property (assign, nonatomic) ZGTableView *variablesTableView;
+@end
 
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
+@implementation ZGTableView
 
-- (BOOL)updateWatchVariablesTimer;
-- (BOOL)updateVariableValuesInRange:(NSRange)variableRange;
+- (BOOL)becomeFirstResponder
+{
+	BOOL willBecomeFirstResponder = [super becomeFirstResponder];
+	if (willBecomeFirstResponder)
+	{
+		_shouldAvoidCustomEditing = YES;
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void) {
+			_shouldAvoidCustomEditing = NO;
+		});
+	}
+	return willBecomeFirstResponder;
+}
 
-- (void)clearCache;
-
-- (void)cleanUp;
+- (BOOL)_userCanChangeSelection
+{
+	if (_shouldIgnoreNextSelection)
+	{
+		_shouldIgnoreNextSelection = NO;
+		return NO;
+	}
+	return [super _userCanChangeSelection];
+}
 
 @end

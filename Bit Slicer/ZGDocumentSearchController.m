@@ -49,6 +49,7 @@
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
 #import "ZGVariableController.h"
+#import "ZGTableView.h"
 
 @interface ZGDocumentSearchController ()
 

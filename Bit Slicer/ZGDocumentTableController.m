@@ -48,6 +48,7 @@
 #import "ZGDocumentWindowController.h"
 #import "ZGScriptManager.h"
 #import "ZGUtilities.h"
+#import "ZGTableView.h"
 
 @interface ZGDocumentTableController ()
 
@@ -80,7 +81,7 @@
 	return self;
 }
 
-- (void)setVariablesTableView:(NSTableView *)tableView
+- (void)setVariablesTableView:(ZGTableView *)tableView
 {
 	_variablesTableView = tableView;
 	__unsafe_unretained id selfReference = self;
@@ -515,18 +516,7 @@
 
 #pragma mark Table View Delegate Methods
 
-- (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
-{
-	if (self.shouldIgnoreTableViewSelectionChange)
-	{
-		self.shouldIgnoreTableViewSelectionChange = NO;
-		return NO;
-	}
-	
-	return YES;
-}
-
-- (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (BOOL)tableView:(ZGTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if (rowIndex < 0 || (NSUInteger)rowIndex >= self.documentData.variables.count)
 	{
@@ -539,7 +529,10 @@
 	{
 		if (variable.type == ZGScript)
 		{
-			[self.windowController.scriptManager openScriptForVariable:variable];
+			if (!tableView.shouldAvoidCustomEditing)
+			{
+				[self.windowController.scriptManager openScriptForVariable:variable];
+			}
 			return NO;
 		}
 		
@@ -572,7 +565,7 @@
 			{
 				NSBeep();
 			}
-			else
+			else if (!tableView.shouldAvoidCustomEditing)
 			{
 				[self.windowController requestEditingVariableAddress:nil];
 			}
@@ -585,7 +578,7 @@
 		{
 			NSBeep();
 		}
-		else
+		else if (!tableView.shouldAvoidCustomEditing)
 		{
 			[self.windowController requestEditingVariableDescription:nil];
 		}

@@ -62,6 +62,7 @@
 #import "ZGDocumentOptionsViewController.h"
 #import "ZGWatchVariableWindowController.h"
 #import "ZGUtilities.h"
+#import "ZGTableView.h"
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"

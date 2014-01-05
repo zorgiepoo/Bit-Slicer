@@ -51,6 +51,7 @@
 #import "ZGDocumentData.h"
 #import "ZGScriptManager.h"
 #import "ZGMachBinary.h"
+#import "ZGTableView.h"
 
 @interface ZGVariableController ()
 
@@ -775,7 +776,7 @@
 	
 	if (!self.windowController.undoManager.isUndoing && !self.windowController.undoManager.isRedoing && undoableRowIndexes.count > 1)
 	{
-		self.windowController.tableController.shouldIgnoreTableViewSelectionChange = YES;
+		self.windowController.variablesTableView.shouldIgnoreNextSelection = YES;
 	}
 	
 	[self updateFrozenActivity];
