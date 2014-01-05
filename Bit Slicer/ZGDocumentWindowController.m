@@ -1027,6 +1027,12 @@
 		{
 			return NO;
 		}
+		
+		ZGVariable *variable = [self.selectedVariables objectAtIndex:0];
+		if (variable.type == ZGScript)
+		{
+			return NO;
+		}
 	}
 	
 	else if (menuItem.action == @selector(insertStoredValueToken:))
