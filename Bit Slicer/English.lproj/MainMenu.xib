@@ -534,7 +534,7 @@ CA
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Add Variable" id="660">
                                     <items>
-                                        <menuItem title="08-bit Integer" keyEquivalent="1" id="661">
+                                        <menuItem title="8-bit Integer" keyEquivalent="1" id="661">
                                             <connections>
                                                 <action selector="addVariable:" target="-1" id="672"/>
                                             </connections>
@@ -566,7 +566,7 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="671"/>
-                                        <menuItem title="08-bit String" tag="6" keyEquivalent="7" id="667">
+                                        <menuItem title="8-bit String" tag="6" keyEquivalent="7" id="667">
                                             <connections>
                                                 <action selector="addVariable:" target="-1" id="679"/>
                                             </connections>
