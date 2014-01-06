@@ -185,9 +185,8 @@ static dispatch_queue_t gPythonQueue;
 	if (script == nil)
 	{
 		unsigned int randomInteger = rand() % INT32_MAX;
-		unsigned int randomInteger2 = rand() % INT32_MAX;
 		
-		NSMutableString *randomFilename = [NSMutableString stringWithFormat:@"%u%u", randomInteger, randomInteger2];
+		NSMutableString *randomFilename = [NSMutableString stringWithFormat:@"Script  (Temp) %X", randomInteger];
 		while ([[NSFileManager defaultManager] fileExistsAtPath:[[SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename] stringByAppendingString:@".py"]])
 		{
 			[randomFilename appendString:@"1"];
