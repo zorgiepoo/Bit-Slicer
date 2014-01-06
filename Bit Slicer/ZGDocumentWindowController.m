@@ -215,7 +215,7 @@
 	}
 	else if ([item.group.identifier isEqualToString:ZGEndianGroup])
 	{
-		ZGByteOrder newByteOrder = [item.identifier isEqualToString:ZGEndianLittle] ? ZGByteOrderLittleEndian : ZGByteOrderBigEndian;
+		CFByteOrder newByteOrder = [item.identifier isEqualToString:ZGEndianLittle] ? CFByteOrderLittleEndian : CFByteOrderBigEndian;
 		
 		if (newByteOrder != self.documentData.byteOrderTag)
 		{
@@ -422,7 +422,7 @@
 		[self.stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringNullTerminated];
 	}
 	
-	[self.endianGroup setSelected:YES forItemWithIdentifier:self.documentData.byteOrderTag == ZGByteOrderBigEndian ? ZGEndianBig : ZGEndianLittle];
+	[self.endianGroup setSelected:YES forItemWithIdentifier:self.documentData.byteOrderTag == CFByteOrderBigEndian ? ZGEndianBig : ZGEndianLittle];
 	
 	if (self.advancedOptionsPopover != nil)
 	{

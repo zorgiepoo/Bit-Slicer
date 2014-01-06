@@ -60,11 +60,6 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGAddressFormulaKey @"ZGAddressFormulaKey"
 #define ZGScriptKey @"ZGScriptKey"
 
-+ (ZGByteOrder)nativeByteOrder
-{
-	return (CFByteOrderGetCurrent() == CFByteOrderBigEndian ? ZGByteOrderBigEndian : ZGByteOrderLittleEndian);
-}
-
 - (void)encodeWithCoder:(NSCoder *)coder
 {	
 	[coder
@@ -92,7 +87,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	 forKey:ZGQualifierKey];
 	
 	[coder
-	 encodeInt32:self.byteOrder
+	 encodeInt32:(int32_t)self.byteOrder
 	 forKey:ZGByteOrderKey];
 	
 	[coder
@@ -145,9 +140,9 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	self.type = [coder decodeInt32ForKey:ZGTypeKey];
 	self.qualifier = [coder decodeInt32ForKey:ZGQualifierKey];
 	self.byteOrder = [coder decodeInt32ForKey:ZGByteOrderKey];
-	if (self.byteOrder == ZGByteOrderUnknown)
+	if (self.byteOrder == CFByteOrderUnknown)
 	{
-		self.byteOrder = [[self class] nativeByteOrder];
+		self.byteOrder = CFByteOrderGetCurrent();
 	}
 	
 	self.usesDynamicAddress = [coder decodeBoolForKey:ZGDynamicAddressKey];
@@ -229,7 +224,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return size;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled byteOrder:(ZGByteOrder)byteOrder
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled byteOrder:(CFByteOrder)byteOrder
 {
 	if ((self = [super init]))
 	{
@@ -266,7 +261,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled
 {
-	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:description enabled:enabled byteOrder:[[self class] nativeByteOrder]];
+	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:description enabled:enabled byteOrder:CFByteOrderGetCurrent()];
 }
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description
@@ -366,7 +361,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		NSString *newStringValue = nil;
 		
-		BOOL needsByteSwapping = [[self class] nativeByteOrder] != self.byteOrder;
+		BOOL needsByteSwapping = CFByteOrderGetCurrent() != self.byteOrder;
 		
 		switch (self.type)
 		{
@@ -470,7 +465,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				newStringValue =
 					[[NSString alloc]
 					 initWithData:[NSData dataWithBytes:self.value length:(NSUInteger)self.size]
-					 encoding:self.byteOrder == ZGByteOrderLittleEndian ? NSUTF16LittleEndianStringEncoding : NSUTF16BigEndianStringEncoding];
+					 encoding:self.byteOrder == CFByteOrderLittleEndian ? NSUTF16LittleEndianStringEncoding : NSUTF16BigEndianStringEncoding];
 				
 				self.stringValue = newStringValue;
 				

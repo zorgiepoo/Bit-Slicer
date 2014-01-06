@@ -192,9 +192,9 @@
 	self.data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
 	
 	self.data.byteOrderTag = [keyedUnarchiver decodeInt32ForKey:ZGByteOrderTagKey];
-	if (self.data.byteOrderTag == ZGByteOrderUnknown)
+	if (self.data.byteOrderTag == CFByteOrderUnknown)
 	{
-		self.data.byteOrderTag = [ZGVariable nativeByteOrder];
+		self.data.byteOrderTag = CFByteOrderGetCurrent();
 	}
 	
 	id searchValue = [keyedUnarchiver decodeObjectForKey:ZGSearchValueKey];

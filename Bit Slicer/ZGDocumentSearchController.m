@@ -294,7 +294,7 @@
 	NSMutableArray *newVariables = [NSMutableArray array];
 	
 	ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
-	ZGByteOrder byteOrder = (ZGByteOrder)self.documentData.byteOrderTag;
+	CFByteOrder byteOrder = self.documentData.byteOrderTag;
 	ZGProcess *currentProcess = self.windowController.currentProcess;
 	ZGMemorySize pointerSize = currentProcess.pointerSize;
 	
@@ -500,7 +500,7 @@
 		}
 	}
 	
-	if ([ZGVariable nativeByteOrder] != self.documentData.byteOrderTag)
+	if (CFByteOrderGetCurrent() != self.documentData.byteOrderTag)
 	{
 		self.searchData.bytesSwapped = YES;
 		if (ZGSupportsSwappingBeforeSearch(functionType, dataType))

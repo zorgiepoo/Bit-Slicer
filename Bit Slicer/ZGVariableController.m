@@ -334,7 +334,7 @@
 - (void)addVariable:(id)sender
 {
 	ZGVariableQualifier qualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
-	ZGByteOrder byteOrder = (ZGByteOrder)self.documentData.byteOrderTag;
+	CFByteOrder byteOrder = self.documentData.byteOrderTag;
 	ZGVariableType variableType = (ZGVariableType)[sender tag];
 	
 	// Try to get an initial address from the debugger or the memory viewer's selection
@@ -667,7 +667,7 @@
 	
 	if (newValue != nil)
 	{
-		if (variable.byteOrder != [ZGVariable nativeByteOrder])
+		if (variable.byteOrder != CFByteOrderGetCurrent())
 		{
 			swappedValue = ZGSwappedValue(self.windowController.currentProcess.is64Bit, newValue, variable.type, writeSize);
 			newValue = swappedValue;
