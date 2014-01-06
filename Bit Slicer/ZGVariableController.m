@@ -749,7 +749,6 @@
 	NSMutableIndexSet *undoableRowIndexes = [[NSMutableIndexSet alloc] init];
 	NSUInteger currentIndex = rowIndexes.firstIndex;
 	
-	BOOL needsToMarkChange = NO; // we may have to mark a document change even if we don't have any un-doable actions, i.e, scripts
 	while (currentIndex != NSNotFound)
 	{
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:currentIndex];
@@ -764,7 +763,6 @@
 			{
 				[self.windowController.scriptManager stopScriptForVariable:variable];
 			}
-			needsToMarkChange = YES;
 		}
 		else
 		{
@@ -790,10 +788,6 @@
 		[[self.windowController.undoManager prepareWithInvocationTarget:self]
 		 changeVariableEnabled:!enabled
 		 rowIndexes:undoableRowIndexes];
-	}
-	else if (needsToMarkChange)
-	{
-		[self.windowController markDocumentChange];
 	}
 }
 
