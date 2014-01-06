@@ -37,6 +37,7 @@
 #import "ZGDocumentData.h"
 #import "ZGSearchData.h"
 #import "ZGVariable.h"
+#import "ZGScriptManager.h"
 
 @interface ZGDocument ()
 
@@ -166,6 +167,16 @@
 	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
 	
 	NSArray *newVariables = [keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey];
+	
+	// If we're reverting, stop any scripts first
+	for (ZGVariable *variable in self.data.variables)
+	{
+		if (variable.type == ZGScript && variable.enabled)
+		{
+			[self.windowController.scriptManager stopScriptForVariable:variable];
+		}
+	}
+	
 	if (newVariables != nil)
 	{
 		self.data.variables = newVariables;
