@@ -45,6 +45,8 @@
 
 - (void)cleanup;
 
+- (void)loadCachedScriptsFromVariables:(NSArray *)variables;
+
 - (void)openScriptForVariable:(ZGVariable *)variable;
 
 - (void)runScriptForVariable:(ZGVariable *)variable;

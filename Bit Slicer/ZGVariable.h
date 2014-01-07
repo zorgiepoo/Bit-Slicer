@@ -61,6 +61,7 @@ extern NSString *ZGVariablePboardType;
 @property (copy, nonatomic) NSString *stringValue;
 @property (nonatomic) void *freezeValue;
 @property (copy, nonatomic) NSString *scriptValue;
+@property (copy, nonatomic) NSString *cachedScriptPath;
 @property (readonly, nonatomic) NSString *sizeStringValue;
 @property (copy, nonatomic) id description;
 @property (nonatomic, readonly) NSString *shortDescription;

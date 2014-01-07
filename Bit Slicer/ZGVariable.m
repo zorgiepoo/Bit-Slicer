@@ -59,6 +59,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGDynamicAddressKey @"ZGIsPointerKey" // value is for backwards compatibility
 #define ZGAddressFormulaKey @"ZGAddressFormulaKey"
 #define ZGScriptKey @"ZGScriptKey"
+#define ZGScriptCachePathKey @"ZGScriptCachePathKey"
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {	
@@ -127,6 +128,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		[coder encodeObject:self.scriptValue forKey:ZGScriptKey];
 	}
+	
+	if (self.cachedScriptPath != nil)
+	{
+		[coder encodeObject:self.cachedScriptPath forKey:ZGScriptCachePathKey];
+	}
 }
 
 - (id)initWithCoder:(NSCoder *)coder
@@ -179,6 +185,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	
 	NSString *scriptValue = [coder decodeObjectForKey:ZGScriptKey];
 	self.scriptValue = scriptValue != nil ? scriptValue : @"";
+	
+	self.cachedScriptPath = [coder decodeObjectForKey:ZGScriptCachePathKey];
 	
 	return self;
 }

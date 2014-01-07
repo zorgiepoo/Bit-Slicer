@@ -438,6 +438,8 @@
 	
 	[self.functionPopUpButton selectItemWithTag:self.documentData.functionTypeTag];
 	[self updateOptions];
+	
+	[self.scriptManager loadCachedScriptsFromVariables:self.documentData.variables];
 }
 
 #pragma mark Selected Variables

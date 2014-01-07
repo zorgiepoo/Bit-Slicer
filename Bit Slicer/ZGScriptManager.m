@@ -50,6 +50,8 @@
 
 #define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
 
+#define SCRIPT_FILENAME_PREFIX @"Script"
+
 @interface ZGScriptManager ()
 
 @property (nonatomic) NSMutableDictionary *scriptsDictionary;
@@ -99,12 +101,34 @@ static dispatch_queue_t gPythonQueue;
 	dispatch_once(&onceToken, ^{
 		srand((unsigned)time(NULL));
 		
-		if ([[NSFileManager defaultManager] fileExistsAtPath:SCRIPT_CACHES_PATH])
+		if (![[NSFileManager defaultManager] fileExistsAtPath:SCRIPT_CACHES_PATH])
 		{
-			[[NSFileManager defaultManager] removeItemAtPath:SCRIPT_CACHES_PATH error:nil];
+			[[NSFileManager defaultManager] createDirectoryAtPath:SCRIPT_CACHES_PATH withIntermediateDirectories:YES attributes:nil error:nil];
 		}
 		
-		[[NSFileManager defaultManager] createDirectoryAtPath:SCRIPT_CACHES_PATH withIntermediateDirectories:YES attributes:nil error:nil];
+		NSMutableArray *filePathsToRemove = [NSMutableArray array];
+		NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:SCRIPT_CACHES_PATH];
+		for (NSString *filename in directoryEnumerator)
+		{
+			if ([filename hasPrefix:SCRIPT_FILENAME_PREFIX] && [[filename pathExtension] isEqualToString:@"py"])
+			{
+				NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[SCRIPT_CACHES_PATH stringByAppendingPathComponent:filename] error:nil];
+				if (fileAttributes != nil)
+				{
+					NSDate *lastModificationDate = [fileAttributes objectForKey:NSFileModificationDate];
+					if ([[NSDate date] timeIntervalSinceDate:lastModificationDate] > 864000) // 10 days
+					{
+						[filePathsToRemove addObject:[SCRIPT_CACHES_PATH stringByAppendingPathComponent:filename]];
+					}
+				}
+			}
+			[directoryEnumerator skipDescendants];
+		}
+		
+		for (NSString *filename in filePathsToRemove)
+		{
+			[[NSFileManager defaultManager] removeItemAtPath:filename error:nil];
+		}
 		
 		gPythonQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
 		
@@ -172,6 +196,34 @@ static dispatch_queue_t gPythonQueue;
 	[self.fileWatchingQueue addPath:fullPath];
 }
 
+- (void)loadCachedScriptsFromVariables:(NSArray *)variables
+{
+	BOOL needsToMarkChange = NO;
+	for (ZGVariable *variable in variables)
+	{
+		if (variable.type == ZGScript)
+		{
+			if (variable.cachedScriptPath != nil && [[NSFileManager defaultManager] fileExistsAtPath:variable.cachedScriptPath])
+			{
+				NSString *cachedScriptString = [[NSString alloc] initWithContentsOfFile:variable.cachedScriptPath encoding:NSUTF8StringEncoding error:nil];
+				if (cachedScriptString != nil && variable.scriptValue != nil && ![variable.scriptValue isEqualToString:cachedScriptString] && cachedScriptString.length > 0)
+				{
+					variable.scriptValue = cachedScriptString;
+					needsToMarkChange = YES;
+				}
+				
+				// Make sure we're watching the script for changes
+				[self scriptForVariable:variable];
+			}
+		}
+	}
+	
+	if (needsToMarkChange)
+	{
+		[self.windowController markDocumentChange];
+	}
+}
+
 - (ZGPyScript *)scriptForVariable:(ZGVariable *)variable
 {
 	ZGPyScript *script = [self.scriptsDictionary objectForKey:[NSValue valueWithNonretainedObject:variable]];
@@ -184,21 +236,35 @@ static dispatch_queue_t gPythonQueue;
 	
 	if (script == nil)
 	{
-		unsigned int randomInteger = rand() % INT32_MAX;
+		NSString *scriptPath = nil;
 		
-		NSMutableString *randomFilename = [NSMutableString stringWithFormat:@"Script  (Temp) %X", randomInteger];
-		while ([[NSFileManager defaultManager] fileExistsAtPath:[[SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename] stringByAppendingString:@".py"]])
+		if (variable.cachedScriptPath != nil && [[NSFileManager defaultManager] fileExistsAtPath:variable.cachedScriptPath])
 		{
-			[randomFilename appendString:@"1"];
+			scriptPath = variable.cachedScriptPath;
+		}
+		else
+		{
+			unsigned int randomInteger = rand() % INT32_MAX;
+			
+			NSMutableString *randomFilename = [NSMutableString stringWithFormat:@"%@ %X", SCRIPT_FILENAME_PREFIX, randomInteger];
+			while ([[NSFileManager defaultManager] fileExistsAtPath:[[SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename] stringByAppendingString:@".py"]])
+			{
+				[randomFilename appendString:@"1"];
+			}
+			
+			[randomFilename appendString:@".py"];
+			
+			scriptPath = [SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename];
 		}
 		
-		[randomFilename appendString:@".py"];
+		if (variable.cachedScriptPath == nil || ![variable.cachedScriptPath isEqualToString:scriptPath])
+		{
+			variable.cachedScriptPath = scriptPath;
+			[self.windowController markDocumentChange];
+		}
 		
-		NSMutableData *scriptData = [NSMutableData data];
+		NSData *scriptData = [variable.scriptValue dataUsingEncoding:NSUTF8StringEncoding];
 		
-		[scriptData appendData:[variable.scriptValue dataUsingEncoding:NSUTF8StringEncoding]];
-		
-		NSString *scriptPath = [SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename];
 		script = [[ZGPyScript alloc] initWithPath:scriptPath];
 		
 		// We have to import the module the first time succesfully so we can reload it later; to ensure this, we use an empty file
