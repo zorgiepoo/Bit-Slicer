@@ -46,4 +46,9 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	Py_XDECREF(self.condition);
+}
+
 @end

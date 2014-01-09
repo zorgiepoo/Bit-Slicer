@@ -59,6 +59,7 @@ bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes,
 void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size);
 
 bool ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
+bool ZGWriteBytesOverwritingProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
 bool ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
 
 bool ZGRegionInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryBasicInfo *regionInfo);

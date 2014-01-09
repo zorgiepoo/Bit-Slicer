@@ -33,13 +33,18 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "Python.h"
 #import "VDKQueue.h"
 #import "ZGMemoryTypes.h"
 
 @class ZGDocumentWindowController;
 @class ZGVariable;
+@class ZGProcess;
 
 @interface ZGScriptManager : NSObject <VDKQueueDelegate>
+
++ (PyObject *)compiledExpressionFromExpression:(NSString *)expression;
++ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process variables:(NSArray *)variables error:(NSError **)error;
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 

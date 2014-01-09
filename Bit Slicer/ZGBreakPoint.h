@@ -33,6 +33,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "Python.h"
 #import "ZGMemoryTypes.h"
 #import "ZGBreakPointDelegate.h"
 
@@ -60,5 +61,7 @@ typedef enum
 @property (assign) BOOL hidden;
 @property (assign) ZGMemoryAddress basePointer;
 @property (nonatomic) NSMutableDictionary *cacheDictionary;
+@property (nonatomic) PyObject *condition;
+@property (nonatomic) ZGMemoryProtection originalProtection;
 
 @end

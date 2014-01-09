@@ -38,7 +38,6 @@
 #import "ZGVariable.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGPyScript.h"
-#import "Python.h"
 #import "ZGPyVirtualMemory.h"
 #import "ZGPyDebugger.h"
 #import "ZGProcess.h"
@@ -136,6 +135,100 @@ static dispatch_queue_t gPythonQueue;
 		
 		[self initializePythonInterpreter];
 	});
+}
+
++ (PyObject *)compiledExpressionFromExpression:(NSString *)expression
+{
+	return Py_CompileString([expression UTF8String], "EvaluateCondition", Py_eval_input);
+}
+
++ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process variables:(NSArray *)variables error:(NSError **)error
+{
+	__block BOOL result = NO;
+	dispatch_sync(gPythonQueue, ^{
+		PyObject *mainModule = PyImport_AddModule("__main__");
+		
+		NSMutableArray *objectsPool = [NSMutableArray array];
+		CFRetain((__bridge CFTypeRef)(objectsPool));
+		
+		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:process objectsPool:objectsPool];
+		
+		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.vmObject);
+		
+		PyObject *globalDictionary = PyModule_GetDict(mainModule);
+		PyObject *localDictionary = PyDict_New();
+		
+		for (ZGVariable *variable in variables)
+		{
+			PyObject *variableObject = NULL;
+			
+			switch (variable.type)
+			{
+				case ZGPointer:
+					if (variable.qualifier == ZGSigned)
+					{
+						variableObject = process.is64Bit ? Py_BuildValue("i", *(int32_t *)variable.value) : Py_BuildValue("L", *(int64_t *)variable.value);
+					}
+					else
+					{
+						variableObject = process.is64Bit ? Py_BuildValue("I", *(uint32_t *)variable.value) : Py_BuildValue("K", *(uint64_t *)variable.value);
+					}
+					break;
+				default:
+					variableObject = Py_BuildValue("y#", variable.value, variable.size);
+					break;
+			}
+			
+			if (variableObject != NULL)
+			{
+				// Use description instead of name for performance
+				PyDict_SetItemString(localDictionary, [[variable.description string] UTF8String], variableObject);
+			}
+			
+			Py_XDECREF(variableObject);
+		}
+		
+		PyObject *evaluatedCode = PyEval_EvalCode(compiledExpression, globalDictionary, localDictionary);
+		
+		if (evaluatedCode == NULL)
+		{
+			result = NO;
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:2 userInfo:@{}];
+			}
+			
+			PyObject *type, *value, *traceback;
+			PyErr_Fetch(&type, &value, &traceback);
+			
+			[self logPythonObject:type];
+			[self logPythonObject:value];
+			[self logPythonObject:traceback];
+		}
+		else
+		{
+			int temporaryResult = PyObject_IsTrue(evaluatedCode);
+			if (temporaryResult == -1)
+			{
+				result = NO;
+				if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:3 userInfo:@{}];
+				}
+			}
+			else
+			{
+				result = temporaryResult;
+			}
+		}
+		
+		Py_XDECREF(evaluatedCode);
+		
+		Py_XDECREF(localDictionary);
+		
+		CFRelease((__bridge CFTypeRef)(objectsPool));
+	});
+	return result;
 }
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController
@@ -298,7 +391,7 @@ static dispatch_queue_t gPythonQueue;
 	}
 }
 
-- (void)logPythonObject:(PyObject *)pythonObject
++ (void)logPythonObject:(PyObject *)pythonObject
 {
 	if (pythonObject != NULL)
 	{
@@ -339,9 +432,9 @@ static dispatch_queue_t gPythonQueue;
 		}
 	});
 	
-	[self logPythonObject:type];
-	[self logPythonObject:value];
-	[self logPythonObject:traceback];
+	[[self class] logPythonObject:type];
+	[[self class] logPythonObject:value];
+	[[self class] logPythonObject:traceback];
 }
 
 - (BOOL)executeScript:(ZGPyScript *)script

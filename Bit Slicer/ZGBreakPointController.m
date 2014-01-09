@@ -63,6 +63,8 @@
 #import "ZGDebuggerController.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
+#import "ZGScriptManager.h"
+#import "ZGRegistersController.h"
 
 #import <mach/task.h>
 #import <mach/thread_act.h>
@@ -273,7 +275,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	if (breakPoint.type == ZGBreakPointInstruction && [self.breakPoints containsObject:breakPoint])
 	{
 		// Restore our instruction
-		ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+		ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
 		
 		breakPoint.needsToRestore = YES;
 		
@@ -315,7 +317,8 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint
 {
 	// Restore our instruction
-	ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+	ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+	ZGProtect(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.size, breakPoint.originalProtection);
 	
 	[self removeBreakPoint:breakPoint];
 }
@@ -444,7 +447,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			{
 				// Restore our breakpoint
 				uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
-				ZGWriteBytesIgnoringProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
+				ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
 				
 				breakPoint.needsToRestore = NO;
 				handledInstructionBreakPoint = YES;
@@ -499,9 +502,37 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	// We should notify delegates if a breakpoint hits after we modify thread states
 	for (ZGBreakPoint *breakPoint in breakPointsToNotify)
 	{
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
-		});
+		BOOL canNotifyDelegate = YES;
+		if (breakPoint.condition != NULL)
+		{
+			NSArray *registerVariables = [ZGRegistersController registerVariablesFromGeneralPurposeThreadState:threadState is64Bit:breakPoint.process.is64Bit];
+			for (ZGVariable *variable in registerVariables)
+			{
+				variable.type = ZGPointer;
+			}
+			
+			NSError *error = nil;
+			if (![ZGScriptManager evaluateCondition:breakPoint.condition process:breakPoint.process variables:registerVariables error:&error])
+			{
+				canNotifyDelegate = NO;
+			}
+			
+			if (error != nil)
+			{
+				NSLog(@"Error: %@", error);
+			}
+		}
+		
+		if (canNotifyDelegate)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
+			});
+		}
+		else
+		{
+			[self resumeFromBreakPoint:breakPoint];
+		}
 	}
 	
 	ZGResumeTask(task);
@@ -818,16 +849,19 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	if (!(memoryProtection & VM_PROT_EXECUTE))
 	{
 		memoryProtection |= VM_PROT_EXECUTE;
-		if (!ZGProtect(process.processTask, protectionAddress, protectionSize, memoryProtection))
-		{
-			return NO;
-		}
+	}
+	
+	if (!ZGProtect(process.processTask, protectionAddress, protectionSize, memoryProtection))
+	{
+		return NO;
 	}
 	
 	ZGVariable *variable = [instruction.variable copy];
 	
+	ZGProtect(process.processTask, variable.address, variable.size, VM_PROT_ALL);
+	
 	uint8_t breakPointOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
-	BOOL success = ZGWriteBytesIgnoringProtection(process.processTask, variable.address, &breakPointOpcode, sizeof(uint8_t));
+	BOOL success = ZGWriteBytesOverwritingProtection(process.processTask, variable.address, &breakPointOpcode, sizeof(uint8_t));
 	if (success)
 	{
 		ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] init];
@@ -839,6 +873,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		breakPoint.hidden = isHidden;
 		breakPoint.thread = thread;
 		breakPoint.basePointer = basePointer;
+		breakPoint.originalProtection = memoryProtection;
 		
 		[self addBreakPoint:breakPoint];
 	}

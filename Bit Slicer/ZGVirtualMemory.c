@@ -100,7 +100,7 @@ bool ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *
 	return (mach_vm_write(processTask, address, (vm_offset_t)bytes, (mach_msg_type_number_t)size) == KERN_SUCCESS);
 }
 
-bool ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)
+static bool ZGWriteBytesOverwritingProtectionAndRevertingBack(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size, bool revertingBack)
 {
 	ZGMemoryAddress protectionAddress = address;
 	ZGMemorySize protectionSize = size;
@@ -122,12 +122,23 @@ bool ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress add
 	bool success = ZGWriteBytes(processTask, address, bytes, size);
 	
 	// Re-protect the region back to the way it was
-	if (!(oldProtection & VM_PROT_WRITE))
+	if (revertingBack && !(oldProtection & VM_PROT_WRITE))
 	{
 		ZGProtect(processTask, protectionAddress, protectionSize, oldProtection);
 	}
 	
 	return success;
+}
+
+bool ZGWriteBytesOverwritingProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)
+{
+	return ZGWriteBytesOverwritingProtectionAndRevertingBack(processTask, address, bytes, size, false);
+}
+
+
+bool ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)
+{
+	return ZGWriteBytesOverwritingProtectionAndRevertingBack(processTask, address, bytes, size, true);
 }
 
 bool ZGRegionInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryBasicInfo *regionInfo)
