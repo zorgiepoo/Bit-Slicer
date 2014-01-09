@@ -394,8 +394,20 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			}
 			else
 			{
-				ZGInstruction *foundInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:(breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) inProcess:breakPoint.process];
-				foundInstructionAddress = foundInstruction.variable.address;
+				ZGMemoryAddress instructionPointer = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
+				
+				NSNumber *instructionPointerNumber = @(instructionPointer);
+				NSNumber *existingInstructionAddress = [breakPoint.cacheDictionary objectForKey:instructionPointerNumber];
+				if (existingInstructionAddress == nil)
+				{
+					ZGInstruction *foundInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process];
+					foundInstructionAddress = foundInstruction.variable.address;
+					[breakPoint.cacheDictionary setObject:@(foundInstructionAddress) forKey:instructionPointerNumber];
+				}
+				else
+				{
+					foundInstructionAddress = [existingInstructionAddress unsignedLongLongValue];
+				}
 			}
 			
 			if (foundInstructionAddress == breakPoint.variable.address)

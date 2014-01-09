@@ -36,4 +36,14 @@
 
 @implementation ZGBreakPoint
 
+- (id)init
+{
+	self = [super init];
+	if (self != nil)
+	{
+		self.cacheDictionary = [NSMutableDictionary dictionary];
+	}
+	return self;
+}
+
 @end

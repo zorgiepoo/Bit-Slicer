@@ -59,5 +59,6 @@ typedef enum
 @property (assign) BOOL needsToRestore;
 @property (assign) BOOL hidden;
 @property (assign) ZGMemoryAddress basePointer;
+@property (nonatomic) NSMutableDictionary *cacheDictionary;
 
 @end
