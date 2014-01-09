@@ -387,15 +387,14 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			}
 			
 			ZGMemoryAddress foundInstructionAddress = 0x0;
+			ZGMemoryAddress instructionPointer = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 			
 			if (foundSingleStepBreakPoint)
 			{
-				foundInstructionAddress = (breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip);
+				foundInstructionAddress = instructionPointer;
 			}
 			else
 			{
-				ZGMemoryAddress instructionPointer = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
-				
 				NSNumber *instructionPointerNumber = @(instructionPointer);
 				NSNumber *existingInstructionAddress = [breakPoint.cacheDictionary objectForKey:instructionPointerNumber];
 				if (existingInstructionAddress == nil)
