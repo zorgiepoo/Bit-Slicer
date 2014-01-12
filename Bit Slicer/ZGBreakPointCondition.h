@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/29/12.
+ * Created by Mayur Pawashe on 1/12/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,18 +32,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGBreakPoint.h"
+#import <Foundation/Foundation.h>
+#import "Python.h"
+#import "ZGMemoryTypes.h"
 
-@implementation ZGBreakPoint
+@interface ZGBreakPointCondition : NSObject
 
-- (id)init
-{
-	self = [super init];
-	if (self != nil)
-	{
-		self.cacheDictionary = [NSMutableDictionary dictionary];
-	}
-	return self;
-}
+- (id)initWithInternalProcessName:(NSString *)internalProcessName address:(ZGMemoryAddress)address condition:(NSString *)condition compiledCondition:(PyObject *)compiledCondition;
+
+@property (nonatomic, copy) NSString *condition;
+@property (nonatomic) PyObject *compiledCondition;
+@property (nonatomic, copy) NSString *internalProcessName;
+@property (nonatomic) ZGMemoryAddress address;
 
 @end

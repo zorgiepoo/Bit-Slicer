@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
+		770F283F18827D1B001B828C /* ZGBreakPointConditionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770F283D18827D1B001B828C /* ZGBreakPointConditionViewController.xib */; };
+		770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F284118832132001B828C /* ZGBreakPointCondition.m */; };
 		770FABAC1848354100C176B7 /* ZGEditValueWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABAA1848354100C176B7 /* ZGEditValueWindowController.m */; };
 		770FABAD1848354100C176B7 /* ZGEditValueWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770FABAB1848354100C176B7 /* ZGEditValueWindowController.xib */; };
 		770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABAF18490DB400C176B7 /* ZGEditAddressWindowController.m */; };
@@ -155,6 +158,11 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; };
+		770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGBreakPointConditionViewController.m; path = "Bit Slicer/ZGBreakPointConditionViewController.m"; sourceTree = "<group>"; };
+		770F283D18827D1B001B828C /* ZGBreakPointConditionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGBreakPointConditionViewController.xib; path = "Bit Slicer/ZGBreakPointConditionViewController.xib"; sourceTree = "<group>"; };
+		770F284018832132001B828C /* ZGBreakPointCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointCondition.h; path = "Bit Slicer/ZGBreakPointCondition.h"; sourceTree = "<group>"; };
+		770F284118832132001B828C /* ZGBreakPointCondition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGBreakPointCondition.m; path = "Bit Slicer/ZGBreakPointCondition.m"; sourceTree = "<group>"; };
 		770FABA91848354100C176B7 /* ZGEditValueWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGEditValueWindowController.h; path = "Bit Slicer/ZGEditValueWindowController.h"; sourceTree = "<group>"; };
 		770FABAA1848354100C176B7 /* ZGEditValueWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditValueWindowController.m; path = "Bit Slicer/ZGEditValueWindowController.m"; sourceTree = "<group>"; };
 		770FABAB1848354100C176B7 /* ZGEditValueWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGEditValueWindowController.xib; path = "Bit Slicer/ZGEditValueWindowController.xib"; sourceTree = "<group>"; };
@@ -657,6 +665,11 @@
 				77F1164217D2EFB4009E002A /* ZGDisassemblerObject.m */,
 				77F1164417D2EFBD009E002A /* ZGInstruction.h */,
 				77F1164517D2EFBD009E002A /* ZGInstruction.m */,
+				770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */,
+				770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */,
+				770F283D18827D1B001B828C /* ZGBreakPointConditionViewController.xib */,
+				770F284018832132001B828C /* ZGBreakPointCondition.h */,
+				770F284118832132001B828C /* ZGBreakPointCondition.m */,
 				77F1164717D2EFC8009E002A /* ZGBreakPointController.h */,
 				77F1164817D2EFC8009E002A /* ZGBreakPointController.m */,
 				77F1164A17D2EFD1009E002A /* ZGBreakPointDelegate.h */,
@@ -1119,6 +1132,7 @@
 				77988F1C185804AC00476A37 /* container_filled.pdf in Resources */,
 				7743F9C618024CE400DBC19A /* python3.3 in Resources */,
 				77988F1A185803E800476A37 /* container.pdf in Resources */,
+				770F283F18827D1B001B828C /* ZGBreakPointConditionViewController.xib in Resources */,
 				77F115B617D2EBAF009E002A /* InfoPlist.strings in Resources */,
 				77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */,
 				77F115B917D2EBCB009E002A /* MainMenu.xib in Resources */,
@@ -1174,6 +1188,7 @@
 				77F115CD17D2ED64009E002A /* ZGMemoryViewerController.m in Sources */,
 				77F115D017D2ED74009E002A /* ZGVerticalScrollerRepresenter.m in Sources */,
 				77F115D317D2ED82009E002A /* ZGStatusBarRepresenter.m in Sources */,
+				770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */,
 				77F115D617D2ED8E009E002A /* ZGLineCountingRepresenter.m in Sources */,
 				771A931D18791A8D0098511D /* ZGTableView.m in Sources */,
 				77F115D917D2ED9D009E002A /* ZGLineCountingView.m in Sources */,
@@ -1213,6 +1228,7 @@
 				77F1163817D2EF76009E002A /* NSArrayAdditions.m in Sources */,
 				77F1163A17D2EF7F009E002A /* main.m in Sources */,
 				77F1163D17D2EF8E009E002A /* ZGMemoryWindowController.m in Sources */,
+				770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */,
 				77F1164017D2EF9E009E002A /* ZGDebuggerController.m in Sources */,
 				77F1164317D2EFB4009E002A /* ZGDisassemblerObject.m in Sources */,
 				77F1164617D2EFBD009E002A /* ZGInstruction.m in Sources */,

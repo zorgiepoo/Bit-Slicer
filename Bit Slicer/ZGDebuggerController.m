@@ -41,6 +41,8 @@
 #import "ZGInstruction.h"
 #import "ZGBreakPoint.h"
 #import "ZGBreakPointController.h"
+#import "ZGBreakPointCondition.h"
+#import "ZGScriptManager.h"
 #import "ZGDisassemblerObject.h"
 #import "ZGUtilities.h"
 #import "ZGRegistersController.h"
@@ -79,6 +81,9 @@
 
 @property (nonatomic) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
+
+@property (nonatomic) NSPopover *breakPointConditionPopover;
+@property (nonatomic) NSMutableArray *breakPointConditions;
 
 @property (nonatomic) id breakPointActivity;
 
@@ -1405,6 +1410,13 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
+	else if (userInterfaceItem.action == @selector(showBreakPointCondition:))
+	{
+		if ([[self selectedInstructions] count] != 1)
+		{
+			return NO;
+		}
+	}
 	
 	return [super validateUserInterfaceItem:userInterfaceItem];
 }
@@ -2198,7 +2210,18 @@ END_DEBUGGER_CHANGE:
 		if (![self isBreakPointAtInstruction:instruction])
 		{
 			[changedInstructions addObject:instruction];
-			addedAtLeastOneBreakPoint = [[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess delegate:self] || addedAtLeastOneBreakPoint;
+			
+			PyObject *compiledCondition = NULL;
+			for (ZGBreakPointCondition *breakPointCondition in self.breakPointConditions)
+			{
+				if (breakPointCondition.address == instruction.variable.address && [breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName])
+				{
+					compiledCondition = breakPointCondition.compiledCondition;
+					break;
+				}
+			}
+			
+			addedAtLeastOneBreakPoint = [[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self.currentProcess condition:compiledCondition delegate:self] || addedAtLeastOneBreakPoint;
 		}
 	}
 	
@@ -2471,6 +2494,105 @@ END_DEBUGGER_CHANGE:
 		}
 	}
 	return foundProcess;
+}
+
+#pragma mark Breakpoint Conditions
+
+- (IBAction)showBreakPointCondition:(id)sender
+{
+	if (self.breakPointConditionPopover == nil)
+	{
+		self.breakPointConditionPopover = [[NSPopover alloc] init];
+		self.breakPointConditionPopover.contentViewController = [[ZGBreakPointConditionViewController alloc] initWithDelegate:self];
+		self.breakPointConditionPopover.behavior = NSPopoverBehaviorSemitransient;
+	}
+	
+	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
+	
+	[(ZGBreakPointConditionViewController *)self.breakPointConditionPopover.contentViewController setTargetAddress:selectedInstruction.variable.address];
+	
+	NSString *displayedCondition = @"";
+	for (ZGBreakPointCondition *breakPointCondition in self.breakPointConditions)
+	{
+		if ([breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && breakPointCondition.address == selectedInstruction.variable.address)
+		{
+			displayedCondition = breakPointCondition.condition;
+			break;
+		}
+	}
+	
+	[(ZGBreakPointConditionViewController *)self.breakPointConditionPopover.contentViewController setCondition:displayedCondition];
+	
+	NSUInteger selectedRow = [self.selectedInstructionIndexes firstIndex];
+	
+	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
+	if (visibleRowsRange.location > selectedRow || selectedRow >= visibleRowsRange.location + visibleRowsRange.length)
+	{
+		[self scrollAndSelectRow:selectedRow];
+	}
+	
+	NSRect cellFrame = [self.instructionsTableView frameOfCellAtColumn:0 row:selectedRow];
+	[self.breakPointConditionPopover showRelativeToRect:cellFrame ofView:self.instructionsTableView preferredEdge:NSMaxYEdge];
+}
+
+- (void)breakPointConditionDidCancel
+{
+	[self.breakPointConditionPopover performClose:nil];
+}
+
+- (void)breakPointCondition:(NSString *)condition didChangeAtAddress:(ZGMemoryAddress)address
+{
+	NSString *strippedCondition = [condition stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	
+	PyObject *newCompiledCondition = NULL;
+	
+	if (strippedCondition.length > 0)
+	{
+		newCompiledCondition = [ZGScriptManager compiledExpressionFromExpression:strippedCondition];
+		if (newCompiledCondition == NULL)
+		{
+			NSLog(@"Error: compiled expression %@ is NULL", strippedCondition);
+			NSRunAlertPanel(@"Invalid Breakpoint Expression", @"An error occured trying to parse this expression", @"OK", nil, nil);
+			return;
+		}
+	}
+	
+	NSArray *breakPoints = [[[ZGAppController sharedController] breakPointController] breakPoints];
+	for (ZGBreakPoint *breakPoint in breakPoints)
+	{
+		if (breakPoint.type == ZGBreakPointInstruction && [breakPoint.process.internalName isEqualToString:self.currentProcess.internalName] && breakPoint.variable.address == address)
+		{
+			breakPoint.condition = newCompiledCondition;
+		}
+	}
+	
+	BOOL foundExistingCondition = NO;
+	for (ZGBreakPointCondition *breakPointCondition in self.breakPointConditions)
+	{
+		if ([breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && breakPointCondition.address == address)
+		{
+			breakPointCondition.compiledCondition = newCompiledCondition;
+			foundExistingCondition = YES;
+			break;
+		}
+	}
+	
+	if (!foundExistingCondition && newCompiledCondition != NULL)
+	{
+		if (self.breakPointConditions == nil)
+		{
+			self.breakPointConditions = [NSMutableArray array];
+		}
+		
+		[self.breakPointConditions addObject:
+		 [[ZGBreakPointCondition alloc]
+		  initWithInternalProcessName:self.currentProcess.internalName
+		  address:address
+		  condition:strippedCondition
+		  compiledCondition:newCompiledCondition]];
+	}
+	
+	[self.breakPointConditionPopover performClose:nil];
 }
 
 #pragma mark Memory Viewer

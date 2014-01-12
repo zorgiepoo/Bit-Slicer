@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/29/12.
+ * Created by Mayur Pawashe on 1/12/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,18 +32,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGBreakPoint.h"
+#import "ZGBreakPointCondition.h"
 
-@implementation ZGBreakPoint
+@implementation ZGBreakPointCondition
 
-- (id)init
+- (id)initWithInternalProcessName:(NSString *)internalProcessName address:(ZGMemoryAddress)address condition:(NSString *)condition compiledCondition:(PyObject *)compiledCondition
 {
 	self = [super init];
 	if (self != nil)
 	{
-		self.cacheDictionary = [NSMutableDictionary dictionary];
+		self.condition = condition;
+		self.compiledCondition = compiledCondition;
+		self.address = address;
+		self.internalProcessName = internalProcessName;
 	}
 	return self;
+}
+
+- (void)setCompiledCondition:(PyObject *)compiledCondition
+{
+	Py_XDECREF(_compiledCondition);
+	_compiledCondition = compiledCondition;
+}
+
+- (void)dealloc
+{
+	self.compiledCondition = NULL;
 }
 
 @end

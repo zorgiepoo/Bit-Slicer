@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/29/12.
+ * Created by Mayur Pawashe on 1/12/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,18 +32,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGBreakPoint.h"
+#import <Cocoa/Cocoa.h>
+#import "ZGMemoryTypes.h"
 
-@implementation ZGBreakPoint
+@protocol ZGBreakPointConditionDelegate <NSObject>
 
-- (id)init
-{
-	self = [super init];
-	if (self != nil)
-	{
-		self.cacheDictionary = [NSMutableDictionary dictionary];
-	}
-	return self;
-}
+- (void)breakPointCondition:(NSString *)condition didChangeAtAddress:(ZGMemoryAddress)address;
+- (void)breakPointConditionDidCancel;
+
+@end
+
+@interface ZGBreakPointConditionViewController : NSViewController
+
+- (id)initWithDelegate:(id <ZGBreakPointConditionDelegate>)delegate;
+
+@property (nonatomic) ZGMemoryAddress targetAddress;
+@property (nonatomic, copy) NSString *condition;
 
 @end

@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/29/12.
+ * Created by Mayur Pawashe on 1/12/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,18 +32,57 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGBreakPoint.h"
+#import "ZGBreakPointConditionViewController.h"
 
-@implementation ZGBreakPoint
+@interface ZGBreakPointConditionViewController ()
 
-- (id)init
+@property (nonatomic, weak) id <ZGBreakPointConditionDelegate> delegate;
+
+@property (nonatomic, assign) IBOutlet NSTextField *conditionTextField;
+
+@end
+
+@implementation ZGBreakPointConditionViewController
+
+- (id)initWithDelegate:(id <ZGBreakPointConditionDelegate>)delegate
 {
-	self = [super init];
-	if (self != nil)
+	self = [self initWithNibName:NSStringFromClass([self class]) bundle:nil];
+    if (self != nil)
 	{
-		self.cacheDictionary = [NSMutableDictionary dictionary];
+		self.delegate = delegate;
+    }
+    return self;
+}
+
+- (void)updateConditionDisplay
+{
+	if (self.condition != nil)
+	{
+		[self.conditionTextField setStringValue:self.condition];
 	}
-	return self;
+}
+
+- (void)setCondition:(NSString *)condition
+{
+	_condition = condition;
+	[self updateConditionDisplay];
+}
+
+- (IBAction)changeCondition:(id)sender
+{
+	[self.delegate breakPointCondition:[self.conditionTextField stringValue] didChangeAtAddress:self.targetAddress];
+}
+
+- (IBAction)cancel:(id)sender
+{
+	[self.delegate breakPointConditionDidCancel];
+}
+
+// TODO: I will need to change this URL
+#define BREAKPOINT_CONDITION_SCRIPTING @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Scripting"
+- (IBAction)showHelp:(id)sender
+{
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:BREAKPOINT_CONDITION_SCRIPTING]];
 }
 
 @end

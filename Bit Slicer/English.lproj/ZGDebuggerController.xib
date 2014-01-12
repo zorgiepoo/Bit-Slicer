@@ -57,6 +57,12 @@
                         <action selector="nopVariables:" target="-1" id="157"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Set Breakpoint Condition…" id="FMB-Ym-nZO">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="showBreakPointCondition:" target="-2" id="cln-yq-dBV"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Inject Code…" id="sc9-6G-u0H">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>

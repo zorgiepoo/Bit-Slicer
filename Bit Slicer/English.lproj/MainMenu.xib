@@ -415,6 +415,12 @@ CA
                                     <action selector="removeAllBreakPoints:" target="-1" id="1036"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Set Breakpoint Condition…" keyEquivalent="\" id="knB-aR-Qem">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="showBreakPointCondition:" target="-1" id="QLI-IW-IK9"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="1021"/>
                             <menuItem title="Continue Execution" keyEquivalent="E" id="1061">
                                 <connections>

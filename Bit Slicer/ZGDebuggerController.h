@@ -37,6 +37,7 @@
 #import "ZGMemoryWindowController.h"
 #import "ZGCodeInjectionWindowController.h"
 #import "ZGBreakPointDelegate.h"
+#import "ZGBreakPointConditionViewController.h"
 
 #define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
 
@@ -44,7 +45,7 @@
 @class ZGInstruction;
 @class ZGMachBinary;
 
-@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource, ZGBreakPointDelegate>
+@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate>
 
 @property (readwrite, nonatomic) BOOL disassembling;
 

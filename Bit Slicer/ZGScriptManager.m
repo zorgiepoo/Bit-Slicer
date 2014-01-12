@@ -139,7 +139,25 @@ static dispatch_queue_t gPythonQueue;
 
 + (PyObject *)compiledExpressionFromExpression:(NSString *)expression
 {
-	return Py_CompileString([expression UTF8String], "EvaluateCondition", Py_eval_input);
+	__block PyObject *compiledExpression = NULL;
+	
+	dispatch_sync(gPythonQueue, ^{
+		compiledExpression = Py_CompileString([expression UTF8String], "EvaluateCondition", Py_eval_input);
+		
+		if (compiledExpression == NULL)
+		{
+			PyObject *type, *value, *traceback;
+			PyErr_Fetch(&type, &value, &traceback);
+			
+			[self logPythonObject:type];
+			[self logPythonObject:value];
+			[self logPythonObject:traceback];
+			
+			PyErr_Clear();
+		}
+	});
+	
+	return compiledExpression;
 }
 
 + (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process variables:(NSArray *)variables error:(NSError **)error
@@ -204,6 +222,8 @@ static dispatch_queue_t gPythonQueue;
 			[self logPythonObject:type];
 			[self logPythonObject:value];
 			[self logPythonObject:traceback];
+			
+			PyErr_Clear();
 		}
 		else
 		{
