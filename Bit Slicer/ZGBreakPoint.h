@@ -59,6 +59,7 @@ typedef enum
 @property (assign) ZGBreakPointType type;
 @property (assign) BOOL needsToRestore;
 @property (assign) BOOL hidden;
+@property BOOL dead;
 @property (assign) ZGMemoryAddress basePointer;
 @property (nonatomic) NSMutableDictionary *cacheDictionary;
 @property (nonatomic) PyObject *condition;

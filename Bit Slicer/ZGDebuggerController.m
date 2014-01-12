@@ -2211,7 +2211,7 @@ END_DEBUGGER_CHANGE:
 	}
 	else
 	{
-		NSRunAlertPanel(@"Failed to Add Breakpoint", @"A breakpoint could not be added most likely because the instruction's memory protection is not executable.", @"OK", nil, nil);
+		NSRunAlertPanel(@"Failed to Add Breakpoint", @"A breakpoint could not be added. Please try again later.", @"OK", nil, nil);
 	}
 }
 
@@ -2403,8 +2403,14 @@ END_DEBUGGER_CHANGE:
 	{
 		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		
-		[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:self.registersController.basePointer delegate:self];
-		[self continueExecution:nil];
+		if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:self.registersController.basePointer delegate:self])
+		{
+			[self continueExecution:nil];
+		}
+		else
+		{
+			NSRunAlertPanel(@"Failed to Step Over", @"Stepping over the instruction failed. Please try again.", @"OK", nil, nil);
+		}
 	}
 	else
 	{
@@ -2417,9 +2423,14 @@ END_DEBUGGER_CHANGE:
 	ZGInstruction *outterInstruction = [self.backtraceController.instructions objectAtIndex:1];
 	ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 	
-	[[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceController.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self];
-	
-	[self continueExecution:nil];
+	if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceController.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self])
+	{
+		[self continueExecution:nil];
+	}
+	else
+	{
+		NSRunAlertPanel(@"Failed to Step Out", @"Stepping out of the function failed. Please try again.", @"OK", nil, nil);
+	}
 }
 
 - (IBAction)stepExecution:(id)sender

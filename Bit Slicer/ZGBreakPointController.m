@@ -279,14 +279,21 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		
 		breakPoint.needsToRestore = YES;
 		
-		// Ensure single-stepping, so on next instruction we can restore our breakpoint
-		shouldSingleStep = YES;
+		if (!breakPoint.dead)
+		{
+			// Ensure single-stepping, so on next instruction we can restore our breakpoint
+			shouldSingleStep = YES;
+		}
+		else
+		{
+			[self removeBreakPoint:breakPoint];
+		}
 	}
 	else
 	{
 		for (ZGBreakPoint *candidateBreakPoint in self.breakPoints)
 		{
-			if (candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.thread == breakPoint.thread && candidateBreakPoint.task == breakPoint.task && [self.breakPoints containsObject:candidateBreakPoint])
+			if (candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.thread == breakPoint.thread && candidateBreakPoint.task == breakPoint.task)
 			{
 				shouldSingleStep = YES;
 				break;
@@ -316,11 +323,26 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	// Restore our instruction
-	ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
-	ZGProtect(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.size, breakPoint.originalProtection);
+	// Mark breakpoint as dead. if the breakpoint is called frequently, it will be removed when resuming from a breakpoint
+	// We handle a breakpoint by reverting the instruction back to normal, single stepping, then reverting the instruction opcode back to being breaked
+	// If we just removed the breakpoint immediately here, and the process single steps, the handler won't know why the exception was raised
+	// Our work around here is giving the process a little delay (perhaps a better way might be to add a single-stepping breakpoint and remove it from there)
+	breakPoint.dead = YES;
 	
-	[self removeBreakPoint:breakPoint];
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void) {
+		if ([self.breakPoints containsObject:breakPoint])
+		{
+			// Restore our instruction
+			ZGSuspendTask(breakPoint.process.processTask);
+			
+			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+			ZGProtect(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.size, breakPoint.originalProtection);
+			
+			[self removeBreakPoint:breakPoint];
+			
+			ZGResumeTask(breakPoint.process.processTask);
+		}
+	});
 }
 
 - (void)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process
@@ -344,6 +366,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 - (BOOL)handleInstructionBreakPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
 {
 	BOOL handledInstructionBreakPoint = NO;
+	NSArray *breakPoints = self.breakPoints;
 	
 	ZGSuspendTask(task);
 	
@@ -357,7 +380,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	BOOL hitBreakPoint = NO;
 	NSMutableArray *breakPointsToNotify = [[NSMutableArray alloc] init];
 	
-	for (ZGBreakPoint *breakPoint in self.breakPoints)
+	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
 		if (breakPoint.type != ZGBreakPointInstruction)
 		{
@@ -455,7 +478,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		}
 	}
 	
-	for (ZGBreakPoint *candidateBreakPoint in self.breakPoints)
+	for (ZGBreakPoint *candidateBreakPoint in breakPoints)
 	{
 		if (candidateBreakPoint.type != ZGBreakPointSingleStepInstruction)
 		{
@@ -502,8 +525,8 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	// We should notify delegates if a breakpoint hits after we modify thread states
 	for (ZGBreakPoint *breakPoint in breakPointsToNotify)
 	{
-		BOOL canNotifyDelegate = YES;
-		if (breakPoint.condition != NULL)
+		BOOL canNotifyDelegate = !breakPoint.dead;
+		if (canNotifyDelegate && breakPoint.condition != NULL)
 		{
 			NSArray *registerVariables = [ZGRegistersController registerVariablesFromGeneralPurposeThreadState:threadState is64Bit:breakPoint.process.is64Bit];
 			for (ZGVariable *variable in registerVariables)
@@ -552,8 +575,14 @@ kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_
 
 kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
 {
-	BOOL handledWatchPoint = [[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
-	BOOL handledInstructionBreakPoint = [[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread];
+	BOOL handledWatchPoint = NO;
+	BOOL handledInstructionBreakPoint = NO;
+	
+	if (exception == EXC_BREAKPOINT)
+	{
+		handledWatchPoint = [[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
+		handledInstructionBreakPoint = [[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread];
+	}
 	
 	return (handledWatchPoint || handledInstructionBreakPoint) ? KERN_SUCCESS : KERN_FAILURE;
 }
@@ -856,27 +885,32 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		return NO;
 	}
 	
+	ZGSuspendTask(process.processTask);
+	
 	ZGVariable *variable = [instruction.variable copy];
 	
-	ZGProtect(process.processTask, variable.address, variable.size, VM_PROT_ALL);
-	
 	uint8_t breakPointOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
-	BOOL success = ZGWriteBytesOverwritingProtection(process.processTask, variable.address, &breakPointOpcode, sizeof(uint8_t));
-	if (success)
+	
+	ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] init];
+	breakPoint.delegate = delegate;
+	breakPoint.task = process.processTask;
+	breakPoint.variable = variable;
+	breakPoint.process = process;
+	breakPoint.type = ZGBreakPointInstruction;
+	breakPoint.hidden = isHidden;
+	breakPoint.thread = thread;
+	breakPoint.basePointer = basePointer;
+	breakPoint.originalProtection = memoryProtection;
+	
+	[self addBreakPoint:breakPoint];
+	
+	BOOL success = ZGWriteBytesIgnoringProtection(process.processTask, variable.address, &breakPointOpcode, sizeof(uint8_t));
+	if (!success)
 	{
-		ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] init];
-		breakPoint.delegate = delegate;
-		breakPoint.task = process.processTask;
-		breakPoint.variable = variable;
-		breakPoint.process = process;
-		breakPoint.type = ZGBreakPointInstruction;
-		breakPoint.hidden = isHidden;
-		breakPoint.thread = thread;
-		breakPoint.basePointer = basePointer;
-		breakPoint.originalProtection = memoryProtection;
-		
-		[self addBreakPoint:breakPoint];
+		[self removeBreakPoint:breakPoint];
 	}
+	
+	ZGResumeTask(process.processTask);
 	
 	return success;
 }
