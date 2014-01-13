@@ -37,6 +37,7 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
 #import "ZGBreakPointController.h"
+#import "ZGBreakPoint.h"
 #import "ZGLoggerWindowController.h"
 #import "ZGProcess.h"
 #import "ZGProcessList.h"
@@ -102,14 +103,24 @@
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
+	self.isTerminating = YES;
+	
 	if (_breakPointController == nil) return NSTerminateNow;
 	
 	NSArray *breakPoints = [self.breakPointController breakPoints];
-	if (breakPoints.count == 0) return NSTerminateNow;
+	BOOL hasConditionalBreakPoint = NO;
+	for (ZGBreakPoint *breakPoint in breakPoints)
+	{
+		if (breakPoint.condition != NULL)
+		{
+			hasConditionalBreakPoint = YES;
+			break;
+		}
+	}
+	
+	if (!hasConditionalBreakPoint) return NSTerminateNow;
 	
 	if (_debuggerController == nil) return NSTerminateNow;
-	
-	self.isTerminating = YES;
 	
 	[self.debuggerController cleanup];
 	

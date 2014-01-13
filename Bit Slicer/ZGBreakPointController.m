@@ -321,33 +321,44 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	ZGResumeTask(breakPoint.process.processTask);
 }
 
+- (void)revertInstructionBackToNormal:(ZGBreakPoint *)breakPoint
+{
+	ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+	ZGProtect(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.size, breakPoint.originalProtection);
+}
+
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	// Mark breakpoint as dead. if the breakpoint is called frequently, it will be removed when resuming from a breakpoint
-	// We handle a breakpoint by reverting the instruction back to normal, single stepping, then reverting the instruction opcode back to being breaked
-	// If we just removed the breakpoint immediately here, and the process single steps, the handler won't know why the exception was raised
-	// Our work around here is giving the process a little delay (perhaps a better way might be to add a single-stepping breakpoint and remove it from there)
-	breakPoint.dead = YES;
-	
-	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void) {
-		if ([self.breakPoints containsObject:breakPoint])
-		{
-			// Restore our instruction
-			ZGSuspendTask(breakPoint.process.processTask);
-			
-			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
-			ZGProtect(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.size, breakPoint.originalProtection);
-			
-			[self removeBreakPoint:breakPoint];
-			
-			ZGResumeTask(breakPoint.process.processTask);
-		}
+	if (breakPoint.condition != NULL)
+	{
+		// Mark breakpoint as dead. if the breakpoint is called frequently (esp. with a falsely evaluated condition), it will be removed when resuming from a breakpoint
+		// We handle a breakpoint by reverting the instruction back to normal, single stepping, then reverting the instruction opcode back to being breaked
+		// If we just removed the breakpoint immediately here, and the process single steps, the handler won't know why the exception was raised
+		// Our work around here is giving the process a little delay (perhaps a better way might be to add a single-stepping breakpoint and remove it from there)
+		breakPoint.dead = YES;
 		
-		if ([[ZGAppController sharedController] isTerminating] && self.breakPoints.count == 0)
-		{
-			[NSApp replyToApplicationShouldTerminate:YES];
-		}
-	});
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void) {
+			if ([self.breakPoints containsObject:breakPoint])
+			{
+				ZGSuspendTask(breakPoint.process.processTask);
+				
+				[self revertInstructionBackToNormal:breakPoint];
+				[self removeBreakPoint:breakPoint];
+				
+				ZGResumeTask(breakPoint.process.processTask);
+			}
+			
+			if ([[ZGAppController sharedController] isTerminating] && self.breakPoints.count == 0)
+			{
+				[NSApp replyToApplicationShouldTerminate:YES];
+			}
+		});
+	}
+	else
+	{
+		[self revertInstructionBackToNormal:breakPoint];
+		[self removeBreakPoint:breakPoint];
+	}
 }
 
 - (void)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process
