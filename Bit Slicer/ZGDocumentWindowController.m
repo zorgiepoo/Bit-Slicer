@@ -1048,8 +1048,17 @@
 
 - (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
 {
-	if (menuItem.action == @selector(clearSearchValues:))
+	if (menuItem.action == @selector(clear:))
 	{
+		if ([self.variableController canClearSearch])
+		{
+			menuItem.title = @"Clear Search Variables";
+		}
+		else
+		{
+			menuItem.title = @"Clear Variables";
+		}
+		
 		if (!self.isClearable)
 		{
 			return NO;
@@ -1438,9 +1447,14 @@
 
 #pragma mark Search Handling
 
-- (IBAction)clearSearchValues:(id)sender
+- (IBAction)clear:(id)sender
 {
 	[self.variableController clear];
+}
+
+- (IBAction)clearSearchValues:(id)sender
+{
+	[self.variableController clearSearch];
 }
 
 - (IBAction)searchValue:(id)sender

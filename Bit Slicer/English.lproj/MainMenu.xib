@@ -532,7 +532,7 @@ CA
                         <items>
                             <menuItem title="Clear Variables" keyEquivalent="r" id="655">
                                 <connections>
-                                    <action selector="clearSearchValues:" target="-1" id="657"/>
+                                    <action selector="clear:" target="-1" id="zgn-jf-Ha1"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="751"/>

@@ -54,6 +54,8 @@
 - (void)pasteVariables;
 
 - (void)clear;
+- (void)clearSearch;
+- (BOOL)canClearSearch;
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes;
 - (void)removeSelectedSearchValues;
 - (void)disableHarmfulVariables:(NSArray *)variables;

@@ -52,6 +52,7 @@
 #import "ZGScriptManager.h"
 #import "ZGMachBinary.h"
 #import "ZGTableView.h"
+#import "NSArrayAdditions.h"
 
 @interface ZGVariableController ()
 
@@ -213,19 +214,23 @@
 
 #pragma mark Adding & Removing Variables
 
-- (void)clear
+- (void)clearSearchByFilteringForSearchVariables:(BOOL)shouldFilterForSearchVariables
 {
 	[[self.windowController.undoManager prepareWithInvocationTarget:self.windowController] updateVariables:self.windowController.documentData.variables searchResults:self.windowController.searchController.searchResults];
 	
-	for (ZGVariable *variable in self.documentData.variables)
+	NSArray *newVariables = nil;
+	if (shouldFilterForSearchVariables)
 	{
-		if (variable.type == ZGScript)
-		{
-			[self.windowController.scriptManager removeScriptForVariable:variable];
-		}
+		newVariables = [self.documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
+			return (variable.type == ZGScript || variable.isFrozen || !variable.enabled);
+		}];
+	}
+	else
+	{
+		newVariables = [NSArray array];
 	}
 	
-	self.windowController.documentData.variables = [NSArray array];
+	self.windowController.documentData.variables = newVariables;
 	self.windowController.searchController.searchResults = nil;
 	
 	self.windowController.runningApplicationsPopUpButton.enabled = YES;
@@ -239,6 +244,37 @@
 	[self.windowController markDocumentChange];
 	
 	[self.windowController.tableController.variablesTableView reloadData];
+}
+
+- (void)clear
+{
+	if ([self canClearSearch])
+	{
+		[self clearSearch];
+	}
+	else
+	{
+		[self clearSearchByFilteringForSearchVariables:NO];
+	}
+}
+
+- (BOOL)canClearSearch
+{
+	BOOL canClearSearch = NO;
+	for (ZGVariable *variable in self.documentData.variables)
+	{
+		if (variable.type != ZGScript && !variable.isFrozen && variable.enabled)
+		{
+			canClearSearch = YES;
+			break;
+		}
+	}
+	return canClearSearch;
+}
+
+- (void)clearSearch
+{
+	[self clearSearchByFilteringForSearchVariables:YES];
 }
 
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
