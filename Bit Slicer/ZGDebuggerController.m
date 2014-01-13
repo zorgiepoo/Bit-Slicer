@@ -117,12 +117,6 @@ enum ZGStepExecution
 	if (self)
 	{
 		self.haltedBreakPoints = [[NSArray alloc] init];
-		
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(applicationWillTerminate:)
-		 name:NSApplicationWillTerminateNotification
-		 object:nil];
 	}
 	
 	return self;
@@ -2472,7 +2466,7 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
-- (void)applicationWillTerminate:(NSNotification *)notification
+- (void)cleanup
 {
 	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
 	

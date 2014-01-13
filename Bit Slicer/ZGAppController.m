@@ -52,6 +52,8 @@
 @property (nonatomic) ZGBreakPointController *breakPointController;
 @property (nonatomic) ZGLoggerWindowController *loggerController;
 
+@property (nonatomic) BOOL isTerminating;
+
 @end
 
 @implementation ZGAppController
@@ -96,6 +98,22 @@
 	}
 	
 	return self;
+}
+
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{
+	if (_breakPointController == nil) return NSTerminateNow;
+	
+	NSArray *breakPoints = [self.breakPointController breakPoints];
+	if (breakPoints.count == 0) return NSTerminateNow;
+	
+	if (_debuggerController == nil) return NSTerminateNow;
+	
+	self.isTerminating = YES;
+	
+	[self.debuggerController cleanup];
+	
+	return NSTerminateLater;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context

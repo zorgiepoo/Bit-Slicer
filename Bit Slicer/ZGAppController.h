@@ -50,6 +50,7 @@
 @property (readonly, nonatomic) ZGLoggerWindowController *loggerController;
 // lastSelectedProcessName keeps track of the last targeted process in a document
 @property (copy, nonatomic) NSString *lastSelectedProcessInternalName;
+@property (readonly, nonatomic) BOOL isTerminating;
 
 + (id)sharedController;
 
