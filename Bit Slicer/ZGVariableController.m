@@ -407,16 +407,6 @@
 	[self
 	 addVariables:@[variable]
 	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
-	
-	if (variable.type != ZGScript)
-	{
-		// have the user edit the variable's address
-		[self.windowController.tableController.variablesTableView
-		 editColumn:[self.windowController.tableController.variablesTableView columnWithIdentifier:@"address"]
-		 row:0
-		 withEvent:nil
-		 select:YES];
-	}
 }
 
 #pragma mark Changing Variables
