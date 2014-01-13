@@ -455,6 +455,8 @@ static dispatch_queue_t gPythonQueue;
 	[[self class] logPythonObject:type];
 	[[self class] logPythonObject:value];
 	[[self class] logPythonObject:traceback];
+	
+	PyErr_Clear();
 }
 
 - (BOOL)executeScript:(ZGPyScript *)script
