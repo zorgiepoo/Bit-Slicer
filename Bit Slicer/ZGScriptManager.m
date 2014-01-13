@@ -185,11 +185,11 @@ static dispatch_queue_t gPythonQueue;
 				case ZGPointer:
 					if (variable.qualifier == ZGSigned)
 					{
-						variableObject = process.is64Bit ? Py_BuildValue("i", *(int32_t *)variable.value) : Py_BuildValue("L", *(int64_t *)variable.value);
+						variableObject = !process.is64Bit ? Py_BuildValue("i", *(int32_t *)variable.value) : Py_BuildValue("L", *(int64_t *)variable.value);
 					}
 					else
 					{
-						variableObject = process.is64Bit ? Py_BuildValue("I", *(uint32_t *)variable.value) : Py_BuildValue("K", *(uint64_t *)variable.value);
+						variableObject = !process.is64Bit ? Py_BuildValue("I", *(uint32_t *)variable.value) : Py_BuildValue("K", *(uint64_t *)variable.value);
 					}
 					break;
 				default:
