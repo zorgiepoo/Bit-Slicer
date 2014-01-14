@@ -42,9 +42,12 @@
 @class ZGVariable;
 @class ZGProcess;
 
+#define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
+
 @interface ZGScriptManager : NSObject <VDKQueueDelegate>
 
 + (PyObject *)compiledExpressionFromExpression:(NSString *)expression;
+
 + (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGFastRegisterEntry *)registerEntries error:(NSError **)error;
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;

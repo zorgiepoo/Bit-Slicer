@@ -210,7 +210,7 @@ static dispatch_queue_t gPythonQueue;
 			result = NO;
 			if (error != NULL)
 			{
-				*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:2 userInfo:@{}];
+				*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:2 userInfo:@{SCRIPT_EVALUATION_ERROR_REASON : @"expression could not be evaluated"}];
 			}
 			
 			PyObject *type, *value, *traceback;
@@ -230,7 +230,7 @@ static dispatch_queue_t gPythonQueue;
 				result = NO;
 				if (error != NULL)
 				{
-					*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:3 userInfo:@{}];
+					*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:3 userInfo:@{SCRIPT_EVALUATION_ERROR_REASON : @"expression did not evaluate to a boolean value"}];
 				}
 			}
 			else

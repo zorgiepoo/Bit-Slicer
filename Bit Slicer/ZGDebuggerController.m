@@ -2382,13 +2382,32 @@ END_DEBUGGER_CHANGE:
 		
 		[self updateExecutionButtons];
 		
-		if (shouldShowNotification && NSClassFromString(@"NSUserNotification"))
+		if (breakPoint.error == nil)
 		{
-			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
-			userNotification.title = @"Hit Breakpoint";
-			userNotification.subtitle = self.currentProcess.name;
-			userNotification.informativeText = [NSString stringWithFormat:@"Stopped at breakpoint %@", self.currentBreakPoint.variable.addressStringValue];
-			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+			if (shouldShowNotification && NSClassFromString(@"NSUserNotification"))
+			{
+				NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+				userNotification.title = @"Hit Breakpoint";
+				userNotification.subtitle = self.currentProcess.name;
+				userNotification.informativeText = [NSString stringWithFormat:@"Stopped at breakpoint %@", self.currentBreakPoint.variable.addressStringValue];
+				[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+			}
+		}
+		else
+		{
+			NSString *scriptContents = @"N/A";
+			for (ZGBreakPointCondition *breakPointCondition in self.breakPointConditions)
+			{
+				if ([breakPointCondition.internalProcessName isEqualToString:breakPoint.process.internalName] && breakPointCondition.address == breakPoint.variable.address)
+				{
+					scriptContents = breakPointCondition.condition;
+					break;
+				}
+			}
+			
+			NSRunAlertPanel(@"Condition Evaluation Error", @"\"%@\" failed to evaluate with the following reason: %@. Check Debug -> Logs in the menu bar for more information.", @"OK", nil, nil, scriptContents, [breakPoint.error.userInfo objectForKey:SCRIPT_EVALUATION_ERROR_REASON]);
+			
+			breakPoint.error = nil;
 		}
 	}
 }

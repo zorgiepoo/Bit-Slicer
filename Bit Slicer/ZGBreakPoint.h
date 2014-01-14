@@ -63,6 +63,7 @@ typedef enum
 @property (assign) ZGMemoryAddress basePointer;
 @property (nonatomic) NSMutableDictionary *cacheDictionary;
 @property (nonatomic) PyObject *condition;
+@property (nonatomic) NSError *error;
 @property (nonatomic) ZGMemoryProtection originalProtection;
 
 @end

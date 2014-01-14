@@ -566,7 +566,14 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			NSError *error = nil;
 			if (![ZGScriptManager evaluateCondition:breakPoint.condition process:breakPoint.process registerEntries:registerEntries error:&error])
 			{
-				canNotifyDelegate = NO;
+				if (error == nil)
+				{
+					canNotifyDelegate = NO;
+				}
+				else
+				{
+					breakPoint.error = error;
+				}
 			}
 		}
 		
