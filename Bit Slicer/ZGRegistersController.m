@@ -36,7 +36,6 @@
 #import "ZGVariable.h"
 #import "ZGBreakPoint.h"
 #import "ZGProcess.h"
-#import "ZGRegister.h"
 #import "ZGPreferencesController.h"
 #import "ZGUtilities.h"
 #import "ZGDebuggerController.h"
@@ -127,7 +126,7 @@
 	strcpy((char *)&entries[entryIndex].name, #registerName); \
 	entries[entryIndex].size = sizeof(avxState.ufs.as64.__fpu_##registerName); \
 	memcpy(&entries[entryIndex].value, &avxState.ufs.as64.__fpu_##registerName, entries[entryIndex].size); \
-	entries[entryIndex].type = ZGRegisterAVXEntry; \
+	entries[entryIndex].type = ZGRegisterAVX; \
 	entryIndex++; \
 }
 
@@ -242,7 +241,7 @@
 	strcpy((char *)&entries[entryIndex].name, #registerName); \
 	entries[entryIndex].size = sizeof(threadState.uts.structureType.__##registerName); \
 	memcpy(&entries[entryIndex].value, &threadState.uts.structureType.__##registerName, entries[entryIndex].size); \
-	entries[entryIndex].type = ZGRegisterGeneralEntry; \
+	entries[entryIndex].type = ZGRegisterGeneralPurpose; \
 	entryIndex++; \
 }
 

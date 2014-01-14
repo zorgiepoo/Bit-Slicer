@@ -189,7 +189,7 @@ static dispatch_queue_t gPythonQueue;
 			void *value = registerEntry->value;
 			PyObject *registerObject = NULL;
 			
-			if (registerEntry->type == ZGRegisterGeneralEntry)
+			if (registerEntry->type == ZGRegisterGeneralPurpose)
 			{
 				registerObject = !process.is64Bit ? Py_BuildValue("i", *(int32_t *)value) : Py_BuildValue("L", *(int64_t *)value);
 			}

@@ -36,6 +36,7 @@
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
 #import <mach/thread_act.h>
+#import "ZGRegister.h"
 
 @class ZGBreakPoint;
 
@@ -45,18 +46,12 @@ typedef void(^program_counter_change_t)(void);
 
 @property (nonatomic, assign) ZGMemoryAddress programCounter;
 
-typedef enum
-{
-	ZGRegisterGeneralEntry,
-	ZGRegisterAVXEntry
-} ZGRegisterEntryType;
-
 typedef struct
 {
 	char name[16];
 	char value[64];
 	size_t size;
-	ZGRegisterEntryType type;
+	ZGRegisterType type;
 } ZGFastRegisterEntry;
 
 #define ZG_MAX_REGISTER_ENTRIES 128
