@@ -422,7 +422,7 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1021"/>
-                            <menuItem title="Continue Execution" keyEquivalent="E" id="1061">
+                            <menuItem title="Continue Execution" keyEquivalent="X" id="1061">
                                 <connections>
                                     <action selector="continueExecution:" target="-1" id="1064"/>
                                 </connections>
@@ -457,6 +457,7 @@ CA
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1108"/>
                             <menuItem title="Inject Code…" keyEquivalent="i" id="bRt-cV-8Ks">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="requestCodeInjection:" target="-1" id="YEG-hq-xn6"/>
                                 </connections>
