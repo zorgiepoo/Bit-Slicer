@@ -79,7 +79,7 @@
 }
 
 // TODO: I will need to change this URL
-#define BREAKPOINT_CONDITION_SCRIPTING @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Scripting"
+#define BREAKPOINT_CONDITION_SCRIPTING @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Conditional%20Breakpoints"
 - (IBAction)showHelp:(id)sender
 {
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:BREAKPOINT_CONDITION_SCRIPTING]];
