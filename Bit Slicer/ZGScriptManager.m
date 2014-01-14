@@ -177,6 +177,7 @@ static dispatch_queue_t gPythonQueue;
 		CFRetain((__bridge CFTypeRef)(objectsPool));
 		
 		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:process objectsPool:objectsPool];
+		CFRetain((__bridge CFTypeRef)(virtualMemoryInstance));
 		
 		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.vmObject);
 		
@@ -243,6 +244,7 @@ static dispatch_queue_t gPythonQueue;
 		
 		Py_XDECREF(localDictionary);
 		
+		CFRelease((__bridge CFTypeRef)(virtualMemoryInstance));
 		CFRelease((__bridge CFTypeRef)(objectsPool));
 	});
 	return result;
