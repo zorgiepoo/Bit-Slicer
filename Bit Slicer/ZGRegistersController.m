@@ -376,7 +376,7 @@
 			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
 			{
 				[newRegister.variable setType:[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
-				[newRegister.variable setValue:[newRegister copyOfValue]];
+				[newRegister.variable setValue:newRegister.value];
 			}
 			
 			[newRegisters addObject:newRegister];
@@ -405,7 +405,7 @@
 			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
 			{
 				[newRegister.variable setType:[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
-				[newRegister.variable setValue:[newRegister copyOfValue]];
+				[newRegister.variable setValue:newRegister.value];
 			}
 			
 			[newRegisters addObject:newRegister];
@@ -422,7 +422,7 @@
 - (void)changeRegister:(ZGRegister *)theRegister oldType:(ZGVariableType)oldType newType:(ZGVariableType)newType
 {
 	[theRegister.variable setType:newType requestedSize:theRegister.size pointerSize:self.breakPoint.process.pointerSize];
-	[theRegister.variable setValue:[theRegister copyOfValue]];
+	[theRegister.variable setValue:theRegister.value];
 	
 	NSMutableDictionary *registerTypesDictionary = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES]];
 	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.name];

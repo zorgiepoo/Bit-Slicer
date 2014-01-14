@@ -78,11 +78,4 @@
 	}
 }
 
-- (void *)copyOfValue
-{
-	void *newValue = calloc(1, self.internalSize);
-	memcpy(newValue, self.value, self.size);
-	return newValue;
-}
-
 @end

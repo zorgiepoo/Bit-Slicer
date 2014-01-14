@@ -52,6 +52,4 @@ typedef enum
 
 - (id)initWithRegisterType:(ZGRegisterType)registerType variable:(ZGVariable *)variable pointerSize:(ZGMemorySize)pointerSize;
 
-- (void *)copyOfValue;
-
 @end
