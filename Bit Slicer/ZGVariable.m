@@ -497,7 +497,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 						hexString = [@"0" stringByAppendingString:hexString];
 					}
 					
-					[byteString appendFormat:@"%@", hexString];
+					[byteString appendString:hexString];
 					if (byteIndex < self.size - 1)
 					{
 						[byteString appendString:@" "];
