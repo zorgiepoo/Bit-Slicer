@@ -34,6 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Python.h"
+#import "ZGRegistersController.h"
 #import "VDKQueue.h"
 #import "ZGMemoryTypes.h"
 
@@ -44,7 +45,7 @@
 @interface ZGScriptManager : NSObject <VDKQueueDelegate>
 
 + (PyObject *)compiledExpressionFromExpression:(NSString *)expression;
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process variables:(NSArray *)variables error:(NSError **)error;
++ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGFastRegisterEntry *)registerEntries error:(NSError **)error;
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 

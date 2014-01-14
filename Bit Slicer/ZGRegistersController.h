@@ -34,6 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
 #import <mach/thread_act.h>
 
 @class ZGBreakPoint;
@@ -43,6 +44,26 @@
 typedef void(^program_counter_change_t)(void);
 
 @property (nonatomic, assign) ZGMemoryAddress programCounter;
+
+typedef enum
+{
+	ZGRegisterGeneralEntry,
+	ZGRegisterAVXEntry
+} ZGRegisterEntryType;
+
+typedef struct
+{
+	char name[16];
+	char value[64];
+	size_t size;
+	ZGRegisterEntryType type;
+} ZGFastRegisterEntry;
+
+#define ZG_MAX_REGISTER_ENTRIES 128
+#define ZG_REGISTER_ENTRY_IS_NULL(entry) ((entry).name[0] == 0)
+
++ (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
++ (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;
 
 + (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
 + (NSArray *)registerVariablesFromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;

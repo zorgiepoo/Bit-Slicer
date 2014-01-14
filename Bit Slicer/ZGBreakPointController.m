@@ -538,27 +538,35 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		}
 	}
 	
+	ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
+	BOOL retrievedRegisterEntries = NO;
+	
 	// We should notify delegates if a breakpoint hits after we modify thread states
 	for (ZGBreakPoint *breakPoint in breakPointsToNotify)
 	{
 		BOOL canNotifyDelegate = !breakPoint.dead;
 		if (canNotifyDelegate && breakPoint.condition != NULL)
 		{
-			NSArray *registerVariables = [ZGRegistersController registerVariablesFromGeneralPurposeThreadState:threadState is64Bit:breakPoint.process.is64Bit];
-			for (ZGVariable *variable in registerVariables)
+			if (!retrievedRegisterEntries)
 			{
-				variable.type = ZGPointer;
+				BOOL is64Bit = breakPoint.process.is64Bit;
+				
+				int numberOfEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
+				
+				x86_avx_state_t avxState;
+				mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
+				if (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS)
+				{
+					[ZGRegistersController getRegisterEntries:registerEntries + numberOfEntries fromAVXThreadState:avxState is64Bit:is64Bit];
+				}
+				
+				retrievedRegisterEntries = YES;
 			}
 			
 			NSError *error = nil;
-			if (![ZGScriptManager evaluateCondition:breakPoint.condition process:breakPoint.process variables:registerVariables error:&error])
+			if (![ZGScriptManager evaluateCondition:breakPoint.condition process:breakPoint.process registerEntries:registerEntries error:&error])
 			{
 				canNotifyDelegate = NO;
-			}
-			
-			if (error != nil)
-			{
-				NSLog(@"Error: %@", error);
 			}
 		}
 		

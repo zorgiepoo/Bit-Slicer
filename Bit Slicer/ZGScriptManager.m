@@ -160,7 +160,7 @@ static dispatch_queue_t gPythonQueue;
 	return compiledExpression;
 }
 
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process variables:(NSArray *)variables error:(NSError **)error
++ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGFastRegisterEntry *)registerEntries error:(NSError **)error
 {
 	__block BOOL result = NO;
 	dispatch_sync(gPythonQueue, ^{
@@ -176,34 +176,24 @@ static dispatch_queue_t gPythonQueue;
 		PyObject *globalDictionary = PyModule_GetDict(mainModule);
 		PyObject *localDictionary = PyDict_New();
 		
-		for (ZGVariable *variable in variables)
+		for (ZGFastRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
 		{
-			PyObject *variableObject = NULL;
+			void *value = registerEntry->value;
+			PyObject *registerObject = NULL;
 			
-			switch (variable.type)
+			if (registerEntry->type == ZGRegisterGeneralEntry)
 			{
-				case ZGPointer:
-					if (variable.qualifier == ZGSigned)
-					{
-						variableObject = !process.is64Bit ? Py_BuildValue("i", *(int32_t *)variable.value) : Py_BuildValue("L", *(int64_t *)variable.value);
-					}
-					else
-					{
-						variableObject = !process.is64Bit ? Py_BuildValue("I", *(uint32_t *)variable.value) : Py_BuildValue("K", *(uint64_t *)variable.value);
-					}
-					break;
-				default:
-					variableObject = Py_BuildValue("y#", variable.value, variable.size);
-					break;
+				registerObject = !process.is64Bit ? Py_BuildValue("i", *(int32_t *)value) : Py_BuildValue("L", *(int64_t *)value);
+			}
+			else
+			{
+				registerObject = Py_BuildValue("y#", value, registerEntry->size);
 			}
 			
-			if (variableObject != NULL)
+			if (registerObject != NULL)
 			{
-				// Use description instead of name for performance
-				PyDict_SetItemString(localDictionary, [[variable.description string] UTF8String], variableObject);
+				PyDict_SetItemString(localDictionary, registerEntry->name, registerObject);
 			}
-			
-			Py_XDECREF(variableObject);
 		}
 		
 		PyObject *evaluatedCode = PyEval_EvalCode(compiledExpression, globalDictionary, localDictionary);
