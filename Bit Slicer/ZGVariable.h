@@ -75,6 +75,8 @@ extern NSString *ZGVariablePboardType;
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled byteOrder:(CFByteOrder)byteOrder;
 
++ (NSString *)byteArrayStringFromValue:(unsigned char *)value size:(ZGMemorySize)size;
+
 - (void)updateStringValue;
 
 - (void)setType:(ZGVariableType)newType requestedSize:(ZGMemorySize)requestedSize pointerSize:(ZGMemorySize)pointerSize;

@@ -363,6 +363,19 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return _scriptValue;
 }
 
++ (NSString *)byteArrayStringFromValue:(unsigned char *)value size:(ZGMemorySize)size
+{
+	NSMutableArray *byteStringComponents = [NSMutableArray array];
+	
+	for (ZGMemorySize byteIndex = 0; byteIndex < size; byteIndex++)
+	{
+		NSString *hexString = [NSString stringWithFormat:@"%02X", value[byteIndex]];
+		[byteStringComponents addObject:hexString];
+	}
+	
+	return [byteStringComponents componentsJoinedByString:@" "];
+}
+
 - (void)updateStringValue
 {
 	if (self.size > 0 && self.value)
@@ -485,26 +498,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				break;
 			case ZGByteArray:
 			{
-				ZGMemorySize byteIndex;
-				unsigned char *valuePtr = self.value;
-				NSMutableString *byteString = [NSMutableString stringWithString:@""];
-				for (byteIndex = 0; byteIndex < self.size; byteIndex++)
-				{
-					NSString *hexString = [NSString stringWithFormat:@"%X", valuePtr[byteIndex]];
-					// Make each byte two digits so it looks nice
-					if (hexString.length == 1)
-					{
-						hexString = [@"0" stringByAppendingString:hexString];
-					}
-					
-					[byteString appendString:hexString];
-					if (byteIndex < self.size - 1)
-					{
-						[byteString appendString:@" "];
-					}
-				}
-				
-				self.stringValue = byteString;
+				self.stringValue = [[self class] byteArrayStringFromValue:self.value size:self.size];
 				break;
 			}
 			case ZGScript:

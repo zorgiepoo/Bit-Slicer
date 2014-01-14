@@ -65,9 +65,6 @@ typedef struct
 + (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
 + (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;
 
-+ (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
-+ (NSArray *)registerVariablesFromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;
-
 - (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
 
 - (ZGMemoryAddress)basePointer;

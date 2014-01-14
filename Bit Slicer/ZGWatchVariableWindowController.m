@@ -200,16 +200,17 @@
 
 #pragma mark Watching
 
-- (void)appendDescription:(NSMutableAttributedString *)description withRegisters:(NSArray *)registerVariables registerLabel:(NSString *)registerLabel boldFont:(NSFont *)boldFont
+- (void)appendDescription:(NSMutableAttributedString *)description withRegisterEntries:(ZGFastRegisterEntry *)registerEntries registerLabel:(NSString *)registerLabel boldFont:(NSFont *)boldFont
 {
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n\n"]];
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:registerLabel attributes:@{NSFontAttributeName : boldFont}]];
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
 	
 	NSMutableArray *registerLines = [NSMutableArray array];
-	for (ZGVariable *variable in registerVariables)
+	
+	for (ZGFastRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
 	{
-		[registerLines addObject:[NSString stringWithFormat:@"%@ = %@", variable.name, variable.stringValue]];
+		[registerLines addObject:[NSString stringWithFormat:@"%s = %@", registerEntry->name, [ZGVariable byteArrayStringFromValue:(unsigned char *)registerEntry->value size:registerEntry->size]]];
 	}
 	
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:[registerLines componentsJoinedByString:@"\n"]]];
@@ -235,15 +236,20 @@
 	
 	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:instruction.variable.name];
 	
-	[self
-	 appendDescription:description
-	 withRegisters:[ZGRegistersController registerVariablesFromGeneralPurposeThreadState:threadState is64Bit:self.watchProcess.is64Bit]
-	 registerLabel:@"General Purpose Registers"
-	 boldFont:boldFont];
+	ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
+	int numberOfGeneralRegisters = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:self.watchProcess.is64Bit];
 	
 	[self
 	 appendDescription:description
-	 withRegisters:[ZGRegistersController registerVariablesFromAVXThreadState:avxState is64Bit:self.watchProcess.is64Bit]
+	 withRegisterEntries:registerEntries
+	 registerLabel:@"General Purpose Registers"
+	 boldFont:boldFont];
+	
+	[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromAVXThreadState:avxState is64Bit:self.watchProcess.is64Bit];
+	
+	[self
+	 appendDescription:description
+	 withRegisterEntries:registerEntries + numberOfGeneralRegisters
 	 registerLabel:@"Advanced Vector Extension (AVX) Registers"
 	 boldFont:boldFont];
 	
