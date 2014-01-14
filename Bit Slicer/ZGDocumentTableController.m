@@ -633,7 +633,7 @@
 		}
 		
 		ZGProcess *currentProcess = self.windowController.currentProcess;
-		if (currentProcess.valid)
+		if (variable.type != ZGScript && currentProcess.valid)
 		{
 			ZGMemoryAddress memoryProtectionAddress = variable.address;
 			ZGMemorySize memoryProtectionSize = variable.size;
