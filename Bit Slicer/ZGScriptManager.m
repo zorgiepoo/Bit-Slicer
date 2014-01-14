@@ -77,6 +77,13 @@ static dispatch_queue_t gPythonQueue;
 		PyObject *sys = PyImport_ImportModule("sys");
 		PyObject *path = PyObject_GetAttrString(sys, "path");
 		
+		PyObject *libDynloadObject = PyUnicode_FromString([[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] UTF8String]);
+		if (PyList_Append(path, libDynloadObject) != 0)
+		{
+			NSLog(@"Error on appending %@", [pythonDirectory stringByAppendingPathComponent:@"lib-dynload"]);
+		}
+		Py_XDECREF(libDynloadObject);
+		
 		PyObject *scriptCacheUnicodeObject = PyUnicode_FromString([SCRIPT_CACHES_PATH UTF8String]);
 		if (PyList_Append(path, scriptCacheUnicodeObject) != 0)
 		{
