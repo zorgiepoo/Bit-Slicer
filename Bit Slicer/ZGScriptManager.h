@@ -44,6 +44,8 @@
 
 #define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
 
+extern dispatch_queue_t gPythonQueue;
+
 @interface ZGScriptManager : NSObject <VDKQueueDelegate>
 
 + (PyObject *)compiledExpressionFromExpression:(NSString *)expression;

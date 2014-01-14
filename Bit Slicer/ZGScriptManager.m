@@ -65,7 +65,7 @@
 
 @implementation ZGScriptManager
 
-static dispatch_queue_t gPythonQueue;
+dispatch_queue_t gPythonQueue;
 
 + (void)initializePythonInterpreter
 {

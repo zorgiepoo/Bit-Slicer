@@ -2611,6 +2611,7 @@ END_DEBUGGER_CHANGE:
 		if (breakPoint.type == ZGBreakPointInstruction && [breakPoint.process.internalName isEqualToString:self.currentProcess.internalName] && breakPoint.variable.address == address)
 		{
 			breakPoint.condition = newCompiledCondition;
+			break;
 		}
 	}
 	
@@ -2619,6 +2620,7 @@ END_DEBUGGER_CHANGE:
 	{
 		if ([breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && breakPointCondition.address == address)
 		{
+			breakPointCondition.condition = strippedCondition;
 			breakPointCondition.compiledCondition = newCompiledCondition;
 			foundExistingCondition = YES;
 			break;

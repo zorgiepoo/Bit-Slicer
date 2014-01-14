@@ -33,6 +33,7 @@
  */
 
 #import "ZGBreakPointCondition.h"
+#import "ZGScriptManager.h"
 
 @implementation ZGBreakPointCondition
 
@@ -51,7 +52,15 @@
 
 - (void)setCompiledCondition:(PyObject *)compiledCondition
 {
-	Py_XDECREF(_compiledCondition);
+	if (_compiledCondition != NULL)
+	{
+		dispatch_async(gPythonQueue, ^{
+			if (Py_IsInitialized())
+			{
+				Py_XDECREF(_compiledCondition);
+			}
+		});
+	}
 	_compiledCondition = compiledCondition;
 }
 
