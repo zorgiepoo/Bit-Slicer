@@ -1598,6 +1598,27 @@ END_DEBUGGER_CHANGE:
 	}
 }
 
+- (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
+{
+	NSString *toolTip = nil;
+	
+	if (row >= 0 && (NSUInteger)row < self.instructions.count)
+	{
+		ZGInstruction *instruction = [self.instructions objectAtIndex:row];
+		
+		for (ZGBreakPointCondition *breakPointCondition in self.breakPointConditions)
+		{
+			if ([breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && instruction.variable.address == breakPointCondition.address)
+			{
+				toolTip = [NSString stringWithFormat:@"Breakpoint Condition: %@", breakPointCondition.condition];
+				break;
+			}
+		}
+	}
+	
+	return toolTip;
+}
+
 #pragma mark Modifying instructions
 
 #define ASSEMBLER_ERROR_DOMAIN @"Assembling Failed"
