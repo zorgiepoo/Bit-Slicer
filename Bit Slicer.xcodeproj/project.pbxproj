@@ -1334,8 +1334,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
-					"/Users/mayur/Documents/Programming/bit-slicer/deps",
-					"/Users/mayur/Documents/Programming/bit-slicer/deps/python/lib",
+					"$(SRCROOT)/deps",
+					"$(SRCROOT)/deps/python/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "-D_DEBUG";
@@ -1378,8 +1378,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
-					"/Users/mayur/Documents/Programming/bit-slicer/deps",
-					"/Users/mayur/Documents/Programming/bit-slicer/deps/python/lib",
+					"$(SRCROOT)/deps",
+					"$(SRCROOT)/deps/python/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "Bit Slicer";
