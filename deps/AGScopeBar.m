@@ -535,11 +535,12 @@
 	mCollapsedLabelField.textColor = SCOPE_BAR_LABEL_COLOR;
 	mCollapsedLabelField.font = SCOPE_BAR_FONT;
 	
-	mPopupButton = [[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO];
-	mPopupButton.cell = [[[AGScopeBarPopupButtonCell alloc] initTextCell:@"" pullsDown:NO] autorelease];
+	mGroupPopupButton = [[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO];
+	mGroupPopupButton.cell = [[[AGScopeBarPopupButtonCell alloc] initTextCell:@"" pullsDown:NO] autorelease];
+	mGroupPopupButton.menu.delegate = self;
 	
 	[mCollapsedView addSubview:mCollapsedLabelField];
-	[mCollapsedView addSubview:mPopupButton];
+	[mCollapsedView addSubview:mGroupPopupButton];
 	
 	return self;
 }
@@ -566,7 +567,8 @@
 	[mView release];
 	[mLabelField release];
 	[mCollapsedView release];
-	[mPopupButton release];
+	[mGroupPopupButton release];
+	[mCollapsedLabelField release];
 	[super dealloc];
 }
 
@@ -681,6 +683,11 @@
 }
 
 
+- (NSArray *)selectedItemIdentifiers
+{
+	return [mSelectedItems valueForKeyPath:@"@unionOfObjects.identifier"];
+}
+
 
 
 #pragma mark -
@@ -742,6 +749,36 @@
 	return nil;
 }
 
+
+
+#pragma mark -
+#pragma mark Group Menu Delegate
+
+- (void)menuWillOpen:(NSMenu *)menu
+{
+	if (menu == mGroupPopupButton.menu) {
+		[mGroupPopupButton removeAllItems];
+		
+		for (AGScopeBarItem * item in self.items) {
+			[mGroupPopupButton.menu addItem:item.menuItem];
+		}
+		
+		[self _updatePopup];
+	}
+}
+
+
+- (void)menuDidClose:(NSMenu *)menu
+{
+	if (menu == mGroupPopupButton.menu) {
+		
+		// Hmm. Was doing this for some reason that I unfortunately cannot recall.
+		// The issue in doing it though is that the clicked-on menu item's action
+		// will not be sent to the target if it's removed from the menu! I thought
+		// it use to work though. This may be a recent change in 10.9?
+		//[mGroupPopupButton removeAllItems];
+	}
+}
 
 
 #pragma mark -
@@ -835,37 +872,38 @@
 		
 		// Popup
 		{
-			[mPopupButton removeAllItems];
+			[mGroupPopupButton removeAllItems];
 			
-			for (AGScopeBarItem * item in self.items) {
-				[mPopupButton.menu addItem:item.menuItem];
-			}
+			//for (AGScopeBarItem * item in self.items) {
+			//	[mGroupPopupButton.menu addItem:item.menuItem];
+			//}
+			
 			
 			if (YES) { //self.allowsMultipleSelection) {
-				NSPopUpButtonCell * cell = [mPopupButton cell];
+				NSPopUpButtonCell * cell = [mGroupPopupButton cell];
 				cell.usesItemFromMenu = NO;
 				cell.menuItem = [[[NSMenuItem alloc] init] autorelease];
 				[self _updatePopup];
 			}
 			
 			
-			[mPopupButton.menu setFont:SCOPE_BAR_MENUITEM_FONT];
-			[mPopupButton setFont:SCOPE_BAR_FONT];
-			[mPopupButton setBezelStyle:NSRecessedBezelStyle];
-			[mPopupButton setButtonType:NSPushOnPushOffButton];
-			[mPopupButton.cell setHighlightsBy:NSCellIsBordered | NSCellIsInsetButton];
-			[mPopupButton setShowsBorderOnlyWhileMouseInside:YES];
-			[mPopupButton.cell setAltersStateOfSelectedItem:NO];
-			[mPopupButton.cell setArrowPosition:NSPopUpArrowAtBottom];
-			[mPopupButton.cell setBackgroundStyle:NSBackgroundStyleRaised];
+			[mGroupPopupButton.menu setFont:SCOPE_BAR_MENUITEM_FONT];
+			[mGroupPopupButton setFont:SCOPE_BAR_FONT];
+			[mGroupPopupButton setBezelStyle:NSRecessedBezelStyle];
+			[mGroupPopupButton setButtonType:NSPushOnPushOffButton];
+			[mGroupPopupButton.cell setHighlightsBy:NSCellIsBordered | NSCellIsInsetButton];
+			[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:YES];
+			[mGroupPopupButton.cell setAltersStateOfSelectedItem:NO];
+			[mGroupPopupButton.cell setArrowPosition:NSPopUpArrowAtBottom];
+			[mGroupPopupButton.cell setBackgroundStyle:NSBackgroundStyleRaised];
 			
-			[mPopupButton sizeToFit];
-			NSRect popFrame = mPopupButton.frame;
+			[mGroupPopupButton sizeToFit];
+			NSRect popFrame = mGroupPopupButton.frame;
 			popFrame.origin.x = xOffset;
 			popFrame.origin.y = ceil((mCollapsedView.frame.size.height - popFrame.size.height) / 2.0);
-			popFrame.size.width = [self _widthForPopup:mPopupButton];
-			mPopupButton.frame = popFrame;
-			xOffset += mPopupButton.frame.size.width;
+			popFrame.size.width = [self _widthForPopup:mGroupPopupButton];
+			mGroupPopupButton.frame = popFrame;
+			xOffset += mGroupPopupButton.frame.size.width;
 		}
 		
 		viewFrame.size.width = xOffset;
@@ -910,19 +948,19 @@
 
 - (void)_updatePopup
 {
-	NSPopUpButtonCell * cell = [mPopupButton cell];
+	NSPopUpButtonCell * cell = [mGroupPopupButton cell];
 	NSArray * selectedItems = self.selectedItems;
 	
 	if (selectedItems.count == 0) {
-		[mPopupButton setTitle:POPUP_TITLE_EMPTY_SELECTION];
+		[mGroupPopupButton setTitle:POPUP_TITLE_EMPTY_SELECTION];
 		[cell.menuItem setTitle:POPUP_TITLE_EMPTY_SELECTION];
 	} else if (selectedItems.count == 1) {
 		NSString * title = [(AGScopeBarItem *)[selectedItems lastObject] title];
 		if (!title) title = @"";
-		[mPopupButton setTitle:title];
+		[mGroupPopupButton setTitle:title];
 		[cell.menuItem setTitle:title];
 	} else if (selectedItems.count > 1) {
-		[mPopupButton setTitle:POPUP_TITLE_MULTIPLE_SELECTION];
+		[mGroupPopupButton setTitle:POPUP_TITLE_MULTIPLE_SELECTION];
 		[cell.menuItem setTitle:POPUP_TITLE_MULTIPLE_SELECTION];
 	}
 	
@@ -931,10 +969,14 @@
 	}
 }
 
+
+
 - (void)setSelected:(BOOL)willBeSelected forItemWithIdentifier:(NSString *)identifier
 {
 	[self setSelected:willBeSelected forItem:[self itemWithIdentifier:identifier]];
 }
+
+
 
 - (void)setSelected:(BOOL)willBeSelected forItem:(AGScopeBarItem *)item
 {
@@ -1043,11 +1085,11 @@
 	// Show the border only on hover when no item are selected
 	// but always show it if one or more items is selected.
 	if (newSelectedItems.count == 0) {
-		[mPopupButton setShowsBorderOnlyWhileMouseInside:YES];
-		[mPopupButton setBordered:YES];
+		[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:YES];
+		[mGroupPopupButton setBordered:YES];
 	} else {
-		[mPopupButton setShowsBorderOnlyWhileMouseInside:NO];
-		[mPopupButton setBordered:YES];
+		[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:NO];
+		[mGroupPopupButton setBordered:YES];
 	}
 }
 
@@ -1533,7 +1575,7 @@
 - (BOOL)trackMouse:(NSEvent *)theEvent inRect:(NSRect)cellFrame ofView:(NSView *)controlView untilMouseUp:(BOOL)untilMouseUp
 {
 	mPopupCell.controlView = controlView;
-	mPopupCell.menu = self.menu;	
+	mPopupCell.menu = self.menu;
 	return [mPopupCell trackMouse:theEvent inRect:cellFrame ofView:controlView untilMouseUp:untilMouseUp];
 }
 

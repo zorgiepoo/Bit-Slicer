@@ -55,7 +55,7 @@ typedef enum {
 
 
 
-@interface AGScopeBarGroup : NSObject
+@interface AGScopeBarGroup : NSObject <NSMenuDelegate>
 {
 	NSString * mIdentifier;
 	NSString * mLabel;
@@ -71,7 +71,7 @@ typedef enum {
 	
 	NSView * mCollapsedView;
 	NSTextField * mCollapsedLabelField;
-	NSPopUpButton * mPopupButton;
+	NSPopUpButton * mGroupPopupButton;
 	BOOL mIsCollapsed;
 }
 
@@ -83,6 +83,7 @@ typedef enum {
 @property (readwrite, assign) AGScopeBarGroupSelectionMode selectionMode;
 @property (readwrite, copy) NSArray * items;
 @property (readonly) NSArray * selectedItems;
+@property (readonly) NSArray * selectedItemIdentifiers;
 
 + (AGScopeBarGroup *)groupWithIdentifier:(NSString *)identifier;
 - (id)initWithIdentifier:(NSString *)identifier;
@@ -97,8 +98,8 @@ typedef enum {
 - (AGScopeBarItem *)itemAtIndex:(NSUInteger)index;
 - (AGScopeBarItem *)itemWithIdentifier:(NSString *)identifier;
 
-- (void)setSelected:(BOOL)selected forItemWithIdentifier:(NSString *)identifier;
 - (void)setSelected:(BOOL)selected forItem:(AGScopeBarItem *)item;
+- (void)setSelected:(BOOL)selected forItemWithIdentifier:(NSString *)identifier;
 
 @end
 
