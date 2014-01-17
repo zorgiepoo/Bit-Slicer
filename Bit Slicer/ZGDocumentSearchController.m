@@ -102,17 +102,6 @@
 	_userInterfaceTimer = newTimer;
 }
 
-- (void)createUserInterfaceTimer
-{
-	self.userInterfaceTimer =
-		[NSTimer
-		 scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-		 target:self
-		 selector:@selector(updateSearchUserInterface:)
-		 userInfo:nil
-		 repeats:YES];
-}
-
 #pragma mark Confirm search input
 
 - (NSString *)testSearchComponent:(NSString *)searchComponent
@@ -747,8 +736,6 @@
 	
 	[self.windowController setStatus:@"Storing All Values..."];
 	[self.searchProgress clear];
-	
-	[self createUserInterfaceTimer];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		self.tempSavedData = ZGGetAllData(self.windowController.currentProcess.processTask, self.searchData, self.searchProgress);
