@@ -151,6 +151,8 @@
 		self.valueTextField.stringValue = [self commonByteArrayPatternFromVariables:variables];
 	}
 	
+	[self.valueTextField selectText:nil];
+	
 	self.variablesToEdit = variables;
 	self.processTask = processTask;
 	

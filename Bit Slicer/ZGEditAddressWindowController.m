@@ -69,6 +69,8 @@
 	self.variable = variable;
 	self.addressTextField.stringValue = variable.addressFormula;
 	
+	[self.addressTextField selectText:nil];
+	
 	[NSApp
 	 beginSheet:self.window
 	 modalForWindow:parentWindow

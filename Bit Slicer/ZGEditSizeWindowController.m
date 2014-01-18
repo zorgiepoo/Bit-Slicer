@@ -71,6 +71,8 @@
 	ZGVariable *firstVariable = [variables objectAtIndex:0];
 	self.sizeTextField.stringValue = firstVariable.sizeStringValue;
 	
+	[self.sizeTextField selectText:nil];
+	
 	self.variables = variables;
 	
 	[NSApp
