@@ -2578,9 +2578,9 @@ END_DEBUGGER_CHANGE:
 	[self.breakPointConditionPopover performClose:nil];
 }
 
-- (void)breakPointCondition:(NSString *)condition didChangeAtAddress:(ZGMemoryAddress)address
+- (BOOL)changeBreakPointCondition:(NSString *)breakPointCondition atAddress:(ZGMemoryAddress)address
 {
-	NSString *strippedCondition = [condition stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	NSString *strippedCondition = [breakPointCondition stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	
 	PyObject *newCompiledCondition = NULL;
 	
@@ -2590,8 +2590,7 @@ END_DEBUGGER_CHANGE:
 		if (newCompiledCondition == NULL)
 		{
 			NSLog(@"Error: compiled expression %@ is NULL", strippedCondition);
-			NSRunAlertPanel(@"Invalid Breakpoint Expression", @"An error occured trying to parse this expression", @"OK", nil, nil);
-			return;
+			return NO;
 		}
 	}
 	
@@ -2605,11 +2604,14 @@ END_DEBUGGER_CHANGE:
 		}
 	}
 	
+	NSString *oldCondition = @"";
+	
 	BOOL foundExistingCondition = NO;
 	for (ZGBreakPointCondition *breakPointCondition in self.breakPointConditions)
 	{
 		if ([breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && breakPointCondition.address == address)
 		{
+			oldCondition = breakPointCondition.condition;
 			breakPointCondition.condition = strippedCondition;
 			breakPointCondition.compiledCondition = newCompiledCondition;
 			foundExistingCondition = YES;
@@ -2632,7 +2634,21 @@ END_DEBUGGER_CHANGE:
 		  compiledCondition:newCompiledCondition]];
 	}
 	
-	[self.breakPointConditionPopover performClose:nil];
+	[[self.undoManager prepareWithInvocationTarget:self] changeBreakPointCondition:oldCondition atAddress:address];
+	
+	return YES;
+}
+
+- (void)breakPointCondition:(NSString *)condition didChangeAtAddress:(ZGMemoryAddress)address
+{
+	if (![self changeBreakPointCondition:condition atAddress:address])
+	{
+		NSRunAlertPanel(@"Invalid Breakpoint Expression", @"An error occured trying to parse this expression", @"OK", nil, nil);
+	}
+	else
+	{
+		[self.breakPointConditionPopover performClose:nil];
+	}
 }
 
 #pragma mark Memory Viewer
