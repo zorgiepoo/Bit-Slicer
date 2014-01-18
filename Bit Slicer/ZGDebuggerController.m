@@ -59,7 +59,6 @@
 
 @property (nonatomic, assign) IBOutlet ZGTableView *instructionsTableView;
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
-@property (nonatomic, assign) IBOutlet NSButton *stopButton;
 @property (nonatomic, assign) IBOutlet NSSplitView *splitView;
 
 @property (nonatomic, assign) IBOutlet ZGBacktraceController *backtraceController;
@@ -771,12 +770,6 @@ enum ZGStepExecution
 	}
 }
 
-- (IBAction)stopDisassembling:(id)sender
-{
-	self.disassembling = NO;
-	[self.stopButton setEnabled:NO];
-}
-
 - (void)updateDisassemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)theSize selectionAddress:(ZGMemoryAddress)selectionAddress
 {
 	[self.dissemblyProgressIndicator setMinValue:0];
@@ -785,8 +778,6 @@ enum ZGStepExecution
 	[self.dissemblyProgressIndicator setHidden:NO];
 	[self.addressTextField setEnabled:NO];
 	[self.runningApplicationsPopUpButton setEnabled:NO];
-	[self.stopButton setEnabled:YES];
-	[self.stopButton setHidden:NO];
 	
 	[self prepareNavigation];
 	
@@ -888,7 +879,6 @@ enum ZGStepExecution
 			[self.dissemblyProgressIndicator setHidden:YES];
 			[self.addressTextField setEnabled:YES];
 			[self.runningApplicationsPopUpButton setEnabled:YES];
-			[self.stopButton setHidden:YES];
 			
 			[self updateNavigationButtons];
 			[self updateExecutionButtons];
