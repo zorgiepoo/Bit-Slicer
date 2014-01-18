@@ -1383,7 +1383,7 @@
 			return NO;
 		}
 		
-		if (memoryAddress > selectedVariable.address || memoryAddress + memorySize < selectedVariable.address + selectedVariable.size)
+		if (memoryAddress > selectedVariable.address || memoryAddress + memorySize <= selectedVariable.address)
 		{
 			return NO;
 		}
