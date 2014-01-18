@@ -456,11 +456,18 @@ enum ZGStepExecution
 				}
 			}];
 			
-			instruction = [[ZGInstruction alloc] init];
-			instruction.text = instructionText;
-			instruction.mnemonic = instructionMnemonic;
-			ZGVariable *variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + memoryOffset size:memorySize address:startAddress + memoryOffset type:ZGByteArray qualifier:0 pointerSize:pointerSize description:instruction.text enabled:NO];
-			instruction.variable = variable;
+			ZGVariable *variable =
+			[[ZGVariable alloc]
+			 initWithValue:disassemblerObject.bytes + memoryOffset
+			 size:memorySize
+			 address:startAddress + memoryOffset
+			 type:ZGByteArray
+			 qualifier:0
+			 pointerSize:pointerSize
+			 description:nil
+			 enabled:NO];
+			
+			instruction = [[ZGInstruction alloc] initWithVariable:variable text:instructionText mnemonic:instructionMnemonic];
 		}
 	}
 	
@@ -591,10 +598,18 @@ enum ZGStepExecution
 				NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
 				
 				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
-					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
-					newInstruction.text = disassembledText;
-					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize description:newInstruction.text enabled:NO];
-					newInstruction.mnemonic = mnemonic;
+					ZGVariable *variable =
+					[[ZGVariable alloc]
+					 initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress)
+					 size:instructionSize
+					 address:instructionAddress
+					 type:ZGByteArray
+					 qualifier:0
+					 pointerSize:self.currentProcess.pointerSize
+					 description:nil
+					 enabled:NO];
+					
+					ZGInstruction *newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
 					
 					[instructionsToReplace addObject:newInstruction];
 				}];
@@ -664,10 +679,18 @@ enum ZGStepExecution
 		if (disassemblerObject != nil)
 		{
 			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
-				ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
-				newInstruction.text = disassembledText;
-				newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize description:newInstruction.text enabled:NO];
-				newInstruction.mnemonic = mnemonic;
+				ZGVariable *variable =
+				[[ZGVariable alloc]
+				 initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address)
+				 size:instructionSize
+				 address:instructionAddress
+				 type:ZGByteArray
+				 qualifier:0
+				 pointerSize:self.currentProcess.pointerSize
+				 description:nil
+				 enabled:NO];
+				
+				ZGInstruction *newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
 				
 				[instructionsToAdd addObject:newInstruction];
 			}];
@@ -728,10 +751,18 @@ enum ZGStepExecution
 			if (disassemblerObject != nil)
 			{
 				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
-					ZGInstruction *newInstruction = [[ZGInstruction alloc] init];
-					newInstruction.text = disassembledText;
-					newInstruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize description:newInstruction.text enabled:NO];
-					newInstruction.mnemonic = mnemonic;
+					ZGVariable *variable =
+					[[ZGVariable alloc]
+					 initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address)
+					 size:instructionSize
+					 address:instructionAddress
+					 type:ZGByteArray
+					 qualifier:0
+					 pointerSize:self.currentProcess.pointerSize
+					 description:nil
+					 enabled:NO];
+					
+					ZGInstruction *newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
 					
 					[instructionsToAdd addObject:newInstruction];
 				}];
@@ -829,12 +860,20 @@ enum ZGStepExecution
 			};
 			
 			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
-				ZGInstruction *instruction = [[ZGInstruction alloc] init];
-				instruction.text = disassembledText;
-				instruction.variable = [[ZGVariable alloc] initWithValue:disassemblerObject.bytes + (instructionAddress - address) size:instructionSize address:instructionAddress type:ZGByteArray qualifier:0 pointerSize:self.currentProcess.pointerSize description:instruction.text enabled:NO];
-				instruction.mnemonic = mnemonic;
+				ZGVariable *variable =
+				[[ZGVariable alloc]
+				 initWithValue:disassemblerObject.bytes + (instructionAddress - address)
+				 size:instructionSize
+				 address:instructionAddress
+				 type:ZGByteArray
+				 qualifier:0
+				 pointerSize:self.currentProcess.pointerSize
+				 description:nil
+				 enabled:NO];
 				
-				[newInstructions addObject:instruction];
+				ZGInstruction *instruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
+				
+				[newInstructions addObject:[[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic]];
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					self.dissemblyProgressIndicator.doubleValue += instruction.variable.size;
@@ -1431,6 +1470,8 @@ END_DEBUGGER_CHANGE:
 				instruction.variable.usesDynamicAddress = YES;
 			}
 		}
+		
+		instruction.variable.description = instruction.text;
 		
 		[variablesArray addObject:instruction.variable];
 	}

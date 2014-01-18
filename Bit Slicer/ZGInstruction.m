@@ -36,7 +36,27 @@
 #import "ZGVariable.h"
 #import "ZGUtilities.h"
 
+@interface ZGInstruction ()
+
+@property (nonatomic) ud_mnemonic_code_t mnemonic;
+@property (nonatomic, copy) NSString *text;
+@property (nonatomic) ZGVariable *variable;
+
+@end
+
 @implementation ZGInstruction
+
+- (id)initWithVariable:(ZGVariable *)variable text:(NSString *)text mnemonic:(ud_mnemonic_code_t)mnemonic
+{
+	self = [super init];
+	if (self != nil)
+	{
+		self.variable = variable;
+		self.text = text;
+		self.mnemonic = mnemonic;
+	}
+	return self;
+}
 
 // Possible candidates: UD_Isyscall, UD_Ivmcall, UD_Ivmmcall ??
 - (BOOL)isCallMnemonic
