@@ -57,6 +57,7 @@ void *ZGSwappedValue(BOOL isProcess64Bit, void *value, ZGVariableType dataType, 
 
 ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
 
+NSArray *ZGByteArrayComponentsFromString(NSString *searchString);
 unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);
 
 NSString *ZGProtectionDescription(ZGMemoryProtection protection);
