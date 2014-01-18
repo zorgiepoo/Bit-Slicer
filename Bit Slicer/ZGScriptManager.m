@@ -272,6 +272,8 @@ static dispatch_queue_t gPythonQueue;
 			[self stopScriptForVariable:[variableValue pointerValue]];
 		}
 	}];
+	
+	[self.fileWatchingQueue removeAllPaths];
 }
 
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString *)noteName forPath:(NSString *)fullPath
@@ -649,10 +651,13 @@ static dispatch_queue_t gPythonQueue;
 	}
 }
 
+/*
+ // Not used currently but may be useful to have in future
 - (void)removeScriptForVariable:(ZGVariable *)variable
 {
 	[self.scriptsDictionary removeObjectForKey:[NSValue valueWithNonretainedObject:variable]];
 }
+ */
 
 - (void)stopScriptForVariable:(ZGVariable *)variable
 {
