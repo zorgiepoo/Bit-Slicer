@@ -54,7 +54,6 @@
 @interface ZGDocumentSearchController ()
 
 @property (assign) ZGDocumentWindowController *windowController;
-@property (strong, nonatomic, readwrite) NSTimer *userInterfaceTimer;
 @property (readwrite, strong, nonatomic) ZGSearchProgress *searchProgress;
 @property (nonatomic) ZGSearchResults *temporarySearchResults;
 @property (nonatomic) NSArray *tempSavedData;
@@ -88,18 +87,10 @@
 
 - (void)cleanUp
 {
-	self.userInterfaceTimer = nil;
-	
 	// Force canceling
 	self.searchProgress.shouldCancelSearch = YES;
 	
 	self.windowController = nil;
-}
-
-- (void)setUserInterfaceTimer:(NSTimer *)newTimer
-{
-	[_userInterfaceTimer invalidate];
-	_userInterfaceTimer = newTimer;
 }
 
 #pragma mark Confirm search input
@@ -741,8 +732,6 @@
 		self.tempSavedData = ZGGetAllData(self.windowController.currentProcess.processTask, self.searchData, self.searchProgress);
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			self.userInterfaceTimer = nil;
-			
 			if (!self.searchProgress.shouldCancelSearch)
 			{
 				if (self.searchData.savedData == nil)
