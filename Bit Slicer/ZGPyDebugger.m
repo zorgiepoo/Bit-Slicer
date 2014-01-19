@@ -44,6 +44,7 @@
 #import "ZGProcess.h"
 #import "ZGScriptManager.h"
 #import "ZGBreakPointController.h"
+#import "ZGBreakPoint.h"
 #import "ZGInstruction.h"
 #import "ZGMachBinary.h"
 #import "structmember.h"
@@ -59,6 +60,7 @@ typedef struct
 	char is64Bit;
 	ZGMemoryAddress dylinkerHeaderAddress;
 	ZGMemoryAddress dylinkerFilePathAddress;
+	__unsafe_unretained ZGPyDebugger *objcSelf;
 	__unsafe_unretained id <ZGBreakPointDelegate> breakPointDelegate;
 } DebuggerClass;
 
@@ -81,6 +83,8 @@ declareDebugPrototypeMethod(injectCode)
 declareDebugPrototypeMethod(watchWriteAccesses)
 declareDebugPrototypeMethod(watchReadAndWriteAccesses)
 declareDebugPrototypeMethod(removeWatchAccesses)
+declareDebugPrototypeMethod(addBreakpoint)
+declareDebugPrototypeMethod(resume)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
 #define declareDebugMethod(name) declareDebugMethod2(name, METH_VARARGS)
@@ -98,6 +102,8 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(watchWriteAccesses)
 	declareDebugMethod(watchReadAndWriteAccesses)
 	declareDebugMethod(removeWatchAccesses)
+	declareDebugMethod(addBreakpoint)
+	declareDebugMethod(resume)
 	{NULL, NULL, 0, NULL}
 };
 
@@ -148,6 +154,8 @@ static PyTypeObject DebuggerType =
 
 @property (nonatomic) NSMutableDictionary *cachedInstructionPointers;
 @property (nonatomic) NSMutableDictionary *processCacheDictionary;
+@property (nonatomic) ZGProcess *process;
+@property (nonatomic) ZGBreakPoint *haltedBreakPoint;
 
 @end
 
@@ -181,8 +189,10 @@ static PyTypeObject DebuggerType =
 		}
 		
 		self.scriptManager = scriptManager;
+		self.process = process;
 		
 		DebuggerClass *debuggerObject = (DebuggerClass *)self.object;
+		debuggerObject->objcSelf = self;
 		debuggerObject->processIdentifier = process.processID;
 		debuggerObject->processTask = process.processTask;
 		debuggerObject->is64Bit = process.is64Bit;
@@ -197,6 +207,18 @@ static PyTypeObject DebuggerType =
 	return self;
 }
 
+- (void)dealloc
+{
+	if (self.haltedBreakPoint != nil)
+	{
+		self.haltedBreakPoint.dead = YES;
+		[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.haltedBreakPoint];
+	}
+	
+	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
+	self.object = NULL;
+}
+
 - (void)setObject:(PyObject *)object
 {
 	if (Py_IsInitialized())
@@ -204,12 +226,6 @@ static PyTypeObject DebuggerType =
 		Py_XDECREF(_object);
 	}
 	_object = object;
-}
-
-- (void)dealloc
-{
-	[[[ZGAppController sharedController] breakPointController] removeObserver:((DebuggerClass *)self.object)->breakPointDelegate];
-	self.object = NULL;
 }
 
 static PyObject *Debugger_log(DebuggerClass *self, PyObject *args)
@@ -558,6 +574,46 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 		[[[ZGAppController sharedController] breakPointController] removeObserver:self->breakPointDelegate withProcessID:self->processIdentifier atAddress:memoryAddress];
 		retValue = Py_BuildValue("");
 	}
+	return retValue;
+}
+
+- (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
+{
+	self.haltedBreakPoint = breakPoint;
+	
+	[self.scriptManager handleInstructionBreakPoint:breakPoint sender:self];
+}
+
+static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
+{
+	if (self->objcSelf.haltedBreakPoint == nil)
+	{
+		return NULL;
+	}
+	
+	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
+	self->objcSelf.haltedBreakPoint = nil;
+	
+	return Py_BuildValue("");
+}
+
+static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0;
+	
+	if (PyArg_ParseTuple(args, "K:addBreakpoint", &memoryAddress))
+	{
+		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf.process];
+		if (instruction != nil)
+		{
+			if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self->objcSelf.process condition:NULL delegate:self->breakPointDelegate])
+			{
+				retValue = Py_BuildValue("");
+			}
+		}
+	}
+	
 	return retValue;
 }
 

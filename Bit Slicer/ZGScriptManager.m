@@ -40,6 +40,7 @@
 #import "ZGPyScript.h"
 #import "ZGPyVirtualMemory.h"
 #import "ZGPyDebugger.h"
+#import "ZGBreakPoint.h"
 #import "ZGProcess.h"
 #import "ZGPyMainModule.h"
 #import "ZGSearchProgress.h"
@@ -747,6 +748,21 @@ static dispatch_queue_t gPythonQueue;
 	}
 }
 
+- (void)handleBreakPointFailureWithVariable:(ZGVariable *)variable methodCallResult:(PyObject *)methodCallResult forMethodName:(const char *)methodName shouldStop:(BOOL *)stop
+{
+	if (methodCallResult == NULL)
+	{
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[[[ZGAppController sharedController] loggerController] writeLine:[NSString stringWithFormat:@"Exception raised in %s callback", methodName]];
+		});
+		[self logPythonError];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self stopScriptForVariable:variable];
+		});
+		*stop = YES;
+	}
+}
+
 - (void)handleBreakPointDataAddress:(ZGMemoryAddress)dataAddress instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender
 {
 	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
@@ -754,17 +770,21 @@ static dispatch_queue_t gPythonQueue;
 			if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 			{
 				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "dataAccessed", "KK", dataAddress, instructionAddress);
-				if (result == NULL)
-				{
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[[[ZGAppController sharedController] loggerController] writeLine:@"Exception raised in dataAccessed callback"];
-					});
-					[self logPythonError];
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[self stopScriptForVariable:[variableValue pointerValue]];
-					});
-					*stop = YES;
-				}
+				[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"dataAccessed" shouldStop:stop];
+				Py_XDECREF(result);
+			}
+		});
+	}];
+}
+
+- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint sender:(id)sender
+{
+	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+		dispatch_async(gPythonQueue, ^{
+			if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
+			{
+				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "breakpointAccessed", "");
+				[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"breakpointAccessed" shouldStop:stop];
 				Py_XDECREF(result);
 			}
 		});

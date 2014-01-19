@@ -876,7 +876,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	BOOL breakPointAlreadyExists = NO;
 	for (ZGBreakPoint *breakPoint in self.breakPoints)
 	{
-		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address == instruction.variable.address)
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address == instruction.variable.address && breakPoint.delegate == delegate)
 		{
 			breakPointAlreadyExists = YES;
 			break;

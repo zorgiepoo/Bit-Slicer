@@ -41,6 +41,7 @@
 @class ZGDocumentWindowController;
 @class ZGVariable;
 @class ZGProcess;
+@class ZGBreakPoint;
 
 #define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
 
@@ -62,5 +63,6 @@
 - (void)stopScriptForVariable:(ZGVariable *)variable;
 
 - (void)handleBreakPointDataAddress:(ZGMemoryAddress)dataAddress instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender;
+- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint sender:(id)sender;
 
 @end
