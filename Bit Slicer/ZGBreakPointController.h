@@ -53,7 +53,7 @@ typedef enum
 	ZGWatchPointReadOrWrite,
 } ZGWatchPointType;
 
-@property (strong) NSArray *breakPoints;
+@property (nonatomic) NSArray *breakPoints;
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate;
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer delegate:(id)delegate;

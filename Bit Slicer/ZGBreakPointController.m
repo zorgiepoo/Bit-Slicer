@@ -950,16 +950,30 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 
 - (void)addBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	NSMutableArray *currentBreakPoints = [NSMutableArray arrayWithArray:self.breakPoints];
-	[currentBreakPoints addObject:breakPoint];
-	self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+	@synchronized(self)
+	{
+		NSMutableArray *currentBreakPoints = [NSMutableArray arrayWithArray:self.breakPoints];
+		[currentBreakPoints addObject:breakPoint];
+		self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+	}
 }
 
 - (void)removeBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	NSMutableArray *currentBreakPoints = [NSMutableArray arrayWithArray:self.breakPoints];
-	[currentBreakPoints removeObject:breakPoint];
-	self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+	@synchronized(self)
+	{
+		NSMutableArray *currentBreakPoints = [NSMutableArray arrayWithArray:self.breakPoints];
+		[currentBreakPoints removeObject:breakPoint];
+		self.breakPoints = [NSArray arrayWithArray:currentBreakPoints];
+	}
+}
+
+- (NSArray *)breakPoints
+{
+	@synchronized(self)
+	{
+		return _breakPoints;
+	}
 }
 
 @end
