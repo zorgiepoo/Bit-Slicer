@@ -49,18 +49,20 @@ typedef enum
 
 @interface ZGBreakPoint : NSObject
 
-@property (assign, nonatomic) id <ZGBreakPointDelegate> delegate;
-@property (readwrite, nonatomic) ZGMemoryMap task;
-@property (readwrite, nonatomic) thread_act_t thread;
-@property (strong, nonatomic) ZGVariable *variable;
-@property (readwrite) ZGMemorySize watchSize;
-@property (strong, nonatomic) ZGProcess *process;
-@property (strong, nonatomic) NSArray *debugThreads;
-@property (assign) ZGBreakPointType type;
-@property (assign) BOOL needsToRestore;
-@property (assign) BOOL hidden;
+- (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type  delegate:(id <ZGBreakPointDelegate>)delegate;
+
+@property (weak, nonatomic) id <ZGBreakPointDelegate> delegate;
+@property (readonly, nonatomic) ZGMemoryMap task;
+@property (nonatomic) thread_act_t thread;
+@property (nonatomic) ZGVariable *variable;
+@property (nonatomic) ZGMemorySize watchSize;
+@property (readonly, nonatomic) ZGProcess *process;
+@property (nonatomic) NSArray *debugThreads;
+@property (readonly, nonatomic) ZGBreakPointType type;
+@property BOOL needsToRestore;
+@property BOOL hidden;
 @property BOOL dead;
-@property (assign) ZGMemoryAddress basePointer;
+@property ZGMemoryAddress basePointer;
 @property (nonatomic) NSMutableDictionary *cacheDictionary;
 @property (nonatomic) PyObject *condition;
 @property (nonatomic) NSError *error;

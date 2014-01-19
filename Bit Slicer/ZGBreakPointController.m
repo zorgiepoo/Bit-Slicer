@@ -840,14 +840,10 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			return NO;
 		}
 		
-		ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] init];
-		breakPoint.task = process.processTask;
-		breakPoint.delegate = delegate;
+		ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] initWithProcess:process type:ZGBreakPointWatchData delegate:delegate];
 		breakPoint.debugThreads = [NSArray arrayWithArray:debugThreads];
 		breakPoint.variable = variable;
 		breakPoint.watchSize = watchSize;
-		breakPoint.process = process;
-		breakPoint.type = ZGBreakPointWatchData;
 		
 		[self addBreakPoint:breakPoint];
 		
@@ -922,12 +918,9 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	
 	uint8_t breakPointOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
 	
-	ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] init];
-	breakPoint.delegate = delegate;
-	breakPoint.task = process.processTask;
+	ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] initWithProcess:process type:ZGBreakPointInstruction delegate:delegate];
+	
 	breakPoint.variable = variable;
-	breakPoint.process = process;
-	breakPoint.type = ZGBreakPointInstruction;
 	breakPoint.hidden = isHidden;
 	breakPoint.thread = thread;
 	breakPoint.basePointer = basePointer;
@@ -949,12 +942,8 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 
 - (void)addSingleStepBreakPointFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	ZGBreakPoint *singleStepBreakPoint = [[ZGBreakPoint alloc] init];
-	singleStepBreakPoint.process = breakPoint.process;
-	singleStepBreakPoint.delegate = breakPoint.delegate;
-	singleStepBreakPoint.task = breakPoint.task;
+	ZGBreakPoint *singleStepBreakPoint = [[ZGBreakPoint alloc] initWithProcess:breakPoint.process type:ZGBreakPointSingleStepInstruction delegate:breakPoint.delegate];
 	singleStepBreakPoint.thread = breakPoint.thread;
-	singleStepBreakPoint.type = ZGBreakPointSingleStepInstruction;
 	
 	[self addBreakPoint:singleStepBreakPoint];
 }

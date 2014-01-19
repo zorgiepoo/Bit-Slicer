@@ -33,15 +33,29 @@
  */
 
 #import "ZGBreakPoint.h"
+#import "ZGProcess.h"
+
+@interface ZGBreakPoint ()
+
+@property (nonatomic) ZGMemoryMap task;
+@property (nonatomic) ZGProcess *process;
+@property (nonatomic) ZGBreakPointType type;
+
+@end
 
 @implementation ZGBreakPoint
 
-- (id)init
+- (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type  delegate:(id <ZGBreakPointDelegate>)delegate
 {
 	self = [super init];
 	if (self != nil)
 	{
 		self.cacheDictionary = [NSMutableDictionary dictionary];
+		self.process = process;
+		self.type = type;
+		self.delegate = delegate;
+		self.task = process.processTask;
+		self.delegate = delegate;
 	}
 	return self;
 }
