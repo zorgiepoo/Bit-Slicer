@@ -234,7 +234,7 @@
 	NSFont *userFont = [NSFont userFontOfSize:12];
 	NSFont *boldFont = [[NSFontManager sharedFontManager] fontWithFamily:userFont.familyName traits:NSBoldFontMask weight:0 size:userFont.pointSize];
 	
-	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:instruction.variable.name];
+	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:instruction.text];
 	
 	ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	int numberOfGeneralRegisters = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:self.watchProcess.is64Bit];

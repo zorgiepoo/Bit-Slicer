@@ -1515,7 +1515,12 @@ END_DEBUGGER_CHANGE:
 
 - (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-	NSArray *variables = [[self.instructions objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	NSMutableArray *variables = [NSMutableArray array];
+	for (ZGInstruction *instruction in [self.instructions objectsAtIndexes:rowIndexes])
+	{
+		instruction.variable.description = instruction.text;
+		[variables addObject:instruction.variable];
+	}
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
