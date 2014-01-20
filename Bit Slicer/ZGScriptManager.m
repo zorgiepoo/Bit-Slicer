@@ -783,7 +783,7 @@ static dispatch_queue_t gPythonQueue;
 		dispatch_async(gPythonQueue, ^{
 			if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 			{
-				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "breakpointAccessed", "");
+				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "breakpointAccessed", "K", breakPoint.variable.address);
 				[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"breakpointAccessed" shouldStop:stop];
 				Py_XDECREF(result);
 			}
