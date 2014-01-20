@@ -179,7 +179,14 @@ static PyObject *convertRegisterEntriesToPyDict(ZGFastRegisterEntry *registerEnt
 		
 		if (registerEntry->type == ZGRegisterGeneralPurpose)
 		{
-			registerObject = !is64Bit ? Py_BuildValue("i", *(int32_t *)value) : Py_BuildValue("L", *(int64_t *)value);
+			if (registerEntry->prefersUnsigned)
+			{
+				registerObject = !is64Bit ? Py_BuildValue("I", *(uint32_t *)value) : Py_BuildValue("K", *(uint64_t *)value);
+			}
+			else
+			{
+				registerObject = !is64Bit ? Py_BuildValue("i", *(int32_t *)value) : Py_BuildValue("L", *(int64_t *)value);
+			}
 		}
 		else
 		{

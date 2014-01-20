@@ -52,6 +52,7 @@ typedef struct
 	char value[64];
 	size_t size;
 	ZGRegisterType type;
+	BOOL prefersUnsigned;
 } ZGFastRegisterEntry;
 
 #define ZG_MAX_REGISTER_ENTRIES 128
