@@ -67,5 +67,8 @@ typedef enum
 @property (nonatomic) PyObject *condition;
 @property (nonatomic) NSError *error;
 @property (nonatomic) ZGMemoryProtection originalProtection;
+@property (nonatomic) x86_thread_state_t generalPurposeThreadState;
+@property (nonatomic) x86_avx_state_t avxState;
+@property (nonatomic) BOOL hasAVXState;
 
 @end

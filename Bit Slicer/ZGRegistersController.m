@@ -359,43 +359,36 @@
 	
 	NSMutableArray *newRegisters = [NSMutableArray array];
 	
-	x86_thread_state_t threadState;
-	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-	if (thread_get_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) == KERN_SUCCESS)
+	NSArray *registerVariables = [[self class] registerVariablesFromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:breakPoint.process.is64Bit];
+	
+	for (ZGVariable *registerVariable in registerVariables)
 	{
-		NSArray *registerVariables = [[self class] registerVariablesFromGeneralPurposeThreadState:threadState is64Bit:breakPoint.process.is64Bit];
+		[registerVariable setQualifier:self.qualifier];
 		
-		for (ZGVariable *registerVariable in registerVariables)
+		ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterGeneralPurpose variable:registerVariable pointerSize:pointerSize];
+		
+		NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
+		if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
 		{
-			[registerVariable setQualifier:self.qualifier];
-			
-			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterGeneralPurpose variable:registerVariable pointerSize:pointerSize];
-			
-			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
-			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
-			{
-				[newRegister.variable setType:[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
-				[newRegister.variable setValue:newRegister.value];
-			}
-			
-			[newRegisters addObject:newRegister];
+			[newRegister.variable setType:[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
+			[newRegister.variable setValue:newRegister.value];
 		}
 		
-		if (breakPoint.process.is64Bit)
-		{
-			self.programCounter = threadState.uts.ts64.__rip;
-		}
-		else
-		{
-			self.programCounter = threadState.uts.ts32.__eip;
-		}
+		[newRegisters addObject:newRegister];
 	}
 	
-	x86_avx_state_t avxState;
-	mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
-	if (thread_get_state(self.breakPoint.thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS)
+	if (breakPoint.process.is64Bit)
 	{
-		NSArray *registerVariables = [[self class] registerVariablesFromAVXThreadState:avxState is64Bit:breakPoint.process.is64Bit];
+		self.programCounter = breakPoint.generalPurposeThreadState.uts.ts64.__rip;
+	}
+	else
+	{
+		self.programCounter = breakPoint.generalPurposeThreadState.uts.ts32.__eip;
+	}
+	
+	if (breakPoint.hasAVXState)
+	{
+		NSArray *registerVariables = [[self class] registerVariablesFromAVXThreadState:breakPoint.avxState is64Bit:breakPoint.process.is64Bit];
 		for (ZGVariable *registerVariable in registerVariables)
 		{
 			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterAVX variable:registerVariable pointerSize:pointerSize];
@@ -510,6 +503,8 @@
 		return NO;
 	}
 	
+	self.breakPoint.avxState = avxState;
+	
 	theRegister.variable = newVariable;
 	
 	return YES;
@@ -551,6 +546,8 @@
 		NSLog(@"Failure in setting registers thread state for writing register value (general purpose): %d", self.breakPoint.thread);
 		return NO;
 	}
+	
+	self.breakPoint.generalPurposeThreadState = threadState;
 	
 	theRegister.variable = newVariable;
 	

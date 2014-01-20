@@ -538,6 +538,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		}
 	}
 	
+	x86_avx_state_t avxState;
+	mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
+	BOOL retrievedAVXState = (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS);
+	
 	ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	BOOL retrievedRegisterEntries = NO;
 	
@@ -545,19 +549,18 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	for (ZGBreakPoint *breakPoint in breakPointsToNotify)
 	{
 		BOOL canNotifyDelegate = !breakPoint.dead;
+		
 		if (canNotifyDelegate && breakPoint.condition != NULL)
 		{
 			if (!retrievedRegisterEntries)
 			{
 				BOOL is64Bit = breakPoint.process.is64Bit;
 				
-				int numberOfEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
+				int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
 				
-				x86_avx_state_t avxState;
-				mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
-				if (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS)
+				if (retrievedAVXState)
 				{
-					[ZGRegistersController getRegisterEntries:registerEntries + numberOfEntries fromAVXThreadState:avxState is64Bit:is64Bit];
+					[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromAVXThreadState:avxState is64Bit:is64Bit];
 				}
 				
 				retrievedRegisterEntries = YES;
@@ -579,8 +582,12 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		
 		if (canNotifyDelegate)
 		{
+			breakPoint.generalPurposeThreadState = threadState;
+			breakPoint.avxState = avxState;
+			breakPoint.hasAVXState = retrievedAVXState;
+			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[breakPoint.delegate performSelector:@selector(breakPointDidHit:) withObject:breakPoint];
+				[breakPoint.delegate breakPointDidHit:breakPoint];
 			});
 		}
 		else

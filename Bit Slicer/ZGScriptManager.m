@@ -168,6 +168,33 @@ static dispatch_queue_t gPythonQueue;
 	return compiledExpression;
 }
 
+static PyObject *convertRegisterEntriesToPyDict(ZGFastRegisterEntry *registerEntries, BOOL is64Bit)
+{
+	PyObject *dictionary = PyDict_New();
+	
+	for (ZGFastRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
+	{
+		void *value = registerEntry->value;
+		PyObject *registerObject = NULL;
+		
+		if (registerEntry->type == ZGRegisterGeneralPurpose)
+		{
+			registerObject = !is64Bit ? Py_BuildValue("i", *(int32_t *)value) : Py_BuildValue("L", *(int64_t *)value);
+		}
+		else
+		{
+			registerObject = Py_BuildValue("y#", value, registerEntry->size);
+		}
+		
+		if (registerObject != NULL)
+		{
+			PyDict_SetItemString(dictionary, registerEntry->name, registerObject);
+		}
+	}
+	
+	return dictionary;
+}
+
 + (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGFastRegisterEntry *)registerEntries error:(NSError **)error
 {
 	__block BOOL result = NO;
@@ -183,27 +210,7 @@ static dispatch_queue_t gPythonQueue;
 		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.vmObject);
 		
 		PyObject *globalDictionary = PyModule_GetDict(mainModule);
-		PyObject *localDictionary = PyDict_New();
-		
-		for (ZGFastRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
-		{
-			void *value = registerEntry->value;
-			PyObject *registerObject = NULL;
-			
-			if (registerEntry->type == ZGRegisterGeneralPurpose)
-			{
-				registerObject = !process.is64Bit ? Py_BuildValue("i", *(int32_t *)value) : Py_BuildValue("L", *(int64_t *)value);
-			}
-			else
-			{
-				registerObject = Py_BuildValue("y#", value, registerEntry->size);
-			}
-			
-			if (registerObject != NULL)
-			{
-				PyDict_SetItemString(localDictionary, registerEntry->name, registerObject);
-			}
-		}
+		PyObject *localDictionary = convertRegisterEntriesToPyDict(registerEntries, process.is64Bit);
 		
 		PyObject *evaluatedCode = PyEval_EvalCode(compiledExpression, globalDictionary, localDictionary);
 		
@@ -783,7 +790,20 @@ static dispatch_queue_t gPythonQueue;
 		dispatch_async(gPythonQueue, ^{
 			if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 			{
-				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "breakpointAccessed", "K", breakPoint.variable.address);
+				ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
+				BOOL is64Bit = breakPoint.process.is64Bit;
+				
+				int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:is64Bit];
+				
+				if (breakPoint.hasAVXState)
+				{
+					[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromAVXThreadState:breakPoint.avxState is64Bit:is64Bit];
+				}
+				
+				PyObject *registers = convertRegisterEntriesToPyDict(registerEntries, is64Bit);
+				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "breakpointAccessed", "KO", breakPoint.variable.address, registers);
+				Py_XDECREF(registers);
+				
 				[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"breakpointAccessed" shouldStop:stop];
 				Py_XDECREF(result);
 			}

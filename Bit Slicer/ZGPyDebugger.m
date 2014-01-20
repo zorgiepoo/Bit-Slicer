@@ -586,11 +586,6 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 
 static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
 {
-	if (self->objcSelf.haltedBreakPoint == nil)
-	{
-		return NULL;
-	}
-	
 	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
 	self->objcSelf.haltedBreakPoint = nil;
 	
