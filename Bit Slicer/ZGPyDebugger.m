@@ -477,9 +477,6 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		{
 			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.injectCode failed with source address: 0x%llx, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
 			
-			NSLog(@"Failed to inject code from script...");
-			NSLog(@"%@", error);
-			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[[[ZGAppController sharedController] loggerController] writeLine:[[error userInfo] objectForKey:@"reason"]];
 				if ([[error userInfo] objectForKey:@"description"] != nil)
