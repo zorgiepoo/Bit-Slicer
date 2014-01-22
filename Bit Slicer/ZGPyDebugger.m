@@ -497,7 +497,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-- (void)dataAddress:(ZGMemoryAddress)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionPointer threadState:(x86_thread_state_t)threadState avxState:(x86_avx_state_t)avxState
+- (void)dataAccessedByBreakPoint:(ZGBreakPoint *)breakPoint fromInstructionPointer:(ZGMemoryAddress)instructionPointer
 {
 	NSNumber *instructionPointerNumber = @(instructionPointer);
 	ZGMemoryAddress instructionAddress = 0;
@@ -520,7 +520,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		instructionAddress = [[self.cachedInstructionPointers objectForKey:instructionPointerNumber] unsignedLongLongValue];
 	}
 	
-	[self.scriptManager handleBreakPointDataAddress:dataAddress instructionAddress:instructionAddress sender:self];
+	[self.scriptManager handleDataBreakPoint:breakPoint instructionAddress:instructionAddress sender:self];
 }
 
 static PyObject *watchAccess(DebuggerClass *self, PyObject *args, NSString *functionName, ZGWatchPointType watchPointType)

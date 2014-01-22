@@ -216,7 +216,7 @@
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:[registerLines componentsJoinedByString:@"\n"]]];
 }
 
-- (void)dataAddress:(ZGMemoryAddress)dataAddress accessedByInstructionPointer:(ZGMemoryAddress)instructionAddress threadState:(x86_thread_state_t)threadState avxState:(x86_avx_state_t)avxState
+- (void)dataAccessedByBreakPoint:(ZGBreakPoint *)breakPoint fromInstructionPointer:(ZGMemoryAddress)instructionAddress
 {
 	NSNumber *instructionAddressNumber = @(instructionAddress);
 	if (!self.watchProcess.valid || [self.foundBreakPointAddresses containsObject:instructionAddressNumber]) return;
@@ -237,7 +237,7 @@
 	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:instruction.text];
 	
 	ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
-	int numberOfGeneralRegisters = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:self.watchProcess.is64Bit];
+	int numberOfGeneralRegisters = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:self.watchProcess.is64Bit];
 	
 	[self
 	 appendDescription:description
@@ -245,7 +245,7 @@
 	 registerLabel:@"General Purpose Registers"
 	 boldFont:boldFont];
 	
-	[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromAVXThreadState:avxState is64Bit:self.watchProcess.is64Bit];
+	[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromAVXThreadState:breakPoint.avxState is64Bit:self.watchProcess.is64Bit];
 	
 	[self
 	 appendDescription:description

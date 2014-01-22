@@ -777,14 +777,31 @@ static PyObject *convertRegisterEntriesToPyDict(ZGFastRegisterEntry *registerEnt
 	}
 }
 
-- (void)handleBreakPointDataAddress:(ZGMemoryAddress)dataAddress instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender
+- (PyObject *)registersfromBreakPoint:(ZGBreakPoint *)breakPoint
+{
+	ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
+	BOOL is64Bit = breakPoint.process.is64Bit;
+	
+	int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:is64Bit];
+	
+	if (breakPoint.hasAVXState)
+	{
+		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromAVXThreadState:breakPoint.avxState is64Bit:is64Bit];
+	}
+	
+	return convertRegisterEntriesToPyDict(registerEntries, is64Bit);
+}
+
+- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender
 {
 	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
 		dispatch_async(gPythonQueue, ^{
 			if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 			{
-				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "dataAccessed", "KK", dataAddress, instructionAddress);
+				PyObject *registers = [self registersfromBreakPoint:breakPoint];
+				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "dataAccessed", "KKO", breakPoint.variable.address, instructionAddress, registers);
 				[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"dataAccessed" shouldStop:stop];
+				Py_XDECREF(registers);
 				Py_XDECREF(result);
 			}
 		});
@@ -797,17 +814,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGFastRegisterEntry *registerEnt
 		dispatch_async(gPythonQueue, ^{
 			if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 			{
-				ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
-				BOOL is64Bit = breakPoint.process.is64Bit;
-				
-				int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:is64Bit];
-				
-				if (breakPoint.hasAVXState)
-				{
-					[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromAVXThreadState:breakPoint.avxState is64Bit:is64Bit];
-				}
-				
-				PyObject *registers = convertRegisterEntriesToPyDict(registerEntries, is64Bit);
+				PyObject *registers = [self registersfromBreakPoint:breakPoint];
 				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "breakpointAccessed", "KO", breakPoint.variable.address, registers);
 				Py_XDECREF(registers);
 				

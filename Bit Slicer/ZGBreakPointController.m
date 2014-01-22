@@ -232,8 +232,11 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 								NSLog(@"ERROR: Grabbing avx state failed from watch point handler");
 							}
 							
+							breakPoint.generalPurposeThreadState = threadState;
+							breakPoint.avxState = avxState;
+							
 							dispatch_async(dispatch_get_main_queue(), ^{
-								[breakPoint.delegate dataAddress:breakPoint.variable.address accessedByInstructionPointer:instructionAddress threadState:threadState avxState:avxState];
+								[breakPoint.delegate dataAccessedByBreakPoint:breakPoint fromInstructionPointer:instructionAddress];
 							});
 						}
 					}

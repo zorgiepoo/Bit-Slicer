@@ -62,7 +62,7 @@
 - (void)runScriptForVariable:(ZGVariable *)variable;
 - (void)stopScriptForVariable:(ZGVariable *)variable;
 
-- (void)handleBreakPointDataAddress:(ZGMemoryAddress)dataAddress instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender;
+- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender;
 - (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint sender:(id)sender;
 
 @end
