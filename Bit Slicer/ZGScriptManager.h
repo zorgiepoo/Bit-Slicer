@@ -45,6 +45,8 @@
 
 #define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
 
+extern dispatch_queue_t gPythonQueue;
+
 @interface ZGScriptManager : NSObject <VDKQueueDelegate>
 
 + (PyObject *)compiledExpressionFromExpression:(NSString *)expression;
@@ -62,7 +64,7 @@
 - (void)runScriptForVariable:(ZGVariable *)variable;
 - (void)stopScriptForVariable:(ZGVariable *)variable;
 
-- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender;
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint sender:(id)sender;
+- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender;
+- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender;
 
 @end

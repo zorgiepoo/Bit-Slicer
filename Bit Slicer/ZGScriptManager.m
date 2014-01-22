@@ -66,7 +66,7 @@
 
 @implementation ZGScriptManager
 
-static dispatch_queue_t gPythonQueue;
+dispatch_queue_t gPythonQueue;
 
 + (void)initializePythonInterpreter
 {
@@ -792,37 +792,41 @@ static PyObject *convertRegisterEntriesToPyDict(ZGFastRegisterEntry *registerEnt
 	return convertRegisterEntriesToPyDict(registerEntries, is64Bit);
 }
 
-- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress sender:(id)sender
+- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender
 {
-	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
-		dispatch_async(gPythonQueue, ^{
-			if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
-			{
-				PyObject *registers = [self registersfromBreakPoint:breakPoint];
-				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "dataAccessed", "KKO", breakPoint.variable.address, instructionAddress, registers);
-				[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"dataAccessed" shouldStop:stop];
-				Py_XDECREF(registers);
-				Py_XDECREF(result);
-			}
-		});
-	}];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+			dispatch_async(gPythonQueue, ^{
+				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
+				{
+					PyObject *registers = [self registersfromBreakPoint:breakPoint];
+					PyObject *result = PyObject_CallFunction(callback, "KKO", breakPoint.variable.address, instructionAddress, registers);
+					[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"data watchpoint" shouldStop:stop];
+					Py_XDECREF(registers);
+					Py_XDECREF(result);
+				}
+			});
+		}];
+	});
 }
 
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint sender:(id)sender
+- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender
 {
-	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
-		dispatch_async(gPythonQueue, ^{
-			if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
-			{
-				PyObject *registers = [self registersfromBreakPoint:breakPoint];
-				PyObject *result = PyObject_CallMethod(pyScript.scriptObject, "breakpointAccessed", "KO", breakPoint.variable.address, registers);
-				Py_XDECREF(registers);
-				
-				[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"breakpointAccessed" shouldStop:stop];
-				Py_XDECREF(result);
-			}
-		});
-	}];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+			dispatch_async(gPythonQueue, ^{
+				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
+				{
+					PyObject *registers = [self registersfromBreakPoint:breakPoint];
+					PyObject *result = PyObject_CallFunction(callback, "KO", breakPoint.variable.address, registers);
+					Py_XDECREF(registers);
+					
+					[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"instruction breakpoint" shouldStop:stop];
+					Py_XDECREF(result);
+				}
+			});
+		}];
+	});
 }
 
 @end
