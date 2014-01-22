@@ -84,6 +84,7 @@ declareDebugPrototypeMethod(watchWriteAccesses)
 declareDebugPrototypeMethod(watchReadAndWriteAccesses)
 declareDebugPrototypeMethod(removeWatchAccesses)
 declareDebugPrototypeMethod(addBreakpoint)
+declareDebugPrototypeMethod(removeBreakpoint)
 declareDebugPrototypeMethod(resume)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
@@ -103,6 +104,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(watchReadAndWriteAccesses)
 	declareDebugMethod(removeWatchAccesses)
 	declareDebugMethod(addBreakpoint)
+	declareDebugMethod(removeBreakpoint)
 	declareDebugMethod(resume)
 	{NULL, NULL, 0, NULL}
 };
@@ -581,14 +583,6 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 	[self.scriptManager handleInstructionBreakPoint:breakPoint sender:self];
 }
 
-static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
-{
-	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
-	self->objcSelf.haltedBreakPoint = nil;
-	
-	return Py_BuildValue("");
-}
-
 static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
@@ -615,6 +609,36 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 	}
 	
 	return retValue;
+}
+
+static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0;
+	
+	if (PyArg_ParseTuple(args, "K:removeBreakpoint", &memoryAddress))
+	{
+		ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf.process];
+		if (instruction != nil)
+		{
+			[[[ZGAppController sharedController] breakPointController] removeBreakPointOnInstruction:instruction inProcess:self->objcSelf.process];
+			retValue = Py_BuildValue("");
+		}
+		else
+		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.removeBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
+		}
+	}
+	
+	return retValue;
+}
+
+static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
+{
+	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
+	self->objcSelf.haltedBreakPoint = nil;
+	
+	return Py_BuildValue("");
 }
 
 @end
