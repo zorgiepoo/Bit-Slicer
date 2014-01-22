@@ -532,14 +532,9 @@ static PyObject *watchAccess(DebuggerClass *self, PyObject *args, NSString *func
 		void *value = NULL;
 		if (ZGReadBytes(self->processTask, memoryAddress, &value, &numberOfBytes))
 		{
-			ZGProcess *process = [[ZGProcess alloc] init];
-			process.processTask = self->processTask;
-			process.is64Bit = self->is64Bit;
-			process.processID = self->processIdentifier;
+			ZGVariable *variable = [[ZGVariable alloc] initWithValue:value size:numberOfBytes address:memoryAddress type:ZGByteArray qualifier:0 pointerSize:self->objcSelf.process.pointerSize];
 			
-			ZGVariable *variable = [[ZGVariable alloc] initWithValue:value size:numberOfBytes address:memoryAddress type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
-			
-			if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:process watchPointType:watchPointType delegate:self->breakPointDelegate getBreakPoint:NULL])
+			if ([[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self->objcSelf.process watchPointType:watchPointType delegate:self->breakPointDelegate getBreakPoint:NULL])
 			{
 				retValue = Py_BuildValue("");
 			}
