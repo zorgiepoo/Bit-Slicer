@@ -603,6 +603,14 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 			{
 				retValue = Py_BuildValue("");
 			}
+			else
+			{
+				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX", memoryAddress] UTF8String]);
+			}
+		}
+		else
+		{
+			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.addBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
 		}
 	}
 	
