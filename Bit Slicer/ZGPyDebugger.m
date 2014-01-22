@@ -221,16 +221,19 @@ static PyTypeObject DebuggerType =
 		[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.haltedBreakPoint];
 	}
 	
-	for (NSNumber *addressNumber in [self.breakPointCallbacks allKeys])
+	if (Py_IsInitialized())
 	{
-		PyObject *callback = [[self.breakPointCallbacks objectForKey:addressNumber] pointerValue];
-		Py_XDECREF(callback);
-	}
-	
-	for (NSNumber *addressNumber in [self.watchPointCallbacks allKeys])
-	{
-		PyObject *callback = [[self.watchPointCallbacks objectForKey:addressNumber] pointerValue];
-		Py_XDECREF(callback);
+		for (NSNumber *addressNumber in [self.breakPointCallbacks allKeys])
+		{
+			PyObject *callback = [[self.breakPointCallbacks objectForKey:addressNumber] pointerValue];
+			Py_XDECREF(callback);
+		}
+		
+		for (NSNumber *addressNumber in [self.watchPointCallbacks allKeys])
+		{
+			PyObject *callback = [[self.watchPointCallbacks objectForKey:addressNumber] pointerValue];
+			Py_XDECREF(callback);
+		}
 	}
 	
 	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
