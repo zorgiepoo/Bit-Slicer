@@ -307,8 +307,6 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 		{
 			PyErr_SetString(PyExc_ValueError, [[NSString stringWithFormat:@"debug.assemble failed to assemble:\n%s", codeString] UTF8String]);
 			
-			NSLog(@"Error: couldn't assemble data");
-			NSLog(@"%@", error);
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[[[ZGAppController sharedController] loggerController] writeLine:[[error userInfo] objectForKey:@"reason"]];
 				if ([[error userInfo] objectForKey:@"description"] != nil)
@@ -371,7 +369,6 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.readBytes failed to read %llu byte(s) at 0x%llX", size, address] UTF8String]);
 			
 			NSString *errorMessage = @"Error: Failed to read bytes using debug object";
-			NSLog(@"%@", errorMessage);
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[[[ZGAppController sharedController] loggerController] writeLine:errorMessage];
 			});
