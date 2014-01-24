@@ -440,6 +440,12 @@
 	}
 	else
 	{
+		if (dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray)
+		{
+			NSRunAlertPanel(@"Invalid Search Input", [NSString stringWithFormat:@"Comparing Stored Values is not supported for %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"], nil, nil, nil);
+			return NO;
+		}
+		
 		self.searchData.searchValue = NULL;
 		self.searchData.dataSize = ZGDataSizeFromNumericalDataType(is64Bit, dataType);
 		
