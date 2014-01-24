@@ -813,9 +813,9 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	PyObject *key = NULL;
 	PyObject *value = NULL;
-	Py_ssize_t pos = 0;
+	Py_ssize_t position = 0;
 	
-	while (PyDict_Next(registers, &pos, &key, &value))
+	while (PyDict_Next(registers, &position, &key, &value))
 	{
 		PyObject *asciiRegisterKey = PyUnicode_AsASCIIString(key);
 		if (asciiRegisterKey == NULL) continue;
