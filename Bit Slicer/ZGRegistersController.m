@@ -237,19 +237,18 @@
 	return registerVariables;
 }
 
-#define ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName, _prefersUnsigned) \
+#define ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName) \
 { \
 	strcpy((char *)&entries[entryIndex].name, #registerName); \
 	entries[entryIndex].size = sizeof(threadState.uts.structureType.__##registerName); \
 	memcpy(&entries[entryIndex].value, &threadState.uts.structureType.__##registerName, entries[entryIndex].size); \
 	entries[entryIndex].offset = offsetof(structName, __##registerName); \
 	entries[entryIndex].type = ZGRegisterGeneralPurpose; \
-	entries[entryIndex].prefersUnsigned = _prefersUnsigned; \
 	entryIndex++; \
 }
 
-#define ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName, prefersUnsigned) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, x86_thread_state32_t, prefersUnsigned)
-#define ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName, prefersUnsigned) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, x86_thread_state64_t, prefersUnsigned)
+#define ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, x86_thread_state32_t)
+#define ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, x86_thread_state64_t)
 
 + (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
 {
@@ -258,67 +257,67 @@
 	if (is64Bit)
 	{
 		// General registers
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rax, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbx, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rcx, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdx, NO);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rax);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbx);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rcx);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdx);
 		
 		// Index and pointers
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdi, YES);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsi, YES);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbp, YES);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsp, YES);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdi);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsi);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbp);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsp);
 		
 		// Extra registers
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r8, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r9, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r10, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r11, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r12, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r13, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r14, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r15, NO);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r8);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r9);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r10);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r11);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r12);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r13);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r14);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r15);
 		
 		// Instruction pointer
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rip, YES);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rip);
 		
 		// Flags indicator
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rflags, NO);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rflags);
 		
 		// Segment registers
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, cs, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, fs, NO);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, gs, NO);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, cs);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, fs);
+		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, gs);
 	}
 	else
 	{
 		// General registers
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, eax, NO);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebx, NO);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ecx, NO);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, edx, NO);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, eax);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebx);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ecx);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, edx);
 		
 		// Index and pointers
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, edi, YES);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, esi, YES);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebp, YES);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, esp, YES);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, edi);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, esi);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebp);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, esp);
 		
 		// Segment register
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ss, NO);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ss);
 		
 		// Flags indicator
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, eflags, NO);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, eflags);
 		
 		// Instruction pointer
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, eip, YES);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, eip);
 		
 		// Segment registers
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, cs, NO);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ds, NO);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, es, NO);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, fs, NO);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, gs, NO);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, cs);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ds);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, es);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, fs);
+		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, gs);
 	}
 	
 	entries[entryIndex].name[0] = 0;

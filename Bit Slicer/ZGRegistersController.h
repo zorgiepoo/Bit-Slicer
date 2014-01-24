@@ -53,7 +53,6 @@ typedef struct
 	size_t size;
 	size_t offset;
 	ZGRegisterType type;
-	BOOL prefersUnsigned;
 } ZGFastRegisterEntry;
 
 #define ZG_MAX_REGISTER_ENTRIES 128
