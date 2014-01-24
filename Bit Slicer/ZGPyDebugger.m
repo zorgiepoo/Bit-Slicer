@@ -762,7 +762,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	if (self->objcSelf.haltedBreakPoint == nil)
 	{
-		PyErr_SetString(PyExc_Exception, [@"debug.writeRegisters failed because we are not at a halted breakpoint" UTF8String]);
+		PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed because we are not at a halted breakpoint");
 		return NULL;
 	}
 	
@@ -772,7 +772,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
 	if (thread_get_state(self->objcSelf.haltedBreakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
 	{
-		PyErr_SetString(PyExc_Exception, [@"debug.writeRegisters failed retrieving target's thread state" UTF8String]);
+		PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed retrieving target's thread state");
 		ZGResumeTask(self->processTask);
 		return NULL;
 	}
@@ -781,7 +781,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
 	if (thread_get_state(self->objcSelf.haltedBreakPoint.thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) != KERN_SUCCESS)
 	{
-		PyErr_SetString(PyExc_Exception, [@"debug.writeRegisters failed retrieving target's AVX state" UTF8String]);
+		PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed retrieving target's AVX state");
 		ZGResumeTask(self->processTask);
 		return NULL;
 	}
@@ -845,7 +845,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		
 		if (thread_set_state(self->objcSelf.haltedBreakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
 		{
-			PyErr_SetString(PyExc_Exception, [@"debug.writeRegisters failed to write the new thread state" UTF8String]);
+			PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed to write the new thread state");
 			success = NO;
 		}
 		
@@ -858,7 +858,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		
 		if (thread_set_state(self->objcSelf.haltedBreakPoint.thread, self->is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, self->is64Bit ? (thread_state_t)&avxState.ufs.as64 : (thread_state_t)&avxState.ufs.as32, avxStateCount) != KERN_SUCCESS)
 		{
-			PyErr_SetString(PyExc_Exception, [@"debug.writeRegisters failed to write the new AVX state" UTF8String]);
+			PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed to write the new AVX state");
 			success = NO;
 		}
 		
