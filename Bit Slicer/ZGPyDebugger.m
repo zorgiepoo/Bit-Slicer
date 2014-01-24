@@ -734,9 +734,8 @@ static BOOL writeRegister(NSDictionary *registerOffsetsDictionary, const char *r
 		memcpy(registerPointer, &integerValue, MIN(registerEntry.size, sizeof(PY_LONG_LONG)));
 		if (wroteValue != NULL) *wroteValue = YES;
 	}
-	// if register size is only 4 bytes then only float makes sense
-	// however it may be ambiguous if the register size is >= 8 bytes where we couldn't say for sure
-	else if (registerEntry.size == sizeof(float) && PyFloat_Check(value))
+	// it may be ambiguous if the register size is >= 8 bytes
+	else if (registerEntry.size >= sizeof(float) && registerEntry.size < sizeof(double) && PyFloat_Check(value))
 	{
 		float floatValue = (float)PyFloat_AsDouble(value);
 		*(float *)registerPointer = floatValue;
