@@ -172,7 +172,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 {
 	PyObject *dictionary = PyDict_New();
 	
-	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
+	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(registerEntry); registerEntry++)
 	{
 		void *value = registerEntry->value;
 		PyObject *registerObject = NULL;

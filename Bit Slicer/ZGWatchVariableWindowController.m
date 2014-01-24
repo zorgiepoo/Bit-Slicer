@@ -208,7 +208,7 @@
 	
 	NSMutableArray *registerLines = [NSMutableArray array];
 	
-	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
+	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(registerEntry); registerEntry++)
 	{
 		[registerLines addObject:[NSString stringWithFormat:@"%s = %@", registerEntry->name, [ZGVariable byteArrayStringFromValue:(unsigned char *)registerEntry->value size:registerEntry->size]]];
 	}

@@ -219,7 +219,7 @@
 	ZGRegisterEntry entries[64];
 	[self getRegisterEntries:entries fromAVXThreadState:avxState is64Bit:is64Bit];
 	
-	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(*entry); entry++)
+	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(entry); entry++)
 	{
 		ZGVariable *variable =
 		[[ZGVariable alloc]
@@ -332,7 +332,7 @@
 	ZGRegisterEntry entries[28];
 	[self getRegisterEntries:entries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
 	
-	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(*entry); entry++)
+	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(entry); entry++)
 	{
 		ZGVariable *variable =
 		[[ZGVariable alloc]

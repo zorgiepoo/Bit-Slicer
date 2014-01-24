@@ -689,7 +689,7 @@ static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
 static NSDictionary *registerOffsetsCacheDictionary(ZGRegisterEntry *registerEntries)
 {
 	NSMutableDictionary *offsetsDictionary = [NSMutableDictionary dictionary];
-	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
+	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(registerEntry); registerEntry++)
 	{
 		[offsetsDictionary
 		 setObject:[NSValue valueWithBytes:registerEntry objCType:@encode(ZGRegisterEntry)]
