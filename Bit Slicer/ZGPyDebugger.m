@@ -827,7 +827,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (void *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
 		if (wroteValue) needsToWriteGeneralRegisters = YES;
 		
-		if (success)
+		if (success && !wroteValue)
 		{
 			success = writeRegister(avxRegisterOffsetsDictionary, registerString, value, (void *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
 			if (wroteValue) needsToWriteAVXRegisters = YES;
