@@ -51,6 +51,7 @@ typedef struct
 	char name[16];
 	char value[64];
 	size_t size;
+	size_t offset;
 	ZGRegisterType type;
 	BOOL prefersUnsigned;
 } ZGFastRegisterEntry;

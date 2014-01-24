@@ -125,6 +125,7 @@
 { \
 	strcpy((char *)&entries[entryIndex].name, #registerName); \
 	entries[entryIndex].size = sizeof(avxState.ufs.as64.__fpu_##registerName); \
+	entries[entryIndex].offset = offsetof(x86_avx_state64_t, __fpu_##registerName); \
 	memcpy(&entries[entryIndex].value, &avxState.ufs.as64.__fpu_##registerName, entries[entryIndex].size); \
 	entries[entryIndex].type = ZGRegisterAVX; \
 	entryIndex++; \
@@ -236,18 +237,19 @@
 	return registerVariables;
 }
 
-#define ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, _prefersUnsigned) \
+#define ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName, _prefersUnsigned) \
 { \
 	strcpy((char *)&entries[entryIndex].name, #registerName); \
 	entries[entryIndex].size = sizeof(threadState.uts.structureType.__##registerName); \
 	memcpy(&entries[entryIndex].value, &threadState.uts.structureType.__##registerName, entries[entryIndex].size); \
+	entries[entryIndex].offset = offsetof(structName, __##registerName); \
 	entries[entryIndex].type = ZGRegisterGeneralPurpose; \
 	entries[entryIndex].prefersUnsigned = _prefersUnsigned; \
 	entryIndex++; \
 }
 
-#define ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName, prefersUnsigned) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, prefersUnsigned)
-#define ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName, prefersUnsigned) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, prefersUnsigned)
+#define ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName, prefersUnsigned) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, x86_thread_state32_t, prefersUnsigned)
+#define ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName, prefersUnsigned) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, x86_thread_state64_t, prefersUnsigned)
 
 + (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
 {
