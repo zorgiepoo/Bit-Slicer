@@ -104,22 +104,9 @@
 {
 	ZGVariableType dataType = self.dataType;
 	
-	if (ZGIsNumericalDataType(dataType))
+	if (ZGIsNumericalDataType(dataType) && !ZGIsFunctionTypeStore(self.functionType))
 	{
-		if (!ZGIsFunctionTypeStore(self.functionType))
-		{
-			NSString *inputError = [self testSearchComponent:expression];
-			
-			if (inputError)
-			{
-				return inputError;
-			}
-		}
-	}
-	
-	if ((dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray) && [self.searchData shouldCompareStoredValues])
-	{
-		return [NSString stringWithFormat:@"Comparing Stored Values is not supported for %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"];
+		return [self testSearchComponent:expression];
 	}
 	
 	return nil;
