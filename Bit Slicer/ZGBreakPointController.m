@@ -545,7 +545,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
 	BOOL retrievedAVXState = (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS);
 	
-	ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
+	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	BOOL retrievedRegisterEntries = NO;
 	
 	// We should notify delegates if a breakpoint hits after we modify thread states

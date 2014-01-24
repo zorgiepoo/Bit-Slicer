@@ -200,7 +200,7 @@
 
 #pragma mark Watching
 
-- (void)appendDescription:(NSMutableAttributedString *)description withRegisterEntries:(ZGFastRegisterEntry *)registerEntries registerLabel:(NSString *)registerLabel boldFont:(NSFont *)boldFont
+- (void)appendDescription:(NSMutableAttributedString *)description withRegisterEntries:(ZGRegisterEntry *)registerEntries registerLabel:(NSString *)registerLabel boldFont:(NSFont *)boldFont
 {
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n\n"]];
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:registerLabel attributes:@{NSFontAttributeName : boldFont}]];
@@ -208,7 +208,7 @@
 	
 	NSMutableArray *registerLines = [NSMutableArray array];
 	
-	for (ZGFastRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
+	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
 	{
 		[registerLines addObject:[NSString stringWithFormat:@"%s = %@", registerEntry->name, [ZGVariable byteArrayStringFromValue:(unsigned char *)registerEntry->value size:registerEntry->size]]];
 	}
@@ -236,7 +236,7 @@
 	
 	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:instruction.text];
 	
-	ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
+	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	int numberOfGeneralRegisters = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:self.watchProcess.is64Bit];
 	
 	[self

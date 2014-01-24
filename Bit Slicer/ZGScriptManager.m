@@ -168,11 +168,11 @@ dispatch_queue_t gPythonQueue;
 	return compiledExpression;
 }
 
-static PyObject *convertRegisterEntriesToPyDict(ZGFastRegisterEntry *registerEntries, BOOL is64Bit)
+static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries, BOOL is64Bit)
 {
 	PyObject *dictionary = PyDict_New();
 	
-	for (ZGFastRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
+	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
 	{
 		void *value = registerEntry->value;
 		PyObject *registerObject = NULL;
@@ -195,7 +195,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGFastRegisterEntry *registerEnt
 	return dictionary;
 }
 
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGFastRegisterEntry *)registerEntries error:(NSError **)error
++ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError **)error
 {
 	__block BOOL result = NO;
 	dispatch_sync(gPythonQueue, ^{
@@ -772,7 +772,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGFastRegisterEntry *registerEnt
 
 - (PyObject *)registersfromBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	ZGFastRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
+	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	BOOL is64Bit = breakPoint.process.is64Bit;
 	
 	int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:is64Bit];

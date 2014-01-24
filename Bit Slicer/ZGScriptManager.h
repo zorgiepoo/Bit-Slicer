@@ -51,7 +51,7 @@ extern dispatch_queue_t gPythonQueue;
 
 + (PyObject *)compiledExpressionFromExpression:(NSString *)expression;
 
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGFastRegisterEntry *)registerEntries error:(NSError **)error;
++ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError **)error;
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 

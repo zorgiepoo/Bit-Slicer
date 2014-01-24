@@ -53,13 +53,13 @@ typedef struct
 	size_t size;
 	size_t offset;
 	ZGRegisterType type;
-} ZGFastRegisterEntry;
+} ZGRegisterEntry;
 
 #define ZG_MAX_REGISTER_ENTRIES 128
 #define ZG_REGISTER_ENTRY_IS_NULL(entry) ((entry).name[0] == 0)
 
-+ (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
-+ (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;
 
 - (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
 

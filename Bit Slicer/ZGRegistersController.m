@@ -121,7 +121,7 @@
 	return basePointer;
 }
 
-#define ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, registerName) \
+#define ADD_AVX_REGISTER(entries, entryIndex, avxState, registerName) \
 { \
 	strcpy((char *)&entries[entryIndex].name, #registerName); \
 	entries[entryIndex].size = sizeof(avxState.ufs.as64.__fpu_##registerName); \
@@ -131,80 +131,80 @@
 	entryIndex++; \
 }
 
-+ (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit
 {
 	int entryIndex = 0;
 	
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, fcw); // FPU control word
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, fsw); // FPU status word
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ftw); // FPU tag word
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, fop); // FPU Opcode
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, fcw); // FPU control word
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, fsw); // FPU status word
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ftw); // FPU tag word
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, fop); // FPU Opcode
 	
 	// Instruction Pointer
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ip); // offset
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, cs); // selector
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ip); // offset
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, cs); // selector
 	
 	// Instruction operand (data) pointer
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, dp); // offset
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ds); // selector
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, dp); // offset
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ds); // selector
 	
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, mxcsr); // MXCSR Register state
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, mxcsrmask); // MXCSR mask
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, mxcsr); // MXCSR Register state
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, mxcsrmask); // MXCSR mask
 	
 	// STX/MMX
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, stmm0);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, stmm1);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, stmm2);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, stmm3);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, stmm4);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, stmm5);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, stmm6);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, stmm7);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm0);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm1);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm2);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm3);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm4);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm5);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm6);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm7);
 	
 	// XMM 0 through 7
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm0);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm1);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm2);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm3);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm4);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm5);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm6);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm7);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm0);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm1);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm2);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm3);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm4);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm5);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm6);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm7);
 	
 	if (is64Bit)
 	{
 		// XMM 8 through 15
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm8);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm9);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm10);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm11);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm12);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm13);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm14);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, xmm15);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm8);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm9);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm10);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm11);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm12);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm13);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm14);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm15);
 	}
 	
 	// YMMH 0 through 7
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh0);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh1);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh2);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh3);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh4);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh5);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh6);
-	ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh7);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh0);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh1);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh2);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh3);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh4);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh5);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh6);
+	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh7);
 	
 	if (is64Bit)
 	{
 		// YMMH 8 through 15
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh8);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh9);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh10);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh11);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh12);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh13);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh14);
-		ADD_FAST_AVX_REGISTER(entries, entryIndex, avxState, ymmh15);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh8);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh9);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh10);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh11);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh12);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh13);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh14);
+		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh15);
 	}
 	
 	entries[entryIndex].name[0] = 0;
@@ -216,10 +216,10 @@
 {
 	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
 	
-	ZGFastRegisterEntry entries[64];
+	ZGRegisterEntry entries[64];
 	[self getRegisterEntries:entries fromAVXThreadState:avxState is64Bit:is64Bit];
 	
-	for (ZGFastRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(*entry); entry++)
+	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(*entry); entry++)
 	{
 		ZGVariable *variable =
 		[[ZGVariable alloc]
@@ -237,7 +237,7 @@
 	return registerVariables;
 }
 
-#define ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName) \
+#define ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName) \
 { \
 	strcpy((char *)&entries[entryIndex].name, #registerName); \
 	entries[entryIndex].size = sizeof(threadState.uts.structureType.__##registerName); \
@@ -247,77 +247,77 @@
 	entryIndex++; \
 }
 
-#define ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, x86_thread_state32_t)
-#define ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName) ADD_FAST_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, x86_thread_state64_t)
+#define ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, x86_thread_state32_t)
+#define ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, x86_thread_state64_t)
 
-+ (int)getRegisterEntries:(ZGFastRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
 {
 	int entryIndex = 0;
 	
 	if (is64Bit)
 	{
 		// General registers
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rax);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbx);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rcx);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdx);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rax);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbx);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rcx);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdx);
 		
 		// Index and pointers
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdi);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsi);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbp);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsp);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdi);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsi);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbp);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsp);
 		
 		// Extra registers
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r8);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r9);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r10);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r11);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r12);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r13);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r14);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, r15);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r8);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r9);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r10);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r11);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r12);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r13);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r14);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r15);
 		
 		// Instruction pointer
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rip);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rip);
 		
 		// Flags indicator
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, rflags);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rflags);
 		
 		// Segment registers
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, cs);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, fs);
-		ADD_FAST_GENERAL_REGISTER_64(entries, entryIndex, threadState, gs);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, cs);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, fs);
+		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, gs);
 	}
 	else
 	{
 		// General registers
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, eax);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebx);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ecx);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, edx);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, eax);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebx);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ecx);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, edx);
 		
 		// Index and pointers
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, edi);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, esi);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebp);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, esp);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, edi);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, esi);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebp);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, esp);
 		
 		// Segment register
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ss);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ss);
 		
 		// Flags indicator
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, eflags);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, eflags);
 		
 		// Instruction pointer
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, eip);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, eip);
 		
 		// Segment registers
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, cs);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, ds);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, es);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, fs);
-		ADD_FAST_GENERAL_REGISTER_32(entries, entryIndex, threadState, gs);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, cs);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ds);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, es);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, fs);
+		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, gs);
 	}
 	
 	entries[entryIndex].name[0] = 0;
@@ -329,10 +329,10 @@
 {
 	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
 	
-	ZGFastRegisterEntry entries[28];
+	ZGRegisterEntry entries[28];
 	[self getRegisterEntries:entries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
 	
-	for (ZGFastRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(*entry); entry++)
+	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(*entry); entry++)
 	{
 		ZGVariable *variable =
 		[[ZGVariable alloc]

@@ -686,13 +686,13 @@ static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static NSDictionary *registerOffsetsCacheDictionary(ZGFastRegisterEntry *registerEntries)
+static NSDictionary *registerOffsetsCacheDictionary(ZGRegisterEntry *registerEntries)
 {
 	NSMutableDictionary *offsetsDictionary = [NSMutableDictionary dictionary];
-	for (ZGFastRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
+	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(*registerEntry); registerEntry++)
 	{
 		[offsetsDictionary
-		 setObject:[NSValue valueWithBytes:registerEntry objCType:@encode(ZGFastRegisterEntry)]
+		 setObject:[NSValue valueWithBytes:registerEntry objCType:@encode(ZGRegisterEntry)]
 		 forKey:@(registerEntry->name)];
 	}
 	
@@ -709,7 +709,7 @@ static BOOL writeRegister(NSDictionary *registerOffsetsDictionary, const char *r
 		return YES;
 	}
 	
-	ZGFastRegisterEntry registerEntry;
+	ZGRegisterEntry registerEntry;
 	[registerValue getValue:&registerEntry];
 	
 	void *registerPointer = registerStartPointer + registerEntry.offset;
@@ -790,7 +790,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	if (self->objcSelf.generalPurposeRegisterOffsetsDictionary == nil)
 	{
-		ZGFastRegisterEntry generalPurposeRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
+		ZGRegisterEntry generalPurposeRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
 		[ZGRegistersController getRegisterEntries:generalPurposeRegisterEntries fromGeneralPurposeThreadState:threadState is64Bit:self->is64Bit];
 		
 		self->objcSelf.generalPurposeRegisterOffsetsDictionary = registerOffsetsCacheDictionary(generalPurposeRegisterEntries);
@@ -798,7 +798,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	if (self->objcSelf.avxRegisterOffsetsDictionary == nil)
 	{
-		ZGFastRegisterEntry avxRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
+		ZGRegisterEntry avxRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
 		[ZGRegistersController getRegisterEntries:avxRegisterEntries fromAVXThreadState:avxState is64Bit:self->is64Bit];
 		
 		self->objcSelf.avxRegisterOffsetsDictionary = registerOffsetsCacheDictionary(avxRegisterEntries);
