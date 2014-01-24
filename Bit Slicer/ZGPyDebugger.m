@@ -815,7 +815,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	PyObject *value = NULL;
 	Py_ssize_t position = 0;
 	
-	while (PyDict_Next(registers, &position, &key, &value))
+	while (success && PyDict_Next(registers, &position, &key, &value))
 	{
 		PyObject *asciiRegisterKey = PyUnicode_AsASCIIString(key);
 		if (asciiRegisterKey == NULL) continue;
@@ -834,8 +834,6 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		}
 		
 		Py_XDECREF(asciiRegisterKey);
-		
-		if (!success) break;
 	}
 	
 	if (success && needsToWriteGeneralRegisters)
