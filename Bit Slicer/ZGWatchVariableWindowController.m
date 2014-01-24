@@ -210,7 +210,24 @@
 	
 	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(registerEntry); registerEntry++)
 	{
-		[registerLines addObject:[NSString stringWithFormat:@"%s = %@", registerEntry->name, [ZGVariable byteArrayStringFromValue:(unsigned char *)registerEntry->value size:registerEntry->size]]];
+		NSMutableString *registerLine = [NSMutableString string];
+		
+		registerLine.string = [NSString stringWithFormat:@"%s = %@", registerEntry->name, [ZGVariable byteArrayStringFromValue:(unsigned char *)registerEntry->value size:registerEntry->size]];
+		
+		if (registerEntry->type == ZGRegisterGeneralPurpose)
+		{
+			switch (registerEntry->size)
+			{
+				case sizeof(uint32_t):
+					[registerLine appendFormat:@" (%u)", *(uint32_t *)registerEntry->value];
+					break;
+				case sizeof(uint64_t):
+					[registerLine appendFormat:@" (%llu)", *(uint64_t *)registerEntry->value];
+					break;
+			}
+		}
+		
+		[registerLines addObject:registerLine];
 	}
 	
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:[registerLines componentsJoinedByString:@"\n"]]];
