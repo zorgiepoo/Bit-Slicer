@@ -777,8 +777,8 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	}
 	
 	x86_avx_state_t avxState;
-	mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
-	if (thread_get_state(self->objcSelf.haltedBreakPoint.thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) != KERN_SUCCESS)
+	mach_msg_type_number_t avxStateCount = self->is64Bit ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
+	if (thread_get_state(self->objcSelf.haltedBreakPoint.thread, self->is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, self->is64Bit ? (thread_state_t)&avxState.ufs.as64 : (thread_state_t)&avxState.ufs.as32, &avxStateCount) != KERN_SUCCESS)
 	{
 		PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed retrieving target's AVX state");
 		ZGResumeTask(self->processTask);
@@ -815,13 +815,22 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	PyObject *value = NULL;
 	Py_ssize_t position = 0;
 	
-	while (success && PyDict_Next(registers, &position, &key, &value))
+	Py_ssize_t numberOfRegisters = PyDict_Size(registers); // keep track # of entries to avoid potential bug with PyDict_Next
+	while (success && numberOfRegisters > 0 && PyDict_Next(registers, &position, &key, &value))
 	{
 		PyObject *asciiRegisterKey = PyUnicode_AsASCIIString(key);
-		if (asciiRegisterKey == NULL) continue;
+		if (asciiRegisterKey == NULL)
+		{
+			numberOfRegisters--;
+			continue;
+		}
 		
 		const char *registerString = PyBytes_AsString(asciiRegisterKey);
-		if (registerString == NULL) continue;
+		if (registerString == NULL)
+		{
+			numberOfRegisters--;
+			continue;
+		}
 		
 		BOOL wroteValue = NO;
 		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (void *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
@@ -829,11 +838,13 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		
 		if (success && !wroteValue)
 		{
-			success = writeRegister(avxRegisterOffsetsDictionary, registerString, value, (void *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
+			success = writeRegister(avxRegisterOffsetsDictionary, registerString, value, (void *)&avxState + sizeof(x86_state_hdr_t), &wroteValue);
 			if (wroteValue) needsToWriteAVXRegisters = YES;
 		}
 		
 		Py_XDECREF(asciiRegisterKey);
+		
+		numberOfRegisters--;
 	}
 	
 	if (success && needsToWriteGeneralRegisters)
