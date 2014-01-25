@@ -409,94 +409,96 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			continue;
 		}
 		
-		if (breakPoint.task == task)
+		if (breakPoint.task != task)
 		{
-			breakPoint.thread = thread;
-			
-			// Remove single-stepping
-			if (breakPoint.process.is64Bit)
+			continue;
+		}
+		
+		breakPoint.thread = thread;
+		
+		// Remove single-stepping
+		if (breakPoint.process.is64Bit)
+		{
+			threadState.uts.ts64.__rflags &= ~(1 << 8);
+		}
+		else
+		{
+			threadState.uts.ts32.__eflags &= ~(1 << 8);
+		}
+		
+		// If we had single-stepped in here, use current program counter, otherwise use instruction address before program counter
+		BOOL foundSingleStepBreakPoint = NO;
+		for (ZGBreakPoint *candidateBreakPoint in self.breakPoints)
+		{
+			if (candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread)
 			{
-				threadState.uts.ts64.__rflags &= ~(1 << 8);
+				foundSingleStepBreakPoint = YES;
+				break;
+			}
+		}
+		
+		ZGMemoryAddress foundInstructionAddress = 0x0;
+		ZGMemoryAddress instructionPointer = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
+		
+		if (foundSingleStepBreakPoint)
+		{
+			foundInstructionAddress = instructionPointer;
+		}
+		else
+		{
+			NSNumber *instructionPointerNumber = @(instructionPointer);
+			NSNumber *existingInstructionAddress = [breakPoint.cacheDictionary objectForKey:instructionPointerNumber];
+			if (existingInstructionAddress == nil)
+			{
+				ZGInstruction *foundInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process];
+				foundInstructionAddress = foundInstruction.variable.address;
+				[breakPoint.cacheDictionary setObject:@(foundInstructionAddress) forKey:instructionPointerNumber];
 			}
 			else
 			{
-				threadState.uts.ts32.__eflags &= ~(1 << 8);
+				foundInstructionAddress = [existingInstructionAddress unsignedLongLongValue];
 			}
+		}
+		
+		if (foundInstructionAddress == breakPoint.variable.address)
+		{
+			uint8_t *opcode = NULL;
+			ZGMemorySize opcodeSize = 0x1;
 			
-			// If we had single-stepped in here, use current program counter, otherwise use instruction address before program counter
-			BOOL foundSingleStepBreakPoint = NO;
-			for (ZGBreakPoint *candidateBreakPoint in self.breakPoints)
+			if (ZGReadBytes(breakPoint.process.processTask, foundInstructionAddress, (void **)&opcode, &opcodeSize))
 			{
-				if (candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread)
-				{	
-					foundSingleStepBreakPoint = YES;
-					break;
-				}
-			}
-			
-			ZGMemoryAddress foundInstructionAddress = 0x0;
-			ZGMemoryAddress instructionPointer = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
-			
-			if (foundSingleStepBreakPoint)
-			{
-				foundInstructionAddress = instructionPointer;
-			}
-			else
-			{
-				NSNumber *instructionPointerNumber = @(instructionPointer);
-				NSNumber *existingInstructionAddress = [breakPoint.cacheDictionary objectForKey:instructionPointerNumber];
-				if (existingInstructionAddress == nil)
+				if (*opcode == INSTRUCTION_BREAKPOINT_OPCODE)
 				{
-					ZGInstruction *foundInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process];
-					foundInstructionAddress = foundInstruction.variable.address;
-					[breakPoint.cacheDictionary setObject:@(foundInstructionAddress) forKey:instructionPointerNumber];
-				}
-				else
-				{
-					foundInstructionAddress = [existingInstructionAddress unsignedLongLongValue];
-				}
-			}
-			
-			if (foundInstructionAddress == breakPoint.variable.address)
-			{
-				uint8_t *opcode = NULL;
-				ZGMemorySize opcodeSize = 0x1;
-				
-				if (ZGReadBytes(breakPoint.process.processTask, foundInstructionAddress, (void **)&opcode, &opcodeSize))
-				{
-					if (*opcode == INSTRUCTION_BREAKPOINT_OPCODE)
+					hitBreakPoint = YES;
+					ZGSuspendTask(task);
+					
+					// Restore program counter
+					if (breakPoint.process.is64Bit)
 					{
-						hitBreakPoint = YES;
-						ZGSuspendTask(task);
-						
-						// Restore program counter
-						if (breakPoint.process.is64Bit)
-						{
-							threadState.uts.ts64.__rip = breakPoint.variable.address;
-						}
-						else
-						{
-							threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
-						}
-						
-						[breakPointsToNotify addObject:breakPoint];
+						threadState.uts.ts64.__rip = breakPoint.variable.address;
+					}
+					else
+					{
+						threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
 					}
 					
-					ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
+					[breakPointsToNotify addObject:breakPoint];
 				}
 				
-				handledInstructionBreakPoint = YES;
+				ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
 			}
 			
-			if (breakPoint.needsToRestore)
-			{
-				// Restore our breakpoint
-				uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
-				ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
-				
-				breakPoint.needsToRestore = NO;
-				handledInstructionBreakPoint = YES;
-			}
+			handledInstructionBreakPoint = YES;
+		}
+		
+		if (breakPoint.needsToRestore)
+		{
+			// Restore our breakpoint
+			uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
+			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
+			
+			breakPoint.needsToRestore = NO;
+			handledInstructionBreakPoint = YES;
 		}
 	}
 	
@@ -507,33 +509,35 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			continue;
 		}
 		
-		if (candidateBreakPoint.task == task && candidateBreakPoint.thread == thread)
+		if (candidateBreakPoint.task != task || candidateBreakPoint.thread != thread)
 		{
-			// Remove single-stepping
-			if (candidateBreakPoint.process.is64Bit)
-			{
-				threadState.uts.ts64.__rflags &= ~(1 << 8);
-			}
-			else
-			{
-				threadState.uts.ts32.__eflags &= ~(1 << 8);
-			}
-			
-			if (!hitBreakPoint)
-			{
-				ZGSuspendTask(task);
-				
-				candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
-				
-				[breakPointsToNotify addObject:candidateBreakPoint];
-				
-				hitBreakPoint = YES;
-			}
-			
-			[self removeBreakPoint:candidateBreakPoint];
-			
-			handledInstructionBreakPoint = YES;
+			continue;
 		}
+		
+		// Remove single-stepping
+		if (candidateBreakPoint.process.is64Bit)
+		{
+			threadState.uts.ts64.__rflags &= ~(1 << 8);
+		}
+		else
+		{
+			threadState.uts.ts32.__eflags &= ~(1 << 8);
+		}
+		
+		if (!hitBreakPoint)
+		{
+			ZGSuspendTask(task);
+			
+			candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
+			
+			[breakPointsToNotify addObject:candidateBreakPoint];
+			
+			hitBreakPoint = YES;
+		}
+		
+		[self removeBreakPoint:candidateBreakPoint];
+		
+		handledInstructionBreakPoint = YES;
 	}
 	
 	if (handledInstructionBreakPoint)
