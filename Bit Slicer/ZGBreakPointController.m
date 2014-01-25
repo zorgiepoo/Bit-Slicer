@@ -237,7 +237,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 							breakPoint.avxState = avxState;
 							
 							dispatch_async(dispatch_get_main_queue(), ^{
-								[breakPoint.delegate dataAccessedByBreakPoint:breakPoint fromInstructionPointer:instructionAddress];
+								@synchronized(self)
+								{
+									[breakPoint.delegate dataAccessedByBreakPoint:breakPoint fromInstructionPointer:instructionAddress];
+								}
 							});
 						}
 					}
@@ -591,7 +594,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			breakPoint.hasAVXState = retrievedAVXState;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[breakPoint.delegate breakPointDidHit:breakPoint];
+				@synchronized(self)
+				{
+					[breakPoint.delegate breakPointDidHit:breakPoint];
+				}
 			});
 		}
 		else
@@ -665,6 +671,8 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 						}
 					}
 					
+					breakPoint.delegate = nil;
+					
 					if (isDead || breakPoint.type == ZGBreakPointSingleStepInstruction)
 					{
 						[self removeBreakPoint:breakPoint];
@@ -681,7 +689,6 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 						{
 							self.delayedTermination = YES;
 							[[ZGAppController sharedController] increaseLivingCount];
-							breakPoint.delegate = nil;
 						}
 						
 						[self removeInstructionBreakPoint:breakPoint];
