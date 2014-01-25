@@ -73,7 +73,6 @@ enum ZGNavigation
 - (void)windowDidAppearForFirstTime:(id)sender;
 - (void)windowDidShow:(id)sender;
 
-- (void)markChanges;
 - (void)setWindowAttributesWithIdentifier:(NSString *)windowIdentifier;
 
 - (void)setupProcessListNotificationsAndPopUpButton;

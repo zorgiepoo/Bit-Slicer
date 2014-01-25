@@ -524,7 +524,7 @@
 	
 END_MEMORY_VIEW_CHANGE:
 	
-	[self markChanges];
+	[self invalidateRestorableState];
 	
 	if (!success)
 	{

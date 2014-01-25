@@ -63,25 +63,13 @@
 	return self.undoManager;
 }
 
-- (void)markChanges
-{
-	if ([self respondsToSelector:@selector(invalidateRestorableState)])
-	{
-		[self invalidateRestorableState];
-	}
-}
-
 - (void)setWindowAttributesWithIdentifier:(NSString *)windowIdentifier
 {
 	self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
-	
-	if ([self.window respondsToSelector:@selector(setRestorable:)] && [self.window respondsToSelector:@selector(setRestorationClass:)])
-	{
-		self.window.restorable = YES;
-		self.window.restorationClass = [ZGAppController class];
-		self.window.identifier = windowIdentifier;
-		[self markChanges];
-	}
+	self.window.restorable = YES;
+	self.window.restorationClass = [ZGAppController class];
+	self.window.identifier = windowIdentifier;
+	[self invalidateRestorableState];
 }
 
 - (IBAction)showWindow:(id)sender
