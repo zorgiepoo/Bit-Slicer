@@ -39,6 +39,7 @@
 #import "ZGPreferencesController.h"
 #import "ZGUtilities.h"
 #import "ZGDebuggerController.h"
+#import "ZGRegisterUtilities.h"
 
 @interface ZGRegistersController ()
 
@@ -77,26 +78,30 @@
 
 - (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter
 {
-	if (_programCounter != newProgramCounter)
+	if (_programCounter == newProgramCounter)
 	{
-		x86_thread_state_t threadState;
-		mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-		if (thread_get_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) == KERN_SUCCESS)
-		{
-			if (self.breakPoint.process.is64Bit)
-			{
-				threadState.uts.ts64.__rip = newProgramCounter;
-			}
-			else
-			{
-				threadState.uts.ts32.__eip = (uint32_t)newProgramCounter;
-			}
-			
-			if (thread_set_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) == KERN_SUCCESS)
-			{
-				self.programCounter = newProgramCounter;
-			}
-		}
+		return;
+	}
+	
+	x86_thread_state_t threadState;
+	mach_msg_type_number_t threadStateCount;
+	if (!ZGGetGeneralThreadState(&threadState, self.breakPoint.thread, &threadStateCount))
+	{
+		return;
+	}
+	
+	if (self.breakPoint.process.is64Bit)
+	{
+		threadState.uts.ts64.__rip = newProgramCounter;
+	}
+	else
+	{
+		threadState.uts.ts32.__eip = (uint32_t)newProgramCounter;
+	}
+	
+	if (ZGSetGeneralThreadState(&threadState, self.breakPoint.thread, threadStateCount))
+	{
+		self.programCounter = newProgramCounter;
 	}
 }
 
@@ -105,17 +110,10 @@
 	ZGMemoryAddress basePointer = 0x0;
 	
 	x86_thread_state_t threadState;
-	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-	if (thread_get_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) == KERN_SUCCESS)
+	mach_msg_type_number_t threadStateCount;
+	if (!ZGGetGeneralThreadState(&threadState, self.breakPoint.thread, &threadStateCount))
 	{
-		if (self.breakPoint.process.is64Bit)
-		{
-			basePointer = threadState.uts.ts64.__rbp;
-		}
-		else
-		{
-			basePointer = threadState.uts.ts32.__ebp;
-		}
+		basePointer = self.breakPoint.process.is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
 	}
 	
 	return basePointer;
@@ -515,8 +513,8 @@
 - (BOOL)changeGeneralPurposeRegister:(ZGRegister *)theRegister oldVariable:(ZGVariable *)oldVariable newVariable:(ZGVariable *)newVariable
 {
 	x86_thread_state_t threadState;
-	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-	if (thread_get_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+	mach_msg_type_number_t threadStateCount;
+	if (!ZGGetGeneralThreadState(&threadState, self.breakPoint.thread, &threadStateCount))
 	{
 		return NO;
 	}
@@ -543,7 +541,7 @@
 	
 	if (!shouldWriteRegister) return NO;
 	
-	if (thread_set_state(self.breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+	if (!ZGSetGeneralThreadState(&threadState, self.breakPoint.thread, threadStateCount))
 	{
 		NSLog(@"Failure in setting registers thread state for writing register value (general purpose): %d", self.breakPoint.thread);
 		return NO;

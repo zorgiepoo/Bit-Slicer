@@ -38,6 +38,9 @@
 #include <mach/thread_act.h>
 #include <stdbool.h>
 
+bool ZGGetGeneralThreadState(x86_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t *stateCount);
+bool ZGSetGeneralThreadState(x86_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t stateCount);
+
 bool ZGGetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t *stateCount);
 bool ZGSetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t stateCount);
 

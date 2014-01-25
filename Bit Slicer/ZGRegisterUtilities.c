@@ -34,10 +34,25 @@
 
 #include "ZGRegisterUtilities.h"
 
+bool ZGGetGeneralThreadState(x86_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t *stateCount)
+{
+	mach_msg_type_number_t localStateCount = x86_THREAD_STATE_COUNT;
+	bool success = (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)threadState, &localStateCount) == KERN_SUCCESS);
+	if (stateCount != NULL) *stateCount = localStateCount;
+	return success;
+}
+
+bool ZGSetGeneralThreadState(x86_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t stateCount)
+{
+	return (thread_set_state(thread, x86_THREAD_STATE, (thread_state_t)threadState, stateCount) == KERN_SUCCESS);
+}
+
 bool ZGGetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t *stateCount)
 {
-	*stateCount = x86_DEBUG_STATE_COUNT;
-	return (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)debugState, stateCount) == KERN_SUCCESS);
+	mach_msg_type_number_t localStateCount = x86_DEBUG_STATE_COUNT;
+	bool success = (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)debugState, &localStateCount) == KERN_SUCCESS);
+	if (stateCount != NULL) *stateCount = localStateCount;
+	return success;
 }
 
 bool ZGSetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t stateCount)

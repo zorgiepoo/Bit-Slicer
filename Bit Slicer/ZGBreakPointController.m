@@ -225,8 +225,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			}
 			
 			x86_thread_state_t threadState;
-			mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-			if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+			if (!ZGGetGeneralThreadState(&threadState, thread, NULL))
 			{
 				continue;
 			}
@@ -269,10 +268,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
 	x86_thread_state_t threadState;
-	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-	if (thread_get_state(breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+	mach_msg_type_number_t threadStateCount;
+	if (!ZGGetGeneralThreadState(&threadState, breakPoint.thread, &threadStateCount))
 	{
-		NSLog(@"ERROR: Grabbing thread state failed in resumeFromBreakPoint:");
+			//NSLog(@"ERROR: Grabbing thread state failed in resumeFromBreakPoint:");
 	}
 	
 	BOOL shouldSingleStep = NO;
@@ -319,9 +318,9 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		}
 	}
 	
-	if (thread_set_state(breakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+	if (!ZGSetGeneralThreadState(&threadState, breakPoint.thread, threadStateCount))
 	{
-		NSLog(@"Failure in setting registers thread state for resumeFromBreakPoint: for thread %d", breakPoint.thread);
+		//NSLog(@"Failure in setting registers thread state for resumeFromBreakPoint: for thread %d", breakPoint.thread);
 	}
 	
 	ZGResumeTask(breakPoint.process.processTask);
@@ -393,10 +392,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	ZGSuspendTask(task);
 	
 	x86_thread_state_t threadState;
-	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-	if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+	mach_msg_type_number_t threadStateCount;
+	if (!ZGGetGeneralThreadState(&threadState, thread, &threadStateCount))
 	{
-		NSLog(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping.");
+		//NSLog(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping.");
 	}
 	
 	BOOL hitBreakPoint = NO;
@@ -542,9 +541,9 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	
 	if (handledInstructionBreakPoint)
 	{
-		if (thread_set_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+		if (!ZGSetGeneralThreadState(&threadState, thread, threadStateCount))
 		{
-			NSLog(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d", thread);
+			//NSLog(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d", thread);
 		}
 	}
 	

@@ -47,6 +47,7 @@
 #import "ZGBreakPoint.h"
 #import "ZGInstruction.h"
 #import "ZGRegistersController.h"
+#import "ZGRegisterUtilities.h"
 #import "ZGMachBinary.h"
 #import "structmember.h"
 #import "CoreSymbolication.h"
@@ -768,8 +769,8 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	ZGSuspendTask(self->processTask);
 	
 	x86_thread_state_t threadState;
-	mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-	if (thread_get_state(self->objcSelf.haltedBreakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+	mach_msg_type_number_t threadStateCount;
+	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, &threadStateCount))
 	{
 		PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed retrieving target's thread state");
 		ZGResumeTask(self->processTask);
@@ -843,7 +844,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	{
 		ZGSuspendTask(self->processTask);
 		
-		if (thread_set_state(self->objcSelf.haltedBreakPoint.thread, x86_THREAD_STATE, (thread_state_t)&threadState, threadStateCount) != KERN_SUCCESS)
+		if (!ZGSetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, threadStateCount))
 		{
 			PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed to write the new thread state");
 			success = NO;
