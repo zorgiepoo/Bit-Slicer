@@ -264,13 +264,16 @@
 	 registerLabel:@"General Purpose Registers"
 	 boldFont:boldFont];
 	
-	[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromAVXThreadState:breakPoint.avxState is64Bit:self.watchProcess.is64Bit];
-	
-	[self
-	 appendDescription:description
-	 withRegisterEntries:registerEntries + numberOfGeneralRegisters
-	 registerLabel:@"Advanced Vector Extension (AVX) Registers"
-	 boldFont:boldFont];
+	if (breakPoint.hasAVXState)
+	{
+		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromAVXThreadState:breakPoint.avxState is64Bit:self.watchProcess.is64Bit];
+		
+		[self
+		 appendDescription:description
+		 withRegisterEntries:registerEntries + numberOfGeneralRegisters
+		 registerLabel:@"Advanced Vector Extension (AVX) Registers"
+		 boldFont:boldFont];
+	}
 	
 	instruction.variable.description = description;
 	
