@@ -111,7 +111,7 @@
 	
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
-	if (!ZGGetGeneralThreadState(&threadState, self.breakPoint.thread, &threadStateCount))
+	if (ZGGetGeneralThreadState(&threadState, self.breakPoint.thread, &threadStateCount))
 	{
 		basePointer = self.breakPoint.process.is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
 	}
