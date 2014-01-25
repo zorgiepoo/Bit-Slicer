@@ -246,12 +246,9 @@
 						 [self.progressTimer invalidate];
 						 self.progressTimer = nil;
 						 
-						 if (!self.searchProgress.shouldCancelSearch && NSClassFromString(@"NSUserNotification"))
+						 if (!self.searchProgress.shouldCancelSearch)
 						 {
-							 NSUserNotification *userNotification = [[NSUserNotification alloc] init];
-							 userNotification.title = @"Finished Dumping Memory";
-							 userNotification.informativeText = [NSString stringWithFormat:@"Dumped all memory for %@", self.memoryViewer.currentProcess.name];
-							 [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+							 ZGDeliverUserNotification(@"Finished Dumping Memory", nil, [NSString stringWithFormat:@"Dumped all memory for %@", self.memoryViewer.currentProcess.name]);
 						 }
 						 
 						 self.progressIndicator.doubleValue = 0.0;

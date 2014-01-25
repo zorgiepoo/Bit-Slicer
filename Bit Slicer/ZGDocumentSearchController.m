@@ -313,14 +313,7 @@
 {
 	if (!self.searchProgress.shouldCancelSearch)
 	{
-		if (NSClassFromString(@"NSUserNotification"))
-		{
-			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
-			userNotification.title = @"Search Finished";
-			userNotification.subtitle = self.windowController.currentProcess.name;
-			userNotification.informativeText = [self numberOfVariablesFoundDescriptionFromProgress:self.searchProgress];
-			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
-		}
+		ZGDeliverUserNotification(@"Search Finished", self.windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:self.searchProgress]);
 		
 		if (notSearchedVariables.count + self.temporarySearchResults.addressCount != oldVariables.count)
 		{

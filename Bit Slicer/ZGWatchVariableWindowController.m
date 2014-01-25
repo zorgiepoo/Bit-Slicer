@@ -49,6 +49,7 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
 #import "ZGVariableController.h"
+#import "ZGUtilities.h"
 
 @interface ZGWatchVariableWindowController ()
 
@@ -287,14 +288,7 @@
 	
 	NSString *foundInstructionStatus = [NSString stringWithFormat:@"Found instruction \"%@\"", instruction.text];
 	
-	if (NSClassFromString(@"NSUserNotification"))
-	{
-		NSUserNotification *userNotification = [[NSUserNotification alloc] init];
-		userNotification.title = @"Found Instruction";
-		userNotification.subtitle = self.watchProcess.name;
-		userNotification.informativeText = foundInstructionStatus;
-		[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
-	}
+	ZGDeliverUserNotification(@"Found Instruction", self.watchProcess.name, foundInstructionStatus);
 }
 
 - (void)watchVariable:(ZGVariable *)variable withWatchPointType:(ZGWatchPointType)watchPointType inProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow completionHandler:(watch_variable_completion_t)completionHandler

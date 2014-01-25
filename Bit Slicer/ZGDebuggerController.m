@@ -2447,16 +2447,9 @@ END_DEBUGGER_CHANGE:
 		
 		[self updateExecutionButtons];
 		
-		if (breakPoint.error == nil)
+		if (breakPoint.error == nil && shouldShowNotification)
 		{
-			if (shouldShowNotification && NSClassFromString(@"NSUserNotification"))
-			{
-				NSUserNotification *userNotification = [[NSUserNotification alloc] init];
-				userNotification.title = @"Hit Breakpoint";
-				userNotification.subtitle = self.currentProcess.name;
-				userNotification.informativeText = [NSString stringWithFormat:@"Stopped at breakpoint %@", self.currentBreakPoint.variable.addressStringValue];
-				[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
-			}
+			ZGDeliverUserNotification(@"Hit Breakpoint", self.currentProcess.name, [NSString stringWithFormat:@"Stopped at breakpoint %@", self.currentBreakPoint.variable.addressStringValue]);
 		}
 		else
 		{

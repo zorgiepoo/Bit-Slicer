@@ -63,3 +63,4 @@ unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);
 NSString *ZGProtectionDescription(ZGMemoryProtection protection);
 
 void ZGUpdateProcessMenuItem(NSMenuItem *menuItem, NSString *name, pid_t processIdentifier, NSImage *icon);
+void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText);

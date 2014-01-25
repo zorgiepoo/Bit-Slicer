@@ -45,6 +45,7 @@
 #import "ZGPyMainModule.h"
 #import "ZGSearchProgress.h"
 #import "ZGTableView.h"
+#import "ZGUtilities.h"
 
 #import "structmember.h"
 
@@ -463,12 +464,9 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		ZGLoggerWindowController *loggerController = [[ZGAppController sharedController] loggerController];
 		[loggerController writeLine:errorMessage];
 		
-		if ((![NSApp isActive] || ![loggerController.window isVisible]) && NSClassFromString(@"NSUserNotification") != nil)
+		if ((![NSApp isActive] || ![loggerController.window isVisible]))
 		{
-			NSUserNotification *userNotification = [[NSUserNotification alloc] init];
-			userNotification.title = @"Script Failed";
-			userNotification.informativeText = errorMessage;
-			[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+			ZGDeliverUserNotification(@"Script Failed", nil, errorMessage);
 		}
 	});
 	
