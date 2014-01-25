@@ -228,13 +228,11 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 							
 							x86_avx_state_t avxState;
 							mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
-							if (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) != KERN_SUCCESS)
-							{
-								NSLog(@"ERROR: Grabbing avx state failed from watch point handler");
-							}
+							BOOL retrievedAVXState = (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS);
 							
 							breakPoint.generalPurposeThreadState = threadState;
 							breakPoint.avxState = avxState;
+							breakPoint.hasAVXState = retrievedAVXState;
 							
 							dispatch_async(dispatch_get_main_queue(), ^{
 								@synchronized(self)
@@ -557,22 +555,22 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	{
 		BOOL canNotifyDelegate = !breakPoint.dead;
 		
-		if (canNotifyDelegate && breakPoint.condition != NULL)
+		if (canNotifyDelegate && !retrievedRegisterEntries)
 		{
-			if (!retrievedRegisterEntries)
+			BOOL is64Bit = breakPoint.process.is64Bit;
+			
+			int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
+			
+			if (retrievedAVXState)
 			{
-				BOOL is64Bit = breakPoint.process.is64Bit;
-				
-				int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
-				
-				if (retrievedAVXState)
-				{
-					[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromAVXThreadState:avxState is64Bit:is64Bit];
-				}
-				
-				retrievedRegisterEntries = YES;
+				[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromAVXThreadState:avxState is64Bit:is64Bit];
 			}
 			
+			retrievedRegisterEntries = YES;
+		}
+		
+		if (canNotifyDelegate && breakPoint.condition != NULL)
+		{
 			NSError *error = nil;
 			if (![ZGScriptManager evaluateCondition:breakPoint.condition process:breakPoint.process registerEntries:registerEntries error:&error])
 			{
