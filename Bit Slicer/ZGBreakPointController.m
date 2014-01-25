@@ -158,7 +158,6 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	}
 	
 	// we may still catch exceptions momentarily for our breakpoint if the data is being acccessed frequently, so do not remove it immediately
-	breakPoint.delegate = nil;
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
 		[self removeBreakPoint:breakPoint];
 	});
