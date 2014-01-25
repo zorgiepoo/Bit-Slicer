@@ -36,6 +36,7 @@
 #import "Python.h"
 #import "ZGMemoryTypes.h"
 #import "ZGBreakPointDelegate.h"
+#import "ZGRegisterUtilities.h"
 
 @class ZGVariable;
 @class ZGProcess;
@@ -68,7 +69,7 @@ typedef enum
 @property (nonatomic) NSError *error;
 @property (nonatomic) ZGMemoryProtection originalProtection;
 @property (nonatomic) x86_thread_state_t generalPurposeThreadState;
-@property (nonatomic) x86_avx_state_t avxState;
-@property (nonatomic) BOOL hasAVXState;
+@property (nonatomic) zg_x86_vector_state_t vectorState;
+@property (nonatomic) BOOL hasVectorState;
 
 @end

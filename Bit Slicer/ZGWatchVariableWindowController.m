@@ -264,14 +264,14 @@
 	 registerLabel:@"General Purpose Registers"
 	 boldFont:boldFont];
 	
-	if (breakPoint.hasAVXState)
+	if (breakPoint.hasVectorState)
 	{
-		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromAVXThreadState:breakPoint.avxState is64Bit:self.watchProcess.is64Bit];
+		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:breakPoint.vectorState is64Bit:self.watchProcess.is64Bit];
 		
 		[self
 		 appendDescription:description
 		 withRegisterEntries:registerEntries + numberOfGeneralRegisters
-		 registerLabel:@"Advanced Vector Extension (AVX) Registers"
+		 registerLabel:@"Float/Vector Registers"
 		 boldFont:boldFont];
 	}
 	

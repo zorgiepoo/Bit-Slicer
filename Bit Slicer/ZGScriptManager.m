@@ -807,9 +807,9 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	
 	int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:is64Bit];
 	
-	if (breakPoint.hasAVXState)
+	if (breakPoint.hasVectorState)
 	{
-		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromAVXThreadState:breakPoint.avxState is64Bit:is64Bit];
+		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:breakPoint.vectorState is64Bit:is64Bit];
 	}
 	
 	return convertRegisterEntriesToPyDict(registerEntries, is64Bit);

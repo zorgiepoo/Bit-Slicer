@@ -165,7 +165,7 @@ static PyTypeObject DebuggerType =
 @property (nonatomic) ZGProcess *process;
 @property (nonatomic) ZGBreakPoint *haltedBreakPoint;
 @property (nonatomic) NSDictionary *generalPurposeRegisterOffsetsDictionary;
-@property (nonatomic) NSDictionary *avxRegisterOffsetsDictionary;
+@property (nonatomic) NSDictionary *vectorRegisterOffsetsDictionary;
 
 @end
 
@@ -777,13 +777,9 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	BOOL hasAVXRegisters = YES;
-	x86_avx_state_t avxState;
-	mach_msg_type_number_t avxStateCount = self->is64Bit ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
-	if (thread_get_state(self->objcSelf.haltedBreakPoint.thread, self->is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, self->is64Bit ? (thread_state_t)&avxState.ufs.as64 : (thread_state_t)&avxState.ufs.as32, &avxStateCount) != KERN_SUCCESS)
-	{
-		hasAVXRegisters = NO;
-	}
+	zg_x86_vector_state_t vectorState;
+	mach_msg_type_number_t vectorStateCount;
+	BOOL hasVectorRegisters = ZGGetVectorThreadState(&vectorState, self->objcSelf.haltedBreakPoint.thread, &vectorStateCount, self->is64Bit);
 	
 	ZGResumeTask(self->processTask);
 	
@@ -795,21 +791,21 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		self->objcSelf.generalPurposeRegisterOffsetsDictionary = registerOffsetsCacheDictionary(generalPurposeRegisterEntries);
 	}
 	
-	if (hasAVXRegisters && self->objcSelf.avxRegisterOffsetsDictionary == nil)
+	if (hasVectorRegisters && self->objcSelf.vectorRegisterOffsetsDictionary == nil)
 	{
-		ZGRegisterEntry avxRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
-		[ZGRegistersController getRegisterEntries:avxRegisterEntries fromAVXThreadState:avxState is64Bit:self->is64Bit];
+		ZGRegisterEntry vectorRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
+		[ZGRegistersController getRegisterEntries:vectorRegisterEntries fromVectorThreadState:vectorState is64Bit:self->is64Bit];
 		
-		self->objcSelf.avxRegisterOffsetsDictionary = registerOffsetsCacheDictionary(avxRegisterEntries);
+		self->objcSelf.vectorRegisterOffsetsDictionary = registerOffsetsCacheDictionary(vectorRegisterEntries);
 	}
 	
 	BOOL success = YES;
 	
 	NSDictionary *generalPurposeRegisterOffsetsDictionary = self->objcSelf.generalPurposeRegisterOffsetsDictionary;
-	NSDictionary *avxRegisterOffsetsDictionary = self->objcSelf.avxRegisterOffsetsDictionary;
+	NSDictionary *vectorRegisterOffsetsDictionary = self->objcSelf.vectorRegisterOffsetsDictionary;
 	
 	BOOL needsToWriteGeneralRegisters = NO;
-	BOOL needsToWriteAVXRegisters = NO;
+	BOOL needsToWriteVectorRegisters = NO;
 	
 	PyObject *key = NULL;
 	PyObject *value = NULL;
@@ -831,10 +827,10 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (void *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
 		if (wroteValue) needsToWriteGeneralRegisters = YES;
 		
-		if (success && !wroteValue && hasAVXRegisters)
+		if (success && !wroteValue && hasVectorRegisters)
 		{
-			success = writeRegister(avxRegisterOffsetsDictionary, registerString, value, (void *)&avxState + sizeof(x86_state_hdr_t), &wroteValue);
-			if (wroteValue) needsToWriteAVXRegisters = YES;
+			success = writeRegister(vectorRegisterOffsetsDictionary, registerString, value, (void *)&vectorState + sizeof(x86_state_hdr_t), &wroteValue);
+			if (wroteValue) needsToWriteVectorRegisters = YES;
 		}
 		
 		Py_XDECREF(asciiRegisterKey);
@@ -853,13 +849,13 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		ZGResumeTask(self->processTask);
 	}
 	
-	if (success && needsToWriteAVXRegisters)
+	if (success && needsToWriteVectorRegisters)
 	{
 		ZGSuspendTask(self->processTask);
 		
-		if (thread_set_state(self->objcSelf.haltedBreakPoint.thread, self->is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, self->is64Bit ? (thread_state_t)&avxState.ufs.as64 : (thread_state_t)&avxState.ufs.as32, avxStateCount) != KERN_SUCCESS)
+		if (!ZGSetVectorThreadState(&vectorState, self->objcSelf.haltedBreakPoint.thread, vectorStateCount, self->is64Bit))
 		{
-			PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed to write the new AVX state");
+			PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed to write the new vector state");
 			success = NO;
 		}
 		

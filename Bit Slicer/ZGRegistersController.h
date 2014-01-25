@@ -37,6 +37,7 @@
 #import "ZGVariableTypes.h"
 #import <mach/thread_act.h>
 #import "ZGRegister.h"
+#import "ZGRegisterUtilities.h"
 
 @class ZGBreakPoint;
 
@@ -59,7 +60,7 @@ typedef struct
 #define ZG_REGISTER_ENTRY_IS_NULL(entry) ((entry)->name[0] == 0)
 
 + (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
-+ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit;
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit;
 
 - (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
 

@@ -39,7 +39,6 @@
 #import "ZGPreferencesController.h"
 #import "ZGUtilities.h"
 #import "ZGDebuggerController.h"
-#import "ZGRegisterUtilities.h"
 
 @interface ZGRegistersController ()
 
@@ -119,90 +118,94 @@
 	return basePointer;
 }
 
-#define ADD_AVX_REGISTER(entries, entryIndex, avxState, registerName) \
+#define ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, registerName) \
 { \
 	strcpy((char *)&entries[entryIndex].name, #registerName); \
-	entries[entryIndex].size = sizeof(avxState.ufs.as64.__fpu_##registerName); \
+	entries[entryIndex].size = sizeof(vectorState.ufs.as64.__fpu_##registerName); \
 	entries[entryIndex].offset = offsetof(x86_avx_state64_t, __fpu_##registerName); \
-	memcpy(&entries[entryIndex].value, &avxState.ufs.as64.__fpu_##registerName, entries[entryIndex].size); \
-	entries[entryIndex].type = ZGRegisterAVX; \
+	memcpy(&entries[entryIndex].value, &vectorState.ufs.as64.__fpu_##registerName, entries[entryIndex].size); \
+	entries[entryIndex].type = ZGRegisterVector; \
 	entryIndex++; \
 }
 
-+ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit
 {
+	bool hasAVXSupport = ZGHasAVXSupport();
 	int entryIndex = 0;
 	
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, fcw); // FPU control word
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, fsw); // FPU status word
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ftw); // FPU tag word
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, fop); // FPU Opcode
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fcw); // FPU control word
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fsw); // FPU status word
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ftw); // FPU tag word
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fop); // FPU Opcode
 	
 	// Instruction Pointer
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ip); // offset
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, cs); // selector
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ip); // offset
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, cs); // selector
 	
 	// Instruction operand (data) pointer
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, dp); // offset
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ds); // selector
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, dp); // offset
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ds); // selector
 	
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, mxcsr); // MXCSR Register state
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, mxcsrmask); // MXCSR mask
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, mxcsr); // MXCSR Register state
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, mxcsrmask); // MXCSR mask
 	
 	// STX/MMX
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm0);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm1);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm2);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm3);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm4);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm5);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm6);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, stmm7);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm0);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm1);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm2);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm3);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm4);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm5);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm6);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm7);
 	
 	// XMM 0 through 7
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm0);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm1);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm2);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm3);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm4);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm5);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm6);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm7);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm0);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm1);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm2);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm3);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm4);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm5);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm6);
+	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm7);
 	
 	if (is64Bit)
 	{
 		// XMM 8 through 15
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm8);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm9);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm10);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm11);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm12);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm13);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm14);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, xmm15);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm8);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm9);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm10);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm11);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm12);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm13);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm14);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm15);
 	}
 	
-	// YMMH 0 through 7
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh0);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh1);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh2);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh3);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh4);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh5);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh6);
-	ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh7);
-	
-	if (is64Bit)
+	if (hasAVXSupport)
 	{
-		// YMMH 8 through 15
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh8);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh9);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh10);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh11);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh12);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh13);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh14);
-		ADD_AVX_REGISTER(entries, entryIndex, avxState, ymmh15);
+		// YMMH 0 through 7
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh0);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh1);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh2);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh3);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh4);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh5);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh6);
+		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh7);
+		
+		if (is64Bit)
+		{
+			// YMMH 8 through 15
+			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh8);
+			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh9);
+			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh10);
+			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh11);
+			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh12);
+			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh13);
+			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh14);
+			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh15);
+		}
 	}
 	
 	entries[entryIndex].name[0] = 0;
@@ -210,12 +213,12 @@
 	return entryIndex;
 }
 
-+ (NSArray *)registerVariablesFromAVXThreadState:(x86_avx_state_t)avxState is64Bit:(BOOL)is64Bit
++ (NSArray *)registerVariablesFromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit
 {
 	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
 	
 	ZGRegisterEntry entries[64];
-	[self getRegisterEntries:entries fromAVXThreadState:avxState is64Bit:is64Bit];
+	[self getRegisterEntries:entries fromVectorThreadState:vectorState is64Bit:is64Bit];
 	
 	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(entry); entry++)
 	{
@@ -386,12 +389,12 @@
 		self.programCounter = breakPoint.generalPurposeThreadState.uts.ts32.__eip;
 	}
 	
-	if (breakPoint.hasAVXState)
+	if (breakPoint.hasVectorState)
 	{
-		NSArray *registerVariables = [[self class] registerVariablesFromAVXThreadState:breakPoint.avxState is64Bit:breakPoint.process.is64Bit];
+		NSArray *registerVariables = [[self class] registerVariablesFromVectorThreadState:breakPoint.vectorState is64Bit:breakPoint.process.is64Bit];
 		for (ZGVariable *registerVariable in registerVariables)
 		{
-			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterAVX variable:registerVariable pointerSize:pointerSize];
+			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterVector variable:registerVariable pointerSize:pointerSize];
 			
 			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
 			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
@@ -426,16 +429,15 @@
 	[self.tableView reloadData];
 }
 
-#define WRITE_AVX_STATE(avxState, variable, registerName) memcpy(&avxState.ufs.as64.__fpu_##registerName, variable.value, MIN(variable.size, sizeof(avxState.ufs.as64.__fpu_##registerName)))
+#define WRITE_VECTOR_STATE(vectorState, variable, registerName) memcpy(&vectorState.ufs.as64.__fpu_##registerName, variable.value, MIN(variable.size, sizeof(vectorState.ufs.as64.__fpu_##registerName)))
 
 - (BOOL)changeFloatingPointRegister:(ZGRegister *)theRegister oldVariable:(ZGVariable *)oldVariable newVariable:(ZGVariable *)newVariable
 {
 	BOOL is64Bit = self.breakPoint.process.is64Bit;
 	
-	// For some bizarre reason, thread_set_state will not work later if I use x86_AVX_STATE, so I'm forced to explicitly use x86_AVX_STATE32 and x86_AVX_STATE64
-	x86_avx_state_t avxState;
-	mach_msg_type_number_t avxStateCount = is64Bit ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
-	if (thread_get_state(self.breakPoint.thread, is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, is64Bit ? (thread_state_t)&avxState.ufs.as64 : (thread_state_t)&avxState.ufs.as32, &avxStateCount) != KERN_SUCCESS)
+	zg_x86_vector_state_t vectorState;
+	mach_msg_type_number_t vectorStateCount;
+	if (!ZGGetVectorThreadState(&vectorState, self.breakPoint.thread, &vectorStateCount, is64Bit))
 	{
 		return NO;
 	}
@@ -443,67 +445,67 @@
 	NSString *registerName = theRegister.variable.name;
 	if ([registerName isEqualToString:@"fcw"])
 	{
-		WRITE_AVX_STATE(avxState, newVariable, fcw);
+		WRITE_VECTOR_STATE(vectorState, newVariable, fcw);
 	}
 	else if ([registerName isEqualToString:@"fsw"])
 	{
-		WRITE_AVX_STATE(avxState, newVariable, fsw);
+		WRITE_VECTOR_STATE(vectorState, newVariable, fsw);
 	}
 	else if ([registerName isEqualToString:@"fop"])
 	{
-		WRITE_AVX_STATE(avxState, newVariable, fop);
+		WRITE_VECTOR_STATE(vectorState, newVariable, fop);
 	}
 	else if ([registerName isEqualToString:@"ip"])
 	{
-		WRITE_AVX_STATE(avxState, newVariable, ip);
+		WRITE_VECTOR_STATE(vectorState, newVariable, ip);
 	}
 	else if ([registerName isEqualToString:@"cs"])
 	{
-		WRITE_AVX_STATE(avxState, newVariable, cs);
+		WRITE_VECTOR_STATE(vectorState, newVariable, cs);
 	}
 	else if ([registerName isEqualToString:@"dp"])
 	{
-		WRITE_AVX_STATE(avxState, newVariable, dp);
+		WRITE_VECTOR_STATE(vectorState, newVariable, dp);
 	}
 	else if ([registerName isEqualToString:@"ds"])
 	{
-		WRITE_AVX_STATE(avxState, newVariable, ds);
+		WRITE_VECTOR_STATE(vectorState, newVariable, ds);
 	}
 	else if ([registerName isEqualToString:@"mxcsr"])
 	{
-		WRITE_AVX_STATE(avxState, newVariable, mxcsr);
+		WRITE_VECTOR_STATE(vectorState, newVariable, mxcsr);
 	}
 	else if ([registerName isEqualToString:@"mxcsrmask"])
 	{
-		WRITE_AVX_STATE(avxState, newVariable, mxcsrmask);
+		WRITE_VECTOR_STATE(vectorState, newVariable, mxcsrmask);
 	}
 	else if ([registerName hasPrefix:@"stmm"])
 	{
 		int stmmIndexValue = [[registerName substringFromIndex:[@"stmm" length]] intValue];
-		memcpy((_STRUCT_MMST_REG *)&avxState.ufs.as64.__fpu_stmm0 + stmmIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_MMST_REG)));
+		memcpy((_STRUCT_MMST_REG *)&vectorState.ufs.as64.__fpu_stmm0 + stmmIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_MMST_REG)));
 	}
 	else if ([registerName hasPrefix:@"xmm"])
 	{
 		int xmmIndexValue = [[registerName substringFromIndex:[@"xmm" length]] intValue];
-		memcpy((_STRUCT_XMM_REG *)&avxState.ufs.as64.__fpu_xmm0 + xmmIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_XMM_REG)));
+		memcpy((_STRUCT_XMM_REG *)&vectorState.ufs.as64.__fpu_xmm0 + xmmIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_XMM_REG)));
 	}
 	else if ([registerName hasPrefix:@"ymmh"])
 	{
 		int ymmhIndexValue = [[registerName substringFromIndex:[@"ymmh" length]] intValue];
-		memcpy((_STRUCT_XMM_REG *)&avxState.ufs.as64.__fpu_ymmh0 + ymmhIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_XMM_REG)));
+		memcpy((_STRUCT_XMM_REG *)&vectorState.ufs.as64.__fpu_ymmh0 + ymmhIndexValue, newVariable.value, MIN(newVariable.size, sizeof(_STRUCT_XMM_REG)));
 	}
 	else
 	{
 		return NO;
 	}
 	
-	if (thread_set_state(self.breakPoint.thread, is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, is64Bit ? (thread_state_t)&avxState.ufs.as64 : (thread_state_t)&avxState.ufs.as32, avxStateCount) != KERN_SUCCESS)
+	if (!ZGSetVectorThreadState(&vectorState, self.breakPoint.thread, vectorStateCount, is64Bit))
 	{
 		NSLog(@"Failure in setting registers thread state for writing register value (floating point): %d", self.breakPoint.thread);
 		return NO;
 	}
 	
-	self.breakPoint.avxState = avxState;
+	self.breakPoint.vectorState = vectorState;
 	
 	theRegister.variable = newVariable;
 	
@@ -571,7 +573,7 @@
 		case ZGRegisterGeneralPurpose:
 			success = [self changeGeneralPurposeRegister:theRegister oldVariable:oldVariable newVariable:newVariable];
 			break;
-		case ZGRegisterAVX:
+		case ZGRegisterVector:
 			success = [self changeFloatingPointRegister:theRegister oldVariable:oldVariable newVariable:newVariable];
 			break;
 	}

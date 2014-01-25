@@ -167,7 +167,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 #define IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, type) \
 	(((debugState.uds.type.__dr6 & (1 << debugRegisterIndex)) != 0) && ((debugState.uds.type.__dr7 & (1 << 2*debugRegisterIndex)) != 0))
 
-- (BOOL)handleWatchPointsWithTask:(mach_port_t) task inThread:(mach_port_t)thread
+- (BOOL)handleWatchPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
 {
 	BOOL handledWatchPoint = NO;
 	for (ZGBreakPoint *breakPoint in self.breakPoints)
@@ -232,13 +232,12 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			
 			ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
 			
-			x86_avx_state_t avxState;
-			mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
-			BOOL retrievedAVXState = (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS);
+			zg_x86_vector_state_t vectorState;
+			BOOL retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit);
 			
 			breakPoint.generalPurposeThreadState = threadState;
-			breakPoint.avxState = avxState;
-			breakPoint.hasAVXState = retrievedAVXState;
+			breakPoint.vectorState = vectorState;
+			breakPoint.hasVectorState = retrievedVectorState;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
@@ -547,12 +546,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		}
 	}
 	
-	x86_avx_state_t avxState;
-	mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
-	BOOL retrievedAVXState = (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS);
-	
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	BOOL retrievedRegisterEntries = NO;
+	BOOL retrievedVectorState = NO;
+	zg_x86_vector_state_t vectorState;
 	
 	// We should notify delegates if a breakpoint hits after we modify thread states
 	for (ZGBreakPoint *breakPoint in breakPointsToNotify)
@@ -565,9 +562,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			
 			int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
 			
-			if (retrievedAVXState)
+			retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit);
+			if (retrievedVectorState)
 			{
-				[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromAVXThreadState:avxState is64Bit:is64Bit];
+				[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:vectorState is64Bit:is64Bit];
 			}
 			
 			retrievedRegisterEntries = YES;
@@ -592,8 +590,8 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		if (canNotifyDelegate)
 		{
 			breakPoint.generalPurposeThreadState = threadState;
-			breakPoint.avxState = avxState;
-			breakPoint.hasAVXState = retrievedAVXState;
+			breakPoint.vectorState = vectorState;
+			breakPoint.hasVectorState = retrievedVectorState;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
@@ -810,7 +808,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 			mach_msg_type_number_t stateCount;
 			if (!ZGGetDebugThreadState(&debugState, threadList[threadIndex], &stateCount))
 			{
-				NSLog(@"ERROR: thread_get_state failed on adding watchpoint for thread %d", threadList[threadIndex]);
+				NSLog(@"ERROR: ZGGetDebugThreadState failed on adding watchpoint for thread %d", threadList[threadIndex]);
 				continue;
 			}
 			
