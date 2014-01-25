@@ -62,16 +62,6 @@
 	return NSStringFromClass([self class]);
 }
 
-- (void)encodeRestorableStateWithCoder:(NSCoder *)coder
-{
-	[super encodeRestorableStateWithCoder:coder];
-}
-
-- (void)restoreStateWithCoder:(NSCoder *)coder
-{
-	[super restoreStateWithCoder:coder];
-}
-
 - (void)updateDisplay
 {	
 	[self.clearButton setEnabled:[[self.loggerTextView textStorage] mutableString].length > 0];
