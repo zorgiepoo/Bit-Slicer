@@ -821,7 +821,11 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		if (asciiRegisterKey == NULL) continue;
 		
 		const char *registerString = PyBytes_AsString(asciiRegisterKey);
-		if (registerString == NULL) continue;
+		if (registerString == NULL)
+		{
+			Py_XDECREF(asciiRegisterKey);
+			continue;
+		}
 		
 		BOOL wroteValue = NO;
 		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (void *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
