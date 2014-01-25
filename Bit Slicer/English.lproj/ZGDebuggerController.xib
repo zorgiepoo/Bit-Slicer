@@ -76,10 +76,10 @@
                         <action selector="jump:" target="-1" id="158"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Go to Function" id="292">
+                <menuItem title="Go to Call Address" id="292">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="goToCallAddress:" target="-2" id="294"/>
+                        <action selector="jumpToOperandOffset:" target="-2" id="eK7-4i-bfK"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="291"/>

@@ -971,10 +971,10 @@ enum ZGStepExecution
 	return !self.disassembling && [super canEnableNavigationButtons];
 }
 
-- (IBAction)goToCallAddress:(id)sender
+- (IBAction)jumpToOperandOffset:(id)sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
-	[self jumpToMemoryAddress:selectedInstruction.callAddress];
+	[self jumpToMemoryAddress:selectedInstruction.branchAddress];
 }
 
 - (void)prepareNavigation
@@ -1310,9 +1310,9 @@ END_DEBUGGER_CHANGE:
 	[self.stepExecutionSegmentedControl setEnabled:[self canStepOutOfExecution] forSegment:ZGStepOutExecution];
 }
 
-- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
+- (BOOL)validateUserInterfaceItem:(NSMenuItem *)userInterfaceItem
 {
-	NSMenuItem *menuItem = [[(NSObject *)userInterfaceItem class] isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
+	NSMenuItem *menuItem = [userInterfaceItem isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
 	
 	if (userInterfaceItem.action == @selector(nopVariables:))
 	{
@@ -1407,7 +1407,7 @@ END_DEBUGGER_CHANGE:
 			return NO;
 		}
 	}
-	else if (userInterfaceItem.action == @selector(goToCallAddress:))
+	else if (userInterfaceItem.action == @selector(jumpToOperandOffset:))
 	{
 		if (self.disassembling || !self.currentProcess.valid)
 		{
@@ -1420,7 +1420,15 @@ END_DEBUGGER_CHANGE:
 		}
 		
 		ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
-		if (!selectedInstruction.isCallMnemonic)
+		if (selectedInstruction.isCallMnemonic)
+		{
+			[menuItem setTitle:@"Go to Call Address"];
+		}
+		else if (selectedInstruction.isJumpMnemonic)
+		{
+			[menuItem setTitle:@"Go to Branch Address"];
+		}
+		else
 		{
 			return NO;
 		}

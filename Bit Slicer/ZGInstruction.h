@@ -47,6 +47,7 @@
 @property (nonatomic, copy) NSString *symbols;
 
 - (BOOL)isCallMnemonic;
-- (ZGMemoryAddress)callAddress;
+- (BOOL)isJumpMnemonic;
+- (ZGMemoryAddress)branchAddress;
 
 @end

@@ -64,17 +64,22 @@
 	return self.mnemonic == UD_Icall;
 }
 
-// This should be a call mnemonic (check against isCallMnemonic)
-- (ZGMemoryAddress)callAddress
+- (BOOL)isJumpMnemonic
 {
-	ZGMemoryAddress callAddress = 0;
-	NSArray *callComponents = [self.text componentsSeparatedByString:@" "];
-	if ([callComponents count] > 1)
+	return self.mnemonic >= UD_Ijo && self.mnemonic <= UD_Ijmp;
+}
+
+// This should be a call or jump mnemonic
+- (ZGMemoryAddress)branchAddress
+{
+	ZGMemoryAddress branchAddress = 0;
+	NSString *lastComponent = [[self.text componentsSeparatedByString:@" "] lastObject];
+	if (lastComponent != nil)
 	{
-		callAddress = ZGMemoryAddressFromExpression([callComponents objectAtIndex:1]);
+		branchAddress = ZGMemoryAddressFromExpression(lastComponent);
 	}
 	
-	return callAddress;
+	return branchAddress;
 }
 
 - (BOOL)isEqual:(id)object

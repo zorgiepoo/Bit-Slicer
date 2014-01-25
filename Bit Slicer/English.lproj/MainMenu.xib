@@ -462,9 +462,9 @@ CA
                                     <action selector="requestCodeInjection:" target="-1" id="YEG-hq-xn6"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Go to Function" keyEquivalent="F" id="1106">
+                            <menuItem title="Go to Call Address" keyEquivalent="F" id="1106">
                                 <connections>
-                                    <action selector="goToCallAddress:" target="-1" id="1109"/>
+                                    <action selector="jumpToOperandOffset:" target="-1" id="9R6-et-wkJ"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1026"/>
