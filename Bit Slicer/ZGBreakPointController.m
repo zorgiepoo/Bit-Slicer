@@ -233,11 +233,13 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
 			
 			zg_x86_vector_state_t vectorState;
-			BOOL retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit);
+			bool hasAVXSupport = NO;
+			BOOL retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit, &hasAVXSupport);
 			
 			breakPoint.generalPurposeThreadState = threadState;
 			breakPoint.vectorState = vectorState;
 			breakPoint.hasVectorState = retrievedVectorState;
+			breakPoint.hasAVXSupport = hasAVXSupport;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
@@ -549,6 +551,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	BOOL retrievedRegisterEntries = NO;
 	BOOL retrievedVectorState = NO;
+	bool hasAVXSupport = NO;
 	zg_x86_vector_state_t vectorState;
 	
 	// We should notify delegates if a breakpoint hits after we modify thread states
@@ -562,10 +565,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			
 			int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
 			
-			retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit);
+			retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit, &hasAVXSupport);
 			if (retrievedVectorState)
 			{
-				[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:vectorState is64Bit:is64Bit];
+				[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:vectorState is64Bit:is64Bit hasAVXSupport:hasAVXSupport];
 			}
 			
 			retrievedRegisterEntries = YES;
@@ -592,6 +595,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			breakPoint.generalPurposeThreadState = threadState;
 			breakPoint.vectorState = vectorState;
 			breakPoint.hasVectorState = retrievedVectorState;
+			breakPoint.hasAVXSupport = hasAVXSupport;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)

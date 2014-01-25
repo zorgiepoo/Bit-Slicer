@@ -128,9 +128,8 @@
 	entryIndex++; \
 }
 
-+ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
 {
-	bool hasAVXSupport = ZGHasAVXSupport();
 	int entryIndex = 0;
 	
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fcw); // FPU control word
@@ -213,12 +212,12 @@
 	return entryIndex;
 }
 
-+ (NSArray *)registerVariablesFromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit
++ (NSArray *)registerVariablesFromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
 {
 	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
 	
 	ZGRegisterEntry entries[64];
-	[self getRegisterEntries:entries fromVectorThreadState:vectorState is64Bit:is64Bit];
+	[self getRegisterEntries:entries fromVectorThreadState:vectorState is64Bit:is64Bit hasAVXSupport:hasAVXSupport];
 	
 	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(entry); entry++)
 	{
@@ -391,7 +390,7 @@
 	
 	if (breakPoint.hasVectorState)
 	{
-		NSArray *registerVariables = [[self class] registerVariablesFromVectorThreadState:breakPoint.vectorState is64Bit:breakPoint.process.is64Bit];
+		NSArray *registerVariables = [[self class] registerVariablesFromVectorThreadState:breakPoint.vectorState is64Bit:breakPoint.process.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
 		for (ZGVariable *registerVariable in registerVariables)
 		{
 			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterVector variable:registerVariable pointerSize:pointerSize];
@@ -437,7 +436,7 @@
 	
 	zg_x86_vector_state_t vectorState;
 	mach_msg_type_number_t vectorStateCount;
-	if (!ZGGetVectorThreadState(&vectorState, self.breakPoint.thread, &vectorStateCount, is64Bit))
+	if (!ZGGetVectorThreadState(&vectorState, self.breakPoint.thread, &vectorStateCount, is64Bit, NULL))
 	{
 		return NO;
 	}

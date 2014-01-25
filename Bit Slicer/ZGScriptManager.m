@@ -807,7 +807,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	
 	if (breakPoint.hasVectorState)
 	{
-		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:breakPoint.vectorState is64Bit:is64Bit];
+		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:breakPoint.vectorState is64Bit:is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
 	}
 	
 	return convertRegisterEntriesToPyDict(registerEntries, is64Bit);

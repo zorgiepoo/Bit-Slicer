@@ -814,7 +814,8 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	zg_x86_vector_state_t vectorState;
 	mach_msg_type_number_t vectorStateCount;
-	BOOL hasVectorRegisters = ZGGetVectorThreadState(&vectorState, self->objcSelf.haltedBreakPoint.thread, &vectorStateCount, self->is64Bit);
+	bool hasAVXSupport = NO;
+	BOOL hasVectorRegisters = ZGGetVectorThreadState(&vectorState, self->objcSelf.haltedBreakPoint.thread, &vectorStateCount, self->is64Bit, &hasAVXSupport);
 	
 	ZGResumeTask(self->processTask);
 	
@@ -829,7 +830,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	if (hasVectorRegisters && self->objcSelf.vectorRegisterOffsetsDictionary == nil)
 	{
 		ZGRegisterEntry vectorRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
-		[ZGRegistersController getRegisterEntries:vectorRegisterEntries fromVectorThreadState:vectorState is64Bit:self->is64Bit];
+		[ZGRegistersController getRegisterEntries:vectorRegisterEntries fromVectorThreadState:vectorState is64Bit:self->is64Bit hasAVXSupport:hasAVXSupport];
 		
 		self->objcSelf.vectorRegisterOffsetsDictionary = registerOffsetsCacheDictionary(vectorRegisterEntries);
 	}

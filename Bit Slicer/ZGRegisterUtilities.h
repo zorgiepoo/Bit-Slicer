@@ -46,9 +46,7 @@ bool ZGSetGeneralThreadState(x86_thread_state_t *threadState, thread_act_t threa
 bool ZGGetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t *stateCount);
 bool ZGSetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t stateCount);
 
-bool ZGHasAVXSupport(void);
-
-bool ZGGetVectorThreadState(zg_x86_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit);
+bool ZGGetVectorThreadState(zg_x86_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit, bool *hasAVXSupport);
 bool ZGSetVectorThreadState(zg_x86_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t stateCount, bool is64Bit);
 
 #endif

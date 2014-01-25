@@ -267,7 +267,7 @@
 	
 	if (breakPoint.hasVectorState)
 	{
-		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:breakPoint.vectorState is64Bit:self.watchProcess.is64Bit];
+		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:breakPoint.vectorState is64Bit:self.watchProcess.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
 		
 		[self
 		 appendDescription:description
