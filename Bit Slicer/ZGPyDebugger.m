@@ -776,13 +776,12 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
+	BOOL hasAVXRegisters = YES;
 	x86_avx_state_t avxState;
 	mach_msg_type_number_t avxStateCount = self->is64Bit ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
 	if (thread_get_state(self->objcSelf.haltedBreakPoint.thread, self->is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, self->is64Bit ? (thread_state_t)&avxState.ufs.as64 : (thread_state_t)&avxState.ufs.as32, &avxStateCount) != KERN_SUCCESS)
 	{
-		PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed retrieving target's AVX state");
-		ZGResumeTask(self->processTask);
-		return NULL;
+		hasAVXRegisters = NO;
 	}
 	
 	ZGResumeTask(self->processTask);
@@ -795,7 +794,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		self->objcSelf.generalPurposeRegisterOffsetsDictionary = registerOffsetsCacheDictionary(generalPurposeRegisterEntries);
 	}
 	
-	if (self->objcSelf.avxRegisterOffsetsDictionary == nil)
+	if (hasAVXRegisters && self->objcSelf.avxRegisterOffsetsDictionary == nil)
 	{
 		ZGRegisterEntry avxRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
 		[ZGRegistersController getRegisterEntries:avxRegisterEntries fromAVXThreadState:avxState is64Bit:self->is64Bit];
@@ -831,7 +830,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (void *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
 		if (wroteValue) needsToWriteGeneralRegisters = YES;
 		
-		if (success && !wroteValue)
+		if (success && !wroteValue && hasAVXRegisters)
 		{
 			success = writeRegister(avxRegisterOffsetsDictionary, registerString, value, (void *)&avxState + sizeof(x86_state_hdr_t), &wroteValue);
 			if (wroteValue) needsToWriteAVXRegisters = YES;
