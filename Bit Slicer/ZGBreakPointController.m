@@ -74,6 +74,7 @@
 @interface ZGBreakPointController ()
 
 @property (readwrite, nonatomic) mach_port_t exceptionPort;
+@property (nonatomic) BOOL delayedTermination;
 
 @end
 
@@ -351,9 +352,9 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 				ZGResumeTask(breakPoint.process.processTask);
 			}
 			
-			if ([[ZGAppController sharedController] isTerminating] && self.breakPoints.count == 0)
+			if (self.delayedTermination && self.breakPoints.count == 0)
 			{
-				[NSApp replyToApplicationShouldTerminate:YES];
+				[[ZGAppController sharedController] decreaseLivingCount];
 			}
 		});
 	}
@@ -676,6 +677,13 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 					}
 					else if (breakPoint.type == ZGBreakPointInstruction)
 					{
+						if (!self.delayedTermination && breakPoint.condition != NULL && [[ZGAppController sharedController] isTerminating])
+						{
+							self.delayedTermination = YES;
+							[[ZGAppController sharedController] increaseLivingCount];
+							breakPoint.delegate = nil;
+						}
+						
 						[self removeInstructionBreakPoint:breakPoint];
 					}
 				}

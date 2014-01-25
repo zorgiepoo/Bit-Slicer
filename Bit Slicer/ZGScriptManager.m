@@ -53,6 +53,9 @@
 #define SCRIPT_FILENAME_PREFIX @"Script"
 
 @interface ZGScriptManager ()
+{
+	dispatch_once_t _cleanupDispatch;
+}
 
 @property (nonatomic) NSMutableDictionary *scriptsDictionary;
 @property (nonatomic) VDKQueue *fileWatchingQueue;
@@ -61,6 +64,7 @@
 @property NSMutableArray *runningScripts;
 @property (nonatomic) NSMutableArray *objectsPool;
 @property (nonatomic) id scriptActivity;
+@property (nonatomic) BOOL delayedAppTermination;
 
 @end
 
@@ -274,14 +278,21 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 
 - (void)cleanup
 {
-	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
-		if ([self.runningScripts containsObject:pyScript])
-		{
-			[self stopScriptForVariable:[variableValue pointerValue]];
-		}
-	}];
-	
-	[self.fileWatchingQueue removeAllPaths];
+	dispatch_once(&_cleanupDispatch, ^{
+		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+			if ([self.runningScripts containsObject:pyScript])
+			{
+				if ([[ZGAppController sharedController] isTerminating])
+				{
+					[[ZGAppController sharedController] increaseLivingCount];
+					self.delayedAppTermination = YES;
+				}
+				[self stopScriptForVariable:[variableValue pointerValue]];
+			}
+		}];
+		
+		[self.fileWatchingQueue removeAllPaths];
+	});
 }
 
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString *)noteName forPath:(NSString *)fullPath
@@ -699,22 +710,27 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			[[NSNotificationCenter defaultCenter] removeObserver:self];
 		}
 		
+		BOOL delayedAppTermination = self.delayedAppTermination;
+		
 		NSUInteger scriptFinishedCount = script.finishedCount;
 		
 		dispatch_async(gPythonQueue, ^{
 			if (script.finishedCount == scriptFinishedCount)
 			{
-				const char *finishFunctionName = "finish";
-				if (Py_IsInitialized() && self.windowController.currentProcess.valid && script.scriptObject != NULL && PyObject_HasAttrString(script.scriptObject, finishFunctionName))
+				if (!delayedAppTermination)
 				{
-					PyObject *retValue = PyObject_CallMethod(script.scriptObject, (char *)finishFunctionName, NULL);
-					if (Py_IsInitialized())
+					const char *finishFunctionName = "finish";
+					if (Py_IsInitialized() && self.windowController.currentProcess.valid && script.scriptObject != NULL && PyObject_HasAttrString(script.scriptObject, finishFunctionName))
 					{
-						if (retValue == NULL)
+						PyObject *retValue = PyObject_CallMethod(script.scriptObject, (char *)finishFunctionName, NULL);
+						if (Py_IsInitialized())
 						{
-							[self logPythonError];
+							if (retValue == NULL)
+							{
+								[self logPythonError];
+							}
+							Py_XDECREF(retValue);
 						}
-						Py_XDECREF(retValue);
 					}
 				}
 				
@@ -724,6 +740,13 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				script.scriptObject = NULL;
 				script.executeFunction = NULL;
 				script.finishedCount++;
+				
+				if (delayedAppTermination)
+				{
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[[ZGAppController sharedController] decreaseLivingCount];
+					});
+				}
 			}
 		});
 		
@@ -741,15 +764,22 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
 			if (scriptFinishedCount == script.finishedCount)
 			{
-				// Give up
-				Py_Finalize();
-				dispatch_async(gPythonQueue, ^{
-					@synchronized(self.objectsPool)
-					{
-						[self.objectsPool removeAllObjects];
-					}
-					[[self class] initializePythonInterpreter];
-				});
+				if (delayedAppTermination)
+				{
+					[[ZGAppController sharedController] decreaseLivingCount];
+				}
+				else
+				{
+					// Give up
+					Py_Finalize();
+					dispatch_async(gPythonQueue, ^{
+						@synchronized(self.objectsPool)
+						{
+							[self.objectsPool removeAllObjects];
+						}
+						[[self class] initializePythonInterpreter];
+					});
+				}
 			}
 		});
 	}

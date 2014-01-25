@@ -56,4 +56,7 @@
 
 + (void)registerPauseAndUnpauseHotKey;
 
+- (void)increaseLivingCount;
+- (void)decreaseLivingCount;
+
 @end

@@ -44,6 +44,9 @@
 #import "ZGRunningProcess.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGDocument.h"
+#import "ZGDocumentWindowController.h"
+#import "ZGScriptManager.h"
 
 @interface ZGAppController ()
 
@@ -54,6 +57,7 @@
 @property (nonatomic) ZGLoggerWindowController *loggerController;
 
 @property (nonatomic) BOOL isTerminating;
+@property (nonatomic) int livingCount;
 
 @end
 
@@ -101,30 +105,41 @@
 	return self;
 }
 
+- (void)setLivingCount:(int)livingCount
+{
+	_livingCount = livingCount;
+	if (_livingCount == 0)
+	{
+		[NSApp replyToApplicationShouldTerminate:YES];
+	}
+}
+
+- (void)increaseLivingCount
+{
+	self.livingCount++;
+}
+
+- (void)decreaseLivingCount
+{
+	self.livingCount--;
+}
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
 	self.isTerminating = YES;
 	
-	if (_breakPointController == nil) return NSTerminateNow;
-	
-	NSArray *breakPoints = [self.breakPointController breakPoints];
-	BOOL hasConditionalBreakPoint = NO;
-	for (ZGBreakPoint *breakPoint in breakPoints)
+	if (_debuggerController != nil)
 	{
-		if (breakPoint.condition != NULL)
-		{
-			hasConditionalBreakPoint = YES;
-			break;
-		}
+		[self.debuggerController cleanup];
 	}
 	
-	if (!hasConditionalBreakPoint) return NSTerminateNow;
+	for (ZGDocument *document in [[NSDocumentController sharedDocumentController] documents])
+	{
+		ZGDocumentWindowController *windowController = [document.windowControllers lastObject];
+		[windowController.scriptManager cleanup];
+	}
 	
-	if (_debuggerController == nil) return NSTerminateNow;
-	
-	[self.debuggerController cleanup];
-	
-	return NSTerminateLater;
+	return (_breakPointController == nil || self.livingCount == 0) ? NSTerminateNow : NSTerminateLater;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
