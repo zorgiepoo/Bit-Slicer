@@ -55,6 +55,7 @@
 #import "ZGBreakPointController.h"
 #import "ZGAppController.h"
 #import "ZGVirtualMemory.h"
+#import "ZGRegisterUtilities.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
 #import "ZGDebugThread.h"
@@ -65,6 +66,7 @@
 #import "ZGRunningProcess.h"
 #import "ZGScriptManager.h"
 #import "ZGRegistersController.h"
+#import "ZGUtilities.h"
 
 #import <mach/task.h>
 #import <mach/thread_act.h>
@@ -127,11 +129,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		}
 		
 		x86_debug_state_t debugState;
-		mach_msg_type_number_t stateCount = x86_DEBUG_STATE_COUNT;
-		kern_return_t error = 0;
-		if ((error = thread_get_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount)) != KERN_SUCCESS)
+		mach_msg_type_number_t stateCount;
+		if (!ZGGetDebugThreadState(&debugState, debugThread.thread, &stateCount))
 		{
-			NSLog(@"ERROR: Grabbing debug state failed in removeWatchPoint:, %d, continuing...", error);
+			NSLog(@"ERROR: Grabbing debug state failed in removeWatchPoint: continuing...");
 			continue;
 		}
 		
@@ -146,9 +147,9 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds32);
 		}
 		
-		if ((error = thread_set_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, stateCount)) != KERN_SUCCESS)
+		if (!ZGSetDebugThreadState(&debugState, debugThread.thread, stateCount))
 		{
-			NSLog(@"ERROR: Failure in setting thread state registers, %d, in removeWatchPoint:", error);
+			NSLog(@"ERROR: Failure in setting thread state registers in removeWatchPoint:");
 		}
 	}
 	
@@ -185,10 +186,10 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 				if (debugThread.thread == thread)
 				{
 					x86_debug_state_t debugState;
-					mach_msg_type_number_t debugStateCount = x86_DEBUG_STATE_COUNT;
-					if (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)&debugState, &debugStateCount) != KERN_SUCCESS)
+					mach_msg_type_number_t debugStateCount;
+					if (!ZGGetDebugThreadState(&debugState, thread, &debugStateCount))
 					{
-						NSLog(@"ERROR: Grabbing debug state failed when checking for breakpoint existance");
+						//NSLog(@"ERROR: Grabbing debug state failed when checking for breakpoint existance");
 						continue;
 					}
 					
@@ -210,9 +211,9 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 							debugState.uds.ds32.__dr6 &= ~(1 << debugRegisterIndex);
 						}
 						
-						if (thread_set_state(debugThread.thread, x86_DEBUG_STATE, (thread_state_t)&debugState, debugStateCount) != KERN_SUCCESS)
+						if (!ZGSetDebugThreadState(&debugState, debugThread.thread, debugStateCount))
 						{
-							NSLog(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint...Not good.");
+							//NSLog(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint...Not good.");
 						}
 						
 						x86_thread_state_t threadState;
@@ -804,8 +805,8 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		for (mach_msg_type_number_t threadIndex = 0; threadIndex < threadListCount; threadIndex++)
 		{
 			x86_debug_state_t debugState;
-			mach_msg_type_number_t stateCount = x86_DEBUG_STATE_COUNT;
-			if (thread_get_state(threadList[threadIndex], x86_DEBUG_STATE, (thread_state_t)&debugState, &stateCount) != KERN_SUCCESS)
+			mach_msg_type_number_t stateCount;
+			if (!ZGGetDebugThreadState(&debugState, threadList[threadIndex], &stateCount))
 			{
 				NSLog(@"ERROR: thread_get_state failed on adding watchpoint for thread %d", threadList[threadIndex]);
 				continue;
@@ -837,7 +838,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 					WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(debugRegisterIndex, debugState, variable, ds32, uint32_t);
 				}
 				
-				if (thread_set_state(threadList[threadIndex], x86_DEBUG_STATE, (thread_state_t)&debugState, stateCount) != KERN_SUCCESS)
+				if (!ZGSetDebugThreadState(&debugState, threadList[threadIndex], stateCount))
 				{
 					NSLog(@"Failure in setting registers thread state for adding watchpoint for thread %d", threadList[threadIndex]);
 					continue;
