@@ -51,6 +51,7 @@
 #import "ZGMachBinary.h"
 #import "structmember.h"
 #import "CoreSymbolication.h"
+#import "ZGUtilities.h"
 
 @class ZGPyDebugger;
 
@@ -74,6 +75,7 @@ static PyMemberDef Debugger_members[] =
 #define declareDebugPrototypeMethod(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args);
 
 declareDebugPrototypeMethod(log)
+declareDebugPrototypeMethod(notify)
 
 declareDebugPrototypeMethod(assemble)
 declareDebugPrototypeMethod(disassemble)
@@ -96,6 +98,7 @@ declareDebugPrototypeMethod(writeRegisters)
 static PyMethodDef Debugger_methods[] =
 {
 	declareDebugMethod(log)
+	declareDebugMethod(notify)
 	declareDebugMethod(assemble)
 	declareDebugMethod(disassemble)
 	declareDebugMethod(findSymbol)
@@ -292,6 +295,38 @@ static PyObject *Debugger_log(DebuggerClass *self, PyObject *args)
 	});
 	
 	return Py_BuildValue("");
+}
+
+static PyObject *Debugger_notify(DebuggerClass *self, PyObject *args)
+{
+	Py_buffer title, informativeText;
+	if (!PyArg_ParseTuple(args, "s*s*:notify", &title, &informativeText))
+	{
+		return NULL;
+	}
+	
+	PyObject *retValue = NULL;
+	
+	if (!PyBuffer_IsContiguous(&title, 'C') || !PyBuffer_IsContiguous(&informativeText, 'C'))
+	{
+		PyErr_SetString(PyExc_BufferError, "debug.notify can't take in non-contiguous buffer");
+	}
+	else
+	{
+		NSString *titleString = [[NSString alloc] initWithBytes:title.buf length:title.len encoding:NSUTF8StringEncoding];
+		NSString *informativeTextString = [[NSString alloc] initWithBytes:informativeText.buf length:informativeText.len encoding:NSUTF8StringEncoding];
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			ZGDeliverUserNotification(titleString, nil, informativeTextString);
+		});
+		
+		retValue = Py_BuildValue("");
+	}
+	
+	PyBuffer_Release(&title);
+	PyBuffer_Release(&informativeText);
+	
+	return retValue;
 }
 
 static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
