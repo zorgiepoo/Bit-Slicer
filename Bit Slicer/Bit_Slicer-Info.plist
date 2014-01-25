@@ -38,11 +38,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.7 alpha 11</string>
+	<string>1.7 alpha 12</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1071</string>
+	<string>1072</string>
 	<key>SecTaskAccess</key>
 	<array>
 		<string>allowed</string>
