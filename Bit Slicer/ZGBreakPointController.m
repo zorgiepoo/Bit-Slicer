@@ -402,7 +402,6 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	
 	BOOL hitBreakPoint = NO;
 	NSMutableArray *breakPointsToNotify = [[NSMutableArray alloc] init];
-	ZGMemoryAddress earliestInstructionPointerEncountered = 0x0;
 	
 	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
@@ -484,36 +483,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 						threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
 					}
 					
-					if (earliestInstructionPointerEncountered == 0)
-					{
-						earliestInstructionPointerEncountered = breakPoint.variable.address;
-					}
-					else
-					{
-						earliestInstructionPointerEncountered = MIN(breakPoint.variable.address, earliestInstructionPointerEncountered);
-					}
-					
 					[breakPointsToNotify addObject:breakPoint];
-
-					// Only notify the earliest hit breakpoint
-					if (breakPointsToNotify.count > 1)
-					{
-						NSArray *newBreakPoints = [breakPointsToNotify zgFilterUsingBlock:(zg_array_filter_t)^(ZGBreakPoint *breakPoint) {
-							return breakPoint.variable.address <= earliestInstructionPointerEncountered;
-						}];
-						
-						NSUInteger countDifference = breakPointsToNotify.count - newBreakPoints.count;
-						if (countDifference > 0)
-						{
-							[breakPointsToNotify removeAllObjects];
-							[breakPointsToNotify addObjectsFromArray:newBreakPoints];
-							
-							for (NSUInteger countIndex = 0; countIndex < countDifference; countIndex++)
-							{
-								ZGResumeTask(task);
-							}
-						}
-					}
 				}
 				
 				ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
