@@ -34,6 +34,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#define ZGLoggerIdentifier @"ZGLoggerIdentifier"
+
 @interface ZGLoggerWindowController : NSWindowController
 
 - (void)writeLine:(NSString *)text;

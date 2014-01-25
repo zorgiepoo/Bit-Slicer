@@ -33,6 +33,7 @@
  */
 
 #import "ZGLoggerWindowController.h"
+#import "ZGAppController.h"
 
 @interface ZGLoggerWindowController ()
 
@@ -61,6 +62,16 @@
 	return NSStringFromClass([self class]);
 }
 
+- (void)encodeRestorableStateWithCoder:(NSCoder *)coder
+{
+	[super encodeRestorableStateWithCoder:coder];
+}
+
+- (void)restoreStateWithCoder:(NSCoder *)coder
+{
+	[super restoreStateWithCoder:coder];
+}
+
 - (void)updateDisplay
 {	
 	[self.clearButton setEnabled:[[self.loggerTextView textStorage] mutableString].length > 0];
@@ -80,6 +91,11 @@
 - (void)windowDidLoad
 {
     [super windowDidLoad];
+	
+	self.window.restorable = YES;
+	self.window.restorationClass = [ZGAppController class];
+	self.window.identifier = ZGLoggerIdentifier;
+	[self invalidateRestorableState];
 	
 	[[[self.loggerTextView textStorage] mutableString] setString:self.loggerText];
 	[self.loggerTextView scrollRangeToVisible:NSMakeRange(self.loggerText.length, 0)];

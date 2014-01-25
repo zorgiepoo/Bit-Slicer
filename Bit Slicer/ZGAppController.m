@@ -230,6 +230,14 @@ static BOOL didRegisteredHotKey;
 		
 		completionHandler([[[self sharedController] debuggerController] window], nil);
 	}
+	else if ([identifier isEqualToString:ZGLoggerIdentifier])
+	{
+		[self.sharedController
+		 openLogger:nil
+		 showWindow:NO];
+		
+		completionHandler([[[self sharedController] loggerController] window], nil);
+	}
 }
 
 - (ZGPreferencesController *)preferencesController
@@ -287,6 +295,11 @@ static BOOL didRegisteredHotKey;
 	}
 }
 
+- (IBAction)openDebugger:(id)sender
+{
+	[self openDebugger:sender showWindow:YES];
+}
+
 - (ZGDebuggerController *)debuggerController
 {
 	if (!_debuggerController)
@@ -294,11 +307,6 @@ static BOOL didRegisteredHotKey;
 		_debuggerController = [[ZGDebuggerController alloc] init];
 	}
 	return _debuggerController;
-}
-
-- (IBAction)openDebugger:(id)sender
-{
-	[self openDebugger:sender showWindow:YES];
 }
 
 - (ZGLoggerWindowController *)loggerController
@@ -311,9 +319,17 @@ static BOOL didRegisteredHotKey;
 	return _loggerController;
 }
 
+- (void)openLogger:(id)sender showWindow:(BOOL)shouldShowWindow
+{
+	if (self.loggerController && shouldShowWindow)
+	{
+		[self.loggerController showWindow:nil];
+	}
+}
+
 - (IBAction)openLogger:(id)sender
 {
-	[self.loggerController showWindow:self];
+	[self openLogger:sender showWindow:YES];
 }
 
 #pragma mark Help
