@@ -815,22 +815,13 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	PyObject *value = NULL;
 	Py_ssize_t position = 0;
 	
-	Py_ssize_t numberOfRegisters = PyDict_Size(registers); // keep track # of entries to avoid potential bug with PyDict_Next
-	while (success && numberOfRegisters > 0 && PyDict_Next(registers, &position, &key, &value))
+	while (success && PyDict_Next(registers, &position, &key, &value))
 	{
 		PyObject *asciiRegisterKey = PyUnicode_AsASCIIString(key);
-		if (asciiRegisterKey == NULL)
-		{
-			numberOfRegisters--;
-			continue;
-		}
+		if (asciiRegisterKey == NULL) continue;
 		
 		const char *registerString = PyBytes_AsString(asciiRegisterKey);
-		if (registerString == NULL)
-		{
-			numberOfRegisters--;
-			continue;
-		}
+		if (registerString == NULL) continue;
 		
 		BOOL wroteValue = NO;
 		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (void *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
@@ -843,8 +834,6 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		}
 		
 		Py_XDECREF(asciiRegisterKey);
-		
-		numberOfRegisters--;
 	}
 	
 	if (success && needsToWriteGeneralRegisters)
