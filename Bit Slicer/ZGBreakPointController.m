@@ -177,78 +177,79 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			continue;
 		}
 		
-		if (breakPoint.task == task)
+		if (breakPoint.task != task)
 		{
-			ZGSuspendTask(task);
-			
-			for (ZGDebugThread *debugThread in breakPoint.debugThreads)
+			continue;
+		}
+		
+		ZGSuspendTask(task);
+		
+		for (ZGDebugThread *debugThread in breakPoint.debugThreads)
+		{
+			if (debugThread.thread != thread)
 			{
-				if (debugThread.thread == thread)
-				{
-					x86_debug_state_t debugState;
-					mach_msg_type_number_t debugStateCount;
-					if (!ZGGetDebugThreadState(&debugState, thread, &debugStateCount))
-					{
-						//NSLog(@"ERROR: Grabbing debug state failed when checking for breakpoint existance");
-						continue;
-					}
-					
-					int debugRegisterIndex = debugThread.registerNumber;
-					
-					BOOL isWatchPointAvailable = breakPoint.process.is64Bit ? IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds64) : IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds32);
-					
-					if (isWatchPointAvailable)
-					{
-						handledWatchPoint = YES;
-						
-						// Clear dr6 debug status
-						if (breakPoint.process.is64Bit)
-						{
-							debugState.uds.ds64.__dr6 &= ~(1 << debugRegisterIndex);
-						}
-						else
-						{
-							debugState.uds.ds32.__dr6 &= ~(1 << debugRegisterIndex);
-						}
-						
-						if (!ZGSetDebugThreadState(&debugState, debugThread.thread, debugStateCount))
-						{
-							//NSLog(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint...Not good.");
-						}
-						
-						x86_thread_state_t threadState;
-						mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
-						if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
-						{
-							NSLog(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping.");
-						}
-						else
-						{
-							ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
-							
-							x86_avx_state_t avxState;
-							mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
-							BOOL retrievedAVXState = (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS);
-							
-							breakPoint.generalPurposeThreadState = threadState;
-							breakPoint.avxState = avxState;
-							breakPoint.hasAVXState = retrievedAVXState;
-							
-							dispatch_async(dispatch_get_main_queue(), ^{
-								@synchronized(self)
-								{
-									[breakPoint.delegate dataAccessedByBreakPoint:breakPoint fromInstructionPointer:instructionAddress];
-								}
-							});
-						}
-					}
-					
-					//break;
-				}
+				continue;
 			}
 			
-			ZGResumeTask(task);
+			x86_debug_state_t debugState;
+			mach_msg_type_number_t debugStateCount;
+			if (!ZGGetDebugThreadState(&debugState, thread, &debugStateCount))
+			{
+				continue;
+			}
+			
+			int debugRegisterIndex = debugThread.registerNumber;
+			
+			BOOL isWatchPointAvailable = breakPoint.process.is64Bit ? IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds64) : IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds32);
+			
+			if (!isWatchPointAvailable)
+			{
+				continue;
+			}
+			
+			handledWatchPoint = YES;
+			
+			// Clear dr6 debug status
+			if (breakPoint.process.is64Bit)
+			{
+				debugState.uds.ds64.__dr6 &= ~(1 << debugRegisterIndex);
+			}
+			else
+			{
+				debugState.uds.ds32.__dr6 &= ~(1 << debugRegisterIndex);
+			}
+			
+			if (!ZGSetDebugThreadState(&debugState, debugThread.thread, debugStateCount))
+			{
+				//NSLog(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint...Not good.");
+			}
+			
+			x86_thread_state_t threadState;
+			mach_msg_type_number_t threadStateCount = x86_THREAD_STATE_COUNT;
+			if (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)&threadState, &threadStateCount) != KERN_SUCCESS)
+			{
+				continue;
+			}
+			
+			ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
+			
+			x86_avx_state_t avxState;
+			mach_msg_type_number_t avxStateCount = x86_AVX_STATE_COUNT;
+			BOOL retrievedAVXState = (thread_get_state(thread, x86_AVX_STATE, (thread_state_t)&avxState, &avxStateCount) == KERN_SUCCESS);
+			
+			breakPoint.generalPurposeThreadState = threadState;
+			breakPoint.avxState = avxState;
+			breakPoint.hasAVXState = retrievedAVXState;
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				@synchronized(self)
+				{
+					[breakPoint.delegate dataAccessedByBreakPoint:breakPoint fromInstructionPointer:instructionAddress];
+				}
+			});
 		}
+		
+		ZGResumeTask(task);
 	}
 	
 	return handledWatchPoint;
