@@ -601,7 +601,14 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
 				{
-					[breakPoint.delegate breakPointDidHit:breakPoint];
+					if (breakPoint.delegate != nil)
+					{
+						[breakPoint.delegate breakPointDidHit:breakPoint];
+					}
+					else
+					{
+						[self resumeFromBreakPoint:breakPoint];
+					}
 				}
 			});
 		}
