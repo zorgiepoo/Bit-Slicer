@@ -431,7 +431,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		BOOL foundSingleStepBreakPoint = NO;
 		for (ZGBreakPoint *candidateBreakPoint in self.breakPoints)
 		{
-			if (candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread)
+			if ((candidateBreakPoint.needsToRestore || candidateBreakPoint.type == ZGBreakPointSingleStepInstruction) && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread)
 			{
 				foundSingleStepBreakPoint = YES;
 				break;
