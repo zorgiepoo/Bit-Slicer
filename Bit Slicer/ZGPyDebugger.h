@@ -47,6 +47,7 @@
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
 - (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager;
+- (void)cleanup;
 
 @property (nonatomic, assign) PyObject *object;
 

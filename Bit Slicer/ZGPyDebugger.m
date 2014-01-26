@@ -222,7 +222,8 @@ static PyTypeObject DebuggerType =
 	return self;
 }
 
-- (void)dealloc
+// Use cleanup method instead of dealloc since the break point controller's weak delegate reference may be nil by that time
+- (void)cleanup
 {
 	if (self.haltedBreakPoint != nil)
 	{

@@ -734,6 +734,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				
 				script.deltaTime = 0;
 				script.virtualMemoryInstance = nil;
+				[script.debuggerInstance cleanup];
 				script.debuggerInstance = nil;
 				script.scriptObject = NULL;
 				script.executeFunction = NULL;
