@@ -38,9 +38,11 @@ It allows you to cheat in video games by searching and modifying values such as 
 * **Bit Slicer 1.6 or later**: OS X 10.6.8 or newer, a 64-bit intel Mac
 * [Bit Slicer 1.5.2](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.5.2.zip): OS X 10.6.8
 
+
 ## Support & Feedback
-* Check the [wiki](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/) for how to use features
-* Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for getting help
+* Check the [wiki](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/) for how to use Bit Slicer
+* Report bugs or request features on the [bug tracker](https://bitbucket.org/zorgiepoo/bit-slicer/issues)
+* Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for discussion and future development
 * Or send an email to zorgiepoo (at) gmail (dot) com
 
 ## Donations
