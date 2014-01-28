@@ -36,7 +36,9 @@
 
 @interface ZGDebugThread : NSObject
 
-@property (readwrite) thread_act_t thread;
-@property (readwrite) int registerNumber;
+- (id)initWithThread:(thread_act_t)thread registerIndex:(int)registerIndex;
+
+@property (readonly, nonatomic) thread_act_t thread;
+@property (readonly, nonatomic) int registerIndex;
 
 @end

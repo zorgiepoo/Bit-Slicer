@@ -58,7 +58,7 @@ typedef enum
 @property (nonatomic) ZGVariable *variable;
 @property (nonatomic) ZGMemorySize watchSize;
 @property (readonly, nonatomic) ZGProcess *process;
-@property (nonatomic) NSArray *debugThreads;
+@property NSArray *debugThreads;
 @property (readonly, nonatomic) ZGBreakPointType type;
 @property BOOL needsToRestore;
 @property BOOL hidden;
