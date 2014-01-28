@@ -2451,7 +2451,7 @@ END_DEBUGGER_CHANGE:
 		{
 			ZGDeliverUserNotification(@"Hit Breakpoint", self.currentProcess.name, [NSString stringWithFormat:@"Stopped at breakpoint %@", self.currentBreakPoint.variable.addressStringValue]);
 		}
-		else
+		else if (breakPoint.error != nil)
 		{
 			NSString *scriptContents = @"N/A";
 			for (ZGBreakPointCondition *breakPointCondition in self.breakPointConditions)
