@@ -117,7 +117,7 @@ static DDMathEvaluator * _sharedEvaluator = nil;
 	return [functionMap allKeys];
 }
 
-- (BOOL) functionExpressionFailedToResolve:(_DDFunctionExpression *)functionExpression error:(NSError **)error {
+- (BOOL) functionExpressionFailedToResolve:(_DDFunctionExpression *)functionExpression error:(NSError * __autoreleasing *)error {
     NSString *functionName = [functionExpression function];
 	if (error) {
         *error = [NSError errorWithDomain:DDMathParserErrorDomain 
@@ -175,7 +175,7 @@ static DDMathEvaluator * _sharedEvaluator = nil;
 	return returnValue;
 }
 
-- (NSNumber *) evaluateString:(NSString *)expressionString withSubstitutions:(NSDictionary *)substitutions error:(NSError **)error {
+- (NSNumber *) evaluateString:(NSString *)expressionString withSubstitutions:(NSDictionary *)substitutions error:(NSError * __autoreleasing *)error {
 	DDParser * parser = [DDParser parserWithString:expressionString error:error];
 	if (!parser) {
 		return nil;

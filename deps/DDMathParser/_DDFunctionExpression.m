@@ -22,7 +22,7 @@
 
 @implementation _DDFunctionExpression
 
-- (id) initWithFunction:(NSString *)f arguments:(NSArray *)a error:(NSError **)error {
+- (id) initWithFunction:(NSString *)f arguments:(NSArray *)a error:(NSError * __autoreleasing *)error {
 	self = [super init];
 	if (self) {
 		for (id arg in a) {
@@ -68,7 +68,7 @@
 - (NSString *) function { return function; }
 - (NSArray *) arguments { return arguments; }
 
-- (DDExpression *) simplifiedExpressionWithEvaluator:(DDMathEvaluator *)evaluator error:(NSError **)error {
+- (DDExpression *) simplifiedExpressionWithEvaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
 	BOOL canSimplify = YES;
     
     NSMutableArray *newSubexpressions = [NSMutableArray array];
@@ -94,7 +94,7 @@
 	return [_DDFunctionExpression functionExpressionWithFunction:[self function] arguments:newSubexpressions error:error];
 }
 
-- (NSNumber *) evaluateWithSubstitutions:(NSDictionary *)substitutions evaluator:(DDMathEvaluator *)evaluator error:(NSError **)error {
+- (NSNumber *) evaluateWithSubstitutions:(NSDictionary *)substitutions evaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
 	if (evaluator == nil) { evaluator = [DDMathEvaluator sharedMathEvaluator]; }
 	
 	DDMathFunction mathFunction = [evaluator functionWithName:[self function]];

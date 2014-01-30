@@ -9,22 +9,6 @@
 
 @class HFByteSlice, HFProgressTracker, HFFileReference, HFByteRangeAttributeArray;
 
-/*! @class HFByteArray
-@brief The principal Model class for HexFiend's MVC architecture.
-
-HFByteArray implements the Model portion of HexFiend.framework.  It is logically a mutable, resizable array of bytes, with a 64 bit length.  It is somewhat analagous to a 64 bit version of NSMutableData, except that it is designed to enable efficient (faster than O(n)) implementations of insertion and deletion.
-
-HFByteArray, being an abstract class, will raise an exception if you attempt to instantiate it directly.  For most uses, instantiate HFBTreeByteArray instead, with the usual <tt>[[class alloc] init]</tt>.
-
-HFByteArray also exposes itself as an array of @link HFByteSlice HFByteSlices@endlink, which are logically immutable arrays of bytes.   which is useful for operations such as file saving that need to access the underlying byte slices.
-
-HFByteArray contains a generation count, which is incremented whenever the HFByteArray changes (to allow caches to be implemented on top of it).  It also includes the notion of locking: a locked HFByteArray will raise an exception if written to, but it may still be read.
-
-ByteArrays have the usual threading restrictions for non-concurrent data structures.  It is safe to read an HFByteArray concurrently from multiple threads.  It is not safe to read an HFByteArray while it is being modified from another thread, nor is it safe to modify one simultaneously from two threads.
-
-HFByteArray is an abstract class.  It will raise an exception if you attempt to instantiate it directly.  The principal concrete subclass is HFBTreeByteArray.
-*/
-
 enum
 {
     HFHexDataStringType,
@@ -34,6 +18,21 @@ typedef NSUInteger HFByteArrayDataStringType;
 
 @class HFByteRangeAttributeArray;
 
+/*! @class HFByteArray
+ @brief The principal Model class for HexFiend's MVC architecture.
+ 
+ HFByteArray implements the Model portion of HexFiend.framework.  It is logically a mutable, resizable array of bytes, with a 64 bit length.  It is somewhat analagous to a 64 bit version of NSMutableData, except that it is designed to enable efficient (faster than O(n)) implementations of insertion and deletion.
+ 
+ HFByteArray, being an abstract class, will raise an exception if you attempt to instantiate it directly.  For most uses, instantiate HFBTreeByteArray instead, with the usual <tt>[[class alloc] init]</tt>.
+ 
+ HFByteArray also exposes itself as an array of @link HFByteSlice HFByteSlices@endlink, which are logically immutable arrays of bytes.   which is useful for operations such as file saving that need to access the underlying byte slices.
+ 
+ HFByteArray contains a generation count, which is incremented whenever the HFByteArray changes (to allow caches to be implemented on top of it).  It also includes the notion of locking: a locked HFByteArray will raise an exception if written to, but it may still be read.
+ 
+ ByteArrays have the usual threading restrictions for non-concurrent data structures.  It is safe to read an HFByteArray concurrently from multiple threads.  It is not safe to read an HFByteArray while it is being modified from another thread, nor is it safe to modify one simultaneously from two threads.
+ 
+ HFByteArray is an abstract class.  It will raise an exception if you attempt to instantiate it directly.  The principal concrete subclass is HFBTreeByteArray.
+ */
 @interface HFByteArray : NSObject <NSCopying, NSMutableCopying> {
 @private
     NSUInteger changeLockCounter;

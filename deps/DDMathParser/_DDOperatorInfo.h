@@ -17,8 +17,8 @@
     NSString *_function;
 }
 
-@property (nonatomic, readonly, DD_STRONG) NSString *function;
-@property (nonatomic, readonly, DD_STRONG) NSString *token;
+@property (nonatomic, readonly) NSString *function;
+@property (nonatomic, readonly) NSString *token;
 @property (nonatomic, readonly) DDOperatorArity arity;
 @property (nonatomic, assign) DDOperatorAssociativity defaultAssociativity;
 @property (nonatomic, readonly) NSInteger precedence;

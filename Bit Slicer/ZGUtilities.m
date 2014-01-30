@@ -95,7 +95,10 @@ ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType
 		case ZGPointer:
 			dataSize = isProcess64Bit ? 8 : 4;
 			break;
-		default:
+		case ZGString8:
+		case ZGString16:
+		case ZGByteArray:
+		case ZGScript:
 			dataSize = 0;
 			break;
 	}
@@ -180,8 +183,13 @@ void *ZGSwappedValue(BOOL isProcess64Bit, void *value, ZGVariableType dataType, 
 			break;
 		}
 		
-		default:
+		case ZGInt8:
+		case ZGString8:
+		case ZGByteArray:
 			memcpy(swappedValue, value, dataSize);
+			break;
+		case ZGScript:
+		case ZGPointer:
 			break;
 	}
 	

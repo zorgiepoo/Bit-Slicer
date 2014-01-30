@@ -235,7 +235,10 @@
 					case ZGString16:
 						[variable updateStringValue];
 						break;
-					default:
+					case ZGInt8:
+					case ZGByteArray:
+					case ZGString8:
+					case ZGScript:
 						break;
 				}
 			}
@@ -808,7 +811,13 @@
 				case ZGInt64:
 					[variable updateStringValue];
 					break;
-				default:
+				case ZGString8:
+				case ZGString16:
+				case ZGByteArray:
+				case ZGScript:
+				case ZGPointer:
+				case ZGFloat:
+				case ZGDouble:
 					break;
 			}
 		}
@@ -1011,7 +1020,14 @@
 			case ZGLessThan:
 				functionType = isLinearlyExpressedStoredValue ? ZGLessThanStoredLinear : ZGLessThanStored;
 				break;
-			default:
+			case ZGEqualsStored:
+			case ZGNotEqualsStored:
+			case ZGGreaterThanStored:
+			case ZGLessThanStored:
+			case ZGEqualsStoredLinear:
+			case ZGNotEqualsStoredLinear:
+			case ZGGreaterThanStoredLinear:
+			case ZGLessThanStoredLinear:
 				break;
 		}
 	}

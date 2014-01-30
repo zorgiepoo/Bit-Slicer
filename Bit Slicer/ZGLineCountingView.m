@@ -96,7 +96,10 @@
 	[self getLineNumberFormatString:formatString length:sizeof formatString];
 
 	while (lineCount--) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
 		int charCount = sprintf(buffer + bufferIndex, formatString, lineValue);
+#pragma clang diagnostic pop
 		//HFASSERT(charCount > 0);
 		bufferIndex += charCount;
 		buffer[bufferIndex++] = '\n';   
@@ -148,7 +151,10 @@ static inline int common_prefix_length(const char *a, const char *b)
 			NSString *replacementCharacters = nil;
 			NSRange replacementRange;
 			char buff[256];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
 			int newStringLength = snprintf(buff, sizeof buff, formatString, lineValue);
+#pragma clang diagnostic pop
 			//HFASSERT(newStringLength > 0);
 			int prefixLength = common_prefix_length(previousBuff, buff);
 			//HFASSERT(prefixLength <= newStringLength);
@@ -207,7 +213,10 @@ static inline int common_prefix_length(const char *a, const char *b)
 	while (linesRemaining--) {
 		if (NSIntersectsRect(textRect, clipRect)) {
 			char buff[256];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
 			int newStringLength = snprintf(buff, sizeof buff, formatString, lineValue);
+#pragma clang diagnostic pop
 			//HFASSERT(newStringLength > 0);
 			NSString *string = [[NSString alloc] initWithBytesNoCopy:buff length:newStringLength encoding:NSASCIIStringEncoding freeWhenDone:NO];
 			[string drawInRect:textRect withAttributes:textAttributes];

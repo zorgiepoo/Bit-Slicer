@@ -278,7 +278,7 @@
 	return multiplicativeConstantString;
 }
 
-+ (BOOL)parseLinearExpression:(NSString *)linearExpression andGetAdditiveConstant:(NSString **)additiveConstantString multiplicateConstant:(NSString **)multiplicativeConstantString
++ (BOOL)parseLinearExpression:(NSString *)linearExpression andGetAdditiveConstant:(NSString * __autoreleasing *)additiveConstantString multiplicateConstant:(NSString * __autoreleasing *)multiplicativeConstantString
 {
 	NSError *error = nil;
 	DDMathEvaluator *evaluator = [[DDMathEvaluator alloc] init];
@@ -393,7 +393,7 @@
 	return [[expression stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0;
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression substitutions:(NSDictionary *)substitutions error:(NSError **)error
++ (NSString *)evaluateExpression:(NSString *)expression substitutions:(NSDictionary *)substitutions error:(NSError * __autoreleasing *)error
 {
 	if (![self isValidExpression:expression])
 	{
@@ -409,7 +409,7 @@
 	return [self evaluateExpression:expression substitutions:nil error:&unusedError];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages symbolicator:(CSSymbolicatorRef)symbolicator error:(NSError **)error
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages symbolicator:(CSSymbolicatorRef)symbolicator error:(NSError * __autoreleasing *)error
 {
 	NSMutableString	 *newExpression = [[NSMutableString alloc] initWithString:expression];
 	

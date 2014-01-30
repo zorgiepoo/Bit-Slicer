@@ -392,7 +392,7 @@
 		
 		if (inputErrorMessage != nil)
 		{
-			NSRunAlertPanel(@"Invalid Search Input", inputErrorMessage, nil, nil, nil);
+			NSRunAlertPanel(@"Invalid Search Input", @"%@", nil, nil, nil, inputErrorMessage);
 			return NO;
 		}
 		
@@ -422,7 +422,7 @@
 	{
 		if (dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray)
 		{
-			NSRunAlertPanel(@"Invalid Search Input", [NSString stringWithFormat:@"Comparing Stored Values is not supported for %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"], nil, nil, nil);
+			NSRunAlertPanel(@"Invalid Search Input", @"Comparing Stored Values is not supported for %@.", nil, nil, nil, dataType == ZGByteArray ? @"Byte Arrays" : @"Strings");
 			return NO;
 		}
 		

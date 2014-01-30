@@ -33,7 +33,7 @@
 
 #define POPUP_MIN_WIDTH					40.0					// minimum width a popup-button can be narrowed to.
 #define POPUP_MAX_WIDTH                  200.0
-#define POPUP_RESIZES                    YES
+#define POPUP_RESIZES                    1
 
 #define POPUP_TITLE_EMPTY_SELECTION		NSLocalizedString(@"(None)", nil)		// title used when no items in the popup are selected.
 #define POPUP_TITLE_MULTIPLE_SELECTION	NSLocalizedString(@"(Multiple)", nil)	// title used when multiple items in the popup are selected.
@@ -52,8 +52,8 @@
 
 @interface AGScopeBarItem ()
 @property (readwrite, assign) AGScopeBarGroup * group;
-@property (readonly) NSButton * button;
-@property (readonly) NSMenuItem * menuItem;
+@property (nonatomic, readonly) NSButton * button;
+@property (nonatomic, readonly) NSMenuItem * menuItem;
 
 - (void)_setSelected:(BOOL)isSelected;
 - (void)_recreateButton;
@@ -185,6 +185,7 @@
 	[mBottomBorderColor autorelease];
 	mBottomBorderColor = [bottomBorderColor retain];
 }
+
 
 
 - (NSColor *)bottomBorderColor
@@ -622,7 +623,6 @@
 			
 		case AGScopeBarGroupSelectNone:
 		case AGScopeBarGroupSelectAny:
-		default:
 			return NO;
 	}
 }
@@ -637,7 +637,6 @@
 			
 		case AGScopeBarGroupSelectNone:
 		case AGScopeBarGroupSelectOne:
-		default:
 			return NO;
 	}
 }
@@ -917,29 +916,27 @@
 {
 	CGFloat width = 0.0;
 	
-	if (POPUP_RESIZES) {
-		[popup sizeToFit];
-		width = popup.frame.size.width;
-		
-	} else {
-		NSPopUpButtonCell * inCell = [[[popup cell] retain] autorelease];
-		NSPopUpButtonCell * cell = [[[NSPopUpButtonCell alloc] initTextCell:inCell.title pullsDown:inCell.pullsDown] autorelease];
-		
-		popup.cell = cell;
-		[cell setBezelStyle:NSRecessedBezelStyle];
-		[cell setFont:SCOPE_BAR_FONT];
-		[cell setBackgroundStyle:NSBackgroundStyleRaised];
-		[cell setMenu:inCell.menu];
-		
-		[popup sizeToFit];
-		width = popup.frame.size.width;
-		
-		popup.cell = inCell;
-		[popup.cell setUsesItemFromMenu:NO];
-		[popup.cell setMenuItem:[[[NSMenuItem alloc] init] autorelease]];
-		[self _updatePopup];
-	}
+#ifdef POPUP_RESIZES
+	[popup sizeToFit];
+	width = popup.frame.size.width;
+#else
+	NSPopUpButtonCell * inCell = [[[popup cell] retain] autorelease];
+	NSPopUpButtonCell * cell = [[[NSPopUpButtonCell alloc] initTextCell:inCell.title pullsDown:inCell.pullsDown] autorelease];
 	
+	popup.cell = cell;
+	[cell setBezelStyle:NSRecessedBezelStyle];
+	[cell setFont:SCOPE_BAR_FONT];
+	[cell setBackgroundStyle:NSBackgroundStyleRaised];
+	[cell setMenu:inCell.menu];
+	
+	[popup sizeToFit];
+	width = popup.frame.size.width;
+	
+	popup.cell = inCell;
+	[popup.cell setUsesItemFromMenu:NO];
+	[popup.cell setMenuItem:[[[NSMenuItem alloc] init] autorelease]];
+	[self _updatePopup];
+#endif
 	
 	return MIN(MAX(POPUP_MIN_WIDTH, width), POPUP_MAX_WIDTH);
 }

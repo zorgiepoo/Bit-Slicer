@@ -16,7 +16,7 @@
 }
 
 @property (nonatomic,copy) DDMathFunction function;
-@property (nonatomic,readonly,DD_STRONG) NSSet *aliases;
+@property (nonatomic,readonly) NSSet *aliases;
 
 + (NSString *)normalizedAlias:(NSString *)alias;
 

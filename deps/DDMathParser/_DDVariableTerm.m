@@ -14,7 +14,7 @@
 @implementation _DDVariableTerm
 
 - (DDParserTermType)type { return DDParserTermTypeVariable; }
-- (BOOL)resolveWithParser:(DDParser *)parser error:(NSError **)error {
+- (BOOL)resolveWithParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
 #pragma unused(parser, error)
     [self setResolved:YES];
     return YES;
@@ -23,7 +23,7 @@
     return [NSString stringWithFormat:@"$%@", [[self token] token]];
 }
 
-- (DDExpression *)expressionWithError:(NSError **)error {
+- (DDExpression *)expressionWithError:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
     return [DDExpression variableExpressionWithVariable:[[self token] token]];
 }

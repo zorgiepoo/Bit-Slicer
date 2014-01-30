@@ -263,40 +263,34 @@ static inline HFRange HFIntersectionRange(HFRange range1, HFRange range2) {
     return HFRangeMake(0, 0);
 }
 
-/*! ceil() for a CGFloat, for compatibility with OSes that do not have the CG versions.  */
 static inline CGFloat HFCeil(CGFloat a) {
-    if (sizeof(a) == sizeof(float)) return (CGFloat)ceilf((float)a);
-    else return (CGFloat)ceil((double)a);
+	return ceil(a);
 }
 
-/*! floor() for a CGFloat, for compatibility with OSes that do not have the CG versions.  */
 static inline CGFloat HFFloor(CGFloat a) {
-    if (sizeof(a) == sizeof(float)) return (CGFloat)floorf((float)a);
-    else return (CGFloat)floor((double)a);
+    return floor(a);
 }
 
-/*! round() for a CGFloat, for compatibility with OSes that do not have the CG versions.  */
 static inline CGFloat HFRound(CGFloat a) {
-    if (sizeof(a) == sizeof(float)) return (CGFloat)roundf((float)a);
-    else return (CGFloat)round((double)a);
+    return round(a);
 }
 
-/*! fmin() for a CGFloat, for compatibility with OSes that do not have the CG versions.  */
 static inline CGFloat HFMin(CGFloat a, CGFloat b) {
-    if (sizeof(a) == sizeof(float)) return (CGFloat)fminf((float)a, (float)b);
-    else return (CGFloat)fmin((double)a, (double)b);    
+	return fmin(a, b);
 }
 
 /*! fmax() for a CGFloat, for compatibility with OSes that do not have the CG versions.  */
 static inline CGFloat HFMax(CGFloat a, CGFloat b) {
-    if (sizeof(a) == sizeof(float)) return (CGFloat)fmaxf((float)a, (float)b);
-    else return (CGFloat)fmax((double)a, (double)b);    
+	return fmax(a, b);
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
 /*! Returns true if the given HFFPRanges are equal.  */
 static inline BOOL HFFPRangeEqualsRange(HFFPRange a, HFFPRange b) {
     return a.location == b.location && a.length == b.length;
 }
+#pragma clang diagnostic pop
 
 /*! copysign() for a CGFloat */
 static inline CGFloat HFCopysign(CGFloat a, CGFloat b) {
@@ -330,7 +324,10 @@ static inline unsigned long long HFFPToUL(long double val) {
     assert(val >= 0);
     assert(val <= ULLONG_MAX);
     unsigned long long result = (unsigned long long)val;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
     assert((long double)result == val);
+#pragma clang diagnostic pop
     return result;
 }
 

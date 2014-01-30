@@ -1310,9 +1310,9 @@ END_DEBUGGER_CHANGE:
 	[self.stepExecutionSegmentedControl setEnabled:[self canStepOutOfExecution] forSegment:ZGStepOutExecution];
 }
 
-- (BOOL)validateUserInterfaceItem:(NSMenuItem *)userInterfaceItem
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
 {
-	NSMenuItem *menuItem = [userInterfaceItem isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
+	NSMenuItem *menuItem = [(NSObject *)userInterfaceItem isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
 	
 	if (userInterfaceItem.action == @selector(nopVariables:))
 	{
@@ -1666,7 +1666,7 @@ END_DEBUGGER_CHANGE:
 #pragma mark Modifying instructions
 
 #define ASSEMBLER_ERROR_DOMAIN @"Assembling Failed"
-- (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError **)error
+- (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError * __autoreleasing *)error
 {
 	NSData *data = [NSData data];
 	NSString *outputFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"assembler_output.XXXXXX"];
@@ -2013,7 +2013,7 @@ END_DEBUGGER_CHANGE:
 	processTask:(ZGMemoryMap)processTask
 	pointerSize:(ZGMemorySize)pointerSize
 	recordUndo:(BOOL)shouldRecordUndo
-	error:(NSError **)error
+	error:(NSError * __autoreleasing *)error
 {
 	BOOL success = NO;
 	

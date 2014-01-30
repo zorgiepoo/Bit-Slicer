@@ -31,7 +31,7 @@ typedef enum {
 
 @property (nonatomic,getter=isResolved) BOOL resolved;
 @property (nonatomic,readonly) DDParserTermType type;
-@property (nonatomic,readonly,DD_STRONG) DDMathStringToken *token;
+@property (nonatomic,readonly) DDMathStringToken *token;
 
 + (id)rootTermWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError **)error;
 + (id)termWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError **)error;

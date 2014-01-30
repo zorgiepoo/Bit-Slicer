@@ -73,7 +73,8 @@ static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) 
 	case eInspectionNoData: return @"(select some data)";
 	case eInspectionTooMuchData: return @"(select less data)";
 	case eInspectionBadByteCount: return @"(select a power of 2 bytes)";
-	default: return nil;
+	case eInspectionCanInspect:
+			return nil;
     }
 }
 
@@ -163,9 +164,6 @@ static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) 
 		case 4: case 8: return eInspectionCanInspect;
 		default: return (count > 8) ? eInspectionTooMuchData : eInspectionBadByteCount;
 	    }
-        
-        default:
-            return NO;
     }
 }
 
@@ -217,7 +215,7 @@ static id unsignedIntegerDescription(const unsigned char *bytes, NSUInteger leng
         {
             FETCH(int64_t)
             FLIP(8)
-            FORMAT(@"%qi") 
+            FORMAT(@"%lli")
 
         }
         default: return nil;
@@ -247,7 +245,7 @@ static id signedIntegerDescription(const unsigned char *bytes, NSUInteger length
         {
             FETCH(uint64_t)
             FLIP(8)
-            FORMAT(@"%qu") 
+            FORMAT(@"%llu")
             
         }
         default: return nil;
@@ -297,9 +295,6 @@ static id floatingPointDescription(const unsigned char *bytes, NSUInteger length
         
         case eInspectorTypeFloatingPoint:
             return floatingPointDescription(bytes, length, endianness);
-            
-        default:
-            return nil;
     }
 }
 

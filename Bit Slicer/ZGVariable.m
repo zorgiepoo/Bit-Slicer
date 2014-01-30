@@ -225,7 +225,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		case ZGPointer:
 			size = pointerSize;
 			break;
-		default:
+		case ZGString8:
+		case ZGString16:
 			break;
 	}
 	

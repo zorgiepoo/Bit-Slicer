@@ -52,9 +52,7 @@
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
 
 #define ZGMemoryViewerAddressField @"ZGMemoryViewerAddressField"
-#define ZGMemoryViewerSizeField @"ZGMemoryViewerSizeField"
 #define ZGMemoryViewerAddress @"ZGMemoryViewerAddress"
-#define ZGMemoryViewerSize @"ZGMemoryViewerSize"
 #define ZGMemoryViewerProcessInternalName @"ZGMemoryViewerProcessName"
 #define ZGMemoryViewerShowsDataInspector @"ZGMemoryViewerShowsDataInspector"
 

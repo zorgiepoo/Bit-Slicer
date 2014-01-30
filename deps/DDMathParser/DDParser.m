@@ -90,20 +90,20 @@ static inline DDOperatorAssociativity DDOperatorGetAssociativity(NSString *o) {
 + (void) setDefaultPowerAssociativity:(DDOperatorAssociativity)newAssociativity { DDOperatorSetAssociativity(DDOperatorPower, newAssociativity); }
 
 
-+ (id) parserWithString:(NSString *)string error:(NSError **)error {
++ (id) parserWithString:(NSString *)string error:(NSError * __autoreleasing *)error {
     return DD_AUTORELEASE([[self alloc] initWithString:string error:error]);
 }
 
-- (id) initWithString:(NSString *)string error:(NSError **)error {
+- (id) initWithString:(NSString *)string error:(NSError * __autoreleasing *)error {
     DDMathStringTokenizer *t = [DDMathStringTokenizer tokenizerWithString:string error:error];
     return [self initWithTokenizer:t error:error];
 }
 
-+ (id)parserWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError **)error {
++ (id)parserWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError * __autoreleasing *)error {
 	return DD_AUTORELEASE([[self alloc] initWithTokenizer:tokenizer error:error]);
 }
 
-- (id)initWithTokenizer:(DDMathStringTokenizer *)t error:(NSError **)error {
+- (id)initWithTokenizer:(DDMathStringTokenizer *)t error:(NSError * __autoreleasing *)error {
 	ERR_ASSERT(error);
 	self = [super init];
 	if (self) {
@@ -165,7 +165,7 @@ static inline DDOperatorAssociativity DDOperatorGetAssociativity(NSString *o) {
     return DDOperatorGetAssociativity(operatorType);
 }
 
-- (DDExpression *) parsedExpressionWithError:(NSError **)error {
+- (DDExpression *) parsedExpressionWithError:(NSError * __autoreleasing *)error {
 	ERR_ASSERT(error);
 	[tokenizer reset]; //reset the token stream
     

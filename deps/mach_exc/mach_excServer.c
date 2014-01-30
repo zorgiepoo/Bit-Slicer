@@ -681,14 +681,14 @@ mig_routine_t mach_exc_server_routine(
 
 
 /* Description of this subsystem, for use in direct RPC */
-const struct catch_mach_exc_subsystem {
+static const struct catch_mach_exc_subsystem {
 	mig_server_routine_t 	server;	/* Server routine */
 	mach_msg_id_t	start;	/* Min routine number */
 	mach_msg_id_t	end;	/* Max routine number + 1 */
 	unsigned int	maxsize;	/* Max msg size */
 	vm_address_t	reserved;	/* Reserved */
 	struct routine_descriptor	/*Array of routine descriptors */
-		routine[3];
+	routine[3];
 } catch_mach_exc_subsystem = {
 	mach_exc_server_routine,
 	2405,
@@ -696,12 +696,12 @@ const struct catch_mach_exc_subsystem {
 	(mach_msg_size_t)sizeof(union __ReplyUnion__catch_mach_exc_subsystem),
 	(vm_address_t)0,
 	{
-          { (mig_impl_routine_t) 0,
-          (mig_stub_routine_t) _Xmach_exception_raise, 6, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__mach_exception_raise_t)},
-          { (mig_impl_routine_t) 0,
-          (mig_stub_routine_t) _Xmach_exception_raise_state, 9, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__mach_exception_raise_state_t)},
-          { (mig_impl_routine_t) 0,
-          (mig_stub_routine_t) _Xmach_exception_raise_state_identity, 11, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__mach_exception_raise_state_identity_t)},
+		{ (mig_impl_routine_t) 0,
+			(mig_stub_routine_t) _Xmach_exception_raise, 6, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__mach_exception_raise_t)},
+		{ (mig_impl_routine_t) 0,
+			(mig_stub_routine_t) _Xmach_exception_raise_state, 9, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__mach_exception_raise_state_t)},
+		{ (mig_impl_routine_t) 0,
+			(mig_stub_routine_t) _Xmach_exception_raise_state_identity, 11, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__mach_exception_raise_state_identity_t)},
 	}
 };
 

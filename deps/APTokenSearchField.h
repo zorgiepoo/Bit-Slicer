@@ -11,9 +11,9 @@
 #import <Cocoa/Cocoa.h>
 
 @interface APTokenSearchFieldCell : NSTokenFieldCell
-@property (readwrite, retain) NSMenu * searchMenu;
-@property (readwrite, assign) BOOL sendsSearchStringImmediately;
-@property (readwrite, assign) BOOL sendsSearchStringOnlyAfterReturn; // Added by Mayur
+@property (nonatomic, readwrite, retain) NSMenu * searchMenu;
+@property (nonatomic, readwrite, assign) BOOL sendsSearchStringImmediately;
+@property (nonatomic, readwrite, assign) BOOL sendsSearchStringOnlyAfterReturn; // Added by Mayur
 
 @end
 

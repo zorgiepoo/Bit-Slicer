@@ -78,7 +78,7 @@
 	[self addWindowController:self.windowController];
 }
 
-- (NSFileWrapper *)fileWrapperOfType:(NSString *)typeName error:(NSError **)outError
+- (NSFileWrapper *)fileWrapperOfType:(NSString *)typeName error:(NSError * __autoreleasing *)outError
 {
 	NSMutableData *writeData = [[NSMutableData alloc] init];
 	NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:writeData];
@@ -161,7 +161,7 @@
 	return string != nil ? string : @"";
 }
 
-- (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError **)outError
+- (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * __autoreleasing *)outError
 {
 	NSData *readData = [fileWrapper regularFileContents];
 	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];

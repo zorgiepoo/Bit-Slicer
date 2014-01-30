@@ -116,7 +116,7 @@
 				 }
 				 @catch (NSException *exception)
 				 {
-					 NSLog(@"Failed to write data");
+					 NSLog(@"Failed to write data: %@", exception);
 					 success = NO;
 				 }
 				 @finally

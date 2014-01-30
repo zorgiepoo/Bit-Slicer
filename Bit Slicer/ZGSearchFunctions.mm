@@ -60,7 +60,10 @@ BOOL ZGIsFunctionTypeStore(ZGFunctionType functionType)
 		case ZGLessThanStoredLinear:
 			isFunctionTypeStore = YES;
 			break;
-		default:
+		case ZGEquals:
+		case ZGNotEquals:
+		case ZGGreaterThan:
+		case ZGLessThan:
 			isFunctionTypeStore = NO;
 	}
 	
@@ -79,7 +82,14 @@ BOOL ZGIsFunctionTypeLinear(ZGFunctionType functionType)
 		case ZGLessThanStoredLinear:
 			isFunctionTypeLinear = YES;
 			break;
-		default:
+		case ZGEquals:
+		case ZGNotEquals:
+		case ZGGreaterThan:
+		case ZGLessThan:
+		case ZGEqualsStored:
+		case ZGNotEqualsStored:
+		case ZGGreaterThanStored:
+		case ZGLessThanStored:
 			isFunctionTypeLinear = NO;
 	}
 	
@@ -97,7 +107,15 @@ BOOL ZGIsFunctionTypeEquals(ZGFunctionType functionType)
 		case ZGEqualsStoredLinear:
 			isFunctionTypeEquals = YES;
 			break;
-		default:
+		case ZGNotEquals:
+		case ZGNotEqualsStored:
+		case ZGNotEqualsStoredLinear:
+		case ZGGreaterThan:
+		case ZGLessThan:
+		case ZGGreaterThanStored:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThanStored:
+		case ZGLessThanStoredLinear:
 			isFunctionTypeEquals = NO;
 	}
 	
@@ -115,7 +133,15 @@ BOOL ZGIsFunctionTypeNotEquals(ZGFunctionType functionType)
 		case ZGNotEqualsStoredLinear:
 			isFunctionTypeNotEquals = YES;
 			break;
-		default:
+		case ZGEquals:
+		case ZGEqualsStored:
+		case ZGEqualsStoredLinear:
+		case ZGGreaterThan:
+		case ZGGreaterThanStored:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThan:
+		case ZGLessThanStored:
+		case ZGLessThanStoredLinear:
 			isFunctionTypeNotEquals = NO;
 	}
 	
@@ -133,7 +159,15 @@ BOOL ZGIsFunctionTypeGreaterThan(ZGFunctionType functionType)
 		case ZGGreaterThanStoredLinear:
 			isFunctionTypeGreaterThan = YES;
 			break;
-		default:
+		case ZGEquals:
+		case ZGEqualsStored:
+		case ZGEqualsStoredLinear:
+		case ZGNotEquals:
+		case ZGNotEqualsStored:
+		case ZGNotEqualsStoredLinear:
+		case ZGLessThan:
+		case ZGLessThanStored:
+		case ZGLessThanStoredLinear:
 			isFunctionTypeGreaterThan = NO;
 	}
 	
@@ -151,7 +185,15 @@ BOOL ZGIsFunctionTypeLessThan(ZGFunctionType functionType)
 		case ZGLessThanStoredLinear:
 			isFunctionTypeLessThan = YES;
 			break;
-		default:
+		case ZGEquals:
+		case ZGNotEquals:
+		case ZGNotEqualsStoredLinear:
+		case ZGNotEqualsStored:
+		case ZGEqualsStored:
+		case ZGEqualsStoredLinear:
+		case ZGGreaterThan:
+		case ZGGreaterThanStored:
+		case ZGGreaterThanStoredLinear:
 			isFunctionTypeLessThan = NO;
 	}
 	
@@ -706,7 +748,14 @@ else {\
 		ZGHandleIntegerType(function, int16_t, integerQualifier, ZGInt16, processTask, searchData, searchProgress, delegate);\
 		ZGHandleIntegerType(function, int32_t, integerQualifier, ZGInt32, processTask, searchData, searchProgress, delegate);\
 		ZGHandleIntegerType(function, int64_t, integerQualifier, ZGInt64, processTask, searchData, searchProgress, delegate);\
-		default: break;\
+		case ZGFloat: \
+		case ZGDouble: \
+		case ZGString8: \
+		case ZGString16: \
+		case ZGPointer: \
+		case ZGByteArray: \
+		case ZGScript: \
+		break;\
 	}\
 }\
 
@@ -975,11 +1024,20 @@ bool ZGFloatingPointSwappedLesserThanLinear(ZGSearchData *__unsafe_unretained se
 		retValue = ZGSearchWithFunction(functionType, processTask, (type *)searchData.searchValue, searchData, searchProgress, delegate); \
 	break
 
-#define ZGHandleFloatingPointCase(case, function) \
-switch (case) {\
+#define ZGHandleFloatingPointCase(theCase, function) \
+switch (theCase) {\
 	ZGHandleType(function, float, ZGFloat, processTask, searchData, searchProgress, delegate);\
 	ZGHandleType(function, double, ZGDouble, processTask, searchData, searchProgress, delegate);\
-	default: break;\
+	case ZGInt8:\
+	case ZGInt16:\
+	case ZGInt32:\
+	case ZGInt64:\
+	case ZGString8:\
+	case ZGString16:\
+	case ZGByteArray:\
+	case ZGScript:\
+	case ZGPointer:\
+	break;\
 }
 
 ZGSearchResults *ZGSearchForFloatingPoints(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGFunctionType functionType)
@@ -1165,11 +1223,20 @@ bool ZGString16FastSwappedCaseInsensitiveNotEquals(ZGSearchData *__unsafe_unreta
 	return ZGString16CaseInsensitiveNotEquals(searchData, variableValue, (T *)(searchData->_swappedValue));
 }
 
-#define ZGHandleStringCase(case, function1, function2) \
-	switch (case) {\
+#define ZGHandleStringCase(theCase, function1, function2) \
+	switch (theCase) {\
 		ZGHandleType(function1, char, ZGString8, processTask, searchData, searchProgress, delegate);\
 		ZGHandleType(function2, unichar, ZGString16, processTask, searchData, searchProgress, delegate);\
-		default: break;\
+		case ZGInt8:\
+		case ZGInt16:\
+		case ZGInt32:\
+		case ZGInt64:\
+		case ZGFloat:\
+		case ZGDouble:\
+		case ZGScript:\
+		case ZGPointer:\
+		case ZGByteArray:\
+		break;\
 	}\
 
 ZGSearchResults *ZGSearchForCaseInsensitiveStrings(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGFunctionType functionType)
@@ -1198,7 +1265,16 @@ ZGSearchResults *ZGSearchForCaseInsensitiveStrings(ZGMemoryMap processTask, ZGSe
 				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16CaseInsensitiveNotEquals);
 			}
 			break;
-		default:
+		case ZGEqualsStored:
+		case ZGEqualsStoredLinear:
+		case ZGNotEqualsStored:
+		case ZGNotEqualsStoredLinear:
+		case ZGGreaterThan:
+		case ZGGreaterThanStored:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThan:
+		case ZGLessThanStored:
+		case ZGLessThanStoredLinear:
 			break;
 	}
 	
@@ -1251,7 +1327,16 @@ ZGSearchResults *ZGSearchForByteArraysWithWildcards(ZGMemoryMap processTask, ZGS
 		case ZGNotEquals:
 			retValue = ZGSearchWithFunction(ZGByteArrayWithWildcardsNotEquals, processTask, searchData.searchValue, searchData, searchProgress, delegate);
 			break;
-		default:
+		case ZGEqualsStored:
+		case ZGEqualsStoredLinear:
+		case ZGNotEqualsStored:
+		case ZGNotEqualsStoredLinear:
+		case ZGGreaterThan:
+		case ZGGreaterThanStored:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThan:
+		case ZGLessThanStored:
+		case ZGLessThanStoredLinear:
 			break;
 	}
 	
@@ -1271,22 +1356,33 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 		// use fast boyer moore
 		retValue = ZGSearchForBytes(processTask, searchData, searchProgress, delegate);
 	}
-	else if ([@[@(ZGInt8), @(ZGInt16), @(ZGInt32), @(ZGInt64), @(ZGPointer)] containsObject:@(dataType)])
+	else
 	{
-		retValue = ZGSearchForIntegers(processTask, searchData, searchProgress, delegate, dataType, integerQualifier, functionType);
+		switch (dataType)
+		{
+			case ZGInt8:
+			case ZGInt16:
+			case ZGInt32:
+			case ZGInt64:
+			case ZGPointer:
+				retValue = ZGSearchForIntegers(processTask, searchData, searchProgress, delegate, dataType, integerQualifier, functionType);
+				break;
+			case ZGFloat:
+			case ZGDouble:
+				retValue = ZGSearchForFloatingPoints(processTask, searchData, searchProgress, delegate, dataType, functionType);
+				break;
+			case ZGString8:
+			case ZGString16:
+				retValue = ZGSearchForCaseInsensitiveStrings(processTask, searchData, searchProgress, delegate, dataType, functionType);
+				break;
+			case ZGByteArray:
+				retValue = ZGSearchForByteArraysWithWildcards(processTask, searchData, searchProgress, delegate, dataType, functionType);
+				break;
+			case ZGScript:
+				break;
+		}
 	}
-	else if ([@[@(ZGFloat), @(ZGDouble)] containsObject:@(dataType)])
-	{
-		retValue = ZGSearchForFloatingPoints(processTask, searchData, searchProgress, delegate, dataType, functionType);
-	}
-	else if ([@[@(ZGString8), @(ZGString16)] containsObject:@(dataType)])
-	{
-		retValue = ZGSearchForCaseInsensitiveStrings(processTask, searchData, searchProgress, delegate, dataType, functionType);
-	}
-	else if (dataType == ZGByteArray)
-	{
-		retValue = ZGSearchForByteArraysWithWildcards(processTask, searchData, searchProgress, delegate, dataType, functionType);
-	}
+	
 	return retValue;
 }
 
@@ -1656,7 +1752,14 @@ else {\
 		ZGHandleNarrowIntegerType(function, int16_t, integerQualifier, ZGInt16, processTask, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);\
 		ZGHandleNarrowIntegerType(function, int32_t, integerQualifier, ZGInt32, processTask, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);\
 		ZGHandleNarrowIntegerType(function, int64_t, integerQualifier, ZGInt64, processTask, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);\
-		default: break;\
+		case ZGFloat:\
+		case ZGDouble:\
+		case ZGPointer:\
+		case ZGString8:\
+		case ZGString16:\
+		case ZGByteArray:\
+		case ZGScript:\
+			break;\
 	}\
 }\
 
@@ -1780,11 +1883,20 @@ ZGSearchResults *ZGNarrowSearchForIntegers(ZGMemoryMap processTask, ZGSearchData
 		retValue = ZGNarrowSearchWithFunction(functionType, processTask, (type *)searchData.searchValue, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);\
 		break
 
-#define ZGHandleNarrowFloatingPointCase(case, function) \
-switch (case) {\
+#define ZGHandleNarrowFloatingPointCase(theCase, function) \
+switch (theCase) {\
 	ZGHandleNarrowType(function, float, ZGFloat, processTask, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);\
 	ZGHandleNarrowType(function, double, ZGDouble, processTask, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);\
-	default: break;\
+	case ZGInt8:\
+	case ZGInt16:\
+	case ZGInt32:\
+	case ZGInt64:\
+	case ZGByteArray:\
+	case ZGPointer:\
+	case ZGString8:\
+	case ZGString16:\
+	case ZGScript:\
+	break;\
 }
 
 #pragma mark Narrowing Floating Points
@@ -1958,7 +2070,16 @@ ZGSearchResults *ZGNarrowSearchForByteArrays(ZGMemoryMap processTask, ZGSearchDa
 				retValue = ZGNarrowSearchWithFunction(ZGByteArrayNotEquals, processTask, (void *)searchData.searchValue, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);
 			}
 			break;
-		default:
+		case ZGEqualsStored:
+		case ZGEqualsStoredLinear:
+		case ZGNotEqualsStored:
+		case ZGNotEqualsStoredLinear:
+		case ZGGreaterThan:
+		case ZGGreaterThanStored:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThan:
+		case ZGLessThanStored:
+		case ZGLessThanStoredLinear:
 			break;
 	}
 	
@@ -1967,11 +2088,20 @@ ZGSearchResults *ZGNarrowSearchForByteArrays(ZGMemoryMap processTask, ZGSearchDa
 
 #pragma mark Narrowing Strings
 
-#define ZGHandleNarrowStringCase(case, function1, function2) \
-switch (case) {\
+#define ZGHandleNarrowStringCase(theCase, function1, function2) \
+switch (theCase) {\
 	ZGHandleNarrowType(function1, char, ZGString8, processTask, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);\
 	ZGHandleNarrowType(function2, unichar, ZGString16, processTask, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);\
-	default: break;\
+	case ZGInt8:\
+	case ZGInt16:\
+	case ZGInt32:\
+	case ZGInt64:\
+	case ZGFloat:\
+	case ZGDouble:\
+	case ZGByteArray:\
+	case ZGPointer:\
+	case ZGScript:\
+	break;\
 }\
 
 ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress, id <ZGSearchProgressDelegate> __unsafe_unretained delegate, ZGVariableType dataType, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults)
@@ -2002,7 +2132,16 @@ ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData 
 					retValue = ZGNarrowSearchWithFunction(ZGByteArrayNotEquals, processTask, (void *)searchData.searchValue, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults);
 				}
 				break;
-			default:
+			case ZGEqualsStored:
+			case ZGEqualsStoredLinear:
+			case ZGNotEqualsStored:
+			case ZGNotEqualsStoredLinear:
+			case ZGGreaterThan:
+			case ZGGreaterThanStored:
+			case ZGGreaterThanStoredLinear:
+			case ZGLessThan:
+			case ZGLessThanStored:
+			case ZGLessThanStoredLinear:
 				break;
 		}
 	}
@@ -2030,7 +2169,16 @@ ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData 
 					ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16CaseInsensitiveNotEquals);
 				}
 				break;
-			default:
+			case ZGEqualsStored:
+			case ZGEqualsStoredLinear:
+			case ZGNotEqualsStored:
+			case ZGNotEqualsStoredLinear:
+			case ZGGreaterThan:
+			case ZGGreaterThanStored:
+			case ZGGreaterThanStoredLinear:
+			case ZGLessThan:
+			case ZGLessThanStored:
+			case ZGLessThanStoredLinear:
 				break;
 		}
 	}
@@ -2047,21 +2195,28 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 	
 	id retValue = nil;
 	
-	if ([@[@(ZGInt8), @(ZGInt16), @(ZGInt32), @(ZGInt64), @(ZGPointer)] containsObject:@(dataType)])
+	switch (dataType)
 	{
-		retValue = ZGNarrowSearchForIntegers(processTask, searchData, searchProgress, delegate, dataType, integerQualifier, functionType, firstSearchResults, laterSearchResults);
-	}
-	else if ([@[@(ZGFloat), @(ZGDouble)] containsObject:@(dataType)])
-	{
-		retValue = ZGNarrowSearchForFloatingPoints(processTask, searchData, searchProgress, delegate, dataType, functionType, firstSearchResults, laterSearchResults);
-	}
-	else if ([@[@(ZGString8), @(ZGString16)] containsObject:@(dataType)])
-	{
-		retValue = ZGNarrowSearchForStrings(processTask, searchData, searchProgress, delegate, dataType, functionType, firstSearchResults, laterSearchResults);
-	}
-	else if (dataType == ZGByteArray)
-	{
-		retValue = ZGNarrowSearchForByteArrays(processTask, searchData, searchProgress, delegate, dataType, functionType, firstSearchResults, laterSearchResults);
+		case ZGInt8:
+		case ZGInt16:
+		case ZGInt32:
+		case ZGInt64:
+		case ZGPointer:
+			retValue = ZGNarrowSearchForIntegers(processTask, searchData, searchProgress, delegate, dataType, integerQualifier, functionType, firstSearchResults, laterSearchResults);
+			break;
+		case ZGFloat:
+		case ZGDouble:
+			retValue = ZGNarrowSearchForFloatingPoints(processTask, searchData, searchProgress, delegate, dataType, functionType, firstSearchResults, laterSearchResults);
+			break;
+		case ZGString8:
+		case ZGString16:
+			retValue = ZGNarrowSearchForStrings(processTask, searchData, searchProgress, delegate, dataType, functionType, firstSearchResults, laterSearchResults);
+			break;
+		case ZGByteArray:
+			retValue = ZGNarrowSearchForByteArrays(processTask, searchData, searchProgress, delegate, dataType, functionType, firstSearchResults, laterSearchResults);
+			break;
+		case ZGScript:
+			break;
 	}
 	
 	return retValue;

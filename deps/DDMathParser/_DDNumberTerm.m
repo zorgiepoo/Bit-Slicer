@@ -14,7 +14,7 @@
 @implementation _DDNumberTerm
 
 - (DDParserTermType)type { return DDParserTermTypeNumber; }
-- (BOOL)resolveWithParser:(DDParser *)parser error:(NSError **)error {
+- (BOOL)resolveWithParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
 #pragma unused(parser, error)
     [self setResolved:YES];
     return YES;
@@ -23,7 +23,7 @@
     return [[self token] description];
 }
 
-- (DDExpression *)expressionWithError:(NSError **)error {
+- (DDExpression *)expressionWithError:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
     return [DDExpression numberExpressionWithNumber:[[self token] numberValue]];
 }

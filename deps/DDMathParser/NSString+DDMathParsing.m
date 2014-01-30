@@ -24,7 +24,7 @@
 	return returnValue;
 }
 
-- (NSNumber *)ddNumberByEvaluatingStringWithSubstitutions:(NSDictionary *)substitutions error:(NSError **)error {
+- (NSNumber *)ddNumberByEvaluatingStringWithSubstitutions:(NSDictionary *)substitutions error:(NSError * __autoreleasing *)error {
 	DDExpression * e = [DDExpression expressionFromString:self error:error];
 	return [e evaluateWithSubstitutions:substitutions evaluator:nil error:error];
 }

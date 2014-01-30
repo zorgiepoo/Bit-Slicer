@@ -33,7 +33,7 @@
     subterms = [newTerms mutableCopy];
 }
 
-- (id)_initWithSubterms:(NSArray *)terms error:(NSError **)error {
+- (id)_initWithSubterms:(NSArray *)terms error:(NSError * __autoreleasing *)error {
 #pragma unused(error)
     self = [super init];
     if (self) {
@@ -42,7 +42,7 @@
     return self;
 }
 
-- (id)_initWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError **)error {
+- (id)_initWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
     self = [super _initWithTokenizer:tokenizer error:error];
     if (self) {
@@ -89,7 +89,7 @@
 
 #pragma mark - Resolution
 
-- (BOOL)resolveWithParser:(DDParser *)parser error:(NSError **)error {
+- (BOOL)resolveWithParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
     if ([self isResolved]) { return YES; }
     ERR_ASSERT(error);
     
@@ -150,7 +150,7 @@
 	return indices;
 }
 
-- (BOOL)_reduceTermsAroundOperatorAtIndex:(NSUInteger)index withParser:(DDParser *)parser error:(NSError **)error {
+- (BOOL)_reduceTermsAroundOperatorAtIndex:(NSUInteger)index withParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
     _DDOperatorTerm *operator = [[self subterms] objectAtIndex:index];
     
@@ -164,7 +164,7 @@
     return NO;
 }
 
-- (BOOL)_reduceBinaryOperatorAtIndex:(NSUInteger)index withParser:(DDParser *)parser error:(NSError **)error {
+- (BOOL)_reduceBinaryOperatorAtIndex:(NSUInteger)index withParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
 #pragma unused(parser)
     _DDOperatorTerm *operator = [[self subterms] objectAtIndex:index];
@@ -212,7 +212,7 @@
     return YES;
 }
 
-- (BOOL)_reduceUnaryOperatorAtIndex:(NSUInteger)index withParser:(DDParser *)parser error:(NSError **)error {
+- (BOOL)_reduceUnaryOperatorAtIndex:(NSUInteger)index withParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
     _DDOperatorTerm *operator = [[self subterms] objectAtIndex:index];
     DDOperatorAssociativity associativity = [parser associativityForOperator:[operator operatorType]];
@@ -254,7 +254,7 @@
 
 #pragma mark - Expressions
 
-- (DDExpression *)expressionWithError:(NSError **)error {
+- (DDExpression *)expressionWithError:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
     if ([[self subterms] count] == 1) {
         _DDParserTerm *term = [[self subterms] objectAtIndex:0];

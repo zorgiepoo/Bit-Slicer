@@ -61,7 +61,7 @@ enum ZGNavigation
 @property (readwrite) ZGMemoryAddress currentMemoryAddress;
 @property (readwrite) ZGMemorySize currentMemorySize;
 
-@property (readonly) ZGProcess *currentProcess;
+@property (nonatomic, readonly) ZGProcess *currentProcess;
 @property (nonatomic, copy) NSString *desiredProcessInternalName;
 
 @property (readwrite, nonatomic) BOOL windowDidAppear;

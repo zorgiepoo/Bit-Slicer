@@ -1351,11 +1351,22 @@
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wextra",
+					"-Weverything",
 					"-Wno-unused-parameter",
-					"-Wshorten-64-to-32",
-					"-Wswitch",
+					"-Wno-objc-missing-property-synthesis",
+					"-Wno-padded",
+					"-Wno-empty-translation-unit",
+					"-Wno-undef",
+					"-Wno-gnu",
+					"-Wno-pointer-arith",
+					"-Wno-cast-align",
+					"-Wno-objc-interface-ivars",
+					"-Wno-overriding-method-mismatch",
+					"-Wno-method-signatures",
+					"-Wno-assign-enum",
+					"-Wno-direct-ivar-access",
+					"-Wno-unused-macros",
+					"-Wno-used-but-marked-unused",
 				);
 			};
 			name = Debug;
@@ -1393,11 +1404,22 @@
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wextra",
+					"-Weverything",
 					"-Wno-unused-parameter",
-					"-Wshorten-64-to-32",
-					"-Wswitch",
+					"-Wno-objc-missing-property-synthesis",
+					"-Wno-padded",
+					"-Wno-empty-translation-unit",
+					"-Wno-undef",
+					"-Wno-gnu",
+					"-Wno-pointer-arith",
+					"-Wno-cast-align",
+					"-Wno-objc-interface-ivars",
+					"-Wno-overriding-method-mismatch",
+					"-Wno-method-signatures",
+					"-Wno-assign-enum",
+					"-Wno-direct-ivar-access",
+					"-Wno-unused-macros",
+					"-Wno-used-but-marked-unused",
 				);
 			};
 			name = Release;
