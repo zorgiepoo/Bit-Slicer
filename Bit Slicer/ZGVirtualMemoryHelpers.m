@@ -37,7 +37,6 @@
 #import "ZGRegion.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
-#import "ZGMachBinary.h"
 #import "NSArrayAdditions.h"
 
 #import <mach/mach_error.h>

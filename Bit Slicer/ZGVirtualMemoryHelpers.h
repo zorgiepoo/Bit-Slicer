@@ -43,7 +43,6 @@ extern "C" {
 @class ZGSearchData;
 @class ZGSearchProgress;
 @class ZGRegion;
-@class ZGMachBinary;
 
 BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task);
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
