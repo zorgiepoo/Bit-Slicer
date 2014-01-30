@@ -285,7 +285,7 @@
 	
 	[searchResults removeNumberOfAddresses:numberOfVariables];
 	
-	[self.windowController.variableController annotateVariables:newVariables];
+	[ZGVariableController annotateVariables:newVariables process:currentProcess];
 	
 	[allVariables addObjectsFromArray:newVariables];
 	self.documentData.variables = [NSArray arrayWithArray:allVariables];

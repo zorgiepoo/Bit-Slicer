@@ -1,7 +1,7 @@
 /*
  * Created by Mayur Pawashe on 1/30/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -348,30 +348,6 @@ NSRange ZGTextRange(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBin
 	if (machHeaderAddress != NULL) *machHeaderAddress = machHeaderAddressReturned;
 	
 	return NSMakeRange(textAddress, textSize);
-}
-
-ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName)
-{
-	ZGMemoryAddress offset = 0x0;
-	
-	NSString *mappedFilePath = nil;
-	ZGMemoryAddress machHeaderAddress = 0x0;
-	
-	NSRange textRange = ZGTextRange(processTask, pointerSize, dylinkerBinary, instructionAddress, &mappedFilePath, &machHeaderAddress, slide, cacheDictionary);
-	if (textRange.location <= instructionAddress && textRange.location + textRange.length >= instructionAddress + instructionSize && mappedFilePath != nil)
-	{
-		NSError *error = nil;
-		NSString *partialPath = [mappedFilePath lastPathComponent];
-		// Make sure base address with our partial path matches with base address at full path
-		ZGMemoryAddress baseVerificationAddress = ZGFindExecutableImageWithCache(processTask, pointerSize, dylinkerBinary, partialPath, cacheDictionary, &error);
-		if (error == nil && baseVerificationAddress == machHeaderAddress)
-		{
-			offset = instructionAddress - machHeaderAddress;
-			if (partialImageName != NULL) *partialImageName = [partialPath copy];
-		}
-	}
-	
-	return offset;
 }
 
 ZGMemoryAddress ZGFindExecutableImage(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSString *partialImageName)

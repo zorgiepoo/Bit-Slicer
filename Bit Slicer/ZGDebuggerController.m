@@ -55,6 +55,7 @@
 #import "ZGMachBinaryInfo.h"
 #import "CoreSymbolication.h"
 #import "ZGTableView.h"
+#import "ZGVariableController.h"
 
 @interface ZGDebuggerController ()
 
@@ -1459,28 +1460,44 @@ END_DEBUGGER_CHANGE:
 	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
+- (void)prepareInstructionsForPasteboard:(NSArray *)instructions
+{
+	NSMutableArray *variablesToAnnotate = [NSMutableArray array];
+	for (ZGInstruction *instruction in instructions)
+	{
+		if (!instruction.variable.usesDynamicAddress)
+		{
+			[variablesToAnnotate addObject:instruction.variable];
+		}
+	}
+	
+	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess];
+	
+	for (ZGInstruction *instruction in instructions)
+	{
+		if ([instruction.variable.description length] == 0)
+		{
+			instruction.variable.description = instruction.text;
+		}
+		else if ([variablesToAnnotate containsObject:instruction.variable])
+		{
+			NSMutableAttributedString *newDescription = [[NSMutableAttributedString alloc] initWithString:[instruction.text stringByAppendingString:@"\n"]];
+			[newDescription appendAttributedString:instruction.variable.description];
+			instruction.variable.description = newDescription;
+		}
+	}
+}
+
 - (IBAction)copy:(id)sender
 {
 	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
 	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
 	
+	[self prepareInstructionsForPasteboard:self.selectedInstructions];
+	
 	for (ZGInstruction *instruction in self.selectedInstructions)
 	{
 		[descriptionComponents addObject:[@[instruction.variable.addressStringValue, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
-		
-		if (!instruction.variable.usesDynamicAddress)
-		{
-			NSString *partialPath = nil;
-			ZGMemoryAddress slide = 0;
-			ZGMemoryAddress relativeOffset = ZGInstructionOffset(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, self.currentProcess.cacheDictionary, instruction.variable.address, instruction.variable.size, &slide, &partialPath);
-			if (partialPath != nil && (slide > 0 || instruction.variable.address - relativeOffset > self.currentProcess.baseAddress))
-			{
-				instruction.variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(\"%@\") + 0x%llX", partialPath, relativeOffset];
-				instruction.variable.usesDynamicAddress = YES;
-			}
-		}
-		
-		instruction.variable.description = instruction.text;
 		
 		[variablesArray addObject:instruction.variable];
 	}
@@ -1524,13 +1541,10 @@ END_DEBUGGER_CHANGE:
 
 - (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-	NSMutableArray *variables = [NSMutableArray array];
-	for (ZGInstruction *instruction in [self.instructions objectsAtIndexes:rowIndexes])
-	{
-		instruction.variable.description = instruction.text;
-		[variables addObject:instruction.variable];
-	}
-	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
+	NSArray *instructions = [self.instructions objectsAtIndexes:rowIndexes];
+	[self prepareInstructionsForPasteboard:instructions];
+	
+	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:[instructions valueForKey:@"variable"]] forType:ZGVariablePboardType];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification

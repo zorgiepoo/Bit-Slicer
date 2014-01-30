@@ -39,6 +39,7 @@
 #define SIGNED_BUTTON_CELL_TAG 0
 
 @class ZGDocumentWindowController;
+@class ZGProcess;
 
 @interface ZGVariableController : NSObject
 
@@ -70,7 +71,7 @@
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
 
 - (void)relativizeVariables:(NSArray *)variables;
-- (void)annotateVariables:(NSArray *)variables;
++ (void)annotateVariables:(NSArray *)variables process:(ZGProcess *)process;
 
 - (void)editVariables:(NSArray *)variables newValues:(NSArray *)newValues;
 - (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula;

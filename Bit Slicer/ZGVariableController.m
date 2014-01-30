@@ -883,19 +883,19 @@
 
 - (void)relativizeVariables:(NSArray *)variables
 {
-	[self annotateVariables:variables];
+	[[self class] annotateVariables:variables process:self.windowController.currentProcess];
 	
 	self.windowController.undoManager.actionName = [NSString stringWithFormat:@"Relativize Variable%@", variables.count == 1 ? @"" : @"s"];
 	[[self.windowController.undoManager prepareWithInvocationTarget:self] unrelativizeVariables:variables];
 }
 
-- (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray *)machBinaries filePathDictionary:(NSDictionary *)machFilePathDictionary
++ (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray *)machBinaries filePathDictionary:(NSDictionary *)machFilePathDictionary process:(ZGProcess *)process
 {
 	NSString *staticVariableDescription = nil;
 	
-	NSDictionary *cacheDictionary = self.windowController.currentProcess.cacheDictionary;
-	ZGMemoryMap processTask = self.windowController.currentProcess.processTask;
-	ZGMemorySize pointerSize = self.windowController.currentProcess.pointerSize;
+	NSDictionary *cacheDictionary = process.cacheDictionary;
+	ZGMemoryMap processTask = process.processTask;
+	ZGMemorySize pointerSize = process.pointerSize;
 	
 	ZGMachBinary *machBinary = ZGNearestMachBinary(machBinaries, variable.address);
 	ZGMemoryAddress machHeaderAddress = machBinary.headerAddress;
@@ -977,11 +977,10 @@
 	return staticVariableDescription;
 }
 
-- (void)annotateVariables:(NSArray *)variables
++ (void)annotateVariables:(NSArray *)variables process:(ZGProcess *)process
 {
-	ZGProcess *currentProcess = self.windowController.currentProcess;
-	ZGMemoryMap processTask = currentProcess.processTask;
-	NSArray *machBinaries = ZGMachBinaries(processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary);
+	ZGMemoryMap processTask = process.processTask;
+	NSArray *machBinaries = ZGMachBinaries(processTask, process.pointerSize, process.dylinkerBinary);
 	NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
 	
 	for (ZGMachBinary *machBinary in machBinaries)
@@ -999,7 +998,7 @@
 	
 	for (ZGVariable *variable in variables)
 	{
-		NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary];
+		NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process];
 		
 		if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
 		{
