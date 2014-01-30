@@ -653,8 +653,8 @@
 			
 			NSString *userTagDescription = ZGUserTagDescriptionFromAddress(currentProcess.processTask, variable.address, variable.size);
 			NSString *mappedFilePath = nil;
-			ZGMemorySize relativeOffset = 0;
-			NSString *sectionName = ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL, currentProcess.cacheDictionary);
+			ZGMemorySize machBinaryAddress = 0;
+			NSString *sectionName = ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, &mappedFilePath, &machBinaryAddress, NULL, currentProcess.cacheDictionary);
 			
 			BOOL needsUserTag = userTagDescription != nil && [variable.name rangeOfString:userTagDescription].location == NSNotFound;
 			BOOL needsSectionName = sectionName != nil && [variable.name rangeOfString:sectionName].location == NSNotFound;
@@ -669,7 +669,7 @@
 				[displayComponents addObject:[NSString stringWithFormat:@"Mapped: %@", mappedFilePath]];
 				if (!variable.usesDynamicAddress)
 				{
-					[displayComponents addObject:[NSString stringWithFormat:@"Offset: 0x%llX", relativeOffset]];
+					[displayComponents addObject:[NSString stringWithFormat:@"Offset: 0x%llX", variable.address - machBinaryAddress]];
 				}
 			}
 			

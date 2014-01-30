@@ -1316,9 +1316,9 @@
 				return NO;
 			}
 			
-			ZGMemoryAddress relativeOffset = 0;
+			ZGMemoryAddress machBinaryAddress = 0;
 			ZGMemoryAddress slide = 0;
-			if (variable.usesDynamicAddress || ZGSectionName(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, variable.address, variable.size, NULL, &relativeOffset, &slide, self.currentProcess.cacheDictionary) == nil || (slide == 0 && variable.address - relativeOffset == self.currentProcess.baseAddress))
+			if (variable.usesDynamicAddress || ZGSectionName(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, variable.address, NULL, &machBinaryAddress, &slide, self.currentProcess.cacheDictionary) == nil || (slide == 0 && machBinaryAddress == self.currentProcess.baseAddress))
 			{
 				return NO;
 			}
