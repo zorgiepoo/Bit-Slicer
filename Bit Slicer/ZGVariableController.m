@@ -883,22 +883,7 @@
 
 - (void)relativizeVariables:(NSArray *)variables
 {
-	ZGProcess *currentProcess = self.windowController.currentProcess;
-	NSMutableDictionary *cacheDictionary = currentProcess.cacheDictionary;
-	for (ZGVariable *variable in variables)
-	{
-		NSString *mappedFilePath = nil;
-		ZGMemorySize relativeOffset = 0;
-		if (ZGSectionName(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, variable.address, variable.size, &mappedFilePath, &relativeOffset, NULL, cacheDictionary) != nil)
-		{
-			NSString *partialPath = [mappedFilePath lastPathComponent];
-			NSError *error = nil;
-			ZGMemoryAddress baseAddress = ZGFindExecutableImageWithCache(currentProcess.processTask, currentProcess.pointerSize, currentProcess.dylinkerBinary, partialPath, self.windowController.currentProcess.cacheDictionary, &error);
-			NSString *pathToUse = (error == nil && baseAddress == variable.address - relativeOffset) ? partialPath : mappedFilePath;
-			variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(\"%@\") + 0x%llX", pathToUse, relativeOffset];
-			variable.usesDynamicAddress = YES;
-		}
-	}
+	[self annotateVariables:variables];
 	
 	self.windowController.undoManager.actionName = [NSString stringWithFormat:@"Relativize Variable%@", variables.count == 1 ? @"" : @"s"];
 	[[self.windowController.undoManager prepareWithInvocationTarget:self] unrelativizeVariables:variables];
@@ -1047,7 +1032,9 @@
 		else
 		{
 			NSString *appendedString = [NSString stringWithFormat:@"\n\n%@", [validDescriptionComponents componentsJoinedByString:@"\n"]];
-			[variable.description appendAttributedString:[[NSAttributedString alloc] initWithString:appendedString]];
+			NSMutableAttributedString *newDescription = [variable.description mutableCopy];
+			[newDescription appendAttributedString:[[NSAttributedString alloc] initWithString:appendedString]];
+			variable.description = newDescription;
 		}
 	}
 }
