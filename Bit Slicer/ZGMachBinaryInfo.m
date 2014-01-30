@@ -282,7 +282,7 @@ ZGMachBinary *ZGNearestMachBinary(NSArray *machBinaries, ZGMemoryAddress targetA
 	return previousMachBinary;
 }
 
-void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize, NSMutableDictionary *cacheDictionary)
+static void ZGGetNearestMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *textAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize, NSMutableDictionary *cacheDictionary)
 {
 	ZGMachBinary *machBinary = ZGNearestMachBinary(ZGMachBinaries(processTask, pointerSize, dylinkerBinary), targetAddress);
 	if (machBinary != nil)
