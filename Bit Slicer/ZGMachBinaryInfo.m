@@ -199,6 +199,7 @@ ZGMachBinary *ZGDylinkerBinary(ZGMemoryMap processTask)
 					if (dylinkerCommand->cmd == LC_ID_DYLINKER || dylinkerCommand->cmd == LC_LOAD_DYLINKER)
 					{
 						dylinkerBinary = [[ZGMachBinary alloc] initWithHeaderAddress:regionAddress filePathAddress:dylinkerCommand->name.offset + (void *)dylinkerCommand - regionBytes + regionAddress];
+						break;
 					}
 					
 					bytes += dylinkerCommand->cmdsize;
