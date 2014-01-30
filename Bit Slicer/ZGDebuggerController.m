@@ -52,6 +52,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGMachBinaryInfo.h"
 #import "CoreSymbolication.h"
 #import "ZGTableView.h"
 

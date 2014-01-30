@@ -36,6 +36,7 @@
 #import "NSStringAdditions.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGMachBinaryInfo.h"
 #import "ZGRegion.h"
 #import "ZGProcess.h"
 #import "DDMathEvaluator.h"

@@ -56,7 +56,7 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGDocument.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
+#import "ZGMachBinaryInfo.h"
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
 #import "ZGDocumentOptionsViewController.h"

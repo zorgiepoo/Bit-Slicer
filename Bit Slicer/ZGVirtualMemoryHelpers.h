@@ -39,11 +39,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
-#define ZGImageName @"ZGImageName"
-#define ZGMappedPathDictionary @"ZGMappedPathDictionary"
-#define ZGMappedBinaryDictionary @"ZGMappedBinaryDictionary"
-#define ZGMachFileDataDictionary @"ZGMachFileDataDictionary"
 
 @class ZGSearchData;
 @class ZGSearchProgress;
@@ -61,22 +56,6 @@ NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask);
 	
 NSString *ZGUserTagDescription(unsigned int userTag);
 NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
-
-ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error);
-
-ZGMachBinary *ZGDylinkerBinary(ZGMemoryMap processTask);
-NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize, ZGMachBinary *dylinkerBinary);
-NSString *ZGFilePathAtAddress(ZGMemoryMap processTask, ZGMemoryAddress filePathAddress);
-
-ZGMachBinary *ZGNearestMachBinary(NSArray *machBinaries, ZGMemoryAddress targetAddress);
-	
-void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, NSString *mappedFilePath, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize, NSDictionary *cacheDictionary);
-	
-NSRange ZGTextRange(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary);
-
-ZGMemoryAddress ZGInstructionOffset(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSMutableDictionary *cacheDictionary, ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ZGMemoryAddress *slide, NSString **partialImageName);
-	
-NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress address, ZGMemorySize size, NSString **mappedFilePath, ZGMemoryAddress *relativeOffset, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary);
 
 CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName, BOOL requiresExactMatch);
 

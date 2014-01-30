@@ -44,6 +44,7 @@
 #import "ZGSearchResults.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGMachBinaryInfo.h"
 #import "ZGDocumentData.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGScriptManager.h"

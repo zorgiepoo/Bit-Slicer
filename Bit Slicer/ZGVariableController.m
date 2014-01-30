@@ -51,6 +51,7 @@
 #import "ZGDocumentData.h"
 #import "ZGScriptManager.h"
 #import "ZGMachBinary.h"
+#import "ZGMachBinaryInfo.h"
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
 

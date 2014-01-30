@@ -59,6 +59,7 @@
 		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		777AD8C717D96F30003A5317 /* ZGPyDebugger.m in Sources */ = {isa = PBXBuildFile; fileRef = 777AD8C617D96F30003A5317 /* ZGPyDebugger.m */; };
 		777C34B5187523D0005E64E1 /* ZGNoSmallSizeToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */; };
+		7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */; };
 		77988F1A185803E800476A37 /* container.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F19185803E800476A37 /* container.pdf */; };
 		77988F1C185804AC00476A37 /* container_filled.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F1B185804AC00476A37 /* container_filled.pdf */; };
 		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
@@ -348,6 +349,8 @@
 		777AD8C617D96F30003A5317 /* ZGPyDebugger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyDebugger.m; path = "Bit Slicer/ZGPyDebugger.m"; sourceTree = "<group>"; };
 		777C34B3187523D0005E64E1 /* ZGNoSmallSizeToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGNoSmallSizeToolbar.h; path = "Bit Slicer/ZGNoSmallSizeToolbar.h"; sourceTree = "<group>"; };
 		777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGNoSmallSizeToolbar.m; path = "Bit Slicer/ZGNoSmallSizeToolbar.m"; sourceTree = "<group>"; };
+		7789C379189A570F00F1FDAF /* ZGMachBinaryInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMachBinaryInfo.h; path = "Bit Slicer/ZGMachBinaryInfo.h"; sourceTree = "<group>"; };
+		7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMachBinaryInfo.m; path = "Bit Slicer/ZGMachBinaryInfo.m"; sourceTree = "<group>"; };
 		77988F19185803E800476A37 /* container.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container.pdf; path = "Bit Slicer/docicons/container.pdf"; sourceTree = "<group>"; };
 		77988F1B185804AC00476A37 /* container_filled.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container_filled.pdf; path = "Bit Slicer/docicons/container_filled.pdf"; sourceTree = "<group>"; };
 		77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLoggerWindowController.h; path = "Bit Slicer/ZGLoggerWindowController.h"; sourceTree = "<group>"; };
@@ -1015,6 +1018,8 @@
 				77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */,
 				77F1162317D2EF31009E002A /* ZGRegion.h */,
 				77F1162417D2EF31009E002A /* ZGRegion.m */,
+				7789C379189A570F00F1FDAF /* ZGMachBinaryInfo.h */,
+				7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */,
 				77E9DBCC181F812E009F4982 /* ZGMachBinary.h */,
 				77E9DBCD181F812E009F4982 /* ZGMachBinary.m */,
 				77FE406218937EE700BCC339 /* ZGRegisterUtilities.h */,
@@ -1234,6 +1239,7 @@
 				77F1163817D2EF76009E002A /* NSArrayAdditions.m in Sources */,
 				77F1163A17D2EF7F009E002A /* main.m in Sources */,
 				77F1163D17D2EF8E009E002A /* ZGMemoryWindowController.m in Sources */,
+				7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */,
 				770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */,
 				77F1164017D2EF9E009E002A /* ZGDebuggerController.m in Sources */,
 				77F1164317D2EFB4009E002A /* ZGDisassemblerObject.m in Sources */,

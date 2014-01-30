@@ -36,6 +36,7 @@
 #import "ZGMachBinary.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGMachBinaryInfo.h"
 
 #include <libproc.h>
 
