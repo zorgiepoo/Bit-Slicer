@@ -52,6 +52,7 @@ typedef struct
 	int32_t processIdentifier;
 	char is64Bit;
 	ZGMemoryAddress baseAddress;
+	integer_t suspendCount;
 	__unsafe_unretained NSMutableArray *objectsPool;
 	__unsafe_unretained NSMutableDictionary *allocationSizeTable;
 	__unsafe_unretained ZGProcess *process;
@@ -256,6 +257,11 @@ static PyTypeObject VirtualMemoryType =
 
 - (void)dealloc
 {
+	for (integer_t resumeIndex = 0; resumeIndex < ((VirtualMemory *)self.vmObject)->suspendCount; resumeIndex++)
+	{
+		ZGResumeTask(((VirtualMemory *)self.vmObject)->processTask);
+	}
+	
 	self.vmObject = NULL;
 }
 
@@ -523,6 +529,9 @@ static PyObject *VirtualMemory_pause(VirtualMemory *self, PyObject *args)
 		
 		return NULL;
 	}
+	
+	self->suspendCount++;
+	
 	return Py_BuildValue("");
 }
 
@@ -530,10 +539,13 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject *args)
 {
 	if (!ZGResumeTask(self->processTask))
 	{
-		PyErr_SetString(PyExc_Exception, "vm.unpause failed to unpause process");
+		PyErr_SetString(PyExc_Exception, "vm.unpause failed to unpause process; perhaps it was not paused?");
 		
 		return NULL;
 	}
+	
+	self->suspendCount--;
+	
 	return Py_BuildValue("");
 }
 
