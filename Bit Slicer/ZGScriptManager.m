@@ -771,13 +771,13 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				else
 				{
 					// Give up
-					Py_Finalize();
+					PyErr_SetInterrupt();
+					
 					dispatch_async(gPythonQueue, ^{
 						@synchronized(self.objectsPool)
 						{
 							[self.objectsPool removeAllObjects];
 						}
-						[[self class] initializePythonInterpreter];
 					});
 				}
 			}
