@@ -1027,7 +1027,7 @@ enum ZGStepExecution
 		if (self.mappedFilePath != nil && sender == nil)
 		{
 			NSError *error = nil;
-			ZGMemoryAddress guessAddress = [[ZGMachBinary machBinaryWithPartialImageName:self.mappedFilePath inProcess:self.currentProcess error:&error] headerAddress];
+			ZGMemoryAddress guessAddress = [[ZGMachBinary machBinaryWithPartialImageName:self.mappedFilePath inProcess:self.currentProcess error:&error] headerAddress] + self.offsetFromBase;
 			
 			if (error == nil)
 			{
@@ -1113,6 +1113,9 @@ enum ZGStepExecution
 			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:calculatedMemoryAddress fromMachBinaries:machBinaries];
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
 			NSRange textRange = NSMakeRange(machBinaryInfo.textAddress, machBinaryInfo.textSize);
+			
+			baseAddress = machBinary.headerAddress;
+			mappedFilePath = [machBinary filePathInProcess:self.currentProcess];
 			
 			firstInstructionAddress = textRange.location;
 			maxInstructionsSize = textRange.length;
