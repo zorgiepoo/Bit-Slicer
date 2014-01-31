@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 8/29/13.
+ * Created by Mayur Pawashe on 1/31/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,21 +33,37 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
-#import "ZGSearchProgressDelegate.h"
-#import "ZGFunctionTypes.h"
 
-@class ZGSearchData;
-@class ZGSearchResults;
+typedef enum
+{
+	// Regular comparisons
+	ZGEquals = 0,
+	ZGNotEquals,
+	ZGGreaterThan,
+	ZGLessThan,
+	// Stored comparisons
+	ZGEqualsStored,
+	ZGNotEqualsStored,
+	ZGGreaterThanStored,
+	ZGLessThanStored,
+	// Linearly expressed stored comparisons
+	ZGEqualsStoredLinear,
+	ZGNotEqualsStoredLinear,
+	ZGGreaterThanStoredLinear,
+	ZGLessThanStoredLinear
+} ZGFunctionType;
 
-#ifdef __cplusplus
-extern "C"
-#endif
-ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType);
+BOOL ZGIsFunctionTypeStore(ZGFunctionType functionType);
 
-#ifdef __cplusplus
-extern "C"
-#endif
-ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults);
+BOOL ZGIsFunctionTypeLinear(ZGFunctionType functionType);
 
+BOOL ZGIsFunctionTypeEquals(ZGFunctionType functionType);
+
+BOOL ZGIsFunctionTypeNotEquals(ZGFunctionType functionType);
+
+BOOL ZGIsFunctionTypeGreaterThan(ZGFunctionType functionType);
+
+BOOL ZGIsFunctionTypeLessThan(ZGFunctionType functionType);
+
+BOOL ZGSupportsSwappingBeforeSearch(ZGFunctionType functionType, ZGVariableType dataType);
