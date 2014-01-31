@@ -49,14 +49,18 @@
 @property (copy, nonatomic) NSString *name;
 @property (copy, nonatomic) NSString *internalName;
 @property (nonatomic) BOOL is64Bit;
-@property (nonatomic) ZGMemoryAddress baseAddress;
+
+@property (nonatomic) ZGMachBinary *mainMachBinary;
 @property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
-@property NSMutableDictionary *cacheDictionary;
+
+@property (nonatomic) NSMutableDictionary *cacheDictionary;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
-- (id)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
-- (id)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
+- (instancetype)initWithProcess:(ZGProcess *)process;
+
 - (void)markInvalid;
 - (BOOL)grantUsAccess;
 - (BOOL)hasGrantedAccess;

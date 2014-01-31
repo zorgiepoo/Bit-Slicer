@@ -36,9 +36,8 @@
 #import "ZGMachBinary.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
-
-#include <libproc.h>
 
 @implementation ZGProcess
 
@@ -58,7 +57,7 @@
 	}
 }
 
-- (id)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit
 {
 	if ((self = [super init]))
 	{
@@ -71,9 +70,20 @@
 	return self;
 }
 
-- (id)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit
 {
 	return [self initWithName:processName internalName:internalName processID:NON_EXISTENT_PID_NUMBER is64Bit:flag64Bit];
+}
+
+- (instancetype)initWithProcess:(ZGProcess *)process
+{
+	self = [self initWithName:process.name internalName:process.internalName processID:process.processID is64Bit:process.is64Bit];
+	if (self != nil)
+	{
+		self.processTask = process.processTask;
+		[self setUpMachBinaryData];
+	}
+	return self;
 }
 
 - (BOOL)valid
@@ -88,52 +98,24 @@
 	self.cacheDictionary = nil;
 }
 
+- (void)setUpMachBinaryData
+{
+	self.cacheDictionary = [[NSMutableDictionary alloc] initWithDictionary:@{ZGMachBinaryPathToBinaryInfoDictionary : [NSMutableDictionary dictionary], ZGMachBinaryPathToBinaryDictionary : [NSMutableDictionary dictionary]}];
+	
+	_dylinkerBinary = [ZGMachBinary dynamicLinkerMachBinaryInProcess:self];
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self];
+	if (machBinaries.count > 0)
+	{
+		self.mainMachBinary = [machBinaries objectAtIndex:0];
+	}
+}
+
 - (BOOL)grantUsAccess
 {
 	BOOL success = ZGGetTaskForProcess(self.processID, &_processTask);
 	if (success)
 	{	
-		self.cacheDictionary = [[NSMutableDictionary alloc] init];
-		NSMutableDictionary *mappedPathDictionary = [[NSMutableDictionary alloc] init];
-		NSMutableDictionary *mappedBinaryDictionary = [[NSMutableDictionary alloc] init];
-		[self.cacheDictionary setObject:mappedPathDictionary forKey:ZGMappedPathDictionary];
-		[self.cacheDictionary setObject:mappedBinaryDictionary forKey:ZGMappedBinaryDictionary];
-		[self.cacheDictionary setObject:[NSMutableDictionary dictionary] forKey:ZGMachFileDataDictionary];
-		
-		_dylinkerBinary = ZGDylinkerBinary(_processTask);
-		NSArray *machBinaries = ZGMachBinaries(_processTask, self.pointerSize, _dylinkerBinary);
-		if (machBinaries.count > 0)
-		{
-			self.baseAddress = [[machBinaries objectAtIndex:0] headerAddress];
-			
-			// Set up initial cache for full paths, partial paths, and partial paths prepended with forward slashes
-			for (ZGMachBinary *machBinary in machBinaries)
-			{
-				ZGMemoryAddress machAddress = machBinary.headerAddress;
-				NSString *mappedPath = ZGFilePathAtAddress(_processTask, machBinary.filePathAddress);
-				NSString *lastPathComponent = [mappedPath lastPathComponent];
-				
-				if ([mappedPathDictionary objectForKey:mappedPath] == nil)
-				{
-					[mappedPathDictionary setObject:@(machAddress) forKey:mappedPath];
-				}
-				if ([mappedPathDictionary objectForKey:lastPathComponent] == nil)
-				{
-					[mappedPathDictionary setObject:@(machAddress) forKey:lastPathComponent];
-				}
-				if ([[mappedPath stringByDeletingLastPathComponent] length] > 0)
-				{
-					NSString *forwardSlashedPrependedPath = [@"/" stringByAppendingString:lastPathComponent];
-					if ([mappedPathDictionary objectForKey:forwardSlashedPrependedPath] == nil)
-					{
-						[mappedPathDictionary setObject:@(machAddress) forKey:forwardSlashedPrependedPath];
-					}
-				}
-				
-				// Region address -> mach binary address
-				[mappedBinaryDictionary setObject:@(machAddress) forKey:@(machAddress)];
-			}
-		}
+		[self setUpMachBinaryData];
 	}
 	return success;
 }

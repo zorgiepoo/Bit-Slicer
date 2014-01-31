@@ -36,6 +36,7 @@
 #import "NSStringAdditions.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 #import "ZGRegion.h"
 #import "ZGProcess.h"
@@ -72,7 +73,7 @@
 		ZGMemoryAddress foundAddress = 0x0;
 		if (args.count == 0)
 		{
-			foundAddress = process.baseAddress;
+			foundAddress = process.mainMachBinary.headerAddress;
 		}
 		else if (args.count == 1)
 		{
@@ -90,11 +91,12 @@
 				}
 				else
 				{
-					foundAddress = ZGFindExecutableImageWithCache(process.processTask, process.pointerSize, process.dylinkerBinary, expression.variable, process.cacheDictionary, error);
+					foundAddress = [[ZGMachBinary machBinaryWithPartialImageName:expression.variable inProcess:process error:error] headerAddress];
+					
 					if (error != NULL && *error != nil)
 					{
 						NSError *imageError = *error;
-						[failedImages addObject:[imageError.userInfo objectForKey:ZGImageName]];
+						[failedImages addObject:[imageError.userInfo objectForKey:ZGFailedImageName]];
 					}
 				}
 			}

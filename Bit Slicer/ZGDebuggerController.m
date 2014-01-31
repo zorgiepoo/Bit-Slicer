@@ -52,6 +52,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 #import "CoreSymbolication.h"
 #import "ZGTableView.h"
@@ -393,16 +394,11 @@ enum ZGStepExecution
 
 - (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
-	return [self findInstructionBeforeAddress:address processTask:process.processTask pointerSize:process.pointerSize dylinkerBinary:process.dylinkerBinary cacheDictionary:process.cacheDictionary];
-}
-
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize dylinkerBinary:(ZGMachBinary *)dylinkerBinary cacheDictionary:(NSMutableDictionary *)cacheDictionary
-{
 	ZGInstruction *instruction = nil;
 	
 	ZGMemoryBasicInfo regionInfo;
 	ZGRegion *targetRegion = [[ZGRegion alloc] initWithAddress:address size:1];
-	if (!ZGRegionInfo(processTask, &targetRegion->_address, &targetRegion->_size, &regionInfo))
+	if (!ZGRegionInfo(process.processTask, &targetRegion->_address, &targetRegion->_size, &regionInfo))
 	{
 		targetRegion = nil;
 	}
@@ -420,11 +416,12 @@ enum ZGStepExecution
 			startAddress = targetRegion.address;
 		}
 		
-		ZGMemoryAddress firstInstructionAddress = ZGTextRange(processTask, pointerSize, dylinkerBinary, address, NULL, NULL, NULL, cacheDictionary).location;
+		ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:address fromMachBinaries:[ZGMachBinary machBinariesInProcess:process]];
+		ZGMemoryAddress textAddress = [[machBinary machBinaryInfoInProcess:process] textAddress];
 		
-		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
+		if (textAddress != 0 && startAddress < textAddress)
 		{
-			startAddress = firstInstructionAddress;
+			startAddress = textAddress;
 			if (address < startAddress)
 			{
 				return instruction;
@@ -439,7 +436,7 @@ enum ZGStepExecution
 			readSize = targetRegion.address + targetRegion.size - startAddress;
 		}
 		
-		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:processTask pointerSize:pointerSize address:startAddress size:readSize];
+		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask pointerSize:process.pointerSize address:startAddress size:readSize];
 		if (disassemblerObject != nil)
 		{
 			__block ZGMemoryAddress memoryOffset = 0;
@@ -465,7 +462,7 @@ enum ZGStepExecution
 			 address:startAddress + memoryOffset
 			 type:ZGByteArray
 			 qualifier:0
-			 pointerSize:pointerSize
+			 pointerSize:process.pointerSize
 			 description:nil
 			 enabled:NO];
 			
@@ -1030,7 +1027,8 @@ enum ZGStepExecution
 		if (self.mappedFilePath != nil && sender == nil)
 		{
 			NSError *error = nil;
-			ZGMemoryAddress guessAddress = ZGFindExecutableImageWithCache(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, self.mappedFilePath, self.currentProcess.cacheDictionary, &error) + self.offsetFromBase;
+			ZGMemoryAddress guessAddress = [[ZGMachBinary machBinaryWithPartialImageName:self.mappedFilePath inProcess:self.currentProcess error:&error] headerAddress];
+			
 			if (error == nil)
 			{
 				calculatedMemoryAddress = guessAddress;
@@ -1055,9 +1053,8 @@ enum ZGStepExecution
 		
 		BOOL shouldUseFirstInstruction = NO;
 		
-		NSString *firstMappedFilePath = @"";
-		ZGMemoryAddress firstBaseAddress = 0;
-		NSRange firstTextRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, self.currentProcess.baseAddress, &firstMappedFilePath, &firstBaseAddress, NULL, self.currentProcess.cacheDictionary);
+		ZGMachBinaryInfo *firstMachBinaryInfo = [self.currentProcess.mainMachBinary machBinaryInfoInProcess:self.currentProcess];
+		NSRange firstTextRange = NSMakeRange(firstMachBinaryInfo.textAddress, firstMachBinaryInfo.textSize);
 		
 		if (calculatedMemoryAddress == 0)
 		{
@@ -1112,7 +1109,10 @@ enum ZGStepExecution
 		
 		if (!shouldUseFirstInstruction)
 		{
-			NSRange textRange = ZGTextRange(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, calculatedMemoryAddress, &mappedFilePath, &baseAddress, NULL, self.currentProcess.cacheDictionary);
+			NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:calculatedMemoryAddress fromMachBinaries:machBinaries];
+			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
+			NSRange textRange = NSMakeRange(machBinaryInfo.textAddress, machBinaryInfo.textSize);
 			
 			firstInstructionAddress = textRange.location;
 			maxInstructionsSize = textRange.length;
@@ -1135,8 +1135,8 @@ enum ZGStepExecution
 		{
 			firstInstructionAddress = calculatedMemoryAddress;
 			maxInstructionsSize = firstTextRange.length;
-			mappedFilePath = firstMappedFilePath;
-			baseAddress = firstBaseAddress;
+			mappedFilePath = [self.currentProcess.mainMachBinary filePathInProcess:self.currentProcess];
+			baseAddress = self.currentProcess.mainMachBinary.headerAddress;
 		}
 		
 		self.mappedFilePath = mappedFilePath;
@@ -2025,8 +2025,7 @@ END_DEBUGGER_CHANGE:
 	injectCode:(NSData *)codeData
 	intoAddress:(ZGMemoryAddress)allocatedAddress
 	hookingIntoOriginalInstructions:(NSArray *)hookedInstructions
-	processTask:(ZGMemoryMap)processTask
-	pointerSize:(ZGMemorySize)pointerSize
+	process:(ZGProcess *)process
 	recordUndo:(BOOL)shouldRecordUndo
 	error:(NSError * __autoreleasing *)error
 {
@@ -2036,12 +2035,12 @@ END_DEBUGGER_CHANGE:
 	{
 		NSMutableData *newInstructionsData = [NSMutableData dataWithData:codeData];
 		
-		ZGSuspendTask(processTask);
+		ZGSuspendTask(process.processTask);
 		
 		void *nopBuffer = malloc(codeData.length);
 		memset(nopBuffer, NOP_VALUE, codeData.length);
 		
-		if (!ZGWriteBytesIgnoringProtection(processTask, allocatedAddress, nopBuffer, codeData.length))
+		if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, codeData.length))
 		{
 			NSLog(@"Error: Failed to write nop buffer..");
 			if (error != nil)
@@ -2051,7 +2050,7 @@ END_DEBUGGER_CHANGE:
 		}
 		else
 		{
-			if (!ZGProtect(processTask, allocatedAddress, codeData.length, VM_PROT_READ | VM_PROT_EXECUTE))
+			if (!ZGProtect(process.processTask, allocatedAddress, codeData.length, VM_PROT_READ | VM_PROT_EXECUTE))
 			{
 				NSLog(@"Error: Failed to protect memory..");
 				if (error != nil)
@@ -2063,7 +2062,7 @@ END_DEBUGGER_CHANGE:
 			{
 				[self.undoManager setActionName:@"Inject code"];
 				
-				[self nopInstructions:hookedInstructions processTask:processTask is64Bit:pointerSize == sizeof(int64_t) recordUndo:shouldRecordUndo actionName:nil];
+				[self nopInstructions:hookedInstructions processTask:process.processTask is64Bit:process.pointerSize == sizeof(int64_t) recordUndo:shouldRecordUndo actionName:nil];
 				
 				ZGMemorySize hookedInstructionsLength = 0;
 				for (ZGInstruction *instruction in hookedInstructions)
@@ -2072,20 +2071,20 @@ END_DEBUGGER_CHANGE:
 				}
 				ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
 				
-				NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:pointerSize*8 error:error];
+				NSData *jumpToIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", allocatedAddress] atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:process.pointerSize*8 error:error];
 				
 				if (jumpToIslandData.length > 0)
 				{
-					ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:pointerSize];
+					ZGVariable *variable = [[ZGVariable alloc] initWithValue:(void *)jumpToIslandData.bytes size:jumpToIslandData.length address:firstInstruction.variable.address type:ZGByteArray qualifier:0 pointerSize:process.pointerSize];
 					
-					[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] processTask:processTask is64Bit:(pointerSize == sizeof(int64_t)) recordUndo:shouldRecordUndo actionName:nil];
+					[self replaceInstructions:@[firstInstruction] fromOldStringValues:@[firstInstruction.variable.stringValue] toNewStringValues:@[variable.stringValue] processTask:process.processTask is64Bit:(process.pointerSize == sizeof(int64_t)) recordUndo:shouldRecordUndo actionName:nil];
 					
-					NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:pointerSize*8 error:error];
+					NSData *jumpFromIslandData = [self assembleInstructionText:[NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] atInstructionPointer:allocatedAddress + newInstructionsData.length usingArchitectureBits:process.pointerSize*8 error:error];
 					if (jumpFromIslandData.length > 0)
 					{
 						[newInstructionsData appendData:jumpFromIslandData];
 						
-						ZGWriteBytesIgnoringProtection(processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
+						ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
 						
 						success = YES;
 					}
@@ -2095,23 +2094,23 @@ END_DEBUGGER_CHANGE:
 		
 		free(nopBuffer);
 		
-		ZGResumeTask(processTask);
+		ZGResumeTask(process.processTask);
 	}
 	
 	return success;
 }
 
-- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress processTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize dylinkerBinary:(ZGMachBinary *)dylinkerBinary
+- (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process
 {
 	NSMutableArray *instructions = nil;
 	
-	if (pointerSize == sizeof(ZG32BitMemoryAddress) || !((destinationAddress > address && destinationAddress - address > INT_MAX) || (address > destinationAddress && address - destinationAddress > INT_MAX)))
+	if (process.pointerSize == sizeof(ZG32BitMemoryAddress) || !((destinationAddress > address && destinationAddress - address > INT_MAX) || (address > destinationAddress && address - destinationAddress > INT_MAX)))
 	{
 		instructions = [[NSMutableArray alloc] init];
 		int consumedLength = JUMP_REL32_INSTRUCTION_LENGTH;
 		while (consumedLength > 0)
 		{
-			ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 processTask:processTask pointerSize:pointerSize dylinkerBinary:dylinkerBinary cacheDictionary:nil];
+			ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inProcess:process];
 			if (newInstruction == nil)
 			{
 				instructions = nil;
@@ -2143,7 +2142,7 @@ END_DEBUGGER_CHANGE:
 		free(nopBuffer);
 		
 		ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
-		NSArray *instructions = [self instructionsBeforeHookingIntoAddress:firstInstruction.variable.address injectingIntoDestination:allocatedAddress processTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize dylinkerBinary:self.currentProcess.dylinkerBinary];
+		NSArray *instructions = [self instructionsBeforeHookingIntoAddress:firstInstruction.variable.address injectingIntoDestination:allocatedAddress inProcess:self.currentProcess];
 		
 		if (instructions != nil)
 		{
@@ -2181,7 +2180,7 @@ END_DEBUGGER_CHANGE:
 					NSError *error = nil;
 					NSData *injectedCode = [self assembleInstructionText:injectedCodeString atInstructionPointer:allocatedAddress usingArchitectureBits:self.currentProcess.pointerSize*8 error:&error];
 					
-					if (injectedCode.length == 0 || error != nil || ![self injectCode:injectedCode intoAddress:allocatedAddress hookingIntoOriginalInstructions:instructions processTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize recordUndo:YES error:&error])
+					if (injectedCode.length == 0 || error != nil || ![self injectCode:injectedCode intoAddress:allocatedAddress hookingIntoOriginalInstructions:instructions process:self.currentProcess recordUndo:YES error:&error])
 					{
 						NSLog(@"Error while injecting code");
 						NSLog(@"%@", error);

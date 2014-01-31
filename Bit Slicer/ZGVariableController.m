@@ -893,27 +893,18 @@
 {
 	NSString *staticVariableDescription = nil;
 	
-	NSDictionary *cacheDictionary = process.cacheDictionary;
-	ZGMemoryMap processTask = process.processTask;
-	ZGMemorySize pointerSize = process.pointerSize;
-	
-	ZGMachBinary *machBinary = ZGNearestMachBinary(machBinaries, variable.address);
-	ZGMemoryAddress machHeaderAddress = machBinary.headerAddress;
+	ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variable.address fromMachBinaries:machBinaries];
 	
 	NSString *machFilePath = [machFilePathDictionary objectForKey:@(machBinary.filePathAddress)];
 	
 	if (machFilePath != nil)
 	{
-		ZGMemorySize slide = 0;
-		ZGMemorySize textSize = 0;
-		ZGMemorySize dataSize = 0;
-		ZGMemorySize linkEditSize = 0;
+		ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:process];
+		NSString *sectionName = [machBinary sectionNameAtAddress:variable.address fromMachBinaryInfo:machBinaryInfo];
 		
-		ZGGetMachBinaryInfo(processTask, pointerSize, machHeaderAddress, machFilePath, NULL, &slide, &textSize, &dataSize, &linkEditSize, cacheDictionary);
-		
-		if (variable.address >= machHeaderAddress && variable.address + variable.size <= machHeaderAddress + textSize + dataSize + linkEditSize)
+		if (sectionName != nil)
 		{
-			if (slide > 0)
+			if (machBinaryInfo.slide > 0)
 			{
 				NSString *partialPath = [machFilePath lastPathComponent];
 				NSString *pathToUse = nil;
@@ -941,33 +932,9 @@
 					baseArgument = [NSString stringWithFormat:@"\"%@\"", pathToUse];
 				}
 				
-				variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variable.address - machHeaderAddress];
+				variable.addressFormula = [NSString stringWithFormat:ZGBaseAddressFunction@"(%@) + 0x%llX", baseArgument, variable.address - machBinary.headerAddress];
 				variable.usesDynamicAddress = YES;
 				variable.finishedEvaluatingDynamicAddress = YES;
-				
-				// Cache the path
-				if (pathToUse != nil)
-				{
-					NSMutableDictionary *mappedPathDictionary = [cacheDictionary objectForKey:ZGMappedPathDictionary];
-					if ([mappedPathDictionary objectForKey:pathToUse] == nil)
-					{
-						[mappedPathDictionary setObject:@(machHeaderAddress) forKey:pathToUse];
-					}
-				}
-			}
-			
-			NSString *sectionName = nil;
-			if (variable.address + variable.size <= machHeaderAddress + textSize)
-			{
-				sectionName = @"__TEXT";
-			}
-			else if (variable.address + variable.size <= machHeaderAddress + textSize + dataSize)
-			{
-				sectionName = @"__DATA";
-			}
-			else
-			{
-				sectionName = @"__LINKEDIT";
 			}
 			
 			staticVariableDescription = [NSString stringWithFormat:@"static address (%@)", sectionName];
@@ -980,12 +947,12 @@
 + (void)annotateVariables:(NSArray *)variables process:(ZGProcess *)process
 {
 	ZGMemoryMap processTask = process.processTask;
-	NSArray *machBinaries = ZGMachBinaries(processTask, process.pointerSize, process.dylinkerBinary);
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:process];
 	NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
 	
 	for (ZGMachBinary *machBinary in machBinaries)
 	{
-		NSString *filePath = ZGFilePathAtAddress(processTask, machBinary.filePathAddress);
+		NSString *filePath = [machBinary filePathInProcess:process];
 		if (filePath != nil)
 		{
 			[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];

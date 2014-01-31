@@ -1,7 +1,7 @@
 /*
  * Created by Mayur Pawashe on 1/30/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,23 +36,16 @@
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
 
-extern NSString * const ZGMachFileDataDictionary;
-extern NSString * const ZGImageName;
-extern NSString * const ZGMappedPathDictionary;
-extern NSString * const ZGMappedBinaryDictionary;
-
 @class ZGMachBinary;
 
-ZGMemoryAddress ZGFindExecutableImageWithCache(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, NSString *partialImageName, NSMutableDictionary *cacheDictionary, NSError **error);
+@interface ZGMachBinaryInfo : NSObject
 
-ZGMachBinary *ZGDylinkerBinary(ZGMemoryMap processTask);
-NSArray *ZGMachBinaries(ZGMemoryMap processTask, ZGMemoryAddress pointerSize, ZGMachBinary *dylinkerBinary);
-NSString *ZGFilePathAtAddress(ZGMemoryMap processTask, ZGMemoryAddress filePathAddress);
+- (instancetype)initWithTextAddress:(ZGMemoryAddress)textAddress textSize:(ZGMemorySize)textSize dataSize:(ZGMemorySize)dataSize linkEditSize:(ZGMemorySize)linkEditSize slide:(ZGMemoryAddress)slide;
 
-ZGMachBinary *ZGNearestMachBinary(NSArray *machBinaries, ZGMemoryAddress targetAddress);
+@property (nonatomic, readonly) ZGMemoryAddress textAddress;
+@property (nonatomic, readonly) ZGMemorySize textSize;
+@property (nonatomic, readonly) ZGMemorySize dataSize;
+@property (nonatomic, readonly) ZGMemorySize linkEditSize;
+@property (nonatomic, readonly) ZGMemoryAddress slide;
 
-void ZGGetMachBinaryInfo(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMemoryAddress machHeaderAddress, NSString *mappedFilePath, ZGMemoryAddress *firstInstructionAddress, ZGMemoryAddress *slide, ZGMemorySize *textSize, ZGMemorySize *dataSize, ZGMemorySize *linkEditSize, NSDictionary *cacheDictionary);
-
-NSRange ZGTextRange(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress targetAddress, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary);
-
-NSString *ZGSectionName(ZGMemoryMap processTask, ZGMemorySize pointerSize, ZGMachBinary *dylinkerBinary, ZGMemoryAddress address, NSString **mappedFilePath, ZGMemoryAddress *machHeaderAddress, ZGMemoryAddress *slide, NSMutableDictionary *cacheDictionary);
+@end

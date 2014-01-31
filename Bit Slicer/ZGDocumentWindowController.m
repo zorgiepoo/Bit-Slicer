@@ -56,6 +56,7 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGDocument.h"
 #import "ZGVirtualMemory.h"
+#import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
@@ -1309,6 +1310,7 @@
 		
 		menuItem.title = [NSString stringWithFormat:@"Relativize Variable%@", selectedVariables.count != 1 ? @"s" : @""];
 		
+		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 		for (ZGVariable *variable in selectedVariables)
 		{
 			if (variable.type == ZGScript)
@@ -1316,9 +1318,19 @@
 				return NO;
 			}
 			
-			ZGMemoryAddress machBinaryAddress = 0;
-			ZGMemoryAddress slide = 0;
-			if (variable.usesDynamicAddress || ZGSectionName(self.currentProcess.processTask, self.currentProcess.pointerSize, self.currentProcess.dylinkerBinary, variable.address, NULL, &machBinaryAddress, &slide, self.currentProcess.cacheDictionary) == nil || (slide == 0 && machBinaryAddress == self.currentProcess.baseAddress))
+			if (variable.usesDynamicAddress)
+			{
+				return NO;
+			}
+			
+			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variable.address fromMachBinaries:machBinaries];
+			if (machBinary == nil)
+			{
+				return NO;
+			}
+			
+			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
+			if (machBinaryInfo.slide == 0 && machBinary.headerAddress == self.currentProcess.mainMachBinary.headerAddress)
 			{
 				return NO;
 			}

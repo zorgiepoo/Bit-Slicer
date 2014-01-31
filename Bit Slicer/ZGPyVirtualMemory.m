@@ -52,11 +52,9 @@ typedef struct
 	int32_t processIdentifier;
 	char is64Bit;
 	ZGMemoryAddress baseAddress;
-	ZGMemoryAddress dylinkerHeaderAddress;
-	ZGMemoryAddress dylinkerFilePathAddress;
 	__unsafe_unretained NSMutableArray *objectsPool;
 	__unsafe_unretained NSMutableDictionary *allocationSizeTable;
-	__unsafe_unretained NSMutableDictionary *processCacheDictionary;
+	__unsafe_unretained ZGProcess *process;
 } VirtualMemory;
 
 static PyMemberDef VirtualMemory_members[] =
@@ -232,18 +230,15 @@ static PyTypeObject VirtualMemoryType =
 		vmObject->processTask = process.processTask;
 		vmObject->processIdentifier = process.processID;
 		vmObject->is64Bit = process.is64Bit;
-		vmObject->baseAddress = process.baseAddress;
-		vmObject->dylinkerHeaderAddress = process.dylinkerBinary.headerAddress;
-		vmObject->dylinkerFilePathAddress = process.dylinkerBinary.filePathAddress;
+		vmObject->baseAddress = process.mainMachBinary.headerAddress;
 		
 		NSMutableDictionary *allocationSizeTable = [[NSMutableDictionary alloc] init];
 		vmObject->allocationSizeTable = allocationSizeTable;
-		NSMutableDictionary *processCacheDictionary = [process.cacheDictionary mutableCopy];
-		vmObject->processCacheDictionary = processCacheDictionary;
+		vmObject->process = process;
 		@synchronized(objectsPool)
 		{
 			[objectsPool addObject:allocationSizeTable];
-			[objectsPool addObject:processCacheDictionary];
+			[objectsPool addObject:process];
 		}
 		vmObject->objectsPool = objectsPool;
 	}
@@ -646,7 +641,7 @@ static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
 		
 		if (partialPath != NULL)
 		{
-			imageAddress = ZGFindExecutableImageWithCache(self->processTask, self->is64Bit ? sizeof(ZGMemoryAddress) : sizeof(ZG32BitMemoryAddress), [[ZGMachBinary alloc] initWithHeaderAddress:self->dylinkerHeaderAddress filePathAddress:self->dylinkerFilePathAddress], [NSString stringWithUTF8String:partialPath], self->processCacheDictionary, &error);
+			imageAddress = [[ZGMachBinary machBinaryWithPartialImageName:[NSString stringWithUTF8String:partialPath] inProcess:self->process error:&error] headerAddress];
 		}
 		
 		if (error == nil)

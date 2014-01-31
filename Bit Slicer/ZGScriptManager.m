@@ -562,9 +562,10 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				
 				Py_XDECREF(scriptClassType);
 				
-				script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:self.windowController.currentProcess objectsPool:self.objectsPool];
+				ZGProcess *process = [[ZGProcess alloc] initWithProcess:self.windowController.currentProcess];
 				
-				script.debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:self.windowController.currentProcess scriptManager:self];
+				script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:process objectsPool:self.objectsPool];
+				script.debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:process scriptManager:self];
 				
 				if (script.virtualMemoryInstance == nil || script.debuggerInstance == nil)
 				{

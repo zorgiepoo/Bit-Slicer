@@ -45,13 +45,13 @@
 
 @implementation ZGBreakPoint
 
-- (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type  delegate:(id <ZGBreakPointDelegate>)delegate
+- (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type delegate:(id <ZGBreakPointDelegate>)delegate
 {
 	self = [super init];
 	if (self != nil)
 	{
 		self.cacheDictionary = [NSMutableDictionary dictionary];
-		self.process = process;
+		self.process = [[ZGProcess alloc] initWithProcess:process];
 		self.type = type;
 		self.delegate = delegate;
 		self.task = process.processTask;
