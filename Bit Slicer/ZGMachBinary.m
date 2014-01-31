@@ -176,7 +176,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	return foundMachBinary;
 }
 
-- (instancetype)initWithHeaderAddress:(ZGMemoryAddress)headerAddress filePathAddress:(ZGMemoryAddress)filePathAddress
+- (id)initWithHeaderAddress:(ZGMemoryAddress)headerAddress filePathAddress:(ZGMemoryAddress)filePathAddress
 {
 	self = [super init];
 	if (self != nil)

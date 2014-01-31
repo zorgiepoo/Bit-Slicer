@@ -52,7 +52,7 @@
 @property (copy, nonatomic) NSString *lastSelectedProcessInternalName;
 @property (readonly, nonatomic) BOOL isTerminating;
 
-+ (id)sharedController;
++ (instancetype)sharedController;
 
 + (void)registerPauseAndUnpauseHotKey;
 

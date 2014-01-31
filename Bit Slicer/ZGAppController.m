@@ -65,7 +65,7 @@
 
 #pragma mark Singleton & Accessors
 
-+ (id)sharedController
++ (instancetype)sharedController
 {
 	return [NSApp delegate];
 }

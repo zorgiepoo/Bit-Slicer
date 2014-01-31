@@ -39,7 +39,7 @@
 // Observable for new and old changes via KVO
 @property (nonatomic, readonly) NSArray *runningProcesses;
 
-+ (id)sharedProcessList;
++ (instancetype)sharedProcessList;
 
 // Forces to fetch all process information
 - (void)retrieveList;

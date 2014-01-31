@@ -49,7 +49,7 @@ extern NSString * const ZGFailedImageName;
 + (instancetype)machBinaryNearestToAddress:(ZGMemoryAddress)address fromMachBinaries:(NSArray *)machBinaries;
 + (instancetype)machBinaryWithPartialImageName:(NSString *)partialImageName inProcess:(ZGProcess *)process error:(NSError * __autoreleasing *)error;
 
-- (instancetype)initWithHeaderAddress:(ZGMemoryAddress)headerAddress filePathAddress:(ZGMemoryAddress)filePathAddress;
+- (id)initWithHeaderAddress:(ZGMemoryAddress)headerAddress filePathAddress:(ZGMemoryAddress)filePathAddress;
 
 @property (nonatomic, readonly) ZGMemoryAddress headerAddress;
 @property (nonatomic, readonly) ZGMemoryAddress filePathAddress;

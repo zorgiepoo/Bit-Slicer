@@ -92,7 +92,7 @@
 
 #pragma mark Birth
 
-+ (id)sharedProcessList
++ (instancetype)sharedProcessList
 {
 	static dispatch_once_t predicate;
 	static id sharedProcessList = nil;
