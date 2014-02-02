@@ -305,58 +305,6 @@ CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, N
 	return resultSymbol;
 }
 
-NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress)
-{
-	NSMutableArray *dataArray = [[NSMutableArray alloc] init];
-	ZGProtectionMode protectionMode = searchData.protectionMode;
-	
-	NSArray *regions = [ZGRegionsForProcessTask(processTask) zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-		return region.protection & VM_PROT_READ &&
-			(protectionMode == ZGProtectionAll || (protectionMode == ZGProtectionWrite && region.protection & VM_PROT_WRITE) || (protectionMode == ZGProtectionExecute && region.protection & VM_PROT_EXECUTE));
-	}];
-	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		searchProgress.initiatedSearch = YES;
-		searchProgress.progressType = ZGSearchProgressMemoryStoring;
-		searchProgress.maxProgress = regions.count;
-	});
-	
-	for (ZGRegion *region in regions)
-	{
-		void *bytes = NULL;
-		ZGMemorySize size = region.size;
-		
-		if (ZGReadBytes(processTask, region.address, &bytes, &size))
-		{
-			region.bytes = bytes;
-			region.size = size;
-			
-			[dataArray addObject:region];
-		}
-		
-		if (searchProgress.shouldCancelSearch)
-		{
-			ZGFreeData(dataArray);
-			dataArray = nil;
-			break;
-		}
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			searchProgress.progress++;
-		});
-	}
-	
-	return dataArray;
-}
-
-void ZGFreeData(NSArray *dataArray)
-{
-	for (ZGRegion *memoryRegion in dataArray)
-	{
-		ZGFreeBytes(memoryRegion.processTask, memoryRegion.bytes, memoryRegion.size);
-	}
-}
-
 // helper function for ZGSaveAllDataToDirectory
 static void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
 {

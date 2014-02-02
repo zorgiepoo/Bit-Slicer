@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/21/12.
+ * Created by Mayur Pawashe on 2/2/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,74 +32,61 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGSearchData.h"
+#import "ZGStoredData.h"
+#import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
+#import "ZGSearchData.h"
+#import "ZGRegion.h"
+#import "ZGSearchProgress.h"
+#import "ZGUtilities.h"
 
-@implementation ZGSearchData
+@interface ZGStoredData ()
 
-- (id)init
+@property (nonatomic) ZGMemoryMap processTask;
+@property (nonatomic) NSArray *regions;
+
+@end
+
+@implementation ZGStoredData
+
++ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask
 {
-	return [self initWithSearchValue:NULL dataSize:0 dataAlignment:1 pointerSize:0];
+	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	
+	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
+	{
+		void *bytes = NULL;
+		ZGMemorySize size = region.size;
+		
+		if (ZGReadBytes(processTask, region.address, &bytes, &size))
+		{
+			region.bytes = bytes;
+			region.size = size;
+			
+			[regions addObject:region];
+		}
+	}
+	
+	return [[self alloc] initWithProcessTask:processTask regions:regions];
 }
 
-- (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize
+- (id)initWithProcessTask:(ZGMemoryMap)processTask regions:(NSArray *)regions
 {
 	self = [super init];
 	if (self != nil)
 	{
-		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &_collator);
-		self.endAddress = MAX_MEMORY_ADDRESS;
-		self.protectionMode = ZGProtectionAll;
-		self.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
-		
-		self.searchValue = searchValue;
-		self.dataSize = dataSize;
-		self.dataAlignment = dataAlignment;
-		self.pointerSize = pointerSize;
+		self.processTask = processTask;
+		self.regions = regions;
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	UCDisposeCollator(&_collator);
-	
-	self.rangeValue = NULL;
-	self.swappedValue = NULL;
-	self.byteArrayFlags = NULL;
-	self.searchValue = NULL;
-	self.savedData = nil;
-	self.additiveConstant = NULL;
-}
-
-- (void)setSearchValue:(void *)searchValue
-{
-	free(_searchValue);
-	_searchValue = searchValue;
-}
-
-- (void)setSwappedValue:(void *)swappedValue
-{
-	free(_swappedValue);
-	_swappedValue = swappedValue;
-}
-
-- (void)setRangeValue:(void *)newRangeValue
-{
-	free(_rangeValue);
-	_rangeValue = newRangeValue;
-}
-
-- (void)setByteArrayFlags:(unsigned char *)newByteArrayFlags
-{
-	free(_byteArrayFlags);
-	_byteArrayFlags = newByteArrayFlags;
-}
-
-- (void)setAdditiveConstant:(void *)additiveConstant
-{
-	free(_additiveConstant);
-	_additiveConstant = additiveConstant;
+	for (ZGRegion *region in self.regions)
+	{
+		ZGFreeBytes(self.processTask, region.bytes, region.size);
+	}
 }
 
 @end

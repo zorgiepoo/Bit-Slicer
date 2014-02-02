@@ -20,6 +20,7 @@
 		770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC0518542BFF00C176B7 /* ZGSearchToken.m */; };
 		771A931D18791A8D0098511D /* ZGTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 771A931C18791A8D0098511D /* ZGTableView.m */; };
 		77282120189B854D0044E4BC /* ZGFunctionTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7728211F189B854D0044E4BC /* ZGFunctionTypes.m */; };
+		77282123189E769B0044E4BC /* ZGStoredData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282122189E769B0044E4BC /* ZGStoredData.m */; };
 		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
 		7730999E18660A29008B71DA /* ZGDocumentOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */; };
 		773972B117D2E61200B958EE /* _DDFunctionContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728517D2E61200B958EE /* _DDFunctionContainer.m */; };
@@ -183,6 +184,8 @@
 		771A931C18791A8D0098511D /* ZGTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGTableView.m; path = "Bit Slicer/ZGTableView.m"; sourceTree = "<group>"; };
 		7728211E189B854D0044E4BC /* ZGFunctionTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGFunctionTypes.h; path = "Bit Slicer/ZGFunctionTypes.h"; sourceTree = "<group>"; };
 		7728211F189B854D0044E4BC /* ZGFunctionTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGFunctionTypes.m; path = "Bit Slicer/ZGFunctionTypes.m"; sourceTree = "<group>"; };
+		77282121189E769B0044E4BC /* ZGStoredData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGStoredData.h; path = "Bit Slicer/ZGStoredData.h"; sourceTree = "<group>"; };
+		77282122189E769B0044E4BC /* ZGStoredData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGStoredData.m; path = "Bit Slicer/ZGStoredData.m"; sourceTree = "<group>"; };
 		772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchProgressDelegate.h; path = "Bit Slicer/ZGSearchProgressDelegate.h"; sourceTree = "<group>"; };
 		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; };
 		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; };
@@ -989,6 +992,8 @@
 			children = (
 				77F1160D17D2EED6009E002A /* ZGSearchData.h */,
 				77F1160E17D2EED6009E002A /* ZGSearchData.m */,
+				77282121189E769B0044E4BC /* ZGStoredData.h */,
+				77282122189E769B0044E4BC /* ZGStoredData.m */,
 				772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */,
 				77F1161017D2EEE1009E002A /* ZGSearchProgress.h */,
 				77F1161117D2EEE1009E002A /* ZGSearchProgress.m */,
@@ -1203,6 +1208,7 @@
 				77FE406118937EC800BCC339 /* ZGRegisterUtilities.c in Sources */,
 				77F115CD17D2ED64009E002A /* ZGMemoryViewerController.m in Sources */,
 				77F115D017D2ED74009E002A /* ZGVerticalScrollerRepresenter.m in Sources */,
+				77282123189E769B0044E4BC /* ZGStoredData.m in Sources */,
 				77F115D317D2ED82009E002A /* ZGStatusBarRepresenter.m in Sources */,
 				770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */,
 				77F115D617D2ED8E009E002A /* ZGLineCountingRepresenter.m in Sources */,

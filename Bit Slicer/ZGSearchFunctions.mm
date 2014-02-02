@@ -40,6 +40,7 @@
 #import "ZGVirtualMemoryHelpers.h"
 #import "NSArrayAdditions.h"
 #import "ZGSearchResults.h"
+#import "ZGStoredData.h"
 #import <stdint.h>
 
 #pragma mark Byte Order Swapping
@@ -201,7 +202,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	}
 	else
 	{
-		regions = searchData.savedData;
+		regions = searchData.savedData.regions;
 	}
 	
 	if (delegate != nil)
@@ -1529,7 +1530,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 		}
 		else
 		{
-			NSArray *savedData = searchData.savedData;
+			NSArray *savedData = searchData.savedData.regions;
 			
 			NSMutableDictionary *pageToSavedRegionTable = nil;
 			

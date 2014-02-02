@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 3/9/13.
+ * Created by Mayur Pawashe on 2/2/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,19 +35,10 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
-@interface ZGRegion : NSObject
-{
-@public
-	ZGMemoryAddress _address;
-	ZGMemorySize _size;
-	void *_bytes;
-}
+@interface ZGStoredData : NSObject
 
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;
++ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask;
 
-@property (nonatomic) ZGMemoryAddress address;
-@property (nonatomic) ZGMemorySize size;
-@property (nonatomic) ZGMemoryProtection protection;
-@property (nonatomic) void *bytes;
+@property (nonatomic, readonly) NSArray *regions;
 
 @end

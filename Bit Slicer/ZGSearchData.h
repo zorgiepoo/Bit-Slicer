@@ -37,6 +37,8 @@
 
 #define DEFAULT_FLOATING_POINT_EPSILON 0.1
 
+@class ZGStoredData;
+
 @interface ZGSearchData : NSObject
 {
 @public
@@ -76,7 +78,7 @@ typedef enum
 @property (nonatomic) BOOL bytesSwapped;
 
 @property (nonatomic) void *rangeValue;
-@property (nonatomic) NSArray *savedData;
+@property (nonatomic) ZGStoredData *savedData;
 @property (nonatomic) BOOL shouldCompareStoredValues;
 @property (nonatomic) double epsilon;
 @property (nonatomic) BOOL shouldIgnoreStringCase;

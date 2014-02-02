@@ -58,9 +58,6 @@ NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddre
 
 CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName, BOOL requiresExactMatch);
 
-void ZGFreeData(NSArray *dataArray);
-NSArray *ZGGetAllData(ZGMemoryMap processTask, ZGSearchData *searchData, ZGSearchProgress *searchProgress);
-
 BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSearchProgress *searchProgress);
 
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize, ZGMemorySize maxStringSizeLimit);
