@@ -200,7 +200,7 @@ static PyTypeObject DebuggerType =
 		}
 		
 		self.scriptManager = scriptManager;
-		self.process = process;
+		self.process = [[ZGProcess alloc] initWithProcess:process];
 		
 		DebuggerClass *debuggerObject = (DebuggerClass *)self.object;
 		debuggerObject->objcSelf = self;

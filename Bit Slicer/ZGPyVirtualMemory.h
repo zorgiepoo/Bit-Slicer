@@ -37,12 +37,13 @@
 #import "ZGMemoryTypes.h"
 
 @class ZGProcess;
+@class ZGSearchProgress;
 
 @interface ZGPyVirtualMemory : NSObject
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
-- (id)initWithProcess:(ZGProcess *)process objectsPool:(NSMutableArray *)objectsPool;
+- (id)initWithProcess:(ZGProcess *)process;
 
 @property (nonatomic, assign) PyObject *vmObject;
 

@@ -206,10 +206,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	dispatch_sync(gPythonQueue, ^{
 		PyObject *mainModule = PyImport_AddModule("__main__");
 		
-		NSMutableArray *objectsPool = [NSMutableArray array];
-		CFRetain((__bridge CFTypeRef)(objectsPool));
-		
-		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:process objectsPool:objectsPool];
+		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:process];
 		CFRetain((__bridge CFTypeRef)(virtualMemoryInstance));
 		
 		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.vmObject);
@@ -258,7 +255,6 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		Py_XDECREF(localDictionary);
 		
 		CFRelease((__bridge CFTypeRef)(virtualMemoryInstance));
-		CFRelease((__bridge CFTypeRef)(objectsPool));
 	});
 	return result;
 }
@@ -272,7 +268,6 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		self.fileWatchingQueue = [[VDKQueue alloc] init];
 		self.fileWatchingQueue.delegate = self;
 		self.windowController = windowController;
-		self.objectsPool = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
@@ -541,132 +536,136 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	if (!self.windowController.currentProcess.valid)
 	{
 		[self disableVariable:variable];
+		return;
 	}
-	else
-	{
-		dispatch_async(gPythonQueue, ^{
-			script.module = PyImport_ImportModule([script.moduleName UTF8String]);
-			script.module = PyImport_ReloadModule(script.module);
+	
+	dispatch_async(gPythonQueue, ^{
+		script.module = PyImport_ImportModule([script.moduleName UTF8String]);
+		script.module = PyImport_ReloadModule(script.module);
+		
+		if (script.module == NULL)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self disableVariable:variable];
+			});
+			[self logPythonError];
 			
-			if (script.module == NULL)
+			return;
+		}
+		
+		PyTypeObject *scriptClassType = (PyTypeObject *)PyObject_GetAttrString(script.module, "Script");
+		script.scriptObject = scriptClassType->tp_alloc(scriptClassType, 0);
+		
+		Py_XDECREF(scriptClassType);
+		
+		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:self.windowController.currentProcess];
+		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:self.windowController.currentProcess scriptManager:self];
+		
+		script.virtualMemoryInstance = virtualMemoryInstance;
+		script.debuggerInstance = debuggerInstance;
+		
+		if (virtualMemoryInstance == nil || debuggerInstance == nil)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self disableVariable:variable];
+				NSLog(@"Error: Couldn't create VM or Debug instance");
+			});
+			
+			return;
+		}
+		
+		if (self.runningScripts == nil)
+		{
+			self.runningScripts = [[NSMutableArray alloc] init];
+		}
+		
+		[self.runningScripts addObject:script];
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[[NSNotificationCenter defaultCenter]
+			 addObserver:self
+			 selector:@selector(watchProcessDied:)
+			 name:ZGTargetProcessDiedNotification
+			 object:self.windowController.currentProcess];
+		});
+		
+		PyObject_SetAttrString(script.module, "vm", virtualMemoryInstance.vmObject);
+		PyObject_SetAttrString(script.module, "debug", debuggerInstance.object);
+		
+		id scriptInitActivity = nil;
+		if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+		{
+			scriptInitActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script initializer"];
+		}
+		
+		PyObject *initMethodResult = PyObject_CallMethod(script.scriptObject, "__init__", NULL);
+		
+		if (scriptInitActivity != nil)
+		{
+			[[NSProcessInfo processInfo] endActivity:scriptInitActivity];
+		}
+		
+		BOOL stillInitialized = Py_IsInitialized();
+		if (initMethodResult == NULL || !stillInitialized)
+		{
+			if (stillInitialized)
 			{
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[self disableVariable:variable];
-				});
 				[self logPythonError];
 			}
-			else
-			{
-				PyTypeObject *scriptClassType = (PyTypeObject *)PyObject_GetAttrString(script.module, "Script");
-				script.scriptObject = scriptClassType->tp_alloc(scriptClassType, 0);
-				
-				Py_XDECREF(scriptClassType);
-				
-				ZGProcess *process = [[ZGProcess alloc] initWithProcess:self.windowController.currentProcess];
-				
-				script.virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:process objectsPool:self.objectsPool];
-				script.debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:process scriptManager:self];
-				
-				if (script.virtualMemoryInstance == nil || script.debuggerInstance == nil)
+			
+			script.scriptObject = NULL;
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self stopScriptForVariable:variable];
+			});
+			
+			Py_XDECREF(initMethodResult);
+			return;
+		}
+		
+		script.lastTime = [NSDate timeIntervalSinceReferenceDate];
+		script.deltaTime = 0;
+		
+		const char *executeFunctionName = "execute";
+		if (!PyObject_HasAttrString(script.scriptObject, executeFunctionName))
+		{
+			Py_XDECREF(initMethodResult);
+			return;
+		}
+		
+		script.executeFunction = PyObject_GetAttrString(script.scriptObject, executeFunctionName);
+		
+		if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue)) != NULL)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
 				{
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[self disableVariable:variable];
-						NSLog(@"Error: Couldn't create VM or Debug instance");
-					});
+					self.scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script execute timer"];
 				}
-				else
+			});
+			
+			dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
+			dispatch_source_set_event_handler(self.scriptTimer, ^{
+				for (ZGPyScript *script in self.runningScripts)
 				{
-					if (self.runningScripts == nil)
-					{
-						self.runningScripts = [[NSMutableArray alloc] init];
-					}
-					
-					[self.runningScripts addObject:script];
-					
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[[NSNotificationCenter defaultCenter]
-						 addObserver:self
-						 selector:@selector(watchProcessDied:)
-						 name:ZGTargetProcessDiedNotification
-						 object:self.windowController.currentProcess];
-					});
-					
-					PyObject_SetAttrString(script.module, "vm", script.virtualMemoryInstance.vmObject);
-					PyObject_SetAttrString(script.module, "debug", script.debuggerInstance.object);
-					
-					id scriptInitActivity = nil;
-					if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
-					{
-						scriptInitActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script initializer"];
-					}
-					
-					PyObject *initMethodResult = PyObject_CallMethod(script.scriptObject, "__init__", NULL);
-					
-					if (scriptInitActivity != nil)
-					{
-						[[NSProcessInfo processInfo] endActivity:scriptInitActivity];
-					}
-					
-					BOOL stillInitialized = Py_IsInitialized();
-					if (initMethodResult == NULL || !stillInitialized)
-					{
-						if (stillInitialized)
-						{
-							[self logPythonError];
-						}
-						
-						script.scriptObject = NULL;
-						
-						dispatch_async(dispatch_get_main_queue(), ^{
-							[self stopScriptForVariable:variable];
-						});
-					}
-					else
-					{
-						script.lastTime = [NSDate timeIntervalSinceReferenceDate];
-						script.deltaTime = 0;
-						
-						const char *executeFunctionName = "execute";
-						if (PyObject_HasAttrString(script.scriptObject, executeFunctionName))
-						{
-							script.executeFunction = PyObject_GetAttrString(script.scriptObject, executeFunctionName);
-							
-							if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue)) != NULL)
-							{
-								dispatch_async(dispatch_get_main_queue(), ^{
-									if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
-									{
-										self.scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script execute timer"];
-									}
-								});
-								
-								dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
-								dispatch_source_set_event_handler(self.scriptTimer, ^{
-									for (ZGPyScript *script in self.runningScripts)
-									{
-										NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
-										script.deltaTime = currentTime - script.lastTime;
-										script.lastTime = currentTime;
-										[self executeScript:script];
-									}
-								});
-								dispatch_resume(self.scriptTimer);
-							}
-							
-							if (self.scriptTimer == NULL)
-							{
-								dispatch_async(dispatch_get_main_queue(), ^{
-									[self stopScriptForVariable:variable];
-								});
-							}
-						}
-					}
-					
-					Py_XDECREF(initMethodResult);
+					NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
+					script.deltaTime = currentTime - script.lastTime;
+					script.lastTime = currentTime;
+					[self executeScript:script];
 				}
-			}
-		});
-	}
+			});
+			dispatch_resume(self.scriptTimer);
+		}
+		
+		if (self.scriptTimer == NULL)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self stopScriptForVariable:variable];
+			});
+		}
+		
+		Py_XDECREF(initMethodResult);
+	});
 }
 
 /*
@@ -713,6 +712,16 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		
 		NSUInteger scriptFinishedCount = script.finishedCount;
 		
+		void (^scriptCleanup)(void) = ^{
+			script.deltaTime = 0;
+			script.virtualMemoryInstance = nil;
+			[script.debuggerInstance cleanup];
+			script.debuggerInstance = nil;
+			script.scriptObject = NULL;
+			script.executeFunction = NULL;
+			script.finishedCount++;
+		};
+		
 		dispatch_async(gPythonQueue, ^{
 			if (script.finishedCount == scriptFinishedCount)
 			{
@@ -733,13 +742,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 					}
 				}
 				
-				script.deltaTime = 0;
-				script.virtualMemoryInstance = nil;
-				[script.debuggerInstance cleanup];
-				script.debuggerInstance = nil;
-				script.scriptObject = NULL;
-				script.executeFunction = NULL;
-				script.finishedCount++;
+				scriptCleanup();
 				
 				if (delayedAppTermination)
 				{
@@ -750,17 +753,6 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			}
 		});
 		
-		@synchronized(self.objectsPool)
-		{
-			for (id object in self.objectsPool)
-			{
-				if ([object isKindOfClass:[ZGSearchProgress class]])
-				{
-					[object setShouldCancelSearch:YES];
-				}
-			}
-		}
-		
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
 			if (scriptFinishedCount == script.finishedCount)
 			{
@@ -770,14 +762,11 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				}
 				else
 				{
-					// Give up
+					// Give up - this should be okay to call from another thread
 					PyErr_SetInterrupt();
 					
 					dispatch_async(gPythonQueue, ^{
-						@synchronized(self.objectsPool)
-						{
-							[self.objectsPool removeAllObjects];
-						}
+						scriptCleanup();
 					});
 				}
 			}
