@@ -53,7 +53,7 @@
 
 @interface ZGDocumentSearchController ()
 
-@property (assign) ZGDocumentWindowController *windowController;
+@property (nonatomic, weak) ZGDocumentWindowController *windowController;
 @property (readwrite, strong, nonatomic) ZGSearchProgress *searchProgress;
 @property (nonatomic) ZGSearchResults *temporarySearchResults;
 @property (nonatomic) NSArray *tempSavedData;
@@ -678,15 +678,18 @@
 		[self.windowController.tableController.variablesTableView reloadData];
 		
 		[self searchVariables:searchedVariables byNarrowing:isNarrowingSearch usingCompletionBlock:^ {
-			self.searchData.searchValue = NULL;
-			self.searchData.swappedValue = NULL;
-			
-			if (searchDataActivity != nil)
+			if (self.windowController != nil)
 			{
-				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
+				self.searchData.searchValue = NULL;
+				self.searchData.swappedValue = NULL;
+				
+				if (searchDataActivity != nil)
+				{
+					[[NSProcessInfo processInfo] endActivity:searchDataActivity];
+				}
+				
+				[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
 			}
-			
-			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
 		}];
 	}
 }
