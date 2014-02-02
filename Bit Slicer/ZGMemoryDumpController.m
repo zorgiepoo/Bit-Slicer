@@ -39,9 +39,9 @@
 #import "ZGMemoryTypes.h"
 #import "ZGUtilities.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGSearchProgress.h"
+#import "ZGRegion.h"
 
 @interface ZGMemoryDumpController ()
 
@@ -168,6 +168,98 @@
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
+}
+
+#pragma mark Dumping Data to Disk
+
+// helper function for ZGSaveAllDataToDirectory
+static void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
+{
+	if (currentData)
+	{
+		ZGMemoryAddress endAddress = currentStartingAddress + [currentData length];
+		(*fileNumber)++;
+		[currentData
+		 writeToFile:[directory stringByAppendingPathComponent:[[NSString alloc] initWithFormat:@"(%d) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
+		 atomically:NO];
+		
+		if (mergedFile)
+		{
+			fwrite(currentData.bytes, currentData.length, 1, mergedFile);
+		}
+	}
+}
+
+static BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSearchProgress *searchProgress)
+{
+	BOOL success = NO;
+	
+	NSMutableData *currentData = nil;
+	ZGMemoryAddress currentStartingAddress = 0;
+	ZGMemoryAddress lastAddress = currentStartingAddress;
+	int fileNumber = 0;
+	
+	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
+	
+	NSArray *regions = [ZGRegion regionsFromProcessTask:processTask];
+	
+	dispatch_async(dispatch_get_main_queue(), ^{
+		searchProgress.initiatedSearch = YES;
+		searchProgress.progressType = ZGSearchProgressMemoryDumping;
+		searchProgress.maxProgress = regions.count;
+	});
+	
+	for (ZGRegion *region in regions)
+	{
+		if (lastAddress != region.address || !(region.protection & VM_PROT_READ))
+		{
+			// We're done with this piece of data
+			ZGSavePieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
+			currentData = nil;
+		}
+		
+		if (region.protection & VM_PROT_READ)
+		{
+			if (!currentData)
+			{
+				currentData = [[NSMutableData alloc] init];
+				currentStartingAddress = region.address;
+			}
+			
+			// outputSize should not differ from size
+			ZGMemorySize outputSize = region.size;
+			void *bytes = NULL;
+			if (ZGReadBytes(processTask, region.address, &bytes, &outputSize))
+			{
+				[currentData appendBytes:bytes length:(NSUInteger)outputSize];
+				ZGFreeBytes(processTask, bytes, outputSize);
+			}
+		}
+		
+		lastAddress = region.address;
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			searchProgress.progress++;
+		});
+  	    
+		if (searchProgress.shouldCancelSearch)
+		{
+			goto EXIT_ON_CANCEL;
+		}
+	}
+	
+	ZGSavePieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
+    
+EXIT_ON_CANCEL:
+	
+	if (mergedFile)
+	{
+		fclose(mergedFile);
+	}
+	
+	success = YES;
+	
+	return success;
 }
 
 #pragma mark Memory Dump All

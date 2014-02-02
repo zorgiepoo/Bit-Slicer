@@ -39,15 +39,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-@class ZGSearchProgress;
 	
 NSString *ZGUserTagDescription(unsigned int userTag);
 NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
 
 CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName, BOOL requiresExactMatch);
-
-BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSearchProgress *searchProgress);
 
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize, ZGMemorySize maxStringSizeLimit);
 	
