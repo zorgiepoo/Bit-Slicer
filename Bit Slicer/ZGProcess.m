@@ -35,7 +35,7 @@
 #import "ZGProcess.h"
 #import "ZGMachBinary.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
+#import "ZGProcessTaskManager.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 
@@ -112,7 +112,7 @@
 
 - (BOOL)grantUsAccess
 {
-	BOOL success = ZGGetTaskForProcess(self.processID, &_processTask);
+	BOOL success = [[ZGProcessTaskManager sharedManager] getTask:&_processTask forProcessIdentifier:self.processID];
 	if (success)
 	{	
 		[self setUpMachBinaryData];

@@ -47,6 +47,7 @@
 #import "ZGDocument.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGScriptManager.h"
+#import "ZGProcessTaskManager.h"
 
 @interface ZGAppController ()
 
@@ -152,10 +153,9 @@
 		{
 			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
 			{
-				ZGMemoryMap task;
-				if (ZGTaskExistsForProcess(runningProcess.processIdentifier, &task))
+				if ([[ZGProcessTaskManager sharedManager] taskExistsForProcessIdentifier:runningProcess.processIdentifier])
 				{
-					ZGFreeTask(task);
+					[[ZGProcessTaskManager sharedManager] freeTaskForProcessIdentifier:runningProcess.processIdentifier];
 				}
 			}
 		}
@@ -164,14 +164,14 @@
 
 #pragma mark Pausing and Unpausing processes
 
-OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler,EventRef theEvent, void *userData)
+OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
 {
 	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
 	{
 		if (runningApplication.isActive && runningApplication.processIdentifier != getpid() && ![[[ZGAppController sharedController] debuggerController] isProcessIdentifierHalted:runningApplication.processIdentifier])
 		{
 			ZGMemoryMap processTask = 0;
-			if (ZGGetTaskForProcess(runningApplication.processIdentifier, &processTask))
+			if ([[ZGProcessTaskManager sharedManager] getTask:&processTask forProcessIdentifier:runningApplication.processIdentifier])
 			{
 				[ZGProcess pauseOrUnpauseProcessTask:processTask];
 			}

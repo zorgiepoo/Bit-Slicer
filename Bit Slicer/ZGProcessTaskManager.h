@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 8/9/13.
+ * Created by Mayur Pawashe on 2/2/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,25 +32,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
-#import "ZGVariableTypes.h"
-#import "CoreSymbolication.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+@interface ZGProcessTaskManager : NSObject
 
-@class ZGSearchProgress;
-	
-NSString *ZGUserTagDescription(unsigned int userTag);
-NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
++ (instancetype)sharedManager;
 
-CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName, BOOL requiresExactMatch);
+- (BOOL)taskExistsForProcessIdentifier:(pid_t)processIdentifier;
+- (BOOL)getTask:(ZGMemoryMap *)processTask forProcessIdentifier:(pid_t)processIdentifier;
+- (void)freeTaskForProcessIdentifier:(pid_t)processIdentifier;
 
-BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSearchProgress *searchProgress);
-
-ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize, ZGMemorySize maxStringSizeLimit);
-	
-#ifdef __cplusplus
-}
-#endif
+@end
