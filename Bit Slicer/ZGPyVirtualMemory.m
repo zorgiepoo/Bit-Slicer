@@ -199,6 +199,7 @@ static PyTypeObject VirtualMemoryType =
 
 @interface ZGPyVirtualMemory ()
 
+@property (nonatomic, assign) PyObject *object;
 @property (nonatomic) ZGProcess *process;
 @property (nonatomic) NSMutableDictionary *allocationSizeTable;
 @property ZGSearchProgress *searchProgress;
@@ -228,12 +229,12 @@ static PyTypeObject VirtualMemoryType =
 	if (self != nil)
 	{
 		PyTypeObject *type = &VirtualMemoryType;
-		self.vmObject = (PyObject *)((VirtualMemory *)type->tp_alloc(type, 0));
-		if (self.vmObject == NULL)
+		self.object = (PyObject *)((VirtualMemory *)type->tp_alloc(type, 0));
+		if (self.object == NULL)
 		{
 			return nil;
 		}
-		VirtualMemory *vmObject = (VirtualMemory *)self.vmObject;
+		VirtualMemory *vmObject = (VirtualMemory *)self.object;
 		vmObject->objcSelf = self;
 		vmObject->processTask = process.processTask;
 		vmObject->processIdentifier = process.processID;
@@ -246,23 +247,23 @@ static PyTypeObject VirtualMemoryType =
 	return self;
 }
 
-- (void)setVmObject:(PyObject *)vmObject
+- (void)setObject:(PyObject *)vmObject
 {
 	if (Py_IsInitialized())
 	{
-		Py_XDECREF(_vmObject);
+		Py_XDECREF(_object);
 	}
-	_vmObject = vmObject;
+	_object = vmObject;
 }
 
 - (void)dealloc
 {
-	for (integer_t resumeIndex = 0; resumeIndex < ((VirtualMemory *)self.vmObject)->suspendCount; resumeIndex++)
+	for (integer_t resumeIndex = 0; resumeIndex < ((VirtualMemory *)self.object)->suspendCount; resumeIndex++)
 	{
-		ZGResumeTask(((VirtualMemory *)self.vmObject)->processTask);
+		ZGResumeTask(((VirtualMemory *)self.object)->processTask);
 	}
 	
-	self.vmObject = NULL;
+	self.object = NULL;
 }
 
 #define VirtualMemory_read(type, typeFormat, functionName) \

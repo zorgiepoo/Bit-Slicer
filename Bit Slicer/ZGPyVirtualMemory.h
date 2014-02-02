@@ -46,7 +46,7 @@
 
 - (id)initWithProcess:(ZGProcess *)process;
 
-@property (nonatomic, assign) PyObject *vmObject;
+@property (nonatomic, readonly, assign) PyObject *object;
 @property (readonly) ZGSearchProgress *searchProgress; // main queue property
 
 @end

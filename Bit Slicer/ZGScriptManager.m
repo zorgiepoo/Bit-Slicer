@@ -209,7 +209,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:process];
 		CFRetain((__bridge CFTypeRef)(virtualMemoryInstance));
 		
-		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.vmObject);
+		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.object);
 		
 		PyObject *globalDictionary = PyModule_GetDict(mainModule);
 		PyObject *localDictionary = convertRegisterEntriesToPyDict(registerEntries, process.is64Bit);
@@ -589,7 +589,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			 object:self.windowController.currentProcess];
 		});
 		
-		PyObject_SetAttrString(script.module, "vm", virtualMemoryInstance.vmObject);
+		PyObject_SetAttrString(script.module, "vm", virtualMemoryInstance.object);
 		PyObject_SetAttrString(script.module, "debug", debuggerInstance.object);
 		
 		id scriptInitActivity = nil;
