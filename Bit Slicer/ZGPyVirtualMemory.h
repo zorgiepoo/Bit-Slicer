@@ -35,16 +35,18 @@
 #import <Foundation/Foundation.h>
 #import "Python.h"
 #import "ZGMemoryTypes.h"
+#import "ZGSearchProgressDelegate.h"
 
 @class ZGProcess;
 @class ZGSearchProgress;
 
-@interface ZGPyVirtualMemory : NSObject
+@interface ZGPyVirtualMemory : NSObject <ZGSearchProgressDelegate>
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
 - (id)initWithProcess:(ZGProcess *)process;
 
 @property (nonatomic, assign) PyObject *vmObject;
+@property (readonly) ZGSearchProgress *searchProgress; // main queue property
 
 @end

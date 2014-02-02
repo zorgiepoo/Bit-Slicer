@@ -722,6 +722,8 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			script.finishedCount++;
 		};
 		
+		[script.virtualMemoryInstance.searchProgress setShouldCancelSearch:YES];
+		
 		dispatch_async(gPythonQueue, ^{
 			if (script.finishedCount == scriptFinishedCount)
 			{

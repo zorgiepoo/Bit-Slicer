@@ -201,6 +201,7 @@ static PyTypeObject VirtualMemoryType =
 
 @property (nonatomic) ZGProcess *process;
 @property (nonatomic) NSMutableDictionary *allocationSizeTable;
+@property ZGSearchProgress *searchProgress;
 
 @end
 
@@ -548,6 +549,15 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
+- (void)progressWillBegin:(ZGSearchProgress *)searchProgress
+{
+	self.searchProgress = searchProgress;
+}
+
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
+{
+}
+
 #define MAX_VALUES_SCANNED 1000
 
 static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, const char *functionName)
@@ -555,7 +565,7 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, c
 	PyObject *retValue = NULL;
 	if (searchData.dataSize > 0)
 	{
-		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, nil, ZGByteArray, 0, ZGEquals);
+		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, self->objcSelf, ZGByteArray, 0, ZGEquals);
 		
 		Py_ssize_t numberOfEntries = MIN(MAX_VALUES_SCANNED, (Py_ssize_t)results.addressCount);
 		PyObject *pythonResults = PyList_New(numberOfEntries);
