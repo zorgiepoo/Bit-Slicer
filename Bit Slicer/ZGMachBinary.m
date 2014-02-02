@@ -53,7 +53,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 {
 	ZGMemoryMap processTask = process.processTask;
 	ZGMachBinary *dylinkerBinary = nil;
-	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
+	for (ZGRegion *region in [ZGRegion regionsFromProcessTask:process.processTask])
 	{
 		ZGMemoryAddress regionAddress = region.address;
 		ZGMemorySize regionSize = region.size;

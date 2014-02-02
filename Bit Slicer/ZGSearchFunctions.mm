@@ -198,7 +198,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	NSArray *regions;
 	if (!shouldCompareStoredValues)
 	{
-		regions = ZGFilterRegions(ZGRegionsForProcessTask(processTask), dataBeginAddress, dataEndAddress, searchData.protectionMode);
+		regions = ZGFilterRegions([ZGRegion regionsFromProcessTask:processTask], dataBeginAddress, dataEndAddress, searchData.protectionMode);
 	}
 	else
 	{
@@ -1480,7 +1480,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 	ZGMemorySize pageSize = NSPageSize(); // sane default
 	ZGPageSize(processTask, &pageSize);
 	
-	NSArray *allRegions = ZGRegionsForProcessTask(processTask);
+	NSArray *allRegions = [ZGRegion regionsFromProcessTask:processTask];
 	
 	return ZGNarrowSearchForDataHelper(processTask, searchData, searchProgress, delegate, firstSearchResults, laterSearchResults, ^(size_t resultSetIndex, NSUInteger oldResultSetStartIndex, NSData * __unsafe_unretained oldResultSet, NSMutableData * __unsafe_unretained newResultSet) {
 		NSMutableDictionary *pageToRegionTable = nil;

@@ -40,18 +40,11 @@
 extern "C" {
 #endif
 
-@class ZGSearchData;
 @class ZGSearchProgress;
-@class ZGRegion;
 
 BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task);
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
-
-NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
-NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
-
-NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask);
 	
 NSString *ZGUserTagDescription(unsigned int userTag);
 NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);

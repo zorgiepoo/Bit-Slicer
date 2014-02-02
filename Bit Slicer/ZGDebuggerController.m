@@ -1081,7 +1081,7 @@ enum ZGStepExecution
 			goto END_DEBUGGER_CHANGE;
 		}
 		
-		NSArray *memoryRegions = ZGRegionsForProcessTask(self.currentProcess.processTask);
+		NSArray *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
 		if (memoryRegions.count == 0)
 		{
 			goto END_DEBUGGER_CHANGE;

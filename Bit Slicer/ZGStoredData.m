@@ -53,17 +53,17 @@
 {
 	NSMutableArray *regions = [[NSMutableArray alloc] init];
 	
-	for (ZGRegion *region in ZGRegionsForProcessTask(processTask))
+	for (ZGRegion *region in [ZGRegion regionsFromProcessTask:processTask])
 	{
 		void *bytes = NULL;
 		ZGMemorySize size = region.size;
 		
 		if (ZGReadBytes(processTask, region.address, &bytes, &size))
 		{
-			region.bytes = bytes;
-			region.size = size;
+			ZGRegion *newRegion = [[ZGRegion alloc] initWithAddress:region.address size:region.size protection:region.protection];
+			newRegion->_bytes = bytes;
 			
-			[regions addObject:region];
+			[regions addObject:newRegion];
 		}
 	}
 	

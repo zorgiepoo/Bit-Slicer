@@ -33,18 +33,84 @@
  */
 
 #import "ZGRegion.h"
+#import <mach/mach_vm.h>
 
 @implementation ZGRegion
 
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size
++ (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask
+{
+	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	
+	ZGMemoryAddress address = 0x0;
+	ZGMemorySize size;
+	vm_region_basic_info_data_64_t info;
+	mach_msg_type_number_t infoCount;
+	mach_port_t objectName = MACH_PORT_NULL;
+	
+	while (YES)
+	{
+		infoCount = VM_REGION_BASIC_INFO_COUNT_64;
+		if (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &infoCount, &objectName) != KERN_SUCCESS)
+		{
+			break;
+		}
+		
+		[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection]];
+		
+		address += size;
+	}
+	
+	return [NSArray arrayWithArray:regions];
+}
+
++ (NSArray *)regionsFromProcessTaskRecursively:(ZGMemoryMap)processTask
+{
+	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	
+	ZGMemoryAddress address = 0x0;
+	ZGMemorySize size;
+	vm_region_submap_info_data_64_t info;
+	mach_msg_type_number_t infoCount;
+	natural_t depth = 0;
+	
+	while (YES)
+	{
+		infoCount = VM_REGION_SUBMAP_INFO_COUNT_64;
+		if (mach_vm_region_recurse(processTask, &address, &size, &depth, (vm_region_recurse_info_t)&info, &infoCount) != KERN_SUCCESS)
+		{
+			break;
+		}
+		
+		if (info.is_submap)
+		{
+			depth++;
+		}
+		else
+		{
+			[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection]];
+			
+			address += size;
+		}
+	}
+	
+	return [NSArray arrayWithArray:regions];
+}
+
+- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection
 {
 	self = [super init];
 	if (self != nil)
 	{
 		_address = address;
 		_size = size;
+		_protection = protection;
 	}
 	return self;
+}
+
+- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size
+{
+	return [self initWithAddress:address size:size protection:0];
 }
 
 @end

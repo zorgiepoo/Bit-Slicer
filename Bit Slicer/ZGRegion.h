@@ -43,11 +43,15 @@
 	void *_bytes;
 }
 
++ (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask;
++ (NSArray *)regionsFromProcessTaskRecursively:(ZGMemoryMap)processTask;
+
+- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection;
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 
-@property (nonatomic) ZGMemoryAddress address;
-@property (nonatomic) ZGMemorySize size;
-@property (nonatomic) ZGMemoryProtection protection;
-@property (nonatomic) void *bytes;
+@property (nonatomic, readonly) ZGMemoryAddress address;
+@property (nonatomic, readonly) ZGMemorySize size;
+@property (nonatomic, readonly) ZGMemoryProtection protection;
+@property (nonatomic, readonly) void *bytes;
 
 @end

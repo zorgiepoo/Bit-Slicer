@@ -112,74 +112,6 @@ void ZGFreeTask(ZGMemoryMap task)
 	}
 }
 
-NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
-{
-	NSMutableArray *regions = [[NSMutableArray alloc] init];
-	
-	ZGMemoryAddress address = 0x0;
-	ZGMemorySize size;
-	vm_region_basic_info_data_64_t info;
-	mach_msg_type_number_t infoCount;
-	mach_port_t objectName = MACH_PORT_NULL;
-	
-	while (1)
-	{
-		infoCount = VM_REGION_BASIC_INFO_COUNT_64;
-		if (mach_vm_region(processTask, &address, &size, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&info, &infoCount, &objectName) != KERN_SUCCESS)
-		{
-			break;
-		}
-		
-		ZGRegion *region = [[ZGRegion alloc] initWithAddress:address size:size];
-		region.protection = info.protection;
-		
-		[regions addObject:region];
-		
-		address += size;
-	}
-	
-	return [NSArray arrayWithArray:regions];
-}
-
-NSArray *ZGRegionsForProcessTaskRecursively(ZGMemoryMap processTask)
-{
-	NSMutableArray *regions = [[NSMutableArray alloc] init];
-	
-	ZGMemoryAddress address = 0x0;
-	ZGMemorySize size;
-	vm_region_submap_info_data_64_t info;
-	mach_msg_type_number_t infoCount;
-	natural_t depth = 0;
-	
-	while (1)
-	{
-		infoCount = VM_REGION_SUBMAP_INFO_COUNT_64;
-		if (mach_vm_region_recurse(processTask, &address, &size, &depth, (vm_region_recurse_info_t)&info, &infoCount) != KERN_SUCCESS)
-		{
-			break;
-		}
-		
-		if (info.is_submap)
-		{
-			depth++;
-		}
-		else
-		{
-			ZGRegion *region = [[ZGRegion alloc] initWithAddress:address size:size];
-			region.protection = info.protection;
-			
-			address += size;
-		}
-	}
-	
-	return [NSArray arrayWithArray:regions];
-}
-
-NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask)
-{
-	return [ZGRegionsForProcessTask(processTask) count];
-}
-
 #define ZGUserTagPretty(x) [[[(x) stringByReplacingOccurrencesOfString:@"VM_MEMORY_" withString:@""] stringByReplacingOccurrencesOfString:@"_" withString:@" "] capitalizedString]
 
 #define ZGHandleUserTagCase(result, value) \
@@ -334,7 +266,7 @@ BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSe
 	
 	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
 	
-	NSArray *regions = ZGRegionsForProcessTask(processTask);
+	NSArray *regions = [ZGRegion regionsFromProcessTask:processTask];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
 		searchProgress.initiatedSearch = YES;
