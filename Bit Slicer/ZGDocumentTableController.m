@@ -54,7 +54,7 @@
 
 @interface ZGDocumentTableController ()
 
-@property (assign) ZGDocumentWindowController *windowController;
+@property (weak, nonatomic) ZGDocumentWindowController *windowController;
 @property (assign) ZGDocumentData *documentData;
 @property (nonatomic) NSTimer *watchVariablesTimer;
 @property (nonatomic) NSMutableArray *failedExecutableImages;
