@@ -52,7 +52,7 @@ typedef enum
 
 - (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type  delegate:(id <ZGBreakPointDelegate>)delegate;
 
-@property (weak, nonatomic) id <ZGBreakPointDelegate> delegate;
+@property (weak) id <ZGBreakPointDelegate> delegate;
 @property (readonly, nonatomic) ZGMemoryMap task;
 @property (nonatomic) thread_act_t thread;
 @property (nonatomic) ZGVariable *variable;
