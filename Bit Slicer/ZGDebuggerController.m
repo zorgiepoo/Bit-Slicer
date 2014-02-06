@@ -417,11 +417,11 @@ enum ZGStepExecution
 		}
 		
 		ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:address fromMachBinaries:[ZGMachBinary machBinariesInProcess:process]];
-		ZGMemoryAddress textAddress = [[machBinary machBinaryInfoInProcess:process] textAddress];
+		ZGMemoryAddress firstInstructionAddress = [[machBinary machBinaryInfoInProcess:process] instructionRange].location;
 		
-		if (textAddress != 0 && startAddress < textAddress)
+		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
 		{
-			startAddress = textAddress;
+			startAddress = firstInstructionAddress;
 			if (address < startAddress)
 			{
 				return instruction;
@@ -1054,11 +1054,11 @@ enum ZGStepExecution
 		BOOL shouldUseFirstInstruction = NO;
 		
 		ZGMachBinaryInfo *firstMachBinaryInfo = [self.currentProcess.mainMachBinary machBinaryInfoInProcess:self.currentProcess];
-		NSRange firstTextRange = NSMakeRange(firstMachBinaryInfo.textAddress, firstMachBinaryInfo.textSize);
+		NSRange machInstructionRange = firstMachBinaryInfo.instructionRange;
 		
 		if (calculatedMemoryAddress == 0)
 		{
-			calculatedMemoryAddress = firstTextRange.location;
+			calculatedMemoryAddress = machInstructionRange.location;
 			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
 			shouldUseFirstInstruction = YES;
 		}
@@ -1112,13 +1112,13 @@ enum ZGStepExecution
 			NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:calculatedMemoryAddress fromMachBinaries:machBinaries];
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
-			NSRange textRange = NSMakeRange(machBinaryInfo.textAddress, machBinaryInfo.textSize);
+			NSRange instructionRange = machBinaryInfo.instructionRange;
 			
 			baseAddress = machBinary.headerAddress;
 			mappedFilePath = [machBinary filePathInProcess:self.currentProcess];
 			
-			firstInstructionAddress = textRange.location;
-			maxInstructionsSize = textRange.length;
+			firstInstructionAddress = instructionRange.location;
+			maxInstructionsSize = instructionRange.length;
 			
 			if (firstInstructionAddress + maxInstructionsSize < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
 			{
@@ -1137,7 +1137,7 @@ enum ZGStepExecution
 		else
 		{
 			firstInstructionAddress = calculatedMemoryAddress;
-			maxInstructionsSize = firstTextRange.length;
+			maxInstructionsSize = machInstructionRange.length;
 			mappedFilePath = [self.currentProcess.mainMachBinary filePathInProcess:self.currentProcess];
 			baseAddress = self.currentProcess.mainMachBinary.headerAddress;
 		}

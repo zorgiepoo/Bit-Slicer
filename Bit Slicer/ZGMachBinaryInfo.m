@@ -34,20 +34,136 @@
 
 #import "ZGMachBinaryInfo.h"
 
+#import <mach-o/loader.h>
+
+typedef struct
+{
+	char name[16];
+	NSRange range;
+} ZGMachBinarySegment;
+
+@interface ZGMachBinaryInfo ()
+
+@property (nonatomic) ZGMemorySize slide;
+@property (nonatomic) NSRange instructionRange; // aka __text section range
+
+@property (nonatomic) uint32_t numberOfSegments;
+@property (nonatomic) ZGMemorySize totalSegmentSize;
+@property (nonatomic) ZGMachBinarySegment *segments;
+
+@end
+
 @implementation ZGMachBinaryInfo
 
-- (instancetype)initWithTextAddress:(ZGMemoryAddress)textAddress textSize:(ZGMemorySize)textSize dataSize:(ZGMemorySize)dataSize linkEditSize:(ZGMemorySize)linkEditSize slide:(ZGMemoryAddress)slide
+- (id)initWithMachHeaderAddress:(ZGMemoryAddress)machHeaderAddress segmentBytes:(const void * const)segmentBytes commandSize:(uint32_t)commandSize
 {
 	self = [super init];
-	if (self != nil)
+	if (self == nil)
 	{
-		_textAddress = textAddress;
-		_textSize = textSize;
-		_dataSize = dataSize;
-		_linkEditSize = linkEditSize;
-		_slide = slide;
+		return nil;
 	}
+	
+	uint32_t maxNumberOfSegmentCommands = 0;
+	const struct load_command *loadCommand = NULL;
+	for (const void *commandBytes = segmentBytes; commandBytes < segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
+	{
+		loadCommand = commandBytes;
+		if (loadCommand->cmd == LC_SEGMENT_64 || loadCommand->cmd == LC_SEGMENT)
+		{
+			maxNumberOfSegmentCommands++;
+		}
+	}
+	
+	if (maxNumberOfSegmentCommands == 0)
+	{
+		return nil;
+	}
+	
+	self.segments = malloc(sizeof(*_segments) * maxNumberOfSegmentCommands);
+	
+	loadCommand = NULL;
+	for (const void *commandBytes = segmentBytes; commandBytes < segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
+	{
+		loadCommand = commandBytes;
+		
+		if (loadCommand->cmd != LC_SEGMENT_64 && loadCommand->cmd != LC_SEGMENT)
+		{
+			continue;
+		}
+		
+		const struct segment_command_64 *segmentCommand64 = commandBytes;
+		const struct segment_command *segmentCommand32 = commandBytes;
+		
+		if ((loadCommand->cmd == LC_SEGMENT_64 && segmentCommand64->vmsize == 0) || (loadCommand->cmd == LC_SEGMENT && segmentCommand32->vmsize == 0))
+		{
+			continue;
+		}
+		
+		ZGMachBinarySegment newSegment = {};
+		strncpy(newSegment.name, segmentCommand32->segname, sizeof(newSegment.name));
+		
+		if (strcmp(newSegment.name, "__TEXT") == 0)
+		{
+			const void *sectionsOffset = loadCommand->cmd == LC_SEGMENT_64 ? commandBytes + sizeof(*segmentCommand64) : commandBytes + sizeof(*segmentCommand32);
+			const struct section_64 *firstSection64 = sectionsOffset;
+			const struct section *firstSection32 = sectionsOffset;
+			
+			// struct section has enough relevant fields to make this test for 64-bit as well
+			if (sectionsOffset + sizeof(*firstSection32) <= commandBytes + loadCommand->cmdsize)
+			{
+				if (loadCommand->cmd == LC_SEGMENT_64)
+				{
+					self.instructionRange = NSMakeRange(machHeaderAddress + firstSection64->offset, firstSection64->size);
+					self.slide = machHeaderAddress + firstSection64->offset - firstSection64->addr;
+				}
+				else
+				{
+					self.instructionRange = NSMakeRange(machHeaderAddress + firstSection32->offset, firstSection32->size);
+					self.slide = machHeaderAddress + firstSection32->offset - firstSection32->addr;
+				}
+			}
+		}
+		// We assume __TEXT is the first segment, so we can obtain the slide needed by other segments
+		// This might skip __PAGEZERO in some cases, but I don't think it's that important anyway
+		else if (self.numberOfSegments == 0)
+		{
+			continue;
+		}
+		
+		if (loadCommand->cmd == LC_SEGMENT_64)
+		{
+			newSegment.range = NSMakeRange(segmentCommand64->vmaddr + self.slide, segmentCommand64->vmsize);
+		}
+		else
+		{
+			newSegment.range = NSMakeRange(segmentCommand32->vmaddr + self.slide, segmentCommand32->vmsize);
+		}
+		
+		self.segments[self.numberOfSegments] = newSegment;
+		self.totalSegmentSize += newSegment.range.length;
+		self.numberOfSegments++;
+	}
+	
 	return self;
+}
+
+- (void)dealloc
+{
+	free(self.segments);
+}
+
+- (NSString *)segmentNameAtAddress:(ZGMemoryAddress)address
+{
+	for (ZGMemorySize segmentIndex = 0; segmentIndex < self.numberOfSegments; segmentIndex++)
+	{
+		ZGMachBinarySegment *segment = self.segments + segmentIndex;
+		if (segment->range.location <= address && address < segment->range.location + segment->range.length)
+		{
+			return @(segment->name);
+		}
+	}
+	
+	return nil;
 }
 
 @end

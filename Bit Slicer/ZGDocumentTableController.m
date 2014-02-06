@@ -657,11 +657,11 @@
 			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variable.address fromMachBinaries:[ZGMachBinary machBinariesInProcess:currentProcess]];
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:currentProcess];
 			
-			NSString *sectionName = [machBinary sectionNameAtAddress:variable.address fromMachBinaryInfo:machBinaryInfo];
+			NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variable.address];
 			NSString *mappedFilePath = [machBinary filePathInProcess:currentProcess];
 			
 			BOOL needsUserTag = userTagDescription != nil && [variable.name rangeOfString:userTagDescription].location == NSNotFound;
-			BOOL needsSectionName = sectionName != nil && [variable.name rangeOfString:sectionName].location == NSNotFound;
+			BOOL needsSegmentName = segmentName != nil && [variable.name rangeOfString:segmentName].location == NSNotFound;
 			
 			if (needsUserTag)
 			{
@@ -677,9 +677,9 @@
 				}
 			}
 			
-			if (needsSectionName)
+			if (needsSegmentName)
 			{
-				[displayComponents addObject:[NSString stringWithFormat:@"Section: %@", sectionName]];
+				[displayComponents addObject:[NSString stringWithFormat:@"Segment: %@", segmentName]];
 			}
 		}
 	}

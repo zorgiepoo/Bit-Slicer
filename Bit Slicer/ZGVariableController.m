@@ -900,9 +900,9 @@
 	if (machFilePath != nil)
 	{
 		ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:process];
-		NSString *sectionName = [machBinary sectionNameAtAddress:variable.address fromMachBinaryInfo:machBinaryInfo];
+		NSString *segmentName = [machBinaryInfo segmentNameAtAddress:variable.address];
 		
-		if (sectionName != nil)
+		if (segmentName != nil)
 		{
 			if (machBinaryInfo.slide > 0)
 			{
@@ -937,7 +937,7 @@
 				variable.finishedEvaluatingDynamicAddress = YES;
 			}
 			
-			staticVariableDescription = [NSString stringWithFormat:@"static address (%@)", sectionName];
+			staticVariableDescription = [NSString stringWithFormat:@"static address (%@)", segmentName];
 		}
 	}
 	

@@ -60,6 +60,4 @@ extern NSString * const ZGFailedImageName;
 
 - (ZGMachBinaryInfo *)machBinaryInfoInProcess:(ZGProcess *)process;
 
-- (NSString *)sectionNameAtAddress:(ZGMemoryAddress)address fromMachBinaryInfo:(ZGMachBinaryInfo *)machBinaryInfo;
-
 @end

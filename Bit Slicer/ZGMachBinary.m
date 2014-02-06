@@ -206,34 +206,6 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	return filePath;
 }
 
-#define ZGRetrieveMachSectionInfo(segment_type, section_type, bytes, machHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind) \
-struct segment_type *segmentCommand = bytes; \
-void *sectionBytes = bytes + sizeof(*segmentCommand); \
-if (strcmp(segmentCommand->segname, "__TEXT") == 0) \
-{ \
-	for (struct section_type *section = sectionBytes; (void *)section < sectionBytes + segmentCommand->cmdsize; section++) \
-	{ \
-		if (strcmp("__text", section->sectname) == 0) \
-		{ \
-			textAddress = machHeaderAddress + section->offset; \
-			slide = machHeaderAddress + section->offset - section->addr; \
-			break; \
-		} \
-	} \
-	textSize = segmentCommand->vmsize; \
-	numberOfSegmentsToFind--; \
-} \
-else if (strcmp(segmentCommand->segname, "__DATA") == 0) \
-{ \
-	dataSize = segmentCommand->vmsize; \
-	numberOfSegmentsToFind--; \
-} \
-else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
-{ \
-	linkEditSize = segmentCommand->vmsize; \
-	numberOfSegmentsToFind--; \
-}
-
 - (ZGMachBinaryInfo *)parseMachHeaderWithBytes:(const void *)machHeaderBytes range:(NSRange)range pointerSize:(size_t)pointerSize
 {
 	ZGMemoryAddress machHeaderAddress = self.headerAddress;
@@ -257,41 +229,13 @@ else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
 	
 	ZGMachBinaryInfo *machBinaryInfo = nil;
 	
-	ZGMemoryAddress textAddress = 0x0;
-	ZGMemoryAddress slide = 0x0;
-	ZGMemorySize textSize = 0x0;
-	ZGMemorySize dataSize = 0x0;
-	ZGMemorySize linkEditSize = 0x0;
-	
 	if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
 	{
 		void *segmentBytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
 		assert(sizeof(segmentBytes) == sizeof(range.location));
 		if (segmentBytes + machHeader->sizeofcmds <= (void *)range.location + range.length)
 		{
-			int numberOfSegmentsToFind = 3;
-			for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
-			{
-				struct load_command *loadCommand = segmentBytes;
-				
-				if (loadCommand->cmd == LC_SEGMENT_64)
-				{
-					ZGRetrieveMachSectionInfo(segment_command_64, section_64, segmentBytes, machHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
-				}
-				else if (loadCommand->cmd == LC_SEGMENT)
-				{
-					ZGRetrieveMachSectionInfo(segment_command, section, segmentBytes, machHeaderAddress, textAddress, slide, textSize, dataSize, linkEditSize, numberOfSegmentsToFind);
-				}
-				
-				if (numberOfSegmentsToFind <= 0)
-				{
-					break;
-				}
-				
-				segmentBytes += loadCommand->cmdsize;
-			}
-			
-			machBinaryInfo = [[ZGMachBinaryInfo alloc] initWithTextAddress:textAddress textSize:textSize dataSize:dataSize linkEditSize:linkEditSize slide:slide];
+			machBinaryInfo = [[ZGMachBinaryInfo alloc] initWithMachHeaderAddress:machHeaderAddress segmentBytes:segmentBytes commandSize:machHeader->sizeofcmds];
 		}
 	}
 	
@@ -346,7 +290,7 @@ else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
 - (ZGMachBinaryInfo *)machBinaryInfoInProcess:(ZGProcess *)process
 {
 	ZGMachBinaryInfo *machBinaryInfo = [self machBinaryInfoFromMemoryInProcess:process];
-	if (machBinaryInfo.textSize + machBinaryInfo.dataSize + machBinaryInfo.linkEditSize == 0)
+	if (machBinaryInfo.totalSegmentSize == 0)
 	{
 		NSString *filePath = [self filePathInProcess:process];
 		if (filePath.length > 0)
@@ -355,29 +299,6 @@ else if (strcmp(segmentCommand->segname, "__LINKEDIT") == 0) \
 		}
 	}
 	return machBinaryInfo;
-}
-
-- (NSString *)sectionNameAtAddress:(ZGMemoryAddress)address fromMachBinaryInfo:(ZGMachBinaryInfo *)machBinaryInfo
-{
-	NSString *sectionName = nil;
-	
-	if (address >= self.headerAddress)
-	{
-		if (address < self.headerAddress + machBinaryInfo.textSize)
-		{
-			sectionName = @"__TEXT";
-		}
-		else if (address < self.headerAddress + machBinaryInfo.textSize + machBinaryInfo.dataSize)
-		{
-			sectionName = @"__DATA";
-		}
-		else if (address < self.headerAddress + machBinaryInfo.textSize + machBinaryInfo.dataSize + machBinaryInfo.linkEditSize)
-		{
-			sectionName = @"__LINKEDIT";
-		}
-	}
-	
-	return sectionName;
 }
 
 @end

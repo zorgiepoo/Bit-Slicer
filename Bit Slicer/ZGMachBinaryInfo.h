@@ -40,12 +40,12 @@
 
 @interface ZGMachBinaryInfo : NSObject
 
-- (instancetype)initWithTextAddress:(ZGMemoryAddress)textAddress textSize:(ZGMemorySize)textSize dataSize:(ZGMemorySize)dataSize linkEditSize:(ZGMemorySize)linkEditSize slide:(ZGMemoryAddress)slide;
+- (id)initWithMachHeaderAddress:(ZGMemoryAddress)machHeaderAddress segmentBytes:(const void *)segmentBytes commandSize:(uint32_t)commandSize;
 
-@property (nonatomic, readonly) ZGMemoryAddress textAddress;
-@property (nonatomic, readonly) ZGMemorySize textSize;
-@property (nonatomic, readonly) ZGMemorySize dataSize;
-@property (nonatomic, readonly) ZGMemorySize linkEditSize;
-@property (nonatomic, readonly) ZGMemoryAddress slide;
+@property (nonatomic, readonly) ZGMemorySize totalSegmentSize;
+@property (nonatomic, readonly) ZGMemorySize slide;
+@property (nonatomic, readonly) NSRange instructionRange;
+
+- (NSString *)segmentNameAtAddress:(ZGMemoryAddress)address;
 
 @end
