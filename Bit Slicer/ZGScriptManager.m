@@ -529,6 +529,28 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	}
 }
 
+- (void)setUpStackDepthLimit
+{
+	PyObject *sys = PyImport_ImportModule("sys");
+	if (sys != NULL)
+	{
+		PyObject *setRecursionLimitFunction = PyObject_GetAttrString(sys, "setrecursionlimit");
+		if (setRecursionLimitFunction != NULL)
+		{
+			PyObject *successValue = PyObject_CallFunction(setRecursionLimitFunction, "K", 500);
+			if (successValue == NULL)
+			{
+				[self logPythonError];
+			}
+			Py_XDECREF(successValue);
+			
+			Py_DecRef(setRecursionLimitFunction);
+		}
+
+		Py_DecRef(sys);
+	}
+}
+
 - (void)runScriptForVariable:(ZGVariable *)variable
 {
 	ZGPyScript *script = [self scriptForVariable:variable];
@@ -597,6 +619,8 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		{
 			scriptInitActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script initializer"];
 		}
+		
+		[self setUpStackDepthLimit];
 		
 		PyObject *initMethodResult = PyObject_CallMethod(script.scriptObject, "__init__", NULL);
 		
