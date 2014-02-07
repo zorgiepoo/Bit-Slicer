@@ -45,10 +45,9 @@ typedef struct
 @interface ZGMachBinaryInfo ()
 
 @property (nonatomic) ZGMemorySize slide;
-@property (nonatomic) NSRange instructionRange; // aka __text section range
+@property (nonatomic) ZGMemoryAddress firstInstructionAddress; // aka location of __text section
 
 @property (nonatomic) uint32_t numberOfSegments;
-@property (nonatomic) ZGMemorySize totalSegmentSize;
 @property (nonatomic) ZGMachBinarySegment *segments;
 
 @end
@@ -113,17 +112,18 @@ typedef struct
 			{
 				if (loadCommand->cmd == LC_SEGMENT_64)
 				{
-					self.instructionRange = NSMakeRange(machHeaderAddress + firstSection64->offset, firstSection64->size);
+					self.firstInstructionAddress = machHeaderAddress + firstSection64->offset;
 					self.slide = machHeaderAddress + firstSection64->offset - firstSection64->addr;
 				}
 				else
 				{
-					self.instructionRange = NSMakeRange(machHeaderAddress + firstSection32->offset, firstSection32->size);
+					self.firstInstructionAddress = machHeaderAddress + firstSection32->offset;
 					self.slide = machHeaderAddress + firstSection32->offset - firstSection32->addr;
 				}
 			}
 		}
 		// We assume __TEXT is the first segment, so we can obtain the slide needed by other segments
+		// This is also assumed precondition below in -textSegmentRange
 		// This might skip __PAGEZERO in some cases, but I don't think it's that important anyway
 		else if (self.numberOfSegments == 0)
 		{
@@ -140,7 +140,6 @@ typedef struct
 		}
 		
 		self.segments[self.numberOfSegments] = newSegment;
-		self.totalSegmentSize += newSegment.range.length;
 		self.numberOfSegments++;
 	}
 	
@@ -150,6 +149,13 @@ typedef struct
 - (void)dealloc
 {
 	free(self.segments);
+}
+
+- (NSRange)textSegmentRange
+{
+	if (self.numberOfSegments == 0) return NSMakeRange(0, 0);
+	
+	return self.segments[0].range;
 }
 
 - (NSString *)segmentNameAtAddress:(ZGMemoryAddress)address

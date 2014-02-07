@@ -290,7 +290,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 - (ZGMachBinaryInfo *)machBinaryInfoInProcess:(ZGProcess *)process
 {
 	ZGMachBinaryInfo *machBinaryInfo = [self machBinaryInfoFromMemoryInProcess:process];
-	if (machBinaryInfo.totalSegmentSize == 0)
+	if (machBinaryInfo.textSegmentRange.length == 0)
 	{
 		NSString *filePath = [self filePathInProcess:process];
 		if (filePath.length > 0)

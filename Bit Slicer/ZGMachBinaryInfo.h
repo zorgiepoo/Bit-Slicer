@@ -42,9 +42,9 @@
 
 - (id)initWithMachHeaderAddress:(ZGMemoryAddress)machHeaderAddress segmentBytes:(const void *)segmentBytes commandSize:(uint32_t)commandSize;
 
-@property (nonatomic, readonly) ZGMemorySize totalSegmentSize;
 @property (nonatomic, readonly) ZGMemorySize slide;
-@property (nonatomic, readonly) NSRange instructionRange;
+@property (nonatomic, readonly) ZGMemoryAddress firstInstructionAddress;
+@property (nonatomic, readonly) NSRange textSegmentRange;
 
 - (NSString *)segmentNameAtAddress:(ZGMemoryAddress)address;
 

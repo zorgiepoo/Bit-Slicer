@@ -417,7 +417,7 @@ enum ZGStepExecution
 		}
 		
 		ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:address fromMachBinaries:[ZGMachBinary machBinariesInProcess:process]];
-		ZGMemoryAddress firstInstructionAddress = [[machBinary machBinaryInfoInProcess:process] instructionRange].location;
+		ZGMemoryAddress firstInstructionAddress = [[machBinary machBinaryInfoInProcess:process] firstInstructionAddress];
 		
 		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
 		{
@@ -1054,7 +1054,7 @@ enum ZGStepExecution
 		BOOL shouldUseFirstInstruction = NO;
 		
 		ZGMachBinaryInfo *firstMachBinaryInfo = [self.currentProcess.mainMachBinary machBinaryInfoInProcess:self.currentProcess];
-		NSRange machInstructionRange = firstMachBinaryInfo.instructionRange;
+		NSRange machInstructionRange = NSMakeRange(firstMachBinaryInfo.firstInstructionAddress, firstMachBinaryInfo.textSegmentRange.length - (firstMachBinaryInfo.firstInstructionAddress - firstMachBinaryInfo.textSegmentRange.location));
 		
 		if (calculatedMemoryAddress == 0)
 		{
@@ -1112,7 +1112,7 @@ enum ZGStepExecution
 			NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:calculatedMemoryAddress fromMachBinaries:machBinaries];
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
-			NSRange instructionRange = machBinaryInfo.instructionRange;
+			NSRange instructionRange = NSMakeRange(machBinaryInfo.firstInstructionAddress, machBinaryInfo.textSegmentRange.length - (machBinaryInfo.firstInstructionAddress - machBinaryInfo.textSegmentRange.location));
 			
 			baseAddress = machBinary.headerAddress;
 			mappedFilePath = [machBinary filePathInProcess:self.currentProcess];
@@ -1137,7 +1137,7 @@ enum ZGStepExecution
 		else
 		{
 			firstInstructionAddress = calculatedMemoryAddress;
-			maxInstructionsSize = machInstructionRange.length;
+			maxInstructionsSize = machInstructionRange.length - (calculatedMemoryAddress - machInstructionRange.location);
 			mappedFilePath = [self.currentProcess.mainMachBinary filePathInProcess:self.currentProcess];
 			baseAddress = self.currentProcess.mainMachBinary.headerAddress;
 		}
