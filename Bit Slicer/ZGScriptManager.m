@@ -73,8 +73,22 @@
 
 dispatch_queue_t gPythonQueue;
 
++ (void)appendPath:(NSString *)path toSysPath:(PyObject *)sysPath
+{
+	if (path == nil) return;
+	
+	PyObject *newPath = PyUnicode_FromString([path UTF8String]);
+	if (PyList_Append(sysPath, newPath) != 0)
+	{
+		NSLog(@"Error on appending %@", path);
+	}
+	Py_XDECREF(newPath);
+}
+
 + (void)initializePythonInterpreter
 {
+	NSString *userModulesDirectory = [[ZGAppController sharedController] createUserModulesDirectory];
+	
 	NSString *pythonDirectory = [[NSBundle mainBundle] pathForResource:@"python3.3" ofType:nil];
 	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
 	setenv("PYTHONPATH", [pythonDirectory UTF8String], 1);
@@ -83,19 +97,9 @@ dispatch_queue_t gPythonQueue;
 		PyObject *sys = PyImport_ImportModule("sys");
 		PyObject *path = PyObject_GetAttrString(sys, "path");
 		
-		PyObject *libDynloadObject = PyUnicode_FromString([[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] UTF8String]);
-		if (PyList_Append(path, libDynloadObject) != 0)
-		{
-			NSLog(@"Error on appending %@", [pythonDirectory stringByAppendingPathComponent:@"lib-dynload"]);
-		}
-		Py_XDECREF(libDynloadObject);
-		
-		PyObject *scriptCacheUnicodeObject = PyUnicode_FromString([SCRIPT_CACHES_PATH UTF8String]);
-		if (PyList_Append(path, scriptCacheUnicodeObject) != 0)
-		{
-			NSLog(@"Error on appending %@", SCRIPT_CACHES_PATH);
-		}
-		Py_XDECREF(scriptCacheUnicodeObject);
+		[self appendPath:[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] toSysPath:path];
+		[self appendPath:SCRIPT_CACHES_PATH toSysPath:path];
+		[self appendPath:userModulesDirectory toSysPath:path];
 		
 		Py_XDECREF(path);
 		

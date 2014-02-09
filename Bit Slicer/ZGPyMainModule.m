@@ -36,13 +36,21 @@
 
 #define MAIN_MODULE_NAME "bitslicer"
 
+static PyObject *BitSlicer_reload(PyObject *self, PyObject *args);
+
+static PyMethodDef mainModuleMethods[] =
+{
+	{"reload", (PyCFunction)BitSlicer_reload, METH_VARARGS, NULL}
+};
+
 static struct PyModuleDef mainModuleDefinition =
 {
 	PyModuleDef_HEAD_INIT,
 	MAIN_MODULE_NAME,
 	"Main Bit Slicer Module",
 	-1,
-	NULL, NULL, NULL, NULL, NULL
+	mainModuleMethods,
+	NULL, NULL, NULL, NULL
 };
 
 PyObject *loadMainPythonModule(PyObject *sysModule)
@@ -54,9 +62,33 @@ PyObject *loadMainPythonModule(PyObject *sysModule)
 	PyObject *modules = PyObject_GetAttrString(sysModule, "modules");
 	if (PyDict_SetItem(modules, PyUnicode_FromString(MAIN_MODULE_NAME), mainModule) != 0)
 	{
-		NSLog(@"Failed to add bitslicer module to sys.modules!");
+		NSLog(@"Failed to add "MAIN_MODULE_NAME" module to sys.modules!");
 	}
 	Py_XDECREF(modules);
 	
 	return mainModule;
+}
+
+// The API provided in 3.3 for reloading modules is deprecated, so rather than waiting for 3.4, we should provide our own
+static PyObject *BitSlicer_reload(PyObject *self, PyObject *args)
+{
+	PyObject *moduleName = NULL;
+	if (!PyArg_ParseTuple(args, "O:load", &moduleName))
+	{
+		return NULL;
+	}
+	
+	PyObject *module = PyImport_Import(moduleName);
+	if (module == NULL)
+	{
+		return NULL;
+	}
+	
+	PyObject *reloadedModule = PyImport_ReloadModule(module);
+	if (reloadedModule == NULL)
+	{
+		return NULL;
+	}
+	
+	return reloadedModule;
 }

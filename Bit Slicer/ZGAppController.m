@@ -217,6 +217,35 @@ static BOOL didRegisteredHotKey;
 
 #pragma mark Controller behavior
 
+- (NSString *)ourApplicationSupportPath
+{
+	NSString *applicationSupportPath = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) lastObject];
+	return [applicationSupportPath stringByAppendingPathComponent:@"Bit Slicer"];
+}
+
+- (NSString *)createUserModulesDirectory
+{
+	NSString *ourApplicationSupportPath = [self ourApplicationSupportPath];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:ourApplicationSupportPath])
+	{
+		if (![[NSFileManager defaultManager] createDirectoryAtPath:ourApplicationSupportPath withIntermediateDirectories:NO attributes:nil error:NULL])
+		{
+			return nil;
+		}
+	}
+	
+	NSString *modulesPath = [ourApplicationSupportPath stringByAppendingPathComponent:@"Modules"];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:modulesPath])
+	{
+		if (![[NSFileManager defaultManager] createDirectoryAtPath:modulesPath withIntermediateDirectories:NO attributes:nil error:NULL])
+		{
+			return nil;
+		}
+	}
+	
+	return modulesPath;
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
 	// Initialize preference defaults
