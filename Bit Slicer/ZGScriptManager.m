@@ -561,7 +561,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	PyObject *sys = PyImport_ImportModule("sys");
 	if (sys != NULL)
 	{
-		PyObject *setRecursionLimitFunction = PyObject_GetAttrString(sys, "setrecursionlimit");
+		PyObject *setRecursionLimitFunction = PySys_GetObject("setrecursionlimit");
 		if (setRecursionLimitFunction != NULL)
 		{
 			PyObject *successValue = PyObject_CallFunction(setRecursionLimitFunction, "K", 500);
@@ -570,8 +570,6 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				[self logPythonError];
 			}
 			Py_XDECREF(successValue);
-			
-			Py_DecRef(setRecursionLimitFunction);
 		}
 
 		Py_DecRef(sys);
