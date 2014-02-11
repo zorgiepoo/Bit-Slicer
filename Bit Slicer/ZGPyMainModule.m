@@ -73,7 +73,7 @@ PyObject *loadMainPythonModule(PyObject *sysModule)
 static PyObject *BitSlicer_reload(PyObject *self, PyObject *args)
 {
 	PyObject *moduleName = NULL;
-	if (!PyArg_ParseTuple(args, "O:load", &moduleName))
+	if (!PyArg_ParseTuple(args, "O:reload", &moduleName))
 	{
 		return NULL;
 	}
