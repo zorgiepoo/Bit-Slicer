@@ -53,18 +53,17 @@ static struct PyModuleDef mainModuleDefinition =
 	NULL, NULL, NULL, NULL
 };
 
-PyObject *loadMainPythonModule(PyObject *sysModule)
+PyObject *loadMainPythonModule(void)
 {
 	PyObject *mainModule = PyModule_Create(&mainModuleDefinition);
 	
 	// PyModule_Create won't add the module to sys.modules like Py_InitModule would in 2.x
 	// We have to do that manually
-	PyObject *modules = PyObject_GetAttrString(sysModule, "modules");
+	PyObject *modules = PySys_GetObject("modules");
 	if (PyDict_SetItem(modules, PyUnicode_FromString(MAIN_MODULE_NAME), mainModule) != 0)
 	{
 		NSLog(@"Failed to add "MAIN_MODULE_NAME" module to sys.modules!");
 	}
-	Py_XDECREF(modules);
 	
 	return mainModule;
 }

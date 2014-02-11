@@ -94,20 +94,15 @@ dispatch_queue_t gPythonQueue;
 	setenv("PYTHONPATH", [pythonDirectory UTF8String], 1);
 	dispatch_async(gPythonQueue, ^{
 		Py_Initialize();
-		PyObject *sys = PyImport_ImportModule("sys");
-		PyObject *path = PyObject_GetAttrString(sys, "path");
+		PyObject *path = PySys_GetObject("path");
 		
 		[self appendPath:[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] toSysPath:path];
 		[self appendPath:SCRIPT_CACHES_PATH toSysPath:path];
 		[self appendPath:userModulesDirectory toSysPath:path];
 		
-		Py_XDECREF(path);
-		
-		PyObject *mainModule = loadMainPythonModule(sys);
+		PyObject *mainModule = loadMainPythonModule();
 		[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
 		[ZGPyDebugger loadPythonClassInMainModule:mainModule];
-		
-		Py_XDECREF(sys);
 	});
 }
 
