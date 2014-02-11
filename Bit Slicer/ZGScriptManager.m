@@ -466,7 +466,35 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	
 	[[self class] logPythonObject:type];
 	[[self class] logPythonObject:value];
-	[[self class] logPythonObject:traceback];
+	
+	// Log detailed traceback info including the line where the exception was thrown
+	if (traceback != NULL)
+	{
+		NSString *logPath = [[ZGAppController sharedController] lastErrorLogPath];
+		if (logPath != NULL && [logPath UTF8String] != NULL)
+		{
+			FILE *logFile = fopen([logPath UTF8String], "w");
+			if (logFile != NULL)
+			{
+				PyObject *file = PyFile_FromFd(fileno(logFile), NULL, "w", -1, NULL, NULL, NULL, NO);
+				if (file != NULL)
+				{
+					PyTraceBack_Print(traceback, file);
+					Py_DecRef(file);
+				}
+				
+				fclose(logFile);
+				
+				NSString *latestLog = [[NSString alloc] initWithContentsOfFile:logPath encoding:NSUTF8StringEncoding error:NULL];
+				if (latestLog != nil)
+				{
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[[[ZGAppController sharedController] loggerController] writeLine:latestLog];
+					});
+				}
+			}
+		}
+	}
 	
 	PyErr_Clear();
 }

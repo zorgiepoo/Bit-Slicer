@@ -223,24 +223,45 @@ static BOOL didRegisteredHotKey;
 	return [applicationSupportPath stringByAppendingPathComponent:@"Bit Slicer"];
 }
 
-- (NSString *)createUserModulesDirectory
+- (NSString *)createApplicationSupportPath
 {
 	NSString *ourApplicationSupportPath = [self ourApplicationSupportPath];
-	if (![[NSFileManager defaultManager] fileExistsAtPath:ourApplicationSupportPath])
+	if (ourApplicationSupportPath == nil)
 	{
-		if (![[NSFileManager defaultManager] createDirectoryAtPath:ourApplicationSupportPath withIntermediateDirectories:NO attributes:nil error:NULL])
-		{
-			return nil;
-		}
+		return nil;
+	}
+	
+	if (![[NSFileManager defaultManager] fileExistsAtPath:ourApplicationSupportPath] && ![[NSFileManager defaultManager] createDirectoryAtPath:ourApplicationSupportPath withIntermediateDirectories:NO attributes:nil error:NULL])
+	{
+		return nil;
+	}
+	
+	return ourApplicationSupportPath;
+}
+
+- (NSString *)lastErrorLogPath
+{
+	NSString *ourApplicationSupportPath = [self createApplicationSupportPath];
+	if (ourApplicationSupportPath == nil)
+	{
+		return nil;
+	}
+	
+	return [ourApplicationSupportPath stringByAppendingPathComponent:@"last script error.txt"];
+}
+
+- (NSString *)createUserModulesDirectory
+{
+	NSString *ourApplicationSupportPath = [self createApplicationSupportPath];
+	if (ourApplicationSupportPath == nil)
+	{
+		return nil;
 	}
 	
 	NSString *modulesPath = [ourApplicationSupportPath stringByAppendingPathComponent:@"Modules"];
-	if (![[NSFileManager defaultManager] fileExistsAtPath:modulesPath])
+	if (![[NSFileManager defaultManager] fileExistsAtPath:modulesPath] && ![[NSFileManager defaultManager] createDirectoryAtPath:modulesPath withIntermediateDirectories:NO attributes:nil error:NULL])
 	{
-		if (![[NSFileManager defaultManager] createDirectoryAtPath:modulesPath withIntermediateDirectories:NO attributes:nil error:NULL])
-		{
-			return nil;
-		}
+		return nil;
 	}
 	
 	return modulesPath;

@@ -57,6 +57,7 @@
 + (void)registerPauseAndUnpauseHotKey;
 
 - (NSString *)createUserModulesDirectory;
+- (NSString *)lastErrorLogPath;
 
 - (void)increaseLivingCount;
 - (void)decreaseLivingCount;
