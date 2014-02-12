@@ -374,7 +374,7 @@
 	
 	// create scope block to allow for goto
 	{
-		NSArray *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
+		NSArray *memoryRegions = [ZGRegion regionsFromProcessTaskRecursively:self.currentProcess.processTask];
 		if (memoryRegions.count == 0)
 		{
 			goto END_MEMORY_VIEW_CHANGE;
