@@ -63,6 +63,7 @@ extern dispatch_queue_t gPythonQueue;
 
 - (void)runScriptForVariable:(ZGVariable *)variable;
 - (void)stopScriptForVariable:(ZGVariable *)variable;
+- (void)removeScriptForVariable:(ZGVariable *)variable;
 
 - (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender;
 - (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender;

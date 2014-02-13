@@ -168,15 +168,6 @@
 	
 	NSArray *newVariables = [keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey];
 	
-	// If we're reverting, stop any scripts first
-	for (ZGVariable *variable in self.data.variables)
-	{
-		if (variable.type == ZGScript && variable.enabled)
-		{
-			[self.windowController.scriptManager stopScriptForVariable:variable];
-		}
-	}
-	
 	if (newVariables != nil)
 	{
 		self.data.variables = newVariables;
@@ -230,13 +221,30 @@
 	self.data.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];
 	self.data.lastBelowRangeValue = [keyedUnarchiver decodeObjectForKey:ZGBelowValueKey];
 	
-	// For reverting, the window controller may have already been loaded
-	if (self.windowController != nil)
+	return YES;
+}
+
+- (BOOL)revertToContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError * __autoreleasing *)outError
+{
+	// Stop and remove all scripts before attempting to revert
+	for (ZGVariable *variable in self.data.variables)
+	{
+		if (variable.type == ZGScript)
+		{
+			if (variable.enabled)
+			{
+				[self.windowController.scriptManager stopScriptForVariable:variable];
+			}
+			[self.windowController.scriptManager removeScriptForVariable:variable];
+		}
+	}
+	
+	BOOL reverted = [super revertToContentsOfURL:absoluteURL ofType:typeName error:outError];
+	if (reverted)
 	{
 		[self.windowController loadDocumentUserInterface];
 	}
-	
-	return YES;
+	return reverted;
 }
 
 @end

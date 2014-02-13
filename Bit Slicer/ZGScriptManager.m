@@ -717,13 +717,15 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	});
 }
 
-/*
- // Not used currently but may be useful to have in future
 - (void)removeScriptForVariable:(ZGVariable *)variable
 {
-	[self.scriptsDictionary removeObjectForKey:[NSValue valueWithNonretainedObject:variable]];
+	ZGPyScript *script = [self.scriptsDictionary objectForKey:[NSValue valueWithNonretainedObject:variable]];
+	if (script != nil)
+	{
+		[self.fileWatchingQueue removePath:script.path];
+		[self.scriptsDictionary removeObjectForKey:[NSValue valueWithNonretainedObject:variable]];
+	}
 }
- */
 
 - (void)stopScriptForVariable:(ZGVariable *)variable
 {
