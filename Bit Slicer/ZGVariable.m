@@ -36,6 +36,9 @@
 #import "NSStringAdditions.h"
 
 @interface ZGVariable ()
+{
+	NSString *_addressStringValue;
+}
 
 @property (readwrite, nonatomic) ZGMemoryAddress address;
 
@@ -352,7 +355,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		_scriptValue =
 			@"#Edit Me!\n"
 			@"#Documentation for scripting: https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Scripting\n"
-			@"from bitslicer import *\n\n"
+			@"import bitslicer\n\n"
 			@"class Script(object):\n"
 			@"\tdef __init__(self):\n"
 			@"\t\tdebug.log('Initialization goes here')\n"
