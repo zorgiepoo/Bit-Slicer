@@ -1014,186 +1014,178 @@ enum ZGStepExecution
 
 - (IBAction)readMemory:(id)sender
 {
-	BOOL success = NO;
-	
-	if (!self.currentProcess.valid || ![self.currentProcess hasGrantedAccess])
-	{
-		goto END_DEBUGGER_CHANGE;
-	}
-	
-	// create scope block to allow for goto
-	{
-		ZGMemoryAddress calculatedMemoryAddress = 0;
-		if (self.mappedFilePath != nil && sender == nil)
-		{
-			NSError *error = nil;
-			ZGMemoryAddress guessAddress = [[ZGMachBinary machBinaryWithPartialImageName:self.mappedFilePath inProcess:self.currentProcess error:&error] headerAddress] + self.offsetFromBase;
-			
-			if (error == nil)
-			{
-				calculatedMemoryAddress = guessAddress;
-				[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
-			}
-		}
-		else
-		{
-			NSError *error = nil;
-			NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue process:self.currentProcess failedImages:nil symbolicator:self.symbolicator error:&error];
-			if (error != nil)
-			{
-				NSLog(@"Encountered error when reading memory from debugger:");
-				NSLog(@"%@", error);
-				return;
-			}
-			if (ZGIsValidNumber(calculatedMemoryAddressExpression))
-			{
-				calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
-			}
-		}
-		
-		BOOL shouldUseFirstInstruction = NO;
-		
-		ZGMachBinaryInfo *firstMachBinaryInfo = [self.currentProcess.mainMachBinary machBinaryInfoInProcess:self.currentProcess];
-		NSRange machInstructionRange = NSMakeRange(firstMachBinaryInfo.firstInstructionAddress, firstMachBinaryInfo.textSegmentRange.length - (firstMachBinaryInfo.firstInstructionAddress - firstMachBinaryInfo.textSegmentRange.location));
-		
-		if (calculatedMemoryAddress == 0)
-		{
-			calculatedMemoryAddress = machInstructionRange.location;
-			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
-			shouldUseFirstInstruction = YES;
-		}
-		
-		// See if the instruction is already in the table, if so, just go to it
-		ZGInstruction *foundInstructionInTable = [self findInstructionInTableAtAddress:calculatedMemoryAddress];
-		if (foundInstructionInTable != nil)
-		{
-			self.offsetFromBase = calculatedMemoryAddress - self.baseAddress;
-			[self prepareNavigation];
-			[self scrollAndSelectRow:[self.instructions indexOfObject:foundInstructionInTable]];
-			if (self.window.firstResponder != self.backtraceController.tableView)
-			{
-				[self.window makeFirstResponder:self.instructionsTableView];
-			}
-			
-			[self updateNavigationButtons];
-			
-			success = YES;
-			goto END_DEBUGGER_CHANGE;
-		}
-		
-		NSArray *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
-		if (memoryRegions.count == 0)
-		{
-			goto END_DEBUGGER_CHANGE;
-		}
-		
-		ZGRegion *chosenRegion = nil;
-		for (ZGRegion *region in memoryRegions)
-		{
-			if ((region.protection & VM_PROT_READ) && (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size))
-			{
-				chosenRegion = region;
-				break;
-			}
-		}
-		
-		if (chosenRegion == nil)
-		{
-			goto END_DEBUGGER_CHANGE;
-		}
-		
-		ZGMemoryAddress firstInstructionAddress = 0;
-		ZGMemorySize maxInstructionsSize = 0;
-		NSString *mappedFilePath = @"";
-		ZGMemoryAddress baseAddress = 0;
-		
-		if (!shouldUseFirstInstruction)
-		{
-			NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
-			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:calculatedMemoryAddress fromMachBinaries:machBinaries];
-			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
-			NSRange instructionRange = NSMakeRange(machBinaryInfo.firstInstructionAddress, machBinaryInfo.textSegmentRange.length - (machBinaryInfo.firstInstructionAddress - machBinaryInfo.textSegmentRange.location));
-			
-			baseAddress = machBinary.headerAddress;
-			mappedFilePath = [machBinary filePathInProcess:self.currentProcess];
-			
-			firstInstructionAddress = instructionRange.location;
-			maxInstructionsSize = instructionRange.length;
-			
-			if (firstInstructionAddress + maxInstructionsSize < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
-			{
-				// let's use the chosen region if the text section doesn't intersect with it
-				firstInstructionAddress = chosenRegion.address;
-				maxInstructionsSize = chosenRegion.size;
-				mappedFilePath = @"";
-				baseAddress = 0;
-			}
-			else if (calculatedMemoryAddress < firstInstructionAddress)
-			{
-				calculatedMemoryAddress = firstInstructionAddress;
-				[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
-			}
-		}
-		else
-		{
-			firstInstructionAddress = calculatedMemoryAddress;
-			maxInstructionsSize = machInstructionRange.length - (calculatedMemoryAddress - machInstructionRange.location);
-			mappedFilePath = [self.currentProcess.mainMachBinary filePathInProcess:self.currentProcess];
-			baseAddress = self.currentProcess.mainMachBinary.headerAddress;
-		}
-		
-		self.mappedFilePath = mappedFilePath;
-		self.baseAddress = baseAddress;
-		self.offsetFromBase = calculatedMemoryAddress - baseAddress;
-		
-		// Make sure disassembler won't show anything before this address
-		self.instructionBoundary = NSMakeRange(firstInstructionAddress, maxInstructionsSize);
-		
-		// Disassemble within a range from +- WINDOW_SIZE from selection address
-		const NSUInteger WINDOW_SIZE = 2048;
-		
-		ZGMemoryAddress lowBoundAddress = calculatedMemoryAddress - WINDOW_SIZE;
-		if (lowBoundAddress <= firstInstructionAddress)
-		{
-			lowBoundAddress = firstInstructionAddress;
-		}
-		else
-		{
-			lowBoundAddress = [self findInstructionBeforeAddress:lowBoundAddress inProcess:self.currentProcess].variable.address;
-			if (lowBoundAddress < firstInstructionAddress)
-			{
-				lowBoundAddress = firstInstructionAddress;
-			}
-		}
-		
-		ZGMemoryAddress highBoundAddress = calculatedMemoryAddress + WINDOW_SIZE;
-		if (highBoundAddress >= chosenRegion.address + chosenRegion.size)
-		{
-			highBoundAddress = chosenRegion.address + chosenRegion.size;
-		}
-		else
-		{
-			highBoundAddress = [self findInstructionBeforeAddress:highBoundAddress inProcess:self.currentProcess].variable.address;
-			if (highBoundAddress <= chosenRegion.address || highBoundAddress > chosenRegion.address + chosenRegion.size)
-			{
-				highBoundAddress = chosenRegion.address + chosenRegion.size;
-			}
-		}
-		
-		[self.undoManager removeAllActions];
-		[self updateDisassemblerWithAddress:lowBoundAddress size:highBoundAddress - lowBoundAddress selectionAddress:calculatedMemoryAddress];
-		
-		success = YES;
-	}
-	
-END_DEBUGGER_CHANGE:
-	if (!success)
-	{
-		// clear data
+	void (^cleanupOnFailure)(void) = ^{
 		self.instructions = [NSArray array];
 		[self.instructionsTableView reloadData];
 		[self updateStatusBar];
+	};
+	
+	if (!self.currentProcess.valid || ![self.currentProcess hasGrantedAccess])
+	{
+		cleanupOnFailure();
+		return;
 	}
+	
+	ZGMemoryAddress calculatedMemoryAddress = 0;
+	if (self.mappedFilePath != nil && sender == nil)
+	{
+		NSError *error = nil;
+		ZGMemoryAddress guessAddress = [[ZGMachBinary machBinaryWithPartialImageName:self.mappedFilePath inProcess:self.currentProcess error:&error] headerAddress] + self.offsetFromBase;
+		
+		if (error == nil)
+		{
+			calculatedMemoryAddress = guessAddress;
+			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
+		}
+	}
+	else
+	{
+		NSError *error = nil;
+		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue process:self.currentProcess failedImages:nil symbolicator:self.symbolicator error:&error];
+		if (error != nil)
+		{
+			NSLog(@"Encountered error when reading memory from debugger:");
+			NSLog(@"%@", error);
+			return;
+		}
+		if (ZGIsValidNumber(calculatedMemoryAddressExpression))
+		{
+			calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
+		}
+	}
+	
+	BOOL shouldUseFirstInstruction = NO;
+	
+	ZGMachBinaryInfo *firstMachBinaryInfo = [self.currentProcess.mainMachBinary machBinaryInfoInProcess:self.currentProcess];
+	NSRange machInstructionRange = NSMakeRange(firstMachBinaryInfo.firstInstructionAddress, firstMachBinaryInfo.textSegmentRange.length - (firstMachBinaryInfo.firstInstructionAddress - firstMachBinaryInfo.textSegmentRange.location));
+	
+	if (calculatedMemoryAddress == 0)
+	{
+		calculatedMemoryAddress = machInstructionRange.location;
+		[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
+		shouldUseFirstInstruction = YES;
+	}
+	
+	// See if the instruction is already in the table, if so, just go to it
+	ZGInstruction *foundInstructionInTable = [self findInstructionInTableAtAddress:calculatedMemoryAddress];
+	if (foundInstructionInTable != nil)
+	{
+		self.offsetFromBase = calculatedMemoryAddress - self.baseAddress;
+		[self prepareNavigation];
+		[self scrollAndSelectRow:[self.instructions indexOfObject:foundInstructionInTable]];
+		if (self.window.firstResponder != self.backtraceController.tableView)
+		{
+			[self.window makeFirstResponder:self.instructionsTableView];
+		}
+		
+		[self updateNavigationButtons];
+		
+		return;
+	}
+	
+	NSArray *memoryRegions = [ZGRegion regionsFromProcessTaskRecursively:self.currentProcess.processTask];
+	if (memoryRegions.count == 0)
+	{
+		cleanupOnFailure();
+		return;
+	}
+	
+	ZGRegion *chosenRegion = nil;
+	for (ZGRegion *region in memoryRegions)
+	{
+		if ((region.protection & VM_PROT_READ) && (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size))
+		{
+			chosenRegion = region;
+			break;
+		}
+	}
+	
+	if (chosenRegion == nil)
+	{
+		cleanupOnFailure();
+		return;
+	}
+	
+	ZGMemoryAddress firstInstructionAddress = 0;
+	ZGMemorySize maxInstructionsSize = 0;
+	NSString *mappedFilePath = @"";
+	ZGMemoryAddress baseAddress = 0;
+	
+	if (!shouldUseFirstInstruction)
+	{
+		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+		ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:calculatedMemoryAddress fromMachBinaries:machBinaries];
+		ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
+		NSRange instructionRange = NSMakeRange(machBinaryInfo.firstInstructionAddress, machBinaryInfo.textSegmentRange.length - (machBinaryInfo.firstInstructionAddress - machBinaryInfo.textSegmentRange.location));
+		
+		baseAddress = machBinary.headerAddress;
+		mappedFilePath = [machBinary filePathInProcess:self.currentProcess];
+		
+		firstInstructionAddress = instructionRange.location;
+		maxInstructionsSize = instructionRange.length;
+		
+		if (firstInstructionAddress + maxInstructionsSize < chosenRegion.address || firstInstructionAddress >= chosenRegion.address + chosenRegion.size)
+		{
+			// let's use the chosen region if the text section doesn't intersect with it
+			firstInstructionAddress = chosenRegion.address;
+			maxInstructionsSize = chosenRegion.size;
+			mappedFilePath = @"";
+			baseAddress = 0;
+		}
+		else if (calculatedMemoryAddress < firstInstructionAddress)
+		{
+			calculatedMemoryAddress = firstInstructionAddress;
+			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
+		}
+	}
+	else
+	{
+		firstInstructionAddress = calculatedMemoryAddress;
+		maxInstructionsSize = machInstructionRange.length - (calculatedMemoryAddress - machInstructionRange.location);
+		mappedFilePath = [self.currentProcess.mainMachBinary filePathInProcess:self.currentProcess];
+		baseAddress = self.currentProcess.mainMachBinary.headerAddress;
+	}
+	
+	self.mappedFilePath = mappedFilePath;
+	self.baseAddress = baseAddress;
+	self.offsetFromBase = calculatedMemoryAddress - baseAddress;
+	
+	// Make sure disassembler won't show anything before this address
+	self.instructionBoundary = NSMakeRange(firstInstructionAddress, maxInstructionsSize);
+	
+	// Disassemble within a range from +- WINDOW_SIZE from selection address
+	const NSUInteger WINDOW_SIZE = 2048;
+	
+	ZGMemoryAddress lowBoundAddress = calculatedMemoryAddress - WINDOW_SIZE;
+	if (lowBoundAddress <= firstInstructionAddress)
+	{
+		lowBoundAddress = firstInstructionAddress;
+	}
+	else
+	{
+		lowBoundAddress = [self findInstructionBeforeAddress:lowBoundAddress inProcess:self.currentProcess].variable.address;
+		if (lowBoundAddress < firstInstructionAddress)
+		{
+			lowBoundAddress = firstInstructionAddress;
+		}
+	}
+	
+	ZGMemoryAddress highBoundAddress = calculatedMemoryAddress + WINDOW_SIZE;
+	if (highBoundAddress >= chosenRegion.address + chosenRegion.size)
+	{
+		highBoundAddress = chosenRegion.address + chosenRegion.size;
+	}
+	else
+	{
+		highBoundAddress = [self findInstructionBeforeAddress:highBoundAddress inProcess:self.currentProcess].variable.address;
+		if (highBoundAddress <= chosenRegion.address || highBoundAddress > chosenRegion.address + chosenRegion.size)
+		{
+			highBoundAddress = chosenRegion.address + chosenRegion.size;
+		}
+	}
+	
+	[self.undoManager removeAllActions];
+	[self updateDisassemblerWithAddress:lowBoundAddress size:highBoundAddress - lowBoundAddress selectionAddress:calculatedMemoryAddress];
 }
 
 #pragma mark Useful methods for the world
