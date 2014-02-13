@@ -52,6 +52,7 @@
 #import "structmember.h"
 #import "CoreSymbolication.h"
 #import "ZGUtilities.h"
+#import "ZGPyVirtualMemory.h"
 
 @class ZGPyDebugger;
 
@@ -172,6 +173,8 @@ static PyTypeObject DebuggerType =
 
 @implementation ZGPyDebugger
 
+static PyObject *gDebuggerException;
+
 + (void)loadPythonClassInMainModule:(PyObject *)module
 {
 	DebuggerType.tp_new = PyType_GenericNew;
@@ -180,6 +183,12 @@ static PyTypeObject DebuggerType =
 		Py_INCREF(&DebuggerType);
 		
 		PyModule_AddObject(module, "Debugger", (PyObject *)&DebuggerType);
+		
+		const char *debuggerExceptionName = "DebuggerError";
+		NSString *exceptionNameWithModule = [NSString stringWithFormat:@"%s.%s", PyModule_GetName(module), debuggerExceptionName];
+		
+		gDebuggerException = PyErr_NewException([exceptionNameWithModule UTF8String], NULL, NULL);
+		PyModule_AddObject(module, debuggerExceptionName, gDebuggerException);
 	}
 	else
 	{
@@ -404,7 +413,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 		}
 		else
 		{
-			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.readBytes failed to read %llu byte(s) at 0x%llX", size, address] UTF8String]);
+			PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"debug.readBytes failed to read %llu byte(s) at 0x%llX", size, address] UTF8String]);
 			
 			NSString *errorMessage = @"Error: Failed to read bytes using debug object";
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -435,7 +444,7 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 		
 		if (!success)
 		{
-			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
+			PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"debug.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
 		}
 		
 		PyBuffer_Release(&buffer);
@@ -457,7 +466,7 @@ static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
 			CSSymbolRef symbol = ZGFindSymbol(symbolicator, @(symbolName), symbolOwner == NULL ? nil : @(symbolOwner), YES);
 			if (CSIsNull(symbol))
 			{
-				PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.findSymbol failed to find symbol %s", symbolName] UTF8String]);
+				PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.findSymbol failed to find symbol %s", symbolName] UTF8String]);
 			}
 			else
 			{
@@ -500,7 +509,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 		}
 		else
 		{
-			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.bytesBeforeInjection failed with source address: 0x%llX, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
+			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.bytesBeforeInjection failed with source address: 0x%llX, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
 		}
 	}
 	return retValue;
@@ -530,7 +539,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		 recordUndo:NO
 		 error:&error])
 		{
-			PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.injectCode failed with source address: 0x%llx, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
+			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.injectCode failed with source address: 0x%llx, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[[[ZGAppController sharedController] loggerController] writeLine:[[error userInfo] objectForKey:@"reason"]];
@@ -587,17 +596,16 @@ static PyObject *watchAccess(DebuggerClass *self, PyObject *args, NSString *func
 	
 	if (PyCallable_Check(callback) == 0)
 	{
-		PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.%@ failed adding watchpoint at 0x%llX (%llu byte(s)) because callback is not callable", functionName, memoryAddress, numberOfBytes] UTF8String]);
+		PyErr_SetString(PyExc_ValueError, [[NSString stringWithFormat:@"debug.%@ failed adding watchpoint at 0x%llX (%llu byte(s)) because callback is not callable", functionName, memoryAddress, numberOfBytes] UTF8String]);
 		
 		return NULL;
 	}
 
-	
 	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:numberOfBytes address:memoryAddress type:ZGByteArray qualifier:0 pointerSize:self->objcSelf.process.pointerSize];
 	
 	if (![[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self->objcSelf.process watchPointType:watchPointType delegate:self->breakPointDelegate getBreakPoint:NULL])
 	{
-		PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.%@ failed adding watchpoint at 0x%llX (%llu byte(s))", functionName, memoryAddress, numberOfBytes] UTF8String]);
+		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.%@ failed adding watchpoint at 0x%llX (%llu byte(s))", functionName, memoryAddress, numberOfBytes] UTF8String]);
 		
 		return NULL;
 	}
@@ -657,7 +665,7 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 	
 	if (PyCallable_Check(callback) == 0)
 	{
-		PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX because callback is not callable", memoryAddress] UTF8String]);
+		PyErr_SetString(PyExc_ValueError, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX because callback is not callable", memoryAddress] UTF8String]);
 		return NULL;
 	}
 	
@@ -665,13 +673,13 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 	
 	if (instruction == nil)
 	{
-		PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.addBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
+		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.addBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
 		return NULL;
 	}
 	
 	if (![[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self->objcSelf.process condition:NULL delegate:self->breakPointDelegate])
 	{
-		PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX", memoryAddress] UTF8String]);
+		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX", memoryAddress] UTF8String]);
 		return NULL;
 	}
 	
@@ -694,7 +702,7 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 	
 	if (instruction == nil)
 	{
-		PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.removeBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
+		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.removeBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
 		return NULL;
 	}
 	
@@ -773,7 +781,7 @@ static BOOL writeRegister(NSDictionary *registerOffsetsDictionary, const char *r
 	else
 	{
 		// Unexpected type...
-		PyErr_SetString(PyExc_Exception, [[NSString stringWithFormat:@"debug.writeRegisters encountered an unexpected value type for key %s", registerString] UTF8String]);
+		PyErr_SetString(PyExc_ValueError, [[NSString stringWithFormat:@"debug.writeRegisters encountered an unexpected value type for key %s", registerString] UTF8String]);
 		return NO;
 	}
 	
@@ -790,7 +798,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	if (self->objcSelf.haltedBreakPoint == nil)
 	{
-		PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed because we are not at a halted breakpoint");
+		PyErr_SetString(gDebuggerException, "debug.writeRegisters failed because we are not at a halted breakpoint");
 		return NULL;
 	}
 	
@@ -800,7 +808,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, &threadStateCount))
 	{
-		PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed retrieving target's thread state");
+		PyErr_SetString(gDebuggerException, "debug.writeRegisters failed retrieving target's thread state");
 		ZGResumeTask(self->processTask);
 		return NULL;
 	}
@@ -871,7 +879,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		
 		if (!ZGSetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, threadStateCount))
 		{
-			PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed to write the new thread state");
+			PyErr_SetString(gDebuggerException, "debug.writeRegisters failed to write the new thread state");
 			success = NO;
 		}
 		
@@ -884,7 +892,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		
 		if (!ZGSetVectorThreadState(&vectorState, self->objcSelf.haltedBreakPoint.thread, vectorStateCount, self->is64Bit))
 		{
-			PyErr_SetString(PyExc_Exception, "debug.writeRegisters failed to write the new vector state");
+			PyErr_SetString(gDebuggerException, "debug.writeRegisters failed to write the new vector state");
 			success = NO;
 		}
 		

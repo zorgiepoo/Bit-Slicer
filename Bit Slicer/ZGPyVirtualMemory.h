@@ -40,6 +40,8 @@
 @class ZGProcess;
 @class ZGSearchProgress;
 
+extern PyObject *gVirtualMemoryException;
+
 @interface ZGPyVirtualMemory : NSObject <ZGSearchProgressDelegate>
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
