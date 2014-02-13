@@ -357,10 +357,26 @@
 
 - (void)updateMemoryViewerAtAddress:(ZGMemoryAddress)desiredMemoryAddress withSelectionLength:(ZGMemorySize)selectionLength
 {
-	BOOL success = NO;
 	self.lastUpdateCount++;
 	
 	self.lastUpdatedData = nil;
+	
+	void (^cleanupOnSuccess)(BOOL) = ^(BOOL success) {
+		[self invalidateRestorableState];
+		
+		if (!success)
+		{
+			[self clearData];
+		}
+		
+		// Revert back to overwrite mode
+		self.textView.controller.editable = YES;
+		[self.textView.controller setInOverwriteMode:YES];
+		
+		[self.textView.controller.undoManager removeAllActions];
+		
+		self.lastUpdateCount--;
+	};
 	
 	// When filling or clearing the memory viewer, make sure we aren't in overwrite mode
 	// If we are, filling the memory viewer will take too long, or clearing it will fail
@@ -369,173 +385,156 @@
 	
 	if (!self.currentProcess.valid || ![self.currentProcess hasGrantedAccess])
 	{
-		goto END_MEMORY_VIEW_CHANGE;
+		cleanupOnSuccess(NO);
+		return;
 	}
 	
-	// create scope block to allow for goto
+	NSArray *memoryRegions = [ZGRegion regionsFromProcessTaskRecursively:self.currentProcess.processTask];
+	if (memoryRegions.count == 0)
 	{
-		NSArray *memoryRegions = [ZGRegion regionsFromProcessTaskRecursively:self.currentProcess.processTask];
-		if (memoryRegions.count == 0)
-		{
-			goto END_MEMORY_VIEW_CHANGE;
-		}
-		
-		ZGRegion *chosenRegion = nil;
-		if (desiredMemoryAddress != 0)
-		{
-			for (ZGRegion *region in memoryRegions)
-			{
-				if ((region.protection & VM_PROT_READ) && desiredMemoryAddress >= region.address && desiredMemoryAddress < region.address + region.size)
-				{
-					chosenRegion = region;
-					break;
-				}
-			}
-		}
-		
-		if (!chosenRegion)
-		{
-			for (ZGRegion *region in memoryRegions)
-			{
-				if (region.protection & VM_PROT_READ)
-				{
-					chosenRegion = region;
-					break;
-				}
-			}
-			
-			if (!chosenRegion)
-			{
-				goto END_MEMORY_VIEW_CHANGE;
-			}
-			
-			desiredMemoryAddress = 0;
-			selectionLength = 0;
-		}
-		
-		ZGMemoryAddress oldMemoryAddress = self.currentMemoryAddress;
-		
-		self.currentMemoryAddress = chosenRegion.address;
-		self.currentMemorySize = chosenRegion.size;
-		
-#define MEMORY_VIEW_THRESHOLD 26843545
-		// Bound the upper and lower half by a threshold so that we will never view too much data that we won't be able to handle, in the rarer cases
-		if (desiredMemoryAddress > 0)
-		{
-			if (desiredMemoryAddress >= MEMORY_VIEW_THRESHOLD && desiredMemoryAddress - MEMORY_VIEW_THRESHOLD > self.currentMemoryAddress)
-			{
-				ZGMemoryAddress newMemoryAddress = desiredMemoryAddress - MEMORY_VIEW_THRESHOLD;
-				self.currentMemorySize -= newMemoryAddress - self.currentMemoryAddress;
-				self.currentMemoryAddress = newMemoryAddress;
-			}
-			
-			if (desiredMemoryAddress + MEMORY_VIEW_THRESHOLD < self.currentMemoryAddress + self.currentMemorySize)
-			{
-				self.currentMemorySize -= self.currentMemoryAddress + self.currentMemorySize - (desiredMemoryAddress + MEMORY_VIEW_THRESHOLD);
-			}
-		}
-		else
-		{
-			if (self.currentMemorySize > MEMORY_VIEW_THRESHOLD * 2)
-			{
-				self.currentMemorySize = MEMORY_VIEW_THRESHOLD * 2;
-			}
-		}
-		
-		ZGMemoryAddress memoryAddress = self.currentMemoryAddress;
-		ZGMemorySize memorySize = self.currentMemorySize;
-		
-		void *bytes = NULL;
-		
-		if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize))
-		{
-			if (self.textView.data && ![self.textView.data isEqualToData:[NSData data]])
-			{	
-				HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
-				HFRange selectionRange = [[self.textView.controller.selectedContentsRanges objectAtIndex:0] HFRange];
-				
-				ZGMemorySize selectionLength;
-				ZGMemoryAddress navigationAddress;
-				
-				if (selectionRange.length > 0 && selectionRange.location >= displayedLineRange.location * self.textView.controller.bytesPerLine && selectionRange.location + selectionRange.length <= (displayedLineRange.location + displayedLineRange.length) * self.textView.controller.bytesPerLine)
-				{
-					// Selection is completely within the user's sight
-					navigationAddress = oldMemoryAddress + selectionRange.location;
-					selectionLength = selectionRange.length;
-				}
-				else
-				{
-					// Selection not completely within user's sight, use middle of viewer as the point to navigate
-					navigationAddress = oldMemoryAddress + (displayedLineRange.location + displayedLineRange.length / 2) * self.textView.controller.bytesPerLine;
-					selectionLength = 0;
-				}
-								
-				[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:selectionLength];
-			}
-			
-			// Replace all the contents of the self.textView
-			self.textView.data = [NSData dataWithBytes:bytes length:(NSUInteger)memorySize];
-			self.currentMemoryAddress = memoryAddress;
-			self.currentMemorySize = memorySize;
-			
-			self.statusBarRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
-			// Select the first byte of data
-			self.statusBarRepresenter.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(0, 0)]];
-			// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
-			[self.statusBarRepresenter updateString];
-			
-			self.lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase10(memoryAddress + memorySize);
-			self.lineCountingRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
-			// This will force the line numbers to update
-			[self.lineCountingRepresenter.view setNeedsDisplay:YES];
-			// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
-			[self.textView.layoutRepresenter performLayout];
-			
-			success = YES;
-			
-			ZGFreeBytes(self.currentProcess.processTask, bytes, memorySize);
-			
-			if (!desiredMemoryAddress)
-			{
-				desiredMemoryAddress = memoryAddress;
-			}
-			
-			self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", desiredMemoryAddress];
-			
-			// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
-			for (id representer in self.textView.controller.representers)
-			{
-				if ([representer isKindOfClass:[HFHexTextRepresenter class]])
-				{
-					[self.window makeFirstResponder:[representer view]];
-					break;
-				}
-			}
-			
-			[self relayoutAndResizeWindowPreservingBytesPerLine];
-			
-			[self jumpToMemoryAddress:desiredMemoryAddress withSelectionLength:selectionLength];
-			
-			[self updateNavigationButtons];
-		}
+		cleanupOnSuccess(NO);
+		return;
 	}
 	
-END_MEMORY_VIEW_CHANGE:
-	
-	[self invalidateRestorableState];
-	
-	if (!success)
+	ZGRegion *chosenRegion = nil;
+	if (desiredMemoryAddress != 0)
 	{
-		[self clearData];
+		for (ZGRegion *region in memoryRegions)
+		{
+			if ((region.protection & VM_PROT_READ) && desiredMemoryAddress >= region.address && desiredMemoryAddress < region.address + region.size)
+			{
+				chosenRegion = region;
+				break;
+			}
+		}
 	}
 	
-	// Revert back to overwrite mode
-	self.textView.controller.editable = YES;
-	[self.textView.controller setInOverwriteMode:YES];
+	if (chosenRegion == nil)
+	{
+		for (ZGRegion *region in memoryRegions)
+		{
+			if (region.protection & VM_PROT_READ)
+			{
+				chosenRegion = region;
+				break;
+			}
+		}
+		
+		if (chosenRegion == nil)
+		{
+			cleanupOnSuccess(NO);
+			return;
+		}
+		
+		desiredMemoryAddress = 0;
+		selectionLength = 0;
+	}
 	
-	[self.textView.controller.undoManager removeAllActions];
+	ZGMemoryAddress oldMemoryAddress = self.currentMemoryAddress;
 	
-	self.lastUpdateCount--;
+	self.currentMemoryAddress = chosenRegion.address;
+	self.currentMemorySize = chosenRegion.size;
+	
+	const NSUInteger MEMORY_VIEW_THRESHOLD = 26843545;
+	// Bound the upper and lower half by a threshold so that we will never view too much data that we won't be able to handle, in the rarer cases
+	if (desiredMemoryAddress > 0)
+	{
+		if (desiredMemoryAddress >= MEMORY_VIEW_THRESHOLD && desiredMemoryAddress - MEMORY_VIEW_THRESHOLD > self.currentMemoryAddress)
+		{
+			ZGMemoryAddress newMemoryAddress = desiredMemoryAddress - MEMORY_VIEW_THRESHOLD;
+			self.currentMemorySize -= newMemoryAddress - self.currentMemoryAddress;
+			self.currentMemoryAddress = newMemoryAddress;
+		}
+		
+		if (desiredMemoryAddress + MEMORY_VIEW_THRESHOLD < self.currentMemoryAddress + self.currentMemorySize)
+		{
+			self.currentMemorySize -= self.currentMemoryAddress + self.currentMemorySize - (desiredMemoryAddress + MEMORY_VIEW_THRESHOLD);
+		}
+	}
+	else
+	{
+		if (self.currentMemorySize > MEMORY_VIEW_THRESHOLD * 2)
+		{
+			self.currentMemorySize = MEMORY_VIEW_THRESHOLD * 2;
+		}
+	}
+	
+	ZGMemoryAddress memoryAddress = self.currentMemoryAddress;
+	ZGMemorySize memorySize = self.currentMemorySize;
+	
+	void *bytes = NULL;
+	
+	if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize))
+	{
+		if (self.textView.data && ![self.textView.data isEqualToData:[NSData data]])
+		{
+			HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
+			HFRange selectionRange = [[self.textView.controller.selectedContentsRanges objectAtIndex:0] HFRange];
+			
+			ZGMemorySize selectionLength;
+			ZGMemoryAddress navigationAddress;
+			
+			if (selectionRange.length > 0 && selectionRange.location >= displayedLineRange.location * self.textView.controller.bytesPerLine && selectionRange.location + selectionRange.length <= (displayedLineRange.location + displayedLineRange.length) * self.textView.controller.bytesPerLine)
+			{
+				// Selection is completely within the user's sight
+				navigationAddress = oldMemoryAddress + selectionRange.location;
+				selectionLength = selectionRange.length;
+			}
+			else
+			{
+				// Selection not completely within user's sight, use middle of viewer as the point to navigate
+				navigationAddress = oldMemoryAddress + (displayedLineRange.location + displayedLineRange.length / 2) * self.textView.controller.bytesPerLine;
+				selectionLength = 0;
+			}
+			
+			[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:selectionLength];
+		}
+		
+		// Replace all the contents of the self.textView
+		self.textView.data = [NSData dataWithBytes:bytes length:(NSUInteger)memorySize];
+		self.currentMemoryAddress = memoryAddress;
+		self.currentMemorySize = memorySize;
+		
+		self.statusBarRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
+		// Select the first byte of data
+		self.statusBarRepresenter.controller.selectedContentsRanges = @[[HFRangeWrapper withRange:HFRangeMake(0, 0)]];
+		// To make sure status bar doesn't always show 0x0 as the offset, we need to force it to update
+		[self.statusBarRepresenter updateString];
+		
+		self.lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase10(memoryAddress + memorySize);
+		self.lineCountingRepresenter.beginningMemoryAddress = self.currentMemoryAddress;
+		// This will force the line numbers to update
+		[self.lineCountingRepresenter.view setNeedsDisplay:YES];
+		// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
+		[self.textView.layoutRepresenter performLayout];
+		
+		ZGFreeBytes(self.currentProcess.processTask, bytes, memorySize);
+		
+		if (desiredMemoryAddress == 0)
+		{
+			desiredMemoryAddress = memoryAddress;
+		}
+		
+		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", desiredMemoryAddress];
+		
+		// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
+		for (id representer in self.textView.controller.representers)
+		{
+			if ([representer isKindOfClass:[HFHexTextRepresenter class]])
+			{
+				[self.window makeFirstResponder:[representer view]];
+				break;
+			}
+		}
+		
+		[self relayoutAndResizeWindowPreservingBytesPerLine];
+		
+		[self jumpToMemoryAddress:desiredMemoryAddress withSelectionLength:selectionLength];
+		
+		[self updateNavigationButtons];
+	}
+	
+	cleanupOnSuccess(YES);
 }
 
 - (IBAction)changeMemoryView:(id)sender
