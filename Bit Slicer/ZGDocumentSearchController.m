@@ -215,7 +215,6 @@
 
 - (void)updateProgressBarFromProgress:(ZGSearchProgress *)searchProgress
 {
-	self.windowController.progressIndicator.maxValue = (double)searchProgress.maxProgress;
 	self.windowController.progressIndicator.doubleValue = (double)searchProgress.progress;
 	
 	[self.windowController setStatus:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
@@ -242,6 +241,7 @@
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress
 {
+	self.windowController.progressIndicator.maxValue = (double)searchProgress.maxProgress;
 	[self updateProgressBarFromProgress:searchProgress];
 	
 	self.searchProgress = searchProgress;
@@ -716,7 +716,6 @@
 	[self prepareTask];
 	
 	[self.windowController setStatus:@"Storing All Values..."];
-	[self.searchProgress clear];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		self.tempSavedData = [ZGStoredData storedDataFromProcessTask:self.windowController.currentProcess.processTask];

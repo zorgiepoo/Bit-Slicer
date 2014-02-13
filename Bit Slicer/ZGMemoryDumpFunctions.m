@@ -66,9 +66,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 	
 	NSArray *regions = [ZGRegion regionsFromProcessTaskRecursively:processTask];
 	
-	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] init];
-	searchProgress.progressType = ZGSearchProgressMemoryDumping;
-	searchProgress.maxProgress = regions.count;
+	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryDumping maxProgress:regions.count];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[delegate progressWillBegin:searchProgress];

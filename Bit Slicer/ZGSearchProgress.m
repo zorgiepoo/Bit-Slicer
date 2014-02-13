@@ -36,12 +36,15 @@
 
 @implementation ZGSearchProgress
 
-- (void)clear
+- (id)initWithProgressType:(ZGSearchProgressType)progressType maxProgress:(ZGMemorySize)maxProgress
 {
-	self.progress = 0;
-	self.maxProgress = 0;
-	self.numberOfVariablesFound = 0;
-	self.shouldCancelSearch = NO;
+	self = [super init];
+	if (self != nil)
+	{
+		_progressType = progressType;
+		_maxProgress = maxProgress;
+	}
+	return self;
 }
 
 @end

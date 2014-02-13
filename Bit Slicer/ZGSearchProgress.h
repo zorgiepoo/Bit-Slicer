@@ -37,12 +37,6 @@
 
 @interface ZGSearchProgress : NSObject
 
-@property (nonatomic) ZGMemorySize progress;
-@property (nonatomic) ZGMemorySize maxProgress;
-@property (nonatomic) NSUInteger numberOfVariablesFound;
-
-@property (readwrite) BOOL shouldCancelSearch;
-
 typedef enum
 {
 	ZGSearchProgressMemoryScanning,
@@ -50,8 +44,14 @@ typedef enum
 	ZGSearchProgressMemoryDumping
 } ZGSearchProgressType;
 
-@property (nonatomic) ZGSearchProgressType progressType;
+- (id)initWithProgressType:(ZGSearchProgressType)progressType maxProgress:(ZGMemorySize)maxProgress;
 
-- (void)clear;
+@property (nonatomic, readonly) ZGSearchProgressType progressType;
+
+@property (nonatomic) ZGMemorySize progress;
+@property (nonatomic, readonly) ZGMemorySize maxProgress;
+@property (nonatomic) NSUInteger numberOfVariablesFound;
+
+@property BOOL shouldCancelSearch;
 
 @end
