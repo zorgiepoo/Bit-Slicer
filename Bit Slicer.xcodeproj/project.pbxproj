@@ -18,6 +18,7 @@
 		770FABB81849160200C176B7 /* ZGEditSizeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770FABB61849160200C176B7 /* ZGEditSizeWindowController.xib */; };
 		770FAC031853C5D600C176B7 /* APTokenSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC021853C5D600C176B7 /* APTokenSearchField.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC0518542BFF00C176B7 /* ZGSearchToken.m */; };
+		7714194118AC7D8500600423 /* ZGMemoryDumpFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714194018AC7D8500600423 /* ZGMemoryDumpFunctions.m */; };
 		771A931D18791A8D0098511D /* ZGTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 771A931C18791A8D0098511D /* ZGTableView.m */; };
 		77282120189B854D0044E4BC /* ZGFunctionTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7728211F189B854D0044E4BC /* ZGFunctionTypes.m */; };
 		77282123189E769B0044E4BC /* ZGStoredData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282122189E769B0044E4BC /* ZGStoredData.m */; };
@@ -181,6 +182,8 @@
 		770FAC021853C5D600C176B7 /* APTokenSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APTokenSearchField.m; path = deps/APTokenSearchField.m; sourceTree = "<group>"; };
 		770FAC0418542BFF00C176B7 /* ZGSearchToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchToken.h; path = "Bit Slicer/ZGSearchToken.h"; sourceTree = "<group>"; };
 		770FAC0518542BFF00C176B7 /* ZGSearchToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchToken.m; path = "Bit Slicer/ZGSearchToken.m"; sourceTree = "<group>"; };
+		7714193F18AC7D8500600423 /* ZGMemoryDumpFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryDumpFunctions.h; path = "Bit Slicer/ZGMemoryDumpFunctions.h"; sourceTree = "<group>"; };
+		7714194018AC7D8500600423 /* ZGMemoryDumpFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMemoryDumpFunctions.m; path = "Bit Slicer/ZGMemoryDumpFunctions.m"; sourceTree = "<group>"; };
 		771A931B18791A8D0098511D /* ZGTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGTableView.h; path = "Bit Slicer/ZGTableView.h"; sourceTree = "<group>"; };
 		771A931C18791A8D0098511D /* ZGTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGTableView.m; path = "Bit Slicer/ZGTableView.m"; sourceTree = "<group>"; };
 		7728211E189B854D0044E4BC /* ZGFunctionTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGFunctionTypes.h; path = "Bit Slicer/ZGFunctionTypes.h"; sourceTree = "<group>"; };
@@ -656,15 +659,15 @@
 			name = "Search Controls & Tokens";
 			sourceTree = "<group>";
 		};
-		7728EE0C16BE3DDA00F9E1AD /* Misc. */ = {
+		7728EE0C16BE3DDA00F9E1AD /* Dumping Memory */ = {
 			isa = PBXGroup;
 			children = (
 				77F115DA17D2EDB7009E002A /* ZGMemoryDumpController.h */,
 				77F115DB17D2EDB7009E002A /* ZGMemoryDumpController.m */,
-				77F115DC17D2EDB7009E002A /* ZGMemoryProtectionController.h */,
-				77F115DD17D2EDB7009E002A /* ZGMemoryProtectionController.m */,
+				7714193F18AC7D8500600423 /* ZGMemoryDumpFunctions.h */,
+				7714194018AC7D8500600423 /* ZGMemoryDumpFunctions.m */,
 			);
-			name = Misc.;
+			name = "Dumping Memory";
 			sourceTree = "<group>";
 		};
 		77329B5A168D07B6007DCAE2 /* Debugger */ = {
@@ -871,7 +874,9 @@
 				77F115A517D2E865009E002A /* HFLineCountingView.h */,
 				77F115D717D2ED9D009E002A /* ZGLineCountingView.h */,
 				77F115D817D2ED9D009E002A /* ZGLineCountingView.m */,
-				7728EE0C16BE3DDA00F9E1AD /* Misc. */,
+				7728EE0C16BE3DDA00F9E1AD /* Dumping Memory */,
+				77F115DC17D2EDB7009E002A /* ZGMemoryProtectionController.h */,
+				77F115DD17D2EDB7009E002A /* ZGMemoryProtectionController.m */,
 			);
 			name = "Memory Viewer";
 			sourceTree = "<group>";
@@ -1259,6 +1264,7 @@
 				77F1163D17D2EF8E009E002A /* ZGMemoryWindowController.m in Sources */,
 				7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */,
 				770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */,
+				7714194118AC7D8500600423 /* ZGMemoryDumpFunctions.m in Sources */,
 				77F1164017D2EF9E009E002A /* ZGDebuggerController.m in Sources */,
 				77F1164317D2EFB4009E002A /* ZGDisassemblerObject.m in Sources */,
 				77F1164617D2EFBD009E002A /* ZGInstruction.m in Sources */,

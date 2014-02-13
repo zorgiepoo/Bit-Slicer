@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/19/12.
+ * Created by Mayur Pawashe on 2/12/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,12 +34,6 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGSearchProgressDelegate.h"
+#import "ZGMemoryTypes.h"
 
-@interface ZGMemoryDumpController : NSObject <ZGSearchProgressDelegate>
-
-@property (readonly, nonatomic) BOOL isBusy;
-
-- (void)memoryDumpRangeRequest;
-- (void)memoryDumpAllRequest;
-
-@end
+BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <ZGSearchProgressDelegate> delegate);

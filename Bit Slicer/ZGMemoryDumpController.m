@@ -34,14 +34,13 @@
 
 #import "ZGMemoryDumpController.h"
 #import "ZGMemoryViewerController.h"
+#import "ZGMemoryDumpFunctions.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGMemoryTypes.h"
 #import "ZGUtilities.h"
 #import "ZGVirtualMemory.h"
-#import "ZGDocumentSearchController.h"
 #import "ZGSearchProgress.h"
-#import "ZGRegion.h"
 
 @interface ZGMemoryDumpController ()
 
@@ -56,21 +55,12 @@
 
 @property (assign) IBOutlet NSProgressIndicator *progressIndicator;
 
-@property (readwrite, strong, nonatomic) NSTimer *progressTimer;
+@property (nonatomic) ZGSearchProgress *searchProgress;
+@property (nonatomic) BOOL isBusy;
 
 @end
 
 @implementation ZGMemoryDumpController
-
-- (id)init
-{
-	self = [super init];
-	if (self)
-	{
-		self.searchProgress = [[ZGSearchProgress alloc] init];
-	}
-	return self;
-}
 
 #pragma mark Memory Dump in Range
 
@@ -94,40 +84,28 @@
 		 {
 			 if (result == NSFileHandlingPanelOKButton)
 			 {
-				 BOOL success = YES;
+				 BOOL success = NO;
+				 ZGMemorySize size = toAddress - fromAddress;
+				 void *bytes = NULL;
 				 
-				 @try
+				 if ((success = ZGReadBytes(self.memoryViewer.currentProcess.processTask, fromAddress, &bytes, &size)))
 				 {
-					 ZGMemorySize size = toAddress - fromAddress;
-					 void *bytes = NULL;
+					 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
+					 success = [data writeToURL:savePanel.URL atomically:NO];
 					 
-					 if (ZGReadBytes(self.memoryViewer.currentProcess.processTask, fromAddress, &bytes, &size))
-					 {
-						 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
-						 success = [data writeToURL:savePanel.URL atomically:NO];
-						 
-						 ZGFreeBytes(self.memoryViewer.currentProcess.processTask, bytes, size);
-					 }
-					 else
-					 {
-						 NSLog(@"Failed to read region");
-						 success = NO;
-					 }
+					 ZGFreeBytes(self.memoryViewer.currentProcess.processTask, bytes, size);
 				 }
-				 @catch (NSException *exception)
+				 else
 				 {
-					 NSLog(@"Failed to write data: %@", exception);
-					 success = NO;
+					 NSLog(@"Failed to read region");
 				 }
-				 @finally
+				 
+				 if (!success)
 				 {
-					 if (!success)
-					 {
-						 NSRunAlertPanel(
-										 @"The Memory Dump failed",
-										 @"An error resulted in writing the memory dump.",
-										 @"OK", nil, nil);
-					 }
+					 NSRunAlertPanel(
+									 @"The Memory Dump failed",
+									 @"An error resulted in writing the memory dump.",
+									 @"OK", nil, nil);
 				 }
 			 }
 		 }];
@@ -170,108 +148,7 @@
 	 contextInfo:NULL];
 }
 
-#pragma mark Dumping Data to Disk
-
-// helper function for ZGSaveAllDataToDirectory
-static void ZGSavePieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
-{
-	if (currentData)
-	{
-		ZGMemoryAddress endAddress = currentStartingAddress + [currentData length];
-		(*fileNumber)++;
-		[currentData
-		 writeToFile:[directory stringByAppendingPathComponent:[[NSString alloc] initWithFormat:@"(%d) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
-		 atomically:NO];
-		
-		if (mergedFile)
-		{
-			fwrite(currentData.bytes, currentData.length, 1, mergedFile);
-		}
-	}
-}
-
-static BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, ZGSearchProgress *searchProgress)
-{
-	BOOL success = NO;
-	
-	NSMutableData *currentData = nil;
-	ZGMemoryAddress currentStartingAddress = 0;
-	ZGMemoryAddress lastAddress = currentStartingAddress;
-	int fileNumber = 0;
-	
-	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
-	
-	NSArray *regions = [ZGRegion regionsFromProcessTaskRecursively:processTask];
-	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		searchProgress.initiatedSearch = YES;
-		searchProgress.progressType = ZGSearchProgressMemoryDumping;
-		searchProgress.maxProgress = regions.count;
-	});
-	
-	for (ZGRegion *region in regions)
-	{
-		if (lastAddress != region.address || !(region.protection & VM_PROT_READ))
-		{
-			// We're done with this piece of data
-			ZGSavePieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
-			currentData = nil;
-		}
-		
-		if (region.protection & VM_PROT_READ)
-		{
-			if (!currentData)
-			{
-				currentData = [[NSMutableData alloc] init];
-				currentStartingAddress = region.address;
-			}
-			
-			// outputSize should not differ from size
-			ZGMemorySize outputSize = region.size;
-			void *bytes = NULL;
-			if (ZGReadBytes(processTask, region.address, &bytes, &outputSize))
-			{
-				[currentData appendBytes:bytes length:(NSUInteger)outputSize];
-				ZGFreeBytes(processTask, bytes, outputSize);
-			}
-		}
-		
-		lastAddress = region.address;
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			searchProgress.progress++;
-		});
-  	    
-		if (searchProgress.shouldCancelSearch)
-		{
-			goto EXIT_ON_CANCEL;
-		}
-	}
-	
-	ZGSavePieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
-    
-EXIT_ON_CANCEL:
-	
-	if (mergedFile)
-	{
-		fclose(mergedFile);
-	}
-	
-	success = YES;
-	
-	return success;
-}
-
 #pragma mark Memory Dump All
-
-- (void)updateMemoryDumpProgress:(NSTimer *)timer
-{
-	if (self.searchProgress.initiatedSearch)
-	{
-		self.progressIndicator.maxValue = self.searchProgress.maxProgress;
-		self.progressIndicator.doubleValue = self.searchProgress.progress;
-	}
-}
 
 - (void)memoryDumpAllRequest
 {
@@ -307,16 +184,6 @@ EXIT_ON_CANCEL:
 				 
 				 [self.memoryDumpProgressCancelButton setEnabled:YES];
 				 
-				 [self.searchProgress clear];
-				 
-				 self.progressTimer =
-					[NSTimer
-					 scheduledTimerWithTimeInterval:USER_INTERFACE_UPDATE_TIME_INTERVAL
-					 target:self
-					 selector:@selector(updateMemoryDumpProgress:)
-					 userInfo:nil
-					 repeats:YES];
-				 
 				 self.isBusy = YES;
 				 
 				 id dumpMemoryActivity = nil;
@@ -326,7 +193,7 @@ EXIT_ON_CANCEL:
 				 }
 				 
 				 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-					 if (!ZGSaveAllDataToDirectory(savePanel.URL.relativePath, self.memoryViewer.currentProcess.processTask, self.searchProgress))
+					 if (!ZGDumpAllDataToDirectory(savePanel.URL.relativePath, self.memoryViewer.currentProcess.processTask, self))
 					 {
 						 NSRunAlertPanel(
 										 @"The Memory Dump failed",
@@ -335,9 +202,6 @@ EXIT_ON_CANCEL:
 					 }
 					 
 					 dispatch_async(dispatch_get_main_queue(), ^{
-						 [self.progressTimer invalidate];
-						 self.progressTimer = nil;
-						 
 						 if (!self.searchProgress.shouldCancelSearch)
 						 {
 							 ZGDeliverUserNotification(@"Finished Dumping Memory", nil, [NSString stringWithFormat:@"Dumped all memory for %@", self.memoryViewer.currentProcess.name]);
@@ -349,6 +213,7 @@ EXIT_ON_CANCEL:
 						 [self.memoryDumpProgressWindow close];
 						 
 						 self.isBusy = NO;
+						 self.searchProgress = nil;
 						 
 						 if (dumpMemoryActivity != nil)
 						 {
@@ -365,6 +230,19 @@ EXIT_ON_CANCEL:
 {
 	self.searchProgress.shouldCancelSearch = YES;
 	[self.memoryDumpProgressCancelButton setEnabled:NO];
+}
+
+#pragma mark Memory Dump All Progress
+
+- (void)progressWillBegin:(ZGSearchProgress *)searchProgress
+{
+	self.searchProgress = searchProgress;
+	self.progressIndicator.maxValue = self.searchProgress.maxProgress;
+}
+
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
+{
+	self.progressIndicator.doubleValue = self.searchProgress.progress;
 }
 
 @end
