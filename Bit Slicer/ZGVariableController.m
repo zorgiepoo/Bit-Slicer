@@ -513,7 +513,17 @@
 	
 	BOOL stringIsAHexRepresentation = stringObject.zgIsHexRepresentation;
 	
-	switch (variable.type)
+	ZGVariableType variableType;
+	if (variable.type == ZGPointer)
+	{
+		variableType = (variable.size == sizeof(int32_t)) ? ZGInt32 : ZGInt64;
+	}
+	else
+	{
+		variableType = variable.type;
+	}
+	
+	switch (variableType)
 	{
 		case ZGInt8:
 			if (stringIsAHexRepresentation)
@@ -541,19 +551,7 @@
 			
 			newValue = int16Value;
 			break;
-		case ZGPointer:
-			if (variable.size == sizeof(int32_t))
-			{
-				goto INT32_BIT_CHANGE_VARIABLE;
-			}
-			else if (variable.size == sizeof(int64_t))
-			{
-				goto INT64_BIT_CHANGE_VARIABLE;
-			}
-			
-			break;
 		case ZGInt32:
-		INT32_BIT_CHANGE_VARIABLE:
 			if (stringIsAHexRepresentation)
 			{
 				[[NSScanner scannerWithString:stringObject] scanHexInt:(unsigned int *)int32Value];
@@ -578,7 +576,6 @@
 			newValue = floatValue;
 			break;
 		case ZGInt64:
-		INT64_BIT_CHANGE_VARIABLE:
 			if (stringIsAHexRepresentation)
 			{
 				[[NSScanner scannerWithString:stringObject] scanHexLongLong:(unsigned long long *)int64Value];
@@ -688,6 +685,7 @@
 			
 			break;
 		}
+		case ZGPointer:
 		case ZGScript:
 			break;
 	}
@@ -696,7 +694,7 @@
 	{
 		if (variable.byteOrder != CFByteOrderGetCurrent())
 		{
-			swappedValue = ZGSwappedValue(self.windowController.currentProcess.is64Bit, newValue, variable.type, writeSize);
+			swappedValue = ZGSwappedValue(self.windowController.currentProcess.is64Bit, newValue, variableType, writeSize);
 			newValue = swappedValue;
 		}
 		
@@ -734,7 +732,7 @@
 				successfulWrite = NO;
 			}
 			
-			if (successfulWrite && variable.type == ZGString16)
+			if (successfulWrite && variableType == ZGString16)
 			{
 				// Don't forget to write the null terminator
 				unichar nullTerminator = 0;
