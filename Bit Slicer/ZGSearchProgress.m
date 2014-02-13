@@ -42,7 +42,6 @@
 	self.maxProgress = 0;
 	self.numberOfVariablesFound = 0;
 	self.shouldCancelSearch = NO;
-	self.initiatedSearch = NO;
 }
 
 @end

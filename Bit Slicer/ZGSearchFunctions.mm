@@ -208,7 +208,6 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	if (delegate != nil)
 	{
 		dispatch_async(dispatch_get_main_queue(), ^{
-			searchProgress.initiatedSearch = YES;
 			searchProgress.progressType = ZGSearchProgressMemoryScanning;
 			searchProgress.maxProgress = regions.count;
 			[delegate progressWillBegin:searchProgress];
@@ -1239,7 +1238,6 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDa
 	if (delegate != nil)
 	{
 		dispatch_async(dispatch_get_main_queue(), ^{
-			searchProgress.initiatedSearch = YES;
 			searchProgress.progressType = ZGSearchProgressMemoryScanning;
 			searchProgress.maxProgress = newResultSetCount;
 			[delegate progressWillBegin:searchProgress];
