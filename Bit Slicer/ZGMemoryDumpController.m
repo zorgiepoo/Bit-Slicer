@@ -201,7 +201,7 @@ static BOOL ZGSaveAllDataToDirectory(NSString *directory, ZGMemoryMap processTas
 	
 	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
 	
-	NSArray *regions = [ZGRegion regionsFromProcessTask:processTask];
+	NSArray *regions = [ZGRegion regionsFromProcessTaskRecursively:processTask];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
 		searchProgress.initiatedSearch = YES;
