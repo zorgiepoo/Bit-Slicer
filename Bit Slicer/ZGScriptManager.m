@@ -193,6 +193,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		if (registerObject != NULL)
 		{
 			PyDict_SetItemString(dictionary, registerEntry->name, registerObject);
+			Py_DecRef(registerObject);
 		}
 	}
 	
