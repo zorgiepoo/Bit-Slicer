@@ -39,6 +39,13 @@
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 
+@interface ZGProcess ()
+
+@property (nonatomic) ZGMachBinary *mainMachBinary;
+@property (nonatomic) ZGMachBinary *dylinkerBinary;
+
+@end
+
 @implementation ZGProcess
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask
@@ -81,7 +88,6 @@
 	if (self != nil)
 	{
 		self.processTask = process.processTask;
-		[self setUpMachBinaryData];
 	}
 	return self;
 }
@@ -95,29 +101,43 @@
 {
 	self.processID = NON_EXISTENT_PID_NUMBER;
 	self.processTask = MACH_PORT_NULL;
-	self.cacheDictionary = nil;
+	_cacheDictionary = nil;
 }
 
-- (void)setUpMachBinaryData
+- (NSMutableDictionary *)cacheDictionary
 {
-	self.cacheDictionary = [[NSMutableDictionary alloc] initWithDictionary:@{ZGMachBinaryPathToBinaryInfoDictionary : [NSMutableDictionary dictionary], ZGMachBinaryPathToBinaryDictionary : [NSMutableDictionary dictionary]}];
-	
-	_dylinkerBinary = [ZGMachBinary dynamicLinkerMachBinaryInProcess:self];
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self];
-	if (machBinaries.count > 0)
+	if (_cacheDictionary == nil)
 	{
-		self.mainMachBinary = [machBinaries objectAtIndex:0];
+		_cacheDictionary = [[NSMutableDictionary alloc] initWithDictionary:@{ZGMachBinaryPathToBinaryInfoDictionary : [NSMutableDictionary dictionary], ZGMachBinaryPathToBinaryDictionary : [NSMutableDictionary dictionary]}];
 	}
+	return _cacheDictionary;
+}
+
+- (ZGMachBinary *)dylinkerBinary
+{
+	if (_dylinkerBinary == nil)
+	{
+		_dylinkerBinary = [ZGMachBinary dynamicLinkerMachBinaryInProcess:self];;
+	}
+	return _dylinkerBinary;
+}
+
+- (ZGMachBinary *)mainMachBinary
+{
+	if (_mainMachBinary == nil)
+	{
+		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self];
+		if (machBinaries.count > 0)
+		{
+			_mainMachBinary = [machBinaries objectAtIndex:0];
+		}
+	}
+	return _mainMachBinary;
 }
 
 - (BOOL)grantUsAccess
 {
-	BOOL success = [[ZGProcessTaskManager sharedManager] getTask:&_processTask forProcessIdentifier:self.processID];
-	if (success)
-	{	
-		[self setUpMachBinaryData];
-	}
-	return success;
+	return [[ZGProcessTaskManager sharedManager] getTask:&_processTask forProcessIdentifier:self.processID];
 }
 
 - (BOOL)hasGrantedAccess

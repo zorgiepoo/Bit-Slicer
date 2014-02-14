@@ -50,7 +50,7 @@
 @property (copy, nonatomic) NSString *internalName;
 @property (nonatomic) BOOL is64Bit;
 
-@property (nonatomic) ZGMachBinary *mainMachBinary;
+@property (nonatomic, readonly) ZGMachBinary *mainMachBinary;
 @property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
 
 @property (nonatomic) NSMutableDictionary *cacheDictionary;
