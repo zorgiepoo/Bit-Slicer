@@ -72,6 +72,8 @@
 @implementation ZGScriptManager
 
 dispatch_queue_t gPythonQueue;
+static PyObject *gCtypesObject;
+static PyObject *gStructObject;
 
 + (void)appendPath:(NSString *)path toSysPath:(PyObject *)sysPath
 {
@@ -103,6 +105,9 @@ dispatch_queue_t gPythonQueue;
 		PyObject *mainModule = loadMainPythonModule();
 		[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
 		[ZGPyDebugger loadPythonClassInMainModule:mainModule];
+		
+		gCtypesObject = PyImport_ImportModule("ctypes");
+		gStructObject = PyImport_ImportModule("struct");
 	});
 }
 
@@ -213,6 +218,9 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		
 		PyObject *globalDictionary = PyModule_GetDict(mainModule);
 		PyObject *localDictionary = convertRegisterEntriesToPyDict(registerEntries, process.is64Bit);
+		
+		PyDict_SetItemString(localDictionary, "ctypes", gCtypesObject);
+		PyDict_SetItemString(localDictionary, "struct", gStructObject);
 		
 		PyObject *evaluatedCode = PyEval_EvalCode(compiledExpression, globalDictionary, localDictionary);
 		
