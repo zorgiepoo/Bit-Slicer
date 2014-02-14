@@ -230,7 +230,7 @@ PyObject *gVirtualMemoryException;
 	}
 }
 
-- (id)initWithProcess:(ZGProcess *)process
+- (id)initWithProcess:(ZGProcess *)process shouldCopy:(BOOL)shouldCopyProcess
 {
 	self = [super init];
 	if (self != nil)
@@ -248,10 +248,35 @@ PyObject *gVirtualMemoryException;
 		vmObject->is64Bit = process.is64Bit;
 		vmObject->baseAddress = process.mainMachBinary.headerAddress;
 		
-		self.allocationSizeTable = [[NSMutableDictionary alloc] init];
-		self.process = [[ZGProcess alloc] initWithProcess:process];
+		if (shouldCopyProcess)
+		{
+			self.process = [[ZGProcess alloc] initWithProcess:process];
+		}
+		else
+		{
+			self.process = process;
+		}
 	}
 	return self;
+}
+
+- (id)initWithProcess:(ZGProcess *)process
+{
+	return [self initWithProcess:process shouldCopy:YES];
+}
+
+- (id)initWithProcessNoCopy:(ZGProcess *)process
+{
+	return [self initWithProcess:process shouldCopy:NO];
+}
+
+- (NSMutableDictionary *)allocationSizeTable
+{
+	if (_allocationSizeTable == nil)
+	{
+		_allocationSizeTable = [[NSMutableDictionary alloc] init];
+	}
+	return _allocationSizeTable;
 }
 
 - (void)setObject:(PyObject *)vmObject

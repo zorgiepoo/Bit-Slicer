@@ -211,7 +211,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	dispatch_sync(gPythonQueue, ^{
 		PyObject *mainModule = PyImport_AddModule("__main__");
 		
-		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:process];
+		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessNoCopy:process];
 		CFRetain((__bridge CFTypeRef)(virtualMemoryInstance));
 		
 		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.object);

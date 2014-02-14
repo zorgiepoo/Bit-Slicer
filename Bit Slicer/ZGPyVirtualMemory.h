@@ -47,6 +47,7 @@ extern PyObject *gVirtualMemoryException;
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
 - (id)initWithProcess:(ZGProcess *)process;
+- (id)initWithProcessNoCopy:(ZGProcess *)process;
 
 @property (nonatomic, readonly, assign) PyObject *object;
 @property (readonly) ZGSearchProgress *searchProgress; // main queue property
