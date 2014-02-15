@@ -102,6 +102,8 @@
 	self.processID = NON_EXISTENT_PID_NUMBER;
 	self.processTask = MACH_PORT_NULL;
 	_cacheDictionary = nil;
+	_dylinkerBinary = nil;
+	_mainMachBinary = nil;
 }
 
 - (NSMutableDictionary *)cacheDictionary
