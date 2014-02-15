@@ -1397,6 +1397,7 @@
 					"-Wno-direct-ivar-access",
 					"-Wno-unused-macros",
 					"-Wno-used-but-marked-unused",
+					"-Wno-semicolon-before-method-body",
 				);
 			};
 			name = Debug;
@@ -1450,6 +1451,7 @@
 					"-Wno-direct-ivar-access",
 					"-Wno-unused-macros",
 					"-Wno-used-but-marked-unused",
+					"-Wno-semicolon-before-method-body",
 				);
 			};
 			name = Release;

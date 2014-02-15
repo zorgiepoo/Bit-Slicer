@@ -3,7 +3,30 @@
 //  AGScopeBar
 //
 //  Created by Seth Willits on 6/25/12.
-//  Copyright (c) 2012 Araelium Group. All rights reserved.
+//  https://github.com/swillits/AGScopeBar
+//
+//  Licensed under the "zlib" license.
+//
+//  Copyright (c) 2012-2014, Seth Willits
+//
+//	This software is provided 'as-is', without any express or implied
+//	warranty. In no event will the authors be held liable for any damages
+//	arising from the use of this software.
+//
+//	Permission is granted to anyone to use this software for any purpose,
+//	including commercial applications, and to alter it and redistribute it
+//	freely, subject to the following restrictions:
+//
+//	1. The origin of this software must not be misrepresented; you must not
+//	claim that you wrote the original software. If you use this software
+//	in a product, an acknowledgment in the product documentation would be
+//	appreciated but is not required.
+//
+//	2. Altered source versions must be plainly marked as such, and must not be
+//	misrepresented as being the original software.
+//
+//	3. This notice may not be removed or altered from any source
+//	distribution.
 //
 
 #import <Cocoa/Cocoa.h>
@@ -38,8 +61,8 @@ typedef enum {
 	NSMenuItem * mMenuItem;
 }
 
-@property (readonly) AGScopeBarGroup * group;
-@property (readonly) NSString * identifier;
+@property (nonatomic, readonly) AGScopeBarGroup * group;
+@property (nonatomic, readonly) NSString * identifier;
 @property (nonatomic, readwrite, copy) NSString * title;
 @property (nonatomic, readwrite, copy) NSImage * image;
 @property (nonatomic, readwrite, retain) NSMenu * menu;
@@ -62,6 +85,7 @@ typedef enum {
 	BOOL mShowsSeparator;
 	BOOL mCanBeCollapsed;
 	AGScopeBarGroupSelectionMode mSelectionMode;
+	BOOL mIsEnabled;
 	NSArray * mItems;
 	NSArray * mSelectedItems;
 	
@@ -76,11 +100,12 @@ typedef enum {
 }
 
 
-@property (readonly) NSString * identifier;
+@property (nonatomic, readonly) NSString * identifier;
 @property (nonatomic, readwrite, retain) NSString * label;
-@property (readwrite, assign) BOOL showsSeparator;
-@property (readwrite, assign) BOOL canBeCollapsed;
+@property (nonatomic, readwrite, assign) BOOL showsSeparator;
+@property (nonatomic, readwrite, assign) BOOL canBeCollapsed;
 @property (nonatomic, readwrite, assign) AGScopeBarGroupSelectionMode selectionMode;
+@property (nonatomic, readwrite, assign, getter=isEnabled) BOOL enabled;
 @property (nonatomic, readwrite, copy) NSArray * items;
 @property (nonatomic, readonly) NSArray * selectedItems;
 @property (nonatomic, readonly) NSArray * selectedItemIdentifiers;
@@ -113,15 +138,17 @@ typedef enum {
 	NSView * mAccessoryView;
 	NSArray * mGroups;
 	NSColor * mBottomBorderColor;
+	BOOL mIsEnabled;
 	
 	BOOL mNeedsTiling;
 }
 
 
-@property (readwrite, assign) IBOutlet id<AGScopeBarDelegate> delegate;
+@property (nonatomic, readwrite, assign) IBOutlet id<AGScopeBarDelegate> delegate;
 @property (nonatomic, readwrite, assign) BOOL smartResizeEnabled;
 @property (nonatomic, readwrite, retain) NSView * accessoryView;
 @property (nonatomic, readwrite, copy) NSArray * groups;
+@property (nonatomic, readwrite, assign, getter=isEnabled) BOOL enabled;
 
 @property (nonatomic, readwrite, retain) NSColor * bottomBorderColor;
 + (CGFloat)scopeBarHeight;
