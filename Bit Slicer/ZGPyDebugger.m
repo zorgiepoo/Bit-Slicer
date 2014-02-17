@@ -89,6 +89,7 @@ declareDebugPrototypeMethod(removeWatchAccesses)
 declareDebugPrototypeMethod(addBreakpoint)
 declareDebugPrototypeMethod(removeBreakpoint)
 declareDebugPrototypeMethod(resume)
+declareDebugPrototypeMethod(stepIn)
 declareDebugPrototypeMethod(writeRegisters)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
@@ -111,6 +112,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(addBreakpoint)
 	declareDebugMethod(removeBreakpoint)
 	declareDebugMethod(resume)
+	declareDebugMethod(stepIn)
 	declareDebugMethod(writeRegisters)
 	{NULL, NULL, 0, NULL}
 };
@@ -711,8 +713,43 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
+static PyObject *Debugger_stepIn(DebuggerClass *self, PyObject *args)
+{
+	PyObject *callback = NULL;
+	if (!PyArg_ParseTuple(args, "O:stepIn", &callback))
+	{
+		return NULL;
+	}
+	
+	if (PyCallable_Check(callback) == 0)
+	{
+		PyErr_SetString(PyExc_ValueError, [@"debug.stepIn failed because callback is not callable" UTF8String]);
+		return NULL;
+	}
+	
+	ZGBreakPoint *singleStepBreakPoint = [[[ZGAppController sharedController] breakPointController] addSingleStepBreakPointFromBreakPoint:self->objcSelf.haltedBreakPoint];
+	
+	singleStepBreakPoint.callback = callback;
+	Py_XINCREF(callback);
+	
+	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
+	self->objcSelf.haltedBreakPoint = nil;
+	
+	return Py_BuildValue("");
+}
+
 static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
 {
+	NSArray *removedBreakPoints = [[[ZGAppController sharedController] breakPointController] removeSingleStepBreakPointsFromBreakPoint:self->objcSelf.haltedBreakPoint];
+	for (ZGBreakPoint *breakPoint in removedBreakPoints)
+	{
+		if (breakPoint.callback != NULL)
+		{
+			Py_DecRef(breakPoint.callback);
+			breakPoint.callback = NULL;
+		}
+	}
+	
 	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
 	self->objcSelf.haltedBreakPoint = nil;
 	

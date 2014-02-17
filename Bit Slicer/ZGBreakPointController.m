@@ -280,15 +280,20 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	return handledWatchPoint;
 }
 
-- (void)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint
+- (NSArray *)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
+	NSMutableArray *removedBreakPoints = [NSMutableArray array];
+	
 	for (ZGBreakPoint *candidateBreakPoint in self.breakPoints)
 	{
 		if (candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.task == breakPoint.task && candidateBreakPoint.thread == breakPoint.thread)
 		{
+			[removedBreakPoints addObject:candidateBreakPoint];
 			[self removeBreakPoint:candidateBreakPoint];
 		}
 	}
+	
+	return removedBreakPoints;
 }
 
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint
@@ -1064,12 +1069,14 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return success;
 }
 
-- (void)addSingleStepBreakPointFromBreakPoint:(ZGBreakPoint *)breakPoint
+- (ZGBreakPoint *)addSingleStepBreakPointFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
 	ZGBreakPoint *singleStepBreakPoint = [[ZGBreakPoint alloc] initWithProcess:breakPoint.process type:ZGBreakPointSingleStepInstruction delegate:breakPoint.delegate];
 	singleStepBreakPoint.thread = breakPoint.thread;
 	
 	[self addBreakPoint:singleStepBreakPoint];
+	
+	return singleStepBreakPoint;
 }
 
 - (void)addBreakPoint:(ZGBreakPoint *)breakPoint
