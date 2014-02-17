@@ -392,7 +392,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	}
 }
 
-- (void)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process
+- (ZGBreakPoint *)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process
 {
 	ZGBreakPoint *targetBreakPoint = nil;
 	for (ZGBreakPoint *breakPoint in self.breakPoints)
@@ -408,6 +408,8 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 	{
 		[self removeInstructionBreakPoint:targetBreakPoint];
 	}
+	
+	return targetBreakPoint;
 }
 
 - (BOOL)handleInstructionBreakPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
@@ -671,23 +673,24 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return (handledWatchPoint || handledInstructionBreakPoint) ? KERN_SUCCESS : KERN_FAILURE;
 }
 
-- (void)removeObserver:(id)observer
+- (NSArray *)removeObserver:(id)observer
 {
-	[self removeObserver:observer runningProcess:nil withProcessID:-1 atAddress:0];
+	return [self removeObserver:observer runningProcess:nil withProcessID:-1 atAddress:0];
 }
 
-- (void)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address
+- (NSArray *)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address
 {
-	[self removeObserver:observer runningProcess:nil withProcessID:processID atAddress:address];
+	return [self removeObserver:observer runningProcess:nil withProcessID:processID atAddress:address];
 }
 
-- (void)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process
+- (NSArray *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process
 {
-	[self removeObserver:observer runningProcess:process withProcessID:-1 atAddress:0];
+	return [self removeObserver:observer runningProcess:process withProcessID:-1 atAddress:0];
 }
 
-- (void)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address
+- (NSArray *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address
 {
+	NSMutableArray *removedBreakPoints = [NSMutableArray array];
 	@synchronized(self)
 	{
 		for (ZGBreakPoint *breakPoint in self.breakPoints)
@@ -711,10 +714,13 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 					
 					if (isDead || breakPoint.type == ZGBreakPointSingleStepInstruction)
 					{
+						[removedBreakPoints addObject:breakPoint];
 						[self removeBreakPoint:breakPoint];
 					}
 					else if (breakPoint.type == ZGBreakPointWatchData)
 					{
+						[removedBreakPoints addObject:breakPoint];
+						
 						ZGSuspendTask(breakPoint.task);
 						[self removeWatchPoint:breakPoint];
 						ZGResumeTask(breakPoint.task);
@@ -727,12 +733,16 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 							[[ZGAppController sharedController] increaseLivingCount];
 						}
 						
+						[removedBreakPoints addObject:breakPoint];
+						
 						[self removeInstructionBreakPoint:breakPoint];
 					}
 				}
 			}
 		}
 	}
+	
+	return removedBreakPoints;
 }
 
 - (BOOL)setUpExceptionPortForProcess:(ZGProcess *)process
@@ -964,17 +974,22 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	return YES;
 }
 
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process callback:(PyObject *)callback delegate:(id)delegate
+{
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO condition:NULL callback:callback delegate:delegate];
+}
+
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO condition:condition delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO condition:condition callback:NULL delegate:delegate];
 }
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES condition:nil delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES condition:NULL callback:NULL delegate:delegate];
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer hidden:(BOOL)isHidden condition:(PyObject *)condition delegate:(id)delegate
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer hidden:(BOOL)isHidden condition:(PyObject *)condition callback:(PyObject *)callback delegate:(id)delegate
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{
@@ -1034,6 +1049,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	breakPoint.basePointer = basePointer;
 	breakPoint.originalProtection = memoryProtection;
 	breakPoint.condition = condition;
+	breakPoint.callback = callback;
 	
 	[self addBreakPoint:breakPoint];
 	

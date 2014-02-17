@@ -161,8 +161,6 @@ static PyTypeObject DebuggerType =
 @interface ZGPyDebugger ()
 
 @property (nonatomic) NSMutableDictionary *cachedInstructionPointers;
-@property (nonatomic) NSMutableDictionary *breakPointCallbacks;
-@property (nonatomic) NSMutableDictionary *watchPointCallbacks;
 @property (nonatomic) ZGProcess *process;
 @property (nonatomic) ZGMachBinary *dylinkerBinary;
 @property (nonatomic) ZGBreakPoint *haltedBreakPoint;
@@ -221,8 +219,6 @@ static PyObject *gDebuggerException;
 		self.dylinkerBinary = process.dylinkerBinary;
 		
 		self.cachedInstructionPointers = [[NSMutableDictionary alloc] init];
-		self.breakPointCallbacks = [[NSMutableDictionary alloc] init];
-		self.watchPointCallbacks = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
@@ -236,22 +232,20 @@ static PyObject *gDebuggerException;
 		[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self.haltedBreakPoint];
 	}
 	
+	NSArray *removedBreakPoints = [[[ZGAppController sharedController] breakPointController] removeObserver:self];
 	if (Py_IsInitialized())
 	{
-		for (NSNumber *addressNumber in [self.breakPointCallbacks allKeys])
+		for (ZGBreakPoint *breakPoint in removedBreakPoints)
 		{
-			PyObject *callback = [[self.breakPointCallbacks objectForKey:addressNumber] pointerValue];
-			Py_XDECREF(callback);
-		}
-		
-		for (NSNumber *addressNumber in [self.watchPointCallbacks allKeys])
-		{
-			PyObject *callback = [[self.watchPointCallbacks objectForKey:addressNumber] pointerValue];
-			Py_XDECREF(callback);
+			PyObject *callback = breakPoint.callback;
+			if (callback != NULL)
+			{
+				Py_DecRef(callback);
+				breakPoint.callback = NULL;
+			}
 		}
 	}
 	
-	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
 	self.object = NULL;
 }
 
@@ -579,8 +573,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 			instructionAddress = [[self.cachedInstructionPointers objectForKey:instructionPointerNumber] unsignedLongLongValue];
 		}
 		
-		PyObject *callback = [[self.watchPointCallbacks objectForKey:@(breakPoint.variable.address)] pointerValue];
-		[self.scriptManager handleDataBreakPoint:breakPoint instructionAddress:instructionAddress callback:callback sender:self];
+		[self.scriptManager handleDataBreakPoint:breakPoint instructionAddress:instructionAddress callback:breakPoint.callback sender:self];
 	});
 }
 
@@ -603,15 +596,17 @@ static PyObject *watchAccess(DebuggerClass *self, PyObject *args, NSString *func
 
 	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:numberOfBytes address:memoryAddress type:ZGByteArray qualifier:0 pointerSize:self->objcSelf.process.pointerSize];
 	
-	if (![[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self->objcSelf.process watchPointType:watchPointType delegate:self->breakPointDelegate getBreakPoint:NULL])
+	ZGBreakPoint *breakPoint = nil;
+	if (![[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:self->objcSelf.process watchPointType:watchPointType delegate:self->breakPointDelegate getBreakPoint:&breakPoint])
 	{
 		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.%@ failed adding watchpoint at 0x%llX (%llu byte(s))", functionName, memoryAddress, numberOfBytes] UTF8String]);
 		
 		return NULL;
 	}
 	
+	breakPoint.callback = callback;
+	
 	Py_XINCREF(callback);
-	[self->objcSelf.watchPointCallbacks setObject:[NSValue valueWithPointer:callback] forKey:@(variable.address)];
 	
 	return Py_BuildValue("");
 }
@@ -634,11 +629,16 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 		return NULL;
 	}
 	
-	[[[ZGAppController sharedController] breakPointController] removeObserver:self->breakPointDelegate withProcessID:self->processIdentifier atAddress:memoryAddress];
+	NSArray *breakPointsRemoved = [[[ZGAppController sharedController] breakPointController] removeObserver:self->breakPointDelegate withProcessID:self->processIdentifier atAddress:memoryAddress];
 	
-	PyObject *callback = [[self->objcSelf.watchPointCallbacks objectForKey:@(memoryAddress)] pointerValue];
-	Py_XDECREF(callback);
-	[self->objcSelf.watchPointCallbacks removeObjectForKey:@(memoryAddress)];
+	for (ZGBreakPoint *breakPoint in breakPointsRemoved)
+	{
+		if (breakPoint.callback != NULL)
+		{
+			Py_DecRef(breakPoint.callback);
+			breakPoint.callback = NULL;
+		}
+	}
 	
 	return Py_BuildValue("");
 }
@@ -647,9 +647,7 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 {
 	dispatch_async(gPythonQueue, ^{
 		self.haltedBreakPoint = breakPoint;
-		
-		PyObject *callback = [[self.breakPointCallbacks objectForKey:@(breakPoint.variable.address)] pointerValue];
-		[self.scriptManager handleInstructionBreakPoint:breakPoint callback:callback sender:self];
+		[self.scriptManager handleInstructionBreakPoint:breakPoint callback:breakPoint.callback sender:self];
 	});
 }
 
@@ -677,14 +675,13 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	if (![[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self->objcSelf.process condition:NULL delegate:self->breakPointDelegate])
+	if (![[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:instruction inProcess:self->objcSelf.process callback:callback delegate:self->breakPointDelegate])
 	{
 		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX", memoryAddress] UTF8String]);
 		return NULL;
 	}
 	
 	Py_XINCREF(callback);
-	[self->objcSelf.breakPointCallbacks setObject:[NSValue valueWithPointer:callback] forKey:@(instruction.variable.address)];
 	
 	return Py_BuildValue("");
 }
@@ -706,11 +703,10 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	[[[ZGAppController sharedController] breakPointController] removeBreakPointOnInstruction:instruction inProcess:self->objcSelf.process];
+	ZGBreakPoint *breakPoint = [[[ZGAppController sharedController] breakPointController] removeBreakPointOnInstruction:instruction inProcess:self->objcSelf.process];
 	
-	PyObject *callback = [[self->objcSelf.breakPointCallbacks objectForKey:@(instruction.variable.address)] pointerValue];
+	PyObject *callback = breakPoint.callback;
 	Py_XDECREF(callback);
-	[self->objcSelf.breakPointCallbacks removeObjectForKey:@(instruction.variable.address)];
 	
 	return Py_BuildValue("");
 }

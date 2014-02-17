@@ -56,8 +56,9 @@ typedef enum
 @property (nonatomic) NSArray *breakPoints;
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate;
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process callback:(PyObject *)callback delegate:(id)delegate;
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer delegate:(id)delegate;
-- (void)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process;
+- (ZGBreakPoint *)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process;
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint;
 - (void)addSingleStepBreakPointFromBreakPoint:(ZGBreakPoint *)breakPoint;
 - (void)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint;
@@ -65,8 +66,8 @@ typedef enum
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointDelegate>)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
 
-- (void)removeObserver:(id)observer;
-- (void)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;
-- (void)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address;
+- (NSArray *)removeObserver:(id)observer;
+- (NSArray *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;
+- (NSArray *)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address;
 
 @end
