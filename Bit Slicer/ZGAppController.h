@@ -43,7 +43,6 @@
 
 @interface ZGAppController : NSObject
 
-@property (readonly, nonatomic) ZGPreferencesController *preferencesController;
 @property (readonly, nonatomic) ZGMemoryViewerController *memoryViewer;
 @property (readonly, nonatomic) ZGDebuggerController *debuggerController;
 @property (readonly, nonatomic) ZGBreakPointController *breakPointController;
