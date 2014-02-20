@@ -90,6 +90,7 @@ declareDebugPrototypeMethod(addBreakpoint)
 declareDebugPrototypeMethod(removeBreakpoint)
 declareDebugPrototypeMethod(resume)
 declareDebugPrototypeMethod(stepIn)
+declareDebugPrototypeMethod(stepOver)
 declareDebugPrototypeMethod(writeRegisters)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
@@ -113,6 +114,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(removeBreakpoint)
 	declareDebugMethod(resume)
 	declareDebugMethod(stepIn)
+	declareDebugMethod(stepOver)
 	declareDebugMethod(writeRegisters)
 	{NULL, NULL, 0, NULL}
 };
@@ -645,10 +647,47 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 	return Py_BuildValue("");
 }
 
+static void resumeFromHaltedBreakPointInDebugger(DebuggerClass *self)
+{
+	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
+	self->objcSelf.haltedBreakPoint = nil;
+}
+
+static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
+{
+	NSArray *removedBreakPoints = [[[ZGAppController sharedController] breakPointController] removeSingleStepBreakPointsFromBreakPoint:self->objcSelf.haltedBreakPoint];
+	for (ZGBreakPoint *breakPoint in removedBreakPoints)
+	{
+		if (breakPoint.callback != NULL)
+		{
+			Py_DecRef(breakPoint.callback);
+			breakPoint.callback = NULL;
+		}
+	}
+	
+	resumeFromHaltedBreakPointInDebugger(self);
+}
+
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
 {
 	dispatch_async(gPythonQueue, ^{
 		self.haltedBreakPoint = breakPoint;
+		
+		if (breakPoint.hidden)
+		{
+			ZGMemoryAddress basePointer = breakPoint.process.is64Bit ? breakPoint.generalPurposeThreadState.uts.ts64.__rbp : breakPoint.generalPurposeThreadState.uts.ts32.__ebp;
+			
+			if (basePointer == breakPoint.basePointer)
+			{
+				[[[ZGAppController sharedController] breakPointController] removeInstructionBreakPoint:breakPoint];
+			}
+			else
+			{
+				continueFromHaltedBreakPointsInDebugger((DebuggerClass *)self.object);
+				return;
+			}
+		}
+		
 		[self.scriptManager handleInstructionBreakPoint:breakPoint callback:breakPoint.callback sender:self];
 	});
 }
@@ -713,6 +752,14 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
+static void stepIntoDebuggerWithHaltedBreakPointAndCallback(ZGBreakPoint *haltedBreakPoint, PyObject *callback)
+{
+	ZGBreakPoint *singleStepBreakPoint = [[[ZGAppController sharedController] breakPointController] addSingleStepBreakPointFromBreakPoint:haltedBreakPoint];
+	
+	singleStepBreakPoint.callback = callback;
+	Py_XINCREF(callback);
+}
+
 static PyObject *Debugger_stepIn(DebuggerClass *self, PyObject *args)
 {
 	PyObject *callback = NULL;
@@ -727,31 +774,77 @@ static PyObject *Debugger_stepIn(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGBreakPoint *singleStepBreakPoint = [[[ZGAppController sharedController] breakPointController] addSingleStepBreakPointFromBreakPoint:self->objcSelf.haltedBreakPoint];
+	stepIntoDebuggerWithHaltedBreakPointAndCallback(self->objcSelf.haltedBreakPoint, callback);
+	resumeFromHaltedBreakPointInDebugger(self);
 	
-	singleStepBreakPoint.callback = callback;
-	Py_XINCREF(callback);
+	return Py_BuildValue("");
+}
+
+static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
+{
+	PyObject *callback = NULL;
+	if (!PyArg_ParseTuple(args, "O:stepOver", &callback))
+	{
+		return NULL;
+	}
 	
-	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
-	self->objcSelf.haltedBreakPoint = nil;
+	if (PyCallable_Check(callback) == 0)
+	{
+		PyErr_SetString(PyExc_ValueError, "debug.stepOver failed because callback is not callable");
+		return NULL;
+	}
+	
+	x86_thread_state_t threadState;
+	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, NULL))
+	{
+		PyErr_SetString(gDebuggerException, "debug.stepOver failed to retrieve current general thread state");
+		return NULL;
+	}
+	
+	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
+	
+	ZGInstruction *currentInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf.process];
+	
+	if (currentInstruction == nil)
+	{
+		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to retrieve instruction at 0x%llX", instructionPointer] UTF8String]);
+		return NULL;
+	}
+	
+	if ([currentInstruction isCallMnemonic])
+	{
+		ZGInstruction *nextInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf.process];
+		
+		if (nextInstruction == nil)
+		{
+			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to retrieve instruction at 0x%llX", instructionPointer] UTF8String]);
+			return NULL;
+		}
+		
+		ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+		
+		if (![[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self->objcSelf.process thread:self->objcSelf.haltedBreakPoint.thread basePointer:basePointer callback:callback delegate:self->objcSelf])
+		{
+			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to set breakpoint at 0x%llX", nextInstruction.variable.address] UTF8String]);
+			return NULL;
+		}
+		
+		Py_XINCREF(callback);
+		
+		continueFromHaltedBreakPointsInDebugger(self);
+	}
+	else
+	{
+		stepIntoDebuggerWithHaltedBreakPointAndCallback(self->objcSelf.haltedBreakPoint, callback);
+		resumeFromHaltedBreakPointInDebugger(self);
+	}
 	
 	return Py_BuildValue("");
 }
 
 static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
 {
-	NSArray *removedBreakPoints = [[[ZGAppController sharedController] breakPointController] removeSingleStepBreakPointsFromBreakPoint:self->objcSelf.haltedBreakPoint];
-	for (ZGBreakPoint *breakPoint in removedBreakPoints)
-	{
-		if (breakPoint.callback != NULL)
-		{
-			Py_DecRef(breakPoint.callback);
-			breakPoint.callback = NULL;
-		}
-	}
-	
-	[[[ZGAppController sharedController] breakPointController] resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
-	self->objcSelf.haltedBreakPoint = nil;
+	continueFromHaltedBreakPointsInDebugger(self);
 	
 	return Py_BuildValue("");
 }
