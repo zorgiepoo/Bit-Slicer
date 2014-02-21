@@ -897,6 +897,12 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 					
 					[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"instruction breakpoint" shouldStop:stop];
 					Py_XDECREF(result);
+					
+					if (breakPoint.hidden && breakPoint.callback != NULL)
+					{
+						Py_DecRef(breakPoint.callback);
+						breakPoint.callback = NULL;
+					}
 				}
 			});
 		}];

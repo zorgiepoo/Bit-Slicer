@@ -680,15 +680,18 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 			if (basePointer == breakPoint.basePointer)
 			{
 				[[[ZGAppController sharedController] breakPointController] removeInstructionBreakPoint:breakPoint];
+				
+				[self.scriptManager handleInstructionBreakPoint:breakPoint callback:breakPoint.callback sender:self];
 			}
 			else
 			{
 				continueFromHaltedBreakPointsInDebugger((DebuggerClass *)self.object);
-				return;
 			}
 		}
-		
-		[self.scriptManager handleInstructionBreakPoint:breakPoint callback:breakPoint.callback sender:self];
+		else
+		{
+			[self.scriptManager handleInstructionBreakPoint:breakPoint callback:breakPoint.callback sender:self];
+		}
 	});
 }
 
