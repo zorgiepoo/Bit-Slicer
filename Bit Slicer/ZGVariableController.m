@@ -663,11 +663,27 @@
 				unsigned char *valuePtr = newValue;
 				writeSize = 0;
 				
+				NSArray *oldComponents = ZGByteArrayComponentsFromString(oldStringValue);
+				
 				for (NSString *byteString in bytesArray)
 				{
-					unsigned int theValue = 0;
-					[[NSScanner scannerWithString:byteString] scanHexInt:&theValue];
-					*valuePtr = (unsigned char)theValue;
+					// old string value will be same size as new string value so accessing this index is fine
+					NSString *oldComponent = [oldComponents objectAtIndex:writeSize];
+					
+					unichar oldCharacters[2];
+					[oldComponent getCharacters:oldCharacters];
+					
+					unichar newCharacters[2];
+					[byteString getCharacters:newCharacters	];
+					
+					unichar replaceCharacters[2];
+					replaceCharacters[0] = (newCharacters[0] == '?' || newCharacters[0] == '*') ? oldCharacters[0] : newCharacters[0];
+					replaceCharacters[1] = (newCharacters[1] == '?' || newCharacters[1] == '*') ? oldCharacters[1] : newCharacters[1];
+					
+					unsigned int replaceValue = 0;
+					[[NSScanner scannerWithString:[NSString stringWithCharacters:replaceCharacters length:2]] scanHexInt:&replaceValue];
+					
+					*valuePtr = (unsigned char)replaceValue;
 					valuePtr++;
 					
 					if ([byteString stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet].length == 0)
@@ -822,11 +838,8 @@
 {
 	NSMutableArray *oldValues = [[NSMutableArray alloc] init];
 	
-	[variables enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop)
-	 {
-		 ZGVariable *variable = object;
-		 
-		 [oldValues addObject:variable.stringValue];
+	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop) {
+		[oldValues addObject:variable.stringValue];
 		 
 		 [self
 		  changeVariable:variable

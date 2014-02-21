@@ -187,60 +187,23 @@
 		}
 	}
 	
+	self.variablesToEdit = nil;
+	
 	if (validVariables.count == 0)
 	{
 		NSRunAlertPanel(@"Writing Variables Failed", @"The selected variables could not be overwritten.", nil, nil, nil);
-	}
-	else
-	{
-		NSMutableArray *valuesArray = [[NSMutableArray alloc] init];
-		
-		NSString *replaceString = self.valueTextField.stringValue;
-		NSArray *replaceComponents = nil;
-		
-		for (NSUInteger variableIndex = 0; variableIndex < validVariables.count; variableIndex++)
-		{
-			ZGVariable *variable = [validVariables objectAtIndex:variableIndex];
-			
-			if (variable.type != ZGByteArray || ([replaceString rangeOfString:@"?"].location == NSNotFound &&  [replaceString rangeOfString:@"*"].location == NSNotFound))
-			{
-				[valuesArray addObject:replaceString];
-			}
-			else
-			{
-				NSArray *variableComponents = ZGByteArrayComponentsFromString(variable.stringValue);
-				if (replaceComponents == nil)
-				{
-					replaceComponents = ZGByteArrayComponentsFromString(replaceString);
-				}
-				
-				NSMutableArray *newReplaceComponents = [NSMutableArray array];
-				for (NSUInteger componentIndex = 0; componentIndex < MIN(variableComponents.count, replaceComponents.count); componentIndex++)
-				{
-					NSString *variableComponent = [variableComponents objectAtIndex:componentIndex];
-					NSString *replaceComponent = [replaceComponents objectAtIndex:componentIndex];
-					
-					unichar variableCharacters[2];
-					[variableComponent getCharacters:variableCharacters];
-					
-					unichar replaceCharacters[2];
-					[replaceComponent getCharacters:replaceCharacters	];
-					
-					unichar newCharacters[2];
-					newCharacters[0] = (replaceCharacters[0] == '?' || replaceCharacters[0] == '*') ? variableCharacters[0] : replaceCharacters[0];
-					newCharacters[1] = (replaceCharacters[1] == '?' || replaceCharacters[1] == '*') ? variableCharacters[1] : replaceCharacters[1];
-					
-					[newReplaceComponents addObject:[NSString stringWithCharacters:newCharacters length:2]];
-				}
-				
-				[valuesArray addObject:[newReplaceComponents componentsJoinedByString:@" "]];
-			}
-		}
-		
-		[self.variableController editVariables:validVariables newValues:valuesArray];
+		return;
 	}
 	
-	self.variablesToEdit = nil;
+	NSMutableArray *newValues = [[NSMutableArray alloc] init];
+	NSString *replaceString = self.valueTextField.stringValue;
+	
+	for (ZGVariable *variable in validVariables)
+	{
+		[newValues addObject:replaceString];
+	}
+	
+	[self.variableController editVariables:validVariables newValues:newValues];
 }
 
 - (IBAction)cancelEditingValues:(id)sender
