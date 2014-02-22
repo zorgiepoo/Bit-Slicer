@@ -45,6 +45,9 @@
 
 @property (assign) IBOutlet ZGDebuggerController *debuggerController;
 
+@property (nonatomic) NSArray *instructions;
+@property (nonatomic) NSArray *basePointers;
+
 @property (assign, nonatomic) BOOL shouldIgnoreTableSelection;
 
 @end
