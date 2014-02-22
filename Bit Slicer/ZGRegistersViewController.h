@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 8/25/13.
+ * Created by Mayur Pawashe on 2/22/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,40 +32,29 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "Python.h"
-#import "VDKQueue.h"
+#import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
-#import "ZGRegisterEntries.h"
+#import "ZGVariableTypes.h"
+#import <mach/thread_act.h>
+#import "ZGRegister.h"
 
-@class ZGDocumentWindowController;
-@class ZGVariable;
-@class ZGProcess;
 @class ZGBreakPoint;
+@class ZGDebuggerController;
 
-#define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
+@interface ZGRegistersViewController : NSViewController
 
-extern dispatch_queue_t gPythonQueue;
+- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController;
 
-@interface ZGScriptManager : NSObject <VDKQueueDelegate>
+typedef void(^program_counter_change_t)(void);
 
-+ (PyObject *)compiledExpressionFromExpression:(NSString *)expression;
+@property (nonatomic, assign) ZGMemoryAddress programCounter;
 
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError **)error;
+- (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
 
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
+- (ZGMemoryAddress)basePointer;
 
-- (void)cleanup;
+- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock;
 
-- (void)loadCachedScriptsFromVariables:(NSArray *)variables;
-
-- (void)openScriptForVariable:(ZGVariable *)variable;
-
-- (void)runScriptForVariable:(ZGVariable *)variable;
-- (void)stopScriptForVariable:(ZGVariable *)variable;
-- (void)removeScriptForVariable:(ZGVariable *)variable;
-
-- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender;
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender;
+- (IBAction)changeQualifier:(id)sender;
 
 @end

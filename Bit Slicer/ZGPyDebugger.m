@@ -46,8 +46,8 @@
 #import "ZGBreakPointController.h"
 #import "ZGBreakPoint.h"
 #import "ZGInstruction.h"
-#import "ZGRegistersController.h"
 #import "ZGRegisterUtilities.h"
+#import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
 #import "structmember.h"
 #import "CoreSymbolication.h"
@@ -952,7 +952,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	if (self->objcSelf.generalPurposeRegisterOffsetsDictionary == nil)
 	{
 		ZGRegisterEntry generalPurposeRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
-		[ZGRegistersController getRegisterEntries:generalPurposeRegisterEntries fromGeneralPurposeThreadState:threadState is64Bit:self->is64Bit];
+		[ZGRegisterEntries getRegisterEntries:generalPurposeRegisterEntries fromGeneralPurposeThreadState:threadState is64Bit:self->is64Bit];
 		
 		self->objcSelf.generalPurposeRegisterOffsetsDictionary = registerOffsetsCacheDictionary(generalPurposeRegisterEntries);
 	}
@@ -960,7 +960,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	if (hasVectorRegisters && self->objcSelf.vectorRegisterOffsetsDictionary == nil)
 	{
 		ZGRegisterEntry vectorRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
-		[ZGRegistersController getRegisterEntries:vectorRegisterEntries fromVectorThreadState:vectorState is64Bit:self->is64Bit hasAVXSupport:hasAVXSupport];
+		[ZGRegisterEntries getRegisterEntries:vectorRegisterEntries fromVectorThreadState:vectorState is64Bit:self->is64Bit hasAVXSupport:hasAVXSupport];
 		
 		self->objcSelf.vectorRegisterOffsetsDictionary = registerOffsetsCacheDictionary(vectorRegisterEntries);
 	}

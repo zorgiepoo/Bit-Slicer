@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 2/7/13.
+ * Created by Mayur Pawashe on 2/22/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,19 +33,10 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
-#import "ZGVariableTypes.h"
-#import <mach/thread_act.h>
 #import "ZGRegister.h"
 #import "ZGRegisterUtilities.h"
 
-@class ZGBreakPoint;
-
-@interface ZGRegistersController : NSResponder
-
-typedef void(^program_counter_change_t)(void);
-
-@property (nonatomic, assign) ZGMemoryAddress programCounter;
+@interface ZGRegisterEntries : NSObject
 
 typedef struct
 {
@@ -62,12 +53,7 @@ typedef struct
 + (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
 + (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport;
 
-- (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
-
-- (ZGMemoryAddress)basePointer;
-
-- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock;
-
-- (IBAction)changeQualifier:(id)sender;
++ (NSArray *)registerVariablesFromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport;
++ (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
 
 @end

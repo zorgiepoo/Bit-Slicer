@@ -23,6 +23,7 @@
 		77282120189B854D0044E4BC /* ZGFunctionTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7728211F189B854D0044E4BC /* ZGFunctionTypes.m */; };
 		77282123189E769B0044E4BC /* ZGStoredData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282122189E769B0044E4BC /* ZGStoredData.m */; };
 		77282126189EA4520044E4BC /* ZGProcessTaskManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282125189EA4520044E4BC /* ZGProcessTaskManager.m */; };
+		772C0F7E18B88AFA009FFF72 /* ZGRegisterEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 772C0F7D18B88AFA009FFF72 /* ZGRegisterEntries.m */; };
 		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
 		7730999E18660A29008B71DA /* ZGDocumentOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */; };
 		773972B117D2E61200B958EE /* _DDFunctionContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728517D2E61200B958EE /* _DDFunctionContainer.m */; };
@@ -69,6 +70,8 @@
 		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
 		77CE28B817D538E300998F28 /* ZGLoggerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */; };
 		77CE28BA17D580AD00998F28 /* ZGPyMainModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B917D580AD00998F28 /* ZGPyMainModule.m */; };
+		77CECE1718B8861C006D45E9 /* ZGRegistersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */; };
+		77CECE1818B8861C006D45E9 /* ZGRegistersViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77CECE1618B8861C006D45E9 /* ZGRegistersViewController.xib */; };
 		77DA9D0B1800639E00549A37 /* continue.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D071800639E00549A37 /* continue.pdf */; };
 		77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D081800639E00549A37 /* stepin.pdf */; };
 		77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D091800639E00549A37 /* stepout.pdf */; };
@@ -132,7 +135,6 @@
 		77F1164D17D2EFDA009E002A /* ZGBreakPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1164C17D2EFDA009E002A /* ZGBreakPoint.m */; };
 		77F1165017D2EFE4009E002A /* ZGDebugThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1164F17D2EFE4009E002A /* ZGDebugThread.m */; };
 		77F1165317D2EFED009E002A /* ZGBacktraceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165217D2EFED009E002A /* ZGBacktraceController.m */; };
-		77F1165617D2EFF5009E002A /* ZGRegistersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165517D2EFF5009E002A /* ZGRegistersController.m */; };
 		77F1165917D2F001009E002A /* ZGRegister.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165817D2F001009E002A /* ZGRegister.m */; };
 		77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */; };
 		77FE406118937EC800BCC339 /* ZGRegisterUtilities.c in Sources */ = {isa = PBXBuildFile; fileRef = 77FE406018937EC800BCC339 /* ZGRegisterUtilities.c */; };
@@ -192,6 +194,8 @@
 		77282122189E769B0044E4BC /* ZGStoredData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGStoredData.m; path = "Bit Slicer/ZGStoredData.m"; sourceTree = "<group>"; };
 		77282124189EA4520044E4BC /* ZGProcessTaskManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGProcessTaskManager.h; path = "Bit Slicer/ZGProcessTaskManager.h"; sourceTree = "<group>"; };
 		77282125189EA4520044E4BC /* ZGProcessTaskManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGProcessTaskManager.m; path = "Bit Slicer/ZGProcessTaskManager.m"; sourceTree = "<group>"; };
+		772C0F7C18B88AFA009FFF72 /* ZGRegisterEntries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegisterEntries.h; path = "Bit Slicer/ZGRegisterEntries.h"; sourceTree = "<group>"; };
+		772C0F7D18B88AFA009FFF72 /* ZGRegisterEntries.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegisterEntries.m; path = "Bit Slicer/ZGRegisterEntries.m"; sourceTree = "<group>"; };
 		772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchProgressDelegate.h; path = "Bit Slicer/ZGSearchProgressDelegate.h"; sourceTree = "<group>"; };
 		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; };
 		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; };
@@ -370,6 +374,9 @@
 		77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGLoggerWindowController.xib; path = "Bit Slicer/ZGLoggerWindowController.xib"; sourceTree = "<group>"; };
 		77CE28B917D580AD00998F28 /* ZGPyMainModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyMainModule.m; path = "Bit Slicer/ZGPyMainModule.m"; sourceTree = "<group>"; };
 		77CE28BB17D580D400998F28 /* ZGPyMainModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyMainModule.h; path = "Bit Slicer/ZGPyMainModule.h"; sourceTree = "<group>"; };
+		77CECE1418B8861C006D45E9 /* ZGRegistersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegistersViewController.h; path = "Bit Slicer/ZGRegistersViewController.h"; sourceTree = "<group>"; };
+		77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegistersViewController.m; path = "Bit Slicer/ZGRegistersViewController.m"; sourceTree = "<group>"; };
+		77CECE1618B8861C006D45E9 /* ZGRegistersViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGRegistersViewController.xib; path = "Bit Slicer/ZGRegistersViewController.xib"; sourceTree = "<group>"; };
 		77DA9D071800639E00549A37 /* continue.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = continue.pdf; path = "Bit Slicer/debuggericons/continue.pdf"; sourceTree = "<group>"; };
 		77DA9D081800639E00549A37 /* stepin.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepin.pdf; path = "Bit Slicer/debuggericons/stepin.pdf"; sourceTree = "<group>"; };
 		77DA9D091800639E00549A37 /* stepout.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepout.pdf; path = "Bit Slicer/debuggericons/stepout.pdf"; sourceTree = "<group>"; };
@@ -481,8 +488,6 @@
 		77F1164F17D2EFE4009E002A /* ZGDebugThread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDebugThread.m; path = "Bit Slicer/ZGDebugThread.m"; sourceTree = "<group>"; };
 		77F1165117D2EFED009E002A /* ZGBacktraceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBacktraceController.h; path = "Bit Slicer/ZGBacktraceController.h"; sourceTree = "<group>"; };
 		77F1165217D2EFED009E002A /* ZGBacktraceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGBacktraceController.m; path = "Bit Slicer/ZGBacktraceController.m"; sourceTree = "<group>"; };
-		77F1165417D2EFF5009E002A /* ZGRegistersController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegistersController.h; path = "Bit Slicer/ZGRegistersController.h"; sourceTree = "<group>"; };
-		77F1165517D2EFF5009E002A /* ZGRegistersController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegistersController.m; path = "Bit Slicer/ZGRegistersController.m"; sourceTree = "<group>"; };
 		77F1165717D2F001009E002A /* ZGRegister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegister.h; path = "Bit Slicer/ZGRegister.h"; sourceTree = "<group>"; };
 		77F1165817D2F001009E002A /* ZGRegister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegister.m; path = "Bit Slicer/ZGRegister.m"; sourceTree = "<group>"; };
 		77F1165A17D2F00A009E002A /* ZGCodeInjectionWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGCodeInjectionWindowController.h; path = "Bit Slicer/ZGCodeInjectionWindowController.h"; sourceTree = "<group>"; };
@@ -679,6 +684,11 @@
 				77F1163E17D2EF9E009E002A /* ZGDebuggerController.h */,
 				77F1163F17D2EF9E009E002A /* ZGDebuggerController.m */,
 				77F115C017D2EBEC009E002A /* ZGDebuggerController.xib */,
+				77CECE1418B8861C006D45E9 /* ZGRegistersViewController.h */,
+				77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */,
+				77CECE1618B8861C006D45E9 /* ZGRegistersViewController.xib */,
+				772C0F7C18B88AFA009FFF72 /* ZGRegisterEntries.h */,
+				772C0F7D18B88AFA009FFF72 /* ZGRegisterEntries.m */,
 				77F1164117D2EFB4009E002A /* ZGDisassemblerObject.h */,
 				77F1164217D2EFB4009E002A /* ZGDisassemblerObject.m */,
 				77F1164417D2EFBD009E002A /* ZGInstruction.h */,
@@ -697,8 +707,6 @@
 				77F1164F17D2EFE4009E002A /* ZGDebugThread.m */,
 				77F1165117D2EFED009E002A /* ZGBacktraceController.h */,
 				77F1165217D2EFED009E002A /* ZGBacktraceController.m */,
-				77F1165417D2EFF5009E002A /* ZGRegistersController.h */,
-				77F1165517D2EFF5009E002A /* ZGRegistersController.m */,
 				77F1165717D2F001009E002A /* ZGRegister.h */,
 				77F1165817D2F001009E002A /* ZGRegister.m */,
 				77F1165A17D2F00A009E002A /* ZGCodeInjectionWindowController.h */,
@@ -1170,6 +1178,7 @@
 				77F115BC17D2EBD7009E002A /* Preferences.xib in Resources */,
 				77F115BF17D2EBE1009E002A /* MyDocument.xib in Resources */,
 				77F115C217D2EBEC009E002A /* ZGDebuggerController.xib in Resources */,
+				77CECE1818B8861C006D45E9 /* ZGRegistersViewController.xib in Resources */,
 				77F115C517D2EBF3009E002A /* ZGCodeInjectionWindowController.xib in Resources */,
 				770FABB81849160200C176B7 /* ZGEditSizeWindowController.xib in Resources */,
 				77F115C817D2EBFA009E002A /* ZGMemoryViewerController.xib in Resources */,
@@ -1205,6 +1214,7 @@
 				773972BF17D2E61200B958EE /* DDMathEvaluator.m in Sources */,
 				773972C017D2E61200B958EE /* DDMathStringToken.m in Sources */,
 				773972C117D2E61200B958EE /* DDMathStringTokenizer.m in Sources */,
+				772C0F7E18B88AFA009FFF72 /* ZGRegisterEntries.m in Sources */,
 				773972C217D2E61200B958EE /* DDParser.m in Sources */,
 				773972C317D2E61200B958EE /* DDParserTypes.m in Sources */,
 				773972C417D2E61200B958EE /* DDTypes.m in Sources */,
@@ -1236,6 +1246,7 @@
 				77F115F417D2EE0B009E002A /* ZGDocumentData.m in Sources */,
 				770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */,
 				77F115F717D2EE28009E002A /* ZGDocumentWindowController.m in Sources */,
+				77CECE1718B8861C006D45E9 /* ZGRegistersViewController.m in Sources */,
 				77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */,
 				77F115FD17D2EE7E009E002A /* ZGDocumentTableController.m in Sources */,
 				770FABAC1848354100C176B7 /* ZGEditValueWindowController.m in Sources */,
@@ -1273,7 +1284,6 @@
 				77F1165017D2EFE4009E002A /* ZGDebugThread.m in Sources */,
 				77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */,
 				77F1165317D2EFED009E002A /* ZGBacktraceController.m in Sources */,
-				77F1165617D2EFF5009E002A /* ZGRegistersController.m in Sources */,
 				77F1165917D2F001009E002A /* ZGRegister.m in Sources */,
 				77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */,
 				77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */,

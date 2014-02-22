@@ -65,9 +65,9 @@
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 #import "ZGScriptManager.h"
-#import "ZGRegistersController.h"
 #import "ZGUtilities.h"
 #import "NSArrayAdditions.h"
+#import "ZGRegisterEntries.h"
 
 #import <mach/task.h>
 #import <mach/thread_act.h>
@@ -595,12 +595,12 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 		{
 			BOOL is64Bit = breakPoint.process.is64Bit;
 			
-			int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
+			int numberOfGeneralPurposeEntries = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
 			
 			retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit, &hasAVXSupport);
 			if (retrievedVectorState)
 			{
-				[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:vectorState is64Bit:is64Bit hasAVXSupport:hasAVXSupport];
+				[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:vectorState is64Bit:is64Bit hasAVXSupport:hasAVXSupport];
 			}
 			
 			retrievedRegisterEntries = YES;

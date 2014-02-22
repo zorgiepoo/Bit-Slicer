@@ -44,12 +44,12 @@
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
-#import "ZGRegistersController.h"
 #import "NSArrayAdditions.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
 #import "ZGVariableController.h"
 #import "ZGUtilities.h"
+#import "ZGRegisterEntries.h"
 
 @interface ZGWatchVariableWindowController ()
 
@@ -257,7 +257,7 @@
 	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:instruction.text];
 	
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
-	int numberOfGeneralRegisters = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:self.watchProcess.is64Bit];
+	int numberOfGeneralRegisters = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:self.watchProcess.is64Bit];
 	
 	[self
 	 appendDescription:description
@@ -267,7 +267,7 @@
 	
 	if (breakPoint.hasVectorState)
 	{
-		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:breakPoint.vectorState is64Bit:self.watchProcess.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
+		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:breakPoint.vectorState is64Bit:self.watchProcess.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
 		
 		[self
 		 appendDescription:description

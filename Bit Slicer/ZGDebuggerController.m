@@ -45,7 +45,7 @@
 #import "ZGScriptManager.h"
 #import "ZGDisassemblerObject.h"
 #import "ZGUtilities.h"
-#import "ZGRegistersController.h"
+#import "ZGRegistersViewController.h"
 #import "ZGPreferencesController.h"
 #import "ZGBacktraceController.h"
 #import "ZGMemoryViewerController.h"
@@ -65,7 +65,11 @@
 @property (nonatomic, assign) IBOutlet NSSplitView *splitView;
 
 @property (nonatomic, assign) IBOutlet ZGBacktraceController *backtraceController;
-@property (nonatomic, assign) IBOutlet ZGRegistersController *registersController;
+
+@property (nonatomic, assign) IBOutlet NSSplitView *registersAndBacktraceSplitView;
+
+@property (nonatomic, assign) IBOutlet NSView *registersView;
+@property (nonatomic) ZGRegistersViewController *registersViewController;
 
 @property (nonatomic, assign) IBOutlet NSButton *continueButton;
 @property (nonatomic, assign) IBOutlet NSSegmentedControl *stepExecutionSegmentedControl;
@@ -181,6 +185,9 @@ enum ZGStepExecution
 	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepOverExecution] setTemplate:YES];
 	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepOutExecution] setTemplate:YES];
 	
+	self.registersViewController = [[ZGRegistersViewController alloc] initWithDebuggerController:self];
+	[self.registersAndBacktraceSplitView replaceSubview:self.registersView with:self.registersViewController.view];
+	
 	[self updateExecutionButtons];
 }
 
@@ -227,7 +234,7 @@ enum ZGStepExecution
 		[self updateRegisters];
 		[self updateBacktrace];
 		
-		[self jumpToMemoryAddress:self.registersController.programCounter];
+		[self jumpToMemoryAddress:self.registersViewController.programCounter];
 	}
 	else
 	{
@@ -300,7 +307,7 @@ enum ZGStepExecution
 		case NSOffState:
 			if (![self.splitView isSubviewCollapsed:[self.splitView.subviews objectAtIndex:1]])
 			{
-				[self.undoManager removeAllActionsWithTarget:self.registersController];
+				[self.undoManager removeAllActionsWithTarget:self.registersViewController];
 				[self collapseBottomSubview];
 			}
 			break;
@@ -1257,7 +1264,7 @@ enum ZGStepExecution
 		return NO;
 	}
 	
-	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersController.programCounter + 1 inProcess:self.currentProcess];
+	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersViewController.programCounter + 1 inProcess:self.currentProcess];
 	if (!currentInstruction)
 	{
 		return NO;
@@ -1646,7 +1653,7 @@ enum ZGStepExecution
 	if ([tableColumn.identifier isEqualToString:@"address"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
-		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.registersController.programCounter == instruction.variable.address);
+		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.registersViewController.programCounter == instruction.variable.address);
 		
 		[cell setTextColor:isInstructionBreakPoint ? NSColor.redColor : NSColor.textColor];
 	}
@@ -2396,8 +2403,8 @@ enum ZGStepExecution
 {
 	if (self.currentBreakPoint && !self.disassembling)
 	{
-		ZGMemoryAddress currentAddress = [self.registersController programCounter];
-		[self.registersController changeProgramCounter:newAddress];
+		ZGMemoryAddress currentAddress = [self.registersViewController programCounter];
+		[self.registersViewController changeProgramCounter:newAddress];
 		[[self.undoManager prepareWithInvocationTarget:self] jumpProgramCounterToAddress:currentAddress];
 		[self.undoManager setActionName:@"Jump"];
 	}
@@ -2411,7 +2418,7 @@ enum ZGStepExecution
 
 - (void)updateRegisters
 {
-	[self.registersController updateRegistersFromBreakPoint:self.currentBreakPoint programCounterChange:^{
+	[self.registersViewController updateRegistersFromBreakPoint:self.currentBreakPoint programCounterChange:^{
 		if (self.currentBreakPoint)
 		{
 			[self.instructionsTableView reloadData];
@@ -2421,7 +2428,7 @@ enum ZGStepExecution
 
 - (void)updateBacktrace
 {
-	NSArray *backtraceComponents = [self.backtraceController backtraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
+	NSArray *backtraceComponents = [self.backtraceController backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.programCounter inProcess:self.currentProcess];
 	
 	NSArray *instructions = [backtraceComponents objectAtIndex:0];
 	
@@ -2462,7 +2469,7 @@ enum ZGStepExecution
 		
 		[self toggleBacktraceView:NSOnState];
 		
-		[self jumpToMemoryAddress:self.registersController.programCounter];
+		[self jumpToMemoryAddress:self.registersViewController.programCounter];
 		
 		[self updateBacktrace];
 		
@@ -2470,7 +2477,7 @@ enum ZGStepExecution
 		
 		if (self.currentBreakPoint.hidden)
 		{
-			if (breakPoint.basePointer == self.registersController.basePointer)
+			if (breakPoint.basePointer == self.registersViewController.basePointer)
 			{
 				[[[ZGAppController sharedController] breakPointController] removeInstructionBreakPoint:breakPoint];
 			}
@@ -2534,12 +2541,12 @@ enum ZGStepExecution
 
 - (IBAction)stepOver:(id)sender
 {
-	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersController.programCounter + 1 inProcess:self.currentProcess];
+	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersViewController.programCounter + 1 inProcess:self.currentProcess];
 	if ([currentInstruction isCallMnemonic])
 	{
 		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		
-		if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:self.registersController.basePointer delegate:self])
+		if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:self.registersViewController.basePointer delegate:self])
 		{
 			[self continueExecution:nil];
 		}

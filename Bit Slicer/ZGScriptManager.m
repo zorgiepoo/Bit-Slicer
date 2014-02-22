@@ -46,6 +46,7 @@
 #import "ZGSearchProgress.h"
 #import "ZGTableView.h"
 #import "ZGUtilities.h"
+#import "ZGRegisterEntries.h"
 
 #import "structmember.h"
 
@@ -856,11 +857,11 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	BOOL is64Bit = breakPoint.process.is64Bit;
 	
-	int numberOfGeneralPurposeEntries = [ZGRegistersController getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:is64Bit];
+	int numberOfGeneralPurposeEntries = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:is64Bit];
 	
 	if (breakPoint.hasVectorState)
 	{
-		[ZGRegistersController getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:breakPoint.vectorState is64Bit:is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
+		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:breakPoint.vectorState is64Bit:is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
 	}
 	
 	return convertRegisterEntriesToPyDict(registerEntries, is64Bit);

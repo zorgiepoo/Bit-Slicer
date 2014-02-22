@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 2/7/13.
+ * Created by Mayur Pawashe on 2/22/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,31 +32,45 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGRegistersController.h"
+#import "ZGRegistersViewController.h"
+
 #import "ZGVariable.h"
 #import "ZGBreakPoint.h"
 #import "ZGProcess.h"
 #import "ZGPreferencesController.h"
 #import "ZGUtilities.h"
 #import "ZGDebuggerController.h"
+#import "ZGRegisterEntries.h"
 
-@interface ZGRegistersController ()
+@interface ZGRegistersViewController ()
 
 @property (assign) IBOutlet NSTableView *tableView;
-@property (assign) IBOutlet ZGDebuggerController *debuggerController;
+@property (weak) ZGDebuggerController *debuggerController;
 
-@property (nonatomic, strong) NSArray *registers;
-@property (nonatomic, strong) ZGBreakPoint *breakPoint;
+@property (nonatomic) NSArray *registers;
+@property (nonatomic) ZGBreakPoint *breakPoint;
 @property (nonatomic, assign) ZGVariableType qualifier;
 
 @property (nonatomic, copy) program_counter_change_t programCounterChangeBlock;
 
 @end
 
-@implementation ZGRegistersController
+@implementation ZGRegistersViewController
 
-- (void)awakeFromNib
+- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController
 {
+	self = [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
+	if (self != nil)
+	{
+		self.debuggerController = debuggerController;
+	}
+	return self;
+}
+
+- (void)loadView
+{
+	[super loadView];
+	
 	[self setNextResponder:[self.tableView nextResponder]];
 	[self.tableView setNextResponder:self];
 	
@@ -118,238 +132,6 @@
 	return basePointer;
 }
 
-#define ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, registerName) \
-{ \
-	strcpy((char *)&entries[entryIndex].name, #registerName); \
-	entries[entryIndex].size = sizeof(vectorState.ufs.as64.__fpu_##registerName); \
-	entries[entryIndex].offset = offsetof(x86_avx_state64_t, __fpu_##registerName); \
-	memcpy(&entries[entryIndex].value, &vectorState.ufs.as64.__fpu_##registerName, entries[entryIndex].size); \
-	entries[entryIndex].type = ZGRegisterVector; \
-	entryIndex++; \
-}
-
-+ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
-{
-	int entryIndex = 0;
-	
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fcw); // FPU control word
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fsw); // FPU status word
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ftw); // FPU tag word
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fop); // FPU Opcode
-	
-	// Instruction Pointer
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ip); // offset
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, cs); // selector
-	
-	// Instruction operand (data) pointer
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, dp); // offset
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ds); // selector
-	
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, mxcsr); // MXCSR Register state
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, mxcsrmask); // MXCSR mask
-	
-	// STX/MMX
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm0);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm1);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm2);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm3);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm4);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm5);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm6);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, stmm7);
-	
-	// XMM 0 through 7
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm0);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm1);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm2);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm3);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm4);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm5);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm6);
-	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm7);
-	
-	if (is64Bit)
-	{
-		// XMM 8 through 15
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm8);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm9);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm10);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm11);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm12);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm13);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm14);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm15);
-	}
-	
-	if (hasAVXSupport)
-	{
-		// YMMH 0 through 7
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh0);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh1);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh2);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh3);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh4);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh5);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh6);
-		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh7);
-		
-		if (is64Bit)
-		{
-			// YMMH 8 through 15
-			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh8);
-			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh9);
-			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh10);
-			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh11);
-			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh12);
-			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh13);
-			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh14);
-			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh15);
-		}
-	}
-	
-	entries[entryIndex].name[0] = 0;
-	
-	return entryIndex;
-}
-
-+ (NSArray *)registerVariablesFromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
-{
-	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
-	
-	ZGRegisterEntry entries[64];
-	[self getRegisterEntries:entries fromVectorThreadState:vectorState is64Bit:is64Bit hasAVXSupport:hasAVXSupport];
-	
-	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(entry); entry++)
-	{
-		ZGVariable *variable =
-		[[ZGVariable alloc]
-		 initWithValue:entry->value
-		 size:entry->size
-		 address:0
-		 type:ZGByteArray
-		 qualifier:0
-		 pointerSize:is64Bit
-		 description:@(entry->name)];
-		
-		[registerVariables addObject:variable];
-	}
-	
-	return registerVariables;
-}
-
-#define ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName) \
-{ \
-	strcpy((char *)&entries[entryIndex].name, #registerName); \
-	entries[entryIndex].size = sizeof(threadState.uts.structureType.__##registerName); \
-	memcpy(&entries[entryIndex].value, &threadState.uts.structureType.__##registerName, entries[entryIndex].size); \
-	entries[entryIndex].offset = offsetof(structName, __##registerName); \
-	entries[entryIndex].type = ZGRegisterGeneralPurpose; \
-	entryIndex++; \
-}
-
-#define ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, x86_thread_state32_t)
-#define ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, x86_thread_state64_t)
-
-+ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
-{
-	int entryIndex = 0;
-	
-	if (is64Bit)
-	{
-		// General registers
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rax);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbx);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rcx);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdx);
-		
-		// Index and pointers
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rdi);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsi);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rbp);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rsp);
-		
-		// Extra registers
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r8);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r9);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r10);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r11);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r12);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r13);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r14);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, r15);
-		
-		// Instruction pointer
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rip);
-		
-		// Flags indicator
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rflags);
-		
-		// Segment registers
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, cs);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, fs);
-		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, gs);
-	}
-	else
-	{
-		// General registers
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, eax);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebx);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ecx);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, edx);
-		
-		// Index and pointers
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, edi);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, esi);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ebp);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, esp);
-		
-		// Segment register
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ss);
-		
-		// Flags indicator
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, eflags);
-		
-		// Instruction pointer
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, eip);
-		
-		// Segment registers
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, cs);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, ds);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, es);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, fs);
-		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, gs);
-	}
-	
-	entries[entryIndex].name[0] = 0;
-	
-	return entryIndex;
-}
-
-+ (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
-{
-	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
-	
-	ZGRegisterEntry entries[28];
-	[self getRegisterEntries:entries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
-	
-	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(entry); entry++)
-	{
-		ZGVariable *variable =
-		[[ZGVariable alloc]
-		 initWithValue:entry->value
-		 size:entry->size
-		 address:0
-		 type:ZGByteArray
-		 qualifier:0
-		 pointerSize:is64Bit
-		 description:@(entry->name)];
-		
-		[registerVariables addObject:variable];
-	}
-	
-	return registerVariables;
-}
-
 - (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock
 {
 	self.breakPoint = breakPoint;
@@ -361,7 +143,7 @@
 	
 	NSMutableArray *newRegisters = [NSMutableArray array];
 	
-	NSArray *registerVariables = [[self class] registerVariablesFromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:breakPoint.process.is64Bit];
+	NSArray *registerVariables = [ZGRegisterEntries registerVariablesFromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:breakPoint.process.is64Bit];
 	
 	for (ZGVariable *registerVariable in registerVariables)
 	{
@@ -390,7 +172,7 @@
 	
 	if (breakPoint.hasVectorState)
 	{
-		NSArray *registerVariables = [[self class] registerVariablesFromVectorThreadState:breakPoint.vectorState is64Bit:breakPoint.process.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
+		NSArray *registerVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:breakPoint.vectorState is64Bit:breakPoint.process.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
 		for (ZGVariable *registerVariable in registerVariables)
 		{
 			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterVector variable:registerVariable pointerSize:pointerSize];
@@ -738,5 +520,6 @@
 	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
 	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 }
+
 
 @end
