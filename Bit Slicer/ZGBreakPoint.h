@@ -36,7 +36,7 @@
 #import "Python.h"
 #import "ZGMemoryTypes.h"
 #import "ZGBreakPointDelegate.h"
-#import "ZGRegisterUtilities.h"
+#import "ZGThreadStates.h"
 
 @class ZGVariable;
 @class ZGProcess;

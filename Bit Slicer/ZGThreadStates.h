@@ -32,8 +32,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Bit_Slicer_ZGRegisterUtilities_h
-#define Bit_Slicer_ZGRegisterUtilities_h
+#ifndef Bit_Slicer_ZGThreadStates_h
+#define Bit_Slicer_ZGThreadStates_h
 
 #include <mach/thread_act.h>
 #include <stdbool.h>

@@ -32,7 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ZGRegisterUtilities.h"
+#include "ZGThreadStates.h"
 
 bool ZGGetGeneralThreadState(x86_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t *stateCount)
 {

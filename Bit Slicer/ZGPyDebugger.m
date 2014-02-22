@@ -46,7 +46,7 @@
 #import "ZGBreakPointController.h"
 #import "ZGBreakPoint.h"
 #import "ZGInstruction.h"
-#import "ZGRegisterUtilities.h"
+#import "ZGThreadStates.h"
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
 #import "structmember.h"

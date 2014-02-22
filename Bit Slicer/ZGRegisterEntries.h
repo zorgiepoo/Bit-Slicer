@@ -34,7 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGRegister.h"
-#import "ZGRegisterUtilities.h"
+#import "ZGThreadStates.h"
 
 @interface ZGRegisterEntries : NSObject
 

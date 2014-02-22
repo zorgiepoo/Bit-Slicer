@@ -55,7 +55,7 @@
 #import "ZGBreakPointController.h"
 #import "ZGAppController.h"
 #import "ZGVirtualMemory.h"
-#import "ZGRegisterUtilities.h"
+#import "ZGThreadStates.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
 #import "ZGDebugThread.h"
