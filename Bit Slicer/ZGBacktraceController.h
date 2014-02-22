@@ -40,9 +40,10 @@
 @interface ZGBacktraceController : NSResponder
 
 @property (assign) IBOutlet NSTableView *tableView;
-@property (strong) NSArray *instructions;
-@property (strong) NSArray *basePointers;
+@property (nonatomic) NSArray *instructions;
+@property (nonatomic) NSArray *basePointers;
 
-- (void)updateBacktraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer inProcess:(ZGProcess *)process;
+- (NSArray *)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer inProcess:(ZGProcess *)process;
+- (void)updateBacktrace:(NSArray *)backtrace;
 
 @end

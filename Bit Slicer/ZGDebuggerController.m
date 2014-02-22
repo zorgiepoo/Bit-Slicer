@@ -225,7 +225,7 @@ enum ZGStepExecution
 	{
 		[self toggleBacktraceView:NSOnState];
 		[self updateRegisters];
-		[self.backtraceController updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
+		[self updateBacktrace];
 		
 		[self jumpToMemoryAddress:self.registersController.programCounter];
 	}
@@ -624,7 +624,7 @@ enum ZGStepExecution
 	}
 }
 
-- (void)updateInstructionSymbols
+- (void)updateVisibleInstructionSymbols
 {
 	static BOOL isUpdatingSymbols = NO;
 	
@@ -795,7 +795,7 @@ enum ZGStepExecution
 	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && !self.disassembling && self.instructions.count > 0)
 	{
 		[self updateInstructionValues];
-		[self updateInstructionSymbols];
+		[self updateVisibleInstructionSymbols];
 		[self updateInstructionsBeyondTableView];
 	}
 }
@@ -2419,6 +2419,33 @@ enum ZGStepExecution
 	}];
 }
 
+- (void)updateBacktrace
+{
+	NSArray *backtraceComponents = [self.backtraceController backtraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
+	
+	NSArray *instructions = [backtraceComponents objectAtIndex:0];
+	
+	if ([self shouldUpdateSymbolsForInstructions:instructions])
+	{
+		[self updateSymbolsForInstructions:instructions];
+	}
+	
+	for (ZGInstruction *instruction in instructions)
+	{
+		if (instruction.symbols.length == 0)
+		{
+			instruction.symbols = @""; // in case symbols is nil
+			instruction.variable.description = instruction.variable.addressStringValue;
+		}
+		else
+		{
+			instruction.variable.description = instruction.symbols;
+		}
+	}
+	
+	[self.backtraceController updateBacktrace:backtraceComponents];
+}
+
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
 {	
 	[self removeHaltedBreakPoint:self.currentBreakPoint];
@@ -2437,7 +2464,7 @@ enum ZGStepExecution
 		
 		[self jumpToMemoryAddress:self.registersController.programCounter];
 		
-		[self.backtraceController	updateBacktraceWithBasePointer:self.registersController.basePointer instructionPointer:self.registersController.programCounter inProcess:self.currentProcess];
+		[self updateBacktrace];
 		
 		BOOL shouldShowNotification = YES;
 		

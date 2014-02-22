@@ -64,15 +64,15 @@
 	[self.tableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
 
-#pragma mark Updating Backtrace
+#pragma mark Backtrace
 
-- (void)updateBacktraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer inProcess:(ZGProcess *)process
+- (NSArray *)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer inProcess:(ZGProcess *)process
 {
 	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
 	
 	ZGInstruction *currentInstruction = [self.debuggerController findInstructionBeforeAddress:instructionPointer+1 inProcess:process];
-	if (currentInstruction)
+	if (currentInstruction != nil)
 	{
 		[newInstructions addObject:currentInstruction];
 		[newBasePointers addObject:@(basePointer)];
@@ -80,69 +80,69 @@
 		while (basePointer > 0)
 		{
 			// Read return address
-			void *bytes = NULL;
-			ZGMemorySize size = process.pointerSize;
-			if (ZGReadBytes(process.processTask, basePointer + process.pointerSize, &bytes, &size))
-			{
-				ZGMemoryAddress returnAddress = 0;
-				memcpy(&returnAddress, bytes, size);
-				
-				ZGFreeBytes(process.processTask, bytes, size);
-				
-				ZGInstruction *instruction = [self.debuggerController findInstructionBeforeAddress:returnAddress inProcess:process];
-				if (instruction)
-				{
-					[newInstructions addObject:instruction];
-					
-					// Read base pointer
-					bytes = NULL;
-					size = process.pointerSize;
-					if (ZGReadBytes(process.processTask, basePointer, &bytes, &size))
-					{
-						basePointer = 0;
-						memcpy(&basePointer, bytes, size);
-						
-						[newBasePointers addObject:@(basePointer)];
-						
-						ZGFreeBytes(process.processTask, bytes, size);
-					}
-					else
-					{
-						break;
-					}
-				}
-				else
-				{
-					break;
-				}
-			}
-			else
+			void *returnAddressBytes = NULL;
+			ZGMemorySize returnAddressSize = process.pointerSize;
+			if (!ZGReadBytes(process.processTask, basePointer + process.pointerSize, &returnAddressBytes, &returnAddressSize))
 			{
 				break;
 			}
+			
+			ZGMemoryAddress returnAddress;
+			switch (returnAddressSize)
+			{
+				case sizeof(ZGMemoryAddress):
+					returnAddress = *(ZGMemoryAddress *)returnAddressBytes;
+					break;
+				case sizeof(ZG32BitMemoryAddress):
+					returnAddress = *(ZG32BitMemoryAddress *)returnAddressBytes;
+					break;
+				default:
+					returnAddress = 0;
+			}
+			
+			ZGFreeBytes(process.processTask, returnAddressBytes, returnAddressSize);
+			
+			ZGInstruction *instruction = [self.debuggerController findInstructionBeforeAddress:returnAddress inProcess:process];
+			if (instruction == nil)
+			{
+				break;
+			}
+			
+			[newInstructions addObject:instruction];
+			
+			// Read base pointer
+			void *basePointerBytes = NULL;
+			ZGMemorySize basePointerSize = process.pointerSize;
+			if (!ZGReadBytes(process.processTask, basePointer, &basePointerBytes, &basePointerSize))
+			{
+				break;
+			}
+			
+			switch (basePointerSize)
+			{
+				case sizeof(ZGMemoryAddress):
+					basePointer = *(ZGMemoryAddress *)basePointerBytes;
+					break;
+				case sizeof(ZG32BitMemoryAddress):
+					basePointer = *(ZG32BitMemoryAddress *)basePointerBytes;
+					break;
+				default:
+					basePointer = 0;
+			}
+			
+			[newBasePointers addObject:@(basePointer)];
+			
+			ZGFreeBytes(process.processTask, basePointerBytes, basePointerSize);
 		}
 	}
 	
-	self.instructions = [NSArray arrayWithArray:newInstructions];
-	self.basePointers = [NSArray arrayWithArray:newBasePointers];
-	
-	if ([self.debuggerController shouldUpdateSymbolsForInstructions:self.instructions])
-	{
-		[self.debuggerController updateSymbolsForInstructions:self.instructions];
-	}
-	
-	for (ZGInstruction *instruction in self.instructions)
-	{
-		if (!instruction.symbols || [instruction.symbols isEqualToString:@""])
-		{
-			instruction.symbols = @"";
-			instruction.variable.description = instruction.variable.addressStringValue;
-		}
-		else
-		{
-			instruction.variable.description = instruction.symbols;
-		}
-	}
+	return @[newInstructions, newBasePointers];
+}
+
+- (void)updateBacktrace:(NSArray *)backtraceComponents
+{
+	self.instructions = [backtraceComponents objectAtIndex:0];
+	self.basePointers = [backtraceComponents objectAtIndex:1];
 	
 	[self.tableView reloadData];
 	if (self.instructions.count > 0)
