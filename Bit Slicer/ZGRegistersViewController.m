@@ -39,30 +39,30 @@
 #import "ZGProcess.h"
 #import "ZGPreferencesController.h"
 #import "ZGUtilities.h"
-#import "ZGDebuggerController.h"
+#import "ZGRegister.h"
 #import "ZGRegisterEntries.h"
 
 @interface ZGRegistersViewController ()
 
-@property (assign) IBOutlet NSTableView *tableView;
-@property (weak) ZGDebuggerController *debuggerController;
+@property (assign, nonatomic) IBOutlet NSTableView *tableView;
+@property (weak, nonatomic) NSUndoManager *undoManager;
 
 @property (nonatomic) NSArray *registers;
 @property (nonatomic) ZGBreakPoint *breakPoint;
-@property (nonatomic, assign) ZGVariableType qualifier;
+@property (nonatomic) ZGVariableType qualifier;
 
-@property (nonatomic, copy) program_counter_change_t programCounterChangeBlock;
+@property (nonatomic) ZGMemoryAddress instructionPointer;
 
 @end
 
 @implementation ZGRegistersViewController
 
-- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController
+- (id)initWithUndoManager:(NSUndoManager *)undoManager
 {
 	self = [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
 	if (self != nil)
 	{
-		self.debuggerController = debuggerController;
+		self.undoManager = undoManager;
 	}
 	return self;
 }
@@ -77,44 +77,32 @@
 	[self.tableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
 
-- (void)setProgramCounter:(ZGMemoryAddress)programCounter
+- (void)changeInstructionPointer:(ZGMemoryAddress)newInstructionPointer
 {
-	if (_programCounter != programCounter)
+	if (self.instructionPointer == newInstructionPointer)
 	{
-		_programCounter = programCounter;
-		if (self.programCounterChangeBlock)
+		return;
+	}
+	
+	for (ZGRegister *theRegister in self.registers)
+	{
+		if ([@[@"eip", @"rip"] containsObject:theRegister.variable.name])
 		{
-			self.programCounterChangeBlock();
+			ZGVariable *newVariable = [theRegister.variable copy];
+			
+			if (self.breakPoint.process.is64Bit)
+			{
+				[newVariable setValue:&newInstructionPointer];
+			}
+			else
+			{
+				ZG32BitMemoryAddress memoryAddress = (ZG32BitMemoryAddress)newInstructionPointer;
+				[newVariable setValue:&memoryAddress];
+			}
+			
+			[self changeRegister:theRegister oldVariable:theRegister.variable newVariable:newVariable];
+			break;
 		}
-	}
-}
-
-- (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter
-{
-	if (_programCounter == newProgramCounter)
-	{
-		return;
-	}
-	
-	x86_thread_state_t threadState;
-	mach_msg_type_number_t threadStateCount;
-	if (!ZGGetGeneralThreadState(&threadState, self.breakPoint.thread, &threadStateCount))
-	{
-		return;
-	}
-	
-	if (self.breakPoint.process.is64Bit)
-	{
-		threadState.uts.ts64.__rip = newProgramCounter;
-	}
-	else
-	{
-		threadState.uts.ts32.__eip = (uint32_t)newProgramCounter;
-	}
-	
-	if (ZGSetGeneralThreadState(&threadState, self.breakPoint.thread, threadStateCount))
-	{
-		self.programCounter = newProgramCounter;
 	}
 }
 
@@ -132,11 +120,9 @@
 	return basePointer;
 }
 
-- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock
+- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
 	self.breakPoint = breakPoint;
-	// initialize program counter with a sane value
-	self.programCounter = self.breakPoint.variable.address;
 	
 	ZGMemorySize pointerSize = breakPoint.process.pointerSize;
 	NSDictionary *registerDefaultsDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES];
@@ -161,14 +147,7 @@
 		[newRegisters addObject:newRegister];
 	}
 	
-	if (breakPoint.process.is64Bit)
-	{
-		self.programCounter = breakPoint.generalPurposeThreadState.uts.ts64.__rip;
-	}
-	else
-	{
-		self.programCounter = breakPoint.generalPurposeThreadState.uts.ts32.__eip;
-	}
+	self.instructionPointer = breakPoint.process.is64Bit ? breakPoint.generalPurposeThreadState.uts.ts64.__rip : breakPoint.generalPurposeThreadState.uts.ts32.__eip;
 	
 	if (breakPoint.hasVectorState)
 	{
@@ -190,8 +169,6 @@
 	
 	self.registers = [NSArray arrayWithArray:newRegisters];
 	
-	self.programCounterChangeBlock = programCounterChangeBlock;
-	
 	[self.tableView reloadData];
 }
 
@@ -204,8 +181,8 @@
 	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.name];
 	[[NSUserDefaults standardUserDefaults] setObject:registerTypesDictionary forKey:ZG_REGISTER_TYPES];
 	
-	[[self.debuggerController.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
-	[self.debuggerController.undoManager setActionName:@"Register Type Change"];
+	[[self.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
+	[self.undoManager setActionName:@"Register Type Change"];
 	
 	[self.tableView reloadData];
 }
@@ -336,11 +313,11 @@
 	
 	if ([theRegister.variable.name isEqualToString:@"rip"])
 	{
-		self.programCounter = *(uint64_t *)theRegister.value;
+		self.instructionPointer = *(uint64_t *)theRegister.value;
 	}
 	else if ([theRegister.variable.name isEqualToString:@"eip"])
 	{
-		self.programCounter = *(uint32_t *)theRegister.value;
+		self.instructionPointer = *(uint32_t *)theRegister.value;
 	}
 	
 	return YES;
@@ -361,8 +338,8 @@
 	
 	if (success)
 	{
-		[[self.debuggerController.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
-		[self.debuggerController.undoManager setActionName:@"Register Value Change"];
+		[[self.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
+		[self.undoManager setActionName:@"Register Value Change"];
 		
 		[self.tableView reloadData];
 	}
@@ -520,6 +497,5 @@
 	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
 	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 }
-
 
 @end

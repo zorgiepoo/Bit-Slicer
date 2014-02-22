@@ -34,27 +34,18 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
-#import "ZGVariableTypes.h"
-#import <mach/thread_act.h>
-#import "ZGRegister.h"
 
 @class ZGBreakPoint;
-@class ZGDebuggerController;
 
 @interface ZGRegistersViewController : NSViewController
 
-- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController;
+- (id)initWithUndoManager:(NSUndoManager *)undoManager;
 
-typedef void(^program_counter_change_t)(void);
+@property (nonatomic, readonly) ZGMemoryAddress instructionPointer;
+@property (nonatomic, readonly) ZGMemoryAddress basePointer;
 
-@property (nonatomic, assign) ZGMemoryAddress programCounter;
+- (void)changeInstructionPointer:(ZGMemoryAddress)newInstructionPointer;
 
-- (void)changeProgramCounter:(ZGMemoryAddress)newProgramCounter;
-
-- (ZGMemoryAddress)basePointer;
-
-- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint programCounterChange:(program_counter_change_t)programCounterChangeBlock;
-
-- (IBAction)changeQualifier:(id)sender;
+- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint;
 
 @end

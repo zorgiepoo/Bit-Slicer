@@ -160,7 +160,7 @@
 		self.windowDidAppear = YES;
 	}
 	
-	if (self.currentProcess)
+	if (self.currentProcess != nil)
 	{
 		if (self.currentProcess.valid)
 		{

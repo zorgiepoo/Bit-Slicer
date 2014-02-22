@@ -185,9 +185,6 @@ enum ZGStepExecution
 	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepOverExecution] setTemplate:YES];
 	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepOutExecution] setTemplate:YES];
 	
-	self.registersViewController = [[ZGRegistersViewController alloc] initWithDebuggerController:self];
-	[self.registersAndBacktraceSplitView replaceSubview:self.registersView with:self.registersViewController.view];
-	
 	[self updateExecutionButtons];
 }
 
@@ -228,13 +225,13 @@ enum ZGStepExecution
 	
 	[self updateExecutionButtons];
 	
-	if (self.currentBreakPoint)
+	if (self.currentBreakPoint != nil)
 	{
 		[self toggleBacktraceView:NSOnState];
 		[self updateRegisters];
 		[self updateBacktrace];
 		
-		[self jumpToMemoryAddress:self.registersViewController.programCounter];
+		[self jumpToMemoryAddress:self.registersViewController.instructionPointer];
 	}
 	else
 	{
@@ -1264,7 +1261,7 @@ enum ZGStepExecution
 		return NO;
 	}
 	
-	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersViewController.programCounter + 1 inProcess:self.currentProcess];
+	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess];
 	if (!currentInstruction)
 	{
 		return NO;
@@ -1653,7 +1650,7 @@ enum ZGStepExecution
 	if ([tableColumn.identifier isEqualToString:@"address"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
 		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
-		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.registersViewController.programCounter == instruction.variable.address);
+		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.registersViewController.instructionPointer == instruction.variable.address);
 		
 		[cell setTextColor:isInstructionBreakPoint ? NSColor.redColor : NSColor.textColor];
 	}
@@ -2399,13 +2396,13 @@ enum ZGStepExecution
 	return foundInstruction;
 }
 
-- (void)jumpProgramCounterToAddress:(ZGMemoryAddress)newAddress
+- (void)moveInstructionPointerToAddress:(ZGMemoryAddress)newAddress
 {
-	if (self.currentBreakPoint && !self.disassembling)
+	if (self.currentBreakPoint != nil && !self.disassembling)
 	{
-		ZGMemoryAddress currentAddress = [self.registersViewController programCounter];
-		[self.registersViewController changeProgramCounter:newAddress];
-		[[self.undoManager prepareWithInvocationTarget:self] jumpProgramCounterToAddress:currentAddress];
+		ZGMemoryAddress currentAddress = self.registersViewController.instructionPointer;
+		[self.registersViewController changeInstructionPointer:newAddress];
+		[[self.undoManager prepareWithInvocationTarget:self] moveInstructionPointerToAddress:currentAddress];
 		[self.undoManager setActionName:@"Jump"];
 	}
 }
@@ -2413,22 +2410,27 @@ enum ZGStepExecution
 - (IBAction)jump:(id)sender
 {
 	ZGInstruction *instruction = [self.selectedInstructions objectAtIndex:0];
-	[self jumpProgramCounterToAddress:instruction.variable.address];
+	[self moveInstructionPointerToAddress:instruction.variable.address];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if (object == self.registersViewController)
+	{
+		[self.instructionsTableView reloadData];
+	}
+	
+	[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 - (void)updateRegisters
 {
-	[self.registersViewController updateRegistersFromBreakPoint:self.currentBreakPoint programCounterChange:^{
-		if (self.currentBreakPoint)
-		{
-			[self.instructionsTableView reloadData];
-		}
-	}];
+	[self.registersViewController updateRegistersFromBreakPoint:self.currentBreakPoint];
 }
 
 - (void)updateBacktrace
 {
-	NSArray *backtraceComponents = [self.backtraceController backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.programCounter inProcess:self.currentProcess];
+	NSArray *backtraceComponents = [self.backtraceController backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.instructionPointer inProcess:self.currentProcess];
 	
 	NSArray *instructions = [backtraceComponents objectAtIndex:0];
 	
@@ -2458,18 +2460,25 @@ enum ZGStepExecution
 	[self removeHaltedBreakPoint:self.currentBreakPoint];
 	[self addHaltedBreakPoint:breakPoint];
 	
-	if (self.currentBreakPoint)
+	if (self.currentBreakPoint != nil)
 	{
 		if (!self.window.isVisible)
 		{
 			[self showWindow:nil];
 		}
 		
+		if (self.registersViewController == nil)
+		{
+			self.registersViewController = [[ZGRegistersViewController alloc] initWithUndoManager:self.undoManager];
+			[self.registersAndBacktraceSplitView replaceSubview:self.registersView with:self.registersViewController.view];
+			[self.registersViewController addObserver:self forKeyPath:@"instructionPointer" options:NSKeyValueObservingOptionNew context:NULL];
+		}
+		
 		[self updateRegisters];
 		
 		[self toggleBacktraceView:NSOnState];
 		
-		[self jumpToMemoryAddress:self.registersViewController.programCounter];
+		[self jumpToMemoryAddress:self.registersViewController.instructionPointer];
 		
 		[self updateBacktrace];
 		
@@ -2541,7 +2550,7 @@ enum ZGStepExecution
 
 - (IBAction)stepOver:(id)sender
 {
-	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersViewController.programCounter + 1 inProcess:self.currentProcess];
+	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess];
 	if ([currentInstruction isCallMnemonic])
 	{
 		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
