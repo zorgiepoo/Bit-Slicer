@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 2/6/13.
+ * Created by Mayur Pawashe on 2/22/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGBacktraceController.h"
+#import "ZGBacktraceViewController.h"
 #import "ZGDebuggerController.h"
+
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
@@ -41,10 +42,11 @@
 #import "ZGAppController.h"
 #import "ZGMemoryViewerController.h"
 
-@interface ZGBacktraceController ()
+@interface ZGBacktraceViewController ()
 
-@property (assign) IBOutlet ZGDebuggerController *debuggerController;
+@property (nonatomic, weak) ZGDebuggerController *debuggerController;
 
+@property (nonatomic, assign) IBOutlet NSTableView *tableView;
 @property (nonatomic) NSArray *instructions;
 @property (nonatomic) NSArray *basePointers;
 
@@ -52,12 +54,24 @@
 
 @end
 
-@implementation ZGBacktraceController
+@implementation ZGBacktraceViewController
 
 #pragma mark Birth
 
-- (void)awakeFromNib
+- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController
 {
+	self = [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
+	if (self != nil)
+	{
+		self.debuggerController = debuggerController;
+	}
+	return self;
+}
+
+- (void)loadView
+{
+	[super loadView];
+	
 	self.tableView.target = self;
 	self.tableView.doubleAction = @selector(jumpToSelectedInstruction:);
 	

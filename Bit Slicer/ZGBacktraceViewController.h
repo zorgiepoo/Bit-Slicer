@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 2/6/13.
+ * Created by Mayur Pawashe on 2/22/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,17 +32,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
+@class ZGDebuggerController;
 @class ZGProcess;
 
-@interface ZGBacktraceController : NSResponder
+@interface ZGBacktraceViewController : NSViewController
 
-@property (assign) IBOutlet NSTableView *tableView;
+- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController;
 
 @property (nonatomic, readonly) NSArray *instructions;
 @property (nonatomic, readonly) NSArray *basePointers;
+
+@property (nonatomic, readonly) NSTableView *tableView;
 
 - (NSArray *)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer inProcess:(ZGProcess *)process;
 - (void)updateBacktrace:(NSArray *)backtrace;

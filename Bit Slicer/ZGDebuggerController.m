@@ -46,8 +46,8 @@
 #import "ZGDisassemblerObject.h"
 #import "ZGUtilities.h"
 #import "ZGRegistersViewController.h"
+#import "ZGBacktraceViewController.h"
 #import "ZGPreferencesController.h"
-#import "ZGBacktraceController.h"
 #import "ZGMemoryViewerController.h"
 #import "NSArrayAdditions.h"
 #import "ZGVirtualMemory.h"
@@ -64,12 +64,13 @@
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
 @property (nonatomic, assign) IBOutlet NSSplitView *splitView;
 
-@property (nonatomic, assign) IBOutlet ZGBacktraceController *backtraceController;
-
 @property (nonatomic, assign) IBOutlet NSSplitView *registersAndBacktraceSplitView;
 
 @property (nonatomic, assign) IBOutlet NSView *registersView;
 @property (nonatomic) ZGRegistersViewController *registersViewController;
+
+@property (nonatomic, assign) IBOutlet NSView *backtraceView;
+@property (nonatomic) ZGBacktraceViewController *backtraceViewController;
 
 @property (nonatomic, assign) IBOutlet NSButton *continueButton;
 @property (nonatomic, assign) IBOutlet NSSegmentedControl *stepExecutionSegmentedControl;
@@ -852,7 +853,7 @@ enum ZGStepExecution
 					NSMutableArray *appendedInstructions = [[NSMutableArray alloc] initWithArray:self.instructions];
 					[appendedInstructions addObjectsFromArray:currentBatch];
 					
-					if (self.instructions.count == 0 && self.window.firstResponder != self.backtraceController.tableView)
+					if (self.instructions.count == 0 && self.window.firstResponder != self.backtraceViewController.tableView)
 					{
 						[self.window makeFirstResponder:self.instructionsTableView];
 					}
@@ -1077,7 +1078,7 @@ enum ZGStepExecution
 		self.offsetFromBase = calculatedMemoryAddress - self.baseAddress;
 		[self prepareNavigation];
 		[self scrollAndSelectRow:[self.instructions indexOfObject:foundInstructionInTable]];
-		if (self.window.firstResponder != self.backtraceController.tableView)
+		if (self.window.firstResponder != self.backtraceViewController.tableView)
 		{
 			[self.window makeFirstResponder:self.instructionsTableView];
 		}
@@ -1286,12 +1287,12 @@ enum ZGStepExecution
 		return NO;
 	}
 	
-	if (self.backtraceController.instructions.count <= 1 || self.backtraceController.basePointers.count <= 1)
+	if (self.backtraceViewController.instructions.count <= 1 || self.backtraceViewController.basePointers.count <= 1)
 	{
 		return NO;
 	}
 	
-	ZGInstruction *outterInstruction = [self.backtraceController.instructions objectAtIndex:1];
+	ZGInstruction *outterInstruction = [self.backtraceViewController.instructions objectAtIndex:1];
 	ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 	
 	if (!returnInstruction)
@@ -2430,7 +2431,7 @@ enum ZGStepExecution
 
 - (void)updateBacktrace
 {
-	NSArray *backtraceComponents = [self.backtraceController backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.instructionPointer inProcess:self.currentProcess];
+	NSArray *backtraceComponents = [self.backtraceViewController backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.instructionPointer inProcess:self.currentProcess];
 	
 	NSArray *instructions = [backtraceComponents objectAtIndex:0];
 	
@@ -2452,7 +2453,7 @@ enum ZGStepExecution
 		}
 	}
 	
-	[self.backtraceController updateBacktrace:backtraceComponents];
+	[self.backtraceViewController updateBacktrace:backtraceComponents];
 }
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
@@ -2472,6 +2473,12 @@ enum ZGStepExecution
 			self.registersViewController = [[ZGRegistersViewController alloc] initWithUndoManager:self.undoManager];
 			[self.registersAndBacktraceSplitView replaceSubview:self.registersView with:self.registersViewController.view];
 			[self.registersViewController addObserver:self forKeyPath:@"instructionPointer" options:NSKeyValueObservingOptionNew context:NULL];
+		}
+		
+		if (self.backtraceViewController == nil)
+		{
+			self.backtraceViewController = [[ZGBacktraceViewController alloc] initWithDebuggerController:self];
+			[self.registersAndBacktraceSplitView replaceSubview:self.backtraceView with:self.backtraceViewController.view];
 		}
 		
 		[self updateRegisters];
@@ -2572,10 +2579,10 @@ enum ZGStepExecution
 
 - (IBAction)stepOut:(id)sender
 {
-	ZGInstruction *outterInstruction = [self.backtraceController.instructions objectAtIndex:1];
+	ZGInstruction *outterInstruction = [self.backtraceViewController.instructions objectAtIndex:1];
 	ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 	
-	if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceController.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self])
+	if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceViewController.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self])
 	{
 		[self continueExecution:nil];
 	}
