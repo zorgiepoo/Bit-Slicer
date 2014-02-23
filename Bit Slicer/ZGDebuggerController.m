@@ -46,7 +46,6 @@
 #import "ZGDisassemblerObject.h"
 #import "ZGUtilities.h"
 #import "ZGRegistersViewController.h"
-#import "ZGBacktraceViewController.h"
 #import "ZGPreferencesController.h"
 #import "ZGMemoryViewerController.h"
 #import "NSArrayAdditions.h"
@@ -361,7 +360,7 @@ enum ZGStepExecution
 
 #pragma mark Disassembling
 
-- (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size
++ (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size
 {
 	void *originalBytes = NULL;
 	if (!ZGReadBytes(processTask, address, &originalBytes, &size))
@@ -386,7 +385,7 @@ enum ZGStepExecution
 	return [NSData dataWithBytesNoCopy:newBytes length:size];
 }
 
-- (ZGDisassemblerObject *)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size
++ (ZGDisassemblerObject *)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size
 {
 	ZGDisassemblerObject *newObject = nil;
 	NSData *data = [self readDataWithProcessTask:processTask address:address size:size];
@@ -397,7 +396,7 @@ enum ZGStepExecution
 	return newObject;
 }
 
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
++ (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process
 {
 	ZGInstruction *instruction = nil;
 	
@@ -539,7 +538,7 @@ enum ZGStepExecution
 				if (startRow == 0) break;
 				
 				ZGInstruction *instruction = [self.instructions objectAtIndex:startRow];
-				ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess];
+				ZGInstruction *searchedInstruction = [[self class] findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess];
 				
 				startRow--;
 				
@@ -556,7 +555,7 @@ enum ZGStepExecution
 			// Extend past first row if necessary
 			if (startRow == 0)
 			{
-				ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess];
+				ZGInstruction *searchedInstruction = [[self class] findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess];
 				if (searchedInstruction.variable.address + searchedInstruction.variable.size != startAddress)
 				{
 					startAddress = searchedInstruction.variable.address;
@@ -570,7 +569,7 @@ enum ZGStepExecution
 				if (endRow >= self.instructions.count) break;
 				
 				ZGInstruction *instruction = [self.instructions objectAtIndex:endRow];
-				ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess];
+				ZGInstruction *searchedInstruction = [[self class] findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess];
 				
 				endRow++;
 				
@@ -587,7 +586,7 @@ enum ZGStepExecution
 			// Extend past last row if necessary
 			if (endRow >= self.instructions.count)
 			{
-				ZGInstruction *searchedInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address + endInstruction.variable.size inProcess:self.currentProcess];
+				ZGInstruction *searchedInstruction = [[self class] findInstructionBeforeAddress:endInstruction.variable.address + endInstruction.variable.size inProcess:self.currentProcess];
 				if (endInstruction.variable.address != searchedInstruction.variable.address)
 				{
 					endAddress = searchedInstruction.variable.address + searchedInstruction.variable.size;
@@ -596,7 +595,7 @@ enum ZGStepExecution
 			
 			ZGMemorySize size = endAddress - startAddress;
 			
-			ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size];
+			ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size];
 			if (disassemblerObject != nil)
 			{
 				NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
@@ -662,7 +661,7 @@ enum ZGStepExecution
 	
 	while (startInstruction == nil && bytesBehind > 0)
 	{
-		startInstruction = [self findInstructionBeforeAddress:endInstruction.variable.address - bytesBehind inProcess:self.currentProcess];
+		startInstruction = [[self class] findInstructionBeforeAddress:endInstruction.variable.address - bytesBehind inProcess:self.currentProcess];
 		if (startInstruction.variable.address < self.instructionBoundary.location)
 		{
 			// Try again
@@ -678,7 +677,7 @@ enum ZGStepExecution
 		
 		NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
 		
-		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size];
+		ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size];
 		
 		if (disassemblerObject != nil)
 		{
@@ -721,7 +720,7 @@ enum ZGStepExecution
 - (void)addMoreInstructionsAfterLastRow
 {
 	ZGInstruction *lastInstruction = self.instructions.lastObject;
-	ZGInstruction *startInstruction = [self findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess];
+	ZGInstruction *startInstruction = [[self class] findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess];
 	
 	if (startInstruction.variable.address + startInstruction.variable.size >= self.instructionBoundary.location +  self.instructionBoundary.length)
 	{
@@ -734,7 +733,7 @@ enum ZGStepExecution
 		NSUInteger bytesAhead = DESIRED_BYTES_TO_ADD_OFFSET;
 		while (endInstruction == nil && bytesAhead > 0)
 		{
-			endInstruction = [self findInstructionBeforeAddress:(startInstruction.variable.address + startInstruction.variable.size + bytesAhead) inProcess:self.currentProcess];
+			endInstruction = [[self class] findInstructionBeforeAddress:(startInstruction.variable.address + startInstruction.variable.size + bytesAhead) inProcess:self.currentProcess];
 			if (endInstruction.variable.address + endInstruction.variable.size > self.instructionBoundary.location +  self.instructionBoundary.length)
 			{
 				// Try again
@@ -750,7 +749,7 @@ enum ZGStepExecution
 			
 			NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
 			
-			ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size];
+			ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size];
 			
 			if (disassemblerObject != nil)
 			{
@@ -832,7 +831,7 @@ enum ZGStepExecution
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		ZGMemorySize size = theSize;
-		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size];
+		ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size];
 		
 		if (disassemblerObject != nil)
 		{
@@ -1168,7 +1167,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		lowBoundAddress = [self findInstructionBeforeAddress:lowBoundAddress inProcess:self.currentProcess].variable.address;
+		lowBoundAddress = [[self class] findInstructionBeforeAddress:lowBoundAddress inProcess:self.currentProcess].variable.address;
 		if (lowBoundAddress < firstInstructionAddress)
 		{
 			lowBoundAddress = firstInstructionAddress;
@@ -1182,7 +1181,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		highBoundAddress = [self findInstructionBeforeAddress:highBoundAddress inProcess:self.currentProcess].variable.address;
+		highBoundAddress = [[self class] findInstructionBeforeAddress:highBoundAddress inProcess:self.currentProcess].variable.address;
 		if (highBoundAddress <= chosenRegion.address || highBoundAddress > chosenRegion.address + chosenRegion.size)
 		{
 			highBoundAddress = chosenRegion.address + chosenRegion.size;
@@ -1262,7 +1261,7 @@ enum ZGStepExecution
 		return NO;
 	}
 	
-	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess];
+	ZGInstruction *currentInstruction = [[self class] findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess];
 	if (!currentInstruction)
 	{
 		return NO;
@@ -1270,7 +1269,7 @@ enum ZGStepExecution
 	
 	if ([currentInstruction isCallMnemonic])
 	{
-		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
+		ZGInstruction *nextInstruction = [[self class] findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		if (!nextInstruction)
 		{
 			return NO;
@@ -1293,7 +1292,7 @@ enum ZGStepExecution
 	}
 	
 	ZGInstruction *outterInstruction = [self.backtraceViewController.instructions objectAtIndex:1];
-	ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
+	ZGInstruction *returnInstruction = [[self class] findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 	
 	if (!returnInstruction)
 	{
@@ -1460,7 +1459,7 @@ enum ZGStepExecution
 	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
-- (void)prepareInstructionsForPasteboard:(NSArray *)instructions
+- (void)annotateInstructions:(NSArray *)instructions
 {
 	NSMutableArray *variablesToAnnotate = [NSMutableArray array];
 	for (ZGInstruction *instruction in instructions)
@@ -1490,15 +1489,19 @@ enum ZGStepExecution
 
 - (IBAction)copy:(id)sender
 {
+	NSArray *selectedInstructions = (self.window.firstResponder == self.backtraceViewController.tableView) ? self.backtraceViewController.selectedInstructions : self.selectedInstructions;
+	
+	if (self.window.firstResponder == self.instructionsTableView)
+	{
+		[self annotateInstructions:selectedInstructions];
+	}
+	
 	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
 	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
 	
-	[self prepareInstructionsForPasteboard:self.selectedInstructions];
-	
-	for (ZGInstruction *instruction in self.selectedInstructions)
+	for (ZGInstruction *instruction in selectedInstructions)
 	{
 		[descriptionComponents addObject:[@[instruction.variable.addressStringValue, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
-		
 		[variablesArray addObject:instruction.variable];
 	}
 	
@@ -1509,7 +1512,8 @@ enum ZGStepExecution
 
 - (IBAction)copyAddress:(id)sender
 {
-	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
+	NSArray *selectedInstructions = (self.window.firstResponder == self.backtraceViewController.tableView) ? self.backtraceViewController.selectedInstructions : self.selectedInstructions;
+	ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
 }
@@ -1542,7 +1546,7 @@ enum ZGStepExecution
 - (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
 	NSArray *instructions = [self.instructions objectsAtIndexes:rowIndexes];
-	[self prepareInstructionsForPasteboard:instructions];
+	[self annotateInstructions:instructions];
 	
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:[instructions valueForKey:@"variable"]] forType:ZGVariablePboardType];
 }
@@ -2110,7 +2114,7 @@ enum ZGStepExecution
 		int consumedLength = JUMP_REL32_INSTRUCTION_LENGTH;
 		while (consumedLength > 0)
 		{
-			ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inProcess:process];
+			ZGInstruction *newInstruction = [[self class] findInstructionBeforeAddress:address+1 inProcess:process];
 			if (newInstruction == nil)
 			{
 				instructions = nil;
@@ -2456,6 +2460,16 @@ enum ZGStepExecution
 	[self.backtraceViewController updateBacktrace:backtraceComponents];
 }
 
+- (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address
+{
+	[self jumpToMemoryAddress:address inProcess:self.currentProcess];
+}
+
+- (BOOL)backtraceSelectionShouldChange
+{
+	return !self.disassembling;
+}
+
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
 {	
 	[self removeHaltedBreakPoint:self.currentBreakPoint];
@@ -2477,7 +2491,7 @@ enum ZGStepExecution
 		
 		if (self.backtraceViewController == nil)
 		{
-			self.backtraceViewController = [[ZGBacktraceViewController alloc] initWithDebuggerController:self];
+			self.backtraceViewController = [[ZGBacktraceViewController alloc] initWithDelegate:self];
 			[self.registersAndBacktraceSplitView replaceSubview:self.backtraceView with:self.backtraceViewController.view];
 		}
 		
@@ -2557,10 +2571,10 @@ enum ZGStepExecution
 
 - (IBAction)stepOver:(id)sender
 {
-	ZGInstruction *currentInstruction = [self findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess];
+	ZGInstruction *currentInstruction = [[self class] findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess];
 	if ([currentInstruction isCallMnemonic])
 	{
-		ZGInstruction *nextInstruction = [self findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
+		ZGInstruction *nextInstruction = [[self class] findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		
 		if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:self.registersViewController.basePointer delegate:self])
 		{
@@ -2580,7 +2594,7 @@ enum ZGStepExecution
 - (IBAction)stepOut:(id)sender
 {
 	ZGInstruction *outterInstruction = [self.backtraceViewController.instructions objectAtIndex:1];
-	ZGInstruction *returnInstruction = [self findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
+	ZGInstruction *returnInstruction = [[self class] findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 	
 	if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceViewController.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self])
 	{
@@ -2761,7 +2775,9 @@ enum ZGStepExecution
 
 - (IBAction)showMemoryViewer:(id)sender
 {
-	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+	NSArray *selectedInstructions = (self.window.firstResponder == self.backtraceViewController.tableView) ? self.backtraceViewController.selectedInstructions : self.selectedInstructions;
+	ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
+	
 	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedInstruction.variable.address withSelectionLength:selectedInstruction.variable.size inProcess:self.currentProcess];
 }
 

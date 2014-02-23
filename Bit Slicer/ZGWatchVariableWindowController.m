@@ -243,7 +243,7 @@
 	
 	[self.foundBreakPointAddresses addObject:instructionAddressNumber];
 	
-	ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:instructionAddress inProcess:self.watchProcess];
+	ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:instructionAddress inProcess:self.watchProcess];
 	
 	if (instruction == nil)
 	{

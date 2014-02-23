@@ -44,7 +44,7 @@
 
 @interface ZGBacktraceViewController ()
 
-@property (nonatomic, weak) ZGDebuggerController *debuggerController;
+@property (nonatomic, weak) id <ZGBacktraceViewControllerDelegate> delegate;
 
 @property (nonatomic, assign) IBOutlet NSTableView *tableView;
 @property (nonatomic) NSArray *instructions;
@@ -58,12 +58,12 @@
 
 #pragma mark Birth
 
-- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController
+- (id)initWithDelegate:(id <ZGBacktraceViewControllerDelegate>)delegate
 {
 	self = [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
 	if (self != nil)
 	{
-		self.debuggerController = debuggerController;
+		self.delegate = delegate;
 	}
 	return self;
 }
@@ -73,7 +73,7 @@
 	[super loadView];
 	
 	self.tableView.target = self;
-	self.tableView.doubleAction = @selector(jumpToSelectedInstruction:);
+	self.tableView.doubleAction = @selector(changeInstructionSelection:);
 	
 	[self setNextResponder:[self.tableView nextResponder]];
 	[self.tableView setNextResponder:self];
@@ -88,7 +88,7 @@
 	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
 	
-	ZGInstruction *currentInstruction = [self.debuggerController findInstructionBeforeAddress:instructionPointer+1 inProcess:process];
+	ZGInstruction *currentInstruction = [ZGDebuggerController findInstructionBeforeAddress:instructionPointer+1 inProcess:process];
 	if (currentInstruction != nil)
 	{
 		[newInstructions addObject:currentInstruction];
@@ -119,7 +119,7 @@
 			
 			ZGFreeBytes(process.processTask, returnAddressBytes, returnAddressSize);
 			
-			ZGInstruction *instruction = [self.debuggerController findInstructionBeforeAddress:returnAddress inProcess:process];
+			ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:returnAddress inProcess:process];
 			if (instruction == nil)
 			{
 				break;
@@ -169,19 +169,12 @@
 	}
 }
 
-- (IBAction)jumpToSelectedInstruction:(id)sender
+- (IBAction)changeInstructionSelection:(id)sender
 {
 	if (self.tableView.selectedRowIndexes.count > 0 && (NSUInteger)self.tableView.selectedRow < self.instructions.count)
 	{
-		if (self.debuggerController.disassembling)
-		{
-			NSBeep();
-		}
-		else
-		{
-			ZGInstruction *selectedInstruction = [self.instructions objectAtIndex:(NSUInteger)self.tableView.selectedRow];
-			[self.debuggerController jumpToMemoryAddress:selectedInstruction.variable.address inProcess:self.debuggerController.currentProcess];
-		}
+		ZGInstruction *selectedInstruction = [self.instructions objectAtIndex:(NSUInteger)self.tableView.selectedRow];
+		[self.delegate backtraceSelectionChangedToAddress:selectedInstruction.variable.address];
 	}
 }
 
@@ -223,7 +216,7 @@
 	
 	if (!self.shouldIgnoreTableSelection)
 	{
-		[self jumpToSelectedInstruction:nil];
+		[self changeInstructionSelection:nil];
 	}
 	else
 	{
@@ -233,7 +226,7 @@
 
 - (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
 {
-	return !self.debuggerController.disassembling;
+	return [self.delegate backtraceSelectionShouldChange];
 }
 
 #pragma mark Menu Item Validation
@@ -265,7 +258,7 @@
 	return YES;
 }
 
-#pragma mark Copy
+#pragma mark Selection
 
 - (NSArray *)selectedInstructions
 {
@@ -275,37 +268,6 @@
 	NSIndexSet *selectionIndexSet = (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
 	
 	return [self.instructions objectsAtIndexes:selectionIndexSet];
-}
-
-- (IBAction)copy:(id)sender
-{
-	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
-	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
-	
-	for (ZGInstruction *instruction in self.selectedInstructions)
-	{
-		[descriptionComponents addObject:[@[instruction.text, instruction.symbols, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
-		[variablesArray addObject:instruction.variable];
-	}
-	
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
-	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
-}
-
-- (IBAction)copyAddress:(id)sender
-{
-	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
-}
-
-#pragma mark Memory Viewer
-
-- (IBAction)showMemoryViewer:(id)sender
-{
-	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
-	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedInstruction.variable.address withSelectionLength:selectedInstruction.variable.size inProcess:self.debuggerController.currentProcess];
 }
 
 @end

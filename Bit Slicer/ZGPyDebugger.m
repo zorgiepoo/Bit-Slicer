@@ -404,7 +404,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 	ZGMemorySize size = 0x0;
 	if (PyArg_ParseTuple(args, "KK:readBytes", &address, &size))
 	{
-		NSData *readData = [[[ZGAppController sharedController] debuggerController] readDataWithProcessTask:self->processTask	address:address size:size];
+		NSData *readData = [ZGDebuggerController readDataWithProcessTask:self->processTask address:address size:size];
 		if (readData != nil)
 		{
 			retValue = Py_BuildValue("y#", readData.bytes, readData.length);
@@ -564,10 +564,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		NSNumber *cachedInstructionAddress = [self.cachedInstructionPointers objectForKey:instructionPointerNumber];
 		if (cachedInstructionAddress == nil)
 		{
-			ZGInstruction *instruction =
-			[[[ZGAppController sharedController] debuggerController]
-			 findInstructionBeforeAddress:[instructionPointerNumber unsignedLongLongValue]
-			 inProcess:self.process];
+			ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:[instructionPointerNumber unsignedLongLongValue] inProcess:self.process];
 			
 			instructionAddress = instruction.variable.address;
 			[self.cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointerNumber];
@@ -711,7 +708,7 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf.process];
+	ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf.process];
 	
 	if (instruction == nil)
 	{
@@ -739,7 +736,7 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGInstruction *instruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf.process];
+	ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf.process];
 	
 	if (instruction == nil)
 	{
@@ -806,7 +803,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 	
-	ZGInstruction *currentInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf.process];
+	ZGInstruction *currentInstruction = [ZGDebuggerController findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf.process];
 	
 	if (currentInstruction == nil)
 	{
@@ -816,7 +813,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	if ([currentInstruction isCallMnemonic])
 	{
-		ZGInstruction *nextInstruction = [[[ZGAppController sharedController] debuggerController] findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf.process];
+		ZGInstruction *nextInstruction = [ZGDebuggerController findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf.process];
 		
 		if (nextInstruction == nil)
 		{

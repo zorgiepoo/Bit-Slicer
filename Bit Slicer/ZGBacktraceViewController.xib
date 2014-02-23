@@ -74,20 +74,20 @@
                 <menuItem title="Copy" id="ALu-mJ-3Ud">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="copy:" target="-2" id="HJF-Ep-V2G"/>
+                        <action selector="copy:" target="-1" id="fE6-2L-aJj"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Copy Address" id="aXd-k8-FQC">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="copyAddress:" target="-2" id="2al-XO-Cjj"/>
+                        <action selector="copyAddress:" target="-1" id="KTk-gN-klz"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="bE9-Bf-tJ3"/>
                 <menuItem title="Show in Memory Viewer" id="teb-0W-szd">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="showMemoryViewer:" target="-2" id="LBd-gr-hl9"/>
+                        <action selector="showMemoryViewer:" target="-1" id="Qun-cA-ord"/>
                     </connections>
                 </menuItem>
             </items>

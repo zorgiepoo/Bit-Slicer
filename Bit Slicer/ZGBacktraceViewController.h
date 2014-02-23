@@ -38,12 +38,21 @@
 @class ZGDebuggerController;
 @class ZGProcess;
 
+@protocol ZGBacktraceViewControllerDelegate <NSObject>
+
+- (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address;
+- (BOOL)backtraceSelectionShouldChange;
+
+@end
+
 @interface ZGBacktraceViewController : NSViewController
 
-- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController;
+- (id)initWithDelegate:(id <ZGBacktraceViewControllerDelegate>)delegate;
 
 @property (nonatomic, readonly) NSArray *instructions;
 @property (nonatomic, readonly) NSArray *basePointers;
+
+@property (nonatomic, readonly) NSArray *selectedInstructions;
 
 @property (nonatomic, readonly) NSTableView *tableView;
 

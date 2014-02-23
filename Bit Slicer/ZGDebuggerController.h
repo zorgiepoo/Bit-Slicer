@@ -38,6 +38,7 @@
 #import "ZGCodeInjectionWindowController.h"
 #import "ZGBreakPointDelegate.h"
 #import "ZGBreakPointConditionViewController.h"
+#import "ZGBacktraceViewController.h"
 
 #define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
 
@@ -45,7 +46,12 @@
 @class ZGInstruction;
 @class ZGMachBinary;
 
-@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate>
+@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate>
+
+// This method is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
++ (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process;
+
+- (id)init;
 
 - (void)cleanup;
 
@@ -57,9 +63,6 @@
 
 - (BOOL)shouldUpdateSymbolsForInstructions:(NSArray *)instructions;
 - (void)updateSymbolsForInstructions:(NSArray *)instructions;
-
-// This function is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
-- (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process;
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
 
@@ -75,7 +78,7 @@
 	recordUndo:(BOOL)shouldRecordUndo
 	error:(NSError **)error;
 
-- (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size;
++ (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 - (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit;
 
 @end
