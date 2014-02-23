@@ -213,7 +213,7 @@ enum ZGStepExecution
 		[self readMemory:nil];
 	}
 	
-	[self toggleBacktraceView:NSOffState];
+	[self toggleBacktraceAndRegistersViews:NSOffState];
 }
 
 #pragma mark Current Process Changed
@@ -226,7 +226,7 @@ enum ZGStepExecution
 	
 	if (self.currentBreakPoint != nil)
 	{
-		[self toggleBacktraceView:NSOnState];
+		[self toggleBacktraceAndRegistersViews:NSOnState];
 		[self updateRegisters];
 		[self updateBacktrace];
 		
@@ -234,7 +234,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		[self toggleBacktraceView:NSOffState];
+		[self toggleBacktraceAndRegistersViews:NSOffState];
 		[self readMemory:nil];
 	}
 }
@@ -243,6 +243,7 @@ enum ZGStepExecution
 
 - (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
 {
+	// prevent bottom view from going all the way up
 	return proposedMinimumPosition + 60;
 }
 
@@ -290,7 +291,7 @@ enum ZGStepExecution
 	[self.splitView display];
 }
 
-- (void)toggleBacktraceView:(NSCellStateValue)state
+- (void)toggleBacktraceAndRegistersViews:(NSCellStateValue)state
 {	
 	switch (state)
 	{
@@ -2498,7 +2499,7 @@ enum ZGStepExecution
 		
 		[self updateRegisters];
 		
-		[self toggleBacktraceView:NSOnState];
+		[self toggleBacktraceAndRegistersViews:NSOnState];
 		
 		[self jumpToMemoryAddress:self.registersViewController.instructionPointer];
 		
@@ -2556,7 +2557,7 @@ enum ZGStepExecution
 {
 	[[[ZGAppController sharedController] breakPointController] removeSingleStepBreakPointsFromBreakPoint:breakPoint];
 	[self resumeBreakPoint:breakPoint];
-	[self toggleBacktraceView:NSOffState];
+	[self toggleBacktraceAndRegistersViews:NSOffState];
 }
 
 - (IBAction)continueExecution:(id)sender
