@@ -32,27 +32,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
-@class ZGDebuggerController;
 @class ZGProcess;
-@class ZGBacktrace;
 
-@protocol ZGBacktraceViewControllerDelegate <NSObject>
+@interface ZGBacktrace : NSObject
 
-- (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address;
-- (BOOL)backtraceSelectionShouldChange;
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process;
 
-@end
-
-@interface ZGBacktraceViewController : NSViewController
-
-- (id)initWithDelegate:(id <ZGBacktraceViewControllerDelegate>)delegate;
-
-@property (nonatomic) ZGBacktrace *backtrace;
-
-@property (nonatomic, readonly) NSArray *selectedInstructions;
-@property (nonatomic, readonly) NSTableView *tableView;
+@property (nonatomic, readonly) NSArray *instructions;
+@property (nonatomic, readonly) NSArray *basePointers;
 
 @end

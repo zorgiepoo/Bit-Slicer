@@ -56,6 +56,7 @@
 #import "CoreSymbolication.h"
 #import "ZGTableView.h"
 #import "ZGVariableController.h"
+#import "ZGBacktrace.h"
 
 @interface ZGDebuggerController ()
 
@@ -1286,12 +1287,12 @@ enum ZGStepExecution
 		return NO;
 	}
 	
-	if (self.backtraceViewController.instructions.count <= 1 || self.backtraceViewController.basePointers.count <= 1)
+	if (self.backtraceViewController.backtrace.instructions.count <= 1 || self.backtraceViewController.backtrace.basePointers.count <= 1)
 	{
 		return NO;
 	}
 	
-	ZGInstruction *outterInstruction = [self.backtraceViewController.instructions objectAtIndex:1];
+	ZGInstruction *outterInstruction = [self.backtraceViewController.backtrace.instructions objectAtIndex:1];
 	ZGInstruction *returnInstruction = [[self class] findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 	
 	if (!returnInstruction)
@@ -2435,16 +2436,14 @@ enum ZGStepExecution
 
 - (void)updateBacktrace
 {
-	NSArray *backtraceComponents = [self.backtraceViewController backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.instructionPointer inProcess:self.currentProcess];
+	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.instructionPointer process:self.currentProcess];
 	
-	NSArray *instructions = [backtraceComponents objectAtIndex:0];
-	
-	if ([self shouldUpdateSymbolsForInstructions:instructions])
+	if ([self shouldUpdateSymbolsForInstructions:backtrace.instructions])
 	{
-		[self updateSymbolsForInstructions:instructions];
+		[self updateSymbolsForInstructions:backtrace.instructions];
 	}
 	
-	for (ZGInstruction *instruction in instructions)
+	for (ZGInstruction *instruction in backtrace.instructions)
 	{
 		if (instruction.symbols.length == 0)
 		{
@@ -2457,7 +2456,7 @@ enum ZGStepExecution
 		}
 	}
 	
-	[self.backtraceViewController updateBacktrace:backtraceComponents];
+	self.backtraceViewController.backtrace = backtrace;
 }
 
 - (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address
@@ -2593,10 +2592,10 @@ enum ZGStepExecution
 
 - (IBAction)stepOut:(id)sender
 {
-	ZGInstruction *outterInstruction = [self.backtraceViewController.instructions objectAtIndex:1];
+	ZGInstruction *outterInstruction = [self.backtraceViewController.backtrace.instructions objectAtIndex:1];
 	ZGInstruction *returnInstruction = [[self class] findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess];
 	
-	if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceViewController.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self])
+	if ([[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceViewController.backtrace.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self])
 	{
 		[self continueExecution:nil];
 	}
