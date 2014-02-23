@@ -95,14 +95,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="cFD-3I-ALg">
-                                <rect key="frame" x="0.0" y="0.0" width="818" height="282"/>
+                                <rect key="frame" x="0.0" y="0.0" width="818" height="238"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <clipView key="contentView" id="QCs-yF-iGW">
-                                    <rect key="frame" x="1" y="17" width="816" height="264"/>
+                                    <rect key="frame" x="1" y="17" width="816" height="220"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA" customClass="ZGTableView">
-                                            <rect key="frame" x="0.0" y="0.0" width="816" height="264"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="816" height="220"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -196,15 +196,15 @@
                                 </tableHeaderView>
                             </scrollView>
                             <splitView autosaveName="ZGDisassemblerVerticalSplitter" dividerStyle="thin" vertical="YES" id="246" userLabel="Registers/Backtrace SplitView">
-                                <rect key="frame" x="0.0" y="283" width="818" height="201"/>
+                                <rect key="frame" x="0.0" y="239" width="818" height="245"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <customView id="Bh5-To-vJR" userLabel="Backtrace View">
-                                        <rect key="frame" x="0.0" y="0.0" width="510" height="201"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="510" height="245"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </customView>
                                     <customView id="YKc-8G-cFS" userLabel="Registers View">
-                                        <rect key="frame" x="511" y="0.0" width="307" height="201"/>
+                                        <rect key="frame" x="511" y="0.0" width="307" height="245"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                     </customView>
                                 </subviews>
