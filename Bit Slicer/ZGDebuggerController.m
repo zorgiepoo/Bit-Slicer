@@ -64,8 +64,6 @@
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
 @property (nonatomic, assign) IBOutlet NSSplitView *splitView;
 
-@property (nonatomic, assign) IBOutlet NSSplitView *registersAndBacktraceSplitView;
-
 @property (nonatomic, assign) IBOutlet NSView *registersView;
 @property (nonatomic) ZGRegistersViewController *registersViewController;
 
@@ -2484,14 +2482,18 @@ enum ZGStepExecution
 		if (self.registersViewController == nil)
 		{
 			self.registersViewController = [[ZGRegistersViewController alloc] initWithUndoManager:self.undoManager];
-			[self.registersAndBacktraceSplitView replaceSubview:self.registersView with:self.registersViewController.view];
 			[self.registersViewController addObserver:self forKeyPath:@"instructionPointer" options:NSKeyValueObservingOptionNew context:NULL];
+			
+			[self.registersView addSubview:self.registersViewController.view];
+			self.registersViewController.view.frame = self.registersView.bounds;
 		}
 		
 		if (self.backtraceViewController == nil)
 		{
 			self.backtraceViewController = [[ZGBacktraceViewController alloc] initWithDelegate:self];
-			[self.registersAndBacktraceSplitView replaceSubview:self.backtraceView with:self.backtraceViewController.view];
+			
+			[self.backtraceView addSubview:self.backtraceViewController.view];
+			self.backtraceViewController.view.frame = self.backtraceView.bounds;
 		}
 		
 		[self updateRegisters];

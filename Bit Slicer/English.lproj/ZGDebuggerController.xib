@@ -13,13 +13,11 @@
                 <outlet property="dissemblyProgressIndicator" destination="RaP-PN-2IR" id="pyc-Nx-WJ6"/>
                 <outlet property="instructionsTableView" destination="Ksp-7e-9HA" id="xuY-up-g0Y"/>
                 <outlet property="navigationSegmentedControl" destination="vkH-Yd-fy0" id="Ky9-Xf-TmK"/>
-                <outlet property="registersAndBacktraceSplitView" destination="246" id="zMW-mk-fzd"/>
                 <outlet property="registersView" destination="YKc-8G-cFS" id="00F-gy-zwL"/>
                 <outlet property="runningApplicationsPopUpButton" destination="fpR-fU-ajG" id="98g-ZN-oRL"/>
                 <outlet property="splitView" destination="239" id="247"/>
                 <outlet property="statusTextField" destination="QFr-ST-Ct0" id="t5w-EZ-lIx"/>
                 <outlet property="stepExecutionSegmentedControl" destination="hed-Ji-GwK" id="6XI-Fz-1zt"/>
-                <outlet property="toolbar" destination="BPq-cf-Fjg" id="VbF-ag-Co8"/>
                 <outlet property="window" destination="5" id="37"/>
             </connections>
         </customObject>
@@ -201,11 +199,11 @@
                                 <subviews>
                                     <customView id="Bh5-To-vJR" userLabel="Backtrace View">
                                         <rect key="frame" x="0.0" y="0.0" width="510" height="245"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     </customView>
                                     <customView id="YKc-8G-cFS" userLabel="Registers View">
                                         <rect key="frame" x="511" y="0.0" width="307" height="245"/>
-                                        <autoresizingMask key="autoresizingMask"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     </customView>
                                 </subviews>
                                 <holdingPriorities>
