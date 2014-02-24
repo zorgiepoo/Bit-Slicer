@@ -194,10 +194,7 @@
 	[[self window] setFrameAutosaveName: NSStringFromClass([self class])];
 	
 	[self setupProcessListNotificationsAndPopUpButton];
-}
-
-- (void)windowDidAppearForFirstTime:(id)sender
-{
+	
 	[self changeMemoryView:nil];
 }
 
