@@ -58,11 +58,15 @@
 #import "ZGVariableController.h"
 #import "ZGBacktrace.h"
 
+#define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
+#define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
+
 @interface ZGDebuggerController ()
 
 @property (nonatomic, assign) IBOutlet ZGTableView *instructionsTableView;
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
 @property (nonatomic, assign) IBOutlet NSSplitView *splitView;
+@property (nonatomic, assign) IBOutlet NSSplitView *registersAndBacktraceSplitView;
 
 @property (nonatomic, assign) IBOutlet NSView *registersView;
 @property (nonatomic) ZGRegistersViewController *registersViewController;
@@ -185,6 +189,14 @@ enum ZGStepExecution
 	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepOutExecution] setTemplate:YES];
 	
 	[self updateExecutionButtons];
+	
+	[self createSymbolicator];
+	
+	[self toggleBacktraceAndRegistersViews:NSOffState];
+	
+	// Don't set these in IB; can't trust setting these at the right time and not screwing up the saved positions
+	self.splitView.autosaveName = ZGDebuggerSplitViewAutosaveName;
+	self.registersAndBacktraceSplitView.autosaveName = ZGRegistersAndBacktraceSplitViewAutosaveName;
 }
 
 - (void)createSymbolicator
@@ -206,14 +218,10 @@ enum ZGStepExecution
 
 - (void)windowDidAppearForFirstTime:(id)sender
 {
-	[self createSymbolicator];
-	
 	if (!sender)
 	{
 		[self readMemory:nil];
 	}
-	
-	[self toggleBacktraceAndRegistersViews:NSOffState];
 }
 
 #pragma mark Current Process Changed
