@@ -53,6 +53,7 @@
 #import "CoreSymbolication.h"
 #import "ZGUtilities.h"
 #import "ZGPyVirtualMemory.h"
+#import "ZGBacktrace.h"
 
 @class ZGPyDebugger;
 
@@ -91,6 +92,7 @@ declareDebugPrototypeMethod(removeBreakpoint)
 declareDebugPrototypeMethod(resume)
 declareDebugPrototypeMethod(stepIn)
 declareDebugPrototypeMethod(stepOver)
+declareDebugPrototypeMethod(backtrace)
 declareDebugPrototypeMethod(writeRegisters)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
@@ -115,6 +117,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(resume)
 	declareDebugMethod(stepIn)
 	declareDebugMethod(stepOver)
+	declareDebugMethod(backtrace)
 	declareDebugMethod(writeRegisters)
 	{NULL, NULL, 0, NULL}
 };
@@ -840,6 +843,37 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	}
 	
 	return Py_BuildValue("");
+}
+
+static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject *args)
+{
+	if (self->objcSelf.haltedBreakPoint == nil)
+	{
+		PyErr_SetString(gDebuggerException, "debug.backtrace called without a current breakpoint set");
+		return NULL;
+	}
+	
+	x86_thread_state_t threadState;
+	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, NULL))
+	{
+		PyErr_SetString(gDebuggerException, "debug.backtrace failed to retrieve current general thread state");
+		return NULL;
+	}
+	
+	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
+	ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+	
+	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf.process];
+	
+	PyObject *pythonInstructionAddresses = PyList_New(backtrace.instructions.count);
+	Py_ssize_t instructionIndex = 0;
+	for (ZGInstruction *instruction in backtrace.instructions)
+	{
+		PyList_SET_ITEM(pythonInstructionAddresses, instructionIndex, Py_BuildValue("K", instruction.variable.address));
+		instructionIndex++;
+	}
+	
+	return pythonInstructionAddresses;
 }
 
 static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
