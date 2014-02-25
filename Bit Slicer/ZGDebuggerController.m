@@ -884,7 +884,7 @@ enum ZGStepExecution
 				
 				ZGInstruction *instruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
 				
-				[newInstructions addObject:[[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic]];
+				[newInstructions addObject:instruction];
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					self.dissemblyProgressIndicator.doubleValue += instruction.variable.size;
