@@ -34,10 +34,14 @@
 
 #import "ZGDisassemblerObject.h"
 
+#import "ZGVariable.h"
+
 @interface ZGDisassemblerObject ()
 
-@property (nonatomic, readwrite) ud_t *object;
-@property (nonatomic, readwrite) void *bytes;
+@property (nonatomic) ud_t *object;
+@property (nonatomic) void *bytes;
+@property (nonatomic) ZGMemoryAddress startAddress;
+@property (nonatomic) ZGMemorySize pointerSize;
 
 @end
 
@@ -71,12 +75,16 @@ static void disassemblerTranslator(ud_t *object)
 		self.bytes = malloc(size);
 		memcpy(self.bytes, bytes, size);
 		
+		self.startAddress = address;
 		self.object = malloc(sizeof(ud_t));
+		
+		self.pointerSize = pointerSize;
+		
 		ud_init(self.object);
 		ud_set_input_buffer(self.object, self.bytes, size);
-		ud_set_mode(self.object, pointerSize * 8);
+		ud_set_mode(self.object, self.pointerSize * 8);
 		ud_set_syntax(self.object, disassemblerTranslator);
-		ud_set_pc(self.object, address);
+		ud_set_pc(self.object, self.startAddress);
 	}
 	return self;
 }
@@ -95,6 +103,68 @@ static void disassemblerTranslator(ud_t *object)
 		callback(ud_insn_off(self.object), ud_insn_len(self.object), ud_insn_mnemonic(self.object), @(ud_insn_asm(self.object)), &stop);
 		if (stop) break;
 	}
+}
+
+- (NSArray *)readInstructions
+{
+	NSMutableArray *instructions = [NSMutableArray array];
+	
+	while (ud_disassemble(_object) > 0)
+	{
+		ZGMemoryAddress instructionAddress = ud_insn_off(_object);
+		ZGMemorySize instructionSize = ud_insn_len(_object);
+		ud_mnemonic_code_t mnemonic = ud_insn_mnemonic(_object);
+		NSString *disassembledText = @(ud_insn_asm(_object));
+		
+		ZGVariable *variable =
+		[[ZGVariable alloc]
+		 initWithValue:_bytes + (instructionAddress - _startAddress)
+		 size:instructionSize
+		 address:instructionAddress
+		 type:ZGByteArray
+		 qualifier:0
+		 pointerSize:_pointerSize
+		 description:nil
+		 enabled:NO];
+		
+		ZGInstruction *newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
+		
+		[instructions addObject:newInstruction];
+	}
+	
+	return instructions;
+}
+
+- (ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize
+{
+	ZGInstruction *newInstruction = nil;
+	while (ud_disassemble(_object) > 0)
+	{
+		ZGMemoryAddress instructionAddress = ud_insn_off(_object);
+		ZGMemorySize instructionSize = ud_insn_len(_object);
+		
+		if ((instructionAddress - _startAddress) + instructionSize >= maxSize)
+		{
+			ud_mnemonic_code_t mnemonic = ud_insn_mnemonic(_object);
+			NSString *disassembledText = @(ud_insn_asm(_object));
+			
+			ZGVariable *variable =
+			[[ZGVariable alloc]
+			 initWithValue:_bytes + (instructionAddress - _startAddress)
+			 size:instructionSize
+			 address:instructionAddress
+			 type:ZGByteArray
+			 qualifier:0
+			 pointerSize:_pointerSize
+			 description:nil
+			 enabled:NO];
+			
+			newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
+			
+			break;
+		}
+	}
+	return newInstruction;
 }
 
 @end

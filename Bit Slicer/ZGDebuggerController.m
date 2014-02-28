@@ -449,37 +449,8 @@ enum ZGStepExecution
 		}
 		
 		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask pointerSize:process.pointerSize address:startAddress size:readSize];
-		if (disassemblerObject != nil)
-		{
-			__block ZGMemoryAddress memoryOffset = 0;
-			__block ZGMemorySize memorySize = 0;
-			__block NSString *instructionText = nil;
-			__block ud_mnemonic_code_t instructionMnemonic = 0;
-			
-			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop) {
-				if ((instructionAddress - startAddress) + instructionSize >= size)
-				{
-					memoryOffset = instructionAddress - startAddress;
-					memorySize = instructionSize;
-					instructionText = disassembledText;
-					instructionMnemonic = mnemonic;
-					*stop = YES;
-				}
-			}];
-			
-			ZGVariable *variable =
-			[[ZGVariable alloc]
-			 initWithValue:disassemblerObject.bytes + memoryOffset
-			 size:memorySize
-			 address:startAddress + memoryOffset
-			 type:ZGByteArray
-			 qualifier:0
-			 pointerSize:process.pointerSize
-			 description:nil
-			 enabled:NO];
-			
-			instruction = [[ZGInstruction alloc] initWithVariable:variable text:instructionText mnemonic:instructionMnemonic];
-		}
+		
+		instruction = [disassemblerObject readLastInstructionWithMaxSize:size];
 	}
 	
 	return instruction;
@@ -606,24 +577,7 @@ enum ZGStepExecution
 			ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size];
 			if (disassemblerObject != nil)
 			{
-				NSMutableArray *instructionsToReplace = [[NSMutableArray alloc] init];
-				
-				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
-					ZGVariable *variable =
-					[[ZGVariable alloc]
-					 initWithValue:disassemblerObject.bytes + (instructionAddress - startAddress)
-					 size:instructionSize
-					 address:instructionAddress
-					 type:ZGByteArray
-					 qualifier:0
-					 pointerSize:self.currentProcess.pointerSize
-					 description:nil
-					 enabled:NO];
-					
-					ZGInstruction *newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
-					
-					[instructionsToReplace addObject:newInstruction];
-				}];
+				NSArray *instructionsToReplace = [disassemblerObject readInstructions];
 				
 				// Replace the visible instructions
 				NSMutableArray *newInstructions = [[NSMutableArray alloc] initWithArray:self.instructions];
@@ -683,28 +637,11 @@ enum ZGStepExecution
 	{
 		ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 		
-		NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
-		
 		ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size];
 		
 		if (disassemblerObject != nil)
 		{
-			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
-				ZGVariable *variable =
-				[[ZGVariable alloc]
-				 initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address)
-				 size:instructionSize
-				 address:instructionAddress
-				 type:ZGByteArray
-				 qualifier:0
-				 pointerSize:self.currentProcess.pointerSize
-				 description:nil
-				 enabled:NO];
-				
-				ZGInstruction *newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
-				
-				[instructionsToAdd addObject:newInstruction];
-			}];
+			NSMutableArray *instructionsToAdd = [NSMutableArray arrayWithArray:[disassemblerObject readInstructions]];
 			
 			NSUInteger numberOfInstructionsAdded = instructionsToAdd.count;
 			NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
@@ -755,29 +692,11 @@ enum ZGStepExecution
 		{
 			ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 			
-			NSMutableArray *instructionsToAdd = [[NSMutableArray alloc] init];
-			
 			ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size];
 			
 			if (disassemblerObject != nil)
 			{
-				[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
-					ZGVariable *variable =
-					[[ZGVariable alloc]
-					 initWithValue:disassemblerObject.bytes + (instructionAddress - startInstruction.variable.address)
-					 size:instructionSize
-					 address:instructionAddress
-					 type:ZGByteArray
-					 qualifier:0
-					 pointerSize:self.currentProcess.pointerSize
-					 description:nil
-					 enabled:NO];
-					
-					ZGInstruction *newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
-					
-					[instructionsToAdd addObject:newInstruction];
-				}];
-				
+				NSArray *instructionsToAdd = [disassemblerObject readInstructions];
 				NSMutableArray *appendedInstructions = [NSMutableArray arrayWithArray:self.instructions];
 				[appendedInstructions addObjectsFromArray:instructionsToAdd];
 				
