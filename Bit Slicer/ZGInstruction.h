@@ -46,6 +46,4 @@
 @property (nonatomic, readonly) ZGVariable *variable;
 @property (nonatomic, copy) NSString *symbols;
 
-- (ZGMemoryAddress)branchAddress;
-
 @end

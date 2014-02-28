@@ -836,7 +836,13 @@ enum ZGStepExecution
 - (IBAction)jumpToOperandOffset:(id)sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
-	[self jumpToMemoryAddress:selectedInstruction.branchAddress];
+	
+	ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:selectedInstruction.variable.address size:selectedInstruction.variable.size];
+	
+	if (disassemblerObject != nil)
+	{
+		[self jumpToMemoryAddress:[disassemblerObject readBranchImmediateOperand]];
+	}
 }
 
 - (void)prepareNavigation

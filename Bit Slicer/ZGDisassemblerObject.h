@@ -45,7 +45,9 @@
 
 @property (readonly, nonatomic) void *bytes;
 
+// These methods may advance the object's internal position for disassembling instructions
 - (NSArray *)readInstructions;
 - (ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize;
+- (ZGMemoryAddress)readBranchImmediateOperand;
 
 @end

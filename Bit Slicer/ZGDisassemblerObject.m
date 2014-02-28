@@ -168,4 +168,47 @@ static void disassemblerTranslator(ud_t *object)
 	return newInstruction;
 }
 
+- (ZGMemoryAddress)readBranchImmediateOperand
+{
+	ZGMemoryAddress immediateOperand = 0;
+	ud_set_pc(_object, 0);
+	if (ud_disassemble(_object) > 0)
+	{
+		const ud_operand_t *operand = NULL;
+		unsigned int operandIndex = 0;
+		while ((operand = ud_insn_opr(_object, operandIndex)) != NULL)
+		{
+			if (operand->type == UD_OP_JIMM)
+			{
+				break;
+			}
+			operandIndex++;
+		}
+		
+		if (operand != NULL)
+		{
+			int64_t operandOffset = 0x0;
+			switch (operand->size)
+			{
+				case sizeof(int8_t) * 8:
+					operandOffset = operand->lval.sbyte;
+					break;
+				case sizeof(int16_t) * 8:
+					operandOffset = operand->lval.sword;
+					break;
+				case sizeof(int32_t) * 8:
+					operandOffset = operand->lval.sdword;
+					break;
+				case sizeof(int64_t) * 8:
+					operandOffset = operand->lval.sqword;
+					break;
+			}
+			
+			immediateOperand = self.startAddress + ud_insn_len(_object) + operandOffset;
+		}
+	}
+	
+	return immediateOperand;
+}
+
 @end

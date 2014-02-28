@@ -58,19 +58,6 @@
 	return self;
 }
 
-// This should be a call or jump mnemonic
-- (ZGMemoryAddress)branchAddress
-{
-	ZGMemoryAddress branchAddress = 0;
-	NSString *lastComponent = [[self.text componentsSeparatedByString:@" "] lastObject];
-	if (lastComponent != nil)
-	{
-		branchAddress = ZGMemoryAddressFromExpression(lastComponent);
-	}
-	
-	return branchAddress;
-}
-
 - (BOOL)isEqual:(id)object
 {
 	if (![object isKindOfClass:[ZGInstruction class]])
