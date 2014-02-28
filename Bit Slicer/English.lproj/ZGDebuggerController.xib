@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1070" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
@@ -10,7 +10,6 @@
                 <outlet property="addressTextField" destination="ztk-ei-XwG" id="HE9-HV-rHU"/>
                 <outlet property="backtraceView" destination="Bh5-To-vJR" id="7wn-JW-2kV"/>
                 <outlet property="continueButton" destination="2Xc-JX-DhY" id="dr8-aT-zNo"/>
-                <outlet property="dissemblyProgressIndicator" destination="RaP-PN-2IR" id="pyc-Nx-WJ6"/>
                 <outlet property="instructionsTableView" destination="Ksp-7e-9HA" id="xuY-up-g0Y"/>
                 <outlet property="navigationSegmentedControl" destination="vkH-Yd-fy0" id="Ky9-Xf-TmK"/>
                 <outlet property="registersAndBacktraceSplitView" destination="246" id="FXl-Gz-Yfd"/>
@@ -230,10 +229,6 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <progressIndicator hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" controlSize="small" style="spinning" id="RaP-PN-2IR">
-                        <rect key="frame" x="782" y="2" width="16" height="16"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                    </progressIndicator>
                 </subviews>
             </view>
             <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" explicitIdentifier="ZGDebuggerToolbar" displayMode="iconAndLabel" sizeMode="regular" id="BPq-cf-Fjg" customClass="ZGNoSmallSizeToolbar">

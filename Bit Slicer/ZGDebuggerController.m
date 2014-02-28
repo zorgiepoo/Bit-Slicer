@@ -64,7 +64,6 @@
 @interface ZGDebuggerController ()
 
 @property (nonatomic, assign) IBOutlet ZGTableView *instructionsTableView;
-@property (nonatomic, assign) IBOutlet NSProgressIndicator *dissemblyProgressIndicator;
 @property (nonatomic, assign) IBOutlet NSSplitView *splitView;
 @property (nonatomic, assign) IBOutlet NSSplitView *registersAndBacktraceSplitView;
 
@@ -731,12 +730,8 @@ enum ZGStepExecution
 	}
 }
 
-- (void)updateDisassemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)theSize selectionAddress:(ZGMemoryAddress)selectionAddress
+- (void)updateDisassemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size selectionAddress:(ZGMemoryAddress)selectionAddress
 {
-	[self.dissemblyProgressIndicator setMinValue:0];
-	[self.dissemblyProgressIndicator setMaxValue:theSize];
-	[self.dissemblyProgressIndicator setDoubleValue:0];
-	[self.dissemblyProgressIndicator setHidden:NO];
 	[self.addressTextField setEnabled:NO];
 	[self.runningApplicationsPopUpButton setEnabled:NO];
 	
@@ -757,95 +752,32 @@ enum ZGStepExecution
 	}
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		ZGMemorySize size = theSize;
 		ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size];
+		NSArray *newInstructions = @[];
 		
 		if (disassemblerObject != nil)
 		{
-			__block NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
-			
-			// We add instructions to table in batches. First time 1000 variables will be added, 2nd time 1000*2, third time 1000*2*2, etc.
-			__block NSUInteger thresholdCount = 1000;
-			
-			__block NSUInteger totalInstructionCount = 0;
-			
-			__block NSUInteger selectionRow = 0;
-			
-			// Block for adding a batch of instructions which will be used for later
-			void (^addBatchOfInstructions)(void) = ^{
-				NSArray *currentBatch = newInstructions;
-				
-				dispatch_async(dispatch_get_main_queue(), ^{
-					NSMutableArray *appendedInstructions = [[NSMutableArray alloc] initWithArray:self.instructions];
-					[appendedInstructions addObjectsFromArray:currentBatch];
-					
-					if (self.instructions.count == 0 && self.window.firstResponder != self.backtraceViewController.tableView)
-					{
-						[self.window makeFirstResponder:self.instructionsTableView];
-					}
-					self.instructions = [NSArray arrayWithArray:appendedInstructions];
-					[self.instructionsTableView noteNumberOfRowsChanged];
-					self.currentMemorySize = self.instructions.count;
-				});
-			};
-			
-			[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop)  {
-				ZGVariable *variable =
-				[[ZGVariable alloc]
-				 initWithValue:disassemblerObject.bytes + (instructionAddress - address)
-				 size:instructionSize
-				 address:instructionAddress
-				 type:ZGByteArray
-				 qualifier:0
-				 pointerSize:self.currentProcess.pointerSize
-				 description:nil
-				 enabled:NO];
-				
-				ZGInstruction *instruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
-				
-				[newInstructions addObject:instruction];
-				
-				dispatch_async(dispatch_get_main_queue(), ^{
-					self.dissemblyProgressIndicator.doubleValue += instruction.variable.size;
-				});
-				
-				if (selectionAddress >= instruction.variable.address && selectionAddress < instruction.variable.address + instruction.variable.size)
-				{
-					selectionRow = totalInstructionCount;
-				}
-				
-				if (!self.disassembling)
-				{
-					*stop = YES;
-				}
-				else
-				{
-					totalInstructionCount++;
-					
-					if (totalInstructionCount >= thresholdCount)
-					{
-						addBatchOfInstructions();
-						newInstructions = [[NSMutableArray alloc] init];
-						thresholdCount *= 2;
-					}
-				}
-			}];
-			
-			// Add the leftover batch
-			addBatchOfInstructions();
-			
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self scrollAndSelectRow:selectionRow];
-			});
+			newInstructions = [disassemblerObject readInstructions];
 		}
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
+			self.instructions = newInstructions;
+			self.currentMemorySize = self.instructions.count;
+			
+			[self.instructionsTableView noteNumberOfRowsChanged];
+			
+			ZGInstruction *selectionInstruction = [self findInstructionInTableAtAddress:selectionAddress];
+			if (selectionInstruction != nil)
+			{
+				[self scrollAndSelectRow:[self.instructions indexOfObject:selectionInstruction]];
+			}
+			
 			self.disassembling = NO;
 			if (disassemblingActivity != nil)
 			{
 				[[NSProcessInfo processInfo] endActivity:disassemblingActivity];
 			}
-			[self.dissemblyProgressIndicator setHidden:YES];
+			
 			[self.addressTextField setEnabled:YES];
 			[self.runningApplicationsPopUpButton setEnabled:YES];
 			
