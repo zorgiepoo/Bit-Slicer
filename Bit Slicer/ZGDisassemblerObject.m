@@ -171,7 +171,6 @@ static void disassemblerTranslator(ud_t *object)
 - (ZGMemoryAddress)readBranchImmediateOperand
 {
 	ZGMemoryAddress immediateOperand = 0;
-	ud_set_pc(_object, 0);
 	if (ud_disassemble(_object) > 0)
 	{
 		const ud_operand_t *operand = NULL;
