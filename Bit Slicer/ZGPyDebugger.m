@@ -54,6 +54,7 @@
 #import "ZGUtilities.h"
 #import "ZGPyVirtualMemory.h"
 #import "ZGBacktrace.h"
+#import "NSArrayAdditions.h"
 
 @class ZGPyDebugger;
 
@@ -386,12 +387,9 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 		
 		ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithBytes:buffer.buf address:instructionPointer size:buffer.len pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		
-		NSMutableArray *disassembledTexts = [[NSMutableArray alloc] init];
-		[disassemblerObject enumerateWithBlock:^(ZGMemoryAddress instructionAddress, ZGMemorySize instructionSize, ud_mnemonic_code_t mnemonic, NSString *disassembledText, BOOL *stop) {
-			[disassembledTexts addObject:disassembledText];
-		}];
+		NSArray *instructions = [disassemblerObject readInstructions];
 		
-		NSString *disassembledString = [disassembledTexts componentsJoinedByString:@"\n"];
+		NSString *disassembledString = [[instructions zgMapUsingBlock:^(ZGInstruction *instruction) { return instruction.text; }] componentsJoinedByString:@"\n"];
 		retValue = Py_BuildValue("s", [disassembledString UTF8String]);
 		
 		PyBuffer_Release(&buffer);

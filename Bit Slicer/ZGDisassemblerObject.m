@@ -95,16 +95,6 @@ static void disassemblerTranslator(ud_t *object)
 	free(self.bytes); self.bytes = NULL;
 }
 
-- (void)enumerateWithBlock:(void (^)(ZGMemoryAddress, ZGMemorySize, ud_mnemonic_code_t, NSString *, BOOL *))callback
-{
-	BOOL stop = NO;
-	while (ud_disassemble(self.object) > 0)
-	{
-		callback(ud_insn_off(self.object), ud_insn_len(self.object), ud_insn_mnemonic(self.object), @(ud_insn_asm(self.object)), &stop);
-		if (stop) break;
-	}
-}
-
 - (NSArray *)readInstructions
 {
 	NSMutableArray *instructions = [NSMutableArray array];

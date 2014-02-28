@@ -51,6 +51,18 @@
 	return [NSArray arrayWithArray:newResults];
 }
 
+- (NSArray *)zgMapUsingBlock:(zg_map_t)map
+{
+	NSMutableArray *newResults = [[NSMutableArray alloc] init];
+	
+	for (id item in self)
+	{
+		[newResults addObject:map(item)];
+	}
+	
+	return newResults;
+}
+
 // our's first, their's later
 - (id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator
 {
