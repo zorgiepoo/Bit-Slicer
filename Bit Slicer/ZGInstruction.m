@@ -35,7 +35,6 @@
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
 #import "ZGUtilities.h"
-#import "udis86.h"
 
 @interface ZGInstruction ()
 
