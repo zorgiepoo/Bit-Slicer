@@ -35,13 +35,15 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 #import "ZGInstruction.h"
-#import "udis86.h"
 
 @interface ZGDisassemblerObject : NSObject
 
-@property (readonly, nonatomic) void *bytes;
++ (BOOL)isCallMnemonic:(int)mnemonic;
++ (BOOL)isJumpMnemonic:(int)mnemonic;
 
 - (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize;
+
+@property (readonly, nonatomic) void *bytes;
 
 - (NSArray *)readInstructions;
 - (ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize;

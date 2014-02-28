@@ -1126,7 +1126,7 @@ enum ZGStepExecution
 		return NO;
 	}
 	
-	if ([currentInstruction isCallMnemonic])
+	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
 	{
 		ZGInstruction *nextInstruction = [[self class] findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		if (!nextInstruction)
@@ -1280,11 +1280,11 @@ enum ZGStepExecution
 		}
 		
 		ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
-		if (selectedInstruction.isCallMnemonic)
+		if ([ZGDisassemblerObject isCallMnemonic:selectedInstruction.mnemonic])
 		{
 			[menuItem setTitle:@"Go to Call Address"];
 		}
-		else if (selectedInstruction.isJumpMnemonic)
+		else if ([ZGDisassemblerObject isJumpMnemonic:selectedInstruction.mnemonic])
 		{
 			[menuItem setTitle:@"Go to Branch Address"];
 		}
@@ -2433,7 +2433,7 @@ enum ZGStepExecution
 - (IBAction)stepOver:(id)sender
 {
 	ZGInstruction *currentInstruction = [[self class] findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess];
-	if ([currentInstruction isCallMnemonic])
+	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
 	{
 		ZGInstruction *nextInstruction = [[self class] findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess];
 		

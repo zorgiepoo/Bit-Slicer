@@ -33,21 +33,19 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "udis86.h"
 #import "ZGMemoryTypes.h"
 
 @class ZGVariable;
 
 @interface ZGInstruction : NSObject
 
-- (id)initWithVariable:(ZGVariable *)variable text:(NSString *)text mnemonic:(ud_mnemonic_code_t)mnemonic;
+- (id)initWithVariable:(ZGVariable *)variable text:(NSString *)text mnemonic:(int)mnemonic;
 
 @property (nonatomic, readonly, copy) NSString *text;
+@property (nonatomic, readonly) int mnemonic;
 @property (nonatomic, readonly) ZGVariable *variable;
 @property (nonatomic, copy) NSString *symbols;
 
-- (BOOL)isCallMnemonic;
-- (BOOL)isJumpMnemonic;
 - (ZGMemoryAddress)branchAddress;
 
 @end

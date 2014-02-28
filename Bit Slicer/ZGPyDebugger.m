@@ -812,7 +812,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	if ([currentInstruction isCallMnemonic])
+	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
 	{
 		ZGInstruction *nextInstruction = [ZGDebuggerController findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf.process];
 		

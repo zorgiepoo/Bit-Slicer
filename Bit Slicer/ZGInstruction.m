@@ -35,10 +35,11 @@
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
 #import "ZGUtilities.h"
+#import "udis86.h"
 
 @interface ZGInstruction ()
 
-@property (nonatomic) ud_mnemonic_code_t mnemonic;
+@property (nonatomic) int mnemonic;
 @property (nonatomic, copy) NSString *text;
 @property (nonatomic) ZGVariable *variable;
 
@@ -46,7 +47,7 @@
 
 @implementation ZGInstruction
 
-- (id)initWithVariable:(ZGVariable *)variable text:(NSString *)text mnemonic:(ud_mnemonic_code_t)mnemonic
+- (id)initWithVariable:(ZGVariable *)variable text:(NSString *)text mnemonic:(int)mnemonic
 {
 	self = [super init];
 	if (self != nil)
@@ -56,17 +57,6 @@
 		self.mnemonic = mnemonic;
 	}
 	return self;
-}
-
-// Possible candidates: UD_Isyscall, UD_Ivmcall, UD_Ivmmcall ??
-- (BOOL)isCallMnemonic
-{
-	return self.mnemonic == UD_Icall;
-}
-
-- (BOOL)isJumpMnemonic
-{
-	return self.mnemonic >= UD_Ijo && self.mnemonic <= UD_Ijmp;
 }
 
 // This should be a call or jump mnemonic

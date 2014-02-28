@@ -33,7 +33,7 @@
  */
 
 #import "ZGDisassemblerObject.h"
-
+#import "udis86.h"
 #import "ZGVariable.h"
 
 @interface ZGDisassemblerObject ()
@@ -46,6 +46,17 @@
 @end
 
 @implementation ZGDisassemblerObject
+
+// Possible candidates: UD_Isyscall, UD_Ivmcall, UD_Ivmmcall ??
++ (BOOL)isCallMnemonic:(int)mnemonic
+{
+	return mnemonic == UD_Icall;
+}
+
++ (BOOL)isJumpMnemonic:(int)mnemonic
+{
+	return mnemonic >= UD_Ijo && mnemonic <= UD_Ijmp;
+}
 
 // Put "short" in short jump instructions to be less ambiguous
 static void disassemblerTranslator(ud_t *object)
