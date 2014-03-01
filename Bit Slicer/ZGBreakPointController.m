@@ -813,13 +813,12 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	else if (watchSize == 4) { debugState.uds.type.__dr7 |= (1 << (18 + 4*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 4*debugRegisterIndex+1)); } \
 	else if (watchSize == 8) { debugState.uds.type.__dr7 &= ~(1 << (18 + 4*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 4*debugRegisterIndex+1)); }
 
-- (BOOL)updateThreadListInWatchpoint:(ZGBreakPoint *)watchPoint
+- (BOOL)updateThreadListInWatchpoint:(ZGBreakPoint *)watchPoint type:(ZGWatchPointType)watchPointType
 {
 	ZGMemoryMap processTask = watchPoint.process.processTask;
 	BOOL is64Bit = watchPoint.process.is64Bit;
 	ZGMemorySize watchSize = watchPoint.watchSize;
 	ZGVariable *variable = watchPoint.variable;
-	ZGBreakPointType watchPointType = watchPoint.type;
 	NSArray *oldDebugThreads = watchPoint.debugThreads;
 	
 	ZGSuspendTask(processTask);
@@ -946,7 +945,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		breakPoint.variable = variable;
 		breakPoint.watchSize = watchSize;
 		
-		if (![self updateThreadListInWatchpoint:breakPoint])
+		if (![self updateThreadListInWatchpoint:breakPoint type:watchPointType])
 		{
 			return NO;
 		}
@@ -962,7 +961,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 						continue;
 					}
 					
-					[self updateThreadListInWatchpoint:breakPoint];
+					[self updateThreadListInWatchpoint:breakPoint type:watchPointType];
 				}
 			});
 			dispatch_resume(self.watchPointTimer);
