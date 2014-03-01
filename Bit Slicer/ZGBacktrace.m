@@ -58,7 +58,7 @@
 	return self;
 }
 
-+ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved
 {
 	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
@@ -69,7 +69,7 @@
 		[newInstructions addObject:currentInstruction];
 		[newBasePointers addObject:@(basePointer)];
 		
-		while (basePointer > 0)
+		while (basePointer > 0 && (maxNumberOfInstructionsRetrieved == 0 || newInstructions.count < maxNumberOfInstructionsRetrieved))
 		{
 			// Read return address
 			void *returnAddressBytes = NULL;
@@ -129,6 +129,11 @@
 	}
 	
 	return [[ZGBacktrace alloc] initWithInstructions:newInstructions basePointers:newBasePointers];
+}
+
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process
+{
+	return [self backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:process maxLimit:0];
 }
 
 @end

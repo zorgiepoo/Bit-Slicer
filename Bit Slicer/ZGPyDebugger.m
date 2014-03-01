@@ -93,6 +93,7 @@ declareDebugPrototypeMethod(removeBreakpoint)
 declareDebugPrototypeMethod(resume)
 declareDebugPrototypeMethod(stepIn)
 declareDebugPrototypeMethod(stepOver)
+declareDebugPrototypeMethod(stepOut)
 declareDebugPrototypeMethod(backtrace)
 declareDebugPrototypeMethod(writeRegisters)
 
@@ -118,6 +119,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(resume)
 	declareDebugMethod(stepIn)
 	declareDebugMethod(stepOver)
+	declareDebugMethod(stepOut)
 	declareDebugMethod(backtrace)
 	declareDebugMethod(writeRegisters)
 	{NULL, NULL, 0, NULL}
@@ -839,6 +841,47 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		stepIntoDebuggerWithHaltedBreakPointAndCallback(self->objcSelf.haltedBreakPoint, callback);
 		resumeFromHaltedBreakPointInDebugger(self);
 	}
+	
+	return Py_BuildValue("");
+}
+
+static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
+{
+	PyObject *callback = NULL;
+	if (!PyArg_ParseTuple(args, "O:stepOut", &callback))
+	{
+		return NULL;
+	}
+	
+	x86_thread_state_t threadState;
+	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, NULL))
+	{
+		PyErr_SetString(gDebuggerException, "debug.stepOut failed to retrieve current general thread state");
+		return NULL;
+	}
+	
+	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
+	ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+	
+	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf.process maxLimit:2];
+	if (backtrace.instructions.count < 2)
+	{
+		PyErr_SetString(gDebuggerException, "debug.stepOut failed to find available instruction to step out to");
+		return NULL;
+	}
+	
+	ZGInstruction *outerInstruction = [backtrace.instructions objectAtIndex:1];
+	NSNumber *outerBasePointer = [backtrace.basePointers objectAtIndex:1];
+	
+	if (![[[ZGAppController sharedController] breakPointController] addBreakPointOnInstruction:outerInstruction inProcess:self->objcSelf.process thread:self->objcSelf.haltedBreakPoint.thread basePointer:outerBasePointer.unsignedLongLongValue callback:callback delegate:self->objcSelf])
+	{
+		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOut failed to set breakpoint at 0x%llX", outerInstruction.variable.address] UTF8String]);
+		return NULL;
+	}
+	
+	Py_XINCREF(callback);
+	
+	continueFromHaltedBreakPointsInDebugger(self);
 	
 	return Py_BuildValue("");
 }

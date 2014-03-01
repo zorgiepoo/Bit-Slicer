@@ -40,6 +40,7 @@
 @interface ZGBacktrace : NSObject
 
 + (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process;
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved;
 
 @property (nonatomic, readonly) NSArray *instructions;
 @property (nonatomic, readonly) NSArray *basePointers;
