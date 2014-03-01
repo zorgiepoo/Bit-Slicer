@@ -781,6 +781,11 @@ enum ZGStepExecution
 			[self.addressTextField setEnabled:YES];
 			[self.runningApplicationsPopUpButton setEnabled:YES];
 			
+			if (self.window.firstResponder != self.backtraceViewController.tableView)
+			{
+				[self.window makeFirstResponder:self.instructionsTableView];
+			}
+			
 			[self updateNavigationButtons];
 			[self updateExecutionButtons];
 			[self updateStatusBar];
