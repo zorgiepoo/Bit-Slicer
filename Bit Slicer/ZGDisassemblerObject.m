@@ -54,9 +54,14 @@
 	return (mnemonic == X86_INS_CALL);
 }
 
-+ (BOOL)isJumpMnemonic:(int)mnemonic
+static BOOL isJumpMnemonic(int mnemonic)
 {
 	return (mnemonic >= X86_INS_JAE && mnemonic <= X86_INS_JS);
+}
+
++ (BOOL)isJumpMnemonic:(int)mnemonic
+{
+	return isJumpMnemonic(mnemonic);
 }
 
 - (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize
@@ -85,12 +90,23 @@
 	free(self.bytes); self.bytes = NULL;
 }
 
-static void getTextBuffer(char *destinationBuffer, const char *mnemonicBuffer, size_t mnemonicBufferSize, const char *opStringBuffer, size_t opStringBufferSize)
+static void getTextBuffer(void *instructionBytes, size_t instructionSize, unsigned int mnemonicID, char *destinationBuffer, const char *mnemonicBuffer, size_t mnemonicBufferSize, const char *operandStringBuffer, size_t operandStringBufferSize)
 {
 	size_t mnemonicStringLength = strlen(mnemonicBuffer);
 	memcpy(destinationBuffer, mnemonicBuffer, mnemonicStringLength);
-	destinationBuffer[mnemonicStringLength] = ' ';
-	memcpy(destinationBuffer + mnemonicStringLength + 1, opStringBuffer, opStringBufferSize);
+	
+	if (isJumpMnemonic(mnemonicID) && instructionSize == 2 && strstr(mnemonicBuffer, "short") == NULL)
+	{
+		// Specify that instruction is a short jump
+		char shortString[] = " short ";
+		memcpy(destinationBuffer + mnemonicStringLength, shortString, sizeof(shortString) - 1);
+		memcpy(destinationBuffer + mnemonicStringLength + sizeof(shortString) - 1, operandStringBuffer, operandStringBufferSize);
+	}
+	else
+	{
+		destinationBuffer[mnemonicStringLength] = ' ';
+		memcpy(destinationBuffer + mnemonicStringLength + 1, operandStringBuffer, operandStringBufferSize);
+	}
 }
 
 - (NSArray *)readInstructions
@@ -105,13 +121,15 @@ static void getTextBuffer(char *destinationBuffer, const char *mnemonicBuffer, s
 		ZGMemorySize size = disassembledInstructions[instructionIndex].size;
 		unsigned int mnemonicID = disassembledInstructions[instructionIndex].id;
 		
-		char textBuffer[sizeof(disassembledInstructions[instructionIndex].mnemonic) + sizeof(disassembledInstructions[instructionIndex].op_str) + 1];
-		getTextBuffer(textBuffer, disassembledInstructions[instructionIndex].mnemonic, sizeof(disassembledInstructions[instructionIndex].mnemonic), disassembledInstructions[instructionIndex].op_str, sizeof(disassembledInstructions[instructionIndex].op_str));
+		void *instructionBytes = _bytes + (address - _startAddress);
+		
+		char textBuffer[sizeof(disassembledInstructions[instructionIndex].mnemonic) + sizeof(disassembledInstructions[instructionIndex].op_str) + 10];
+		getTextBuffer(instructionBytes, size, mnemonicID, textBuffer, disassembledInstructions[instructionIndex].mnemonic, sizeof(disassembledInstructions[instructionIndex].mnemonic), disassembledInstructions[instructionIndex].op_str, sizeof(disassembledInstructions[instructionIndex].op_str));
 		NSString *text = @(textBuffer);
 		
 		ZGVariable *variable =
 		[[ZGVariable alloc]
-		 initWithValue:_bytes + (address - _startAddress)
+		 initWithValue:instructionBytes
 		 size:size
 		 address:address
 		 type:ZGByteArray
@@ -146,14 +164,15 @@ static void getTextBuffer(char *destinationBuffer, const char *mnemonicBuffer, s
 		if ((address - _startAddress) + size >= maxSize)
 		{
 			unsigned int mnemonicID = disassembledInstructions[instructionIndex].id;
+			void *instructionBytes = _bytes + (address - _startAddress);
 			
-			char textBuffer[sizeof(disassembledInstructions[instructionIndex].mnemonic) + sizeof(disassembledInstructions[instructionIndex].op_str) + 1];
-			getTextBuffer(textBuffer, disassembledInstructions[instructionIndex].mnemonic, sizeof(disassembledInstructions[instructionIndex].mnemonic), disassembledInstructions[instructionIndex].op_str, sizeof(disassembledInstructions[instructionIndex].op_str));
+			char textBuffer[sizeof(disassembledInstructions[instructionIndex].mnemonic) + sizeof(disassembledInstructions[instructionIndex].op_str) + 10];
+			getTextBuffer(instructionBytes, size, mnemonicID, textBuffer, disassembledInstructions[instructionIndex].mnemonic, sizeof(disassembledInstructions[instructionIndex].mnemonic), disassembledInstructions[instructionIndex].op_str, sizeof(disassembledInstructions[instructionIndex].op_str));
 			NSString *text = @(textBuffer);
 			
 			ZGVariable *variable =
 			[[ZGVariable alloc]
-			 initWithValue:_bytes + (address - _startAddress)
+			 initWithValue:instructionBytes
 			 size:size
 			 address:address
 			 type:ZGByteArray
