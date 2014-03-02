@@ -49,6 +49,7 @@
 #define ZGProcessVariable @"ZGProcessVariable"
 #define ZGFailedImagesVariable @"ZGFailedImagesVariable"
 #define ZGSymbolicatorVariable @"ZGSymbolicatorVariable"
+#define ZGLastSearchInfoVariable @"ZGLastSearchInfoVariable"
 
 @implementation ZGVariable (ZGCalculatorAdditions)
 
@@ -156,6 +157,7 @@
 {
 	DDMathFunction findSymbolFunction = ^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
 		NSValue *symbolicatorValue = [vars objectForKey:ZGSymbolicatorVariable];
+		NSDictionary *lastSearchInfo = [vars objectForKey:ZGLastSearchInfoVariable];
 		__block NSNumber *symbolAddressNumber = @(0);
 		if (args.count == 0 || args.count > 2)
 		{
@@ -208,7 +210,9 @@
 				if (!encounteredError)
 				{
 					CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
-					CSSymbolRef symbolFound = ZGFindSymbol(symbolicator, symbolString, targetOwnerNameSuffix, NO);
+					ZGMemoryAddress previousFoundAddress = [[lastSearchInfo objectForKey:symbolString] unsignedLongLongValue];
+					
+					CSSymbolRef symbolFound = ZGFindSymbol(symbolicator, symbolString, targetOwnerNameSuffix, previousFoundAddress, NO);
 					if (!CSIsNull(symbolFound))
 					{
 						symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
@@ -412,7 +416,7 @@
 	return [self evaluateExpression:expression substitutions:nil error:&unusedError];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages symbolicator:(CSSymbolicatorRef)symbolicator error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages symbolicator:(CSSymbolicatorRef)symbolicator lastSearchInfo:(NSDictionary *)lastSearchInfo error:(NSError * __autoreleasing *)error
 {
 	NSMutableString	 *newExpression = [[NSMutableString alloc] initWithString:expression];
 	
@@ -428,6 +432,11 @@
 	if (!CSIsNull(symbolicator))
 	{
 		[substitutions setObject:[NSValue valueWithPointer:&symbolicator] forKey:ZGSymbolicatorVariable];
+		
+		if (lastSearchInfo != nil)
+		{
+			[substitutions setObject:lastSearchInfo forKey:ZGLastSearchInfoVariable];
+		}
 	}
 	return [self evaluateExpression:newExpression substitutions:substitutions error:error];
 }

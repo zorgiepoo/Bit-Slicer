@@ -125,40 +125,38 @@ NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddre
 	return userTagDescription;
 }
 
-CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName, BOOL requiresExactMatch)
+CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName, ZGMemoryAddress previousFoundAddress, BOOL requiresExactMatch)
 {
 	__block CSSymbolRef resultSymbol = kCSNull;
-	__block CSSymbolRef partialResultSymbol = kCSNull;
+	__block BOOL foundDesiredSymbol = NO;
+	
 	const char *symbolCString = [symbolName UTF8String];
 	
 	CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
-		const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
-		if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [partialSymbolOwnerName hasSuffix:@(symbolOwnerName)]))
+		if (!foundDesiredSymbol)
 		{
-			CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
-				if (CSIsNull(resultSymbol))
-				{
-					const char *symbolFound = CSSymbolGetName(symbol);
-					if (symbolFound != NULL)
+			const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
+			if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [partialSymbolOwnerName hasSuffix:@(symbolOwnerName)]))
+			{
+				CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
+					if (!foundDesiredSymbol)
 					{
-						if (strcmp(symbolCString, symbolFound) == 0)
+						const char *symbolFound = CSSymbolGetName(symbol);
+						if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
 						{
+							CSRange symbolRange = CSSymbolGetRange(symbol);
+							if (previousFoundAddress == 0x0 || previousFoundAddress >= symbolRange.location + symbolRange.length)
+							{
+								foundDesiredSymbol = YES;
+							}
+							
 							resultSymbol = symbol;
 						}
-						else if (!requiresExactMatch && CSIsNull(partialResultSymbol) && [@(symbolFound) rangeOfString:symbolName].location != NSNotFound)
-						{
-							partialResultSymbol = symbol;
-						}
 					}
-				}
-			});
+				});
+			}
 		}
 	});
-	
-	if (!requiresExactMatch && CSIsNull(resultSymbol))
-	{
-		resultSymbol = partialResultSymbol;
-	}
 	
 	return resultSymbol;
 }

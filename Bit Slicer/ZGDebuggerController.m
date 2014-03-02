@@ -96,6 +96,7 @@
 @property (nonatomic) id breakPointActivity;
 
 @property (nonatomic) CSSymbolicatorRef symbolicator;
+@property (nonatomic) NSDictionary *lastSearchInfo;
 
 @end
 
@@ -914,8 +915,9 @@ enum ZGStepExecution
 	}
 	else
 	{
+		NSString *userInput = self.addressTextField.stringValue;
 		NSError *error = nil;
-		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue process:self.currentProcess failedImages:nil symbolicator:self.symbolicator error:&error];
+		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:userInput process:self.currentProcess failedImages:nil symbolicator:self.symbolicator lastSearchInfo:self.lastSearchInfo error:&error];
 		if (error != nil)
 		{
 			NSLog(@"Encountered error when reading memory from debugger:");
@@ -925,6 +927,8 @@ enum ZGStepExecution
 		if (ZGIsValidNumber(calculatedMemoryAddressExpression))
 		{
 			calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
+			
+			self.lastSearchInfo = @{userInput : @(calculatedMemoryAddress)};
 		}
 	}
 	

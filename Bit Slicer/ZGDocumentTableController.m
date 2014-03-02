@@ -224,6 +224,7 @@
 			 process:self.windowController.currentProcess
 			 failedImages:self.failedExecutableImages
 			 symbolicator:kCSNull
+			 lastSearchInfo:nil
 			 error:&error];
 		
 		if (variable.address != newAddressString.zgUnsignedLongLongValue)
