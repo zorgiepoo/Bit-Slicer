@@ -202,7 +202,7 @@ static void getTextBuffer(void *instructionBytes, size_t instructionSize, unsign
 	cs_option(self.object, CS_OPT_DETAIL, CS_OPT_ON);
 	
 	cs_insn *disassembledInstructions = NULL;
-	size_t numberOfInstructionsDisassembled = cs_disasm_ex(self.object, self.bytes, self.size, self.startAddress, 0, &disassembledInstructions);
+	size_t numberOfInstructionsDisassembled = cs_disasm_ex(self.object, self.bytes, self.size, self.startAddress, 1, &disassembledInstructions);
 	if (numberOfInstructionsDisassembled > 0)
 	{
 		cs_insn instruction = disassembledInstructions[0];
