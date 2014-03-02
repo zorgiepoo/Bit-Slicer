@@ -33,104 +33,100 @@
  */
 
 #import "ZGDisassemblerObject.h"
-#import "udis86.h"
+#import "capstone.h"
 #import "ZGVariable.h"
 
 @interface ZGDisassemblerObject ()
 
-@property (nonatomic) ud_t *object;
+@property (nonatomic) csh object;
+
 @property (nonatomic) void *bytes;
-@property (nonatomic) ZGMemoryAddress startAddress;
+@property (nonatomic) ZGMemorySize size;
 @property (nonatomic) ZGMemorySize pointerSize;
+@property (nonatomic) ZGMemoryAddress startAddress;
 
 @end
 
 @implementation ZGDisassemblerObject
 
-// Possible candidates: UD_Isyscall, UD_Ivmcall, UD_Ivmmcall ??
 + (BOOL)isCallMnemonic:(int)mnemonic
 {
-	return mnemonic == UD_Icall;
+	return (mnemonic == X86_INS_CALL);
 }
 
 + (BOOL)isJumpMnemonic:(int)mnemonic
 {
-	return mnemonic >= UD_Ijo && mnemonic <= UD_Ijmp;
-}
-
-// Put "short" in short jump instructions to be less ambiguous
-static void disassemblerTranslator(ud_t *object)
-{
-	UD_SYN_INTEL(object);
-	if (ud_insn_len(object) == 2 && object->mnemonic >= UD_Ijo && object->mnemonic <= UD_Ijmp)
-	{
-		const char *originalText = ud_insn_asm(object);
-		if (strstr(originalText, "short") == NULL)
-		{
-			NSMutableArray *textComponents = [NSMutableArray arrayWithArray:[@(originalText) componentsSeparatedByString:@" "]];
-			[textComponents insertObject:@"short" atIndex:1];
-			const char *text = [[textComponents componentsJoinedByString:@" "] UTF8String];
-			if (strlen(text)+1 <= object->asm_buf_size)
-			{
-				strncpy(object->asm_buf, text, strlen(text)+1);
-			}
-		}
-	}
+	return (mnemonic >= X86_INS_JAE && mnemonic <= X86_INS_JS);
 }
 
 - (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize
 {
 	self = [super init];
-	if (self)
+	if (self != nil)
 	{
+		if (cs_open(CS_ARCH_X86, pointerSize == sizeof(int64_t) ? CS_MODE_64 : CS_MODE_32, &_object) != CS_ERR_OK)
+		{
+			return nil;
+		}
+		
 		self.bytes = malloc(size);
 		memcpy(self.bytes, bytes, size);
 		
 		self.startAddress = address;
-		self.object = malloc(sizeof(ud_t));
-		
+		self.size = size;
 		self.pointerSize = pointerSize;
-		
-		ud_init(self.object);
-		ud_set_input_buffer(self.object, self.bytes, size);
-		ud_set_mode(self.object, self.pointerSize * 8);
-		ud_set_syntax(self.object, disassemblerTranslator);
-		ud_set_pc(self.object, self.startAddress);
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	free(self.object); self.object = NULL;
+	cs_close(self.object);
 	free(self.bytes); self.bytes = NULL;
+}
+
+static void getTextBuffer(char *destinationBuffer, const char *mnemonicBuffer, size_t mnemonicBufferSize, const char *opStringBuffer, size_t opStringBufferSize)
+{
+	size_t mnemonicStringLength = strlen(mnemonicBuffer);
+	memcpy(destinationBuffer, mnemonicBuffer, mnemonicStringLength);
+	destinationBuffer[mnemonicStringLength] = ' ';
+	memcpy(destinationBuffer + mnemonicStringLength + 1, opStringBuffer, opStringBufferSize);
 }
 
 - (NSArray *)readInstructions
 {
 	NSMutableArray *instructions = [NSMutableArray array];
 	
-	while (ud_disassemble(_object) > 0)
+	cs_insn *disassembledInstructions = NULL;
+	size_t numberOfInstructionsDisassembled = cs_disasm_ex(self.object, self.bytes, self.size, self.startAddress, 0, &disassembledInstructions);
+	for (size_t instructionIndex = 0; instructionIndex < numberOfInstructionsDisassembled; instructionIndex++)
 	{
-		ZGMemoryAddress instructionAddress = ud_insn_off(_object);
-		ZGMemorySize instructionSize = ud_insn_len(_object);
-		ud_mnemonic_code_t mnemonic = ud_insn_mnemonic(_object);
-		NSString *disassembledText = @(ud_insn_asm(_object));
+		ZGMemoryAddress address = disassembledInstructions[instructionIndex].address;
+		ZGMemorySize size = disassembledInstructions[instructionIndex].size;
+		unsigned int mnemonicID = disassembledInstructions[instructionIndex].id;
+		
+		char textBuffer[sizeof(disassembledInstructions[instructionIndex].mnemonic) + sizeof(disassembledInstructions[instructionIndex].op_str) + 1];
+		getTextBuffer(textBuffer, disassembledInstructions[instructionIndex].mnemonic, sizeof(disassembledInstructions[instructionIndex].mnemonic), disassembledInstructions[instructionIndex].op_str, sizeof(disassembledInstructions[instructionIndex].op_str));
+		NSString *text = @(textBuffer);
 		
 		ZGVariable *variable =
 		[[ZGVariable alloc]
-		 initWithValue:_bytes + (instructionAddress - _startAddress)
-		 size:instructionSize
-		 address:instructionAddress
+		 initWithValue:_bytes + (address - _startAddress)
+		 size:size
+		 address:address
 		 type:ZGByteArray
 		 qualifier:0
 		 pointerSize:_pointerSize
 		 description:nil
 		 enabled:NO];
 		
-		ZGInstruction *newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
-		
+		ZGInstruction *newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:text mnemonic:mnemonicID];
 		[instructions addObject:newInstruction];
+	}
+	
+	if (numberOfInstructionsDisassembled > 0)
+	{
+		cs_free(disassembledInstructions, numberOfInstructionsDisassembled);
 	}
 	
 	return instructions;
@@ -139,72 +135,70 @@ static void disassemblerTranslator(ud_t *object)
 - (ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize
 {
 	ZGInstruction *newInstruction = nil;
-	while (ud_disassemble(_object) > 0)
+	
+	cs_insn *disassembledInstructions = NULL;
+	size_t numberOfInstructionsDisassembled = cs_disasm_ex(self.object, self.bytes, self.size, self.startAddress, 0, &disassembledInstructions);
+	for (size_t instructionIndex = 0; instructionIndex < numberOfInstructionsDisassembled; instructionIndex++)
 	{
-		ZGMemoryAddress instructionAddress = ud_insn_off(_object);
-		ZGMemorySize instructionSize = ud_insn_len(_object);
+		ZGMemoryAddress address = disassembledInstructions[instructionIndex].address;
+		ZGMemorySize size = disassembledInstructions[instructionIndex].size;
 		
-		if ((instructionAddress - _startAddress) + instructionSize >= maxSize)
+		if ((address - _startAddress) + size >= maxSize)
 		{
-			ud_mnemonic_code_t mnemonic = ud_insn_mnemonic(_object);
-			NSString *disassembledText = @(ud_insn_asm(_object));
+			unsigned int mnemonicID = disassembledInstructions[instructionIndex].id;
+			
+			char textBuffer[sizeof(disassembledInstructions[instructionIndex].mnemonic) + sizeof(disassembledInstructions[instructionIndex].op_str) + 1];
+			getTextBuffer(textBuffer, disassembledInstructions[instructionIndex].mnemonic, sizeof(disassembledInstructions[instructionIndex].mnemonic), disassembledInstructions[instructionIndex].op_str, sizeof(disassembledInstructions[instructionIndex].op_str));
+			NSString *text = @(textBuffer);
 			
 			ZGVariable *variable =
 			[[ZGVariable alloc]
-			 initWithValue:_bytes + (instructionAddress - _startAddress)
-			 size:instructionSize
-			 address:instructionAddress
+			 initWithValue:_bytes + (address - _startAddress)
+			 size:size
+			 address:address
 			 type:ZGByteArray
 			 qualifier:0
 			 pointerSize:_pointerSize
 			 description:nil
 			 enabled:NO];
 			
-			newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:disassembledText mnemonic:mnemonic];
+			newInstruction = [[ZGInstruction alloc] initWithVariable:variable text:text mnemonic:mnemonicID];
 			
 			break;
 		}
 	}
+	
+	if (numberOfInstructionsDisassembled > 0)
+	{
+		cs_free(disassembledInstructions, numberOfInstructionsDisassembled);
+	}
+	
 	return newInstruction;
 }
 
 - (ZGMemoryAddress)readBranchImmediateOperand
 {
 	ZGMemoryAddress immediateOperand = 0;
-	if (ud_disassemble(_object) > 0)
+	
+	cs_option(self.object, CS_OPT_DETAIL, CS_OPT_ON);
+	
+	cs_insn *disassembledInstructions = NULL;
+	size_t numberOfInstructionsDisassembled = cs_disasm_ex(self.object, self.bytes, self.size, self.startAddress, 0, &disassembledInstructions);
+	if (numberOfInstructionsDisassembled > 0)
 	{
-		const ud_operand_t *operand = NULL;
-		unsigned int operandIndex = 0;
-		while ((operand = ud_insn_opr(_object, operandIndex)) != NULL)
+		cs_insn instruction = disassembledInstructions[0];
+		cs_detail *detail = instruction.detail;
+		for (int detailIndex = 0; detailIndex < detail->x86.op_count; detailIndex++)
 		{
-			if (operand->type == UD_OP_JIMM)
-			{
-				break;
-			}
-			operandIndex++;
+			cs_x86_op operand = detail->x86.operands[detailIndex];
+			if (operand.type != X86_OP_IMM) continue;
+			
+			immediateOperand = operand.imm;
+			
+			break;
 		}
 		
-		if (operand != NULL)
-		{
-			int64_t operandOffset = 0x0;
-			switch (operand->size)
-			{
-				case sizeof(int8_t) * 8:
-					operandOffset = operand->lval.sbyte;
-					break;
-				case sizeof(int16_t) * 8:
-					operandOffset = operand->lval.sword;
-					break;
-				case sizeof(int32_t) * 8:
-					operandOffset = operand->lval.sdword;
-					break;
-				case sizeof(int64_t) * 8:
-					operandOffset = operand->lval.sqword;
-					break;
-			}
-			
-			immediateOperand = self.startAddress + ud_insn_len(_object) + operandOffset;
-		}
+		cs_free(disassembledInstructions, numberOfInstructionsDisassembled);
 	}
 	
 	return immediateOperand;

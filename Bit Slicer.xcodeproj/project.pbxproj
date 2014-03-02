@@ -28,6 +28,7 @@
 		772C0F8318B95603009FFF72 /* ZGBacktraceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 772C0F8118B95603009FFF72 /* ZGBacktraceViewController.xib */; };
 		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
 		7730999E18660A29008B71DA /* ZGDocumentOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */; };
+		7738C5E818C2A13600F67504 /* libcapstone.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7738C5DE18C2A06100F67504 /* libcapstone.a */; };
 		773972B117D2E61200B958EE /* _DDFunctionContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728517D2E61200B958EE /* _DDFunctionContainer.m */; };
 		773972B217D2E61200B958EE /* _DDFunctionExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728717D2E61200B958EE /* _DDFunctionExpression.m */; };
 		773972B317D2E61200B958EE /* _DDFunctionTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7739728917D2E61200B958EE /* _DDFunctionTerm.m */; };
@@ -58,7 +59,6 @@
 		773E8AFC1821DC5A00D1A71A /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8AF71821DBE800D1A71A /* ApplicationServices.framework */; };
 		773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
 		773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
-		773E8B061821DE9300D1A71A /* libudis86.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B051821DE9300D1A71A /* libudis86.a */; };
 		773E8B081821DEAC00D1A71A /* libpython3.3m.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B071821DEAC00D1A71A /* libpython3.3m.a */; };
 		773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
 		7743F9C618024CE400DBC19A /* python3.3 in Resources */ = {isa = PBXBuildFile; fileRef = 7743F9C518024CE400DBC19A /* python3.3 */; };
@@ -205,6 +205,14 @@
 		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; };
 		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; };
 		7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGDocumentOptionsViewController.xib; path = "Bit Slicer/ZGDocumentOptionsViewController.xib"; sourceTree = "<group>"; };
+		7738C5DE18C2A06100F67504 /* libcapstone.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcapstone.a; path = deps/capstone/libcapstone.a; sourceTree = "<group>"; };
+		7738C5E018C2A06800F67504 /* arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = arm.h; path = deps/capstone/arm.h; sourceTree = "<group>"; };
+		7738C5E118C2A06800F67504 /* arm64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = arm64.h; path = deps/capstone/arm64.h; sourceTree = "<group>"; };
+		7738C5E218C2A06800F67504 /* capstone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = capstone.h; path = deps/capstone/capstone.h; sourceTree = "<group>"; };
+		7738C5E318C2A06800F67504 /* diet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = diet.h; path = deps/capstone/diet.h; sourceTree = "<group>"; };
+		7738C5E418C2A06800F67504 /* mips.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mips.h; path = deps/capstone/mips.h; sourceTree = "<group>"; };
+		7738C5E518C2A06800F67504 /* ppc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ppc.h; path = deps/capstone/ppc.h; sourceTree = "<group>"; };
+		7738C5E618C2A06800F67504 /* x86.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = x86.h; path = deps/capstone/x86.h; sourceTree = "<group>"; };
 		7739728417D2E61200B958EE /* _DDFunctionContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionContainer.h; path = deps/DDMathParser/_DDFunctionContainer.h; sourceTree = "<group>"; };
 		7739728517D2E61200B958EE /* _DDFunctionContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDFunctionContainer.m; path = deps/DDMathParser/_DDFunctionContainer.m; sourceTree = "<group>"; };
 		7739728617D2E61200B958EE /* _DDFunctionExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionExpression.h; path = deps/DDMathParser/_DDFunctionExpression.h; sourceTree = "<group>"; };
@@ -250,13 +258,9 @@
 		773972AE17D2E61200B958EE /* DDTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDTypes.m; path = deps/DDMathParser/DDTypes.m; sourceTree = "<group>"; };
 		773972AF17D2E61200B958EE /* NSString+DDMathParsing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+DDMathParsing.h"; path = "deps/DDMathParser/NSString+DDMathParsing.h"; sourceTree = "<group>"; };
 		773972B017D2E61200B958EE /* NSString+DDMathParsing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+DDMathParsing.m"; path = "deps/DDMathParser/NSString+DDMathParsing.m"; sourceTree = "<group>"; };
-		773972DC17D2E67D00B958EE /* extern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = extern.h; path = deps/libudis86/extern.h; sourceTree = "<group>"; };
-		773972E017D2E67D00B958EE /* itab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = itab.h; path = deps/libudis86/itab.h; sourceTree = "<group>"; };
-		773972E517D2E67D00B958EE /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = deps/libudis86/types.h; sourceTree = "<group>"; };
 		773972EE17D2E6AE00B958EE /* mach_exc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mach_exc.h; path = deps/mach_exc/mach_exc.h; sourceTree = "<group>"; };
 		773972EF17D2E6AE00B958EE /* mach_excServer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excServer.c; path = deps/mach_exc/mach_excServer.c; sourceTree = "<group>"; };
 		773972F017D2E6AE00B958EE /* mach_excUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excUser.c; path = deps/mach_exc/mach_excUser.c; sourceTree = "<group>"; };
-		773972F317D2E70400B958EE /* udis86.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = udis86.h; path = deps/udis86.h; sourceTree = "<group>"; };
 		773972F417D2E7B600B958EE /* DataInspectorRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DataInspectorRepresenter.h; path = deps/DataInspectorRepresenter.h; sourceTree = "<group>"; };
 		773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DataInspectorRepresenter.m; path = deps/DataInspectorRepresenter.m; sourceTree = "<group>"; };
 		773972F717D2E80F00B958EE /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = deps/ShortcutRecorder.framework; sourceTree = "<group>"; };
@@ -265,7 +269,6 @@
 		773E8AF91821DBF300D1A71A /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreSymbolication.framework; path = ../../../../../System/Library/PrivateFrameworks/CoreSymbolication.framework; sourceTree = "<group>"; };
 		773E8B031821DE5300D1A71A /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend.framework; sourceTree = "<group>"; };
-		773E8B051821DE9300D1A71A /* libudis86.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libudis86.a; path = deps/libudis86.a; sourceTree = "<group>"; };
 		773E8B071821DEAC00D1A71A /* libpython3.3m.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpython3.3m.a; path = deps/python/lib/libpython3.3m.a; sourceTree = "<group>"; };
 		773E8B091821E01200D1A71A /* CoreSymbolication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreSymbolication.h; path = deps/CoreSymbolication/CoreSymbolication.h; sourceTree = "<group>"; };
 		7743F9C518024CE400DBC19A /* python3.3 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = python3.3; path = deps/python/lib/python3.3; sourceTree = "<group>"; };
@@ -521,8 +524,8 @@
 				773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */,
 				773E8B081821DEAC00D1A71A /* libpython3.3m.a in Frameworks */,
 				773972FA17D2E80F00B958EE /* Sparkle.framework in Frameworks */,
-				773E8B061821DE9300D1A71A /* libudis86.a in Frameworks */,
 				773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */,
+				7738C5E818C2A13600F67504 /* libcapstone.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -685,7 +688,7 @@
 			children = (
 				773E8B0B1821E01700D1A71A /* CoreSymbolication */,
 				7701EF411696A29100877373 /* mach_exc */,
-				77329B74168D0E16007DCAE2 /* libudis86 */,
+				7738C5DD18C2A05500F67504 /* capstone */,
 				77F1163E17D2EF9E009E002A /* ZGDebuggerController.h */,
 				77F1163F17D2EF9E009E002A /* ZGDebuggerController.m */,
 				77F115C017D2EBEC009E002A /* ZGDebuggerController.xib */,
@@ -724,16 +727,19 @@
 			name = Debugger;
 			sourceTree = "<group>";
 		};
-		77329B74168D0E16007DCAE2 /* libudis86 */ = {
+		7738C5DD18C2A05500F67504 /* capstone */ = {
 			isa = PBXGroup;
 			children = (
-				773E8B051821DE9300D1A71A /* libudis86.a */,
-				773972F317D2E70400B958EE /* udis86.h */,
-				773972DC17D2E67D00B958EE /* extern.h */,
-				773972E017D2E67D00B958EE /* itab.h */,
-				773972E517D2E67D00B958EE /* types.h */,
+				7738C5E018C2A06800F67504 /* arm.h */,
+				7738C5E118C2A06800F67504 /* arm64.h */,
+				7738C5E218C2A06800F67504 /* capstone.h */,
+				7738C5E318C2A06800F67504 /* diet.h */,
+				7738C5E418C2A06800F67504 /* mips.h */,
+				7738C5E518C2A06800F67504 /* ppc.h */,
+				7738C5E618C2A06800F67504 /* x86.h */,
+				7738C5DE18C2A06100F67504 /* libcapstone.a */,
 			);
-			name = libudis86;
+			name = capstone;
 			sourceTree = "<group>";
 		};
 		7739728017D26A1600B958EE /* Scripting */ = {
@@ -1392,6 +1398,7 @@
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
 					"$(SRCROOT)/deps/python/lib",
+					"$(SRCROOT)/deps/capstone/",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "-D_DEBUG";
@@ -1418,6 +1425,7 @@
 					"-Wno-unused-macros",
 					"-Wno-used-but-marked-unused",
 					"-Wno-semicolon-before-method-body",
+					"-Wno-c11-extensions",
 				);
 			};
 			name = Debug;
@@ -1448,6 +1456,7 @@
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
 					"$(SRCROOT)/deps/python/lib",
+					"$(SRCROOT)/deps/capstone/",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "Bit Slicer";
@@ -1472,6 +1481,7 @@
 					"-Wno-unused-macros",
 					"-Wno-used-but-marked-unused",
 					"-Wno-semicolon-before-method-body",
+					"-Wno-c11-extensions",
 				);
 			};
 			name = Release;
