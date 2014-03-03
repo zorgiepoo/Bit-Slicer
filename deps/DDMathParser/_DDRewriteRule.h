@@ -10,11 +10,7 @@
 
 @class DDExpression;
 
-@interface _DDRewriteRule : NSObject {
-    DDExpression *predicate;
-    DDExpression *pattern;
-    DDExpression *condition;
-}
+@interface _DDRewriteRule : NSObject
 
 + (_DDRewriteRule *)rewriteRuleWithTemplate:(NSString *)string replacementPattern:(NSString *)replacement condition:(NSString *)condition;
 

@@ -16,23 +16,22 @@
 #import "DDExpression.h"
 
 @implementation _DDFunctionTerm
-@synthesize functionName;
 
 - (id)_initWithFunction:(NSString *)function subterms:(NSArray *)terms error:(NSError * __autoreleasing *)error {
     self = [super _initWithSubterms:terms error:error];
     if (self) {
-        functionName = [function copy];
+        _functionName = [function copy];
     }
     return self;
 }
 
 - (id)_initWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
-    DDMathStringToken *t = [tokenizer nextToken];
+    DDMathStringToken *t = [tokenizer nextObject];
     
     self = [super _initWithTokenizer:tokenizer error:error];
     if (self) {
-        functionName = [[t token] copy];
+        _functionName = [[t token] copy];
         
         // process the subterms to group them up by commas
         NSMutableArray *newSubterms = [NSMutableArray array];
@@ -46,7 +45,6 @@
                     if (parameterGroup) {
                         [newSubterms addObject:parameterGroup];
                     }
-                    DD_RELEASE(parameterGroup);
                 } else {
                     // there's only one term in this parameter; no need to group it in parentheses
                     [newSubterms addObject:[parameterGroupTerms objectAtIndex:0]];
@@ -67,7 +65,6 @@
             NSArray *lastParameters = [[self subterms] subarrayWithRange:rangeOfLastParameter];
             _DDGroupTerm *parameterGroup = [[_DDGroupTerm alloc] _initWithSubterms:lastParameters error:error];
             [newSubterms addObject:parameterGroup];
-            DD_RELEASE(parameterGroup);
         } else if (rangeOfLastParameter.length == 1) {
             [newSubterms addObject:[[self subterms] objectAtIndex:rangeOfLastParameter.location]];
         }
@@ -79,19 +76,12 @@
     return self;
 }
 
-#if !DD_HAS_ARC
-- (void)dealloc {
-    [functionName release];
-    [super dealloc];
-}
-#endif
-
 - (DDParserTermType)type { return DDParserTermTypeFunction; }
 
 - (NSString *)description {
     NSArray *parameterDescriptions = [[self subterms] valueForKey:@"description"];
     NSString *parameters = [parameterDescriptions componentsJoinedByString:@","];
-    return [NSString stringWithFormat:@"%@(%@)", functionName, parameters];
+    return [NSString stringWithFormat:@"%@(%@)", _functionName, parameters];
 }
 
 - (BOOL)resolveWithParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
@@ -118,7 +108,7 @@
         [parameters addObject:parameter];
     }
     
-    return [DDExpression functionExpressionWithFunction:functionName arguments:parameters error:error];
+    return [DDExpression functionExpressionWithFunction:_functionName arguments:parameters error:error];
 }
 
 @end

@@ -8,29 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-@class DDMathStringToken;
+@class DDMathStringToken, DDMathOperatorSet;
 
-@interface DDMathStringTokenizer : NSObject {
-    unichar *_characters;
-    NSUInteger _length;
-    NSUInteger _characterIndex;
-    
-    NSArray *_tokens;
-    NSUInteger _tokenIndex;
-    
-}
+@interface DDMathStringTokenizer : NSEnumerator
 
-+ (NSCharacterSet *)legalCharacters;
+@property (readonly) DDMathOperatorSet *operatorSet;
 
-+ (id)tokenizerWithString:(NSString *)expressionString error:(NSError **)error;
-- (id)initWithString:(NSString *)expressionString error:(NSError **)error;
+- (instancetype)initWithString:(NSString *)expressionString operatorSet:(DDMathOperatorSet *)operatorSet error:(NSError **)error;
 
-- (NSArray *)tokens;
-
-- (DDMathStringToken *)nextToken;
-- (DDMathStringToken *)currentToken;
-- (DDMathStringToken *)peekNextToken;
-- (DDMathStringToken *)previousToken;
+- (DDMathStringToken *)peekNextObject;
 
 - (void)reset;
 
@@ -39,5 +25,12 @@
 
 // methods that can be used by subclasses
 - (void)appendToken:(DDMathStringToken *)token;
+
+@end
+
+@interface DDMathStringTokenizer (Deprecated)
+
++ (id)tokenizerWithString:(NSString *)expressionString error:(NSError **)error __attribute__((deprecated("Use -initWithString:operatorSet:error: instead")));
+- (id)initWithString:(NSString *)expressionString error:(NSError **)error __attribute__((deprecated("Use -initWithString:operatorSet:error: instead")));
 
 @end

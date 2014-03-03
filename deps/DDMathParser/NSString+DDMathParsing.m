@@ -8,14 +8,15 @@
 
 #import "NSString+DDMathParsing.h"
 #import "DDExpression.h"
+#import "DDMathEvaluator.h"
 
 @implementation NSString (DDMathParsing)
 
-- (NSNumber *) ddNumberByEvaluatingString {
+- (NSNumber *)ddNumberByEvaluatingString {
 	return [self ddNumberByEvaluatingStringWithSubstitutions:nil];
 }
 
-- (NSNumber *) ddNumberByEvaluatingStringWithSubstitutions:(NSDictionary *)substitutions {
+- (NSNumber *)ddNumberByEvaluatingStringWithSubstitutions:(NSDictionary *)substitutions {
 	NSError *error = nil;
 	NSNumber *returnValue = [self ddNumberByEvaluatingStringWithSubstitutions:substitutions error:&error];
 	if (returnValue == nil) {
@@ -25,8 +26,7 @@
 }
 
 - (NSNumber *)ddNumberByEvaluatingStringWithSubstitutions:(NSDictionary *)substitutions error:(NSError * __autoreleasing *)error {
-	DDExpression * e = [DDExpression expressionFromString:self error:error];
-	return [e evaluateWithSubstitutions:substitutions evaluator:nil error:error];
+    return [[DDMathEvaluator defaultMathEvaluator] evaluateString:self withSubstitutions:substitutions error:error];
 }
 
 @end

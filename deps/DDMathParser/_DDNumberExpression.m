@@ -10,12 +10,14 @@
 #import "_DDNumberExpression.h"
 
 
-@implementation _DDNumberExpression
+@implementation _DDNumberExpression {
+	NSNumber *_number;
+}
 
-- (id) initWithNumber:(NSNumber *)n {
+- (id)initWithNumber:(NSNumber *)n {
 	self = [super init];
 	if (self) {
-		number = DD_RETAIN(n);
+		_number = n;
 	}
 	return self;
 }
@@ -28,33 +30,20 @@
     [aCoder encodeObject:[self number] forKey:@"number"];
 }
 
-#if !DD_HAS_ARC
-- (void) dealloc {
-	[number release];
-	[super dealloc];
+- (id)copyWithZone:(NSZone *)zone {
+    return [[[self class] alloc] initWithNumber:[self number]];
 }
-#endif
 
-- (DDExpressionType) expressionType { return DDExpressionTypeNumber; }
+- (DDExpressionType)expressionType { return DDExpressionTypeNumber; }
 
 - (DDExpression *)simplifiedExpressionWithEvaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
 #pragma unused(evaluator, error)
 	return self;
 }
 
-- (NSNumber *) evaluateWithSubstitutions:(NSDictionary *)substitutions evaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
-#pragma unused(substitutions, evaluator, error)
-	return [self number];
-}
+- (NSNumber *)number { return _number; }
 
-- (NSNumber *) number { return number; }
-
-- (NSExpression *) expressionValueForEvaluator:(DDMathEvaluator *)evaluator {
-#pragma unused(evaluator)
-	return [NSExpression expressionForConstantValue:[self number]];
-}
-
-- (NSString *) description {
+- (NSString *)description {
 	return [[self number] description];
 }
 

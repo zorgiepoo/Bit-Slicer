@@ -21,19 +21,15 @@
 
 @interface _DDParserTerm ()
 
-- (id)_initWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError **)error;
+- (id)_initWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError * __autoreleasing *)error;
 
 @end
 
 @implementation _DDParserTerm
 
-@synthesize resolved;
-@synthesize type;
-@synthesize token;
-
 + (id)rootTermWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError * __autoreleasing *)error {
     NSMutableArray *terms = [NSMutableArray array];
-    while ([tokenizer peekNextToken] != nil) {
+    while ([tokenizer peekNextObject] != nil) {
         _DDParserTerm *nextTerm = [_DDParserTerm termWithTokenizer:tokenizer error:error];
         if (!nextTerm) {
             return nil;
@@ -42,12 +38,12 @@
         [terms addObject:nextTerm];
     }
     
-    return DD_AUTORELEASE([[_DDGroupTerm alloc] _initWithSubterms:terms error:error]);
+    return [[_DDGroupTerm alloc] _initWithSubterms:terms error:error];
 }
 
 + (id)termWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
-    DDMathStringToken *next = [tokenizer peekNextToken];
+    DDMathStringToken *next = [tokenizer peekNextObject];
     if (next) {
         _DDParserTerm *term = nil;
         if ([next tokenType] == DDTokenTypeNumber) {
@@ -64,7 +60,7 @@
             term = [[_DDFunctionTerm alloc] _initWithTokenizer:tokenizer error:error];
         }
         
-        return DD_AUTORELEASE(term);
+        return term;
     } else {
         *error = ERR(DDErrorCodeInvalidFormat, @"can't create a term with a nil token");
     }
@@ -75,22 +71,15 @@
 #pragma unused(error)
     self = [super init];
     if (self) {
-        resolved = NO;
-        token = DD_RETAIN(t);
+        _resolved = NO;
+        _token = t;
     }
     return self;
 }
 
 - (id)_initWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError * __autoreleasing *)error {
-    return [self _initWithToken:[tokenizer nextToken] error:error];
+    return [self _initWithToken:[tokenizer nextObject] error:error];
 }
-
-#if !DD_HAS_ARC
-- (void)dealloc {
-    [token release];
-    [super dealloc];
-}
-#endif
 
 - (BOOL)resolveWithParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
 #pragma unused(parser,error)

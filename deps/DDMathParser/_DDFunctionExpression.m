@@ -20,9 +20,12 @@
 
 @end
 
-@implementation _DDFunctionExpression
+@implementation _DDFunctionExpression {
+	NSString *_function;
+	NSArray *_arguments;
+}
 
-- (id) initWithFunction:(NSString *)f arguments:(NSArray *)a error:(NSError * __autoreleasing *)error {
+- (id)initWithFunction:(NSString *)f arguments:(NSArray *)a error:(NSError * __autoreleasing *)error {
 	self = [super init];
 	if (self) {
 		for (id arg in a) {
@@ -30,14 +33,13 @@
 				if (error != nil) {
                     *error = ERR(DDErrorCodeInvalidArgument, @"function arguments must be DDExpression objects");
 				}
-                DD_RELEASE(self);
 				return nil;
 			}
 		}
 		
-		function = [f copy];
-		arguments = [a copy];
-        for (DDExpression *argument in arguments) {
+		_function = [f copy];
+		_arguments = [a copy];
+        for (DDExpression *argument in _arguments) {
             [argument _setParentExpression:self];
         }
 	}
@@ -55,20 +57,21 @@
     [aCoder encodeObject:[self arguments] forKey:@"arguments"];
 }
 
-#if !DD_HAS_ARC
-- (void) dealloc {
-	[function release];
-	[arguments release];
-	[super dealloc];
+- (id)copyWithZone:(NSZone *)zone {
+    NSMutableArray *newArguments = [NSMutableArray array];
+    for (id<NSCopying> arg in [self arguments]) {
+        [newArguments addObject:[arg copyWithZone:zone]];
+    }
+    
+    return [[[self class] alloc] initWithFunction:[self function] arguments:newArguments error:nil];
 }
-#endif
 
-- (DDExpressionType) expressionType { return DDExpressionTypeFunction; }
+- (DDExpressionType)expressionType { return DDExpressionTypeFunction; }
 
-- (NSString *) function { return function; }
-- (NSArray *) arguments { return arguments; }
+- (NSString *)function { return _function; }
+- (NSArray *)arguments { return _arguments; }
 
-- (DDExpression *) simplifiedExpressionWithEvaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
+- (DDExpression *)simplifiedExpressionWithEvaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
 	BOOL canSimplify = YES;
     
     NSMutableArray *newSubexpressions = [NSMutableArray array];
@@ -80,9 +83,9 @@
 	}
 	
 	if (canSimplify) {
-		if (evaluator == nil) { evaluator = [DDMathEvaluator sharedMathEvaluator]; }
+		if (evaluator == nil) { evaluator = [DDMathEvaluator defaultMathEvaluator]; }
 		
-        id result = [self evaluateWithSubstitutions:nil evaluator:evaluator error:error];
+        id result = [evaluator evaluateExpression:self withSubstitutions:nil error:error];
 		
 		if ([result isKindOfClass:[_DDNumberExpression class]]) {
 			return result;
@@ -91,41 +94,10 @@
 		}		
 	}
 	
-	return [_DDFunctionExpression functionExpressionWithFunction:[self function] arguments:newSubexpressions error:error];
+	return [DDExpression functionExpressionWithFunction:[self function] arguments:newSubexpressions error:error];
 }
 
-- (NSNumber *) evaluateWithSubstitutions:(NSDictionary *)substitutions evaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
-	if (evaluator == nil) { evaluator = [DDMathEvaluator sharedMathEvaluator]; }
-	
-	DDMathFunction mathFunction = [evaluator functionWithName:[self function]];
-	
-	if (mathFunction != nil) {
-		
-		id result = mathFunction([self arguments], substitutions, evaluator, error);
-		if (!result) { return nil; }
-		
-		NSNumber * numberValue = nil;
-        if ([result isKindOfClass:[DDExpression class]]) {
-            numberValue = [result evaluateWithSubstitutions:substitutions evaluator:evaluator error:error];
-		} else if ([result isKindOfClass:[NSNumber class]]) {
-			numberValue = result;
-        } else if ([result isKindOfClass:[NSString class]]) {
-            numberValue = [evaluator evaluateString:result withSubstitutions:substitutions error:error];
-		} else {
-			if (error != nil) {
-                *error = ERR(DDErrorCodeInvalidFunctionReturnType, @"invalid return type from %@ function", [self function]);
-			}
-			return nil;
-		}
-		return numberValue;
-	} else {
-		[evaluator functionExpressionFailedToResolve:self error:error];
-		return nil;
-	}
-	
-}
-
-- (NSString *) description {
+- (NSString *)description {
 	return [NSString stringWithFormat:@"%@(%@)", [self function], [[[self arguments] valueForKey:@"description"] componentsJoinedByString:@","]];
 }
 

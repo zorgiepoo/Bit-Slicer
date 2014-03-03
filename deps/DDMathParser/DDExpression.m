@@ -19,66 +19,77 @@
 
 @implementation DDExpression
 
-@synthesize parentExpression=_parentExpression;
-
-+ (id) expressionFromString:(NSString *)expressionString error:(NSError * __autoreleasing *)error {
++ (id)expressionFromString:(NSString *)expressionString error:(NSError * __autoreleasing *)error {
     DDParser *parser = [DDParser parserWithString:expressionString error:error];
     return [parser parsedExpressionWithError:error];
 }
 
-+ (id) numberExpressionWithNumber:(NSNumber *)number {
-	return DD_AUTORELEASE([[_DDNumberExpression alloc] initWithNumber:number]);
++ (id)numberExpressionWithNumber:(NSNumber *)number {
+	return [[_DDNumberExpression alloc] initWithNumber:number];
 }
 
-+ (id) functionExpressionWithFunction:(NSString *)function arguments:(NSArray *)arguments error:(NSError * __autoreleasing *)error {
-	return DD_AUTORELEASE([[_DDFunctionExpression alloc] initWithFunction:function arguments:arguments error:error]);
++ (id)functionExpressionWithFunction:(NSString *)function arguments:(NSArray *)arguments error:(NSError * __autoreleasing *)error {
+	return [[_DDFunctionExpression alloc] initWithFunction:function arguments:arguments error:error];
 }
 
-+ (id) variableExpressionWithVariable:(NSString *)variable {
-	return DD_AUTORELEASE([[_DDVariableExpression alloc] initWithVariable:variable]);
++ (id)variableExpressionWithVariable:(NSString *)variable {
+	return [[_DDVariableExpression alloc] initWithVariable:variable];
 }
 
 #pragma mark -
 #pragma mark Abstract method implementations
 
-- (DDExpressionType) expressionType {
-	[NSException raise:NSInvalidArgumentException format:@"this method should be overridden: %@", NSStringFromSelector(_cmd)];
-	return 0;
+- (id)copyWithZone:(NSZone *)zone {
+	[NSException raise:NSInternalInconsistencyException format:@"this method should be overridden: %@", NSStringFromSelector(_cmd)];
+    return nil;
 }
-- (NSNumber *) evaluateWithSubstitutions:(NSDictionary *)substitutions evaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error { 
-#pragma unused(substitutions, evaluator, error)
-	[NSException raise:NSInvalidArgumentException format:@"this method should be overridden: %@", NSStringFromSelector(_cmd)]; 
-	return nil; 
+
+- (DDExpressionType)expressionType {
+	[NSException raise:NSInternalInconsistencyException format:@"this method should be overridden: %@", NSStringFromSelector(_cmd)];
+	return DDExpressionTypeNumber;
 }
-- (DDExpression *) simplifiedExpression {
+- (NSNumber *)evaluateWithSubstitutions:(NSDictionary *)substitutions evaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
+	return [evaluator evaluateExpression:self withSubstitutions:substitutions error:error];
+}
+- (DDExpression *)simplifiedExpression {
 	NSError *error = nil;
-	DDExpression *simplified = [self simplifiedExpressionWithEvaluator:[DDMathEvaluator sharedMathEvaluator] error:&error];
+	DDExpression *simplified = [self simplifiedExpressionWithEvaluator:[DDMathEvaluator defaultMathEvaluator] error:&error];
 	if (error != nil) {
 		NSLog(@"error: %@", error);
 		return nil;
 	}
 	return simplified;
 }
-- (DDExpression *) simplifiedExpressionWithEvaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
+- (DDExpression *)simplifiedExpressionWithEvaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
 #pragma unused(evaluator, error)
 	[NSException raise:NSInvalidArgumentException format:@"this method should be overridden: %@", NSStringFromSelector(_cmd)]; 
 	return nil; 
 }
-- (NSNumber *) number { 
-	[NSException raise:NSInvalidArgumentException format:@"This is not a numeric expression"]; 
+- (NSNumber *)number { 
+	[NSException raise:NSInternalInconsistencyException format:@"This is not a numeric expression"]; 
 	return nil; 
 }
-- (NSString *) function { 
+- (NSString *)function { 
 	[NSException raise:NSInvalidArgumentException format:@"This is not a function expression"]; 
 	return nil; 
 }
-- (NSArray *) arguments { 
+- (NSArray *)arguments { 
 	[NSException raise:NSInvalidArgumentException format:@"This is not a function expression"]; 
 	return nil; 
 }
-- (NSString *) variable { 
+- (NSString *)variable { 
 	[NSException raise:NSInvalidArgumentException format:@"This is not a variable expression"]; 
 	return nil; 
+}
+- (NSUInteger)hash {
+    if ([self expressionType] == DDExpressionTypeNumber) {
+        return [[self number] hash];
+    } else if ([self expressionType] == DDExpressionTypeVariable) {
+        return [[self variable] hash];
+    } else if ([self expressionType] == DDExpressionTypeFunction) {
+        return [[self function] hash];
+    }
+    return [super hash];
 }
 - (BOOL)isEqual:(id)object {
 	if ([object isKindOfClass:[DDExpression class]] == NO) { return NO; }

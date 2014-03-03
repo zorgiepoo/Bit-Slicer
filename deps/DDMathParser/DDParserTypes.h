@@ -8,17 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
-typedef enum {
+typedef NS_ENUM(NSInteger, DDOperatorAssociativity) {
 	DDOperatorAssociativityLeft = 0,
 	DDOperatorAssociativityRight = 1
-} DDOperatorAssociativity;
+};
 
-typedef enum {
+typedef NS_ENUM(NSInteger, DDOperatorArity) {
     DDOperatorArityUnknown = 0,
     
     DDOperatorArityUnary,
     DDOperatorArityBinary
-} DDOperatorArity;
+};
 
 extern NSString *const DDOperatorInvalid;
 extern NSString *const DDOperatorLogicalOr;

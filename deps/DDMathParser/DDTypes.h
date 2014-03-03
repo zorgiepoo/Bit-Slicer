@@ -19,8 +19,9 @@ extern NSString * const DDMathParserErrorDomain;
 
 extern NSString * const DDUnknownFunctionKey;
 extern NSString * const DDUnknownVariableKey;
-      
-typedef enum {
+
+
+typedef NS_ENUM(NSInteger, DDErrorCode) {
     // ERROR CODE                                   // LOCALIZED DESCRIPTION EXAMPLE
     
     // a generic error
@@ -49,9 +50,9 @@ typedef enum {
     DDErrorCodeInvalidNumberOfArguments,            //@"random() may only have up to 2 arguments"
     DDErrorCodeInvalidArgument,                     //@"upper bound (%ld) of random() must be larger than lower bound (%ld)"
 
-} DDErrorCode;
+};
 
-typedef enum {
+typedef NS_ENUM(NSInteger, DDAngleMeasurementMode) {
     DDAngleMeasurementModeRadians,
     DDAngleMeasurementModeDegrees
-} DDAngleMeasurementMode;
+};

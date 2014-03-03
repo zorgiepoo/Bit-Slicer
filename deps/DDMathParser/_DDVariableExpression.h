@@ -9,11 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "DDExpression.h"
 
-@interface _DDVariableExpression : DDExpression {
-	
-	NSString * variable;
-}
+@interface _DDVariableExpression : DDExpression
 
-- (id) initWithVariable:(NSString *)v;
+- (id)initWithVariable:(NSString *)v;
 
 @end

@@ -12,19 +12,20 @@
 #import "DDMathEvaluator+Private.h"
 #import "DDMathParserMacros.h"
 
-@implementation _DDVariableExpression
+@implementation _DDVariableExpression {
+	NSString *_variable;
+}
 
-- (id) initWithVariable:(NSString *)v {
+- (id)initWithVariable:(NSString *)v {
 	self = [super init];
 	if (self) {
         if ([v hasPrefix:@"$"]) {
             v = [v substringFromIndex:1];
         }
         if ([v length] == 0) {
-            DD_RELEASE(self);
             return nil;
         }
-		variable = [v copy];
+		_variable = [v copy];
 	}
 	return self;
 }
@@ -37,57 +38,20 @@
     [aCoder encodeObject:[self variable] forKey:@"variable"];
 }
 
-#if !DD_HAS_ARC
-- (void) dealloc {
-	[variable release];
-	[super dealloc];
+- (id)copyWithZone:(NSZone *)zone {
+    return [[[self class] alloc] initWithVariable:[self variable]];
 }
-#endif
 
-- (DDExpressionType) expressionType { return DDExpressionTypeVariable; }
+- (DDExpressionType)expressionType { return DDExpressionTypeVariable; }
 
-- (NSString *) variable { return variable; }
+- (NSString *)variable { return _variable; }
 
 - (DDExpression *)simplifiedExpressionWithEvaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
 #pragma unused(evaluator, error)
 	return self;
 }
 
-- (NSNumber *) evaluateWithSubstitutions:(NSDictionary *)substitutions evaluator:(DDMathEvaluator *)evaluator error:(NSError * __autoreleasing *)error {
-	if (evaluator == nil) { evaluator = [DDMathEvaluator sharedMathEvaluator]; }
-	
-	id variableValue = [substitutions objectForKey:[self variable]];
-    
-    if (variableValue == nil) {
-        variableValue = [evaluator variableWithName:[self variable]];
-    }
-    
-	if ([variableValue isKindOfClass:[DDExpression class]]) {
-		return [variableValue evaluateWithSubstitutions:substitutions evaluator:evaluator error:error];
-	}
-    if ([variableValue isKindOfClass:[NSString class]]) {
-        return [evaluator evaluateString:variableValue withSubstitutions:substitutions error:error];
-    }
-	if ([variableValue isKindOfClass:[NSNumber class]]) {
-		return variableValue;
-	}
-	if (error != nil) {
-        *error = [NSError errorWithDomain:DDMathParserErrorDomain 
-                                     code:DDErrorCodeUnresolvedVariable 
-                                 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
-                                           [NSString stringWithFormat:@"unable to resolve variable: %@", self], NSLocalizedDescriptionKey,
-                                           [self variable], DDUnknownVariableKey,
-                                           nil]];
-	}
-	return nil;
-}
-
-- (NSExpression *) expressionValueForEvaluator:(DDMathEvaluator *)evaluator {
-#pragma unused(evaluator)
-	return [NSExpression expressionForVariable:[self variable]];
-}
-
-- (NSString *) description {
+- (NSString *)description {
 	return [NSString stringWithFormat:@"$%@", [self variable]];
 }
 

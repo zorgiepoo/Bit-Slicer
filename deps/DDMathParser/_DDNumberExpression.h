@@ -9,10 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "DDExpression.h"
 
-@interface _DDNumberExpression : DDExpression {
-	NSNumber * number;
-}
+@interface _DDNumberExpression : DDExpression
 
-- (id) initWithNumber:(NSNumber *)n;
+- (id)initWithNumber:(NSNumber *)n;
 
 @end

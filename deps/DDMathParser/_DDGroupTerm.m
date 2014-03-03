@@ -26,11 +26,9 @@
 @end
 
 @implementation _DDGroupTerm
-@synthesize subterms;
 
 - (void)_setSubterms:(NSArray *)newTerms {
-    DD_RELEASE(subterms);
-    subterms = [newTerms mutableCopy];
+    _subterms = [newTerms mutableCopy];
 }
 
 - (id)_initWithSubterms:(NSArray *)terms error:(NSError * __autoreleasing *)error {
@@ -47,23 +45,21 @@
     self = [super _initWithTokenizer:tokenizer error:error];
     if (self) {
         NSMutableArray *terms = [NSMutableArray array];
-        DDMathStringToken *nextToken = [tokenizer peekNextToken];
+        DDMathStringToken *nextToken = [tokenizer peekNextObject];
         while (nextToken && [nextToken operatorType] != DDOperatorParenthesisClose) {
             _DDParserTerm *nextTerm = [_DDParserTerm termWithTokenizer:tokenizer error:error];
             if (nextTerm) {
                 [terms addObject:nextTerm];
             } else {
                 // extracting a term failed.  *error should've been filled already
-                DD_RELEASE(self);
                 return nil;
             }
-            nextToken = [tokenizer peekNextToken];
+            nextToken = [tokenizer peekNextObject];
         }
         
         // consume the closing parenthesis and verify it exists
-        if ([tokenizer nextToken] == nil) {
+        if ([tokenizer nextObject] == nil) {
             *error = ERR(DDErrorCodeImbalancedParentheses, @"imbalanced parentheses");
-            DD_RELEASE(self);
             return nil;
         }
         
@@ -71,13 +67,6 @@
     }
     return self;
 }
-
-#if !DD_HAS_ARC
-- (void)dealloc {
-    [subterms release];
-    [super dealloc];
-}
-#endif
 
 - (DDParserTermType)type { return DDParserTermTypeGroup; }
 
@@ -102,7 +91,7 @@
                 // use a different index if the operator is right associative
                 _DDOperatorTerm *operatorTerm = [[self subterms] objectAtIndex:index];
                 
-                if ([parser associativityForOperator:[operatorTerm operatorType]] == DDOperatorAssociativityRight) {
+                if ([parser associativityForOperatorFunction:[operatorTerm operatorType]] == DDOperatorAssociativityRight) {
                     index = [operatorIndices lastIndex];
                 }
             }
@@ -152,29 +141,29 @@
 
 - (BOOL)_reduceTermsAroundOperatorAtIndex:(NSUInteger)index withParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
-    _DDOperatorTerm *operator = [[self subterms] objectAtIndex:index];
+    _DDOperatorTerm *operatorTerm = [[self subterms] objectAtIndex:index];
     
-    if ([operator operatorArity] == DDOperatorArityBinary) {
+    if ([operatorTerm operatorArity] == DDOperatorArityBinary) {
         return [self _reduceBinaryOperatorAtIndex:index withParser:parser error:error];
-    } else if ([operator operatorArity] == DDOperatorArityUnary) {
+    } else if ([operatorTerm operatorArity] == DDOperatorArityUnary) {
         return [self _reduceUnaryOperatorAtIndex:index withParser:parser error:error];
     }
     
-    *error = ERR(DDErrorCodeInvalidOperatorArity, @"unknown arity for operator: %@", operator);
+    *error = ERR(DDErrorCodeInvalidOperatorArity, @"unknown arity for operator: %@", operatorTerm);
     return NO;
 }
 
 - (BOOL)_reduceBinaryOperatorAtIndex:(NSUInteger)index withParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
 #pragma unused(parser)
-    _DDOperatorTerm *operator = [[self subterms] objectAtIndex:index];
+    _DDOperatorTerm *operatorTerm = [[self subterms] objectAtIndex:index];
     
     if (index == 0) {
-        *error = ERR(DDErrorCodeBinaryOperatorMissingLeftOperand, @"no left operand to binary %@", operator);
+        *error = ERR(DDErrorCodeBinaryOperatorMissingLeftOperand, @"no left operand to binary %@", operatorTerm);
         return NO;
     }
     if (index == [[self subterms] count] - 1) {
-        *error = ERR(DDErrorCodeBinaryOperatorMissingRightOperand, @"no right operand to binary %@", operator);
+        *error = ERR(DDErrorCodeBinaryOperatorMissingRightOperand, @"no right operand to binary %@", operatorTerm);
         return NO;
     }
     
@@ -197,25 +186,23 @@
     if (rightOperandRange.length > 1) {
         NSArray *rightOperands = [[self subterms] subarrayWithRange:rightOperandRange];
         _DDGroupTerm *group = [[_DDGroupTerm alloc] _initWithSubterms:rightOperands error:error];
-        [[self subterms] replaceObjectsInRange:rightOperandRange withObjectsFromArray:[NSArray arrayWithObject:group]];
-        DD_RELEASE(group);
+        [[self subterms] replaceObjectsInRange:rightOperandRange withObjectsFromArray:@[group]];
         
         rightmostOperand = [[self subterms] objectAtIndex:NSMaxRange(replacementRange)-1];
     }
     
-    NSArray *parameters = [NSArray arrayWithObjects:leftOperand, rightmostOperand, nil];
-    _DDFunctionTerm *function = [[_DDFunctionTerm alloc] _initWithFunction:[operator operatorFunction] subterms:parameters error:error];
+    NSArray *parameters = @[leftOperand, rightmostOperand];
+    _DDFunctionTerm *function = [[_DDFunctionTerm alloc] _initWithFunction:[operatorTerm operatorFunction] subterms:parameters error:error];
     
-    [[self subterms] replaceObjectsInRange:replacementRange withObjectsFromArray:[NSArray arrayWithObject:function]];
-    DD_RELEASE(function);
+    [[self subterms] replaceObjectsInRange:replacementRange withObjectsFromArray:@[function]];
     
     return YES;
 }
 
 - (BOOL)_reduceUnaryOperatorAtIndex:(NSUInteger)index withParser:(DDParser *)parser error:(NSError * __autoreleasing *)error {
     ERR_ASSERT(error);
-    _DDOperatorTerm *operator = [[self subterms] objectAtIndex:index];
-    DDOperatorAssociativity associativity = [parser associativityForOperator:[operator operatorType]];
+    _DDOperatorTerm *operatorTerm = [[self subterms] objectAtIndex:index];
+    DDOperatorAssociativity associativity = [parser associativityForOperatorFunction:[operatorTerm operatorType]];
     
     NSRange replacementRange;
     _DDParserTerm *parameter = nil;
@@ -223,7 +210,7 @@
     if (associativity == DDOperatorAssociativityRight) {
         // right associative unary operator (negate, not)
         if (index == [[self subterms] count] - 1) {
-            *error = ERR(DDErrorCodeUnaryOperatorMissingRightOperand, @"no right operand to unary %@", operator);
+            *error = ERR(DDErrorCodeUnaryOperatorMissingRightOperand, @"no right operand to unary %@", operatorTerm);
             return NO;
         }
         
@@ -233,7 +220,7 @@
     } else {
         // left associative unary operator (factorial)
         if (index == 0) {
-            *error = ERR(DDErrorCodeUnaryOperatorMissingLeftOperand, @"no left operand to unary %@", operator);
+            *error = ERR(DDErrorCodeUnaryOperatorMissingLeftOperand, @"no left operand to unary %@", operatorTerm);
             return NO;
         }
         
@@ -242,12 +229,10 @@
         
     }
     
-    NSArray *parameters = [NSArray arrayWithObject:parameter];
-    _DDFunctionTerm *function = [[_DDFunctionTerm alloc] _initWithFunction:[operator operatorFunction] subterms:parameters error:error];
+    NSArray *parameters = @[parameter];
+    _DDFunctionTerm *function = [[_DDFunctionTerm alloc] _initWithFunction:[operatorTerm operatorFunction] subterms:parameters error:error];
     
-    [[self subterms] replaceObjectsInRange:replacementRange withObjectsFromArray:[NSArray arrayWithObject:function]];
-    
-    DD_RELEASE(function);
+    [[self subterms] replaceObjectsInRange:replacementRange withObjectsFromArray:@[function]];
     
     return YES;
 }
