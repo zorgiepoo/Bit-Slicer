@@ -189,10 +189,9 @@
 	
 	self.textView.controller.undoManager = [[NSUndoManager alloc] init];
 	
-	[self initiateDataInspector];
-	
-	// It's important to set frame autosave name after we initiate the data inspector, otherwise the data inspector's frame will not be correct for some reason
 	[[self window] setFrameAutosaveName:NSStringFromClass([self class])];
+	
+	[self initiateDataInspector];
 	
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZGMemoryViewerShowsDataInspector])
 	{

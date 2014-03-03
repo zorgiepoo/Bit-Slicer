@@ -492,11 +492,13 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (void)loadDefaultInspectors {
+	/*
 	DataInspector *ins = [[DataInspector alloc] init];
 	[ins setEndianness:eNativeEndianness];
 	[inspectors addObject:ins];
 	[ins release];
-	/*
+	 */
+	
     NSArray *defaultInspectorDictionaries = [[NSUserDefaults standardUserDefaults] objectForKey:kDataInspectorUserDefaultsKey];
     if (! defaultInspectorDictionaries) {
         DataInspector *ins = [[DataInspector alloc] init];
@@ -513,11 +515,9 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
             [ins release];            
         }
     }
-	 */
 }
 
 - (void)saveDefaultInspectors {
-	/*
     NSMutableArray *inspectorDictionaries = [[NSMutableArray alloc] init];
     DataInspector *inspector;
     NSEnumerator *enumer = [inspectors objectEnumerator];
@@ -526,7 +526,6 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
     }
     [[NSUserDefaults standardUserDefaults] setObject:inspectorDictionaries forKey:kDataInspectorUserDefaultsKey];
     [inspectorDictionaries release];
-	 */
 }
 
 - (NSView *)createView {
@@ -664,6 +663,7 @@ static NSAttributedString *inspectionError(NSString *s) {
         NSLog(@"Unknown column identifier %@", ident);
     }
     
+	[self saveDefaultInspectors];
 }
 
 - (void)resizeTableViewAfterChangingRowCount {
