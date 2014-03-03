@@ -113,7 +113,7 @@
 
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder
 {
-    [super encodeRestorableStateWithCoder:coder];
+	[super encodeRestorableStateWithCoder:coder];
     
     [coder
 		 encodeObject:self.addressTextField.stringValue
