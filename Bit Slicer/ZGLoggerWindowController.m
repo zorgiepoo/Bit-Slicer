@@ -35,6 +35,8 @@
 #import "ZGLoggerWindowController.h"
 #import "ZGAppController.h"
 
+#define ZGLoggerWindowText @"ZGLoggerWindowText"
+
 @interface ZGLoggerWindowController ()
 
 @property (nonatomic, assign) IBOutlet NSTextView *loggerTextView;
@@ -60,6 +62,25 @@
 - (NSString *)windowNibName
 {
 	return NSStringFromClass([self class]);
+}
+
+- (void)encodeRestorableStateWithCoder:(NSCoder *)coder
+{
+    [super encodeRestorableStateWithCoder:coder];
+	
+	NSArray *lines = [self.loggerText componentsSeparatedByString:@"\n"];
+	NSUInteger numberOfLinesToTake = MIN(50U, lines.count);
+	NSArray *lastFewLines = [lines subarrayWithRange:NSMakeRange(lines.count - numberOfLinesToTake, numberOfLinesToTake)];
+	
+	[coder encodeObject:[lastFewLines componentsJoinedByString:@"\n"] forKey:ZGLoggerWindowText];
+}
+
+- (void)restoreStateWithCoder:(NSCoder *)coder
+{
+	[super restoreStateWithCoder:coder];
+	
+	self.loggerText = [NSMutableString stringWithString:[coder decodeObjectForKey:ZGLoggerWindowText]];
+	[self writeLine:@"\t[Restored]" withDateFormatting:NO];
 }
 
 - (void)updateDisplay
@@ -101,7 +122,7 @@
 	[self updateDisplay];
 }
 
-- (void)writeLine:(NSString *)text
+- (void)writeLine:(NSString *)text withDateFormatting:(BOOL)shouldIncludeDateFormatting
 {
 	if (text == nil)
 	{
@@ -112,22 +133,29 @@
 	[dateFormatter setDateStyle:NSDateFormatterNoStyle];
 	[dateFormatter setTimeStyle:kCFDateFormatterMediumStyle];
 	
-	NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
-	
 	NSMutableString *newText = [[NSMutableString alloc] init];
-	[newText appendString:dateString];
-	[newText appendString:@": "];
+	
+	if (shouldIncludeDateFormatting)
+	{
+		[newText appendString:[dateFormatter stringFromDate:[NSDate date]]];
+		[newText appendString:@": "];
+	}
 	[newText appendString:text];
 	[newText appendString:@"\n"];
 	
 	[self.loggerText appendString:newText];
-	[[[self.loggerTextView textStorage] mutableString] appendString:newText];
+	[[[self.loggerTextView textStorage] mutableString] setString:self.loggerText];
 	
 	[self.loggerTextView scrollRangeToVisible:NSMakeRange(self.loggerText.length, 0)];
 	
 	self.numberOfMessages++;
 	
 	[self updateDisplay];
+}
+
+- (void)writeLine:(NSString *)text
+{
+	[self writeLine:text withDateFormatting:YES];
 }
 
 @end
