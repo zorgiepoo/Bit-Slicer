@@ -103,6 +103,14 @@
 
 #pragma mark Initialization
 
++ (void)initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGMemoryViewerShowsDataInspector : @NO}];
+	});
+}
+
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder
 {
     [super encodeRestorableStateWithCoder:coder];
@@ -118,8 +126,6 @@
     [coder
 		 encodeObject:self.desiredProcessInternalName
 		 forKey:ZGMemoryViewerProcessInternalName];
-	
-	[coder encodeBool:self.showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
 }
 
 - (void)restoreStateWithCoder:(NSCoder *)coder
@@ -136,11 +142,6 @@
 	
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGMemoryViewerProcessInternalName];
 	[self updateRunningProcesses];
-	
-	if ([coder decodeBoolForKey:ZGMemoryViewerShowsDataInspector])
-	{
-		[self toggleDataInspector:nil];
-	}
 	
 	[self windowDidShow:nil];
 }
@@ -191,7 +192,12 @@
 	[self initiateDataInspector];
 	
 	// It's important to set frame autosave name after we initiate the data inspector, otherwise the data inspector's frame will not be correct for some reason
-	[[self window] setFrameAutosaveName: NSStringFromClass([self class])];
+	[[self window] setFrameAutosaveName:NSStringFromClass([self class])];
+	
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZGMemoryViewerShowsDataInspector])
+	{
+		[self toggleDataInspector:nil];
+	}
 	
 	[self setupProcessListNotificationsAndPopUpButton];
 	
@@ -264,6 +270,8 @@
 	[@[self.textView.controller, self.textView.layoutRepresenter] makeObjectsPerformSelector:action withObject:self.dataInspectorRepresenter];
 	
 	self.showsDataInspector = !self.showsDataInspector;
+	
+	[[NSUserDefaults standardUserDefaults] setBool:self.showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
 }
 
 - (NSSize)minimumWindowFrameSizeForProposedSize:(NSSize)frameSize
@@ -310,6 +318,8 @@
 	[[self.textView layoutRepresenter] removeRepresenter:inspector];
 	[self relayoutAndResizeWindowPreservingFrame];
 	self.showsDataInspector = NO;
+	
+	[[NSUserDefaults standardUserDefaults] setBool:self.showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
 }
 
 // Called when our data inspector changes its size (number of rows)
