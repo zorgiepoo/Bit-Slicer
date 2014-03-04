@@ -36,6 +36,7 @@
 #import "ZGRunningProcess.h"
 #import "ZGRunningProcessObserver.h"
 #import "ZGVirtualMemory.h"
+#import "ZGProcessTaskManager.h"
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
@@ -277,19 +278,23 @@
 	BOOL shouldRetrieveList = NO;
 	
 	for (ZGRunningProcessObserver *runningProcessObserver in self.priorityProcesses)
-	{	
+	{
 		ZGMemoryMap task = MACH_PORT_NULL;
-		BOOL success = ZGTaskForPID(runningProcessObserver.runningProcess.processIdentifier, &task);
+		pid_t processIdentifier = runningProcessObserver.runningProcess.processIdentifier;
+		BOOL foundExistingTask = [[ZGProcessTaskManager  sharedManager] taskExistsForProcessIdentifier:processIdentifier];
 		
-		if (!success || !MACH_PORT_VALID(task))
+		BOOL retrievedTask = foundExistingTask && [[ZGProcessTaskManager  sharedManager] getTask:&task forProcessIdentifier:processIdentifier];
+		BOOL increasedUserReference = retrievedTask && ZGSetPortSendRightReferenceCountByDelta(task, 1);
+		
+		if (!increasedUserReference || !MACH_PORT_VALID(task))
 		{
 			shouldRetrieveList = YES;
-			[self removePriorityToProcessIdentifier:runningProcessObserver.runningProcess.processIdentifier withObserver:runningProcessObserver.observer];
+			[self removePriorityToProcessIdentifier:processIdentifier withObserver:runningProcessObserver.observer];
 		}
 		
-		if (task != MACH_PORT_NULL)
+		if (increasedUserReference && MACH_PORT_VALID(task))
 		{
-			ZGDeallocatePort(task);
+			ZGSetPortSendRightReferenceCountByDelta(task, -1);
 		}
 	}
 	

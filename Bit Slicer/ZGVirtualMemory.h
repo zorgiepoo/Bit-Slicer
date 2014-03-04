@@ -46,6 +46,8 @@ extern "C" {
 // Caller for ZGTaskForPID is responsible for using ZGDeallocatePort
 bool ZGTaskForPID(int processID, ZGMemoryMap *processTask);
 bool ZGDeallocatePort(ZGMemoryMap processTask);
+	
+bool ZGSetPortSendRightReferenceCountByDelta(ZGMemoryMap processTask, mach_port_delta_t delta);
 
 bool ZGPIDForTask(ZGMemoryMap processTask, int *processID);
 

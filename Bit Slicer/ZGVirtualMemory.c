@@ -48,6 +48,11 @@ bool ZGDeallocatePort(ZGMemoryMap processTask)
 	return (mach_port_deallocate(mach_task_self(), processTask) == KERN_SUCCESS);
 }
 
+bool ZGSetPortSendRightReferenceCountByDelta(ZGMemoryMap processTask, mach_port_delta_t delta)
+{
+	return (mach_port_mod_refs(mach_task_self(), processTask, MACH_PORT_RIGHT_SEND, delta) == KERN_SUCCESS);
+}
+
 bool ZGPIDForTask(ZGMemoryMap processTask, int *processID)
 {
 	return (pid_for_task(processTask, processID) == KERN_SUCCESS);
