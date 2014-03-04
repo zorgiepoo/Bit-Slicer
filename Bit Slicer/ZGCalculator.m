@@ -419,13 +419,54 @@
 	return [self evaluateExpression:expression substitutions:nil error:&unusedError];
 }
 
++ (NSString *)expressionBySubstitutingCalculatePointerFunctionInExpression:(NSString *)expression
+{
+	BOOL isInsideSingleQuote = NO;
+	BOOL isInsideDoubleQuote = NO;
+	
+	const char *characters = [expression UTF8String];
+	size_t charactersLength = strlen(characters);
+	char previousCharacter = 0;
+	NSMutableData *newData = [NSMutableData data];
+	
+	for (size_t characterIndex = 0; characterIndex < charactersLength; characterIndex++)
+	{
+		char character = characters[characterIndex];
+		NSString *substitutionString = nil;
+		switch (character)
+		{
+			case '\'':
+				if (!isInsideDoubleQuote && previousCharacter != '\\') isInsideSingleQuote = !isInsideSingleQuote;
+				break;
+			case '"':
+				if (!isInsideSingleQuote && previousCharacter != '\\') isInsideDoubleQuote = !isInsideDoubleQuote;
+				break;
+			case '[':
+				if (!isInsideDoubleQuote && !isInsideSingleQuote) substitutionString = ZGCalculatePointerFunction@"(";
+				break;
+			case ']':
+				if (!isInsideDoubleQuote && !isInsideSingleQuote) substitutionString = @")";
+				break;
+		}
+		
+		if (substitutionString != nil)
+		{
+			[newData appendBytes:[substitutionString UTF8String] length:strlen([substitutionString UTF8String])];
+		}
+		else
+		{
+			[newData appendBytes:&character length:sizeof(character)];
+		}
+		
+		previousCharacter = character;
+	}
+	
+	return [[NSString alloc] initWithData:newData encoding:NSUTF8StringEncoding];
+}
+
 + (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages symbolicator:(CSSymbolicatorRef)symbolicator lastSearchInfo:(NSDictionary *)lastSearchInfo error:(NSError * __autoreleasing *)error
 {
-	NSMutableString	 *newExpression = [[NSMutableString alloc] initWithString:expression];
-	
-	// Handle [expression] by renaming it as a function
-	[newExpression replaceOccurrencesOfString:@"[" withString:ZGCalculatePointerFunction@"(" options:NSLiteralSearch range:NSMakeRange(0, newExpression.length)];
-	[newExpression replaceOccurrencesOfString:@"]" withString:@")" options:NSLiteralSearch range:NSMakeRange(0, newExpression.length)];
+	NSString *newExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:expression];
 	
 	NSMutableDictionary *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process}];
 	if (failedImages != nil)
