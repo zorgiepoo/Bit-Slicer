@@ -170,6 +170,13 @@
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	 context:NULL];
 	
+	// Still need to observe this for reliably fetching icon and localized name
+	[[NSWorkspace sharedWorkspace]
+	 addObserver:self
+	 forKeyPath:@"runningApplications"
+	 options:NSKeyValueObservingOptionNew
+	 context:NULL];
+	
 	[[NSNotificationCenter defaultCenter]
 	 addObserver:self
 	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
@@ -183,6 +190,28 @@
 	{
 		[self updateRunningProcesses];
 		[self processListChanged:change];
+	}
+	else if (object == [NSWorkspace sharedWorkspace])
+	{
+		NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
+		
+		// ZGProcessList may report processes to us faster than NSRunningApplication can ocasionally
+		// So be sure to get updated icon
+		for (NSRunningApplication *runningApplication in newRunningProcesses)
+		{
+			for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
+			{
+				ZGProcess *representedProcess = [menuItem representedObject];
+				if (representedProcess.processID == runningApplication.processIdentifier)
+				{
+					NSImage *iconImage = [runningApplication.icon copy];
+					iconImage.size = NSMakeSize(16, 16);
+					menuItem.image = iconImage;
+					
+					break;
+				}
+			}
+		}
 	}
 }
 

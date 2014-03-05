@@ -132,6 +132,12 @@
 		 forKeyPath:@"runningProcesses"
 		 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 		 context:NULL];
+		
+		[[NSWorkspace sharedWorkspace]
+		 addObserver:self
+		 forKeyPath:@"runningApplications"
+		 options:NSKeyValueObservingOptionNew
+		 context:NULL];
 	}
 	return self;
 }
@@ -143,6 +149,10 @@
 	[[ZGProcessList sharedProcessList]
 	 removeObserver:self
 	 forKeyPath:@"runningProcesses"];
+	
+	[[NSWorkspace sharedWorkspace]
+	 removeObserver:self
+	 forKeyPath:@"runningApplications"];
 	
 	[self.searchController cleanUp];
 	[self.tableController cleanUp];
@@ -658,11 +668,11 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
+	NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
+	NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
+	
 	if (object == [ZGProcessList sharedProcessList] && self.runningApplicationsPopUpButton.itemArray.count > 0)
 	{
-		NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
-		NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
-		
 		if (newRunningProcesses)
 		{
 			for (ZGRunningProcess *runningProcess in newRunningProcesses)
@@ -676,6 +686,27 @@
 			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
 			{
 				[self removeRunningProcessFromPopupButton:runningProcess];
+			}
+		}
+	}
+	// ZGProcessList may report processes to us faster than NSRunningApplication can ocasionally
+	// So be sure to get updated icon
+	else if (object == [NSWorkspace sharedWorkspace] && self.runningApplicationsPopUpButton.itemArray.count > 0)
+	{
+		for (NSRunningApplication *runningApplication in newRunningProcesses)
+		{
+			for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
+			{
+				ZGProcess *representedProcess = [menuItem representedObject];
+				
+				if (runningApplication.processIdentifier == representedProcess.processID)
+				{
+					NSImage *iconImage = [runningApplication.icon copy];
+					iconImage.size = NSMakeSize(16, 16);
+					menuItem.image = iconImage;
+					
+					break;
+				}
 			}
 		}
 	}
