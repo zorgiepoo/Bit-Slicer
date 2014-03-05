@@ -110,6 +110,11 @@ void ZGFreeTask(ZGMemoryMap task)
 	}
 }
 
+BOOL ZGSetPortSendRightReferenceCountByDelta(ZGMemoryMap processTask, mach_port_delta_t delta)
+{
+	return (mach_port_mod_refs(mach_task_self(), processTask, MACH_PORT_RIGHT_SEND, delta) == KERN_SUCCESS);
+}
+
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask)
 {
 	NSMutableArray *regions = [[NSMutableArray alloc] init];

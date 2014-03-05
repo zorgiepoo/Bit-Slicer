@@ -51,6 +51,8 @@ BOOL ZGTaskExistsForProcess(pid_t process, ZGMemoryMap *task);
 BOOL ZGGetTaskForProcess(pid_t process, ZGMemoryMap *task);
 void ZGFreeTask(ZGMemoryMap task);
 
+BOOL ZGSetPortSendRightReferenceCountByDelta(ZGMemoryMap processTask, mach_port_delta_t delta);
+
 NSArray *ZGRegionsForProcessTask(ZGMemoryMap processTask);
 NSUInteger ZGNumberOfRegionsForProcessTask(ZGMemoryMap processTask);
 

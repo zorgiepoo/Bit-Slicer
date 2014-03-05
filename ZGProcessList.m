@@ -280,19 +280,23 @@
 	BOOL shouldRetrieveList = NO;
 	
 	for (ZGRunningProcessObserver *runningProcessObserver in self.priorityProcesses)
-	{	
+	{
+		pid_t processIdentifier = runningProcessObserver.runningProcess.processIdentifier;
 		mach_port_name_t task = MACH_PORT_NULL;
-		kern_return_t result = task_for_pid(current_task(), runningProcessObserver.runningProcess.processIdentifier, &task);
+		BOOL foundExistingTask = ZGTaskExistsForProcess(processIdentifier, &task);
 		
-		if (result != KERN_SUCCESS || !MACH_PORT_VALID(task))
+		BOOL retrievedTask = foundExistingTask && ZGGetTaskForProcess(processIdentifier, &task);
+		BOOL increasedUserReference = retrievedTask && ZGSetPortSendRightReferenceCountByDelta(task, 1);
+		
+		if (!increasedUserReference || !MACH_PORT_VALID(task))
 		{
 			shouldRetrieveList = YES;
-			[self removePriorityToProcessIdentifier:runningProcessObserver.runningProcess.processIdentifier withObserver:runningProcessObserver.observer];
+			[self removePriorityToProcessIdentifier:processIdentifier withObserver:runningProcessObserver.observer];
 		}
 		
-		if (task != MACH_PORT_NULL)
+		if (increasedUserReference && task != MACH_PORT_VALID(task))
 		{
-			mach_port_deallocate(mach_task_self(), task);
+			ZGSetPortSendRightReferenceCountByDelta(task, -1);
 		}
 	}
 	
