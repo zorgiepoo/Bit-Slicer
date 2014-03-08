@@ -112,8 +112,10 @@ typedef struct
 			{
 				if (loadCommand->cmd == LC_SEGMENT_64)
 				{
-					self.firstInstructionAddress = machHeaderAddress + firstSection64->offset;
-					self.slide = machHeaderAddress + firstSection64->offset - firstSection64->addr;
+					// Use first 4 bytes of addr instead of firstSection64->offset which seems to be more trustworthy
+					uint32_t offset = *(uint32_t *)&firstSection64->addr;
+					self.firstInstructionAddress = machHeaderAddress + offset;
+					self.slide = machHeaderAddress + offset - firstSection64->addr;
 				}
 				else
 				{
