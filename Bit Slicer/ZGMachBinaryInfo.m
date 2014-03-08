@@ -107,20 +107,24 @@ typedef struct
 			const struct section_64 *firstSection64 = sectionsOffset;
 			const struct section *firstSection32 = sectionsOffset;
 			
+			const void *segmentVMAddressPointer = &segmentCommand32->vmaddr;
+			
 			// struct section has enough relevant fields to make this test for 64-bit as well
 			if (sectionsOffset + sizeof(*firstSection32) <= commandBytes + loadCommand->cmdsize)
 			{
 				if (loadCommand->cmd == LC_SEGMENT_64)
 				{
-					// Use first 4 bytes of addr instead of firstSection64->offset which seems to be more trustworthy
-					uint32_t offset = *(uint32_t *)&firstSection64->addr;
+					// We could use firstSection64->offset instead, but this seems to catch some obfuscation cases
+					uint64_t offset = firstSection64->addr - *(uint64_t *)segmentVMAddressPointer;
 					self.firstInstructionAddress = machHeaderAddress + offset;
 					self.slide = machHeaderAddress + offset - firstSection64->addr;
 				}
 				else
 				{
-					self.firstInstructionAddress = machHeaderAddress + firstSection32->offset;
-					self.slide = machHeaderAddress + firstSection32->offset - firstSection32->addr;
+					// We could use firstSection32->offset instead, but this seems to catch some obfuscation cases
+					uint32_t offset = firstSection32->addr - *(uint32_t *)segmentVMAddressPointer;
+					self.firstInstructionAddress = machHeaderAddress + offset;
+					self.slide = machHeaderAddress + offset - firstSection32->addr;
 				}
 			}
 		}
