@@ -81,6 +81,8 @@
 @property (nonatomic) ZGMemoryAddress baseAddress;
 @property (nonatomic) ZGMemoryAddress offsetFromBase;
 
+@property (nonatomic) BOOL disassembling;
+
 @property (nonatomic) NSArray *instructions;
 
 @property (nonatomic) NSRange instructionBoundary;

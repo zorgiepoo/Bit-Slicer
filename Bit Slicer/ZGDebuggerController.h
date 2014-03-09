@@ -55,8 +55,6 @@
 
 - (void)cleanup;
 
-@property (readwrite, nonatomic) BOOL disassembling;
-
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
 
 - (NSArray *)selectedInstructions;
