@@ -37,6 +37,9 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
+extern NSString *ZGLastChosenInternalProcessNameNotification;
+extern NSString *ZGLastChosenInternalProcessNameKey;
+
 @class ZGProcess;
 @class ZGProcessTaskManager;
 

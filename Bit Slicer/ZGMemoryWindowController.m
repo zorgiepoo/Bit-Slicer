@@ -41,10 +41,15 @@
 #import "ZGVirtualMemory.h"
 #import "ZGUtilities.h"
 
+NSString *ZGLastChosenInternalProcessNameNotification = @"ZGLastChosenInternalProcessNameNotification";
+NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessNameKey";
+
 @interface ZGMemoryWindowController ()
 
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic) ZGProcessList *processList;
+
+@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
 
 @end
 
@@ -62,9 +67,39 @@
 		
 		self.undoManager = [[NSUndoManager alloc] init];
 		self.navigationManager = [[NSUndoManager alloc] init];
+		
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(lastChosenInternalProcessNameChanged:)
+		 name:ZGLastChosenInternalProcessNameNotification
+		 object:nil];
 	}
 	
 	return self;
+}
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter]
+	 removeObserver:self
+	 name:ZGLastChosenInternalProcessNameNotification
+	 object:nil];
+}
+
+- (void)lastChosenInternalProcessNameChanged:(NSNotification *)notification
+{
+	if (notification.object != self)
+	{
+		self.lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
+	}
+}
+
+- (void)postLastChosenInternalProcessNameChange
+{
+	[[NSNotificationCenter defaultCenter]
+	 postNotificationName:ZGLastChosenInternalProcessNameNotification
+	 object:self
+	 userInfo:@{ZGLastChosenInternalProcessNameKey : self.lastChosenInternalProcessName}];
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(id)sender
@@ -210,7 +245,7 @@
 	self.processList = [[ZGProcessList alloc] initWithProcessTaskManager:self.processTaskManager];
 	
 	// Add processes to popup button
-	self.desiredProcessInternalName = [[ZGAppController sharedController] lastSelectedProcessInternalName];
+	self.desiredProcessInternalName = self.lastChosenInternalProcessName;
 	[self updateRunningProcesses];
 	
 	[self.processList
@@ -375,8 +410,15 @@
 - (void)switchProcess
 {
 	self.desiredProcessInternalName = [self.runningApplicationsPopUpButton.selectedItem.representedObject internalName];
-	[[ZGAppController sharedController] setLastSelectedProcessInternalName:self.desiredProcessInternalName];
+	
+	if (self.desiredProcessInternalName != nil)
+	{
+		self.lastChosenInternalProcessName = self.desiredProcessInternalName;
+		[self postLastChosenInternalProcessNameChange];
+	}
+	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
+	
 	[self.navigationManager removeAllActions];
 	[self updateNavigationButtons];
 }

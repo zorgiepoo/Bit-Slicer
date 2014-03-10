@@ -51,7 +51,6 @@
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
-#import "ZGAppController.h"
 #import "ZGDebuggerController.h"
 #import "ZGBreakPointController.h"
 #import "ZGMemoryViewerController.h"
@@ -84,6 +83,8 @@
 #define ZGEndianBig @"ZGEndianBig"
 
 @interface ZGDocumentWindowController ()
+
+@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
 
 @property (nonatomic) ZGProcessList *processList;
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;
@@ -123,6 +124,14 @@
 		 forKeyPath:@"runningApplications"
 		 options:NSKeyValueObservingOptionNew
 		 context:NULL];
+		
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(lastChosenInternalProcessNameChanged:)
+		 name:ZGLastChosenInternalProcessNameNotification
+		 object:nil];
+		
+		self.lastChosenInternalProcessName = document.lastChosenInternalProcessName;
 		
 		self.processTaskManager = document.processTaskManager;
 		self.debuggerController = document.debuggerController;
@@ -496,6 +505,22 @@
 
 #pragma mark Watching other applications
 
+- (void)lastChosenInternalProcessNameChanged:(NSNotification *)notification
+{
+	if (notification.object != self)
+	{
+		self.lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
+	}
+}
+
+- (void)postLastChosenInternalProcessNameChange
+{
+	[[NSNotificationCenter defaultCenter]
+	 postNotificationName:ZGLastChosenInternalProcessNameNotification
+	 object:self
+	 userInfo:@{ZGLastChosenInternalProcessNameKey : self.lastChosenInternalProcessName}];
+}
+
 - (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
 {
 	[self.processList retrieveList];
@@ -557,7 +582,11 @@
 	}
 	
 	// keep track of the process the user targeted
-	[[ZGAppController sharedController] setLastSelectedProcessInternalName:self.currentProcess.internalName];
+	if (self.currentProcess.internalName != nil)
+	{
+		self.lastChosenInternalProcessName = self.currentProcess.internalName;
+		[self postLastChosenInternalProcessNameChange];
+	}
 	
 	if (sender != nil && ![self.documentData.desiredProcessInternalName isEqualToString:self.currentProcess.internalName])
 	{
@@ -608,7 +637,7 @@
 
 - (void)addProcessesToPopupButton
 {
-	NSString *lastSelectedProcessInternalName = [[ZGAppController sharedController] lastSelectedProcessInternalName];
+	NSString *lastSelectedProcessInternalName = self.lastChosenInternalProcessName;
 	BOOL foundLastSelectedProcessInternalName = NO;
 	
 	// Add running applications to popup button; we want activiation policy for NSApplicationActivationPolicyRegular to appear first, since they're more likely to be targetted and more likely to have sufficient privillages for accessing virtual memory

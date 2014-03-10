@@ -41,7 +41,7 @@
 
 @interface ZGDocument ()
 
-@property (strong, nonatomic) ZGDocumentWindowController *windowController;
+@property (nonatomic) ZGDocumentWindowController *windowController;
 
 @end
 

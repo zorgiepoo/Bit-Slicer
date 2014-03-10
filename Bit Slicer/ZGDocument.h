@@ -50,6 +50,8 @@
 @property (nonatomic) ZGMemoryViewerController *memoryViewerController;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
 
+@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
+
 @property (nonatomic) ZGDocumentData *data;
 @property (nonatomic) ZGSearchData *searchData;
 
