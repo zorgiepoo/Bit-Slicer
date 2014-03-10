@@ -58,12 +58,12 @@
 	return self;
 }
 
-+ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved
 {
 	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
 	
-	ZGInstruction *currentInstruction = [ZGDebuggerController findInstructionBeforeAddress:instructionPointer+1 inProcess:process];
+	ZGInstruction *currentInstruction = [ZGDebuggerController findInstructionBeforeAddress:instructionPointer+1 inProcess:process withBreakPoints:breakPoints];
 	if (currentInstruction != nil)
 	{
 		[newInstructions addObject:currentInstruction];
@@ -94,7 +94,7 @@
 			
 			ZGFreeBytes(process.processTask, returnAddressBytes, returnAddressSize);
 			
-			ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:returnAddress inProcess:process];
+			ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints];
 			if (instruction == nil)
 			{
 				break;
@@ -131,9 +131,9 @@
 	return [[ZGBacktrace alloc] initWithInstructions:newInstructions basePointers:newBasePointers];
 }
 
-+ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints
 {
-	return [self backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:process maxLimit:0];
+	return [self backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:process breakPoints:breakPoints maxLimit:0];
 }
 
 @end

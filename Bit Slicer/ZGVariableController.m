@@ -57,8 +57,10 @@
 
 @interface ZGVariableController ()
 
-@property (assign) ZGDocumentWindowController *windowController;
-@property (assign) ZGDocumentData *documentData;
+@property (nonatomic) ZGDebuggerController *debuggerController;
+@property (nonatomic) ZGMemoryViewerController *memoryViewer;
+@property (nonatomic, assign) ZGDocumentWindowController *windowController;
+@property (nonatomic, assign) ZGDocumentData *documentData;
 
 @property (nonatomic) id frozenActivity;
 
@@ -66,13 +68,15 @@
 
 @implementation ZGVariableController
 
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController
+- (id)initWithWindowController:(ZGDocumentWindowController *)windowController debuggerController:(ZGDebuggerController *)debuggerController memoryViewer:(ZGMemoryViewerController *)memoryViewer
 {
 	self = [super init];
 	if (self)
 	{
 		self.windowController = windowController;
 		self.documentData = self.windowController.documentData;
+		self.debuggerController = debuggerController;
+		self.memoryViewer = memoryViewer;
 	}
 	return self;
 }
@@ -378,9 +382,9 @@
 	ZGMemoryAddress initialAddress = 0x0;
 	ZGMemorySize initialSize = 0;
 	
-	if (variableType == ZGByteArray && [[[[ZGAppController sharedController] debuggerController] currentProcess] processID] == self.windowController.currentProcess.processID)
+	if (variableType == ZGByteArray && self.debuggerController.currentProcess.processID == self.windowController.currentProcess.processID)
 	{
-		NSArray *selectedInstructions = [[[ZGAppController sharedController] debuggerController] selectedInstructions];
+		NSArray *selectedInstructions = self.debuggerController.selectedInstructions;
 		if (selectedInstructions.count > 0)
 		{
 			ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
@@ -388,9 +392,9 @@
 			initialSize = selectedInstruction.variable.size;
 		}
 	}
-	else if ([[[[ZGAppController sharedController] memoryViewer] currentProcess] processID] == self.windowController.currentProcess.processID)
+	else if (self.memoryViewer.currentProcess.processID == self.windowController.currentProcess.processID)
 	{
-		initialAddress = [[[ZGAppController sharedController] memoryViewer] selectedAddressRange].location;
+		initialAddress = [self.memoryViewer selectedAddressRange].location;
 	}
 	
 	ZGVariable *variable =

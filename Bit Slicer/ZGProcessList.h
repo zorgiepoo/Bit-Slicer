@@ -34,12 +34,15 @@
 
 #import <Foundation/Foundation.h>
 
+@class ZGProcessTaskManager;
+
 @interface ZGProcessList : NSObject
+
+- (id)init;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
 
 // Observable for new and old changes via KVO
 @property (nonatomic, readonly) NSArray *runningProcesses;
-
-+ (instancetype)sharedProcessList;
 
 // Forces to fetch all process information
 - (void)retrieveList;

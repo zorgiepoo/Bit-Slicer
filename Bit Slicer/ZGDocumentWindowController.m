@@ -53,6 +53,7 @@
 #import "ZGSearchResults.h"
 #import "ZGAppController.h"
 #import "ZGDebuggerController.h"
+#import "ZGBreakPointController.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGDocument.h"
 #import "ZGVirtualMemory.h"
@@ -84,6 +85,13 @@
 
 @interface ZGDocumentWindowController ()
 
+@property (nonatomic) ZGProcessList *processList;
+@property (nonatomic) ZGProcessTaskManager *processTaskManager;
+@property (nonatomic) ZGDebuggerController *debuggerController;
+@property (nonatomic) ZGBreakPointController *breakPointController;
+@property (nonatomic) ZGMemoryViewerController *memoryViewer;
+@property (nonatomic) ZGLoggerWindowController *loggerWindowController;
+
 @property (nonatomic) ZGWatchVariableWindowController *watchVariableWindowController;
 
 @property (nonatomic) ZGEditValueWindowController *editValueWindowController;
@@ -104,22 +112,30 @@
 
 @implementation ZGDocumentWindowController
 
-- (id)init
+- (id)initWithDocument:(ZGDocument *)document
 {
 	self = [super initWithWindowNibName:@"MyDocument"];
 	if (self != nil)
 	{
-		[[ZGProcessList sharedProcessList]
-		 addObserver:self
-		 forKeyPath:@"runningProcesses"
-		 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-		 context:NULL];
-		
 		// Still need to observe this for reliably fetching icon and localized name
 		[[NSWorkspace sharedWorkspace]
 		 addObserver:self
 		 forKeyPath:@"runningApplications"
 		 options:NSKeyValueObservingOptionNew
+		 context:NULL];
+		
+		self.processTaskManager = document.processTaskManager;
+		self.debuggerController = document.debuggerController;
+		self.breakPointController = document.breakPointController;
+		self.memoryViewer = document.memoryViewerController;
+		self.loggerWindowController = document.loggerWindowController;
+		
+		self.processList = [[ZGProcessList alloc] initWithProcessTaskManager:self.processTaskManager];
+		
+		[self.processList
+		 addObserver:self
+		 forKeyPath:@"runningProcesses"
+		 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 		 context:NULL];
 	}
 	return self;
@@ -129,7 +145,7 @@
 {
 	[NSNotificationCenter.defaultCenter removeObserver:self];
 	
-	[[ZGProcessList sharedProcessList]
+	[self.processList
 	 removeObserver:self
 	 forKeyPath:@"runningProcesses"];
 	
@@ -258,7 +274,7 @@
 	self.searchData = [self.document searchData];
 	
 	self.tableController = [[ZGDocumentTableController alloc] initWithWindowController:self];
-	self.variableController = [[ZGVariableController alloc] initWithWindowController:self];
+	self.variableController = [[ZGVariableController alloc] initWithWindowController:self debuggerController:self.debuggerController memoryViewer:self.memoryViewer];
 	self.searchController = [[ZGDocumentSearchController alloc] initWithWindowController:self];
 	self.scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
 	
@@ -313,21 +329,21 @@
 			{
 				if (self.currentProcess.valid)
 				{
-					[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+					[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 				}
 				
-				[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+				[self.processList unrequestPollingWithObserver:self];
 			}
 		}
 		else if (!self.isOccluded)
 		{
 			if (self.currentProcess.valid)
 			{
-				[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+				[self.processList addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 			}
 			else
 			{
-				[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+				[self.processList requestPollingWithObserver:self];
 			}
 		}
 	}
@@ -338,7 +354,7 @@
 	self.isOccluded = (self.window.occlusionState & NSWindowOcclusionStateVisible) == 0;
 	if (!self.isOccluded)
 	{
-		[[ZGProcessList sharedProcessList] retrieveList];
+		[self.processList retrieveList];
 		[self.tableController.variablesTableView reloadData];
 	}
 	[self updateObservingProcessOcclusionState];
@@ -350,10 +366,10 @@
 	{
 		if (self.currentProcess.valid)
 		{
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+			[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 		}
 		
-		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+		[self.processList unrequestPollingWithObserver:self];
 	}
 }
 
@@ -482,7 +498,7 @@
 
 - (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
 {
-	[[ZGProcessList sharedProcessList] retrieveList];
+	[self.processList retrieveList];
 }
 
 - (IBAction)runningApplicationsPopUpButtonRequest:(id)sender
@@ -521,7 +537,7 @@
 	
 	if (self.currentProcess)
 	{
-		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+		[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
@@ -555,9 +571,9 @@
 	
 	if (self.currentProcess && self.currentProcess.valid)
 	{
-		[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+		[self.processList addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 		
-		if (!self.currentProcess.hasGrantedAccess && ![self.currentProcess grantUsAccess])
+		if (!self.currentProcess.hasGrantedAccess && !ZGGrantMemoryAccessToProcess(self.processTaskManager, self.currentProcess))
 		{
 			[self setStatus:[NSString stringWithFormat:@"Failed accessing %@", self.currentProcess.name]];
 		}
@@ -578,7 +594,7 @@
 		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:[[menuItem representedObject] processID]];
 		if (menuItem != self.runningApplicationsPopUpButton.selectedItem &&
 			(![menuItem.representedObject valid] ||
-			 ![[[ZGProcessList sharedProcessList] runningProcesses] containsObject:runningProcess]))
+			 ![[self.processList runningProcesses] containsObject:runningProcess]))
 		{
 			[itemsToRemove addObject:menuItem];
 		}
@@ -595,9 +611,9 @@
 	NSString *lastSelectedProcessInternalName = [[ZGAppController sharedController] lastSelectedProcessInternalName];
 	BOOL foundLastSelectedProcessInternalName = NO;
 	
-	// Add running applications to popup button ; we want activiation policy for NSApplicationActivationPolicyRegular to appear first, since they're more likely to be targetted and more likely to have sufficient privillages for accessing virtual memory
+	// Add running applications to popup button; we want activiation policy for NSApplicationActivationPolicyRegular to appear first, since they're more likely to be targetted and more likely to have sufficient privillages for accessing virtual memory
 	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
-	for (ZGRunningProcess *runningProcess in [[[ZGProcessList sharedProcessList] runningProcesses] sortedArrayUsingDescriptors:@[sortDescriptor]])
+	for (ZGRunningProcess *runningProcess in [[self.processList runningProcesses] sortedArrayUsingDescriptors:@[sortDescriptor]])
 	{
 		// If there's no desired process, try to use the last selected process only if it exists
 		if (self.documentData.desiredProcessInternalName == nil && lastSelectedProcessInternalName != nil && !foundLastSelectedProcessInternalName && [runningProcess.internalName isEqualToString:lastSelectedProcessInternalName])
@@ -645,7 +661,7 @@
 				[self.searchController cancelTask];
 			}
 			
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+			[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 			
 			[self.tableController clearCache];
 			for (ZGVariable *variable in self.documentData.variables)
@@ -666,7 +682,7 @@
 			
 			ZGUpdateProcessMenuItem(self.runningApplicationsPopUpButton.selectedItem, self.currentProcess.internalName, -1, nil);
 			
-			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+			[self.processList requestPollingWithObserver:self];
 		}
 		else if (oldRunningProcess.processIdentifier != -1)
 		{
@@ -710,7 +726,7 @@
 				
 				[self runningApplicationsPopUpButtonRequest:nil];
 				
-				[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+				[self.processList unrequestPollingWithObserver:self];
 				
 				return;
 			}
@@ -744,47 +760,49 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (self.document != nil)
+	NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
+	NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
+	
+	if (object == self.processList && self.runningApplicationsPopUpButton.itemArray.count > 0)
 	{
-		NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
-		NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
-		
-		if (object == [ZGProcessList sharedProcessList] && self.runningApplicationsPopUpButton.itemArray.count > 0)
+		if (newRunningProcesses != nil)
 		{
-			if (newRunningProcesses)
+			for (ZGRunningProcess *runningProcess in newRunningProcesses)
 			{
-				for (ZGRunningProcess *runningProcess in newRunningProcesses)
-				{
-					[self addRunningProcessToPopupButton:runningProcess];
-				}
+				[self addRunningProcessToPopupButton:runningProcess];
 			}
-			
-			if (oldRunningProcesses)
+		}
+		
+		if (oldRunningProcesses != nil)
+		{
+			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
 			{
-				for (ZGRunningProcess *runningProcess in oldRunningProcesses)
+				[self removeRunningProcessFromPopupButton:runningProcess];
+				
+				if ([self.processTaskManager taskExistsForProcessIdentifier:runningProcess.processIdentifier])
 				{
-					[self removeRunningProcessFromPopupButton:runningProcess];
+					[self.processTaskManager freeTaskForProcessIdentifier:runningProcess.processIdentifier];
 				}
 			}
 		}
-		else if (object == [NSWorkspace sharedWorkspace] && self.runningApplicationsPopUpButton.itemArray.count > 0)
+	}
+	else if (object == [NSWorkspace sharedWorkspace] && self.runningApplicationsPopUpButton.itemArray.count > 0)
+	{
+		// ZGProcessList may report processes to us faster than NSRunningApplication can ocasionally
+		// So be sure to get updated localized name and icon
+		for (NSRunningApplication *runningApplication in newRunningProcesses)
 		{
-			// ZGProcessList may report processes to us faster than NSRunningApplication can ocasionally
-			// So be sure to get updated localized name and icon
-			for (NSRunningApplication *runningApplication in newRunningProcesses)
+			for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
 			{
-				for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
+				ZGProcess *representedProcess = [menuItem representedObject];
+				
+				if (runningApplication.processIdentifier == representedProcess.processID)
 				{
-					ZGProcess *representedProcess = [menuItem representedObject];
+					representedProcess.name = runningApplication.localizedName;
 					
-					if (runningApplication.processIdentifier == representedProcess.processID)
-					{
-						representedProcess.name = runningApplication.localizedName;
-						
-						ZGUpdateProcessMenuItem(menuItem, runningApplication.localizedName, runningApplication.processIdentifier, runningApplication.icon);
-						
-						break;
-					}
+					ZGUpdateProcessMenuItem(menuItem, runningApplication.localizedName, runningApplication.processIdentifier, runningApplication.icon);
+					
+					break;
 				}
 			}
 		}
@@ -1243,7 +1261,7 @@
 			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
 		}
 		
-		if ([[[ZGAppController sharedController] debuggerController] isProcessIdentifierHalted:self.currentProcess.processID])
+		if ([self.debuggerController isProcessIdentifierHalted:self.currentProcess.processID])
 		{
 			return NO;
 		}
@@ -1642,7 +1660,7 @@
 {
 	if (self.watchVariableWindowController == nil)
 	{
-		self.watchVariableWindowController = [[ZGWatchVariableWindowController alloc] init];
+		self.watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithDebuggerController:self.debuggerController breakPointController:self.breakPointController memoryViewer:self.memoryViewer];
 	}
 	
 	[self.watchVariableWindowController watchVariable:[self.selectedVariables objectAtIndex:0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:self.window completionHandler:^(NSArray *foundVariables) {
@@ -1661,14 +1679,14 @@
 - (IBAction)showMemoryViewer:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH inProcess:self.currentProcess];
+	[self.memoryViewer jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH inProcess:self.currentProcess];
 }
 
 - (IBAction)showDebugger:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[[[ZGAppController sharedController] debuggerController] showWindow:self];
-	[[[ZGAppController sharedController] debuggerController] jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
+	[self.debuggerController showWindow:self];
+	[self.debuggerController jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
 }
 
 #pragma mark Pausing and Unpausing Processes

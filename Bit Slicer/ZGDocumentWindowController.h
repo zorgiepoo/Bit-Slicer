@@ -47,10 +47,16 @@
 @class ZGScriptManager;
 @class APTokenSearchField;
 @class ZGTableView;
+@class ZGBreakPointController;
+@class ZGLoggerWindowController;
+@class ZGDocument;
 
 #define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
 
 @interface ZGDocumentWindowController : NSWindowController <AGScopeBarDelegate>
+
+@property (readonly, nonatomic) ZGBreakPointController *breakPointController;
+@property (readonly, nonatomic) ZGLoggerWindowController *loggerWindowController;
 
 @property (assign) IBOutlet ZGTableView *variablesTableView;
 @property (assign) IBOutlet NSProgressIndicator *progressIndicator;
@@ -77,6 +83,8 @@
 
 @property (assign, nonatomic) ZGDocumentData *documentData;
 @property (assign, nonatomic) ZGSearchData *searchData;
+
+- (id)initWithDocument:(ZGDocument *)document;
 
 - (void)loadDocumentUserInterface;
 

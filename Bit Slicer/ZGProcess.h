@@ -62,7 +62,6 @@
 - (instancetype)initWithProcess:(ZGProcess *)process;
 
 - (void)markInvalid;
-- (BOOL)grantUsAccess;
 - (BOOL)hasGrantedAccess;
 
 - (ZGMemorySize)pointerSize;

@@ -53,6 +53,8 @@ typedef enum
 	ZGWatchPointReadOrWrite,
 } ZGWatchPointType;
 
++ (instancetype)sharedController;
+
 @property (nonatomic) NSArray *breakPoints;
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate;

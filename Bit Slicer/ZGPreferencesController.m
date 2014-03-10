@@ -33,17 +33,16 @@
  */
 
 #import "ZGPreferencesController.h"
-#import "ZGAppController.h"
 
-#import <Sparkle/Sparkle.h>
+#import "ZGHotKeyController.h"
+#import "ZGAppUpdaterController.h"
 
-#define SU_FEED_URL_KEY @"SUFeedURL"
-#define SU_SEND_PROFILE_INFO_KEY @"SUSendProfileInfo"
-
-#define APPCAST_URL @"http://zorg.tejat.net/bitslicer/update.php"
-#define ALPHA_APPCAST_URL @"http://zorg.tejat.net/bitslicer/update_alpha.php"
+#import <ShortcutRecorder/ShortcutRecorder.h>
 
 @interface ZGPreferencesController ()
+
+@property (nonatomic) ZGHotKeyController *hotKeyController;
+@property (nonatomic) ZGAppUpdaterController *appUpdaterController;
 
 @property (assign) IBOutlet SRRecorderControl *hotkeyRecorder;
 @property (assign) IBOutlet NSButton *checkForUpdatesButton;
@@ -54,69 +53,35 @@
 
 @implementation ZGPreferencesController
 
-+ (BOOL)runningAlpha
-{
-	return [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"] rangeOfString:@"a"].location != NSNotFound;
-}
-
-+ (void)initialize
-{
-	[NSUserDefaults.standardUserDefaults
-	 registerDefaults:
-		@{
-			ZG_HOT_KEY : @((NSInteger)INVALID_KEY_CODE),
-			ZG_HOT_KEY_MODIFIER : @((NSInteger)0),
-			// If user is running an alpha version, we should set this to YES
-			ZG_CHECK_FOR_ALPHA_UPDATES : @([self runningAlpha]),
-			ZG_REGISTER_TYPES : @{},
-			ZG_DEBUG_QUALIFIER : @(0),
-			SU_FEED_URL_KEY : ([self runningAlpha] ? ALPHA_APPCAST_URL : APPCAST_URL),
-		}];
-}
-
-- (void)updateFeedURL
-{
-	if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
-	{
-		[NSUserDefaults.standardUserDefaults setObject:ALPHA_APPCAST_URL forKey:SU_FEED_URL_KEY];
-		[[SUUpdater sharedUpdater] setFeedURL:[NSURL URLWithString:ALPHA_APPCAST_URL]];
-	}
-	else
-	{
-		[NSUserDefaults.standardUserDefaults setObject:APPCAST_URL forKey:SU_FEED_URL_KEY];
-		[[SUUpdater sharedUpdater] setFeedURL:[NSURL URLWithString:APPCAST_URL]];
-	}
-}
-
-- (id)init
+- (id)initWithHotKeyController:(ZGHotKeyController *)hotKeyController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController
 {
 	self = [super initWithWindowNibName:@"Preferences"];
 	
-	[self setWindowFrameAutosaveName:@"ZGPreferencesWindow"];
-	
-	[self updateFeedURL];
+	self.hotKeyController = hotKeyController;
+	self.appUpdaterController = appUpdaterController;
 	
 	return self;
 }
 
 - (void)updateCheckingForUpdateButtons
 {
-	if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_UPDATES])
+	if (self.appUpdaterController.checksForUpdates)
 	{
-		if ([NSUserDefaults.standardUserDefaults boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES])
-		{
-			self.checkForAlphaUpdatesButton.state = NSOnState;
-		}
+		self.checkForUpdatesButton.state = NSOnState;
 		
-		if ([NSUserDefaults.standardUserDefaults boolForKey:SU_SEND_PROFILE_INFO_KEY])
-		{
-			self.sendProfileInfoButton.state = NSOnState;
-		}
+		self.checkForAlphaUpdatesButton.enabled = YES;
+		self.checkForAlphaUpdatesButton.state = self.appUpdaterController.checksForAlphaUpdates ? NSOnState : NSOffState;
+		
+		self.sendProfileInfoButton.enabled = YES;
+		self.sendProfileInfoButton.state = self.appUpdaterController.sendsAnonymousInfo ? NSOnState : NSOffState;
 	}
 	else
 	{
 		self.checkForAlphaUpdatesButton.enabled = NO;
+		self.sendProfileInfoButton.enabled = NO;
+		
 		self.checkForUpdatesButton.state = NSOffState;
+		self.checkForAlphaUpdatesButton.state = NSOffState;
 		self.sendProfileInfoButton.state = NSOffState;
 	}
 }
@@ -131,80 +96,47 @@
 	[super showWindow:nil];
 	
 	// These states could change, for example, when the user has to make Sparkle pick between checking for automatic updates or not checking for them
+	[self.appUpdaterController reloadValuesFromDefaults];
 	[self updateCheckingForUpdateButtons];
 }
 
 - (void)windowDidLoad
 {
 	[self.hotkeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	
-	NSInteger hotkeyCode = [NSUserDefaults.standardUserDefaults integerForKey:ZG_HOT_KEY];
-	// INVALID_KEY_CODE used to be set at -999 (now it's at -1), so just take this into account
-	if (hotkeyCode < INVALID_KEY_CODE)
-	{
-		hotkeyCode = INVALID_KEY_CODE;
-		[NSUserDefaults.standardUserDefaults setInteger:INVALID_KEY_CODE forKey:ZG_HOT_KEY];
-	}
-	
-	KeyCombo hotkeyCombo;
-	hotkeyCombo.code = hotkeyCode;
-	hotkeyCombo.flags = SRCarbonToCocoaFlags([[NSUserDefaults standardUserDefaults] integerForKey:ZG_HOT_KEY_MODIFIER]);
-	
-	self.hotkeyRecorder.keyCombo = hotkeyCombo;
+	self.hotkeyRecorder.keyCombo = self.hotKeyController.pauseHotKeyCombo;
 }
 
-- (void)shortcutRecorder:(SRRecorderControl *)aRecorder keyComboDidChange:(KeyCombo)newKeyCombo
+- (void)shortcutRecorder:(SRRecorderControl *)recorder keyComboDidChange:(KeyCombo)newKeyCombo
 {
-	[NSUserDefaults.standardUserDefaults
-	 setInteger:[aRecorder keyCombo].code
-	 forKey:ZG_HOT_KEY];
-    
-	[NSUserDefaults.standardUserDefaults
-	 setInteger:SRCocoaToCarbonFlags([aRecorder keyCombo].flags)
-	 forKey:ZG_HOT_KEY_MODIFIER];
-	
-	[ZGAppController registerPauseAndUnpauseHotKey];
+	self.hotKeyController.pauseHotKeyCombo = (KeyCombo){.code = newKeyCombo.code, .flags = SRCocoaToCarbonFlags(newKeyCombo.flags)};
 }
 
 - (IBAction)checkForUpdatesButton:(id)sender
 {
 	if (self.checkForUpdatesButton.state == NSOffState)
 	{
-		self.checkForAlphaUpdatesButton.enabled = NO;
-		self.checkForAlphaUpdatesButton.state = NSOffState;
-		[[NSUserDefaults standardUserDefaults] setBool:NO forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+		self.appUpdaterController.checksForAlphaUpdates = NO;
+		self.appUpdaterController.checksForUpdates = NO;
 	}
 	else
 	{
-		self.checkForAlphaUpdatesButton.enabled = YES;
-		if ([[self class] runningAlpha])
-		{
-			self.checkForAlphaUpdatesButton.state = NSOnState;
-			[[NSUserDefaults standardUserDefaults] setBool:YES forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
-		}
+		self.appUpdaterController.checksForUpdates = YES;
+		self.appUpdaterController.checksForAlphaUpdates = [ZGAppUpdaterController runningAlpha];
 	}
 	
-	[NSUserDefaults.standardUserDefaults
-	 setBool:(self.checkForUpdatesButton.state == NSOnState)
-	 forKey:ZG_CHECK_FOR_UPDATES];
-	
-	[self updateFeedURL];
+	[self updateCheckingForUpdateButtons];
 }
 
 - (IBAction)checkForAlphaUpdatesButton:(id)sender
 {
-	[NSUserDefaults.standardUserDefaults
-	 setBool:self.checkForAlphaUpdatesButton.state == NSOnState
-	 forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
-	
-	[self updateFeedURL];
+	self.appUpdaterController.checksForAlphaUpdates = (self.checkForAlphaUpdatesButton.state == NSOnState);
+	[self updateCheckingForUpdateButtons];
 }
 
 - (IBAction)changeSendProfileInformation:(id)sender
 {
-	[NSUserDefaults.standardUserDefaults
-	 setBool:self.sendProfileInfoButton.state == NSOnState
-	 forKey:SU_SEND_PROFILE_INFO_KEY];
+	self.appUpdaterController.sendsAnonymousInfo = (self.sendProfileInfoButton.state == NSOnState);
+	[self updateCheckingForUpdateButtons];
 }
 
 @end

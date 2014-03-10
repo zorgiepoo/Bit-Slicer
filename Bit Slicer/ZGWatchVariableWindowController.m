@@ -53,6 +53,10 @@
 
 @interface ZGWatchVariableWindowController ()
 
+@property (nonatomic) ZGDebuggerController *debuggerController;
+@property (nonatomic) ZGBreakPointController *breakPointController;
+@property (nonatomic) ZGMemoryViewerController *memoryViewer;
+
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
 @property (nonatomic, assign) IBOutlet NSTextField *statusTextField;
 @property (nonatomic, assign) IBOutlet NSButton *addButton;
@@ -72,7 +76,7 @@
 
 #pragma mark Birth & Death
 
-- (id)init
+- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController memoryViewer:(ZGMemoryViewerController *)memoryViewer
 {
 	self = [super init];
 	if (self != nil)
@@ -82,6 +86,10 @@
 		 selector:@selector(applicationWillTerminate:)
 		 name:NSApplicationWillTerminateNotification
 		 object:nil];
+		
+		self.debuggerController = debuggerController;
+		self.breakPointController = breakPointController;
+		self.memoryViewer = memoryViewer;
 	}
 	return self;
 }
@@ -94,7 +102,7 @@
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
+	[self.breakPointController removeObserver:self];
 }
 
 - (NSString *)windowNibName
@@ -106,7 +114,7 @@
 
 - (void)stopWatchingAndInvokeCompletionHandler:(BOOL)shouldInvokeCompletionHandler
 {
-	[[[ZGAppController sharedController] breakPointController] removeObserver:self];
+	[self.breakPointController removeObserver:self];
 	self.watchProcess = nil;
 	
 	[self.progressIndicator stopAnimation:nil];
@@ -243,7 +251,7 @@
 	
 	[self.foundBreakPointAddresses addObject:instructionAddressNumber];
 	
-	ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:instructionAddress inProcess:self.watchProcess];
+	ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:instructionAddress inProcess:self.watchProcess withBreakPoints:self.breakPointController.breakPoints];
 	
 	if (instruction == nil)
 	{
@@ -294,7 +302,7 @@
 - (void)watchVariable:(ZGVariable *)variable withWatchPointType:(ZGWatchPointType)watchPointType inProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow completionHandler:(watch_variable_completion_t)completionHandler
 {
 	ZGBreakPoint *breakPoint = nil;
-	if (![[[ZGAppController sharedController] breakPointController] addWatchpointOnVariable:variable inProcess:process watchPointType:watchPointType delegate:self getBreakPoint:&breakPoint])
+	if (![self.breakPointController addWatchpointOnVariable:variable inProcess:process watchPointType:watchPointType delegate:self getBreakPoint:&breakPoint])
 	{
 		NSRunAlertPanel(
 						@"Failed to Watch Variable",
@@ -459,14 +467,14 @@
 - (IBAction)showMemoryViewer:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[[[ZGAppController sharedController] memoryViewer] jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size inProcess:self.watchProcess];
+	[self.memoryViewer jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size inProcess:self.watchProcess];
 }
 
 - (IBAction)showDebugger:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[[[ZGAppController sharedController] debuggerController] showWindow:self];
-	[[[ZGAppController sharedController] debuggerController] jumpToMemoryAddress:selectedVariable.address inProcess:self.watchProcess];
+	[self.debuggerController showWindow:self];
+	[self.debuggerController jumpToMemoryAddress:selectedVariable.address inProcess:self.watchProcess];
 }
 
 @end

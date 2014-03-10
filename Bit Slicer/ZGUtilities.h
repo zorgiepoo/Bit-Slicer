@@ -37,12 +37,16 @@
 #import "ZGVariable.h"
 #import "ZGSearchData.h"
 #import "ZGSearchFunctions.h"
+#import "ZGProcessTaskManager.h"
+#import "ZGProcess.h"
 
 #ifdef _DEBUG
 	#define ZG_LOG(format, ...) NSLog(format, __VA_ARGS__)
 #else
 	#define ZG_LOG(format, ...) do { } while (0)
 #endif
+
+BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManager, ZGProcess *process);
 
 ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression);
 BOOL ZGIsValidNumber(NSString *expression);

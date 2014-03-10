@@ -137,11 +137,6 @@
 	return _mainMachBinary;
 }
 
-- (BOOL)grantUsAccess
-{
-	return [[ZGProcessTaskManager sharedManager] getTask:&_processTask forProcessIdentifier:self.processID];
-}
-
 - (BOOL)hasGrantedAccess
 {
     return MACH_PORT_VALID(self.processTask);

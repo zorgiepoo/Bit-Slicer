@@ -38,8 +38,13 @@
 
 @class ZGVariable;
 @class ZGProcess;
+@class ZGDebuggerController;
+@class ZGBreakPointController;
+@class ZGMemoryViewerController;
 
 @interface ZGWatchVariableWindowController : NSWindowController <ZGBreakPointDelegate, NSTableViewDataSource>
+
+- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController memoryViewer:(ZGMemoryViewerController *)memoryViewer;
 
 typedef void (^watch_variable_completion_t)(NSArray *variablesFound);
 

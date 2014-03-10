@@ -73,7 +73,7 @@
 
 - (void)makeWindowControllers
 {
-	self.windowController = [[ZGDocumentWindowController alloc] init];
+	self.windowController = [[ZGDocumentWindowController alloc] initWithDocument:self];
 	
 	[self addWindowController:self.windowController];
 }

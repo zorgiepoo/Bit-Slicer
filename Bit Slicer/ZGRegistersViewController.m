@@ -37,10 +37,12 @@
 #import "ZGVariable.h"
 #import "ZGBreakPoint.h"
 #import "ZGProcess.h"
-#import "ZGPreferencesController.h"
 #import "ZGUtilities.h"
 #import "ZGRegister.h"
 #import "ZGRegisterEntries.h"
+
+#define ZG_REGISTER_TYPES @"ZG_REGISTER_TYPES"
+#define ZG_DEBUG_QUALIFIER @"ZG_DEBUG_QUALIFIER"
 
 @interface ZGRegistersViewController ()
 
@@ -56,6 +58,14 @@
 @end
 
 @implementation ZGRegistersViewController
+
++ (void)initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZG_REGISTER_TYPES : @{}, ZG_DEBUG_QUALIFIER : @0}];
+	});
+}
 
 - (id)initWithUndoManager:(NSUndoManager *)undoManager
 {

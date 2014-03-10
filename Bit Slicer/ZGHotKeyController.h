@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 8/25/13.
+ * Created by Mayur Pawashe on 3/9/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,41 +33,22 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Python.h"
-#import "VDKQueue.h"
-#import "ZGMemoryTypes.h"
-#import "ZGRegisterEntries.h"
+#import <ShortcutRecorder/SRCommon.h>
 
-@class ZGDocumentWindowController;
-@class ZGVariable;
-@class ZGProcess;
-@class ZGBreakPoint;
+// INVALID_KEY_CODE used to be -999, take in account
+#define INVALID_KEY_CODE -1
+#define INVALID_KEY_MODIFIER 0
 
-#define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
-#define SCRIPT_COMPILATION_ERROR_REASON @"SCRIPT_COMPILATION_ERROR_REASON"
-#define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
+#define ZG_HOT_KEY_MODIFIER @"ZG_HOT_KEY_MODIFIER"
+#define ZG_HOT_KEY @"ZG_HOT_KEY_CODE"
 
-extern dispatch_queue_t gPythonQueue;
+@class ZGProcessTaskManager;
+@class ZGDebuggerController;
 
-@interface ZGScriptManager : NSObject <VDKQueueDelegate>
+@interface ZGHotKeyController : NSObject
 
-+ (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController;
 
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError **)error;
-
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
-
-- (void)cleanup;
-
-- (void)loadCachedScriptsFromVariables:(NSArray *)variables;
-
-- (void)openScriptForVariable:(ZGVariable *)variable;
-
-- (void)runScriptForVariable:(ZGVariable *)variable;
-- (void)stopScriptForVariable:(ZGVariable *)variable;
-- (void)removeScriptForVariable:(ZGVariable *)variable;
-
-- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender;
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender;
+@property (nonatomic) KeyCombo pauseHotKeyCombo;
 
 @end

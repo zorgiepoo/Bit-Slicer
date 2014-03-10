@@ -33,30 +33,17 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import <Carbon/Carbon.h>
-
-@class ZGPreferencesController;
-@class ZGMemoryViewerController;
-@class ZGDebuggerController;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
 
 @interface ZGAppController : NSObject
 
-@property (readonly, nonatomic) ZGMemoryViewerController *memoryViewer;
-@property (readonly, nonatomic) ZGDebuggerController *debuggerController;
-@property (readonly, nonatomic) ZGBreakPointController *breakPointController;
-@property (readonly, nonatomic) ZGLoggerWindowController *loggerController;
 // lastSelectedProcessName keeps track of the last targeted process in a document
 @property (copy, nonatomic) NSString *lastSelectedProcessInternalName;
 @property (readonly, nonatomic) BOOL isTerminating;
 
 + (instancetype)sharedController;
 
-+ (void)registerPauseAndUnpauseHotKey;
-
-- (NSString *)createUserModulesDirectory;
-- (NSString *)lastErrorLogPath;
++ (NSString *)createUserModulesDirectory;
++ (NSString *)lastErrorLogPath;
 
 - (void)increaseLivingCount;
 - (void)decreaseLivingCount;

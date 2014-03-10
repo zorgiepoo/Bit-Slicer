@@ -35,6 +35,15 @@
 #import "ZGUtilities.h"
 #import "NSStringAdditions.h"
 
+BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManager, ZGProcess *process)
+{
+	ZGMemoryMap processTask;
+	BOOL success = [processTaskManager getTask:&processTask forProcessIdentifier:process.processID];
+	process.processTask = processTask;
+	
+	return success;
+}
+
 ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression)
 {
 	ZGMemoryAddress address;

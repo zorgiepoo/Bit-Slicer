@@ -43,18 +43,6 @@
 
 @implementation ZGProcessTaskManager
 
-+ (instancetype)sharedManager
-{
-	static id sharedManager = nil;
-	static dispatch_once_t onceToken;
-	
-	dispatch_once(&onceToken, ^{
-		sharedManager = [[self alloc] init];
-	});
-	
-	return sharedManager;
-}
-
 - (BOOL)taskExistsForProcessIdentifier:(pid_t)processIdentifier
 {
 	return [self.tasksDictionary objectForKey:@(processIdentifier)] != nil;

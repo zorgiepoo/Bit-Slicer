@@ -33,17 +33,12 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import <ShortcutRecorder/ShortcutRecorder.h>
 
-// INVALID_KEY_CODE used to be -999, take in account
-#define INVALID_KEY_CODE -1
-#define ZG_HOT_KEY_MODIFIER @"ZG_HOT_KEY_MODIFIER"
-#define ZG_HOT_KEY @"ZG_HOT_KEY_CODE"
-#define ZG_CHECK_FOR_UPDATES @"SUEnableAutomaticChecks"
-#define ZG_CHECK_FOR_ALPHA_UPDATES @"ZG_CHECK_FOR_ALPHA_UPDATES_2"
-#define ZG_REGISTER_TYPES @"ZG_REGISTER_TYPES"
-#define ZG_DEBUG_QUALIFIER @"ZG_DEBUG_QUALIFIER"
+@class ZGHotKeyController;
+@class ZGAppUpdaterController;
 
 @interface ZGPreferencesController : NSWindowController
+
+- (id)initWithHotKeyController:(ZGHotKeyController *)hotKeyController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController;
 
 @end

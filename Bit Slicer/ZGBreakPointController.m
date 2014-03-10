@@ -74,6 +74,8 @@
 #import <mach/mach_port.h>
 #import <mach/mach.h>
 
+extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *OutHeadP);
+
 @interface ZGBreakPointController ()
 
 @property (readwrite, nonatomic) mach_port_t exceptionPort;
@@ -84,7 +86,15 @@
 
 @implementation ZGBreakPointController
 
-extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *OutHeadP);
+static ZGBreakPointController *gBreakPointController;
++ (instancetype)sharedController
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		gBreakPointController = [[ZGBreakPointController alloc] init];
+	});
+	return gBreakPointController;
+}
 
 #define RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(type) \
 	if (debugRegisterIndex == 0) { debugState.uds.type.__dr0 = 0x0; } \
@@ -482,7 +492,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 			NSNumber *existingInstructionAddress = [breakPoint.cacheDictionary objectForKey:instructionPointerNumber];
 			if (existingInstructionAddress == nil)
 			{
-				ZGInstruction *foundInstruction = [ZGDebuggerController findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process];
+				ZGInstruction *foundInstruction = [ZGDebuggerController findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:self.breakPoints];
 				foundInstructionAddress = foundInstruction.variable.address;
 				[breakPoint.cacheDictionary setObject:@(foundInstructionAddress) forKey:instructionPointerNumber];
 			}
@@ -671,8 +681,8 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	
 	if (exception == EXC_BREAKPOINT)
 	{
-		handledWatchPoint = [[[ZGAppController sharedController] breakPointController] handleWatchPointsWithTask:task inThread:thread];
-		handledInstructionBreakPoint = [[[ZGAppController sharedController] breakPointController] handleInstructionBreakPointsWithTask:task inThread:thread];
+		handledWatchPoint = [gBreakPointController handleWatchPointsWithTask:task inThread:thread];
+		handledInstructionBreakPoint = [gBreakPointController handleInstructionBreakPointsWithTask:task inThread:thread];
 	}
 	
 	return (handledWatchPoint || handledInstructionBreakPoint) ? KERN_SUCCESS : KERN_FAILURE;
@@ -698,6 +708,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 	NSMutableArray *removedBreakPoints = [NSMutableArray array];
 	@synchronized(self)
 	{
+		NSArray *runningProcesses = [[[ZGProcessList alloc] init] runningProcesses];
 		for (ZGBreakPoint *breakPoint in self.breakPoints)
 		{
 			if (processID <= 0 || (processID == breakPoint.process.processID && breakPoint.variable.address == address))
@@ -706,7 +717,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 				{
 					BOOL isDead = YES;
 					
-					for (ZGRunningProcess *runningProcess in [[ZGProcessList sharedProcessList] runningProcesses])
+					for (ZGRunningProcess *runningProcess in runningProcesses)
 					{
 						if (runningProcess.processIdentifier == breakPoint.process.processID)
 						{

@@ -45,10 +45,12 @@
 	NSMutableArray *_runningProcesses;
 }
 
-@property (assign) NSUInteger pollRequestCount;
-@property (nonatomic, strong) NSArray *priorityProcesses;
-@property (nonatomic, strong) NSArray *pollObservers;
-@property (nonatomic, strong) NSTimer *pollTimer;
+@property (nonatomic) ZGProcessTaskManager *processTaskManager;
+
+@property NSUInteger pollRequestCount;
+@property (nonatomic) NSArray *priorityProcesses;
+@property (nonatomic) NSArray *pollObservers;
+@property (nonatomic) NSTimer *pollTimer;
 
 @end
 
@@ -93,24 +95,23 @@
 
 #pragma mark Birth
 
-+ (instancetype)sharedProcessList
-{
-	static dispatch_once_t predicate;
-	static id sharedProcessList = nil;
-	
-	dispatch_once(&predicate, ^{
-		sharedProcessList = [[[self class] alloc] init];
-	});
-	return sharedProcessList;
-}
-
 - (id)init
 {
 	self = [super init];
-	if (self)
+	if (self != nil)
 	{
 		_runningProcesses = [[NSMutableArray alloc] init];
 		[self retrieveList];
+	}
+	return self;
+}
+
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager
+{
+	self = [self init];
+	if (self != nil)
+	{
+		self.processTaskManager = processTaskManager;
 	}
 	return self;
 }
@@ -230,7 +231,7 @@
 	{
 		[self retrieveList];
 	}
-	else if (self.priorityProcesses)
+	else if (self.priorityProcesses != nil)
 	{
 		[self watchPriorityProcesses];
 	}
@@ -281,9 +282,9 @@
 	{
 		ZGMemoryMap task = MACH_PORT_NULL;
 		pid_t processIdentifier = runningProcessObserver.runningProcess.processIdentifier;
-		BOOL foundExistingTask = [[ZGProcessTaskManager  sharedManager] taskExistsForProcessIdentifier:processIdentifier];
+		BOOL foundExistingTask = [self.processTaskManager taskExistsForProcessIdentifier:processIdentifier];
 		
-		BOOL retrievedTask = foundExistingTask && [[ZGProcessTaskManager  sharedManager] getTask:&task forProcessIdentifier:processIdentifier];
+		BOOL retrievedTask = foundExistingTask && [self.processTaskManager getTask:&task forProcessIdentifier:processIdentifier];
 		BOOL increasedUserReference = retrievedTask && ZGSetPortSendRightReferenceCountByDelta(task, 1);
 		
 		if (!increasedUserReference || !MACH_PORT_VALID(task))
@@ -306,6 +307,8 @@
 
 - (void)addPriorityToProcessIdentifier:(pid_t)processIdentifier withObserver:(id)observer
 {
+	assert(self.processTaskManager != nil);
+	
 	ZGRunningProcessObserver *runningProcessObserver = [[ZGRunningProcessObserver alloc] initWithProcessIdentifier:processIdentifier observer:observer];
 	
 	if (![self.priorityProcesses containsObject:runningProcessObserver])

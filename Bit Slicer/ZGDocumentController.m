@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 8/25/13.
+ * Created by Mayur Pawashe on 3/8/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,42 +32,45 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "Python.h"
-#import "VDKQueue.h"
-#import "ZGMemoryTypes.h"
-#import "ZGRegisterEntries.h"
+#import "ZGDocumentController.h"
+#import "ZGDebuggerController.h"
+#import "ZGProcessTaskManager.h"
+#import "ZGDocument.h"
 
-@class ZGDocumentWindowController;
-@class ZGVariable;
-@class ZGProcess;
-@class ZGBreakPoint;
+@implementation ZGDocumentController
+{
+	ZGProcessTaskManager *_processTaskManager;
+	ZGDebuggerController *_debuggerController;
+	ZGBreakPointController *_breakPointController;
+	ZGMemoryViewerController *_memoryViewerController;
+	ZGLoggerWindowController *_loggerWindowController;
+}
 
-#define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
-#define SCRIPT_COMPILATION_ERROR_REASON @"SCRIPT_COMPILATION_ERROR_REASON"
-#define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController memoryViewer:(ZGMemoryViewerController *)memoryViewer loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+{
+	self = [super init];
+	if (self != nil)
+	{
+		_processTaskManager = processTaskManager;
+		_debuggerController = debuggerController;
+		_breakPointController = breakPointController;
+		_loggerWindowController = loggerWindowController;
+		_memoryViewerController = memoryViewer;
+	}
+	return self;
+}
 
-extern dispatch_queue_t gPythonQueue;
-
-@interface ZGScriptManager : NSObject <VDKQueueDelegate>
-
-+ (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
-
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError **)error;
-
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
-
-- (void)cleanup;
-
-- (void)loadCachedScriptsFromVariables:(NSArray *)variables;
-
-- (void)openScriptForVariable:(ZGVariable *)variable;
-
-- (void)runScriptForVariable:(ZGVariable *)variable;
-- (void)stopScriptForVariable:(ZGVariable *)variable;
-- (void)removeScriptForVariable:(ZGVariable *)variable;
-
-- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender;
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender;
+- (void)addDocument:(id)theDocument
+{
+	ZGDocument *document = theDocument;
+	
+	document.processTaskManager = _processTaskManager;
+	document.debuggerController = _debuggerController;
+	document.breakPointController = _breakPointController;
+	document.memoryViewerController = _memoryViewerController;
+	document.loggerWindowController = _loggerWindowController;
+	
+	[super addDocument:document];
+}
 
 @end

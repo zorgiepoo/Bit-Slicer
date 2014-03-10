@@ -34,13 +34,24 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class ZGProcessTaskManager;
+@class ZGDebuggerController;
+@class ZGBreakPointController;
+@class ZGMemoryViewerController;
+@class ZGLoggerWindowController;
 @class ZGDocumentData;
 @class ZGSearchData;
 
 @interface ZGDocument : NSDocument
 
-@property (strong, nonatomic) ZGDocumentData *data;
-@property (strong, nonatomic) ZGSearchData *searchData;
+@property (nonatomic) ZGProcessTaskManager *processTaskManager;
+@property (nonatomic) ZGDebuggerController *debuggerController;
+@property (nonatomic) ZGBreakPointController *breakPointController;
+@property (nonatomic) ZGMemoryViewerController *memoryViewerController;
+@property (nonatomic) ZGLoggerWindowController *loggerWindowController;
+
+@property (nonatomic) ZGDocumentData *data;
+@property (nonatomic) ZGSearchData *searchData;
 
 - (void)markChange;
 

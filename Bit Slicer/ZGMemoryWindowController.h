@@ -38,7 +38,7 @@
 #import "ZGMemoryTypes.h"
 
 @class ZGProcess;
-@class ZGProcessList;
+@class ZGProcessTaskManager;
 
 enum ZGNavigation
 {
@@ -50,6 +50,10 @@ enum ZGNavigation
 {
 	ZGProcess *_currentProcess;
 }
+
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
+
+@property (nonatomic, weak) id debuggerController;
 
 @property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (assign) IBOutlet NSSegmentedControl *navigationSegmentedControl;

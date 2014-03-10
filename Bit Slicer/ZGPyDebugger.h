@@ -39,6 +39,8 @@
 
 @class ZGScriptManager;
 @class ZGProcess;
+@class ZGBreakPointController;
+@class ZGLoggerWindowController;
 
 @interface ZGPyDebugger : NSObject <ZGBreakPointDelegate>
 
@@ -46,7 +48,7 @@
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
-- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager;
+- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 - (void)cleanup;
 
 @property (nonatomic, assign) PyObject *object;

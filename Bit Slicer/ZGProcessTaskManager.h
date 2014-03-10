@@ -37,8 +37,6 @@
 
 @interface ZGProcessTaskManager : NSObject
 
-+ (instancetype)sharedManager;
-
 - (BOOL)taskExistsForProcessIdentifier:(pid_t)processIdentifier;
 - (BOOL)getTask:(ZGMemoryMap *)processTask forProcessIdentifier:(pid_t)processIdentifier;
 - (void)freeTaskForProcessIdentifier:(pid_t)processIdentifier;

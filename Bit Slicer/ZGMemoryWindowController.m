@@ -41,16 +41,25 @@
 #import "ZGVirtualMemory.h"
 #import "ZGUtilities.h"
 
+@interface ZGMemoryWindowController ()
+
+@property (nonatomic) ZGProcessTaskManager *processTaskManager;
+@property (nonatomic) ZGProcessList *processList;
+
+@end
+
 @implementation ZGMemoryWindowController
 
 #pragma mark Birth
 
-- (id)init
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager
 {
 	self = [super initWithWindowNibName:NSStringFromClass([self class])];
 	
-	if (self)
+	if (self != nil)
 	{
+		self.processTaskManager = processTaskManager;
+		
 		self.undoManager = [[NSUndoManager alloc] init];
 		self.navigationManager = [[NSUndoManager alloc] init];
 	}
@@ -75,6 +84,8 @@
 - (IBAction)showWindow:(id)sender
 {
 	[super showWindow:sender];
+	
+	[self.processList retrieveList];
 	
 	[self windowDidShow:sender];
 }
@@ -111,8 +122,8 @@
 	{
 		[self destroyUpdateDisplayTimer];
 		
-		[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
-		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+		[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+		[self.processList unrequestPollingWithObserver:self];
 	}
 	else
 	{
@@ -121,15 +132,15 @@
 			[self makeUpdateDisplayTimer];
 		}
 		
-		[[ZGProcessList sharedProcessList] retrieveList];
+		[self.processList retrieveList];
 		
 		if (self.currentProcess.valid)
 		{
-			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+			[self.processList addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 		}
 		else
 		{
-			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+			[self.processList requestPollingWithObserver:self];
 		}
 	}
 }
@@ -164,11 +175,11 @@
 	{
 		if (self.currentProcess.valid)
 		{
-			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+			[self.processList addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 		}
 		else
 		{
-			[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+			[self.processList requestPollingWithObserver:self];
 		}
 	}
 	
@@ -185,10 +196,10 @@
 		
 		if (self.currentProcess.valid)
 		{
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+			[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 		}
 		
-		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+		[self.processList unrequestPollingWithObserver:self];
 	}
 }
 
@@ -196,11 +207,13 @@
 
 - (void)setupProcessListNotificationsAndPopUpButton
 {
+	self.processList = [[ZGProcessList alloc] initWithProcessTaskManager:self.processTaskManager];
+	
 	// Add processes to popup button
 	self.desiredProcessInternalName = [[ZGAppController sharedController] lastSelectedProcessInternalName];
 	[self updateRunningProcesses];
 	
-	[[ZGProcessList sharedProcessList]
+	[self.processList
 	 addObserver:self
 	 forKeyPath:@"runningProcesses"
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
@@ -222,8 +235,16 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (object == [ZGProcessList sharedProcessList])
+	if (object == self.processList)
 	{
+		for (ZGRunningProcess *runningProcess in [change objectForKey:NSKeyValueChangeOldKey])
+		{
+			if ([self.processTaskManager taskExistsForProcessIdentifier:runningProcess.processIdentifier])
+			{
+				[self.processTaskManager freeTaskForProcessIdentifier:runningProcess.processIdentifier];
+			}
+		}
+		
 		[self updateRunningProcesses];
 		[self processListChanged:change];
 	}
@@ -267,11 +288,11 @@
 		
 		if (_currentProcess)
 		{
-			[[ZGProcessList sharedProcessList] removePriorityToProcessIdentifier:_currentProcess.processID withObserver:self];
+			[self.processList removePriorityToProcessIdentifier:_currentProcess.processID withObserver:self];
 		}
 		if (newProcess.valid)
 		{
-			[[ZGProcessList sharedProcessList] addPriorityToProcessIdentifier:newProcess.processID withObserver:self];
+			[self.processList addPriorityToProcessIdentifier:newProcess.processID withObserver:self];
 		}
 		
 		shouldUpdateDisplay = YES;
@@ -279,7 +300,7 @@
 	_currentProcess = newProcess;
 	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.valid)
 	{
-		if (![_currentProcess grantUsAccess])
+		if (!ZGGrantMemoryAccessToProcess(self.processTaskManager, _currentProcess))
 		{
 			shouldUpdateDisplay = YES;
 			NSLog(@"%@ failed to grant access to PID %d", NSStringFromClass([self class]), _currentProcess.processID);
@@ -300,7 +321,7 @@
 	
 	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
 	BOOL foundTargetProcess = NO;
-	for (ZGRunningProcess *runningProcess in  [[[ZGProcessList sharedProcessList] runningProcesses] sortedArrayUsingDescriptors:@[sortDescriptor]])
+	for (ZGRunningProcess *runningProcess in  [self.processList.runningProcesses sortedArrayUsingDescriptors:@[sortDescriptor]])
 	{
 		if (runningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
 		{
@@ -336,11 +357,11 @@
 		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
 		
-		[[ZGProcessList sharedProcessList] requestPollingWithObserver:self];
+		[self.processList requestPollingWithObserver:self];
 	}
 	else
 	{
-		[[ZGProcessList sharedProcessList] unrequestPollingWithObserver:self];
+		[self.processList unrequestPollingWithObserver:self];
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
@@ -348,7 +369,7 @@
 
 - (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
 {
-	[[ZGProcessList sharedProcessList] retrieveList];
+	[self.processList retrieveList];
 }
 
 - (void)switchProcess
@@ -436,7 +457,7 @@
 			[menuItem setTitle:[NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"]];
 		}
 		
-		if ([[[ZGAppController sharedController] debuggerController] isProcessIdentifierHalted:self.currentProcess.processID])
+		if ([self.debuggerController isProcessIdentifierHalted:self.currentProcess.processID])
 		{
 			return NO;
 		}

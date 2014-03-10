@@ -37,25 +37,26 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
 #import "ZGBreakPointController.h"
-#import "ZGBreakPoint.h"
 #import "ZGLoggerWindowController.h"
-#import "ZGProcess.h"
-#import "ZGProcessList.h"
-#import "ZGRunningProcess.h"
-#import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
 #import "ZGDocument.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGScriptManager.h"
 #import "ZGProcessTaskManager.h"
+#import "ZGDocumentController.h"
+#import "ZGHotKeyController.h"
+#import "ZGAppUpdaterController.h"
 
 @interface ZGAppController ()
 
+@property (nonatomic) ZGAppUpdaterController *appUpdaterController;
+@property (nonatomic) ZGDocumentController *documentController;
 @property (nonatomic) ZGPreferencesController *preferencesController;
 @property (nonatomic) ZGMemoryViewerController *memoryViewer;
 @property (nonatomic) ZGDebuggerController *debuggerController;
 @property (nonatomic) ZGBreakPointController *breakPointController;
-@property (nonatomic) ZGLoggerWindowController *loggerController;
+@property (nonatomic) ZGLoggerWindowController *loggerWindowController;
+@property (nonatomic) ZGProcessTaskManager *processTaskManager;
+@property (nonatomic) ZGHotKeyController *hotKeyController;
 
 @property (nonatomic) BOOL isTerminating;
 @property (nonatomic) int livingCount;
@@ -71,36 +72,29 @@
 	return [NSApp delegate];
 }
 
-- (ZGBreakPointController *)breakPointController
-{
-	if (!_breakPointController)
-	{
-		self.breakPointController = [[ZGBreakPointController alloc] init];
-	}
-	
-	return _breakPointController;
-}
-
-+ (void)initialize
-{
-	static dispatch_once_t onceToken = 0;
-	dispatch_once(&onceToken, ^{
-		// ensure user defaults are initialized
-		[ZGPreferencesController class];
-	});
-}
-
 - (id)init
 {
 	self = [super init];
 	
-	if (self)
+	if (self != nil)
 	{
-		[[ZGProcessList sharedProcessList]
-		 addObserver:self
-		 forKeyPath:@"runningProcesses"
-		 options:NSKeyValueObservingOptionOld
-		 context:NULL];
+		self.appUpdaterController = [[ZGAppUpdaterController alloc] init];
+		
+		self.processTaskManager = [[ZGProcessTaskManager alloc] init];
+		
+		self.loggerWindowController = [[ZGLoggerWindowController alloc] init];
+		
+		self.breakPointController = [ZGBreakPointController sharedController];
+		
+		self.memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:self.processTaskManager];
+		
+		self.debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:self.processTaskManager breakPointController:self.breakPointController memoryViewer:self.memoryViewer loggerWindowController:self.loggerWindowController];
+		
+		self.memoryViewer.debuggerController = self.debuggerController;
+		
+		self.hotKeyController = [[ZGHotKeyController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController];
+		
+		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController memoryViewer:self.memoryViewer loggerWindowController:self.loggerWindowController];
 	}
 	
 	return self;
@@ -129,101 +123,26 @@
 {
 	self.isTerminating = YES;
 	
-	if (_debuggerController != nil)
-	{
-		[self.debuggerController cleanup];
-	}
+	[self.debuggerController cleanup];
 	
-	for (ZGDocument *document in [[NSDocumentController sharedDocumentController] documents])
+	for (ZGDocument *document in self.documentController.documents)
 	{
 		ZGDocumentWindowController *windowController = [document.windowControllers lastObject];
 		[windowController.scriptManager cleanup];
 	}
 	
-	return (_breakPointController == nil || self.livingCount == 0) ? NSTerminateNow : NSTerminateLater;
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-	if (object == [ZGProcessList sharedProcessList])
-	{
-		NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
-		
-		if (oldRunningProcesses)
-		{
-			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
-			{
-				if ([[ZGProcessTaskManager sharedManager] taskExistsForProcessIdentifier:runningProcess.processIdentifier])
-				{
-					[[ZGProcessTaskManager sharedManager] freeTaskForProcessIdentifier:runningProcess.processIdentifier];
-				}
-			}
-		}
-	}
-}
-
-#pragma mark Pausing and Unpausing processes
-
-OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
-{
-	for (NSRunningApplication *runningApplication in NSWorkspace.sharedWorkspace.runningApplications)
-	{
-		if (runningApplication.isActive && runningApplication.processIdentifier != getpid() && ![[[ZGAppController sharedController] debuggerController] isProcessIdentifierHalted:runningApplication.processIdentifier])
-		{
-			ZGMemoryMap processTask = 0;
-			if ([[ZGProcessTaskManager sharedManager] getTask:&processTask forProcessIdentifier:runningApplication.processIdentifier])
-			{
-				[ZGProcess pauseOrUnpauseProcessTask:processTask];
-			}
-			else
-			{
-				NSLog(@"Failed to pause/unpause process with pid %d", runningApplication.processIdentifier);
-			}
-		}
-	}
-	
-	return noErr;
-}
-
-static EventHotKeyRef hotKeyRef;
-static BOOL didRegisteredHotKey;
-+ (void)registerPauseAndUnpauseHotKey
-{
-	if (didRegisteredHotKey)
-	{
-		UnregisterEventHotKey(hotKeyRef);
-	}
-	
-	NSNumber *hotKeyCodeNumber = [NSUserDefaults.standardUserDefaults objectForKey:ZG_HOT_KEY];
-	NSNumber *hotKeyModifier = [NSUserDefaults.standardUserDefaults objectForKey:ZG_HOT_KEY_MODIFIER];
-    
-	if (hotKeyCodeNumber && hotKeyCodeNumber.integerValue > INVALID_KEY_CODE)
-	{
-		EventTypeSpec eventType;
-		eventType.eventClass = kEventClassKeyboard;
-		eventType.eventKind = kEventHotKeyPressed;
-		
-		InstallApplicationEventHandler(&pauseOrUnpauseHotKeyHandler, 1, &eventType, NULL, NULL);
-		
-		EventHotKeyID hotKeyID;
-		hotKeyID.signature = 'htk1';
-		hotKeyID.id = 1;
-		
-		RegisterEventHotKey(hotKeyCodeNumber.intValue, hotKeyModifier.intValue, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef);
-		
-		didRegisteredHotKey = YES;
-	}
+	return (self.livingCount == 0) ? NSTerminateNow : NSTerminateLater;
 }
 
 #pragma mark Controller behavior
 
-- (NSString *)ourApplicationSupportPath
++ (NSString *)ourApplicationSupportPath
 {
 	NSString *applicationSupportPath = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) lastObject];
 	return [applicationSupportPath stringByAppendingPathComponent:@"Bit Slicer"];
 }
 
-- (NSString *)createApplicationSupportPath
++ (NSString *)createApplicationSupportPath
 {
 	NSString *ourApplicationSupportPath = [self ourApplicationSupportPath];
 	if (ourApplicationSupportPath == nil)
@@ -231,7 +150,9 @@ static BOOL didRegisteredHotKey;
 		return nil;
 	}
 	
-	if (![[NSFileManager defaultManager] fileExistsAtPath:ourApplicationSupportPath] && ![[NSFileManager defaultManager] createDirectoryAtPath:ourApplicationSupportPath withIntermediateDirectories:NO attributes:nil error:NULL])
+	NSFileManager *fileManager = [[NSFileManager alloc] init];
+	
+	if (![fileManager fileExistsAtPath:ourApplicationSupportPath] && ![fileManager createDirectoryAtPath:ourApplicationSupportPath withIntermediateDirectories:NO attributes:nil error:NULL])
 	{
 		return nil;
 	}
@@ -239,7 +160,7 @@ static BOOL didRegisteredHotKey;
 	return ourApplicationSupportPath;
 }
 
-- (NSString *)lastErrorLogPath
++ (NSString *)lastErrorLogPath
 {
 	NSString *ourApplicationSupportPath = [self createApplicationSupportPath];
 	if (ourApplicationSupportPath == nil)
@@ -250,7 +171,7 @@ static BOOL didRegisteredHotKey;
 	return [ourApplicationSupportPath stringByAppendingPathComponent:@"last script error.txt"];
 }
 
-- (NSString *)createUserModulesDirectory
++ (NSString *)createUserModulesDirectory
 {
 	NSString *ourApplicationSupportPath = [self createApplicationSupportPath];
 	if (ourApplicationSupportPath == nil)
@@ -258,8 +179,10 @@ static BOOL didRegisteredHotKey;
 		return nil;
 	}
 	
+	NSFileManager *fileManager = [[NSFileManager alloc] init];
+	
 	NSString *modulesPath = [ourApplicationSupportPath stringByAppendingPathComponent:@"Modules"];
-	if (![[NSFileManager defaultManager] fileExistsAtPath:modulesPath] && ![[NSFileManager defaultManager] createDirectoryAtPath:modulesPath withIntermediateDirectories:NO attributes:nil error:NULL])
+	if (![fileManager fileExistsAtPath:modulesPath] && ![fileManager createDirectoryAtPath:modulesPath withIntermediateDirectories:NO attributes:nil error:NULL])
 	{
 		return nil;
 	}
@@ -267,134 +190,54 @@ static BOOL didRegisteredHotKey;
 	return modulesPath;
 }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)notification
-{
-	// Initialize preference defaults
-	[self openPreferences:nil showWindow:NO];
-    
-	[self.class registerPauseAndUnpauseHotKey];
-}
-
 #pragma mark Actions
 
 + (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
+	ZGAppController *appController = [NSApp delegate];
+	
 	if ([identifier isEqualToString:ZGMemoryViewerIdentifier])
 	{
-		[self.sharedController
-		 openMemoryViewer:nil
-		 showWindow:NO];
-        
-		completionHandler([[[self sharedController] memoryViewer] window], nil);
+		completionHandler(appController.memoryViewer.window, nil);
 	}
 	else if ([identifier isEqualToString:ZGDebuggerIdentifier])
 	{
-		[self.sharedController
-		 openDebugger:nil
-		 showWindow:NO];
-		
-		completionHandler([[[self sharedController] debuggerController] window], nil);
+		completionHandler(appController.debuggerController.window, nil);
 	}
 	else if ([identifier isEqualToString:ZGLoggerIdentifier])
 	{
-		[self.sharedController
-		 openLogger:nil
-		 showWindow:NO];
-		
-		completionHandler([[[self sharedController] loggerController] window], nil);
-	}
-}
-
-- (ZGPreferencesController *)preferencesController
-{
-	if (!_preferencesController)
-	{
-		_preferencesController = [[ZGPreferencesController alloc] init];
-	}
-	return _preferencesController;
-}
-
-- (void)openPreferences:(id)sender showWindow:(BOOL)shouldShowWindow
-{
-	// Testing for preferencesController will ensure it'll be allocated
-	if (self.preferencesController && shouldShowWindow)
-	{
-		[self.preferencesController showWindow:nil];
+		completionHandler(appController.loggerWindowController.window, nil);
 	}
 }
 
 - (IBAction)openPreferences:(id)sender
 {
-	[self openPreferences:sender showWindow:YES];
-}
-
-- (ZGMemoryViewerController *)memoryViewer
-{
-	if (!_memoryViewer)
+	if (self.preferencesController == nil)
 	{
-		_memoryViewer = [[ZGMemoryViewerController alloc] init];
+		self.preferencesController = [[ZGPreferencesController alloc] initWithHotKeyController:self.hotKeyController appUpdaterController:self.appUpdaterController];
 	}
-	return _memoryViewer;
-}
-
-- (void)openMemoryViewer:(id)sender showWindow:(BOOL)shouldShowWindow
-{
-	// Testing for memoryViewer will ensure it'll be allocated
-	if (self.memoryViewer && shouldShowWindow)
-	{
-		[self.memoryViewer showWindow:nil];
-	}
+	
+	[self.preferencesController showWindow:nil];
 }
 
 - (IBAction)openMemoryViewer:(id)sender
 {
-	[self openMemoryViewer:sender showWindow:YES];
-}
-
-- (void)openDebugger:(id)sender showWindow:(BOOL)shouldShowWindow
-{
-	// Testing for debuggerController will ensure it'll be allocated
-	if (self.debuggerController && shouldShowWindow)
-	{
-		[self.debuggerController showWindow:nil];
-	}
+	[self.memoryViewer showWindow:nil];
 }
 
 - (IBAction)openDebugger:(id)sender
 {
-	[self openDebugger:sender showWindow:YES];
-}
-
-- (ZGDebuggerController *)debuggerController
-{
-	if (!_debuggerController)
-	{
-		_debuggerController = [[ZGDebuggerController alloc] init];
-	}
-	return _debuggerController;
-}
-
-- (ZGLoggerWindowController *)loggerController
-{
-	if (!_loggerController)
-	{
-		self.loggerController = [[ZGLoggerWindowController alloc] init];
-	}
-	
-	return _loggerController;
-}
-
-- (void)openLogger:(id)sender showWindow:(BOOL)shouldShowWindow
-{
-	if (self.loggerController && shouldShowWindow)
-	{
-		[self.loggerController showWindow:nil];
-	}
+	[self.debuggerController showWindow:nil];
 }
 
 - (IBAction)openLogger:(id)sender
 {
-	[self openLogger:sender showWindow:YES];
+	[self.loggerWindowController showWindow:nil];
+}
+
+- (IBAction)checkForUpdates:(id)sender
+{
+	[self.appUpdaterController checkForUpdates];
 }
 
 #pragma mark Help
@@ -423,9 +266,10 @@ static BOOL didRegisteredHotKey;
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:[@"mailto:" stringByAppendingString:FEEDBACK_EMAIL]]];
 }
 
+#define DONATION_URL @"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A3DTDV2F3VE5G&lc=US&item_name=Bit%20Slicer%20App&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"
 - (IBAction)openDonationURL:(id)sender
 {
-	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:@"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A3DTDV2F3VE5G&lc=US&item_name=Bit%20Slicer%20App&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"]];
+	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:DONATION_URL]];
 }
 
 @end

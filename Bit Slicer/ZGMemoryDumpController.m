@@ -162,14 +162,16 @@
 		 if (result == NSFileHandlingPanelOKButton)
 		 {
 			 dispatch_async(dispatch_get_main_queue(), ^{
-				 if ([NSFileManager.defaultManager fileExistsAtPath:savePanel.URL.relativePath])
+				 NSFileManager *fileManager = [[NSFileManager alloc] init];
+				 
+				 if ([fileManager fileExistsAtPath:savePanel.URL.relativePath])
 				 {
-					 [NSFileManager.defaultManager
+					 [fileManager
 					  removeItemAtPath:savePanel.URL.relativePath
 					  error:NULL];
 				 }
 				 
-				 [NSFileManager.defaultManager
+				 [fileManager
 				  createDirectoryAtPath:savePanel.URL.relativePath
 				  withIntermediateDirectories:NO
 				  attributes:nil

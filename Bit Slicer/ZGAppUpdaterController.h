@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 8/25/13.
+ * Created by Mayur Pawashe on 3/9/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,41 +33,16 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Python.h"
-#import "VDKQueue.h"
-#import "ZGMemoryTypes.h"
-#import "ZGRegisterEntries.h"
 
-@class ZGDocumentWindowController;
-@class ZGVariable;
-@class ZGProcess;
-@class ZGBreakPoint;
+@interface ZGAppUpdaterController : NSObject
 
-#define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
-#define SCRIPT_COMPILATION_ERROR_REASON @"SCRIPT_COMPILATION_ERROR_REASON"
-#define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
++ (BOOL)runningAlpha;
 
-extern dispatch_queue_t gPythonQueue;
+@property (nonatomic) BOOL checksForUpdates;
+@property (nonatomic) BOOL checksForAlphaUpdates;
+@property (nonatomic) BOOL sendsAnonymousInfo;
 
-@interface ZGScriptManager : NSObject <VDKQueueDelegate>
-
-+ (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
-
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError **)error;
-
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
-
-- (void)cleanup;
-
-- (void)loadCachedScriptsFromVariables:(NSArray *)variables;
-
-- (void)openScriptForVariable:(ZGVariable *)variable;
-
-- (void)runScriptForVariable:(ZGVariable *)variable;
-- (void)stopScriptForVariable:(ZGVariable *)variable;
-- (void)removeScriptForVariable:(ZGVariable *)variable;
-
-- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender;
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender;
+- (void)reloadValuesFromDefaults;
+- (void)checkForUpdates;
 
 @end
