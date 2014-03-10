@@ -198,7 +198,7 @@
 	NSMutableArray *newValues = [[NSMutableArray alloc] init];
 	NSString *replaceString = self.valueTextField.stringValue;
 	
-	for (ZGVariable *variable in validVariables)
+	for (NSUInteger index = 0; index < validVariables.count; index++)
 	{
 		[newValues addObject:replaceString];
 	}
