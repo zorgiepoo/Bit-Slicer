@@ -110,64 +110,6 @@
 	return appTerminationState.isDead ? NSTerminateNow : NSTerminateLater;
 }
 
-#pragma mark Controller behavior
-
-+ (NSString *)ourApplicationSupportPath
-{
-	NSString *applicationSupportPath = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) lastObject];
-	return [applicationSupportPath stringByAppendingPathComponent:@"Bit Slicer"];
-}
-
-+ (NSString *)createApplicationSupportPath
-{
-	NSString *ourApplicationSupportPath = [self ourApplicationSupportPath];
-	if (ourApplicationSupportPath == nil)
-	{
-		return nil;
-	}
-	
-	NSFileManager *fileManager = [[NSFileManager alloc] init];
-	
-	if (![fileManager fileExistsAtPath:ourApplicationSupportPath] && ![fileManager createDirectoryAtPath:ourApplicationSupportPath withIntermediateDirectories:NO attributes:nil error:NULL])
-	{
-		return nil;
-	}
-	
-	return ourApplicationSupportPath;
-}
-
-+ (NSString *)lastErrorLogPath
-{
-	NSString *ourApplicationSupportPath = [self createApplicationSupportPath];
-	if (ourApplicationSupportPath == nil)
-	{
-		return nil;
-	}
-	
-	return [ourApplicationSupportPath stringByAppendingPathComponent:@"last script error.txt"];
-}
-
-+ (NSString *)createUserModulesDirectory
-{
-	NSString *ourApplicationSupportPath = [self createApplicationSupportPath];
-	if (ourApplicationSupportPath == nil)
-	{
-		return nil;
-	}
-	
-	NSFileManager *fileManager = [[NSFileManager alloc] init];
-	
-	NSString *modulesPath = [ourApplicationSupportPath stringByAppendingPathComponent:@"Modules"];
-	if (![fileManager fileExistsAtPath:modulesPath] && ![fileManager createDirectoryAtPath:modulesPath withIntermediateDirectories:NO attributes:nil error:NULL])
-	{
-		return nil;
-	}
-	
-	return modulesPath;
-}
-
-#pragma mark Actions
-
 + (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
 	ZGAppController *appController = [NSApp delegate];
@@ -185,6 +127,8 @@
 		completionHandler(appController.loggerWindowController.window, nil);
 	}
 }
+
+#pragma mark Menu Actions
 
 - (IBAction)openPreferences:(id)sender
 {

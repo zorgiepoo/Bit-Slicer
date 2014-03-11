@@ -33,7 +33,6 @@
  */
 
 #import "ZGLoggerWindowController.h"
-#import "ZGAppController.h"
 #import "ZGScriptManager.h"
 #import "ZGVariable.h"
 #import "ZGDocumentWindowController.h"
@@ -48,6 +47,7 @@
 #import "ZGUtilities.h"
 #import "ZGRegisterEntries.h"
 #import "ZGAppTerminationState.h"
+#import "ZGAppPathUtilities.h"
 
 #import "structmember.h"
 
@@ -95,7 +95,7 @@ static PyObject *gStructObject;
 
 + (void)initializePythonInterpreter
 {
-	NSString *userModulesDirectory = [ZGAppController createUserModulesDirectory];
+	NSString *userModulesDirectory = [ZGAppPathUtilities createUserModulesDirectory];
 	
 	NSString *pythonDirectory = [[NSBundle mainBundle] pathForResource:@"python3.3" ofType:nil];
 	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
@@ -513,7 +513,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	// Log detailed traceback info including the line where the exception was thrown
 	if (traceback != NULL)
 	{
-		NSString *logPath = [ZGAppController lastErrorLogPath];
+		NSString *logPath = [ZGAppPathUtilities lastErrorLogPath];
 		if (logPath != NULL && [logPath UTF8String] != NULL)
 		{
 			FILE *logFile = fopen([logPath UTF8String], "w");

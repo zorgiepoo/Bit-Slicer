@@ -53,7 +53,6 @@
 // Note: There are some trick cases if the user decides to jump to an address or manually single-step or step-over
 
 #import "ZGBreakPointController.h"
-#import "ZGAppController.h"
 #import "ZGVirtualMemory.h"
 #import "ZGThreadStates.h"
 #import "ZGVariable.h"

@@ -33,7 +33,6 @@
  */
 
 #import "ZGPyDebugger.h"
-#import "ZGAppController.h"
 #import "ZGDebuggerController.h"
 #import "ZGLoggerWindowController.h"
 #import "ZGInstruction.h"

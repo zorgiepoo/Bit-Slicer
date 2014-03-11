@@ -44,7 +44,6 @@
 #import "ZGProcessList.h"
 #import "ZGProcess.h"
 #import "ZGVariableTypes.h"
-#import "ZGAppController.h"
 #import "ZGRunningProcess.h"
 #import "ZGPreferencesController.h"
 #import "ZGDocumentData.h"

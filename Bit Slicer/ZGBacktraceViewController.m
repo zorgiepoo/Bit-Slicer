@@ -39,7 +39,6 @@
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
-#import "ZGAppController.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGBacktrace.h"
 

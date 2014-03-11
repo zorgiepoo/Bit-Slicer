@@ -34,7 +34,6 @@
 
 #import "ZGVariableController.h"
 #import "ZGDocumentTableController.h"
-#import "ZGAppController.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"

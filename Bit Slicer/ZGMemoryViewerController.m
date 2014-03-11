@@ -39,7 +39,6 @@
 #import "DataInspectorRepresenter.h"
 #import "ZGProcess.h"
 #import "ZGSearchProgress.h"
-#import "ZGAppController.h"
 #import "ZGUtilities.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"

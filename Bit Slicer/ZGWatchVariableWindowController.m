@@ -34,7 +34,6 @@
 
 #import "ZGWatchVariableWindowController.h"
 #import "ZGDocumentWindowController.h"
-#import "ZGAppController.h"
 #import "ZGBreakPointController.h"
 #import "ZGDebuggerController.h"
 #import "ZGInstruction.h"
