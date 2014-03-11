@@ -42,6 +42,7 @@
 @class ZGVariable;
 @class ZGProcess;
 @class ZGBreakPoint;
+@class ZGAppTerminationState;
 
 #define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
 #define SCRIPT_COMPILATION_ERROR_REASON @"SCRIPT_COMPILATION_ERROR_REASON"
@@ -58,6 +59,7 @@ extern dispatch_queue_t gPythonQueue;
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
 - (void)cleanup;
+- (void)cleanupWithAppTerminationState:(ZGAppTerminationState *)appTerminationState;
 
 - (void)loadCachedScriptsFromVariables:(NSArray *)variables;
 

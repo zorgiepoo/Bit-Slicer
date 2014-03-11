@@ -45,6 +45,7 @@
 #import "ZGDocumentController.h"
 #import "ZGHotKeyController.h"
 #import "ZGAppUpdaterController.h"
+#import "ZGAppTerminationState.h"
 
 @interface ZGAppController ()
 
@@ -58,19 +59,11 @@
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic) ZGHotKeyController *hotKeyController;
 
-@property (nonatomic) BOOL isTerminating;
-@property (nonatomic) int livingCount;
-
 @end
 
 @implementation ZGAppController
 
-#pragma mark Singleton & Accessors
-
-+ (instancetype)sharedController
-{
-	return [NSApp delegate];
-}
+#pragma mark Birth & Death
 
 - (id)init
 {
@@ -100,38 +93,21 @@
 	return self;
 }
 
-- (void)setLivingCount:(int)livingCount
-{
-	_livingCount = livingCount;
-	if (_livingCount == 0)
-	{
-		[NSApp replyToApplicationShouldTerminate:YES];
-	}
-}
-
-- (void)increaseLivingCount
-{
-	self.livingCount++;
-}
-
-- (void)decreaseLivingCount
-{
-	self.livingCount--;
-}
-
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-	self.isTerminating = YES;
+	ZGAppTerminationState *appTerminationState = [[ZGAppTerminationState alloc] init];
+	
+	self.breakPointController.appTerminationState = appTerminationState;
 	
 	[self.debuggerController cleanup];
 	
 	for (ZGDocument *document in self.documentController.documents)
 	{
-		ZGDocumentWindowController *windowController = [document.windowControllers lastObject];
-		[windowController.scriptManager cleanup];
+		ZGScriptManager *scriptManager = [[document.windowControllers lastObject] scriptManager];
+		[scriptManager cleanupWithAppTerminationState:appTerminationState];
 	}
 	
-	return (self.livingCount == 0) ? NSTerminateNow : NSTerminateLater;
+	return appTerminationState.isDead ? NSTerminateNow : NSTerminateLater;
 }
 
 #pragma mark Controller behavior

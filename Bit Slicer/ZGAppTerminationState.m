@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 2/5/10.
+ * Created by Mayur Pawashe on 3/10/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,11 +32,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#import "ZGAppTerminationState.h"
 
-@interface ZGAppController : NSObject
+@implementation ZGAppTerminationState
+{
+	int _lifeCount;
+}
 
-+ (NSString *)createUserModulesDirectory;
-+ (NSString *)lastErrorLogPath;
+- (BOOL)isDead
+{
+	return _lifeCount <= 0;
+}
+
+- (void)increaseLifeCount
+{
+	_lifeCount++;
+}
+
+- (void)decreaseLifeCount
+{
+	_lifeCount--;
+	if (_lifeCount <= 0)
+	{
+		[NSApp replyToApplicationShouldTerminate:YES];
+	}
+}
 
 @end

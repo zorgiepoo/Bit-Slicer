@@ -68,6 +68,7 @@
 #import "ZGUtilities.h"
 #import "NSArrayAdditions.h"
 #import "ZGRegisterEntries.h"
+#import "ZGAppTerminationState.h"
 
 #import <mach/task.h>
 #import <mach/thread_act.h>
@@ -396,7 +397,7 @@ static ZGBreakPointController *gBreakPointController;
 			
 			if (self.delayedTermination && self.breakPoints.count == 0)
 			{
-				[[ZGAppController sharedController] decreaseLivingCount];
+				[self.appTerminationState decreaseLifeCount];
 			}
 		});
 	}
@@ -743,10 +744,10 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 					}
 					else if (breakPoint.type == ZGBreakPointInstruction)
 					{
-						if (!self.delayedTermination && breakPoint.condition != NULL && [[ZGAppController sharedController] isTerminating])
+						if (self.appTerminationState != nil && !self.delayedTermination && breakPoint.condition != NULL)
 						{
 							self.delayedTermination = YES;
-							[[ZGAppController sharedController] increaseLivingCount];
+							[self.appTerminationState increaseLifeCount];
 						}
 						
 						[removedBreakPoints addObject:breakPoint];

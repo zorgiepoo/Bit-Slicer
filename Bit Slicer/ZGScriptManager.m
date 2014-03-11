@@ -47,6 +47,7 @@
 #import "ZGTableView.h"
 #import "ZGUtilities.h"
 #import "ZGRegisterEntries.h"
+#import "ZGAppTerminationState.h"
 
 #import "structmember.h"
 
@@ -68,6 +69,8 @@
 @property NSMutableArray *runningScripts;
 @property (nonatomic) NSMutableArray *objectsPool;
 @property (nonatomic) id scriptActivity;
+
+@property (nonatomic) ZGAppTerminationState *appTerminationState;
 @property (nonatomic) BOOL delayedAppTermination;
 
 @end
@@ -276,15 +279,17 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	return self;
 }
 
-- (void)cleanup
+- (void)cleanupWithAppTerminationState:(ZGAppTerminationState *)appTerminationState
 {
 	dispatch_once(&_cleanupDispatch, ^{
+		self.appTerminationState = appTerminationState;
+		
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
 			if ([self.runningScripts containsObject:pyScript])
 			{
-				if ([[ZGAppController sharedController] isTerminating])
+				if (self.appTerminationState != nil)
 				{
-					[[ZGAppController sharedController] increaseLivingCount];
+					[self.appTerminationState increaseLifeCount];
 					self.delayedAppTermination = YES;
 				}
 				[self stopScriptForVariable:[variableValue pointerValue]];
@@ -293,6 +298,11 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		
 		[self.fileWatchingQueue removeAllPaths];
 	});
+}
+
+- (void)cleanup
+{
+	[self cleanupWithAppTerminationState:nil];
 }
 
 - (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString *)noteName forPath:(NSString *)fullPath
@@ -833,7 +843,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				if (delayedAppTermination)
 				{
 					dispatch_async(dispatch_get_main_queue(), ^{
-						[[ZGAppController sharedController] decreaseLivingCount];
+						[self.appTerminationState decreaseLifeCount];
 					});
 				}
 			}
@@ -844,7 +854,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			{
 				if (delayedAppTermination)
 				{
-					[[ZGAppController sharedController] decreaseLivingCount];
+					[self.appTerminationState decreaseLifeCount];
 				}
 				else
 				{
