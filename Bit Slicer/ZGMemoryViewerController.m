@@ -140,15 +140,13 @@
 	self.currentMemoryAddress = [coder decodeInt64ForKey:ZGMemoryViewerAddress];
 	
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGMemoryViewerProcessInternalName];
-	[self updateRunningProcesses];
 	
-	[self windowDidShow:nil];
+	[self updateRunningProcesses];
+	[self changeMemoryView:nil];
 }
 
 - (void)windowDidLoad
-{	
-	[self setWindowAttributesWithIdentifier:ZGMemoryViewerIdentifier];
-	
+{
 	// So, I've no idea what HFTextView does by default, remove any type of representer that it might have and that we want to add
 	NSMutableArray *representersToRemove = [[NSMutableArray alloc] init];
 	
@@ -198,8 +196,16 @@
 	}
 	
 	[self setupProcessListNotificationsAndPopUpButton];
+}
+
+- (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory
+{
+	[super updateWindow];
 	
-	[self changeMemoryView:nil];
+	if (shouldReadMemory)
+	{
+		[self changeMemoryView:nil];
+	}
 }
 
 - (double)displayMemoryTimeInterval
@@ -685,10 +691,6 @@
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength inProcess:(ZGProcess *)requestedProcess
 {
-	BOOL firstTimeMakingWindowVisible = !self.windowDidAppear;
-	
-	[self showWindow:nil];
-	
 	NSMenuItem *targetMenuItem = nil;
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.menu.itemArray)
 	{
@@ -700,19 +702,12 @@
 		}
 	}
 	
-	if (targetMenuItem)
+	if (targetMenuItem != nil)
 	{
 		[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
 		[self runningApplicationsPopUpButton:nil];
 		[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", memoryAddress]];
 		[self updateMemoryViewerAtAddress:memoryAddress withSelectionLength:selectionLength];
-		
-		// When the window is first loaded, it tries to read in memory from wherever it can manage to.. However, if we are loading memory for the first time by being requested to jump somewhere, remove the history of navigating back to the first load that the user won't see anyway
-		if (firstTimeMakingWindowVisible)
-		{
-			[self.navigationManager removeAllActions];
-			[self updateNavigationButtons];
-		}
 	}
 }
 

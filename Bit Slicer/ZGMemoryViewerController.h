@@ -41,9 +41,9 @@
 
 #define DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH 4
 
-#define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
-
 @interface ZGMemoryViewerController : ZGMemoryWindowController <NSWindowDelegate>
+
+- (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
 
 - (HFRange)selectedAddressRange;
 

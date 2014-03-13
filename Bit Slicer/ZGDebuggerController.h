@@ -40,8 +40,6 @@
 #import "ZGBreakPointConditionViewController.h"
 #import "ZGBacktraceViewController.h"
 
-#define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
-
 @class ZGProcess;
 @class ZGInstruction;
 @class ZGMachBinary;
@@ -74,6 +72,8 @@ error:(NSError **)error;
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController memoryViewer:(ZGMemoryViewerController *)memoryViewer loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 
 - (void)cleanup;
+
+- (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
 

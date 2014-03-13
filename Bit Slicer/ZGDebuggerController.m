@@ -57,6 +57,7 @@
 #import "ZGTableView.h"
 #import "ZGVariableController.h"
 #import "ZGBacktrace.h"
+#import "ZGNavigationPost.h"
 
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
@@ -176,17 +177,14 @@ enum ZGStepExecution
 	}
 	
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGDebuggerProcessInternalName];
-	
 	[self updateRunningProcesses];
 	
-	[self windowDidShow:nil];
+	[self.debuggerController updateWindowAndReadMemory:YES];
 }
 
 - (void)windowDidLoad
 {
     [super windowDidLoad];
-	
-	[self setWindowAttributesWithIdentifier:ZGDebuggerIdentifier];
 	
 	[self setupProcessListNotificationsAndPopUpButton];
 	
@@ -210,6 +208,16 @@ enum ZGStepExecution
 	self.registersAndBacktraceSplitView.autosaveName = ZGRegistersAndBacktraceSplitViewAutosaveName;
 }
 
+- (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory
+{
+	[super updateWindow];
+	
+	if (shouldReadMemory)
+	{
+		[self readMemory:nil];
+	}
+}
+
 - (void)createSymbolicator
 {
 	if (!CSIsNull(self.symbolicator) && self.currentProcess.valid)
@@ -224,14 +232,6 @@ enum ZGStepExecution
 	else
 	{
 		self.symbolicator = kCSNull;
-	}
-}
-
-- (void)windowDidAppearForFirstTime:(id)sender
-{
-	if (!sender)
-	{
-		[self readMemory:nil];
 	}
 }
 
@@ -967,6 +967,7 @@ enum ZGStepExecution
 		}
 		
 		[self updateNavigationButtons];
+		[self invalidateRestorableState];
 		
 		return;
 	}
@@ -1074,6 +1075,8 @@ enum ZGStepExecution
 	
 	[self.undoManager removeAllActions];
 	[self updateDisassemblerWithAddress:lowBoundAddress size:highBoundAddress - lowBoundAddress selectionAddress:calculatedMemoryAddress];
+	
+	[self invalidateRestorableState];
 }
 
 #pragma mark Useful methods for the world
@@ -2672,7 +2675,7 @@ enum ZGStepExecution
 	NSArray *selectedInstructions = (self.window.firstResponder == self.backtraceViewController.tableView) ? self.backtraceViewController.selectedInstructions : self.selectedInstructions;
 	ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
 	
-	[self.memoryViewer jumpToMemoryAddress:selectedInstruction.variable.address withSelectionLength:selectedInstruction.variable.size inProcess:self.currentProcess];
+	[ZGNavigationPost postShowMemoryViewerWithProcess:self.currentProcess address:selectedInstruction.variable.address selectionLength:selectedInstruction.variable.size];
 }
 
 @end

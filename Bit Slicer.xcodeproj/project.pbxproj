@@ -52,6 +52,7 @@
 		777C34B5187523D0005E64E1 /* ZGNoSmallSizeToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */; };
 		777DA25218CE97BE0092DEC9 /* ZGAppTerminationState.m in Sources */ = {isa = PBXBuildFile; fileRef = 777DA25118CE97BE0092DEC9 /* ZGAppTerminationState.m */; };
 		777DA25518CEA0390092DEC9 /* ZGAppPathUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 777DA25418CEA0390092DEC9 /* ZGAppPathUtilities.m */; };
+		777DA25918CF55750092DEC9 /* ZGNavigationPost.m in Sources */ = {isa = PBXBuildFile; fileRef = 777DA25818CF55750092DEC9 /* ZGNavigationPost.m */; };
 		7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */; };
 		77988F1A185803E800476A37 /* container.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F19185803E800476A37 /* container.pdf */; };
 		77988F1C185804AC00476A37 /* container_filled.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F1B185804AC00476A37 /* container_filled.pdf */; };
@@ -347,6 +348,8 @@
 		777DA25318CEA0390092DEC9 /* ZGAppPathUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGAppPathUtilities.h; path = "Bit Slicer/ZGAppPathUtilities.h"; sourceTree = "<group>"; };
 		777DA25418CEA0390092DEC9 /* ZGAppPathUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGAppPathUtilities.m; path = "Bit Slicer/ZGAppPathUtilities.m"; sourceTree = "<group>"; };
 		777DA25618CEAFE70092DEC9 /* ZGAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGAppController.h; path = "Bit Slicer/ZGAppController.h"; sourceTree = "<group>"; };
+		777DA25718CF55750092DEC9 /* ZGNavigationPost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGNavigationPost.h; path = "Bit Slicer/ZGNavigationPost.h"; sourceTree = "<group>"; };
+		777DA25818CF55750092DEC9 /* ZGNavigationPost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGNavigationPost.m; path = "Bit Slicer/ZGNavigationPost.m"; sourceTree = "<group>"; };
 		7789C379189A570F00F1FDAF /* ZGMachBinaryInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMachBinaryInfo.h; path = "Bit Slicer/ZGMachBinaryInfo.h"; sourceTree = "<group>"; };
 		7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMachBinaryInfo.m; path = "Bit Slicer/ZGMachBinaryInfo.m"; sourceTree = "<group>"; };
 		77988F19185803E800476A37 /* container.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container.pdf; path = "Bit Slicer/docicons/container.pdf"; sourceTree = "<group>"; };
@@ -1114,6 +1117,8 @@
 			children = (
 				777DA25618CEAFE70092DEC9 /* ZGAppController.h */,
 				77F115E117D2EDC3009E002A /* ZGAppController.m */,
+				777DA25718CF55750092DEC9 /* ZGNavigationPost.h */,
+				777DA25818CF55750092DEC9 /* ZGNavigationPost.m */,
 				777DA25018CE97BE0092DEC9 /* ZGAppTerminationState.h */,
 				777DA25118CE97BE0092DEC9 /* ZGAppTerminationState.m */,
 				777DA25318CEA0390092DEC9 /* ZGAppPathUtilities.h */,
@@ -1244,6 +1249,7 @@
 				7798EED018C40B7F001120FB /* _DDVariableExpression.m in Sources */,
 				770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */,
 				77FFC14C18711D2700122357 /* ZGEditDescriptionWindowController.m in Sources */,
+				777DA25918CF55750092DEC9 /* ZGNavigationPost.m in Sources */,
 				770FAC031853C5D600C176B7 /* APTokenSearchField.m in Sources */,
 				772C0F7E18B88AFA009FFF72 /* ZGRegisterEntries.m in Sources */,
 				7798EED518C40B7F001120FB /* DDMathOperator.m in Sources */,

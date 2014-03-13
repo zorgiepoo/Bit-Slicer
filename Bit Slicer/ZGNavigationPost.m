@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 9/2/13.
+ * Created by Mayur Pawashe on 3/11/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#import "ZGNavigationPost.h"
 
-@interface ZGLoggerWindowController : NSWindowController
+NSString *ZGNavigationShowMemoryViewerNotification = @"ZGNavigationShowMemoryViewerNotification";
+NSString *ZGNavigationShowDebuggerNotification = @"ZGNavigationShowDebuggerNotification";
 
-- (void)writeLine:(NSString *)text;
+NSString *ZGNavigationProcessKey = @"ZGNavigationProcessKey";
+NSString *ZGNavigationMemoryAddressKey = @"ZGNavigationMemoryAddressKey";
+NSString *ZGNavigationSelectionLengthKey = @"ZGNavigationSelectionLengthKey";
+
+@implementation ZGNavigationPost
+
++ (void)postShowMemoryViewerWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address selectionLength:(NSUInteger)selectionLength
+{
+	NSNotification *notification =
+	[NSNotification
+	 notificationWithName:ZGNavigationShowMemoryViewerNotification
+	 object:nil
+	 userInfo:@{ZGNavigationProcessKey : process, ZGNavigationMemoryAddressKey : @(address), ZGNavigationSelectionLengthKey : @(selectionLength)}];
+	
+	[[NSNotificationCenter defaultCenter] postNotification:notification];
+}
+
++ (void)postShowDebuggerWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address
+{
+	NSNotification *notification =
+	[NSNotification
+	 notificationWithName:ZGNavigationShowDebuggerNotification
+	 object:nil
+	 userInfo:@{ZGNavigationProcessKey : process, ZGNavigationMemoryAddressKey : @(address)}];
+	
+	[[NSNotificationCenter defaultCenter] postNotification:notification];
+}
 
 @end

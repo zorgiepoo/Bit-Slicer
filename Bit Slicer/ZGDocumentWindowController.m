@@ -63,6 +63,7 @@
 #import "ZGWatchVariableWindowController.h"
 #import "ZGUtilities.h"
 #import "ZGTableView.h"
+#import "ZGNavigationPost.h"
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
@@ -1688,7 +1689,7 @@
 {
 	if (self.watchVariableWindowController == nil)
 	{
-		self.watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithDebuggerController:self.debuggerController breakPointController:self.breakPointController memoryViewer:self.memoryViewer];
+		self.watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:self.breakPointController];
 	}
 	
 	[self.watchVariableWindowController watchVariable:[self.selectedVariables objectAtIndex:0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:self.window completionHandler:^(NSArray *foundVariables) {
@@ -1707,14 +1708,17 @@
 - (IBAction)showMemoryViewer:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[self.memoryViewer jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH inProcess:self.currentProcess];
+	
+	[ZGNavigationPost
+	 postShowMemoryViewerWithProcess:self.currentProcess
+	 address:selectedVariable.address
+	 selectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
 }
 
 - (IBAction)showDebugger:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[self.debuggerController showWindow:self];
-	[self.debuggerController jumpToMemoryAddress:selectedVariable.address inProcess:self.currentProcess];
+	[ZGNavigationPost postShowDebuggerWithProcess:self.currentProcess address:selectedVariable.address];
 }
 
 #pragma mark Pausing and Unpausing Processes

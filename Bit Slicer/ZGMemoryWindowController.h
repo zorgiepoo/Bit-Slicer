@@ -71,16 +71,11 @@ enum ZGNavigation
 @property (nonatomic, readonly) ZGProcess *currentProcess;
 @property (nonatomic, copy) NSString *desiredProcessInternalName;
 
-@property (readwrite, nonatomic) BOOL windowDidAppear;
-
 @property (readwrite, strong) NSTimer *updateDisplayTimer;
 
 - (IBAction)pauseOrUnpauseProcess:(id)sender;
 
-- (void)windowDidAppearForFirstTime:(id)sender;
-- (void)windowDidShow:(id)sender;
-
-- (void)setWindowAttributesWithIdentifier:(NSString *)windowIdentifier;
+- (void)updateWindow;
 
 - (void)setupProcessListNotificationsAndPopUpButton;
 

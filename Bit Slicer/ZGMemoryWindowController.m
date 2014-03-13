@@ -33,7 +33,6 @@
  */
 
 #import "ZGMemoryWindowController.h"
-#import "ZGAppController.h"
 #import "ZGDebuggerController.h" // For seeing if we can pause/unpause a process
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
@@ -107,24 +106,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	return self.undoManager;
 }
 
-- (void)setWindowAttributesWithIdentifier:(NSString *)windowIdentifier
-{
-	self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
-	self.window.restorable = YES;
-	self.window.restorationClass = [ZGAppController class];
-	self.window.identifier = windowIdentifier;
-	[self invalidateRestorableState];
-}
-
-- (IBAction)showWindow:(id)sender
-{
-	[super showWindow:sender];
-	
-	[self.processList retrieveList];
-	
-	[self windowDidShow:sender];
-}
-
 - (void)windowDidAppearForFirstTime:(id)sender
 {
 }
@@ -192,18 +173,13 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	}
 }
 
-// This is intended to be called when the window shows up - either from showWindow: or from window restoration
-- (void)windowDidShow:(id)sender
+- (void)updateWindow
 {
+	[self.processList retrieveList];
+	
 	if (self.updateDisplayTimer == nil)
 	{
 		[self makeUpdateDisplayTimer];
-	}
-	
-	if (!self.windowDidAppear)
-	{
-		[self windowDidAppearForFirstTime:sender];
-		self.windowDidAppear = YES;
 	}
 	
 	if (self.currentProcess != nil)
@@ -342,7 +318,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 		}
 	}
 	
-	if (shouldUpdateDisplay && self.windowDidAppear)
+	if (shouldUpdateDisplay)
 	{
 		[self currentProcessChanged];
 	}

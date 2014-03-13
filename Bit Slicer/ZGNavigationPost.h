@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 9/2/13.
+ * Created by Mayur Pawashe on 3/11/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#import "ZGMemoryTypes.h"
 
-@interface ZGLoggerWindowController : NSWindowController
+extern NSString *ZGNavigationShowMemoryViewerNotification;
+extern NSString *ZGNavigationShowDebuggerNotification;
 
-- (void)writeLine:(NSString *)text;
+extern NSString *ZGNavigationProcessKey;
+extern NSString *ZGNavigationMemoryAddressKey;
+extern NSString *ZGNavigationSelectionLengthKey;
+
+@class ZGProcess;
+
+@interface ZGNavigationPost : NSObject
+
++ (void)postShowMemoryViewerWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address selectionLength:(NSUInteger)selectionLength;
++ (void)postShowDebuggerWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address;
 
 @end

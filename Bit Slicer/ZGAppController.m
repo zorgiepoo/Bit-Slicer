@@ -46,6 +46,11 @@
 #import "ZGHotKeyController.h"
 #import "ZGAppUpdaterController.h"
 #import "ZGAppTerminationState.h"
+#import "ZGNavigationPost.h"
+
+#define ZGLoggerIdentifier @"ZGLoggerIdentifier"
+#define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
+#define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
 
 @interface ZGAppController ()
 
@@ -88,6 +93,18 @@
 		self.hotKeyController = [[ZGHotKeyController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController];
 		
 		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController memoryViewer:self.memoryViewer loggerWindowController:self.loggerWindowController];
+		
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(showWindowControllerNotification:)
+		 name:ZGNavigationShowMemoryViewerNotification
+		 object:nil];
+		
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(showWindowControllerNotification:)
+		 name:ZGNavigationShowDebuggerNotification
+		 object:nil];
 	}
 	
 	return self;
@@ -110,25 +127,79 @@
 	return appTerminationState.isDead ? NSTerminateNow : NSTerminateLater;
 }
 
+#pragma mark Restoration
+
 + (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
 	ZGAppController *appController = [NSApp delegate];
 	
+	NSWindowController *restoredWindowController = nil;
+	
 	if ([identifier isEqualToString:ZGMemoryViewerIdentifier])
 	{
-		completionHandler(appController.memoryViewer.window, nil);
+		restoredWindowController = appController.memoryViewer;
 	}
 	else if ([identifier isEqualToString:ZGDebuggerIdentifier])
 	{
-		completionHandler(appController.debuggerController.window, nil);
+		restoredWindowController = appController.debuggerController;
 	}
 	else if ([identifier isEqualToString:ZGLoggerIdentifier])
 	{
-		completionHandler(appController.loggerWindowController.window, nil);
+		restoredWindowController = appController.loggerWindowController;
+	}
+	
+	if (restoredWindowController != nil)
+	{
+		[appController setRestorationForWindowController:restoredWindowController	withWindowIdentifier:identifier];
+		
+		completionHandler(restoredWindowController.window, nil);
+	}
+	else
+	{
+		NSLog(@"Error: Restored window controller is nil from identifier %@", identifier);
 	}
 }
 
+- (BOOL)setRestorationForWindowController:(NSWindowController *)windowController withWindowIdentifier:(NSString *)windowIdentifier
+{
+	BOOL firstTimeLoading = (windowController.window.restorationClass == nil);
+	
+	if (firstTimeLoading)
+	{
+		windowController.window.restorationClass = self.class;
+		windowController.window.identifier = windowIdentifier;
+	}
+	
+	return firstTimeLoading;
+}
+
 #pragma mark Menu Actions
+
+- (void)showMemoryWindowController:(id)memoryWindowController withWindowIdentifier:(NSString *)windowIdentifier andCanReadMemory:(BOOL)canReadMemory
+{
+	[memoryWindowController showWindow:nil];
+	
+	BOOL firstTimeLoading = [self setRestorationForWindowController:memoryWindowController withWindowIdentifier:windowIdentifier];
+	
+	[memoryWindowController updateWindowAndReadMemory:canReadMemory && firstTimeLoading];
+}
+
+- (IBAction)openMemoryViewer:(id)sender
+{
+	[self showMemoryWindowController:self.memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:YES];
+}
+
+- (IBAction)openDebugger:(id)sender
+{
+	[self showMemoryWindowController:self.debuggerController withWindowIdentifier:ZGDebuggerIdentifier andCanReadMemory:YES];
+}
+
+- (IBAction)openLogger:(id)sender
+{
+	[self.loggerWindowController showWindow:nil];
+	
+	[self setRestorationForWindowController:self.loggerWindowController withWindowIdentifier:ZGLoggerIdentifier];
+}
 
 - (IBAction)openPreferences:(id)sender
 {
@@ -140,27 +211,33 @@
 	[self.preferencesController showWindow:nil];
 }
 
-- (IBAction)openMemoryViewer:(id)sender
-{
-	[self.memoryViewer showWindow:nil];
-}
-
-- (IBAction)openDebugger:(id)sender
-{
-	[self.debuggerController showWindow:nil];
-}
-
-- (IBAction)openLogger:(id)sender
-{
-	[self.loggerWindowController showWindow:nil];
-}
-
 - (IBAction)checkForUpdates:(id)sender
 {
 	[self.appUpdaterController checkForUpdates];
 }
 
-#pragma mark Help
+#pragma mark Notifications
+
+- (void)showWindowControllerNotification:(NSNotification *)notification
+{
+	ZGProcess *process = [notification.userInfo objectForKey:ZGNavigationProcessKey];
+	ZGMemoryAddress address = [[notification.userInfo objectForKey:ZGNavigationMemoryAddressKey] unsignedLongLongValue];
+	
+	if ([notification.name isEqualToString:ZGNavigationShowDebuggerNotification])
+	{
+		[self showMemoryWindowController:self.debuggerController withWindowIdentifier:ZGDebuggerIdentifier andCanReadMemory:NO];
+		[self.debuggerController jumpToMemoryAddress:address inProcess:process];
+	}
+	else if ([notification.name isEqualToString:ZGNavigationShowMemoryViewerNotification])
+	{
+		ZGMemoryAddress selectionLength = [[notification.userInfo objectForKey:ZGNavigationSelectionLengthKey] unsignedLongLongValue];
+		
+		[self showMemoryWindowController:self.memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:NO];
+		[self.memoryViewer jumpToMemoryAddress:address withSelectionLength:selectionLength inProcess:process];
+	}
+}
+
+#pragma mark Links
 
 #define WIKI_URL @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki"
 - (IBAction)help:(id)sender

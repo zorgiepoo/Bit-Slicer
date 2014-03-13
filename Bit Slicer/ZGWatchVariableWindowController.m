@@ -35,7 +35,6 @@
 #import "ZGWatchVariableWindowController.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGBreakPointController.h"
-#import "ZGDebuggerController.h"
 #import "ZGInstruction.h"
 #import "ZGBreakPoint.h"
 #import "ZGVariable.h"
@@ -44,17 +43,15 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 #import "NSArrayAdditions.h"
-#import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
 #import "ZGVariableController.h"
 #import "ZGUtilities.h"
 #import "ZGRegisterEntries.h"
+#import "ZGNavigationPost.h"
 
 @interface ZGWatchVariableWindowController ()
 
-@property (nonatomic) ZGDebuggerController *debuggerController;
 @property (nonatomic) ZGBreakPointController *breakPointController;
-@property (nonatomic) ZGMemoryViewerController *memoryViewer;
 
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
 @property (nonatomic, assign) IBOutlet NSTextField *statusTextField;
@@ -75,7 +72,7 @@
 
 #pragma mark Birth & Death
 
-- (id)initWithDebuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController memoryViewer:(ZGMemoryViewerController *)memoryViewer
+- (id)initWithBreakPointController:(ZGBreakPointController *)breakPointController
 {
 	self = [super init];
 	if (self != nil)
@@ -86,9 +83,7 @@
 		 name:NSApplicationWillTerminateNotification
 		 object:nil];
 		
-		self.debuggerController = debuggerController;
 		self.breakPointController = breakPointController;
-		self.memoryViewer = memoryViewer;
 	}
 	return self;
 }
@@ -466,14 +461,13 @@
 - (IBAction)showMemoryViewer:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[self.memoryViewer jumpToMemoryAddress:selectedVariable.address withSelectionLength:selectedVariable.size inProcess:self.watchProcess];
+	[ZGNavigationPost postShowMemoryViewerWithProcess:self.watchProcess address:selectedVariable.address selectionLength:selectedVariable.size];
 }
 
 - (IBAction)showDebugger:(id)sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[self.debuggerController showWindow:self];
-	[self.debuggerController jumpToMemoryAddress:selectedVariable.address inProcess:self.watchProcess];
+	[ZGNavigationPost postShowDebuggerWithProcess:self.watchProcess address:selectedVariable.address];
 }
 
 @end
