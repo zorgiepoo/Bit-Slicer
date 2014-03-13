@@ -304,8 +304,9 @@ static PyObject *Debugger_log(DebuggerClass *self, PyObject *args)
 	Py_XDECREF(unicodeObject);
 	Py_XDECREF(objectToLogString);
 	
+	ZGLoggerWindowController *loggerWindowController = self->objcSelf.loggerWindowController;
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[self->objcSelf.loggerWindowController writeLine:objcStringToLog];
+		[loggerWindowController writeLine:objcStringToLog];
 	});
 	
 	return Py_BuildValue("");
@@ -362,11 +363,12 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 		{
 			PyErr_SetString(PyExc_ValueError, [[NSString stringWithFormat:@"debug.assemble failed to assemble:\n%s", codeString] UTF8String]);
 			
+			ZGLoggerWindowController *loggerWindowController = self->objcSelf.loggerWindowController;
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[self->objcSelf.loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
+				[loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
 				if ([[error userInfo] objectForKey:@"description"] != nil)
 				{
-					[self->objcSelf.loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
+					[loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
 				}
 			});
 		}
@@ -421,8 +423,9 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 			PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"debug.readBytes failed to read %llu byte(s) at 0x%llX", size, address] UTF8String]);
 			
 			NSString *errorMessage = @"Error: Failed to read bytes using debug object";
+			ZGLoggerWindowController *loggerWindowController = self->objcSelf.loggerWindowController;
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[self->objcSelf.loggerWindowController writeLine:errorMessage];
+				[loggerWindowController writeLine:errorMessage];
 			});
 		}
 	}
@@ -552,11 +555,12 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		{
 			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.injectCode failed with source address: 0x%llx, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
 			
+			ZGLoggerWindowController *loggerWindowController = self->objcSelf.loggerWindowController;
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[self->objcSelf.loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
+				[loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
 				if ([[error userInfo] objectForKey:@"description"] != nil)
 				{
-					[self->objcSelf.loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
+					[loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
 				}
 			});
 			
