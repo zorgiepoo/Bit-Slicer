@@ -85,10 +85,8 @@
 	self.lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
 }
 
-- (void)addDocument:(id)theDocument
+- (void)initializeDocument:(ZGDocument *)document
 {
-	ZGDocument *document = theDocument;
-	
 	document.processTaskManager = _processTaskManager;
 	document.debuggerController = _debuggerController;
 	document.breakPointController = _breakPointController;
@@ -96,8 +94,36 @@
 	document.loggerWindowController = _loggerWindowController;
 	
 	document.lastChosenInternalProcessName = self.lastChosenInternalProcessName;
+}
+
+// Override makeDocumentXXX methods so we can initialize the document's properties
+// instead of overriding addDocument: which will not handle all cases (eg: browsing different versions to revert back to)
+
+- (id)makeDocumentForURL:(NSURL *)absoluteDocumentURL withContentsOfURL:(NSURL *)absoluteDocumentContentsURL ofType:(NSString *)typeName error:(NSError * __autoreleasing *)outError
+{
+	id document = [super makeDocumentForURL:absoluteDocumentURL withContentsOfURL:absoluteDocumentContentsURL ofType:typeName error:outError];
 	
-	[super addDocument:document];
+	[self initializeDocument:document];
+	
+	return document;
+}
+
+- (id)makeDocumentWithContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError * __autoreleasing *)outError
+{
+	id document = [super makeDocumentWithContentsOfURL:absoluteURL ofType:typeName error:outError];
+	
+	[self initializeDocument:document];
+	
+	return document;
+}
+
+- (id)makeUntitledDocumentOfType:(NSString *)typeName error:(NSError * __autoreleasing *)outError
+{
+	id document = [super makeUntitledDocumentOfType:typeName error:outError];
+	
+	[self initializeDocument:document];
+	
+	return document;
 }
 
 @end
