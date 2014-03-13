@@ -633,7 +633,13 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		script.module = PyImport_ImportModule([script.moduleName UTF8String]);
 		script.module = PyImport_ReloadModule(script.module);
 		
-		if (script.module == NULL)
+		PyTypeObject *scriptClassType = NULL;
+		if (script.module != NULL)
+		{
+			scriptClassType = (PyTypeObject *)PyObject_GetAttrString(script.module, "Script");
+		}
+		
+		if (scriptClassType == NULL)
 		{
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[self disableVariable:variable];
@@ -643,7 +649,6 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			return;
 		}
 		
-		PyTypeObject *scriptClassType = (PyTypeObject *)PyObject_GetAttrString(script.module, "Script");
 		script.scriptObject = scriptClassType->tp_alloc(scriptClassType, 0);
 		
 		Py_XDECREF(scriptClassType);
