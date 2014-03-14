@@ -47,7 +47,6 @@
 #import "ZGUtilities.h"
 #import "ZGRegistersViewController.h"
 #import "ZGPreferencesController.h"
-#import "ZGMemoryViewerController.h"
 #import "NSArrayAdditions.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
@@ -65,7 +64,6 @@
 @interface ZGDebuggerController ()
 
 @property (nonatomic) ZGBreakPointController *breakPointController;
-@property (nonatomic, weak) ZGMemoryViewerController *memoryViewer;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
 
 @property (nonatomic, assign) IBOutlet ZGTableView *instructionsTableView;
@@ -126,7 +124,7 @@ enum ZGStepExecution
 
 #pragma mark Birth & Death
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController memoryViewer:(ZGMemoryViewerController *)memoryViewer loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super initWithProcessTaskManager:processTaskManager];
 	
@@ -134,7 +132,6 @@ enum ZGStepExecution
 	{
 		self.debuggerController = self;
 		self.breakPointController = breakPointController;
-		self.memoryViewer = memoryViewer;
 		self.loggerWindowController = loggerWindowController;
 		
 		self.haltedBreakPoints = [[NSArray alloc] init];
@@ -1440,6 +1437,11 @@ enum ZGStepExecution
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
+	if (self.instructions.count > 0 && self.selectedInstructions.count > 0)
+	{
+		ZGInstruction *firstInstruction = [self.selectedInstructions objectAtIndex:0];
+		[ZGNavigationPost postMemorySelectionChangeWithProcess:self.currentProcess selectionRange:NSMakeRange(firstInstruction.variable.address, firstInstruction.variable.size)];
+	}
 	[self updateStatusBar];
 }
 

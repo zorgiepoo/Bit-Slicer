@@ -47,7 +47,6 @@
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic) ZGDebuggerController *debuggerController;
 @property (nonatomic) ZGBreakPointController *breakPointController;
-@property (nonatomic) ZGMemoryViewerController *memoryViewerController;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;

@@ -37,11 +37,10 @@
 @class ZGProcessTaskManager;
 @class ZGDebuggerController;
 @class ZGBreakPointController;
-@class ZGMemoryViewerController;
 @class ZGLoggerWindowController;
 
 @interface ZGDocumentController : NSDocumentController
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController memoryViewer:(ZGMemoryViewerController *)memoryViewer loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 
 @end

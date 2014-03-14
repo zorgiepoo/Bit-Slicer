@@ -45,7 +45,6 @@
 @class ZGMachBinary;
 @class ZGProcessTaskManager;
 @class ZGBreakPointController;
-@class ZGMemoryViewerController;
 @class ZGLoggerWindowController;
 
 @interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate>
@@ -69,7 +68,7 @@ error:(NSError **)error;
 + (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray *)breakPoints;
 + (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit breakPoints:(NSArray *)breakPoints;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController memoryViewer:(ZGMemoryViewerController *)memoryViewer loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 
 - (void)cleanup;
 

@@ -53,11 +53,13 @@
 #import "ZGMachBinaryInfo.h"
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
+#import "ZGNavigationPost.h"
 
 @interface ZGVariableController ()
 
-@property (nonatomic) ZGDebuggerController *debuggerController;
-@property (nonatomic) ZGMemoryViewerController *memoryViewer;
+// last selection from memory viewer or debugger
+@property (nonatomic) NSRange lastSelectedMemoryRangeFromOutside;
+
 @property (nonatomic, assign) ZGDocumentWindowController *windowController;
 @property (nonatomic, assign) ZGDocumentData *documentData;
 
@@ -67,17 +69,41 @@
 
 @implementation ZGVariableController
 
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController debuggerController:(ZGDebuggerController *)debuggerController memoryViewer:(ZGMemoryViewerController *)memoryViewer
+- (id)initWithWindowController:(ZGDocumentWindowController *)windowController
 {
 	self = [super init];
 	if (self)
 	{
 		self.windowController = windowController;
 		self.documentData = self.windowController.documentData;
-		self.debuggerController = debuggerController;
-		self.memoryViewer = memoryViewer;
+		
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(memorySelectionChangedFromMemoryWindowNotification:)
+		 name:ZGNavigationSelectionChangeNotification
+		 object:nil];
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter]
+	 removeObserver:self
+	 name:ZGNavigationSelectionChangeNotification
+	 object:nil];
+}
+
+- (void)memorySelectionChangedFromMemoryWindowNotification:(NSNotification *)notification
+{
+	ZGProcess *process = [notification.userInfo objectForKey:ZGNavigationProcessKey];
+	ZGMemoryAddress selectionAddress = [[notification.userInfo objectForKey:ZGNavigationMemoryAddressKey] unsignedLongLongValue];
+	ZGMemoryAddress selectionSize = [[notification.userInfo objectForKey:ZGNavigationSelectionLengthKey] unsignedLongLongValue];
+	
+	if ([process isEqual:self.windowController.currentProcess])
+	{
+		self.lastSelectedMemoryRangeFromOutside = NSMakeRange(selectionAddress, selectionSize);
+	}
 }
 
 #pragma mark Freezing variables
@@ -378,23 +404,8 @@
 	ZGVariableType variableType = (ZGVariableType)[sender tag];
 	
 	// Try to get an initial address from the debugger or the memory viewer's selection
-	ZGMemoryAddress initialAddress = 0x0;
-	ZGMemorySize initialSize = 0;
-	
-	if (variableType == ZGByteArray && self.debuggerController.currentProcess.processID == self.windowController.currentProcess.processID)
-	{
-		NSArray *selectedInstructions = self.debuggerController.selectedInstructions;
-		if (selectedInstructions.count > 0)
-		{
-			ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
-			initialAddress = selectedInstruction.variable.address;
-			initialSize = selectedInstruction.variable.size;
-		}
-	}
-	else if (self.memoryViewer.currentProcess.processID == self.windowController.currentProcess.processID)
-	{
-		initialAddress = [self.memoryViewer selectedAddressRange].location;
-	}
+	ZGMemoryAddress initialAddress = self.lastSelectedMemoryRangeFromOutside.location;
+	ZGMemorySize initialSize = self.lastSelectedMemoryRangeFromOutside.length;
 	
 	ZGVariable *variable =
 		[[ZGVariable alloc]

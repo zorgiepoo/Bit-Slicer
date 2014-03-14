@@ -40,12 +40,10 @@
 
 @class ZGDocumentWindowController;
 @class ZGProcess;
-@class ZGDebuggerController;
-@class ZGMemoryViewerController;
 
 @interface ZGVariableController : NSObject
 
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController debuggerController:(ZGDebuggerController *)debuggerController memoryViewer:(ZGMemoryViewerController *)memoryViewer;
+- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
 - (void)freezeVariables;
 

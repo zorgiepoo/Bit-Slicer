@@ -92,6 +92,11 @@
 	return self;
 }
 
+- (BOOL)isEqual:(id)process
+{
+	return ([process processID] == self.processID);
+}
+
 - (BOOL)valid
 {
 	return self.processID != NON_EXISTENT_PID_NUMBER;

@@ -46,6 +46,7 @@
 #import "ZGRegion.h"
 #import "ZGMemoryProtectionController.h"
 #import "ZGMemoryDumpController.h"
+#import "ZGNavigationPost.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -185,6 +186,8 @@
 	[self.textView.layoutRepresenter addRepresenter:verticalScrollerRepresenter];
 	
 	self.textView.controller.undoManager = [[NSUndoManager alloc] init];
+	
+	self.textView.delegate = self;
 	
 	[[self window] setFrameAutosaveName:NSStringFromClass([self class])];
 	
@@ -618,6 +621,11 @@
 		// Give user a moment to be able to make changes before we can re-enable live-updating
 		self.lastUpdateCount--;
 		[self performSelector:@selector(revertUpdateCount) withObject:nil afterDelay:1.5];
+	}
+	else if (properties & HFControllerSelectedRanges && self.currentMemorySize > 0)
+	{
+		HFRange selectedAddressRange = [self selectedAddressRange];
+		[ZGNavigationPost postMemorySelectionChangeWithProcess:self.currentProcess selectionRange:NSMakeRange(selectedAddressRange.location, selectedAddressRange.length)];
 	}
 }
 

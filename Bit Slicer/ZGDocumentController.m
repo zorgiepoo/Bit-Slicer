@@ -48,11 +48,10 @@
 	ZGProcessTaskManager *_processTaskManager;
 	ZGDebuggerController *_debuggerController;
 	ZGBreakPointController *_breakPointController;
-	ZGMemoryViewerController *_memoryViewerController;
 	ZGLoggerWindowController *_loggerWindowController;
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController memoryViewer:(ZGMemoryViewerController *)memoryViewer loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super init];
 	if (self != nil)
@@ -61,7 +60,6 @@
 		_debuggerController = debuggerController;
 		_breakPointController = breakPointController;
 		_loggerWindowController = loggerWindowController;
-		_memoryViewerController = memoryViewer;
 		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
@@ -90,7 +88,6 @@
 	document.processTaskManager = _processTaskManager;
 	document.debuggerController = _debuggerController;
 	document.breakPointController = _breakPointController;
-	document.memoryViewerController = _memoryViewerController;
 	document.loggerWindowController = _loggerWindowController;
 	
 	document.lastChosenInternalProcessName = self.lastChosenInternalProcessName;

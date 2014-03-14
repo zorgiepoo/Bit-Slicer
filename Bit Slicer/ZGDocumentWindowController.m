@@ -136,7 +136,6 @@
 		self.processTaskManager = document.processTaskManager;
 		self.debuggerController = document.debuggerController;
 		self.breakPointController = document.breakPointController;
-		self.memoryViewer = document.memoryViewerController;
 		self.loggerWindowController = document.loggerWindowController;
 		
 		self.processList = [[ZGProcessList alloc] initWithProcessTaskManager:self.processTaskManager];
@@ -283,7 +282,7 @@
 	self.searchData = [self.document searchData];
 	
 	self.tableController = [[ZGDocumentTableController alloc] initWithWindowController:self];
-	self.variableController = [[ZGVariableController alloc] initWithWindowController:self debuggerController:self.debuggerController memoryViewer:self.memoryViewer];
+	self.variableController = [[ZGVariableController alloc] initWithWindowController:self];
 	self.searchController = [[ZGDocumentSearchController alloc] initWithWindowController:self];
 	self.scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
 	

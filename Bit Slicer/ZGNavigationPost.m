@@ -36,6 +36,7 @@
 
 NSString *ZGNavigationShowMemoryViewerNotification = @"ZGNavigationShowMemoryViewerNotification";
 NSString *ZGNavigationShowDebuggerNotification = @"ZGNavigationShowDebuggerNotification";
+NSString *ZGNavigationSelectionChangeNotification = @"ZGNavigationSelectionChangeNotification";
 
 NSString *ZGNavigationProcessKey = @"ZGNavigationProcessKey";
 NSString *ZGNavigationMemoryAddressKey = @"ZGNavigationMemoryAddressKey";
@@ -61,6 +62,17 @@ NSString *ZGNavigationSelectionLengthKey = @"ZGNavigationSelectionLengthKey";
 	 notificationWithName:ZGNavigationShowDebuggerNotification
 	 object:nil
 	 userInfo:@{ZGNavigationProcessKey : process, ZGNavigationMemoryAddressKey : @(address)}];
+	
+	[[NSNotificationCenter defaultCenter] postNotification:notification];
+}
+
++ (void)postMemorySelectionChangeWithProcess:(ZGProcess *)process selectionRange:(NSRange)selectionRange
+{
+	NSNotification *notification =
+	[NSNotification
+	 notificationWithName:ZGNavigationSelectionChangeNotification
+	 object:nil
+	 userInfo:@{ZGNavigationProcessKey : process, ZGNavigationMemoryAddressKey : @(selectionRange.location), ZGNavigationSelectionLengthKey : @(selectionRange.length)}];
 	
 	[[NSNotificationCenter defaultCenter] postNotification:notification];
 }

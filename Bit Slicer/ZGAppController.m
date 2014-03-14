@@ -84,15 +84,14 @@
 		
 		self.breakPointController = [ZGBreakPointController sharedController];
 		
+		self.debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:self.processTaskManager breakPointController:self.breakPointController loggerWindowController:self.loggerWindowController];
+		
 		self.memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:self.processTaskManager];
-		
-		self.debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:self.processTaskManager breakPointController:self.breakPointController memoryViewer:self.memoryViewer loggerWindowController:self.loggerWindowController];
-		
 		self.memoryViewer.debuggerController = self.debuggerController;
 		
 		self.hotKeyController = [[ZGHotKeyController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController];
 		
-		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController memoryViewer:self.memoryViewer loggerWindowController:self.loggerWindowController];
+		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController loggerWindowController:self.loggerWindowController];
 		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self

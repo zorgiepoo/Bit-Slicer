@@ -37,6 +37,7 @@
 
 extern NSString *ZGNavigationShowMemoryViewerNotification;
 extern NSString *ZGNavigationShowDebuggerNotification;
+extern NSString *ZGNavigationSelectionChangeNotification;
 
 extern NSString *ZGNavigationProcessKey;
 extern NSString *ZGNavigationMemoryAddressKey;
@@ -48,5 +49,7 @@ extern NSString *ZGNavigationSelectionLengthKey;
 
 + (void)postShowMemoryViewerWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address selectionLength:(NSUInteger)selectionLength;
 + (void)postShowDebuggerWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address;
+
++ (void)postMemorySelectionChangeWithProcess:(ZGProcess *)process selectionRange:(NSRange)selectionRange;
 
 @end

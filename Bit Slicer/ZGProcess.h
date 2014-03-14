@@ -61,6 +61,8 @@
 - (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
 - (instancetype)initWithProcess:(ZGProcess *)process;
 
+- (BOOL)isEqual:(id)process;
+
 - (void)markInvalid;
 - (BOOL)hasGrantedAccess;
 
