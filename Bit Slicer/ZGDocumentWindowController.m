@@ -105,7 +105,7 @@
 @property (nonatomic) AGScopeBarGroup *stringMatchingGroup;
 @property (nonatomic) AGScopeBarGroup *endianGroup;
 
-@property (assign) IBOutlet NSTextField *generalStatusTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *generalStatusTextField;
 
 @property (nonatomic) NSPopover *advancedOptionsPopover;
 
@@ -477,7 +477,7 @@
 	NSIndexSet *tableIndexSet = self.tableController.variablesTableView.selectedRowIndexes;
 	NSInteger clickedRow = self.tableController.variablesTableView.clickedRow;
 	
-	return (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
+	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 }
 
 - (NSArray *)selectedVariables

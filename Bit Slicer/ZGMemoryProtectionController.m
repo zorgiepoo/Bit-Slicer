@@ -42,13 +42,13 @@
 
 @interface ZGMemoryProtectionController ()
 
-@property (assign) IBOutlet ZGMemoryViewerController *memoryViewer;
-@property (assign) IBOutlet NSWindow *changeProtectionWindow;
-@property (assign) IBOutlet NSTextField *changeProtectionAddressTextField;
-@property (assign) IBOutlet NSTextField *changeProtectionSizeTextField;
-@property (assign) IBOutlet NSButton *changeProtectionReadButton;
-@property (assign) IBOutlet NSButton *changeProtectionWriteButton;
-@property (assign) IBOutlet NSButton *changeProtectionExecuteButton;
+@property (nonatomic, assign) IBOutlet ZGMemoryViewerController *memoryViewer;
+@property (nonatomic, assign) IBOutlet NSWindow *changeProtectionWindow;
+@property (nonatomic, assign) IBOutlet NSTextField *changeProtectionAddressTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *changeProtectionSizeTextField;
+@property (nonatomic, assign) IBOutlet NSButton *changeProtectionReadButton;
+@property (nonatomic, assign) IBOutlet NSButton *changeProtectionWriteButton;
+@property (nonatomic, assign) IBOutlet NSButton *changeProtectionExecuteButton;
 
 @end
 

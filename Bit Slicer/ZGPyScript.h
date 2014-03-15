@@ -46,8 +46,8 @@
 @property (nonatomic) PyObject *executeFunction;
 @property (nonatomic) NSTimeInterval lastTime;
 @property (nonatomic) NSTimeInterval deltaTime;
-@property ZGPyVirtualMemory *virtualMemoryInstance;
-@property ZGPyDebugger *debuggerInstance;
+@property (atomic) ZGPyVirtualMemory *virtualMemoryInstance;
+@property (atomic) ZGPyDebugger *debuggerInstance;
 @property (atomic) NSUInteger finishedCount;
 
 - (id)initWithPath:(NSString *)path;

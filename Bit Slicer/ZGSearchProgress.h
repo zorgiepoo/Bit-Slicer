@@ -52,6 +52,6 @@ typedef enum
 @property (nonatomic, readonly) ZGMemorySize maxProgress;
 @property (nonatomic) NSUInteger numberOfVariablesFound;
 
-@property BOOL shouldCancelSearch;
+@property (atomic) BOOL shouldCancelSearch;
 
 @end

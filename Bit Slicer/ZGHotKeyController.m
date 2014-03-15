@@ -74,7 +74,7 @@
 			[NSUserDefaults.standardUserDefaults setInteger:INVALID_KEY_CODE forKey:ZG_HOT_KEY];
 		}
 		
-		_pauseHotKeyCombo = (KeyCombo){.code = hotKeyCode, .flags = [NSUserDefaults.standardUserDefaults integerForKey:ZG_HOT_KEY_MODIFIER]};
+		_pauseHotKeyCombo = (KeyCombo){.code = hotKeyCode, .flags = (unsigned)[NSUserDefaults.standardUserDefaults integerForKey:ZG_HOT_KEY_MODIFIER]};
 		
 		[self registerPauseAndUnpauseHotKey];
 	}
@@ -85,8 +85,8 @@
 {
 	_pauseHotKeyCombo = pauseHotKeyCombo;
 	
-	[NSUserDefaults.standardUserDefaults setInteger:_pauseHotKeyCombo.code forKey:ZG_HOT_KEY];
-	[NSUserDefaults.standardUserDefaults setInteger:_pauseHotKeyCombo.flags forKey:ZG_HOT_KEY_MODIFIER];
+	[NSUserDefaults.standardUserDefaults setInteger:(signed)_pauseHotKeyCombo.code forKey:ZG_HOT_KEY];
+	[NSUserDefaults.standardUserDefaults setInteger:(signed)_pauseHotKeyCombo.flags forKey:ZG_HOT_KEY_MODIFIER];
 	
 	[self registerPauseAndUnpauseHotKey];
 }
@@ -131,7 +131,7 @@ static OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler, Eve
 		EventTypeSpec eventType = {.eventClass = kEventClassKeyboard, .eventKind = kEventHotKeyPressed};
 		InstallApplicationEventHandler(&pauseOrUnpauseHotKeyHandler, 1, &eventType, (__bridge void *)self, NULL);
 		
-		RegisterEventHotKey(self.pauseHotKeyCombo.code, self.pauseHotKeyCombo.flags, (EventHotKeyID){.signature = 'htk1', .id = 1}, GetApplicationEventTarget(), 0, &_pauseHotKeyRef);
+		RegisterEventHotKey((UInt32)self.pauseHotKeyCombo.code, (UInt32)self.pauseHotKeyCombo.flags, (EventHotKeyID){.signature = 'htk1', .id = 1}, GetApplicationEventTarget(), 0, &_pauseHotKeyRef);
 	}
 }
 

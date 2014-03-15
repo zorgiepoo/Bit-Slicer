@@ -58,16 +58,16 @@
 
 @interface ZGMemoryViewerController ()
 
-@property (strong) ZGStatusBarRepresenter *statusBarRepresenter;
-@property (strong) ZGLineCountingRepresenter *lineCountingRepresenter;
-@property (strong) DataInspectorRepresenter *dataInspectorRepresenter;
-@property BOOL showsDataInspector;
+@property (nonatomic) ZGStatusBarRepresenter *statusBarRepresenter;
+@property (nonatomic) ZGLineCountingRepresenter *lineCountingRepresenter;
+@property (nonatomic) DataInspectorRepresenter *dataInspectorRepresenter;
+@property (atomic) BOOL showsDataInspector;
 
 @property (strong, nonatomic) NSData *lastUpdatedData;
 @property (nonatomic) HFRange lastUpdatedRange;
 @property (nonatomic) int lastUpdateCount;
 
-@property (assign) IBOutlet HFTextView *textView;
+@property (nonatomic, assign) IBOutlet HFTextView *textView;
 
 @property (assign, nonatomic) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
 @property (assign, nonatomic) IBOutlet ZGMemoryDumpController *memoryDumpController;
@@ -138,7 +138,7 @@
 		self.addressTextField.stringValue = memoryViewerAddressField;
 	}
 	
-	self.currentMemoryAddress = [coder decodeInt64ForKey:ZGMemoryViewerAddress];
+	self.currentMemoryAddress = (unsigned)[coder decodeInt64ForKey:ZGMemoryViewerAddress];
 	
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGMemoryViewerProcessInternalName];
 	
@@ -293,7 +293,7 @@
 - (void)relayoutAndResizeWindowPreservingBytesPerLine
 {
 	const NSUInteger bytesMultiple = 4;
-	int remainder = self.textView.controller.bytesPerLine % bytesMultiple;
+	NSUInteger remainder = self.textView.controller.bytesPerLine % bytesMultiple;
 	NSUInteger bytesPerLineRoundedUp = (remainder == 0) ? (self.textView.controller.bytesPerLine) : (self.textView.controller.bytesPerLine + bytesMultiple - remainder);
 	NSUInteger bytesPerLineRoundedDown = bytesPerLineRoundedUp - bytesMultiple;
 	
@@ -485,23 +485,23 @@
 			HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
 			HFRange selectionRange = [[self.textView.controller.selectedContentsRanges objectAtIndex:0] HFRange];
 			
-			ZGMemorySize selectionLength;
 			ZGMemoryAddress navigationAddress;
+			ZGMemorySize navigationLength;
 			
 			if (selectionRange.length > 0 && selectionRange.location >= displayedLineRange.location * self.textView.controller.bytesPerLine && selectionRange.location + selectionRange.length <= (displayedLineRange.location + displayedLineRange.length) * self.textView.controller.bytesPerLine)
 			{
 				// Selection is completely within the user's sight
 				navigationAddress = oldMemoryAddress + selectionRange.location;
-				selectionLength = selectionRange.length;
+				navigationLength = selectionRange.length;
 			}
 			else
 			{
 				// Selection not completely within user's sight, use middle of viewer as the point to navigate
-				navigationAddress = oldMemoryAddress + (displayedLineRange.location + displayedLineRange.length / 2) * self.textView.controller.bytesPerLine;
-				selectionLength = 0;
+				navigationAddress = oldMemoryAddress + (ZGMemorySize)((displayedLineRange.location + displayedLineRange.length / 2) * self.textView.controller.bytesPerLine);
+				navigationLength = 0;
 			}
 			
-			[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:selectionLength];
+			[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:navigationLength];
 		}
 		
 		// Replace all the contents of the self.textView
@@ -679,9 +679,9 @@
 // memoryAddress is assumed to be within bounds of current memory region being viewed
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength
 {
-	long double offset = (long double)(memoryAddress - self.currentMemoryAddress);
+	unsigned long long offset = (memoryAddress - self.currentMemoryAddress);
 	
-	long double offsetLine = offset / [self.textView.controller bytesPerLine];
+	unsigned long long offsetLine = offset / [self.textView.controller bytesPerLine];
 	
 	HFFPRange displayedLineRange = self.textView.controller.displayedLineRange;
 	

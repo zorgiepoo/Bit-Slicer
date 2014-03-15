@@ -93,7 +93,7 @@ static void disassemblerTranslator(ud_t *object)
 		
 		ud_init(self.object);
 		ud_set_input_buffer(self.object, self.bytes, size);
-		ud_set_mode(self.object, self.pointerSize * 8);
+		ud_set_mode(self.object, (uint8_t)self.pointerSize * 8);
 		ud_set_syntax(self.object, disassemblerTranslator);
 		ud_set_pc(self.object, self.startAddress);
 	}
@@ -203,7 +203,15 @@ static void disassemblerTranslator(ud_t *object)
 					break;
 			}
 			
-			immediateOperand = self.startAddress + ud_insn_len(_object) + operandOffset;
+			immediateOperand = self.startAddress + ud_insn_len(_object);
+			if (operandOffset >= 0)
+			{
+				immediateOperand += (unsigned)operandOffset;
+			}
+			else
+			{
+				immediateOperand -= (unsigned)(-operandOffset);
+			}
 		}
 	}
 	

@@ -144,7 +144,7 @@ extern NSString * VDKQueueAccessRevocationNotification;
 
 
 
-@property (assign) id<VDKQueueDelegate> delegate;
-@property (assign) BOOL alwaysPostNotifications;
+@property (atomic, assign) id<VDKQueueDelegate> delegate;
+@property (atomic, assign) BOOL alwaysPostNotifications;
 
 @end

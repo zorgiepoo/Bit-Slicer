@@ -659,11 +659,11 @@ enum ZGStepExecution
 			NSInteger previousSelectedRow = [self.instructionsTableView selectedRow];
 			[self.instructionsTableView noteNumberOfRowsChanged];
 			
-			[self.instructionsTableView scrollRowToVisible:MIN(numberOfInstructionsAdded + visibleRowsRange.length - 1, self.instructions.count)];
+			[self.instructionsTableView scrollRowToVisible:(NSInteger)MIN(numberOfInstructionsAdded + visibleRowsRange.length - 1, self.instructions.count)];
 			
 			if (previousSelectedRow >= 0)
 			{
-				[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:previousSelectedRow + numberOfInstructionsAdded] byExtendingSelection:NO];
+				[self.instructionsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:(NSUInteger)previousSelectedRow + numberOfInstructionsAdded] byExtendingSelection:NO];
 			}
 		}
 	}
@@ -1083,7 +1083,7 @@ enum ZGStepExecution
 	NSIndexSet *tableIndexSet = self.instructionsTableView.selectedRowIndexes;
 	NSInteger clickedRow = self.instructionsTableView.clickedRow;
 	
-	return (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
+	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 }
 
 - (NSArray *)selectedInstructions
@@ -1409,7 +1409,7 @@ enum ZGStepExecution
 	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
 	if (visibleRowsRange.location + visibleRowsRange.length / 2 < selectionRow)
 	{
-		[self.instructionsTableView scrollRowToVisible:MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
+		[self.instructionsTableView scrollRowToVisible:(signed)MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
 	}
 	else if (visibleRowsRange.location + visibleRowsRange.length / 2 > selectionRow)
 	{
@@ -1420,7 +1420,7 @@ enum ZGStepExecution
 		}
 		else
 		{
-			[self.instructionsTableView scrollRowToVisible:selectionRow - visibleRowsRange.length / 2];
+			[self.instructionsTableView scrollRowToVisible:(signed)(selectionRow - visibleRowsRange.length / 2)];
 		}
 	}
 }
@@ -1463,7 +1463,7 @@ enum ZGStepExecution
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return self.instructions.count;
+	return (signed)self.instructions.count;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
@@ -1471,7 +1471,7 @@ enum ZGStepExecution
 	id result = nil;
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
-		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
+		ZGInstruction *instruction = [self.instructions objectAtIndex:(NSUInteger)rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"address"])
 		{
 			result = instruction.variable.addressStringValue;
@@ -1513,7 +1513,7 @@ enum ZGStepExecution
 		{
 			NSArray *targetInstructions = nil;
 			NSArray *selectedInstructions = [self selectedInstructions];
-			ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
+			ZGInstruction *instruction = [self.instructions objectAtIndex:(NSUInteger)rowIndex];
 			if (![selectedInstructions containsObject:instruction])
 			{
 				targetInstructions = @[instruction];
@@ -1543,7 +1543,7 @@ enum ZGStepExecution
 {
 	if ([tableColumn.identifier isEqualToString:@"address"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
-		ZGInstruction *instruction = [self.instructions objectAtIndex:rowIndex];
+		ZGInstruction *instruction = [self.instructions objectAtIndex:(NSUInteger)rowIndex];
 		BOOL isInstructionBreakPoint = (self.currentBreakPoint && self.registersViewController.instructionPointer == instruction.variable.address);
 		
 		[cell setTextColor:isInstructionBreakPoint ? NSColor.redColor : NSColor.textColor];
@@ -1556,7 +1556,7 @@ enum ZGStepExecution
 	
 	if (row >= 0 && (NSUInteger)row < self.instructions.count)
 	{
-		ZGInstruction *instruction = [self.instructions objectAtIndex:row];
+		ZGInstruction *instruction = [self.instructions objectAtIndex:(NSUInteger)row];
 		
 		for (ZGBreakPointCondition *breakPointCondition in self.breakPointConditions)
 		{
@@ -1704,7 +1704,7 @@ enum ZGStepExecution
 			
 			if (bytesRead > originalOutputLength)
 			{
-				const int8_t nopValue = NOP_VALUE;
+				const uint8_t nopValue = NOP_VALUE;
 				for (ZGMemorySize byteIndex = currentInstruction.variable.address + currentInstruction.variable.size - (bytesRead - originalOutputLength); byteIndex < currentInstruction.variable.address + currentInstruction.variable.size; byteIndex++)
 				{
 					[outputData appendBytes:&nopValue length:sizeof(int8_t)];
@@ -2082,7 +2082,7 @@ enum ZGStepExecution
 						NSLog(@"Error while injecting code");
 						NSLog(@"%@", error);
 						
-						if (!ZGDeallocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
+						if (!ZGDeallocateMemory(self.currentProcess.processTask, allocatedAddress, numberOfAllocatedBytes))
 						{
 							NSLog(@"Error: Failed to deallocate VM memory after failing to inject code..");
 						}
@@ -2093,7 +2093,7 @@ enum ZGStepExecution
 				}
 				else
 				{
-					if (!ZGDeallocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
+					if (!ZGDeallocateMemory(self.currentProcess.processTask, allocatedAddress, numberOfAllocatedBytes))
 					{
 						NSLog(@"Error: Failed to deallocate VM memory after canceling from injecting code..");
 					}
@@ -2102,7 +2102,7 @@ enum ZGStepExecution
 		}
 		else
 		{
-			if (!ZGDeallocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
+			if (!ZGDeallocateMemory(self.currentProcess.processTask, allocatedAddress, numberOfAllocatedBytes))
 			{
 				NSLog(@"Error: Failed to deallocate VM memory after failing to fetch enough instructions..");
 			}
@@ -2586,7 +2586,7 @@ enum ZGStepExecution
 		[self scrollAndSelectRow:selectedRow];
 	}
 	
-	NSRect cellFrame = [self.instructionsTableView frameOfCellAtColumn:0 row:selectedRow];
+	NSRect cellFrame = [self.instructionsTableView frameOfCellAtColumn:0 row:(NSInteger)selectedRow];
 	[self.breakPointConditionPopover showRelativeToRect:cellFrame ofView:self.instructionsTableView preferredEdge:NSMaxYEdge];
 }
 
@@ -2624,13 +2624,13 @@ enum ZGStepExecution
 	NSString *oldCondition = @"";
 	
 	BOOL foundExistingCondition = NO;
-	for (ZGBreakPointCondition *breakPointCondition in self.breakPointConditions)
+	for (ZGBreakPointCondition *breakCondition in self.breakPointConditions)
 	{
-		if ([breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && breakPointCondition.address == address)
+		if ([breakCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && breakCondition.address == address)
 		{
-			oldCondition = breakPointCondition.condition;
-			breakPointCondition.condition = strippedCondition;
-			breakPointCondition.compiledCondition = newCompiledCondition;
+			oldCondition = breakCondition.condition;
+			breakCondition.condition = strippedCondition;
+			breakCondition.compiledCondition = newCompiledCondition;
 			foundExistingCondition = YES;
 			break;
 		}

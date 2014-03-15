@@ -10,7 +10,7 @@
 
 @interface DDMathOperator ()
 
-@property (readwrite, assign) NSInteger precedence;
+@property (nonatomic, readwrite, assign) NSInteger precedence;
 
 @end
 

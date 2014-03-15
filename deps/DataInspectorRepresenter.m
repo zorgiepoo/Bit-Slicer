@@ -116,8 +116,8 @@ static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) 
 - (id)initWithCoder:(NSCoder *)coder {
     HFASSERT([coder allowsKeyedCoding]);
     self = [super init];
-    inspectorType = [coder decodeInt32ForKey:@"InspectorType"];
-    endianness = [coder decodeInt32ForKey:@"Endianness"];
+    inspectorType = (enum InspectorType_t)[coder decodeInt32ForKey:@"InspectorType"];
+    endianness = (enum Endianness_t)[coder decodeInt32ForKey:@"Endianness"];
     return self;
 }
 
@@ -440,8 +440,8 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (void)setPropertyListRepresentation:(id)plist {
-    inspectorType = [[plist objectForKey:@"InspectorType"] intValue];
-    endianness = [[plist objectForKey:@"Endianness"] intValue];
+    inspectorType = (enum InspectorType_t)[[(NSDictionary *)plist objectForKey:@"InspectorType"] intValue];
+    endianness = (enum Endianness_t)[[(NSDictionary *)plist objectForKey:@"Endianness"] intValue];
 }
 
 @end
@@ -559,11 +559,11 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     USE(tableView);
-    return [self rowCount];
+    return (NSInteger)[self rowCount];
 }
 
 /* returns the number of bytes that are selected, or NSUIntegerMax if there is more than one selection, or the selection is larger than MAX_EDITABLE_BYTE_COUNT */
-- (NSInteger)selectedByteCountForEditing {
+- (NSUInteger)selectedByteCountForEditing {
     NSArray *selectedRanges = [[self controller] selectedContentsRanges];
     if ([selectedRanges count] != 1) return INVALID_EDITING_BYTE_COUNT;
     HFRange selectedRange = [[selectedRanges objectAtIndex:0] HFRange];
@@ -605,7 +605,10 @@ static NSAttributedString *inspectionError(NSString *s) {
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     USE(tableView);
-    DataInspector *inspector = [inspectors objectAtIndex:row];
+	
+	if (row < 0) return nil;
+	
+    DataInspector *inspector = [inspectors objectAtIndex:(NSUInteger)row];
     NSString *ident = [tableColumn identifier];
     if ([ident isEqualToString:kInspectorTypeColumnIdentifier]) {
         return [NSNumber numberWithInt:[inspector type]];
@@ -629,14 +632,16 @@ static NSAttributedString *inspectionError(NSString *s) {
     NSString *ident = [tableColumn identifier];
     /* This gets called after clicking on the + or - button.  If you delete the last row, then this gets called with a row >= the number of inspectors, so bail out for +/- buttons before pulling out our inspector */
     if ([ident isEqualToString:kInspectorSubtractButtonColumnIdentifier]) return;
+	
+	if (row < 0) return;
     
-    DataInspector *inspector = [inspectors objectAtIndex:row];
+    DataInspector *inspector = [inspectors objectAtIndex:(NSUInteger)row];
     if ([ident isEqualToString:kInspectorTypeColumnIdentifier]) {
-        [inspector setType:[object intValue]];
+        [inspector setType:(enum InspectorType_t)[object intValue]];
         [tableView reloadData];
     }
     else if ([ident isEqualToString:kInspectorSubtypeColumnIdentifier]) {
-        [inspector setEndianness:[object intValue]];
+        [inspector setEndianness:(enum Endianness_t)[object intValue]];
         [tableView reloadData];
     }
     else if ([ident isEqualToString:kInspectorValueColumnIdentifier]) {
@@ -668,11 +673,11 @@ static NSAttributedString *inspectionError(NSString *s) {
 
 - (void)resizeTableViewAfterChangingRowCount {
     [table noteNumberOfRowsChanged];
-    NSUInteger rowCount = [table numberOfRows];
+    NSUInteger rowCount = (NSUInteger)[table numberOfRows];
     if (rowCount > 0) {
         NSScrollView *scrollView = [table enclosingScrollView];
         NSSize newTableViewBoundsSize = [table frame].size;
-        newTableViewBoundsSize.height = NSMaxY([table rectOfRow:rowCount - 1]) - NSMinY([table bounds]);
+        newTableViewBoundsSize.height = NSMaxY([table rectOfRow:(NSInteger)(rowCount - 1)]) - NSMinY([table bounds]);
         /* Is converting to the scroll view's coordinate system right?  It doesn't matter much because nothing is scaled except possibly the window */
         CGFloat newScrollViewHeight = [[scrollView class] frameSizeForContentSize:[table convertSize:newTableViewBoundsSize toView:scrollView]
                                                             hasHorizontalScroller:[scrollView hasHorizontalScroller]
@@ -696,31 +701,34 @@ static NSAttributedString *inspectionError(NSString *s) {
     [existingInspectors release];
     
     NSInteger clickedRow = [table clickedRow];
-    [inspectors insertObject:ins atIndex:clickedRow + 1];
+    [inspectors insertObject:ins atIndex:(unsigned)(clickedRow + 1)];
     [ins release];
     [self saveDefaultInspectors];
     [self resizeTableViewAfterChangingRowCount];
 }
 
 - (void)removeRow:(id)sender {
-    USE(sender);
-    if ([self rowCount] == 1) {
-	[[NSNotificationCenter defaultCenter] postNotificationName:DataInspectorDidDeleteAllRows object:self userInfo:nil];
-    }
-    else {
-	NSInteger clickedRow = [table clickedRow];
-	[inspectors removeObjectAtIndex:clickedRow];
-        [self saveDefaultInspectors];
-	[self resizeTableViewAfterChangingRowCount];
-    }
+	USE(sender);
+	if ([self rowCount] == 1) {
+		[[NSNotificationCenter defaultCenter] postNotificationName:DataInspectorDidDeleteAllRows object:self userInfo:nil];
+	}
+	else {
+		NSInteger clickedRow = [table clickedRow];
+		if (clickedRow >= 0)
+		{
+			[inspectors removeObjectAtIndex:(unsigned)clickedRow];
+			[self saveDefaultInspectors];
+			[self resizeTableViewAfterChangingRowCount];
+		}
+	}
 }
 
 - (IBAction)doubleClickedTable:(id)sender {
     USE(sender);
     NSInteger column = [table clickedColumn], row = [table clickedRow];
-    if (column >= 0 && row >= 0 && [[[[table tableColumns] objectAtIndex:column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
+    if (column >= 0 && row >= 0 && [[[[table tableColumns] objectAtIndex:(unsigned)column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
 	BOOL isError;
-	[self valueFromInspector:[inspectors objectAtIndex:row] isError:&isError];
+	[self valueFromInspector:[inspectors objectAtIndex:(unsigned)row] isError:&isError];
 	if (! isError) {
 	    [table editColumn:column row:row withEvent:[NSApp currentEvent] select:YES];
 	}
@@ -738,7 +746,7 @@ static NSAttributedString *inspectionError(NSString *s) {
     NSUInteger byteCount = [self selectedByteCountForEditing];
     if (byteCount == INVALID_EDITING_BYTE_COUNT) return NO;
     
-    DataInspector *inspector = [inspectors objectAtIndex:row];
+    DataInspector *inspector = [inspectors objectAtIndex:(unsigned)row];
     return [inspector acceptStringValue:[fieldEditor string] replacingByteCount:byteCount intoData:NULL];
 }
 
@@ -816,7 +824,7 @@ static NSAttributedString *inspectionError(NSString *s) {
     
     const unsigned char * const bitmapData = (const unsigned char *)(isPlus ? plusData : minusData);
     
-    NSInteger width = 8, height = 8;
+    NSUInteger width = 8, height = 8;
     assert(width * height * bytesPerPixel == sizeof plusData);
     assert(width * height * bytesPerPixel == sizeof minusData);
     NSRect bitmapRect = NSMakeRect(NSMidX(cellFrame) - width/2, NSMidY(cellFrame) - height/2, width, height);
@@ -824,7 +832,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 
     CGColorSpaceRef space = CGColorSpaceCreateWithName(kCGColorSpaceGenericGray);
     CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, bitmapData, width * height * bytesPerPixel, NULL);
-    CGImageRef image = CGImageCreate(width, height, CHAR_BIT, bytesPerPixel * CHAR_BIT, bytesPerPixel * width, space, kCGImageAlphaPremultipliedLast, provider, NULL, YES, kCGRenderingIntentDefault);
+    CGImageRef image = CGImageCreate(width, height, CHAR_BIT, bytesPerPixel * CHAR_BIT, bytesPerPixel * width, space, (enum CGBitmapInfo)kCGImageAlphaPremultipliedLast, provider, NULL, YES, kCGRenderingIntentDefault);
     CGDataProviderRelease(provider);
     CGColorSpaceRelease(space);
     [[NSGraphicsContext currentContext] setCompositingOperation:NSCompositeSourceOver];

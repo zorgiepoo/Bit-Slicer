@@ -15,7 +15,7 @@
 
 @interface DDParser : NSObject
 
-@property (readonly) DDMathOperatorSet *operatorSet;
+@property (nonatomic, readonly) DDMathOperatorSet *operatorSet;
 
 + (id)parserWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError **)error;
 - (id)initWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError **)error;

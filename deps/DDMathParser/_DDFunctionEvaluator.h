@@ -42,7 +42,7 @@ extern DDExpression* _DDRTOD(DDExpression *e, DDMathEvaluator *evaluator, NSErro
 
 - (id)initWithMathEvaluator:(DDMathEvaluator *)evaluator;
 
-@property (readonly, weak) DDMathEvaluator *evaluator;
+@property (nonatomic, readonly, weak) DDMathEvaluator *evaluator;
 
 - (DDExpression *)evaluateFunction:(_DDFunctionExpression *)expression variables:(NSDictionary *)variables error:(NSError **)error;
 

@@ -66,9 +66,6 @@
 // our's first, their's later
 - (id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator
 {
-	CFArrayRef selfReference = (__bridge CFArrayRef)(self);
-	id __unsafe_unretained targetObject = nil;
-	
 	if (self.count > 0)
 	{
 		NSUInteger maxIndex = self.count - 1;
@@ -76,7 +73,7 @@
 		while (maxIndex >= minIndex)
 		{
 			NSUInteger middleIndex = (minIndex + maxIndex) / 2;
-			id __unsafe_unretained object = CFArrayGetValueAtIndex(selfReference, middleIndex);
+			id __unsafe_unretained object = [self objectAtIndex:middleIndex];
 			
 			switch (comparator(object))
 			{
@@ -84,19 +81,16 @@
 					minIndex = middleIndex + 1;
 					break;
 				case NSOrderedDescending:
-					if (middleIndex == 0) goto ZG_BINARY_SEARCH_FINISHED;
+					if (middleIndex == 0) return nil;
 					maxIndex = middleIndex - 1;
 					break;
 				case NSOrderedSame:
-					targetObject = object;
-					goto ZG_BINARY_SEARCH_FINISHED;
+					return object;
 			}
 		}
 	}
 	
-ZG_BINARY_SEARCH_FINISHED:
-	
-	return targetObject;
+	return nil;
 }
 
 @end

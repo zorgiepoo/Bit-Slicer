@@ -340,7 +340,7 @@
 	NSIndexSet *tableIndexSet = self.tableView.selectedRowIndexes;
 	NSInteger clickedRow = self.tableView.clickedRow;
 	
-	return (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
+	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 }
 
 - (NSArray *)selectedVariables
@@ -352,7 +352,7 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return self.foundVariables.count;
+	return (NSInteger)self.foundVariables.count;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
@@ -362,7 +362,7 @@
 		return nil;
 	}
 	
-	ZGVariable *variable = [self.foundVariables objectAtIndex:rowIndex];
+	ZGVariable *variable = [self.foundVariables objectAtIndex:(NSUInteger)rowIndex];
 	if ([tableColumn.identifier isEqualToString:@"enabled"])
 	{
 		return @(variable.enabled);
@@ -386,7 +386,7 @@
 		return;
 	}
 	
-	ZGVariable *variable = [self.foundVariables objectAtIndex:rowIndex];
+	ZGVariable *variable = [self.foundVariables objectAtIndex:(NSUInteger)rowIndex];
 	if ([tableColumn.identifier isEqualToString:@"enabled"])
 	{
 		variable.enabled = [object boolValue];

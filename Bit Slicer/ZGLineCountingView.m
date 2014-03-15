@@ -39,6 +39,8 @@
 #import "ZGLineCountingRepresenter.h"
 #import <math.h>
 
+#define HFASSERT assert
+
 #ifndef check_malloc
 #define check_malloc(x) ({ size_t _count = x; void* result = malloc(_count); if (! result) { fprintf(stderr, "Out of memory allocating %lu bytes\n", (unsigned long)_count); exit(EXIT_FAILURE); } result; })
 #endif
@@ -53,7 +55,7 @@
 
 - (NSUInteger)characterCountForLineRange:(HFRange)range
 {
-	//HFASSERT(range.length <= NSUIntegerMax);
+	HFASSERT(range.length <= NSUIntegerMax);
 	NSUInteger characterCount;
 	
 	NSUInteger lineCount = ll2l(range.length);
@@ -72,14 +74,15 @@
 		characterCount = ([rep digitCount] + 1) * lineCount; // +1 for newlines
 	}
 	else {
-		characterCount = -1;
+		//characterCount = -1;
+		characterCount = 0;
 	}
 	return characterCount;
 }
 
 - (NSString *)createLineStringForRange:(HFRange)range NS_RETURNS_RETAINED
 {
-	//HFASSERT(range.length <= NSUIntegerMax);
+	HFASSERT(range.length <= NSUIntegerMax);
 	NSUInteger lineCount = ll2l(range.length);
 	const NSUInteger stride = bytesPerLine;
 	unsigned long long lineValue = HFProductULL(range.location, bytesPerLine) + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
@@ -100,12 +103,12 @@
 #pragma clang diagnostic ignored "-Wformat-nonliteral"
 		int charCount = sprintf(buffer + bufferIndex, formatString, lineValue);
 #pragma clang diagnostic pop
-		//HFASSERT(charCount > 0);
-		bufferIndex += charCount;
+		HFASSERT(charCount > 0);
+		bufferIndex += (unsigned)charCount;
 		buffer[bufferIndex++] = '\n';   
 		lineValue += stride;
 	}
-	//HFASSERT(bufferIndex == characterCount);
+	HFASSERT(bufferIndex == characterCount);
 	
 	// ownership is transferred
 	NSString *string = [[NSString alloc] initWithBytesNoCopy:(void *)buffer length:bufferIndex encoding:NSASCIIStringEncoding freeWhenDone:YES];
@@ -155,17 +158,17 @@ static inline int common_prefix_length(const char *a, const char *b)
 #pragma clang diagnostic ignored "-Wformat-nonliteral"
 			int newStringLength = snprintf(buff, sizeof buff, formatString, lineValue);
 #pragma clang diagnostic pop
-			//HFASSERT(newStringLength > 0);
+			HFASSERT(newStringLength > 0);
 			int prefixLength = common_prefix_length(previousBuff, buff);
-			//HFASSERT(prefixLength <= newStringLength);
-			//HFASSERT(prefixLength <= previousStringLength);
-			replacementRange = NSMakeRange(prefixLength, previousStringLength - prefixLength);
-			replacementCharacters = [[NSString alloc] initWithBytesNoCopy:buff + prefixLength length:newStringLength - prefixLength encoding:NSASCIIStringEncoding freeWhenDone:NO];
+			HFASSERT(prefixLength <= newStringLength);
+			HFASSERT(prefixLength <= previousStringLength);
+			replacementRange = NSMakeRange((NSUInteger)prefixLength, (NSUInteger)(previousStringLength - prefixLength));
+			replacementCharacters = [[NSString alloc] initWithBytesNoCopy:buff + prefixLength length:(unsigned)(newStringLength - prefixLength) encoding:NSASCIIStringEncoding freeWhenDone:NO];
 			NSUInteger glyphCount;
 			[textStorage replaceCharactersInRange:replacementRange withString:replacementCharacters];
 			if (previousTextStorageCharacterCount == 0) {
 				NSDictionary *atts = [[NSDictionary alloc] initWithObjectsAndKeys:font, NSFontAttributeName, [NSColor colorWithCalibratedWhite:(CGFloat).1 alpha:(CGFloat).8], NSForegroundColorAttributeName, nil];
-				[textStorage setAttributes:atts range:NSMakeRange(0, newStringLength)];
+				[textStorage setAttributes:atts range:NSMakeRange(0, (unsigned)newStringLength)];
 				[atts release];
 			}
 			glyphCount = [layoutManager numberOfGlyphs];
@@ -173,7 +176,7 @@ static inline int common_prefix_length(const char *a, const char *b)
 				CGFloat maxX = NSMaxX([layoutManager lineFragmentUsedRectForGlyphAtIndex:glyphCount - 1 effectiveRange:NULL]);
 				[layoutManager drawGlyphsForGlyphRange:NSMakeRange(0, glyphCount) atPoint:NSMakePoint(textRect.origin.x + textRect.size.width - maxX, textRect.origin.y)];
 			}
-			previousTextStorageCharacterCount = newStringLength;
+			previousTextStorageCharacterCount = (unsigned)newStringLength;
 			[replacementCharacters release];
 			memcpy(previousBuff, buff, newStringLength + 1);
 			previousStringLength = newStringLength;
@@ -217,8 +220,8 @@ static inline int common_prefix_length(const char *a, const char *b)
 #pragma clang diagnostic ignored "-Wformat-nonliteral"
 			int newStringLength = snprintf(buff, sizeof buff, formatString, lineValue);
 #pragma clang diagnostic pop
-			//HFASSERT(newStringLength > 0);
-			NSString *string = [[NSString alloc] initWithBytesNoCopy:buff length:newStringLength encoding:NSASCIIStringEncoding freeWhenDone:NO];
+			HFASSERT(newStringLength > 0);
+			NSString *string = [[NSString alloc] initWithBytesNoCopy:buff length:(unsigned)newStringLength encoding:NSASCIIStringEncoding freeWhenDone:NO];
 			[string drawInRect:textRect withAttributes:textAttributes];
 			[string release];
 		}

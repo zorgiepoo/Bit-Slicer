@@ -112,7 +112,7 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return self.backtrace.instructions.count;
+	return (NSInteger)self.backtrace.instructions.count;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
@@ -120,7 +120,7 @@
 	id result = nil;
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.backtrace.instructions.count)
 	{
-		ZGInstruction *instruction = [self.backtrace.instructions objectAtIndex:rowIndex];
+		ZGInstruction *instruction = [self.backtrace.instructions objectAtIndex:(NSUInteger)rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"backtrace"])
 		{
 			result = instruction.variable.description;
@@ -189,7 +189,7 @@
 	NSIndexSet *tableIndexSet = self.tableView.selectedRowIndexes;
 	NSInteger clickedRow = self.tableView.clickedRow;
 	
-	NSIndexSet *selectionIndexSet = (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
+	NSIndexSet *selectionIndexSet = (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 	
 	return [self.backtrace.instructions objectsAtIndexes:selectionIndexSet];
 }

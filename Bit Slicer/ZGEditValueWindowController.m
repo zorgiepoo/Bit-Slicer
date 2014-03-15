@@ -42,8 +42,8 @@
 
 @interface ZGEditValueWindowController ()
 
-@property (assign) IBOutlet NSTextField *valueTextField;
-@property (assign) ZGVariableController *variableController;
+@property (nonatomic, assign) IBOutlet NSTextField *valueTextField;
+@property (nonatomic, assign) ZGVariableController *variableController;
 
 @property (nonatomic) NSArray *variablesToEdit;
 @property (nonatomic) ZGMemoryMap processTask;

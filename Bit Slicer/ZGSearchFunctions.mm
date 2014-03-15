@@ -62,7 +62,7 @@ uint8_t ZGSwapBytes<uint8_t>(uint8_t value)
 template<>
 int16_t ZGSwapBytes<int16_t>(int16_t value)
 {
-	return CFSwapInt16(value);
+	return (int16_t)CFSwapInt16((uint16_t)value);
 }
 
 template<>
@@ -74,7 +74,7 @@ uint16_t ZGSwapBytes<uint16_t>(uint16_t value)
 template<>
 int32_t ZGSwapBytes<int32_t>(int32_t value)
 {
-	return CFSwapInt32(value);
+	return (int32_t)CFSwapInt32((uint32_t)value);
 }
 
 template<>
@@ -86,7 +86,7 @@ uint32_t ZGSwapBytes<uint32_t>(uint32_t value)
 template<>
 int64_t ZGSwapBytes<int64_t>(int64_t value)
 {
-	return CFSwapInt64(value);
+	return (int64_t)CFSwapInt64((uint64_t)value);
 }
 
 template<>
@@ -415,7 +415,7 @@ ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchD
 			foundSubstring = boyer_moore_helper((const unsigned char *)foundSubstring, searchValue, haystackLengthLeft, (unsigned long)dataSize, (const unsigned long *)charJump, (const unsigned long *)matchJump);
 			if (foundSubstring == NULL) break;
 			
-			ZGMemoryAddress foundAddress = foundSubstring - (unsigned char *)bytes + address;
+			ZGMemoryAddress foundAddress = address + (ZGMemoryAddress)(foundSubstring - (unsigned char *)bytes);
 			// boyer_moore_helper is only checking 0 .. dataSize-1 characters, so make a check to see if the last characters are equal
 			if (foundAddress % dataAlignment == 0 && foundSubstring[dataSize-1] == searchValue[dataSize-1])
 			{
@@ -423,7 +423,7 @@ ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchD
 			}
 			
 			foundSubstring++;
-			haystackLengthLeft = (unsigned char *)bytes + size - foundSubstring;
+			haystackLengthLeft = address + size - foundAddress - 1;
 		}
 		
 		free(matchJump);

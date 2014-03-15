@@ -52,18 +52,18 @@ typedef enum
 
 - (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type  delegate:(id <ZGBreakPointDelegate>)delegate;
 
-@property (weak) id <ZGBreakPointDelegate> delegate;
+@property (atomic, weak) id <ZGBreakPointDelegate> delegate;
 @property (readonly, nonatomic) ZGMemoryMap task;
 @property (nonatomic) thread_act_t thread;
 @property (nonatomic) ZGVariable *variable;
 @property (nonatomic) ZGMemorySize watchSize;
 @property (readonly, nonatomic) ZGProcess *process;
-@property NSArray *debugThreads;
+@property (atomic) NSArray *debugThreads;
 @property (readonly, nonatomic) ZGBreakPointType type;
-@property BOOL needsToRestore;
-@property BOOL hidden;
-@property BOOL dead;
-@property ZGMemoryAddress basePointer;
+@property (atomic) BOOL needsToRestore;
+@property (atomic) BOOL hidden;
+@property (atomic) BOOL dead;
+@property (atomic) ZGMemoryAddress basePointer;
 @property (nonatomic) NSMutableDictionary *cacheDictionary;
 @property (nonatomic) PyObject *condition;
 @property (nonatomic) PyObject *callback;

@@ -67,11 +67,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 - (void)encodeWithCoder:(NSCoder *)coder
 {	
 	[coder
-	 encodeInt64:self.address
+	 encodeInt64:(signed)self.address
 	 forKey:ZGAddressKey];
 	
 	[coder
-	 encodeInt64:self.size
+	 encodeInt64:(signed)self.size
 	 forKey:ZGSizeKey];
 	
 	[coder
@@ -140,14 +140,14 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	self.address = [coder decodeInt64ForKey:ZGAddressKey];
+	self.address = (unsigned)[coder decodeInt64ForKey:ZGAddressKey];
 	[self setAddressStringValue:nil];
 	
-	self.size = [coder decodeInt64ForKey:ZGSizeKey];
+	self.size = (unsigned)[coder decodeInt64ForKey:ZGSizeKey];
 	self.enabled = [coder decodeBoolForKey:ZGEnabledKey];
 	self.isFrozen = [coder decodeBoolForKey:ZGIsFrozenKey];
-	self.type = [coder decodeInt32ForKey:ZGTypeKey];
-	self.qualifier = [coder decodeInt32ForKey:ZGQualifierKey];
+	self.type = (ZGVariableType)[coder decodeInt32ForKey:ZGTypeKey];
+	self.qualifier = (ZGVariableQualifier)[coder decodeInt32ForKey:ZGQualifierKey];
 	self.byteOrder = [coder decodeInt32ForKey:ZGByteOrderKey];
 	if (self.byteOrder == CFByteOrderUnknown)
 	{

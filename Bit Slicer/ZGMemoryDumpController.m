@@ -46,14 +46,14 @@
 
 @property (assign, nonatomic) IBOutlet ZGMemoryViewerController *memoryViewer;
 
-@property (assign) IBOutlet NSWindow *memoryDumpWindow;
-@property (assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;
-@property (assign) IBOutlet NSTextField *memoryDumpToAddressTextField;
+@property (nonatomic, assign) IBOutlet NSWindow *memoryDumpWindow;
+@property (nonatomic, assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *memoryDumpToAddressTextField;
 
-@property (assign) IBOutlet NSWindow *memoryDumpProgressWindow;
-@property (assign) IBOutlet NSButton *memoryDumpProgressCancelButton;
+@property (nonatomic, assign) IBOutlet NSWindow *memoryDumpProgressWindow;
+@property (nonatomic, assign) IBOutlet NSButton *memoryDumpProgressCancelButton;
 
-@property (assign) IBOutlet NSProgressIndicator *progressIndicator;
+@property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
 
 @property (nonatomic) ZGSearchProgress *searchProgress;
 @property (nonatomic) BOOL isBusy;

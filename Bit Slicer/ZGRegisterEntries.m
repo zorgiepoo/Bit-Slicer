@@ -235,7 +235,7 @@
 		 address:0
 		 type:ZGByteArray
 		 qualifier:0
-		 pointerSize:is64Bit
+		 pointerSize:is64Bit ? sizeof(int64_t) : sizeof(int32_t)
 		 description:@(entry->name)];
 		
 		[registerVariables addObject:variable];
@@ -260,7 +260,7 @@
 		 address:0
 		 type:ZGByteArray
 		 qualifier:0
-		 pointerSize:is64Bit
+		 pointerSize:is64Bit ? sizeof(int64_t) : sizeof(int32_t)
 		 description:@(entry->name)];
 		
 		[registerVariables addObject:variable];

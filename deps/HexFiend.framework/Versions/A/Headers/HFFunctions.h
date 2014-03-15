@@ -304,18 +304,18 @@ static inline CGFloat HFCopysign(CGFloat a, CGFloat b) {
 /*! Atomically increments an NSUInteger, returning the new value.  Optionally invokes a memory barrier. */
 static inline NSUInteger HFAtomicIncrement(NSUInteger *ptr, BOOL barrier) {
 #if __LP64__
-    return (barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr);
+    return (unsigned)(barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr);
 #else
-    return (barrier ? OSAtomicIncrement32Barrier : OSAtomicIncrement32)((volatile int32_t *)ptr);
+    return (unsigned)(barrier ? OSAtomicIncrement32Barrier : OSAtomicIncrement32)((volatile int32_t *)ptr);
 #endif
 }
 
 /*! Atomically decrements an NSUInteger, returning the new value.  Optionally invokes a memory barrier. */
 static inline NSUInteger HFAtomicDecrement(NSUInteger *ptr, BOOL barrier) {
 #if __LP64__
-    return (barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr);
+    return (unsigned)(barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr);
 #else
-    return (barrier ? OSAtomicDecrement32Barrier : OSAtomicDecrement32)((volatile int32_t *)ptr);
+    return (unsigned)(barrier ? OSAtomicDecrement32Barrier : OSAtomicDecrement32)((volatile int32_t *)ptr);
 #endif
 }
 

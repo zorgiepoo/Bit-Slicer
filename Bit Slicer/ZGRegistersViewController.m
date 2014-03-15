@@ -51,7 +51,7 @@
 
 @property (nonatomic) NSArray *registers;
 @property (nonatomic) ZGBreakPoint *breakPoint;
-@property (nonatomic) ZGVariableType qualifier;
+@property (nonatomic) ZGVariableQualifier qualifier;
 
 @property (nonatomic) ZGMemoryAddress instructionPointer;
 
@@ -150,7 +150,7 @@
 		NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
 		if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
 		{
-			[newRegister.variable setType:[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
+			[newRegister.variable setType:(ZGVariableType)[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
 			[newRegister.variable setValue:newRegister.value];
 		}
 		
@@ -161,15 +161,15 @@
 	
 	if (breakPoint.hasVectorState)
 	{
-		NSArray *registerVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:breakPoint.vectorState is64Bit:breakPoint.process.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
-		for (ZGVariable *registerVariable in registerVariables)
+		NSArray *registerVectorVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:breakPoint.vectorState is64Bit:breakPoint.process.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
+		for (ZGVariable *registerVariable in registerVectorVariables)
 		{
 			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterVector variable:registerVariable pointerSize:pointerSize];
 			
 			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
 			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
 			{
-				[newRegister.variable setType:[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
+				[newRegister.variable setType:(ZGVariableType)[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
 				[newRegister.variable setValue:newRegister.value];
 			}
 			
@@ -191,8 +191,9 @@
 	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.name];
 	[[NSUserDefaults standardUserDefaults] setObject:registerTypesDictionary forKey:ZG_REGISTER_TYPES];
 	
-	[[self.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
-	[self.undoManager setActionName:@"Register Type Change"];
+	NSUndoManager *undoManager = self.undoManager;
+	[[undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
+	[undoManager setActionName:@"Register Type Change"];
 	
 	[self.tableView reloadData];
 }
@@ -348,8 +349,9 @@
 	
 	if (success)
 	{
-		[[self.undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
-		[self.undoManager setActionName:@"Register Value Change"];
+		NSUndoManager *undoManager = self.undoManager;
+		[[undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
+		[undoManager setActionName:@"Register Value Change"];
 		
 		[self.tableView reloadData];
 	}
@@ -365,7 +367,7 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return self.registers.count;
+	return (NSInteger)self.registers.count;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
@@ -373,7 +375,7 @@
 	id result = nil;
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.registers.count)
 	{
-		ZGRegister *theRegister = [self.registers objectAtIndex:rowIndex];
+		ZGRegister *theRegister = [self.registers objectAtIndex:(NSUInteger)rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
 			result = theRegister.variable.name;
@@ -395,7 +397,7 @@
 {
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.registers.count)
 	{
-		ZGRegister *theRegister = [self.registers objectAtIndex:rowIndex];
+		ZGRegister *theRegister = [self.registers objectAtIndex:(NSUInteger)rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"value"])
 		{
 			ZGMemorySize size;
@@ -436,7 +438,7 @@
 			return NO;
 		}
 		
-		ZGRegister *theRegister = [self.registers objectAtIndex:rowIndex];
+		ZGRegister *theRegister = [self.registers objectAtIndex:(NSUInteger)rowIndex];
 		if (!theRegister.variable.value)
 		{
 			return NO;
@@ -452,7 +454,7 @@
 {
 	if (self.qualifier != [sender tag])
 	{
-		self.qualifier = [sender tag];
+		self.qualifier = (ZGVariableQualifier)[sender tag];
 		[[NSUserDefaults standardUserDefaults] setInteger:self.qualifier forKey:ZG_DEBUG_QUALIFIER];
 		for (ZGRegister *theRegister in self.registers)
 		{
@@ -487,7 +489,7 @@
 	NSIndexSet *tableIndexSet = self.tableView.selectedRowIndexes;
 	NSInteger clickedRow = self.tableView.clickedRow;
 	
-	NSIndexSet *selectionIndexSet = (clickedRow != -1 && ![tableIndexSet containsIndex:clickedRow]) ? [NSIndexSet indexSetWithIndex:clickedRow] : tableIndexSet;
+	NSIndexSet *selectionIndexSet = (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 	
 	return [self.registers objectsAtIndexes:selectionIndexSet];
 }

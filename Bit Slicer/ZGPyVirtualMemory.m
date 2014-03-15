@@ -361,7 +361,7 @@ static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 	if (PyArg_ParseTuple(args, "KK:readBytes", &memoryAddress, &numberOfBytes))
 	{
 		void *bytes = NULL;
-		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, numberOfBytes))
+		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &numberOfBytes))
 		{
 			retValue = Py_BuildValue("y#", bytes, numberOfBytes);
 			ZGFreeBytes(self->processTask, bytes, numberOfBytes);
@@ -391,7 +391,7 @@ static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, Z
 			void *bytes = NULL;
 			if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &numberOfBytes))
 			{
-				retValue = PyUnicode_Decode(bytes, numberOfBytes, encoding, NULL);
+				retValue = PyUnicode_Decode(bytes, (Py_ssize_t)numberOfBytes, encoding, NULL);
 				if (retValue == NULL)
 				{
 					PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.%s failed to convert string to encoding %s (read %llu byte(s) from 0x%llX)", functionName, encoding, numberOfBytes, memoryAddress] UTF8String]);
@@ -491,7 +491,7 @@ static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 			return NULL;
 		}
 		
-		if (buffer.len > 0 && !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, buffer.len))
+		if (buffer.len > 0 && !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, (ZGMemorySize)buffer.len))
 		{
 			PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
 			
@@ -524,7 +524,7 @@ static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuff
 		
 		if (buffer.len > 0)
 		{
-			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, buffer.len) || !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress+buffer.len, nullBuffer, nullSize))
+			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, (ZGMemorySize)buffer.len) || !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress + (ZGMemorySize)buffer.len, nullBuffer, (ZGMemorySize)nullSize))
 			{
 				PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.%s failed to write %lu byte(s) at 0x%llX", functionName, buffer.len, memoryAddress] UTF8String]);
 				
@@ -591,7 +591,7 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject *args)
 {
 }
 
-#define MAX_VALUES_SCANNED 1000
+#define MAX_VALUES_SCANNED 1000U
 
 static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, const char *functionName)
 {
@@ -600,8 +600,8 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, c
 	{
 		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, self->objcSelf, ZGByteArray, 0, ZGEquals);
 		
-		Py_ssize_t numberOfEntries = MIN(MAX_VALUES_SCANNED, (Py_ssize_t)results.addressCount);
-		PyObject *pythonResults = PyList_New(numberOfEntries);
+		ZGMemorySize numberOfEntries = MIN(MAX_VALUES_SCANNED, results.addressCount);
+		PyObject *pythonResults = PyList_New((Py_ssize_t)numberOfEntries);
 		__block Py_ssize_t addressIndex = 0;
 		[results enumerateWithCount:numberOfEntries usingBlock:^(ZGMemoryAddress address, BOOL *stop) {
 			PyList_SET_ITEM(pythonResults, addressIndex, Py_BuildValue("K", address));
@@ -655,14 +655,14 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 			return NULL;
 		}
 		
-		void *data = malloc(buffer.len);
+		void *data = malloc((size_t)buffer.len);
 		memcpy(data, buffer.buf, buffer.len);
 		
 		ZGSearchData *searchData =
 		[[ZGSearchData alloc]
 		 initWithSearchValue:data
-		 dataSize:buffer.len
-		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, buffer.len)
+		 dataSize:(ZGMemorySize)buffer.len
+		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, (ZGMemorySize)buffer.len)
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		
 		retValue = scanSearchData(self, searchData, "scanBytes");

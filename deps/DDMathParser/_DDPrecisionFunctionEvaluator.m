@@ -16,10 +16,11 @@
 
 - (DDExpression *)add:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(2);
-	NSNumber *firstValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *firstValue = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(firstValue);
 	
-	NSNumber *secondValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
+	NSNumber *secondValue = [evaluator evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(secondValue);
     
     NSDecimal decimal = DDDecimalAdd([firstValue decimalValue], [secondValue decimalValue]);
@@ -29,9 +30,10 @@
 
 - (DDExpression *)subtract:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(2);
-	NSNumber *firstValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *firstValue = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(firstValue);
-	NSNumber *secondValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
+	NSNumber *secondValue = [evaluator evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(secondValue);
     NSDecimal decimal = DDDecimalSubtract([firstValue decimalValue], [secondValue decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
@@ -40,9 +42,10 @@
 
 - (DDExpression *)multiply:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(2);
-	NSNumber *firstValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *firstValue = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(firstValue);
-	NSNumber *secondValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
+	NSNumber *secondValue = [evaluator evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(secondValue);
     NSDecimal decimal = DDDecimalMultiply([firstValue decimalValue], [secondValue decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
@@ -51,9 +54,10 @@
 
 - (DDExpression *)divide:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(2);
-	NSNumber *firstValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *firstValue = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(firstValue);
-	NSNumber *secondValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
+	NSNumber *secondValue = [evaluator evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(secondValue);
     NSDecimal decimal = DDDecimalDivide([firstValue decimalValue], [secondValue decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
@@ -62,9 +66,10 @@
 
 - (DDExpression *)mod:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(2);
-	NSNumber *firstValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *firstValue = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(firstValue);
-	NSNumber *secondValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
+	NSNumber *secondValue = [evaluator evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(secondValue);
     NSDecimal decimal = DDDecimalMod([firstValue decimalValue], [secondValue decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
@@ -73,7 +78,8 @@
 
 - (DDExpression *)negate:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-	NSNumber *firstValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *firstValue = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(firstValue);
     NSDecimal decimal = [firstValue decimalValue];
     DDDecimalNegate(&decimal);
@@ -83,7 +89,8 @@
 
 - (DDExpression *)factorial:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-	NSNumber *firstValue = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *firstValue = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(firstValue);
     
     NSNumber *result = nil;
@@ -109,9 +116,10 @@
 
 - (DDExpression *)pow:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(2);
-	NSNumber *base = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *base = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(base);
-	NSNumber *exponent = [[self evaluator] evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
+	NSNumber *exponent = [evaluator evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(exponent);
     
     NSDecimal decimal = DDDecimalPower([base decimalValue], [exponent decimalValue]);
@@ -121,9 +129,10 @@
 
 - (DDExpression *)nthroot:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(2);
-	NSNumber *base = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *base = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(base);
-	NSNumber *root = [[self evaluator] evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
+	NSNumber *root = [evaluator evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(root);
     
     NSDecimal exponent = DDDecimalInverse([root decimalValue]);
@@ -139,9 +148,10 @@
 
 - (DDExpression *)rshift:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(2);
-	NSNumber *first = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *first = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(first);
-	NSNumber *second = [[self evaluator] evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
+	NSNumber *second = [evaluator evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(second);
     NSDecimal decimal = DDDecimalRightShift([first decimalValue], [second decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
@@ -150,9 +160,10 @@
 
 - (DDExpression *)lshift:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(2);
-	NSNumber *first = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *first = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(first);
-	NSNumber *second = [[self evaluator] evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
+	NSNumber *second = [evaluator evaluateExpression:[arguments objectAtIndex:1] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(second);
     NSDecimal decimal = DDDecimalLeftShift([first decimalValue], [second decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
@@ -165,7 +176,7 @@
 	RETURN_IF_NIL(sumExpression);
     
     NSDecimal sum = [[sumExpression number] decimalValue];
-    NSDecimal count = DDDecimalFromInteger([arguments count]);
+    NSDecimal count = DDDecimalFromInteger((signed)[arguments count]);
     NSDecimal decimal = DDDecimalDivide(sum, count);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
 	return [DDExpression numberExpressionWithNumber:result];
@@ -173,9 +184,10 @@
 
 - (DDExpression *)sum:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_GTOE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     NSDecimal sum = DDDecimalZero();
 	for (DDExpression *e in arguments) {
-        NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+        NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
         RETURN_IF_NIL(n);
         sum = DDDecimalAdd(sum, [n decimalValue]);
 	}
@@ -195,9 +207,10 @@
 
 - (DDExpression *)median:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_GTOE_N_ARGS(2);
+	DDMathEvaluator *evaluator = [self evaluator];
 	NSMutableArray *evaluatedNumbers = [NSMutableArray array];
 	for (DDExpression *e in arguments) {
-        NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+        NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
         RETURN_IF_NIL(n);
 		[evaluatedNumbers addObject:n];
 	}
@@ -205,11 +218,11 @@
 	
 	NSNumber *median = nil;
 	if (([evaluatedNumbers count] % 2) == 1) {
-		NSUInteger index = floor([evaluatedNumbers count] / 2);
+		NSUInteger index = (unsigned)lround(floor([evaluatedNumbers count] / 2.0));
 		median = [evaluatedNumbers objectAtIndex:index];
 	} else {
-		NSUInteger lowIndex = floor([evaluatedNumbers count] / 2);
-		NSUInteger highIndex = ceil([evaluatedNumbers count] / 2);
+		NSUInteger lowIndex = (unsigned)lround(floor([evaluatedNumbers count] / 2.0));
+		NSUInteger highIndex = (unsigned)lround(ceil([evaluatedNumbers count] / 2.0));
         NSNumber *low = [evaluatedNumbers objectAtIndex:lowIndex];
         NSNumber *high = [evaluatedNumbers objectAtIndex:highIndex];
         NSDecimal decimal = DDDecimalAverage2([low decimalValue], [high decimalValue]);
@@ -222,17 +235,19 @@
 	REQUIRE_GTOE_N_ARGS(2);
 	DDExpression *avgExpression = [self average:arguments variables:variables error:error];
 	RETURN_IF_NIL(avgExpression);
+	
+	DDMathEvaluator *evaluator = [self evaluator];
     
     NSDecimal avg = [[avgExpression number] decimalValue];
     NSDecimal stddev = DDDecimalZero();
     for (DDExpression *e in arguments) {
-        NSNumber *argValue = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+        NSNumber *argValue = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
         RETURN_IF_NIL(argValue);
         NSDecimal diff = DDDecimalSubtract(avg, [argValue decimalValue]);
         diff = DDDecimalPower(diff, DDDecimalTwo());
         stddev = DDDecimalAdd(stddev, diff);
     }
-    stddev = DDDecimalDivide(stddev, DDDecimalFromInteger([arguments count]));
+    stddev = DDDecimalDivide(stddev, DDDecimalFromInteger((signed)[arguments count]));
     stddev = DDDecimalSqrt(stddev);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:stddev];
 	return [DDExpression numberExpressionWithNumber:result];
@@ -240,7 +255,8 @@
 
 - (DDExpression *)sqrt:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-	NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalSqrt([n decimalValue]);
@@ -254,7 +270,8 @@
 
 - (DDExpression *)log:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-	NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(n);
     // FIXME: use high precision math
     NSNumber *result = @(log10([n doubleValue]));
@@ -263,7 +280,8 @@
 
 - (DDExpression *)ln:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-	NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(n);
     // FIXME: use high precision math
 	return [DDExpression numberExpressionWithNumber:@(log([n doubleValue]))];
@@ -271,7 +289,8 @@
 
 - (DDExpression *)log2:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-	NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(n);
     // FIXME: use high precision math
     NSNumber *result = @(log2([n doubleValue]));
@@ -280,7 +299,8 @@
 
 - (DDExpression *)exp:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-	NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+	NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
 	RETURN_IF_NIL(n);
     // FIXME: use high precision math
     NSNumber *result = @(exp([n doubleValue]));
@@ -289,7 +309,8 @@
 
 - (DDExpression *)ceil:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = [n decimalValue];
@@ -300,7 +321,8 @@
 
 - (DDExpression *)abs:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = [n decimalValue];
@@ -314,7 +336,8 @@
 
 - (DDExpression *)floor:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = [n decimalValue];
@@ -325,6 +348,7 @@
 
 - (DDExpression *)percent:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
     REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *percentArgument = [arguments objectAtIndex:0];
     DDExpression *percentExpression = [percentArgument parentExpression];
     DDExpression *percentContext = [percentExpression parentExpression];
@@ -341,13 +365,13 @@
             
             if (percentIsRightArgument) {
                 DDExpression *baseExpression = [[percentContext arguments] objectAtIndex:0];
-                context = [[self evaluator] evaluateExpression:baseExpression withSubstitutions:variables error:error];
+                context = [evaluator evaluateExpression:baseExpression withSubstitutions:variables error:error];
                 
             }
         }
     }
     
-    NSNumber *percent = [[self evaluator] evaluateExpression:percentArgument withSubstitutions:variables error:error];
+    NSNumber *percent = [evaluator evaluateExpression:percentArgument withSubstitutions:variables error:error];
     
     RETURN_IF_NIL(context);
     RETURN_IF_NIL(percent);
@@ -362,9 +386,10 @@
 
 - (DDExpression *)sin:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalSin([n decimalValue]);
@@ -374,9 +399,10 @@
 
 - (DDExpression *)cos:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCos([n decimalValue]);
@@ -386,9 +412,10 @@
 
 - (DDExpression *)tan:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalTan([n decimalValue]);
@@ -398,39 +425,43 @@
 
 - (DDExpression *)asin:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAsin([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)acos:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAcos([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)atan:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAtan([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)sinh:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalSinh([n decimalValue]);
@@ -440,9 +471,10 @@
 
 - (DDExpression *)cosh:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCosh([n decimalValue]);
@@ -452,9 +484,10 @@
 
 - (DDExpression *)tanh:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalTanh([n decimalValue]);
@@ -464,39 +497,43 @@
 
 - (DDExpression *)asinh:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAsinh([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)acosh:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAcosh([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)atanh:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAtanh([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)csc:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCsc([n decimalValue]);
@@ -506,9 +543,10 @@
 
 - (DDExpression *)sec:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalSec([n decimalValue]);
@@ -518,9 +556,10 @@
 
 - (DDExpression *)cotan:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCot([n decimalValue]);
@@ -530,39 +569,43 @@
 
 - (DDExpression *)acsc:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAcsc([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)asec:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAsec([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)acotan:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAcot([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)csch:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCsch([n decimalValue]);
@@ -572,9 +615,10 @@
 
 - (DDExpression *)sech:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalSech([n decimalValue]);
@@ -584,9 +628,10 @@
 
 - (DDExpression *)cotanh:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCoth([n decimalValue]);
@@ -596,39 +641,43 @@
 
 - (DDExpression *)acsch:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAcsch([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)asech:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAsech([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 
 - (DDExpression *)acotanh:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalAcoth([n decimalValue]);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
-	return _DDRTOD([DDExpression numberExpressionWithNumber:result], [self evaluator], error);
+	return _DDRTOD([DDExpression numberExpressionWithNumber:result], evaluator, error);
 }
 // more trig functions
 - (DDExpression *)versin:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCos([n decimalValue]);
@@ -639,9 +688,10 @@
 
 - (DDExpression *)vercosin:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCos([n decimalValue]);
@@ -652,9 +702,10 @@
 
 - (DDExpression *)coversin:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalSin([n decimalValue]);
@@ -665,9 +716,10 @@
 
 - (DDExpression *)covercosin:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalSin([n decimalValue]);
@@ -722,9 +774,10 @@
 
 - (DDExpression *)exsec:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCos([n decimalValue]);
@@ -736,9 +789,10 @@
 
 - (DDExpression *)excsc:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalSin([n decimalValue]);
@@ -750,9 +804,10 @@
 
 - (DDExpression *)crd:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
+	DDMathEvaluator *evaluator = [self evaluator];
     DDExpression *e = [arguments objectAtIndex:0];
-    e = _DDDTOR(e, [self evaluator], error);
-    NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
+    e = _DDDTOR(e, evaluator, error);
+    NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = DDDecimalCos([n decimalValue]);
@@ -764,7 +819,8 @@
 
 - (DDExpression *)dtor:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = [n decimalValue];
@@ -776,7 +832,8 @@
 
 - (DDExpression *)rtod:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_N_ARGS(1);
-    NSNumber *n = [[self evaluator] evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
+	DDMathEvaluator *evaluator = [self evaluator];
+    NSNumber *n = [evaluator evaluateExpression:[arguments objectAtIndex:0] withSubstitutions:variables error:error];
     RETURN_IF_NIL(n);
     
     NSDecimal decimal = [n decimalValue];

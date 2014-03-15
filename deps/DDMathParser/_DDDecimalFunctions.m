@@ -75,10 +75,10 @@ NSDecimal DDDecimalPi() {
 NSDecimal DDDecimal2Pi() {
 	static NSDecimalNumber * _2pi = nil;
 	if (_2pi == nil) {
-		NSDecimal pi = DDDecimalPi();
+		NSDecimal myPi = DDDecimalPi();
 		NSDecimal two = DDDecimalTwo();
 		NSDecimal tpi;
-		NSDecimalMultiply(&tpi, &pi, &two, NSRoundBankers);
+		NSDecimalMultiply(&tpi, &myPi, &two, NSRoundBankers);
 		_2pi = [[NSDecimalNumber alloc] initWithDecimal:tpi];
 	}
 	return [_2pi decimalValue];
@@ -151,7 +151,7 @@ NSDecimal DDDecimalLn10() {
 #pragma mark Creation
 
 NSDecimal DDDecimalFromInteger(NSInteger i) {
-	unsigned long long ull = i;
+	unsigned long long ull = (unsigned)i;
 	return [[NSDecimalNumber decimalNumberWithMantissa:ull exponent:0 isNegative:(i < 0)] decimalValue];
 }
 
@@ -240,10 +240,10 @@ NSDecimal DDDecimalMod(NSDecimal a, NSDecimal b) {
 
 NSDecimal DDDecimalMod2Pi(NSDecimal a) {
     // returns a number in the range of -π to π
-    NSDecimal pi = DDDecimalPi();
+    NSDecimal myPi = DDDecimalPi();
     NSDecimal tpi = DDDecimal2Pi();
 	a = DDDecimalMod(a, tpi);
-    if (NSDecimalCompare(&a, &pi) == NSOrderedDescending) {
+    if (NSDecimalCompare(&a, &myPi) == NSOrderedDescending) {
         //a > pi
         NSDecimalSubtract(&a, &a, &tpi, NSRoundBankers);
     }
@@ -407,12 +407,12 @@ NSDecimal DDDecimalSin(NSDecimal x) {
     NSDecimal final = x;
     BOOL shouldSubtract = YES;
     NSCalculationError e = NSCalculationNoError;
-    for (NSInteger i = 3; i <= 45; i += 2) {
+    for (NSUInteger i = 3; i <= 45; i += 2) {
         NSDecimal numerator;
         e = NSDecimalPower(&numerator, &x, i, NSRoundBankers);
         if (IS_FATAL(e)) { break; }
         
-        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger(i));
+        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger((signed)i));
         
         NSDecimal term;
         e = NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);
@@ -437,12 +437,12 @@ NSDecimal DDDecimalCos(NSDecimal x) {
     NSDecimal final = DDDecimalOne();
     BOOL shouldSubtract = YES;
     NSCalculationError e = NSCalculationNoError;
-    for (NSInteger i = 2; i <= 45; i += 2) {
+    for (NSUInteger i = 2; i <= 45; i += 2) {
         NSDecimal numerator;
         e = NSDecimalPower(&numerator, &x, i, NSRoundBankers);
         if (IS_FATAL(e)) { break; }
         
-        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger(i));
+        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger((signed)i));
         
         NSDecimal term;
         e = NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);
@@ -575,7 +575,7 @@ NSDecimal DDDecimalAtan(NSDecimal x) {
         NSDecimalMultiply(&z, &four, &firstArctangent, NSRoundBankers);
     } else {
         BOOL shouldSubtract = YES;
-        for (NSInteger n = 3; n < 150; n += 2) {
+        for (NSUInteger n = 3; n < 150; n += 2) {
             NSDecimal numerator;
             if (NSDecimalPower(&numerator, &x, n, NSRoundBankers) == NSCalculationUnderflow)
             {
@@ -583,7 +583,7 @@ NSDecimal DDDecimalAtan(NSDecimal x) {
                 n = 150;
             }
             
-            NSDecimal denominator = DDDecimalFromInteger(n);
+            NSDecimal denominator = DDDecimalFromInteger((signed)n);
             
             NSDecimal term;
             if (NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers) == NSCalculationUnderflow)
@@ -668,11 +668,11 @@ NSDecimal DDDecimalSinh(NSDecimal x) {
     // from: http://en.wikipedia.org/wiki/Hyperbolic_sine#Taylor_series_expressions
     
     NSDecimal final = x;
-    for (NSInteger i = 3; i <= 51; i += 2) {
+    for (NSUInteger i = 3; i <= 51; i += 2) {
         NSDecimal numerator;
         NSDecimalPower(&numerator, &x, i, NSRoundBankers);
         
-        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger(i));
+        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger((signed)i));
         
         NSDecimal term;
         NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);
@@ -687,11 +687,11 @@ NSDecimal DDDecimalCosh(NSDecimal x) {
     // from: http://en.wikipedia.org/wiki/Hyperbolic_sine#Taylor_series_expressions
     
     NSDecimal final = DDDecimalOne();
-    for (NSInteger i = 2; i <= 20; i += 2) {
+    for (NSUInteger i = 2; i <= 20; i += 2) {
         NSDecimal numerator;
         NSDecimalPower(&numerator, &x, i, NSRoundBankers);
         
-        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger(i));
+        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger((signed)i));
         
         NSDecimal term;
         NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);
@@ -739,13 +739,13 @@ NSDecimal DDDecimalAsinh(NSDecimal x) {
     
     NSDecimal z = x;
     NSDecimal fraction = DDDecimalOne();
-    for (NSInteger n = 1; n < 20;) {
-        NSDecimal numerator = DDDecimalFromInteger(n);
+    for (NSUInteger n = 1; n < 20;) {
+        NSDecimal numerator = DDDecimalFromInteger((signed)n);
         NSDecimalMultiply(&fraction, &fraction, &numerator, NSRoundBankers);
-        NSDecimal denominator = DDDecimalFromInteger(++n);
+        NSDecimal denominator = DDDecimalFromInteger((signed)(++n));
         NSDecimalDivide(&fraction, &fraction, &denominator, NSRoundBankers);
         
-        denominator = DDDecimalFromInteger(++n);
+        denominator = DDDecimalFromInteger((signed)(++n));
         NSDecimalPower(&numerator, &x, n, NSRoundBankers);
         NSDecimal zTerm;
         NSDecimalDivide(&zTerm, &numerator, &denominator, NSRoundBankers);
@@ -780,10 +780,10 @@ NSDecimal DDDecimalAtanh(NSDecimal x) {
     }
     
     NSDecimal z = x;
-    for (NSInteger n = 3; n < 20; n += 2) {
+    for (NSUInteger n = 3; n < 20; n += 2) {
         NSDecimal numerator;
         NSDecimalPower(&numerator, &x, n, NSRoundBankers);
-        NSDecimal denominator = DDDecimalFromInteger(n);
+        NSDecimal denominator = DDDecimalFromInteger((signed)n);
         
         NSDecimal term;
         NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);

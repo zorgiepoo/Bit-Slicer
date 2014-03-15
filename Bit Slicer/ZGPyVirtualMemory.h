@@ -50,6 +50,6 @@ extern PyObject *gVirtualMemoryException;
 - (id)initWithProcessNoCopy:(ZGProcess *)process;
 
 @property (nonatomic, readonly, assign) PyObject *object;
-@property (readonly) ZGSearchProgress *searchProgress; // main queue property
+@property (atomic, readonly) ZGSearchProgress *searchProgress; // main queue property
 
 @end

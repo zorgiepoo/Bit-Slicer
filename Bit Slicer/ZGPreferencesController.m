@@ -44,10 +44,10 @@
 @property (nonatomic) ZGHotKeyController *hotKeyController;
 @property (nonatomic) ZGAppUpdaterController *appUpdaterController;
 
-@property (assign) IBOutlet SRRecorderControl *hotkeyRecorder;
-@property (assign) IBOutlet NSButton *checkForUpdatesButton;
-@property (assign) IBOutlet NSButton *checkForAlphaUpdatesButton;
-@property (assign) IBOutlet NSButton *sendProfileInfoButton;
+@property (nonatomic, assign) IBOutlet SRRecorderControl *hotkeyRecorder;
+@property (nonatomic, assign) IBOutlet NSButton *checkForUpdatesButton;
+@property (nonatomic, assign) IBOutlet NSButton *checkForAlphaUpdatesButton;
+@property (nonatomic, assign) IBOutlet NSButton *sendProfileInfoButton;
 
 @end
 

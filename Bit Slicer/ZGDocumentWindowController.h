@@ -58,28 +58,28 @@
 @property (readonly, nonatomic) ZGBreakPointController *breakPointController;
 @property (readonly, nonatomic) ZGLoggerWindowController *loggerWindowController;
 
-@property (assign) IBOutlet ZGTableView *variablesTableView;
-@property (assign) IBOutlet NSProgressIndicator *progressIndicator;
-@property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
-@property (assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
-@property (assign) IBOutlet NSButton *storeValuesButton;
-@property (assign) IBOutlet APTokenSearchField *searchValueTextField;
-@property (assign) IBOutlet NSTextField *flagsTextField;
-@property (assign) IBOutlet NSPopUpButton *functionPopUpButton;
+@property (nonatomic, assign) IBOutlet ZGTableView *variablesTableView;
+@property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
+@property (nonatomic, assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
+@property (nonatomic, assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
+@property (nonatomic, assign) IBOutlet NSButton *storeValuesButton;
+@property (nonatomic, assign) IBOutlet APTokenSearchField *searchValueTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *flagsTextField;
+@property (nonatomic, assign) IBOutlet NSPopUpButton *functionPopUpButton;
 
-@property (assign) IBOutlet NSTextField *flagsLabel;
+@property (nonatomic, assign) IBOutlet NSTextField *flagsLabel;
 
-@property (assign) IBOutlet AGScopeBar *scopeBar;
-@property (assign) IBOutlet NSView *scopeBarFlagsView;
+@property (nonatomic, assign) IBOutlet AGScopeBar *scopeBar;
+@property (nonatomic, assign) IBOutlet NSView *scopeBarFlagsView;
 
-@property (strong) ZGDocumentTableController *tableController;
-@property (strong) ZGVariableController *variableController;
-@property (strong) ZGDocumentSearchController *searchController;
-@property (strong) ZGScriptManager *scriptManager;
+@property (nonatomic) ZGDocumentTableController *tableController;
+@property (nonatomic) ZGVariableController *variableController;
+@property (nonatomic) ZGDocumentSearchController *searchController;
+@property (nonatomic) ZGScriptManager *scriptManager;
 
 @property (nonatomic) BOOL isOccluded;
 
-@property (strong, nonatomic) ZGProcess *currentProcess;
+@property (nonatomic) ZGProcess *currentProcess;
 
 @property (assign, nonatomic) ZGDocumentData *documentData;
 @property (assign, nonatomic) ZGSearchData *searchData;

@@ -43,7 +43,7 @@
 @property (nonatomic) ZGVariableController *variableController;
 @property (nonatomic) NSArray *variables;
 
-@property (assign) IBOutlet NSTextField *sizeTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *sizeTextField;
 
 @end
 

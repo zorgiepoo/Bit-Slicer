@@ -38,7 +38,7 @@
 
 @interface ZGStatusBarRepresenter : HFStatusBarRepresenter
 
-@property (readwrite) ZGMemoryAddress beginningMemoryAddress;
+@property (nonatomic) ZGMemoryAddress beginningMemoryAddress;
 
 // expose this private method
 - (void)updateString;

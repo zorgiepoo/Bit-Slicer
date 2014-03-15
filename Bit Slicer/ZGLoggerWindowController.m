@@ -125,7 +125,7 @@
 	
 	NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
 	[dateFormatter setDateStyle:NSDateFormatterNoStyle];
-	[dateFormatter setTimeStyle:kCFDateFormatterMediumStyle];
+	[dateFormatter setTimeStyle:NSDateFormatterMediumStyle];
 	
 	NSMutableString *newText = [[NSMutableString alloc] init];
 	

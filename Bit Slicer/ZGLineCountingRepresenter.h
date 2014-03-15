@@ -38,6 +38,6 @@
 
 @interface ZGLineCountingRepresenter : HFLineCountingRepresenter
 
-@property (readwrite) ZGMemoryAddress beginningMemoryAddress;
+@property (nonatomic) ZGMemoryAddress beginningMemoryAddress;
 
 @end

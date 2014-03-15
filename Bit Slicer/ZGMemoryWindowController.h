@@ -58,20 +58,20 @@ enum ZGNavigation
 
 @property (nonatomic, weak) id debuggerController;
 
-@property (assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
-@property (assign) IBOutlet NSSegmentedControl *navigationSegmentedControl;
-@property (assign) IBOutlet NSTextField *addressTextField;
+@property (nonatomic, assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
+@property (nonatomic, assign) IBOutlet NSSegmentedControl *navigationSegmentedControl;
+@property (nonatomic, assign) IBOutlet NSTextField *addressTextField;
 
-@property (nonatomic, strong) NSUndoManager *undoManager;
-@property (nonatomic, strong) NSUndoManager *navigationManager;
+@property (nonatomic) NSUndoManager *undoManager;
+@property (nonatomic) NSUndoManager *navigationManager;
 
-@property (readwrite) ZGMemoryAddress currentMemoryAddress;
-@property (readwrite) ZGMemorySize currentMemorySize;
+@property (nonatomic) ZGMemoryAddress currentMemoryAddress;
+@property (nonatomic) ZGMemorySize currentMemorySize;
 
 @property (nonatomic, readonly) ZGProcess *currentProcess;
 @property (nonatomic, copy) NSString *desiredProcessInternalName;
 
-@property (readwrite, strong) NSTimer *updateDisplayTimer;
+@property (nonatomic) NSTimer *updateDisplayTimer;
 
 - (IBAction)pauseOrUnpauseProcess:(id)sender;
 

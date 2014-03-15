@@ -328,8 +328,8 @@ static PyObject *Debugger_notify(DebuggerClass *self, PyObject *args)
 	}
 	else
 	{
-		NSString *titleString = [[NSString alloc] initWithBytes:title.buf length:title.len encoding:NSUTF8StringEncoding];
-		NSString *informativeTextString = [[NSString alloc] initWithBytes:informativeText.buf length:informativeText.len encoding:NSUTF8StringEncoding];
+		NSString *titleString = [[NSString alloc] initWithBytes:title.buf length:(NSUInteger)title.len encoding:NSUTF8StringEncoding];
+		NSString *informativeTextString = [[NSString alloc] initWithBytes:informativeText.buf length:(NSUInteger)informativeText.len encoding:NSUTF8StringEncoding];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			ZGDeliverUserNotification(titleString, nil, informativeTextString);
@@ -393,7 +393,7 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithBytes:buffer.buf address:instructionPointer size:buffer.len pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		
 		NSArray *instructions = [disassemblerObject readInstructions];
 		
@@ -448,7 +448,7 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		success = [ZGDebuggerController writeData:[NSData dataWithBytes:buffer.buf length:buffer.len] atAddress:memoryAddress processTask:self->processTask is64Bit:self->is64Bit breakPoints:self->objcSelf.breakPointController.breakPoints];
+		success = [ZGDebuggerController writeData:[NSData dataWithBytes:buffer.buf length:(NSUInteger)buffer.len] atAddress:memoryAddress processTask:self->processTask is64Bit:self->is64Bit breakPoints:self->objcSelf.breakPointController.breakPoints];
 		
 		if (!success)
 		{
@@ -543,7 +543,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		NSError *error = nil;
 		BOOL injectedCode =
 		[ZGDebuggerController
-		 injectCode:[NSData dataWithBytes:newCode.buf length:newCode.len]
+		 injectCode:[NSData dataWithBytes:newCode.buf length:(NSUInteger)newCode.len]
 		 intoAddress:destinationAddress
 		 hookingIntoOriginalInstructions:originalInstructions
 		 process:self->objcSelf.process
@@ -921,7 +921,7 @@ static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject *args)
 	
 	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf.process breakPoints:self->objcSelf.breakPointController.breakPoints];
 	
-	PyObject *pythonInstructionAddresses = PyList_New(backtrace.instructions.count);
+	PyObject *pythonInstructionAddresses = PyList_New((Py_ssize_t)backtrace.instructions.count);
 	Py_ssize_t instructionIndex = 0;
 	for (ZGInstruction *instruction in backtrace.instructions)
 	{

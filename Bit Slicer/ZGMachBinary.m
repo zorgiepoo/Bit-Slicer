@@ -73,7 +73,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 						dylinkerBinary =
 						[[ZGMachBinary alloc]
 						 initWithHeaderAddress:regionAddress
-						 filePathAddress:dylinkerCommand->name.offset + (void *)dylinkerCommand - regionBytes + regionAddress];
+						 filePathAddress:regionAddress + dylinkerCommand->name.offset + (ZGMemoryAddress)((uint8_t *)dylinkerCommand - (uint8_t *)regionBytes)];
 						
 						break;
 					}
@@ -206,7 +206,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	return filePath;
 }
 
-- (ZGMachBinaryInfo *)parseMachHeaderWithBytes:(const void *)machHeaderBytes range:(NSRange)range pointerSize:(size_t)pointerSize
+- (ZGMachBinaryInfo *)parseMachHeaderWithBytes:(const void *)machHeaderBytes startPointer:(const void *)startPointer dataLength:(ZGMemorySize)dataLength pointerSize:(size_t)pointerSize
 {
 	ZGMemoryAddress machHeaderAddress = self.headerAddress;
 	
@@ -232,8 +232,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
 	{
 		void *segmentBytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
-		assert(sizeof(segmentBytes) == sizeof(range.location));
-		if (segmentBytes + machHeader->sizeofcmds <= (void *)range.location + range.length)
+		if (segmentBytes + machHeader->sizeofcmds <= startPointer + dataLength)
 		{
 			machBinaryInfo = [[ZGMachBinaryInfo alloc] initWithMachHeaderAddress:machHeaderAddress segmentBytes:segmentBytes commandSize:machHeader->sizeofcmds];
 		}
@@ -253,7 +252,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		NSData *machFileData = [NSData dataWithContentsOfFile:filePath];
 		if (machFileData != nil)
 		{
-			binaryInfo = [self parseMachHeaderWithBytes:machFileData.bytes range:NSMakeRange(machFileData.bytes, machFileData.length) pointerSize:process.pointerSize];
+			binaryInfo = [self parseMachHeaderWithBytes:machFileData.bytes startPointer:machFileData.bytes dataLength:machFileData.length pointerSize:process.pointerSize];
 			if (binaryInfo != nil)
 			{
 				[machPathToInfoDictionary setObject:binaryInfo forKey:filePath];
@@ -278,7 +277,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		if (ZGReadBytes(process.processTask, regionAddress, &regionBytes, &regionSize))
 		{
 			const struct mach_header_64 *machHeader = regionBytes + self.headerAddress - regionAddress;
-			binaryInfo = [self parseMachHeaderWithBytes:machHeader range:NSMakeRange(regionBytes, regionSize) pointerSize:process.pointerSize];
+			binaryInfo = [self parseMachHeaderWithBytes:machHeader startPointer:regionBytes dataLength:regionSize pointerSize:process.pointerSize];
 			
 			ZGFreeBytes(process.processTask, regionBytes, regionSize);
 		}

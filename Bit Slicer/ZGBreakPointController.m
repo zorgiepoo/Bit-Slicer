@@ -171,7 +171,7 @@ static ZGBreakPointController *gBreakPointController;
 	}
 	
 	// we may still catch exceptions momentarily for our breakpoint if the data is being acccessed frequently, so do not remove it immediately
-	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 2), dispatch_get_main_queue(), ^{
 		if (self.watchPointTimer != NULL)
 		{
 			BOOL shouldKeepTimer = NO;
@@ -461,11 +461,11 @@ static ZGBreakPointController *gBreakPointController;
 		// Remove single-stepping
 		if (breakPoint.process.is64Bit)
 		{
-			threadState.uts.ts64.__rflags &= ~(1 << 8);
+			threadState.uts.ts64.__rflags &= ~(1U << 8);
 		}
 		else
 		{
-			threadState.uts.ts32.__eflags &= ~(1 << 8);
+			threadState.uts.ts32.__eflags &= ~(1U << 8);
 		}
 		
 		// If we had single-stepped in here, use current program counter, otherwise use instruction address before program counter
@@ -559,11 +559,11 @@ static ZGBreakPointController *gBreakPointController;
 		// Remove single-stepping
 		if (candidateBreakPoint.process.is64Bit)
 		{
-			threadState.uts.ts64.__rflags &= ~(1 << 8);
+			threadState.uts.ts64.__rflags &= ~(1U << 8);
 		}
 		else
 		{
-			threadState.uts.ts32.__eflags &= ~(1 << 8);
+			threadState.uts.ts32.__eflags &= ~(1U << 8);
 		}
 		
 		if (!hitBreakPoint)
@@ -642,9 +642,10 @@ static ZGBreakPointController *gBreakPointController;
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
 				{
-					if (breakPoint.delegate != nil)
+					id <ZGBreakPointDelegate> delegate = breakPoint.delegate;
+					if (delegate != nil)
 					{
-						[breakPoint.delegate breakPointDidHit:breakPoint];
+						[delegate breakPointDidHit:breakPoint];
 					}
 					else
 					{
@@ -784,7 +785,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		}
 	}
 	
-	if (task_set_exception_ports(process.processTask, EXC_MASK_BREAKPOINT, self.exceptionPort, EXCEPTION_DEFAULT | MACH_EXCEPTION_CODES, MACHINE_THREAD_STATE) != KERN_SUCCESS)
+	if (task_set_exception_ports(process.processTask, EXC_MASK_BREAKPOINT, self.exceptionPort, (exception_behavior_t)(EXCEPTION_DEFAULT | MACH_EXCEPTION_CODES), MACHINE_THREAD_STATE) != KERN_SUCCESS)
 	{
 		NSLog(@"ERROR: task_set_exception_ports failed on adding breakpoint");
 		return NO;
@@ -963,16 +964,16 @@ kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t
 		
 		if (self.watchPointTimer == NULL && (self.watchPointTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())) != NULL)
 		{
-			dispatch_source_set_timer(self.watchPointTimer, dispatch_walltime(NULL, 0), 0.5 * NSEC_PER_SEC, 0.1 * NSEC_PER_SEC);
+			dispatch_source_set_timer(self.watchPointTimer, dispatch_walltime(NULL, 0), NSEC_PER_SEC / 2, (uint64_t)(0.1 * NSEC_PER_SEC));
 			dispatch_source_set_event_handler(self.watchPointTimer, ^{
-				for (ZGBreakPoint *breakPoint in self.breakPoints)
+				for (ZGBreakPoint *existingBreakPoint in self.breakPoints)
 				{
-					if (breakPoint.type != ZGBreakPointWatchData)
+					if (existingBreakPoint.type != ZGBreakPointWatchData)
 					{
 						continue;
 					}
 					
-					[self updateThreadListInWatchpoint:breakPoint type:watchPointType];
+					[self updateThreadListInWatchpoint:existingBreakPoint type:watchPointType];
 				}
 			});
 			dispatch_resume(self.watchPointTimer);

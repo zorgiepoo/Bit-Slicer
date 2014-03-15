@@ -65,8 +65,8 @@
 @property (nonatomic) NSMutableDictionary *scriptsDictionary;
 @property (nonatomic) VDKQueue *fileWatchingQueue;
 @property (nonatomic, weak) ZGDocumentWindowController *windowController;
-@property dispatch_source_t scriptTimer;
-@property NSMutableArray *runningScripts;
+@property (atomic) dispatch_source_t scriptTimer;
+@property (atomic) NSMutableArray *runningScripts;
 @property (nonatomic) NSMutableArray *objectsPool;
 @property (nonatomic) id scriptActivity;
 
@@ -252,7 +252,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			}
 			else
 			{
-				result = temporaryResult;
+				result = (BOOL)temporaryResult;
 			}
 		}
 		
@@ -274,7 +274,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		self.fileWatchingQueue = [[VDKQueue alloc] init];
 		self.fileWatchingQueue.delegate = self;
 		self.windowController = windowController;
-		self.loggerWindowController = self.windowController.loggerWindowController;
+		self.loggerWindowController = windowController.loggerWindowController;
 	}
 	return self;
 }
@@ -331,8 +331,9 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	
 	if (assignedNewScript)
 	{
-		[self.windowController.variablesTableView reloadData];
-		[self.windowController markDocumentChange];
+		ZGDocumentWindowController *windowController = self.windowController;
+		[windowController.variablesTableView reloadData];
+		[windowController markDocumentChange];
 	}
 	
 	// Handle atomic saves
@@ -594,8 +595,9 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	if (variable.enabled)
 	{
 		variable.enabled = NO;
-		[self.windowController.variablesTableView reloadData];
-		[self.windowController markDocumentChange];
+		ZGDocumentWindowController *windowController = self.windowController;
+		[windowController.variablesTableView reloadData];
+		[windowController markDocumentChange];
 	}
 }
 
@@ -623,7 +625,9 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 {
 	ZGPyScript *script = [self scriptForVariable:variable];
 	
-	if (!self.windowController.currentProcess.valid)
+	ZGDocumentWindowController *windowController = self.windowController;
+	
+	if (!windowController.currentProcess.valid)
 	{
 		[self disableVariable:variable];
 		return;
@@ -653,8 +657,8 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		
 		Py_XDECREF(scriptClassType);
 		
-		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:self.windowController.currentProcess];
-		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:self.windowController.currentProcess scriptManager:self breakPointController:self.windowController.breakPointController loggerWindowController:self.windowController.loggerWindowController];
+		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:windowController.currentProcess];
+		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptManager:self breakPointController:self.windowController.breakPointController loggerWindowController:windowController.loggerWindowController];
 		
 		script.virtualMemoryInstance = virtualMemoryInstance;
 		script.debuggerInstance = debuggerInstance;
@@ -702,7 +706,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			[[NSProcessInfo processInfo] endActivity:scriptInitActivity];
 		}
 		
-		BOOL stillInitialized = Py_IsInitialized();
+		BOOL stillInitialized = (BOOL)Py_IsInitialized();
 		if (initMethodResult == NULL || !stillInitialized)
 		{
 			if (stillInitialized)
@@ -741,14 +745,14 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				}
 			});
 			
-			dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), 0.03 * NSEC_PER_SEC, 0.01 * NSEC_PER_SEC);
+			dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), (uint64_t)(0.03 * NSEC_PER_SEC), (uint64_t)(0.01 * NSEC_PER_SEC));
 			dispatch_source_set_event_handler(self.scriptTimer, ^{
-				for (ZGPyScript *script in self.runningScripts)
+				for (ZGPyScript *runningScript in self.runningScripts)
 				{
 					NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
-					script.deltaTime = currentTime - script.lastTime;
-					script.lastTime = currentTime;
-					[self executeScript:script];
+					runningScript.deltaTime = currentTime - runningScript.lastTime;
+					runningScript.lastTime = currentTime;
+					[self executeScript:runningScript];
 				}
 			});
 			dispatch_resume(self.scriptTimer);
@@ -854,7 +858,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			}
 		});
 		
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 2), dispatch_get_main_queue(), ^{
 			if (scriptFinishedCount == script.finishedCount)
 			{
 				if (delayedAppTermination)

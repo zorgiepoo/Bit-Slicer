@@ -40,7 +40,7 @@
 
 @property (nonatomic) ZGVariableController *variableController;
 
-@property (assign) IBOutlet NSTextField *addressTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *addressTextField;
 @property (nonatomic) ZGVariable *variable;
 
 @end

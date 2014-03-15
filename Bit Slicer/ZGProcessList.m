@@ -47,7 +47,7 @@
 
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;
 
-@property NSUInteger pollRequestCount;
+@property (atomic) NSUInteger pollRequestCount;
 @property (nonatomic) NSArray *priorityProcesses;
 @property (nonatomic) NSArray *pollObservers;
 @property (nonatomic) NSTimer *pollTimer;
