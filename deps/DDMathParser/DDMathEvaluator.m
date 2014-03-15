@@ -82,21 +82,6 @@
     return YES;
 }
 
-- (void)unregisterFunctionWithName:(NSString *)functionName {
-    [_functionMap removeObjectForKey:functionName];
-}
-
-- (NSArray *)registeredFunctions {
-    NSMutableArray *array = [NSMutableArray array];
-    
-    [array addObjectsFromArray:[[_DDFunctionEvaluator standardFunctions] array]];
-    [array addObjectsFromArray:[_functionMap allKeys]];
-    
-    [array sortUsingSelector:@selector(compare:)];
-    
-    return array;
-}
-
 #pragma mark - Lazy Resolution
 
 - (DDExpression *)resolveFunction:(_DDFunctionExpression *)functionExpression variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
@@ -279,6 +264,9 @@
 
 #pragma mark - Deprecated Methods
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+
 + (id)sharedMathEvaluator {
     return [self defaultMathEvaluator];
 }
@@ -290,5 +278,22 @@
 - (void)addRewriteRule:(NSString *)rule forExpressionsMatchingTemplate:(NSString *)templateString condition:(NSString *)condition {
     [[DDExpressionRewriter defaultRewriter] addRewriteRule:rule forExpressionsMatchingTemplate:templateString condition:condition];
 }
+
+- (void)unregisterFunctionWithName:(NSString *)functionName {
+    [_functionMap removeObjectForKey:functionName];
+}
+
+- (NSArray *)registeredFunctions {
+    NSMutableArray *array = [NSMutableArray array];
+    
+    [array addObjectsFromArray:[[_DDFunctionEvaluator standardFunctions] array]];
+    [array addObjectsFromArray:[_functionMap allKeys]];
+    
+    [array sortUsingSelector:@selector(compare:)];
+    
+    return array;
+}
+
+#pragma clang diagnostic pop
 
 @end

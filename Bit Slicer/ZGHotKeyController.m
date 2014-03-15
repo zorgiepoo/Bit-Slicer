@@ -131,7 +131,10 @@ static OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler, Eve
 		EventTypeSpec eventType = {.eventClass = kEventClassKeyboard, .eventKind = kEventHotKeyPressed};
 		InstallApplicationEventHandler(&pauseOrUnpauseHotKeyHandler, 1, &eventType, (__bridge void *)self, NULL);
 		
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfour-char-constants"
 		RegisterEventHotKey((UInt32)self.pauseHotKeyCombo.code, (UInt32)self.pauseHotKeyCombo.flags, (EventHotKeyID){.signature = 'htk1', .id = 1}, GetApplicationEventTarget(), 0, &_pauseHotKeyRef);
+#pragma clang diagnostic pop
 	}
 }
 
