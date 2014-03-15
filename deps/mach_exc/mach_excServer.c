@@ -238,7 +238,7 @@ mig_internal novalue _Xmach_exception_raise_state_identity
 #if !defined(__MIG_check__Request__mach_exception_raise_t__defined)
 #define __MIG_check__Request__mach_exception_raise_t__defined
 
-mig_internal kern_return_t __MIG_check__Request__mach_exception_raise_t(__attribute__((__unused__)) __Request__mach_exception_raise_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__mach_exception_raise_t(__Request__mach_exception_raise_t *In0P)
 {
 
 	typedef __Request__mach_exception_raise_t __Request;
@@ -364,7 +364,7 @@ mig_internal novalue _Xmach_exception_raise
 #if !defined(__MIG_check__Request__mach_exception_raise_state_t__defined)
 #define __MIG_check__Request__mach_exception_raise_state_t__defined
 
-mig_internal kern_return_t __MIG_check__Request__mach_exception_raise_state_t(__attribute__((__unused__)) __Request__mach_exception_raise_state_t *In0P, __attribute__((__unused__)) __Request__mach_exception_raise_state_t **In1PP)
+mig_internal kern_return_t __MIG_check__Request__mach_exception_raise_state_t(__Request__mach_exception_raise_state_t *In0P, __Request__mach_exception_raise_state_t **In1PP)
 {
 
 	typedef __Request__mach_exception_raise_state_t __Request;
@@ -505,7 +505,7 @@ mig_internal novalue _Xmach_exception_raise_state
 #if !defined(__MIG_check__Request__mach_exception_raise_state_identity_t__defined)
 #define __MIG_check__Request__mach_exception_raise_state_identity_t__defined
 
-mig_internal kern_return_t __MIG_check__Request__mach_exception_raise_state_identity_t(__attribute__((__unused__)) __Request__mach_exception_raise_state_identity_t *In0P, __attribute__((__unused__)) __Request__mach_exception_raise_state_identity_t **In1PP)
+mig_internal kern_return_t __MIG_check__Request__mach_exception_raise_state_identity_t(__Request__mach_exception_raise_state_identity_t *In0P, __Request__mach_exception_raise_state_identity_t **In1PP)
 {
 
 	typedef __Request__mach_exception_raise_state_identity_t __Request;
