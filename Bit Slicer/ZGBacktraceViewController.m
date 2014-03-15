@@ -33,8 +33,7 @@
  */
 
 #import "ZGBacktraceViewController.h"
-#import "ZGDebuggerController.h"
-
+#import "ZGNavigationPost.h"
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
@@ -192,6 +191,38 @@
 	NSIndexSet *selectionIndexSet = (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 	
 	return [self.backtrace.instructions objectsAtIndexes:selectionIndexSet];
+}
+
+#pragma mark Actions
+
+- (IBAction)copy:(id)sender
+{
+	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
+	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
+	
+	for (ZGInstruction *instruction in self.selectedInstructions)
+	{
+		[descriptionComponents addObject:[@[instruction.variable.addressStringValue, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
+		[variablesArray addObject:instruction.variable];
+	}
+	
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
+}
+
+- (IBAction)copyAddress:(id)sender
+{
+	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
+	
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
+	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
+}
+
+- (IBAction)showMemoryViewer:(id)sender
+{
+	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
+	[ZGNavigationPost postShowMemoryViewerWithProcess:self.process address:selectedInstruction.variable.address selectionLength:selectedInstruction.variable.size];
 }
 
 @end

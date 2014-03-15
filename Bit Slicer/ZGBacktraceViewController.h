@@ -35,7 +35,6 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
-@class ZGDebuggerController;
 @class ZGProcess;
 @class ZGBacktrace;
 
@@ -51,6 +50,7 @@
 - (id)initWithDelegate:(id <ZGBacktraceViewControllerDelegate>)delegate;
 
 @property (nonatomic) ZGBacktrace *backtrace;
+@property (nonatomic) ZGProcess *process;
 
 @property (nonatomic, readonly) NSArray *selectedInstructions;
 @property (nonatomic, readonly) NSTableView *tableView;

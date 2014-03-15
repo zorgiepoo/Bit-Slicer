@@ -1497,7 +1497,6 @@
 					"-Wno-missing-prototypes",
 					"-Wno-strict-selector-match",
 					"-Wno-selector",
-					"-Wno-undeclared-selector",
 				);
 			};
 			name = Debug;
@@ -1581,7 +1580,6 @@
 					"-Wno-missing-prototypes",
 					"-Wno-strict-selector-match",
 					"-Wno-selector",
-					"-Wno-undeclared-selector",
 				);
 			};
 			name = Release;

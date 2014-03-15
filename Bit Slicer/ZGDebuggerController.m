@@ -1373,12 +1373,9 @@ enum ZGStepExecution
 
 - (IBAction)copy:(id)sender
 {
-	NSArray *selectedInstructions = (self.window.firstResponder == self.backtraceViewController.tableView) ? self.backtraceViewController.selectedInstructions : self.selectedInstructions;
+	NSArray *selectedInstructions = self.selectedInstructions;
 	
-	if (self.window.firstResponder == self.instructionsTableView)
-	{
-		[self annotateInstructions:selectedInstructions];
-	}
+	[self annotateInstructions:selectedInstructions];
 	
 	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
 	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
@@ -1396,8 +1393,8 @@ enum ZGStepExecution
 
 - (IBAction)copyAddress:(id)sender
 {
-	NSArray *selectedInstructions = (self.window.firstResponder == self.backtraceViewController.tableView) ? self.backtraceViewController.selectedInstructions : self.selectedInstructions;
-	ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
+	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
+	
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
 }
@@ -2349,6 +2346,7 @@ enum ZGStepExecution
 	}
 	
 	self.backtraceViewController.backtrace = backtrace;
+	self.backtraceViewController.process = [[ZGProcess alloc] initWithProcess:self.currentProcess];
 }
 
 - (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address
@@ -2674,8 +2672,7 @@ enum ZGStepExecution
 
 - (IBAction)showMemoryViewer:(id)sender
 {
-	NSArray *selectedInstructions = (self.window.firstResponder == self.backtraceViewController.tableView) ? self.backtraceViewController.selectedInstructions : self.selectedInstructions;
-	ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
+	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
 	
 	[ZGNavigationPost postShowMemoryViewerWithProcess:self.currentProcess address:selectedInstruction.variable.address selectionLength:selectedInstruction.variable.size];
 }

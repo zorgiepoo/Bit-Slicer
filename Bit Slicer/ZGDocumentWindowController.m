@@ -502,6 +502,16 @@
 	[self.document markChange];
 }
 
+- (IBAction)undoDocument:(id)sender
+{
+	[self.undoManager undo];
+}
+
+- (IBAction)redoDocument:(id)sender
+{
+	[self.undoManager redo];
+}
+
 #pragma mark Watching other applications
 
 - (void)lastChosenInternalProcessNameChanged:(NSNotification *)notification
@@ -1215,14 +1225,6 @@
 	else if (menuItem.action == @selector(addVariable:))
 	{
 		if (![self.searchController canStartTask])
-		{
-			return NO;
-		}
-	}
-	
-	else if (menuItem.action == @selector(undo:))
-	{
-		if ([self.searchController canCancelTask])
 		{
 			return NO;
 		}

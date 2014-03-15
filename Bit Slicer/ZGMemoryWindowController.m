@@ -115,6 +115,10 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	return 0.5;
 }
 
+- (void)updateDisplayTimer:(NSTimer *)timer
+{
+}
+
 - (void)makeUpdateDisplayTimer
 {
 	self.updateDisplayTimer =
