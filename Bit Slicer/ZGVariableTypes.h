@@ -53,7 +53,7 @@ typedef enum
 typedef enum
 {
 	ZGSigned = 0,
-	ZGUnsigned,
+	ZGUnsigned
 } ZGVariableQualifier;
 
 #endif
