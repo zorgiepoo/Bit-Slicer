@@ -390,7 +390,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		}
 		else
 		{
-			uint32_t randomInteger = arc4random() % UINT32_MAX;
+			uint32_t randomInteger = arc4random();
 			
 			NSMutableString *randomFilename = [NSMutableString stringWithFormat:@"%@ %X", SCRIPT_FILENAME_PREFIX, randomInteger];
 			while ([fileManager fileExistsAtPath:[[SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename] stringByAppendingString:@".py"]])
