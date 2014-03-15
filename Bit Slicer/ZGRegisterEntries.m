@@ -44,7 +44,8 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 
 #define ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName) \
 { \
-	strcpy((char *)&entries[entryIndex].name, #registerName); \
+	strncpy((char *)&entries[entryIndex].name, #registerName, sizeof(entries[entryIndex].name)); \
+	entries[entryIndex].name[sizeof(entries[entryIndex].name) - 1] = '\0'; \
 	entries[entryIndex].size = sizeof(threadState.uts.structureType.__##registerName); \
 	memcpy(&entries[entryIndex].value, &threadState.uts.structureType.__##registerName, entries[entryIndex].size); \
 	entries[entryIndex].offset = offsetof(structName, __##registerName); \
@@ -132,7 +133,8 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 
 #define ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, registerName) \
 { \
-	strcpy((char *)&entries[entryIndex].name, #registerName); \
+	strncpy((char *)&entries[entryIndex].name, #registerName, sizeof(entries[entryIndex].name)); \
+	entries[entryIndex].name[sizeof(entries[entryIndex].name) - 1] = '\0'; \
 	entries[entryIndex].size = sizeof(vectorState.ufs.as64.__fpu_##registerName); \
 	entries[entryIndex].offset = offsetof(x86_avx_state64_t, __fpu_##registerName); \
 	memcpy(&entries[entryIndex].value, &vectorState.ufs.as64.__fpu_##registerName, entries[entryIndex].size); \

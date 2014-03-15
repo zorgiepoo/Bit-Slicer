@@ -1576,8 +1576,9 @@ enum ZGStepExecution
 	NSData *data = [NSData data];
 	NSString *outputFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"assembler_output.XXXXXX"];
 	const char *tempFileTemplateCString = [outputFileTemplate fileSystemRepresentation];
-	char *tempFileNameCString = malloc(strlen(tempFileTemplateCString) + 1);
-	strcpy(tempFileNameCString, tempFileTemplateCString);
+	size_t templateFileTemplateLength = strlen(tempFileTemplateCString);
+	char *tempFileNameCString = malloc(templateFileTemplateLength + 1);
+	strncpy(tempFileNameCString, tempFileTemplateCString, templateFileTemplateLength + 1);
 	int fileDescriptor = mkstemp(tempFileNameCString);
 	
 	if (fileDescriptor != -1)

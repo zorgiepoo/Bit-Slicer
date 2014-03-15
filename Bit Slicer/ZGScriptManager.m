@@ -121,8 +121,6 @@ static PyObject *gStructObject;
 {
 	static dispatch_once_t onceToken = 0;
 	dispatch_once(&onceToken, ^{
-		srand((unsigned)time(NULL));
-		
 		NSFileManager *fileManager = [[NSFileManager alloc] init];
 		
 		if (![fileManager fileExistsAtPath:SCRIPT_CACHES_PATH])
@@ -392,7 +390,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		}
 		else
 		{
-			unsigned int randomInteger = rand() % INT32_MAX;
+			uint32_t randomInteger = arc4random() % UINT32_MAX;
 			
 			NSMutableString *randomFilename = [NSMutableString stringWithFormat:@"%@ %X", SCRIPT_FILENAME_PREFIX, randomInteger];
 			while ([fileManager fileExistsAtPath:[[SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename] stringByAppendingString:@".py"]])
