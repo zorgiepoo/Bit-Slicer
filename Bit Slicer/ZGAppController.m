@@ -130,7 +130,7 @@
 
 + (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
-	ZGAppController *appController = [NSApp delegate];
+	ZGAppController *appController = [[NSApplication sharedApplication] delegate];
 	
 	NSWindowController *restoredWindowController = nil;
 	

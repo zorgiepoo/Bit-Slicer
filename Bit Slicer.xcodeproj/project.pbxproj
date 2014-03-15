@@ -1495,7 +1495,6 @@
 					"-Wno-semicolon-before-method-body",
 					"-Wno-receiver-is-weak",
 					"-Wno-missing-prototypes",
-					"-Wno-strict-selector-match",
 					"-Wno-selector",
 				);
 			};
@@ -1578,7 +1577,6 @@
 					"-Wno-semicolon-before-method-body",
 					"-Wno-receiver-is-weak",
 					"-Wno-missing-prototypes",
-					"-Wno-strict-selector-match",
 					"-Wno-selector",
 				);
 			};

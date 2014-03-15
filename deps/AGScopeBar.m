@@ -399,7 +399,7 @@
 - (void)scopeButtonClicked:(id)sender
 {
 	BOOL senderIsMenuItem = [sender isKindOfClass:[NSMenuItem class]];
-	AGScopeBarItem * item = (senderIsMenuItem ? [sender representedObject] : [[sender cell] representedObject]);
+	AGScopeBarItem * item = (senderIsMenuItem ? [(NSMenuItem *)sender representedObject] : [(NSCell *)[sender cell] representedObject]);
 	AGScopeBarGroup * group = [self groupContainingItem:item];
 	
 	[group setSelected:!item.isSelected forItem:item];
@@ -547,7 +547,7 @@
 
 + (AGScopeBarGroup *)groupWithIdentifier:(NSString *)identifier;
 {
-	return [[[[self class] alloc] initWithIdentifier:identifier] autorelease];
+	return [[(AGScopeBarGroup *)[self alloc] initWithIdentifier:identifier] autorelease];
 }
 
 
@@ -1200,7 +1200,7 @@
 
 + (AGScopeBarItem *)itemWithIdentifier:(NSString *)identifier;
 {
-	return [[[[self class] alloc] initWithIdentifier:identifier] autorelease];
+	return [[(AGScopeBarItem *)[self alloc] initWithIdentifier:identifier] autorelease];
 }
 
 
@@ -1429,7 +1429,7 @@
 	}
 	
 	[button setToolTip:self.toolTip];
-	[button.cell setRepresentedObject:self];
+	[(NSCell *)button.cell setRepresentedObject:self];
 	[button setFont:SCOPE_BAR_FONT];
 	[button setTarget:self];
 	[button setAction:@selector(scopeButtonClicked:)];

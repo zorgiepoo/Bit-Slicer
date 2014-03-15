@@ -73,7 +73,7 @@ static NSString *const _DDFunctionSelectorSuffix = @":variables:error:";
             free(methods);
         }
         
-        [set sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        [set sortUsingComparator:^NSComparisonResult(NSString *obj1, NSString *obj2) {
             return [obj1 compare:obj2];
         }];
         

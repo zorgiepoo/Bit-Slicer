@@ -1251,7 +1251,7 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDa
 		if (regionIndex >= firstSearchResults.resultSets.count)
 		{
 			laterResultSetsAbsoluteIndexes[regionIndex - firstSearchResults.resultSets.count] = laterResultSetsAbsoluteIndexAccumulator;
-			laterResultSetsAbsoluteIndexAccumulator += [[laterSearchResults.resultSets objectAtIndex:regionIndex - firstSearchResults.resultSets.count] length];
+			laterResultSetsAbsoluteIndexAccumulator += [(NSData *)[laterSearchResults.resultSets objectAtIndex:regionIndex - firstSearchResults.resultSets.count] length];
 		}
 	}
 	

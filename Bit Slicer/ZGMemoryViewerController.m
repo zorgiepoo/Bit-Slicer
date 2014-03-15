@@ -532,7 +532,7 @@
 		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", desiredMemoryAddress];
 		
 		// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
-		for (id representer in self.textView.controller.representers)
+		for (HFRepresenter *representer in self.textView.controller.representers)
 		{
 			if ([representer isKindOfClass:[HFHexTextRepresenter class]])
 			{

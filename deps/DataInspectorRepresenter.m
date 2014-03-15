@@ -726,7 +726,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 - (IBAction)doubleClickedTable:(id)sender {
     USE(sender);
     NSInteger column = [table clickedColumn], row = [table clickedRow];
-    if (column >= 0 && row >= 0 && [[[[table tableColumns] objectAtIndex:(unsigned)column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
+    if (column >= 0 && row >= 0 && [[(NSTableColumn *)[[table tableColumns] objectAtIndex:(unsigned)column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
 	BOOL isError;
 	[self valueFromInspector:[inspectors objectAtIndex:(unsigned)row] isError:&isError];
 	if (! isError) {

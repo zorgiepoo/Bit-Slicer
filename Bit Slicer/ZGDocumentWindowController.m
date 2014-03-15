@@ -489,12 +489,12 @@
 
 - (NSUndoManager *)windowWillReturnUndoManager:(id)sender
 {
-	return [self.document undoManager];
+	return [(ZGDocument *)self.document undoManager];
 }
 
 - (id)undoManager
 {
-	return [self.document undoManager];
+	return [(ZGDocument *)self.document undoManager];
 }
 
 - (void)markDocumentChange

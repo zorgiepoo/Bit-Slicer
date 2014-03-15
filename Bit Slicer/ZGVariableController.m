@@ -1016,7 +1016,7 @@
 		if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];
 		if (protectionDescription != nil) [validDescriptionComponents addObject:protectionDescription];
 		
-		if ([variable.description length] == 0)
+		if ([(NSAttributedString *)variable.description length] == 0)
 		{
 			variable.description = [validDescriptionComponents componentsJoinedByString:@", "];
 		}

@@ -74,7 +74,7 @@
 
 - (IBAction)changeIgnoreDataAlignment:(id)sender
 {
-	self.document.data.ignoreDataAlignment = [sender state];
+	self.document.data.ignoreDataAlignment = ([(NSCell *)sender state] == NSOnState);
 	[self.document markChange];
 }
 

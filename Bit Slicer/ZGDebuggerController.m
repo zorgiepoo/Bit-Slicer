@@ -1358,7 +1358,7 @@ enum ZGStepExecution
 	
 	for (ZGInstruction *instruction in instructions)
 	{
-		if ([instruction.variable.description length] == 0)
+		if ([(NSAttributedString *)instruction.variable.description length] == 0)
 		{
 			instruction.variable.description = instruction.text;
 		}
