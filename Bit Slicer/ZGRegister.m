@@ -37,7 +37,11 @@
 
 @interface ZGRegister ()
 
-@property (nonatomic, assign) void *value;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+@property (nonatomic) void *value;
+#pragma clang diagnostic pop
+
 @property (nonatomic, assign) ZGMemorySize size;
 @property (nonatomic, assign) ZGMemorySize internalSize;
 @property (nonatomic, assign) ZGRegisterType registerType;

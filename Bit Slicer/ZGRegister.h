@@ -46,7 +46,12 @@ typedef enum
 @interface ZGRegister : NSObject
 
 @property (nonatomic, strong) ZGVariable *variable;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 @property (nonatomic, readonly) void *value;
+#pragma clang diagnostic pop
+
 @property (nonatomic, readonly) ZGMemorySize size;
 @property (nonatomic, readonly) ZGRegisterType registerType;
 
