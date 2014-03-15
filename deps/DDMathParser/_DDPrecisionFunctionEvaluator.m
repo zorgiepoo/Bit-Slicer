@@ -176,7 +176,7 @@
 	RETURN_IF_NIL(sumExpression);
     
     NSDecimal sum = [[sumExpression number] decimalValue];
-    NSDecimal count = DDDecimalFromInteger((signed)[arguments count]);
+    NSDecimal count = DDDecimalFromInteger([arguments count]);
     NSDecimal decimal = DDDecimalDivide(sum, count);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:decimal];
 	return [DDExpression numberExpressionWithNumber:result];
@@ -207,10 +207,9 @@
 
 - (DDExpression *)median:(NSArray *)arguments variables:(NSDictionary *)variables error:(NSError * __autoreleasing *)error {
 	REQUIRE_GTOE_N_ARGS(2);
-	DDMathEvaluator *evaluator = [self evaluator];
 	NSMutableArray *evaluatedNumbers = [NSMutableArray array];
 	for (DDExpression *e in arguments) {
-        NSNumber *n = [evaluator evaluateExpression:e withSubstitutions:variables error:error];
+        NSNumber *n = [[self evaluator] evaluateExpression:e withSubstitutions:variables error:error];
         RETURN_IF_NIL(n);
 		[evaluatedNumbers addObject:n];
 	}
@@ -218,11 +217,11 @@
 	
 	NSNumber *median = nil;
 	if (([evaluatedNumbers count] % 2) == 1) {
-		NSUInteger index = (unsigned)lround(floor([evaluatedNumbers count] / 2.0));
+		NSUInteger index = [evaluatedNumbers count] / 2;
 		median = [evaluatedNumbers objectAtIndex:index];
 	} else {
-		NSUInteger lowIndex = (unsigned)lround(floor([evaluatedNumbers count] / 2.0));
-		NSUInteger highIndex = (unsigned)lround(ceil([evaluatedNumbers count] / 2.0));
+		NSUInteger highIndex = [evaluatedNumbers count] / 2;
+		NSUInteger lowIndex = highIndex - 1;
         NSNumber *low = [evaluatedNumbers objectAtIndex:lowIndex];
         NSNumber *high = [evaluatedNumbers objectAtIndex:highIndex];
         NSDecimal decimal = DDDecimalAverage2([low decimalValue], [high decimalValue]);
@@ -247,7 +246,7 @@
         diff = DDDecimalPower(diff, DDDecimalTwo());
         stddev = DDDecimalAdd(stddev, diff);
     }
-    stddev = DDDecimalDivide(stddev, DDDecimalFromInteger((signed)[arguments count]));
+    stddev = DDDecimalDivide(stddev, DDDecimalFromInteger([arguments count]));
     stddev = DDDecimalSqrt(stddev);
     NSDecimalNumber *result = [NSDecimalNumber decimalNumberWithDecimal:stddev];
 	return [DDExpression numberExpressionWithNumber:result];

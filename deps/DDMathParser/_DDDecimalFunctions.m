@@ -150,9 +150,8 @@ NSDecimal DDDecimalLn10() {
 
 #pragma mark Creation
 
-NSDecimal DDDecimalFromInteger(NSInteger i) {
-	unsigned long long ull = (unsigned)i;
-	return [[NSDecimalNumber decimalNumberWithMantissa:ull exponent:0 isNegative:(i < 0)] decimalValue];
+NSDecimal DDDecimalFromInteger(NSUInteger i) {
+	return [[NSDecimalNumber decimalNumberWithMantissa:i exponent:0 isNegative:NO] decimalValue];
 }
 
 NSDecimal DDDecimalFromDouble(double d) {
@@ -412,7 +411,7 @@ NSDecimal DDDecimalSin(NSDecimal x) {
         e = NSDecimalPower(&numerator, &x, i, NSRoundBankers);
         if (IS_FATAL(e)) { break; }
         
-        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger((signed)i));
+        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger(i));
         
         NSDecimal term;
         e = NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);
@@ -442,7 +441,7 @@ NSDecimal DDDecimalCos(NSDecimal x) {
         e = NSDecimalPower(&numerator, &x, i, NSRoundBankers);
         if (IS_FATAL(e)) { break; }
         
-        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger((signed)i));
+        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger(i));
         
         NSDecimal term;
         e = NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);
@@ -583,7 +582,7 @@ NSDecimal DDDecimalAtan(NSDecimal x) {
                 n = 150;
             }
             
-            NSDecimal denominator = DDDecimalFromInteger((signed)n);
+            NSDecimal denominator = DDDecimalFromInteger(n);
             
             NSDecimal term;
             if (NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers) == NSCalculationUnderflow)
@@ -672,7 +671,7 @@ NSDecimal DDDecimalSinh(NSDecimal x) {
         NSDecimal numerator;
         NSDecimalPower(&numerator, &x, i, NSRoundBankers);
         
-        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger((signed)i));
+        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger(i));
         
         NSDecimal term;
         NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);
@@ -691,7 +690,7 @@ NSDecimal DDDecimalCosh(NSDecimal x) {
         NSDecimal numerator;
         NSDecimalPower(&numerator, &x, i, NSRoundBankers);
         
-        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger((signed)i));
+        NSDecimal denominator = DDDecimalFactorial(DDDecimalFromInteger(i));
         
         NSDecimal term;
         NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);
@@ -740,12 +739,12 @@ NSDecimal DDDecimalAsinh(NSDecimal x) {
     NSDecimal z = x;
     NSDecimal fraction = DDDecimalOne();
     for (NSUInteger n = 1; n < 20;) {
-        NSDecimal numerator = DDDecimalFromInteger((signed)n);
+        NSDecimal numerator = DDDecimalFromInteger(n);
         NSDecimalMultiply(&fraction, &fraction, &numerator, NSRoundBankers);
-        NSDecimal denominator = DDDecimalFromInteger((signed)(++n));
+        NSDecimal denominator = DDDecimalFromInteger(++n);
         NSDecimalDivide(&fraction, &fraction, &denominator, NSRoundBankers);
         
-        denominator = DDDecimalFromInteger((signed)(++n));
+        denominator = DDDecimalFromInteger(++n);
         NSDecimalPower(&numerator, &x, n, NSRoundBankers);
         NSDecimal zTerm;
         NSDecimalDivide(&zTerm, &numerator, &denominator, NSRoundBankers);
@@ -783,7 +782,7 @@ NSDecimal DDDecimalAtanh(NSDecimal x) {
     for (NSUInteger n = 3; n < 20; n += 2) {
         NSDecimal numerator;
         NSDecimalPower(&numerator, &x, n, NSRoundBankers);
-        NSDecimal denominator = DDDecimalFromInteger((signed)n);
+        NSDecimal denominator = DDDecimalFromInteger(n);
         
         NSDecimal term;
         NSDecimalDivide(&term, &numerator, &denominator, NSRoundBankers);

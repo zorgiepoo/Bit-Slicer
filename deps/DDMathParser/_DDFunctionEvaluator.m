@@ -357,11 +357,11 @@ static NSString *const _DDFunctionSelectorSuffix = @":variables:error:";
 	
 	NSNumber *median = nil;
 	if (([evaluatedNumbers count] % 2) == 1) {
-		NSUInteger index = (unsigned)lround(floor([evaluatedNumbers count] / 2.0));
+		NSUInteger index = [evaluatedNumbers count] / 2;
 		median = [evaluatedNumbers objectAtIndex:index];
 	} else {
-		NSUInteger lowIndex = (unsigned)lround(floor([evaluatedNumbers count] / 2.0));
-		NSUInteger highIndex = (unsigned)lround(ceil([evaluatedNumbers count] / 2.0));
+		NSUInteger highIndex = [evaluatedNumbers count] / 2;
+		NSUInteger lowIndex = highIndex - 1;
         NSNumber *low = [evaluatedNumbers objectAtIndex:lowIndex];
         NSNumber *high = [evaluatedNumbers objectAtIndex:highIndex];
         median = @(([low doubleValue] + [high doubleValue])/2);
@@ -424,10 +424,14 @@ static NSString *const _DDFunctionSelectorSuffix = @":variables:error:";
         upperBound = [[params objectAtIndex:1] intValue];
     }
     
-    int32_t random = (signed)arc4random_uniform((unsigned)upperBound);
-    while (random < lowerBound) {
-        random = (signed)arc4random_uniform((unsigned)upperBound);
-    }
+	if (lowerBound >= upperBound) {
+		if (error != nil) {
+			*error = ERR(DDErrorCodeInvalidArgument, @"upper bound (%d) of random() must be greater than lower bound (%d)", upperBound, lowerBound);
+		}
+		return nil;
+	}
+	
+	int32_t random = (signed)arc4random_uniform((unsigned)(upperBound - lowerBound)) + lowerBound;
 	
 	return [DDExpression numberExpressionWithNumber:@(random)];
 }

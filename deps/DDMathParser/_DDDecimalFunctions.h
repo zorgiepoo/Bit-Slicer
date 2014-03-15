@@ -27,7 +27,7 @@ extern NSDecimal DDDecimalLn2(void);
 extern NSDecimal DDDecimalLn10(void);
 
 #pragma mark Decimal Creation
-extern NSDecimal DDDecimalFromInteger(NSInteger i);
+extern NSDecimal DDDecimalFromInteger(NSUInteger i);
 extern NSDecimal DDDecimalFromDouble(double d);
 
 #pragma mark Extraction
