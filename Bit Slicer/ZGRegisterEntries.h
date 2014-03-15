@@ -50,6 +50,8 @@ typedef struct
 #define ZG_MAX_REGISTER_ENTRIES 128
 #define ZG_REGISTER_ENTRY_IS_NULL(entry) ((entry)->name[0] == 0)
 
+void *ZGRegisterEntryValue(ZGRegisterEntry *entry);
+
 + (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit;
 + (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport;
 

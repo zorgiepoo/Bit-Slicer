@@ -193,7 +193,7 @@ static void flip(void *val, NSUInteger amount) {
 #define FETCH(type) type s = *(const type *)bytes;
 #define FLIP(amount) if (endianness != eNativeEndianness) { flip(&s, amount); }
 #define FORMAT(specifier) return [NSString stringWithFormat:specifier, s];
-static id unsignedIntegerDescription(const unsigned char *bytes, NSUInteger length, enum Endianness_t endianness) {
+static id unsignedIntegerDescription(const void *bytes, NSUInteger length, enum Endianness_t endianness) {
     switch (length) {
         case 1:
         {
@@ -223,7 +223,7 @@ static id unsignedIntegerDescription(const unsigned char *bytes, NSUInteger leng
     }
 }
 
-static id signedIntegerDescription(const unsigned char *bytes, NSUInteger length, enum Endianness_t endianness) {
+static id signedIntegerDescription(const void *bytes, NSUInteger length, enum Endianness_t endianness) {
     switch (length) {
         case 1:
         {
@@ -257,7 +257,7 @@ static id signedIntegerDescription(const unsigned char *bytes, NSUInteger length
 #undef FORMAT
 
 
-static id floatingPointDescription(const unsigned char *bytes, NSUInteger length, enum Endianness_t endianness) {
+static id floatingPointDescription(const void *bytes, NSUInteger length, enum Endianness_t endianness) {
     switch (length) {
         case sizeof(float):
         {

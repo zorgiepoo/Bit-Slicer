@@ -220,10 +220,10 @@
 			switch (registerEntry->size)
 			{
 				case sizeof(uint32_t):
-					[registerLine appendFormat:@"0x%X (%u)", *(uint32_t *)registerEntry->value, *(uint32_t *)registerEntry->value];
+					[registerLine appendFormat:@"0x%X (%u)", *(uint32_t *)ZGRegisterEntryValue(registerEntry), *(uint32_t *)ZGRegisterEntryValue(registerEntry)];
 					break;
 				case sizeof(uint64_t):
-					[registerLine appendFormat:@"0x%llX (%llu)", *(uint64_t *)registerEntry->value, *(uint64_t *)registerEntry->value];
+					[registerLine appendFormat:@"0x%llX (%llu)", *(uint64_t *)ZGRegisterEntryValue(registerEntry), *(uint64_t *)ZGRegisterEntryValue(registerEntry)];
 					break;
 			}
 		}

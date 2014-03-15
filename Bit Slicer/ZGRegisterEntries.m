@@ -37,6 +37,11 @@
 
 @implementation ZGRegisterEntries
 
+void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
+{
+	return entry->value;
+}
+
 #define ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName) \
 { \
 	strcpy((char *)&entries[entryIndex].name, #registerName); \
