@@ -529,8 +529,9 @@
 
 #pragma mark Table View Delegate Methods
 
-- (BOOL)tableView:(ZGTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (BOOL)tableView:(NSTableView *)aTableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
+	ZGTableView *tableView = (ZGTableView *)aTableView;
 	if (rowIndex < 0 || (NSUInteger)rowIndex >= self.documentData.variables.count)
 	{
 		return NO;

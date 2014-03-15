@@ -141,8 +141,9 @@ static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) 
     return inspectorType + (endianness << 8UL);
 }
 
-- (BOOL)isEqual:(DataInspector *)him {
-    if (! [him isKindOfClass:[DataInspector class]]) return NO;
+- (BOOL)isEqual:(id)himObject {
+    if (! [himObject isKindOfClass:[DataInspector class]]) return NO;
+	DataInspector *him = himObject;
     return inspectorType == him->inspectorType && endianness == him->endianness;
 }
 
