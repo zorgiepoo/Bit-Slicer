@@ -157,11 +157,14 @@ typedef struct
 	free(self.segments);
 }
 
-- (NSRange)textSegmentRange
+- (NSRange)totalSegmentRange
 {
 	if (self.numberOfSegments == 0) return NSMakeRange(0, 0);
 	
-	return self.segments[0].range;
+	ZGMachBinarySegment firstSegment = self.segments[0];
+	ZGMachBinarySegment lastSegment = self.segments[self.numberOfSegments - 1];
+	
+	return NSMakeRange(firstSegment.range.location, lastSegment.range.location - firstSegment.range.location + lastSegment.range.length);
 }
 
 - (NSString *)segmentNameAtAddress:(ZGMemoryAddress)address

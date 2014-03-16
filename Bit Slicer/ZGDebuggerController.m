@@ -942,7 +942,7 @@ enum ZGStepExecution
 	BOOL shouldUseFirstInstruction = NO;
 	
 	ZGMachBinaryInfo *firstMachBinaryInfo = [self.currentProcess.mainMachBinary machBinaryInfoInProcess:self.currentProcess];
-	NSRange machInstructionRange = NSMakeRange(firstMachBinaryInfo.firstInstructionAddress, firstMachBinaryInfo.textSegmentRange.length - (firstMachBinaryInfo.firstInstructionAddress - firstMachBinaryInfo.textSegmentRange.location));
+	NSRange machInstructionRange = NSMakeRange(firstMachBinaryInfo.firstInstructionAddress, firstMachBinaryInfo.totalSegmentRange.length - (firstMachBinaryInfo.firstInstructionAddress - firstMachBinaryInfo.totalSegmentRange.location));
 	
 	if (calculatedMemoryAddress == 0)
 	{
@@ -1002,7 +1002,7 @@ enum ZGStepExecution
 		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 		ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:calculatedMemoryAddress fromMachBinaries:machBinaries];
 		ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
-		NSRange instructionRange = NSMakeRange(machBinaryInfo.firstInstructionAddress, machBinaryInfo.textSegmentRange.length - (machBinaryInfo.firstInstructionAddress - machBinaryInfo.textSegmentRange.location));
+		NSRange instructionRange = NSMakeRange(machBinaryInfo.firstInstructionAddress, machBinaryInfo.totalSegmentRange.length - (machBinaryInfo.firstInstructionAddress - machBinaryInfo.totalSegmentRange.location));
 		
 		baseAddress = machBinary.headerAddress;
 		mappedFilePath = [machBinary filePathInProcess:self.currentProcess];

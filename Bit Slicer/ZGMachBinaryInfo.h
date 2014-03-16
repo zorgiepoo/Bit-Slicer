@@ -44,7 +44,7 @@
 
 @property (nonatomic, readonly) ZGMemorySize slide;
 @property (nonatomic, readonly) ZGMemoryAddress firstInstructionAddress;
-@property (nonatomic, readonly) NSRange textSegmentRange;
+@property (nonatomic, readonly) NSRange totalSegmentRange;
 
 - (NSString *)segmentNameAtAddress:(ZGMemoryAddress)address;
 
