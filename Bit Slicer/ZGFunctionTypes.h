@@ -67,3 +67,5 @@ BOOL ZGIsFunctionTypeGreaterThan(ZGFunctionType functionType);
 BOOL ZGIsFunctionTypeLessThan(ZGFunctionType functionType);
 
 BOOL ZGSupportsSwappingBeforeSearch(ZGFunctionType functionType, ZGVariableType dataType);
+
+BOOL ZGSupportsEndianness(ZGVariableType dataType);

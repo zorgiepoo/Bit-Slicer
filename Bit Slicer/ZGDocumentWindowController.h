@@ -64,13 +64,7 @@
 @property (nonatomic, assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
 @property (nonatomic, assign) IBOutlet NSButton *storeValuesButton;
 @property (nonatomic, assign) IBOutlet APTokenSearchField *searchValueTextField;
-@property (nonatomic, assign) IBOutlet NSTextField *flagsTextField;
 @property (nonatomic, assign) IBOutlet NSPopUpButton *functionPopUpButton;
-
-@property (nonatomic, assign) IBOutlet NSTextField *flagsLabel;
-
-@property (nonatomic, assign) IBOutlet AGScopeBar *scopeBar;
-@property (nonatomic, assign) IBOutlet NSView *scopeBarFlagsView;
 
 @property (nonatomic) ZGDocumentTableController *tableController;
 @property (nonatomic) ZGVariableController *variableController;
@@ -83,6 +77,9 @@
 
 @property (assign, nonatomic) ZGDocumentData *documentData;
 @property (assign, nonatomic) ZGSearchData *searchData;
+
+@property (nonatomic, readonly) NSString *flagsStringValue;
+@property (nonatomic, readonly) BOOL showsFlags;
 
 - (id)initWithDocument:(ZGDocument *)document;
 

@@ -194,3 +194,27 @@ BOOL ZGSupportsSwappingBeforeSearch(ZGFunctionType functionType, ZGVariableType 
 {
 	return (functionType == ZGEquals || functionType == ZGNotEquals) && (dataType == ZGInt16 || dataType == ZGInt32 || dataType == ZGInt64 || dataType == ZGPointer || dataType == ZGString16);
 }
+
+BOOL ZGSupportsEndianness(ZGVariableType dataType)
+{
+	BOOL supportsEndianness;
+	switch (dataType)
+	{
+		case ZGInt8:
+		case ZGString8:
+		case ZGByteArray:
+			supportsEndianness = NO;
+			break;
+		case ZGInt16:
+		case ZGInt32:
+		case ZGInt64:
+		case ZGFloat:
+		case ZGDouble:
+		case ZGString16:
+		case ZGPointer:
+		case ZGScript:
+			supportsEndianness = YES;
+			break;
+	}
+	return supportsEndianness;
+}

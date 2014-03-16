@@ -94,25 +94,6 @@
 	self.windowController = nil;
 }
 
-#pragma mark Confirm search input
-
-- (NSString *)testSearchComponent:(NSString *)searchComponent
-{
-	return ZGIsValidNumber(searchComponent) ? nil : @"The operator you are using requires the search value to be a valid expression.";
-}
-
-- (NSString *)confirmSearchInput:(NSString *)expression
-{
-	ZGVariableType dataType = self.dataType;
-	
-	if (ZGIsNumericalDataType(dataType) && !ZGIsFunctionTypeStore(self.functionType))
-	{
-		return [self testSearchComponent:expression];
-	}
-	
-	return nil;
-}
-
 #pragma mark Report information
 
 - (BOOL)isVariableNarrowable:(ZGVariable *)variable withDataType:(ZGVariableType)dataType
@@ -375,7 +356,108 @@
 	}
 }
 
-- (BOOL)retrieveSearchData
+#define ZGRetrieveFlagsErrorDomain @"ZGRetrieveFlagsErrorDomain"
+#define ZGRetrieveFlagsErrorDescriptionKey @"ZGRetrieveFlagsErrorDescriptionKey"
+
+- (BOOL)retrieveFlagsSearchDataWithDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType error:(NSError * __autoreleasing *)error
+{
+	ZGDocumentWindowController *windowController = self.windowController;
+	
+	if (!windowController.showsFlags) return YES;
+	
+	ZGProcess *currentProcess = windowController.currentProcess;
+	NSString *flagsStringValue = windowController.flagsStringValue;
+	
+	BOOL flagsFieldIsBlank = [[flagsStringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] length] == 0;
+	NSString *flagsExpression = !ZGIsNumericalDataType(dataType) ? flagsStringValue : [ZGCalculator evaluateExpression:flagsStringValue];
+	
+	if (!flagsFieldIsBlank && !ZGIsValidNumber(flagsExpression))
+	{
+		NSString *field = (ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType)) ? @"Round Error" : (ZGIsFunctionTypeGreaterThan(functionType) ? @"Below" : @"Above");
+		
+		if (error != NULL)
+		{
+			*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:@"The value corresponding to %@ needs to be a valid expression or be empty.", field]}];
+		}
+		
+		return NO;
+	}
+	else
+	{
+		if (ZGIsFunctionTypeGreaterThan(functionType) ||  ZGIsFunctionTypeLessThan(functionType))
+		{
+			if (!flagsFieldIsBlank)
+			{
+				// Clearly a range type of search
+				ZGMemorySize rangeDataSize;
+				self.searchData.rangeValue = ZGValueFromString(currentProcess.is64Bit, flagsExpression, dataType, &rangeDataSize);
+			}
+			else
+			{
+				self.searchData.rangeValue = NULL;
+			}
+			
+			if (ZGIsFunctionTypeGreaterThan(functionType))
+			{
+				self.documentData.lastBelowRangeValue = flagsStringValue;
+			}
+			else if (ZGIsFunctionTypeLessThan(functionType))
+			{
+				self.documentData.lastAboveRangeValue = flagsStringValue;
+			}
+		}
+		else
+		{
+			if (!flagsFieldIsBlank)
+			{
+				// Clearly an epsilon flag
+				ZGMemorySize epsilonDataSize;
+				void *epsilon = ZGValueFromString(currentProcess.is64Bit, flagsExpression, ZGDouble, &epsilonDataSize);
+				if (epsilon)
+				{
+					self.searchData.epsilon = *((double *)epsilon);
+					free(epsilon);
+				}
+			}
+			else
+			{
+				self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
+			}
+			
+			self.documentData.lastEpsilonValue = flagsStringValue;
+		}
+	}
+	
+	return YES;
+}
+
+- (BOOL)getBoundaryAddress:(ZGMemoryAddress *)boundaryAddress fromStringValue:(NSString *)stringValue label:(NSString *)label error:(NSError * __autoreleasing *)error
+{
+	assert(boundaryAddress != NULL);
+	
+	BOOL success = YES;
+	
+	if ([stringValue length] != 0)
+	{
+		if (!ZGIsValidNumber(stringValue))
+		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:@"The expression in the %@ address field is not valid.", label]}];
+			}
+			
+			success = NO;
+		}
+		else
+		{
+			*boundaryAddress = ZGMemoryAddressFromExpression([ZGCalculator evaluateExpression:stringValue]);
+		}
+	}
+	
+	return success;
+}
+
+- (BOOL)retrieveSearchDataWithError:(NSError * __autoreleasing *)error
 {
 	ZGDocumentWindowController *windowController = self.windowController;
 	ZGVariableType dataType = self.dataType;
@@ -385,8 +467,6 @@
 	// Set default search arguments
 	self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
 	self.searchData.rangeValue = NULL;
-
-	NSString *inputErrorMessage = nil;
 	
 	ZGFunctionType functionType = self.functionType;
 	
@@ -399,11 +479,12 @@
 		NSString *searchValueInput = [self.searchComponents objectAtIndex:0];
 		NSString *finalSearchExpression = ZGIsNumericalDataType(dataType) ? [ZGCalculator evaluateExpression:searchValueInput] : searchValueInput;
 		
-		inputErrorMessage = [self confirmSearchInput:finalSearchExpression];
-		
-		if (inputErrorMessage != nil)
+		if (ZGIsNumericalDataType(dataType) && !ZGIsFunctionTypeStore(self.functionType) && !ZGIsValidNumber(finalSearchExpression))
 		{
-			NSRunAlertPanel(@"Invalid Search Input", @"%@", nil, nil, nil, inputErrorMessage);
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @"The operator you are using requires the search value to be a valid expression."}];
+			}
 			return NO;
 		}
 		
@@ -433,7 +514,10 @@
 	{
 		if (dataType == ZGString8 || dataType == ZGString16 || dataType == ZGByteArray)
 		{
-			NSRunAlertPanel(@"Invalid Search Input", @"Comparing Stored Values is not supported for %@.", nil, nil, nil, dataType == ZGByteArray ? @"Byte Arrays" : @"Strings");
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:@"Comparing Stored Values is not supported for %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"]}];
+			}
 			return NO;
 		}
 		
@@ -460,8 +544,10 @@
 			
 			if (![ZGCalculator parseLinearExpression:linearExpression andGetAdditiveConstant:&additiveConstantString multiplicateConstant:&multiplicativeConstantString])
 			{
-				NSLog(@"Error: Failed to parse linear expression %@", linearExpression);
-				NSRunAlertPanel(@"Invalid Search Input", @"The search expression could not be properly parsed. Try a simpler expression.", nil, nil, nil);
+				if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @"The search expression could not be properly parsed. Try a simpler expression."}];
+				}
 				return NO;
 			}
 			
@@ -470,8 +556,10 @@
 			
 			if (self.searchData.additiveConstant == NULL)
 			{
-				NSLog(@"Error: transformed additive is NULL");
-				NSRunAlertPanel(@"Invalid Search Input", @"The additive part of the search expression could not be properly parsed. Try a simpler expression", nil, nil, nil);
+				if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @"The search expression could not be properly parsed. Try a simpler expression."}];
+				}
 				return NO;
 			}
 		}
@@ -496,111 +584,43 @@
 		? sizeof(int8_t)
 		: ZGDataAlignment(windowController.currentProcess.is64Bit, dataType, self.searchData.dataSize);
 	
-	BOOL flagsFieldIsBlank = [[windowController.flagsTextField.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] isEqualToString:@""];
-	
-	if (windowController.flagsTextField.isEnabled)
+	if (![self retrieveFlagsSearchDataWithDataType:dataType functionType:functionType error:error])
 	{
-		NSString *flagsExpression =
-			!ZGIsNumericalDataType(dataType)
-			? windowController.flagsTextField.stringValue
-			: [ZGCalculator evaluateExpression:windowController.flagsTextField.stringValue];
-		
-		inputErrorMessage = [self testSearchComponent:flagsExpression];
-		
-		if (inputErrorMessage && !flagsFieldIsBlank)
-		{
-			NSString *field =
-				(ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType))
-				? @"Round Error"
-				: (ZGIsFunctionTypeGreaterThan(functionType) ? @"Below" : @"Above");
-			NSRunAlertPanel(@"Invalid Search Input", @"The value corresponding to %@ needs to be a valid expression or be left blank.", nil, nil, nil, field);
-			return NO;
-		}
-		else /* if (!inputErrorMessage || flagsFieldIsBlank) */
-		{
-			if (ZGIsFunctionTypeGreaterThan(functionType) ||  ZGIsFunctionTypeLessThan(functionType))
-			{
-				if (!flagsFieldIsBlank)
-				{
-					// Clearly a range type of search
-					ZGMemorySize rangeDataSize;
-					self.searchData.rangeValue = ZGValueFromString(windowController.currentProcess.is64Bit, flagsExpression, dataType, &rangeDataSize);
-				}
-				else
-				{
-					self.searchData.rangeValue = NULL;
-				}
-				
-				if (ZGIsFunctionTypeGreaterThan(functionType))
-				{
-					self.documentData.lastBelowRangeValue = windowController.flagsTextField.stringValue;
-				}
-				else if (ZGIsFunctionTypeLessThan(functionType))
-				{
-					self.documentData.lastAboveRangeValue = windowController.flagsTextField.stringValue;
-				}
-			}
-			else
-			{
-				if (!flagsFieldIsBlank)
-				{
-					// Clearly an epsilon flag
-					ZGMemorySize epsilonDataSize;
-					void *epsilon = ZGValueFromString(windowController.currentProcess.is64Bit, flagsExpression, ZGDouble, &epsilonDataSize);
-					if (epsilon)
-					{
-						self.searchData.epsilon = *((double *)epsilon);
-						free(epsilon);
-					}
-				}
-				else
-				{
-					self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
-				}
-				
-				self.documentData.lastEpsilonValue = windowController.flagsTextField.stringValue;
-			}
-		}
+		return NO;
 	}
 	
-	// Deal with beginning and ending addresses, if there are any
+	ZGMemoryAddress beginningAddress = 0x0;
 	
-	NSString *calculatedBeginAddress = [ZGCalculator evaluateExpression:self.documentData.beginningAddressStringValue];
-	NSString *calculatedEndAddress = [ZGCalculator evaluateExpression:self.documentData.endingAddressStringValue];
+	BOOL retrievedBoundaryAddress =
+	[self
+	 getBoundaryAddress:&beginningAddress
+	 fromStringValue:self.documentData.beginningAddressStringValue
+	 label:@"beginning"
+	 error:error];
 	
-	if (![self.documentData.beginningAddressStringValue isEqualToString:@""])
-	{
-		if ([self testSearchComponent:calculatedBeginAddress])
-		{
-			NSRunAlertPanel(@"Invalid Search Input", @"The expression in the beginning address field is not valid.", nil, nil, nil, nil);
-			return NO;
-		}
-		
-		self.searchData.beginAddress = ZGMemoryAddressFromExpression(calculatedBeginAddress);
-	}
-	else
-	{
-		self.searchData.beginAddress = 0x0;
-	}
+	if (!retrievedBoundaryAddress) return NO;
 	
-	if (![self.documentData.endingAddressStringValue isEqualToString:@""])
-	{
-		if ([self testSearchComponent:calculatedEndAddress])
-		{
-			NSRunAlertPanel(@"Invalid Search Input", @"The expression in the ending address field is not valid.", nil, nil, nil, nil);
-			return NO;
-		}
-		
-		self.searchData.endAddress = ZGMemoryAddressFromExpression(calculatedEndAddress);
-	}
-	else
-	{
-		self.searchData.endAddress = MAX_MEMORY_ADDRESS;
-	}
+	self.searchData.beginAddress = beginningAddress;
+	
+	ZGMemoryAddress endingAddress = MAX_MEMORY_ADDRESS;
+	
+	retrievedBoundaryAddress =
+	[self
+	 getBoundaryAddress:&endingAddress
+	 fromStringValue:self.documentData.endingAddressStringValue
+	 label:@"ending"
+	 error:error];
+	
+	if (!retrievedBoundaryAddress) return NO;
+	
+	self.searchData.endAddress = endingAddress;
 	
 	if (self.searchData.beginAddress >= self.searchData.endAddress)
 	{
-		NSRunAlertPanel(@"Invalid Search Input", @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted.", nil, nil, nil, nil);
+		if (error != NULL)
+		{
+			*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted."}];
+		}
 		return NO;
 	}
 	
@@ -655,54 +675,58 @@
 	self.searchComponents = searchComponents;
 	self.allowsNarrowing = allowsNarrowing;
 	
-	if ([self retrieveSearchData])
+	NSError *error = nil;
+	if (![self retrieveSearchDataWithError:&error])
 	{
-		NSMutableArray *notSearchedVariables = [[NSMutableArray alloc] init];
-		NSMutableArray *searchedVariables = [[NSMutableArray alloc] init];
-		
-		BOOL isNarrowingSearch = allowsNarrowing && [self isInNarrowSearchMode];
-		
-		// Add all variables whose value should not be searched for, first
-		for (ZGVariable *variable in self.documentData.variables)
-		{
-			if (!isNarrowingSearch || ![self isVariableNarrowable:variable withDataType:dataType])
-			{
-				[notSearchedVariables addObject:variable];
-			}
-			else
-			{
-				[searchedVariables addObject:variable];
-			}
-		}
-		
-		[self prepareTask];
-		
-		id searchDataActivity = nil;
-		if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
-		{
-			searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
-		}
-		
-		NSArray *oldVariables = self.documentData.variables;
-		
-		self.documentData.variables = notSearchedVariables;
-		[self.windowController.tableController.variablesTableView reloadData];
-		
-		[self searchVariables:searchedVariables byNarrowing:isNarrowingSearch usingCompletionBlock:^ {
-			if (self.windowController != nil)
-			{
-				self.searchData.searchValue = NULL;
-				self.searchData.swappedValue = NULL;
-				
-				if (searchDataActivity != nil)
-				{
-					[[NSProcessInfo processInfo] endActivity:searchDataActivity];
-				}
-				
-				[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
-			}
-		}];
+		NSRunAlertPanel(@"Invalid Search Input", @"%@", nil, nil, nil, [error.userInfo objectForKey:ZGRetrieveFlagsErrorDescriptionKey]);
+		return;
 	}
+	
+	NSMutableArray *notSearchedVariables = [[NSMutableArray alloc] init];
+	NSMutableArray *searchedVariables = [[NSMutableArray alloc] init];
+	
+	BOOL isNarrowingSearch = allowsNarrowing && [self isInNarrowSearchMode];
+	
+	// Add all variables whose value should not be searched for, first
+	for (ZGVariable *variable in self.documentData.variables)
+	{
+		if (!isNarrowingSearch || ![self isVariableNarrowable:variable withDataType:dataType])
+		{
+			[notSearchedVariables addObject:variable];
+		}
+		else
+		{
+			[searchedVariables addObject:variable];
+		}
+	}
+	
+	[self prepareTask];
+	
+	id searchDataActivity = nil;
+	if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+	{
+		searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
+	}
+	
+	NSArray *oldVariables = self.documentData.variables;
+	
+	self.documentData.variables = notSearchedVariables;
+	[self.windowController.tableController.variablesTableView reloadData];
+	
+	[self searchVariables:searchedVariables byNarrowing:isNarrowingSearch usingCompletionBlock:^ {
+		if (self.windowController != nil)
+		{
+			self.searchData.searchValue = NULL;
+			self.searchData.swappedValue = NULL;
+			
+			if (searchDataActivity != nil)
+			{
+				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
+			}
+			
+			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];
+		}
+	}];
 }
 
 - (void)cancelTask

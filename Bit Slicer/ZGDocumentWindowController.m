@@ -86,6 +86,9 @@
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;
 
+@property (nonatomic) NSString *flagsStringValue;
+@property (nonatomic) NSString *flagsLabelStringValue;
+
 @property (nonatomic) ZGProcessList *processList;
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic) ZGDebuggerController *debuggerController;
@@ -100,12 +103,17 @@
 @property (nonatomic) ZGEditDescriptionWindowController *editDescriptionWindowController;
 @property (nonatomic) ZGEditSizeWindowController *editSizeWindowController;
 
+@property (nonatomic, assign) IBOutlet AGScopeBar *scopeBar;
+@property (nonatomic, assign) IBOutlet NSView *scopeBarFlagsView;
+
 @property (nonatomic) AGScopeBarGroup *protectionGroup;
 @property (nonatomic) AGScopeBarGroup *qualifierGroup;
 @property (nonatomic) AGScopeBarGroup *stringMatchingGroup;
 @property (nonatomic) AGScopeBarGroup *endianGroup;
 
 @property (nonatomic, assign) IBOutlet NSTextField *generalStatusTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *flagsTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *flagsLabel;
 
 @property (nonatomic) NSPopover *advancedOptionsPopover;
 
@@ -886,34 +894,50 @@
 	}
 }
 
+- (void)setFlagsLabelStringValue:(NSString *)flagsLabelStringValue
+{
+	_flagsLabelStringValue = [flagsLabelStringValue copy];
+	[self.flagsLabel setStringValue:_flagsLabelStringValue];
+}
+
+- (void)setFlagsStringValue:(NSString *)flagsStringValue
+{
+	_flagsStringValue = [flagsStringValue copy];
+	[self.flagsTextField setStringValue:_flagsStringValue];
+}
+
+- (IBAction)changeFlags:(id)sender
+{
+	[self setFlagsStringValue:[sender stringValue]];
+}
+
 - (void)updateFlagsRangeTextField
 {
 	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
-	
 	if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored || functionType == ZGGreaterThanStoredLinear)
 	{
-		self.flagsLabel.stringValue = @"Below:";
+		self.flagsLabelStringValue = @"Below:";
 		
-		if (self.documentData.lastBelowRangeValue)
+		if (self.documentData.lastBelowRangeValue != nil)
 		{
-			self.flagsTextField.stringValue = self.documentData.lastBelowRangeValue;
+			self.flagsStringValue = self.documentData.lastBelowRangeValue;
 		}
 		else
 		{
-			self.flagsTextField.stringValue = @"";
+			self.flagsStringValue = @"";
 		}
 	}
 	else if (functionType == ZGLessThan || functionType == ZGLessThanStored || functionType == ZGLessThanStoredLinear)
 	{
-		self.flagsLabel.stringValue = @"Above:";
+		self.flagsLabelStringValue = @"Above:";
 		
-		if (self.documentData.lastAboveRangeValue)
+		if (self.documentData.lastAboveRangeValue != nil)
 		{
-			self.flagsTextField.stringValue = self.documentData.lastAboveRangeValue;
+			self.flagsStringValue = self.documentData.lastAboveRangeValue;
 		}
 		else
 		{
-			self.flagsTextField.stringValue = @"";
+			self.flagsStringValue = @"";
 		}
 	}
 }
@@ -943,17 +967,17 @@
 	
 	if (dataType == ZGFloat || dataType == ZGDouble)
 	{
-		if (functionType == ZGEquals || functionType == ZGNotEquals || functionType == ZGEqualsStored || functionType == ZGNotEqualsStored || functionType == ZGEqualsStoredLinear || functionType == ZGNotEqualsStoredLinear)
+		if (ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType))
 		{
 			// epsilon
-			self.flagsLabel.stringValue = @"Round Error:";
-			if (self.documentData.lastEpsilonValue)
+			self.flagsLabelStringValue = @"Round Error:";
+			if (self.documentData.lastEpsilonValue != nil)
 			{
-				self.flagsTextField.stringValue = self.documentData.lastEpsilonValue;
+				self.flagsStringValue = self.documentData.lastEpsilonValue;
 			}
 			else
 			{
-				self.flagsTextField.stringValue = @"";
+				self.flagsStringValue = @"";
 			}
 		}
 		else
@@ -970,7 +994,7 @@
 	}
 	else if (dataType != ZGByteArray)
 	{
-		if (functionType != ZGEquals && functionType != ZGNotEquals && functionType != ZGEqualsStored && functionType != ZGNotEqualsStored && functionType != ZGEqualsStoredLinear && functionType != ZGNotEqualsStoredLinear)
+		if (!ZGIsFunctionTypeEquals(functionType) && !ZGIsFunctionTypeNotEquals(functionType))
 		{
 			// range
 			[self updateFlagsRangeTextField];
@@ -1006,13 +1030,14 @@
 		self.documentData.functionTypeTag = self.functionPopUpButton.selectedTag;
 	}
 	
-	BOOL needsEndianness = dataType != ZGInt8 && dataType != ZGString8 && dataType != ZGByteArray;
+	BOOL needsEndianness = ZGSupportsEndianness(dataType);
 	
 	[self changeScopeBarGroup:self.qualifierGroup shouldExist:needsQualifier];
 	[self changeScopeBarGroup:self.stringMatchingGroup shouldExist:needsStringMatching];
 	[self changeScopeBarGroup:self.endianGroup shouldExist:needsEndianness];
 	
-	self.scopeBar.accessoryView = needsFlags ? self.scopeBarFlagsView : nil;
+	_showsFlags = needsFlags;
+	self.scopeBar.accessoryView = _showsFlags ? self.scopeBarFlagsView : nil;
 }
 
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo
