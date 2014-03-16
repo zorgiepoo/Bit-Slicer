@@ -89,4 +89,16 @@
 	[self.window close];
 }
 
+// Make this controller the only one that can use the font and color panels, since nobody else needs it
+
+- (IBAction)zgOrderFrontFontPanel:(id)sender
+{
+	[[NSFontManager sharedFontManager] orderFrontFontPanel:sender];
+}
+
+- (IBAction)zgOrderFrontColorPanel:(id)sender
+{
+	[[NSColorPanel sharedColorPanel] orderFront:nil];
+}
+
 @end

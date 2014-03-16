@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5053"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -206,7 +206,7 @@ CA
                                     <items>
                                         <menuItem title="Show Fonts" keyEquivalent="t" id="196-mO-a1w">
                                             <connections>
-                                                <action selector="orderFrontFontPanel:" target="419" id="cLi-JU-PUe"/>
+                                                <action selector="zgOrderFrontFontPanel:" target="-1" id="Ywx-RH-mqf"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Bold" tag="2" keyEquivalent="b" id="TSu-oj-2rv">
@@ -332,7 +332,7 @@ CA
                                         <menuItem isSeparatorItem="YES" id="baK-w5-8M5"/>
                                         <menuItem title="Show Colors" keyEquivalent="C" id="0uh-KE-NmN">
                                             <connections>
-                                                <action selector="orderFrontColorPanel:" target="-1" id="pzF-FY-QXt"/>
+                                                <action selector="zgOrderFrontColorPanel:" target="-1" id="2dw-dK-I9n"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="yN4-qV-Tix"/>
