@@ -225,7 +225,7 @@
 	self.pollTimer = nil;
 }
 
-- (void)poll:(NSTimer *)timer
+- (void)poll:(NSTimer *)__unused timer
 {
 	if (self.pollRequestCount > 0)
 	{

@@ -310,7 +310,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &size)) \
 		{ \
 			retValue =  Py_BuildValue(typeFormat, *(type *)bytes); \
-			ZGFreeBytes(self->processTask, bytes, size); \
+			ZGFreeBytes(bytes, size); \
 		} \
 		else \
 		{ \
@@ -343,7 +343,7 @@ static PyObject *VirtualMemory_readPointer(VirtualMemory *self, PyObject *args)
 		{
 			ZGMemoryAddress pointer = self->is64Bit ? *(ZGMemoryAddress *)bytes : *(ZG32BitMemoryAddress *)bytes;
 			retValue = Py_BuildValue("K", pointer);
-			ZGFreeBytes(self->processTask, bytes, size);
+			ZGFreeBytes(bytes, size);
 		}
 		else
 		{
@@ -364,7 +364,7 @@ static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &numberOfBytes))
 		{
 			retValue = Py_BuildValue("y#", bytes, numberOfBytes);
-			ZGFreeBytes(self->processTask, bytes, numberOfBytes);
+			ZGFreeBytes(bytes, numberOfBytes);
 		}
 		else
 		{
@@ -396,7 +396,7 @@ static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, Z
 				{
 					PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.%s failed to convert string to encoding %s (read %llu byte(s) from 0x%llX)", functionName, encoding, numberOfBytes, memoryAddress] UTF8String]);
 				}
-				ZGFreeBytes(self->processTask, bytes, numberOfBytes);
+				ZGFreeBytes(bytes, numberOfBytes);
 			}
 			else
 			{
@@ -554,7 +554,7 @@ static PyObject *VirtualMemory_writeString16(VirtualMemory *self, PyObject *args
 	return writeString(self, args, &nullByte, sizeof(nullByte), "writeString16");
 }
 
-static PyObject *VirtualMemory_pause(VirtualMemory *self, PyObject *args)
+static PyObject *VirtualMemory_pause(VirtualMemory *self, PyObject * __unused args)
 {
 	if (!ZGSuspendTask(self->processTask))
 	{
@@ -568,7 +568,7 @@ static PyObject *VirtualMemory_pause(VirtualMemory *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject *args)
+static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject * __unused args)
 {
 	if (!ZGResumeTask(self->processTask))
 	{
@@ -587,7 +587,7 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject *args)
 	self.searchProgress = searchProgress;
 }
 
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
+- (void)progress:(ZGSearchProgress *)__unused searchProgress advancedWithResultSet:(NSData *)__unused resultSet
 {
 }
 
@@ -602,8 +602,9 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, c
 		
 		ZGMemorySize numberOfEntries = MIN(MAX_VALUES_SCANNED, results.addressCount);
 		PyObject *pythonResults = PyList_New((Py_ssize_t)numberOfEntries);
+		
 		__block Py_ssize_t addressIndex = 0;
-		[results enumerateWithCount:numberOfEntries usingBlock:^(ZGMemoryAddress address, BOOL *stop) {
+		[results enumerateWithCount:numberOfEntries usingBlock:^(ZGMemoryAddress address, BOOL * __unused stop) {
 			PyList_SET_ITEM(pythonResults, addressIndex, Py_BuildValue("K", address));
 			addressIndex++;
 		}];

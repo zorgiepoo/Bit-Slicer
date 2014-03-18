@@ -83,7 +83,7 @@
 	 contextInfo:NULL];
 }
 
-- (IBAction)editVariablesSizes:(id)sender
+- (IBAction)editVariablesSizes:(id)__unused sender
 {
 	NSString *sizeExpression = [ZGCalculator evaluateExpression:self.sizeTextField.stringValue];
 	
@@ -126,7 +126,7 @@
 	}
 }
 
-- (IBAction)cancelEditingVariablesSizes:(id)sender
+- (IBAction)cancelEditingVariablesSizes:(id)__unused sender
 {
 	[NSApp endSheet:self.window];
 	[self.window close];

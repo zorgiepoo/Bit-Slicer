@@ -69,7 +69,7 @@ PyObject *loadMainPythonModule(void)
 }
 
 // The API provided in 3.3 for reloading modules is deprecated, so rather than waiting for 3.4, we should provide our own
-static PyObject *BitSlicer_reload(PyObject *self, PyObject *args)
+static PyObject *BitSlicer_reload(PyObject * __unused self, PyObject *args)
 {
 	PyObject *moduleName = NULL;
 	if (!PyArg_ParseTuple(args, "O:reload", &moduleName))

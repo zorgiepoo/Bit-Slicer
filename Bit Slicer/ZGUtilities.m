@@ -403,7 +403,7 @@ unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue)
 	if (data)
 	{
 		__block BOOL didUseWildcard = NO;
-		[bytesArray enumerateObjectsUsingBlock:^(NSString *byteString, NSUInteger byteIndex, BOOL *stop)
+		[bytesArray enumerateObjectsUsingBlock:^(NSString *byteString, NSUInteger byteIndex, BOOL *__unused stop)
 		 {
 			 if (byteString.length == 2)
 			 {

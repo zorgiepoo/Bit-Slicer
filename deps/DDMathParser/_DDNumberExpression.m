@@ -31,6 +31,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
+#pragma unused(zone)
     return [[[self class] alloc] initWithNumber:[self number]];
 }
 

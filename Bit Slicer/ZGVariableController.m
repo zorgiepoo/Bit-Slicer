@@ -665,7 +665,7 @@
 				
 				oldStringValue = oldVariable.stringValue;
 				
-				ZGFreeBytes(self.windowController.currentProcess.processTask, oldData, oldSize);
+				ZGFreeBytes(oldData, oldSize);
 			}
 			
 			// this is the maximum size allocated needed
@@ -852,7 +852,7 @@
 {
 	NSMutableArray *oldValues = [[NSMutableArray alloc] init];
 	
-	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop) {
+	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL * __unused stop) {
 		[oldValues addObject:variable.stringValue];
 		 
 		 [self
@@ -1038,7 +1038,7 @@
 	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
 	
 	// Make sure the size changes are possible. Only change the ones that seem possible.
-	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL * __unused stop)
 	 {
 		 ZGMemorySize size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
 		 void *buffer = NULL;
@@ -1051,7 +1051,7 @@
 				 [currentVariableSizes addObject:@(variable.size)];
 			 }
 			 
-			 ZGFreeBytes(self.windowController.currentProcess.processTask, buffer, size);
+			 ZGFreeBytes(buffer, size);
 		 }
 	 }];
 	
@@ -1062,7 +1062,7 @@
 		 editVariables:validVariables
 		 requestedSizes:currentVariableSizes];
 		
-		[validVariables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL *stop)
+		[validVariables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL * __unused stop)
 		 {
 			 variable.size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
 		 }];

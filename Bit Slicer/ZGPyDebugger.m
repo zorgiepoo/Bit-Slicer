@@ -312,7 +312,7 @@ static PyObject *Debugger_log(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject *Debugger_notify(DebuggerClass *self, PyObject *args)
+static PyObject *Debugger_notify(DebuggerClass * __unused self, PyObject *args)
 {
 	Py_buffer title, informativeText;
 	if (!PyArg_ParseTuple(args, "s*s*:notify", &title, &informativeText))
@@ -448,7 +448,7 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		success = [ZGDebuggerController writeData:[NSData dataWithBytes:buffer.buf length:(NSUInteger)buffer.len] atAddress:memoryAddress processTask:self->processTask is64Bit:self->is64Bit breakPoints:self->objcSelf.breakPointController.breakPoints];
+		success = [ZGDebuggerController writeData:[NSData dataWithBytes:buffer.buf length:(NSUInteger)buffer.len] atAddress:memoryAddress processTask:self->processTask breakPoints:self->objcSelf.breakPointController.breakPoints];
 		
 		if (!success)
 		{
@@ -901,7 +901,7 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject *args)
+static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject * __unused args)
 {
 	if (self->objcSelf.haltedBreakPoint == nil)
 	{
@@ -932,7 +932,7 @@ static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject *args)
 	return pythonInstructionAddresses;
 }
 
-static PyObject *Debugger_resume(DebuggerClass *self, PyObject *args)
+static PyObject *Debugger_resume(DebuggerClass *self, PyObject * __unused args)
 {
 	continueFromHaltedBreakPointsInDebugger(self);
 	

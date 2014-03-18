@@ -14,10 +14,6 @@
 #define HFASSERT(x) ;
 #endif
 
-#ifndef USE
-#define USE(x) ;
-#endif
-
 /* NSTableColumn identifiers */
 #define kInspectorTypeColumnIdentifier @"inspector_type"
 #define kInspectorSubtypeColumnIdentifier @"inspector_subtype"
@@ -559,7 +555,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    USE(tableView);
+#pragma unused(tableView)
     return (NSInteger)[self rowCount];
 }
 
@@ -605,7 +601,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    USE(tableView);
+#pragma unused(tableView)
 	
 	if (row < 0) return nil;
 	
@@ -689,7 +685,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 }
 
 - (void)addRow:(id)sender {
-    USE(sender);
+#pragma unused(sender)
     DataInspector *ins = [[DataInspector alloc] init];
 	[ins setEndianness:eNativeEndianness];
 	
@@ -709,7 +705,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 }
 
 - (void)removeRow:(id)sender {
-	USE(sender);
+#pragma unused(sender)
 	if ([self rowCount] == 1) {
 		[[NSNotificationCenter defaultCenter] postNotificationName:DataInspectorDidDeleteAllRows object:self userInfo:nil];
 	}
@@ -725,7 +721,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 }
 
 - (IBAction)doubleClickedTable:(id)sender {
-    USE(sender);
+#pragma unused(sender)
     NSInteger column = [table clickedColumn], row = [table clickedRow];
     if (column >= 0 && row >= 0 && [[(NSTableColumn *)[[table tableColumns] objectAtIndex:(unsigned)column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
 	BOOL isError;
@@ -740,7 +736,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 }
 
 - (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor {
-    USE(control);
+#pragma unused(control)
     NSInteger row = [table editedRow];
     if (row < 0) return YES; /* paranoia */
     
@@ -756,16 +752,16 @@ static NSAttributedString *inspectionError(NSString *s) {
 
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
     /* since shouldTrackCell is only available on 10.5, fall back to crappier behavior on 10.4 */
-    USE(tableView);
-    USE(row);
+#pragma unused(tableView)
+#pragma unused(row)
     return ! isRunningOnLeopardOrLater();
 }
 
 - (BOOL)tableView:(NSTableView *)tableView shouldTrackCell:(NSCell *)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    USE(tableView);
-    USE(row);
-    USE(cell);
-    USE(tableColumn);
+#pragma unused(tableView)
+#pragma unused(row)
+#pragma unused(cell)
+#pragma unused(tableColumn)
     return YES;
 }
 
@@ -843,9 +839,9 @@ static NSAttributedString *inspectionError(NSString *s) {
 
 - (NSRect)drawTitle:(NSAttributedString*)title withFrame:(NSRect)frame inView:(NSView*)controlView {
     /* Defeat title drawing by doing nothing */
-    USE(title);
-    USE(frame);
-    USE(controlView);
+#pragma unused(title)
+#pragma unused(frame)
+#pragma unused(controlView)
     return NSZeroRect;
 }
 
@@ -860,7 +856,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 @implementation DataInspectorTableView
 
 - (void)highlightSelectionInClipRect:(NSRect)clipRect {
-    USE(clipRect);
+#pragma unused(clipRect)
 }
 
 @end

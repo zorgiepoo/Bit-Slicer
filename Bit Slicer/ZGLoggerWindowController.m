@@ -108,7 +108,7 @@
 	[self updateDisplay];
 }
 
-- (IBAction)clearText:(id)sender
+- (IBAction)clearText:(id)__unused sender
 {
 	[self.loggerText setString:@""];
 	[[[self.loggerTextView textStorage] mutableString] setString:self.loggerText];

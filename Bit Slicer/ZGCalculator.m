@@ -70,7 +70,7 @@
 
 + (void)registerBaseAddressFunctionWithEvaluator:(DDMathEvaluator *)evaluator
 {
-	[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+	[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator * __unused eval, NSError *__autoreleasing *error) {
 		ZGProcess *process = [vars objectForKey:ZGProcessVariable];
 		ZGMemoryAddress foundAddress = 0x0;
 		if (args.count == 0)
@@ -139,7 +139,7 @@
 				{
 					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumber userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" didn't read sufficient number of bytes"}];
 				}
-				ZGFreeBytes(process.processTask, bytes, sizeRead);
+				ZGFreeBytes(bytes, sizeRead);
 			}
 			else if (error != NULL)
 			{
@@ -156,7 +156,7 @@
 
 + (DDMathFunction)registerFindSymbolFunctionWithEvaluator:(DDMathEvaluator *)evaluator
 {
-	DDMathFunction findSymbolFunction = ^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+	DDMathFunction findSymbolFunction = ^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator * __unused eval, NSError *__autoreleasing *error) {
 		NSValue *symbolicatorValue = [vars objectForKey:ZGSymbolicatorVariable];
 		NSDictionary *lastSearchInfo = [vars objectForKey:ZGLastSearchInfoVariable];
 		__block NSNumber *symbolAddressNumber = @(0);

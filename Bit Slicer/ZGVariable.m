@@ -194,7 +194,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone
+- (id)copyWithZone:(NSZone *)__unused zone
 {
 	NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:self];
 	return [NSKeyedUnarchiver unarchiveObjectWithData:archivedData];

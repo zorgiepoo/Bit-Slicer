@@ -77,7 +77,7 @@
 	return success;
 }
 
-- (IBAction)changeProtectionOkayButton:(id)sender
+- (IBAction)changeProtectionOkayButton:(id)__unused sender
 {
 	NSString *addressExpression = [ZGCalculator evaluateExpression:self.changeProtectionAddressTextField.stringValue];
 	ZGMemoryAddress address = ZGMemoryAddressFromExpression(addressExpression);
@@ -133,7 +133,7 @@
 	}
 }
 
-- (IBAction)changeProtectionCancelButton:(id)sender
+- (IBAction)changeProtectionCancelButton:(id)__unused sender
 {
 	[NSApp endSheet:self.changeProtectionWindow];
 	[self.changeProtectionWindow close];

@@ -63,7 +63,7 @@
 	 contextInfo:NULL];
 }
 
-- (IBAction)injectCode:(id)sender
+- (IBAction)injectCode:(id)__unused sender
 {
 	BOOL succeeded = YES;
 	self.completionHandler([self.textView.textStorage.mutableString copy], NO, &succeeded);
@@ -75,7 +75,7 @@
 	}
 }
 
-- (IBAction)cancel:(id)sender
+- (IBAction)cancel:(id)__unused sender
 {
 	self.completionHandler(nil, YES, NULL);
 	[NSApp endSheet:self.window];

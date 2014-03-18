@@ -257,7 +257,7 @@ enum ZGStepExecution
 
 #pragma mark Split Views
 
-- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
+- (CGFloat)splitView:(NSSplitView *)__unused splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)__unused dividerIndex
 {
 	// prevent bottom view from going all the way up
 	return proposedMinimumPosition + 60;
@@ -273,7 +273,7 @@ enum ZGStepExecution
 	return NO;
 }
 
-- (BOOL)splitView:(NSSplitView *)splitView shouldHideDividerAtIndex:(NSInteger)dividerIndex
+- (BOOL)splitView:(NSSplitView *)__unused splitView shouldHideDividerAtIndex:(NSInteger)__unused dividerIndex
 {
 	return (self.currentBreakPoint == nil);
 }
@@ -387,7 +387,7 @@ enum ZGStepExecution
 	void *newBytes = malloc(size);
 	memcpy(newBytes, originalBytes, size);
 	
-	ZGFreeBytes(processTask, originalBytes, size);
+	ZGFreeBytes(originalBytes, size);
 	
 	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
@@ -468,49 +468,41 @@ enum ZGStepExecution
 	// Check to see if anything in the window needs to be updated
 	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
 	if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
-	{
-		__block ZGMemoryAddress regionAddress = 0x0;
-		__block ZGMemorySize regionSize = 0x0;
-		__block BOOL foundRegion = NO;
+	{	
+		BOOL needsToUpdateWindow = NO;
 		
-		__block BOOL needsToUpdateWindow = NO;
-		[[self.instructions subarrayWithRange:visibleRowsRange] enumerateObjectsUsingBlock:^(ZGInstruction *instruction, NSUInteger index, BOOL *stop)
-		 {
-			 void *bytes = NULL;
-			 ZGMemorySize size = instruction.variable.size;
-			 if (ZGReadBytes(self.currentProcess.processTask, instruction.variable.address, &bytes, &size))
-			 {
-				 if (memcmp(bytes, instruction.variable.value, size) != 0)
-				 {
-					 // Ignore trivial breakpoint changes
-					 BOOL foundBreakPoint = NO;
-					 if (*(uint8_t *)bytes == INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp(bytes+sizeof(uint8_t), instruction.variable.value+sizeof(uint8_t), size-sizeof(uint8_t)) == 0))
-					 {
-						 for (ZGBreakPoint *breakPoint in self.breakPointController.breakPoints)
-						 {
-							 if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.value == *(uint8_t *)instruction.variable.value)
-							 {
-								 foundBreakPoint = YES;
-								 break;
-							 }
-						 }
-					 }
-					 
-					 if (!foundBreakPoint)
-					 {
-						 // Find the region our instruction is in
-						 ZGMemoryBasicInfo unusedInfo;
-						 regionAddress = instruction.variable.address;
-						 regionSize = instruction.variable.size;
-						 foundRegion = ZGRegionInfo(self.currentProcess.processTask, &regionAddress, &regionSize, &unusedInfo);
-						 needsToUpdateWindow = YES;
-						 *stop = YES;
-					 }
-				 }
-				 
-				 ZGFreeBytes(self.currentProcess.processTask, bytes, size);
-			 }
-		 }];
+		for (ZGInstruction *instruction in [self.instructions subarrayWithRange:visibleRowsRange])
+		{
+			void *bytes = NULL;
+			ZGMemorySize size = instruction.variable.size;
+			if (ZGReadBytes(self.currentProcess.processTask, instruction.variable.address, &bytes, &size))
+			{
+				if (memcmp(bytes, instruction.variable.value, size) != 0)
+				{
+					// Ignore trivial breakpoint changes
+					BOOL foundBreakPoint = NO;
+					if (*(uint8_t *)bytes == INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp(bytes+sizeof(uint8_t), instruction.variable.value+sizeof(uint8_t), size-sizeof(uint8_t)) == 0))
+					{
+						for (ZGBreakPoint *breakPoint in self.breakPointController.breakPoints)
+						{
+							if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.value == *(uint8_t *)instruction.variable.value)
+							{
+								foundBreakPoint = YES;
+								break;
+							}
+						}
+					}
+					
+					if (!foundBreakPoint)
+					{
+						needsToUpdateWindow = YES;
+						break;
+					}
+				}
+				
+				ZGFreeBytes(bytes, size);
+			}
+		}
 		
 		if (needsToUpdateWindow)
 		{
@@ -728,7 +720,7 @@ enum ZGStepExecution
 	}
 }
 
-- (void)updateDisplayTimer:(NSTimer *)timer
+- (void)updateDisplayTimer:(NSTimer *)__unused timer
 {
 	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && !self.disassembling && self.instructions.count > 0)
 	{
@@ -834,7 +826,7 @@ enum ZGStepExecution
 	}
 }
 
-- (IBAction)runningApplicationsPopUpButton:(id)sender
+- (IBAction)runningApplicationsPopUpButton:(id)__unused sender
 {
 	[self switchProcessMenuItemAndSelectAddress:0x0];
 }
@@ -846,7 +838,7 @@ enum ZGStepExecution
 	return !self.disassembling && [super canEnableNavigationButtons];
 }
 
-- (IBAction)jumpToOperandOffset:(id)sender
+- (IBAction)jumpToOperandOffset:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
 	
@@ -1371,7 +1363,7 @@ enum ZGStepExecution
 	}
 }
 
-- (IBAction)copy:(id)sender
+- (IBAction)copy:(id)__unused sender
 {
 	NSArray *selectedInstructions = self.selectedInstructions;
 	
@@ -1391,7 +1383,7 @@ enum ZGStepExecution
 	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 }
 
-- (IBAction)copyAddress:(id)sender
+- (IBAction)copyAddress:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
 	
@@ -1424,7 +1416,7 @@ enum ZGStepExecution
 
 #pragma mark TableView Methods
 
-- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+- (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
 	NSArray *instructions = [self.instructions objectsAtIndexes:rowIndexes];
 	[self annotateInstructions:instructions];
@@ -1432,7 +1424,7 @@ enum ZGStepExecution
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:[instructions valueForKey:@"variable"]] forType:ZGVariablePboardType];
 }
 
-- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+- (void)tableViewSelectionDidChange:(NSNotification *)__unused aNotification
 {
 	if (self.instructions.count > 0 && self.selectedInstructions.count > 0)
 	{
@@ -1458,12 +1450,12 @@ enum ZGStepExecution
 	return answer;
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
 {
 	return (signed)self.instructions.count;
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (id)tableView:(NSTableView *)__unused tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	id result = nil;
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
@@ -1494,7 +1486,7 @@ enum ZGStepExecution
 	return result;
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (void)tableView:(NSTableView *)__unused tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
@@ -1536,7 +1528,7 @@ enum ZGStepExecution
 	}
 }
 
-- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (void)tableView:(NSTableView *)__unused tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if ([tableColumn.identifier isEqualToString:@"address"] && rowIndex >= 0 && (NSUInteger)rowIndex < self.instructions.count)
 	{
@@ -1547,7 +1539,7 @@ enum ZGStepExecution
 	}
 }
 
-- (NSString *)tableView:(NSTableView *)tableView toolTipForCell:(NSCell *)cell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
+- (NSString *)tableView:(NSTableView *)__unused tableView toolTipForCell:(NSCell *)__unused cell rect:(NSRectPointer)__unused rect tableColumn:(NSTableColumn *)__unused tableColumn row:(NSInteger)row mouseLocation:(NSPoint)__unused mouseLocation
 {
 	NSString *toolTip = nil;
 	
@@ -1826,10 +1818,10 @@ enum ZGStepExecution
 	ZGMemorySize newSize = 0;
 	void *newValue = ZGValueFromString(is64Bit, stringValue, ZGByteArray, &newSize);
 	
-	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] atAddress:address processTask:processTask is64Bit:is64Bit breakPoints:breakPoints];
+	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] atAddress:address processTask:processTask breakPoints:breakPoints];
 }
 
-+ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask is64Bit:(BOOL)is64Bit breakPoints:(NSArray *)breakPoints
++ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPoints:(NSArray *)breakPoints
 {
 	BOOL success = YES;
 	pid_t processID = 0;
@@ -1909,7 +1901,7 @@ enum ZGStepExecution
 	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues processTask:processTask is64Bit:is64Bit breakPoints:breakPoints undoManager:undoManager actionName:actionName];
 }
 
-- (IBAction)nopVariables:(id)sender
+- (IBAction)nopVariables:(id)__unused sender
 {
 	[[self class] nopInstructions:[self selectedInstructions] inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints undoManager:self.undoManager actionName:@"NOP Change"];
 }
@@ -2020,7 +2012,7 @@ enum ZGStepExecution
 	return [instructions copy];
 }
 
-- (IBAction)requestCodeInjection:(id)sender
+- (IBAction)requestCodeInjection:(id)__unused sender
 {
 	ZGMemoryAddress allocatedAddress = 0;
 	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
@@ -2212,7 +2204,7 @@ enum ZGStepExecution
 	}
 }
 
-- (IBAction)toggleBreakPoints:(id)sender
+- (IBAction)toggleBreakPoints:(id)__unused sender
 {
 	if ([self isBreakPointAtInstruction:[self.selectedInstructions objectAtIndex:0]])
 	{
@@ -2224,7 +2216,7 @@ enum ZGStepExecution
 	}
 }
 
-- (IBAction)removeAllBreakPoints:(id)sender
+- (IBAction)removeAllBreakPoints:(id)__unused sender
 {
 	[self.breakPointController removeObserver:self];
 	[self stopBreakPointActivity];
@@ -2303,7 +2295,7 @@ enum ZGStepExecution
 	}
 }
 
-- (IBAction)jump:(id)sender
+- (IBAction)jump:(id)__unused sender
 {
 	ZGInstruction *instruction = [self.selectedInstructions objectAtIndex:0];
 	[self moveInstructionPointerToAddress:instruction.variable.address];
@@ -2454,18 +2446,18 @@ enum ZGStepExecution
 	[self toggleBacktraceAndRegistersViews:NSOffState];
 }
 
-- (IBAction)continueExecution:(id)sender
+- (IBAction)continueExecution:(id)__unused sender
 {
 	[self continueFromBreakPoint:self.currentBreakPoint];
 }
 
-- (IBAction)stepInto:(id)sender
+- (IBAction)stepInto:(id)__unused sender
 {
 	[self.breakPointController addSingleStepBreakPointFromBreakPoint:self.currentBreakPoint];
 	[self resumeBreakPoint:self.currentBreakPoint];
 }
 
-- (IBAction)stepOver:(id)sender
+- (IBAction)stepOver:(id)__unused sender
 {
 	ZGInstruction *currentInstruction = [[self class] findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
@@ -2487,7 +2479,7 @@ enum ZGStepExecution
 	}
 }
 
-- (IBAction)stepOut:(id)sender
+- (IBAction)stepOut:(id)__unused sender
 {
 	ZGInstruction *outterInstruction = [self.backtraceViewController.backtrace.instructions objectAtIndex:1];
 	ZGInstruction *returnInstruction = [[self class] findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
@@ -2518,7 +2510,7 @@ enum ZGStepExecution
 	}
 }
 
-- (void)applicationWillTerminate:(NSNotification *)notification
+- (void)applicationWillTerminate:(NSNotification *)__unused notification
 {
 	[self cleanup];
 }
@@ -2552,7 +2544,7 @@ enum ZGStepExecution
 
 #pragma mark Breakpoint Conditions
 
-- (IBAction)showBreakPointCondition:(id)sender
+- (IBAction)showBreakPointCondition:(id)__unused sender
 {
 	if (self.breakPointConditionPopover == nil)
 	{
@@ -2671,7 +2663,7 @@ enum ZGStepExecution
 
 #pragma mark Memory Viewer
 
-- (IBAction)showMemoryViewer:(id)sender
+- (IBAction)showMemoryViewer:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
 	

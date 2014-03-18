@@ -362,7 +362,7 @@
 
 
 
-- (void)drawRect:(NSRect)dirtyRect;
+- (void)drawRect:(NSRect)__unused dirtyRect;
 {
 	// Draw gradient background
 	NSGradient * gradient = [[[NSGradient alloc] initWithStartingColor:SCOPE_BAR_START_COLOR_GRAY 
@@ -377,7 +377,7 @@
 	}
 	
 	// Draw separators
-	[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL *stop) {
+	[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL * __unused stop) {
 		if ((groupIndex > 0) && (group.showsSeparator)) {
 			NSRect sepRect = NSMakeRect(0, 0, SCOPE_BAR_SEPARATOR_WIDTH, SCOPE_BAR_SEPARATOR_HEIGHT);
 			sepRect.origin.y = ((self.bounds.size.height - sepRect.size.height) / 2.0);
@@ -431,7 +431,7 @@
 	
 	
 	// Get maxNeededSpaceForGroups
-	[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL *stop){
+	[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL * __unused stop){
 		if (groupIndex > 0) {
 			if (group.showsSeparator) maxNeededSpaceForGroups += SCOPE_BAR_SEPARATOR_WIDTH;
 			maxNeededSpaceForGroups += SCOPE_BAR_GROUP_SPACING;
@@ -464,7 +464,7 @@
 			hasCollapsedAllGroups = YES;
 			
 			// Collapse a group
-			[self.groups enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL *stop){
+			[self.groups enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(AGScopeBarGroup * group, NSUInteger __unused groupIndex, BOOL *stop){
 				if (group.canBeCollapsed && !group.isCollapsed) {
 					hasCollapsedAllGroups = NO;
 					group.isCollapsed = YES;
@@ -473,7 +473,7 @@
 			}];
 			
 			// Calculate needed space for groups
-			[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL *stop){
+			[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL * __unused stop){
 				if (groupIndex > 0) {
 					if (group.showsSeparator) maxNeededSpaceForGroups += SCOPE_BAR_SEPARATOR_WIDTH;
 					neededSpace += SCOPE_BAR_GROUP_SPACING;
@@ -1544,7 +1544,7 @@
 
 
 
-- (id)copyWithZone:(NSZone *)zone;
+- (id)copyWithZone:(NSZone *)__unused zone;
 {
 	AGScopeBarPopupButtonCell * copy = [[AGScopeBarPopupButtonCell alloc] initTextCell:self.title pullsDown:self.pullsDown];
 	
@@ -1563,7 +1563,7 @@
 
 #pragma mark -
 
-- (void)drawBezelWithFrame:(NSRect)frame inView:(NSView *)controlView
+- (void)drawBezelWithFrame:(NSRect)frame inView:(NSView *)__unused controlView
 {
 	[mRecessedButton setFrame:frame];
 	[mRecessedButton drawRect:frame];

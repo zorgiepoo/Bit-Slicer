@@ -188,7 +188,7 @@
 						needsToReloadTable = YES;
 					}
 					
-					ZGFreeBytes(currentProcess.processTask, value, outputSize);
+					ZGFreeBytes(value, outputSize);
 				}
 				else if (variable.value)
 				{
@@ -244,7 +244,7 @@
 	return needsToReload;
 }
 
-- (void)updateWatchVariablesTable:(NSTimer *)timer
+- (void)updateWatchVariablesTable:(NSTimer *)__unused timer
 {
 	BOOL needsToReloadTable = NO;
 	ZGDocumentWindowController *windowController = self.windowController;
@@ -340,7 +340,7 @@
 
 #pragma mark Table View Drag & Drop
 
-- (NSDragOperation)tableView:(NSTableView *)tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)row proposedDropOperation:(NSTableViewDropOperation)operation
+- (NSDragOperation)tableView:(NSTableView *)__unused tableView validateDrop:(id <NSDraggingInfo>)draggingInfo proposedRow:(NSInteger)__unused row proposedDropOperation:(NSTableViewDropOperation)operation
 {
 	if ([draggingInfo draggingSource] == self.variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType] && operation != NSTableViewDropOn)
 	{
@@ -365,7 +365,7 @@
 	[self.variablesTableView reloadData];
 }
 
-- (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)operation
+- (BOOL)tableView:(NSTableView *)__unused tableView acceptDrop:(id <NSDraggingInfo>)draggingInfo row:(NSInteger)newRow dropOperation:(NSTableViewDropOperation)__unused operation
 {
 	if (newRow < 0)
 	{
@@ -417,12 +417,12 @@
 	return YES;
 }
 
-- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pasteboard
+- (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pasteboard
 {
 	[pasteboard declareTypes:@[ZGVariableReorderType, ZGVariablePboardType] owner:self];
 	
 	NSMutableArray *rows = [[NSMutableArray alloc] init];
-	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
+	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger index, BOOL * __unused stop) {
 		[rows addObject:@(index)];
 	}];
 	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableReorderType];
@@ -522,7 +522,7 @@
 	}
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
 {
 	return (NSInteger)self.documentData.variables.count;
 }
@@ -604,7 +604,7 @@
 	return YES;
 }
 
-- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (void)tableView:(NSTableView *)__unused tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
@@ -615,7 +615,7 @@
 	}
 }
 
-- (NSString *)tableView:(NSTableView *)aTableView toolTipForCell:(NSCell *)aCell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation
+- (NSString *)tableView:(NSTableView *)__unused aTableView toolTipForCell:(NSCell *)__unused aCell rect:(NSRectPointer)__unused rect tableColumn:(NSTableColumn *)__unused aTableColumn row:(NSInteger)row mouseLocation:(NSPoint)__unused mouseLocation
 {
 	NSMutableArray *displayComponents = [[NSMutableArray alloc] init];
 	

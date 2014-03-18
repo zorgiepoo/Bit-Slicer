@@ -81,7 +81,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 					bytes += dylinkerCommand->cmdsize;
 				}
 			}
-			ZGFreeBytes(processTask, regionBytes, regionSize);
+			ZGFreeBytes(regionBytes, regionSize);
 		}
 		if (dylinkerBinary != nil)
 		{
@@ -125,9 +125,9 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 					
 					[machBinaries addObject:[[ZGMachBinary alloc] initWithHeaderAddress:machHeaderAddress filePathAddress:imageFilePathAddress]];
 				}
-				ZGFreeBytes(processTask, infoArrayBytes, infoArraySize);
+				ZGFreeBytes(infoArrayBytes, infoArraySize);
 			}
-			ZGFreeBytes(processTask, allImageInfos, allImageInfosSize);
+			ZGFreeBytes(allImageInfos, allImageInfosSize);
 		}
 		
 		[machBinaries addObject:dylinkerBinary];
@@ -201,7 +201,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	if (ZGReadBytes(processTask, self.filePathAddress, &filePathBytes, &pathSize))
 	{
 		filePath = [[NSString alloc] initWithBytes:filePathBytes length:pathSize encoding:NSUTF8StringEncoding];
-		ZGFreeBytes(processTask, filePathBytes, pathSize);
+		ZGFreeBytes(filePathBytes, pathSize);
 	}
 	return filePath;
 }
@@ -279,7 +279,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 			const struct mach_header_64 *machHeader = regionBytes + self.headerAddress - regionAddress;
 			binaryInfo = [self parseMachHeaderWithBytes:machHeader startPointer:regionBytes dataLength:regionSize pointerSize:process.pointerSize];
 			
-			ZGFreeBytes(process.processTask, regionBytes, regionSize);
+			ZGFreeBytes(regionBytes, regionSize);
 		}
 	}
 	

@@ -204,7 +204,7 @@
 	self.scopeBar.delegate = self;
 }
 
-- (void)scopeBar:(AGScopeBar *)scopeBar item:(AGScopeBarItem *)item wasSelected:(BOOL)selected
+- (void)scopeBar:(AGScopeBar *)__unused scopeBar item:(AGScopeBarItem *)item wasSelected:(BOOL)selected
 {
 	if ([item.group.identifier isEqualToString:ZGProtectionGroup])
 	{
@@ -365,7 +365,7 @@
 	}
 }
 
-- (void)windowDidChangeOcclusionState:(NSNotification *)notification
+- (void)windowDidChangeOcclusionState:(NSNotification *)__unused notification
 {
 	self.isOccluded = (self.window.occlusionState & NSWindowOcclusionStateVisible) == 0;
 	if (!self.isOccluded)
@@ -495,7 +495,7 @@
 
 #pragma mark Undo Manager
 
-- (NSUndoManager *)windowWillReturnUndoManager:(id)sender
+- (NSUndoManager *)windowWillReturnUndoManager:(id)__unused sender
 {
 	return [(ZGDocument *)self.document undoManager];
 }
@@ -510,12 +510,12 @@
 	[self.document markChange];
 }
 
-- (IBAction)undoDocument:(id)sender
+- (IBAction)undoDocument:(id)__unused sender
 {
 	[self.undoManager undo];
 }
 
-- (IBAction)redoDocument:(id)sender
+- (IBAction)redoDocument:(id)__unused sender
 {
 	[self.undoManager redo];
 }
@@ -538,7 +538,7 @@
 	 userInfo:@{ZGLastChosenInternalProcessNameKey : self.lastChosenInternalProcessName}];
 }
 
-- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
+- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)__unused notification
 {
 	[self.processList retrieveList];
 }
@@ -804,7 +804,7 @@
 	}
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void)observeValueForKeyPath:(NSString *)__unused keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)__unused context
 {
 	NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
 	NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
@@ -1510,18 +1510,18 @@
 	}
 }
 
-- (IBAction)insertStoredValueToken:(id)sender
+- (IBAction)insertStoredValueToken:(id)__unused sender
 {
 	self.searchValueTextField.objectValue = @[[[ZGSearchToken alloc] initWithName:@"Stored Value"]];
 	[self deselectSearchField];
 }
 
-- (id)tokenField:(NSTokenField *)tokenField representedObjectForEditingString:(NSString *)editingString
+- (id)tokenField:(NSTokenField *)__unused tokenField representedObjectForEditingString:(NSString *)editingString
 {
 	return editingString;
 }
 
-- (NSString *)tokenField:(NSTokenField *)tokenField displayStringForRepresentedObject:(id)representedObject
+- (NSString *)tokenField:(NSTokenField *)__unused tokenField displayStringForRepresentedObject:(id)representedObject
 {
 	NSString *result = nil;
 	if ([representedObject isKindOfClass:[NSString class]])
@@ -1536,29 +1536,29 @@
 	return result;
 }
 
-- (NSTokenStyle)tokenField:(NSTokenField *)tokenField styleForRepresentedObject:(id)representedObject
+- (NSTokenStyle)tokenField:(NSTokenField *)__unused tokenField styleForRepresentedObject:(id)representedObject
 {
 	return ([representedObject isKindOfClass:[ZGSearchToken class]]) ? NSRoundedTokenStyle : NSPlainTextTokenStyle;
 }
 
-- (NSString *)tokenField:(NSTokenField *)tokenField editingStringForRepresentedObject:(id)representedObject
+- (NSString *)tokenField:(NSTokenField *)__unused tokenField editingStringForRepresentedObject:(id)representedObject
 {
 	return ([representedObject isKindOfClass:[ZGSearchToken class]]) ? nil : representedObject;
 }
 
 #pragma mark Search Handling
 
-- (IBAction)clear:(id)sender
+- (IBAction)clear:(id)__unused sender
 {
 	[self.variableController clear];
 }
 
-- (IBAction)clearSearchValues:(id)sender
+- (IBAction)clearSearchValues:(id)__unused sender
 {
 	[self.variableController clearSearch];
 }
 
-- (IBAction)searchValue:(id)sender
+- (IBAction)searchValue:(id)__unused sender
 {
 	self.documentData.searchValue = self.searchValueTextField.objectValue;
 	
@@ -1588,7 +1588,7 @@
 	}
 }
 
-- (IBAction)searchPointerToSelectedVariable:(id)sender
+- (IBAction)searchPointerToSelectedVariable:(id)__unused sender
 {
 	ZGVariable *variable = [self.selectedVariables objectAtIndex:0];
 	
@@ -1603,7 +1603,7 @@
 	self.searchValueTextField.cell.searchMenu = searchMenu;
 }
 
-- (IBAction)storeAllValues:(id)sender
+- (IBAction)storeAllValues:(id)__unused sender
 {
 	self.documentData.searchValue = self.searchValueTextField.objectValue;
 	[self.searchController storeAllValues];
@@ -1623,33 +1623,33 @@
 
 #pragma mark Variables Handling
 
-- (IBAction)freezeVariables:(id)sender
+- (IBAction)freezeVariables:(id)__unused sender
 {
 	[self.variableController freezeVariables];
 }
 
-- (IBAction)copy:(id)sender
+- (IBAction)copy:(id)__unused sender
 {
 	[self.variableController copyVariables];
 }
 
-- (IBAction)copyAddress:(id)sender
+- (IBAction)copyAddress:(id)__unused sender
 {
 	[self.variableController copyAddress];
 }
 
-- (IBAction)paste:(id)sender
+- (IBAction)paste:(id)__unused sender
 {
 	[self.variableController pasteVariables];
 }
 
-- (IBAction)cut:(id)sender
+- (IBAction)cut:(id)__unused sender
 {
 	[self.variableController copyVariables];
 	[self removeSelectedSearchValues:nil];
 }
 
-- (IBAction)removeSelectedSearchValues:(id)sender
+- (IBAction)removeSelectedSearchValues:(id)__unused sender
 {
 	[self.variableController removeSelectedSearchValues];
 }
@@ -1659,12 +1659,12 @@
 	[self.variableController addVariable:sender];
 }
 
-- (IBAction)nopVariables:(id)sender
+- (IBAction)nopVariables:(id)__unused sender
 {
 	[self.variableController nopVariables:[self selectedVariables]];
 }
 
-- (IBAction)requestEditingVariablesValue:(id)sender
+- (IBAction)requestEditingVariablesValue:(id)__unused sender
 {
 	if (self.editValueWindowController == nil)
 	{
@@ -1674,7 +1674,7 @@
 	[self.editValueWindowController requestEditingValuesFromVariables:self.selectedVariables withProcessTask:self.currentProcess.processTask attachedToWindow:self.window scriptManager:self.scriptManager];
 }
 
-- (IBAction)requestEditingVariableDescription:(id)sender
+- (IBAction)requestEditingVariableDescription:(id)__unused sender
 {
 	if (self.editDescriptionWindowController == nil)
 	{
@@ -1684,7 +1684,7 @@
 	[self.editDescriptionWindowController requestEditingDescriptionFromVariable:[self.selectedVariables objectAtIndex:0] attachedToWindow:self.window];
 }
 
-- (IBAction)requestEditingVariableAddress:(id)sender
+- (IBAction)requestEditingVariableAddress:(id)__unused sender
 {
 	if (self.editAddressWindowController == nil)
 	{
@@ -1694,7 +1694,7 @@
 	[self.editAddressWindowController requestEditingAddressFromVariable:[self.selectedVariables objectAtIndex:0] attachedToWindow:self.window];
 }
 
-- (IBAction)requestEditingVariablesSize:(id)sender
+- (IBAction)requestEditingVariablesSize:(id)__unused sender
 {
 	if (self.editSizeWindowController == nil)
 	{
@@ -1704,7 +1704,7 @@
 	[self.editSizeWindowController requestEditingSizesFromVariables:self.selectedVariables attachedToWindow:self.window];
 }
 
-- (IBAction)relativizeVariablesAddress:(id)sender
+- (IBAction)relativizeVariablesAddress:(id)__unused sender
 {
 	[self.variableController relativizeVariables:[self selectedVariables]];
 }
@@ -1731,7 +1731,7 @@
 
 #pragma mark Showing Other Controllers
 
-- (IBAction)showMemoryViewer:(id)sender
+- (IBAction)showMemoryViewer:(id)__unused sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
 	
@@ -1741,7 +1741,7 @@
 	 selectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
 }
 
-- (IBAction)showDebugger:(id)sender
+- (IBAction)showDebugger:(id)__unused sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
 	[ZGNavigationPost postShowDebuggerWithProcess:self.currentProcess address:selectedVariable.address];
@@ -1749,7 +1749,7 @@
 
 #pragma mark Pausing and Unpausing Processes
 
-- (IBAction)pauseOrUnpauseProcess:(id)sender
+- (IBAction)pauseOrUnpauseProcess:(id)__unused sender
 {
 	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }

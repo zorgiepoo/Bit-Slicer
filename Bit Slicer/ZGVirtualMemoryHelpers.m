@@ -207,7 +207,7 @@ ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, Z
 				totalSize += characterSize;
 			}
 			
-			ZGFreeBytes(processTask, buffer, outputtedSize);
+			ZGFreeBytes(buffer, outputtedSize);
 			
 			if (maxStringSizeLimit > 0 && totalSize >= maxStringSizeLimit)
 			{

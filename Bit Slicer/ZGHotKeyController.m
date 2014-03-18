@@ -91,7 +91,7 @@
 	[self registerPauseAndUnpauseHotKey];
 }
 
-static OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
+static OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef __unused theEvent, void *userData)
 {
 	ZGHotKeyController *self = (__bridge ZGHotKeyController *)(userData);
 	

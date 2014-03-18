@@ -200,7 +200,7 @@
 
 #define WRITE_VECTOR_STATE(vectorState, variable, registerName) memcpy(&vectorState.ufs.as64.__fpu_##registerName, variable.value, MIN(variable.size, sizeof(vectorState.ufs.as64.__fpu_##registerName)))
 
-- (BOOL)changeFloatingPointRegister:(ZGRegister *)theRegister oldVariable:(ZGVariable *)oldVariable newVariable:(ZGVariable *)newVariable
+- (BOOL)changeFloatingPointRegister:(ZGRegister *)theRegister newVariable:(ZGVariable *)newVariable
 {
 	BOOL is64Bit = self.breakPoint.process.is64Bit;
 	
@@ -281,7 +281,7 @@
 	return YES;
 }
 
-- (BOOL)changeGeneralPurposeRegister:(ZGRegister *)theRegister oldVariable:(ZGVariable *)oldVariable newVariable:(ZGVariable *)newVariable
+- (BOOL)changeGeneralPurposeRegister:(ZGRegister *)theRegister newVariable:(ZGVariable *)newVariable
 {
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
@@ -340,10 +340,10 @@
 	switch (theRegister.registerType)
 	{
 		case ZGRegisterGeneralPurpose:
-			success = [self changeGeneralPurposeRegister:theRegister oldVariable:oldVariable newVariable:newVariable];
+			success = [self changeGeneralPurposeRegister:theRegister newVariable:newVariable];
 			break;
 		case ZGRegisterVector:
-			success = [self changeFloatingPointRegister:theRegister oldVariable:oldVariable newVariable:newVariable];
+			success = [self changeFloatingPointRegister:theRegister newVariable:newVariable];
 			break;
 	}
 	
@@ -359,18 +359,18 @@
 
 #pragma mark TableView Methods
 
-- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+- (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
 	NSArray *variables = [[self.registers objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
 {
 	return (NSInteger)self.registers.count;
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (id)tableView:(NSTableView *)__unused tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	id result = nil;
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.registers.count)
@@ -393,7 +393,7 @@
 	return result;
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (void)tableView:(NSTableView *)__unused tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.registers.count)
 	{
@@ -429,7 +429,7 @@
 	}
 }
 
-- (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (BOOL)tableView:(NSTableView *)__unused tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
@@ -494,7 +494,7 @@
 	return [self.registers objectsAtIndexes:selectionIndexSet];
 }
 
-- (IBAction)copy:(id)sender
+- (IBAction)copy:(id)__unused sender
 {
 	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
 	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];

@@ -39,6 +39,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
+#pragma unused(zone)
     return [[[self class] alloc] initWithVariable:[self variable]];
 }
 

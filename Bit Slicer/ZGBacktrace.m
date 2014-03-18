@@ -92,7 +92,7 @@
 					returnAddress = 0;
 			}
 			
-			ZGFreeBytes(process.processTask, returnAddressBytes, returnAddressSize);
+			ZGFreeBytes(returnAddressBytes, returnAddressSize);
 			
 			ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints];
 			if (instruction == nil)
@@ -124,7 +124,7 @@
 			
 			[newBasePointers addObject:@(basePointer)];
 			
-			ZGFreeBytes(process.processTask, basePointerBytes, basePointerSize);
+			ZGFreeBytes(basePointerBytes, basePointerSize);
 		}
 	}
 	

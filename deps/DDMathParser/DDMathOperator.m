@@ -187,7 +187,7 @@
     _tokens = [_tokens arrayByAddingObjectsFromArray:[moreTokens valueForKey:@"lowercaseString"]];
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (id)copyWithZone:(NSZone *)__unused zone {
     return [[[self class] alloc] initWithOperatorFunction:_function
                                                    tokens:_tokens
                                                     arity:_arity
@@ -246,7 +246,7 @@
 - (instancetype)initWithOperators:(NSArray *)operators {
     self = [super init];
     if (self) {
-        _operators = [NSMutableOrderedSet orderedSetWithArray:[DDMathOperator _defaultOperators]];
+        _operators = [NSMutableOrderedSet orderedSetWithArray:operators];
         _operatorsByFunction = [NSMutableDictionary dictionary];
         _operatorsByToken = [NSMutableDictionary dictionary];
         
@@ -271,6 +271,7 @@
 }
 
 - (id)copyWithZone:(NSZone *)zone {
+#pragma unused(zone)
     DDMathOperatorSet *dupe = [[[self class] alloc] initWithOperators:_operators.array];
     dupe.interpretsPercentSignAsModulo = self.interpretsPercentSignAsModulo;
     return dupe;
@@ -373,19 +374,17 @@
                 // the new operator has a precedence higher than the original operator
                 // all operators that have an equivalent (or higher) precedence need to be bumped up one
                 // to accomodate the new operator
-                [_operators enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                    DDMathOperator *op = obj;
+                for (DDMathOperator *op in _operators) {
                     if (op.precedence >= newPrecedence) {
                         op.precedence++;
                     }
-                }];
+                }
             } else {
-                [_operators enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                    DDMathOperator *op = obj;
+                for (DDMathOperator *op in _operators) {
                     if (op.precedence > newPrecedence || op == newOperator) {
                         op.precedence++;
                     }
-                }];
+                }
             }
         }
         

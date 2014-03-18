@@ -91,7 +91,7 @@
 	[self updateCheckingForUpdateButtons];
 }
 
-- (IBAction)showWindow:(id)sender
+- (IBAction)showWindow:(id)__unused sender
 {
 	[super showWindow:nil];
 	
@@ -106,12 +106,12 @@
 	self.hotkeyRecorder.keyCombo = self.hotKeyController.pauseHotKeyCombo;
 }
 
-- (void)shortcutRecorder:(SRRecorderControl *)recorder keyComboDidChange:(KeyCombo)newKeyCombo
+- (void)shortcutRecorder:(SRRecorderControl *)__unused recorder keyComboDidChange:(KeyCombo)newKeyCombo
 {
 	self.hotKeyController.pauseHotKeyCombo = (KeyCombo){.code = newKeyCombo.code, .flags = SRCocoaToCarbonFlags(newKeyCombo.flags)};
 }
 
-- (IBAction)checkForUpdatesButton:(id)sender
+- (IBAction)checkForUpdatesButton:(id)__unused sender
 {
 	if (self.checkForUpdatesButton.state == NSOffState)
 	{
@@ -127,13 +127,13 @@
 	[self updateCheckingForUpdateButtons];
 }
 
-- (IBAction)checkForAlphaUpdatesButton:(id)sender
+- (IBAction)checkForAlphaUpdatesButton:(id)__unused sender
 {
 	self.appUpdaterController.checksForAlphaUpdates = (self.checkForAlphaUpdatesButton.state == NSOnState);
 	[self updateCheckingForUpdateButtons];
 }
 
-- (IBAction)changeSendProfileInformation:(id)sender
+- (IBAction)changeSendProfileInformation:(id)__unused sender
 {
 	self.appUpdaterController.sendsAnonymousInfo = (self.sendProfileInfoButton.state == NSOnState);
 	[self updateCheckingForUpdateButtons];

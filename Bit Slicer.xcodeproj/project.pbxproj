@@ -1494,7 +1494,6 @@
 				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Weverything",
-					"-Wno-unused-parameter",
 					"-Wno-objc-missing-property-synthesis",
 					"-Wno-padded",
 					"-Wno-empty-translation-unit",
@@ -1592,7 +1591,6 @@
 				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Weverything",
-					"-Wno-unused-parameter",
 					"-Wno-objc-missing-property-synthesis",
 					"-Wno-padded",
 					"-Wno-empty-translation-unit",

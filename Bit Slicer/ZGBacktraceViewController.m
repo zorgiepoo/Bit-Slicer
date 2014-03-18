@@ -92,7 +92,7 @@
 	}
 }
 
-- (IBAction)changeInstructionSelection:(id)sender
+- (IBAction)changeInstructionSelection:(id)__unused sender
 {
 	if (self.tableView.selectedRowIndexes.count > 0 && (NSUInteger)self.tableView.selectedRow < self.backtrace.instructions.count)
 	{
@@ -103,18 +103,18 @@
 
 #pragma mark Table View
 
-- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
+- (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
 	NSArray *variables = [[self.backtrace.instructions objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
 {
 	return (NSInteger)self.backtrace.instructions.count;
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (id)tableView:(NSTableView *)__unused tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	id result = nil;
 	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.backtrace.instructions.count)
@@ -129,7 +129,7 @@
 	return result;
 }
 
-- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+- (void)tableViewSelectionDidChange:(NSNotification *)__unused aNotification
 {
 	// we should only ignore selection on the first row
 	if (self.shouldIgnoreTableSelection && ![[self.tableView selectedRowIndexes] isEqualToIndexSet:[NSIndexSet indexSetWithIndex:0]])
@@ -147,7 +147,7 @@
 	}
 }
 
-- (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
+- (BOOL)selectionShouldChangeInTableView:(NSTableView *)__unused aTableView
 {
 	return [self.delegate backtraceSelectionShouldChange];
 }
@@ -195,7 +195,7 @@
 
 #pragma mark Actions
 
-- (IBAction)copy:(id)sender
+- (IBAction)copy:(id)__unused sender
 {
 	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
 	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
@@ -211,7 +211,7 @@
 	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
 }
 
-- (IBAction)copyAddress:(id)sender
+- (IBAction)copyAddress:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
 	
@@ -219,7 +219,7 @@
 	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
 }
 
-- (IBAction)showMemoryViewer:(id)sender
+- (IBAction)showMemoryViewer:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
 	[ZGNavigationPost postShowMemoryViewerWithProcess:self.process address:selectedInstruction.variable.address selectionLength:selectedInstruction.variable.size];

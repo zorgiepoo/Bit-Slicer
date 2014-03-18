@@ -78,7 +78,7 @@
 	[self.document markChange];
 }
 
-- (IBAction)changeBeginningAddress:(id)sender
+- (IBAction)changeBeginningAddress:(id)__unused sender
 {
 	if (![self.document.data.beginningAddressStringValue isEqualToString:self.beginningAddressTextField.stringValue])
 	{
@@ -87,7 +87,7 @@
 	}
 }
 
-- (IBAction)changeEndingAddress:(id)sender
+- (IBAction)changeEndingAddress:(id)__unused sender
 {
 	if (![self.document.data.endingAddressStringValue isEqualToString:self.endingAddressTextField.stringValue])
 	{

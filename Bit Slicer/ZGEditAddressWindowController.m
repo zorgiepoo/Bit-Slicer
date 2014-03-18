@@ -79,7 +79,7 @@
 	 contextInfo:NULL];
 }
 
-- (IBAction)editAddress:(id)sender
+- (IBAction)editAddress:(id)__unused sender
 {
 	[NSApp endSheet:self.window];
 	[self.window close];
@@ -91,7 +91,7 @@
 	self.variable = nil;
 }
 
-- (IBAction)cancelEditingAddress:(id)sender
+- (IBAction)cancelEditingAddress:(id)__unused sender
 {
 	[NSApp endSheet:self.window];
 	[self.window close];

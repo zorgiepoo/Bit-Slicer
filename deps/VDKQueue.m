@@ -214,7 +214,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
 //  WARNING: This thread has no active autorelease pool, so if you make changes, you must manually manage 
 //           memory without relying on autorelease. Otherwise, you will leak!
 //
-- (void) watcherThread:(id)sender
+- (void) watcherThread:(id)__unused sender
 {
     int					n;
     struct kevent		ev;

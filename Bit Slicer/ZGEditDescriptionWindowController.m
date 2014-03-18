@@ -76,14 +76,14 @@
 	 contextInfo:NULL];
 }
 
-- (IBAction)editVariableDescription:(id)sender
+- (IBAction)editVariableDescription:(id)__unused sender
 {
 	[self.variableController changeVariable:self.variable newDescription:[self.descriptionTextView.textStorage copy]];
 	[NSApp endSheet:self.window];
 	[self.window close];
 }
 
-- (IBAction)cancelEditingVariableDescription:(id)sender
+- (IBAction)cancelEditingVariableDescription:(id)__unused sender
 {
 	[NSApp endSheet:self.window];
 	[self.window close];
@@ -96,7 +96,7 @@
 	[[NSFontManager sharedFontManager] orderFrontFontPanel:sender];
 }
 
-- (IBAction)zgOrderFrontColorPanel:(id)sender
+- (IBAction)zgOrderFrontColorPanel:(id)__unused sender
 {
 	[[NSColorPanel sharedColorPanel] orderFront:nil];
 }

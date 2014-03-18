@@ -95,7 +95,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 			if (ZGReadBytes(processTask, region.address, &bytes, &outputSize))
 			{
 				[currentData appendBytes:bytes length:(NSUInteger)outputSize];
-				ZGFreeBytes(processTask, bytes, outputSize);
+				ZGFreeBytes(bytes, outputSize);
 			}
 		}
 		

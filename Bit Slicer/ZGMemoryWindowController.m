@@ -101,12 +101,12 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	 userInfo:@{ZGLastChosenInternalProcessNameKey : self.lastChosenInternalProcessName}];
 }
 
-- (NSUndoManager *)windowWillReturnUndoManager:(id)sender
+- (NSUndoManager *)windowWillReturnUndoManager:(id)__unused sender
 {
 	return self.undoManager;
 }
 
-- (void)windowDidAppearForFirstTime:(id)sender
+- (void)windowDidAppearForFirstTime:(id)__unused sender
 {
 }
 
@@ -115,7 +115,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	return 0.5;
 }
 
-- (void)updateDisplayTimer:(NSTimer *)timer
+- (void)updateDisplayTimer:(NSTimer *)__unused timer
 {
 }
 
@@ -136,7 +136,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	self.updateDisplayTimer = nil;
 }
 
-- (void)windowDidChangeOcclusionState:(NSNotification *)notification
+- (void)windowDidChangeOcclusionState:(NSNotification *)__unused notification
 {
 	if (([self.window occlusionState] & NSWindowOcclusionStateVisible) == 0)
 	{
@@ -248,7 +248,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	 object:self.runningApplicationsPopUpButton];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void)observeValueForKeyPath:(NSString *)__unused keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)__unused context
 {
 	if (object == self.processList)
 	{
@@ -285,7 +285,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	}
 }
 
-- (void)processListChanged:(NSDictionary *)change
+- (void)processListChanged:(NSDictionary *)__unused change
 {
 }
 
@@ -382,7 +382,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 }
 
-- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification
+- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)__unused notification
 {
 	[self.processList retrieveList];
 }
@@ -405,13 +405,13 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 #pragma mark Navigation
 
-- (IBAction)goBack:(id)sender
+- (IBAction)goBack:(id)__unused sender
 {
 	[self.navigationManager undo];
 	[self updateNavigationButtons];
 }
 
-- (IBAction)goForward:(id)sender
+- (IBAction)goForward:(id)__unused sender
 {
 	[self.navigationManager redo];
 	[self updateNavigationButtons];
@@ -451,7 +451,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 #pragma mark Pausing
 
-- (IBAction)pauseOrUnpauseProcess:(id)sender
+- (IBAction)pauseOrUnpauseProcess:(id)__unused sender
 {
 	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }

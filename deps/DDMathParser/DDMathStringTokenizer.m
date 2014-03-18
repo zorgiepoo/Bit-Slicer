@@ -22,8 +22,8 @@
 
 - (BOOL)_processToken:(DDMathStringToken *)token withError:(NSError * __autoreleasing *)error;
 - (BOOL)_processUnknownOperatorToken:(DDMathStringToken *)token withError:(NSError * __autoreleasing *)error;
-- (BOOL)_processImplicitMultiplicationWithToken:(DDMathStringToken *)token error:(NSError * __autoreleasing *)error;
-- (BOOL)_processArgumentlessFunctionWithToken:(DDMathStringToken *)token error:(NSError * __autoreleasing *)error;
+- (BOOL)_processImplicitMultiplicationWithToken:(DDMathStringToken *)token;
+- (BOOL)_processArgumentlessFunctionWithToken:(DDMathStringToken *)token;
 
 - (unichar)_peekNextCharacter;
 - (unichar)_nextCharacter;
@@ -119,10 +119,10 @@
     }
     
     //this adds support for not adding parentheses to functions
-    (void)[self _processArgumentlessFunctionWithToken:token error:error];
+    (void)[self _processArgumentlessFunctionWithToken:token];
     
     //this adds support for implicit multiplication
-    (void)[self _processImplicitMultiplicationWithToken:token error:error];
+    (void)[self _processImplicitMultiplicationWithToken:token];
     
     [self appendToken:token];
     return YES;
@@ -200,7 +200,7 @@
     return YES;
 }
 
-- (BOOL)_processImplicitMultiplicationWithToken:(DDMathStringToken *)token error:(NSError * __autoreleasing *)error {
+- (BOOL)_processImplicitMultiplicationWithToken:(DDMathStringToken *)token {
     // See: https://github.com/davedelong/DDMathParser/wiki/Implicit-Multiplication
     
     DDMathStringToken *previousToken = [_tokens lastObject];
@@ -227,7 +227,7 @@
     return YES;
 }
 
-- (BOOL)_processArgumentlessFunctionWithToken:(DDMathStringToken *)token error:(NSError * __autoreleasing *)error {
+- (BOOL)_processArgumentlessFunctionWithToken:(DDMathStringToken *)token {
     DDMathStringToken *previousToken = [_tokens lastObject];
     if (previousToken != nil && [previousToken tokenType] == DDTokenTypeFunction) {
         if ([token tokenType] != DDTokenTypeOperator || [token operatorType] != DDOperatorParenthesisOpen || token == nil) {

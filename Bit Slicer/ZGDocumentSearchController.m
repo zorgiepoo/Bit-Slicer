@@ -186,7 +186,7 @@
 
 #pragma mark Update UI
 
-- (void)updateMemoryStoreUserInterface:(NSTimer *)timer
+- (void)updateMemoryStoreUserInterface:(NSTimer *)__unused timer
 {
 	self.windowController.progressIndicator.doubleValue = self.searchProgress.progress;
 }
@@ -256,7 +256,7 @@
 	
 	ZGMemorySize dataSize = searchResults.dataSize;
 	BOOL enabled = searchResults.enabled;
-	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL *stop) {
+	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL * __unused stop) {
 		ZGVariable *newVariable =
 		[[ZGVariable alloc]
 		 initWithValue:NULL

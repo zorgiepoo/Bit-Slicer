@@ -40,6 +40,7 @@
 #pragma mark Abstract method implementations
 
 - (id)copyWithZone:(NSZone *)zone {
+#pragma unused(zone)
 	[NSException raise:NSInternalInconsistencyException format:@"this method should be overridden: %@", NSStringFromSelector(_cmd)];
     return nil;
 }

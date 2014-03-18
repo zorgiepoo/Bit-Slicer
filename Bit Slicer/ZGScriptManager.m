@@ -282,7 +282,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	dispatch_once(&_cleanupDispatch, ^{
 		self.appTerminationState = appTerminationState;
 		
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL * __unused stop) {
 			if ([self.runningScripts containsObject:pyScript])
 			{
 				if (self.appTerminationState != nil)
@@ -303,7 +303,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	[self cleanupWithAppTerminationState:nil];
 }
 
-- (void)VDKQueue:(VDKQueue *)queue receivedNotification:(NSString *)noteName forPath:(NSString *)fullPath
+- (void)VDKQueue:(VDKQueue *)__unused queue receivedNotification:(NSString *)__unused noteName forPath:(NSString *)fullPath
 {
 	NSFileManager *fileManager = [[NSFileManager alloc] init];
 	__block BOOL assignedNewScript = NO;
@@ -578,9 +578,9 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	return retValue != NULL;
 }
 
-- (void)watchProcessDied:(NSNotification *)notification
+- (void)watchProcessDied:(NSNotification *)__unused notification
 {
-	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *__unused stop) {
 		if ([self.runningScripts containsObject:pyScript])
 		{
 			[self stopScriptForVariable:[variableValue pointerValue]];

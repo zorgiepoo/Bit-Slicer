@@ -42,7 +42,6 @@
 
 @interface ZGStoredData ()
 
-@property (nonatomic) ZGMemoryMap processTask;
 @property (nonatomic) NSArray *regions;
 
 @end
@@ -67,15 +66,14 @@
 		}
 	}
 	
-	return [[self alloc] initWithProcessTask:processTask regions:regions];
+	return [[self alloc] initWithRegions:regions];
 }
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask regions:(NSArray *)regions
+- (id)initWithRegions:(NSArray *)regions
 {
 	self = [super init];
 	if (self != nil)
 	{
-		self.processTask = processTask;
 		self.regions = regions;
 	}
 	return self;
@@ -85,7 +83,7 @@
 {
 	for (ZGRegion *region in self.regions)
 	{
-		ZGFreeBytes(self.processTask, region.bytes, region.size);
+		ZGFreeBytes(region.bytes, region.size);
 	}
 }
 

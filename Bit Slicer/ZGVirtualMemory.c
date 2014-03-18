@@ -95,9 +95,9 @@ bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes,
 	return success;
 }
 
-void ZGFreeBytes(ZGMemoryMap processTask, const void *bytes, ZGMemorySize size)
+bool ZGFreeBytes(const void *bytes, ZGMemorySize size)
 {
-	mach_vm_deallocate(current_task(), (vm_offset_t)bytes, size);
+	return mach_vm_deallocate(current_task(), (vm_offset_t)bytes, size) == KERN_SUCCESS;
 }
 
 bool ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)

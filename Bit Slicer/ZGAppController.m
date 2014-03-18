@@ -109,7 +109,7 @@
 	return self;
 }
 
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)__unused sender
 {
 	ZGAppTerminationState *appTerminationState = [[ZGAppTerminationState alloc] init];
 	
@@ -128,7 +128,7 @@
 
 #pragma mark Restoration
 
-+ (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
++ (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)__unused state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
 	ZGAppController *appController = [[NSApplication sharedApplication] delegate];
 	
@@ -183,24 +183,24 @@
 	[memoryWindowController updateWindowAndReadMemory:canReadMemory && firstTimeLoading];
 }
 
-- (IBAction)openMemoryViewer:(id)sender
+- (IBAction)openMemoryViewer:(id)__unused sender
 {
 	[self showMemoryWindowController:self.memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:YES];
 }
 
-- (IBAction)openDebugger:(id)sender
+- (IBAction)openDebugger:(id)__unused sender
 {
 	[self showMemoryWindowController:self.debuggerController withWindowIdentifier:ZGDebuggerIdentifier andCanReadMemory:YES];
 }
 
-- (IBAction)openLogger:(id)sender
+- (IBAction)openLogger:(id)__unused sender
 {
 	[self.loggerWindowController showWindow:nil];
 	
 	[self setRestorationForWindowController:self.loggerWindowController withWindowIdentifier:ZGLoggerIdentifier];
 }
 
-- (IBAction)openPreferences:(id)sender
+- (IBAction)openPreferences:(id)__unused sender
 {
 	if (self.preferencesController == nil)
 	{
@@ -210,7 +210,7 @@
 	[self.preferencesController showWindow:nil];
 }
 
-- (IBAction)checkForUpdates:(id)sender
+- (IBAction)checkForUpdates:(id)__unused sender
 {
 	[self.appUpdaterController checkForUpdates];
 }
@@ -239,31 +239,31 @@
 #pragma mark Links
 
 #define WIKI_URL @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki"
-- (IBAction)help:(id)sender
+- (IBAction)help:(id)__unused sender
 {	
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:WIKI_URL]];
 }
 
 #define ISSUES_TRACKER_URL @"https://bitbucket.org/zorgiepoo/bit-slicer/issues"
-- (IBAction)reportABug:(id)sender
+- (IBAction)reportABug:(id)__unused sender
 {
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:ISSUES_TRACKER_URL]];
 }
 
 #define FORUMS_URL @"http://portingteam.com/forum/157-bit-slicer/"
-- (IBAction)visitForums:(id)sender
+- (IBAction)visitForums:(id)__unused sender
 {
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:FORUMS_URL]];
 }
 
 #define FEEDBACK_EMAIL @"zorgiepoo@gmail.com"
-- (IBAction)sendFeedback:(id)sender
+- (IBAction)sendFeedback:(id)__unused sender
 {
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:[@"mailto:" stringByAppendingString:FEEDBACK_EMAIL]]];
 }
 
 #define DONATION_URL @"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A3DTDV2F3VE5G&lc=US&item_name=Bit%20Slicer%20App&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"
-- (IBAction)openDonationURL:(id)sender
+- (IBAction)openDonationURL:(id)__unused sender
 {
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:DONATION_URL]];
 }

@@ -94,7 +94,7 @@
 	self.watchProcess = nil;
 }
 
-- (void)applicationWillTerminate:(NSNotification *)notification
+- (void)applicationWillTerminate:(NSNotification *)__unused notification
 {
 	[self.breakPointController removeObserver:self];
 }
@@ -137,17 +137,17 @@
 	self.foundBreakPointAddresses = nil;
 }
 
-- (IBAction)stopWatchingAndAddInstructions:(id)sender
+- (IBAction)stopWatchingAndAddInstructions:(id)__unused sender
 {
 	[self stopWatchingAndInvokeCompletionHandler:YES];
 }
 
-- (IBAction)cancel:(id)sender
+- (IBAction)cancel:(id)__unused sender
 {
 	[self stopWatchingAndInvokeCompletionHandler:NO];
 }
 
-- (void)watchProcessDied:(NSNotification *)notification
+- (void)watchProcessDied:(NSNotification *)__unused notification
 {
 	if (self.foundVariables.count == 0)
 	{
@@ -350,12 +350,12 @@
 
 #pragma mark Table View
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
 {
 	return (NSInteger)self.foundVariables.count;
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (id)tableView:(NSTableView *)__unused tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if (rowIndex < 0 || (NSUInteger)rowIndex >= self.foundVariables.count)
 	{
@@ -379,7 +379,7 @@
 	return nil;
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
+- (void)tableView:(NSTableView *)__unused tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if (rowIndex < 0 || (NSUInteger)rowIndex >= self.foundVariables.count)
 	{
@@ -408,7 +408,7 @@
 	}
 }
 
-- (BOOL)selectionShouldChangeInTableView:(NSTableView *)aTableView
+- (BOOL)selectionShouldChangeInTableView:(NSTableView *)__unused tableView
 {
 	if (self.shouldIgnoreTableViewSelectionChange)
 	{
@@ -448,23 +448,23 @@
 
 #pragma mark Actions
 
-- (IBAction)copy:(id)sender
+- (IBAction)copy:(id)__unused sender
 {
 	[ZGVariableController copyVariablesToPasteboard:[self selectedVariables]];
 }
 
-- (IBAction)copyAddress:(id)sender
+- (IBAction)copyAddress:(id)__unused sender
 {
 	[ZGVariableController copyVariableAddress:[[self selectedVariables] objectAtIndex:0]];
 }
 
-- (IBAction)showMemoryViewer:(id)sender
+- (IBAction)showMemoryViewer:(id)__unused sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
 	[ZGNavigationPost postShowMemoryViewerWithProcess:self.watchProcess address:selectedVariable.address selectionLength:selectedVariable.size];
 }
 
-- (IBAction)showDebugger:(id)sender
+- (IBAction)showDebugger:(id)__unused sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
 	[ZGNavigationPost postShowDebuggerWithProcess:self.watchProcess address:selectedVariable.address];

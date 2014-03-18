@@ -68,19 +68,19 @@
 	[self updateConditionDisplay];
 }
 
-- (IBAction)changeCondition:(id)sender
+- (IBAction)changeCondition:(id)__unused sender
 {
 	[self.delegate breakPointCondition:[self.conditionTextField stringValue] didChangeAtAddress:self.targetAddress];
 }
 
-- (IBAction)cancel:(id)sender
+- (IBAction)cancel:(id)__unused sender
 {
 	[self.delegate breakPointConditionDidCancel];
 }
 
 // TODO: I will need to change this URL
 #define BREAKPOINT_CONDITION_SCRIPTING @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Conditional%20Breakpoints"
-- (IBAction)showHelp:(id)sender
+- (IBAction)showHelp:(id)__unused sender
 {
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:BREAKPOINT_CONDITION_SCRIPTING]];
 }

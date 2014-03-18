@@ -527,7 +527,7 @@ static ZGBreakPointController *gBreakPointController;
 					[breakPointsToNotify addObject:breakPoint];
 				}
 				
-				ZGFreeBytes(breakPoint.process.processTask, opcode, opcodeSize);
+				ZGFreeBytes(opcode, opcodeSize);
 			}
 			
 			handledInstructionBreakPoint = YES;
@@ -665,17 +665,17 @@ static ZGBreakPointController *gBreakPointController;
 	return handledInstructionBreakPoint;
 }
 
-kern_return_t  catch_mach_exception_raise_state(mach_port_t exception_port, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
+kern_return_t  catch_mach_exception_raise_state(mach_port_t __unused exception_port, exception_type_t __unused exception, exception_data_t __unused code, mach_msg_type_number_t __unused code_count, int * __unused flavor, thread_state_t __unused in_state, mach_msg_type_number_t __unused in_state_count, thread_state_t __unused out_state, mach_msg_type_number_t * __unused out_state_count)
 {
 	return KERN_FAILURE;
 }
 
-kern_return_t   catch_mach_exception_raise_state_identity(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count, int *flavor, thread_state_t in_state, mach_msg_type_number_t in_state_count, thread_state_t out_state, mach_msg_type_number_t *out_state_count)
+kern_return_t  catch_mach_exception_raise_state_identity(mach_port_t __unused exception_port, mach_port_t __unused thread, mach_port_t __unused task, exception_type_t __unused exception, exception_data_t __unused code, mach_msg_type_number_t __unused code_count, int * __unused flavor, thread_state_t __unused in_state, mach_msg_type_number_t __unused in_state_count, thread_state_t __unused out_state, mach_msg_type_number_t * __unused out_state_count)
 {
 	return KERN_FAILURE;
 }
 
-kern_return_t catch_mach_exception_raise(mach_port_t exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t code, mach_msg_type_number_t code_count)
+kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, mach_port_t thread, mach_port_t task, exception_type_t exception, exception_data_t __unused code, mach_msg_type_number_t __unused code_count)
 {
 	BOOL handledWatchPoint = NO;
 	BOOL handledInstructionBreakPoint = NO;

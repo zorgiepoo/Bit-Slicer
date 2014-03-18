@@ -64,7 +64,7 @@
 
 #pragma mark Memory Dump in Range
 
-- (IBAction)memoryDumpOkayButton:(id)sender
+- (IBAction)memoryDumpOkayButton:(id)__unused sender
 {
 	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:self.memoryDumpFromAddressTextField.stringValue];
 	ZGMemoryAddress fromAddress = ZGMemoryAddressFromExpression(fromAddressExpression);
@@ -93,7 +93,7 @@
 					 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
 					 success = [data writeToURL:savePanel.URL atomically:NO];
 					 
-					 ZGFreeBytes(self.memoryViewer.currentProcess.processTask, bytes, size);
+					 ZGFreeBytes(bytes, size);
 				 }
 				 else
 				 {
@@ -119,7 +119,7 @@
 	}
 }
 
-- (IBAction)memoryDumpCancelButton:(id)sender
+- (IBAction)memoryDumpCancelButton:(id)__unused sender
 {
 	[NSApp endSheet:self.memoryDumpWindow];
 	[self.memoryDumpWindow close];
@@ -228,7 +228,7 @@
 	 }];
 }
 
-- (IBAction)cancelDumpingAllMemory:(id)sender
+- (IBAction)cancelDumpingAllMemory:(id)__unused sender
 {
 	self.searchProgress.shouldCancelSearch = YES;
 	[self.memoryDumpProgressCancelButton setEnabled:NO];
@@ -242,9 +242,9 @@
 	self.progressIndicator.maxValue = self.searchProgress.maxProgress;
 }
 
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)__unused resultSet
 {
-	self.progressIndicator.doubleValue = self.searchProgress.progress;
+	self.progressIndicator.doubleValue = searchProgress.progress;
 }
 
 @end

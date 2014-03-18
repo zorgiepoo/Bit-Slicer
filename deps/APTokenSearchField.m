@@ -64,7 +64,7 @@
 }
 
 
-- (BOOL)textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector
+- (BOOL)textView:(NSTextView *)__unused textView doCommandBySelector:(SEL)commandSelector
 {
 	if (commandSelector == @selector(insertNewline:)) {
 		[self sendAction:self.action to:self.target];
@@ -295,7 +295,7 @@
 }
 
 
-- (void)textDidChange:(NSNotification *)notification
+- (void)textDidChange:(NSNotification *)__unused notification
 {
 	if (!self.sendsSearchStringOnlyAfterReturn)
 	{

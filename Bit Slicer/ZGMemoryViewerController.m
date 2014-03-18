@@ -270,7 +270,7 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataInspectorDeletedAllRows:) name:DataInspectorDidDeleteAllRows object:self.dataInspectorRepresenter];
 }
 
-- (IBAction)toggleDataInspector:(id)sender
+- (IBAction)toggleDataInspector:(id)__unused sender
 {
 	SEL action = self.showsDataInspector ? @selector(removeRepresenter:) : @selector(addRepresenter:);
 	
@@ -343,7 +343,7 @@
 	[self.textView.layoutRepresenter performLayout];
 }
 
-- (void)windowDidResize:(NSNotification *)notification
+- (void)windowDidResize:(NSNotification *)__unused notification
 {
 	[self relayoutAndResizeWindowPreservingBytesPerLine];
 }
@@ -359,7 +359,7 @@
 	self.textView.data = [NSData data];
 }
 
-- (IBAction)runningApplicationsPopUpButton:(id)sender
+- (IBAction)runningApplicationsPopUpButton:(id)__unused sender
 {
 	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
 	{
@@ -522,7 +522,7 @@
 		// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
 		[self.textView.layoutRepresenter performLayout];
 		
-		ZGFreeBytes(self.currentProcess.processTask, bytes, memorySize);
+		ZGFreeBytes(bytes, memorySize);
 		
 		if (desiredMemoryAddress == 0)
 		{
@@ -551,7 +551,7 @@
 	cleanupOnSuccess(YES);
 }
 
-- (IBAction)changeMemoryView:(id)sender
+- (IBAction)changeMemoryView:(id)__unused sender
 {
 	NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue];
 	
@@ -579,7 +579,7 @@
 	}
 }
 
-- (void)hexTextView:(HFTextView *)representer didChangeProperties:(HFControllerPropertyBits)properties
+- (void)hexTextView:(HFTextView *)__unused representer didChangeProperties:(HFControllerPropertyBits)properties
 {
 	if (properties & HFControllerContentValue && self.currentMemorySize > 0 && self.lastUpdateCount <= 0 && self.lastUpdatedData != nil)
 	{
@@ -629,7 +629,7 @@
 	}
 }
 
-- (void)updateDisplayTimer:(NSTimer *)timer
+- (void)updateDisplayTimer:(NSTimer *)__unused timer
 {
 	if (self.currentMemorySize > 0)
 	{
@@ -670,7 +670,7 @@
 				}
 				self.lastUpdateCount--;
 				
-				ZGFreeBytes(self.currentProcess.processTask, bytes, readSize);
+				ZGFreeBytes(bytes, readSize);
 			}
 		}
 	}
@@ -721,7 +721,7 @@
 
 #pragma mark Copying
 
-- (IBAction)copyAddress:(id)sender
+- (IBAction)copyAddress:(id)__unused sender
 {
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:[NSString stringWithFormat:@"0x%llX", [self selectedAddressRange].location] forType:NSStringPboardType];
@@ -729,19 +729,19 @@
 
 #pragma mark Memory Protection
 
-- (IBAction)changeMemoryProtection:(id)sender
+- (IBAction)changeMemoryProtection:(id)__unused sender
 {
 	[self.memoryProtectionController changeMemoryProtectionRequest];
 }
 
 #pragma mark Dumping Memory
 
-- (IBAction)dumpMemoryInRange:(id)sender
+- (IBAction)dumpMemoryInRange:(id)__unused sender
 {
 	[self.memoryDumpController memoryDumpRangeRequest];
 }
 
-- (IBAction)dumpAllMemory:(id)sender
+- (IBAction)dumpAllMemory:(id)__unused sender
 {
 	[self.memoryDumpController memoryDumpAllRequest];
 }

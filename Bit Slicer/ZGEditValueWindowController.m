@@ -164,7 +164,7 @@
 	 contextInfo:NULL];
 }
 
-- (IBAction)editValues:(id)sender
+- (IBAction)editValues:(id)__unused sender
 {
 	[NSApp endSheet:self.window];
 	[self.window close];
@@ -206,7 +206,7 @@
 	[self.variableController editVariables:validVariables newValues:newValues];
 }
 
-- (IBAction)cancelEditingValues:(id)sender
+- (IBAction)cancelEditingValues:(id)__unused sender
 {
 	[NSApp endSheet:self.window];
 	[self.window close];
