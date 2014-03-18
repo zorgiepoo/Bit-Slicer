@@ -1509,7 +1509,6 @@
 					"-Wno-missing-prototypes",
 					"-Wno-selector",
 					"-Wno-c++11-long-long",
-					"-Wno-newline-eof",
 					"-Werror",
 				);
 			};
@@ -1606,7 +1605,6 @@
 					"-Wno-missing-prototypes",
 					"-Wno-selector",
 					"-Wno-c++11-long-long",
-					"-Wno-newline-eof",
 					"-Werror",
 				);
 			};
