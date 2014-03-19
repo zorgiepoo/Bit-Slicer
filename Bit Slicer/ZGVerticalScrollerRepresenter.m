@@ -42,7 +42,7 @@
 {
 	if (linesInt == 0) return;
 	
-	long double lines = HFULToFP((unsigned)linesInt);
+	long double lines = HFULToFP((unsigned long long)linesInt);
 	
 	HFController *controller = [self controller];
 	//HFASSERT(controller != NULL);

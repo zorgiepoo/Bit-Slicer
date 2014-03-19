@@ -206,11 +206,11 @@ static void disassemblerTranslator(ud_t *object)
 			immediateOperand = self.startAddress + ud_insn_len(_object);
 			if (operandOffset >= 0)
 			{
-				immediateOperand += (unsigned)operandOffset;
+				immediateOperand += (uint64_t)operandOffset;
 			}
 			else
 			{
-				immediateOperand -= (unsigned)(-operandOffset);
+				immediateOperand -= (uint64_t)(-operandOffset);
 			}
 		}
 	}

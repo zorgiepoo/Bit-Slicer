@@ -74,7 +74,7 @@
 			[NSUserDefaults.standardUserDefaults setInteger:INVALID_KEY_CODE forKey:ZG_HOT_KEY];
 		}
 		
-		_pauseHotKeyCombo = (KeyCombo){.code = hotKeyCode, .flags = (unsigned)[NSUserDefaults.standardUserDefaults integerForKey:ZG_HOT_KEY_MODIFIER]};
+		_pauseHotKeyCombo = (KeyCombo){.code = hotKeyCode, .flags = (NSUInteger)[NSUserDefaults.standardUserDefaults integerForKey:ZG_HOT_KEY_MODIFIER]};
 		
 		[self registerPauseAndUnpauseHotKey];
 	}
@@ -85,8 +85,8 @@
 {
 	_pauseHotKeyCombo = pauseHotKeyCombo;
 	
-	[NSUserDefaults.standardUserDefaults setInteger:(signed)_pauseHotKeyCombo.code forKey:ZG_HOT_KEY];
-	[NSUserDefaults.standardUserDefaults setInteger:(signed)_pauseHotKeyCombo.flags forKey:ZG_HOT_KEY_MODIFIER];
+	[NSUserDefaults.standardUserDefaults setInteger:(NSInteger)_pauseHotKeyCombo.code forKey:ZG_HOT_KEY];
+	[NSUserDefaults.standardUserDefaults setInteger:(NSInteger)_pauseHotKeyCombo.flags forKey:ZG_HOT_KEY_MODIFIER];
 	
 	[self registerPauseAndUnpauseHotKey];
 }

@@ -138,7 +138,7 @@
 		self.addressTextField.stringValue = memoryViewerAddressField;
 	}
 	
-	self.currentMemoryAddress = (unsigned)[coder decodeInt64ForKey:ZGMemoryViewerAddress];
+	self.currentMemoryAddress = (uint64_t)[coder decodeInt64ForKey:ZGMemoryViewerAddress];
 	
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGMemoryViewerProcessInternalName];
 	

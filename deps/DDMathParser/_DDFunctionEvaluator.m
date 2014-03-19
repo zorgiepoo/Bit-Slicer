@@ -431,7 +431,7 @@ static NSString *const _DDFunctionSelectorSuffix = @":variables:error:";
 		return nil;
 	}
 	
-	int32_t random = (signed)arc4random_uniform((unsigned)(upperBound - lowerBound)) + lowerBound;
+	int32_t random = (int32_t)arc4random_uniform((u_int32_t)(upperBound - lowerBound)) + lowerBound;
 	
 	return [DDExpression numberExpressionWithNumber:@(random)];
 }

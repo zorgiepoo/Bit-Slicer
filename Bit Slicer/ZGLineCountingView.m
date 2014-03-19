@@ -104,7 +104,7 @@
 		int charCount = sprintf(buffer + bufferIndex, formatString, lineValue);
 #pragma clang diagnostic pop
 		HFASSERT(charCount > 0);
-		bufferIndex += (unsigned)charCount;
+		bufferIndex += (NSUInteger)charCount;
 		buffer[bufferIndex++] = '\n';   
 		lineValue += stride;
 	}
@@ -163,12 +163,12 @@ static inline int common_prefix_length(const char *a, const char *b)
 			HFASSERT(prefixLength <= newStringLength);
 			HFASSERT(prefixLength <= previousStringLength);
 			replacementRange = NSMakeRange((NSUInteger)prefixLength, (NSUInteger)(previousStringLength - prefixLength));
-			replacementCharacters = [[NSString alloc] initWithBytesNoCopy:buff + prefixLength length:(unsigned)(newStringLength - prefixLength) encoding:NSASCIIStringEncoding freeWhenDone:NO];
+			replacementCharacters = [[NSString alloc] initWithBytesNoCopy:buff + prefixLength length:(NSUInteger)(newStringLength - prefixLength) encoding:NSASCIIStringEncoding freeWhenDone:NO];
 			NSUInteger glyphCount;
 			[textStorage replaceCharactersInRange:replacementRange withString:replacementCharacters];
 			if (previousTextStorageCharacterCount == 0) {
 				NSDictionary *atts = [[NSDictionary alloc] initWithObjectsAndKeys:font, NSFontAttributeName, [NSColor colorWithCalibratedWhite:(CGFloat).1 alpha:(CGFloat).8], NSForegroundColorAttributeName, nil];
-				[textStorage setAttributes:atts range:NSMakeRange(0, (unsigned)newStringLength)];
+				[textStorage setAttributes:atts range:NSMakeRange(0, (NSUInteger)newStringLength)];
 				[atts release];
 			}
 			glyphCount = [layoutManager numberOfGlyphs];
@@ -176,7 +176,7 @@ static inline int common_prefix_length(const char *a, const char *b)
 				CGFloat maxX = NSMaxX([layoutManager lineFragmentUsedRectForGlyphAtIndex:glyphCount - 1 effectiveRange:NULL]);
 				[layoutManager drawGlyphsForGlyphRange:NSMakeRange(0, glyphCount) atPoint:NSMakePoint(textRect.origin.x + textRect.size.width - maxX, textRect.origin.y)];
 			}
-			previousTextStorageCharacterCount = (unsigned)newStringLength;
+			previousTextStorageCharacterCount = (NSUInteger)newStringLength;
 			[replacementCharacters release];
 			memcpy(previousBuff, buff, newStringLength + 1);
 			previousStringLength = newStringLength;
@@ -221,7 +221,7 @@ static inline int common_prefix_length(const char *a, const char *b)
 			int newStringLength = snprintf(buff, sizeof buff, formatString, lineValue);
 #pragma clang diagnostic pop
 			HFASSERT(newStringLength > 0);
-			NSString *string = [[NSString alloc] initWithBytesNoCopy:buff length:(unsigned)newStringLength encoding:NSASCIIStringEncoding freeWhenDone:NO];
+			NSString *string = [[NSString alloc] initWithBytesNoCopy:buff length:(NSUInteger)newStringLength encoding:NSASCIIStringEncoding freeWhenDone:NO];
 			[string drawInRect:textRect withAttributes:textAttributes];
 			[string release];
 		}

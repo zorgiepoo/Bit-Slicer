@@ -65,13 +65,13 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGScriptCachePathKey @"ZGScriptCachePathKey"
 
 - (void)encodeWithCoder:(NSCoder *)coder
-{	
+{
 	[coder
-	 encodeInt64:(signed)self.address
+	 encodeInt64:(int64_t)self.address
 	 forKey:ZGAddressKey];
 	
 	[coder
-	 encodeInt64:(signed)self.size
+	 encodeInt64:(int64_t)self.size
 	 forKey:ZGSizeKey];
 	
 	[coder
@@ -140,10 +140,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	self.address = (unsigned)[coder decodeInt64ForKey:ZGAddressKey];
+	self.address = (uint64_t)[coder decodeInt64ForKey:ZGAddressKey];
+	
 	[self setAddressStringValue:nil];
 	
-	self.size = (unsigned)[coder decodeInt64ForKey:ZGSizeKey];
+	self.size = (uint64_t)[coder decodeInt64ForKey:ZGSizeKey];
 	self.enabled = [coder decodeBoolForKey:ZGEnabledKey];
 	self.isFrozen = [coder decodeBoolForKey:ZGIsFrozenKey];
 	self.type = (ZGVariableType)[coder decodeInt32ForKey:ZGTypeKey];

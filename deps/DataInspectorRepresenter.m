@@ -698,7 +698,7 @@ static NSAttributedString *inspectionError(NSString *s) {
     [existingInspectors release];
     
     NSInteger clickedRow = [table clickedRow];
-    [inspectors insertObject:ins atIndex:(unsigned)(clickedRow + 1)];
+    [inspectors insertObject:ins atIndex:(NSUInteger)(clickedRow + 1)];
     [ins release];
     [self saveDefaultInspectors];
     [self resizeTableViewAfterChangingRowCount];
@@ -713,7 +713,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 		NSInteger clickedRow = [table clickedRow];
 		if (clickedRow >= 0)
 		{
-			[inspectors removeObjectAtIndex:(unsigned)clickedRow];
+			[inspectors removeObjectAtIndex:(NSUInteger)clickedRow];
 			[self saveDefaultInspectors];
 			[self resizeTableViewAfterChangingRowCount];
 		}
@@ -723,9 +723,9 @@ static NSAttributedString *inspectionError(NSString *s) {
 - (IBAction)doubleClickedTable:(id)sender {
 #pragma unused(sender)
     NSInteger column = [table clickedColumn], row = [table clickedRow];
-    if (column >= 0 && row >= 0 && [[(NSTableColumn *)[[table tableColumns] objectAtIndex:(unsigned)column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
+    if (column >= 0 && row >= 0 && [[(NSTableColumn *)[[table tableColumns] objectAtIndex:(NSUInteger)column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
 	BOOL isError;
-	[self valueFromInspector:[inspectors objectAtIndex:(unsigned)row] isError:&isError];
+	[self valueFromInspector:[inspectors objectAtIndex:(NSUInteger)row] isError:&isError];
 	if (! isError) {
 	    [table editColumn:column row:row withEvent:[NSApp currentEvent] select:YES];
 	}
@@ -743,7 +743,7 @@ static NSAttributedString *inspectionError(NSString *s) {
     NSUInteger byteCount = [self selectedByteCountForEditing];
     if (byteCount == INVALID_EDITING_BYTE_COUNT) return NO;
     
-    DataInspector *inspector = [inspectors objectAtIndex:(unsigned)row];
+    DataInspector *inspector = [inspectors objectAtIndex:(NSUInteger)row];
     return [inspector acceptStringValue:[fieldEditor string] replacingByteCount:byteCount intoData:NULL];
 }
 

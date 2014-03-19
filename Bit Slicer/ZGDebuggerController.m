@@ -1398,7 +1398,7 @@ enum ZGStepExecution
 	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
 	if (visibleRowsRange.location + visibleRowsRange.length / 2 < selectionRow)
 	{
-		[self.instructionsTableView scrollRowToVisible:(signed)MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
+		[self.instructionsTableView scrollRowToVisible:(NSInteger)MIN(selectionRow + visibleRowsRange.length / 2, self.instructions.count-1)];
 	}
 	else if (visibleRowsRange.location + visibleRowsRange.length / 2 > selectionRow)
 	{
@@ -1409,7 +1409,7 @@ enum ZGStepExecution
 		}
 		else
 		{
-			[self.instructionsTableView scrollRowToVisible:(signed)(selectionRow - visibleRowsRange.length / 2)];
+			[self.instructionsTableView scrollRowToVisible:(NSInteger)(selectionRow - visibleRowsRange.length / 2)];
 		}
 	}
 }
@@ -1452,7 +1452,7 @@ enum ZGStepExecution
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
 {
-	return (signed)self.instructions.count;
+	return (NSInteger)self.instructions.count;
 }
 
 - (id)tableView:(NSTableView *)__unused tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
