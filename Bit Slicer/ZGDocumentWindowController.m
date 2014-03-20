@@ -168,10 +168,6 @@
 	[[NSWorkspace sharedWorkspace]
 	 removeObserver:self
 	 forKeyPath:@"runningApplications"];
-	
-	[self.searchController cleanUp];
-	[self.tableController cleanUp];
-	[self.scriptManager cleanup];
 }
 
 - (void)setupScopeBar
@@ -386,6 +382,10 @@
 		}
 		
 		[self.processList unrequestPollingWithObserver:self];
+
+		[self.searchController cleanUp];
+		[self.tableController cleanUp];
+		[self.scriptManager cleanup];
 	}
 }
 
