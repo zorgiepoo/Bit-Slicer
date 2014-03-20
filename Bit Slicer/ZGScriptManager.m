@@ -64,7 +64,7 @@
 
 @property (nonatomic) NSMutableDictionary *scriptsDictionary;
 @property (nonatomic) VDKQueue *fileWatchingQueue;
-@property (nonatomic, weak) ZGDocumentWindowController *windowController;
+@property (nonatomic, assign) ZGDocumentWindowController *windowController;
 @property (atomic) dispatch_source_t scriptTimer;
 @property (atomic) NSMutableArray *runningScripts;
 @property (nonatomic) NSMutableArray *objectsPool;

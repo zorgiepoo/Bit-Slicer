@@ -54,7 +54,7 @@
 
 @interface ZGDocumentSearchController ()
 
-@property (nonatomic, weak) ZGDocumentWindowController *windowController;
+@property (nonatomic, assign) ZGDocumentWindowController *windowController;
 @property (nonatomic) ZGSearchProgress *searchProgress;
 @property (nonatomic) ZGSearchResults *temporarySearchResults;
 @property (nonatomic) ZGStoredData *tempSavedData;
