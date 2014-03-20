@@ -106,10 +106,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	return self.undoManager;
 }
 
-- (void)windowDidAppearForFirstTime:(id)__unused sender
-{
-}
-
 - (double)displayMemoryTimeInterval
 {
 	return 0.5;
