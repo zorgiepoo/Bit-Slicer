@@ -244,7 +244,7 @@
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:WIKI_URL]];
 }
 
-#define ISSUES_TRACKER_URL @"https://bitbucket.org/zorgiepoo/bit-slicer/issues"
+#define ISSUES_TRACKER_URL @"https://github.com/zorgiepoo/Bit-Slicer/issues"
 - (IBAction)reportABug:(id)__unused sender
 {
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:ISSUES_TRACKER_URL]];
