@@ -32,8 +32,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// This is the superclass of ZGDebugController and ZGMemoryViewerController, which contains a lot of functionality that both classes use
-
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
@@ -43,12 +41,6 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 @class ZGProcess;
 @class ZGProcessTaskManager;
 
-enum ZGNavigation
-{
-	ZGNavigationBack,
-	ZGNavigationForward
-};
-
 @interface ZGMemoryWindowController : NSWindowController
 {
 	ZGProcess *_currentProcess;
@@ -56,19 +48,13 @@ enum ZGNavigation
 
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
 
-@property (nonatomic, weak) id debuggerController;
+@property (nonatomic, assign) id debuggerController;
 
 @property (nonatomic, assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
-@property (nonatomic, assign) IBOutlet NSSegmentedControl *navigationSegmentedControl;
-@property (nonatomic, assign) IBOutlet NSTextField *addressTextField;
 
 @property (nonatomic) NSUndoManager *undoManager;
-@property (nonatomic) NSUndoManager *navigationManager;
 
-@property (nonatomic) ZGMemoryAddress currentMemoryAddress;
-@property (nonatomic) ZGMemorySize currentMemorySize;
-
-@property (nonatomic, readonly) ZGProcess *currentProcess;
+@property (nonatomic) ZGProcess *currentProcess;
 @property (nonatomic, copy) NSString *desiredProcessInternalName;
 
 @property (nonatomic) NSTimer *updateDisplayTimer;
@@ -84,13 +70,6 @@ enum ZGNavigation
 - (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification;
 
 - (void)switchProcess;
-
-- (IBAction)goBack:(id)sender;
-- (IBAction)goForward:(id)sender;
-- (IBAction)navigate:(id)sender;
-
-- (BOOL)canEnableNavigationButtons;
-- (void)updateNavigationButtons;
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem;
 

@@ -31,6 +31,7 @@
 		772C0F8318B95603009FFF72 /* ZGBacktraceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 772C0F8118B95603009FFF72 /* ZGBacktraceViewController.xib */; };
 		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
 		7730999E18660A29008B71DA /* ZGDocumentOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */; };
+		7735B05518DAB3E8000371AA /* ZGMemoryNavigationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7735B05418DAB3E8000371AA /* ZGMemoryNavigationWindowController.m */; };
 		773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972EF17D2E6AE00B958EE /* mach_excServer.c */; };
 		773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972F017D2E6AE00B958EE /* mach_excUser.c */; };
 		773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -219,6 +220,8 @@
 		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; };
 		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; };
 		7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGDocumentOptionsViewController.xib; path = "Bit Slicer/ZGDocumentOptionsViewController.xib"; sourceTree = "<group>"; };
+		7735B05318DAB3E8000371AA /* ZGMemoryNavigationWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryNavigationWindowController.h; path = "Bit Slicer/ZGMemoryNavigationWindowController.h"; sourceTree = "<group>"; };
+		7735B05418DAB3E8000371AA /* ZGMemoryNavigationWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMemoryNavigationWindowController.m; path = "Bit Slicer/ZGMemoryNavigationWindowController.m"; sourceTree = "<group>"; };
 		773972DC17D2E67D00B958EE /* extern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = extern.h; path = deps/libudis86/extern.h; sourceTree = "<group>"; };
 		773972E017D2E67D00B958EE /* itab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = itab.h; path = deps/libudis86/itab.h; sourceTree = "<group>"; };
 		773972E517D2E67D00B958EE /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = deps/libudis86/types.h; sourceTree = "<group>"; };
@@ -995,6 +998,8 @@
 			children = (
 				77F1163B17D2EF8E009E002A /* ZGMemoryWindowController.h */,
 				77F1163C17D2EF8E009E002A /* ZGMemoryWindowController.m */,
+				7735B05318DAB3E8000371AA /* ZGMemoryNavigationWindowController.h */,
+				7735B05418DAB3E8000371AA /* ZGMemoryNavigationWindowController.m */,
 				77329B5A168D07B6007DCAE2 /* Debugger */,
 				77D5AEAC137C6FC000026388 /* Memory Viewer */,
 			);
@@ -1310,6 +1315,7 @@
 				77F1161217D2EEE1009E002A /* ZGSearchProgress.m in Sources */,
 				77F1161517D2EEEC009E002A /* ZGSearchResults.m in Sources */,
 				7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */,
+				7735B05518DAB3E8000371AA /* ZGMemoryNavigationWindowController.m in Sources */,
 				771A3F4518CC0B0900D19676 /* ZGDocumentController.m in Sources */,
 				77F1161817D2EEF6009E002A /* ZGSearchFunctions.mm in Sources */,
 				77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */,

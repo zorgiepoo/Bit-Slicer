@@ -65,7 +65,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 		self.processTaskManager = processTaskManager;
 		
 		self.undoManager = [[NSUndoManager alloc] init];
-		self.navigationManager = [[NSUndoManager alloc] init];
 		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
@@ -193,8 +192,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 			[self.processList requestPollingWithObserver:self];
 		}
 	}
-	
-	[self updateNavigationButtons];
 }
 
 #pragma mark Death
@@ -322,8 +319,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	{
 		[self currentProcessChanged];
 	}
-	
-	[self updateNavigationButtons];
 }
 
 - (void)updateRunningProcesses
@@ -394,55 +389,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
-	
-	[self.navigationManager removeAllActions];
-	[self updateNavigationButtons];
-}
-
-#pragma mark Navigation
-
-- (IBAction)goBack:(id)__unused sender
-{
-	[self.navigationManager undo];
-	[self updateNavigationButtons];
-}
-
-- (IBAction)goForward:(id)__unused sender
-{
-	[self.navigationManager redo];
-	[self updateNavigationButtons];
-}
-
-- (IBAction)navigate:(id)sender
-{
-	switch ([sender selectedSegment])
-	{
-		case ZGNavigationBack:
-			[self goBack:nil];
-			break;
-		case ZGNavigationForward:
-			[self goForward:nil];
-			break;
-	}
-}
-
-- (BOOL)canEnableNavigationButtons
-{
-	return self.currentProcess.valid;
-}
-
-- (void)updateNavigationButtons
-{
-	if ([self canEnableNavigationButtons])
-	{
-		[self.navigationSegmentedControl setEnabled:self.navigationManager.canUndo forSegment:ZGNavigationBack];
-		[self.navigationSegmentedControl setEnabled:self.navigationManager.canRedo forSegment:ZGNavigationForward];
-	}
-	else
-	{
-		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationBack];
-		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationForward];
-	}
 }
 
 #pragma mark Pausing
@@ -476,18 +422,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 		}
 		
 		if ([self.debuggerController isProcessIdentifierHalted:self.currentProcess.processID])
-		{
-			return NO;
-		}
-	}
-	else if (userInterfaceItem.action == @selector(goBack:) || userInterfaceItem.action == @selector(goForward:))
-	{
-		if (![self canEnableNavigationButtons])
-		{
-			return NO;
-		}
-		
-		if ((userInterfaceItem.action == @selector(goBack:) && !self.navigationManager.canUndo) || (userInterfaceItem.action == @selector(goForward:) && !self.navigationManager.canRedo))
 		{
 			return NO;
 		}

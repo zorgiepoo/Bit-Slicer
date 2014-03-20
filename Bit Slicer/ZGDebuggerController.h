@@ -34,7 +34,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
-#import "ZGMemoryWindowController.h"
+#import "ZGMemoryNavigationWindowController.h"
 #import "ZGCodeInjectionWindowController.h"
 #import "ZGBreakPointDelegate.h"
 #import "ZGBreakPointConditionViewController.h"
@@ -47,7 +47,7 @@
 @class ZGBreakPointController;
 @class ZGLoggerWindowController;
 
-@interface ZGDebuggerController : ZGMemoryWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate>
+@interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate>
 
 // This method is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
 + (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process withBreakPoints:(NSArray *)breakPoints;
