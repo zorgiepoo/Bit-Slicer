@@ -40,7 +40,7 @@ It allows you to cheat in video games by searching and modifying values such as 
 
 ## Support & Feedback
 * Check the [wiki](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/) for how to use Bit Slicer
-* Report bugs or request features on the [bug tracker](https://bitbucket.org/zorgiepoo/bit-slicer/issues)
+* Report bugs or request features on the [bug tracker](https://github.com/zorgiepoo/Bit-Slicer/issues)
 * Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for discussion and current development
 * Or send an email to zorgiepoo (at) gmail (dot) com
 
