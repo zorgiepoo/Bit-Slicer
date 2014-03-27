@@ -183,7 +183,10 @@ enum ZGStepExecution
 {
     [super windowDidLoad];
 	
-	[self setupProcessListNotificationsAndPopUpButton];
+	[self setupProcessListNotifications];
+
+	self.desiredProcessInternalName = self.lastChosenInternalProcessName;
+	[self updateRunningProcesses];
 	
 	[self.instructionsTableView registerForDraggedTypes:@[ZGVariablePboardType]];
 	

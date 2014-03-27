@@ -264,16 +264,9 @@
 	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
 	
 	[self.generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
-	
+
+	[self setupProcessListNotifications];
 	[self loadDocumentUserInterface];
-
-	[self setupProcessListNotificationsAndPopUpButton];
-	[self updateWindow];
-}
-
-- (NSString *)preferredInternalProcessName
-{
-	return (self.documentData.desiredProcessInternalName != nil) ? self.documentData.desiredProcessInternalName : self.lastChosenInternalProcessName;
 }
 
 - (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess
@@ -345,9 +338,9 @@
 
 - (BOOL)shouldStartProcessActivity
 {
-	BOOL shouldKeepWatchVariablesTimer = [self.tableController updateWatchVariablesTimer];
+	[self.tableController updateWatchVariablesTimer];
 
-	return shouldKeepWatchVariablesTimer || self.searchController.canCancelTask;
+	return YES;
 }
 
 - (BOOL)shouldStopProcessActivity
@@ -383,8 +376,18 @@
 	[self setStatusString:valuesDisplayedString];
 }
 
+- (void)setDesiredProcessInternalName:(NSString *)desiredProcessInternalName
+{
+	[super setDesiredProcessInternalName:desiredProcessInternalName];
+	self.documentData.desiredProcessInternalName = desiredProcessInternalName;
+}
+
 - (void)loadDocumentUserInterface
 {
+	self.desiredProcessInternalName = (self.documentData.desiredProcessInternalName != nil) ? self.documentData.desiredProcessInternalName : self.lastChosenInternalProcessName;
+
+	[self updateRunningProcesses];
+
 	[self updateNumberOfValuesDisplayedStatus];
 	
 	[self.variableController disableHarmfulVariables:self.documentData.variables];

@@ -185,8 +185,14 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 {
 	[self destroyUpdateDisplayTimer];
 	
-	[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
-	[self.processList unrequestPollingWithObserver:self];
+	if (self.currentProcess.valid)
+	{
+		[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+	}
+	else
+	{
+		[self.processList unrequestPollingWithObserver:self];
+	}
 }
 
 - (void)updateOcclusionActivity
@@ -267,18 +273,9 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 #pragma mark Process Handling
 
-- (NSString *)preferredInternalProcessName
-{
-	return self.lastChosenInternalProcessName;
-}
-
-- (void)setupProcessListNotificationsAndPopUpButton
+- (void)setupProcessListNotifications
 {
 	self.processList = [[ZGProcessList alloc] initWithProcessTaskManager:self.processTaskManager];
-	
-	// Add processes to popup button
-	self.desiredProcessInternalName = [self preferredInternalProcessName];
-	[self updateRunningProcesses];
 	
 	[self.processList
 	 addObserver:self

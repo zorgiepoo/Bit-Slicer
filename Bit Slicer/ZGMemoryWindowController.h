@@ -67,15 +67,13 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 
 @property (nonatomic, readonly) BOOL isOccluded;
 
-- (NSString *)preferredInternalProcessName;
-
 - (IBAction)pauseOrUnpauseProcess:(id)sender;
 
 - (void)updateWindow;
 
 - (void)windowWillClose:(NSNotification *)notification;
 
-- (void)setupProcessListNotificationsAndPopUpButton;
+- (void)setupProcessListNotifications;
 
 - (BOOL)hasDefaultUpdateDisplayTimer;
 - (void)updateOcclusionActivity;

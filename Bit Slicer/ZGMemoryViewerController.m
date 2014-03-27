@@ -96,7 +96,7 @@
 
 #pragma mark Current Process Changed
 
-- (void)currentProcessChanged
+- (void)currentProcessChangedWithOldProcess:(ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
 {
 	[self changeMemoryView:nil];
 }
@@ -148,6 +148,8 @@
 
 - (void)windowDidLoad
 {
+	[super windowDidLoad];
+
 	// So, I've no idea what HFTextView does by default, remove any type of representer that it might have and that we want to add
 	NSMutableArray *representersToRemove = [[NSMutableArray alloc] init];
 	
@@ -197,8 +199,11 @@
 	{
 		[self toggleDataInspector:nil];
 	}
-	
-	[self setupProcessListNotificationsAndPopUpButton];
+
+	[self setupProcessListNotifications];
+
+	self.desiredProcessInternalName = self.lastChosenInternalProcessName;
+	[self updateRunningProcesses];
 }
 
 - (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory
