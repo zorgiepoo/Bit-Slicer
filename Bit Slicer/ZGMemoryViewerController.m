@@ -359,14 +359,6 @@
 	self.textView.data = [NSData data];
 }
 
-- (IBAction)runningApplicationsPopUpButton:(id)__unused sender
-{
-	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
-	{
-		[self switchProcess];
-	}
-}
-
 #pragma mark Reading from Memory
 
 - (void)updateMemoryViewerAtAddress:(ZGMemoryAddress)desiredMemoryAddress withSelectionLength:(ZGMemorySize)selectionLength

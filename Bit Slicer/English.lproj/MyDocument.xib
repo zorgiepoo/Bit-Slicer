@@ -645,10 +645,10 @@
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
                                 <menu key="menu" title="OtherViews" id="a2r-06-14a"/>
+                                <connections>
+                                    <action selector="runningApplicationsPopUpButton:" target="-2" id="SGA-if-PXe"/>
+                                </connections>
                             </popUpButtonCell>
-                            <connections>
-                                <action selector="runningApplicationsPopUpButtonRequest:" target="-2" id="qkV-qn-pLi"/>
-                            </connections>
                         </popUpButton>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="41602B2F-FA2E-443A-88AC-9DAD73A95550" label="Data Type" paletteLabel="Data Type" id="70m-RL-vim">

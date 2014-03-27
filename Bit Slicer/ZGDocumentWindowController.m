@@ -64,6 +64,7 @@
 #import "ZGUtilities.h"
 #import "ZGTableView.h"
 #import "ZGNavigationPost.h"
+#import "NSArrayAdditions.h"
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
@@ -89,8 +90,6 @@
 @property (nonatomic) NSString *flagsStringValue;
 @property (nonatomic) NSString *flagsLabelStringValue;
 
-@property (nonatomic) ZGProcessList *processList;
-@property (nonatomic) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic) ZGDebuggerController *debuggerController;
 @property (nonatomic) ZGBreakPointController *breakPointController;
 @property (nonatomic) ZGMemoryViewerController *memoryViewer;
@@ -123,51 +122,28 @@
 
 - (id)initWithDocument:(ZGDocument *)document
 {
-	self = [super initWithWindowNibName:@"MyDocument"];
+	self = [super initWithProcessTaskManager:document.processTaskManager];
 	if (self != nil)
 	{
-		// Still need to observe this for reliably fetching icon and localized name
-		[[NSWorkspace sharedWorkspace]
-		 addObserver:self
-		 forKeyPath:@"runningApplications"
-		 options:NSKeyValueObservingOptionNew
-		 context:NULL];
-		
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(lastChosenInternalProcessNameChanged:)
-		 name:ZGLastChosenInternalProcessNameNotification
-		 object:nil];
-		
 		self.lastChosenInternalProcessName = document.lastChosenInternalProcessName;
 		
-		self.processTaskManager = document.processTaskManager;
 		self.debuggerController = document.debuggerController;
 		self.breakPointController = document.breakPointController;
 		self.loggerWindowController = document.loggerWindowController;
-		
-		self.processList = [[ZGProcessList alloc] initWithProcessTaskManager:self.processTaskManager];
-		
-		[self.processList
-		 addObserver:self
-		 forKeyPath:@"runningProcesses"
-		 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-		 context:NULL];
 	}
 	return self;
 }
 
+- (NSString *)windowNibName
+{
+	return @"MyDocument";
+}
+
 - (void)dealloc
 {
-	[NSNotificationCenter.defaultCenter removeObserver:self];
-	
-	[self.processList
-	 removeObserver:self
-	 forKeyPath:@"runningProcesses"];
-	
-	[[NSWorkspace sharedWorkspace]
-	 removeObserver:self
-	 forKeyPath:@"runningApplications"];
+	[self.searchController cleanUp];
+	[self.tableController cleanUp];
+	[self.scriptManager cleanup];
 }
 
 - (void)setupScopeBar
@@ -253,22 +229,9 @@
 			for (ZGVariable *variable in self.documentData.variables)
 			{
 				variable.byteOrder = newByteOrder;
-				switch (variable.type)
+				if (ZGSupportsEndianness(variable.type))
 				{
-					case ZGInt16:
-					case ZGInt32:
-					case ZGInt64:
-					case ZGFloat:
-					case ZGDouble:
-					case ZGPointer:
-					case ZGString16:
-						[variable updateStringValue];
-						break;
-					case ZGInt8:
-					case ZGByteArray:
-					case ZGString8:
-					case ZGScript:
-						break;
+					[variable updateStringValue];
 				}
 			}
 			
@@ -302,126 +265,127 @@
 	
 	[self.generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	
-	if ([self.window respondsToSelector:@selector(occlusionState)])
-	{
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(windowDidChangeOcclusionState:)
-		 name:NSWindowDidChangeOcclusionStateNotification
-		 object:self.window];
-	}
-	
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(runningApplicationsPopUpButtonWillPopUp:)
-	 name:NSPopUpButtonWillPopUpNotification
-	 object:self.runningApplicationsPopUpButton];
-	
 	[self loadDocumentUserInterface];
+
+	[self setupProcessListNotificationsAndPopUpButton];
+	[self updateWindow];
 }
 
-- (void)updateObservingProcessOcclusionState
+- (NSString *)preferredInternalProcessName
 {
-	if ([self.window respondsToSelector:@selector(occlusionState)])
+	return (self.documentData.desiredProcessInternalName != nil) ? self.documentData.desiredProcessInternalName : self.lastChosenInternalProcessName;
+}
+
+- (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess
+{
+	for (ZGVariable *variable in self.documentData.variables)
 	{
-		BOOL shouldKeepWatchVariablesTimer = [self.tableController updateWatchVariablesTimer];
-		if (self.isOccluded && !shouldKeepWatchVariablesTimer && !self.searchController.canCancelTask)
+		if (variable.enabled)
 		{
-			BOOL foundRunningScript = NO;
-			for (ZGVariable *variable in self.documentData.variables)
+			if (variable.type == ZGScript)
 			{
-				if (variable.enabled && variable.type == ZGScript)
-				{
-					foundRunningScript = YES;
-					break;
-				}
+				[self.scriptManager stopScriptForVariable:variable];
 			}
-			
-			if (!foundRunningScript)
+			else if (variable.isFrozen)
 			{
-				if (self.currentProcess.valid)
-				{
-					[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
-				}
-				
-				[self.processList unrequestPollingWithObserver:self];
-			}
-		}
-		else if (!self.isOccluded)
-		{
-			if (self.currentProcess.valid)
-			{
-				[self.processList addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
-			}
-			else
-			{
-				[self.processList requestPollingWithObserver:self];
+				variable.enabled = NO;
 			}
 		}
 	}
-}
 
-- (void)windowDidChangeOcclusionState:(NSNotification *)__unused notification
-{
-	self.isOccluded = (self.window.occlusionState & NSWindowOcclusionStateVisible) == 0;
-	if (!self.isOccluded)
+	[self.undoManager removeAllActions];
+
+	[self.tableController clearCache];
+
+	for (ZGVariable *variable in self.documentData.variables)
 	{
-		[self.processList retrieveList];
-		[self.tableController.variablesTableView reloadData];
+		variable.finishedEvaluatingDynamicAddress = NO;
+		variable.value = NULL;
 	}
-	[self updateObservingProcessOcclusionState];
-}
 
-- (void)windowWillClose:(NSNotification *)notification
-{
-	if ([notification object] == self.window)
+	if (oldProcess.is64Bit != newProcess.is64Bit)
 	{
-		if (self.currentProcess.valid)
+		for (ZGVariable *variable in self.documentData.variables)
 		{
-			[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+			if (variable.type == ZGPointer)
+			{
+				variable.pointerSize = self.currentProcess.pointerSize;
+			}
 		}
-		
-		[self.processList unrequestPollingWithObserver:self];
+	}
 
-		[self.searchController cleanUp];
-		[self.tableController cleanUp];
-		[self.scriptManager cleanup];
+	if (oldProcess.valid && newProcess.valid)
+	{
+		[self markDocumentChange];
+	}
+
+	[self.tableController updateWatchVariablesTimer];
+
+	[self.tableController.variablesTableView reloadData];
+
+	self.storeValuesButton.enabled = newProcess.valid;
+
+	if (oldProcess.valid && !newProcess.valid)
+	{
+		if (self.searchController.canCancelTask && !self.searchController.searchProgress.shouldCancelSearch)
+		{
+			[self.searchController cancelTask];
+		}
+
+		[[NSNotificationCenter defaultCenter]
+		 postNotificationName:ZGTargetProcessDiedNotification
+		 object:newProcess];
 	}
 }
 
-- (void)setStatus:(id)status
+- (BOOL)hasDefaultUpdateDisplayTimer
 {
-	if (status == nil)
+	return NO;
+}
+
+- (BOOL)shouldStartProcessActivity
+{
+	BOOL shouldKeepWatchVariablesTimer = [self.tableController updateWatchVariablesTimer];
+
+	return shouldKeepWatchVariablesTimer || self.searchController.canCancelTask;
+}
+
+- (BOOL)shouldStopProcessActivity
+{
+	BOOL shouldKeepWatchVariablesTimer = [self.tableController updateWatchVariablesTimer];
+
+	BOOL foundRunningScript = [self.documentData.variables zgHasObjectMatchingCondition:(zg_has_object_t)^(ZGVariable *variable) {
+		return (variable.enabled && variable.type == ZGScript);
+	}];
+
+	return !shouldKeepWatchVariablesTimer && self.searchController.canStartTask && !foundRunningScript;
+}
+
+- (void)setStatusString:(NSString *)statusString
+{
+	[self.generalStatusTextField setStringValue:statusString];
+}
+
+- (void)updateNumberOfValuesDisplayedStatus
+{
+	NSUInteger variableCount = self.documentData.variables.count + self.searchController.searchResults.addressCount;
+	
+	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
+	numberOfVariablesFormatter.format = @"#,###";
+	
+	NSString *valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
+	
+	if (variableCount != 1)
 	{
-		NSUInteger variableCount = self.documentData.variables.count + self.searchController.searchResults.addressCount;
-		
-		NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
-		numberOfVariablesFormatter.format = @"#,###";
-		
-		NSString *valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
-		
-		if (variableCount != 1)
-		{
-			valuesDisplayedString = [valuesDisplayedString stringByAppendingString:@"s"];
-		}
-		
-		[self.generalStatusTextField setStringValue:valuesDisplayedString];
+		valuesDisplayedString = [valuesDisplayedString stringByAppendingString:@"s"];
 	}
-	else if ([status isKindOfClass:[NSString class]])
-	{
-		[self.generalStatusTextField setStringValue:status];
-	}
-	else if ([status isKindOfClass:[NSAttributedString class]])
-	{
-		[self.generalStatusTextField setAttributedStringValue:status];
-	}
+	
+	[self setStatusString:valuesDisplayedString];
 }
 
 - (void)loadDocumentUserInterface
 {
-	[self setStatus:nil];
-	
-	[self addProcessesToPopupButton];
+	[self updateNumberOfValuesDisplayedStatus];
 	
 	[self.variableController disableHarmfulVariables:self.documentData.variables];
 	[self updateVariables:self.documentData.variables searchResults:nil];
@@ -521,339 +485,6 @@
 }
 
 #pragma mark Watching other applications
-
-- (void)lastChosenInternalProcessNameChanged:(NSNotification *)notification
-{
-	if (notification.object != self)
-	{
-		self.lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
-	}
-}
-
-- (void)postLastChosenInternalProcessNameChange
-{
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:ZGLastChosenInternalProcessNameNotification
-	 object:self
-	 userInfo:@{ZGLastChosenInternalProcessNameKey : self.lastChosenInternalProcessName}];
-}
-
-- (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)__unused notification
-{
-	[self.processList retrieveList];
-}
-
-- (IBAction)runningApplicationsPopUpButtonRequest:(id)sender
-{
-	BOOL pointerSizeChanged = YES;
-	
-	if (self.runningApplicationsPopUpButton.selectedItem.representedObject != self.currentProcess)
-	{
-		if (self.runningApplicationsPopUpButton.selectedItem.representedObject && self.currentProcess && [self.runningApplicationsPopUpButton.selectedItem.representedObject is64Bit] != self.currentProcess.is64Bit)
-		{
-			pointerSizeChanged = YES;
-		}
-		
-		for (ZGVariable *variable in self.documentData.variables)
-		{
-			if (variable.enabled)
-			{
-				if (variable.type == ZGScript)
-				{
-					[self.scriptManager stopScriptForVariable:variable];
-				}
-				else if (variable.isFrozen)
-				{
-					variable.enabled = NO;
-				}
-			}
-			
-			variable.finishedEvaluatingDynamicAddress = NO;
-		}
-		
-		// this is about as far as we go when it comes to undo/redos...
-		[self.undoManager removeAllActions];
-		
-		[self.tableController clearCache];
-	}
-	
-	if (self.currentProcess)
-	{
-		[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
-	}
-	
-	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
-	
-	if (pointerSizeChanged)
-	{
-		// Update the pointer variable sizes
-		for (ZGVariable *variable in self.documentData.variables)
-		{
-			if (variable.type == ZGPointer)
-			{
-				variable.pointerSize = self.currentProcess.pointerSize;
-			}
-		}
-		
-		[self.tableController.variablesTableView reloadData];
-	}
-	
-	// keep track of the process the user targeted
-	if (self.currentProcess.internalName != nil)
-	{
-		self.lastChosenInternalProcessName = self.currentProcess.internalName;
-		[self postLastChosenInternalProcessNameChange];
-	}
-	
-	if (sender != nil && ![self.documentData.desiredProcessInternalName isEqualToString:self.currentProcess.internalName])
-	{
-		self.documentData.desiredProcessInternalName = self.currentProcess.internalName;
-		[self markDocumentChange];
-	}
-	else if (self.documentData.desiredProcessInternalName == nil)
-	{
-		self.documentData.desiredProcessInternalName = self.currentProcess.internalName;
-	}
-	
-	if (self.currentProcess && self.currentProcess.valid)
-	{
-		[self.processList addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
-		
-		if (!self.currentProcess.hasGrantedAccess && !ZGGrantMemoryAccessToProcess(self.processTaskManager, self.currentProcess))
-		{
-			[self setStatus:[NSString stringWithFormat:@"Failed accessing %@", self.currentProcess.name]];
-		}
-		else
-		{
-			[self setStatus:nil];
-			
-			self.storeValuesButton.enabled = YES;
-		}
-	}
-	
-	[self.tableController updateWatchVariablesTimer];
-	
-	// Trash all other menu items if they're dead
-	NSMutableArray *itemsToRemove = [[NSMutableArray alloc] init];
-	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
-	{
-		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:[[menuItem representedObject] processID]];
-		if (menuItem != self.runningApplicationsPopUpButton.selectedItem &&
-			(![menuItem.representedObject valid] ||
-			 ![[self.processList runningProcesses] containsObject:runningProcess]))
-		{
-			[itemsToRemove addObject:menuItem];
-		}
-	}
-	
-	for (id item in itemsToRemove)
-	{
-		[self.runningApplicationsPopUpButton removeItemAtIndex:[self.runningApplicationsPopUpButton indexOfItem:item]];
-	}
-}
-
-- (void)addProcessesToPopupButton
-{
-	NSString *lastSelectedProcessInternalName = self.lastChosenInternalProcessName;
-	BOOL foundLastSelectedProcessInternalName = NO;
-	
-	// Add running applications to popup button; we want activiation policy for NSApplicationActivationPolicyRegular to appear first, since they're more likely to be targetted and more likely to have sufficient privillages for accessing virtual memory
-	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
-	for (ZGRunningProcess *runningProcess in [[self.processList runningProcesses] sortedArrayUsingDescriptors:@[sortDescriptor]])
-	{
-		// If there's no desired process, try to use the last selected process only if it exists
-		if (self.documentData.desiredProcessInternalName == nil && lastSelectedProcessInternalName != nil && !foundLastSelectedProcessInternalName && [runningProcess.internalName isEqualToString:lastSelectedProcessInternalName])
-		{
-			self.documentData.desiredProcessInternalName = lastSelectedProcessInternalName;
-			foundLastSelectedProcessInternalName = YES;
-		}
-		[self addRunningProcessToPopupButton:runningProcess];
-	}
-	
-	if (self.documentData.desiredProcessInternalName != nil && ![self.currentProcess.internalName isEqualToString:self.documentData.desiredProcessInternalName])
-	{
-		ZGProcess *deadProcess = [[ZGProcess alloc] initWithName:nil internalName:self.documentData.desiredProcessInternalName is64Bit:YES];
-		
-		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		menuItem.title = [NSString stringWithFormat:@"%@ (none)", deadProcess.internalName];
-		menuItem.representedObject = deadProcess;
-		
-		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
-		
-		[self.runningApplicationsPopUpButton selectItem:menuItem];
-		
-		[self runningApplicationsPopUpButtonRequest:nil];
-		[self removeRunningProcessFromPopupButton:nil];
-	}
-	else
-	{
-		[self runningApplicationsPopUpButtonRequest:nil];
-	}
-}
-
-- (void)removeRunningProcessFromPopupButton:(ZGRunningProcess *)oldRunningProcess
-{
-	// Just to be sure
-	if (oldRunningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
-	{
-		// oldRunningProcess == nil, means remove 'current process'
-		if (self.currentProcess.processID == oldRunningProcess.processIdentifier || !oldRunningProcess)
-		{
-			// Don't remove the item, just indicate it's terminated
-			[self setStatus:[NSString stringWithFormat:@"%@ is not running", self.currentProcess.name]];
-			
-			if (self.searchController.canCancelTask && !self.searchController.searchProgress.shouldCancelSearch)
-			{
-				[self.searchController cancelTask];
-			}
-			
-			[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
-			
-			[self.tableController clearCache];
-			for (ZGVariable *variable in self.documentData.variables)
-			{
-				variable.finishedEvaluatingDynamicAddress = NO;
-				variable.value = NULL;
-			}
-			
-			[self.currentProcess markInvalid];
-			[self.tableController updateWatchVariablesTimer];
-			[self.variablesTableView reloadData];
-			
-			self.storeValuesButton.enabled = NO;
-			
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ZGTargetProcessDiedNotification
-			 object:self.currentProcess];
-			
-			ZGUpdateProcessMenuItem(self.runningApplicationsPopUpButton.selectedItem, self.currentProcess.internalName, -1, nil);
-			
-			[self.processList requestPollingWithObserver:self];
-		}
-		else if (oldRunningProcess.processIdentifier != -1)
-		{
-			// Find the menu item, and remove it
-			NSMenuItem *itemToRemove = nil;
-			for (NSMenuItem *item in self.runningApplicationsPopUpButton.itemArray)
-			{
-				if ([item.representedObject processID] == oldRunningProcess.processIdentifier)
-				{
-					itemToRemove = item;
-					break;
-				}
-			}
-			
-			if (itemToRemove)
-			{
-				[self.runningApplicationsPopUpButton removeItemAtIndex:[self.runningApplicationsPopUpButton indexOfItem:itemToRemove]];
-			}
-		}
-	}
-}
-
-- (void)addRunningProcessToPopupButton:(ZGRunningProcess *)newRunningProcess
-{
-	// Don't add ourselves
-	if (newRunningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
-	{
-		// Check if a dead application can be 'revived'
-		for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
-		{
-			ZGProcess *process = menuItem.representedObject;
-			if (process == self.currentProcess &&
-				!self.currentProcess.valid &&
-				[self.currentProcess.internalName isEqualToString:newRunningProcess.internalName])
-			{
-				self.currentProcess.processID = newRunningProcess.processIdentifier;
-				self.currentProcess.name = newRunningProcess.name;
-				self.currentProcess.is64Bit = newRunningProcess.is64Bit;
-				
-				ZGUpdateProcessMenuItem(menuItem, newRunningProcess.name, newRunningProcess.processIdentifier, newRunningProcess.icon);
-				
-				[self runningApplicationsPopUpButtonRequest:nil];
-				
-				[self.processList unrequestPollingWithObserver:self];
-				
-				return;
-			}
-		}
-		
-		// Otherwise add the new application
-		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		
-		ZGUpdateProcessMenuItem(menuItem, newRunningProcess.name, newRunningProcess.processIdentifier, newRunningProcess.icon);
-		
-		ZGProcess *representedProcess =
-		[[ZGProcess alloc]
-		 initWithName:newRunningProcess.name
-		 internalName:newRunningProcess.internalName
-		 processID:newRunningProcess.processIdentifier
-		 is64Bit:newRunningProcess.is64Bit];
-		
-		menuItem.representedObject = representedProcess;
-		
-		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
-		
-		// If we found desired process name, select it
-		if (![self.currentProcess.internalName isEqualToString:self.documentData.desiredProcessInternalName] &&
-			[self.documentData.desiredProcessInternalName isEqualToString:newRunningProcess.internalName])
-		{
-			[self.runningApplicationsPopUpButton selectItem:menuItem];
-			[self runningApplicationsPopUpButtonRequest:nil];
-		}
-	}
-}
-
-- (void)observeValueForKeyPath:(NSString *)__unused keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)__unused context
-{
-	NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
-	NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
-	
-	if (object == self.processList && self.runningApplicationsPopUpButton.itemArray.count > 0)
-	{
-		if (newRunningProcesses != nil)
-		{
-			for (ZGRunningProcess *runningProcess in newRunningProcesses)
-			{
-				[self addRunningProcessToPopupButton:runningProcess];
-			}
-		}
-		
-		if (oldRunningProcesses != nil)
-		{
-			for (ZGRunningProcess *runningProcess in oldRunningProcesses)
-			{
-				[self removeRunningProcessFromPopupButton:runningProcess];
-				
-				if ([self.processTaskManager taskExistsForProcessIdentifier:runningProcess.processIdentifier])
-				{
-					[self.processTaskManager freeTaskForProcessIdentifier:runningProcess.processIdentifier];
-				}
-			}
-		}
-	}
-	else if (object == [NSWorkspace sharedWorkspace] && self.runningApplicationsPopUpButton.itemArray.count > 0)
-	{
-		// ZGProcessList may report processes to us faster than NSRunningApplication can ocasionally
-		// So be sure to get updated localized name and icon
-		for (NSRunningApplication *runningApplication in newRunningProcesses)
-		{
-			for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
-			{
-				ZGProcess *representedProcess = [menuItem representedObject];
-				
-				if (runningApplication.processIdentifier == representedProcess.processID)
-				{
-					representedProcess.name = runningApplication.localizedName;
-					
-					ZGUpdateProcessMenuItem(menuItem, runningApplication.localizedName, runningApplication.processIdentifier, runningApplication.icon);
-					
-					break;
-				}
-			}
-		}
-	}
-}
 
 - (BOOL)isClearable
 {
@@ -1139,13 +770,15 @@
 	[self.tableController updateWatchVariablesTimer];
 	[self.tableController.variablesTableView reloadData];
 	
-	[self setStatus:nil];
+	[self updateNumberOfValuesDisplayedStatus];
 }
 
 #pragma mark Menu item validation
 
-- (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
 {
+	NSMenuItem *menuItem = (NSMenuItem *)userInterfaceItem;
+	
 	if (menuItem.action == @selector(clear:))
 	{
 		if ([self.variableController canClearSearch])
@@ -1294,29 +927,6 @@
 	else if (menuItem.action == @selector(paste:))
 	{
 		if ([self.searchController canCancelTask] || ![NSPasteboard.generalPasteboard dataForType:ZGVariablePboardType])
-		{
-			return NO;
-		}
-	}
-	
-	else if (menuItem.action == @selector(pauseOrUnpauseProcess:))
-	{
-		if (!self.currentProcess || !self.currentProcess.valid)
-		{
-			return NO;
-		}
-		
-		integer_t suspendCount;
-		if (!ZGSuspendCount(self.currentProcess.processTask, &suspendCount))
-		{
-			return NO;
-		}
-		else
-		{
-			menuItem.title = [NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"];
-		}
-		
-		if ([self.debuggerController isProcessIdentifierHalted:self.currentProcess.processID])
 		{
 			return NO;
 		}
@@ -1495,7 +1105,7 @@
 		}
 	}
 	
-	return YES;
+	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
 #pragma mark Search Field Tokens
@@ -1745,13 +1355,6 @@
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
 	[ZGNavigationPost postShowDebuggerWithProcess:self.currentProcess address:selectedVariable.address];
-}
-
-#pragma mark Pausing and Unpausing Processes
-
-- (IBAction)pauseOrUnpauseProcess:(id)__unused sender
-{
-	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }
 
 @end

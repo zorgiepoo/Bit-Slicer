@@ -203,6 +203,7 @@ BOOL ZGSupportsEndianness(ZGVariableType dataType)
 		case ZGInt8:
 		case ZGString8:
 		case ZGByteArray:
+		case ZGScript:
 			supportsEndianness = NO;
 			break;
 		case ZGInt16:
@@ -212,7 +213,6 @@ BOOL ZGSupportsEndianness(ZGVariableType dataType)
 		case ZGDouble:
 		case ZGString16:
 		case ZGPointer:
-		case ZGScript:
 			supportsEndianness = YES;
 			break;
 	}

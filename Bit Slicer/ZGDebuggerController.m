@@ -234,7 +234,7 @@ enum ZGStepExecution
 
 #pragma mark Current Process Changed
 
-- (void)currentProcessChanged
+- (void)currentProcessChangedWithOldProcess:(ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
 {
 	[self createSymbolicator];
 	

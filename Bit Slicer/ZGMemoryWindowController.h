@@ -40,6 +40,7 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 
 @class ZGProcess;
 @class ZGProcessTaskManager;
+@class ZGProcessList;
 
 @interface ZGMemoryWindowController : NSWindowController
 {
@@ -47,6 +48,11 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 }
 
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
+
+@property (nonatomic) ZGProcessTaskManager *processTaskManager;
+@property (nonatomic) ZGProcessList *processList;
+
+@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
 
 @property (nonatomic, assign) id debuggerController;
 
@@ -59,17 +65,34 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 
 @property (nonatomic) NSTimer *updateDisplayTimer;
 
+@property (nonatomic, readonly) BOOL isOccluded;
+
+- (NSString *)preferredInternalProcessName;
+
 - (IBAction)pauseOrUnpauseProcess:(id)sender;
 
 - (void)updateWindow;
 
+- (void)windowWillClose:(NSNotification *)notification;
+
 - (void)setupProcessListNotificationsAndPopUpButton;
 
+- (BOOL)hasDefaultUpdateDisplayTimer;
+- (void)updateOcclusionActivity;
+
+- (BOOL)shouldStartProcessActivity;
+- (void)startProcessActivity;
+- (BOOL)shouldStopProcessActivity;
+- (void)stopProcessActivity;
+
+- (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess;
 - (void)processListChanged:(NSDictionary *)change;
 - (void)updateRunningProcesses;
 - (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification;
 
 - (void)switchProcess;
+
+- (IBAction)runningApplicationsPopUpButton:(id)__unused sender;
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem;
 

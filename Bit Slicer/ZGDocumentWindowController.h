@@ -35,6 +35,7 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGSearchFunctions.h"
 #import "AGScopeBar.h"
+#import "ZGMemoryWindowController.h"
 
 @class ZGDocumentTableController;
 @class ZGVariableController;
@@ -53,14 +54,13 @@
 
 #define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
 
-@interface ZGDocumentWindowController : NSWindowController <AGScopeBarDelegate>
+@interface ZGDocumentWindowController : ZGMemoryWindowController <AGScopeBarDelegate>
 
 @property (readonly, nonatomic) ZGBreakPointController *breakPointController;
 @property (readonly, nonatomic) ZGLoggerWindowController *loggerWindowController;
 
 @property (nonatomic, assign) IBOutlet ZGTableView *variablesTableView;
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
-@property (nonatomic, assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 @property (nonatomic, assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
 @property (nonatomic, assign) IBOutlet NSButton *storeValuesButton;
 @property (nonatomic, assign) IBOutlet APTokenSearchField *searchValueTextField;
@@ -70,8 +70,6 @@
 @property (nonatomic) ZGVariableController *variableController;
 @property (nonatomic) ZGDocumentSearchController *searchController;
 @property (nonatomic) ZGScriptManager *scriptManager;
-
-@property (nonatomic) BOOL isOccluded;
 
 @property (nonatomic) ZGProcess *currentProcess;
 
@@ -87,7 +85,8 @@
 
 - (void)markDocumentChange;
 
-- (void)setStatus:(id)status;
+- (void)updateNumberOfValuesDisplayedStatus;
+- (void)setStatusString:(NSString *)statusString;
 
 - (IBAction)requestEditingVariableDescription:(id)sender;
 - (IBAction)requestEditingVariableAddress:(id)sender;
@@ -105,9 +104,5 @@
 - (IBAction)insertStoredValueToken:(id)sender;
 
 - (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;
-
-- (void)updateObservingProcessOcclusionState;
-
-- (void)removeRunningProcessFromPopupButton:(ZGRunningProcess *)oldRunningProcess;
 
 @end

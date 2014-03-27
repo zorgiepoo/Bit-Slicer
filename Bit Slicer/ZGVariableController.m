@@ -268,7 +268,7 @@
 	
 	if (self.windowController.currentProcess.valid)
 	{
-		[self.windowController setStatus:nil];
+		[self.windowController updateNumberOfValuesDisplayedStatus];
 	}
 	
 	[self.windowController markDocumentChange];
@@ -388,13 +388,13 @@
 	}
 	[[self.windowController.undoManager prepareWithInvocationTarget:self] removeVariablesAtRowIndexes:rowIndexes];
 	
-	[self.windowController setStatus:nil];
+	[self.windowController updateNumberOfValuesDisplayedStatus];
 }
 
 - (void)removeSelectedSearchValues
 {
 	[self removeVariablesAtRowIndexes:self.windowController.selectedVariableIndexes];
-	[self.windowController setStatus:nil];
+	[self.windowController updateNumberOfValuesDisplayedStatus];
 }
 
 - (void)addVariable:(id)sender

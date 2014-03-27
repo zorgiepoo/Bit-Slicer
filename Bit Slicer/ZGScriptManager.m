@@ -801,7 +801,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 							self.scriptActivity = nil;
 						}
 						
-						[self.windowController updateObservingProcessOcclusionState];
+						[self.windowController updateOcclusionActivity];
 					});
 				}
 			});

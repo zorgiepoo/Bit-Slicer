@@ -175,7 +175,7 @@
 	
 	if (!windowController.currentProcess.valid)
 	{
-		[windowController removeRunningProcessFromPopupButton:nil];
+		//[windowController removeRunningProcessFromPopupButton:nil];
 	}
 }
 
@@ -203,7 +203,7 @@
 	ZGDocumentWindowController *windowController = self.windowController;
 	windowController.progressIndicator.doubleValue = (double)searchProgress.progress;
 	
-	[windowController setStatus:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
+	[windowController setStatusString:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
 }
 
 - (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
@@ -324,11 +324,11 @@
 		[windowController.tableController.variablesTableView reloadData];
 	}
 	
-	[windowController updateObservingProcessOcclusionState];
+	[windowController updateOcclusionActivity];
 	
 	self.temporarySearchResults = nil;
 	
-	[windowController setStatus:nil];
+	[windowController updateNumberOfValuesDisplayedStatus];
 	
 	if (self.allowsNarrowing)
 	{
@@ -734,11 +734,11 @@
 	ZGDocumentWindowController *windowController = self.windowController;
 	if (self.searchProgress.progressType == ZGSearchProgressMemoryScanning)
 	{
-		[windowController setStatus:@"Cancelling search..."];
+		[windowController setStatusString:@"Cancelling search..."];
 	}
 	else if (self.searchProgress.progressType == ZGSearchProgressMemoryStoring)
 	{
-		[windowController setStatus:@"Canceling Memory Store..."];
+		[windowController setStatusString:@"Canceling Memory Store..."];
 	}
 	
 	self.searchProgress.shouldCancelSearch = YES;
@@ -752,7 +752,7 @@
 	
 	ZGDocumentWindowController *windowController = self.windowController;
 	
-	[windowController setStatus:@"Storing All Values..."];
+	[windowController setStatusString:@"Storing All Values..."];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		self.tempSavedData = [ZGStoredData storedDataFromProcessTask:windowController.currentProcess.processTask];
@@ -775,7 +775,7 @@
 				}
 			}
 			
-			[windowController setStatus:nil];
+			[windowController updateNumberOfValuesDisplayedStatus];
 			
 			windowController.progressIndicator.doubleValue = 0;
 			

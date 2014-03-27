@@ -45,10 +45,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 @interface ZGMemoryWindowController ()
 
-@property (nonatomic) ZGProcessTaskManager *processTaskManager;
-@property (nonatomic) ZGProcessList *processList;
-
-@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
+@property (nonatomic) BOOL isOccluded;
 
 @end
 
@@ -58,7 +55,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager
 {
-	self = [super initWithWindowNibName:NSStringFromClass([self class])];
+	self = [super init];
 	
 	if (self != nil)
 	{
@@ -76,12 +73,28 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	return self;
 }
 
+- (NSString *)windowNibName
+{
+	return NSStringFromClass([self class]);
+}
+
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter]
 	 removeObserver:self
 	 name:ZGLastChosenInternalProcessNameNotification
 	 object:nil];
+	
+	[[NSNotificationCenter defaultCenter]
+	 removeObserver:self
+	 name:NSWindowDidChangeOcclusionStateNotification
+	 object:nil];
+	
+	[[NSWorkspace sharedWorkspace]
+	 removeObserver:self
+	 forKeyPath:@"runningApplications"];
+	
+	[self.processList removeObserver:self forKeyPath:@"runningProcesses"];
 }
 
 - (void)lastChosenInternalProcessNameChanged:(NSNotification *)notification
@@ -110,19 +123,27 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	return 0.5;
 }
 
+- (BOOL)hasDefaultUpdateDisplayTimer
+{
+	return YES;
+}
+
 - (void)updateDisplayTimer:(NSTimer *)__unused timer
 {
 }
 
 - (void)makeUpdateDisplayTimer
 {
-	self.updateDisplayTimer =
-	[NSTimer
-	 scheduledTimerWithTimeInterval:[self displayMemoryTimeInterval]
-	 target:self
-	 selector:@selector(updateDisplayTimer:)
-	 userInfo:nil
-	 repeats:YES];
+	if ([self hasDefaultUpdateDisplayTimer])
+	{
+		self.updateDisplayTimer =
+		[NSTimer
+		 scheduledTimerWithTimeInterval:[self displayMemoryTimeInterval]
+		 target:self
+		 selector:@selector(updateDisplayTimer:)
+		 userInfo:nil
+		 repeats:YES];
+	}
 }
 
 - (void)destroyUpdateDisplayTimer
@@ -131,33 +152,68 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	self.updateDisplayTimer = nil;
 }
 
-- (void)windowDidChangeOcclusionState:(NSNotification *)__unused notification
+- (BOOL)shouldStartProcessActivity
 {
-	if (([self.window occlusionState] & NSWindowOcclusionStateVisible) == 0)
+	return YES;
+}
+
+- (void)startProcessActivity
+{
+	if (self.updateDisplayTimer == nil)
 	{
-		[self destroyUpdateDisplayTimer];
-		
-		[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
-		[self.processList unrequestPollingWithObserver:self];
+		[self makeUpdateDisplayTimer];
+	}
+	
+	[self.processList retrieveList];
+	
+	if (self.currentProcess.valid)
+	{
+		[self.processList addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
 	}
 	else
 	{
-		if (self.updateDisplayTimer == nil)
+		[self.processList requestPollingWithObserver:self];
+	}
+}
+
+- (BOOL)shouldStopProcessActivity
+{
+	return YES;
+}
+
+- (void)stopProcessActivity
+{
+	[self destroyUpdateDisplayTimer];
+	
+	[self.processList removePriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+	[self.processList unrequestPollingWithObserver:self];
+}
+
+- (void)updateOcclusionActivity
+{
+	if ([self.window respondsToSelector:@selector(occlusionState)])
+	{
+		if (!self.isOccluded)
 		{
-			[self makeUpdateDisplayTimer];
-		}
-		
-		[self.processList retrieveList];
-		
-		if (self.currentProcess.valid)
-		{
-			[self.processList addPriorityToProcessIdentifier:self.currentProcess.processID withObserver:self];
+			if ([self shouldStartProcessActivity])
+			{
+				[self startProcessActivity];
+			}
 		}
 		else
 		{
-			[self.processList requestPollingWithObserver:self];
+			if ([self shouldStopProcessActivity])
+			{
+				[self stopProcessActivity];
+			}
 		}
 	}
+}
+
+- (void)windowDidChangeOcclusionState:(NSNotification *)__unused notification
+{
+	self.isOccluded = ([self.window occlusionState] & NSWindowOcclusionStateVisible) == 0;
+	[self updateOcclusionActivity];
 }
 
 - (void)windowDidLoad
@@ -194,8 +250,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	}
 }
 
-#pragma mark Death
-
 - (void)windowWillClose:(NSNotification *)notification
 {
 	if ([notification object] == self.window)
@@ -213,12 +267,17 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 #pragma mark Process Handling
 
+- (NSString *)preferredInternalProcessName
+{
+	return self.lastChosenInternalProcessName;
+}
+
 - (void)setupProcessListNotificationsAndPopUpButton
 {
 	self.processList = [[ZGProcessList alloc] initWithProcessTaskManager:self.processTaskManager];
 	
 	// Add processes to popup button
-	self.desiredProcessInternalName = self.lastChosenInternalProcessName;
+	self.desiredProcessInternalName = [self preferredInternalProcessName];
 	[self updateRunningProcesses];
 	
 	[self.processList
@@ -282,7 +341,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 {
 }
 
-- (void)currentProcessChanged
+- (void)currentProcessChangedWithOldProcess:(ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
 {
 }
 
@@ -290,7 +349,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 {
 	BOOL shouldUpdateDisplay = NO;
 	
-	if (_currentProcess.processID != newProcess.processID)
+	if (_currentProcess == nil || ![_currentProcess isEqual:newProcess])
 	{
 		[self.undoManager removeAllActions];
 		
@@ -305,8 +364,11 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 		
 		shouldUpdateDisplay = YES;
 	}
+	
+	ZGProcess *oldProcess = _currentProcess;
 	_currentProcess = newProcess;
-	if (_currentProcess && ![_currentProcess hasGrantedAccess] && _currentProcess.valid)
+	
+	if (_currentProcess != nil && ![_currentProcess hasGrantedAccess] && _currentProcess.valid)
 	{
 		if (!ZGGrantMemoryAccessToProcess(self.processTaskManager, _currentProcess))
 		{
@@ -317,7 +379,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	
 	if (shouldUpdateDisplay)
 	{
-		[self currentProcessChanged];
+		[self currentProcessChangedWithOldProcess:oldProcess newProcess:newProcess];
 	}
 }
 
@@ -371,11 +433,20 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
+	self.desiredProcessInternalName = self.currentProcess.internalName;
 }
 
 - (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)__unused notification
 {
 	[self.processList retrieveList];
+}
+
+- (IBAction)runningApplicationsPopUpButton:(id)__unused sender
+{
+	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
+	{
+		[self switchProcess];
+	}
 }
 
 - (void)switchProcess

@@ -63,6 +63,18 @@
 	return newResults;
 }
 
+- (BOOL)zgHasObjectMatchingCondition:(zg_has_object_t)matchingCondition
+{
+	for (id item in self)
+	{
+		if (matchingCondition(item))
+		{
+			return YES;
+		}
+	}
+	return NO;
+}
+
 // our's first, their's later
 - (id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator
 {
