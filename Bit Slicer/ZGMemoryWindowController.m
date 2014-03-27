@@ -384,9 +384,8 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 {
 	[self.runningApplicationsPopUpButton removeAllItems];
 	
-	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES];
 	BOOL foundTargetProcess = NO;
-	for (ZGRunningProcess *runningProcess in  [self.processList.runningProcesses sortedArrayUsingDescriptors:@[sortDescriptor]])
+	for (ZGRunningProcess *runningProcess in  [self.processList.runningProcesses sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES], [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]])
 	{
 		if (runningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
 		{
@@ -417,18 +416,19 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	{
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
 		ZGUpdateProcessMenuItem(menuItem, self.desiredProcessInternalName, -1, nil);
-		
+
 		menuItem.representedObject = [[ZGProcess alloc] initWithName:nil internalName:self.desiredProcessInternalName is64Bit:YES];
-		[self.runningApplicationsPopUpButton.menu addItem:menuItem];
-		[self.runningApplicationsPopUpButton selectItem:self.runningApplicationsPopUpButton.lastItem];
-		
+
+		[self.runningApplicationsPopUpButton.menu insertItem:menuItem atIndex:0];
+		[self.runningApplicationsPopUpButton selectItem:menuItem];
+
 		[self.processList requestPollingWithObserver:self];
 	}
 	else
 	{
 		[self.processList unrequestPollingWithObserver:self];
 	}
-	
+
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
 	self.desiredProcessInternalName = self.currentProcess.internalName;
 }
