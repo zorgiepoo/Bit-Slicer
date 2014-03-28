@@ -78,9 +78,7 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 - (BOOL)hasDefaultUpdateDisplayTimer;
 - (void)updateOcclusionActivity;
 
-- (BOOL)shouldStartProcessActivity;
 - (void)startProcessActivity;
-- (BOOL)shouldStopProcessActivity;
 - (void)stopProcessActivity;
 
 - (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess;

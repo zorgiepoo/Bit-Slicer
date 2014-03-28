@@ -152,11 +152,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	self.updateDisplayTimer = nil;
 }
 
-- (BOOL)shouldStartProcessActivity
-{
-	return YES;
-}
-
 - (void)startProcessActivity
 {
 	if (self.updateDisplayTimer == nil)
@@ -174,11 +169,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	{
 		[self.processList requestPollingWithObserver:self];
 	}
-}
-
-- (BOOL)shouldStopProcessActivity
-{
-	return YES;
 }
 
 - (void)stopProcessActivity
@@ -201,17 +191,11 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	{
 		if (!self.isOccluded)
 		{
-			if ([self shouldStartProcessActivity])
-			{
-				[self startProcessActivity];
-			}
+			[self startProcessActivity];
 		}
 		else
 		{
-			if ([self shouldStopProcessActivity])
-			{
-				[self stopProcessActivity];
-			}
+			[self stopProcessActivity];
 		}
 	}
 }

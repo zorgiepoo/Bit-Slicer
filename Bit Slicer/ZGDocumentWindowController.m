@@ -336,22 +336,26 @@
 	return NO;
 }
 
-- (BOOL)shouldStartProcessActivity
+- (void)startProcessActivity
 {
 	[self.tableController updateWatchVariablesTimer];
-
-	return YES;
+	[super startProcessActivity];
 }
 
-- (BOOL)shouldStopProcessActivity
+- (void)stopProcessActivity
 {
 	BOOL shouldKeepWatchVariablesTimer = [self.tableController updateWatchVariablesTimer];
+	if (!shouldKeepWatchVariablesTimer && self.searchController.canStartTask)
+	{
+		BOOL foundRunningScript = [self.documentData.variables zgHasObjectMatchingCondition:(zg_has_object_t)^(ZGVariable *variable) {
+			return (variable.enabled && variable.type == ZGScript);
+		}];
 
-	BOOL foundRunningScript = [self.documentData.variables zgHasObjectMatchingCondition:(zg_has_object_t)^(ZGVariable *variable) {
-		return (variable.enabled && variable.type == ZGScript);
-	}];
-
-	return !shouldKeepWatchVariablesTimer && self.searchController.canStartTask && !foundRunningScript;
+		if (!foundRunningScript)
+		{
+			[super stopProcessActivity];
+		}
+	}
 }
 
 - (void)setStatusString:(NSString *)statusString
