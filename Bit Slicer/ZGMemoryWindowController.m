@@ -61,8 +61,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	{
 		self.processTaskManager = processTaskManager;
 		
-		self.undoManager = [[NSUndoManager alloc] init];
-		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
 		 selector:@selector(lastChosenInternalProcessNameChanged:)
@@ -76,6 +74,15 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 - (NSString *)windowNibName
 {
 	return NSStringFromClass([self class]);
+}
+
+- (NSUndoManager *)undoManager
+{
+	if (_undoManager == nil)
+	{
+		_undoManager = [[NSUndoManager alloc] init];
+	}
+	return _undoManager;
 }
 
 - (void)dealloc
