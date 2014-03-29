@@ -430,7 +430,7 @@ enum ZGStepExecution
 				if (startRow == 0) break;
 				
 				ZGInstruction *instruction = [self.instructions objectAtIndex:startRow];
-				ZGInstruction *searchedInstruction = [[self class] findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 				
 				startRow--;
 				
@@ -447,7 +447,7 @@ enum ZGStepExecution
 			// Extend past first row if necessary
 			if (startRow == 0)
 			{
-				ZGInstruction *searchedInstruction = [[self class] findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 				if (searchedInstruction.variable.address + searchedInstruction.variable.size != startAddress)
 				{
 					startAddress = searchedInstruction.variable.address;
@@ -461,7 +461,7 @@ enum ZGStepExecution
 				if (endRow >= self.instructions.count) break;
 				
 				ZGInstruction *instruction = [self.instructions objectAtIndex:endRow];
-				ZGInstruction *searchedInstruction = [[self class] findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 				
 				endRow++;
 				
@@ -478,7 +478,7 @@ enum ZGStepExecution
 			// Extend past last row if necessary
 			if (endRow >= self.instructions.count)
 			{
-				ZGInstruction *searchedInstruction = [[self class] findInstructionBeforeAddress:endInstruction.variable.address + endInstruction.variable.size inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:endInstruction.variable.address + endInstruction.variable.size inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 				if (endInstruction.variable.address != searchedInstruction.variable.address)
 				{
 					endAddress = searchedInstruction.variable.address + searchedInstruction.variable.size;
@@ -487,7 +487,7 @@ enum ZGStepExecution
 			
 			ZGMemorySize size = endAddress - startAddress;
 			
-			ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size breakPoints:self.breakPointController.breakPoints];
+			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size breakPoints:self.breakPointController.breakPoints];
 			if (disassemblerObject != nil)
 			{
 				NSArray *instructionsToReplace = [disassemblerObject readInstructions];
@@ -536,7 +536,7 @@ enum ZGStepExecution
 	
 	while (startInstruction == nil && bytesBehind > 0)
 	{
-		startInstruction = [[self class] findInstructionBeforeAddress:endInstruction.variable.address - bytesBehind inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+		startInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:endInstruction.variable.address - bytesBehind inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 		if (startInstruction.variable.address < self.instructionBoundary.location)
 		{
 			// Try again
@@ -578,7 +578,7 @@ enum ZGStepExecution
 - (void)addMoreInstructionsAfterLastRow
 {
 	ZGInstruction *lastInstruction = self.instructions.lastObject;
-	ZGInstruction *startInstruction = [[self class] findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	ZGInstruction *startInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 	
 	if (startInstruction.variable.address + startInstruction.variable.size >= self.instructionBoundary.location +  self.instructionBoundary.length)
 	{
@@ -591,7 +591,7 @@ enum ZGStepExecution
 		NSUInteger bytesAhead = DESIRED_BYTES_TO_ADD_OFFSET;
 		while (endInstruction == nil && bytesAhead > 0)
 		{
-			endInstruction = [[self class] findInstructionBeforeAddress:(startInstruction.variable.address + startInstruction.variable.size + bytesAhead) inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+			endInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:(startInstruction.variable.address + startInstruction.variable.size + bytesAhead) inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 			if (endInstruction.variable.address + endInstruction.variable.size > self.instructionBoundary.location +  self.instructionBoundary.length)
 			{
 				// Try again
@@ -605,7 +605,7 @@ enum ZGStepExecution
 		{
 			ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 			
-			ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size breakPoints:self.breakPointController.breakPoints];
+			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size breakPoints:self.breakPointController.breakPoints];
 			
 			if (disassemblerObject != nil)
 			{
@@ -666,7 +666,7 @@ enum ZGStepExecution
 	}
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size breakPoints:self.breakPointController.breakPoints];
+		ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size breakPoints:self.breakPointController.breakPoints];
 		NSArray *newInstructions = @[];
 		
 		if (disassemblerObject != nil)
@@ -756,7 +756,7 @@ enum ZGStepExecution
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
 	
-	ZGDisassemblerObject *disassemblerObject = [[self class] disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:self.breakPointController.breakPoints];
+	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:self.breakPointController.breakPoints];
 	
 	if (disassemblerObject != nil)
 	{
@@ -955,7 +955,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		lowBoundAddress = [[self class] findInstructionBeforeAddress:lowBoundAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints].variable.address;
+		lowBoundAddress = [ZGDebuggerUtilities findInstructionBeforeAddress:lowBoundAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints].variable.address;
 		if (lowBoundAddress < firstInstructionAddress)
 		{
 			lowBoundAddress = firstInstructionAddress;
@@ -969,7 +969,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		highBoundAddress = [[self class] findInstructionBeforeAddress:highBoundAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints].variable.address;
+		highBoundAddress = [ZGDebuggerUtilities findInstructionBeforeAddress:highBoundAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints].variable.address;
 		if (highBoundAddress <= chosenRegion.address || highBoundAddress > chosenRegion.address + chosenRegion.size)
 		{
 			highBoundAddress = chosenRegion.address + chosenRegion.size;
@@ -1051,7 +1051,7 @@ enum ZGStepExecution
 		return NO;
 	}
 	
-	ZGInstruction *currentInstruction = [[self class] findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 	if (!currentInstruction)
 	{
 		return NO;
@@ -1059,7 +1059,7 @@ enum ZGStepExecution
 	
 	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
 	{
-		ZGInstruction *nextInstruction = [[self class] findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 		if (!nextInstruction)
 		{
 			return NO;
@@ -1082,7 +1082,7 @@ enum ZGStepExecution
 	}
 	
 	ZGInstruction *outterInstruction = [self.backtraceViewController.backtrace.instructions objectAtIndex:1];
-	ZGInstruction *returnInstruction = [[self class] findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	ZGInstruction *returnInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 	
 	if (!returnInstruction)
 	{
@@ -1480,7 +1480,7 @@ enum ZGStepExecution
 {
 	NSError *error = nil;
 	ZGInstruction *firstInstruction = [self.instructions objectAtIndex:instructionIndex];
-	NSData *data = [[self class] assembleInstructionText:instructionText atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:self.currentProcess.pointerSize * 8 error:&error];
+	NSData *data = [ZGDebuggerUtilities assembleInstructionText:instructionText atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:self.currentProcess.pointerSize * 8 error:&error];
 	if (data.length == 0)
 	{
 		if (error != nil)
@@ -1603,7 +1603,7 @@ enum ZGStepExecution
 		free(nopBuffer);
 		
 		ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
-		NSArray *instructions = [[self class] instructionsBeforeHookingIntoAddress:firstInstruction.variable.address injectingIntoDestination:allocatedAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+		NSArray *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:firstInstruction.variable.address injectingIntoDestination:allocatedAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 		
 		if (instructions != nil)
 		{
@@ -1639,9 +1639,9 @@ enum ZGStepExecution
 				if (!canceled)
 				{
 					NSError *error = nil;
-					NSData *injectedCode = [[self class] assembleInstructionText:injectedCodeString atInstructionPointer:allocatedAddress usingArchitectureBits:self.currentProcess.pointerSize*8 error:&error];
+					NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:injectedCodeString atInstructionPointer:allocatedAddress usingArchitectureBits:self.currentProcess.pointerSize*8 error:&error];
 					
-					if (injectedCode.length == 0 || error != nil || ![[self class] injectCode:injectedCode intoAddress:allocatedAddress hookingIntoOriginalInstructions:instructions process:self.currentProcess breakPoints:self.breakPointController.breakPoints undoManager:self.undoManager error:&error])
+					if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:allocatedAddress hookingIntoOriginalInstructions:instructions process:self.currentProcess breakPoints:self.breakPointController.breakPoints undoManager:self.undoManager error:&error])
 					{
 						NSLog(@"Error while injecting code");
 						NSLog(@"%@", error);
@@ -2033,10 +2033,10 @@ enum ZGStepExecution
 
 - (IBAction)stepOver:(id)__unused sender
 {
-	ZGInstruction *currentInstruction = [[self class] findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
 	{
-		ZGInstruction *nextInstruction = [[self class] findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 		
 		if ([self.breakPointController addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:self.registersViewController.basePointer delegate:self])
 		{
@@ -2056,7 +2056,7 @@ enum ZGStepExecution
 - (IBAction)stepOut:(id)__unused sender
 {
 	ZGInstruction *outterInstruction = [self.backtraceViewController.backtrace.instructions objectAtIndex:1];
-	ZGInstruction *returnInstruction = [[self class] findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	ZGInstruction *returnInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
 	
 	if ([self.breakPointController addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceViewController.backtrace.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self])
 	{
