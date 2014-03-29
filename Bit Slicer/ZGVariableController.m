@@ -40,7 +40,6 @@
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
-#import "ZGDebuggerController.h"
 #import "ZGInstruction.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"

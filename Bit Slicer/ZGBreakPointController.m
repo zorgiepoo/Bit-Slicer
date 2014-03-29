@@ -60,7 +60,7 @@
 #import "ZGDebugThread.h"
 #import "ZGBreakPoint.h"
 #import "ZGInstruction.h"
-#import "ZGDebuggerController.h"
+#import "ZGDebuggerUtilities.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 #import "ZGScriptManager.h"
@@ -492,7 +492,7 @@ static ZGBreakPointController *gBreakPointController;
 			NSNumber *existingInstructionAddress = [breakPoint.cacheDictionary objectForKey:instructionPointerNumber];
 			if (existingInstructionAddress == nil)
 			{
-				ZGInstruction *foundInstruction = [ZGDebuggerController findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:self.breakPoints];
+				ZGInstruction *foundInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:self.breakPoints];
 				foundInstructionAddress = foundInstruction.variable.address;
 				[breakPoint.cacheDictionary setObject:@(foundInstructionAddress) forKey:instructionPointerNumber];
 			}

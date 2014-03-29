@@ -35,7 +35,7 @@
 #import "ZGBacktrace.h"
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
-#import "ZGDebuggerController.h"
+#import "ZGDebuggerUtilities.h"
 #import "ZGVirtualMemory.h"
 
 @interface ZGBacktrace ()
@@ -63,7 +63,7 @@
 	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
 	
-	ZGInstruction *currentInstruction = [ZGDebuggerController findInstructionBeforeAddress:instructionPointer+1 inProcess:process withBreakPoints:breakPoints];
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer+1 inProcess:process withBreakPoints:breakPoints];
 	if (currentInstruction != nil)
 	{
 		[newInstructions addObject:currentInstruction];
@@ -94,7 +94,7 @@
 			
 			ZGFreeBytes(returnAddressBytes, returnAddressSize);
 			
-			ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints];
+			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints];
 			if (instruction == nil)
 			{
 				break;

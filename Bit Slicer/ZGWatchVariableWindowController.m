@@ -35,6 +35,7 @@
 #import "ZGWatchVariableWindowController.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGBreakPointController.h"
+#import "ZGDebuggerUtilities.h"
 #import "ZGInstruction.h"
 #import "ZGBreakPoint.h"
 #import "ZGVariable.h"
@@ -43,7 +44,6 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 #import "NSArrayAdditions.h"
-#import "ZGDebuggerController.h"
 #import "ZGVariableController.h"
 #import "ZGUtilities.h"
 #import "ZGRegisterEntries.h"
@@ -245,7 +245,7 @@
 	
 	[self.foundBreakPointAddresses addObject:instructionAddressNumber];
 	
-	ZGInstruction *instruction = [ZGDebuggerController findInstructionBeforeAddress:instructionAddress inProcess:self.watchProcess withBreakPoints:self.breakPointController.breakPoints];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddress inProcess:self.watchProcess withBreakPoints:self.breakPointController.breakPoints];
 	
 	if (instruction == nil)
 	{

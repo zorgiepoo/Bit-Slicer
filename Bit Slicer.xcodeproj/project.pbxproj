@@ -80,6 +80,7 @@
 		7798EED918C40B7F001120FB /* DDParserTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC018C40B7F001120FB /* DDParserTypes.m */; };
 		7798EEDA18C40B7F001120FB /* DDTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC218C40B7F001120FB /* DDTypes.m */; };
 		7798EEDB18C40B7F001120FB /* NSString+DDMathParsing.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC418C40B7F001120FB /* NSString+DDMathParsing.m */; };
+		779C6CC318E7309B0076D647 /* ZGDebuggerUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */; };
 		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
 		77CE28B817D538E300998F28 /* ZGLoggerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */; };
 		77CE28BA17D580AD00998F28 /* ZGPyMainModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B917D580AD00998F28 /* ZGPyMainModule.m */; };
@@ -407,6 +408,8 @@
 		7798EEC218C40B7F001120FB /* DDTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDTypes.m; path = deps/DDMathParser/DDTypes.m; sourceTree = "<group>"; };
 		7798EEC318C40B7F001120FB /* NSString+DDMathParsing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+DDMathParsing.h"; path = "deps/DDMathParser/NSString+DDMathParsing.h"; sourceTree = "<group>"; };
 		7798EEC418C40B7F001120FB /* NSString+DDMathParsing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+DDMathParsing.m"; path = "deps/DDMathParser/NSString+DDMathParsing.m"; sourceTree = "<group>"; };
+		779C6CC118E7309B0076D647 /* ZGDebuggerUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDebuggerUtilities.h; path = "Bit Slicer/ZGDebuggerUtilities.h"; sourceTree = "<group>"; };
+		779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDebuggerUtilities.m; path = "Bit Slicer/ZGDebuggerUtilities.m"; sourceTree = "<group>"; };
 		77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLoggerWindowController.h; path = "Bit Slicer/ZGLoggerWindowController.h"; sourceTree = "<group>"; };
 		77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLoggerWindowController.m; path = "Bit Slicer/ZGLoggerWindowController.m"; sourceTree = "<group>"; };
 		77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGLoggerWindowController.xib; path = "Bit Slicer/ZGLoggerWindowController.xib"; sourceTree = "<group>"; };
@@ -717,6 +720,8 @@
 				77F1163E17D2EF9E009E002A /* ZGDebuggerController.h */,
 				77F1163F17D2EF9E009E002A /* ZGDebuggerController.m */,
 				77F115C017D2EBEC009E002A /* ZGDebuggerController.xib */,
+				779C6CC118E7309B0076D647 /* ZGDebuggerUtilities.h */,
+				779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */,
 				77CECE1418B8861C006D45E9 /* ZGRegistersViewController.h */,
 				77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */,
 				77CECE1618B8861C006D45E9 /* ZGRegistersViewController.xib */,
@@ -1298,6 +1303,7 @@
 				7798EEC518C40B7F001120FB /* _DDDecimalFunctions.m in Sources */,
 				77CECE1718B8861C006D45E9 /* ZGRegistersViewController.m in Sources */,
 				77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */,
+				779C6CC318E7309B0076D647 /* ZGDebuggerUtilities.m in Sources */,
 				77F115FD17D2EE7E009E002A /* ZGDocumentTableController.m in Sources */,
 				7798EED118C40B7F001120FB /* _DDVariableTerm.m in Sources */,
 				770FABAC1848354100C176B7 /* ZGEditValueWindowController.m in Sources */,
