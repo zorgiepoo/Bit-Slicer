@@ -174,20 +174,7 @@ static ZGBreakPointController *gBreakPointController;
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 2), dispatch_get_main_queue(), ^{
 		if (self.watchPointTimer != NULL)
 		{
-			BOOL shouldKeepTimer = NO;
-			for (ZGBreakPoint *watchPoint in self.breakPoints)
-			{
-				if (watchPoint.type != ZGBreakPointWatchData)
-				{
-					continue;
-				}
-				
-				if (watchPoint != breakPoint)
-				{
-					shouldKeepTimer = YES;
-					break;
-				}
-			}
+			BOOL shouldKeepTimer = [self.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *watchPoint){ return (BOOL)(watchPoint.type != ZGBreakPointWatchData && watchPoint != breakPoint); }];
 			if (!shouldKeepTimer)
 			{
 				dispatch_source_cancel(self.watchPointTimer);
@@ -337,14 +324,9 @@ static ZGBreakPointController *gBreakPointController;
 	}
 	else
 	{
-		for (ZGBreakPoint *candidateBreakPoint in self.breakPoints)
-		{
-			if (candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.thread == breakPoint.thread && candidateBreakPoint.task == breakPoint.task)
-			{
-				shouldSingleStep = YES;
-				break;
-			}
-		}
+		shouldSingleStep = [self.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
+			return (BOOL)(candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.thread == breakPoint.thread && candidateBreakPoint.task == breakPoint.task);
+		}];
 	}
 	
 	if (shouldSingleStep)
@@ -469,15 +451,9 @@ static ZGBreakPointController *gBreakPointController;
 		}
 		
 		// If we had single-stepped in here, use current program counter, otherwise use instruction address before program counter
-		BOOL foundSingleStepBreakPoint = NO;
-		for (ZGBreakPoint *candidateBreakPoint in self.breakPoints)
-		{
-			if ((candidateBreakPoint.needsToRestore || candidateBreakPoint.type == ZGBreakPointSingleStepInstruction) && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread)
-			{
-				foundSingleStepBreakPoint = YES;
-				break;
-			}
-		}
+		BOOL foundSingleStepBreakPoint = [self.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
+			return (BOOL)((candidateBreakPoint.needsToRestore || candidateBreakPoint.type == ZGBreakPointSingleStepInstruction) && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread);
+		}];
 		
 		ZGMemoryAddress foundInstructionAddress = 0x0;
 		ZGMemoryAddress instructionPointer = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
@@ -716,16 +692,9 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 			{
 				if (breakPoint.delegate == observer && (!process || breakPoint.process.processID == process.processIdentifier))
 				{
-					BOOL isDead = YES;
-					
-					for (ZGRunningProcess *runningProcess in runningProcesses)
-					{
-						if (runningProcess.processIdentifier == breakPoint.process.processID)
-						{
-							isDead = NO;
-							break;
-						}
-					}
+					BOOL isDead = ![runningProcesses zgHasObjectMatchingCondition:^(ZGRunningProcess *runningProcess) {
+						return (BOOL)(runningProcess.processIdentifier == breakPoint.process.processID);
+					}];
 					
 					breakPoint.delegate = nil;
 					
@@ -1017,15 +986,9 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		return NO;
 	}
 	
-	BOOL breakPointAlreadyExists = NO;
-	for (ZGBreakPoint *breakPoint in self.breakPoints)
-	{
-		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address == instruction.variable.address)
-		{
-			breakPointAlreadyExists = YES;
-			break;
-		}
-	}
+	BOOL breakPointAlreadyExists = [self.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) {
+		return (BOOL)(breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address == instruction.variable.address);
+	}];
 	
 	if (breakPointAlreadyExists)
 	{

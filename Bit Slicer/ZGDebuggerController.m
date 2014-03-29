@@ -358,21 +358,7 @@ enum ZGStepExecution
 
 - (BOOL)shouldUpdateSymbolsForInstructions:(NSArray *)instructions
 {
-	BOOL shouldUpdateSymbols = NO;
-	
-	if (!CSIsNull(self.symbolicator))
-	{
-		for (ZGInstruction *instruction in instructions)
-		{
-			if (instruction.symbols == nil)
-			{
-				shouldUpdateSymbols = YES;
-				break;
-			}
-		}
-	}
-	
-	return shouldUpdateSymbols;
+	return !CSIsNull(self.symbolicator) && [instructions zgHasObjectMatchingCondition:^(ZGInstruction *instruction){ return (BOOL)(instruction.symbols == nil); }];
 }
 
 #pragma mark Disassembling
@@ -397,14 +383,9 @@ enum ZGStepExecution
 					BOOL foundBreakPoint = NO;
 					if (*(uint8_t *)bytes == INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp(bytes+sizeof(uint8_t), instruction.variable.value+sizeof(uint8_t), size-sizeof(uint8_t)) == 0))
 					{
-						for (ZGBreakPoint *breakPoint in self.breakPointController.breakPoints)
-						{
-							if (breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.value == *(uint8_t *)instruction.variable.value)
-							{
-								foundBreakPoint = YES;
-								break;
-							}
-						}
+						foundBreakPoint = [self.breakPointController.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) {
+							return (BOOL)(breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.value == *(uint8_t *)instruction.variable.value);
+						}];
 					}
 					
 					if (!foundBreakPoint)
@@ -1350,18 +1331,9 @@ enum ZGStepExecution
 
 - (BOOL)isBreakPointAtInstruction:(ZGInstruction *)instruction
 {
-	BOOL answer = NO;
-	
-	for (ZGBreakPoint *breakPoint in self.breakPointController.breakPoints)
-	{
-		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.hidden && breakPoint.delegate == self)
-		{
-			answer = YES;
-			break;
-		}
-	}
-	
-	return answer;
+	return [self.breakPointController.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) {
+		return (BOOL)(breakPoint.delegate == self && breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.hidden);
+	}];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
@@ -1686,16 +1658,7 @@ enum ZGStepExecution
 
 - (BOOL)hasBreakPoint
 {
-	BOOL hasBreakPoint = NO;
-	for (ZGBreakPoint *breakPoint in self.breakPointController.breakPoints)
-	{
-		if (breakPoint.delegate == self)
-		{
-			hasBreakPoint = YES;
-			break;
-		}
-	}
-	return hasBreakPoint;
+	return [self.breakPointController.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) { return (BOOL)(breakPoint.delegate == self); }];
 }
 
 - (void)startBreakPointActivity
@@ -2104,16 +2067,7 @@ enum ZGStepExecution
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier
 {
-	BOOL foundProcess = NO;
-	for (ZGBreakPoint *breakPoint in self.haltedBreakPoints)
-	{
-		if (breakPoint.process.processID == processIdentifier)
-		{
-			foundProcess = YES;
-			break;
-		}
-	}
-	return foundProcess;
+	return [self.haltedBreakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) { return (BOOL)(breakPoint.process.processID == processIdentifier); }];
 }
 
 #pragma mark Breakpoint Conditions

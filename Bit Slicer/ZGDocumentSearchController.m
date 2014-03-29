@@ -104,18 +104,9 @@
 - (BOOL)isInNarrowSearchMode
 {
 	ZGVariableType dataType = self.dataType;
-	
-	BOOL goingToNarrowDownSearches = NO;
-	for (ZGVariable *variable in self.documentData.variables)
-	{
-		if ([self isVariableNarrowable:variable withDataType:dataType])
-		{
-			goingToNarrowDownSearches = YES;
-			break;
-		}
-	}
-	
-	return goingToNarrowDownSearches;
+	return [self.documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
+		return [self isVariableNarrowable:variable withDataType:dataType];
+	}];
 }
 
 - (BOOL)canStartTask

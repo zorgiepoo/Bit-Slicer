@@ -347,8 +347,8 @@
 	BOOL shouldKeepWatchVariablesTimer = [self.tableController updateWatchVariablesTimer];
 	if (!shouldKeepWatchVariablesTimer && self.searchController.canStartTask)
 	{
-		BOOL foundRunningScript = [self.documentData.variables zgHasObjectMatchingCondition:(zg_has_object_t)^(ZGVariable *variable) {
-			return (variable.enabled && variable.type == ZGScript);
+		BOOL foundRunningScript = [self.documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
+			return (BOOL)(variable.enabled && variable.type == ZGScript);
 		}];
 
 		if (!foundRunningScript)
@@ -712,16 +712,8 @@
 {
 	self.documentData.searchValue = self.searchValueTextField.objectValue;
 	
-	BOOL isStoringValues = NO;
-	for (id searchValueObject in self.documentData.searchValue)
-	{
-		if ([searchValueObject isKindOfClass:[ZGSearchToken class]])
-		{
-			isStoringValues = YES;
-			break;
-		}
-	}
-	
+	BOOL isStoringValues = [self.documentData.searchValue zgHasObjectMatchingCondition:^(id searchValueObject) { return [searchValueObject isKindOfClass:[ZGSearchToken class]]; }];
+
 	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
 	if (isStoringValues)
 	{
@@ -856,26 +848,17 @@
 		{
 			// All the variables selected need to either be all unfrozen or all frozen
 			BOOL isFrozen = [[self.selectedVariables objectAtIndex:0] isFrozen];
-			BOOL isInconsistent = NO;
-			BOOL scriptExists = [(ZGVariable *)[self.selectedVariables objectAtIndex:0] type] == ZGScript;
-			
-			for (ZGVariable *variable in [self.selectedVariables subarrayWithRange:NSMakeRange(1, self.selectedVariables.count-1)])
-			{
-				if (variable.isFrozen != isFrozen || !variable.value)
-				{
-					isInconsistent = YES;
-					break;
-				}
-				else if (variable.type == ZGScript)
-				{
-					scriptExists = YES;
-					break;
-				}
-			}
 			
 			menuItem.title = [NSString stringWithFormat:@"%@ Variable%@", isFrozen ? @"Unfreeze" : @"Freeze", self.selectedVariables.count != 1 ? @"s" : @""];
+
+			if (!self.isClearable)
+			{
+				return NO;
+			}
 			
-			if (isInconsistent || scriptExists || !self.isClearable)
+			if ([[self.selectedVariables subarrayWithRange:NSMakeRange(1, self.selectedVariables.count-1)] zgHasObjectMatchingCondition:^(ZGVariable *variable) {
+				return (BOOL)(variable.type == ZGScript || variable.isFrozen != isFrozen || variable.value == NULL);
+			}])
 			{
 				return NO;
 			}
@@ -897,22 +880,7 @@
 	
 	else if (menuItem.action == @selector(copy:))
 	{
-		if (self.selectedVariables.count == 0)
-		{
-			return NO;
-		}
-		
-		BOOL isValid = NO;
-		for (ZGVariable *variable in self.selectedVariables)
-		{
-			if (variable.type != ZGScript)
-			{
-				isValid = YES;
-				break;
-			}
-		}
-		
-		if (!isValid)
+		if (![self.selectedVariables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGScript); }])
 		{
 			return NO;
 		}
@@ -1065,17 +1033,10 @@
 			return NO;
 		}
 		
-		BOOL isValid = YES;
-		for (ZGVariable *variable in self.selectedVariables)
+		if (![self.selectedVariables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGByteArray || variable.value == NULL); }])
 		{
-			if (variable.type != ZGByteArray || !variable.value)
-			{
-				isValid = NO;
-				break;
-			}
+			return NO;
 		}
-		
-		return isValid;
 	}
 	
 	else if (menuItem.action == @selector(showMemoryViewer:) || menuItem.action == @selector(showDebugger:))

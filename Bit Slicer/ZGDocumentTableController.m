@@ -51,6 +51,7 @@
 #import "ZGScriptManager.h"
 #import "ZGUtilities.h"
 #import "ZGTableView.h"
+#import "NSArrayAdditions.h"
 
 @interface ZGDocumentTableController ()
 
@@ -108,39 +109,10 @@
 - (BOOL)updateWatchVariablesTimer
 {
 	ZGDocumentWindowController *windowController = self.windowController;
-	BOOL shouldHaveTimer = NO;
+	ZGProcess *process = windowController.currentProcess;
 	
-	BOOL hasVariablesThatNeedUpdating = NO;
-	if (windowController.currentProcess.valid && windowController.currentProcess.hasGrantedAccess)
-	{
-		for (ZGVariable *variable in self.documentData.variables)
-		{
-			if (variable.type != ZGScript)
-			{
-				hasVariablesThatNeedUpdating = YES;
-				break;
-			}
-		}
-	}
-	
-	if (hasVariablesThatNeedUpdating)
-	{
-		if (!windowController.isOccluded)
-		{
-			shouldHaveTimer = YES;
-		}
-		else
-		{
-			for (ZGVariable *variable in self.documentData.variables)
-			{
-				if (variable.isFrozen && variable.enabled)
-				{
-					shouldHaveTimer = YES;
-					break;
-				}
-			}
-		}
-	}
+	BOOL hasVariablesThatNeedUpdating = process.valid && process.hasGrantedAccess && [self.documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGScript); }];
+	BOOL shouldHaveTimer = hasVariablesThatNeedUpdating && (!windowController.isOccluded || [self.documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }]);
 	
 	if (shouldHaveTimer && self.watchVariablesTimer == nil)
 	{

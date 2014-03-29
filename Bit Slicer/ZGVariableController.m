@@ -109,16 +109,8 @@
 
 - (void)updateFrozenActivity
 {
-	BOOL hasFrozenVariable = NO;
-	for (ZGVariable *variable in self.documentData.variables)
-	{
-		if (variable.isFrozen && variable.enabled)
-		{
-			hasFrozenVariable = YES;
-			break;
-		}
-	}
-	
+	BOOL hasFrozenVariable = [self.documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }];
+
 	if (hasFrozenVariable && self.frozenActivity == nil && [[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)]	)
 	{
 		self.frozenActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Freezing Variables"];
@@ -289,16 +281,7 @@
 
 - (BOOL)canClearSearch
 {
-	BOOL canClearSearch = NO;
-	for (ZGVariable *variable in self.documentData.variables)
-	{
-		if (variable.type != ZGScript && !variable.isFrozen && variable.enabled)
-		{
-			canClearSearch = YES;
-			break;
-		}
-	}
-	return canClearSearch;
+	return [self.documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGScript && !variable.isFrozen && variable.enabled); }];
 }
 
 - (void)clearSearch
