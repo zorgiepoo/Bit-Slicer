@@ -928,9 +928,9 @@
 		
 		if (segmentName != nil)
 		{
+			NSString *partialPath = [machFilePath lastPathComponent];
 			if (machBinaryInfo.slide > 0)
 			{
-				NSString *partialPath = [machFilePath lastPathComponent];
 				NSString *pathToUse = nil;
 				NSString *baseArgument = @"";
 				
@@ -961,7 +961,7 @@
 				variable.finishedEvaluatingDynamicAddress = YES;
 			}
 			
-			staticVariableDescription = [NSString stringWithFormat:@"static address (%@)", segmentName];
+			staticVariableDescription = [NSString stringWithFormat:@"%@ %@ (static)", partialPath, segmentName];
 		}
 	}
 	
