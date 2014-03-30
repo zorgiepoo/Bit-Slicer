@@ -383,6 +383,12 @@
 - (void)setDesiredProcessInternalName:(NSString *)desiredProcessInternalName
 {
 	[super setDesiredProcessInternalName:desiredProcessInternalName];
+
+	if (self.documentData.desiredProcessInternalName != nil)
+	{
+		[self markDocumentChange];
+	}
+
 	self.documentData.desiredProcessInternalName = desiredProcessInternalName;
 }
 
