@@ -555,10 +555,14 @@
 
 - (void)changeMemoryViewWithSelectionLength:(ZGMemorySize)selectionLength
 {
-	NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue];
-	
+	NSError *error = nil;
+	NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAndSymbolicateExpression:self.addressTextField.stringValue process:self.currentProcess lastSearchInfo:nil error:&error];
+	if (error != nil)
+	{
+		NSLog(@"Error calculating memory address expression in memory viewer: %@", error);
+	}
+
 	ZGMemoryAddress calculatedMemoryAddress = 0;
-	
 	if (ZGIsValidNumber(calculatedMemoryAddressExpression))
 	{
 		calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
