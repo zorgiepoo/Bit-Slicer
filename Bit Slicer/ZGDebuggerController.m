@@ -171,8 +171,6 @@ enum ZGStepExecution
 	
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGDebuggerProcessInternalName];
 	[self updateRunningProcesses];
-	
-	[self.debuggerController updateWindowAndReadMemory:YES];
 }
 
 - (void)windowDidLoad
