@@ -98,7 +98,7 @@
 
 - (void)currentProcessChangedWithOldProcess:(ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
 {
-	[self changeMemoryView:nil];
+	[self changeMemoryViewWithSelectionLength:0];
 }
 
 #pragma mark Initialization
@@ -143,7 +143,7 @@
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGMemoryViewerProcessInternalName];
 	
 	[self updateRunningProcesses];
-	[self changeMemoryView:nil];
+	[self changeMemoryViewWithSelectionLength:0];
 }
 
 - (void)windowDidLoad
@@ -212,7 +212,7 @@
 	
 	if (shouldReadMemory)
 	{
-		[self changeMemoryView:nil];
+		[self changeMemoryViewWithSelectionLength:0];
 	}
 }
 
@@ -550,6 +550,11 @@
 
 - (IBAction)changeMemoryView:(id)__unused sender
 {
+	[self changeMemoryViewWithSelectionLength:DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
+}
+
+- (void)changeMemoryViewWithSelectionLength:(ZGMemorySize)selectionLength
+{
 	NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue];
 	
 	ZGMemoryAddress calculatedMemoryAddress = 0;
@@ -559,7 +564,7 @@
 		calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
 	}
 	
-	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
+	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:selectionLength];
 }
 
 - (void)revertUpdateCount
