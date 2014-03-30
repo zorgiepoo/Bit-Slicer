@@ -229,6 +229,8 @@ enum ZGStepExecution
 		[self toggleBacktraceAndRegistersViews:NSOffState];
 		[self readMemory:nil];
 	}
+
+	self.lastSearchInfo = nil;
 }
 
 #pragma mark Split Views
