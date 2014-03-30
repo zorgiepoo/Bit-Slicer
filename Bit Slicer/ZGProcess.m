@@ -92,6 +92,14 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	if (self.valid && !CSIsNull(self.symbolicator))
+	{
+		CSRelease(self.symbolicator);
+	}
+}
+
 - (BOOL)isEqual:(id)process
 {
 	return ([process processID] == self.processID);
@@ -109,6 +117,41 @@
 	_cacheDictionary = nil;
 	_dylinkerBinary = nil;
 	_mainMachBinary = nil;
+}
+
+- (CSSymbolicatorRef)symbolicator
+{
+	if (self.valid && CSIsNull(_symbolicator))
+	{
+		_symbolicator = CSSymbolicatorCreateWithTask(self.processTask);
+	}
+	return _symbolicator;
+}
+
+- (NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(ZGMemoryAddress *)relativeOffset
+{
+	NSString *symbolName = nil;
+	CSSymbolicatorRef symbolicator = self.symbolicator;
+	if (!CSIsNull(symbolicator))
+	{
+		CSSymbolRef symbol = CSSymbolicatorGetSymbolWithAddressAtTime(symbolicator, address, kCSNow);
+		if (!CSIsNull(symbol))
+		{
+			const char *symbolNameCString = CSSymbolGetName(symbol);
+			if (symbolNameCString != NULL)
+			{
+				symbolName = @(symbolNameCString);
+			}
+
+			if (relativeOffset != NULL)
+			{
+				CSRange symbolRange = CSSymbolGetRange(symbol);
+				*relativeOffset = address - symbolRange.location;
+			}
+		}
+	}
+
+	return symbolName;
 }
 
 - (NSMutableDictionary *)cacheDictionary

@@ -101,7 +101,6 @@
 
 @property (nonatomic) id breakPointActivity;
 
-@property (nonatomic) CSSymbolicatorRef symbolicator;
 @property (nonatomic) NSDictionary *lastSearchInfo;
 
 @end
@@ -197,8 +196,6 @@ enum ZGStepExecution
 	
 	[self updateExecutionButtons];
 	
-	[self createSymbolicator];
-	
 	[self toggleBacktraceAndRegistersViews:NSOffState];
 	
 	// Don't set these in IB; can't trust setting these at the right time and not screwing up the saved positions
@@ -216,29 +213,10 @@ enum ZGStepExecution
 	}
 }
 
-- (void)createSymbolicator
-{
-	if (!CSIsNull(self.symbolicator) && self.currentProcess.valid)
-	{
-		CSRelease(self.symbolicator);
-	}
-	
-	if (self.currentProcess.valid)
-	{
-		self.symbolicator = CSSymbolicatorCreateWithTask(self.currentProcess.processTask);
-	}
-	else
-	{
-		self.symbolicator = kCSNull;
-	}
-}
-
 #pragma mark Current Process Changed
 
 - (void)currentProcessChangedWithOldProcess:(ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
 {
-	[self createSymbolicator];
-	
 	[self updateExecutionButtons];
 	
 	if (self.currentBreakPoint != nil)
@@ -337,28 +315,16 @@ enum ZGStepExecution
 {
 	for (ZGInstruction *instruction in instructions)
 	{
-		CSSymbolRef symbol = CSSymbolicatorGetSymbolWithAddressAtTime(self.symbolicator, instruction.variable.address, kCSNow);
-		if (!CSIsNull(symbol))
-		{
-			NSMutableString *symbolName = [NSMutableString string];
-			
-			const char *symbolNameCString = CSSymbolGetName(symbol);
-			if (symbolNameCString != NULL)
-			{
-				[symbolName setString:@(symbolNameCString)];
-			}
-			
-			CSRange symbolRange = CSSymbolGetRange(symbol);
-			[symbolName appendFormat:@" + %llu", instruction.variable.address - symbolRange.location];
-			
-			instruction.symbols = symbolName;
-		}
+		ZGMemoryAddress relativeProcedureOffset = 0x0;
+		NSString *symbolName = [self.currentProcess symbolAtAddress:instruction.variable.address relativeOffset:&relativeProcedureOffset];
+
+		instruction.symbols = (symbolName != nil) ? [NSString stringWithFormat:@"%@ + %llu", symbolName, relativeProcedureOffset] : @"";
 	}
 }
 
 - (BOOL)shouldUpdateSymbolsForInstructions:(NSArray *)instructions
 {
-	return !CSIsNull(self.symbolicator) && [instructions zgHasObjectMatchingCondition:^(ZGInstruction *instruction){ return (BOOL)(instruction.symbols == nil); }];
+	return self.currentProcess.valid && [instructions zgHasObjectMatchingCondition:^(ZGInstruction *instruction){ return (BOOL)(instruction.symbols == nil); }];
 }
 
 #pragma mark Disassembling
@@ -811,7 +777,7 @@ enum ZGStepExecution
 	{
 		NSString *userInput = self.addressTextField.stringValue;
 		NSError *error = nil;
-		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:userInput process:self.currentProcess failedImages:nil symbolicator:self.symbolicator lastSearchInfo:self.lastSearchInfo error:&error];
+		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:userInput process:self.currentProcess failedImages:nil symbolicator:self.currentProcess.symbolicator lastSearchInfo:self.lastSearchInfo error:&error];
 		if (error != nil)
 		{
 			NSLog(@"Encountered error when reading memory from debugger:");

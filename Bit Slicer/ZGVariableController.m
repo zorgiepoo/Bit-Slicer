@@ -974,6 +974,8 @@
 	{
 		NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process];
 		
+		NSString *symbol = [process symbolAtAddress:variable.address relativeOffset:NULL];
+
 		if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
 		{
 			cachedSubmapRegionAddress = variable.address;
@@ -994,6 +996,7 @@
 		}
 		
 		NSMutableArray *validDescriptionComponents = [NSMutableArray array];
+		if (symbol.length > 0) [validDescriptionComponents addObject:symbol];
 		if (staticDescription != nil) [validDescriptionComponents addObject:staticDescription];
 		if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];
 		if (protectionDescription != nil) [validDescriptionComponents addObject:protectionDescription];

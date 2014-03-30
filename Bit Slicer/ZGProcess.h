@@ -34,6 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "CoreSymbolication.h"
 #import <sys/sysctl.h>
 
 #define NON_EXISTENT_PID_NUMBER -1
@@ -50,6 +51,8 @@
 @property (copy, nonatomic) NSString *internalName;
 @property (nonatomic) BOOL is64Bit;
 
+@property (nonatomic) CSSymbolicatorRef symbolicator;
+
 @property (nonatomic, readonly) ZGMachBinary *mainMachBinary;
 @property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
 
@@ -60,6 +63,8 @@
 - (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
 - (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
 - (instancetype)initWithProcess:(ZGProcess *)process;
+
+- (NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(ZGMemoryAddress *)relativeOffset;
 
 - (BOOL)isEqual:(id)process;
 
