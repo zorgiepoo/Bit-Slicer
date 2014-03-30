@@ -49,7 +49,6 @@
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
 #import "structmember.h"
-#import "CoreSymbolication.h"
 #import "ZGUtilities.h"
 #import "ZGPyVirtualMemory.h"
 #import "ZGBacktrace.h"
@@ -468,22 +467,17 @@ static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
 	char *symbolOwner = NULL;
 	if (PyArg_ParseTuple(args, "s|s:findSymbol", &symbolName, &symbolOwner))
 	{
-		CSSymbolicatorRef symbolicator = CSSymbolicatorCreateWithTask(self->processTask);
-		if (!CSIsNull(symbolicator))
+		ZGProcess *process = self->objcSelf.process;
+		NSNumber *symbolAddressNumber = [process findSymbol:@(symbolName) withPartialSymbolOwnerName:symbolOwner == NULL ? nil : @(symbolOwner) requiringExactMatch:YES pastAddress:0x0];
+		if (symbolAddressNumber == nil)
 		{
-			CSSymbolRef symbol = ZGFindSymbol(symbolicator, @(symbolName), symbolOwner == NULL ? nil : @(symbolOwner), 0x0, YES);
-			if (CSIsNull(symbol))
-			{
-				PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.findSymbol failed to find symbol %s", symbolName] UTF8String]);
-			}
-			else
-			{
-				retValue = Py_BuildValue("K", CSSymbolGetRange(symbol).location);
-			}
-			CSRelease(symbolicator);
+			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.findSymbol failed to find symbol %s", symbolName] UTF8String]);
+		}
+		else
+		{
+			retValue = Py_BuildValue("K", [symbolAddressNumber unsignedLongLongValue]);
 		}
 	}
-	
 	return retValue;
 }
 

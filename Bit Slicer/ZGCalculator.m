@@ -49,7 +49,7 @@
 #define ZGFindSymbolFunction @"symbol"
 #define ZGProcessVariable @"ZGProcessVariable"
 #define ZGFailedImagesVariable @"ZGFailedImagesVariable"
-#define ZGSymbolicatorVariable @"ZGSymbolicatorVariable"
+#define ZGSymbolicatesVariable @"ZGSymbolicatesVariable"
 #define ZGLastSearchInfoVariable @"ZGLastSearchInfoVariable"
 
 @implementation ZGVariable (ZGCalculatorAdditions)
@@ -157,9 +157,12 @@
 + (DDMathFunction)registerFindSymbolFunctionWithEvaluator:(DDMathEvaluator *)evaluator
 {
 	DDMathFunction findSymbolFunction = ^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator * __unused eval, NSError *__autoreleasing *error) {
-		NSValue *symbolicatorValue = [vars objectForKey:ZGSymbolicatorVariable];
+		NSNumber *symbolicatesNumber = [vars objectForKey:ZGSymbolicatesVariable];
+		ZGProcess *process = [vars objectForKey:ZGProcessVariable];
 		NSDictionary *lastSearchInfo = [vars objectForKey:ZGLastSearchInfoVariable];
+
 		__block NSNumber *symbolAddressNumber = @(0);
+
 		if (args.count == 0 || args.count > 2)
 		{
 			if (error != NULL)
@@ -167,7 +170,7 @@
 				*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumberOfArguments userInfo:@{NSLocalizedDescriptionKey:ZGFindSymbolFunction @" expects 1 or 2 arguments"}];
 			}
 		}
-		else if (symbolicatorValue == nil)
+		else if (process == nil || symbolicatesNumber == nil || ![symbolicatesNumber boolValue])
 		{
 			if (error != NULL)
 			{
@@ -210,15 +213,10 @@
 				
 				if (!encounteredError)
 				{
-					CSSymbolicatorRef symbolicator = *(CSSymbolicatorRef *)[symbolicatorValue pointerValue];
 					ZGMemoryAddress previousFoundAddress = [[lastSearchInfo objectForKey:symbolString] unsignedLongLongValue];
-					
-					CSSymbolRef symbolFound = ZGFindSymbol(symbolicator, symbolString, targetOwnerNameSuffix, previousFoundAddress, NO);
-					if (!CSIsNull(symbolFound))
-					{
-						symbolAddressNumber = @(CSSymbolGetRange(symbolFound).location);
-					}
-					else
+					symbolAddressNumber = [process findSymbol:symbolString withPartialSymbolOwnerName:targetOwnerNameSuffix requiringExactMatch:NO pastAddress:previousFoundAddress];
+
+					if (symbolAddressNumber == nil)
 					{
 						if (error != NULL)
 						{
@@ -242,7 +240,7 @@
 	evaluator.functionResolver = (DDFunctionResolver)^(NSString *name) {
 		return (DDMathFunction)^(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError **error) {
 			id result = nil;
-			if ([vars objectForKey:ZGSymbolicatorVariable] != nil && args.count == 0)
+			if ([[vars objectForKey:ZGSymbolicatesVariable] boolValue] && args.count == 0)
 			{
 				result = findSymbolFunction(@[[DDExpression variableExpressionWithVariable:name]], vars, eval, error);
 			}
@@ -464,25 +462,33 @@
 	return [[NSString alloc] initWithData:newData encoding:NSUTF8StringEncoding];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages symbolicator:(CSSymbolicatorRef)symbolicator lastSearchInfo:(NSDictionary *)lastSearchInfo error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates lastSearchInfo:(NSDictionary *)lastSearchInfo error:(NSError * __autoreleasing *)error
 {
 	NSString *newExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:expression];
 	
-	NSMutableDictionary *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process}];
+	NSMutableDictionary *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process, ZGSymbolicatesVariable : @(symbolicates)}];
+
 	if (failedImages != nil)
 	{
 		[substitutions setObject:failedImages forKey:ZGFailedImagesVariable];
 	}
-	if (!CSIsNull(symbolicator))
+
+	if (lastSearchInfo != nil)
 	{
-		[substitutions setObject:[NSValue valueWithPointer:&symbolicator] forKey:ZGSymbolicatorVariable];
-		
-		if (lastSearchInfo != nil)
-		{
-			[substitutions setObject:lastSearchInfo forKey:ZGLastSearchInfoVariable];
-		}
+		[substitutions setObject:lastSearchInfo forKey:ZGLastSearchInfoVariable];
 	}
+
 	return [self evaluateExpression:newExpression substitutions:substitutions error:error];
+}
+
++ (NSString *)evaluateAndSymbolicateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process lastSearchInfo:(NSDictionary *)lastSearchInfo error:(NSError * __autoreleasing *)error
+{
+	return [self evaluateExpression:expression process:process failedImages:nil symbolicates:YES lastSearchInfo:lastSearchInfo error:error];
+}
+
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages error:(NSError * __autoreleasing *)error
+{
+	return [self evaluateExpression:expression process:process failedImages:failedImages symbolicates:NO lastSearchInfo:nil error:error];
 }
 
 @end

@@ -125,42 +125,6 @@ NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddre
 	return userTagDescription;
 }
 
-CSSymbolRef ZGFindSymbol(CSSymbolicatorRef symbolicator, NSString *symbolName, NSString *partialSymbolOwnerName, ZGMemoryAddress previousFoundAddress, BOOL requiresExactMatch)
-{
-	__block CSSymbolRef resultSymbol = kCSNull;
-	__block BOOL foundDesiredSymbol = NO;
-	
-	const char *symbolCString = [symbolName UTF8String];
-	
-	CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
-		if (!foundDesiredSymbol)
-		{
-			const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
-			if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [partialSymbolOwnerName hasSuffix:@(symbolOwnerName)]))
-			{
-				CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
-					if (!foundDesiredSymbol)
-					{
-						const char *symbolFound = CSSymbolGetName(symbol);
-						if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
-						{
-							CSRange symbolRange = CSSymbolGetRange(symbol);
-							if (previousFoundAddress == 0x0 || previousFoundAddress >= symbolRange.location + symbolRange.length)
-							{
-								foundDesiredSymbol = YES;
-							}
-							
-							resultSymbol = symbol;
-						}
-					}
-				});
-			}
-		}
-	});
-	
-	return resultSymbol;
-}
-
 ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize, ZGMemorySize maxStringSizeLimit)
 {
 	ZGMemorySize totalSize = 0;

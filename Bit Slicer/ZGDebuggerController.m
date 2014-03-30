@@ -53,7 +53,6 @@
 #import "ZGVirtualMemoryHelpers.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
-#import "CoreSymbolication.h"
 #import "ZGTableView.h"
 #import "ZGVariableController.h"
 #import "ZGBacktrace.h"
@@ -777,7 +776,7 @@ enum ZGStepExecution
 	{
 		NSString *userInput = self.addressTextField.stringValue;
 		NSError *error = nil;
-		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateExpression:userInput process:self.currentProcess failedImages:nil symbolicator:self.currentProcess.symbolicator lastSearchInfo:self.lastSearchInfo error:&error];
+		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAndSymbolicateExpression:userInput process:self.currentProcess lastSearchInfo:self.lastSearchInfo error:&error];
 		if (error != nil)
 		{
 			NSLog(@"Encountered error when reading memory from debugger:");

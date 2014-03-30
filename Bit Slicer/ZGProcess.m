@@ -38,11 +38,14 @@
 #import "ZGProcessTaskManager.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
+#import "CoreSymbolication.h"
 
 @interface ZGProcess ()
 
 @property (nonatomic) ZGMachBinary *mainMachBinary;
 @property (nonatomic) ZGMachBinary *dylinkerBinary;
+
+@property (nonatomic) CSSymbolicatorRef symbolicator;
 
 @end
 
@@ -152,6 +155,45 @@
 	}
 
 	return symbolName;
+}
+
+- (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress
+{
+	__block CSSymbolRef resultSymbol = kCSNull;
+	__block BOOL foundDesiredSymbol = NO;
+
+	CSSymbolicatorRef symbolicator = self.symbolicator;
+	if (CSIsNull(symbolicator)) return nil;
+
+	const char *symbolCString = [symbolName UTF8String];
+
+	CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
+		if (!foundDesiredSymbol)
+		{
+			const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
+			if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [partialSymbolOwnerName hasSuffix:@(symbolOwnerName)]))
+			{
+				CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
+					if (!foundDesiredSymbol)
+					{
+						const char *symbolFound = CSSymbolGetName(symbol);
+						if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
+						{
+							CSRange symbolRange = CSSymbolGetRange(symbol);
+							if (pastAddress == 0x0 || pastAddress >= symbolRange.location + symbolRange.length)
+							{
+								foundDesiredSymbol = YES;
+							}
+
+							resultSymbol = symbol;
+						}
+					}
+				});
+			}
+		}
+	});
+
+	return CSIsNull(resultSymbol) ? nil : @(CSSymbolGetRange(resultSymbol).location);
 }
 
 - (NSMutableDictionary *)cacheDictionary
