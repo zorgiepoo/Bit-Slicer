@@ -448,6 +448,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	}
 	
 	self.currentProcess = self.runningApplicationsPopUpButton.selectedItem.representedObject;
+	[self updateRunningProcesses];
 }
 
 #pragma mark Pausing
