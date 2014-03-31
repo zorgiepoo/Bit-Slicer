@@ -85,8 +85,6 @@
 
 @interface ZGDocumentWindowController ()
 
-@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
-
 @property (nonatomic) NSString *flagsStringValue;
 @property (nonatomic) NSString *flagsLabelStringValue;
 
@@ -394,7 +392,15 @@
 
 - (void)loadDocumentUserInterface
 {
-	self.desiredProcessInternalName = (self.documentData.desiredProcessInternalName != nil) ? self.documentData.desiredProcessInternalName : self.lastChosenInternalProcessName;
+	if (self.documentData.desiredProcessInternalName != nil)
+	{
+		self.desiredProcessInternalName = self.documentData.desiredProcessInternalName;
+		//[self postLastChosenInternalProcessNameChange];
+	}
+	else
+	{
+		self.desiredProcessInternalName = self.lastChosenInternalProcessName;
+	}
 
 	[self updateRunningProcesses];
 

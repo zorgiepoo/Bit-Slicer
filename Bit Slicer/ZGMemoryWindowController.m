@@ -108,7 +108,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 {
 	if (notification.object != self)
 	{
-		self.lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
+		self.lastChosenInternalProcessName = [[notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey] copy];
 	}
 }
 
