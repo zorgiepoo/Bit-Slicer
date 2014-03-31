@@ -180,7 +180,7 @@
 						if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
 						{
 							CSRange symbolRange = CSSymbolGetRange(symbol);
-							if (pastAddress == 0x0 || pastAddress >= symbolRange.location + symbolRange.length)
+							if (pastAddress < symbolRange.location)
 							{
 								foundDesiredSymbol = YES;
 							}

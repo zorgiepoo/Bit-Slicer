@@ -100,8 +100,6 @@
 
 @property (nonatomic) id breakPointActivity;
 
-@property (nonatomic) NSDictionary *lastSearchInfo;
-
 @end
 
 #define ZGDebuggerAddressField @"ZGDisassemblerAddressField"
@@ -229,8 +227,6 @@ enum ZGStepExecution
 		[self toggleBacktraceAndRegistersViews:NSOffState];
 		[self readMemory:nil];
 	}
-
-	self.lastSearchInfo = nil;
 }
 
 #pragma mark Split Views
@@ -761,6 +757,7 @@ enum ZGStepExecution
 	}
 	
 	ZGMemoryAddress calculatedMemoryAddress = 0;
+
 	if (self.mappedFilePath != nil && sender == nil)
 	{
 		NSError *error = nil;
@@ -775,8 +772,9 @@ enum ZGStepExecution
 	else
 	{
 		NSString *userInput = self.addressTextField.stringValue;
+		ZGMemoryAddress selectedAddress = ((ZGInstruction *)[self.selectedInstructions lastObject]).variable.address;
 		NSError *error = nil;
-		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAndSymbolicateExpression:userInput process:self.currentProcess lastSearchInfo:self.lastSearchInfo error:&error];
+		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAndSymbolicateExpression:userInput process:self.currentProcess currentAddress:selectedAddress error:&error];
 		if (error != nil)
 		{
 			NSLog(@"Encountered error when reading memory from debugger:");
@@ -786,8 +784,6 @@ enum ZGStepExecution
 		if (ZGIsValidNumber(calculatedMemoryAddressExpression))
 		{
 			calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
-			
-			self.lastSearchInfo = @{userInput : @(calculatedMemoryAddress)};
 		}
 	}
 	
