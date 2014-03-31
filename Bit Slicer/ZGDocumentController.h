@@ -43,4 +43,6 @@
 
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 
+@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
+
 @end

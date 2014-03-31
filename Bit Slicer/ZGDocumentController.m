@@ -37,12 +37,6 @@
 #import "ZGProcessTaskManager.h"
 #import "ZGDocument.h"
 
-@interface ZGDocumentController ()
-
-@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
-
-@end
-
 @implementation ZGDocumentController
 {
 	ZGProcessTaskManager *_processTaskManager;
@@ -60,27 +54,8 @@
 		_debuggerController = debuggerController;
 		_breakPointController = breakPointController;
 		_loggerWindowController = loggerWindowController;
-		
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(lastChosenInternalProcessNameChanged:)
-		 name:ZGLastChosenInternalProcessNameNotification
-		 object:nil];
 	}
 	return self;
-}
-
-- (void)dealloc
-{
-	[[NSNotificationCenter defaultCenter]
-	 removeObserver:self
-	 name:ZGLastChosenInternalProcessNameNotification
-	 object:nil];
-}
-
-- (void)lastChosenInternalProcessNameChanged:(NSNotification *)notification
-{
-	self.lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
 }
 
 - (void)initializeDocument:(ZGDocument *)document

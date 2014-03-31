@@ -71,7 +71,7 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 
 - (void)updateWindow;
 
-- (void)postLastChosenInternalProcessNameChange;
+- (void)setAndPostLastChosenInternalProcessName;
 
 - (void)windowWillClose:(NSNotification *)notification;
 

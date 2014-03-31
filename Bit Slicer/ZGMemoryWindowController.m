@@ -60,12 +60,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	if (self != nil)
 	{
 		self.processTaskManager = processTaskManager;
-		
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(lastChosenInternalProcessNameChanged:)
-		 name:ZGLastChosenInternalProcessNameNotification
-		 object:nil];
 	}
 	
 	return self;
@@ -89,11 +83,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 {
 	[[NSNotificationCenter defaultCenter]
 	 removeObserver:self
-	 name:ZGLastChosenInternalProcessNameNotification
-	 object:nil];
-	
-	[[NSNotificationCenter defaultCenter]
-	 removeObserver:self
 	 name:NSWindowDidChangeOcclusionStateNotification
 	 object:nil];
 	
@@ -104,20 +93,21 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	[self.processList removeObserver:self forKeyPath:@"runningProcesses"];
 }
 
-- (void)lastChosenInternalProcessNameChanged:(NSNotification *)notification
-{
-	if (notification.object != self)
-	{
-		self.lastChosenInternalProcessName = [[notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey] copy];
-	}
-}
-
 - (void)postLastChosenInternalProcessNameChange
 {
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName:ZGLastChosenInternalProcessNameNotification
 	 object:self
 	 userInfo:@{ZGLastChosenInternalProcessNameKey : self.lastChosenInternalProcessName}];
+}
+
+- (void)setAndPostLastChosenInternalProcessName
+{
+	if (self.currentProcess.valid)
+	{
+		self.lastChosenInternalProcessName = self.currentProcess.internalName;
+		[self postLastChosenInternalProcessNameChange];
+	}
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(id)__unused sender

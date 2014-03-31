@@ -98,11 +98,17 @@
 		 selector:@selector(showWindowControllerNotification:)
 		 name:ZGNavigationShowMemoryViewerNotification
 		 object:nil];
-		
+
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
 		 selector:@selector(showWindowControllerNotification:)
 		 name:ZGNavigationShowDebuggerNotification
+		 object:nil];
+
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+		 selector:@selector(lastChosenInternalProcessNameChanged:)
+		 name:ZGLastChosenInternalProcessNameNotification
 		 object:nil];
 	}
 	
@@ -233,6 +239,23 @@
 		
 		[self showMemoryWindowController:self.memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:NO];
 		[self.memoryViewer jumpToMemoryAddress:address withSelectionLength:selectionLength inProcess:process];
+	}
+}
+
+- (void)lastChosenInternalProcessNameChanged:(NSNotification *)notification
+{
+	NSString *lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
+
+	self.documentController.lastChosenInternalProcessName = lastChosenInternalProcessName;
+
+	if (self.debuggerController != notification.object)
+	{
+		self.debuggerController.lastChosenInternalProcessName = lastChosenInternalProcessName;
+	}
+
+	if (self.memoryViewer != notification.object)
+	{
+		self.memoryViewer.lastChosenInternalProcessName = lastChosenInternalProcessName;
 	}
 }
 

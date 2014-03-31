@@ -143,6 +143,7 @@
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGMemoryViewerProcessInternalName];
 	
 	[self updateRunningProcesses];
+	[self setAndPostLastChosenInternalProcessName];
 	[self changeMemoryViewWithSelectionLength:0];
 }
 

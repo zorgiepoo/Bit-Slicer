@@ -114,6 +114,8 @@
 
 @property (nonatomic) NSPopover *advancedOptionsPopover;
 
+@property (nonatomic) BOOL loadedDocumentBefore;
+
 @end
 
 @implementation ZGDocumentWindowController
@@ -265,6 +267,8 @@
 
 	[self setupProcessListNotifications];
 	[self loadDocumentUserInterface];
+
+	self.loadedDocumentBefore = YES;
 }
 
 - (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess
@@ -382,7 +386,7 @@
 {
 	[super setDesiredProcessInternalName:desiredProcessInternalName];
 
-	if (self.documentData.desiredProcessInternalName != nil)
+	if (self.loadedDocumentBefore)
 	{
 		[self markDocumentChange];
 	}
@@ -392,17 +396,10 @@
 
 - (void)loadDocumentUserInterface
 {
-	if (self.documentData.desiredProcessInternalName != nil)
-	{
-		self.desiredProcessInternalName = self.documentData.desiredProcessInternalName;
-		//[self postLastChosenInternalProcessNameChange];
-	}
-	else
-	{
-		self.desiredProcessInternalName = self.lastChosenInternalProcessName;
-	}
+	self.desiredProcessInternalName = (self.documentData.desiredProcessInternalName != nil) ? self.documentData.desiredProcessInternalName : self.lastChosenInternalProcessName;
 
 	[self updateRunningProcesses];
+	[self setAndPostLastChosenInternalProcessName];
 
 	[self updateNumberOfValuesDisplayedStatus];
 	
