@@ -43,6 +43,9 @@
 
 @interface ZGMemoryViewerController : ZGMemoryNavigationWindowController <NSWindowDelegate>
 
+@property (nonatomic) ZGMemoryAddress currentMemoryAddress;
+@property (nonatomic) ZGMemorySize currentMemorySize;
+
 - (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
 
 - (HFRange)selectedAddressRange;

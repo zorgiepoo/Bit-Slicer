@@ -597,9 +597,6 @@ enum ZGStepExecution
 	self.instructions = @[];
 	[self.instructionsTableView reloadData];
 	
-	self.currentMemoryAddress = address;
-	self.currentMemorySize = 0;
-	
 	self.disassembling = YES;
 	
 	id disassemblingActivity = nil;
@@ -619,8 +616,7 @@ enum ZGStepExecution
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			self.instructions = newInstructions;
-			self.currentMemorySize = self.instructions.count;
-			
+
 			[self.instructionsTableView noteNumberOfRowsChanged];
 			
 			ZGInstruction *selectionInstruction = [self findInstructionInTableAtAddress:selectionAddress];

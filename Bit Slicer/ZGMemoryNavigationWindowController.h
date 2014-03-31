@@ -45,9 +45,6 @@ enum ZGNavigation
 @property (nonatomic, assign) IBOutlet NSSegmentedControl *navigationSegmentedControl;
 @property (nonatomic, assign) IBOutlet NSTextField *addressTextField;
 
-@property (nonatomic) ZGMemoryAddress currentMemoryAddress;
-@property (nonatomic) ZGMemorySize currentMemorySize;
-
 @property (nonatomic) NSUndoManager *navigationManager;
 
 - (void)updateNavigationButtons;
