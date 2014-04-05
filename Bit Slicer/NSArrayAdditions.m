@@ -63,7 +63,7 @@
 	return newResults;
 }
 
-- (BOOL)zgHasObjectMatchingCondition:(zg_has_object_t)matchingCondition
+- (BOOL)zgHasObjectMatchingCondition:(zg_array_filter_t)matchingCondition
 {
 	for (id item in self)
 	{
@@ -73,6 +73,11 @@
 		}
 	}
 	return NO;
+}
+
+- (BOOL)zgAllObjectsMatchingCondition:(zg_array_filter_t)matchingCondition
+{
+	return [self zgFilterUsingBlock:matchingCondition].count == self.count;
 }
 
 // our's first, their's later

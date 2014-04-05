@@ -1042,7 +1042,7 @@
 			return NO;
 		}
 		
-		if (![self.selectedVariables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGByteArray || variable.value == NULL); }])
+		if (![self.selectedVariables zgAllObjectsMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type == ZGByteArray && variable.value != NULL); }])
 		{
 			return NO;
 		}
