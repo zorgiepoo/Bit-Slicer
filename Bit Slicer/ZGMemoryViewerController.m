@@ -44,7 +44,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 #import "ZGRegion.h"
-#import "ZGMemoryProtectionController.h"
+#import "ZGMemoryProtectionWindowController.h"
 #import "ZGMemoryDumpController.h"
 #import "ZGNavigationPost.h"
 
@@ -69,7 +69,7 @@
 
 @property (nonatomic, assign) IBOutlet HFTextView *textView;
 
-@property (assign, nonatomic) IBOutlet ZGMemoryProtectionController *memoryProtectionController;
+@property (nonatomic) ZGMemoryProtectionWindowController *memoryProtectionWindowController;
 @property (assign, nonatomic) IBOutlet ZGMemoryDumpController *memoryDumpController;
 
 @end
@@ -736,9 +736,22 @@
 
 #pragma mark Memory Protection
 
+- (ZGMemoryProtectionWindowController *)memoryProtectionWindowController
+{
+	if (_memoryProtectionWindowController == nil)
+	{
+		_memoryProtectionWindowController = [[ZGMemoryProtectionWindowController alloc] init];
+	}
+	return _memoryProtectionWindowController;
+}
+
 - (IBAction)changeMemoryProtection:(id)__unused sender
 {
-	[self.memoryProtectionController changeMemoryProtectionRequest];
+	[self.memoryProtectionWindowController
+	 attachToWindow:self.window
+	 withProcess:self.currentProcess
+	 requestedAddressRange:self.selectedAddressRange
+	 undoManager:self.undoManager];
 }
 
 #pragma mark Dumping Memory

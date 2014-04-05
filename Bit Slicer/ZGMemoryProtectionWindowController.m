@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/19/12.
+ * Created by Mayur Pawashe on 4/5/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,33 +32,37 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGMemoryProtectionController.h"
-#import "ZGMemoryViewerController.h"
+#import "ZGMemoryProtectionWindowController.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
 #import "ZGUtilities.h"
 #import "ZGMemoryTypes.h"
 
-@interface ZGMemoryProtectionController ()
+@interface ZGMemoryProtectionWindowController ()
 
-@property (nonatomic, assign) IBOutlet ZGMemoryViewerController *memoryViewer;
-@property (nonatomic, assign) IBOutlet NSWindow *changeProtectionWindow;
-@property (nonatomic, assign) IBOutlet NSTextField *changeProtectionAddressTextField;
-@property (nonatomic, assign) IBOutlet NSTextField *changeProtectionSizeTextField;
-@property (nonatomic, assign) IBOutlet NSButton *changeProtectionReadButton;
-@property (nonatomic, assign) IBOutlet NSButton *changeProtectionWriteButton;
-@property (nonatomic, assign) IBOutlet NSButton *changeProtectionExecuteButton;
+@property (nonatomic, assign) IBOutlet NSTextField *addressTextField;
+@property (nonatomic, assign) IBOutlet NSTextField *sizeTextField;
+
+@property (nonatomic, assign) IBOutlet NSButton *readButton;
+@property (nonatomic, assign) IBOutlet NSButton *writeButton;
+@property (nonatomic, assign) IBOutlet NSButton *executeButton;
+
+@property (nonatomic) NSUndoManager *undoManager;
+@property (nonatomic) ZGProcess *process;
 
 @end
 
-@implementation ZGMemoryProtectionController
+@implementation ZGMemoryProtectionWindowController
 
-#pragma mark Memory Protection
+- (NSString *)windowNibName
+{
+	return NSStringFromClass([self class]);
+}
 
 - (BOOL)changeProtectionAtAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size oldProtection:(ZGMemoryProtection)oldProtection newProtection:(ZGMemoryProtection)newProtection
 {
-	BOOL success = ZGProtect(self.memoryViewer.currentProcess.processTask, address, size, newProtection);
+	BOOL success = ZGProtect(self.process.processTask, address, size, newProtection);
 	
 	if (!success)
 	{
@@ -69,29 +73,29 @@
 	}
 	else
 	{
-		self.memoryViewer.undoManager.actionName = @"Protection Change";
-		[[self.memoryViewer.undoManager prepareWithInvocationTarget:self]
+		self.undoManager.actionName = @"Protection Change";
+		[[self.undoManager prepareWithInvocationTarget:self]
 		 changeProtectionAtAddress:address size:size oldProtection:newProtection newProtection:oldProtection	];
 	}
 	
 	return success;
 }
 
-- (IBAction)changeProtectionOkayButton:(id)__unused sender
+- (IBAction)changeMemoryProtection:(id)__unused sender
 {
-	NSString *addressExpression = [ZGCalculator evaluateExpression:self.changeProtectionAddressTextField.stringValue];
+	NSString *addressExpression = [ZGCalculator evaluateExpression:self.addressTextField.stringValue];
 	ZGMemoryAddress address = ZGMemoryAddressFromExpression(addressExpression);
 	
-	NSString *sizeExpression = [ZGCalculator evaluateExpression:self.changeProtectionSizeTextField.stringValue];
+	NSString *sizeExpression = [ZGCalculator evaluateExpression:self.sizeTextField.stringValue];
 	ZGMemorySize size = (ZGMemorySize)ZGMemoryAddressFromExpression(sizeExpression);
 	
-	if (size > 0 && ![addressExpression isEqualToString:@""] && ![sizeExpression isEqualToString:@""])
+	if (size > 0 && addressExpression.length > 0 && sizeExpression.length > 0)
 	{
 		// First check if we can find the memory region the address resides in
 		ZGMemoryAddress memoryAddress = address;
 		ZGMemorySize memorySize = size;
 		ZGMemoryProtection oldProtection;
-		if (!ZGMemoryProtectionInRegion(self.memoryViewer.currentProcess.processTask, &memoryAddress, &memorySize, &oldProtection))
+		if (!ZGMemoryProtectionInRegion(self.process.processTask, &memoryAddress, &memorySize, &oldProtection))
 		{
 			NSRunAlertPanel(
 							@"Memory Protection Change Failed",
@@ -102,26 +106,26 @@
 		{
 			ZGMemoryProtection protection = VM_PROT_NONE;
 			
-			if (self.changeProtectionReadButton.state == NSOnState)
+			if (self.readButton.state == NSOnState)
 			{
 				protection |= VM_PROT_READ;
 			}
 			
-			if (self.changeProtectionWriteButton.state == NSOnState)
+			if (self.writeButton.state == NSOnState)
 			{
 				protection |= VM_PROT_WRITE;
 			}
 			
-			if (self.changeProtectionExecuteButton.state == NSOnState)
+			if (self.executeButton.state == NSOnState)
 			{
 				protection |= VM_PROT_EXECUTE;
 			}
 			
 			if ([self changeProtectionAtAddress:address size:size oldProtection:oldProtection newProtection:protection])
 			{
-				[NSApp endSheet:self.changeProtectionWindow];
-				[self.changeProtectionWindow close];
-			} 
+				[NSApp endSheet:self.window];
+				[self.window close];
+			}
 		}
 	}
 	else
@@ -133,46 +137,48 @@
 	}
 }
 
-- (IBAction)changeProtectionCancelButton:(id)__unused sender
+- (IBAction)cancelMemoryProtectionChange:(id)__unused sender
 {
-	[NSApp endSheet:self.changeProtectionWindow];
-	[self.changeProtectionWindow close];
+	[NSApp endSheet:self.window];
+	[self.window close];
 }
 
-- (void)changeMemoryProtectionRequest
+- (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process requestedAddressRange:(HFRange)requestedAddressRange undoManager:(NSUndoManager *)undoManager
 {
-	// guess what the user may want based on selection
-	HFRange selectedRange = self.memoryViewer.selectedAddressRange;
+	self.process = process;
+	self.undoManager = undoManager;
 	
-	if (selectedRange.length > 0)
+	[self window]; // ensure window is loaded
+	
+	if (requestedAddressRange.length > 0)
 	{
-		self.changeProtectionAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", selectedRange.location];
-		self.changeProtectionSizeTextField.stringValue = [NSString stringWithFormat:@"%llu", selectedRange.length];
+		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", requestedAddressRange.location];
+		self.sizeTextField.stringValue = [NSString stringWithFormat:@"%llu", requestedAddressRange.length];
 		
 		ZGMemoryProtection memoryProtection;
-		ZGMemoryAddress memoryAddress = selectedRange.location;
+		ZGMemoryAddress memoryAddress = requestedAddressRange.location;
 		ZGMemorySize memorySize;
 		
 		// Tell the user what the current memory protection is set as
-		if (ZGMemoryProtectionInRegion(self.memoryViewer.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection) &&
-            memoryAddress <= selectedRange.location && memoryAddress + memorySize >= selectedRange.location + selectedRange.length)
+		if (ZGMemoryProtectionInRegion(self.process.processTask, &memoryAddress, &memorySize, &memoryProtection) &&
+            memoryAddress <= requestedAddressRange.location && memoryAddress + memorySize >= requestedAddressRange.location + requestedAddressRange.length)
 		{
-			self.changeProtectionReadButton.state = memoryProtection & VM_PROT_READ;
-			self.changeProtectionWriteButton.state = memoryProtection & VM_PROT_WRITE;
-			self.changeProtectionExecuteButton.state = memoryProtection & VM_PROT_EXECUTE;
+			self.readButton.state = memoryProtection & VM_PROT_READ;
+			self.writeButton.state = memoryProtection & VM_PROT_WRITE;
+			self.executeButton.state = memoryProtection & VM_PROT_EXECUTE;
 		}
 		else
 		{
 			// Turn everything off if we couldn't find the current memory protection
-			self.changeProtectionReadButton.state = NSOffState;
-			self.changeProtectionWriteButton.state = NSOffState;
-			self.changeProtectionExecuteButton.state = NSOffState;
+			self.readButton.state = NSOffState;
+			self.writeButton.state = NSOffState;
+			self.executeButton.state = NSOffState;
 		}
 	}
 	
 	[NSApp
-	 beginSheet:self.changeProtectionWindow
-	 modalForWindow:self.memoryViewer.window
+	 beginSheet:self.window
+	 modalForWindow:parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];
