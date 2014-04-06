@@ -1191,14 +1191,10 @@ enum ZGStepExecution
 
 - (void)annotateInstructions:(NSArray *)instructions
 {
-	NSMutableArray *variablesToAnnotate = [NSMutableArray array];
-	for (ZGInstruction *instruction in instructions)
-	{
-		if (!instruction.variable.usesDynamicAddress)
-		{
-			[variablesToAnnotate addObject:instruction.variable];
-		}
-	}
+	NSArray *variablesToAnnotate = [[instructions zgMapUsingBlock:^(ZGInstruction *instruction) { return instruction.variable; }]
+	 zgFilterUsingBlock:^(ZGVariable *variable) {
+		 return (BOOL)(!variable.usesDynamicAddress);
+	 }];
 	
 	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess];
 	
@@ -1228,7 +1224,7 @@ enum ZGStepExecution
 	
 	for (ZGInstruction *instruction in selectedInstructions)
 	{
-		[descriptionComponents addObject:[@[instruction.variable.addressStringValue, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
+		[descriptionComponents addObject:[@[instruction.variable.addressFormula, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
 		[variablesArray addObject:instruction.variable];
 	}
 	
@@ -1240,9 +1236,10 @@ enum ZGStepExecution
 - (IBAction)copyAddress:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
-	
+	[self annotateInstructions:@[selectedInstruction]];
+
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressStringValue	forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressFormula forType:NSStringPboardType];
 }
 
 - (void)scrollAndSelectRow:(NSUInteger)selectionRow

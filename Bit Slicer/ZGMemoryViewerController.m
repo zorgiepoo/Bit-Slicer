@@ -48,6 +48,7 @@
 #import "ZGMemoryDumpRangeWindowController.h"
 #import "ZGMemoryDumpAllWindowController.h"
 #import "ZGNavigationPost.h"
+#import "ZGVariableController.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -732,8 +733,13 @@
 
 - (IBAction)copyAddress:(id)__unused sender
 {
+	HFRange selectedAddressRange = [self selectedAddressRange];
+	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:selectedAddressRange.length address:selectedAddressRange.location type:ZGByteArray qualifier:ZGUnsigned pointerSize:self.currentProcess.pointerSize];
+
+	[ZGVariableController annotateVariables:@[variable] process:self.currentProcess];
+	
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:[NSString stringWithFormat:@"0x%llX", [self selectedAddressRange].location] forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] setString:variable.addressFormula forType:NSStringPboardType];
 }
 
 #pragma mark Memory Protection

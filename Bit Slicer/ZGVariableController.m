@@ -178,7 +178,7 @@
 	 owner:self];
 	
 	[NSPasteboard.generalPasteboard
-	 setString:variable.addressStringValue
+	 setString:variable.addressFormula
 	 forType:NSStringPboardType];
 }
 
@@ -199,7 +199,7 @@
 	{
 		if (variable.type != ZGScript)
 		{
-			[linesToWrite addObject:[@[variable.shortDescription, variable.addressStringValue, variable.stringValue] componentsJoinedByString:@"\t"]];
+			[linesToWrite addObject:[@[variable.shortDescription, variable.addressFormula, variable.stringValue] componentsJoinedByString:@"\t"]];
 		}
 	}
 	

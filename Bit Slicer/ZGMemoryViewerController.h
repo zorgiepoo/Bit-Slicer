@@ -48,8 +48,6 @@
 
 - (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
 
-- (HFRange)selectedAddressRange;
-
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength inProcess:(ZGProcess *)requestedProcess;
 
 - (IBAction)toggleDataInspector:(id)sender;
