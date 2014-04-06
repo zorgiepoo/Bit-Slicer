@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/19/12.
+ * Created by Mayur Pawashe on 4/6/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,23 +32,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGMemoryDumpController.h"
-#import "ZGMemoryViewerController.h"
-#import "ZGMemoryDumpFunctions.h"
-#import "ZGProcess.h"
-#import "ZGCalculator.h"
-#import "ZGMemoryTypes.h"
-#import "ZGUtilities.h"
-#import "ZGVirtualMemory.h"
+#import "ZGMemoryDumpAllWindowController.h"
 #import "ZGSearchProgress.h"
+#import "ZGProcess.h"
+#import "ZGMemoryDumpFunctions.h"
+#import "ZGUtilities.h"
 
-@interface ZGMemoryDumpController ()
+@interface ZGMemoryDumpAllWindowController ()
 
-@property (assign, nonatomic) IBOutlet ZGMemoryViewerController *memoryViewer;
-
-@property (nonatomic, assign) IBOutlet NSWindow *memoryDumpProgressWindow;
-@property (nonatomic, assign) IBOutlet NSButton *memoryDumpProgressCancelButton;
-
+@property (nonatomic, assign) IBOutlet NSButton *cancelButton;
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
 
 @property (nonatomic) ZGSearchProgress *searchProgress;
@@ -56,17 +48,20 @@
 
 @end
 
-@implementation ZGMemoryDumpController
+@implementation ZGMemoryDumpAllWindowController
 
-#pragma mark Memory Dump All
+- (NSString *)windowNibName
+{
+	return NSStringFromClass([self class]);
+}
 
-- (void)memoryDumpAllRequest
+- (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process
 {
 	NSSavePanel *savePanel = NSSavePanel.savePanel;
 	savePanel.message = @"Choose a folder name to save the memory dump files to.";
 	
 	[savePanel
-	 beginSheetModalForWindow:self.memoryViewer.window
+	 beginSheetModalForWindow:parentWindow
 	 completionHandler:^(NSInteger result)
 	 {
 		 if (result == NSFileHandlingPanelOKButton)
@@ -88,13 +83,13 @@
 				  error:NULL];
 				 
 				 [NSApp
-				  beginSheet:self.memoryDumpProgressWindow
-				  modalForWindow:self.memoryViewer.window
+				  beginSheet:self.window
+				  modalForWindow:parentWindow
 				  modalDelegate:self
 				  didEndSelector:nil
 				  contextInfo:NULL];
 				 
-				 [self.memoryDumpProgressCancelButton setEnabled:YES];
+				 [self.cancelButton setEnabled:YES];
 				 
 				 self.isBusy = YES;
 				 
@@ -105,7 +100,7 @@
 				 }
 				 
 				 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-					 if (!ZGDumpAllDataToDirectory(savePanel.URL.relativePath, self.memoryViewer.currentProcess.processTask, self))
+					 if (!ZGDumpAllDataToDirectory(savePanel.URL.relativePath, process.processTask, self))
 					 {
 						 NSRunAlertPanel(
 										 @"The Memory Dump failed",
@@ -116,13 +111,13 @@
 					 dispatch_async(dispatch_get_main_queue(), ^{
 						 if (!self.searchProgress.shouldCancelSearch)
 						 {
-							 ZGDeliverUserNotification(@"Finished Dumping Memory", nil, [NSString stringWithFormat:@"Dumped all memory for %@", self.memoryViewer.currentProcess.name]);
+							 ZGDeliverUserNotification(@"Finished Dumping Memory", nil, [NSString stringWithFormat:@"Dumped all memory for %@", process.name]);
 						 }
 						 
 						 self.progressIndicator.doubleValue = 0.0;
 						 
-						 [NSApp endSheet:self.memoryDumpProgressWindow];
-						 [self.memoryDumpProgressWindow close];
+						 [NSApp endSheet:self.window];
+						 [self.window close];
 						 
 						 self.isBusy = NO;
 						 self.searchProgress = nil;
@@ -141,10 +136,8 @@
 - (IBAction)cancelDumpingAllMemory:(id)__unused sender
 {
 	self.searchProgress.shouldCancelSearch = YES;
-	[self.memoryDumpProgressCancelButton setEnabled:NO];
+	[self.cancelButton setEnabled:NO];
 }
-
-#pragma mark Memory Dump All Progress
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress
 {
