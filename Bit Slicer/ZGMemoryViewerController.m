@@ -46,6 +46,7 @@
 #import "ZGRegion.h"
 #import "ZGMemoryProtectionWindowController.h"
 #import "ZGMemoryDumpController.h"
+#import "ZGMemoryDumpRangeWindowController.h"
 #import "ZGNavigationPost.h"
 
 #define READ_MEMORY_INTERVAL 0.1
@@ -70,6 +71,7 @@
 @property (nonatomic, assign) IBOutlet HFTextView *textView;
 
 @property (nonatomic) ZGMemoryProtectionWindowController *memoryProtectionWindowController;
+@property (nonatomic) ZGMemoryDumpRangeWindowController *memoryDumpRangeWindowController;
 @property (assign, nonatomic) IBOutlet ZGMemoryDumpController *memoryDumpController;
 
 @end
@@ -756,9 +758,24 @@
 
 #pragma mark Dumping Memory
 
+- (ZGMemoryDumpRangeWindowController *)memoryDumpRangeWindowController
+{
+	if (_memoryDumpRangeWindowController == nil)
+	{
+		_memoryDumpRangeWindowController = [[ZGMemoryDumpRangeWindowController alloc] init];
+	}
+	return _memoryDumpRangeWindowController;
+}
+
 - (IBAction)dumpMemoryInRange:(id)__unused sender
 {
-	[self.memoryDumpController memoryDumpRangeRequest];
+	HFRange selectedAddressRange = self.selectedAddressRange;
+	HFRange requestedAddressRange = selectedAddressRange.length == 0 ? HFRangeMake(self.currentMemoryAddress, self.currentMemorySize) : selectedAddressRange;
+
+	[self.memoryDumpRangeWindowController
+	 attachToWindow:self.window
+	 withProcess:self.currentProcess
+	 requestedAddressRange:requestedAddressRange];
 }
 
 - (IBAction)dumpAllMemory:(id)__unused sender

@@ -46,10 +46,6 @@
 
 @property (assign, nonatomic) IBOutlet ZGMemoryViewerController *memoryViewer;
 
-@property (nonatomic, assign) IBOutlet NSWindow *memoryDumpWindow;
-@property (nonatomic, assign) IBOutlet NSTextField *memoryDumpFromAddressTextField;
-@property (nonatomic, assign) IBOutlet NSTextField *memoryDumpToAddressTextField;
-
 @property (nonatomic, assign) IBOutlet NSWindow *memoryDumpProgressWindow;
 @property (nonatomic, assign) IBOutlet NSButton *memoryDumpProgressCancelButton;
 
@@ -61,92 +57,6 @@
 @end
 
 @implementation ZGMemoryDumpController
-
-#pragma mark Memory Dump in Range
-
-- (IBAction)memoryDumpOkayButton:(id)__unused sender
-{
-	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:self.memoryDumpFromAddressTextField.stringValue];
-	ZGMemoryAddress fromAddress = ZGMemoryAddressFromExpression(fromAddressExpression);
-	
-	NSString *toAddressExpression = [ZGCalculator evaluateExpression:self.memoryDumpToAddressTextField.stringValue];
-	ZGMemoryAddress toAddress = ZGMemoryAddressFromExpression(toAddressExpression);
-	
-	if (toAddress > fromAddress && ![fromAddressExpression isEqualToString:@""] && ![toAddressExpression isEqualToString:@""])
-	{
-		[NSApp endSheet:self.memoryDumpWindow];
-		[self.memoryDumpWindow close];
-		
-		NSSavePanel *savePanel = NSSavePanel.savePanel;
-		[savePanel
-		 beginSheetModalForWindow:self.memoryViewer.window
-		 completionHandler:^(NSInteger result)
-		 {
-			 if (result == NSFileHandlingPanelOKButton)
-			 {
-				 BOOL success = NO;
-				 ZGMemorySize size = toAddress - fromAddress;
-				 void *bytes = NULL;
-				 
-				 if ((success = ZGReadBytes(self.memoryViewer.currentProcess.processTask, fromAddress, &bytes, &size)))
-				 {
-					 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
-					 success = [data writeToURL:savePanel.URL atomically:NO];
-					 
-					 ZGFreeBytes(bytes, size);
-				 }
-				 else
-				 {
-					 NSLog(@"Failed to read region");
-				 }
-				 
-				 if (!success)
-				 {
-					 NSRunAlertPanel(
-									 @"The Memory Dump failed",
-									 @"An error resulted in writing the memory dump.",
-									 @"OK", nil, nil);
-				 }
-			 }
-		 }];
-	}
-	else
-	{
-		NSRunAlertPanel(
-						@"Invalid range",
-						@"Please make sure you typed in the addresses correctly.",
-						@"OK", nil, nil);
-	}
-}
-
-- (IBAction)memoryDumpCancelButton:(id)__unused sender
-{
-	[NSApp endSheet:self.memoryDumpWindow];
-	[self.memoryDumpWindow close];
-}
-
-- (void)memoryDumpRangeRequest
-{
-	// guess what the user may want if nothing is in the text fields
-	HFRange selectedRange = self.memoryViewer.selectedAddressRange;
-	if (selectedRange.length > 0)
-	{
-		self.memoryDumpFromAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", selectedRange.location];
-		self.memoryDumpToAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", selectedRange.location + selectedRange.length];
-	}
-	else
-	{
-		self.memoryDumpFromAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", self.memoryViewer.currentMemoryAddress];
-		self.memoryDumpToAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", self.memoryViewer.currentMemoryAddress + self.memoryViewer.currentMemorySize];
-	}
-	
-	[NSApp
-	 beginSheet:self.memoryDumpWindow
-	 modalForWindow:self.memoryViewer.window
-	 modalDelegate:self
-	 didEndSelector:nil
-	 contextInfo:NULL];
-}
 
 #pragma mark Memory Dump All
 

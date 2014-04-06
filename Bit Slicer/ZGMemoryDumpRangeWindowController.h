@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/19/12.
+ * Created by Mayur Pawashe on 4/6/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,13 +32,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "ZGSearchProgressDelegate.h"
+#import <Cocoa/Cocoa.h>
+#import <HexFiend/HexFiend.h>
 
-@interface ZGMemoryDumpController : NSObject <ZGSearchProgressDelegate>
+@class ZGProcess;
 
-@property (readonly, nonatomic) BOOL isBusy;
+@interface ZGMemoryDumpRangeWindowController : NSWindowController
 
-- (void)memoryDumpAllRequest;
+- (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process requestedAddressRange:(HFRange)requestedAddressRange;
 
 @end
