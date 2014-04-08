@@ -81,6 +81,7 @@ declareDebugPrototypeMethod(disassemble)
 declareDebugPrototypeMethod(readBytes)
 declareDebugPrototypeMethod(writeBytes)
 declareDebugPrototypeMethod(findSymbol)
+declareDebugPrototypeMethod(symbolAt)
 declareDebugPrototypeMethod(bytesBeforeInjection)
 declareDebugPrototypeMethod(injectCode)
 declareDebugPrototypeMethod(watchWriteAccesses)
@@ -105,6 +106,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(assemble)
 	declareDebugMethod(disassemble)
 	declareDebugMethod(findSymbol)
+	declareDebugMethod(symbolAt)
 	declareDebugMethod(readBytes)
 	declareDebugMethod(writeBytes)
 	declareDebugMethod(bytesBeforeInjection)
@@ -476,6 +478,28 @@ static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
 		else
 		{
 			retValue = Py_BuildValue("K", [symbolAddressNumber unsignedLongLongValue]);
+		}
+	}
+	return retValue;
+}
+
+static PyObject *Debugger_symbolAt(DebuggerClass *self, PyObject *args)
+{
+	PyObject *retValue = NULL;
+	ZGMemoryAddress memoryAddress = 0x0;
+	if (PyArg_ParseTuple(args, "K:symbolAt", &memoryAddress))
+	{
+		ZGProcess *process = self->objcSelf.process;
+		ZGMemoryAddress relativeOffset = 0x0;
+		NSString *symbol = [process symbolAtAddress:memoryAddress relativeOffset:&relativeOffset];
+		if (symbol != nil)
+		{
+			NSString *symbolWithRelativeOffset = [NSString stringWithFormat:@"%@ + %llu", symbol, relativeOffset];
+			retValue = Py_BuildValue("s", [symbolWithRelativeOffset UTF8String]);
+		}
+		else
+		{
+			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.symbolAt failed to retrieve symbol at 0x%llX", memoryAddress] UTF8String]);
 		}
 	}
 	return retValue;
