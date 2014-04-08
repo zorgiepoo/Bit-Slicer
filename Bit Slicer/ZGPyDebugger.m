@@ -471,13 +471,13 @@ static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
 	{
 		ZGProcess *process = self->objcSelf.process;
 		NSNumber *symbolAddressNumber = [process findSymbol:@(symbolName) withPartialSymbolOwnerName:symbolOwner == NULL ? nil : @(symbolOwner) requiringExactMatch:YES pastAddress:0x0];
-		if (symbolAddressNumber == nil)
+		if (symbolAddressNumber != nil)
 		{
-			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.findSymbol failed to find symbol %s", symbolName] UTF8String]);
+			retValue = Py_BuildValue("K", [symbolAddressNumber unsignedLongLongValue]);
 		}
 		else
 		{
-			retValue = Py_BuildValue("K", [symbolAddressNumber unsignedLongLongValue]);
+			retValue = Py_BuildValue("");
 		}
 	}
 	return retValue;
@@ -499,7 +499,7 @@ static PyObject *Debugger_symbolAt(DebuggerClass *self, PyObject *args)
 		}
 		else
 		{
-			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.symbolAt failed to retrieve symbol at 0x%llX", memoryAddress] UTF8String]);
+			retValue = Py_BuildValue("");
 		}
 	}
 	return retValue;
