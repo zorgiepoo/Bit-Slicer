@@ -881,8 +881,14 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	
 	ZGInstruction *outerInstruction = [backtrace.instructions objectAtIndex:1];
 	NSNumber *outerBasePointer = [backtrace.basePointers objectAtIndex:1];
-	
-	if (![self->objcSelf.breakPointController addBreakPointOnInstruction:outerInstruction inProcess:self->objcSelf.process thread:self->objcSelf.haltedBreakPoint.thread basePointer:outerBasePointer.unsignedLongLongValue callback:callback delegate:self->objcSelf])
+
+	ZGInstruction *returnInstruction =
+	[ZGDebuggerUtilities
+	 findInstructionBeforeAddress:outerInstruction.variable.address + outerInstruction.variable.size + 1
+	 inProcess:self->objcSelf.process
+	 withBreakPoints:self->objcSelf.breakPointController.breakPoints];
+
+	if (![self->objcSelf.breakPointController addBreakPointOnInstruction:returnInstruction inProcess:self->objcSelf.process thread:self->objcSelf.haltedBreakPoint.thread basePointer:outerBasePointer.unsignedLongLongValue callback:callback delegate:self->objcSelf])
 	{
 		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOut failed to set breakpoint at 0x%llX", outerInstruction.variable.address] UTF8String]);
 		return NULL;
