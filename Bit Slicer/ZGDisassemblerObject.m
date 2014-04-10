@@ -212,6 +212,11 @@ static void disassemblerTranslator(ud_t *object)
 			{
 				immediateOperand -= (uint64_t)(-operandOffset);
 			}
+
+			if (self.pointerSize == sizeof(ZG32BitMemoryAddress))
+			{
+				immediateOperand = (ZG32BitMemoryAddress)immediateOperand;
+			}
 		}
 	}
 	
