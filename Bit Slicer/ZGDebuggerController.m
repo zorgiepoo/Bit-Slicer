@@ -670,11 +670,11 @@ enum ZGStepExecution
 	}
 }
 
-- (void)switchProcessMenuItemAndSelectAddress:(ZGMemoryAddress)address
+- (void)switchProcessMenuItemAndSelectAddressStringValue:(NSString *)addressStringValue
 {
-	if ([self.runningApplicationsPopUpButton.selectedItem.representedObject processID] != self.currentProcess.processID)
+	if (![self.runningApplicationsPopUpButton.selectedItem.representedObject isEqual:self.currentProcess])
 	{
-		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", address];
+		self.addressTextField.stringValue = addressStringValue;
 		self.mappedFilePath = nil;
 		[self switchProcess];
 	}
@@ -682,7 +682,7 @@ enum ZGStepExecution
 
 - (IBAction)runningApplicationsPopUpButton:(id)__unused sender
 {
-	[self switchProcessMenuItemAndSelectAddress:0x0];
+	[self switchProcessMenuItemAndSelectAddressStringValue:@"0x0"];
 }
 
 #pragma mark Changing disassembler view
@@ -700,7 +700,19 @@ enum ZGStepExecution
 	
 	if (disassemblerObject != nil)
 	{
-		[self jumpToMemoryAddress:[disassemblerObject readBranchImmediateOperand]];
+		NSString *branchDestination = [disassemblerObject readBranchOperand];
+		if (branchDestination != nil)
+		{
+			[self jumpToMemoryAddressStringValue:branchDestination inProcess:self.currentProcess];
+		}
+		else
+		{
+			ZG_LOG(@"Failed to jump to branch address on %@", selectedInstruction.text);
+		}
+	}
+	else
+	{
+		ZG_LOG(@"Failed to disassemble bytes to jump to branch address on %@", selectedInstruction.text);
 	}
 }
 
@@ -944,11 +956,16 @@ enum ZGStepExecution
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess
 {
+	[self jumpToMemoryAddressStringValue:[NSString stringWithFormat:@"0x%llX", address] inProcess:requestedProcess];
+}
+
+- (void)jumpToMemoryAddressStringValue:(NSString *)memoryAddressStringValue inProcess:(ZGProcess *)requestedProcess
+{
 	NSMenuItem *targetMenuItem = nil;
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.menu.itemArray)
 	{
 		ZGProcess *process = menuItem.representedObject;
-		if ([process processID] == requestedProcess.processID)
+		if ([process isEqual:requestedProcess])
 		{
 			targetMenuItem = menuItem;
 			break;
@@ -957,16 +974,16 @@ enum ZGStepExecution
 	
 	if (targetMenuItem != nil)
 	{
-		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", address];
+		self.addressTextField.stringValue = memoryAddressStringValue;
 		
-		if ([targetMenuItem.representedObject processID] != self.currentProcess.processID)
+		if (![targetMenuItem.representedObject isEqual:self.currentProcess])
 		{
 			[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
 			
 			self.instructions = @[];
 			[self.instructionsTableView reloadData];
 			
-			[self switchProcessMenuItemAndSelectAddress:address];
+			[self switchProcessMenuItemAndSelectAddressStringValue:memoryAddressStringValue];
 		}
 		else
 		{

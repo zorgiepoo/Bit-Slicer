@@ -168,23 +168,27 @@ static void disassemblerTranslator(ud_t *object)
 	return newInstruction;
 }
 
-- (ZGMemoryAddress)readBranchImmediateOperand
+- (NSString *)readBranchOperand
 {
-	ZGMemoryAddress immediateOperand = 0;
+	NSString *branchOperandString = nil;
+	ZGMemoryAddress branchOperandAddress = 0;
+
 	if (ud_disassemble(_object) > 0)
 	{
 		const ud_operand_t *operand = NULL;
+		enum ud_type operandType = UD_NONE;
 		unsigned int operandIndex = 0;
 		while ((operand = ud_insn_opr(_object, operandIndex)) != NULL)
 		{
-			if (operand->type == UD_OP_JIMM)
+			if (operand->type == UD_OP_JIMM || operand->type == UD_OP_MEM)
 			{
+				operandType = operand->type;
 				break;
 			}
 			operandIndex++;
 		}
-		
-		if (operand != NULL)
+
+		if (operand != NULL && operandType != UD_NONE)
 		{
 			int64_t operandOffset = 0x0;
 			switch (operand->size)
@@ -203,24 +207,55 @@ static void disassemblerTranslator(ud_t *object)
 					break;
 			}
 			
-			immediateOperand = self.startAddress + ud_insn_len(_object);
-			if (operandOffset >= 0)
+			BOOL canResolveOperand = YES;
+			if (operandType == UD_OP_JIMM)
 			{
-				immediateOperand += (uint64_t)operandOffset;
+				branchOperandAddress = self.startAddress + ud_insn_len(_object);
+				if (operandOffset >= 0)
+				{
+					branchOperandAddress += (uint64_t)operandOffset;
+				}
+				else
+				{
+					branchOperandAddress -= (uint64_t)(-operandOffset);
+				}
 			}
 			else
 			{
-				immediateOperand -= (uint64_t)(-operandOffset);
+				if (operand->base == UD_R_RIP)
+				{
+					branchOperandAddress = self.startAddress + (uint64_t)operandOffset;
+				}
+				else if (operand->base != UD_NONE)
+				{
+					canResolveOperand = NO;
+				}
+				else
+				{
+					branchOperandAddress = (uint64_t)operandOffset;
+				}
 			}
 
-			if (self.pointerSize == sizeof(ZG32BitMemoryAddress))
+			if (canResolveOperand)
 			{
-				immediateOperand = (ZG32BitMemoryAddress)immediateOperand;
+				if (self.pointerSize == sizeof(ZG32BitMemoryAddress))
+				{
+					branchOperandAddress = (ZG32BitMemoryAddress)branchOperandAddress;
+				}
+
+				if (operandType == UD_OP_JIMM)
+				{
+					branchOperandString = [NSString stringWithFormat:@"0x%llX", branchOperandAddress];
+				}
+				else
+				{
+					branchOperandString = [NSString stringWithFormat:@"[0x%llX]", branchOperandAddress];
+				}
 			}
 		}
 	}
 	
-	return immediateOperand;
+	return branchOperandString;
 }
 
 @end
