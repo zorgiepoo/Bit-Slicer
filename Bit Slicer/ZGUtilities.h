@@ -40,8 +40,8 @@
 #import "ZGProcessTaskManager.h"
 #import "ZGProcess.h"
 
-#ifdef _DEBUG
-	#define ZG_LOG(format, ...) NSLog(format, __VA_ARGS__)
+#ifdef _BSDEBUG
+	#define ZG_LOG(format, args...) NSLog(format, ##args)
 #else
 	#define ZG_LOG(format, ...) do { } while (0)
 #endif

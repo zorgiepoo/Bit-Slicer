@@ -1516,7 +1516,7 @@
 					"$(SRCROOT)/deps/python/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				OTHER_CFLAGS = "-D_DEBUG";
+				OTHER_CFLAGS = "-D_BSDEBUG";
 				PRODUCT_NAME = "Bit Slicer";
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -1539,6 +1539,7 @@
 					"-Wno-missing-prototypes",
 					"-Wno-selector",
 					"-Wno-c++11-long-long",
+					"-Wno-variadic-macros",
 					"-Werror",
 				);
 			};
@@ -1635,6 +1636,7 @@
 					"-Wno-missing-prototypes",
 					"-Wno-selector",
 					"-Wno-c++11-long-long",
+					"-Wno-variadic-macros",
 					"-Werror",
 				);
 			};

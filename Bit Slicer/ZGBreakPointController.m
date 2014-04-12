@@ -119,7 +119,7 @@ static ZGBreakPointController *gBreakPointController;
 	mach_msg_type_number_t threadListCount = 0;
 	if (task_threads(breakPoint.process.processTask, &threadList, &threadListCount) != KERN_SUCCESS)
 	{
-		NSLog(@"ERROR: task_threads failed on removing watchpoint");
+		ZG_LOG(@"ERROR: task_threads failed on removing watchpoint");
 		return;
 	}
 	
@@ -144,7 +144,7 @@ static ZGBreakPointController *gBreakPointController;
 		mach_msg_type_number_t stateCount;
 		if (!ZGGetDebugThreadState(&debugState, debugThread.thread, &stateCount))
 		{
-			NSLog(@"ERROR: Grabbing debug state failed in removeWatchPoint: continuing...");
+			ZG_LOG(@"ERROR: Grabbing debug state failed in %s: continuing...", __PRETTY_FUNCTION__);
 			continue;
 		}
 		
@@ -161,13 +161,13 @@ static ZGBreakPointController *gBreakPointController;
 		
 		if (!ZGSetDebugThreadState(&debugState, debugThread.thread, stateCount))
 		{
-			NSLog(@"ERROR: Failure in setting thread state registers in removeWatchPoint:");
+			ZG_LOG(@"ERROR: Failure in setting thread state registers in %s", __PRETTY_FUNCTION__);
 		}
 	}
 	
 	if (!ZGDeallocateMemory(current_task(), (mach_vm_address_t)threadList, threadListCount * sizeof(thread_act_t)))
 	{
-		NSLog(@"Failed to deallocate thread list in removeWatchPoint...");
+		ZG_LOG(@"Failed to deallocate thread list in %s", __PRETTY_FUNCTION__);
 	}
 	
 	// we may still catch exceptions momentarily for our breakpoint if the data is being acccessed frequently, so do not remove it immediately
@@ -245,7 +245,7 @@ static ZGBreakPointController *gBreakPointController;
 			
 			if (!ZGSetDebugThreadState(&debugState, debugThread.thread, debugStateCount))
 			{
-				//NSLog(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint...Not good.");
+				ZG_LOG(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint...Not good.");
 			}
 			
 			x86_thread_state_t threadState;
@@ -301,7 +301,7 @@ static ZGBreakPointController *gBreakPointController;
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, breakPoint.thread, &threadStateCount))
 	{
-			//NSLog(@"ERROR: Grabbing thread state failed in resumeFromBreakPoint:");
+			ZG_LOG(@"ERROR: Grabbing thread state failed in %s", __PRETTY_FUNCTION__);
 	}
 	
 	BOOL shouldSingleStep = NO;
@@ -345,7 +345,7 @@ static ZGBreakPointController *gBreakPointController;
 	
 	if (!ZGSetGeneralThreadState(&threadState, breakPoint.thread, threadStateCount))
 	{
-		//NSLog(@"Failure in setting registers thread state for resumeFromBreakPoint: for thread %d", breakPoint.thread);
+		ZG_LOG(@"Failure in setting registers thread state for thread %d, %s", breakPoint.thread, __PRETTY_FUNCTION__);
 	}
 	
 	ZGResumeTask(breakPoint.process.processTask);
@@ -422,7 +422,7 @@ static ZGBreakPointController *gBreakPointController;
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, thread, &threadStateCount))
 	{
-		//NSLog(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping.");
+		ZG_LOG(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping. %s", __PRETTY_FUNCTION__);
 	}
 	
 	BOOL hitBreakPoint = NO;
@@ -564,7 +564,7 @@ static ZGBreakPointController *gBreakPointController;
 	{
 		if (!ZGSetGeneralThreadState(&threadState, thread, threadStateCount))
 		{
-			//NSLog(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d", thread);
+			ZG_LOG(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d, %s", thread, __PRETTY_FUNCTION__);
 		}
 	}
 	
@@ -810,7 +810,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	mach_msg_type_number_t threadListCount = 0;
 	if (task_threads(processTask, &threadList, &threadListCount) != KERN_SUCCESS)
 	{
-		//NSLog(@"ERROR: task_threads failed on adding watchpoint");
+		ZG_LOG(@"ERROR: task_threads failed on adding watchpoint");
 		ZGResumeTask(processTask);
 		return NO;
 	}
@@ -839,7 +839,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		mach_msg_type_number_t stateCount;
 		if (!ZGGetDebugThreadState(&debugState, threadList[threadIndex], &stateCount))
 		{
-			//NSLog(@"ERROR: ZGGetDebugThreadState failed on adding watchpoint for thread %d", threadList[threadIndex]);
+			ZG_LOG(@"ERROR: ZGGetDebugThreadState failed on adding watchpoint for thread %d, %s", threadList[threadIndex], __PRETTY_FUNCTION__);
 			continue;
 		}
 		
@@ -855,7 +855,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		
 		if (debugRegisterIndex < 0)
 		{
-			//NSLog(@"Failed to find available debug register for thread %d", threadList[threadIndex]);
+			ZG_LOG(@"Failed to find available debug register for thread %d, %s", threadList[threadIndex], __PRETTY_FUNCTION__);
 			continue;
 		}
 		
@@ -872,7 +872,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		
 		if (!ZGSetDebugThreadState(&debugState, threadList[threadIndex], stateCount))
 		{
-			//NSLog(@"Failure in setting registers thread state for adding watchpoint for thread %d", threadList[threadIndex]);
+			ZG_LOG(@"Failure in setting registers thread state for adding watchpoint for thread %d", threadList[threadIndex]);
 			continue;
 		}
 		
@@ -881,7 +881,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	if (!ZGDeallocateMemory(current_task(), (mach_vm_address_t)threadList, threadListCount * sizeof(thread_act_t)))
 	{
-		//NSLog(@"Failed to deallocate thread list in addWatchpointOnVariable...");
+		ZG_LOG(@"Failed to deallocate thread list in %s...", __PRETTY_FUNCTION__);
 	}
 	
 	ZGResumeTask(processTask);
@@ -890,7 +890,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	if (newDebugThreads.count == 0)
 	{
-		//NSLog(@"ERROR: Failed to set watch variable: no threads found.");
+		ZG_LOG(@"ERROR: Failed to set watch variable: no threads found.");
 		return NO;
 	}
 	
