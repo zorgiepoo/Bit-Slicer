@@ -44,6 +44,7 @@
 #import "NSString+DDMathParsing.h"
 #import "DDExpression.h"
 #import "DDExpressionRewriter.h"
+#import "ZGUtilities.h"
 
 #define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"
 #define ZGFindSymbolFunction @"symbol"
@@ -327,7 +328,7 @@
 	DDExpression *simplifiedExpression = [[DDExpression expressionFromString:linearExpression error:&error] simplifiedExpression];
 	if (simplifiedExpression == nil)
 	{
-		NSLog(@"Error simplifiying expression: %@", error);
+		ZG_LOG(@"Error simplifiying expression: %@", error);
 		return NO;
 	}
 	
@@ -335,7 +336,7 @@
 	
 	if (rewrittenExpression == nil)
 	{
-		NSLog(@"Error: Failed to rewrite expression %@", simplifiedExpression);
+		ZG_LOG(@"Error: Failed to rewrite expression %@", simplifiedExpression);
 		return NO;
 	}
 	
@@ -346,7 +347,7 @@
 	}
 	else if (rewrittenExpression.expressionType != DDExpressionTypeFunction)
 	{
-		NSLog(@"Error: Rewritten expression is not a function or variable");
+		ZG_LOG(@"Error: Rewritten expression is not a function or variable");
 		return NO;
 	}
 	else if ([rewrittenExpression.function isEqualToString:@"multiply"])

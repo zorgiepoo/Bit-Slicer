@@ -36,6 +36,7 @@
 #import "ZGProcess.h"
 #import "ZGProcessTaskManager.h"
 #import "ZGDebuggerController.h"
+#import "ZGUtilities.h"
 
 #import <Carbon/Carbon.h>
 
@@ -108,7 +109,7 @@ static OSStatus pauseOrUnpauseHotKeyHandler(EventHandlerCallRef __unused nextHan
 				}
 				else
 				{
-					NSLog(@"Failed to pause/unpause process with pid %d", runningApplication.processIdentifier);
+					ZG_LOG(@"Failed to pause/unpause process with pid %d", runningApplication.processIdentifier);
 				}
 			}
 			

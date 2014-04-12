@@ -34,6 +34,7 @@
 
 #import "ZGProcessTaskManager.h"
 #import "ZGVirtualMemory.h"
+#import "ZGUtilities.h"
 
 @interface ZGProcessTaskManager ()
 
@@ -69,7 +70,7 @@
 			ZGDeallocatePort(*processTask);
 		}
 		
-		NSLog(@"Mach port is not valid for process %d", processIdentifier);
+		ZG_LOG(@"Mach port is not valid for process %d", processIdentifier);
 		
 		*processTask = MACH_PORT_NULL;
 		return NO;

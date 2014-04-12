@@ -351,7 +351,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 		if (!ZGGrantMemoryAccessToProcess(self.processTaskManager, _currentProcess))
 		{
 			shouldUpdateDisplay = YES;
-			NSLog(@"%@ failed to grant access to PID %d", NSStringFromClass([self class]), _currentProcess.processID);
+			ZG_LOG(@"%@ failed to grant access to PID %d", NSStringFromClass([self class]), _currentProcess.processID);
 		}
 	}
 	
