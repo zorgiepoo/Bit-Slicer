@@ -212,7 +212,11 @@ static ZGBreakPointController *gBreakPointController;
 			{
 				continue;
 			}
-			
+
+			// Normally I'd set this to YES after isWatchPointAvailable is YES below, however, it is possible this will miss a watchpoint just being removed.
+			// To be safe, we will just pretend we handled the watchpoint so that we don't crash the target process
+			handledWatchPoint = YES;
+
 			x86_debug_state_t debugState;
 			mach_msg_type_number_t debugStateCount;
 			if (!ZGGetDebugThreadState(&debugState, thread, &debugStateCount))
@@ -228,8 +232,6 @@ static ZGBreakPointController *gBreakPointController;
 			{
 				continue;
 			}
-			
-			handledWatchPoint = YES;
 			
 			// Clear dr6 debug status
 			if (breakPoint.process.is64Bit)
@@ -930,7 +932,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		{
 			return NO;
 		}
-		
+
 		if (self.watchPointTimer == NULL && (self.watchPointTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())) != NULL)
 		{
 			dispatch_source_set_timer(self.watchPointTimer, dispatch_walltime(NULL, 0), NSEC_PER_SEC / 2, (uint64_t)(0.1 * NSEC_PER_SEC));
@@ -947,7 +949,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 			});
 			dispatch_resume(self.watchPointTimer);
 		}
-		
+
 		[self addBreakPoint:breakPoint];
 		
 		if (returnedBreakPoint)
