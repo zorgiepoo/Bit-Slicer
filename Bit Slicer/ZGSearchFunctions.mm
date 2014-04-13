@@ -1399,6 +1399,9 @@ void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T
 	ZGProtectionMode protectionMode = searchData.protectionMode;
 	bool regionMatchesProtection = true;
 
+	ZGMemoryAddress beginAddress = searchData.beginAddress;
+	ZGMemoryAddress endAddress = searchData.endAddress;
+
 	const ZGMemorySize maxSteps = 4096;
 	ZGMemoryAddress dataIndex = oldResultSetStartIndex;
 	while (dataIndex < oldDataLength)
@@ -1435,7 +1438,7 @@ void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T
 					newRegion = [pageToRegionTable objectForKey:@(variableAddress - (variableAddress % pageSize))];
 				}
 				
-				if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size && regionMatchesProtection)
+				if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
 				{
 					lastUsedRegion = [[ZGRegion alloc] initWithAddress:newRegion->_address size:newRegion->_size];
 					
@@ -1455,7 +1458,7 @@ void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T
 				}
 			}
 			
-			if (lastUsedRegion != nil)
+			if (lastUsedRegion != nil && regionMatchesProtection && variableAddress >= beginAddress && variableAddress + dataSize <= endAddress)
 			{
 				compareHelperFunction(&lastUsedSavedRegion, lastUsedRegion, variableAddress, dataSize, savedPageToRegionTable, savedRegions, pageSize, comparisonFunction, memoryAddresses, numberOfVariablesFound, searchData, searchValue);
 			}
@@ -1504,7 +1507,17 @@ ZGSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSearchD
 				firstAddress = *((ZG32BitMemoryAddress *)oldResultSet.bytes + oldResultSetStartIndex / sizeof(ZG32BitMemoryAddress));
 				lastAddress = *((ZG32BitMemoryAddress *)oldResultSet.bytes + oldResultSet.length / sizeof(ZG32BitMemoryAddress) - 1) + dataSize;
 			}
-			
+
+			if (firstAddress < searchData.beginAddress)
+			{
+				firstAddress = searchData.beginAddress;
+			}
+
+			if (lastAddress > searchData.endAddress)
+			{
+				lastAddress = searchData.endAddress;
+			}
+
 			NSArray *regions = ZGFilterRegions(allRegions, firstAddress, lastAddress, searchData.protectionMode);
 			
 			for (ZGRegion *region in regions)
