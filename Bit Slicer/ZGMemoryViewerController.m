@@ -117,18 +117,9 @@
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder
 {
 	[super encodeRestorableStateWithCoder:coder];
-    
-    [coder
-		 encodeObject:self.addressTextField.stringValue
-		 forKey:ZGMemoryViewerAddressField];
-    
-    [coder
-		 encodeInt64:(int64_t)self.currentMemoryAddress
-		 forKey:ZGMemoryViewerAddress];
-    
-    [coder
-		 encodeObject:self.desiredProcessInternalName
-		 forKey:ZGMemoryViewerProcessInternalName];
+
+    [coder encodeObject:self.addressTextField.stringValue forKey:ZGMemoryViewerAddressField];
+    [coder encodeObject:self.desiredProcessInternalName forKey:ZGMemoryViewerProcessInternalName];
 }
 
 - (void)restoreStateWithCoder:(NSCoder *)coder
@@ -136,12 +127,10 @@
 	[super restoreStateWithCoder:coder];
 	
 	NSString *memoryViewerAddressField = [coder decodeObjectForKey:ZGMemoryViewerAddressField];
-	if (memoryViewerAddressField)
+	if (memoryViewerAddressField != nil)
 	{
 		self.addressTextField.stringValue = memoryViewerAddressField;
 	}
-	
-	self.currentMemoryAddress = (uint64_t)[coder decodeInt64ForKey:ZGMemoryViewerAddress];
 	
 	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGMemoryViewerProcessInternalName];
 	
@@ -528,9 +517,8 @@
 		if (desiredMemoryAddress == 0)
 		{
 			desiredMemoryAddress = memoryAddress;
+			self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", desiredMemoryAddress];
 		}
-		
-		self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", desiredMemoryAddress];
 		
 		// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
 		for (HFRepresenter *representer in self.textView.controller.representers)
