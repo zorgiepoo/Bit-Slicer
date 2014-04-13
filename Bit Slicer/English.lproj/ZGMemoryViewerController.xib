@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5053"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGMemoryViewerController">
@@ -81,9 +81,9 @@
                     <toolbarItem implicitItemIdentifier="4317D272-6BC6-4B90-B1BD-AEEBC90B4775" label="Address" paletteLabel="Address" id="dKv-kA-cOR">
                         <nil key="toolTip"/>
                         <size key="minSize" width="150" height="22"/>
-                        <size key="maxSize" width="150" height="22"/>
+                        <size key="maxSize" width="175" height="22"/>
                         <textField key="view" verticalHuggingPriority="750" id="DkB-mV-Rmo">
-                            <rect key="frame" x="0.0" y="14" width="150" height="22"/>
+                            <rect key="frame" x="0.0" y="14" width="175" height="22"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="0x0" bezelStyle="round" id="o8x-c0-Kha">
                                 <font key="font" metaFont="system"/>
