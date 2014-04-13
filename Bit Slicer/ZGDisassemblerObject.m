@@ -224,7 +224,15 @@ static void disassemblerTranslator(ud_t *object)
 			{
 				if (operand->base == UD_R_RIP)
 				{
-					branchOperandAddress = self.startAddress + (uint64_t)operandOffset;
+					branchOperandAddress = self.startAddress +  ud_insn_len(_object);
+					if (operandOffset >= 0)
+					{
+						branchOperandAddress += (uint64_t)operandOffset;
+					}
+					else
+					{
+						branchOperandAddress -= (uint64_t)(-operandOffset);
+					}
 				}
 				else if (operand->base != UD_NONE)
 				{
