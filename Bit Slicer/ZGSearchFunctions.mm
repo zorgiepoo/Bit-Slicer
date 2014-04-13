@@ -173,12 +173,15 @@ void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long 
 
 #pragma mark Generic Searching
 
-NSArray *ZGFilterRegions(NSArray *regions, ZGMemoryAddress beginAddress, ZGMemoryAddress endAddress, ZGProtectionMode protectionMode)
+static bool ZGMemoryProtectionMatchesProtectionMode(ZGMemoryProtection memoryProtection, ZGProtectionMode protectionMode)
+{
+	return ((protectionMode == ZGProtectionAll && memoryProtection & VM_PROT_READ) || (protectionMode == ZGProtectionWrite && memoryProtection & VM_PROT_WRITE) || (protectionMode == ZGProtectionExecute && memoryProtection & VM_PROT_EXECUTE));
+}
+
+static NSArray *ZGFilterRegions(NSArray *regions, ZGMemoryAddress beginAddress, ZGMemoryAddress endAddress, ZGProtectionMode protectionMode)
 {
 	return [regions zgFilterUsingBlock:(zg_array_filter_t)^(ZGRegion *region) {
-		return region.address < endAddress && region.address + region.size > beginAddress &&
-			region.protection & VM_PROT_READ &&
-			(protectionMode == ZGProtectionAll || (protectionMode == ZGProtectionWrite && region.protection & VM_PROT_WRITE) || (protectionMode == ZGProtectionExecute && region.protection & VM_PROT_EXECUTE));
+		return region.address < endAddress && region.address + region.size > beginAddress && ZGMemoryProtectionMatchesProtectionMode(region.protection, protectionMode);
 	}];
 }
 
@@ -1393,6 +1396,9 @@ void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T
 	ZGMemorySize oldDataLength = oldResultSet.length;
 	const void *oldResultSetBytes = oldResultSet.bytes;
 	
+	ZGProtectionMode protectionMode = searchData.protectionMode;
+	bool regionMatchesProtection = true;
+
 	const ZGMemorySize maxSteps = 4096;
 	ZGMemoryAddress dataIndex = oldResultSetStartIndex;
 	while (dataIndex < oldDataLength)
@@ -1420,7 +1426,8 @@ void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T
 					ZGMemoryBasicInfo basicInfo;
 					if (ZGRegionInfo(processTask, &regionAddress, &regionSize, &basicInfo))
 					{
-						newRegion = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize];
+						newRegion = [[ZGRegion alloc] initWithAddress:regionAddress size:regionSize protection:basicInfo.protection];
+						regionMatchesProtection = ZGMemoryProtectionMatchesProtectionMode(basicInfo.protection, protectionMode);
 					}
 				}
 				else
@@ -1428,7 +1435,7 @@ void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T
 					newRegion = [pageToRegionTable objectForKey:@(variableAddress - (variableAddress % pageSize))];
 				}
 				
-				if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
+				if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size && regionMatchesProtection)
 				{
 					lastUsedRegion = [[ZGRegion alloc] initWithAddress:newRegion->_address size:newRegion->_size];
 					
