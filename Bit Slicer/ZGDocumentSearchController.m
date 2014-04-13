@@ -163,11 +163,6 @@
 			[windowController deselectSearchField];
 		}
 	}
-	
-	if (!windowController.currentProcess.valid)
-	{
-		//[windowController removeRunningProcessFromPopupButton:nil];
-	}
 }
 
 - (void)resumeFromTask
