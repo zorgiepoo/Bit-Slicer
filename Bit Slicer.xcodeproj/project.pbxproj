@@ -131,6 +131,7 @@
 		77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */; };
 		77E2BBD518FD904400E41FA0 /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
 		77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162417D2EF31009E002A /* ZGRegion.m */; };
+		77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */; };
 		77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E9DBCD181F812E009F4982 /* ZGMachBinary.m */; };
 		77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
 		77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
@@ -486,6 +487,7 @@
 		77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LinearExpressionParsingTest.m; sourceTree = "<group>"; };
 		77E2BBAF18FD88A700E41FA0 /* Bit Slicer Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bit Slicer Tests-Prefix.pch"; sourceTree = "<group>"; };
 		77E2BBB518FD8B7900E41FA0 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PointerFunctionSubstitutionTest.m; sourceTree = "<group>"; };
 		77E9DBCC181F812E009F4982 /* ZGMachBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMachBinary.h; path = "Bit Slicer/ZGMachBinary.h"; sourceTree = "<group>"; };
 		77E9DBCD181F812E009F4982 /* ZGMachBinary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMachBinary.m; path = "Bit Slicer/ZGMachBinary.m"; sourceTree = "<group>"; };
 		77F115A517D2E865009E002A /* HFLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HFLineCountingView.h; sourceTree = "<group>"; };
@@ -1078,6 +1080,7 @@
 		77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */ = {
 			isa = PBXGroup;
 			children = (
+				77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */,
 				77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */,
 				77E2BBA818FD88A700E41FA0 /* Supporting Files */,
 			);
@@ -1419,6 +1422,7 @@
 				77E2BBCE18FD8FC100E41FA0 /* DDTypes.m in Sources */,
 				77E2BBCF18FD8FC100E41FA0 /* NSString+DDMathParsing.m in Sources */,
 				77E2BBAE18FD88A700E41FA0 /* LinearExpressionParsingTest.m in Sources */,
+				77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
