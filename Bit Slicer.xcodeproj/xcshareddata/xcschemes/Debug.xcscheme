@@ -28,6 +28,16 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "77E2BBA318FD88A700E41FA0"
+               BuildableName = "Bit Slicer Tests.xctest"
+               BlueprintName = "Bit Slicer Tests"
+               ReferencedContainer = "container:Bit Slicer.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

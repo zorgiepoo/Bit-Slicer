@@ -96,6 +96,41 @@
 		77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D081800639E00549A37 /* stepin.pdf */; };
 		77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D091800639E00549A37 /* stepout.pdf */; };
 		77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D0A1800639E00549A37 /* stepover.pdf */; };
+		77E2BBAC18FD88A700E41FA0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 77E2BBAA18FD88A700E41FA0 /* InfoPlist.strings */; };
+		77E2BBAE18FD88A700E41FA0 /* LinearExpressionParsingTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */; };
+		77E2BBB618FD8B7900E41FA0 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77E2BBB518FD8B7900E41FA0 /* XCTest.framework */; };
+		77E2BBB718FD8F6B00E41FA0 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1163117D2EF62009E002A /* ZGCalculator.m */; };
+		77E2BBB818FD8F9200E41FA0 /* ZGVirtualMemory.c in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161D17D2EF14009E002A /* ZGVirtualMemory.c */; };
+		77E2BBB918FD8FC100E41FA0 /* _DDDecimalFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9418C40B7F001120FB /* _DDDecimalFunctions.m */; };
+		77E2BBBA18FD8FC100E41FA0 /* _DDFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9618C40B7F001120FB /* _DDFunctionEvaluator.m */; };
+		77E2BBBB18FD8FC100E41FA0 /* _DDFunctionExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9818C40B7F001120FB /* _DDFunctionExpression.m */; };
+		77E2BBBC18FD8FC100E41FA0 /* _DDFunctionTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9A18C40B7F001120FB /* _DDFunctionTerm.m */; };
+		77E2BBBD18FD8FC100E41FA0 /* _DDGroupTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9C18C40B7F001120FB /* _DDGroupTerm.m */; };
+		77E2BBBE18FD8FC100E41FA0 /* _DDNumberExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9E18C40B7F001120FB /* _DDNumberExpression.m */; };
+		77E2BBBF18FD8FC100E41FA0 /* _DDNumberTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA018C40B7F001120FB /* _DDNumberTerm.m */; };
+		77E2BBC018FD8FC100E41FA0 /* _DDOperatorTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA218C40B7F001120FB /* _DDOperatorTerm.m */; };
+		77E2BBC118FD8FC100E41FA0 /* _DDParserTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA418C40B7F001120FB /* _DDParserTerm.m */; };
+		77E2BBC218FD8FC100E41FA0 /* _DDPrecisionFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA618C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m */; };
+		77E2BBC318FD8FC100E41FA0 /* _DDRewriteRule.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA818C40B7F001120FB /* _DDRewriteRule.m */; };
+		77E2BBC418FD8FC100E41FA0 /* _DDVariableExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAA18C40B7F001120FB /* _DDVariableExpression.m */; };
+		77E2BBC518FD8FC100E41FA0 /* _DDVariableTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAC18C40B7F001120FB /* _DDVariableTerm.m */; };
+		77E2BBC618FD8FC100E41FA0 /* DDExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAE18C40B7F001120FB /* DDExpression.m */; };
+		77E2BBC718FD8FC100E41FA0 /* DDExpressionRewriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB018C40B7F001120FB /* DDExpressionRewriter.m */; };
+		77E2BBC818FD8FC100E41FA0 /* DDMathEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB218C40B7F001120FB /* DDMathEvaluator.m */; };
+		77E2BBC918FD8FC100E41FA0 /* DDMathOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB618C40B7F001120FB /* DDMathOperator.m */; };
+		77E2BBCA18FD8FC100E41FA0 /* DDMathStringToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBA18C40B7F001120FB /* DDMathStringToken.m */; };
+		77E2BBCB18FD8FC100E41FA0 /* DDMathStringTokenizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBC18C40B7F001120FB /* DDMathStringTokenizer.m */; };
+		77E2BBCC18FD8FC100E41FA0 /* DDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBE18C40B7F001120FB /* DDParser.m */; };
+		77E2BBCD18FD8FC100E41FA0 /* DDParserTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC018C40B7F001120FB /* DDParserTypes.m */; };
+		77E2BBCE18FD8FC100E41FA0 /* DDTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC218C40B7F001120FB /* DDTypes.m */; };
+		77E2BBCF18FD8FC100E41FA0 /* NSString+DDMathParsing.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC418C40B7F001120FB /* NSString+DDMathParsing.m */; };
+		77E2BBD018FD8FE400E41FA0 /* ZGMachBinary.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E9DBCD181F812E009F4982 /* ZGMachBinary.m */; };
+		77E2BBD118FD8FF600E41FA0 /* ZGMachBinaryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */; };
+		77E2BBD218FD900300E41FA0 /* ZGVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162B17D2EF50009E002A /* ZGVariable.m */; };
+		77E2BBD318FD900C00E41FA0 /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162717D2EF3A009E002A /* ZGProcess.m */; };
+		77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */; };
+		77E2BBD518FD904400E41FA0 /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
+		77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162417D2EF31009E002A /* ZGRegion.m */; };
 		77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E9DBCD181F812E009F4982 /* ZGMachBinary.m */; };
 		77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
 		77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
@@ -160,6 +195,16 @@
 		77FFC14D18711D2700122357 /* ZGEditDescriptionWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77FFC14B18711D2700122357 /* ZGEditDescriptionWindowController.xib */; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		77E2BBB018FD88A700E41FA0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D15AC270486D014006FF6A4;
+			remoteInfo = "Bit Slicer";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		770EA827137B74F2007FB85A /* Copy Frameworks */ = {
@@ -435,6 +480,12 @@
 		77DA9D081800639E00549A37 /* stepin.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepin.pdf; path = "Bit Slicer/debuggericons/stepin.pdf"; sourceTree = "<group>"; };
 		77DA9D091800639E00549A37 /* stepout.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepout.pdf; path = "Bit Slicer/debuggericons/stepout.pdf"; sourceTree = "<group>"; };
 		77DA9D0A1800639E00549A37 /* stepover.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepover.pdf; path = "Bit Slicer/debuggericons/stepover.pdf"; sourceTree = "<group>"; };
+		77E2BBA418FD88A700E41FA0 /* Bit Slicer Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bit Slicer Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		77E2BBA918FD88A700E41FA0 /* Bit Slicer Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Bit Slicer Tests-Info.plist"; sourceTree = "<group>"; };
+		77E2BBAB18FD88A700E41FA0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LinearExpressionParsingTest.m; sourceTree = "<group>"; };
+		77E2BBAF18FD88A700E41FA0 /* Bit Slicer Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bit Slicer Tests-Prefix.pch"; sourceTree = "<group>"; };
+		77E2BBB518FD8B7900E41FA0 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		77E9DBCC181F812E009F4982 /* ZGMachBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMachBinary.h; path = "Bit Slicer/ZGMachBinary.h"; sourceTree = "<group>"; };
 		77E9DBCD181F812E009F4982 /* ZGMachBinary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMachBinary.m; path = "Bit Slicer/ZGMachBinary.m"; sourceTree = "<group>"; };
 		77F115A517D2E865009E002A /* HFLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HFLineCountingView.h; sourceTree = "<group>"; };
@@ -549,6 +600,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		77E2BBA118FD88A700E41FA0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				77E2BBB618FD8B7900E41FA0 /* XCTest.framework in Frameworks */,
+				77E2BBD518FD904400E41FA0 /* CoreSymbolication.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D15AC330486D014006FF6A4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -572,6 +632,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				77E2BBB518FD8B7900E41FA0 /* XCTest.framework */,
 				773E8B031821DE5300D1A71A /* HexFiend.framework */,
 				773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */,
 				773E8AF91821DBF300D1A71A /* CoreServices.framework */,
@@ -598,6 +659,7 @@
 			isa = PBXGroup;
 			children = (
 				8D15AC370486D014006FF6A4 /* Bit Slicer.app */,
+				77E2BBA418FD88A700E41FA0 /* Bit Slicer Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -608,6 +670,7 @@
 				2A37F4ABFDCFA73011CA2CEA /* Code */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
+				77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 			);
@@ -1012,6 +1075,25 @@
 			name = DDMathParser;
 			sourceTree = "<group>";
 		};
+		77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */ = {
+			isa = PBXGroup;
+			children = (
+				77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */,
+				77E2BBA818FD88A700E41FA0 /* Supporting Files */,
+			);
+			path = "Bit Slicer Tests";
+			sourceTree = "<group>";
+		};
+		77E2BBA818FD88A700E41FA0 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				77E2BBA918FD88A700E41FA0 /* Bit Slicer Tests-Info.plist */,
+				77E2BBAA18FD88A700E41FA0 /* InfoPlist.strings */,
+				77E2BBAF18FD88A700E41FA0 /* Bit Slicer Tests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		77FF507B16E9B7D40005915D /* Memory Window Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -1179,6 +1261,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		77E2BBA318FD88A700E41FA0 /* Bit Slicer Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 77E2BBB418FD88A700E41FA0 /* Build configuration list for PBXNativeTarget "Bit Slicer Tests" */;
+			buildPhases = (
+				77E2BBA018FD88A700E41FA0 /* Sources */,
+				77E2BBA118FD88A700E41FA0 /* Frameworks */,
+				77E2BBA218FD88A700E41FA0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				77E2BBB118FD88A700E41FA0 /* PBXTargetDependency */,
+			);
+			name = "Bit Slicer Tests";
+			productName = "Bit Slicer Tests";
+			productReference = 77E2BBA418FD88A700E41FA0 /* Bit Slicer Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		8D15AC270486D014006FF6A4 /* Bit Slicer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Bit Slicer" */;
@@ -1205,6 +1305,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0510;
+				TargetAttributes = {
+					77E2BBA318FD88A700E41FA0 = {
+						TestTargetID = 8D15AC270486D014006FF6A4;
+					};
+				};
 			};
 			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "Bit Slicer" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1215,17 +1320,27 @@
 				Japanese,
 				French,
 				German,
+				en,
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Bit Slicer */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				8D15AC270486D014006FF6A4 /* Bit Slicer */,
+				77E2BBA318FD88A700E41FA0 /* Bit Slicer Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		77E2BBA218FD88A700E41FA0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				77E2BBAC18FD88A700E41FA0 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D15AC2B0486D014006FF6A4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1268,6 +1383,45 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		77E2BBA018FD88A700E41FA0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */,
+				77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryHelpers.m in Sources */,
+				77E2BBD318FD900C00E41FA0 /* ZGProcess.m in Sources */,
+				77E2BBD218FD900300E41FA0 /* ZGVariable.m in Sources */,
+				77E2BBD118FD8FF600E41FA0 /* ZGMachBinaryInfo.m in Sources */,
+				77E2BBD018FD8FE400E41FA0 /* ZGMachBinary.m in Sources */,
+				77E2BBB818FD8F9200E41FA0 /* ZGVirtualMemory.c in Sources */,
+				77E2BBB718FD8F6B00E41FA0 /* ZGCalculator.m in Sources */,
+				77E2BBB918FD8FC100E41FA0 /* _DDDecimalFunctions.m in Sources */,
+				77E2BBBA18FD8FC100E41FA0 /* _DDFunctionEvaluator.m in Sources */,
+				77E2BBBB18FD8FC100E41FA0 /* _DDFunctionExpression.m in Sources */,
+				77E2BBBC18FD8FC100E41FA0 /* _DDFunctionTerm.m in Sources */,
+				77E2BBBD18FD8FC100E41FA0 /* _DDGroupTerm.m in Sources */,
+				77E2BBBE18FD8FC100E41FA0 /* _DDNumberExpression.m in Sources */,
+				77E2BBBF18FD8FC100E41FA0 /* _DDNumberTerm.m in Sources */,
+				77E2BBC018FD8FC100E41FA0 /* _DDOperatorTerm.m in Sources */,
+				77E2BBC118FD8FC100E41FA0 /* _DDParserTerm.m in Sources */,
+				77E2BBC218FD8FC100E41FA0 /* _DDPrecisionFunctionEvaluator.m in Sources */,
+				77E2BBC318FD8FC100E41FA0 /* _DDRewriteRule.m in Sources */,
+				77E2BBC418FD8FC100E41FA0 /* _DDVariableExpression.m in Sources */,
+				77E2BBC518FD8FC100E41FA0 /* _DDVariableTerm.m in Sources */,
+				77E2BBC618FD8FC100E41FA0 /* DDExpression.m in Sources */,
+				77E2BBC718FD8FC100E41FA0 /* DDExpressionRewriter.m in Sources */,
+				77E2BBC818FD8FC100E41FA0 /* DDMathEvaluator.m in Sources */,
+				77E2BBC918FD8FC100E41FA0 /* DDMathOperator.m in Sources */,
+				77E2BBCA18FD8FC100E41FA0 /* DDMathStringToken.m in Sources */,
+				77E2BBCB18FD8FC100E41FA0 /* DDMathStringTokenizer.m in Sources */,
+				77E2BBCC18FD8FC100E41FA0 /* DDParser.m in Sources */,
+				77E2BBCD18FD8FC100E41FA0 /* DDParserTypes.m in Sources */,
+				77E2BBCE18FD8FC100E41FA0 /* DDTypes.m in Sources */,
+				77E2BBCF18FD8FC100E41FA0 /* NSString+DDMathParsing.m in Sources */,
+				77E2BBAE18FD88A700E41FA0 /* LinearExpressionParsingTest.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8D15AC300486D014006FF6A4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1384,7 +1538,23 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		77E2BBB118FD88A700E41FA0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D15AC270486D014006FF6A4 /* Bit Slicer */;
+			targetProxy = 77E2BBB018FD88A700E41FA0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
+		77E2BBAA18FD88A700E41FA0 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				77E2BBAB18FD88A700E41FA0 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		77F115B417D2EBAF009E002A /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1444,6 +1614,194 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		77E2BBB218FD88A700E41FA0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Bit Slicer.app/Contents/MacOS/Bit Slicer";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_CXX0X_EXTENSIONS = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
+				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
+				CLANG_WARN_OBJC_RECEIVER_WEAK = YES;
+				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Bit Slicer Tests/Bit Slicer Tests-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MULTIPLE_DEFINITION_TYPES_FOR_SELECTOR = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				INFOPLIST_FILE = "Bit Slicer Tests/Bit Slicer Tests-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = "-D_BSDEBUG";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WARNING_CFLAGS = (
+					"-Weverything",
+					"-Wno-objc-missing-property-synthesis",
+					"-Wno-padded",
+					"-Wno-empty-translation-unit",
+					"-Wno-undef",
+					"-Wno-gnu",
+					"-Wno-pointer-arith",
+					"-Wno-objc-interface-ivars",
+					"-Wno-assign-enum",
+					"-Wno-direct-ivar-access",
+					"-Wno-unused-macros",
+					"-Wno-semicolon-before-method-body",
+					"-Wno-receiver-is-weak",
+					"-Wno-missing-prototypes",
+					"-Wno-selector",
+					"-Wno-c++11-long-long",
+					"-Wno-auto-import",
+					"-Wno-variadic-macros",
+					"-Wno-incomplete-module",
+					"-Werror",
+				);
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		77E2BBB318FD88A700E41FA0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Bit Slicer.app/Contents/MacOS/Bit Slicer";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_CXX0X_EXTENSIONS = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
+				CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
+				CLANG_WARN_OBJC_RECEIVER_WEAK = YES;
+				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Bit Slicer Tests/Bit Slicer Tests-Prefix.pch";
+				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_MULTIPLE_DEFINITION_TYPES_FOR_SELECTOR = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
+				GCC_WARN_UNUSED_PARAMETER = YES;
+				INFOPLIST_FILE = "Bit Slicer Tests/Bit Slicer Tests-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = "-D_BSDEBUG";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WARNING_CFLAGS = (
+					"-Weverything",
+					"-Wno-objc-missing-property-synthesis",
+					"-Wno-padded",
+					"-Wno-empty-translation-unit",
+					"-Wno-undef",
+					"-Wno-gnu",
+					"-Wno-pointer-arith",
+					"-Wno-objc-interface-ivars",
+					"-Wno-assign-enum",
+					"-Wno-direct-ivar-access",
+					"-Wno-unused-macros",
+					"-Wno-semicolon-before-method-body",
+					"-Wno-receiver-is-weak",
+					"-Wno-missing-prototypes",
+					"-Wno-selector",
+					"-Wno-c++11-long-long",
+					"-Wno-auto-import",
+					"-Wno-variadic-macros",
+					"-Wno-incomplete-module",
+					"-Werror",
+				);
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
 		C05733C808A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1677,6 +2035,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		77E2BBB418FD88A700E41FA0 /* Build configuration list for PBXNativeTarget "Bit Slicer Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				77E2BBB218FD88A700E41FA0 /* Debug */,
+				77E2BBB318FD88A700E41FA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Bit Slicer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
