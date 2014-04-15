@@ -43,6 +43,8 @@
 #import "ZGStoredData.h"
 #import <stdint.h>
 
+#define MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES 4096U
+
 #pragma mark Byte Order Swapping
 
 template<typename T> T ZGSwapBytes(T value);
@@ -292,33 +294,15 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	return [[ZGSearchResults alloc] initWithResultSets:resultSets dataSize:dataSize pointerSize:pointerSize];
 }
 
-#define ADD_VARIABLE_ADDRESS(addressExpression, pointerSize, resultSet) \
-switch (pointerSize) \
-{ \
-case sizeof(ZGMemoryAddress): \
-	{ \
-		ZGMemoryAddress memoryAddress = (addressExpression); \
-		[resultSet appendBytes:&memoryAddress length:sizeof(memoryAddress)]; \
-		break; \
-	} \
-case sizeof(ZG32BitMemoryAddress): \
-	{ \
-		ZG32BitMemoryAddress memoryAddress = (ZG32BitMemoryAddress)(addressExpression); \
-		[resultSet appendBytes:&memoryAddress length:sizeof(memoryAddress)]; \
-		break; \
-	} \
-}
-
 template <typename T, typename P>
 void ZGSearchWithFunctionHelperRegular(T *searchValue, bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, NSMutableData * __unsafe_unretained resultSet, ZGMemoryAddress address, void *bytes)
 {
-	const ZGMemorySize maxSteps = 4096;
 	while (dataIndex <= endLimit)
 	{
 		ZGMemorySize numberOfVariablesFound = 0;
-		P memoryAddresses[maxSteps];
+		P memoryAddresses[MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES];
 		
-		ZGMemorySize numberOfStepsToTake = MIN(maxSteps, (endLimit + dataAlignment - dataIndex) / dataAlignment);
+		ZGMemorySize numberOfStepsToTake = MIN(MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES, (endLimit + dataAlignment - dataIndex) / dataAlignment);
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			if (comparisonFunction(searchData, ((T *)bytes + dataIndex / sizeof(T)), searchValue))
@@ -338,13 +322,12 @@ void ZGSearchWithFunctionHelperRegular(T *searchValue, bool (*comparisonFunction
 template <typename T, typename P>
 void ZGSearchWithFunctionHelperStored(T *regionBytes, bool (*comparisonFunction)(ZGSearchData *, T *, T *), ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, NSMutableData * __unsafe_unretained resultSet, ZGMemoryAddress address, void *bytes)
 {
-	const ZGMemorySize maxSteps = 4096;
 	while (dataIndex <= endLimit)
 	{
 		ZGMemorySize numberOfVariablesFound = 0;
-		P memoryAddresses[maxSteps];
+		P memoryAddresses[MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES];
 		
-		ZGMemorySize numberOfStepsToTake = MIN(maxSteps, (endLimit + dataAlignment - dataIndex) / dataAlignment);
+		ZGMemorySize numberOfStepsToTake = MIN(MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES, (endLimit + dataAlignment - dataIndex) / dataAlignment);
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			if (comparisonFunction(searchData, ((T *)bytes + dataIndex / sizeof(T)), ((T *)regionBytes + dataIndex / sizeof(T))))
@@ -396,11 +379,11 @@ ZGSearchResults *ZGSearchWithFunction(bool (*comparisonFunction)(ZGSearchData *,
 	});
 }
 
-ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate)
+template <typename P>
+ZGSearchResults *_ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate)
 {
 	const unsigned long dataSize = searchData.dataSize;
 	const unsigned char *searchValue = (searchData.bytesSwapped && searchData.swappedValue != NULL) ? (const unsigned char *)searchData.swappedValue : (const unsigned char *)searchData.searchValue;
-	ZGMemorySize pointerSize = searchData.pointerSize;
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	
 	return ZGSearchForDataHelper(processTask, searchData, delegate, ^(ZGMemorySize __unused dataIndex, ZGMemoryAddress address, ZGMemorySize size, NSMutableData * __unsafe_unretained resultSet, void *bytes, void * __unused regionBytes) {
@@ -412,6 +395,9 @@ ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchD
 		
 		unsigned char *foundSubstring = (unsigned char *)bytes;
 		unsigned long haystackLengthLeft = size;
+
+		P memoryAddresses[MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES];
+		ZGMemorySize numberOfVariablesFound = 0;
 		
 		while (haystackLengthLeft >= dataSize)
 		{
@@ -422,15 +408,43 @@ ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchD
 			// boyer_moore_helper is only checking 0 .. dataSize-1 characters, so make a check to see if the last characters are equal
 			if (foundAddress % dataAlignment == 0 && foundSubstring[dataSize-1] == searchValue[dataSize-1])
 			{
-				ADD_VARIABLE_ADDRESS(foundAddress, pointerSize, resultSet);
+				memoryAddresses[numberOfVariablesFound] = (P)(foundAddress);
+				numberOfVariablesFound++;
+
+				if (numberOfVariablesFound >= MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES)
+				{
+					[resultSet appendBytes:memoryAddresses length:sizeof(memoryAddresses[0]) * numberOfVariablesFound];
+					numberOfVariablesFound = 0;
+				}
 			}
 			
 			foundSubstring++;
 			haystackLengthLeft = address + size - foundAddress - 1;
 		}
 		
+		if (numberOfVariablesFound > 0)
+		{
+			[resultSet appendBytes:&memoryAddresses length:sizeof(memoryAddresses[0]) * numberOfVariablesFound];
+		}
+
 		free(matchJump);
 	});
+}
+
+ZGSearchResults *ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate)
+{
+	ZGSearchResults *searchResults = nil;
+	ZGMemorySize pointerSize = searchData.pointerSize;
+	switch (pointerSize)
+	{
+		case sizeof(ZGMemoryAddress):
+			searchResults = _ZGSearchForBytes<ZGMemoryAddress>(processTask, searchData, delegate);
+			break;
+		case sizeof(ZG32BitMemoryAddress):
+			searchResults = _ZGSearchForBytes<ZG32BitMemoryAddress>(processTask, searchData, delegate);
+			break;
+	}
+	return searchResults;
 }
 
 #pragma mark Integers
@@ -1402,13 +1416,12 @@ void ZGNarrowSearchWithFunctionType(bool (*comparisonFunction)(ZGSearchData *, T
 	ZGMemoryAddress beginAddress = searchData.beginAddress;
 	ZGMemoryAddress endAddress = searchData.endAddress;
 
-	const ZGMemorySize maxSteps = 4096;
 	ZGMemoryAddress dataIndex = oldResultSetStartIndex;
 	while (dataIndex < oldDataLength)
 	{
-		P memoryAddresses[maxSteps];
+		P memoryAddresses[MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES];
 		ZGMemorySize numberOfVariablesFound = 0;
-		ZGMemorySize numberOfStepsToTake = MIN(maxSteps, (oldDataLength - dataIndex) / sizeof(P));
+		ZGMemorySize numberOfStepsToTake = MIN(MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES, (oldDataLength - dataIndex) / sizeof(P));
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			P variableAddress = *((P *)oldResultSetBytes + dataIndex / sizeof(P));
