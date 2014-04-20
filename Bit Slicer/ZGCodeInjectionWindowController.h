@@ -34,13 +34,11 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class ZGProcess;
+@class ZGInstruction;
+
 @interface ZGCodeInjectionWindowController : NSWindowController
 
-@property (assign, nonatomic) IBOutlet NSTextView *textView;
-@property (nonatomic, copy) NSString *suggestedCode;
-
-typedef void (^code_injection_completion_t)(NSString *codeInjected, BOOL canceled, BOOL *succeeded);
-
-- (void)attachToWindow:(NSWindow *)parentWindow completionHandler:(code_injection_completion_t)completionHandler;
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process instruction:(ZGInstruction *)instruction breakPoints:(NSArray *)breakPoints undoManager:(NSUndoManager *)undoManager;
 
 @end

@@ -1533,98 +1533,17 @@ enum ZGStepExecution
 
 - (IBAction)requestCodeInjection:(id)__unused sender
 {
-	ZGMemoryAddress allocatedAddress = 0;
-	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
-	ZGPageSize(self.currentProcess.processTask, &numberOfAllocatedBytes);
+	if (self.codeInjectionController == nil)
+	{
+		self.codeInjectionController = [[ZGCodeInjectionWindowController alloc] init];
+	}
 	
-	if (ZGAllocateMemory(self.currentProcess.processTask, &allocatedAddress, numberOfAllocatedBytes))
-	{
-		void *nopBuffer = malloc(numberOfAllocatedBytes);
-		memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
-		if (!ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
-		{
-			NSLog(@"Failed to nop allocated memory for code injection");
-		}
-		free(nopBuffer);
-		
-		ZGInstruction *firstInstruction = [[self selectedInstructions] objectAtIndex:0];
-		NSArray *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:firstInstruction.variable.address injectingIntoDestination:allocatedAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
-		
-		if (instructions != nil)
-		{
-			NSMutableString *suggestedCode = [NSMutableString stringWithFormat:@"; Injected code will be allocated at 0x%llX\n", allocatedAddress];
-			for (ZGInstruction *instruction in instructions)
-			{
-				NSMutableString *instructionText = [NSMutableString stringWithString:[instruction text]];
-				if (self.currentProcess.is64Bit && [instructionText rangeOfString:@"rip"].location != NSNotFound)
-				{
-					NSString *ripReplacement = nil;
-					if (allocatedAddress > firstInstruction.variable.address)
-					{
-						ripReplacement = [NSString stringWithFormat:@"rip-0x%llX", allocatedAddress + (instruction.variable.address - firstInstruction.variable.address) - instruction.variable.address];
-					}
-					else
-					{
-						ripReplacement = [NSString stringWithFormat:@"rip+0x%llX", instruction.variable.address + (instruction.variable.address - firstInstruction.variable.address) - allocatedAddress];
-					}
-					
-					[instructionText replaceOccurrencesOfString:@"rip" withString:ripReplacement options:NSLiteralSearch range:NSMakeRange(0, instructionText.length)];
-				}
-				[suggestedCode appendString:instructionText];
-				[suggestedCode appendString:@"\n"];
-			}
-			
-			if (self.codeInjectionController == nil)
-			{
-				self.codeInjectionController = [[ZGCodeInjectionWindowController alloc] init];
-			}
-			
-			[self.codeInjectionController setSuggestedCode:suggestedCode];
-			[self.codeInjectionController attachToWindow:self.window completionHandler:^(NSString *injectedCodeString, BOOL canceled, BOOL *succeeded) {
-				if (!canceled)
-				{
-					NSError *error = nil;
-					NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:injectedCodeString atInstructionPointer:allocatedAddress usingArchitectureBits:self.currentProcess.pointerSize*8 error:&error];
-					
-					if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:allocatedAddress hookingIntoOriginalInstructions:instructions process:self.currentProcess breakPoints:self.breakPointController.breakPoints undoManager:self.undoManager error:&error])
-					{
-						NSLog(@"Error while injecting code");
-						NSLog(@"%@", error);
-						
-						if (!ZGDeallocateMemory(self.currentProcess.processTask, allocatedAddress, numberOfAllocatedBytes))
-						{
-							NSLog(@"Error: Failed to deallocate VM memory after failing to inject code..");
-						}
-						
-						*succeeded = NO;
-						NSRunAlertPanel(@"Failed to Inject Code", @"An error occured assembling the new code: %@", @"OK", nil, nil, [error.userInfo objectForKey:@"reason"]);
-					}
-				}
-				else
-				{
-					if (!ZGDeallocateMemory(self.currentProcess.processTask, allocatedAddress, numberOfAllocatedBytes))
-					{
-						NSLog(@"Error: Failed to deallocate VM memory after canceling from injecting code..");
-					}
-				}
-			}];
-		}
-		else
-		{
-			if (!ZGDeallocateMemory(self.currentProcess.processTask, allocatedAddress, numberOfAllocatedBytes))
-			{
-				NSLog(@"Error: Failed to deallocate VM memory after failing to fetch enough instructions..");
-			}
-			
-			NSLog(@"Error: not enough instructions to override, or allocated memory address was too far away. Source: 0x%llX, destination: 0x%llX", firstInstruction.variable.address, allocatedAddress);
-			NSRunAlertPanel(@"Failed to Inject Code", @"There was not enough space to override this instruction, or the newly allocated address was too far away", @"OK", nil, nil);
-		}
-	}
-	else
-	{
-		NSLog(@"Failed to allocate code for code injection");
-		NSRunAlertPanel(@"Failed to Allocate Memory", @"An error occured trying to allocate new memory into the process", @"OK", nil, nil);
-	}
+	[self.codeInjectionController
+	 attachToWindow:self.window
+	 process:self.currentProcess
+	 instruction:[self.selectedInstructions objectAtIndex:0]
+	 breakPoints:self.breakPointController.breakPoints
+	 undoManager:self.undoManager];
 }
 
 #pragma mark Break Points
