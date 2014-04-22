@@ -1430,7 +1430,7 @@ enum ZGStepExecution
 	{
 		if (error != nil)
 		{
-			NSLog(@"%@", error);
+			ZG_LOG(@"%@", error);
 			NSRunAlertPanel(@"Failed to Modify Instruction", @"An error occured trying to assemble \"%@\": %@", @"OK", nil, nil, instructionText, [error.userInfo objectForKey:@"reason"]);
 		}
 	}
