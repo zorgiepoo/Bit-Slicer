@@ -44,6 +44,7 @@
 
 #define JUMP_REL32_INSTRUCTION_LENGTH 5
 #define INDIRECT_JUMP_INSTRUCTIONS_LENGTH 14
+#define POP_REGISTER_INSTRUCTION_LENGTH 1
 
 @implementation ZGDebuggerUtilities
 
@@ -479,7 +480,7 @@ error:(NSError * __autoreleasing *)error
 
 	NSData *jumpFromIslandData =
 	[[self class]
-	 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax", firstInstruction.variable.address + jumpToIslandData.length - 0x1]
+	 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax", firstInstruction.variable.address + jumpToIslandData.length - POP_REGISTER_INSTRUCTION_LENGTH]
 	 atInstructionPointer:allocatedAddress + newInstructionsData.length
 	 usingArchitectureBits:process.pointerSize*8
 	 error:error];
