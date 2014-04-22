@@ -107,7 +107,7 @@
 		return;
 	}
 	
-	NSMutableString *suggestedCode = [NSMutableString stringWithFormat:@"; Injected code will be allocated at 0x%llX\n", allocatedAddress];
+	NSMutableString *suggestedCode = [NSMutableString stringWithFormat:@"; New code will be written at 0x%llX\n", allocatedAddress + INJECTED_NOP_SLIDE_LENGTH];
 	
 	for (ZGInstruction *suggestedInstruction in instructions)
 	{
@@ -117,11 +117,11 @@
 			NSString *ripReplacement = nil;
 			if (allocatedAddress > instruction.variable.address)
 			{
-				ripReplacement = [NSString stringWithFormat:@"rip-0x%llX", allocatedAddress + (suggestedInstruction.variable.address - instruction.variable.address) - suggestedInstruction.variable.address];
+				ripReplacement = [NSString stringWithFormat:@"rip-0x%llX", allocatedAddress + INJECTED_NOP_SLIDE_LENGTH + (suggestedInstruction.variable.address - instruction.variable.address) - suggestedInstruction.variable.address];
 			}
 			else
 			{
-				ripReplacement = [NSString stringWithFormat:@"rip+0x%llX", suggestedInstruction.variable.address + (suggestedInstruction.variable.address - instruction.variable.address) - allocatedAddress];
+				ripReplacement = [NSString stringWithFormat:@"rip+0x%llX", suggestedInstruction.variable.address + (suggestedInstruction.variable.address - instruction.variable.address) - allocatedAddress - INJECTED_NOP_SLIDE_LENGTH];
 			}
 			
 			[instructionText replaceOccurrencesOfString:@"rip" withString:ripReplacement options:NSLiteralSearch range:NSMakeRange(0, instructionText.length)];
