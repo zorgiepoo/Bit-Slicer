@@ -90,8 +90,8 @@ typedef struct cs_x86_op {
 		x86_op_type type;	// operand type
 		union {
 			unsigned int reg;	// register value for REG operand
-			int64_t imm;		// immediate value for C-IMM, P-IMM or IMM operand
-			double fp;			// floating point value for FP operand
+			int64_t imm;		// immediate value for IMM operand
+			double fp;		// floating point value for FP operand
 			x86_op_mem mem;		// base/index/scale/disp value for MEM operand
 		};
 } cs_x86_op;
@@ -149,7 +149,7 @@ typedef struct cs_x86 {
 } cs_x86;
 
 //> X86 instructions
-typedef enum  x86_insn {
+typedef enum x86_insn {
 	X86_INS_INVALID = 0,
 
 	X86_INS_AAA,
@@ -746,6 +746,7 @@ typedef enum  x86_insn {
 	X86_INS_RSQRTPS,
 	X86_INS_RSQRTSS,
 	X86_INS_SAHF,
+	X86_INS_SAL,
 	X86_INS_SALC,
 	X86_INS_SAR,
 	X86_INS_SARX,

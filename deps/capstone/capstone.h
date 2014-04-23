@@ -14,8 +14,6 @@ extern "C" {
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "diet.h"	// CAPSTONE_DIET
-
 #ifdef _MSC_VER
 #pragma warning(disable:4201)
 #pragma warning(disable:4100)
@@ -23,7 +21,7 @@ extern "C" {
 
 // Capstone API version
 #define CS_API_MAJOR 2
-#define CS_API_MINOR 1
+#define CS_API_MINOR 2
 
 // Macro to create combined version which can be compared to
 // result of cs_version() API.
@@ -39,11 +37,21 @@ typedef enum cs_arch {
 	CS_ARCH_MIPS,		// Mips architecture
 	CS_ARCH_X86,		// X86 architecture (including x86 & x86-64)
 	CS_ARCH_PPC,		// PowerPC architecture
+	CS_ARCH_SPARC,		// Sparc architecture
+	CS_ARCH_SYSZ,		// SystemZ architecture
 	CS_ARCH_MAX,
 	CS_ARCH_ALL = 0xFFFF,
 } cs_arch;
 
+// Support value to verify diet mode of the engine.
+// If cs_support(CS_SUPPORT_DIET) return True, the engine was compiled
+// in diet mode.
 #define CS_SUPPORT_DIET (CS_ARCH_ALL + 1)
+
+// Support value to verify X86 reduce mode of the engine.
+// If cs_support(CS_SUPPORT_X86_REDUCE) return True, the engine was compiled
+// in X86 reduce mode.
+#define CS_SUPPORT_X86_REDUCE (CS_ARCH_ALL + 2)
 
 // Mode type
 typedef enum cs_mode {
@@ -55,8 +63,8 @@ typedef enum cs_mode {
 	CS_MODE_THUMB = 1 << 4,	// ARM's Thumb mode, including Thumb-2
 	CS_MODE_MICRO = 1 << 4, // MicroMips mode (MIPS architecture)
 	CS_MODE_N64 = 1 << 5, // Nintendo-64 mode (MIPS architecture)
-
-	// CS_MODE_BIG_ENDIAN = 1 << 31	// big endian mode; commenting out since gives signed overflow warning, and I don't use this anyway
+	CS_MODE_V9 = 1 << 4, // SparcV9 mode (Sparc architecture)
+	CS_MODE_BIG_ENDIAN = 1 << 31	// big endian mode
 } cs_mode;
 
 typedef void* (*cs_malloc_t)(size_t size);
@@ -82,28 +90,65 @@ typedef enum cs_opt_type {
 	CS_OPT_DETAIL,	// Break down instruction structure into details
 	CS_OPT_MODE,	// Change engine's mode at run-time
 	CS_OPT_MEM,	// User-defined dynamic memory related functions
+	CS_OPT_SKIPDATA, // Skip data when disassembling. Then engine is in SKIPDATA mode.
+	CS_OPT_SKIPDATA_SETUP, // Setup user-defined function for SKIPDATA option
 } cs_opt_type;
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wduplicate-enum"
 
 // Runtime option value (associated with option type above)
 typedef enum cs_opt_value {
-	CS_OPT_OFF = 0,  // Turn OFF an option - default option for CS_OPT_DETAIL.
-	CS_OPT_ON = 3, // Turn ON an option (CS_OPT_DETAIL).
+	CS_OPT_OFF = 0,  // Turn OFF an option - default option of CS_OPT_DETAIL, CS_OPT_SKIPDATA.
+	CS_OPT_ON = 3, // Turn ON an option (CS_OPT_DETAIL, CS_OPT_SKIPDATA).
 	CS_OPT_SYNTAX_DEFAULT = 0, // Default asm syntax (CS_OPT_SYNTAX).
 	CS_OPT_SYNTAX_INTEL, // X86 Intel asm syntax - default on X86 (CS_OPT_SYNTAX).
 	CS_OPT_SYNTAX_ATT,   // X86 ATT asm syntax (CS_OPT_SYNTAX).
-	CS_OPT_SYNTAX_NOREGNAME, // PPC asm syntax: Prints register name with only number (CS_OPT_SYNTAX)
+	CS_OPT_SYNTAX_NOREGNAME, // Prints register name with only number (CS_OPT_SYNTAX)
 } cs_opt_value;
 
-#pragma clang diagnostic pop
+// User-defined callback function for SKIPDATA option
+// @code: the input buffer containing code to be disassembled. This is the 
+//      same buffer passed to cs_disasm_ex().
+// @offset: the position of the currently-examining byte in the input
+//      buffer @code mentioned above.
+// @user_data: user-data passed to cs_option() via @user_data field in
+//      cs_opt_skipdata struct below.
+// @return: return number of bytes to skip, or 0 to immediately stop disassembling.
+typedef size_t (*cs_skipdata_cb_t)(const uint8_t *code, size_t offset, void* user_data);
+
+// User-customized setup for SKIPDATA option
+typedef struct cs_opt_skipdata {
+	// Capstone considers data to skip as special "instructions".
+	// User can specify the string for this instruction's "mnemonic" here.
+	// By default (if @mnemonic is NULL), Capstone use ".db".
+	const char *mnemonic;
+
+	// User-defined callback function to be called when Capstone hits data.
+	// If the returned value from this callback is positive (>0), Capstone
+	// will skip exactly that number of bytes & continue. Otherwise, if
+	// the callback returns 0, Capstone stops disassembling and returns
+	// immediately from cs_disasm_ex()
+	// NOTE: if this callback pointer is NULL, Capstone would skip a number
+	// of bytes depending on architectures, as following:
+	// Arm:     2 bytes (Thumb mode) or 4 bytes.
+	// Arm64:   4 bytes.
+	// Mips:    4 bytes.
+	// PowerPC: 4 bytes.
+	// Sparc:   4 bytes.
+	// SystemZ: 2 bytes.
+	// X86:     1 bytes.
+	cs_skipdata_cb_t callback; 	// default value is NULL
+
+	// User-defined data to be passed to @callback function pointer.
+	void *user_data;
+} cs_opt_skipdata;
+
 
 #include "arm.h"
 #include "arm64.h"
 #include "mips.h"
-#include "x86.h"
 #include "ppc.h"
+#include "sparc.h"
+#include "systemz.h"
+#include "x86.h"
 
 // NOTE: All information in cs_detail is only available when CS_OPT_DETAIL = CS_OPT_ON
 typedef struct cs_detail {
@@ -123,6 +168,8 @@ typedef struct cs_detail {
 		cs_arm arm;		// ARM architecture (including Thumb/Thumb2)
 		cs_mips mips;	// MIPS architecture
 		cs_ppc ppc;	// PowerPC architecture
+		cs_sparc sparc;	// Sparc architecture
+		cs_sysz sysz;	// SystemZ architecture
 	};
 } cs_detail;
 
@@ -154,8 +201,10 @@ typedef struct cs_insn {
 	char op_str[160];
 
 	// Pointer to cs_detail.
-	// NOTE: detail pointer is only valid (not NULL) when CS_OP_DETAIL = CS_OPT_ON
-	// Otherwise, if CS_OPT_DETAIL = CS_OPT_OFF, @detail = NULL
+	// NOTE: detail pointer is only valid (not NULL) when both requirements below are met:
+	// (1) CS_OP_DETAIL = CS_OPT_ON
+	// (2) If engine is in Skipdata mode (CS_OP_SKIPDATA option set to CS_OPT_ON), then
+	//   the current instruction is not the "data" instruction (which clearly has no detail).
 	cs_detail *detail;
 } cs_insn;
 
@@ -169,17 +218,18 @@ typedef struct cs_insn {
 // All type of errors encountered by Capstone API.
 // These are values returned by cs_errno()
 typedef enum cs_err {
-	CS_ERR_OK = 0,	// No error: everything was fine
-	CS_ERR_MEM,	// Out-Of-Memory error: cs_open(), cs_disasm_ex()
-	CS_ERR_ARCH,	// Unsupported architecture: cs_open()
-	CS_ERR_HANDLE,	// Invalid handle: cs_op_count(), cs_op_index()
-	CS_ERR_CSH,	    // Invalid csh argument: cs_close(), cs_errno(), cs_option()
-	CS_ERR_MODE,	// Invalid/unsupported mode: cs_open()
-	CS_ERR_OPTION,	// Invalid/unsupported option: cs_option()
-	CS_ERR_DETAIL,	// Information is unavailable because detail option is OFF
+	CS_ERR_OK = 0,   // No error: everything was fine
+	CS_ERR_MEM,      // Out-Of-Memory error: cs_open(), cs_disasm_ex()
+	CS_ERR_ARCH,     // Unsupported architecture: cs_open()
+	CS_ERR_HANDLE,   // Invalid handle: cs_op_count(), cs_op_index()
+	CS_ERR_CSH,	     // Invalid csh argument: cs_close(), cs_errno(), cs_option()
+	CS_ERR_MODE,     // Invalid/unsupported mode: cs_open()
+	CS_ERR_OPTION,   // Invalid/unsupported option: cs_option()
+	CS_ERR_DETAIL,   // Information is unavailable because detail option is OFF
 	CS_ERR_MEMSETUP, // Dynamic memory management uninitialized (see CS_OPT_MEM)
-	CS_ERR_VERSION, // Unsupported version (bindings)
-	CS_ERR_DIET,	// Access irrelevant data in "diet" engine
+	CS_ERR_VERSION,  // Unsupported version (bindings)
+	CS_ERR_DIET,     // Access irrelevant data in "diet" engine
+	CS_ERR_SKIPDATA, // Access irrelevant data for "data" instruction in SKIPDATA mode
 } cs_err;
 
 /*
@@ -236,12 +286,14 @@ cs_err cs_open(cs_arch arch, cs_mode mode, csh *handle);
  cached memory, thus access to any Capstone API after cs_close() might crash
  your application.
 
- @handle: handle returned by cs_open()
+ In fact,this API invalidate @handle by ZERO out its value (i.e *handle = 0).
+
+ @handle: pointer to a handle returned by cs_open()
 
  @return CS_ERR_OK on success, or other value on failure (refer to cs_err enum
  for detailed error).
 */
-cs_err cs_close(csh handle);
+cs_err cs_close(csh *handle);
 
 /*
  Set option for disassembling engine at runtime

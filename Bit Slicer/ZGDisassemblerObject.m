@@ -73,10 +73,21 @@ static BOOL isJumpMnemonic(int mnemonic)
 		{
 			return nil;
 		}
-		
+
+		cs_opt_skipdata skipdata = { .mnemonic = "db" };
+		if (cs_option(_object, CS_OPT_SKIPDATA_SETUP, &skipdata) != CS_ERR_OK)
+		{
+			return nil;
+		}
+
+		if (cs_option(_object, CS_OPT_SKIPDATA, CS_OPT_ON) != CS_ERR_OK)
+		{
+			return nil;
+		}
+
 		self.bytes = malloc(size);
 		memcpy(self.bytes, bytes, size);
-		
+
 		self.startAddress = address;
 		self.size = size;
 		self.pointerSize = pointerSize;
@@ -86,7 +97,7 @@ static BOOL isJumpMnemonic(int mnemonic)
 
 - (void)dealloc
 {
-	cs_close(self.object);
+	cs_close(&_object);
 	free(self.bytes); self.bytes = NULL;
 }
 
@@ -95,7 +106,7 @@ static void getTextBuffer(void *instructionBytes, size_t instructionSize, unsign
 	size_t mnemonicStringLength = strlen(mnemonicBuffer);
 	memcpy(destinationBuffer, mnemonicBuffer, mnemonicStringLength);
 	
-	if (isJumpMnemonic(mnemonicID) && instructionSize == 2 && strstr(mnemonicBuffer, "short") == NULL)
+	if (isJumpMnemonic(mnemonicID) && instructionSize == 2 && strstr(operandStringBuffer, "0x") != NULL && strstr(mnemonicBuffer, "short") == NULL)
 	{
 		// Specify that instruction is a short jump
 		char shortString[] = " short ";

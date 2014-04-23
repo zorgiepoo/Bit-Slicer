@@ -381,6 +381,8 @@
 		7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMachBinaryInfo.m; path = "Bit Slicer/ZGMachBinaryInfo.m"; sourceTree = "<group>"; };
 		77988F19185803E800476A37 /* container.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container.pdf; path = "Bit Slicer/docicons/container.pdf"; sourceTree = "<group>"; };
 		77988F1B185804AC00476A37 /* container_filled.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container_filled.pdf; path = "Bit Slicer/docicons/container_filled.pdf"; sourceTree = "<group>"; };
+		77ABB5BC19075288000A3860 /* sparc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sparc.h; path = deps/capstone/sparc.h; sourceTree = "<group>"; };
+		77ABB5BD19075288000A3860 /* systemz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemz.h; path = deps/capstone/systemz.h; sourceTree = "<group>"; };
 		77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLoggerWindowController.h; path = "Bit Slicer/ZGLoggerWindowController.h"; sourceTree = "<group>"; };
 		77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLoggerWindowController.m; path = "Bit Slicer/ZGLoggerWindowController.m"; sourceTree = "<group>"; };
 		77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGLoggerWindowController.xib; path = "Bit Slicer/ZGLoggerWindowController.xib"; sourceTree = "<group>"; };
@@ -737,6 +739,8 @@
 				7738C5E418C2A06800F67504 /* mips.h */,
 				7738C5E518C2A06800F67504 /* ppc.h */,
 				7738C5E618C2A06800F67504 /* x86.h */,
+				77ABB5BC19075288000A3860 /* sparc.h */,
+				77ABB5BD19075288000A3860 /* systemz.h */,
 				7738C5DE18C2A06100F67504 /* libcapstone.a */,
 			);
 			name = capstone;
