@@ -65,7 +65,8 @@ static void disassemblerTranslator(ud_t *object)
 	if (ud_insn_len(object) == 2 && object->mnemonic >= UD_Ijo && object->mnemonic <= UD_Ijmp)
 	{
 		const char *originalText = ud_insn_asm(object);
-		if (strstr(originalText, "short") == NULL)
+		// test for '0x' as a cheap way to detect if it's an immediate operand as opposed to an indirect register
+		if (strstr(originalText, "short") == NULL && strstr(originalText, "0x") != NULL)
 		{
 			NSMutableArray *textComponents = [NSMutableArray arrayWithArray:[@(originalText) componentsSeparatedByString:@" "]];
 			[textComponents insertObject:@"short" atIndex:1];
