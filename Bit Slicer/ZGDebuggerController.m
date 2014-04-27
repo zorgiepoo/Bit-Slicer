@@ -560,18 +560,14 @@ enum ZGStepExecution
 
 - (void)updateVisibleInstructionSymbols
 {
-	static BOOL isUpdatingSymbols = NO;
-	
 	NSRange visibleRowsRange = [self.instructionsTableView rowsInRect:self.instructionsTableView.visibleRect];
 	if (visibleRowsRange.location + visibleRowsRange.length <= self.instructions.count)
 	{
 		NSArray *instructions = [self.instructions subarrayWithRange:visibleRowsRange];
-		if ([self shouldUpdateSymbolsForInstructions:instructions] && !isUpdatingSymbols)
+		if ([self shouldUpdateSymbolsForInstructions:instructions])
 		{
-			isUpdatingSymbols = YES;
 			[self updateSymbolsForInstructions:instructions];
 			[self.instructionsTableView reloadData];
-			isUpdatingSymbols = NO;
 		}
 	}
 }
