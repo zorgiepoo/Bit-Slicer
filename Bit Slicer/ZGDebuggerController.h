@@ -50,6 +50,9 @@
 @class ZGLoggerWindowController;
 
 extern NSString *ZGPauseAndUnpauseHotKey;
+extern NSString *ZGStepInHotKey;
+extern NSString *ZGStepOverHotKey;
+extern NSString *ZGStepOutHotKey;
 
 @interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate, ZGHotKeyDelegate>
 
@@ -58,6 +61,9 @@ extern NSString *ZGPauseAndUnpauseHotKey;
 - (void)cleanup;
 
 @property (nonatomic, readonly) ZGHotKey *pauseAndUnpauseHotKey;
+@property (nonatomic, readonly) ZGHotKey *stepInHotKey;
+@property (nonatomic, readonly) ZGHotKey *stepOverHotKey;
+@property (nonatomic, readonly) ZGHotKey *stepOutHotKey;
 
 - (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
 

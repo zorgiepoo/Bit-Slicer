@@ -12,6 +12,9 @@
                 <outlet property="hotkeyRecorder" destination="29" id="30"/>
                 <outlet property="pauseAndUnpauseHotKeyRecorder" destination="29" id="K1W-AS-mFz"/>
                 <outlet property="sendProfileInfoButton" destination="hAA-Cs-32G" id="CVJ-f3-Wvz"/>
+                <outlet property="stepInHotKeyRecorder" destination="YSm-k4-bna" id="Qlh-ye-QcE"/>
+                <outlet property="stepOutHotKeyRecorder" destination="DJg-ez-7UC" id="r4v-WZ-5Ia"/>
+                <outlet property="stepOverHotKeyRecorder" destination="DW5-R7-z7W" id="Sc8-fm-lUl"/>
                 <outlet property="window" destination="1" id="26"/>
             </connections>
         </customObject>
@@ -20,30 +23,21 @@
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" frameAutosaveName="ZGPreferencesWindow" animationBehavior="default" id="1">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="524" y="518" width="256" height="207"/>
+            <rect key="contentRect" x="524" y="518" width="322" height="232"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="256" height="207"/>
+                <rect key="frame" x="0.0" y="0.0" width="322" height="232"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField verticalHuggingPriority="750" id="3">
-                        <rect key="frame" x="25" y="20" width="195" height="56"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="When this hotkey is invoked, Bit Slicer will toggle between freezing and unfreezing the frontmost target." id="23">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <customView id="29" customClass="SRRecorderControl">
-                        <rect key="frame" x="28" y="84" width="189" height="35"/>
+                        <rect key="frame" x="131" y="116" width="171" height="25"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <connections>
                             <outlet property="delegate" destination="-2" id="32"/>
                         </connections>
                     </customView>
                     <button id="35">
-                        <rect key="frame" x="17" y="171" width="194" height="18"/>
+                        <rect key="frame" x="17" y="196" width="194" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="Automatically check for updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="36">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -54,7 +48,7 @@
                         </connections>
                     </button>
                     <button id="37">
-                        <rect key="frame" x="34" y="151" width="141" height="18"/>
+                        <rect key="frame" x="34" y="176" width="141" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="Include alpha versions" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="38">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -65,7 +59,7 @@
                         </connections>
                     </button>
                     <button id="hAA-Cs-32G">
-                        <rect key="frame" x="34" y="133" width="204" height="18"/>
+                        <rect key="frame" x="34" y="158" width="204" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="Include anonymous system profile" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="Ca8-JH-wcL">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -76,12 +70,69 @@
                         </connections>
                     </button>
                     <box autoresizesSubviews="NO" verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="39">
-                        <rect key="frame" x="20" y="125" width="205" height="5"/>
+                        <rect key="frame" x="20" y="150" width="282" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <font key="titleFont" metaFont="system"/>
                     </box>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="kZo-uH-ynD">
+                        <rect key="frame" x="18" y="121" width="107" height="14"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pausing/Resuming:" id="z1m-MT-RRG">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="wzp-Dw-fbq">
+                        <rect key="frame" x="46" y="88" width="79" height="14"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Stepping Into:" id="kid-iW-2xD">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <customView id="YSm-k4-bna" customClass="SRRecorderControl">
+                        <rect key="frame" x="131" y="83" width="171" height="25"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <connections>
+                            <outlet property="delegate" destination="-2" id="pIs-Fm-Jo3"/>
+                        </connections>
+                    </customView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="BqE-NK-wR3">
+                        <rect key="frame" x="42" y="58" width="83" height="14"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Stepping Over:" id="L4n-dZ-lGd">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <customView id="DW5-R7-z7W" customClass="SRRecorderControl">
+                        <rect key="frame" x="131" y="53" width="171" height="25"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <connections>
+                            <outlet property="delegate" destination="-2" id="l7u-N3-9ng"/>
+                        </connections>
+                    </customView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="asK-ri-TY6">
+                        <rect key="frame" x="47" y="25" width="78" height="14"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Stepping Out:" id="SWR-4m-jnO">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <customView id="DJg-ez-7UC" customClass="SRRecorderControl">
+                        <rect key="frame" x="131" y="20" width="171" height="25"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <connections>
+                            <outlet property="delegate" destination="-2" id="HxP-9R-teq"/>
+                        </connections>
+                    </customView>
                 </subviews>
             </view>
         </window>

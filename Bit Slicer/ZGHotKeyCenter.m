@@ -69,7 +69,7 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 {
 	for (ZGHotKey *registeredHotKey in _registeredHotKeys)
 	{
-		if (registeredHotKey.keyCombo.code == hotKey.keyCombo.code && registeredHotKey.keyCombo.flags == hotKey.keyCombo.flags)
+		if (![registeredHotKey isInvalid] && registeredHotKey.keyCombo.code == hotKey.keyCombo.code && registeredHotKey.keyCombo.flags == hotKey.keyCombo.flags)
 		{
 			return NO;
 		}
@@ -97,11 +97,6 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 	[_registeredHotKeys addObject:hotKey];
 
 	return YES;
-}
-
-- (BOOL)registerHotKey:(ZGHotKey *)hotKey
-{
-	return [self registerHotKey:hotKey delegate:hotKey.delegate];
 }
 
 - (void)unregisterHotKey:(ZGHotKey *)hotKey

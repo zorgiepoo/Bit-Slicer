@@ -104,6 +104,9 @@
 
 @end
 
+NSString *ZGStepInHotKey = @"ZGStepInHotKey";
+NSString *ZGStepOverHotKey = @"ZGStepOverHotKey";
+NSString *ZGStepOutHotKey = @"ZGStepOutHotKey";
 NSString *ZGPauseAndUnpauseHotKey = @"ZGPauseAndUnpauseHotKey";
 
 #define ZGOldPauseAndUnpauseHotKeyCode @"ZG_HOT_KEY_CODE"
@@ -129,6 +132,8 @@ enum ZGStepExecution
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
+		NSData *emptyHotKeyData = [NSKeyedArchiver archivedDataWithRootObject:[ZGHotKey hotKey]];
+
 		// Versions before 1.7 have pause/unpause hot key stored in different default keys, so do a migration
 		NSNumber *oldPauseAndUnpauseHotKeyCode = [[NSUserDefaults standardUserDefaults] objectForKey:ZGOldPauseAndUnpauseHotKeyCode];
 		NSNumber *oldPauseAndUnpauseHotKeyFlags = [[NSUserDefaults standardUserDefaults] objectForKey:ZGOldPauseAndUnpauseHotKeyFlags];
@@ -149,9 +154,12 @@ enum ZGStepExecution
 		}
 		else
 		{
-			[[NSUserDefaults standardUserDefaults]
-			 registerDefaults:@{ZGPauseAndUnpauseHotKey : [NSKeyedArchiver archivedDataWithRootObject:[ZGHotKey hotKey]]}];
+			[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGPauseAndUnpauseHotKey : emptyHotKeyData}];
 		}
+
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGStepInHotKey : emptyHotKeyData}];
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGStepOverHotKey : emptyHotKeyData}];
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGStepOutHotKey : emptyHotKeyData}];
 	});
 }
 
@@ -159,7 +167,7 @@ enum ZGStepExecution
 {
 	self = [super initWithProcessTaskManager:processTaskManager];
 	
-	if (self)
+	if (self != nil)
 	{
 		self.debuggerController = self;
 		self.breakPointController = breakPointController;
@@ -168,15 +176,22 @@ enum ZGStepExecution
 		self.haltedBreakPoints = [[NSArray alloc] init];
 		
 		_pauseAndUnpauseHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGPauseAndUnpauseHotKey]];
-		[hotKeyCenter registerHotKey:self.pauseAndUnpauseHotKey delegate:self];
-		
+		_stepInHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGStepInHotKey]];
+		_stepOverHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOverHotKey]];
+		_stepOutHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOutHotKey]];
+
+		[hotKeyCenter registerHotKey:_pauseAndUnpauseHotKey delegate:self];
+		[hotKeyCenter registerHotKey:_stepInHotKey delegate:self];
+		[hotKeyCenter registerHotKey:_stepOverHotKey delegate:self];
+		[hotKeyCenter registerHotKey:_stepOutHotKey delegate:self];
+
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
 		 selector:@selector(applicationWillTerminate:)
 		 name:NSApplicationWillTerminateNotification
 		 object:nil];
 	}
-	
+
 	return self;
 }
 
@@ -256,24 +271,52 @@ enum ZGStepExecution
 {
 	if (hotKey == _pauseAndUnpauseHotKey)
 	{
-		for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
+		if ([self canContinueOrStepIntoExecution])
 		{
-			if (runningApplication.isActive)
+			[self continueExecution:nil];
+		}
+		else
+		{
+			for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
 			{
-				if (runningApplication.processIdentifier != getpid() && ![self isProcessIdentifierHalted:runningApplication.processIdentifier])
+				if (runningApplication.isActive)
 				{
-					ZGMemoryMap processTask = 0;
-					if ([self.processTaskManager getTask:&processTask forProcessIdentifier:runningApplication.processIdentifier])
+					if (runningApplication.processIdentifier != getpid() && ![self isProcessIdentifierHalted:runningApplication.processIdentifier])
 					{
-						[ZGProcess pauseOrUnpauseProcessTask:processTask];
+						ZGMemoryMap processTask = 0;
+						if ([self.processTaskManager getTask:&processTask forProcessIdentifier:runningApplication.processIdentifier])
+						{
+							[ZGProcess pauseOrUnpauseProcessTask:processTask];
+						}
+						else
+						{
+							ZG_LOG(@"Failed to pause/unpause process with pid %d", runningApplication.processIdentifier);
+						}
 					}
-					else
-					{
-						ZG_LOG(@"Failed to pause/unpause process with pid %d", runningApplication.processIdentifier);
-					}
+					break;
 				}
-				break;
 			}
+		}
+	}
+	else if (hotKey == _stepInHotKey)
+	{
+		if ([self canContinueOrStepIntoExecution])
+		{
+			[self stepInto:nil];
+		}
+	}
+	else if (hotKey == _stepOverHotKey)
+	{
+		if ([self canStepOverExecution])
+		{
+			[self stepOver:nil];
+		}
+	}
+	else if (hotKey == _stepOutHotKey)
+	{
+		if ([self canStepOutOfExecution])
+		{
+			[self stepOut:nil];
 		}
 	}
 }

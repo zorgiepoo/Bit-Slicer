@@ -78,7 +78,7 @@
 
 - (BOOL)isInvalid
 {
-	return (_keyCombo.code == INVALID_KEY_CODE || _keyCombo.flags == INVALID_KEY_MODIFIER);
+	return (_keyCombo.code == INVALID_KEY_CODE && _keyCombo.flags == INVALID_KEY_MODIFIER);
 }
 
 @end
