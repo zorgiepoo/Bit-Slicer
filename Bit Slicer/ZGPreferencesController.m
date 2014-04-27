@@ -116,8 +116,10 @@
 	if (recorder == self.pauseAndUnpauseHotKeyRecorder)
 	{
 		ZGHotKey *hotKey = self.debuggerController.pauseAndUnpauseHotKey;
+		[self.hotKeyCenter unregisterHotKey:hotKey];
+
 		hotKey.keyCombo = newCarbonKeyCode;
-		[self.hotKeyCenter updateHotKey:hotKey];
+		[self.hotKeyCenter registerHotKey:hotKey];
 
 		[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:hotKey] forKey:ZGPauseAndUnpauseHotKey];
 	}

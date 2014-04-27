@@ -99,6 +99,11 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 	return YES;
 }
 
+- (BOOL)registerHotKey:(ZGHotKey *)hotKey
+{
+	return [self registerHotKey:hotKey delegate:hotKey.delegate];
+}
+
 - (void)unregisterHotKey:(ZGHotKey *)hotKey
 {
 	if ([_registeredHotKeys containsObject:hotKey])
@@ -110,12 +115,6 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 
 		[_registeredHotKeys removeObject:hotKey];
 	}
-}
-
-- (void)updateHotKey:(ZGHotKey *)hotKey
-{
-	[self unregisterHotKey:hotKey];
-	[self registerHotKey:hotKey delegate:hotKey.delegate];
 }
 
 @end

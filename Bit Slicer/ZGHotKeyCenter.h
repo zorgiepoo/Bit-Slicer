@@ -40,8 +40,7 @@
 @interface ZGHotKeyCenter : NSObject
 
 - (BOOL)registerHotKey:(ZGHotKey *)hotKey delegate:(id <ZGHotKeyDelegate>)delegate;
+- (BOOL)registerHotKey:(ZGHotKey *)hotKey;
 - (void)unregisterHotKey:(ZGHotKey *)hotKey;
-
-- (void)updateHotKey:(ZGHotKey *)hotKey;
 
 @end
