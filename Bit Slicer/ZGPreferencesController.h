@@ -34,11 +34,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class ZGHotKeyController;
+@class ZGHotKeyCenter;
 @class ZGAppUpdaterController;
+@class ZGDebuggerController;
 
 @interface ZGPreferencesController : NSWindowController
 
-- (id)initWithHotKeyController:(ZGHotKeyController *)hotKeyController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController;
+- (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController;
 
 @end

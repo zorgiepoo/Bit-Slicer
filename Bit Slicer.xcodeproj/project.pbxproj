@@ -21,7 +21,7 @@
 		7714194118AC7D8500600423 /* ZGMemoryDumpFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714194018AC7D8500600423 /* ZGMemoryDumpFunctions.m */; };
 		77179F6B18CD34F100BCB6D0 /* ZGAppUpdaterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77179F6A18CD34F100BCB6D0 /* ZGAppUpdaterController.m */; };
 		771A3F4518CC0B0900D19676 /* ZGDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 771A3F4418CC0B0900D19676 /* ZGDocumentController.m */; };
-		771A3F4818CCF32F00D19676 /* ZGHotKeyController.m in Sources */ = {isa = PBXBuildFile; fileRef = 771A3F4718CCF32F00D19676 /* ZGHotKeyController.m */; };
+		771A3F4818CCF32F00D19676 /* ZGHotKeyCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 771A3F4718CCF32F00D19676 /* ZGHotKeyCenter.m */; };
 		771A931D18791A8D0098511D /* ZGTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 771A931C18791A8D0098511D /* ZGTableView.m */; };
 		77282120189B854D0044E4BC /* ZGFunctionTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7728211F189B854D0044E4BC /* ZGFunctionTypes.m */; };
 		77282123189E769B0044E4BC /* ZGStoredData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282122189E769B0044E4BC /* ZGStoredData.m */; };
@@ -29,6 +29,7 @@
 		772C0F7E18B88AFA009FFF72 /* ZGRegisterEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 772C0F7D18B88AFA009FFF72 /* ZGRegisterEntries.m */; };
 		772C0F8218B95603009FFF72 /* ZGBacktraceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 772C0F8018B95603009FFF72 /* ZGBacktraceViewController.m */; };
 		772C0F8318B95603009FFF72 /* ZGBacktraceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 772C0F8118B95603009FFF72 /* ZGBacktraceViewController.xib */; };
+		772D1217190D85CC00800B1B /* ZGHotKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 772D1216190D85CC00800B1B /* ZGHotKey.m */; };
 		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
 		7730999E18660A29008B71DA /* ZGDocumentOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7730999C18660A29008B71DA /* ZGDocumentOptionsViewController.xib */; };
 		7735B05518DAB3E8000371AA /* ZGMemoryNavigationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7735B05418DAB3E8000371AA /* ZGMemoryNavigationWindowController.m */; };
@@ -252,8 +253,8 @@
 		77179F6A18CD34F100BCB6D0 /* ZGAppUpdaterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGAppUpdaterController.m; path = "Bit Slicer/ZGAppUpdaterController.m"; sourceTree = "<group>"; };
 		771A3F4318CC0B0900D19676 /* ZGDocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentController.h; path = "Bit Slicer/ZGDocumentController.h"; sourceTree = "<group>"; };
 		771A3F4418CC0B0900D19676 /* ZGDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentController.m; path = "Bit Slicer/ZGDocumentController.m"; sourceTree = "<group>"; };
-		771A3F4618CCF32F00D19676 /* ZGHotKeyController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGHotKeyController.h; path = "Bit Slicer/ZGHotKeyController.h"; sourceTree = "<group>"; };
-		771A3F4718CCF32F00D19676 /* ZGHotKeyController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGHotKeyController.m; path = "Bit Slicer/ZGHotKeyController.m"; sourceTree = "<group>"; };
+		771A3F4618CCF32F00D19676 /* ZGHotKeyCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGHotKeyCenter.h; path = "Bit Slicer/ZGHotKeyCenter.h"; sourceTree = "<group>"; };
+		771A3F4718CCF32F00D19676 /* ZGHotKeyCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGHotKeyCenter.m; path = "Bit Slicer/ZGHotKeyCenter.m"; sourceTree = "<group>"; };
 		771A931B18791A8D0098511D /* ZGTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGTableView.h; path = "Bit Slicer/ZGTableView.h"; sourceTree = "<group>"; };
 		771A931C18791A8D0098511D /* ZGTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGTableView.m; path = "Bit Slicer/ZGTableView.m"; sourceTree = "<group>"; };
 		7728211E189B854D0044E4BC /* ZGFunctionTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGFunctionTypes.h; path = "Bit Slicer/ZGFunctionTypes.h"; sourceTree = "<group>"; };
@@ -267,6 +268,9 @@
 		772C0F7F18B95603009FFF72 /* ZGBacktraceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBacktraceViewController.h; path = "Bit Slicer/ZGBacktraceViewController.h"; sourceTree = "<group>"; };
 		772C0F8018B95603009FFF72 /* ZGBacktraceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGBacktraceViewController.m; path = "Bit Slicer/ZGBacktraceViewController.m"; sourceTree = "<group>"; };
 		772C0F8118B95603009FFF72 /* ZGBacktraceViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGBacktraceViewController.xib; path = "Bit Slicer/ZGBacktraceViewController.xib"; sourceTree = "<group>"; };
+		772D1215190D85CC00800B1B /* ZGHotKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGHotKey.h; path = "Bit Slicer/ZGHotKey.h"; sourceTree = "<group>"; };
+		772D1216190D85CC00800B1B /* ZGHotKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGHotKey.m; path = "Bit Slicer/ZGHotKey.m"; sourceTree = "<group>"; };
+		772D1219190D927400800B1B /* ZGHotKeyDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGHotKeyDelegate.h; path = "Bit Slicer/ZGHotKeyDelegate.h"; sourceTree = "<group>"; };
 		772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchProgressDelegate.h; path = "Bit Slicer/ZGSearchProgressDelegate.h"; sourceTree = "<group>"; };
 		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; };
 		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; };
@@ -685,6 +689,7 @@
 				7743F9C718024D0E00DBC19A /* Python */,
 				77FF507B16E9B7D40005915D /* Memory Window Controllers */,
 				77FF508216EAD0630005915D /* Controllers */,
+				772D1218190D85D200800B1B /* Hot Keys */,
 				77FF507C16EACF380005915D /* Process List */,
 				77FF507D16EACF520005915D /* Documents */,
 				77FF507E16EACF6E0005915D /* Searching */,
@@ -787,6 +792,18 @@
 				779D56C418F1284100FD5408 /* ZGMemoryDumpRangeWindowController.xib */,
 			);
 			name = "Dumping Memory";
+			sourceTree = "<group>";
+		};
+		772D1218190D85D200800B1B /* Hot Keys */ = {
+			isa = PBXGroup;
+			children = (
+				772D1219190D927400800B1B /* ZGHotKeyDelegate.h */,
+				771A3F4618CCF32F00D19676 /* ZGHotKeyCenter.h */,
+				771A3F4718CCF32F00D19676 /* ZGHotKeyCenter.m */,
+				772D1215190D85CC00800B1B /* ZGHotKey.h */,
+				772D1216190D85CC00800B1B /* ZGHotKey.m */,
+			);
+			name = "Hot Keys";
 			sourceTree = "<group>";
 		};
 		77329B5A168D07B6007DCAE2 /* Debugger */ = {
@@ -1235,8 +1252,6 @@
 				77F115B717D2EBCB009E002A /* MainMenu.xib */,
 				77179F6918CD34F100BCB6D0 /* ZGAppUpdaterController.h */,
 				77179F6A18CD34F100BCB6D0 /* ZGAppUpdaterController.m */,
-				771A3F4618CCF32F00D19676 /* ZGHotKeyController.h */,
-				771A3F4718CCF32F00D19676 /* ZGHotKeyController.m */,
 				771A3F4318CC0B0900D19676 /* ZGDocumentController.h */,
 				771A3F4418CC0B0900D19676 /* ZGDocumentController.m */,
 				77F115E317D2EDCD009E002A /* ZGPreferencesController.h */,
@@ -1503,7 +1518,8 @@
 				77F1162517D2EF31009E002A /* ZGRegion.m in Sources */,
 				770FABB71849160200C176B7 /* ZGEditSizeWindowController.m in Sources */,
 				779D56C518F1284200FD5408 /* ZGMemoryDumpRangeWindowController.m in Sources */,
-				771A3F4818CCF32F00D19676 /* ZGHotKeyController.m in Sources */,
+				771A3F4818CCF32F00D19676 /* ZGHotKeyCenter.m in Sources */,
+				772D1217190D85CC00800B1B /* ZGHotKey.m in Sources */,
 				77282126189EA4520044E4BC /* ZGProcessTaskManager.m in Sources */,
 				77F1162817D2EF3A009E002A /* ZGProcess.m in Sources */,
 				77F1162C17D2EF50009E002A /* ZGVariable.m in Sources */,

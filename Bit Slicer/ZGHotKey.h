@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/27/12.
+ * Created by Mayur Pawashe on 4/27/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,39 +32,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "ZGMemoryTypes.h"
-#import "ZGMemoryNavigationWindowController.h"
-#import "ZGCodeInjectionWindowController.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGBreakPointConditionViewController.h"
-#import "ZGBacktraceViewController.h"
+#import <Foundation/Foundation.h>
+#import <ShortcutRecorder/SRCommon.h>
 #import "ZGHotKeyDelegate.h"
 
-@class ZGProcess;
-@class ZGInstruction;
-@class ZGMachBinary;
-@class ZGProcessTaskManager;
-@class ZGBreakPointController;
-@class ZGHotKeyCenter;
-@class ZGLoggerWindowController;
+#define INVALID_KEY_CODE -1
+#define INVALID_KEY_MODIFIER 0
 
-extern NSString *ZGPauseAndUnpauseHotKey;
+@interface ZGHotKey : NSObject <NSCoding>
 
-@interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate, ZGHotKeyDelegate>
++ (instancetype)hotKey;
++ (instancetype)hotKeyWithKeyCombo:(KeyCombo)keyCombo;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
+@property (nonatomic) KeyCombo keyCombo;
 
-- (void)cleanup;
+- (BOOL)isInvalid;
 
-@property (nonatomic, readonly) ZGHotKey *pauseAndUnpauseHotKey;
-
-- (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
-
-- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
-
-- (NSArray *)selectedInstructions;
-
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
+// internal stuff
+@property (nonatomic) EventHotKeyRef hotKeyRef;
+@property (nonatomic, assign) id <ZGHotKeyDelegate> delegate;
+@property (nonatomic) UInt32 internalID;
 
 @end

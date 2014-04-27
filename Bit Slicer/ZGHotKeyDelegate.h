@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 3/9/14.
+ * Created by Mayur Pawashe on 4/27/14.
  *
  * Copyright (c) 2014 zgcoder
  * All rights reserved.
@@ -33,22 +33,11 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <ShortcutRecorder/SRCommon.h>
 
-// INVALID_KEY_CODE used to be -999, take in account
-#define INVALID_KEY_CODE -1
-#define INVALID_KEY_MODIFIER 0
+@class ZGHotKey;
 
-#define ZG_HOT_KEY_MODIFIER @"ZG_HOT_KEY_MODIFIER"
-#define ZG_HOT_KEY @"ZG_HOT_KEY_CODE"
+@protocol ZGHotKeyDelegate <NSObject>
 
-@class ZGProcessTaskManager;
-@class ZGDebuggerController;
-
-@interface ZGHotKeyController : NSObject
-
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController;
-
-@property (nonatomic) KeyCombo pauseHotKeyCombo;
+- (void)hotKeyDidTrigger:(ZGHotKey *)hotKey;
 
 @end

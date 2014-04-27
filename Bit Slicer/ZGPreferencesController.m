@@ -34,17 +34,20 @@
 
 #import "ZGPreferencesController.h"
 
-#import "ZGHotKeyController.h"
+#import "ZGHotKeyCenter.h"
 #import "ZGAppUpdaterController.h"
+#import "ZGDebuggerController.h"
+#import "ZGHotKey.h"
 
 #import <ShortcutRecorder/ShortcutRecorder.h>
 
 @interface ZGPreferencesController ()
 
-@property (nonatomic) ZGHotKeyController *hotKeyController;
+@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
 @property (nonatomic) ZGAppUpdaterController *appUpdaterController;
+@property (nonatomic) ZGDebuggerController *debuggerController;
 
-@property (nonatomic, assign) IBOutlet SRRecorderControl *hotkeyRecorder;
+@property (nonatomic, assign) IBOutlet SRRecorderControl *pauseAndUnpauseHotKeyRecorder;
 @property (nonatomic, assign) IBOutlet NSButton *checkForUpdatesButton;
 @property (nonatomic, assign) IBOutlet NSButton *checkForAlphaUpdatesButton;
 @property (nonatomic, assign) IBOutlet NSButton *sendProfileInfoButton;
@@ -53,12 +56,13 @@
 
 @implementation ZGPreferencesController
 
-- (id)initWithHotKeyController:(ZGHotKeyController *)hotKeyController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController
+- (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController
 {
 	self = [super initWithWindowNibName:@"Preferences"];
 	
-	self.hotKeyController = hotKeyController;
+	self.hotKeyCenter = hotKeyCenter;
 	self.appUpdaterController = appUpdaterController;
+	self.debuggerController = debuggerController;
 	
 	return self;
 }
@@ -102,13 +106,21 @@
 
 - (void)windowDidLoad
 {
-	[self.hotkeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	self.hotkeyRecorder.keyCombo = self.hotKeyController.pauseHotKeyCombo;
+	[self.pauseAndUnpauseHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
+	self.pauseAndUnpauseHotKeyRecorder.keyCombo = self.debuggerController.pauseAndUnpauseHotKey.keyCombo;
 }
 
-- (void)shortcutRecorder:(SRRecorderControl *)__unused recorder keyComboDidChange:(KeyCombo)newKeyCombo
+- (void)shortcutRecorder:(SRRecorderControl *)recorder keyComboDidChange:(KeyCombo)newKeyCombo
 {
-	self.hotKeyController.pauseHotKeyCombo = (KeyCombo){.code = newKeyCombo.code, .flags = SRCocoaToCarbonFlags(newKeyCombo.flags)};
+	KeyCombo newCarbonKeyCode = {.code = newKeyCombo.code, .flags = SRCocoaToCarbonFlags(newKeyCombo.flags)};
+	if (recorder == self.pauseAndUnpauseHotKeyRecorder)
+	{
+		ZGHotKey *hotKey = self.debuggerController.pauseAndUnpauseHotKey;
+		hotKey.keyCombo = newCarbonKeyCode;
+		[self.hotKeyCenter updateHotKey:hotKey];
+
+		[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:hotKey] forKey:ZGPauseAndUnpauseHotKey];
+	}
 }
 
 - (IBAction)checkForUpdatesButton:(id)__unused sender

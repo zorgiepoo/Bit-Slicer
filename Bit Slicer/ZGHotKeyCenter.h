@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/27/12.
+ * Created by Mayur Pawashe on 3/9/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,39 +32,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "ZGMemoryTypes.h"
-#import "ZGMemoryNavigationWindowController.h"
-#import "ZGCodeInjectionWindowController.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGBreakPointConditionViewController.h"
-#import "ZGBacktraceViewController.h"
+#import <Foundation/Foundation.h>
 #import "ZGHotKeyDelegate.h"
 
-@class ZGProcess;
-@class ZGInstruction;
-@class ZGMachBinary;
-@class ZGProcessTaskManager;
-@class ZGBreakPointController;
-@class ZGHotKeyCenter;
-@class ZGLoggerWindowController;
+@class ZGHotKey;
 
-extern NSString *ZGPauseAndUnpauseHotKey;
+@interface ZGHotKeyCenter : NSObject
 
-@interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate, ZGHotKeyDelegate>
+- (BOOL)registerHotKey:(ZGHotKey *)hotKey delegate:(id <ZGHotKeyDelegate>)delegate;
+- (void)unregisterHotKey:(ZGHotKey *)hotKey;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-
-- (void)cleanup;
-
-@property (nonatomic, readonly) ZGHotKey *pauseAndUnpauseHotKey;
-
-- (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
-
-- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
-
-- (NSArray *)selectedInstructions;
-
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
+- (void)updateHotKey:(ZGHotKey *)hotKey;
 
 @end

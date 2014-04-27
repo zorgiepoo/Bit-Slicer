@@ -43,7 +43,7 @@
 #import "ZGScriptManager.h"
 #import "ZGProcessTaskManager.h"
 #import "ZGDocumentController.h"
-#import "ZGHotKeyController.h"
+#import "ZGHotKeyCenter.h"
 #import "ZGAppUpdaterController.h"
 #import "ZGAppTerminationState.h"
 #import "ZGNavigationPost.h"
@@ -62,7 +62,7 @@
 @property (nonatomic) ZGBreakPointController *breakPointController;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;
-@property (nonatomic) ZGHotKeyController *hotKeyController;
+@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
 
 @end
 
@@ -79,17 +79,17 @@
 		self.appUpdaterController = [[ZGAppUpdaterController alloc] init];
 		
 		self.processTaskManager = [[ZGProcessTaskManager alloc] init];
-		
+
+		self.hotKeyCenter = [[ZGHotKeyCenter alloc] init];
+
 		self.loggerWindowController = [[ZGLoggerWindowController alloc] init];
 		
 		self.breakPointController = [ZGBreakPointController sharedController];
 		
-		self.debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:self.processTaskManager breakPointController:self.breakPointController loggerWindowController:self.loggerWindowController];
+		self.debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:self.processTaskManager breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
 		
 		self.memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:self.processTaskManager];
 		self.memoryViewer.debuggerController = self.debuggerController;
-		
-		self.hotKeyController = [[ZGHotKeyController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController];
 		
 		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController loggerWindowController:self.loggerWindowController];
 		
@@ -210,7 +210,7 @@
 {
 	if (self.preferencesController == nil)
 	{
-		self.preferencesController = [[ZGPreferencesController alloc] initWithHotKeyController:self.hotKeyController appUpdaterController:self.appUpdaterController];
+		self.preferencesController = [[ZGPreferencesController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController appUpdaterController:self.appUpdaterController];
 	}
 	
 	[self.preferencesController showWindow:nil];

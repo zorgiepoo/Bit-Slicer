@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/27/12.
+ * Created by Mayur Pawashe on 4/27/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,39 +32,53 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "ZGMemoryTypes.h"
-#import "ZGMemoryNavigationWindowController.h"
-#import "ZGCodeInjectionWindowController.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGBreakPointConditionViewController.h"
-#import "ZGBacktraceViewController.h"
-#import "ZGHotKeyDelegate.h"
+#import "ZGHotKey.h"
 
-@class ZGProcess;
-@class ZGInstruction;
-@class ZGMachBinary;
-@class ZGProcessTaskManager;
-@class ZGBreakPointController;
-@class ZGHotKeyCenter;
-@class ZGLoggerWindowController;
+#define ZGHotKeyComboCode @"ZGHotKeyComboCode"
+#define ZGHotKeyComboFlags @"ZGHotKeyComboFlags"
 
-extern NSString *ZGPauseAndUnpauseHotKey;
+@implementation ZGHotKey
+{
+	KeyCombo _keyCombo;
+}
 
-@interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate, ZGHotKeyDelegate>
++ (instancetype)hotKeyWithKeyCombo:(KeyCombo)keyCombo
+{
+	return [[self alloc] initWithKeyCombo:keyCombo];
+}
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
++ (instancetype)hotKey
+{
+	return [self hotKeyWithKeyCombo:(KeyCombo){.code = INVALID_KEY_CODE, .flags = INVALID_KEY_MODIFIER}];
+}
 
-- (void)cleanup;
+- (id)initWithKeyCombo:(KeyCombo)keyCombo
+{
+	self = [super init];
+	if (self != nil)
+	{
+		_keyCombo = keyCombo;
+	}
+	return self;
+}
 
-@property (nonatomic, readonly) ZGHotKey *pauseAndUnpauseHotKey;
+- (id)initWithCoder:(NSCoder *)decoder
+{
+	NSInteger code = [decoder decodeIntegerForKey:ZGHotKeyComboCode];
+	NSUInteger flags = (NSUInteger)[decoder decodeIntegerForKey:ZGHotKeyComboFlags];
 
-- (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
+	return [self initWithKeyCombo:(KeyCombo){.code = code, .flags = flags}];
+}
 
-- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
+- (void)encodeWithCoder:(NSCoder *)encoder
+{
+	[encoder encodeInteger:_keyCombo.code forKey:ZGHotKeyComboCode];
+	[encoder encodeInteger:(NSInteger)_keyCombo.flags forKey:ZGHotKeyComboFlags];
+}
 
-- (NSArray *)selectedInstructions;
-
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
+- (BOOL)isInvalid
+{
+	return (_keyCombo.code == INVALID_KEY_CODE || _keyCombo.flags == INVALID_KEY_MODIFIER);
+}
 
 @end

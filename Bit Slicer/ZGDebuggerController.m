@@ -57,6 +57,8 @@
 #import "ZGVariableController.h"
 #import "ZGBacktrace.h"
 #import "ZGNavigationPost.h"
+#import "ZGHotKeyCenter.h"
+#import "ZGHotKey.h"
 
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
@@ -102,6 +104,11 @@
 
 @end
 
+NSString *ZGPauseAndUnpauseHotKey = @"ZGPauseAndUnpauseHotKey";
+
+#define ZGOldPauseAndUnpauseHotKeyCode @"ZG_HOT_KEY_CODE"
+#define ZGOldPauseAndUnpauseHotKeyFlags @"ZG_HOT_KEY_MODIFIER"
+
 #define ZGDebuggerAddressField @"ZGDisassemblerAddressField"
 #define ZGDebuggerProcessInternalName @"ZGDisassemblerProcessName"
 #define ZGDebuggerOffsetFromBase @"ZGDebuggerOffsetFromBase"
@@ -118,7 +125,37 @@ enum ZGStepExecution
 
 #pragma mark Birth & Death
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
++ (void)initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		// Versions before 1.7 have pause/unpause hot key stored in different default keys, so do a migration
+		NSNumber *oldPauseAndUnpauseHotKeyCode = [[NSUserDefaults standardUserDefaults] objectForKey:ZGOldPauseAndUnpauseHotKeyCode];
+		NSNumber *oldPauseAndUnpauseHotKeyFlags = [[NSUserDefaults standardUserDefaults] objectForKey:ZGOldPauseAndUnpauseHotKeyFlags];
+		if (oldPauseAndUnpauseHotKeyCode != nil && oldPauseAndUnpauseHotKeyFlags != nil)
+		{
+			NSUInteger oldFlags = oldPauseAndUnpauseHotKeyFlags.unsignedIntegerValue;
+			NSInteger oldCode = oldPauseAndUnpauseHotKeyCode.integerValue;
+			if (oldCode < INVALID_KEY_CODE) // versions before 1.6 stored invalid key code as -999
+			{
+				oldCode = INVALID_KEY_CODE;
+			}
+
+			[[NSUserDefaults standardUserDefaults]
+			 registerDefaults:@{ZGPauseAndUnpauseHotKey : [NSKeyedArchiver archivedDataWithRootObject:[ZGHotKey hotKeyWithKeyCombo:(KeyCombo){.code = oldCode, .flags = oldFlags}]]}];
+
+			[[NSUserDefaults standardUserDefaults] removeObjectForKey:ZGOldPauseAndUnpauseHotKeyCode];
+			[[NSUserDefaults standardUserDefaults] removeObjectForKey:ZGOldPauseAndUnpauseHotKeyFlags];
+		}
+		else
+		{
+			[[NSUserDefaults standardUserDefaults]
+			 registerDefaults:@{ZGPauseAndUnpauseHotKey : [NSKeyedArchiver archivedDataWithRootObject:[ZGHotKey hotKey]]}];
+		}
+	});
+}
+
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super initWithProcessTaskManager:processTaskManager];
 	
@@ -129,6 +166,9 @@ enum ZGStepExecution
 		self.loggerWindowController = loggerWindowController;
 		
 		self.haltedBreakPoints = [[NSArray alloc] init];
+		
+		_pauseAndUnpauseHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGPauseAndUnpauseHotKey]];
+		[hotKeyCenter registerHotKey:self.pauseAndUnpauseHotKey delegate:self];
 		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
@@ -207,6 +247,34 @@ enum ZGStepExecution
 	if (shouldReadMemory)
 	{
 		[self readMemory:nil];
+	}
+}
+
+#pragma mark Hot Keys
+
+- (void)hotKeyDidTrigger:(ZGHotKey *)hotKey
+{
+	if (hotKey == _pauseAndUnpauseHotKey)
+	{
+		for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications])
+		{
+			if (runningApplication.isActive)
+			{
+				if (runningApplication.processIdentifier != getpid() && ![self isProcessIdentifierHalted:runningApplication.processIdentifier])
+				{
+					ZGMemoryMap processTask = 0;
+					if ([self.processTaskManager getTask:&processTask forProcessIdentifier:runningApplication.processIdentifier])
+					{
+						[ZGProcess pauseOrUnpauseProcessTask:processTask];
+					}
+					else
+					{
+						ZG_LOG(@"Failed to pause/unpause process with pid %d", runningApplication.processIdentifier);
+					}
+				}
+				break;
+			}
+		}
 	}
 }
 
