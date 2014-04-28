@@ -713,6 +713,8 @@ enum ZGStepExecution
 		disassemblingActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Disassembling Data"];
 	}
 	
+	ZGProcess *processToUpdate = self.currentProcess;
+
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size breakPoints:self.breakPointController.breakPoints];
 		NSArray *newInstructions = @[];
@@ -723,14 +725,17 @@ enum ZGStepExecution
 		}
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			self.instructions = newInstructions;
-
-			[self.instructionsTableView noteNumberOfRowsChanged];
-			
-			ZGInstruction *selectionInstruction = [self findInstructionInTableAtAddress:selectionAddress];
-			if (selectionInstruction != nil)
+			if (processToUpdate == self.currentProcess) // make sure current process hasn't changed
 			{
-				[self scrollAndSelectRow:[self.instructions indexOfObject:selectionInstruction]];
+				self.instructions = newInstructions;
+
+				[self.instructionsTableView noteNumberOfRowsChanged];
+
+				ZGInstruction *selectionInstruction = [self findInstructionInTableAtAddress:selectionAddress];
+				if (selectionInstruction != nil)
+				{
+					[self scrollAndSelectRow:[self.instructions indexOfObject:selectionInstruction]];
+				}
 			}
 			
 			self.disassembling = NO;
