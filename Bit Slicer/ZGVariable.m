@@ -349,25 +349,6 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return _stringValue;
 }
 
-- (NSString *)scriptValue
-{
-	if (_scriptValue == nil)
-	{
-		_scriptValue =
-			@"#Edit Me!\n"
-			@"#Documentation for scripting: https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Scripting\n"
-			@"import bitslicer\n\n"
-			@"class Script(object):\n"
-			@"\tdef __init__(self):\n"
-			@"\t\tdebug.log('Initialization goes here')\n"
-			@"\t#def execute(self, deltaTime):\n"
-			@"\t\t#write some interesting code, or don't implement me\n"
-			@"\tdef finish(self):\n"
-			@"\t\tdebug.log('Cleaning up goes here')\n";
-	}
-	return _scriptValue;
-}
-
 + (NSString *)byteArrayStringFromValue:(unsigned char *)value size:(ZGMemorySize)size
 {
 	NSMutableArray *byteStringComponents = [NSMutableArray array];
