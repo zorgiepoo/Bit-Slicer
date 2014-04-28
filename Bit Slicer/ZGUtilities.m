@@ -445,7 +445,7 @@ void ZGUpdateProcessMenuItem(NSMenuItem *menuItem, NSString *name, pid_t process
 	BOOL isDead = (processIdentifier < 0);
 	if (isDead)
 	{
-		NSFont *menuFont = [NSFont menuFontOfSize:13]; // don't think there's a real way to get font size if we were to set the non-attributed title
+		NSFont *menuFont = [NSFont menuFontOfSize:12]; // don't think there's a real way to get font size if we were to set the non-attributed title
 		NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ (none)", name]];
 		[attributedString addAttribute:NSStrikethroughStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0, attributedString.length)];
 		[attributedString addAttribute:NSFontAttributeName value:menuFont range:NSMakeRange(0, attributedString.length)];
