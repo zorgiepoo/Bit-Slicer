@@ -712,51 +712,42 @@ enum ZGStepExecution
 	{
 		disassemblingActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Disassembling Data"];
 	}
-	
-	ZGProcess *processToUpdate = self.currentProcess;
 
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size breakPoints:self.breakPointController.breakPoints];
-		NSArray *newInstructions = @[];
-		
-		if (disassemblerObject != nil)
-		{
-			newInstructions = [disassemblerObject readInstructions];
-		}
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			if (processToUpdate == self.currentProcess) // make sure current process hasn't changed
-			{
-				self.instructions = newInstructions;
+	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size breakPoints:self.breakPointController.breakPoints];
+	NSArray *newInstructions = @[];
 
-				[self.instructionsTableView noteNumberOfRowsChanged];
+	if (disassemblerObject != nil)
+	{
+		newInstructions = [disassemblerObject readInstructions];
+	}
 
-				ZGInstruction *selectionInstruction = [self findInstructionInTableAtAddress:selectionAddress];
-				if (selectionInstruction != nil)
-				{
-					[self scrollAndSelectRow:[self.instructions indexOfObject:selectionInstruction]];
-				}
-			}
-			
-			self.disassembling = NO;
-			if (disassemblingActivity != nil)
-			{
-				[[NSProcessInfo processInfo] endActivity:disassemblingActivity];
-			}
-			
-			[self.addressTextField setEnabled:YES];
-			[self.runningApplicationsPopUpButton setEnabled:YES];
-			
-			if (self.window.firstResponder != self.backtraceViewController.tableView)
-			{
-				[self.window makeFirstResponder:self.instructionsTableView];
-			}
-			
-			[self updateNavigationButtons];
-			[self updateExecutionButtons];
-			[self updateStatusBar];
-		});
-	});
+	self.instructions = newInstructions;
+
+	[self.instructionsTableView noteNumberOfRowsChanged];
+
+	ZGInstruction *selectionInstruction = [self findInstructionInTableAtAddress:selectionAddress];
+	if (selectionInstruction != nil)
+	{
+		[self scrollAndSelectRow:[self.instructions indexOfObject:selectionInstruction]];
+	}
+
+	self.disassembling = NO;
+	if (disassemblingActivity != nil)
+	{
+		[[NSProcessInfo processInfo] endActivity:disassemblingActivity];
+	}
+
+	[self.addressTextField setEnabled:YES];
+	[self.runningApplicationsPopUpButton setEnabled:YES];
+
+	if (self.window.firstResponder != self.backtraceViewController.tableView)
+	{
+		[self.window makeFirstResponder:self.instructionsTableView];
+	}
+
+	[self updateNavigationButtons];
+	[self updateExecutionButtons];
+	[self updateStatusBar];
 }
 
 #pragma mark Handling Processes
