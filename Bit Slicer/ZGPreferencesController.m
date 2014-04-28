@@ -33,13 +33,11 @@
  */
 
 #import "ZGPreferencesController.h"
-
+#import "ZGUpdatePreferencesViewController.h"
+#import "ZGHotKeyPreferencesViewController.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGAppUpdaterController.h"
 #import "ZGDebuggerController.h"
-#import "ZGHotKey.h"
-
-#import <ShortcutRecorder/ShortcutRecorder.h>
 
 @interface ZGPreferencesController ()
 
@@ -47,14 +45,11 @@
 @property (nonatomic) ZGAppUpdaterController *appUpdaterController;
 @property (nonatomic) ZGDebuggerController *debuggerController;
 
-@property (nonatomic, assign) IBOutlet SRRecorderControl *pauseAndUnpauseHotKeyRecorder;
-@property (nonatomic, assign) IBOutlet SRRecorderControl *stepInHotKeyRecorder;
-@property (nonatomic, assign) IBOutlet SRRecorderControl *stepOverHotKeyRecorder;
-@property (nonatomic, assign) IBOutlet SRRecorderControl *stepOutHotKeyRecorder;
+@property (nonatomic) ZGUpdatePreferencesViewController *updatePreferencesViewController;
+@property (nonatomic, assign) IBOutlet NSView *updatePreferencesView;
 
-@property (nonatomic, assign) IBOutlet NSButton *checkForUpdatesButton;
-@property (nonatomic, assign) IBOutlet NSButton *checkForAlphaUpdatesButton;
-@property (nonatomic, assign) IBOutlet NSButton *sendProfileInfoButton;
+@property (nonatomic) ZGHotKeyPreferencesViewController *hotKeyPreferencesViewController;
+@property (nonatomic, assign) IBOutlet NSView *hotKeyPreferencesView;
 
 @end
 
@@ -64,127 +59,25 @@
 {
 	self = [super initWithWindowNibName:@"Preferences"];
 	
-	self.hotKeyCenter = hotKeyCenter;
-	self.appUpdaterController = appUpdaterController;
-	self.debuggerController = debuggerController;
+	if (self != nil)
+	{
+		self.hotKeyCenter = hotKeyCenter;
+		self.appUpdaterController = appUpdaterController;
+		self.debuggerController = debuggerController;
+	}
 	
 	return self;
 }
 
-- (void)updateCheckingForUpdateButtons
-{
-	if (self.appUpdaterController.checksForUpdates)
-	{
-		self.checkForUpdatesButton.state = NSOnState;
-		
-		self.checkForAlphaUpdatesButton.enabled = YES;
-		self.checkForAlphaUpdatesButton.state = self.appUpdaterController.checksForAlphaUpdates ? NSOnState : NSOffState;
-		
-		self.sendProfileInfoButton.enabled = YES;
-		self.sendProfileInfoButton.state = self.appUpdaterController.sendsAnonymousInfo ? NSOnState : NSOffState;
-	}
-	else
-	{
-		self.checkForAlphaUpdatesButton.enabled = NO;
-		self.sendProfileInfoButton.enabled = NO;
-		
-		self.checkForUpdatesButton.state = NSOffState;
-		self.checkForAlphaUpdatesButton.state = NSOffState;
-		self.sendProfileInfoButton.state = NSOffState;
-	}
-}
-
-- (void)awakeFromNib
-{
-	[self updateCheckingForUpdateButtons];
-}
-
-- (IBAction)showWindow:(id)__unused sender
-{
-	[super showWindow:nil];
-	
-	// These states could change, for example, when the user has to make Sparkle pick between checking for automatic updates or not checking for them
-	[self.appUpdaterController reloadValuesFromDefaults];
-	[self updateCheckingForUpdateButtons];
-}
-
 - (void)windowDidLoad
-{
-	[self.pauseAndUnpauseHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	self.pauseAndUnpauseHotKeyRecorder.keyCombo = self.debuggerController.pauseAndUnpauseHotKey.keyCombo;
-
-	[self.stepInHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	self.stepInHotKeyRecorder.keyCombo = self.debuggerController.stepInHotKey.keyCombo;
+{	
+	self.updatePreferencesViewController = [[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:self.appUpdaterController];
+	[self.updatePreferencesView addSubview:self.updatePreferencesViewController.view];
+	self.updatePreferencesViewController.view.frame = self.updatePreferencesView.bounds;
 	
-	[self.stepOverHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	self.stepOverHotKeyRecorder.keyCombo = self.debuggerController.stepOverHotKey.keyCombo;
-	
-	[self.stepOutHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	self.stepOutHotKeyRecorder.keyCombo = self.debuggerController.stepOutHotKey.keyCombo;
-}
-
-- (void)shortcutRecorder:(SRRecorderControl *)recorder keyComboDidChange:(KeyCombo)newKeyCombo
-{
-	KeyCombo newCarbonKeyCode = {.code = newKeyCombo.code, .flags = SRCocoaToCarbonFlags(newKeyCombo.flags)};
-	ZGHotKey *hotKey = nil;
-	NSString *hotKeyDefaultsKey = nil;
-	if (recorder == self.pauseAndUnpauseHotKeyRecorder)
-	{
-		hotKey = self.debuggerController.pauseAndUnpauseHotKey;
-		hotKeyDefaultsKey = ZGPauseAndUnpauseHotKey;
-	}
-	else if (recorder == self.stepInHotKeyRecorder)
-	{
-		hotKey = self.debuggerController.stepInHotKey;
-		hotKeyDefaultsKey = ZGStepInHotKey;
-	}
-	else if (recorder == self.stepOverHotKeyRecorder)
-	{
-		hotKey = self.debuggerController.stepOverHotKey;
-		hotKeyDefaultsKey = ZGStepOverHotKey;
-	}
-	else if (recorder == self.stepOutHotKeyRecorder)
-	{
-		hotKey = self.debuggerController.stepOutHotKey;
-		hotKeyDefaultsKey = ZGStepOutHotKey;
-	}
-
-	if (hotKey != nil)
-	{
-		[self.hotKeyCenter unregisterHotKey:hotKey];
-		hotKey.keyCombo = newCarbonKeyCode;
-		[self.hotKeyCenter registerHotKey:hotKey delegate:self.debuggerController];
-
-		[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:hotKey] forKey:hotKeyDefaultsKey];
-	}
-}
-
-- (IBAction)checkForUpdatesButton:(id)__unused sender
-{
-	if (self.checkForUpdatesButton.state == NSOffState)
-	{
-		self.appUpdaterController.checksForAlphaUpdates = NO;
-		self.appUpdaterController.checksForUpdates = NO;
-	}
-	else
-	{
-		self.appUpdaterController.checksForUpdates = YES;
-		self.appUpdaterController.checksForAlphaUpdates = [ZGAppUpdaterController runningAlpha];
-	}
-	
-	[self updateCheckingForUpdateButtons];
-}
-
-- (IBAction)checkForAlphaUpdatesButton:(id)__unused sender
-{
-	self.appUpdaterController.checksForAlphaUpdates = (self.checkForAlphaUpdatesButton.state == NSOnState);
-	[self updateCheckingForUpdateButtons];
-}
-
-- (IBAction)changeSendProfileInformation:(id)__unused sender
-{
-	self.appUpdaterController.sendsAnonymousInfo = (self.sendProfileInfoButton.state == NSOnState);
-	[self updateCheckingForUpdateButtons];
+	self.hotKeyPreferencesViewController = [[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController];
+	[self.hotKeyPreferencesView addSubview:self.hotKeyPreferencesViewController.view];
+	self.hotKeyPreferencesViewController.view.frame = self.hotKeyPreferencesView.bounds;
 }
 
 @end
