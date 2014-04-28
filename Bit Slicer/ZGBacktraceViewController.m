@@ -147,11 +147,6 @@
 	}
 }
 
-- (BOOL)selectionShouldChangeInTableView:(NSTableView *)__unused aTableView
-{
-	return [self.delegate backtraceSelectionShouldChange];
-}
-
 #pragma mark Menu Item Validation
 
 - (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem

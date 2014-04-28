@@ -86,8 +86,6 @@
 @property (nonatomic) ZGMemoryAddress baseAddress;
 @property (nonatomic) ZGMemoryAddress offsetFromBase;
 
-@property (nonatomic) BOOL disassembling;
-
 @property (nonatomic) NSArray *instructions;
 
 @property (nonatomic) NSRange instructionBoundary;
@@ -687,7 +685,7 @@ enum ZGStepExecution
 
 - (void)updateDisplayTimer:(NSTimer *)__unused timer
 {
-	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && !self.disassembling && self.instructions.count > 0)
+	if (self.currentProcess.valid && self.instructionsTableView.editedRow == -1 && self.instructions.count > 0)
 	{
 		[self updateInstructionValues];
 		[self updateVisibleInstructionSymbols];
@@ -704,14 +702,6 @@ enum ZGStepExecution
 	
 	self.instructions = @[];
 	[self.instructionsTableView reloadData];
-	
-	self.disassembling = YES;
-	
-	id disassemblingActivity = nil;
-	if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
-	{
-		disassemblingActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Disassembling Data"];
-	}
 
 	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size breakPoints:self.breakPointController.breakPoints];
 	NSArray *newInstructions = @[];
@@ -729,12 +719,6 @@ enum ZGStepExecution
 	if (selectionInstruction != nil)
 	{
 		[self scrollAndSelectRow:[self.instructions indexOfObject:selectionInstruction]];
-	}
-
-	self.disassembling = NO;
-	if (disassemblingActivity != nil)
-	{
-		[[NSProcessInfo processInfo] endActivity:disassemblingActivity];
 	}
 
 	[self.addressTextField setEnabled:YES];
@@ -789,11 +773,6 @@ enum ZGStepExecution
 }
 
 #pragma mark Changing disassembler view
-
-- (BOOL)canEnableNavigationButtons
-{
-	return !self.disassembling && [super canEnableNavigationButtons];
-}
 
 - (IBAction)jumpToOperandOffset:(id)__unused sender
 {
@@ -1101,12 +1080,12 @@ enum ZGStepExecution
 
 - (BOOL)canContinueOrStepIntoExecution
 {
-	return self.currentBreakPoint != nil && !self.disassembling;
+	return self.currentBreakPoint != nil;
 }
 
 - (BOOL)canStepOverExecution
 {
-	if (!self.currentBreakPoint || self.disassembling)
+	if (self.currentBreakPoint == nil)
 	{
 		return NO;
 	}
@@ -1131,7 +1110,7 @@ enum ZGStepExecution
 
 - (BOOL)canStepOutOfExecution
 {
-	if (!self.currentBreakPoint || self.disassembling)
+	if (self.currentBreakPoint == nil)
 	{
 		return NO;
 	}
@@ -1169,7 +1148,7 @@ enum ZGStepExecution
 	{
 		[menuItem setTitle:[NSString stringWithFormat:@"NOP Instruction%@", self.selectedInstructions.count == 1 ? @"" : @"s"]];
 		
-		if (self.selectedInstructions.count == 0 || !self.currentProcess.valid || self.instructionsTableView.editedRow != -1 || self.disassembling)
+		if (self.selectedInstructions.count == 0 || !self.currentProcess.valid || self.instructionsTableView.editedRow != -1)
 		{
 			return NO;
 		}
@@ -1211,7 +1190,7 @@ enum ZGStepExecution
 	}
 	else if (userInterfaceItem.action == @selector(toggleBreakPoints:))
 	{
-		if (self.disassembling || self.selectedInstructions.count == 0)
+		if (self.selectedInstructions.count == 0)
 		{
 			return NO;
 		}
@@ -1241,11 +1220,6 @@ enum ZGStepExecution
 	}
 	else if (userInterfaceItem.action == @selector(removeAllBreakPoints:))
 	{
-		if (self.disassembling)
-		{
-			return NO;
-		}
-		
 		if (![self hasBreakPoint])
 		{
 			return NO;
@@ -1253,14 +1227,14 @@ enum ZGStepExecution
 	}
 	else if (userInterfaceItem.action == @selector(jump:))
 	{
-		if (self.disassembling || !self.currentBreakPoint || self.selectedInstructions.count != 1)
+		if (self.currentBreakPoint == nil || self.selectedInstructions.count != 1)
 		{
 			return NO;
 		}
 	}
 	else if (userInterfaceItem.action == @selector(jumpToOperandOffset:))
 	{
-		if (self.disassembling || !self.currentProcess.valid)
+		if (!self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1818,7 +1792,7 @@ enum ZGStepExecution
 
 - (void)moveInstructionPointerToAddress:(ZGMemoryAddress)newAddress
 {
-	if (self.currentBreakPoint != nil && !self.disassembling)
+	if (self.currentBreakPoint != nil)
 	{
 		ZGMemoryAddress currentAddress = self.registersViewController.instructionPointer;
 		[self.registersViewController changeInstructionPointer:newAddress];
@@ -1877,11 +1851,6 @@ enum ZGStepExecution
 - (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address
 {
 	[self jumpToMemoryAddress:address inProcess:self.currentProcess];
-}
-
-- (BOOL)backtraceSelectionShouldChange
-{
-	return !self.disassembling;
 }
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint

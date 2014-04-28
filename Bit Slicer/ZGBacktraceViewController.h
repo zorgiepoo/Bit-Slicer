@@ -41,7 +41,6 @@
 @protocol ZGBacktraceViewControllerDelegate <NSObject>
 
 - (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address;
-- (BOOL)backtraceSelectionShouldChange;
 
 @end
 
