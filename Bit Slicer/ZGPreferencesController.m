@@ -45,8 +45,6 @@
 @property (nonatomic) ZGAppUpdaterController *appUpdaterController;
 @property (nonatomic) ZGDebuggerController *debuggerController;
 
-@property (nonatomic, assign) IBOutlet NSToolbar *toolbar;
-
 @property (nonatomic) ZGUpdatePreferencesViewController *updatePreferencesViewController;
 @property (nonatomic) ZGHotKeyPreferencesViewController *hotKeyPreferencesViewController;
 
@@ -75,12 +73,12 @@
 
 - (void)windowDidLoad
 {
-	[self.toolbar setAllowsUserCustomization:NO];
-	[self.toolbar setSelectedItemIdentifier:ZGSoftwareUpdateIdentifier];
+	[self.window.toolbar setAllowsUserCustomization:NO];
+	[self.window.toolbar setSelectedItemIdentifier:ZGSoftwareUpdateIdentifier];
 	
 	if ([[NSFileManager defaultManager] fileExistsAtPath:ZGSoftwareUpdateIconPath])
 	{
-		for (NSToolbarItem *toolbarItem in self.toolbar.items)
+		for (NSToolbarItem *toolbarItem in self.window.toolbar.items)
 		{
 			if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdateIdentifier])
 			{
