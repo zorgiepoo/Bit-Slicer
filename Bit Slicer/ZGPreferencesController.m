@@ -73,7 +73,6 @@
 
 - (void)windowDidLoad
 {
-	[self.window.toolbar setAllowsUserCustomization:NO];
 	[self.window.toolbar setSelectedItemIdentifier:ZGSoftwareUpdateIdentifier];
 	
 	if ([[NSFileManager defaultManager] fileExistsAtPath:ZGSoftwareUpdateIconPath])
