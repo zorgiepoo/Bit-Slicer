@@ -38,6 +38,8 @@
 
 #define SIGNED_BUTTON_CELL_TAG 0
 
+extern NSString *ZGScriptIndentationUsingTabsKey;
+
 @class ZGDocumentWindowController;
 @class ZGProcess;
 

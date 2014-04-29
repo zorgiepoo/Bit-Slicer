@@ -60,6 +60,39 @@
 	return ourApplicationSupportPath;
 }
 
++ (NSString *)createEmptyPythonFile
+{
+	NSString *applicationSupportPath = [self createApplicationSupportPath];
+	if (applicationSupportPath == nil)
+	{
+		return nil;
+	}
+	
+	NSFileManager *fileManager = [[NSFileManager alloc] init];
+	if (![fileManager fileExistsAtPath:applicationSupportPath])
+	{
+		return nil;
+	}
+	
+	NSString *emptyPythonFilePath = [applicationSupportPath stringByAppendingPathComponent:[@"temporary_script" stringByAppendingPathExtension:@"py"]];
+	
+	if ([fileManager fileExistsAtPath:emptyPythonFilePath])
+	{
+		return emptyPythonFilePath;
+	}
+	
+	FILE *file = fopen([emptyPythonFilePath UTF8String], "w");
+	
+	if (file == NULL)
+	{
+		return nil;
+	}
+	
+	fclose(file);
+	
+	return emptyPythonFilePath;
+}
+
 + (NSString *)lastErrorLogPath
 {
 	NSString *ourApplicationSupportPath = [self createApplicationSupportPath];

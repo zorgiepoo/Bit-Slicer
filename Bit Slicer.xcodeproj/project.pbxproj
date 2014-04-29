@@ -42,6 +42,8 @@
 		773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
 		773972FA17D2E80F00B958EE /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
+		773DE962190F4D130078E8F9 /* ZGScriptPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */; };
+		773DE963190F4D130078E8F9 /* ZGScriptPreferencesViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 773DE961190F4D130078E8F9 /* ZGScriptPreferencesViewController.xib */; };
 		773E8AFB1821DC5A00D1A71A /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8AF91821DBF300D1A71A /* CoreServices.framework */; };
 		773E8AFC1821DC5A00D1A71A /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8AF71821DBE800D1A71A /* ApplicationServices.framework */; };
 		773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
@@ -298,6 +300,9 @@
 		773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DataInspectorRepresenter.m; path = deps/DataInspectorRepresenter.m; sourceTree = "<group>"; };
 		773972F717D2E80F00B958EE /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = deps/ShortcutRecorder.framework; sourceTree = "<group>"; };
 		773972F817D2E80F00B958EE /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = deps/Sparkle.framework; sourceTree = "<group>"; };
+		773DE95F190F4D130078E8F9 /* ZGScriptPreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPreferencesViewController.h; path = "Bit Slicer/ZGScriptPreferencesViewController.h"; sourceTree = "<group>"; };
+		773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPreferencesViewController.m; path = "Bit Slicer/ZGScriptPreferencesViewController.m"; sourceTree = "<group>"; };
+		773DE961190F4D130078E8F9 /* ZGScriptPreferencesViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGScriptPreferencesViewController.xib; path = "Bit Slicer/ZGScriptPreferencesViewController.xib"; sourceTree = "<group>"; };
 		773E8AF71821DBE800D1A71A /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
 		773E8AF91821DBF300D1A71A /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreSymbolication.framework; path = ../../../../../System/Library/PrivateFrameworks/CoreSymbolication.framework; sourceTree = "<group>"; };
@@ -828,6 +833,9 @@
 				772D1265190E0D8600800B1B /* ZGHotKeyPreferencesViewController.h */,
 				772D1266190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m */,
 				772D1267190E0D8600800B1B /* ZGHotKeyPreferencesViewController.xib */,
+				773DE95F190F4D130078E8F9 /* ZGScriptPreferencesViewController.h */,
+				773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */,
+				773DE961190F4D130078E8F9 /* ZGScriptPreferencesViewController.xib */,
 			);
 			name = Preferences;
 			sourceTree = "<group>";
@@ -1407,6 +1415,7 @@
 				779D56C618F1284200FD5408 /* ZGMemoryDumpRangeWindowController.xib in Resources */,
 				770F283F18827D1B001B828C /* ZGBreakPointConditionViewController.xib in Resources */,
 				77F115B617D2EBAF009E002A /* InfoPlist.strings in Resources */,
+				773DE963190F4D130078E8F9 /* ZGScriptPreferencesViewController.xib in Resources */,
 				77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */,
 				77F115B917D2EBCB009E002A /* MainMenu.xib in Resources */,
 				772D1269190E0D8600800B1B /* ZGHotKeyPreferencesViewController.xib in Resources */,
@@ -1528,6 +1537,7 @@
 				7798EED318C40B7F001120FB /* DDExpressionRewriter.m in Sources */,
 				77F1160917D2EEC0009E002A /* ZGPyVirtualMemory.m in Sources */,
 				7798EED918C40B7F001120FB /* DDParserTypes.m in Sources */,
+				773DE962190F4D130078E8F9 /* ZGScriptPreferencesViewController.m in Sources */,
 				77F1160C17D2EECA009E002A /* ZGPyScript.m in Sources */,
 				777DA25218CE97BE0092DEC9 /* ZGAppTerminationState.m in Sources */,
 				77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */,

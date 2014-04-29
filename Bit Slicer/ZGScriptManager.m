@@ -55,6 +55,8 @@
 
 #define SCRIPT_FILENAME_PREFIX @"Script"
 
+NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEditorKey";
+
 @interface ZGScriptManager ()
 {
 	dispatch_once_t _cleanupDispatch;
@@ -121,6 +123,8 @@ static PyObject *gStructObject;
 {
 	static dispatch_once_t onceToken = 0;
 	dispatch_once(&onceToken, ^{
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGScriptDefaultApplicationEditorKey : @""}];
+		
 		NSFileManager *fileManager = [[NSFileManager alloc] init];
 		
 		if (![fileManager fileExistsAtPath:SCRIPT_CACHES_PATH])
@@ -433,14 +437,17 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 - (void)openScriptForVariable:(ZGVariable *)variable
 {
 	ZGPyScript *script = [self scriptForVariable:variable];
-	NSArray *items = CFBridgingRelease(LSCopyApplicationURLsForURL((__bridge CFURLRef)([NSURL fileURLWithPath:script.path]), kLSRolesEditor));
-	if (items.count == 0)
+	NSString *editorApplication = [[NSUserDefaults standardUserDefaults] objectForKey:ZGScriptDefaultApplicationEditorKey];
+	if (editorApplication.length == 0)
 	{
-		[[NSWorkspace sharedWorkspace] openFile:script.path withApplication:@"TextEdit"];
+		[[NSWorkspace sharedWorkspace] openFile:script.path];
 	}
 	else
 	{
-		[[NSWorkspace sharedWorkspace] openFile:script.path];
+		if (![[NSWorkspace sharedWorkspace] openFile:script.path withApplication:editorApplication])
+		{
+			[[NSWorkspace sharedWorkspace] openFile:script.path];
+		}
 	}
 }
 

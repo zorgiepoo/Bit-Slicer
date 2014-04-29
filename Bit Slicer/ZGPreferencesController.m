@@ -36,6 +36,7 @@
 #import "ZGUpdatePreferencesViewController.h"
 #import "ZGHotKeyPreferencesViewController.h"
 #import "ZGHotKeyCenter.h"
+#import "ZGScriptPreferencesViewController.h"
 #import "ZGAppUpdaterController.h"
 #import "ZGDebuggerController.h"
 
@@ -45,13 +46,13 @@
 @property (nonatomic) ZGAppUpdaterController *appUpdaterController;
 @property (nonatomic) ZGDebuggerController *debuggerController;
 
-@property (nonatomic) ZGUpdatePreferencesViewController *updatePreferencesViewController;
-@property (nonatomic) ZGHotKeyPreferencesViewController *hotKeyPreferencesViewController;
+@property (nonatomic) NSViewController *preferencesViewController;
 
 @end
 
-#define ZGSoftwareUpdateIdentifier @"ZGSoftwareUpdateIdentifier"
-#define ZGDebuggerHotKeysIdentifier @"ZGDebuggerHotKeysIdentifier"
+#define ZGSoftwareUpdatePreferenceIdentifier @"ZGSoftwareUpdateIdentifier"
+#define ZGDebuggerHotKeysPreferenceIdentifier @"ZGDebuggerHotKeysIdentifier"
+#define ZGScriptPreferenceIdentifier @"ZGScriptPreferenceIdentifier"
 
 #define ZGSoftwareUpdateIconPath @"/System/Library/CoreServices/Software Update.app/Contents/Resources/SoftwareUpdate.icns"
 
@@ -73,13 +74,13 @@
 
 - (void)windowDidLoad
 {
-	[self.window.toolbar setSelectedItemIdentifier:ZGSoftwareUpdateIdentifier];
+	[self.window.toolbar setSelectedItemIdentifier:ZGSoftwareUpdatePreferenceIdentifier];
 	
 	if ([[NSFileManager defaultManager] fileExistsAtPath:ZGSoftwareUpdateIconPath])
 	{
 		for (NSToolbarItem *toolbarItem in self.window.toolbar.items)
 		{
-			if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdateIdentifier])
+			if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdatePreferenceIdentifier])
 			{
 				toolbarItem.image = [[NSImage alloc] initWithContentsOfFile:ZGSoftwareUpdateIconPath];
 				break;
@@ -92,35 +93,41 @@
 
 - (void)setUpdatePreferencesView
 {
-	if (self.updatePreferencesViewController == nil)
-	{
-		self.updatePreferencesViewController = [[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:self.appUpdaterController];
-	}
+	self.preferencesViewController = [[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:self.appUpdaterController];
 	
-	self.window.contentView = self.updatePreferencesViewController.view;
+	self.window.contentView = self.preferencesViewController.view;
 	[self.window setTitle:@"Software Update"];
 }
 
 - (void)setHotKeyPreferencesView
 {
-	if (self.hotKeyPreferencesViewController == nil)
-	{
-		self.hotKeyPreferencesViewController = [[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController];
-	}
+	self.preferencesViewController = [[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController];
 	
-	self.window.contentView = self.hotKeyPreferencesViewController.view;
+	self.window.contentView = self.preferencesViewController.view;
 	[self.window setTitle:@"Hot Keys"];
+}
+
+- (void)setScriptPreferencesView
+{
+	self.preferencesViewController = [[ZGScriptPreferencesViewController alloc] init];
+	
+	self.window.contentView = self.preferencesViewController.view;
+	[self.window setTitle:@"Scripts"];
 }
 
 - (IBAction)changePreferencesView:(NSToolbarItem *)toolbarItem
 {
-	if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdateIdentifier])
+	if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdatePreferenceIdentifier])
 	{
 		[self setUpdatePreferencesView];
 	}
-	else if ([toolbarItem.itemIdentifier isEqualToString:ZGDebuggerHotKeysIdentifier])
+	else if ([toolbarItem.itemIdentifier isEqualToString:ZGDebuggerHotKeysPreferenceIdentifier])
 	{
 		[self setHotKeyPreferencesView];
+	}
+	else if ([toolbarItem.itemIdentifier isEqualToString:ZGScriptPreferenceIdentifier])
+	{
+		[self setScriptPreferencesView];
 	}
 }
 

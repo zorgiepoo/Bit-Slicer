@@ -50,6 +50,8 @@
 
 extern dispatch_queue_t gPythonQueue;
 
+extern NSString *ZGScriptDefaultApplicationEditorKey;
+
 @interface ZGScriptManager : NSObject <VDKQueueDelegate>
 
 + (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;

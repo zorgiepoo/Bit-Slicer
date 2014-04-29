@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 3/10/14.
+ * Created by Mayur Pawashe on 4/28/14.
  *
  * Copyright (c) 2014 zgcoder
  * All rights reserved.
@@ -32,13 +32,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
-@interface ZGAppPathUtilities : NSObject
-
-+ (NSString *)createUserModulesDirectory;
-+ (NSString *)lastErrorLogPath;
-
-+ (NSString *)createEmptyPythonFile;
+@interface ZGScriptPreferencesViewController : NSViewController
 
 @end

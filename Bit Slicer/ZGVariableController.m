@@ -66,7 +66,19 @@
 
 @end
 
+NSString *ZGScriptIndentationUsingTabsKey = @"ZGScriptIndentationUsingTabsKey";
+static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpacesWidthKey";
+
 @implementation ZGVariableController
+
++ (void)initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		// We default to tabs in spite of Python standards since it's possible a user may have nothing but TextEdit installed
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGScriptIndentationUsingTabsKey : @YES, ZGScriptIndentationSpacesWidthKey : @4}];
+	});
+}
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController
 {
@@ -403,17 +415,25 @@
 	
 	if (variable.type == ZGScript)
 	{
-		variable.scriptValue =
+		BOOL usingTabs = [[NSUserDefaults standardUserDefaults] boolForKey:ZGScriptIndentationUsingTabsKey];
+		NSUInteger spacesWidth = [[[NSUserDefaults standardUserDefaults] objectForKey:ZGScriptIndentationSpacesWidthKey] unsignedIntegerValue];
+		NSString *indentationString =
+		usingTabs ? @"\t" :
+		[@"" stringByPaddingToLength:spacesWidth withString:@" " startingAtIndex:0]; // equivalent to " " * spacesWidth in a sane language
+		
+		NSString *scriptValue =
 		@"#Edit Me!\n"
 		@"#Documentation for scripting: https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Scripting\n"
 		@"import bitslicer\n\n"
 		@"class Script(object):\n"
-		@"\tdef __init__(self):\n"
-		@"\t\tdebug.log('Initialization goes here')\n"
-		@"\t#def execute(self, deltaTime):\n"
-		@"\t\t#write some interesting code, or don't implement me\n"
-		@"\tdef finish(self):\n"
-		@"\t\tdebug.log('Cleaning up goes here')\n";
+		@"`def __init__(self):\n"
+		@"``debug.log('Initialization goes here')\n"
+		@"`#def execute(self, deltaTime):\n"
+		@"``#write some interesting code, or don't implement me\n"
+		@"`def finish(self):\n"
+		@"``debug.log('Cleaning up goes here')\n";
+		
+		variable.scriptValue = [scriptValue stringByReplacingOccurrencesOfString:@"`" withString:indentationString];
 	}
 
 	[self
