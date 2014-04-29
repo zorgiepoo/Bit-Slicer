@@ -45,13 +45,17 @@
 @property (nonatomic) ZGAppUpdaterController *appUpdaterController;
 @property (nonatomic) ZGDebuggerController *debuggerController;
 
-@property (nonatomic) ZGUpdatePreferencesViewController *updatePreferencesViewController;
-@property (nonatomic, assign) IBOutlet NSView *updatePreferencesView;
+@property (nonatomic, assign) IBOutlet NSToolbar *toolbar;
 
+@property (nonatomic) ZGUpdatePreferencesViewController *updatePreferencesViewController;
 @property (nonatomic) ZGHotKeyPreferencesViewController *hotKeyPreferencesViewController;
-@property (nonatomic, assign) IBOutlet NSView *hotKeyPreferencesView;
 
 @end
+
+#define ZGSoftwareUpdateIdentifier @"ZGSoftwareUpdateIdentifier"
+#define ZGDebuggerHotKeysIdentifier @"ZGDebuggerHotKeysIdentifier"
+
+#define ZGSoftwareUpdateIconPath @"/System/Library/CoreServices/Software Update.app/Contents/Resources/SoftwareUpdate.icns"
 
 @implementation ZGPreferencesController
 
@@ -70,14 +74,57 @@
 }
 
 - (void)windowDidLoad
-{	
-	self.updatePreferencesViewController = [[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:self.appUpdaterController];
-	[self.updatePreferencesView addSubview:self.updatePreferencesViewController.view];
-	self.updatePreferencesViewController.view.frame = self.updatePreferencesView.bounds;
+{
+	[self.toolbar setAllowsUserCustomization:NO];
+	[self.toolbar setSelectedItemIdentifier:ZGSoftwareUpdateIdentifier];
 	
-	self.hotKeyPreferencesViewController = [[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController];
-	[self.hotKeyPreferencesView addSubview:self.hotKeyPreferencesViewController.view];
-	self.hotKeyPreferencesViewController.view.frame = self.hotKeyPreferencesView.bounds;
+	if ([[NSFileManager defaultManager] fileExistsAtPath:ZGSoftwareUpdateIconPath])
+	{
+		for (NSToolbarItem *toolbarItem in self.toolbar.items)
+		{
+			if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdateIdentifier])
+			{
+				toolbarItem.image = [[NSImage alloc] initWithContentsOfFile:ZGSoftwareUpdateIconPath];
+				break;
+			}
+		}
+	}
+	
+	[self setUpdatePreferencesView];
+}
+
+- (void)setUpdatePreferencesView
+{
+	if (self.updatePreferencesViewController == nil)
+	{
+		self.updatePreferencesViewController = [[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:self.appUpdaterController];
+	}
+	
+	self.window.contentView = self.updatePreferencesViewController.view;
+	[self.window setTitle:@"Software Update"];
+}
+
+- (void)setHotKeyPreferencesView
+{
+	if (self.hotKeyPreferencesViewController == nil)
+	{
+		self.hotKeyPreferencesViewController = [[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController];
+	}
+	
+	self.window.contentView = self.hotKeyPreferencesViewController.view;
+	[self.window setTitle:@"Hot Keys"];
+}
+
+- (IBAction)changePreferencesView:(NSToolbarItem *)toolbarItem
+{
+	if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdateIdentifier])
+	{
+		[self setUpdatePreferencesView];
+	}
+	else if ([toolbarItem.itemIdentifier isEqualToString:ZGDebuggerHotKeysIdentifier])
+	{
+		[self setHotKeyPreferencesView];
+	}
 }
 
 @end
