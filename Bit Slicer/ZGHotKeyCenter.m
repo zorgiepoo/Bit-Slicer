@@ -93,7 +93,10 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 		hotKey.internalID = _nextRegisteredHotKeyID;
 
 		EventHotKeyRef newHotKeyRef = hotKey.hotKeyRef;
-		RegisterEventHotKey((UInt32)hotKey.keyCombo.code, (UInt32)hotKey.keyCombo.flags, (EventHotKeyID){.signature = hotKey.internalID, .id = hotKey.internalID}, GetApplicationEventTarget(), 0, &newHotKeyRef);
+		if (RegisterEventHotKey((UInt32)hotKey.keyCombo.code, (UInt32)hotKey.keyCombo.flags, (EventHotKeyID){.signature = hotKey.internalID, .id = hotKey.internalID}, GetApplicationEventTarget(), 0, &newHotKeyRef) != noErr)
+		{
+			return NO;
+		}
 		hotKey.hotKeyRef = newHotKeyRef;
 	}
 
