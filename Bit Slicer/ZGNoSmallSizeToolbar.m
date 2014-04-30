@@ -42,4 +42,10 @@
 	return mode != NSToolbarSizeModeSmall;
 }
 
+// Found this method by introspecting NSToolbar's methods
+- (BOOL)_allowsShowHideToolbarContextMenuItem
+{
+	return NO;
+}
+
 @end
