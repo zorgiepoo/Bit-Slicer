@@ -82,7 +82,10 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 			_registeredHotKeys = [NSMutableArray array];
 
 			EventTypeSpec eventType = {.eventClass = kEventClassKeyboard, .eventKind = kEventHotKeyPressed};
-			InstallApplicationEventHandler(&hotKeyHandler, 1, &eventType, (__bridge void *)self, NULL);
+			if (InstallApplicationEventHandler(&hotKeyHandler, 1, &eventType, (__bridge void *)self, NULL) != noErr)
+			{
+				return NO;
+			}
 		}
 
 		_nextRegisteredHotKeyID++;
