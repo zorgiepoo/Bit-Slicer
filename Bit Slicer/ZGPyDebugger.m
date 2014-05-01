@@ -79,6 +79,7 @@ declareDebugPrototypeMethod(log)
 declareDebugPrototypeMethod(notify)
 declareDebugPrototypeMethod(registerHotKey)
 declareDebugPrototypeMethod(unregisterHotKey)
+declareDebugPrototypeMethod(isRegisteredHotKey)
 
 declareDebugPrototypeMethod(assemble)
 declareDebugPrototypeMethod(disassemble)
@@ -109,6 +110,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(notify)
 	declareDebugMethod(registerHotKey)
 	declareDebugMethod(unregisterHotKey)
+	declareDebugMethod(isRegisteredHotKey)
 	declareDebugMethod(assemble)
 	declareDebugMethod(disassemble)
 	declareDebugMethod(findSymbol)
@@ -416,23 +418,48 @@ static PyObject *Debugger_registerHotKey(DebuggerClass *self, PyObject *args)
 static PyObject *Debugger_unregisterHotKey(DebuggerClass *self, PyObject *args)
 {
 	UInt32 hotKeyID = 0;
-	if (PyArg_ParseTuple(args, "I:unregisterHotKey", &hotKeyID))
+	if (!PyArg_ParseTuple(args, "I:unregisterHotKey", &hotKeyID))
 	{
-		__block ZGHotKey *unregisteredHotKey = nil;
-		dispatch_sync(dispatch_get_main_queue(), ^{
-			unregisteredHotKey = [self->objcSelf.hotKeyCenter unregisterHotKeyWithInternalID:hotKeyID];
-		});
-		
-		if (unregisteredHotKey == nil)
-		{
-			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.unregisterHotKey failed to unregister hot key with ID %d", hotKeyID] UTF8String]);
-			return NULL;
-		}
-		
-		PyObject *callback = unregisteredHotKey.userData;
-		Py_XDECREF(callback);
+		return NULL;
 	}
+	
+	__block ZGHotKey *unregisteredHotKey = nil;
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		unregisteredHotKey = [self->objcSelf.hotKeyCenter unregisterHotKeyWithInternalID:hotKeyID];
+	});
+	
+	if (unregisteredHotKey == nil)
+	{
+		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.unregisterHotKey failed to unregister hot key with ID %d", hotKeyID] UTF8String]);
+		return NULL;
+	}
+	
+	PyObject *callback = unregisteredHotKey.userData;
+	Py_XDECREF(callback);
+	
 	return Py_BuildValue("");
+}
+
+static PyObject *Debugger_isRegisteredHotKey(DebuggerClass *self, PyObject *args)
+{
+	UInt32 keyCode = 0;
+	UInt32 modifierFlags = 0;
+	if (!PyArg_ParseTuple(args, "II:isRegisteredHotKey", &keyCode, &modifierFlags))
+	{
+		return NULL;
+	}
+	
+	__block BOOL isRegistered = NO;
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		isRegistered = [self->objcSelf.hotKeyCenter isRegisteredHotKey:[ZGHotKey hotKeyWithKeyCombo:(KeyCombo){.code = keyCode, .flags = modifierFlags}]];
+	});
+	
+	if (!isRegistered)
+	{
+		Py_RETURN_FALSE;
+	}
+	
+	Py_RETURN_TRUE;
 }
 
 static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)

@@ -163,4 +163,16 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 	return [NSArray arrayWithArray:foundHotKeys];
 }
 
+- (BOOL)isRegisteredHotKey:(ZGHotKey *)hotKey
+{
+	for (ZGHotKey *registeredHotKey in _registeredHotKeys)
+	{
+		if (registeredHotKey.keyCombo.code == hotKey.keyCombo.code && registeredHotKey.keyCombo.flags == hotKey.keyCombo.flags)
+		{
+			return YES;
+		}
+	}
+	return NO;
+}
+
 @end

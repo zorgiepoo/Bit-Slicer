@@ -45,4 +45,6 @@
 - (ZGHotKey *)unregisterHotKeyWithInternalID:(UInt32)internalID;
 - (NSArray *)unregisterHotKeysWithDelegate:(id <ZGHotKeyDelegate>)delegate;
 
+- (BOOL)isRegisteredHotKey:(ZGHotKey *)hotKey;
+
 @end
