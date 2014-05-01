@@ -77,9 +77,9 @@ static PyMemberDef Debugger_members[] =
 
 declareDebugPrototypeMethod(log)
 declareDebugPrototypeMethod(notify)
-declareDebugPrototypeMethod(registerHotKey)
-declareDebugPrototypeMethod(unregisterHotKey)
-declareDebugPrototypeMethod(isRegisteredHotKey)
+declareDebugPrototypeMethod(registerHotkey)
+declareDebugPrototypeMethod(unregisterHotkey)
+declareDebugPrototypeMethod(isRegisteredHotkey)
 
 declareDebugPrototypeMethod(assemble)
 declareDebugPrototypeMethod(disassemble)
@@ -108,9 +108,9 @@ static PyMethodDef Debugger_methods[] =
 {
 	declareDebugMethod(log)
 	declareDebugMethod(notify)
-	declareDebugMethod(registerHotKey)
-	declareDebugMethod(unregisterHotKey)
-	declareDebugMethod(isRegisteredHotKey)
+	declareDebugMethod(registerHotkey)
+	declareDebugMethod(unregisterHotkey)
+	declareDebugMethod(isRegisteredHotkey)
 	declareDebugMethod(assemble)
 	declareDebugMethod(disassemble)
 	declareDebugMethod(findSymbol)
@@ -379,7 +379,7 @@ static PyObject *Debugger_notify(DebuggerClass * __unused self, PyObject *args)
 	});
 }
 
-static PyObject *Debugger_registerHotKey(DebuggerClass *self, PyObject *args)
+static PyObject *Debugger_registerHotkey(DebuggerClass *self, PyObject *args)
 {
 	UInt32 keyCode = 0;
 	UInt32 modifierFlags = 0;
@@ -415,7 +415,7 @@ static PyObject *Debugger_registerHotKey(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("I", hotKey.internalID);
 }
 
-static PyObject *Debugger_unregisterHotKey(DebuggerClass *self, PyObject *args)
+static PyObject *Debugger_unregisterHotkey(DebuggerClass *self, PyObject *args)
 {
 	UInt32 hotKeyID = 0;
 	if (!PyArg_ParseTuple(args, "I:unregisterHotKey", &hotKeyID))
@@ -440,7 +440,7 @@ static PyObject *Debugger_unregisterHotKey(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject *Debugger_isRegisteredHotKey(DebuggerClass *self, PyObject *args)
+static PyObject *Debugger_isRegisteredHotkey(DebuggerClass *self, PyObject *args)
 {
 	UInt32 keyCode = 0;
 	UInt32 modifierFlags = 0;
