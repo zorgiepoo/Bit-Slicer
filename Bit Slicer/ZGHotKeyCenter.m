@@ -172,6 +172,26 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 			return YES;
 		}
 	}
+	
+	CFArrayRef cfSystemHotKeyDictionaries = NULL;
+	if (CopySymbolicHotKeys(&cfSystemHotKeyDictionaries) == noErr)
+	{
+		NSArray *systemHotKeyDictionaries = (__bridge_transfer NSArray *)cfSystemHotKeyDictionaries;
+		for (NSDictionary *hotKeyDictionary in systemHotKeyDictionaries)
+		{
+			BOOL enabled = [[hotKeyDictionary objectForKey:(NSString *)kHISymbolicHotKeyEnabled] boolValue];
+			if (enabled)
+			{
+				UInt32 keyCode = [[hotKeyDictionary objectForKey:(NSString *)kHISymbolicHotKeyCode] unsignedIntValue];
+				UInt32 modifierFlags = [[hotKeyDictionary objectForKey:(NSString *)kHISymbolicHotKeyModifiers] unsignedIntValue];
+				if (hotKey.keyCombo.code == keyCode && hotKey.keyCombo.flags == modifierFlags)
+				{
+					return YES;
+				}
+			}
+		}
+	}
+	
 	return NO;
 }
 
