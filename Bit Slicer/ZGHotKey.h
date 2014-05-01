@@ -45,8 +45,7 @@
 + (instancetype)hotKeyWithKeyCombo:(KeyCombo)keyCombo;
 
 @property (nonatomic) KeyCombo keyCombo;
-
-- (BOOL)isInvalid;
+@property (nonatomic, readonly) BOOL valid;
 
 // internal stuff
 @property (nonatomic) EventHotKeyRef hotKeyRef;
