@@ -50,6 +50,7 @@
 @class ZGTableView;
 @class ZGBreakPointController;
 @class ZGLoggerWindowController;
+@class ZGHotKeyCenter;
 @class ZGDocument;
 
 #define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
@@ -58,6 +59,7 @@
 
 @property (readonly, nonatomic) ZGBreakPointController *breakPointController;
 @property (readonly, nonatomic) ZGLoggerWindowController *loggerWindowController;
+@property (readonly, nonatomic) ZGHotKeyCenter *hotKeyCenter;
 
 @property (nonatomic, assign) IBOutlet ZGTableView *variablesTableView;
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;

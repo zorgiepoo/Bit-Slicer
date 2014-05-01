@@ -38,6 +38,7 @@
 @class ZGDebuggerController;
 @class ZGBreakPointController;
 @class ZGMemoryViewerController;
+@class ZGHotKeyCenter;
 @class ZGLoggerWindowController;
 @class ZGDocumentData;
 @class ZGSearchData;
@@ -47,6 +48,7 @@
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic) ZGDebuggerController *debuggerController;
 @property (nonatomic) ZGBreakPointController *breakPointController;
+@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;

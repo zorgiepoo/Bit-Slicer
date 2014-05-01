@@ -53,6 +53,8 @@
 #import "ZGPyVirtualMemory.h"
 #import "ZGBacktrace.h"
 #import "NSArrayAdditions.h"
+#import "ZGHotKeyCenter.h"
+#import "ZGHotKey.h"
 
 @class ZGPyDebugger;
 
@@ -75,6 +77,8 @@ static PyMemberDef Debugger_members[] =
 
 declareDebugPrototypeMethod(log)
 declareDebugPrototypeMethod(notify)
+declareDebugPrototypeMethod(registerHotKey)
+declareDebugPrototypeMethod(unregisterHotKey)
 
 declareDebugPrototypeMethod(assemble)
 declareDebugPrototypeMethod(disassemble)
@@ -103,6 +107,8 @@ static PyMethodDef Debugger_methods[] =
 {
 	declareDebugMethod(log)
 	declareDebugMethod(notify)
+	declareDebugMethod(registerHotKey)
+	declareDebugMethod(unregisterHotKey)
 	declareDebugMethod(assemble)
 	declareDebugMethod(disassemble)
 	declareDebugMethod(findSymbol)
@@ -172,6 +178,7 @@ static PyTypeObject DebuggerType =
 
 @property (nonatomic) ZGBreakPointController *breakPointController;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
+@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
 
 @property (nonatomic) NSMutableDictionary *cachedInstructionPointers;
 @property (nonatomic) ZGProcess *process;
@@ -207,7 +214,7 @@ static PyObject *gDebuggerException;
 	}
 }
 
-- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super init];
 	if (self != nil)
@@ -223,6 +230,7 @@ static PyObject *gDebuggerException;
 		self.process = [[ZGProcess alloc] initWithProcess:process];
 		self.breakPointController = breakPointController;
 		self.loggerWindowController = loggerWindowController;
+		self.hotKeyCenter = hotKeyCenter;
 		
 		DebuggerClass *debuggerObject = (DebuggerClass *)self.object;
 		debuggerObject->objcSelf = self;
@@ -241,6 +249,20 @@ static PyObject *gDebuggerException;
 // Use cleanup method instead of dealloc since the break point controller's weak delegate reference may be nil by that time
 - (void)cleanup
 {
+	__block NSArray *unregisteredHotKeys = nil;
+	dispatch_async(dispatch_get_main_queue(), ^{
+		unregisteredHotKeys = [self.hotKeyCenter unregisterHotKeysWithDelegate:self];
+	});
+	
+	if (Py_IsInitialized())
+	{
+		for (ZGHotKey *hotKey in unregisteredHotKeys)
+		{
+			PyObject *callback = hotKey.userData;
+			Py_XDECREF(callback);
+		}
+	}
+	
 	if (self.haltedBreakPoint != nil)
 	{
 		self.haltedBreakPoint.dead = YES;
@@ -343,6 +365,67 @@ static PyObject *Debugger_notify(DebuggerClass * __unused self, PyObject *args)
 	PyBuffer_Release(&informativeText);
 	
 	return retValue;
+}
+
+- (void)hotKeyDidTrigger:(ZGHotKey *)hotKey
+{
+	UInt32 hotKeyID = hotKey.internalID;
+	PyObject *callback = hotKey.userData;
+	
+	dispatch_async(gPythonQueue, ^{
+		[self.scriptManager handleHotKeyTriggerWithInternalID:hotKeyID callback:callback sender:self];
+	});
+}
+
+static PyObject *Debugger_registerHotKey(DebuggerClass *self, PyObject *args)
+{
+	UInt32 keyCode = 0;
+	UInt32 modifierFlags = 0;
+	PyObject *callback = NULL;
+	ZGHotKey *hotKey = nil;
+	if (!PyArg_ParseTuple(args, "IIO:registerHotKey", &keyCode, &modifierFlags, &callback))
+	{
+		return NULL;
+	}
+	
+	if (PyCallable_Check(callback) == 0)
+	{
+		PyErr_SetString(PyExc_ValueError, [[NSString stringWithFormat:@"debug.registerHotKey failed registering code = 0x%X, flags = 0x%X because callback is not callable", keyCode, modifierFlags] UTF8String]);
+		return NULL;
+	}
+	
+	__block BOOL registeredHotKey = NO;
+	hotKey = [ZGHotKey hotKeyWithKeyCombo:(KeyCombo){.code = keyCode, .flags = modifierFlags}];
+	
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		registeredHotKey = [self->objcSelf.hotKeyCenter registerHotKey:hotKey delegate:self->objcSelf];
+	});
+	
+	if (!registeredHotKey)
+	{
+		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.registerHotKey failed to register code = 0x%X, flags = 0x%X", keyCode, modifierFlags] UTF8String]);
+		return NULL;
+	}
+	
+	hotKey.userData = callback;
+	Py_XINCREF(callback);
+	
+	return Py_BuildValue("I", hotKey.internalID);
+}
+
+static PyObject *Debugger_unregisterHotKey(DebuggerClass *self, PyObject *args)
+{
+	UInt32 hotKeyID = 0;
+	if (PyArg_ParseTuple(args, "I:unregisterHotKey", &hotKeyID))
+	{
+		__block ZGHotKey *unregisteredHotKey = nil;
+		dispatch_sync(dispatch_get_main_queue(), ^{
+			unregisteredHotKey = [self->objcSelf.hotKeyCenter unregisterHotKeyWithInternalID:hotKeyID];
+		});
+		PyObject *callback = unregisteredHotKey.userData;
+		Py_XDECREF(callback);
+	}
+	return Py_BuildValue("");
 }
 
 static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)

@@ -50,7 +50,8 @@
 
 // internal stuff
 @property (nonatomic) EventHotKeyRef hotKeyRef;
-@property (nonatomic, assign) id <ZGHotKeyDelegate> delegate;
+@property (nonatomic, weak) id <ZGHotKeyDelegate> delegate;
 @property (nonatomic) UInt32 internalID;
+@property (nonatomic) void *userData;
 
 @end

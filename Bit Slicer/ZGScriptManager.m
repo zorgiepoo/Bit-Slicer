@@ -663,7 +663,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		Py_XDECREF(scriptClassType);
 		
 		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:windowController.currentProcess];
-		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptManager:self breakPointController:self.windowController.breakPointController loggerWindowController:windowController.loggerWindowController];
+		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptManager:self breakPointController:self.windowController.breakPointController hotKeyCenter:self.windowController.hotKeyCenter loggerWindowController:windowController.loggerWindowController];
 		
 		script.virtualMemoryInstance = virtualMemoryInstance;
 		script.debuggerInstance = debuggerInstance;
@@ -884,7 +884,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	}
 }
 
-- (void)handleBreakPointFailureWithVariable:(ZGVariable *)variable methodCallResult:(PyObject *)methodCallResult forMethodName:(const char *)methodName shouldStop:(BOOL *)stop
+- (void)handleCallbackFailureWithVariable:(ZGVariable *)variable methodCallResult:(PyObject *)methodCallResult forMethodName:(const char *)methodName shouldStop:(BOOL *)stop
 {
 	if (methodCallResult == NULL)
 	{
@@ -923,7 +923,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				{
 					PyObject *registers = [self registersfromBreakPoint:breakPoint];
 					PyObject *result = PyObject_CallFunction(callback, "KKO", breakPoint.variable.address, instructionAddress, registers);
-					[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"data watchpoint" shouldStop:stop];
+					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"data watchpoint" shouldStop:stop];
 					Py_XDECREF(registers);
 					Py_XDECREF(result);
 				}
@@ -943,7 +943,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 					PyObject *result = PyObject_CallFunction(callback, "KO", breakPoint.variable.address, registers);
 					Py_XDECREF(registers);
 					
-					[self handleBreakPointFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"instruction breakpoint" shouldStop:stop];
+					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"instruction breakpoint" shouldStop:stop];
 					Py_XDECREF(result);
 					
 					if (breakPoint.hidden && breakPoint.callback != NULL)
@@ -951,6 +951,22 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 						Py_DecRef(breakPoint.callback);
 						breakPoint.callback = NULL;
 					}
+				}
+			});
+		}];
+	});
+}
+
+- (void)handleHotKeyTriggerWithInternalID:(UInt32)hotKeyID callback:(PyObject *)callback sender:(id)sender
+{
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+			dispatch_async(gPythonQueue, ^{
+				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
+				{
+					PyObject *result = PyObject_CallFunction(callback, "I", hotKeyID);
+					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"hotkey trigger" shouldStop:stop];
+					Py_XDECREF(result);
 				}
 			});
 		}];

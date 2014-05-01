@@ -118,4 +118,41 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 	}
 }
 
+- (ZGHotKey *)unregisterHotKeyWithInternalID:(UInt32)internalID
+{
+	ZGHotKey *foundHotKey = nil;
+	for (ZGHotKey *hotKey in _registeredHotKeys)
+	{
+		if (hotKey.internalID == internalID)
+		{
+			foundHotKey = hotKey;
+			break;
+		}
+	}
+	
+	if (foundHotKey != nil)
+	{
+		[self unregisterHotKey:foundHotKey];
+	}
+	return foundHotKey;
+}
+
+- (NSArray *)unregisterHotKeysWithDelegate:(id <ZGHotKeyDelegate>)delegate
+{
+	NSMutableArray *foundHotKeys = [NSMutableArray array];
+	for (ZGHotKey *hotKey in _registeredHotKeys)
+	{
+		if (hotKey.delegate == delegate)
+		{
+			[foundHotKeys addObject:hotKey];
+		}
+	}
+	
+	for (ZGHotKey *hotKey in foundHotKeys)
+	{
+		[self unregisterHotKey:hotKey];
+	}
+	return [NSArray arrayWithArray:foundHotKeys];
+}
+
 @end

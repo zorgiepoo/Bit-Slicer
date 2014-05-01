@@ -92,6 +92,7 @@
 @property (nonatomic) ZGBreakPointController *breakPointController;
 @property (nonatomic) ZGMemoryViewerController *memoryViewer;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
+@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
 
 @property (nonatomic) ZGWatchVariableWindowController *watchVariableWindowController;
 
@@ -130,6 +131,7 @@
 		self.debuggerController = document.debuggerController;
 		self.breakPointController = document.breakPointController;
 		self.loggerWindowController = document.loggerWindowController;
+		self.hotKeyCenter = document.hotKeyCenter;
 	}
 	return self;
 }

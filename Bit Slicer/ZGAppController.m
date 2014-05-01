@@ -91,7 +91,7 @@
 		self.memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:self.processTaskManager];
 		self.memoryViewer.debuggerController = self.debuggerController;
 		
-		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController loggerWindowController:self.loggerWindowController];
+		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
 		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
