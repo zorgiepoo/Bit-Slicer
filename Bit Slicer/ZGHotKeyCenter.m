@@ -105,17 +105,24 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 	return YES;
 }
 
-- (void)unregisterHotKey:(ZGHotKey *)hotKey
+- (BOOL)unregisterHotKey:(ZGHotKey *)hotKey
 {
-	if ([_registeredHotKeys containsObject:hotKey])
+	if (![_registeredHotKeys containsObject:hotKey])
 	{
-		if (![hotKey isInvalid])
-		{
-			UnregisterEventHotKey(hotKey.hotKeyRef);
-		}
-
-		[_registeredHotKeys removeObject:hotKey];
+		return NO;
 	}
+	
+	if (![hotKey isInvalid])
+	{
+		if (UnregisterEventHotKey(hotKey.hotKeyRef) != noErr)
+		{
+			return NO;
+		}
+	}
+	
+	[_registeredHotKeys removeObject:hotKey];
+	
+	return YES;
 }
 
 - (ZGHotKey *)unregisterHotKeyWithInternalID:(UInt32)internalID
@@ -130,10 +137,11 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 		}
 	}
 	
-	if (foundHotKey != nil)
+	if (foundHotKey == nil || ![self unregisterHotKey:foundHotKey])
 	{
-		[self unregisterHotKey:foundHotKey];
+		return nil;
 	}
+	
 	return foundHotKey;
 }
 

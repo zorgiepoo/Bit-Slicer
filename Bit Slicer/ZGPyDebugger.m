@@ -422,6 +422,13 @@ static PyObject *Debugger_unregisterHotKey(DebuggerClass *self, PyObject *args)
 		dispatch_sync(dispatch_get_main_queue(), ^{
 			unregisteredHotKey = [self->objcSelf.hotKeyCenter unregisterHotKeyWithInternalID:hotKeyID];
 		});
+		
+		if (unregisteredHotKey == nil)
+		{
+			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.unregisterHotKey failed to unregister hot key with ID %d", hotKeyID] UTF8String]);
+			return NULL;
+		}
+		
 		PyObject *callback = unregisteredHotKey.userData;
 		Py_XDECREF(callback);
 	}
