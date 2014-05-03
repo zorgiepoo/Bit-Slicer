@@ -184,7 +184,6 @@ static PyTypeObject DebuggerType =
 
 @property (nonatomic) NSMutableDictionary *cachedInstructionPointers;
 @property (nonatomic) ZGProcess *process;
-@property (nonatomic) ZGMachBinary *dylinkerBinary;
 @property (nonatomic) ZGBreakPoint *haltedBreakPoint;
 @property (nonatomic) NSDictionary *generalPurposeRegisterOffsetsDictionary;
 @property (nonatomic) NSDictionary *vectorRegisterOffsetsDictionary;
@@ -240,8 +239,6 @@ static PyObject *gDebuggerException;
 		debuggerObject->processTask = process.processTask;
 		debuggerObject->is64Bit = process.is64Bit;
 		debuggerObject->breakPointDelegate = self;
-		
-		self.dylinkerBinary = process.dylinkerBinary;
 		
 		self.cachedInstructionPointers = [[NSMutableDictionary alloc] init];
 	}
