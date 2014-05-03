@@ -402,7 +402,7 @@ static PyObject *Debugger_registerHotkey(DebuggerClass *self, PyObject *args)
 	
 	if (!registeredHotKey)
 	{
-		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.registerHotKey failed to register code = 0x%X, flags = 0x%X", keyCode, modifierFlags] UTF8String]);
+		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.registerHotKey failed to register code = 0x%X, flags = 0x%X. Perhaps it is already being in use?", keyCode, modifierFlags] UTF8String]);
 		return NULL;
 	}
 	
