@@ -37,6 +37,8 @@
 #import "ZGVariable.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGPyScript.h"
+#import "ZGPyKeyCodeModule.h"
+#import "ZGPyKeyModModule.h"
 #import "ZGPyVirtualMemory.h"
 #import "ZGPyDebugger.h"
 #import "ZGBreakPoint.h"
@@ -113,6 +115,9 @@ static PyObject *gStructObject;
 		PyObject *mainModule = loadMainPythonModule();
 		[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
 		[ZGPyDebugger loadPythonClassInMainModule:mainModule];
+		
+		loadKeyCodePythonModule();
+		loadKeyModPythonModule();
 		
 		gCtypesObject = PyImport_ImportModule("ctypes");
 		gStructObject = PyImport_ImportModule("struct");

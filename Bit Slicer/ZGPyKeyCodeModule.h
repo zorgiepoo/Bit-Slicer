@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 9/2/13.
+ * Created by Mayur Pawashe on 5/3/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,55 +32,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGPyMainModule.h"
-#import "ZGPyUtilities.h"
+#import "Python.h"
 
-#define MAIN_MODULE_NAME "bitslicer"
-
-static PyObject *BitSlicer_reload(PyObject *self, PyObject *args);
-
-static PyMethodDef mainModuleMethods[] =
-{
-	{"reload", (PyCFunction)BitSlicer_reload, METH_VARARGS, NULL}
-};
-
-static struct PyModuleDef mainModuleDefinition =
-{
-	PyModuleDef_HEAD_INIT,
-	MAIN_MODULE_NAME,
-	"Main Bit Slicer Module",
-	-1,
-	mainModuleMethods,
-	NULL, NULL, NULL, NULL
-};
-
-PyObject *loadMainPythonModule(void)
-{
-	PyObject *mainModule = PyModule_Create(&mainModuleDefinition);
-	ZGPyAddModuleToSys(MAIN_MODULE_NAME, mainModule);
-	return mainModule;
-}
-
-// The API provided in 3.3 for reloading modules is deprecated, so rather than waiting for 3.4, we should provide our own
-static PyObject *BitSlicer_reload(PyObject * __unused self, PyObject *args)
-{
-	PyObject *moduleName = NULL;
-	if (!PyArg_ParseTuple(args, "O:reload", &moduleName))
-	{
-		return NULL;
-	}
-	
-	PyObject *module = PyImport_Import(moduleName);
-	if (module == NULL)
-	{
-		return NULL;
-	}
-	
-	PyObject *reloadedModule = PyImport_ReloadModule(module);
-	if (reloadedModule == NULL)
-	{
-		return NULL;
-	}
-	
-	return reloadedModule;
-}
+PyObject *loadKeyCodePythonModule(void);

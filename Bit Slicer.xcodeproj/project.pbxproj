@@ -52,6 +52,7 @@
 		773E8B081821DEAC00D1A71A /* libpython3.3m.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B071821DEAC00D1A71A /* libpython3.3m.a */; };
 		773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
 		7743F9C618024CE400DBC19A /* python3.3 in Resources */ = {isa = PBXBuildFile; fileRef = 7743F9C518024CE400DBC19A /* python3.3 */; };
+		774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
 		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7768064018B96A64007F2CAF /* ZGThreadStates.c in Sources */ = {isa = PBXBuildFile; fileRef = 7768063E18B96A64007F2CAF /* ZGThreadStates.c */; };
@@ -94,6 +95,8 @@
 		779D56C618F1284200FD5408 /* ZGMemoryDumpRangeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 779D56C418F1284100FD5408 /* ZGMemoryDumpRangeWindowController.xib */; };
 		779D56CA18F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 779D56C818F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.m */; };
 		779D56CB18F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 779D56C918F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.xib */; };
+		77C19AAF19158ABF0028F7F1 /* ZGPyUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 77C19AAE19158ABF0028F7F1 /* ZGPyUtilities.m */; };
+		77C19AB219158C190028F7F1 /* ZGPyKeyModModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77C19AB119158C190028F7F1 /* ZGPyKeyModModule.m */; };
 		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
 		77CE28B817D538E300998F28 /* ZGLoggerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */; };
 		77CE28BA17D580AD00998F28 /* ZGPyMainModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B917D580AD00998F28 /* ZGPyMainModule.m */; };
@@ -405,6 +408,8 @@
 		7743FA2518024D2A00DBC19A /* unicodeobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unicodeobject.h; path = deps/python/include/unicodeobject.h; sourceTree = "<group>"; };
 		7743FA2618024D2A00DBC19A /* warnings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = warnings.h; path = deps/python/include/warnings.h; sourceTree = "<group>"; };
 		7743FA2718024D2A00DBC19A /* weakrefobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = weakrefobject.h; path = deps/python/include/weakrefobject.h; sourceTree = "<group>"; };
+		774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyKeyCodeModule.m; path = "Bit Slicer/ZGPyKeyCodeModule.m"; sourceTree = "<group>"; };
+		774B5EE71915362900D7AA69 /* ZGPyKeyCodeModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyKeyCodeModule.h; path = "Bit Slicer/ZGPyKeyCodeModule.h"; sourceTree = "<group>"; };
 		775FCB4111719FAF000054FB /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		77607AAF185CD50100AC532B /* AGScopeBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AGScopeBar.h; path = deps/AGScopeBar.h; sourceTree = "<group>"; };
 		77607AB0185CD50100AC532B /* AGScopeBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AGScopeBar.m; path = deps/AGScopeBar.m; sourceTree = "<group>"; };
@@ -488,6 +493,10 @@
 		779D56C718F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryDumpAllWindowController.h; path = "Bit Slicer/ZGMemoryDumpAllWindowController.h"; sourceTree = "<group>"; };
 		779D56C818F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMemoryDumpAllWindowController.m; path = "Bit Slicer/ZGMemoryDumpAllWindowController.m"; sourceTree = "<group>"; };
 		779D56C918F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGMemoryDumpAllWindowController.xib; path = "Bit Slicer/ZGMemoryDumpAllWindowController.xib"; sourceTree = "<group>"; };
+		77C19AAD19158ABF0028F7F1 /* ZGPyUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyUtilities.h; path = "Bit Slicer/ZGPyUtilities.h"; sourceTree = "<group>"; };
+		77C19AAE19158ABF0028F7F1 /* ZGPyUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyUtilities.m; path = "Bit Slicer/ZGPyUtilities.m"; sourceTree = "<group>"; };
+		77C19AB019158C190028F7F1 /* ZGPyKeyModModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyKeyModModule.h; path = "Bit Slicer/ZGPyKeyModModule.h"; sourceTree = "<group>"; };
+		77C19AB119158C190028F7F1 /* ZGPyKeyModModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyKeyModModule.m; path = "Bit Slicer/ZGPyKeyModModule.m"; sourceTree = "<group>"; };
 		77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLoggerWindowController.h; path = "Bit Slicer/ZGLoggerWindowController.h"; sourceTree = "<group>"; };
 		77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLoggerWindowController.m; path = "Bit Slicer/ZGLoggerWindowController.m"; sourceTree = "<group>"; };
 		77CE28B617D538E300998F28 /* ZGLoggerWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGLoggerWindowController.xib; path = "Bit Slicer/ZGLoggerWindowController.xib"; sourceTree = "<group>"; };
@@ -905,6 +914,12 @@
 				77F1160517D2EEB6009E002A /* ZGScriptManager.m */,
 				77CE28BB17D580D400998F28 /* ZGPyMainModule.h */,
 				77CE28B917D580AD00998F28 /* ZGPyMainModule.m */,
+				774B5EE71915362900D7AA69 /* ZGPyKeyCodeModule.h */,
+				774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */,
+				77C19AB019158C190028F7F1 /* ZGPyKeyModModule.h */,
+				77C19AB119158C190028F7F1 /* ZGPyKeyModModule.m */,
+				77C19AAD19158ABF0028F7F1 /* ZGPyUtilities.h */,
+				77C19AAE19158ABF0028F7F1 /* ZGPyUtilities.m */,
 				77F1160717D2EEC0009E002A /* ZGPyVirtualMemory.h */,
 				77F1160817D2EEC0009E002A /* ZGPyVirtualMemory.m */,
 				777AD8C517D96F30003A5317 /* ZGPyDebugger.h */,
@@ -1558,6 +1573,7 @@
 				771A3F4818CCF32F00D19676 /* ZGHotKeyCenter.m in Sources */,
 				772D1217190D85CC00800B1B /* ZGHotKey.m in Sources */,
 				77282126189EA4520044E4BC /* ZGProcessTaskManager.m in Sources */,
+				77C19AB219158C190028F7F1 /* ZGPyKeyModModule.m in Sources */,
 				772D121D190E008500800B1B /* ZGUpdatePreferencesViewController.m in Sources */,
 				77F1162817D2EF3A009E002A /* ZGProcess.m in Sources */,
 				77F1162C17D2EF50009E002A /* ZGVariable.m in Sources */,
@@ -1580,10 +1596,12 @@
 				77F1164917D2EFC8009E002A /* ZGBreakPointController.m in Sources */,
 				772C0F8218B95603009FFF72 /* ZGBacktraceViewController.m in Sources */,
 				7798EECD18C40B7F001120FB /* _DDParserTerm.m in Sources */,
+				77C19AAF19158ABF0028F7F1 /* ZGPyUtilities.m in Sources */,
 				77F1164D17D2EFDA009E002A /* ZGBreakPoint.m in Sources */,
 				77F1165017D2EFE4009E002A /* ZGDebugThread.m in Sources */,
 				77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */,
 				77F1165917D2F001009E002A /* ZGRegister.m in Sources */,
+				774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */,
 				7798EECC18C40B7F001120FB /* _DDOperatorTerm.m in Sources */,
 				77179F6B18CD34F100BCB6D0 /* ZGAppUpdaterController.m in Sources */,
 				77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */,

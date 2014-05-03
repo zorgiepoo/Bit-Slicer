@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 9/2/13.
+ * Created by Mayur Pawashe on 5/3/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,55 +32,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGPyMainModule.h"
+#import "ZGPyKeyModModule.h"
 #import "ZGPyUtilities.h"
+#import "ZGUtilities.h"
+#import <Carbon/Carbon.h>
 
-#define MAIN_MODULE_NAME "bitslicer"
+#define KEYMOD_MODULE_NAME "keymod"
 
-static PyObject *BitSlicer_reload(PyObject *self, PyObject *args);
-
-static PyMethodDef mainModuleMethods[] =
-{
-	{"reload", (PyCFunction)BitSlicer_reload, METH_VARARGS, NULL}
-};
-
-static struct PyModuleDef mainModuleDefinition =
+static struct PyModuleDef keyModModuleDefinition =
 {
 	PyModuleDef_HEAD_INIT,
-	MAIN_MODULE_NAME,
-	"Main Bit Slicer Module",
+	KEYMOD_MODULE_NAME,
+	"Key Mod Module",
 	-1,
-	mainModuleMethods,
+	NULL,
 	NULL, NULL, NULL, NULL
 };
 
-PyObject *loadMainPythonModule(void)
+static void addKeyMods(PyObject *keyModModule)
 {
-	PyObject *mainModule = PyModule_Create(&mainModuleDefinition);
-	ZGPyAddModuleToSys(MAIN_MODULE_NAME, mainModule);
-	return mainModule;
+	ZGPyAddIntegerConstant(keyModModule, "NONE", 0x0);
+	ZGPyAddIntegerConstant(keyModModule, "SHIFT", shiftKey);
+	ZGPyAddIntegerConstant(keyModModule, "COMMAND", cmdKey);
+	ZGPyAddIntegerConstant(keyModModule, "ALPHA_LOCK", alphaLock);
+	ZGPyAddIntegerConstant(keyModModule, "OPTION", optionKey);
+	ZGPyAddIntegerConstant(keyModModule, "CONTROL", controlKey);
 }
 
-// The API provided in 3.3 for reloading modules is deprecated, so rather than waiting for 3.4, we should provide our own
-static PyObject *BitSlicer_reload(PyObject * __unused self, PyObject *args)
+PyObject *loadKeyModPythonModule(void)
 {
-	PyObject *moduleName = NULL;
-	if (!PyArg_ParseTuple(args, "O:reload", &moduleName))
-	{
-		return NULL;
-	}
+	PyObject *keyModModule = PyModule_Create(&keyModModuleDefinition);
+	ZGPyAddModuleToSys(KEYMOD_MODULE_NAME, keyModModule);
 	
-	PyObject *module = PyImport_Import(moduleName);
-	if (module == NULL)
-	{
-		return NULL;
-	}
+	addKeyMods(keyModModule);
 	
-	PyObject *reloadedModule = PyImport_ReloadModule(module);
-	if (reloadedModule == NULL)
-	{
-		return NULL;
-	}
-	
-	return reloadedModule;
+	return keyModModule;
 }
