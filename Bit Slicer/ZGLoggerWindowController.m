@@ -35,6 +35,7 @@
 #import "ZGLoggerWindowController.h"
 
 #define ZGLoggerWindowText @"ZGLoggerWindowText"
+#define MIN_LOG_LINES_TO_RESTORE 50U
 
 @interface ZGLoggerWindowController ()
 
@@ -68,7 +69,7 @@
     [super encodeRestorableStateWithCoder:coder];
 	
 	NSArray *lines = [self.loggerText componentsSeparatedByString:@"\n"];
-	NSUInteger numberOfLinesToTake = MIN(50U, lines.count);
+	NSUInteger numberOfLinesToTake = MIN(MIN_LOG_LINES_TO_RESTORE, lines.count);
 	NSArray *lastFewLines = [lines subarrayWithRange:NSMakeRange(lines.count - numberOfLinesToTake, numberOfLinesToTake)];
 	
 	[coder encodeObject:[lastFewLines componentsJoinedByString:@"\n"] forKey:ZGLoggerWindowText];
@@ -96,6 +97,8 @@
 	}
 	
 	[self.statusTextField setStringValue:[NSString stringWithFormat:@"Logged %lu message%@", self.numberOfMessages, self.numberOfMessages == 1 ? @"" : @"s"]];
+	
+	[self invalidateRestorableState];
 }
 
 - (void)windowDidLoad
