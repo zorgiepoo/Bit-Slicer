@@ -119,6 +119,16 @@
 {
 	if (userInterfaceItem.action == @selector(goBack:) || userInterfaceItem.action == @selector(goForward:))
 	{
+		NSMenuItem *menuItem = (NSMenuItem *)userInterfaceItem;
+		if (userInterfaceItem.action == @selector(goBack:))
+		{
+			menuItem.title = @"Back";
+		}
+		else
+		{
+			menuItem.title = @"Forward";
+		}
+		
 		if (![self canEnableNavigationButtons])
 		{
 			return NO;

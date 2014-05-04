@@ -774,11 +774,32 @@
 	return functionType;
 }
 
-- (IBAction)functionTypePopUpButtonRequest:(id)sender
+- (IBAction)functionTypePopUpButtonRequest:(id)__unused sender
 {
-	self.documentData.functionTypeTag = [sender selectedTag];
+	self.documentData.functionTypeTag = [self.functionPopUpButton selectedTag];
 	[self updateOptions];
 	[self markDocumentChange];
+}
+
+- (void)selectNewFunctionTypeAtIndex:(NSInteger)newIndex
+{
+	NSMenuItem *newItem = [self.functionPopUpButton itemAtIndex:newIndex];
+	[self.functionPopUpButton selectItem:newItem];
+	[self functionTypePopUpButtonRequest:nil];
+}
+
+- (IBAction)goBack:(id)__unused sender
+{
+	NSInteger selectedIndex = [self.functionPopUpButton indexOfSelectedItem];
+	NSInteger newIndex = selectedIndex > 0 ? selectedIndex - 1 : [self.functionPopUpButton numberOfItems] - 1;
+	[self selectNewFunctionTypeAtIndex:newIndex];
+}
+
+- (IBAction)goForward:(id)__unused sender
+{
+	NSInteger selectedIndex = [self.functionPopUpButton indexOfSelectedItem];
+	NSInteger newIndex = selectedIndex < [self.functionPopUpButton numberOfItems] - 1 ? selectedIndex + 1 : 0;
+	[self selectNewFunctionTypeAtIndex:newIndex];
 }
 
 #pragma mark Useful Methods
@@ -1103,6 +1124,23 @@
 		}
 		
 		if (!(memoryProtection & VM_PROT_READ))
+		{
+			return NO;
+		}
+	}
+	
+	else if (menuItem.action == @selector(goBack:) || menuItem.action == @selector(goForward:))
+	{
+		if (menuItem.action == @selector(goBack:))
+		{
+			menuItem.title = @"Previous Operator";
+		}
+		else
+		{
+			menuItem.title = @"Next Operator";
+		}
+		
+		if ([self.searchController canCancelTask])
 		{
 			return NO;
 		}
