@@ -591,7 +591,7 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject * __unused 
 {
 }
 
-#define MAX_VALUES_SCANNED 1000U
+#define MAX_VALUES_SCANNED 100000U
 
 static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, const char *functionName)
 {
