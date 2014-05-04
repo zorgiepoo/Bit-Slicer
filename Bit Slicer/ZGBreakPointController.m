@@ -178,7 +178,6 @@ static ZGBreakPointController *gBreakPointController;
 			if (!shouldKeepTimer)
 			{
 				dispatch_source_cancel(self.watchPointTimer);
-				dispatch_release(self.watchPointTimer);
 				self.watchPointTimer = NULL;
 			}
 		}

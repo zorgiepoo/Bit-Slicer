@@ -804,7 +804,6 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				if (self.scriptTimer != NULL)
 				{
 					dispatch_source_cancel(self.scriptTimer);
-					dispatch_release(self.scriptTimer);
 					self.scriptTimer = NULL;
 					dispatch_async(dispatch_get_main_queue(), ^{
 						if (self.scriptActivity != nil)
