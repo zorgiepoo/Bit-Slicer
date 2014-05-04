@@ -712,6 +712,8 @@
 			children = (
 				7743F9C718024D0E00DBC19A /* Python */,
 				77FF507B16E9B7D40005915D /* Memory Window Controllers */,
+				77C19AB31916D4440028F7F1 /* Changing Memory Protection */,
+				7728EE0C16BE3DDA00F9E1AD /* Dumping Memory */,
 				77FF508216EAD0630005915D /* General */,
 				772D1218190D85D200800B1B /* Hot Keys */,
 				77FF507C16EACF380005915D /* Process List */,
@@ -1049,6 +1051,16 @@
 			name = "Document Icons";
 			sourceTree = "<group>";
 		};
+		77C19AB31916D4440028F7F1 /* Changing Memory Protection */ = {
+			isa = PBXGroup;
+			children = (
+				779D56BD18F0775500FD5408 /* ZGMemoryProtectionWindowController.h */,
+				779D56BE18F0775500FD5408 /* ZGMemoryProtectionWindowController.m */,
+				779D56BF18F0775500FD5408 /* ZGMemoryProtectionWindowController.xib */,
+			);
+			name = "Changing Memory Protection";
+			sourceTree = "<group>";
+		};
 		77D5AEAC137C6FC000026388 /* Memory Viewer */ = {
 			isa = PBXGroup;
 			children = (
@@ -1067,10 +1079,6 @@
 				77F115A517D2E865009E002A /* HFLineCountingView.h */,
 				77F115D717D2ED9D009E002A /* ZGLineCountingView.h */,
 				77F115D817D2ED9D009E002A /* ZGLineCountingView.m */,
-				7728EE0C16BE3DDA00F9E1AD /* Dumping Memory */,
-				779D56BD18F0775500FD5408 /* ZGMemoryProtectionWindowController.h */,
-				779D56BE18F0775500FD5408 /* ZGMemoryProtectionWindowController.m */,
-				779D56BF18F0775500FD5408 /* ZGMemoryProtectionWindowController.xib */,
 			);
 			name = "Memory Viewer";
 			sourceTree = "<group>";

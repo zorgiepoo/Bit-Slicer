@@ -44,9 +44,6 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 #import "ZGRegion.h"
-#import "ZGMemoryProtectionWindowController.h"
-#import "ZGMemoryDumpRangeWindowController.h"
-#import "ZGMemoryDumpAllWindowController.h"
 #import "ZGNavigationPost.h"
 #import "ZGVariableController.h"
 
@@ -71,10 +68,6 @@
 
 @property (nonatomic, assign) IBOutlet HFTextView *textView;
 
-@property (nonatomic) ZGMemoryProtectionWindowController *memoryProtectionWindowController;
-@property (nonatomic) ZGMemoryDumpRangeWindowController *memoryDumpRangeWindowController;
-@property (nonatomic) ZGMemoryDumpAllWindowController *memoryDumpAllWindowController;
-
 @end
 
 @implementation ZGMemoryViewerController
@@ -95,6 +88,12 @@
 		selectedRange.location += self.currentMemoryAddress;
 	}
 	return selectedRange;
+}
+
+- (HFRange)preferredMemoryRequestRange
+{
+	HFRange selectedRange = [self selectedAddressRange];
+	return selectedRange.length > 0 ? selectedRange : HFRangeMake(self.currentMemoryAddress, self.currentMemorySize);
 }
 
 #pragma mark Current Process Changed
@@ -223,20 +222,6 @@
 	if (userInterfaceItem.action == @selector(toggleDataInspector:))
 	{
 		[menuItem setState:self.showsDataInspector];
-	}
-	else if (userInterfaceItem.action == @selector(changeMemoryProtection:))
-	{
-		if (!self.currentProcess.valid || !self.window.isVisible)
-		{
-			return NO;
-		}
-	}
-	else if (userInterfaceItem.action == @selector(dumpMemoryInRange:) || userInterfaceItem.action == @selector(dumpAllMemory:))
-	{
-		if (!self.currentProcess.valid || self.memoryDumpAllWindowController.isBusy)
-		{
-			return NO;
-		}
 	}
 	else if (userInterfaceItem.action == @selector(copyAddress:))
 	{
@@ -728,50 +713,6 @@
 	
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:variable.addressFormula forType:NSStringPboardType];
-}
-
-#pragma mark Memory Protection
-
-- (IBAction)changeMemoryProtection:(id)__unused sender
-{
-	if (self.memoryProtectionWindowController == nil)
-	{
-		self.memoryProtectionWindowController = [[ZGMemoryProtectionWindowController alloc] init];
-	}
-	
-	[self.memoryProtectionWindowController
-	 attachToWindow:self.window
-	 withProcess:self.currentProcess
-	 requestedAddressRange:self.selectedAddressRange
-	 undoManager:self.undoManager];
-}
-
-#pragma mark Dumping Memory
-
-- (IBAction)dumpMemoryInRange:(id)__unused sender
-{
-	if (self.memoryDumpRangeWindowController == nil)
-	{
-		self.memoryDumpRangeWindowController = [[ZGMemoryDumpRangeWindowController alloc] init];
-	}
-
-	HFRange selectedAddressRange = self.selectedAddressRange;
-	HFRange requestedAddressRange = selectedAddressRange.length == 0 ? HFRangeMake(self.currentMemoryAddress, self.currentMemorySize) : selectedAddressRange;
-
-	[self.memoryDumpRangeWindowController
-	 attachToWindow:self.window
-	 withProcess:self.currentProcess
-	 requestedAddressRange:requestedAddressRange];
-}
-
-- (IBAction)dumpAllMemory:(id)__unused sender
-{
-	if (self.memoryDumpAllWindowController == nil)
-	{
-		self.memoryDumpAllWindowController = [[ZGMemoryDumpAllWindowController alloc] init];
-	}
-	
-	[self.memoryDumpAllWindowController attachToWindow:self.window withProcess:self.currentProcess];
 }
 
 @end

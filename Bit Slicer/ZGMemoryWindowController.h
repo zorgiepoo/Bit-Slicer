@@ -34,6 +34,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
+#import <HexFiend/HFTypes.h>
+#import <HexFiend/HFFunctions.h>
 
 extern NSString *ZGLastChosenInternalProcessNameNotification;
 extern NSString *ZGLastChosenInternalProcessNameKey;
@@ -93,5 +95,10 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 - (IBAction)runningApplicationsPopUpButton:(id)__unused sender;
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem;
+
+- (HFRange)preferredMemoryRequestRange;
+- (IBAction)dumpAllMemory:(id)sender;
+- (IBAction)dumpMemoryInRange:(id)sender;
+- (IBAction)changeMemoryProtection:(id)sender;
 
 @end

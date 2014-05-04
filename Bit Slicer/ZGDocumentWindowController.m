@@ -477,6 +477,20 @@
 	return [self.documentData.variables objectsAtIndexes:[self selectedVariableIndexes]];
 }
 
+- (HFRange)preferredMemoryRequestRange
+{
+	NSArray *selectedVariables = [self selectedVariables];
+	ZGVariable *firstVariable = [selectedVariables firstObject];
+	ZGVariable *lastVariable = [selectedVariables lastObject];
+	
+	if (firstVariable == nil)
+	{
+		return [super preferredMemoryRequestRange];
+	}
+	
+	return HFRangeMake(firstVariable.address, lastVariable.address + lastVariable.size - firstVariable.address);
+}
+
 #pragma mark Undo Manager
 
 - (NSUndoManager *)windowWillReturnUndoManager:(id)__unused sender
@@ -850,6 +864,14 @@
 	else if (menuItem.action == @selector(removeSelectedSearchValues:))
 	{
 		if (self.selectedVariables.count == 0 || self.window.firstResponder != self.tableController.variablesTableView)
+		{
+			return NO;
+		}
+	}
+	
+	else if (userInterfaceItem.action == @selector(dumpAllMemory:) || userInterfaceItem.action == @selector(dumpMemoryInRange:) || userInterfaceItem.action == @selector(changeMemoryProtection:))
+	{
+		if (![self.searchController canStartTask])
 		{
 			return NO;
 		}

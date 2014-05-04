@@ -1031,6 +1031,20 @@ enum ZGStepExecution
 	return [self.instructions objectsAtIndexes:[self selectedInstructionIndexes]];
 }
 
+- (HFRange)preferredMemoryRequestRange
+{
+	NSArray *selectedInstructions = [self selectedInstructions];
+	ZGInstruction *firstInstruction = [selectedInstructions firstObject];
+	ZGInstruction *lastInstruction = [selectedInstructions lastObject];
+	
+	if (firstInstruction == nil)
+	{
+		return [super preferredMemoryRequestRange];
+	}
+	
+	return HFRangeMake(firstInstruction.variable.address, lastInstruction.variable.address + lastInstruction.variable.size - firstInstruction.variable.address);
+}
+
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address
 {
 	[self jumpToMemoryAddress:address inProcess:self.currentProcess];

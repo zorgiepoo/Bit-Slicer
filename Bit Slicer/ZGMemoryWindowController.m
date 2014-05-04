@@ -38,6 +38,11 @@
 #import "ZGRunningProcess.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
+#import "ZGMemoryDumpAllWindowController.h"
+#import "ZGMemoryDumpRangeWindowController.h"
+#import "ZGMemoryProtectionWindowController.h"
+#import "ZGMachBinary.h"
+#import "ZGMachBinaryInfo.h"
 #import "ZGUtilities.h"
 
 NSString *ZGLastChosenInternalProcessNameNotification = @"ZGLastChosenInternalProcessNameNotification";
@@ -46,6 +51,10 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 @interface ZGMemoryWindowController ()
 
 @property (nonatomic) BOOL isOccluded;
+
+@property (nonatomic) ZGMemoryDumpAllWindowController *memoryDumpAllWindowController;
+@property (nonatomic) ZGMemoryDumpRangeWindowController *memoryDumpRangeWindowController;
+@property (nonatomic) ZGMemoryProtectionWindowController *memoryProtectionWindowController;
 
 @end
 
@@ -476,8 +485,73 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 			return NO;
 		}
 	}
+	else if (userInterfaceItem.action == @selector(dumpAllMemory:) || userInterfaceItem.action == @selector(dumpMemoryInRange:))
+	{
+		if (!self.currentProcess.valid || self.memoryDumpAllWindowController.isBusy)
+		{
+			return NO;
+		}
+	}
+	else if (userInterfaceItem.action == @selector(changeMemoryProtection:))
+	{
+		if (!self.currentProcess.valid)
+		{
+			return NO;
+		}
+	}
 	
 	return YES;
+}
+
+#pragma mark Preferred Memory Address Range
+
+// Default implementation
+- (HFRange)preferredMemoryRequestRange
+{
+	ZGMachBinaryInfo *mainBinaryInfo = [self.currentProcess.mainMachBinary machBinaryInfoInProcess:self.currentProcess];
+	NSRange totalSegmentRange = mainBinaryInfo.totalSegmentRange;
+	return HFRangeMake(totalSegmentRange.location, totalSegmentRange.length);
+}
+
+#pragma mark Dumping Memory
+
+- (IBAction)dumpAllMemory:(id)__unused sender
+{
+	if (self.memoryDumpAllWindowController == nil)
+	{
+		self.memoryDumpAllWindowController = [[ZGMemoryDumpAllWindowController alloc] init];
+	}
+	
+	[self.memoryDumpAllWindowController attachToWindow:self.window withProcess:self.currentProcess];
+}
+
+- (IBAction)dumpMemoryInRange:(id)__unused sender
+{
+	if (self.memoryDumpRangeWindowController == nil)
+	{
+		self.memoryDumpRangeWindowController = [[ZGMemoryDumpRangeWindowController alloc] init];
+	}
+	
+	[self.memoryDumpRangeWindowController
+	 attachToWindow:self.window
+	 withProcess:self.currentProcess
+	 requestedAddressRange:[self preferredMemoryRequestRange]];
+}
+
+#pragma mark Memory Protection Change
+
+- (IBAction)changeMemoryProtection:(id)__unused sender
+{
+	if (self.memoryProtectionWindowController == nil)
+	{
+		self.memoryProtectionWindowController = [[ZGMemoryProtectionWindowController alloc] init];
+	}
+	
+	[self.memoryProtectionWindowController
+	 attachToWindow:self.window
+	 withProcess:self.currentProcess
+	 requestedAddressRange:[self preferredMemoryRequestRange]
+	 undoManager:self.undoManager];
 }
 
 @end
