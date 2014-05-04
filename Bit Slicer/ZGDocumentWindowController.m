@@ -479,7 +479,7 @@
 
 - (HFRange)preferredMemoryRequestRange
 {
-	NSArray *selectedVariables = [self selectedVariables];
+	NSArray *selectedVariables = [[self selectedVariables] zgFilterUsingBlock:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGScript); }];
 	ZGVariable *firstVariable = [selectedVariables firstObject];
 	ZGVariable *lastVariable = [selectedVariables lastObject];
 	
