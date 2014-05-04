@@ -51,6 +51,8 @@
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
 #import "ZGDebuggerController.h"
+#import "ZGDebuggerUtilities.h"
+#import "ZGInstruction.h"
 #import "ZGBreakPointController.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGDocument.h"
@@ -1333,7 +1335,10 @@
 - (IBAction)showDebugger:(id)__unused sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	[ZGNavigationPost postShowDebuggerWithProcess:self.currentProcess address:selectedVariable.address];
+	ZGInstruction *foundInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:selectedVariable.address + 0x1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	
+	ZGMemoryAddress targetAddress = (foundInstruction != nil) ? foundInstruction.variable.address : selectedVariable.address;
+	[ZGNavigationPost postShowDebuggerWithProcess:self.currentProcess address:targetAddress];
 }
 
 @end
