@@ -32,13 +32,13 @@
                             <action selector="changePreferencesView:" target="-2" id="7Bn-K1-KRP"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="EE190157-26A8-430B-93AF-571C57ED8B5C" explicitItemIdentifier="ZGDebuggerHotKeysIdentifier" label="Hot Keys" paletteLabel="Hot Keys" tag="1" image="NSBonjour" autovalidates="NO" selectable="YES" id="kgo-oj-XB3">
+                    <toolbarItem implicitItemIdentifier="EE190157-26A8-430B-93AF-571C57ED8B5C" explicitItemIdentifier="ZGDebuggerHotKeysIdentifier" label="Hot Keys" paletteLabel="Hot Keys" tag="1" image="hotkey" autovalidates="NO" selectable="YES" id="kgo-oj-XB3">
                         <nil key="toolTip"/>
                         <connections>
                             <action selector="changePreferencesView:" target="-2" id="YXV-iP-083"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="8A223B1E-6293-4DB6-A461-07E053A19CE7" explicitItemIdentifier="ZGScriptPreferenceIdentifier" label="Scripts" paletteLabel="Scripts" tag="2" image="NSFontPanel" autovalidates="NO" selectable="YES" id="kPj-yB-vNE">
+                    <toolbarItem implicitItemIdentifier="8A223B1E-6293-4DB6-A461-07E053A19CE7" explicitItemIdentifier="ZGScriptPreferenceIdentifier" label="Scripts" paletteLabel="Scripts" tag="2" image="scripts" autovalidates="NO" selectable="YES" id="kPj-yB-vNE">
                         <nil key="toolTip"/>
                         <connections>
                             <action selector="changePreferencesView:" target="-2" id="38w-gw-FXJ"/>
@@ -57,8 +57,8 @@
         </window>
     </objects>
     <resources>
-        <image name="NSBonjour" width="32" height="32"/>
-        <image name="NSFontPanel" width="32" height="32"/>
         <image name="NSNetwork" width="32" height="32"/>
+        <image name="hotkey" width="32" height="32"/>
+        <image name="scripts" width="32" height="32"/>
     </resources>
 </document>
