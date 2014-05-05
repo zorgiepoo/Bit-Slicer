@@ -321,7 +321,7 @@ enum ZGStepExecution
 
 #pragma mark Current Process Changed
 
-- (void)currentProcessChangedWithOldProcess:(ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
+- (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)__unused newProcess
 {
 	[self updateExecutionButtons];
 	
@@ -336,7 +336,10 @@ enum ZGStepExecution
 	else
 	{
 		[self toggleBacktraceAndRegistersViews:NSOffState];
-		[self readMemory:nil];
+		if (oldProcess != nil)
+		{
+			[self readMemory:nil];
+		}
 	}
 }
 

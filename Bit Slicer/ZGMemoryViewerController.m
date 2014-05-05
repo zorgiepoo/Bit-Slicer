@@ -98,9 +98,12 @@
 
 #pragma mark Current Process Changed
 
-- (void)currentProcessChangedWithOldProcess:(ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
+- (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)__unused newProcess
 {
-	[self changeMemoryViewWithSelectionLength:0];
+	if (oldProcess != nil)
+	{
+		[self changeMemoryViewWithSelectionLength:0];
+	}
 }
 
 #pragma mark Initialization
