@@ -422,7 +422,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		
 		NSString *scriptValue =
 		@"#Edit Me!\n"
-		@"#Documentation for scripting: https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Scripting\n"
+		@"#Introduction to scripting: https://github.com/zorgiepoo/Bit-Slicer/wiki/Introduction-to-Scripting\n"
 		@"import bitslicer\n\n"
 		@"class Script(object):\n"
 		@"`def __init__(self):\n"

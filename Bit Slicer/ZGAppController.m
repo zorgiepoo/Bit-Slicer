@@ -261,7 +261,7 @@
 
 #pragma mark Links
 
-#define WIKI_URL @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki"
+#define WIKI_URL @"https://github.com/zorgiepoo/Bit-Slicer/wiki"
 - (IBAction)help:(id)__unused sender
 {	
 	[NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:WIKI_URL]];

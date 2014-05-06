@@ -78,8 +78,7 @@
 	[self.delegate breakPointConditionDidCancel];
 }
 
-// TODO: I will need to change this URL
-#define BREAKPOINT_CONDITION_SCRIPTING @"https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Conditional%20Breakpoints"
+#define BREAKPOINT_CONDITION_SCRIPTING @"https://github.com/zorgiepoo/Bit-Slicer/wiki/Setting-Breakpoints"
 - (IBAction)showHelp:(id)__unused sender
 {
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:BREAKPOINT_CONDITION_SCRIPTING]];
