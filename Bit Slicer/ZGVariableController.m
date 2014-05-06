@@ -75,8 +75,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		// We default to tabs in spite of Python standards since it's possible a user may have nothing but TextEdit installed
-		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGScriptIndentationUsingTabsKey : @YES, ZGScriptIndentationSpacesWidthKey : @4}];
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGScriptIndentationUsingTabsKey : @NO, ZGScriptIndentationSpacesWidthKey : @4}];
 	});
 }
 
