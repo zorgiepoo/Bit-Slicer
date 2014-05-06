@@ -95,6 +95,8 @@
 		779D56C618F1284200FD5408 /* ZGMemoryDumpRangeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 779D56C418F1284100FD5408 /* ZGMemoryDumpRangeWindowController.xib */; };
 		779D56CA18F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 779D56C818F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.m */; };
 		779D56CB18F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 779D56C918F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.xib */; };
+		77A5B03019189CC9002BEC69 /* BinarySearchTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77A5B02F19189CC9002BEC69 /* BinarySearchTest.m */; };
+		77A5B03119189DA5002BEC69 /* NSArrayAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1163717D2EF76009E002A /* NSArrayAdditions.m */; };
 		77C19AAF19158ABF0028F7F1 /* ZGPyUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 77C19AAE19158ABF0028F7F1 /* ZGPyUtilities.m */; };
 		77C19AB219158C190028F7F1 /* ZGPyKeyModModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77C19AB119158C190028F7F1 /* ZGPyKeyModModule.m */; };
 		77C19ABB1916E3C20028F7F1 /* hotkey.png in Resources */ = {isa = PBXBuildFile; fileRef = 77C19AB91916E3C20028F7F1 /* hotkey.png */; };
@@ -495,6 +497,7 @@
 		779D56C718F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryDumpAllWindowController.h; path = "Bit Slicer/ZGMemoryDumpAllWindowController.h"; sourceTree = "<group>"; };
 		779D56C818F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMemoryDumpAllWindowController.m; path = "Bit Slicer/ZGMemoryDumpAllWindowController.m"; sourceTree = "<group>"; };
 		779D56C918F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGMemoryDumpAllWindowController.xib; path = "Bit Slicer/ZGMemoryDumpAllWindowController.xib"; sourceTree = "<group>"; };
+		77A5B02F19189CC9002BEC69 /* BinarySearchTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BinarySearchTest.m; sourceTree = "<group>"; };
 		77C19AAD19158ABF0028F7F1 /* ZGPyUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyUtilities.h; path = "Bit Slicer/ZGPyUtilities.h"; sourceTree = "<group>"; };
 		77C19AAE19158ABF0028F7F1 /* ZGPyUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyUtilities.m; path = "Bit Slicer/ZGPyUtilities.m"; sourceTree = "<group>"; };
 		77C19AB019158C190028F7F1 /* ZGPyKeyModModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyKeyModModule.h; path = "Bit Slicer/ZGPyKeyModModule.h"; sourceTree = "<group>"; };
@@ -1168,6 +1171,7 @@
 		77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */ = {
 			isa = PBXGroup;
 			children = (
+				77A5B02F19189CC9002BEC69 /* BinarySearchTest.m */,
 				77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */,
 				77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */,
 				77E2BBA818FD88A700E41FA0 /* Supporting Files */,
@@ -1479,6 +1483,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77A5B03119189DA5002BEC69 /* NSArrayAdditions.m in Sources */,
 				77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */,
 				77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryHelpers.m in Sources */,
 				77E2BBD318FD900C00E41FA0 /* ZGProcess.m in Sources */,
@@ -1491,6 +1496,7 @@
 				77E2BBBA18FD8FC100E41FA0 /* _DDFunctionEvaluator.m in Sources */,
 				77E2BBBB18FD8FC100E41FA0 /* _DDFunctionExpression.m in Sources */,
 				77E2BBBC18FD8FC100E41FA0 /* _DDFunctionTerm.m in Sources */,
+				77A5B03019189CC9002BEC69 /* BinarySearchTest.m in Sources */,
 				77E2BBBD18FD8FC100E41FA0 /* _DDGroupTerm.m in Sources */,
 				77E2BBBE18FD8FC100E41FA0 /* _DDNumberExpression.m in Sources */,
 				77E2BBBF18FD8FC100E41FA0 /* _DDNumberTerm.m in Sources */,
