@@ -898,19 +898,20 @@
 	
 	else if (menuItem.action == @selector(freezeVariables:))
 	{
-		if (self.selectedVariables.count > 0)
+		NSArray *selectedVariables = self.selectedVariables;
+		if (selectedVariables.count > 0)
 		{
 			// All the variables selected need to either be all unfrozen or all frozen
-			BOOL isFrozen = [[self.selectedVariables objectAtIndex:0] isFrozen];
+			BOOL isFrozen = [[selectedVariables firstObject] isFrozen];
 			
-			menuItem.title = [NSString stringWithFormat:@"%@ Variable%@", isFrozen ? @"Unfreeze" : @"Freeze", self.selectedVariables.count != 1 ? @"s" : @""];
+			menuItem.title = [NSString stringWithFormat:@"%@ Variable%@", isFrozen ? @"Unfreeze" : @"Freeze", selectedVariables.count != 1 ? @"s" : @""];
 
 			if (!self.isClearable)
 			{
 				return NO;
 			}
 			
-			if ([[self.selectedVariables subarrayWithRange:NSMakeRange(1, self.selectedVariables.count-1)] zgHasObjectMatchingCondition:^(ZGVariable *variable) {
+			if ([selectedVariables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
 				return (BOOL)(variable.type == ZGScript || variable.isFrozen != isFrozen || variable.value == NULL);
 			}])
 			{
