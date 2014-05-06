@@ -1790,11 +1790,11 @@ enum ZGStepExecution
 - (ZGInstruction *)findInstructionInTableAtAddress:(ZGMemoryAddress)targetAddress
 {
 	ZGInstruction *foundInstruction = [self.instructions zgBinarySearchUsingBlock:^NSComparisonResult(__unsafe_unretained ZGInstruction *instruction) {
-		if (instruction.variable.address + instruction.variable.size < targetAddress)
+		if (targetAddress >= instruction.variable.address + instruction.variable.size)
 		{
 			return NSOrderedAscending;
 		}
-		else if (instruction.variable.address > targetAddress)
+		else if (targetAddress < instruction.variable.address)
 		{
 			return NSOrderedDescending;
 		}

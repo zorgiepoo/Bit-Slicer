@@ -83,27 +83,23 @@
 // our's first, their's later
 - (id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator
 {
-	if (self.count > 0)
+	NSUInteger end = self.count;
+	NSUInteger start = 0;
+	while (end > start)
 	{
-		NSUInteger maxIndex = self.count - 1;
-		NSUInteger minIndex = 0;
-		while (maxIndex >= minIndex)
+		NSUInteger middleIndex = start + (end - start) / 2; // writing this as (start + end) / 2 can fail for large values of start & end
+		id __unsafe_unretained object = [self objectAtIndex:middleIndex];
+		
+		switch (comparator(object))
 		{
-			NSUInteger middleIndex = (minIndex + maxIndex) / 2;
-			id __unsafe_unretained object = [self objectAtIndex:middleIndex];
-			
-			switch (comparator(object))
-			{
-				case NSOrderedAscending:
-					minIndex = middleIndex + 1;
-					break;
-				case NSOrderedDescending:
-					if (middleIndex == 0) return nil;
-					maxIndex = middleIndex - 1;
-					break;
-				case NSOrderedSame:
-					return object;
-			}
+			case NSOrderedAscending:
+				start = middleIndex + 1;
+				break;
+			case NSOrderedDescending:
+				end = middleIndex;
+				break;
+			case NSOrderedSame:
+				return object;
 		}
 	}
 	
