@@ -1353,28 +1353,20 @@ void ZGNarrowSearchWithFunctionStoredCompare(ZGRegion **lastUsedSavedRegionRefer
 		}
 		else
 		{
-			NSUInteger maxIndex = savedRegions.count - 1;
-			NSUInteger minIndex = 0;
-			
-			while (maxIndex >= minIndex)
-			{
-				NSUInteger middleIndex = (minIndex + maxIndex) / 2;
-				ZGRegion *region = [savedRegions objectAtIndex:middleIndex];
-				if (variableAddress < region.address)
+			newRegion = [savedRegions zgBinarySearchUsingBlock:^NSComparisonResult(__unsafe_unretained ZGRegion *region) {
+				if (variableAddress >= region.address + region.size)
 				{
-					if (middleIndex == 0) break;
-					maxIndex = middleIndex - 1;
+					return NSOrderedAscending;
 				}
-				else if (variableAddress >= region.address + region.size)
+				else if (variableAddress < region.address)
 				{
-					minIndex = middleIndex + 1;
+					return NSOrderedDescending;
 				}
 				else
 				{
-					newRegion = region;
-					break;
+					return NSOrderedSame;
 				}
-			}
+			}];
 		}
 		
 		if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
