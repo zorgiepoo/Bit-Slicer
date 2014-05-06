@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5053"/>
+        <deployment defaultVersion="1080" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDebuggerController">
@@ -90,18 +90,18 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <splitView autosaveName="" dividerStyle="thin" id="239">
-                        <rect key="frame" x="0.0" y="22" width="818" height="484"/>
+                        <rect key="frame" x="-1" y="21" width="820" height="486"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="cFD-3I-ALg">
-                                <rect key="frame" x="0.0" y="0.0" width="818" height="283"/>
+                                <rect key="frame" x="0.0" y="0.0" width="820" height="284"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <clipView key="contentView" id="QCs-yF-iGW">
-                                    <rect key="frame" x="1" y="17" width="816" height="265"/>
+                                    <rect key="frame" x="1" y="17" width="818" height="266"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA" customClass="ZGTableView">
-                                            <rect key="frame" x="0.0" y="0.0" width="816" height="265"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="818" height="266"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -145,7 +145,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                 </tableColumn>
-                                                <tableColumn identifier="symbols" editable="NO" width="158" minWidth="10" maxWidth="3.4028234663852886e+38" id="t9W-pd-V9s">
+                                                <tableColumn identifier="symbols" editable="NO" width="160" minWidth="10" maxWidth="3.4028234663852886e+38" id="t9W-pd-V9s">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Symbols">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -190,20 +190,20 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <tableHeaderView key="headerView" id="tpt-Jt-lnH">
-                                    <rect key="frame" x="0.0" y="0.0" width="816" height="17"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="818" height="17"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
                             <splitView autosaveName="" dividerStyle="thin" vertical="YES" id="246" userLabel="Registers/Backtrace SplitView">
-                                <rect key="frame" x="0.0" y="284" width="818" height="200"/>
+                                <rect key="frame" x="0.0" y="285" width="820" height="201"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <customView id="Bh5-To-vJR" userLabel="Backtrace View">
-                                        <rect key="frame" x="0.0" y="0.0" width="510" height="200"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="511" height="201"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     </customView>
                                     <customView id="YKc-8G-cFS" userLabel="Registers View">
-                                        <rect key="frame" x="511" y="0.0" width="307" height="200"/>
+                                        <rect key="frame" x="512" y="0.0" width="308" height="201"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     </customView>
                                 </subviews>
