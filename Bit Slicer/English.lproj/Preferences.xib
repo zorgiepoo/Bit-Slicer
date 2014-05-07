@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment defaultVersion="1070" identifier="macosx"/>
+        <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
@@ -32,7 +32,7 @@
                             <action selector="changePreferencesView:" target="-2" id="7Bn-K1-KRP"/>
                         </connections>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="EE190157-26A8-430B-93AF-571C57ED8B5C" explicitItemIdentifier="ZGDebuggerHotKeysIdentifier" label="Hot Keys" paletteLabel="Hot Keys" tag="1" image="hotkey" autovalidates="NO" selectable="YES" id="kgo-oj-XB3">
+                    <toolbarItem implicitItemIdentifier="EE190157-26A8-430B-93AF-571C57ED8B5C" explicitItemIdentifier="ZGDebuggerHotKeysIdentifier" label="Shortcuts" paletteLabel="Shortcuts" tag="1" image="hotkey" autovalidates="NO" selectable="YES" id="kgo-oj-XB3">
                         <nil key="toolTip"/>
                         <connections>
                             <action selector="changePreferencesView:" target="-2" id="YXV-iP-083"/>
