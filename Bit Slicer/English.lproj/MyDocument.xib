@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1070" identifier="macosx"/>
+        <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
@@ -199,15 +199,15 @@
                 <rect key="frame" x="0.0" y="0.0" width="760" height="255"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="10" verticalLineScroll="16" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="Iy4-iu-99I">
-                        <rect key="frame" x="-1" y="21" width="762" height="210"/>
+                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="10" verticalLineScroll="16" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="Iy4-iu-99I">
+                        <rect key="frame" x="-1" y="22" width="762" height="209"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="4wx-3S-yE8">
-                            <rect key="frame" x="1" y="17" width="760" height="192"/>
+                            <rect key="frame" x="0.0" y="17" width="762" height="192"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" emptySelection="NO" autosaveColumns="NO" rowHeight="14" headerView="FQj-2P-but" id="HbN-z0-Vcf" customClass="ZGTableView">
-                                    <rect key="frame" x="0.0" y="0.0" width="760" height="192"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="762" height="192"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -239,7 +239,7 @@
                                             </textFieldCell>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="value" width="196.109375" minWidth="76" maxWidth="20000" id="aom-rv-8rE">
+                                        <tableColumn identifier="value" width="198.109375" minWidth="76" maxWidth="20000" id="aom-rv-8rE">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Value">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -305,7 +305,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="FQj-2P-but">
-                            <rect key="frame" x="0.0" y="0.0" width="760" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="762" height="17"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
