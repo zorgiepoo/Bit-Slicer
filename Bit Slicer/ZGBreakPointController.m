@@ -377,6 +377,12 @@ static ZGBreakPointController *gBreakPointController;
 				ZGResumeTask(breakPoint.process.processTask);
 			}
 			
+			id <ZGBreakPointDelegate> delegate = breakPoint.delegate;
+			if ([delegate respondsToSelector:@selector(conditionalInstructionBreakPointWasRemoved)])
+			{
+				[delegate conditionalInstructionBreakPointWasRemoved];
+			}
+			
 			if (self.delayedTermination && self.breakPoints.count == 0)
 			{
 				[self.appTerminationState decreaseLifeCount];
@@ -402,7 +408,7 @@ static ZGBreakPointController *gBreakPointController;
 		}
 	}
 	
-	if (targetBreakPoint)
+	if (targetBreakPoint != nil)
 	{
 		[self removeInstructionBreakPoint:targetBreakPoint];
 	}

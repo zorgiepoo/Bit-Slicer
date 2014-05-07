@@ -44,4 +44,6 @@
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint;
 
+- (void)conditionalInstructionBreakPointWasRemoved;
+
 @end

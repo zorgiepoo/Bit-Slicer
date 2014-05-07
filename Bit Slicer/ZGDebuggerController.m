@@ -1688,6 +1688,11 @@ enum ZGStepExecution
 	[self.instructionsTableView reloadData];
 }
 
+- (void)conditionalInstructionBreakPointWasRemoved
+{
+	[self.instructionsTableView reloadData];
+}
+
 - (void)addBreakPointsToInstructions:(NSArray *)instructions
 {
 	NSMutableArray *changedInstructions = [[NSMutableArray alloc] init];
@@ -1710,7 +1715,10 @@ enum ZGStepExecution
 				}
 			}
 			
-			addedAtLeastOneBreakPoint = [self.breakPointController addBreakPointOnInstruction:instruction inProcess:self.currentProcess condition:compiledCondition delegate:self] || addedAtLeastOneBreakPoint;
+			if ([self.breakPointController addBreakPointOnInstruction:instruction inProcess:self.currentProcess condition:compiledCondition delegate:self])
+			{
+				addedAtLeastOneBreakPoint = YES;
+			}
 		}
 	}
 	
