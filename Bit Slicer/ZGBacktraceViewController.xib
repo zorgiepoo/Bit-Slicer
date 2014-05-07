@@ -36,21 +36,21 @@
                 </menuItem>
             </items>
         </menu>
-        <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="f9W-z4-OCY">
+        <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="f9W-z4-OCY">
             <rect key="frame" x="0.0" y="0.0" width="480" height="272"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <clipView key="contentView" id="hGO-DJ-0mU">
-                <rect key="frame" x="1" y="17" width="478" height="254"/>
+                <rect key="frame" x="0.0" y="17" width="480" height="255"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="IXw-3f-7mI" id="2u4-o9-abT">
-                        <rect key="frame" x="0.0" y="0.0" width="478" height="254"/>
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="255"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <size key="intercellSpacing" width="3" height="2"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                         <tableColumns>
-                            <tableColumn identifier="backtrace" editable="NO" width="475" minWidth="40" maxWidth="1000" id="4kh-yY-nSc">
+                            <tableColumn identifier="backtrace" editable="NO" width="477" minWidth="40" maxWidth="1000" id="4kh-yY-nSc">
                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Backtrace">
                                     <font key="font" metaFont="smallSystem"/>
                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -82,7 +82,7 @@
                 <autoresizingMask key="autoresizingMask"/>
             </scroller>
             <tableHeaderView key="headerView" id="IXw-3f-7mI">
-                <rect key="frame" x="0.0" y="0.0" width="478" height="17"/>
+                <rect key="frame" x="0.0" y="0.0" width="480" height="17"/>
                 <autoresizingMask key="autoresizingMask"/>
             </tableHeaderView>
         </scrollView>

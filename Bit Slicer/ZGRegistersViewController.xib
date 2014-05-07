@@ -23,15 +23,15 @@
                 </menuItem>
             </items>
         </menu>
-        <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="RzJ-lX-Jwa">
+        <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="RzJ-lX-Jwa">
             <rect key="frame" x="0.0" y="0.0" width="375" height="303"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <clipView key="contentView" id="tSA-6o-6DU">
-                <rect key="frame" x="1" y="17" width="373" height="285"/>
+                <rect key="frame" x="0.0" y="17" width="375" height="286"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" headerView="Qq9-Lv-82c" id="XOG-Zk-zEz">
-                        <rect key="frame" x="0.0" y="0.0" width="373" height="285"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="286"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <size key="intercellSpacing" width="3" height="2"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -50,7 +50,7 @@
                                 </textFieldCell>
                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                             </tableColumn>
-                            <tableColumn identifier="value" width="175" minWidth="40" maxWidth="1000" id="eDj-ed-Anz">
+                            <tableColumn identifier="value" width="177" minWidth="40" maxWidth="1000" id="eDj-ed-Anz">
                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Value">
                                     <font key="font" metaFont="smallSystem"/>
                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -105,7 +105,7 @@
                 <autoresizingMask key="autoresizingMask"/>
             </scroller>
             <tableHeaderView key="headerView" id="Qq9-Lv-82c">
-                <rect key="frame" x="0.0" y="0.0" width="373" height="17"/>
+                <rect key="frame" x="0.0" y="0.0" width="375" height="17"/>
                 <autoresizingMask key="autoresizingMask"/>
             </tableHeaderView>
         </scrollView>
