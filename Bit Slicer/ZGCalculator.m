@@ -94,7 +94,7 @@
 				}
 				else
 				{
-					foundAddress = [[ZGMachBinary machBinaryWithPartialImageName:expression.variable inProcess:process error:error] headerAddress];
+					foundAddress = [[ZGMachBinary machBinaryWithPartialImageName:expression.variable inProcess:process fromCachedMachBinaries:nil error:error] headerAddress];
 					
 					if (error != NULL && *error != nil)
 					{

@@ -252,7 +252,7 @@
 
 #pragma mark Finding Instructions
 
-+ (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process withBreakPoints:(NSArray *)breakPoints
++ (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process withBreakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries
 {
 	ZGInstruction *instruction = nil;
 	
@@ -276,7 +276,8 @@
 			startAddress = targetRegion.address;
 		}
 		
-		ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:address fromMachBinaries:[ZGMachBinary machBinariesInProcess:process]];
+		// If we can find a close starting address in a mach binary, we should use it, otherwise we may disassemble the first instruction in it incorrectly
+		ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:address fromMachBinaries:machBinaries];
 		ZGMemoryAddress firstInstructionAddress = [[machBinary machBinaryInfoInProcess:process] firstInstructionAddress];
 		
 		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
@@ -508,10 +509,11 @@ error:(NSError * __autoreleasing *)error
 	JUMP_REL32_INSTRUCTION_LENGTH :
 	INDIRECT_JUMP_INSTRUCTIONS_LENGTH;
 	
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:process];
 	NSMutableArray *instructions = [[NSMutableArray alloc] init];
 	while (consumedLength > 0)
 	{
-		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inProcess:process withBreakPoints:breakPoints];
+		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inProcess:process withBreakPoints:breakPoints machBinaries:machBinaries];
 		if (newInstruction == nil)
 		{
 			instructions = nil;

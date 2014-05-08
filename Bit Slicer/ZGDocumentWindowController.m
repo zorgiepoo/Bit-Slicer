@@ -1024,6 +1024,7 @@
 		menuItem.title = [NSString stringWithFormat:@"Relativize Variable%@", selectedVariables.count != 1 ? @"s" : @""];
 		
 		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+		ZGMachBinary *mainMachBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:machBinaries];
 		for (ZGVariable *variable in selectedVariables)
 		{
 			if (variable.type == ZGScript)
@@ -1043,7 +1044,7 @@
 			}
 			
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
-			if (machBinaryInfo.slide == 0 && machBinary.headerAddress == self.currentProcess.mainMachBinary.headerAddress)
+			if (machBinaryInfo.slide == 0 && machBinary.headerAddress == mainMachBinary.headerAddress)
 			{
 				return NO;
 			}

@@ -476,6 +476,8 @@ enum ZGStepExecution
 		
 		if (needsToUpdateWindow)
 		{
+			NSArray *machBinaries = nil;
+			
 			// Find a [start, end) range that we are allowed to remove from the table and insert in again with new instructions
 			// Pick start and end such that they are aligned with the assembly instructions
 			
@@ -486,7 +488,13 @@ enum ZGStepExecution
 				if (startRow == 0) break;
 				
 				ZGInstruction *instruction = [self.instructions objectAtIndex:startRow];
-				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+				
+				if (machBinaries == nil)
+				{
+					machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+				}
+				
+				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instruction.variable.address inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
 				
 				startRow--;
 				
@@ -503,7 +511,13 @@ enum ZGStepExecution
 			// Extend past first row if necessary
 			if (startRow == 0)
 			{
-				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+				if (machBinaries == nil)
+				{
+					machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+				}
+				
+				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
+				
 				if (searchedInstruction.variable.address + searchedInstruction.variable.size != startAddress)
 				{
 					startAddress = searchedInstruction.variable.address;
@@ -517,7 +531,13 @@ enum ZGStepExecution
 				if (endRow >= self.instructions.count) break;
 				
 				ZGInstruction *instruction = [self.instructions objectAtIndex:endRow];
-				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+				
+				if (machBinaries == nil)
+				{
+					machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+				}
+				
+				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instruction.variable.address + instruction.variable.size inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
 				
 				endRow++;
 				
@@ -534,7 +554,13 @@ enum ZGStepExecution
 			// Extend past last row if necessary
 			if (endRow >= self.instructions.count)
 			{
-				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:endInstruction.variable.address + endInstruction.variable.size inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+				if (machBinaries == nil)
+				{
+					machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+				}
+				
+				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:endInstruction.variable.address + endInstruction.variable.size inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
+				
 				if (endInstruction.variable.address != searchedInstruction.variable.address)
 				{
 					endAddress = searchedInstruction.variable.address + searchedInstruction.variable.size;
@@ -586,9 +612,17 @@ enum ZGStepExecution
 		return;
 	}
 	
+	NSArray *machBinaries = nil;
+	
 	while (startInstruction == nil && bytesBehind > 0)
 	{
-		startInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:endInstruction.variable.address - bytesBehind inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+		if (machBinaries == nil)
+		{
+			machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+		}
+		
+		startInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:endInstruction.variable.address - bytesBehind inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
+		
 		if (startInstruction.variable.address < self.instructionBoundary.location)
 		{
 			// Try again
@@ -630,7 +664,10 @@ enum ZGStepExecution
 - (void)addMoreInstructionsAfterLastRow
 {
 	ZGInstruction *lastInstruction = self.instructions.lastObject;
-	ZGInstruction *startInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+	
+	ZGInstruction *startInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
 	
 	if (startInstruction.variable.address + startInstruction.variable.size >= self.instructionBoundary.location +  self.instructionBoundary.length)
 	{
@@ -643,7 +680,8 @@ enum ZGStepExecution
 		NSUInteger bytesAhead = DESIRED_BYTES_TO_ADD_OFFSET;
 		while (endInstruction == nil && bytesAhead > 0)
 		{
-			endInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:(startInstruction.variable.address + startInstruction.variable.size + bytesAhead) inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+			endInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:(startInstruction.variable.address + startInstruction.variable.size + bytesAhead) inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
+			
 			if (endInstruction.variable.address + endInstruction.variable.size > self.instructionBoundary.location +  self.instructionBoundary.length)
 			{
 				// Try again
@@ -851,12 +889,15 @@ enum ZGStepExecution
 		return;
 	}
 	
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+	ZGMachBinary *mainMachBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:machBinaries];
+	
 	ZGMemoryAddress calculatedMemoryAddress = 0;
 
 	if (self.mappedFilePath != nil && sender == nil)
 	{
 		NSError *error = nil;
-		ZGMemoryAddress guessAddress = [[ZGMachBinary machBinaryWithPartialImageName:self.mappedFilePath inProcess:self.currentProcess error:&error] headerAddress] + self.offsetFromBase;
+		ZGMemoryAddress guessAddress = [[ZGMachBinary machBinaryWithPartialImageName:self.mappedFilePath inProcess:self.currentProcess fromCachedMachBinaries:machBinaries error:&error] headerAddress] + self.offsetFromBase;
 		
 		if (error == nil)
 		{
@@ -884,7 +925,7 @@ enum ZGStepExecution
 	
 	BOOL shouldUseFirstInstruction = NO;
 	
-	ZGMachBinaryInfo *firstMachBinaryInfo = [self.currentProcess.mainMachBinary machBinaryInfoInProcess:self.currentProcess];
+	ZGMachBinaryInfo *firstMachBinaryInfo = [mainMachBinary machBinaryInfoInProcess:self.currentProcess];
 	NSRange machInstructionRange = NSMakeRange(firstMachBinaryInfo.firstInstructionAddress, firstMachBinaryInfo.totalSegmentRange.length - (firstMachBinaryInfo.firstInstructionAddress - firstMachBinaryInfo.totalSegmentRange.location));
 	
 	if (calculatedMemoryAddress == 0)
@@ -942,7 +983,6 @@ enum ZGStepExecution
 	
 	if (!shouldUseFirstInstruction)
 	{
-		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 		ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:calculatedMemoryAddress fromMachBinaries:machBinaries];
 		ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:self.currentProcess];
 		NSRange instructionRange = NSMakeRange(machBinaryInfo.firstInstructionAddress, machBinaryInfo.totalSegmentRange.length - (machBinaryInfo.firstInstructionAddress - machBinaryInfo.totalSegmentRange.location));
@@ -971,8 +1011,8 @@ enum ZGStepExecution
 	{
 		firstInstructionAddress = calculatedMemoryAddress;
 		maxInstructionsSize = machInstructionRange.length - (calculatedMemoryAddress - machInstructionRange.location);
-		mappedFilePath = [self.currentProcess.mainMachBinary filePathInProcess:self.currentProcess];
-		baseAddress = self.currentProcess.mainMachBinary.headerAddress;
+		mappedFilePath = [mainMachBinary filePathInProcess:self.currentProcess];
+		baseAddress = mainMachBinary.headerAddress;
 	}
 	
 	self.mappedFilePath = mappedFilePath;
@@ -992,7 +1032,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		lowBoundAddress = [ZGDebuggerUtilities findInstructionBeforeAddress:lowBoundAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints].variable.address;
+		lowBoundAddress = [ZGDebuggerUtilities findInstructionBeforeAddress:lowBoundAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries].variable.address;
 		if (lowBoundAddress < firstInstructionAddress)
 		{
 			lowBoundAddress = firstInstructionAddress;
@@ -1006,7 +1046,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		highBoundAddress = [ZGDebuggerUtilities findInstructionBeforeAddress:highBoundAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints].variable.address;
+		highBoundAddress = [ZGDebuggerUtilities findInstructionBeforeAddress:highBoundAddress inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries].variable.address;
 		if (highBoundAddress <= chosenRegion.address || highBoundAddress > chosenRegion.address + chosenRegion.size)
 		{
 			highBoundAddress = chosenRegion.address + chosenRegion.size;
@@ -1107,7 +1147,9 @@ enum ZGStepExecution
 		return NO;
 	}
 	
-	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+	
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
 	if (!currentInstruction)
 	{
 		return NO;
@@ -1115,7 +1157,7 @@ enum ZGStepExecution
 	
 	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
 	{
-		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
 		if (!nextInstruction)
 		{
 			return NO;
@@ -1138,7 +1180,7 @@ enum ZGStepExecution
 	}
 	
 	ZGInstruction *outterInstruction = [self.backtraceViewController.backtrace.instructions objectAtIndex:1];
-	ZGInstruction *returnInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	ZGInstruction *returnInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:outterInstruction.variable.address + outterInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self.currentProcess]];
 	
 	if (!returnInstruction)
 	{
@@ -1849,7 +1891,7 @@ enum ZGStepExecution
 
 - (void)updateBacktrace
 {
-	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.instructionPointer process:self.currentProcess breakPoints:self.breakPointController.breakPoints];
+	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.instructionPointer process:self.currentProcess breakPoints:self.breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self.currentProcess]];
 	
 	if ([self shouldUpdateSymbolsForInstructions:backtrace.instructions])
 	{
@@ -1985,10 +2027,13 @@ enum ZGStepExecution
 
 - (IBAction)stepOver:(id)__unused sender
 {
-	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+	
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:self.registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
+	
 	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
 	{
-		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
 		
 		if ([self.breakPointController addBreakPointOnInstruction:nextInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:self.registersViewController.basePointer delegate:self])
 		{
@@ -2008,7 +2053,8 @@ enum ZGStepExecution
 - (IBAction)stepOut:(id)__unused sender
 {
 	ZGInstruction *outerInstruction = [self.backtraceViewController.backtrace.instructions objectAtIndex:1];
-	ZGInstruction *returnInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:outerInstruction.variable.address + outerInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints];
+	
+	ZGInstruction *returnInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:outerInstruction.variable.address + outerInstruction.variable.size + 1 inProcess:self.currentProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self.currentProcess]];
 
 	if ([self.breakPointController addBreakPointOnInstruction:returnInstruction inProcess:self.currentProcess thread:self.currentBreakPoint.thread basePointer:[[self.backtraceViewController.backtrace.basePointers objectAtIndex:1] unsignedLongLongValue] delegate:self])
 	{

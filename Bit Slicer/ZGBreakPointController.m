@@ -67,6 +67,7 @@
 #import "ZGUtilities.h"
 #import "NSArrayAdditions.h"
 #import "ZGRegisterEntries.h"
+#import "ZGMachBinary.h"
 #import "ZGAppTerminationState.h"
 
 #import <mach/task.h>
@@ -475,7 +476,8 @@ static ZGBreakPointController *gBreakPointController;
 			NSNumber *existingInstructionAddress = [breakPoint.cacheDictionary objectForKey:instructionPointerNumber];
 			if (existingInstructionAddress == nil)
 			{
-				ZGInstruction *foundInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:self.breakPoints];
+				NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:breakPoint.process];
+				ZGInstruction *foundInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:self.breakPoints machBinaries:machBinaries];
 				foundInstructionAddress = foundInstruction.variable.address;
 				[breakPoint.cacheDictionary setObject:@(foundInstructionAddress) forKey:instructionPointerNumber];
 			}

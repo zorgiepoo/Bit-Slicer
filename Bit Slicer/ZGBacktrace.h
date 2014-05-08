@@ -39,8 +39,8 @@
 
 @interface ZGBacktrace : NSObject
 
-+ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints;
-+ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved;
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries;
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved;
 
 @property (nonatomic, readonly) NSArray *instructions;
 @property (nonatomic, readonly) NSArray *basePointers;

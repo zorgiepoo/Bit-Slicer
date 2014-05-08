@@ -47,6 +47,7 @@
 #import "ZGVariableController.h"
 #import "ZGUtilities.h"
 #import "ZGRegisterEntries.h"
+#import "ZGMachBinary.h"
 #import "ZGNavigationPost.h"
 
 @interface ZGWatchVariableWindowController ()
@@ -245,7 +246,8 @@
 	
 	[self.foundBreakPointAddresses addObject:instructionAddressNumber];
 	
-	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddress inProcess:self.watchProcess withBreakPoints:self.breakPointController.breakPoints];
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.watchProcess];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddress inProcess:self.watchProcess withBreakPoints:self.breakPointController.breakPoints machBinaries:machBinaries];
 	
 	if (instruction == nil)
 	{

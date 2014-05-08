@@ -246,7 +246,6 @@ PyObject *gVirtualMemoryException;
 		vmObject->processTask = process.processTask;
 		vmObject->processIdentifier = process.processID;
 		vmObject->is64Bit = process.is64Bit;
-		vmObject->baseAddress = process.mainMachBinary.headerAddress;
 		
 		if (shouldCopyProcess)
 		{
@@ -680,11 +679,19 @@ static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
 	if (PyArg_ParseTuple(args, "|s:base", &partialPath))
 	{
 		NSError *error = nil;
-		ZGMemoryAddress imageAddress = self->baseAddress;
+		ZGMemoryAddress imageAddress;
 		
 		if (partialPath != NULL)
 		{
-			imageAddress = [[ZGMachBinary machBinaryWithPartialImageName:[NSString stringWithUTF8String:partialPath] inProcess:self->objcSelf.process error:&error] headerAddress];
+			imageAddress = [[ZGMachBinary machBinaryWithPartialImageName:[NSString stringWithUTF8String:partialPath] inProcess:self->objcSelf.process fromCachedMachBinaries:nil error:&error] headerAddress];
+		}
+		else
+		{
+			if (self->baseAddress == 0)
+			{
+				self->baseAddress = [[ZGMachBinary mainMachBinaryFromMachBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf.process]] headerAddress];
+			}
+			imageAddress = self->baseAddress;
 		}
 		
 		if (error == nil)

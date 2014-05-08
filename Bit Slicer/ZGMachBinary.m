@@ -136,6 +136,11 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	return [machBinaries sortedArrayUsingSelector:@selector(compare:)];
 }
 
++ (instancetype)mainMachBinaryFromMachBinaries:(NSArray *)machBinaries
+{
+	return machBinaries.firstObject;
+}
+
 + (instancetype)machBinaryNearestToAddress:(ZGMemoryAddress)address fromMachBinaries:(NSArray *)machBinaries
 {
 	ZGMachBinary *previousMachBinary = nil;
@@ -150,14 +155,19 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	return previousMachBinary;
 }
 
-+ (instancetype)machBinaryWithPartialImageName:(NSString *)partialImageName inProcess:(ZGProcess *)process error:(NSError * __autoreleasing *)error
++ (instancetype)machBinaryWithPartialImageName:(NSString *)partialImageName inProcess:(ZGProcess *)process fromCachedMachBinaries:(NSArray *)machBinaries error:(NSError * __autoreleasing *)error
 {
 	NSMutableDictionary *mappedPathDictionary = [process.cacheDictionary objectForKey:ZGMachBinaryPathToBinaryDictionary];
 	ZGMachBinary *foundMachBinary = [mappedPathDictionary objectForKey:partialImageName];
 	
 	if (foundMachBinary == nil)
 	{
-		for (ZGMachBinary *machBinary in [self machBinariesInProcess:process])
+		if (machBinaries == nil)
+		{
+			machBinaries = [self machBinariesInProcess:process];
+		}
+		
+		for (ZGMachBinary *machBinary in machBinaries)
 		{
 			NSString *mappedFilePath = [machBinary filePathInProcess:process];
 			if ([mappedFilePath hasSuffix:partialImageName])

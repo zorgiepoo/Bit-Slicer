@@ -36,6 +36,7 @@
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
 #import "ZGDebuggerUtilities.h"
+#import "ZGMachBinary.h"
 #import "ZGVirtualMemory.h"
 
 @interface ZGBacktrace ()
@@ -58,12 +59,12 @@
 	return self;
 }
 
-+ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved
 {
 	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
 	
-	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer+1 inProcess:process withBreakPoints:breakPoints];
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer+1 inProcess:process withBreakPoints:breakPoints machBinaries:machBinaries];
 	if (currentInstruction != nil)
 	{
 		[newInstructions addObject:currentInstruction];
@@ -94,7 +95,7 @@
 			
 			ZGFreeBytes(returnAddressBytes, returnAddressSize);
 			
-			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints];
+			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints machBinaries:machBinaries];
 			if (instruction == nil)
 			{
 				break;
@@ -131,9 +132,9 @@
 	return [[ZGBacktrace alloc] initWithInstructions:newInstructions basePointers:newBasePointers];
 }
 
-+ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries
 {
-	return [self backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:process breakPoints:breakPoints maxLimit:0];
+	return [self backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:process breakPoints:breakPoints machBinaries:machBinaries maxLimit:0];
 }
 
 @end

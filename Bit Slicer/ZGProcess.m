@@ -218,11 +218,7 @@
 {
 	if (_mainMachBinary == nil)
 	{
-		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self];
-		if (machBinaries.count > 0)
-		{
-			_mainMachBinary = [machBinaries objectAtIndex:0];
-		}
+		_mainMachBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:[ZGMachBinary machBinariesInProcess:self]];
 	}
 	return _mainMachBinary;
 }

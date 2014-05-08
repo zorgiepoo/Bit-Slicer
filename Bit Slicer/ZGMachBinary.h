@@ -46,8 +46,9 @@ extern NSString * const ZGFailedImageName;
 
 + (instancetype)dynamicLinkerMachBinaryInProcess:(ZGProcess *)process;
 + (NSArray *)machBinariesInProcess:(ZGProcess *)process;
++ (instancetype)mainMachBinaryFromMachBinaries:(NSArray *)machBinaries;
 + (instancetype)machBinaryNearestToAddress:(ZGMemoryAddress)address fromMachBinaries:(NSArray *)machBinaries;
-+ (instancetype)machBinaryWithPartialImageName:(NSString *)partialImageName inProcess:(ZGProcess *)process error:(NSError * __autoreleasing *)error;
++ (instancetype)machBinaryWithPartialImageName:(NSString *)partialImageName inProcess:(ZGProcess *)process fromCachedMachBinaries:(NSArray *)machBinaries error:(NSError * __autoreleasing *)error;
 
 - (id)initWithHeaderAddress:(ZGMemoryAddress)headerAddress filePathAddress:(ZGMemoryAddress)filePathAddress;
 
