@@ -44,6 +44,7 @@ typedef id (^zg_map_t)(id __unsafe_unretained oldObject);
 - (NSArray *)zgFilterUsingBlock:(zg_array_filter_t)shouldKeep;
 - (NSArray *)zgMapUsingBlock:(zg_map_t)map;
 
+- (id)zgFirstObjectThatMatchesCondition:(zg_array_filter_t)matchingCondition;
 - (BOOL)zgHasObjectMatchingCondition:(zg_array_filter_t)matchingCondition;
 - (BOOL)zgAllObjectsMatchingCondition:(zg_array_filter_t)matchingCondition;
 

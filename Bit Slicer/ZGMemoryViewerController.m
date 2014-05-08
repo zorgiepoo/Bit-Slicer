@@ -46,6 +46,7 @@
 #import "ZGRegion.h"
 #import "ZGNavigationPost.h"
 #import "ZGVariableController.h"
+#import "NSArrayAdditions.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -381,7 +382,7 @@
 		return;
 	}
 	
-	NSArray *memoryRegions = [ZGRegion regionsFromProcessTaskRecursively:self.currentProcess.processTask];
+	NSArray *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
 	if (memoryRegions.count == 0)
 	{
 		cleanupOnSuccess(NO);
@@ -391,13 +392,15 @@
 	ZGRegion *chosenRegion = nil;
 	if (desiredMemoryAddress != 0)
 	{
-		for (ZGRegion *region in memoryRegions)
+		chosenRegion = [memoryRegions zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
+			return (BOOL)((region.protection & VM_PROT_READ) != 0 && (desiredMemoryAddress >= region.address && desiredMemoryAddress < region.address + region.size));
+		}];
+		
+		if (chosenRegion != nil)
 		{
-			if ((region.protection & VM_PROT_READ) && desiredMemoryAddress >= region.address && desiredMemoryAddress < region.address + region.size)
-			{
-				chosenRegion = region;
-				break;
-			}
+			chosenRegion = [[ZGRegion submapRegionsFromProcessTask:self.currentProcess.processTask region:chosenRegion] zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
+				return (BOOL)((region.protection & VM_PROT_READ) != 0 && (desiredMemoryAddress >= region.address && desiredMemoryAddress < region.address + region.size));
+			}];
 		}
 	}
 	

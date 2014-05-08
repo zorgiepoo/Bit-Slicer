@@ -96,6 +96,52 @@
 	return [NSArray arrayWithArray:regions];
 }
 
++ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region
+{
+	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	
+	ZGMemoryAddress address = region.address;
+	ZGMemorySize size = region.size; // possibly not necessary to initialize
+	vm_region_submap_info_data_64_t info;
+	mach_msg_type_number_t infoCount;
+	natural_t depth = 0;
+	
+	while (YES)
+	{
+		infoCount = VM_REGION_SUBMAP_INFO_COUNT_64;
+		
+		if (mach_vm_region_recurse(processTask, &address, &size, &depth, (vm_region_recurse_info_t)&info, &infoCount) != KERN_SUCCESS)
+		{
+			break;
+		}
+		
+		if (info.is_submap)
+		{
+			depth++;
+		}
+		else
+		{
+			if (address >= region.address && address + size <= region.address + region.size)
+			{
+				[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection]];
+			
+				address += size;
+				
+				if (address >= region.address + region.size)
+				{
+					break;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+	
+	return regions;
+}
+
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection
 {
 	self = [super init];

@@ -45,6 +45,7 @@
 
 + (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask;
 + (NSArray *)regionsFromProcessTaskRecursively:(ZGMemoryMap)processTask;
++ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
 
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection;
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;

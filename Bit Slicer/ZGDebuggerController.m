@@ -953,21 +953,24 @@ enum ZGStepExecution
 		return;
 	}
 	
-	NSArray *memoryRegions = [ZGRegion regionsFromProcessTaskRecursively:self.currentProcess.processTask];
+	NSArray *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
 	if (memoryRegions.count == 0)
 	{
 		cleanupOnFailure();
 		return;
 	}
 	
-	ZGRegion *chosenRegion = nil;
-	for (ZGRegion *region in memoryRegions)
+	ZGRegion *chosenRegion = [memoryRegions zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
+		return (BOOL)((region.protection & VM_PROT_READ) != 0 && (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size));
+	}];
+	
+	if (chosenRegion != nil)
 	{
-		if ((region.protection & VM_PROT_READ) && (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size))
-		{
-			chosenRegion = region;
-			break;
-		}
+		NSArray *submapRegions =  [ZGRegion submapRegionsFromProcessTask:self.currentProcess.processTask region:chosenRegion];
+		
+		chosenRegion = [submapRegions zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
+			return (BOOL)((region.protection & VM_PROT_READ) != 0 && (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size));
+		}];
 	}
 	
 	if (chosenRegion == nil)

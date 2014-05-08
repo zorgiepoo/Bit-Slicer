@@ -63,6 +63,18 @@
 	return newResults;
 }
 
+- (id)zgFirstObjectThatMatchesCondition:(zg_array_filter_t)matchingCondition
+{
+	for (id item in self)
+	{
+		if (matchingCondition(item))
+		{
+			return item;
+		}
+	}
+	return nil;
+}
+
 - (BOOL)zgHasObjectMatchingCondition:(zg_array_filter_t)matchingCondition
 {
 	for (id item in self)
