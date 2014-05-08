@@ -55,34 +55,60 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	ZGMachBinary *dylinkerBinary = nil;
 	for (ZGRegion *region in [ZGRegion regionsFromProcessTask:process.processTask])
 	{
+		if ((region.protection & VM_PROT_READ) == 0)
+		{
+			continue;
+		}
+		
+		struct mach_header_64 *machHeader = NULL;
+		ZGMemoryAddress machHeaderAddress = region.address;
+		ZGMemorySize machHeaderSize = sizeof(*machHeader);
+		
+		if (!ZGReadBytes(processTask, machHeaderAddress, (void **)&machHeader, &machHeaderSize))
+		{
+			continue;
+		}
+		
+		BOOL foundPotentialDylinkerMatch = (machHeaderSize >= sizeof(*machHeader)) && ((machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64) && machHeader->filetype == MH_DYLINKER);
+		
+		ZGFreeBytes(machHeader, machHeaderSize);
+		
+		if (!foundPotentialDylinkerMatch)
+		{
+			continue;
+		}
+		
 		ZGMemoryAddress regionAddress = region.address;
 		ZGMemorySize regionSize = region.size;
 		void *regionBytes = NULL;
-		if (ZGReadBytes(processTask, regionAddress, &regionBytes, &regionSize))
+		
+		if (!ZGReadBytes(processTask, regionAddress, &regionBytes, &regionSize))
 		{
-			struct mach_header_64 *machHeader = regionBytes;
-			if ((machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64) && machHeader->filetype == MH_DYLINKER)
-			{
-				void *bytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
-				for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
-				{
-					struct dylinker_command *dylinkerCommand = bytes;
-					
-					if (dylinkerCommand->cmd == LC_ID_DYLINKER || dylinkerCommand->cmd == LC_LOAD_DYLINKER)
-					{
-						dylinkerBinary =
-						[[ZGMachBinary alloc]
-						 initWithHeaderAddress:regionAddress
-						 filePathAddress:regionAddress + dylinkerCommand->name.offset + (ZGMemoryAddress)((uint8_t *)dylinkerCommand - (uint8_t *)regionBytes)];
-						
-						break;
-					}
-					
-					bytes += dylinkerCommand->cmdsize;
-				}
-			}
-			ZGFreeBytes(regionBytes, regionSize);
+			continue;
 		}
+		
+		machHeader = regionBytes;
+		void *bytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
+		
+		for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
+		{
+			struct dylinker_command *dylinkerCommand = bytes;
+			
+			if (dylinkerCommand->cmd == LC_ID_DYLINKER || dylinkerCommand->cmd == LC_LOAD_DYLINKER)
+			{
+				dylinkerBinary =
+				[[ZGMachBinary alloc]
+				 initWithHeaderAddress:regionAddress
+				 filePathAddress:regionAddress + dylinkerCommand->name.offset + (ZGMemoryAddress)((uint8_t *)dylinkerCommand - (uint8_t *)regionBytes)];
+				
+				break;
+			}
+			
+			bytes += dylinkerCommand->cmdsize;
+		}
+		
+		ZGFreeBytes(regionBytes, regionSize);
+		
 		if (dylinkerBinary != nil)
 		{
 			break;
