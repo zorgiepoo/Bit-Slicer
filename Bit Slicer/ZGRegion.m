@@ -63,7 +63,7 @@
 	return [NSArray arrayWithArray:regions];
 }
 
-+ (NSArray *)regionsFromProcessTaskRecursively:(ZGMemoryMap)processTask
++ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask
 {
 	NSMutableArray *regions = [[NSMutableArray alloc] init];
 	

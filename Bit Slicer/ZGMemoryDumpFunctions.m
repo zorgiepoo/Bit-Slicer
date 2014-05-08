@@ -64,7 +64,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 	
 	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
 	
-	NSArray *regions = [ZGRegion regionsFromProcessTaskRecursively:processTask];
+	NSArray *regions = [ZGRegion submapRegionsFromProcessTask:processTask];
 	
 	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryDumping maxProgress:regions.count];
 	
