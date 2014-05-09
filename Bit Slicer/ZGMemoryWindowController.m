@@ -305,6 +305,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	else if (object == [NSWorkspace sharedWorkspace])
 	{
 		NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
+		NSArray *currentRunningProcesses = self.processList.runningProcesses;
 		
 		// ZGProcessList may report processes to us faster than NSRunningApplication can ocasionally
 		// So be sure to get updated localized name and icon
@@ -318,6 +319,14 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 					representedProcess.name = runningApplication.localizedName;
 					ZGUpdateProcessMenuItem(menuItem, runningApplication.localizedName, runningApplication.processIdentifier, runningApplication.icon);
 					break;
+				}
+			}
+			
+			for (ZGRunningProcess *runningProcess in currentRunningProcesses)
+			{
+				if (runningProcess.processIdentifier == runningProcess.processIdentifier)
+				{
+					[runningProcess invalidateAppInfoCache];
 				}
 			}
 		}

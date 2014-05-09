@@ -44,6 +44,12 @@
 @end
 
 @implementation ZGRunningProcess
+{
+	NSApplicationActivationPolicy _activationPolicy;
+	NSImage *_icon;
+	NSString *_name;
+	BOOL _didFetchInfo;
+}
 
 #pragma mark Birth
 
@@ -73,22 +79,49 @@
 
 #pragma mark On-the-fly Accessors
 
+- (void)fetchRunningApplicationInfo
+{
+	if (!_didFetchInfo)
+	{
+		NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier];
+		if (runningApplication != nil)
+		{
+			self->_activationPolicy = runningApplication.activationPolicy;
+			self->_icon = runningApplication.icon;
+			self->_name = runningApplication.localizedName;
+		}
+		else
+		{
+			self->_activationPolicy = NSApplicationActivationPolicyProhibited;
+			self->_icon = [NSImage imageNamed:@"NSDefaultApplicationIcon"];
+			self->_name = self.internalName;
+		}
+		
+		_didFetchInfo = YES;
+	}
+}
+
+- (void)invalidateAppInfoCache
+{
+	_didFetchInfo = NO;
+}
+
 - (NSApplicationActivationPolicy)activationPolicy
 {
-	NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier];
-	return runningApplication != nil ? runningApplication.activationPolicy : NSApplicationActivationPolicyProhibited;
+	[self fetchRunningApplicationInfo];
+	return _activationPolicy;
 }
 
 - (NSImage *)icon
 {
-	NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier];
-	return runningApplication != nil ? runningApplication.icon : [NSImage imageNamed:@"NSDefaultApplicationIcon"];
+	[self fetchRunningApplicationInfo];
+	return _icon;
 }
 
 - (NSString *)name
 {
-	NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier];
-	return runningApplication != nil ? runningApplication.localizedName : self.internalName;
+	[self fetchRunningApplicationInfo];
+	return _name;
 }
 
 @end

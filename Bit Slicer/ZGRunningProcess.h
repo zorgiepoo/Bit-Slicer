@@ -39,6 +39,8 @@
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier is64Bit:(BOOL)is64Bit internalName:(NSString *)name;
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier;
 
+- (void)invalidateAppInfoCache;
+
 @property (readonly, nonatomic) pid_t processIdentifier;
 @property (copy, nonatomic) NSString *internalName;
 @property (readonly, nonatomic) NSString *name;
