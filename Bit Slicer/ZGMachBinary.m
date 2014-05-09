@@ -53,7 +53,8 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 {
 	ZGMemoryMap processTask = process.processTask;
 	ZGMachBinary *dylinkerBinary = nil;
-	for (ZGRegion *region in [ZGRegion regionsFromProcessTask:process.processTask])
+	// dyld is usually near the end, so it'll be faster to iterate backwards
+	for (ZGRegion *region in [[ZGRegion regionsFromProcessTask:process.processTask] reverseObjectEnumerator])
 	{
 		if ((region.protection & VM_PROT_READ) == 0)
 		{
