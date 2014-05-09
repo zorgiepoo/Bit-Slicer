@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1070" identifier="macosx"/>
+        <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
@@ -64,7 +64,7 @@
                     <toolbarItem implicitItemIdentifier="7AD14AA0-A832-40BF-890E-22C1420E5869" label="Target" paletteLabel="Target" id="2oH-t9-bYi">
                         <nil key="toolTip"/>
                         <size key="minSize" width="145" height="25"/>
-                        <size key="maxSize" width="145" height="25"/>
+                        <size key="maxSize" width="195" height="25"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="fPm-5I-zjY">
                             <rect key="frame" x="0.0" y="14" width="145" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
