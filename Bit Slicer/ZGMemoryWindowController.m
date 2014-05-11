@@ -90,10 +90,13 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 - (void)dealloc
 {
-	[[NSNotificationCenter defaultCenter]
-	 removeObserver:self
-	 name:NSWindowDidChangeOcclusionStateNotification
-	 object:nil];
+	if ([self.window respondsToSelector:@selector(occlusionState)])
+	{
+		[[NSNotificationCenter defaultCenter]
+		 removeObserver:self
+		 name:NSWindowDidChangeOcclusionStateNotification
+		 object:nil];
+	}
 	
 	[[NSWorkspace sharedWorkspace]
 	 removeObserver:self
