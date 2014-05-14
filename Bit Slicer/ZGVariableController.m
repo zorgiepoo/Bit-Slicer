@@ -423,14 +423,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		NSString *scriptValue =
 		@"#Edit Me!\n"
 		@"#Introduction to scripting: https://github.com/zorgiepoo/Bit-Slicer/wiki/Introduction-to-Scripting\n"
-		@"import bitslicer\n\n"
+		@"from bitslicer import VirtualMemoryError, DebuggerError\n\n"
 		@"class Script(object):\n"
 		@"`def __init__(self):\n"
-		@"``debug.log('Initialization goes here')\n"
+		@"``debug.log('Initialization..')\n"
 		@"`#def execute(self, deltaTime):\n"
-		@"``#write some interesting code, or don't implement me\n"
+		@"``#write some interesting code, or not\n"
 		@"`def finish(self):\n"
-		@"``debug.log('Cleaning up goes here')\n";
+		@"``debug.log('Cleaning up..')\n";
 		
 		variable.scriptValue = [scriptValue stringByReplacingOccurrencesOfString:@"`" withString:indentationString];
 	}
