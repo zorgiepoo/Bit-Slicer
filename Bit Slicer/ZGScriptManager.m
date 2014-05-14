@@ -44,6 +44,7 @@
 #import "ZGBreakPoint.h"
 #import "ZGProcess.h"
 #import "ZGPyMainModule.h"
+#import "ZGPyVMProtModule.h"
 #import "ZGSearchProgress.h"
 #import "ZGTableView.h"
 #import "ZGUtilities.h"
@@ -118,6 +119,7 @@ static PyObject *gStructObject;
 		
 		loadKeyCodePythonModule();
 		loadKeyModPythonModule();
+		loadVMProtPythonModule();
 		
 		gCtypesObject = PyImport_ImportModule("ctypes");
 		gStructObject = PyImport_ImportModule("struct");

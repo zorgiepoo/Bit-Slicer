@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
 		770F283F18827D1B001B828C /* ZGBreakPointConditionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 770F283D18827D1B001B828C /* ZGBreakPointConditionViewController.xib */; };
 		770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F284118832132001B828C /* ZGBreakPointCondition.m */; };
@@ -242,6 +243,8 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		770136E8192309740072A192 /* ZGPyVMProtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyVMProtModule.h; path = "Bit Slicer/ZGPyVMProtModule.h"; sourceTree = "<group>"; };
+		770136E9192309740072A192 /* ZGPyVMProtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyVMProtModule.m; path = "Bit Slicer/ZGPyVMProtModule.m"; sourceTree = "<group>"; };
 		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; };
 		770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGBreakPointConditionViewController.m; path = "Bit Slicer/ZGBreakPointConditionViewController.m"; sourceTree = "<group>"; };
 		770F283D18827D1B001B828C /* ZGBreakPointConditionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGBreakPointConditionViewController.xib; path = "Bit Slicer/ZGBreakPointConditionViewController.xib"; sourceTree = "<group>"; };
@@ -928,6 +931,8 @@
 				774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */,
 				77C19AB019158C190028F7F1 /* ZGPyKeyModModule.h */,
 				77C19AB119158C190028F7F1 /* ZGPyKeyModModule.m */,
+				770136E8192309740072A192 /* ZGPyVMProtModule.h */,
+				770136E9192309740072A192 /* ZGPyVMProtModule.m */,
 				77C19AAD19158ABF0028F7F1 /* ZGPyUtilities.h */,
 				77C19AAE19158ABF0028F7F1 /* ZGPyUtilities.m */,
 				77F1160717D2EEC0009E002A /* ZGPyVirtualMemory.h */,
@@ -1595,6 +1600,7 @@
 				7735B05518DAB3E8000371AA /* ZGMemoryNavigationWindowController.m in Sources */,
 				771A3F4518CC0B0900D19676 /* ZGDocumentController.m in Sources */,
 				77F1161817D2EEF6009E002A /* ZGSearchFunctions.mm in Sources */,
+				770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */,
 				77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */,
 				77F1162217D2EF28009E002A /* ZGVirtualMemoryHelpers.m in Sources */,
 				77F1162517D2EF31009E002A /* ZGRegion.m in Sources */,

@@ -95,6 +95,8 @@ declareVMPrototypeMethod(writeString16)
 declareVMPrototypeMethod(writePointer)
 declareVMPrototypeMethod(writeBytes)
 
+declareVMPrototypeMethod(protect)
+
 declareVMPrototypeMethod(pause)
 declareVMPrototypeMethod(unpause)
 
@@ -140,6 +142,8 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareVMMethod(writeString16)
 	declareVMMethod(writePointer)
 	declareVMMethod(writeBytes)
+	
+	declareVMMethod(protect)
 	
 	declareVMMethod2(pause, METH_NOARGS)
 	declareVMMethod2(unpause, METH_NOARGS)
@@ -551,6 +555,25 @@ static PyObject *VirtualMemory_writeString16(VirtualMemory *self, PyObject *args
 {
 	int16_t nullByte = 0;
 	return writeString(self, args, &nullByte, sizeof(nullByte), "writeString16");
+}
+
+static PyObject *VirtualMemory_protect(VirtualMemory *self, PyObject *args)
+{
+	ZGMemoryAddress address = 0x0;
+	ZGMemorySize size = 0x0;
+	ZGMemoryProtection protection = VM_PROT_NONE;
+	if (!PyArg_ParseTuple(args, "KKi:protect", &address, &size, &protection))
+	{
+		return NULL;
+	}
+	
+	if (!ZGProtect(self->processTask, address, size, protection))
+	{
+		PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.protect failed to protect 0x%llX - 0x%llX", address, address + size] UTF8String]);
+		return NULL;
+	}
+	
+	return Py_BuildValue("");
 }
 
 static PyObject *VirtualMemory_pause(VirtualMemory *self, PyObject * __unused args)
