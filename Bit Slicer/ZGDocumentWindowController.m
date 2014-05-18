@@ -331,7 +331,7 @@
 
 		[[NSNotificationCenter defaultCenter]
 		 postNotificationName:ZGTargetProcessDiedNotification
-		 object:newProcess];
+		 object:oldProcess];
 	}
 }
 
