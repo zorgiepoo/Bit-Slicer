@@ -384,24 +384,41 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 - (void)updateRunningProcesses
 {
+	NSMutableDictionary *oldProcessesDictionary = [[NSMutableDictionary alloc] init];
+	for (NSMenuItem *oldMenuItem in self.runningApplicationsPopUpButton.itemArray)
+	{
+		ZGProcess *oldProcess = oldMenuItem.representedObject;
+		[oldProcessesDictionary setObject:oldProcess forKey:@(oldProcess.processID)];
+	}
+	
 	[self.runningApplicationsPopUpButton removeAllItems];
+	
+	pid_t ourProcessIdentifier = NSRunningApplication.currentApplication.processIdentifier;
 	
 	BOOL foundTargetProcess = NO;
 	for (ZGRunningProcess *runningProcess in  [self.processList.runningProcesses sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES], [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]])
 	{
-		if (runningProcess.processIdentifier != NSRunningApplication.currentApplication.processIdentifier)
+		if (runningProcess.processIdentifier != ourProcessIdentifier)
 		{
 			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
 			ZGUpdateProcessMenuItem(menuItem, runningProcess.name, runningProcess.processIdentifier, runningProcess.icon);
 			
-			ZGProcess *representedProcess =
+			ZGProcess *oldProcess = [oldProcessesDictionary objectForKey:@(runningProcess.processIdentifier)];
+			if (oldProcess != nil)
+			{
+				menuItem.representedObject = oldProcess;
+			}
+			else
+			{
+				ZGProcess *representedProcess =
 				[[ZGProcess alloc]
 				 initWithName:runningProcess.name
 				 internalName:runningProcess.internalName
 				 processID:runningProcess.processIdentifier
 				 is64Bit:runningProcess.is64Bit];
-			
-			menuItem.representedObject = representedProcess;
+				
+				menuItem.representedObject = representedProcess;
+			}
 			
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
