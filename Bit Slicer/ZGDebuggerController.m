@@ -1938,7 +1938,7 @@ enum ZGStepExecution
 		if (self.registersViewController == nil)
 		{
 			self.registersViewController = [[ZGRegistersViewController alloc] initWithUndoManager:self.undoManager];
-			[self.registersViewController addObserver:self forKeyPath:@"instructionPointer" options:NSKeyValueObservingOptionNew context:NULL];
+			[self.registersViewController addObserver:self forKeyPath:ZG_SELECTOR_STRING(self.registersViewController, instructionPointer) options:NSKeyValueObservingOptionNew context:NULL];
 			
 			[self.registersView addSubview:self.registersViewController.view];
 			self.registersViewController.view.frame = self.registersView.bounds;

@@ -46,6 +46,8 @@
 	#define ZG_LOG(format, ...) do { } while (0)
 #endif
 
+#define ZG_SELECTOR_STRING(object, name) (sizeof(object.name), @#name)
+
 BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManager, ZGProcess *process);
 
 ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression);

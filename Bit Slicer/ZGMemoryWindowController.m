@@ -100,9 +100,9 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	
 	[[NSWorkspace sharedWorkspace]
 	 removeObserver:self
-	 forKeyPath:@"runningApplications"];
+	 forKeyPath:ZG_SELECTOR_STRING([NSWorkspace sharedWorkspace], runningApplications)];
 	
-	[self.processList removeObserver:self forKeyPath:@"runningProcesses"];
+	[self.processList removeObserver:self forKeyPath:ZG_SELECTOR_STRING(self.processList, runningProcesses)];
 }
 
 - (void)postLastChosenInternalProcessNameChange
@@ -272,14 +272,14 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	
 	[self.processList
 	 addObserver:self
-	 forKeyPath:@"runningProcesses"
+	 forKeyPath:ZG_SELECTOR_STRING(self.processList, runningProcesses)
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	 context:NULL];
 	
 	// Still need to observe this for reliably fetching icon and localized name
 	[[NSWorkspace sharedWorkspace]
 	 addObserver:self
-	 forKeyPath:@"runningApplications"
+	 forKeyPath:ZG_SELECTOR_STRING([NSWorkspace sharedWorkspace], runningApplications)
 	 options:NSKeyValueObservingOptionNew
 	 context:NULL];
 	
@@ -419,7 +419,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 				
 				menuItem.representedObject = representedProcess;
 			}
-			
+			\
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
 			if ((self.currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [self.desiredProcessInternalName isEqualToString:runningProcess.internalName])
