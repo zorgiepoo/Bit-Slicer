@@ -96,6 +96,7 @@ declareVMPrototypeMethod(writePointer)
 declareVMPrototypeMethod(writeBytes)
 
 declareVMPrototypeMethod(protect)
+declareVMPrototypeMethod(protectionAt)
 
 declareVMPrototypeMethod(pause)
 declareVMPrototypeMethod(unpause)
@@ -144,6 +145,7 @@ static PyMethodDef VirtualMemory_methods[] =
 	declareVMMethod(writeBytes)
 	
 	declareVMMethod(protect)
+	declareVMMethod(protectionAt)
 	
 	declareVMMethod2(pause, METH_NOARGS)
 	declareVMMethod2(unpause, METH_NOARGS)
@@ -574,6 +576,25 @@ static PyObject *VirtualMemory_protect(VirtualMemory *self, PyObject *args)
 	}
 	
 	return Py_BuildValue("");
+}
+
+static PyObject *VirtualMemory_protectionAt(VirtualMemory *self, PyObject *args)
+{
+	ZGMemoryAddress address = 0x0;
+	ZGMemorySize size = 0x0;
+	if (!PyArg_ParseTuple(args, "KK:protectionAt", &address, &size))
+	{
+		return NULL;
+	}
+	
+	ZGMemoryProtection protection = VM_PROT_NONE;
+	if (!ZGMemoryProtectionInRegion(self->processTask, &address, &size, &protection))
+	{
+		PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.protectionAt failed to retrieve memory region info at 0x%llX - 0x%llX", address, address + size] UTF8String]);
+		return NULL;
+	}
+	
+	return Py_BuildValue("i", protection);
 }
 
 static PyObject *VirtualMemory_pause(VirtualMemory *self, PyObject * __unused args)
