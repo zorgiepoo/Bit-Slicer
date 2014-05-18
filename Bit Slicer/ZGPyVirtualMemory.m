@@ -427,7 +427,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 	type value = 0; \
 	if (PyArg_ParseTuple(args, "K"typeFormat":"#functionName, &memoryAddress, &value)) \
 	{ \
-		if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &value, sizeof(type))) \
+		if (!ZGWriteBytes(self->processTask, memoryAddress, &value, sizeof(type))) \
 		{ \
 			PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.%s failed to write %lu byte(s) at 0x%llX", #functionName, sizeof(type), memoryAddress] UTF8String]); \
 			return NULL; \
@@ -459,7 +459,7 @@ static PyObject *VirtualMemory_writePointer(VirtualMemory *self, PyObject *args)
 	{
 		if (self->is64Bit)
 		{
-			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &pointer, sizeof(pointer)))
+			if (!ZGWriteBytes(self->processTask, memoryAddress, &pointer, sizeof(pointer)))
 			{
 				PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.writePointer failed to write %lu byte(s) at 0x%llX", sizeof(pointer), memoryAddress] UTF8String]);
 				
@@ -469,7 +469,7 @@ static PyObject *VirtualMemory_writePointer(VirtualMemory *self, PyObject *args)
 		else
 		{
 			ZG32BitMemoryAddress pointerRead = (ZG32BitMemoryAddress)pointer;
-			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, &pointerRead, sizeof(pointerRead)))
+			if (!ZGWriteBytes(self->processTask, memoryAddress, &pointerRead, sizeof(pointerRead)))
 			{
 				PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.writePointer failed to write %lu byte(s) at 0x%llX", sizeof(pointerRead), memoryAddress] UTF8String]);
 				
@@ -494,7 +494,7 @@ static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 			return NULL;
 		}
 		
-		if (buffer.len > 0 && !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, (ZGMemorySize)buffer.len))
+		if (buffer.len > 0 && !ZGWriteBytes(self->processTask, memoryAddress, buffer.buf, (ZGMemorySize)buffer.len))
 		{
 			PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
 			
@@ -527,7 +527,7 @@ static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuff
 		
 		if (buffer.len > 0)
 		{
-			if (!ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress, buffer.buf, (ZGMemorySize)buffer.len) || !ZGWriteBytesIgnoringProtection(self->processTask, memoryAddress + (ZGMemorySize)buffer.len, nullBuffer, (ZGMemorySize)nullSize))
+			if (!ZGWriteBytes(self->processTask, memoryAddress, buffer.buf, (ZGMemorySize)buffer.len) || !ZGWriteBytes(self->processTask, memoryAddress + (ZGMemorySize)buffer.len, nullBuffer, (ZGMemorySize)nullSize))
 			{
 				PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.%s failed to write %lu byte(s) at 0x%llX", functionName, buffer.len, memoryAddress] UTF8String]);
 				
