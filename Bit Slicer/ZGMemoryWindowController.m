@@ -419,7 +419,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 				
 				menuItem.representedObject = representedProcess;
 			}
-			\
+			
 			[self.runningApplicationsPopUpButton.menu addItem:menuItem];
 			
 			if ((self.currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [self.desiredProcessInternalName isEqualToString:runningProcess.internalName])
