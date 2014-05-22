@@ -386,9 +386,11 @@
 
 - (void)setDesiredProcessInternalName:(NSString *)desiredProcessInternalName
 {
+	BOOL needsToMarkDocumentChange = self.loadedDocumentBefore && (self.desiredProcessInternalName == nil || ![self.desiredProcessInternalName isEqualToString:desiredProcessInternalName]);
+	
 	[super setDesiredProcessInternalName:desiredProcessInternalName];
 
-	if (self.loadedDocumentBefore)
+	if (needsToMarkDocumentChange)
 	{
 		[self markDocumentChange];
 	}
