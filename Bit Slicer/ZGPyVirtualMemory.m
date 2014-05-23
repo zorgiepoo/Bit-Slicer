@@ -581,8 +581,8 @@ static PyObject *VirtualMemory_protect(VirtualMemory *self, PyObject *args)
 static PyObject *VirtualMemory_protectionAt(VirtualMemory *self, PyObject *args)
 {
 	ZGMemoryAddress address = 0x0;
-	ZGMemorySize size = 0x0;
-	if (!PyArg_ParseTuple(args, "KK:protectionAt", &address, &size))
+	ZGMemorySize size = 0x1;
+	if (!PyArg_ParseTuple(args, "K:protectionAt", &address))
 	{
 		return NULL;
 	}
@@ -590,7 +590,7 @@ static PyObject *VirtualMemory_protectionAt(VirtualMemory *self, PyObject *args)
 	ZGMemoryProtection protection = VM_PROT_NONE;
 	if (!ZGMemoryProtectionInRegion(self->processTask, &address, &size, &protection))
 	{
-		PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.protectionAt failed to retrieve memory region info at 0x%llX - 0x%llX", address, address + size] UTF8String]);
+		PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.protectionAt failed to retrieve memory region info at 0x%llX", address] UTF8String]);
 		return NULL;
 	}
 	
