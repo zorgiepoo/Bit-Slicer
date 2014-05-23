@@ -91,28 +91,35 @@
 	[self setUpdatePreferencesView];
 }
 
+- (void)setPreferencesViewController:(NSViewController *)viewController andWindowTitle:(NSString *)windowTitle
+{
+	if ([self.preferencesViewController class] != [viewController class])
+	{
+		self.preferencesViewController = viewController;
+		self.window.contentView = viewController.view;
+		[self.window setTitle:windowTitle];
+	}
+}
+
 - (void)setUpdatePreferencesView
 {
-	self.preferencesViewController = [[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:self.appUpdaterController];
-	
-	self.window.contentView = self.preferencesViewController.view;
-	[self.window setTitle:@"Software Update"];
+	[self
+	 setPreferencesViewController:[[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:self.appUpdaterController]
+	 andWindowTitle:@"Software Update"];
 }
 
 - (void)setHotKeyPreferencesView
 {
-	self.preferencesViewController = [[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController];
-	
-	self.window.contentView = self.preferencesViewController.view;
-	[self.window setTitle:@"Hot Keys"];
+	[self
+	 setPreferencesViewController:[[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController]
+	 andWindowTitle:@"Shortcuts"];
 }
 
 - (void)setScriptPreferencesView
 {
-	self.preferencesViewController = [[ZGScriptPreferencesViewController alloc] init];
-	
-	self.window.contentView = self.preferencesViewController.view;
-	[self.window setTitle:@"Scripts"];
+	[self
+	 setPreferencesViewController:[[ZGScriptPreferencesViewController alloc] init]
+	 andWindowTitle:@"Scripts"];
 }
 
 - (IBAction)changePreferencesView:(NSToolbarItem *)toolbarItem
