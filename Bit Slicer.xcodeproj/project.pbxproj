@@ -58,6 +58,8 @@
 		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		7768064018B96A64007F2CAF /* ZGThreadStates.c in Sources */ = {isa = PBXBuildFile; fileRef = 7768063E18B96A64007F2CAF /* ZGThreadStates.c */; };
 		7768064318B9A36E007F2CAF /* ZGBacktrace.m in Sources */ = {isa = PBXBuildFile; fileRef = 7768064218B9A36E007F2CAF /* ZGBacktrace.m */; };
+		776B62E319312648004BF4A0 /* random_data in Resources */ = {isa = PBXBuildFile; fileRef = 776B62E219312648004BF4A0 /* random_data */; };
+		776B62E6193126B7004BF4A0 /* ByteArraySearchTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 776B62E5193126B7004BF4A0 /* ByteArraySearchTest.mm */; };
 		777AD8C717D96F30003A5317 /* ZGPyDebugger.m in Sources */ = {isa = PBXBuildFile; fileRef = 777AD8C617D96F30003A5317 /* ZGPyDebugger.m */; };
 		777C34B5187523D0005E64E1 /* ZGNoSmallSizeToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */; };
 		777DA25218CE97BE0092DEC9 /* ZGAppTerminationState.m in Sources */ = {isa = PBXBuildFile; fileRef = 777DA25118CE97BE0092DEC9 /* ZGAppTerminationState.m */; };
@@ -111,6 +113,12 @@
 		77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D081800639E00549A37 /* stepin.pdf */; };
 		77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D091800639E00549A37 /* stepout.pdf */; };
 		77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D0A1800639E00549A37 /* stepover.pdf */; };
+		77E133FE19312AD500B5B799 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
+		77E1340019312AFE00B5B799 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
+		77E1340119312B1700B5B799 /* ZGSearchData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160E17D2EED6009E002A /* ZGSearchData.m */; };
+		77E1340219312B1F00B5B799 /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGSearchResults.m */; };
+		77E1340319312B2800B5B799 /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161117D2EEE1009E002A /* ZGSearchProgress.m */; };
+		77E1340419312B2E00B5B799 /* ZGSearchFunctions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */; };
 		77E2BBAC18FD88A700E41FA0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 77E2BBAA18FD88A700E41FA0 /* InfoPlist.strings */; };
 		77E2BBAE18FD88A700E41FA0 /* LinearExpressionParsingTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */; };
 		77E2BBB618FD8B7900E41FA0 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77E2BBB518FD8B7900E41FA0 /* XCTest.framework */; };
@@ -232,6 +240,17 @@
 				77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */,
 				77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */,
 				773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		77E133FF19312AF100B5B799 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				77E1340019312AFE00B5B799 /* HexFiend.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -424,6 +443,8 @@
 		7768063F18B96A64007F2CAF /* ZGThreadStates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGThreadStates.h; path = "Bit Slicer/ZGThreadStates.h"; sourceTree = "<group>"; };
 		7768064118B9A36E007F2CAF /* ZGBacktrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBacktrace.h; path = "Bit Slicer/ZGBacktrace.h"; sourceTree = "<group>"; };
 		7768064218B9A36E007F2CAF /* ZGBacktrace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGBacktrace.m; path = "Bit Slicer/ZGBacktrace.m"; sourceTree = "<group>"; };
+		776B62E219312648004BF4A0 /* random_data */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = random_data; sourceTree = "<group>"; };
+		776B62E5193126B7004BF4A0 /* ByteArraySearchTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ByteArraySearchTest.mm; sourceTree = "<group>"; };
 		777AD8C517D96F30003A5317 /* ZGPyDebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyDebugger.h; path = "Bit Slicer/ZGPyDebugger.h"; sourceTree = "<group>"; };
 		777AD8C617D96F30003A5317 /* ZGPyDebugger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyDebugger.m; path = "Bit Slicer/ZGPyDebugger.m"; sourceTree = "<group>"; };
 		777C34B3187523D0005E64E1 /* ZGNoSmallSizeToolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGNoSmallSizeToolbar.h; path = "Bit Slicer/ZGNoSmallSizeToolbar.h"; sourceTree = "<group>"; };
@@ -646,6 +667,7 @@
 			files = (
 				77E2BBB618FD8B7900E41FA0 /* XCTest.framework in Frameworks */,
 				77E2BBD518FD904400E41FA0 /* CoreSymbolication.framework in Frameworks */,
+				77E133FE19312AD500B5B799 /* HexFiend.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1177,6 +1199,7 @@
 			isa = PBXGroup;
 			children = (
 				77A5B02F19189CC9002BEC69 /* BinarySearchTest.m */,
+				776B62E5193126B7004BF4A0 /* ByteArraySearchTest.mm */,
 				77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */,
 				77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */,
 				77E2BBA818FD88A700E41FA0 /* Supporting Files */,
@@ -1187,6 +1210,7 @@
 		77E2BBA818FD88A700E41FA0 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				776B62E219312648004BF4A0 /* random_data */,
 				77E2BBA918FD88A700E41FA0 /* Bit Slicer Tests-Info.plist */,
 				77E2BBAA18FD88A700E41FA0 /* InfoPlist.strings */,
 				77E2BBAF18FD88A700E41FA0 /* Bit Slicer Tests-Prefix.pch */,
@@ -1364,6 +1388,7 @@
 				77E2BBA018FD88A700E41FA0 /* Sources */,
 				77E2BBA118FD88A700E41FA0 /* Frameworks */,
 				77E2BBA218FD88A700E41FA0 /* Resources */,
+				77E133FF19312AF100B5B799 /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1434,6 +1459,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				77E2BBAC18FD88A700E41FA0 /* InfoPlist.strings in Resources */,
+				776B62E319312648004BF4A0 /* random_data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1488,6 +1514,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77E1340419312B2E00B5B799 /* ZGSearchFunctions.mm in Sources */,
+				77E1340319312B2800B5B799 /* ZGSearchProgress.m in Sources */,
+				77E1340219312B1F00B5B799 /* ZGSearchResults.m in Sources */,
+				77E1340119312B1700B5B799 /* ZGSearchData.m in Sources */,
 				77A5B03119189DA5002BEC69 /* NSArrayAdditions.m in Sources */,
 				77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */,
 				77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryHelpers.m in Sources */,
@@ -1521,6 +1551,7 @@
 				77E2BBCD18FD8FC100E41FA0 /* DDParserTypes.m in Sources */,
 				77E2BBCE18FD8FC100E41FA0 /* DDTypes.m in Sources */,
 				77E2BBCF18FD8FC100E41FA0 /* NSString+DDMathParsing.m in Sources */,
+				776B62E6193126B7004BF4A0 /* ByteArraySearchTest.mm in Sources */,
 				77E2BBAE18FD88A700E41FA0 /* LinearExpressionParsingTest.m in Sources */,
 				77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */,
 			);
@@ -1758,6 +1789,7 @@
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+					"$(PROJECT_DIR)/deps",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -1816,6 +1848,7 @@
 					"-Wno-auto-import",
 					"-Wno-variadic-macros",
 					"-Wno-incomplete-module",
+					"-Wno-c++98-compat-pedantic",
 					"-Werror",
 				);
 				WRAPPER_EXTENSION = xctest;
@@ -1856,6 +1889,7 @@
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+					"$(PROJECT_DIR)/deps",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1908,6 +1942,7 @@
 					"-Wno-auto-import",
 					"-Wno-variadic-macros",
 					"-Wno-incomplete-module",
+					"-Wno-c++98-compat-pedantic",
 					"-Werror",
 				);
 				WRAPPER_EXTENSION = xctest;
