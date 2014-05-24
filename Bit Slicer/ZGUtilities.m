@@ -463,12 +463,9 @@ void ZGUpdateProcessMenuItem(NSMenuItem *menuItem, NSString *name, pid_t process
 
 void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText)
 {
-	if (NSClassFromString(@"NSUserNotification") != nil)
-	{
-		NSUserNotification *userNotification = [[NSUserNotification alloc] init];
-		userNotification.title = title;
-		userNotification.subtitle = subtitle;
-		userNotification.informativeText = informativeText;
-		[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
-	}
+	NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+	userNotification.title = title;
+	userNotification.subtitle = subtitle;
+	userNotification.informativeText = informativeText;
+	[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 }
