@@ -755,7 +755,7 @@
 				self.tempSavedData = nil;
 				windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled"];
 				
-				if (self.documentData.searchValue.count == 0)
+				if (![self.documentData.searchValue zgHasObjectMatchingCondition:^(id object) { return [object isKindOfClass:[ZGSearchToken class]]; }])
 				{
 					[windowController insertStoredValueToken:nil];
 				}
