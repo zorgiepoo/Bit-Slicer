@@ -180,10 +180,31 @@
 	return rect;
 }
 
+// For our hack below
+#ifndef NSAppKitVersionNumber10_9
+#define NSAppKitVersionNumber10_9 1265
+#endif
 
 - (NSRect)searchButtonRectForBounds:(NSRect)rect
 {
 	rect = [self.searchFieldCell searchButtonRectForBounds:rect];
+	
+	// Begin hack
+	// Check if we need to offset the search magnifying glass button
+	static BOOL checkedOffsetting;
+	static BOOL shouldOffsetRect;
+	if (!checkedOffsetting)
+	{
+		shouldOffsetRect = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_9;
+		checkedOffsetting = YES;
+	}
+	
+	if (shouldOffsetRect)
+	{
+		rect.origin.x -= 53;
+	}
+	// End hack
+	
 	return rect;
 }
 
