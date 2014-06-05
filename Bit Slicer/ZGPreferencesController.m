@@ -55,6 +55,9 @@
 #define ZGScriptPreferenceIdentifier @"ZGScriptPreferenceIdentifier"
 
 #define ZGSoftwareUpdateIconPath @"/System/Library/CoreServices/Software Update.app/Contents/Resources/SoftwareUpdate.icns"
+// Eventually we'll have included icons for these two
+#define ZGDebuggerHotkeyIconName @"hotkey"
+#define ZGScriptIconName @"scripts"
 
 @implementation ZGPreferencesController
 
@@ -76,14 +79,29 @@
 {
 	[self.window.toolbar setSelectedItemIdentifier:ZGSoftwareUpdatePreferenceIdentifier];
 	
-	if ([[NSFileManager defaultManager] fileExistsAtPath:ZGSoftwareUpdateIconPath])
+	for (NSToolbarItem *toolbarItem in self.window.toolbar.items)
 	{
-		for (NSToolbarItem *toolbarItem in self.window.toolbar.items)
+		if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdatePreferenceIdentifier])
 		{
-			if ([toolbarItem.itemIdentifier isEqualToString:ZGSoftwareUpdatePreferenceIdentifier])
+			if ([[NSFileManager defaultManager] fileExistsAtPath:ZGSoftwareUpdateIconPath])
 			{
 				toolbarItem.image = [[NSImage alloc] initWithContentsOfFile:ZGSoftwareUpdateIconPath];
-				break;
+			}
+		}
+		else if ([toolbarItem.itemIdentifier isEqualToString:ZGDebuggerHotKeysPreferenceIdentifier])
+		{
+			NSImage *hotkeyIcon = [NSImage imageNamed:ZGDebuggerHotkeyIconName];
+			if (hotkeyIcon != nil)
+			{
+				toolbarItem.image = [hotkeyIcon copy];
+			}
+		}
+		else if ([toolbarItem.itemIdentifier isEqualToString:ZGScriptPreferenceIdentifier])
+		{
+			NSImage *scriptsIcon = [NSImage imageNamed:ZGScriptIconName];
+			if (scriptsIcon != nil)
+			{
+				toolbarItem.image = [scriptsIcon copy];
 			}
 		}
 	}
