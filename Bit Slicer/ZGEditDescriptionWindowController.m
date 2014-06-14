@@ -64,7 +64,7 @@
 {
 	[self window]; // ensure window is loaded
 	
-	[self.descriptionTextView.textStorage setAttributedString:variable.description];
+	[self.descriptionTextView.textStorage setAttributedString:variable.fullAttributedDescription];
 	[self.descriptionTextView scrollRangeToVisible:NSMakeRange(0, 0)];
 	self.variable = variable;
 	

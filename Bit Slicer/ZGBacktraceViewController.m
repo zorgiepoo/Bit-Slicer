@@ -122,7 +122,7 @@
 		ZGInstruction *instruction = [self.backtrace.instructions objectAtIndex:(NSUInteger)rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"backtrace"])
 		{
-			result = instruction.variable.description;
+			result = instruction.variable.fullAttributedDescription;
 		}
 	}
 	

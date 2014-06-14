@@ -415,7 +415,7 @@
 				  type:theRegister.variable.type
 				  qualifier:theRegister.variable.qualifier
 				  pointerSize:self.breakPoint.process.pointerSize
-				  description:theRegister.variable.description
+				  description:theRegister.variable.fullAttributedDescription
 				  enabled:NO]];
 				
 				free(newValue);

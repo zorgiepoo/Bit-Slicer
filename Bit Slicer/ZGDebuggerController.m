@@ -1356,15 +1356,15 @@ enum ZGStepExecution
 	
 	for (ZGInstruction *instruction in instructions)
 	{
-		if ([(NSAttributedString *)instruction.variable.description length] == 0)
+		if (instruction.variable.fullAttributedDescription.length == 0)
 		{
-			instruction.variable.description = instruction.text;
+			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.text];
 		}
 		else if ([variablesToAnnotate containsObject:instruction.variable])
 		{
 			NSMutableAttributedString *newDescription = [[NSMutableAttributedString alloc] initWithString:[instruction.text stringByAppendingString:@"\n"]];
-			[newDescription appendAttributedString:instruction.variable.description];
-			instruction.variable.description = newDescription;
+			[newDescription appendAttributedString:instruction.variable.fullAttributedDescription];
+			instruction.variable.fullAttributedDescription = newDescription;
 		}
 	}
 }
@@ -1906,11 +1906,11 @@ enum ZGStepExecution
 		if (instruction.symbols.length == 0)
 		{
 			instruction.symbols = @""; // in case symbols is nil
-			instruction.variable.description = instruction.variable.addressStringValue;
+			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.variable.addressStringValue];
 		}
 		else
 		{
-			instruction.variable.description = instruction.symbols;
+			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.symbols];
 		}
 	}
 	

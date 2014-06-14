@@ -243,7 +243,7 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 		 type:ZGByteArray
 		 qualifier:0
 		 pointerSize:is64Bit ? sizeof(int64_t) : sizeof(int32_t)
-		 description:@(entry->name)];
+		 description:[[NSAttributedString alloc] initWithString:@(entry->name)]];
 		
 		[registerVariables addObject:variable];
 	}
@@ -268,7 +268,7 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 		 type:ZGByteArray
 		 qualifier:0
 		 pointerSize:is64Bit ? sizeof(int64_t) : sizeof(int32_t)
-		 description:@(entry->name)];
+		 description:[[NSAttributedString alloc] initWithString:@(entry->name)]];
 		
 		[registerVariables addObject:variable];
 	}

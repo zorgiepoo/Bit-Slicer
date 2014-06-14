@@ -408,7 +408,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		 type:variableType
 		 qualifier:qualifier
 		 pointerSize:self.windowController.currentProcess.pointerSize
-		 description:variableType == ZGScript ? @"My Script" : @""
+		 description:[[NSAttributedString alloc] initWithString:variableType == ZGScript ? @"My Script" : @""]
 		 enabled:NO
 		 byteOrder:byteOrder];
 	
@@ -491,9 +491,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	self.windowController.undoManager.actionName = @"Description Change";
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
-	 newDescription:variable.description];
+	 newDescription:variable.fullAttributedDescription];
 	
-	variable.description = newDescription;
+	variable.fullAttributedDescription = newDescription;
 	
 	if (self.windowController.undoManager.isUndoing || self.windowController.undoManager.isRedoing)
 	{
@@ -677,7 +677,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			
 			if (ZGReadBytes(self.windowController.currentProcess.processTask, variable.address, &oldData, &oldSize))
 			{
-				ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldData size:oldSize address:variable.address type:ZGByteArray qualifier:variable.qualifier pointerSize:self.windowController.currentProcess.pointerSize description:variable.description enabled:variable.enabled byteOrder:variable.byteOrder];
+				ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldData size:oldSize address:variable.address type:ZGByteArray qualifier:variable.qualifier pointerSize:self.windowController.currentProcess.pointerSize description:variable.fullAttributedDescription enabled:variable.enabled byteOrder:variable.byteOrder];
 				
 				oldStringValue = oldVariable.stringValue;
 				
@@ -1035,16 +1035,16 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];
 		if (protectionDescription != nil) [validDescriptionComponents addObject:protectionDescription];
 		
-		if ([(NSAttributedString *)variable.description length] == 0)
+		if (variable.fullAttributedDescription.length == 0)
 		{
-			variable.description = [validDescriptionComponents componentsJoinedByString:@", "];
+			variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:[validDescriptionComponents componentsJoinedByString:@", "]];
 		}
 		else
 		{
 			NSString *appendedString = [NSString stringWithFormat:@"\n\n%@", [validDescriptionComponents componentsJoinedByString:@"\n"]];
-			NSMutableAttributedString *newDescription = [variable.description mutableCopy];
+			NSMutableAttributedString *newDescription = [variable.fullAttributedDescription mutableCopy];
 			[newDescription appendAttributedString:[[NSAttributedString alloc] initWithString:appendedString]];
-			variable.description = newDescription;
+			variable.fullAttributedDescription = newDescription;
 		}
 	}
 }

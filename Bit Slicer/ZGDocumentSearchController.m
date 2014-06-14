@@ -251,7 +251,7 @@
 		 type:(ZGVariableType)searchResults.dataType
 		 qualifier:qualifier
 		 pointerSize:pointerSize
-		 description:@""
+		 description:[[NSAttributedString alloc] initWithString:@""]
 		 enabled:enabled
 		 byteOrder:byteOrder];
 		

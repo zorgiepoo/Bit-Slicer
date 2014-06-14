@@ -593,13 +593,15 @@
 	{
 		ZGVariable *variable = [self.documentData.variables objectAtIndex:(NSUInteger)row];
 		
-		if (variable.name.length < [[variable.description string] length])
+		NSString *fullDescription = variable.fullAttributedDescription.string;
+		NSUInteger fullDescriptionLength = fullDescription.length;
+		if (variable.name.length < fullDescriptionLength)
 		{
-			NSArray *lines = [[variable.description string] componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+			NSArray *lines = [fullDescription componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 			NSArray *trimmedLines = [lines subarrayWithRange:NSMakeRange(0, MIN(lines.count, 6U))];
 			NSString *descriptionFromTrimmedLines = [trimmedLines componentsJoinedByString:@"\n"];
 			NSString *trimmedDescription = [descriptionFromTrimmedLines substringWithRange:NSMakeRange(0, MIN(descriptionFromTrimmedLines.length, 100U))];
-			if (trimmedDescription.length < [[variable.description string] length])
+			if (trimmedDescription.length < fullDescriptionLength)
 			{
 				trimmedDescription = [trimmedDescription stringByAppendingString:@"…"];
 			}

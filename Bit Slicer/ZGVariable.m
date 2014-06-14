@@ -95,7 +95,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	 forKey:ZGByteOrderKey];
 	
 	[coder
-	 encodeObject:self.description
+	 encodeObject:self.fullAttributedDescription
 	 forKey:ZGDescriptionKey];
 	
 	// For backwards compatiblity with older versions
@@ -163,7 +163,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		variableDescription = [coder decodeObjectForKey:ZGNameKey];
 	}
-	[self setDescription:variableDescription != nil ? variableDescription : @""];
+	self.fullAttributedDescription = variableDescription != nil ? variableDescription : [[NSAttributedString alloc] initWithString:@""];
 	
 	NSUInteger returnedLength = 0;
 	const uint8_t *buffer =
@@ -237,7 +237,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return size;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled byteOrder:(CFByteOrder)byteOrder
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description enabled:(BOOL)enabled byteOrder:(CFByteOrder)byteOrder
 {
 	if ((self = [super init]))
 	{
@@ -265,44 +265,32 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		
 		if (description != nil)
 		{
-			self.description = description;
+			self.fullAttributedDescription = description;
 		}
 	}
 	
 	return self;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description enabled:(BOOL)enabled
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description enabled:(BOOL)enabled
 {
 	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:description enabled:enabled byteOrder:CFByteOrderGetCurrent()];
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(id)description
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description
 {
 	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:description enabled:YES];
 }
 
 - (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize
 {
-	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:@""];
+	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:[[NSAttributedString alloc] initWithString:@""]];
 }
 
 - (void)dealloc
 {
 	self.value = NULL;
 	self.freezeValue = NULL;
-}
-
-- (void)setDescription:(id)description
-{
-	if ([description isKindOfClass:[NSString class]])
-	{
-		_description = [[NSAttributedString alloc] initWithString:description];
-	}
-	else if ([description isKindOfClass:[NSAttributedString class]])
-	{
-		_description = description;
-	}
 }
 
 - (NSString *)addressStringValue
@@ -534,16 +522,16 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (NSString *)name
 {
-	NSArray *lines = [[self.description string] componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-	if (lines.count <= 1) return [self.description string];
+	NSArray *lines = [self.fullAttributedDescription.string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+	if (lines.count <= 1) return self.fullAttributedDescription.string;
 	
 	return [lines objectAtIndex:0];
 }
 
 - (NSString *)shortDescription
 {
-	NSArray *lines = [[self.description string] componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-	if (lines.count <= 1) return [self.description string];
+	NSArray *lines = [self.fullAttributedDescription.string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+	if (lines.count <= 1) return self.fullAttributedDescription.string;
 	
 	return [[lines objectAtIndex:0] stringByAppendingString:@"…"];
 }

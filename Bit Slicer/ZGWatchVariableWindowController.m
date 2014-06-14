@@ -280,7 +280,7 @@
 		 boldFont:boldFont];
 	}
 	
-	instruction.variable.description = description;
+	instruction.variable.fullAttributedDescription = description;
 	
 	instruction.variable.enabled = YES;
 	
