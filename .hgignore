@@ -1,7 +1,0 @@
-syntax: glob
-Bit Slicer.xcodeproj/*.mode1*
-Bit Slicer.xcodeproj/*.pbxuser
-Bit Slicer.xcodeproj/project.xcworkspace/
-Bit Slicer.xcodeproj/xcuserdata/
-*.orig
-*.DS_Store
