@@ -141,7 +141,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		
 		if (variable.isFrozen)
 		{
-			variable.freezeValue = variable.value;
+			variable.freezeValue = variable.rawValue;
 		}
 	}
 	

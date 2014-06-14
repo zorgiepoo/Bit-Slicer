@@ -67,7 +67,7 @@
 	{
 		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == processTask && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
 		{
-			memcpy(newBytes + (breakPoint.variable.address - address), breakPoint.variable.value, sizeof(uint8_t));
+			memcpy(newBytes + (breakPoint.variable.address - address), breakPoint.variable.rawValue, sizeof(uint8_t));
 		}
 	}
 	
@@ -120,7 +120,7 @@
 				}
 			}
 			
-			*(uint8_t *)targetBreakPoint.variable.value = *(uint8_t *)(data.bytes + targetBreakPoint.variable.address - address);
+			*(uint8_t *)targetBreakPoint.variable.rawValue = *(uint8_t *)(data.bytes + targetBreakPoint.variable.address - address);
 		}
 	}
 	

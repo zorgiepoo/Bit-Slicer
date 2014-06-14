@@ -297,7 +297,7 @@
 	for (ZGVariable *variable in self.documentData.variables)
 	{
 		variable.finishedEvaluatingDynamicAddress = NO;
-		variable.value = NULL;
+		variable.rawValue = NULL;
 	}
 
 	if (oldProcess.is64Bit != newProcess.is64Bit)
@@ -914,7 +914,7 @@
 			}
 			
 			if ([selectedVariables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
-				return (BOOL)(variable.type == ZGScript || variable.isFrozen != isFrozen || variable.value == NULL);
+				return (BOOL)(variable.type == ZGScript || variable.isFrozen != isFrozen || variable.rawValue == NULL);
 			}])
 			{
 				return NO;
@@ -1091,7 +1091,7 @@
 			return NO;
 		}
 		
-		if (![self.selectedVariables zgAllObjectsMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type == ZGByteArray && variable.value != NULL); }])
+		if (![self.selectedVariables zgAllObjectsMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type == ZGByteArray && variable.rawValue != NULL); }])
 		{
 			return NO;
 		}

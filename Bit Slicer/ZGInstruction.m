@@ -67,7 +67,7 @@
 	
 	ZGInstruction *instruction = object;
 	
-	if (self.variable.address == instruction.variable.address && (self.variable.value == instruction.variable.value || (self.variable.size == instruction.variable.size && memcmp(self.variable.value, instruction.variable.value, self.variable.size) == 0)))
+	if (self.variable.address == instruction.variable.address && (self.variable.rawValue == instruction.variable.rawValue || (self.variable.size == instruction.variable.size && memcmp(self.variable.rawValue, instruction.variable.rawValue, self.variable.size) == 0)))
 	{
 		return YES;
 	}

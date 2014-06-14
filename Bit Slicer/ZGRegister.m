@@ -37,10 +37,7 @@
 
 @interface ZGRegister ()
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
-@property (nonatomic) void *value;
-#pragma clang diagnostic pop
+@property (nonatomic) void *rawValue;
 
 @property (nonatomic, assign) ZGMemorySize size;
 @property (nonatomic, assign) ZGMemorySize internalSize;
@@ -73,12 +70,12 @@
 {
 	_variable = variable;
 	
-	free(self.value);
+	free(self.rawValue);
 	
 	if (_variable != nil)
 	{
-		self.value = calloc(1, self.internalSize);
-		memcpy(self.value, _variable.value, self.size);
+		self.rawValue = calloc(1, self.internalSize);
+		memcpy(self.rawValue, _variable.rawValue, self.size);
 	}
 }
 

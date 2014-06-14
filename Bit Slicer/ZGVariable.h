@@ -56,10 +56,7 @@ extern NSString *ZGVariablePboardType;
 @property (nonatomic) BOOL usesDynamicAddress;
 @property (nonatomic) BOOL finishedEvaluatingDynamicAddress;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
-@property (nonatomic) void *value;
-#pragma clang diagnostic pop
+@property (nonatomic) void *rawValue;
 
 @property (copy, nonatomic) NSString *addressStringValue;
 @property (copy, nonatomic) NSString *stringValue;

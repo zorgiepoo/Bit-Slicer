@@ -452,14 +452,14 @@ enum ZGStepExecution
 			ZGMemorySize size = instruction.variable.size;
 			if (ZGReadBytes(self.currentProcess.processTask, instruction.variable.address, &bytes, &size))
 			{
-				if (memcmp(bytes, instruction.variable.value, size) != 0)
+				if (memcmp(bytes, instruction.variable.rawValue, size) != 0)
 				{
 					// Ignore trivial breakpoint changes
 					BOOL foundBreakPoint = NO;
-					if (*(uint8_t *)bytes == INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp(bytes+sizeof(uint8_t), instruction.variable.value+sizeof(uint8_t), size-sizeof(uint8_t)) == 0))
+					if (*(uint8_t *)bytes == INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp(bytes+sizeof(uint8_t), instruction.variable.rawValue+sizeof(uint8_t), size-sizeof(uint8_t)) == 0))
 					{
 						foundBreakPoint = [self.breakPointController.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) {
-							return (BOOL)(breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.value == *(uint8_t *)instruction.variable.value);
+							return (BOOL)(breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.rawValue == *(uint8_t *)instruction.variable.rawValue);
 						}];
 					}
 					
@@ -1642,7 +1642,7 @@ enum ZGStepExecution
 					ZGInstruction *currentInstruction = [self.instructions objectAtIndex:instructionIndex];
 					for (ZGMemorySize valueIndex = 0; (writeIndex < newWriteSize) && (valueIndex < currentInstruction.variable.size); valueIndex++, writeIndex++)
 					{
-						*(char *)(oldValue + writeIndex) = *(char *)(currentInstruction.variable.value + valueIndex);
+						*(char *)(oldValue + writeIndex) = *(char *)(currentInstruction.variable.rawValue + valueIndex);
 					}
 					
 					instructionIndex++;

@@ -154,7 +154,7 @@
 				
 				if (ZGReadBytes(currentProcess.processTask, variable.address, &value, &outputSize))
 				{
-					variable.value = value;
+					variable.rawValue = value;
 					if (![variable.stringValue isEqualToString:oldStringValue])
 					{
 						needsToReloadTable = YES;
@@ -162,15 +162,15 @@
 					
 					ZGFreeBytes(value, outputSize);
 				}
-				else if (variable.value)
+				else if (variable.rawValue != nil)
 				{
-					variable.value = NULL;
+					variable.rawValue = NULL;
 					needsToReloadTable = YES;
 				}
 			}
 			else if (variable.lastUpdatedSize)
 			{
-				variable.value = NULL;
+				variable.rawValue = NULL;
 				needsToReloadTable = YES;
 			}
 			

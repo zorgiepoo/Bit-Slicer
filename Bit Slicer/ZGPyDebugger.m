@@ -639,7 +639,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 			
 			for (ZGInstruction *instruction in instructions)
 			{
-				memcpy(bufferIterator, instruction.variable.value, instruction.variable.size);
+				memcpy(bufferIterator, instruction.variable.rawValue, instruction.variable.size);
 				bufferIterator += instruction.variable.size;
 			}
 			

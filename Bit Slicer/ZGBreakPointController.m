@@ -310,7 +310,7 @@ static ZGBreakPointController *gBreakPointController;
 	if (breakPoint.type == ZGBreakPointInstruction && [self.breakPoints containsObject:breakPoint])
 	{
 		// Restore our instruction
-		ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+		ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
 		
 		breakPoint.needsToRestore = YES;
 		
@@ -353,7 +353,7 @@ static ZGBreakPointController *gBreakPointController;
 
 - (void)revertInstructionBackToNormal:(ZGBreakPoint *)breakPoint
 {
-	ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.value, sizeof(uint8_t));
+	ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
 	ZGProtect(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.size, breakPoint.originalProtection);
 }
 
