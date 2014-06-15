@@ -140,57 +140,63 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-	self.address = (uint64_t)[coder decodeInt64ForKey:ZGAddressKey];
-	
-	[self setAddressStringValue:nil];
-	
-	self.size = (uint64_t)[coder decodeInt64ForKey:ZGSizeKey];
-	self.enabled = [coder decodeBoolForKey:ZGEnabledKey];
-	self.isFrozen = [coder decodeBoolForKey:ZGIsFrozenKey];
-	self.type = (ZGVariableType)[coder decodeInt32ForKey:ZGTypeKey];
-	self.qualifier = (ZGVariableQualifier)[coder decodeInt32ForKey:ZGQualifierKey];
-	self.byteOrder = [coder decodeInt32ForKey:ZGByteOrderKey];
-	if (self.byteOrder == CFByteOrderUnknown)
+	self = [super init];
+	if (self != nil)
 	{
-		self.byteOrder = CFByteOrderGetCurrent();
-	}
-	
-	self.usesDynamicAddress = [coder decodeBoolForKey:ZGDynamicAddressKey];
-	[self setAddressFormula:[coder decodeObjectForKey:ZGAddressFormulaKey]];
-	
-	NSAttributedString *variableDescription = [coder decodeObjectForKey:ZGDescriptionKey];
-	if (variableDescription == nil)
-	{
-		variableDescription = [coder decodeObjectForKey:ZGNameKey];
-	}
-	self.fullAttributedDescription = variableDescription != nil ? variableDescription : [[NSAttributedString alloc] initWithString:@""];
-	
-	NSUInteger returnedLength = 0;
-	const uint8_t *buffer =
+		self.address = (uint64_t)[coder decodeInt64ForKey:ZGAddressKey];
+		
+		[self setAddressStringValue:nil];
+		
+		self.size = (uint64_t)[coder decodeInt64ForKey:ZGSizeKey];
+		self.enabled = [coder decodeBoolForKey:ZGEnabledKey];
+		self.isFrozen = [coder decodeBoolForKey:ZGIsFrozenKey];
+		self.type = (ZGVariableType)[coder decodeInt32ForKey:ZGTypeKey];
+		self.qualifier = (ZGVariableQualifier)[coder decodeInt32ForKey:ZGQualifierKey];
+		self.byteOrder = [coder decodeInt32ForKey:ZGByteOrderKey];
+		if (self.byteOrder == CFByteOrderUnknown)
+		{
+			self.byteOrder = CFByteOrderGetCurrent();
+		}
+		
+		self.usesDynamicAddress = [coder decodeBoolForKey:ZGDynamicAddressKey];
+		[self setAddressFormula:[coder decodeObjectForKey:ZGAddressFormulaKey]];
+		
+		NSAttributedString *variableDescription = [coder decodeObjectForKey:ZGDescriptionKey];
+		if (variableDescription == nil)
+		{
+			variableDescription = [coder decodeObjectForKey:ZGNameKey];
+		}
+		self.fullAttributedDescription = variableDescription != nil ? variableDescription : [[NSAttributedString alloc] initWithString:@""];
+		
+		NSUInteger returnedLength = 0;
+		const uint8_t *buffer =
 		[coder
 		 decodeBytesForKey:ZGValueKey
 		 returnedLength:&returnedLength];
-	
-	if (returnedLength == self.size)
-	{
-		self.rawValue = (void *)buffer;
-	}
-	
-	returnedLength = 0;
-	buffer =
+		
+		if (returnedLength == self.size)
+		{
+			self.rawValue = (void *)buffer;
+		}
+		
+		returnedLength = 0;
+		buffer =
 		[coder
 		 decodeBytesForKey:ZGFreezeValueKey
 		 returnedLength:&returnedLength];
-	
-	if (returnedLength == self.size)
-	{
-		self.freezeValue = (void *)buffer;
+		
+		if (returnedLength == self.size)
+		{
+			self.freezeValue = (void *)buffer;
+		}
+		
+		NSString *scriptValue = [coder decodeObjectForKey:ZGScriptKey];
+		self.scriptValue = scriptValue != nil ? scriptValue : @"";
+		
+		self.cachedScriptPath = [coder decodeObjectForKey:ZGScriptCachePathKey];
+		
+		return self;
 	}
-	
-	NSString *scriptValue = [coder decodeObjectForKey:ZGScriptKey];
-	self.scriptValue = scriptValue != nil ? scriptValue : @"";
-	
-	self.cachedScriptPath = [coder decodeObjectForKey:ZGScriptCachePathKey];
 	
 	return self;
 }
