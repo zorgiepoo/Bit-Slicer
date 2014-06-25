@@ -757,7 +757,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				}
 			});
 			
-			dispatch_source_set_timer(self.scriptTimer, dispatch_walltime(NULL, 0), (uint64_t)(0.03 * NSEC_PER_SEC), (uint64_t)(0.01 * NSEC_PER_SEC));
+			dispatch_source_set_timer(self.scriptTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC * 3 / 100, NSEC_PER_SEC * 1 / 100);
 			dispatch_source_set_event_handler(self.scriptTimer, ^{
 				for (ZGPyScript *runningScript in self.runningScripts)
 				{

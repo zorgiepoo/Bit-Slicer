@@ -942,7 +942,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 
 		if (self.watchPointTimer == NULL && (self.watchPointTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())) != NULL)
 		{
-			dispatch_source_set_timer(self.watchPointTimer, dispatch_walltime(NULL, 0), NSEC_PER_SEC / 2, (uint64_t)(0.1 * NSEC_PER_SEC));
+			dispatch_source_set_timer(self.watchPointTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC / 2, NSEC_PER_SEC / 10);
 			dispatch_source_set_event_handler(self.watchPointTimer, ^{
 				for (ZGBreakPoint *existingBreakPoint in self.breakPoints)
 				{
