@@ -536,7 +536,7 @@
 		{
 			// if the variable is within a single memory region and the memory region is not readable, then don't allow the variable to be writable
 			// if it is not writable, our value changing methods will try to change the protection attributes before modifying the data
-			if (memoryAddress <= variable.address && memoryAddress + memorySize >= variable.address + variable.size && !(memoryProtection & VM_PROT_READ))
+			if ((memoryAddress > variable.address || memoryAddress + memorySize < variable.address + variable.size) || (memoryProtection & VM_PROT_READ) == 0)
 			{
 				NSBeep();
 				return NO;
