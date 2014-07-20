@@ -49,7 +49,7 @@
 
 - (NSString *)windowNibName
 {
-	return NSStringFromClass([self class]);
+	return @"Edit Address Dialog";
 }
 
 - (id)initWithVariableController:(ZGVariableController *)variableController

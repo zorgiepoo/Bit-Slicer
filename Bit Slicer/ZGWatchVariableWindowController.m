@@ -102,7 +102,7 @@
 
 - (NSString *)windowNibName
 {
-	return NSStringFromClass([self class]);
+	return @"Watch Variable Dialog";
 }
 
 #pragma mark Stop Watching

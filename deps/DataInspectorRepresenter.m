@@ -526,7 +526,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (NSView *)createView {
-    BOOL loaded = [[NSBundle mainBundle] loadNibNamed:@"DataInspectorView" owner:self topLevelObjects:nil];
+    BOOL loaded = [[NSBundle mainBundle] loadNibNamed:@"Data Inspector View" owner:self topLevelObjects:nil];
     if (! loaded || ! outletView) {
         [NSException raise:NSInternalInconsistencyException format:@"Unable to load nib named DataInspectorView"];
     }

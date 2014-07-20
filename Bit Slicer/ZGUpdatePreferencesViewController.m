@@ -49,7 +49,7 @@
 
 - (id)initWithAppUpdaterController:(ZGAppUpdaterController *)appUpdaterController
 {
-	self = [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
+	self = [super initWithNibName:@"Software Update View" bundle:nil];
 	if (self != nil)
 	{
 		self.appUpdaterController = appUpdaterController;

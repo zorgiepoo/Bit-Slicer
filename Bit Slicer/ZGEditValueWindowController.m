@@ -64,7 +64,7 @@
 
 - (NSString *)windowNibName
 {
-	return NSStringFromClass([self class]);
+	return @"Edit Value Dialog";
 }
 
 - (NSString *)commonByteArrayPatternFromVariables:(NSArray *)variables

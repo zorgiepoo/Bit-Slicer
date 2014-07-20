@@ -52,7 +52,7 @@
 
 - (NSString *)windowNibName
 {
-	return NSStringFromClass([self class]);
+	return @"Dump All Memory Dialog";
 }
 
 - (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process

@@ -8,28 +8,29 @@
 
 /* Begin PBXBuildFile section */
 		726CA2A019606CA600A6AD40 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA29E19606CA600A6AD40 /* MainMenu.xib */; };
-		726CA2A319606CB600A6AD40 /* MyDocument.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2A119606CB600A6AD40 /* MyDocument.xib */; };
-		726CA2A619606CDD00A6AD40 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2A419606CDD00A6AD40 /* Preferences.xib */; };
-		726CA2A919606D0000A6AD40 /* ZGCodeInjectionWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2A719606D0000A6AD40 /* ZGCodeInjectionWindowController.xib */; };
-		726CA2AC19606D0700A6AD40 /* ZGDebuggerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2AA19606D0700A6AD40 /* ZGDebuggerController.xib */; };
-		726CA2AF19606D1200A6AD40 /* ZGMemoryViewerController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2AD19606D1200A6AD40 /* ZGMemoryViewerController.xib */; };
-		726CA2B019606DA000A6AD40 /* ZGLoggerWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2B219606DA000A6AD40 /* ZGLoggerWindowController.xib */; };
-		726CA2B319606DB300A6AD40 /* ZGBreakPointConditionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2B519606DB300A6AD40 /* ZGBreakPointConditionViewController.xib */; };
-		726CA2B619606DD200A6AD40 /* ZGMemoryProtectionWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2B819606DD200A6AD40 /* ZGMemoryProtectionWindowController.xib */; };
-		726CA2B919606DD900A6AD40 /* ZGMemoryDumpAllWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2BB19606DD900A6AD40 /* ZGMemoryDumpAllWindowController.xib */; };
-		726CA2BC19606DDD00A6AD40 /* ZGMemoryDumpRangeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2BE19606DDD00A6AD40 /* ZGMemoryDumpRangeWindowController.xib */; };
-		726CA2BF19606DF200A6AD40 /* ZGUpdatePreferencesViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2C119606DF200A6AD40 /* ZGUpdatePreferencesViewController.xib */; };
-		726CA2C219606DFC00A6AD40 /* ZGHotKeyPreferencesViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2C419606DFC00A6AD40 /* ZGHotKeyPreferencesViewController.xib */; };
-		726CA2C519606E0100A6AD40 /* ZGScriptPreferencesViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2C719606E0100A6AD40 /* ZGScriptPreferencesViewController.xib */; };
-		726CA2C819606E1D00A6AD40 /* ZGEditValueWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2CA19606E1D00A6AD40 /* ZGEditValueWindowController.xib */; };
-		726CA2CB19606E2200A6AD40 /* ZGEditAddressWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2CD19606E2200A6AD40 /* ZGEditAddressWindowController.xib */; };
-		726CA2CE19606E2600A6AD40 /* ZGEditSizeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D019606E2600A6AD40 /* ZGEditSizeWindowController.xib */; };
-		726CA2D119606E2900A6AD40 /* ZGEditDescriptionWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D319606E2900A6AD40 /* ZGEditDescriptionWindowController.xib */; };
-		726CA2D419606E3100A6AD40 /* ZGDocumentOptionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* ZGDocumentOptionsViewController.xib */; };
-		726CA2D719606E3800A6AD40 /* ZGWatchVariableWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* ZGWatchVariableWindowController.xib */; };
+		726CA2A319606CB600A6AD40 /* Search Document Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2A119606CB600A6AD40 /* Search Document Window.xib */; };
+		726CA2A619606CDD00A6AD40 /* Preferences Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2A419606CDD00A6AD40 /* Preferences Window.xib */; };
+		726CA2A919606D0000A6AD40 /* Code Injection Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2A719606D0000A6AD40 /* Code Injection Window.xib */; };
+		726CA2AC19606D0700A6AD40 /* Debugger Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2AA19606D0700A6AD40 /* Debugger Window.xib */; };
+		726CA2AF19606D1200A6AD40 /* Memory Viewer Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2AD19606D1200A6AD40 /* Memory Viewer Window.xib */; };
+		726CA2B019606DA000A6AD40 /* Logs Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2B219606DA000A6AD40 /* Logs Window.xib */; };
+		726CA2B319606DB300A6AD40 /* Breakpoint Condition View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2B519606DB300A6AD40 /* Breakpoint Condition View.xib */; };
+		726CA2B619606DD200A6AD40 /* Change Memory Protection Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2B819606DD200A6AD40 /* Change Memory Protection Dialog.xib */; };
+		726CA2B919606DD900A6AD40 /* Dump All Memory Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2BB19606DD900A6AD40 /* Dump All Memory Dialog.xib */; };
+		726CA2BC19606DDD00A6AD40 /* Dump Memory Range Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2BE19606DDD00A6AD40 /* Dump Memory Range Dialog.xib */; };
+		726CA2BF19606DF200A6AD40 /* Software Update View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2C119606DF200A6AD40 /* Software Update View.xib */; };
+		726CA2C219606DFC00A6AD40 /* Shortcuts View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2C419606DFC00A6AD40 /* Shortcuts View.xib */; };
+		726CA2C519606E0100A6AD40 /* Scripts View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2C719606E0100A6AD40 /* Scripts View.xib */; };
+		726CA2C819606E1D00A6AD40 /* Edit Value Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2CA19606E1D00A6AD40 /* Edit Value Dialog.xib */; };
+		726CA2CB19606E2200A6AD40 /* Edit Address Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2CD19606E2200A6AD40 /* Edit Address Dialog.xib */; };
+		726CA2CE19606E2600A6AD40 /* Edit Size Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D019606E2600A6AD40 /* Edit Size Dialog.xib */; };
+		726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D319606E2900A6AD40 /* Edit Description Dialog.xib */; };
+		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
+		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
 		72D051A8196088B700EC532A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D051A6196088B700EC532A /* InfoPlist.strings */; };
-		72D051A91960890800EC532A /* DataInspectorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* DataInspectorView.xib */; };
-		72D051AC1960891900EC532A /* ZGBacktraceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AE1960891900EC532A /* ZGBacktraceViewController.xib */; };
+		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
+		72D051AC1960891900EC532A /* Backtrace View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AE1960891900EC532A /* Backtrace View.xib */; };
+		72D051CB1960A41F00EC532A /* Registers View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051C91960A41F00EC532A /* Registers View.xib */; };
 		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
 		770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F284118832132001B828C /* ZGBreakPointCondition.m */; };
@@ -116,7 +117,6 @@
 		77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */; };
 		77CE28BA17D580AD00998F28 /* ZGPyMainModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CE28B917D580AD00998F28 /* ZGPyMainModule.m */; };
 		77CECE1718B8861C006D45E9 /* ZGRegistersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */; };
-		77CECE1818B8861C006D45E9 /* ZGRegistersViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 77CECE1618B8861C006D45E9 /* ZGRegistersViewController.xib */; };
 		77DA9D0B1800639E00549A37 /* continue.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D071800639E00549A37 /* continue.pdf */; };
 		77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D081800639E00549A37 /* stepin.pdf */; };
 		77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D091800639E00549A37 /* stepout.pdf */; };
@@ -260,28 +260,29 @@
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		726CA29F19606CA600A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/MainMenu.xib"; sourceTree = "<group>"; };
-		726CA2A219606CB600A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/MyDocument.xib"; sourceTree = "<group>"; };
-		726CA2A519606CDD00A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Preferences.xib"; sourceTree = "<group>"; };
-		726CA2A819606D0000A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/ZGCodeInjectionWindowController.xib"; sourceTree = "<group>"; };
-		726CA2AB19606D0700A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/ZGDebuggerController.xib"; sourceTree = "<group>"; };
-		726CA2AE19606D1200A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/ZGMemoryViewerController.xib"; sourceTree = "<group>"; };
-		726CA2B119606DA000A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGLoggerWindowController.xib; sourceTree = "<group>"; };
-		726CA2B419606DB300A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGBreakPointConditionViewController.xib; sourceTree = "<group>"; };
-		726CA2B719606DD200A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGMemoryProtectionWindowController.xib; sourceTree = "<group>"; };
-		726CA2BA19606DD900A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGMemoryDumpAllWindowController.xib; sourceTree = "<group>"; };
-		726CA2BD19606DDD00A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGMemoryDumpRangeWindowController.xib; sourceTree = "<group>"; };
-		726CA2C019606DF200A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGUpdatePreferencesViewController.xib; sourceTree = "<group>"; };
-		726CA2C319606DFC00A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGHotKeyPreferencesViewController.xib; sourceTree = "<group>"; };
-		726CA2C619606E0100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGScriptPreferencesViewController.xib; sourceTree = "<group>"; };
-		726CA2C919606E1D00A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGEditValueWindowController.xib; sourceTree = "<group>"; };
-		726CA2CC19606E2200A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGEditAddressWindowController.xib; sourceTree = "<group>"; };
-		726CA2CF19606E2600A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGEditSizeWindowController.xib; sourceTree = "<group>"; };
-		726CA2D219606E2900A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGEditDescriptionWindowController.xib; sourceTree = "<group>"; };
-		726CA2D519606E3100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGDocumentOptionsViewController.xib; sourceTree = "<group>"; };
-		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGWatchVariableWindowController.xib; sourceTree = "<group>"; };
+		726CA2A219606CB600A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Search Document Window.xib"; sourceTree = "<group>"; };
+		726CA2A519606CDD00A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Preferences Window.xib"; sourceTree = "<group>"; };
+		726CA2A819606D0000A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Code Injection Window.xib"; sourceTree = "<group>"; };
+		726CA2AB19606D0700A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Debugger Window.xib"; sourceTree = "<group>"; };
+		726CA2AE19606D1200A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Memory Viewer Window.xib"; sourceTree = "<group>"; };
+		726CA2B119606DA000A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Logs Window.xib"; sourceTree = "<group>"; };
+		726CA2B419606DB300A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Breakpoint Condition View.xib"; sourceTree = "<group>"; };
+		726CA2B719606DD200A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Change Memory Protection Dialog.xib"; sourceTree = "<group>"; };
+		726CA2BA19606DD900A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Dump All Memory Dialog.xib"; sourceTree = "<group>"; };
+		726CA2BD19606DDD00A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Dump Memory Range Dialog.xib"; sourceTree = "<group>"; };
+		726CA2C019606DF200A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Software Update View.xib"; sourceTree = "<group>"; };
+		726CA2C319606DFC00A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Shortcuts View.xib"; sourceTree = "<group>"; };
+		726CA2C619606E0100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Scripts View.xib"; sourceTree = "<group>"; };
+		726CA2C919606E1D00A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Edit Value Dialog.xib"; sourceTree = "<group>"; };
+		726CA2CC19606E2200A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Edit Address Dialog.xib"; sourceTree = "<group>"; };
+		726CA2CF19606E2600A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Edit Size Dialog.xib"; sourceTree = "<group>"; };
+		726CA2D219606E2900A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Edit Description Dialog.xib"; sourceTree = "<group>"; };
+		726CA2D519606E3100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Search Options.xib"; sourceTree = "<group>"; };
+		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Watch Variable Dialog.xib"; sourceTree = "<group>"; };
 		72D051A7196088B700EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = "Bit Slicer/Base.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/DataInspectorView.xib; sourceTree = "<group>"; };
-		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ZGBacktraceViewController.xib; sourceTree = "<group>"; };
+		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Data Inspector View.xib"; sourceTree = "<group>"; };
+		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Backtrace View.xib"; sourceTree = "<group>"; };
+		72D051CA1960A41F00EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Registers View.xib"; sourceTree = "<group>"; };
 		770136E8192309740072A192 /* ZGPyVMProtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyVMProtModule.h; path = "Bit Slicer/ZGPyVMProtModule.h"; sourceTree = "<group>"; };
 		770136E9192309740072A192 /* ZGPyVMProtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyVMProtModule.m; path = "Bit Slicer/ZGPyVMProtModule.m"; sourceTree = "<group>"; };
 		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; };
@@ -540,7 +541,6 @@
 		77CE28BB17D580D400998F28 /* ZGPyMainModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyMainModule.h; path = "Bit Slicer/ZGPyMainModule.h"; sourceTree = "<group>"; };
 		77CECE1418B8861C006D45E9 /* ZGRegistersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegistersViewController.h; path = "Bit Slicer/ZGRegistersViewController.h"; sourceTree = "<group>"; };
 		77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegistersViewController.m; path = "Bit Slicer/ZGRegistersViewController.m"; sourceTree = "<group>"; };
-		77CECE1618B8861C006D45E9 /* ZGRegistersViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ZGRegistersViewController.xib; path = "Bit Slicer/ZGRegistersViewController.xib"; sourceTree = "<group>"; };
 		77DA9D071800639E00549A37 /* continue.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = continue.pdf; path = "Bit Slicer/debuggericons/continue.pdf"; sourceTree = "<group>"; };
 		77DA9D081800639E00549A37 /* stepin.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepin.pdf; path = "Bit Slicer/debuggericons/stepin.pdf"; sourceTree = "<group>"; };
 		77DA9D091800639E00549A37 /* stepout.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = stepout.pdf; path = "Bit Slicer/debuggericons/stepout.pdf"; sourceTree = "<group>"; };
@@ -724,6 +724,7 @@
 			isa = PBXGroup;
 			children = (
 				2A37F4ABFDCFA73011CA2CEA /* Code */,
+				72D051C619609C0A00EC532A /* Nibs */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */,
@@ -787,6 +788,36 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		72D051C619609C0A00EC532A /* Nibs */ = {
+			isa = PBXGroup;
+			children = (
+				726CA29E19606CA600A6AD40 /* MainMenu.xib */,
+				726CA2A119606CB600A6AD40 /* Search Document Window.xib */,
+				726CA2AA19606D0700A6AD40 /* Debugger Window.xib */,
+				72D051AE1960891900EC532A /* Backtrace View.xib */,
+				72D051C91960A41F00EC532A /* Registers View.xib */,
+				726CA2B519606DB300A6AD40 /* Breakpoint Condition View.xib */,
+				726CA2A719606D0000A6AD40 /* Code Injection Window.xib */,
+				726CA2AD19606D1200A6AD40 /* Memory Viewer Window.xib */,
+				72D051AB1960890800EC532A /* Data Inspector View.xib */,
+				726CA2B819606DD200A6AD40 /* Change Memory Protection Dialog.xib */,
+				726CA2BB19606DD900A6AD40 /* Dump All Memory Dialog.xib */,
+				726CA2BE19606DDD00A6AD40 /* Dump Memory Range Dialog.xib */,
+				726CA2A419606CDD00A6AD40 /* Preferences Window.xib */,
+				726CA2C119606DF200A6AD40 /* Software Update View.xib */,
+				726CA2C419606DFC00A6AD40 /* Shortcuts View.xib */,
+				726CA2C719606E0100A6AD40 /* Scripts View.xib */,
+				726CA2B219606DA000A6AD40 /* Logs Window.xib */,
+				726CA2CA19606E1D00A6AD40 /* Edit Value Dialog.xib */,
+				726CA2CD19606E2200A6AD40 /* Edit Address Dialog.xib */,
+				726CA2D019606E2600A6AD40 /* Edit Size Dialog.xib */,
+				726CA2D319606E2900A6AD40 /* Edit Description Dialog.xib */,
+				726CA2D619606E3100A6AD40 /* Search Options.xib */,
+				726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */,
+			);
+			name = Nibs;
+			sourceTree = "<group>";
+		};
 		7701EF411696A29100877373 /* mach_exc */ = {
 			isa = PBXGroup;
 			children = (
@@ -804,16 +835,12 @@
 				77F1160217D2EEAA009E002A /* ZGVariableController.m */,
 				770FABA91848354100C176B7 /* ZGEditValueWindowController.h */,
 				770FABAA1848354100C176B7 /* ZGEditValueWindowController.m */,
-				726CA2CA19606E1D00A6AD40 /* ZGEditValueWindowController.xib */,
 				770FABAE18490DB400C176B7 /* ZGEditAddressWindowController.h */,
 				770FABAF18490DB400C176B7 /* ZGEditAddressWindowController.m */,
-				726CA2CD19606E2200A6AD40 /* ZGEditAddressWindowController.xib */,
 				770FABB41849160200C176B7 /* ZGEditSizeWindowController.h */,
 				770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */,
-				726CA2D019606E2600A6AD40 /* ZGEditSizeWindowController.xib */,
 				77FFC14918711D2700122357 /* ZGEditDescriptionWindowController.h */,
 				77FFC14A18711D2700122357 /* ZGEditDescriptionWindowController.m */,
-				726CA2D319606E2900A6AD40 /* ZGEditDescriptionWindowController.xib */,
 			);
 			name = "Variable Controllers";
 			sourceTree = "<group>";
@@ -836,12 +863,10 @@
 			children = (
 				779D56C718F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.h */,
 				779D56C818F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.m */,
-				726CA2BB19606DD900A6AD40 /* ZGMemoryDumpAllWindowController.xib */,
 				7714193F18AC7D8500600423 /* ZGMemoryDumpFunctions.h */,
 				7714194018AC7D8500600423 /* ZGMemoryDumpFunctions.m */,
 				779D56C218F1284100FD5408 /* ZGMemoryDumpRangeWindowController.h */,
 				779D56C318F1284100FD5408 /* ZGMemoryDumpRangeWindowController.m */,
-				726CA2BE19606DDD00A6AD40 /* ZGMemoryDumpRangeWindowController.xib */,
 			);
 			name = "Dumping Memory";
 			sourceTree = "<group>";
@@ -863,16 +888,12 @@
 			children = (
 				77F115E317D2EDCD009E002A /* ZGPreferencesController.h */,
 				77F115E417D2EDCD009E002A /* ZGPreferencesController.m */,
-				726CA2A419606CDD00A6AD40 /* Preferences.xib */,
 				772D121A190E008500800B1B /* ZGUpdatePreferencesViewController.h */,
 				772D121B190E008500800B1B /* ZGUpdatePreferencesViewController.m */,
-				726CA2C119606DF200A6AD40 /* ZGUpdatePreferencesViewController.xib */,
 				772D1265190E0D8600800B1B /* ZGHotKeyPreferencesViewController.h */,
 				772D1266190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m */,
-				726CA2C419606DFC00A6AD40 /* ZGHotKeyPreferencesViewController.xib */,
 				773DE95F190F4D130078E8F9 /* ZGScriptPreferencesViewController.h */,
 				773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */,
-				726CA2C719606E0100A6AD40 /* ZGScriptPreferencesViewController.xib */,
 			);
 			name = Preferences;
 			sourceTree = "<group>";
@@ -885,17 +906,14 @@
 				77329B74168D0E16007DCAE2 /* libudis86 */,
 				77F1163E17D2EF9E009E002A /* ZGDebuggerController.h */,
 				77F1163F17D2EF9E009E002A /* ZGDebuggerController.m */,
-				726CA2AA19606D0700A6AD40 /* ZGDebuggerController.xib */,
 				779C6CC118E7309B0076D647 /* ZGDebuggerUtilities.h */,
 				779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */,
 				77CECE1418B8861C006D45E9 /* ZGRegistersViewController.h */,
 				77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */,
-				77CECE1618B8861C006D45E9 /* ZGRegistersViewController.xib */,
 				772C0F7C18B88AFA009FFF72 /* ZGRegisterEntries.h */,
 				772C0F7D18B88AFA009FFF72 /* ZGRegisterEntries.m */,
 				772C0F7F18B95603009FFF72 /* ZGBacktraceViewController.h */,
 				772C0F8018B95603009FFF72 /* ZGBacktraceViewController.m */,
-				72D051AE1960891900EC532A /* ZGBacktraceViewController.xib */,
 				7768064118B9A36E007F2CAF /* ZGBacktrace.h */,
 				7768064218B9A36E007F2CAF /* ZGBacktrace.m */,
 				77F1164117D2EFB4009E002A /* ZGDisassemblerObject.h */,
@@ -904,7 +922,6 @@
 				77F1164517D2EFBD009E002A /* ZGInstruction.m */,
 				770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */,
 				770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */,
-				726CA2B519606DB300A6AD40 /* ZGBreakPointConditionViewController.xib */,
 				770F284018832132001B828C /* ZGBreakPointCondition.h */,
 				770F284118832132001B828C /* ZGBreakPointCondition.m */,
 				77F1164717D2EFC8009E002A /* ZGBreakPointController.h */,
@@ -918,7 +935,6 @@
 				77F1165817D2F001009E002A /* ZGRegister.m */,
 				77F1165A17D2F00A009E002A /* ZGCodeInjectionWindowController.h */,
 				77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */,
-				726CA2A719606D0000A6AD40 /* ZGCodeInjectionWindowController.xib */,
 			);
 			name = Debugger;
 			sourceTree = "<group>";
@@ -1084,7 +1100,6 @@
 			children = (
 				779D56BD18F0775500FD5408 /* ZGMemoryProtectionWindowController.h */,
 				779D56BE18F0775500FD5408 /* ZGMemoryProtectionWindowController.m */,
-				726CA2B819606DD200A6AD40 /* ZGMemoryProtectionWindowController.xib */,
 			);
 			name = "Changing Memory Protection";
 			sourceTree = "<group>";
@@ -1094,10 +1109,8 @@
 			children = (
 				77F115CB17D2ED64009E002A /* ZGMemoryViewerController.h */,
 				77F115CC17D2ED64009E002A /* ZGMemoryViewerController.m */,
-				726CA2AD19606D1200A6AD40 /* ZGMemoryViewerController.xib */,
 				773972F417D2E7B600B958EE /* DataInspectorRepresenter.h */,
 				773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */,
-				72D051AB1960890800EC532A /* DataInspectorView.xib */,
 				77F115CE17D2ED74009E002A /* ZGVerticalScrollerRepresenter.h */,
 				77F115CF17D2ED74009E002A /* ZGVerticalScrollerRepresenter.m */,
 				77F115D117D2ED82009E002A /* ZGStatusBarRepresenter.h */,
@@ -1234,21 +1247,18 @@
 				770FABB318490DDD00C176B7 /* Variable Controllers */,
 				77F115EF17D2EDF9009E002A /* ZGDocument.h */,
 				77F115F017D2EDF9009E002A /* ZGDocument.m */,
-				726CA2A119606CB600A6AD40 /* MyDocument.xib */,
 				77F115F217D2EE0B009E002A /* ZGDocumentData.h */,
 				77F115F317D2EE0B009E002A /* ZGDocumentData.m */,
 				77F115F517D2EE28009E002A /* ZGDocumentWindowController.h */,
 				77F115F617D2EE28009E002A /* ZGDocumentWindowController.m */,
 				7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */,
 				7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */,
-				726CA2D619606E3100A6AD40 /* ZGDocumentOptionsViewController.xib */,
 				77F115F817D2EE6F009E002A /* ZGDocumentSearchController.h */,
 				77F115F917D2EE6F009E002A /* ZGDocumentSearchController.m */,
 				77F115FB17D2EE7E009E002A /* ZGDocumentTableController.h */,
 				77F115FC17D2EE7E009E002A /* ZGDocumentTableController.m */,
 				77FFC104186BDA3600122357 /* ZGWatchVariableWindowController.h */,
 				77FFC105186BDA3600122357 /* ZGWatchVariableWindowController.m */,
-				726CA2D919606E3800A6AD40 /* ZGWatchVariableWindowController.xib */,
 				7739728017D26A1600B958EE /* Scripting */,
 			);
 			name = Documents;
@@ -1328,7 +1338,6 @@
 		77FF508216EAD0630005915D /* General */ = {
 			isa = PBXGroup;
 			children = (
-				726CA29E19606CA600A6AD40 /* MainMenu.xib */,
 				777DA25618CEAFE70092DEC9 /* ZGAppController.h */,
 				77F115E117D2EDC3009E002A /* ZGAppController.m */,
 				777DA25718CF55750092DEC9 /* ZGNavigationPost.h */,
@@ -1344,7 +1353,6 @@
 				772D1264190E0CE500800B1B /* Preferences */,
 				77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */,
 				77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */,
-				726CA2B219606DA000A6AD40 /* ZGLoggerWindowController.xib */,
 			);
 			name = General;
 			sourceTree = "<group>";
@@ -1452,40 +1460,40 @@
 			buildActionMask = 2147483647;
 			files = (
 				77F115AA17D2E8AC009E002A /* yasm in Resources */,
-				726CA2B919606DD900A6AD40 /* ZGMemoryDumpAllWindowController.xib in Resources */,
-				726CA2CB19606E2200A6AD40 /* ZGEditAddressWindowController.xib in Resources */,
-				726CA2D719606E3800A6AD40 /* ZGWatchVariableWindowController.xib in Resources */,
+				726CA2B919606DD900A6AD40 /* Dump All Memory Dialog.xib in Resources */,
+				726CA2CB19606E2200A6AD40 /* Edit Address Dialog.xib in Resources */,
+				726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */,
 				77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */,
 				77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */,
 				77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */,
-				726CA2C819606E1D00A6AD40 /* ZGEditValueWindowController.xib in Resources */,
-				726CA2A919606D0000A6AD40 /* ZGCodeInjectionWindowController.xib in Resources */,
+				726CA2C819606E1D00A6AD40 /* Edit Value Dialog.xib in Resources */,
+				726CA2A919606D0000A6AD40 /* Code Injection Window.xib in Resources */,
 				77DA9D0B1800639E00549A37 /* continue.pdf in Resources */,
-				726CA2AF19606D1200A6AD40 /* ZGMemoryViewerController.xib in Resources */,
-				726CA2B619606DD200A6AD40 /* ZGMemoryProtectionWindowController.xib in Resources */,
-				726CA2BF19606DF200A6AD40 /* ZGUpdatePreferencesViewController.xib in Resources */,
+				726CA2AF19606D1200A6AD40 /* Memory Viewer Window.xib in Resources */,
+				726CA2B619606DD200A6AD40 /* Change Memory Protection Dialog.xib in Resources */,
+				726CA2BF19606DF200A6AD40 /* Software Update View.xib in Resources */,
 				77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */,
-				726CA2D119606E2900A6AD40 /* ZGEditDescriptionWindowController.xib in Resources */,
+				726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */,
 				77F115B317D2EAFE009E002A /* Credits.rtf in Resources */,
-				726CA2A619606CDD00A6AD40 /* Preferences.xib in Resources */,
-				726CA2AC19606D0700A6AD40 /* ZGDebuggerController.xib in Resources */,
+				726CA2A619606CDD00A6AD40 /* Preferences Window.xib in Resources */,
+				726CA2AC19606D0700A6AD40 /* Debugger Window.xib in Resources */,
 				77988F1C185804AC00476A37 /* container_filled.pdf in Resources */,
 				7743F9C618024CE400DBC19A /* python3.3 in Resources */,
 				77988F1A185803E800476A37 /* container.pdf in Resources */,
-				726CA2BC19606DDD00A6AD40 /* ZGMemoryDumpRangeWindowController.xib in Resources */,
-				726CA2B319606DB300A6AD40 /* ZGBreakPointConditionViewController.xib in Resources */,
-				726CA2C519606E0100A6AD40 /* ZGScriptPreferencesViewController.xib in Resources */,
+				726CA2BC19606DDD00A6AD40 /* Dump Memory Range Dialog.xib in Resources */,
+				726CA2B319606DB300A6AD40 /* Breakpoint Condition View.xib in Resources */,
+				726CA2C519606E0100A6AD40 /* Scripts View.xib in Resources */,
 				77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */,
-				726CA2C219606DFC00A6AD40 /* ZGHotKeyPreferencesViewController.xib in Resources */,
-				726CA2D419606E3100A6AD40 /* ZGDocumentOptionsViewController.xib in Resources */,
+				726CA2C219606DFC00A6AD40 /* Shortcuts View.xib in Resources */,
+				726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */,
 				726CA2A019606CA600A6AD40 /* MainMenu.xib in Resources */,
-				77CECE1818B8861C006D45E9 /* ZGRegistersViewController.xib in Resources */,
 				72D051A8196088B700EC532A /* InfoPlist.strings in Resources */,
-				726CA2CE19606E2600A6AD40 /* ZGEditSizeWindowController.xib in Resources */,
-				72D051AC1960891900EC532A /* ZGBacktraceViewController.xib in Resources */,
-				72D051A91960890800EC532A /* DataInspectorView.xib in Resources */,
-				726CA2B019606DA000A6AD40 /* ZGLoggerWindowController.xib in Resources */,
-				726CA2A319606CB600A6AD40 /* MyDocument.xib in Resources */,
+				726CA2CE19606E2600A6AD40 /* Edit Size Dialog.xib in Resources */,
+				72D051CB1960A41F00EC532A /* Registers View.xib in Resources */,
+				72D051AC1960891900EC532A /* Backtrace View.xib in Resources */,
+				72D051A91960890800EC532A /* Data Inspector View.xib in Resources */,
+				726CA2B019606DA000A6AD40 /* Logs Window.xib in Resources */,
+				726CA2A319606CB600A6AD40 /* Search Document Window.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1680,169 +1688,169 @@
 			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
-		726CA2A119606CB600A6AD40 /* MyDocument.xib */ = {
+		726CA2A119606CB600A6AD40 /* Search Document Window.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2A219606CB600A6AD40 /* Base */,
 			);
-			name = MyDocument.xib;
+			name = "Search Document Window.xib";
 			sourceTree = "<group>";
 		};
-		726CA2A419606CDD00A6AD40 /* Preferences.xib */ = {
+		726CA2A419606CDD00A6AD40 /* Preferences Window.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2A519606CDD00A6AD40 /* Base */,
 			);
-			name = Preferences.xib;
+			name = "Preferences Window.xib";
 			sourceTree = "<group>";
 		};
-		726CA2A719606D0000A6AD40 /* ZGCodeInjectionWindowController.xib */ = {
+		726CA2A719606D0000A6AD40 /* Code Injection Window.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2A819606D0000A6AD40 /* Base */,
 			);
-			name = ZGCodeInjectionWindowController.xib;
+			name = "Code Injection Window.xib";
 			sourceTree = "<group>";
 		};
-		726CA2AA19606D0700A6AD40 /* ZGDebuggerController.xib */ = {
+		726CA2AA19606D0700A6AD40 /* Debugger Window.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2AB19606D0700A6AD40 /* Base */,
 			);
-			name = ZGDebuggerController.xib;
+			name = "Debugger Window.xib";
 			sourceTree = "<group>";
 		};
-		726CA2AD19606D1200A6AD40 /* ZGMemoryViewerController.xib */ = {
+		726CA2AD19606D1200A6AD40 /* Memory Viewer Window.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2AE19606D1200A6AD40 /* Base */,
 			);
-			name = ZGMemoryViewerController.xib;
+			name = "Memory Viewer Window.xib";
 			sourceTree = "<group>";
 		};
-		726CA2B219606DA000A6AD40 /* ZGLoggerWindowController.xib */ = {
+		726CA2B219606DA000A6AD40 /* Logs Window.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2B119606DA000A6AD40 /* Base */,
 			);
-			name = ZGLoggerWindowController.xib;
+			name = "Logs Window.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2B519606DB300A6AD40 /* ZGBreakPointConditionViewController.xib */ = {
+		726CA2B519606DB300A6AD40 /* Breakpoint Condition View.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2B419606DB300A6AD40 /* Base */,
 			);
-			name = ZGBreakPointConditionViewController.xib;
+			name = "Breakpoint Condition View.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2B819606DD200A6AD40 /* ZGMemoryProtectionWindowController.xib */ = {
+		726CA2B819606DD200A6AD40 /* Change Memory Protection Dialog.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2B719606DD200A6AD40 /* Base */,
 			);
-			name = ZGMemoryProtectionWindowController.xib;
+			name = "Change Memory Protection Dialog.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2BB19606DD900A6AD40 /* ZGMemoryDumpAllWindowController.xib */ = {
+		726CA2BB19606DD900A6AD40 /* Dump All Memory Dialog.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2BA19606DD900A6AD40 /* Base */,
 			);
-			name = ZGMemoryDumpAllWindowController.xib;
+			name = "Dump All Memory Dialog.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2BE19606DDD00A6AD40 /* ZGMemoryDumpRangeWindowController.xib */ = {
+		726CA2BE19606DDD00A6AD40 /* Dump Memory Range Dialog.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2BD19606DDD00A6AD40 /* Base */,
 			);
-			name = ZGMemoryDumpRangeWindowController.xib;
+			name = "Dump Memory Range Dialog.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2C119606DF200A6AD40 /* ZGUpdatePreferencesViewController.xib */ = {
+		726CA2C119606DF200A6AD40 /* Software Update View.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2C019606DF200A6AD40 /* Base */,
 			);
-			name = ZGUpdatePreferencesViewController.xib;
+			name = "Software Update View.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2C419606DFC00A6AD40 /* ZGHotKeyPreferencesViewController.xib */ = {
+		726CA2C419606DFC00A6AD40 /* Shortcuts View.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2C319606DFC00A6AD40 /* Base */,
 			);
-			name = ZGHotKeyPreferencesViewController.xib;
+			name = "Shortcuts View.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2C719606E0100A6AD40 /* ZGScriptPreferencesViewController.xib */ = {
+		726CA2C719606E0100A6AD40 /* Scripts View.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2C619606E0100A6AD40 /* Base */,
 			);
-			name = ZGScriptPreferencesViewController.xib;
+			name = "Scripts View.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2CA19606E1D00A6AD40 /* ZGEditValueWindowController.xib */ = {
+		726CA2CA19606E1D00A6AD40 /* Edit Value Dialog.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2C919606E1D00A6AD40 /* Base */,
 			);
-			name = ZGEditValueWindowController.xib;
+			name = "Edit Value Dialog.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2CD19606E2200A6AD40 /* ZGEditAddressWindowController.xib */ = {
+		726CA2CD19606E2200A6AD40 /* Edit Address Dialog.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2CC19606E2200A6AD40 /* Base */,
 			);
-			name = ZGEditAddressWindowController.xib;
+			name = "Edit Address Dialog.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2D019606E2600A6AD40 /* ZGEditSizeWindowController.xib */ = {
+		726CA2D019606E2600A6AD40 /* Edit Size Dialog.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2CF19606E2600A6AD40 /* Base */,
 			);
-			name = ZGEditSizeWindowController.xib;
+			name = "Edit Size Dialog.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2D319606E2900A6AD40 /* ZGEditDescriptionWindowController.xib */ = {
+		726CA2D319606E2900A6AD40 /* Edit Description Dialog.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2D219606E2900A6AD40 /* Base */,
 			);
-			name = ZGEditDescriptionWindowController.xib;
+			name = "Edit Description Dialog.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2D619606E3100A6AD40 /* ZGDocumentOptionsViewController.xib */ = {
+		726CA2D619606E3100A6AD40 /* Search Options.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2D519606E3100A6AD40 /* Base */,
 			);
-			name = ZGDocumentOptionsViewController.xib;
+			name = "Search Options.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		726CA2D919606E3800A6AD40 /* ZGWatchVariableWindowController.xib */ = {
+		726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				726CA2D819606E3800A6AD40 /* Base */,
 			);
-			name = ZGWatchVariableWindowController.xib;
+			name = "Watch Variable Dialog.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
@@ -1854,22 +1862,30 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		72D051AB1960890800EC532A /* DataInspectorView.xib */ = {
+		72D051AB1960890800EC532A /* Data Inspector View.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				72D051AA1960890800EC532A /* Base */,
 			);
-			name = DataInspectorView.xib;
+			name = "Data Inspector View.xib";
 			path = "Bit Slicer";
 			sourceTree = "<group>";
 		};
-		72D051AE1960891900EC532A /* ZGBacktraceViewController.xib */ = {
+		72D051AE1960891900EC532A /* Backtrace View.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				72D051AD1960891900EC532A /* Base */,
 			);
-			name = ZGBacktraceViewController.xib;
+			name = "Backtrace View.xib";
 			path = "Bit Slicer";
+			sourceTree = "<group>";
+		};
+		72D051C91960A41F00EC532A /* Registers View.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				72D051CA1960A41F00EC532A /* Base */,
+			);
+			name = "Registers View.xib";
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

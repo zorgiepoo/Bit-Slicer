@@ -57,7 +57,7 @@
 
 - (id)initWithDelegate:(id <ZGBacktraceViewControllerDelegate>)delegate
 {
-	self = [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
+	self = [super initWithNibName:@"Backtrace View" bundle:nil];
 	if (self != nil)
 	{
 		self.delegate = delegate;

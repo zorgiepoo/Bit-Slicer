@@ -51,7 +51,7 @@
 
 - (NSString *)windowNibName
 {
-	return NSStringFromClass([self class]);
+	return @"Edit Size Dialog";
 }
 
 - (id)initWithVariableController:(ZGVariableController *)variableController

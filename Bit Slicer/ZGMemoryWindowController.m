@@ -74,11 +74,6 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	return self;
 }
 
-- (NSString *)windowNibName
-{
-	return NSStringFromClass([self class]);
-}
-
 - (NSUndoManager *)undoManager
 {
 	if (_undoManager == nil)

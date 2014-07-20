@@ -47,7 +47,7 @@
 
 - (NSString *)windowNibName
 {
-	return NSStringFromClass([self class]);
+	return @"Edit Description Dialog";
 }
 
 - (id)initWithVariableController:(ZGVariableController *)variableController

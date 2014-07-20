@@ -46,7 +46,7 @@
 
 - (id)initWithDelegate:(id <ZGBreakPointConditionDelegate>)delegate
 {
-	self = [self initWithNibName:NSStringFromClass([self class]) bundle:nil];
+	self = [self initWithNibName:@"Breakpoint Condition View" bundle:nil];
     if (self != nil)
 	{
 		self.delegate = delegate;

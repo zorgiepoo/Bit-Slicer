@@ -138,7 +138,7 @@
 
 - (NSString *)windowNibName
 {
-	return @"MyDocument";
+	return @"Search Document Window";
 }
 
 - (void)dealloc

@@ -69,7 +69,7 @@
 
 - (id)initWithUndoManager:(NSUndoManager *)undoManager
 {
-	self = [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
+	self = [super initWithNibName:@"Registers View" bundle:nil];
 	if (self != nil)
 	{
 		self.undoManager = undoManager;

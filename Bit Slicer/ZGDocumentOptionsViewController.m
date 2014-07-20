@@ -50,7 +50,7 @@
 
 - (id)initWithDocument:(ZGDocument *)document
 {
-	self = [self initWithNibName:NSStringFromClass([self class]) bundle:nil];
+	self = [self initWithNibName:@"Search Options" bundle:nil];
 	if (self != nil)
 	{
 		self.document = document;

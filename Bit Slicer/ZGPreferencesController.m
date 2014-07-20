@@ -63,7 +63,7 @@
 
 - (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController
 {
-	self = [super initWithWindowNibName:@"Preferences"];
+	self = [super initWithWindowNibName:@"Preferences Window"];
 	
 	if (self != nil)
 	{

@@ -226,6 +226,11 @@ enum ZGStepExecution
 	[self readMemory:nil];
 }
 
+- (NSString *)windowNibName
+{
+	return @"Debugger Window";
+}
+
 - (void)windowDidLoad
 {
     [super windowDidLoad];

@@ -54,7 +54,7 @@
 
 - (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController
 {
-	self = [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
+	self = [super initWithNibName:@"Shortcuts View" bundle:nil];
 	if (self != nil)
 	{
 		self.hotKeyCenter = hotKeyCenter;

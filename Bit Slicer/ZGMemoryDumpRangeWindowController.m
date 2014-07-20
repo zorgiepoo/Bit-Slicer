@@ -53,7 +53,7 @@
 
 - (NSString *)windowNibName
 {
-	return NSStringFromClass([self class]);
+	return @"Dump Memory Range Dialog";
 }
 
 - (IBAction)dumpMemory:(id)__unused sender

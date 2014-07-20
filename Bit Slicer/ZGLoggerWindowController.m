@@ -61,7 +61,7 @@
 
 - (NSString *)windowNibName
 {
-	return NSStringFromClass([self class]);
+	return @"Logs Window";
 }
 
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder

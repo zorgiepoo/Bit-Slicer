@@ -57,7 +57,7 @@
 
 - (NSString *)windowNibName
 {
-	return NSStringFromClass([self class]);
+	return @"Code Injection Window";
 }
 
 - (void)setSuggestedCode:(NSString *)suggestedCode

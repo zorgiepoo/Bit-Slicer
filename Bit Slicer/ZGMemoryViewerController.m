@@ -142,6 +142,11 @@
 	[self changeMemoryViewWithSelectionLength:0];
 }
 
+- (NSString *)windowNibName
+{
+	return @"Memory Viewer Window";
+}
+
 - (void)windowDidLoad
 {
 	[super windowDidLoad];

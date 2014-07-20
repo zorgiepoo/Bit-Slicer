@@ -56,7 +56,7 @@ enum ZGScriptIndentationTag
 
 - (id)init
 {
-	return [super initWithNibName:NSStringFromClass([self class]) bundle:nil];
+	return [super initWithNibName:@"Scripts View" bundle:nil];
 }
 
 - (void)loadView
