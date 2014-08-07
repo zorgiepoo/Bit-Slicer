@@ -37,6 +37,8 @@
 #import "ZGVariableController.h"
 #import "ZGAppPathUtilities.h"
 
+#define ZGScriptPreferencesLocalizationTable @"Script Preferences"
+
 enum ZGScriptIndentationTag
 {
 	ZGScriptIndentationTabsTag,
@@ -74,7 +76,7 @@ enum ZGScriptIndentationTag
 	[self.applicationEditorsPopUpButton removeAllItems];
 	
 	NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
-	NSMenuItem *defaultEditorMenuItem = [[NSMenuItem alloc] initWithTitle:@"Default Python Editor" action:NULL keyEquivalent:@""];
+	NSMenuItem *defaultEditorMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"defaultPythonEditor", ZGScriptPreferencesLocalizationTable, nil) action:NULL keyEquivalent:@""];
 	NSImage *extensionIcon = [workspace iconForFileType:@"py"];
 	
 	defaultEditorMenuItem.image = [extensionIcon copy];
@@ -129,10 +131,10 @@ enum ZGScriptIndentationTag
 {
 	[self.indentationPopUpButton removeAllItems];
 	
-	NSMenuItem *tabsMenuItem = [[NSMenuItem alloc] initWithTitle:@"Tabs" action:NULL keyEquivalent:@""];
+	NSMenuItem *tabsMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"tabsIndentation", ZGScriptPreferencesLocalizationTable, nil) action:NULL keyEquivalent:@""];
 	tabsMenuItem.tag = ZGScriptIndentationTabsTag;
 	
-	NSMenuItem *spacesMenuItem = [[NSMenuItem alloc] initWithTitle:@"Spaces" action:NULL keyEquivalent:@""];
+	NSMenuItem *spacesMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedStringFromTable(@"spacesIndentation", ZGScriptPreferencesLocalizationTable, nil) action:NULL keyEquivalent:@""];
 	spacesMenuItem.tag = ZGScriptIndentationSpacesTag;
 	
 	[self.indentationPopUpButton.menu addItem:tabsMenuItem];

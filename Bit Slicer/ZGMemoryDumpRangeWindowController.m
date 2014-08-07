@@ -39,6 +39,8 @@
 #import "ZGVirtualMemory.h"
 #import "ZGUtilities.h"
 
+#define ZGDumpMemoryRangeLocalizableTable @"Dump Memory Range"
+
 @interface ZGMemoryDumpRangeWindowController ()
 
 @property (nonatomic, assign) IBOutlet NSTextField *fromAddressTextField;
@@ -95,9 +97,9 @@
 				 if (!success)
 				 {
 					 NSRunAlertPanel(
-									 @"The Memory Dump failed",
-									 @"An error resulted in writing the memory dump.",
-									 @"OK", nil, nil);
+									 NSLocalizedStringFromTable(@"failedDumpingMemoryAlertTitle", ZGDumpMemoryRangeLocalizableTable, nil),
+									 NSLocalizedStringFromTable(@"failedDumpingMemoryAlertMessageFormat", ZGDumpMemoryRangeLocalizableTable, nil),
+									 nil, nil, nil, fromAddress, toAddress);
 				 }
 			 }
 		 }];
@@ -105,9 +107,9 @@
 	else
 	{
 		NSRunAlertPanel(
-						@"Invalid range",
-						@"Please make sure you typed in the addresses correctly.",
-						@"OK", nil, nil);
+						NSLocalizedStringFromTable(@"invalidAddressRangeAlertTitle", ZGDumpMemoryRangeLocalizableTable, nil),
+						NSLocalizedStringFromTable(@"invalidAddressRangeAlertMessage", ZGDumpMemoryRangeLocalizableTable, nil),
+						nil, nil, nil);
 	}
 }
 

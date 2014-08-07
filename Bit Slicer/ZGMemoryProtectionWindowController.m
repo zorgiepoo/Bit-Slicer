@@ -53,6 +53,8 @@
 
 @end
 
+#define ZGMemoryProtectionLocalizableTable @"Memory Protection"
+
 @implementation ZGMemoryProtectionWindowController
 
 - (NSString *)windowNibName
@@ -67,13 +69,13 @@
 	if (!success)
 	{
 		NSRunAlertPanel(
-						@"Memory Protection Change Failed",
-						@"The memory's protection could not be changed to the specified permissions.",
-						@"OK", nil, nil);
+						NSLocalizedStringFromTable(@"protectionChangeFailedAlertTitle", ZGMemoryProtectionLocalizableTable, nil),
+						NSLocalizedStringFromTable(@"protectionChangeFailedAlertMessage", ZGMemoryProtectionLocalizableTable, nil),
+						nil, nil, nil);
 	}
 	else
 	{
-		self.undoManager.actionName = @"Protection Change";
+		self.undoManager.actionName = NSLocalizedStringFromTable(@"undoProtectionChangeAction", ZGMemoryProtectionLocalizableTable, nil);
 		[[self.undoManager prepareWithInvocationTarget:self]
 		 changeProtectionAtAddress:address size:size oldProtection:newProtection newProtection:oldProtection	];
 	}
@@ -98,9 +100,9 @@
 		if (!ZGMemoryProtectionInRegion(self.process.processTask, &memoryAddress, &memorySize, &oldProtection))
 		{
 			NSRunAlertPanel(
-							@"Memory Protection Change Failed",
-							@"The specified memory address could not be located within a memory region.",
-							@"OK", nil, nil);
+							NSLocalizedStringFromTable(@"protectionChangeFailedAlertTitle", ZGMemoryProtectionLocalizableTable, nil),
+							NSLocalizedStringFromTable(@"findMemoryRegionFailedAlertMessage", ZGMemoryProtectionLocalizableTable, nil),
+							nil, nil, nil);
 		}
 		else
 		{
@@ -131,9 +133,9 @@
 	else
 	{
 		NSRunAlertPanel(
-						@"Invalid Range",
-						@"Please make sure you typed in the addresses correctly.",
-						@"OK", nil, nil);
+						NSLocalizedStringFromTable(@"invalidAddressRangeAlertTitle", ZGMemoryProtectionLocalizableTable, nil),
+						NSLocalizedStringFromTable(@"invalidAddressRangeAlertMessage", ZGMemoryProtectionLocalizableTable, nil),
+						nil, nil, nil);
 	}
 }
 

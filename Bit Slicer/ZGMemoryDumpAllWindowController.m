@@ -58,7 +58,7 @@
 - (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process
 {
 	NSSavePanel *savePanel = NSSavePanel.savePanel;
-	savePanel.message = @"Choose a folder name to save the memory dump files to.";
+	savePanel.message = NSLocalizedStringFromTable(@"savePanelPromptMessage", ZGDumpAllMemoryLocalizableTable, nil);
 	
 	[savePanel
 	 beginSheetModalForWindow:parentWindow
@@ -103,15 +103,15 @@
 					 if (!ZGDumpAllDataToDirectory(savePanel.URL.relativePath, process.processTask, self))
 					 {
 						 NSRunAlertPanel(
-										 @"The Memory Dump failed",
-										 @"An error resulted in writing the memory dump.",
-										 @"OK", nil, nil);
+										 NSLocalizedStringFromTable(@"failedMemoryDumpAlertTitle", ZGDumpAllMemoryLocalizableTable, nil),
+										 NSLocalizedStringFromTable(@"failedMemoryDumpAlertMessage", ZGDumpAllMemoryLocalizableTable, nil),
+										 nil, nil, nil);
 					 }
 					 
 					 dispatch_async(dispatch_get_main_queue(), ^{
 						 if (!self.searchProgress.shouldCancelSearch)
 						 {
-							 ZGDeliverUserNotification(@"Finished Dumping Memory", nil, [NSString stringWithFormat:@"Dumped all memory for %@", process.name]);
+							 ZGDeliverUserNotification(NSLocalizedStringFromTable(@"finishedDumpingMemoryNotificationTitle", ZGDumpAllMemoryLocalizableTable, nil), nil, [NSString stringWithFormat:NSLocalizedStringFromTable(@"finishedDumpingMemoryNotificationMessageFormat", ZGDumpAllMemoryLocalizableTable, nil), process.name]);
 						 }
 						 
 						 self.progressIndicator.doubleValue = 0.0;

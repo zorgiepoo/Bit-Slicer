@@ -32,6 +32,8 @@
 
 #define kDataInspectorUserDefaultsKey @"DataInspectorDefaults"
 
+#define ZGDataInspectorLocalizationTable @"Data Inspector"
+
 static BOOL isRunningOnLeopardOrLater(void) {
     return NSAppKitVersionNumber >= 860.;
 }
@@ -66,9 +68,9 @@ enum InspectionStatus_t {
 
 static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) {
     switch (status) {
-	case eInspectionNoData: return @"(select some data)";
-	case eInspectionTooMuchData: return @"(select less data)";
-	case eInspectionBadByteCount: return @"(select a power of 2 bytes)";
+		case eInspectionNoData: return NSLocalizedStringFromTable(@"noData", ZGDataInspectorLocalizationTable, nil);
+	case eInspectionTooMuchData: return NSLocalizedStringFromTable(@"tooMuchData", ZGDataInspectorLocalizationTable, nil);
+	case eInspectionBadByteCount: return NSLocalizedStringFromTable(@"badByteCount", ZGDataInspectorLocalizationTable, nil);
 	case eInspectionCanInspect:
 			return nil;
     }
@@ -581,7 +583,7 @@ static NSAttributedString *inspectionError(NSString *s) {
     NSArray *selectedRanges = [controller selectedContentsRanges];
     if ([selectedRanges count] != 1) {
 	if (outIsError) *outIsError = YES;
-	return inspectionError(@"(select a contiguous range)");
+	return inspectionError(NSLocalizedStringFromTable(@"contiguousRange", ZGDataInspectorLocalizationTable, nil));
     }
 
     HFRange selectedRange = [[selectedRanges objectAtIndex:0] HFRange];

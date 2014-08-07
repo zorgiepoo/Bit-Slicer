@@ -36,4 +36,6 @@
 #import "ZGSearchProgressDelegate.h"
 #import "ZGMemoryTypes.h"
 
+#define ZGDumpAllMemoryLocalizableTable @"Dump All Memory"
+
 BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <ZGSearchProgressDelegate> delegate);

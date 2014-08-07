@@ -27,10 +27,23 @@
 		726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D319606E2900A6AD40 /* Edit Description Dialog.xib */; };
 		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
-		72D051A8196088B700EC532A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D051A6196088B700EC532A /* InfoPlist.strings */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
 		72D051AC1960891900EC532A /* Backtrace View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AE1960891900EC532A /* Backtrace View.xib */; };
 		72D051CB1960A41F00EC532A /* Registers View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051C91960A41F00EC532A /* Registers View.xib */; };
+		72D271D4197C2A6800CC6914 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D271D2197C2A6800CC6914 /* InfoPlist.strings */; };
+		72D271D9197C2E2200CC6914 /* Memory Navigation.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D271D8197C2E2200CC6914 /* Memory Navigation.strings */; };
+		72D271DB197C2E3500CC6914 /* Debugger.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D271DA197C2E3500CC6914 /* Debugger.strings */; };
+		72D2721D197CC0DE00CC6914 /* Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D2721C197CC0DE00CC6914 /* Debugger Registers.strings */; };
+		72D2729F1989D22100CC6914 /* Memory Viewer.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D2729E1989D22100CC6914 /* Memory Viewer.strings */; };
+		72D272A11989D39D00CC6914 /* Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D272A01989D39D00CC6914 /* Data Inspector.strings */; };
+		72D272A31989D6A000CC6914 /* Memory Viewer Status Bar.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D272A21989D6A000CC6914 /* Memory Viewer Status Bar.strings */; };
+		72D272A51989E5DA00CC6914 /* Memory Protection.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D272A41989E5DA00CC6914 /* Memory Protection.strings */; };
+		72D272A71989F1BD00CC6914 /* Dump All Memory.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D272A61989F1BD00CC6914 /* Dump All Memory.strings */; };
+		72D272A9198AA52E00CC6914 /* Dump Memory Range.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D272A8198AA52E00CC6914 /* Dump Memory Range.strings */; };
+		72D272F1198AE6AA00CC6914 /* Preferences.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D272F0198AE6AA00CC6914 /* Preferences.strings */; };
+		72D272F3198AE87600CC6914 /* Script Preferences.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D272F2198AE87600CC6914 /* Script Preferences.strings */; };
+		72D272F5198AE9F700CC6914 /* Logger Window.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D272F4198AE9F700CC6914 /* Logger Window.strings */; };
+		72D272F7198B030C00CC6914 /* Variable Actions.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D272F6198B030C00CC6914 /* Variable Actions.strings */; };
 		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
 		770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F284118832132001B828C /* ZGBreakPointCondition.m */; };
@@ -279,10 +292,46 @@
 		726CA2D219606E2900A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Edit Description Dialog.xib"; sourceTree = "<group>"; };
 		726CA2D519606E3100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Search Options.xib"; sourceTree = "<group>"; };
 		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Watch Variable Dialog.xib"; sourceTree = "<group>"; };
-		72D051A7196088B700EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = "Bit Slicer/Base.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Data Inspector View.xib"; sourceTree = "<group>"; };
 		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Backtrace View.xib"; sourceTree = "<group>"; };
 		72D051CA1960A41F00EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Registers View.xib"; sourceTree = "<group>"; };
+		72D271B2197C26AB00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		72D271B3197C26AB00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Search Document Window.strings"; sourceTree = "<group>"; };
+		72D271B4197C26AB00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Debugger Window.strings"; sourceTree = "<group>"; };
+		72D271B5197C26AB00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Backtrace View.strings"; sourceTree = "<group>"; };
+		72D271B6197C26AB00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Registers View.strings"; sourceTree = "<group>"; };
+		72D271B7197C26AB00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Breakpoint Condition View.strings"; sourceTree = "<group>"; };
+		72D271B8197C26AB00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Code Injection Window.strings"; sourceTree = "<group>"; };
+		72D271B9197C26AB00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Memory Viewer Window.strings"; sourceTree = "<group>"; };
+		72D271BA197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Data Inspector View.strings"; sourceTree = "<group>"; };
+		72D271BB197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Change Memory Protection Dialog.strings"; sourceTree = "<group>"; };
+		72D271BC197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Dump All Memory Dialog.strings"; sourceTree = "<group>"; };
+		72D271BD197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Dump Memory Range Dialog.strings"; sourceTree = "<group>"; };
+		72D271BE197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Preferences Window.strings"; sourceTree = "<group>"; };
+		72D271BF197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Software Update View.strings"; sourceTree = "<group>"; };
+		72D271C0197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Shortcuts View.strings"; sourceTree = "<group>"; };
+		72D271C1197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Scripts View.strings"; sourceTree = "<group>"; };
+		72D271C3197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Edit Value Dialog.strings"; sourceTree = "<group>"; };
+		72D271C4197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Edit Address Dialog.strings"; sourceTree = "<group>"; };
+		72D271C5197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Edit Size Dialog.strings"; sourceTree = "<group>"; };
+		72D271C6197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Edit Description Dialog.strings"; sourceTree = "<group>"; };
+		72D271C7197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Search Options.strings"; sourceTree = "<group>"; };
+		72D271C8197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Watch Variable Dialog.strings"; sourceTree = "<group>"; };
+		72D271D3197C2A6800CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		72D271D8197C2E2200CC6914 /* Memory Navigation.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Memory Navigation.strings"; path = "Bit Slicer/en.lproj/Code/Memory Navigation.strings"; sourceTree = "<group>"; };
+		72D271DA197C2E3500CC6914 /* Debugger.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Debugger.strings; path = "Bit Slicer/en.lproj/Code/Debugger.strings"; sourceTree = "<group>"; };
+		72D2721C197CC0DE00CC6914 /* Debugger Registers.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Debugger Registers.strings"; path = "Bit Slicer/en.lproj/Code/Debugger Registers.strings"; sourceTree = "<group>"; };
+		72D2729E1989D22100CC6914 /* Memory Viewer.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Memory Viewer.strings"; path = "Bit Slicer/en.lproj/Code/Memory Viewer.strings"; sourceTree = "<group>"; };
+		72D272A01989D39D00CC6914 /* Data Inspector.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Data Inspector.strings"; path = "Bit Slicer/en.lproj/Code/Data Inspector.strings"; sourceTree = "<group>"; };
+		72D272A21989D6A000CC6914 /* Memory Viewer Status Bar.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Memory Viewer Status Bar.strings"; path = "Bit Slicer/en.lproj/Code/Memory Viewer Status Bar.strings"; sourceTree = "<group>"; };
+		72D272A41989E5DA00CC6914 /* Memory Protection.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Memory Protection.strings"; path = "Bit Slicer/en.lproj/Code/Memory Protection.strings"; sourceTree = "<group>"; };
+		72D272A61989F1BD00CC6914 /* Dump All Memory.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Dump All Memory.strings"; path = "Bit Slicer/en.lproj/Code/Dump All Memory.strings"; sourceTree = "<group>"; };
+		72D272A8198AA52E00CC6914 /* Dump Memory Range.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Dump Memory Range.strings"; path = "Bit Slicer/en.lproj/Code/Dump Memory Range.strings"; sourceTree = "<group>"; };
+		72D272F0198AE6AA00CC6914 /* Preferences.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = Preferences.strings; path = "Bit Slicer/en.lproj/Code/Preferences.strings"; sourceTree = "<group>"; };
+		72D272F2198AE87600CC6914 /* Script Preferences.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Script Preferences.strings"; path = "Bit Slicer/en.lproj/Code/Script Preferences.strings"; sourceTree = "<group>"; };
+		72D272F4198AE9F700CC6914 /* Logger Window.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Logger Window.strings"; path = "Bit Slicer/en.lproj/Code/Logger Window.strings"; sourceTree = "<group>"; };
+		72D272F6198B030C00CC6914 /* Variable Actions.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "Variable Actions.strings"; path = "Bit Slicer/en.lproj/Code/Variable Actions.strings"; sourceTree = "<group>"; };
+		72D272F9198B085F00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Logs Window.strings"; sourceTree = "<group>"; };
 		770136E8192309740072A192 /* ZGPyVMProtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyVMProtModule.h; path = "Bit Slicer/ZGPyVMProtModule.h"; sourceTree = "<group>"; };
 		770136E9192309740072A192 /* ZGPyVMProtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyVMProtModule.m; path = "Bit Slicer/ZGPyVMProtModule.m"; sourceTree = "<group>"; };
 		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; };
@@ -725,6 +774,7 @@
 			children = (
 				2A37F4ABFDCFA73011CA2CEA /* Code */,
 				72D051C619609C0A00EC532A /* Nibs */,
+				72D271D1197C2A1400CC6914 /* Strings */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */,
@@ -773,7 +823,6 @@
 				77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */,
 				77F115AD17D2EAE4009E002A /* bitslicericon.iconset */,
 				77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */,
-				72D051A6196088B700EC532A /* InfoPlist.strings */,
 				77F115B217D2EAFE009E002A /* Credits.rtf */,
 			);
 			name = Resources;
@@ -816,6 +865,27 @@
 				726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */,
 			);
 			name = Nibs;
+			sourceTree = "<group>";
+		};
+		72D271D1197C2A1400CC6914 /* Strings */ = {
+			isa = PBXGroup;
+			children = (
+				72D271D8197C2E2200CC6914 /* Memory Navigation.strings */,
+				72D271DA197C2E3500CC6914 /* Debugger.strings */,
+				72D2721C197CC0DE00CC6914 /* Debugger Registers.strings */,
+				72D2729E1989D22100CC6914 /* Memory Viewer.strings */,
+				72D272A01989D39D00CC6914 /* Data Inspector.strings */,
+				72D272A21989D6A000CC6914 /* Memory Viewer Status Bar.strings */,
+				72D272A41989E5DA00CC6914 /* Memory Protection.strings */,
+				72D272A61989F1BD00CC6914 /* Dump All Memory.strings */,
+				72D272A8198AA52E00CC6914 /* Dump Memory Range.strings */,
+				72D272F0198AE6AA00CC6914 /* Preferences.strings */,
+				72D272F2198AE87600CC6914 /* Script Preferences.strings */,
+				72D272F4198AE9F700CC6914 /* Logger Window.strings */,
+				72D272F6198B030C00CC6914 /* Variable Actions.strings */,
+				72D271D2197C2A6800CC6914 /* InfoPlist.strings */,
+			);
+			name = Strings;
 			sourceTree = "<group>";
 		};
 		7701EF411696A29100877373 /* mach_exc */ = {
@@ -1462,6 +1532,8 @@
 				77F115AA17D2E8AC009E002A /* yasm in Resources */,
 				726CA2B919606DD900A6AD40 /* Dump All Memory Dialog.xib in Resources */,
 				726CA2CB19606E2200A6AD40 /* Edit Address Dialog.xib in Resources */,
+				72D2721D197CC0DE00CC6914 /* Debugger Registers.strings in Resources */,
+				72D271DB197C2E3500CC6914 /* Debugger.strings in Resources */,
 				726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */,
 				77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */,
 				77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */,
@@ -1472,25 +1544,36 @@
 				726CA2AF19606D1200A6AD40 /* Memory Viewer Window.xib in Resources */,
 				726CA2B619606DD200A6AD40 /* Change Memory Protection Dialog.xib in Resources */,
 				726CA2BF19606DF200A6AD40 /* Software Update View.xib in Resources */,
+				72D272A51989E5DA00CC6914 /* Memory Protection.strings in Resources */,
 				77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */,
 				726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */,
 				77F115B317D2EAFE009E002A /* Credits.rtf in Resources */,
+				72D272F3198AE87600CC6914 /* Script Preferences.strings in Resources */,
 				726CA2A619606CDD00A6AD40 /* Preferences Window.xib in Resources */,
 				726CA2AC19606D0700A6AD40 /* Debugger Window.xib in Resources */,
 				77988F1C185804AC00476A37 /* container_filled.pdf in Resources */,
+				72D272F1198AE6AA00CC6914 /* Preferences.strings in Resources */,
 				7743F9C618024CE400DBC19A /* python3.3 in Resources */,
 				77988F1A185803E800476A37 /* container.pdf in Resources */,
 				726CA2BC19606DDD00A6AD40 /* Dump Memory Range Dialog.xib in Resources */,
+				72D271D9197C2E2200CC6914 /* Memory Navigation.strings in Resources */,
+				72D272A71989F1BD00CC6914 /* Dump All Memory.strings in Resources */,
 				726CA2B319606DB300A6AD40 /* Breakpoint Condition View.xib in Resources */,
 				726CA2C519606E0100A6AD40 /* Scripts View.xib in Resources */,
 				77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */,
 				726CA2C219606DFC00A6AD40 /* Shortcuts View.xib in Resources */,
 				726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */,
 				726CA2A019606CA600A6AD40 /* MainMenu.xib in Resources */,
-				72D051A8196088B700EC532A /* InfoPlist.strings in Resources */,
+				72D272A11989D39D00CC6914 /* Data Inspector.strings in Resources */,
 				726CA2CE19606E2600A6AD40 /* Edit Size Dialog.xib in Resources */,
+				72D271D4197C2A6800CC6914 /* InfoPlist.strings in Resources */,
+				72D2729F1989D22100CC6914 /* Memory Viewer.strings in Resources */,
+				72D272F7198B030C00CC6914 /* Variable Actions.strings in Resources */,
+				72D272A9198AA52E00CC6914 /* Dump Memory Range.strings in Resources */,
+				72D272A31989D6A000CC6914 /* Memory Viewer Status Bar.strings in Resources */,
 				72D051CB1960A41F00EC532A /* Registers View.xib in Resources */,
 				72D051AC1960891900EC532A /* Backtrace View.xib in Resources */,
+				72D272F5198AE9F700CC6914 /* Logger Window.strings in Resources */,
 				72D051A91960890800EC532A /* Data Inspector View.xib in Resources */,
 				726CA2B019606DA000A6AD40 /* Logs Window.xib in Resources */,
 				726CA2A319606CB600A6AD40 /* Search Document Window.xib in Resources */,
@@ -1684,6 +1767,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA29F19606CA600A6AD40 /* Base */,
+				72D271B2197C26AB00CC6914 /* en */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -1692,6 +1776,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2A219606CB600A6AD40 /* Base */,
+				72D271B3197C26AB00CC6914 /* en */,
 			);
 			name = "Search Document Window.xib";
 			sourceTree = "<group>";
@@ -1700,6 +1785,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2A519606CDD00A6AD40 /* Base */,
+				72D271BE197C26AC00CC6914 /* en */,
 			);
 			name = "Preferences Window.xib";
 			sourceTree = "<group>";
@@ -1708,6 +1794,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2A819606D0000A6AD40 /* Base */,
+				72D271B8197C26AB00CC6914 /* en */,
 			);
 			name = "Code Injection Window.xib";
 			sourceTree = "<group>";
@@ -1716,6 +1803,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2AB19606D0700A6AD40 /* Base */,
+				72D271B4197C26AB00CC6914 /* en */,
 			);
 			name = "Debugger Window.xib";
 			sourceTree = "<group>";
@@ -1724,6 +1812,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2AE19606D1200A6AD40 /* Base */,
+				72D271B9197C26AB00CC6914 /* en */,
 			);
 			name = "Memory Viewer Window.xib";
 			sourceTree = "<group>";
@@ -1732,6 +1821,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2B119606DA000A6AD40 /* Base */,
+				72D272F9198B085F00CC6914 /* en */,
 			);
 			name = "Logs Window.xib";
 			path = "Bit Slicer";
@@ -1741,6 +1831,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2B419606DB300A6AD40 /* Base */,
+				72D271B7197C26AB00CC6914 /* en */,
 			);
 			name = "Breakpoint Condition View.xib";
 			path = "Bit Slicer";
@@ -1750,6 +1841,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2B719606DD200A6AD40 /* Base */,
+				72D271BB197C26AC00CC6914 /* en */,
 			);
 			name = "Change Memory Protection Dialog.xib";
 			path = "Bit Slicer";
@@ -1759,6 +1851,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2BA19606DD900A6AD40 /* Base */,
+				72D271BC197C26AC00CC6914 /* en */,
 			);
 			name = "Dump All Memory Dialog.xib";
 			path = "Bit Slicer";
@@ -1768,6 +1861,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2BD19606DDD00A6AD40 /* Base */,
+				72D271BD197C26AC00CC6914 /* en */,
 			);
 			name = "Dump Memory Range Dialog.xib";
 			path = "Bit Slicer";
@@ -1777,6 +1871,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2C019606DF200A6AD40 /* Base */,
+				72D271BF197C26AC00CC6914 /* en */,
 			);
 			name = "Software Update View.xib";
 			path = "Bit Slicer";
@@ -1786,6 +1881,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2C319606DFC00A6AD40 /* Base */,
+				72D271C0197C26AC00CC6914 /* en */,
 			);
 			name = "Shortcuts View.xib";
 			path = "Bit Slicer";
@@ -1795,6 +1891,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2C619606E0100A6AD40 /* Base */,
+				72D271C1197C26AC00CC6914 /* en */,
 			);
 			name = "Scripts View.xib";
 			path = "Bit Slicer";
@@ -1804,6 +1901,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2C919606E1D00A6AD40 /* Base */,
+				72D271C3197C26AC00CC6914 /* en */,
 			);
 			name = "Edit Value Dialog.xib";
 			path = "Bit Slicer";
@@ -1813,6 +1911,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2CC19606E2200A6AD40 /* Base */,
+				72D271C4197C26AC00CC6914 /* en */,
 			);
 			name = "Edit Address Dialog.xib";
 			path = "Bit Slicer";
@@ -1822,6 +1921,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2CF19606E2600A6AD40 /* Base */,
+				72D271C5197C26AC00CC6914 /* en */,
 			);
 			name = "Edit Size Dialog.xib";
 			path = "Bit Slicer";
@@ -1831,6 +1931,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2D219606E2900A6AD40 /* Base */,
+				72D271C6197C26AC00CC6914 /* en */,
 			);
 			name = "Edit Description Dialog.xib";
 			path = "Bit Slicer";
@@ -1840,6 +1941,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2D519606E3100A6AD40 /* Base */,
+				72D271C7197C26AC00CC6914 /* en */,
 			);
 			name = "Search Options.xib";
 			path = "Bit Slicer";
@@ -1849,23 +1951,17 @@
 			isa = PBXVariantGroup;
 			children = (
 				726CA2D819606E3800A6AD40 /* Base */,
+				72D271C8197C26AC00CC6914 /* en */,
 			);
 			name = "Watch Variable Dialog.xib";
 			path = "Bit Slicer";
-			sourceTree = "<group>";
-		};
-		72D051A6196088B700EC532A /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				72D051A7196088B700EC532A /* Base */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 		72D051AB1960890800EC532A /* Data Inspector View.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				72D051AA1960890800EC532A /* Base */,
+				72D271BA197C26AC00CC6914 /* en */,
 			);
 			name = "Data Inspector View.xib";
 			path = "Bit Slicer";
@@ -1875,6 +1971,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				72D051AD1960891900EC532A /* Base */,
+				72D271B5197C26AB00CC6914 /* en */,
 			);
 			name = "Backtrace View.xib";
 			path = "Bit Slicer";
@@ -1884,8 +1981,17 @@
 			isa = PBXVariantGroup;
 			children = (
 				72D051CA1960A41F00EC532A /* Base */,
+				72D271B6197C26AB00CC6914 /* en */,
 			);
 			name = "Registers View.xib";
+			sourceTree = "<group>";
+		};
+		72D271D2197C2A6800CC6914 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				72D271D3197C2A6800CC6914 /* en */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

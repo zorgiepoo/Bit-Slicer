@@ -176,7 +176,7 @@
 			failedToLaunchTask = YES;
 			if (error != nil)
 			{
-				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"yasm task failed to launch: Name: %@, Reason: %@", exception.name, exception.reason], @"reason" : exception.reason}];
+				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"%@: Name: %@, Reason: %@", NSLocalizedStringFromTable(@"failedLaunchYasm", ZGDebuggerLocalizationTable, nil), exception.name, exception.reason], @"reason" : exception.reason}];
 			}
 		}
 		
@@ -205,7 +205,7 @@
 				{
 					if (error != nil)
 					{
-						*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"nothing was assembled (0 bytes)."}];
+						*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : NSLocalizedStringFromTable(@"failedAssembleWithZeroBytes", ZGDebuggerLocalizationTable, nil)}];
 					}
 				}
 				else
@@ -231,7 +231,7 @@
 	}
 	else if (error != nil)
 	{
-		*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : [NSString stringWithFormat:@"failed to open file descriptor on %s.", tempFileNameCString]}];
+		*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : [NSString stringWithFormat:NSLocalizedStringFromTable(@"failedAssembleWithBadFileDescriptor", ZGDebuggerLocalizationTable, nil), tempFileNameCString]}];
 	}
 	
 	free(tempFileNameCString);
@@ -390,7 +390,7 @@ error:(NSError * __autoreleasing *)error
 		ZG_LOG(@"Error: Failed to write nop buffer..");
 		if (error != nil)
 		{
-			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to NOP current instructions"}];
+			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : NSLocalizedStringFromTable(@"failedNOPInstructionsForInjectingCode", ZGDebuggerLocalizationTable, nil)}];
 		}
 
 		free(nopBuffer);
@@ -403,7 +403,7 @@ error:(NSError * __autoreleasing *)error
 		ZG_LOG(@"Error: Failed to protect memory..");
 		if (error != nil)
 		{
-			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"failed to change memory protection on new instructions"}];
+			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : NSLocalizedStringFromTable(@"failedChangeMemoryProtectionForInjectingCode", ZGDebuggerLocalizationTable, nil)}];
 		}
 		
 		free(nopBuffer);

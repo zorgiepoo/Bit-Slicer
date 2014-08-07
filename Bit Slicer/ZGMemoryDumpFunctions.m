@@ -62,7 +62,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 	ZGMemoryAddress lastAddress = currentStartingAddress;
 	int fileNumber = 0;
 	
-	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:@"(All) Merged"].UTF8String, "w");
+	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:NSLocalizedStringFromTable(@"mergedFilename", ZGDumpAllMemoryLocalizableTable, nil)].UTF8String, "w");
 	
 	NSArray *regions = [ZGRegion submapRegionsFromProcessTask:processTask];
 	

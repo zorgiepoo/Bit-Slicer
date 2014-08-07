@@ -37,6 +37,8 @@
 #define ZGLoggerWindowText @"ZGLoggerWindowText"
 #define MIN_LOG_LINES_TO_RESTORE 50U
 
+#define ZGLoggerWindowLocalizationTable @"Logger Window"
+
 @interface ZGLoggerWindowController ()
 
 @property (nonatomic, assign) IBOutlet NSTextView *loggerTextView;
@@ -80,7 +82,7 @@
 	[super restoreStateWithCoder:coder];
 	
 	self.loggerText = [NSMutableString stringWithString:[coder decodeObjectForKey:ZGLoggerWindowText]];
-	[self writeLine:@"\t[Restored]" withDateFormatting:NO];
+	[self writeLine:NSLocalizedStringFromTable(@"restoredText", ZGLoggerWindowLocalizationTable, nil) withDateFormatting:NO];
 }
 
 - (void)updateDisplay
@@ -96,7 +98,14 @@
 		[self.statusTextField setTextColor:[NSColor controlTextColor]];
 	}
 	
-	[self.statusTextField setStringValue:[NSString stringWithFormat:@"Logged %lu message%@", self.numberOfMessages, self.numberOfMessages == 1 ? @"" : @"s"]];
+	if (self.numberOfMessages == 1)
+	{
+		[self.statusTextField setStringValue:NSLocalizedStringFromTable(@"loggedSingleMessage", ZGLoggerWindowLocalizationTable, nil)];
+	}
+	else
+	{
+		[self.statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"loggedMultipleMessagesFormat", ZGLoggerWindowLocalizationTable, nil), self.numberOfMessages]];
+	}
 	
 	[self invalidateRestorableState];
 }

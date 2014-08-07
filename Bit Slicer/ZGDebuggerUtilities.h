@@ -42,6 +42,8 @@
 #define INJECTED_NOP_SLIDE_LENGTH 0x10
 #define NOP_VALUE 0x90
 
+#define ZGDebuggerLocalizationTable @"Debugger"
+
 @interface ZGDebuggerUtilities : NSObject
 
 + (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray *)breakPoints;

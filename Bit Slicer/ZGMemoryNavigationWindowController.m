@@ -35,6 +35,8 @@
 #import "ZGMemoryNavigationWindowController.h"
 #import "ZGProcess.h"
 
+#define ZGMemoryNavigationLocalizationTable @"Memory Navigation"
+
 @implementation ZGMemoryNavigationWindowController
 
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager
@@ -122,11 +124,11 @@
 		NSMenuItem *menuItem = (NSMenuItem *)userInterfaceItem;
 		if (userInterfaceItem.action == @selector(goBack:))
 		{
-			menuItem.title = @"Back";
+			menuItem.title = NSLocalizedStringFromTable(@"back", ZGMemoryNavigationLocalizationTable, nil);
 		}
 		else
 		{
-			menuItem.title = @"Forward";
+			menuItem.title = NSLocalizedStringFromTable(@"forward", ZGMemoryNavigationLocalizationTable, nil);
 		}
 		
 		if (![self canEnableNavigationButtons])

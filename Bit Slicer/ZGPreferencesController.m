@@ -59,6 +59,8 @@
 #define ZGDebuggerHotkeyIconName @"hotkey"
 #define ZGScriptIconName @"scripts"
 
+#define ZGPreferencesLocalizationTable @"Preferences"
+
 @implementation ZGPreferencesController
 
 - (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController
@@ -123,21 +125,21 @@
 {
 	[self
 	 setPreferencesViewController:[[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:self.appUpdaterController]
-	 andWindowTitle:@"Software Update"];
+	 andWindowTitle:NSLocalizedStringFromTable(@"softwareUpdateWindowTitle", ZGPreferencesLocalizationTable, nil)];
 }
 
 - (void)setHotKeyPreferencesView
 {
 	[self
 	 setPreferencesViewController:[[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController]
-	 andWindowTitle:@"Shortcuts"];
+	 andWindowTitle:NSLocalizedStringFromTable(@"shortcutsWindowTitle", ZGPreferencesLocalizationTable, nil)];
 }
 
 - (void)setScriptPreferencesView
 {
 	[self
 	 setPreferencesViewController:[[ZGScriptPreferencesViewController alloc] init]
-	 andWindowTitle:@"Scripts"];
+	 andWindowTitle:NSLocalizedStringFromTable(@"scriptsWindowTitle", ZGPreferencesLocalizationTable, nil)];
 }
 
 - (IBAction)changePreferencesView:(NSToolbarItem *)toolbarItem

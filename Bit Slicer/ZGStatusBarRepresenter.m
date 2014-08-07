@@ -34,6 +34,8 @@
 
 #import "ZGStatusBarRepresenter.h"
 
+#define ZGStatusBarLocalizationTable @"Memory Viewer Status Bar"
+
 @interface ZGStatusBarRepresenter (InheritedPrivateMethods)
 
 - (NSString *)describeOffset:(unsigned long long)offset;
@@ -52,22 +54,22 @@
 
 - (NSString *)stringForEmptySelectionAtOffset:(unsigned long long)offset length:(unsigned long long)__unused length
 {
-	return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningMemoryAddress]];
+	return [NSString stringWithFormat:NSLocalizedStringFromTable(@"emptySelectionFormat", ZGStatusBarLocalizationTable, nil), [self describeOffset:offset + _beginningMemoryAddress]];
 }
 
 - (NSString *)stringForSingleByteSelectionAtOffset:(unsigned long long)offset length:(unsigned long long)__unused length
 {
-	return [NSString stringWithFormat:@"Selected address is %@", [self describeOffset:offset + _beginningMemoryAddress]];
+	return [NSString stringWithFormat:NSLocalizedStringFromTable(@"singleByteSelectionFormat", ZGStatusBarLocalizationTable, nil), [self describeOffset:offset + _beginningMemoryAddress]];
 }
 
 - (NSString *)stringForSingleRangeSelection:(HFRange)range length:(unsigned long long)__unused length
 {
-	return [NSString stringWithFormat:@"%@ selected at address %@", [self describeLength:range.length], [self describeOffsetExcludingApproximate:range.location + _beginningMemoryAddress]];
+	return [NSString stringWithFormat:NSLocalizedStringFromTable(@"singleRangeSelectionFormat", ZGStatusBarLocalizationTable, nil), [self describeLength:range.length], [self describeOffsetExcludingApproximate:range.location + _beginningMemoryAddress]];
 }
 
 - (NSString *)stringForMultipleSelectionsWithLength:(unsigned long long)multipleSelectionLength length:(unsigned long long)__unused length
 {
-	return [NSString stringWithFormat:@"%@ selected at multiple addresses", [self describeLength:multipleSelectionLength]];
+	return [NSString stringWithFormat:NSLocalizedStringFromTable(@"multipleSelectionLengthFormat", ZGStatusBarLocalizationTable, nil), [self describeLength:multipleSelectionLength]];
 }
 
 - (void)setStatusMode:(HFStatusBarMode)mode
