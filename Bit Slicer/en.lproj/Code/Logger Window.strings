@@ -1,0 +1,16 @@
+/* 
+  Logger Window.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/31/14.
+
+*/
+
+/* Text to log when window is being restored */
+"restoredText" = "\t[Restored]";
+
+/* Label indicating one message has been logged */
+"loggedSingleMessage" = "Logged 1 message";
+
+/* Label indicating multiple (or zero) messages have been logged */
+"loggedMultipleMessagesFormat" = "Logged %lu messages";

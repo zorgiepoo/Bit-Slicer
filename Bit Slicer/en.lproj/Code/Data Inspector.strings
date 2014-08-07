@@ -1,0 +1,19 @@
+/* 
+  Data Inspector.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/30/14.
+
+*/
+
+/* Label for when no data is selected */
+"noData" = "(select some data)";
+
+/* Label for when too much data is selected */
+"tooMuchData" = "(select less data)";
+
+/* Label for when selected byte count is 'bad' */
+"badByteCount" = "(select a power of 2 bytes)";
+
+/* Label for when selected range is not contiguous */
+"contiguousRange" = "(select a contiguous range)";

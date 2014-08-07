@@ -1,0 +1,19 @@
+/* 
+  Memory Viewer Status Bar.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/30/14.
+
+*/
+
+/* Label format for when no data is selected */
+"emptySelectionFormat" = "Selected address is %@";
+
+/* Label format for when single byte is selected */
+"singleByteSelectionFormat" = "Selected address is %@";
+
+/* Label format for when single range is selected */
+"singleRangeSelectionFormat" = "%@ selected at address %@";
+
+/* Label format for when multiple range is selected */
+"multipleSelectionLengthFormat" = "%@ selected at multiple addresses";

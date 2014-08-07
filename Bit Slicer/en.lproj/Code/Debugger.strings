@@ -1,0 +1,130 @@
+/* 
+  Debugger.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/20/14.
+
+*/
+
+/* Labels 'Go to Call Address' menu item in Debug menu when using debugger, when a 'call' type instruction is selected */
+"goToCallAddress" = "Go to Call Address";
+
+/* Labels 'Go to Branch Address' menu item in Debug menu when using debugger, when a 'jmp' type instruction is selected */
+"goToBranchAddress" = "Go to Branch Address";
+
+/* Labels 'Add Breakpoint' menu item in Debug menu when using debugger, when selected instruction does not have a breakpoint attached to it; also used for undo'ing an add breakpoint change in Edit menu */
+"addBreakpoint" = "Add Breakpoint";
+
+/* Labels 'Add Breakpoints' menu item in Debug menu when using debugger, when selected instruction does not have a breakpoint attached to it; also used for undo'ing an add breakpoints change in Edit menu */
+"addBreakpoints" = "Add Breakpoints";
+
+/* Labels 'Remove Breakpoint' menu item in Debug menu when using debugger, when selected instruction does have a breakpoint attached to it; also used for undo'ing an remove breakpoint change in Edit menu */
+"removeBreakpoint" = "Remove Breakpoint";
+
+/* Labels 'Remove Breakpoints' menu item in Debug menu when using debugger, when selected instruction does have a breakpoint attached to it; also used for undo'ing an remove breakpoints change in Edit menu */
+"removeBreakpoints" = "Remove Breakpoints";
+
+/* Labels 'NOP Instruction' menu item in Debug menu when using debugger */
+"nopInstruction" = "NOP Instruction";
+
+/* Labels 'NOP Instructions' menu item in Debug menu when using debugger */
+"nopInstructions" = "NOP Instructions";
+
+/* Tooltip Label when mouse hovering over an instruction that has a breakpoint condition configured */
+"breakpointConditionTooltipLabel" = "Breakpoint Condition";
+
+/* Alert title that shows up when failing to alter an instruction's assembly */
+"failedModifyInstructionAlertTitle" = "Failed to Modify Instruction";
+
+/* Alert message that shows up when failing to alter an instruction's assembly */
+"failedModifyInstructionAlertMessage" = "An error occured trying to assemble";
+
+/* Alert title that shows up when failing to overwrite an instruction */
+"failedOverwriteInstructionsAlertTitle" = "Failed to Overwrite Instructions";
+
+/* Alert message that shows up when failing to overwrite an instruction */
+"failedOverwriteInstructionsAlertMessage" = "This modification exceeds the boundary of instructions displayed.";
+
+/* Alert title that shows up when changing an instruction may require altering more than one instruction */
+"overwriteConfirmationAlertTitle" = "Overwrite Instructions";
+
+/* Alert message that shows up when changing an instruction may require altering more than one instruction */
+"overwriteConfirmationAlertMessage" = "This modification will overwrite %ld instructions. Are you sure you want to overwrite them?";
+
+/* Alert button that shows up when changing an instruction may require altering more than one instruction */
+"overwrite" = "Overwrite";
+
+/* Undo action for changing an instruction */
+"undoInstructionChange" = "Instruction Change";
+
+/* Undo action for nopping an instruction */
+"undoNOPChange" = "NOP Change";
+
+/* Alert title that shows up when adding a breakpoint fails */
+"failedAddBreakpointAlertTitle" = "Failed to Add Breakpoint";
+
+/* Alert message that shows up when adding a breakpoint fails */
+"failedAddBreakpointAlertMessage" = "A breakpoint could not be added.";
+
+/* Undo action for moving the instruction pointer */
+"undoMoveInstructionPointer" = "Jump";
+
+/* Notification title for when a breakpoint is hit */
+"hitBreakpointNotificationTitle" = "Hit Breakpoint";
+
+/* Notification message for when a breakpoint is hit */
+"hitBreakpointNotificationMessage" = "Stopped at breakpoint";
+
+/* Alert title for failing to change a breakpoint condition */
+"failedChangeBreakpointConditionAlertTitle" = "Invalid Breakpoint Expression";
+
+/* Alert title for when a breakpoint condition fails to execute */
+"failedExecuteBreakpointConditionAlertTitle" = "Condition Evaluation Error";
+
+/* Alert message for when a breakpoint condition fails to execute */
+"failedExecuteBreakpointConditionAlertMessage" = "\"%@\" failed to evaluate with the following reason: %@. Check Logs under the Debug menu for detailed information.";
+
+/* Alert title for failing to step over an instruction */
+"failedStepOverAlertTitle" = "Failed to Step Over";
+
+/* Alert message for failing to step over an instruction */
+"failedStepOverAlertMessage" = "Stepping over the instruction failed.";
+
+/* Alert title for failing to step out */
+"failedStepOutAlertTitle" = "Failed to Step Out";
+
+/* Alert message for failing to step out */
+"failedStepOutAlertMessage" = "Stepping out of the procedure failed.";
+
+/* Error indicating yasm assembler failed to launch */
+"failedLaunchYasm" = "yasm task failed to launch";
+
+/* Error indicating yasm did not assemble anything */
+"failedAssembleWithZeroBytes" = "nothing (0 bytes) was assembled.";
+
+/* Error indicating yasm task could not be started */
+"failedAssembleWithBadFileDescriptor" = "failed to open file descriptor on %s.";
+
+/* Error indicating current instructions could not be NOP'ed for code injection */
+"failedNOPInstructionsForInjectingCode" = "failed to NOP current instructions";
+
+/* Alert Title for failing to allocate memory for code injection */
+"failedAllocateMemoryForInjectingCodeAlertTitle" = "Failed to Allocate Memory";
+
+/* Alert Message for failing to allocate memory for code injection */
+"failedAllocateMemoryForInjectingCodeAlertMessage" = "An error occured trying to allocate new memory into the target";
+
+/* Alert Title for failing to inject code at the destination. Used in two places in code. */
+"failedInjectCodeAlertTitle" = "Failed to Inject Code";
+
+/* Alert Message for failing to inject code at the destination */
+"failedInjectCodeAlertMessage" = "There was not enough space to override this instruction, or the newly allocated address was too far away";
+
+/* Message indicating where the new code will be inserted into */
+"newlyCodeInjectedAtMessage" = "; New code will be written at 0x%llX\n";
+
+/* Message for assembling code failing when attemping to inject code. */
+"failedAssemblingForInjectingCodeMessage" = "An error occured assembling the new code";
+
+/* Error indicating memory protection could not be changed for newly injected instructions */
+"failedChangeMemoryProtectionForInjectingCode" = "failed to change memory protection on new instructions";

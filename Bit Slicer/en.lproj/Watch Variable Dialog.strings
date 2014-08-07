@@ -1,0 +1,36 @@
+
+/* Class = "NSTableColumn"; headerCell.title = "Instruction"; ObjectID = "0aX-X4-2Ly"; */
+"0aX-X4-2Ly.headerCell.title" = "Instruction";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "6mE-1V-0N8"; */
+"6mE-1V-0N8.title" = "Cancel";
+
+/* Class = "NSMenuItem"; title = "Show in Memory Viewer"; ObjectID = "Ow4-Q4-j9x"; */
+"Ow4-Q4-j9x.title" = "Show in Memory Viewer";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "TfC-P6-K4a"; */
+"TfC-P6-K4a.title" = "Copy";
+
+/* Class = "NSTextFieldCell"; title = "Watching write accesses at 0x2434 (2 bytes now)"; ObjectID = "WtT-PG-TBK"; */
+"WtT-PG-TBK.title" = "Watching write accesses at 0x2434 (2 bytes now)";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "YnN-82-eBf"; */
+"YnN-82-eBf.title" = "Text Cell";
+
+/* Class = "NSMenuItem"; title = "Show in Debugger"; ObjectID = "aEU-ED-MgK"; */
+"aEU-ED-MgK.title" = "Show in Debugger";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "aeq-Fb-A5m"; */
+"aeq-Fb-A5m.title" = "Copy Address";
+
+/* Class = "NSTableColumn"; headerCell.title = "Address"; ObjectID = "bJK-aR-RHL"; */
+"bJK-aR-RHL.headerCell.title" = "Address";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "eqG-Mx-tbd"; */
+"eqG-Mx-tbd.title" = "Text Cell";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "wdf-l9-OcB"; */
+"wdf-l9-OcB.title" = "Add";
+
+/* Class = "NSTableColumn"; headerCell.title = "Add"; ObjectID = "xrl-DE-ToL"; */
+"xrl-DE-ToL.headerCell.title" = "Add";

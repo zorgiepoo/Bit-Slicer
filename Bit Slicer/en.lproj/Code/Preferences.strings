@@ -1,0 +1,16 @@
+/* 
+  Preferences.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/31/14.
+
+*/
+
+/* Window title for Software Update tab */
+"softwareUpdateWindowTitle" = "Software Update";
+
+/* Window title for Shortcuts tab */
+"shortcutsWindowTitle" = "Shortcuts";
+
+/* Window title for Scripts tab */
+"scriptsWindowTitle" = "Scripts";

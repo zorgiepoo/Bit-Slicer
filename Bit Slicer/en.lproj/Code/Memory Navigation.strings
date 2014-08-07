@@ -1,0 +1,13 @@
+/* 
+  Memory Navigation.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/20/14.
+
+*/
+
+/* Labels 'Back' menu item in View menu when using debugger or memory viewer */
+"back" = "Back";
+
+/* Labels 'Back' menu item in View menu when using debugger or memory viewer */
+"forward" = "Forward";

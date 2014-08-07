@@ -1,0 +1,25 @@
+/* 
+  Memory Protection.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/30/14.
+
+*/
+
+/* Alert title for when changing memory protection fails; used in two places */
+"protectionChangeFailedAlertTitle" = "Memory Protection Change Failed";
+
+/* Alert message for when changing memory protection fails */
+"protectionChangeFailedAlertMessage" = "The memory's protection could not be changed to the specified permissions";
+
+/* Alert message for when finding a memory region fails */
+"findMemoryRegionFailedAlertMessage" = "The specified memory address could not be located within a memory region";
+
+/* Undo action for changing memory protection */
+"undoProtectionChangeAction" = "Protection Change";
+
+/* Alert title when user enters an invalid memory range address range */
+"invalidAddressRangeAlertTitle" = "Invalid Address Range";
+
+/* Alert message when user enters an invalid memory range address range */
+"invalidAddressRangeAlertMessage" = "Please make sure you typed in the addresses correctly.";

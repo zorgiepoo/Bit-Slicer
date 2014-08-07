@@ -1,0 +1,30 @@
+/* 
+  Variable Actions.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/31/14.
+
+*/
+
+/* Undo action for freezing a variable */
+"undoFreezeAction" = "Freeze";
+
+/* Undo action for unfreezing a variable */
+"undoUnfreezeAction" = "Unfreeze";
+
+/* Undo action for adding a variable */
+"undoAddVariable" = "Add Variable";
+
+/* Undo action for adding multiple variables */
+"undoAddVariables" = "Add Variables";
+
+/* Undo action for removing a variable */
+"undoRemoveVariable" = "Delete Variable";
+
+/* Undo action for removing multiple variables */
+"undoRemoveVariables" = "Delete Variables";
+
+/* Default description for new script */
+"defaultScriptDescription" = "My Script";
+
+"undoNOPChangeAction" = "NOP Change";

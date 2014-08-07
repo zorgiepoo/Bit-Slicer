@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment defaultVersion="1080" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="ZGPreferencesController">
+            <connections>
+                <outlet property="toolbar" destination="6st-Zj-6LU" id="wLl-yN-X0b"/>
+                <outlet property="window" destination="1" id="26"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application"/>
+        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ZGPreferencesWindow" animationBehavior="default" id="1">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="524" y="518" width="322" height="156"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <view key="contentView" id="2">
+                <rect key="frame" x="0.0" y="0.0" width="322" height="156"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </view>
+            <toolbar key="toolbar" implicitIdentifier="D7D08D1A-8E44-4FDF-8409-E9CF29EA45F5" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconAndLabel" sizeMode="regular" id="6st-Zj-6LU">
+                <allowedToolbarItems>
+                    <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="WM0-nF-4pf"/>
+                    <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="VRz-v5-SJk"/>
+                    <toolbarItem implicitItemIdentifier="839E6014-BACC-4321-8E43-E69F15A411EC" explicitItemIdentifier="ZGSoftwareUpdateIdentifier" label="Software Update" paletteLabel="Software Update" image="NSNetwork" autovalidates="NO" selectable="YES" id="f0w-AB-SR1">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="changePreferencesView:" target="-2" id="7Bn-K1-KRP"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="EE190157-26A8-430B-93AF-571C57ED8B5C" explicitItemIdentifier="ZGDebuggerHotKeysIdentifier" label="Shortcuts" paletteLabel="Shortcuts" tag="1" image="NSBonjour" autovalidates="NO" selectable="YES" id="kgo-oj-XB3">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="changePreferencesView:" target="-2" id="YXV-iP-083"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="8A223B1E-6293-4DB6-A461-07E053A19CE7" explicitItemIdentifier="ZGScriptPreferenceIdentifier" label="Scripts" paletteLabel="Scripts" tag="2" image="NSFontPanel" autovalidates="NO" selectable="YES" id="kPj-yB-vNE">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="changePreferencesView:" target="-2" id="38w-gw-FXJ"/>
+                        </connections>
+                    </toolbarItem>
+                </allowedToolbarItems>
+                <defaultToolbarItems>
+                    <toolbarItem reference="f0w-AB-SR1"/>
+                    <toolbarItem reference="kgo-oj-XB3"/>
+                    <toolbarItem reference="kPj-yB-vNE"/>
+                </defaultToolbarItems>
+                <connections>
+                    <outlet property="delegate" destination="-2" id="Vm9-fh-zJd"/>
+                </connections>
+            </toolbar>
+        </window>
+    </objects>
+    <resources>
+        <image name="NSBonjour" width="32" height="32"/>
+        <image name="NSFontPanel" width="32" height="32"/>
+        <image name="NSNetwork" width="32" height="32"/>
+    </resources>
+</document>

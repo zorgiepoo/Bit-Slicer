@@ -1,0 +1,19 @@
+/* 
+  Dump Memory Range.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/31/14.
+
+*/
+
+/* Alert Title when dumping memory fails */
+"failedDumpingMemoryAlertTitle" = "Dumping Memory Failed";
+
+/* Alert Message format when dumping memory fails */
+"failedDumpingMemoryAlertMessageFormat" = "An error occured in writing memory from 0x%llX - 0x%llX to disk.";
+
+/* Alert title when user enters an invalid memory range address range */
+"invalidAddressRangeAlertTitle" = "Invalid Address Range";
+
+/* Alert message when user enters an invalid memory range address range */
+"invalidAddressRangeAlertMessage" = "Please make sure you typed in the addresses correctly.";

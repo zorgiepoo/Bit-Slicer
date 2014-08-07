@@ -1,0 +1,30 @@
+
+/* Class = "NSButtonCell"; title = "+"; ObjectID = "65"; */
+"65.title" = "+";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "67"; */
+"67.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Floats"; ObjectID = "69"; */
+"69.title" = "Floats";
+
+/* Class = "NSMenuItem"; title = "Signed Int"; ObjectID = "70"; */
+"70.title" = "Signed Int";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "71"; */
+"71.title" = "Text Cell";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "82"; */
+"82.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "big"; ObjectID = "83"; */
+"83.title" = "big";
+
+/* Class = "NSMenuItem"; title = "little"; ObjectID = "84"; */
+"84.title" = "little";
+
+/* Class = "NSButtonCell"; title = "-"; ObjectID = "87"; */
+"87.title" = "-";
+
+/* Class = "NSMenuItem"; title = "Unsigned Int"; ObjectID = "93"; */
+"93.title" = "Unsigned Int";

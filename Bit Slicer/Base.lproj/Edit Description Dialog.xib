@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment defaultVersion="1080" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="ZGEditDescriptionWindowController">
+            <connections>
+                <outlet property="descriptionTextView" destination="H87-3C-xRB" id="g9Z-zP-xsy"/>
+                <outlet property="window" destination="1" id="3"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application"/>
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ZGEditDescriptionWindow" animationBehavior="default" id="1">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="240" width="439" height="245"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1366" height="746"/>
+            <value key="minSize" type="size" width="343" height="245"/>
+            <view key="contentView" id="2">
+                <rect key="frame" x="0.0" y="0.0" width="439" height="245"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vib-cU-FIA">
+                        <rect key="frame" x="20" y="49" width="399" height="151"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <clipView key="contentView" id="QSc-H1-AVx">
+                            <rect key="frame" x="1" y="1" width="397" height="149"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView importsGraphics="NO" findStyle="panel" allowsUndo="YES" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" allowsNonContiguousLayout="YES" id="H87-3C-xRB">
+                                    <rect key="frame" x="0.0" y="0.0" width="397" height="149"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <size key="minSize" width="397" height="149"/>
+                                    <size key="maxSize" width="463" height="10000000"/>
+                                    <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <size key="minSize" width="397" height="149"/>
+                                    <size key="maxSize" width="463" height="10000000"/>
+                                </textView>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="e9f-Ve-tRh">
+                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="AJE-4O-8gF">
+                            <rect key="frame" x="382" y="1" width="16" height="149"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lXY-UM-UgS">
+                        <rect key="frame" x="261" y="9" width="82" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5hL-cg-7rG">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="cancelEditingVariableDescription:" target="-2" id="tIN-uD-zAN"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kJn-Da-j2c">
+                        <rect key="frame" x="343" y="9" width="82" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="c40-Cm-nxU">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="editVariableDescription:" target="-2" id="blP-nh-GMm"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="L45-YV-hxF">
+                        <rect key="frame" x="20" y="208" width="80" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Description:" id="Mol-tr-SJG">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="Vib-cU-FIA" firstAttribute="top" secondItem="L45-YV-hxF" secondAttribute="bottom" constant="8" id="GdJ-aM-D8V"/>
+                    <constraint firstAttribute="trailing" secondItem="kJn-Da-j2c" secondAttribute="trailing" constant="20" id="NuY-0G-Jjw"/>
+                    <constraint firstItem="lXY-UM-UgS" firstAttribute="width" secondItem="kJn-Da-j2c" secondAttribute="width" id="PNh-nk-Mvb"/>
+                    <constraint firstItem="L45-YV-hxF" firstAttribute="top" secondItem="2" secondAttribute="top" constant="20" id="ZS9-EM-WM1"/>
+                    <constraint firstItem="kJn-Da-j2c" firstAttribute="top" secondItem="Vib-cU-FIA" secondAttribute="bottom" constant="12" id="bds-7w-MFZ"/>
+                    <constraint firstItem="lXY-UM-UgS" firstAttribute="top" secondItem="Vib-cU-FIA" secondAttribute="bottom" constant="12" id="dLp-u4-Rb4"/>
+                    <constraint firstItem="L45-YV-hxF" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="22" id="eJz-nA-5FR"/>
+                    <constraint firstAttribute="trailing" secondItem="Vib-cU-FIA" secondAttribute="trailing" constant="20" id="fU7-2H-ARv"/>
+                    <constraint firstItem="Vib-cU-FIA" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" id="laJ-bY-A6w"/>
+                    <constraint firstAttribute="bottom" secondItem="kJn-Da-j2c" secondAttribute="bottom" constant="16" id="vzj-QG-YeH"/>
+                    <constraint firstItem="kJn-Da-j2c" firstAttribute="leading" secondItem="lXY-UM-UgS" secondAttribute="trailing" constant="12" id="wLG-wh-3bZ"/>
+                    <constraint firstAttribute="bottom" secondItem="lXY-UM-UgS" secondAttribute="bottom" constant="16" id="zSj-bu-Lr3"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="4"/>
+            </connections>
+        </window>
+    </objects>
+</document>

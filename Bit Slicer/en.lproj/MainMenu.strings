@@ -1,0 +1,423 @@
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "5"; */
+"5.title" = "Bring All to Front";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "19"; */
+"19.title" = "Window";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "23"; */
+"23.title" = "Minimize";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "24"; */
+"24.title" = "Window";
+
+/* Class = "NSMenu"; title = "AMainMenu"; ObjectID = "29"; */
+"29.title" = "AMainMenu";
+
+/* Class = "NSMenuItem"; title = "Bit Slicer"; ObjectID = "56"; */
+"56.title" = "Bit Slicer";
+
+/* Class = "NSMenu"; title = "Bit Slicer"; ObjectID = "57"; */
+"57.title" = "Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "About Bit Slicer"; ObjectID = "58"; */
+"58.title" = "About Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "Open…"; ObjectID = "72"; */
+"72.title" = "Open…";
+
+/* Class = "NSMenuItem"; title = "Close"; ObjectID = "73"; */
+"73.title" = "Close";
+
+/* Class = "NSMenuItem"; title = "Save"; ObjectID = "75"; */
+"75.title" = "Save";
+
+/* Class = "NSMenuItem"; title = "Save As…"; ObjectID = "80"; */
+"80.title" = "Save As…";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
+"81.title" = "File";
+
+/* Class = "NSMenuItem"; title = "New"; ObjectID = "82"; */
+"82.title" = "New";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "File";
+
+/* Class = "NSMenuItem"; title = "Revert to Saved"; ObjectID = "112"; */
+"112.title" = "Revert to Saved";
+
+/* Class = "NSMenuItem"; title = "Open Recent"; ObjectID = "124"; */
+"124.title" = "Open Recent";
+
+/* Class = "NSMenu"; title = "Open Recent"; ObjectID = "125"; */
+"125.title" = "Open Recent";
+
+/* Class = "NSMenuItem"; title = "Clear Menu"; ObjectID = "126"; */
+"126.title" = "Clear Menu";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "129"; */
+"129.title" = "Preferences…";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "130"; */
+"130.title" = "Services";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "131"; */
+"131.title" = "Services";
+
+/* Class = "NSMenuItem"; title = "Hide Bit Slicer"; ObjectID = "134"; */
+"134.title" = "Hide Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "Quit Bit Slicer"; ObjectID = "136"; */
+"136.title" = "Quit Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "Hide Others";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "Show All";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "197"; */
+"197.title" = "Copy";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "198"; */
+"198.title" = "Select All";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "199"; */
+"199.title" = "Cut";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "202"; */
+"202.title" = "Delete";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "203"; */
+"203.title" = "Paste";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "205"; */
+"205.title" = "Edit";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "207"; */
+"207.title" = "Undo";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "215"; */
+"215.title" = "Redo";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "217"; */
+"217.title" = "Edit";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "239"; */
+"239.title" = "Zoom";
+
+/* Class = "NSMenuItem"; title = "View"; ObjectID = "295"; */
+"295.title" = "View";
+
+/* Class = "NSMenu"; title = "View"; ObjectID = "296"; */
+"296.title" = "View";
+
+/* Class = "NSMenuItem"; title = "Customize Toolbar…"; ObjectID = "298"; */
+"298.title" = "Customize Toolbar…";
+
+/* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "470"; */
+"470.title" = "Paste and Match Style";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "491"; */
+"491.title" = "Help";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "492"; */
+"492.title" = "Help";
+
+/* Class = "NSMenuItem"; title = "Bit Slicer Wiki"; ObjectID = "493"; */
+"493.title" = "Bit Slicer Wiki";
+
+/* Class = "NSMenuItem"; title = "Variable"; ObjectID = "564"; */
+"564.title" = "Variable";
+
+/* Class = "NSMenu"; title = "Variable"; ObjectID = "565"; */
+"565.title" = "Variable";
+
+/* Class = "NSMenuItem"; title = "Clear Variables"; ObjectID = "655"; */
+"655.title" = "Clear Variables";
+
+/* Class = "NSMenuItem"; title = "Add Variable"; ObjectID = "659"; */
+"659.title" = "Add Variable";
+
+/* Class = "NSMenu"; title = "Add Variable"; ObjectID = "660"; */
+"660.title" = "Add Variable";
+
+/* Class = "NSMenuItem"; title = "8-bit Integer"; ObjectID = "661"; */
+"661.title" = "8-bit Integer";
+
+/* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "662"; */
+"662.title" = "16-bit Integer";
+
+/* Class = "NSMenuItem"; title = "32-bit integer"; ObjectID = "663"; */
+"663.title" = "32-bit integer";
+
+/* Class = "NSMenuItem"; title = "64-bit Integer"; ObjectID = "664"; */
+"664.title" = "64-bit Integer";
+
+/* Class = "NSMenuItem"; title = "Float"; ObjectID = "665"; */
+"665.title" = "Float";
+
+/* Class = "NSMenuItem"; title = "Double"; ObjectID = "666"; */
+"666.title" = "Double";
+
+/* Class = "NSMenuItem"; title = "8-bit String"; ObjectID = "667"; */
+"667.title" = "8-bit String";
+
+/* Class = "NSMenuItem"; title = "Freeze Variables"; ObjectID = "681"; */
+"681.title" = "Freeze Variables";
+
+/* Class = "NSMenuItem"; title = "16-bit String"; ObjectID = "684"; */
+"684.title" = "16-bit String";
+
+/* Class = "NSMenuItem"; title = "Pause Target"; ObjectID = "689"; */
+"689.title" = "Pause Target";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Value…"; ObjectID = "691"; */
+"691.title" = "Edit Variable Value…";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Address…"; ObjectID = "762"; */
+"762.title" = "Edit Variable Address…";
+
+/* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "765"; */
+"765.title" = "Pointer";
+
+/* Class = "NSMenuItem"; title = "Memory"; ObjectID = "782"; */
+"782.title" = "Memory";
+
+/* Class = "NSMenu"; title = "Memory"; ObjectID = "783"; */
+"783.title" = "Memory";
+
+/* Class = "NSMenuItem"; title = "Show Memory Viewer"; ObjectID = "801"; */
+"801.title" = "Show Memory Viewer";
+
+/* Class = "NSMenuItem"; title = "Store All Values"; ObjectID = "811"; */
+"811.title" = "Store All Values";
+
+/* Class = "NSMenuItem"; title = "Byte Array"; ObjectID = "830"; */
+"830.title" = "Byte Array";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Size…"; ObjectID = "833"; */
+"833.title" = "Edit Variable Size…";
+
+/* Class = "NSMenuItem"; title = "Enter Full Screen"; ObjectID = "837"; */
+"837.title" = "Enter Full Screen";
+
+/* Class = "NSMenuItem"; title = "Show Data Inspector"; ObjectID = "848"; */
+"848.title" = "Show Data Inspector";
+
+/* Class = "NSMenuItem"; title = "NOP Variables"; ObjectID = "857"; */
+"857.title" = "NOP Variables";
+
+/* Class = "NSMenuItem"; title = "Show Variable"; ObjectID = "863"; */
+"863.title" = "Show Variable";
+
+/* Class = "NSMenu"; title = "Show Variable"; ObjectID = "864"; */
+"864.title" = "Show Variable";
+
+/* Class = "NSMenuItem"; title = "Memory Viewer"; ObjectID = "865"; */
+"865.title" = "Memory Viewer";
+
+/* Class = "NSMenuItem"; title = "Debugger"; ObjectID = "866"; */
+"866.title" = "Debugger";
+
+/* Class = "NSMenuItem"; title = "Change Memory Protection…"; ObjectID = "872"; */
+"872.title" = "Change Memory Protection…";
+
+/* Class = "NSMenuItem"; title = "Dump Memory in Range…"; ObjectID = "874"; */
+"874.title" = "Dump Memory in Range…";
+
+/* Class = "NSMenuItem"; title = "Dump All Memory…"; ObjectID = "875"; */
+"875.title" = "Dump All Memory…";
+
+/* Class = "NSMenuItem"; title = "Debug"; ObjectID = "930"; */
+"930.title" = "Debug";
+
+/* Class = "NSMenu"; title = "Debug"; ObjectID = "931"; */
+"931.title" = "Debug";
+
+/* Class = "NSMenuItem"; title = "Show Debugger"; ObjectID = "950"; */
+"950.title" = "Show Debugger";
+
+/* Class = "NSMenuItem"; title = "Add Breakpoint"; ObjectID = "1019"; */
+"1019.title" = "Add Breakpoint";
+
+/* Class = "NSMenuItem"; title = "Remove All Breakpoints"; ObjectID = "1020"; */
+"1020.title" = "Remove All Breakpoints";
+
+/* Class = "NSMenuItem"; title = "Registers Qualifier"; ObjectID = "1027"; */
+"1027.title" = "Registers Qualifier";
+
+/* Class = "NSMenu"; title = "Registers Qualifier"; ObjectID = "1028"; */
+"1028.title" = "Registers Qualifier";
+
+/* Class = "NSMenuItem"; title = "Watch Variable"; ObjectID = "1047"; */
+"1047.title" = "Watch Variable";
+
+/* Class = "NSMenu"; title = "Watch Variable"; ObjectID = "1048"; */
+"1048.title" = "Watch Variable";
+
+/* Class = "NSMenuItem"; title = "Write Accesses…"; ObjectID = "1050"; */
+"1050.title" = "Write Accesses…";
+
+/* Class = "NSMenuItem"; title = "Read & Write Accesses…"; ObjectID = "1052"; */
+"1052.title" = "Read & Write Accesses…";
+
+/* Class = "NSMenuItem"; title = "Continue Execution"; ObjectID = "1061"; */
+"1061.title" = "Continue Execution";
+
+/* Class = "NSMenuItem"; title = "Jump to Instruction"; ObjectID = "1062"; */
+"1062.title" = "Jump to Instruction";
+
+/* Class = "NSMenuItem"; title = "Step Execution"; ObjectID = "1068"; */
+"1068.title" = "Step Execution";
+
+/* Class = "NSMenu"; title = "Step Execution"; ObjectID = "1069"; */
+"1069.title" = "Step Execution";
+
+/* Class = "NSMenuItem"; title = "Into Instruction"; ObjectID = "1071"; */
+"1071.title" = "Into Instruction";
+
+/* Class = "NSMenuItem"; title = "Over Instruction"; ObjectID = "1072"; */
+"1072.title" = "Over Instruction";
+
+/* Class = "NSMenuItem"; title = "Out of Function"; ObjectID = "1073"; */
+"1073.title" = "Out of Function";
+
+/* Class = "NSMenuItem"; title = "Signed"; ObjectID = "1083"; */
+"1083.title" = "Signed";
+
+/* Class = "NSMenuItem"; title = "Unsigned"; ObjectID = "1084"; */
+"1084.title" = "Unsigned";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "1087"; */
+"1087.title" = "Copy Address";
+
+/* Class = "NSMenuItem"; title = "Check for Updates…"; ObjectID = "1093"; */
+"1093.title" = "Check for Updates…";
+
+/* Class = "NSMenuItem"; title = "Back"; ObjectID = "1101"; */
+"1101.title" = "Back";
+
+/* Class = "NSMenuItem"; title = "Forward"; ObjectID = "1102"; */
+"1102.title" = "Forward";
+
+/* Class = "NSMenuItem"; title = "Go to Call Address"; ObjectID = "1106"; */
+"1106.title" = "Go to Call Address";
+
+/* Class = "NSMenuItem"; title = "Report a Bug"; ObjectID = "1110"; */
+"1110.title" = "Report a Bug";
+
+/* Class = "NSMenuItem"; title = "Visit Forums"; ObjectID = "1112"; */
+"1112.title" = "Visit Forums";
+
+/* Class = "NSMenuItem"; title = "Send Feedback"; ObjectID = "1113"; */
+"1113.title" = "Send Feedback";
+
+/* Class = "NSMenuItem"; title = "Show Colors"; ObjectID = "0uh-KE-NmN"; */
+"0uh-KE-NmN.title" = "Show Colors";
+
+/* Class = "NSMenuItem"; title = "Show Fonts"; ObjectID = "196-mO-a1w"; */
+"196-mO-a1w.title" = "Show Fonts";
+
+/* Class = "NSMenuItem"; title = "Script"; ObjectID = "24i-VE-23z"; */
+"24i-VE-23z.title" = "Script";
+
+/* Class = "NSMenu"; title = "Kern"; ObjectID = "25p-uh-76y"; */
+"25p-uh-76y.title" = "Kern";
+
+/* Class = "NSMenuItem"; title = "Baseline"; ObjectID = "3RC-ke-Gw9"; */
+"3RC-ke-Gw9.title" = "Baseline";
+
+/* Class = "NSMenuItem"; title = "Underline"; ObjectID = "3g5-A2-zqi"; */
+"3g5-A2-zqi.title" = "Underline";
+
+/* Class = "NSMenuItem"; title = "Loosen"; ObjectID = "6K6-gD-zol"; */
+"6K6-gD-zol.title" = "Loosen";
+
+/* Class = "NSMenuItem"; title = "Tighten"; ObjectID = "6TI-1H-4rH"; */
+"6TI-1H-4rH.title" = "Tighten";
+
+/* Class = "NSMenuItem"; title = "Use All"; ObjectID = "7Xb-k6-JO5"; */
+"7Xb-k6-JO5.title" = "Use All";
+
+/* Class = "NSMenuItem"; title = "Use None"; ObjectID = "FdO-x6-qZB"; */
+"FdO-x6-qZB.title" = "Use None";
+
+/* Class = "NSMenuItem"; title = "Copy Style"; ObjectID = "HDJ-Hn-OD2"; */
+"HDJ-Hn-OD2.title" = "Copy Style";
+
+/* Class = "NSMenuItem"; title = "Show Logs"; ObjectID = "HuH-Wa-MAW"; */
+"HuH-Wa-MAW.title" = "Show Logs";
+
+/* Class = "NSMenuItem"; title = "Relativize Variables"; ObjectID = "Ica-nv-keu"; */
+"Ica-nv-keu.title" = "Relativize Variables";
+
+/* Class = "NSMenuItem"; title = "Superscript"; ObjectID = "Ixp-J7-PA4"; */
+"Ixp-J7-PA4.title" = "Superscript";
+
+/* Class = "NSMenuItem"; title = "Lower"; ObjectID = "JJ8-60-TYn"; */
+"JJ8-60-TYn.title" = "Lower";
+
+/* Class = "NSMenu"; title = "Baseline"; ObjectID = "Ldv-6l-XC4"; */
+"Ldv-6l-XC4.title" = "Baseline";
+
+/* Class = "NSMenuItem"; title = "Use None"; ObjectID = "MCt-YM-vTL"; */
+"MCt-YM-vTL.title" = "Use None";
+
+/* Class = "NSMenuItem"; title = "Bigger"; ObjectID = "PKM-Cr-39O"; */
+"PKM-Cr-39O.title" = "Bigger";
+
+/* Class = "NSMenuItem"; title = "Bold"; ObjectID = "TSu-oj-2rv"; */
+"TSu-oj-2rv.title" = "Bold";
+
+/* Class = "NSMenuItem"; title = "Paste Style"; ObjectID = "W33-GA-dhg"; */
+"W33-GA-dhg.title" = "Paste Style";
+
+/* Class = "NSMenu"; title = "Font"; ObjectID = "WH3-yD-KY0"; */
+"WH3-yD-KY0.title" = "Font";
+
+/* Class = "NSMenuItem"; title = "Ligatures"; ObjectID = "Ydj-ck-VMA"; */
+"Ydj-ck-VMA.title" = "Ligatures";
+
+/* Class = "NSMenuItem"; title = "Inject Code…"; ObjectID = "bRt-cV-8Ks"; */
+"bRt-cV-8Ks.title" = "Inject Code…";
+
+/* Class = "NSMenuItem"; title = "Font"; ObjectID = "cy3-aR-hDp"; */
+"cy3-aR-hDp.title" = "Font";
+
+/* Class = "NSMenuItem"; title = "Search Pointer to Variable"; ObjectID = "dr1-2H-Uqa"; */
+"dr1-2H-Uqa.title" = "Search Pointer to Variable";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "e4N-vH-vLR"; */
+"e4N-vH-vLR.title" = "Use Default";
+
+/* Class = "NSMenuItem"; title = "Subscript"; ObjectID = "flM-3a-hRj"; */
+"flM-3a-hRj.title" = "Subscript";
+
+/* Class = "NSMenuItem"; title = "Set Breakpoint Condition…"; ObjectID = "knB-aR-Qem"; */
+"knB-aR-Qem.title" = "Set Breakpoint Condition…";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "lF7-1X-Xbh"; */
+"lF7-1X-Xbh.title" = "Use Default";
+
+/* Class = "NSMenuItem"; title = "Kern"; ObjectID = "oZ1-K9-3if"; */
+"oZ1-K9-3if.title" = "Kern";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "rt6-Mi-AnR"; */
+"rt6-Mi-AnR.title" = "Use Default";
+
+/* Class = "NSMenuItem"; title = "Donate…"; ObjectID = "sUz-q6-lOh"; */
+"sUz-q6-lOh.title" = "Donate…";
+
+/* Class = "NSMenuItem"; title = "Smaller"; ObjectID = "t9E-uQ-noM"; */
+"t9E-uQ-noM.title" = "Smaller";
+
+/* Class = "NSMenuItem"; title = "Italic"; ObjectID = "ure-VC-LSA"; */
+"ure-VC-LSA.title" = "Italic";
+
+/* Class = "NSMenuItem"; title = "Raise"; ObjectID = "w8p-W4-UKB"; */
+"w8p-W4-UKB.title" = "Raise";
+
+/* Class = "NSMenu"; title = "Ligatures"; ObjectID = "yrk-rh-Kmb"; */
+"yrk-rh-Kmb.title" = "Ligatures";

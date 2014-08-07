@@ -1,0 +1,25 @@
+/* 
+  Dump All Memory.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 7/31/14.
+
+*/
+
+/* Filename for merged file when dumping all memory */
+"mergedFilename" = "(All) Merged";
+
+/* Prompt message that shows up in the save panel for choosing a folder to save memory dump files to */
+"savePanelPromptMessage" = "Choose a folder name to save the memory dump files to.";
+
+/* Alert Title for when dumping all memory fails */
+"failedMemoryDumpAlertTitle" = "Dumping All Memory Failed";
+
+/* Alert Message for when dumping all memory fails */
+"failedMemoryDumpAlertMessage" = "An error occured in writing all data from memory onto disk";
+
+/* Nofitication title for when dumping all memory finishes */
+"finishedDumpingMemoryNotificationTitle" = "Finished Dumping Memory";
+
+/* Nofitication message format for when dumping all memory finishes */
+"finishedDumpingMemoryNotificationMessageFormat" = "Dumped all memory for %@";

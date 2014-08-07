@@ -1,0 +1,18 @@
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3XX-NZ-UPf"; */
+"3XX-NZ-UPf.title" = "Text Cell";
+
+/* Class = "NSTableColumn"; headerCell.title = "Backtrace"; ObjectID = "4kh-yY-nSc"; */
+"4kh-yY-nSc.headerCell.title" = "Backtrace";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "ALu-mJ-3Ud"; */
+"ALu-mJ-3Ud.title" = "Copy";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "aXd-k8-FQC"; */
+"aXd-k8-FQC.title" = "Copy Address";
+
+/* Class = "NSMenu"; title = "Right Click Menu"; ObjectID = "dO3-lj-Kst"; */
+"dO3-lj-Kst.title" = "Right Click Menu";
+
+/* Class = "NSMenuItem"; title = "Show in Memory Viewer"; ObjectID = "teb-0W-szd"; */
+"teb-0W-szd.title" = "Show in Memory Viewer";
