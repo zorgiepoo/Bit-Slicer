@@ -201,7 +201,7 @@
 	
 	if (shouldOffsetRect)
 	{
-		rect.origin.x -= 53;
+		rect.origin.x -= 53 + (self.controlView.bounds.size.width - 194.0) / 2;
 	}
 	// End hack
 	
