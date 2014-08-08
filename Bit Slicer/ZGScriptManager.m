@@ -890,18 +890,17 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	}
 }
 
-- (void)handleCallbackFailureWithVariable:(ZGVariable *)variable methodCallResult:(PyObject *)methodCallResult forMethodName:(const char *)methodName shouldStop:(BOOL *)stop
+- (void)handleCallbackFailureWithVariable:(ZGVariable *)variable methodCallResult:(PyObject *)methodCallResult forMethodName:(NSString *)methodName
 {
 	if (methodCallResult == NULL)
 	{
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[self.loggerWindowController writeLine:[NSString stringWithFormat:@"Exception raised in %s callback", methodName]];
+			[self.loggerWindowController writeLine:[NSString stringWithFormat:@"Exception raised in %@ callback", methodName]];
 		});
 		[self logPythonError];
 		dispatch_async(dispatch_get_main_queue(), ^{
 			[self stopScriptForVariable:variable];
 		});
-		*stop = YES;
 	}
 }
 
@@ -923,13 +922,13 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 - (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(gPythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
 					PyObject *registers = [self registersfromBreakPoint:breakPoint];
 					PyObject *result = PyObject_CallFunction(callback, "KKO", breakPoint.variable.address, instructionAddress, registers);
-					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"data watchpoint" shouldStop:stop];
+					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"data watchpoint"];
 					Py_XDECREF(registers);
 					Py_XDECREF(result);
 				}
@@ -941,7 +940,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 - (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(gPythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
@@ -949,7 +948,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 					PyObject *result = PyObject_CallFunction(callback, "KO", breakPoint.variable.address, registers);
 					Py_XDECREF(registers);
 					
-					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"instruction breakpoint" shouldStop:stop];
+					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"instruction breakpoint"];
 					Py_XDECREF(result);
 					
 					if (breakPoint.hidden && breakPoint.callback != NULL)
@@ -966,12 +965,12 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 - (void)handleHotKeyTriggerWithInternalID:(UInt32)hotKeyID callback:(PyObject *)callback sender:(id)sender
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(gPythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
 					PyObject *result = PyObject_CallFunction(callback, "I", hotKeyID);
-					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:"hotkey trigger" shouldStop:stop];
+					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"hotkey trigger"];
 					Py_XDECREF(result);
 				}
 			});
