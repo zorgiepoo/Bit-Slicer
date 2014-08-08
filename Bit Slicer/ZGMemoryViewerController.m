@@ -234,7 +234,7 @@
 	{
 		[menuItem setState:self.showsDataInspector];
 	}
-	else if (userInterfaceItem.action == @selector(copyAddress:))
+	else if (userInterfaceItem.action == @selector(copyAddress:) || userInterfaceItem.action == @selector(showDebugger:))
 	{
 		if (!self.currentProcess.valid)
 		{
@@ -730,6 +730,14 @@
 	
 	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
 	[[NSPasteboard generalPasteboard] setString:variable.addressFormula forType:NSStringPboardType];
+}
+
+#pragma mark Showing Debugger
+
+- (IBAction)showDebugger:(id)__unused sender
+{
+	HFRange selectedAddressRange = [self selectedAddressRange];
+	[ZGNavigationPost postShowDebuggerWithProcess:self.currentProcess address:selectedAddressRange.location];
 }
 
 @end
