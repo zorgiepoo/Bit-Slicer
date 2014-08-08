@@ -367,7 +367,7 @@ static ZGBreakPointController *gBreakPointController;
 		// Our work around here is giving the process a little delay (perhaps a better way might be to add a single-stepping breakpoint and remove it from there)
 		breakPoint.dead = YES;
 		
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void) {
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 10), dispatch_get_main_queue(), ^(void) {
 			if ([self.breakPoints containsObject:breakPoint])
 			{
 				ZGSuspendTask(breakPoint.process.processTask);

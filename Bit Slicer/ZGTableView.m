@@ -48,7 +48,7 @@
 	if (willBecomeFirstResponder)
 	{
 		_shouldAvoidCustomEditing = YES;
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void) {
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 3 / 10), dispatch_get_main_queue(), ^(void) {
 			self->_shouldAvoidCustomEditing = NO;
 		});
 	}
