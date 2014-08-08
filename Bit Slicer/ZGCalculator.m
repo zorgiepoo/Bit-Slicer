@@ -238,8 +238,8 @@
 {
 	evaluator.functionResolver = (DDFunctionResolver)^(NSString *name) {
 		return (DDMathFunction)^(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError **error) {
-			id result = nil;
-			if ([[vars objectForKey:ZGSymbolicatesVariable] pointerValue] != NULL && args.count == 0)
+			DDExpression *result = nil;
+			if ([[vars objectForKey:ZGSymbolicatesVariable] boolValue] && args.count == 0)
 			{
 				result = findSymbolFunction(@[[DDExpression variableExpressionWithVariable:name]], vars, eval, error);
 			}
