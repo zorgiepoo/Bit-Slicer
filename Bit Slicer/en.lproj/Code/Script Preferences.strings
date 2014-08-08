@@ -1,8 +1,16 @@
 /* 
-  Variable Actions.strings
+  Script Preferences.strings
   Bit Slicer
 
   Created by Mayur Pawashe on 7/31/14.
 
 */
 
+/* Menu item labeling default python editor */
+"defaultPythonEditor" = "Default Python Editor";
+
+/* Menu item labeling tabs for indentation */
+"tabsIndentation" = "Tabs";
+
+/* Menu item labeling spaces for indentation */
+"spacesIndentation" = "Spaces";
