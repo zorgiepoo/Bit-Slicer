@@ -355,7 +355,7 @@
 
 #pragma mark Reading from Memory
 
-- (void)updateMemoryViewerAtAddress:(ZGMemoryAddress)desiredMemoryAddress withSelectionLength:(ZGMemorySize)selectionLength
+- (void)updateMemoryViewerAtAddress:(ZGMemoryAddress)desiredMemoryAddress withSelectionLength:(ZGMemorySize)selectionLength andChangeFirstResponder:(BOOL)shouldChangeFirstResponder
 {
 	self.lastUpdateCount++;
 	
@@ -489,7 +489,7 @@
 				navigationLength = 0;
 			}
 			
-			[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:navigationLength];
+			[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:navigationLength andChangeFirstResponder:shouldChangeFirstResponder];
 		}
 		
 		// Replace all the contents of the self.textView
@@ -518,13 +518,16 @@
 			self.addressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", desiredMemoryAddress];
 		}
 		
-		// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
-		for (HFRepresenter *representer in self.textView.controller.representers)
+		if (shouldChangeFirstResponder)
 		{
-			if ([representer isKindOfClass:[HFHexTextRepresenter class]])
+			// Make the hex view the first responder, so that the highlighted bytes will be blue and in the clear
+			for (HFRepresenter *representer in self.textView.controller.representers)
 			{
-				[self.window makeFirstResponder:[representer view]];
-				break;
+				if ([representer isKindOfClass:[HFHexTextRepresenter class]])
+				{
+					[self.window makeFirstResponder:[representer view]];
+					break;
+				}
 			}
 		}
 		
@@ -545,8 +548,9 @@
 
 - (void)changeMemoryViewWithSelectionLength:(ZGMemorySize)selectionLength
 {
+	BOOL foundSymbol = NO;
 	NSError *error = nil;
-	NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAndSymbolicateExpression:self.addressTextField.stringValue process:self.currentProcess currentAddress:[self selectedAddressRange].location error:&error];
+	NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAndSymbolicateExpression:self.addressTextField.stringValue process:self.currentProcess currentAddress:[self selectedAddressRange].location didSymbolicate:&foundSymbol error:&error];
 	if (error != nil)
 	{
 		NSLog(@"Error calculating memory address expression in memory viewer: %@", error);
@@ -558,7 +562,7 @@
 		calculatedMemoryAddress = ZGMemoryAddressFromExpression(calculatedMemoryAddressExpression);
 	}
 	
-	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:selectionLength];
+	[self updateMemoryViewerAtAddress:calculatedMemoryAddress withSelectionLength:selectionLength andChangeFirstResponder:!foundSymbol];
 }
 
 - (void)revertUpdateCount
@@ -711,7 +715,7 @@
 		[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
 		[self runningApplicationsPopUpButton:nil];
 		[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", memoryAddress]];
-		[self updateMemoryViewerAtAddress:memoryAddress withSelectionLength:selectionLength];
+		[self updateMemoryViewerAtAddress:memoryAddress withSelectionLength:selectionLength andChangeFirstResponder:YES];
 	}
 }
 

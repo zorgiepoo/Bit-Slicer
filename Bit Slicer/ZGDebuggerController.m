@@ -739,7 +739,7 @@ enum ZGStepExecution
 	}
 }
 
-- (void)updateDisassemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size selectionAddress:(ZGMemoryAddress)selectionAddress
+- (void)updateDisassemblerWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size selectionAddress:(ZGMemoryAddress)selectionAddress andChangeFirstResponder:(BOOL)shouldChangeFirstResponder
 {
 	[self.addressTextField setEnabled:NO];
 	[self.runningApplicationsPopUpButton setEnabled:NO];
@@ -770,7 +770,7 @@ enum ZGStepExecution
 	[self.addressTextField setEnabled:YES];
 	[self.runningApplicationsPopUpButton setEnabled:YES];
 
-	if (self.window.firstResponder != self.backtraceViewController.tableView)
+	if (self.window.firstResponder != self.backtraceViewController.tableView && shouldChangeFirstResponder)
 	{
 		[self.window makeFirstResponder:self.instructionsTableView];
 	}
@@ -898,6 +898,7 @@ enum ZGStepExecution
 	ZGMachBinary *mainMachBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:machBinaries];
 	
 	ZGMemoryAddress calculatedMemoryAddress = 0;
+	BOOL didFindSymbol = NO;
 
 	if (self.mappedFilePath != nil && sender == nil)
 	{
@@ -915,7 +916,7 @@ enum ZGStepExecution
 		NSString *userInput = self.addressTextField.stringValue;
 		ZGMemoryAddress selectedAddress = ((ZGInstruction *)[self.selectedInstructions lastObject]).variable.address;
 		NSError *error = nil;
-		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAndSymbolicateExpression:userInput process:self.currentProcess currentAddress:selectedAddress error:&error];
+		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAndSymbolicateExpression:userInput process:self.currentProcess currentAddress:selectedAddress didSymbolicate:&didFindSymbol error:&error];
 		if (error != nil)
 		{
 			NSLog(@"Encountered error when reading memory from debugger:");
@@ -947,7 +948,7 @@ enum ZGStepExecution
 		self.offsetFromBase = calculatedMemoryAddress - self.baseAddress;
 		[self prepareNavigation];
 		[self scrollAndSelectRow:[self.instructions indexOfObject:foundInstructionInTable]];
-		if (self.window.firstResponder != self.backtraceViewController.tableView)
+		if (self.window.firstResponder != self.backtraceViewController.tableView && !didFindSymbol)
 		{
 			[self.window makeFirstResponder:self.instructionsTableView];
 		}
@@ -1062,7 +1063,7 @@ enum ZGStepExecution
 	}
 	
 	[self.undoManager removeAllActions];
-	[self updateDisassemblerWithAddress:lowBoundAddress size:highBoundAddress - lowBoundAddress selectionAddress:calculatedMemoryAddress];
+	[self updateDisassemblerWithAddress:lowBoundAddress size:highBoundAddress - lowBoundAddress selectionAddress:calculatedMemoryAddress andChangeFirstResponder:!didFindSymbol];
 	
 	[self invalidateRestorableState];
 }
