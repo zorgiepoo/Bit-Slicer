@@ -27,4 +27,59 @@
 /* Default description for new script */
 "defaultScriptDescription" = "My Script";
 
+/* Undo action for nopping variables */
 "undoNOPChangeAction" = "NOP Change";
+
+/* Alert title for NOP variable Error */
+"nopErrorAlertTitle" = "NOP Error";
+
+/* Alert message error for nopping a variable */
+"nopSingleErrorAlertMessage" = "An error may have occured with nopping the instruction.";
+
+/* Alert message error for nopping multiple variables */
+"nopMultipleErrorAlertMessage" = "An error may have occured with nopping the instructions.";
+
+/* Undo action for changing variable description */
+"undoDescriptionChange" = "Description Change";
+
+/* Undo action for changing variable type */
+"undoTypeChange" = "Type Change";
+
+/* Undo action for freezing a variable value */
+"undoFreezeValueChange" = "Freeze Value Change";
+
+/* Undo action for changing a variable value */
+"undoValueChange" = "Value Change";
+
+/* Undo action for changing Active state of a single variable */
+"undoSingleActiveChange" = "Active Variable Change";
+
+/* Undo action for changing Active state of multiple variables */
+"undoMultipleActiveChange" = "Active Variable Changes";
+
+/* Undo action for editing variables */
+"undoEditVariablesChange" = "Edit Variables";
+
+/* Undo action for changing variable address */
+"undoAddressChange" = "Address Change";
+
+/* Undo action for relativizing a single variable */
+"undoRelativizeSingleVariable" = "Relativize Variable";
+
+/* Undo action for relativizing multiple variables */
+"undoRelativizeMultipleVariables" = "Relativize Variables";
+
+/* Undo action for unrelativizing a single variable */
+"undoUnrelativizeSingleVariable" = "Unrelativize Variable";
+
+/* Undo action for unrelativizing multiple variables */
+"undoUnrelativizeMultipleVariables" = "Unrelativize Variables";
+
+/* Undo action for changing variable size */
+"undoSizeChange" = "Size Change";
+
+/* Alert error title for changing variable size */
+"failedChangeSizeAlertTitle" = "Failed to Change Size";
+
+/* Alert message title for changing variable size */
+"failedChangeSizeAlertMessage" = "The size could not be changed. Perhaps the requested size is too big?";
