@@ -37,7 +37,7 @@
 #define ZGLoggerWindowText @"ZGLoggerWindowText"
 #define MIN_LOG_LINES_TO_RESTORE 50U
 
-#define ZGLoggerWindowLocalizationTable @"Logger Window"
+#define ZGLoggerWindowLocalizationTable @"[Code] Logger Window"
 
 @interface ZGLoggerWindowController ()
 

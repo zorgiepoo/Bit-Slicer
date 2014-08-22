@@ -56,7 +56,7 @@
 #define ZGMemoryViewerProcessInternalName @"ZGMemoryViewerProcessName"
 #define ZGMemoryViewerShowsDataInspector @"ZGMemoryViewerShowsDataInspector"
 
-#define ZGMemoryViewerLocalizationTable @"Memory Viewer"
+#define ZGMemoryViewerLocalizationTable @"[Code] Memory Viewer"
 
 @interface ZGMemoryViewerController ()
 

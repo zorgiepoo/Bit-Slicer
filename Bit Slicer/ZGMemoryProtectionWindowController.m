@@ -53,7 +53,7 @@
 
 @end
 
-#define ZGMemoryProtectionLocalizableTable @"Memory Protection"
+#define ZGMemoryProtectionLocalizableTable @"[Code] Memory Protection"
 
 @implementation ZGMemoryProtectionWindowController
 

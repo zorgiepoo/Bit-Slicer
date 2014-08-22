@@ -59,7 +59,7 @@
 #define ZGDebuggerHotkeyIconName @"hotkey"
 #define ZGScriptIconName @"scripts"
 
-#define ZGPreferencesLocalizationTable @"Preferences"
+#define ZGPreferencesLocalizationTable @"[Code] Preferences"
 
 @implementation ZGPreferencesController
 

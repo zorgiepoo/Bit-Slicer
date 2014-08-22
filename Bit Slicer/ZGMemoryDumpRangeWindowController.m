@@ -39,7 +39,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGUtilities.h"
 
-#define ZGDumpMemoryRangeLocalizableTable @"Dump Memory Range"
+#define ZGDumpMemoryRangeLocalizableTable @"[Code] Dump Memory Range"
 
 @interface ZGMemoryDumpRangeWindowController ()
 

@@ -35,7 +35,7 @@
 #import "ZGMemoryNavigationWindowController.h"
 #import "ZGProcess.h"
 
-#define ZGMemoryNavigationLocalizationTable @"Memory Navigation"
+#define ZGMemoryNavigationLocalizationTable @"[Code] Memory Navigation"
 
 @implementation ZGMemoryNavigationWindowController
 

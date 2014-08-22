@@ -32,7 +32,7 @@
 
 #define kDataInspectorUserDefaultsKey @"DataInspectorDefaults"
 
-#define ZGDataInspectorLocalizationTable @"Data Inspector"
+#define ZGDataInspectorLocalizationTable @"[Code] Data Inspector"
 
 static BOOL isRunningOnLeopardOrLater(void) {
     return NSAppKitVersionNumber >= 860.;

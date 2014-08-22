@@ -44,7 +44,7 @@
 #define ZG_REGISTER_TYPES @"ZG_REGISTER_TYPES"
 #define ZG_DEBUG_QUALIFIER @"ZG_DEBUG_QUALIFIER"
 
-#define ZGDebuggerRegistersLocalizationTable @"Debugger Registers"
+#define ZGDebuggerRegistersLocalizationTable @"[Code] Debugger Registers"
 
 @interface ZGRegistersViewController ()
 

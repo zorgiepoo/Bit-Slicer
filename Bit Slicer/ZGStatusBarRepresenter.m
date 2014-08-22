@@ -34,7 +34,7 @@
 
 #import "ZGStatusBarRepresenter.h"
 
-#define ZGStatusBarLocalizationTable @"Memory Viewer Status Bar"
+#define ZGStatusBarLocalizationTable @"[Code] Memory Viewer Status Bar"
 
 @interface ZGStatusBarRepresenter (InheritedPrivateMethods)
 

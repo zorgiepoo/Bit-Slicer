@@ -54,7 +54,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGNavigationPost.h"
 
-#define ZGVariableActionsLocalizableTable @"Variable Actions"
+#define ZGVariableActionsLocalizableTable @"[Code] Variable Actions"
 
 @interface ZGVariableController ()
 

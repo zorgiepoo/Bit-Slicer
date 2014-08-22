@@ -37,7 +37,7 @@
 #import "ZGVariableController.h"
 #import "ZGAppPathUtilities.h"
 
-#define ZGScriptPreferencesLocalizationTable @"Script Preferences"
+#define ZGScriptPreferencesLocalizationTable @"[Code] Script Preferences"
 
 enum ZGScriptIndentationTag
 {
