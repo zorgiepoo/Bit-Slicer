@@ -6,8 +6,8 @@
 
 */
 
-/* Window title for Software Update tab */
-"softwareUpdateWindowTitle" = "Software Update";
+/* Window title for Updates tab */
+"softwareUpdateWindowTitle" = "Updates";
 
 /* Window title for Shortcuts tab */
 "shortcutsWindowTitle" = "Shortcuts";

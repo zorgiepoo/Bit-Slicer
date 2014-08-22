@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
@@ -17,7 +17,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="524" y="518" width="322" height="156"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1366" height="746"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="322" height="156"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -26,7 +26,7 @@
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="WM0-nF-4pf"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="VRz-v5-SJk"/>
-                    <toolbarItem implicitItemIdentifier="839E6014-BACC-4321-8E43-E69F15A411EC" explicitItemIdentifier="ZGSoftwareUpdateIdentifier" label="Software Update" paletteLabel="Software Update" image="NSNetwork" autovalidates="NO" selectable="YES" id="f0w-AB-SR1">
+                    <toolbarItem implicitItemIdentifier="839E6014-BACC-4321-8E43-E69F15A411EC" explicitItemIdentifier="ZGSoftwareUpdateIdentifier" label="Updates" paletteLabel="Updates" image="NSNetwork" autovalidates="NO" selectable="YES" id="f0w-AB-SR1">
                         <nil key="toolTip"/>
                         <connections>
                             <action selector="changePreferencesView:" target="-2" id="7Bn-K1-KRP"/>

@@ -2,11 +2,11 @@
 /* Class = "NSWindow"; title = "Preferences"; ObjectID = "1"; */
 "1.title" = "Preferences";
 
-/* Class = "NSToolbarItem"; label = "Software Update"; ObjectID = "f0w-AB-SR1"; */
-"f0w-AB-SR1.label" = "Software Update";
+/* Class = "NSToolbarItem"; label = "Updates"; ObjectID = "f0w-AB-SR1"; */
+"f0w-AB-SR1.label" = "Updates";
 
-/* Class = "NSToolbarItem"; paletteLabel = "Software Update"; ObjectID = "f0w-AB-SR1"; */
-"f0w-AB-SR1.paletteLabel" = "Software Update";
+/* Class = "NSToolbarItem"; paletteLabel = "Updates"; ObjectID = "f0w-AB-SR1"; */
+"f0w-AB-SR1.paletteLabel" = "Updates";
 
 /* Class = "NSToolbarItem"; label = "Scripts"; ObjectID = "kPj-yB-vNE"; */
 "kPj-yB-vNE.label" = "Scripts";
