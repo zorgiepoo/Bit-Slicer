@@ -305,7 +305,7 @@ void ZGSearchWithFunctionHelperRegular(T *searchValue, bool (*comparisonFunction
 		ZGMemorySize numberOfStepsToTake = MIN(MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES, (endLimit + dataAlignment - dataIndex) / dataAlignment);
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
-			if (comparisonFunction(searchData, static_cast<T *>(static_cast<void *>((uint8_t *)bytes + dataIndex)), searchValue))
+			if (comparisonFunction(searchData, static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(bytes) + dataIndex)), searchValue))
 			{
 				memoryAddresses[numberOfVariablesFound] = static_cast<P>(address + dataIndex);
 				numberOfVariablesFound++;
@@ -330,7 +330,7 @@ void ZGSearchWithFunctionHelperStored(T *regionBytes, bool (*comparisonFunction)
 		ZGMemorySize numberOfStepsToTake = MIN(MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES, (endLimit + dataAlignment - dataIndex) / dataAlignment);
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
-			if (comparisonFunction(searchData, (static_cast<T *>(static_cast<void *>((uint8_t *)bytes + dataIndex))), static_cast<T *>(static_cast<void *>((uint8_t *)regionBytes + dataIndex))))
+			if (comparisonFunction(searchData, (static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(bytes) + dataIndex))), static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(static_cast<void *>(regionBytes)) + dataIndex))))
 			{
 				memoryAddresses[numberOfVariablesFound] = static_cast<P>(address + dataIndex);
 				numberOfVariablesFound++;
@@ -1335,7 +1335,7 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 template <typename T, typename P>
 void ZGNarrowSearchWithFunctionRegularCompare(ZGRegion * __unused *lastUsedSavedRegionReference, ZGRegion * __unsafe_unretained lastUsedRegion, P variableAddress, ZGMemorySize __unused dataSize, NSDictionary * __unused __unsafe_unretained savedPageToRegionTable, NSArray * __unused __unsafe_unretained savedRegions, ZGMemorySize __unused pageSize, bool (*comparisonFunction)(ZGSearchData *, T *, T *), P *memoryAddresses, ZGMemorySize &numberOfVariablesFound, ZGSearchData * __unsafe_unretained searchData, T *searchValue)
 {
-	T *currentValue = static_cast<T *>(static_cast<void *>((uint8_t *)(lastUsedRegion->_bytes) + (variableAddress - lastUsedRegion->_address)));
+	T *currentValue = static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(lastUsedRegion->_bytes) + (variableAddress - lastUsedRegion->_address)));
 	if (comparisonFunction(searchData, currentValue, searchValue))
 	{
 		memoryAddresses[numberOfVariablesFound] = variableAddress;
@@ -1383,9 +1383,9 @@ void ZGNarrowSearchWithFunctionStoredCompare(ZGRegion **lastUsedSavedRegionRefer
 	
 	if (*lastUsedSavedRegionReference != nil)
 	{
-		T *currentValue = static_cast<T *>(static_cast<void *>((uint8_t *)(lastUsedRegion->_bytes) + (variableAddress - lastUsedRegion->_address)));
+		T *currentValue = static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(lastUsedRegion->_bytes) + (variableAddress - lastUsedRegion->_address)));
 		
-		T *compareValue = static_cast<T *>(static_cast<void *>((uint8_t *)((*lastUsedSavedRegionReference)->_bytes) + (variableAddress - (*lastUsedSavedRegionReference)->_address)));
+		T *compareValue = static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>((*lastUsedSavedRegionReference)->_bytes) + (variableAddress - (*lastUsedSavedRegionReference)->_address)));
 		
 		if (comparisonFunction(searchData, currentValue, compareValue))
 		{
