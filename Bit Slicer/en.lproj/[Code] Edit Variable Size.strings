@@ -1,0 +1,19 @@
+/* 
+  [Code] Edit Variable Size.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 8/22/14.
+
+*/
+
+/* Alert title indicating that the requested size is invalid */
+"invalidSizeAlertTitle" = "Invalid Size";
+
+/* Alert message indicating that the requested size is invalid */
+"invalidSizeAlertMessage" = "The size you have supplied is not valid.";
+
+/* Alert title indicating that the requested size is too small */
+"sizeIsTooSmallAlertTitle" = "Size is too Small";
+
+/* Alert message indicating that the requested size is too small */
+"sizeIsTooSmallAlertMessage" = "The size must be greater than 0.";

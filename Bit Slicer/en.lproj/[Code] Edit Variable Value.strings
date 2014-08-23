@@ -1,0 +1,13 @@
+/* 
+  [Code] Edit Variable Value.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 8/22/14.
+
+*/
+
+/* Alert title indicating that overwriting a variable's value failed */
+"overwriteValueFailedAlertTitle" = "Writing Variables Failed";
+
+/* Alert message indicating that overwriting a variable's value failed */
+"overwriteValueFailedAlertMessage" = "The selected variables could not be overwritten.";

@@ -40,6 +40,8 @@
 #import "ZGVirtualMemory.h"
 #import "ZGUtilities.h"
 
+#define ZGEditValueLocalizableTable @"[Code] Edit Variable Value"
+
 @interface ZGEditValueWindowController ()
 
 @property (nonatomic, assign) IBOutlet NSTextField *valueTextField;
@@ -191,7 +193,7 @@
 	
 	if (validVariables.count == 0)
 	{
-		NSRunAlertPanel(@"Writing Variables Failed", @"The selected variables could not be overwritten.", nil, nil, nil);
+		NSRunAlertPanel(NSLocalizedStringFromTable(@"overwriteValueFailedAlertTitle", ZGEditValueLocalizableTable, nil), NSLocalizedStringFromTable(@"overwriteValueFailedAlertMessage", ZGEditValueLocalizableTable, nil), nil, nil, nil);
 		return;
 	}
 	

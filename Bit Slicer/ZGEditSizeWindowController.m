@@ -38,6 +38,8 @@
 #import "NSStringAdditions.h"
 #import "ZGUtilities.h"
 
+#define ZGEditSizeLocalizableTable @"[Code] Edit Variable Size"
+
 @interface ZGEditSizeWindowController ()
 
 @property (nonatomic) ZGVariableController *variableController;
@@ -99,11 +101,11 @@
 	
 	if (!ZGIsValidNumber(sizeExpression))
 	{
-		NSRunAlertPanel(@"Invalid size", @"The size you have supplied is not valid.", nil, nil, nil);
+		NSRunAlertPanel(NSLocalizedStringFromTable(@"invalidSizeAlertTitle", ZGEditSizeLocalizableTable, nil), NSLocalizedStringFromTable(@"invalidSizeAlertMessage", ZGEditSizeLocalizableTable, nil), nil, nil, nil);
 	}
 	else if (requestedSize <= 0)
 	{
-		NSRunAlertPanel(@"Failed to edit size", @"The size must be greater than 0.", nil, nil, nil);
+		NSRunAlertPanel(NSLocalizedStringFromTable(@"sizeIsTooSmallAlertTitle", ZGEditSizeLocalizableTable, nil), NSLocalizedStringFromTable(@"sizeIsTooSmallAlertMessage", ZGEditSizeLocalizableTable, nil), nil, nil, nil);
 	}
 	else
 	{
