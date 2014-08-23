@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
@@ -23,11 +23,11 @@
                 <rect key="frame" x="0.0" y="0.0" width="314" height="83"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <progressIndicator fixedFrame="YES" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="rOP-KL-4NZ">
+                    <progressIndicator maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="rOP-KL-4NZ">
                         <rect key="frame" x="20" y="19" width="196" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
-                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JQT-KI-eIC">
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JQT-KI-eIC">
                         <rect key="frame" x="17" y="46" width="274" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Dumping Memory... This may take a while." id="9hP-fw-LR7">
@@ -36,7 +36,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="q0E-hI-5ht">
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="q0E-hI-5ht">
                         <rect key="frame" x="218" y="12" width="82" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="esu-Vf-PMD">
@@ -51,6 +51,18 @@ Gw
                         </connections>
                     </button>
                 </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="q0E-hI-5ht" secondAttribute="bottom" constant="19" id="MR7-RE-QaL"/>
+                    <constraint firstItem="rOP-KL-4NZ" firstAttribute="top" secondItem="JQT-KI-eIC" secondAttribute="bottom" constant="8" id="NPM-16-ctG"/>
+                    <constraint firstAttribute="bottom" secondItem="rOP-KL-4NZ" secondAttribute="bottom" constant="20" id="Q8V-Gg-bOg"/>
+                    <constraint firstAttribute="trailing" secondItem="JQT-KI-eIC" secondAttribute="trailing" constant="25" id="SRH-he-cKy"/>
+                    <constraint firstItem="q0E-hI-5ht" firstAttribute="top" secondItem="JQT-KI-eIC" secondAttribute="bottom" constant="6" id="bdE-Nh-Tdm"/>
+                    <constraint firstItem="JQT-KI-eIC" firstAttribute="leading" secondItem="p5r-yo-Bhc" secondAttribute="leading" constant="19" id="dgG-b9-HTc"/>
+                    <constraint firstItem="JQT-KI-eIC" firstAttribute="top" secondItem="p5r-yo-Bhc" secondAttribute="top" constant="20" id="jVI-O1-wBm"/>
+                    <constraint firstItem="q0E-hI-5ht" firstAttribute="leading" secondItem="rOP-KL-4NZ" secondAttribute="trailing" constant="8" id="lgh-Ap-54P"/>
+                    <constraint firstItem="rOP-KL-4NZ" firstAttribute="leading" secondItem="p5r-yo-Bhc" secondAttribute="leading" constant="20" id="n77-BU-SsH"/>
+                    <constraint firstAttribute="trailing" secondItem="q0E-hI-5ht" secondAttribute="trailing" constant="20" id="n8v-EG-rwt"/>
+                </constraints>
             </view>
         </window>
     </objects>
