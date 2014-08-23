@@ -94,16 +94,16 @@
 "unfreezeMultipleVariablesTitle" = "Unfreeze Variables";
 
 /* Edit single variable value menu item title */
-"editSingleVariableValueTitle" = "Edit Variable Value";
+"editSingleVariableValueTitle" = "Edit Variable Value…";
 
 /* Edit multiple variable values menu item title */
-"editMultipleVariableValuesTitle" = "Edit Variable Values";
+"editMultipleVariableValuesTitle" = "Edit Variable Values…";
 
 /* Edit single variable size menu item title */
-"editSingleVariableSizeTitle" = "Edit Variable Size";
+"editSingleVariableSizeTitle" = "Edit Variable Size…";
 
 /* Edit multiple variable sizes menu item title */
-"editMultipleVariableSizesTitle" = "Edit Variable Sizes";
+"editMultipleVariableSizesTitle" = "Edit Variable Sizes…";
 
 /* Relativize single variable menu item title */
 "relativizeSingleVariableTitle" = "Relativize Variable";
