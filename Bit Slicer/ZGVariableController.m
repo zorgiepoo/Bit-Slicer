@@ -349,6 +349,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	self.documentData.variables = [NSArray arrayWithArray:temporaryArray];
 	[self.windowController.searchController fetchVariablesFromResults];
 	
+	[self.windowController updateNumberOfValuesDisplayedStatus];
+	
 	[self updateFrozenActivity];
 	[self.windowController.tableController updateWatchVariablesTimer];
 	[self.windowController.tableController.variablesTableView reloadData];
