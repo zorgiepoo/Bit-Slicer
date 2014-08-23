@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1070" identifier="macosx"/>
+        <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
@@ -131,7 +131,7 @@
                             <menuItem isSeparatorItem="YES" id="MBD-kp-IpS">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Pause Target" keyEquivalent="p" id="689">
+                            <menuItem title="pause_or_unpause_target" keyEquivalent="p" id="689">
                                 <connections>
                                     <action selector="pauseOrUnpauseProcess:" target="-1" id="690"/>
                                 </connections>
@@ -363,12 +363,12 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="836"/>
-                            <menuItem title="Back" keyEquivalent="[" id="1101">
+                            <menuItem title="back_or_previous_operator" keyEquivalent="[" id="1101">
                                 <connections>
                                     <action selector="goBack:" target="-1" id="1103"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Forward" keyEquivalent="]" id="1102">
+                            <menuItem title="forward_or_next_operator" keyEquivalent="]" id="1102">
                                 <connections>
                                     <action selector="goForward:" target="-1" id="1104"/>
                                 </connections>
@@ -398,7 +398,7 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1043"/>
-                            <menuItem title="Add Breakpoint" keyEquivalent="\" id="1019">
+                            <menuItem title="add_or_remove_breakpoint" keyEquivalent="\" id="1019">
                                 <connections>
                                     <action selector="toggleBreakPoints:" target="-1" id="1038"/>
                                 </connections>
@@ -456,7 +456,7 @@ CA
                                     <action selector="requestCodeInjection:" target="-1" id="YEG-hq-xn6"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Go to Call Address" keyEquivalent="F" id="1106">
+                            <menuItem title="go_to_call_or_branch_address" keyEquivalent="F" id="1106">
                                 <connections>
                                     <action selector="jumpToOperandOffset:" target="-1" id="9R6-et-wkJ"/>
                                 </connections>
@@ -525,7 +525,7 @@ CA
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Variable" id="565">
                         <items>
-                            <menuItem title="Clear Variables" keyEquivalent="r" id="655">
+                            <menuItem title="clear_variables_or_search_variables" keyEquivalent="r" id="655">
                                 <connections>
                                     <action selector="clear:" target="-1" id="zgn-jf-Ha1"/>
                                 </connections>
@@ -598,7 +598,7 @@ CA
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Edit Variable Value…" keyEquivalent="e" id="691">
+                            <menuItem title="edit_variable_value" keyEquivalent="e" id="691">
                                 <connections>
                                     <action selector="requestEditingVariablesValue:" target="-1" id="kRL-Oo-yqQ"/>
                                 </connections>
@@ -609,24 +609,24 @@ CA
                                     <action selector="requestEditingVariableAddress:" target="-1" id="yPE-QT-jnw"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Edit Variable Size…" keyEquivalent="e" id="833">
+                            <menuItem title="edit_variable_size" keyEquivalent="e" id="833">
                                 <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                 <connections>
                                     <action selector="requestEditingVariablesSize:" target="-1" id="2lK-Ko-q9J"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="5EC-ST-1iS"/>
-                            <menuItem title="Freeze Variables" keyEquivalent="f" id="681">
+                            <menuItem title="freeze_variables" keyEquivalent="f" id="681">
                                 <connections>
                                     <action selector="freezeVariables:" target="-1" id="683"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="NOP Variables" keyEquivalent="." id="857">
+                            <menuItem title="nop_variable_or_instruction" keyEquivalent="." id="857">
                                 <connections>
                                     <action selector="nopVariables:" target="-1" id="859"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Relativize Variables" keyEquivalent="R" id="Ica-nv-keu">
+                            <menuItem title="relativize_variable" keyEquivalent="R" id="Ica-nv-keu">
                                 <connections>
                                     <action selector="relativizeVariablesAddress:" target="-1" id="Vo0-8B-DJA"/>
                                 </connections>

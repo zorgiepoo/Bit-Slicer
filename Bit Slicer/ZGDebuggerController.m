@@ -1261,6 +1261,7 @@ enum ZGStepExecution
 	{
 		if (self.selectedInstructions.count == 0)
 		{
+			menuItem.title = NSLocalizedStringFromTable(@"addBreakpoint", ZGDebuggerLocalizationTable, nil);
 			return NO;
 		}
 		
@@ -1306,11 +1307,13 @@ enum ZGStepExecution
 	{
 		if (!self.currentProcess.valid)
 		{
+			menuItem.title = NSLocalizedStringFromTable(@"goToCallAddress", ZGDebuggerLocalizationTable, nil);
 			return NO;
 		}
 		
 		if (self.selectedInstructions.count != 1)
 		{
+			menuItem.title = NSLocalizedStringFromTable(@"goToCallAddress", ZGDebuggerLocalizationTable, nil);
 			return NO;
 		}
 		

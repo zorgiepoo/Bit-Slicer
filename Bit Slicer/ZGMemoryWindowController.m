@@ -524,6 +524,8 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 	
 	if (userInterfaceItem.action == @selector(pauseOrUnpauseProcess:))
 	{
+		menuItem.title = @"Pause Target"; // the default
+		
 		if (!self.currentProcess.valid)
 		{
 			return NO;
@@ -536,7 +538,7 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 		}
 		else
 		{
-			[menuItem setTitle:[NSString stringWithFormat:@"%@ Target", suspendCount > 0 ? @"Unpause" : @"Pause"]];
+			menuItem.title = (suspendCount > 0) ? @"Unpause Target" : @"Pause Target";
 		}
 		
 		if ([self.debuggerController isProcessIdentifierHalted:self.currentProcess.processID])

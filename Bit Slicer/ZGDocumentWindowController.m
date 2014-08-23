@@ -1046,12 +1046,13 @@
 	else if (menuItem.action == @selector(relativizeVariablesAddress:))
 	{
 		NSArray *selectedVariables = [self selectedVariables];
+		
+		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"relativizeMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"relativizeSingleVariableTitle");
+		
 		if ([self.searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
-		
-		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"relativizeMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"relativizeSingleVariableTitle");
 		
 		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 		ZGMachBinary *mainMachBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:machBinaries];

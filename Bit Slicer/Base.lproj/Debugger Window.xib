@@ -38,7 +38,7 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="128"/>
-                <menuItem title="NOP Instruction" id="155">
+                <menuItem title="nop_instruction" id="155">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="nopVariables:" target="-1" id="157"/>
@@ -63,7 +63,7 @@
                         <action selector="jump:" target="-1" id="158"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Go to Call Address" id="292">
+                <menuItem title="go_to_call_or_branch_address" id="292">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="jumpToOperandOffset:" target="-2" id="eK7-4i-bfK"/>
@@ -224,7 +224,7 @@
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="QFr-ST-Ct0" userLabel="Status Text Field">
                         <rect key="frame" x="-3" y="2" width="824" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="36G-7f-7uB">
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="mapped_file_path" id="36G-7f-7uB">
                             <font key="font" metaFont="cellTitle"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
