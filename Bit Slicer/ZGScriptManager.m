@@ -183,7 +183,7 @@ static PyObject *gStructObject;
 			NSString *pythonErrorDescription = [self fetchPythonErrorDescriptionWithoutDescriptiveTraceback];
 			if (error != NULL)
 			{
-				*error = [NSError errorWithDomain:@"CompileConditionFailure" code:2 userInfo:@{SCRIPT_COMPILATION_ERROR_REASON : [NSString stringWithFormat:@"An error occured trying to parse expression %@", expression], SCRIPT_PYTHON_ERROR : pythonErrorDescription}];
+				*error = [NSError errorWithDomain:@"CompileConditionFailure" code:2 userInfo:@{SCRIPT_PYTHON_ERROR : pythonErrorDescription}];
 			}
 		}
 	});

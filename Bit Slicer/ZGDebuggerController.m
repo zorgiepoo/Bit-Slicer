@@ -2230,7 +2230,7 @@ enum ZGStepExecution
 	if (![self changeBreakPointCondition:condition atAddress:address error:&error])
 	{
 		[self.loggerWindowController writeLine:[error.userInfo objectForKey:SCRIPT_PYTHON_ERROR]];
-		NSRunAlertPanel(NSLocalizedStringFromTable(@"failedChangeBreakpointConditionAlertTitle", ZGDebuggerLocalizationTable, nil), @"%@", nil, nil, nil, [error.userInfo objectForKey:SCRIPT_COMPILATION_ERROR_REASON]);
+		NSRunAlertPanel(NSLocalizedStringFromTable(@"failedChangeBreakpointConditionAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedChangeBreakpointConditionAlertMessageFormat", ZGDebuggerLocalizationTable, nil), nil, nil, nil, condition);
 	}
 	else
 	{

@@ -78,6 +78,9 @@
 /* Alert title for failing to change a breakpoint condition */
 "failedChangeBreakpointConditionAlertTitle" = "Invalid Breakpoint Expression";
 
+/* Alert message format for failing to change a breakpoint condition */
+"failedChangeBreakpointConditionAlertMessageFormat" = "An error occured trying to parse the expression '%@'";
+
 /* Alert title for when a breakpoint condition fails to execute */
 "failedExecuteBreakpointConditionAlertTitle" = "Condition Evaluation Error";
 

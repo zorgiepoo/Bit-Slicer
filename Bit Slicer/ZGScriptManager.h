@@ -45,7 +45,6 @@
 @class ZGAppTerminationState;
 
 #define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
-#define SCRIPT_COMPILATION_ERROR_REASON @"SCRIPT_COMPILATION_ERROR_REASON"
 #define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
 
 extern dispatch_queue_t gPythonQueue;
