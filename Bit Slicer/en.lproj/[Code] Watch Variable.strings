@@ -1,0 +1,43 @@
+/* 
+  [Code] Watch Variable.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 8/23/14.
+
+*/
+
+/* Alert title for when target/process dies while watching accesses on a variable */
+"targetTeriminatedAlertTitleFormat" = "%@ Terminated";
+
+/* Alert message for when target/process dies while watching accesses on a variable, asking if user wants to add the found instructions */
+"targetTeriminatedAlertMessage" = "Do you want to add the found instructions to this document?";
+
+/* Alert responce to adding the found instructions when the target process terminated */
+"targetTeriminatedAlertAddButton" = "Add";
+
+/* Alert responce to NOT adding the found instructions when the target process terminated */
+"targetTeriminatedAlertCancelButton" = "Cancel";
+
+/* Annotated description annotated label for general purpose registers; not sure if this should be localized */
+"generalPurposeRegistersDescriptionLabel" = "General Purpose Registers";
+
+/* Annotated description label for float/vector registers; not sure if this should be localized */
+"floatAndVectorRegistersDescriptionLabel" = "Float/Vector Registers";
+
+/* Notification title for when an instruction is found */
+"foundInstructionNotificationTitle" = "Found Instruction";
+
+/* Notification message for when an instruction is found */
+"foundInstructionNotificationMessageFormat" = "Found instruction \"%@\"";
+
+/* Alert title for when a variable cannot be watched */
+"failedToWatchVariableAlertTitle" = "Failed to Watch Variable";
+
+/* Alert message for when a variable's accesses cannot be watched */
+"failedToWatchVariableAlertMessage" = "A watchpoint could not be added for this variable at this time.";
+
+/* Label for watching x-bit write accesses at an address */
+"watchWriteAccessesStatusFormat" = "Watching %lld-bit write accesses at %@…";
+
+/* Label for watching x-bit read and write accesses at an address */
+"watchReadAndWriteAccessesStatusFormat" = "Watching %lld-bit read and write accesses at %@…";

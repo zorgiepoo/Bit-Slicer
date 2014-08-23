@@ -50,6 +50,9 @@
 #import "ZGMachBinary.h"
 #import "ZGNavigationPost.h"
 
+#define ZGWatchVariableLocalizableTable @"[Code] Watch Variable"
+#define ZGLocalizableWatchVariableString(string) NSLocalizedStringFromTable(string, ZGWatchVariableLocalizableTable, nil)
+
 @interface ZGWatchVariableWindowController ()
 
 @property (nonatomic) ZGBreakPointController *breakPointController;
@@ -157,9 +160,9 @@
 	else
 	{
 		NSInteger result = NSRunAlertPanel(
-						[NSString stringWithFormat:@"%@ Died", self.watchProcess.name],
-						@"Do you want to add the instructions that were found to the document?",
-						@"Add", @"Cancel", nil);
+						[NSString stringWithFormat:ZGLocalizableWatchVariableString(@"targetTeriminatedAlertTitleFormat"), self.watchProcess.name],
+						ZGLocalizableWatchVariableString(@"targetTeriminatedAlertMessage"),
+						ZGLocalizableWatchVariableString(@"targetTeriminatedAlertAddButton"), ZGLocalizableWatchVariableString(@"targetTeriminatedAlertCancelButton"), nil);
 		switch (result)
 		{
 			case NSAlertDefaultReturn:
@@ -266,7 +269,7 @@
 	[self
 	 appendDescription:description
 	 withRegisterEntries:registerEntries
-	 registerLabel:@"General Purpose Registers"
+	 registerLabel:ZGLocalizableWatchVariableString(@"generalPurposeRegistersDescriptionLabel")
 	 boldFont:boldFont];
 	
 	if (breakPoint.hasVectorState)
@@ -276,7 +279,7 @@
 		[self
 		 appendDescription:description
 		 withRegisterEntries:registerEntries + numberOfGeneralRegisters
-		 registerLabel:@"Float/Vector Registers"
+		 registerLabel:ZGLocalizableWatchVariableString(@"floatAndVectorRegistersDescriptionLabel")
 		 boldFont:boldFont];
 	}
 	
@@ -290,9 +293,7 @@
 	
 	[self.tableView reloadData];
 	
-	NSString *foundInstructionStatus = [NSString stringWithFormat:@"Found instruction \"%@\"", instruction.text];
-	
-	ZGDeliverUserNotification(@"Found Instruction", self.watchProcess.name, foundInstructionStatus);
+	ZGDeliverUserNotification(ZGLocalizableWatchVariableString(@"foundInstructionNotificationTitle"), self.watchProcess.name, [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"foundInstructionNotificationMessageFormat"), instruction.text]);
 }
 
 - (void)watchVariable:(ZGVariable *)variable withWatchPointType:(ZGWatchPointType)watchPointType inProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow completionHandler:(watch_variable_completion_t)completionHandler
@@ -301,9 +302,9 @@
 	if (![self.breakPointController addWatchpointOnVariable:variable inProcess:process watchPointType:watchPointType delegate:self getBreakPoint:&breakPoint])
 	{
 		NSRunAlertPanel(
-						@"Failed to Watch Variable",
-						@"A watchpoint could not be added for this variable at this time.",
-						@"OK", nil, nil);
+						ZGLocalizableWatchVariableString(@"failedToWatchVariableAlertTitle"),
+						ZGLocalizableWatchVariableString(@"failedToWatchVariableAlertMessage"),
+						nil, nil, nil);
 		return;
 	}
 	
@@ -311,7 +312,7 @@
 	
 	[self updateAddButton];
 	
-	self.statusTextField.stringValue = [NSString stringWithFormat:@"Watching %lld byte%@ %@ accesses to %@…", breakPoint.watchSize, breakPoint.watchSize != 1 ? @"s" : @"", watchPointType == ZGWatchPointWrite ? @"write" : @"read and write", variable.addressStringValue];
+	self.statusTextField.stringValue = [NSString stringWithFormat:ZGLocalizableWatchVariableString((watchPointType == ZGWatchPointWrite) ? @"watchWriteAccessesStatusFormat" : @"watchReadAndWriteAccessesStatusFormat"), breakPoint.watchSize * 8, variable.addressStringValue];
 	
 	[self.progressIndicator startAnimation:nil];
 	[self.tableView reloadData];
