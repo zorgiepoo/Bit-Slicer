@@ -8,3 +8,9 @@
 
 /* Substitute title for the process ID when the current target is not running */
 "deadProcessIdentifierLabel" = "none";
+
+/* Menu item for pausing the target process */
+"pauseTargetProcess" = "Pause Target";
+
+/* Menu item for unpausing the target process */
+"unpauseTargetProcess" = "Unpause Target";

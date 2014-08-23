@@ -520,11 +520,11 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
 {
-	NSMenuItem *menuItem = [[(NSObject *)userInterfaceItem class] isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
+	NSMenuItem *menuItem = [(id <NSObject>)userInterfaceItem isKindOfClass:[NSMenuItem class]] ? (NSMenuItem *)userInterfaceItem : nil;
 	
 	if (userInterfaceItem.action == @selector(pauseOrUnpauseProcess:))
 	{
-		menuItem.title = @"Pause Target"; // the default
+		menuItem.title = NSLocalizedStringFromTable(@"pauseTargetProcess", ZGMemoryWindowLocalizableTable, nil); // the default
 		
 		if (!self.currentProcess.valid)
 		{
@@ -538,7 +538,8 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 		}
 		else
 		{
-			menuItem.title = (suspendCount > 0) ? @"Unpause Target" : @"Pause Target";
+			NSString *localizableKey = suspendCount > 0 ? @"unpauseTargetProcess" : @"pauseTargetProcess";
+			menuItem.title = NSLocalizedStringFromTable(localizableKey, ZGMemoryWindowLocalizableTable, nil);
 		}
 		
 		if ([self.debuggerController isProcessIdentifierHalted:self.currentProcess.processID])
