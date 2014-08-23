@@ -45,14 +45,14 @@
 /* Scope Bar Big Endian */
 "scopeBarEndianBigItem" = "Big";
 
-/* Scope Bar accessory for Below label when doing > value search */
-"scopeBarAccessoryBelowLabel" = "Below:";
+/* Scope Bar accessory for Below label when doing > value search; also used for error reporting */
+"searchBelowLabel" = "Below";
 
-/* Scope Bar accessory for Above label when doing < value search */
-"scopeBarAccessoryAboveLabel" = "Above:";
+/* Scope Bar accessory for Above label when doing < value search; also used for error reporting */
+"searchAboveLabel" = "Above";
 
-/* Scope Bar accessory for Round Error label when doing = or != float/double value search */
-"scopeBarAccessoryRoundErrorLabel" = "Round Error:";
+/* Scope Bar accessory for Round Error label when doing = or != float/double value search; also used for error reporting */
+"searchRoundErrorLabel" = "Round Error";
 
 /* Display Value Label format for one variable */
 "displayingSingleValueLabelFormat" = "Displaying %@ value";
@@ -131,3 +131,51 @@
 
 /* Alert Message that no Stored Values are available when searching with a stored value token */
 "noStoredValuesAlertMessage" = "No stored values are available to compare against. Please store values first before proceeding.";
+
+/* Label format for indicating a single value has been found during a search */
+"foundSingleValueLabelFormat" = "Found %@ value...";
+
+/* Label format for indicating multiple values have been found during a search */
+"foundMultipleValuesLabelFormat" = "Found %@ values...";
+
+/* Search Finished Notification Title */
+"searchFinishedNotificationTitle" = "Search Finished";
+
+/* Undo action name for a Search */
+"undoSearchAction" = "Search";
+
+/* Label title for Beginning Address field */
+"beginningAddressLabel" = "Beginning Address";
+
+/* Label title for Ending Address field */
+"endingAddressLabel" = "Ending Address";
+
+/* Error Message format when Above, Below, Round Error, Beginning Address, Ending Address fields have invalid input */
+"invalidFlagsFieldErrorMessageFormat" = "The value corresponding to '%@' needs to be a valid expression or left empty.";
+
+/* Error Message for when Beginning Address >= Ending Address */
+"endingAddressIsNotGreaterThanBeginningAddressErrorMessage" = "The value in the Beginning Address field must be less than the value in the Ending Address field, or one or both of the fields can be omitted.";
+
+/* Error message for when the selected data type to seach is a numerical one, and the expression cannot be parsed */
+"invalidNumericalSearchExpressionErrorMessage" = "The search value is not a valid numerical expression.";
+
+/* Error Message when attempting to do stored value byte array search */
+"storedValueSearchUnsupportedForByteArrays" = "Comparing Stored Values is not supported for Byte Arrays";
+
+/* Error Message when attempting to do stored value strings search */
+"storedValueSearchUnsupportedForStrings" = "Comparing Stored Values is not supported for Strings";
+
+/* Error Message when failing to parse a linear stored value expression */
+"linearExpressionParseFailureErrorMessage" = "The search expression could not be parsed properly. Please try a simpler expression.";
+
+/* Generic Error Alert Title for when a field could not be parsed properly */
+"invalidSearchInputAlertTitle" = "Invalid Search Input";
+
+/* Label for when search is being cancelled */
+"cancelingSearchStatusLabel" = "Cancelling search...";
+
+/* Label for when Storing Values is being cancelled */
+"cancelingStoringValuesStatusLabel" = "Cancelling Storing Values...";
+
+/* Label for Storing all Values operation is occuring */
+"storingValuesStatusLabel" = "Storing All Values...";

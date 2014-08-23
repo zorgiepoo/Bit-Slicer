@@ -37,6 +37,9 @@
 #import "AGScopeBar.h"
 #import "ZGMemoryWindowController.h"
 
+#define ZGSearchDocumentLocalizableTable @"[Code] Search Document"
+#define ZGLocalizableSearchDocumentString(string) NSLocalizedStringFromTable(string, ZGSearchDocumentLocalizableTable, nil)
+
 @class ZGDocumentTableController;
 @class ZGVariableController;
 @class ZGDocumentSearchController;

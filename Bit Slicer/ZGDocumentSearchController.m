@@ -181,7 +181,8 @@
 {
 	NSNumberFormatter *numberOfVariablesFoundFormatter = [[NSNumberFormatter alloc] init];
 	numberOfVariablesFoundFormatter.format = @"#,###";
-	return [NSString stringWithFormat:@"Found %@ value%@...", [numberOfVariablesFoundFormatter stringFromNumber:@(searchProgress.numberOfVariablesFound)], searchProgress.numberOfVariablesFound != 1 ? @"s" : @""];
+	
+	return [NSString stringWithFormat:ZGLocalizableSearchDocumentString((searchProgress.numberOfVariablesFound != 1) ? @"foundMultipleValuesLabelFormat" : @"foundSingleValueLabelFormat"), [numberOfVariablesFoundFormatter stringFromNumber:@(searchProgress.numberOfVariablesFound)]];
 }
 
 - (void)updateProgressBarFromProgress:(ZGSearchProgress *)searchProgress
@@ -290,11 +291,11 @@
 	
 	if (!self.searchProgress.shouldCancelSearch)
 	{
-		ZGDeliverUserNotification(@"Search Finished", windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:self.searchProgress]);
+		ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:self.searchProgress]);
 		
 		if (notSearchedVariables.count + self.temporarySearchResults.addressCount != oldVariables.count)
 		{
-			windowController.undoManager.actionName = @"Search";
+			windowController.undoManager.actionName = ZGLocalizableSearchDocumentString(@"undoSearchAction");
 			[[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:oldVariables searchResults:self.searchResults];
 			
 			self.searchResults = self.temporarySearchResults;
@@ -359,11 +360,11 @@
 	
 	if (!flagsFieldIsBlank && !ZGIsValidNumber(flagsExpression))
 	{
-		NSString *field = (ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType)) ? @"Round Error" : (ZGIsFunctionTypeGreaterThan(functionType) ? @"Below" : @"Above");
+		NSString *field = ZGLocalizableSearchDocumentString((ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType)) ? @"searchRoundErrorLabel" : (ZGIsFunctionTypeGreaterThan(functionType) ? @"searchBelowLabel" : @"searchAboveLabel"));
 		
 		if (error != NULL)
 		{
-			*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:@"The value corresponding to %@ needs to be a valid expression or be empty.", field]}];
+			*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"invalidFlagsFieldErrorMessageFormat"), field]}];
 		}
 		
 		return NO;
@@ -429,7 +430,7 @@
 		{
 			if (error != NULL)
 			{
-				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:@"The expression in the %@ address field is not valid.", label]}];
+				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"invalidFlagsFieldErrorMessageFormat"), label]}];
 			}
 			
 			success = NO;
@@ -469,7 +470,7 @@
 		{
 			if (error != NULL)
 			{
-				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @"The operator you are using requires the search value to be a valid expression."}];
+				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : ZGLocalizableSearchDocumentString(@"invalidNumericalSearchExpressionErrorMessage")}];
 			}
 			return NO;
 		}
@@ -502,7 +503,7 @@
 		{
 			if (error != NULL)
 			{
-				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:@"Comparing Stored Values is not supported for %@.", dataType == ZGByteArray ? @"Byte Arrays" : @"Strings"]}];
+				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : ZGLocalizableSearchDocumentString(dataType == ZGByteArray ? @"storedValueSearchUnsupportedForByteArrays" : @"storedValueSearchUnsupportedForStrings")}];
 			}
 			return NO;
 		}
@@ -532,7 +533,7 @@
 			{
 				if (error != NULL)
 				{
-					*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @"The search expression could not be properly parsed. Try a simpler expression."}];
+					*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : ZGLocalizableSearchDocumentString(@"linearExpressionParseFailureErrorMessage")}];
 				}
 				return NO;
 			}
@@ -544,7 +545,7 @@
 			{
 				if (error != NULL)
 				{
-					*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @"The search expression could not be properly parsed. Try a simpler expression."}];
+					*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : ZGLocalizableSearchDocumentString(@"linearExpressionParseFailureErrorMessage")}];
 				}
 				return NO;
 			}
@@ -581,7 +582,7 @@
 	[self
 	 getBoundaryAddress:&beginningAddress
 	 fromStringValue:self.documentData.beginningAddressStringValue
-	 label:@"beginning"
+	 label:ZGLocalizableSearchDocumentString(@"beginningAddressLabel")
 	 error:error];
 	
 	if (!retrievedBoundaryAddress) return NO;
@@ -594,7 +595,7 @@
 	[self
 	 getBoundaryAddress:&endingAddress
 	 fromStringValue:self.documentData.endingAddressStringValue
-	 label:@"ending"
+	 label:ZGLocalizableSearchDocumentString(@"endingAddressLabel")
 	 error:error];
 	
 	if (!retrievedBoundaryAddress) return NO;
@@ -605,7 +606,7 @@
 	{
 		if (error != NULL)
 		{
-			*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @"The value in the beginning address field must be less than the value of the ending address field, or one or both of the fields can be omitted."}];
+			*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : ZGLocalizableSearchDocumentString(@"endingAddressIsNotGreaterThanBeginningAddressErrorMessage")}];
 		}
 		return NO;
 	}
@@ -664,7 +665,7 @@
 	NSError *error = nil;
 	if (![self retrieveSearchDataWithError:&error])
 	{
-		NSRunAlertPanel(@"Invalid Search Input", @"%@", nil, nil, nil, [error.userInfo objectForKey:ZGRetrieveFlagsErrorDescriptionKey]);
+		NSRunAlertPanel(ZGLocalizableSearchDocumentString(@"invalidSearchInputAlertTitle"), @"%@", nil, nil, nil, [error.userInfo objectForKey:ZGRetrieveFlagsErrorDescriptionKey]);
 		return;
 	}
 	
@@ -720,11 +721,11 @@
 	ZGDocumentWindowController *windowController = self.windowController;
 	if (self.searchProgress.progressType == ZGSearchProgressMemoryScanning)
 	{
-		[windowController setStatusString:@"Cancelling search..."];
+		[windowController setStatusString:ZGLocalizableSearchDocumentString(@"cancelingSearchStatusLabel")];
 	}
 	else if (self.searchProgress.progressType == ZGSearchProgressMemoryStoring)
 	{
-		[windowController setStatusString:@"Canceling Memory Store..."];
+		[windowController setStatusString:ZGLocalizableSearchDocumentString(@"cancelingStoringValuesStatusLabel")];
 	}
 	
 	self.searchProgress.shouldCancelSearch = YES;
@@ -738,7 +739,7 @@
 	
 	ZGDocumentWindowController *windowController = self.windowController;
 	
-	[windowController setStatusString:@"Storing All Values..."];
+	[windowController setStatusString:ZGLocalizableSearchDocumentString(@"storingValuesStatusLabel")];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		self.tempSavedData = [ZGStoredData storedDataFromProcessTask:windowController.currentProcess.processTask];

@@ -66,9 +66,6 @@
 #import "ZGNavigationPost.h"
 #import "NSArrayAdditions.h"
 
-#define ZGSearchDocumentLocalizableTable @"[Code] Search Document"
-#define ZGLocalizableSearchDocumentString(string) NSLocalizedStringFromTable(string, ZGSearchDocumentLocalizableTable, nil)
-
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
 #define ZGProtectionItemWrite @"ZGProtectionWrite"
@@ -588,7 +585,7 @@
 	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
 	if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored || functionType == ZGGreaterThanStoredLinear)
 	{
-		self.flagsLabelStringValue = ZGLocalizableSearchDocumentString(@"scopeBarAccessoryBelowLabel");
+		self.flagsLabelStringValue = [ZGLocalizableSearchDocumentString(@"searchBelowLabel") stringByAppendingString:@":"];
 		
 		if (self.documentData.lastBelowRangeValue != nil)
 		{
@@ -601,7 +598,7 @@
 	}
 	else if (functionType == ZGLessThan || functionType == ZGLessThanStored || functionType == ZGLessThanStoredLinear)
 	{
-		self.flagsLabelStringValue = ZGLocalizableSearchDocumentString(@"scopeBarAccessoryAboveLabel");
+		self.flagsLabelStringValue = [ZGLocalizableSearchDocumentString(@"searchAboveLabel") stringByAppendingString:@":"];
 		
 		if (self.documentData.lastAboveRangeValue != nil)
 		{
@@ -642,7 +639,7 @@
 		if (ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType))
 		{
 			// epsilon
-			self.flagsLabelStringValue = ZGLocalizableSearchDocumentString(@"scopeBarAccessoryRoundErrorLabel");
+			self.flagsLabelStringValue = [ZGLocalizableSearchDocumentString(@"searchRoundErrorLabel") stringByAppendingString:@":"];
 			if (self.documentData.lastEpsilonValue != nil)
 			{
 				self.flagsStringValue = self.documentData.lastEpsilonValue;
