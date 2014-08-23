@@ -8,8 +8,8 @@
 /* Class = "NSMenuItem"; title = "Watch Write Accesses…"; ObjectID = "100787"; */
 "100787.title" = "Watch Write Accesses…";
 
-/* Class = "NSMenuItem"; title = "NOP Variables"; ObjectID = "100797"; */
-"100797.title" = "NOP Variables";
+/* Class = "NSMenuItem"; title = "nop_variable"; ObjectID = "100797"; */
+"100797.title" = "nop_variable";
 
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "100802"; */
 "100802.title" = "Copy";
@@ -17,14 +17,14 @@
 /* Class = "NSMenuItem"; title = "Paste"; ObjectID = "100803"; */
 "100803.title" = "Paste";
 
-/* Class = "NSMenuItem"; title = "Edit Variable Value…"; ObjectID = "100819"; */
-"100819.title" = "Edit Variable Value…";
+/* Class = "NSMenuItem"; title = "edit_variable_value"; ObjectID = "100819"; */
+"100819.title" = "edit_variable_value";
 
-/* Class = "NSMenuItem"; title = "Edit Variable Size…"; ObjectID = "100822"; */
-"100822.title" = "Edit Variable Size…";
+/* Class = "NSMenuItem"; title = "edit_variable_size"; ObjectID = "100822"; */
+"100822.title" = "edit_variable_size";
 
-/* Class = "NSMenuItem"; title = "Freeze Variable"; ObjectID = "100823"; */
-"100823.title" = "Freeze Variable";
+/* Class = "NSMenuItem"; title = "freeze_variable"; ObjectID = "100823"; */
+"100823.title" = "freeze_variable";
 
 /* Class = "NSMenuItem"; title = "Add Variable"; ObjectID = "100843"; */
 "100843.title" = "Add Variable";
@@ -80,8 +80,8 @@
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3G0-oE-PRY"; */
 "3G0-oE-PRY.title" = "Text Cell";
 
-/* Class = "NSTextFieldCell"; title = "Found 3 variables"; ObjectID = "6Kr-rx-QwW"; */
-"6Kr-rx-QwW.title" = "Found 3 variables";
+/* Class = "NSTextFieldCell"; title = "displaying_or_found_x_variables"; ObjectID = "6Kr-rx-QwW"; */
+"6Kr-rx-QwW.title" = "displaying_or_found_x_variables";
 
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "6iU-LJ-nRI"; */
 "6iU-LJ-nRI.title" = "Pointer";
@@ -161,8 +161,8 @@
 /* Class = "NSMenu"; title = "OtherViews"; ObjectID = "cNT-1t-BfB"; */
 "cNT-1t-BfB.title" = "OtherViews";
 
-/* Class = "NSMenuItem"; title = "Relativize Variables"; ObjectID = "drP-6a-Xg6"; */
-"drP-6a-Xg6.title" = "Relativize Variables";
+/* Class = "NSMenuItem"; title = "relativize_variable"; ObjectID = "drP-6a-Xg6"; */
+"drP-6a-Xg6.title" = "relativize_variable";
 
 /* Class = "NSMenuItem"; title = "64-bit Integer"; ObjectID = "dsI-Uc-Vqg"; */
 "dsI-Uc-Vqg.title" = "64-bit Integer";

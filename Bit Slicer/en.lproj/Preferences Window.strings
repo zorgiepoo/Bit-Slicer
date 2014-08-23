@@ -1,6 +1,6 @@
 
 /* Class = "NSWindow"; title = "Preferences"; ObjectID = "1"; */
-"1.title" = "Preferences";
+"1.title" = "preferences_title";
 
 /* Class = "NSToolbarItem"; label = "Updates"; ObjectID = "f0w-AB-SR1"; */
 "f0w-AB-SR1.label" = "Updates";

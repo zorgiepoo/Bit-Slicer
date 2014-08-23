@@ -11,8 +11,8 @@
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "TfC-P6-K4a"; */
 "TfC-P6-K4a.title" = "Copy";
 
-/* Class = "NSTextFieldCell"; title = "Watching write accesses at 0x2434 (2 bytes now)"; ObjectID = "WtT-PG-TBK"; */
-"WtT-PG-TBK.title" = "Watching write accesses at 0x2434 (2 bytes now)";
+/* Class = "NSTextFieldCell"; title = "watching_accesses_at_address"; ObjectID = "WtT-PG-TBK"; */
+"WtT-PG-TBK.title" = "watching_accesses_at_address";
 
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "YnN-82-eBf"; */
 "YnN-82-eBf.title" = "Text Cell";

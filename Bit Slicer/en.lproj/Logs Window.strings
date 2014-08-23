@@ -5,5 +5,5 @@
 /* Class = "NSButtonCell"; title = "Clear"; ObjectID = "11"; */
 "11.title" = "Clear";
 
-/* Class = "NSTextFieldCell"; title = "Logged 0 messages"; ObjectID = "15"; */
-"15.title" = "Logged 0 messages";
+/* Class = "NSTextFieldCell"; title = "logged_x_messages"; ObjectID = "15"; */
+"15.title" = "logged_x_messages";
