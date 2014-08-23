@@ -9,8 +9,8 @@
 /* Text to log when window is being restored */
 "restoredText" = "\t[Restored]";
 
-/* Label indicating one message has been logged */
-"loggedSingleMessage" = "Logged 1 message";
+/* Label indicating a single message has been logged; only used prior to 10.9 */
+"loggedSingleMessageFormat" = "Logged %lu message";
 
-/* Label indicating multiple (or zero) messages have been logged */
+/* Label indicating multiple (or zero) messages have been logged; only used prior to 10.9 */
 "loggedMultipleMessagesFormat" = "Logged %lu messages";

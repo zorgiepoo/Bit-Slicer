@@ -378,12 +378,15 @@
 	NSUInteger variableCount = self.documentData.variables.count + self.searchController.searchResults.addressCount;
 	
 	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
-	numberOfVariablesFormatter.format = @"#,###";
+	[numberOfVariablesFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
+	
+	NSString *formattedNumber = [numberOfVariablesFormatter stringFromNumber:@(variableCount)];
 	
 	NSString *valuesDisplayedString =
-	(variableCount == 1) ?
-	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"displayingSingleValueLabelFormat"), [numberOfVariablesFormatter stringFromNumber:@(variableCount)]] :
-	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"displayingMultipleValuesLabelFormat"), [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
+	[(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8) ?
+	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"displayingValuesLabelFormat"), variableCount] :
+	[NSString stringWithFormat:ZGLocalizableSearchDocumentString((variableCount == 1) ? @"displayingSingleValueLabelFormat" : @"displayingMultipleValuesLabelFormat"), variableCount]
+	 stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
 	
 	[self setStatusString:valuesDisplayedString];
 }

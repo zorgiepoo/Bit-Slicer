@@ -54,11 +54,11 @@
 /* Scope Bar accessory for Round Error label when doing = or != float/double value search; also used for error reporting */
 "searchRoundErrorLabel" = "Round Error";
 
-/* Display Value Label format for one variable */
-"displayingSingleValueLabelFormat" = "Displaying %@ value";
+/* Display Value Label format for one variable; only used prior to 10.9 */
+"displayingSingleValueLabelFormat" = "Displaying _NUM_ value";
 
-/* Display Value Label format for multiple variables */
-"displayingMultipleValuesLabelFormat" = "Displaying %@ values";
+/* Display Value Label format for multiple variables; only used prior to 10.9 */
+"displayingMultipleValuesLabelFormat" = "Displaying _NUM_ values";
 
 /* Equals Operator Title */
 "equalsOperatorTitle" = "equals";
@@ -132,11 +132,11 @@
 /* Alert Message that no Stored Values are available when searching with a stored value token */
 "noStoredValuesAlertMessage" = "No stored values are available to compare against. Please store values first before proceeding.";
 
-/* Label format for indicating a single value has been found during a search */
-"foundSingleValueLabelFormat" = "Found %@ value...";
+/* Label format for indicating a single value has been found during a search; only used prior to 10.9 */
+"foundSingleValueLabelFormat" = "Found _NUM_ value…";
 
-/* Label format for indicating multiple values have been found during a search */
-"foundMultipleValuesLabelFormat" = "Found %@ values...";
+/* Label format for indicating multiple values have been found during a search; only used prior to 10.9 */
+"foundMultipleValuesLabelFormat" = "Found _NUM_ values…";
 
 /* Search Finished Notification Title */
 "searchFinishedNotificationTitle" = "Search Finished";
@@ -172,10 +172,10 @@
 "invalidSearchInputAlertTitle" = "Invalid Search Input";
 
 /* Label for when search is being cancelled */
-"cancelingSearchStatusLabel" = "Cancelling search...";
+"cancelingSearchStatusLabel" = "Cancelling search…";
 
 /* Label for when Storing Values is being cancelled */
-"cancelingStoringValuesStatusLabel" = "Cancelling Storing Values...";
+"cancelingStoringValuesStatusLabel" = "Cancelling Storing Values…";
 
 /* Label for Storing all Values operation is occuring */
-"storingValuesStatusLabel" = "Storing All Values...";
+"storingValuesStatusLabel" = "Storing All Values…";

@@ -180,9 +180,15 @@
 - (NSString *)numberOfVariablesFoundDescriptionFromProgress:(ZGSearchProgress *)searchProgress
 {
 	NSNumberFormatter *numberOfVariablesFoundFormatter = [[NSNumberFormatter alloc] init];
-	numberOfVariablesFoundFormatter.format = @"#,###";
+	[numberOfVariablesFoundFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
 	
-	return [NSString stringWithFormat:ZGLocalizableSearchDocumentString((searchProgress.numberOfVariablesFound != 1) ? @"foundMultipleValuesLabelFormat" : @"foundSingleValueLabelFormat"), [numberOfVariablesFoundFormatter stringFromNumber:@(searchProgress.numberOfVariablesFound)]];
+	NSUInteger numberOfVariablesFound = searchProgress.numberOfVariablesFound;
+	NSString *formattedNumber = [numberOfVariablesFoundFormatter stringFromNumber:@(numberOfVariablesFound)];
+	
+	return [(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8) ?
+	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"foundValuesLabelFormat"), numberOfVariablesFound] :
+	[NSString stringWithFormat:ZGLocalizableSearchDocumentString((numberOfVariablesFound != 1) ? @"foundMultipleValuesLabelFormat" : @"foundSingleValueLabelFormat"), numberOfVariablesFound]
+			stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
 }
 
 - (void)updateProgressBarFromProgress:(ZGSearchProgress *)searchProgress

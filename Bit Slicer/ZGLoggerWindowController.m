@@ -98,13 +98,13 @@
 		[self.statusTextField setTextColor:[NSColor controlTextColor]];
 	}
 	
-	if (self.numberOfMessages == 1)
+	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8)
 	{
-		[self.statusTextField setStringValue:NSLocalizedStringFromTable(@"loggedSingleMessage", ZGLoggerWindowLocalizationTable, nil)];
+		[self.statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"loggedMessagesFormat", ZGLoggerWindowLocalizationTable, nil), self.numberOfMessages]];
 	}
 	else
 	{
-		[self.statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"loggedMultipleMessagesFormat", ZGLoggerWindowLocalizationTable, nil), self.numberOfMessages]];
+		[self.statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedStringFromTable((self.numberOfMessages == 1) ? @"loggedSingleMessageFormat" : @"loggedMultipleMessagesFormat", ZGLoggerWindowLocalizationTable, nil), self.numberOfMessages]];
 	}
 	
 	[self invalidateRestorableState];
