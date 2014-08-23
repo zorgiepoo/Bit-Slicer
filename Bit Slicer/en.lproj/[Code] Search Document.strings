@@ -1,0 +1,133 @@
+/* 
+  [Code] Search Document.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 8/22/14.
+
+*/
+
+/* Scope Bar Protection Group */
+"scopeBarProtectionGroup" = "Protection:";
+
+/* Scope Bar Protection All */
+"scopeBarProtectionAllItem" = "All";
+
+/* Scope Bar Protection Write */
+"scopeBarProtectionWriteItem" = "Write";
+
+/* Scope Bar Protection Execute */
+"scopeBarProtectionExecuteItem" = "Execute";
+
+/* Scope Bar Qualifier Group */
+"scopeBarQualifierGroup" = "Qualifier:";
+
+/* Scope Bar Qualifier Signed */
+"scopeBarQualifierSignedItem" = "Signed";
+
+/* Scope Bar Qualifier Unsigned */
+"scopeBarQualifierUnsignedItem" = "Unsigned";
+
+/* Scope Bar Matching Group */
+"scopeBarStringMatchingGroup" = "Matching:";
+
+/* Scope Bar Matching Ignore Case */
+"scopeBarStringMatchingIgnoreCaseItem" = "Ignore Case";
+
+/* Scope Bar Matching Null Terminated */
+"scopeBarStringMatchingNullTerminatedItem" = "Null Terminated";
+
+/* Scope Bar Endianness Group */
+"scopeBarEndiannessGroup" = "Endianness:";
+
+/* Scope Bar Little Endian */
+"scopeBarEndianLittleItem" = "Little";
+
+/* Scope Bar Big Endian */
+"scopeBarEndianBigItem" = "Big";
+
+/* Scope Bar accessory for Below label when doing > value search */
+"scopeBarAccessoryBelowLabel" = "Below:";
+
+/* Scope Bar accessory for Above label when doing < value search */
+"scopeBarAccessoryAboveLabel" = "Above:";
+
+/* Scope Bar accessory for Round Error label when doing = or != float/double value search */
+"scopeBarAccessoryRoundErrorLabel" = "Round Error:";
+
+/* Display Value Label format for one variable */
+"displayingSingleValueLabelFormat" = "Displaying %@ value";
+
+/* Display Value Label format for multiple variables */
+"displayingMultipleValuesLabelFormat" = "Displaying %@ values";
+
+/* Equals Operator Title */
+"equalsOperatorTitle" = "equals";
+
+/* Not Equals Operator Title */
+"notEqualsOperatorTitle" = "is not";
+
+/* Greater Than Operator Title */
+"greaterThanOperatorTitle" = "is greater than";
+
+/* Less Than Operator Title */
+"lessThanOperatorTitle" = "is less than";
+
+/* Undo Data Type Change Action */
+"undoDataTypeChangeAction" = "Data Type Change";
+
+/* Clear Search Variables Action Menu Item Title */
+"clearSearchVariablesTitle" = "Clear Search Variables";
+
+/* Clear Variables Action Menu Item Title */
+"clearVariablesTitle" = "Clear Variables";
+
+/* Freeze single variable menu item title */
+"freezeSingleVariableTitle" = "Freeze Variable";
+
+/* Freeze muitiple variables menu item title */
+"freezeMulitipleVariablesTitle" = "Freeze Variables";
+
+/* Unfreeze single variable menu item title */
+"unfreezeSingleVariableTitle" = "Unfreeze Variable";
+
+/* Unfreeze muitiple variables menu item title */
+"unfreezeMultipleVariablesTitle" = "Unfreeze Variables";
+
+/* Edit single variable value menu item title */
+"editSingleVariableValueTitle" = "Edit Variable Value";
+
+/* Edit multiple variable values menu item title */
+"editMultipleVariableValuesTitle" = "Edit Variable Values";
+
+/* Edit single variable size menu item title */
+"editSingleVariableSizeTitle" = "Edit Variable Size";
+
+/* Edit multiple variable sizes menu item title */
+"editMultipleVariableSizesTitle" = "Edit Variable Sizes";
+
+/* Relativize single variable menu item title */
+"relativizeSingleVariableTitle" = "Relativize Variable";
+
+/* Relativize multiple variables menu item title */
+"relativizeMultipleVariablesTitle" = "Relativize Variables";
+
+/* NOP single variable menu item title */
+"nopSingleVariableTitle" = "NOP Variable";
+
+/* NOP multiple variables menu item title */
+"nopMultipleVariablesTitle" = "NOP Variables";
+
+/* Previous Operator menu item title */
+"previousOperatorMenuItem" = "Previous Operator";
+
+/* Next Operator menu item title */
+"nextOperatorMenuItem" = "Next Operator";
+
+/* Title of Stored Value Token in search field, and title of Stored Value menu item in search menu of the search field */
+"storedValueTokenTitle" = "Stored Value";
+
+/* Alert Title that no Stored Values are available when searching with a stored value token */
+"noStoredValuesAlertTitle" = "No Stored Values Available";
+
+/* Alert Message that no Stored Values are available when searching with a stored value token */
+"noStoredValuesAlertMessage" = "No stored values are available to compare against. Please store values first before proceeding.";

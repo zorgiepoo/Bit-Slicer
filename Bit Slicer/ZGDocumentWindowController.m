@@ -66,6 +66,9 @@
 #import "ZGNavigationPost.h"
 #import "NSArrayAdditions.h"
 
+#define ZGSearchDocumentLocalizableTable @"[Code] Search Document"
+#define ZGLocalizableSearchDocumentString(string) NSLocalizedStringFromTable(string, ZGSearchDocumentLocalizableTable, nil)
+
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
 #define ZGProtectionItemWrite @"ZGProtectionWrite"
@@ -150,28 +153,34 @@
 
 - (void)setupScopeBar
 {
-	self.protectionGroup = [self.scopeBar addGroupWithIdentifier:ZGProtectionGroup label:@"Protection:" items:nil];
-	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemAll title:@"All"];
-	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemWrite title:@"Write"];
-	[self.protectionGroup addItemWithIdentifier:ZGProtectionItemExecute title:@"Execute"];
+	self.protectionGroup = [self.scopeBar addGroupWithIdentifier:ZGProtectionGroup label:ZGLocalizableSearchDocumentString(@"scopeBarProtectionGroup") items:nil];
+	[self.protectionGroup
+	 addItemWithIdentifier:ZGProtectionItemAll
+	 title:ZGLocalizableSearchDocumentString(@"scopeBarProtectionAllItem")];
+	[self.protectionGroup
+	 addItemWithIdentifier:ZGProtectionItemWrite
+	 title:ZGLocalizableSearchDocumentString(@"scopeBarProtectionWriteItem")];
+	[self.protectionGroup
+	 addItemWithIdentifier:ZGProtectionItemExecute
+	 title:ZGLocalizableSearchDocumentString(@"scopeBarProtectionExecuteItem")];
 	self.protectionGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
 	self.qualifierGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGQualifierGroup];
-	self.qualifierGroup.label = @"Qualifier:";
-	[self.qualifierGroup addItemWithIdentifier:ZGQualifierSigned title:@"Signed"];
-	[self.qualifierGroup addItemWithIdentifier:ZGQualifierUnsigned title:@"Unsigned"];
+	self.qualifierGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarQualifierGroup");
+	[self.qualifierGroup addItemWithIdentifier:ZGQualifierSigned title:ZGLocalizableSearchDocumentString(@"scopeBarQualifierSignedItem")];
+	[self.qualifierGroup addItemWithIdentifier:ZGQualifierUnsigned title:ZGLocalizableSearchDocumentString(@"scopeBarQualifierUnsignedItem")];
 	self.qualifierGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
 	self.stringMatchingGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGStringMatchingGroup];
-	self.stringMatchingGroup.label = @"Matching:";
-	[self.stringMatchingGroup addItemWithIdentifier:ZGStringIgnoreCase title:@"Ignore Case"];
-	[self.stringMatchingGroup addItemWithIdentifier:ZGStringNullTerminated title:@"Null Terminated"];
+	self.stringMatchingGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarStringMatchingGroup");
+	[self.stringMatchingGroup addItemWithIdentifier:ZGStringIgnoreCase title:ZGLocalizableSearchDocumentString(@"scopeBarStringMatchingIgnoreCaseItem")];
+	[self.stringMatchingGroup addItemWithIdentifier:ZGStringNullTerminated title:ZGLocalizableSearchDocumentString(@"scopeBarStringMatchingNullTerminatedItem")];
 	self.stringMatchingGroup.selectionMode = AGScopeBarGroupSelectAny;
 	
 	self.endianGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGEndianGroup];
-	self.endianGroup.label = @"Endianness";
-	[self.endianGroup addItemWithIdentifier:ZGEndianLittle title:@"Little"];
-	[self.endianGroup addItemWithIdentifier:ZGEndianBig title:@"Big"];
+	self.endianGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarEndiannessGroup");
+	[self.endianGroup addItemWithIdentifier:ZGEndianLittle title:ZGLocalizableSearchDocumentString(@"scopeBarEndianLittleItem")];
+	[self.endianGroup addItemWithIdentifier:ZGEndianBig title:ZGLocalizableSearchDocumentString(@"scopeBarEndianBigItem")];
 	self.endianGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
 	// Set delegate after setting up scope bar so we won't receive initial selection events beforehand
@@ -374,12 +383,10 @@
 	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
 	numberOfVariablesFormatter.format = @"#,###";
 	
-	NSString *valuesDisplayedString = [NSString stringWithFormat:@"Displaying %@ value", [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
-	
-	if (variableCount != 1)
-	{
-		valuesDisplayedString = [valuesDisplayedString stringByAppendingString:@"s"];
-	}
+	NSString *valuesDisplayedString =
+	(variableCount == 1) ?
+	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"displayingSingleValueLabelFormat"), [numberOfVariablesFormatter stringFromNumber:@(variableCount)]] :
+	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"displayingMultipleValuesLabelFormat"), [numberOfVariablesFormatter stringFromNumber:@(variableCount)]];
 	
 	[self setStatusString:valuesDisplayedString];
 }
@@ -581,7 +588,7 @@
 	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
 	if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored || functionType == ZGGreaterThanStoredLinear)
 	{
-		self.flagsLabelStringValue = @"Below:";
+		self.flagsLabelStringValue = ZGLocalizableSearchDocumentString(@"scopeBarAccessoryBelowLabel");
 		
 		if (self.documentData.lastBelowRangeValue != nil)
 		{
@@ -594,7 +601,7 @@
 	}
 	else if (functionType == ZGLessThan || functionType == ZGLessThanStored || functionType == ZGLessThanStoredLinear)
 	{
-		self.flagsLabelStringValue = @"Above:";
+		self.flagsLabelStringValue = ZGLocalizableSearchDocumentString(@"scopeBarAccessoryAboveLabel");
 		
 		if (self.documentData.lastAboveRangeValue != nil)
 		{
@@ -635,7 +642,7 @@
 		if (ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType))
 		{
 			// epsilon
-			self.flagsLabelStringValue = @"Round Error:";
+			self.flagsLabelStringValue = ZGLocalizableSearchDocumentString(@"scopeBarAccessoryRoundErrorLabel");
 			if (self.documentData.lastEpsilonValue != nil)
 			{
 				self.flagsStringValue = self.documentData.lastEpsilonValue;
@@ -675,18 +682,18 @@
 	
 	[self.functionPopUpButton removeAllItems];
 	
-	[self.functionPopUpButton insertItemWithTitle:@"equals" atIndex:0];
+	[self.functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"equalsOperatorTitle") atIndex:0];
 	[[self.functionPopUpButton itemAtIndex:0] setTag:ZGEquals];
 	
-	[self.functionPopUpButton insertItemWithTitle:@"is not" atIndex:1];
+	[self.functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"notEqualsOperatorTitle") atIndex:1];
 	[[self.functionPopUpButton itemAtIndex:1] setTag:ZGNotEquals];
 	
 	if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
 	{
-		[self.functionPopUpButton insertItemWithTitle:@"is greater than" atIndex:2];
+		[self.functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") atIndex:2];
 		[[self.functionPopUpButton itemAtIndex:2] setTag:ZGGreaterThan];
 		
-		[self.functionPopUpButton insertItemWithTitle:@"is less than" atIndex:3];
+		[self.functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") atIndex:3];
 		[[self.functionPopUpButton itemAtIndex:3] setTag:ZGLessThan];
 	}
 	
@@ -718,7 +725,7 @@
 	
 	if (recordUndo && oldVariableTypeTag != newTag)
 	{
-		[self.undoManager setActionName:@"Data Type Change"];
+		[self.undoManager setActionName:ZGLocalizableSearchDocumentString(@"undoDataTypeChangeAction")];
 		[[self.undoManager prepareWithInvocationTarget:self]
 		 selectDataTypeWithTag:oldVariableTypeTag
 		 recordUndo:YES];
@@ -830,11 +837,11 @@
 	{
 		if ([self.variableController canClearSearch])
 		{
-			menuItem.title = @"Clear Search Variables";
+			menuItem.title = ZGLocalizableSearchDocumentString(@"clearSearchVariablesTitle");
 		}
 		else
 		{
-			menuItem.title = @"Clear Variables";
+			menuItem.title = ZGLocalizableSearchDocumentString(@"clearVariablesTitle");
 		}
 		
 		if (!self.isClearable)
@@ -906,7 +913,28 @@
 			// All the variables selected need to either be all unfrozen or all frozen
 			BOOL isFrozen = [[selectedVariables firstObject] isFrozen];
 			
-			menuItem.title = [NSString stringWithFormat:@"%@ Variable%@", isFrozen ? @"Unfreeze" : @"Freeze", selectedVariables.count != 1 ? @"s" : @""];
+			if (isFrozen)
+			{
+				if (selectedVariables.count != 1)
+				{
+					menuItem.title = ZGLocalizableSearchDocumentString(@"unfreezeMultipleVariablesTitle");
+				}
+				else
+				{
+					menuItem.title = ZGLocalizableSearchDocumentString(@"unfreezeSingleVariableTitle");
+				}
+			}
+			else
+			{
+				if (selectedVariables.count != 1)
+				{
+					menuItem.title = ZGLocalizableSearchDocumentString(@"freezeMulitipleVariablesTitle");
+				}
+				else
+				{
+					menuItem.title = ZGLocalizableSearchDocumentString(@"freezeSingleVariableTitle");
+				}
+			}
 
 			if (!self.isClearable)
 			{
@@ -922,7 +950,7 @@
 		}
 		else
 		{
-			menuItem.title = @"Freeze Variables";
+			menuItem.title = ZGLocalizableSearchDocumentString(@"freezeMulitipleVariablesTitle");
 			return NO;
 		}
 	}
@@ -966,7 +994,7 @@
 	
 	else if (menuItem.action == @selector(requestEditingVariablesValue:))
 	{
-		menuItem.title = [NSString stringWithFormat:@"Edit Variable Value%@…", self.selectedVariables.count != 1 ? @"s" : @""];
+		menuItem.title = (self.selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"editMultipleVariableValuesTitle") : ZGLocalizableSearchDocumentString(@"editSingleVariableValueTitle");
 		
 		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
@@ -998,7 +1026,7 @@
     else if (menuItem.action == @selector(requestEditingVariablesSize:))
     {
 		NSArray *selectedVariables = [self selectedVariables];
-		menuItem.title = [NSString stringWithFormat:@"Edit Variable Size%@…", selectedVariables.count != 1 ? @"s" : @""];
+		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"editMultipleVariableSizesTitle") : ZGLocalizableSearchDocumentString(@"editSingleVariableSizeTitle");
 		
 		if ([self.searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
@@ -1023,7 +1051,7 @@
 			return NO;
 		}
 		
-		menuItem.title = [NSString stringWithFormat:@"Relativize Variable%@", selectedVariables.count != 1 ? @"s" : @""];
+		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"relativizeMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"relativizeSingleVariableTitle");
 		
 		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 		ZGMachBinary *mainMachBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:machBinaries];
@@ -1084,7 +1112,7 @@
 	
 	else if (menuItem.action == @selector(nopVariables:))
 	{
-		menuItem.title = [NSString stringWithFormat:@"NOP Variable%@", self.selectedVariables.count != 1 ? @"s" : @""];
+		menuItem.title = (self.selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"nopMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"nopSingleVariableTitle");
 		
 		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
@@ -1135,11 +1163,11 @@
 	{
 		if (menuItem.action == @selector(goBack:))
 		{
-			menuItem.title = @"Previous Operator";
+			menuItem.title = ZGLocalizableSearchDocumentString(@"previousOperatorMenuItem");
 		}
 		else
 		{
-			menuItem.title = @"Next Operator";
+			menuItem.title = ZGLocalizableSearchDocumentString(@"nextOperatorMenuItem");
 		}
 		
 		if ([self.searchController canCancelTask])
@@ -1165,7 +1193,7 @@
 
 - (IBAction)insertStoredValueToken:(id)__unused sender
 {
-	self.searchValueTextField.objectValue = @[[[ZGSearchToken alloc] initWithName:@"Stored Value"]];
+	self.searchValueTextField.objectValue = @[[[ZGSearchToken alloc] initWithName:ZGLocalizableSearchDocumentString(@"storedValueTokenTitle")]];
 	[self deselectSearchField];
 }
 
@@ -1227,7 +1255,7 @@
 	{
 		if (ZGIsFunctionTypeStore([self selectedFunctionType]) && self.searchData.savedData == nil)
 		{
-			NSRunAlertPanel(@"No Stored Values Available", @"There are no stored values to compare against. Please store values first before proceeding.", nil, nil, nil);
+			NSRunAlertPanel(ZGLocalizableSearchDocumentString(@"noStoredValuesAlertTitle"), ZGLocalizableSearchDocumentString(@"noStoredValuesAlertMessage"), nil, nil, nil);
 		}
 		else
 		{
@@ -1251,7 +1279,7 @@
 - (void)createSearchMenu
 {
 	NSMenu *searchMenu = [[NSMenu alloc] init];
-	NSMenuItem *storedValuesMenuItem = [[NSMenuItem alloc] initWithTitle:@"Stored Value" action:@selector(insertStoredValueToken:) keyEquivalent:@""];
+	NSMenuItem *storedValuesMenuItem = [[NSMenuItem alloc] initWithTitle:ZGLocalizableSearchDocumentString(@"storedValueTokenTitle") action:@selector(insertStoredValueToken:) keyEquivalent:@""];
 	[searchMenu addItem:storedValuesMenuItem];
 	self.searchValueTextField.cell.searchMenu = searchMenu;
 }
