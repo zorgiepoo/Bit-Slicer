@@ -285,6 +285,27 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	 object:self.runningApplicationsPopUpButton];
 }
 
++ (void)updateProcessMenuItem:(NSMenuItem *)menuItem name:(NSString *)name processIdentifier:(pid_t)processIdentifier icon:(NSImage *)icon
+{
+	BOOL isDead = (processIdentifier < 0);
+	if (isDead)
+	{
+		NSFont *menuFont = [NSFont menuFontOfSize:12]; // don't think there's a real way to get font size if we were to set the non-attributed title
+		NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ (none)", name]];
+		[attributedString addAttribute:NSStrikethroughStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0, attributedString.length)];
+		[attributedString addAttribute:NSFontAttributeName value:menuFont range:NSMakeRange(0, attributedString.length)];
+		menuItem.attributedTitle = attributedString;
+	}
+	else
+	{
+		menuItem.title = [NSString stringWithFormat:@"%@ (%d)", name, processIdentifier];
+	}
+	
+	NSImage *smallIcon = isDead ? [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy] : [icon copy];
+	smallIcon.size = NSMakeSize(16, 16);
+	menuItem.image = smallIcon;
+}
+
 - (void)observeValueForKeyPath:(NSString *)__unused keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)__unused context
 {
 	if (object == self.processList)
@@ -315,7 +336,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 				if (representedProcess.processID == runningApplication.processIdentifier)
 				{
 					representedProcess.name = runningApplication.localizedName;
-					ZGUpdateProcessMenuItem(menuItem, runningApplication.localizedName, runningApplication.processIdentifier, runningApplication.icon);
+					[[self class] updateProcessMenuItem:menuItem name:runningApplication.localizedName processIdentifier:runningApplication.processIdentifier icon:runningApplication.icon];
 					break;
 				}
 			}
@@ -337,6 +358,15 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 - (void)currentProcessChangedWithOldProcess:(ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
 {
+}
+
+static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManager, ZGProcess *process)
+{
+	ZGMemoryMap processTask;
+	BOOL success = [processTaskManager getTask:&processTask forProcessIdentifier:process.processID];
+	process.processTask = processTask;
+	
+	return success;
 }
 
 - (void)setCurrentProcess:(ZGProcess *)newProcess
@@ -396,7 +426,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 		if (runningProcess.processIdentifier != ourProcessIdentifier)
 		{
 			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-			ZGUpdateProcessMenuItem(menuItem, runningProcess.name, runningProcess.processIdentifier, runningProcess.icon);
+			[[self class] updateProcessMenuItem:menuItem name:runningProcess.name processIdentifier:runningProcess.processIdentifier icon:runningProcess.icon];
 			
 			ZGProcess *oldProcess = [oldProcessesDictionary objectForKey:@(runningProcess.processIdentifier)];
 			if (oldProcess != nil)
@@ -429,8 +459,8 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	if (self.desiredProcessInternalName != nil && ![self.desiredProcessInternalName isEqualToString:[self.runningApplicationsPopUpButton.selectedItem.representedObject internalName]])
 	{
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		ZGUpdateProcessMenuItem(menuItem, self.desiredProcessInternalName, -1, nil);
-
+		[[self class] updateProcessMenuItem:menuItem name:self.desiredProcessInternalName processIdentifier:-1 icon:nil];
+		
 		menuItem.representedObject = [[ZGProcess alloc] initWithName:nil internalName:self.desiredProcessInternalName is64Bit:YES];
 
 		[self.runningApplicationsPopUpButton.menu insertItem:menuItem atIndex:0];

@@ -35,15 +35,6 @@
 #import "ZGUtilities.h"
 #import "NSStringAdditions.h"
 
-BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManager, ZGProcess *process)
-{
-	ZGMemoryMap processTask;
-	BOOL success = [processTaskManager getTask:&processTask forProcessIdentifier:process.processID];
-	process.processTask = processTask;
-	
-	return success;
-}
-
 ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression)
 {
 	ZGMemoryAddress address;
@@ -438,27 +429,6 @@ NSString *ZGProtectionDescription(ZGMemoryProtection protection)
 	[protectionAttributes addObject:(protection & VM_PROT_WRITE) ? @"w" : @"-"];
 	[protectionAttributes addObject:(protection & VM_PROT_EXECUTE) ? @"x" : @"-"];
 	return [protectionAttributes componentsJoinedByString:@""];
-}
-
-void ZGUpdateProcessMenuItem(NSMenuItem *menuItem, NSString *name, pid_t processIdentifier, NSImage *icon)
-{
-	BOOL isDead = (processIdentifier < 0);
-	if (isDead)
-	{
-		NSFont *menuFont = [NSFont menuFontOfSize:12]; // don't think there's a real way to get font size if we were to set the non-attributed title
-		NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ (none)", name]];
-		[attributedString addAttribute:NSStrikethroughStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0, attributedString.length)];
-		[attributedString addAttribute:NSFontAttributeName value:menuFont range:NSMakeRange(0, attributedString.length)];
-		menuItem.attributedTitle = attributedString;
-	}
-	else
-	{
-		menuItem.title = [NSString stringWithFormat:@"%@ (%d)", name, processIdentifier];
-	}
-	
-	NSImage *smallIcon = isDead ? [[NSImage imageNamed:@"NSDefaultApplicationIcon"] copy] : [icon copy];
-	smallIcon.size = NSMakeSize(16, 16);
-	menuItem.image = smallIcon;
 }
 
 void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText)

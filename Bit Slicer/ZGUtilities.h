@@ -48,8 +48,6 @@
 
 #define ZG_SELECTOR_STRING(object, name) (sizeof(object.name), @#name)
 
-BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManager, ZGProcess *process);
-
 ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression);
 BOOL ZGIsValidNumber(NSString *expression);
 
@@ -68,5 +66,4 @@ unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);
 
 NSString *ZGProtectionDescription(ZGMemoryProtection protection);
 
-void ZGUpdateProcessMenuItem(NSMenuItem *menuItem, NSString *name, pid_t processIdentifier, NSImage *icon);
 void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText);
