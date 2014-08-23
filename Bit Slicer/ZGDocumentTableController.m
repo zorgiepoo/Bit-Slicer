@@ -69,6 +69,9 @@
 
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
 
+#define ZGSearchTableLocalizableTable @"[Code] Search Table"
+#define ZGLocalizableSearchTableString(string) NSLocalizedStringFromTable(string, ZGSearchTableLocalizableTable, nil)
+
 #pragma mark Birth & Death
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController
@@ -327,7 +330,7 @@
 - (void)reorderVariables:(NSArray *)newVariables
 {
 	NSUndoManager *undoManager = self.windowController.undoManager;
-	undoManager.actionName = @"Move";
+	undoManager.actionName = ZGLocalizableSearchTableString(@"undoMoveAction");
 	[[undoManager prepareWithInvocationTarget:self] reorderVariables:self.documentData.variables];
 	
 	self.documentData.variables = [NSArray arrayWithArray:newVariables];
@@ -456,7 +459,7 @@
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
 			// Using a space to align the text field cell with the popup button cell
-			return variable.type == ZGScript ? @" Script" : @([tableColumn.dataCell indexOfItemWithTag:variable.type]);
+			return variable.type == ZGScript ? [@" " stringByAppendingString:ZGLocalizableSearchTableString(@"scriptVariableType")] : @([tableColumn.dataCell indexOfItemWithTag:variable.type]);
 		}
 	}
 	
@@ -606,18 +609,19 @@
 				trimmedDescription = [trimmedDescription stringByAppendingString:@"…"];
 			}
 			
-			[displayComponents addObject:@"Description:"];
+			[displayComponents addObject:ZGLocalizableSearchTableString(@"descriptionTooltipLabel")];
 			[displayComponents addObject:trimmedDescription];
 			[displayComponents addObject:@""];
 		}
 		
 		if (variable.usesDynamicAddress)
 		{
-			[displayComponents addObject:[NSString stringWithFormat:@"Address: %@", variable.addressFormula]];
+			[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"addressTooltipLabel"), variable.addressFormula]];
 		}
+		
 		if (variable.type == ZGByteArray)
 		{
-			[displayComponents addObject:[NSString stringWithFormat:@"Byte Size: %@", variable.sizeStringValue]];
+			[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"byteSizeTooltipLabel"), variable.sizeStringValue]];
 		}
 		
 		ZGProcess *currentProcess = self.windowController.currentProcess;
@@ -633,7 +637,7 @@
 					NSString *protectionDescription = ZGProtectionDescription(memoryProtection);
 					if (protectionDescription != nil && [variable.name rangeOfString:protectionDescription].location == NSNotFound)
 					{
-						[displayComponents addObject:[@"Protection: " stringByAppendingString:protectionDescription]];
+						[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"protectionTooltipLabel"), protectionDescription]];
 					}
 				}
 			}
@@ -651,21 +655,21 @@
 			
 			if (needsUserTag)
 			{
-				[displayComponents addObject:[NSString stringWithFormat:@"Tag: %@", userTagDescription]];
+				[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"tagTooltipLabel"), userTagDescription]];
 			}
 			
 			if (mappedFilePath != nil)
 			{
-				[displayComponents addObject:[NSString stringWithFormat:@"Mapped: %@", mappedFilePath]];
+				[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"mappedTooltipLabel"), mappedFilePath]];
 				if (!variable.usesDynamicAddress)
 				{
-					[displayComponents addObject:[NSString stringWithFormat:@"Offset: 0x%llX", variable.address - machBinary.headerAddress]];
+					[displayComponents addObject:[NSString stringWithFormat:@"%@ 0x%llX", ZGLocalizableSearchTableString(@"offsetTooltipLabel"), variable.address - machBinary.headerAddress]];
 				}
 			}
 			
 			if (needsSegmentName)
 			{
-				[displayComponents addObject:[NSString stringWithFormat:@"Segment: %@", segmentName]];
+				[displayComponents addObject:[NSString stringWithFormat:@"%@ %@", ZGLocalizableSearchTableString(@"segmentTooltipLabel"), segmentName]];
 			}
 		}
 	}

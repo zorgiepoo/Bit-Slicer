@@ -1,0 +1,37 @@
+/* 
+  [Code] Search Table.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 8/23/14.
+
+*/
+
+/* Undo action for re-ordering variables */
+"undoMoveAction" = "Move";
+
+/* Name of Script variable type */
+"scriptVariableType" = "Script";
+
+/* Description label for tooltip */
+"descriptionTooltipLabel" = "Description:";
+
+/* Dynamic address of the variable */
+"addressTooltipLabel" = "Address:";
+
+/* Byte size of the byte array variable */
+"byteSizeTooltipLabel" = "Byte Size:";
+
+/* Protection of page the variable is located at */
+"protectionTooltipLabel" = "Protection:";
+
+/* Mapped user tag variable address is located at */
+"tagTooltipLabel" = "Tag:";
+
+/* Mapped file path variable address is located at */
+"mappedTooltipLabel" = "Mapped:";
+
+/* Offset from image address is located at */
+"offsetTooltipLabel" = "Offset:";
+
+/* Mach segment variable address is located in */
+"segmentTooltipLabel" = "Segment:";
