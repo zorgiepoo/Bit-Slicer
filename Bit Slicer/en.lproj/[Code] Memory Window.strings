@@ -1,0 +1,10 @@
+/* 
+  [Code] Memory Window.strings
+  Bit Slicer
+
+  Created by Mayur Pawashe on 8/23/14.
+
+*/
+
+/* Substitute title for the process ID when the current target is not running */
+"deadProcessIdentifierLabel" = "none";

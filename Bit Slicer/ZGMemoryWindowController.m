@@ -45,6 +45,8 @@
 #import "ZGMachBinaryInfo.h"
 #import "ZGUtilities.h"
 
+#define ZGMemoryWindowLocalizableTable @"[Code] Memory Window"
+
 NSString *ZGLastChosenInternalProcessNameNotification = @"ZGLastChosenInternalProcessNameNotification";
 NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessNameKey";
 
@@ -291,8 +293,11 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	if (isDead)
 	{
 		NSFont *menuFont = [NSFont menuFontOfSize:12]; // don't think there's a real way to get font size if we were to set the non-attributed title
-		NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ (none)", name]];
+		
+		NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ (%@)", name, NSLocalizedStringFromTable(@"deadProcessIdentifierLabel", ZGMemoryWindowLocalizableTable, nil)]];
+		
 		[attributedString addAttribute:NSStrikethroughStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0, attributedString.length)];
+		
 		[attributedString addAttribute:NSFontAttributeName value:menuFont range:NSMakeRange(0, attributedString.length)];
 		menuItem.attributedTitle = attributedString;
 	}
