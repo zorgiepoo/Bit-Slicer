@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
@@ -19,13 +19,13 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="480" height="316"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1366" height="746"/>
             <value key="minSize" type="size" width="350" height="350"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="316"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="5">
+                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5">
                         <rect key="frame" x="20" y="46" width="440" height="250"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="JCD-pZ-2KF">
@@ -54,9 +54,12 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <button verticalHuggingPriority="750" id="10">
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="10">
                         <rect key="frame" x="377" y="14" width="88" height="28"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="78" id="cgc-GI-ldb"/>
+                        </constraints>
                         <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="11">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -65,8 +68,8 @@
                             <action selector="clearText:" target="-2" id="12"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" id="14">
-                        <rect key="frame" x="17" y="22" width="231" height="14"/>
+                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="14">
+                        <rect key="frame" x="17" y="22" width="108" height="14"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Logged 0 messages" id="15">
                             <font key="font" metaFont="smallSystem"/>
@@ -75,6 +78,17 @@
                         </textFieldCell>
                     </textField>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="14" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="19" id="8it-pI-MyR"/>
+                    <constraint firstItem="10" firstAttribute="top" secondItem="5" secondAttribute="bottom" constant="8" id="LoP-b4-BE5"/>
+                    <constraint firstItem="5" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" id="Qh3-er-zjU"/>
+                    <constraint firstItem="5" firstAttribute="top" secondItem="2" secondAttribute="top" constant="20" id="fro-KT-mVb"/>
+                    <constraint firstAttribute="trailing" secondItem="5" secondAttribute="trailing" constant="20" id="hxO-ax-ePi"/>
+                    <constraint firstAttribute="bottom" secondItem="10" secondAttribute="bottom" constant="20" id="l5W-Ev-C7d"/>
+                    <constraint firstItem="14" firstAttribute="top" secondItem="5" secondAttribute="bottom" constant="10" id="o1M-vX-i8s"/>
+                    <constraint firstAttribute="bottom" secondItem="14" secondAttribute="bottom" constant="22" id="qmG-NH-IGP"/>
+                    <constraint firstAttribute="trailing" secondItem="10" secondAttribute="trailing" constant="20" id="rls-NW-Mjf"/>
+                </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="4"/>
