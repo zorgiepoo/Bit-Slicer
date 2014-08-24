@@ -11,3 +11,9 @@
 
 /* Cancel that would show up in alerts usually */
 "Cancel" = "Cancel";
+
+/* 'None' selection label for AGScopeBar (scope bar used in search window) */
+"(None)" = "(None)";
+
+/* 'Multiple' selection label for AGScopeBar (scope bar used in search window) */
+"(Multiple)" = "(Multiple)";
