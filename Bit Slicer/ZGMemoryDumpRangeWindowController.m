@@ -39,7 +39,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGUtilities.h"
 
-#define ZGDumpMemoryRangeLocalizableTable @"[Code] Dump Memory Range"
+#define ZGLocalizedStringFromDumpMemoryRangeTable(string) NSLocalizedStringFromTable((string), @"[Code] Dump Memory Range", nil)
 
 @interface ZGMemoryDumpRangeWindowController ()
 
@@ -96,14 +96,14 @@
 				 
 				 if (!success)
 				 {
-					 ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedDumpingMemoryAlertTitle", ZGDumpMemoryRangeLocalizableTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"failedDumpingMemoryAlertMessageFormat", ZGDumpMemoryRangeLocalizableTable, nil), fromAddress, toAddress]);
+					 ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDumpMemoryRangeTable(@"failedDumpingMemoryAlertTitle"), [NSString stringWithFormat:ZGLocalizedStringFromDumpMemoryRangeTable(@"failedDumpingMemoryAlertMessageFormat"), fromAddress, toAddress]);
 				 }
 			 }
 		 }];
 	}
 	else
 	{
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"invalidAddressRangeAlertTitle", ZGDumpMemoryRangeLocalizableTable, nil), NSLocalizedStringFromTable(@"invalidAddressRangeAlertMessage", ZGDumpMemoryRangeLocalizableTable, nil));
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDumpMemoryRangeTable(@"invalidAddressRangeAlertTitle"), ZGLocalizedStringFromDumpMemoryRangeTable(@"invalidAddressRangeAlertMessage"));
 	}
 }
 

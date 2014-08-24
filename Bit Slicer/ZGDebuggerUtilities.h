@@ -42,7 +42,7 @@
 #define INJECTED_NOP_SLIDE_LENGTH 0x10
 #define NOP_VALUE 0x90
 
-#define ZGDebuggerLocalizationTable @"[Code] Debugger"
+#define ZGLocalizedStringFromDebuggerTable(string) NSLocalizedStringFromTable((string), @"[Code] Debugger", nil)
 
 @interface ZGDebuggerUtilities : NSObject
 

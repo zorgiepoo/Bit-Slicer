@@ -37,8 +37,9 @@
 #import "AGScopeBar.h"
 #import "ZGMemoryWindowController.h"
 
-#define ZGSearchDocumentLocalizableTable @"[Code] Search Document"
-#define ZGLocalizableSearchDocumentString(string) NSLocalizedStringFromTable(string, ZGSearchDocumentLocalizableTable, nil)
+#define ZGLocalizableSearchDocumentString(string) NSLocalizedStringFromTable(string, @"[Code] Search Document", nil)
+
+#define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
 
 @class ZGDocumentTableController;
 @class ZGVariableController;
@@ -55,8 +56,6 @@
 @class ZGLoggerWindowController;
 @class ZGHotKeyCenter;
 @class ZGDocument;
-
-#define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
 
 @interface ZGDocumentWindowController : ZGMemoryWindowController <AGScopeBarDelegate>
 

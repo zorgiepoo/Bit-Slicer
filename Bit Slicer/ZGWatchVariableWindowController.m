@@ -50,8 +50,7 @@
 #import "ZGMachBinary.h"
 #import "ZGNavigationPost.h"
 
-#define ZGWatchVariableLocalizableTable @"[Code] Watch Variable"
-#define ZGLocalizableWatchVariableString(string) NSLocalizedStringFromTable(string, ZGWatchVariableLocalizableTable, nil)
+#define ZGLocalizableWatchVariableString(string) NSLocalizedStringFromTable(string, @"[Code] Watch Variable", nil)
 
 @interface ZGWatchVariableWindowController ()
 

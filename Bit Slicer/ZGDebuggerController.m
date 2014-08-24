@@ -1215,7 +1215,7 @@ enum ZGStepExecution
 	if (userInterfaceItem.action == @selector(nopVariables:))
 	{
 		NSString *localizableKey = [NSString stringWithFormat:@"nopInstruction%@", self.selectedInstructions.count != 1 ? @"s" : @""];
-		menuItem.title = NSLocalizedStringFromTable(localizableKey, ZGDebuggerLocalizationTable, nil);
+		menuItem.title = ZGLocalizedStringFromDebuggerTable(localizableKey);
 		
 		if (self.selectedInstructions.count == 0 || !self.currentProcess.valid || self.instructionsTableView.editedRow != -1)
 		{
@@ -1261,7 +1261,7 @@ enum ZGStepExecution
 	{
 		if (self.selectedInstructions.count == 0)
 		{
-			menuItem.title = NSLocalizedStringFromTable(@"addBreakpoint", ZGDebuggerLocalizationTable, nil);
+			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"addBreakpoint");
 			return NO;
 		}
 		
@@ -1285,7 +1285,7 @@ enum ZGStepExecution
 		}
 		
 		NSString *localizableKey = [NSString stringWithFormat:@"%@Breakpoint%@", isBreakPoint ? @"remove" : @"add", self.selectedInstructions.count != 1 ? @"s" : @""];
-		menuItem.title = NSLocalizedStringFromTable(localizableKey, ZGDebuggerLocalizationTable, nil);
+		menuItem.title = ZGLocalizedStringFromDebuggerTable(localizableKey);
 		
 		return shouldValidate;
 	}
@@ -1307,24 +1307,24 @@ enum ZGStepExecution
 	{
 		if (!self.currentProcess.valid)
 		{
-			menuItem.title = NSLocalizedStringFromTable(@"goToCallAddress", ZGDebuggerLocalizationTable, nil);
+			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToCallAddress");
 			return NO;
 		}
 		
 		if (self.selectedInstructions.count != 1)
 		{
-			menuItem.title = NSLocalizedStringFromTable(@"goToCallAddress", ZGDebuggerLocalizationTable, nil);
+			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToCallAddress");
 			return NO;
 		}
 		
 		ZGInstruction *selectedInstruction = [self.selectedInstructions objectAtIndex:0];
 		if ([ZGDisassemblerObject isCallMnemonic:selectedInstruction.mnemonic])
 		{
-			menuItem.title = NSLocalizedStringFromTable(@"goToCallAddress", ZGDebuggerLocalizationTable, nil);
+			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToCallAddress");
 		}
 		else if ([ZGDisassemblerObject isJumpMnemonic:selectedInstruction.mnemonic])
 		{
-			menuItem.title = NSLocalizedStringFromTable(@"goToBranchAddress", ZGDebuggerLocalizationTable, nil);
+			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToBranchAddress");
 		}
 		else
 		{
@@ -1560,7 +1560,7 @@ enum ZGStepExecution
 		{
 			if ([breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && instruction.variable.address == breakPointCondition.address)
 			{
-				toolTip = [NSString stringWithFormat:@"%@: %@", NSLocalizedStringFromTable(@"breakpointConditionTooltipLabel", ZGDebuggerLocalizationTable, nil), breakPointCondition.condition];
+				toolTip = [NSString stringWithFormat:@"%@: %@", ZGLocalizedStringFromDebuggerTable(@"breakpointConditionTooltipLabel"), breakPointCondition.condition];
 				break;
 			}
 		}
@@ -1581,7 +1581,7 @@ enum ZGStepExecution
 		if (error != nil)
 		{
 			ZG_LOG(@"%@", error);
-			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedModifyInstructionAlertTitle", ZGDebuggerLocalizationTable, nil), [NSString stringWithFormat:@"%@ \"%@\": %@", NSLocalizedStringFromTable(@"failedModifyInstructionAlertMessage", ZGDebuggerLocalizationTable, nil), instructionText, [error.userInfo objectForKey:@"reason"]]);
+			ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedModifyInstructionAlertTitle"), [NSString stringWithFormat:@"%@ \"%@\": %@", ZGLocalizedStringFromDebuggerTable(@"failedModifyInstructionAlertMessage"), instructionText, [error.userInfo objectForKey:@"reason"]]);
 		}
 	}
 	else
@@ -1611,14 +1611,14 @@ enum ZGStepExecution
 		
 		if (bytesRead < originalOutputLength)
 		{
-			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedOverwriteInstructionsAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedOverwriteInstructionsAlertMessage", ZGDebuggerLocalizationTable, nil));
+			ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedOverwriteInstructionsAlertTitle"), ZGLocalizedStringFromDebuggerTable(@"failedOverwriteInstructionsAlertMessage"));
 		}
 		else
 		{
 			BOOL shouldOverwriteInstructions = YES;
 			if (numberOfInstructionsOverwritten > 1)
 			{
-				if (ZGRunAlertPanelWithDefaultAndCancelButton(NSLocalizedStringFromTable(@"overwriteConfirmationAlertTitle", ZGDebuggerLocalizationTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"overwriteConfirmationAlertMessageFormat", ZGDebuggerLocalizationTable, nil), numberOfInstructionsOverwritten], NSLocalizedStringFromTable(@"overwrite", ZGDebuggerLocalizationTable, nil)) == NSAlertSecondButtonReturn)
+				if (ZGRunAlertPanelWithDefaultAndCancelButton(ZGLocalizedStringFromDebuggerTable(@"overwriteConfirmationAlertTitle"), [NSString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"overwriteConfirmationAlertMessageFormat"), numberOfInstructionsOverwritten], ZGLocalizedStringFromDebuggerTable(@"overwrite")) == NSAlertSecondButtonReturn)
 				{
 					shouldOverwriteInstructions = NO;
 				}
@@ -1668,7 +1668,7 @@ enum ZGStepExecution
 					
 					ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldValue size:newWriteSize address:instruction.variable.address type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
 					
-					[ZGDebuggerUtilities replaceInstructions:@[instruction] fromOldStringValues:@[oldVariable.stringValue] toNewStringValues:@[newVariable.stringValue] inProcess:self.currentProcess breakPoints:self.breakPointController.breakPoints undoManager:self.undoManager actionName:NSLocalizedStringFromTable(@"undoInstructionChange", ZGDebuggerLocalizationTable, nil)];
+					[ZGDebuggerUtilities replaceInstructions:@[instruction] fromOldStringValues:@[oldVariable.stringValue] toNewStringValues:@[newVariable.stringValue] inProcess:self.currentProcess breakPoints:self.breakPointController.breakPoints undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoInstructionChange")];
 				}
 				
 				free(oldValue);
@@ -1681,7 +1681,7 @@ enum ZGStepExecution
 
 - (IBAction)nopVariables:(id)__unused sender
 {
-	[ZGDebuggerUtilities nopInstructions:[self selectedInstructions] inProcess:self.currentProcess breakPoints:self.breakPointController.breakPoints undoManager:self.undoManager actionName:NSLocalizedStringFromTable(@"undoNOPChange", ZGDebuggerLocalizationTable, nil)];
+	[ZGDebuggerUtilities nopInstructions:[self selectedInstructions] inProcess:self.currentProcess breakPoints:self.breakPointController.breakPoints undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoNOPChange")];
 }
 
 - (IBAction)requestCodeInjection:(id)__unused sender
@@ -1742,7 +1742,7 @@ enum ZGStepExecution
 	}
 	
 	NSString *localizableKey = [NSString stringWithFormat:@"addBreakpoint%@", changedInstructions.count != 1 ? @"s" : @""];
-	[self.undoManager setActionName:NSLocalizedStringFromTable(localizableKey, ZGDebuggerLocalizationTable, nil)];
+	[self.undoManager setActionName:ZGLocalizedStringFromDebuggerTable(localizableKey)];
 	[[self.undoManager prepareWithInvocationTarget:self] addBreakPointsToInstructions:changedInstructions];
 	
 	[self.instructionsTableView reloadData];
@@ -1787,13 +1787,13 @@ enum ZGStepExecution
 		[self startBreakPointActivity];
 		
 		NSString *localizableKey = [NSString stringWithFormat:@"removeBreakpoint%@", changedInstructions.count != 1 ? @"s" : @""];
-		[self.undoManager setActionName:NSLocalizedStringFromTable(localizableKey, ZGDebuggerLocalizationTable, nil)];
+		[self.undoManager setActionName:ZGLocalizedStringFromDebuggerTable(localizableKey)];
 		[[self.undoManager prepareWithInvocationTarget:self] removeBreakPointsToInstructions:changedInstructions];
 		[self.instructionsTableView reloadData];
 	}
 	else
 	{
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedAddBreakpointAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedAddBreakpointAlertMessage", ZGDebuggerLocalizationTable, nil));
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedAddBreakpointAlertTitle"), ZGLocalizedStringFromDebuggerTable(@"failedAddBreakpointAlertMessage"));
 	}
 }
 
@@ -1884,7 +1884,7 @@ enum ZGStepExecution
 		ZGMemoryAddress currentAddress = self.registersViewController.instructionPointer;
 		[self.registersViewController changeInstructionPointer:newAddress];
 		[[self.undoManager prepareWithInvocationTarget:self] moveInstructionPointerToAddress:currentAddress];
-		[self.undoManager setActionName:NSLocalizedStringFromTable(@"undoMoveInstructionPointer", ZGDebuggerLocalizationTable, nil)];
+		[self.undoManager setActionName:ZGLocalizedStringFromDebuggerTable(@"undoMoveInstructionPointer")];
 	}
 }
 
@@ -1996,7 +1996,7 @@ enum ZGStepExecution
 		
 		if (breakPoint.error == nil && shouldShowNotification)
 		{
-			ZGDeliverUserNotification(NSLocalizedStringFromTable(@"hitBreakpointNotificationTitle", ZGDebuggerLocalizationTable, nil), self.currentProcess.name, [NSString stringWithFormat:@"%@ %@", NSLocalizedStringFromTable(@"hitBreakpointNotificationMessage", ZGDebuggerLocalizationTable, nil), self.currentBreakPoint.variable.addressStringValue]);
+			ZGDeliverUserNotification(ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationTitle"), self.currentProcess.name, [NSString stringWithFormat:@"%@ %@", ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationMessage"), self.currentBreakPoint.variable.addressStringValue]);
 		}
 		else if (breakPoint.error != nil)
 		{
@@ -2012,7 +2012,7 @@ enum ZGStepExecution
 			
 			[self.loggerWindowController writeLine:[breakPoint.error.userInfo objectForKey:SCRIPT_PYTHON_ERROR]];
 			
-			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedExecuteBreakpointConditionAlertTitle", ZGDebuggerLocalizationTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"failedExecuteBreakpointConditionAlertMessage", ZGDebuggerLocalizationTable, nil), scriptContents, [breakPoint.error.userInfo objectForKey:SCRIPT_EVALUATION_ERROR_REASON]]);
+			ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedExecuteBreakpointConditionAlertTitle"), [NSString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"failedExecuteBreakpointConditionAlertMessage"), scriptContents, [breakPoint.error.userInfo objectForKey:SCRIPT_EVALUATION_ERROR_REASON]]);
 			
 			breakPoint.error = nil;
 		}
@@ -2061,7 +2061,7 @@ enum ZGStepExecution
 		}
 		else
 		{
-			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedStepOverAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedStepOverAlertMessage", ZGDebuggerLocalizationTable, nil));
+			ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedStepOverAlertTitle"), ZGLocalizedStringFromDebuggerTable(@"failedStepOverAlertMessage"));
 		}
 	}
 	else
@@ -2082,7 +2082,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedStepOutAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedStepOutAlertMessage", ZGDebuggerLocalizationTable, nil));
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedStepOutAlertTitle"), ZGLocalizedStringFromDebuggerTable(@"failedStepOutAlertMessage"));
 	}
 }
 
@@ -2237,7 +2237,7 @@ enum ZGStepExecution
 	{
 		[self.loggerWindowController writeLine:[error.userInfo objectForKey:SCRIPT_PYTHON_ERROR]];
 		
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedChangeBreakpointConditionAlertTitle", ZGDebuggerLocalizationTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"failedChangeBreakpointConditionAlertMessageFormat", ZGDebuggerLocalizationTable, nil), condition]);
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedChangeBreakpointConditionAlertTitle"), [NSString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"failedChangeBreakpointConditionAlertMessageFormat"), condition]);
 	}
 	else
 	{

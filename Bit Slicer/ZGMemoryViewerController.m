@@ -56,7 +56,7 @@
 #define ZGMemoryViewerProcessInternalName @"ZGMemoryViewerProcessName"
 #define ZGMemoryViewerShowsDataInspector @"ZGMemoryViewerShowsDataInspector"
 
-#define ZGMemoryViewerLocalizationTable @"[Code] Memory Viewer"
+#define ZGLocalizedStringFromMemoryViewerTable(string) NSLocalizedStringFromTable((string), @"[Code] Memory Viewer", nil)
 
 @interface ZGMemoryViewerController ()
 
@@ -574,7 +574,7 @@
 {
 	if (ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newData.bytes, size))
 	{
-		[self.textView.controller.undoManager setActionName:NSLocalizedStringFromTable(@"undoMemoryWrite", ZGMemoryViewerLocalizationTable, nil)];
+		[self.textView.controller.undoManager setActionName:ZGLocalizedStringFromMemoryViewerTable(@"undoMemoryWrite")];
 		[[self.textView.controller.undoManager prepareWithInvocationTarget:self] writeNewData:oldData oldData:newData address:address size:size];
 	}
 }

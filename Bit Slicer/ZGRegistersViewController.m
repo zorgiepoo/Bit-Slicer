@@ -44,7 +44,7 @@
 #define ZG_REGISTER_TYPES @"ZG_REGISTER_TYPES"
 #define ZG_DEBUG_QUALIFIER @"ZG_DEBUG_QUALIFIER"
 
-#define ZGDebuggerRegistersLocalizationTable @"[Code] Debugger Registers"
+#define ZGLocalizedStringFromDebuggerRegistersTable(string) NSLocalizedStringFromTable((string), @"[Code] Debugger Registers", nil)
 
 @interface ZGRegistersViewController ()
 
@@ -195,7 +195,7 @@
 	
 	NSUndoManager *undoManager = self.undoManager;
 	[[undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
-	[undoManager setActionName:NSLocalizedStringFromTable(@"undoRegisterTypeChange", ZGDebuggerRegistersLocalizationTable, nil)];
+	[undoManager setActionName:ZGLocalizedStringFromDebuggerRegistersTable(@"undoRegisterTypeChange")];
 	
 	[self.tableView reloadData];
 }
@@ -353,7 +353,7 @@
 	{
 		NSUndoManager *undoManager = self.undoManager;
 		[[undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
-		[undoManager setActionName:NSLocalizedStringFromTable(@"undoRegisterValueChange", ZGDebuggerRegistersLocalizationTable, nil)];
+		[undoManager setActionName:ZGLocalizedStringFromDebuggerRegistersTable(@"undoRegisterValueChange")];
 		
 		[self.tableView reloadData];
 	}

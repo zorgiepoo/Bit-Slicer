@@ -81,7 +81,7 @@
 	if (!ZGAllocateMemory(process.processTask, &allocatedAddress, numberOfAllocatedBytes))
 	{
 		NSLog(@"Failed to allocate code for code injection");
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedAllocateMemoryForInjectingCodeAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedAllocateMemoryForInjectingCodeAlertMessage", ZGDebuggerLocalizationTable, nil));
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedAllocateMemoryForInjectingCodeAlertTitle"), ZGLocalizedStringFromDebuggerTable(@"failedAllocateMemoryForInjectingCodeAlertMessage"));
 		return;
 	}
 	
@@ -103,12 +103,12 @@
 		}
 		
 		NSLog(@"Error: not enough instructions to override, or allocated memory address was too far away. Source: 0x%llX, destination: 0x%llX", instruction.variable.address, allocatedAddress);
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedInjectCodeAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedInjectCodeAlertMessage", ZGDebuggerLocalizationTable, nil));
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedInjectCodeAlertTitle"), ZGLocalizedStringFromDebuggerTable(@"failedInjectCodeAlertMessage"));
 		
 		return;
 	}
 	
-	NSMutableString *suggestedCode = [NSMutableString stringWithFormat:NSLocalizedStringFromTable(@"newlyCodeInjectedAtMessage", ZGDebuggerLocalizationTable, nil), allocatedAddress + INJECTED_NOP_SLIDE_LENGTH];
+	NSMutableString *suggestedCode = [NSMutableString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"newlyCodeInjectedAtMessage"), allocatedAddress + INJECTED_NOP_SLIDE_LENGTH];
 	
 	for (ZGInstruction *suggestedInstruction in instructions)
 	{
@@ -166,7 +166,7 @@
 			NSLog(@"Error: Failed to deallocate VM memory after failing to inject code..");
 		}
 				
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedInjectCodeAlertTitle", ZGDebuggerLocalizationTable, nil), [NSString stringWithFormat:@"%@: %@", NSLocalizedStringFromTable(@"failedAssemblingForInjectingCodeMessage", ZGDebuggerLocalizationTable, nil), [error.userInfo objectForKey:@"reason"]]);
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedInjectCodeAlertTitle"), [NSString stringWithFormat:@"%@: %@", ZGLocalizedStringFromDebuggerTable(@"failedAssemblingForInjectingCodeMessage"), [error.userInfo objectForKey:@"reason"]]);
 	}
 	else
 	{

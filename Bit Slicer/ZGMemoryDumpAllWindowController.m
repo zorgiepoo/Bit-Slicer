@@ -58,7 +58,7 @@
 - (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process
 {
 	NSSavePanel *savePanel = NSSavePanel.savePanel;
-	savePanel.message = NSLocalizedStringFromTable(@"savePanelPromptMessage", ZGDumpAllMemoryLocalizableTable, nil);
+	savePanel.message = ZGLocalizedStringFromDumpAllMemoryTable(@"savePanelPromptMessage");
 	
 	[savePanel
 	 beginSheetModalForWindow:parentWindow
@@ -103,14 +103,14 @@
 					 if (!ZGDumpAllDataToDirectory(savePanel.URL.relativePath, process.processTask, self))
 					 {
 						 ZGRunAlertPanelWithOKButton(
-										 NSLocalizedStringFromTable(@"failedMemoryDumpAlertTitle", ZGDumpAllMemoryLocalizableTable, nil),
-										 NSLocalizedStringFromTable(@"failedMemoryDumpAlertMessage", ZGDumpAllMemoryLocalizableTable, nil));
+										 ZGLocalizedStringFromDumpAllMemoryTable(@"failedMemoryDumpAlertTitle"),
+										 ZGLocalizedStringFromDumpAllMemoryTable(@"failedMemoryDumpAlertMessage"));
 					 }
 					 
 					 dispatch_async(dispatch_get_main_queue(), ^{
 						 if (!self.searchProgress.shouldCancelSearch)
 						 {
-							 ZGDeliverUserNotification(NSLocalizedStringFromTable(@"finishedDumpingMemoryNotificationTitle", ZGDumpAllMemoryLocalizableTable, nil), nil, [NSString stringWithFormat:NSLocalizedStringFromTable(@"finishedDumpingMemoryNotificationMessageFormat", ZGDumpAllMemoryLocalizableTable, nil), process.name]);
+							 ZGDeliverUserNotification(ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationMessageFormat"), process.name]);
 						 }
 						 
 						 self.progressIndicator.doubleValue = 0.0;

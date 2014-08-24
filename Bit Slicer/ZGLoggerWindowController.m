@@ -37,7 +37,7 @@
 #define ZGLoggerWindowText @"ZGLoggerWindowText"
 #define MIN_LOG_LINES_TO_RESTORE 50U
 
-#define ZGLoggerWindowLocalizationTable @"[Code] Logger Window"
+#define ZGLocalizedStringFromLoggerWindowTable(string) NSLocalizedStringFromTable((string), @"[Code] Logger Window", nil)
 
 @interface ZGLoggerWindowController ()
 
@@ -82,7 +82,7 @@
 	[super restoreStateWithCoder:coder];
 	
 	self.loggerText = [NSMutableString stringWithString:[coder decodeObjectForKey:ZGLoggerWindowText]];
-	[self writeLine:NSLocalizedStringFromTable(@"restoredText", ZGLoggerWindowLocalizationTable, nil) withDateFormatting:NO];
+	[self writeLine:ZGLocalizedStringFromLoggerWindowTable(@"restoredText") withDateFormatting:NO];
 }
 
 - (void)updateDisplay
@@ -100,11 +100,11 @@
 	
 	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8)
 	{
-		[self.statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedStringFromTable(@"loggedMessagesFormat", ZGLoggerWindowLocalizationTable, nil), self.numberOfMessages]];
+		[self.statusTextField setStringValue:[NSString stringWithFormat:ZGLocalizedStringFromLoggerWindowTable(@"loggedMessagesFormat"), self.numberOfMessages]];
 	}
 	else
 	{
-		[self.statusTextField setStringValue:[NSString stringWithFormat:NSLocalizedStringFromTable((self.numberOfMessages == 1) ? @"loggedSingleMessageFormat" : @"loggedMultipleMessagesFormat", ZGLoggerWindowLocalizationTable, nil), self.numberOfMessages]];
+		[self.statusTextField setStringValue:[NSString stringWithFormat:ZGLocalizedStringFromLoggerWindowTable((self.numberOfMessages == 1) ? @"loggedSingleMessageFormat" : @"loggedMultipleMessagesFormat"), self.numberOfMessages]];
 	}
 	
 	[self invalidateRestorableState];

@@ -69,8 +69,7 @@
 
 #define WATCH_VARIABLES_UPDATE_TIME_INTERVAL 0.1
 
-#define ZGSearchTableLocalizableTable @"[Code] Search Table"
-#define ZGLocalizableSearchTableString(string) NSLocalizedStringFromTable(string, ZGSearchTableLocalizableTable, nil)
+#define ZGLocalizableSearchTableString(string) NSLocalizedStringFromTable(string, @"[Code] Search Table", nil)
 
 #pragma mark Birth & Death
 

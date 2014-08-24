@@ -45,7 +45,7 @@
 #import "ZGMachBinaryInfo.h"
 #import "ZGUtilities.h"
 
-#define ZGMemoryWindowLocalizableTable @"[Code] Memory Window"
+#define ZGLocalizedStringFromMemoryWindowTable(string) NSLocalizedStringFromTable((string), @"[Code] Memory Window", nil)
 
 NSString *ZGLastChosenInternalProcessNameNotification = @"ZGLastChosenInternalProcessNameNotification";
 NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessNameKey";
@@ -294,7 +294,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	{
 		NSFont *menuFont = [NSFont menuFontOfSize:12]; // don't think there's a real way to get font size if we were to set the non-attributed title
 		
-		NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ (%@)", name, NSLocalizedStringFromTable(@"deadProcessIdentifierLabel", ZGMemoryWindowLocalizableTable, nil)]];
+		NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ (%@)", name, ZGLocalizedStringFromMemoryWindowTable(@"deadProcessIdentifierLabel")]];
 		
 		[attributedString addAttribute:NSStrikethroughStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0, attributedString.length)];
 		
@@ -524,7 +524,7 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 	
 	if (userInterfaceItem.action == @selector(pauseOrUnpauseProcess:))
 	{
-		menuItem.title = NSLocalizedStringFromTable(@"pauseTargetProcess", ZGMemoryWindowLocalizableTable, nil); // the default
+		menuItem.title = ZGLocalizedStringFromMemoryWindowTable(@"pauseTargetProcess"); // the default
 		
 		if (!self.currentProcess.valid)
 		{
@@ -539,7 +539,7 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 		else
 		{
 			NSString *localizableKey = suspendCount > 0 ? @"unpauseTargetProcess" : @"pauseTargetProcess";
-			menuItem.title = NSLocalizedStringFromTable(localizableKey, ZGMemoryWindowLocalizableTable, nil);
+			menuItem.title = ZGLocalizedStringFromMemoryWindowTable(localizableKey);
 		}
 		
 		if ([self.debuggerController isProcessIdentifierHalted:self.currentProcess.processID])

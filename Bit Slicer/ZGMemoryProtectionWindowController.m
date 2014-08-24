@@ -53,7 +53,7 @@
 
 @end
 
-#define ZGMemoryProtectionLocalizableTable @"[Code] Memory Protection"
+#define ZGLocalizedStringFromMemoryProtectionTable(string) NSLocalizedStringFromTable((string), @"[Code] Memory Protection", nil)
 
 @implementation ZGMemoryProtectionWindowController
 
@@ -69,12 +69,12 @@
 	if (!success)
 	{
 		ZGRunAlertPanelWithOKButton(
-						NSLocalizedStringFromTable(@"protectionChangeFailedAlertTitle", ZGMemoryProtectionLocalizableTable, nil),
-						NSLocalizedStringFromTable(@"protectionChangeFailedAlertMessage", ZGMemoryProtectionLocalizableTable, nil));
+						ZGLocalizedStringFromMemoryProtectionTable(@"protectionChangeFailedAlertTitle"),
+						ZGLocalizedStringFromMemoryProtectionTable(@"protectionChangeFailedAlertMessage"));
 	}
 	else
 	{
-		self.undoManager.actionName = NSLocalizedStringFromTable(@"undoProtectionChangeAction", ZGMemoryProtectionLocalizableTable, nil);
+		self.undoManager.actionName = ZGLocalizedStringFromMemoryProtectionTable(@"undoProtectionChangeAction");
 		[[self.undoManager prepareWithInvocationTarget:self]
 		 changeProtectionAtAddress:address size:size oldProtection:newProtection newProtection:oldProtection	];
 	}
@@ -99,8 +99,8 @@
 		if (!ZGMemoryProtectionInRegion(self.process.processTask, &memoryAddress, &memorySize, &oldProtection))
 		{
 			ZGRunAlertPanelWithOKButton(
-							NSLocalizedStringFromTable(@"protectionChangeFailedAlertTitle", ZGMemoryProtectionLocalizableTable, nil),
-							NSLocalizedStringFromTable(@"findMemoryRegionFailedAlertMessage", ZGMemoryProtectionLocalizableTable, nil));
+							ZGLocalizedStringFromMemoryProtectionTable(@"protectionChangeFailedAlertTitle"),
+							ZGLocalizedStringFromMemoryProtectionTable(@"findMemoryRegionFailedAlertMessage"));
 		}
 		else
 		{
@@ -131,8 +131,8 @@
 	else
 	{
 		ZGRunAlertPanelWithOKButton(
-						NSLocalizedStringFromTable(@"invalidAddressRangeAlertTitle", ZGMemoryProtectionLocalizableTable, nil),
-						NSLocalizedStringFromTable(@"invalidAddressRangeAlertMessage", ZGMemoryProtectionLocalizableTable, nil));
+						ZGLocalizedStringFromMemoryProtectionTable(@"invalidAddressRangeAlertTitle"),
+						ZGLocalizedStringFromMemoryProtectionTable(@"invalidAddressRangeAlertMessage"));
 	}
 }
 

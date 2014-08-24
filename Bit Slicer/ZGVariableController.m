@@ -54,7 +54,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGNavigationPost.h"
 
-#define ZGVariableActionsLocalizableTable @"[Code] Variable Actions"
+#define ZGLocalizedStringFromVariableActionsTable(string) NSLocalizedStringFromTable((string), @"[Code] Variable Actions", nil)
 
 @interface ZGVariableController ()
 
@@ -150,8 +150,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[self updateFrozenActivity];
 	[self.windowController.tableController.variablesTableView reloadData];
 	
-	NSString *freezeActionName = NSLocalizedStringFromTable(@"undoFreezeAction", ZGVariableActionsLocalizableTable, nil);
-	NSString *unfreezeActionName = NSLocalizedStringFromTable(@"undoUnfreezeAction", ZGVariableActionsLocalizableTable, nil);
+	NSString *freezeActionName = ZGLocalizedStringFromVariableActionsTable(@"undoFreezeAction");
+	NSString *unfreezeActionName = ZGLocalizedStringFromVariableActionsTable(@"undoUnfreezeAction");
 	
 	// check whether we want to use "Undo Freeze" or "Redo Freeze" or "Undo Unfreeze" or "Redo Unfreeze"
 	if ([[self.documentData.variables objectAtIndex:rowIndexes.firstIndex] isFrozen])
@@ -312,11 +312,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	NSString *undoActionName = nil;
 	if (self.windowController.undoManager.isUndoing)
 	{
-		undoActionName = (rowIndexes.count > 1) ? NSLocalizedStringFromTable(@"undoAddVariables", ZGVariableActionsLocalizableTable, nil) : NSLocalizedStringFromTable(@"undoAddVariable", ZGVariableActionsLocalizableTable, nil);
+		undoActionName = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoAddVariables") : ZGLocalizedStringFromVariableActionsTable(@"undoAddVariable");
 	}
 	else
 	{
-		undoActionName = (rowIndexes.count > 1) ? NSLocalizedStringFromTable(@"undoRemoveVariables", ZGVariableActionsLocalizableTable, nil) : NSLocalizedStringFromTable(@"undoRemoveVariable", ZGVariableActionsLocalizableTable, nil);
+		undoActionName = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRemoveVariables") : ZGLocalizedStringFromVariableActionsTable(@"undoRemoveVariable");
 	}
 	
 	self.windowController.undoManager.actionName = undoActionName;
@@ -384,11 +384,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	NSString *undoActionName = nil;
 	if (self.windowController.undoManager.isUndoing)
 	{
-		undoActionName = (rowIndexes.count > 1) ? NSLocalizedStringFromTable(@"undoRemoveVariables", ZGVariableActionsLocalizableTable, nil) : NSLocalizedStringFromTable(@"undoRemoveVariable", ZGVariableActionsLocalizableTable, nil);
+		undoActionName = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRemoveVariables") : ZGLocalizedStringFromVariableActionsTable(@"undoRemoveVariable");
 	}
 	else
 	{
-		undoActionName = (rowIndexes.count > 1) ? NSLocalizedStringFromTable(@"undoAddVariables", ZGVariableActionsLocalizableTable, nil) : NSLocalizedStringFromTable(@"undoAddVariable", ZGVariableActionsLocalizableTable, nil);
+		undoActionName = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoAddVariables") : ZGLocalizedStringFromVariableActionsTable(@"undoAddVariable");
 	}
 	
 	self.windowController.undoManager.actionName = undoActionName;
@@ -422,7 +422,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		 type:variableType
 		 qualifier:qualifier
 		 pointerSize:self.windowController.currentProcess.pointerSize
-		 description:[[NSAttributedString alloc] initWithString:variableType == ZGScript ? NSLocalizedStringFromTable(@"defaultScriptDescription", ZGVariableActionsLocalizableTable, nil) : @""]
+		 description:[[NSAttributedString alloc] initWithString:variableType == ZGScript ? ZGLocalizedStringFromVariableActionsTable(@"defaultScriptDescription") : @""]
 		 enabled:NO
 		 byteOrder:byteOrder];
 	
@@ -472,7 +472,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		[self changeVariable:variable newValue:[newValues objectAtIndex:variableIndex] shouldRecordUndo:NO];
 	}
 	
-	self.windowController.undoManager.actionName = NSLocalizedStringFromTable(@"undoNOPChangeAction", ZGVariableActionsLocalizableTable, nil);
+	self.windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoNOPChangeAction");
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
 	 nopVariables:variables
 	 withNewValues:oldValues];
@@ -496,15 +496,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	if (![self nopVariables:variables withNewValues:nopValues])
 	{
-		NSString *message = variables.count != 1 ? NSLocalizedStringFromTable(@"nopMultipleErrorAlertMessage", ZGVariableActionsLocalizableTable, nil) : NSLocalizedStringFromTable(@"nopSingleErrorAlertMessage", ZGVariableActionsLocalizableTable, nil);
+		NSString *message = variables.count != 1 ? ZGLocalizedStringFromVariableActionsTable(@"nopMultipleErrorAlertMessage") : ZGLocalizedStringFromVariableActionsTable(@"nopSingleErrorAlertMessage");
 		
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"nopErrorAlertTitle", ZGVariableActionsLocalizableTable, nil), message);
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromVariableActionsTable(@"nopErrorAlertTitle"), message);
 	}
 }
 
 - (void)changeVariable:(ZGVariable *)variable newDescription:(NSAttributedString *)newDescription
 {
-	self.windowController.undoManager.actionName = NSLocalizedStringFromTable(@"undoDescriptionChange", ZGVariableActionsLocalizableTable, nil);
+	self.windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoDescriptionChange");
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
 	 newDescription:variable.fullAttributedDescription];
@@ -519,7 +519,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 - (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size
 {
-	self.windowController.undoManager.actionName = NSLocalizedStringFromTable(@"undoTypeChange", ZGVariableActionsLocalizableTable, nil);
+	self.windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoTypeChange");
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
 	 newType:variable.type
@@ -766,7 +766,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			
 			if (recordUndoFlag)
 			{
-				self.windowController.undoManager.actionName = NSLocalizedStringFromTable(@"undoFreezeValueChange", ZGVariableActionsLocalizableTable, nil);
+				self.windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoFreezeValueChange");
 				[[self.windowController.undoManager prepareWithInvocationTarget:self]
 				 changeVariable:variable
 				 newValue:variable.stringValue
@@ -806,7 +806,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			
 			if (successfulWrite && recordUndoFlag)
 			{
-				self.windowController.undoManager.actionName = NSLocalizedStringFromTable(@"undoValueChange", ZGVariableActionsLocalizableTable, nil);
+				self.windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoValueChange");
 				[[self.windowController.undoManager prepareWithInvocationTarget:self]
 				 changeVariable:variable
 				 newValue:oldStringValue
@@ -871,7 +871,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	if (undoableRowIndexes.count > 0)
 	{
-		NSString *activeChangeAction = (rowIndexes.count > 1) ? NSLocalizedStringFromTable(@"undoMultipleActiveChange", ZGVariableActionsLocalizableTable, nil) : NSLocalizedStringFromTable(@"undoSingleActiveChange", ZGVariableActionsLocalizableTable, nil);
+		NSString *activeChangeAction = (rowIndexes.count > 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoMultipleActiveChange") : ZGLocalizedStringFromVariableActionsTable(@"undoSingleActiveChange");
 		
 		self.windowController.undoManager.actionName = activeChangeAction;
 		
@@ -898,7 +898,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	[self.windowController.tableController.variablesTableView reloadData];
 	
-	self.windowController.undoManager.actionName = NSLocalizedStringFromTable(@"undoEditVariablesChange", ZGVariableActionsLocalizableTable, nil);
+	self.windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoEditVariablesChange");
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
 	 editVariables:variables
 	 newValues:oldValues];
@@ -908,7 +908,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 - (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula
 {
-	self.windowController.undoManager.actionName = NSLocalizedStringFromTable(@"undoAddressChange", ZGVariableActionsLocalizableTable, nil);
+	self.windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoAddressChange");
 	[[self.windowController.undoManager prepareWithInvocationTarget:self]
 	 editVariable:variable
 	 addressFormula:variable.addressFormula];
@@ -937,7 +937,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		variable.usesDynamicAddress = NO;
 	}
 	
-	NSString *actionName = (variables.count == 1) ? NSLocalizedStringFromTable(@"undoUnrelativizeSingleVariable", ZGVariableActionsLocalizableTable, nil) : NSLocalizedStringFromTable(@"undoUnrelativizeMultipleVariables", ZGVariableActionsLocalizableTable, nil);
+	NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoUnrelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoUnrelativizeMultipleVariables");
 	
 	self.windowController.undoManager.actionName = actionName;
 	[[self.windowController.undoManager prepareWithInvocationTarget:self] relativizeVariables:variables];
@@ -947,7 +947,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	[[self class] annotateVariables:variables process:self.windowController.currentProcess];
 	
-	NSString *actionName = (variables.count == 1) ? NSLocalizedStringFromTable(@"undoRelativizeSingleVariable", ZGVariableActionsLocalizableTable, nil) : NSLocalizedStringFromTable(@"undoRelativizeMultipleVariables", ZGVariableActionsLocalizableTable, nil);
+	NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeMultipleVariables");
 	
 	self.windowController.undoManager.actionName = actionName;
 	[[self.windowController.undoManager prepareWithInvocationTarget:self] unrelativizeVariables:variables];
@@ -1099,7 +1099,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	if (validVariables.count > 0)
 	{
-		self.windowController.undoManager.actionName = NSLocalizedStringFromTable(@"undoSizeChange", ZGVariableActionsLocalizableTable, nil);
+		self.windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoSizeChange");
 		[[self.windowController.undoManager prepareWithInvocationTarget:self]
 		 editVariables:validVariables
 		 requestedSizes:currentVariableSizes];
@@ -1113,7 +1113,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	else
 	{
-		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedChangeSizeAlertTitle", ZGVariableActionsLocalizableTable, nil), NSLocalizedStringFromTable(@"failedChangeSizeAlertMessage", ZGVariableActionsLocalizableTable, nil));
+		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromVariableActionsTable(@"failedChangeSizeAlertTitle"), ZGLocalizedStringFromVariableActionsTable(@"failedChangeSizeAlertMessage"));
 	}
 }
 
