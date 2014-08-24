@@ -1581,7 +1581,7 @@ enum ZGStepExecution
 		if (error != nil)
 		{
 			ZG_LOG(@"%@", error);
-			NSRunAlertPanel(NSLocalizedStringFromTable(@"failedModifyInstructionAlertTitle", ZGDebuggerLocalizationTable, nil), @"%@ \"%@\": %@", nil, nil, nil, NSLocalizedStringFromTable(@"failedModifyInstructionAlertMessage", ZGDebuggerLocalizationTable, nil), instructionText, [error.userInfo objectForKey:@"reason"]);
+			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedModifyInstructionAlertTitle", ZGDebuggerLocalizationTable, nil), [NSString stringWithFormat:@"%@ \"%@\": %@", NSLocalizedStringFromTable(@"failedModifyInstructionAlertMessage", ZGDebuggerLocalizationTable, nil), instructionText, [error.userInfo objectForKey:@"reason"]]);
 		}
 	}
 	else
@@ -1611,14 +1611,17 @@ enum ZGStepExecution
 		
 		if (bytesRead < originalOutputLength)
 		{
-			NSRunAlertPanel(NSLocalizedStringFromTable(@"failedOverwriteInstructionsAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedOverwriteInstructionsAlertMessage", ZGDebuggerLocalizationTable, nil), nil, nil, nil);
+			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedOverwriteInstructionsAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedOverwriteInstructionsAlertMessage", ZGDebuggerLocalizationTable, nil));
 		}
 		else
 		{
 			BOOL shouldOverwriteInstructions = YES;
-			if (numberOfInstructionsOverwritten > 1 && NSRunAlertPanel(NSLocalizedStringFromTable(@"overwriteConfirmationAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"overwriteConfirmationAlertMessage", ZGDebuggerLocalizationTable, nil), NSLocalizedString(@"Cancel", nil), NSLocalizedStringFromTable(@"overwrite", ZGDebuggerLocalizationTable, nil), nil, numberOfInstructionsOverwritten) != NSAlertAlternateReturn)
+			if (numberOfInstructionsOverwritten > 1)
 			{
-				shouldOverwriteInstructions = NO;
+				if (ZGRunAlertPanelWithDefaultAndCancelButton(NSLocalizedStringFromTable(@"overwriteConfirmationAlertTitle", ZGDebuggerLocalizationTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"overwriteConfirmationAlertMessageFormat", ZGDebuggerLocalizationTable, nil), numberOfInstructionsOverwritten], NSLocalizedStringFromTable(@"overwrite", ZGDebuggerLocalizationTable, nil)) == NSAlertSecondButtonReturn)
+				{
+					shouldOverwriteInstructions = NO;
+				}
 			}
 			
 			if (shouldOverwriteInstructions)
@@ -1790,7 +1793,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		NSRunAlertPanel(NSLocalizedStringFromTable(@"failedAddBreakpointAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedAddBreakpointAlertMessage", ZGDebuggerLocalizationTable, nil), nil, nil, nil);
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedAddBreakpointAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedAddBreakpointAlertMessage", ZGDebuggerLocalizationTable, nil));
 	}
 }
 
@@ -2009,7 +2012,7 @@ enum ZGStepExecution
 			
 			[self.loggerWindowController writeLine:[breakPoint.error.userInfo objectForKey:SCRIPT_PYTHON_ERROR]];
 			
-			NSRunAlertPanel(NSLocalizedStringFromTable(@"failedExecuteBreakpointConditionAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedExecuteBreakpointConditionAlertMessage", ZGDebuggerLocalizationTable, nil), nil, nil, nil, scriptContents, [breakPoint.error.userInfo objectForKey:SCRIPT_EVALUATION_ERROR_REASON]);
+			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedExecuteBreakpointConditionAlertTitle", ZGDebuggerLocalizationTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"failedExecuteBreakpointConditionAlertMessage", ZGDebuggerLocalizationTable, nil), scriptContents, [breakPoint.error.userInfo objectForKey:SCRIPT_EVALUATION_ERROR_REASON]]);
 			
 			breakPoint.error = nil;
 		}
@@ -2058,7 +2061,7 @@ enum ZGStepExecution
 		}
 		else
 		{
-			NSRunAlertPanel(NSLocalizedStringFromTable(@"failedStepOverAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedStepOverAlertMessage", ZGDebuggerLocalizationTable, nil), nil, nil, nil);
+			ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedStepOverAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedStepOverAlertMessage", ZGDebuggerLocalizationTable, nil));
 		}
 	}
 	else
@@ -2079,7 +2082,7 @@ enum ZGStepExecution
 	}
 	else
 	{
-		NSRunAlertPanel(NSLocalizedStringFromTable(@"failedStepOutAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedStepOutAlertMessage", ZGDebuggerLocalizationTable, nil), nil, nil, nil);
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedStepOutAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedStepOutAlertMessage", ZGDebuggerLocalizationTable, nil));
 	}
 }
 
@@ -2233,7 +2236,8 @@ enum ZGStepExecution
 	if (![self changeBreakPointCondition:condition atAddress:address error:&error])
 	{
 		[self.loggerWindowController writeLine:[error.userInfo objectForKey:SCRIPT_PYTHON_ERROR]];
-		NSRunAlertPanel(NSLocalizedStringFromTable(@"failedChangeBreakpointConditionAlertTitle", ZGDebuggerLocalizationTable, nil), NSLocalizedStringFromTable(@"failedChangeBreakpointConditionAlertMessageFormat", ZGDebuggerLocalizationTable, nil), nil, nil, nil, condition);
+		
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedChangeBreakpointConditionAlertTitle", ZGDebuggerLocalizationTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"failedChangeBreakpointConditionAlertMessageFormat", ZGDebuggerLocalizationTable, nil), condition]);
 	}
 	else
 	{

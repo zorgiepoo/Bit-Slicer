@@ -439,3 +439,26 @@ void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *in
 	userNotification.informativeText = informativeText;
 	[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 }
+
+static NSInteger ZGRunAlertPanelWithDefaultAndAlternativeButton(NSString *title, NSString *message, NSString *defaultButtonTitle, NSString *alternativeButtonTitle)
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	
+	alert.messageText = title;
+	alert.informativeText = message;
+	
+	if (defaultButtonTitle != nil) [alert addButtonWithTitle:defaultButtonTitle];
+	if (alternativeButtonTitle != nil) [alert addButtonWithTitle:alternativeButtonTitle];
+	
+	return [alert runModal];
+}
+
+void ZGRunAlertPanelWithOKButton(NSString *title, NSString *message)
+{
+	ZGRunAlertPanelWithDefaultAndAlternativeButton(title, message, NSLocalizedString(@"OK", nil), nil);
+}
+
+NSInteger ZGRunAlertPanelWithDefaultAndCancelButton(NSString *title, NSString *message, NSString *defaultButtonTitle)
+{
+	return ZGRunAlertPanelWithDefaultAndAlternativeButton(title, message, defaultButtonTitle, NSLocalizedString(@"Cancel", nil));
+}

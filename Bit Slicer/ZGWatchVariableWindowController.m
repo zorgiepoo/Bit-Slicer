@@ -159,16 +159,16 @@
 	}
 	else
 	{
-		NSInteger result = NSRunAlertPanel(
+		NSInteger result = ZGRunAlertPanelWithDefaultAndCancelButton(
 						[NSString stringWithFormat:ZGLocalizableWatchVariableString(@"targetTeriminatedAlertTitleFormat"), self.watchProcess.name],
 						ZGLocalizableWatchVariableString(@"targetTeriminatedAlertMessage"),
-						ZGLocalizableWatchVariableString(@"targetTeriminatedAlertAddButton"), ZGLocalizableWatchVariableString(@"targetTeriminatedAlertCancelButton"), nil);
+						ZGLocalizableWatchVariableString(@"targetTeriminatedAlertAddButton"));
 		switch (result)
 		{
-			case NSAlertDefaultReturn:
+			case NSAlertFirstButtonReturn:
 				[self stopWatchingAndAddInstructions:nil];
 				break;
-			case NSAlertAlternateReturn:
+			case NSAlertSecondButtonReturn:
 				[self cancel:nil];
 				break;
 		}
@@ -301,10 +301,9 @@
 	ZGBreakPoint *breakPoint = nil;
 	if (![self.breakPointController addWatchpointOnVariable:variable inProcess:process watchPointType:watchPointType delegate:self getBreakPoint:&breakPoint])
 	{
-		NSRunAlertPanel(
+		ZGRunAlertPanelWithOKButton(
 						ZGLocalizableWatchVariableString(@"failedToWatchVariableAlertTitle"),
-						ZGLocalizableWatchVariableString(@"failedToWatchVariableAlertMessage"),
-						nil, nil, nil);
+						ZGLocalizableWatchVariableString(@"failedToWatchVariableAlertMessage"));
 		return;
 	}
 	

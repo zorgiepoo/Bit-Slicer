@@ -101,11 +101,11 @@
 	
 	if (!ZGIsValidNumber(sizeExpression))
 	{
-		NSRunAlertPanel(NSLocalizedStringFromTable(@"invalidSizeAlertTitle", ZGEditSizeLocalizableTable, nil), NSLocalizedStringFromTable(@"invalidSizeAlertMessage", ZGEditSizeLocalizableTable, nil), nil, nil, nil);
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"invalidSizeAlertTitle", ZGEditSizeLocalizableTable, nil), NSLocalizedStringFromTable(@"invalidSizeAlertMessage", ZGEditSizeLocalizableTable, nil));
 	}
 	else if (requestedSize <= 0)
 	{
-		NSRunAlertPanel(NSLocalizedStringFromTable(@"sizeIsTooSmallAlertTitle", ZGEditSizeLocalizableTable, nil), NSLocalizedStringFromTable(@"sizeIsTooSmallAlertMessage", ZGEditSizeLocalizableTable, nil), nil, nil, nil);
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"sizeIsTooSmallAlertTitle", ZGEditSizeLocalizableTable, nil), NSLocalizedStringFromTable(@"sizeIsTooSmallAlertMessage", ZGEditSizeLocalizableTable, nil));
 	}
 	else
 	{

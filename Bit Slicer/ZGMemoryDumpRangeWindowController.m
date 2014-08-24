@@ -96,20 +96,14 @@
 				 
 				 if (!success)
 				 {
-					 NSRunAlertPanel(
-									 NSLocalizedStringFromTable(@"failedDumpingMemoryAlertTitle", ZGDumpMemoryRangeLocalizableTable, nil),
-									 NSLocalizedStringFromTable(@"failedDumpingMemoryAlertMessageFormat", ZGDumpMemoryRangeLocalizableTable, nil),
-									 nil, nil, nil, fromAddress, toAddress);
+					 ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedDumpingMemoryAlertTitle", ZGDumpMemoryRangeLocalizableTable, nil), [NSString stringWithFormat:NSLocalizedStringFromTable(@"failedDumpingMemoryAlertMessageFormat", ZGDumpMemoryRangeLocalizableTable, nil), fromAddress, toAddress]);
 				 }
 			 }
 		 }];
 	}
 	else
 	{
-		NSRunAlertPanel(
-						NSLocalizedStringFromTable(@"invalidAddressRangeAlertTitle", ZGDumpMemoryRangeLocalizableTable, nil),
-						NSLocalizedStringFromTable(@"invalidAddressRangeAlertMessage", ZGDumpMemoryRangeLocalizableTable, nil),
-						nil, nil, nil);
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"invalidAddressRangeAlertTitle", ZGDumpMemoryRangeLocalizableTable, nil), NSLocalizedStringFromTable(@"invalidAddressRangeAlertMessage", ZGDumpMemoryRangeLocalizableTable, nil));
 	}
 }
 

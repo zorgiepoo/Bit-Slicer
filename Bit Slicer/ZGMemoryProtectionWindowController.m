@@ -68,10 +68,9 @@
 	
 	if (!success)
 	{
-		NSRunAlertPanel(
+		ZGRunAlertPanelWithOKButton(
 						NSLocalizedStringFromTable(@"protectionChangeFailedAlertTitle", ZGMemoryProtectionLocalizableTable, nil),
-						NSLocalizedStringFromTable(@"protectionChangeFailedAlertMessage", ZGMemoryProtectionLocalizableTable, nil),
-						nil, nil, nil);
+						NSLocalizedStringFromTable(@"protectionChangeFailedAlertMessage", ZGMemoryProtectionLocalizableTable, nil));
 	}
 	else
 	{
@@ -99,10 +98,9 @@
 		ZGMemoryProtection oldProtection;
 		if (!ZGMemoryProtectionInRegion(self.process.processTask, &memoryAddress, &memorySize, &oldProtection))
 		{
-			NSRunAlertPanel(
+			ZGRunAlertPanelWithOKButton(
 							NSLocalizedStringFromTable(@"protectionChangeFailedAlertTitle", ZGMemoryProtectionLocalizableTable, nil),
-							NSLocalizedStringFromTable(@"findMemoryRegionFailedAlertMessage", ZGMemoryProtectionLocalizableTable, nil),
-							nil, nil, nil);
+							NSLocalizedStringFromTable(@"findMemoryRegionFailedAlertMessage", ZGMemoryProtectionLocalizableTable, nil));
 		}
 		else
 		{
@@ -132,10 +130,9 @@
 	}
 	else
 	{
-		NSRunAlertPanel(
+		ZGRunAlertPanelWithOKButton(
 						NSLocalizedStringFromTable(@"invalidAddressRangeAlertTitle", ZGMemoryProtectionLocalizableTable, nil),
-						NSLocalizedStringFromTable(@"invalidAddressRangeAlertMessage", ZGMemoryProtectionLocalizableTable, nil),
-						nil, nil, nil);
+						NSLocalizedStringFromTable(@"invalidAddressRangeAlertMessage", ZGMemoryProtectionLocalizableTable, nil));
 	}
 }
 

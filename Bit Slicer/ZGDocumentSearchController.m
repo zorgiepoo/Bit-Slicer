@@ -671,7 +671,7 @@
 	NSError *error = nil;
 	if (![self retrieveSearchDataWithError:&error])
 	{
-		NSRunAlertPanel(ZGLocalizableSearchDocumentString(@"invalidSearchInputAlertTitle"), @"%@", nil, nil, nil, [error.userInfo objectForKey:ZGRetrieveFlagsErrorDescriptionKey]);
+		ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"invalidSearchInputAlertTitle"), [error.userInfo objectForKey:ZGRetrieveFlagsErrorDescriptionKey]);
 		return;
 	}
 	

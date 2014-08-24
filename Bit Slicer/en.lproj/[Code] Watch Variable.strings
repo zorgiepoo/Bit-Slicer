@@ -15,9 +15,6 @@
 /* Alert responce to adding the found instructions when the target process terminated */
 "targetTeriminatedAlertAddButton" = "Add";
 
-/* Alert responce to NOT adding the found instructions when the target process terminated */
-"targetTeriminatedAlertCancelButton" = "Cancel";
-
 /* Annotated description annotated label for general purpose registers; not sure if this should be localized */
 "generalPurposeRegistersDescriptionLabel" = "General Purpose Registers";
 

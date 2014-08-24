@@ -1256,7 +1256,7 @@
 	{
 		if (ZGIsFunctionTypeStore([self selectedFunctionType]) && self.searchData.savedData == nil)
 		{
-			NSRunAlertPanel(ZGLocalizableSearchDocumentString(@"noStoredValuesAlertTitle"), ZGLocalizableSearchDocumentString(@"noStoredValuesAlertMessage"), nil, nil, nil);
+			ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"noStoredValuesAlertTitle"), ZGLocalizableSearchDocumentString(@"noStoredValuesAlertMessage"));
 		}
 		else
 		{

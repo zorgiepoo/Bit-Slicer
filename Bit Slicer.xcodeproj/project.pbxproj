@@ -48,6 +48,7 @@
 		726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D319606E2900A6AD40 /* Edit Description Dialog.xib */; };
 		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
+		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
 		72D051AC1960891900EC532A /* Backtrace View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AE1960891900EC532A /* Backtrace View.xib */; };
 		72D051CB1960A41F00EC532A /* Registers View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051C91960A41F00EC532A /* Registers View.xib */; };
@@ -321,6 +322,7 @@
 		726CA2D219606E2900A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Edit Description Dialog.xib"; sourceTree = "<group>"; };
 		726CA2D519606E3100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Search Options.xib"; sourceTree = "<group>"; };
 		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Watch Variable Dialog.xib"; sourceTree = "<group>"; };
+		7284245619A96B470081C673 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Data Inspector View.xib"; sourceTree = "<group>"; };
 		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Backtrace View.xib"; sourceTree = "<group>"; };
 		72D051CA1960A41F00EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Registers View.xib"; sourceTree = "<group>"; };
@@ -886,6 +888,7 @@
 		72D271D1197C2A1400CC6914 /* Strings */ = {
 			isa = PBXGroup;
 			children = (
+				7284245519A96B470081C673 /* Localizable.strings */,
 				724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */,
 				724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */,
 				724A9F0719A1657500E72C9D /* [Code] Debugger.strings */,
@@ -1569,6 +1572,7 @@
 				726CA2A919606D0000A6AD40 /* Code Injection Window.xib in Resources */,
 				724A9F5119A8F54600E72C9D /* [Code] Search Document.stringsdict in Resources */,
 				724A9F2619A1657500E72C9D /* [Code] Memory Viewer.strings in Resources */,
+				7284245719A96B470081C673 /* Localizable.strings in Resources */,
 				77DA9D0B1800639E00549A37 /* continue.pdf in Resources */,
 				726CA2AF19606D1200A6AD40 /* Memory Viewer Window.xib in Resources */,
 				726CA2B619606DD200A6AD40 /* Change Memory Protection Dialog.xib in Resources */,
@@ -2155,6 +2159,14 @@
 			);
 			name = "Watch Variable Dialog.xib";
 			path = "Bit Slicer";
+			sourceTree = "<group>";
+		};
+		7284245519A96B470081C673 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7284245619A96B470081C673 /* en */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		72D051AB1960890800EC532A /* Data Inspector View.xib */ = {

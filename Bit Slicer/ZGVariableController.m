@@ -498,7 +498,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		NSString *message = variables.count != 1 ? NSLocalizedStringFromTable(@"nopMultipleErrorAlertMessage", ZGVariableActionsLocalizableTable, nil) : NSLocalizedStringFromTable(@"nopSingleErrorAlertMessage", ZGVariableActionsLocalizableTable, nil);
 		
-		NSRunAlertPanel(NSLocalizedStringFromTable(@"nopErrorAlertTitle", ZGVariableActionsLocalizableTable, nil), @"%@", nil, nil, nil, message);
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"nopErrorAlertTitle", ZGVariableActionsLocalizableTable, nil), message);
 	}
 }
 
@@ -1113,7 +1113,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	else
 	{
-		NSRunAlertPanel(NSLocalizedStringFromTable(@"failedChangeSizeAlertTitle", ZGVariableActionsLocalizableTable, nil), NSLocalizedStringFromTable(@"failedChangeSizeAlertMessage", ZGVariableActionsLocalizableTable, nil), nil, nil, nil);
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"failedChangeSizeAlertTitle", ZGVariableActionsLocalizableTable, nil), NSLocalizedStringFromTable(@"failedChangeSizeAlertMessage", ZGVariableActionsLocalizableTable, nil));
 	}
 }
 

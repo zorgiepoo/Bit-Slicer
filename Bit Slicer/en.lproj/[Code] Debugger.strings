@@ -49,7 +49,7 @@
 "overwriteConfirmationAlertTitle" = "Overwrite Instructions";
 
 /* Alert message that shows up when changing an instruction may require altering more than one instruction */
-"overwriteConfirmationAlertMessage" = "This modification will overwrite %ld instructions. Are you sure you want to overwrite them?";
+"overwriteConfirmationAlertMessageFormat" = "This modification will overwrite %ld instructions. Are you sure you want to overwrite them?";
 
 /* Alert button that shows up when changing an instruction may require altering more than one instruction */
 "overwrite" = "Overwrite";

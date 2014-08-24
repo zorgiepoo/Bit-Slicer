@@ -102,10 +102,9 @@
 				 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 					 if (!ZGDumpAllDataToDirectory(savePanel.URL.relativePath, process.processTask, self))
 					 {
-						 NSRunAlertPanel(
+						 ZGRunAlertPanelWithOKButton(
 										 NSLocalizedStringFromTable(@"failedMemoryDumpAlertTitle", ZGDumpAllMemoryLocalizableTable, nil),
-										 NSLocalizedStringFromTable(@"failedMemoryDumpAlertMessage", ZGDumpAllMemoryLocalizableTable, nil),
-										 nil, nil, nil);
+										 NSLocalizedStringFromTable(@"failedMemoryDumpAlertMessage", ZGDumpAllMemoryLocalizableTable, nil));
 					 }
 					 
 					 dispatch_async(dispatch_get_main_queue(), ^{

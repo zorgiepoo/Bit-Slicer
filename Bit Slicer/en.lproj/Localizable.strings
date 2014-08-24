@@ -1,0 +1,13 @@
+/*
+ Localizable.strings
+ Bit Slicer
+ 
+ Created by Mayur Pawashe on 8/23/14.
+ 
+ */
+
+/* OK that would show up in alerts usually */
+"OK" = "OK";
+
+/* Cancel that would show up in alerts usually */
+"Cancel" = "Cancel";

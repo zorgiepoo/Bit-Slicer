@@ -193,7 +193,7 @@
 	
 	if (validVariables.count == 0)
 	{
-		NSRunAlertPanel(NSLocalizedStringFromTable(@"overwriteValueFailedAlertTitle", ZGEditValueLocalizableTable, nil), NSLocalizedStringFromTable(@"overwriteValueFailedAlertMessage", ZGEditValueLocalizableTable, nil), nil, nil, nil);
+		ZGRunAlertPanelWithOKButton(NSLocalizedStringFromTable(@"overwriteValueFailedAlertTitle", ZGEditValueLocalizableTable, nil), NSLocalizedStringFromTable(@"overwriteValueFailedAlertMessage", ZGEditValueLocalizableTable, nil));
 		return;
 	}
 	
