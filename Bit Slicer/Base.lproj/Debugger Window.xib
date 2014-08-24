@@ -101,13 +101,13 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA" customClass="ZGTableView">
-                                            <rect key="frame" x="0.0" y="0.0" width="855" height="268"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="840" height="268"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                             <tableColumns>
-                                                <tableColumn identifier="breakpoint" width="50" minWidth="20" maxWidth="1000" id="pCd-L4-hx2">
+                                                <tableColumn identifier="breakpoint" width="50" minWidth="20" maxWidth="100" id="pCd-L4-hx2">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Break">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -132,7 +132,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                                 </tableColumn>
-                                                <tableColumn identifier="instruction" width="270" minWidth="40" maxWidth="10000" id="hhm-Yo-i9h">
+                                                <tableColumn identifier="instruction" width="240.8359375" minWidth="40" maxWidth="10000" id="hhm-Yo-i9h">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Instruction">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -145,7 +145,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                 </tableColumn>
-                                                <tableColumn identifier="symbols" editable="NO" width="182" minWidth="10" maxWidth="3.4028234663852886e+38" id="t9W-pd-V9s">
+                                                <tableColumn identifier="symbols" editable="NO" width="184.9609375" minWidth="10" maxWidth="3.4028234663852886e+38" id="t9W-pd-V9s">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Symbols">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -158,7 +158,7 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                 </tableColumn>
-                                                <tableColumn identifier="bytes" width="207" minWidth="10" maxWidth="1000" id="bfc-Km-I9g">
+                                                <tableColumn identifier="bytes" width="218" minWidth="10" maxWidth="1500" id="bfc-Km-I9g">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Bytes">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -181,7 +181,7 @@
                                     </subviews>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </clipView>
-                                <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="Uyj-zZ-YCW">
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="Uyj-zZ-YCW">
                                     <rect key="frame" x="0.0" y="269" width="840" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
@@ -190,7 +190,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <tableHeaderView key="headerView" id="tpt-Jt-lnH">
-                                    <rect key="frame" x="0.0" y="0.0" width="855" height="17"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="840" height="17"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
