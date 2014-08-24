@@ -164,7 +164,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		NSAttributedString *variableDescription = [coder decodeObjectForKey:ZGDescriptionKey];
 		if (variableDescription == nil)
 		{
-			variableDescription = [[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:ZGNameKey]];
+			NSString *name = [coder decodeObjectForKey:ZGNameKey];
+			if (name != nil)
+			{
+				variableDescription = [[NSAttributedString alloc] initWithString:name];
+			}
 		}
 		self.fullAttributedDescription = variableDescription != nil ? variableDescription : [[NSAttributedString alloc] initWithString:@""];
 		
