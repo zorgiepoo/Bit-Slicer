@@ -29,10 +29,13 @@
 //	distribution.
 //
 
+// Modified slightly; see .m file
+
 #import <Cocoa/Cocoa.h>
 @protocol AGScopeBarDelegate;
 @class AGScopeBar;
 @class AGScopeBarGroup;
+@class AGScopeBarAppearance;
 
 
 typedef enum {
@@ -137,8 +140,8 @@ typedef enum {
 	BOOL mSmartResizeEnabled;
 	NSView * mAccessoryView;
 	NSArray * mGroups;
-	NSColor * mBottomBorderColor;
 	BOOL mIsEnabled;
+	AGScopeBarAppearance * mScopeBarAppearance;
 	
 	BOOL mNeedsTiling;
 }
@@ -149,8 +152,9 @@ typedef enum {
 @property (nonatomic, readwrite, retain) NSView * accessoryView;
 @property (nonatomic, readwrite, copy) NSArray * groups;
 @property (nonatomic, readwrite, assign, getter=isEnabled) BOOL enabled;
+@property (nonatomic, readwrite, retain) AGScopeBarAppearance * scopeBarAppearance;
 
-@property (nonatomic, readwrite, retain) NSColor * bottomBorderColor;
+@property (nonatomic, readwrite, retain) NSColor * bottomBorderColor; //! Deprecated. Use scopeBarAppearance.borderColor
 + (CGFloat)scopeBarHeight;
 - (void)smartResize;
 
@@ -180,5 +184,39 @@ typedef enum {
 // If the following method is not implemented, all groups except the first will have a separator before them.
 - (BOOL)scopeBar:(AGScopeBar *)theScopeBar showSeparatorBeforeGroup:(AGScopeBarGroup *)group;
 
+@end
+
+
+
+
+
+@interface AGScopeBarAppearance : NSObject
+{
+	NSColor * backgroundTopColor;
+	NSColor * backgroundBottomColor;
+	NSColor * inactiveBackgroundTopColor;
+	NSColor * inactiveBackgroundBottomColor;
+	NSColor * borderBottomColor;
+	NSColor * separatorColor;
+	CGFloat separatorWidth;
+	CGFloat separatorHeight;
+	NSColor * labelColor;
+	NSFont * labelFont;
+	NSFont * itemButtonFont;
+	NSFont * menuItemFont;
+}
+
+@property (nonatomic, readwrite, copy)   NSColor * backgroundTopColor;
+@property (nonatomic, readwrite, copy)   NSColor * backgroundBottomColor;
+@property (nonatomic, readwrite, copy)   NSColor * inactiveBackgroundTopColor;
+@property (nonatomic, readwrite, copy)   NSColor * inactiveBackgroundBottomColor;
+@property (nonatomic, readwrite, copy)   NSColor * borderBottomColor;
+@property (nonatomic, readwrite, copy)   NSColor * separatorColor; // color of vertical-line separators between groups
+@property (nonatomic, readwrite, assign) CGFloat separatorWidth;   // width of vertical-line separators between groups
+@property (nonatomic, readwrite, assign) CGFloat separatorHeight;  // separators are vertically centered in the bar
+@property (nonatomic, readwrite, copy)   NSColor * labelColor;     // color of groups' labels
+@property (nonatomic, readwrite, copy)   NSFont * labelFont;       // font of groups' labels
+@property (nonatomic, readwrite, copy)   NSFont * itemButtonFont;  // font of group and item buttons
+@property (nonatomic, readwrite, copy)   NSFont * menuItemFont;
 @end
 

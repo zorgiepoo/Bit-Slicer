@@ -29,30 +29,19 @@
 //	distribution.
 //
 
+// Modified by Mayur to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
+// and replacing deprecated Gestalt() with using NSAppKitVersionNumber
+
 #import "AGScopeBar.h"
 
 
 
+#define SCOPE_BAR_HORZ_INSET			8.0						// inset on left and right
+#define SCOPE_BAR_HEIGHT				25.0					// used in -sizeToFit
 
-#define SCOPE_BAR_HORZ_INSET			8.0																		// inset on left and right
-#define SCOPE_BAR_HEIGHT				25.0																	// used in -sizeToFit
-#define SCOPE_BAR_START_COLOR_GRAY		[NSColor colorWithCalibratedWhite:0.75 alpha:1.0]						// bottom color of gray gradient
-#define SCOPE_BAR_END_COLOR_GRAY		[NSColor colorWithCalibratedWhite:0.90 alpha:1.0]						// top color of gray gradient
-#define SCOPE_BAR_BORDER_COLOR			[NSColor colorWithCalibratedWhite:0.5 alpha:1.0]						// bottom line's color
-
-#define SCOPE_BAR_SEPARATOR_COLOR		[NSColor colorWithCalibratedWhite:0.52 alpha:1.0]	// color of vertical-line separators between groups
-#define SCOPE_BAR_SEPARATOR_WIDTH		1.0													// width of vertical-line separators between groups
-#define SCOPE_BAR_SEPARATOR_HEIGHT		16.0												// separators are vertically centered in the bar
-
-#define SCOPE_BAR_LABEL_COLOR			[NSColor colorWithCalibratedWhite:0.45 alpha:1.0]	// color of groups' labels
-#define SCOPE_BAR_FONTSIZE				12.0												// font-size of labels and buttons
-
-#define SCOPE_BAR_FONT                  [NSFont boldSystemFontOfSize:SCOPE_BAR_FONTSIZE]
-#define SCOPE_BAR_MENUITEM_FONT			[NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSRegularControlSize]]
-
-#define SCOPE_BAR_GROUP_SPACING			8.0													// spacing between buttons/separators/labels
-#define SCOPE_BAR_ITEM_SPACING			2.0													// spacing between buttons/separators/labels
-#define SCOPE_BAR_BUTTON_IMAGE_SIZE		16.0												// size of buttons' images (width and height)
+#define SCOPE_BAR_GROUP_SPACING			8.0						// spacing between buttons/separators/labels
+#define SCOPE_BAR_ITEM_SPACING			2.0						// spacing between buttons/separators/labels
+#define SCOPE_BAR_BUTTON_IMAGE_SIZE		16.0					// size of buttons' images (width and height)
 
 #define POPUP_MIN_WIDTH					40.0					// minimum width a popup-button can be narrowed to.
 #define POPUP_MAX_WIDTH                 200.0
@@ -82,6 +71,7 @@
 - (void)_recreateButton;
 - (void)_updateButton;
 - (void)_updateEnabling;
+- (void)_updateStyleFromScopeBarAppearance;
 @end
 
 
@@ -112,16 +102,61 @@
 @implementation AGScopeBar
 
 
+// For detecting if user is > 10.9 for below code
+#ifndef NSAppKitVersionNumber10_9
+#define NSAppKitVersionNumber10_9 1265
+#endif
+
 - (id)initWithFrame:(NSRect)frameRect
 {
 	if (!(self = [super initWithFrame:frameRect])) {
 		return nil;
 	}
 	
-	mBottomBorderColor = [SCOPE_BAR_BORDER_COLOR retain];
 	mSmartResizeEnabled = YES;
 	mGroups = [[NSArray array] retain];
 	mIsEnabled = YES;
+	
+	{
+		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_9) {
+			// Yosemite and Later
+			mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
+			
+			mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:0.89 alpha:1.0];
+			mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:0.87 alpha:1.0];
+			mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:0.95 alpha:1.0];
+			mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:0.95 alpha:1.0];
+			mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:0.6 alpha:1.0];
+			
+			mScopeBarAppearance.separatorColor                  = [NSColor colorWithCalibratedWhite:0.52 alpha:1.0];
+			mScopeBarAppearance.separatorWidth                  = 1.0;
+			mScopeBarAppearance.separatorHeight                 = 16.0;
+			
+			mScopeBarAppearance.labelColor                      = [NSColor colorWithCalibratedWhite:0.45 alpha:1.0];
+			mScopeBarAppearance.labelFont                       = [NSFont boldSystemFontOfSize:12.0];
+			mScopeBarAppearance.itemButtonFont                  = [NSFont boldSystemFontOfSize:12.0];
+			mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSRegularControlSize]];
+			
+		} else {
+			// Mavericks and before
+			mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
+			
+			mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:0.90 alpha:1.0];
+			mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:0.75 alpha:1.0];
+			mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:0.90 alpha:1.0];
+			mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:0.75 alpha:1.0];
+			mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:0.5 alpha:1.0];
+			
+			mScopeBarAppearance.separatorColor                  = [NSColor colorWithCalibratedWhite:0.52 alpha:1.0];
+			mScopeBarAppearance.separatorWidth                  = 1.0;
+			mScopeBarAppearance.separatorHeight                 = 16.0;
+			
+			mScopeBarAppearance.labelColor                      = [NSColor colorWithCalibratedWhite:0.45 alpha:1.0];
+			mScopeBarAppearance.labelFont                       = [NSFont boldSystemFontOfSize:12.0];
+			mScopeBarAppearance.itemButtonFont                  = [NSFont boldSystemFontOfSize:12.0];
+			mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSRegularControlSize]];
+		}
+	}
 	
 	return self;
 }
@@ -136,7 +171,7 @@
 	
 	[mAccessoryView release];
 	[mGroups release];
-	[mBottomBorderColor release];
+	[mScopeBarAppearance release];
 	[super dealloc];
 }
 
@@ -147,6 +182,7 @@
 #pragma mark Properties
 
 @synthesize delegate = mDelegate;
+@synthesize scopeBarAppearance = mScopeBarAppearance;
 
 
 - (void)setEnabled:(BOOL)enabled;
@@ -227,14 +263,13 @@
 
 - (void)setBottomBorderColor:(NSColor *)bottomBorderColor;
 {
-	[mBottomBorderColor autorelease];
-	mBottomBorderColor = [bottomBorderColor retain];
+	self.scopeBarAppearance.borderBottomColor = bottomBorderColor;
 }
 
 
 - (NSColor *)bottomBorderColor;
 {
-	return mBottomBorderColor;
+	return self.scopeBarAppearance.borderBottomColor;
 }
 
 
@@ -353,6 +388,31 @@
 #pragma mark -
 #pragma mark Drawing
 
+- (void)viewWillMoveToWindow:(NSWindow *)newWindow;
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowDidBecomeMainNotification object:self.window];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowDidResignMainNotification object:self.window];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidResignActiveNotification object:nil];
+	
+	if (newWindow) {
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(redrawBecauseOfWindowChange:) name:NSWindowDidBecomeMainNotification object:newWindow];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(redrawBecauseOfWindowChange:) name:NSWindowDidResignMainNotification object:newWindow];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(redrawBecauseOfWindowChange:) name:NSApplicationDidBecomeActiveNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(redrawBecauseOfWindowChange:) name:NSApplicationDidResignActiveNotification object:nil];
+	}
+}
+
+
+
+- (void)redrawBecauseOfWindowChange:(NSNotification *)__unused notification
+{
+	// Redraw so it matches active/inactive window appearance
+	[self setNeedsDisplay:YES];
+}
+
+
+
 - (void)viewWillDraw;
 {
 	if (mNeedsTiling) {
@@ -364,26 +424,36 @@
 
 - (void)drawRect:(NSRect)__unused dirtyRect;
 {
+	BOOL isWindowActive = (self.window.isMainWindow || self.window.isKeyWindow);
+	
+	
 	// Draw gradient background
-	NSGradient * gradient = [[[NSGradient alloc] initWithStartingColor:SCOPE_BAR_START_COLOR_GRAY 
-														   endingColor:SCOPE_BAR_END_COLOR_GRAY] autorelease];
+	NSGradient * gradient = nil;
+	if (isWindowActive) {
+		gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.backgroundBottomColor
+												  endingColor:self.scopeBarAppearance.backgroundTopColor] autorelease];
+	} else {
+		gradient = [[[NSGradient alloc] initWithStartingColor:self.scopeBarAppearance.inactiveBackgroundBottomColor
+												  endingColor:self.scopeBarAppearance.inactiveBackgroundTopColor] autorelease];
+	}
+	
 	[gradient drawInRect:self.bounds angle:90.0];
 	
 	// Draw border
-	if (self.bottomBorderColor) {
+	if (self.scopeBarAppearance.borderBottomColor) {
 		NSRect lineRect = NSMakeRect(0, 0, self.bounds.size.width, 1);
-		[self.bottomBorderColor set];
+		[self.scopeBarAppearance.borderBottomColor set];
 		NSRectFill(lineRect);
 	}
 	
 	// Draw separators
-	[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL * __unused stop) {
+	[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, __unused BOOL *stop) {
 		if ((groupIndex > 0) && (group.showsSeparator)) {
-			NSRect sepRect = NSMakeRect(0, 0, SCOPE_BAR_SEPARATOR_WIDTH, SCOPE_BAR_SEPARATOR_HEIGHT);
+			NSRect sepRect = NSMakeRect(0, 0, self.scopeBarAppearance.separatorWidth, self.scopeBarAppearance.separatorHeight);
 			sepRect.origin.y = ((self.bounds.size.height - sepRect.size.height) / 2.0);
 			sepRect.origin.x = NSMinX(group.view.frame) - SCOPE_BAR_GROUP_SPACING;
 			
-			[SCOPE_BAR_SEPARATOR_COLOR set];
+			[self.scopeBarAppearance.separatorColor set];
 			NSRectFill(sepRect);
 		}
 	}];
@@ -395,17 +465,6 @@
 
 #pragma mark -
 #pragma mark Private
-
-- (void)scopeButtonClicked:(id)sender
-{
-	BOOL senderIsMenuItem = [sender isKindOfClass:[NSMenuItem class]];
-	AGScopeBarItem * item = (senderIsMenuItem ? [(NSMenuItem *)sender representedObject] : [(NSCell *)[sender cell] representedObject]);
-	AGScopeBarGroup * group = [self groupContainingItem:item];
-	
-	[group setSelected:!item.isSelected forItem:item];
-}
-
-
 
 - (void)tile;
 {
@@ -431,9 +490,9 @@
 	
 	
 	// Get maxNeededSpaceForGroups
-	[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL * __unused stop){
+	[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, __unused BOOL *stop){
 		if (groupIndex > 0) {
-			if (group.showsSeparator) maxNeededSpaceForGroups += SCOPE_BAR_SEPARATOR_WIDTH;
+			if (group.showsSeparator) maxNeededSpaceForGroups += self.scopeBarAppearance.separatorWidth;
 			maxNeededSpaceForGroups += SCOPE_BAR_GROUP_SPACING;
 		}
 		
@@ -464,7 +523,7 @@
 			hasCollapsedAllGroups = YES;
 			
 			// Collapse a group
-			[self.groups enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(AGScopeBarGroup * group, NSUInteger __unused groupIndex, BOOL *stop){
+			[self.groups enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(AGScopeBarGroup * group, __unused NSUInteger groupIndex, BOOL *stop){
 				if (group.canBeCollapsed && !group.isCollapsed) {
 					hasCollapsedAllGroups = NO;
 					group.isCollapsed = YES;
@@ -473,9 +532,9 @@
 			}];
 			
 			// Calculate needed space for groups
-			[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, BOOL * __unused stop){
+			[self.groups enumerateObjectsUsingBlock:^(AGScopeBarGroup * group, NSUInteger groupIndex, __unused BOOL *stop){
 				if (groupIndex > 0) {
-					if (group.showsSeparator) maxNeededSpaceForGroups += SCOPE_BAR_SEPARATOR_WIDTH;
+					if (group.showsSeparator) maxNeededSpaceForGroups += self.scopeBarAppearance.separatorWidth;
 					neededSpace += SCOPE_BAR_GROUP_SPACING;
 				}
 				
@@ -501,7 +560,7 @@
 		
 		for (AGScopeBarGroup * group in self.groups) {
 			if (groupIndex > 0) {
-				if (group.showsSeparator) xOffset += SCOPE_BAR_SEPARATOR_WIDTH;
+				if (group.showsSeparator) xOffset += self.scopeBarAppearance.separatorWidth;
 				xOffset += SCOPE_BAR_GROUP_SPACING;
 			}
 			
@@ -547,7 +606,7 @@
 
 + (AGScopeBarGroup *)groupWithIdentifier:(NSString *)identifier;
 {
-	return [[(AGScopeBarGroup *)[self alloc] initWithIdentifier:identifier] autorelease];
+	return [[(AGScopeBarGroup *)[[self class] alloc] initWithIdentifier:identifier] autorelease];
 }
 
 
@@ -570,16 +629,12 @@
 	mLabelField.editable = NO;
 	mLabelField.bordered = NO;
 	mLabelField.drawsBackground = NO;
-	mLabelField.textColor = SCOPE_BAR_LABEL_COLOR;
-	mLabelField.font = SCOPE_BAR_FONT;
 	
 	mCollapsedView = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 0, [AGScopeBar scopeBarHeight])];
 	mCollapsedLabelField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 0, 0)];
 	mCollapsedLabelField.editable = NO;
 	mCollapsedLabelField.bordered = NO;
 	mCollapsedLabelField.drawsBackground = NO;
-	mCollapsedLabelField.textColor = SCOPE_BAR_LABEL_COLOR;
-	mCollapsedLabelField.font = SCOPE_BAR_FONT;
 	
 	mGroupPopupButton = [[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO];
 	mGroupPopupButton.cell = [[[AGScopeBarPopupButtonCell alloc] initTextCell:@"" pullsDown:NO] autorelease];
@@ -856,6 +911,13 @@
 
 - (void)tile;
 {
+	mLabelField.textColor = self.scopeBar.scopeBarAppearance.labelColor;
+	mLabelField.font = self.scopeBar.scopeBarAppearance.labelFont;
+	
+	mCollapsedLabelField.textColor = self.scopeBar.scopeBarAppearance.labelColor;
+	mCollapsedLabelField.font = self.scopeBar.scopeBarAppearance.labelFont;
+	
+	
 	// Full View
 	// -----------------------------------------
 	{
@@ -893,6 +955,7 @@
 		// Items
 		for (AGScopeBarItem * item in self.items) {
 			[item _updateEnabling];
+			[item _updateStyleFromScopeBarAppearance];
 			[mView addSubview:item.button];
 			
 			NSRect itemFrame = item.button.frame;
@@ -952,8 +1015,8 @@
 			}
 			
 			
-			[mGroupPopupButton.menu setFont:SCOPE_BAR_MENUITEM_FONT];
-			[mGroupPopupButton setFont:SCOPE_BAR_FONT];
+			[mGroupPopupButton.menu setFont:mScopeBar.scopeBarAppearance.menuItemFont];
+			[mGroupPopupButton setFont:mScopeBar.scopeBarAppearance.itemButtonFont];
 			[mGroupPopupButton setBezelStyle:NSRecessedBezelStyle];
 			[mGroupPopupButton setButtonType:NSPushOnPushOffButton];
 			[mGroupPopupButton.cell setHighlightsBy:NSCellIsBordered | NSCellIsInsetButton];
@@ -1200,7 +1263,7 @@
 
 + (AGScopeBarItem *)itemWithIdentifier:(NSString *)identifier;
 {
-	return [[(AGScopeBarItem *)[self alloc] initWithIdentifier:identifier] autorelease];
+	return [[(AGScopeBarItem *)[[self class] alloc] initWithIdentifier:identifier] autorelease];
 }
 
 
@@ -1354,7 +1417,6 @@
 	[mMenuItem setTitle:title];
 	[mMenuItem setTarget:self];
 	[mMenuItem setImage:self.image];
-	[mMenuItem setRepresentedObject:self];
 	[mMenuItem setSubmenu:self.menu];
 	[mMenuItem setState:(self.isSelected ? NSOnState : NSOffState)];
 	
@@ -1403,7 +1465,7 @@
 			[self.menu insertItem:titleItem atIndex:0];
 		}
 		
-		[self.menu setFont:SCOPE_BAR_MENUITEM_FONT];
+		[self.menu setFont:self.group.scopeBar.scopeBarAppearance.menuItemFont];
 		
 		
 		// Standard Button
@@ -1428,9 +1490,8 @@
 		[button setImagePosition:NSNoImage];
 	}
 	
+	[button setFont:self.group.scopeBar.scopeBarAppearance.itemButtonFont];
 	[button setToolTip:self.toolTip];
-	[(NSCell *)button.cell setRepresentedObject:self];
-	[button setFont:SCOPE_BAR_FONT];
 	[button setTarget:self];
 	[button setAction:@selector(scopeButtonClicked:)];
 	[button setBezelStyle:NSRecessedBezelStyle];
@@ -1482,6 +1543,19 @@
 
 
 
+- (void)_updateStyleFromScopeBarAppearance;
+{
+	[mButton setFont:self.group.scopeBar.scopeBarAppearance.itemButtonFont];
+	
+	if (self.menu) {
+		[self.menu setFont:self.group.scopeBar.scopeBarAppearance.itemButtonFont];
+	}
+	
+	[mButton sizeToFit];
+}
+
+
+
 - (void)_updateEnabling;
 {
 	mButton.enabled = (self.group.scopeBar.isEnabled && self.group.isEnabled && self.isEnabled);
@@ -1489,9 +1563,9 @@
 
 
 
-- (void)scopeButtonClicked:(id)sender;
+- (void)scopeButtonClicked:(id)__unused sender;
 {
-	[self.group.scopeBar scopeButtonClicked:sender];
+	[self.group setSelected:!self.isSelected forItem:self];
 }
 
 
@@ -1667,3 +1741,57 @@
 
 
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pragma mark  
+#pragma mark ========================================
+
+@implementation AGScopeBarAppearance
+
+- (void)dealloc
+{
+	self.backgroundTopColor = nil;
+	self.backgroundBottomColor = nil;
+	self.inactiveBackgroundTopColor = nil;
+	self.inactiveBackgroundBottomColor = nil;
+	self.borderBottomColor = nil;
+	self.separatorColor = nil;
+	self.labelColor = nil;
+	self.labelFont = nil;
+	self.itemButtonFont = nil;
+	self.menuItemFont = nil;
+	
+	[super dealloc];
+}
+
+
+@synthesize backgroundTopColor;
+@synthesize backgroundBottomColor;
+@synthesize inactiveBackgroundTopColor;
+@synthesize inactiveBackgroundBottomColor;
+@synthesize borderBottomColor;
+@synthesize separatorColor;
+@synthesize separatorWidth;
+@synthesize separatorHeight;
+@synthesize labelColor;
+@synthesize labelFont;
+@synthesize itemButtonFont;
+@synthesize menuItemFont;
+
+
+@end
+
