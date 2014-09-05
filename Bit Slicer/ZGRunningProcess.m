@@ -77,6 +77,11 @@
 	return self.processIdentifier == [object processIdentifier];
 }
 
+- (NSUInteger)hash
+{
+	return (NSUInteger)self.processIdentifier;
+}
+
 #pragma mark On-the-fly Accessors
 
 - (void)fetchRunningApplicationInfo

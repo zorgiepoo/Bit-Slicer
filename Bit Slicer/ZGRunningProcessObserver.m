@@ -55,4 +55,9 @@
 	return [self.runningProcess isEqual:[object runningProcess]] && self.observer == [object observer];
 }
 
+- (NSUInteger)hash
+{
+	return [[NSString stringWithFormat:@"%lu_%lu", self.runningProcess.hash, [self.observer hash]] hash];
+}
+
 @end

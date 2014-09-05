@@ -108,6 +108,11 @@
 	return ([process processID] == self.processID);
 }
 
+- (NSUInteger)hash
+{
+	return (NSUInteger)self.processID;
+}
+
 - (BOOL)valid
 {
 	return self.processID != NON_EXISTENT_PID_NUMBER;

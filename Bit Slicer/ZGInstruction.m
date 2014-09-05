@@ -75,4 +75,9 @@
 	return NO;
 }
 
+- (NSUInteger)hash
+{
+	return [[NSString stringWithFormat:@"%llu_%llu", self.variable.address, self.variable.size] hash];
+}
+
 @end
