@@ -294,7 +294,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	{
 		NSFont *menuFont = [NSFont menuFontOfSize:12]; // don't think there's a real way to get font size if we were to set the non-attributed title
 		
-		NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ (%@)", name, ZGLocalizedStringFromMemoryWindowTable(@"deadProcessIdentifierLabel")]];
+		NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:name];
 		
 		[attributedString addAttribute:NSStrikethroughStyleAttributeName value:@(NSUnderlineStyleSingle) range:NSMakeRange(0, attributedString.length)];
 		
