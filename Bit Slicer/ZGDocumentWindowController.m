@@ -889,9 +889,9 @@
 		}
 	}
 	
-	else if (menuItem.action == @selector(removeSelectedSearchValues:))
+	else if (menuItem.action == @selector(removeSelectedSearchValues:) || menuItem.action == @selector(cut:))
 	{
-		if (self.selectedVariables.count == 0 || self.window.firstResponder != self.tableController.variablesTableView)
+		if (self.selectedVariables.count == 0 || [self.searchController canCancelTask])
 		{
 			return NO;
 		}
@@ -963,7 +963,7 @@
 		}
 	}
 	
-	else if (menuItem.action == @selector(copy:))
+	else if (menuItem.action == @selector(copy:) || menuItem.action == @selector(cut:))
 	{
 		if (![self.selectedVariables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGScript); }])
 		{
