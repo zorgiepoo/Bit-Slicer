@@ -42,7 +42,7 @@
 	return self;
 }
 
-+ (id)mathStringTokenWithToken:(NSString *)t type:(DDTokenType)type {
++ (instancetype)mathStringTokenWithToken:(NSString *)t type:(DDTokenType)type {
 	return [[self alloc] initWithToken:t type:type];
 }
 

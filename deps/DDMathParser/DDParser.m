@@ -21,7 +21,7 @@
 	DDMathStringTokenizer * _tokenizer;
 }
 
-+ (id)parserWithString:(NSString *)string error:(NSError * __autoreleasing *)error {
++ (instancetype)parserWithString:(NSString *)string error:(NSError * __autoreleasing *)error {
     return [[self alloc] initWithString:string error:error];
 }
 
@@ -30,7 +30,7 @@
     return [self initWithTokenizer:t error:error];
 }
 
-+ (id)parserWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError * __autoreleasing *)error {
++ (instancetype)parserWithTokenizer:(DDMathStringTokenizer *)tokenizer error:(NSError * __autoreleasing *)error {
 	return [[self alloc] initWithTokenizer:tokenizer error:error];
 }
 

@@ -20,7 +20,7 @@ typedef NS_ENUM(NSInteger, DDTokenType) {
 
 @interface DDMathStringToken : NSObject
 
-+ (id)mathStringTokenWithToken:(NSString *)t type:(DDTokenType)type;
++ (instancetype)mathStringTokenWithToken:(NSString *)t type:(DDTokenType)type;
 
 @property (nonatomic, readonly) NSString *token;
 @property (nonatomic, readonly) DDTokenType tokenType;
