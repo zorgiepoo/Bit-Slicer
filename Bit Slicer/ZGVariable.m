@@ -385,7 +385,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				uint16_t value = needsByteSwapping ? CFSwapInt16(*(uint16_t *)self.rawValue) : *(uint16_t *)self.rawValue;
 				if (self.qualifier == ZGSigned)
 				{
-					self.stringValue = [NSString stringWithFormat:@"%d", value];
+					self.stringValue = [NSString stringWithFormat:@"%d", (int16_t)value];
 				}
 				else
 				{
