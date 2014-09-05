@@ -398,7 +398,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				uint32_t value = needsByteSwapping ? CFSwapInt32(*(uint32_t *)self.rawValue) : *(uint32_t *)self.rawValue;
 				if (self.qualifier == ZGSigned)
 				{
-					self.stringValue = [NSString stringWithFormat:@"%d", value];
+					self.stringValue = [NSString stringWithFormat:@"%d", (int32_t)value];
 				}
 				else
 				{
@@ -411,7 +411,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				uint64_t value = needsByteSwapping ? CFSwapInt64(*(uint64_t *)self.rawValue) : *(uint64_t *)self.rawValue;
 				if (self.qualifier == ZGSigned)
 				{
-					self.stringValue = [NSString stringWithFormat:@"%lld", value];
+					self.stringValue = [NSString stringWithFormat:@"%lld", (int64_t)value];
 				}
 				else
 				{
