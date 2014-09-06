@@ -297,6 +297,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:[[NSAttributedString alloc] initWithString:@""]];
 }
 
+- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize byteOrder:(CFByteOrder)byteOrder
+{
+	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:[[NSAttributedString alloc] initWithString:@""] enabled:YES byteOrder:byteOrder];
+}
+
 - (void)dealloc
 {
 	self.rawValue = NULL;
@@ -323,7 +328,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		}
 		else
 		{
-			[[NSScanner scannerWithString:newAddressString] scanLongLong:(long long *)&_address];
+			_address = [newAddressString zgUnsignedLongLongValue];
 		}
 	}
 	

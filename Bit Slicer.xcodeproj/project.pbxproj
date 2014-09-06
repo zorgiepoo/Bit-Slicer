@@ -11,6 +11,7 @@
 		722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5619AD4AED009C6AAE /* hotkey@2x.png */; };
 		722CAA5B19AD4AED009C6AAE /* scripts.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5719AD4AED009C6AAE /* scripts.png */; };
 		722CAA5C19AD4AED009C6AAE /* scripts@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5819AD4AED009C6AAE /* scripts@2x.png */; };
+		722CAADF19BB625E009C6AAE /* VariableDisplayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
 		724A9F1F19A1657500E72C9D /* [Code] Debugger.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0719A1657500E72C9D /* [Code] Debugger.strings */; };
@@ -289,6 +290,7 @@
 		722CAA5619AD4AED009C6AAE /* hotkey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hotkey@2x.png"; path = "Bit Slicer/preficons/hotkey@2x.png"; sourceTree = "<group>"; };
 		722CAA5719AD4AED009C6AAE /* scripts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = scripts.png; path = "Bit Slicer/preficons/scripts.png"; sourceTree = "<group>"; };
 		722CAA5819AD4AED009C6AAE /* scripts@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "scripts@2x.png"; path = "Bit Slicer/preficons/scripts@2x.png"; sourceTree = "<group>"; };
+		722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VariableDisplayTest.m; sourceTree = "<group>"; };
 		724A9F0419A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Data Inspector.strings"; sourceTree = "<group>"; };
 		724A9F0619A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger Registers.strings"; sourceTree = "<group>"; };
 		724A9F0819A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger.strings"; sourceTree = "<group>"; };
@@ -1316,6 +1318,7 @@
 				776B62E5193126B7004BF4A0 /* ByteArraySearchTest.mm */,
 				77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */,
 				77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */,
+				722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */,
 				77E2BBA818FD88A700E41FA0 /* Supporting Files */,
 			);
 			path = "Bit Slicer Tests";
@@ -1666,6 +1669,7 @@
 				77E2BBBC18FD8FC100E41FA0 /* _DDFunctionTerm.m in Sources */,
 				77A5B03019189CC9002BEC69 /* BinarySearchTest.m in Sources */,
 				77E2BBBD18FD8FC100E41FA0 /* _DDGroupTerm.m in Sources */,
+				722CAADF19BB625E009C6AAE /* VariableDisplayTest.m in Sources */,
 				77E2BBBE18FD8FC100E41FA0 /* _DDNumberExpression.m in Sources */,
 				77E2BBBF18FD8FC100E41FA0 /* _DDNumberTerm.m in Sources */,
 				77E2BBC018FD8FC100E41FA0 /* _DDOperatorTerm.m in Sources */,
