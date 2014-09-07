@@ -419,12 +419,6 @@
 	XCTAssertEqual(bigEndianResultsWithBigEpsilon.addressCount, 2U);
 }
 
-static double ZGSwapDouble(double value)
-{
-	CFSwappedFloat64 swappedValue = *((CFSwappedFloat64 *)&value);
-	return CFConvertFloat64SwappedToHost(swappedValue);
-}
-
 - (void)testDoubleSearch
 {
 	ZGMemoryAddress address = [self allocateDataIntoProcess];
