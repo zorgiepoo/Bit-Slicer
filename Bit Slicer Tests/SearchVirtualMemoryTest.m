@@ -449,4 +449,54 @@
 	XCTAssertEqual(swappedResults.addressCount, 302U);
 }
 
+- (void)test8BitStringSearch
+{
+	ZGMemoryAddress address = [self allocateDataIntoProcess];
+	
+	char *hello = "hello";
+	if (!ZGWriteBytes(_processTask, address + 96, hello, strlen(hello))) XCTFail(@"Failed to write hello string 1");
+	if (!ZGWriteBytes(_processTask, address + 150, hello, strlen(hello))) XCTFail(@"Failed to write hello string 2");
+	if (!ZGWriteBytes(_processTask, address + 5000, hello, strlen(hello) + 1)) XCTFail(@"Failed to write hello string 3");
+	
+	ZGSearchData *searchData = [self searchDataFromBytes:hello size:strlen(hello) + 1 address:address alignment:1];
+	searchData.dataSize -= 1; // ignore null terminator for now
+	
+	ZGSearchResults *results = ZGSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals);
+	XCTAssertEqual(results.addressCount, 3U);
+	
+	if (!ZGWriteBytes(_processTask, address + 96, "m", 1)) XCTFail(@"Failed to write m");
+	
+	ZGSearchResults *narrowedResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals, [[ZGSearchResults alloc] init], results);
+	XCTAssertEqual(narrowedResults.addressCount, 2U);
+	
+	// .shouldIncludeNullTerminator field isn't "really" used for search functions; it's just a hint for UI state
+	searchData.dataSize++;
+	
+	ZGSearchResults *narrowedTerminatedResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals, [[ZGSearchResults alloc] init], narrowedResults);
+	XCTAssertEqual(narrowedTerminatedResults.addressCount, 1U);
+	
+	searchData.dataSize--;
+	if (!ZGWriteBytes(_processTask, address + 150, "HeLLo", strlen(hello))) XCTFail(@"Failed to write mixed case string");
+	searchData.shouldIgnoreStringCase = YES;
+	
+	ZGSearchResults *narrowedIgnoreCaseResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals, [[ZGSearchResults alloc] init], narrowedResults);
+	XCTAssertEqual(narrowedIgnoreCaseResults.addressCount, 2U);
+	
+	if (!ZGWriteBytes(_processTask, address + 150, "M", 1)) XCTFail(@"Failed to write capital M");
+	
+	ZGSearchResults *narrowedIgnoreCaseNotEqualsResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGNotEquals, [[ZGSearchResults alloc] init], narrowedIgnoreCaseResults);
+	XCTAssertEqual(narrowedIgnoreCaseNotEqualsResults.addressCount, 1U);
+	
+	searchData.shouldIgnoreStringCase = NO;
+	
+	ZGSearchResults *equalResultsAgain = ZGSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGEquals);
+	XCTAssertEqual(equalResultsAgain.addressCount, 1U);
+	
+	searchData.beginAddress = address + _pageSize;
+	searchData.endAddress = address + _pageSize * 2;
+	
+	ZGSearchResults *notEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGString8, 0, ZGNotEquals);
+	XCTAssertEqual(notEqualResults.addressCount, _pageSize - 1 - (strlen(hello) - 1)); // take account for bytes at end that won't be compared
+}
+
 @end
