@@ -45,6 +45,9 @@
 
 #define MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES 4096U
 
+template <typename T>
+bool ZGByteArrayNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue);
+
 #pragma mark Byte Order Swapping
 
 template<typename T> T ZGSwapBytes(T value);
@@ -1077,6 +1080,12 @@ bool ZGString16FastSwappedCaseInsensitiveNotEquals(ZGSearchData *__unsafe_unreta
 	return ZGString16CaseInsensitiveNotEquals(searchData, variableValue, static_cast<T *>(searchData->_swappedValue));
 }
 
+template <typename T>
+bool ZGString16FastSwappedCaseSensitiveNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T * __unused compareValue)
+{
+	return ZGByteArrayNotEquals(searchData, variableValue, static_cast<T *>(searchData->_swappedValue));
+}
+
 #define ZGHandleStringCase(theCase, function1, function2) \
 	switch (theCase) {\
 		ZGHandleType(function1, char, ZGString8, processTask, searchData, delegate);\
@@ -1112,11 +1121,11 @@ ZGSearchResults *ZGSearchForCaseInsensitiveStrings(ZGMemoryMap processTask, ZGSe
 		case ZGNotEquals:
 			if (searchData.bytesSwapped)
 			{
-				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16FastSwappedCaseInsensitiveNotEquals);
+				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16FastSwappedCaseInsensitiveNotEquals);
 			}
 			else
 			{
-				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16CaseInsensitiveNotEquals);
+				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16CaseInsensitiveNotEquals);
 			}
 			break;
 		case ZGEqualsStored:
@@ -1134,6 +1143,40 @@ ZGSearchResults *ZGSearchForCaseInsensitiveStrings(ZGMemoryMap processTask, ZGSe
 	
 	return retValue;
 }
+
+ZGSearchResults *ZGSearchForCaseSensitiveStrings(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGFunctionType functionType)
+{
+	id retValue = nil;
+	
+	switch (functionType)
+	{
+		case ZGNotEquals:
+			if (searchData.bytesSwapped)
+			{
+				ZGHandleStringCase(dataType, ZGByteArrayNotEquals, ZGString16FastSwappedCaseSensitiveNotEquals);
+			}
+			else
+			{
+				ZGHandleStringCase(dataType, ZGByteArrayNotEquals, ZGByteArrayNotEquals);
+			}
+			break;
+		case ZGEquals:
+		case ZGEqualsStored:
+		case ZGEqualsStoredLinear:
+		case ZGNotEqualsStored:
+		case ZGNotEqualsStoredLinear:
+		case ZGGreaterThan:
+		case ZGGreaterThanStored:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThan:
+		case ZGLessThanStored:
+		case ZGLessThanStoredLinear:
+			break;
+	}
+	
+	return retValue;
+}
+
 
 #pragma mark Byte Arrays
 
@@ -1197,6 +1240,32 @@ ZGSearchResults *ZGSearchForByteArraysWithWildcards(ZGMemoryMap processTask, ZGS
 	return retValue;
 }
 
+ZGSearchResults *ZGSearchForByteArrays(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGFunctionType functionType)
+{
+	id retValue = nil;
+	
+	switch (functionType)
+	{
+		case ZGNotEquals:
+			retValue = ZGSearchWithFunction(ZGByteArrayNotEquals, processTask, static_cast<uint8_t *>(searchData.searchValue), searchData, delegate);
+			break;
+		case ZGEquals:
+		case ZGEqualsStored:
+		case ZGEqualsStoredLinear:
+		case ZGNotEqualsStored:
+		case ZGNotEqualsStoredLinear:
+		case ZGGreaterThan:
+		case ZGGreaterThanStored:
+		case ZGGreaterThanStoredLinear:
+		case ZGLessThan:
+		case ZGLessThanStored:
+		case ZGLessThanStoredLinear:
+			break;
+	}
+	
+	return retValue;
+}
+
 #pragma mark Searching for Data
 
 ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType)
@@ -1224,10 +1293,24 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 				break;
 			case ZGString8:
 			case ZGString16:
-				retValue = ZGSearchForCaseInsensitiveStrings(processTask, searchData, delegate, dataType, functionType);
+				if (searchData.shouldIgnoreStringCase)
+				{
+					retValue = ZGSearchForCaseInsensitiveStrings(processTask, searchData, delegate, dataType, functionType);
+				}
+				else
+				{
+					retValue = ZGSearchForCaseSensitiveStrings(processTask, searchData, delegate, dataType, functionType);
+				}
 				break;
 			case ZGByteArray:
-				retValue = ZGSearchForByteArraysWithWildcards(processTask, searchData, delegate, functionType);
+				if (searchData.byteArrayFlags == NULL)
+				{
+					retValue = ZGSearchForByteArrays(processTask, searchData, delegate, functionType);
+				}
+				else
+				{
+					retValue = ZGSearchForByteArraysWithWildcards(processTask, searchData, delegate, functionType);
+				}
 				break;
 			case ZGScript:
 				break;
