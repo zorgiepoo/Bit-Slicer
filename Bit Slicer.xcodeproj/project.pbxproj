@@ -14,6 +14,7 @@
 		722CAADF19BB625E009C6AAE /* VariableDisplayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */; };
 		722CAAE119BBB5A1009C6AAE /* SearchVirtualMemoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAAE019BBB5A1009C6AAE /* SearchVirtualMemoryTest.m */; };
 		722CAAE219BBD7EE009C6AAE /* ZGStoredData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282122189E769B0044E4BC /* ZGStoredData.m */; };
+		72431BA919BFFB6100418893 /* ZGUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162E17D2EF5A009E002A /* ZGUtilities.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
 		724A9F1F19A1657500E72C9D /* [Code] Debugger.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0719A1657500E72C9D /* [Code] Debugger.strings */; };
@@ -1654,6 +1655,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72431BA919BFFB6100418893 /* ZGUtilities.m in Sources */,
 				722CAAE219BBD7EE009C6AAE /* ZGStoredData.m in Sources */,
 				77E1340419312B2E00B5B799 /* ZGSearchFunctions.mm in Sources */,
 				77E1340319312B2800B5B799 /* ZGSearchProgress.m in Sources */,

@@ -38,6 +38,7 @@
 #import "ZGSearchData.h"
 #import "ZGSearchResults.h"
 #import "ZGStoredData.h"
+#import "ZGUtilities.h"
 
 @interface SearchVirtualMemoryTest : XCTestCase
 {
@@ -640,6 +641,42 @@
 	
 	ZGSearchResults *notEqualResultsNullTerminatedNarrowedTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals, [[ZGSearchResults alloc] init], equalResultsNullTerminatedNarrowed);
 	XCTAssertEqual(notEqualResultsNullTerminatedNarrowedTwice.addressCount, 1U);
+}
+
+- (void)testByteArraySearch
+{
+	ZGMemoryAddress address = [self allocateDataIntoProcess];
+	uint8_t bytes[] = {0xC6, 0xED, 0x8F, 0x0D};
+	
+	ZGSearchData *searchData = [self searchDataFromBytes:bytes size:sizeof(bytes) address:address alignment:1];
+	
+	ZGSearchResults *equalResults = ZGSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGEquals);
+	XCTAssertEqual(equalResults.addressCount, 1U);
+	
+	ZGSearchResults *notEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGNotEquals);
+	XCTAssertEqual(notEqualResults.addressCount, _data.length - 1 - 3*5);
+	
+	uint8_t changedBytes[] = {0xC8, 0xED, 0xBF, 0x0D};
+	if (!ZGWriteBytes(_processTask, address + 0x21D4, changedBytes, sizeof(changedBytes))) XCTFail(@"Failed to write changed bytes");
+	
+	NSString *wildcardExpression = @"C? ED *F 0D";
+	unsigned char *byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(wildcardExpression);
+	if (byteArrayFlags == NULL) XCTFail(@"Byte array flags is NULL");
+	
+	searchData.byteArrayFlags = byteArrayFlags;
+	searchData.searchValue = ZGValueFromString(YES, wildcardExpression, ZGByteArray, NULL);
+	
+	ZGSearchResults *equalResultsWildcards = ZGSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGEquals);
+	XCTAssertEqual(equalResultsWildcards.addressCount, 1U);
+	
+	uint8_t changedBytesAgain[] = {0xD9, 0xED, 0xBF, 0x0D};
+	if (!ZGWriteBytes(_processTask, address + 0x21D4, changedBytesAgain, sizeof(changedBytesAgain))) XCTFail(@"Failed to write changed bytes again");
+	
+	ZGSearchResults *equalResultsWildcardsNarrowed = ZGNarrowSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsWildcards);
+	XCTAssertEqual(equalResultsWildcardsNarrowed.addressCount, 0U);
+	
+	ZGSearchResults *notEqualResultsWildcardsNarrowed = ZGNarrowSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGNotEquals, [[ZGSearchResults alloc] init], equalResultsWildcards);
+	XCTAssertEqual(notEqualResultsWildcardsNarrowed.addressCount, 1U);
 }
 
 @end
