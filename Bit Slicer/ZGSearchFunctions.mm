@@ -1051,9 +1051,21 @@ bool ZGString16CaseInsensitiveEquals(ZGSearchData *__unsafe_unretained searchDat
 }
 
 template <typename T>
-bool ZGString16FastSwappedCaseInsensitiveEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T * __unused compareValue)
+bool ZGString16SwappedCaseInsensitiveEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	return ZGString16CaseInsensitiveEquals(searchData, variableValue, static_cast<T *>(searchData->_swappedValue));
+	for (uint32_t index = 0; index < searchData->_dataSize / sizeof(T); index++)
+	{
+		variableValue[index] = ZGSwapBytes(variableValue[index]);
+	}
+	
+	bool retValue = ZGString16CaseInsensitiveEquals(searchData, variableValue, compareValue);
+	
+	for (uint32_t index = 0; index < searchData->_dataSize / sizeof(T); index++)
+	{
+		variableValue[index] = ZGSwapBytes(variableValue[index]);
+	}
+	
+	return retValue;
 }
 
 template <typename T>
@@ -1075,9 +1087,9 @@ bool ZGString16CaseInsensitiveNotEquals(ZGSearchData *__unsafe_unretained search
 }
 
 template <typename T>
-bool ZGString16FastSwappedCaseInsensitiveNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T * __unused compareValue)
+bool ZGString16SwappedCaseInsensitiveNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	return ZGString16CaseInsensitiveNotEquals(searchData, variableValue, static_cast<T *>(searchData->_swappedValue));
+	return ZGString16CaseInsensitiveNotEquals(searchData, variableValue, compareValue);
 }
 
 template <typename T>
@@ -1111,7 +1123,7 @@ ZGSearchResults *ZGSearchForCaseInsensitiveStrings(ZGMemoryMap processTask, ZGSe
 		case ZGEquals:
 			if (searchData.bytesSwapped)
 			{
-				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16FastSwappedCaseInsensitiveEquals);
+				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16SwappedCaseInsensitiveEquals);
 			}
 			else
 			{
@@ -1121,7 +1133,7 @@ ZGSearchResults *ZGSearchForCaseInsensitiveStrings(ZGMemoryMap processTask, ZGSe
 		case ZGNotEquals:
 			if (searchData.bytesSwapped)
 			{
-				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16FastSwappedCaseInsensitiveNotEquals);
+				ZGHandleStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16SwappedCaseInsensitiveNotEquals);
 			}
 			else
 			{
@@ -2096,7 +2108,7 @@ ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData 
 			case ZGEquals:
 				if (searchData.bytesSwapped)
 				{
-					ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16FastSwappedCaseInsensitiveEquals);
+					ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveEquals, ZGString16SwappedCaseInsensitiveEquals);
 				}
 				else
 				{
@@ -2106,7 +2118,7 @@ ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData 
 			case ZGNotEquals:
 				if (searchData.bytesSwapped)
 				{
-					ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16FastSwappedCaseInsensitiveNotEquals);
+					ZGHandleNarrowStringCase(dataType, ZGString8CaseInsensitiveNotEquals, ZGString16SwappedCaseInsensitiveNotEquals);
 				}
 				else
 				{
