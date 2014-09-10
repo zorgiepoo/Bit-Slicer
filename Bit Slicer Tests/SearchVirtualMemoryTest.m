@@ -522,6 +522,9 @@
 	ZGSearchResults *equalResults = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
 	XCTAssertEqual(equalResults.addressCount, 3U);
 	
+	ZGSearchResults *notEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals);
+	XCTAssertEqual(notEqualResults.addressCount, _data.length / sizeof(unichar) - 3 - 4*5);
+	
 	searchData.dataAlignment = 1;
 	
 	ZGSearchResults *equalResultsWithNoAlignment = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
@@ -587,6 +590,9 @@
 	ZGSearchResults *equalResultsBigNarrowTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsBigNarrow);
 	XCTAssertEqual(equalResultsBigNarrowTwice.addressCount, 0U);
 	
+	ZGSearchResults *notEqualResultsBigNarrowTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals, [[ZGSearchResults alloc] init], equalResultsBigNarrow);
+	XCTAssertEqual(notEqualResultsBigNarrowTwice.addressCount, 1U);
+	
 	searchData.shouldIgnoreStringCase = YES;
 	
 	ZGSearchResults *equalResultsBigNarrowThrice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsBigNarrow);
@@ -610,6 +616,9 @@
 	ZGSearchResults *equalResultsBigCaseInsensitiveNullTerminated = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
 	XCTAssertEqual(equalResultsBigCaseInsensitiveNullTerminated.addressCount, 1U);
 	
+	ZGSearchResults *notEqualResultsBigCaseInsensitiveNullTerminated = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals);
+	XCTAssertEqual(notEqualResultsBigCaseInsensitiveNullTerminated.addressCount, _data.length / sizeof(unichar) - 5 * 5);
+	
 	searchData.shouldIgnoreStringCase = NO;
 	searchData.bytesSwapped = NO;
 	
@@ -628,6 +637,9 @@
 	
 	ZGSearchResults *equalResultsNullTerminatedNarrowedTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResultsNullTerminatedNarrowed);
 	XCTAssertEqual(equalResultsNullTerminatedNarrowedTwice.addressCount, 0U);
+	
+	ZGSearchResults *notEqualResultsNullTerminatedNarrowedTwice = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals, [[ZGSearchResults alloc] init], equalResultsNullTerminatedNarrowed);
+	XCTAssertEqual(notEqualResultsNullTerminatedNarrowedTwice.addressCount, 1U);
 }
 
 @end
