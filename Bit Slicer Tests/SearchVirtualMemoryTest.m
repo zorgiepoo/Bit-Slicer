@@ -353,14 +353,18 @@
 	ZGFreeBytes(integerReadReference, integerSize);
 	
 	int32_t *additiveConstant = malloc(sizeof(*additiveConstant));
+	if (additiveConstant == NULL) XCTFail(@"Failed to malloc addititive constant");
 	*additiveConstant = 10;
-	double multiplicativeConstant = 3;
+	
+	int32_t *multiplicativeConstant = malloc(sizeof(*multiplicativeConstant));
+	if (multiplicativeConstant == NULL) XCTFail(@"Failed to malloc multiplicative constant");
+	*multiplicativeConstant = 3;
 	
 	searchData.additiveConstant = additiveConstant;
 	searchData.multiplicativeConstant = multiplicativeConstant;
 	searchData.shouldCompareStoredValues = YES;
 	
-	int32_t alteredInteger = (int32_t)CFSwapInt32HostToBig((uint32_t)((integerRead * multiplicativeConstant + *additiveConstant)));
+	int32_t alteredInteger = (int32_t)CFSwapInt32HostToBig((uint32_t)((integerRead * *multiplicativeConstant + *additiveConstant)));
 	if (!ZGWriteBytesIgnoringProtection(_processTask, address + 0x54, &alteredInteger, sizeof(alteredInteger)))
 	{
 		XCTFail(@"Failed to write altered integer at offset 0x54");

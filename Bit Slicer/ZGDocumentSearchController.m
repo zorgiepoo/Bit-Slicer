@@ -545,7 +545,7 @@
 			}
 			
 			self.searchData.additiveConstant = ZGValueFromString(windowController.currentProcess.is64Bit, additiveConstantString, dataType, NULL);
-			self.searchData.multiplicativeConstant = [multiplicativeConstantString doubleValue];
+			self.searchData.multiplicativeConstant = ZGValueFromString(windowController.currentProcess.is64Bit, multiplicativeConstantString, dataType, NULL);
 			
 			if (self.searchData.additiveConstant == NULL)
 			{

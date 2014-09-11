@@ -521,7 +521,7 @@ bool ZGIntegerSwappedLesserThanStored(ZGSearchData *__unsafe_unretained searchDa
 template <typename T>
 bool ZGIntegerEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = static_cast<T>(searchData->_multiplicativeConstant * *compareValue + *(static_cast<T *>(searchData->_additiveConstant)));
+	T newCompareValue = *static_cast<T *>(searchData->_multiplicativeConstant) * *compareValue + *(static_cast<T *>(searchData->_additiveConstant));
 	return ZGIntegerEquals(searchData, variableValue, &newCompareValue);
 }
 
@@ -530,7 +530,7 @@ bool ZGIntegerSwappedEqualsLinear(ZGSearchData *__unsafe_unretained searchData, 
 {
 	T swappedCompareValue = ZGSwapBytes(*compareValue);
 	T swappedVariableValue = ZGSwapBytes(*variableValue);
-	T newCompareValue = static_cast<T>(searchData->_multiplicativeConstant * swappedCompareValue + *(static_cast<T *>(searchData->_additiveConstant)));
+	T newCompareValue = *static_cast<T *>(searchData->_multiplicativeConstant) * swappedCompareValue + *(static_cast<T *>(searchData->_additiveConstant));
 	
 	return ZGIntegerEquals(searchData, &swappedVariableValue, &newCompareValue);
 }
@@ -538,7 +538,7 @@ bool ZGIntegerSwappedEqualsLinear(ZGSearchData *__unsafe_unretained searchData, 
 template <typename T>
 bool ZGIntegerNotEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = static_cast<T>(searchData->_multiplicativeConstant * *compareValue + *(static_cast<T *>(searchData->_additiveConstant)));
+	T newCompareValue = *static_cast<T *>(searchData->_multiplicativeConstant) * *compareValue + *(static_cast<T *>(searchData->_additiveConstant));
 	return ZGIntegerNotEquals(searchData, variableValue, &newCompareValue);
 }
 
@@ -553,7 +553,7 @@ bool ZGIntegerSwappedNotEqualsLinear(ZGSearchData *__unsafe_unretained searchDat
 template <typename T>
 bool ZGIntegerGreaterThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = static_cast<T>(searchData->_multiplicativeConstant * *compareValue + *(static_cast<T *>(searchData->_additiveConstant)));
+	T newCompareValue = *static_cast<T *>(searchData->_multiplicativeConstant) * *compareValue + *(static_cast<T *>(searchData->_additiveConstant));
 	return ZGIntegerGreaterThan(searchData, variableValue, &newCompareValue);
 }
 
@@ -568,7 +568,7 @@ bool ZGIntegerSwappedGreaterThanLinear(ZGSearchData *__unsafe_unretained searchD
 template <typename T>
 bool ZGIntegerLesserThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = static_cast<T>(searchData->_multiplicativeConstant * *compareValue + *(static_cast<T *>(searchData->_additiveConstant)));
+	T newCompareValue = *static_cast<T *>(searchData->_multiplicativeConstant) * *compareValue + *(static_cast<T *>(searchData->_additiveConstant));
 	return ZGIntegerLesserThan(searchData, variableValue, &newCompareValue);
 }
 
@@ -819,7 +819,7 @@ bool ZGFloatingPointSwappedLesserThanStored(ZGSearchData *__unsafe_unretained se
 template <typename T>
 bool ZGFloatingPointEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = static_cast<T>(searchData->_multiplicativeConstant * *(static_cast<T *>(compareValue)) + *(static_cast<T *>(searchData->_additiveConstant)));
+	T newCompareValue = *static_cast<T *>(searchData->_multiplicativeConstant) * *compareValue + *(static_cast<T *>(searchData->_additiveConstant));
 	return ZGFloatingPointEquals(searchData, variableValue, &newCompareValue);
 }
 
@@ -834,7 +834,7 @@ bool ZGFloatingPointSwappedEqualsLinear(ZGSearchData *__unsafe_unretained search
 template <typename T>
 bool ZGFloatingPointNotEqualsLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = static_cast<T>(searchData->_multiplicativeConstant * *(static_cast<T *>(compareValue)) + *(static_cast<T *>(searchData->_additiveConstant)));
+	T newCompareValue = *(static_cast<T *>(searchData->_multiplicativeConstant)) * *compareValue + *(static_cast<T *>(searchData->_additiveConstant));
 	return ZGFloatingPointNotEquals(searchData, variableValue, &newCompareValue);
 }
 
@@ -849,7 +849,7 @@ bool ZGFloatingPointSwappedNotEqualsLinear(ZGSearchData *__unsafe_unretained sea
 template <typename T>
 bool ZGFloatingPointGreaterThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = static_cast<T>(searchData->_multiplicativeConstant * *(static_cast<T *>(compareValue)) + *(static_cast<T *>(searchData->_additiveConstant)));
+	T newCompareValue = *(static_cast<T *>(searchData->_multiplicativeConstant)) * *compareValue + *(static_cast<T *>(searchData->_additiveConstant));
 	return ZGFloatingPointGreaterThan(searchData, variableValue, &newCompareValue);
 }
 
@@ -864,7 +864,7 @@ bool ZGFloatingPointSwappedGreaterThanLinear(ZGSearchData *__unsafe_unretained s
 template <typename T>
 bool ZGFloatingPointLesserThanLinear(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	T newCompareValue = static_cast<T>(searchData->_multiplicativeConstant * *(static_cast<T *>(compareValue)) + *(static_cast<T *>(searchData->_additiveConstant)));
+	T newCompareValue = *(static_cast<T *>(searchData->_multiplicativeConstant)) * *compareValue + *(static_cast<T *>(searchData->_additiveConstant));
 	return ZGFloatingPointLesserThan(searchData, variableValue, &newCompareValue);
 }
 

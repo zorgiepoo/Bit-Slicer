@@ -102,4 +102,10 @@
 	_additiveConstant = additiveConstant;
 }
 
+- (void)setMultiplicativeConstant:(void *)multiplicativeConstant
+{
+	free(_multiplicativeConstant);
+	_multiplicativeConstant = multiplicativeConstant;
+}
+
 @end

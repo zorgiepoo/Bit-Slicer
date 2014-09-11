@@ -56,7 +56,7 @@
 	
 	// For linearly express stored values
 	void *_additiveConstant;
-	double _multiplicativeConstant;
+	void *_multiplicativeConstant;
 	
 	CollatorRef _collator; // For comparing unicode strings
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
@@ -87,7 +87,7 @@ typedef enum
 @property (nonatomic) ZGMemoryAddress endAddress;
 @property (nonatomic) ZGProtectionMode protectionMode;
 @property (nonatomic) void *additiveConstant;
-@property (nonatomic) double multiplicativeConstant;
+@property (nonatomic) void *multiplicativeConstant;
 @property (nonatomic) unsigned char *byteArrayFlags;
 
 - (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
