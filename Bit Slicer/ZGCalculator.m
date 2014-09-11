@@ -289,6 +289,20 @@
 	return multiplicativeConstantString;
 }
 
++ (void)getAdditiveConstant:(NSString * __autoreleasing *)additiveConstantString andMultiplicativeConstantString:(NSString * __autoreleasing *)multiplicativeConstantString fromNumericalExpression:(DDExpression *)numericalExpression andVariableOrFunctionExpression:(DDExpression *)variableOrFunctionExpression
+{
+	if (variableOrFunctionExpression.expressionType == DDExpressionTypeVariable)
+	{
+		*multiplicativeConstantString = @"1";
+	}
+	else if (variableOrFunctionExpression.expressionType == DDExpressionTypeFunction && [variableOrFunctionExpression.function isEqualToString:@"multiply"])
+	{
+		*multiplicativeConstantString = [self multiplicativeConstantStringFromExpression:variableOrFunctionExpression];
+	}
+	
+	*additiveConstantString = numericalExpression.number.stringValue;
+}
+
 + (BOOL)parseLinearExpression:(NSString *)linearExpression andGetAdditiveConstant:(NSString * __autoreleasing *)additiveConstantString multiplicateConstant:(NSString * __autoreleasing *)multiplicativeConstantString
 {
 	NSError *error = nil;
@@ -348,6 +362,9 @@
 		return NO;
 	}
 	
+	*additiveConstantString = nil;
+	*multiplicativeConstantString = nil;
+	
 	if (rewrittenExpression.expressionType == DDExpressionTypeVariable)
 	{
 		*additiveConstantString = @"0";
@@ -372,31 +389,22 @@
 		
 		DDExpression *firstExpression = [rewrittenExpression.arguments objectAtIndex:0];
 		DDExpression *secondExpression = [rewrittenExpression.arguments objectAtIndex:1];
+		
 		if (secondExpression.expressionType == DDExpressionTypeNumber)
 		{
-			if (firstExpression.expressionType == DDExpressionTypeVariable)
-			{
-				*multiplicativeConstantString = @"1";
-			}
-			else if (firstExpression.expressionType == DDExpressionTypeFunction && [firstExpression.function isEqualToString:@"multiply"])
-			{
-				*multiplicativeConstantString = [self multiplicativeConstantStringFromExpression:firstExpression];
-			}
-			
-			*additiveConstantString = secondExpression.number.stringValue;
+			[self
+			 getAdditiveConstant:additiveConstantString
+			 andMultiplicativeConstantString:multiplicativeConstantString
+			 fromNumericalExpression:secondExpression
+			 andVariableOrFunctionExpression:firstExpression];
 		}
 		else if (firstExpression.expressionType == DDExpressionTypeNumber)
 		{
-			if (secondExpression.expressionType == DDExpressionTypeVariable)
-			{
-				*multiplicativeConstantString = @"1";
-			}
-			else if (secondExpression.expressionType == DDExpressionTypeFunction && [secondExpression.function isEqualToString:@"multiply"])
-			{
-				*multiplicativeConstantString = [self multiplicativeConstantStringFromExpression:secondExpression];
-			}
-			
-			*additiveConstantString = firstExpression.number.stringValue;
+			[self
+			 getAdditiveConstant:additiveConstantString
+			 andMultiplicativeConstantString:multiplicativeConstantString
+			 fromNumericalExpression:firstExpression
+			 andVariableOrFunctionExpression:secondExpression];
 		}
 	}
 	
