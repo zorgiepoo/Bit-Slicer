@@ -69,6 +69,8 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 
 @property (nonatomic, readonly) BOOL isOccluded;
 
+- (void)cleanup;
+
 - (IBAction)pauseOrUnpauseProcess:(id)sender;
 
 - (void)updateWindow;

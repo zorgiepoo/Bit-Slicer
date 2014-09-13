@@ -133,7 +133,12 @@
                             </menuItem>
                             <menuItem title="Pause Target" keyEquivalent="p" id="689">
                                 <connections>
-                                    <action selector="pauseOrUnpauseProcess:" target="-1" id="690"/>
+                                    <action selector="pauseOrUnpauseProcess:" target="-1" id="ctx-Fv-tfT"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Pause Target in Background" keyEquivalent="P" id="J5a-3q-dai">
+                                <connections>
+                                    <action selector="pauseProcessWhenInactive:" target="-1" id="Qkd-bF-aIf"/>
                                 </connections>
                             </menuItem>
                         </items>

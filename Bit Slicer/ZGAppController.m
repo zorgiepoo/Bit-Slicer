@@ -122,11 +122,13 @@
 	self.breakPointController.appTerminationState = appTerminationState;
 	
 	[self.debuggerController cleanup];
+	[self.memoryViewer cleanup];
 	
 	for (ZGDocument *document in self.documentController.documents)
 	{
-		ZGScriptManager *scriptManager = [[document.windowControllers lastObject] scriptManager];
-		[scriptManager cleanupWithAppTerminationState:appTerminationState];
+		ZGDocumentWindowController *documentWindowController = document.windowControllers.firstObject;
+		[documentWindowController.scriptManager cleanupWithAppTerminationState:appTerminationState];
+		[documentWindowController cleanup];
 	}
 	
 	return appTerminationState.isDead ? NSTerminateNow : NSTerminateLater;

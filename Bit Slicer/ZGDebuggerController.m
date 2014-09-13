@@ -2118,6 +2118,8 @@ enum ZGStepExecution
 			[self continueFromBreakPoint:breakPoint];
 		}
 	});
+	
+	[super cleanup];
 }
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier

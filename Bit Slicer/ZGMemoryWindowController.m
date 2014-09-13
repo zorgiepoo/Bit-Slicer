@@ -52,6 +52,9 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 @interface ZGMemoryWindowController ()
 
+@property (nonatomic) BOOL isWatchingActiveProcess;
+@property (nonatomic) BOOL inactiveProcessSuspended;
+
 @property (nonatomic) BOOL isOccluded;
 
 @property (nonatomic) ZGMemoryDumpAllWindowController *memoryDumpAllWindowController;
@@ -85,6 +88,11 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	return _undoManager;
 }
 
+- (void)cleanup
+{
+	[self stopPausingProcessWhenInactive];
+}
+
 - (void)dealloc
 {
 	if ([self.window respondsToSelector:@selector(occlusionState)])
@@ -100,6 +108,8 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	 forKeyPath:ZG_SELECTOR_STRING([NSWorkspace sharedWorkspace], runningApplications)];
 	
 	[self.processList removeObserver:self forKeyPath:ZG_SELECTOR_STRING(self.processList, runningProcesses)];
+	
+	[self cleanup];
 }
 
 - (void)postLastChosenInternalProcessNameChange
@@ -391,6 +401,8 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 			[self.processList addPriorityToProcessIdentifier:newProcess.processID withObserver:self];
 		}
 		
+		[self stopPausingProcessWhenInactive];
+		
 		shouldUpdateDisplay = YES;
 	}
 	
@@ -472,6 +484,8 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 		[self.runningApplicationsPopUpButton selectItem:menuItem];
 
 		[self.processList requestPollingWithObserver:self];
+		
+		[self stopPausingProcessWhenInactive];
 	}
 	else
 	{
@@ -516,6 +530,100 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }
 
+- (void)setIsWatchingActiveProcess:(BOOL)isWatchingActiveProcess
+{
+	if (_isWatchingActiveProcess != isWatchingActiveProcess)
+	{
+		if (isWatchingActiveProcess)
+		{
+			[[[NSWorkspace sharedWorkspace] notificationCenter]
+			 addObserver:self
+			 selector:@selector(activeApplicationChanged:)
+			 name:NSWorkspaceDidActivateApplicationNotification
+			 object:nil];
+		}
+		else
+		{
+			[[[NSWorkspace sharedWorkspace] notificationCenter]
+			 removeObserver:self
+			 name:NSWorkspaceDidActivateApplicationNotification
+			 object:nil];
+		}
+		
+		_isWatchingActiveProcess = isWatchingActiveProcess;
+	}
+}
+
+- (void)setInactiveProcessSuspended:(BOOL)inactiveProcessSuspended
+{
+	if (_inactiveProcessSuspended != inactiveProcessSuspended)
+	{
+		BOOL validProcess = self.currentProcess.valid;
+		ZGMemoryMap processTask = self.currentProcess.processTask;
+		
+		if (validProcess)
+		{
+			if (inactiveProcessSuspended)
+			{
+				if (validProcess && ZGSuspendTask(processTask))
+				{
+					_inactiveProcessSuspended = YES;
+				}
+			}
+			else
+			{
+				if (validProcess && ZGResumeTask(processTask))
+				{
+					_inactiveProcessSuspended = NO;
+				}
+			}
+		}
+		else
+		{
+			_inactiveProcessSuspended = NO;
+		}
+	}
+}
+
+- (void)stopPausingProcessWhenInactive
+{
+	self.isWatchingActiveProcess = NO;
+	self.inactiveProcessSuspended = NO;
+}
+
+- (IBAction)pauseProcessWhenInactive:(id)__unused sender
+{
+	NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.currentProcess.processID];
+	
+	if (!self.isWatchingActiveProcess)
+	{
+		if (runningApplication != nil && !runningApplication.isActive)
+		{
+			self.inactiveProcessSuspended = YES;
+		}
+	}
+	else
+	{
+		self.inactiveProcessSuspended = NO;
+	}
+	
+	self.isWatchingActiveProcess = !self.isWatchingActiveProcess;
+}
+
+- (void)activeApplicationChanged:(NSNotification *)notification
+{
+	NSRunningApplication *runningApplication = [notification.userInfo objectForKey:NSWorkspaceApplicationKey];
+	
+	if (runningApplication != nil && runningApplication.processIdentifier == self.currentProcess.processID)
+	{
+		self.inactiveProcessSuspended = NO;
+	}
+	else
+	{
+		self.inactiveProcessSuspended = YES;
+	}
+}
+
 #pragma mark Menu Item Validation
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
@@ -543,6 +651,21 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 		}
 		
 		if ([self.debuggerController isProcessIdentifierHalted:self.currentProcess.processID])
+		{
+			return NO;
+		}
+	}
+	else if (userInterfaceItem.action == @selector(pauseProcessWhenInactive:))
+	{
+		menuItem.state = self.isWatchingActiveProcess;
+		
+		if (!self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.currentProcess.processID];
+		if (runningApplication == nil)
 		{
 			return NO;
 		}

@@ -173,6 +173,9 @@
 /* Class = "NSMenuItem"; title = "Pause Target"; ObjectID = "689"; */
 "689.title" = "Pause Target";
 
+/* Class = "NSMenuItem"; title = "Pause Target in Background"; ObjectID = "J5a-3q-dai"; */
+"J5a-3q-dai.title" = "Pause Target in Background";
+
 /* Class = "NSMenuItem"; title = "Edit Variable Value…"; ObjectID = "691"; */
 "691.title" = "Edit Variable Value…";
 
