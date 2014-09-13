@@ -464,6 +464,9 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 @end
 
 @implementation DataInspectorRepresenter
+{
+	id _topLevelObjects;
+}
 
 - (id)init {
     self = [super init];
@@ -474,6 +477,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 
 - (void)dealloc {
     [inspectors release];
+    [_topLevelObjects release];
     [super dealloc];
 }
 
@@ -528,10 +532,12 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (NSView *)createView {
-    BOOL loaded = [[NSBundle mainBundle] loadNibNamed:@"Data Inspector View" owner:self topLevelObjects:nil];
+    BOOL loaded = [[NSBundle mainBundle] loadNibNamed:@"Data Inspector View" owner:self topLevelObjects:&_topLevelObjects];
     if (! loaded || ! outletView) {
         [NSException raise:NSInternalInconsistencyException format:@"Unable to load nib named DataInspectorView"];
     }
+    [_topLevelObjects retain];
+
     NSView *resultView = outletView; //want to inherit its retain here
     outletView = nil;
     if ([table respondsToSelector:@selector(setSelectionHighlightStyle:)]) {
