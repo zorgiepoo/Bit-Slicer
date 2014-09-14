@@ -74,7 +74,7 @@ Gw
                             <rect key="frame" x="1" y="17" width="416" height="132"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" columnResizing="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" headerView="e31-yt-wOh" id="4bY-Uc-6gw">
+                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" columnResizing="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" headerView="e31-yt-wOh" id="4bY-Uc-6gw" customClass="ZGTableView">
                                     <rect key="frame" x="0.0" y="0.0" width="416" height="132"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>

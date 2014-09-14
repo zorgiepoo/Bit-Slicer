@@ -51,6 +51,7 @@
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
 #import "ZGNavigationPost.h"
+#import "ZGTableView.h"
 
 #define ZGLocalizableWatchVariableString(string) NSLocalizedStringFromTable(string, @"[Code] Watch Variable", nil)
 
@@ -61,9 +62,7 @@
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
 @property (nonatomic, assign) IBOutlet NSTextField *statusTextField;
 @property (nonatomic, assign) IBOutlet NSButton *addButton;
-@property (nonatomic, assign) IBOutlet NSTableView *tableView;
-
-@property (nonatomic) BOOL shouldIgnoreTableViewSelectionChange;
+@property (nonatomic, assign) IBOutlet ZGTableView *tableView;
 
 @property (nonatomic) ZGProcess *watchProcess;
 @property (nonatomic) id watchActivity;
@@ -443,7 +442,7 @@
 		NSArray *selectedWatchVariables = [self selectedWatchVariables];
 		if (selectedWatchVariables.count > 1 && [selectedWatchVariables containsObject:watchVariable])
 		{
-			self.shouldIgnoreTableViewSelectionChange = YES;
+			self.tableView.shouldIgnoreNextSelection = YES;
 			for (ZGWatchVariable *selectedWatchVariable in selectedWatchVariables)
 			{
 				if (watchVariable != selectedWatchVariable)
@@ -455,17 +454,6 @@
 		
 		[self updateAddButton];
 	}
-}
-
-- (BOOL)selectionShouldChangeInTableView:(NSTableView *)__unused tableView
-{
-	if (self.shouldIgnoreTableViewSelectionChange)
-	{
-		self.shouldIgnoreTableViewSelectionChange = NO;
-		return NO;
-	}
-	
-	return YES;
 }
 
 - (BOOL)validateUserInterfaceItem:(NSMenuItem *)menuItem
