@@ -15,6 +15,7 @@
 		722CAAE119BBB5A1009C6AAE /* SearchVirtualMemoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAAE019BBB5A1009C6AAE /* SearchVirtualMemoryTest.m */; };
 		722CAAE219BBD7EE009C6AAE /* ZGStoredData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282122189E769B0044E4BC /* ZGStoredData.m */; };
 		7231440519C57A5300FBE342 /* ZGRegistersState.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440419C57A5300FBE342 /* ZGRegistersState.m */; };
+		7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440719C607C700FBE342 /* ZGWatchVariable.m */; };
 		72431BA919BFFB6100418893 /* ZGUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162E17D2EF5A009E002A /* ZGUtilities.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
@@ -298,6 +299,8 @@
 		722CAAE019BBB5A1009C6AAE /* SearchVirtualMemoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchVirtualMemoryTest.m; sourceTree = "<group>"; };
 		7231440319C57A5300FBE342 /* ZGRegistersState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegistersState.h; path = "Bit Slicer/ZGRegistersState.h"; sourceTree = "<group>"; };
 		7231440419C57A5300FBE342 /* ZGRegistersState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegistersState.m; path = "Bit Slicer/ZGRegistersState.m"; sourceTree = "<group>"; };
+		7231440619C607C700FBE342 /* ZGWatchVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGWatchVariable.h; path = "Bit Slicer/ZGWatchVariable.h"; sourceTree = "<group>"; };
+		7231440719C607C700FBE342 /* ZGWatchVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGWatchVariable.m; path = "Bit Slicer/ZGWatchVariable.m"; sourceTree = "<group>"; };
 		724A9F0419A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Data Inspector.strings"; sourceTree = "<group>"; };
 		724A9F0619A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger Registers.strings"; sourceTree = "<group>"; };
 		724A9F0819A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger.strings"; sourceTree = "<group>"; };
@@ -1495,6 +1498,8 @@
 				77F1162917D2EF46009E002A /* ZGVariableTypes.h */,
 				77F1162A17D2EF50009E002A /* ZGVariable.h */,
 				77F1162B17D2EF50009E002A /* ZGVariable.m */,
+				7231440619C607C700FBE342 /* ZGWatchVariable.h */,
+				7231440719C607C700FBE342 /* ZGWatchVariable.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -1821,6 +1826,7 @@
 				77F1165917D2F001009E002A /* ZGRegister.m in Sources */,
 				774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */,
 				7798EECC18C40B7F001120FB /* _DDOperatorTerm.m in Sources */,
+				7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */,
 				77179F6B18CD34F100BCB6D0 /* ZGAppUpdaterController.m in Sources */,
 				77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */,
 				77CE28B717D538E300998F28 /* ZGLoggerWindowController.m in Sources */,
