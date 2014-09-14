@@ -40,6 +40,7 @@
 
 @class ZGVariable;
 @class ZGProcess;
+@class ZGRegistersState;
 
 typedef enum
 {
@@ -69,9 +70,6 @@ typedef enum
 @property (nonatomic) PyObject *callback;
 @property (nonatomic) NSError *error;
 @property (nonatomic) ZGMemoryProtection originalProtection;
-@property (nonatomic) x86_thread_state_t generalPurposeThreadState;
-@property (nonatomic) zg_x86_vector_state_t vectorState;
-@property (nonatomic) BOOL hasVectorState;
-@property (nonatomic) BOOL hasAVXSupport;
+@property (nonatomic) ZGRegistersState *registersState;
 
 @end

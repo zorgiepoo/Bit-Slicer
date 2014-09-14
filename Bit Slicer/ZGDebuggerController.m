@@ -333,7 +333,7 @@ enum ZGStepExecution
 	if (self.currentBreakPoint != nil)
 	{
 		[self toggleBacktraceAndRegistersViews:NSOnState];
-		[self updateRegisters];
+		[self.registersViewController updateRegistersFromBreakPoint:self.currentBreakPoint];
 		[self updateBacktrace];
 		
 		[self jumpToMemoryAddress:self.registersViewController.instructionPointer];
@@ -1904,11 +1904,6 @@ enum ZGStepExecution
 	[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
-- (void)updateRegisters
-{
-	[self.registersViewController updateRegistersFromBreakPoint:self.currentBreakPoint];
-}
-
 - (void)updateBacktrace
 {
 	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:self.registersViewController.basePointer instructionPointer:self.registersViewController.instructionPointer process:self.currentProcess breakPoints:self.breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self.currentProcess]];
@@ -1969,7 +1964,7 @@ enum ZGStepExecution
 			self.backtraceViewController.view.frame = self.backtraceView.bounds;
 		}
 		
-		[self updateRegisters];
+		[self.registersViewController updateRegistersFromBreakPoint:breakPoint];
 		
 		[self toggleBacktraceAndRegistersViews:NSOnState];
 		

@@ -59,6 +59,7 @@
 #import "ZGProcess.h"
 #import "ZGDebugThread.h"
 #import "ZGBreakPoint.h"
+#import "ZGRegistersState.h"
 #import "ZGInstruction.h"
 #import "ZGDebuggerUtilities.h"
 #import "ZGProcessList.h"
@@ -260,15 +261,12 @@ static ZGBreakPointController *gBreakPointController;
 			bool hasAVXSupport = NO;
 			BOOL retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit, &hasAVXSupport);
 			
-			breakPoint.generalPurposeThreadState = threadState;
-			breakPoint.vectorState = vectorState;
-			breakPoint.hasVectorState = retrievedVectorState;
-			breakPoint.hasAVXSupport = hasAVXSupport;
+			ZGRegistersState *registersState = [[ZGRegistersState alloc] initWithGeneralPurposeThreadState:threadState vectorState:vectorState hasVectorState:retrievedVectorState hasAVXSupport:hasAVXSupport is64Bit:breakPoint.process.is64Bit];
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
 				{
-					[breakPoint.delegate dataAccessedByBreakPoint:breakPoint fromInstructionPointer:instructionAddress];
+					[breakPoint.delegate dataAccessedByBreakPoint:breakPoint fromInstructionPointer:instructionAddress withRegistersState:registersState];
 				}
 			});
 		}
@@ -619,10 +617,7 @@ static ZGBreakPointController *gBreakPointController;
 		
 		if (canNotifyDelegate)
 		{
-			breakPoint.generalPurposeThreadState = threadState;
-			breakPoint.vectorState = vectorState;
-			breakPoint.hasVectorState = retrievedVectorState;
-			breakPoint.hasAVXSupport = hasAVXSupport;
+			BOOL is64Bit = breakPoint.process.is64Bit;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
@@ -630,6 +625,10 @@ static ZGBreakPointController *gBreakPointController;
 					id <ZGBreakPointDelegate> delegate = breakPoint.delegate;
 					if (delegate != nil)
 					{
+						ZGRegistersState *registersState = [[ZGRegistersState alloc] initWithGeneralPurposeThreadState:threadState vectorState:vectorState hasVectorState:retrievedVectorState hasAVXSupport:hasAVXSupport is64Bit:is64Bit];
+						
+						breakPoint.registersState = registersState;
+						
 						[delegate breakPointDidHit:breakPoint];
 					}
 					else

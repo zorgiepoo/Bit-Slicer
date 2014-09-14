@@ -44,6 +44,7 @@
 #import "ZGScriptManager.h"
 #import "ZGBreakPointController.h"
 #import "ZGBreakPoint.h"
+#import "ZGRegistersState.h"
 #import "ZGInstruction.h"
 #import "ZGThreadStates.h"
 #import "ZGRegisterEntries.h"
@@ -705,8 +706,11 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-- (void)dataAccessedByBreakPoint:(ZGBreakPoint *)breakPoint fromInstructionPointer:(ZGMemoryAddress)instructionPointer
+- (void)dataAccessedByBreakPoint:(ZGBreakPoint *)breakPoint fromInstructionPointer:(ZGMemoryAddress)instructionPointer withRegistersState:(ZGRegistersState *)registersState
 {
+	ZGMemoryAddress dataAddress = breakPoint.variable.address;
+	PyObject *callback = breakPoint.callback;
+	
 	dispatch_async(gPythonQueue, ^{
 		NSNumber *instructionPointerNumber = @(instructionPointer);
 		ZGMemoryAddress instructionAddress = 0;
@@ -723,7 +727,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 			instructionAddress = [[self.cachedInstructionPointers objectForKey:instructionPointerNumber] unsignedLongLongValue];
 		}
 		
-		[self.scriptManager handleDataBreakPoint:breakPoint instructionAddress:instructionAddress callback:breakPoint.callback sender:self];
+		[self.scriptManager handleDataAddress:dataAddress accessedFromInstructionAddress:instructionAddress registersState:registersState callback:callback sender:self];
 	});
 }
 
@@ -814,20 +818,20 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 	resumeFromHaltedBreakPointInDebugger(self);
 }
 
-- (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
+- (void)breakPointDidHit:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState
 {
 	dispatch_async(gPythonQueue, ^{
 		self.haltedBreakPoint = breakPoint;
 		
 		if (breakPoint.hidden)
 		{
-			ZGMemoryAddress basePointer = breakPoint.process.is64Bit ? breakPoint.generalPurposeThreadState.uts.ts64.__rbp : breakPoint.generalPurposeThreadState.uts.ts32.__ebp;
+			ZGMemoryAddress basePointer = breakPoint.process.is64Bit ? registersState.generalPurposeThreadState.uts.ts64.__rbp : registersState.generalPurposeThreadState.uts.ts32.__ebp;
 			
 			if (basePointer == breakPoint.basePointer)
 			{
 				[self.breakPointController removeInstructionBreakPoint:breakPoint];
 				
-				[self.scriptManager handleInstructionBreakPoint:breakPoint callback:breakPoint.callback sender:self];
+				[self.scriptManager handleInstructionBreakPoint:breakPoint withRegistersState:registersState callback:breakPoint.callback sender:self];
 			}
 			else
 			{
@@ -836,7 +840,7 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 		}
 		else
 		{
-			[self.scriptManager handleInstructionBreakPoint:breakPoint callback:breakPoint.callback sender:self];
+			[self.scriptManager handleInstructionBreakPoint:breakPoint withRegistersState:registersState callback:breakPoint.callback sender:self];
 		}
 	});
 }

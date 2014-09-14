@@ -36,6 +36,7 @@
 
 #import "ZGVariable.h"
 #import "ZGBreakPoint.h"
+#import "ZGRegistersState.h"
 #import "ZGProcess.h"
 #import "ZGUtilities.h"
 #import "ZGRegister.h"
@@ -136,12 +137,14 @@
 {
 	self.breakPoint = breakPoint;
 	
+	ZGRegistersState *registersState = breakPoint.registersState;
+	
 	ZGMemorySize pointerSize = breakPoint.process.pointerSize;
 	NSDictionary *registerDefaultsDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES];
 	
 	NSMutableArray *newRegisters = [NSMutableArray array];
 	
-	NSArray *registerVariables = [ZGRegisterEntries registerVariablesFromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:breakPoint.process.is64Bit];
+	NSArray *registerVariables = [ZGRegisterEntries registerVariablesFromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:registersState.is64Bit];
 	
 	for (ZGVariable *registerVariable in registerVariables)
 	{
@@ -159,11 +162,11 @@
 		[newRegisters addObject:newRegister];
 	}
 	
-	self.instructionPointer = breakPoint.process.is64Bit ? breakPoint.generalPurposeThreadState.uts.ts64.__rip : breakPoint.generalPurposeThreadState.uts.ts32.__eip;
+	self.instructionPointer = registersState.is64Bit ? registersState.generalPurposeThreadState.uts.ts64.__rip : registersState.generalPurposeThreadState.uts.ts32.__eip;
 	
-	if (breakPoint.hasVectorState)
+	if (registersState.hasVectorState)
 	{
-		NSArray *registerVectorVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:breakPoint.vectorState is64Bit:breakPoint.process.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
+		NSArray *registerVectorVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:registersState.vectorState is64Bit:registersState.is64Bit hasAVXSupport:registersState.hasAVXSupport];
 		for (ZGVariable *registerVariable in registerVectorVariables)
 		{
 			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterVector variable:registerVariable pointerSize:pointerSize];
@@ -276,7 +279,7 @@
 		return NO;
 	}
 	
-	self.breakPoint.vectorState = vectorState;
+	self.breakPoint.registersState.vectorState = vectorState;
 	
 	theRegister.variable = newVariable;
 	
@@ -293,7 +296,7 @@
 	}
 	
 	BOOL shouldWriteRegister = NO;
-	if (self.breakPoint.process.is64Bit)
+	if (self.breakPoint.registersState.is64Bit)
 	{
 		NSArray *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
 		if ([registers64 containsObject:theRegister.variable.name])
@@ -320,7 +323,7 @@
 		return NO;
 	}
 	
-	self.breakPoint.generalPurposeThreadState = threadState;
+	self.breakPoint.registersState.generalPurposeThreadState = threadState;
 	
 	theRegister.variable = newVariable;
 	

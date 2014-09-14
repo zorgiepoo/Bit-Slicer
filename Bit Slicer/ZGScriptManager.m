@@ -42,6 +42,7 @@
 #import "ZGPyVirtualMemory.h"
 #import "ZGPyDebugger.h"
 #import "ZGBreakPoint.h"
+#import "ZGRegistersState.h"
 #import "ZGProcess.h"
 #import "ZGPyMainModule.h"
 #import "ZGPyVMProtModule.h"
@@ -904,30 +905,30 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	}
 }
 
-- (PyObject *)registersfromBreakPoint:(ZGBreakPoint *)breakPoint
+- (PyObject *)registersfromRegistersState:(ZGRegistersState *)registersState
 {
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
-	BOOL is64Bit = breakPoint.process.is64Bit;
+	BOOL is64Bit = registersState.is64Bit;
 	
-	int numberOfGeneralPurposeEntries = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:is64Bit];
+	int numberOfGeneralPurposeEntries = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:is64Bit];
 	
-	if (breakPoint.hasVectorState)
+	if (registersState.hasVectorState)
 	{
-		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:breakPoint.vectorState is64Bit:is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
+		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:registersState.vectorState is64Bit:is64Bit hasAVXSupport:registersState.hasAVXSupport];
 	}
 	
 	return convertRegisterEntriesToPyDict(registerEntries, is64Bit);
 }
 
-- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender
+- (void)handleDataAddress:(ZGMemoryAddress)dataAddress accessedFromInstructionAddress:(ZGMemoryAddress)instructionAddress registersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(gPythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
-					PyObject *registers = [self registersfromBreakPoint:breakPoint];
-					PyObject *result = PyObject_CallFunction(callback, "KKO", breakPoint.variable.address, instructionAddress, registers);
+					PyObject *registers = [self registersfromRegistersState:registersState];
+					PyObject *result = PyObject_CallFunction(callback, "KKO", dataAddress, instructionAddress, registers);
 					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"data watchpoint"];
 					Py_XDECREF(registers);
 					Py_XDECREF(result);
@@ -937,14 +938,14 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	});
 }
 
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender
+- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(gPythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
-					PyObject *registers = [self registersfromBreakPoint:breakPoint];
+					PyObject *registers = [self registersfromRegistersState:registersState];
 					PyObject *result = PyObject_CallFunction(callback, "KO", breakPoint.variable.address, registers);
 					Py_XDECREF(registers);
 					

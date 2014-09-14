@@ -38,6 +38,7 @@
 #import "ZGDebuggerUtilities.h"
 #import "ZGInstruction.h"
 #import "ZGBreakPoint.h"
+#import "ZGRegistersState.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
@@ -241,7 +242,7 @@
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:[registerLines componentsJoinedByString:@"\n"]]];
 }
 
-- (void)dataAccessedByBreakPoint:(ZGBreakPoint *)breakPoint fromInstructionPointer:(ZGMemoryAddress)instructionAddress
+- (void)dataAccessedByBreakPoint:(ZGBreakPoint *)__unused breakPoint fromInstructionPointer:(ZGMemoryAddress)instructionAddress withRegistersState:(ZGRegistersState *)registersState
 {
 	NSNumber *instructionAddressNumber = @(instructionAddress);
 	if (!self.watchProcess.valid || [self.foundBreakPointAddresses containsObject:instructionAddressNumber]) return;
@@ -263,7 +264,7 @@
 	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:instruction.text];
 	
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
-	int numberOfGeneralRegisters = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:breakPoint.generalPurposeThreadState is64Bit:self.watchProcess.is64Bit];
+	int numberOfGeneralRegisters = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:self.watchProcess.is64Bit];
 	
 	[self
 	 appendDescription:description
@@ -271,9 +272,9 @@
 	 registerLabel:ZGLocalizableWatchVariableString(@"generalPurposeRegistersDescriptionLabel")
 	 boldFont:boldFont];
 	
-	if (breakPoint.hasVectorState)
+	if (registersState.hasVectorState)
 	{
-		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:breakPoint.vectorState is64Bit:self.watchProcess.is64Bit hasAVXSupport:breakPoint.hasAVXSupport];
+		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:registersState.vectorState is64Bit:self.watchProcess.is64Bit hasAVXSupport:registersState.hasAVXSupport];
 		
 		[self
 		 appendDescription:description

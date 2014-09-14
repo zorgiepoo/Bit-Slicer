@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 8/24/13.
+ * Created by Mayur Pawashe on 9/14/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
-#import <mach/thread_act.h>
+#import "ZGThreadStates.h"
 
-@class ZGBreakPoint;
-@class ZGRegistersState;
+@interface ZGRegistersState : NSObject
 
-@protocol ZGBreakPointDelegate <NSObject>
+- (id)initWithGeneralPurposeThreadState:(x86_thread_state_t)generalPurposeThreadState vectorState:(zg_x86_vector_state_t)vectorState hasVectorState:(BOOL)hasVectorState hasAVXSupport:(BOOL)hasAVXSupport is64Bit:(BOOL)is64Bit;
 
-@optional
+@property (nonatomic) x86_thread_state_t generalPurposeThreadState;
+@property (nonatomic) zg_x86_vector_state_t vectorState;
 
-- (void)dataAccessedByBreakPoint:(ZGBreakPoint *)breakPoint fromInstructionPointer:(ZGMemoryAddress)instructionAddress withRegistersState:(ZGRegistersState *)registersState;
-
-- (void)breakPointDidHit:(ZGBreakPoint *)breakPoint;
-
-- (void)conditionalInstructionBreakPointWasRemoved;
+@property (nonatomic, readonly) BOOL hasVectorState;
+@property (nonatomic, readonly) BOOL hasAVXSupport;
+@property (nonatomic, readonly) BOOL is64Bit;
 
 @end

@@ -42,6 +42,7 @@
 @class ZGVariable;
 @class ZGProcess;
 @class ZGBreakPoint;
+@class ZGRegistersState;
 @class ZGAppTerminationState;
 
 #define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
@@ -70,8 +71,8 @@ extern NSString *ZGScriptDefaultApplicationEditorKey;
 - (void)stopScriptForVariable:(ZGVariable *)variable;
 - (void)removeScriptForVariable:(ZGVariable *)variable;
 
-- (void)handleDataBreakPoint:(ZGBreakPoint *)breakPoint instructionAddress:(ZGMemoryAddress)instructionAddress callback:(PyObject *)callback sender:(id)sender;
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint callback:(PyObject *)callback sender:(id)sender;
+- (void)handleDataAddress:(ZGMemoryAddress)dataAddress accessedFromInstructionAddress:(ZGMemoryAddress)instructionAddress registersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender;
+- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender;
 
 - (void)handleHotKeyTriggerWithInternalID:(UInt32)hotKeyID callback:(PyObject *)callback sender:(id)sender;
 
