@@ -41,10 +41,10 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.condition = condition;
-		self.compiledCondition = compiledCondition;
-		self.address = address;
-		self.internalProcessName = internalProcessName;
+		_condition = [condition copy];
+		_compiledCondition = compiledCondition;
+		_address = address;
+		_internalProcessName = internalProcessName;
 	}
 	return self;
 }

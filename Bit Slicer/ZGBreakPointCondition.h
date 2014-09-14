@@ -42,7 +42,7 @@
 
 @property (nonatomic, copy) NSString *condition;
 @property (nonatomic) PyObject *compiledCondition;
-@property (nonatomic, copy) NSString *internalProcessName;
-@property (nonatomic) ZGMemoryAddress address;
+@property (nonatomic, readonly) NSString *internalProcessName;
+@property (nonatomic, readonly) ZGMemoryAddress address;
 
 @end
