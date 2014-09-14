@@ -49,6 +49,8 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 	ZGProcess *_currentProcess;
 }
 
++ (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
+
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
 
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;

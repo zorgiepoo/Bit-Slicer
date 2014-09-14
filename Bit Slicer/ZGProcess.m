@@ -41,6 +41,9 @@
 #import "CoreSymbolication.h"
 
 @interface ZGProcess ()
+{
+	NSMutableDictionary *_cacheDictionary;
+}
 
 @property (nonatomic) ZGMachBinary *mainMachBinary;
 @property (nonatomic) ZGMachBinary *dylinkerBinary;
@@ -51,30 +54,14 @@
 
 @implementation ZGProcess
 
-+ (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask
-{
-	integer_t suspendCount;
-	if (ZGSuspendCount(processTask, &suspendCount))
-	{
-		if (suspendCount > 0)
-		{
-			ZGResumeTask(processTask);
-		}
-		else
-		{
-			ZGSuspendTask(processTask);
-		}
-	}
-}
-
 - (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit
 {
 	if ((self = [super init]))
 	{
-		self.name = processName;
-		self.internalName = internalName;
-		self.processID = aProcessID;
-		self.is64Bit = flag64Bit;
+		_name = [processName copy];
+		_internalName = [internalName copy];
+		_processID = aProcessID;
+		_is64Bit = flag64Bit;
 	}
 	
 	return self;
@@ -85,14 +72,29 @@
 	return [self initWithName:processName internalName:internalName processID:NON_EXISTENT_PID_NUMBER is64Bit:flag64Bit];
 }
 
-- (instancetype)initWithProcess:(ZGProcess *)process
+- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask name:(NSString *)name
 {
-	self = [self initWithName:process.name internalName:process.internalName processID:process.processID is64Bit:process.is64Bit];
+	self = [self initWithName:name internalName:process.internalName processID:process.processID is64Bit:process.is64Bit];
 	if (self != nil)
 	{
-		self.processTask = process.processTask;
+		_processTask = processTask;
 	}
 	return self;
+}
+
+- (instancetype)initWithProcess:(ZGProcess *)process
+{
+	return [self initWithProcess:process processTask:process.processTask name:process.name];
+}
+
+- (instancetype)initWithProcess:(ZGProcess *)process name:(NSString *)name
+{
+	return [self initWithProcess:process processTask:process.processTask name:name];
+}
+
+- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask
+{
+	return [self initWithProcess:process processTask:processTask name:process.name];
 }
 
 - (void)dealloc
@@ -116,15 +118,6 @@
 - (BOOL)valid
 {
 	return self.processID != NON_EXISTENT_PID_NUMBER;
-}
-
-- (void)markInvalid
-{
-	self.processID = NON_EXISTENT_PID_NUMBER;
-	self.processTask = MACH_PORT_NULL;
-	_cacheDictionary = nil;
-	_dylinkerBinary = nil;
-	_mainMachBinary = nil;
 }
 
 - (CSSymbolicatorRef)symbolicator

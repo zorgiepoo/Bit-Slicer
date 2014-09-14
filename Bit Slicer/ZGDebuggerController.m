@@ -289,7 +289,7 @@ enum ZGStepExecution
 						ZGMemoryMap processTask = 0;
 						if ([self.processTaskManager getTask:&processTask forProcessIdentifier:runningApplication.processIdentifier])
 						{
-							[ZGProcess pauseOrUnpauseProcessTask:processTask];
+							[[self class] pauseOrUnpauseProcessTask:processTask];
 						}
 						else
 						{

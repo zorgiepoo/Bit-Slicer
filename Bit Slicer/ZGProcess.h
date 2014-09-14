@@ -43,30 +43,33 @@
 
 @interface ZGProcess : NSObject
 
-@property (nonatomic) pid_t processID;
-@property (nonatomic) ZGMemoryMap processTask;
-@property (readonly, nonatomic) BOOL valid;
-@property (copy, nonatomic) NSString *name;
-@property (copy, nonatomic) NSString *internalName;
-@property (nonatomic) BOOL is64Bit;
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
+
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
+
+- (instancetype)initWithProcess:(ZGProcess *)process;
+
+- (instancetype)initWithProcess:(ZGProcess *)process name:(NSString *)name;
+
+- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask;
+
+@property (nonatomic, readonly) pid_t processID;
+@property (nonatomic, readonly) ZGMemoryMap processTask;
+@property (nonatomic, readonly) BOOL valid;
+@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly) NSString *internalName;
+@property (nonatomic, readonly) BOOL is64Bit;
 
 @property (nonatomic, readonly) ZGMachBinary *mainMachBinary;
 @property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
 
-@property (nonatomic) NSMutableDictionary *cacheDictionary;
-
-+ (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
-
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
-- (instancetype)initWithProcess:(ZGProcess *)process;
+@property (nonatomic, readonly) NSMutableDictionary *cacheDictionary;
 
 - (NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(ZGMemoryAddress *)relativeOffset;
 - (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress;
 
 - (BOOL)isEqual:(id)process;
 
-- (void)markInvalid;
 - (BOOL)hasGrantedAccess;
 
 - (ZGMemorySize)pointerSize;

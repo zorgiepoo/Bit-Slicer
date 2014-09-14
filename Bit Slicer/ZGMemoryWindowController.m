@@ -350,7 +350,10 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 				ZGProcess *representedProcess = [menuItem representedObject];
 				if (representedProcess.processID == runningApplication.processIdentifier)
 				{
-					representedProcess.name = runningApplication.localizedName;
+					ZGProcess *newProcess = [[ZGProcess alloc] initWithProcess:representedProcess name:runningApplication.localizedName];
+					
+					menuItem.representedObject = newProcess;
+					
 					[[self class] updateProcessMenuItem:menuItem name:runningApplication.localizedName processIdentifier:runningApplication.processIdentifier icon:runningApplication.icon];
 					break;
 				}
@@ -375,13 +378,17 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 {
 }
 
-static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManager, ZGProcess *process)
+static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManager, ZGProcess *process, BOOL *grantedAccess)
 {
 	ZGMemoryMap processTask;
 	BOOL success = [processTaskManager getTask:&processTask forProcessIdentifier:process.processID];
-	process.processTask = processTask;
 	
-	return success;
+	if (grantedAccess != NULL)
+	{
+		*grantedAccess = success;
+	}
+	
+	return [[ZGProcess alloc] initWithProcess:process processTask:processTask];
 }
 
 - (void)setCurrentProcess:(ZGProcess *)newProcess
@@ -411,7 +418,9 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 	
 	if (_currentProcess != nil && ![_currentProcess hasGrantedAccess] && _currentProcess.valid)
 	{
-		if (!ZGGrantMemoryAccessToProcess(self.processTaskManager, _currentProcess))
+		BOOL grantedAccess = NO;
+		_currentProcess = ZGGrantMemoryAccessToProcess(self.processTaskManager, _currentProcess, &grantedAccess);
+		if (!grantedAccess)
 		{
 			shouldUpdateDisplay = YES;
 			ZG_LOG(@"%@ failed to grant access to PID %d", NSStringFromClass([self class]), _currentProcess.processID);
@@ -525,9 +534,25 @@ static BOOL ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManage
 
 #pragma mark Pausing
 
++ (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask
+{
+	integer_t suspendCount;
+	if (ZGSuspendCount(processTask, &suspendCount))
+	{
+		if (suspendCount > 0)
+		{
+			ZGResumeTask(processTask);
+		}
+		else
+		{
+			ZGSuspendTask(processTask);
+		}
+	}
+}
+
 - (IBAction)pauseOrUnpauseProcess:(id)__unused sender
 {
-	[ZGProcess pauseOrUnpauseProcessTask:self.currentProcess.processTask];
+	[[self class] pauseOrUnpauseProcessTask:self.currentProcess.processTask];
 }
 
 - (void)setIsWatchingActiveProcess:(BOOL)isWatchingActiveProcess
