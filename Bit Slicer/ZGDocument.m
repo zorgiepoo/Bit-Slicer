@@ -78,6 +78,13 @@
 	[self addWindowController:self.windowController];
 }
 
+// Since there appears to be an AppKit bug where window controllers are removed *before* the app is asked if it really wants to terminate, we'll make a workaround for cleaning the document's state
+- (void)removeWindowController:(NSWindowController *)windowController
+{
+	ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)windowController;
+	[documentWindowController cleanup];
+}
+
 - (NSFileWrapper *)fileWrapperOfType:(NSString *)__unused typeName error:(NSError * __autoreleasing *)__unused outError
 {
 	NSMutableData *writeData = [[NSMutableData alloc] init];
