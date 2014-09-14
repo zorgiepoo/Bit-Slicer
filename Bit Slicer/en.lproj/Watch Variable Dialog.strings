@@ -26,6 +26,9 @@
 /* Class = "NSTableColumn"; headerCell.title = "Address"; ObjectID = "bJK-aR-RHL"; */
 "bJK-aR-RHL.headerCell.title" = "Address";
 
+/* Class = "NSTableColumn"; headerCell.title = "Count"; ObjectID = "Daf-V9-g6D"; */
+"Daf-V9-g6D.headerCell.title" = "Count";
+
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "eqG-Mx-tbd"; */
 "eqG-Mx-tbd.title" = "Text Cell";
 

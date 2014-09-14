@@ -259,7 +259,21 @@
 	ZGInstruction *instruction = watchVariable.instruction;
 	ZGRegistersState *registersState = watchVariable.registersState;
 	
-	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\nAccessed %lu times", instruction.text, watchVariable.accessCount]];
+	NSString *accessedTimes = @"";
+	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8)
+	{
+		accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedTimesFormat"), watchVariable.accessCount];
+	}
+	else if (watchVariable.accessCount == 1)
+	{
+		accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedSingleTimeFormat"), watchVariable.accessCount];
+	}
+	else
+	{
+		accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedMultipleTimesFormat"), watchVariable.accessCount];
+	}
+	
+	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n%@", instruction.text, accessedTimes]];
 	
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	int numberOfGeneralRegisters = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:registersState.is64Bit];

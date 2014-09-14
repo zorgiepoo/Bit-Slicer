@@ -15,6 +15,12 @@
 /* Alert responce to adding the found instructions when the target process terminated */
 "targetTeriminatedAlertAddButton" = "Add";
 
+/* Annotated description for variable being accessed one time; not used on 10.9 or later */
+"accessedSingleTimeFormat" = "Accessed %lu time";
+
+/* Annotated description for variable being accessed multiple times; not used on 10.9 or later */
+"accessedMultipleTimesFormat" = "Accessed %lu times";
+
 /* Annotated description annotated label for general purpose registers; not sure if this should be localized */
 "generalPurposeRegistersDescriptionLabel" = "General Purpose Registers";
 
