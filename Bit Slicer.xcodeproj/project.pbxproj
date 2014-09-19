@@ -99,7 +99,7 @@
 		773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
 		773E8B061821DE9300D1A71A /* libudis86.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B051821DE9300D1A71A /* libudis86.a */; };
 		773E8B081821DEAC00D1A71A /* libpython3.3m.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B071821DEAC00D1A71A /* libpython3.3m.a */; };
-		773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
+		773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7743F9C618024CE400DBC19A /* python3.3 in Resources */ = {isa = PBXBuildFile; fileRef = 7743F9C518024CE400DBC19A /* python3.3 */; };
 		774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
@@ -155,7 +155,7 @@
 		77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D091800639E00549A37 /* stepout.pdf */; };
 		77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D0A1800639E00549A37 /* stepover.pdf */; };
 		77E133FE19312AD500B5B799 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
-		77E1340019312AFE00B5B799 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
+		77E1340019312AFE00B5B799 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		77E1340119312B1700B5B799 /* ZGSearchData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160E17D2EED6009E002A /* ZGSearchData.m */; };
 		77E1340219312B1F00B5B799 /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGSearchResults.m */; };
 		77E1340319312B2800B5B799 /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161117D2EEE1009E002A /* ZGSearchProgress.m */; };
@@ -196,8 +196,8 @@
 		77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162417D2EF31009E002A /* ZGRegion.m */; };
 		77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */; };
 		77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E9DBCD181F812E009F4982 /* ZGMachBinary.m */; };
-		77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
-		77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
+		77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		77F115A817D2E87E009E002A /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115A717D2E87E009E002A /* VDKQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		77F115AA17D2E8AC009E002A /* yasm in Resources */ = {isa = PBXBuildFile; fileRef = 77F115A917D2E8AC009E002A /* yasm */; };
 		77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */; };
@@ -1554,7 +1554,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0600;
 				TargetAttributes = {
 					77E2BBA318FD88A700E41FA0 = {
 						TestTargetID = 8D15AC270486D014006FF6A4;
@@ -2296,6 +2296,7 @@
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -2394,6 +2395,7 @@
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
