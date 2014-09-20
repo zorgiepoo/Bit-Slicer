@@ -48,11 +48,10 @@
 
 @implementation ZGStoredData
 
-+ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask
++ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask regions:(NSArray *)regions
 {
-	NSMutableArray *regions = [[NSMutableArray alloc] init];
-	
-	for (ZGRegion *region in [ZGRegion regionsFromProcessTask:processTask])
+	NSMutableArray *newRegions = [[NSMutableArray alloc] init];
+	for (ZGRegion *region in regions)
 	{
 		void *bytes = NULL;
 		ZGMemorySize size = region.size;
@@ -61,12 +60,16 @@
 		{
 			ZGRegion *newRegion = [[ZGRegion alloc] initWithAddress:region.address size:region.size protection:region.protection];
 			newRegion->_bytes = bytes;
-			
-			[regions addObject:newRegion];
+
+			[newRegions addObject:newRegion];
 		}
 	}
-	
-	return [[self alloc] initWithRegions:regions];
+	return [[self alloc] initWithRegions:newRegions];
+}
+
++ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask
+{
+	return [self storedDataFromProcessTask:processTask regions:[ZGRegion regionsFromProcessTask:processTask]];
 }
 
 - (id)initWithRegions:(NSArray *)regions
@@ -74,7 +77,7 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.regions = regions;
+		_regions = regions;
 	}
 	return self;
 }

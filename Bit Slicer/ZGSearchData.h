@@ -90,6 +90,9 @@ typedef enum
 @property (nonatomic) void *multiplicativeConstant;
 @property (nonatomic) unsigned char *byteArrayFlags;
 
+@property (nonatomic) ZGMemoryAddress maxPointerOffset;
+@property (nonatomic) uint16_t numberOfPointerLevels;
+
 - (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
 
 @end

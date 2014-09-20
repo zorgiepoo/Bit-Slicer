@@ -37,6 +37,7 @@
 
 @interface ZGStoredData : NSObject
 
++ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask regions:(NSArray *)regions;
 + (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask;
 
 @property (nonatomic, readonly) NSArray *regions;

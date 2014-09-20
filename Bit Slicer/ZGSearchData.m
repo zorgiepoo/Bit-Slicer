@@ -56,6 +56,9 @@
 		self.dataSize = dataSize;
 		self.dataAlignment = dataAlignment;
 		self.pointerSize = pointerSize;
+		
+		self.maxPointerOffset = 2048;
+		self.numberOfPointerLevels = 20;
 	}
 	return self;
 }
