@@ -2558,6 +2558,7 @@
 					"-Wno-selector",
 					"-Wno-c++11-long-long",
 					"-Wno-variadic-macros",
+					"-Wno-c++98-compat",
 					"-Werror",
 				);
 			};
@@ -2656,6 +2657,7 @@
 					"-Wno-selector",
 					"-Wno-c++11-long-long",
 					"-Wno-variadic-macros",
+					"-Wno-c++98-compat",
 					"-Werror",
 				);
 			};
@@ -2664,6 +2666,8 @@
 		C05733CC08A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = bitslicer_codesign;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -2681,6 +2685,8 @@
 		C05733CD08A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
