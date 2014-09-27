@@ -50,6 +50,7 @@
 #import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
 #import "ZGVariableController.h"
+#import "ZGMachBinary.h"
 #import "ZGTableView.h"
 
 @interface ZGDocumentSearchController ()
@@ -463,7 +464,8 @@
 	
 	ZGFunctionType functionType = self.functionType;
 	
-	BOOL is64Bit = windowController.currentProcess.is64Bit;
+	ZGProcess *currentProcess = windowController.currentProcess;
+	BOOL is64Bit = currentProcess.is64Bit;
 	
 	self.searchData.shouldCompareStoredValues = ZGIsFunctionTypeStore(functionType);
 	
@@ -501,6 +503,35 @@
 		if (dataType == ZGByteArray)
 		{
 			self.searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(finalSearchExpression);
+		}
+		else if (dataType == ZGPointer)
+		{
+			/*
+			NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:currentProcess];
+			NSArray *filePaths = [machBinaries zgMapUsingBlock:^(ZGMachBinary *machBinary) {
+				return [machBinary filePathInProcess:currentProcess];
+			}];
+			
+			NSArray *filePathSuffixes = [ZGMachBinary filePathSuffixesFromFilePaths:filePaths];
+			NSMutableArray *staticMachBinariesInfo = [NSMutableArray array];
+			NSUInteger machBinaryIndex = 0;
+			for (ZGMachBinary *machBinary in machBinaries)
+			{
+				ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:currentProcess];
+				[staticMachBinariesInfo addObject:[[ZGStaticMachBinaryInfo alloc] initWithSegmentRange:machBinaryInfo.totalSegmentRange filePathSuffix:filePathSuffixes[machBinaryIndex]]];
+				machBinaryIndex++;
+			}
+			
+			NSLog(@"real: %@", filePaths);
+			NSLog(@"suffixes: %@", filePathSuffixes);
+			
+			self.searchData.staticMachBinariesInfo = staticMachBinariesInfo;
+			 */
+			
+			NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:currentProcess];
+			self.searchData.machBinariesInfo =  [machBinaries zgMapUsingBlock:^(ZGMachBinary *machBinary) {
+				return [machBinary machBinaryInfoInProcess:currentProcess];
+			}];
 		}
 	}
 	else

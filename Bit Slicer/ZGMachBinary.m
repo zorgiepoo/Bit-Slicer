@@ -213,6 +213,44 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	return foundMachBinary;
 }
 
++ (NSArray *)filePathSuffixesFromFilePaths:(NSArray *)filePaths
+{
+	NSMutableArray *suffixPaths = [NSMutableArray array];
+	
+	// first file path does not matter since we don't have to use its suffix
+	[suffixPaths addObject:@""];
+	
+	NSMutableArray *encounteredSuffixes = [NSMutableArray array];
+	
+	if (filePaths.count > 1)
+	{
+		for (NSString *filePath in [filePaths subarrayWithRange:NSMakeRange(1, filePaths.count - 1)])
+		{
+			NSArray *pathComponents = filePath.pathComponents;
+			NSString *suffixPath = pathComponents.count > 1 ? [@"/" stringByAppendingString:pathComponents[pathComponents.count - 1]] : filePath;
+			
+			if ([suffixPaths containsObject:suffixPath])
+			{
+				NSUInteger currentIndex = [suffixPaths indexOfObject:suffixPath];
+				suffixPaths[currentIndex] = filePaths[currentIndex];
+				
+				[suffixPaths addObject:filePath];
+			}
+			else if ([encounteredSuffixes containsObject:suffixPath])
+			{
+				[suffixPaths addObject:filePath];
+			}
+			else
+			{
+				[suffixPaths addObject:suffixPath];
+				[encounteredSuffixes addObject:suffixPath];
+			}
+		}
+	}
+	
+	return [suffixPaths copy];
+}
+
 - (id)initWithHeaderAddress:(ZGMemoryAddress)headerAddress filePathAddress:(ZGMemoryAddress)filePathAddress
 {
 	self = [super init];

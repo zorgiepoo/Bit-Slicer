@@ -48,7 +48,6 @@
 	void *_rangeValue;
 	double _epsilon;
 	BOOL _shouldIgnoreStringCase;
-	BOOL _shouldIncludeNullTerminator;
 	
 	// For searching non-native byte order
 	void *_swappedValue;
@@ -92,6 +91,7 @@ typedef enum
 
 @property (nonatomic) ZGMemoryAddress maxPointerOffset;
 @property (nonatomic) uint16_t numberOfPointerLevels;
+@property (nonatomic) NSArray *machBinariesInfo;
 
 - (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
 

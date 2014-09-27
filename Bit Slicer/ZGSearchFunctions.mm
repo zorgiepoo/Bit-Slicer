@@ -41,8 +41,9 @@
 #import "NSArrayAdditions.h"
 #import "ZGSearchResults.h"
 #import "ZGStoredData.h"
-#import <stdint.h>
+#import "ZGMachBinaryInfo.h"
 
+#import <stdint.h>
 #include <cstdlib>
 #include <stack>
 #include <unordered_map>
@@ -465,8 +466,8 @@ struct ZGMemoryPointerEntry
 
 static int ZGSortMemoryPointers(const void *entry1, const void *entry2)
 {
-	ZGMemoryPointerEntry *entry1Reference = static_cast<ZGMemoryPointerEntry *>(const_cast<void *>(entry1));
-	ZGMemoryPointerEntry *entry2Reference = static_cast<ZGMemoryPointerEntry *>(const_cast<void *>(entry2));
+	auto entry1Reference = static_cast<const ZGMemoryPointerEntry *>(entry1);
+	auto entry2Reference = static_cast<const ZGMemoryPointerEntry *>(entry2);
 	
 	if (entry1Reference->value < entry2Reference->value)
 	{
@@ -553,23 +554,6 @@ struct ZGRecursivePointerStackEntry
 	size_t pointerIndex;
 	uint16_t level;
 	std::unordered_map<ZGMemoryAddress, bool> *hashTable;
-	
-	void retain()
-	{
-		_retainCount++;
-	}
-	
-	void release()
-	{
-		if (--_retainCount == 0)
-		{
-			delete hashTable;
-			hashTable = nullptr;
-		}
-	}
-	
-private:
-	size_t _retainCount;
 };
 
 static int ZGComparePointerValue(ZGMemoryAddress addressToSearch, ZGMemoryAddress candidateValue, ZGMemoryAddress maxOffset)
@@ -629,7 +613,6 @@ static void ZGPushPointerStackEntry(std::vector<ZGRecursivePointerEntry> *pointe
 		pointerStackEntry.pointerIndex = pointerEntries->size();
 		pointerStackEntry.level = level;
 		pointerStackEntry.hashTable = hashTable;
-		pointerStackEntry.retain();
 		
 		stack->push(pointerStackEntry);
 		
@@ -677,6 +660,8 @@ static void ZGSearchPointersRecursively(std::vector<ZGRecursivePointerEntry> *po
 {
 	auto stack = new std::stack<ZGRecursivePointerStackEntry>;
 	
+	auto initialStack = *stack;
+	
 	ZGPushPointerStackEntries(pointerEntries, stack, dataTable, dataTableSize, addressToSearch, maxOffset, nullptr, level);
 	
 	while (stack->size() > 0)
@@ -691,56 +676,66 @@ static void ZGSearchPointersRecursively(std::vector<ZGRecursivePointerEntry> *po
 			pointerEntry.nextEntries = new std::vector<ZGRecursivePointerEntry>;
 			ZGPushPointerStackEntries(pointerEntry.nextEntries, stack, dataTable, dataTableSize, pointerEntry.address, maxOffset, stackEntry.hashTable, nextLevel);
 		}
-		
-		stackEntry.release();
 	}
 	
 	delete stack;
+	
+	while (initialStack.size() > 0)
+	{
+		auto stackEntry = initialStack.top();
+		initialStack.pop();
+		
+		delete stackEntry.hashTable;
+	}
 }
 
 struct ZGPointerEntry
 {
 	ZGMemoryAddress address;
 	ZGMemoryAddress offset;
-	char baseImageSuffix[64];
+	int16_t baseImageIndex;
 };
 
-static uint64_t ZGSerializeRecursiveEntries(NSMutableData *pointerEntryData, NSMutableData *nodeNumberData, std::vector<ZGRecursivePointerEntry> *recursivePointerEntries, uint64_t nodePosition)
+static uint64_t ZGSerializeRecursiveEntries(NSMutableData *pointerEntryData, NSMutableData *nodeNumberData, std::vector<ZGRecursivePointerEntry> *recursivePointerEntries, std::deque<uint64_t> nodePositions)
 {
-	uint64_t parentNodePosition = nodePosition;
+	uint64_t nodePosition = nodePositions.front();
 	for (auto recursiveEntry : *recursivePointerEntries)
 	{
 		ZGPointerEntry newPointerEntry;
 		newPointerEntry.address = recursiveEntry.address;
 		newPointerEntry.offset = recursiveEntry.offset;
-		bzero(&(newPointerEntry.baseImageSuffix), sizeof(newPointerEntry.baseImageSuffix));
+		newPointerEntry.baseImageIndex = -1;
 		
 		[pointerEntryData appendBytes:&newPointerEntry length:sizeof(newPointerEntry)];
 		
-		if (parentNodePosition > 0)
-		{
-			uint64_t parentNodeWritten = parentNodePosition - 1;
-			[nodeNumberData appendBytes:&parentNodeWritten length:sizeof(parentNodeWritten)];
-		}
-		
 		nodePosition++;
 		
-		bool shouldPrintThisNode = true;
+		std::deque<uint64_t> localNodePositions = nodePositions;
+		localNodePositions.push_front(nodePosition);
+		
+		bool shouldPrintHere = true;
 		if (recursiveEntry.nextEntries != nullptr)
 		{
 			if (recursiveEntry.nextEntries->size() > 0)
 			{
-				shouldPrintThisNode = false;
-				nodePosition = ZGSerializeRecursiveEntries(pointerEntryData, nodeNumberData, recursiveEntry.nextEntries, nodePosition);
+				shouldPrintHere = false;
+				nodePosition = ZGSerializeRecursiveEntries(pointerEntryData, nodeNumberData, recursiveEntry.nextEntries, localNodePositions);
 			}
 			
 			delete recursiveEntry.nextEntries;
 		}
 		
-		if (shouldPrintThisNode)
+		if (shouldPrintHere)
 		{
-			uint64_t nodeWritten = nodePosition - 1;
-			[nodeNumberData appendBytes:&nodeWritten length:sizeof(nodeWritten)];
+			for (auto nodeIterator = localNodePositions.begin(); nodeIterator < localNodePositions.end(); nodeIterator++)
+			{
+				uint64_t nodeValue = *nodeIterator;
+				if (nodeValue > 0)
+				{
+					uint64_t printedValue = nodeValue - 1;
+					[nodeNumberData appendBytes:&printedValue length:sizeof(printedValue)];
+				}
+			}
 			
 			uint64_t terminatorValue = static_cast<uint64_t>(-1);
 			[nodeNumberData appendBytes:&terminatorValue length:sizeof(terminatorValue)];
@@ -748,6 +743,126 @@ static uint64_t ZGSerializeRecursiveEntries(NSMutableData *pointerEntryData, NSM
 	}
 	
 	return nodePosition;
+}
+
+static void ZGAnnotateStaticInfo(const NSRange *staticMachSegments, const NSUInteger numberOfSegments, NSData *pointerEntryData)
+{
+	const auto pointerEntries = static_cast<ZGPointerEntry *>(const_cast<void *>(pointerEntryData.bytes));
+	const NSUInteger numberOfEntries = pointerEntryData.length / sizeof(*pointerEntries);
+	
+	for (NSUInteger pointerEntryIndex = 0; pointerEntryIndex < numberOfEntries; pointerEntryIndex++)
+	{
+		ZGPointerEntry *pointerEntry = pointerEntries + pointerEntryIndex;
+		
+		NSUInteger end = numberOfSegments;
+		NSUInteger start = 0;
+		
+		while (end > start)
+		{
+			NSUInteger mid = start + (end - start) / 2;
+			NSRange segmentRange = staticMachSegments[mid];
+			
+			if (pointerEntry->address < segmentRange.location)
+			{
+				end = mid;
+			}
+			else if (pointerEntry->address >= segmentRange.location + segmentRange.length)
+			{
+				start = mid + 1;
+			}
+			else
+			{
+				pointerEntry->baseImageIndex = static_cast<int16_t>(mid);
+				pointerEntry->address -= segmentRange.location;
+				break;
+			}
+		}
+	}
+}
+
+static NSData *ZGFilterStaticNodes(NSData *nodeNumberData, NSData *pointerEntryData)
+{
+	NSMutableData *filteredNodeNumberData = [[NSMutableData alloc] init];
+	
+	const auto pointerEntries = static_cast<const ZGPointerEntry *>(pointerEntryData.bytes);
+	
+	const auto nodeNumbers = static_cast<const uint64_t *>(nodeNumberData.bytes);
+	const NSUInteger numberOfNodes = nodeNumberData.length / sizeof(*nodeNumbers);
+	
+	const auto invalidNumber = static_cast<uint64_t>(-1);
+	
+	if (numberOfNodes > 1)
+	{
+		bool startWriting = false;
+		for (NSUInteger nodeIndex = 0; nodeIndex < numberOfNodes; nodeIndex++)
+		{
+			auto nodeNumber = nodeNumbers[nodeIndex];
+			if (nodeNumber != invalidNumber)
+			{
+				auto pointerEntry = pointerEntries[nodeNumber];
+				
+				if (pointerEntry.baseImageIndex != -1)
+				{
+					startWriting = true;
+				}
+				
+				if (startWriting)
+				{
+					[filteredNodeNumberData appendBytes:&nodeNumber length:sizeof(nodeNumber)];
+				}
+			}
+			else
+			{
+				if (startWriting)
+				{
+					[filteredNodeNumberData appendBytes:&invalidNumber length:sizeof(invalidNumber)];
+					startWriting = false;
+				}
+			}
+		}
+		
+		assert(!startWriting);
+	}
+	else
+	{
+		[filteredNodeNumberData appendBytes:&invalidNumber length:sizeof(invalidNumber)];
+	}
+	
+	return filteredNodeNumberData;
+}
+
+static NSString *ZGAddressFormulaForPointerPath(const uint64_t *nodeNumbers, const ZGPointerEntry *pointerEntries)
+{
+	NSString *addressFormula = nil;
+	uint64_t nodeNumber;
+	while ((nodeNumber = *nodeNumbers++) != static_cast<uint64_t>(-1))
+	{
+		const ZGPointerEntry *pointerEntry = pointerEntries + nodeNumber;
+		if (addressFormula == nil)
+		{
+			if (pointerEntry->offset > 0)
+			{
+				addressFormula = [NSString stringWithFormat:@"[base(%u) + 0x%llX] + 0x%llX", pointerEntry->baseImageIndex, pointerEntry->address, pointerEntry->offset];
+			}
+			else
+			{
+				addressFormula = [NSString stringWithFormat:@"[base(%u) + 0x%llX]", pointerEntry->baseImageIndex, pointerEntry->address];
+			}
+		}
+		else
+		{
+			if (pointerEntry->offset > 0)
+			{
+				addressFormula = [NSString stringWithFormat:@"[%@] + 0x%llX", addressFormula, pointerEntry->offset];
+			}
+			else
+			{
+				addressFormula = [NSString stringWithFormat:@"[%@]", addressFormula];
+			}
+		}
+	}
+	
+	return addressFormula;
 }
 
 static ZGSearchResults *ZGSearchForPointer(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate)
@@ -772,18 +887,60 @@ static ZGSearchResults *ZGSearchForPointer(ZGMemoryMap processTask, ZGSearchData
 	
 	NSMutableData *pointerEntryData = [[NSMutableData alloc] init];
 	NSMutableData *nodeNumberData = [[NSMutableData alloc] init];
-	uint64_t nodePosition = 0;
-	ZGSerializeRecursiveEntries(pointerEntryData, nodeNumberData, recursivePointerEntries, nodePosition);
+	std::deque<uint64_t> nodePositions;
+	nodePositions.push_front(0);
+	ZGSerializeRecursiveEntries(pointerEntryData, nodeNumberData, recursivePointerEntries, nodePositions);
 	
-	uint64_t *nodeNumberPtr = static_cast<uint64_t *>(const_cast<void *>(nodeNumberData.bytes));
-	uint64_t nodeNumber = 0;
-	while ((nodeNumber = *nodeNumberPtr++) != static_cast<uint64_t>(-1))
+	NSArray *machBinariesInfo = searchData.machBinariesInfo;
+	NSRange *segmentRanges = new NSRange[machBinariesInfo.count];
+	
+	NSUInteger machBinaryInfoIndex = 0;
+	for (ZGMachBinaryInfo *machBinaryInfo in machBinariesInfo)
 	{
-		ZGPointerEntry *pointerEntry = static_cast<ZGPointerEntry *>(const_cast<void *>(pointerEntryData.bytes)) + nodeNumber;
-		NSLog(@"Address 0x%llX offset 0x%llX, node %llu", pointerEntry->address, pointerEntry->offset, nodeNumber);
+		segmentRanges[machBinaryInfoIndex++] = machBinaryInfo.totalSegmentRange;
+		NSLog(@"%lu: 0x%lX", machBinaryInfoIndex - 1, machBinaryInfo.totalSegmentRange.location);
 	}
 	
-	NSLog(@"%lu, %lu", nodeNumberData.length, pointerEntryData.length);
+	ZGAnnotateStaticInfo(segmentRanges, machBinariesInfo.count, pointerEntryData);
+	
+	delete[] segmentRanges;
+	
+	NSData *reducedNodeNumberData = ZGFilterStaticNodes(nodeNumberData, pointerEntryData);
+	
+	NSLog(@"Reduced vs real count: %lu, %lu", reducedNodeNumberData.length, nodeNumberData.length);
+	
+	NSLog(@"Formula..: %@", ZGAddressFormulaForPointerPath(static_cast<const uint64_t *>(reducedNodeNumberData.bytes), static_cast<const ZGPointerEntry *>(pointerEntryData.bytes)));
+	
+	/*
+	if (pointerEntryData.length > 0)
+	{
+		const auto intialNodeNumberPtr = static_cast<const uint64_t *>(reducedNodeNumberData.bytes);
+		auto nodeNumberLength = reducedNodeNumberData.length;
+		auto pointerEntries = static_cast<ZGPointerEntry *>(const_cast<void *>(pointerEntryData.bytes));
+		
+		NSLog(@"Blah: %p", pointerEntries);
+		
+		auto nodeNumberPtr = const_cast<uint64_t *>(intialNodeNumberPtr);
+		uint64_t nodeNumber = 0;
+		while (nodeNumberPtr < intialNodeNumberPtr + nodeNumberLength)
+		{
+			nodeNumber = *nodeNumberPtr;
+			if (nodeNumber != static_cast<uint64_t>(-1))
+			{
+				ZGPointerEntry *pointerEntry = pointerEntries + nodeNumber;
+				NSLog(@"Address 0x%llX offset 0x%llX, node %llu", pointerEntry->address, pointerEntry->offset, nodeNumber);
+			}
+			else
+			{
+				NSLog(@"-1");
+			}
+			
+			nodeNumberPtr++;
+		}
+	}
+	 */
+	
+	NSLog(@"%lu, %lu", reducedNodeNumberData.length, pointerEntryData.length);
 	
 	return [[ZGSearchResults alloc] initWithResultSets:@[] dataSize:dataSize pointerSize:sizeof(ZGMemoryAddress)];
 }

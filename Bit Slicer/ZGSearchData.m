@@ -58,7 +58,7 @@
 		self.pointerSize = pointerSize;
 		
 		self.maxPointerOffset = 2048;
-		self.numberOfPointerLevels = 20;
+		self.numberOfPointerLevels = 5;
 	}
 	return self;
 }
