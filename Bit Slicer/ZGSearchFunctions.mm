@@ -553,7 +553,6 @@ struct ZGRecursivePointerStackEntry
 	std::vector<ZGRecursivePointerEntry> *pointerEntries;
 	size_t pointerIndex;
 	uint16_t level;
-	std::unordered_map<ZGMemoryAddress, bool> *hashTable;
 };
 
 static int ZGComparePointerValue(ZGMemoryAddress addressToSearch, ZGMemoryAddress candidateValue, ZGMemoryAddress maxOffset)
@@ -597,40 +596,29 @@ static NSUInteger ZGBinarySearch(ZGMemoryPointerEntry *dataTable, NSUInteger dat
 	return NSUIntegerMax;
 }
 
-static void ZGPushPointerStackEntry(std::vector<ZGRecursivePointerEntry> *pointerEntries, std::stack<ZGRecursivePointerStackEntry> *stack, ZGMemoryAddress addressToSearch, std::unordered_map<ZGMemoryAddress, bool> *hashTable, uint16_t level, ZGMemoryPointerEntry *memoryPointerEntry)
+static void ZGPushPointerStackEntry(std::vector<ZGRecursivePointerEntry> *pointerEntries, std::stack<ZGRecursivePointerStackEntry> *stack, ZGMemoryAddress addressToSearch, uint16_t level, ZGMemoryPointerEntry *memoryPointerEntry)
 {
-	if (hashTable == nullptr || hashTable->find(memoryPointerEntry->address) == hashTable->end())
-	{
-		if (hashTable == nullptr)
-		{
-			hashTable = new std::unordered_map<ZGMemoryAddress, bool>;
-		}
-		
-		(*hashTable)[memoryPointerEntry->address] = true;
-		
-		ZGRecursivePointerStackEntry pointerStackEntry;
-		pointerStackEntry.pointerEntries = pointerEntries;
-		pointerStackEntry.pointerIndex = pointerEntries->size();
-		pointerStackEntry.level = level;
-		pointerStackEntry.hashTable = hashTable;
-		
-		stack->push(pointerStackEntry);
-		
-		ZGRecursivePointerEntry newEntry;
-		newEntry.address = memoryPointerEntry->address;
-		newEntry.offset = addressToSearch - memoryPointerEntry->value;
-		newEntry.nextEntries = nullptr;
-		
-		pointerEntries->push_back(newEntry);
-	}
+	ZGRecursivePointerStackEntry pointerStackEntry;
+	pointerStackEntry.pointerEntries = pointerEntries;
+	pointerStackEntry.pointerIndex = pointerEntries->size();
+	pointerStackEntry.level = level;
+	
+	stack->push(pointerStackEntry);
+	
+	ZGRecursivePointerEntry newEntry;
+	newEntry.address = memoryPointerEntry->address;
+	newEntry.offset = addressToSearch - memoryPointerEntry->value;
+	newEntry.nextEntries = nullptr;
+	
+	pointerEntries->push_back(newEntry);
 }
 
-static void ZGPushPointerStackEntries(std::vector<ZGRecursivePointerEntry> *pointerEntries, std::stack<ZGRecursivePointerStackEntry> *stack, ZGMemoryPointerEntry *dataTable, NSUInteger dataTableSize, ZGMemoryAddress addressToSearch, ZGMemoryAddress maxOffset, std::unordered_map<ZGMemoryAddress, bool> *hashTable, uint16_t level)
+static void ZGPushPointerStackEntries(std::vector<ZGRecursivePointerEntry> *pointerEntries, std::stack<ZGRecursivePointerStackEntry> *stack, ZGMemoryPointerEntry *dataTable, NSUInteger dataTableSize, ZGMemoryAddress addressToSearch, ZGMemoryAddress maxOffset, uint16_t level)
 {
 	NSUInteger searchIndex = ZGBinarySearch(dataTable, dataTableSize, addressToSearch, maxOffset);
 	if (searchIndex != NSUIntegerMax)
 	{
-		ZGPushPointerStackEntry(pointerEntries, stack, addressToSearch, hashTable, level, dataTable + searchIndex);
+		ZGPushPointerStackEntry(pointerEntries, stack, addressToSearch, level, dataTable + searchIndex);
 		
 		NSUInteger belowIndex = searchIndex;
 		while (belowIndex-- > 0)
@@ -640,7 +628,7 @@ static void ZGPushPointerStackEntries(std::vector<ZGRecursivePointerEntry> *poin
 			{
 				break;
 			}
-			ZGPushPointerStackEntry(pointerEntries, stack, addressToSearch, hashTable, level, candidate);
+			ZGPushPointerStackEntry(pointerEntries, stack, addressToSearch, level, candidate);
 		}
 		
 		NSUInteger aboveIndex = searchIndex;
@@ -651,18 +639,18 @@ static void ZGPushPointerStackEntries(std::vector<ZGRecursivePointerEntry> *poin
 			{
 				break;
 			}
-			ZGPushPointerStackEntry(pointerEntries, stack, addressToSearch, hashTable, level, candidate);
+			ZGPushPointerStackEntry(pointerEntries, stack, addressToSearch, level, candidate);
 		}
 	}
 }
 
-static void ZGSearchPointersRecursively(std::vector<ZGRecursivePointerEntry> *pointerEntries, ZGMemoryPointerEntry *dataTable, NSUInteger dataTableSize, ZGMemoryAddress addressToSearch, ZGMemoryAddress maxOffset, uint16_t level)
+static std::unordered_map<ZGMemoryAddress, std::vector<ZGRecursivePointerEntry> *> *ZGSearchPointersRecursively(std::vector<ZGRecursivePointerEntry> *pointerEntries, ZGMemoryPointerEntry *dataTable, NSUInteger dataTableSize, ZGMemoryAddress addressToSearch, ZGMemoryAddress maxOffset, uint16_t level)
 {
 	auto stack = new std::stack<ZGRecursivePointerStackEntry>;
 	
-	auto initialStack = *stack;
+	auto *hashTable = new std::unordered_map<ZGMemoryAddress, std::vector<ZGRecursivePointerEntry> *>;
 	
-	ZGPushPointerStackEntries(pointerEntries, stack, dataTable, dataTableSize, addressToSearch, maxOffset, nullptr, level);
+	ZGPushPointerStackEntries(pointerEntries, stack, dataTable, dataTableSize, addressToSearch, maxOffset, level);
 	
 	while (stack->size() > 0)
 	{
@@ -673,20 +661,25 @@ static void ZGSearchPointersRecursively(std::vector<ZGRecursivePointerEntry> *po
 		if (nextLevel > 0)
 		{
 			ZGRecursivePointerEntry &pointerEntry = (*(stackEntry.pointerEntries))[stackEntry.pointerIndex];
-			pointerEntry.nextEntries = new std::vector<ZGRecursivePointerEntry>;
-			ZGPushPointerStackEntries(pointerEntry.nextEntries, stack, dataTable, dataTableSize, pointerEntry.address, maxOffset, stackEntry.hashTable, nextLevel);
+			
+			auto iterator = hashTable->find(pointerEntry.address);
+			
+			if (iterator == hashTable->end())
+			{
+				pointerEntry.nextEntries = new std::vector<ZGRecursivePointerEntry>;
+				(*hashTable)[pointerEntry.address] = pointerEntry.nextEntries;
+				ZGPushPointerStackEntries(pointerEntry.nextEntries, stack, dataTable, dataTableSize, pointerEntry.address, maxOffset, nextLevel);
+			}
+			else
+			{
+				pointerEntry.nextEntries = iterator->second;
+			}
 		}
 	}
 	
 	delete stack;
 	
-	while (initialStack.size() > 0)
-	{
-		auto stackEntry = initialStack.top();
-		initialStack.pop();
-		
-		delete stackEntry.hashTable;
-	}
+	return hashTable;
 }
 
 struct ZGPointerEntry
@@ -696,8 +689,9 @@ struct ZGPointerEntry
 	int16_t baseImageIndex;
 };
 
-static uint64_t ZGSerializeRecursiveEntries(NSMutableData *pointerEntryData, NSMutableData *nodeNumberData, std::vector<ZGRecursivePointerEntry> *recursivePointerEntries, std::deque<uint64_t> nodePositions)
+static uint64_t ZGSerializeRecursiveEntries(NSMutableData *pointerEntryData, NSMutableData *nodeNumberData, std::vector<ZGRecursivePointerEntry> *recursivePointerEntries, std::deque<uint64_t> nodePositions, uint16_t level)
 {
+	uint16_t nextLevel = level - 1;
 	uint64_t nodePosition = nodePositions.front();
 	for (auto recursiveEntry : *recursivePointerEntries)
 	{
@@ -710,24 +704,21 @@ static uint64_t ZGSerializeRecursiveEntries(NSMutableData *pointerEntryData, NSM
 		
 		nodePosition++;
 		
-		std::deque<uint64_t> localNodePositions = nodePositions;
-		localNodePositions.push_front(nodePosition);
+		nodePositions.push_front(nodePosition);
 		
 		bool shouldPrintHere = true;
 		if (recursiveEntry.nextEntries != nullptr)
 		{
-			if (recursiveEntry.nextEntries->size() > 0)
+			if (nextLevel > 0 && recursiveEntry.nextEntries->size() > 0)
 			{
 				shouldPrintHere = false;
-				nodePosition = ZGSerializeRecursiveEntries(pointerEntryData, nodeNumberData, recursiveEntry.nextEntries, localNodePositions);
+				nodePosition = ZGSerializeRecursiveEntries(pointerEntryData, nodeNumberData, recursiveEntry.nextEntries, nodePositions, nextLevel);
 			}
-			
-			delete recursiveEntry.nextEntries;
 		}
 		
 		if (shouldPrintHere)
 		{
-			for (auto nodeIterator = localNodePositions.begin(); nodeIterator < localNodePositions.end(); nodeIterator++)
+			for (auto nodeIterator = nodePositions.begin(); nodeIterator < nodePositions.end(); nodeIterator++)
 			{
 				uint64_t nodeValue = *nodeIterator;
 				if (nodeValue > 0)
@@ -740,6 +731,8 @@ static uint64_t ZGSerializeRecursiveEntries(NSMutableData *pointerEntryData, NSM
 			uint64_t terminatorValue = static_cast<uint64_t>(-1);
 			[nodeNumberData appendBytes:&terminatorValue length:sizeof(terminatorValue)];
 		}
+		
+		nodePositions.pop_front();
 	}
 	
 	return nodePosition;
@@ -883,13 +876,19 @@ static ZGSearchResults *ZGSearchForPointer(ZGMemoryMap processTask, ZGSearchData
 	NSLog(@"Levels %d", searchData.numberOfPointerLevels);
 	
 	auto recursivePointerEntries = new std::vector<ZGRecursivePointerEntry>;
-	ZGSearchPointersRecursively(recursivePointerEntries, static_cast<ZGMemoryPointerEntry *>(const_cast<void *>(memoryPointerEntries.bytes)), memoryPointerEntries.length / sizeof(ZGMemoryPointerEntry), *static_cast<ZGMemoryAddress *>(searchData.searchValue), searchData.maxPointerOffset, searchData.numberOfPointerLevels);
+	auto allocatedEntries = ZGSearchPointersRecursively(recursivePointerEntries, static_cast<ZGMemoryPointerEntry *>(const_cast<void *>(memoryPointerEntries.bytes)), memoryPointerEntries.length / sizeof(ZGMemoryPointerEntry), *static_cast<ZGMemoryAddress *>(searchData.searchValue), searchData.maxPointerOffset, searchData.numberOfPointerLevels);
 	
+	NSLog(@"Serializing...");
 	NSMutableData *pointerEntryData = [[NSMutableData alloc] init];
 	NSMutableData *nodeNumberData = [[NSMutableData alloc] init];
 	std::deque<uint64_t> nodePositions;
 	nodePositions.push_front(0);
-	ZGSerializeRecursiveEntries(pointerEntryData, nodeNumberData, recursivePointerEntries, nodePositions);
+	ZGSerializeRecursiveEntries(pointerEntryData, nodeNumberData, recursivePointerEntries, nodePositions, searchData.numberOfPointerLevels);
+	
+	for (auto entry : *allocatedEntries)
+	{
+		delete (entry.second);
+	}
 	
 	NSArray *machBinariesInfo = searchData.machBinariesInfo;
 	NSRange *segmentRanges = new NSRange[machBinariesInfo.count];
@@ -900,6 +899,8 @@ static ZGSearchResults *ZGSearchForPointer(ZGMemoryMap processTask, ZGSearchData
 		segmentRanges[machBinaryInfoIndex++] = machBinaryInfo.totalSegmentRange;
 		NSLog(@"%lu: 0x%lX", machBinaryInfoIndex - 1, machBinaryInfo.totalSegmentRange.location);
 	}
+	
+	NSLog(@"Annotating...");
 	
 	ZGAnnotateStaticInfo(segmentRanges, machBinariesInfo.count, pointerEntryData);
 	
