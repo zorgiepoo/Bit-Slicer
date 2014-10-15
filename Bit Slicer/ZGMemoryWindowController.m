@@ -350,11 +350,15 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 				ZGProcess *representedProcess = [menuItem representedObject];
 				if (representedProcess.processID == runningApplication.processIdentifier)
 				{
-					ZGProcess *newProcess = [[ZGProcess alloc] initWithProcess:representedProcess name:runningApplication.localizedName];
-					
+					// For some reason -localizedName can return nil if it's the first time the user authenticates with task_for_pid, after logging back in
+					// perhaps this is an apple bug?
+					NSString *localizedName = runningApplication.localizedName;
+					NSString *processName = (localizedName != nil) ? localizedName : @"";
+					ZGProcess *newProcess = [[ZGProcess alloc] initWithProcess:representedProcess name:processName];
+
 					menuItem.representedObject = newProcess;
-					
-					[[self class] updateProcessMenuItem:menuItem name:runningApplication.localizedName processIdentifier:runningApplication.processIdentifier icon:runningApplication.icon];
+
+					[[self class] updateProcessMenuItem:menuItem name:processName processIdentifier:runningApplication.processIdentifier icon:runningApplication.icon];
 					break;
 				}
 			}
@@ -452,6 +456,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 		if (runningProcess.processIdentifier != ourProcessIdentifier)
 		{
 			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+			assert(runningProcess.name != nil);
 			[[self class] updateProcessMenuItem:menuItem name:runningProcess.name processIdentifier:runningProcess.processIdentifier icon:runningProcess.icon];
 			
 			ZGProcess *oldProcess = [oldProcessesDictionary objectForKey:@(runningProcess.processIdentifier)];
