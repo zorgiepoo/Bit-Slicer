@@ -345,29 +345,33 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 		// So be sure to get updated localized name and icon
 		for (NSRunningApplication *runningApplication in newRunningProcesses)
 		{
-			for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
+			assert([runningApplication isKindOfClass:[NSRunningApplication class]]);
+
+			pid_t runningProcessIdentifier = runningApplication.processIdentifier;
+			// when the running proccess identifier is -1, nothing useful is filled out in the NSRunningApplication instance
+			if (runningProcessIdentifier != -1)
 			{
-				ZGProcess *representedProcess = [menuItem representedObject];
-				if (representedProcess.processID == runningApplication.processIdentifier)
+				for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.itemArray)
 				{
-					// For some reason -localizedName can return nil if it's the first time the user authenticates with task_for_pid, after logging back in
-					// perhaps this is an apple bug?
-					NSString *localizedName = runningApplication.localizedName;
-					NSString *processName = (localizedName != nil) ? localizedName : @"";
-					ZGProcess *newProcess = [[ZGProcess alloc] initWithProcess:representedProcess name:processName];
+					ZGProcess *representedProcess = [menuItem representedObject];
+					if (representedProcess.processID == runningApplication.processIdentifier)
+					{
+						NSString *processName = runningApplication.localizedName;
+						ZGProcess *newProcess = [[ZGProcess alloc] initWithProcess:representedProcess name:runningApplication.localizedName];
 
-					menuItem.representedObject = newProcess;
+						menuItem.representedObject = newProcess;
 
-					[[self class] updateProcessMenuItem:menuItem name:processName processIdentifier:runningApplication.processIdentifier icon:runningApplication.icon];
-					break;
+						[[self class] updateProcessMenuItem:menuItem name:processName processIdentifier:runningApplication.processIdentifier icon:runningApplication.icon];
+						break;
+					}
 				}
-			}
-			
-			for (ZGRunningProcess *runningProcess in currentRunningProcesses)
-			{
-				if (runningProcess.processIdentifier == runningProcess.processIdentifier)
+
+				for (ZGRunningProcess *runningProcess in currentRunningProcesses)
 				{
-					[runningProcess invalidateAppInfoCache];
+					if (runningProcess.processIdentifier == runningProcess.processIdentifier)
+					{
+						[runningProcess invalidateAppInfoCache];
+					}
 				}
 			}
 		}
