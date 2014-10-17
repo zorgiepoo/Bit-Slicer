@@ -57,7 +57,6 @@
 #import "ZGVirtualMemory.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
-#import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
 #import "ZGDocumentOptionsViewController.h"
 #import "ZGWatchVariableWindowController.h"
@@ -263,8 +262,8 @@
 	
 	self.tableController.variablesTableView = self.variablesTableView;
 	
-	self.searchValueTextField.cell.sendsSearchStringImmediately = NO;
-	self.searchValueTextField.cell.sendsSearchStringOnlyAfterReturn = YES;
+	self.searchValueTextField.target = self;
+	self.searchValueTextField.action = @selector(searchValue:);
 	
 	[self setupScopeBar];
 	
@@ -457,7 +456,8 @@
 		[optionsViewController reloadInterface];
 	}
 	
-	self.searchValueTextField.objectValue = self.documentData.searchValue;
+	self.searchValueTextField.stringValue = self.documentData.searchValue;
+	
 	[self.window makeFirstResponder:self.searchValueTextField];
 	
 	[self.dataTypesPopUpButton selectItemWithTag:self.documentData.selectedDatatypeTag];
@@ -744,14 +744,14 @@
 
 - (ZGFunctionType)selectedFunctionType
 {
-	self.documentData.searchValue = self.searchValueTextField.objectValue;
+	self.documentData.searchValue = self.searchValueTextField.stringValue;
 	
-	BOOL isStoringValues = [self.documentData.searchValue zgHasObjectMatchingCondition:^(id searchValueObject) { return [searchValueObject isKindOfClass:[ZGSearchToken class]]; }];
+	BOOL isLinearlyExpressedStoredValue = NO;
+	BOOL isStoringValues = [[self.searchController class] hasStoredValueTokenFromExpression:self.documentData.searchValue isLinearlyExpressed:&isLinearlyExpressedStoredValue];
 
 	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
 	if (isStoringValues)
 	{
-		BOOL isLinearlyExpressedStoredValue = self.documentData.searchValue.count > 1;
 		switch (functionType)
 		{
 			case ZGEquals:
@@ -880,12 +880,9 @@
 		}
 		
 		// I'd like to use self.documentData.searchValue but we don't update it instantly
-		for (id object in self.searchValueTextField.objectValue)
+		if (![[self.searchController class] hasStoredValueTokenFromExpression:self.searchValueTextField.stringValue])
 		{
-			if ([object isKindOfClass:[ZGSearchToken class]])
-			{
-				return NO;
-			}
+			return NO;
 		}
 	}
 	
@@ -1194,7 +1191,7 @@
 
 - (IBAction)insertStoredValueToken:(id)__unused sender
 {
-	self.searchValueTextField.objectValue = @[[[ZGSearchToken alloc] initWithName:ZGLocalizableSearchDocumentString(@"storedValueTokenTitle")]];
+	self.searchValueTextField.stringValue = ZGLocalizableSearchDocumentString(@"storedValueTokenName");
 	[self deselectSearchField];
 }
 
@@ -1242,19 +1239,22 @@
 
 - (IBAction)searchValue:(id)__unused sender
 {
-	self.documentData.searchValue = self.searchValueTextField.objectValue;
+	self.documentData.searchValue = self.searchValueTextField.stringValue;
 	
-	if (self.documentData.searchValue.count == 0 && self.searchController.canCancelTask)
+	BOOL hasEmptyExpression = [self.documentData.searchValue isEqualToString:@""];
+	
+	if (hasEmptyExpression && self.searchController.canCancelTask)
 	{
 		[self.searchController cancelTask];
 	}
-	else if (self.documentData.searchValue.count == 0 && [self isClearable])
+	else if (hasEmptyExpression && [self isClearable])
 	{
 		[self clearSearchValues:nil];
 	}
-	else if (self.documentData.searchValue.count > 0 && self.searchController.canStartTask && self.currentProcess.valid)
+	else if (!hasEmptyExpression && self.searchController.canStartTask && self.currentProcess.valid)
 	{
-		if (ZGIsFunctionTypeStore([self selectedFunctionType]) && self.searchData.savedData == nil)
+		ZGFunctionType functionType = [self selectedFunctionType];
+		if (ZGIsFunctionTypeStore(functionType) && self.searchData.savedData == nil)
 		{
 			ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"noStoredValuesAlertTitle"), ZGLocalizableSearchDocumentString(@"noStoredValuesAlertMessage"));
 		}
@@ -1265,7 +1265,7 @@
 				[self.undoManager removeAllActions];
 			}
 			
-			[self.searchController searchComponents:self.documentData.searchValue withDataType:self.selectedDataType functionType:self.selectedFunctionType allowsNarrowing:YES];
+			[self.searchController searchVariablesWithString:self.documentData.searchValue withDataType:self.selectedDataType functionType:functionType allowsNarrowing:YES];
 		}
 	}
 }
@@ -1274,20 +1274,12 @@
 {
 	ZGVariable *variable = [self.selectedVariables objectAtIndex:0];
 	
-	[self.searchController searchComponents:@[variable.addressStringValue] withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO];
-}
-
-- (void)createSearchMenu
-{
-	NSMenu *searchMenu = [[NSMenu alloc] init];
-	NSMenuItem *storedValuesMenuItem = [[NSMenuItem alloc] initWithTitle:ZGLocalizableSearchDocumentString(@"storedValueTokenTitle") action:@selector(insertStoredValueToken:) keyEquivalent:@""];
-	[searchMenu addItem:storedValuesMenuItem];
-	self.searchValueTextField.cell.searchMenu = searchMenu;
+	[self.searchController searchVariablesWithString:variable.addressStringValue withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO];
 }
 
 - (IBAction)storeAllValues:(id)__unused sender
 {
-	self.documentData.searchValue = self.searchValueTextField.objectValue;
+	self.documentData.searchValue = self.searchValueTextField.stringValue;
 	[self.searchController storeAllValues];
 }
 

@@ -70,7 +70,6 @@
 		770FABAC1848354100C176B7 /* ZGEditValueWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABAA1848354100C176B7 /* ZGEditValueWindowController.m */; };
 		770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABAF18490DB400C176B7 /* ZGEditAddressWindowController.m */; };
 		770FABB71849160200C176B7 /* ZGEditSizeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */; };
-		770FAC031853C5D600C176B7 /* APTokenSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC021853C5D600C176B7 /* APTokenSearchField.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC0518542BFF00C176B7 /* ZGSearchToken.m */; };
 		7714194118AC7D8500600423 /* ZGMemoryDumpFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714194018AC7D8500600423 /* ZGMemoryDumpFunctions.m */; };
 		77179F6B18CD34F100BCB6D0 /* ZGAppUpdaterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77179F6A18CD34F100BCB6D0 /* ZGAppUpdaterController.m */; };
@@ -384,8 +383,6 @@
 		770FABAF18490DB400C176B7 /* ZGEditAddressWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditAddressWindowController.m; path = "Bit Slicer/ZGEditAddressWindowController.m"; sourceTree = "<group>"; };
 		770FABB41849160200C176B7 /* ZGEditSizeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGEditSizeWindowController.h; path = "Bit Slicer/ZGEditSizeWindowController.h"; sourceTree = "<group>"; };
 		770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditSizeWindowController.m; path = "Bit Slicer/ZGEditSizeWindowController.m"; sourceTree = "<group>"; };
-		770FAC011853C5D600C176B7 /* APTokenSearchField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APTokenSearchField.h; path = deps/APTokenSearchField.h; sourceTree = "<group>"; };
-		770FAC021853C5D600C176B7 /* APTokenSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APTokenSearchField.m; path = deps/APTokenSearchField.m; sourceTree = "<group>"; };
 		770FAC0418542BFF00C176B7 /* ZGSearchToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchToken.h; path = "Bit Slicer/ZGSearchToken.h"; sourceTree = "<group>"; };
 		770FAC0518542BFF00C176B7 /* ZGSearchToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchToken.m; path = "Bit Slicer/ZGSearchToken.m"; sourceTree = "<group>"; };
 		7714193F18AC7D8500600423 /* ZGMemoryDumpFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryDumpFunctions.h; path = "Bit Slicer/ZGMemoryDumpFunctions.h"; sourceTree = "<group>"; };
@@ -982,8 +979,6 @@
 			children = (
 				77607AAF185CD50100AC532B /* AGScopeBar.h */,
 				77607AB0185CD50100AC532B /* AGScopeBar.m */,
-				770FAC011853C5D600C176B7 /* APTokenSearchField.h */,
-				770FAC021853C5D600C176B7 /* APTokenSearchField.m */,
 				770FAC0418542BFF00C176B7 /* ZGSearchToken.h */,
 				770FAC0518542BFF00C176B7 /* ZGSearchToken.m */,
 			);
@@ -1725,7 +1720,6 @@
 				770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */,
 				77FFC14C18711D2700122357 /* ZGEditDescriptionWindowController.m in Sources */,
 				777DA25918CF55750092DEC9 /* ZGNavigationPost.m in Sources */,
-				770FAC031853C5D600C176B7 /* APTokenSearchField.m in Sources */,
 				772C0F7E18B88AFA009FFF72 /* ZGRegisterEntries.m in Sources */,
 				7798EED518C40B7F001120FB /* DDMathOperator.m in Sources */,
 				777C34B5187523D0005E64E1 /* ZGNoSmallSizeToolbar.m in Sources */,

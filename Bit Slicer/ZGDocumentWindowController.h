@@ -50,7 +50,6 @@
 @class ZGDocumentData;
 @class ZGSearchData;
 @class ZGScriptManager;
-@class APTokenSearchField;
 @class ZGTableView;
 @class ZGBreakPointController;
 @class ZGLoggerWindowController;
@@ -67,7 +66,7 @@
 @property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
 @property (nonatomic, assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
 @property (nonatomic, assign) IBOutlet NSButton *storeValuesButton;
-@property (nonatomic, assign) IBOutlet APTokenSearchField *searchValueTextField;
+@property (nonatomic, assign) IBOutlet NSSearchField *searchValueTextField;
 @property (nonatomic, assign) IBOutlet NSPopUpButton *functionPopUpButton;
 
 @property (nonatomic) ZGDocumentTableController *tableController;
@@ -103,7 +102,6 @@
 - (ZGVariableType)selectedDataType;
 - (ZGFunctionType)selectedFunctionType;
 
-- (void)createSearchMenu;
 - (void)deselectSearchField;
 - (IBAction)insertStoredValueToken:(id)sender;
 

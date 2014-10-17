@@ -123,8 +123,11 @@
 /* Next Operator menu item title */
 "nextOperatorMenuItem" = "Next Operator";
 
-/* Title of Stored Value Token in search field, and title of Stored Value menu item in search menu of the search field */
+/* Title of Stored Value menu item in search menu of the search field */
 "storedValueTokenTitle" = "Stored Value";
+
+/* Name  of Stored Value Token in search field */
+"storedValueTokenName" = "$StoredValue";
 
 /* Alert Title that no Stored Values are available when searching with a stored value token */
 "noStoredValuesAlertTitle" = "No Stored Values Available";

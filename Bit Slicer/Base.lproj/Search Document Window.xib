@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6249" systemVersion="14A389" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6249"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDocumentWindowController">
@@ -16,7 +16,7 @@
                 <outlet property="runningApplicationsPopUpButton" destination="1ts-DF-nZQ" id="rls-ER-d1b"/>
                 <outlet property="scopeBar" destination="fFc-9y-zR5" id="D3V-L4-ePc"/>
                 <outlet property="scopeBarFlagsView" destination="053-lf-ydX" id="Bn8-FX-fuZ"/>
-                <outlet property="searchValueTextField" destination="obS-mO-KvZ" id="DrG-CI-hqA"/>
+                <outlet property="searchValueTextField" destination="WaT-8a-dxh" id="fXI-m4-PoJ"/>
                 <outlet property="storeValuesButton" destination="evf-rf-Ae5" id="hg1-ot-trk"/>
                 <outlet property="variablesTableView" destination="HbN-z0-Vcf" id="a1I-Pk-xWi"/>
                 <outlet property="window" destination="d6e-L4-aaf" id="NIk-dD-o77"/>
@@ -188,7 +188,7 @@
                 </menuItem>
             </items>
         </menu>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="d6e-L4-aaf" userLabel="Document Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -207,7 +207,7 @@
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" emptySelection="NO" autosaveColumns="NO" rowHeight="14" headerView="FQj-2P-but" id="HbN-z0-Vcf" customClass="ZGTableView">
-                                    <rect key="frame" x="0.0" y="0.0" width="762" height="192"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="762" height="16"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -300,8 +300,7 @@
                             <rect key="frame" x="1" y="222" width="720" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="q9s-b7-KVu">
-                            <rect key="frame" x="662" y="17" width="16" height="0.0"/>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="q9s-b7-KVu">
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <tableHeaderView key="headerView" id="FQj-2P-but">
@@ -632,7 +631,7 @@
                     </button>
                 </subviews>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" displayMode="iconAndLabel" sizeMode="regular" id="UZg-mb-r8g" customClass="ZGNoSmallSizeToolbar">
+            <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" displayMode="iconOnly" sizeMode="regular" id="UZg-mb-r8g" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
@@ -704,24 +703,6 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="cbr-z0-cak"/>
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="AUv-ym-Pvh"/>
-                    <toolbarItem implicitItemIdentifier="DF0FFDE5-A04C-4501-BFC4-CBADF0541044" label="Search" paletteLabel="Search" id="xlb-JZ-GJa">
-                        <nil key="toolTip"/>
-                        <size key="minSize" width="150" height="22"/>
-                        <size key="maxSize" width="250" height="22"/>
-                        <tokenField key="view" verticalHuggingPriority="750" id="obS-mO-KvZ" customClass="APTokenSearchField">
-                            <rect key="frame" x="0.0" y="14" width="200" height="22"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <tokenFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" allowsEditingTextAttributes="YES" bezelStyle="round" id="S2B-QJ-8Ge" customClass="APTokenSearchFieldCell">
-                                <font key="font" metaFont="cellTitle"/>
-                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </tokenFieldCell>
-                            <connections>
-                                <action selector="searchValue:" target="-1" id="B2W-3B-KGC"/>
-                                <outlet property="delegate" destination="-2" id="k1z-RK-9AL"/>
-                            </connections>
-                        </tokenField>
-                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="A2B7475C-29AA-4716-9400-D2EF29F1ED5A" label="Store Values" paletteLabel="Store Values" image="container" id="q4V-IG-gxK">
                         <nil key="toolTip"/>
                         <size key="minSize" width="39" height="25"/>
@@ -738,6 +719,20 @@
                             </connections>
                         </button>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="52E16CE5-DDC6-4458-A993-F5F7CF90040C" label="Search" paletteLabel="Search" id="x8t-Jw-Hi9" userLabel="Search">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="150" height="22"/>
+                        <size key="maxSize" width="1000" height="22"/>
+                        <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" id="WaT-8a-dxh">
+                            <rect key="frame" x="0.0" y="14" width="200" height="22"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
+                            <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" sendsWholeSearchString="YES" id="LLw-3d-Kna">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </searchFieldCell>
+                        </searchField>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="jO3-Z2-Pv7"/>
@@ -745,7 +740,7 @@
                     <toolbarItem reference="LxQ-Vs-KYQ"/>
                     <toolbarItem reference="q4V-IG-gxK"/>
                     <toolbarItem reference="cbr-z0-cak"/>
-                    <toolbarItem reference="xlb-JZ-GJa"/>
+                    <toolbarItem reference="x8t-Jw-Hi9"/>
                 </defaultToolbarItems>
             </toolbar>
             <contentBorderThickness minY="22"/>
@@ -767,7 +762,6 @@
                     </textFieldCell>
                     <connections>
                         <action selector="changeFlags:" target="-2" id="DMV-A6-D8D"/>
-                        <outlet property="nextKeyView" destination="obS-mO-KvZ" id="xXl-k4-qF2"/>
                     </connections>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="U3S-5O-0jn">

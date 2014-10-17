@@ -47,10 +47,12 @@
 #import "ZGUtilities.h"
 #import "NSArrayAdditions.h"
 #import "ZGDocumentData.h"
-#import "APTokenSearchField.h"
 #import "ZGSearchToken.h"
 #import "ZGVariableController.h"
 #import "ZGTableView.h"
+#import "DDMathStringToken.h"
+#import "DDMathStringTokenizer.h"
+#import "DDMathOperator.h"
 
 @interface ZGDocumentSearchController ()
 
@@ -63,11 +65,51 @@
 @property (nonatomic) ZGVariableType dataType;
 @property (nonatomic) ZGFunctionType functionType;
 @property (nonatomic) BOOL allowsNarrowing;
-@property (nonatomic) NSArray *searchComponents;
+@property (nonatomic) NSString *searchValueString;
 
 @end
 
 @implementation ZGDocumentSearchController
+
+#pragma mark Class Utilities
+
++ (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression isLinearlyExpressed:(BOOL *)isLinearlyExpressedReference
+{
+	BOOL result = NO;
+	BOOL isLinearlyExpressed = NO;
+	
+	NSError *error = nil;
+	DDMathStringTokenizer *tokenizer = [[DDMathStringTokenizer alloc] initWithString:expression operatorSet:[DDMathOperatorSet defaultOperatorSet] error:&error];
+	if (error == nil)
+	{
+		NSUInteger tokenCount = 0;
+		for (DDMathStringToken *token in tokenizer)
+		{
+			if (token.tokenType == DDTokenTypeVariable)
+			{
+				result = YES;
+			}
+			tokenCount++;
+		}
+		
+		if (result && tokenCount > 1)
+		{
+			isLinearlyExpressed = YES;
+		}
+	}
+	
+	if (isLinearlyExpressedReference != NULL)
+	{
+		*isLinearlyExpressedReference = isLinearlyExpressed;
+	}
+	
+	return result;
+}
+
++ (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression
+{
+	return [self hasStoredValueTokenFromExpression:expression isLinearlyExpressed:NULL];
+}
 
 #pragma mark Birth & Death
 
@@ -469,7 +511,7 @@
 	
 	if (!self.searchData.shouldCompareStoredValues)
 	{
-		NSString *searchValueInput = [self.searchComponents objectAtIndex:0];
+		NSString *searchValueInput = self.searchValueString;
 		NSString *finalSearchExpression = ZGIsNumericalDataType(dataType) ? [ZGCalculator evaluateExpression:searchValueInput] : searchValueInput;
 		
 		if (ZGIsNumericalDataType(dataType) && !ZGIsFunctionTypeStore(self.functionType) && !ZGIsValidNumber(finalSearchExpression))
@@ -519,19 +561,7 @@
 		
 		if (ZGIsFunctionTypeLinear(functionType))
 		{
-			NSMutableArray *stringComponents = [NSMutableArray array];
-			for (id object in self.searchComponents)
-			{
-				if ([object isKindOfClass:[ZGSearchToken class]])
-				{
-					[stringComponents addObject:@"$StoredValue"];
-				}
-				else if ([object isKindOfClass:[NSString class]])
-				{
-					[stringComponents addObject:object];
-				}
-			}
-			NSString *linearExpression = [stringComponents componentsJoinedByString:@""];
+			NSString *linearExpression = self.searchValueString;
 			NSString *additiveConstantString = nil;
 			NSString *multiplicativeConstantString = nil;
 			
@@ -661,11 +691,11 @@
 	});
 }
 
-- (void)searchComponents:(NSArray *)searchComponents withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing
+- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing
 {
 	self.dataType = dataType;
 	self.functionType = functionType;
-	self.searchComponents = searchComponents;
+	self.searchValueString = searchStringValue;
 	self.allowsNarrowing = allowsNarrowing;
 	
 	NSError *error = nil;
@@ -753,16 +783,11 @@
 		dispatch_async(dispatch_get_main_queue(), ^{
 			if (!self.searchProgress.shouldCancelSearch)
 			{
-				if (self.searchData.savedData == nil)
-				{
-					[windowController createSearchMenu];
-				}
-				
 				self.searchData.savedData = self.tempSavedData;
 				self.tempSavedData = nil;
 				windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled"];
 				
-				if (![self.documentData.searchValue zgHasObjectMatchingCondition:^(id object) { return [object isKindOfClass:[ZGSearchToken class]]; }])
+				if (![[self class] hasStoredValueTokenFromExpression:self.documentData.searchValue])
 				{
 					[windowController insertStoredValueToken:nil];
 				}
