@@ -72,8 +72,11 @@
 	self.tableView.target = self;
 	self.tableView.doubleAction = @selector(changeInstructionSelection:);
 	
-	[self setNextResponder:[self.tableView nextResponder]];
-	[self.tableView setNextResponder:self];
+	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_9)
+	{
+		[self setNextResponder:[self.tableView nextResponder]];
+		[self.tableView setNextResponder:self];
+	}
 	
 	[self.tableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
