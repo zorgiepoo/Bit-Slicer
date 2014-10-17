@@ -101,12 +101,6 @@
 #pragma mark ========================================
 @implementation AGScopeBar
 
-
-// For detecting if user is > 10.9 for below code
-#ifndef NSAppKitVersionNumber10_9
-#define NSAppKitVersionNumber10_9 1265
-#endif
-
 - (id)initWithFrame:(NSRect)frameRect
 {
 	if (!(self = [super initWithFrame:frameRect])) {

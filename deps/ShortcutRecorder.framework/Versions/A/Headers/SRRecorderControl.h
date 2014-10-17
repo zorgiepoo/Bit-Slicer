@@ -68,7 +68,7 @@
 #pragma mark *** Binding Methods ***
 
 - (NSDictionary *)objectValue;
-- (void)setObjectValue:(id <NSCopying>)shortcut;
+- (void)setObjectValue:(id)shortcut;
 
 @end
 

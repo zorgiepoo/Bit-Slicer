@@ -107,6 +107,8 @@ NSString *ZGUserTagDescription(unsigned int userTag)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_LIBDISPATCH, @"libdispatch")
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ACCELERATE)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREUI, @"CoreUI")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREUIFILE, @"CoreUI File")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_GENEALOGY, @"Genealogy");
 	}
 	
 	return userTagDescription;
