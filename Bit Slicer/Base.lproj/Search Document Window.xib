@@ -635,7 +635,7 @@
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="160" height="24"/>
+                        <size key="minSize" width="160" height="25"/>
                         <size key="maxSize" width="160" height="26"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="1ts-DF-nZQ">
                             <rect key="frame" x="0.0" y="14" width="160" height="25"/>
