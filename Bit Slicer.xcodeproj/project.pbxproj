@@ -2356,6 +2356,7 @@
 					"-Wno-variadic-macros",
 					"-Wno-incomplete-module",
 					"-Wno-c++98-compat-pedantic",
+					"-Wno-documentation-unknown-command",
 					"-Werror",
 				);
 				WRAPPER_EXTENSION = xctest;
@@ -2451,6 +2452,7 @@
 					"-Wno-variadic-macros",
 					"-Wno-incomplete-module",
 					"-Wno-c++98-compat-pedantic",
+					"-Wno-documentation-unknown-command",
 					"-Werror",
 				);
 				WRAPPER_EXTENSION = xctest;

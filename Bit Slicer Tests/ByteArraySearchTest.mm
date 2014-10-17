@@ -63,7 +63,7 @@ extern void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigne
 	NSUInteger numberOfResults = 0;
 	for (NSUInteger dataIndex = 0; dataIndex + length <= self.data.length; dataIndex++)
 	{
-		if (memcmp(bytes, (uint8_t *)self.data.bytes + dataIndex, length) == 0)
+		if (memcmp(bytes, static_cast<const uint8_t *>(self.data.bytes) + dataIndex, length) == 0)
 		{
 			numberOfResults++;
 		}
@@ -73,19 +73,19 @@ extern void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigne
 	
 	unsigned long long size = self.data.length;
 	unsigned long long dataSize = length;
-	const unsigned char *dataBytes = (const unsigned char *)self.data.bytes;
+	const unsigned char *dataBytes = static_cast<const unsigned char *>(self.data.bytes);
 	
 	unsigned long charJump[UCHAR_MAX + 1] = {0};
-	unsigned long *matchJump = (unsigned long *)malloc(2 * (dataSize + 1) * sizeof(*matchJump));
+	unsigned long *matchJump = static_cast<unsigned long *>(malloc(2 * (dataSize + 1) * sizeof(*matchJump)));
 	
 	ZGPrepareBoyerMooreSearch(bytes, dataSize, charJump, matchJump);
 	
-	unsigned char *foundSubstring = (unsigned char *)dataBytes;
+	const unsigned char *foundSubstring = static_cast<const unsigned char *>(dataBytes);
 	unsigned long haystackLengthLeft = size;
 	
 	while (haystackLengthLeft >= dataSize)
 	{
-		foundSubstring = boyer_moore_helper((const unsigned char *)foundSubstring, bytes, haystackLengthLeft, dataSize, (const unsigned long *)charJump, (const unsigned long *)matchJump);
+		foundSubstring = boyer_moore_helper(foundSubstring, bytes, haystackLengthLeft, dataSize, charJump, matchJump);
 		if (foundSubstring == NULL) break;
 		
 		// boyer_moore_helper is only checking 0 .. dataSize-1 characters, so make a check to see if the last characters are equal
@@ -95,7 +95,7 @@ extern void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigne
 		}
 		
 		foundSubstring++;
-		haystackLengthLeft = size - (unsigned long long)(foundSubstring - dataBytes);
+		haystackLengthLeft = size - static_cast<unsigned long long>(foundSubstring - dataBytes);
 	}
 	
 	free(matchJump);
