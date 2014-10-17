@@ -55,7 +55,7 @@
 }
 
 
-- (void)setObjectValue:(id<NSCopying>)obj
+- (void)setObjectValue:(id)obj
 {
 	[super setObjectValue:obj];
 	[self resetCursorRects];
@@ -180,11 +180,6 @@
 	return rect;
 }
 
-// For our hack below
-#ifndef NSAppKitVersionNumber10_9
-#define NSAppKitVersionNumber10_9 1265
-#endif
-
 - (NSRect)searchButtonRectForBounds:(NSRect)rect
 {
 	rect = [self.searchFieldCell searchButtonRectForBounds:rect];
@@ -221,7 +216,7 @@
 #pragma mark
 
 
-- (NSUInteger)hitTestForEvent:(NSEvent *)event inRect:(NSRect)cellFrame ofView:(NSView *)controlView
+- (NSCellHitResult)hitTestForEvent:(NSEvent *)event inRect:(NSRect)cellFrame ofView:(NSView *)controlView
 {
 	NSPoint pointInView = [controlView convertPoint:event.locationInWindow fromView:nil];
 	NSPoint pointInCell = NSMakePoint(pointInView.x - cellFrame.origin.x, pointInView.y - cellFrame.origin.y);
@@ -275,6 +270,36 @@
 						[self valueDidChange];
 					}
 					stop = YES;
+					break;
+				case NSLeftMouseDown:
+				case NSRightMouseDown:
+				case NSRightMouseUp:
+				case NSMouseMoved:
+				case NSRightMouseDragged:
+				case NSMouseEntered:
+				case NSMouseExited:
+				case NSKeyDown:
+				case NSKeyUp:
+				case NSFlagsChanged:
+				case NSAppKitDefined:
+				case NSSystemDefined:
+				case NSApplicationDefined:
+				case NSPeriodic:
+				case NSCursorUpdate:
+				case NSScrollWheel:
+				case NSTabletPoint:
+				case NSTabletProximity:
+				case NSOtherMouseDown:
+				case NSOtherMouseUp:
+				case NSOtherMouseDragged:
+				case NSEventTypeGesture:
+				case NSEventTypeMagnify:
+				case NSEventTypeSwipe:
+				case NSEventTypeRotate:
+				case NSEventTypeBeginGesture:
+				case NSEventTypeEndGesture:
+				case NSEventTypeSmartMagnify:
+				case NSEventTypeQuickLook:
 					break;
 			}
 		}
