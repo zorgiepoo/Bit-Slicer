@@ -57,7 +57,6 @@
 #import "ZGVirtualMemory.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
-#import "ZGSearchToken.h"
 #import "ZGDocumentOptionsViewController.h"
 #import "ZGWatchVariableWindowController.h"
 #import "ZGUtilities.h"
@@ -1193,36 +1192,6 @@
 {
 	self.searchValueTextField.stringValue = ZGLocalizableSearchDocumentString(@"storedValueTokenName");
 	[self deselectSearchField];
-}
-
-- (id)tokenField:(NSTokenField *)__unused tokenField representedObjectForEditingString:(NSString *)editingString
-{
-	return editingString;
-}
-
-- (NSString *)tokenField:(NSTokenField *)__unused tokenField displayStringForRepresentedObject:(id)representedObject
-{
-	NSString *result = nil;
-	if ([representedObject isKindOfClass:[NSString class]])
-	{
-		result = representedObject;
-	}
-	else if ([representedObject isKindOfClass:[ZGSearchToken class]])
-	{
-		result = [representedObject name];
-	}
-	
-	return result;
-}
-
-- (NSTokenStyle)tokenField:(NSTokenField *)__unused tokenField styleForRepresentedObject:(id)representedObject
-{
-	return ([representedObject isKindOfClass:[ZGSearchToken class]]) ? NSRoundedTokenStyle : NSPlainTextTokenStyle;
-}
-
-- (NSString *)tokenField:(NSTokenField *)__unused tokenField editingStringForRepresentedObject:(id)representedObject
-{
-	return ([representedObject isKindOfClass:[ZGSearchToken class]]) ? nil : representedObject;
 }
 
 #pragma mark Search Handling
