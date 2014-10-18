@@ -66,7 +66,12 @@
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZG_REGISTER_TYPES : @{}, ZG_DEBUG_QUALIFIER : @0}];
+		NSDictionary *registeredDefaultTypes =
+		@{
+		  @"rflags" : @(ZGByteArray),
+		  @"eflags" : @(ZGByteArray)
+		  };
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZG_REGISTER_TYPES : registeredDefaultTypes, ZG_DEBUG_QUALIFIER : @0}];
 	});
 }
 
@@ -156,9 +161,10 @@
 		ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterGeneralPurpose variable:registerVariable pointerSize:pointerSize];
 		
 		NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
-		if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)
+		ZGVariableType dataType = (registerDefaultType == nil) ? ZGPointer : (ZGVariableType)[registerDefaultType intValue];
+		if (dataType != newRegister.variable.type)
 		{
-			[newRegister.variable setType:(ZGVariableType)[registerDefaultType intValue] requestedSize:newRegister.size pointerSize:pointerSize];
+			[newRegister.variable setType:dataType requestedSize:newRegister.size pointerSize:pointerSize];
 			[newRegister.variable setRawValue:newRegister.rawValue];
 		}
 		
