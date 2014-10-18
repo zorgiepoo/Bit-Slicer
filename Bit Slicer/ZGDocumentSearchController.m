@@ -200,7 +200,7 @@
 	if (shouldMakeSearchFieldFirstResponder)
 	{
 		[windowController.window makeFirstResponder:windowController.searchValueTextField];
-		if (ZGIsFunctionTypeStore(self.functionType))
+		if ([[self class] hasStoredValueTokenFromExpression:windowController.searchValueTextField.stringValue])
 		{
 			[windowController deselectSearchField];
 		}
@@ -789,7 +789,7 @@
 				
 				if (![[self class] hasStoredValueTokenFromExpression:self.documentData.searchValue])
 				{
-					[windowController insertStoredValueToken:nil];
+					[windowController insertStoredValueToken];
 				}
 			}
 			

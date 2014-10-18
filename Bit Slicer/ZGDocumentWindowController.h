@@ -103,7 +103,7 @@
 - (ZGFunctionType)selectedFunctionType;
 
 - (void)deselectSearchField;
-- (IBAction)insertStoredValueToken:(id)sender;
+- (void)insertStoredValueToken;
 
 - (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;
 

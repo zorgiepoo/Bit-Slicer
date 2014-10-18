@@ -871,20 +871,6 @@
 		}
 	}
 	
-	else if (menuItem.action == @selector(insertStoredValueToken:))
-	{
-		if (self.searchData.savedData == nil)
-		{
-			return NO;
-		}
-		
-		// I'd like to use self.documentData.searchValue but we don't update it instantly
-		if (![[self.searchController class] hasStoredValueTokenFromExpression:self.searchValueTextField.stringValue])
-		{
-			return NO;
-		}
-	}
-	
 	else if (menuItem.action == @selector(removeSelectedSearchValues:) || menuItem.action == @selector(cut:))
 	{
 		if (self.selectedVariables.count == 0 || [self.searchController canCancelTask])
@@ -1176,7 +1162,7 @@
 	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
-#pragma mark Search Field Tokens
+#pragma mark Stored Value Tokens
 
 - (void)deselectSearchField
 {
@@ -1188,7 +1174,7 @@
 	}
 }
 
-- (IBAction)insertStoredValueToken:(id)__unused sender
+- (void)insertStoredValueToken
 {
 	self.searchValueTextField.stringValue = ZGLocalizableSearchDocumentString(@"storedValueTokenName");
 	[self deselectSearchField];
