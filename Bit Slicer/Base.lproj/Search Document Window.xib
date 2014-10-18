@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6249" systemVersion="14A389" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6249"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDocumentWindowController">
@@ -632,7 +632,7 @@
                     </button>
                 </subviews>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" displayMode="iconOnly" sizeMode="regular" id="UZg-mb-r8g" customClass="ZGNoSmallSizeToolbar">
+            <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" explicitIdentifier="ZGDocumentToolbarIdentifier" displayMode="iconOnly" sizeMode="regular" id="UZg-mb-r8g" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
