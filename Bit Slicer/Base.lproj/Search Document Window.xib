@@ -620,7 +620,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     </customView>
                     <button id="zKb-Ip-63U">
-                        <rect key="frame" x="4" y="0.0" width="28" height="21"/>
+                        <rect key="frame" x="4" y="1" width="28" height="21"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                         <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="NSActionTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Thf-cu-8Vk">
                             <behavior key="behavior" lightByContents="YES"/>
