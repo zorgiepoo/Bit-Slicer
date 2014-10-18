@@ -225,7 +225,8 @@
 				}
 				else if ([component isKindOfClass:[ZGSearchToken class]])
 				{
-					[tokens addObject:[@"$" stringByAppendingString:[(ZGSearchToken *)component name]]];
+					NSString *tokenName = [[[(ZGSearchToken *)component name] componentsSeparatedByString:@" "] componentsJoinedByString:@""];
+					[tokens addObject:[@"$" stringByAppendingString:tokenName]];
 				}
 			}
 			searchValue = [tokens componentsJoinedByString:@""];
