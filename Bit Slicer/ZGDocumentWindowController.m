@@ -269,6 +269,8 @@
 	[self.storeValuesButton.image setTemplate:YES];
 	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
 	
+	self.storeValuesButton.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");
+	
 	[self.generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 
 	[self setupProcessListNotifications];

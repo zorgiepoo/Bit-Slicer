@@ -126,8 +126,11 @@
 /* Title of Stored Value menu item in search menu of the search field */
 "storedValueTokenTitle" = "Stored Value";
 
-/* Name  of Stored Value Token in search field */
+/* Name of Stored Value Token in search field */
 "storedValueTokenName" = "$StoredValue";
+
+/* Tool tip for Store Values button */
+"storeValuesButtonToolTip" = "Store all the values from the target, so you can later make searches based on how these values change";
 
 /* Alert Title that no Stored Values are available when searching with a stored value token */
 "noStoredValuesAlertTitle" = "No Stored Values Available";

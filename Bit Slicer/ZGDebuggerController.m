@@ -249,6 +249,20 @@ enum ZGStepExecution
 	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepOverExecution] setTemplate:YES];
 	[[self.stepExecutionSegmentedControl imageForSegment:ZGStepOutExecution] setTemplate:YES];
 	
+	self.continueButton.toolTip = ZGLocalizedStringFromDebuggerTable(@"continueButtonToolTip");
+	
+	[self.stepExecutionSegmentedControl.cell
+	 setToolTip:ZGLocalizedStringFromDebuggerTable(@"stepIntoSegmentToolTip")
+	 forSegment:ZGStepIntoExecution];
+	
+	[self.stepExecutionSegmentedControl.cell
+	 setToolTip:ZGLocalizedStringFromDebuggerTable(@"stepOverSegmentToolTip")
+	 forSegment:ZGStepOverExecution];
+	
+	[self.stepExecutionSegmentedControl.cell
+	 setToolTip:ZGLocalizedStringFromDebuggerTable(@"stepOutSegmentToolTip")
+	 forSegment:ZGStepOutExecution];
+	
 	[self updateExecutionButtons];
 	
 	[self toggleBacktraceAndRegistersViews:NSOffState];

@@ -6,6 +6,18 @@
 
 */
 
+/* Tool tip for the continue execution button */
+"continueButtonToolTip" = "Continue execution";
+
+/* Tool tip for the step into instruction button */
+"stepIntoSegmentToolTip" = "Step execution into instruction";
+
+/* Tool tip for the step over instruction button */
+"stepOverSegmentToolTip" = "Step execution over instruction";
+
+/* Tool tip for the step out of function button */
+"stepOutSegmentToolTip" = "Step execution out from the current function";
+
 /* Labels 'Go to Call Address' menu item in Debug menu when using debugger, when a 'call' type instruction is selected */
 "goToCallAddress" = "Go to Call Address";
 
