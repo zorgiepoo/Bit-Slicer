@@ -54,6 +54,9 @@
 @property (strong, nonatomic) ZGSearchResults *searchResults;
 @property (readonly, strong, nonatomic) ZGSearchProgress *searchProgress;
 
++ (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression isLinearlyExpressed:(BOOL *)isLinearlyExpressedReference;
++ (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression;
+
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
 - (BOOL)canStartTask;
@@ -66,7 +69,7 @@
 - (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables;
 - (void)fetchVariablesFromResults;
 
-- (void)searchComponents:(NSArray *)searchComponents withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing;
+- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing;
 - (void)storeAllValues;
 
 - (void)cleanUp;

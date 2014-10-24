@@ -38,6 +38,7 @@
 #import "ZGSearchData.h"
 #import "ZGVariable.h"
 #import "ZGScriptManager.h"
+#import "ZGSearchToken.h"
 
 @interface ZGDocument ()
 
@@ -158,7 +159,7 @@
     
 	[keyedArchiver
 	 encodeObject:self.data.searchValue
-	 forKey:ZGSearchValueKey];
+	 forKey:ZGSearchStringValueKeyNew];
 	
 	[keyedArchiver finishEncoding];
 	
@@ -208,23 +209,40 @@
 		self.data.byteOrderTag = CFByteOrderGetCurrent();
 	}
 	
-	id searchValue = [keyedUnarchiver decodeObjectForKey:ZGSearchValueKey];
-	if (searchValue == nil)
+	NSString *searchValue = nil;
+	NSString *newSearchStringValue = [keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKeyNew];
+	if (newSearchStringValue == nil)
 	{
-		NSString *legacySearchStringValue = [keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKey];
-		if (legacySearchStringValue != nil)
+		NSArray *legacySearchValueComponents = [keyedUnarchiver decodeObjectForKey:ZGSearchValueComponentsOldKey];
+		if (legacySearchValueComponents != nil)
 		{
-			searchValue = @[legacySearchStringValue];
+			NSMutableArray *tokens = [NSMutableArray array];
+			for (id component in legacySearchValueComponents)
+			{
+				if ([component isKindOfClass:[NSString class]])
+				{
+					[tokens addObject:component];
+				}
+				else if ([component isKindOfClass:[ZGSearchToken class]])
+				{
+					NSString *tokenName = [[[(ZGSearchToken *)component name] componentsSeparatedByString:@" "] componentsJoinedByString:@""];
+					[tokens addObject:[@"$" stringByAppendingString:tokenName]];
+				}
+			}
+			searchValue = [tokens componentsJoinedByString:@""];
 		}
-	}
-	if (searchValue != nil)
-	{
-		self.data.searchValue = searchValue;
+		else
+		{
+			NSString *legacySearchStringValue = [keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKeyOld];
+			searchValue = legacySearchStringValue;
+		}
 	}
 	else
 	{
-		self.data.searchValue = @[@""];
+		searchValue = newSearchStringValue;
 	}
+	
+	self.data.searchValue = (searchValue != nil) ? searchValue : @"";
 	
 	self.data.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
 	self.data.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];

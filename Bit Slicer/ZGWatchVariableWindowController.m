@@ -277,20 +277,26 @@
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	int numberOfGeneralRegisters = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:registersState.is64Bit];
 	
+	NSString *generalPurposeLabel = ZGLocalizableWatchVariableString(@"generalPurposeRegistersDescriptionLabel");
+	NSString *generalPurposeAnnotatedLabel = watchVariable.accessCount > 1 ? [NSString stringWithFormat:@"%@ %@", generalPurposeLabel, ZGLocalizableWatchVariableString(@"firstRegisterAccessLabel")] : generalPurposeLabel;
+	
 	[self
 	 appendDescription:description
 	 withRegisterEntries:registerEntries
-	 registerLabel:ZGLocalizableWatchVariableString(@"generalPurposeRegistersDescriptionLabel")
+	 registerLabel:generalPurposeAnnotatedLabel
 	 boldFont:boldFont];
 	
 	if (registersState.hasVectorState)
 	{
 		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:registersState.vectorState is64Bit:registersState.is64Bit hasAVXSupport:registersState.hasAVXSupport];
 		
+		NSString *vectorLabel = ZGLocalizableWatchVariableString(@"floatAndVectorRegistersDescriptionLabel");
+		NSString *vectorAnnotatedLabel = watchVariable.accessCount > 1 ? [NSString stringWithFormat:@"%@ %@", vectorLabel, ZGLocalizableWatchVariableString(@"firstRegisterAccessLabel")] : vectorLabel;
+		
 		[self
 		 appendDescription:description
 		 withRegisterEntries:registerEntries + numberOfGeneralRegisters
-		 registerLabel:ZGLocalizableWatchVariableString(@"floatAndVectorRegistersDescriptionLabel")
+		 registerLabel:vectorAnnotatedLabel
 		 boldFont:boldFont];
 	}
 	

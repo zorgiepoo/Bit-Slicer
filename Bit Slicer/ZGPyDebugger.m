@@ -818,8 +818,10 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 	resumeFromHaltedBreakPointInDebugger(self);
 }
 
-- (void)breakPointDidHit:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState
+- (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
 {
+	ZGRegistersState *registersState = breakPoint.registersState;
+	
 	dispatch_async(gPythonQueue, ^{
 		self.haltedBreakPoint = breakPoint;
 		

@@ -27,6 +27,9 @@
 /* Annotated description label for float/vector registers; not sure if this should be localized */
 "floatAndVectorRegistersDescriptionLabel" = "Float/Vector Registers";
 
+/* Optional meta-label for generalPurposeRegistersDescriptionLabel and floatAndVectorRegistersDescriptionLabel above */
+"firstRegisterAccessLabel" = "(1st access)";
+
 /* Notification title for when an instruction is found */
 "foundInstructionNotificationTitle" = "Found Instruction";
 

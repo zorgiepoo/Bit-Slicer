@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDebuggerController">
@@ -22,7 +22,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <menu id="100" userLabel="Debugger Right Click Menu">
             <items>
                 <menuItem title="Copy" id="127">
@@ -101,7 +101,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA" customClass="ZGTableView">
-                                            <rect key="frame" x="0.0" y="0.0" width="840" height="268"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="840" height="19"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -185,8 +185,7 @@
                                     <rect key="frame" x="0.0" y="269" width="840" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="suw-GF-T35">
-                                    <rect key="frame" x="-16" y="17" width="16" height="0.0"/>
+                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="suw-GF-T35">
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <tableHeaderView key="headerView" id="tpt-Jt-lnH">
@@ -232,7 +231,7 @@
                     </textField>
                 </subviews>
             </view>
-            <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" explicitIdentifier="ZGDebuggerToolbar" displayMode="iconAndLabel" sizeMode="regular" id="BPq-cf-Fjg" customClass="ZGNoSmallSizeToolbar">
+            <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" explicitIdentifier="ZGDebuggerToolbar2" displayMode="iconOnly" sizeMode="regular" id="BPq-cf-Fjg" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="31B40B1D-066A-465E-9326-51493CC4C4EB" label="Back/Forward" paletteLabel="Back/Forward" id="saO-Gp-UGR">
                         <nil key="toolTip"/>
@@ -241,7 +240,7 @@
                         <segmentedControl key="view" verticalHuggingPriority="750" id="vkH-Yd-fy0">
                             <rect key="frame" x="14" y="14" width="53" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <segmentedCell key="cell" alignment="left" style="texturedSquare" trackingMode="momentary" id="4Gz-L1-umm">
+                            <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="4Gz-L1-umm">
                                 <font key="font" metaFont="system"/>
                                 <segments>
                                     <segment image="NSLeftFacingTriangleTemplate" width="25">
@@ -297,7 +296,7 @@
                         <segmentedControl key="view" verticalHuggingPriority="750" id="hed-Ji-GwK">
                             <rect key="frame" x="0.0" y="14" width="100" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <segmentedCell key="cell" alignment="left" style="texturedSquare" trackingMode="momentary" id="AnD-9c-1f5">
+                            <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="AnD-9c-1f5">
                                 <font key="font" metaFont="system"/>
                                 <segments>
                                     <segment image="stepin" width="32">
@@ -355,8 +354,8 @@
         </window>
     </objects>
     <resources>
-        <image name="NSLeftFacingTriangleTemplate" width="9" height="9"/>
-        <image name="NSRightFacingTriangleTemplate" width="9" height="9"/>
+        <image name="NSLeftFacingTriangleTemplate" width="9" height="12"/>
+        <image name="NSRightFacingTriangleTemplate" width="9" height="12"/>
         <image name="continue" width="19" height="19"/>
         <image name="stepin" width="19" height="19"/>
         <image name="stepout" width="19" height="19"/>
