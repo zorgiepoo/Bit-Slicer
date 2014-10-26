@@ -919,10 +919,29 @@ static std::vector<bool> ZGFliterTreeForStaticInfo(std::unordered_map<ZGMemoryAd
 	return statics;
 }
 
- // slow because of no cache, which is not very easy to do with the level constraint :|
-static uint16_t ZGCountFilteredTree(const std::vector<ZGRecursivePointerEntry> *recursivePointerEntries, const uint16_t level)
+struct ZGFilterTreeKey
 {
-	uint16_t count = 0;
+	ZGMemoryAddress address;
+	uint16_t level;
+	
+	bool operator==(const ZGFilterTreeKey &other) const
+	{
+		return address == other.address && level == other.level;
+	}
+};
+
+template <>
+struct std::hash<ZGFilterTreeKey>
+{
+	std::size_t operator()(const ZGFilterTreeKey& key) const
+	{
+		return key.address + key.level;
+	}
+};
+
+static uint64_t ZGCountFilteredTree(const std::vector<ZGRecursivePointerEntry> *recursivePointerEntries, const uint16_t level, std::unordered_map<ZGFilterTreeKey, uint64_t> *alreadyVisited)
+{
+	uint64_t count = 0;
 	const uint16_t nextLevel = level - 1;
 	for (auto &entry : *recursivePointerEntries)
 	{
@@ -932,20 +951,32 @@ static uint16_t ZGCountFilteredTree(const std::vector<ZGRecursivePointerEntry> *
 		}
 		else
 		{
-			auto result = ZGCountFilteredTree(entry.nextEntries, nextLevel);
-			if (result < entry.nextEntries->size())
+			ZGFilterTreeKey key = {entry.address, level};
+			auto iterator = alreadyVisited->find(key);
+			
+			if (iterator == alreadyVisited->end())
 			{
-				count += (entry.baseImageIndex == -1) ? 0 : 1;
+				uint64_t result = ZGCountFilteredTree(entry.nextEntries, nextLevel, alreadyVisited);
+				if (result < entry.nextEntries->size())
+				{
+					result += (entry.baseImageIndex == -1) ? 0 : 1;
+				}
+				count += result;
+				
+				(*alreadyVisited)[key] = result;
 			}
-			count += result;
+			else
+			{
+				count += iterator->second;
+			}
 		}
 	}
 	return count;
 }
 
-static uint16_t ZGCountTree(const std::vector<ZGRecursivePointerEntry> *recursivePointerEntries, std::unordered_map<ZGMemoryAddress, uint16_t> *alreadyVisited)
+static uint64_t ZGCountTree(const std::vector<ZGRecursivePointerEntry> *recursivePointerEntries, std::unordered_map<ZGMemoryAddress, uint64_t> *alreadyVisited)
 {
-	uint16_t count = 0;
+	uint64_t count = 0;
 	for (auto &entry : *recursivePointerEntries)
 	{
 		if (entry.nextEntries == nullptr || entry.nextEntries->size() == 0)
@@ -957,13 +988,13 @@ static uint16_t ZGCountTree(const std::vector<ZGRecursivePointerEntry> *recursiv
 			auto iterator = alreadyVisited->find(entry.address);
 			if (iterator == alreadyVisited->end())
 			{
-				auto result = ZGCountTree(entry.nextEntries, alreadyVisited);
+				uint64_t result = ZGCountTree(entry.nextEntries, alreadyVisited) + 1;
 				(*alreadyVisited)[entry.address] = result;
-				count += result + 1;
+				count += result;
 			}
 			else
 			{
-				count += iterator->second + 1;
+				count += iterator->second;
 			}
 		}
 	}
@@ -1019,6 +1050,7 @@ static ZGSearchResults *ZGSearchForPointer(ZGMemoryMap processTask, ZGSearchData
 	ZGAnnotateTreeStaticInfo(segmentRanges, machBinariesInfo.count, *staticsHashTable, *visitedStaticEntries, recursivePointerEntries);
 	
 	delete staticsHashTable;
+	delete visitedStaticEntries;
 	delete[] segmentRanges;
 	
 	NSLog(@"Pre Filtering statics...");
@@ -1028,9 +1060,15 @@ static ZGSearchResults *ZGSearchForPointer(ZGMemoryMap processTask, ZGSearchData
 	delete hasStaticHashTable;
 	
 	NSLog(@"Starting count...");
-	auto countVisitors = new std::unordered_map<ZGMemoryAddress, uint16_t>;
-	NSLog(@"Plain count is %hu", ZGCountTree(recursivePointerEntries, countVisitors));
-	NSLog(@"Filter Count will be %hu", ZGCountFilteredTree(recursivePointerEntries, numberOfLevels));
+	auto countVisitors = new std::unordered_map<ZGMemoryAddress, uint64_t>;
+	NSLog(@"Plain count is %llu", ZGCountTree(recursivePointerEntries, countVisitors));
+	
+	delete countVisitors;
+	
+	auto filterCountVisitors = new std::unordered_map<ZGFilterTreeKey, uint64_t>;
+	NSLog(@"Filter Count will be %llu", ZGCountFilteredTree(recursivePointerEntries, numberOfLevels, filterCountVisitors));
+	
+	delete filterCountVisitors;
 	
 	/*
 	NSLog(@"Serializing...");
