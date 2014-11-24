@@ -2005,7 +2005,7 @@ enum ZGStepExecution
 		
 		if (breakPoint.error == nil && shouldShowNotification)
 		{
-			ZGDeliverUserNotification(ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationTitle"), self.currentProcess.name, [NSString stringWithFormat:@"%@ %@", ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationMessage"), self.currentBreakPoint.variable.addressStringValue]);
+			ZGDeliverUserNotification(ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationTitle"), self.currentProcess.name, [NSString stringWithFormat:@"%@ %@", ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationMessage"), self.currentBreakPoint.variable.addressStringValue], nil);
 		}
 		else if (breakPoint.error != nil)
 		{

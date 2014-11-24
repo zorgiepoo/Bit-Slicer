@@ -34,6 +34,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface ZGAppController : NSObject <NSApplicationDelegate>
+@interface ZGAppController : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate>
 
 @end

@@ -517,7 +517,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		
 		if ((![NSApp isActive] || ![self.loggerWindowController.window isVisible]))
 		{
-			ZGDeliverUserNotification(@"Script Failed", nil, errorMessage);
+			ZGDeliverUserNotification(@"Script Failed", nil, errorMessage, nil);
 		}
 	});
 	

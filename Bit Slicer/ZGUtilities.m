@@ -431,12 +431,13 @@ NSString *ZGProtectionDescription(ZGMemoryProtection protection)
 	return [protectionAttributes componentsJoinedByString:@""];
 }
 
-void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText)
+void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, NSDictionary *userInfo)
 {
 	NSUserNotification *userNotification = [[NSUserNotification alloc] init];
 	userNotification.title = title;
 	userNotification.subtitle = subtitle;
 	userNotification.informativeText = informativeText;
+	userNotification.userInfo = userInfo;
 	[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
 }
 

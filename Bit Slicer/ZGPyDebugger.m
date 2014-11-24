@@ -355,7 +355,7 @@ static PyObject *Debugger_notify(DebuggerClass * __unused self, PyObject *args)
 		NSString *informativeTextString = [[NSString alloc] initWithBytes:informativeText.buf length:(NSUInteger)informativeText.len encoding:NSUTF8StringEncoding];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			ZGDeliverUserNotification(titleString, nil, informativeTextString);
+			ZGDeliverUserNotification(titleString, nil, informativeTextString, @{ZGScriptNotificationTypeKey : @(YES)});
 		});
 		
 		retValue = Py_BuildValue("");

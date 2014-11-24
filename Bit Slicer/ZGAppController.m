@@ -110,6 +110,8 @@
 		 selector:@selector(lastChosenInternalProcessNameChanged:)
 		 name:ZGLastChosenInternalProcessNameNotification
 		 object:nil];
+		
+		[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 	}
 	
 	return self;
@@ -138,7 +140,9 @@
 
 + (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)__unused state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
-	ZGAppController *appController = [[NSApplication sharedApplication] delegate];
+	ZGAppController *appController = (ZGAppController *)[[NSApplication sharedApplication] delegate];
+	
+	assert([appController isKindOfClass:[ZGAppController class]]);
 	
 	NSWindowController *restoredWindowController = nil;
 	
@@ -259,6 +263,13 @@
 	{
 		self.memoryViewer.lastChosenInternalProcessName = lastChosenInternalProcessName;
 	}
+}
+
+#pragma mark User Notifications
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)__unused center shouldPresentNotification:(NSUserNotification *)notification
+{
+	return ([[notification.userInfo objectForKey:ZGScriptNotificationTypeKey] boolValue] || ![[NSRunningApplication currentApplication] isActive]);
 }
 
 #pragma mark Links

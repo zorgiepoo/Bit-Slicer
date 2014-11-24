@@ -48,6 +48,8 @@
 #define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
 #define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
 
+#define ZGScriptNotificationTypeKey @"script_type"
+
 extern dispatch_queue_t gPythonQueue;
 
 extern NSString *ZGScriptDefaultApplicationEditorKey;
