@@ -160,11 +160,6 @@
 	{
 		NSLog(@"Error while injecting code");
 		NSLog(@"%@", error);
-		
-		if (!ZGDeallocateMemory(self.process.processTask, self.allocatedAddress, self.numberOfAllocatedBytes))
-		{
-			NSLog(@"Error: Failed to deallocate VM memory after failing to inject code..");
-		}
 				
 		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedInjectCodeAlertTitle"), [NSString stringWithFormat:@"%@: %@", ZGLocalizedStringFromDebuggerTable(@"failedAssemblingForInjectingCodeMessage"), [error.userInfo objectForKey:@"reason"]]);
 	}
