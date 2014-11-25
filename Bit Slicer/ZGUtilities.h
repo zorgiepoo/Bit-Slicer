@@ -66,7 +66,8 @@ unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);
 
 NSString *ZGProtectionDescription(ZGMemoryProtection protection);
 
-void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, BOOL hasReplyButton, NSDictionary *userInfo);
+void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, NSDictionary *userInfo);
+void ZGDeliverUserNotificationWithReply(NSString *title, NSString *subtitle, NSString *informativeText, NSString *responsePlaceholder, NSDictionary *userInfo);
 
 void ZGRunAlertPanelWithOKButton(NSString *title, NSString *message);
 NSInteger ZGRunAlertPanelWithDefaultAndCancelButton(NSString *title, NSString *message, NSString *defaultButtonTitle);

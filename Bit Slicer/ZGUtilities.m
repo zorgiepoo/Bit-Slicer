@@ -431,7 +431,7 @@ NSString *ZGProtectionDescription(ZGMemoryProtection protection)
 	return [protectionAttributes componentsJoinedByString:@""];
 }
 
-void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, BOOL hasReplyButton, NSDictionary *userInfo)
+void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitle, NSString *informativeText, BOOL hasReplyButton, NSString *responsePlaceholder, NSDictionary *userInfo)
 {
 	NSUserNotification *userNotification = [[NSUserNotification alloc] init];
 	userNotification.title = title;
@@ -441,12 +441,28 @@ void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *in
 	if ([userNotification respondsToSelector:@selector(hasReplyButton)])
 	{
 		userNotification.hasReplyButton = hasReplyButton;
+		
+		if ([userNotification respondsToSelector:@selector(responsePlaceholder)])
+		{
+			userNotification.responsePlaceholder = responsePlaceholder;
+		}
+		
 		if (hasReplyButton && [NSApp isActive])
 		{
-			userNotification.deliveryDate = [[NSDate date] dateByAddingTimeInterval:2.5];
+			userNotification.deliveryDate = [[NSDate date] dateByAddingTimeInterval:5.0];
 		}
 	}
 	[[NSUserNotificationCenter defaultUserNotificationCenter] scheduleNotification:userNotification];
+}
+
+void ZGDeliverUserNotificationWithReply(NSString *title, NSString *subtitle, NSString *informativeText, NSString *responsePlaceholder, NSDictionary *userInfo)
+{
+	ZGDeliverUserNotificationWithReplyOption(title, subtitle, informativeText, YES, responsePlaceholder, userInfo);
+}
+
+void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, NSDictionary *userInfo)
+{
+	ZGDeliverUserNotificationWithReplyOption(title, subtitle, informativeText, NO, nil, userInfo);
 }
 
 static NSInteger ZGRunAlertPanelWithDefaultAndAlternativeButton(NSString *title, NSString *message, NSString *defaultButtonTitle, NSString *alternativeButtonTitle)

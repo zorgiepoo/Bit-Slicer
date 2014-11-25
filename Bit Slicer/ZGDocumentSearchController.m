@@ -339,7 +339,7 @@
 	
 	if (!self.searchProgress.shouldCancelSearch)
 	{
-		ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:self.searchProgress], NO, nil);
+		ZGDeliverUserNotification(ZGLocalizableSearchDocumentString(@"searchFinishedNotificationTitle"), windowController.currentProcess.name, [self numberOfVariablesFoundDescriptionFromProgress:self.searchProgress], nil);
 		
 		if (notSearchedVariables.count + self.temporarySearchResults.addressCount != oldVariables.count)
 		{

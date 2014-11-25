@@ -340,7 +340,7 @@
 	
 	[self.tableView reloadData];
 	
-	ZGDeliverUserNotification(ZGLocalizableWatchVariableString(@"foundInstructionNotificationTitle"), self.watchProcess.name, [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"foundInstructionNotificationMessageFormat"), instruction.text], NO, nil);
+	ZGDeliverUserNotification(ZGLocalizableWatchVariableString(@"foundInstructionNotificationTitle"), self.watchProcess.name, [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"foundInstructionNotificationMessageFormat"), instruction.text], nil);
 }
 
 - (void)watchVariable:(ZGVariable *)variable withWatchPointType:(ZGWatchPointType)watchPointType inProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow completionHandler:(watch_variable_completion_t)completionHandler
