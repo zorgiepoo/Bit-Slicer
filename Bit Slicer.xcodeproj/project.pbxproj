@@ -326,6 +326,7 @@
 		724A9F4719A8791F00E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Memory Window.strings"; sourceTree = "<group>"; };
 		724A9F4D19A8EDD700E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Logger Window.stringsdict"; sourceTree = "<group>"; };
 		724A9F5019A8F54600E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Search Document.stringsdict"; sourceTree = "<group>"; };
+		725DEC851A24EE6F0095C9B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Script Prompt Dialog.strings"; sourceTree = "<group>"; };
 		726B7CA51A23E849004354BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Script Prompt Dialog.xib"; sourceTree = "<group>"; };
 		726B7CA71A23F0EE004354BC /* ZGScriptPromptWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPromptWindowController.h; path = "Bit Slicer/ZGScriptPromptWindowController.h"; sourceTree = "<group>"; };
 		726B7CA81A23F0EE004354BC /* ZGScriptPromptWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPromptWindowController.m; path = "Bit Slicer/ZGScriptPromptWindowController.m"; sourceTree = "<group>"; };
@@ -2043,6 +2044,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				726B7CA51A23E849004354BC /* Base */,
+				725DEC851A24EE6F0095C9B3 /* en */,
 			);
 			name = "Script Prompt Dialog.xib";
 			sourceTree = "<group>";

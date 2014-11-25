@@ -86,7 +86,7 @@ DQ
                     <constraint firstItem="V9s-9E-eHc" firstAttribute="top" secondItem="BBl-Rh-kff" secondAttribute="bottom" constant="8" id="qb9-PM-foF"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="-22.5" y="201"/>
+            <point key="canvasLocation" x="-161.5" y="160"/>
         </window>
     </objects>
 </document>
