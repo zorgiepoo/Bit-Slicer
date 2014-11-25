@@ -411,7 +411,7 @@ static PyObject *Debugger_prompt(DebuggerClass *self, PyObject *args)
 	
 	if (scriptManager.hasAttachedPrompt)
 	{
-		PyErr_SetString(PyExc_AssertionError, "debug.prompt failed because a prompt is already visible");
+		PyErr_SetString(gDebuggerException, "debug.prompt failed because a prompt is already visible");
 		return NULL;
 	}
 	
