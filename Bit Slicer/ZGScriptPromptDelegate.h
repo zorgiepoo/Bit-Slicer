@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 9/5/13.
+ * Created by Mayur Pawashe on 11/24/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,27 +33,11 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Python.h"
-#import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGHotKeyDelegate.h"
-#import "ZGScriptPromptDelegate.h"
 
-@class ZGScriptManager;
-@class ZGProcess;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
-@class ZGHotKeyCenter;
+@class ZGScriptPrompt;
 
-@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
+@protocol ZGScriptPromptDelegate <NSObject>
 
-@property (nonatomic, assign) ZGScriptManager *scriptManager;
-
-+ (void)loadPythonClassInMainModule:(PyObject *)module;
-
-- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-- (void)cleanup;
-
-@property (nonatomic, assign) PyObject *object;
+- (void)scriptPrompt:(ZGScriptPrompt *)scriptPrompt didReceiveAnswer:(NSString *)answer;
 
 @end

@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 9/5/13.
+ * Created by Mayur Pawashe on 11/24/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,28 +32,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "Python.h"
-#import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGHotKeyDelegate.h"
+#import <Cocoa/Cocoa.h>
 #import "ZGScriptPromptDelegate.h"
 
-@class ZGScriptManager;
-@class ZGProcess;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
-@class ZGHotKeyCenter;
+@class ZGScriptPrompt;
 
-@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
+@interface ZGScriptPromptWindowController : NSWindowController
 
-@property (nonatomic, assign) ZGScriptManager *scriptManager;
+@property (nonatomic, readonly, weak) id <ZGScriptPromptDelegate> delegate;
+@property (atomic, readonly) BOOL isAttached;
 
-+ (void)loadPythonClassInMainModule:(PyObject *)module;
-
-- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-- (void)cleanup;
-
-@property (nonatomic, assign) PyObject *object;
+- (void)attachToWindow:(NSWindow *)parentWindow withScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate;
+- (void)terminateSession;
 
 @end

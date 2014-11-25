@@ -52,6 +52,8 @@
 #import "ZGRegisterEntries.h"
 #import "ZGAppTerminationState.h"
 #import "ZGAppPathUtilities.h"
+#import "ZGScriptPrompt.h"
+#import "ZGScriptPromptWindowController.h"
 
 #import "structmember.h"
 
@@ -75,6 +77,8 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 @property (atomic) NSMutableArray *runningScripts;
 @property (nonatomic) NSMutableArray *objectsPool;
 @property (nonatomic) id scriptActivity;
+
+@property (nonatomic) ZGScriptPromptWindowController *scriptPromptWindowController;
 
 @property (nonatomic) ZGAppTerminationState *appTerminationState;
 @property (nonatomic) BOOL delayedAppTermination;
@@ -285,6 +289,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		self.fileWatchingQueue.delegate = self;
 		self.windowController = windowController;
 		self.loggerWindowController = windowController.loggerWindowController;
+		self.scriptPromptWindowController = [[ZGScriptPromptWindowController alloc] init];
 	}
 	return self;
 }
@@ -823,6 +828,11 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			[[NSNotificationCenter defaultCenter] removeObserver:self];
 		}
 		
+		if ([self hasAttachedPrompt] && self.scriptPromptWindowController.delegate == script.debuggerInstance)
+		{
+			[self.scriptPromptWindowController terminateSession];
+		}
+		
 		BOOL delayedAppTermination = self.delayedAppTermination;
 		
 		NSUInteger scriptFinishedCount = script.finishedCount;
@@ -891,18 +901,51 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	}
 }
 
-- (void)handleCallbackFailureWithVariable:(ZGVariable *)variable methodCallResult:(PyObject *)methodCallResult forMethodName:(NSString *)methodName
+- (void)handleFailureWithVariable:(ZGVariable *)variable methodCallResult:(PyObject *)methodCallResult forMethodName:(NSString *)methodName
 {
 	if (methodCallResult == NULL)
 	{
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[self.loggerWindowController writeLine:[NSString stringWithFormat:@"Exception raised in %@ callback", methodName]];
+			[self.loggerWindowController writeLine:[NSString stringWithFormat:@"Exception raised in %@", methodName]];
 		});
 		[self logPythonError];
 		dispatch_async(dispatch_get_main_queue(), ^{
 			[self stopScriptForVariable:variable];
 		});
 	}
+}
+
+- (BOOL)hasAttachedPrompt
+{
+	return self.scriptPromptWindowController.isAttached;
+}
+
+- (void)showScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate
+{
+	if (![self hasAttachedPrompt])
+	{
+		ZGDeliverUserNotification(@"Script Prompt", nil, scriptPrompt.message, nil);
+		[self.scriptPromptWindowController attachToWindow:self.windowController.window withScriptPrompt:scriptPrompt delegate:delegate];
+	}
+}
+
+- (void)handleScriptPrompt:(ZGScriptPrompt *)scriptPrompt withAnswer:(NSString *)answer sender:(id)sender
+{
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
+			dispatch_async(gPythonQueue, ^{
+				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
+				{
+					PyObject *callback = scriptPrompt.userData;
+					PyObject *result = (answer != nil) ? PyObject_CallFunction(callback, "s", [answer UTF8String]) : PyObject_CallFunction(callback, "O", Py_None);
+					
+					[self handleFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"script prompt callback"];
+					Py_XDECREF(callback);
+					Py_XDECREF(result);
+				}
+			});
+		}];
+	});
 }
 
 - (PyObject *)registersfromRegistersState:(ZGRegistersState *)registersState
@@ -929,7 +972,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				{
 					PyObject *registers = [self registersfromRegistersState:registersState];
 					PyObject *result = PyObject_CallFunction(callback, "KKO", dataAddress, instructionAddress, registers);
-					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"data watchpoint"];
+					[self handleFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"data watchpoint callback"];
 					Py_XDECREF(registers);
 					Py_XDECREF(result);
 				}
@@ -949,7 +992,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 					PyObject *result = PyObject_CallFunction(callback, "KO", breakPoint.variable.address, registers);
 					Py_XDECREF(registers);
 					
-					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"instruction breakpoint"];
+					[self handleFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"instruction breakpoint callback"];
 					Py_XDECREF(result);
 					
 					if (breakPoint.hidden && breakPoint.callback != NULL)
@@ -971,7 +1014,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
 					PyObject *result = PyObject_CallFunction(callback, "I", hotKeyID);
-					[self handleCallbackFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"hotkey trigger"];
+					[self handleFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"hotkey trigger callback"];
 					Py_XDECREF(result);
 				}
 			});

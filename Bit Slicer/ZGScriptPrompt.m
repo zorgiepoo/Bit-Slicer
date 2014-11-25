@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 9/5/13.
+ * Created by Mayur Pawashe on 11/24/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,28 +32,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "Python.h"
-#import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGHotKeyDelegate.h"
-#import "ZGScriptPromptDelegate.h"
+#import "ZGScriptPrompt.h"
 
-@class ZGScriptManager;
-@class ZGProcess;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
-@class ZGHotKeyCenter;
+@implementation ZGScriptPrompt
 
-@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
-
-@property (nonatomic, assign) ZGScriptManager *scriptManager;
-
-+ (void)loadPythonClassInMainModule:(PyObject *)module;
-
-- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-- (void)cleanup;
-
-@property (nonatomic, assign) PyObject *object;
+- (id)initWithMessage:(NSString *)message defaultAnswer:(NSString *)defaultAnswer userData:(void *)userData
+{
+	self = [super init];
+	if (self != nil)
+	{
+		_message = [message copy];
+		_answer = [defaultAnswer copy];
+		_userData = userData;
+	}
+	return self;
+}
 
 @end

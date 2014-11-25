@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 9/5/13.
+ * Created by Mayur Pawashe on 11/24/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,28 +32,72 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "Python.h"
-#import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGHotKeyDelegate.h"
-#import "ZGScriptPromptDelegate.h"
+#import "ZGScriptPromptWindowController.h"
+#import "ZGScriptPrompt.h"
 
-@class ZGScriptManager;
-@class ZGProcess;
-@class ZGBreakPointController;
-@class ZGLoggerWindowController;
-@class ZGHotKeyCenter;
+@interface ZGScriptPromptWindowController ()
 
-@interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
+@property (nonatomic) ZGScriptPrompt *scriptPrompt;
 
-@property (nonatomic, assign) ZGScriptManager *scriptManager;
+@property (atomic) BOOL isAttached;
+@property (nonatomic, weak) id <ZGScriptPromptDelegate> delegate;
 
-+ (void)loadPythonClassInMainModule:(PyObject *)module;
+@end
 
-- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
-- (void)cleanup;
+@implementation ZGScriptPromptWindowController
+{
+	IBOutlet NSTextField *_messageTextField;
+	IBOutlet NSTextField *_answerTextField;
+}
+ 
+- (NSString *)windowNibName
+{
+	return @"Script Prompt Dialog";
+}
 
-@property (nonatomic, assign) PyObject *object;
+- (void)attachToWindow:(NSWindow *)parentWindow withScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate
+{
+	[self window];
+	
+	_messageTextField.stringValue = scriptPrompt.message;
+	_answerTextField.stringValue = scriptPrompt.answer;
+	
+	[_answerTextField selectText:nil];
+	
+	[NSApp
+	 beginSheet:self.window
+	 modalForWindow:parentWindow
+	 modalDelegate:nil
+	 didEndSelector:nil
+	 contextInfo:NULL];
+	
+	self.scriptPrompt = scriptPrompt;
+	self.isAttached = YES;
+	
+	self.delegate = delegate;
+}
+
+- (void)terminateSession
+{
+	if (self.isAttached)
+	{
+		[NSApp endSheet:self.window];
+		[self.window close];
+		
+		self.isAttached = NO;
+	}
+}
+
+- (IBAction)hitDefaultButton:(id)__unused sender
+{
+	[self.delegate scriptPrompt:self.scriptPrompt didReceiveAnswer:_answerTextField.stringValue];
+	[self terminateSession];
+}
+
+- (IBAction)hitAlternativeButton:(id)__unused sender
+{
+	[self.delegate scriptPrompt:self.scriptPrompt didReceiveAnswer:nil];
+	[self terminateSession];
+}
 
 @end

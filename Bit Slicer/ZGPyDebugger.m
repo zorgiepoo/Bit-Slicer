@@ -56,6 +56,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGHotKey.h"
+#import "ZGScriptPrompt.h"
 
 @class ZGPyDebugger;
 
@@ -78,6 +79,7 @@ static PyMemberDef Debugger_members[] =
 
 declareDebugPrototypeMethod(log)
 declareDebugPrototypeMethod(notify)
+declareDebugPrototypeMethod(prompt)
 declareDebugPrototypeMethod(registerHotkey)
 declareDebugPrototypeMethod(unregisterHotkey)
 declareDebugPrototypeMethod(isRegisteredHotkey)
@@ -109,6 +111,7 @@ static PyMethodDef Debugger_methods[] =
 {
 	declareDebugMethod(log)
 	declareDebugMethod(notify)
+	declareDebugMethod(prompt)
 	declareDebugMethod(registerHotkey)
 	declareDebugMethod(unregisterHotkey)
 	declareDebugMethod(isRegisteredHotkey)
@@ -365,6 +368,69 @@ static PyObject *Debugger_notify(DebuggerClass * __unused self, PyObject *args)
 	PyBuffer_Release(&informativeText);
 	
 	return retValue;
+}
+
+- (void)scriptPrompt:(ZGScriptPrompt *)scriptPrompt didReceiveAnswer:(NSString *)answer
+{
+	dispatch_async(gPythonQueue, ^{
+		[self.scriptManager handleScriptPrompt:scriptPrompt withAnswer:answer sender:self];
+	});
+}
+
+static PyObject *Debugger_prompt(DebuggerClass *self, PyObject *args)
+{
+	Py_buffer text;
+	Py_buffer defaultAnswer;
+	PyObject *callback = NULL;
+	
+	if (!PyArg_ParseTuple(args, "s*s*O:prompt", &text, &defaultAnswer, &callback))
+	{
+		return NULL;
+	}
+	
+	if (!PyBuffer_IsContiguous(&text, 'C') || !PyBuffer_IsContiguous(&defaultAnswer, 'C'))
+	{
+		PyErr_SetString(PyExc_BufferError, "debug.prompt can't take in non-contiguous buffer");
+		
+		PyBuffer_Release(&text);
+		PyBuffer_Release(&defaultAnswer);
+		return NULL;
+	}
+	
+	if (PyCallable_Check(callback) == 0)
+	{
+		PyErr_SetString(PyExc_ValueError, "debug.prompt failed because callback is not callable");
+		
+		PyBuffer_Release(&text);
+		PyBuffer_Release(&defaultAnswer);
+		return NULL;
+	}
+	
+	ZGPyDebugger *selfReference = self->objcSelf;
+	ZGScriptManager *scriptManager = selfReference.scriptManager;
+	
+	if (scriptManager.hasAttachedPrompt)
+	{
+		PyErr_SetString(PyExc_AssertionError, "debug.prompt failed because a prompt is already visible");
+		return NULL;
+	}
+	
+	NSString *textString = [[NSString alloc] initWithBytes:text.buf length:(NSUInteger)text.len encoding:NSUTF8StringEncoding];
+	NSString *defaultAnswerString = [[NSString alloc] initWithBytes:defaultAnswer.buf length:(NSUInteger)defaultAnswer.len encoding:NSUTF8StringEncoding];
+	
+	Py_XINCREF(callback);
+	
+	// We can't async here because we want to prevent showing a prompt when another prompt from this or another script is already visible
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		[scriptManager
+		 showScriptPrompt:[[ZGScriptPrompt alloc] initWithMessage:textString defaultAnswer:defaultAnswerString userData:callback]
+		 delegate:selfReference];
+	});
+	
+	PyBuffer_Release(&text);
+	PyBuffer_Release(&defaultAnswer);
+	
+	return Py_BuildValue("");
 }
 
 - (void)hotKeyDidTrigger:(ZGHotKey *)hotKey

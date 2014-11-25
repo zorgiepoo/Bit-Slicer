@@ -39,6 +39,8 @@
 		724A9F4819A8792000E72C9D /* [Code] Memory Window.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4619A8791F00E72C9D /* [Code] Memory Window.strings */; };
 		724A9F4E19A8EDD700E72C9D /* [Code] Logger Window.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4C19A8EDD700E72C9D /* [Code] Logger Window.stringsdict */; };
 		724A9F5119A8F54600E72C9D /* [Code] Search Document.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4F19A8F54600E72C9D /* [Code] Search Document.stringsdict */; };
+		726B7CA61A23E849004354BC /* Script Prompt Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726B7CA41A23E849004354BC /* Script Prompt Dialog.xib */; };
+		726B7CA91A23F0EE004354BC /* ZGScriptPromptWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 726B7CA81A23F0EE004354BC /* ZGScriptPromptWindowController.m */; };
 		726CA2A019606CA600A6AD40 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA29E19606CA600A6AD40 /* MainMenu.xib */; };
 		726CA2A319606CB600A6AD40 /* Search Document Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2A119606CB600A6AD40 /* Search Document Window.xib */; };
 		726CA2A619606CDD00A6AD40 /* Preferences Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2A419606CDD00A6AD40 /* Preferences Window.xib */; };
@@ -60,6 +62,7 @@
 		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
+		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
 		72D051AC1960891900EC532A /* Backtrace View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AE1960891900EC532A /* Backtrace View.xib */; };
 		72D051CB1960A41F00EC532A /* Registers View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051C91960A41F00EC532A /* Registers View.xib */; };
@@ -323,6 +326,9 @@
 		724A9F4719A8791F00E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Memory Window.strings"; sourceTree = "<group>"; };
 		724A9F4D19A8EDD700E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Logger Window.stringsdict"; sourceTree = "<group>"; };
 		724A9F5019A8F54600E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Search Document.stringsdict"; sourceTree = "<group>"; };
+		726B7CA51A23E849004354BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Script Prompt Dialog.xib"; sourceTree = "<group>"; };
+		726B7CA71A23F0EE004354BC /* ZGScriptPromptWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPromptWindowController.h; path = "Bit Slicer/ZGScriptPromptWindowController.h"; sourceTree = "<group>"; };
+		726B7CA81A23F0EE004354BC /* ZGScriptPromptWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPromptWindowController.m; path = "Bit Slicer/ZGScriptPromptWindowController.m"; sourceTree = "<group>"; };
 		726CA29F19606CA600A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/MainMenu.xib"; sourceTree = "<group>"; };
 		726CA2A219606CB600A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Search Document Window.xib"; sourceTree = "<group>"; };
 		726CA2A519606CDD00A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Preferences Window.xib"; sourceTree = "<group>"; };
@@ -344,6 +350,9 @@
 		726CA2D519606E3100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Search Options.xib"; sourceTree = "<group>"; };
 		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Watch Variable Dialog.xib"; sourceTree = "<group>"; };
 		7284245619A96B470081C673 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPrompt.h; path = "Bit Slicer/ZGScriptPrompt.h"; sourceTree = "<group>"; };
+		72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPrompt.m; path = "Bit Slicer/ZGScriptPrompt.m"; sourceTree = "<group>"; };
+		72AA79841A2413B4005A9BD6 /* ZGScriptPromptDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPromptDelegate.h; path = "Bit Slicer/ZGScriptPromptDelegate.h"; sourceTree = "<group>"; };
 		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Data Inspector View.xib"; sourceTree = "<group>"; };
 		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Backtrace View.xib"; sourceTree = "<group>"; };
 		72D051CA1960A41F00EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Registers View.xib"; sourceTree = "<group>"; };
@@ -912,6 +921,7 @@
 				726CA2D319606E2900A6AD40 /* Edit Description Dialog.xib */,
 				726CA2D619606E3100A6AD40 /* Search Options.xib */,
 				726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */,
+				726B7CA41A23E849004354BC /* Script Prompt Dialog.xib */,
 			);
 			name = Nibs;
 			sourceTree = "<group>";
@@ -1085,6 +1095,11 @@
 			children = (
 				77F1160417D2EEB6009E002A /* ZGScriptManager.h */,
 				77F1160517D2EEB6009E002A /* ZGScriptManager.m */,
+				72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */,
+				72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */,
+				72AA79841A2413B4005A9BD6 /* ZGScriptPromptDelegate.h */,
+				726B7CA71A23F0EE004354BC /* ZGScriptPromptWindowController.h */,
+				726B7CA81A23F0EE004354BC /* ZGScriptPromptWindowController.m */,
 				77CE28BB17D580D400998F28 /* ZGPyMainModule.h */,
 				77CE28B917D580AD00998F28 /* ZGPyMainModule.m */,
 				774B5EE71915362900D7AA69 /* ZGPyKeyCodeModule.h */,
@@ -1622,6 +1637,7 @@
 				77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */,
 				726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */,
 				77F115B317D2EAFE009E002A /* Credits.rtf in Resources */,
+				726B7CA61A23E849004354BC /* Script Prompt Dialog.xib in Resources */,
 				726CA2A619606CDD00A6AD40 /* Preferences Window.xib in Resources */,
 				722CAA5B19AD4AED009C6AAE /* scripts.png in Resources */,
 				724A9F2319A1657500E72C9D /* [Code] Memory Navigation.strings in Resources */,
@@ -1745,6 +1761,7 @@
 				77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */,
 				7798EED618C40B7F001120FB /* DDMathStringToken.m in Sources */,
 				77F115E217D2EDC3009E002A /* ZGAppController.m in Sources */,
+				726B7CA91A23F0EE004354BC /* ZGScriptPromptWindowController.m in Sources */,
 				7798EEDB18C40B7F001120FB /* NSString+DDMathParsing.m in Sources */,
 				7768064018B96A64007F2CAF /* ZGThreadStates.c in Sources */,
 				77F115E517D2EDCD009E002A /* ZGPreferencesController.m in Sources */,
@@ -1805,6 +1822,7 @@
 				77F1163817D2EF76009E002A /* NSArrayAdditions.m in Sources */,
 				7798EEC818C40B7F001120FB /* _DDFunctionTerm.m in Sources */,
 				77F1163A17D2EF7F009E002A /* main.m in Sources */,
+				72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */,
 				77F1163D17D2EF8E009E002A /* ZGMemoryWindowController.m in Sources */,
 				7798EEDA18C40B7F001120FB /* DDTypes.m in Sources */,
 				7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */,
@@ -2019,6 +2037,14 @@
 				724A9F5019A8F54600E72C9D /* en */,
 			);
 			name = "[Code] Search Document.stringsdict";
+			sourceTree = "<group>";
+		};
+		726B7CA41A23E849004354BC /* Script Prompt Dialog.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				726B7CA51A23E849004354BC /* Base */,
+			);
+			name = "Script Prompt Dialog.xib";
 			sourceTree = "<group>";
 		};
 		726CA29E19606CA600A6AD40 /* MainMenu.xib */ = {

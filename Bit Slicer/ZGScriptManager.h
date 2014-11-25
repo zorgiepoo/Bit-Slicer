@@ -37,6 +37,7 @@
 #import "VDKQueue.h"
 #import "ZGMemoryTypes.h"
 #import "ZGRegisterEntries.h"
+#import "ZGScriptPromptDelegate.h"
 
 @class ZGDocumentWindowController;
 @class ZGVariable;
@@ -44,6 +45,7 @@
 @class ZGBreakPoint;
 @class ZGRegistersState;
 @class ZGAppTerminationState;
+@class ZGScriptPrompt;
 
 #define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
 #define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
@@ -72,6 +74,10 @@ extern NSString *ZGScriptDefaultApplicationEditorKey;
 - (void)runScriptForVariable:(ZGVariable *)variable;
 - (void)stopScriptForVariable:(ZGVariable *)variable;
 - (void)removeScriptForVariable:(ZGVariable *)variable;
+
+- (BOOL)hasAttachedPrompt;
+- (void)showScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate;
+- (void)handleScriptPrompt:(ZGScriptPrompt *)scriptPrompt withAnswer:(NSString *)answer sender:(id)sender;
 
 - (void)handleDataAddress:(ZGMemoryAddress)dataAddress accessedFromInstructionAddress:(ZGMemoryAddress)instructionAddress registersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender;
 - (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender;
