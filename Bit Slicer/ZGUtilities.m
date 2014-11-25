@@ -431,14 +431,22 @@ NSString *ZGProtectionDescription(ZGMemoryProtection protection)
 	return [protectionAttributes componentsJoinedByString:@""];
 }
 
-void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, NSDictionary *userInfo)
+void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, BOOL hasReplyButton, NSDictionary *userInfo)
 {
 	NSUserNotification *userNotification = [[NSUserNotification alloc] init];
 	userNotification.title = title;
 	userNotification.subtitle = subtitle;
 	userNotification.informativeText = informativeText;
 	userNotification.userInfo = userInfo;
-	[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+	if ([userNotification respondsToSelector:@selector(hasReplyButton)])
+	{
+		userNotification.hasReplyButton = hasReplyButton;
+		if (hasReplyButton && [NSApp isActive])
+		{
+			userNotification.deliveryDate = [[NSDate date] dateByAddingTimeInterval:2.5];
+		}
+	}
+	[[NSUserNotificationCenter defaultUserNotificationCenter] scheduleNotification:userNotification];
 }
 
 static NSInteger ZGRunAlertPanelWithDefaultAndAlternativeButton(NSString *title, NSString *message, NSString *defaultButtonTitle, NSString *alternativeButtonTitle)

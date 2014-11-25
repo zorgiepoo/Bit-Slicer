@@ -110,7 +110,7 @@
 					 dispatch_async(dispatch_get_main_queue(), ^{
 						 if (!self.searchProgress.shouldCancelSearch)
 						 {
-							 ZGDeliverUserNotification(ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationMessageFormat"), process.name], nil);
+							 ZGDeliverUserNotification(ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationMessageFormat"), process.name], NO, nil);
 						 }
 						 
 						 self.progressIndicator.doubleValue = 0.0;

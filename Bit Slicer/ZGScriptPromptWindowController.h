@@ -41,8 +41,11 @@
 
 @property (nonatomic, readonly, weak) id <ZGScriptPromptDelegate> delegate;
 @property (atomic, readonly) BOOL isAttached;
+@property (nonatomic, readonly) ZGScriptPrompt *scriptPrompt;
 
 - (void)attachToWindow:(NSWindow *)parentWindow withScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate;
+
+- (void)terminateSessionWithAnswer:(NSString *)answer;
 - (void)terminateSession;
 
 @end

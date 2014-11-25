@@ -41,6 +41,8 @@
 #import "ZGDocument.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGScriptManager.h"
+#import "ZGScriptPrompt.h"
+#import "ZGScriptPromptWindowController.h"
 #import "ZGProcessTaskManager.h"
 #import "ZGDocumentController.h"
 #import "ZGHotKeyCenter.h"
@@ -269,7 +271,24 @@
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)__unused center shouldPresentNotification:(NSUserNotification *)notification
 {
-	return ([[notification.userInfo objectForKey:ZGScriptNotificationTypeKey] boolValue] || ![[NSRunningApplication currentApplication] isActive]);
+	return [notification.userInfo[ZGScriptNotificationTypeKey] boolValue] || ![NSApp isActive];
+}
+
+- (void)userNotificationCenter:(NSUserNotificationCenter *)__unused center didActivateNotification:(NSUserNotification *)notification
+{
+	if (notification.activationType == NSUserNotificationActivationTypeReplied)
+	{
+		NSNumber *scriptPromptHash = notification.userInfo[ZGScriptNotificationPromptHashKey];
+		if (scriptPromptHash != nil)
+		{
+			for (ZGDocument *document in self.documentController.documents)
+			{
+				ZGDocumentWindowController *documentWindowController = [document.windowControllers firstObject];
+				ZGScriptManager *scriptManager = documentWindowController.scriptManager;
+				[scriptManager handleScriptPromptHash:scriptPromptHash withUserNotificationReply:notification.response.string];
+			}
+		}
+	}
 }
 
 #pragma mark Links

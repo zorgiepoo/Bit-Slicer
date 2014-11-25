@@ -77,6 +77,12 @@
 	self.delegate = delegate;
 }
 
+- (void)terminateSessionWithAnswer:(NSString *)answer
+{
+	[self.delegate scriptPrompt:self.scriptPrompt didReceiveAnswer:answer];
+	[self terminateSession];
+}
+
 - (void)terminateSession
 {
 	if (self.isAttached)
@@ -85,19 +91,18 @@
 		[self.window close];
 		
 		self.isAttached = NO;
+		self.delegate = nil;
 	}
 }
 
 - (IBAction)hitDefaultButton:(id)__unused sender
 {
-	[self.delegate scriptPrompt:self.scriptPrompt didReceiveAnswer:_answerTextField.stringValue];
-	[self terminateSession];
+	[self terminateSessionWithAnswer:_answerTextField.stringValue];
 }
 
 - (IBAction)hitAlternativeButton:(id)__unused sender
 {
-	[self.delegate scriptPrompt:self.scriptPrompt didReceiveAnswer:nil];
-	[self terminateSession];
+	[self terminateSessionWithAnswer:nil];
 }
 
 @end

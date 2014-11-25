@@ -525,7 +525,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		
 		if ((![NSApp isActive] || ![self.loggerWindowController.window isVisible]))
 		{
-			ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptFailedNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizableScriptManagerString(@"scriptFailedNotificationTextFormat"), process.name], nil);
+			ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptFailedNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizableScriptManagerString(@"scriptFailedNotificationTextFormat"), process.name], NO, nil);
 		}
 	});
 	
@@ -927,13 +927,38 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 {
 	if (![self hasAttachedPrompt])
 	{
-		ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), nil, scriptPrompt.message, nil);
+		ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), self.windowController.currentProcess.name, scriptPrompt.message, YES, @{ZGScriptNotificationPromptHashKey : @(scriptPrompt.hash)});
+		
 		[self.scriptPromptWindowController attachToWindow:self.windowController.window withScriptPrompt:scriptPrompt delegate:delegate];
+	}
+}
+
+- (void)handleScriptPromptHash:(NSNumber *)scriptPromptHash withUserNotificationReply:(NSString *)reply
+{
+	if ([scriptPromptHash isEqualToNumber:@(self.scriptPromptWindowController.scriptPrompt.hash)])
+	{
+		[self.scriptPromptWindowController terminateSessionWithAnswer:reply];
+	}
+}
+
+- (void)removeUserNotifications:(NSArray *)userNotifications withScriptPrompt:(ZGScriptPrompt *)scriptPrompt
+{
+	for (NSUserNotification *userNotification in userNotifications)
+	{
+		NSNumber *scriptPromptHash = userNotification.userInfo[ZGScriptNotificationPromptHashKey];
+		if (scriptPromptHash != nil && [scriptPromptHash isEqualToNumber:@(scriptPrompt.hash)])
+		{
+			[[NSUserNotificationCenter defaultUserNotificationCenter] removeScheduledNotification:userNotification];
+		}
 	}
 }
 
 - (void)handleScriptPrompt:(ZGScriptPrompt *)scriptPrompt withAnswer:(NSString *)answer sender:(id)sender
 {
+	NSUserNotificationCenter *userNotificationCenter = [NSUserNotificationCenter defaultUserNotificationCenter];
+	[self removeUserNotifications:userNotificationCenter.scheduledNotifications withScriptPrompt:scriptPrompt];
+	[self removeUserNotifications:userNotificationCenter.deliveredNotifications withScriptPrompt:scriptPrompt];
+	
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(gPythonQueue, ^{

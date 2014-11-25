@@ -51,12 +51,13 @@
 #define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
 
 #define ZGScriptNotificationTypeKey @"script_type"
+#define ZGScriptNotificationPromptHashKey @"ZGScriptNotificationPromptHashKey"
 
 extern dispatch_queue_t gPythonQueue;
 
 extern NSString *ZGScriptDefaultApplicationEditorKey;
 
-@interface ZGScriptManager : NSObject <VDKQueueDelegate>
+@interface ZGScriptManager : NSObject <VDKQueueDelegate, NSUserNotificationCenterDelegate>
 
 + (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
 
@@ -78,6 +79,7 @@ extern NSString *ZGScriptDefaultApplicationEditorKey;
 - (BOOL)hasAttachedPrompt;
 - (void)showScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate;
 - (void)handleScriptPrompt:(ZGScriptPrompt *)scriptPrompt withAnswer:(NSString *)answer sender:(id)sender;
+- (void)handleScriptPromptHash:(NSNumber *)scriptPromptHash withUserNotificationReply:(NSString *)reply;
 
 - (void)handleDataAddress:(ZGMemoryAddress)dataAddress accessedFromInstructionAddress:(ZGMemoryAddress)instructionAddress registersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender;
 - (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender;
