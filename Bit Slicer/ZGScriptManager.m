@@ -61,6 +61,8 @@
 
 #define SCRIPT_FILENAME_PREFIX @"Script"
 
+#define ZGLocalizableScriptManagerString(string) NSLocalizedStringFromTable(string, @"[Code] Script Manager", nil)
+
 NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEditorKey";
 
 @interface ZGScriptManager ()
@@ -517,12 +519,13 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	PyErr_Fetch(&type, &value, &traceback);
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		NSString *errorMessage = [NSString stringWithFormat:@"An error occured trying to run the script on %@", self.windowController.currentProcess.name];
+		ZGProcess *process = self.windowController.currentProcess;
+		NSString *errorMessage = [NSString stringWithFormat:@"An error occured trying to run the script on %@", process.name];
 		[self.loggerWindowController writeLine:errorMessage];
 		
 		if ((![NSApp isActive] || ![self.loggerWindowController.window isVisible]))
 		{
-			ZGDeliverUserNotification(@"Script Failed", nil, errorMessage, nil);
+			ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptFailedNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizableScriptManagerString(@"scriptFailedNotificationTextFormat"), process.name], nil);
 		}
 	});
 	
@@ -924,7 +927,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 {
 	if (![self hasAttachedPrompt])
 	{
-		ZGDeliverUserNotification(@"Script Prompt", nil, scriptPrompt.message, nil);
+		ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), nil, scriptPrompt.message, nil);
 		[self.scriptPromptWindowController attachToWindow:self.windowController.window withScriptPrompt:scriptPrompt delegate:delegate];
 	}
 }

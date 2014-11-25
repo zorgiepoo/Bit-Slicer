@@ -39,6 +39,7 @@
 		724A9F4819A8792000E72C9D /* [Code] Memory Window.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4619A8791F00E72C9D /* [Code] Memory Window.strings */; };
 		724A9F4E19A8EDD700E72C9D /* [Code] Logger Window.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4C19A8EDD700E72C9D /* [Code] Logger Window.stringsdict */; };
 		724A9F5119A8F54600E72C9D /* [Code] Search Document.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4F19A8F54600E72C9D /* [Code] Search Document.stringsdict */; };
+		725DEC881A24F7610095C9B3 /* [Code] Script Manager.strings in Resources */ = {isa = PBXBuildFile; fileRef = 725DEC861A24F7610095C9B3 /* [Code] Script Manager.strings */; };
 		726B7CA61A23E849004354BC /* Script Prompt Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726B7CA41A23E849004354BC /* Script Prompt Dialog.xib */; };
 		726B7CA91A23F0EE004354BC /* ZGScriptPromptWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 726B7CA81A23F0EE004354BC /* ZGScriptPromptWindowController.m */; };
 		726CA2A019606CA600A6AD40 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA29E19606CA600A6AD40 /* MainMenu.xib */; };
@@ -327,6 +328,7 @@
 		724A9F4D19A8EDD700E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Logger Window.stringsdict"; sourceTree = "<group>"; };
 		724A9F5019A8F54600E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Search Document.stringsdict"; sourceTree = "<group>"; };
 		725DEC851A24EE6F0095C9B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Script Prompt Dialog.strings"; sourceTree = "<group>"; };
+		725DEC871A24F7610095C9B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Script Manager.strings"; sourceTree = "<group>"; };
 		726B7CA51A23E849004354BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Script Prompt Dialog.xib"; sourceTree = "<group>"; };
 		726B7CA71A23F0EE004354BC /* ZGScriptPromptWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPromptWindowController.h; path = "Bit Slicer/ZGScriptPromptWindowController.h"; sourceTree = "<group>"; };
 		726B7CA81A23F0EE004354BC /* ZGScriptPromptWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPromptWindowController.m; path = "Bit Slicer/ZGScriptPromptWindowController.m"; sourceTree = "<group>"; };
@@ -938,6 +940,7 @@
 				724A9F0B19A1657500E72C9D /* [Code] Dump Memory Range.strings */,
 				724A9F0D19A1657500E72C9D /* [Code] Logger Window.strings */,
 				724A9F4C19A8EDD700E72C9D /* [Code] Logger Window.stringsdict */,
+				725DEC861A24F7610095C9B3 /* [Code] Script Manager.strings */,
 				724A9F4619A8791F00E72C9D /* [Code] Memory Window.strings */,
 				724A9F0F19A1657500E72C9D /* [Code] Memory Navigation.strings */,
 				724A9F1119A1657500E72C9D /* [Code] Memory Protection.strings */,
@@ -1664,6 +1667,7 @@
 				724A9F2219A1657500E72C9D /* [Code] Logger Window.strings in Resources */,
 				726CA2CE19606E2600A6AD40 /* Edit Size Dialog.xib in Resources */,
 				72D271D4197C2A6800CC6914 /* InfoPlist.strings in Resources */,
+				725DEC881A24F7610095C9B3 /* [Code] Script Manager.strings in Resources */,
 				724A9F2419A1657500E72C9D /* [Code] Memory Protection.strings in Resources */,
 				72D051CB1960A41F00EC532A /* Registers View.xib in Resources */,
 				72D051AC1960891900EC532A /* Backtrace View.xib in Resources */,
@@ -2038,6 +2042,14 @@
 				724A9F5019A8F54600E72C9D /* en */,
 			);
 			name = "[Code] Search Document.stringsdict";
+			sourceTree = "<group>";
+		};
+		725DEC861A24F7610095C9B3 /* [Code] Script Manager.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				725DEC871A24F7610095C9B3 /* en */,
+			);
+			name = "[Code] Script Manager.strings";
 			sourceTree = "<group>";
 		};
 		726B7CA41A23E849004354BC /* Script Prompt Dialog.xib */ = {
