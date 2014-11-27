@@ -80,6 +80,7 @@ static PyMemberDef Debugger_members[] =
 declareDebugPrototypeMethod(log)
 declareDebugPrototypeMethod(notify)
 declareDebugPrototypeMethod(prompt)
+declareDebugPrototypeMethod(activate)
 declareDebugPrototypeMethod(registerHotkey)
 declareDebugPrototypeMethod(unregisterHotkey)
 declareDebugPrototypeMethod(isRegisteredHotkey)
@@ -112,6 +113,7 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(log)
 	declareDebugMethod(notify)
 	declareDebugMethod(prompt)
+	declareDebugMethod(activate)
 	declareDebugMethod(registerHotkey)
 	declareDebugMethod(unregisterHotkey)
 	declareDebugMethod(isRegisteredHotkey)
@@ -431,6 +433,20 @@ static PyObject *Debugger_prompt(DebuggerClass *self, PyObject *args)
 	PyBuffer_Release(&defaultAnswer);
 	
 	return Py_BuildValue("");
+}
+
+static PyObject *Debugger_activate(DebuggerClass *self, PyObject *__unused args)
+{
+	NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self->processIdentifier];
+	if (runningApplication == nil)
+	{
+		Py_RETURN_FALSE;
+	}
+	
+	BOOL didActivate = [runningApplication activateWithOptions:NSApplicationActivateAllWindows];
+	PyObject *result = PyBool_FromLong(didActivate);
+	Py_INCREF(result);
+	return result;
 }
 
 - (void)hotKeyDidTrigger:(ZGHotKey *)hotKey
