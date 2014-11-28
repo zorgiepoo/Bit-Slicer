@@ -444,9 +444,7 @@ static PyObject *Debugger_activate(DebuggerClass *self, PyObject *__unused args)
 	}
 	
 	BOOL didActivate = [runningApplication activateWithOptions:NSApplicationActivateAllWindows];
-	PyObject *result = PyBool_FromLong(didActivate);
-	Py_INCREF(result);
-	return result;
+	return PyBool_FromLong(didActivate);
 }
 
 - (void)hotKeyDidTrigger:(ZGHotKey *)hotKey
