@@ -264,6 +264,10 @@
 	self.searchValueTextField.target = self;
 	self.searchValueTextField.action = @selector(searchValue:);
 	
+	NSSearchFieldCell *searchFieldCell = self.searchValueTextField.cell;
+	searchFieldCell.cancelButtonCell.target = self;
+	searchFieldCell.cancelButtonCell.action = @selector(clearSearchValues:);
+	
 	[self setupScopeBar];
 	
 	[self.storeValuesButton.image setTemplate:YES];
@@ -1191,24 +1195,28 @@
 
 - (IBAction)clearSearchValues:(id)__unused sender
 {
-	[self.variableController clearSearch];
+	if (self.searchController.canCancelTask)
+	{
+		[self.searchController cancelTask];
+	}
+	else
+	{
+		if ([self isClearable])
+		{
+			[self.variableController clearSearch];
+		}
+		
+		self.searchValueTextField.stringValue = @"";
+		self.documentData.searchValue = self.searchValueTextField.stringValue;
+	}
 }
 
 - (IBAction)searchValue:(id)__unused sender
 {
 	self.documentData.searchValue = self.searchValueTextField.stringValue;
 	
-	BOOL hasEmptyExpression = [self.documentData.searchValue isEqualToString:@""];
-	
-	if (hasEmptyExpression && self.searchController.canCancelTask)
-	{
-		[self.searchController cancelTask];
-	}
-	else if (hasEmptyExpression && [self isClearable])
-	{
-		[self clearSearchValues:nil];
-	}
-	else if (!hasEmptyExpression && self.searchController.canStartTask && self.currentProcess.valid)
+	BOOL hasEmptyExpression = (self.documentData.searchValue.length == 0);
+	if (!hasEmptyExpression && self.searchController.canStartTask && self.currentProcess.valid)
 	{
 		ZGFunctionType functionType = [self selectedFunctionType];
 		if (ZGIsFunctionTypeStore(functionType) && self.searchData.savedData == nil)
