@@ -588,7 +588,7 @@
 		}
 	}
 	
-	if (CFByteOrderGetCurrent() != self.documentData.byteOrderTag)
+	if (CFByteOrderGetCurrent() != self.documentData.byteOrderTag && ZGSupportsEndianness(dataType))
 	{
 		self.searchData.bytesSwapped = YES;
 		if (ZGSupportsSwappingBeforeSearch(functionType, dataType))
