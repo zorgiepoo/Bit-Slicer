@@ -38,7 +38,8 @@
 #import "ZGProcessTaskManager.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
-#import "CoreSymbolication.h"
+
+#import "ZGLocalProcessHandle.h" // temporary...
 
 @interface ZGProcess ()
 {
@@ -47,8 +48,6 @@
 
 @property (nonatomic) ZGMachBinary *mainMachBinary;
 @property (nonatomic) ZGMachBinary *dylinkerBinary;
-
-@property (nonatomic) CSSymbolicatorRef symbolicator;
 
 @end
 
@@ -78,6 +77,7 @@
 	if (self != nil)
 	{
 		_processTask = processTask;
+		_handle = [[ZGLocalProcessHandle alloc] initWithProcessTask:_processTask];
 	}
 	return self;
 }
@@ -97,14 +97,6 @@
 	return [self initWithProcess:process processTask:processTask name:process.name];
 }
 
-- (void)dealloc
-{
-	if (self.valid && !CSIsNull(self.symbolicator))
-	{
-		CSRelease(self.symbolicator);
-	}
-}
-
 - (BOOL)isEqual:(id)process
 {
 	return ([process processID] == self.processID);
@@ -118,80 +110,6 @@
 - (BOOL)valid
 {
 	return self.processID != NON_EXISTENT_PID_NUMBER;
-}
-
-- (CSSymbolicatorRef)symbolicator
-{
-	if (self.valid && CSIsNull(_symbolicator))
-	{
-		_symbolicator = CSSymbolicatorCreateWithTask(self.processTask);
-	}
-	return _symbolicator;
-}
-
-- (NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(ZGMemoryAddress *)relativeOffset
-{
-	NSString *symbolName = nil;
-	CSSymbolicatorRef symbolicator = self.symbolicator;
-	if (!CSIsNull(symbolicator))
-	{
-		CSSymbolRef symbol = CSSymbolicatorGetSymbolWithAddressAtTime(symbolicator, address, kCSNow);
-		if (!CSIsNull(symbol))
-		{
-			const char *symbolNameCString = CSSymbolGetName(symbol);
-			if (symbolNameCString != NULL)
-			{
-				symbolName = @(symbolNameCString);
-			}
-
-			if (relativeOffset != NULL)
-			{
-				CSRange symbolRange = CSSymbolGetRange(symbol);
-				*relativeOffset = address - symbolRange.location;
-			}
-		}
-	}
-
-	return symbolName;
-}
-
-- (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress
-{
-	__block CSSymbolRef resultSymbol = kCSNull;
-	__block BOOL foundDesiredSymbol = NO;
-
-	CSSymbolicatorRef symbolicator = self.symbolicator;
-	if (CSIsNull(symbolicator)) return nil;
-
-	const char *symbolCString = [symbolName UTF8String];
-
-	CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
-		if (!foundDesiredSymbol)
-		{
-			const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
-			if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [partialSymbolOwnerName hasSuffix:@(symbolOwnerName)]))
-			{
-				CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
-					if (!foundDesiredSymbol)
-					{
-						const char *symbolFound = CSSymbolGetName(symbol);
-						if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
-						{
-							CSRange symbolRange = CSSymbolGetRange(symbol);
-							if (pastAddress < symbolRange.location)
-							{
-								foundDesiredSymbol = YES;
-							}
-
-							resultSymbol = symbol;
-						}
-					}
-				});
-			}
-		}
-	});
-
-	return CSIsNull(resultSymbol) ? nil : @(CSSymbolGetRange(resultSymbol).location);
 }
 
 - (NSMutableDictionary *)cacheDictionary

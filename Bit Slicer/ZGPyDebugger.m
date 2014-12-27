@@ -609,7 +609,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 	ZGMemorySize size = 0x0;
 	if (PyArg_ParseTuple(args, "KK:readBytes", &address, &size))
 	{
-		NSData *readData = [ZGDebuggerUtilities readDataWithProcessTask:self->processTask address:address size:size breakPoints:self->objcSelf.breakPointController.breakPoints];
+		NSData *readData = [ZGDebuggerUtilities readDataWithProcess:self->objcSelf.process address:address size:size breakPoints:self->objcSelf.breakPointController.breakPoints];
 		if (readData != nil)
 		{
 			retValue = Py_BuildValue("y#", readData.bytes, readData.length);
@@ -644,7 +644,7 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		success = [ZGDebuggerUtilities writeData:[NSData dataWithBytes:buffer.buf length:(NSUInteger)buffer.len] atAddress:memoryAddress processTask:self->processTask breakPoints:self->objcSelf.breakPointController.breakPoints];
+		success = [ZGDebuggerUtilities writeData:[NSData dataWithBytes:buffer.buf length:(NSUInteger)buffer.len] withProcess:self->objcSelf.process address:memoryAddress breakPoints:self->objcSelf.breakPointController.breakPoints];
 		
 		if (!success)
 		{
@@ -665,7 +665,7 @@ static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
 	if (PyArg_ParseTuple(args, "s|s:findSymbol", &symbolName, &symbolOwner))
 	{
 		ZGProcess *process = self->objcSelf.process;
-		NSNumber *symbolAddressNumber = [process findSymbol:@(symbolName) withPartialSymbolOwnerName:symbolOwner == NULL ? nil : @(symbolOwner) requiringExactMatch:YES pastAddress:0x0];
+		NSNumber *symbolAddressNumber = [process.handle findSymbol:@(symbolName) withPartialSymbolOwnerName:symbolOwner == NULL ? nil : @(symbolOwner) requiringExactMatch:YES pastAddress:0x0];
 		if (symbolAddressNumber != nil)
 		{
 			retValue = Py_BuildValue("K", [symbolAddressNumber unsignedLongLongValue]);
@@ -686,7 +686,7 @@ static PyObject *Debugger_symbolAt(DebuggerClass *self, PyObject *args)
 	{
 		ZGProcess *process = self->objcSelf.process;
 		ZGMemoryAddress relativeOffset = 0x0;
-		NSString *symbol = [process symbolAtAddress:memoryAddress relativeOffset:&relativeOffset];
+		NSString *symbol = [process.handle symbolAtAddress:memoryAddress relativeOffset:&relativeOffset];
 		if (symbol != nil)
 		{
 			NSString *symbolWithRelativeOffset = [NSString stringWithFormat:@"%@ + %llu", symbol, relativeOffset];
@@ -1247,14 +1247,16 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGSuspendTask(self->processTask);
+	id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle;
+	
+	[processHandle suspend];
 	
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, &threadStateCount))
 	{
 		PyErr_SetString(gDebuggerException, "debug.writeRegisters failed retrieving target's thread state");
-		ZGResumeTask(self->processTask);
+		[processHandle resume];
 		return NULL;
 	}
 	
@@ -1263,7 +1265,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	bool hasAVXSupport = NO;
 	BOOL hasVectorRegisters = ZGGetVectorThreadState(&vectorState, self->objcSelf.haltedBreakPoint.thread, &vectorStateCount, self->is64Bit, &hasAVXSupport);
 	
-	ZGResumeTask(self->processTask);
+	[processHandle resume];
 	
 	if (self->objcSelf.generalPurposeRegisterOffsetsDictionary == nil)
 	{
@@ -1320,7 +1322,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	if (success && needsToWriteGeneralRegisters)
 	{
-		ZGSuspendTask(self->processTask);
+		[processHandle suspend];
 		
 		if (!ZGSetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, threadStateCount))
 		{
@@ -1328,12 +1330,12 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 			success = NO;
 		}
 		
-		ZGResumeTask(self->processTask);
+		[processHandle resume];
 	}
 	
 	if (success && needsToWriteVectorRegisters)
 	{
-		ZGSuspendTask(self->processTask);
+		[processHandle suspend];
 		
 		if (!ZGSetVectorThreadState(&vectorState, self->objcSelf.haltedBreakPoint.thread, vectorStateCount, self->is64Bit))
 		{
@@ -1341,7 +1343,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 			success = NO;
 		}
 		
-		ZGResumeTask(self->processTask);
+		[processHandle resume];
 	}
 	
 	return success ? Py_BuildValue("") : NULL;

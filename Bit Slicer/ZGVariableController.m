@@ -37,6 +37,7 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
+#import "ZGProcessHandleProtocol.h"
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
@@ -691,13 +692,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			void *oldData = NULL;
 			ZGMemorySize oldSize = variable.size;
 			
-			if (ZGReadBytes(self.windowController.currentProcess.processTask, variable.address, &oldData, &oldSize))
+			id <ZGProcessHandleProtocol> processHandle = self.windowController.currentProcess.handle;
+			if ([processHandle readBytes:&oldData address:variable.address size:&oldSize])
 			{
 				ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldData size:oldSize address:variable.address type:ZGByteArray qualifier:variable.qualifier pointerSize:self.windowController.currentProcess.pointerSize description:variable.fullAttributedDescription enabled:variable.enabled byteOrder:variable.byteOrder];
 				
 				oldStringValue = oldVariable.stringValue;
 				
-				ZGFreeBytes(oldData, oldSize);
+				[processHandle freeBytes:oldData size:oldSize];
 			}
 			
 			// this is the maximum size allocated needed
@@ -781,10 +783,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		else
 		{
 			BOOL successfulWrite = YES;
+			id <ZGProcessHandleProtocol> processHandle = self.windowController.currentProcess.handle;
 			
 			if (writeSize)
 			{
-				if (!ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address, newValue, writeSize))
+				if (![processHandle writeBytes:newValue address:variable.address size:writeSize])
 				{
 					successfulWrite = NO;
 				}
@@ -798,7 +801,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			{
 				// Don't forget to write the null terminator
 				unichar nullTerminator = 0;
-				if (!ZGWriteBytesIgnoringProtection(self.windowController.currentProcess.processTask, variable.address + writeSize, &nullTerminator, sizeof(unichar)))
+				if (![processHandle writeBytesIgnoringProtection:&nullTerminator address:variable.address + writeSize size:sizeof(unichar)])
 				{
 					successfulWrite = NO;
 				}
@@ -1031,7 +1034,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process];
 		
-		NSString *symbol = [process symbolAtAddress:variable.address relativeOffset:NULL];
+		NSString *symbol = [process.handle symbolAtAddress:variable.address relativeOffset:NULL];
 
 		if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
 		{
@@ -1079,13 +1082,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	NSMutableArray *currentVariableSizes = [[NSMutableArray alloc] init];
 	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
 	
+	id <ZGProcessHandleProtocol> processHandle = self.windowController.currentProcess.handle;
+	
 	// Make sure the size changes are possible. Only change the ones that seem possible.
 	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL * __unused stop)
 	 {
 		 ZGMemorySize size = [[requestedSizes objectAtIndex:index] unsignedLongLongValue];
 		 void *buffer = NULL;
 		 
-		 if (ZGReadBytes(self.windowController.currentProcess.processTask, variable.address, &buffer, &size))
+		 if ([processHandle readBytes:&buffer address:variable.address size:&size])
 		 {
 			 if (size == [[requestedSizes objectAtIndex:index] unsignedLongLongValue])
 			 {
@@ -1093,7 +1098,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				 [currentVariableSizes addObject:@(variable.size)];
 			 }
 			 
-			 ZGFreeBytes(buffer, size);
+			 [processHandle freeBytes:buffer size:size];
 		 }
 	 }];
 	

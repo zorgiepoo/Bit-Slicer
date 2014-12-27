@@ -76,9 +76,12 @@
 {
 	ZGMemoryAddress allocatedAddress = 0;
 	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
-	ZGPageSize(process.processTask, &numberOfAllocatedBytes);
 	
-	if (!ZGAllocateMemory(process.processTask, &allocatedAddress, numberOfAllocatedBytes))
+	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	
+	[processHandle getPageSize:&numberOfAllocatedBytes];
+	
+	if (![processHandle allocateMemoryAndGetAddress:&allocatedAddress size:numberOfAllocatedBytes])
 	{
 		NSLog(@"Failed to allocate code for code injection");
 		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedAllocateMemoryForInjectingCodeAlertTitle"), ZGLocalizedStringFromDebuggerTable(@"failedAllocateMemoryForInjectingCodeAlertMessage"));
@@ -87,7 +90,7 @@
 	
 	void *nopBuffer = malloc(numberOfAllocatedBytes);
 	memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
-	if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
+	if (![processHandle writeBytesIgnoringProtection:nopBuffer address:allocatedAddress size:numberOfAllocatedBytes])
 	{
 		NSLog(@"Failed to nop allocated memory for code injection"); // not a fatal error
 	}
@@ -97,7 +100,7 @@
 	
 	if (instructions == nil)
 	{
-		if (!ZGDeallocateMemory(process.processTask, allocatedAddress, numberOfAllocatedBytes))
+		if (![processHandle deallocateMemoryAtAddress:allocatedAddress size:numberOfAllocatedBytes])
 		{
 			NSLog(@"Error: Failed to deallocate VM memory after failing to fetch enough instructions..");
 		}
@@ -172,7 +175,7 @@
 
 - (IBAction)cancel:(id)__unused sender
 {
-	if (!ZGDeallocateMemory(self.process.processTask, self.allocatedAddress, self.numberOfAllocatedBytes))
+	if (![self.process.handle deallocateMemoryAtAddress:self.allocatedAddress size:self.numberOfAllocatedBytes])
 	{
 		NSLog(@"Error: Failed to deallocate VM memory after canceling from injecting code..");
 	}

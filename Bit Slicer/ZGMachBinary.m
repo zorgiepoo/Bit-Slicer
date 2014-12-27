@@ -51,8 +51,9 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 
 + (instancetype)dynamicLinkerMachBinaryInProcess:(ZGProcess *)process
 {
-	ZGMemoryMap processTask = process.processTask;
 	ZGMachBinary *dylinkerBinary = nil;
+	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	
 	// dyld is usually near the end, so it'll be faster to iterate backwards
 	for (ZGRegion *region in [[ZGRegion regionsFromProcessTask:process.processTask] reverseObjectEnumerator])
 	{
@@ -65,14 +66,14 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		ZGMemoryAddress machHeaderAddress = region.address;
 		ZGMemorySize machHeaderSize = sizeof(*machHeader);
 		
-		if (!ZGReadBytes(processTask, machHeaderAddress, (void **)&machHeader, &machHeaderSize))
+		if (![processHandle readBytes:(void **)&machHeader address:machHeaderAddress size:&machHeaderSize])
 		{
 			continue;
 		}
 		
 		BOOL foundPotentialDylinkerMatch = (machHeaderSize >= sizeof(*machHeader)) && ((machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64) && machHeader->filetype == MH_DYLINKER);
 		
-		ZGFreeBytes(machHeader, machHeaderSize);
+		[processHandle freeBytes:machHeader size:machHeaderSize];
 		
 		if (!foundPotentialDylinkerMatch)
 		{
@@ -83,7 +84,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		ZGMemorySize regionSize = region.size;
 		void *regionBytes = NULL;
 		
-		if (!ZGReadBytes(processTask, regionAddress, &regionBytes, &regionSize))
+		if (![processHandle readBytes:&regionBytes address:regionAddress size:&regionSize])
 		{
 			continue;
 		}
@@ -108,7 +109,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 			bytes += dylinkerCommand->cmdsize;
 		}
 		
-		ZGFreeBytes(regionBytes, regionSize);
+		[processHandle freeBytes:regionBytes size:regionSize];
 		
 		if (dylinkerBinary != nil)
 		{
@@ -122,25 +123,26 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 {
 	ZGMachBinary *dylinkerBinary = process.dylinkerBinary;
 	ZGMemorySize pointerSize = process.pointerSize;
-	ZGMemoryMap processTask = process.processTask;
+	
+	id <ZGProcessHandleProtocol> processHandle = process.handle;
 	
 	NSMutableArray *machBinaries = [[NSMutableArray alloc] init];
 	
 	struct task_dyld_info dyld_info;
 	mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
-	if (task_info(processTask, TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS)
+	if ([processHandle getTaskInfo:&dyld_info flavor:TASK_DYLD_INFO count:&count])
 	{
 		ZGMemoryAddress allImageInfosAddress = dyld_info.all_image_info_addr;
 		ZGMemorySize allImageInfosSize = sizeof(uint32_t) * 2 + pointerSize; // Just interested in first three fields of struct dyld_all_image_infos
 		struct dyld_all_image_infos *allImageInfos = NULL;
-		if (ZGReadBytes(processTask, allImageInfosAddress, (void **)&allImageInfos, &allImageInfosSize))
+		if ([processHandle readBytes:(void **)&allImageInfos address:allImageInfosAddress size:&allImageInfosSize])
 		{
 			ZGMemoryAddress infoArrayAddress = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)&allImageInfos->infoArray : *(ZGMemoryAddress *)&allImageInfos->infoArray;
 			const ZGMemorySize imageInfoSize = pointerSize * 3; // sizeof struct dyld_image_info
 			
 			void *infoArrayBytes = NULL;
 			ZGMemorySize infoArraySize = imageInfoSize * allImageInfos->infoArrayCount;
-			if (ZGReadBytes(processTask, infoArrayAddress, &infoArrayBytes, &infoArraySize))
+			if ([processHandle readBytes:&infoArrayBytes address:infoArrayAddress size:&infoArraySize])
 			{
 				for (uint32_t infoIndex = 0; infoIndex < allImageInfos->infoArrayCount; infoIndex++)
 				{
@@ -152,9 +154,9 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 					
 					[machBinaries addObject:[[ZGMachBinary alloc] initWithHeaderAddress:machHeaderAddress filePathAddress:imageFilePathAddress]];
 				}
-				ZGFreeBytes(infoArrayBytes, infoArraySize);
+				[processHandle freeBytes:infoArrayBytes size:infoArraySize];
 			}
-			ZGFreeBytes(allImageInfos, allImageInfosSize);
+			[processHandle freeBytes:allImageInfos size:allImageInfosSize];
 		}
 		
 		[machBinaries addObject:dylinkerBinary];
@@ -232,13 +234,13 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 - (NSString *)filePathInProcess:(ZGProcess *)process
 {
 	NSString *filePath = nil;
-	ZGMemoryMap processTask = process.processTask;
-	ZGMemorySize pathSize = ZGGetStringSize(processTask, self.filePathAddress, ZGString8, 200, PATH_MAX);
+	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	ZGMemorySize pathSize = [processHandle readStringSizeFromAddress:self.filePathAddress dataType:ZGString8 oldSize:200 maxSize:PATH_MAX];
 	void *filePathBytes = NULL;
-	if (ZGReadBytes(processTask, self.filePathAddress, &filePathBytes, &pathSize))
+	if ([processHandle readBytes:&filePathBytes address:self.filePathAddress size:&pathSize])
 	{
 		filePath = [[NSString alloc] initWithBytes:filePathBytes length:pathSize encoding:NSUTF8StringEncoding];
-		ZGFreeBytes(filePathBytes, pathSize);
+		[processHandle freeBytes:filePathBytes size:pathSize];
 	}
 	return filePath;
 }
@@ -308,15 +310,17 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	ZGMemorySize regionSize = 0x1;
 	ZGMemoryBasicInfo unusedInfo;
 	
-	if (ZGRegionInfo(process.processTask, &regionAddress, &regionSize, &unusedInfo) && self.headerAddress >= regionAddress && self.headerAddress < regionAddress + regionSize)
+	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	
+	if ([processHandle getRegionInfo:&unusedInfo address:&regionAddress size:&regionSize] && self.headerAddress >= regionAddress && self.headerAddress < regionAddress + regionSize)
 	{
 		void *regionBytes = NULL;
-		if (ZGReadBytes(process.processTask, regionAddress, &regionBytes, &regionSize))
+		if ([processHandle readBytes:&regionBytes address:regionAddress size:&regionSize])
 		{
 			const struct mach_header_64 *machHeader = regionBytes + self.headerAddress - regionAddress;
 			binaryInfo = [self parseMachHeaderWithBytes:machHeader startPointer:regionBytes dataLength:regionSize pointerSize:process.pointerSize];
 			
-			ZGFreeBytes(regionBytes, regionSize);
+			[processHandle freeBytes:regionBytes size:regionSize];
 		}
 	}
 	

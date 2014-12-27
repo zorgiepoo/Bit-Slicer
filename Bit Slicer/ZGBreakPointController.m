@@ -57,6 +57,7 @@
 #import "ZGThreadStates.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
+#import "ZGProcessHandleProtocol.h"
 #import "ZGDebugThread.h"
 #import "ZGBreakPoint.h"
 #import "ZGRegistersState.h"
@@ -205,7 +206,9 @@ static ZGBreakPointController *gBreakPointController;
 			continue;
 		}
 		
-		ZGSuspendTask(task);
+		id <ZGProcessHandleProtocol> processHandle = breakPoint.process.handle;
+		
+		[processHandle suspend];
 		
 		for (ZGDebugThread *debugThread in breakPoint.debugThreads)
 		{
@@ -271,7 +274,7 @@ static ZGBreakPointController *gBreakPointController;
 			});
 		}
 		
-		ZGResumeTask(task);
+		[processHandle resume];
 	}
 	
 	return handledWatchPoint;
@@ -295,6 +298,8 @@ static ZGBreakPointController *gBreakPointController;
 
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
+	id <ZGProcessHandleProtocol> processHandle = breakPoint.process.handle;
+	
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, breakPoint.thread, &threadStateCount))
@@ -308,7 +313,7 @@ static ZGBreakPointController *gBreakPointController;
 	if (breakPoint.type == ZGBreakPointInstruction && [self.breakPoints containsObject:breakPoint])
 	{
 		// Restore our instruction
-		ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
+		[processHandle writeBytesOverwritingProtection:breakPoint.variable.rawValue address:breakPoint.variable.address size:sizeof(uint8_t)];
 		
 		breakPoint.needsToRestore = YES;
 		
@@ -346,13 +351,14 @@ static ZGBreakPointController *gBreakPointController;
 		ZG_LOG(@"Failure in setting registers thread state for thread %d, %s", breakPoint.thread, __PRETTY_FUNCTION__);
 	}
 	
-	ZGResumeTask(breakPoint.process.processTask);
+	[processHandle resume];
 }
 
 - (void)revertInstructionBackToNormal:(ZGBreakPoint *)breakPoint
 {
-	ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
-	ZGProtect(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.size, breakPoint.originalProtection);
+	id <ZGProcessHandleProtocol> processHandle = breakPoint.process.handle;
+	[processHandle writeBytesOverwritingProtection:breakPoint.variable.rawValue address:breakPoint.variable.address size:sizeof(uint8_t)];
+	[processHandle setProtection:breakPoint.originalProtection address:breakPoint.variable.address size:breakPoint.variable.size];
 }
 
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint
@@ -368,12 +374,14 @@ static ZGBreakPointController *gBreakPointController;
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 10), dispatch_get_main_queue(), ^(void) {
 			if ([self.breakPoints containsObject:breakPoint])
 			{
-				ZGSuspendTask(breakPoint.process.processTask);
+				id <ZGProcessHandleProtocol> processHandle = breakPoint.process.handle;
+				
+				[processHandle suspend];
 				
 				[self revertInstructionBackToNormal:breakPoint];
 				[self removeBreakPoint:breakPoint];
 				
-				ZGResumeTask(breakPoint.process.processTask);
+				[processHandle resume];
 			}
 			
 			id <ZGBreakPointDelegate> delegate = breakPoint.delegate;
@@ -420,7 +428,17 @@ static ZGBreakPointController *gBreakPointController;
 	BOOL handledInstructionBreakPoint = NO;
 	NSArray *breakPoints = self.breakPoints;
 	
-	ZGSuspendTask(task);
+	ZGBreakPoint *matchingBreakPoint = [breakPoints zgFirstObjectThatMatchesCondition:^(ZGProcess *process) {
+		return (BOOL)(process.processTask == task);
+	}];
+	
+	id <ZGProcessHandleProtocol> processHandle = matchingBreakPoint.process.handle;
+	if (processHandle == nil)
+	{
+		return handledInstructionBreakPoint;
+	}
+	
+	[processHandle suspend];
 	
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
@@ -490,12 +508,12 @@ static ZGBreakPointController *gBreakPointController;
 			uint8_t *opcode = NULL;
 			ZGMemorySize opcodeSize = 0x1;
 			
-			if (ZGReadBytes(breakPoint.process.processTask, foundInstructionAddress, (void **)&opcode, &opcodeSize))
+			if ([processHandle readBytes:(void **)&opcode address:foundInstructionAddress size:&opcodeSize])
 			{
 				if (*opcode == INSTRUCTION_BREAKPOINT_OPCODE)
 				{
 					hitBreakPoint = YES;
-					ZGSuspendTask(task);
+					[processHandle suspend];
 					
 					// Restore program counter
 					if (breakPoint.process.is64Bit)
@@ -510,7 +528,7 @@ static ZGBreakPointController *gBreakPointController;
 					[breakPointsToNotify addObject:breakPoint];
 				}
 				
-				ZGFreeBytes(opcode, opcodeSize);
+				[processHandle freeBytes:opcode size:opcodeSize];
 			}
 			
 			handledInstructionBreakPoint = YES;
@@ -520,7 +538,7 @@ static ZGBreakPointController *gBreakPointController;
 		{
 			// Restore our breakpoint
 			uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
-			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
+			[processHandle writeBytesOverwritingProtection:&writeOpcode address:breakPoint.variable.address size:sizeof(uint8_t)];
 			
 			breakPoint.needsToRestore = NO;
 			handledInstructionBreakPoint = YES;
@@ -551,7 +569,7 @@ static ZGBreakPointController *gBreakPointController;
 		
 		if (!hitBreakPoint)
 		{
-			ZGSuspendTask(task);
+			[processHandle suspend];
 			
 			candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
 			
@@ -644,7 +662,7 @@ static ZGBreakPointController *gBreakPointController;
 		}
 	}
 	
-	ZGResumeTask(task);
+	[processHandle resume];
 	
 	return handledInstructionBreakPoint;
 }
@@ -715,9 +733,11 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 					{
 						[removedBreakPoints addObject:breakPoint];
 						
-						ZGSuspendTask(breakPoint.task);
+						[breakPoint.process.handle suspend];
+						
 						[self removeWatchPoint:breakPoint];
-						ZGResumeTask(breakPoint.task);
+						
+						[breakPoint.process.handle resume];
 					}
 					else if (breakPoint.type == ZGBreakPointInstruction)
 					{
@@ -810,14 +830,16 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	ZGVariable *variable = watchPoint.variable;
 	NSArray *oldDebugThreads = watchPoint.debugThreads;
 	
-	ZGSuspendTask(processTask);
+	id <ZGProcessHandleProtocol> processHandle = watchPoint.process.handle;
+	
+	[processHandle suspend];
 	
 	thread_act_array_t threadList = NULL;
 	mach_msg_type_number_t threadListCount = 0;
 	if (task_threads(processTask, &threadList, &threadListCount) != KERN_SUCCESS)
 	{
 		ZG_LOG(@"ERROR: task_threads failed on adding watchpoint");
-		ZGResumeTask(processTask);
+		[processHandle resume];
 		return NO;
 	}
 	
@@ -890,7 +912,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		ZG_LOG(@"Failed to deallocate thread list in %s...", __PRETTY_FUNCTION__);
 	}
 	
-	ZGResumeTask(processTask);
+	[processHandle resume];
 	
 	watchPoint.debugThreads = newDebugThreads;
 	
@@ -1003,11 +1025,13 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		return NO;
 	}
 	
+	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	
 	// Find memory protection of instruction. If it's not executable, make it executable
 	ZGMemoryAddress protectionAddress = instruction.variable.address;
 	ZGMemorySize protectionSize = instruction.variable.size;
 	ZGMemoryProtection memoryProtection = 0;
-	if (!ZGMemoryProtectionInRegion(process.processTask, &protectionAddress, &protectionSize, &memoryProtection))
+	if (![processHandle getMemoryProtection:&memoryProtection address:&protectionAddress size:&protectionSize])
 	{
 		return NO;
 	}
@@ -1022,12 +1046,12 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		memoryProtection |= VM_PROT_EXECUTE;
 	}
 	
-	if (!ZGProtect(process.processTask, protectionAddress, protectionSize, memoryProtection))
+	if (![processHandle setProtection:memoryProtection address:protectionAddress size:protectionSize])
 	{
 		return NO;
 	}
 	
-	ZGSuspendTask(process.processTask);
+	[processHandle suspend];
 	
 	ZGVariable *variable = [instruction.variable copy];
 	
@@ -1045,13 +1069,13 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	[self addBreakPoint:breakPoint];
 	
-	BOOL success = ZGWriteBytesIgnoringProtection(process.processTask, variable.address, &breakPointOpcode, sizeof(uint8_t));
+	BOOL success = [processHandle writeBytesIgnoringProtection:&breakPointOpcode address:variable.address size:sizeof(uint8_t)];
 	if (!success)
 	{
 		[self removeBreakPoint:breakPoint];
 	}
 	
-	ZGResumeTask(process.processTask);
+	[processHandle resume];
 	
 	return success;
 }

@@ -50,10 +50,10 @@
 
 #pragma mark Reading & Writing Data
 
-+ (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray *)breakPoints
++ (NSData *)readDataWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray *)breakPoints
 {
 	void *originalBytes = NULL;
-	if (!ZGReadBytes(processTask, address, &originalBytes, &size))
+	if (![process.handle readBytes:&originalBytes address:address size:&size])
 	{
 		return nil;
 	}
@@ -61,11 +61,11 @@
 	void *newBytes = malloc(size);
 	memcpy(newBytes, originalBytes, size);
 	
-	ZGFreeBytes(originalBytes, size);
+	[process.handle freeBytes:originalBytes size:size];
 	
 	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
-		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == processTask && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
 		{
 			memcpy(newBytes + (breakPoint.variable.address - address), breakPoint.variable.rawValue, sizeof(uint8_t));
 		}
@@ -74,54 +74,47 @@
 	return [NSData dataWithBytesNoCopy:newBytes length:size];
 }
 
-+ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPoints:(NSArray *)breakPoints
++ (BOOL)writeData:(NSData *)data withProcess:(ZGProcess *)process address:(ZGMemoryAddress)address breakPoints:(NSArray *)breakPoints
 {
 	BOOL success = YES;
-	pid_t processID = 0;
-	if (!ZGPIDForTask(processTask, &processID))
+	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	
+	ZGBreakPoint *targetBreakPoint = nil;
+	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
-		NSLog(@"Error in writeStringValue: method for retrieving process ID");
-		success = NO;
+		if (breakPoint.process.processTask == process.processTask && breakPoint.variable.address >= address && breakPoint.variable.address < address + data.length)
+		{
+			targetBreakPoint = breakPoint;
+			break;
+		}
+	}
+	
+	if (targetBreakPoint == nil)
+	{
+		if (![processHandle writeBytesIgnoringProtection:data.bytes address:address size:data.length])
+		{
+			success = NO;
+		}
 	}
 	else
 	{
-		ZGBreakPoint *targetBreakPoint = nil;
-		for (ZGBreakPoint *breakPoint in breakPoints)
+		if (targetBreakPoint.variable.address - address > 0)
 		{
-			if (breakPoint.process.processID == processID && breakPoint.variable.address >= address && breakPoint.variable.address < address + data.length)
-			{
-				targetBreakPoint = breakPoint;
-				break;
-			}
-		}
-		
-		if (targetBreakPoint == nil)
-		{
-			if (!ZGWriteBytesIgnoringProtection(processTask, address, data.bytes, data.length))
+			if (![processHandle writeBytesIgnoringProtection:data.bytes address:address size:targetBreakPoint.variable.address - address])
 			{
 				success = NO;
 			}
 		}
-		else
+		
+		if (address + data.length - targetBreakPoint.variable.address - 1 > 0)
 		{
-			if (targetBreakPoint.variable.address - address > 0)
+			if (![processHandle writeBytesIgnoringProtection:data.bytes + (targetBreakPoint.variable.address + 1 - address) address:targetBreakPoint.variable.address + 1 size:address + data.length - targetBreakPoint.variable.address - 1])
 			{
-				if (!ZGWriteBytesIgnoringProtection(processTask, address, data.bytes, targetBreakPoint.variable.address - address))
-				{
-					success = NO;
-				}
+				success = NO;
 			}
-			
-			if (address + data.length - targetBreakPoint.variable.address - 1 > 0)
-			{
-				if (!ZGWriteBytesIgnoringProtection(processTask, targetBreakPoint.variable.address + 1, data.bytes + (targetBreakPoint.variable.address + 1 - address), address + data.length - targetBreakPoint.variable.address - 1))
-				{
-					success = NO;
-				}
-			}
-			
-			*(uint8_t *)targetBreakPoint.variable.rawValue = *(uint8_t *)(data.bytes + targetBreakPoint.variable.address - address);
 		}
+		
+		*(uint8_t *)targetBreakPoint.variable.rawValue = *(uint8_t *)(data.bytes + targetBreakPoint.variable.address - address);
 	}
 	
 	return success;
@@ -132,7 +125,7 @@
 	ZGMemorySize newSize = 0;
 	void *newValue = ZGValueFromString(process.is64Bit, stringValue, ZGByteArray, &newSize);
 	
-	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] atAddress:address processTask:process.processTask breakPoints:breakPoints];
+	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] withProcess:process address:address breakPoints:breakPoints];
 }
 
 #pragma mark Assembling & Disassembling
@@ -239,13 +232,13 @@
 	return data;
 }
 
-+ (ZGDisassemblerObject *)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray *)breakPoints
++ (ZGDisassemblerObject *)disassemblerObjectWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray *)breakPoints
 {
 	ZGDisassemblerObject *newObject = nil;
-	NSData *data = [self readDataWithProcessTask:processTask address:address size:size breakPoints:breakPoints];
+	NSData *data = [self readDataWithProcess:process address:address size:size breakPoints:breakPoints];
 	if (data != nil)
 	{
-		newObject = [[ZGDisassemblerObject alloc] initWithBytes:data.bytes address:address size:data.length pointerSize:pointerSize];
+		newObject = [[ZGDisassemblerObject alloc] initWithBytes:data.bytes address:address size:data.length pointerSize:process.pointerSize];
 	}
 	return newObject;
 }
@@ -258,7 +251,7 @@
 	
 	ZGMemoryBasicInfo regionInfo;
 	ZGRegion *targetRegion = [[ZGRegion alloc] initWithAddress:address size:1];
-	if (!ZGRegionInfo(process.processTask, &targetRegion->_address, &targetRegion->_size, &regionInfo))
+	if (![process.handle getRegionInfo:&regionInfo address:&targetRegion->_address size:&targetRegion->_size])
 	{
 		targetRegion = nil;
 	}
@@ -297,7 +290,7 @@
 			readSize = targetRegion.address + targetRegion.size - startAddress;
 		}
 		
-		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask pointerSize:process.pointerSize address:startAddress size:readSize breakPoints:breakPoints];
+		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcess:process address:startAddress size:readSize breakPoints:breakPoints];
 		
 		instruction = [disassemblerObject readLastInstructionWithMaxSize:size];
 	}
@@ -380,12 +373,14 @@ error:(NSError * __autoreleasing *)error
 		return NO;
 	}
 	
-	ZGSuspendTask(process.processTask);
+	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	
+	[processHandle suspend];
 	
 	void *nopBuffer = malloc(codeData.length);
 	memset(nopBuffer, NOP_VALUE, codeData.length);
 	
-	if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, codeData.length))
+	if (![processHandle writeBytesIgnoringProtection:nopBuffer address:allocatedAddress size:codeData.length])
 	{
 		ZG_LOG(@"Error: Failed to write nop buffer..");
 		if (error != nil)
@@ -394,11 +389,11 @@ error:(NSError * __autoreleasing *)error
 		}
 
 		free(nopBuffer);
-		ZGResumeTask(process.processTask);
+		[processHandle resume];
 		return NO;
 	}
 	
-	if (!ZGProtect(process.processTask, allocatedAddress, codeData.length, VM_PROT_READ | VM_PROT_EXECUTE))
+	if (![processHandle setProtection:VM_PROT_READ | VM_PROT_EXECUTE address:allocatedAddress size:codeData.length])
 	{
 		ZG_LOG(@"Error: Failed to protect memory..");
 		if (error != nil)
@@ -407,7 +402,7 @@ error:(NSError * __autoreleasing *)error
 		}
 		
 		free(nopBuffer);
-		ZGResumeTask(process.processTask);
+		[processHandle resume];
 		return NO;
 	}
 	
@@ -434,7 +429,7 @@ error:(NSError * __autoreleasing *)error
 		{
 			ZG_LOG(@"Error: Failed to assemble pop rax");
 			free(nopBuffer);
-			ZGResumeTask(process.processTask);
+			[processHandle resume];
 			return NO;
 		}
 		[newInstructionsData appendData:popRaxData	];
@@ -457,7 +452,7 @@ error:(NSError * __autoreleasing *)error
 	{
 		ZG_LOG(@"Error generating jumpToIslandData");
 		free(nopBuffer);
-		ZGResumeTask(process.processTask);
+		[processHandle resume];
 		return NO;
 	}
 	
@@ -490,14 +485,14 @@ error:(NSError * __autoreleasing *)error
 	{
 		ZG_LOG(@"Error generating jumpFromIslandData");
 		free(nopBuffer);
-		ZGResumeTask(process.processTask);
+		[processHandle resume];
 		return NO;
 	}
 	
 	[newInstructionsData appendData:jumpFromIslandData];
-	ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, newInstructionsData.bytes, newInstructionsData.length);
+	[processHandle writeBytesIgnoringProtection:newInstructionsData.bytes address:allocatedAddress size:newInstructionsData.length];
 	
-	ZGResumeTask(process.processTask);
+	[processHandle resume];
 
 	return YES;
 }

@@ -82,12 +82,13 @@
 				 ZGMemorySize size = toAddress - fromAddress;
 				 void *bytes = NULL;
 				 
-				 if ((success = ZGReadBytes(self.process.processTask, fromAddress, &bytes, &size)))
+				 id <ZGProcessHandleProtocol> processHandle = self.process.handle;
+				 if ((success = [processHandle readBytes:&bytes address:fromAddress size:&size]))
 				 {
 					 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
 					 success = [data writeToURL:savePanel.URL atomically:NO];
 					 
-					 ZGFreeBytes(bytes, size);
+					 [processHandle freeBytes:bytes size:size];
 				 }
 				 else
 				 {

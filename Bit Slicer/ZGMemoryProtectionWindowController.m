@@ -64,7 +64,7 @@
 
 - (BOOL)changeProtectionAtAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size oldProtection:(ZGMemoryProtection)oldProtection newProtection:(ZGMemoryProtection)newProtection
 {
-	BOOL success = ZGProtect(self.process.processTask, address, size, newProtection);
+	BOOL success = [self.process.handle setProtection:newProtection address:address size:size];
 	
 	if (!success)
 	{
@@ -96,7 +96,7 @@
 		ZGMemoryAddress memoryAddress = address;
 		ZGMemorySize memorySize = size;
 		ZGMemoryProtection oldProtection;
-		if (!ZGMemoryProtectionInRegion(self.process.processTask, &memoryAddress, &memorySize, &oldProtection))
+		if (![self.process.handle getMemoryProtection:&oldProtection address:&memoryAddress size:&memorySize])
 		{
 			ZGRunAlertPanelWithOKButton(
 							ZGLocalizedStringFromMemoryProtectionTable(@"protectionChangeFailedAlertTitle"),
@@ -159,7 +159,7 @@
 		ZGMemorySize memorySize;
 		
 		// Tell the user what the current memory protection is set as
-		if (ZGMemoryProtectionInRegion(self.process.processTask, &memoryAddress, &memorySize, &memoryProtection) &&
+		if ([self.process.handle getMemoryProtection:&memoryProtection address:&memoryAddress size:&memorySize] &&
             memoryAddress <= requestedAddressRange.location && memoryAddress + memorySize >= requestedAddressRange.location + requestedAddressRange.length)
 		{
 			self.readButton.state = memoryProtection & VM_PROT_READ;

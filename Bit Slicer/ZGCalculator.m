@@ -131,7 +131,8 @@
 			
 			void *bytes = NULL;
 			ZGMemorySize sizeRead = process.pointerSize;
-			if (ZGReadBytes(process.processTask, memoryAddress, &bytes, &sizeRead))
+			id <ZGProcessHandleProtocol> processHandle = process.handle;
+			if ([processHandle readBytes:&bytes address:memoryAddress size:&sizeRead])
 			{
 				if (sizeRead == process.pointerSize)
 				{
@@ -141,7 +142,7 @@
 				{
 					*error = [NSError errorWithDomain:DDMathParserErrorDomain code:DDErrorCodeInvalidNumber userInfo:@{NSLocalizedDescriptionKey:ZGCalculatePointerFunction @" didn't read sufficient number of bytes"}];
 				}
-				ZGFreeBytes(bytes, sizeRead);
+				[processHandle freeBytes:bytes size:sizeRead];
 			}
 			else if (error != NULL)
 			{
@@ -215,7 +216,7 @@
 				
 				if (!encounteredError)
 				{
-					symbolAddressNumber = [process findSymbol:symbolString withPartialSymbolOwnerName:targetOwnerNameSuffix requiringExactMatch:NO pastAddress:[currentAddressNumber unsignedLongLongValue]];
+					symbolAddressNumber = [process.handle findSymbol:symbolString withPartialSymbolOwnerName:targetOwnerNameSuffix requiringExactMatch:NO pastAddress:[currentAddressNumber unsignedLongLongValue]];
 					if (symbolAddressNumber == nil)
 					{
 						if (error != NULL)

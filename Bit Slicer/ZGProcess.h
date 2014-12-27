@@ -33,6 +33,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ZGProcessHandleProtocol.h"
 #import "ZGMemoryTypes.h"
 #import <sys/sysctl.h>
 
@@ -60,13 +61,12 @@
 @property (nonatomic, readonly) NSString *internalName;
 @property (nonatomic, readonly) BOOL is64Bit;
 
+@property (nonatomic, readonly) id <ZGProcessHandleProtocol> handle;
+
 @property (nonatomic, readonly) ZGMachBinary *mainMachBinary;
 @property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
 
 @property (nonatomic, readonly) NSMutableDictionary *cacheDictionary;
-
-- (NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(ZGMemoryAddress *)relativeOffset;
-- (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress;
 
 - (BOOL)isEqual:(id)process;
 

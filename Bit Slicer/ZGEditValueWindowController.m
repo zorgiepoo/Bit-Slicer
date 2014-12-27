@@ -48,7 +48,7 @@
 @property (nonatomic, assign) ZGVariableController *variableController;
 
 @property (nonatomic) NSArray *variablesToEdit;
-@property (nonatomic) ZGMemoryMap processTask;
+@property (nonatomic) ZGProcess *process;
 
 @end
 
@@ -119,7 +119,7 @@
 	return [commonComponents componentsJoinedByString:@" "];
 }
 
-- (void)requestEditingValuesFromVariables:(NSArray *)variables withProcessTask:(ZGMemoryMap)processTask attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager
+- (void)requestEditingValuesFromVariables:(NSArray *)variables withProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager
 {
 	ZGVariable *firstNonScriptVariable = nil;
 	BOOL isAllByteArrays = YES;
@@ -156,7 +156,7 @@
 	[self.valueTextField selectText:nil];
 	
 	self.variablesToEdit = variables;
-	self.processTask = processTask;
+	self.process = process;
 	
 	[NSApp
 	 beginSheet:self.window
@@ -181,7 +181,7 @@
 		ZGMemoryAddress memoryAddress = variable.address;
 		ZGMemorySize memorySize = variable.size;
 		
-		if (!ZGMemoryProtectionInRegion(self.processTask, &memoryAddress, &memorySize, &memoryProtection)) continue;
+		if (![self.process.handle getMemoryProtection:&memoryProtection address:&memoryAddress size:&memorySize]) continue;
 		
 		if (variable.address >= memoryAddress && variable.address + variable.size <= memoryAddress + memorySize)
 		{

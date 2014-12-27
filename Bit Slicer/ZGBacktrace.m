@@ -34,6 +34,7 @@
 
 #import "ZGBacktrace.h"
 #import "ZGProcess.h"
+#import "ZGProcessHandleProtocol.h"
 #import "ZGInstruction.h"
 #import "ZGDebuggerUtilities.h"
 #import "ZGMachBinary.h"
@@ -75,7 +76,7 @@
 			// Read return address
 			void *returnAddressBytes = NULL;
 			ZGMemorySize returnAddressSize = process.pointerSize;
-			if (!ZGReadBytes(process.processTask, basePointer + process.pointerSize, &returnAddressBytes, &returnAddressSize))
+			if (![process.handle readBytes:&returnAddressBytes address:basePointer + process.pointerSize size:&returnAddressSize])
 			{
 				break;
 			}
@@ -93,7 +94,7 @@
 					returnAddress = 0;
 			}
 			
-			ZGFreeBytes(returnAddressBytes, returnAddressSize);
+			[process.handle freeBytes:returnAddressBytes size:returnAddressSize];
 			
 			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints machBinaries:machBinaries];
 			if (instruction == nil)
@@ -106,7 +107,7 @@
 			// Read base pointer
 			void *basePointerBytes = NULL;
 			ZGMemorySize basePointerSize = process.pointerSize;
-			if (!ZGReadBytes(process.processTask, basePointer, &basePointerBytes, &basePointerSize))
+			if (![process.handle readBytes:&basePointerBytes address:basePointer size:&basePointerSize])
 			{
 				break;
 			}
@@ -125,7 +126,7 @@
 			
 			[newBasePointers addObject:@(basePointer)];
 			
-			ZGFreeBytes(basePointerBytes, basePointerSize);
+			[process.handle freeBytes:basePointerBytes size:basePointerSize];
 		}
 	}
 	

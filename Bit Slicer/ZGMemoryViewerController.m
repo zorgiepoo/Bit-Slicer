@@ -378,6 +378,8 @@
 		self.lastUpdateCount--;
 	};
 	
+	id <ZGProcessHandleProtocol> processHandle = self.currentProcess.handle;
+	
 	// When filling or clearing the memory viewer, make sure we aren't in overwrite mode
 	// If we are, filling the memory viewer will take too long, or clearing it will fail
 	self.textView.controller.editable = NO;
@@ -389,7 +391,7 @@
 		return;
 	}
 	
-	NSArray *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
+	NSArray *memoryRegions = [processHandle regions];
 	if (memoryRegions.count == 0)
 	{
 		cleanupOnSuccess(NO);
@@ -405,7 +407,7 @@
 		
 		if (chosenRegion != nil)
 		{
-			chosenRegion = [[ZGRegion submapRegionsFromProcessTask:self.currentProcess.processTask region:chosenRegion] zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
+			chosenRegion = [[processHandle submapRegionsInRegion:chosenRegion] zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
 				return (BOOL)((region.protection & VM_PROT_READ) != 0 && (desiredMemoryAddress >= region.address && desiredMemoryAddress < region.address + region.size));
 			}];
 		}
@@ -465,8 +467,7 @@
 	ZGMemorySize memorySize = self.currentMemorySize;
 	
 	void *bytes = NULL;
-	
-	if (ZGReadBytes(self.currentProcess.processTask, memoryAddress, &bytes, &memorySize))
+	if ([processHandle readBytes:&bytes address:memoryAddress size:&memorySize])
 	{
 		if (self.textView.data && ![self.textView.data isEqualToData:[NSData data]])
 		{
@@ -510,7 +511,7 @@
 		// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
 		[self.textView.layoutRepresenter performLayout];
 		
-		ZGFreeBytes(bytes, memorySize);
+		[processHandle freeBytes:bytes size:memorySize];
 		
 		if (desiredMemoryAddress == 0)
 		{
@@ -572,7 +573,7 @@
 
 - (void)writeNewData:(NSData *)newData oldData:(NSData *)oldData address:(ZGMemoryAddress)address size:(ZGMemorySize)size
 {
-	if (ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newData.bytes, size))
+	if ([self.currentProcess.handle writeBytesIgnoringProtection:newData.bytes address:address size:size])
 	{
 		[self.textView.controller.undoManager setActionName:ZGLocalizedStringFromMemoryViewerTable(@"undoMemoryWrite")];
 		[[self.textView.controller.undoManager prepareWithInvocationTarget:self] writeNewData:oldData oldData:newData address:address size:size];
@@ -648,7 +649,8 @@
 			}
 			
 			void *bytes = NULL;
-			if (ZGReadBytes(self.currentProcess.processTask, readAddress, &bytes, &readSize) && readSize > 0)
+			id <ZGProcessHandleProtocol> processHandle = self.currentProcess.handle;
+			if ([processHandle readBytes:&bytes address:readAddress size:&readSize] && readSize > 0)
 			{
 				NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)readSize];
 				HFFullMemoryByteSlice *byteSlice = [[HFFullMemoryByteSlice alloc] initWithData:data];
@@ -670,7 +672,7 @@
 				}
 				self.lastUpdateCount--;
 				
-				ZGFreeBytes(bytes, readSize);
+				[processHandle freeBytes:bytes size:readSize];
 			}
 		}
 	}

@@ -1088,7 +1088,7 @@
 		ZGMemorySize memorySize = selectedVariable.size;
 		ZGMemoryProtection memoryProtection;
 		
-		if (!ZGMemoryProtectionInRegion(self.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+		if (![self.currentProcess.handle getMemoryProtection:&memoryProtection address:&memoryAddress size:&memorySize])
 		{
 			return NO;
 		}
@@ -1132,7 +1132,7 @@
 		ZGMemorySize memorySize = selectedVariable.size;
 		ZGMemoryProtection memoryProtection;
 		
-		if (!ZGMemoryProtectionInRegion(self.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+		if (![self.currentProcess.handle getMemoryProtection:&memoryProtection address:&memoryAddress size:&memorySize])
 		{
 			return NO;
 		}
@@ -1310,7 +1310,7 @@
 		self.editValueWindowController = [[ZGEditValueWindowController alloc] initWithVariableController:self.variableController];
 	}
 	
-	[self.editValueWindowController requestEditingValuesFromVariables:self.selectedVariables withProcessTask:self.currentProcess.processTask attachedToWindow:self.window scriptManager:self.scriptManager];
+	[self.editValueWindowController requestEditingValuesFromVariables:self.selectedVariables withProcess:self.currentProcess attachedToWindow:self.window scriptManager:self.scriptManager];
 }
 
 - (IBAction)requestEditingVariableDescription:(id)__unused sender

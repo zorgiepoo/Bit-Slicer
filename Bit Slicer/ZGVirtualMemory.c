@@ -53,11 +53,6 @@ bool ZGSetPortSendRightReferenceCountByDelta(ZGMemoryMap processTask, mach_port_
 	return (mach_port_mod_refs(mach_task_self(), processTask, MACH_PORT_RIGHT_SEND, delta) == KERN_SUCCESS);
 }
 
-bool ZGPIDForTask(ZGMemoryMap processTask, int *processID)
-{
-	return (pid_for_task(processTask, processID) == KERN_SUCCESS);
-}
-
 bool ZGPageSize(ZGMemoryMap processTask, ZGMemorySize *pageSize)
 {
 	vm_size_t tempPageSize;
@@ -140,7 +135,6 @@ bool ZGWriteBytesOverwritingProtection(ZGMemoryMap processTask, ZGMemoryAddress 
 	return ZGWriteBytesOverwritingProtectionAndRevertingBack(processTask, address, bytes, size, false);
 }
 
-
 bool ZGWriteBytesIgnoringProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)
 {
 	return ZGWriteBytesOverwritingProtectionAndRevertingBack(processTask, address, bytes, size, true);
@@ -190,13 +184,18 @@ bool ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize si
 	return (mach_vm_protect(processTask, address, size, FALSE, protection) == KERN_SUCCESS);
 }
 
+bool ZGTaskInfo(ZGMemoryMap processTask, void *taskInfo, task_flavor_t flavor, mach_msg_type_number_t *count)
+{
+	return (task_info(processTask, flavor, (task_info_t)taskInfo, count) == KERN_SUCCESS);
+}
+
 bool ZGSuspendCount(ZGMemoryMap processTask, integer_t *suspendCount)
 {
 	*suspendCount = -1;
 	task_basic_info_64_data_t taskInfo;
 	mach_msg_type_number_t count = TASK_BASIC_INFO_64_COUNT;
 	
-	bool success = (task_info(processTask, TASK_BASIC_INFO_64, (task_info_t)&taskInfo, &count) == KERN_SUCCESS);
+	bool success = ZGTaskInfo(processTask, &taskInfo, TASK_BASIC_INFO_64, &count);
 	if (success)
 	{
 		*suspendCount = taskInfo.suspend_count;

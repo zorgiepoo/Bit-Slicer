@@ -41,6 +41,7 @@ extern "C" {
 
 #include "ZGMemoryTypes.h"
 #include <mach/vm_region.h>
+#include <mach/task_info.h>
 #include <stdbool.h>
 
 // Caller for ZGTaskForPID is responsible for using ZGDeallocatePort
@@ -48,8 +49,6 @@ bool ZGTaskForPID(int processID, ZGMemoryMap *processTask);
 bool ZGDeallocatePort(ZGMemoryMap processTask);
 	
 bool ZGSetPortSendRightReferenceCountByDelta(ZGMemoryMap processTask, mach_port_delta_t delta);
-
-bool ZGPIDForTask(ZGMemoryMap processTask, int *processID);
 
 bool ZGPageSize(ZGMemoryMap processTask, ZGMemorySize *pageSize);
 
@@ -69,7 +68,9 @@ bool ZGRegionSubmapInfo(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMem
 
 bool ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *address, ZGMemorySize *size, ZGMemoryProtection *memoryProtection);
 bool ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection);
-
+	
+bool ZGTaskInfo(ZGMemoryMap processTask, void *taskInfo, task_flavor_t flavor, mach_msg_type_number_t *count);
+	
 bool ZGSuspendCount(ZGMemoryMap processTask, integer_t *suspendCount);
 
 bool ZGSuspendTask(ZGMemoryMap processTask);

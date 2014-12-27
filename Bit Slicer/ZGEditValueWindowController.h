@@ -37,11 +37,12 @@
 
 @class ZGVariableController;
 @class ZGScriptManager;
+@class ZGProcess;
 
 @interface ZGEditValueWindowController : NSWindowController
 
 - (id)initWithVariableController:(ZGVariableController *)variableController;
 
-- (void)requestEditingValuesFromVariables:(NSArray *)variables withProcessTask:(ZGMemoryMap)processTask attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager;
+- (void)requestEditingValuesFromVariables:(NSArray *)variables withProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager;
 
 @end

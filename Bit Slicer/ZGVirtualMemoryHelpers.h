@@ -41,8 +41,6 @@ extern "C" {
 	
 NSString *ZGUserTagDescription(unsigned int userTag);
 NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
-
-ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize, ZGMemorySize maxStringSizeLimit);
 	
 #ifdef __cplusplus
 }

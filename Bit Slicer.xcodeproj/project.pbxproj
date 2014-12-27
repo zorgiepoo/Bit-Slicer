@@ -63,6 +63,7 @@
 		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
+		7296693F1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 7296693E1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.m */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
 		72D051AC1960891900EC532A /* Backtrace View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AE1960891900EC532A /* Backtrace View.xib */; };
@@ -353,6 +354,9 @@
 		726CA2D519606E3100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Search Options.xib"; sourceTree = "<group>"; };
 		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Watch Variable Dialog.xib"; sourceTree = "<group>"; };
 		7284245619A96B470081C673 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		7296693D1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLocalProcessHandle.h; path = "Bit Slicer/ZGLocalProcessHandle.h"; sourceTree = "<group>"; };
+		7296693E1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLocalProcessHandle.m; path = "Bit Slicer/ZGLocalProcessHandle.m"; sourceTree = "<group>"; };
+		729669401A4E2AD000BB5A3D /* ZGProcessHandleProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGProcessHandleProtocol.h; path = "Bit Slicer/ZGProcessHandleProtocol.h"; sourceTree = "<group>"; };
 		72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPrompt.h; path = "Bit Slicer/ZGScriptPrompt.h"; sourceTree = "<group>"; };
 		72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPrompt.m; path = "Bit Slicer/ZGScriptPrompt.m"; sourceTree = "<group>"; };
 		72AA79841A2413B4005A9BD6 /* ZGScriptPromptDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPromptDelegate.h; path = "Bit Slicer/ZGScriptPromptDelegate.h"; sourceTree = "<group>"; };
@@ -1455,6 +1459,9 @@
 				77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */,
 				77282124189EA4520044E4BC /* ZGProcessTaskManager.h */,
 				77282125189EA4520044E4BC /* ZGProcessTaskManager.m */,
+				729669401A4E2AD000BB5A3D /* ZGProcessHandleProtocol.h */,
+				7296693D1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.h */,
+				7296693E1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.m */,
 				77F1162317D2EF31009E002A /* ZGRegion.h */,
 				77F1162417D2EF31009E002A /* ZGRegion.m */,
 				77E9DBCC181F812E009F4982 /* ZGMachBinary.h */,
@@ -1794,6 +1801,7 @@
 				77F1160917D2EEC0009E002A /* ZGPyVirtualMemory.m in Sources */,
 				7798EED918C40B7F001120FB /* DDParserTypes.m in Sources */,
 				773DE962190F4D130078E8F9 /* ZGScriptPreferencesViewController.m in Sources */,
+				7296693F1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.m in Sources */,
 				77F1160C17D2EECA009E002A /* ZGPyScript.m in Sources */,
 				777DA25218CE97BE0092DEC9 /* ZGAppTerminationState.m in Sources */,
 				77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */,

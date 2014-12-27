@@ -33,6 +33,7 @@
  */
 
 #import "ZGRegion.h"
+#import "ZGProcess.h"
 #import <mach/mach_vm.h>
 
 @implementation ZGRegion

@@ -444,7 +444,7 @@ enum ZGStepExecution
 	for (ZGInstruction *instruction in instructions)
 	{
 		ZGMemoryAddress relativeProcedureOffset = 0x0;
-		NSString *symbolName = [self.currentProcess symbolAtAddress:instruction.variable.address relativeOffset:&relativeProcedureOffset];
+		NSString *symbolName = [self.currentProcess.handle symbolAtAddress:instruction.variable.address relativeOffset:&relativeProcedureOffset];
 
 		instruction.symbols = (symbolName != nil) ? [NSString stringWithFormat:@"%@ + %llu", symbolName, relativeProcedureOffset] : @"";
 	}
@@ -465,11 +465,12 @@ enum ZGStepExecution
 	{	
 		BOOL needsToUpdateWindow = NO;
 		
+		id <ZGProcessHandleProtocol> processHandle = self.currentProcess.handle;
 		for (ZGInstruction *instruction in [self.instructions subarrayWithRange:visibleRowsRange])
 		{
 			void *bytes = NULL;
 			ZGMemorySize size = instruction.variable.size;
-			if (ZGReadBytes(self.currentProcess.processTask, instruction.variable.address, &bytes, &size))
+			if ([processHandle readBytes:&bytes address:instruction.variable.address size:&size])
 			{
 				if (memcmp(bytes, instruction.variable.rawValue, size) != 0)
 				{
@@ -489,7 +490,7 @@ enum ZGStepExecution
 					}
 				}
 				
-				ZGFreeBytes(bytes, size);
+				[processHandle freeBytes:bytes size:size];
 			}
 		}
 		
@@ -588,7 +589,7 @@ enum ZGStepExecution
 			
 			ZGMemorySize size = endAddress - startAddress;
 			
-			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size breakPoints:self.breakPointController.breakPoints];
+			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcess:self.currentProcess address:startAddress size:size breakPoints:self.breakPointController.breakPoints];
 			if (disassemblerObject != nil)
 			{
 				NSArray *instructionsToReplace = [disassemblerObject readInstructions];
@@ -655,7 +656,7 @@ enum ZGStepExecution
 	{
 		ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 		
-		ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size breakPoints:self.breakPointController.breakPoints];
+		ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcess:self.currentProcess address:startInstruction.variable.address size:size breakPoints:self.breakPointController.breakPoints];
 		
 		if (disassemblerObject != nil)
 		{
@@ -714,7 +715,7 @@ enum ZGStepExecution
 		{
 			ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 			
-			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size breakPoints:self.breakPointController.breakPoints];
+			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcess:self.currentProcess address:startInstruction.variable.address size:size breakPoints:self.breakPointController.breakPoints];
 			
 			if (disassemblerObject != nil)
 			{
@@ -763,7 +764,7 @@ enum ZGStepExecution
 	self.instructions = @[];
 	[self.instructionsTableView reloadData];
 
-	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size breakPoints:self.breakPointController.breakPoints];
+	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcess:self.currentProcess address:address size:size breakPoints:self.breakPointController.breakPoints];
 	NSArray *newInstructions = @[];
 
 	if (disassemblerObject != nil)
@@ -838,7 +839,7 @@ enum ZGStepExecution
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
 	
-	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:self.breakPointController.breakPoints];
+	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcess:self.currentProcess address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:self.breakPointController.breakPoints];
 	
 	if (disassemblerObject != nil)
 	{

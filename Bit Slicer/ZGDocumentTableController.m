@@ -141,12 +141,13 @@
 	BOOL needsToReloadTable = NO;
 	if (variableRange.location + variableRange.length <= self.documentData.variables.count)
 	{
+		id <ZGProcessHandleProtocol> processHandle = currentProcess.handle;
 		for (ZGVariable *variable in [self.documentData.variables subarrayWithRange:variableRange])
 		{
 			NSString *oldStringValue = [variable.stringValue copy];
 			if (!(variable.isFrozen && variable.freezeValue) && (variable.type == ZGString8 || variable.type == ZGString16))
 			{
-				variable.size = ZGGetStringSize(currentProcess.processTask, variable.address, variable.type, variable.size, 1024);
+				variable.size = [currentProcess.handle readStringSizeFromAddress:variable.address dataType:variable.type oldSize:variable.size maxSize:1024];
 			}
 			
 			if (variable.size)
@@ -154,7 +155,7 @@
 				ZGMemorySize outputSize = variable.size;
 				void *value = NULL;
 				
-				if (ZGReadBytes(currentProcess.processTask, variable.address, &value, &outputSize))
+				if ([processHandle readBytes:&value address:variable.address size:&outputSize])
 				{
 					variable.rawValue = value;
 					if (![variable.stringValue isEqualToString:oldStringValue])
@@ -162,7 +163,7 @@
 						needsToReloadTable = YES;
 					}
 					
-					ZGFreeBytes(value, outputSize);
+					[processHandle freeBytes:value size:outputSize];
 				}
 				else if (variable.rawValue != nil)
 				{
@@ -257,6 +258,7 @@
 	if (windowController.currentProcess.hasGrantedAccess)
 	{
 		// Freeze all variables that need be frozen!
+		id <ZGProcessHandleProtocol> processHandle = windowController.currentProcess.handle;
 		NSUInteger variableIndex = 0;
 		for (ZGVariable *variable in self.documentData.variables)
 		{
@@ -271,15 +273,15 @@
 					}
 				}
 				
-				if (variable.size)
+				if (variable.size > 0)
 				{
-					ZGWriteBytesIgnoringProtection(windowController.currentProcess.processTask, variable.address, variable.freezeValue, variable.size);
+					[processHandle writeBytesIgnoringProtection:variable.freezeValue address:variable.address size:variable.size];
 				}
 				
 				if (variable.type == ZGString8 || variable.type == ZGString16)
 				{
 					unichar terminatorValue = 0;
-					ZGWriteBytesIgnoringProtection(windowController.currentProcess.processTask, variable.address + variable.size, &terminatorValue, variable.type == ZGString8 ? sizeof(char) : sizeof(unichar));
+					[processHandle writeBytesIgnoringProtection:&terminatorValue address:variable.address + variable.size size:variable.type == ZGString8 ? sizeof(char) : sizeof(unichar)];
 				}
 			}
 			
@@ -534,7 +536,7 @@
 		ZGMemoryAddress memoryAddress = variable.address;
 		ZGMemorySize memorySize = variable.size;
 		
-		if (ZGMemoryProtectionInRegion(windowController.currentProcess.processTask, &memoryAddress, &memorySize, &memoryProtection))
+		if ([windowController.currentProcess.handle getMemoryProtection:&memoryProtection address:&memoryAddress size:&memorySize])
 		{
 			// if the variable is within a single memory region and the memory region is not readable, then don't allow the variable to be writable
 			// if it is not writable, our value changing methods will try to change the protection attributes before modifying the data
@@ -629,7 +631,7 @@
 			ZGMemoryAddress memoryProtectionAddress = variable.address;
 			ZGMemorySize memoryProtectionSize = variable.size;
 			ZGMemoryProtection memoryProtection;
-			if (ZGMemoryProtectionInRegion(currentProcess.processTask, &memoryProtectionAddress, &memoryProtectionSize, &memoryProtection))
+			if ([currentProcess.handle getMemoryProtection:&memoryProtection address:&memoryProtectionAddress size:&memoryProtectionSize])
 			{
 				if (variable.address >= memoryProtectionAddress && variable.address + variable.size <= memoryProtectionAddress + memoryProtectionSize)
 				{

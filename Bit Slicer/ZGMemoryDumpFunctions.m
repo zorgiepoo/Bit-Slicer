@@ -36,6 +36,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGSearchProgress.h"
 #import "ZGRegion.h"
+#import "ZGProcess.h"
 
 // helper function for ZGSaveAllDataToDirectory
 static void ZGDumpPieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
@@ -55,16 +56,18 @@ static void ZGDumpPieceOfData(NSMutableData *currentData, ZGMemoryAddress curren
 	}
 }
 
-BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <ZGSearchProgressDelegate> delegate)
+BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGProcess *process, id <ZGSearchProgressDelegate> delegate)
 {
 	NSMutableData *currentData = nil;
 	ZGMemoryAddress currentStartingAddress = 0;
 	ZGMemoryAddress lastAddress = currentStartingAddress;
 	int fileNumber = 0;
 	
+	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	
 	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:ZGLocalizedStringFromDumpAllMemoryTable(@"mergedFilename")].UTF8String, "w");
 	
-	NSArray *regions = [ZGRegion submapRegionsFromProcessTask:processTask];
+	NSArray *regions = [ZGRegion submapRegionsFromProcessTask:process.processTask];
 	
 	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryDumping maxProgress:regions.count];
 	
@@ -92,10 +95,10 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 			// outputSize should not differ from size
 			ZGMemorySize outputSize = region.size;
 			void *bytes = NULL;
-			if (ZGReadBytes(processTask, region.address, &bytes, &outputSize))
+			if ([processHandle readBytes:&bytes address:region.address size:&outputSize])
 			{
 				[currentData appendBytes:bytes length:(NSUInteger)outputSize];
-				ZGFreeBytes(bytes, outputSize);
+				[processHandle freeBytes:bytes size:outputSize];
 			}
 		}
 		
