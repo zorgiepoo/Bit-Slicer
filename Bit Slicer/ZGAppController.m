@@ -63,7 +63,6 @@
 @property (nonatomic) ZGDebuggerController *debuggerController;
 @property (nonatomic) ZGBreakPointController *breakPointController;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
-@property (nonatomic) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
 
 @end
@@ -80,7 +79,7 @@
 	{
 		self.appUpdaterController = [[ZGAppUpdaterController alloc] init];
 		
-		self.processTaskManager = [[ZGProcessTaskManager alloc] init];
+		ZGProcessTaskManager *processTaskManager = [[ZGProcessTaskManager alloc] init];
 
 		self.hotKeyCenter = [[ZGHotKeyCenter alloc] init];
 
@@ -88,12 +87,12 @@
 		
 		self.breakPointController = [ZGBreakPointController sharedController];
 		
-		self.debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:self.processTaskManager breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
+		self.debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:processTaskManager breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
 		
-		self.memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:self.processTaskManager];
+		self.memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:processTaskManager];
 		self.memoryViewer.debuggerController = self.debuggerController;
 		
-		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
+		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
 		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
