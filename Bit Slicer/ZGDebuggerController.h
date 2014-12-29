@@ -44,7 +44,6 @@
 @class ZGProcess;
 @class ZGInstruction;
 @class ZGMachBinary;
-@class ZGProcessTaskManager;
 @class ZGBreakPointController;
 @class ZGHotKeyCenter;
 @class ZGLoggerWindowController;
@@ -56,7 +55,7 @@ extern NSString *ZGStepOutHotKey;
 
 @interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate, ZGHotKeyDelegate>
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 
 - (void)cleanup;
 

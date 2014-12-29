@@ -81,6 +81,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 
 @interface ZGBreakPointController ()
 
+@property (nonatomic) id <ZGProcessTaskManager> processTaskManager;
 @property (readwrite, nonatomic) mach_port_t exceptionPort;
 @property (nonatomic) BOOL delayedTermination;
 @property (nonatomic) dispatch_source_t watchPointTimer;
@@ -90,13 +91,17 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 @implementation ZGBreakPointController
 
 static ZGBreakPointController *gBreakPointController;
-+ (instancetype)sharedController
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager
 {
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		gBreakPointController = [[ZGBreakPointController alloc] init];
-	});
-	return gBreakPointController;
+	self = [super init];
+	if (self != nil)
+	{
+		_processTaskManager = processTaskManager;
+		
+		assert(gBreakPointController == nil);
+		gBreakPointController = self;
+	}
+	return self;
 }
 
 #define RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(type) \
@@ -711,7 +716,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	NSMutableArray *removedBreakPoints = [NSMutableArray array];
 	@synchronized(self)
 	{
-		NSArray *runningProcesses = [[[ZGProcessList alloc] init] runningProcesses];
+		NSArray *runningProcesses = [[self.processTaskManager createProcessList] runningProcesses];
 		for (ZGBreakPoint *breakPoint in self.breakPoints)
 		{
 			if (processID <= 0 || (processID == breakPoint.process.processID && breakPoint.variable.address == address))

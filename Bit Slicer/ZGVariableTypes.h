@@ -35,7 +35,7 @@
 #ifndef _ZG_VARIABLE_TYPES_H
 #define _ZG_VARIABLE_TYPES_H
 
-typedef enum
+typedef NS_ENUM(uint16_t, ZGVariableType)
 {
 	ZGInt8 = 0,
 	ZGInt16,
@@ -48,7 +48,7 @@ typedef enum
 	ZGPointer,
     ZGByteArray,
 	ZGScript
-} ZGVariableType;
+};
 
 typedef enum
 {

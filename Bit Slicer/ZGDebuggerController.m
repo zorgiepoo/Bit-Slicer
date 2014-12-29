@@ -161,7 +161,7 @@ enum ZGStepExecution
 	});
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super initWithProcessTaskManager:processTaskManager];
 	
@@ -974,7 +974,7 @@ enum ZGStepExecution
 		return;
 	}
 	
-	NSArray *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
+	NSArray *memoryRegions = [self.currentProcess.handle regions];
 	if (memoryRegions.count == 0)
 	{
 		cleanupOnFailure();
@@ -987,7 +987,7 @@ enum ZGStepExecution
 	
 	if (chosenRegion != nil)
 	{
-		NSArray *submapRegions =  [ZGRegion submapRegionsFromProcessTask:self.currentProcess.processTask region:chosenRegion];
+		NSArray *submapRegions =  [self.currentProcess.handle submapRegionsInRegion:chosenRegion];
 		
 		chosenRegion = [submapRegions zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
 			return (BOOL)((region.protection & VM_PROT_READ) != 0 && (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size));

@@ -36,12 +36,12 @@
 #import "ZGMemoryTypes.h"
 #import <HexFiend/HFTypes.h>
 #import <HexFiend/HFFunctions.h>
+#import "ZGProcessTaskManager.h"
 
 extern NSString *ZGLastChosenInternalProcessNameNotification;
 extern NSString *ZGLastChosenInternalProcessNameKey;
 
 @class ZGProcess;
-@class ZGProcessTaskManager;
 @class ZGProcessList;
 
 @interface ZGMemoryWindowController : NSWindowController
@@ -51,9 +51,9 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager;
 
-@property (nonatomic) ZGProcessTaskManager *processTaskManager;
+@property (nonatomic) id <ZGProcessTaskManager> processTaskManager;
 @property (nonatomic) ZGProcessList *processList;
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;

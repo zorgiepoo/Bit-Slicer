@@ -82,7 +82,7 @@
 	return ZGReadBytes(_processTask, address, bytes, size);
 }
 
-- (BOOL)freeBytes:(const void *)bytes size:(ZGMemorySize)size
+- (BOOL)freeBytes:(void *)bytes size:(ZGMemorySize)size
 {
 	return ZGFreeBytes(bytes, size);
 }
@@ -102,9 +102,12 @@
 	return ZGWriteBytesIgnoringProtection(_processTask, address, bytes, size);
 }
 
-- (BOOL)getTaskInfo:(void *)taskInfo flavor:(task_flavor_t)flavor count:(mach_msg_type_number_t *)count
+- (BOOL)getDyldTaskInfo:(struct task_dyld_info *)dyldTaskInfo count:(mach_msg_type_number_t *)count
 {
-	return ZGTaskInfo(_processTask, taskInfo, flavor, count);
+	mach_msg_type_number_t localCount = TASK_DYLD_INFO_COUNT;
+	bool success = ZGTaskInfo(_processTask, dyldTaskInfo, TASK_DYLD_INFO, &localCount);
+	*count = localCount;
+	return success;
 }
 
 - (BOOL)setProtection:(ZGMemoryProtection)protection address:(ZGMemoryAddress)address size:(ZGMemorySize)size

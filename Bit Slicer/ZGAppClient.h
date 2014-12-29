@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 3/9/13.
+ * Created by Mayur Pawashe on 12/27/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,26 +33,22 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
+#import "ZGNetworkCommon.h"
 
-@interface ZGRegion : NSObject <NSSecureCoding>
-{
-@public
-	ZGMemoryAddress _address;
-	ZGMemorySize _size;
-	void *_bytes;
-}
+@interface ZGAppClient : NSObject
 
-+ (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask;
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask;
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
+- (id)initWithHost:(NSString *)host;
 
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection;
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;
+- (void)connect;
 
-@property (nonatomic, readonly) ZGMemoryAddress address;
-@property (nonatomic, readonly) ZGMemorySize size;
-@property (nonatomic, readonly) ZGMemoryProtection protection;
-@property (nonatomic, readonly) void *bytes;
+@property (nonatomic, readonly) BOOL connected;
+
+@property (nonatomic, readonly) dispatch_queue_t dispatchQueue;
+
+- (void)sendBytes:(const void *)bytes length:(size_t)length;
+- (void)receiveBytes:(void *)bytes length:(size_t)length;
+
+- (void)sendMessageType:(ZGNetworkMessageType)messageType;
+- (void)sendMessageType:(ZGNetworkMessageType)messageType andObjectID:(uint16_t)objectID;
 
 @end

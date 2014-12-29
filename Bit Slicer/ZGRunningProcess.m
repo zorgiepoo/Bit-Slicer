@@ -36,12 +36,13 @@
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
-@interface ZGRunningProcess ()
-
-@property (readwrite, nonatomic) pid_t processIdentifier;
-@property (readwrite, nonatomic) BOOL is64Bit;
-
-@end
+#define ZGRunningProcessInternalNameKey @"ZGRunningProcessInternalNameKey"
+#define ZGRunningProcessIs64BitKey @"ZGRunningProcessIs64BitKey"
+#define ZGRunningProcessIdentifierKey @"ZGRunningProcessIdentifierKey"
+#define ZGRunningProcessIconKey @"ZGRunningProcessIconKey"
+#define ZGRunningProcessNameKey @"ZGRunningProcessNameKey"
+#define ZGRunningProcessActivationPolicyKey @"ZGRunningProcessActivationPolicyKey"
+#define ZGRunningProcessDidFetchInfoKey @"ZGRunningProcessDidFetchInfoKey"
 
 @implementation ZGRunningProcess
 {
@@ -51,6 +52,46 @@
 	BOOL _didFetchInfo;
 }
 
+#pragma mark Archiving
+
++ (BOOL)supportsSecureCoding
+{
+	return YES;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+	[coder encodeObject:_internalName forKey:ZGRunningProcessInternalNameKey];
+	[coder encodeBool:_is64Bit forKey:ZGRunningProcessIs64BitKey];
+	[coder encodeInteger:_processIdentifier forKey:ZGRunningProcessIdentifierKey];
+	
+	[coder encodeObject:_icon forKey:ZGRunningProcessIconKey];
+	[coder encodeObject:_name forKey:ZGRunningProcessNameKey];
+	[coder encodeInteger:_activationPolicy forKey:ZGRunningProcessActivationPolicyKey];
+	[coder encodeBool:_didFetchInfo forKey:ZGRunningProcessDidFetchInfoKey];
+}
+
+- (id)initWithCoder:(NSCoder *)decoder
+{
+	Class myClass = [self class];
+	NSString *internalName = [decoder decodeObjectOfClass:myClass forKey:ZGRunningProcessInternalNameKey];
+	BOOL is64Bit = [decoder decodeBoolForKey:ZGRunningProcessIs64BitKey];
+	pid_t processIdentifier = (pid_t)[decoder decodeIntegerForKey:ZGRunningProcessIdentifierKey];
+	
+	self = [self initWithProcessIdentifier:processIdentifier is64Bit:is64Bit internalName:internalName];
+	if (self != nil)
+	{
+		_didFetchInfo = [[decoder decodeObjectOfClass:myClass forKey:ZGRunningProcessDidFetchInfoKey] boolValue];
+		if (_didFetchInfo)
+		{
+			_icon = [decoder decodeObjectOfClass:myClass forKey:ZGRunningProcessIconKey];
+			_name = [decoder decodeObjectOfClass:myClass forKey:ZGRunningProcessNameKey];
+			_activationPolicy = [decoder decodeIntegerForKey:ZGRunningProcessActivationPolicyKey];
+		}
+	}
+	return self;
+}
+
 #pragma mark Birth
 
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier is64Bit:(BOOL)is64Bit internalName:(NSString *)name
@@ -58,9 +99,9 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.processIdentifier = processIdentifier;
+		_processIdentifier = processIdentifier;
+		_is64Bit = is64Bit;
 		self.internalName = name;
-		self.is64Bit = is64Bit;
 	}
 	return self;
 }

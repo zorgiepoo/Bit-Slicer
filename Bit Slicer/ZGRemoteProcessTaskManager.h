@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 3/9/13.
+ * Created by Mayur Pawashe on 12/27/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,26 +33,14 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
+#import "ZGProcessTaskManager.h"
 
-@interface ZGRegion : NSObject <NSSecureCoding>
-{
-@public
-	ZGMemoryAddress _address;
-	ZGMemorySize _size;
-	void *_bytes;
-}
+@class ZGAppClient;
 
-+ (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask;
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask;
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
+@interface ZGRemoteProcessTaskManager : NSObject <ZGProcessTaskManager>
 
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection;
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;
+- (id)initWithAppClient:(ZGAppClient *)appClient;
 
-@property (nonatomic, readonly) ZGMemoryAddress address;
-@property (nonatomic, readonly) ZGMemorySize size;
-@property (nonatomic, readonly) ZGMemoryProtection protection;
-@property (nonatomic, readonly) void *bytes;
+@property (nonatomic, readonly) ZGAppClient *appClient;
 
 @end

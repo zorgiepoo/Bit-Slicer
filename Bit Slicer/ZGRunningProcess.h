@@ -34,7 +34,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface ZGRunningProcess : NSObject
+@interface ZGRunningProcess : NSObject <NSSecureCoding>
 
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier is64Bit:(BOOL)is64Bit internalName:(NSString *)name;
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier;

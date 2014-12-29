@@ -55,7 +55,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	id <ZGProcessHandleProtocol> processHandle = process.handle;
 	
 	// dyld is usually near the end, so it'll be faster to iterate backwards
-	for (ZGRegion *region in [[ZGRegion regionsFromProcessTask:process.processTask] reverseObjectEnumerator])
+	for (ZGRegion *region in [[process.handle regions] reverseObjectEnumerator])
 	{
 		if ((region.protection & VM_PROT_READ) == 0)
 		{
@@ -129,8 +129,8 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	NSMutableArray *machBinaries = [[NSMutableArray alloc] init];
 	
 	struct task_dyld_info dyld_info;
-	mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
-	if ([processHandle getTaskInfo:&dyld_info flavor:TASK_DYLD_INFO count:&count])
+	mach_msg_type_number_t count;
+	if ([processHandle getDyldTaskInfo:&dyld_info count:&count])
 	{
 		ZGMemoryAddress allImageInfosAddress = dyld_info.all_image_info_addr;
 		ZGMemorySize allImageInfosSize = sizeof(uint32_t) * 2 + pointerSize; // Just interested in first three fields of struct dyld_all_image_infos

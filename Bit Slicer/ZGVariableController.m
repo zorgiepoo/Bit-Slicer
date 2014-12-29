@@ -787,7 +787,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			
 			if (writeSize)
 			{
-				if (![processHandle writeBytes:newValue address:variable.address size:writeSize])
+				if (![processHandle writeBytesIgnoringProtection:newValue address:variable.address size:writeSize])
 				{
 					successfulWrite = NO;
 				}

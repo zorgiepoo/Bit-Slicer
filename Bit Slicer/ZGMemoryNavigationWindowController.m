@@ -39,7 +39,7 @@
 
 @implementation ZGMemoryNavigationWindowController
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager
 {
 	self = [super initWithProcessTaskManager:processTaskManager];
 	

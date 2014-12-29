@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 3/9/13.
+ * Created by Mayur Pawashe on 12/27/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,26 +33,49 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
 
-@interface ZGRegion : NSObject <NSSecureCoding>
+#include <stdint.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <sys/wait.h>
+#include <signal.h>
+
+#define NETWORK_PORT "58393"
+
+typedef  NS_ENUM(uint16_t, ZGNetworkMessageType)
 {
-@public
-	ZGMemoryAddress _address;
-	ZGMemorySize _size;
-	void *_bytes;
-}
-
-+ (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask;
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask;
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
-
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection;
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;
-
-@property (nonatomic, readonly) ZGMemoryAddress address;
-@property (nonatomic, readonly) ZGMemorySize size;
-@property (nonatomic, readonly) ZGMemoryProtection protection;
-@property (nonatomic, readonly) void *bytes;
-
-@end
+	ZGNetworkMessageTaskExistsForProcessIndentifier,
+	ZGNetworkMessageGetTaskForProcessIdentifier,
+	ZGNetworkMessageFreeTaskForProcessIdentifier,
+	ZGNetworkMessageSetPortRightReferenceCountByDelta,
+	ZGNetworkMessageCreateProcessList,
+	ZGNetworkMessageRetreiveProcessList,
+	ZGNetworkMessageCreateProcessHandle,
+	ZGNetworkMessageAllocateMemory,
+	ZGNetworkMessageDeallocateMemory,
+	ZGNetworkMessageReadBytes,
+	ZGNetworkMessageWriteBytes,
+	ZGNetworkMessageWriteBytesOverwritingProtection,
+	ZGNetworkMessageWriteBytesIgnoringProtection,
+	ZGNetworkMessageGetDlydTaskInfo,
+	ZGNetworkMessageSetProtection,
+	ZGNetworkMessageGetPageSize,
+	ZGNetworkMessageSuspend,
+	ZGNetworkMessageResume,
+	ZGNetworkMessageGetSuspendCount,
+	ZGNetworkMessageRegions,
+	ZGNetworkMessageSubmapRegions,
+	ZGNetworkMessageSubmapRegionsInRegion,
+	ZGNetworkMessageGetRegionInfo,
+	ZGNetworkMessageGetMemoryProtection,
+	ZGNetworkMessageSymbolAtAddress,
+	ZGNetworkMessageFindSymbol,
+	ZGNetworkMessageReadStringSizeFromAddress
+};

@@ -35,20 +35,13 @@
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 #import "ZGRunningProcessObserver.h"
-#import "ZGVirtualMemory.h"
-#import "ZGProcessTaskManager.h"
-#import <sys/types.h>
-#import <sys/sysctl.h>
 
 @interface ZGProcessList ()
 {
 	NSMutableArray *_runningProcesses;
 }
 
-@property (nonatomic) ZGProcessTaskManager *processTaskManager;
-
 @property (atomic) NSUInteger pollRequestCount;
-@property (nonatomic) NSArray *priorityProcesses;
 @property (nonatomic) NSArray *pollObservers;
 @property (nonatomic) NSTimer *pollTimer;
 
@@ -95,89 +88,27 @@
 
 #pragma mark Birth
 
-- (id)init
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager
 {
 	self = [super init];
 	if (self != nil)
 	{
+		_processTaskManager = processTaskManager;
 		_runningProcesses = [[NSMutableArray alloc] init];
 		[self retrieveList];
 	}
 	return self;
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager
-{
-	self = [self init];
-	if (self != nil)
-	{
-		self.processTaskManager = processTaskManager;
-	}
-	return self;
-}
-
 #pragma mark Process Retrieval
 
-// http://stackoverflow.com/questions/7729245/can-i-use-sysctl-to-retrieve-a-process-list-with-the-user
-// http://www.nightproductions.net/dsprocessesinfo_m.html
-// Apparently I could use proc_listpids instead of sysctl.. Although we are already using sysctl for obtaining CPU architecture, and I'm unsure if this would actually be a better choice
 - (void)retrieveList
 {
-	struct kinfo_proc *processList = NULL;
-	size_t length = 0;
+	NSLog(@"Error: retrieveList not implemented!");
+}
 
-	static const int name[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
-
-	// Call sysctl with a NULL buffer to get proper length
-	if (sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1, NULL, &length, NULL, 0) != 0) return;
-
-	// Allocate buffer
-	processList = malloc(length);
-	if (!processList) return;
-
-	// Get the actual process list
-	if (sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1, processList, &length, NULL, 0) != 0)
-	{
-		free(processList);
-		return;
-	}
-	
-	NSMutableArray *newRunningProcesses = [[NSMutableArray alloc] init];
-	
-	int processCount = (int)(length / sizeof(struct kinfo_proc));
-	for (int processIndex = 0; processIndex < processCount; processIndex++)
-	{
-		uid_t uid = processList[processIndex].kp_eproc.e_ucred.cr_uid;
-		pid_t processID = processList[processIndex].kp_proc.p_pid;
-		
-		// I want user processes and I don't want zombies!
-		// Also don't get a process if it's still being created by fork() or if the pid is -1
-		if (processID != -1 && uid == getuid() && !(processList[processIndex].kp_proc.p_stat & SIDL))
-		{
-			// Get CPU type
-			// http://stackoverflow.com/questions/1350181/determine-a-processs-architecture
-			
-			size_t mibLen = CTL_MAXNAME;
-			int mib[CTL_MAXNAME];
-			
-			if (sysctlnametomib("sysctl.proc_cputype", mib, &mibLen) == 0)
-			{
-				mib[mibLen] = processID;
-				mibLen++;
-				
-				cpu_type_t cpuType;
-				size_t cpuTypeSize;
-				cpuTypeSize = sizeof(cpuType);
-				
-				if (sysctl(mib, (u_int)mibLen, &cpuType, &cpuTypeSize, 0, 0) == 0)
-				{
-					ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processID is64Bit:((cpuType & CPU_ARCH_ABI64) != 0) internalName:@(processList[processIndex].kp_proc.p_comm)];
-					[newRunningProcesses addObject:runningProcess];
-				}
-			}
-		}
-	}
-	
+- (void)updateRunningProcessList:(NSArray *)newRunningProcesses
+{
 	NSMutableArray *currentProcesses = [self mutableArrayValueForKey:@"runningProcesses"];
 	
 	if (![currentProcesses isEqualToArray:newRunningProcesses])
@@ -208,8 +139,6 @@
 		
 		[currentProcesses addObjectsFromArray:processesToAdd];
 	}
-	
-	free(processList);
 }
 
 #pragma mark Polling
@@ -231,7 +160,7 @@
 	{
 		[self retrieveList];
 	}
-	else if (self.priorityProcesses != nil)
+	else if (_priorityProcesses != nil)
 	{
 		[self watchPriorityProcesses];
 	}
@@ -265,7 +194,7 @@
 		
 		self.pollRequestCount--;
 		
-		if (self.pollRequestCount == 0 && self.priorityProcesses.count == 0)
+		if (self.pollRequestCount == 0 && _priorityProcesses.count == 0)
 		{
 			[self destroyPollTimer];
 		}
@@ -278,14 +207,14 @@
 {
 	BOOL shouldRetrieveList = NO;
 	
-	for (ZGRunningProcessObserver *runningProcessObserver in self.priorityProcesses)
+	for (ZGRunningProcessObserver *runningProcessObserver in _priorityProcesses)
 	{
 		ZGMemoryMap task = MACH_PORT_NULL;
 		pid_t processIdentifier = runningProcessObserver.runningProcess.processIdentifier;
-		BOOL foundExistingTask = [self.processTaskManager taskExistsForProcessIdentifier:processIdentifier];
+		BOOL foundExistingTask = [_processTaskManager taskExistsForProcessIdentifier:processIdentifier];
 		
-		BOOL retrievedTask = foundExistingTask && [self.processTaskManager getTask:&task forProcessIdentifier:processIdentifier];
-		BOOL increasedUserReference = retrievedTask && ZGSetPortSendRightReferenceCountByDelta(task, 1);
+		BOOL retrievedTask = foundExistingTask && [_processTaskManager getTask:&task forProcessIdentifier:processIdentifier];
+		BOOL increasedUserReference = retrievedTask && [_processTaskManager setPortSendRightReferenceCountByDelta:1 task:task];
 		
 		if (!increasedUserReference || !MACH_PORT_VALID(task))
 		{
@@ -295,7 +224,7 @@
 		
 		if (increasedUserReference && MACH_PORT_VALID(task))
 		{
-			ZGSetPortSendRightReferenceCountByDelta(task, -1);
+			[_processTaskManager setPortSendRightReferenceCountByDelta:-1 task:task];
 		}
 	}
 	
@@ -307,15 +236,13 @@
 
 - (void)addPriorityToProcessIdentifier:(pid_t)processIdentifier withObserver:(id)observer
 {
-	assert(self.processTaskManager != nil);
-	
 	ZGRunningProcessObserver *runningProcessObserver = [[ZGRunningProcessObserver alloc] initWithProcessIdentifier:processIdentifier observer:observer];
 	
-	if (![self.priorityProcesses containsObject:runningProcessObserver])
+	if (![_priorityProcesses containsObject:runningProcessObserver])
 	{
-		NSMutableArray *newPriorityProcesses = self.priorityProcesses ? [NSMutableArray arrayWithArray:self.priorityProcesses] : [NSMutableArray array];
+		NSMutableArray *newPriorityProcesses = _priorityProcesses ? [NSMutableArray arrayWithArray:_priorityProcesses] : [NSMutableArray array];
 		[newPriorityProcesses addObject:runningProcessObserver];
-		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
+		_priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
 		if (!self.pollTimer)
 		{
 			[self createPollTimer];
@@ -327,12 +254,12 @@
 {
 	ZGRunningProcessObserver *runningProcessObserver = [[ZGRunningProcessObserver alloc] initWithProcessIdentifier:processIdentifier observer:observer];
 	
-	if ([self.priorityProcesses containsObject:runningProcessObserver])
+	if ([_priorityProcesses containsObject:runningProcessObserver])
 	{
-		NSMutableArray *newPriorityProcesses = [NSMutableArray arrayWithArray:self.priorityProcesses];
+		NSMutableArray *newPriorityProcesses = [NSMutableArray arrayWithArray:_priorityProcesses];
 		[newPriorityProcesses removeObject:runningProcessObserver];
-		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
-		if (self.priorityProcesses.count == 0 && self.pollRequestCount == 0)
+		_priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
+		if (_priorityProcesses.count == 0 && self.pollRequestCount == 0)
 		{
 			[self destroyPollTimer];
 		}

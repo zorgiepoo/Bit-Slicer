@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 2/2/14.
+ * Created by Mayur Pawashe on 12/27/14.
  *
  * Copyright (c) 2014 zgcoder
  * All rights reserved.
@@ -34,11 +34,20 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGProcessHandleProtocol.h"
 
-@interface ZGProcessTaskManager : NSObject
+@class ZGProcessList;
+
+@protocol ZGProcessTaskManager <NSObject>
+
+- (ZGProcessList *)createProcessList;
+- (id <ZGProcessHandleProtocol>)createProcessHandleWithProcessTask:(ZGMemoryMap)processTask;
 
 - (BOOL)taskExistsForProcessIdentifier:(pid_t)processIdentifier;
+
 - (BOOL)getTask:(ZGMemoryMap *)processTask forProcessIdentifier:(pid_t)processIdentifier;
 - (void)freeTaskForProcessIdentifier:(pid_t)processIdentifier;
+
+- (BOOL)setPortSendRightReferenceCountByDelta:(mach_port_delta_t)delta task:(ZGMemoryMap)task;
 
 @end

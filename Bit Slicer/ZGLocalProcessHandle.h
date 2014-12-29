@@ -37,4 +37,6 @@
 
 @interface ZGLocalProcessHandle : NSObject <ZGProcessHandleProtocol>
 
+- (id)initWithProcessTask:(ZGMemoryMap)processTask;
+
 @end

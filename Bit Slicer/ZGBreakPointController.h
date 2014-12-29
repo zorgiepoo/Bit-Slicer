@@ -36,6 +36,7 @@
 #import "Python.h"
 #import "ZGMemoryTypes.h"
 #import "ZGBreakPointDelegate.h"
+#import "ZGProcessTaskManager.h"
 
 #define INSTRUCTION_BREAKPOINT_OPCODE 0xCC
 
@@ -54,7 +55,7 @@ typedef enum
 	ZGWatchPointReadOrWrite,
 } ZGWatchPointType;
 
-+ (instancetype)sharedController;
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager;
 
 @property (nonatomic) NSArray *breakPoints;
 

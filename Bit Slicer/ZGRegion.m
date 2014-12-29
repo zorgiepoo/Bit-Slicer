@@ -36,7 +36,32 @@
 #import "ZGProcess.h"
 #import <mach/mach_vm.h>
 
+#define ZGRegionAddressKey @"ZGRegionAddressKey"
+#define ZGRegionSizeKey @"ZGRegionSizeKey"
+#define ZGRegionProtectionKey @"ZGRegionProtectionKey"
+
 @implementation ZGRegion
+
++ (BOOL)supportsSecureCoding
+{
+	return YES;
+}
+
+- (id)initWithCoder:(NSCoder *)decoder
+{
+	ZGMemoryAddress address = (uint64_t)[decoder decodeInt64ForKey:ZGRegionAddressKey];
+	ZGMemorySize size = (uint64_t)[decoder decodeInt64ForKey:ZGRegionSizeKey];
+	ZGMemoryProtection protection = [decoder decodeInt32ForKey:ZGRegionProtectionKey];
+	
+	return [self initWithAddress:address size:size protection:protection];
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+	[coder encodeInt64:(int64_t)_address forKey:ZGRegionAddressKey];
+	[coder encodeInt64:(int64_t)_size forKey:ZGRegionSizeKey];
+	[coder encodeInt32:_protection forKey:ZGRegionProtectionKey];
+}
 
 + (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask
 {

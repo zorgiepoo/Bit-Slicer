@@ -40,19 +40,17 @@
 
 @protocol ZGProcessHandleProtocol <NSObject>
 
-- (id)initWithProcessTask:(ZGMemoryMap)processTask;
-
 - (BOOL)allocateMemoryAndGetAddress:(ZGMemoryAddress *)address size:(ZGMemorySize)size;
 - (BOOL)deallocateMemoryAtAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 
 - (BOOL)readBytes:(void **)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize *)size;
-- (BOOL)freeBytes:(const void *)bytes size:(ZGMemorySize)size;
+- (BOOL)freeBytes:(void *)bytes size:(ZGMemorySize)size;
 
 - (BOOL)writeBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 - (BOOL)writeBytesOverwritingProtection:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 - (BOOL)writeBytesIgnoringProtection:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 
-- (BOOL)getTaskInfo:(void *)taskInfo flavor:(task_flavor_t)flavor count:(mach_msg_type_number_t *)count;
+- (BOOL)getDyldTaskInfo:(struct task_dyld_info *)dyldTaskInfo count:(mach_msg_type_number_t *)count;
 
 - (BOOL)setProtection:(ZGMemoryProtection)protection address:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 

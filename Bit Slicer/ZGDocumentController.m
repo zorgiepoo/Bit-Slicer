@@ -40,14 +40,14 @@
 
 @implementation ZGDocumentController
 {
-	ZGProcessTaskManager *_processTaskManager;
+	id <ZGProcessTaskManager> _processTaskManager;
 	ZGDebuggerController *_debuggerController;
 	ZGBreakPointController *_breakPointController;
 	ZGHotKeyCenter *_hotKeyCenter;
 	ZGLoggerWindowController *_loggerWindowController;
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super init];
 	if (self != nil)

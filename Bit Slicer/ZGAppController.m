@@ -44,30 +44,35 @@
 #import "ZGScriptPrompt.h"
 #import "ZGScriptPromptWindowController.h"
 #import "ZGProcessTaskManager.h"
+#import "ZGLocalProcessTaskManager.h"
+#import "ZGRemoteProcessTaskManager.h"
 #import "ZGDocumentController.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGAppUpdaterController.h"
 #import "ZGAppTerminationState.h"
 #import "ZGNavigationPost.h"
+#import "ZGAppServer.h"
+#import "ZGAppClient.h"
 
 #define ZGLoggerIdentifier @"ZGLoggerIdentifier"
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
 #define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
 
-@interface ZGAppController ()
-
-@property (nonatomic) ZGAppUpdaterController *appUpdaterController;
-@property (nonatomic) ZGDocumentController *documentController;
-@property (nonatomic) ZGPreferencesController *preferencesController;
-@property (nonatomic) ZGMemoryViewerController *memoryViewer;
-@property (nonatomic) ZGDebuggerController *debuggerController;
-@property (nonatomic) ZGBreakPointController *breakPointController;
-@property (nonatomic) ZGLoggerWindowController *loggerWindowController;
-@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
-
-@end
-
 @implementation ZGAppController
+{
+	ZGAppUpdaterController *_appUpdaterController;
+	ZGDocumentController *_documentController;
+	ZGPreferencesController *_preferencesController;
+	ZGMemoryViewerController *_memoryViewer;
+	ZGDebuggerController *_debuggerController;
+	ZGBreakPointController *_breakPointController;
+	ZGLoggerWindowController *_loggerWindowController;
+	ZGHotKeyCenter *_hotKeyCenter;
+	id <ZGProcessTaskManager> _localProcessTaskManager;
+	id <ZGProcessTaskManager> _remoteProcessTaskManager;
+	ZGAppServer *_appServer;
+	ZGAppClient *_appClient;
+}
 
 #pragma mark Birth & Death
 
@@ -77,22 +82,22 @@
 	
 	if (self != nil)
 	{
-		self.appUpdaterController = [[ZGAppUpdaterController alloc] init];
+		_appUpdaterController = [[ZGAppUpdaterController alloc] init];
 		
-		ZGProcessTaskManager *processTaskManager = [[ZGProcessTaskManager alloc] init];
+		_localProcessTaskManager = [[ZGLocalProcessTaskManager alloc] init];
 
-		self.hotKeyCenter = [[ZGHotKeyCenter alloc] init];
+		_hotKeyCenter = [[ZGHotKeyCenter alloc] init];
 
-		self.loggerWindowController = [[ZGLoggerWindowController alloc] init];
+		_loggerWindowController = [[ZGLoggerWindowController alloc] init];
 		
-		self.breakPointController = [ZGBreakPointController sharedController];
+		_breakPointController = [[ZGBreakPointController alloc] initWithProcessTaskManager:_localProcessTaskManager];
 		
-		self.debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:processTaskManager breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
+		_debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:_localProcessTaskManager breakPointController:_breakPointController hotKeyCenter:_hotKeyCenter loggerWindowController:_loggerWindowController];
 		
-		self.memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:processTaskManager];
-		self.memoryViewer.debuggerController = self.debuggerController;
+		_memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:_localProcessTaskManager];
+		_memoryViewer.debuggerController = _debuggerController;
 		
-		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
+		_documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:_localProcessTaskManager debuggerController:_debuggerController breakPointController:_breakPointController hotKeyCenter:_hotKeyCenter loggerWindowController:_loggerWindowController];
 		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
@@ -122,12 +127,12 @@
 {
 	ZGAppTerminationState *appTerminationState = [[ZGAppTerminationState alloc] init];
 	
-	self.breakPointController.appTerminationState = appTerminationState;
+	_breakPointController.appTerminationState = appTerminationState;
 	
-	[self.debuggerController cleanup];
-	[self.memoryViewer cleanup];
+	[_debuggerController cleanup];
+	[_memoryViewer cleanup];
 	
-	for (ZGDocument *document in self.documentController.documents)
+	for (ZGDocument *document in _documentController.documents)
 	{
 		ZGDocumentWindowController *documentWindowController = document.windowControllers.firstObject;
 		[documentWindowController.scriptManager cleanupWithAppTerminationState:appTerminationState];
@@ -149,15 +154,15 @@
 	
 	if ([identifier isEqualToString:ZGMemoryViewerIdentifier])
 	{
-		restoredWindowController = appController.memoryViewer;
+		restoredWindowController = appController->_memoryViewer;
 	}
 	else if ([identifier isEqualToString:ZGDebuggerIdentifier])
 	{
-		restoredWindowController = appController.debuggerController;
+		restoredWindowController = appController->_debuggerController;
 	}
 	else if ([identifier isEqualToString:ZGLoggerIdentifier])
 	{
-		restoredWindowController = appController.loggerWindowController;
+		restoredWindowController = appController->_loggerWindowController;
 	}
 	
 	if (restoredWindowController != nil)
@@ -198,34 +203,60 @@
 
 - (IBAction)openMemoryViewer:(id)__unused sender
 {
-	[self showMemoryWindowController:self.memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:YES];
+	[self showMemoryWindowController:_memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:YES];
 }
 
 - (IBAction)openDebugger:(id)__unused sender
 {
-	[self showMemoryWindowController:self.debuggerController withWindowIdentifier:ZGDebuggerIdentifier andCanReadMemory:YES];
+	[self showMemoryWindowController:_debuggerController withWindowIdentifier:ZGDebuggerIdentifier andCanReadMemory:YES];
 }
 
 - (IBAction)openLogger:(id)__unused sender
 {
-	[self.loggerWindowController showWindow:nil];
+	[_loggerWindowController showWindow:nil];
 	
-	[self setRestorationForWindowController:self.loggerWindowController withWindowIdentifier:ZGLoggerIdentifier];
+	[self setRestorationForWindowController:_loggerWindowController withWindowIdentifier:ZGLoggerIdentifier];
 }
 
 - (IBAction)openPreferences:(id)__unused sender
 {
-	if (self.preferencesController == nil)
+	if (_preferencesController == nil)
 	{
-		self.preferencesController = [[ZGPreferencesController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController appUpdaterController:self.appUpdaterController];
+		_preferencesController = [[ZGPreferencesController alloc] initWithHotKeyCenter:_hotKeyCenter debuggerController:_debuggerController appUpdaterController:_appUpdaterController];
 	}
 	
-	[self.preferencesController showWindow:nil];
+	[_preferencesController showWindow:nil];
+}
+
+- (IBAction)startServer:(id)__unused sender
+{
+	if (_appServer == nil)
+	{
+		_appServer = [[ZGAppServer alloc] initWithProcessTaskManager:_localProcessTaskManager];
+	}
+	
+	[_appServer start];
+}
+
+- (IBAction)startClient:(id)__unused sender
+{
+	if (_appClient == nil)
+	{
+		_appClient = [[ZGAppClient alloc] initWithHost:@"127.0.0.1"];
+	}
+	
+	[_appClient connect];
+	
+	if ([_appClient connected])
+	{
+		_remoteProcessTaskManager = [[ZGRemoteProcessTaskManager alloc] initWithAppClient:_appClient];
+		_documentController.processTaskManager = _remoteProcessTaskManager;
+	}
 }
 
 - (IBAction)checkForUpdates:(id)__unused sender
 {
-	[self.appUpdaterController checkForUpdates];
+	[_appUpdaterController checkForUpdates];
 }
 
 #pragma mark Notifications
@@ -237,15 +268,15 @@
 	
 	if ([notification.name isEqualToString:ZGNavigationShowDebuggerNotification])
 	{
-		[self showMemoryWindowController:self.debuggerController withWindowIdentifier:ZGDebuggerIdentifier andCanReadMemory:NO];
-		[self.debuggerController jumpToMemoryAddress:address inProcess:process];
+		[self showMemoryWindowController:_debuggerController withWindowIdentifier:ZGDebuggerIdentifier andCanReadMemory:NO];
+		[_debuggerController jumpToMemoryAddress:address inProcess:process];
 	}
 	else if ([notification.name isEqualToString:ZGNavigationShowMemoryViewerNotification])
 	{
 		ZGMemoryAddress selectionLength = [[notification.userInfo objectForKey:ZGNavigationSelectionLengthKey] unsignedLongLongValue];
 		
-		[self showMemoryWindowController:self.memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:NO];
-		[self.memoryViewer jumpToMemoryAddress:address withSelectionLength:selectionLength inProcess:process];
+		[self showMemoryWindowController:_memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:NO];
+		[_memoryViewer jumpToMemoryAddress:address withSelectionLength:selectionLength inProcess:process];
 	}
 }
 
@@ -253,16 +284,16 @@
 {
 	NSString *lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
 
-	self.documentController.lastChosenInternalProcessName = lastChosenInternalProcessName;
+	_documentController.lastChosenInternalProcessName = lastChosenInternalProcessName;
 
-	if (self.debuggerController != notification.object)
+	if (_debuggerController != notification.object)
 	{
-		self.debuggerController.lastChosenInternalProcessName = lastChosenInternalProcessName;
+		_debuggerController.lastChosenInternalProcessName = lastChosenInternalProcessName;
 	}
 
-	if (self.memoryViewer != notification.object)
+	if (_memoryViewer != notification.object)
 	{
-		self.memoryViewer.lastChosenInternalProcessName = lastChosenInternalProcessName;
+		_memoryViewer.lastChosenInternalProcessName = lastChosenInternalProcessName;
 	}
 }
 
@@ -280,7 +311,7 @@
 		NSNumber *scriptPromptHash = notification.userInfo[ZGScriptNotificationPromptHashKey];
 		if (scriptPromptHash != nil)
 		{
-			for (ZGDocument *document in self.documentController.documents)
+			for (ZGDocument *document in _documentController.documents)
 			{
 				ZGDocumentWindowController *documentWindowController = [document.windowControllers firstObject];
 				ZGScriptManager *scriptManager = documentWindowController.scriptManager;

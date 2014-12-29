@@ -32,14 +32,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
+// Abstract Class
 
-@class ZGProcessTaskManager;
+#import <Foundation/Foundation.h>
+#import "ZGProcessTaskManager.h"
 
 @interface ZGProcessList : NSObject
+{
+	NSArray *_priorityProcesses;
+	id <ZGProcessTaskManager> _processTaskManager;
+}
 
-- (id)init;
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager;
 
 // Observable for new and old changes via KVO
 @property (nonatomic, readonly) NSArray *runningProcesses;

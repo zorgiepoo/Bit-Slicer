@@ -52,7 +52,7 @@
 
 - (instancetype)initWithProcess:(ZGProcess *)process name:(NSString *)name;
 
-- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask;
+- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask handle:(id <ZGProcessHandleProtocol>)handle;
 
 @property (nonatomic, readonly) pid_t processID;
 @property (nonatomic, readonly) ZGMemoryMap processTask;

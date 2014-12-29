@@ -36,6 +36,7 @@
 #import "ZGDebuggerController.h" // For seeing if we can pause/unpause a process
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
+#import "ZGLocalProcessTaskManager.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
 #import "ZGMemoryDumpAllWindowController.h"
@@ -67,7 +68,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 #pragma mark Birth
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager
 {
 	self = [super init];
 	
@@ -103,9 +104,12 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 		 object:nil];
 	}
 	
-	[[NSWorkspace sharedWorkspace]
-	 removeObserver:self
-	 forKeyPath:ZG_SELECTOR_STRING([NSWorkspace sharedWorkspace], runningApplications)];
+	if ([self.processTaskManager isKindOfClass:[ZGLocalProcessTaskManager class]])
+	{
+		[[NSWorkspace sharedWorkspace]
+		 removeObserver:self
+		 forKeyPath:ZG_SELECTOR_STRING([NSWorkspace sharedWorkspace], runningApplications)];
+	}
 	
 	[self.processList removeObserver:self forKeyPath:ZG_SELECTOR_STRING(self.processList, runningProcesses)];
 	
@@ -275,7 +279,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 - (void)setupProcessListNotifications
 {
-	self.processList = [[ZGProcessList alloc] initWithProcessTaskManager:self.processTaskManager];
+	self.processList = [self.processTaskManager createProcessList];
 	
 	[self.processList
 	 addObserver:self
@@ -283,12 +287,15 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	 context:NULL];
 	
-	// Still need to observe this for reliably fetching icon and localized name
-	[[NSWorkspace sharedWorkspace]
-	 addObserver:self
-	 forKeyPath:ZG_SELECTOR_STRING([NSWorkspace sharedWorkspace], runningApplications)
-	 options:NSKeyValueObservingOptionNew
-	 context:NULL];
+	if ([self.processTaskManager isKindOfClass:[ZGLocalProcessTaskManager class]])
+	{
+		// Still need to observe this for reliably fetching icon and localized name
+		[[NSWorkspace sharedWorkspace]
+		 addObserver:self
+		 forKeyPath:ZG_SELECTOR_STRING([NSWorkspace sharedWorkspace], runningApplications)
+		 options:NSKeyValueObservingOptionNew
+		 context:NULL];
+	}
 	
 	[[NSNotificationCenter defaultCenter]
 	 addObserver:self
@@ -386,7 +393,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 {
 }
 
-static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTaskManager, ZGProcess *process, BOOL *grantedAccess)
+static ZGProcess *ZGGrantMemoryAccessToProcess(id <ZGProcessTaskManager> processTaskManager, ZGProcess *process, BOOL *grantedAccess)
 {
 	ZGMemoryMap processTask;
 	BOOL success = [processTaskManager getTask:&processTask forProcessIdentifier:process.processID];
@@ -396,7 +403,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 		*grantedAccess = success;
 	}
 	
-	return [[ZGProcess alloc] initWithProcess:process processTask:processTask];
+	return [[ZGProcess alloc] initWithProcess:process processTask:processTask handle:[processTaskManager createProcessHandleWithProcessTask:processTask]];
 }
 
 - (void)setCurrentProcess:(ZGProcess *)newProcess

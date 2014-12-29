@@ -33,8 +33,8 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import "ZGProcessTaskManager.h"
 
-@class ZGProcessTaskManager;
 @class ZGDebuggerController;
 @class ZGBreakPointController;
 @class ZGHotKeyCenter;
@@ -42,8 +42,10 @@
 
 @interface ZGDocumentController : NSDocumentController
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
+- (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;
+
+@property (nonatomic) id <ZGProcessTaskManager> processTaskManager;
 
 @end

@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 2/2/14.
+ * Created by Mayur Pawashe on 12/27/14.
  *
  * Copyright (c) 2014 zgcoder
  * All rights reserved.
@@ -32,65 +32,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGProcessTaskManager.h"
-#import "ZGVirtualMemory.h"
-#import "ZGUtilities.h"
+#import <Foundation/Foundation.h>
+#import "ZGProcessList.h"
 
-@interface ZGProcessTaskManager ()
-
-@property (nonatomic) NSMutableDictionary *tasksDictionary;
-
-@end
-
-@implementation ZGProcessTaskManager
-
-- (BOOL)taskExistsForProcessIdentifier:(pid_t)processIdentifier
-{
-	return [self.tasksDictionary objectForKey:@(processIdentifier)] != nil;
-}
-
-- (BOOL)getTask:(ZGMemoryMap *)processTask forProcessIdentifier:(pid_t)processIdentifier
-{
-	if (self.tasksDictionary == nil)
-	{
-		self.tasksDictionary = [NSMutableDictionary dictionary];
-	}
-	
-	NSNumber *taskNumber = [self.tasksDictionary objectForKey:@(processIdentifier)];
-	if (taskNumber != nil)
-	{
-		*processTask = [taskNumber unsignedIntValue];
-		return YES;
-	}
-	
-	if (!ZGTaskForPID(processIdentifier, processTask) || !MACH_PORT_VALID(*processTask))
-	{
-		if (*processTask != MACH_PORT_NULL)
-		{
-			ZGDeallocatePort(*processTask);
-		}
-		
-		ZG_LOG(@"Mach port is not valid for process %d", processIdentifier);
-		
-		*processTask = MACH_PORT_NULL;
-		return NO;
-	}
-	
-	[self.tasksDictionary setObject:@(*processTask) forKey:@(processIdentifier)];
-	
-	return YES;
-}
-
-- (void)freeTaskForProcessIdentifier:(pid_t)processIdentifier
-{
-	NSNumber *taskNumber = [self.tasksDictionary objectForKey:@(processIdentifier)];
-	if (taskNumber == nil)
-	{
-		return;
-	}
-	
-	ZGDeallocatePort([taskNumber unsignedIntValue]);
-	[self.tasksDictionary removeObjectForKey:@(processIdentifier)];
-}
+@interface ZGLocalProcessList : ZGProcessList
 
 @end

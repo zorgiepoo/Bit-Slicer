@@ -33,8 +33,8 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import "ZGProcessTaskManager.h"
 
-@class ZGProcessTaskManager;
 @class ZGDebuggerController;
 @class ZGBreakPointController;
 @class ZGMemoryViewerController;
@@ -45,7 +45,7 @@
 
 @interface ZGDocument : NSDocument
 
-@property (nonatomic) ZGProcessTaskManager *processTaskManager;
+@property (nonatomic) id <ZGProcessTaskManager> processTaskManager;
 @property (nonatomic) ZGDebuggerController *debuggerController;
 @property (nonatomic) ZGBreakPointController *breakPointController;
 @property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
