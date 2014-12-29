@@ -106,8 +106,6 @@
 - (BOOL)readBytes:(void **)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize *)size
 {
 	__block bool success = false;
-	__block uint64_t sizeReceived = 0;
-	__block void *bytesReceived = NULL;
 	
 	dispatch_sync(_appClient.dispatchQueue, ^{
 		[self->_appClient sendMessageType:ZGNetworkMessageReadBytes andObjectID:self->_remoteHandleIdentifier];
@@ -119,21 +117,18 @@
 		
 		if (success)
 		{
+			uint64_t sizeReceived = 0;
 			[self->_appClient receiveBytes:&sizeReceived length:sizeof(sizeReceived)];
+			
+			*size = sizeReceived;
+			*bytes = malloc(sizeReceived);
+			
 			if (sizeReceived > 0)
 			{
-				bytesReceived = malloc(sizeReceived);
-				
-				[self->_appClient receiveBytes:bytesReceived length:sizeReceived];
+				[self->_appClient receiveBytes:*bytes length:sizeReceived];
 			}
 		}
 	});
-	
-	if (success)
-	{
-		*bytes = bytesReceived;
-		*size = sizeReceived;
-	}
 	
 	return success;
 }
