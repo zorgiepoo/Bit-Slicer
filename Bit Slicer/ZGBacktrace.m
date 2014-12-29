@@ -34,7 +34,7 @@
 
 #import "ZGBacktrace.h"
 #import "ZGProcess.h"
-#import "ZGProcessHandleProtocol.h"
+#import "ZGProcessHandle.h"
 #import "ZGInstruction.h"
 #import "ZGDebuggerUtilities.h"
 #import "ZGMachBinary.h"

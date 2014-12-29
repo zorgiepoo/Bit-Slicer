@@ -378,7 +378,7 @@
 		self.lastUpdateCount--;
 	};
 	
-	id <ZGProcessHandleProtocol> processHandle = self.currentProcess.handle;
+	id <ZGProcessHandle> processHandle = self.currentProcess.handle;
 	
 	// When filling or clearing the memory viewer, make sure we aren't in overwrite mode
 	// If we are, filling the memory viewer will take too long, or clearing it will fail
@@ -649,7 +649,7 @@
 			}
 			
 			void *bytes = NULL;
-			id <ZGProcessHandleProtocol> processHandle = self.currentProcess.handle;
+			id <ZGProcessHandle> processHandle = self.currentProcess.handle;
 			if ([processHandle readBytes:&bytes address:readAddress size:&readSize] && readSize > 0)
 			{
 				NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)readSize];

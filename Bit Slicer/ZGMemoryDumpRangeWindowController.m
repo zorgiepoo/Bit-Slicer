@@ -82,7 +82,7 @@
 				 ZGMemorySize size = toAddress - fromAddress;
 				 void *bytes = NULL;
 				 
-				 id <ZGProcessHandleProtocol> processHandle = self.process.handle;
+				 id <ZGProcessHandle> processHandle = self.process.handle;
 				 if ((success = [processHandle readBytes:&bytes address:fromAddress size:&size]))
 				 {
 					 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];

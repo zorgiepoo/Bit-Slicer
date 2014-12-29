@@ -71,7 +71,7 @@
 	return [self initWithName:processName internalName:internalName processID:NON_EXISTENT_PID_NUMBER is64Bit:flag64Bit];
 }
 
-- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask handle:(id <ZGProcessHandleProtocol>)handle name:(NSString *)name
+- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask handle:(id <ZGProcessHandle>)handle name:(NSString *)name
 {
 	self = [self initWithName:name internalName:process.internalName processID:process.processID is64Bit:process.is64Bit];
 	if (self != nil)
@@ -92,7 +92,7 @@
 	return [self initWithProcess:process processTask:process.processTask handle:process.handle name:name];
 }
 
-- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask handle:(id <ZGProcessHandleProtocol>)handle
+- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask handle:(id <ZGProcessHandle>)handle
 {
 	return [self initWithProcess:process processTask:processTask handle:handle name:process.name];
 }

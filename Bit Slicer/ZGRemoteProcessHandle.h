@@ -33,11 +33,11 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGProcessHandleProtocol.h"
+#import "ZGProcessHandle.h"
 
 @class ZGAppClient;
 
-@interface ZGRemoteProcessHandle : NSObject <ZGProcessHandleProtocol>
+@interface ZGRemoteProcessHandle : NSObject <ZGProcessHandle>
 
 - (id)initWithProcessTask:(ZGMemoryMap)processTask appClient:(ZGAppClient *)appClient;
 

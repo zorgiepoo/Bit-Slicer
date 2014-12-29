@@ -51,7 +51,7 @@
 	return [[ZGLocalProcessList alloc] initWithProcessTaskManager:self];
 }
 
-- (id <ZGProcessHandleProtocol>)createProcessHandleWithProcessTask:(ZGMemoryMap)processTask
+- (id <ZGProcessHandle>)createProcessHandleWithProcessTask:(ZGMemoryMap)processTask
 {
 	return [[ZGLocalProcessHandle alloc] initWithProcessTask:processTask];
 }

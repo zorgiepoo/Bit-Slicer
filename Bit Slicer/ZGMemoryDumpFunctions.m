@@ -63,7 +63,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGProcess *process, id <ZGSea
 	ZGMemoryAddress lastAddress = currentStartingAddress;
 	int fileNumber = 0;
 	
-	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	id <ZGProcessHandle> processHandle = process.handle;
 	
 	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:ZGLocalizedStringFromDumpAllMemoryTable(@"mergedFilename")].UTF8String, "w");
 	

@@ -52,7 +52,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 + (instancetype)dynamicLinkerMachBinaryInProcess:(ZGProcess *)process
 {
 	ZGMachBinary *dylinkerBinary = nil;
-	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	id <ZGProcessHandle> processHandle = process.handle;
 	
 	// dyld is usually near the end, so it'll be faster to iterate backwards
 	for (ZGRegion *region in [[process.handle regions] reverseObjectEnumerator])
@@ -124,7 +124,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	ZGMachBinary *dylinkerBinary = process.dylinkerBinary;
 	ZGMemorySize pointerSize = process.pointerSize;
 	
-	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	id <ZGProcessHandle> processHandle = process.handle;
 	
 	NSMutableArray *machBinaries = [[NSMutableArray alloc] init];
 	
@@ -234,7 +234,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 - (NSString *)filePathInProcess:(ZGProcess *)process
 {
 	NSString *filePath = nil;
-	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	id <ZGProcessHandle> processHandle = process.handle;
 	ZGMemorySize pathSize = [processHandle readStringSizeFromAddress:self.filePathAddress dataType:ZGString8 oldSize:200 maxSize:PATH_MAX];
 	void *filePathBytes = NULL;
 	if ([processHandle readBytes:&filePathBytes address:self.filePathAddress size:&pathSize])
@@ -310,7 +310,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	ZGMemorySize regionSize = 0x1;
 	ZGMemoryBasicInfo unusedInfo;
 	
-	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	id <ZGProcessHandle> processHandle = process.handle;
 	
 	if ([processHandle getRegionInfo:&unusedInfo address:&regionAddress size:&regionSize] && self.headerAddress >= regionAddress && self.headerAddress < regionAddress + regionSize)
 	{

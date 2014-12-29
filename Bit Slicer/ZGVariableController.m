@@ -37,7 +37,7 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
-#import "ZGProcessHandleProtocol.h"
+#import "ZGProcessHandle.h"
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
@@ -692,7 +692,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			void *oldData = NULL;
 			ZGMemorySize oldSize = variable.size;
 			
-			id <ZGProcessHandleProtocol> processHandle = self.windowController.currentProcess.handle;
+			id <ZGProcessHandle> processHandle = self.windowController.currentProcess.handle;
 			if ([processHandle readBytes:&oldData address:variable.address size:&oldSize])
 			{
 				ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldData size:oldSize address:variable.address type:ZGByteArray qualifier:variable.qualifier pointerSize:self.windowController.currentProcess.pointerSize description:variable.fullAttributedDescription enabled:variable.enabled byteOrder:variable.byteOrder];
@@ -783,7 +783,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		else
 		{
 			BOOL successfulWrite = YES;
-			id <ZGProcessHandleProtocol> processHandle = self.windowController.currentProcess.handle;
+			id <ZGProcessHandle> processHandle = self.windowController.currentProcess.handle;
 			
 			if (writeSize)
 			{
@@ -1082,7 +1082,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	NSMutableArray *currentVariableSizes = [[NSMutableArray alloc] init];
 	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
 	
-	id <ZGProcessHandleProtocol> processHandle = self.windowController.currentProcess.handle;
+	id <ZGProcessHandle> processHandle = self.windowController.currentProcess.handle;
 	
 	// Make sure the size changes are possible. Only change the ones that seem possible.
 	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL * __unused stop)

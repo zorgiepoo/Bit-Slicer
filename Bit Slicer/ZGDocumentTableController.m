@@ -141,7 +141,7 @@
 	BOOL needsToReloadTable = NO;
 	if (variableRange.location + variableRange.length <= self.documentData.variables.count)
 	{
-		id <ZGProcessHandleProtocol> processHandle = currentProcess.handle;
+		id <ZGProcessHandle> processHandle = currentProcess.handle;
 		for (ZGVariable *variable in [self.documentData.variables subarrayWithRange:variableRange])
 		{
 			NSString *oldStringValue = [variable.stringValue copy];
@@ -258,7 +258,7 @@
 	if (windowController.currentProcess.hasGrantedAccess)
 	{
 		// Freeze all variables that need be frozen!
-		id <ZGProcessHandleProtocol> processHandle = windowController.currentProcess.handle;
+		id <ZGProcessHandle> processHandle = windowController.currentProcess.handle;
 		NSUInteger variableIndex = 0;
 		for (ZGVariable *variable in self.documentData.variables)
 		{

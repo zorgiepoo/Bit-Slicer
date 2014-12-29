@@ -57,7 +57,7 @@
 #import "ZGThreadStates.h"
 #import "ZGVariable.h"
 #import "ZGProcess.h"
-#import "ZGProcessHandleProtocol.h"
+#import "ZGProcessHandle.h"
 #import "ZGDebugThread.h"
 #import "ZGBreakPoint.h"
 #import "ZGRegistersState.h"
@@ -211,7 +211,7 @@ static ZGBreakPointController *gBreakPointController;
 			continue;
 		}
 		
-		id <ZGProcessHandleProtocol> processHandle = breakPoint.process.handle;
+		id <ZGProcessHandle> processHandle = breakPoint.process.handle;
 		
 		[processHandle suspend];
 		
@@ -303,7 +303,7 @@ static ZGBreakPointController *gBreakPointController;
 
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	id <ZGProcessHandleProtocol> processHandle = breakPoint.process.handle;
+	id <ZGProcessHandle> processHandle = breakPoint.process.handle;
 	
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
@@ -361,7 +361,7 @@ static ZGBreakPointController *gBreakPointController;
 
 - (void)revertInstructionBackToNormal:(ZGBreakPoint *)breakPoint
 {
-	id <ZGProcessHandleProtocol> processHandle = breakPoint.process.handle;
+	id <ZGProcessHandle> processHandle = breakPoint.process.handle;
 	[processHandle writeBytesOverwritingProtection:breakPoint.variable.rawValue address:breakPoint.variable.address size:sizeof(uint8_t)];
 	[processHandle setProtection:breakPoint.originalProtection address:breakPoint.variable.address size:breakPoint.variable.size];
 }
@@ -379,7 +379,7 @@ static ZGBreakPointController *gBreakPointController;
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 10), dispatch_get_main_queue(), ^(void) {
 			if ([self.breakPoints containsObject:breakPoint])
 			{
-				id <ZGProcessHandleProtocol> processHandle = breakPoint.process.handle;
+				id <ZGProcessHandle> processHandle = breakPoint.process.handle;
 				
 				[processHandle suspend];
 				
@@ -437,7 +437,7 @@ static ZGBreakPointController *gBreakPointController;
 		return (BOOL)(process.processTask == task);
 	}];
 	
-	id <ZGProcessHandleProtocol> processHandle = matchingBreakPoint.process.handle;
+	id <ZGProcessHandle> processHandle = matchingBreakPoint.process.handle;
 	if (processHandle == nil)
 	{
 		return handledInstructionBreakPoint;
@@ -835,7 +835,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	ZGVariable *variable = watchPoint.variable;
 	NSArray *oldDebugThreads = watchPoint.debugThreads;
 	
-	id <ZGProcessHandleProtocol> processHandle = watchPoint.process.handle;
+	id <ZGProcessHandle> processHandle = watchPoint.process.handle;
 	
 	[processHandle suspend];
 	
@@ -1030,7 +1030,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		return NO;
 	}
 	
-	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	id <ZGProcessHandle> processHandle = process.handle;
 	
 	// Find memory protection of instruction. If it's not executable, make it executable
 	ZGMemoryAddress protectionAddress = instruction.variable.address;

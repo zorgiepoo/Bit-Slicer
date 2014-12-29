@@ -38,7 +38,7 @@
 @class ZGProcess;
 @class ZGRegion;
 
-@protocol ZGProcessHandleProtocol <NSObject>
+@protocol ZGProcessHandle <NSObject>
 
 - (BOOL)allocateMemoryAndGetAddress:(ZGMemoryAddress *)address size:(ZGMemorySize)size;
 - (BOOL)deallocateMemoryAtAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;

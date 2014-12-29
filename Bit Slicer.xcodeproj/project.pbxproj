@@ -375,7 +375,7 @@
 		7288B91C1A4F81AE00119085 /* ZGRemoteProcessHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRemoteProcessHandle.m; path = "Bit Slicer/ZGRemoteProcessHandle.m"; sourceTree = "<group>"; };
 		7296693D1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLocalProcessHandle.h; path = "Bit Slicer/ZGLocalProcessHandle.h"; sourceTree = "<group>"; };
 		7296693E1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLocalProcessHandle.m; path = "Bit Slicer/ZGLocalProcessHandle.m"; sourceTree = "<group>"; };
-		729669401A4E2AD000BB5A3D /* ZGProcessHandleProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGProcessHandleProtocol.h; path = "Bit Slicer/ZGProcessHandleProtocol.h"; sourceTree = "<group>"; };
+		729669401A4E2AD000BB5A3D /* ZGProcessHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGProcessHandle.h; path = "Bit Slicer/ZGProcessHandle.h"; sourceTree = "<group>"; };
 		729669411A4F101700BB5A3D /* ZGAppServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGAppServer.h; path = "Bit Slicer/ZGAppServer.h"; sourceTree = "<group>"; };
 		729669421A4F101700BB5A3D /* ZGAppServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGAppServer.m; path = "Bit Slicer/ZGAppServer.m"; sourceTree = "<group>"; };
 		72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPrompt.h; path = "Bit Slicer/ZGScriptPrompt.h"; sourceTree = "<group>"; };
@@ -1502,7 +1502,7 @@
 				77282125189EA4520044E4BC /* ZGLocalProcessTaskManager.m */,
 				7288B9121A4F44C800119085 /* ZGRemoteProcessTaskManager.h */,
 				7288B9131A4F44C800119085 /* ZGRemoteProcessTaskManager.m */,
-				729669401A4E2AD000BB5A3D /* ZGProcessHandleProtocol.h */,
+				729669401A4E2AD000BB5A3D /* ZGProcessHandle.h */,
 				7296693D1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.h */,
 				7296693E1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.m */,
 				7288B91B1A4F81AE00119085 /* ZGRemoteProcessHandle.h */,

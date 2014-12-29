@@ -34,14 +34,14 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
-#import "ZGProcessHandleProtocol.h"
+#import "ZGProcessHandle.h"
 
 @class ZGProcessList;
 
 @protocol ZGProcessTaskManager <NSObject>
 
 - (ZGProcessList *)createProcessList;
-- (id <ZGProcessHandleProtocol>)createProcessHandleWithProcessTask:(ZGMemoryMap)processTask;
+- (id <ZGProcessHandle>)createProcessHandleWithProcessTask:(ZGMemoryMap)processTask;
 
 - (BOOL)taskExistsForProcessIdentifier:(pid_t)processIdentifier;
 

@@ -33,9 +33,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGProcessHandleProtocol.h"
+#import "ZGProcessHandle.h"
 
-@interface ZGLocalProcessHandle : NSObject <ZGProcessHandleProtocol>
+@interface ZGLocalProcessHandle : NSObject <ZGProcessHandle>
 
 - (id)initWithProcessTask:(ZGMemoryMap)processTask;
 

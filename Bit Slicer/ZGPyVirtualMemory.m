@@ -295,7 +295,7 @@ PyObject *gVirtualMemoryException;
 
 - (void)dealloc
 {
-	id <ZGProcessHandleProtocol> processHandle = self.process.handle;
+	id <ZGProcessHandle> processHandle = self.process.handle;
 	for (integer_t resumeIndex = 0; resumeIndex < ((VirtualMemory *)self.object)->suspendCount; resumeIndex++)
 	{
 		[processHandle resume];
@@ -313,7 +313,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 	{ \
 		void *bytes = NULL; \
 		ZGMemorySize size = sizeof(type); \
-		id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle; \
+		id <ZGProcessHandle> processHandle = self->objcSelf.process.handle; \
 		if ([processHandle readBytes:&bytes address:memoryAddress size:&size]) \
 		{ \
 			retValue =  Py_BuildValue(typeFormat, *(type *)bytes); \
@@ -346,7 +346,7 @@ static PyObject *VirtualMemory_readPointer(VirtualMemory *self, PyObject *args)
 	if (PyArg_ParseTuple(args, "K:readPointer", &memoryAddress))
 	{
 		void *bytes = NULL;
-		id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle;
+		id <ZGProcessHandle> processHandle = self->objcSelf.process.handle;
 		if ([processHandle readBytes:&bytes address:memoryAddress size:&size])
 		{
 			ZGMemoryAddress pointer = self->is64Bit ? *(ZGMemoryAddress *)bytes : *(ZG32BitMemoryAddress *)bytes;
@@ -369,7 +369,7 @@ static PyObject *VirtualMemory_readBytes(VirtualMemory *self, PyObject *args)
 	if (PyArg_ParseTuple(args, "KK:readBytes", &memoryAddress, &numberOfBytes))
 	{
 		void *bytes = NULL;
-		id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle;
+		id <ZGProcessHandle> processHandle = self->objcSelf.process.handle;
 		if ([processHandle readBytes:&bytes address:memoryAddress size:&numberOfBytes])
 		{
 			retValue = Py_BuildValue("y#", bytes, numberOfBytes);
@@ -390,7 +390,7 @@ static PyObject *VirtualMemory_readString(VirtualMemory *self, PyObject *args, Z
 	char *encoding = defaultEncoding;
 	if (PyArg_ParseTuple(args, [[NSString stringWithFormat:@"K|s:%s", functionName] UTF8String], &memoryAddress, &encoding))
 	{
-		id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle;
+		id <ZGProcessHandle> processHandle = self->objcSelf.process.handle;
 		ZGMemorySize numberOfBytes = [processHandle readStringSizeFromAddress:memoryAddress dataType:variableType oldSize:0 maxSize:0];
 		if (numberOfBytes == 0)
 		{
@@ -464,7 +464,7 @@ static PyObject *VirtualMemory_writePointer(VirtualMemory *self, PyObject *args)
 	ZGMemoryAddress pointer = 0x0;
 	if (PyArg_ParseTuple(args, "KK:writePointer", &memoryAddress, &pointer))
 	{
-		id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle;
+		id <ZGProcessHandle> processHandle = self->objcSelf.process.handle;
 		if (self->is64Bit)
 		{
 			if (![processHandle writeBytes:&pointer address:memoryAddress size:sizeof(pointer)])
@@ -504,7 +504,7 @@ static PyObject *VirtualMemory_writeBytes(VirtualMemory *self, PyObject *args)
 		
 		if (buffer.len > 0)
 		{
-			id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle;
+			id <ZGProcessHandle> processHandle = self->objcSelf.process.handle;
 			if (![processHandle writeBytes:buffer.buf address:memoryAddress size:(ZGMemorySize)buffer.len])
 			{
 				PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
@@ -539,7 +539,7 @@ static PyObject *writeString(VirtualMemory *self, PyObject *args, void *nullBuff
 		
 		if (buffer.len > 0)
 		{
-			id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle;
+			id <ZGProcessHandle> processHandle = self->objcSelf.process.handle;
 			if (![processHandle writeBytes:buffer.buf address:memoryAddress size:(ZGMemorySize)buffer.len] || ![processHandle writeBytes:nullBuffer address:memoryAddress + (ZGMemorySize)buffer.len size:(ZGMemorySize)nullSize])
 			{
 				PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"vm.%s failed to write %lu byte(s) at 0x%llX", functionName, buffer.len, memoryAddress] UTF8String]);
@@ -764,7 +764,7 @@ static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
 static PyObject *VirtualMemory_allocate(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
-	id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle;
+	id <ZGProcessHandle> processHandle = self->objcSelf.process.handle;
 	ZGMemorySize numberOfBytes = NSPageSize(); // sane default
 	[processHandle getPageSize:&numberOfBytes];
 	if (PyArg_ParseTuple(args, "|K:allocate", &numberOfBytes))

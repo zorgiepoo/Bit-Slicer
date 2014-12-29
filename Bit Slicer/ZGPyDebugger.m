@@ -1247,7 +1247,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	id <ZGProcessHandleProtocol> processHandle = self->objcSelf.process.handle;
+	id <ZGProcessHandle> processHandle = self->objcSelf.process.handle;
 	
 	[processHandle suspend];
 	

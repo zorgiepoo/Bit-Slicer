@@ -33,7 +33,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGProcessHandleProtocol.h"
+#import "ZGProcessHandle.h"
 #import "ZGMemoryTypes.h"
 #import <sys/sysctl.h>
 
@@ -52,7 +52,7 @@
 
 - (instancetype)initWithProcess:(ZGProcess *)process name:(NSString *)name;
 
-- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask handle:(id <ZGProcessHandleProtocol>)handle;
+- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask handle:(id <ZGProcessHandle>)handle;
 
 @property (nonatomic, readonly) pid_t processID;
 @property (nonatomic, readonly) ZGMemoryMap processTask;
@@ -61,7 +61,7 @@
 @property (nonatomic, readonly) NSString *internalName;
 @property (nonatomic, readonly) BOOL is64Bit;
 
-@property (nonatomic, readonly) id <ZGProcessHandleProtocol> handle;
+@property (nonatomic, readonly) id <ZGProcessHandle> handle;
 
 @property (nonatomic, readonly) ZGMachBinary *mainMachBinary;
 @property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;

@@ -131,7 +131,7 @@
 			
 			void *bytes = NULL;
 			ZGMemorySize sizeRead = process.pointerSize;
-			id <ZGProcessHandleProtocol> processHandle = process.handle;
+			id <ZGProcessHandle> processHandle = process.handle;
 			if ([processHandle readBytes:&bytes address:memoryAddress size:&sizeRead])
 			{
 				if (sizeRead == process.pointerSize)

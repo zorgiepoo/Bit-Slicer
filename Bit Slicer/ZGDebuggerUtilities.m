@@ -77,7 +77,7 @@
 + (BOOL)writeData:(NSData *)data withProcess:(ZGProcess *)process address:(ZGMemoryAddress)address breakPoints:(NSArray *)breakPoints
 {
 	BOOL success = YES;
-	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	id <ZGProcessHandle> processHandle = process.handle;
 	
 	ZGBreakPoint *targetBreakPoint = nil;
 	for (ZGBreakPoint *breakPoint in breakPoints)
@@ -373,7 +373,7 @@ error:(NSError * __autoreleasing *)error
 		return NO;
 	}
 	
-	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	id <ZGProcessHandle> processHandle = process.handle;
 	
 	[processHandle suspend];
 	

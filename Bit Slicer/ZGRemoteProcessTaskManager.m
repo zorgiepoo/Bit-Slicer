@@ -57,7 +57,7 @@
 	return [[ZGRemoteProcessList alloc] initWithProcessTaskManager:self];
 }
 
-- (id <ZGProcessHandleProtocol>)createProcessHandleWithProcessTask:(ZGMemoryMap)processTask
+- (id <ZGProcessHandle>)createProcessHandleWithProcessTask:(ZGMemoryMap)processTask
 {
 	return [[ZGRemoteProcessHandle alloc] initWithProcessTask:processTask appClient:_appClient];
 }

@@ -77,7 +77,7 @@
 	ZGMemoryAddress allocatedAddress = 0;
 	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
 	
-	id <ZGProcessHandleProtocol> processHandle = process.handle;
+	id <ZGProcessHandle> processHandle = process.handle;
 	
 	[processHandle getPageSize:&numberOfAllocatedBytes];
 	

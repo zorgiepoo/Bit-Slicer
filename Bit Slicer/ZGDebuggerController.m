@@ -465,7 +465,7 @@ enum ZGStepExecution
 	{	
 		BOOL needsToUpdateWindow = NO;
 		
-		id <ZGProcessHandleProtocol> processHandle = self.currentProcess.handle;
+		id <ZGProcessHandle> processHandle = self.currentProcess.handle;
 		for (ZGInstruction *instruction in [self.instructions subarrayWithRange:visibleRowsRange])
 		{
 			void *bytes = NULL;
