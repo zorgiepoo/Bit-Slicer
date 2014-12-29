@@ -34,6 +34,8 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
+#import "ZGFunctionTypes.h"
 
 #define DEFAULT_FLOATING_POINT_EPSILON 0.1
 
@@ -70,6 +72,9 @@ typedef enum
 } ZGProtectionMode;
 
 @property (nonatomic) void *searchValue;
+@property (nonatomic) ZGVariableType dataType;
+@property (nonatomic) ZGVariableQualifier qualifier;
+@property (nonatomic) ZGFunctionType functionType;
 @property (nonatomic) ZGMemorySize dataSize;
 @property (nonatomic) ZGMemorySize dataAlignment;
 @property (nonatomic) ZGMemorySize pointerSize;
@@ -90,6 +95,6 @@ typedef enum
 @property (nonatomic) void *multiplicativeConstant;
 @property (nonatomic) unsigned char *byteArrayFlags;
 
-- (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
+- (id)initWithSearchValue:(void *)searchValue functionType:(ZGFunctionType)functionType dataType:(ZGVariableType)dataType dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
 
 @end

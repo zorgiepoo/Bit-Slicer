@@ -652,7 +652,7 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, c
 	PyObject *retValue = NULL;
 	if (searchData.dataSize > 0)
 	{
-		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, self->objcSelf, ZGByteArray, 0, ZGEquals);
+		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, self->objcSelf);
 		
 		ZGMemorySize numberOfEntries = MIN(MAX_VALUES_SCANNED, results.addressCount);
 		PyObject *pythonResults = PyList_New((Py_ssize_t)numberOfEntries);
@@ -684,6 +684,8 @@ static PyObject *VirtualMemory_scanByteString(VirtualMemory *self, PyObject *arg
 		ZGSearchData *searchData =
 		[[ZGSearchData alloc]
 		 initWithSearchValue:searchValue
+		 functionType:ZGEquals
+		 dataType:ZGByteArray
 		 dataSize:dataSize
 		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, dataSize)
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
@@ -716,6 +718,8 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 		ZGSearchData *searchData =
 		[[ZGSearchData alloc]
 		 initWithSearchValue:data
+		 functionType:ZGEquals
+		 dataType:ZGByteArray
 		 dataSize:(ZGMemorySize)buffer.len
 		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, (ZGMemorySize)buffer.len)
 		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];

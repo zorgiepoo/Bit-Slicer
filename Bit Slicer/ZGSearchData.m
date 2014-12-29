@@ -39,10 +39,10 @@
 
 - (id)init
 {
-	return [self initWithSearchValue:NULL dataSize:0 dataAlignment:1 pointerSize:0];
+	return [self initWithSearchValue:NULL functionType:ZGEquals dataType:ZGInt32 dataSize:0 dataAlignment:1 pointerSize:0];
 }
 
-- (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize
+- (id)initWithSearchValue:(void *)searchValue functionType:(ZGFunctionType)functionType dataType:(ZGVariableType)dataType dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize
 {
 	self = [super init];
 	if (self != nil)
@@ -53,6 +53,8 @@
 		self.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
 		
 		self.searchValue = searchValue;
+		self.functionType = functionType;
+		self.dataType = dataType;
 		self.dataSize = dataSize;
 		self.dataAlignment = dataAlignment;
 		self.pointerSize = pointerSize;

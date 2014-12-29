@@ -496,14 +496,17 @@
 {
 	ZGDocumentWindowController *windowController = self.windowController;
 	ZGVariableType dataType = self.dataType;
+	ZGFunctionType functionType = self.functionType;
+	
+	self.searchData.functionType = functionType;
+	self.searchData.dataType = dataType;
+	self.searchData.qualifier = 	(ZGVariableQualifier)self.documentData.qualifierTag;
 	
 	self.searchData.pointerSize = windowController.currentProcess.pointerSize;
 	
 	// Set default search arguments
 	self.searchData.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
 	self.searchData.rangeValue = NULL;
-	
-	ZGFunctionType functionType = self.functionType;
 	
 	BOOL is64Bit = windowController.currentProcess.is64Bit;
 	
@@ -677,11 +680,11 @@
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		if (!isNarrowing)
 		{
-			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self, dataType, (ZGVariableQualifier)self.documentData.qualifierTag, self.functionType);
+			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self);
 		}
 		else
 		{
-			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self, dataType, (ZGVariableQualifier)self.documentData.qualifierTag, self.functionType, firstSearchResults, (self.searchResults.dataType == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
+			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self, firstSearchResults, (self.searchResults.dataType == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
 		}
 		
 		self.temporarySearchResults.dataType = dataType;

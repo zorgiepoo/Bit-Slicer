@@ -1280,8 +1280,12 @@ ZGSearchResults *ZGSearchForByteArrays(ZGMemoryMap processTask, ZGSearchData *se
 
 #pragma mark Searching for Data
 
-ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType)
+ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate)
 {
+	ZGVariableType dataType = searchData.dataType;
+	ZGVariableQualifier qualifier = searchData.qualifier;
+	ZGFunctionType functionType = searchData.functionType;
+	
 	id retValue = nil;
 	if (((dataType == ZGByteArray && searchData.byteArrayFlags == NULL) || ((dataType == ZGString8 || dataType == ZGString16) && !searchData.shouldIgnoreStringCase)) && !searchData.shouldCompareStoredValues && functionType == ZGEquals)
 	{
@@ -1297,7 +1301,7 @@ ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchDa
 			case ZGInt32:
 			case ZGInt64:
 			case ZGPointer:
-				retValue = ZGSearchForIntegers(processTask, searchData, delegate, dataType, integerQualifier, functionType);
+				retValue = ZGSearchForIntegers(processTask, searchData, delegate, dataType, qualifier, functionType);
 				break;
 			case ZGFloat:
 			case ZGDouble:
@@ -2144,10 +2148,13 @@ ZGSearchResults *ZGNarrowSearchForStrings(ZGMemoryMap processTask, ZGSearchData 
 
 #pragma mark Narrow Search for Data
 
-ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults)
+ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults)
 {
-	id retValue = nil;
+	ZGVariableType dataType = searchData.dataType;
+	ZGVariableQualifier qualifier = searchData.qualifier;
+	ZGFunctionType functionType = searchData.functionType;
 	
+	id retValue = nil;
 	switch (dataType)
 	{
 		case ZGInt8:
@@ -2155,7 +2162,7 @@ ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *se
 		case ZGInt32:
 		case ZGInt64:
 		case ZGPointer:
-			retValue = ZGNarrowSearchForIntegers(processTask, searchData, delegate, dataType, integerQualifier, functionType, firstSearchResults, laterSearchResults);
+			retValue = ZGNarrowSearchForIntegers(processTask, searchData, delegate, dataType, qualifier, functionType, firstSearchResults, laterSearchResults);
 			break;
 		case ZGFloat:
 		case ZGDouble:
