@@ -433,8 +433,8 @@ static ZGBreakPointController *gBreakPointController;
 	BOOL handledInstructionBreakPoint = NO;
 	NSArray *breakPoints = self.breakPoints;
 	
-	ZGBreakPoint *matchingBreakPoint = [breakPoints zgFirstObjectThatMatchesCondition:^(ZGProcess *process) {
-		return (BOOL)(process.processTask == task);
+	ZGBreakPoint *matchingBreakPoint = [breakPoints zgFirstObjectThatMatchesCondition:^(ZGBreakPoint *breakPoint) {
+		return (BOOL)(breakPoint.task == task);
 	}];
 	
 	id <ZGProcessHandle> processHandle = matchingBreakPoint.process.handle;
