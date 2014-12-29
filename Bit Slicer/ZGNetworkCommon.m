@@ -57,7 +57,7 @@ bool ZGNetworkReadData(int socket, void *data, size_t length)
 	while (totalBytesRead < length)
 	{
 		ssize_t bytesRead = recv(socket, buffer + totalBytesRead, length - totalBytesRead, 0);
-		if (bytesRead == -1)
+		if (bytesRead <= 0)
 		{
 			return false;
 		}
