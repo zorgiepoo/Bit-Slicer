@@ -700,6 +700,11 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(id <ZGProcessTaskManager> process
 	{
 		menuItem.state = self.isWatchingActiveProcess;
 		
+		if (![self.processTaskManager isKindOfClass:[ZGLocalProcessTaskManager class]])
+		{
+			return NO;
+		}
+		
 		if (!self.currentProcess.valid)
 		{
 			return NO;
