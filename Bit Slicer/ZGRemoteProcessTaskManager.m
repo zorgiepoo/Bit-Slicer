@@ -71,6 +71,8 @@
 		[self->_appClient sendBytes:&processIdentifier length:sizeof(processIdentifier)];
 		
 		[self->_appClient receiveBytes:&result length:sizeof(bool)];
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	return result;
@@ -88,6 +90,8 @@
 		[self->_appClient receiveBytes:results length:sizeof(results)];
 		
 		task = results[0];
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	BOOL success = (bool)results[1];
@@ -103,6 +107,7 @@
 	dispatch_async(_appClient.dispatchQueue, ^{
 		[self->_appClient sendMessageType:ZGNetworkMessageFreeTaskForProcessIdentifier];
 		[self->_appClient sendBytes:&processIdentifier length:sizeof(processIdentifier)];
+		[self->_appClient sendEndMessage];
 	});
 }
 
@@ -119,6 +124,8 @@
 		[self->_appClient sendBytes:&taskSent length:sizeof(taskSent)];
 		
 		[self->_appClient receiveBytes:&success length:sizeof(success)];
+		
+		[self->_appClient sendEndMessage];
 	});
 	return success;
 }

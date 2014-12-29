@@ -38,6 +38,7 @@
 #import "ZGProcessList.h"
 #import "ZGLocalProcessHandle.h"
 #import "ZGRegion.h"
+#import "ZGUtilities.h"
 
 #define BACKLOG 10
 
@@ -68,7 +69,7 @@
 	int addressInfoError = getaddrinfo(NULL, NETWORK_PORT, &hints, &serverInfoResults);
 	if (addressInfoError != 0)
 	{
-		NSLog(@"getaddrinfo error: %s", gai_strerror(addressInfoError));
+		ZG_LOG(@"getaddrinfo error: %s", gai_strerror(addressInfoError));
 		return;
 	}
 	
@@ -103,7 +104,7 @@
 	
 	if (addressInfo == NULL)
 	{
-		NSLog(@"Failed to find addressInfo to bind to");
+		ZG_LOG(@"Failed to find addressInfo to bind to");
 		return;
 	}
 	
@@ -127,7 +128,7 @@
 				continue;
 			}
 			
-			NSLog(@"Accepted socket");
+			ZG_LOG(@"Accepted socket");
 			
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 				uint16_t nextAvailableObjectID = 0;
@@ -851,10 +852,27 @@
 							break;
 						}
 					}
+					else
+					{
+						ZG_LOG(@"Server: Invalid message type %d..", messageType);
+						break;
+					}
+					
+					uint16_t endMessage = 0;
+					if (![self receiveFromSocket:clientSocket bytes:&endMessage length:sizeof(endMessage)])
+					{
+						break;
+					}
+					
+					if (endMessage != ZGNetworkMessageEndProcedure)
+					{
+						ZG_LOG(@"Server: End message not received after type %u..", messageType);
+						break;
+					}
 				}
 				
 				close(clientSocket);
-				NSLog(@"Closing client socket..");
+				ZG_LOG(@"Closing client socket..");
 			});
 		}
 	});
@@ -862,20 +880,20 @@
 
 - (BOOL)sendToSocket:(int)socket bytes:(const void *)bytes length:(size_t)length
 {
-	BOOL success = (send(socket, bytes, length, 0) > 0);
+	bool success = ZGNetworkWriteData(socket, bytes, length);
 	if (!success)
 	{
-		NSLog(@"server: send failed..");
+		ZG_LOG(@"server: sendToSocket failed..");
 	}
 	return success;
 }
 
 - (BOOL)receiveFromSocket:(int)socket bytes:(void *)bytes length:(size_t)length
 {
-	BOOL success = (recv(socket, bytes, length, 0) > 0);
+	bool success = ZGNetworkReadData(socket, bytes, length);
 	if (!success)
 	{
-		NSLog(@"server: recv failed..");
+		ZG_LOG(@"server: receiveFromSocket failed..");
 	}
 	return success;
 }

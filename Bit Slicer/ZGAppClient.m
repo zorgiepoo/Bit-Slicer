@@ -33,6 +33,7 @@
  */
 
 #import "ZGAppClient.h"
+#import "ZGUtilities.h"
 
 @implementation ZGAppClient
 {
@@ -103,11 +104,10 @@
 	_connected = YES;
 	if (_dispatchQueue == NULL)
 	{
-		NSLog(@"Created queue");
 		_dispatchQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
 	}
 	
-	NSLog(@"Connected to server");
+	ZG_LOG(@"Connected to server");
 }
 
 - (void)disconnect
@@ -121,19 +121,19 @@
 
 - (void)sendBytes:(const void *)bytes length:(size_t)length
 {
-	if (_connected && send(_socket, bytes, length, 0) <= 0)
+	if (_connected && !ZGNetworkWriteData(_socket, bytes, length))
 	{
 		[self disconnect];
-		NSLog(@"Send failed..");
+		ZG_LOG(@"Client: Send failed..");
 	}
 }
 
 - (void)receiveBytes:(void *)bytes length:(size_t)length
 {
-	if (_connected && recv(_socket, bytes, length, 0) <= 0)
+	if (_connected && !ZGNetworkReadData(_socket, bytes, length))
 	{
 		[self disconnect];
-		NSLog(@"Recv failed..");
+		ZG_LOG(@"Client: Recv failed..");
 	}
 }
 
@@ -146,6 +146,11 @@
 {
 	[self sendMessageType:messageType];
 	[self sendBytes:&objectID length:sizeof(objectID)];
+}
+
+- (void)sendEndMessage
+{
+	[self sendMessageType:ZGNetworkMessageEndProcedure];
 }
 
 @end

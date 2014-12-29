@@ -71,6 +71,7 @@
 		7296693F1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 7296693E1A4E2A8C00BB5A3D /* ZGLocalProcessHandle.m */; };
 		729669431A4F101700BB5A3D /* ZGAppServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 729669421A4F101700BB5A3D /* ZGAppServer.m */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
+		72C834591A5132070026501F /* ZGNetworkCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C834581A5132070026501F /* ZGNetworkCommon.m */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
 		72D051AC1960891900EC532A /* Backtrace View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AE1960891900EC532A /* Backtrace View.xib */; };
 		72D051CB1960A41F00EC532A /* Registers View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051C91960A41F00EC532A /* Registers View.xib */; };
@@ -380,6 +381,7 @@
 		72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPrompt.h; path = "Bit Slicer/ZGScriptPrompt.h"; sourceTree = "<group>"; };
 		72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPrompt.m; path = "Bit Slicer/ZGScriptPrompt.m"; sourceTree = "<group>"; };
 		72AA79841A2413B4005A9BD6 /* ZGScriptPromptDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPromptDelegate.h; path = "Bit Slicer/ZGScriptPromptDelegate.h"; sourceTree = "<group>"; };
+		72C834581A5132070026501F /* ZGNetworkCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGNetworkCommon.m; path = "Bit Slicer/ZGNetworkCommon.m"; sourceTree = "<group>"; };
 		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Data Inspector View.xib"; sourceTree = "<group>"; };
 		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Backtrace View.xib"; sourceTree = "<group>"; };
 		72D051CA1960A41F00EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Registers View.xib"; sourceTree = "<group>"; };
@@ -927,6 +929,7 @@
 			isa = PBXGroup;
 			children = (
 				7288B9101A4F349100119085 /* ZGNetworkCommon.h */,
+				72C834581A5132070026501F /* ZGNetworkCommon.m */,
 				729669411A4F101700BB5A3D /* ZGAppServer.h */,
 				729669421A4F101700BB5A3D /* ZGAppServer.m */,
 				7288B90C1A4F33E900119085 /* ZGAppClient.h */,
@@ -1849,6 +1852,7 @@
 				77F1160C17D2EECA009E002A /* ZGPyScript.m in Sources */,
 				777DA25218CE97BE0092DEC9 /* ZGAppTerminationState.m in Sources */,
 				77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */,
+				72C834591A5132070026501F /* ZGNetworkCommon.m in Sources */,
 				7288B9141A4F44C800119085 /* ZGRemoteProcessTaskManager.m in Sources */,
 				7288B9171A4F4C6D00119085 /* ZGLocalProcessList.m in Sources */,
 				7798EED218C40B7F001120FB /* DDExpression.m in Sources */,

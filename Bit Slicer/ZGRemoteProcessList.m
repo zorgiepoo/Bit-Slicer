@@ -56,6 +56,7 @@
 	dispatch_async(_appClient.dispatchQueue, ^{
 		[self->_appClient sendMessageType:ZGNetworkMessageCreateProcessList];
 		[self->_appClient receiveBytes:&self->_processListIdentifier length:sizeof(self->_processListIdentifier)];
+		[self->_appClient sendEndMessage];
 	});
 	
 	return [super initWithProcessTaskManager:processTaskManager];
@@ -78,6 +79,8 @@
 			
 			updatedRunningProcesses = [NSKeyedUnarchiver unarchiveObjectWithData:[NSData dataWithBytesNoCopy:bytes length:numberOfBytesToReceive]];
 		}
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	if (updatedRunningProcesses != nil)

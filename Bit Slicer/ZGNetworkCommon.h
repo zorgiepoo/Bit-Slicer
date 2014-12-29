@@ -77,5 +77,9 @@ typedef  NS_ENUM(uint16_t, ZGNetworkMessageType)
 	ZGNetworkMessageGetMemoryProtection,
 	ZGNetworkMessageSymbolAtAddress,
 	ZGNetworkMessageFindSymbol,
-	ZGNetworkMessageReadStringSizeFromAddress
+	ZGNetworkMessageReadStringSizeFromAddress,
+	ZGNetworkMessageEndProcedure = 0xFFFF
 };
+
+bool ZGNetworkWriteData(int socket, const void *data, size_t length);
+bool ZGNetworkReadData(int socket, void *data, size_t length);

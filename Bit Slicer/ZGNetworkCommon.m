@@ -1,5 +1,5 @@
 /*
- * Created by Mayur Pawashe on 12/27/14.
+ * Created by Mayur Pawashe on 12/29/14.
  *
  * Copyright (c) 2014 zgcoder
  * All rights reserved.
@@ -32,24 +32,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
 #import "ZGNetworkCommon.h"
 
-@interface ZGAppClient : NSObject
+bool ZGNetworkWriteData(int socket, const void *data, size_t length)
+{
+	size_t totalBytesSent = 0;
+	const char *buffer = data;
+	while (totalBytesSent < length)
+	{
+		ssize_t bytesSent = send(socket, buffer + totalBytesSent, length - totalBytesSent, 0);
+		if (bytesSent == -1)
+		{
+			return false;
+		}
+		totalBytesSent += (size_t)bytesSent;
+	}
+	return true;
+}
 
-- (id)initWithHost:(NSString *)host;
-
-- (void)connect;
-
-@property (nonatomic, readonly) BOOL connected;
-
-@property (nonatomic, readonly) dispatch_queue_t dispatchQueue;
-
-- (void)sendBytes:(const void *)bytes length:(size_t)length;
-- (void)receiveBytes:(void *)bytes length:(size_t)length;
-
-- (void)sendMessageType:(ZGNetworkMessageType)messageType;
-- (void)sendMessageType:(ZGNetworkMessageType)messageType andObjectID:(uint16_t)objectID;
-- (void)sendEndMessage;
-
-@end
+bool ZGNetworkReadData(int socket, void *data, size_t length)
+{
+	char *buffer = data;
+	size_t totalBytesRead = 0;
+	while (totalBytesRead < length)
+	{
+		ssize_t bytesRead = recv(socket, buffer + totalBytesRead, length - totalBytesRead, 0);
+		if (bytesRead == -1)
+		{
+			return false;
+		}
+		totalBytesRead += (size_t)bytesRead;
+	}
+	return true;
+}

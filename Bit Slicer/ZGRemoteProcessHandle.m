@@ -55,6 +55,8 @@
 			uint32_t task = processTask;
 			[self->_appClient sendBytes:&task length:sizeof(task)];
 			[self->_appClient receiveBytes:&self->_remoteHandleIdentifier length:sizeof(self->_remoteHandleIdentifier)];
+			
+			[self->_appClient sendEndMessage];
 		});
 	}
 	return self;
@@ -72,6 +74,8 @@
 		
 		uint64_t results[2];
 		[self->_appClient receiveBytes:results length:sizeof(results)];
+		
+		[self->_appClient sendEndMessage];
 		
 		addressReceived = results[0];
 		success = (bool)results[1];
@@ -98,6 +102,8 @@
 		[self->_appClient sendBytes:&sizeSent length:sizeof(sizeSent)];
 		
 		[self->_appClient receiveBytes:&success length:sizeof(success)];
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	return success;
@@ -120,6 +126,7 @@
 			uint64_t sizeReceived = 0;
 			[self->_appClient receiveBytes:&sizeReceived length:sizeof(sizeReceived)];
 			
+			//NSLog(@"Allocating size %llu, size first was %llu", sizeReceived, *size);
 			*size = sizeReceived;
 			*bytes = malloc(sizeReceived);
 			
@@ -128,6 +135,8 @@
 				[self->_appClient receiveBytes:*bytes length:sizeReceived];
 			}
 		}
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	return success;
@@ -151,6 +160,8 @@
 		[self->_appClient sendBytes:bytes length:size];
 		
 		[self->_appClient receiveBytes:&success length:sizeof(success)];
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	return success;
@@ -187,6 +198,8 @@
 		{
 			[self ->_appClient receiveBytes:dyldTaskInfo length:sizeof(*dyldTaskInfo)];
 		}
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	return success;
@@ -203,6 +216,8 @@
 		[self->_appClient sendBytes:&sentProtection length:sizeof(sentProtection)];
 		[self->_appClient sendBytes:addressAndSize length:sizeof(addressAndSize)];
 		[self->_appClient receiveBytes:&success length:sizeof(success)];
+		
+		[self->_appClient sendEndMessage];
 	});
 	return success;
 }
@@ -220,6 +235,8 @@
 			
 			*pageSize = pageSizeReceived;
 		}
+		
+		[self->_appClient sendEndMessage];
 	});
 	return success;
 }
@@ -230,6 +247,7 @@
 	dispatch_sync(_appClient.dispatchQueue, ^{
 		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteHandleIdentifier];
 		[self->_appClient receiveBytes:&success length:sizeof(success)];
+		[self->_appClient sendEndMessage];
 	});
 	return success;
 }
@@ -258,6 +276,8 @@
 			
 			*suspendCount = receivedSuspendCount;
 		}
+		
+		[self->_appClient sendEndMessage];
 	});
 	return success;
 }
@@ -276,6 +296,8 @@
 		[self->_appClient receiveBytes:buffer length:numberOfBytes];
 		
 		regions = [NSKeyedUnarchiver unarchiveObjectWithData:[NSData dataWithBytesNoCopy:buffer length:numberOfBytes]];
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	assert([regions isKindOfClass:[NSArray class]]);
@@ -317,6 +339,8 @@
 		[self->_appClient receiveBytes:buffer length:numberOfBytesToReceive];
 		
 		regions = [NSKeyedUnarchiver unarchiveObjectWithData:[NSData dataWithBytesNoCopy:buffer length:numberOfBytesToReceive]];
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	assert([regions isKindOfClass:[NSArray class]]);
@@ -349,6 +373,8 @@
 			
 			[self->_appClient receiveBytes:regionInfo length:sizeof(*regionInfo)];
 		}
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	return success;
@@ -378,6 +404,8 @@
 			
 			*memoryProtection = protection;
 		}
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	return success;
@@ -416,6 +444,8 @@
 				*relativeOffset = offset;
 			}
 		}
+		
+		[self->_appClient sendEndMessage];
 	});
 	return symbol;
 }
@@ -461,6 +491,8 @@
 			
 			symbolAddressNumber = @(result);
 		}
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	return symbolAddressNumber;
@@ -485,6 +517,8 @@
 		[self->_appClient sendBytes:&maxStringSizeLimitToSend length:sizeof(maxStringSizeLimitToSend)];
 		
 		[self->_appClient receiveBytes:&sizeRead length:sizeof(sizeRead)];
+		
+		[self->_appClient sendEndMessage];
 	});
 	
 	return sizeRead;
