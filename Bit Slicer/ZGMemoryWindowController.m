@@ -550,6 +550,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(id <ZGProcessTaskManager> process
 
 #pragma mark Pausing
 
+// todo: Need to adjust/remove this later
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask
 {
 	integer_t suspendCount;
@@ -568,7 +569,19 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(id <ZGProcessTaskManager> process
 
 - (IBAction)pauseOrUnpauseProcess:(id)__unused sender
 {
-	[[self class] pauseOrUnpauseProcessTask:self.currentProcess.processTask];
+	id <ZGProcessHandle> processHandle = self.currentProcess.handle;
+	integer_t suspendCount = 0;
+	if ([processHandle getSuspendCount:&suspendCount])
+	{
+		if (suspendCount > 0)
+		{
+			[processHandle resume];
+		}
+		else
+		{
+			[processHandle suspend];
+		}
+	}
 }
 
 - (void)setIsWatchingActiveProcess:(BOOL)isWatchingActiveProcess
