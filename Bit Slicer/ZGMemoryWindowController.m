@@ -694,7 +694,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(id <ZGProcessTaskManager> process
 		}
 		
 		integer_t suspendCount;
-		if (!ZGSuspendCount(self.currentProcess.processTask, &suspendCount))
+		if (![self.currentProcess.handle getSuspendCount:&suspendCount])
 		{
 			return NO;
 		}
