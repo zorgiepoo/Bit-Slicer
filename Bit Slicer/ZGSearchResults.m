@@ -84,8 +84,6 @@
 	ZGMemoryAddress endOffset = 0;
 	ZGMemoryAddress accumulator = 0;
 	
-	BOOL shouldStopEnumerating = NO;
-	
 	ZGMemorySize pointerSize = self.pointerSize;
 	
 	for (NSData *resultSet in self.resultSets)
@@ -121,20 +119,15 @@
 				switch (pointerSize)
 				{
 					case sizeof(ZGMemoryAddress):
-						addressCallback(*(ZGMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+						addressCallback(*(ZGMemoryAddress *)(resultBytes + offset));
 						break;
 					default:
-						addressCallback(*(ZG32BitMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+						addressCallback(*(ZG32BitMemoryAddress *)(resultBytes + offset));
 						break;
-				}
-				
-				if (shouldStopEnumerating)
-				{
-					break;
 				}
 			}
 			
-			if (setEndOffset || shouldStopEnumerating)
+			if (setEndOffset)
 			{
 				break;
 			}

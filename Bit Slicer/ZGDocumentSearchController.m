@@ -291,7 +291,7 @@
 	
 	ZGMemorySize dataSize = searchResults.dataSize;
 	BOOL enabled = searchResults.enabled;
-	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress, BOOL * __unused stop) {
+	[searchResults enumerateWithCount:numberOfVariables usingBlock:^(ZGMemoryAddress variableAddress) {
 		ZGVariable *newVariable =
 		[[ZGVariable alloc]
 		 initWithValue:NULL

@@ -48,7 +48,7 @@
 @property (nonatomic) ZGVariableType dataType;
 @property (nonatomic) BOOL enabled;
 
-typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
+typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address);
 
 - (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize;
 

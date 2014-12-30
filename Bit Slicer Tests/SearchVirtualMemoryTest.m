@@ -257,7 +257,7 @@
 	XCTAssertEqual(sizeof(ZGMemoryAddress), 8U);
 	
 	__block NSUInteger addressIndex = 0;
-	[equalExecuteNarrowResults enumerateWithCount:2 usingBlock:^(ZGMemoryAddress resultAddress, __unused BOOL *stop) {
+	[equalExecuteNarrowResults enumerateWithCount:2 usingBlock:^(ZGMemoryAddress resultAddress) {
 		addressesRemoved[addressIndex] = resultAddress;
 		addressIndex++;
 	}];
