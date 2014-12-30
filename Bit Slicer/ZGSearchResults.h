@@ -55,6 +55,5 @@ typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address);
 - (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses;
 
 - (void)enumerateWithCount:(ZGMemorySize)addressCount usingBlock:(zg_enumerate_search_results_t)addressCallback;
-- (void)enumerateUsingBlock:(zg_enumerate_search_results_t)addressCallback;
 
 @end

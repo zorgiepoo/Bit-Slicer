@@ -140,9 +140,4 @@
 	[self enumerateInRange:NSMakeRange(self.addressIndex, addressCount) usingBlock:addressCallback];
 }
 
-- (void)enumerateUsingBlock:(zg_enumerate_search_results_t)addressCallback
-{
-	[self enumerateWithCount:self.addressCount usingBlock:addressCallback];
-}
-
 @end
