@@ -34,6 +34,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
 
 @interface ZGSearchResults : NSObject
 
@@ -44,9 +45,8 @@
 @property (nonatomic, readonly) NSArray *resultSets;
 
 // User data fields
-@property (nonatomic) int dataType;
+@property (nonatomic) ZGVariableType dataType;
 @property (nonatomic) BOOL enabled;
-@property (nonatomic) int byteOrder;
 
 typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
 
