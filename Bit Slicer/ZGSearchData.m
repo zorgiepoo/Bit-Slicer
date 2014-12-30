@@ -117,7 +117,7 @@
 {
 	NSUInteger lengthDecoded = 0;
 	const uint8_t *bytes = [decoder decodeBytesForKey:key returnedLength:&lengthDecoded];
-	if (lengthDecoded == _dataSize)
+	if (lengthDecoded == expectedLength)
 	{
 		*bytesReturned = malloc(expectedLength);
 		memcpy(*bytesReturned, bytes, expectedLength);
