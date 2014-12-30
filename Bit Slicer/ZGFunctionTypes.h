@@ -35,7 +35,7 @@
 #import <Foundation/Foundation.h>
 #import "ZGVariableTypes.h"
 
-typedef enum
+typedef NS_ENUM(uint16_t, ZGFunctionType)
 {
 	// Regular comparisons
 	ZGEquals = 0,
@@ -52,7 +52,7 @@ typedef enum
 	ZGNotEqualsStoredLinear,
 	ZGGreaterThanStoredLinear,
 	ZGLessThanStoredLinear
-} ZGFunctionType;
+};
 
 BOOL ZGIsFunctionTypeStore(ZGFunctionType functionType);
 

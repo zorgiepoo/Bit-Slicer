@@ -50,10 +50,10 @@ typedef NS_ENUM(uint16_t, ZGVariableType)
 	ZGScript
 };
 
-typedef enum
+typedef NS_ENUM(uint16_t, ZGVariableQualifier)
 {
 	ZGSigned = 0,
 	ZGUnsigned
-} ZGVariableQualifier;
+};
 
 #endif

@@ -41,7 +41,7 @@
 
 @class ZGStoredData;
 
-@interface ZGSearchData : NSObject
+@interface ZGSearchData : NSObject <NSSecureCoding>
 {
 @public
 	// All for fast access, for comparison functions
@@ -64,12 +64,12 @@
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
 }
 
-typedef enum
+typedef NS_ENUM(uint16_t, ZGProtectionMode)
 {
 	ZGProtectionAll,
 	ZGProtectionWrite,
 	ZGProtectionExecute
-} ZGProtectionMode;
+};
 
 @property (nonatomic) void *searchValue;
 @property (nonatomic) ZGVariableType dataType;
@@ -96,5 +96,7 @@ typedef enum
 @property (nonatomic) unsigned char *byteArrayFlags;
 
 - (id)initWithSearchValue:(void *)searchValue functionType:(ZGFunctionType)functionType dataType:(ZGVariableType)dataType dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
+
+- (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
 
 @end
