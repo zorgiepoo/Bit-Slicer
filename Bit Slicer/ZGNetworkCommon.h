@@ -58,6 +58,7 @@ typedef  NS_ENUM(uint16_t, ZGNetworkMessageType)
 	ZGNetworkMessageCreateProcessList,
 	ZGNetworkMessageRetreiveProcessList,
 	ZGNetworkMessageCreateProcessHandle,
+	ZGNetworkMessageDeallocProcessHandle,
 	ZGNetworkMessageAllocateMemory,
 	ZGNetworkMessageDeallocateMemory,
 	ZGNetworkMessageReadBytes,
@@ -74,10 +75,19 @@ typedef  NS_ENUM(uint16_t, ZGNetworkMessageType)
 	ZGNetworkMessageSubmapRegions,
 	ZGNetworkMessageSubmapRegionsInRegion,
 	ZGNetworkMessageGetRegionInfo,
+	ZGNetworkMessageGetRegionSubmapInfo,
 	ZGNetworkMessageGetMemoryProtection,
+	ZGNetworkMessageUserTagDescription,
 	ZGNetworkMessageSymbolAtAddress,
 	ZGNetworkMessageFindSymbol,
 	ZGNetworkMessageReadStringSizeFromAddress,
+	ZGNetworkMessageSendSearchData,
+	ZGNetworkMessageReceiveSearchProgress,
+	ZGNetworkMessageSearchResultsRemoveNumberOfAddresses,
+	ZGNetworkMessageSearchResultsEnumerateWithCount,
+	ZGNetworkMessageSearchResultsAddressCount,
+	ZGNetworkMessageSearchResultsPointerSize,
+	ZGNetworkMessageSearchResultsDealloc,
 	ZGNetworkMessageEndProcedure = 0xFFFF
 };
 

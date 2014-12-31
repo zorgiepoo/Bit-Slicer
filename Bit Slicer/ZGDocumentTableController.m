@@ -43,7 +43,7 @@
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
+#import "ZGUserTagDescription.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 #import "ZGDocumentData.h"
@@ -643,7 +643,7 @@
 				}
 			}
 			
-			NSString *userTagDescription = ZGUserTagDescriptionFromAddress(currentProcess.processTask, variable.address, variable.size);
+			NSString *userTagDescription = [currentProcess.handle userTagDescriptionFromAddress:variable.address size:variable.size];
 			
 			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:variable.address fromMachBinaries:[ZGMachBinary machBinariesInProcess:currentProcess]];
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:currentProcess];

@@ -33,7 +33,6 @@
  */
 
 #import "ZGMemoryTypes.h"
-#import "ZGVariableTypes.h"
 
 #ifdef __cplusplus
 extern "C" {

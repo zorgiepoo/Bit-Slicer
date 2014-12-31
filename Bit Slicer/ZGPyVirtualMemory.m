@@ -34,7 +34,6 @@
 
 #import "ZGPyVirtualMemory.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
 #import "ZGMachBinaryInfo.h"
 #import "ZGUtilities.h"
 #import "ZGSearchData.h"
@@ -636,12 +635,12 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject * __unused 
 	return Py_BuildValue("");
 }
 
-- (void)progressWillBegin:(ZGSearchProgress *)searchProgress
+- (void)progressWillBegin:(ZGSearchProgress *)searchProgress searchData:(ZGSearchData *)__unused searchData
 {
 	self.searchProgress = searchProgress;
 }
 
-- (void)progress:(ZGSearchProgress *)__unused searchProgress advancedWithResultSet:(NSData *)__unused resultSet
+- (void)progress:(ZGSearchProgress *)__unused searchProgress advancedWithResultSet:(NSData *)__unused resultSet searchData:(ZGSearchData *)__unused searchData
 {
 }
 
@@ -652,7 +651,7 @@ static PyObject *scanSearchData(VirtualMemory *self, ZGSearchData *searchData, c
 	PyObject *retValue = NULL;
 	if (searchData.dataSize > 0)
 	{
-		ZGSearchResults *results = ZGSearchForData(self->processTask, searchData, self->objcSelf);
+		id <ZGSearchResults> results = ZGSearchForData(self->processTask, searchData, self->objcSelf);
 		
 		ZGMemorySize numberOfEntries = MIN(MAX_VALUES_SCANNED, results.addressCount);
 		PyObject *pythonResults = PyList_New((Py_ssize_t)numberOfEntries);

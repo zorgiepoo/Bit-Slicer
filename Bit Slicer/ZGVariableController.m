@@ -43,7 +43,7 @@
 #import "ZGUtilities.h"
 #import "ZGInstruction.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
+#import "ZGUserTagDescription.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGSearchResults.h"
 #import "ZGDocumentWindowController.h"
@@ -1013,7 +1013,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 + (void)annotateVariables:(NSArray *)variables process:(ZGProcess *)process
 {
-	ZGMemoryMap processTask = process.processTask;
 	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:process];
 	NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
 	
@@ -1039,7 +1038,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
 		{
 			cachedSubmapRegionAddress = variable.address;
-			if (!ZGRegionSubmapInfo(processTask, &cachedSubmapRegionAddress, &cachedSubmapRegionSize, &cachedSubmapInfo))
+			if (![process.handle getSubmapRegionInfo:&cachedSubmapInfo address:&cachedSubmapRegionAddress size:&cachedSubmapRegionSize])
 			{
 				cachedSubmapRegionAddress = 0;
 				cachedSubmapRegionSize = 0;

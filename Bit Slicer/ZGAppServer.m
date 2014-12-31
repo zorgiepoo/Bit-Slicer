@@ -38,13 +38,20 @@
 #import "ZGProcessList.h"
 #import "ZGLocalProcessHandle.h"
 #import "ZGRegion.h"
+#import "ZGSearchData.h"
+#import "ZGSearchProgress.h"
+#import "ZGLocalSearchResults.h"
+#import "ZGUserTagDescription.h"
 #import "ZGUtilities.h"
 
 #define BACKLOG 10
+#define MAX_RESULT_SET_BYTES_SENT 8192U // should be power of 2
 
 @implementation ZGAppServer
 {
 	id <ZGProcessTaskManager> _taskManager;
+	NSMutableDictionary *_searchQueueDictionary;
+	NSMutableDictionary *_searchBytesSentDictionary;
 }
 
 - (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)taskManager
@@ -53,6 +60,8 @@
 	if (self != nil)
 	{
 		_taskManager = taskManager;
+		_searchQueueDictionary = [[NSMutableDictionary alloc] init];
+		_searchBytesSentDictionary = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
@@ -301,6 +310,21 @@
 						}
 						
 						nextAvailableObjectID++;
+					}
+					else if (messageType == ZGNetworkMessageDeallocProcessHandle)
+					{
+						uint16_t objectID = 0;
+						if (![self receiveFromSocket:clientSocket bytes:&objectID length:sizeof(objectID)])
+						{
+							break;
+						}
+						
+						if (![objectDictionary[@(objectID)] isKindOfClass:[ZGLocalProcessHandle class]])
+						{
+							break;
+						}
+						
+						[objectDictionary removeObjectForKey:@(objectID)];
 					}
 					else if (messageType == ZGNetworkMessageAllocateMemory)
 					{
@@ -613,7 +637,7 @@
 							break;
 						}
 					}
-					else if (messageType == ZGNetworkMessageGetRegionInfo)
+					else if (messageType == ZGNetworkMessageGetRegionInfo || messageType == ZGNetworkMessageGetRegionSubmapInfo)
 					{
 						ZGLocalProcessHandle *processHandle = [self receiveFromSocket:clientSocket objectDictionary:objectDictionary expectedClass:[ZGLocalProcessHandle class]];
 						if (processHandle == nil)
@@ -627,11 +651,21 @@
 							break;
 						}
 						
-						ZGMemoryBasicInfo basicInfo = {};
-						bool success = [processHandle getRegionInfo:&basicInfo address:&addressAndSize[0] size:&addressAndSize[1]];
+						size_t infoSize =
+							messageType == ZGNetworkMessageGetRegionInfo ?
+							sizeof(ZGMemoryBasicInfo) :
+							sizeof(ZGMemorySubmapInfo);
+						
+						void *info = malloc(infoSize);
+						
+						bool success =
+							messageType == ZGNetworkMessageGetRegionInfo ?
+							[processHandle getRegionInfo:info address:&addressAndSize[0] size:&addressAndSize[1]] :
+							[processHandle getSubmapRegionInfo:info address:&addressAndSize[0] size:&addressAndSize[1]];
 						
 						if (![self sendToSocket:clientSocket bytes:&success length:sizeof(success)])
 						{
+							free(info);
 							break;
 						}
 						
@@ -639,14 +673,18 @@
 						{
 							if (![self sendToSocket:clientSocket bytes:addressAndSize length:sizeof(addressAndSize)])
 							{
+								free(info);
 								break;
 							}
 							
-							if (![self sendToSocket:clientSocket bytes:&basicInfo length:sizeof(basicInfo)])
+							if (![self sendToSocket:clientSocket bytes:info length:infoSize])
 							{
+								free(info);
 								break;
 							}
 						}
+						
+						free(info);
 					}
 					else if (messageType == ZGNetworkMessageGetMemoryProtection)
 					{
@@ -678,6 +716,44 @@
 							}
 							
 							if (![self sendToSocket:clientSocket bytes:&protection length:sizeof(protection)])
+							{
+								break;
+							}
+						}
+					}
+					else if (messageType == ZGNetworkMessageUserTagDescription)
+					{
+						ZGLocalProcessHandle *processHandle = [self receiveFromSocket:clientSocket objectDictionary:objectDictionary expectedClass:[ZGLocalProcessHandle class]];
+						if (processHandle == nil)
+						{
+							break;
+						}
+						
+						uint64_t addressAndSize[2] = {};
+						if (![self receiveFromSocket:clientSocket bytes:addressAndSize length:sizeof(addressAndSize)])
+						{
+							break;
+						}
+						
+						NSString *userTag = [processHandle userTagDescriptionFromAddress:addressAndSize[0] size:addressAndSize[1]];
+						bool success = (userTag != nil);
+						
+						if (![self sendToSocket:clientSocket bytes:&success length:sizeof(success)])
+						{
+							break;
+						}
+						
+						if (success)
+						{
+							const char *cString = [userTag UTF8String];
+							uint64_t length = strlen(cString);
+							
+							if (![self sendToSocket:clientSocket bytes:&length length:sizeof(length)])
+							{
+								break;
+							}
+							
+							if (![self sendToSocket:clientSocket bytes:cString length:length])
 							{
 								break;
 							}
@@ -852,6 +928,253 @@
 							break;
 						}
 					}
+					else if (messageType == ZGNetworkMessageSendSearchData)
+					{
+						ZGLocalProcessHandle *processHandle = [self receiveFromSocket:clientSocket objectDictionary:objectDictionary expectedClass:[ZGLocalProcessHandle class]];
+						if (processHandle == nil)
+						{
+							break;
+						}
+						
+						uint64_t numberOfSearchDataBytes = 0;
+						if (![self receiveFromSocket:clientSocket bytes:&numberOfSearchDataBytes length:sizeof(numberOfSearchDataBytes)])
+						{
+							break;
+						}
+						
+						void *searchDataBytes = malloc(numberOfSearchDataBytes);
+						if (![self receiveFromSocket:clientSocket bytes:searchDataBytes length:numberOfSearchDataBytes])
+						{
+							break;
+						}
+						
+						ZGSearchData *searchData = [NSKeyedUnarchiver unarchiveObjectWithData:[NSData dataWithBytesNoCopy:searchDataBytes length:numberOfSearchDataBytes]];
+						
+						if (![searchData isKindOfClass:[ZGSearchData class]])
+						{
+							ZG_LOG(@"Server: Expected ZGSearchData class... breaking out");
+							break;
+						}
+						
+						NSNumber *currentObjectID = @(nextAvailableObjectID);
+						objectDictionary[currentObjectID] = searchData;
+						searchData.objectID = nextAvailableObjectID;
+						
+						if (![self sendToSocket:clientSocket bytes:&nextAvailableObjectID length:sizeof(nextAvailableObjectID)])
+						{
+							break;
+						}
+						
+						nextAvailableObjectID++;
+						
+						bool isNarrowing = false;
+						if (![self receiveFromSocket:clientSocket bytes:&isNarrowing length:sizeof(isNarrowing)])
+						{
+							break;
+						}
+						
+						ZGLocalSearchResults <ZGSearchResults> *firstSearchResults = nil;
+						id <ZGSearchResults> laterSearchResults = nil;
+						if (isNarrowing)
+						{
+							uint64_t firstResultsLength = 0;
+							if (![self receiveFromSocket:clientSocket bytes:&firstResultsLength length:sizeof(firstResultsLength)])
+							{
+								break;
+							}
+							
+							void *firstResultsBytes = malloc(firstResultsLength);
+							if (![self receiveFromSocket:clientSocket bytes:firstResultsBytes length:firstResultsLength])
+							{
+								break;
+							}
+							
+							NSArray *resultSets = [NSKeyedUnarchiver unarchiveObjectWithData:[NSData dataWithBytesNoCopy:firstResultsBytes length:firstResultsLength]];
+							
+							assert([resultSets isKindOfClass:[NSArray class]]);
+							for (id object in resultSets)
+							{
+								assert([object isKindOfClass:[NSData class]]);
+							}
+							
+							firstSearchResults = [[ZGLocalSearchResults alloc] initWithResultSets:resultSets dataSize:searchData.dataSize pointerSize:searchData.pointerSize];
+							
+							uint16_t laterSearchResultsIdentifier = 0;
+							if (![self receiveFromSocket:clientSocket bytes:&laterSearchResultsIdentifier length:sizeof(laterSearchResultsIdentifier)])
+							{
+								break;
+							}
+							
+							laterSearchResults = objectDictionary[@(laterSearchResultsIdentifier)];
+							assert([laterSearchResults isKindOfClass:[ZGLocalSearchResults class]]);
+						}
+						
+						dispatch_async(dispatch_get_main_queue(), ^{
+							self->_searchQueueDictionary[currentObjectID] = [NSMutableArray array];
+							self->_searchBytesSentDictionary[currentObjectID] = @0;
+						});
+						
+						dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+							id <ZGSearchResults> searchResults =
+								!isNarrowing ?
+								[processHandle searchData:searchData delegate:self] :
+								[processHandle narrowSearchData:searchData withFirstSearchResults:firstSearchResults laterSearchResults:laterSearchResults delegate:self];
+							
+							dispatch_async(dispatch_get_main_queue(), ^{
+								[self->_searchQueueDictionary[currentObjectID] addObject:searchResults];
+							});
+						});
+					}
+					else if (messageType == ZGNetworkMessageReceiveSearchProgress)
+					{
+						ZGSearchData *searchData = [self receiveFromSocket:clientSocket objectDictionary:objectDictionary expectedClass:[ZGSearchData class]];
+						if (searchData == nil)
+						{
+							break;
+						}
+						
+						NSNumber *searchDataObjectID = @(searchData.objectID);
+						
+						__block NSArray *elementsDequeued = nil;
+						__block id <ZGSearchResults> searchResults = nil;
+						
+						dispatch_sync(dispatch_get_main_queue(), ^{
+							NSMutableArray *queue = self->_searchQueueDictionary[searchDataObjectID];
+							assert(queue != nil);
+							
+							if ([queue.lastObject isKindOfClass:[ZGLocalSearchResults class]])
+							{
+								searchResults = queue.lastObject;
+								elementsDequeued = [queue subarrayWithRange:NSMakeRange(0, queue.count - 1)];
+								
+								[self->_searchQueueDictionary removeObjectForKey:searchDataObjectID];
+								[self->_searchBytesSentDictionary removeObjectForKey:searchDataObjectID];
+							}
+							else
+							{
+								elementsDequeued = [NSArray arrayWithArray:queue];
+							}
+							
+							[queue removeAllObjects];
+						});
+						
+						if (elementsDequeued.count == 0)
+						{
+							uint64_t zero = 0;
+							if (![self sendToSocket:clientSocket bytes:&zero length:sizeof(zero)])
+							{
+								break;
+							}
+						}
+						else
+						{
+							NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:elementsDequeued];
+							uint64_t archivedDataLength = archivedData.length;
+							
+							if (![self sendToSocket:clientSocket bytes:&archivedDataLength length:sizeof(archivedDataLength)])
+							{
+								break;
+							}
+							
+							if (![self sendToSocket:clientSocket bytes:archivedData.bytes length:archivedDataLength])
+							{
+								break;
+							}
+						}
+						
+						bool hasSearchResults = (searchResults != nil);
+						if (![self sendToSocket:clientSocket bytes:&hasSearchResults length:sizeof(hasSearchResults)])
+						{
+							break;
+						}
+						
+						if (hasSearchResults)
+						{
+							objectDictionary[@(nextAvailableObjectID)] = searchResults;
+							
+							if (![self sendToSocket:clientSocket bytes:&nextAvailableObjectID length:sizeof(nextAvailableObjectID)])
+							{
+								break;
+							}
+							
+							nextAvailableObjectID++;
+							
+							[objectDictionary removeObjectForKey:searchDataObjectID];
+						}
+					}
+					else if (messageType == ZGNetworkMessageSearchResultsRemoveNumberOfAddresses)
+					{
+						id <ZGSearchResults> searchResults = [self receiveFromSocket:clientSocket objectDictionary:objectDictionary expectedClass:[ZGLocalSearchResults class]];
+						if (searchResults == nil)
+						{
+							break;
+						}
+						
+						uint64_t numberOfAddresses = 0;
+						if (![self receiveFromSocket:clientSocket bytes:&numberOfAddresses length:sizeof(numberOfAddresses)])
+						{
+							break;
+						}
+						
+						[searchResults removeNumberOfAddresses:numberOfAddresses];
+					}
+					else if (messageType == ZGNetworkMessageSearchResultsEnumerateWithCount)
+					{
+						id <ZGSearchResults> searchResults = [self receiveFromSocket:clientSocket objectDictionary:objectDictionary expectedClass:[ZGLocalSearchResults class]];
+						if (searchResults == nil)
+						{
+							break;
+						}
+						
+						uint64_t addressCount = 0;
+						if (![self receiveFromSocket:clientSocket bytes:&addressCount length:sizeof(addressCount)])
+						{
+							break;
+						}
+						
+						uint64_t *addresses = calloc(addressCount, sizeof(*addresses));
+						__block NSUInteger addressIndex = 0;
+						[searchResults enumerateWithCount:addressCount usingBlock:^(ZGMemoryAddress address) {
+							addresses[addressIndex++] = address;
+						}];
+						
+						if (![self sendToSocket:clientSocket bytes:addresses length:addressCount * sizeof(*addresses)])
+						{
+							break;
+						}
+						
+						free(addresses);
+					}
+					else if (messageType == ZGNetworkMessageSearchResultsAddressCount || messageType == ZGNetworkMessageSearchResultsPointerSize)
+					{
+						id <ZGSearchResults> searchResults = [self receiveFromSocket:clientSocket objectDictionary:objectDictionary expectedClass:[ZGLocalSearchResults class]];
+						if (searchResults == nil)
+						{
+							break;
+						}
+						
+						uint64_t size = (messageType == ZGNetworkMessageSearchResultsAddressCount) ? [searchResults addressCount] : [searchResults pointerSize];
+						
+						if (![self sendToSocket:clientSocket bytes:&size length:sizeof(size)])
+						{
+							break;
+						}
+					}
+					else if (messageType == ZGNetworkMessageSearchResultsDealloc)
+					{
+						uint16_t objectID = 0;
+						if (![self receiveFromSocket:clientSocket bytes:&objectID length:sizeof(objectID)])
+						{
+							break;
+						}
+						
+						if (![objectDictionary[@(objectID)] isKindOfClass:[ZGLocalSearchResults class]])
+						{
+							break;
+						}
+						
+						[objectDictionary removeObjectForKey:@(objectID)];
+					}
 					else
 					{
 						ZG_LOG(@"Server: Invalid message type %d..", messageType);
@@ -913,6 +1236,32 @@
 	}
 	
 	return object;
+}
+
+- (void)progressWillBegin:(ZGSearchProgress *)searchProgress searchData:(ZGSearchData *)searchData
+{
+	[_searchQueueDictionary[@(searchData.objectID)] addObject:[searchProgress copy]];
+}
+
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet searchData:(ZGSearchData *)searchData
+{
+	NSNumber *objectID = @(searchData.objectID);
+	uint64_t numberOfBytesAlreadySent = [_searchBytesSentDictionary[objectID] unsignedLongLongValue];
+	
+	NSData *dataToSend = nil;
+	if (numberOfBytesAlreadySent >= MAX_RESULT_SET_BYTES_SENT)
+	{
+		dataToSend = [NSData data];
+	}
+	else
+	{
+		uint64_t numberOfBytesToSend = MAX_RESULT_SET_BYTES_SENT - numberOfBytesAlreadySent;
+		dataToSend = [resultSet subdataWithRange:NSMakeRange(0, MIN(numberOfBytesToSend, resultSet.length))];
+		
+		_searchBytesSentDictionary[objectID] = @(numberOfBytesAlreadySent + dataToSend.length);
+	}
+	
+	[_searchQueueDictionary[objectID] addObject:@[[searchProgress copy], dataToSend]];
 }
 
 @end

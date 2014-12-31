@@ -34,9 +34,13 @@
 
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
+#import "ZGSearchResults.h"
+#import "ZGSearchProgressDelegate.h"
 
 @class ZGProcess;
 @class ZGRegion;
+@class ZGSearchData;
+@class ZGLocalSearchResults;
 
 @protocol ZGProcessHandle <NSObject>
 
@@ -65,11 +69,17 @@
 - (NSArray *)submapRegionsInRegion:(ZGRegion *)region;
 
 - (BOOL)getRegionInfo:(ZGMemoryBasicInfo *)regionInfo address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size;
+- (BOOL)getSubmapRegionInfo:(ZGMemorySubmapInfo *)submapRegionInfo address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size;
 - (BOOL)getMemoryProtection:(ZGMemoryProtection *)memoryProtection address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size;
+
+- (NSString *)userTagDescriptionFromAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 
 - (NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(ZGMemoryAddress *)relativeOffset;
 - (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress;
 
 - (ZGMemorySize)readStringSizeFromAddress:(ZGMemoryAddress)address dataType:(ZGVariableType)dataType oldSize:(ZGMemorySize)oldSize maxSize:(ZGMemorySize)maxStringSizeLimit;
+
+- (id <ZGSearchResults>)searchData:(ZGSearchData *)searchData delegate:(id <ZGSearchProgressDelegate>)delegate;
+- (id <ZGSearchResults>)narrowSearchData:(ZGSearchData *)searchData withFirstSearchResults:(ZGLocalSearchResults <ZGSearchResults> *)firstSearchResults laterSearchResults:(id <ZGSearchResults>)laterSearchResults delegate:(id <ZGSearchProgressDelegate>)delegate;
 
 @end

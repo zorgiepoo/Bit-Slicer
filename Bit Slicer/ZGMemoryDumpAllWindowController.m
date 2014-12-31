@@ -138,13 +138,13 @@
 	[self.cancelButton setEnabled:NO];
 }
 
-- (void)progressWillBegin:(ZGSearchProgress *)searchProgress
+- (void)progressWillBegin:(ZGSearchProgress *)searchProgress searchData:(ZGSearchData *)__unused searchData
 {
 	self.searchProgress = searchProgress;
 	self.progressIndicator.maxValue = self.searchProgress.maxProgress;
 }
 
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)__unused resultSet
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)__unused resultSet searchData:(ZGSearchData *)__unused searchData
 {
 	self.progressIndicator.doubleValue = searchProgress.progress;
 }

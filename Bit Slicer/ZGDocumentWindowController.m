@@ -816,7 +816,7 @@
 
 #pragma mark Useful Methods
 
-- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults
+- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(id <ZGSearchResults>)searchResults
 {
 	if (self.undoManager.isUndoing || self.undoManager.isRedoing)
 	{

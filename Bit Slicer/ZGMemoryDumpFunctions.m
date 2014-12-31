@@ -72,7 +72,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGProcess *process, id <ZGSea
 	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryDumping maxProgress:regions.count];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[delegate progressWillBegin:searchProgress];
+		[delegate progressWillBegin:searchProgress searchData:nil];
 	});
 	
 	for (ZGRegion *region in regions)
@@ -106,7 +106,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGProcess *process, id <ZGSea
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			searchProgress.progress++;
-			[delegate progress:searchProgress advancedWithResultSet:nil];
+			[delegate progress:searchProgress advancedWithResultSet:nil searchData:nil];
 		});
   	    
 		if (searchProgress.shouldCancelSearch)

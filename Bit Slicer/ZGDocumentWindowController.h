@@ -36,6 +36,7 @@
 #import "ZGSearchFunctions.h"
 #import "AGScopeBar.h"
 #import "ZGMemoryWindowController.h"
+#import "ZGSearchResults.h"
 
 #define ZGLocalizableSearchDocumentString(string) NSLocalizedStringFromTable(string, @"[Code] Search Document", nil)
 
@@ -45,7 +46,6 @@
 @class ZGVariableController;
 @class ZGDocumentSearchController;
 @class ZGProcess;
-@class ZGSearchResults;
 @class ZGRunningProcess;
 @class ZGDocumentData;
 @class ZGSearchData;
@@ -105,6 +105,6 @@
 - (void)deselectSearchField;
 - (void)insertStoredValueToken;
 
-- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;
+- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(id <ZGSearchResults>)searchResults;
 
 @end

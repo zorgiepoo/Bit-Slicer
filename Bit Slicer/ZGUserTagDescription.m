@@ -32,7 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGVirtualMemoryHelpers.h"
+#import "ZGUserTagDescription.h"
 #import "ZGVirtualMemory.h"
 
 #import <mach/mach_error.h>

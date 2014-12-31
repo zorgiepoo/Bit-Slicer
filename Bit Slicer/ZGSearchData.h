@@ -95,6 +95,8 @@ typedef NS_ENUM(uint16_t, ZGProtectionMode)
 @property (nonatomic) void *multiplicativeConstant;
 @property (nonatomic) unsigned char *byteArrayFlags;
 
+@property (nonatomic) uint16_t objectID;
+
 - (id)initWithSearchValue:(void *)searchValue functionType:(ZGFunctionType)functionType dataType:(ZGVariableType)dataType dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
 
 - (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;

@@ -34,8 +34,9 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGProcessTaskManager.h"
+#import "ZGSearchProgressDelegate.h"
 
-@interface ZGAppServer : NSObject
+@interface ZGAppServer : NSObject <ZGSearchProgressDelegate>
 
 - (id)initWithProcessTaskManager:(id <ZGProcessTaskManager>)taskManager;
 

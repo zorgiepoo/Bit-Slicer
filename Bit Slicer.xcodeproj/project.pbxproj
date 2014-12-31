@@ -17,6 +17,7 @@
 		7231440519C57A5300FBE342 /* ZGRegistersState.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440419C57A5300FBE342 /* ZGRegistersState.m */; };
 		7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440719C607C700FBE342 /* ZGWatchVariable.m */; };
 		7231440E19C6230F00FBE342 /* [Code] Watch Variable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 7231440C19C6230F00FBE342 /* [Code] Watch Variable.stringsdict */; };
+		723CEB631A52783600CBC6AB /* ZGRemoteSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 723CEB621A52783600CBC6AB /* ZGRemoteSearchResults.m */; };
 		72431BA919BFFB6100418893 /* ZGUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162E17D2EF5A009E002A /* ZGUtilities.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
@@ -168,7 +169,7 @@
 		77E133FE19312AD500B5B799 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
 		77E1340019312AFE00B5B799 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		77E1340119312B1700B5B799 /* ZGSearchData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160E17D2EED6009E002A /* ZGSearchData.m */; };
-		77E1340219312B1F00B5B799 /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGSearchResults.m */; };
+		77E1340219312B1F00B5B799 /* ZGLocalSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGLocalSearchResults.m */; };
 		77E1340319312B2800B5B799 /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161117D2EEE1009E002A /* ZGSearchProgress.m */; };
 		77E1340419312B2E00B5B799 /* ZGSearchFunctions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */; };
 		77E2BBAE18FD88A700E41FA0 /* LinearExpressionParsingTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E2BBAD18FD88A700E41FA0 /* LinearExpressionParsingTest.m */; };
@@ -202,7 +203,7 @@
 		77E2BBD118FD8FF600E41FA0 /* ZGMachBinaryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */; };
 		77E2BBD218FD900300E41FA0 /* ZGVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162B17D2EF50009E002A /* ZGVariable.m */; };
 		77E2BBD318FD900C00E41FA0 /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162717D2EF3A009E002A /* ZGProcess.m */; };
-		77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */; };
+		77E2BBD418FD901600E41FA0 /* ZGUserTagDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGUserTagDescription.m */; };
 		77E2BBD518FD904400E41FA0 /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
 		77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162417D2EF31009E002A /* ZGRegion.m */; };
 		77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */; };
@@ -235,10 +236,10 @@
 		77F1160C17D2EECA009E002A /* ZGPyScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160B17D2EECA009E002A /* ZGPyScript.m */; };
 		77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160E17D2EED6009E002A /* ZGSearchData.m */; };
 		77F1161217D2EEE1009E002A /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161117D2EEE1009E002A /* ZGSearchProgress.m */; };
-		77F1161517D2EEEC009E002A /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGSearchResults.m */; };
+		77F1161517D2EEEC009E002A /* ZGLocalSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGLocalSearchResults.m */; };
 		77F1161817D2EEF6009E002A /* ZGSearchFunctions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */; };
 		77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161D17D2EF14009E002A /* ZGVirtualMemory.c */; };
-		77F1162217D2EF28009E002A /* ZGVirtualMemoryHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */; };
+		77F1162217D2EF28009E002A /* ZGUserTagDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGUserTagDescription.m */; };
 		77F1162517D2EF31009E002A /* ZGRegion.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162417D2EF31009E002A /* ZGRegion.m */; };
 		77F1162817D2EF3A009E002A /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162717D2EF3A009E002A /* ZGProcess.m */; };
 		77F1162C17D2EF50009E002A /* ZGVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162B17D2EF50009E002A /* ZGVariable.m */; };
@@ -314,6 +315,9 @@
 		7231440619C607C700FBE342 /* ZGWatchVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGWatchVariable.h; path = "Bit Slicer/ZGWatchVariable.h"; sourceTree = "<group>"; };
 		7231440719C607C700FBE342 /* ZGWatchVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGWatchVariable.m; path = "Bit Slicer/ZGWatchVariable.m"; sourceTree = "<group>"; };
 		7231440D19C6230F00FBE342 /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Watch Variable.stringsdict"; sourceTree = "<group>"; };
+		723CEB601A5251C400CBC6AB /* ZGSearchResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchResults.h; path = "Bit Slicer/ZGSearchResults.h"; sourceTree = "<group>"; };
+		723CEB611A52783600CBC6AB /* ZGRemoteSearchResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRemoteSearchResults.h; path = "Bit Slicer/ZGRemoteSearchResults.h"; sourceTree = "<group>"; };
+		723CEB621A52783600CBC6AB /* ZGRemoteSearchResults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRemoteSearchResults.m; path = "Bit Slicer/ZGRemoteSearchResults.m"; sourceTree = "<group>"; };
 		724A9F0419A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Data Inspector.strings"; sourceTree = "<group>"; };
 		724A9F0619A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger Registers.strings"; sourceTree = "<group>"; };
 		724A9F0819A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger.strings"; sourceTree = "<group>"; };
@@ -727,15 +731,15 @@
 		77F1160E17D2EED6009E002A /* ZGSearchData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchData.m; path = "Bit Slicer/ZGSearchData.m"; sourceTree = "<group>"; };
 		77F1161017D2EEE1009E002A /* ZGSearchProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchProgress.h; path = "Bit Slicer/ZGSearchProgress.h"; sourceTree = "<group>"; };
 		77F1161117D2EEE1009E002A /* ZGSearchProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchProgress.m; path = "Bit Slicer/ZGSearchProgress.m"; sourceTree = "<group>"; };
-		77F1161317D2EEEC009E002A /* ZGSearchResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchResults.h; path = "Bit Slicer/ZGSearchResults.h"; sourceTree = "<group>"; };
-		77F1161417D2EEEC009E002A /* ZGSearchResults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchResults.m; path = "Bit Slicer/ZGSearchResults.m"; sourceTree = "<group>"; };
+		77F1161317D2EEEC009E002A /* ZGLocalSearchResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLocalSearchResults.h; path = "Bit Slicer/ZGLocalSearchResults.h"; sourceTree = "<group>"; };
+		77F1161417D2EEEC009E002A /* ZGLocalSearchResults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLocalSearchResults.m; path = "Bit Slicer/ZGLocalSearchResults.m"; sourceTree = "<group>"; };
 		77F1161617D2EEF6009E002A /* ZGSearchFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchFunctions.h; path = "Bit Slicer/ZGSearchFunctions.h"; sourceTree = "<group>"; };
 		77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ZGSearchFunctions.mm; path = "Bit Slicer/ZGSearchFunctions.mm"; sourceTree = "<group>"; };
 		77F1161C17D2EF09009E002A /* ZGMemoryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryTypes.h; path = "Bit Slicer/ZGMemoryTypes.h"; sourceTree = "<group>"; };
 		77F1161D17D2EF14009E002A /* ZGVirtualMemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ZGVirtualMemory.c; path = "Bit Slicer/ZGVirtualMemory.c"; sourceTree = "<group>"; };
 		77F1161E17D2EF14009E002A /* ZGVirtualMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGVirtualMemory.h; path = "Bit Slicer/ZGVirtualMemory.h"; sourceTree = "<group>"; };
-		77F1162017D2EF28009E002A /* ZGVirtualMemoryHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGVirtualMemoryHelpers.h; path = "Bit Slicer/ZGVirtualMemoryHelpers.h"; sourceTree = "<group>"; };
-		77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGVirtualMemoryHelpers.m; path = "Bit Slicer/ZGVirtualMemoryHelpers.m"; sourceTree = "<group>"; };
+		77F1162017D2EF28009E002A /* ZGUserTagDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGUserTagDescription.h; path = "Bit Slicer/ZGUserTagDescription.h"; sourceTree = "<group>"; };
+		77F1162117D2EF28009E002A /* ZGUserTagDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGUserTagDescription.m; path = "Bit Slicer/ZGUserTagDescription.m"; sourceTree = "<group>"; };
 		77F1162317D2EF31009E002A /* ZGRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegion.h; path = "Bit Slicer/ZGRegion.h"; sourceTree = "<group>"; };
 		77F1162417D2EF31009E002A /* ZGRegion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegion.m; path = "Bit Slicer/ZGRegion.m"; sourceTree = "<group>"; };
 		77F1162617D2EF3A009E002A /* ZGProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGProcess.h; path = "Bit Slicer/ZGProcess.h"; sourceTree = "<group>"; };
@@ -1468,8 +1472,11 @@
 				772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */,
 				77F1161017D2EEE1009E002A /* ZGSearchProgress.h */,
 				77F1161117D2EEE1009E002A /* ZGSearchProgress.m */,
-				77F1161317D2EEEC009E002A /* ZGSearchResults.h */,
-				77F1161417D2EEEC009E002A /* ZGSearchResults.m */,
+				723CEB601A5251C400CBC6AB /* ZGSearchResults.h */,
+				77F1161317D2EEEC009E002A /* ZGLocalSearchResults.h */,
+				77F1161417D2EEEC009E002A /* ZGLocalSearchResults.m */,
+				723CEB611A52783600CBC6AB /* ZGRemoteSearchResults.h */,
+				723CEB621A52783600CBC6AB /* ZGRemoteSearchResults.m */,
 				77F1161617D2EEF6009E002A /* ZGSearchFunctions.h */,
 				77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */,
 				7728211E189B854D0044E4BC /* ZGFunctionTypes.h */,
@@ -1495,8 +1502,8 @@
 				77F1161C17D2EF09009E002A /* ZGMemoryTypes.h */,
 				77F1161E17D2EF14009E002A /* ZGVirtualMemory.h */,
 				77F1161D17D2EF14009E002A /* ZGVirtualMemory.c */,
-				77F1162017D2EF28009E002A /* ZGVirtualMemoryHelpers.h */,
-				77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */,
+				77F1162017D2EF28009E002A /* ZGUserTagDescription.h */,
+				77F1162117D2EF28009E002A /* ZGUserTagDescription.m */,
 				7288B9111A4F417700119085 /* ZGProcessTaskManager.h */,
 				77282124189EA4520044E4BC /* ZGLocalProcessTaskManager.h */,
 				77282125189EA4520044E4BC /* ZGLocalProcessTaskManager.m */,
@@ -1742,11 +1749,11 @@
 				77E1340419312B2E00B5B799 /* ZGSearchFunctions.mm in Sources */,
 				77E1340319312B2800B5B799 /* ZGSearchProgress.m in Sources */,
 				722CAAE119BBB5A1009C6AAE /* SearchVirtualMemoryTest.m in Sources */,
-				77E1340219312B1F00B5B799 /* ZGSearchResults.m in Sources */,
+				77E1340219312B1F00B5B799 /* ZGLocalSearchResults.m in Sources */,
 				77E1340119312B1700B5B799 /* ZGSearchData.m in Sources */,
 				77A5B03119189DA5002BEC69 /* NSArrayAdditions.m in Sources */,
 				77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */,
-				77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryHelpers.m in Sources */,
+				77E2BBD418FD901600E41FA0 /* ZGUserTagDescription.m in Sources */,
 				77E2BBD318FD900C00E41FA0 /* ZGProcess.m in Sources */,
 				77E2BBD218FD900300E41FA0 /* ZGVariable.m in Sources */,
 				77E2BBD118FD8FF600E41FA0 /* ZGMachBinaryInfo.m in Sources */,
@@ -1836,6 +1843,7 @@
 				7288B90E1A4F33E900119085 /* ZGAppClient.m in Sources */,
 				7798EEC518C40B7F001120FB /* _DDDecimalFunctions.m in Sources */,
 				77CECE1718B8861C006D45E9 /* ZGRegistersViewController.m in Sources */,
+				723CEB631A52783600CBC6AB /* ZGRemoteSearchResults.m in Sources */,
 				77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */,
 				779D56CA18F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.m in Sources */,
 				779C6CC318E7309B0076D647 /* ZGDebuggerUtilities.m in Sources */,
@@ -1859,14 +1867,14 @@
 				7798EECE18C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m in Sources */,
 				77282120189B854D0044E4BC /* ZGFunctionTypes.m in Sources */,
 				77F1161217D2EEE1009E002A /* ZGSearchProgress.m in Sources */,
-				77F1161517D2EEEC009E002A /* ZGSearchResults.m in Sources */,
+				77F1161517D2EEEC009E002A /* ZGLocalSearchResults.m in Sources */,
 				7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */,
 				7735B05518DAB3E8000371AA /* ZGMemoryNavigationWindowController.m in Sources */,
 				771A3F4518CC0B0900D19676 /* ZGDocumentController.m in Sources */,
 				77F1161817D2EEF6009E002A /* ZGSearchFunctions.mm in Sources */,
 				770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */,
 				77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */,
-				77F1162217D2EF28009E002A /* ZGVirtualMemoryHelpers.m in Sources */,
+				77F1162217D2EF28009E002A /* ZGUserTagDescription.m in Sources */,
 				77F1162517D2EF31009E002A /* ZGRegion.m in Sources */,
 				770FABB71849160200C176B7 /* ZGEditSizeWindowController.m in Sources */,
 				779D56C518F1284200FD5408 /* ZGMemoryDumpRangeWindowController.m in Sources */,

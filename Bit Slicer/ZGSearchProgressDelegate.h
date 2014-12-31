@@ -35,10 +35,11 @@
 #import <Foundation/Foundation.h>
 
 @class ZGSearchProgress;
+@class ZGSearchData;
 
 @protocol ZGSearchProgressDelegate <NSObject>
 
-- (void)progressWillBegin:(ZGSearchProgress *)searchProgress;
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet;
+- (void)progressWillBegin:(ZGSearchProgress *)searchProgress searchData:(ZGSearchData *)searchData;
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet searchData:(ZGSearchData *)searchData;
 
 @end

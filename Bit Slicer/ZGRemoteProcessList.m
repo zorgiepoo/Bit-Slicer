@@ -53,7 +53,7 @@
 {
 	_appClient = [(ZGRemoteProcessTaskManager *)processTaskManager appClient];
 	
-	dispatch_async(_appClient.dispatchQueue, ^{
+	dispatch_sync(_appClient.dispatchQueue, ^{
 		[self->_appClient sendMessageType:ZGNetworkMessageCreateProcessList];
 		[self->_appClient receiveBytes:&self->_processListIdentifier length:sizeof(self->_processListIdentifier)];
 		[self->_appClient sendEndMessage];

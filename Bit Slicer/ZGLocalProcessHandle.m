@@ -37,6 +37,9 @@
 #import <mach/mach_vm.h>
 #import "ZGRegion.h"
 #import "CoreSymbolication.h"
+#import "ZGSearchFunctions.h"
+#import "ZGLocalSearchResults.h"
+#import "ZGUserTagDescription.h"
 
 @interface ZGLocalProcessHandle ()
 
@@ -155,9 +158,19 @@
 	return ZGRegionInfo(_processTask, address, size, regionInfo);
 }
 
+- (BOOL)getSubmapRegionInfo:(ZGMemorySubmapInfo *)submapRegionInfo address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size
+{
+	return ZGRegionSubmapInfo(_processTask, address, size, submapRegionInfo);
+}
+
 - (BOOL)getMemoryProtection:(ZGMemoryProtection *)memoryProtection address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size
 {
 	return ZGMemoryProtectionInRegion(_processTask, address, size, memoryProtection);
+}
+
+- (NSString *)userTagDescriptionFromAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size
+{
+	return ZGUserTagDescriptionFromAddress(_processTask, address, size);
 }
 
 - (CSSymbolicatorRef)symbolicator
@@ -307,6 +320,16 @@
 	}
 	
 	return totalSize;
+}
+
+- (id <ZGSearchResults>)searchData:(ZGSearchData *)searchData delegate:(id <ZGSearchProgressDelegate>)delegate
+{
+	return ZGSearchForData(_processTask, searchData, delegate);
+}
+
+- (id <ZGSearchResults>)narrowSearchData:(ZGSearchData *)searchData withFirstSearchResults:(ZGLocalSearchResults <ZGSearchResults> *)firstSearchResults laterSearchResults:(id <ZGSearchResults>)laterSearchResults delegate:(id <ZGSearchProgressDelegate>)delegate
+{
+	return ZGNarrowSearchForData(_processTask, searchData, delegate, firstSearchResults, laterSearchResults);
 }
 
 @end

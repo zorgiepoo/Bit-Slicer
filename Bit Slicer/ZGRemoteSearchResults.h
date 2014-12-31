@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 7/21/12.
+ * Created by Mayur Pawashe on 12/30/14.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,46 +33,14 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGSearchProgressDelegate.h"
-#import "ZGVariableTypes.h"
-#import "ZGSearchFunctions.h"
 #import "ZGSearchResults.h"
 
-#define USER_INTERFACE_UPDATE_TIME_INTERVAL	 0.33
+@class ZGAppClient;
 
-@class ZGSearchData;
-@class ZGSearchProgress;
-@class ZGSearchResults;
-@class ZGDocumentWindowController;
-@class ZGDocumentData;
+@interface ZGRemoteSearchResults : NSObject <ZGSearchResults>
 
-#define MAX_NUMBER_OF_VARIABLES_TO_FETCH ((NSUInteger)1000)
+- (id)initWithAppClient:(ZGAppClient *)appClient remoteIdentifier:(uint16_t)remoteIdentifier dataSize:(ZGMemorySize)dataSize;
 
-@interface ZGDocumentSearchController : NSObject <ZGSearchProgressDelegate>
-
-@property (assign, nonatomic) ZGDocumentData *documentData;
-@property (assign, nonatomic) ZGSearchData *searchData;
-@property (strong, nonatomic) id <ZGSearchResults> searchResults;
-@property (readonly, strong, nonatomic) ZGSearchProgress *searchProgress;
-
-+ (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression isLinearlyExpressed:(BOOL *)isLinearlyExpressedReference;
-+ (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression;
-
-- (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
-
-- (BOOL)canStartTask;
-- (BOOL)canCancelTask;
-- (void)cancelTask;
-- (void)prepareTask;
-- (void)resumeFromTaskAndMakeSearchFieldFirstResponder:(BOOL)shouldMakeSearchFieldFirstResponder;
-- (void)resumeFromTask;
-
-- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables;
-- (void)fetchVariablesFromResults;
-
-- (void)searchVariablesWithString:(NSString *)searchStringValue withDataType:(ZGVariableType)dataType functionType:(ZGFunctionType)functionType allowsNarrowing:(BOOL)allowsNarrowing;
-- (void)storeAllValues;
-
-- (void)cleanUp;
+@property (nonatomic, readonly) uint16_t remoteIdentifier;
 
 @end

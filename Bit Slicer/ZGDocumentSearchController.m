@@ -37,11 +37,11 @@
 #import "ZGProcess.h"
 #import "ZGDocumentTableController.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
 #import "ZGRegion.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
+#import "ZGLocalSearchResults.h"
 #import "ZGStoredData.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
@@ -58,7 +58,7 @@
 
 @property (nonatomic, assign) ZGDocumentWindowController *windowController;
 @property (nonatomic) ZGSearchProgress *searchProgress;
-@property (nonatomic) ZGSearchResults *temporarySearchResults;
+@property (nonatomic) id <ZGSearchResults> temporarySearchResults;
 @property (nonatomic) ZGStoredData *tempSavedData;
 @property (atomic) BOOL isBusy;
 
@@ -241,15 +241,17 @@
 	[windowController setStatusString:[self numberOfVariablesFoundDescriptionFromProgress:searchProgress]];
 }
 
-- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet
+- (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet searchData:(ZGSearchData *)searchData
 {
+	self.searchProgress = searchProgress;
+	
 	if (!self.searchProgress.shouldCancelSearch)
 	{
 		NSUInteger currentVariableCount = self.documentData.variables.count;
 		
 		if (currentVariableCount < MAX_NUMBER_OF_VARIABLES_TO_FETCH && resultSet.length > 0)
 		{
-			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
+			id <ZGSearchResults> searchResults = [[ZGLocalSearchResults alloc] initWithResultSets:@[resultSet] dataSize:searchData.dataSize pointerSize:searchData.pointerSize];
 			searchResults.dataType = self.dataType;
 			searchResults.enabled = self.allowsNarrowing;
 			[self fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH - currentVariableCount fromResults:searchResults];
@@ -260,17 +262,17 @@
 	}
 }
 
-- (void)progressWillBegin:(ZGSearchProgress *)searchProgress
+- (void)progressWillBegin:(ZGSearchProgress *)searchProgress searchData:(ZGSearchData *)__unused searchData
 {
+	self.searchProgress = searchProgress;
+	
 	self.windowController.progressIndicator.maxValue = (double)searchProgress.maxProgress;
 	[self updateProgressBarFromProgress:searchProgress];
-	
-	self.searchProgress = searchProgress;
 }
 
 #pragma mark Searching
 
-- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables fromResults:(ZGSearchResults *)searchResults
+- (void)fetchNumberOfVariables:(NSUInteger)numberOfVariables fromResults:(id <ZGSearchResults>)searchResults
 {
 	if (searchResults.addressCount == 0) return;
 	
@@ -657,7 +659,7 @@
 {
 	ZGProcess *currentProcess = self.windowController.currentProcess;
 	ZGVariableType dataType = self.dataType;
-	ZGSearchResults *firstSearchResults = nil;
+	id <ZGSearchResults> firstSearchResults = nil;
 	if (isNarrowing)
 	{
 		NSMutableData *firstResultSets = [NSMutableData data];
@@ -674,17 +676,22 @@
 				[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
 			}
 		}
-		firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
+		firstSearchResults = [[ZGLocalSearchResults alloc] initWithResultSets:@[firstResultSets] dataSize:self.searchData.dataSize pointerSize:self.searchData.pointerSize];
 	}
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		if (!isNarrowing)
 		{
-			self.temporarySearchResults = ZGSearchForData(currentProcess.processTask, self.searchData, self);
+			self.temporarySearchResults = [currentProcess.handle searchData:self.searchData delegate:self];
 		}
 		else
 		{
-			self.temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self.searchData, self, firstSearchResults, (self.searchResults.dataType == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ? self.searchResults : nil);
+			id <ZGSearchResults> laterSearchResults =
+				(self.searchResults.dataType == dataType && currentProcess.pointerSize == self.searchResults.pointerSize) ?
+				self.searchResults :
+				nil;
+			
+			self.temporarySearchResults = [currentProcess.handle narrowSearchData:self.searchData withFirstSearchResults:firstSearchResults laterSearchResults:laterSearchResults delegate:self];
 		}
 		
 		self.temporarySearchResults.dataType = dataType;

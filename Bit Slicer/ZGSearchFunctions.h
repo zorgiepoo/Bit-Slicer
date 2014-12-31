@@ -37,17 +37,18 @@
 #import "ZGVariableTypes.h"
 #import "ZGSearchProgressDelegate.h"
 #import "ZGFunctionTypes.h"
+#import "ZGSearchResults.h"
 
 @class ZGSearchData;
-@class ZGSearchResults;
+@class ZGLocalSearchResults;
 
 #ifdef __cplusplus
 extern "C"
 #endif
-ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate);
+ZGLocalSearchResults <ZGSearchResults> *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate);
 
 #ifdef __cplusplus
 extern "C"
 #endif
-ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults);
+ZGLocalSearchResults <ZGSearchResults> *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGLocalSearchResults *firstSearchResults, ZGLocalSearchResults *laterSearchResults);
 

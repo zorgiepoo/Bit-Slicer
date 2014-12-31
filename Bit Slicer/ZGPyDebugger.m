@@ -39,7 +39,6 @@
 #import "ZGVariable.h"
 #import "ZGDisassemblerObject.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
 #import "ZGProcess.h"
 #import "ZGScriptManager.h"
 #import "ZGBreakPointController.h"

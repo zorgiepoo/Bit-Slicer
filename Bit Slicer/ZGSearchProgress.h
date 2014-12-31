@@ -35,14 +35,14 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
-@interface ZGSearchProgress : NSObject
+@interface ZGSearchProgress : NSObject <NSSecureCoding, NSCopying>
 
-typedef enum
+typedef NS_ENUM(uint16_t, ZGSearchProgressType)
 {
 	ZGSearchProgressMemoryScanning,
 	ZGSearchProgressMemoryStoring,
 	ZGSearchProgressMemoryDumping
-} ZGSearchProgressType;
+};
 
 - (id)initWithProgressType:(ZGSearchProgressType)progressType maxProgress:(ZGMemorySize)maxProgress;
 

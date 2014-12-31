@@ -35,7 +35,6 @@
 #import "ZGCalculator.h"
 #import "NSStringAdditions.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 #import "ZGRegion.h"

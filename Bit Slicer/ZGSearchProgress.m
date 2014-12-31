@@ -34,7 +34,44 @@
 
 #import "ZGSearchProgress.h"
 
+#define ZGSearchProgressProgressTypeKey @"ZGSearchProgressProgressTypeKey"
+#define ZGSearchProgressMaxProgressKey @"ZGSearchProgressMaxProgressKey"
+#define ZGSearchProgressNumberOfVariablesFoundKey @"ZGSearchProgressNumberOfVariablesFoundKey"
+#define ZGSearchProgressProgressKey @"ZGSearchProgressProgressKey"
+
 @implementation ZGSearchProgress
+
++ (BOOL)supportsSecureCoding
+{
+	return YES;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+	[coder encodeInt32:_progressType forKey:ZGSearchProgressProgressTypeKey];
+	[coder encodeInt64:(int64_t)_maxProgress forKey:ZGSearchProgressMaxProgressKey];
+	[coder encodeInteger:(NSInteger)_numberOfVariablesFound forKey:ZGSearchProgressNumberOfVariablesFoundKey];
+	[coder encodeInt64:(int64_t)_progress forKey:ZGSearchProgressProgressKey];
+}
+
+- (id)initWithCoder:(NSCoder *)decoder
+{
+	self = [super init];
+	if (self == nil) return nil;
+	
+	_progressType = (uint16_t)[decoder decodeInt32ForKey:ZGSearchProgressProgressTypeKey];
+	_maxProgress = (uint64_t)[decoder decodeInt64ForKey:ZGSearchProgressMaxProgressKey];
+	_numberOfVariablesFound = (uint64_t)[decoder decodeInt64ForKey:ZGSearchProgressNumberOfVariablesFoundKey];
+	_progress = (uint64_t)[decoder decodeInt64ForKey:ZGSearchProgressProgressKey];
+	
+	return self;
+}
+
+- (id)copyWithZone:(NSZone *)__unused zone
+{
+	NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:self];
+	return [NSKeyedUnarchiver unarchiveObjectWithData:archivedData];
+}
 
 - (id)initWithProgressType:(ZGSearchProgressType)progressType maxProgress:(ZGMemorySize)maxProgress
 {

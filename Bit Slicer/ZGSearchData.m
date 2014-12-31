@@ -33,7 +33,6 @@
  */
 
 #import "ZGSearchData.h"
-#import "ZGVirtualMemoryHelpers.h"
 
 #define ZGSearchDataSearchValueKey @"ZGSearchDataSearchValueKey"
 #define ZGSearchDataFunctionTypeKey @"ZGSearchDataFunctionTypeKey"
@@ -133,7 +132,7 @@
 	_dataType = (uint16_t)[decoder decodeInt32ForKey:ZGSearchDataDataTypeKey];
 	_dataSize = (uint64_t)[decoder decodeInt64ForKey:ZGSearchDataDataSizeKey];
 	_dataAlignment = (uint64_t)[decoder decodeInt64ForKey:ZGSearchDataDataAlignmentKey];
-	_pointerSize = (uint64_t)[decoder decodeInt64ForKey:ZGSearchDataDataAlignmentKey];
+	_pointerSize = (uint64_t)[decoder decodeInt64ForKey:ZGSearchDataPointerSizeKey];
 	_qualifier = (uint16_t)[decoder decodeInt32ForKey:ZGSearchDataQualifierKey];
 	
 	_beginAddress = (uint64_t)[decoder decodeInt64ForKey:ZGSearchDataBeginAddressKey];

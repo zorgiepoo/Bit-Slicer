@@ -35,6 +35,12 @@
 #import "ZGRemoteProcessHandle.h"
 #import "ZGAppClient.h"
 #import "ZGRegion.h"
+#import "ZGRemoteSearchResults.h"
+#import "ZGSearchProgress.h"
+#import "ZGSearchData.h"
+#import "ZGLocalSearchResults.h"
+
+#import "ZGUtilities.h"
 
 @implementation ZGRemoteProcessHandle
 {
@@ -60,6 +66,14 @@
 		});
 	}
 	return self;
+}
+
+- (void)dealloc
+{
+	dispatch_sync(_appClient.dispatchQueue, ^{
+		[self->_appClient sendMessageType:ZGNetworkMessageDeallocProcessHandle andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendEndMessage];
+	});
 }
 
 - (BOOL)allocateMemoryAndGetAddress:(ZGMemoryAddress *)address size:(ZGMemorySize)size
@@ -352,11 +366,11 @@
 	return regions;
 }
 
-- (BOOL)getRegionInfo:(ZGMemoryBasicInfo *)regionInfo address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size
+- (BOOL)getRegionInfo:(void *)regionInfo regionInfoSize:(size_t)regionInfoSize messageType:(ZGNetworkMessageType)messageType address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageGetRegionInfo andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteHandleIdentifier];
 		
 		uint64_t sendData[2] = {*address, *size};
 		[self->_appClient sendBytes:sendData length:sizeof(sendData)];
@@ -371,13 +385,23 @@
 			*address = receiveData[0];
 			*size = receiveData[1];
 			
-			[self->_appClient receiveBytes:regionInfo length:sizeof(*regionInfo)];
+			[self->_appClient receiveBytes:regionInfo length:regionInfoSize];
 		}
 		
 		[self->_appClient sendEndMessage];
 	});
 	
 	return success;
+}
+
+- (BOOL)getRegionInfo:(ZGMemoryBasicInfo *)regionInfo address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size
+{
+	return [self getRegionInfo:regionInfo regionInfoSize:sizeof(*regionInfo) messageType:ZGNetworkMessageGetRegionInfo address:address size:size];
+}
+
+- (BOOL)getSubmapRegionInfo:(ZGMemorySubmapInfo *)submapRegionInfo address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size
+{
+	return [self getRegionInfo:submapRegionInfo regionInfoSize:sizeof(*submapRegionInfo) messageType:ZGNetworkMessageGetRegionSubmapInfo address:address size:size];
 }
 
 - (BOOL)getMemoryProtection:(ZGMemoryProtection *)memoryProtection address:(ZGMemoryAddress *)address size:(ZGMemorySize *)size
@@ -409,6 +433,36 @@
 	});
 	
 	return success;
+}
+
+- (NSString *)userTagDescriptionFromAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size
+{
+	__block NSString *userTag = nil;
+	
+	dispatch_sync(_appClient.dispatchQueue, ^{
+		[self->_appClient sendMessageType:ZGNetworkMessageUserTagDescription andObjectID:self->_remoteHandleIdentifier];
+		
+		uint64_t addressAndSize[2] = {address, size};
+		[self->_appClient sendBytes:addressAndSize length:sizeof(addressAndSize)];
+		
+		bool success = false;
+		[self->_appClient receiveBytes:&success length:sizeof(success)];
+		
+		if (success)
+		{
+			uint64_t length = 0;
+			[self->_appClient receiveBytes:&length length:sizeof(length)];
+			
+			void *buffer = malloc(length);
+			[self->_appClient receiveBytes:buffer length:length];
+			
+			userTag = [[NSString alloc] initWithBytesNoCopy:buffer length:length encoding:NSUTF8StringEncoding freeWhenDone:YES];
+		}
+		
+		[self->_appClient sendEndMessage];
+	});
+	
+	return userTag;
 }
 
 - (NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(ZGMemoryAddress *)relativeOffset
@@ -522,6 +576,111 @@
 	});
 	
 	return sizeRead;
+}
+
+- (uint16_t)sendSearchData:(ZGSearchData *)searchData isNarrowing:(BOOL)narrowing withFirstSearchResults:(ZGLocalSearchResults <ZGSearchResults> *)firstSearchResults laterSearchResults:(id <ZGSearchResults>)laterSearchResults
+{
+	__block uint16_t searchIdentifier = 0;
+	dispatch_sync(_appClient.dispatchQueue, ^{
+		[self->_appClient sendMessageType:ZGNetworkMessageSendSearchData andObjectID:self->_remoteHandleIdentifier];
+		
+		NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:searchData];
+		
+		uint64_t dataLength = archivedData.length;
+		[self->_appClient sendBytes:&dataLength length:sizeof(dataLength)];
+		
+		[self->_appClient sendBytes:archivedData.bytes length:dataLength];
+		
+		[self->_appClient receiveBytes:&searchIdentifier length:sizeof(searchIdentifier)];
+		
+		bool isNarrowing = narrowing;
+		[self->_appClient sendBytes:&isNarrowing length:sizeof(isNarrowing)];
+		
+		if (isNarrowing)
+		{
+			NSData *archivedResultsData = [NSKeyedArchiver archivedDataWithRootObject:firstSearchResults.resultSets];
+			uint64_t archivedResultsSize = archivedResultsData.length;
+			
+			[self->_appClient sendBytes:&archivedResultsSize length:sizeof(archivedResultsSize)];
+			[self->_appClient sendBytes:archivedResultsData.bytes length:archivedResultsSize];
+			
+			assert([laterSearchResults isKindOfClass:[ZGRemoteSearchResults class]]);
+			uint16_t laterSearchResultsIdentifier = [((ZGRemoteSearchResults *)laterSearchResults) remoteIdentifier];
+			
+			[self->_appClient sendBytes:&laterSearchResultsIdentifier length:sizeof(laterSearchResultsIdentifier)];
+		}
+		
+		[self->_appClient sendEndMessage];
+	});
+	return searchIdentifier;
+}
+
+- (id <ZGSearchResults>)receiveProgressUpdatesWithDelegate:(id <ZGSearchProgressDelegate>)delegate andSearchResultsFromSearchIdentifier:(uint16_t)searchIdentifier withSearchData:(ZGSearchData *)searchData
+{
+	__block bool reachedEnd = false;
+	__block uint16_t remoteIdentifier = 0;
+	while (!reachedEnd)
+	{
+		dispatch_sync(_appClient.dispatchQueue, ^{
+			[self->_appClient sendMessageType:ZGNetworkMessageReceiveSearchProgress andObjectID:searchIdentifier];
+			
+			uint64_t numberOfBytes = 0;
+			[self->_appClient receiveBytes:&numberOfBytes length:sizeof(numberOfBytes)];
+			
+			if (numberOfBytes > 0)
+			{
+				void *bytes = malloc(numberOfBytes);
+				[self->_appClient receiveBytes:bytes length:numberOfBytes];
+				
+				NSArray *queue = [NSKeyedUnarchiver unarchiveObjectWithData:[NSData dataWithBytesNoCopy:bytes length:numberOfBytes]];
+				
+				for (id object in queue)
+				{
+					if ([object isKindOfClass:[ZGSearchProgress class]])
+					{
+						dispatch_async(dispatch_get_main_queue(), ^{
+							[delegate progressWillBegin:object searchData:searchData];
+						});
+					}
+					else if ([object isKindOfClass:[NSArray class]] && [object count] == 2)
+					{
+						ZGSearchProgress *searchProgress = [object objectAtIndex:0];
+						NSData *resultData = [object objectAtIndex:1];
+						
+						if ([searchProgress isKindOfClass:[ZGSearchProgress class]] && [resultData isKindOfClass:[NSData class]])
+						{
+							dispatch_async(dispatch_get_main_queue(), ^{
+								[delegate progress:searchProgress advancedWithResultSet:resultData searchData:searchData];
+							});
+						}
+					}
+				}
+			}
+			
+			[self->_appClient receiveBytes:&reachedEnd length:sizeof(reachedEnd)];
+			
+			if (reachedEnd)
+			{
+				[self->_appClient receiveBytes:&remoteIdentifier length:sizeof(remoteIdentifier)];
+			}
+			
+			[self->_appClient sendEndMessage];
+		});
+	}
+	
+	return [[ZGRemoteSearchResults alloc] initWithAppClient:_appClient remoteIdentifier:remoteIdentifier dataSize:searchData.dataSize];
+}
+
+- (id <ZGSearchResults>)searchData:(ZGSearchData *)searchData delegate:(id <ZGSearchProgressDelegate>)delegate
+{
+	uint16_t searchIdentifier = [self sendSearchData:searchData isNarrowing:NO withFirstSearchResults:nil laterSearchResults:nil];
+	return [self receiveProgressUpdatesWithDelegate:delegate andSearchResultsFromSearchIdentifier:searchIdentifier withSearchData:searchData];
+}
+
+- (id <ZGSearchResults>)narrowSearchData:(ZGSearchData *)searchData withFirstSearchResults:(ZGLocalSearchResults <ZGSearchResults> *)firstSearchResults laterSearchResults:(id <ZGSearchResults>)laterSearchResults delegate:(id <ZGSearchProgressDelegate>)delegate
+{
+	uint16_t searchIdentifier = [self sendSearchData:searchData isNarrowing:YES withFirstSearchResults:firstSearchResults laterSearchResults:laterSearchResults];
+	return [self receiveProgressUpdatesWithDelegate:delegate andSearchResultsFromSearchIdentifier:searchIdentifier withSearchData:searchData];
 }
 
 @end

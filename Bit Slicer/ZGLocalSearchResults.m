@@ -32,51 +32,45 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGSearchResults.h"
+#import "ZGLocalSearchResults.h"
 
-@interface ZGSearchResults ()
+@implementation ZGLocalSearchResults
 
-@property (nonatomic) ZGMemorySize addressIndex;
-@property (nonatomic) NSArray *resultSets;
-@property (nonatomic) ZGMemorySize addressCount;
-@property (nonatomic) ZGMemorySize dataSize;
-@property (nonatomic) ZGMemorySize pointerSize;
-
-@end
-
-@implementation ZGSearchResults
+@synthesize dataType = _dataType;
+@synthesize enabled = _enabled;
+@synthesize dataSize = _dataSize;
 
 - (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize
 {
 	self = [super init];
 	if (self != nil)
 	{
-		self.resultSets = resultSets;
-		self.pointerSize = pointerSize;
-		for (NSData *result in self.resultSets)
+		_resultSets = resultSets;
+		_pointerSize = pointerSize;
+		for (NSData *result in _resultSets)
 		{
-			self.addressCount += result.length / self.pointerSize;
+			_addressCount += result.length / _pointerSize;
 		}
-		self.dataSize = dataSize;
+		_dataSize = dataSize;
 	}
 	return self;
 }
 
 - (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses
 {
-	self.addressIndex += numberOfAddresses;
-	self.addressCount -= numberOfAddresses;
+	_addressIndex += numberOfAddresses;
+	_addressCount -= numberOfAddresses;
 	
 	if (self.addressCount == 0)
 	{
-		self.resultSets = nil;
+		_resultSets = nil;
 	}
 }
 
 - (void)enumerateInRange:(NSRange)range usingBlock:(zg_enumerate_search_results_t)addressCallback
 {
-	ZGMemoryAddress absoluteLocation = range.location * self.pointerSize;
-	ZGMemoryAddress absoluteLength = range.length * self.pointerSize;
+	ZGMemoryAddress absoluteLocation = range.location * _pointerSize;
+	ZGMemoryAddress absoluteLength = range.length * _pointerSize;
 	
 	BOOL setBeginOffset = NO;
 	BOOL setEndOffset = NO;
@@ -84,9 +78,9 @@
 	ZGMemoryAddress endOffset = 0;
 	ZGMemoryAddress accumulator = 0;
 	
-	ZGMemorySize pointerSize = self.pointerSize;
+	ZGMemorySize pointerSize = _pointerSize;
 	
-	for (NSData *resultSet in self.resultSets)
+	for (NSData *resultSet in _resultSets)
 	{
 		NSUInteger resultSetLength = resultSet.length;
 		accumulator += resultSetLength;
@@ -137,7 +131,7 @@
 
 - (void)enumerateWithCount:(ZGMemorySize)addressCount usingBlock:(zg_enumerate_search_results_t)addressCallback
 {
-	[self enumerateInRange:NSMakeRange(self.addressIndex, addressCount) usingBlock:addressCallback];
+	[self enumerateInRange:NSMakeRange(_addressIndex, addressCount) usingBlock:addressCallback];
 }
 
 @end

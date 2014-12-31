@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 3/16/13.
+ * Created by Mayur Pawashe on 12/29/14.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2014 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,24 +33,21 @@
  */
 
 #import <Foundation/Foundation.h>
+
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
 
-@interface ZGSearchResults : NSObject
-
-@property (nonatomic, readonly) ZGMemorySize addressIndex;
-@property (nonatomic, readonly) ZGMemorySize addressCount;
-@property (nonatomic, readonly) ZGMemorySize pointerSize;
-@property (nonatomic, readonly) ZGMemorySize dataSize;
-@property (nonatomic, readonly) NSArray *resultSets;
-
-// User data fields
-@property (nonatomic) ZGVariableType dataType;
-@property (nonatomic) BOOL enabled;
-
 typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address);
 
-- (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize;
+@protocol ZGSearchResults <NSObject>
+
+- (ZGMemorySize)addressCount;
+- (ZGMemorySize)pointerSize;
+
+// Local user data fields
+@property (nonatomic, readonly) ZGMemorySize dataSize;
+@property (nonatomic) ZGVariableType dataType;
+@property (nonatomic) BOOL enabled;
 
 - (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses;
 

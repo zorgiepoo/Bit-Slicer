@@ -104,7 +104,7 @@
 
 - (void)freeTaskForProcessIdentifier:(pid_t)processIdentifier
 {
-	dispatch_async(_appClient.dispatchQueue, ^{
+	dispatch_sync(_appClient.dispatchQueue, ^{
 		[self->_appClient sendMessageType:ZGNetworkMessageFreeTaskForProcessIdentifier];
 		[self->_appClient sendBytes:&processIdentifier length:sizeof(processIdentifier)];
 		[self->_appClient sendEndMessage];
