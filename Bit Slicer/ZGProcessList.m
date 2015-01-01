@@ -209,22 +209,11 @@
 	
 	for (ZGRunningProcessObserver *runningProcessObserver in _priorityProcesses)
 	{
-		ZGMemoryMap task = MACH_PORT_NULL;
 		pid_t processIdentifier = runningProcessObserver.runningProcess.processIdentifier;
-		BOOL foundExistingTask = [_processTaskManager taskExistsForProcessIdentifier:processIdentifier];
-		
-		BOOL retrievedTask = foundExistingTask && [_processTaskManager getTask:&task forProcessIdentifier:processIdentifier];
-		BOOL increasedUserReference = retrievedTask && [_processTaskManager setPortSendRightReferenceCountByDelta:1 task:task];
-		
-		if (!increasedUserReference || !MACH_PORT_VALID(task))
+		if (![_processTaskManager isProcessAlive:processIdentifier])
 		{
 			shouldRetrieveList = YES;
 			[self removePriorityToProcessIdentifier:processIdentifier withObserver:runningProcessObserver.observer];
-		}
-		
-		if (increasedUserReference && MACH_PORT_VALID(task))
-		{
-			[_processTaskManager setPortSendRightReferenceCountByDelta:-1 task:task];
 		}
 	}
 	

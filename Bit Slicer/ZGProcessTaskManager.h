@@ -48,6 +48,6 @@
 - (BOOL)getTask:(ZGMemoryMap *)processTask forProcessIdentifier:(pid_t)processIdentifier;
 - (void)freeTaskForProcessIdentifier:(pid_t)processIdentifier;
 
-- (BOOL)setPortSendRightReferenceCountByDelta:(mach_port_delta_t)delta task:(ZGMemoryMap)task;
+- (BOOL)isProcessAlive:(pid_t)processIdentifier;
 
 @end

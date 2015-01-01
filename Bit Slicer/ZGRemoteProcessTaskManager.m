@@ -111,23 +111,19 @@
 	});
 }
 
-- (BOOL)setPortSendRightReferenceCountByDelta:(mach_port_delta_t)delta task:(ZGMemoryMap)processTask
+- (BOOL)isProcessAlive:(pid_t)processIdentifier
 {
-	__block bool success = false;
+	__block bool isProcessAlive = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageSetPortRightReferenceCountByDelta];
+		[self->_appClient sendMessageType:ZGNetworkMessageIsProcessAlive];
+		[self->_appClient sendBytes:&processIdentifier length:sizeof(processIdentifier)];
 		
-		int32_t deltaSent = delta;
-		[self->_appClient sendBytes:&deltaSent length:sizeof(deltaSent)];
-		
-		uint32_t taskSent = processTask;
-		[self->_appClient sendBytes:&taskSent length:sizeof(taskSent)];
-		
-		[self->_appClient receiveBytes:&success length:sizeof(success)];
+		[self->_appClient receiveBytes:&isProcessAlive length:sizeof(isProcessAlive)];
 		
 		[self->_appClient sendEndMessage];
 	});
-	return success;
+	
+	return isProcessAlive;
 }
 
 @end

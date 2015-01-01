@@ -140,7 +140,6 @@
 			uint64_t sizeReceived = 0;
 			[self->_appClient receiveBytes:&sizeReceived length:sizeof(sizeReceived)];
 			
-			//NSLog(@"Allocating size %llu, size first was %llu", sizeReceived, *size);
 			*size = sizeReceived;
 			*bytes = malloc(sizeReceived);
 			

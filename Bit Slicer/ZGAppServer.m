@@ -202,26 +202,20 @@
 							[self->_taskManager freeTaskForProcessIdentifier:processIdentifier];
 						});
 					}
-					else if (messageType == ZGNetworkMessageSetPortRightReferenceCountByDelta)
+					else if (messageType == ZGNetworkMessageIsProcessAlive)
 					{
-						int32_t delta = 0;
-						if (![self receiveFromSocket:clientSocket bytes:&delta length:sizeof(delta)])
+						int32_t processIdentifier = 0;
+						if (![self receiveFromSocket:clientSocket bytes:&processIdentifier length:sizeof(processIdentifier)])
 						{
 							break;
 						}
 						
-						uint32_t processTask = 0;
-						if (![self receiveFromSocket:clientSocket bytes:&processTask length:sizeof(processTask)])
-						{
-							break;
-						}
-						
-						__block bool result = false;
+						__block bool isProcessAlive = false;
 						dispatch_sync(dispatch_get_main_queue(), ^{
-							result = [self->_taskManager setPortSendRightReferenceCountByDelta:delta task:processTask];
+							isProcessAlive = [self->_taskManager isProcessAlive:processIdentifier];
 						});
 						
-						if (![self sendToSocket:clientSocket bytes:&result length:sizeof(result)])
+						if (![self sendToSocket:clientSocket bytes:&isProcessAlive length:sizeof(isProcessAlive)])
 						{
 							break;
 						}

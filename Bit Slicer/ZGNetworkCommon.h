@@ -54,7 +54,7 @@ typedef  NS_ENUM(uint16_t, ZGNetworkMessageType)
 	ZGNetworkMessageTaskExistsForProcessIndentifier,
 	ZGNetworkMessageGetTaskForProcessIdentifier,
 	ZGNetworkMessageFreeTaskForProcessIdentifier,
-	ZGNetworkMessageSetPortRightReferenceCountByDelta,
+	ZGNetworkMessageIsProcessAlive,
 	ZGNetworkMessageCreateProcessList,
 	ZGNetworkMessageRetreiveProcessList,
 	ZGNetworkMessageCreateProcessHandle,

@@ -105,9 +105,25 @@
 	[self.tasksDictionary removeObjectForKey:@(processIdentifier)];
 }
 
-- (BOOL)setPortSendRightReferenceCountByDelta:(mach_port_delta_t)delta task:(ZGMemoryMap)processTask
+- (BOOL)isProcessAlive:(pid_t)processIdentifier
 {
-	return ZGSetPortSendRightReferenceCountByDelta(processTask, delta);
+	BOOL isProcessAlive = YES;
+	ZGMemoryMap task = MACH_PORT_NULL;
+	BOOL foundExistingTask = [self taskExistsForProcessIdentifier:processIdentifier];
+	BOOL retrievedTask = foundExistingTask && [self getTask:&task forProcessIdentifier:processIdentifier];
+	BOOL increasedUserReference = retrievedTask && ZGSetPortSendRightReferenceCountByDelta(task, 1);
+	
+	if (!increasedUserReference || !MACH_PORT_VALID(task))
+	{
+		isProcessAlive = NO;
+	}
+	
+	if (increasedUserReference && MACH_PORT_VALID(task))
+	{
+		ZGSetPortSendRightReferenceCountByDelta(task, -1);
+	}
+	
+	return isProcessAlive;
 }
 
 @end
