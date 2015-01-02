@@ -437,6 +437,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(id <ZGProcessTaskManager> process
 		_currentProcess = ZGGrantMemoryAccessToProcess(self.processTaskManager, _currentProcess, &grantedAccess);
 		if (!grantedAccess)
 		{
+			shouldUpdateDisplay = YES;
 			ZG_LOG(@"%@ failed to grant access to PID %d", NSStringFromClass([self class]), _currentProcess.processID);
 		}
 	}
