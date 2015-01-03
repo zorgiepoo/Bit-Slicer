@@ -42,7 +42,6 @@
 #import "ZGSearchProgress.h"
 #import "ZGSearchResults.h"
 #import "ZGLocalSearchResults.h"
-#import "ZGStoredData.h"
 #import "ZGCalculator.h"
 #import "ZGUtilities.h"
 #import "NSArrayAdditions.h"
@@ -59,7 +58,7 @@
 @property (nonatomic, assign) ZGDocumentWindowController *windowController;
 @property (nonatomic) ZGSearchProgress *searchProgress;
 @property (nonatomic) id <ZGSearchResults> temporarySearchResults;
-@property (nonatomic) ZGStoredData *tempSavedData;
+@property (nonatomic) id tempSavedData;
 @property (atomic) BOOL isBusy;
 
 @property (nonatomic) ZGVariableType dataType;
@@ -784,11 +783,11 @@
 	[self prepareTask];
 	
 	ZGDocumentWindowController *windowController = self.windowController;
-	
 	[windowController setStatusString:ZGLocalizableSearchDocumentString(@"storingValuesStatusLabel")];
 	
+	ZGProcess *currentProcess = windowController.currentProcess;
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		self.tempSavedData = [ZGStoredData storedDataFromProcessTask:windowController.currentProcess.processTask];
+		self.tempSavedData = [currentProcess.handle retrieveStoredData];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			if (!self.searchProgress.shouldCancelSearch)

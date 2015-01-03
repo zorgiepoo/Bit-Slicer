@@ -42,6 +42,8 @@
 #import "ZGSearchProgress.h"
 #import "ZGLocalSearchResults.h"
 #import "ZGUserTagDescription.h"
+#import "ZGLocalStoredData.h"
+#import "ZGRemoteStoredData.h"
 #import "ZGUtilities.h"
 
 #define BACKLOG 10
@@ -922,6 +924,34 @@
 							break;
 						}
 					}
+					else if (messageType == ZGNetworkMessageStoreValues)
+					{
+						ZGLocalProcessHandle *processHandle = [self receiveFromSocket:clientSocket objectDictionary:objectDictionary expectedClass:[ZGLocalProcessHandle class]];
+						if (processHandle == nil)
+						{
+							break;
+						}
+						
+						if (![self sendToSocket:clientSocket bytes:&nextAvailableObjectID length:sizeof(nextAvailableObjectID)])
+						{
+							break;
+						}
+						
+						ZGLocalStoredData *storedData = [processHandle retrieveStoredData];
+						objectDictionary[@(nextAvailableObjectID)] = storedData;
+						
+						nextAvailableObjectID++;
+					}
+					else if (messageType == ZGNetworkMessageStoreValuesDealloc)
+					{
+						uint16_t objectID = 0;
+						if (![self receiveFromSocket:clientSocket bytes:&objectID length:sizeof(objectID)])
+						{
+							break;
+						}
+						
+						[objectDictionary removeObjectForKey:@(objectID)];
+					}
 					else if (messageType == ZGNetworkMessageSendSearchData)
 					{
 						ZGLocalProcessHandle *processHandle = [self receiveFromSocket:clientSocket objectDictionary:objectDictionary expectedClass:[ZGLocalProcessHandle class]];
@@ -948,6 +978,14 @@
 						{
 							ZG_LOG(@"Server: Expected ZGSearchData class... breaking out");
 							break;
+						}
+						
+						ZGRemoteStoredData *remoteStoredData = searchData.savedData;
+						if (remoteStoredData != nil)
+						{
+							ZGLocalStoredData *localStoredData = objectDictionary[@(remoteStoredData.remoteIdentifier)];
+							assert([localStoredData isKindOfClass:[ZGLocalStoredData class]]);
+							searchData.savedData = localStoredData;
 						}
 						
 						NSNumber *currentObjectID = @(nextAvailableObjectID);

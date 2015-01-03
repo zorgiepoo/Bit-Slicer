@@ -39,13 +39,14 @@
 #import "ZGSearchProgress.h"
 #import "ZGSearchData.h"
 #import "ZGLocalSearchResults.h"
+#import "ZGRemoteStoredData.h"
 
 #import "ZGUtilities.h"
 
 @implementation ZGRemoteProcessHandle
 {
 	ZGAppClient *_appClient;
-	uint16_t _remoteHandleIdentifier;
+	uint16_t _remoteIdentifier;
 }
 
 - (id)initWithProcessTask:(ZGMemoryMap)processTask appClient:(ZGAppClient *)appClient
@@ -60,7 +61,7 @@
 			
 			uint32_t task = processTask;
 			[self->_appClient sendBytes:&task length:sizeof(task)];
-			[self->_appClient receiveBytes:&self->_remoteHandleIdentifier length:sizeof(self->_remoteHandleIdentifier)];
+			[self->_appClient receiveBytes:&self->_remoteIdentifier length:sizeof(self->_remoteIdentifier)];
 			
 			[self->_appClient sendEndMessage];
 		});
@@ -71,7 +72,7 @@
 - (void)dealloc
 {
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageDeallocProcessHandle andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageDeallocProcessHandle andObjectID:self->_remoteIdentifier];
 		[self->_appClient sendEndMessage];
 	});
 }
@@ -81,7 +82,7 @@
 	__block ZGMemoryAddress addressReceived = 0x0;
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageAllocateMemory andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageAllocateMemory andObjectID:self->_remoteIdentifier];
 		
 		uint64_t sizeSent = size;
 		[self->_appClient sendBytes:&sizeSent length:sizeof(sizeSent)];
@@ -107,7 +108,7 @@
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageDeallocateMemory andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageDeallocateMemory andObjectID:self->_remoteIdentifier];
 		
 		uint64_t sizeSent = size;
 		uint64_t addressSent = address;
@@ -128,7 +129,7 @@
 	__block bool success = false;
 	
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageReadBytes andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageReadBytes andObjectID:self->_remoteIdentifier];
 		
 		uint64_t sendData[2] = {address, *size};
 		[self->_appClient sendBytes:sendData length:sizeof(sendData)];
@@ -165,7 +166,7 @@
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteIdentifier];
 		
 		uint64_t sendData[2] = {address, size};
 		[self->_appClient sendBytes:sendData length:sizeof(sendData)];
@@ -199,7 +200,7 @@
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageGetDlydTaskInfo andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageGetDlydTaskInfo andObjectID:self->_remoteIdentifier];
 		[self->_appClient receiveBytes:&success length:sizeof(success)];
 		
 		uint32_t countReceived = 0;
@@ -222,7 +223,7 @@
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageSetProtection andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageSetProtection andObjectID:self->_remoteIdentifier];
 		int32_t sentProtection = protection;
 		uint64_t addressAndSize[2] = {address, size};
 		
@@ -239,7 +240,7 @@
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageGetPageSize andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageGetPageSize andObjectID:self->_remoteIdentifier];
 		[self->_appClient receiveBytes:&success length:sizeof(success)];
 		if (success)
 		{
@@ -258,7 +259,7 @@
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteIdentifier];
 		[self->_appClient receiveBytes:&success length:sizeof(success)];
 		[self->_appClient sendEndMessage];
 	});
@@ -279,7 +280,7 @@
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageGetSuspendCount andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageGetSuspendCount andObjectID:self->_remoteIdentifier];
 		[self->_appClient receiveBytes:&success length:sizeof(success)];
 		
 		if (success)
@@ -299,7 +300,7 @@
 {
 	__block NSArray *regions = nil;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteIdentifier];
 		
 		uint64_t numberOfBytes = 0;
 		[self->_appClient receiveBytes:&numberOfBytes length:sizeof(numberOfBytes)];
@@ -336,7 +337,7 @@
 {
 	__block NSArray *regions = nil;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageSubmapRegionsInRegion andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageSubmapRegionsInRegion andObjectID:self->_remoteIdentifier];
 		
 		NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:region];
 		uint64_t numberOfBytesSent = archivedData.length;
@@ -369,7 +370,7 @@
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:messageType andObjectID:self->_remoteIdentifier];
 		
 		uint64_t sendData[2] = {*address, *size};
 		[self->_appClient sendBytes:sendData length:sizeof(sendData)];
@@ -407,7 +408,7 @@
 {
 	__block bool success = false;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageGetMemoryProtection andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageGetMemoryProtection andObjectID:self->_remoteIdentifier];
 		
 		uint64_t sendData[2] = {*address, *size};
 		[self->_appClient sendBytes:sendData length:sizeof(sendData)];
@@ -439,7 +440,7 @@
 	__block NSString *userTag = nil;
 	
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageUserTagDescription andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageUserTagDescription andObjectID:self->_remoteIdentifier];
 		
 		uint64_t addressAndSize[2] = {address, size};
 		[self->_appClient sendBytes:addressAndSize length:sizeof(addressAndSize)];
@@ -468,7 +469,7 @@
 {
 	__block NSString *symbol = nil;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageSymbolAtAddress andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageSymbolAtAddress andObjectID:self->_remoteIdentifier];
 		
 		uint64_t addressSent = address;
 		[self->_appClient sendBytes:&addressSent length:sizeof(addressSent)];
@@ -507,7 +508,7 @@
 {
 	__block NSNumber *symbolAddressNumber = nil;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageFindSymbol andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageFindSymbol andObjectID:self->_remoteIdentifier];
 		
 		const void *symbolNameCString = [symbolName UTF8String];
 		assert(symbolNameCString != NULL);
@@ -555,7 +556,7 @@
 {
 	__block uint64_t sizeRead = 0;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageReadStringSizeFromAddress andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageReadStringSizeFromAddress andObjectID:self->_remoteIdentifier];
 		
 		uint64_t addressToSend = address;
 		[self->_appClient sendBytes:&addressToSend length:sizeof(addressToSend)];
@@ -577,11 +578,16 @@
 	return sizeRead;
 }
 
+- (id)retrieveStoredData
+{
+	return [[ZGRemoteStoredData alloc] initWithAppClient:_appClient handleIdentifier:_remoteIdentifier];
+}
+
 - (uint16_t)sendSearchData:(ZGSearchData *)searchData isNarrowing:(BOOL)narrowing withFirstSearchResults:(ZGLocalSearchResults <ZGSearchResults> *)firstSearchResults laterSearchResults:(id <ZGSearchResults>)laterSearchResults
 {
 	__block uint16_t searchIdentifier = 0;
 	dispatch_sync(_appClient.dispatchQueue, ^{
-		[self->_appClient sendMessageType:ZGNetworkMessageSendSearchData andObjectID:self->_remoteHandleIdentifier];
+		[self->_appClient sendMessageType:ZGNetworkMessageSendSearchData andObjectID:self->_remoteIdentifier];
 		
 		NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:searchData];
 		

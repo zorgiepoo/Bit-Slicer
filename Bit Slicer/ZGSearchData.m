@@ -33,6 +33,7 @@
  */
 
 #import "ZGSearchData.h"
+#import "ZGRemoteStoredData.h"
 
 #define ZGSearchDataSearchValueKey @"ZGSearchDataSearchValueKey"
 #define ZGSearchDataFunctionTypeKey @"ZGSearchDataFunctionTypeKey"
@@ -54,6 +55,7 @@
 #define ZGSearchDataAdditiveConstantKey @"ZGSearchDataAdditiveConstantKey"
 #define ZGSearchDataMultiplicativeConstantKey @"ZGSearchDataMultiplicativeConstantKey"
 #define ZGSearchDataByteArrayFlagsKey @"ZGSearchDataByteArrayFlagsKey"
+#define ZGSearchDataRemoteStoredDataKey @"ZGSearchDataRemoteStoredDataKey"
 
 @implementation ZGSearchData
 
@@ -80,6 +82,11 @@
 	[coder encodeBool:_shouldIncludeNullTerminator forKey:ZGSearchDataShouldIncludeNullTerminatorKey];
 	[coder encodeBool:_shouldCompareStoredValues forKey:ZGSearchDataShouldCompareStoredValuesKey];
 	[coder encodeBool:_bytesSwapped forKey:ZGSearchDataBytesSwappedKey];
+	
+	if ([_savedData conformsToProtocol:@protocol(NSCoding)])
+	{
+		[coder encodeObject:_savedData forKey:ZGSearchDataRemoteStoredDataKey];
+	}
 	
 	if (_searchValue != NULL)
 	{
@@ -144,6 +151,9 @@
 	_shouldIncludeNullTerminator = [decoder decodeBoolForKey:ZGSearchDataShouldIncludeNullTerminatorKey];
 	_shouldCompareStoredValues = [decoder decodeBoolForKey:ZGSearchDataShouldCompareStoredValuesKey];
 	_bytesSwapped = [decoder decodeBoolForKey:ZGSearchDataBytesSwappedKey];
+	
+	id storedData = [decoder decodeObjectOfClass:[ZGRemoteStoredData class] forKey:ZGSearchDataRemoteStoredDataKey];
+	_savedData = storedData;
 	
 	[self decodeWithDecoder:decoder getBytes:&_searchValue forKey:ZGSearchDataSearchValueKey expectedLength:_dataSize];
 	[self decodeWithDecoder:decoder getBytes:&_swappedValue forKey:ZGSearchDataSwappedValueKey expectedLength:_dataSize];

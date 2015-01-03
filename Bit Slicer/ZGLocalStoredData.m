@@ -32,20 +32,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGStoredData.h"
+#import "ZGLocalStoredData.h"
 #import "ZGVirtualMemory.h"
 #import "ZGSearchData.h"
 #import "ZGRegion.h"
 #import "ZGSearchProgress.h"
 #import "ZGUtilities.h"
 
-@interface ZGStoredData ()
-
-@property (nonatomic) NSArray *regions;
-
-@end
-
-@implementation ZGStoredData
+@implementation ZGLocalStoredData
+{
+	NSArray *_regions;
+}
 
 + (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask
 {
@@ -73,14 +70,14 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.regions = regions;
+		_regions = regions;
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	for (ZGRegion *region in self.regions)
+	for (ZGRegion *region in _regions)
 	{
 		ZGFreeBytes(region.bytes, region.size);
 	}

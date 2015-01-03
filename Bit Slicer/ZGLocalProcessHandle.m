@@ -40,6 +40,7 @@
 #import "ZGSearchFunctions.h"
 #import "ZGLocalSearchResults.h"
 #import "ZGUserTagDescription.h"
+#import "ZGLocalStoredData.h"
 
 @interface ZGLocalProcessHandle ()
 
@@ -320,6 +321,11 @@
 	}
 	
 	return totalSize;
+}
+
+- (id)retrieveStoredData
+{
+	return [ZGLocalStoredData storedDataFromProcessTask:_processTask];
 }
 
 - (id <ZGSearchResults>)searchData:(ZGSearchData *)searchData delegate:(id <ZGSearchProgressDelegate>)delegate

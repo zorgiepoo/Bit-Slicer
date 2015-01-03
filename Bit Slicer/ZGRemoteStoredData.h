@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 2/2/14.
+ * Created by Mayur Pawashe on 1/2/15.
  *
- * Copyright (c) 2014 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,12 +33,13 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
 
-@interface ZGStoredData : NSObject
+@class ZGAppClient;
 
-+ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask;
+@interface ZGRemoteStoredData : NSObject <NSSecureCoding>
 
-@property (nonatomic, readonly) NSArray *regions;
+- (id)initWithAppClient:(ZGAppClient *)appClient handleIdentifier:(uint16_t)handleIdentifier;
+
+@property (nonatomic, readonly) uint16_t remoteIdentifier;
 
 @end

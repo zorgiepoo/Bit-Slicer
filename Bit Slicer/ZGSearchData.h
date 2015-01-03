@@ -39,8 +39,6 @@
 
 #define DEFAULT_FLOATING_POINT_EPSILON 0.1
 
-@class ZGStoredData;
-
 @interface ZGSearchData : NSObject <NSSecureCoding>
 {
 @public
@@ -83,7 +81,7 @@ typedef NS_ENUM(uint16_t, ZGProtectionMode)
 @property (nonatomic) BOOL bytesSwapped;
 
 @property (nonatomic) void *rangeValue;
-@property (nonatomic) ZGStoredData *savedData;
+@property (nonatomic) id savedData;
 @property (nonatomic) BOOL shouldCompareStoredValues;
 @property (nonatomic) double epsilon;
 @property (nonatomic) BOOL shouldIgnoreStringCase;

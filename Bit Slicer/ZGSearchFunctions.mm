@@ -39,7 +39,7 @@
 #import "ZGVirtualMemory.h"
 #import "NSArrayAdditions.h"
 #import "ZGLocalSearchResults.h"
-#import "ZGStoredData.h"
+#import "ZGLocalStoredData.h"
 #import <stdint.h>
 
 #define MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES 4096U
@@ -209,7 +209,9 @@ ZGLocalSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchDat
 	}
 	else
 	{
-		regions = searchData.savedData.regions;
+		ZGLocalStoredData *storedData = searchData.savedData;
+		assert([storedData isKindOfClass:[ZGLocalStoredData class]]);
+		regions = storedData.regions;
 	}
 	
 	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryScanning maxProgress:regions.count];
@@ -1651,7 +1653,10 @@ ZGLocalSearchResults *ZGNarrowSearchWithFunction(bool (*comparisonFunction)(ZGSe
 		}
 		else
 		{
-			NSArray *savedData = searchData.savedData.regions;
+			ZGLocalStoredData *storedData = searchData.savedData;
+			assert([storedData isKindOfClass:[ZGLocalStoredData class]]);
+			
+			NSArray *savedData = storedData.regions;
 			
 			NSMutableDictionary *pageToSavedRegionTable = nil;
 			

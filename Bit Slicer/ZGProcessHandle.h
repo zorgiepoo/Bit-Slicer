@@ -79,6 +79,8 @@
 
 - (ZGMemorySize)readStringSizeFromAddress:(ZGMemoryAddress)address dataType:(ZGVariableType)dataType oldSize:(ZGMemorySize)oldSize maxSize:(ZGMemorySize)maxStringSizeLimit;
 
+- (id)retrieveStoredData;
+
 - (id <ZGSearchResults>)searchData:(ZGSearchData *)searchData delegate:(id <ZGSearchProgressDelegate>)delegate;
 - (id <ZGSearchResults>)narrowSearchData:(ZGSearchData *)searchData withFirstSearchResults:(ZGLocalSearchResults <ZGSearchResults> *)firstSearchResults laterSearchResults:(id <ZGSearchResults>)laterSearchResults delegate:(id <ZGSearchProgressDelegate>)delegate;
 

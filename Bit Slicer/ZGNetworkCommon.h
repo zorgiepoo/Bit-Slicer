@@ -81,6 +81,8 @@ typedef  NS_ENUM(uint16_t, ZGNetworkMessageType)
 	ZGNetworkMessageSymbolAtAddress,
 	ZGNetworkMessageFindSymbol,
 	ZGNetworkMessageReadStringSizeFromAddress,
+	ZGNetworkMessageStoreValues,
+	ZGNetworkMessageStoreValuesDealloc,
 	ZGNetworkMessageSendSearchData,
 	ZGNetworkMessageReceiveSearchProgress,
 	ZGNetworkMessageSearchResultsRemoveNumberOfAddresses,
