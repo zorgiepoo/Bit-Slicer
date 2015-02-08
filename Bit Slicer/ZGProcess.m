@@ -158,39 +158,32 @@
 - (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress
 {
 	__block CSSymbolRef resultSymbol = kCSNull;
-	__block BOOL foundDesiredSymbol = NO;
-
+	__block unsigned long long minLocation = 0;
+	
 	CSSymbolicatorRef symbolicator = self.symbolicator;
 	if (CSIsNull(symbolicator)) return nil;
-
+	
 	const char *symbolCString = [symbolName UTF8String];
-
+	
 	CSSymbolicatorForeachSymbolOwnerAtTime(symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
-		if (!foundDesiredSymbol)
+		const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
+		if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [partialSymbolOwnerName hasSuffix:@(symbolOwnerName)]))
 		{
-			const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
-			if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [partialSymbolOwnerName hasSuffix:@(symbolOwnerName)]))
-			{
-				CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
-					if (!foundDesiredSymbol)
+			CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
+				const char *symbolFound = CSSymbolGetName(symbol);
+				if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
+				{
+					CSRange symbolRange = CSSymbolGetRange(symbol);
+					if ((minLocation == 0 || minLocation > symbolRange.location) && pastAddress < symbolRange.location)
 					{
-						const char *symbolFound = CSSymbolGetName(symbol);
-						if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
-						{
-							CSRange symbolRange = CSSymbolGetRange(symbol);
-							if (pastAddress < symbolRange.location)
-							{
-								foundDesiredSymbol = YES;
-							}
-
-							resultSymbol = symbol;
-						}
+						resultSymbol = symbol;
+						minLocation = symbolRange.location;
 					}
-				});
-			}
+				}
+			});
 		}
 	});
-
+	
 	return CSIsNull(resultSymbol) ? nil : @(CSSymbolGetRange(resultSymbol).location);
 }
 
