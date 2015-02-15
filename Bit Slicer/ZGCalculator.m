@@ -215,7 +215,7 @@
 				
 				if (!encounteredError)
 				{
-					symbolAddressNumber = [process findSymbol:symbolString withPartialSymbolOwnerName:targetOwnerNameSuffix requiringExactMatch:NO pastAddress:[currentAddressNumber unsignedLongLongValue]];
+					symbolAddressNumber = [process findSymbol:symbolString withPartialSymbolOwnerName:targetOwnerNameSuffix requiringExactMatch:NO pastAddress:[currentAddressNumber unsignedLongLongValue] allowsWrappingToBeginning:YES];
 					if (symbolAddressNumber == nil)
 					{
 						if (error != NULL)

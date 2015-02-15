@@ -665,7 +665,7 @@ static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
 	if (PyArg_ParseTuple(args, "s|s:findSymbol", &symbolName, &symbolOwner))
 	{
 		ZGProcess *process = self->objcSelf.process;
-		NSNumber *symbolAddressNumber = [process findSymbol:@(symbolName) withPartialSymbolOwnerName:symbolOwner == NULL ? nil : @(symbolOwner) requiringExactMatch:YES pastAddress:0x0];
+		NSNumber *symbolAddressNumber = [process findSymbol:@(symbolName) withPartialSymbolOwnerName:symbolOwner == NULL ? nil : @(symbolOwner) requiringExactMatch:YES pastAddress:0x0 allowsWrappingToBeginning:NO];
 		if (symbolAddressNumber != nil)
 		{
 			retValue = Py_BuildValue("K", [symbolAddressNumber unsignedLongLongValue]);

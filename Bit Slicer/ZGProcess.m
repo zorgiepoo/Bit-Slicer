@@ -39,6 +39,7 @@
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 #import "CoreSymbolication.h"
+#import "NSArrayAdditions.h"
 
 @interface ZGProcess ()
 {
@@ -155,13 +156,14 @@
 	return symbolName;
 }
 
-- (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress
+- (NSArray *)findSymbolsWithName:(NSString *)symbolName partialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch
 {
-	__block CSSymbolRef resultSymbol = kCSNull;
-	__block unsigned long long minLocation = 0;
-	
 	CSSymbolicatorRef symbolicator = self.symbolicator;
 	if (CSIsNull(symbolicator)) return nil;
+	
+	assert(sizeof(NSRange) == sizeof(CSRange));
+	
+	NSMutableArray *symbolRanges = [NSMutableArray array];
 	
 	const char *symbolCString = [symbolName UTF8String];
 	
@@ -174,17 +176,48 @@
 				if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
 				{
 					CSRange symbolRange = CSSymbolGetRange(symbol);
-					if ((minLocation == 0 || minLocation > symbolRange.location) && pastAddress < symbolRange.location)
-					{
-						resultSymbol = symbol;
-						minLocation = symbolRange.location;
-					}
+					[symbolRanges addObject:[NSValue valueWithRange:*(NSRange *)&symbolRange]];
 				}
 			});
 		}
 	});
 	
-	return CSIsNull(resultSymbol) ? nil : @(CSSymbolGetRange(resultSymbol).location);
+	return [symbolRanges sortedArrayUsingComparator:^(id rangeValue1, id rangeValue2) {
+		NSRange range1 = [rangeValue1 rangeValue];
+		NSRange range2 = [rangeValue2 rangeValue];
+		
+		if (range1.location > range2.location)
+		{
+			return NSOrderedDescending;
+		}
+		
+		if (range1.location < range2.location)
+		{
+			return NSOrderedAscending;
+		}
+		
+		return NSOrderedSame;
+	}];
+}
+
+- (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress allowsWrappingToBeginning:(BOOL)allowsWrapping
+{
+	NSArray *symbols = [self findSymbolsWithName:symbolName partialSymbolOwnerName:partialSymbolOwnerName requiringExactMatch:requiresExactMatch];
+	
+	NSValue *symbolRangeValue = [symbols zgFirstObjectThatMatchesCondition:^BOOL(NSValue *symbolValue) {
+		return (symbolValue.rangeValue.location > pastAddress);
+	}];
+	
+	if (symbolRangeValue == nil)
+	{
+		if (allowsWrapping && symbols.count > 0)
+		{
+			return @([symbols[0] rangeValue].location);
+		}
+		return nil;
+	}
+	
+	return @([symbolRangeValue rangeValue].location);
 }
 
 - (NSMutableDictionary *)cacheDictionary
