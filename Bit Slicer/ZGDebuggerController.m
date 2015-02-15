@@ -1046,7 +1046,7 @@ enum ZGStepExecution
 	self.instructionBoundary = NSMakeRange(firstInstructionAddress, maxInstructionsSize);
 	
 	// Disassemble within a range from +- WINDOW_SIZE from selection address
-	const NSUInteger WINDOW_SIZE = 2048;
+	const NSUInteger WINDOW_SIZE = 512;
 	
 	ZGMemoryAddress lowBoundAddress = calculatedMemoryAddress - WINDOW_SIZE;
 	if (lowBoundAddress <= firstInstructionAddress)
