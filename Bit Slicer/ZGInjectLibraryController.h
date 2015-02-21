@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/29/12.
+ * Created by Mayur Pawashe on 2/21/15.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,31 +32,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGBreakPoint.h"
-#import "ZGProcess.h"
+#import <Foundation/Foundation.h>
+#import "ZGBreakPointDelegate.h"
 
-@interface ZGBreakPoint ()
+@class ZGProcess;
+@class ZGBreakPointController;
 
-@property (nonatomic) ZGMemoryMap task;
-@property (nonatomic) ZGProcess *process;
-@property (nonatomic) ZGBreakPointType type;
+@interface ZGInjectLibraryController : NSObject <ZGBreakPointDelegate>
 
-@end
-
-@implementation ZGBreakPoint
-
-- (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type delegate:(id <ZGBreakPointDelegate>)delegate
-{
-	self = [super init];
-	if (self != nil)
-	{
-		self.cacheDictionary = [NSMutableDictionary dictionary];
-		self.process = [[ZGProcess alloc] initWithProcess:process];
-		self.type = type;
-		self.delegate = delegate;
-		self.task = process.processTask;
-	}
-	return self;
-}
+- (void)injectDynamicLibraryAtPath:(NSString *)path inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController;
 
 @end

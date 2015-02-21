@@ -45,6 +45,7 @@
 #import "ZGBreakPointCondition.h"
 #import "ZGScriptManager.h"
 #import "ZGDisassemblerObject.h"
+#import "ZGInjectLibraryController.h"
 #import "ZGUtilities.h"
 #import "ZGRegistersViewController.h"
 #import "ZGPreferencesController.h"
@@ -91,6 +92,7 @@
 @property (nonatomic) NSRange instructionBoundary;
 
 @property (nonatomic) ZGCodeInjectionWindowController *codeInjectionController;
+@property (nonatomic) ZGInjectLibraryController *injectLibraryController;
 
 @property (nonatomic) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
@@ -1359,6 +1361,13 @@ enum ZGStepExecution
 			return NO;
 		}
 	}
+	else if (userInterfaceItem.action == @selector(injectDynamicLibrary:))
+	{
+		if (!self.currentProcess.valid)
+		{
+			return NO;
+		}
+	}
 	else if (userInterfaceItem.action == @selector(showBreakPointCondition:))
 	{
 		if ([[self selectedInstructions] count] != 1)
@@ -1711,6 +1720,29 @@ enum ZGStepExecution
 	 instruction:[self.selectedInstructions objectAtIndex:0]
 	 breakPoints:self.breakPointController.breakPoints
 	 undoManager:self.undoManager];
+}
+
+- (IBAction)injectDynamicLibrary:(id)__unused sender
+{
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+	[openPanel setCanChooseDirectories:NO];
+	[openPanel setCanChooseFiles:YES];
+	[openPanel setAllowsMultipleSelection:NO];
+	[openPanel setCanCreateDirectories:NO];
+	[openPanel setAllowedFileTypes:@[@"dylib"]];
+	[openPanel setTreatsFilePackagesAsDirectories:YES];
+	[openPanel setMessage:@"Choose the dylib that you want to inject"];
+	
+	[openPanel beginWithCompletionHandler:^(NSInteger result) {
+		if (result == NSFileHandlingPanelOKButton)
+		{
+			if (self.injectLibraryController == nil)
+			{
+				self.injectLibraryController = [[ZGInjectLibraryController alloc] init];
+			}
+			[self.injectLibraryController injectDynamicLibraryAtPath:openPanel.URL.path inProcess:self.currentProcess breakPointController:self.breakPointController];
+		}
+	}];
 }
 
 #pragma mark Break Points
