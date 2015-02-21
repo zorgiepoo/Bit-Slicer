@@ -46,10 +46,21 @@
 {
 	x86_thread_state_t _originalThreadState;
 	mach_msg_type_number_t _threadStateCount;
+	
 	zg_x86_vector_state_t _originalVectorState;
 	mach_msg_type_number_t _vectorStateCount;
+	
 	thread_act_array_t _threadList;
 	mach_msg_type_number_t _threadListCount;
+	
+	ZGMemoryAddress _codeAddress;
+	ZGMemorySize _codeSize;
+	
+	ZGMemoryAddress _stackAddress;
+	ZGMemorySize _stackSize;
+	
+	ZGMemoryAddress _dataAddress;
+	ZGMemorySize _dataSize;
 	
 	ZGBreakPointController *_breakPointController;
 	ZGInstruction *_haltedInstruction;
@@ -156,6 +167,9 @@
 			return;
 		}
 		
+		_codeAddress = codeAddress;
+		_codeSize = codeSize;
+		
 		if (!ZGProtect(processTask, codeAddress, codeSize, VM_PROT_READ))
 		{
 			ZG_LOG(@"Failed setting memory protection for code");
@@ -170,6 +184,9 @@
 			return;
 		}
 		
+		_stackAddress = stackAddress;
+		_stackSize = stackSize;
+		
 		if (!ZGProtect(processTask, stackAddress, stackSize, VM_PROT_READ | VM_PROT_WRITE))
 		{
 			ZG_LOG(@"Failed setting memory protection for stack");
@@ -183,6 +200,9 @@
 			ZG_LOG(@"Failed allocating memory for data");
 			return;
 		}
+		
+		_dataAddress = dataAddress;
+		_dataSize = dataSize;
 		
 		if (!ZGProtect(processTask, dataAddress, dataSize, VM_PROT_READ | VM_PROT_WRITE))
 		{
@@ -325,6 +345,21 @@
 		if (!ZGDeallocateMemory(current_task(), (mach_vm_address_t)_threadList, _threadListCount * sizeof(thread_act_t)))
 		{
 			ZG_LOG(@"Failed to deallocate thread list in %s", __PRETTY_FUNCTION__);
+		}
+		
+		if (!ZGDeallocateMemory(processTask, _codeAddress, _codeSize))
+		{
+			ZG_LOG(@"Failed to deallocate code in %s", __PRETTY_FUNCTION__);
+		}
+		
+		if (!ZGDeallocateMemory(processTask, _stackAddress, _stackSize))
+		{
+			ZG_LOG(@"Failed to deallocate stack in %s", __PRETTY_FUNCTION__);
+		}
+		
+		if (!ZGDeallocateMemory(processTask, _dataAddress, _dataSize))
+		{
+			ZG_LOG(@"Failed to deallocate data in %s", __PRETTY_FUNCTION__);
 		}
 		
 		//_breakPointController = nil;
