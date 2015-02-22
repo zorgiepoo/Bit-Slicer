@@ -41,6 +41,7 @@
 #import "ZGDebuggerUtilities.h"
 #import "ZGBreakPoint.h"
 #import "ZGInstruction.h"
+#import "NSArrayAdditions.h"
 #include <dlfcn.h>
 
 @implementation ZGInjectLibraryController
@@ -66,6 +67,7 @@
 	ZGBreakPointController *_breakPointController;
 	ZGInstruction *_haltedInstruction;
 	NSString *_path;
+	NSArray *_machBinariesBeforeInjecting;
 	BOOL _secondPass;
 	
 	ZGInjectLibraryCompletionHandler _completionHandler;
@@ -88,6 +90,7 @@
 	_stackSize = 0;
 	_dataAddress = 0;
 	_dataSize = 0;
+	_machBinariesBeforeInjecting = nil;
 	
 	ZGMemoryMap processTask = process.processTask;
 	
@@ -102,7 +105,7 @@
 			ZGDeallocateMemory(current_task(), (mach_vm_address_t)self->_threadList, self->_threadListCount * sizeof(thread_act_t));
 		}
 		ZGResumeTask(processTask);
-		completionHandler(NO);
+		completionHandler(NO, nil);
 	};
 	
 	if (task_threads(processTask, &_threadList, &_threadListCount) != KERN_SUCCESS)
@@ -132,7 +135,8 @@
 	
 	ZGMemoryAddress instructionPointer = process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 	
-	_haltedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 0x1 inProcess:process withBreakPoints:breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:process]];
+	_machBinariesBeforeInjecting = [ZGMachBinary machBinariesInProcess:process];
+	_haltedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 0x1 inProcess:process withBreakPoints:breakPointController.breakPoints machBinaries:_machBinariesBeforeInjecting];
 	
 	if (_haltedInstruction == nil)
 	{
@@ -199,7 +203,7 @@
 			[self->_breakPointController resumeFromBreakPoint:breakPoint];
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				self->_completionHandler(NO);
+				self->_completionHandler(NO, nil);
 			});
 		};
 		
@@ -380,7 +384,7 @@
 			return;
 		}
 		
-		endOfCodeInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:codeAddress + codeData.length + 0x2 inProcess:process withBreakPoints:_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:process]];
+		endOfCodeInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:codeAddress + codeData.length + 0x2 inProcess:process withBreakPoints:_breakPointController.breakPoints machBinaries:_machBinariesBeforeInjecting];
 		if (![_breakPointController addBreakPointOnInstruction:endOfCodeInstruction inProcess:process condition:NULL delegate:self])
 		{
 			ZG_LOG(@"Failed to add breakpoint at 0x%llX", endOfCodeInstruction.variable.address);
@@ -482,10 +486,26 @@
 			ZG_LOG(@"Failed to deallocate data in %s", __PRETTY_FUNCTION__);
 		}
 		
+		NSMutableDictionary *machBinaryDictionary = [[NSMutableDictionary alloc] init];
+		for (ZGMachBinary *binary in _machBinariesBeforeInjecting)
+		{
+			[machBinaryDictionary setObject:binary forKey:@(binary.headerAddress)];
+		}
+		
+		NSArray *newMachBinaries = [ZGMachBinary machBinariesInProcess:process];
+		ZGMachBinary *newBinary = [newMachBinaries zgFirstObjectThatMatchesCondition:^BOOL(ZGMachBinary *binary) {
+			if (machBinaryDictionary[@(binary.headerAddress)] != nil)
+			{
+				return NO;
+			}
+			
+			return [[binary filePathInProcess:process] isEqualToString:self->_path];
+		}];
+		
 		[_breakPointController resumeFromBreakPoint:breakPoint];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
-			self->_completionHandler(success);
+			self->_completionHandler(success, newBinary);
 		});
 	}
 }

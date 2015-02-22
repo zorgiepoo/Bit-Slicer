@@ -37,10 +37,11 @@
 
 @class ZGProcess;
 @class ZGBreakPointController;
+@class ZGMachBinary;
 
 @interface ZGInjectLibraryController : NSObject <ZGBreakPointDelegate>
 
-typedef void (^ZGInjectLibraryCompletionHandler)(BOOL);
+typedef void (^ZGInjectLibraryCompletionHandler)(BOOL, ZGMachBinary *);
 
 - (void)injectDynamicLibraryAtPath:(NSString *)path inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController completionHandler:(ZGInjectLibraryCompletionHandler)completionHandler;
 

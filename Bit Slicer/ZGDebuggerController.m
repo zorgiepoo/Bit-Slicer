@@ -1742,10 +1742,15 @@ enum ZGStepExecution
 				self.injectLibraryController = [[ZGInjectLibraryController alloc] init];
 			}
 			
-			[self.injectLibraryController injectDynamicLibraryAtPath:openPanel.URL.path inProcess:process breakPointController:self.breakPointController completionHandler:^(BOOL success) {
+			[self.injectLibraryController injectDynamicLibraryAtPath:openPanel.URL.path inProcess:process breakPointController:self.breakPointController completionHandler:^(BOOL success, ZGMachBinary *newBinary) {
 				if (success)
 				{
 					[process resymbolicate];
+					ZGMemoryAddress firstInstruction = [[newBinary machBinaryInfoInProcess:process] firstInstructionAddress];
+					if (firstInstruction != 0x0)
+					{
+						[self jumpToMemoryAddress:firstInstruction];
+					}
 				}
 				else
 				{
