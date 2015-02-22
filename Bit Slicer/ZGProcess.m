@@ -125,7 +125,8 @@
 {
 	if (self.valid && !CSIsNull(_symbolicator))
 	{
-		CSSymbolicatorResymbolicate(_symbolicator);
+		CSRelease(_symbolicator);
+		_symbolicator = kCSNull;
 	}
 }
 
