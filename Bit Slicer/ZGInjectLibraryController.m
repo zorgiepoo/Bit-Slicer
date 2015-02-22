@@ -44,6 +44,8 @@
 #import "NSArrayAdditions.h"
 #include <dlfcn.h>
 
+#define DLOPEN_RETURN_ADDRESS_MAX_SIZE 0x8
+
 @implementation ZGInjectLibraryController
 {
 	x86_thread_state_t _originalThreadState;
@@ -288,7 +290,7 @@
 		}
 		
 		size_t pathCStringLength = strlen(pathCString);
-		ZGMemoryAddress libraryPathAddress = dataAddress + 0x8;
+		ZGMemoryAddress libraryPathAddress = dataAddress + DLOPEN_RETURN_ADDRESS_MAX_SIZE;
 		
 		if (libraryPathAddress + pathCStringLength + 1 > dataAddress + dataSize)
 		{
@@ -300,6 +302,14 @@
 		if (!ZGWriteBytes(processTask, libraryPathAddress, pathCString, pathCStringLength + 1))
 		{
 			ZG_LOG(@"Failed writing C path string to memory");
+			handleFailure();
+			return;
+		}
+		
+		uint8_t zeroes[DLOPEN_RETURN_ADDRESS_MAX_SIZE] = {};
+		if (!ZGWriteBytes(processTask, dataAddress, zeroes, sizeof(zeroes)))
+		{
+			ZG_LOG(@"Failed writing zeroes at dataAddress");
 			handleFailure();
 			return;
 		}
@@ -445,14 +455,14 @@
 		}
 		
 		ZGMemoryAddress *returnedAddress = NULL;
-		ZGMemorySize returnedAddressSize = 0x8;
+		ZGMemorySize returnedAddressSize = DLOPEN_RETURN_ADDRESS_MAX_SIZE;
 		if (!ZGReadBytes(processTask, _dataAddress, (void **)&returnedAddress, &returnedAddressSize))
 		{
 			ZG_LOG(@"Failed to read return address from dlopen");
 			success = NO;
 		}
 		
-		if (returnedAddressSize < 0x8)
+		if (returnedAddressSize < DLOPEN_RETURN_ADDRESS_MAX_SIZE)
 		{
 			ZG_LOG(@"dlopen read returned less bytes than expected");
 			success = NO;
