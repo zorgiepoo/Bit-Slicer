@@ -59,6 +59,7 @@
 #import "ZGNavigationPost.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGHotKey.h"
+#import "ZGInjectLibraryController.h"
 
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
@@ -1721,15 +1722,6 @@ enum ZGStepExecution
 	 undoManager:self.undoManager];
 }
 
-- (void)dynamicLibraryWasInjectedFromPath:(NSString *)__unused libraryPath process:(ZGProcess *)process
-{
-	ZGProcess *currentProcess = self.currentProcess;
-	if ([currentProcess isEqual:process])
-	{
-		[currentProcess resymbolicate];
-	}
-}
-
 - (IBAction)injectDynamicLibrary:(id)__unused sender
 {
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -1744,11 +1736,22 @@ enum ZGStepExecution
 	[openPanel beginWithCompletionHandler:^(NSInteger result) {
 		if (result == NSFileHandlingPanelOKButton)
 		{
+			ZGProcess *process = self.currentProcess;
 			if (self.injectLibraryController == nil)
 			{
 				self.injectLibraryController = [[ZGInjectLibraryController alloc] init];
 			}
-			[self.injectLibraryController injectDynamicLibraryAtPath:openPanel.URL.path inProcess:self.currentProcess breakPointController:self.breakPointController delegate:self];
+			
+			[self.injectLibraryController injectDynamicLibraryAtPath:openPanel.URL.path inProcess:process breakPointController:self.breakPointController completionHandler:^(BOOL success) {
+				if (success)
+				{
+					[process resymbolicate];
+				}
+				else
+				{
+					ZGRunAlertPanelWithOKButton(@"Library Injection Failed", @"This dynamic library could not be loaded into this process.");
+				}
+			}];
 		}
 	}];
 }
