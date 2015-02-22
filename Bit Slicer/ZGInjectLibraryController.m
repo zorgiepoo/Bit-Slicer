@@ -361,13 +361,6 @@
 		{
 			ZG_LOG(@"Failed to deallocate data in %s", __PRETTY_FUNCTION__);
 		}
-		
-		//_breakPointController = nil;
-		
-		//	for (ZGMachBinary *machBinary in [ZGMachBinary machBinariesInProcess:breakPoint.process])
-		//	{
-		//		NSLog(@"0x%llX: %@", machBinary.headerAddress, [machBinary filePathInProcess:breakPoint.process]);
-		//	}
 	}
 }
 
