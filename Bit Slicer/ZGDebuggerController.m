@@ -362,6 +362,8 @@ enum ZGStepExecution
 			[self readMemory:nil];
 		}
 	}
+	
+	self.injectLibraryController = nil;
 }
 
 #pragma mark Split Views
@@ -1363,7 +1365,7 @@ enum ZGStepExecution
 	}
 	else if (userInterfaceItem.action == @selector(injectDynamicLibrary:))
 	{
-		if (!self.currentProcess.valid)
+		if (!self.currentProcess.valid || self.injectLibraryController != nil)
 		{
 			return NO;
 		}
@@ -1737,10 +1739,7 @@ enum ZGStepExecution
 		if (result == NSFileHandlingPanelOKButton)
 		{
 			ZGProcess *process = self.currentProcess;
-			if (self.injectLibraryController == nil)
-			{
-				self.injectLibraryController = [[ZGInjectLibraryController alloc] init];
-			}
+			self.injectLibraryController = [[ZGInjectLibraryController alloc] init];
 			
 			[self.injectLibraryController injectDynamicLibraryAtPath:openPanel.URL.path inProcess:process breakPointController:self.breakPointController completionHandler:^(BOOL success, ZGMachBinary *newBinary) {
 				if (success)
@@ -1756,6 +1755,8 @@ enum ZGStepExecution
 				{
 					ZGRunAlertPanelWithOKButton(@"Library Injection Failed", @"This dynamic library could not be loaded into this process.");
 				}
+				
+				self.injectLibraryController = nil;
 			}];
 		}
 	}];
