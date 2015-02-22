@@ -138,7 +138,14 @@
 	ZGMemoryAddress instructionPointer = process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 	
 	_machBinariesBeforeInjecting = [ZGMachBinary machBinariesInProcess:process];
-	_haltedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 0x1 inProcess:process withBreakPoints:breakPointController.breakPoints machBinaries:_machBinariesBeforeInjecting];
+	
+	// Though we can set a breakpoint and inject directly from where we stopped, this *sometimes* fails
+	// It's more reliable to set a breakpoint at a 'reliable' place. So, if objc is linked we set a breakpoint to a msgSend, otherwise we set one here
+	// Most games are graphical and interface with cocoa so I believe this is worth doing
+	NSNumber *objcMsgSendNumberAddress = [process findSymbol:@"objc_msgSend" withPartialSymbolOwnerName:@"/usr/lib/libobjc.A.dylib" requiringExactMatch:YES pastAddress:0x0 allowsWrappingToBeginning:NO];
+	
+	ZGMemoryAddress instructionAddressToHalt = (objcMsgSendNumberAddress != nil) ? objcMsgSendNumberAddress.unsignedLongLongValue : instructionPointer;
+	_haltedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddressToHalt + 0x1 inProcess:process withBreakPoints:breakPointController.breakPoints machBinaries:_machBinariesBeforeInjecting];
 	
 	if (_haltedInstruction == nil)
 	{
