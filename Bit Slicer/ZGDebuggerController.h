@@ -40,6 +40,7 @@
 #import "ZGBreakPointConditionViewController.h"
 #import "ZGBacktraceViewController.h"
 #import "ZGHotKeyDelegate.h"
+#import "ZGInjectLibraryController.h"
 
 @class ZGProcess;
 @class ZGInstruction;
@@ -54,7 +55,7 @@ extern NSString *ZGStepInHotKey;
 extern NSString *ZGStepOverHotKey;
 extern NSString *ZGStepOutHotKey;
 
-@interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate, ZGHotKeyDelegate>
+@interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate, ZGHotKeyDelegate, ZGInjectLibraryDelegate>
 
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 

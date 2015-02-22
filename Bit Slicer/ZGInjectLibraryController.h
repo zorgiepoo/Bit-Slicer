@@ -38,8 +38,16 @@
 @class ZGProcess;
 @class ZGBreakPointController;
 
+@protocol ZGInjectLibraryDelegate <NSObject>
+
+- (void)dynamicLibraryWasInjectedFromPath:(NSString *)libraryPath process:(ZGProcess *)process;
+
+@end
+
 @interface ZGInjectLibraryController : NSObject <ZGBreakPointDelegate>
 
-- (void)injectDynamicLibraryAtPath:(NSString *)path inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController;
+@property (nonatomic, weak) id <ZGInjectLibraryDelegate> delegate;
+
+- (void)injectDynamicLibraryAtPath:(NSString *)path inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController delegate:(id <ZGInjectLibraryDelegate>)delegate;
 
 @end

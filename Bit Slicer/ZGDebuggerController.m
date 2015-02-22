@@ -45,7 +45,6 @@
 #import "ZGBreakPointCondition.h"
 #import "ZGScriptManager.h"
 #import "ZGDisassemblerObject.h"
-#import "ZGInjectLibraryController.h"
 #import "ZGUtilities.h"
 #import "ZGRegistersViewController.h"
 #import "ZGPreferencesController.h"
@@ -1722,6 +1721,15 @@ enum ZGStepExecution
 	 undoManager:self.undoManager];
 }
 
+- (void)dynamicLibraryWasInjectedFromPath:(NSString *)__unused libraryPath process:(ZGProcess *)process
+{
+	ZGProcess *currentProcess = self.currentProcess;
+	if ([currentProcess isEqual:process])
+	{
+		[currentProcess resymbolicate];
+	}
+}
+
 - (IBAction)injectDynamicLibrary:(id)__unused sender
 {
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -1740,7 +1748,7 @@ enum ZGStepExecution
 			{
 				self.injectLibraryController = [[ZGInjectLibraryController alloc] init];
 			}
-			[self.injectLibraryController injectDynamicLibraryAtPath:openPanel.URL.path inProcess:self.currentProcess breakPointController:self.breakPointController];
+			[self.injectLibraryController injectDynamicLibraryAtPath:openPanel.URL.path inProcess:self.currentProcess breakPointController:self.breakPointController delegate:self];
 		}
 	}];
 }

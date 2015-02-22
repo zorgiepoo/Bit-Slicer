@@ -70,8 +70,9 @@
 
 // Pauses current execution of the process and adds a breakpoint at the current instruction pointer
 // If we don't add a breakpoint, things will get screwy (presumably because the debug flags will not be set properly?)
-- (void)injectDynamicLibraryAtPath:(NSString *)path inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController
+- (void)injectDynamicLibraryAtPath:(NSString *)path inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController delegate:(id <ZGInjectLibraryDelegate>)delegate
 {
+	_delegate = delegate;
 	_breakPointController = breakPointController;
 	_path = [path copy];
 	
@@ -251,13 +252,13 @@
 		_originalVectorState = vectorState;
 		_vectorStateCount = vectorStateCount;
 		
-//		for (mach_msg_type_number_t threadIndex = 0; threadIndex < _threadListCount; ++threadIndex)
-//		{
-//			if (threadIndex > 0 && thread_suspend(_threadList[threadIndex]) != KERN_SUCCESS)
-//			{
-//				NSLog(@"Failed suspending thread %u", _threadList[threadIndex]);
-//			}
-//		}
+		for (mach_msg_type_number_t threadIndex = 0; threadIndex < _threadListCount; ++threadIndex)
+		{
+			if (threadIndex > 0 && thread_suspend(_threadList[threadIndex]) != KERN_SUCCESS)
+			{
+				NSLog(@"Failed suspending thread %u", _threadList[threadIndex]);
+			}
+		}
 		
 		const int dlopenMode = RTLD_NOW | RTLD_GLOBAL;
 		
@@ -334,13 +335,13 @@
 		
 		[_breakPointController resumeFromBreakPoint:breakPoint];
 		
-//		for (mach_msg_type_number_t threadIndex = 0; threadIndex < _threadListCount; ++threadIndex)
-//		{
-//			if (threadIndex > 0 && thread_resume(_threadList[threadIndex]) != KERN_SUCCESS)
-//			{
-//				NSLog(@"Failed resuming thread %u", _threadList[threadIndex]);
-//			}
-//		}
+		for (mach_msg_type_number_t threadIndex = 0; threadIndex < _threadListCount; ++threadIndex)
+		{
+			if (threadIndex > 0 && thread_resume(_threadList[threadIndex]) != KERN_SUCCESS)
+			{
+				NSLog(@"Failed resuming thread %u", _threadList[threadIndex]);
+			}
+		}
 		
 		if (!ZGDeallocateMemory(current_task(), (mach_vm_address_t)_threadList, _threadListCount * sizeof(thread_act_t)))
 		{
@@ -361,6 +362,12 @@
 		{
 			ZG_LOG(@"Failed to deallocate data in %s", __PRETTY_FUNCTION__);
 		}
+		
+		NSString *libraryPath = [_path copy];
+		id <ZGInjectLibraryDelegate> delegate = self.delegate;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[delegate dynamicLibraryWasInjectedFromPath:libraryPath process:process];
+		});
 	}
 }
 
