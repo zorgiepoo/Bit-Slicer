@@ -40,6 +40,7 @@
 #import "ZGMachBinary.h"
 #import "ZGDebuggerUtilities.h"
 #import "ZGBreakPoint.h"
+#import "ZGInstruction.h"
 #include <dlfcn.h>
 
 @implementation ZGInjectLibraryController
@@ -293,7 +294,8 @@
 		ZGInstruction *endInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:codeAddress + codeData.length + 0x2 inProcess:process withBreakPoints:_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:process]];
 		if (![_breakPointController addBreakPointOnInstruction:endInstruction inProcess:process condition:NULL delegate:self])
 		{
-			ZG_LOG(@"Failed to add breakpoint... :(");
+			ZG_LOG(@"Failed to add breakpoint at 0x%llX", endInstruction.variable.address);
+			return;
 		}
 		
 		if (!process.is64Bit)
@@ -313,7 +315,7 @@
 		}
 		
 		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
-		_haltedInstruction = nil;
+		_haltedInstruction = endInstruction;
 		
 		[_breakPointController resumeFromBreakPoint:breakPoint];
 	}
@@ -332,6 +334,9 @@
 			ZG_LOG(@"Failed to set vector state after breakpoint");
 			return;
 		}
+		
+		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
+		_haltedInstruction = nil;
 		
 		[_breakPointController resumeFromBreakPoint:breakPoint];
 		
