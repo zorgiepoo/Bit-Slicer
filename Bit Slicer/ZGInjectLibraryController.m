@@ -502,15 +502,19 @@
 			[machBinaryDictionary setObject:binary forKey:@(binary.headerAddress)];
 		}
 		
-		NSArray *newMachBinaries = [ZGMachBinary machBinariesInProcess:process];
-		ZGMachBinary *newBinary = [newMachBinaries zgFirstObjectThatMatchesCondition:^BOOL(ZGMachBinary *binary) {
-			if (machBinaryDictionary[@(binary.headerAddress)] != nil)
-			{
-				return NO;
-			}
-			
-			return [[binary filePathInProcess:process] isEqualToString:self->_path];
-		}];
+		ZGMachBinary *newBinary = nil;
+		if (success)
+		{
+			NSArray *newMachBinaries = [ZGMachBinary machBinariesInProcess:process];
+			newBinary = [newMachBinaries zgFirstObjectThatMatchesCondition:^BOOL(ZGMachBinary *binary) {
+				if (machBinaryDictionary[@(binary.headerAddress)] != nil)
+				{
+					return NO;
+				}
+
+				return [[binary filePathInProcess:process] isEqualToString:self->_path];
+			}];
+		}
 		
 		[_breakPointController resumeFromBreakPoint:breakPoint];
 		
