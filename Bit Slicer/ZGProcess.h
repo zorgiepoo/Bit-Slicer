@@ -68,6 +68,8 @@
 - (NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(ZGMemoryAddress *)relativeOffset;
 - (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress allowsWrappingToBeginning:(BOOL)allowsWrapping;
 
+- (void)resymbolicate;
+
 - (BOOL)isEqual:(id)process;
 
 - (BOOL)hasGrantedAccess;

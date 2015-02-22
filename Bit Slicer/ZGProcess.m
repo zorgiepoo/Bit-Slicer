@@ -121,6 +121,14 @@
 	return self.processID != NON_EXISTENT_PID_NUMBER;
 }
 
+- (void)resymbolicate
+{
+	if (self.valid && !CSIsNull(_symbolicator))
+	{
+		CSSymbolicatorResymbolicate(_symbolicator);
+	}
+}
+
 - (CSSymbolicatorRef)symbolicator
 {
 	if (self.valid && CSIsNull(_symbolicator))
@@ -178,8 +186,12 @@
 					CSRange symbolRange = CSSymbolGetRange(symbol);
 					[symbolRanges addObject:[NSValue valueWithRange:*(NSRange *)&symbolRange]];
 				}
+				
+				return 0;
 			});
 		}
+		
+		return 0;
 	});
 	
 	return [symbolRanges sortedArrayUsingComparator:^(id rangeValue1, id rangeValue2) {
