@@ -454,27 +454,30 @@
 			}
 		}
 		
-		ZGMemoryAddress *returnedAddress = NULL;
-		ZGMemorySize returnedAddressSize = DLOPEN_RETURN_ADDRESS_MAX_SIZE;
-		if (!ZGReadBytes(processTask, _dataAddress, (void **)&returnedAddress, &returnedAddressSize))
+		if (success)
 		{
-			ZG_LOG(@"Failed to read return address from dlopen");
-			success = NO;
+			ZGMemoryAddress *returnedAddress = NULL;
+			ZGMemorySize returnedAddressSize = DLOPEN_RETURN_ADDRESS_MAX_SIZE;
+			if (!ZGReadBytes(processTask, _dataAddress, (void **)&returnedAddress, &returnedAddressSize))
+			{
+				ZG_LOG(@"Failed to read return address from dlopen");
+				success = NO;
+			}
+			
+			if (returnedAddressSize < DLOPEN_RETURN_ADDRESS_MAX_SIZE)
+			{
+				ZG_LOG(@"dlopen read returned less bytes than expected");
+				success = NO;
+			}
+			
+			if (*returnedAddress == 0x0)
+			{
+				ZG_LOG(@"dlopen returned value NULL");
+				success = NO;
+			}
+			
+			ZGFreeBytes(returnedAddress, returnedAddressSize);
 		}
-		
-		if (returnedAddressSize < DLOPEN_RETURN_ADDRESS_MAX_SIZE)
-		{
-			ZG_LOG(@"dlopen read returned less bytes than expected");
-			success = NO;
-		}
-		
-		if (*returnedAddress == 0x0)
-		{
-			ZG_LOG(@"dlopen returned value NULL");
-			success = NO;
-		}
-		
-		ZGFreeBytes(returnedAddress, returnedAddressSize);
 		
 		if (!ZGDeallocateMemory(current_task(), (mach_vm_address_t)_threadList, _threadListCount * sizeof(thread_act_t)))
 		{
