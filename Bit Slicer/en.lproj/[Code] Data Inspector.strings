@@ -1,11 +1,3 @@
-/* 
-  Data Inspector.strings
-  Bit Slicer
-
-  Created by Mayur Pawashe on 7/30/14.
-
-*/
-
 /* Label for when no data is selected */
 "noData" = "(select some data)";
 

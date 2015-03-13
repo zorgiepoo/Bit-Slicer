@@ -1,10 +1,3 @@
-/* 
-  Variable Actions.strings
-  Bit Slicer
-
-  Created by Mayur Pawashe on 7/31/14.
-
-*/
 
 /* Undo action for freezing a variable */
 "undoFreezeAction" = "Freeze";

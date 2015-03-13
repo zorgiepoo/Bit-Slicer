@@ -1,11 +1,3 @@
-/* 
-  Debugger.strings
-  Bit Slicer
-
-  Created by Mayur Pawashe on 7/20/14.
-
-*/
-
 /* Tool tip for the continue execution button */
 "continueButtonToolTip" = "Continue execution";
 

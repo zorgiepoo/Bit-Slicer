@@ -1,11 +1,3 @@
-/* 
-  Debugger Registers.strings
-  Bit Slicer
-
-  Created by Mayur Pawashe on 7/20/14.
-
-*/
-
 /* Undo action name for changing a register type */
 "undoRegisterTypeChange" = "Register Type Change";
 

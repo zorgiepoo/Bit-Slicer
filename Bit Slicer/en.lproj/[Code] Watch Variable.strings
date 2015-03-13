@@ -1,10 +1,3 @@
-/* 
-  [Code] Watch Variable.strings
-  Bit Slicer
-
-  Created by Mayur Pawashe on 8/23/14.
-
-*/
 
 /* Alert title for when target/process dies while watching accesses on a variable */
 "targetTeriminatedAlertTitleFormat" = "%@ Terminated";

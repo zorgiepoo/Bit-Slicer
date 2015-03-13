@@ -1,10 +1,3 @@
-/* 
-  Dump Memory Range.strings
-  Bit Slicer
-
-  Created by Mayur Pawashe on 7/31/14.
-
-*/
 
 /* Alert Title when dumping memory fails */
 "failedDumpingMemoryAlertTitle" = "Dumping Memory Failed";
