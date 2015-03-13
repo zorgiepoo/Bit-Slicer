@@ -467,6 +467,12 @@ CA
                                     <action selector="injectDynamicLibrary:" target="-1" id="UpO-4a-JGg"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Change Speed…" id="9HI-OE-kKv">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="setTimerSpeed:" target="-1" id="9W7-dS-1th"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="u1D-VA-RFp"/>
                             <menuItem title="Go to Call Address" keyEquivalent="F" id="1106">
                                 <connections>

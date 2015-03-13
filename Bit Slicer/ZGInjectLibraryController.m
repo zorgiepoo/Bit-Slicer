@@ -44,6 +44,8 @@
 #import "NSArrayAdditions.h"
 #include <dlfcn.h>
 
+#import "ZGRegistersState.h" // temporary
+
 #define DLOPEN_RETURN_ADDRESS_MAX_SIZE 0x8
 
 @implementation ZGInjectLibraryController
@@ -53,6 +55,9 @@
 	
 	zg_x86_vector_state_t _originalVectorState;
 	mach_msg_type_number_t _vectorStateCount;
+	
+	x86_debug_state_t _originalDebugState;
+	mach_msg_type_number_t _debugStateCount;
 	
 	thread_act_array_t _threadList;
 	mach_msg_type_number_t _threadListCount;
@@ -75,13 +80,103 @@
 	ZGInjectLibraryCompletionHandler _completionHandler;
 }
 
+// See https://github.com/rodionovd/RDInjectionWizard/blob/master/RDInjectionWizard/RDInjectionWizard.m#L116
+extern int sandbox_check(pid_t pid, const char *operation, int type, ...);
+extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
+
 // Pauses current execution of the process and adds a breakpoint at the current instruction pointer
 // If we don't add a breakpoint, things will get screwy (presumably because the debug flags will not be set properly?)
 - (void)injectDynamicLibraryAtPath:(NSString *)path inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController completionHandler:(ZGInjectLibraryCompletionHandler)completionHandler
 {
-	_breakPointController = breakPointController;
-	_path = [path copy];
+	// If the process is sandboxed, we need to copy the injected library into its container
+	BOOL isSandboxed = NO;
+	NSString *sandboxPath = nil;
+	if (sandbox_check(process.processID, NULL, 0) != 0)
+	{
+		isSandboxed = YES;
+		
+		size_t containerBufferSize = MAXPATHLEN;
+		char *containerBuffer = calloc(1, containerBufferSize);
+		assert(containerBuffer != NULL);
+		
+		if (sandbox_container_path_for_pid(process.processID, containerBuffer, containerBufferSize) == KERN_SUCCESS)
+		{
+			NSString *containerPath = @(containerBuffer);
+			if (containerPath != nil)
+			{
+				NSString *directoryPath = [containerPath stringByAppendingPathComponent:@"Bit Slicer Injected Libraries"];
+				
+				NSFileManager *fileManager = [[NSFileManager alloc] init];
+				if (![fileManager fileExistsAtPath:directoryPath isDirectory:NULL])
+				{
+					NSError *error = nil;
+					if (![fileManager createDirectoryAtPath:directoryPath withIntermediateDirectories:NO attributes:nil error:&error])
+					{
+						NSLog(@"Failed to create directory %@, error: %@", directoryPath, error);
+					}
+				}
+				
+				if ([[path stringByDeletingLastPathComponent] isEqualToString:directoryPath])
+				{
+					sandboxPath = [path copy];
+				}
+				else
+				{
+					NSString *destinationPath = [directoryPath stringByAppendingPathComponent:[path lastPathComponent]];
+					BOOL needsRename = NO;
+					
+					// Check if we can remove any existing file that isn't in use
+					if ([fileManager fileExistsAtPath:destinationPath])
+					{
+						needsRename = YES;
+						
+						NSError *error = nil;
+						NSDictionary *fileAttributes =  [fileManager attributesOfItemAtPath:destinationPath error:&error];
+						if (fileAttributes != nil)
+						{
+							BOOL immutable = [[fileAttributes objectForKey:NSFileImmutable] boolValue];
+							if (!immutable)
+							{
+								if (![fileManager removeItemAtPath:destinationPath error:&error])
+								{
+									NSLog(@"Failed to remove path %@ ; error: %@", destinationPath, error);
+								}
+								else
+								{
+									needsRename = NO;
+								}
+							}
+						}
+						else
+						{
+							NSLog(@"Failed to fetch file attributes for %@ ; error: %@", destinationPath, error);
+						}
+					}
+					
+					if (needsRename)
+					{
+						NSString *newDestinationPath = [[[destinationPath stringByDeletingPathExtension] stringByAppendingFormat:@"%f", [NSDate timeIntervalSinceReferenceDate]] stringByAppendingPathExtension:[destinationPath pathExtension]];
+						
+						destinationPath = newDestinationPath;
+					}
+					
+					NSError *error = nil;
+					if ([fileManager copyItemAtPath:path toPath:destinationPath error:&error])
+					{
+						sandboxPath = destinationPath;
+					}
+					else
+					{
+						NSLog(@"Failed to copy %@ to %@ ; error: %@", path, destinationPath, error);
+					}
+				}
+			}
+		}
+		
+		free(containerBuffer);
+	}
 	
+	_breakPointController = breakPointController;
 	_completionHandler = completionHandler;
 	
 	// Fields we'll need later; initialize to 0
@@ -93,6 +188,7 @@
 	_dataAddress = 0;
 	_dataSize = 0;
 	_machBinariesBeforeInjecting = nil;
+	_haltedInstruction = nil;
 	
 	ZGMemoryMap processTask = process.processTask;
 	
@@ -106,9 +202,31 @@
 		{
 			ZGDeallocateMemory(current_task(), (mach_vm_address_t)self->_threadList, self->_threadListCount * sizeof(thread_act_t));
 		}
+		
+		if (self->_haltedInstruction != nil)
+		{
+			[breakPointController removeBreakPointOnInstruction:self->_haltedInstruction inProcess:process];
+		}
 		ZGResumeTask(processTask);
 		completionHandler(NO, nil);
 	};
+	
+	if (isSandboxed)
+	{
+		if (sandboxPath == nil)
+		{
+			handleFailure();
+			return;
+		}
+		else
+		{
+			_path = sandboxPath;
+		}
+	}
+	else
+	{
+		_path = [path copy];
+	}
 	
 	if (task_threads(processTask, &_threadList, &_threadListCount) != KERN_SUCCESS)
 	{
@@ -145,6 +263,10 @@
 	NSNumber *objcMsgSendNumberAddress = [process findSymbol:@"objc_msgSend" withPartialSymbolOwnerName:@"/usr/lib/libobjc.A.dylib" requiringExactMatch:YES pastAddress:0x0 allowsWrappingToBeginning:NO];
 	
 	ZGMemoryAddress instructionAddressToHalt = (objcMsgSendNumberAddress != nil) ? objcMsgSendNumberAddress.unsignedLongLongValue : instructionPointer;
+	
+	//ZGMemoryAddress instructionAddressToHalt = instructionPointer;
+	NSLog(@"Setting bp at 0x%llX with tid %u", instructionAddressToHalt, mainThread);
+	
 	_haltedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddressToHalt + 0x1 inProcess:process withBreakPoints:breakPointController.breakPoints machBinaries:_machBinariesBeforeInjecting];
 	
 	if (_haltedInstruction == nil)
@@ -176,6 +298,9 @@
 	{
 		_secondPass = YES;
 		
+		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
+		_haltedInstruction = nil;
+		
 		ZGInstruction *endOfCodeInstruction = nil;
 		
 		void (^handleFailure)(void) = ^{
@@ -192,11 +317,6 @@
 			if (self->_stackAddress != 0)
 			{
 				ZGDeallocateMemory(processTask, self->_stackAddress, self->_stackSize);
-			}
-			
-			if (self->_haltedInstruction != nil)
-			{
-				[self->_breakPointController removeBreakPointOnInstruction:self->_haltedInstruction inProcess:process];
 			}
 			
 			if (endOfCodeInstruction != nil)
@@ -219,7 +339,10 @@
 		// Inject our code that will call dlopen
 		// After it's injected, change the stack and instruction pointers to our own
 		
-		NSNumber *dlopenAddressNumber = [process findSymbol:@"dlopen" withPartialSymbolOwnerName:@"/usr/bin/dyld" requiringExactMatch:YES pastAddress:0x0 allowsWrappingToBeginning:NO];
+		// /usr/lib/dyld
+		// /usr/lib/system/libdyld.dylib
+		// /usr/bin/dyld
+		NSNumber *dlopenAddressNumber = [process findSymbol:@"dlopen" withPartialSymbolOwnerName:@"/usr/lib/dyld" requiringExactMatch:YES pastAddress:0x0 allowsWrappingToBeginning:NO];
 		
 		if (dlopenAddressNumber == nil)
 		{
@@ -346,6 +469,8 @@
 			return;
 		}
 		
+		NSLog(@"Stopped at (1st) 0x%X, tid: %d", breakPoint.registersState.generalPurposeThreadState.uts.ts32.__eip, breakPoint.thread);
+		
 		_originalThreadState = threadState;
 		_threadStateCount = threadStateCount;
 		
@@ -360,6 +485,18 @@
 		
 		_originalVectorState = vectorState;
 		_vectorStateCount = vectorStateCount;
+		
+		x86_debug_state_t debugState;
+		mach_msg_type_number_t debugStateCount;
+		if (!ZGGetDebugThreadState(&debugState, mainThread, &debugStateCount))
+		{
+			ZG_LOG(@"ERROR: Grabbing debug state failed %s", __PRETTY_FUNCTION__);
+			handleFailure();
+			return;
+		}
+		
+		_originalDebugState = debugState;
+		_debugStateCount = debugStateCount;
 		
 		for (mach_msg_type_number_t threadIndex = 0; threadIndex < _threadListCount; ++threadIndex)
 		{
@@ -402,7 +539,12 @@
 		}
 		
 		endOfCodeInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:codeAddress + codeData.length + 0x2 inProcess:process withBreakPoints:_breakPointController.breakPoints machBinaries:_machBinariesBeforeInjecting];
-		if (![_breakPointController addBreakPointOnInstruction:endOfCodeInstruction inProcess:process condition:NULL delegate:self])
+		
+		ZGMemoryAddress basePointer = process.is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+		
+		NSLog(@"Adding bp to end 0x%llX", endOfCodeInstruction.variable.address);
+		
+		if (![_breakPointController addBreakPointOnInstruction:endOfCodeInstruction inProcess:process thread:mainThread basePointer:basePointer delegate:self])
 		{
 			ZG_LOG(@"Failed to add breakpoint at 0x%llX", endOfCodeInstruction.variable.address);
 			endOfCodeInstruction = nil;
@@ -428,15 +570,19 @@
 			return;
 		}
 		
-		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
 		_haltedInstruction = endOfCodeInstruction;
 		
 		[_breakPointController resumeFromBreakPoint:breakPoint];
 	}
 	else
 	{
+		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
+		_haltedInstruction = nil;
+		
 		// Restore everything to the way it was before we ran our code
 		BOOL success = YES;
+		
+		NSLog(@"Hit last bp at 0x%X, tid: %d", breakPoint.registersState.generalPurposeThreadState.uts.ts32.__eip, breakPoint.thread);
 		
 		if (!ZGSetGeneralThreadState(&_originalThreadState, thread, _threadStateCount))
 		{
@@ -450,8 +596,11 @@
 			success = NO;
 		}
 		
-		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
-		_haltedInstruction = nil;
+		if (!ZGSetDebugThreadState(&_originalDebugState, thread, _debugStateCount))
+		{
+			ZG_LOG(@"Failed to set debug state after breakpoint");
+			success = NO;
+		}
 		
 		for (mach_msg_type_number_t threadIndex = 0; threadIndex < _threadListCount; ++threadIndex)
 		{

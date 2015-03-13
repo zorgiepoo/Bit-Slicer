@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/29/12.
+ * Created by Mayur Pawashe on 2/22/15.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,45 +32,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "Python.h"
-#import "ZGMemoryTypes.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGThreadStates.h"
+#import <Cocoa/Cocoa.h>
 
-@class ZGVariable;
+@class ZGBreakPointController;
 @class ZGProcess;
-@class ZGRegistersState;
 
-typedef enum
-{
-	ZGBreakPointWatchData,
-	ZGBreakPointInstruction,
-	ZGBreakPointSingleStepInstruction,
-} ZGBreakPointType;
+@interface ZGSpeedModifierWindowController : NSWindowController
 
-@interface ZGBreakPoint : NSObject
-
-- (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type  delegate:(id <ZGBreakPointDelegate>)delegate;
-
-@property (atomic, weak) id <ZGBreakPointDelegate> delegate;
-@property (readonly, nonatomic) ZGMemoryMap task;
-@property (nonatomic) thread_act_t targetThread;
-@property (nonatomic) thread_act_t thread;
-@property (nonatomic) ZGVariable *variable;
-@property (nonatomic) ZGMemorySize watchSize;
-@property (readonly, nonatomic) ZGProcess *process;
-@property (atomic) NSArray *debugThreads;
-@property (readonly, nonatomic) ZGBreakPointType type;
-@property (atomic) BOOL needsToRestore;
-@property (atomic) BOOL hidden;
-@property (atomic) BOOL dead;
-@property (atomic) ZGMemoryAddress basePointer;
-@property (nonatomic) NSMutableDictionary *cacheDictionary;
-@property (nonatomic) PyObject *condition;
-@property (nonatomic) PyObject *callback;
-@property (nonatomic) NSError *error;
-@property (nonatomic) ZGMemoryProtection originalProtection;
-@property (nonatomic) ZGRegistersState *registersState;
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController undoManager:(NSUndoManager *)undoManager;
 
 @end

@@ -60,6 +60,7 @@
 #import "ZGHotKeyCenter.h"
 #import "ZGHotKey.h"
 #import "ZGInjectLibraryController.h"
+#import "ZGSpeedModifierWindowController.h"
 
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
@@ -93,6 +94,7 @@
 
 @property (nonatomic) ZGCodeInjectionWindowController *codeInjectionController;
 @property (nonatomic) ZGInjectLibraryController *injectLibraryController;
+@property (nonatomic) ZGSpeedModifierWindowController *speedModifierController;
 
 @property (nonatomic) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
@@ -1731,7 +1733,7 @@ enum ZGStepExecution
 	[openPanel setCanChooseFiles:YES];
 	[openPanel setAllowsMultipleSelection:NO];
 	[openPanel setCanCreateDirectories:NO];
-	[openPanel setAllowedFileTypes:@[@"dylib"]];
+	[openPanel setAllowedFileTypes:@[@"dylib", @"so", @"bundle"]];
 	[openPanel setTreatsFilePackagesAsDirectories:YES];
 	[openPanel setMessage:@"Choose the dylib that you want to inject"];
 	
@@ -1760,6 +1762,16 @@ enum ZGStepExecution
 			}];
 		}
 	}];
+}
+
+- (IBAction)setTimerSpeed:(id)__unused sender
+{
+	if (self.speedModifierController == nil)
+	{
+		self.speedModifierController = [[ZGSpeedModifierWindowController alloc] init];
+	}
+	
+	[self.speedModifierController attachToWindow:self.window process:self.currentProcess breakPointController:self.breakPointController undoManager:self.undoManager];
 }
 
 #pragma mark Break Points
