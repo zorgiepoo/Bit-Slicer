@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7211B30F1A92AE04003A5730 /* libSystem.B.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7211B30E1A92AE04003A5730 /* libSystem.B.dylib */; };
-		7211B3121A98EF91003A5730 /* ZGInjectLibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7211B3111A98EF91003A5730 /* ZGInjectLibraryController.m */; };
 		722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5519AD4AED009C6AAE /* hotkey.png */; };
 		722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5619AD4AED009C6AAE /* hotkey@2x.png */; };
 		722CAA5B19AD4AED009C6AAE /* scripts.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5719AD4AED009C6AAE /* scripts.png */; };
@@ -66,13 +64,10 @@
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
-		72BA3E9D1A9A407C008DAA11 /* ZGSpeedModifierWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72BA3E9B1A9A407C008DAA11 /* ZGSpeedModifierWindowController.m */; };
-		72BA3E9E1A9A407C008DAA11 /* Modify Speed Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72BA3E9C1A9A407C008DAA11 /* Modify Speed Dialog.xib */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
 		72D051AC1960891900EC532A /* Backtrace View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AE1960891900EC532A /* Backtrace View.xib */; };
 		72D051CB1960A41F00EC532A /* Registers View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051C91960A41F00EC532A /* Registers View.xib */; };
 		72D271D4197C2A6800CC6914 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D271D2197C2A6800CC6914 /* InfoPlist.strings */; };
-		72D72B191AB279F2005044CF /* inject.dylib in Resources */ = {isa = PBXBuildFile; fileRef = 72D72B171AB27990005044CF /* inject.dylib */; };
 		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
 		770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F284118832132001B828C /* ZGBreakPointCondition.m */; };
@@ -300,12 +295,6 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		7211B3071A92A9E6003A5730 /* libpthread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpthread.dylib; path = usr/lib/libpthread.dylib; sourceTree = SDKROOT; };
-		7211B3091A92ACA5003A5730 /* libsystem_pthread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsystem_pthread.dylib; path = usr/lib/system/libsystem_pthread.dylib; sourceTree = SDKROOT; };
-		7211B30B1A92AD15003A5730 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = ../../../../../System/Library/Frameworks/System.framework; sourceTree = "<group>"; };
-		7211B30E1A92AE04003A5730 /* libSystem.B.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSystem.B.dylib; path = usr/lib/libSystem.B.dylib; sourceTree = SDKROOT; };
-		7211B3101A98EF91003A5730 /* ZGInjectLibraryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGInjectLibraryController.h; path = "Bit Slicer/ZGInjectLibraryController.h"; sourceTree = "<group>"; };
-		7211B3111A98EF91003A5730 /* ZGInjectLibraryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGInjectLibraryController.m; path = "Bit Slicer/ZGInjectLibraryController.m"; sourceTree = "<group>"; };
 		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
 		722CAA5619AD4AED009C6AAE /* hotkey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hotkey@2x.png"; path = "Bit Slicer/preficons/hotkey@2x.png"; sourceTree = "<group>"; };
 		722CAA5719AD4AED009C6AAE /* scripts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = scripts.png; path = "Bit Slicer/preficons/scripts.png"; sourceTree = "<group>"; };
@@ -367,9 +356,6 @@
 		72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPrompt.h; path = "Bit Slicer/ZGScriptPrompt.h"; sourceTree = "<group>"; };
 		72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPrompt.m; path = "Bit Slicer/ZGScriptPrompt.m"; sourceTree = "<group>"; };
 		72AA79841A2413B4005A9BD6 /* ZGScriptPromptDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPromptDelegate.h; path = "Bit Slicer/ZGScriptPromptDelegate.h"; sourceTree = "<group>"; };
-		72BA3E9A1A9A407C008DAA11 /* ZGSpeedModifierWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSpeedModifierWindowController.h; path = "Bit Slicer/ZGSpeedModifierWindowController.h"; sourceTree = "<group>"; };
-		72BA3E9B1A9A407C008DAA11 /* ZGSpeedModifierWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSpeedModifierWindowController.m; path = "Bit Slicer/ZGSpeedModifierWindowController.m"; sourceTree = "<group>"; };
-		72BA3E9C1A9A407C008DAA11 /* Modify Speed Dialog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = "Modify Speed Dialog.xib"; path = "Bit Slicer/Modify Speed Dialog.xib"; sourceTree = "<group>"; };
 		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Data Inspector View.xib"; sourceTree = "<group>"; };
 		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Backtrace View.xib"; sourceTree = "<group>"; };
 		72D051CA1960A41F00EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Registers View.xib"; sourceTree = "<group>"; };
@@ -397,7 +383,6 @@
 		72D271C8197C26AC00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Watch Variable Dialog.strings"; sourceTree = "<group>"; };
 		72D271D3197C2A6800CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		72D272F9198B085F00CC6914 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Logs Window.strings"; sourceTree = "<group>"; };
-		72D72B171AB27990005044CF /* inject.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = inject.dylib; sourceTree = "<group>"; };
 		770136E8192309740072A192 /* ZGPyVMProtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyVMProtModule.h; path = "Bit Slicer/ZGPyVMProtModule.h"; sourceTree = "<group>"; };
 		770136E9192309740072A192 /* ZGPyVMProtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyVMProtModule.m; path = "Bit Slicer/ZGPyVMProtModule.m"; sourceTree = "<group>"; };
 		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; };
@@ -782,7 +767,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7211B30F1A92AE04003A5730 /* libSystem.B.dylib in Frameworks */,
 				773E8AFB1821DC5A00D1A71A /* CoreServices.framework in Frameworks */,
 				773E8AFC1821DC5A00D1A71A /* ApplicationServices.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
@@ -881,7 +865,6 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				72D72B171AB27990005044CF /* inject.dylib */,
 				7743F9C518024CE400DBC19A /* python3.3 */,
 				77DA9D0F180063A600549A37 /* Debugger Icons */,
 				77988F18185803DA00476A37 /* Document Icons */,
@@ -898,10 +881,6 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7211B30E1A92AE04003A5730 /* libSystem.B.dylib */,
-				7211B30B1A92AD15003A5730 /* System.framework */,
-				7211B3091A92ACA5003A5730 /* libsystem_pthread.dylib */,
-				7211B3071A92A9E6003A5730 /* libpthread.dylib */,
 				1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */,
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
@@ -929,7 +908,6 @@
 				72D051C91960A41F00EC532A /* Registers View.xib */,
 				726CA2B519606DB300A6AD40 /* Breakpoint Condition View.xib */,
 				726CA2A719606D0000A6AD40 /* Code Injection Window.xib */,
-				72BA3E9C1A9A407C008DAA11 /* Modify Speed Dialog.xib */,
 				726CA2AD19606D1200A6AD40 /* Memory Viewer Window.xib */,
 				72D051AB1960890800EC532A /* Data Inspector View.xib */,
 				726CA2B819606DD200A6AD40 /* Change Memory Protection Dialog.xib */,
@@ -1071,8 +1049,6 @@
 				77F1163F17D2EF9E009E002A /* ZGDebuggerController.m */,
 				779C6CC118E7309B0076D647 /* ZGDebuggerUtilities.h */,
 				779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */,
-				7211B3101A98EF91003A5730 /* ZGInjectLibraryController.h */,
-				7211B3111A98EF91003A5730 /* ZGInjectLibraryController.m */,
 				77CECE1418B8861C006D45E9 /* ZGRegistersViewController.h */,
 				77CECE1518B8861C006D45E9 /* ZGRegistersViewController.m */,
 				772C0F7C18B88AFA009FFF72 /* ZGRegisterEntries.h */,
@@ -1102,8 +1078,6 @@
 				77F1165817D2F001009E002A /* ZGRegister.m */,
 				77F1165A17D2F00A009E002A /* ZGCodeInjectionWindowController.h */,
 				77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */,
-				72BA3E9A1A9A407C008DAA11 /* ZGSpeedModifierWindowController.h */,
-				72BA3E9B1A9A407C008DAA11 /* ZGSpeedModifierWindowController.m */,
 			);
 			name = Debugger;
 			sourceTree = "<group>";
@@ -1637,7 +1611,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72D72B191AB279F2005044CF /* inject.dylib in Resources */,
 				77F115AA17D2E8AC009E002A /* yasm in Resources */,
 				724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */,
 				726CA2B919606DD900A6AD40 /* Dump All Memory Dialog.xib in Resources */,
@@ -1702,7 +1675,6 @@
 				726CA2B019606DA000A6AD40 /* Logs Window.xib in Resources */,
 				724A9F2119A1657500E72C9D /* [Code] Dump Memory Range.strings in Resources */,
 				726CA2A319606CB600A6AD40 /* Search Document Window.xib in Resources */,
-				72BA3E9E1A9A407C008DAA11 /* Modify Speed Dialog.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1799,7 +1771,6 @@
 				7768064018B96A64007F2CAF /* ZGThreadStates.c in Sources */,
 				77F115E517D2EDCD009E002A /* ZGPreferencesController.m in Sources */,
 				77F115E817D2EDD9009E002A /* ZGProcessList.m in Sources */,
-				72BA3E9D1A9A407C008DAA11 /* ZGSpeedModifierWindowController.m in Sources */,
 				7798EED818C40B7F001120FB /* DDParser.m in Sources */,
 				77F115EB17D2EDE3009E002A /* ZGRunningProcess.m in Sources */,
 				77F115EE17D2EDEE009E002A /* ZGRunningProcessObserver.m in Sources */,
@@ -1850,7 +1821,6 @@
 				77F1162817D2EF3A009E002A /* ZGProcess.m in Sources */,
 				77F1162C17D2EF50009E002A /* ZGVariable.m in Sources */,
 				7768064318B9A36E007F2CAF /* ZGBacktrace.m in Sources */,
-				7211B3121A98EF91003A5730 /* ZGInjectLibraryController.m in Sources */,
 				77F1162F17D2EF5A009E002A /* ZGUtilities.m in Sources */,
 				77F1163217D2EF62009E002A /* ZGCalculator.m in Sources */,
 				77F1163517D2EF6D009E002A /* NSStringAdditions.m in Sources */,
@@ -2536,7 +2506,6 @@
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
-				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_CXX0X_EXTENSIONS = YES;
@@ -2553,12 +2522,10 @@
 				CLANG_WARN_OBJC_RECEIVER_WEAK = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
@@ -2601,8 +2568,6 @@
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
 					"$(SRCROOT)/deps/python/lib",
-					"$(SDKROOT)/usr/lib/system",
-					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = "-D_BSDEBUG";
@@ -2642,7 +2607,6 @@
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
-				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_CXX0X_EXTENSIONS = YES;
@@ -2659,13 +2623,11 @@
 				CLANG_WARN_OBJC_RECEIVER_WEAK = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
@@ -2706,8 +2668,6 @@
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
 					"$(SRCROOT)/deps/python/lib",
-					"$(SDKROOT)/usr/lib/system",
-					"$(PROJECT_DIR)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "Bit Slicer";

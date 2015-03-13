@@ -66,12 +66,7 @@
 @property (nonatomic, readonly) NSMutableDictionary *cacheDictionary;
 
 - (NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(ZGMemoryAddress *)relativeOffset;
-
-- (NSArray *)findSymbolsWithName:(NSString *)symbolName partialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch;
-
 - (NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress allowsWrappingToBeginning:(BOOL)allowsWrapping;
-
-- (void)resymbolicate;
 
 - (BOOL)isEqual:(id)process;
 

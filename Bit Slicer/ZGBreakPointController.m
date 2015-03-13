@@ -308,7 +308,6 @@ static ZGBreakPointController *gBreakPointController;
 	if (breakPoint.type == ZGBreakPointInstruction && [self.breakPoints containsObject:breakPoint])
 	{
 		// Restore our instruction
-		NSLog(@"Writing original byte val at 0x%llX", breakPoint.variable.address);
 		ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
 		
 		breakPoint.needsToRestore = YES;
@@ -486,8 +485,6 @@ static ZGBreakPointController *gBreakPointController;
 			}
 		}
 		
-		NSLog(@"Found inst addr: 0x%llX vs bp addr: 0x%llX (found single = %d, IP: 0x%llX)", foundInstructionAddress, breakPoint.variable.address, foundSingleStepBreakPoint, instructionPointer);
-		
 		if (foundInstructionAddress == breakPoint.variable.address)
 		{
 			uint8_t *opcode = NULL;
@@ -503,11 +500,11 @@ static ZGBreakPointController *gBreakPointController;
 					// Restore program counter
 					if (breakPoint.process.is64Bit)
 					{
-						threadState.uts.ts64.__rip = foundInstructionAddress;
+						threadState.uts.ts64.__rip = breakPoint.variable.address;
 					}
 					else
 					{
-						threadState.uts.ts32.__eip = (uint32_t)foundInstructionAddress;
+						threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
 					}
 					
 					[breakPointsToNotify addObject:breakPoint];
@@ -521,11 +518,8 @@ static ZGBreakPointController *gBreakPointController;
 		
 		if (breakPoint.needsToRestore)
 		{
-			NSLog(@"Restored BP at tid %u", breakPoint.thread);
-			
 			// Restore our breakpoint
 			uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
-			NSLog(@"Writing CC opcode to 0x%llX", breakPoint.variable.address);
 			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
 			
 			breakPoint.needsToRestore = NO;
@@ -561,8 +555,6 @@ static ZGBreakPointController *gBreakPointController;
 			
 			candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
 			
-			NSLog(@"Added strange BP 0x%llX", candidateBreakPoint.variable.address);
-			
 			[breakPointsToNotify addObject:candidateBreakPoint];
 			
 			hitBreakPoint = YES;
@@ -590,7 +582,7 @@ static ZGBreakPointController *gBreakPointController;
 	// We should notify delegates if a breakpoint hits after we modify thread states
 	for (ZGBreakPoint *breakPoint in breakPointsToNotify)
 	{
-		BOOL canNotifyDelegate = !breakPoint.dead && (breakPoint.targetThread == 0 || breakPoint.targetThread == thread);
+		BOOL canNotifyDelegate = !breakPoint.dead;
 		
 		if (canNotifyDelegate && !retrievedRegisterEntries)
 		{
@@ -625,7 +617,6 @@ static ZGBreakPointController *gBreakPointController;
 		
 		if (canNotifyDelegate)
 		{
-			NSLog(@"Notifying tid %u", breakPoint.thread);
 			BOOL is64Bit = breakPoint.process.is64Bit;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -649,21 +640,11 @@ static ZGBreakPointController *gBreakPointController;
 		}
 		else
 		{
-			NSLog(@"Resumind without notifying tid %u", breakPoint.thread);
 			[self resumeFromBreakPoint:breakPoint];
 		}
 	}
 	
 	ZGResumeTask(task);
-	
-	if (!handledInstructionBreakPoint)
-	{
-		NSLog(@"We did not handle... crash? :( %lu", breakPoints.count);
-		for (ZGBreakPoint *breakPoint in breakPoints)
-		{
-			NSLog(@"BP Addr: 0x%llX TID: %u needsRestore: %d, dead: %d", breakPoint.variable.address, breakPoint.thread, breakPoint.needsToRestore, breakPoint.dead);
-		}
-	}
 	
 	return handledInstructionBreakPoint;
 }
@@ -685,8 +666,6 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	if (exception == EXC_BREAKPOINT)
 	{
-		NSLog(@"Reahed breakpoint... tid: %d", thread);
-		
 		handledWatchPoint = [gBreakPointController handleWatchPointsWithTask:task inThread:thread];
 		handledInstructionBreakPoint = [gBreakPointController handleInstructionBreakPointsWithTask:task inThread:thread];
 	}
@@ -1058,7 +1037,6 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	breakPoint.variable = variable;
 	breakPoint.hidden = isHidden;
-	breakPoint.targetThread = thread;
 	breakPoint.thread = thread;
 	breakPoint.basePointer = basePointer;
 	breakPoint.originalProtection = memoryProtection;
@@ -1082,7 +1060,6 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 {
 	ZGBreakPoint *singleStepBreakPoint = [[ZGBreakPoint alloc] initWithProcess:breakPoint.process type:ZGBreakPointSingleStepInstruction delegate:breakPoint.delegate];
 	singleStepBreakPoint.thread = breakPoint.thread;
-	singleStepBreakPoint.targetThread = breakPoint.thread;
 	
 	[self addBreakPoint:singleStepBreakPoint];
 	

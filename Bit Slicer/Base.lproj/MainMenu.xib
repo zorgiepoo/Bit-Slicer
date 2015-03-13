@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
+        <deployment defaultVersion="1080" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -11,7 +11,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customObject id="-3" userLabel="Application"/>
         <menu title="AMainMenu" systemMenu="main" id="29">
             <items>
                 <menuItem title="Bit Slicer" id="56">
@@ -461,19 +461,6 @@ CA
                                     <action selector="requestCodeInjection:" target="-1" id="YEG-hq-xn6"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Inject Library…" keyEquivalent="i" id="Hj3-J0-qO4">
-                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
-                                <connections>
-                                    <action selector="injectDynamicLibrary:" target="-1" id="UpO-4a-JGg"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Change Speed…" id="9HI-OE-kKv">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="setTimerSpeed:" target="-1" id="9W7-dS-1th"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem isSeparatorItem="YES" id="u1D-VA-RFp"/>
                             <menuItem title="Go to Call Address" keyEquivalent="F" id="1106">
                                 <connections>
                                     <action selector="jumpToOperandOffset:" target="-1" id="9R6-et-wkJ"/>

@@ -55,7 +55,6 @@ typedef enum
 
 @property (atomic, weak) id <ZGBreakPointDelegate> delegate;
 @property (readonly, nonatomic) ZGMemoryMap task;
-@property (nonatomic) thread_act_t targetThread;
 @property (nonatomic) thread_act_t thread;
 @property (nonatomic) ZGVariable *variable;
 @property (nonatomic) ZGMemorySize watchSize;

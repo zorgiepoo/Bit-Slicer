@@ -59,8 +59,6 @@
 #import "ZGNavigationPost.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGHotKey.h"
-#import "ZGInjectLibraryController.h"
-#import "ZGSpeedModifierWindowController.h"
 
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
@@ -93,8 +91,6 @@
 @property (nonatomic) NSRange instructionBoundary;
 
 @property (nonatomic) ZGCodeInjectionWindowController *codeInjectionController;
-@property (nonatomic) ZGInjectLibraryController *injectLibraryController;
-@property (nonatomic) ZGSpeedModifierWindowController *speedModifierController;
 
 @property (nonatomic) NSArray *haltedBreakPoints;
 @property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
@@ -364,8 +360,6 @@ enum ZGStepExecution
 			[self readMemory:nil];
 		}
 	}
-	
-	self.injectLibraryController = nil;
 }
 
 #pragma mark Split Views
@@ -1365,13 +1359,6 @@ enum ZGStepExecution
 			return NO;
 		}
 	}
-	else if (userInterfaceItem.action == @selector(injectDynamicLibrary:))
-	{
-		if (!self.currentProcess.valid || self.injectLibraryController != nil)
-		{
-			return NO;
-		}
-	}
 	else if (userInterfaceItem.action == @selector(showBreakPointCondition:))
 	{
 		if ([[self selectedInstructions] count] != 1)
@@ -1724,54 +1711,6 @@ enum ZGStepExecution
 	 instruction:[self.selectedInstructions objectAtIndex:0]
 	 breakPoints:self.breakPointController.breakPoints
 	 undoManager:self.undoManager];
-}
-
-- (IBAction)injectDynamicLibrary:(id)__unused sender
-{
-	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-	[openPanel setCanChooseDirectories:NO];
-	[openPanel setCanChooseFiles:YES];
-	[openPanel setAllowsMultipleSelection:NO];
-	[openPanel setCanCreateDirectories:NO];
-	[openPanel setAllowedFileTypes:@[@"dylib", @"so", @"bundle"]];
-	[openPanel setTreatsFilePackagesAsDirectories:YES];
-	[openPanel setMessage:@"Choose the dylib that you want to inject"];
-	
-	[openPanel beginWithCompletionHandler:^(NSInteger result) {
-		if (result == NSFileHandlingPanelOKButton)
-		{
-			ZGProcess *process = self.currentProcess;
-			self.injectLibraryController = [[ZGInjectLibraryController alloc] init];
-			
-			[self.injectLibraryController injectDynamicLibraryAtPath:openPanel.URL.path inProcess:process breakPointController:self.breakPointController completionHandler:^(BOOL success, ZGMachBinary *newBinary) {
-				if (success)
-				{
-					[process resymbolicate];
-					ZGMemoryAddress firstInstruction = [[newBinary machBinaryInfoInProcess:process] firstInstructionAddress];
-					if (firstInstruction != 0x0)
-					{
-						[self jumpToMemoryAddress:firstInstruction];
-					}
-				}
-				else
-				{
-					ZGRunAlertPanelWithOKButton(@"Library Injection Failed", @"This dynamic library could not be loaded into this process.");
-				}
-				
-				self.injectLibraryController = nil;
-			}];
-		}
-	}];
-}
-
-- (IBAction)setTimerSpeed:(id)__unused sender
-{
-	if (self.speedModifierController == nil)
-	{
-		self.speedModifierController = [[ZGSpeedModifierWindowController alloc] init];
-	}
-	
-	[self.speedModifierController attachToWindow:self.window process:self.currentProcess breakPointController:self.breakPointController undoManager:self.undoManager];
 }
 
 #pragma mark Break Points

@@ -55,6 +55,7 @@
 		self.type = type;
 		self.delegate = delegate;
 		self.task = process.processTask;
+		self.delegate = delegate;
 	}
 	return self;
 }
