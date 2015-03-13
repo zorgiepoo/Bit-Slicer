@@ -1,0 +1,39 @@
+
+/* Class = "NSTableColumn"; headerCell.title = "Instruction"; ObjectID = "0aX-X4-2Ly"; */
+"0aX-X4-2Ly.headerCell.title" = "Инструкции";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "6mE-1V-0N8"; */
+"6mE-1V-0N8.title" = "Отмена";
+
+/* Class = "NSMenuItem"; title = "Show in Memory Viewer"; ObjectID = "Ow4-Q4-j9x"; */
+"Ow4-Q4-j9x.title" = "Просмотр памяти";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "TfC-P6-K4a"; */
+"TfC-P6-K4a.title" = "Скопировать";
+
+/* Class = "NSTextFieldCell"; title = "watching_accesses_at_address"; ObjectID = "WtT-PG-TBK"; */
+"WtT-PG-TBK.title" = "watching_accesses_at_address";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "YnN-82-eBf"; */
+"YnN-82-eBf.title" = "Текстовая ячейка";
+
+/* Class = "NSMenuItem"; title = "Show in Debugger"; ObjectID = "aEU-ED-MgK"; */
+"aEU-ED-MgK.title" = "Открыть в отладчике";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "aeq-Fb-A5m"; */
+"aeq-Fb-A5m.title" = "Скопировать адрес";
+
+/* Class = "NSTableColumn"; headerCell.title = "Address"; ObjectID = "bJK-aR-RHL"; */
+"bJK-aR-RHL.headerCell.title" = "Адрес";
+
+/* Class = "NSTableColumn"; headerCell.title = "Count"; ObjectID = "Daf-V9-g6D"; */
+"Daf-V9-g6D.headerCell.title" = "Считать";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "eqG-Mx-tbd"; */
+"eqG-Mx-tbd.title" = "Текстовая ячейка";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "wdf-l9-OcB"; */
+"wdf-l9-OcB.title" = "Добавить";
+
+/* Class = "NSTableColumn"; headerCell.title = "Add"; ObjectID = "xrl-DE-ToL"; */
+"xrl-DE-ToL.headerCell.title" = "Добавить";

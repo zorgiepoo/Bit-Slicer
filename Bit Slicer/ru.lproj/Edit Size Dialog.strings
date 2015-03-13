@@ -1,0 +1,9 @@
+
+/* Class = "NSTextFieldCell"; title = "Byte Size:"; ObjectID = "12"; */
+"12.title" = "Размер байта:";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "13"; */
+"13.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "14"; */
+"14.title" = "Отмена";

@@ -1,0 +1,21 @@
+
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "1"; */
+"1.title" = "preferences_title";
+
+/* Class = "NSToolbarItem"; label = "Updates"; ObjectID = "f0w-AB-SR1"; */
+"f0w-AB-SR1.label" = "Обновления";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Updates"; ObjectID = "f0w-AB-SR1"; */
+"f0w-AB-SR1.paletteLabel" = "Обновления";
+
+/* Class = "NSToolbarItem"; label = "Scripts"; ObjectID = "kPj-yB-vNE"; */
+"kPj-yB-vNE.label" = "Скрипты";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Scripts"; ObjectID = "kPj-yB-vNE"; */
+"kPj-yB-vNE.paletteLabel" = "Скрипты";
+
+/* Class = "NSToolbarItem"; label = "Shortcuts"; ObjectID = "kgo-oj-XB3"; */
+"kgo-oj-XB3.label" = "Комбинации клавиш";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Shortcuts"; ObjectID = "kgo-oj-XB3"; */
+"kgo-oj-XB3.paletteLabel" = "Комбинации клавиш";

@@ -1,0 +1,426 @@
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "5"; */
+"5.title" = "Все на передний план";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "19"; */
+"19.title" = "Окно";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "23"; */
+"23.title" = "Свернуть";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "24"; */
+"24.title" = "Окно";
+
+/* Class = "NSMenu"; title = "AMainMenu"; ObjectID = "29"; */
+"29.title" = "Главное меню";
+
+/* Class = "NSMenuItem"; title = "Bit Slicer"; ObjectID = "56"; */
+"56.title" = "Bit Slicer";
+
+/* Class = "NSMenu"; title = "Bit Slicer"; ObjectID = "57"; */
+"57.title" = "Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "About Bit Slicer"; ObjectID = "58"; */
+"58.title" = "О программе Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "Open…"; ObjectID = "72"; */
+"72.title" = "Открыть…";
+
+/* Class = "NSMenuItem"; title = "Close"; ObjectID = "73"; */
+"73.title" = "Закрыть";
+
+/* Class = "NSMenuItem"; title = "Save"; ObjectID = "75"; */
+"75.title" = "Сохранить";
+
+/* Class = "NSMenuItem"; title = "Save As…"; ObjectID = "80"; */
+"80.title" = "Сохранить как…";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
+"81.title" = "Файл";
+
+/* Class = "NSMenuItem"; title = "New"; ObjectID = "82"; */
+"82.title" = "Новый";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "Файл";
+
+/* Class = "NSMenuItem"; title = "Revert to Saved"; ObjectID = "112"; */
+"112.title" = "Вернуться к сохраненному";
+
+/* Class = "NSMenuItem"; title = "Open Recent"; ObjectID = "124"; */
+"124.title" = "Недавние документы";
+
+/* Class = "NSMenu"; title = "Open Recent"; ObjectID = "125"; */
+"125.title" = "Открыть недавние";
+
+/* Class = "NSMenuItem"; title = "Clear Menu"; ObjectID = "126"; */
+"126.title" = "Очистить меню";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "129"; */
+"129.title" = "Настройки…";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "130"; */
+"130.title" = "Сервисы";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "131"; */
+"131.title" = "Сервисы";
+
+/* Class = "NSMenuItem"; title = "Hide Bit Slicer"; ObjectID = "134"; */
+"134.title" = "Скрыть Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "Quit Bit Slicer"; ObjectID = "136"; */
+"136.title" = "Выйти из Bit Slicer";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "Скрыть другие";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "Показать все";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "197"; */
+"197.title" = "Скопировать";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "198"; */
+"198.title" = "Выбрать все";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "199"; */
+"199.title" = "Вырезать";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "202"; */
+"202.title" = "Удалить";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "203"; */
+"203.title" = "Вставить";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "205"; */
+"205.title" = "Редактирование";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "207"; */
+"207.title" = "Вернуть";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "215"; */
+"215.title" = "Повторить";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "217"; */
+"217.title" = "Редактировать";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "239"; */
+"239.title" = "Увеличить";
+
+/* Class = "NSMenuItem"; title = "View"; ObjectID = "295"; */
+"295.title" = "View";
+
+/* Class = "NSMenu"; title = "View"; ObjectID = "296"; */
+"296.title" = "Вид";
+
+/* Class = "NSMenuItem"; title = "Customize Toolbar…"; ObjectID = "298"; */
+"298.title" = "Настроить панель инструментов…";
+
+/* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "470"; */
+"470.title" = "Вставить в текущем стиле";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "491"; */
+"491.title" = "Справка";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "492"; */
+"492.title" = "Справка";
+
+/* Class = "NSMenuItem"; title = "Bit Slicer Wiki"; ObjectID = "493"; */
+"493.title" = "Bit Slicer Wiki";
+
+/* Class = "NSMenuItem"; title = "Variable"; ObjectID = "564"; */
+"564.title" = "Переменная";
+
+/* Class = "NSMenu"; title = "Variable"; ObjectID = "565"; */
+"565.title" = "Переменная";
+
+/* Class = "NSMenuItem"; title = "Clear Variables"; ObjectID = "655"; */
+"655.title" = "Очистить переменные";
+
+/* Class = "NSMenuItem"; title = "Add Variable"; ObjectID = "659"; */
+"659.title" = "Добавить переменную";
+
+/* Class = "NSMenu"; title = "Add Variable"; ObjectID = "660"; */
+"660.title" = "Добавить переменную";
+
+/* Class = "NSMenuItem"; title = "8-bit Integer"; ObjectID = "661"; */
+"661.title" = "8-разрядное число";
+
+/* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "662"; */
+"662.title" = "16-разрядное число";
+
+/* Class = "NSMenuItem"; title = "32-bit integer"; ObjectID = "663"; */
+"663.title" = "32-разрядное число";
+
+/* Class = "NSMenuItem"; title = "64-bit Integer"; ObjectID = "664"; */
+"664.title" = "64-разрядное число";
+
+/* Class = "NSMenuItem"; title = "Float"; ObjectID = "665"; */
+"665.title" = "Плавающее (Float 4 байта)";
+
+/* Class = "NSMenuItem"; title = "Double"; ObjectID = "666"; */
+"666.title" = "Плавающее (Double 8 байт)";
+
+/* Class = "NSMenuItem"; title = "8-bit String"; ObjectID = "667"; */
+"667.title" = "8-разрядная Строка";
+
+/* Class = "NSMenuItem"; title = "Freeze Variables"; ObjectID = "681"; */
+"681.title" = "Заморозить переменные";
+
+/* Class = "NSMenuItem"; title = "16-bit String"; ObjectID = "684"; */
+"684.title" = "16-разрядная Строка";
+
+/* Class = "NSMenuItem"; title = "Pause Target"; ObjectID = "689"; */
+"689.title" = "Приостановаить Мишень";
+
+/* Class = "NSMenuItem"; title = "Pause Target When in Background"; ObjectID = "J5a-3q-dai"; */
+"J5a-3q-dai.title" = "Приостановить мишень, когда в фоновом режиме";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Value…"; ObjectID = "691"; */
+"691.title" = "Изменить значение переменной…";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Address…"; ObjectID = "762"; */
+"762.title" = "Изменить адрес переменной…";
+
+/* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "765"; */
+"765.title" = "Пойнтер";
+
+/* Class = "NSMenuItem"; title = "Memory"; ObjectID = "782"; */
+"782.title" = "Память";
+
+/* Class = "NSMenu"; title = "Memory"; ObjectID = "783"; */
+"783.title" = "Память";
+
+/* Class = "NSMenuItem"; title = "Show Memory Viewer"; ObjectID = "801"; */
+"801.title" = "Просмотр памяти";
+
+/* Class = "NSMenuItem"; title = "Store All Values"; ObjectID = "811"; */
+"811.title" = "Сохранить все значения";
+
+/* Class = "NSMenuItem"; title = "Byte Array"; ObjectID = "830"; */
+"830.title" = "Байтовый массив";
+
+/* Class = "NSMenuItem"; title = "Edit Variable Size…"; ObjectID = "833"; */
+"833.title" = "Изменить размер переменной…";
+
+/* Class = "NSMenuItem"; title = "Enter Full Screen"; ObjectID = "837"; */
+"837.title" = "На полный экран";
+
+/* Class = "NSMenuItem"; title = "Show Data Inspector"; ObjectID = "848"; */
+"848.title" = "Инспектор данных";
+
+/* Class = "NSMenuItem"; title = "NOP Variables"; ObjectID = "857"; */
+"857.title" = "NOP-переменный";
+
+/* Class = "NSMenuItem"; title = "Show Variable"; ObjectID = "863"; */
+"863.title" = "Показать переменную";
+
+/* Class = "NSMenu"; title = "Show Variable"; ObjectID = "864"; */
+"864.title" = "Показать переменную";
+
+/* Class = "NSMenuItem"; title = "Memory Viewer"; ObjectID = "865"; */
+"865.title" = "Просмотр памяти";
+
+/* Class = "NSMenuItem"; title = "Debugger"; ObjectID = "866"; */
+"866.title" = "Отладчик";
+
+/* Class = "NSMenuItem"; title = "Change Memory Protection…"; ObjectID = "872"; */
+"872.title" = "Изменить Защиту памяти…";
+
+/* Class = "NSMenuItem"; title = "Dump Memory in Range…"; ObjectID = "874"; */
+"874.title" = "Дамп памяти в диапазоне…";
+
+/* Class = "NSMenuItem"; title = "Dump All Memory…"; ObjectID = "875"; */
+"875.title" = "Дамп всей памяти…";
+
+/* Class = "NSMenuItem"; title = "Debug"; ObjectID = "930"; */
+"930.title" = "Отладка";
+
+/* Class = "NSMenu"; title = "Debug"; ObjectID = "931"; */
+"931.title" = "Отладка";
+
+/* Class = "NSMenuItem"; title = "Show Debugger"; ObjectID = "950"; */
+"950.title" = "Открыть Отладчик";
+
+/* Class = "NSMenuItem"; title = "Add Breakpoint"; ObjectID = "1019"; */
+"1019.title" = "Добавит брикпоинт";
+
+/* Class = "NSMenuItem"; title = "Remove All Breakpoints"; ObjectID = "1020"; */
+"1020.title" = "Убрать все брикпоинты";
+
+/* Class = "NSMenuItem"; title = "Registers Qualifier"; ObjectID = "1027"; */
+"1027.title" = "Класификатор регистров";
+
+/* Class = "NSMenu"; title = "Registers Qualifier"; ObjectID = "1028"; */
+"1028.title" = "Класификатор регистров";
+
+/* Class = "NSMenuItem"; title = "Watch Variable"; ObjectID = "1047"; */
+"1047.title" = "Следить за переменной";
+
+/* Class = "NSMenu"; title = "Watch Variable"; ObjectID = "1048"; */
+"1048.title" = "Следить за переменной";
+
+/* Class = "NSMenuItem"; title = "Write Accesses…"; ObjectID = "1050"; */
+"1050.title" = "Попытки Записи…";
+
+/* Class = "NSMenuItem"; title = "Read & Write Accesses…"; ObjectID = "1052"; */
+"1052.title" = "Попытки Чтения и Записи…";
+
+/* Class = "NSMenuItem"; title = "Continue Execution"; ObjectID = "1061"; */
+"1061.title" = "Продолжить выполнение";
+
+/* Class = "NSMenuItem"; title = "Jump to Instruction"; ObjectID = "1062"; */
+"1062.title" = "Перейти к инструкции";
+
+/* Class = "NSMenuItem"; title = "Step Execution"; ObjectID = "1068"; */
+"1068.title" = "Шаг выполнения";
+
+/* Class = "NSMenu"; title = "Step Execution"; ObjectID = "1069"; */
+"1069.title" = "Шаг выполнения";
+
+/* Class = "NSMenuItem"; title = "Into Instruction"; ObjectID = "1071"; */
+"1071.title" = "Внутри инструкции";
+
+/* Class = "NSMenuItem"; title = "Over Instruction"; ObjectID = "1072"; */
+"1072.title" = "За инструкцией";
+
+/* Class = "NSMenuItem"; title = "Out of Function"; ObjectID = "1073"; */
+"1073.title" = "Вне функции";
+
+/* Class = "NSMenuItem"; title = "Signed"; ObjectID = "1083"; */
+"1083.title" = "Знаковый";
+
+/* Class = "NSMenuItem"; title = "Unsigned"; ObjectID = "1084"; */
+"1084.title" = "Не знаковый";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "1087"; */
+"1087.title" = "Скопировать адрес";
+
+/* Class = "NSMenuItem"; title = "Check for Updates…"; ObjectID = "1093"; */
+"1093.title" = "Проверить обновления…";
+
+/* Class = "NSMenuItem"; title = "Back"; ObjectID = "1101"; */
+"1101.title" = "Назад";
+
+/* Class = "NSMenuItem"; title = "Forward"; ObjectID = "1102"; */
+"1102.title" = "Вперед";
+
+/* Class = "NSMenuItem"; title = "Go to Call Address"; ObjectID = "1106"; */
+"1106.title" = "Перейти к адресу вызова";
+
+/* Class = "NSMenuItem"; title = "Report a Bug"; ObjectID = "1110"; */
+"1110.title" = "Отчет об ошибках";
+
+/* Class = "NSMenuItem"; title = "Visit Forums"; ObjectID = "1112"; */
+"1112.title" = "Посетить форум";
+
+/* Class = "NSMenuItem"; title = "Send Feedback"; ObjectID = "1113"; */
+"1113.title" = "Обратная связь";
+
+/* Class = "NSMenuItem"; title = "Show Colors"; ObjectID = "0uh-KE-NmN"; */
+"0uh-KE-NmN.title" = "Показать Цвета";
+
+/* Class = "NSMenuItem"; title = "Show Fonts"; ObjectID = "196-mO-a1w"; */
+"196-mO-a1w.title" = "Показать Шрифты";
+
+/* Class = "NSMenuItem"; title = "Script"; ObjectID = "24i-VE-23z"; */
+"24i-VE-23z.title" = "Скрипт";
+
+/* Class = "NSMenu"; title = "Kern"; ObjectID = "25p-uh-76y"; */
+"25p-uh-76y.title" = "Керн";
+
+/* Class = "NSMenuItem"; title = "Baseline"; ObjectID = "3RC-ke-Gw9"; */
+"3RC-ke-Gw9.title" = "Базовая линия";
+
+/* Class = "NSMenuItem"; title = "Underline"; ObjectID = "3g5-A2-zqi"; */
+"3g5-A2-zqi.title" = "Подчеркивание";
+
+/* Class = "NSMenuItem"; title = "Loosen"; ObjectID = "6K6-gD-zol"; */
+"6K6-gD-zol.title" = "Разредить";
+
+/* Class = "NSMenuItem"; title = "Tighten"; ObjectID = "6TI-1H-4rH"; */
+"6TI-1H-4rH.title" = "Плотнее";
+
+/* Class = "NSMenuItem"; title = "Use All"; ObjectID = "7Xb-k6-JO5"; */
+"7Xb-k6-JO5.title" = "Использовать все";
+
+/* Class = "NSMenuItem"; title = "Use None"; ObjectID = "FdO-x6-qZB"; */
+"FdO-x6-qZB.title" = "Ничего";
+
+/* Class = "NSMenuItem"; title = "Copy Style"; ObjectID = "HDJ-Hn-OD2"; */
+"HDJ-Hn-OD2.title" = "Скопировать стиль";
+
+/* Class = "NSMenuItem"; title = "Show Logs"; ObjectID = "HuH-Wa-MAW"; */
+"HuH-Wa-MAW.title" = "Показать Журнал";
+
+/* Class = "NSMenuItem"; title = "Relativize Variables"; ObjectID = "Ica-nv-keu"; */
+"Ica-nv-keu.title" = "Релятивизировать переменные";
+
+/* Class = "NSMenuItem"; title = "Superscript"; ObjectID = "Ixp-J7-PA4"; */
+"Ixp-J7-PA4.title" = "Суперскрипт";
+
+/* Class = "NSMenuItem"; title = "Lower"; ObjectID = "JJ8-60-TYn"; */
+"JJ8-60-TYn.title" = "Ниже";
+
+/* Class = "NSMenu"; title = "Baseline"; ObjectID = "Ldv-6l-XC4"; */
+"Ldv-6l-XC4.title" = "Базовая линия";
+
+/* Class = "NSMenuItem"; title = "Use None"; ObjectID = "MCt-YM-vTL"; */
+"MCt-YM-vTL.title" = "Ничего";
+
+/* Class = "NSMenuItem"; title = "Bigger"; ObjectID = "PKM-Cr-39O"; */
+"PKM-Cr-39O.title" = "Больше";
+
+/* Class = "NSMenuItem"; title = "Bold"; ObjectID = "TSu-oj-2rv"; */
+"TSu-oj-2rv.title" = "Жирный";
+
+/* Class = "NSMenuItem"; title = "Paste Style"; ObjectID = "W33-GA-dhg"; */
+"W33-GA-dhg.title" = "Вставить стиль";
+
+/* Class = "NSMenu"; title = "Font"; ObjectID = "WH3-yD-KY0"; */
+"WH3-yD-KY0.title" = "Шрифт";
+
+/* Class = "NSMenuItem"; title = "Ligatures"; ObjectID = "Ydj-ck-VMA"; */
+"Ydj-ck-VMA.title" = "Лигатуры";
+
+/* Class = "NSMenuItem"; title = "Inject Code…"; ObjectID = "bRt-cV-8Ks"; */
+"bRt-cV-8Ks.title" = "Внедрить код…";
+
+/* Class = "NSMenuItem"; title = "Font"; ObjectID = "cy3-aR-hDp"; */
+"cy3-aR-hDp.title" = "Шрифт";
+
+/* Class = "NSMenuItem"; title = "Search Pointer to Variable"; ObjectID = "dr1-2H-Uqa"; */
+"dr1-2H-Uqa.title" = "Искать указатель перменной";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "e4N-vH-vLR"; */
+"e4N-vH-vLR.title" = "Использовать по умолчанию";
+
+/* Class = "NSMenuItem"; title = "Subscript"; ObjectID = "flM-3a-hRj"; */
+"flM-3a-hRj.title" = "Подскрипт";
+
+/* Class = "NSMenuItem"; title = "Set Breakpoint Condition…"; ObjectID = "knB-aR-Qem"; */
+"knB-aR-Qem.title" = "Установить условия брикпоинта…";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "lF7-1X-Xbh"; */
+"lF7-1X-Xbh.title" = "Использовать по умолчанию";
+
+/* Class = "NSMenuItem"; title = "Kern"; ObjectID = "oZ1-K9-3if"; */
+"oZ1-K9-3if.title" = "Керн";
+
+/* Class = "NSMenuItem"; title = "Use Default"; ObjectID = "rt6-Mi-AnR"; */
+"rt6-Mi-AnR.title" = "Использовать по умолчанию";
+
+/* Class = "NSMenuItem"; title = "Donate…"; ObjectID = "sUz-q6-lOh"; */
+"sUz-q6-lOh.title" = "Отблагодарить…";
+
+/* Class = "NSMenuItem"; title = "Smaller"; ObjectID = "t9E-uQ-noM"; */
+"t9E-uQ-noM.title" = "Меньший";
+
+/* Class = "NSMenuItem"; title = "Italic"; ObjectID = "ure-VC-LSA"; */
+"ure-VC-LSA.title" = "Курсив";
+
+/* Class = "NSMenuItem"; title = "Raise"; ObjectID = "w8p-W4-UKB"; */
+"w8p-W4-UKB.title" = "Приподнятый";
+
+/* Class = "NSMenu"; title = "Ligatures"; ObjectID = "yrk-rh-Kmb"; */
+"yrk-rh-Kmb.title" = "Лигатуры";

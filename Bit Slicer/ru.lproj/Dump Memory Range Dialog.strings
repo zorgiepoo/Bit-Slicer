@@ -1,0 +1,12 @@
+
+/* Class = "NSTextFieldCell"; title = "To:"; ObjectID = "693-oo-8j5"; */
+"693-oo-8j5.title" = "До:";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "Bpf-26-gFN"; */
+"Bpf-26-gFN.title" = "Отмена";
+
+/* Class = "NSTextFieldCell"; title = "From:"; ObjectID = "icV-SG-mry"; */
+"icV-SG-mry.title" = "От:";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "jGp-uC-IW4"; */
+"jGp-uC-IW4.title" = "OK";

@@ -1,0 +1,12 @@
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "E8L-gt-bay"; */
+"E8L-gt-bay.title" = "Отмена";
+
+/* Class = "NSTextFieldCell"; title = "Address:"; ObjectID = "En6-Kd-M7t"; */
+"En6-Kd-M7t.title" = "Адрес:";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "Ln7-Xd-Cjr"; */
+"Ln7-Xd-Cjr.title" = "OK";
+
+/* Class = "NSTextFieldCell"; title = "[address] will be substituted with the pointer value read at address. \nbase(\"executable\") will be substituted with the address of executable."; ObjectID = "yr8-jR-NWj"; */
+"yr8-jR-NWj.title" = "[address] будет заменен на значение указателя чтения по адресу. \nbase(\"executable\") будет заменен на адрес исполняемого файла.";

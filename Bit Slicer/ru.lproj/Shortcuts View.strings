@@ -1,0 +1,12 @@
+
+/* Class = "NSTextFieldCell"; title = "Pausing/Continuing:"; ObjectID = "OZp-xD-Aza"; */
+"OZp-xD-Aza.title" = "Пауза/Продолжение:";
+
+/* Class = "NSTextFieldCell"; title = "Stepping Over:"; ObjectID = "TC3-Sc-pTc"; */
+"TC3-Sc-pTc.title" = "Шаг с перешагиванием инструкций:";
+
+/* Class = "NSTextFieldCell"; title = "Stepping Out:"; ObjectID = "TWO-T9-AWJ"; */
+"TWO-T9-AWJ.title" = "Шаг с выходом из фун-ции:";
+
+/* Class = "NSTextFieldCell"; title = "Stepping Into:"; ObjectID = "rgu-ne-tsn"; */
+"rgu-ne-tsn.title" = "Шаг со входом в инструкцию:";

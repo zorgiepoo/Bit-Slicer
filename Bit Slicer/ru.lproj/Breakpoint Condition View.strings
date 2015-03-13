@@ -1,0 +1,9 @@
+
+/* Class = "NSTextFieldCell"; title = "Breakpoint Condition:"; ObjectID = "0u1-vd-b9T"; */
+"0u1-vd-b9T.title" = "Условия для брикпоинта:";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "LMA-lw-scv"; */
+"LMA-lw-scv.title" = "Отмена";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "RBk-gz-jUG"; */
+"RBk-gz-jUG.title" = "OK";
