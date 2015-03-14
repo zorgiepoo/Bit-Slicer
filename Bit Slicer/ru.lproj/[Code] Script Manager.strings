@@ -1,0 +1,9 @@
+
+/* User Notification Title for when a script encounters an error and fails */
+"scriptFailedNotificationTitle" = "Script Failed";
+
+/* User Notification Informative Text for when a script encounters an error and fails */
+"scriptFailedNotificationTextFormat" = "An error occured trying to run the script on %@";
+
+/* User Notification Title for when a script prompt dialog is brought onto the screen */
+"scriptPromptNotificationTitle" = "Script Prompt";

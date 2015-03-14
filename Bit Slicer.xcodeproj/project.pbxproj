@@ -434,6 +434,7 @@
 		72D72BC81AB28B8C005044CF /* ru */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		72D72BC91AB3E9FA005044CF /* ZGLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLocalization.h; path = "Bit Slicer/ZGLocalization.h"; sourceTree = "<group>"; };
 		72D72BCA1AB3E9FA005044CF /* ZGLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLocalization.m; path = "Bit Slicer/ZGLocalization.m"; sourceTree = "<group>"; };
+		72D72BCC1AB3FEC0005044CF /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] Script Manager.strings"; sourceTree = "<group>"; };
 		770136E8192309740072A192 /* ZGPyVMProtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyVMProtModule.h; path = "Bit Slicer/ZGPyVMProtModule.h"; sourceTree = "<group>"; };
 		770136E9192309740072A192 /* ZGPyVMProtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyVMProtModule.m; path = "Bit Slicer/ZGPyVMProtModule.m"; sourceTree = "<group>"; };
 		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; };
@@ -2125,6 +2126,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				725DEC871A24F7610095C9B3 /* en */,
+				72D72BCC1AB3FEC0005044CF /* ru */,
 			);
 			name = "[Code] Script Manager.strings";
 			sourceTree = "<group>";
