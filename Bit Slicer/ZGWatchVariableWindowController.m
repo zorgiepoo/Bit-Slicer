@@ -48,6 +48,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGVariableController.h"
 #import "ZGUtilities.h"
+#import "ZGLocalization.h"
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
 #import "ZGNavigationPost.h"

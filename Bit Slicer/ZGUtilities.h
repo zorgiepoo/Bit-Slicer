@@ -71,5 +71,3 @@ void ZGDeliverUserNotificationWithReply(NSString *title, NSString *subtitle, NSS
 
 void ZGRunAlertPanelWithOKButton(NSString *title, NSString *message);
 NSInteger ZGRunAlertPanelWithDefaultAndCancelButton(NSString *title, NSString *message, NSString *defaultButtonTitle);
-
-void ZGAdjustLocalizableWidthsForTableColumns(NSWindow *window, NSArray *tableColumns, NSDictionary *deltaWidthsDictionary);

@@ -18,7 +18,7 @@
 "82.title" = "Другие виды";
 
 /* Class = "NSMenuItem"; title = "big"; ObjectID = "83"; */
-"83.title" = "старший к младему.";
+"83.title" = "старший к младему";
 
 /* Class = "NSMenuItem"; title = "little"; ObjectID = "84"; */
 "84.title" = "младший к старшему";

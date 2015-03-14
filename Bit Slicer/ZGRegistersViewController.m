@@ -39,6 +39,7 @@
 #import "ZGRegistersState.h"
 #import "ZGProcess.h"
 #import "ZGUtilities.h"
+#import "ZGLocalization.h"
 #import "ZGRegister.h"
 #import "ZGRegisterEntries.h"
 

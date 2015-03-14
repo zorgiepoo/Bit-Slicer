@@ -7,6 +7,7 @@
 //
 
 #import "DataInspectorRepresenter.h"
+#import "ZGLocalization.h"
 
 // Don't want to include these macros, so not using them
 
@@ -551,6 +552,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (void)initializeView {
+	ZGAdjustLocalizableWidthsForTableColumns(nil, @[integerQualifierTableColumn, endianTableColumn], @{@"ru" : @[@55, @90]});
     [self resizeTableViewAfterChangingRowCount];
 }
 

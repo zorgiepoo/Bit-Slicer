@@ -60,6 +60,7 @@
 #import "ZGDocumentOptionsViewController.h"
 #import "ZGWatchVariableWindowController.h"
 #import "ZGUtilities.h"
+#import "ZGLocalization.h"
 #import "ZGTableView.h"
 #import "ZGNavigationPost.h"
 #import "NSArrayAdditions.h"

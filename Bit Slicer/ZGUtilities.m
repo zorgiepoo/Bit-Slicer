@@ -488,35 +488,3 @@ NSInteger ZGRunAlertPanelWithDefaultAndCancelButton(NSString *title, NSString *m
 {
 	return ZGRunAlertPanelWithDefaultAndAlternativeButton(title, message, defaultButtonTitle, NSLocalizedString(@"Cancel", nil));
 }
-
-static void ZGAdjustWindowAndTableColumnByWidthDelta(NSWindow *window, NSTableColumn *tableColumn, CGFloat widthDelta)
-{
-	tableColumn.maxWidth += widthDelta;
-	tableColumn.width += widthDelta;
-	tableColumn.minWidth += widthDelta;
-	
-	NSRect frame = window.frame;
-	frame.size = NSMakeSize(frame.size.width + widthDelta, frame.size.height);
-	[window setFrame:frame display:YES];
-}
-
-void ZGAdjustLocalizableWidthsForTableColumns(NSWindow *window, NSArray *tableColumns, NSDictionary *deltaWidthsDictionary)
-{
-	NSString *preferredLanguage =
-	[[NSLocale preferredLanguages] zgFirstObjectThatMatchesCondition:^BOOL(NSString *language) {
-		return [language isEqualToString:@"en"] || deltaWidthsDictionary[language] != nil;
-	}];
-	
-	if (preferredLanguage != nil)
-	{
-		NSArray *deltaWidths = deltaWidthsDictionary[preferredLanguage];
-		if (deltaWidths != nil)
-		{
-			[tableColumns enumerateObjectsUsingBlock:^(NSTableColumn *tableColumn, NSUInteger tableColumnIndex, __unused BOOL *stop) {
-				NSNumber *deltaWidth = deltaWidths[tableColumnIndex];
-				assert([deltaWidth isKindOfClass:[NSNumber class]]);
-				ZGAdjustWindowAndTableColumnByWidthDelta(window, tableColumn, deltaWidth.doubleValue);
-			}];
-		}
-	}
-}
