@@ -1,5 +1,5 @@
 /* Undo action name for changing a register type */
 "undoRegisterTypeChange" = "Register Type Change";
 
-/* Undo action name for changing a register type */
+/* Undo action name for changing a register value */
 "undoRegisterValueChange" = "Register Value Change";

@@ -2,5 +2,5 @@
 /* Labels 'Back' menu item in View menu when using debugger or memory viewer */
 "back" = "Back";
 
-/* Labels 'Back' menu item in View menu when using debugger or memory viewer */
+/* Labels 'Forward' menu item in View menu when using debugger or memory viewer */
 "forward" = "Forward";
