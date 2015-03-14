@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1510" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGWatchVariableWindowController">
             <connections>
                 <outlet property="addButton" destination="Wlf-lu-mTm" id="nKj-A9-YFV"/>
+                <outlet property="addTableColumn" destination="xrl-DE-ToL" id="Rw5-IX-478"/>
                 <outlet property="progressIndicator" destination="VzN-Qp-l3Q" id="3ZH-py-dLl"/>
                 <outlet property="statusTextField" destination="Fqd-Of-gZ2" id="3JY-7p-IRQ"/>
                 <outlet property="tableView" destination="4bY-Uc-6gw" id="l7j-gW-K0v"/>

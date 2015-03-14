@@ -63,6 +63,7 @@
 @property (nonatomic, assign) IBOutlet NSTextField *statusTextField;
 @property (nonatomic, assign) IBOutlet NSButton *addButton;
 @property (nonatomic, assign) IBOutlet ZGTableView *tableView;
+@property (nonatomic, assign) IBOutlet NSTableColumn *addTableColumn;
 
 @property (nonatomic) ZGProcess *watchProcess;
 @property (nonatomic) id watchActivity;
@@ -96,6 +97,11 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	self.watchProcess = nil;
+}
+
+- (void)windowDidLoad
+{
+	ZGAdjustLocalizableWidthsForTableColumns(self.window, @[self.addTableColumn], @{@"ru" : @[@20.0]});
 }
 
 - (void)applicationWillTerminate:(NSNotification *)__unused notification

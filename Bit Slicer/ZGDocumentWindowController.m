@@ -99,6 +99,8 @@
 @property (nonatomic) ZGEditDescriptionWindowController *editDescriptionWindowController;
 @property (nonatomic) ZGEditSizeWindowController *editSizeWindowController;
 
+@property (nonatomic, assign) IBOutlet NSTableColumn *dataTypeTableColumn;
+
 @property (nonatomic, assign) IBOutlet AGScopeBar *scopeBar;
 @property (nonatomic, assign) IBOutlet NSView *scopeBarFlagsView;
 
@@ -269,6 +271,7 @@
 	searchFieldCell.cancelButtonCell.action = @selector(clearSearchValues:);
 	
 	[self setupScopeBar];
+	ZGAdjustLocalizableWidthsForTableColumns(self.window, @[self.dataTypeTableColumn], @{@"ru" : @[@60.0]});
 	
 	[self.storeValuesButton.image setTemplate:YES];
 	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];

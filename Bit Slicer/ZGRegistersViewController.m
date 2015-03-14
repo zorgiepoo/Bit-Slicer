@@ -50,6 +50,7 @@
 @interface ZGRegistersViewController ()
 
 @property (assign, nonatomic) IBOutlet NSTableView *tableView;
+@property (assign, nonatomic) IBOutlet NSTableColumn *dataTypeTableColumn;
 @property (weak, nonatomic) NSUndoManager *undoManager;
 
 @property (nonatomic) NSArray *registers;
@@ -96,6 +97,8 @@
 	}
 	
 	[self.tableView registerForDraggedTypes:@[ZGVariablePboardType]];
+	
+	ZGAdjustLocalizableWidthsForTableColumns(self.view.window, @[self.dataTypeTableColumn], @{@"ru" : @[@80.0]});
 }
 
 - (void)changeInstructionPointer:(ZGMemoryAddress)newInstructionPointer
