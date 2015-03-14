@@ -5,7 +5,7 @@
 	<key>displayingValuesLabelFormat</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>Displaying %#@values@</string>
+		<string>Отображение %#@values@</string>
 		<key>values</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -13,16 +13,35 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>lu</string>
 			<key>one</key>
-			<string>_NUM_ value</string>
+			<string>_NUM_ значение</string>
+			<key>few</key>
+			<string>_NUM_ значения</string>
+			<key>many</key>
+			<string>_NUM_ значения</string>
 			<key>other</key>
-			<string>_NUM_ values</string>
+			<string>_NUM_ значения</string>
 		</dict>
 	</dict>
 	
 	<key>foundValuesLabelFormat</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>Found %#@values@</string>
+		<string>%#@found@</string>
+		<key>found</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lu</string>
+			<key>one</key>
+			<string>Найдено %#@values@</string>
+			<key>few</key>
+			<string>Найдены %#@values@</string>
+			<key>many</key>
+			<string>Найдены %#@values@</string>
+			<key>other</key>
+			<string>Найдены %#@values@</string>
+		</dict>
 		<key>values</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -30,9 +49,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>lu</string>
 			<key>one</key>
-			<string>_NUM_ value…</string>
+			<string>_NUM_ значение…</string>
+			<key>few</key>
+			<string>_NUM_ значения…</string>
+			<key>many</key>
+			<string>_NUM_ значения…</string>
 			<key>other</key>
-			<string>_NUM_ values…</string>
+			<string>_NUM_ значения…</string>
 		</dict>
 	</dict>
 </dict>
