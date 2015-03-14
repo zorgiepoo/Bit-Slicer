@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1510" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGHotKeyPreferencesViewController">
@@ -17,13 +17,13 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="Hz6-mo-xeY" userLabel="Hot Keys View">
-            <rect key="frame" x="0.0" y="0.0" width="326" height="161"/>
+            <rect key="frame" x="0.0" y="0.0" width="405" height="161"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="M2o-0Z-hRs" customClass="SRRecorderControl">
-                    <rect key="frame" x="135" y="116" width="171" height="25"/>
+                    <rect key="frame" x="135" y="116" width="250" height="25"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="171" id="jDp-J8-obt"/>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="lJT-dm-1gw"/>
                         <constraint firstAttribute="height" constant="25" id="t8a-gg-WXc"/>
                     </constraints>
                     <connections>
@@ -47,9 +47,8 @@
                     </textFieldCell>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="4rh-ZL-4XK" customClass="SRRecorderControl">
-                    <rect key="frame" x="135" y="83" width="171" height="25"/>
+                    <rect key="frame" x="135" y="83" width="250" height="25"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="171" id="8Ak-wn-Usf"/>
                         <constraint firstAttribute="height" constant="25" id="Pv1-Zx-Hc6"/>
                     </constraints>
                     <connections>
@@ -65,9 +64,8 @@
                     </textFieldCell>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="y5g-aN-ONf" customClass="SRRecorderControl">
-                    <rect key="frame" x="135" y="53" width="171" height="25"/>
+                    <rect key="frame" x="135" y="53" width="250" height="25"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="171" id="2Bt-xU-RTR"/>
                         <constraint firstAttribute="height" constant="25" id="xsu-GG-YY4"/>
                     </constraints>
                     <connections>
@@ -83,10 +81,9 @@
                     </textFieldCell>
                 </textField>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="PpO-1X-8NQ" customClass="SRRecorderControl">
-                    <rect key="frame" x="135" y="20" width="171" height="25"/>
+                    <rect key="frame" x="135" y="20" width="250" height="25"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="25" id="Vne-hX-iNm"/>
-                        <constraint firstAttribute="width" constant="171" id="b4r-Kc-Pt7"/>
                     </constraints>
                     <connections>
                         <outlet property="delegate" destination="-2" id="Jqk-5s-mXy"/>
@@ -94,8 +91,11 @@
                 </customView>
             </subviews>
             <constraints>
+                <constraint firstItem="7yW-dX-gFI" firstAttribute="width" secondItem="eG1-2f-JzZ" secondAttribute="width" id="2Ak-TK-XAR"/>
                 <constraint firstItem="4rh-ZL-4XK" firstAttribute="leading" secondItem="uwd-TF-QxG" secondAttribute="trailing" constant="8" id="2LG-yu-4ZL"/>
+                <constraint firstItem="4rh-ZL-4XK" firstAttribute="width" secondItem="M2o-0Z-hRs" secondAttribute="width" id="2rB-Ff-Vd9"/>
                 <constraint firstItem="uwd-TF-QxG" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" id="3C0-fr-Jlm"/>
+                <constraint firstItem="uwd-TF-QxG" firstAttribute="width" secondItem="7yW-dX-gFI" secondAttribute="width" id="4Ya-n7-0n6"/>
                 <constraint firstItem="0Cx-gb-b38" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="25" id="5Cj-NL-8k3"/>
                 <constraint firstAttribute="trailing" secondItem="M2o-0Z-hRs" secondAttribute="trailing" constant="20" id="7vI-hX-FaE"/>
                 <constraint firstItem="PpO-1X-8NQ" firstAttribute="top" secondItem="y5g-aN-ONf" secondAttribute="bottom" constant="8" id="9NC-QG-ZH7"/>
@@ -103,6 +103,7 @@
                 <constraint firstAttribute="trailing" secondItem="PpO-1X-8NQ" secondAttribute="trailing" constant="20" id="Ebh-5s-Yyo"/>
                 <constraint firstItem="M2o-0Z-hRs" firstAttribute="leading" secondItem="0Cx-gb-b38" secondAttribute="trailing" constant="8" id="G0F-94-4Nz"/>
                 <constraint firstItem="y5g-aN-ONf" firstAttribute="leading" secondItem="7yW-dX-gFI" secondAttribute="trailing" constant="8" id="JWs-yw-pVK"/>
+                <constraint firstItem="0Cx-gb-b38" firstAttribute="width" secondItem="uwd-TF-QxG" secondAttribute="width" id="Kga-kg-NMj"/>
                 <constraint firstItem="eG1-2f-JzZ" firstAttribute="top" secondItem="7yW-dX-gFI" secondAttribute="bottom" constant="19" id="SbP-mE-DDS"/>
                 <constraint firstItem="7yW-dX-gFI" firstAttribute="leading" secondItem="eG1-2f-JzZ" secondAttribute="leading" id="WgH-AA-0Zb"/>
                 <constraint firstItem="7yW-dX-gFI" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" id="X8f-6P-0B4"/>
@@ -115,11 +116,14 @@
                 <constraint firstItem="eG1-2f-JzZ" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" id="jXd-65-m0y"/>
                 <constraint firstItem="7yW-dX-gFI" firstAttribute="leading" secondItem="uwd-TF-QxG" secondAttribute="leading" id="kXg-J0-TdZ"/>
                 <constraint firstItem="uwd-TF-QxG" firstAttribute="top" secondItem="0Cx-gb-b38" secondAttribute="bottom" constant="19" id="n8h-VG-xsa"/>
+                <constraint firstItem="y5g-aN-ONf" firstAttribute="width" secondItem="PpO-1X-8NQ" secondAttribute="width" id="one-Is-fJf"/>
                 <constraint firstItem="7yW-dX-gFI" firstAttribute="leading" secondItem="0Cx-gb-b38" secondAttribute="leading" id="paM-5W-ePa"/>
                 <constraint firstItem="y5g-aN-ONf" firstAttribute="top" secondItem="4rh-ZL-4XK" secondAttribute="bottom" constant="5" id="qVq-VI-sX5"/>
                 <constraint firstItem="0Cx-gb-b38" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" id="riP-24-Oom"/>
+                <constraint firstItem="4rh-ZL-4XK" firstAttribute="width" secondItem="y5g-aN-ONf" secondAttribute="width" id="tpH-b1-pu8"/>
                 <constraint firstItem="M2o-0Z-hRs" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="20" id="vRK-Kf-oip"/>
             </constraints>
+            <point key="canvasLocation" x="419.5" y="318.5"/>
         </customView>
     </objects>
 </document>
