@@ -44,6 +44,7 @@
 @interface ZGProcess ()
 {
 	NSMutableDictionary *_cacheDictionary;
+	BOOL _failedCreatingSymbolicator;
 }
 
 @property (nonatomic) ZGMachBinary *mainMachBinary;
@@ -100,9 +101,9 @@
 
 - (void)dealloc
 {
-	if (self.valid && !CSIsNull(self.symbolicator))
+	if (self.valid && !CSIsNull(_symbolicator))
 	{
-		CSRelease(self.symbolicator);
+		CSRelease(_symbolicator);
 	}
 }
 
@@ -123,9 +124,14 @@
 
 - (CSSymbolicatorRef)symbolicator
 {
-	if (self.valid && CSIsNull(_symbolicator))
+	if (self.valid && CSIsNull(_symbolicator) && !_failedCreatingSymbolicator)
 	{
 		_symbolicator = CSSymbolicatorCreateWithTask(self.processTask);
+		// Creating the symbolicator is very costly; make sure we don't try creating one often if it keeps failing
+		if (CSIsNull(_symbolicator))
+		{
+			_failedCreatingSymbolicator = YES;
+		}
 	}
 	return _symbolicator;
 }
