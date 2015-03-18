@@ -5,7 +5,7 @@
 	<key>accessedTimesFormat</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>Доступны %#@number_accesses@</string>
+		<string>Сработано %#@number_accesses@</string>
 		<key>number_accesses</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -15,7 +15,7 @@
 			<key>one</key>
 			<string>%lu раз</string>
 			<key>few</key>
-			<string>%lu раз</string>
+			<string>%lu раза</string>
 			<key>many</key>
 			<string>%lu раз</string>
 			<key>other</key>

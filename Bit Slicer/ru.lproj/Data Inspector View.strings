@@ -6,7 +6,7 @@
 "67.title" = "Другие виды";
 
 /* Class = "NSMenuItem"; title = "Floats"; ObjectID = "69"; */
-"69.title" = "Floats";
+"69.title" = "Плавающие (floats)";
 
 /* Class = "NSMenuItem"; title = "Signed Int"; ObjectID = "70"; */
 "70.title" = "Знаковый (signed int)";
@@ -18,10 +18,10 @@
 "82.title" = "Другие виды";
 
 /* Class = "NSMenuItem"; title = "big"; ObjectID = "83"; */
-"83.title" = "старший к младему";
+"83.title" = "обратное размещение байтов";
 
 /* Class = "NSMenuItem"; title = "little"; ObjectID = "84"; */
-"84.title" = "младший к старшему";
+"84.title" = "прямое размещение байтов";
 
 /* Class = "NSButtonCell"; title = "-"; ObjectID = "87"; */
 "87.title" = "-";

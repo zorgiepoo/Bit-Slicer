@@ -552,7 +552,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (void)initializeView {
-	ZGAdjustLocalizableWidthsForTableColumns(nil, @[integerQualifierTableColumn, endianTableColumn], @{@"ru" : @[@55, @90]});
+	ZGAdjustLocalizableWidthsForTableColumns(nil, @[integerQualifierTableColumn, endianTableColumn], @{@"ru" : @[@50, @120]});
     [self resizeTableViewAfterChangingRowCount];
 }
 

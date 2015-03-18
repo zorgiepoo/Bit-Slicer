@@ -15,7 +15,7 @@
 			<key>one</key>
 			<string>Записано %#@num_messages_logged@</string>
 			<key>few</key>
-			<string>Записаны %#@num_messages_logged@</string>
+			<string>Записано %#@num_messages_logged@</string>
 			<key>many</key>
 			<string>Записаны %#@num_messages_logged@</string>
 			<key>other</key>
@@ -32,7 +32,7 @@
 			<key>few</key>
 			<string>%lu сообщения</string>
 			<key>many</key>
-			<string>%lu сообщения</string>
+			<string>%lu сообщений</string>
 			<key>other</key>
 			<string>%lu сообщения</string>
 		</dict>

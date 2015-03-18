@@ -27,7 +27,7 @@
 "bJK-aR-RHL.headerCell.title" = "Адрес";
 
 /* Class = "NSTableColumn"; headerCell.title = "Count"; ObjectID = "Daf-V9-g6D"; */
-"Daf-V9-g6D.headerCell.title" = "Считать";
+"Daf-V9-g6D.headerCell.title" = "Счетчик";
 
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "eqG-Mx-tbd"; */
 "eqG-Mx-tbd.title" = "Текстовая ячейка";

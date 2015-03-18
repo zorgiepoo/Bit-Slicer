@@ -3,7 +3,7 @@
 "3XX-NZ-UPf.title" = "Текстовая ячейка";
 
 /* Class = "NSTableColumn"; headerCell.title = "Backtrace"; ObjectID = "4kh-yY-nSc"; */
-"4kh-yY-nSc.headerCell.title" = "Отслеживать (Backtrace)";
+"4kh-yY-nSc.headerCell.title" = "Трассировка";
 
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "ALu-mJ-3Ud"; */
 "ALu-mJ-3Ud.title" = "Скопировать";

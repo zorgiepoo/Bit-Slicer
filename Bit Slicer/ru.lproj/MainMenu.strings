@@ -174,7 +174,7 @@
 "689.title" = "Приостановаить Мишень";
 
 /* Class = "NSMenuItem"; title = "Pause Target When in Background"; ObjectID = "J5a-3q-dai"; */
-"J5a-3q-dai.title" = "Приостановить мишень, когда в фоновом режиме";
+"J5a-3q-dai.title" = "Приостановить мишень, когда она в фоновом режиме";
 
 /* Class = "NSMenuItem"; title = "Edit Variable Value…"; ObjectID = "691"; */
 "691.title" = "Изменить значение переменной…";
@@ -183,7 +183,7 @@
 "762.title" = "Изменить адрес переменной…";
 
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "765"; */
-"765.title" = "Пойнтер";
+"765.title" = "Указатель";
 
 /* Class = "NSMenuItem"; title = "Memory"; ObjectID = "782"; */
 "782.title" = "Память";

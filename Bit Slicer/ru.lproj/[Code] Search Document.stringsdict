@@ -5,7 +5,7 @@
 	<key>displayingValuesLabelFormat</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>Отображение %#@values@</string>
+		<string>Отображено %#@values@</string>
 		<key>values</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -17,7 +17,7 @@
 			<key>few</key>
 			<string>_NUM_ значения</string>
 			<key>many</key>
-			<string>_NUM_ значения</string>
+			<string>_NUM_ значений</string>
 			<key>other</key>
 			<string>_NUM_ значения</string>
 		</dict>
@@ -38,7 +38,7 @@
 			<key>few</key>
 			<string>Найдены %#@values@</string>
 			<key>many</key>
-			<string>Найдены %#@values@</string>
+			<string>Найдено %#@values@</string>
 			<key>other</key>
 			<string>Найдены %#@values@</string>
 		</dict>
@@ -53,7 +53,7 @@
 			<key>few</key>
 			<string>_NUM_ значения…</string>
 			<key>many</key>
-			<string>_NUM_ значения…</string>
+			<string>_NUM_ значений…</string>
 			<key>other</key>
 			<string>_NUM_ значения…</string>
 		</dict>

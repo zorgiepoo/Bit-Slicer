@@ -30,7 +30,7 @@
 "WEg-d2-avs.title" = "Скопировать";
 
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "aEL-fJ-gBa"; */
-"aEL-fJ-gBa.title" = "Пойнтер";
+"aEL-fJ-gBa.title" = "Указатель";
 
 /* Class = "NSTableColumn"; headerCell.title = "Type"; ObjectID = "d5c-kz-wqB"; */
 "d5c-kz-wqB.headerCell.title" = "Тип";

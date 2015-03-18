@@ -1,9 +1,9 @@
 
 /* User Notification Title for when a script encounters an error and fails */
-"scriptFailedNotificationTitle" = "Script Failed";
+"scriptFailedNotificationTitle" = "Ошибка в скрипте";
 
 /* User Notification Informative Text for when a script encounters an error and fails */
-"scriptFailedNotificationTextFormat" = "An error occured trying to run the script on %@";
+"scriptFailedNotificationTextFormat" = "Произошла ошибка при попытке запуска скрипта на %@";
 
 /* User Notification Title for when a script prompt dialog is brought onto the screen */
-"scriptPromptNotificationTitle" = "Script Prompt";
+"scriptPromptNotificationTitle" = "Сообщение Скрипта";

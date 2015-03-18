@@ -6,7 +6,7 @@
 "TC3-Sc-pTc.title" = "Шаг с перешагиванием инструкций:";
 
 /* Class = "NSTextFieldCell"; title = "Stepping Out:"; ObjectID = "TWO-T9-AWJ"; */
-"TWO-T9-AWJ.title" = "Шаг с выходом из фун-ции:";
+"TWO-T9-AWJ.title" = "Шаг с выходом из функции:";
 
 /* Class = "NSTextFieldCell"; title = "Stepping Into:"; ObjectID = "rgu-ne-tsn"; */
 "rgu-ne-tsn.title" = "Шаг со входом в инструкцию:";

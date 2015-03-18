@@ -60,7 +60,7 @@
 "100857.title" = "Байтовый массив";
 
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "100859"; */
-"100859.title" = "Пойнтер";
+"100859.title" = "Указатель";
 
 /* Class = "NSMenuItem"; title = "Watch Read & Write Accesses…"; ObjectID = "100885"; */
 "100885.title" = "Следить за чтением и записью…";
@@ -84,7 +84,7 @@
 "6Kr-rx-QwW.title" = "displaying_or_found_x_variables";
 
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "6iU-LJ-nRI"; */
-"6iU-LJ-nRI.title" = "Пойнтер";
+"6iU-LJ-nRI.title" = "Указатель";
 
 /* Class = "NSToolbarItem"; label = "Data Type"; ObjectID = "70m-RL-vim"; */
 "70m-RL-vim.label" = "Тип данных";
@@ -114,7 +114,7 @@
 "FMi-B9-hS9.title" = "Байтовый массив";
 
 /* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "GzQ-9Y-rMY"; */
-"GzQ-9Y-rMY.title" = "Пойнтер";
+"GzQ-9Y-rMY.title" = "Указатель";
 
 /* Class = "NSMenuItem"; title = "Search Pointer to Variable"; ObjectID = "JI2-jh-sbh"; */
 "JI2-jh-sbh.title" = "Искать указатель на переменную";
@@ -186,10 +186,10 @@
 "luK-87-e1C.title" = "Плавающее (Float 4 байта)";
 
 /* Class = "NSToolbarItem"; label = "Store Values"; ObjectID = "q4V-IG-gxK"; */
-"q4V-IG-gxK.label" = "Сохраненные значения";
+"q4V-IG-gxK.label" = "Снимок значений";
 
 /* Class = "NSToolbarItem"; paletteLabel = "Store Values"; ObjectID = "q4V-IG-gxK"; */
-"q4V-IG-gxK.paletteLabel" = "Сохраненные значения";
+"q4V-IG-gxK.paletteLabel" = "Снимок значений";
 
 /* Class = "NSTextFieldCell"; title = "Address"; ObjectID = "qcP-TU-pcN"; */
 "qcP-TU-pcN.title" = "Адрес";
@@ -207,4 +207,4 @@
 "xlb-JZ-GJa.paletteLabel" = "Поиск";
 
 /* Class = "NSMenuItem"; title = "Float"; ObjectID = "xya-wF-ZfW"; */
-"xya-wF-ZfW.title" = "Плавающее (Float 4 байта)";
+"xya-wF-ZfW.title" = "Плавающее (Float4 байта)";
