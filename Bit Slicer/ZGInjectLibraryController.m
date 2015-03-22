@@ -261,9 +261,6 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 	
 	ZGMemoryAddress instructionAddressToHalt = (objcMsgSendNumberAddress != nil) ? objcMsgSendNumberAddress.unsignedLongLongValue : instructionPointer;
 	
-	//ZGMemoryAddress instructionAddressToHalt = instructionPointer;
-	NSLog(@"Setting bp at 0x%llX with tid %u", instructionAddressToHalt, mainThread);
-	
 	_haltedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddressToHalt + 0x1 inProcess:process withBreakPoints:breakPointController.breakPoints machBinaries:_machBinariesBeforeInjecting];
 	
 	if (_haltedInstruction == nil)
@@ -295,7 +292,6 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 	{
 		_secondPass = YES;
 		
-		NSLog(@"Removing breakpoint on 0x%llX", _haltedInstruction.variable.address);
 		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
 		_haltedInstruction = nil;
 		
@@ -467,8 +463,6 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 			return;
 		}
 		
-		NSLog(@"Stopped at (1st) 0x%llX, tid: %d", breakPoint.registersState.generalPurposeThreadState.uts.ts64.__rip, breakPoint.thread);
-		
 		_originalThreadState = threadState;
 		_threadStateCount = threadStateCount;
 		
@@ -537,8 +531,6 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 		
 		ZGMemoryAddress basePointer = process.is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
 		
-		NSLog(@"Adding bp to end 0x%llX", endOfCodeInstruction.variable.address);
-		
 		if (![_breakPointController addBreakPointOnInstruction:endOfCodeInstruction inProcess:process thread:mainThread basePointer:basePointer delegate:self])
 		{
 			ZG_LOG(@"Failed to add breakpoint at 0x%llX", endOfCodeInstruction.variable.address);
@@ -571,14 +563,11 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 	}
 	else
 	{
-		NSLog(@"Removing breakpoint on 0x%llX (time to end)", _haltedInstruction.variable.address);
 		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
 		_haltedInstruction = nil;
 		
 		// Restore everything to the way it was before we ran our code
 		BOOL success = YES;
-		
-		NSLog(@"Hit last bp at 0x%llX, tid: %d", breakPoint.registersState.generalPurposeThreadState.uts.ts64.__rip, breakPoint.thread);
 		
 		x86_thread_state_t threadState;
 		mach_msg_type_number_t threadStateCount;

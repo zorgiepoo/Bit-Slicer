@@ -320,14 +320,9 @@ static ZGBreakPointController *gBreakPointController;
 	}
 	else
 	{
-		NSLog(@"Testing SHOULD SINGLE STEP when bp doesn't exist");
 		shouldSingleStep = [self.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
 			return (BOOL)(candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.thread == breakPoint.thread && candidateBreakPoint.task == breakPoint.task);
 		}];
-		if (shouldSingleStep)
-		{
-			NSLog(@"YES SINGLE");
-		}
 	}
 	
 	if (shouldSingleStep)
@@ -483,8 +478,6 @@ static ZGBreakPointController *gBreakPointController;
 			}
 		}
 		
-		NSLog(@"Found inst addr: 0x%llX vs bp addr: 0x%llX (found single = %d, IP: 0x%llX)", foundInstructionAddress, breakPoint.variable.address, foundSingleStepBreakPoint, instructionPointer);
-		
 		if (foundInstructionAddress == breakPoint.variable.address)
 		{
 			uint8_t *opcode = NULL;
@@ -518,11 +511,8 @@ static ZGBreakPointController *gBreakPointController;
 		
 		if (breakPoint.needsToRestore)
 		{
-			NSLog(@"Restored BP at tid %u", breakPoint.thread);
-			
 			// Restore our breakpoint
 			uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
-			NSLog(@"Writing CC opcode to 0x%llX", breakPoint.variable.address);
 			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
 			
 			breakPoint.needsToRestore = NO;
@@ -557,8 +547,6 @@ static ZGBreakPointController *gBreakPointController;
 			ZGSuspendTask(task);
 			
 			candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
-			
-			NSLog(@"Added strange BP 0x%llX", candidateBreakPoint.variable.address);
 			
 			[breakPointsToNotify addObject:candidateBreakPoint];
 			
@@ -622,7 +610,6 @@ static ZGBreakPointController *gBreakPointController;
 		
 		if (canNotifyDelegate)
 		{
-			NSLog(@"Notifying tid %u", breakPoint.thread);
 			BOOL is64Bit = breakPoint.process.is64Bit;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -646,39 +633,7 @@ static ZGBreakPointController *gBreakPointController;
 		}
 		else
 		{
-			NSLog(@"Resumind without notifying tid %u", breakPoint.thread);
 			[self resumeFromBreakPoint:breakPoint];
-		}
-	}
-	
-	if (!handledInstructionBreakPoint)
-	{
-		NSLog(@"We did not handle... crash? :( %lu", breakPoints.count);
-		NSLog(@"IP Was 0x%llX", threadState.uts.ts64.__rip);
-		
-		uint8_t *bytes = NULL;
-		ZGMemorySize size = 6;
-		if (ZGReadBytes(task, 0x7FFF90B8D0C0, (void **)&bytes, &size))
-		{
-			for (ZGMemorySize index = 0; index < size; ++index)
-			{
-				NSLog(@"Byte at index %llu: 0x%X", index, bytes[index]);
-			}
-			ZGFreeBytes(bytes, size);
-		}
-		
-		if ((threadState.uts.ts64.__rflags & (1U << 8)) != 0)
-		{
-			NSLog(@"SINGLE STEPPING IS ON");
-		}
-		else
-		{
-			NSLog(@"SINGLE STEPPING IS OFF");
-		}
-		
-		for (ZGBreakPoint *breakPoint in breakPoints)
-		{
-			NSLog(@"BP Addr: 0x%llX TID: %u needsRestore: %d, dead: %d", breakPoint.variable.address, breakPoint.thread, breakPoint.needsToRestore, breakPoint.dead);
 		}
 	}
 	
@@ -704,14 +659,10 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	if (exception == EXC_BREAKPOINT)
 	{
-		NSLog(@"Reahed breakpoint... tid: %d", thread);
-		
 		NSArray *breakPoints = [gBreakPointController breakPoints];
 		
 		handledWatchPoint = [gBreakPointController handleWatchPoints:breakPoints withTask:task inThread:thread];
 		handledInstructionBreakPoint = [gBreakPointController handleInstructionBreakPoints:breakPoints withTask:task inThread:thread];
-		
-		NSLog(@"End Handles");
 	}
 	
 	return (handledWatchPoint || handledInstructionBreakPoint) ? KERN_SUCCESS : KERN_FAILURE;
