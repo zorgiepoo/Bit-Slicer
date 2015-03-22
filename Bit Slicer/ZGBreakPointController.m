@@ -307,22 +307,15 @@ static ZGBreakPointController *gBreakPointController;
 	// Check if breakpoint still exists
 	if (breakPoint.type == ZGBreakPointInstruction && [self.breakPoints containsObject:breakPoint])
 	{
-		// Restore our instruction
-		NSLog(@"Writing original byte val at 0x%llX", breakPoint.variable.address);
-		ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
-		
-		breakPoint.needsToRestore = YES;
-		
 		if (!breakPoint.dead)
 		{
+			// Restore our instruction
+			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
+			
+			breakPoint.needsToRestore = YES;
+			
 			// Ensure single-stepping, so on next instruction we can restore our breakpoint
-			NSLog(@"Gonna SINGLE BP LIKE U MEAN IT");
 			shouldSingleStep = YES;
-		}
-		else
-		{
-			//NSLog(@"REMOVING RESUMED BP");
-			//[self removeBreakPoint:breakPoint];
 		}
 	}
 	else
