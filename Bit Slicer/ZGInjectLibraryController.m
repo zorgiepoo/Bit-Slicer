@@ -56,9 +56,6 @@
 	zg_x86_vector_state_t _originalVectorState;
 	mach_msg_type_number_t _vectorStateCount;
 	
-	x86_debug_state_t _originalDebugState;
-	mach_msg_type_number_t _debugStateCount;
-	
 	thread_act_array_t _threadList;
 	mach_msg_type_number_t _threadListCount;
 	
@@ -298,6 +295,7 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 	{
 		_secondPass = YES;
 		
+		NSLog(@"Removing breakpoint on 0x%llX", _haltedInstruction.variable.address);
 		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
 		_haltedInstruction = nil;
 		
@@ -469,7 +467,7 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 			return;
 		}
 		
-		NSLog(@"Stopped at (1st) 0x%X, tid: %d", breakPoint.registersState.generalPurposeThreadState.uts.ts32.__eip, breakPoint.thread);
+		NSLog(@"Stopped at (1st) 0x%llX, tid: %d", breakPoint.registersState.generalPurposeThreadState.uts.ts64.__rip, breakPoint.thread);
 		
 		_originalThreadState = threadState;
 		_threadStateCount = threadStateCount;
@@ -494,9 +492,6 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 			handleFailure();
 			return;
 		}
-		
-		_originalDebugState = debugState;
-		_debugStateCount = debugStateCount;
 		
 		for (mach_msg_type_number_t threadIndex = 0; threadIndex < _threadListCount; ++threadIndex)
 		{
@@ -576,13 +571,31 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 	}
 	else
 	{
+		NSLog(@"Removing breakpoint on 0x%llX (time to end)", _haltedInstruction.variable.address);
 		[_breakPointController removeBreakPointOnInstruction:_haltedInstruction inProcess:process];
 		_haltedInstruction = nil;
 		
 		// Restore everything to the way it was before we ran our code
 		BOOL success = YES;
 		
-		NSLog(@"Hit last bp at 0x%X, tid: %d", breakPoint.registersState.generalPurposeThreadState.uts.ts32.__eip, breakPoint.thread);
+		NSLog(@"Hit last bp at 0x%llX, tid: %d", breakPoint.registersState.generalPurposeThreadState.uts.ts64.__rip, breakPoint.thread);
+		
+		x86_thread_state_t threadState;
+		mach_msg_type_number_t threadStateCount;
+		if (!ZGGetGeneralThreadState(&threadState, thread, &threadStateCount))
+		{
+			ZG_LOG(@"ERROR: Grabbing thread state failed %s", __PRETTY_FUNCTION__);
+			success = NO;
+		}
+		
+		if (process.is64Bit)
+		{
+			_originalThreadState.uts.ts64.__rflags = threadState.uts.ts64.__rflags;
+		}
+		else
+		{
+			_originalThreadState.uts.ts32.__eflags = threadState.uts.ts32.__eflags;
+		}
 		
 		if (!ZGSetGeneralThreadState(&_originalThreadState, thread, _threadStateCount))
 		{
@@ -593,12 +606,6 @@ extern int sandbox_container_path_for_pid(pid_t, char *buffer, size_t bufsize);
 		if (!ZGSetVectorThreadState(&_originalVectorState, thread, _vectorStateCount, breakPoint.process.is64Bit))
 		{
 			ZG_LOG(@"Failed to set vector state after breakpoint");
-			success = NO;
-		}
-		
-		if (!ZGSetDebugThreadState(&_originalDebugState, thread, _debugStateCount))
-		{
-			ZG_LOG(@"Failed to set debug state after breakpoint");
 			success = NO;
 		}
 		

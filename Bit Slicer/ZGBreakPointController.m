@@ -190,10 +190,10 @@ static ZGBreakPointController *gBreakPointController;
 #define IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, type) \
 	(((debugState.uds.type.__dr6 & (1 << debugRegisterIndex)) != 0) && ((debugState.uds.type.__dr7 & (1 << 2*debugRegisterIndex)) != 0))
 
-- (BOOL)handleWatchPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
+- (BOOL)handleWatchPoints:(NSArray *)breakPoints withTask:(mach_port_t)task inThread:(mach_port_t)thread
 {
 	BOOL handledWatchPoint = NO;
-	for (ZGBreakPoint *breakPoint in self.breakPoints)
+	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
 		if (breakPoint.type != ZGBreakPointWatchData)
 		{
@@ -316,18 +316,25 @@ static ZGBreakPointController *gBreakPointController;
 		if (!breakPoint.dead)
 		{
 			// Ensure single-stepping, so on next instruction we can restore our breakpoint
+			NSLog(@"Gonna SINGLE BP LIKE U MEAN IT");
 			shouldSingleStep = YES;
 		}
 		else
 		{
-			[self removeBreakPoint:breakPoint];
+			//NSLog(@"REMOVING RESUMED BP");
+			//[self removeBreakPoint:breakPoint];
 		}
 	}
 	else
 	{
+		NSLog(@"Testing SHOULD SINGLE STEP when bp doesn't exist");
 		shouldSingleStep = [self.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
 			return (BOOL)(candidateBreakPoint.type == ZGBreakPointSingleStepInstruction && candidateBreakPoint.thread == breakPoint.thread && candidateBreakPoint.task == breakPoint.task);
 		}];
+		if (shouldSingleStep)
+		{
+			NSLog(@"YES SINGLE");
+		}
 	}
 	
 	if (shouldSingleStep)
@@ -358,42 +365,40 @@ static ZGBreakPointController *gBreakPointController;
 
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	if (breakPoint.condition != NULL)
-	{
-		// Mark breakpoint as dead. if the breakpoint is called frequently (esp. with a falsely evaluated condition), it will be removed when resuming from a breakpoint
-		// We handle a breakpoint by reverting the instruction back to normal, single stepping, then reverting the instruction opcode back to being breaked
-		// If we just removed the breakpoint immediately here, and the process single steps, the handler won't know why the exception was raised
-		// Our work around here is giving the process a little delay (perhaps a better way might be to add a single-stepping breakpoint and remove it from there)
-		breakPoint.dead = YES;
-		
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 10), dispatch_get_main_queue(), ^(void) {
-			if ([self.breakPoints containsObject:breakPoint])
-			{
-				ZGSuspendTask(breakPoint.process.processTask);
-				
-				[self revertInstructionBackToNormal:breakPoint];
-				[self removeBreakPoint:breakPoint];
-				
-				ZGResumeTask(breakPoint.process.processTask);
-			}
+	// Mark the breakpoint as dead and revert the instruction opcode back to normal
+	// After a little delay, we will remove the breakpoint from our collection
+	// This delay is needed in the case if multiple threads access a breakpoint simultaneously
+	// In this case, the exception handler will be called multiple times even if we suspend the process task
+	breakPoint.dead = YES;
+	
+	ZGSuspendTask(breakPoint.process.processTask);
+	[self revertInstructionBackToNormal:breakPoint];
+	ZGResumeTask(breakPoint.process.processTask);
+	
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC / 2), dispatch_get_main_queue(), ^(void) {
+		if ([self.breakPoints containsObject:breakPoint])
+		{
+			ZGSuspendTask(breakPoint.process.processTask);
 			
+			[self removeBreakPoint:breakPoint];
+			
+			ZGResumeTask(breakPoint.process.processTask);
+		}
+		
+		if (breakPoint.condition != NULL)
+		{
 			id <ZGBreakPointDelegate> delegate = breakPoint.delegate;
 			if ([delegate respondsToSelector:@selector(conditionalInstructionBreakPointWasRemoved)])
 			{
 				[delegate conditionalInstructionBreakPointWasRemoved];
 			}
-			
-			if (self.delayedTermination && self.breakPoints.count == 0)
-			{
-				[self.appTerminationState decreaseLifeCount];
-			}
-		});
-	}
-	else
-	{
-		[self revertInstructionBackToNormal:breakPoint];
-		[self removeBreakPoint:breakPoint];
-	}
+		}
+		
+		if (self.delayedTermination && self.breakPoints.count == 0)
+		{
+			[self.appTerminationState decreaseLifeCount];
+		}
+	});
 }
 
 - (ZGBreakPoint *)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process
@@ -416,10 +421,9 @@ static ZGBreakPointController *gBreakPointController;
 	return targetBreakPoint;
 }
 
-- (BOOL)handleInstructionBreakPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
+- (BOOL)handleInstructionBreakPoints:(NSArray *)breakPoints withTask:(mach_port_t)task inThread:(mach_port_t)thread
 {
 	BOOL handledInstructionBreakPoint = NO;
-	NSArray *breakPoints = self.breakPoints;
 	
 	ZGSuspendTask(task);
 	
@@ -458,7 +462,7 @@ static ZGBreakPointController *gBreakPointController;
 		}
 		
 		// If we had single-stepped in here, use current program counter, otherwise use instruction address before program counter
-		BOOL foundSingleStepBreakPoint = [self.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
+		BOOL foundSingleStepBreakPoint = [breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
 			return (BOOL)((candidateBreakPoint.needsToRestore || candidateBreakPoint.type == ZGBreakPointSingleStepInstruction) && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread);
 		}];
 		
@@ -476,7 +480,7 @@ static ZGBreakPointController *gBreakPointController;
 			if (existingInstructionAddress == nil)
 			{
 				NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:breakPoint.process];
-				ZGInstruction *foundInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:self.breakPoints machBinaries:machBinaries];
+				ZGInstruction *foundInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:breakPoints machBinaries:machBinaries];
 				foundInstructionAddress = foundInstruction.variable.address;
 				[breakPoint.cacheDictionary setObject:@(foundInstructionAddress) forKey:instructionPointerNumber];
 			}
@@ -495,7 +499,7 @@ static ZGBreakPointController *gBreakPointController;
 			
 			if (ZGReadBytes(breakPoint.process.processTask, foundInstructionAddress, (void **)&opcode, &opcodeSize))
 			{
-				if (*opcode == INSTRUCTION_BREAKPOINT_OPCODE)
+				if (*opcode == INSTRUCTION_BREAKPOINT_OPCODE || breakPoint.dead)
 				{
 					hitBreakPoint = YES;
 					ZGSuspendTask(task);
@@ -654,16 +658,38 @@ static ZGBreakPointController *gBreakPointController;
 		}
 	}
 	
-	ZGResumeTask(task);
-	
 	if (!handledInstructionBreakPoint)
 	{
 		NSLog(@"We did not handle... crash? :( %lu", breakPoints.count);
+		NSLog(@"IP Was 0x%llX", threadState.uts.ts64.__rip);
+		
+		uint8_t *bytes = NULL;
+		ZGMemorySize size = 6;
+		if (ZGReadBytes(task, 0x7FFF90B8D0C0, (void **)&bytes, &size))
+		{
+			for (ZGMemorySize index = 0; index < size; ++index)
+			{
+				NSLog(@"Byte at index %llu: 0x%X", index, bytes[index]);
+			}
+			ZGFreeBytes(bytes, size);
+		}
+		
+		if ((threadState.uts.ts64.__rflags & (1U << 8)) != 0)
+		{
+			NSLog(@"SINGLE STEPPING IS ON");
+		}
+		else
+		{
+			NSLog(@"SINGLE STEPPING IS OFF");
+		}
+		
 		for (ZGBreakPoint *breakPoint in breakPoints)
 		{
 			NSLog(@"BP Addr: 0x%llX TID: %u needsRestore: %d, dead: %d", breakPoint.variable.address, breakPoint.thread, breakPoint.needsToRestore, breakPoint.dead);
 		}
 	}
+	
+	ZGResumeTask(task);
 	
 	return handledInstructionBreakPoint;
 }
@@ -687,8 +713,12 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	{
 		NSLog(@"Reahed breakpoint... tid: %d", thread);
 		
-		handledWatchPoint = [gBreakPointController handleWatchPointsWithTask:task inThread:thread];
-		handledInstructionBreakPoint = [gBreakPointController handleInstructionBreakPointsWithTask:task inThread:thread];
+		NSArray *breakPoints = [gBreakPointController breakPoints];
+		
+		handledWatchPoint = [gBreakPointController handleWatchPoints:breakPoints withTask:task inThread:thread];
+		handledInstructionBreakPoint = [gBreakPointController handleInstructionBreakPoints:breakPoints withTask:task inThread:thread];
+		
+		NSLog(@"End Handles");
 	}
 	
 	return (handledWatchPoint || handledInstructionBreakPoint) ? KERN_SUCCESS : KERN_FAILURE;
