@@ -989,9 +989,22 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		return NO;
 	}
 	
-	BOOL breakPointAlreadyExists = [self.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) {
-		return (BOOL)(breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address == instruction.variable.address);
-	}];
+	NSMutableArray *deadBreakPoints = [[NSMutableArray alloc] init];
+	BOOL breakPointAlreadyExists = NO;
+	for (ZGBreakPoint *breakPoint in self.breakPoints)
+	{
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == process.processTask && breakPoint.variable.address == instruction.variable.address)
+		{
+			if (breakPoint.dead)
+			{
+				[deadBreakPoints addObject:breakPoint];
+			}
+			else
+			{
+				breakPointAlreadyExists = YES;
+			}
+		}
+	}
 	
 	if (breakPointAlreadyExists)
 	{
@@ -1040,6 +1053,11 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	breakPoint.callback = callback;
 	
 	[self addBreakPoint:breakPoint];
+	
+	for (ZGBreakPoint *deadBreakPoint in deadBreakPoints)
+	{
+		[self removeBreakPoint:deadBreakPoint];
+	}
 	
 	BOOL success = ZGWriteBytesIgnoringProtection(process.processTask, variable.address, &breakPointOpcode, sizeof(uint8_t));
 	if (!success)

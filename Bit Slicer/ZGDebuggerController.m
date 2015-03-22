@@ -1482,7 +1482,7 @@ enum ZGStepExecution
 - (BOOL)isBreakPointAtInstruction:(ZGInstruction *)instruction
 {
 	return [self.breakPointController.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) {
-		return (BOOL)(breakPoint.delegate == self && breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.hidden);
+		return (BOOL)(breakPoint.delegate == self && breakPoint.type == ZGBreakPointInstruction && breakPoint.task == self.currentProcess.processTask && breakPoint.variable.address == instruction.variable.address && !breakPoint.hidden && !breakPoint.dead);
 	}];
 }
 
