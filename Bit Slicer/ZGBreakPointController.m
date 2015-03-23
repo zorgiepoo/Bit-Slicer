@@ -305,18 +305,15 @@ static ZGBreakPointController *gBreakPointController;
 	BOOL shouldSingleStep = NO;
 	
 	// Check if breakpoint still exists
-	if (breakPoint.type == ZGBreakPointInstruction && [self.breakPoints containsObject:breakPoint])
+	if (breakPoint.type == ZGBreakPointInstruction && !breakPoint.dead && [self.breakPoints containsObject:breakPoint])
 	{
-		if (!breakPoint.dead)
-		{
-			// Restore our instruction
-			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
-			
-			breakPoint.needsToRestore = YES;
-			
-			// Ensure single-stepping, so on next instruction we can restore our breakpoint
-			shouldSingleStep = YES;
-		}
+		// Restore our instruction
+		ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
+		
+		breakPoint.needsToRestore = YES;
+		
+		// Ensure single-stepping, so on next instruction we can restore our breakpoint
+		shouldSingleStep = YES;
 	}
 	else
 	{
