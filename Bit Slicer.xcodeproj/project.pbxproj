@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7216F7D01AC66133005288A8 /* dsa_pub.pem */; };
 		722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5519AD4AED009C6AAE /* hotkey.png */; };
 		722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5619AD4AED009C6AAE /* hotkey@2x.png */; };
 		722CAA5B19AD4AED009C6AAE /* scripts.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5719AD4AED009C6AAE /* scripts.png */; };
@@ -296,6 +297,7 @@
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		2A37F4C4FDCFA73011CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
 		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
 		722CAA5619AD4AED009C6AAE /* hotkey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hotkey@2x.png"; path = "Bit Slicer/preficons/hotkey@2x.png"; sourceTree = "<group>"; };
 		722CAA5719AD4AED009C6AAE /* scripts.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = scripts.png; path = "Bit Slicer/preficons/scripts.png"; sourceTree = "<group>"; };
@@ -926,6 +928,7 @@
 				77F115AD17D2EAE4009E002A /* bitslicericon.iconset */,
 				77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */,
 				77F115B217D2EAFE009E002A /* Credits.rtf */,
+				7216F7D01AC66133005288A8 /* dsa_pub.pem */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1726,6 +1729,7 @@
 				724A9F2419A1657500E72C9D /* [Code] Memory Protection.strings in Resources */,
 				72D051CB1960A41F00EC532A /* Registers View.xib in Resources */,
 				72D051AC1960891900EC532A /* Backtrace View.xib in Resources */,
+				7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */,
 				72D051A91960890800EC532A /* Data Inspector View.xib in Resources */,
 				726CA2B019606DA000A6AD40 /* Logs Window.xib in Resources */,
 				724A9F2119A1657500E72C9D /* [Code] Dump Memory Range.strings in Resources */,

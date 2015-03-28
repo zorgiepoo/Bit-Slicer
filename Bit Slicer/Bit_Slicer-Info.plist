@@ -47,6 +47,8 @@
 	<array>
 		<string>allowed</string>
 	</array>
+	<key>SUPublicDSAKeyFile</key>
+	<string>dsa_pub.pem</string>
 	<key>SUFeedURL</key>
 	<string>http://web.zgcoder.net/bitslicer/update.php</string>
 	<key>SUEnableSystemProfiling</key>
