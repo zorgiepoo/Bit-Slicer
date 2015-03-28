@@ -2668,6 +2668,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Bit Slicer/Bit_Slicer-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
@@ -2768,6 +2769,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Bit Slicer/Bit_Slicer-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
