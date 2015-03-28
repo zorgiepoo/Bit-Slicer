@@ -48,7 +48,7 @@
 		<string>allowed</string>
 	</array>
 	<key>SUFeedURL</key>
-	<string>http://zorg.tejat.net/bitslicer/update.php</string>
+	<string>http://web.zgcoder.net/bitslicer/update.php</string>
 	<key>SUEnableSystemProfiling</key>
 	<string>YES</string>
 	<key>LSMinimumSystemVersion</key>

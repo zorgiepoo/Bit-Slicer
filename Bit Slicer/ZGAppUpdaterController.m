@@ -42,8 +42,8 @@
 #define SU_FEED_URL_KEY @"SUFeedURL"
 #define SU_SEND_PROFILE_INFO_KEY @"SUSendProfileInfo"
 
-#define APPCAST_URL @"http://zorg.tejat.net/bitslicer/update.php"
-#define ALPHA_APPCAST_URL @"http://zorg.tejat.net/bitslicer/update_alpha.php"
+#define APPCAST_URL @"http://web.zgcoder.net/bitslicer/update.php"
+#define ALPHA_APPCAST_URL @"http://web.zgcoder.net/bitslicer/update_alpha.php"
 
 @interface ZGAppUpdaterController ()
 
