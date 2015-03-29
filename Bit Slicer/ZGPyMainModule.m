@@ -41,7 +41,8 @@ static PyObject *BitSlicer_reload(PyObject *self, PyObject *args);
 
 static PyMethodDef mainModuleMethods[] =
 {
-	{"reload", (PyCFunction)BitSlicer_reload, METH_VARARGS, NULL}
+	{"reload", BitSlicer_reload, METH_VARARGS, NULL},
+	{NULL, NULL, 0, NULL}
 };
 
 static struct PyModuleDef mainModuleDefinition =
