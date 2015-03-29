@@ -121,8 +121,16 @@ static PyObject *gStructObject;
 		[self appendPath:userModulesDirectory toSysPath:path];
 		
 		PyObject *mainModule = loadMainPythonModule();
-		[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
-		[ZGPyDebugger loadPythonClassInMainModule:mainModule];
+		if (mainModule != NULL)
+		{
+			[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
+			[ZGPyDebugger loadPythonClassInMainModule:mainModule];
+		}
+		else
+		{
+			NSLog(@"Error: Main Module could not be loaded");
+			NSLog(@"Error Message: %@", [self fetchPythonErrorDescriptionWithoutDescriptiveTraceback]);
+		}
 		
 		loadKeyCodePythonModule();
 		loadKeyModPythonModule();

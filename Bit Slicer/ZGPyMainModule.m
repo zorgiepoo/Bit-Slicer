@@ -58,6 +58,11 @@ static struct PyModuleDef mainModuleDefinition =
 PyObject *loadMainPythonModule(void)
 {
 	PyObject *mainModule = PyModule_Create(&mainModuleDefinition);
+	if (mainModule == NULL)
+	{
+		return NULL;
+	}
+	
 	ZGPyAddModuleToSys(MAIN_MODULE_NAME, mainModule);
 	return mainModule;
 }
