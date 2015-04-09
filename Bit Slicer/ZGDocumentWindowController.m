@@ -122,6 +122,8 @@
 
 @implementation ZGDocumentWindowController
 
+@dynamic debuggerController;
+
 - (id)initWithDocument:(ZGDocument *)document
 {
 	self = [super initWithProcessTaskManager:document.processTaskManager];
