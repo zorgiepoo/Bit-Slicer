@@ -156,7 +156,7 @@
 		NSString *outputFilePath = [fileManager stringWithFileSystemRepresentation:tempFileNameCString length:strlen(tempFileNameCString)];
 		
 		NSTask *task = [[NSTask alloc] init];
-		[task setLaunchPath:[[NSBundle mainBundle] pathForResource:@"yasm" ofType:nil]];
+		task.launchPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"yasm"];
 		[task setArguments:@[@"--arch=x86", @"-", @"-o", outputFilePath]];
 		
 		NSPipe *inputPipe = [NSPipe pipe];

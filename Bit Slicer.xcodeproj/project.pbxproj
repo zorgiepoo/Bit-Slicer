@@ -70,6 +70,7 @@
 		72D051CB1960A41F00EC532A /* Registers View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051C91960A41F00EC532A /* Registers View.xib */; };
 		72D271D4197C2A6800CC6914 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D271D2197C2A6800CC6914 /* InfoPlist.strings */; };
 		72D72BCB1AB3E9FA005044CF /* ZGLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D72BCA1AB3E9FA005044CF /* ZGLocalization.m */; };
+		72DEBBB11ADA0ED30053CD3E /* yasm in CopyFiles */ = {isa = PBXBuildFile; fileRef = 77F115A917D2E8AC009E002A /* yasm */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
 		770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F284118832132001B828C /* ZGBreakPointCondition.m */; };
@@ -204,7 +205,6 @@
 		77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		77F115A817D2E87E009E002A /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115A717D2E87E009E002A /* VDKQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		77F115AA17D2E8AC009E002A /* yasm in Resources */ = {isa = PBXBuildFile; fileRef = 77F115A917D2E8AC009E002A /* yasm */; };
 		77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */; };
 		77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77F115AD17D2EAE4009E002A /* bitslicericon.iconset */; };
 		77F115B317D2EAFE009E002A /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 77F115B217D2EAFE009E002A /* Credits.rtf */; };
@@ -266,6 +266,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		72DEBBB01ADA0EB80053CD3E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				72DEBBB11ADA0ED30053CD3E /* yasm in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		770EA827137B74F2007FB85A /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1608,6 +1618,7 @@
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
 				770EA827137B74F2007FB85A /* Copy Frameworks */,
+				72DEBBB01ADA0EB80053CD3E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -1669,7 +1680,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				77F115AA17D2E8AC009E002A /* yasm in Resources */,
 				724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */,
 				726CA2B919606DD900A6AD40 /* Dump All Memory Dialog.xib in Resources */,
 				724A9F2819A1657500E72C9D /* [Code] Script Preferences.strings in Resources */,
