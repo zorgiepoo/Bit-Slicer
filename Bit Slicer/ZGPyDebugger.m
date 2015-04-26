@@ -1194,7 +1194,7 @@ static BOOL writeRegister(NSDictionary *registerOffsetsDictionary, const char *r
 	ZGRegisterEntry registerEntry;
 	[registerValue getValue:&registerEntry];
 	
-	void *registerPointer = registerStartPointer + registerEntry.offset;
+	void *registerPointer = (uint8_t *)registerStartPointer + registerEntry.offset;
 	
 	if (PyByteArray_Check(value))
 	{
@@ -1306,12 +1306,12 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		}
 		
 		BOOL wroteValue = NO;
-		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (void *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
+		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (uint8_t *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
 		if (wroteValue) needsToWriteGeneralRegisters = YES;
 		
 		if (success && !wroteValue && hasVectorRegisters)
 		{
-			success = writeRegister(vectorRegisterOffsetsDictionary, registerString, value, (void *)&vectorState + sizeof(x86_state_hdr_t), &wroteValue);
+			success = writeRegister(vectorRegisterOffsetsDictionary, registerString, value, (uint8_t *)&vectorState + sizeof(x86_state_hdr_t), &wroteValue);
 			if (wroteValue) needsToWriteVectorRegisters = YES;
 		}
 		

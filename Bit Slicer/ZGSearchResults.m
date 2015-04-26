@@ -118,15 +118,20 @@
 			const void *resultBytes = resultSet.bytes;
 			for (ZGMemorySize offset = beginOffset; offset < endOffset; offset += pointerSize)
 			{
+				ZGMemoryAddress address;
 				switch (pointerSize)
 				{
 					case sizeof(ZGMemoryAddress):
-						addressCallback(*(ZGMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
+						address = *(ZGMemoryAddress *)(void *)((uint8_t *)resultBytes + offset);
+						break;
+					case sizeof(ZG32BitMemoryAddress):
+						address = *(ZG32BitMemoryAddress *)(void *)((uint8_t *)resultBytes + offset);
 						break;
 					default:
-						addressCallback(*(ZG32BitMemoryAddress *)(resultBytes + offset), &shouldStopEnumerating);
-						break;
+						assert("Retrieved unexpected pointer size" == NULL);
 				}
+				
+				addressCallback(address, &shouldStopEnumerating);
 				
 				if (shouldStopEnumerating)
 				{

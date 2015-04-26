@@ -67,7 +67,7 @@
 	{
 		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == processTask && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
 		{
-			memcpy(newBytes + (breakPoint.variable.address - address), breakPoint.variable.rawValue, sizeof(uint8_t));
+			memcpy((uint8_t *)newBytes + (breakPoint.variable.address - address), breakPoint.variable.rawValue, sizeof(uint8_t));
 		}
 	}
 	
@@ -114,13 +114,13 @@
 			
 			if (address + data.length - targetBreakPoint.variable.address - 1 > 0)
 			{
-				if (!ZGWriteBytesIgnoringProtection(processTask, targetBreakPoint.variable.address + 1, data.bytes + (targetBreakPoint.variable.address + 1 - address), address + data.length - targetBreakPoint.variable.address - 1))
+				if (!ZGWriteBytesIgnoringProtection(processTask, targetBreakPoint.variable.address + 1, (uint8_t *)data.bytes + (targetBreakPoint.variable.address + 1 - address), address + data.length - targetBreakPoint.variable.address - 1))
 				{
 					success = NO;
 				}
 			}
 			
-			*(uint8_t *)targetBreakPoint.variable.rawValue = *(uint8_t *)(data.bytes + targetBreakPoint.variable.address - address);
+			*(uint8_t *)targetBreakPoint.variable.rawValue = *((uint8_t *)data.bytes + targetBreakPoint.variable.address - address);
 		}
 	}
 	
@@ -210,7 +210,7 @@
 				}
 				else
 				{
-					data = [NSData dataWithBytes:tempData.bytes + numberOfNoppedInstructions length:tempData.length - numberOfNoppedInstructions];
+					data = [NSData dataWithBytes:(uint8_t *)tempData.bytes + numberOfNoppedInstructions length:tempData.length - numberOfNoppedInstructions];
 				}
 			}
 			else

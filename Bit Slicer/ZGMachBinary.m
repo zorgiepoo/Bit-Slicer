@@ -89,11 +89,11 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		}
 		
 		machHeader = regionBytes;
-		void *bytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
+		uint8_t *bytes = (uint8_t *)(void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
 		
 		for (uint32_t commandIndex = 0; commandIndex < machHeader->ncmds; commandIndex++)
 		{
-			struct dylinker_command *dylinkerCommand = bytes;
+			struct dylinker_command *dylinkerCommand = (void *)bytes;
 			
 			if (dylinkerCommand->cmd == LC_ID_DYLINKER || dylinkerCommand->cmd == LC_LOAD_DYLINKER)
 			{
@@ -144,11 +144,11 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 			{
 				for (uint32_t infoIndex = 0; infoIndex < allImageInfos->infoArrayCount; infoIndex++)
 				{
-					void *infoImage = infoArrayBytes + imageInfoSize * infoIndex;
+					void *infoImage = (uint8_t *)infoArrayBytes + imageInfoSize * infoIndex;
 					
 					ZGMemoryAddress machHeaderAddress = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)infoImage : *(ZGMemoryAddress *)infoImage;
 					
-					ZGMemoryAddress imageFilePathAddress = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)(infoImage + pointerSize) : *(ZGMemoryAddress *)(infoImage + pointerSize);
+					ZGMemoryAddress imageFilePathAddress = (pointerSize == sizeof(ZG32BitMemoryAddress)) ? *(ZG32BitMemoryAddress *)(void *)((uint8_t *)infoImage + pointerSize) : *(ZGMemoryAddress *)(void *)((uint8_t *)infoImage + pointerSize);
 					
 					[machBinaries addObject:[[ZGMachBinary alloc] initWithHeaderAddress:machHeaderAddress filePathAddress:imageFilePathAddress]];
 				}
@@ -255,10 +255,10 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		uint32_t numberOfArchitectures = CFSwapInt32BigToHost(((struct fat_header *)machHeader)->nfat_arch);
 		for (uint32_t architectureIndex = 0; architectureIndex < numberOfArchitectures; architectureIndex++)
 		{
-			struct fat_arch *fatArchitecture = (void *)machHeader + sizeof(struct fat_header) + sizeof(struct fat_arch) * architectureIndex;
+			struct fat_arch *fatArchitecture = (void *)(((uint8_t *)(void *)machHeader) + sizeof(struct fat_header) + sizeof(struct fat_arch) * architectureIndex);
 			if ((pointerSize == sizeof(ZGMemoryAddress) && fatArchitecture->cputype & CPU_TYPE_X86_64) || (pointerSize == sizeof(ZG32BitMemoryAddress) && fatArchitecture->cputype & CPU_TYPE_I386))
 			{
-				machHeader = (void *)machHeader + CFSwapInt32BigToHost(fatArchitecture->offset);
+				machHeader = (void *)(((uint8_t *)(void *)machHeader) + CFSwapInt32BigToHost(fatArchitecture->offset));
 				break;
 			}
 		}
@@ -268,8 +268,8 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	
 	if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
 	{
-		void *segmentBytes = (void *)machHeader + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
-		if (segmentBytes + machHeader->sizeofcmds <= startPointer + dataLength)
+		void *segmentBytes = ((uint8_t *)(void *)machHeader) + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
+		if ((uint8_t *)segmentBytes + machHeader->sizeofcmds <= (uint8_t *)startPointer + dataLength)
 		{
 			machBinaryInfo = [[ZGMachBinaryInfo alloc] initWithMachHeaderAddress:machHeaderAddress segmentBytes:segmentBytes commandSize:machHeader->sizeofcmds];
 		}
@@ -313,7 +313,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		void *regionBytes = NULL;
 		if (ZGReadBytes(process.processTask, regionAddress, &regionBytes, &regionSize))
 		{
-			const struct mach_header_64 *machHeader = regionBytes + self.headerAddress - regionAddress;
+			const struct mach_header_64 *machHeader = (void *)((uint8_t *)regionBytes + self.headerAddress - regionAddress);
 			binaryInfo = [self parseMachHeaderWithBytes:machHeader startPointer:regionBytes dataLength:regionSize pointerSize:process.pointerSize];
 			
 			ZGFreeBytes(regionBytes, regionSize);

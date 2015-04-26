@@ -64,9 +64,9 @@ typedef struct
 	
 	uint32_t maxNumberOfSegmentCommands = 0;
 	const struct load_command *loadCommand = NULL;
-	for (const void *commandBytes = segmentBytes; commandBytes < segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
+	for (const uint8_t *commandBytes = segmentBytes; commandBytes < (uint8_t *)segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
 	{
-		loadCommand = commandBytes;
+		loadCommand = (void *)commandBytes;
 		if (loadCommand->cmd == LC_SEGMENT_64 || loadCommand->cmd == LC_SEGMENT)
 		{
 			maxNumberOfSegmentCommands++;
@@ -81,17 +81,17 @@ typedef struct
 	self.segments = malloc(sizeof(*_segments) * maxNumberOfSegmentCommands);
 	
 	loadCommand = NULL;
-	for (const void *commandBytes = segmentBytes; commandBytes < segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
+	for (const uint8_t *commandBytes = segmentBytes; commandBytes < (uint8_t *)segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
 	{
-		loadCommand = commandBytes;
+		loadCommand = (void *)commandBytes;
 		
 		if (loadCommand->cmd != LC_SEGMENT_64 && loadCommand->cmd != LC_SEGMENT)
 		{
 			continue;
 		}
 		
-		const struct segment_command_64 *segmentCommand64 = commandBytes;
-		const struct segment_command *segmentCommand32 = commandBytes;
+		const struct segment_command_64 *segmentCommand64 = (void *)commandBytes;
+		const struct segment_command *segmentCommand32 = (void *)commandBytes;
 		
 		if ((loadCommand->cmd == LC_SEGMENT_64 && segmentCommand64->vmsize == 0) || (loadCommand->cmd == LC_SEGMENT && segmentCommand32->vmsize == 0))
 		{
@@ -110,7 +110,7 @@ typedef struct
 			const void *segmentVMAddressPointer = &segmentCommand32->vmaddr;
 			
 			// struct section has enough relevant fields to make this test for 64-bit as well
-			if (sectionsOffset + sizeof(*firstSection32) <= commandBytes + loadCommand->cmdsize)
+			if ((uint8_t *)sectionsOffset + sizeof(*firstSection32) <= commandBytes + loadCommand->cmdsize)
 			{
 				if (loadCommand->cmd == LC_SEGMENT_64)
 				{

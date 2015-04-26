@@ -120,7 +120,7 @@ static void disassemblerTranslator(ud_t *object)
 		
 		ZGVariable *variable =
 		[[ZGVariable alloc]
-		 initWithValue:_bytes + (instructionAddress - _startAddress)
+		 initWithValue:(uint8_t *)_bytes + (instructionAddress - _startAddress)
 		 size:instructionSize
 		 address:instructionAddress
 		 type:ZGByteArray
@@ -152,7 +152,7 @@ static void disassemblerTranslator(ud_t *object)
 			
 			ZGVariable *variable =
 			[[ZGVariable alloc]
-			 initWithValue:_bytes + (instructionAddress - _startAddress)
+			 initWithValue:(uint8_t *)_bytes + (instructionAddress - _startAddress)
 			 size:instructionSize
 			 address:instructionAddress
 			 type:ZGByteArray
