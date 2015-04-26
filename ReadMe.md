@@ -41,12 +41,13 @@ It allows you to cheat in video games by searching and modifying values such as 
 * [Bit Slicer 1.6.2](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.6.2.zip): OS X 10.6.8, a 64-bit intel Mac
 * [Bit Slicer 1.5.2](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.5.2.zip): OS X 10.6.8
 
-## Support & Feedback
+## Support & Contributing
 * Check the [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) for how to use Bit Slicer
 * Report bugs or request features on the [bug tracker](https://github.com/zorgiepoo/Bit-Slicer/issues)
 * Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for discussion and current development
-* Help [translate](https://github.com/zorgiepoo/Bit-Slicer/wiki/Localization) Bit Slicer into a different language. 
-* Or send an email to zorgiepoo (at) gmail (dot) com
+* Help [translate](https://github.com/zorgiepoo/Bit-Slicer/wiki/Localization) Bit Slicer into a different language.
+* Help design better artwork (e.g. application icon) for Bit Slicer, following Apple's Human Interface Guidelines.
+* Send an email to zorgiepoo (at) gmail (dot) com for any assistance or thoughts.
 
 ## Source Code
 ### Licensing
@@ -55,6 +56,6 @@ Bit Slicer is licensed under the 3-clause BSD license. Versions prior to 1.6, ho
 ### Code Signing
 In order to build Bit Slicer, code signing is required to gain sufficient privilleges to using *task_for_pid()*. Building with the Debug scheme uses a self-signed certificate (which only works locally) and building with the Release scheme uses my purchased Developer ID certificate (which works for distribution).
 
-In order to build Bit Slicer in Debug mode using a self-signed certificate, please follow [these instructions](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Code%20Signing). Note that this involves more steps than code-signing typical applications.
+To build in Debug mode, please follow [these instructions](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Code%20Signing). Note that this involves more steps than code-signing typical applications.
 
 Versions prior to 1.6 are not code-signed, and consequently, the user is required to authorize the application to run as the superuser.
