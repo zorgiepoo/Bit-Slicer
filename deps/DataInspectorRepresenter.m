@@ -537,7 +537,10 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
     if (! loaded || ! outletView) {
         [NSException raise:NSInternalInconsistencyException format:@"Unable to load nib named DataInspectorView"];
     }
+#ifndef __clang_analyzer__
+    // clang's analyzer thinks we are leaking, but we *need* to keep the top level objects alive
     [_topLevelObjects retain];
+#endif
 
     NSView *resultView = outletView; //want to inherit its retain here
     outletView = nil;
@@ -547,7 +550,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
     [table setBackgroundColor:[NSColor colorWithCalibratedWhite:(CGFloat).91 alpha:1]];
     [table setRefusesFirstResponder:YES];
     [table setTarget:self];
-    [table setDoubleAction:@selector(doubleClickedTable:)];    
+    [table setDoubleAction:@selector(doubleClickedTable:)];
     return resultView;
 }
 
