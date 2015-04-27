@@ -69,11 +69,14 @@ enum InspectionStatus_t {
 
 static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) {
     switch (status) {
-		case eInspectionNoData: return NSLocalizedStringFromTable(@"noData", ZGDataInspectorLocalizationTable, nil);
-	case eInspectionTooMuchData: return NSLocalizedStringFromTable(@"tooMuchData", ZGDataInspectorLocalizationTable, nil);
-	case eInspectionBadByteCount: return NSLocalizedStringFromTable(@"badByteCount", ZGDataInspectorLocalizationTable, nil);
-	case eInspectionCanInspect:
-			return nil;
+        case eInspectionNoData:
+            return NSLocalizedStringFromTable(@"noData", ZGDataInspectorLocalizationTable, nil);
+        case eInspectionTooMuchData:
+            return NSLocalizedStringFromTable(@"tooMuchData", ZGDataInspectorLocalizationTable, nil);
+        case eInspectionBadByteCount:
+            return NSLocalizedStringFromTable(@"badByteCount", ZGDataInspectorLocalizationTable, nil);
+        case eInspectionCanInspect:
+            return nil;
     }
 }
 
@@ -496,13 +499,13 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (void)loadDefaultInspectors {
-	/*
-	DataInspector *ins = [[DataInspector alloc] init];
-	[ins setEndianness:eNativeEndianness];
-	[inspectors addObject:ins];
-	[ins release];
-	 */
-	
+    /*
+    DataInspector *ins = [[DataInspector alloc] init];
+    [ins setEndianness:eNativeEndianness];
+    [inspectors addObject:ins];
+    [ins release];
+     */
+
     NSArray *defaultInspectorDictionaries = [[NSUserDefaults standardUserDefaults] objectForKey:kDataInspectorUserDefaultsKey];
     if (! defaultInspectorDictionaries) {
         DataInspector *ins = [[DataInspector alloc] init];
@@ -555,7 +558,7 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (void)initializeView {
-	ZGAdjustLocalizableWidthsForTableColumns(nil, @[integerQualifierTableColumn, endianTableColumn], @{@"ru" : @[@50, @120]});
+    ZGAdjustLocalizableWidthsForTableColumns(nil, @[integerQualifierTableColumn, endianTableColumn], @{@"ru" : @[@50, @120]});
     [self resizeTableViewAfterChangingRowCount];
 }
 
@@ -655,7 +658,7 @@ static NSAttributedString *inspectionError(NSString *s) {
         [tableView reloadData];
     }
     else if ([ident isEqualToString:kInspectorValueColumnIdentifier]) {
-		/*
+            /*
 	NSUInteger byteCount = [self selectedByteCountForEditing];
 	if (byteCount != INVALID_EDITING_BYTE_COUNT) {
 	    HFASSERT(byteCount <= MAX_EDITABLE_BYTE_COUNT);
@@ -669,7 +672,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 		[controller setSelectedContentsRanges:selectedRanges]; //Hack to preserve the selection across the data insertion
 	    }
 	}
-		 */
+            */
     }
     else if ([ident isEqualToString:kInspectorAddButtonColumnIdentifier] || [ident isEqualToString:kInspectorSubtractButtonColumnIdentifier]) {
         /* Nothing to do */
@@ -677,8 +680,8 @@ static NSAttributedString *inspectionError(NSString *s) {
     else {
         NSLog(@"Unknown column identifier %@", ident);
     }
-    
-	[self saveDefaultInspectors];
+
+    [self saveDefaultInspectors];
 }
 
 - (void)resizeTableViewAfterChangingRowCount {
@@ -700,7 +703,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 - (void)addRow:(id)sender {
 #pragma unused(sender)
     DataInspector *ins = [[DataInspector alloc] init];
-	[ins setEndianness:eNativeEndianness];
+    [ins setEndianness:eNativeEndianness];
 	
     // Try to add an inspector that we don't already have
     NSMutableSet *existingInspectors = [[NSMutableSet alloc] initWithArray:inspectors];
