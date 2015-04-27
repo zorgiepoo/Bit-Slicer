@@ -56,6 +56,6 @@ Bit Slicer is licensed under the 3-clause BSD license. Versions prior to 1.6, ho
 ### Code Signing
 In order to build Bit Slicer, code signing is required to gain sufficient privilleges to using *task_for_pid()*. Building with the Debug scheme uses a self-signed certificate (which only works locally) and building with the Release scheme uses my purchased Developer ID certificate (which works for distribution).
 
-To build in Debug mode, please follow [these instructions](https://bitbucket.org/zorgiepoo/bit-slicer/wiki/Code%20Signing). Note that this involves more steps than code-signing typical applications.
+To build in Debug mode, please follow [these instructions](https://github.com/zorgiepoo/Bit-Slicer/wiki/Code-Signing). Note that this involves more steps than code-signing typical applications.
 
 Versions prior to 1.6 are not code-signed, and consequently, the user is required to authorize the application to run as the superuser.
