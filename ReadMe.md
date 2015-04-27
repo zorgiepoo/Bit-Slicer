@@ -45,7 +45,7 @@ It allows you to cheat in video games by searching and modifying values such as 
 * Check the [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) for how to use Bit Slicer
 * Report bugs or request features on the [bug tracker](https://github.com/zorgiepoo/Bit-Slicer/issues)
 * Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for discussion and current development
-* Help [translate](Localization) Bit Slicer into a different language.
+* Help [translate](https://github.com/zorgiepoo/Bit-Slicer/wiki/Localization) Bit Slicer into a different language.
 * Help design better artwork (e.g. application icon) for Bit Slicer, following Apple's Human Interface Guidelines.
 * Send an email to zorgiepoo (at) gmail (dot) com for any assistance or thoughts.
 
