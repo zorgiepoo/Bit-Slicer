@@ -66,9 +66,6 @@
 NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEditorKey";
 
 @interface ZGScriptManager ()
-{
-	dispatch_once_t _cleanupDispatch;
-}
 
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
 
@@ -88,6 +85,9 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 @end
 
 @implementation ZGScriptManager
+{
+	BOOL _cleanedUp;
+}
 
 dispatch_queue_t gPythonQueue;
 static PyObject *gCtypesObject;
@@ -306,7 +306,8 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 
 - (void)cleanupWithAppTerminationState:(ZGAppTerminationState *)appTerminationState
 {
-	dispatch_once(&_cleanupDispatch, ^{
+	if (!_cleanedUp)
+	{
 		self.appTerminationState = appTerminationState;
 		
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL * __unused stop) {
@@ -322,7 +323,9 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		}];
 		
 		[self.fileWatchingQueue removeAllPaths];
-	});
+		
+		_cleanedUp = YES;
+	}
 }
 
 - (void)cleanup
