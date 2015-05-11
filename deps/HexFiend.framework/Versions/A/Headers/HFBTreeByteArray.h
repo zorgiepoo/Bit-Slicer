@@ -18,10 +18,7 @@ HFBTreeByteArray is an efficient subclass of HFByteArray that stores @link HFByt
 Create an HFBTreeByteArray via \c -init.  It has no methods other than those on HFByteArray.
 */
 
-@interface HFBTreeByteArray : HFByteArray {
-@private
-    HFBTree *btree;
-}
+@interface HFBTreeByteArray : HFByteArray
 
 /*! Designated initializer for HFBTreeByteArray.
 */

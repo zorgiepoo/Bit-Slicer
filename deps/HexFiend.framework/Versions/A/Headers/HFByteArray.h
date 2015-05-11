@@ -33,11 +33,7 @@ typedef NSUInteger HFByteArrayDataStringType;
  
  HFByteArray is an abstract class.  It will raise an exception if you attempt to instantiate it directly.  The principal concrete subclass is HFBTreeByteArray.
  */
-@interface HFByteArray : NSObject <NSCopying, NSMutableCopying> {
-@private
-    NSUInteger changeLockCounter;
-    NSUInteger changeGenerationCount;
-}
+@interface HFByteArray : NSObject <NSCopying, NSMutableCopying>
 
 /*! @name Accessing raw data
 */

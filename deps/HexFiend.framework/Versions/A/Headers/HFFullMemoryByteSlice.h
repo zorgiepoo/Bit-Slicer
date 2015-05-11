@@ -11,9 +11,7 @@
 
     @brief A simple subclass of HFByteSlice that wraps an NSData.  For most uses, prefer HFSharedMemoryByteSlice.
 */
-@interface HFFullMemoryByteSlice : HFByteSlice {
-    NSData *data;
-}
+@interface HFFullMemoryByteSlice : HFByteSlice
 
 /*! Init with a given NSData, which is copied via the \c -copy message. */
 - (id)initWithData:(NSData *)val;

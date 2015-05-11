@@ -50,19 +50,6 @@ typedef enum {
 
 
 @interface AGScopeBarItem : NSObject
-{
-	NSString * mIdentifier;
-	NSString * mTitle;
-	NSString * mToolTip;
-	NSImage * mImage;
-	NSMenu * mMenu;
-	BOOL mIsSelected;
-	BOOL mIsEnabled;
-	
-	AGScopeBarGroup * mGroup;
-	NSButton * mButton;
-	NSMenuItem * mMenuItem;
-}
 
 @property (nonatomic, readonly) AGScopeBarGroup * group;
 @property (nonatomic, readonly) NSString * identifier;
@@ -82,25 +69,6 @@ typedef enum {
 
 
 @interface AGScopeBarGroup : NSObject <NSMenuDelegate>
-{
-	NSString * mIdentifier;
-	NSString * mLabel;
-	BOOL mShowsSeparator;
-	BOOL mCanBeCollapsed;
-	AGScopeBarGroupSelectionMode mSelectionMode;
-	BOOL mIsEnabled;
-	NSArray * mItems;
-	NSArray * mSelectedItems;
-	
-	AGScopeBar * mScopeBar;
-	NSView * mView;
-	NSTextField * mLabelField;
-	
-	NSView * mCollapsedView;
-	NSTextField * mCollapsedLabelField;
-	NSPopUpButton * mGroupPopupButton;
-	BOOL mIsCollapsed;
-}
 
 
 @property (nonatomic, readonly) NSString * identifier;
@@ -135,16 +103,6 @@ typedef enum {
 
 
 @interface AGScopeBar : NSView
-{
-	id<AGScopeBarDelegate> mDelegate;
-	BOOL mSmartResizeEnabled;
-	NSView * mAccessoryView;
-	NSArray * mGroups;
-	BOOL mIsEnabled;
-	AGScopeBarAppearance * mScopeBarAppearance;
-	
-	BOOL mNeedsTiling;
-}
 
 
 @property (nonatomic, readwrite, assign) IBOutlet id<AGScopeBarDelegate> delegate;
@@ -191,20 +149,6 @@ typedef enum {
 
 
 @interface AGScopeBarAppearance : NSObject
-{
-	NSColor * backgroundTopColor;
-	NSColor * backgroundBottomColor;
-	NSColor * inactiveBackgroundTopColor;
-	NSColor * inactiveBackgroundBottomColor;
-	NSColor * borderBottomColor;
-	NSColor * separatorColor;
-	CGFloat separatorWidth;
-	CGFloat separatorHeight;
-	NSColor * labelColor;
-	NSFont * labelFont;
-	NSFont * itemButtonFont;
-	NSFont * menuItemFont;
-}
 
 @property (nonatomic, readwrite, copy)   NSColor * backgroundTopColor;
 @property (nonatomic, readwrite, copy)   NSColor * backgroundBottomColor;

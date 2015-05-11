@@ -41,7 +41,11 @@ extern NSString *ZGVariablePboardType;
 @interface ZGVariable : NSObject <NSCoding, NSCopying>
 {
 @public
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
+	// For fast access
 	NSString *_addressFormula;
+#pragma clang diagnostic pop
 }
 
 @property (nonatomic) BOOL enabled;

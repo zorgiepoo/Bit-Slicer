@@ -55,10 +55,7 @@
 
 
 #pragma mark  
-@interface AGScopeBarPopupButtonCell : NSPopUpButtonCell {
-	NSButton * mRecessedButton;
-	NSPopUpButtonCell * mPopupCell;
-}
+@interface AGScopeBarPopupButtonCell : NSPopUpButtonCell
 @end
 
 
@@ -100,6 +97,16 @@
 #pragma mark  
 #pragma mark ========================================
 @implementation AGScopeBar
+{
+	id<AGScopeBarDelegate> mDelegate;
+	BOOL mSmartResizeEnabled;
+	NSView * mAccessoryView;
+	NSArray * mGroups;
+	BOOL mIsEnabled;
+	AGScopeBarAppearance * mScopeBarAppearance;
+	
+	BOOL mNeedsTiling;
+}
 
 - (id)initWithFrame:(NSRect)frameRect
 {
@@ -596,6 +603,25 @@
 #pragma mark  
 #pragma mark ========================================
 @implementation AGScopeBarGroup
+{
+	NSString * mIdentifier;
+	NSString * mLabel;
+	BOOL mShowsSeparator;
+	BOOL mCanBeCollapsed;
+	AGScopeBarGroupSelectionMode mSelectionMode;
+	BOOL mIsEnabled;
+	NSArray * mItems;
+	NSArray * mSelectedItems;
+	
+	AGScopeBar * mScopeBar;
+	NSView * mView;
+	NSTextField * mLabelField;
+	
+	NSView * mCollapsedView;
+	NSTextField * mCollapsedLabelField;
+	NSPopUpButton * mGroupPopupButton;
+	BOOL mIsCollapsed;
+}
 
 
 + (AGScopeBarGroup *)groupWithIdentifier:(NSString *)identifier;
@@ -1253,6 +1279,19 @@
 #pragma mark  
 #pragma mark ========================================
 @implementation AGScopeBarItem
+{
+	NSString * mIdentifier;
+	NSString * mTitle;
+	NSString * mToolTip;
+	NSImage * mImage;
+	NSMenu * mMenu;
+	BOOL mIsSelected;
+	BOOL mIsEnabled;
+	
+	AGScopeBarGroup * mGroup;
+	NSButton * mButton;
+	NSMenuItem * mMenuItem;
+}
 
 
 + (AGScopeBarItem *)itemWithIdentifier:(NSString *)identifier;
@@ -1575,6 +1614,10 @@
 #pragma mark  
 #pragma mark ========================================
 @implementation AGScopeBarPopupButtonCell
+{
+	NSButton * mRecessedButton;
+	NSPopUpButtonCell * mPopupCell;
+}
 
 - (id)initTextCell:(NSString *)title pullsDown:(BOOL)pullsDown
 {
@@ -1755,6 +1798,20 @@
 #pragma mark ========================================
 
 @implementation AGScopeBarAppearance
+{
+	NSColor * backgroundTopColor;
+	NSColor * backgroundBottomColor;
+	NSColor * inactiveBackgroundTopColor;
+	NSColor * inactiveBackgroundBottomColor;
+	NSColor * borderBottomColor;
+	NSColor * separatorColor;
+	CGFloat separatorWidth;
+	CGFloat separatorHeight;
+	NSColor * labelColor;
+	NSFont * labelFont;
+	NSFont * itemButtonFont;
+	NSFont * menuItemFont;
+}
 
 - (void)dealloc
 {

@@ -29,21 +29,7 @@ struct HFEditInstruction_t {
     HFRange dst;
 };
 
-@interface HFByteArrayEditScript : NSObject {
-    HFByteArray *source;
-    HFByteArray *destination;
-    
-    unsigned long long sourceLength;
-    unsigned long long destLength;
-    
-    volatile const int *cancelRequested;
-    volatile int64_t *currentProgress;
-    
-    int32_t concurrentProcesses;
-    dispatch_queue_t insnQueue;
-    struct HFEditInstruction_t *insns;
-    size_t insnCount, insnCapacity;
-}
+@interface HFByteArrayEditScript : NSObject
 
 /*! Computes the edit script (differences) from src to dst.  This retains both src and dst, and if they are modified then the receiver will likely no longer function. You may optionally pass an HFProgressTracker for progress reporting and cancellation.  This returns nil if it was cancelled. */
 - (id)initWithDifferenceFromSource:(HFByteArray *)src toDestination:(HFByteArray *)dst trackingProgress:(HFProgressTracker *)progressTracker;

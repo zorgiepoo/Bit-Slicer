@@ -38,9 +38,13 @@
 @interface ZGRegion : NSObject
 {
 @public
+	// For fast access
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 	ZGMemoryAddress _address;
 	ZGMemorySize _size;
 	void *_bytes;
+#pragma clang diagnostic pop
 }
 
 + (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask;

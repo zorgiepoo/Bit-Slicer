@@ -11,6 +11,8 @@
 
 @interface HFLineCountingView : NSView
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 	NSFont *font;
 	CGFloat lineHeight;
 	HFFPRange lineRangeToDraw;
@@ -25,6 +27,7 @@
 	NSUInteger storedLineCount;
 	HFLineNumberFormat lineNumberFormat;
 	BOOL useStringDrawingPath;
+#pragma clang diagnostic pop
 }
 
 - (void)setFont:(NSFont *)val;

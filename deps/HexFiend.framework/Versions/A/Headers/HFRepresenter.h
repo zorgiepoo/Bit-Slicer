@@ -26,12 +26,7 @@
     -# If your view's width depends on the properties of the controller, override some of the measurement methods, such as \c +maximumBytesPerLineForViewWidth:, so that your view gets sized correctly
     
 */
-@interface HFRepresenter : NSObject <NSCoding> {
-    @private
-    id view;
-    HFController *controller;
-    NSPoint layoutPosition;
-}
+@interface HFRepresenter : NSObject <NSCoding>
 
 /*! @name View management
     Methods related to accessing and initializing the representer's view.

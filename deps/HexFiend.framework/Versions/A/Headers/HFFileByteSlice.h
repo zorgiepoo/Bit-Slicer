@@ -14,11 +14,7 @@
     
     HFFileByteSlice is a subclass of HFByteSlice that represents a portion of data from a file.  The file is specified as an HFFileReference; since the HFFileReference encapsulates the file descriptor, multiple HFFileByteSlices may all reference the same file without risking overrunning the limit on open files.
 */
-@interface HFFileByteSlice : HFByteSlice {
-    HFFileReference *fileReference;
-    unsigned long long offset;
-    unsigned long long length;
-}
+@interface HFFileByteSlice : HFByteSlice
 
 /*! Initialize an HFByteSlice from a file.  The receiver represents the entire extent of the file. */
 - (id)initWithFile:(HFFileReference *)file;

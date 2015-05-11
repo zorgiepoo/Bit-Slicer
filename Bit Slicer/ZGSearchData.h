@@ -43,7 +43,8 @@
 {
 @public
 	// All for fast access, for comparison functions
-	
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 	ZGMemorySize _dataSize;
 	void *_rangeValue;
 	double _epsilon;
@@ -60,6 +61,7 @@
 	
 	CollatorRef _collator; // For comparing unicode strings
 	unsigned char *_byteArrayFlags; // For wildcard byte array searches
+#pragma clang diagnostic pop
 }
 
 typedef enum

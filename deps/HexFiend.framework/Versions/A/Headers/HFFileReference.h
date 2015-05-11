@@ -16,15 +16,7 @@
     
     All HFFileReferences use non-caching IO (F_NOCACHE is set).
 */
-@interface HFFileReference : NSObject {
-    @protected
-    int fileDescriptor;
-    dev_t device;
-    unsigned long long inode;
-    unsigned long long fileLength;
-    mode_t fileMode;
-    BOOL isWritable;
-}
+@interface HFFileReference : NSObject
 
 
 /*! Open a file for reading and writing at the given path.  The permissions mode of any newly created file is 0744.  Returns nil if the file could not be opened, in which case the error parameter (if not nil) will be set. */

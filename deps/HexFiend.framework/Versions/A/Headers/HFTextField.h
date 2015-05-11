@@ -19,14 +19,7 @@
     This class is currently missing a fair amount of functionality, such as enabled state.
 */
     
-@interface HFTextField : NSControl {
-    HFController *dataController;
-    HFLayoutRepresenter *layoutRepresenter;
-    HFHexTextRepresenter *hexRepresenter;
-    HFStringEncodingTextRepresenter *textRepresenter;
-    IBOutlet id target;
-    SEL action;
-}
+@interface HFTextField : NSControl
 
 /*! Returns whether the hexadecimal view is shown. */
 - (BOOL)usesHexArea;

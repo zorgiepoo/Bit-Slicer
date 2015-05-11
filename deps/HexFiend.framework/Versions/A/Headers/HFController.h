@@ -94,49 +94,7 @@ An HFController is the top point of ownership for a HexFiend object graph.  It r
 You create an HFController via <tt>[[HFController alloc] init]</tt>.  After that, give it an HFByteArray via setByteArray:, and some Representers via addRepresenter:.  Then insert the Representers' views in a window, and you're done.
 
 */
-@interface HFController : NSObject <NSCoding> {
-@private
-    NSMutableArray *representers;
-    HFByteArray *byteArray;
-    NSMutableArray *selectedContentsRanges;
-    HFRange displayedContentsRange;
-    HFFPRange displayedLineRange;
-    NSUInteger bytesPerLine;
-    NSUInteger bytesPerColumn;
-    NSFont *font;
-    CGFloat lineHeight;
-    
-    NSUInteger currentPropertyChangeToken;
-    NSMutableArray *additionalPendingTransactions;
-    HFControllerPropertyBits propertiesToUpdateInCurrentTransaction;
-    
-    NSUndoManager *undoManager;
-    NSMutableSet *undoOperations;
-    HFControllerCoalescedUndo *undoCoalescer;
-    
-    unsigned long long selectionAnchor;
-    HFRange selectionAnchorRange;
-    
-    CFAbsoluteTime pulseSelectionStartTime, pulseSelectionCurrentTime;
-    NSTimer *pulseSelectionTimer;
-    
-    /* Basic cache support */
-    HFRange cachedRange;
-    NSData *cachedData;
-    NSUInteger cachedGenerationIndex;
-    
-    struct  {
-        unsigned antialias:1;
-        unsigned overwriteMode:1;
-        unsigned editable:1;
-        unsigned selectable:1;
-        unsigned selectionInProgress:1;
-        unsigned shiftExtendSelection:1;
-        unsigned commandExtendSelection:1;
-        unsigned reserved1:25;
-        unsigned reserved2:32;
-    } _hfflags;
-}
+@interface HFController : NSObject <NSCoding>
 
 /*! @name Representer handling.
    Methods for modifying the list of HFRepresenters attached to a controller.  Attached representers receive the controllerDidChange: message when various properties of the controller change.  A representer may only be attached to one controller at a time.  Representers are retained by the controller.

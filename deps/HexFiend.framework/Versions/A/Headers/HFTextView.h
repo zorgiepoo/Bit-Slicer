@@ -15,14 +15,7 @@
     
     HFTextField encapsulates a HFController and HFRepresenters into a single "do it all" NSControl analagous to NSTextView.  
 */    
-@interface HFTextView : NSControl {
-    HFController *dataController;
-    HFLayoutRepresenter *layoutRepresenter;
-    NSArray *backgroundColors;
-    BOOL bordered;
-    IBOutlet id delegate;
-    NSData *cachedData;
-}
+@interface HFTextView : NSControl
 
 /*! @name Accessing MVC components
 */

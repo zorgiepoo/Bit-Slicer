@@ -49,15 +49,10 @@
 @end
 
 #ifndef DOXYGEN_ONLY
-@interface HFNaiveByteRangeAttributeArray : HFByteRangeAttributeArray {
-    NSMutableArray *attributeRuns;
-}
+@interface HFNaiveByteRangeAttributeArray : HFByteRangeAttributeArray
 @end
 
 @class HFAnnotatedTree;
-@interface HFAnnotatedTreeByteRangeAttributeArray : HFByteRangeAttributeArray {
-    HFAnnotatedTree *atree;
-    NSMutableDictionary *attributesToNodes;
-}
+@interface HFAnnotatedTreeByteRangeAttributeArray : HFByteRangeAttributeArray
 @end
 #endif

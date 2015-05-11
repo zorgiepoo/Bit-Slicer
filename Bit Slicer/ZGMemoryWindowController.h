@@ -45,9 +45,6 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 @class ZGProcessList;
 
 @interface ZGMemoryWindowController : NSWindowController
-{
-	ZGProcess *_currentProcess;
-}
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 

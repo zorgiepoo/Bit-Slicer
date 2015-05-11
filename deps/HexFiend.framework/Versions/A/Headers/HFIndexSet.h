@@ -11,13 +11,7 @@
 /*! @class HFIndexSet
     @brief Hex Fiend's answer to NSIndexSet.  It can contain any unsigned long long value.
 */
-@interface HFIndexSet : NSObject <NSCopying, NSMutableCopying> {
-    @protected
-    NSUInteger rangeCount;
-    NSUInteger rangeCapacity;
-    HFRange singleRange;
-    HFRange *multipleRanges;
-}
+@interface HFIndexSet : NSObject <NSCopying, NSMutableCopying>
 
 /*! Initializes the receiver as empty. */
 - (id)init;

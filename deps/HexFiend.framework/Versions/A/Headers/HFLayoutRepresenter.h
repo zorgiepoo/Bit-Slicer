@@ -38,10 +38,7 @@
     -# If there is any horizontal space left over, it is divided evenly between all views in that slice that have \c NSViewWidthSizable set in their autoresizing mask.
     
 */
-@interface HFLayoutRepresenter : HFRepresenter {
-    NSMutableArray *representers;
-    BOOL maximizesBytesPerLine;
-}
+@interface HFLayoutRepresenter : HFRepresenter
 
 /*! @name Managed representers
     Managing the list of representers laid out by the receiver

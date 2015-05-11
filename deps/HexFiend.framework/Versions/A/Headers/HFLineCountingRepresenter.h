@@ -23,15 +23,7 @@ typedef NSUInteger HFLineNumberFormat;
     
     HFLineCountingRepresenter is the HFRepresenter used to show the "line number gutter."  HFLineCountingRepresenter makes space for a certain number of digits.
 */
-@interface HFLineCountingRepresenter : HFRepresenter {
-    CGFloat lineHeight;
-    NSUInteger digitsToRepresentContentsLength;
-    NSUInteger minimumDigitCount;
-    HFLineNumberFormat lineNumberFormat;
-    NSInteger interiorShadowEdge;
-    CGFloat preferredWidth;
-    CGFloat digitAdvance;
-}
+@interface HFLineCountingRepresenter : HFRepresenter
 
 /*! Sets the minimum digit count.  The receiver will always ensure it is big enough to display at least the minimum digit count.  The default is 2. */
 - (void)setMinimumDigitCount:(NSUInteger)count;

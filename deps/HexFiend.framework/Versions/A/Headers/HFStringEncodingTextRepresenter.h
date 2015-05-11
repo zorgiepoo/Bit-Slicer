@@ -13,10 +13,7 @@
 
     HFHexTextRepresenter is an HFRepresenter responsible for showing and editing data interpreted via an NSStringEncoding.  Currently only supersets of ASCII are supported.
 */
-@interface HFStringEncodingTextRepresenter : HFTextRepresenter {
-    NSStringEncoding stringEncoding;
-    
-}
+@interface HFStringEncodingTextRepresenter : HFTextRepresenter
 
 /*! Get the string encoding for this representer.  The default encoding is <tt>[NSString defaultCStringEncoding]</tt>. */
 - (NSStringEncoding)encoding;

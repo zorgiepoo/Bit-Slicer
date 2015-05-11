@@ -15,10 +15,7 @@
     
     Most of the functionality of HFTextRepresenter is private, and there is not yet enough exposed to allow creating new representers based on it.  However, there is a small amount of configurability.
 */
-@interface HFTextRepresenter : HFRepresenter {
-    BOOL behavesAsTextField;
-    NSArray *rowBackgroundColors;
-}
+@interface HFTextRepresenter : HFRepresenter
 
 /*! Given a rect edge, return an NSRect representing the maximum edge in that direction, in the coordinate system of the receiver's view.  The dimension in the direction of the edge is 0 (so if edge is NSMaxXEdge, the resulting width is 0).  The returned rect is in the coordinate space of the receiver's view.  If the byte range is not displayed, returns NSZeroRect.
  

@@ -81,10 +81,7 @@ static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) 
 }
 
 /* A class representing a single row of the data inspector */
-@interface DataInspector : NSObject {
-    enum InspectorType_t inspectorType;
-    enum Endianness_t endianness;
-}
+@interface DataInspector : NSObject
 
 - (enum InspectorType_t)type;
 - (void)setType:(enum InspectorType_t)type;
@@ -108,6 +105,10 @@ static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) 
 @end
 
 @implementation DataInspector
+{
+    enum InspectorType_t inspectorType;
+    enum Endianness_t endianness;
+}
 
 - (void)encodeWithCoder:(NSCoder *)coder {
     HFASSERT([coder allowsKeyedCoding]);
@@ -470,6 +471,11 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 @implementation DataInspectorRepresenter
 {
 	id _topLevelObjects;
+    IBOutlet NSView *outletView; //used only for loading the nib
+    IBOutlet NSTableView *table; //not retained - is a subview of our view (stored in superclass)
+    IBOutlet NSTableColumn *integerQualifierTableColumn;
+    IBOutlet NSTableColumn *endianTableColumn;
+    NSMutableArray *inspectors;
 }
 
 - (id)init {

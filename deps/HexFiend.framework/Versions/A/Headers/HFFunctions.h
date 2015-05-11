@@ -422,7 +422,10 @@ NSString *HFDescribeByteCount(unsigned long long count);
   A simple class responsible for holding an immutable HFRange as an object.  Methods that logically work on multiple HFRanges usually take or return arrays of HFRangeWrappers. */
 @interface HFRangeWrapper : NSObject {
     @public
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     HFRange range;
+#pragma clang diagnostic pop
 }
 
 /*! Returns the HFRange for this HFRangeWrapper. */

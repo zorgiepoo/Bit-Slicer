@@ -35,45 +35,6 @@ enum SRRecorderStyle {
 typedef enum SRRecorderStyle SRRecorderStyle;
 
 @interface SRRecorderCell : NSActionCell <NSCoding>
-{	
-	NSGradient          *recordingGradient;
-	NSString            *autosaveName;
-	
-	BOOL                isRecording;
-	BOOL                mouseInsideTrackingArea;
-	BOOL                mouseDown;
-	
-	SRRecorderStyle		style;
-	
-	BOOL				isAnimating;
-	CGFloat				transitionProgress;
-	BOOL				isAnimatingNow;
-	BOOL				isAnimatingTowardsRecording;
-	BOOL				comboJustChanged;
-	
-	NSTrackingRectTag   removeTrackingRectTag;
-	NSTrackingRectTag   snapbackTrackingRectTag;
-	
-	KeyCombo            keyCombo;
-	BOOL				hasKeyChars;
-	NSString		    *keyChars;
-	NSString		    *keyCharsIgnoringModifiers;
-	
-	NSUInteger        allowedFlags;
-	NSUInteger        requiredFlags;
-	NSUInteger        recordingFlags;
-	
-	BOOL				allowsKeyOnly;
-	BOOL				escapeKeysRecord;
-	
-	NSSet               *cancelCharacterSet;
-	
-    SRValidator         *validator;
-    
-	IBOutlet id         delegate;
-	BOOL				globalHotKeys;
-	void				*hotKeyModeToken;
-}
 
 - (void)resetTrackingRects;
 

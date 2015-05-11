@@ -15,9 +15,6 @@
 #import "SRRecorderCell.h"
 
 @interface SRRecorderControl : NSControl
-{
-	IBOutlet id delegate;
-}
 
 #pragma mark *** Aesthetics ***
 - (BOOL)animates;

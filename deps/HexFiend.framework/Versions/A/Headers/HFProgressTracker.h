@@ -27,6 +27,8 @@
 */
 
 @interface HFProgressTracker : NSObject {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     @public
     volatile unsigned long long currentProgress;
     volatile int cancelRequested;
@@ -36,7 +38,8 @@
     NSTimer *progressTimer;
     double lastSetValue;
     NSDictionary *userInfo;
-    id delegate;
+	id delegate;
+#pragma clang diagnostic pop
 }
 
 /*!
