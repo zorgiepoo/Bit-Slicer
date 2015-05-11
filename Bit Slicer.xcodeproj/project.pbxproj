@@ -110,7 +110,7 @@
 		7743F9C618024CE400DBC19A /* python3.3 in Resources */ = {isa = PBXBuildFile; fileRef = 7743F9C518024CE400DBC19A /* python3.3 */; };
 		774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */; };
 		775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 775FCB4111719FAF000054FB /* Carbon.framework */; };
-		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -Wno-semicolon-before-method-body"; }; };
 		7768064018B96A64007F2CAF /* ZGThreadStates.c in Sources */ = {isa = PBXBuildFile; fileRef = 7768063E18B96A64007F2CAF /* ZGThreadStates.c */; };
 		7768064318B9A36E007F2CAF /* ZGBacktrace.m in Sources */ = {isa = PBXBuildFile; fileRef = 7768064218B9A36E007F2CAF /* ZGBacktrace.m */; };
 		776B62E319312648004BF4A0 /* random_data in Resources */ = {isa = PBXBuildFile; fileRef = 776B62E219312648004BF4A0 /* random_data */; };
@@ -2714,7 +2714,6 @@
 					"-Wno-assign-enum",
 					"-Wno-direct-ivar-access",
 					"-Wno-unused-macros",
-					"-Wno-semicolon-before-method-body",
 					"-Wno-missing-prototypes",
 					"-Wno-selector",
 					"-Wno-variadic-macros",
@@ -2813,7 +2812,6 @@
 					"-Wno-assign-enum",
 					"-Wno-direct-ivar-access",
 					"-Wno-unused-macros",
-					"-Wno-semicolon-before-method-body",
 					"-Wno-missing-prototypes",
 					"-Wno-selector",
 					"-Wno-variadic-macros",
