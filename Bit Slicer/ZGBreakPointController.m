@@ -64,6 +64,7 @@
 #import "ZGDebuggerUtilities.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
+#import "ZGScriptingInterpreter.h"
 #import "ZGScriptManager.h"
 #import "ZGUtilities.h"
 #import "NSArrayAdditions.h"
@@ -602,7 +603,7 @@ static ZGBreakPointController *gBreakPointController;
 		if (canNotifyDelegate && breakPoint.condition != NULL)
 		{
 			NSError *error = nil;
-			if (![ZGScriptManager evaluateCondition:breakPoint.condition process:breakPoint.process registerEntries:registerEntries error:&error])
+			if (![_scriptingInterpreter evaluateCondition:breakPoint.condition process:breakPoint.process registerEntries:registerEntries error:&error])
 			{
 				if (error == nil)
 				{

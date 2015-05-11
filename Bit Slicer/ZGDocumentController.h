@@ -37,12 +37,13 @@
 @class ZGProcessTaskManager;
 @class ZGDebuggerController;
 @class ZGBreakPointController;
+@class ZGScriptingInterpreter;
 @class ZGHotKeyCenter;
 @class ZGLoggerWindowController;
 
 @interface ZGDocumentController : NSDocumentController
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;
 

@@ -52,6 +52,7 @@
 @class ZGScriptManager;
 @class ZGTableView;
 @class ZGBreakPointController;
+@class ZGScriptingInterpreter;
 @class ZGLoggerWindowController;
 @class ZGHotKeyCenter;
 @class ZGDocument;
@@ -59,6 +60,7 @@
 @interface ZGDocumentWindowController : ZGMemoryWindowController <AGScopeBarDelegate>
 
 @property (readonly, nonatomic) ZGBreakPointController *breakPointController;
+@property (readonly, nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
 @property (readonly, nonatomic) ZGLoggerWindowController *loggerWindowController;
 @property (readonly, nonatomic) ZGHotKeyCenter *hotKeyCenter;
 

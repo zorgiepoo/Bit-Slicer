@@ -34,6 +34,7 @@
 
 #import "ZGDocumentController.h"
 #import "ZGDebuggerController.h"
+#import "ZGScriptingInterpreter.h"
 #import "ZGProcessTaskManager.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGDocument.h"
@@ -43,11 +44,12 @@
 	ZGProcessTaskManager *_processTaskManager;
 	ZGDebuggerController *_debuggerController;
 	ZGBreakPointController *_breakPointController;
+	ZGScriptingInterpreter *_scriptingInterpreter;
 	ZGHotKeyCenter *_hotKeyCenter;
 	ZGLoggerWindowController *_loggerWindowController;
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super init];
 	if (self != nil)
@@ -55,6 +57,7 @@
 		_processTaskManager = processTaskManager;
 		_debuggerController = debuggerController;
 		_breakPointController = breakPointController;
+		_scriptingInterpreter = scriptingInterpreter;
 		_hotKeyCenter = hotKeyCenter;
 		_loggerWindowController = loggerWindowController;
 	}
@@ -66,6 +69,7 @@
 	document.processTaskManager = _processTaskManager;
 	document.debuggerController = _debuggerController;
 	document.breakPointController = _breakPointController;
+	document.scriptingInterpreter = _scriptingInterpreter;
 	document.hotKeyCenter = _hotKeyCenter;
 	document.loggerWindowController = _loggerWindowController;
 	

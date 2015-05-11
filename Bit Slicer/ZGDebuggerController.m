@@ -43,6 +43,7 @@
 #import "ZGBreakPoint.h"
 #import "ZGBreakPointController.h"
 #import "ZGBreakPointCondition.h"
+#import "ZGScriptingInterpreter.h"
 #import "ZGScriptManager.h"
 #import "ZGDisassemblerObject.h"
 #import "ZGUtilities.h"
@@ -66,6 +67,7 @@
 @interface ZGDebuggerController ()
 
 @property (nonatomic) ZGBreakPointController *breakPointController;
+@property (nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
 
 @property (nonatomic, assign) IBOutlet ZGTableView *instructionsTableView;
@@ -161,7 +163,7 @@ enum ZGStepExecution
 	});
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
 {
 	self = [super initWithProcessTaskManager:processTaskManager];
 	
@@ -169,6 +171,7 @@ enum ZGStepExecution
 	{
 		self.debuggerController = self;
 		self.breakPointController = breakPointController;
+		self.scriptingInterpreter = scriptingInterpreter;
 		self.loggerWindowController = loggerWindowController;
 		
 		self.haltedBreakPoints = [[NSArray alloc] init];
@@ -2188,7 +2191,7 @@ enum ZGStepExecution
 	
 	if (strippedCondition.length > 0)
 	{
-		newCompiledCondition = [ZGScriptManager compiledExpressionFromExpression:strippedCondition error:error];
+		newCompiledCondition = [self.scriptingInterpreter compiledExpressionFromExpression:strippedCondition error:error];
 		if (newCompiledCondition == NULL)
 		{
 			NSLog(@"Error: compiled expression %@ is NULL", strippedCondition);

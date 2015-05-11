@@ -49,6 +49,7 @@
 #import "ZGAppUpdaterController.h"
 #import "ZGAppTerminationState.h"
 #import "ZGNavigationPost.h"
+#import "ZGScriptingInterpreter.h"
 
 #define ZGLoggerIdentifier @"ZGLoggerIdentifier"
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
@@ -65,6 +66,7 @@
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
 @property (nonatomic) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
+@property (nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
 
 @end
 
@@ -86,14 +88,30 @@
 
 		self.loggerWindowController = [[ZGLoggerWindowController alloc] init];
 		
-		self.breakPointController = [ZGBreakPointController sharedController];
+		self.scriptingInterpreter = [ZGScriptingInterpreter sharedInterpreter];
 		
-		self.debuggerController = [[ZGDebuggerController alloc] initWithProcessTaskManager:self.processTaskManager breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
+		self.breakPointController = [ZGBreakPointController sharedController];
+		self.breakPointController.scriptingInterpreter = self.scriptingInterpreter;
+		
+		self.debuggerController =
+		[[ZGDebuggerController alloc]
+		 initWithProcessTaskManager:self.processTaskManager
+		 breakPointController:self.breakPointController
+		 scriptingInterpreter:self.scriptingInterpreter
+		 hotKeyCenter:self.hotKeyCenter
+		 loggerWindowController:self.loggerWindowController];
 		
 		self.memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:self.processTaskManager];
 		self.memoryViewer.debuggerController = self.debuggerController;
 		
-		self.documentController = [[ZGDocumentController alloc] initWithProcessTaskManager:self.processTaskManager debuggerController:self.debuggerController breakPointController:self.breakPointController hotKeyCenter:self.hotKeyCenter loggerWindowController:self.loggerWindowController];
+		self.documentController =
+		[[ZGDocumentController alloc]
+		 initWithProcessTaskManager:self.processTaskManager
+		 debuggerController:self.debuggerController
+		 breakPointController:self.breakPointController
+		 scriptingInterpreter:self.scriptingInterpreter
+		 hotKeyCenter:self.hotKeyCenter
+		 loggerWindowController:self.loggerWindowController];
 		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self

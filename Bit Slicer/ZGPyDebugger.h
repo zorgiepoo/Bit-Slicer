@@ -39,6 +39,7 @@
 #import "ZGHotKeyDelegate.h"
 #import "ZGScriptPromptDelegate.h"
 
+@class ZGScriptingInterpreter;
 @class ZGScriptManager;
 @class ZGProcess;
 @class ZGBreakPointController;
@@ -51,7 +52,7 @@
 
 + (void)loadPythonClassInMainModule:(PyObject *)module;
 
-- (id)initWithProcess:(ZGProcess *)process scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
+- (id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 - (void)cleanup;
 
 @property (nonatomic, assign) PyObject *object;

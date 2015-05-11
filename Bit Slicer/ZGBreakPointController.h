@@ -45,6 +45,7 @@
 @class ZGInstruction;
 @class ZGRunningProcess;
 @class ZGAppTerminationState;
+@class ZGScriptingInterpreter;
 
 @interface ZGBreakPointController : NSObject
 
@@ -58,6 +59,7 @@ typedef enum
 
 @property (nonatomic) NSArray *breakPoints;
 
+@property (nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
 @property (nonatomic) ZGAppTerminationState *appTerminationState;
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate;

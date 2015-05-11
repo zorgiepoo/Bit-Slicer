@@ -47,21 +47,14 @@
 @class ZGAppTerminationState;
 @class ZGScriptPrompt;
 
-#define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
 #define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
 
 #define ZGScriptNotificationTypeKey @"script_type"
 #define ZGScriptNotificationPromptHashKey @"ZGScriptNotificationPromptHashKey"
 
-extern dispatch_queue_t gPythonQueue;
-
 extern NSString *ZGScriptDefaultApplicationEditorKey;
 
 @interface ZGScriptManager : NSObject <VDKQueueDelegate, NSUserNotificationCenterDelegate>
-
-+ (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
-
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError **)error;
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 

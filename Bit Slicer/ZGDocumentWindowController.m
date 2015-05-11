@@ -52,6 +52,7 @@
 #import "ZGSearchResults.h"
 #import "ZGDebuggerController.h"
 #import "ZGBreakPointController.h"
+#import "ZGScriptingInterpreter.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGDocument.h"
 #import "ZGVirtualMemory.h"
@@ -89,6 +90,7 @@
 
 @property (nonatomic) ZGDebuggerController *debuggerController;
 @property (nonatomic) ZGBreakPointController *breakPointController;
+@property (nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
 @property (nonatomic) ZGMemoryViewerController *memoryViewer;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
 @property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
@@ -133,6 +135,7 @@
 		
 		self.debuggerController = document.debuggerController;
 		self.breakPointController = document.breakPointController;
+		self.scriptingInterpreter = document.scriptingInterpreter;
 		self.loggerWindowController = document.loggerWindowController;
 		self.hotKeyCenter = document.hotKeyCenter;
 	}

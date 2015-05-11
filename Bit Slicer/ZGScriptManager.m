@@ -32,8 +32,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGLoggerWindowController.h"
 #import "ZGScriptManager.h"
+#import "ZGScriptingInterpreter.h"
+#import "ZGLoggerWindowController.h"
 #import "ZGVariable.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGPyScript.h"
@@ -57,10 +58,6 @@
 
 #import "structmember.h"
 
-#define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
-
-#define SCRIPT_FILENAME_PREFIX @"Script"
-
 #define ZGLocalizableScriptManagerString(string) NSLocalizedStringFromTable(string, @"[Code] Script Manager", nil)
 
 NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEditorKey";
@@ -68,6 +65,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 @interface ZGScriptManager ()
 
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
+@property (nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
 
 @property (nonatomic) NSMutableDictionary *scriptsDictionary;
 @property (nonatomic) VDKQueue *fileWatchingQueue;
@@ -87,206 +85,15 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 @implementation ZGScriptManager
 {
 	BOOL _cleanedUp;
-}
-
-dispatch_queue_t gPythonQueue;
-static PyObject *gCtypesObject;
-static PyObject *gStructObject;
-
-+ (void)appendPath:(NSString *)path toSysPath:(PyObject *)sysPath
-{
-	if (path == nil) return;
-	
-	PyObject *newPath = PyUnicode_FromString([path UTF8String]);
-	if (PyList_Append(sysPath, newPath) != 0)
-	{
-		NSLog(@"Error on appending %@", path);
-	}
-	Py_XDECREF(newPath);
-}
-
-+ (void)initializePythonInterpreter
-{
-	NSString *userModulesDirectory = [ZGAppPathUtilities createUserModulesDirectory];
-	
-	NSString *pythonDirectory = [[NSBundle mainBundle] pathForResource:@"python3.3" ofType:nil];
-	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
-	setenv("PYTHONPATH", [pythonDirectory UTF8String], 1);
-	dispatch_async(gPythonQueue, ^{
-		Py_Initialize();
-		PyObject *path = PySys_GetObject("path");
-		
-		[self appendPath:[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] toSysPath:path];
-		[self appendPath:SCRIPT_CACHES_PATH toSysPath:path];
-		[self appendPath:userModulesDirectory toSysPath:path];
-		
-		PyObject *mainModule = loadMainPythonModule();
-		if (mainModule != NULL)
-		{
-			[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
-			[ZGPyDebugger loadPythonClassInMainModule:mainModule];
-		}
-		else
-		{
-			NSLog(@"Error: Main Module could not be loaded");
-			NSLog(@"Error Message: %@", [self fetchPythonErrorDescriptionWithoutDescriptiveTraceback]);
-		}
-		
-		loadKeyCodePythonModule();
-		loadKeyModPythonModule();
-		loadVMProtPythonModule();
-		
-		gCtypesObject = PyImport_ImportModule("ctypes");
-		gStructObject = PyImport_ImportModule("struct");
-	});
+	dispatch_queue_t _pythonQueue;
 }
 
 + (void)initialize
 {
-	static dispatch_once_t onceToken = 0;
+	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGScriptDefaultApplicationEditorKey : @""}];
-		
-		NSFileManager *fileManager = [[NSFileManager alloc] init];
-		
-		if (![fileManager fileExistsAtPath:SCRIPT_CACHES_PATH])
-		{
-			[fileManager createDirectoryAtPath:SCRIPT_CACHES_PATH withIntermediateDirectories:YES attributes:nil error:nil];
-		}
-		
-		NSMutableArray *filePathsToRemove = [NSMutableArray array];
-		NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtPath:SCRIPT_CACHES_PATH];
-		for (NSString *filename in directoryEnumerator)
-		{
-			if ([filename hasPrefix:SCRIPT_FILENAME_PREFIX] && [[filename pathExtension] isEqualToString:@"py"])
-			{
-				NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:[SCRIPT_CACHES_PATH stringByAppendingPathComponent:filename] error:nil];
-				if (fileAttributes != nil)
-				{
-					NSDate *lastModificationDate = [fileAttributes objectForKey:NSFileModificationDate];
-					if ([[NSDate date] timeIntervalSinceDate:lastModificationDate] > 864000) // 10 days
-					{
-						[filePathsToRemove addObject:[SCRIPT_CACHES_PATH stringByAppendingPathComponent:filename]];
-					}
-				}
-			}
-			[directoryEnumerator skipDescendants];
-		}
-		
-		for (NSString *filename in filePathsToRemove)
-		{
-			[fileManager removeItemAtPath:filename error:nil];
-		}
-		
-		gPythonQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
-		
-		setenv("PYTHONDONTWRITEBYTECODE", "1", 1);
-		
-		[self initializePythonInterpreter];
 	});
-}
-
-+ (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error
-{
-	__block PyObject *compiledExpression = NULL;
-	
-	dispatch_sync(gPythonQueue, ^{
-		compiledExpression = Py_CompileString([expression UTF8String], "EvaluateCondition", Py_eval_input);
-		
-		if (compiledExpression == NULL)
-		{
-			NSString *pythonErrorDescription = [self fetchPythonErrorDescriptionWithoutDescriptiveTraceback];
-			if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:@"CompileConditionFailure" code:2 userInfo:@{SCRIPT_PYTHON_ERROR : pythonErrorDescription}];
-			}
-		}
-	});
-	
-	return compiledExpression;
-}
-
-static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries, BOOL is64Bit)
-{
-	PyObject *dictionary = PyDict_New();
-	
-	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(registerEntry); registerEntry++)
-	{
-		void *value = registerEntry->value;
-		PyObject *registerObject = NULL;
-		
-		if (registerEntry->type == ZGRegisterGeneralPurpose)
-		{
-			registerObject = !is64Bit ? Py_BuildValue("I", *(uint32_t *)value) : Py_BuildValue("K", *(uint64_t *)value);
-		}
-		else
-		{
-			registerObject = Py_BuildValue("y#", value, registerEntry->size);
-		}
-		
-		if (registerObject != NULL)
-		{
-			PyDict_SetItemString(dictionary, registerEntry->name, registerObject);
-			Py_DecRef(registerObject);
-		}
-	}
-	
-	return dictionary;
-}
-
-+ (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError * __autoreleasing *)error
-{
-	__block BOOL result = NO;
-	dispatch_sync(gPythonQueue, ^{
-		PyObject *mainModule = PyImport_AddModule("__main__");
-		
-		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessNoCopy:process];
-		CFRetain((__bridge CFTypeRef)(virtualMemoryInstance));
-		
-		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.object);
-		
-		PyObject *globalDictionary = PyModule_GetDict(mainModule);
-		PyObject *localDictionary = convertRegisterEntriesToPyDict(registerEntries, process.is64Bit);
-		
-		PyDict_SetItemString(localDictionary, "ctypes", gCtypesObject);
-		PyDict_SetItemString(localDictionary, "struct", gStructObject);
-		
-		PyObject *evaluatedCode = PyEval_EvalCode(compiledExpression, globalDictionary, localDictionary);
-		
-		if (evaluatedCode == NULL)
-		{
-			NSString *pythonErrorDescription = [self fetchPythonErrorDescriptionWithoutDescriptiveTraceback];
-			
-			result = NO;
-			if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:2 userInfo:@{SCRIPT_EVALUATION_ERROR_REASON : @"expression could not be evaluated", SCRIPT_PYTHON_ERROR : pythonErrorDescription}];
-			}
-		}
-		else
-		{
-			int temporaryResult = PyObject_IsTrue(evaluatedCode);
-			if (temporaryResult == -1)
-			{
-				result = NO;
-				if (error != NULL)
-				{
-					*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:3 userInfo:@{SCRIPT_EVALUATION_ERROR_REASON : @"expression did not evaluate to a boolean value"}];
-				}
-			}
-			else
-			{
-				result = (BOOL)temporaryResult;
-			}
-		}
-		
-		Py_XDECREF(evaluatedCode);
-		
-		Py_XDECREF(localDictionary);
-		
-		CFRelease((__bridge CFTypeRef)(virtualMemoryInstance));
-	});
-	return result;
 }
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController
@@ -299,7 +106,10 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		self.fileWatchingQueue.delegate = self;
 		self.windowController = windowController;
 		self.loggerWindowController = windowController.loggerWindowController;
+		self.scriptingInterpreter = windowController.scriptingInterpreter;
 		self.scriptPromptWindowController = [[ZGScriptPromptWindowController alloc] init];
+		
+		_pythonQueue = self.scriptingInterpreter.pythonQueue;
 	}
 	return self;
 }
@@ -446,7 +256,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		// We have to import the module the first time succesfully so we can reload it later; to ensure this, we use an empty file
 		[[NSData data] writeToFile:scriptPath atomically:YES];
 		
-		dispatch_sync(gPythonQueue, ^{
+		dispatch_sync(_pythonQueue, ^{
 			script.module = PyImport_ImportModule([script.moduleName UTF8String]);
 		});
 		
@@ -477,51 +287,13 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	}
 }
 
-+ (NSString *)fetchPythonErrorDescriptionFromObject:(PyObject *)pythonObject
+- (void)logPythonObject:(PyObject *)pythonObject
 {
-	NSString *description = @"";
-	if (pythonObject != NULL)
-	{
-		PyObject *pythonString = PyObject_Str(pythonObject);
-		PyObject *unicodeString = PyUnicode_AsUTF8String(pythonString);
-		const char *pythonCString = PyBytes_AsString(unicodeString);
-		if (pythonCString != NULL)
-		{
-			description = @(pythonCString);
-		}
-		
-		Py_XDECREF(unicodeString);
-		Py_XDECREF(pythonString);
-	}
-	
-	Py_XDECREF(pythonObject);
-	
-	return description;
-}
-
-+ (NSString *)fetchPythonErrorDescriptionWithoutDescriptiveTraceback
-{
-	PyObject *type, *value, *traceback;
-	PyErr_Fetch(&type, &value, &traceback);
-	
-	NSArray *errorDescriptionComponents = @[[self fetchPythonErrorDescriptionFromObject:type], [self fetchPythonErrorDescriptionFromObject:value], [self fetchPythonErrorDescriptionFromObject:traceback]];
-	
-	PyErr_Clear();
-	
-	return [errorDescriptionComponents componentsJoinedByString:@"\n"];
-}
-
-+ (void)logPythonObject:(PyObject *)pythonObject withLoggerWindowController:(ZGLoggerWindowController *)loggerWindowController
-{
-	NSString *errorDescription = [[self class] fetchPythonErrorDescriptionFromObject:pythonObject];
+	NSString *errorDescription = [self.scriptingInterpreter fetchPythonErrorDescriptionFromObject:pythonObject];
+	ZGLoggerWindowController *loggerWindowController = self.loggerWindowController;
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[loggerWindowController writeLine:errorDescription];
 	});
-}
-
-- (void)logPythonObject:(PyObject *)pythonObject
-{
-	[[self class] logPythonObject:pythonObject withLoggerWindowController:self.loggerWindowController];
 }
 
 - (void)logPythonError
@@ -665,7 +437,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		return;
 	}
 	
-	dispatch_async(gPythonQueue, ^{
+	dispatch_async(_pythonQueue, ^{
 		script.module = PyImport_ImportModule([script.moduleName UTF8String]);
 		script.module = PyImport_ReloadModule(script.module);
 		
@@ -690,7 +462,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		Py_XDECREF(scriptClassType);
 		
 		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:windowController.currentProcess];
-		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptManager:self breakPointController:self.windowController.breakPointController hotKeyCenter:self.windowController.hotKeyCenter loggerWindowController:windowController.loggerWindowController];
+		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptingInterpreter:self.scriptingInterpreter scriptManager:self breakPointController:self.windowController.breakPointController hotKeyCenter:self.windowController.hotKeyCenter loggerWindowController:windowController.loggerWindowController];
 		
 		script.virtualMemoryInstance = virtualMemoryInstance;
 		script.debuggerInstance = debuggerInstance;
@@ -768,7 +540,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		
 		script.executeFunction = PyObject_GetAttrString(script.scriptObject, executeFunctionName);
 		
-		if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, gPythonQueue)) != NULL)
+		if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self->_pythonQueue)) != NULL)
 		{
 			dispatch_async(dispatch_get_main_queue(), ^{
 				if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
@@ -822,7 +594,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		[self.runningScripts removeObject:script];
 		if (self.runningScripts.count == 0)
 		{
-			dispatch_async(gPythonQueue, ^{
+			dispatch_async(_pythonQueue, ^{
 				if (self.scriptTimer != NULL)
 				{
 					dispatch_source_cancel(self.scriptTimer);
@@ -866,7 +638,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		
 		[script.virtualMemoryInstance.searchProgress setShouldCancelSearch:YES];
 		
-		dispatch_async(gPythonQueue, ^{
+		dispatch_async(_pythonQueue, ^{
 			if (script.finishedCount == scriptFinishedCount)
 			{
 				if (!delayedAppTermination)
@@ -909,7 +681,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 					// Give up - this should be okay to call from another thread
 					PyErr_SetInterrupt();
 					
-					dispatch_async(gPythonQueue, ^{
+					dispatch_async(self->_pythonQueue, ^{
 						scriptCleanup();
 					});
 				}
@@ -980,7 +752,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
-			dispatch_async(gPythonQueue, ^{
+			dispatch_async(self->_pythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
 					PyObject *callback = scriptPrompt.userData;
@@ -995,29 +767,14 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	});
 }
 
-- (PyObject *)registersfromRegistersState:(ZGRegistersState *)registersState
-{
-	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
-	BOOL is64Bit = registersState.is64Bit;
-	
-	int numberOfGeneralPurposeEntries = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:is64Bit];
-	
-	if (registersState.hasVectorState)
-	{
-		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:registersState.vectorState is64Bit:is64Bit hasAVXSupport:registersState.hasAVXSupport];
-	}
-	
-	return convertRegisterEntriesToPyDict(registerEntries, is64Bit);
-}
-
 - (void)handleDataAddress:(ZGMemoryAddress)dataAddress accessedFromInstructionAddress:(ZGMemoryAddress)instructionAddress registersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
-			dispatch_async(gPythonQueue, ^{
+			dispatch_async(self->_pythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
-					PyObject *registers = [self registersfromRegistersState:registersState];
+					PyObject *registers = [self.scriptingInterpreter registersfromRegistersState:registersState];
 					PyObject *result = PyObject_CallFunction(callback, "KKO", dataAddress, instructionAddress, registers);
 					[self handleFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"data watchpoint callback"];
 					Py_XDECREF(registers);
@@ -1032,10 +789,10 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
-			dispatch_async(gPythonQueue, ^{
+			dispatch_async(self->_pythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
-					PyObject *registers = [self registersfromRegistersState:registersState];
+					PyObject *registers = [self.scriptingInterpreter registersfromRegistersState:registersState];
 					PyObject *result = PyObject_CallFunction(callback, "KO", breakPoint.variable.address, registers);
 					Py_XDECREF(registers);
 					
@@ -1057,7 +814,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
-			dispatch_async(gPythonQueue, ^{
+			dispatch_async(self->_pythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
 					PyObject *result = PyObject_CallFunction(callback, "I", hotKeyID);

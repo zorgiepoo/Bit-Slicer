@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 10/25/09.
+ * Created by Mayur Pawashe on 5/10/15.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,32 +32,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#import "Python.h"
+#import "ZGRegisterEntries.h"
 
-@class ZGProcessTaskManager;
-@class ZGDebuggerController;
-@class ZGBreakPointController;
-@class ZGScriptingInterpreter;
-@class ZGMemoryViewerController;
-@class ZGHotKeyCenter;
-@class ZGLoggerWindowController;
-@class ZGDocumentData;
-@class ZGSearchData;
+#define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
+#define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
 
-@interface ZGDocument : NSDocument
+#define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
 
-@property (nonatomic) ZGProcessTaskManager *processTaskManager;
-@property (nonatomic) ZGDebuggerController *debuggerController;
-@property (nonatomic) ZGBreakPointController *breakPointController;
-@property (nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
-@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
-@property (nonatomic) ZGLoggerWindowController *loggerWindowController;
+#define SCRIPT_FILENAME_PREFIX @"Script"
 
-@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
+@class ZGProcess;
+@class ZGRegistersState;
 
-@property (nonatomic) ZGDocumentData *data;
-@property (nonatomic) ZGSearchData *searchData;
+@interface ZGScriptingInterpreter : NSObject
 
-- (void)markChange;
++ (instancetype)sharedInterpreter;
+
+@property (nonatomic, readonly) dispatch_queue_t pythonQueue;
+
+- (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
+
+- (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError * __autoreleasing *)error;
+
+- (PyObject *)registersfromRegistersState:(ZGRegistersState *)registersState;
+
+- (NSString *)fetchPythonErrorDescriptionFromObject:(PyObject *)pythonObject;
 
 @end
