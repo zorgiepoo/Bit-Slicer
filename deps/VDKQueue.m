@@ -24,7 +24,9 @@
 #import <fcntl.h>
 #include <sys/stat.h>
 
-
+#ifndef DEBUG_LOG_THREAD_LIFETIME
+#define DEBUG_LOG_THREAD_LIFETIME 0
+#endif
 
 NSString * VDKQueueRenameNotification = @"VDKQueueFileRenamedNotification";
 NSString * VDKQueueWriteNotification = @"VDKQueueFileWrittenToNotification";

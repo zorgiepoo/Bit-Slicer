@@ -35,6 +35,10 @@
 
 #define ZGDataInspectorLocalizationTable @"[Code] Data Inspector"
 
+#ifndef __BIG_ENDIAN__
+#define __BIG_ENDIAN__ 0
+#endif
+
 static BOOL isRunningOnLeopardOrLater(void) {
     return NSAppKitVersionNumber >= 860.;
 }

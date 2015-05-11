@@ -41,6 +41,10 @@
 
 #define HFASSERT assert
 
+#ifndef TIME_LINE_NUMBERS
+#define TIME_LINE_NUMBERS 0
+#endif
+
 #ifndef check_malloc
 #define check_malloc(x) ({ size_t _count = x; void* result = malloc(_count); if (! result) { fprintf(stderr, "Out of memory allocating %lu bytes\n", (unsigned long)_count); exit(EXIT_FAILURE); } result; })
 #endif

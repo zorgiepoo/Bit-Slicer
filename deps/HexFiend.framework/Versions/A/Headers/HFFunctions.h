@@ -3,6 +3,10 @@
 #import <HexFiend/HFTypes.h>
 #import <libkern/OSAtomic.h>
 
+#ifndef NDEBUG
+#define NDEBUG 0
+#endif
+
 #define HFZeroRange (HFRange){0, 0}
 
 /*!
