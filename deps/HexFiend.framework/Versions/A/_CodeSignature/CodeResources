@@ -25,19 +25,19 @@
 	<dict>
 		<key>Headers/HFAttributedByteArray.h</key>
 		<data>
-		2A0CCrqu+1sgrGw4pLPCHUCNy5U=
+		3/g9M3G8Z76JnXjAbrENQtyilaw=
 		</data>
 		<key>Headers/HFBTreeByteArray.h</key>
 		<data>
-		wsQYbK1E01i2oZVZEvNPGxMlpwI=
+		51MK/IyjoYOZr/Nw4WXq9ANuFOg=
 		</data>
 		<key>Headers/HFByteArray.h</key>
 		<data>
-		uX1prEyNs5YoAWH0YjN1/N8XnLc=
+		9b7pRKjXUAjYDDKS7QsHzuVF53Y=
 		</data>
 		<key>Headers/HFByteArrayEditScript.h</key>
 		<data>
-		/VoSY7JWoMcWIsBvhrCanLT85Ys=
+		/3qdq2JHn0tSBglruvH96Hid8JM=
 		</data>
 		<key>Headers/HFByteRangeAttribute.h</key>
 		<data>
@@ -45,11 +45,11 @@
 		</data>
 		<key>Headers/HFByteRangeAttributeArray.h</key>
 		<data>
-		Ffl4OWyWGZFyzaBEvl9/VX18mD8=
+		eJdZrPEVGf+5jtwUtLvrXqFY3jY=
 		</data>
 		<key>Headers/HFByteSlice.h</key>
 		<data>
-		qK2LwfuabAXZ+XFDzdxfwPUxhEM=
+		CmTQC/rux2aFXFO52N8dTBD+BKs=
 		</data>
 		<key>Headers/HFCancelButton.h</key>
 		<data>
@@ -57,43 +57,43 @@
 		</data>
 		<key>Headers/HFController.h</key>
 		<data>
-		XJkbMrEL+AmzARtho2E6geT2zkw=
+		IDd7Tt5A/Nx5Ir4o+YBQPNs7h2s=
 		</data>
 		<key>Headers/HFFileByteSlice.h</key>
 		<data>
-		+vTL0GxREObTE4GdNQ9AS/pDS28=
+		DjoPZVaY83oX0xy8qAzMuQDnv+4=
 		</data>
 		<key>Headers/HFFileReference.h</key>
 		<data>
-		fycDybpGAo2/388c0mtObfxMspM=
+		MnhJV9Npo3YDtsCp4kxtOQPbPe4=
 		</data>
 		<key>Headers/HFFullMemoryByteArray.h</key>
 		<data>
-		mbJtCzGm7uF1tSDgx6DlZklZYwg=
+		PMf+w7jAAhzBv2reTtuk1dXzTfo=
 		</data>
 		<key>Headers/HFFullMemoryByteSlice.h</key>
 		<data>
-		qSKDFTXWG7lETikt+un5kBFLd0Y=
+		8o1R0oopZySLy9rdyFz5bOIjins=
 		</data>
 		<key>Headers/HFFunctions.h</key>
 		<data>
-		y21GG95c/+YAFsyBSJ4Gaq0gN80=
+		cSvObcXQ+W7xy01LzyebbrcZjFc=
 		</data>
 		<key>Headers/HFHexTextRepresenter.h</key>
 		<data>
-		NUYF7uxuw3HGTUFdHs71AgvqjD8=
+		j2klq4+eEAXcgv58RQZLN54uJn8=
 		</data>
 		<key>Headers/HFIndexSet.h</key>
 		<data>
-		ECqxNzXMZHYI/tkRAcNaeSDw498=
+		E624BVsCb/uXfXWKWb1DApndm1o=
 		</data>
 		<key>Headers/HFLayoutRepresenter.h</key>
 		<data>
-		Uhf3twNlzQ4pOVlWZlQANUnRxEQ=
+		ZZZpNSEPH0nl+00LLTSg0GBAv6s=
 		</data>
 		<key>Headers/HFLineCountingRepresenter.h</key>
 		<data>
-		OcYa97R/6g0Senxcst5qfb9xZgc=
+		Cdm7mdJHQHVJXRYPIuWeZEmGKYU=
 		</data>
 		<key>Headers/HFProcessMemoryByteSlice.h</key>
 		<data>
@@ -101,35 +101,35 @@
 		</data>
 		<key>Headers/HFProgressTracker.h</key>
 		<data>
-		nSUB2RL35hofJ5m52LQcbC/y32U=
+		qgto4PX/xD3yjDbUlC2x8TcLZS4=
 		</data>
 		<key>Headers/HFRepresenter.h</key>
 		<data>
-		MmhCY6i5bhHKNe887JpAlxpqnf4=
+		JZ20wbBge66f0cLe7ul8xzgUT6s=
 		</data>
 		<key>Headers/HFSharedMemoryByteSlice.h</key>
 		<data>
-		yLEpuIF69RPWse8FpSQwVb4OjF8=
+		hq6oj9ye9zg7acbiAxKckg49++s=
 		</data>
 		<key>Headers/HFStatusBarRepresenter.h</key>
 		<data>
-		vTrndsvPAdHYHHm7bJbBnTwZlgc=
+		Gdvcr9nn5nkI8QsN4SbKog+0VpA=
 		</data>
 		<key>Headers/HFStringEncodingTextRepresenter.h</key>
 		<data>
-		9vzTzTzmRGa4SM3bSdxmoyQwn8A=
+		oSNiRxiENjvTo50YLg6h5TI1X+M=
 		</data>
 		<key>Headers/HFTextField.h</key>
 		<data>
-		KoGhlHqdWGGiehyghHwO2jXRc3w=
+		Zp8ZEh8fEK2C3mBY63S3Jo6b/EU=
 		</data>
 		<key>Headers/HFTextRepresenter.h</key>
 		<data>
-		a7vHnDDYWaAFNW/HkwO9vlPCDT8=
+		VWUdi3DsfsZ3mXRwdk9NUivbPeU=
 		</data>
 		<key>Headers/HFTextView.h</key>
 		<data>
-		y683qBCRWWrmn+fIindvA8UeMN4=
+		HriRApLdIE0a4Tf/XcxNJfMQ6Ss=
 		</data>
 		<key>Headers/HFTypes.h</key>
 		<data>
