@@ -49,6 +49,7 @@
 {
 	PyObject *_cTypesObject;
 	PyObject *_structObject;
+	BOOL _initializedInterpreter;
 }
 
 + (instancetype)sharedInterpreter
@@ -97,7 +98,7 @@
 			[fileManager removeItemAtPath:filename error:nil];
 		}
 		
-		[self initializePythonInterpreter];
+		_pythonQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
 	}
 	return self;
 }
@@ -114,9 +115,10 @@
 	Py_XDECREF(newPath);
 }
 
-- (void)initializePythonInterpreter
+- (void)acquireInterpreter
 {
-	_pythonQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
+	if (_initializedInterpreter) return;
+	_initializedInterpreter = YES;
 	
 	setenv("PYTHONDONTWRITEBYTECODE", "1", 1);
 	
@@ -190,6 +192,8 @@
 
 - (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error
 {
+	[self acquireInterpreter];
+	
 	__block PyObject *compiledExpression = NULL;
 	
 	dispatch_sync(_pythonQueue, ^{

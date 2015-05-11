@@ -50,6 +50,8 @@
 
 + (instancetype)sharedInterpreter;
 
+- (void)acquireInterpreter;
+
 @property (nonatomic, readonly) dispatch_queue_t pythonQueue;
 
 - (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;

@@ -222,6 +222,8 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	
 	if (script == nil)
 	{
+		[self.scriptingInterpreter acquireInterpreter];
+		
 		NSString *scriptPath = nil;
 		
 		if (variable.cachedScriptPath != nil && [fileManager fileExistsAtPath:variable.cachedScriptPath])
