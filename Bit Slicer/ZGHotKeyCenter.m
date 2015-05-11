@@ -55,7 +55,8 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 			{
 				if (registeredHotKey.internalID == hotKeyID.id)
 				{
-					[registeredHotKey.delegate hotKeyDidTrigger:registeredHotKey];
+					id <ZGHotKeyDelegate> delegate = registeredHotKey.delegate;
+					[delegate hotKeyDidTrigger:registeredHotKey];
 					break;
 				}
 			}

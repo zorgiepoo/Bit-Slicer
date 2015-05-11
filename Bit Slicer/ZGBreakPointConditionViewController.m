@@ -70,12 +70,14 @@
 
 - (IBAction)changeCondition:(id)__unused sender
 {
-	[self.delegate breakPointCondition:[self.conditionTextField stringValue] didChangeAtAddress:self.targetAddress];
+	id <ZGBreakPointConditionDelegate> delegate = self.delegate;
+	[delegate breakPointCondition:[self.conditionTextField stringValue] didChangeAtAddress:self.targetAddress];
 }
 
 - (IBAction)cancel:(id)__unused sender
 {
-	[self.delegate breakPointConditionDidCancel];
+	id <ZGBreakPointConditionDelegate> delegate = self.delegate;
+	[delegate breakPointConditionDidCancel];
 }
 
 #define BREAKPOINT_CONDITION_SCRIPTING @"https://github.com/zorgiepoo/Bit-Slicer/wiki/Setting-Breakpoints"

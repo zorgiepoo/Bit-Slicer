@@ -79,7 +79,8 @@
 
 - (void)terminateSessionWithAnswer:(NSString *)answer
 {
-	[self.delegate scriptPrompt:self.scriptPrompt didReceiveAnswer:answer];
+	id <ZGScriptPromptDelegate> delegate = self.delegate;
+	[delegate scriptPrompt:self.scriptPrompt didReceiveAnswer:answer];
 	[self terminateSession];
 }
 

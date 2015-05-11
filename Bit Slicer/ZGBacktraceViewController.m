@@ -100,7 +100,8 @@
 	if (self.tableView.selectedRowIndexes.count > 0 && (NSUInteger)self.tableView.selectedRow < self.backtrace.instructions.count)
 	{
 		ZGInstruction *selectedInstruction = [self.backtrace.instructions objectAtIndex:(NSUInteger)self.tableView.selectedRow];
-		[self.delegate backtraceSelectionChangedToAddress:selectedInstruction.variable.address];
+		id <ZGBacktraceViewControllerDelegate> delegate = self.delegate;
+		[delegate backtraceSelectionChangedToAddress:selectedInstruction.variable.address];
 	}
 }
 

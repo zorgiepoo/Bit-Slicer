@@ -123,28 +123,28 @@
 		7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */; };
 		77988F1A185803E800476A37 /* container.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F19185803E800476A37 /* container.pdf */; };
 		77988F1C185804AC00476A37 /* container_filled.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F1B185804AC00476A37 /* container_filled.pdf */; };
-		7798EEC518C40B7F001120FB /* _DDDecimalFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9418C40B7F001120FB /* _DDDecimalFunctions.m */; };
-		7798EEC618C40B7F001120FB /* _DDFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9618C40B7F001120FB /* _DDFunctionEvaluator.m */; };
-		7798EEC718C40B7F001120FB /* _DDFunctionExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9818C40B7F001120FB /* _DDFunctionExpression.m */; };
-		7798EEC818C40B7F001120FB /* _DDFunctionTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9A18C40B7F001120FB /* _DDFunctionTerm.m */; };
-		7798EEC918C40B7F001120FB /* _DDGroupTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9C18C40B7F001120FB /* _DDGroupTerm.m */; };
-		7798EECA18C40B7F001120FB /* _DDNumberExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9E18C40B7F001120FB /* _DDNumberExpression.m */; };
-		7798EECB18C40B7F001120FB /* _DDNumberTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA018C40B7F001120FB /* _DDNumberTerm.m */; };
-		7798EECC18C40B7F001120FB /* _DDOperatorTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA218C40B7F001120FB /* _DDOperatorTerm.m */; };
-		7798EECD18C40B7F001120FB /* _DDParserTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA418C40B7F001120FB /* _DDParserTerm.m */; };
-		7798EECE18C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA618C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m */; };
-		7798EECF18C40B7F001120FB /* _DDRewriteRule.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA818C40B7F001120FB /* _DDRewriteRule.m */; };
-		7798EED018C40B7F001120FB /* _DDVariableExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAA18C40B7F001120FB /* _DDVariableExpression.m */; };
-		7798EED118C40B7F001120FB /* _DDVariableTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAC18C40B7F001120FB /* _DDVariableTerm.m */; };
-		7798EED218C40B7F001120FB /* DDExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAE18C40B7F001120FB /* DDExpression.m */; };
-		7798EED318C40B7F001120FB /* DDExpressionRewriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB018C40B7F001120FB /* DDExpressionRewriter.m */; };
-		7798EED418C40B7F001120FB /* DDMathEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB218C40B7F001120FB /* DDMathEvaluator.m */; };
-		7798EED518C40B7F001120FB /* DDMathOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB618C40B7F001120FB /* DDMathOperator.m */; };
-		7798EED618C40B7F001120FB /* DDMathStringToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBA18C40B7F001120FB /* DDMathStringToken.m */; };
-		7798EED718C40B7F001120FB /* DDMathStringTokenizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBC18C40B7F001120FB /* DDMathStringTokenizer.m */; };
-		7798EED818C40B7F001120FB /* DDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBE18C40B7F001120FB /* DDParser.m */; };
-		7798EED918C40B7F001120FB /* DDParserTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC018C40B7F001120FB /* DDParserTypes.m */; };
-		7798EEDA18C40B7F001120FB /* DDTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC218C40B7F001120FB /* DDTypes.m */; };
+		7798EEC518C40B7F001120FB /* _DDDecimalFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9418C40B7F001120FB /* _DDDecimalFunctions.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EEC618C40B7F001120FB /* _DDFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9618C40B7F001120FB /* _DDFunctionEvaluator.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EEC718C40B7F001120FB /* _DDFunctionExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9818C40B7F001120FB /* _DDFunctionExpression.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EEC818C40B7F001120FB /* _DDFunctionTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9A18C40B7F001120FB /* _DDFunctionTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EEC918C40B7F001120FB /* _DDGroupTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9C18C40B7F001120FB /* _DDGroupTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EECA18C40B7F001120FB /* _DDNumberExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9E18C40B7F001120FB /* _DDNumberExpression.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EECB18C40B7F001120FB /* _DDNumberTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA018C40B7F001120FB /* _DDNumberTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EECC18C40B7F001120FB /* _DDOperatorTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA218C40B7F001120FB /* _DDOperatorTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EECD18C40B7F001120FB /* _DDParserTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA418C40B7F001120FB /* _DDParserTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EECE18C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA618C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EECF18C40B7F001120FB /* _DDRewriteRule.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA818C40B7F001120FB /* _DDRewriteRule.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED018C40B7F001120FB /* _DDVariableExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAA18C40B7F001120FB /* _DDVariableExpression.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED118C40B7F001120FB /* _DDVariableTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAC18C40B7F001120FB /* _DDVariableTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED218C40B7F001120FB /* DDExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAE18C40B7F001120FB /* DDExpression.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED318C40B7F001120FB /* DDExpressionRewriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB018C40B7F001120FB /* DDExpressionRewriter.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED418C40B7F001120FB /* DDMathEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB218C40B7F001120FB /* DDMathEvaluator.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED518C40B7F001120FB /* DDMathOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB618C40B7F001120FB /* DDMathOperator.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED618C40B7F001120FB /* DDMathStringToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBA18C40B7F001120FB /* DDMathStringToken.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED718C40B7F001120FB /* DDMathStringTokenizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBC18C40B7F001120FB /* DDMathStringTokenizer.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED818C40B7F001120FB /* DDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBE18C40B7F001120FB /* DDParser.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EED918C40B7F001120FB /* DDParserTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC018C40B7F001120FB /* DDParserTypes.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
+		7798EEDA18C40B7F001120FB /* DDTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC218C40B7F001120FB /* DDTypes.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
 		7798EEDB18C40B7F001120FB /* NSString+DDMathParsing.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC418C40B7F001120FB /* NSString+DDMathParsing.m */; };
 		779C6CC318E7309B0076D647 /* ZGDebuggerUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */; };
 		779D56C018F0775500FD5408 /* ZGMemoryProtectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 779D56BE18F0775500FD5408 /* ZGMemoryProtectionWindowController.m */; };
@@ -2716,7 +2716,6 @@
 					"-Wno-direct-ivar-access",
 					"-Wno-unused-macros",
 					"-Wno-semicolon-before-method-body",
-					"-Wno-receiver-is-weak",
 					"-Wno-missing-prototypes",
 					"-Wno-selector",
 					"-Wno-variadic-macros",
@@ -2817,7 +2816,6 @@
 					"-Wno-direct-ivar-access",
 					"-Wno-unused-macros",
 					"-Wno-semicolon-before-method-body",
-					"-Wno-receiver-is-weak",
 					"-Wno-missing-prototypes",
 					"-Wno-selector",
 					"-Wno-variadic-macros",

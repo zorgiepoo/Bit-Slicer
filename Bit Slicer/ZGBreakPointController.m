@@ -267,7 +267,8 @@ static ZGBreakPointController *gBreakPointController;
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
 				{
-					[breakPoint.delegate dataAccessedByBreakPoint:breakPoint fromInstructionPointer:instructionAddress withRegistersState:registersState];
+					id <ZGBreakPointDelegate> delegate = breakPoint.delegate;
+					[delegate dataAccessedByBreakPoint:breakPoint fromInstructionPointer:instructionAddress withRegistersState:registersState];
 				}
 			});
 		}
