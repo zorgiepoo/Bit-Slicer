@@ -1039,7 +1039,7 @@
 			[mGroupPopupButton setFont:mScopeBar.scopeBarAppearance.itemButtonFont];
 			[mGroupPopupButton setBezelStyle:NSRecessedBezelStyle];
 			[mGroupPopupButton setButtonType:NSPushOnPushOffButton];
-			[mGroupPopupButton.cell setHighlightsBy:NSCellIsBordered | NSCellIsInsetButton];
+			[mGroupPopupButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 			[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:YES];
 			[mGroupPopupButton.cell setAltersStateOfSelectedItem:NO];
 			[mGroupPopupButton.cell setArrowPosition:NSPopUpArrowAtBottom];
@@ -1529,7 +1529,7 @@
 	[button setAction:@selector(scopeButtonClicked:)];
 	[button setBezelStyle:NSRecessedBezelStyle];
 	[button setButtonType:NSPushOnPushOffButton];
-	[button.cell setHighlightsBy:NSCellIsBordered | NSCellIsInsetButton];
+	[button.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 	[button setShowsBorderOnlyWhileMouseInside:YES];
 	[button.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	
@@ -1632,7 +1632,7 @@
 	mRecessedButton.buttonType = NSPushOnPushOffButton;
 	mRecessedButton.bezelStyle = NSRecessedBezelStyle;
 	mRecessedButton.showsBorderOnlyWhileMouseInside = NO;
-	[mRecessedButton.cell setHighlightsBy:NSCellIsBordered | NSCellIsInsetButton];
+	[mRecessedButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 	mRecessedButton.state = NSOnState;
 	
 	// We use another popup cell so that the font of the displayed menu does not

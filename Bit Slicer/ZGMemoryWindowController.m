@@ -280,7 +280,7 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	[self.processList
 	 addObserver:self
 	 forKeyPath:ZG_SELECTOR_STRING(self.processList, runningProcesses)
-	 options:NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+	 options:(NSKeyValueObservingOptions)(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew)
 	 context:NULL];
 	
 	// Still need to observe this for reliably fetching icon and localized name
