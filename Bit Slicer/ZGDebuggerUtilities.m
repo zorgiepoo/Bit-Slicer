@@ -398,6 +398,8 @@ error:(NSError * __autoreleasing *)error
 		return NO;
 	}
 	
+	free(nopBuffer);
+	
 	if (!ZGProtect(process.processTask, allocatedAddress, codeData.length, VM_PROT_READ | VM_PROT_EXECUTE))
 	{
 		ZG_LOG(@"Error: Failed to protect memory..");
@@ -406,7 +408,6 @@ error:(NSError * __autoreleasing *)error
 			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : ZGLocalizedStringFromDebuggerTable(@"failedChangeMemoryProtectionForInjectingCode")}];
 		}
 		
-		free(nopBuffer);
 		ZGResumeTask(process.processTask);
 		return NO;
 	}
@@ -433,7 +434,6 @@ error:(NSError * __autoreleasing *)error
 		if (popRaxData.length == 0)
 		{
 			ZG_LOG(@"Error: Failed to assemble pop rax");
-			free(nopBuffer);
 			ZGResumeTask(process.processTask);
 			return NO;
 		}
@@ -456,7 +456,6 @@ error:(NSError * __autoreleasing *)error
 	if (jumpToIslandData.length == 0)
 	{
 		ZG_LOG(@"Error generating jumpToIslandData");
-		free(nopBuffer);
 		ZGResumeTask(process.processTask);
 		return NO;
 	}
@@ -489,7 +488,6 @@ error:(NSError * __autoreleasing *)error
 	if (jumpFromIslandData.length == 0)
 	{
 		ZG_LOG(@"Error generating jumpFromIslandData");
-		free(nopBuffer);
 		ZGResumeTask(process.processTask);
 		return NO;
 	}
