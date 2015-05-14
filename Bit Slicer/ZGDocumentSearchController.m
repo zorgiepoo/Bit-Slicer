@@ -50,9 +50,9 @@
 #import "ZGSearchToken.h"
 #import "ZGVariableController.h"
 #import "ZGTableView.h"
-#import "DDMathStringToken.h"
-#import "DDMathStringTokenizer.h"
-#import "DDMathOperator.h"
+#import <DDMathParser/DDMathStringToken.h>
+#import <DDMathParser/DDMathStringTokenizer.h>
+#import <DDMathParser/DDMathOperator.h>
 
 @interface ZGDocumentSearchController ()
 

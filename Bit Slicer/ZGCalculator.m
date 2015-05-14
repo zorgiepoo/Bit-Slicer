@@ -40,10 +40,10 @@
 #import "ZGMachBinaryInfo.h"
 #import "ZGRegion.h"
 #import "ZGProcess.h"
-#import "DDMathEvaluator.h"
-#import "NSString+DDMathParsing.h"
-#import "DDExpression.h"
-#import "DDExpressionRewriter.h"
+#import <DDMathParser/DDMathEvaluator.h>
+#import <DDMathParser/NSString+DDMathParsing.h>
+#import <DDMathParser/DDExpression.h>
+#import <DDMathParser/DDExpressionRewriter.h>
 #import "ZGUtilities.h"
 
 #define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"

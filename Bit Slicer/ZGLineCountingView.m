@@ -182,7 +182,7 @@ static inline int common_prefix_length(const char *a, const char *b)
 			}
 			previousTextStorageCharacterCount = (NSUInteger)newStringLength;
 			[replacementCharacters release];
-			memcpy(previousBuff, buff, newStringLength + 1);
+			memcpy(previousBuff, buff, (size_t)(newStringLength + 1));
 			previousStringLength = newStringLength;
 		}
 		textRect.origin.y += lineHeight;

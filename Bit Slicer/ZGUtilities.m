@@ -33,6 +33,7 @@
  */
 
 #import "ZGUtilities.h"
+#import <AppKit/AppKit.h>
 #import "NSStringAdditions.h"
 #import "NSArrayAdditions.h"
 

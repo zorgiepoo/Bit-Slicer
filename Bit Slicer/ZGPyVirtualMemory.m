@@ -700,7 +700,7 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 		}
 		
 		void *data = malloc((size_t)buffer.len);
-		memcpy(data, buffer.buf, buffer.len);
+		memcpy(data, buffer.buf, (size_t)buffer.len);
 		
 		ZGSearchData *searchData =
 		[[ZGSearchData alloc]

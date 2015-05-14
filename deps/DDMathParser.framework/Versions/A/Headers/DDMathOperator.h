@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DDMathParser.h"
+#import "DDParserTypes.h"
 
 @interface DDMathOperator : NSObject <NSCopying>
 

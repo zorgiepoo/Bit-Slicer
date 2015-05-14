@@ -20,6 +20,7 @@
 //	   distribution.
 
 #import "VDKQueue.h"
+#import <Cocoa/Cocoa.h>
 #import <unistd.h>
 #import <fcntl.h>
 #include <sys/stat.h>

@@ -2,6 +2,7 @@
 
 #import <HexFiend/HFTypes.h>
 #import <libkern/OSAtomic.h>
+#import <Cocoa/Cocoa.h>
 
 #ifndef NDEBUG
 #define NDEBUG 0

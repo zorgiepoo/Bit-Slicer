@@ -32,6 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <Carbon/Carbon.h>
 #import <Foundation/Foundation.h>
 #import <ShortcutRecorder/SRCommon.h>
 #import "ZGHotKeyDelegate.h"

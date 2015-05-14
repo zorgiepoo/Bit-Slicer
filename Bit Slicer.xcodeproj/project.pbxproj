@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		72030ADC1B00191400A5621C /* ZGScriptingInterpreter.m in Sources */ = {isa = PBXBuildFile; fileRef = 72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */; };
+		72030C7A1B0558F800A5621C /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72030C791B0558F800A5621C /* DDMathParser.framework */; };
+		72030C7B1B0558F800A5621C /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72030C791B0558F800A5621C /* DDMathParser.framework */; };
+		72030C7C1B055B3500A5621C /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 72030C791B0558F800A5621C /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7216F7D01AC66133005288A8 /* dsa_pub.pem */; };
 		722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5519AD4AED009C6AAE /* hotkey.png */; };
 		722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5619AD4AED009C6AAE /* hotkey@2x.png */; };
@@ -123,29 +126,6 @@
 		7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */; };
 		77988F1A185803E800476A37 /* container.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F19185803E800476A37 /* container.pdf */; };
 		77988F1C185804AC00476A37 /* container_filled.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77988F1B185804AC00476A37 /* container_filled.pdf */; };
-		7798EEC518C40B7F001120FB /* _DDDecimalFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9418C40B7F001120FB /* _DDDecimalFunctions.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EEC618C40B7F001120FB /* _DDFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9618C40B7F001120FB /* _DDFunctionEvaluator.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EEC718C40B7F001120FB /* _DDFunctionExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9818C40B7F001120FB /* _DDFunctionExpression.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EEC818C40B7F001120FB /* _DDFunctionTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9A18C40B7F001120FB /* _DDFunctionTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EEC918C40B7F001120FB /* _DDGroupTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9C18C40B7F001120FB /* _DDGroupTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EECA18C40B7F001120FB /* _DDNumberExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9E18C40B7F001120FB /* _DDNumberExpression.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EECB18C40B7F001120FB /* _DDNumberTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA018C40B7F001120FB /* _DDNumberTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EECC18C40B7F001120FB /* _DDOperatorTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA218C40B7F001120FB /* _DDOperatorTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EECD18C40B7F001120FB /* _DDParserTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA418C40B7F001120FB /* _DDParserTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EECE18C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA618C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EECF18C40B7F001120FB /* _DDRewriteRule.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA818C40B7F001120FB /* _DDRewriteRule.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED018C40B7F001120FB /* _DDVariableExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAA18C40B7F001120FB /* _DDVariableExpression.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED118C40B7F001120FB /* _DDVariableTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAC18C40B7F001120FB /* _DDVariableTerm.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED218C40B7F001120FB /* DDExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAE18C40B7F001120FB /* DDExpression.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED318C40B7F001120FB /* DDExpressionRewriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB018C40B7F001120FB /* DDExpressionRewriter.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED418C40B7F001120FB /* DDMathEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB218C40B7F001120FB /* DDMathEvaluator.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED518C40B7F001120FB /* DDMathOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB618C40B7F001120FB /* DDMathOperator.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED618C40B7F001120FB /* DDMathStringToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBA18C40B7F001120FB /* DDMathStringToken.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED718C40B7F001120FB /* DDMathStringTokenizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBC18C40B7F001120FB /* DDMathStringTokenizer.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED818C40B7F001120FB /* DDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBE18C40B7F001120FB /* DDParser.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EED918C40B7F001120FB /* DDParserTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC018C40B7F001120FB /* DDParserTypes.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EEDA18C40B7F001120FB /* DDTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC218C40B7F001120FB /* DDTypes.m */; settings = {COMPILER_FLAGS = "-Wno-receiver-is-weak"; }; };
-		7798EEDB18C40B7F001120FB /* NSString+DDMathParsing.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC418C40B7F001120FB /* NSString+DDMathParsing.m */; };
 		779C6CC318E7309B0076D647 /* ZGDebuggerUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */; };
 		779D56C018F0775500FD5408 /* ZGMemoryProtectionWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 779D56BE18F0775500FD5408 /* ZGMemoryProtectionWindowController.m */; };
 		779D56C518F1284200FD5408 /* ZGMemoryDumpRangeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 779D56C318F1284100FD5408 /* ZGMemoryDumpRangeWindowController.m */; };
@@ -171,29 +151,6 @@
 		77E2BBB618FD8B7900E41FA0 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77E2BBB518FD8B7900E41FA0 /* XCTest.framework */; };
 		77E2BBB718FD8F6B00E41FA0 /* ZGCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1163117D2EF62009E002A /* ZGCalculator.m */; };
 		77E2BBB818FD8F9200E41FA0 /* ZGVirtualMemory.c in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161D17D2EF14009E002A /* ZGVirtualMemory.c */; };
-		77E2BBB918FD8FC100E41FA0 /* _DDDecimalFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9418C40B7F001120FB /* _DDDecimalFunctions.m */; };
-		77E2BBBA18FD8FC100E41FA0 /* _DDFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9618C40B7F001120FB /* _DDFunctionEvaluator.m */; };
-		77E2BBBB18FD8FC100E41FA0 /* _DDFunctionExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9818C40B7F001120FB /* _DDFunctionExpression.m */; };
-		77E2BBBC18FD8FC100E41FA0 /* _DDFunctionTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9A18C40B7F001120FB /* _DDFunctionTerm.m */; };
-		77E2BBBD18FD8FC100E41FA0 /* _DDGroupTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9C18C40B7F001120FB /* _DDGroupTerm.m */; };
-		77E2BBBE18FD8FC100E41FA0 /* _DDNumberExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EE9E18C40B7F001120FB /* _DDNumberExpression.m */; };
-		77E2BBBF18FD8FC100E41FA0 /* _DDNumberTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA018C40B7F001120FB /* _DDNumberTerm.m */; };
-		77E2BBC018FD8FC100E41FA0 /* _DDOperatorTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA218C40B7F001120FB /* _DDOperatorTerm.m */; };
-		77E2BBC118FD8FC100E41FA0 /* _DDParserTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA418C40B7F001120FB /* _DDParserTerm.m */; };
-		77E2BBC218FD8FC100E41FA0 /* _DDPrecisionFunctionEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA618C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m */; };
-		77E2BBC318FD8FC100E41FA0 /* _DDRewriteRule.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEA818C40B7F001120FB /* _DDRewriteRule.m */; };
-		77E2BBC418FD8FC100E41FA0 /* _DDVariableExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAA18C40B7F001120FB /* _DDVariableExpression.m */; };
-		77E2BBC518FD8FC100E41FA0 /* _DDVariableTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAC18C40B7F001120FB /* _DDVariableTerm.m */; };
-		77E2BBC618FD8FC100E41FA0 /* DDExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEAE18C40B7F001120FB /* DDExpression.m */; };
-		77E2BBC718FD8FC100E41FA0 /* DDExpressionRewriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB018C40B7F001120FB /* DDExpressionRewriter.m */; };
-		77E2BBC818FD8FC100E41FA0 /* DDMathEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB218C40B7F001120FB /* DDMathEvaluator.m */; };
-		77E2BBC918FD8FC100E41FA0 /* DDMathOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEB618C40B7F001120FB /* DDMathOperator.m */; };
-		77E2BBCA18FD8FC100E41FA0 /* DDMathStringToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBA18C40B7F001120FB /* DDMathStringToken.m */; };
-		77E2BBCB18FD8FC100E41FA0 /* DDMathStringTokenizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBC18C40B7F001120FB /* DDMathStringTokenizer.m */; };
-		77E2BBCC18FD8FC100E41FA0 /* DDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEBE18C40B7F001120FB /* DDParser.m */; };
-		77E2BBCD18FD8FC100E41FA0 /* DDParserTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC018C40B7F001120FB /* DDParserTypes.m */; };
-		77E2BBCE18FD8FC100E41FA0 /* DDTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC218C40B7F001120FB /* DDTypes.m */; };
-		77E2BBCF18FD8FC100E41FA0 /* NSString+DDMathParsing.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798EEC418C40B7F001120FB /* NSString+DDMathParsing.m */; };
 		77E2BBD018FD8FE400E41FA0 /* ZGMachBinary.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E9DBCD181F812E009F4982 /* ZGMachBinary.m */; };
 		77E2BBD118FD8FF600E41FA0 /* ZGMachBinaryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */; };
 		77E2BBD218FD900300E41FA0 /* ZGVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162B17D2EF50009E002A /* ZGVariable.m */; };
@@ -284,6 +241,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */,
+				72030C7C1B055B3500A5621C /* DDMathParser.framework in Copy Frameworks */,
 				77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */,
 				773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */,
 			);
@@ -310,6 +268,11 @@
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		72030ADA1B00191400A5621C /* ZGScriptingInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptingInterpreter.h; path = "Bit Slicer/ZGScriptingInterpreter.h"; sourceTree = "<group>"; };
 		72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptingInterpreter.m; path = "Bit Slicer/ZGScriptingInterpreter.m"; sourceTree = "<group>"; };
+		72030AF81B01924B00A5621C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		72030AF91B01924B00A5621C /* DDMathParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDMathParser.h; sourceTree = "<group>"; };
+		72030B071B01924C00A5621C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		72030B081B01924C00A5621C /* DDMathParserTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DDMathParserTests.m; sourceTree = "<group>"; };
+		72030C791B0558F800A5621C /* DDMathParser.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DDMathParser.framework; path = deps/DDMathParser.framework; sourceTree = "<group>"; };
 		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
 		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
 		722CAA5619AD4AED009C6AAE /* hotkey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hotkey@2x.png"; path = "Bit Slicer/preficons/hotkey@2x.png"; sourceTree = "<group>"; };
@@ -637,56 +600,6 @@
 		7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMachBinaryInfo.m; path = "Bit Slicer/ZGMachBinaryInfo.m"; sourceTree = "<group>"; usesTabs = 1; };
 		77988F19185803E800476A37 /* container.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container.pdf; path = "Bit Slicer/docicons/container.pdf"; sourceTree = "<group>"; };
 		77988F1B185804AC00476A37 /* container_filled.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = container_filled.pdf; path = "Bit Slicer/docicons/container_filled.pdf"; sourceTree = "<group>"; };
-		7798EE9318C40B7F001120FB /* _DDDecimalFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDDecimalFunctions.h; path = deps/DDMathParser/_DDDecimalFunctions.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9418C40B7F001120FB /* _DDDecimalFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDDecimalFunctions.m; path = deps/DDMathParser/_DDDecimalFunctions.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9518C40B7F001120FB /* _DDFunctionEvaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionEvaluator.h; path = deps/DDMathParser/_DDFunctionEvaluator.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9618C40B7F001120FB /* _DDFunctionEvaluator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDFunctionEvaluator.m; path = deps/DDMathParser/_DDFunctionEvaluator.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9718C40B7F001120FB /* _DDFunctionExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionExpression.h; path = deps/DDMathParser/_DDFunctionExpression.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9818C40B7F001120FB /* _DDFunctionExpression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDFunctionExpression.m; path = deps/DDMathParser/_DDFunctionExpression.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9918C40B7F001120FB /* _DDFunctionTerm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDFunctionTerm.h; path = deps/DDMathParser/_DDFunctionTerm.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9A18C40B7F001120FB /* _DDFunctionTerm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDFunctionTerm.m; path = deps/DDMathParser/_DDFunctionTerm.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9B18C40B7F001120FB /* _DDGroupTerm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDGroupTerm.h; path = deps/DDMathParser/_DDGroupTerm.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9C18C40B7F001120FB /* _DDGroupTerm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDGroupTerm.m; path = deps/DDMathParser/_DDGroupTerm.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9D18C40B7F001120FB /* _DDNumberExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDNumberExpression.h; path = deps/DDMathParser/_DDNumberExpression.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9E18C40B7F001120FB /* _DDNumberExpression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDNumberExpression.m; path = deps/DDMathParser/_DDNumberExpression.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EE9F18C40B7F001120FB /* _DDNumberTerm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDNumberTerm.h; path = deps/DDMathParser/_DDNumberTerm.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA018C40B7F001120FB /* _DDNumberTerm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDNumberTerm.m; path = deps/DDMathParser/_DDNumberTerm.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA118C40B7F001120FB /* _DDOperatorTerm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDOperatorTerm.h; path = deps/DDMathParser/_DDOperatorTerm.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA218C40B7F001120FB /* _DDOperatorTerm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDOperatorTerm.m; path = deps/DDMathParser/_DDOperatorTerm.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA318C40B7F001120FB /* _DDParserTerm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDParserTerm.h; path = deps/DDMathParser/_DDParserTerm.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA418C40B7F001120FB /* _DDParserTerm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDParserTerm.m; path = deps/DDMathParser/_DDParserTerm.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA518C40B7F001120FB /* _DDPrecisionFunctionEvaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDPrecisionFunctionEvaluator.h; path = deps/DDMathParser/_DDPrecisionFunctionEvaluator.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA618C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDPrecisionFunctionEvaluator.m; path = deps/DDMathParser/_DDPrecisionFunctionEvaluator.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA718C40B7F001120FB /* _DDRewriteRule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDRewriteRule.h; path = deps/DDMathParser/_DDRewriteRule.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA818C40B7F001120FB /* _DDRewriteRule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDRewriteRule.m; path = deps/DDMathParser/_DDRewriteRule.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEA918C40B7F001120FB /* _DDVariableExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDVariableExpression.h; path = deps/DDMathParser/_DDVariableExpression.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEAA18C40B7F001120FB /* _DDVariableExpression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDVariableExpression.m; path = deps/DDMathParser/_DDVariableExpression.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEAB18C40B7F001120FB /* _DDVariableTerm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _DDVariableTerm.h; path = deps/DDMathParser/_DDVariableTerm.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEAC18C40B7F001120FB /* _DDVariableTerm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = _DDVariableTerm.m; path = deps/DDMathParser/_DDVariableTerm.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEAD18C40B7F001120FB /* DDExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDExpression.h; path = deps/DDMathParser/DDExpression.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEAE18C40B7F001120FB /* DDExpression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDExpression.m; path = deps/DDMathParser/DDExpression.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEAF18C40B7F001120FB /* DDExpressionRewriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDExpressionRewriter.h; path = deps/DDMathParser/DDExpressionRewriter.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB018C40B7F001120FB /* DDExpressionRewriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDExpressionRewriter.m; path = deps/DDMathParser/DDExpressionRewriter.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB118C40B7F001120FB /* DDMathEvaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDMathEvaluator.h; path = deps/DDMathParser/DDMathEvaluator.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB218C40B7F001120FB /* DDMathEvaluator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDMathEvaluator.m; path = deps/DDMathParser/DDMathEvaluator.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB318C40B7F001120FB /* DDMathEvaluator+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "DDMathEvaluator+Private.h"; path = "deps/DDMathParser/DDMathEvaluator+Private.h"; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB418C40B7F001120FB /* DDMathOperator_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDMathOperator_Internal.h; path = deps/DDMathParser/DDMathOperator_Internal.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB518C40B7F001120FB /* DDMathOperator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDMathOperator.h; path = deps/DDMathParser/DDMathOperator.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB618C40B7F001120FB /* DDMathOperator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDMathOperator.m; path = deps/DDMathParser/DDMathOperator.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB718C40B7F001120FB /* DDMathParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDMathParser.h; path = deps/DDMathParser/DDMathParser.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB818C40B7F001120FB /* DDMathParserMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDMathParserMacros.h; path = deps/DDMathParser/DDMathParserMacros.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEB918C40B7F001120FB /* DDMathStringToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDMathStringToken.h; path = deps/DDMathParser/DDMathStringToken.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEBA18C40B7F001120FB /* DDMathStringToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDMathStringToken.m; path = deps/DDMathParser/DDMathStringToken.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEBB18C40B7F001120FB /* DDMathStringTokenizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDMathStringTokenizer.h; path = deps/DDMathParser/DDMathStringTokenizer.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEBC18C40B7F001120FB /* DDMathStringTokenizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDMathStringTokenizer.m; path = deps/DDMathParser/DDMathStringTokenizer.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEBD18C40B7F001120FB /* DDParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDParser.h; path = deps/DDMathParser/DDParser.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEBE18C40B7F001120FB /* DDParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDParser.m; path = deps/DDMathParser/DDParser.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEBF18C40B7F001120FB /* DDParserTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDParserTypes.h; path = deps/DDMathParser/DDParserTypes.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEC018C40B7F001120FB /* DDParserTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDParserTypes.m; path = deps/DDMathParser/DDParserTypes.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEC118C40B7F001120FB /* DDTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDTypes.h; path = deps/DDMathParser/DDTypes.h; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEC218C40B7F001120FB /* DDTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDTypes.m; path = deps/DDMathParser/DDTypes.m; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEC318C40B7F001120FB /* NSString+DDMathParsing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+DDMathParsing.h"; path = "deps/DDMathParser/NSString+DDMathParsing.h"; sourceTree = "<group>"; usesTabs = 0; };
-		7798EEC418C40B7F001120FB /* NSString+DDMathParsing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+DDMathParsing.m"; path = "deps/DDMathParser/NSString+DDMathParsing.m"; sourceTree = "<group>"; usesTabs = 0; };
 		779C6CC118E7309B0076D647 /* ZGDebuggerUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDebuggerUtilities.h; path = "Bit Slicer/ZGDebuggerUtilities.h"; sourceTree = "<group>"; usesTabs = 1; };
 		779C6CC218E7309B0076D647 /* ZGDebuggerUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDebuggerUtilities.m; path = "Bit Slicer/ZGDebuggerUtilities.m"; sourceTree = "<group>"; usesTabs = 1; };
 		779D56BD18F0775500FD5408 /* ZGMemoryProtectionWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryProtectionWindowController.h; path = "Bit Slicer/ZGMemoryProtectionWindowController.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -722,7 +635,6 @@
 		77F115A617D2E87E009E002A /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VDKQueue.h; path = deps/VDKQueue.h; sourceTree = "<group>"; };
 		77F115A717D2E87E009E002A /* VDKQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VDKQueue.m; path = deps/VDKQueue.m; sourceTree = "<group>"; };
 		77F115A917D2E8AC009E002A /* yasm */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = yasm; path = deps/yasm; sourceTree = "<group>"; };
-		77F115AB17D2EAC3009E002A /* Bit_Slicer_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Bit_Slicer_Prefix.pch; path = "Bit Slicer/Bit_Slicer_Prefix.pch"; sourceTree = "<group>"; usesTabs = 1; };
 		77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = bitslicerdocicon.iconset; path = "Bit Slicer/bitslicerdocicon.iconset"; sourceTree = "<group>"; };
 		77F115AD17D2EAE4009E002A /* bitslicericon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = bitslicericon.iconset; path = "Bit Slicer/bitslicericon.iconset"; sourceTree = "<group>"; };
 		77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Bit_Slicer-Info.plist"; path = "Bit Slicer/Bit_Slicer-Info.plist"; sourceTree = "<group>"; };
@@ -825,6 +737,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				77E2BBB618FD8B7900E41FA0 /* XCTest.framework in Frameworks */,
+				72030C7B1B0558F800A5621C /* DDMathParser.framework in Frameworks */,
 				77E2BBD518FD904400E41FA0 /* CoreSymbolication.framework in Frameworks */,
 				77E133FE19312AD500B5B799 /* HexFiend.framework in Frameworks */,
 			);
@@ -835,6 +748,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				773E8AFB1821DC5A00D1A71A /* CoreServices.framework in Frameworks */,
+				72030C7A1B0558F800A5621C /* DDMathParser.framework in Frameworks */,
 				773E8AFC1821DC5A00D1A71A /* ApplicationServices.framework in Frameworks */,
 				8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */,
 				775FCB4211719FAF000054FB /* Carbon.framework in Frameworks */,
@@ -854,6 +768,7 @@
 			isa = PBXGroup;
 			children = (
 				77E2BBB518FD8B7900E41FA0 /* XCTest.framework */,
+				72030C791B0558F800A5621C /* DDMathParser.framework */,
 				773E8B031821DE5300D1A71A /* HexFiend.framework */,
 				773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */,
 				773E8AF91821DBF300D1A71A /* CoreServices.framework */,
@@ -894,6 +809,8 @@
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */,
+				72030AF61B01924B00A5621C /* DDMathParser */,
+				72030B051B01924B00A5621C /* DDMathParserTests */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 			);
@@ -923,7 +840,6 @@
 		2A37F4AFFDCFA73011CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				77F115AB17D2EAC3009E002A /* Bit_Slicer_Prefix.pch */,
 				77F1163917D2EF7F009E002A /* main.m */,
 			);
 			name = "Other Sources";
@@ -953,6 +869,40 @@
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		72030AF61B01924B00A5621C /* DDMathParser */ = {
+			isa = PBXGroup;
+			children = (
+				72030AF91B01924B00A5621C /* DDMathParser.h */,
+				72030AF71B01924B00A5621C /* Supporting Files */,
+			);
+			path = DDMathParser;
+			sourceTree = "<group>";
+		};
+		72030AF71B01924B00A5621C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				72030AF81B01924B00A5621C /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		72030B051B01924B00A5621C /* DDMathParserTests */ = {
+			isa = PBXGroup;
+			children = (
+				72030B081B01924C00A5621C /* DDMathParserTests.m */,
+				72030B061B01924C00A5621C /* Supporting Files */,
+			);
+			path = DDMathParserTests;
+			sourceTree = "<group>";
+		};
+		72030B061B01924C00A5621C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				72030B071B01924C00A5621C /* Info.plist */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		722CAA5D19AD4AF2009C6AAE /* Preference Icons */ = {
@@ -1351,63 +1301,6 @@
 			name = "Debugger Icons";
 			sourceTree = "<group>";
 		};
-		77DC40F917AF218E000626A2 /* DDMathParser */ = {
-			isa = PBXGroup;
-			children = (
-				7798EE9318C40B7F001120FB /* _DDDecimalFunctions.h */,
-				7798EE9418C40B7F001120FB /* _DDDecimalFunctions.m */,
-				7798EE9518C40B7F001120FB /* _DDFunctionEvaluator.h */,
-				7798EE9618C40B7F001120FB /* _DDFunctionEvaluator.m */,
-				7798EE9718C40B7F001120FB /* _DDFunctionExpression.h */,
-				7798EE9818C40B7F001120FB /* _DDFunctionExpression.m */,
-				7798EE9918C40B7F001120FB /* _DDFunctionTerm.h */,
-				7798EE9A18C40B7F001120FB /* _DDFunctionTerm.m */,
-				7798EE9B18C40B7F001120FB /* _DDGroupTerm.h */,
-				7798EE9C18C40B7F001120FB /* _DDGroupTerm.m */,
-				7798EE9D18C40B7F001120FB /* _DDNumberExpression.h */,
-				7798EE9E18C40B7F001120FB /* _DDNumberExpression.m */,
-				7798EE9F18C40B7F001120FB /* _DDNumberTerm.h */,
-				7798EEA018C40B7F001120FB /* _DDNumberTerm.m */,
-				7798EEA118C40B7F001120FB /* _DDOperatorTerm.h */,
-				7798EEA218C40B7F001120FB /* _DDOperatorTerm.m */,
-				7798EEA318C40B7F001120FB /* _DDParserTerm.h */,
-				7798EEA418C40B7F001120FB /* _DDParserTerm.m */,
-				7798EEA518C40B7F001120FB /* _DDPrecisionFunctionEvaluator.h */,
-				7798EEA618C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m */,
-				7798EEA718C40B7F001120FB /* _DDRewriteRule.h */,
-				7798EEA818C40B7F001120FB /* _DDRewriteRule.m */,
-				7798EEA918C40B7F001120FB /* _DDVariableExpression.h */,
-				7798EEAA18C40B7F001120FB /* _DDVariableExpression.m */,
-				7798EEAB18C40B7F001120FB /* _DDVariableTerm.h */,
-				7798EEAC18C40B7F001120FB /* _DDVariableTerm.m */,
-				7798EEAD18C40B7F001120FB /* DDExpression.h */,
-				7798EEAE18C40B7F001120FB /* DDExpression.m */,
-				7798EEAF18C40B7F001120FB /* DDExpressionRewriter.h */,
-				7798EEB018C40B7F001120FB /* DDExpressionRewriter.m */,
-				7798EEB118C40B7F001120FB /* DDMathEvaluator.h */,
-				7798EEB218C40B7F001120FB /* DDMathEvaluator.m */,
-				7798EEB318C40B7F001120FB /* DDMathEvaluator+Private.h */,
-				7798EEB418C40B7F001120FB /* DDMathOperator_Internal.h */,
-				7798EEB518C40B7F001120FB /* DDMathOperator.h */,
-				7798EEB618C40B7F001120FB /* DDMathOperator.m */,
-				7798EEB718C40B7F001120FB /* DDMathParser.h */,
-				7798EEB818C40B7F001120FB /* DDMathParserMacros.h */,
-				7798EEB918C40B7F001120FB /* DDMathStringToken.h */,
-				7798EEBA18C40B7F001120FB /* DDMathStringToken.m */,
-				7798EEBB18C40B7F001120FB /* DDMathStringTokenizer.h */,
-				7798EEBC18C40B7F001120FB /* DDMathStringTokenizer.m */,
-				7798EEBD18C40B7F001120FB /* DDParser.h */,
-				7798EEBE18C40B7F001120FB /* DDParser.m */,
-				7798EEBF18C40B7F001120FB /* DDParserTypes.h */,
-				7798EEC018C40B7F001120FB /* DDParserTypes.m */,
-				7798EEC118C40B7F001120FB /* DDTypes.h */,
-				7798EEC218C40B7F001120FB /* DDTypes.m */,
-				7798EEC318C40B7F001120FB /* NSString+DDMathParsing.h */,
-				7798EEC418C40B7F001120FB /* NSString+DDMathParsing.m */,
-			);
-			name = DDMathParser;
-			sourceTree = "<group>";
-		};
 		77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1550,7 +1443,6 @@
 				777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */,
 				771A931B18791A8D0098511D /* ZGTableView.h */,
 				771A931C18791A8D0098511D /* ZGTableView.m */,
-				77DC40F917AF218E000626A2 /* DDMathParser */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -1775,31 +1667,8 @@
 				77E2BBD018FD8FE400E41FA0 /* ZGMachBinary.m in Sources */,
 				77E2BBB818FD8F9200E41FA0 /* ZGVirtualMemory.c in Sources */,
 				77E2BBB718FD8F6B00E41FA0 /* ZGCalculator.m in Sources */,
-				77E2BBB918FD8FC100E41FA0 /* _DDDecimalFunctions.m in Sources */,
-				77E2BBBA18FD8FC100E41FA0 /* _DDFunctionEvaluator.m in Sources */,
-				77E2BBBB18FD8FC100E41FA0 /* _DDFunctionExpression.m in Sources */,
-				77E2BBBC18FD8FC100E41FA0 /* _DDFunctionTerm.m in Sources */,
 				77A5B03019189CC9002BEC69 /* BinarySearchTest.m in Sources */,
-				77E2BBBD18FD8FC100E41FA0 /* _DDGroupTerm.m in Sources */,
 				722CAADF19BB625E009C6AAE /* VariableDisplayTest.m in Sources */,
-				77E2BBBE18FD8FC100E41FA0 /* _DDNumberExpression.m in Sources */,
-				77E2BBBF18FD8FC100E41FA0 /* _DDNumberTerm.m in Sources */,
-				77E2BBC018FD8FC100E41FA0 /* _DDOperatorTerm.m in Sources */,
-				77E2BBC118FD8FC100E41FA0 /* _DDParserTerm.m in Sources */,
-				77E2BBC218FD8FC100E41FA0 /* _DDPrecisionFunctionEvaluator.m in Sources */,
-				77E2BBC318FD8FC100E41FA0 /* _DDRewriteRule.m in Sources */,
-				77E2BBC418FD8FC100E41FA0 /* _DDVariableExpression.m in Sources */,
-				77E2BBC518FD8FC100E41FA0 /* _DDVariableTerm.m in Sources */,
-				77E2BBC618FD8FC100E41FA0 /* DDExpression.m in Sources */,
-				77E2BBC718FD8FC100E41FA0 /* DDExpressionRewriter.m in Sources */,
-				77E2BBC818FD8FC100E41FA0 /* DDMathEvaluator.m in Sources */,
-				77E2BBC918FD8FC100E41FA0 /* DDMathOperator.m in Sources */,
-				77E2BBCA18FD8FC100E41FA0 /* DDMathStringToken.m in Sources */,
-				77E2BBCB18FD8FC100E41FA0 /* DDMathStringTokenizer.m in Sources */,
-				77E2BBCC18FD8FC100E41FA0 /* DDParser.m in Sources */,
-				77E2BBCD18FD8FC100E41FA0 /* DDParserTypes.m in Sources */,
-				77E2BBCE18FD8FC100E41FA0 /* DDTypes.m in Sources */,
-				77E2BBCF18FD8FC100E41FA0 /* NSString+DDMathParsing.m in Sources */,
 				776B62E6193126B7004BF4A0 /* ByteArraySearchTest.mm in Sources */,
 				77E2BBAE18FD88A700E41FA0 /* LinearExpressionParsingTest.m in Sources */,
 				77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */,
@@ -1811,69 +1680,51 @@
 			buildActionMask = 2147483647;
 			files = (
 				777DA25518CEA0390092DEC9 /* ZGAppPathUtilities.m in Sources */,
-				7798EED018C40B7F001120FB /* _DDVariableExpression.m in Sources */,
 				770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */,
 				77FFC14C18711D2700122357 /* ZGEditDescriptionWindowController.m in Sources */,
 				777DA25918CF55750092DEC9 /* ZGNavigationPost.m in Sources */,
 				772C0F7E18B88AFA009FFF72 /* ZGRegisterEntries.m in Sources */,
-				7798EED518C40B7F001120FB /* DDMathOperator.m in Sources */,
 				777C34B5187523D0005E64E1 /* ZGNoSmallSizeToolbar.m in Sources */,
-				7798EEC618C40B7F001120FB /* _DDFunctionEvaluator.m in Sources */,
 				773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */,
 				773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */,
 				773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */,
 				77FFC107186BDA3600122357 /* ZGWatchVariableWindowController.m in Sources */,
-				7798EECF18C40B7F001120FB /* _DDRewriteRule.m in Sources */,
 				77F115A817D2E87E009E002A /* VDKQueue.m in Sources */,
 				77F115CD17D2ED64009E002A /* ZGMemoryViewerController.m in Sources */,
 				77F115D017D2ED74009E002A /* ZGVerticalScrollerRepresenter.m in Sources */,
 				77282123189E769B0044E4BC /* ZGStoredData.m in Sources */,
 				77F115D317D2ED82009E002A /* ZGStatusBarRepresenter.m in Sources */,
-				7798EED718C40B7F001120FB /* DDMathStringTokenizer.m in Sources */,
-				7798EECA18C40B7F001120FB /* _DDNumberExpression.m in Sources */,
 				770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */,
 				77F115D617D2ED8E009E002A /* ZGLineCountingRepresenter.m in Sources */,
 				772D1268190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m in Sources */,
 				771A931D18791A8D0098511D /* ZGTableView.m in Sources */,
 				77F115D917D2ED9D009E002A /* ZGLineCountingView.m in Sources */,
-				7798EEC718C40B7F001120FB /* _DDFunctionExpression.m in Sources */,
 				77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */,
-				7798EED618C40B7F001120FB /* DDMathStringToken.m in Sources */,
 				77F115E217D2EDC3009E002A /* ZGAppController.m in Sources */,
 				726B7CA91A23F0EE004354BC /* ZGScriptPromptWindowController.m in Sources */,
-				7798EEDB18C40B7F001120FB /* NSString+DDMathParsing.m in Sources */,
 				7768064018B96A64007F2CAF /* ZGThreadStates.c in Sources */,
 				77F115E517D2EDCD009E002A /* ZGPreferencesController.m in Sources */,
 				77F115E817D2EDD9009E002A /* ZGProcessList.m in Sources */,
-				7798EED818C40B7F001120FB /* DDParser.m in Sources */,
 				77F115EB17D2EDE3009E002A /* ZGRunningProcess.m in Sources */,
 				77F115EE17D2EDEE009E002A /* ZGRunningProcessObserver.m in Sources */,
-				7798EECB18C40B7F001120FB /* _DDNumberTerm.m in Sources */,
 				77F115F117D2EDF9009E002A /* ZGDocument.m in Sources */,
 				72D72BCB1AB3E9FA005044CF /* ZGLocalization.m in Sources */,
-				7798EED418C40B7F001120FB /* DDMathEvaluator.m in Sources */,
 				77F115F417D2EE0B009E002A /* ZGDocumentData.m in Sources */,
 				770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */,
 				77F115F717D2EE28009E002A /* ZGDocumentWindowController.m in Sources */,
-				7798EEC518C40B7F001120FB /* _DDDecimalFunctions.m in Sources */,
 				77CECE1718B8861C006D45E9 /* ZGRegistersViewController.m in Sources */,
 				77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */,
 				779D56CA18F1BB0300FD5408 /* ZGMemoryDumpAllWindowController.m in Sources */,
 				779C6CC318E7309B0076D647 /* ZGDebuggerUtilities.m in Sources */,
 				77F115FD17D2EE7E009E002A /* ZGDocumentTableController.m in Sources */,
-				7798EED118C40B7F001120FB /* _DDVariableTerm.m in Sources */,
 				770FABAC1848354100C176B7 /* ZGEditValueWindowController.m in Sources */,
 				77F1160317D2EEAA009E002A /* ZGVariableController.m in Sources */,
 				77F1160617D2EEB6009E002A /* ZGScriptManager.m in Sources */,
-				7798EED318C40B7F001120FB /* DDExpressionRewriter.m in Sources */,
 				77F1160917D2EEC0009E002A /* ZGPyVirtualMemory.m in Sources */,
-				7798EED918C40B7F001120FB /* DDParserTypes.m in Sources */,
 				773DE962190F4D130078E8F9 /* ZGScriptPreferencesViewController.m in Sources */,
 				77F1160C17D2EECA009E002A /* ZGPyScript.m in Sources */,
 				777DA25218CE97BE0092DEC9 /* ZGAppTerminationState.m in Sources */,
 				77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */,
-				7798EED218C40B7F001120FB /* DDExpression.m in Sources */,
-				7798EECE18C40B7F001120FB /* _DDPrecisionFunctionEvaluator.m in Sources */,
 				77282120189B854D0044E4BC /* ZGFunctionTypes.m in Sources */,
 				77F1161217D2EEE1009E002A /* ZGSearchProgress.m in Sources */,
 				77F1161517D2EEEC009E002A /* ZGSearchResults.m in Sources */,
@@ -1900,21 +1751,17 @@
 				77F1163217D2EF62009E002A /* ZGCalculator.m in Sources */,
 				77F1163517D2EF6D009E002A /* NSStringAdditions.m in Sources */,
 				77F1163817D2EF76009E002A /* NSArrayAdditions.m in Sources */,
-				7798EEC818C40B7F001120FB /* _DDFunctionTerm.m in Sources */,
 				77F1163A17D2EF7F009E002A /* main.m in Sources */,
 				72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */,
 				77F1163D17D2EF8E009E002A /* ZGMemoryWindowController.m in Sources */,
-				7798EEDA18C40B7F001120FB /* DDTypes.m in Sources */,
 				7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */,
 				770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */,
 				7714194118AC7D8500600423 /* ZGMemoryDumpFunctions.m in Sources */,
 				77F1164017D2EF9E009E002A /* ZGDebuggerController.m in Sources */,
 				77F1164317D2EFB4009E002A /* ZGDisassemblerObject.m in Sources */,
 				77F1164617D2EFBD009E002A /* ZGInstruction.m in Sources */,
-				7798EEC918C40B7F001120FB /* _DDGroupTerm.m in Sources */,
 				77F1164917D2EFC8009E002A /* ZGBreakPointController.m in Sources */,
 				772C0F8218B95603009FFF72 /* ZGBacktraceViewController.m in Sources */,
-				7798EECD18C40B7F001120FB /* _DDParserTerm.m in Sources */,
 				77C19AAF19158ABF0028F7F1 /* ZGPyUtilities.m in Sources */,
 				77F1164D17D2EFDA009E002A /* ZGBreakPoint.m in Sources */,
 				72030ADC1B00191400A5621C /* ZGScriptingInterpreter.m in Sources */,
@@ -1922,7 +1769,6 @@
 				77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */,
 				77F1165917D2F001009E002A /* ZGRegister.m in Sources */,
 				774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */,
-				7798EECC18C40B7F001120FB /* _DDOperatorTerm.m in Sources */,
 				7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */,
 				77179F6B18CD34F100BCB6D0 /* ZGAppUpdaterController.m in Sources */,
 				77F1165C17D2F00A009E002A /* ZGCodeInjectionWindowController.m in Sources */,
@@ -2465,8 +2311,7 @@
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Bit Slicer Tests/Bit Slicer Tests-Prefix.pch";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -2499,6 +2344,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = "-D_BSDEBUG";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_PRECOMPS_DIR = "";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WARNING_CFLAGS = (
 					"-Weverything",
@@ -2566,8 +2412,7 @@
 					"$(PROJECT_DIR)/deps",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Bit Slicer Tests/Bit Slicer Tests-Prefix.pch";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -2595,6 +2440,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = "-D_BSDEBUG";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SHARED_PRECOMPS_DIR = "";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WARNING_CFLAGS = (
 					"-Weverything",
@@ -2628,9 +2474,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -2658,13 +2506,13 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
+					"$(PROJECT_DIR)/deps",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Bit Slicer/Bit_Slicer_Prefix.pch";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -2690,7 +2538,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Bit Slicer/Bit_Slicer-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
@@ -2716,6 +2564,7 @@
 					"-Wno-variadic-macros",
 					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
+					"-Wno-auto-import",
 					"-Werror",
 				);
 			};
@@ -2725,9 +2574,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -2756,11 +2607,11 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
+					"$(PROJECT_DIR)/deps",
 				);
 				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Bit Slicer/Bit_Slicer_Prefix.pch";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
@@ -2786,7 +2637,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Bit Slicer/Bit_Slicer-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
@@ -2811,6 +2662,7 @@
 					"-Wno-variadic-macros",
 					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
+					"-Wno-auto-import",
 					"-Werror",
 				);
 			};
@@ -2829,8 +2681,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
+				SHARED_PRECOMPS_DIR = "";
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -2846,8 +2700,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
+				SHARED_PRECOMPS_DIR = "";
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;

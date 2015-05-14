@@ -1,4 +1,3 @@
-#import <Cocoa/Cocoa.h>
 #import <HexFiend/HexFiend.h>
 
 //notification posted when our DataInspector's height changes.  Has a single key "height" which is the new height for the scroll view

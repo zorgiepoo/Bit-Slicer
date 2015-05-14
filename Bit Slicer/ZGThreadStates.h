@@ -35,6 +35,8 @@
 #ifndef Bit_Slicer_ZGThreadStates_h
 #define Bit_Slicer_ZGThreadStates_h
 
+#include <machine/_mcontext.h> // this header is needed when modules are enabled
+#include <mach/message.h>
 #include <mach/thread_act.h>
 #include <stdbool.h>
 

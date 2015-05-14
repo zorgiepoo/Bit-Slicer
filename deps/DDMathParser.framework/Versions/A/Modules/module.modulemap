@@ -1,0 +1,6 @@
+framework module DDMathParser {
+  umbrella header "DDMathParser.h"
+
+  export *
+  module * { export * }
+}

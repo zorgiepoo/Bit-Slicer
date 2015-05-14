@@ -33,6 +33,7 @@
  */
 
 #import "NSStringAdditions.h"
+#include <stdlib.h>
 
 @implementation NSString (NSStringAdditions)
 

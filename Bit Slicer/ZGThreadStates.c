@@ -63,7 +63,7 @@ bool ZGSetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, m
 // For some reason for AVX set/get thread functions, it is important to distinguish between 32 vs 64 bit,
 // even when I can use more generic versions for general purpose and debug registers
 
-static bool ZGGetAVXThreadState(x86_avx_state_t *avxState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit)
+static bool ZGGetAVXThreadState(x86_avx_state_t * avxState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit)
 {
 	mach_msg_type_number_t localStateCount = is64Bit ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
 	bool success = (thread_get_state(thread, is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, is64Bit ? (thread_state_t)&(avxState->ufs.as64) : (thread_state_t)&(avxState->ufs.as32), &localStateCount) == KERN_SUCCESS);

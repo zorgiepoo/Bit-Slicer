@@ -35,6 +35,7 @@
 #import "ZGPyKeyModModule.h"
 #import "ZGPyUtilities.h"
 #import "ZGUtilities.h"
+#import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
 
 #define KEYMOD_MODULE_NAME "keymod"
