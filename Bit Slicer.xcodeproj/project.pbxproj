@@ -268,10 +268,6 @@
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		72030ADA1B00191400A5621C /* ZGScriptingInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptingInterpreter.h; path = "Bit Slicer/ZGScriptingInterpreter.h"; sourceTree = "<group>"; };
 		72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptingInterpreter.m; path = "Bit Slicer/ZGScriptingInterpreter.m"; sourceTree = "<group>"; };
-		72030AF81B01924B00A5621C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		72030AF91B01924B00A5621C /* DDMathParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DDMathParser.h; sourceTree = "<group>"; };
-		72030B071B01924C00A5621C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		72030B081B01924C00A5621C /* DDMathParserTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DDMathParserTests.m; sourceTree = "<group>"; };
 		72030C791B0558F800A5621C /* DDMathParser.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DDMathParser.framework; path = deps/DDMathParser.framework; sourceTree = "<group>"; };
 		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
 		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
@@ -809,8 +805,6 @@
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				77E2BBA718FD88A700E41FA0 /* Bit Slicer Tests */,
-				72030AF61B01924B00A5621C /* DDMathParser */,
-				72030B051B01924B00A5621C /* DDMathParserTests */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
 			);
@@ -869,40 +863,6 @@
 				1058C7A8FEA54F5311CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		72030AF61B01924B00A5621C /* DDMathParser */ = {
-			isa = PBXGroup;
-			children = (
-				72030AF91B01924B00A5621C /* DDMathParser.h */,
-				72030AF71B01924B00A5621C /* Supporting Files */,
-			);
-			path = DDMathParser;
-			sourceTree = "<group>";
-		};
-		72030AF71B01924B00A5621C /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				72030AF81B01924B00A5621C /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		72030B051B01924B00A5621C /* DDMathParserTests */ = {
-			isa = PBXGroup;
-			children = (
-				72030B081B01924C00A5621C /* DDMathParserTests.m */,
-				72030B061B01924C00A5621C /* Supporting Files */,
-			);
-			path = DDMathParserTests;
-			sourceTree = "<group>";
-		};
-		72030B061B01924C00A5621C /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				72030B071B01924C00A5621C /* Info.plist */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		722CAA5D19AD4AF2009C6AAE /* Preference Icons */ = {
