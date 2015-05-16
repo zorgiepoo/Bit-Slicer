@@ -88,10 +88,9 @@
 
 		self.loggerWindowController = [[ZGLoggerWindowController alloc] init];
 		
-		self.scriptingInterpreter = [ZGScriptingInterpreter sharedInterpreter];
+		self.scriptingInterpreter = [ZGScriptingInterpreter createInterpreterOnce];
 		
-		self.breakPointController = [ZGBreakPointController sharedController];
-		self.breakPointController.scriptingInterpreter = self.scriptingInterpreter;
+		self.breakPointController = [ZGBreakPointController createBreakPointControllerOnceWithScriptingInterpreter:self.scriptingInterpreter];
 		
 		self.debuggerController =
 		[[ZGDebuggerController alloc]

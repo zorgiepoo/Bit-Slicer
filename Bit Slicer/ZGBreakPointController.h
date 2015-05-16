@@ -55,11 +55,9 @@ typedef enum
 	ZGWatchPointReadOrWrite,
 } ZGWatchPointType;
 
-+ (instancetype)sharedController;
++ (instancetype)createBreakPointControllerOnceWithScriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter;
 
 @property (nonatomic) NSArray *breakPoints;
-
-@property (nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
 @property (nonatomic) ZGAppTerminationState *appTerminationState;
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate;

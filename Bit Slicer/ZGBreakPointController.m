@@ -88,15 +88,27 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 @end
 
 @implementation ZGBreakPointController
+{
+	ZGScriptingInterpreter *_scriptingInterpreter;
+}
 
 static ZGBreakPointController *gBreakPointController;
-+ (instancetype)sharedController
++ (instancetype)createBreakPointControllerOnceWithScriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter
 {
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		gBreakPointController = [[ZGBreakPointController alloc] init];
-	});
+	assert(gBreakPointController == nil);
+	
+	gBreakPointController = [[self alloc] initWithScriptingInterpreter:scriptingInterpreter];
 	return gBreakPointController;
+}
+
+- (id)initWithScriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter
+{
+	self = [super init];
+	if (self != nil)
+	{
+		_scriptingInterpreter = scriptingInterpreter;
+	}
+	return self;
 }
 
 #define RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(type) \

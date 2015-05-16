@@ -48,7 +48,7 @@
 
 @interface ZGScriptingInterpreter : NSObject
 
-+ (instancetype)sharedInterpreter;
++ (instancetype)createInterpreterOnce;
 
 - (void)acquireInterpreter;
 

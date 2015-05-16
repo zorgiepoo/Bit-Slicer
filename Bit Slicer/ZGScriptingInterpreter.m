@@ -52,13 +52,12 @@
 	BOOL _initializedInterpreter;
 }
 
-+ (instancetype)sharedInterpreter
++ (instancetype)createInterpreterOnce
 {
 	static ZGScriptingInterpreter *scriptingInterpreter;
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		scriptingInterpreter = [[[self class] alloc] init];
-	});
+	assert(scriptingInterpreter == nil);
+	
+	scriptingInterpreter = [[[self class] alloc] init];
 	return scriptingInterpreter;
 }
 
