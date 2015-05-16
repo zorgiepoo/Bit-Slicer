@@ -94,9 +94,6 @@
 
 @property (nonatomic) ZGCodeInjectionWindowController *codeInjectionController;
 
-@property (nonatomic) NSArray *haltedBreakPoints;
-@property (nonatomic, readonly) ZGBreakPoint *currentBreakPoint;
-
 @property (nonatomic) NSPopover *breakPointConditionPopover;
 @property (nonatomic) NSMutableArray *breakPointConditions;
 
@@ -127,6 +124,7 @@ enum ZGStepExecution
 @implementation ZGDebuggerController
 {
 	BOOL _cleanedUp;
+	NSMutableArray *_haltedBreakPoints;
 }
 
 #pragma mark Birth & Death
@@ -177,7 +175,7 @@ enum ZGStepExecution
 		self.scriptingInterpreter = scriptingInterpreter;
 		self.loggerWindowController = loggerWindowController;
 		
-		self.haltedBreakPoints = [[NSArray alloc] init];
+		_haltedBreakPoints = [[NSMutableArray alloc] init];
 		
 		_pauseAndUnpauseHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGPauseAndUnpauseHotKey]];
 		_stepInHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGStepInHotKey]];
@@ -350,10 +348,12 @@ enum ZGStepExecution
 {
 	[self updateExecutionButtons];
 	
-	if (self.currentBreakPoint != nil)
+	ZGBreakPoint *currentBreakpoint = self.currentBreakPoint;
+	
+	if (currentBreakpoint != nil)
 	{
 		[self toggleBacktraceAndRegistersViews:NSOnState];
-		[self.registersViewController updateRegistersFromBreakPoint:self.currentBreakPoint];
+		[self.registersViewController updateRegistersFromBreakPoint:currentBreakpoint];
 		[self updateBacktrace];
 		
 		[self jumpToMemoryAddress:self.registersViewController.instructionPointer];
@@ -810,7 +810,7 @@ enum ZGStepExecution
 		for (ZGRunningProcess *runningProcess in oldRunningProcesses)
 		{
 			[self.breakPointController removeObserver:self runningProcess:runningProcess];
-			for (ZGBreakPoint *haltedBreakPoint in self.haltedBreakPoints)
+			for (ZGBreakPoint *haltedBreakPoint in _haltedBreakPoints)
 			{
 				if (haltedBreakPoint.process.processID == runningProcess.processIdentifier)
 				{
@@ -1839,11 +1839,9 @@ enum ZGStepExecution
 
 - (void)addHaltedBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	NSMutableArray *newBreakPoints = [[NSMutableArray alloc] initWithArray:self.haltedBreakPoints];
-	[newBreakPoints addObject:breakPoint];
-	self.haltedBreakPoints = [NSArray arrayWithArray:newBreakPoints];
+	[_haltedBreakPoints addObject:breakPoint];
 	
-	if (breakPoint.process.processID == self.currentProcess.processID)
+	if ([breakPoint.process isEqual:self.currentProcess])
 	{
 		[self.instructionsTableView reloadData];
 	}
@@ -1851,11 +1849,9 @@ enum ZGStepExecution
 
 - (void)removeHaltedBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	NSMutableArray *newBreakPoints = [[NSMutableArray alloc] initWithArray:self.haltedBreakPoints];
-	[newBreakPoints removeObject:breakPoint];
-	self.haltedBreakPoints = [NSArray arrayWithArray:newBreakPoints];
+	[_haltedBreakPoints removeObject:breakPoint];
 	
-	if (breakPoint.process.processID == self.currentProcess.processID)
+	if ([breakPoint.process isEqual:self.currentProcess])
 	{
 		[self.instructionsTableView reloadData];
 	}
@@ -1863,18 +1859,9 @@ enum ZGStepExecution
 
 - (ZGBreakPoint *)currentBreakPoint
 {
-	ZGBreakPoint *currentBreakPoint = nil;
-	
-	for (ZGBreakPoint *breakPoint in self.haltedBreakPoints)
-	{
-		if (breakPoint.process.processID == self.currentProcess.processID)
-		{
-			currentBreakPoint = breakPoint;
-			break;
-		}
-	}
-	
-	return currentBreakPoint;
+	return [_haltedBreakPoints zgFirstObjectThatMatchesCondition:^BOOL(ZGBreakPoint *breakPoint) {
+		return [breakPoint.process isEqual:self.currentProcess];
+	}];
 }
 
 - (ZGInstruction *)findInstructionInTableAtAddress:(ZGMemoryAddress)targetAddress
@@ -1956,11 +1943,13 @@ enum ZGStepExecution
 }
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
-{	
+{
 	[self removeHaltedBreakPoint:self.currentBreakPoint];
 	[self addHaltedBreakPoint:breakPoint];
 	
-	if (self.currentBreakPoint != nil)
+	ZGBreakPoint *currentBreakPoint = self.currentBreakPoint;
+	
+	if (currentBreakPoint != nil)
 	{
 		if (!self.window.isVisible)
 		{
@@ -1994,7 +1983,7 @@ enum ZGStepExecution
 		
 		BOOL shouldShowNotification = YES;
 		
-		if (self.currentBreakPoint.hidden)
+		if (currentBreakPoint.hidden)
 		{
 			if (breakPoint.basePointer == self.registersViewController.basePointer)
 			{
@@ -2011,7 +2000,7 @@ enum ZGStepExecution
 		
 		if (breakPoint.error == nil && shouldShowNotification)
 		{
-			ZGDeliverUserNotification(ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationTitle"), self.currentProcess.name, [NSString stringWithFormat:@"%@ %@", ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationMessage"), self.currentBreakPoint.variable.addressStringValue], nil);
+			ZGDeliverUserNotification(ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationTitle"), self.currentProcess.name, [NSString stringWithFormat:@"%@ %@", ZGLocalizedStringFromDebuggerTable(@"hitBreakpointNotificationMessage"), currentBreakPoint.variable.addressStringValue], nil);
 		}
 		else if (breakPoint.error != nil)
 		{
@@ -2056,8 +2045,9 @@ enum ZGStepExecution
 
 - (IBAction)stepInto:(id)__unused sender
 {
-	[self.breakPointController addSingleStepBreakPointFromBreakPoint:self.currentBreakPoint];
-	[self resumeBreakPoint:self.currentBreakPoint];
+	ZGBreakPoint *currentBreakPoint = self.currentBreakPoint;
+	[self.breakPointController addSingleStepBreakPointFromBreakPoint:currentBreakPoint];
+	[self resumeBreakPoint:currentBreakPoint];
 }
 
 - (IBAction)stepOver:(id)__unused sender
@@ -2128,7 +2118,7 @@ enum ZGStepExecution
 	{
 		[self.breakPointController removeObserver:self];
 		
-		for (ZGBreakPoint *breakPoint in self.haltedBreakPoints)
+		for (ZGBreakPoint *breakPoint in _haltedBreakPoints)
 		{
 			[self continueFromBreakPoint:breakPoint];
 		}
@@ -2141,7 +2131,7 @@ enum ZGStepExecution
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier
 {
-	return [self.haltedBreakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) { return (BOOL)(breakPoint.process.processID == processIdentifier); }];
+	return [_haltedBreakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) { return (BOOL)(breakPoint.process.processID == processIdentifier); }];
 }
 
 #pragma mark Breakpoint Conditions
