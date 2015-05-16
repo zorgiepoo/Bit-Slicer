@@ -125,6 +125,9 @@ enum ZGStepExecution
 };
 
 @implementation ZGDebuggerController
+{
+	BOOL _cleanedUp;
+}
 
 #pragma mark Birth & Death
 
@@ -2121,15 +2124,17 @@ enum ZGStepExecution
 
 - (void)cleanup
 {
-	static dispatch_once_t once;
-	dispatch_once(&once, ^{
+	if (!_cleanedUp)
+	{
 		[self.breakPointController removeObserver:self];
 		
 		for (ZGBreakPoint *breakPoint in self.haltedBreakPoints)
 		{
 			[self continueFromBreakPoint:breakPoint];
 		}
-	});
+		
+		_cleanedUp = YES;
+	}
 	
 	[super cleanup];
 }
