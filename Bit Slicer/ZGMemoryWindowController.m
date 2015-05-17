@@ -33,7 +33,8 @@
  */
 
 #import "ZGMemoryWindowController.h"
-#import "ZGDebuggerController.h" // For seeing if we can pause/unpause a process
+#import "ZGBreakPoint.h" // For seeing if we can pause/unpause a process
+#import "NSArrayAdditions.h"
 #import "ZGProcessList.h"
 #import "ZGRunningProcess.h"
 #import "ZGProcess.h"
@@ -658,6 +659,16 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 	}
 }
 
+- (BOOL)isProcessIdentifier:(pid_t)processIdentifier inHaltedBreakPoints:(NSArray *)haltedBreakPoints
+{
+	return [haltedBreakPoints zgHasObjectMatchingCondition:^BOOL (ZGBreakPoint *breakPoint) { return (breakPoint.process.processID == processIdentifier); }];
+}
+
+- (BOOL)isProcessIdentifierHalted:(pid_t)__unused processIdentifier
+{
+	return NO;
+}
+
 #pragma mark Menu Item Validation
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
@@ -684,7 +695,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 			menuItem.title = ZGLocalizedStringFromMemoryWindowTable(localizableKey);
 		}
 		
-		if ([self.debuggerController isProcessIdentifierHalted:self.currentProcess.processID])
+		if ([self isProcessIdentifierHalted:self.currentProcess.processID])
 		{
 			return NO;
 		}

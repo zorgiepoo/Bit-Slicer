@@ -55,8 +55,6 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;
 
-@property (nonatomic, assign) id debuggerController;
-
 @property (nonatomic, assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 
 @property (nonatomic) NSUndoManager *undoManager;
@@ -71,6 +69,9 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 - (void)cleanup;
 
 - (IBAction)pauseOrUnpauseProcess:(id)sender;
+
+- (BOOL)isProcessIdentifier:(pid_t)processIdentifier inHaltedBreakPoints:(NSArray *)haltedBreakPoints;
+- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier; // should be overridden
 
 - (void)updateWindow;
 

@@ -73,6 +73,9 @@
 @end
 
 @implementation ZGMemoryViewerController
+{
+	NSMutableArray *_haltedBreakPoints;
+}
 
 #pragma mark Accessors
 
@@ -116,6 +119,16 @@
 	dispatch_once(&onceToken, ^{
 		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGMemoryViewerShowsDataInspector : @NO}];
 	});
+}
+
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints
+{
+	self = [super initWithProcessTaskManager:processTaskManager];
+	if (self != nil)
+	{
+		_haltedBreakPoints = haltedBreakPoints;
+	}
+	return self;
 }
 
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder
@@ -224,6 +237,11 @@
 }
 
 #pragma mark Menu Item Validation
+
+- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier
+{
+	return [super isProcessIdentifier:processIdentifier inHaltedBreakPoints:_haltedBreakPoints];
+}
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem
 {

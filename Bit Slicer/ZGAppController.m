@@ -100,8 +100,10 @@
 		 hotKeyCenter:self.hotKeyCenter
 		 loggerWindowController:self.loggerWindowController];
 		
-		self.memoryViewer = [[ZGMemoryViewerController alloc] initWithProcessTaskManager:self.processTaskManager];
-		self.memoryViewer.debuggerController = self.debuggerController;
+		self.memoryViewer =
+		[[ZGMemoryViewerController alloc]
+		 initWithProcessTaskManager:self.processTaskManager
+		 haltedBreakPoints:self.debuggerController.haltedBreakPoints];
 		
 		self.documentController =
 		[[ZGDocumentController alloc]

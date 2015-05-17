@@ -124,8 +124,6 @@
 
 @implementation ZGDocumentWindowController
 
-@dynamic debuggerController;
-
 - (id)initWithDocument:(ZGDocument *)document
 {
 	self = [super initWithProcessTaskManager:document.processTaskManager];
@@ -839,6 +837,11 @@
 	[self.tableController.variablesTableView reloadData];
 	
 	[self updateNumberOfValuesDisplayedStatus];
+}
+
+- (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier
+{
+	return [super isProcessIdentifier:processIdentifier inHaltedBreakPoints:self.debuggerController.haltedBreakPoints];
 }
 
 #pragma mark Menu item validation

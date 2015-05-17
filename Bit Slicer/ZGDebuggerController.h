@@ -61,6 +61,8 @@ extern NSString *ZGStepOutHotKey;
 
 - (void)cleanup;
 
+@property (nonatomic, readonly) NSMutableArray *haltedBreakPoints;
+
 @property (nonatomic, readonly) ZGHotKey *pauseAndUnpauseHotKey;
 @property (nonatomic, readonly) ZGHotKey *stepInHotKey;
 @property (nonatomic, readonly) ZGHotKey *stepOverHotKey;

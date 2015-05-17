@@ -124,7 +124,6 @@ enum ZGStepExecution
 @implementation ZGDebuggerController
 {
 	BOOL _cleanedUp;
-	NSMutableArray *_haltedBreakPoints;
 }
 
 #pragma mark Birth & Death
@@ -170,7 +169,6 @@ enum ZGStepExecution
 	
 	if (self != nil)
 	{
-		self.debuggerController = self;
 		self.breakPointController = breakPointController;
 		self.scriptingInterpreter = scriptingInterpreter;
 		self.loggerWindowController = loggerWindowController;
@@ -2131,7 +2129,7 @@ enum ZGStepExecution
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier
 {
-	return [_haltedBreakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) { return (BOOL)(breakPoint.process.processID == processIdentifier); }];
+	return [super isProcessIdentifier:processIdentifier inHaltedBreakPoints:_haltedBreakPoints];
 }
 
 #pragma mark Breakpoint Conditions
