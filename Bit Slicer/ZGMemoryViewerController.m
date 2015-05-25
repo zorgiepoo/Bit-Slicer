@@ -62,7 +62,7 @@
 @property (nonatomic) ZGStatusBarRepresenter *statusBarRepresenter;
 @property (nonatomic) ZGLineCountingRepresenter *lineCountingRepresenter;
 @property (nonatomic) DataInspectorRepresenter *dataInspectorRepresenter;
-@property (atomic) BOOL showsDataInspector;
+@property (nonatomic) BOOL showsDataInspector;
 
 @property (strong, nonatomic) NSData *lastUpdatedData;
 @property (nonatomic) HFRange lastUpdatedRange;

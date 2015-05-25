@@ -60,7 +60,7 @@
 @property (nonatomic) ZGSearchProgress *searchProgress;
 @property (nonatomic) ZGSearchResults *temporarySearchResults;
 @property (nonatomic) ZGStoredData *tempSavedData;
-@property (atomic) BOOL isBusy;
+@property (nonatomic) BOOL isBusy;
 
 @property (nonatomic) ZGVariableType dataType;
 @property (nonatomic) ZGFunctionType functionType;

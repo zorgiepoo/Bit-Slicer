@@ -417,7 +417,12 @@ static PyObject *Debugger_prompt(DebuggerClass *self, PyObject *args)
 	ZGPyDebugger *selfReference = self->objcSelf;
 	ZGScriptManager *scriptManager = selfReference.scriptManager;
 	
-	if (scriptManager.hasAttachedPrompt)
+	__block BOOL attachedPrompt = NO;
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		attachedPrompt = scriptManager.hasAttachedPrompt;
+	});
+	
+	if (attachedPrompt)
 	{
 		PyErr_SetString(gDebuggerException, "debug.prompt failed because a prompt is already visible");
 		return NULL;
@@ -907,15 +912,17 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint
 {
 	ZGRegistersState *registersState = breakPoint.registersState;
+	ZGMemoryAddress breakPointBasePointer = breakPoint.basePointer;
+	BOOL hidden = breakPoint.hidden;
 	
 	dispatch_async(_pythonQueue, ^{
 		self.haltedBreakPoint = breakPoint;
 		
-		if (breakPoint.hidden)
+		if (hidden)
 		{
 			ZGMemoryAddress basePointer = breakPoint.process.is64Bit ? registersState.generalPurposeThreadState.uts.ts64.__rbp : registersState.generalPurposeThreadState.uts.ts32.__ebp;
 			
-			if (basePointer == breakPoint.basePointer)
+			if (basePointer == breakPointBasePointer)
 			{
 				[self.breakPointController removeInstructionBreakPoint:breakPoint];
 				

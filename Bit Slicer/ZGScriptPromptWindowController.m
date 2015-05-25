@@ -39,7 +39,7 @@
 
 @property (nonatomic) ZGScriptPrompt *scriptPrompt;
 
-@property (atomic) BOOL isAttached;
+@property (nonatomic) BOOL isAttached;
 @property (nonatomic, weak) id <ZGScriptPromptDelegate> delegate;
 
 @end

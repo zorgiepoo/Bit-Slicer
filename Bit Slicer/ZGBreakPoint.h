@@ -62,9 +62,9 @@ typedef enum
 @property (atomic) NSArray *debugThreads;
 @property (readonly, nonatomic) ZGBreakPointType type;
 @property (atomic) BOOL needsToRestore;
-@property (atomic) BOOL hidden;
+@property (nonatomic) BOOL hidden;
 @property (atomic) BOOL dead;
-@property (atomic) ZGMemoryAddress basePointer;
+@property (nonatomic) ZGMemoryAddress basePointer;
 @property (nonatomic) NSMutableDictionary *cacheDictionary;
 @property (nonatomic) PyObject *condition;
 @property (nonatomic) PyObject *callback;

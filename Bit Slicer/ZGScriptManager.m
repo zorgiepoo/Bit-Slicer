@@ -70,7 +70,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 @property (nonatomic) NSMutableDictionary *scriptsDictionary;
 @property (nonatomic) VDKQueue *fileWatchingQueue;
 @property (nonatomic, assign) ZGDocumentWindowController *windowController;
-@property (atomic) dispatch_source_t scriptTimer;
+@property (nonatomic) dispatch_source_t scriptTimer; // only accessed on python queue
 @property (atomic) NSMutableArray *runningScripts;
 @property (nonatomic) NSMutableArray *objectsPool;
 @property (nonatomic) id scriptActivity;
@@ -790,6 +790,8 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 - (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
+		BOOL breakPointHidden = breakPoint.hidden;
+		
 		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(self->_pythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
@@ -801,7 +803,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 					[self handleFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"instruction breakpoint callback"];
 					Py_XDECREF(result);
 					
-					if (breakPoint.hidden && breakPoint.callback != NULL)
+					if (breakPointHidden && breakPoint.callback != NULL)
 					{
 						Py_DecRef(breakPoint.callback);
 						breakPoint.callback = NULL;
