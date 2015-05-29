@@ -45,7 +45,7 @@
 	
 	if (self != nil)
 	{
-		self.navigationManager = [[NSUndoManager alloc] init];
+		_navigationManager = [[NSUndoManager alloc] init];
 	}
 	
 	return self;
@@ -61,7 +61,7 @@
 {
 	[super setCurrentProcess:newProcess];
 	
-	[self.navigationManager removeAllActions];
+	[_navigationManager removeAllActions];
 	[self updateNavigationButtons];
 }
 
@@ -69,19 +69,19 @@
 {
 	[super switchProcess];
 	
-	[self.navigationManager removeAllActions];
+	[_navigationManager removeAllActions];
 	[self updateNavigationButtons];
 }
 
 - (IBAction)goBack:(id)__unused sender
 {
-	[self.navigationManager undo];
+	[_navigationManager undo];
 	[self updateNavigationButtons];
 }
 
 - (IBAction)goForward:(id)__unused sender
 {
-	[self.navigationManager redo];
+	[_navigationManager redo];
 	[self updateNavigationButtons];
 }
 
@@ -107,13 +107,13 @@
 {
 	if ([self canEnableNavigationButtons])
 	{
-		[self.navigationSegmentedControl setEnabled:self.navigationManager.canUndo forSegment:ZGNavigationBack];
-		[self.navigationSegmentedControl setEnabled:self.navigationManager.canRedo forSegment:ZGNavigationForward];
+		[_navigationSegmentedControl setEnabled:_navigationManager.canUndo forSegment:ZGNavigationBack];
+		[_navigationSegmentedControl setEnabled:_navigationManager.canRedo forSegment:ZGNavigationForward];
 	}
 	else
 	{
-		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationBack];
-		[self.navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationForward];
+		[_navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationBack];
+		[_navigationSegmentedControl setEnabled:NO forSegment:ZGNavigationForward];
 	}
 }
 
@@ -136,7 +136,7 @@
 			return NO;
 		}
 		
-		if ((userInterfaceItem.action == @selector(goBack:) && !self.navigationManager.canUndo) || (userInterfaceItem.action == @selector(goForward:) && !self.navigationManager.canRedo))
+		if ((userInterfaceItem.action == @selector(goBack:) && !_navigationManager.canUndo) || (userInterfaceItem.action == @selector(goForward:) && !_navigationManager.canRedo))
 		{
 			return NO;
 		}

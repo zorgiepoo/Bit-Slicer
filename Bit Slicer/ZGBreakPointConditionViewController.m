@@ -34,31 +34,28 @@
 
 #import "ZGBreakPointConditionViewController.h"
 
-@interface ZGBreakPointConditionViewController ()
-
-@property (nonatomic, weak) id <ZGBreakPointConditionDelegate> delegate;
-
-@property (nonatomic, assign) IBOutlet NSTextField *conditionTextField;
-
-@end
-
 @implementation ZGBreakPointConditionViewController
+{
+	__weak id <ZGBreakPointConditionDelegate> _delegate;
+	
+	IBOutlet NSTextField *_conditionTextField;
+}
 
 - (id)initWithDelegate:(id <ZGBreakPointConditionDelegate>)delegate
 {
 	self = [self initWithNibName:@"Breakpoint Condition View" bundle:nil];
     if (self != nil)
 	{
-		self.delegate = delegate;
+		_delegate = delegate;
     }
     return self;
 }
 
 - (void)updateConditionDisplay
 {
-	if (self.condition != nil)
+	if (_condition != nil)
 	{
-		[self.conditionTextField setStringValue:self.condition];
+		[_conditionTextField setStringValue:_condition];
 	}
 }
 
@@ -70,13 +67,13 @@
 
 - (IBAction)changeCondition:(id)__unused sender
 {
-	id <ZGBreakPointConditionDelegate> delegate = self.delegate;
-	[delegate breakPointCondition:[self.conditionTextField stringValue] didChangeAtAddress:self.targetAddress];
+	id <ZGBreakPointConditionDelegate> delegate = _delegate;
+	[delegate breakPointCondition:_conditionTextField.stringValue didChangeAtAddress:self.targetAddress];
 }
 
 - (IBAction)cancel:(id)__unused sender
 {
-	id <ZGBreakPointConditionDelegate> delegate = self.delegate;
+	id <ZGBreakPointConditionDelegate> delegate = _delegate;
 	[delegate breakPointConditionDidCancel];
 }
 

@@ -83,46 +83,33 @@
 #define ZGEndianLittle @"ZGEndianLittle"
 #define ZGEndianBig @"ZGEndianBig"
 
-@interface ZGDocumentWindowController ()
-
-@property (nonatomic) NSString *flagsStringValue;
-@property (nonatomic) NSString *flagsLabelStringValue;
-
-@property (nonatomic) ZGDebuggerController *debuggerController;
-@property (nonatomic) ZGBreakPointController *breakPointController;
-@property (nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
-@property (nonatomic) ZGMemoryViewerController *memoryViewer;
-@property (nonatomic) ZGLoggerWindowController *loggerWindowController;
-@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
-
-@property (nonatomic) ZGWatchVariableWindowController *watchVariableWindowController;
-
-@property (nonatomic) ZGEditValueWindowController *editValueWindowController;
-@property (nonatomic) ZGEditAddressWindowController *editAddressWindowController;
-@property (nonatomic) ZGEditDescriptionWindowController *editDescriptionWindowController;
-@property (nonatomic) ZGEditSizeWindowController *editSizeWindowController;
-
-@property (nonatomic, assign) IBOutlet NSTableColumn *dataTypeTableColumn;
-
-@property (nonatomic, assign) IBOutlet AGScopeBar *scopeBar;
-@property (nonatomic, assign) IBOutlet NSView *scopeBarFlagsView;
-
-@property (nonatomic) AGScopeBarGroup *protectionGroup;
-@property (nonatomic) AGScopeBarGroup *qualifierGroup;
-@property (nonatomic) AGScopeBarGroup *stringMatchingGroup;
-@property (nonatomic) AGScopeBarGroup *endianGroup;
-
-@property (nonatomic, assign) IBOutlet NSTextField *generalStatusTextField;
-@property (nonatomic, assign) IBOutlet NSTextField *flagsTextField;
-@property (nonatomic, assign) IBOutlet NSTextField *flagsLabel;
-
-@property (nonatomic) NSPopover *advancedOptionsPopover;
-
-@property (nonatomic) BOOL loadedDocumentBefore;
-
-@end
-
 @implementation ZGDocumentWindowController
+{
+	ZGDebuggerController *_debuggerController;
+	ZGWatchVariableWindowController *_watchVariableWindowController;
+	
+	ZGEditValueWindowController *_editValueWindowController;
+	ZGEditAddressWindowController *_editAddressWindowController;
+	ZGEditDescriptionWindowController *_editDescriptionWindowController;
+	ZGEditSizeWindowController *_editSizeWindowController;
+	
+	BOOL _loadedDocumentBefore;
+	NSString *_flagsLabelStringValue;
+	
+	AGScopeBarGroup *_protectionGroup;
+	AGScopeBarGroup *_qualifierGroup;
+	AGScopeBarGroup *_stringMatchingGroup;
+	AGScopeBarGroup *_endianGroup;
+	
+	NSPopover *_advancedOptionsPopover;
+	
+	IBOutlet NSTableColumn *_dataTypeTableColumn;
+	IBOutlet NSTextField *_generalStatusTextField;
+	IBOutlet NSTextField *_flagsTextField;
+	IBOutlet NSTextField *_flagsLabel;
+	IBOutlet AGScopeBar *_scopeBar;
+	IBOutlet NSView *_scopeBarFlagsView;
+}
 
 - (id)initWithDocument:(ZGDocument *)document
 {
@@ -131,11 +118,11 @@
 	{
 		self.lastChosenInternalProcessName = document.lastChosenInternalProcessName;
 		
-		self.debuggerController = document.debuggerController;
-		self.breakPointController = document.breakPointController;
-		self.scriptingInterpreter = document.scriptingInterpreter;
-		self.loggerWindowController = document.loggerWindowController;
-		self.hotKeyCenter = document.hotKeyCenter;
+		_debuggerController = document.debuggerController;
+		_breakPointController = document.breakPointController;
+		_scriptingInterpreter = document.scriptingInterpreter;
+		_loggerWindowController = document.loggerWindowController;
+		_hotKeyCenter = document.hotKeyCenter;
 	}
 	return self;
 }
@@ -147,45 +134,45 @@
 
 - (void)dealloc
 {
-	[self.searchController cleanUp];
-	[self.tableController cleanUp];
-	[self.scriptManager cleanup];
+	[_searchController cleanUp];
+	[_tableController cleanUp];
+	[_scriptManager cleanup];
 }
 
 - (void)setupScopeBar
 {
-	self.protectionGroup = [self.scopeBar addGroupWithIdentifier:ZGProtectionGroup label:ZGLocalizableSearchDocumentString(@"scopeBarProtectionGroup") items:nil];
-	[self.protectionGroup
+	_protectionGroup = [_scopeBar addGroupWithIdentifier:ZGProtectionGroup label:ZGLocalizableSearchDocumentString(@"scopeBarProtectionGroup") items:nil];
+	[_protectionGroup
 	 addItemWithIdentifier:ZGProtectionItemAll
 	 title:ZGLocalizableSearchDocumentString(@"scopeBarProtectionAllItem")];
-	[self.protectionGroup
+	[_protectionGroup
 	 addItemWithIdentifier:ZGProtectionItemWrite
 	 title:ZGLocalizableSearchDocumentString(@"scopeBarProtectionWriteItem")];
-	[self.protectionGroup
+	[_protectionGroup
 	 addItemWithIdentifier:ZGProtectionItemExecute
 	 title:ZGLocalizableSearchDocumentString(@"scopeBarProtectionExecuteItem")];
-	self.protectionGroup.selectionMode = AGScopeBarGroupSelectOne;
+	_protectionGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
-	self.qualifierGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGQualifierGroup];
-	self.qualifierGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarQualifierGroup");
-	[self.qualifierGroup addItemWithIdentifier:ZGQualifierSigned title:ZGLocalizableSearchDocumentString(@"scopeBarQualifierSignedItem")];
-	[self.qualifierGroup addItemWithIdentifier:ZGQualifierUnsigned title:ZGLocalizableSearchDocumentString(@"scopeBarQualifierUnsignedItem")];
-	self.qualifierGroup.selectionMode = AGScopeBarGroupSelectOne;
+	_qualifierGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGQualifierGroup];
+	_qualifierGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarQualifierGroup");
+	[_qualifierGroup addItemWithIdentifier:ZGQualifierSigned title:ZGLocalizableSearchDocumentString(@"scopeBarQualifierSignedItem")];
+	[_qualifierGroup addItemWithIdentifier:ZGQualifierUnsigned title:ZGLocalizableSearchDocumentString(@"scopeBarQualifierUnsignedItem")];
+	_qualifierGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
-	self.stringMatchingGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGStringMatchingGroup];
-	self.stringMatchingGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarStringMatchingGroup");
-	[self.stringMatchingGroup addItemWithIdentifier:ZGStringIgnoreCase title:ZGLocalizableSearchDocumentString(@"scopeBarStringMatchingIgnoreCaseItem")];
-	[self.stringMatchingGroup addItemWithIdentifier:ZGStringNullTerminated title:ZGLocalizableSearchDocumentString(@"scopeBarStringMatchingNullTerminatedItem")];
-	self.stringMatchingGroup.selectionMode = AGScopeBarGroupSelectAny;
+	_stringMatchingGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGStringMatchingGroup];
+	_stringMatchingGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarStringMatchingGroup");
+	[_stringMatchingGroup addItemWithIdentifier:ZGStringIgnoreCase title:ZGLocalizableSearchDocumentString(@"scopeBarStringMatchingIgnoreCaseItem")];
+	[_stringMatchingGroup addItemWithIdentifier:ZGStringNullTerminated title:ZGLocalizableSearchDocumentString(@"scopeBarStringMatchingNullTerminatedItem")];
+	_stringMatchingGroup.selectionMode = AGScopeBarGroupSelectAny;
 	
-	self.endianGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGEndianGroup];
-	self.endianGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarEndiannessGroup");
-	[self.endianGroup addItemWithIdentifier:ZGEndianLittle title:ZGLocalizableSearchDocumentString(@"scopeBarEndianLittleItem")];
-	[self.endianGroup addItemWithIdentifier:ZGEndianBig title:ZGLocalizableSearchDocumentString(@"scopeBarEndianBigItem")];
-	self.endianGroup.selectionMode = AGScopeBarGroupSelectOne;
+	_endianGroup = [[AGScopeBarGroup alloc] initWithIdentifier:ZGEndianGroup];
+	_endianGroup.label = ZGLocalizableSearchDocumentString(@"scopeBarEndiannessGroup");
+	[_endianGroup addItemWithIdentifier:ZGEndianLittle title:ZGLocalizableSearchDocumentString(@"scopeBarEndianLittleItem")];
+	[_endianGroup addItemWithIdentifier:ZGEndianBig title:ZGLocalizableSearchDocumentString(@"scopeBarEndianBigItem")];
+	_endianGroup.selectionMode = AGScopeBarGroupSelectOne;
 	
 	// Set delegate after setting up scope bar so we won't receive initial selection events beforehand
-	self.scopeBar.delegate = self;
+	_scopeBar.delegate = self;
 }
 
 - (void)scopeBar:(AGScopeBar *)__unused scopeBar item:(AGScopeBarItem *)item wasSelected:(BOOL)selected
@@ -196,15 +183,15 @@
 		{
 			if ([item.identifier isEqualToString:ZGProtectionItemAll])
 			{
-				self.searchData.protectionMode = ZGProtectionAll;
+				_searchData.protectionMode = ZGProtectionAll;
 			}
 			else if ([item.identifier isEqualToString:ZGProtectionItemWrite])
 			{
-				self.searchData.protectionMode = ZGProtectionWrite;
+				_searchData.protectionMode = ZGProtectionWrite;
 			}
 			else if ([item.identifier isEqualToString:ZGProtectionItemExecute])
 			{
-				self.searchData.protectionMode = ZGProtectionExecute;
+				_searchData.protectionMode = ZGProtectionExecute;
 			}
 			
 			[self markDocumentChange];
@@ -221,11 +208,11 @@
 	{
 		if ([item.identifier isEqualToString:ZGStringIgnoreCase])
 		{
-			self.searchData.shouldIgnoreStringCase = selected;
+			_searchData.shouldIgnoreStringCase = selected;
 		}
 		else if ([item.identifier isEqualToString:ZGStringNullTerminated])
 		{
-			self.searchData.shouldIncludeNullTerminator = selected;
+			_searchData.shouldIncludeNullTerminator = selected;
 		}
 		
 		[self markDocumentChange];
@@ -234,11 +221,11 @@
 	{
 		CFByteOrder newByteOrder = [item.identifier isEqualToString:ZGEndianLittle] ? CFByteOrderLittleEndian : CFByteOrderBigEndian;
 		
-		if (newByteOrder != self.documentData.byteOrderTag)
+		if (newByteOrder != _documentData.byteOrderTag)
 		{
-			self.documentData.byteOrderTag = newByteOrder;
+			_documentData.byteOrderTag = newByteOrder;
 			
-			for (ZGVariable *variable in self.documentData.variables)
+			for (ZGVariable *variable in _documentData.variables)
 			{
 				variable.byteOrder = newByteOrder;
 				if (ZGSupportsEndianness(variable.type))
@@ -247,7 +234,7 @@
 				}
 			}
 			
-			[self.variablesTableView reloadData];
+			[_variablesTableView reloadData];
 			[self markDocumentChange];
 		}
 	}
@@ -257,48 +244,46 @@
 {
 	[super windowDidLoad];
 	
-	self.documentData = [(ZGDocument *)self.document data];
-	self.searchData = [self.document searchData];
+	_documentData = [(ZGDocument *)self.document data];
+	_searchData = [self.document searchData];
 	
-	self.tableController = [[ZGDocumentTableController alloc] initWithWindowController:self];
-	self.variableController = [[ZGVariableController alloc] initWithWindowController:self];
-	self.searchController = [[ZGDocumentSearchController alloc] initWithWindowController:self];
-	self.scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
+	_tableController = [[ZGDocumentTableController alloc] initWithWindowController:self];
+	_variableController = [[ZGVariableController alloc] initWithWindowController:self];
+	_searchController = [[ZGDocumentSearchController alloc] initWithWindowController:self];
+	_scriptManager = [[ZGScriptManager alloc] initWithWindowController:self];
 	
-	self.tableController.variablesTableView = self.variablesTableView;
+	_searchValueTextField.target = self;
+	_searchValueTextField.action = @selector(searchValue:);
 	
-	self.searchValueTextField.target = self;
-	self.searchValueTextField.action = @selector(searchValue:);
-	
-	NSSearchFieldCell *searchFieldCell = self.searchValueTextField.cell;
+	NSSearchFieldCell *searchFieldCell = _searchValueTextField.cell;
 	searchFieldCell.cancelButtonCell.target = self;
 	searchFieldCell.cancelButtonCell.action = @selector(clearSearchValues:);
 	
 	[self setupScopeBar];
-	ZGAdjustLocalizableWidthsForTableColumns(self.window, @[self.dataTypeTableColumn], @{@"ru" : @[@60.0]});
+	ZGAdjustLocalizableWidthsForTableColumns(self.window, @[_dataTypeTableColumn], @{@"ru" : @[@60.0]});
 	
-	[self.storeValuesButton.image setTemplate:YES];
+	[_storeValuesButton.image setTemplate:YES];
 	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
 	
-	self.storeValuesButton.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");
+	_storeValuesButton.toolTip = ZGLocalizableSearchDocumentString(@"storeValuesButtonToolTip");
 	
-	[self.generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
+	[_generalStatusTextField.cell setBackgroundStyle:NSBackgroundStyleRaised];
 
 	[self setupProcessListNotifications];
 	[self loadDocumentUserInterface];
 
-	self.loadedDocumentBefore = YES;
+	_loadedDocumentBefore = YES;
 }
 
 - (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess
 {
-	for (ZGVariable *variable in self.documentData.variables)
+	for (ZGVariable *variable in _documentData.variables)
 	{
 		if (variable.enabled)
 		{
 			if (variable.type == ZGScript)
 			{
-				[self.scriptManager stopScriptForVariable:variable];
+				[_scriptManager stopScriptForVariable:variable];
 			}
 			else if (variable.isFrozen)
 			{
@@ -309,9 +294,9 @@
 
 	[self.undoManager removeAllActions];
 
-	[self.tableController clearCache];
+	[_tableController clearCache];
 
-	for (ZGVariable *variable in self.documentData.variables)
+	for (ZGVariable *variable in _documentData.variables)
 	{
 		variable.finishedEvaluatingDynamicAddress = NO;
 		variable.rawValue = NULL;
@@ -319,7 +304,7 @@
 
 	if (oldProcess.is64Bit != newProcess.is64Bit)
 	{
-		for (ZGVariable *variable in self.documentData.variables)
+		for (ZGVariable *variable in _documentData.variables)
 		{
 			if (variable.type == ZGPointer)
 			{
@@ -333,17 +318,17 @@
 		[self markDocumentChange];
 	}
 
-	[self.tableController updateWatchVariablesTimer];
+	[_tableController updateWatchVariablesTimer];
 
-	[self.tableController.variablesTableView reloadData];
+	[_variablesTableView reloadData];
 
-	self.storeValuesButton.enabled = newProcess.valid;
+	_storeValuesButton.enabled = newProcess.valid;
 
 	if (oldProcess.valid && !newProcess.valid)
 	{
-		if (self.searchController.canCancelTask && !self.searchController.searchProgress.shouldCancelSearch)
+		if (_searchController.canCancelTask && !_searchController.searchProgress.shouldCancelSearch)
 		{
-			[self.searchController cancelTask];
+			[_searchController cancelTask];
 		}
 
 		[[NSNotificationCenter defaultCenter]
@@ -359,16 +344,16 @@
 
 - (void)startProcessActivity
 {
-	[self.tableController updateWatchVariablesTimer];
+	[_tableController updateWatchVariablesTimer];
 	[super startProcessActivity];
 }
 
 - (void)stopProcessActivity
 {
-	BOOL shouldKeepWatchVariablesTimer = [self.tableController updateWatchVariablesTimer];
-	if (!shouldKeepWatchVariablesTimer && self.searchController.canStartTask)
+	BOOL shouldKeepWatchVariablesTimer = [_tableController updateWatchVariablesTimer];
+	if (!shouldKeepWatchVariablesTimer && _searchController.canStartTask)
 	{
-		BOOL foundRunningScript = [self.documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
+		BOOL foundRunningScript = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) {
 			return (BOOL)(variable.enabled && variable.type == ZGScript);
 		}];
 
@@ -381,12 +366,12 @@
 
 - (void)setStatusString:(NSString *)statusString
 {
-	[self.generalStatusTextField setStringValue:statusString];
+	[_generalStatusTextField setStringValue:statusString];
 }
 
 - (void)updateNumberOfValuesDisplayedStatus
 {
-	NSUInteger variableCount = self.documentData.variables.count + self.searchController.searchResults.addressCount;
+	NSUInteger variableCount = _documentData.variables.count + _searchController.searchResults.addressCount;
 	
 	NSNumberFormatter *numberOfVariablesFormatter = [[NSNumberFormatter alloc] init];
 	[numberOfVariablesFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
@@ -404,7 +389,7 @@
 
 - (void)setDesiredProcessInternalName:(NSString *)desiredProcessInternalName
 {
-	BOOL needsToMarkDocumentChange = self.loadedDocumentBefore && (self.desiredProcessInternalName == nil || ![self.desiredProcessInternalName isEqualToString:desiredProcessInternalName]);
+	BOOL needsToMarkDocumentChange = _loadedDocumentBefore && (self.desiredProcessInternalName == nil || ![self.desiredProcessInternalName isEqualToString:desiredProcessInternalName]);
 	
 	[super setDesiredProcessInternalName:desiredProcessInternalName];
 
@@ -413,87 +398,87 @@
 		[self markDocumentChange];
 	}
 
-	self.documentData.desiredProcessInternalName = desiredProcessInternalName;
+	_documentData.desiredProcessInternalName = desiredProcessInternalName;
 }
 
 - (void)loadDocumentUserInterface
 {
-	self.desiredProcessInternalName = (self.documentData.desiredProcessInternalName != nil) ? self.documentData.desiredProcessInternalName : self.lastChosenInternalProcessName;
+	self.desiredProcessInternalName = (_documentData.desiredProcessInternalName != nil) ? _documentData.desiredProcessInternalName : self.lastChosenInternalProcessName;
 
 	[self updateRunningProcesses];
 	[self setAndPostLastChosenInternalProcessName];
 
 	[self updateNumberOfValuesDisplayedStatus];
 	
-	[self.variableController disableHarmfulVariables:self.documentData.variables];
-	[self updateVariables:self.documentData.variables searchResults:nil];
+	[_variableController disableHarmfulVariables:_documentData.variables];
+	[self updateVariables:_documentData.variables searchResults:nil];
 	
-	switch (self.searchData.protectionMode)
+	switch (_searchData.protectionMode)
 	{
 		case ZGProtectionAll:
-			[self.protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemAll];
+			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemAll];
 			break;
 		case ZGProtectionWrite:
-			[self.protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemWrite];
+			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemWrite];
 			break;
 		case ZGProtectionExecute:
-			[self.protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemExecute];
+			[_protectionGroup setSelected:YES forItemWithIdentifier:ZGProtectionItemExecute];
 			break;
 	}
 	
-	if (self.documentData.qualifierTag == ZGSigned)
+	if (_documentData.qualifierTag == ZGSigned)
 	{
-		[self.qualifierGroup setSelected:YES forItemWithIdentifier:ZGQualifierSigned];
+		[_qualifierGroup setSelected:YES forItemWithIdentifier:ZGQualifierSigned];
 	}
 	else
 	{
-		[self.qualifierGroup setSelected:YES forItemWithIdentifier:ZGQualifierUnsigned];
+		[_qualifierGroup setSelected:YES forItemWithIdentifier:ZGQualifierUnsigned];
 	}
 	
-	if (self.searchData.shouldIgnoreStringCase)
+	if (_searchData.shouldIgnoreStringCase)
 	{
-		[self.stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringIgnoreCase];
+		[_stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringIgnoreCase];
 	}
 	
-	if (self.searchData.shouldIncludeNullTerminator)
+	if (_searchData.shouldIncludeNullTerminator)
 	{
-		[self.stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringNullTerminated];
+		[_stringMatchingGroup setSelected:YES forItemWithIdentifier:ZGStringNullTerminated];
 	}
 	
-	[self.endianGroup setSelected:YES forItemWithIdentifier:self.documentData.byteOrderTag == CFByteOrderBigEndian ? ZGEndianBig : ZGEndianLittle];
+	[_endianGroup setSelected:YES forItemWithIdentifier:_documentData.byteOrderTag == CFByteOrderBigEndian ? ZGEndianBig : ZGEndianLittle];
 	
-	if (self.advancedOptionsPopover != nil)
+	if (_advancedOptionsPopover != nil)
 	{
-		ZGDocumentOptionsViewController *optionsViewController = (id)self.advancedOptionsPopover.contentViewController;
+		ZGDocumentOptionsViewController *optionsViewController = (id)_advancedOptionsPopover.contentViewController;
 		[optionsViewController reloadInterface];
 	}
 	
-	self.searchValueTextField.stringValue = self.documentData.searchValue;
+	_searchValueTextField.stringValue = _documentData.searchValue;
 	
-	[self.window makeFirstResponder:self.searchValueTextField];
+	[self.window makeFirstResponder:_searchValueTextField];
 	
-	[self.dataTypesPopUpButton selectItemWithTag:self.documentData.selectedDatatypeTag];
-	[self selectDataTypeWithTag:(ZGVariableType)self.documentData.selectedDatatypeTag recordUndo:NO];
+	[_dataTypesPopUpButton selectItemWithTag:_documentData.selectedDatatypeTag];
+	[self selectDataTypeWithTag:(ZGVariableType)_documentData.selectedDatatypeTag recordUndo:NO];
 	
-	[self.functionPopUpButton selectItemWithTag:self.documentData.functionTypeTag];
+	[_functionPopUpButton selectItemWithTag:_documentData.functionTypeTag];
 	[self updateOptions];
 	
-	[self.scriptManager loadCachedScriptsFromVariables:self.documentData.variables];
+	[_scriptManager loadCachedScriptsFromVariables:_documentData.variables];
 }
 
 #pragma mark Selected Variables
 
 - (NSIndexSet *)selectedVariableIndexes
 {
-	NSIndexSet *tableIndexSet = self.tableController.variablesTableView.selectedRowIndexes;
-	NSInteger clickedRow = self.tableController.variablesTableView.clickedRow;
+	NSIndexSet *tableIndexSet = _variablesTableView.selectedRowIndexes;
+	NSInteger clickedRow = _variablesTableView.clickedRow;
 	
 	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 }
 
 - (NSArray *)selectedVariables
 {
-	return [self.documentData.variables objectsAtIndexes:[self selectedVariableIndexes]];
+	return [_documentData.variables objectsAtIndexes:[self selectedVariableIndexes]];
 }
 
 - (HFRange)preferredMemoryRequestRange
@@ -541,15 +526,15 @@
 
 - (BOOL)isClearable
 {
-	return (self.documentData.variables.count > 0 && [self.searchController canStartTask]);
+	return (_documentData.variables.count > 0 && [_searchController canStartTask]);
 }
 
 - (void)changeIntegerQualifier:(ZGVariableQualifier)newQualifier
 {
-	ZGVariableQualifier oldQualifier = (ZGVariableQualifier)self.documentData.qualifierTag;
+	ZGVariableQualifier oldQualifier = (ZGVariableQualifier)_documentData.qualifierTag;
 	if (oldQualifier != newQualifier)
 	{
-		for (ZGVariable *variable in self.documentData.variables)
+		for (ZGVariable *variable in _documentData.variables)
 		{
 			variable.qualifier = newQualifier;
 			switch (variable.type)
@@ -571,23 +556,23 @@
 			}
 		}
 		
-		[self.tableController.variablesTableView reloadData];
+		[_variablesTableView reloadData];
 		[self markDocumentChange];
 		
-		self.documentData.qualifierTag = newQualifier;
+		_documentData.qualifierTag = newQualifier;
 	}
 }
 
 - (void)setFlagsLabelStringValue:(NSString *)flagsLabelStringValue
 {
 	_flagsLabelStringValue = [flagsLabelStringValue copy];
-	[self.flagsLabel setStringValue:_flagsLabelStringValue];
+	[_flagsLabel setStringValue:_flagsLabelStringValue];
 }
 
 - (void)setFlagsStringValue:(NSString *)flagsStringValue
 {
 	_flagsStringValue = [flagsStringValue copy];
-	[self.flagsTextField setStringValue:_flagsStringValue];
+	[_flagsTextField setStringValue:_flagsStringValue];
 }
 
 - (IBAction)changeFlags:(id)sender
@@ -597,46 +582,46 @@
 
 - (void)updateFlagsRangeTextField
 {
-	ZGFunctionType functionType = (ZGFunctionType)self.functionPopUpButton.selectedItem.tag;
+	ZGFunctionType functionType = (ZGFunctionType)_functionPopUpButton.selectedItem.tag;
 	if (functionType == ZGGreaterThan || functionType == ZGGreaterThanStored || functionType == ZGGreaterThanStoredLinear)
 	{
-		self.flagsLabelStringValue = [ZGLocalizableSearchDocumentString(@"searchBelowLabel") stringByAppendingString:@":"];
+		[self setFlagsLabelStringValue:[ZGLocalizableSearchDocumentString(@"searchBelowLabel") stringByAppendingString:@":"]];
 		
-		if (self.documentData.lastBelowRangeValue != nil)
+		if (_documentData.lastBelowRangeValue != nil)
 		{
-			self.flagsStringValue = self.documentData.lastBelowRangeValue;
+			[self setFlagsStringValue:_documentData.lastBelowRangeValue];
 		}
 		else
 		{
-			self.flagsStringValue = @"";
+			[self setFlagsStringValue:@""];
 		}
 	}
 	else if (functionType == ZGLessThan || functionType == ZGLessThanStored || functionType == ZGLessThanStoredLinear)
 	{
-		self.flagsLabelStringValue = [ZGLocalizableSearchDocumentString(@"searchAboveLabel") stringByAppendingString:@":"];
+		[self setFlagsLabelStringValue:[ZGLocalizableSearchDocumentString(@"searchAboveLabel") stringByAppendingString:@":"]];
 		
-		if (self.documentData.lastAboveRangeValue != nil)
+		if (_documentData.lastAboveRangeValue != nil)
 		{
-			self.flagsStringValue = self.documentData.lastAboveRangeValue;
+			[self setFlagsStringValue:_documentData.lastAboveRangeValue];
 		}
 		else
 		{
-			self.flagsStringValue = @"";
+			[self setFlagsStringValue:@""];
 		}
 	}
 }
 
 - (void)changeScopeBarGroup:(AGScopeBarGroup *)group shouldExist:(BOOL)shouldExist
 {
-	BOOL alreadyExists = [self.scopeBar.groups containsObject:group];
+	BOOL alreadyExists = [_scopeBar.groups containsObject:group];
 	if (alreadyExists)
 	{
-		[self.scopeBar removeGroupAtIndex:[self.scopeBar.groups indexOfObject:group]];
+		[_scopeBar removeGroupAtIndex:[_scopeBar.groups indexOfObject:group]];
 	}
 	
 	if (shouldExist)
 	{
-		[self.scopeBar insertGroup:group atIndex:self.scopeBar.groups.count];
+		[_scopeBar insertGroup:group atIndex:_scopeBar.groups.count];
 	}
 }
 
@@ -654,14 +639,14 @@
 		if (ZGIsFunctionTypeEquals(functionType) || ZGIsFunctionTypeNotEquals(functionType))
 		{
 			// epsilon
-			self.flagsLabelStringValue = [ZGLocalizableSearchDocumentString(@"searchRoundErrorLabel") stringByAppendingString:@":"];
-			if (self.documentData.lastEpsilonValue != nil)
+			[self setFlagsLabelStringValue:[ZGLocalizableSearchDocumentString(@"searchRoundErrorLabel") stringByAppendingString:@":"]];
+			if (_documentData.lastEpsilonValue != nil)
 			{
-				self.flagsStringValue = self.documentData.lastEpsilonValue;
+				[self setFlagsStringValue:_documentData.lastEpsilonValue];
 			}
 			else
 			{
-				self.flagsStringValue = @"";
+				[self setFlagsStringValue:@""];
 			}
 		}
 		else
@@ -692,46 +677,46 @@
 		}
 	}
 	
-	[self.functionPopUpButton removeAllItems];
+	[_functionPopUpButton removeAllItems];
 	
-	[self.functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"equalsOperatorTitle") atIndex:0];
-	[[self.functionPopUpButton itemAtIndex:0] setTag:ZGEquals];
+	[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"equalsOperatorTitle") atIndex:0];
+	[[_functionPopUpButton itemAtIndex:0] setTag:ZGEquals];
 	
-	[self.functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"notEqualsOperatorTitle") atIndex:1];
-	[[self.functionPopUpButton itemAtIndex:1] setTag:ZGNotEquals];
+	[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"notEqualsOperatorTitle") atIndex:1];
+	[[_functionPopUpButton itemAtIndex:1] setTag:ZGNotEquals];
 	
 	if (dataType != ZGString8 && dataType != ZGString16 && dataType != ZGByteArray)
 	{
-		[self.functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") atIndex:2];
-		[[self.functionPopUpButton itemAtIndex:2] setTag:ZGGreaterThan];
+		[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"greaterThanOperatorTitle") atIndex:2];
+		[[_functionPopUpButton itemAtIndex:2] setTag:ZGGreaterThan];
 		
-		[self.functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") atIndex:3];
-		[[self.functionPopUpButton itemAtIndex:3] setTag:ZGLessThan];
+		[_functionPopUpButton insertItemWithTitle:ZGLocalizableSearchDocumentString(@"lessThanOperatorTitle") atIndex:3];
+		[[_functionPopUpButton itemAtIndex:3] setTag:ZGLessThan];
 	}
 	
-	if (![self.functionPopUpButton selectItemWithTag:self.documentData.functionTypeTag])
+	if (![_functionPopUpButton selectItemWithTag:_documentData.functionTypeTag])
 	{
-		self.documentData.functionTypeTag = self.functionPopUpButton.selectedTag;
+		_documentData.functionTypeTag = _functionPopUpButton.selectedTag;
 	}
 	
 	BOOL needsEndianness = ZGSupportsEndianness(dataType);
 	
-	[self changeScopeBarGroup:self.qualifierGroup shouldExist:needsQualifier];
-	[self changeScopeBarGroup:self.stringMatchingGroup shouldExist:needsStringMatching];
-	[self changeScopeBarGroup:self.endianGroup shouldExist:needsEndianness];
+	[self changeScopeBarGroup:_qualifierGroup shouldExist:needsQualifier];
+	[self changeScopeBarGroup:_stringMatchingGroup shouldExist:needsStringMatching];
+	[self changeScopeBarGroup:_endianGroup shouldExist:needsEndianness];
 	
 	_showsFlags = needsFlags;
-	self.scopeBar.accessoryView = _showsFlags ? self.scopeBarFlagsView : nil;
+	_scopeBar.accessoryView = _showsFlags ? _scopeBarFlagsView : nil;
 }
 
 - (void)selectDataTypeWithTag:(ZGVariableType)newTag recordUndo:(BOOL)recordUndo
 {
-	ZGVariableType oldVariableTypeTag = (ZGVariableType)self.documentData.selectedDatatypeTag;
+	ZGVariableType oldVariableTypeTag = (ZGVariableType)_documentData.selectedDatatypeTag;
 	
-	self.documentData.selectedDatatypeTag = newTag;
-	[self.dataTypesPopUpButton selectItemWithTag:newTag];
+	_documentData.selectedDatatypeTag = newTag;
+	[_dataTypesPopUpButton selectItemWithTag:newTag];
 	
-	self.functionPopUpButton.enabled = YES;
+	_functionPopUpButton.enabled = YES;
 	
 	[self updateOptions];
 	
@@ -751,17 +736,17 @@
 
 - (ZGVariableType)selectedDataType
 {
-	return (ZGVariableType)self.documentData.selectedDatatypeTag;
+	return (ZGVariableType)_documentData.selectedDatatypeTag;
 }
 
 - (ZGFunctionType)selectedFunctionType
 {
-	self.documentData.searchValue = self.searchValueTextField.stringValue;
+	_documentData.searchValue = _searchValueTextField.stringValue;
 	
 	BOOL isLinearlyExpressedStoredValue = NO;
-	BOOL isStoringValues = [[self.searchController class] hasStoredValueTokenFromExpression:self.documentData.searchValue isLinearlyExpressed:&isLinearlyExpressedStoredValue];
+	BOOL isStoringValues = [[_searchController class] hasStoredValueTokenFromExpression:_documentData.searchValue isLinearlyExpressed:&isLinearlyExpressedStoredValue];
 
-	ZGFunctionType functionType = (ZGFunctionType)self.documentData.functionTypeTag;
+	ZGFunctionType functionType = (ZGFunctionType)_documentData.functionTypeTag;
 	if (isStoringValues)
 	{
 		switch (functionType)
@@ -795,29 +780,29 @@
 
 - (IBAction)functionTypePopUpButtonRequest:(id)__unused sender
 {
-	self.documentData.functionTypeTag = [self.functionPopUpButton selectedTag];
+	_documentData.functionTypeTag = [_functionPopUpButton selectedTag];
 	[self updateOptions];
 	[self markDocumentChange];
 }
 
 - (void)selectNewFunctionTypeAtIndex:(NSInteger)newIndex
 {
-	NSMenuItem *newItem = [self.functionPopUpButton itemAtIndex:newIndex];
-	[self.functionPopUpButton selectItem:newItem];
+	NSMenuItem *newItem = [_functionPopUpButton itemAtIndex:newIndex];
+	[_functionPopUpButton selectItem:newItem];
 	[self functionTypePopUpButtonRequest:nil];
 }
 
 - (IBAction)goBack:(id)__unused sender
 {
-	NSInteger selectedIndex = [self.functionPopUpButton indexOfSelectedItem];
-	NSInteger newIndex = selectedIndex > 0 ? selectedIndex - 1 : [self.functionPopUpButton numberOfItems] - 1;
+	NSInteger selectedIndex = [_functionPopUpButton indexOfSelectedItem];
+	NSInteger newIndex = selectedIndex > 0 ? selectedIndex - 1 : [_functionPopUpButton numberOfItems] - 1;
 	[self selectNewFunctionTypeAtIndex:newIndex];
 }
 
 - (IBAction)goForward:(id)__unused sender
 {
-	NSInteger selectedIndex = [self.functionPopUpButton indexOfSelectedItem];
-	NSInteger newIndex = selectedIndex < [self.functionPopUpButton numberOfItems] - 1 ? selectedIndex + 1 : 0;
+	NSInteger selectedIndex = [_functionPopUpButton indexOfSelectedItem];
+	NSInteger newIndex = selectedIndex < [_functionPopUpButton numberOfItems] - 1 ? selectedIndex + 1 : 0;
 	[self selectNewFunctionTypeAtIndex:newIndex];
 }
 
@@ -827,21 +812,21 @@
 {
 	if (self.undoManager.isUndoing || self.undoManager.isRedoing)
 	{
-		[[self.undoManager prepareWithInvocationTarget:self] updateVariables:self.documentData.variables searchResults:self.searchController.searchResults];
+		[[self.undoManager prepareWithInvocationTarget:self] updateVariables:_documentData.variables searchResults:_searchController.searchResults];
 	}
 	
-	self.documentData.variables = newWatchVariablesArray;
-	self.searchController.searchResults = searchResults;
+	_documentData.variables = newWatchVariablesArray;
+	_searchController.searchResults = searchResults;
 	
-	[self.tableController updateWatchVariablesTimer];
-	[self.tableController.variablesTableView reloadData];
+	[_tableController updateWatchVariablesTimer];
+	[_variablesTableView reloadData];
 	
 	[self updateNumberOfValuesDisplayedStatus];
 }
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier
 {
-	return [super isProcessIdentifier:processIdentifier inHaltedBreakPoints:self.debuggerController.haltedBreakPoints];
+	return [super isProcessIdentifier:processIdentifier inHaltedBreakPoints:_debuggerController.haltedBreakPoints];
 }
 
 #pragma mark Menu item validation
@@ -852,7 +837,7 @@
 	
 	if (menuItem.action == @selector(clear:))
 	{
-		if ([self.variableController canClearSearch])
+		if ([_variableController canClearSearch])
 		{
 			menuItem.title = ZGLocalizableSearchDocumentString(@"clearSearchVariablesTitle");
 		}
@@ -861,7 +846,7 @@
 			menuItem.title = ZGLocalizableSearchDocumentString(@"clearVariablesTitle");
 		}
 		
-		if (!self.isClearable)
+		if (![self isClearable])
 		{
 			return NO;
 		}
@@ -869,7 +854,7 @@
 	
 	else if (menuItem.action == @selector(storeAllValues:))
 	{
-		if (!self.currentProcess.valid || ![self.searchController canStartTask])
+		if (!self.currentProcess.valid || ![_searchController canStartTask])
 		{
 			return NO;
 		}
@@ -877,12 +862,12 @@
 	
 	else if (menuItem.action == @selector(searchPointerToSelectedVariable:))
 	{
-		if (!self.currentProcess.valid || ![self.searchController canStartTask] || self.selectedVariables.count != 1)
+		if (!self.currentProcess.valid || ![_searchController canStartTask] || self.selectedVariables.count != 1)
 		{
 			return NO;
 		}
 		
-		ZGVariable *variable = [self.selectedVariables objectAtIndex:0];
+		ZGVariable *variable = [self selectedVariables][0];
 		if (variable.type == ZGScript)
 		{
 			return NO;
@@ -891,7 +876,7 @@
 	
 	else if (menuItem.action == @selector(removeSelectedSearchValues:) || menuItem.action == @selector(cut:))
 	{
-		if (self.selectedVariables.count == 0 || [self.searchController canCancelTask])
+		if ([self selectedVariables].count == 0 || [_searchController canCancelTask])
 		{
 			return NO;
 		}
@@ -899,7 +884,7 @@
 	
 	else if (userInterfaceItem.action == @selector(dumpAllMemory:) || userInterfaceItem.action == @selector(dumpMemoryInRange:) || userInterfaceItem.action == @selector(changeMemoryProtection:))
 	{
-		if (![self.searchController canStartTask])
+		if (![_searchController canStartTask])
 		{
 			return NO;
 		}
@@ -907,7 +892,7 @@
 	
 	else if (menuItem.action == @selector(freezeVariables:))
 	{
-		NSArray *selectedVariables = self.selectedVariables;
+		NSArray *selectedVariables = [self selectedVariables];
 		if (selectedVariables.count > 0)
 		{
 			// All the variables selected need to either be all unfrozen or all frozen
@@ -936,7 +921,7 @@
 				}
 			}
 
-			if (!self.isClearable)
+			if (![self isClearable])
 			{
 				return NO;
 			}
@@ -957,7 +942,7 @@
 	
 	else if (menuItem.action == @selector(addVariable:))
 	{
-		if (![self.searchController canStartTask])
+		if (![_searchController canStartTask])
 		{
 			return NO;
 		}
@@ -965,7 +950,7 @@
 	
 	else if (menuItem.action == @selector(copy:) || menuItem.action == @selector(cut:))
 	{
-		if (![self.selectedVariables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGScript); }])
+		if (![[self selectedVariables] zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGScript); }])
 		{
 			return NO;
 		}
@@ -973,12 +958,12 @@
 	
 	else if (menuItem.action == @selector(copyAddress:))
 	{
-		if (self.selectedVariables.count != 1)
+		if ([self selectedVariables].count != 1)
 		{
 			return NO;
 		}
 		
-		if ([(ZGVariable *)[self.selectedVariables objectAtIndex:0] type] == ZGScript)
+		if ([(ZGVariable *)[self selectedVariables][0] type] == ZGScript)
 		{
 			return NO;
 		}
@@ -986,7 +971,7 @@
 	
 	else if (menuItem.action == @selector(paste:))
 	{
-		if ([self.searchController canCancelTask] || ![NSPasteboard.generalPasteboard dataForType:ZGVariablePboardType])
+		if ([_searchController canCancelTask] || ![NSPasteboard.generalPasteboard dataForType:ZGVariablePboardType])
 		{
 			return NO;
 		}
@@ -994,14 +979,14 @@
 	
 	else if (menuItem.action == @selector(requestEditingVariablesValue:))
 	{
-		menuItem.title = (self.selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"editMultipleVariableValuesTitle") : ZGLocalizableSearchDocumentString(@"editSingleVariableValueTitle");
+		menuItem.title = ([self selectedVariables].count != 1) ? ZGLocalizableSearchDocumentString(@"editMultipleVariableValuesTitle") : ZGLocalizableSearchDocumentString(@"editSingleVariableValueTitle");
 		
-		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([_searchController canCancelTask] || [self selectedVariables].count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
 		
-		for (ZGVariable *variable in self.selectedVariables)
+		for (ZGVariable *variable in [self selectedVariables])
 		{
 			if (variable.type == ZGScript)
 			{
@@ -1012,12 +997,12 @@
 	
 	else if (menuItem.action == @selector(requestEditingVariableAddress:))
 	{
-		if ([self.searchController canCancelTask] || self.selectedVariables.count != 1 || !self.currentProcess.valid)
+		if ([_searchController canCancelTask] || [self selectedVariables].count != 1 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
 		
-		if ([(ZGVariable *)[self.selectedVariables objectAtIndex:0] type] == ZGScript)
+		if ([(ZGVariable *)[self selectedVariables][0] type] == ZGScript)
 		{
 			return NO;
 		}
@@ -1028,7 +1013,7 @@
 		NSArray *selectedVariables = [self selectedVariables];
 		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"editMultipleVariableSizesTitle") : ZGLocalizableSearchDocumentString(@"editSingleVariableSizeTitle");
 		
-		if ([self.searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([_searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1049,7 +1034,7 @@
 		
 		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"relativizeMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"relativizeSingleVariableTitle");
 		
-		if ([self.searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([_searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1084,7 +1069,7 @@
 	
 	else if (menuItem.action == @selector(watchVariable:))
 	{
-		if ([self.searchController canCancelTask] || !self.currentProcess.valid || self.selectedVariables.count != 1)
+		if ([_searchController canCancelTask] || !self.currentProcess.valid || [self selectedVariables].count != 1)
 		{
 			return NO;
 		}
@@ -1113,14 +1098,14 @@
 	
 	else if (menuItem.action == @selector(nopVariables:))
 	{
-		menuItem.title = (self.selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"nopMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"nopSingleVariableTitle");
+		menuItem.title = ([self selectedVariables].count != 1) ? ZGLocalizableSearchDocumentString(@"nopMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"nopSingleVariableTitle");
 		
-		if ([self.searchController canCancelTask] || self.selectedVariables.count == 0 || !self.currentProcess.valid)
+		if ([_searchController canCancelTask] || [self selectedVariables].count == 0 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
 		
-		if (![self.selectedVariables zgAllObjectsMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type == ZGByteArray && variable.rawValue != NULL); }])
+		if (![[self selectedVariables] zgAllObjectsMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type == ZGByteArray && variable.rawValue != NULL); }])
 		{
 			return NO;
 		}
@@ -1128,7 +1113,7 @@
 	
 	else if (menuItem.action == @selector(showMemoryViewer:) || menuItem.action == @selector(showDebugger:))
 	{
-		if (self.selectedVariables.count != 1 || !self.currentProcess.valid)
+		if ([self selectedVariables].count != 1 || !self.currentProcess.valid)
 		{
 			return NO;
 		}
@@ -1171,7 +1156,7 @@
 			menuItem.title = ZGLocalizableSearchDocumentString(@"nextOperatorMenuItem");
 		}
 		
-		if ([self.searchController canCancelTask])
+		if ([_searchController canCancelTask])
 		{
 			return NO;
 		}
@@ -1184,7 +1169,7 @@
 
 - (void)deselectSearchField
 {
-	NSText *fieldEditor = [self.searchValueTextField currentEditor];
+	NSText *fieldEditor = [_searchValueTextField currentEditor];
 	if (fieldEditor != nil)
 	{
 		fieldEditor.selectedRange = NSMakeRange(fieldEditor.string.length, 0);
@@ -1194,7 +1179,7 @@
 
 - (void)insertStoredValueToken
 {
-	self.searchValueTextField.stringValue = ZGLocalizableSearchDocumentString(@"storedValueTokenName");
+	_searchValueTextField.stringValue = ZGLocalizableSearchDocumentString(@"storedValueTokenName");
 	[self deselectSearchField];
 }
 
@@ -1202,180 +1187,179 @@
 
 - (IBAction)clear:(id)__unused sender
 {
-	[self.variableController clear];
+	[_variableController clear];
 }
 
 - (IBAction)clearSearchValues:(id)__unused sender
 {
-	if (self.searchController.canCancelTask)
+	if (_searchController.canCancelTask)
 	{
-		[self.searchController cancelTask];
+		[_searchController cancelTask];
 	}
 	else
 	{
 		if ([self isClearable])
 		{
-			[self.variableController clearSearch];
+			[_variableController clearSearch];
 		}
 		
-		self.searchValueTextField.stringValue = @"";
-		self.documentData.searchValue = self.searchValueTextField.stringValue;
+		_searchValueTextField.stringValue = @"";
+		_documentData.searchValue = _searchValueTextField.stringValue;
 	}
 }
 
 - (IBAction)searchValue:(id)__unused sender
 {
-	self.documentData.searchValue = self.searchValueTextField.stringValue;
+	_documentData.searchValue = _searchValueTextField.stringValue;
 	
-	BOOL hasEmptyExpression = (self.documentData.searchValue.length == 0);
-	if (!hasEmptyExpression && self.searchController.canStartTask && self.currentProcess.valid)
+	BOOL hasEmptyExpression = (_documentData.searchValue.length == 0);
+	if (!hasEmptyExpression && _searchController.canStartTask && self.currentProcess.valid)
 	{
 		ZGFunctionType functionType = [self selectedFunctionType];
-		if (ZGIsFunctionTypeStore(functionType) && self.searchData.savedData == nil)
+		if (ZGIsFunctionTypeStore(functionType) && _searchData.savedData == nil)
 		{
 			ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"noStoredValuesAlertTitle"), ZGLocalizableSearchDocumentString(@"noStoredValuesAlertMessage"));
 		}
 		else
 		{
-			if (self.documentData.variables.count == 0)
+			if (_documentData.variables.count == 0)
 			{
 				[self.undoManager removeAllActions];
 			}
 			
-			[self.searchController searchVariablesWithString:self.documentData.searchValue withDataType:self.selectedDataType functionType:functionType allowsNarrowing:YES];
+			[_searchController searchVariablesWithString:_documentData.searchValue withDataType:[self selectedDataType] functionType:functionType allowsNarrowing:YES];
 		}
 	}
 }
 
 - (IBAction)searchPointerToSelectedVariable:(id)__unused sender
 {
-	ZGVariable *variable = [self.selectedVariables objectAtIndex:0];
-	
-	[self.searchController searchVariablesWithString:variable.addressStringValue withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO];
+	ZGVariable *variable = [[self selectedVariables] objectAtIndex:0];
+	[_searchController searchVariablesWithString:variable.addressStringValue withDataType:ZGPointer functionType:ZGEquals allowsNarrowing:NO];
 }
 
 - (IBAction)storeAllValues:(id)__unused sender
 {
-	self.documentData.searchValue = self.searchValueTextField.stringValue;
-	[self.searchController storeAllValues];
+	_documentData.searchValue = _searchValueTextField.stringValue;
+	[_searchController storeAllValues];
 }
 
 - (IBAction)showAdvancedOptions:(id)sender
 {
-	if (self.advancedOptionsPopover == nil)
+	if (_advancedOptionsPopover == nil)
 	{
-		self.advancedOptionsPopover = [[NSPopover alloc] init];
-		self.advancedOptionsPopover.contentViewController = [[ZGDocumentOptionsViewController alloc] initWithDocument:self.document];
-		self.advancedOptionsPopover.behavior = NSPopoverBehaviorTransient;
+		_advancedOptionsPopover = [[NSPopover alloc] init];
+		_advancedOptionsPopover.contentViewController = [[ZGDocumentOptionsViewController alloc] initWithDocument:self.document];
+		_advancedOptionsPopover.behavior = NSPopoverBehaviorTransient;
 	}
 	
-	[self.advancedOptionsPopover showRelativeToRect:[sender bounds] ofView:sender preferredEdge:NSMaxYEdge];
+	[_advancedOptionsPopover showRelativeToRect:[sender bounds] ofView:sender preferredEdge:NSMaxYEdge];
 }
 
 #pragma mark Variables Handling
 
 - (IBAction)freezeVariables:(id)__unused sender
 {
-	[self.variableController freezeVariables];
+	[_variableController freezeVariables];
 }
 
 - (IBAction)copy:(id)__unused sender
 {
-	[self.variableController copyVariables];
+	[_variableController copyVariables];
 }
 
 - (IBAction)copyAddress:(id)__unused sender
 {
-	[self.variableController copyAddress];
+	[_variableController copyAddress];
 }
 
 - (IBAction)paste:(id)__unused sender
 {
-	[self.variableController pasteVariables];
+	[_variableController pasteVariables];
 }
 
 - (IBAction)cut:(id)__unused sender
 {
-	[self.variableController copyVariables];
+	[_variableController copyVariables];
 	[self removeSelectedSearchValues:nil];
 }
 
 - (IBAction)removeSelectedSearchValues:(id)__unused sender
 {
-	[self.variableController removeSelectedSearchValues];
+	[_variableController removeSelectedSearchValues];
 }
 
 - (IBAction)addVariable:(id)sender
 {
-	[self.variableController addVariable:sender];
+	[_variableController addVariable:sender];
 }
 
 - (IBAction)nopVariables:(id)__unused sender
 {
-	[self.variableController nopVariables:[self selectedVariables]];
+	[_variableController nopVariables:[self selectedVariables]];
 }
 
 - (IBAction)requestEditingVariablesValue:(id)__unused sender
 {
-	if (self.editValueWindowController == nil)
+	if (_editValueWindowController == nil)
 	{
-		self.editValueWindowController = [[ZGEditValueWindowController alloc] initWithVariableController:self.variableController];
+		_editValueWindowController = [[ZGEditValueWindowController alloc] initWithVariableController:_variableController];
 	}
 	
-	[self.editValueWindowController requestEditingValuesFromVariables:self.selectedVariables withProcessTask:self.currentProcess.processTask attachedToWindow:self.window scriptManager:self.scriptManager];
+	[_editValueWindowController requestEditingValuesFromVariables:[self selectedVariables] withProcessTask:self.currentProcess.processTask attachedToWindow:self.window scriptManager:_scriptManager];
 }
 
 - (IBAction)requestEditingVariableDescription:(id)__unused sender
 {
-	if (self.editDescriptionWindowController == nil)
+	if (_editDescriptionWindowController == nil)
 	{
-		self.editDescriptionWindowController = [[ZGEditDescriptionWindowController alloc] initWithVariableController:self.variableController];
+		_editDescriptionWindowController = [[ZGEditDescriptionWindowController alloc] initWithVariableController:_variableController];
 	}
 	
-	[self.editDescriptionWindowController requestEditingDescriptionFromVariable:[self.selectedVariables objectAtIndex:0] attachedToWindow:self.window];
+	[_editDescriptionWindowController requestEditingDescriptionFromVariable:[self selectedVariables][0] attachedToWindow:self.window];
 }
 
 - (IBAction)requestEditingVariableAddress:(id)__unused sender
 {
-	if (self.editAddressWindowController == nil)
+	if (_editAddressWindowController == nil)
 	{
-		self.editAddressWindowController = [[ZGEditAddressWindowController alloc] initWithVariableController:self.variableController];
+		_editAddressWindowController = [[ZGEditAddressWindowController alloc] initWithVariableController:_variableController];
 	}
 	
-	[self.editAddressWindowController requestEditingAddressFromVariable:[self.selectedVariables objectAtIndex:0] attachedToWindow:self.window];
+	[_editAddressWindowController requestEditingAddressFromVariable:[self selectedVariables][0] attachedToWindow:self.window];
 }
 
 - (IBAction)requestEditingVariablesSize:(id)__unused sender
 {
-	if (self.editSizeWindowController == nil)
+	if (_editSizeWindowController == nil)
 	{
-		self.editSizeWindowController = [[ZGEditSizeWindowController alloc] initWithVariableController:self.variableController];
+		_editSizeWindowController = [[ZGEditSizeWindowController alloc] initWithVariableController:_variableController];
 	}
 	
-	[self.editSizeWindowController requestEditingSizesFromVariables:self.selectedVariables attachedToWindow:self.window];
+	[_editSizeWindowController requestEditingSizesFromVariables:[self selectedVariables] attachedToWindow:self.window];
 }
 
 - (IBAction)relativizeVariablesAddress:(id)__unused sender
 {
-	[self.variableController relativizeVariables:[self selectedVariables]];
+	[_variableController relativizeVariables:[self selectedVariables]];
 }
 
 #pragma mark Variable Watching Handling
 
 - (IBAction)watchVariable:(id)sender
 {
-	if (self.watchVariableWindowController == nil)
+	if (_watchVariableWindowController == nil)
 	{
-		self.watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:self.breakPointController];
+		_watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:_breakPointController];
 	}
 	
-	[self.watchVariableWindowController watchVariable:[self.selectedVariables objectAtIndex:0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:self.window completionHandler:^(NSArray *foundVariables) {
+	[_watchVariableWindowController watchVariable:[self selectedVariables][0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:self.window completionHandler:^(NSArray *foundVariables) {
 		if (foundVariables.count > 0)
 		{
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];
-			[self.variableController addVariables:foundVariables atRowIndexes:rowIndexes];
+			[self->_variableController addVariables:foundVariables atRowIndexes:rowIndexes];
 			[ZGVariableController annotateVariables:foundVariables process:self.currentProcess];
-			[self.tableController.variablesTableView scrollRowToVisible:0];
+			[self->_variablesTableView scrollRowToVisible:0];
 		}
 	}];
 }

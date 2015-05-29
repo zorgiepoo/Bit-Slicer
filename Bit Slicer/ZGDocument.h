@@ -55,8 +55,8 @@
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;
 
-@property (nonatomic) ZGDocumentData *data;
-@property (nonatomic) ZGSearchData *searchData;
+@property (nonatomic, readonly) ZGDocumentData *data;
+@property (nonatomic, readonly) ZGSearchData *searchData;
 
 - (void)markChange;
 

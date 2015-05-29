@@ -41,20 +41,17 @@
 #import "ZGVariable.h"
 #import "ZGUtilities.h"
 
-@interface ZGCodeInjectionWindowController ()
-
-@property (assign, nonatomic) IBOutlet NSTextView *textView;
-@property (nonatomic, copy) NSString *suggestedCode;
-@property (nonatomic) NSUndoManager *undoManager;
-@property (nonatomic) ZGMemoryAddress allocatedAddress;
-@property (nonatomic) ZGMemorySize numberOfAllocatedBytes;
-@property (nonatomic) ZGProcess *process;
-@property (nonatomic) NSArray *instructions;
-@property (nonatomic) NSArray *breakPoints;
-
-@end
-
 @implementation ZGCodeInjectionWindowController
+{
+	IBOutlet NSTextView *_textView;
+	NSString *_suggestedCode;
+	NSUndoManager *_undoManager;
+	ZGMemoryAddress _allocatedAddress;
+	ZGMemorySize _numberOfAllocatedBytes;
+	ZGProcess *_process;
+	NSArray *_instructions;
+	NSArray *_breakPoints;
+}
 
 - (NSString *)windowNibName
 {
@@ -64,12 +61,12 @@
 - (void)setSuggestedCode:(NSString *)suggestedCode
 {
 	_suggestedCode = [suggestedCode copy];
-	[self.textView.textStorage.mutableString setString:_suggestedCode];
+	[_textView.textStorage.mutableString setString:_suggestedCode];
 }
 
 - (void)updateSuggestedCode
 {
-	_suggestedCode = [self.textView.textStorage.mutableString copy];
+	_suggestedCode = [_textView.textStorage.mutableString copy];
 }
 
 - (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process instruction:(ZGInstruction *)instruction breakPoints:(NSArray *)breakPoints undoManager:(NSUndoManager *)undoManager
@@ -133,13 +130,14 @@
 	
 	[self window]; // Ensure window is loaded
 	
-	self.suggestedCode = suggestedCode;
-	self.undoManager = undoManager;
-	self.process = process;
-	self.allocatedAddress = allocatedAddress;
-	self.numberOfAllocatedBytes = numberOfAllocatedBytes;
-	self.instructions = instructions;
-	self.breakPoints = breakPoints;
+	[self setSuggestedCode:suggestedCode];
+	
+	_undoManager = undoManager;
+	_process = process;
+	_allocatedAddress = allocatedAddress;
+	_numberOfAllocatedBytes = numberOfAllocatedBytes;
+	_instructions = instructions;
+	_breakPoints = breakPoints;
 	
 	[NSApp
 	 beginSheet:self.window
@@ -154,9 +152,9 @@
 	[self updateSuggestedCode];
 	
 	NSError *error = nil;
-	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:self.suggestedCode atInstructionPointer:self.allocatedAddress usingArchitectureBits:self.process.pointerSize*8 error:&error];
+	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:_suggestedCode atInstructionPointer:_allocatedAddress usingArchitectureBits:_process.pointerSize * 8 error:&error];
 	
-	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:self.allocatedAddress hookingIntoOriginalInstructions:self.instructions process:self.process breakPoints:self.breakPoints undoManager:self.undoManager error:&error])
+	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:_process breakPoints:_breakPoints undoManager:_undoManager error:&error])
 	{
 		NSLog(@"Error while injecting code");
 		NSLog(@"%@", error);
@@ -172,7 +170,7 @@
 
 - (IBAction)cancel:(id)__unused sender
 {
-	if (!ZGDeallocateMemory(self.process.processTask, self.allocatedAddress, self.numberOfAllocatedBytes))
+	if (!ZGDeallocateMemory(_process.processTask, _allocatedAddress, _numberOfAllocatedBytes))
 	{
 		NSLog(@"Error: Failed to deallocate VM memory after canceling from injecting code..");
 	}

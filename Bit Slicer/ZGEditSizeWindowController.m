@@ -40,16 +40,13 @@
 
 #define ZGEditSizeLocalizableTable @"[Code] Edit Variable Size"
 
-@interface ZGEditSizeWindowController ()
-
-@property (nonatomic) ZGVariableController *variableController;
-@property (nonatomic) NSArray *variables;
-
-@property (nonatomic, assign) IBOutlet NSTextField *sizeTextField;
-
-@end
-
 @implementation ZGEditSizeWindowController
+{
+	ZGVariableController *_variableController;
+	NSArray *_variables;
+	
+	IBOutlet NSTextField *_sizeTextField;
+}
 
 - (NSString *)windowNibName
 {
@@ -61,7 +58,7 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.variableController = variableController;
+		_variableController = variableController;
 	}
 	return self;
 }
@@ -71,11 +68,11 @@
 	[self window]; // ensure window is loaded
 	
 	ZGVariable *firstVariable = [variables objectAtIndex:0];
-	self.sizeTextField.stringValue = firstVariable.sizeStringValue;
+	_sizeTextField.stringValue = firstVariable.sizeStringValue;
 	
-	[self.sizeTextField selectText:nil];
+	[_sizeTextField selectText:nil];
 	
-	self.variables = variables;
+	_variables = variables;
 	
 	[NSApp
 	 beginSheet:self.window
@@ -87,7 +84,7 @@
 
 - (IBAction)editVariablesSizes:(id)__unused sender
 {
-	NSString *sizeExpression = [ZGCalculator evaluateExpression:self.sizeTextField.stringValue];
+	NSString *sizeExpression = [ZGCalculator evaluateExpression:_sizeTextField.stringValue];
 	
 	ZGMemorySize requestedSize = 0;
 	if (sizeExpression.zgIsHexRepresentation)
@@ -115,16 +112,16 @@
 		NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
 		
 		NSUInteger variableIndex;
-		for (variableIndex = 0; variableIndex < self.variables.count; variableIndex++)
+		for (variableIndex = 0; variableIndex < _variables.count; variableIndex++)
 		{
 			[requestedSizes addObject:@(requestedSize)];
 		}
 		
-		[self.variableController
-		 editVariables:self.variables
+		[_variableController
+		 editVariables:_variables
 		 requestedSizes:requestedSizes];
 		
-		self.variables = nil;
+		_variables = nil;
 	}
 }
 
@@ -133,7 +130,7 @@
 	[NSApp endSheet:self.window];
 	[self.window close];
 	
-	self.variables = nil;
+	_variables = nil;
 }
 
 @end

@@ -73,7 +73,7 @@
 	document.hotKeyCenter = _hotKeyCenter;
 	document.loggerWindowController = _loggerWindowController;
 	
-	document.lastChosenInternalProcessName = self.lastChosenInternalProcessName;
+	document.lastChosenInternalProcessName = _lastChosenInternalProcessName;
 }
 
 // Override makeDocumentXXX methods so we can initialize the document's properties

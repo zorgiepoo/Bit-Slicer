@@ -183,23 +183,19 @@ static PyTypeObject DebuggerType =
 	0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
-@interface ZGPyDebugger ()
-
-@property (nonatomic) ZGBreakPointController *breakPointController;
-@property (nonatomic) ZGLoggerWindowController *loggerWindowController;
-@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
-
-@property (nonatomic) NSMutableDictionary *cachedInstructionPointers;
-@property (nonatomic) ZGProcess *process;
-@property (nonatomic) ZGBreakPoint *haltedBreakPoint;
-@property (nonatomic) NSDictionary *generalPurposeRegisterOffsetsDictionary;
-@property (nonatomic) NSDictionary *vectorRegisterOffsetsDictionary;
-
-@end
-
 @implementation ZGPyDebugger
 {
 	dispatch_queue_t _pythonQueue;
+	
+	__weak ZGScriptManager *_scriptManager;
+	ZGBreakPointController *_breakPointController;
+	ZGLoggerWindowController *_loggerWindowController;
+	NSMutableDictionary *_cachedInstructionPointers;
+	ZGHotKeyCenter *_hotKeyCenter;
+	ZGProcess *_process;
+	ZGBreakPoint *_haltedBreakPoint;
+	NSDictionary *_generalPurposeRegisterOffsetsDictionary;
+	NSDictionary *_vectorRegisterOffsetsDictionary;
 }
 
 static PyObject *gDebuggerException;
@@ -232,27 +228,27 @@ static PyObject *gDebuggerException;
 	{
 		PyTypeObject *type = &DebuggerType;
 		self.object = (PyObject *)((DebuggerClass *)type->tp_alloc(type, 0));
-		if (self.object == NULL)
+		if (_object == NULL)
 		{
 			return nil;
 		}
 		
-		self.scriptManager = scriptManager;
-		self.process = [[ZGProcess alloc] initWithProcess:process];
-		self.breakPointController = breakPointController;
-		self.loggerWindowController = loggerWindowController;
-		self.hotKeyCenter = hotKeyCenter;
+		_scriptManager = scriptManager;
+		_process = [[ZGProcess alloc] initWithProcess:process];
+		_breakPointController = breakPointController;
+		_loggerWindowController = loggerWindowController;
+		_hotKeyCenter = hotKeyCenter;
 		
 		_pythonQueue = scriptingInterpreter.pythonQueue;
 		
-		DebuggerClass *debuggerObject = (DebuggerClass *)self.object;
+		DebuggerClass *debuggerObject = (DebuggerClass *)_object;
 		debuggerObject->objcSelf = self;
 		debuggerObject->processIdentifier = process.processID;
 		debuggerObject->processTask = process.processTask;
 		debuggerObject->is64Bit = process.is64Bit;
 		debuggerObject->breakPointDelegate = self;
 		
-		self.cachedInstructionPointers = [[NSMutableDictionary alloc] init];
+		_cachedInstructionPointers = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
@@ -262,7 +258,7 @@ static PyObject *gDebuggerException;
 {
 	__block NSArray *unregisteredHotKeys = nil;
 	dispatch_async(dispatch_get_main_queue(), ^{
-		unregisteredHotKeys = [self.hotKeyCenter unregisterHotKeysWithDelegate:self];
+		unregisteredHotKeys = [self->_hotKeyCenter unregisterHotKeysWithDelegate:self];
 	});
 	
 	if (Py_IsInitialized())
@@ -274,13 +270,13 @@ static PyObject *gDebuggerException;
 		}
 	}
 	
-	if (self.haltedBreakPoint != nil)
+	if (_haltedBreakPoint != nil)
 	{
-		self.haltedBreakPoint.dead = YES;
-		[self.breakPointController resumeFromBreakPoint:self.haltedBreakPoint];
+		_haltedBreakPoint.dead = YES;
+		[_breakPointController resumeFromBreakPoint:_haltedBreakPoint];
 	}
 	
-	NSArray *removedBreakPoints = [self.breakPointController removeObserver:self];
+	NSArray *removedBreakPoints = [_breakPointController removeObserver:self];
 	if (Py_IsInitialized())
 	{
 		for (ZGBreakPoint *breakPoint in removedBreakPoints)
@@ -340,7 +336,7 @@ static PyObject *Debugger_log(DebuggerClass *self, PyObject *args)
 	
 	ZGPyDebugger *debugger = self->objcSelf;
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[debugger.loggerWindowController writeLine:objcStringToLog];
+		[debugger->_loggerWindowController writeLine:objcStringToLog];
 	});
 	
 	return Py_BuildValue("");
@@ -380,8 +376,9 @@ static PyObject *Debugger_notify(DebuggerClass * __unused self, PyObject *args)
 
 - (void)scriptPrompt:(ZGScriptPrompt *)scriptPrompt didReceiveAnswer:(NSString *)answer
 {
+	ZGScriptManager *scriptManager = _scriptManager;
 	dispatch_async(_pythonQueue, ^{
-		[self.scriptManager handleScriptPrompt:scriptPrompt withAnswer:answer sender:self];
+		[scriptManager handleScriptPrompt:scriptPrompt withAnswer:answer sender:self];
 	});
 }
 
@@ -463,8 +460,9 @@ static PyObject *Debugger_activate(DebuggerClass *self, PyObject *__unused args)
 	UInt32 hotKeyID = hotKey.internalID;
 	PyObject *callback = hotKey.userData;
 	
+	ZGScriptManager *scriptManager = _scriptManager;
 	dispatch_async(_pythonQueue, ^{
-		[self.scriptManager handleHotKeyTriggerWithInternalID:hotKeyID callback:callback sender:self];
+		[scriptManager handleHotKeyTriggerWithInternalID:hotKeyID callback:callback sender:self];
 	});
 }
 
@@ -489,7 +487,7 @@ static PyObject *Debugger_registerHotkey(DebuggerClass *self, PyObject *args)
 	hotKey = [ZGHotKey hotKeyWithKeyCombo:(KeyCombo){.code = keyCode, .flags = modifierFlags}];
 	
 	dispatch_sync(dispatch_get_main_queue(), ^{
-		registeredHotKey = [self->objcSelf.hotKeyCenter registerHotKey:hotKey delegate:self->objcSelf];
+		registeredHotKey = [self->objcSelf->_hotKeyCenter registerHotKey:hotKey delegate:self->objcSelf];
 	});
 	
 	if (!registeredHotKey)
@@ -514,7 +512,7 @@ static PyObject *Debugger_unregisterHotkey(DebuggerClass *self, PyObject *args)
 	
 	__block ZGHotKey *unregisteredHotKey = nil;
 	dispatch_sync(dispatch_get_main_queue(), ^{
-		unregisteredHotKey = [self->objcSelf.hotKeyCenter unregisterHotKeyWithInternalID:hotKeyID];
+		unregisteredHotKey = [self->objcSelf->_hotKeyCenter unregisterHotKeyWithInternalID:hotKeyID];
 	});
 	
 	if (unregisteredHotKey == nil)
@@ -540,7 +538,7 @@ static PyObject *Debugger_isRegisteredHotkey(DebuggerClass *self, PyObject *args
 	
 	__block BOOL isRegistered = NO;
 	dispatch_sync(dispatch_get_main_queue(), ^{
-		isRegistered = [self->objcSelf.hotKeyCenter isRegisteredHotKey:[ZGHotKey hotKeyWithKeyCombo:(KeyCombo){.code = keyCode, .flags = modifierFlags}]];
+		isRegistered = [self->objcSelf->_hotKeyCenter isRegisteredHotKey:[ZGHotKey hotKeyWithKeyCombo:(KeyCombo){.code = keyCode, .flags = modifierFlags}]];
 	});
 	
 	if (!isRegistered)
@@ -572,10 +570,10 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 			
 			ZGPyDebugger *debugger = self->objcSelf;
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[debugger.loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
+				[debugger->_loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
 				if ([[error userInfo] objectForKey:@"description"] != nil)
 				{
-					[debugger.loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
+					[debugger->_loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
 				}
 			});
 		}
@@ -620,7 +618,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 	ZGMemorySize size = 0x0;
 	if (PyArg_ParseTuple(args, "KK:readBytes", &address, &size))
 	{
-		NSData *readData = [ZGDebuggerUtilities readDataWithProcessTask:self->processTask address:address size:size breakPoints:self->objcSelf.breakPointController.breakPoints];
+		NSData *readData = [ZGDebuggerUtilities readDataWithProcessTask:self->processTask address:address size:size breakPoints:self->objcSelf->_breakPointController.breakPoints];
 		if (readData != nil)
 		{
 			retValue = Py_BuildValue("y#", readData.bytes, readData.length);
@@ -632,7 +630,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 			NSString *errorMessage = @"Error: Failed to read bytes using debug object";
 			ZGPyDebugger *debugger = self->objcSelf;
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[debugger.loggerWindowController writeLine:errorMessage];
+				[debugger->_loggerWindowController writeLine:errorMessage];
 			});
 		}
 	}
@@ -655,7 +653,7 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		success = [ZGDebuggerUtilities writeData:[NSData dataWithBytes:buffer.buf length:(NSUInteger)buffer.len] atAddress:memoryAddress processTask:self->processTask breakPoints:self->objcSelf.breakPointController.breakPoints];
+		success = [ZGDebuggerUtilities writeData:[NSData dataWithBytes:buffer.buf length:(NSUInteger)buffer.len] atAddress:memoryAddress processTask:self->processTask breakPoints:self->objcSelf->_breakPointController.breakPoints];
 		
 		if (!success)
 		{
@@ -675,7 +673,7 @@ static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
 	char *symbolOwner = NULL;
 	if (PyArg_ParseTuple(args, "s|s:findSymbol", &symbolName, &symbolOwner))
 	{
-		ZGProcess *process = self->objcSelf.process;
+		ZGProcess *process = self->objcSelf->_process;
 		NSNumber *symbolAddressNumber = [process findSymbol:@(symbolName) withPartialSymbolOwnerName:symbolOwner == NULL ? nil : @(symbolOwner) requiringExactMatch:YES pastAddress:0x0 allowsWrappingToBeginning:NO];
 		if (symbolAddressNumber != nil)
 		{
@@ -695,7 +693,7 @@ static PyObject *Debugger_symbolAt(DebuggerClass *self, PyObject *args)
 	ZGMemoryAddress memoryAddress = 0x0;
 	if (PyArg_ParseTuple(args, "K:symbolAt", &memoryAddress))
 	{
-		ZGProcess *process = self->objcSelf.process;
+		ZGProcess *process = self->objcSelf->_process;
 		ZGMemoryAddress relativeOffset = 0x0;
 		NSString *symbol = [process symbolAtAddress:memoryAddress relativeOffset:&relativeOffset];
 		if (symbol != nil)
@@ -718,7 +716,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 	ZGMemoryAddress destinationAddress = 0x0;
 	if (PyArg_ParseTuple(args, "KK:bytesBeforeInjection", &sourceAddress, &destinationAddress))
 	{
-		NSArray *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf.process withBreakPoints:self->objcSelf.breakPointController.breakPoints];
+		NSArray *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints];
 		ZGMemorySize bufferLength = 0;
 		for (ZGInstruction *instruction in instructions)
 		{
@@ -762,7 +760,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		NSArray *originalInstructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf.process withBreakPoints:self->objcSelf.breakPointController.breakPoints];
+		NSArray *originalInstructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints];
 		
 		NSError *error = nil;
 		BOOL injectedCode =
@@ -770,8 +768,8 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		 injectCode:[NSData dataWithBytes:newCode.buf length:(NSUInteger)newCode.len]
 		 intoAddress:destinationAddress
 		 hookingIntoOriginalInstructions:originalInstructions
-		 process:self->objcSelf.process
-		 breakPoints:self->objcSelf.breakPointController.breakPoints
+		 process:self->objcSelf->_process
+		 breakPoints:self->objcSelf->_breakPointController.breakPoints
 		 undoManager:nil
 		 error:&error];
 		
@@ -781,10 +779,10 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 			
 			ZGPyDebugger *debugger = self->objcSelf;
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[debugger.loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
+				[debugger->_loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
 				if ([[error userInfo] objectForKey:@"description"] != nil)
 				{
-					[debugger.loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
+					[debugger->_loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
 				}
 			});
 			
@@ -801,24 +799,25 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 {
 	ZGMemoryAddress dataAddress = breakPoint.variable.address;
 	PyObject *callback = breakPoint.callback;
+	ZGScriptManager *scriptManager = _scriptManager;
 	
 	dispatch_async(_pythonQueue, ^{
 		NSNumber *instructionPointerNumber = @(instructionPointer);
 		ZGMemoryAddress instructionAddress = 0;
-		NSNumber *cachedInstructionAddress = [self.cachedInstructionPointers objectForKey:instructionPointerNumber];
+		NSNumber *cachedInstructionAddress = [self->_cachedInstructionPointers objectForKey:instructionPointerNumber];
 		if (cachedInstructionAddress == nil)
 		{
-			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:[instructionPointerNumber unsignedLongLongValue] inProcess:self.process withBreakPoints:self.breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self.process]];
+			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:[instructionPointerNumber unsignedLongLongValue] inProcess:self->_process withBreakPoints:self->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->_process]];
 			
 			instructionAddress = instruction.variable.address;
-			[self.cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointerNumber];
+			[self->_cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointerNumber];
 		}
 		else
 		{
-			instructionAddress = [[self.cachedInstructionPointers objectForKey:instructionPointerNumber] unsignedLongLongValue];
+			instructionAddress = [[self->_cachedInstructionPointers objectForKey:instructionPointerNumber] unsignedLongLongValue];
 		}
 		
-		[self.scriptManager handleDataAddress:dataAddress accessedFromInstructionAddress:instructionAddress registersState:registersState callback:callback sender:self];
+		[scriptManager handleDataAddress:dataAddress accessedFromInstructionAddress:instructionAddress registersState:registersState callback:callback sender:self];
 	});
 }
 
@@ -839,10 +838,10 @@ static PyObject *watchAccess(DebuggerClass *self, PyObject *args, NSString *func
 		return NULL;
 	}
 
-	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:numberOfBytes address:memoryAddress type:ZGByteArray qualifier:0 pointerSize:self->objcSelf.process.pointerSize];
+	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:numberOfBytes address:memoryAddress type:ZGByteArray qualifier:0 pointerSize:self->objcSelf->_process.pointerSize];
 	
 	ZGBreakPoint *breakPoint = nil;
-	if (![self->objcSelf.breakPointController addWatchpointOnVariable:variable inProcess:self->objcSelf.process watchPointType:watchPointType delegate:self->breakPointDelegate getBreakPoint:&breakPoint])
+	if (![self->objcSelf->_breakPointController addWatchpointOnVariable:variable inProcess:self->objcSelf->_process watchPointType:watchPointType delegate:self->breakPointDelegate getBreakPoint:&breakPoint])
 	{
 		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.%@ failed adding watchpoint at 0x%llX (%llu byte(s))", functionName, memoryAddress, numberOfBytes] UTF8String]);
 		
@@ -874,7 +873,7 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 		return NULL;
 	}
 	
-	NSArray *breakPointsRemoved = [self->objcSelf.breakPointController removeObserver:self->breakPointDelegate withProcessID:self->processIdentifier atAddress:memoryAddress];
+	NSArray *breakPointsRemoved = [self->objcSelf->_breakPointController removeObserver:self->breakPointDelegate withProcessID:self->processIdentifier atAddress:memoryAddress];
 	
 	for (ZGBreakPoint *breakPoint in breakPointsRemoved)
 	{
@@ -890,13 +889,13 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 
 static void resumeFromHaltedBreakPointInDebugger(DebuggerClass *self)
 {
-	[self->objcSelf.breakPointController resumeFromBreakPoint:self->objcSelf.haltedBreakPoint];
-	self->objcSelf.haltedBreakPoint = nil;
+	[self->objcSelf->_breakPointController resumeFromBreakPoint:self->objcSelf->_haltedBreakPoint];
+	self->objcSelf->_haltedBreakPoint = nil;
 }
 
 static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 {
-	NSArray *removedBreakPoints = [self->objcSelf.breakPointController removeSingleStepBreakPointsFromBreakPoint:self->objcSelf.haltedBreakPoint];
+	NSArray *removedBreakPoints = [self->objcSelf->_breakPointController removeSingleStepBreakPointsFromBreakPoint:self->objcSelf->_haltedBreakPoint];
 	for (ZGBreakPoint *breakPoint in removedBreakPoints)
 	{
 		if (breakPoint.callback != NULL)
@@ -914,9 +913,10 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 	ZGRegistersState *registersState = breakPoint.registersState;
 	ZGMemoryAddress breakPointBasePointer = breakPoint.basePointer;
 	BOOL hidden = breakPoint.hidden;
+	ZGScriptManager *scriptManager = _scriptManager;
 	
 	dispatch_async(_pythonQueue, ^{
-		self.haltedBreakPoint = breakPoint;
+		self->_haltedBreakPoint = breakPoint;
 		
 		if (hidden)
 		{
@@ -924,18 +924,18 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 			
 			if (basePointer == breakPointBasePointer)
 			{
-				[self.breakPointController removeInstructionBreakPoint:breakPoint];
+				[self->_breakPointController removeInstructionBreakPoint:breakPoint];
 				
-				[self.scriptManager handleInstructionBreakPoint:breakPoint withRegistersState:registersState callback:breakPoint.callback sender:self];
+				[scriptManager handleInstructionBreakPoint:breakPoint withRegistersState:registersState callback:breakPoint.callback sender:self];
 			}
 			else
 			{
-				continueFromHaltedBreakPointsInDebugger((DebuggerClass *)self.object);
+				continueFromHaltedBreakPointsInDebugger((DebuggerClass *)self->_object);
 			}
 		}
 		else
 		{
-			[self.scriptManager handleInstructionBreakPoint:breakPoint withRegistersState:registersState callback:breakPoint.callback sender:self];
+			[scriptManager handleInstructionBreakPoint:breakPoint withRegistersState:registersState callback:breakPoint.callback sender:self];
 		}
 	});
 }
@@ -956,7 +956,7 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf.process withBreakPoints:self->objcSelf.breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf.process]];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
 	
 	if (instruction == nil)
 	{
@@ -964,7 +964,7 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	if (![self->objcSelf.breakPointController addBreakPointOnInstruction:instruction inProcess:self->objcSelf.process callback:callback delegate:self->breakPointDelegate])
+	if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:instruction inProcess:self->objcSelf->_process callback:callback delegate:self->breakPointDelegate])
 	{
 		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX", memoryAddress] UTF8String]);
 		return NULL;
@@ -984,7 +984,7 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf.process withBreakPoints:self->objcSelf.breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf.process]];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
 	
 	if (instruction == nil)
 	{
@@ -992,7 +992,7 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGBreakPoint *breakPoint = [self->objcSelf.breakPointController removeBreakPointOnInstruction:instruction inProcess:self->objcSelf.process];
+	ZGBreakPoint *breakPoint = [self->objcSelf->_breakPointController removeBreakPointOnInstruction:instruction inProcess:self->objcSelf->_process];
 	
 	PyObject *callback = breakPoint.callback;
 	Py_XDECREF(callback);
@@ -1002,8 +1002,8 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 
 static void stepIntoDebuggerWithHaltedBreakPointAndCallback(DebuggerClass *self, PyObject *callback)
 {
-	ZGBreakPoint *haltedBreakPoint = self->objcSelf.haltedBreakPoint;
-	ZGBreakPoint *singleStepBreakPoint = [self->objcSelf.breakPointController addSingleStepBreakPointFromBreakPoint:haltedBreakPoint];
+	ZGBreakPoint *haltedBreakPoint = self->objcSelf->_haltedBreakPoint;
+	ZGBreakPoint *singleStepBreakPoint = [self->objcSelf->_breakPointController addSingleStepBreakPointFromBreakPoint:haltedBreakPoint];
 	
 	singleStepBreakPoint.callback = callback;
 	Py_XINCREF(callback);
@@ -1044,7 +1044,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	}
 	
 	x86_thread_state_t threadState;
-	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, NULL))
+	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, NULL))
 	{
 		PyErr_SetString(gDebuggerException, "debug.stepOver failed to retrieve current general thread state");
 		return NULL;
@@ -1052,9 +1052,9 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 	
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf.process];
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
-	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf.process withBreakPoints:self->objcSelf.breakPointController.breakPoints machBinaries:machBinaries];
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries];
 	
 	if (currentInstruction == nil)
 	{
@@ -1064,7 +1064,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
 	{
-		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf.process withBreakPoints:self->objcSelf.breakPointController.breakPoints machBinaries:machBinaries];
+		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries];
 		
 		if (nextInstruction == nil)
 		{
@@ -1074,7 +1074,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		
 		ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
 		
-		if (![self->objcSelf.breakPointController addBreakPointOnInstruction:nextInstruction inProcess:self->objcSelf.process thread:self->objcSelf.haltedBreakPoint.thread basePointer:basePointer callback:callback delegate:self->objcSelf])
+		if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:nextInstruction inProcess:self->objcSelf->_process thread:self->objcSelf->_haltedBreakPoint.thread basePointer:basePointer callback:callback delegate:self->objcSelf])
 		{
 			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to set breakpoint at 0x%llX", nextInstruction.variable.address] UTF8String]);
 			return NULL;
@@ -1102,7 +1102,7 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	}
 	
 	x86_thread_state_t threadState;
-	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, NULL))
+	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, NULL))
 	{
 		PyErr_SetString(gDebuggerException, "debug.stepOut failed to retrieve current general thread state");
 		return NULL;
@@ -1111,9 +1111,9 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 	ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
 	
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf.process];
+	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
-	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf.process breakPoints:self->objcSelf.breakPointController.breakPoints machBinaries:machBinaries maxLimit:2];
+	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf->_process breakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries maxLimit:2];
 	if (backtrace.instructions.count < 2)
 	{
 		PyErr_SetString(gDebuggerException, "debug.stepOut failed to find available instruction to step out to");
@@ -1126,11 +1126,11 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	ZGInstruction *returnInstruction =
 	[ZGDebuggerUtilities
 	 findInstructionBeforeAddress:outerInstruction.variable.address + outerInstruction.variable.size + 1
-	 inProcess:self->objcSelf.process
-	 withBreakPoints:self->objcSelf.breakPointController.breakPoints
+	 inProcess:self->objcSelf->_process
+	 withBreakPoints:self->objcSelf->_breakPointController.breakPoints
 	 machBinaries:machBinaries];
 
-	if (![self->objcSelf.breakPointController addBreakPointOnInstruction:returnInstruction inProcess:self->objcSelf.process thread:self->objcSelf.haltedBreakPoint.thread basePointer:outerBasePointer.unsignedLongLongValue callback:callback delegate:self->objcSelf])
+	if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:returnInstruction inProcess:self->objcSelf->_process thread:self->objcSelf->_haltedBreakPoint.thread basePointer:outerBasePointer.unsignedLongLongValue callback:callback delegate:self->objcSelf])
 	{
 		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOut failed to set breakpoint at 0x%llX", outerInstruction.variable.address] UTF8String]);
 		return NULL;
@@ -1145,14 +1145,14 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 
 static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject * __unused args)
 {
-	if (self->objcSelf.haltedBreakPoint == nil)
+	if (self->objcSelf->_haltedBreakPoint == nil)
 	{
 		PyErr_SetString(gDebuggerException, "debug.backtrace called without a current breakpoint set");
 		return NULL;
 	}
 	
 	x86_thread_state_t threadState;
-	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, NULL))
+	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, NULL))
 	{
 		PyErr_SetString(gDebuggerException, "debug.backtrace failed to retrieve current general thread state");
 		return NULL;
@@ -1161,7 +1161,7 @@ static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject * __unused arg
 	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 	ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
 	
-	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf.process breakPoints:self->objcSelf.breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf.process]];
+	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf->_process breakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
 	
 	PyObject *pythonInstructionAddresses = PyList_New((Py_ssize_t)backtrace.instructions.count);
 	Py_ssize_t instructionIndex = 0;
@@ -1254,7 +1254,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	if (self->objcSelf.haltedBreakPoint == nil)
+	if (self->objcSelf->_haltedBreakPoint == nil)
 	{
 		PyErr_SetString(gDebuggerException, "debug.writeRegisters failed because we are not at a halted breakpoint");
 		return NULL;
@@ -1264,7 +1264,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
-	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, &threadStateCount))
+	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, &threadStateCount))
 	{
 		PyErr_SetString(gDebuggerException, "debug.writeRegisters failed retrieving target's thread state");
 		ZGResumeTask(self->processTask);
@@ -1274,30 +1274,30 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	zg_x86_vector_state_t vectorState;
 	mach_msg_type_number_t vectorStateCount;
 	bool hasAVXSupport = NO;
-	BOOL hasVectorRegisters = ZGGetVectorThreadState(&vectorState, self->objcSelf.haltedBreakPoint.thread, &vectorStateCount, self->is64Bit, &hasAVXSupport);
+	BOOL hasVectorRegisters = ZGGetVectorThreadState(&vectorState, self->objcSelf->_haltedBreakPoint.thread, &vectorStateCount, self->is64Bit, &hasAVXSupport);
 	
 	ZGResumeTask(self->processTask);
 	
-	if (self->objcSelf.generalPurposeRegisterOffsetsDictionary == nil)
+	if (self->objcSelf->_generalPurposeRegisterOffsetsDictionary == nil)
 	{
 		ZGRegisterEntry generalPurposeRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
 		[ZGRegisterEntries getRegisterEntries:generalPurposeRegisterEntries fromGeneralPurposeThreadState:threadState is64Bit:self->is64Bit];
 		
-		self->objcSelf.generalPurposeRegisterOffsetsDictionary = registerOffsetsCacheDictionary(generalPurposeRegisterEntries);
+		self->objcSelf->_generalPurposeRegisterOffsetsDictionary = registerOffsetsCacheDictionary(generalPurposeRegisterEntries);
 	}
 	
-	if (hasVectorRegisters && self->objcSelf.vectorRegisterOffsetsDictionary == nil)
+	if (hasVectorRegisters && self->objcSelf->_vectorRegisterOffsetsDictionary == nil)
 	{
 		ZGRegisterEntry vectorRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
 		[ZGRegisterEntries getRegisterEntries:vectorRegisterEntries fromVectorThreadState:vectorState is64Bit:self->is64Bit hasAVXSupport:hasAVXSupport];
 		
-		self->objcSelf.vectorRegisterOffsetsDictionary = registerOffsetsCacheDictionary(vectorRegisterEntries);
+		self->objcSelf->_vectorRegisterOffsetsDictionary = registerOffsetsCacheDictionary(vectorRegisterEntries);
 	}
 	
 	BOOL success = YES;
 	
-	NSDictionary *generalPurposeRegisterOffsetsDictionary = self->objcSelf.generalPurposeRegisterOffsetsDictionary;
-	NSDictionary *vectorRegisterOffsetsDictionary = self->objcSelf.vectorRegisterOffsetsDictionary;
+	NSDictionary *generalPurposeRegisterOffsetsDictionary = self->objcSelf->_generalPurposeRegisterOffsetsDictionary;
+	NSDictionary *vectorRegisterOffsetsDictionary = self->objcSelf->_vectorRegisterOffsetsDictionary;
 	
 	BOOL needsToWriteGeneralRegisters = NO;
 	BOOL needsToWriteVectorRegisters = NO;
@@ -1335,7 +1335,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	{
 		ZGSuspendTask(self->processTask);
 		
-		if (!ZGSetGeneralThreadState(&threadState, self->objcSelf.haltedBreakPoint.thread, threadStateCount))
+		if (!ZGSetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, threadStateCount))
 		{
 			PyErr_SetString(gDebuggerException, "debug.writeRegisters failed to write the new thread state");
 			success = NO;
@@ -1348,7 +1348,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	{
 		ZGSuspendTask(self->processTask);
 		
-		if (!ZGSetVectorThreadState(&vectorState, self->objcSelf.haltedBreakPoint.thread, vectorStateCount, self->is64Bit))
+		if (!ZGSetVectorThreadState(&vectorState, self->objcSelf->_haltedBreakPoint.thread, vectorStateCount, self->is64Bit))
 		{
 			PyErr_SetString(gDebuggerException, "debug.writeRegisters failed to write the new vector state");
 			success = NO;

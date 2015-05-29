@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGMemoryDumpAllWindowController">
             <connections>
-                <outlet property="cancelButton" destination="q0E-hI-5ht" id="dyn-bv-B33"/>
-                <outlet property="progressIndicator" destination="rOP-KL-4NZ" id="hIT-km-Sjp"/>
+                <outlet property="_cancelButton" destination="q0E-hI-5ht" id="Q0Q-2u-kdf"/>
+                <outlet property="_progressIndicator" destination="rOP-KL-4NZ" id="xu9-iB-3Du"/>
                 <outlet property="window" destination="BLo-DI-UYF" id="l10-eU-Zdd"/>
             </connections>
         </customObject>

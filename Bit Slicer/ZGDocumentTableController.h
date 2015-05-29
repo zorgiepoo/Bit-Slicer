@@ -35,11 +35,8 @@
 #import <Cocoa/Cocoa.h>
 
 @class ZGDocumentWindowController;
-@class ZGTableView;
 
 @interface ZGDocumentTableController : NSObject <NSTableViewDelegate>
-
-@property (assign, nonatomic) ZGTableView *variablesTableView;
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 

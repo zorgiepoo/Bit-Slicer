@@ -38,8 +38,8 @@
 
 @interface ZGRunningProcessObserver : NSObject
 
-@property (strong, nonatomic) ZGRunningProcess *runningProcess;
-@property (assign, nonatomic) id observer;
+@property (nonatomic, readonly) ZGRunningProcess *runningProcess;
+@property (weak, nonatomic, readonly) id observer;
 
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier observer:(id)observer;
 

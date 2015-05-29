@@ -36,16 +36,13 @@
 #import "udis86.h"
 #import "ZGVariable.h"
 
-@interface ZGDisassemblerObject ()
-
-@property (nonatomic) ud_t *object;
-@property (nonatomic) void *bytes;
-@property (nonatomic) ZGMemoryAddress startAddress;
-@property (nonatomic) ZGMemorySize pointerSize;
-
-@end
-
 @implementation ZGDisassemblerObject
+{
+	ud_t *_object;
+	void *_bytes;
+	ZGMemoryAddress _startAddress;
+	ZGMemorySize _pointerSize;
+}
 
 // Possible candidates: UD_Isyscall, UD_Ivmcall, UD_Ivmmcall ??
 + (BOOL)isCallMnemonic:(int)mnemonic
@@ -82,29 +79,29 @@ static void disassemblerTranslator(ud_t *object)
 - (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize
 {
 	self = [super init];
-	if (self)
+	if (self != nil)
 	{
-		self.bytes = malloc(size);
-		memcpy(self.bytes, bytes, size);
+		_bytes = malloc(size);
+		memcpy(_bytes, bytes, size);
 		
-		self.startAddress = address;
-		self.object = malloc(sizeof(ud_t));
+		_startAddress = address;
+		_object = malloc(sizeof(*_object));
 		
-		self.pointerSize = pointerSize;
+		_pointerSize = pointerSize;
 		
-		ud_init(self.object);
-		ud_set_input_buffer(self.object, self.bytes, size);
-		ud_set_mode(self.object, (uint8_t)self.pointerSize * 8);
-		ud_set_syntax(self.object, disassemblerTranslator);
-		ud_set_pc(self.object, self.startAddress);
+		ud_init(_object);
+		ud_set_input_buffer(_object, _bytes, size);
+		ud_set_mode(_object, (uint8_t)_pointerSize * 8);
+		ud_set_syntax(_object, disassemblerTranslator);
+		ud_set_pc(_object, _startAddress);
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	free(self.object); self.object = NULL;
-	free(self.bytes); self.bytes = NULL;
+	free(_object); _object = NULL;
+	free(_bytes); _bytes = NULL;
 }
 
 - (NSArray *)readInstructions
@@ -211,7 +208,7 @@ static void disassemblerTranslator(ud_t *object)
 			BOOL canResolveOperand = YES;
 			if (operandType == UD_OP_JIMM)
 			{
-				branchOperandAddress = self.startAddress + ud_insn_len(_object);
+				branchOperandAddress = _startAddress + ud_insn_len(_object);
 				if (operandOffset >= 0)
 				{
 					branchOperandAddress += (uint64_t)operandOffset;
@@ -225,7 +222,7 @@ static void disassemblerTranslator(ud_t *object)
 			{
 				if (operand->base == UD_R_RIP)
 				{
-					branchOperandAddress = self.startAddress +  ud_insn_len(_object);
+					branchOperandAddress = _startAddress +  ud_insn_len(_object);
 					if (operandOffset >= 0)
 					{
 						branchOperandAddress += (uint64_t)operandOffset;
@@ -247,7 +244,7 @@ static void disassemblerTranslator(ud_t *object)
 
 			if (canResolveOperand)
 			{
-				if (self.pointerSize == sizeof(ZG32BitMemoryAddress))
+				if (_pointerSize == sizeof(ZG32BitMemoryAddress))
 				{
 					branchOperandAddress = (ZG32BitMemoryAddress)branchOperandAddress;
 				}

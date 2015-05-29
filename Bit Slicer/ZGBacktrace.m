@@ -39,13 +39,6 @@
 #import "ZGMachBinary.h"
 #import "ZGVirtualMemory.h"
 
-@interface ZGBacktrace ()
-
-@property (nonatomic) NSArray *instructions;
-@property (nonatomic) NSArray *basePointers;
-
-@end
-
 @implementation ZGBacktrace
 
 - (id)initWithInstructions:(NSArray *)instructions basePointers:(NSArray *)basePointers
@@ -53,8 +46,8 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.instructions = instructions;
-		self.basePointers = basePointers;
+		_instructions = instructions;
+		_basePointers = basePointers;
 	}
 	return self;
 }

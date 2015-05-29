@@ -39,25 +39,21 @@
 
 #define USER_INTERFACE_UPDATE_TIME_INTERVAL	 0.33
 
-@class ZGSearchData;
 @class ZGSearchProgress;
 @class ZGSearchResults;
 @class ZGDocumentWindowController;
-@class ZGDocumentData;
 
 #define MAX_NUMBER_OF_VARIABLES_TO_FETCH ((NSUInteger)1000)
 
 @interface ZGDocumentSearchController : NSObject <ZGSearchProgressDelegate>
 
-@property (assign, nonatomic) ZGDocumentData *documentData;
-@property (assign, nonatomic) ZGSearchData *searchData;
-@property (strong, nonatomic) ZGSearchResults *searchResults;
-@property (readonly, strong, nonatomic) ZGSearchProgress *searchProgress;
-
 + (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression isLinearlyExpressed:(BOOL *)isLinearlyExpressedReference;
 + (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression;
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
+
+@property (nonatomic) ZGSearchResults *searchResults;
+@property (nonatomic, readonly) ZGSearchProgress *searchProgress;
 
 - (BOOL)canStartTask;
 - (BOOL)canCancelTask;

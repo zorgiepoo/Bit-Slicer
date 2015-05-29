@@ -40,21 +40,16 @@
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
-@interface ZGProcessList ()
-{
-	NSMutableArray *_runningProcesses;
-}
-
-@property (nonatomic) ZGProcessTaskManager *processTaskManager;
-
-@property (nonatomic) NSUInteger pollRequestCount;
-@property (nonatomic) NSArray *priorityProcesses;
-@property (nonatomic) NSArray *pollObservers;
-@property (nonatomic) NSTimer *pollTimer;
-
-@end
-
 @implementation ZGProcessList
+{
+	ZGProcessTaskManager *_processTaskManager;
+	NSMutableArray *_runningProcesses;
+	
+	NSTimer *_pollTimer;
+	NSUInteger _pollRequestCount;
+	NSMutableArray *_priorityProcesses;
+	NSMutableArray *_pollObservers;
+}
 
 #pragma mark Setter & Accessors
 
@@ -111,7 +106,7 @@
 	self = [self init];
 	if (self != nil)
 	{
-		self.processTaskManager = processTaskManager;
+		_processTaskManager = processTaskManager;
 	}
 	return self;
 }
@@ -216,22 +211,22 @@
 
 - (void)createPollTimer
 {
-	self.pollTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(poll:) userInfo:nil repeats:YES];
+	_pollTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(poll:) userInfo:nil repeats:YES];
 }
 
 - (void)destroyPollTimer
 {
-	[self.pollTimer invalidate];
-	self.pollTimer = nil;
+	[_pollTimer invalidate];
+	_pollTimer = nil;
 }
 
 - (void)poll:(NSTimer *)__unused timer
 {
-	if (self.pollRequestCount > 0)
+	if (_pollRequestCount > 0)
 	{
 		[self retrieveList];
 	}
-	else if (self.priorityProcesses != nil)
+	else if (_priorityProcesses != nil)
 	{
 		[self watchPriorityProcesses];
 	}
@@ -239,33 +234,33 @@
 
 - (void)requestPollingWithObserver:(id)observer
 {
-	if (![self.pollObservers containsObject:observer])
+	if (![_pollObservers containsObject:observer])
 	{
-		NSMutableArray *newObservers = self.pollObservers ? [NSMutableArray arrayWithArray:self.pollObservers] : [NSMutableArray array];
+		if (_pollObservers == nil)
+		{
+			_pollObservers = [NSMutableArray array];
+		}
 		
-		[newObservers addObject:observer];
-		self.pollObservers = [NSArray arrayWithArray:newObservers];
+		[_pollObservers addObject:observer];
 		
-		if (self.pollRequestCount == 0 && !self.pollTimer)
+		if (_pollRequestCount == 0 && _pollTimer == nil)
 		{
 			[self createPollTimer];
 		}
 		
-		self.pollRequestCount++;
+		_pollRequestCount++;
 	}
 }
 
 - (void)unrequestPollingWithObserver:(id)observer
 {
-	if ([self.pollObservers containsObject:observer])
+	if ([_pollObservers containsObject:observer])
 	{
-		NSMutableArray *newObservers = [NSMutableArray arrayWithArray:self.pollObservers];
-		[newObservers removeObject:observer];
-		self.pollObservers = [NSArray arrayWithArray:newObservers];
+		[_pollObservers removeObject:observer];
 		
-		self.pollRequestCount--;
+		_pollRequestCount--;
 		
-		if (self.pollRequestCount == 0 && self.priorityProcesses.count == 0)
+		if (_pollRequestCount == 0 && _priorityProcesses.count == 0)
 		{
 			[self destroyPollTimer];
 		}
@@ -278,13 +273,13 @@
 {
 	BOOL shouldRetrieveList = NO;
 	
-	for (ZGRunningProcessObserver *runningProcessObserver in self.priorityProcesses)
+	for (ZGRunningProcessObserver *runningProcessObserver in _priorityProcesses)
 	{
 		ZGMemoryMap task = MACH_PORT_NULL;
 		pid_t processIdentifier = runningProcessObserver.runningProcess.processIdentifier;
-		BOOL foundExistingTask = [self.processTaskManager taskExistsForProcessIdentifier:processIdentifier];
+		BOOL foundExistingTask = [_processTaskManager taskExistsForProcessIdentifier:processIdentifier];
 		
-		BOOL retrievedTask = foundExistingTask && [self.processTaskManager getTask:&task forProcessIdentifier:processIdentifier];
+		BOOL retrievedTask = foundExistingTask && [_processTaskManager getTask:&task forProcessIdentifier:processIdentifier];
 		BOOL increasedUserReference = retrievedTask && ZGSetPortSendRightReferenceCountByDelta(task, 1);
 		
 		if (!increasedUserReference || !MACH_PORT_VALID(task))
@@ -307,16 +302,20 @@
 
 - (void)addPriorityToProcessIdentifier:(pid_t)processIdentifier withObserver:(id)observer
 {
-	assert(self.processTaskManager != nil);
+	assert(_processTaskManager != nil);
 	
 	ZGRunningProcessObserver *runningProcessObserver = [[ZGRunningProcessObserver alloc] initWithProcessIdentifier:processIdentifier observer:observer];
 	
-	if (![self.priorityProcesses containsObject:runningProcessObserver])
+	if (![_priorityProcesses containsObject:runningProcessObserver])
 	{
-		NSMutableArray *newPriorityProcesses = self.priorityProcesses ? [NSMutableArray arrayWithArray:self.priorityProcesses] : [NSMutableArray array];
-		[newPriorityProcesses addObject:runningProcessObserver];
-		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
-		if (!self.pollTimer)
+		if (_priorityProcesses == nil)
+		{
+			_priorityProcesses = [NSMutableArray array];
+		}
+		
+		[_priorityProcesses addObject:runningProcessObserver];
+		
+		if (_pollTimer == nil)
 		{
 			[self createPollTimer];
 		}
@@ -327,12 +326,11 @@
 {
 	ZGRunningProcessObserver *runningProcessObserver = [[ZGRunningProcessObserver alloc] initWithProcessIdentifier:processIdentifier observer:observer];
 	
-	if ([self.priorityProcesses containsObject:runningProcessObserver])
+	if ([_priorityProcesses containsObject:runningProcessObserver])
 	{
-		NSMutableArray *newPriorityProcesses = [NSMutableArray arrayWithArray:self.priorityProcesses];
-		[newPriorityProcesses removeObject:runningProcessObserver];
-		self.priorityProcesses = [NSArray arrayWithArray:newPriorityProcesses];
-		if (self.priorityProcesses.count == 0 && self.pollRequestCount == 0)
+		[_priorityProcesses removeObject:runningProcessObserver];
+		
+		if (_priorityProcesses.count == 0 && _pollRequestCount == 0)
 		{
 			[self destroyPollTimer];
 		}

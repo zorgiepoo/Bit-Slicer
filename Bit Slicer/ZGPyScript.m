@@ -41,7 +41,7 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.path = path;
+		_path = [path copy];
 	}
 	return self;
 }

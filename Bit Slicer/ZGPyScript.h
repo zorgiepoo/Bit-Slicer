@@ -40,7 +40,10 @@
 
 @interface ZGPyScript : NSObject
 
-@property (nonatomic, copy) NSString *path;
+- (id)initWithPath:(NSString *)path;
+- (NSString *)moduleName;
+
+@property (nonatomic, copy, readonly) NSString *path;
 @property (nonatomic) PyObject *module;
 @property (nonatomic) PyObject *scriptObject;
 @property (nonatomic) PyObject *executeFunction;
@@ -49,8 +52,5 @@
 @property (atomic) ZGPyVirtualMemory *virtualMemoryInstance;
 @property (atomic) ZGPyDebugger *debuggerInstance;
 @property (atomic) NSUInteger finishedCount;
-
-- (id)initWithPath:(NSString *)path;
-- (NSString *)moduleName;
 
 @end

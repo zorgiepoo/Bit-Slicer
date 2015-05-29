@@ -205,14 +205,15 @@ static PyTypeObject VirtualMemoryType =
 
 @interface ZGPyVirtualMemory ()
 
-@property (nonatomic, assign) PyObject *object;
-@property (nonatomic) ZGProcess *process;
-@property (nonatomic) NSMutableDictionary *allocationSizeTable;
-@property ZGSearchProgress *searchProgress;
+@property (atomic) ZGSearchProgress *searchProgress;
 
 @end
 
 @implementation ZGPyVirtualMemory
+{
+	ZGProcess *_process;
+	NSMutableDictionary *_allocationSizeTable;
+}
 
 PyObject *gVirtualMemoryException;
 + (void)loadPythonClassInMainModule:(PyObject *)module
@@ -242,25 +243,18 @@ PyObject *gVirtualMemoryException;
 	if (self != nil)
 	{
 		PyTypeObject *type = &VirtualMemoryType;
-		self.object = (PyObject *)((VirtualMemory *)type->tp_alloc(type, 0));
-		if (self.object == NULL)
+		[self setObject:(PyObject *)((VirtualMemory *)type->tp_alloc(type, 0))];
+		if (_object == NULL)
 		{
 			return nil;
 		}
-		VirtualMemory *vmObject = (VirtualMemory *)self.object;
+		VirtualMemory *vmObject = (VirtualMemory *)_object;
 		vmObject->objcSelf = self;
 		vmObject->processTask = process.processTask;
 		vmObject->processIdentifier = process.processID;
 		vmObject->is64Bit = process.is64Bit;
 		
-		if (shouldCopyProcess)
-		{
-			self.process = [[ZGProcess alloc] initWithProcess:process];
-		}
-		else
-		{
-			self.process = process;
-		}
+		_process = shouldCopyProcess ? [[ZGProcess alloc] initWithProcess:process] : process;
 	}
 	return self;
 }
@@ -295,12 +289,12 @@ PyObject *gVirtualMemoryException;
 
 - (void)dealloc
 {
-	for (integer_t resumeIndex = 0; resumeIndex < ((VirtualMemory *)self.object)->suspendCount; resumeIndex++)
+	for (integer_t resumeIndex = 0; resumeIndex < ((VirtualMemory *)_object)->suspendCount; resumeIndex++)
 	{
-		ZGResumeTask(((VirtualMemory *)self.object)->processTask);
+		ZGResumeTask(((VirtualMemory *)_object)->processTask);
 	}
 	
-	self.object = NULL;
+	[self setObject:NULL];
 }
 
 #define VirtualMemory_read(type, typeFormat, functionName) \
@@ -727,13 +721,13 @@ static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
 		
 		if (partialPath != NULL)
 		{
-			imageAddress = [[ZGMachBinary machBinaryWithPartialImageName:[NSString stringWithUTF8String:partialPath] inProcess:self->objcSelf.process fromCachedMachBinaries:nil error:&error] headerAddress];
+			imageAddress = [[ZGMachBinary machBinaryWithPartialImageName:[NSString stringWithUTF8String:partialPath] inProcess:self->objcSelf->_process fromCachedMachBinaries:nil error:&error] headerAddress];
 		}
 		else
 		{
 			if (self->baseAddress == 0)
 			{
-				self->baseAddress = [[ZGMachBinary mainMachBinaryFromMachBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf.process]] headerAddress];
+				self->baseAddress = [[ZGMachBinary mainMachBinaryFromMachBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]] headerAddress];
 			}
 			imageAddress = self->baseAddress;
 		}
@@ -760,7 +754,7 @@ static PyObject *VirtualMemory_allocate(VirtualMemory *self, PyObject *args)
 		ZGMemoryAddress memoryAddress = 0;
 		if (ZGAllocateMemory(self->processTask, &memoryAddress, numberOfBytes))
 		{
-			[self->objcSelf.allocationSizeTable setObject:@(numberOfBytes) forKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
+			[[self->objcSelf allocationSizeTable] setObject:@(numberOfBytes) forKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
 			retValue = Py_BuildValue("K", memoryAddress);
 		}
 		else
@@ -777,14 +771,14 @@ static PyObject *VirtualMemory_deallocate(VirtualMemory *self, PyObject *args)
 	ZGMemoryAddress memoryAddress = 0;
 	if (PyArg_ParseTuple(args, "K:deallocate", &memoryAddress))
 	{
-		NSNumber *bytesNumber = [self->objcSelf.allocationSizeTable objectForKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
+		NSNumber *bytesNumber = [self->objcSelf allocationSizeTable][@(memoryAddress)];
 		if (bytesNumber != nil)
 		{
 			ZGMemorySize numberOfBytes = [bytesNumber unsignedLongLongValue];
 			if (ZGDeallocateMemory(self->processTask, memoryAddress, numberOfBytes))
 			{
 				retValue = Py_BuildValue("");
-				[self->objcSelf.allocationSizeTable removeObjectForKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
+				[[self->objcSelf allocationSizeTable] removeObjectForKey:[NSNumber numberWithUnsignedLongLong:memoryAddress]];
 			}
 			else
 			{

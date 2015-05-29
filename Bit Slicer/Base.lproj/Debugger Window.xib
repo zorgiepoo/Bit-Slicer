@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDebuggerController">
             <connections>
+                <outlet property="_backtraceView" destination="Bh5-To-vJR" id="bfA-EE-S8E"/>
+                <outlet property="_continueButton" destination="2Xc-JX-DhY" id="T5D-6i-GbH"/>
+                <outlet property="_instructionsTableView" destination="Ksp-7e-9HA" id="G3L-dK-8yp"/>
+                <outlet property="_registersAndBacktraceSplitView" destination="246" id="Rfr-5R-8ne"/>
+                <outlet property="_registersView" destination="YKc-8G-cFS" id="Gvf-Mf-9Er"/>
+                <outlet property="_splitView" destination="239" id="mm1-lA-4RG"/>
+                <outlet property="_statusTextField" destination="QFr-ST-Ct0" id="KWB-Po-Ehn"/>
+                <outlet property="_stepExecutionSegmentedControl" destination="hed-Ji-GwK" id="Zj5-rL-JHM"/>
                 <outlet property="addressTextField" destination="ztk-ei-XwG" id="HE9-HV-rHU"/>
-                <outlet property="backtraceView" destination="Bh5-To-vJR" id="7wn-JW-2kV"/>
-                <outlet property="continueButton" destination="2Xc-JX-DhY" id="dr8-aT-zNo"/>
-                <outlet property="instructionsTableView" destination="Ksp-7e-9HA" id="xuY-up-g0Y"/>
                 <outlet property="navigationSegmentedControl" destination="vkH-Yd-fy0" id="Ky9-Xf-TmK"/>
-                <outlet property="registersAndBacktraceSplitView" destination="246" id="FXl-Gz-Yfd"/>
-                <outlet property="registersView" destination="YKc-8G-cFS" id="00F-gy-zwL"/>
                 <outlet property="runningApplicationsPopUpButton" destination="fpR-fU-ajG" id="98g-ZN-oRL"/>
-                <outlet property="splitView" destination="239" id="247"/>
-                <outlet property="statusTextField" destination="QFr-ST-Ct0" id="t5w-EZ-lIx"/>
-                <outlet property="stepExecutionSegmentedControl" destination="hed-Ji-GwK" id="6XI-Fz-1zt"/>
                 <outlet property="window" destination="5" id="37"/>
             </connections>
         </customObject>
@@ -104,7 +104,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="840" height="19"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
-                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                             <tableColumns>
                                                 <tableColumn identifier="breakpoint" width="50" minWidth="20" maxWidth="100" id="pCd-L4-hx2">

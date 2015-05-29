@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGMemoryDumpRangeWindowController">
             <connections>
-                <outlet property="fromAddressTextField" destination="OVD-PR-crm" id="US3-iv-Nzj"/>
-                <outlet property="toAddressTextField" destination="4Th-Ss-lQG" id="TM5-My-30e"/>
+                <outlet property="_fromAddressTextField" destination="OVD-PR-crm" id="Ewx-0h-ptI"/>
+                <outlet property="_toAddressTextField" destination="4Th-Ss-lQG" id="Dcf-lR-YGP"/>
                 <outlet property="window" destination="grv-2d-rnv" id="cHN-zo-UDF"/>
             </connections>
         </customObject>
@@ -24,7 +24,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="htx-Ct-Vja">
-                        <rect key="frame" x="153" y="12" width="96" height="32"/>
+                        <rect key="frame" x="152" y="12" width="97" height="32"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="jGp-uC-IW4">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -37,7 +37,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="biT-Ms-21y">
-                        <rect key="frame" x="57" y="12" width="96" height="32"/>
+                        <rect key="frame" x="55" y="12" width="97" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Bpf-26-gFN">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -66,7 +66,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nXs-WJ-5I6">
-                        <rect key="frame" x="33" y="50" width="25" height="17"/>
+                        <rect key="frame" x="33" y="50" width="23" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="To:" id="693-oo-8j5">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -74,7 +74,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Th-Ss-lQG">
-                        <rect key="frame" x="63" y="48" width="180" height="22"/>
+                        <rect key="frame" x="61" y="48" width="182" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="vq3-s4-qvK">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>

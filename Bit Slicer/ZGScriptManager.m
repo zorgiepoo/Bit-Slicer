@@ -64,21 +64,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 
 @interface ZGScriptManager ()
 
-@property (nonatomic) ZGLoggerWindowController *loggerWindowController;
-@property (nonatomic) ZGScriptingInterpreter *scriptingInterpreter;
-
-@property (nonatomic) NSMutableDictionary *scriptsDictionary;
-@property (nonatomic) VDKQueue *fileWatchingQueue;
-@property (nonatomic, assign) ZGDocumentWindowController *windowController;
-@property (nonatomic) dispatch_source_t scriptTimer; // only accessed on python queue
 @property (atomic) NSMutableArray *runningScripts;
-@property (nonatomic) NSMutableArray *objectsPool;
-@property (nonatomic) id scriptActivity;
-
-@property (nonatomic) ZGScriptPromptWindowController *scriptPromptWindowController;
-
-@property (nonatomic) ZGAppTerminationState *appTerminationState;
-@property (nonatomic) BOOL delayedAppTermination;
 
 @end
 
@@ -86,6 +72,16 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 {
 	BOOL _cleanedUp;
 	dispatch_queue_t _pythonQueue;
+	__weak ZGDocumentWindowController *_windowController;
+	ZGLoggerWindowController *_loggerWindowController;
+	ZGScriptingInterpreter *_scriptingInterpreter;
+	NSMutableDictionary *_scriptsDictionary;
+	VDKQueue *_fileWatchingQueue;
+	dispatch_source_t _scriptTimer; // only accessed on python queue
+	id _scriptActivity;
+	ZGScriptPromptWindowController *_scriptPromptWindowController;
+	ZGAppTerminationState *_appTerminationState;
+	BOOL _delayedAppTermination;
 }
 
 + (void)initialize
@@ -101,15 +97,15 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	self = [super init];
 	if (self != nil)
 	{
-		self.scriptsDictionary = [[NSMutableDictionary alloc] init];
-		self.fileWatchingQueue = [[VDKQueue alloc] init];
-		self.fileWatchingQueue.delegate = self;
-		self.windowController = windowController;
-		self.loggerWindowController = windowController.loggerWindowController;
-		self.scriptingInterpreter = windowController.scriptingInterpreter;
-		self.scriptPromptWindowController = [[ZGScriptPromptWindowController alloc] init];
+		_scriptsDictionary = [[NSMutableDictionary alloc] init];
+		_fileWatchingQueue = [[VDKQueue alloc] init];
+		_fileWatchingQueue.delegate = self;
+		_windowController = windowController;
+		_loggerWindowController = windowController.loggerWindowController;
+		_scriptingInterpreter = windowController.scriptingInterpreter;
+		_scriptPromptWindowController = [[ZGScriptPromptWindowController alloc] init];
 		
-		_pythonQueue = self.scriptingInterpreter.pythonQueue;
+		_pythonQueue = _scriptingInterpreter.pythonQueue;
 	}
 	return self;
 }
@@ -118,21 +114,21 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 {
 	if (!_cleanedUp)
 	{
-		self.appTerminationState = appTerminationState;
+		_appTerminationState = appTerminationState;
 		
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL * __unused stop) {
-			if ([self.runningScripts containsObject:pyScript])
+		[_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL * __unused stop) {
+			if ([[self runningScripts] containsObject:pyScript])
 			{
-				if (self.appTerminationState != nil)
+				if (self->_appTerminationState != nil)
 				{
-					[self.appTerminationState increaseLifeCount];
-					self.delayedAppTermination = YES;
+					[self->_appTerminationState increaseLifeCount];
+					self->_delayedAppTermination = YES;
 				}
 				[self stopScriptForVariable:[variableValue pointerValue]];
 			}
 		}];
 		
-		[self.fileWatchingQueue removeAllPaths];
+		[_fileWatchingQueue removeAllPaths];
 		
 		_cleanedUp = YES;
 	}
@@ -147,7 +143,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 {
 	NSFileManager *fileManager = [[NSFileManager alloc] init];
 	__block BOOL assignedNewScript = NO;
-	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *script, BOOL *stop) {
+	[_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *script, BOOL *stop) {
 		if ([script.path isEqualToString:fullPath])
 		{
 			if ([fileManager fileExistsAtPath:script.path])
@@ -169,14 +165,14 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	
 	if (assignedNewScript)
 	{
-		ZGDocumentWindowController *windowController = self.windowController;
+		ZGDocumentWindowController *windowController = _windowController;
 		[windowController.variablesTableView reloadData];
 		[windowController markDocumentChange];
 	}
 	
 	// Handle atomic saves
-	[self.fileWatchingQueue removePath:fullPath];
-	[self.fileWatchingQueue addPath:fullPath];
+	[_fileWatchingQueue removePath:fullPath];
+	[_fileWatchingQueue addPath:fullPath];
 }
 
 - (void)loadCachedScriptsFromVariables:(NSArray *)variables
@@ -204,7 +200,8 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	
 	if (needsToMarkChange)
 	{
-		[self.windowController markDocumentChange];
+		ZGDocumentWindowController *windowController = _windowController;
+		[windowController markDocumentChange];
 	}
 }
 
@@ -212,17 +209,17 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 {
 	NSFileManager *fileManager = [[NSFileManager alloc] init];
 	
-	ZGPyScript *script = [self.scriptsDictionary objectForKey:[NSValue valueWithNonretainedObject:variable]];
+	ZGPyScript *script = [_scriptsDictionary objectForKey:[NSValue valueWithNonretainedObject:variable]];
 	if (script != nil && ![fileManager fileExistsAtPath:script.path])
 	{
-		[self.scriptsDictionary removeObjectForKey:[NSValue valueWithNonretainedObject:variable]];
-		[self.fileWatchingQueue removePath:script.path];
+		[_scriptsDictionary removeObjectForKey:[NSValue valueWithNonretainedObject:variable]];
+		[_fileWatchingQueue removePath:script.path];
 		script = nil;
 	}
 	
 	if (script == nil)
 	{
-		[self.scriptingInterpreter acquireInterpreter];
+		[_scriptingInterpreter acquireInterpreter];
 		
 		NSString *scriptPath = nil;
 		
@@ -248,7 +245,9 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		if (variable.cachedScriptPath == nil || ![variable.cachedScriptPath isEqualToString:scriptPath])
 		{
 			variable.cachedScriptPath = scriptPath;
-			[self.windowController markDocumentChange];
+			
+			ZGDocumentWindowController *windowController = _windowController;
+			[windowController markDocumentChange];
 		}
 		
 		NSData *scriptData = [variable.scriptValue dataUsingEncoding:NSUTF8StringEncoding];
@@ -264,9 +263,9 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		
 		[scriptData writeToFile:scriptPath atomically:YES];
 		
-		[self.fileWatchingQueue addPath:scriptPath];
+		[_fileWatchingQueue addPath:scriptPath];
 		
-		[self.scriptsDictionary setObject:script forKey:[NSValue valueWithNonretainedObject:variable]];
+		[_scriptsDictionary setObject:script forKey:[NSValue valueWithNonretainedObject:variable]];
 	}
 	
 	return script;
@@ -291,8 +290,8 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 
 - (void)logPythonObject:(PyObject *)pythonObject
 {
-	NSString *errorDescription = [self.scriptingInterpreter fetchPythonErrorDescriptionFromObject:pythonObject];
-	ZGLoggerWindowController *loggerWindowController = self.loggerWindowController;
+	NSString *errorDescription = [_scriptingInterpreter fetchPythonErrorDescriptionFromObject:pythonObject];
+	ZGLoggerWindowController *loggerWindowController = _loggerWindowController;
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[loggerWindowController writeLine:errorDescription];
 	});
@@ -303,12 +302,13 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	PyObject *type, *value, *traceback;
 	PyErr_Fetch(&type, &value, &traceback);
 	
+	ZGDocumentWindowController *windowController = _windowController;
 	dispatch_async(dispatch_get_main_queue(), ^{
-		ZGProcess *process = self.windowController.currentProcess;
+		ZGProcess *process = windowController.currentProcess;
 		NSString *errorMessage = [NSString stringWithFormat:@"An error occured trying to run the script on %@", process.name];
-		[self.loggerWindowController writeLine:errorMessage];
+		[self->_loggerWindowController writeLine:errorMessage];
 		
-		if ((![NSApp isActive] || ![self.loggerWindowController.window isVisible]))
+		if ((![NSApp isActive] || ![self->_loggerWindowController.window isVisible]))
 		{
 			ZGDeliverUserNotification(ZGLocalizableScriptManagerString(@"scriptFailedNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizableScriptManagerString(@"scriptFailedNotificationTextFormat"), process.name], nil);
 		}
@@ -339,7 +339,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 				if (latestLog != nil)
 				{
 					dispatch_async(dispatch_get_main_queue(), ^{
-						[self.loggerWindowController writeLine:latestLog];
+						[self->_loggerWindowController writeLine:latestLog];
 					});
 				}
 			}
@@ -367,7 +367,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		
 		script.scriptObject = NULL;
 		
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
+		[_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *stop) {
 			if (pyScript == script)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -388,8 +388,8 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 
 - (void)watchProcessDied:(NSNotification *)__unused notification
 {
-	[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *__unused stop) {
-		if ([self.runningScripts containsObject:pyScript])
+	[_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *__unused stop) {
+		if ([[self runningScripts] containsObject:pyScript])
 		{
 			[self stopScriptForVariable:[variableValue pointerValue]];
 		}
@@ -401,7 +401,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	if (variable.enabled)
 	{
 		variable.enabled = NO;
-		ZGDocumentWindowController *windowController = self.windowController;
+		ZGDocumentWindowController *windowController = _windowController;
 		[windowController.variablesTableView reloadData];
 		[windowController markDocumentChange];
 	}
@@ -431,7 +431,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 {
 	ZGPyScript *script = [self scriptForVariable:variable];
 	
-	ZGDocumentWindowController *windowController = self.windowController;
+	ZGDocumentWindowController *windowController = _windowController;
 	
 	if (!windowController.currentProcess.valid)
 	{
@@ -464,7 +464,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		Py_XDECREF(scriptClassType);
 		
 		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:windowController.currentProcess];
-		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptingInterpreter:self.scriptingInterpreter scriptManager:self breakPointController:self.windowController.breakPointController hotKeyCenter:self.windowController.hotKeyCenter loggerWindowController:windowController.loggerWindowController];
+		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptingInterpreter:self->_scriptingInterpreter scriptManager:self breakPointController:windowController.breakPointController hotKeyCenter:windowController.hotKeyCenter loggerWindowController:windowController.loggerWindowController];
 		
 		script.virtualMemoryInstance = virtualMemoryInstance;
 		script.debuggerInstance = debuggerInstance;
@@ -479,9 +479,9 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 			return;
 		}
 		
-		if (self.runningScripts == nil)
+		if ([self runningScripts] == nil)
 		{
-			self.runningScripts = [[NSMutableArray alloc] init];
+			[self setRunningScripts:[[NSMutableArray alloc] init]];
 		}
 		
 		[self.runningScripts addObject:script];
@@ -491,7 +491,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 			 addObserver:self
 			 selector:@selector(watchProcessDied:)
 			 name:ZGTargetProcessDiedNotification
-			 object:self.windowController.currentProcess];
+			 object:windowController.currentProcess];
 		});
 		
 		PyObject_SetAttrString(script.module, "vm", virtualMemoryInstance.object);
@@ -542,18 +542,18 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		
 		script.executeFunction = PyObject_GetAttrString(script.scriptObject, executeFunctionName);
 		
-		if (self.scriptTimer == NULL && (self.scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self->_pythonQueue)) != NULL)
+		if (self->_scriptTimer == NULL && (self->_scriptTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self->_pythonQueue)) != NULL)
 		{
 			dispatch_async(dispatch_get_main_queue(), ^{
 				if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
 				{
-					self.scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script execute timer"];
+					self->_scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script execute timer"];
 				}
 			});
 			
-			dispatch_source_set_timer(self.scriptTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC * 3 / 100, NSEC_PER_SEC * 1 / 100);
-			dispatch_source_set_event_handler(self.scriptTimer, ^{
-				for (ZGPyScript *runningScript in self.runningScripts)
+			dispatch_source_set_timer(self->_scriptTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC * 3 / 100, NSEC_PER_SEC * 1 / 100);
+			dispatch_source_set_event_handler(self->_scriptTimer, ^{
+				for (ZGPyScript *runningScript in [self runningScripts])
 				{
 					NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
 					runningScript.deltaTime = currentTime - runningScript.lastTime;
@@ -561,10 +561,10 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 					[self executeScript:runningScript];
 				}
 			});
-			dispatch_resume(self.scriptTimer);
+			dispatch_resume(self->_scriptTimer);
 		}
 		
-		if (self.scriptTimer == NULL)
+		if (self->_scriptTimer == NULL)
 		{
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[self stopScriptForVariable:variable];
@@ -577,11 +577,11 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 
 - (void)removeScriptForVariable:(ZGVariable *)variable
 {
-	ZGPyScript *script = [self.scriptsDictionary objectForKey:[NSValue valueWithNonretainedObject:variable]];
+	ZGPyScript *script = [_scriptsDictionary objectForKey:[NSValue valueWithNonretainedObject:variable]];
 	if (script != nil)
 	{
-		[self.fileWatchingQueue removePath:script.path];
-		[self.scriptsDictionary removeObjectForKey:[NSValue valueWithNonretainedObject:variable]];
+		[_fileWatchingQueue removePath:script.path];
+		[_scriptsDictionary removeObjectForKey:[NSValue valueWithNonretainedObject:variable]];
 	}
 }
 
@@ -591,24 +591,26 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	
 	ZGPyScript *script = [self scriptForVariable:variable];
 	
-	if ([self.runningScripts containsObject:script])
+	if ([[self runningScripts] containsObject:script])
 	{
-		[self.runningScripts removeObject:script];
-		if (self.runningScripts.count == 0)
+		ZGDocumentWindowController *windowController = _windowController;
+		
+		[[self runningScripts] removeObject:script];
+		if ([self runningScripts].count == 0)
 		{
 			dispatch_async(_pythonQueue, ^{
-				if (self.scriptTimer != NULL)
+				if (self->_scriptTimer != NULL)
 				{
-					dispatch_source_cancel(self.scriptTimer);
-					self.scriptTimer = NULL;
+					dispatch_source_cancel(self->_scriptTimer);
+					self->_scriptTimer = NULL;
 					dispatch_async(dispatch_get_main_queue(), ^{
-						if (self.scriptActivity != nil)
+						if (self->_scriptActivity != nil)
 						{
-							[[NSProcessInfo processInfo] endActivity:self.scriptActivity];
-							self.scriptActivity = nil;
+							[[NSProcessInfo processInfo] endActivity:self->_scriptActivity];
+							self->_scriptActivity = nil;
 						}
 						
-						[self.windowController updateOcclusionActivity];
+						[windowController updateOcclusionActivity];
 					});
 				}
 			});
@@ -616,15 +618,15 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 			[[NSNotificationCenter defaultCenter] removeObserver:self];
 		}
 		
-		if ([self hasAttachedPrompt] && self.scriptPromptWindowController.delegate == script.debuggerInstance)
+		if ([self hasAttachedPrompt] && _scriptPromptWindowController.delegate == script.debuggerInstance)
 		{
-			ZGScriptPrompt *scriptPrompt = self.scriptPromptWindowController.scriptPrompt;
+			ZGScriptPrompt *scriptPrompt = _scriptPromptWindowController.scriptPrompt;
 			[self removeUserNotificationsForScriptPrompt:scriptPrompt];
 			
-			[self.scriptPromptWindowController terminateSession];
+			[_scriptPromptWindowController terminateSession];
 		}
 		
-		BOOL delayedAppTermination = self.delayedAppTermination;
+		BOOL delayedAppTermination = _delayedAppTermination;
 		
 		NSUInteger scriptFinishedCount = script.finishedCount;
 		
@@ -646,7 +648,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 				if (!delayedAppTermination)
 				{
 					const char *finishFunctionName = "finish";
-					if (Py_IsInitialized() && self.windowController.currentProcess.valid && script.scriptObject != NULL && PyObject_HasAttrString(script.scriptObject, finishFunctionName))
+					if (Py_IsInitialized() && windowController.currentProcess.valid && script.scriptObject != NULL && PyObject_HasAttrString(script.scriptObject, finishFunctionName))
 					{
 						PyObject *retValue = PyObject_CallMethod(script.scriptObject, (char *)finishFunctionName, NULL);
 						if (Py_IsInitialized())
@@ -665,7 +667,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 				if (delayedAppTermination)
 				{
 					dispatch_async(dispatch_get_main_queue(), ^{
-						[self.appTerminationState decreaseLifeCount];
+						[self->_appTerminationState decreaseLifeCount];
 					});
 				}
 			}
@@ -676,7 +678,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 			{
 				if (delayedAppTermination)
 				{
-					[self.appTerminationState decreaseLifeCount];
+					[self->_appTerminationState decreaseLifeCount];
 				}
 				else
 				{
@@ -697,7 +699,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	if (methodCallResult == NULL)
 	{
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[self.loggerWindowController writeLine:[NSString stringWithFormat:@"Exception raised in %@", methodName]];
+			[self->_loggerWindowController writeLine:[NSString stringWithFormat:@"Exception raised in %@", methodName]];
 		});
 		[self logPythonError];
 		dispatch_async(dispatch_get_main_queue(), ^{
@@ -708,24 +710,28 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 
 - (BOOL)hasAttachedPrompt
 {
-	return self.scriptPromptWindowController.isAttached;
+	return _scriptPromptWindowController.isAttached;
 }
 
 - (void)showScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate
 {
 	if (![self hasAttachedPrompt])
 	{
-		ZGDeliverUserNotificationWithReply(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), self.windowController.currentProcess.name, scriptPrompt.message, scriptPrompt.answer, @{ZGScriptNotificationPromptHashKey : @(scriptPrompt.hash)});
-		
-		[self.scriptPromptWindowController attachToWindow:self.windowController.window withScriptPrompt:scriptPrompt delegate:delegate];
+		ZGDocumentWindowController *windowController = _windowController;
+		if (windowController != nil)
+		{
+			ZGDeliverUserNotificationWithReply(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), windowController.currentProcess.name, scriptPrompt.message, scriptPrompt.answer, @{ZGScriptNotificationPromptHashKey : @(scriptPrompt.hash)});
+			
+			[_scriptPromptWindowController attachToWindow:windowController.window withScriptPrompt:scriptPrompt delegate:delegate];
+		}
 	}
 }
 
 - (void)handleScriptPromptHash:(NSNumber *)scriptPromptHash withUserNotificationReply:(NSString *)reply
 {
-	if ([scriptPromptHash isEqualToNumber:@(self.scriptPromptWindowController.scriptPrompt.hash)])
+	if ([scriptPromptHash isEqualToNumber:@(_scriptPromptWindowController.scriptPrompt.hash)])
 	{
-		[self.scriptPromptWindowController terminateSessionWithAnswer:reply];
+		[_scriptPromptWindowController terminateSessionWithAnswer:reply];
 	}
 }
 
@@ -753,7 +759,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	[self removeUserNotificationsForScriptPrompt:scriptPrompt];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
+		[self->_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(self->_pythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
@@ -772,11 +778,11 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 - (void)handleDataAddress:(ZGMemoryAddress)dataAddress accessedFromInstructionAddress:(ZGMemoryAddress)instructionAddress registersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
+		[self->_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(self->_pythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
-					PyObject *registers = [self.scriptingInterpreter registersfromRegistersState:registersState];
+					PyObject *registers = [self->_scriptingInterpreter registersfromRegistersState:registersState];
 					PyObject *result = PyObject_CallFunction(callback, "KKO", dataAddress, instructionAddress, registers);
 					[self handleFailureWithVariable:[variableValue pointerValue] methodCallResult:result forMethodName:@"data watchpoint callback"];
 					Py_XDECREF(registers);
@@ -792,11 +798,11 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	dispatch_async(dispatch_get_main_queue(), ^{
 		BOOL breakPointHidden = breakPoint.hidden;
 		
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
+		[self->_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(self->_pythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{
-					PyObject *registers = [self.scriptingInterpreter registersfromRegistersState:registersState];
+					PyObject *registers = [self->_scriptingInterpreter registersfromRegistersState:registersState];
 					PyObject *result = PyObject_CallFunction(callback, "KO", breakPoint.variable.address, registers);
 					Py_XDECREF(registers);
 					
@@ -817,7 +823,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 - (void)handleHotKeyTriggerWithInternalID:(UInt32)hotKeyID callback:(PyObject *)callback sender:(id)sender
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[self.scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
+		[self->_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, __unused BOOL *stop) {
 			dispatch_async(self->_pythonQueue, ^{
 				if (Py_IsInitialized() && pyScript.debuggerInstance == sender)
 				{

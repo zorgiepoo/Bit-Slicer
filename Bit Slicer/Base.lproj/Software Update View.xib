@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGUpdatePreferencesViewController">
             <connections>
-                <outlet property="checkForAlphaUpdatesButton" destination="xPo-4W-oz4" id="wDi-Et-J3D"/>
-                <outlet property="checkForUpdatesButton" destination="glC-qM-2XZ" id="ZwS-I5-Npb"/>
-                <outlet property="sendProfileInfoButton" destination="4l5-xI-WHY" id="wkH-vB-tBS"/>
+                <outlet property="_checkForAlphaUpdatesButton" destination="xPo-4W-oz4" id="zob-0R-C16"/>
+                <outlet property="_checkForUpdatesButton" destination="glC-qM-2XZ" id="s8Y-Z5-w4z"/>
+                <outlet property="_sendProfileInfoButton" destination="4l5-xI-WHY" id="jJ4-3g-Jxl"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>
         </customObject>

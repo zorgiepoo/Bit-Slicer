@@ -40,16 +40,6 @@
 #import "ZGAppUpdaterController.h"
 #import "ZGDebuggerController.h"
 
-@interface ZGPreferencesController ()
-
-@property (nonatomic) ZGHotKeyCenter *hotKeyCenter;
-@property (nonatomic) ZGAppUpdaterController *appUpdaterController;
-@property (nonatomic) ZGDebuggerController *debuggerController;
-
-@property (nonatomic) NSViewController *preferencesViewController;
-
-@end
-
 #define ZGSoftwareUpdatePreferenceIdentifier @"ZGSoftwareUpdateIdentifier"
 #define ZGDebuggerHotKeysPreferenceIdentifier @"ZGDebuggerHotKeysIdentifier"
 #define ZGScriptPreferenceIdentifier @"ZGScriptPreferenceIdentifier"
@@ -59,6 +49,13 @@
 #define ZGPreferencesLocalizationTable @"[Code] Preferences"
 
 @implementation ZGPreferencesController
+{
+	ZGHotKeyCenter *_hotKeyCenter;
+	ZGAppUpdaterController *_appUpdaterController;
+	ZGDebuggerController *_debuggerController;
+	
+	NSViewController *_preferencesViewController;
+}
 
 - (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController
 {
@@ -66,9 +63,9 @@
 	
 	if (self != nil)
 	{
-		self.hotKeyCenter = hotKeyCenter;
-		self.appUpdaterController = appUpdaterController;
-		self.debuggerController = debuggerController;
+		_hotKeyCenter = hotKeyCenter;
+		_appUpdaterController = appUpdaterController;
+		_debuggerController = debuggerController;
 	}
 	
 	return self;
@@ -94,9 +91,9 @@
 
 - (void)setPreferencesViewController:(NSViewController *)viewController andWindowTitle:(NSString *)windowTitle
 {
-	if ([self.preferencesViewController class] != [viewController class])
+	if ([_preferencesViewController class] != [viewController class])
 	{
-		self.preferencesViewController = viewController;
+		_preferencesViewController = viewController;
 		self.window.contentView = viewController.view;
 		[self.window setTitle:windowTitle];
 	}
@@ -105,14 +102,14 @@
 - (void)setUpdatePreferencesView
 {
 	[self
-	 setPreferencesViewController:[[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:self.appUpdaterController]
+	 setPreferencesViewController:[[ZGUpdatePreferencesViewController alloc] initWithAppUpdaterController:_appUpdaterController]
 	 andWindowTitle:NSLocalizedStringFromTable(@"softwareUpdateWindowTitle", ZGPreferencesLocalizationTable, nil)];
 }
 
 - (void)setHotKeyPreferencesView
 {
 	[self
-	 setPreferencesViewController:[[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:self.hotKeyCenter debuggerController:self.debuggerController]
+	 setPreferencesViewController:[[ZGHotKeyPreferencesViewController alloc] initWithHotKeyCenter:_hotKeyCenter debuggerController:_debuggerController]
 	 andWindowTitle:NSLocalizedStringFromTable(@"shortcutsWindowTitle", ZGPreferencesLocalizationTable, nil)];
 }
 

@@ -36,9 +36,10 @@
 
 @interface ZGDebugThread : NSObject
 
-- (id)initWithThread:(thread_act_t)thread registerIndex:(int)registerIndex;
+// registerIndex should only be within [0, 4)
+- (id)initWithThread:(thread_act_t)thread registerIndex:(uint8_t)registerIndex;
 
 @property (readonly, nonatomic) thread_act_t thread;
-@property (readonly, nonatomic) int registerIndex;
+@property (readonly, nonatomic) uint8_t registerIndex;
 
 @end

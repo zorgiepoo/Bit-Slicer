@@ -42,24 +42,21 @@
 
 #define ZGEditValueLocalizableTable @"[Code] Edit Variable Value"
 
-@interface ZGEditValueWindowController ()
-
-@property (nonatomic, assign) IBOutlet NSTextField *valueTextField;
-@property (nonatomic, assign) ZGVariableController *variableController;
-
-@property (nonatomic) NSArray *variablesToEdit;
-@property (nonatomic) ZGMemoryMap processTask;
-
-@end
-
 @implementation ZGEditValueWindowController
+{
+	ZGVariableController *_variableController;
+	NSArray *_variablesToEdit;
+	ZGMemoryMap _processTask;
+	
+	IBOutlet NSTextField *_valueTextField;
+}
 
 - (id)initWithVariableController:(ZGVariableController *)variableController
 {
 	self = [super init];
 	if (self != nil)
 	{
-		self.variableController = variableController;
+		_variableController = variableController;
 	}
 	return self;
 }
@@ -146,17 +143,17 @@
 	
 	if (!isAllByteArrays)
 	{
-		self.valueTextField.stringValue = firstNonScriptVariable.stringValue;
+		_valueTextField.stringValue = firstNonScriptVariable.stringValue;
 	}
 	else
 	{
-		self.valueTextField.stringValue = [self commonByteArrayPatternFromVariables:variables];
+		_valueTextField.stringValue = [self commonByteArrayPatternFromVariables:variables];
 	}
 	
-	[self.valueTextField selectText:nil];
+	[_valueTextField selectText:nil];
 	
-	self.variablesToEdit = variables;
-	self.processTask = processTask;
+	_variablesToEdit = variables;
+	_processTask = processTask;
 	
 	[NSApp
 	 beginSheet:self.window
@@ -173,7 +170,7 @@
 	
 	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
 	
-	for (ZGVariable *variable in self.variablesToEdit)
+	for (ZGVariable *variable in _variablesToEdit)
 	{
 		if (variable.type == ZGScript) continue;
 		
@@ -181,7 +178,7 @@
 		ZGMemoryAddress memoryAddress = variable.address;
 		ZGMemorySize memorySize = variable.size;
 		
-		if (!ZGMemoryProtectionInRegion(self.processTask, &memoryAddress, &memorySize, &memoryProtection)) continue;
+		if (!ZGMemoryProtectionInRegion(_processTask, &memoryAddress, &memorySize, &memoryProtection)) continue;
 		
 		if (variable.address >= memoryAddress && variable.address + variable.size <= memoryAddress + memorySize)
 		{
@@ -189,7 +186,7 @@
 		}
 	}
 	
-	self.variablesToEdit = nil;
+	_variablesToEdit = nil;
 	
 	if (validVariables.count == 0)
 	{
@@ -198,21 +195,21 @@
 	}
 	
 	NSMutableArray *newValues = [[NSMutableArray alloc] init];
-	NSString *replaceString = self.valueTextField.stringValue;
+	NSString *replaceString = _valueTextField.stringValue;
 	
 	for (NSUInteger index = 0; index < validVariables.count; index++)
 	{
 		[newValues addObject:replaceString];
 	}
 	
-	[self.variableController editVariables:validVariables newValues:newValues];
+	[_variableController editVariables:validVariables newValues:newValues];
 }
 
 - (IBAction)cancelEditingValues:(id)__unused sender
 {
 	[NSApp endSheet:self.window];
 	[self.window close];
-	self.variablesToEdit = nil;
+	_variablesToEdit = nil;
 }
 
 @end

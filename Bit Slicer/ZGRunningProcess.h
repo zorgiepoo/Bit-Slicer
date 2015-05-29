@@ -42,7 +42,7 @@
 - (void)invalidateAppInfoCache;
 
 @property (readonly, nonatomic) pid_t processIdentifier;
-@property (copy, nonatomic) NSString *internalName;
+@property (readonly, nonatomic, copy) NSString *internalName;
 @property (readonly, nonatomic) NSString *name;
 @property (readonly, nonatomic) NSImage *icon;
 @property (readonly, nonatomic) BOOL is64Bit;

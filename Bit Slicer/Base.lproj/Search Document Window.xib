@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDocumentWindowController">
             <connections>
-                <outlet property="dataTypeTableColumn" destination="87D-Rg-AzL" id="UdJ-ox-WIH"/>
+                <outlet property="_dataTypeTableColumn" destination="87D-Rg-AzL" id="cIG-Hx-rzK"/>
+                <outlet property="_flagsLabel" destination="U3S-5O-0jn" id="rQA-Da-65N"/>
+                <outlet property="_flagsTextField" destination="hY6-jr-dYH" id="Z4f-mz-kAT"/>
+                <outlet property="_generalStatusTextField" destination="8dg-I8-jgu" id="wZa-tg-K5V"/>
+                <outlet property="_scopeBar" destination="fFc-9y-zR5" id="tck-Ti-LtU"/>
+                <outlet property="_scopeBarFlagsView" destination="053-lf-ydX" id="bS5-vp-dPP"/>
                 <outlet property="dataTypesPopUpButton" destination="wMv-KV-nmE" id="ohz-17-Uj6"/>
-                <outlet property="flagsLabel" destination="U3S-5O-0jn" id="oT3-ZN-NAD"/>
-                <outlet property="flagsTextField" destination="hY6-jr-dYH" id="NNB-3Q-ALg"/>
                 <outlet property="functionPopUpButton" destination="Vpc-Jb-WRb" id="9wG-B2-0wl"/>
-                <outlet property="generalStatusTextField" destination="8dg-I8-jgu" id="Xth-G7-LMt"/>
                 <outlet property="progressIndicator" destination="SfW-co-kf4" id="T8e-Oe-5Fc"/>
                 <outlet property="runningApplicationsPopUpButton" destination="1ts-DF-nZQ" id="rls-ER-d1b"/>
-                <outlet property="scopeBar" destination="fFc-9y-zR5" id="D3V-L4-ePc"/>
-                <outlet property="scopeBarFlagsView" destination="053-lf-ydX" id="Bn8-FX-fuZ"/>
                 <outlet property="searchValueTextField" destination="WaT-8a-dxh" id="fXI-m4-PoJ"/>
                 <outlet property="storeValuesButton" destination="evf-rf-Ae5" id="hg1-ot-trk"/>
                 <outlet property="variablesTableView" destination="HbN-z0-Vcf" id="a1I-Pk-xWi"/>

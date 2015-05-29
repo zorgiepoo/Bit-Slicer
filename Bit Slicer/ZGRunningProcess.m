@@ -36,13 +36,6 @@
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
-@interface ZGRunningProcess ()
-
-@property (readwrite, nonatomic) pid_t processIdentifier;
-@property (readwrite, nonatomic) BOOL is64Bit;
-
-@end
-
 @implementation ZGRunningProcess
 {
 	NSApplicationActivationPolicy _activationPolicy;
@@ -58,9 +51,9 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.processIdentifier = processIdentifier;
-		self.internalName = name;
-		self.is64Bit = is64Bit;
+		_processIdentifier = processIdentifier;
+		_internalName = [name copy];
+		_is64Bit = is64Bit;
 	}
 	return self;
 }
@@ -74,12 +67,12 @@
 
 - (BOOL)isEqual:(id)object
 {
-	return self.processIdentifier == [object processIdentifier];
+	return _processIdentifier == [object processIdentifier];
 }
 
 - (NSUInteger)hash
 {
-	return (NSUInteger)self.processIdentifier;
+	return (NSUInteger)_processIdentifier;
 }
 
 #pragma mark On-the-fly Accessors
@@ -99,7 +92,7 @@
 		{
 			self->_activationPolicy = NSApplicationActivationPolicyProhibited;
 			self->_icon = [NSImage imageNamed:@"NSDefaultApplicationIcon"];
-			self->_name = self.internalName;
+			self->_name = _internalName;
 		}
 		
 		_didFetchInfo = YES;

@@ -35,15 +35,13 @@
 #import "ZGEditDescriptionWindowController.h"
 #import "ZGVariableController.h"
 
-@interface ZGEditDescriptionWindowController ()
-
-@property (nonatomic) ZGVariableController *variableController;
-@property (nonatomic) ZGVariable *variable;
-@property (nonatomic, assign) IBOutlet NSTextView *descriptionTextView;
-
-@end
-
 @implementation ZGEditDescriptionWindowController
+{
+	ZGVariableController *_variableController;
+	ZGVariable *_variable;
+	
+	IBOutlet NSTextView *_descriptionTextView;
+}
 
 - (NSString *)windowNibName
 {
@@ -55,7 +53,7 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.variableController = variableController;
+		_variableController = variableController;
 	}
 	return self;
 }
@@ -64,9 +62,9 @@
 {
 	[self window]; // ensure window is loaded
 	
-	[self.descriptionTextView.textStorage setAttributedString:variable.fullAttributedDescription];
-	[self.descriptionTextView scrollRangeToVisible:NSMakeRange(0, 0)];
-	self.variable = variable;
+	[_descriptionTextView.textStorage setAttributedString:variable.fullAttributedDescription];
+	[_descriptionTextView scrollRangeToVisible:NSMakeRange(0, 0)];
+	_variable = variable;
 	
 	[NSApp
 	 beginSheet:self.window
@@ -78,7 +76,7 @@
 
 - (IBAction)editVariableDescription:(id)__unused sender
 {
-	[self.variableController changeVariable:self.variable newDescription:[self.descriptionTextView.textStorage copy]];
+	[_variableController changeVariable:_variable newDescription:[_descriptionTextView.textStorage copy]];
 	[NSApp endSheet:self.window];
 	[self.window close];
 }

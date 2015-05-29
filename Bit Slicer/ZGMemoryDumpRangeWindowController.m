@@ -41,17 +41,14 @@
 
 #define ZGLocalizedStringFromDumpMemoryRangeTable(string) NSLocalizedStringFromTable((string), @"[Code] Dump Memory Range", nil)
 
-@interface ZGMemoryDumpRangeWindowController ()
-
-@property (nonatomic, assign) IBOutlet NSTextField *fromAddressTextField;
-@property (nonatomic, assign) IBOutlet NSTextField *toAddressTextField;
-
-@property (nonatomic) ZGProcess *process;
-@property (nonatomic) NSWindow *parentWindow;
-
-@end
-
 @implementation ZGMemoryDumpRangeWindowController
+{
+	ZGProcess *_process;
+	NSWindow *_parentWindow;
+	
+	IBOutlet NSTextField *_fromAddressTextField;
+	IBOutlet NSTextField *_toAddressTextField;
+}
 
 - (NSString *)windowNibName
 {
@@ -60,10 +57,10 @@
 
 - (IBAction)dumpMemory:(id)__unused sender
 {
-	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:self.fromAddressTextField.stringValue];
+	NSString *fromAddressExpression = [ZGCalculator evaluateExpression:_fromAddressTextField.stringValue];
 	ZGMemoryAddress fromAddress = ZGMemoryAddressFromExpression(fromAddressExpression);
 	
-	NSString *toAddressExpression = [ZGCalculator evaluateExpression:self.toAddressTextField.stringValue];
+	NSString *toAddressExpression = [ZGCalculator evaluateExpression:_toAddressTextField.stringValue];
 	ZGMemoryAddress toAddress = ZGMemoryAddressFromExpression(toAddressExpression);
 	
 	if (toAddress > fromAddress && fromAddressExpression.length > 0 && toAddressExpression.length > 0)
@@ -73,7 +70,7 @@
 		
 		NSSavePanel *savePanel = NSSavePanel.savePanel;
 		[savePanel
-		 beginSheetModalForWindow:self.parentWindow
+		 beginSheetModalForWindow:_parentWindow
 		 completionHandler:^(NSInteger result)
 		 {
 			 if (result == NSFileHandlingPanelOKButton)
@@ -82,7 +79,7 @@
 				 ZGMemorySize size = toAddress - fromAddress;
 				 void *bytes = NULL;
 				 
-				 if ((success = ZGReadBytes(self.process.processTask, fromAddress, &bytes, &size)))
+				 if ((success = ZGReadBytes(self->_process.processTask, fromAddress, &bytes, &size)))
 				 {
 					 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
 					 success = [data writeToURL:savePanel.URL atomically:NO];
@@ -115,17 +112,17 @@
 
 - (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process requestedAddressRange:(HFRange)requestedAddressRange
 {
-	self.process = process;
-	self.parentWindow = parentWindow;
+	_process = process;
+	_parentWindow = parentWindow;
 	
 	[self window]; // ensure window is loaded
 	
-	self.fromAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", requestedAddressRange.location];
-	self.toAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", requestedAddressRange.location + requestedAddressRange.length];
+	_fromAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", requestedAddressRange.location];
+	_toAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", requestedAddressRange.location + requestedAddressRange.length];
 	
 	[NSApp
 	 beginSheet:self.window
-	 modalForWindow:self.parentWindow
+	 modalForWindow:_parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];

@@ -63,7 +63,7 @@
 @property (nonatomic) BOOL ignoreDataAlignment;
 @property (copy, nonatomic) NSString *beginningAddressStringValue;
 @property (copy, nonatomic) NSString *endingAddressStringValue;
-@property (nonatomic) NSString *searchValue;
+@property (copy, nonatomic) NSString *searchValue;
 @property (nonatomic) NSArray *variables;
 @property (copy, nonatomic) NSString *desiredProcessInternalName;
 @property (copy, nonatomic) NSString *lastEpsilonValue;

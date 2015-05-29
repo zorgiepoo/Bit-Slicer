@@ -48,21 +48,17 @@
 
 #define ZGLocalizedStringFromDebuggerRegistersTable(string) NSLocalizedStringFromTable((string), @"[Code] Debugger Registers", nil)
 
-@interface ZGRegistersViewController ()
-
-@property (assign, nonatomic) IBOutlet NSTableView *tableView;
-@property (assign, nonatomic) IBOutlet NSTableColumn *dataTypeTableColumn;
-@property (weak, nonatomic) NSUndoManager *undoManager;
-
-@property (nonatomic) NSArray *registers;
-@property (nonatomic) ZGBreakPoint *breakPoint;
-@property (nonatomic) ZGVariableQualifier qualifier;
-
-@property (nonatomic) ZGMemoryAddress instructionPointer;
-
-@end
-
 @implementation ZGRegistersViewController
+{
+	__weak id <ZGRegistersViewDelegate> _delegate;
+	NSUndoManager *_undoManager;
+	NSArray *_registers;
+	ZGBreakPoint *_breakPoint;
+	ZGVariableQualifier _qualifier;
+	
+	IBOutlet NSTableView *_tableView;
+	IBOutlet NSTableColumn *_dataTypeTableColumn;
+}
 
 + (void)initialize
 {
@@ -77,12 +73,13 @@
 	});
 }
 
-- (id)initWithUndoManager:(NSUndoManager *)undoManager
+- (id)initWithUndoManager:(NSUndoManager *)undoManager delegate:(id <ZGRegistersViewDelegate>)delegate
 {
 	self = [super initWithNibName:@"Registers View" bundle:nil];
 	if (self != nil)
 	{
-		self.undoManager = undoManager;
+		_undoManager = undoManager;
+		_delegate = delegate;
 	}
 	return self;
 }
@@ -93,29 +90,37 @@
 	
 	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_9)
 	{
-		[self setNextResponder:[self.tableView nextResponder]];
-		[self.tableView setNextResponder:self];
+		[self setNextResponder:[_tableView nextResponder]];
+		[_tableView setNextResponder:self];
 	}
 	
-	[self.tableView registerForDraggedTypes:@[ZGVariablePboardType]];
+	[_tableView registerForDraggedTypes:@[ZGVariablePboardType]];
 	
-	ZGAdjustLocalizableWidthsForTableColumns(self.view.window, @[self.dataTypeTableColumn], @{@"ru" : @[@80.0]});
+	ZGAdjustLocalizableWidthsForTableColumns(self.view.window, @[_dataTypeTableColumn], @{@"ru" : @[@80.0]});
+}
+
+- (void)setInstructionPointer:(ZGMemoryAddress)instructionPointer
+{
+	_instructionPointer = instructionPointer;
+	
+	id <ZGRegistersViewDelegate> delegate = _delegate;
+	[delegate instructionPointerDidChange];
 }
 
 - (void)changeInstructionPointer:(ZGMemoryAddress)newInstructionPointer
 {
-	if (self.instructionPointer == newInstructionPointer)
+	if (_instructionPointer == newInstructionPointer)
 	{
 		return;
 	}
 	
-	for (ZGRegister *theRegister in self.registers)
+	for (ZGRegister *theRegister in _registers)
 	{
 		if ([@[@"eip", @"rip"] containsObject:theRegister.variable.name])
 		{
 			ZGVariable *newVariable = [theRegister.variable copy];
 			
-			if (self.breakPoint.process.is64Bit)
+			if (_breakPoint.process.is64Bit)
 			{
 				[newVariable setRawValue:&newInstructionPointer];
 			}
@@ -137,9 +142,9 @@
 	
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
-	if (ZGGetGeneralThreadState(&threadState, self.breakPoint.thread, &threadStateCount))
+	if (ZGGetGeneralThreadState(&threadState, _breakPoint.thread, &threadStateCount))
 	{
-		basePointer = self.breakPoint.process.is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+		basePointer = _breakPoint.process.is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
 	}
 	
 	return basePointer;
@@ -147,7 +152,7 @@
 
 - (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	self.breakPoint = breakPoint;
+	_breakPoint = breakPoint;
 	
 	ZGRegistersState *registersState = breakPoint.registersState;
 	
@@ -160,7 +165,7 @@
 	
 	for (ZGVariable *registerVariable in registerVariables)
 	{
-		[registerVariable setQualifier:self.qualifier];
+		[registerVariable setQualifier:_qualifier];
 		
 		ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterGeneralPurpose variable:registerVariable pointerSize:pointerSize];
 		
@@ -175,7 +180,7 @@
 		[newRegisters addObject:newRegister];
 	}
 	
-	self.instructionPointer = registersState.is64Bit ? registersState.generalPurposeThreadState.uts.ts64.__rip : registersState.generalPurposeThreadState.uts.ts32.__eip;
+	[self setInstructionPointer:registersState.is64Bit ? registersState.generalPurposeThreadState.uts.ts64.__rip : registersState.generalPurposeThreadState.uts.ts32.__eip];
 	
 	if (registersState.hasVectorState)
 	{
@@ -195,36 +200,35 @@
 		}
 	}
 	
-	self.registers = [NSArray arrayWithArray:newRegisters];
+	_registers = [NSArray arrayWithArray:newRegisters];
 	
-	[self.tableView reloadData];
+	[_tableView reloadData];
 }
 
 - (void)changeRegister:(ZGRegister *)theRegister oldType:(ZGVariableType)oldType newType:(ZGVariableType)newType
 {
-	[theRegister.variable setType:newType requestedSize:theRegister.size pointerSize:self.breakPoint.process.pointerSize];
+	[theRegister.variable setType:newType requestedSize:theRegister.size pointerSize:_breakPoint.process.pointerSize];
 	[theRegister.variable setRawValue:theRegister.rawValue];
 	
 	NSMutableDictionary *registerTypesDictionary = [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES]];
 	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.name];
 	[[NSUserDefaults standardUserDefaults] setObject:registerTypesDictionary forKey:ZG_REGISTER_TYPES];
 	
-	NSUndoManager *undoManager = self.undoManager;
-	[[undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
-	[undoManager setActionName:ZGLocalizedStringFromDebuggerRegistersTable(@"undoRegisterTypeChange")];
+	[[_undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
+	[_undoManager setActionName:ZGLocalizedStringFromDebuggerRegistersTable(@"undoRegisterTypeChange")];
 	
-	[self.tableView reloadData];
+	[_tableView reloadData];
 }
 
 #define WRITE_VECTOR_STATE(vectorState, variable, registerName) memcpy(&vectorState.ufs.as64.__fpu_##registerName, variable.rawValue, MIN(variable.size, sizeof(vectorState.ufs.as64.__fpu_##registerName)))
 
 - (BOOL)changeFloatingPointRegister:(ZGRegister *)theRegister newVariable:(ZGVariable *)newVariable
 {
-	BOOL is64Bit = self.breakPoint.process.is64Bit;
+	BOOL is64Bit = _breakPoint.process.is64Bit;
 	
 	zg_x86_vector_state_t vectorState;
 	mach_msg_type_number_t vectorStateCount;
-	if (!ZGGetVectorThreadState(&vectorState, self.breakPoint.thread, &vectorStateCount, is64Bit, NULL))
+	if (!ZGGetVectorThreadState(&vectorState, _breakPoint.thread, &vectorStateCount, is64Bit, NULL))
 	{
 		return NO;
 	}
@@ -286,13 +290,13 @@
 		return NO;
 	}
 	
-	if (!ZGSetVectorThreadState(&vectorState, self.breakPoint.thread, vectorStateCount, is64Bit))
+	if (!ZGSetVectorThreadState(&vectorState, _breakPoint.thread, vectorStateCount, is64Bit))
 	{
-		NSLog(@"Failure in setting registers thread state for writing register value (floating point): %d", self.breakPoint.thread);
+		NSLog(@"Failure in setting registers thread state for writing register value (floating point): %d", _breakPoint.thread);
 		return NO;
 	}
 	
-	self.breakPoint.registersState.vectorState = vectorState;
+	_breakPoint.registersState.vectorState = vectorState;
 	
 	theRegister.variable = newVariable;
 	
@@ -303,13 +307,13 @@
 {
 	x86_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
-	if (!ZGGetGeneralThreadState(&threadState, self.breakPoint.thread, &threadStateCount))
+	if (!ZGGetGeneralThreadState(&threadState, _breakPoint.thread, &threadStateCount))
 	{
 		return NO;
 	}
 	
 	BOOL shouldWriteRegister = NO;
-	if (self.breakPoint.registersState.is64Bit)
+	if (_breakPoint.registersState.is64Bit)
 	{
 		NSArray *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
 		if ([registers64 containsObject:theRegister.variable.name])
@@ -330,23 +334,23 @@
 	
 	if (!shouldWriteRegister) return NO;
 	
-	if (!ZGSetGeneralThreadState(&threadState, self.breakPoint.thread, threadStateCount))
+	if (!ZGSetGeneralThreadState(&threadState, _breakPoint.thread, threadStateCount))
 	{
-		NSLog(@"Failure in setting registers thread state for writing register value (general purpose): %d", self.breakPoint.thread);
+		NSLog(@"Failure in setting registers thread state for writing register value (general purpose): %d", _breakPoint.thread);
 		return NO;
 	}
 	
-	self.breakPoint.registersState.generalPurposeThreadState = threadState;
+	_breakPoint.registersState.generalPurposeThreadState = threadState;
 	
 	theRegister.variable = newVariable;
 	
 	if ([theRegister.variable.name isEqualToString:@"rip"])
 	{
-		self.instructionPointer = *(uint64_t *)theRegister.rawValue;
+		[self setInstructionPointer:*(uint64_t *)theRegister.rawValue];
 	}
 	else if ([theRegister.variable.name isEqualToString:@"eip"])
 	{
-		self.instructionPointer = *(uint32_t *)theRegister.rawValue;
+		[self setInstructionPointer:*(uint32_t *)theRegister.rawValue];
 	}
 	
 	return YES;
@@ -367,11 +371,10 @@
 	
 	if (success)
 	{
-		NSUndoManager *undoManager = self.undoManager;
-		[[undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
-		[undoManager setActionName:ZGLocalizedStringFromDebuggerRegistersTable(@"undoRegisterValueChange")];
+		[[_undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
+		[_undoManager setActionName:ZGLocalizedStringFromDebuggerRegistersTable(@"undoRegisterValueChange")];
 		
-		[self.tableView reloadData];
+		[_tableView reloadData];
 	}
 }
 
@@ -379,21 +382,21 @@
 
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-	NSArray *variables = [[self.registers objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	NSArray *variables = [[_registers objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)__unused tableView
 {
-	return (NSInteger)self.registers.count;
+	return (NSInteger)_registers.count;
 }
 
 - (id)tableView:(NSTableView *)__unused tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	id result = nil;
-	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.registers.count)
+	if (rowIndex >= 0 && (NSUInteger)rowIndex < _registers.count)
 	{
-		ZGRegister *theRegister = [self.registers objectAtIndex:(NSUInteger)rowIndex];
+		ZGRegister *theRegister = [_registers objectAtIndex:(NSUInteger)rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"name"])
 		{
 			result = theRegister.variable.name;
@@ -413,13 +416,13 @@
 
 - (void)tableView:(NSTableView *)__unused tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if (rowIndex >= 0 && (NSUInteger)rowIndex < self.registers.count)
+	if (rowIndex >= 0 && (NSUInteger)rowIndex < _registers.count)
 	{
-		ZGRegister *theRegister = [self.registers objectAtIndex:(NSUInteger)rowIndex];
+		ZGRegister *theRegister = [_registers objectAtIndex:(NSUInteger)rowIndex];
 		if ([tableColumn.identifier isEqualToString:@"value"])
 		{
 			ZGMemorySize size;
-			void *newValue = ZGValueFromString(self.breakPoint.process.is64Bit, object, theRegister.variable.type, &size);
+			void *newValue = ZGValueFromString(_breakPoint.process.is64Bit, object, theRegister.variable.type, &size);
 			if (newValue != NULL)
 			{
 				[self
@@ -432,7 +435,7 @@
 				  address:theRegister.variable.address
 				  type:theRegister.variable.type
 				  qualifier:theRegister.variable.qualifier
-				  pointerSize:self.breakPoint.process.pointerSize
+				  pointerSize:_breakPoint.process.pointerSize
 				  description:theRegister.variable.fullAttributedDescription
 				  enabled:NO]];
 				
@@ -451,12 +454,12 @@
 {
 	if ([tableColumn.identifier isEqualToString:@"value"])
 	{
-		if (rowIndex < 0 || (NSUInteger)rowIndex >= self.registers.count)
+		if (rowIndex < 0 || (NSUInteger)rowIndex >= _registers.count)
 		{
 			return NO;
 		}
 		
-		ZGRegister *theRegister = [self.registers objectAtIndex:(NSUInteger)rowIndex];
+		ZGRegister *theRegister = [_registers objectAtIndex:(NSUInteger)rowIndex];
 		if (theRegister.variable.rawValue == nil)
 		{
 			return NO;
@@ -470,16 +473,16 @@
 
 - (IBAction)changeQualifier:(id)sender
 {
-	if (self.qualifier != [sender tag])
+	if (_qualifier != [sender tag])
 	{
-		self.qualifier = (ZGVariableQualifier)[sender tag];
-		[[NSUserDefaults standardUserDefaults] setInteger:self.qualifier forKey:ZG_DEBUG_QUALIFIER];
-		for (ZGRegister *theRegister in self.registers)
+		_qualifier = (ZGVariableQualifier)[sender tag];
+		[[NSUserDefaults standardUserDefaults] setInteger:_qualifier forKey:ZG_DEBUG_QUALIFIER];
+		for (ZGRegister *theRegister in _registers)
 		{
-			theRegister.variable.qualifier = self.qualifier;
+			theRegister.variable.qualifier = _qualifier;
 		}
 		
-		[self.tableView reloadData];
+		[_tableView reloadData];
 	}
 }
 
@@ -487,7 +490,7 @@
 {
 	if (menuItem.action == @selector(changeQualifier:))
 	{
-		[menuItem setState:self.qualifier == [menuItem tag]];
+		[menuItem setState:_qualifier == [menuItem tag]];
 	}
 	else if (menuItem.action == @selector(copy:))
 	{
@@ -504,12 +507,12 @@
 
 - (NSArray *)selectedRegisters
 {
-	NSIndexSet *tableIndexSet = self.tableView.selectedRowIndexes;
-	NSInteger clickedRow = self.tableView.clickedRow;
+	NSIndexSet *tableIndexSet = _tableView.selectedRowIndexes;
+	NSInteger clickedRow = _tableView.clickedRow;
 	
 	NSIndexSet *selectionIndexSet = (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 	
-	return [self.registers objectsAtIndexes:selectionIndexSet];
+	return [_registers objectsAtIndexes:selectionIndexSet];
 }
 
 - (IBAction)copy:(id)__unused sender

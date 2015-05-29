@@ -37,32 +37,32 @@
 #import "ZGDocumentData.h"
 #import "ZGVariable.h"
 
-@interface ZGDocumentOptionsViewController ()
-
-@property (nonatomic, assign) ZGDocument *document;
-@property (nonatomic, assign) IBOutlet NSButton *ignoreDataAlignmentCheckbox;
-@property (nonatomic, assign) IBOutlet NSTextField *beginningAddressTextField;
-@property (nonatomic, assign) IBOutlet NSTextField *endingAddressTextField;
-
-@end
-
 @implementation ZGDocumentOptionsViewController
+{
+	__weak ZGDocument *_document;
+	ZGDocumentData *_documentData;
+	
+	IBOutlet NSButton *_ignoreDataAlignmentCheckbox;
+	IBOutlet NSTextField *_beginningAddressTextField;
+	IBOutlet NSTextField *_endingAddressTextField;
+}
 
 - (id)initWithDocument:(ZGDocument *)document
 {
 	self = [self initWithNibName:@"Search Options" bundle:nil];
 	if (self != nil)
 	{
-		self.document = document;
+		_document = document;
+		_documentData = document.data;
 	}
 	return self;
 }
 
 - (void)reloadInterface
 {
-	[self.ignoreDataAlignmentCheckbox setState:self.document.data.ignoreDataAlignment];
-	self.beginningAddressTextField.stringValue = self.document.data.beginningAddressStringValue;
-	self.endingAddressTextField.stringValue = self.document.data.endingAddressStringValue;
+	[_ignoreDataAlignmentCheckbox setState:_documentData.ignoreDataAlignment];
+	_beginningAddressTextField.stringValue = _documentData.beginningAddressStringValue;
+	_endingAddressTextField.stringValue = _documentData.endingAddressStringValue;
 }
 
 - (void)loadView
@@ -74,25 +74,31 @@
 
 - (IBAction)changeIgnoreDataAlignment:(id)sender
 {
-	self.document.data.ignoreDataAlignment = ([(NSCell *)sender state] == NSOnState);
-	[self.document markChange];
+	_documentData.ignoreDataAlignment = ([(NSCell *)sender state] == NSOnState);
+	
+	ZGDocument *document = _document;
+	[document markChange];
 }
 
 - (IBAction)changeBeginningAddress:(id)__unused sender
 {
-	if (![self.document.data.beginningAddressStringValue isEqualToString:self.beginningAddressTextField.stringValue])
+	if (![_documentData.beginningAddressStringValue isEqualToString:_beginningAddressTextField.stringValue])
 	{
-		self.document.data.beginningAddressStringValue = self.beginningAddressTextField.stringValue;
-		[self.document markChange];
+		_documentData.beginningAddressStringValue = _beginningAddressTextField.stringValue;
+		
+		ZGDocument *document = _document;
+		[document markChange];
 	}
 }
 
 - (IBAction)changeEndingAddress:(id)__unused sender
 {
-	if (![self.document.data.endingAddressStringValue isEqualToString:self.endingAddressTextField.stringValue])
+	if (![_documentData.endingAddressStringValue isEqualToString:_endingAddressTextField.stringValue])
 	{
-		self.document.data.endingAddressStringValue = self.endingAddressTextField.stringValue;
-		[self.document markChange];
+		_documentData.endingAddressStringValue = _endingAddressTextField.stringValue;
+		
+		ZGDocument *document = _document;
+		[document markChange];
 	}
 }
 

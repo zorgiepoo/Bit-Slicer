@@ -45,8 +45,8 @@
 
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints;
 
-@property (nonatomic) ZGMemoryAddress currentMemoryAddress;
-@property (nonatomic) ZGMemorySize currentMemorySize;
+@property (nonatomic, readonly) ZGMemoryAddress currentMemoryAddress;
+@property (nonatomic, readonly) ZGMemorySize currentMemorySize;
 
 - (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
 

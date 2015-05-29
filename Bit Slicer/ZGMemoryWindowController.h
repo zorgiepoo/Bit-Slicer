@@ -50,19 +50,22 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
 
-@property (nonatomic) ZGProcessTaskManager *processTaskManager;
-@property (nonatomic) ZGProcessList *processList;
+@property (nonatomic, readonly) ZGProcessTaskManager *processTaskManager;
+@property (nonatomic, readonly) ZGProcessList *processList;
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;
 
-@property (nonatomic, assign) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
+@property (nonatomic) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 
-@property (nonatomic) NSUndoManager *undoManager;
+@property (nonatomic, readonly) NSUndoManager *undoManager;
 
+// Mutator method can be overridden
 @property (nonatomic) ZGProcess *currentProcess;
+
+// Mutator method can be overridden
 @property (nonatomic, copy) NSString *desiredProcessInternalName;
 
-@property (nonatomic) NSTimer *updateDisplayTimer;
+@property (nonatomic, readonly) NSTimer *updateDisplayTimer;
 
 @property (nonatomic, readonly) BOOL isOccluded;
 

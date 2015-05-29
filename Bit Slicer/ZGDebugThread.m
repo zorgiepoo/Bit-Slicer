@@ -36,7 +36,7 @@
 
 @implementation ZGDebugThread
 
-- (id)initWithThread:(thread_act_t)thread registerIndex:(int)registerIndex
+- (id)initWithThread:(thread_act_t)thread registerIndex:(uint8_t)registerIndex
 {
 	self = [super init];
 	if (self != nil)

@@ -45,13 +45,10 @@
 #define APPCAST_URL @"http://web.zgcoder.net/bitslicer/update.php"
 #define ALPHA_APPCAST_URL @"http://web.zgcoder.net/bitslicer/update_alpha.php"
 
-@interface ZGAppUpdaterController ()
-
-@property (nonatomic) SUUpdater *updater;
-
-@end
-
 @implementation ZGAppUpdaterController
+{
+	SUUpdater *_updater;
+}
 
 + (BOOL)runningAlpha
 {
@@ -76,7 +73,7 @@
 	{
 		[self reloadValuesFromDefaults];
 		
-		self.updater = [[SUUpdater alloc] init];
+		_updater = [[SUUpdater alloc] init];
 		[self updateFeedURL];
 	}
 	return self;
@@ -91,7 +88,7 @@
 
 - (void)updateFeedURL
 {
-	[self.updater setFeedURL:[NSURL URLWithString:self.checksForAlphaUpdates ? ALPHA_APPCAST_URL : APPCAST_URL]];
+	[_updater setFeedURL:[NSURL URLWithString:_checksForAlphaUpdates ? ALPHA_APPCAST_URL : APPCAST_URL]];
 }
 
 - (void)setChecksForUpdates:(BOOL)checksForUpdates
@@ -121,7 +118,7 @@
 
 - (void)checkForUpdates
 {
-	[self.updater checkForUpdates:nil];
+	[_updater checkForUpdates:nil];
 }
 
 @end

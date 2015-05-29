@@ -45,14 +45,14 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.variables = [[NSArray alloc] init];
-		self.beginningAddressStringValue = @"";
-		self.endingAddressStringValue = @"";
-		self.searchValue = @"";
-		self.functionTypeTag = ZGEquals;
-		self.selectedDatatypeTag = ZGInt32;
-		self.lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];
-		self.byteOrderTag = CFByteOrderGetCurrent();
+		_variables = [[NSArray alloc] init];
+		_beginningAddressStringValue = @"";
+		_endingAddressStringValue = @"";
+		_searchValue = @"";
+		_functionTypeTag = ZGEquals;
+		_selectedDatatypeTag = ZGInt32;
+		_lastEpsilonValue = [NSString stringWithFormat:@"%.1f", DEFAULT_FLOATING_POINT_EPSILON];
+		_byteOrderTag = CFByteOrderGetCurrent();
 	}
 	return self;
 }

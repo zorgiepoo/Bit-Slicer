@@ -37,15 +37,15 @@
 
 @class ZGVariable;
 
-typedef enum
+typedef NS_ENUM(uint8_t, ZGRegisterType)
 {
 	ZGRegisterGeneralPurpose,
 	ZGRegisterVector
-} ZGRegisterType;
+};
 
 @interface ZGRegister : NSObject
 
-@property (nonatomic, strong) ZGVariable *variable;
+@property (nonatomic) ZGVariable *variable;
 
 @property (nonatomic, readonly) void *rawValue;
 

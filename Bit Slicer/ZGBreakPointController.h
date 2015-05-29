@@ -49,15 +49,15 @@
 
 @interface ZGBreakPointController : NSObject
 
-typedef enum
+typedef NS_ENUM(uint8_t, ZGWatchPointType)
 {
 	ZGWatchPointWrite,
 	ZGWatchPointReadOrWrite,
-} ZGWatchPointType;
+};
 
 + (instancetype)createBreakPointControllerOnceWithScriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter;
 
-@property (nonatomic) NSArray *breakPoints;
+@property (nonatomic, readonly) NSArray *breakPoints;
 @property (nonatomic) ZGAppTerminationState *appTerminationState;
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate;

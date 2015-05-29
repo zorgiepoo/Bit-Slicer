@@ -64,20 +64,20 @@
 @property (readonly, nonatomic) ZGLoggerWindowController *loggerWindowController;
 @property (readonly, nonatomic) ZGHotKeyCenter *hotKeyCenter;
 
-@property (nonatomic, assign) IBOutlet ZGTableView *variablesTableView;
-@property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
-@property (nonatomic, assign) IBOutlet NSPopUpButton *dataTypesPopUpButton;
-@property (nonatomic, assign) IBOutlet NSButton *storeValuesButton;
-@property (nonatomic, assign) IBOutlet NSSearchField *searchValueTextField;
-@property (nonatomic, assign) IBOutlet NSPopUpButton *functionPopUpButton;
+@property (nonatomic) IBOutlet ZGTableView *variablesTableView;
+@property (nonatomic) IBOutlet NSProgressIndicator *progressIndicator;
+@property (nonatomic) IBOutlet NSPopUpButton *dataTypesPopUpButton;
+@property (nonatomic) IBOutlet NSButton *storeValuesButton;
+@property (nonatomic) IBOutlet NSSearchField *searchValueTextField;
+@property (nonatomic) IBOutlet NSPopUpButton *functionPopUpButton;
 
-@property (nonatomic) ZGDocumentTableController *tableController;
-@property (nonatomic) ZGVariableController *variableController;
-@property (nonatomic) ZGDocumentSearchController *searchController;
-@property (nonatomic) ZGScriptManager *scriptManager;
+@property (nonatomic, readonly) ZGDocumentTableController *tableController;
+@property (nonatomic, readonly) ZGVariableController *variableController;
+@property (nonatomic, readonly) ZGDocumentSearchController *searchController;
+@property (nonatomic, readonly) ZGScriptManager *scriptManager;
 
-@property (assign, nonatomic) ZGDocumentData *documentData;
-@property (assign, nonatomic) ZGSearchData *searchData;
+@property (nonatomic, readonly) ZGDocumentData *documentData;
+@property (nonatomic, readonly) ZGSearchData *searchData;
 
 @property (nonatomic, readonly) NSString *flagsStringValue;
 @property (nonatomic, readonly) BOOL showsFlags;

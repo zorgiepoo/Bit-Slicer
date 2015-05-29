@@ -34,7 +34,7 @@
 
 #import "ZGMemoryWindowController.h"
 
-enum ZGNavigation
+typedef NS_ENUM(NSInteger, ZGNavigation)
 {
 	ZGNavigationBack,
 	ZGNavigationForward
@@ -42,10 +42,10 @@ enum ZGNavigation
 
 @interface ZGMemoryNavigationWindowController : ZGMemoryWindowController
 
-@property (nonatomic, assign) IBOutlet NSSegmentedControl *navigationSegmentedControl;
-@property (nonatomic, assign) IBOutlet NSTextField *addressTextField;
+@property (nonatomic) IBOutlet NSSegmentedControl *navigationSegmentedControl;
+@property (nonatomic) IBOutlet NSTextField *addressTextField;
 
-@property (nonatomic) NSUndoManager *navigationManager;
+@property (nonatomic, readonly) NSUndoManager *navigationManager;
 
 - (void)updateNavigationButtons;
 - (BOOL)canEnableNavigationButtons;

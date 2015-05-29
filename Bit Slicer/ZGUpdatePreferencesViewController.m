@@ -35,24 +35,21 @@
 #import "ZGUpdatePreferencesViewController.h"
 #import "ZGAppUpdaterController.h"
 
-@interface ZGUpdatePreferencesViewController ()
-
-@property (nonatomic) ZGAppUpdaterController *appUpdaterController;
-
-@property (nonatomic, assign) IBOutlet NSButton *checkForUpdatesButton;
-@property (nonatomic, assign) IBOutlet NSButton *checkForAlphaUpdatesButton;
-@property (nonatomic, assign) IBOutlet NSButton *sendProfileInfoButton;
-
-@end
-
 @implementation ZGUpdatePreferencesViewController
+{
+	ZGAppUpdaterController *_appUpdaterController;
+	
+	IBOutlet NSButton *_checkForUpdatesButton;
+	IBOutlet NSButton *_checkForAlphaUpdatesButton;
+	IBOutlet NSButton *_sendProfileInfoButton;
+}
 
 - (id)initWithAppUpdaterController:(ZGAppUpdaterController *)appUpdaterController
 {
 	self = [super initWithNibName:@"Software Update View" bundle:nil];
 	if (self != nil)
 	{
-		self.appUpdaterController = appUpdaterController;
+		_appUpdaterController = appUpdaterController;
 	}
 	return self;
 }
@@ -62,44 +59,44 @@
 	[super loadView];
 	
 	// These states could change, for example, when the user has to make Sparkle pick between checking for automatic updates or not checking for them
-	[self.appUpdaterController reloadValuesFromDefaults];
+	[_appUpdaterController reloadValuesFromDefaults];
 	[self updateCheckingForUpdateButtons];
 }
 
 - (void)updateCheckingForUpdateButtons
 {
-	if (self.appUpdaterController.checksForUpdates)
+	if (_appUpdaterController.checksForUpdates)
 	{
-		self.checkForUpdatesButton.state = NSOnState;
+		_checkForUpdatesButton.state = NSOnState;
 		
-		self.checkForAlphaUpdatesButton.enabled = YES;
-		self.checkForAlphaUpdatesButton.state = self.appUpdaterController.checksForAlphaUpdates ? NSOnState : NSOffState;
+		_checkForAlphaUpdatesButton.enabled = YES;
+		_checkForAlphaUpdatesButton.state = _appUpdaterController.checksForAlphaUpdates ? NSOnState : NSOffState;
 		
-		self.sendProfileInfoButton.enabled = YES;
-		self.sendProfileInfoButton.state = self.appUpdaterController.sendsAnonymousInfo ? NSOnState : NSOffState;
+		_sendProfileInfoButton.enabled = YES;
+		_sendProfileInfoButton.state = _appUpdaterController.sendsAnonymousInfo ? NSOnState : NSOffState;
 	}
 	else
 	{
-		self.checkForAlphaUpdatesButton.enabled = NO;
-		self.sendProfileInfoButton.enabled = NO;
+		_checkForAlphaUpdatesButton.enabled = NO;
+		_sendProfileInfoButton.enabled = NO;
 		
-		self.checkForUpdatesButton.state = NSOffState;
-		self.checkForAlphaUpdatesButton.state = NSOffState;
-		self.sendProfileInfoButton.state = NSOffState;
+		_checkForUpdatesButton.state = NSOffState;
+		_checkForAlphaUpdatesButton.state = NSOffState;
+		_sendProfileInfoButton.state = NSOffState;
 	}
 }
 
 - (IBAction)checkForUpdatesButton:(id)__unused sender
 {
-	if (self.checkForUpdatesButton.state == NSOffState)
+	if (_checkForUpdatesButton.state == NSOffState)
 	{
-		self.appUpdaterController.checksForAlphaUpdates = NO;
-		self.appUpdaterController.checksForUpdates = NO;
+		_appUpdaterController.checksForAlphaUpdates = NO;
+		_appUpdaterController.checksForUpdates = NO;
 	}
 	else
 	{
-		self.appUpdaterController.checksForUpdates = YES;
-		self.appUpdaterController.checksForAlphaUpdates = [ZGAppUpdaterController runningAlpha];
+		_appUpdaterController.checksForUpdates = YES;
+		_appUpdaterController.checksForAlphaUpdates = [ZGAppUpdaterController runningAlpha];
 	}
 	
 	[self updateCheckingForUpdateButtons];
@@ -107,13 +104,13 @@
 
 - (IBAction)checkForAlphaUpdatesButton:(id)__unused sender
 {
-	self.appUpdaterController.checksForAlphaUpdates = (self.checkForAlphaUpdatesButton.state == NSOnState);
+	_appUpdaterController.checksForAlphaUpdates = (_checkForAlphaUpdatesButton.state == NSOnState);
 	[self updateCheckingForUpdateButtons];
 }
 
 - (IBAction)changeSendProfileInformation:(id)__unused sender
 {
-	self.appUpdaterController.sendsAnonymousInfo = (self.sendProfileInfoButton.state == NSOnState);
+	_appUpdaterController.sendsAnonymousInfo = (_sendProfileInfoButton.state == NSOnState);
 	[self updateCheckingForUpdateButtons];
 }
 

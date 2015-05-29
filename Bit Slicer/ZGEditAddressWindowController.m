@@ -36,16 +36,13 @@
 #import "ZGVariableController.h"
 #import "ZGVariable.h"
 
-@interface ZGEditAddressWindowController ()
-
-@property (nonatomic) ZGVariableController *variableController;
-
-@property (nonatomic, assign) IBOutlet NSTextField *addressTextField;
-@property (nonatomic) ZGVariable *variable;
-
-@end
-
 @implementation ZGEditAddressWindowController
+{
+	ZGVariableController *_variableController;
+	ZGVariable *_variable;
+	
+	IBOutlet NSTextField *_addressTextField;
+}
 
 - (NSString *)windowNibName
 {
@@ -57,7 +54,7 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.variableController = variableController;
+		_variableController = variableController;
 	}
 	return self;
 }
@@ -66,10 +63,10 @@
 {
 	[self window]; // ensure window is loaded
 	
-	self.variable = variable;
-	self.addressTextField.stringValue = variable.addressFormula;
+	_variable = variable;
+	_addressTextField.stringValue = variable.addressFormula;
 	
-	[self.addressTextField selectText:nil];
+	[_addressTextField selectText:nil];
 	
 	[NSApp
 	 beginSheet:self.window
@@ -84,11 +81,11 @@
 	[NSApp endSheet:self.window];
 	[self.window close];
 	
-	[self.variableController
-	 editVariable:self.variable
-	 addressFormula:self.addressTextField.stringValue];
+	[_variableController
+	 editVariable:_variable
+	 addressFormula:_addressTextField.stringValue];
 	
-	self.variable = nil;
+	_variable = nil;
 }
 
 - (IBAction)cancelEditingAddress:(id)__unused sender
@@ -96,7 +93,7 @@
 	[NSApp endSheet:self.window];
 	[self.window close];
 	
-	self.variable = nil;
+	_variable = nil;
 }
 
 @end

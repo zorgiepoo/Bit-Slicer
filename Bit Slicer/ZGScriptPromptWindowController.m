@@ -35,15 +35,6 @@
 #import "ZGScriptPromptWindowController.h"
 #import "ZGScriptPrompt.h"
 
-@interface ZGScriptPromptWindowController ()
-
-@property (nonatomic) ZGScriptPrompt *scriptPrompt;
-
-@property (nonatomic) BOOL isAttached;
-@property (nonatomic, weak) id <ZGScriptPromptDelegate> delegate;
-
-@end
-
 @implementation ZGScriptPromptWindowController
 {
 	IBOutlet NSTextField *_messageTextField;
@@ -71,28 +62,28 @@
 	 didEndSelector:nil
 	 contextInfo:NULL];
 	
-	self.scriptPrompt = scriptPrompt;
-	self.isAttached = YES;
+	_scriptPrompt = scriptPrompt;
+	_isAttached = YES;
 	
-	self.delegate = delegate;
+	_delegate = delegate;
 }
 
 - (void)terminateSessionWithAnswer:(NSString *)answer
 {
-	id <ZGScriptPromptDelegate> delegate = self.delegate;
-	[delegate scriptPrompt:self.scriptPrompt didReceiveAnswer:answer];
+	id <ZGScriptPromptDelegate> delegate = _delegate;
+	[delegate scriptPrompt:_scriptPrompt didReceiveAnswer:answer];
 	[self terminateSession];
 }
 
 - (void)terminateSession
 {
-	if (self.isAttached)
+	if (_isAttached)
 	{
 		[NSApp endSheet:self.window];
 		[self.window close];
 		
-		self.isAttached = NO;
-		self.delegate = nil;
+		_isAttached = NO;
+		_delegate = nil;
 	}
 }
 

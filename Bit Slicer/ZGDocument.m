@@ -40,13 +40,10 @@
 #import "ZGScriptManager.h"
 #import "ZGSearchToken.h"
 
-@interface ZGDocument ()
-
-@property (nonatomic) ZGDocumentWindowController *windowController;
-
-@end
-
 @implementation ZGDocument
+{
+	ZGDocumentWindowController *_windowController;
+}
 
 #pragma mark Document stuff
 
@@ -55,8 +52,8 @@
 	self = [super init];
 	if (self)
 	{
-		self.data = [[ZGDocumentData alloc] init];
-		self.searchData = [[ZGSearchData alloc] init];
+		_data = [[ZGDocumentData alloc] init];
+		_searchData = [[ZGSearchData alloc] init];
 	}
 	return self;
 }
@@ -74,9 +71,8 @@
 
 - (void)makeWindowControllers
 {
-	self.windowController = [[ZGDocumentWindowController alloc] initWithDocument:self];
-	
-	[self addWindowController:self.windowController];
+	_windowController = [[ZGDocumentWindowController alloc] initWithDocument:self];
+	[self addWindowController:_windowController];
 }
 
 // Since there appears to be an AppKit bug where window controllers are removed *before* the app is asked if it really wants to terminate (if the document is marked dirty), we'll make a workaround for cleaning the document's state
@@ -95,70 +91,70 @@
 	
 	NSArray *watchVariablesArrayToSave = nil;
 	
-	watchVariablesArrayToSave = self.data.variables;
+	watchVariablesArrayToSave = _data.variables;
 	
 	[keyedArchiver
 	 encodeObject:watchVariablesArrayToSave
 	 forKey:ZGWatchVariablesArrayKey];
 	
 	[keyedArchiver
-	 encodeObject:self.data.desiredProcessInternalName != nil ? self.data.desiredProcessInternalName : [NSNull null]
+	 encodeObject:_data.desiredProcessInternalName != nil ? _data.desiredProcessInternalName : [NSNull null]
 	 forKey:ZGProcessInternalNameKey];
     
 	[keyedArchiver
-	 encodeInt32:(int32_t)self.data.selectedDatatypeTag
+	 encodeInt32:(int32_t)_data.selectedDatatypeTag
 	 forKey:ZGSelectedDataTypeTag];
     
 	[keyedArchiver
-	 encodeInt32:(int32_t)self.data.qualifierTag
+	 encodeInt32:(int32_t)_data.qualifierTag
 	 forKey:ZGQualifierTagKey];
 	
 	[keyedArchiver
-	 encodeInt32:(int32_t)self.data.byteOrderTag
+	 encodeInt32:(int32_t)_data.byteOrderTag
 	 forKey:ZGByteOrderTagKey];
     
 	[keyedArchiver
-	 encodeInt32:(int32_t)self.data.functionTypeTag
+	 encodeInt32:(int32_t)_data.functionTypeTag
 	 forKey:ZGFunctionTypeTagKey];
 	
 	[keyedArchiver
-	 encodeInt32:self.searchData.protectionMode
+	 encodeInt32:_searchData.protectionMode
 	 forKey:ZGProtectionModeKey];
     
 	[keyedArchiver
-	 encodeBool:self.data.ignoreDataAlignment
+	 encodeBool:_data.ignoreDataAlignment
 	 forKey:ZGIgnoreDataAlignmentKey];
     
 	[keyedArchiver
-	 encodeBool:self.searchData.shouldIncludeNullTerminator
+	 encodeBool:_searchData.shouldIncludeNullTerminator
 	 forKey:ZGExactStringLengthKey];
     
 	[keyedArchiver
-	 encodeBool:self.searchData.shouldIgnoreStringCase
+	 encodeBool:_searchData.shouldIgnoreStringCase
 	 forKey:ZGIgnoreStringCaseKey];
     
 	[keyedArchiver
-	 encodeObject:self.data.beginningAddressStringValue
+	 encodeObject:_data.beginningAddressStringValue
 	 forKey:ZGBeginningAddressKey];
     
 	[keyedArchiver
-	 encodeObject:self.data.endingAddressStringValue
+	 encodeObject:_data.endingAddressStringValue
 	 forKey:ZGEndingAddressKey];
     
 	[keyedArchiver
-	 encodeObject:self.data.lastEpsilonValue
+	 encodeObject:_data.lastEpsilonValue
 	 forKey:ZGEpsilonKey];
     
 	[keyedArchiver
-	 encodeObject:self.data.lastAboveRangeValue
+	 encodeObject:_data.lastAboveRangeValue
 	 forKey:ZGAboveValueKey];
     
 	[keyedArchiver
-	 encodeObject:self.data.lastBelowRangeValue
+	 encodeObject:_data.lastBelowRangeValue
 	 forKey:ZGBelowValueKey];
     
 	[keyedArchiver
-	 encodeObject:self.data.searchValue
+	 encodeObject:_data.searchValue
 	 forKey:ZGSearchStringValueKeyNew];
 	
 	[keyedArchiver finishEncoding];
@@ -180,33 +176,33 @@
 	
 	if (newVariables != nil)
 	{
-		self.data.variables = newVariables;
+		_data.variables = newVariables;
 	}
 	else
 	{
-		self.data.variables = [NSArray array];
+		_data.variables = [NSArray array];
 	}
 	
-	self.data.desiredProcessInternalName = [keyedUnarchiver decodeObjectForKey:ZGProcessInternalNameKey];
-	if ((id)self.data.desiredProcessInternalName == [NSNull null])
+	_data.desiredProcessInternalName = [keyedUnarchiver decodeObjectForKey:ZGProcessInternalNameKey];
+	if ((id)_data.desiredProcessInternalName == [NSNull null])
 	{
-		self.data.desiredProcessInternalName = nil;
+		_data.desiredProcessInternalName = nil;
 	}
 	
-	self.data.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
-	self.data.qualifierTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey];
-	self.data.functionTypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey];
-	self.searchData.protectionMode = (ZGProtectionMode)[keyedUnarchiver decodeInt32ForKey:ZGProtectionModeKey];
-	self.data.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
-	self.searchData.shouldIncludeNullTerminator = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
-	self.searchData.shouldIgnoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
-	self.data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey]];
-	self.data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
+	_data.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
+	_data.qualifierTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGQualifierTagKey];
+	_data.functionTypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGFunctionTypeTagKey];
+	_searchData.protectionMode = (ZGProtectionMode)[keyedUnarchiver decodeInt32ForKey:ZGProtectionModeKey];
+	_data.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
+	_searchData.shouldIncludeNullTerminator = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
+	_searchData.shouldIgnoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
+	_data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey]];
+	_data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
 	
-	self.data.byteOrderTag = [keyedUnarchiver decodeInt32ForKey:ZGByteOrderTagKey];
-	if (self.data.byteOrderTag == CFByteOrderUnknown)
+	_data.byteOrderTag = [keyedUnarchiver decodeInt32ForKey:ZGByteOrderTagKey];
+	if (_data.byteOrderTag == CFByteOrderUnknown)
 	{
-		self.data.byteOrderTag = CFByteOrderGetCurrent();
+		_data.byteOrderTag = CFByteOrderGetCurrent();
 	}
 	
 	NSString *searchValue = nil;
@@ -242,11 +238,11 @@
 		searchValue = newSearchStringValue;
 	}
 	
-	self.data.searchValue = (searchValue != nil) ? searchValue : @"";
+	_data.searchValue = (searchValue != nil) ? searchValue : @"";
 	
-	self.data.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
-	self.data.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];
-	self.data.lastBelowRangeValue = [keyedUnarchiver decodeObjectForKey:ZGBelowValueKey];
+	_data.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
+	_data.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];
+	_data.lastBelowRangeValue = [keyedUnarchiver decodeObjectForKey:ZGBelowValueKey];
 	
 	return YES;
 }
@@ -254,22 +250,22 @@
 - (BOOL)revertToContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError * __autoreleasing *)outError
 {
 	// Stop and remove all scripts before attempting to revert
-	for (ZGVariable *variable in self.data.variables)
+	for (ZGVariable *variable in _data.variables)
 	{
 		if (variable.type == ZGScript)
 		{
 			if (variable.enabled)
 			{
-				[self.windowController.scriptManager stopScriptForVariable:variable];
+				[_windowController.scriptManager stopScriptForVariable:variable];
 			}
-			[self.windowController.scriptManager removeScriptForVariable:variable];
+			[_windowController.scriptManager removeScriptForVariable:variable];
 		}
 	}
 	
 	BOOL reverted = [super revertToContentsOfURL:absoluteURL ofType:typeName error:outError];
 	if (reverted)
 	{
-		[self.windowController loadDocumentUserInterface];
+		[_windowController loadDocumentUserInterface];
 	}
 	return reverted;
 }

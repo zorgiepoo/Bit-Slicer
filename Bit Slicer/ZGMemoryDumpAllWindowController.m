@@ -38,17 +38,14 @@
 #import "ZGMemoryDumpFunctions.h"
 #import "ZGUtilities.h"
 
-@interface ZGMemoryDumpAllWindowController ()
-
-@property (nonatomic, assign) IBOutlet NSButton *cancelButton;
-@property (nonatomic, assign) IBOutlet NSProgressIndicator *progressIndicator;
-
-@property (nonatomic) ZGSearchProgress *searchProgress;
-@property (nonatomic) BOOL isBusy;
-
-@end
-
 @implementation ZGMemoryDumpAllWindowController
+{
+	IBOutlet NSButton *_cancelButton;
+	IBOutlet NSProgressIndicator *_progressIndicator;
+	
+	ZGSearchProgress *_searchProgress;
+	BOOL _isBusy;
+}
 
 - (NSString *)windowNibName
 {
@@ -89,9 +86,9 @@
 				  didEndSelector:nil
 				  contextInfo:NULL];
 				 
-				 [self.cancelButton setEnabled:YES];
+				 [self->_cancelButton setEnabled:YES];
 				 
-				 self.isBusy = YES;
+				 self->_isBusy = YES;
 				 
 				 id dumpMemoryActivity = nil;
 				 if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
@@ -108,18 +105,18 @@
 					 }
 					 
 					 dispatch_async(dispatch_get_main_queue(), ^{
-						 if (!self.searchProgress.shouldCancelSearch)
+						 if (!self->_searchProgress.shouldCancelSearch)
 						 {
 							 ZGDeliverUserNotification(ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationMessageFormat"), process.name], nil);
 						 }
 						 
-						 self.progressIndicator.doubleValue = 0.0;
+						 self->_progressIndicator.doubleValue = 0.0;
 						 
 						 [NSApp endSheet:self.window];
 						 [self.window close];
 						 
-						 self.isBusy = NO;
-						 self.searchProgress = nil;
+						 self->_isBusy = NO;
+						 self->_searchProgress = nil;
 						 
 						 if (dumpMemoryActivity != nil)
 						 {
@@ -134,19 +131,19 @@
 
 - (IBAction)cancelDumpingAllMemory:(id)__unused sender
 {
-	self.searchProgress.shouldCancelSearch = YES;
-	[self.cancelButton setEnabled:NO];
+	_searchProgress.shouldCancelSearch = YES;
+	[_cancelButton setEnabled:NO];
 }
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress
 {
-	self.searchProgress = searchProgress;
-	self.progressIndicator.maxValue = self.searchProgress.maxProgress;
+	_searchProgress = searchProgress;
+	_progressIndicator.maxValue = _searchProgress.maxProgress;
 }
 
 - (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)__unused resultSet
 {
-	self.progressIndicator.doubleValue = searchProgress.progress;
+	_progressIndicator.doubleValue = searchProgress.progress;
 }
 
 @end
