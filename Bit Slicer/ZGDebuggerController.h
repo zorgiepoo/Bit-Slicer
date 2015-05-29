@@ -41,6 +41,7 @@
 #import "ZGBacktraceViewController.h"
 #import "ZGHotKeyDelegate.h"
 #import "ZGRegistersViewController.h"
+#import "ZGMemorySelectionDelegate.h"
 
 @class ZGProcess;
 @class ZGInstruction;
@@ -58,7 +59,7 @@ extern NSString *ZGStepOutHotKey;
 
 @interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate, ZGHotKeyDelegate, ZGRegistersViewDelegate>
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController delegate:(id <ZGChosenProcessDelegate>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 - (void)cleanup;
 

@@ -53,7 +53,6 @@
 #import "ZGDebuggerController.h"
 #import "ZGBreakPointController.h"
 #import "ZGScriptingInterpreter.h"
-#import "ZGMemoryViewerController.h"
 #import "ZGDocument.h"
 #import "ZGVirtualMemory.h"
 #import "ZGMachBinary.h"
@@ -63,7 +62,6 @@
 #import "ZGUtilities.h"
 #import "ZGLocalization.h"
 #import "ZGTableView.h"
-#import "ZGNavigationPost.h"
 #import "NSArrayAdditions.h"
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
@@ -111,7 +109,7 @@
 	IBOutlet NSView *_scopeBarFlagsView;
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName delegate:(id <ZGChosenProcessDelegate>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager delegate:delegate];
 	if (self != nil)
@@ -1350,7 +1348,7 @@
 {
 	if (_watchVariableWindowController == nil)
 	{
-		_watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:_breakPointController];
+		_watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:_breakPointController delegate:self.delegate];
 	}
 	
 	[_watchVariableWindowController watchVariable:[self selectedVariables][0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:self.window completionHandler:^(NSArray *foundVariables) {
@@ -1369,17 +1367,15 @@
 - (IBAction)showMemoryViewer:(id)__unused sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] objectAtIndex:0];
-	
-	[ZGNavigationPost
-	 postShowMemoryViewerWithProcess:self.currentProcess
-	 address:selectedVariable.address
-	 selectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
+	id <ZGShowMemoryWindow> delegate = self.delegate;
+	[delegate showMemoryViewerWindowWithProcess:self.currentProcess address:selectedVariable.address selectionLength:selectedVariable.size > 0 ? selectedVariable.size : DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH];
 }
 
 - (IBAction)showDebugger:(id)__unused sender
 {
 	ZGVariable *selectedVariable = [[self selectedVariables] firstObject];
-	[ZGNavigationPost postShowDebuggerWithProcess:self.currentProcess address:selectedVariable.address];
+	id <ZGShowMemoryWindow> delegate = self.delegate;
+	[delegate showDebuggerWindowWithProcess:self.currentProcess address:selectedVariable.address];
 }
 
 @end

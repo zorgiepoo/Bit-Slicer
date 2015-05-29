@@ -58,12 +58,11 @@
 	ZGMemoryProtectionWindowController *_memoryProtectionWindowController;
 	
 	NSUndoManager *_undoManager;
-	__weak id <ZGChosenProcessDelegate> _delegate;
 }
 
 #pragma mark Birth
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
 	self = [super init];
 	

@@ -35,6 +35,8 @@
 #import <Cocoa/Cocoa.h>
 
 #import "ZGChosenProcessDelegate.h"
+#import "ZGMemorySelectionDelegate.h"
+#import "ZGShowMemoryWindow.h"
 #import "ZGPreferencesController.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
@@ -50,14 +52,14 @@
 #import "ZGHotKeyCenter.h"
 #import "ZGAppUpdaterController.h"
 #import "ZGAppTerminationState.h"
-#import "ZGNavigationPost.h"
 #import "ZGScriptingInterpreter.h"
+#import "ZGProcess.h"
 
 #define ZGLoggerIdentifier @"ZGLoggerIdentifier"
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
 #define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
 
-@interface ZGAppController : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, ZGChosenProcessDelegate>
+@interface ZGAppController : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>
 
 @end
 
@@ -75,6 +77,7 @@
 	ZGScriptingInterpreter *_scriptingInterpreter;
 	
 	NSString *_lastChosenInternalProcessName;
+	NSMutableDictionary *_memorySelectionRanges;
 }
 
 #pragma mark Birth & Death
@@ -128,18 +131,6 @@
 			 lastChosenInternalProcessName:selfReference->_lastChosenInternalProcessName
 			 delegate:selfReference];
 		}];
-		
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(showWindowControllerNotification:)
-		 name:ZGNavigationShowMemoryViewerNotification
-		 object:nil];
-
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(showWindowControllerNotification:)
-		 name:ZGNavigationShowDebuggerNotification
-		 object:nil];
 		
 		[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 	}
@@ -257,28 +248,19 @@
 	[_appUpdaterController checkForUpdates];
 }
 
-#pragma mark Notifications
+#pragma mark Delegate Methods
 
-- (void)showWindowControllerNotification:(NSNotification *)notification
+- (void)showDebuggerWindowWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address
 {
-	ZGProcess *process = [notification.userInfo objectForKey:ZGNavigationProcessKey];
-	ZGMemoryAddress address = [[notification.userInfo objectForKey:ZGNavigationMemoryAddressKey] unsignedLongLongValue];
-	
-	if ([notification.name isEqualToString:ZGNavigationShowDebuggerNotification])
-	{
-		[self showMemoryWindowController:_debuggerController withWindowIdentifier:ZGDebuggerIdentifier andCanReadMemory:NO];
-		[_debuggerController jumpToMemoryAddress:address inProcess:process];
-	}
-	else if ([notification.name isEqualToString:ZGNavigationShowMemoryViewerNotification])
-	{
-		ZGMemoryAddress selectionLength = [[notification.userInfo objectForKey:ZGNavigationSelectionLengthKey] unsignedLongLongValue];
-		
-		[self showMemoryWindowController:_memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:NO];
-		[_memoryViewer jumpToMemoryAddress:address withSelectionLength:selectionLength inProcess:process];
-	}
+	[self showMemoryWindowController:_debuggerController withWindowIdentifier:ZGDebuggerIdentifier andCanReadMemory:NO];
+	[_debuggerController jumpToMemoryAddress:address inProcess:process];
 }
 
-#pragma mark Delegate Methods
+- (void)showMemoryViewerWindowWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address selectionLength:(ZGMemorySize)selectionLength
+{
+	[self showMemoryWindowController:_memoryViewer withWindowIdentifier:ZGMemoryViewerIdentifier andCanReadMemory:NO];
+	[_memoryViewer jumpToMemoryAddress:address withSelectionLength:selectionLength inProcess:process];
+}
 
 - (void)memoryWindowController:(ZGMemoryWindowController *)memoryWindowController didChangeProcessInternalName:(NSString *)newChosenInternalProcessName
 {
@@ -293,6 +275,25 @@
 	{
 		_memoryViewer.lastChosenInternalProcessName = newChosenInternalProcessName;
 	}
+}
+
+- (void)memorySelectionDidChange:(NSRange)newMemorySelectionRange process:(ZGProcess *)process
+{
+	if (_memorySelectionRanges == nil)
+	{
+		_memorySelectionRanges = [[NSMutableDictionary alloc] init];
+	}
+	_memorySelectionRanges[@(process.processID)] = [NSValue valueWithRange:newMemorySelectionRange];
+}
+
+- (NSRange)lastMemorySelectionForProcess:(ZGProcess *)process
+{
+	if (_memorySelectionRanges == nil || _memorySelectionRanges[@(process.processID)] == nil)
+	{
+		return NSMakeRange(0, 0);
+	}
+	
+	return [(NSValue *)(_memorySelectionRanges[@(process.processID)]) rangeValue];
 }
 
 #pragma mark User Notifications

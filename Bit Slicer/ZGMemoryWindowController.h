@@ -34,6 +34,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ZGChosenProcessDelegate.h"
+#import "ZGMemorySelectionDelegate.h"
+#import "ZGShowMemoryWindow.h"
 #import "ZGMemoryTypes.h"
 #import <HexFiend/HFTypes.h>
 #import <HexFiend/HFFunctions.h>
@@ -46,10 +48,12 @@
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 @property (nonatomic, readonly) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic, readonly) ZGProcessList *processList;
+
+@property (nonatomic, weak, readonly) id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow> delegate;
 
 @property (nonatomic, copy) NSString *lastChosenInternalProcessName;
 

@@ -51,7 +51,6 @@
 #import "ZGLocalization.h"
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
-#import "ZGNavigationPost.h"
 #import "ZGTableView.h"
 
 #define ZGLocalizableWatchVariableString(string) NSLocalizedStringFromTable(string, @"[Code] Watch Variable", nil)
@@ -70,11 +69,13 @@
 	NSMutableArray *_foundWatchVariables;
 	NSMutableDictionary *_foundWatchVariablesDictionary;
 	watch_variable_completion_t _completionHandler;
+	
+	__weak id <ZGShowMemoryWindow> _delegate;
 }
 
 #pragma mark Birth & Death
 
-- (id)initWithBreakPointController:(ZGBreakPointController *)breakPointController
+- (id)initWithBreakPointController:(ZGBreakPointController *)breakPointController delegate:(id <ZGShowMemoryWindow>)delegate
 {
 	self = [super init];
 	if (self != nil)
@@ -86,6 +87,7 @@
 		 object:nil];
 		
 		_breakPointController = breakPointController;
+		_delegate = delegate;
 	}
 	return self;
 }
@@ -518,13 +520,15 @@
 - (IBAction)showMemoryViewer:(id)__unused sender
 {
 	ZGWatchVariable *selectedWatchVariable = [[self selectedWatchVariables] firstObject];
-	[ZGNavigationPost postShowMemoryViewerWithProcess:_watchProcess address:selectedWatchVariable.instruction.variable.address selectionLength:selectedWatchVariable.instruction.variable.size];
+	id <ZGShowMemoryWindow> delegate = _delegate;
+	[delegate showMemoryViewerWindowWithProcess:_watchProcess address:selectedWatchVariable.instruction.variable.address selectionLength:selectedWatchVariable.instruction.variable.size];
 }
 
 - (IBAction)showDebugger:(id)__unused sender
 {
 	ZGWatchVariable *selectedWatchVariable = [[self selectedWatchVariables] firstObject];
-	[ZGNavigationPost postShowDebuggerWithProcess:_watchProcess address:selectedWatchVariable.instruction.variable.address];
+	id <ZGShowMemoryWindow> delegate = _delegate;
+	[delegate showDebuggerWindowWithProcess:_watchProcess address:selectedWatchVariable.instruction.variable.address];
 }
 
 @end

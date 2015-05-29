@@ -33,7 +33,6 @@
  */
 
 #import "ZGBacktraceViewController.h"
-#import "ZGNavigationPost.h"
 #import "ZGVirtualMemory.h"
 #import "ZGProcess.h"
 #import "ZGInstruction.h"
@@ -217,7 +216,10 @@
 - (IBAction)showMemoryViewer:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
-	[ZGNavigationPost postShowMemoryViewerWithProcess:_process address:selectedInstruction.variable.address selectionLength:selectedInstruction.variable.size];
+	
+	id <ZGBacktraceViewControllerDelegate> delegate = _delegate;
+	id <ZGShowMemoryWindow> showMemoryWindowController =  delegate.delegate;
+	[showMemoryWindowController showMemoryViewerWindowWithProcess:_process address:selectedInstruction.variable.address selectionLength:selectedInstruction.variable.size];
 }
 
 @end

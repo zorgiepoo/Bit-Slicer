@@ -52,7 +52,6 @@
 #import "ZGMachBinaryInfo.h"
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
-#import "ZGNavigationPost.h"
 
 #define ZGLocalizedStringFromVariableActionsTable(string) NSLocalizedStringFromTable((string), @"[Code] Variable Actions", nil)
 
@@ -62,9 +61,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 @implementation ZGVariableController
 {
 	__weak ZGDocumentWindowController *_windowController;
-	
-	// last selection from memory viewer or debugger
-	NSRange _lastSelectedMemoryRangeFromOutside;
 	
 	ZGDocumentData *_documentData;
 	id _frozenActivity;
@@ -85,35 +81,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		_windowController = windowController;
 		_documentData = windowController.documentData;
-		
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(memorySelectionChangedFromMemoryWindowNotification:)
-		 name:ZGNavigationSelectionChangeNotification
-		 object:nil];
 	}
 	return self;
-}
-
-- (void)dealloc
-{
-	[[NSNotificationCenter defaultCenter]
-	 removeObserver:self
-	 name:ZGNavigationSelectionChangeNotification
-	 object:nil];
-}
-
-- (void)memorySelectionChangedFromMemoryWindowNotification:(NSNotification *)notification
-{
-	ZGProcess *process = [notification.userInfo objectForKey:ZGNavigationProcessKey];
-	ZGMemoryAddress selectionAddress = [[notification.userInfo objectForKey:ZGNavigationMemoryAddressKey] unsignedLongLongValue];
-	ZGMemoryAddress selectionSize = [[notification.userInfo objectForKey:ZGNavigationSelectionLengthKey] unsignedLongLongValue];
-	
-	ZGDocumentWindowController *windowController = _windowController;
-	if ([process isEqual:windowController.currentProcess])
-	{
-		_lastSelectedMemoryRangeFromOutside = NSMakeRange(selectionAddress, selectionSize);
-	}
 }
 
 #pragma mark Freezing variables
@@ -421,11 +390,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	CFByteOrder byteOrder = _documentData.byteOrderTag;
 	ZGVariableType variableType = (ZGVariableType)[sender tag];
 	
-	// Try to get an initial address from the debugger or the memory viewer's selection
-	ZGMemoryAddress initialAddress = _lastSelectedMemoryRangeFromOutside.location;
-	ZGMemorySize initialSize = _lastSelectedMemoryRangeFromOutside.length;
-	
 	ZGDocumentWindowController *windowController = _windowController;
+	
+	// Try to get an initial address from the debugger or the memory viewer's selection
+	id <ZGMemorySelectionDelegate> memorySelectionDelegate = windowController.delegate;
+	NSRange lastMemorySelectionRange = [memorySelectionDelegate lastMemorySelectionForProcess:windowController.currentProcess];
+	ZGMemoryAddress initialAddress = lastMemorySelectionRange.location;
+	ZGMemorySize initialSize = lastMemorySelectionRange.length;
+	
 	ZGVariable *variable =
 		[[ZGVariable alloc]
 		 initWithValue:NULL

@@ -44,7 +44,6 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryHelpers.h"
 #import "ZGRegion.h"
-#import "ZGNavigationPost.h"
 #import "ZGVariableController.h"
 #import "NSArrayAdditions.h"
 
@@ -118,7 +117,7 @@
 	});
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager delegate:delegate];
 	if (self != nil)
@@ -639,7 +638,9 @@
 	else if (properties & HFControllerSelectedRanges && _currentMemorySize > 0)
 	{
 		HFRange selectedAddressRange = [self selectedAddressRange];
-		[ZGNavigationPost postMemorySelectionChangeWithProcess:self.currentProcess selectionRange:NSMakeRange(selectedAddressRange.location, selectedAddressRange.length)];
+		
+		id <ZGMemorySelectionDelegate> delegate = self.delegate;
+		[delegate memorySelectionDidChange:NSMakeRange(selectedAddressRange.location, selectedAddressRange.length) process:self.currentProcess];
 	}
 }
 
@@ -751,7 +752,8 @@
 - (IBAction)showDebugger:(id)__unused sender
 {
 	HFRange selectedAddressRange = [self selectedAddressRange];
-	[ZGNavigationPost postShowDebuggerWithProcess:self.currentProcess address:selectedAddressRange.location];
+	id <ZGShowMemoryWindow> delegate = self.delegate;
+	[delegate showDebuggerWindowWithProcess:self.currentProcess address:selectedAddressRange.location];
 }
 
 @end

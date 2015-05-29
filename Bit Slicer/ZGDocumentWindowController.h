@@ -83,7 +83,7 @@
 @property (nonatomic, readonly) NSString *flagsStringValue;
 @property (nonatomic, readonly) BOOL showsFlags;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName delegate:(id <ZGChosenProcessDelegate>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 - (void)loadDocumentUserInterface;
 

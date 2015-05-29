@@ -39,7 +39,7 @@
 
 @implementation ZGMemoryNavigationWindowController
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager delegate:delegate];
 	

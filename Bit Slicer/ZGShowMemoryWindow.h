@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 12/25/13.
+ * Created by Mayur Pawashe on 5/29/15.
  *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,21 +32,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "ZGBreakPointController.h"
-#import "ZGBreakPointDelegate.h"
-#import "ZGShowMemoryWindow.h"
+#import <Foundation/Foundation.h>
+#import "ZGMemoryTypes.h"
 
-@class ZGVariable;
 @class ZGProcess;
-@class ZGBreakPointController;
 
-typedef void (^watch_variable_completion_t)(NSArray *variablesFound);
+#define DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH 0x4
 
-@interface ZGWatchVariableWindowController : NSWindowController <ZGBreakPointDelegate, NSTableViewDataSource>
+@protocol ZGShowMemoryWindow <NSObject>
 
-- (id)initWithBreakPointController:(ZGBreakPointController *)breakPointController delegate:(id <ZGShowMemoryWindow>)delegate;
-
-- (void)watchVariable:(ZGVariable *)variable withWatchPointType:(ZGWatchPointType)watchPointType inProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow completionHandler:(watch_variable_completion_t)completionHandler;
+- (void)showDebuggerWindowWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address;
+- (void)showMemoryViewerWindowWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address selectionLength:(ZGMemorySize)selectionLength;
 
 @end

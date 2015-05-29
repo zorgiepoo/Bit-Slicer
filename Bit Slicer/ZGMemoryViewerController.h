@@ -36,14 +36,13 @@
 #import <HexFiend/HexFiend.h>
 #import "ZGMemoryTypes.h"
 #import "ZGMemoryNavigationWindowController.h"
+#import "ZGMemorySelectionDelegate.h"
 
 @class ZGProcess;
 
-#define DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH 4
-
 @interface ZGMemoryViewerController : ZGMemoryNavigationWindowController <NSWindowDelegate>
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 @property (nonatomic, readonly) ZGMemoryAddress currentMemoryAddress;
 @property (nonatomic, readonly) ZGMemorySize currentMemorySize;

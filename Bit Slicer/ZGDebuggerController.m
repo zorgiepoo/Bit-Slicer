@@ -56,7 +56,6 @@
 #import "ZGTableView.h"
 #import "ZGVariableController.h"
 #import "ZGBacktrace.h"
-#import "ZGNavigationPost.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGHotKey.h"
 
@@ -160,7 +159,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	});
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController delegate:(id <ZGChosenProcessDelegate>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager delegate:delegate];
 	
@@ -1472,7 +1471,14 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		if (selectedInstructions.count > 0)
 		{
 			ZGInstruction *firstInstruction = [selectedInstructions objectAtIndex:0];
-			[ZGNavigationPost postMemorySelectionChangeWithProcess:self.currentProcess selectionRange:NSMakeRange(firstInstruction.variable.address, firstInstruction.variable.size)];
+			
+			// I think the cast may be necessary due to a possible compiler bug
+			id <ZGMemorySelectionDelegate> delegate = (id <ZGMemorySelectionDelegate>)(self.delegate);
+			if (delegate != nil)
+			{
+				assert([delegate conformsToProtocol:@protocol(ZGMemorySelectionDelegate)]);
+				[delegate memorySelectionDidChange:NSMakeRange(firstInstruction.variable.address, firstInstruction.variable.size) process:self.currentProcess];
+			}
 		}
 	}
 	[self updateStatusBar];
@@ -2260,8 +2266,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 - (IBAction)showMemoryViewer:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
-	
-	[ZGNavigationPost postShowMemoryViewerWithProcess:self.currentProcess address:selectedInstruction.variable.address selectionLength:selectedInstruction.variable.size];
+	id <ZGShowMemoryWindow> delegate = self.delegate;
+	[delegate showMemoryViewerWindowWithProcess:self.currentProcess address:selectedInstruction.variable.address selectionLength:selectedInstruction.variable.size];
 }
 
 @end

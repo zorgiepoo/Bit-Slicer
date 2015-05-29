@@ -34,6 +34,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
+#import "ZGShowMemoryWindow.h"
 
 @class ZGProcess;
 @class ZGBacktrace;
@@ -41,6 +42,8 @@
 @protocol ZGBacktraceViewControllerDelegate <NSObject>
 
 - (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address;
+
+@property (nonatomic, weak, readonly) id <ZGShowMemoryWindow> delegate;
 
 @end
 

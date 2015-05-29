@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 3/11/14.
+ * Created by Mayur Pawashe on 5/29/15.
  *
- * Copyright (c) 2014 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,23 +33,13 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
-
-extern NSString *ZGNavigationShowMemoryViewerNotification;
-extern NSString *ZGNavigationShowDebuggerNotification;
-extern NSString *ZGNavigationSelectionChangeNotification;
-
-extern NSString *ZGNavigationProcessKey;
-extern NSString *ZGNavigationMemoryAddressKey;
-extern NSString *ZGNavigationSelectionLengthKey;
 
 @class ZGProcess;
 
-@interface ZGNavigationPost : NSObject
+@protocol ZGMemorySelectionDelegate <NSObject>
 
-+ (void)postShowMemoryViewerWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address selectionLength:(NSUInteger)selectionLength;
-+ (void)postShowDebuggerWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address;
+- (void)memorySelectionDidChange:(NSRange)newMemorySelectionRange process:(ZGProcess *)process;
 
-+ (void)postMemorySelectionChangeWithProcess:(ZGProcess *)process selectionRange:(NSRange)selectionRange;
+- (NSRange)lastMemorySelectionForProcess:(ZGProcess *)process;
 
 @end
