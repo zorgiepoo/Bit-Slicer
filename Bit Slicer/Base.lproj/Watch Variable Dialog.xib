@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1510" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGWatchVariableWindowController">
             <connections>
-                <outlet property="addButton" destination="Wlf-lu-mTm" id="nKj-A9-YFV"/>
-                <outlet property="addTableColumn" destination="xrl-DE-ToL" id="Rw5-IX-478"/>
-                <outlet property="progressIndicator" destination="VzN-Qp-l3Q" id="3ZH-py-dLl"/>
-                <outlet property="statusTextField" destination="Fqd-Of-gZ2" id="3JY-7p-IRQ"/>
-                <outlet property="tableView" destination="4bY-Uc-6gw" id="l7j-gW-K0v"/>
+                <outlet property="_addButton" destination="Wlf-lu-mTm" id="gA3-KC-tLh"/>
+                <outlet property="_addTableColumn" destination="xrl-DE-ToL" id="tgY-tK-U2L"/>
+                <outlet property="_progressIndicator" destination="VzN-Qp-l3Q" id="RGG-dk-jwN"/>
+                <outlet property="_statusTextField" destination="Fqd-Of-gZ2" id="zhp-om-zan"/>
+                <outlet property="_tableView" destination="4bY-Uc-6gw" id="c3a-co-Mwd"/>
                 <outlet property="window" destination="1" id="3"/>
             </connections>
         </customObject>
@@ -66,7 +66,7 @@ Gw
                     </button>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="20" horizontalPageScroll="10" verticalLineScroll="20" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fgo-4x-ix4">
                         <rect key="frame" x="20" y="47" width="418" height="150"/>
-                        <clipView key="contentView" misplaced="YES" id="AnS-if-Uae">
+                        <clipView key="contentView" id="AnS-if-Uae">
                             <rect key="frame" x="1" y="17" width="416" height="132"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
@@ -74,7 +74,7 @@ Gw
                                     <rect key="frame" x="0.0" y="0.0" width="416" height="20"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
                                         <tableColumn identifier="count" editable="NO" width="70" minWidth="70" maxWidth="70" id="Daf-V9-g6D">
