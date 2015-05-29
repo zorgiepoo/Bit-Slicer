@@ -42,12 +42,12 @@
 @class ZGProcess;
 @class ZGRegistersState;
 
-typedef enum
+typedef NS_ENUM(NSInteger, ZGBreakPointType)
 {
 	ZGBreakPointWatchData,
 	ZGBreakPointInstruction,
 	ZGBreakPointSingleStepInstruction,
-} ZGBreakPointType;
+};
 
 @interface ZGBreakPoint : NSObject
 

@@ -37,12 +37,12 @@
 
 @interface ZGSearchProgress : NSObject
 
-typedef enum
+typedef NS_ENUM(NSInteger, ZGSearchProgressType)
 {
 	ZGSearchProgressMemoryScanning,
 	ZGSearchProgressMemoryStoring,
 	ZGSearchProgressMemoryDumping
-} ZGSearchProgressType;
+};
 
 - (id)initWithProgressType:(ZGSearchProgressType)progressType maxProgress:(ZGMemorySize)maxProgress;
 

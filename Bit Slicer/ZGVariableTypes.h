@@ -35,7 +35,7 @@
 #ifndef _ZG_VARIABLE_TYPES_H
 #define _ZG_VARIABLE_TYPES_H
 
-typedef enum
+typedef enum : NSInteger
 {
 	ZGInt8 = 0,
 	ZGInt16,
@@ -50,7 +50,7 @@ typedef enum
 	ZGScript
 } ZGVariableType;
 
-typedef enum
+typedef enum : NSInteger
 {
 	ZGSigned = 0,
 	ZGUnsigned

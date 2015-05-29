@@ -64,12 +64,12 @@
 #pragma clang diagnostic pop
 }
 
-typedef enum
+typedef NS_ENUM(NSInteger, ZGProtectionMode)
 {
 	ZGProtectionAll,
 	ZGProtectionWrite,
 	ZGProtectionExecute
-} ZGProtectionMode;
+};
 
 @property (nonatomic) void *searchValue;
 @property (nonatomic) ZGMemorySize dataSize;
