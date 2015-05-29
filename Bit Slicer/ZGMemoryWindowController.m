@@ -48,9 +48,6 @@
 
 #define ZGLocalizedStringFromMemoryWindowTable(string) NSLocalizedStringFromTable((string), @"[Code] Memory Window", nil)
 
-NSString *ZGLastChosenInternalProcessNameNotification = @"ZGLastChosenInternalProcessNameNotification";
-NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessNameKey";
-
 @implementation ZGMemoryWindowController
 {
 	BOOL _isWatchingActiveProcess;
@@ -61,17 +58,19 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 	ZGMemoryProtectionWindowController *_memoryProtectionWindowController;
 	
 	NSUndoManager *_undoManager;
+	__weak id <ZGChosenProcessDelegate> _delegate;
 }
 
 #pragma mark Birth
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate>)delegate
 {
 	self = [super init];
 	
 	if (self != nil)
 	{
 		_processTaskManager = processTaskManager;
+		_delegate = delegate;
 	}
 	
 	return self;
@@ -112,10 +111,8 @@ NSString *ZGLastChosenInternalProcessNameKey = @"ZGLastChosenInternalProcessName
 
 - (void)postLastChosenInternalProcessNameChange
 {
-	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:ZGLastChosenInternalProcessNameNotification
-	 object:self
-	 userInfo:@{ZGLastChosenInternalProcessNameKey : _lastChosenInternalProcessName}];
+	id <ZGChosenProcessDelegate> delegate = _delegate;
+	[delegate memoryWindowController:self didChangeProcessInternalName:_lastChosenInternalProcessName];
 }
 
 - (void)setAndPostLastChosenInternalProcessName

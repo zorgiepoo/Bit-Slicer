@@ -43,7 +43,7 @@
 
 @interface ZGMemoryViewerController : ZGMemoryNavigationWindowController <NSWindowDelegate>
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate>)delegate;
 
 @property (nonatomic, readonly) ZGMemoryAddress currentMemoryAddress;
 @property (nonatomic, readonly) ZGMemorySize currentMemorySize;

@@ -118,9 +118,9 @@
 	});
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate>)delegate
 {
-	self = [super initWithProcessTaskManager:processTaskManager];
+	self = [super initWithProcessTaskManager:processTaskManager delegate:delegate];
 	if (self != nil)
 	{
 		_haltedBreakPoints = haltedBreakPoints;

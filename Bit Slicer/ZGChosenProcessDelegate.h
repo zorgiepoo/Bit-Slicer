@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 2/5/10.
+ * Created by Mayur Pawashe on 5/29/15.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
-@interface ZGAppController : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate>
+@class ZGMemoryWindowController;
+
+@protocol ZGChosenProcessDelegate <NSObject>
+
+- (void)memoryWindowController:(ZGMemoryWindowController *)memoryWindowController didChangeProcessInternalName:(NSString *)newChosenInternalProcessName;
 
 @end

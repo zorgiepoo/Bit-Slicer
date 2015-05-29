@@ -32,7 +32,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGAppController.h"
+#import <Cocoa/Cocoa.h>
+
+#import "ZGChosenProcessDelegate.h"
 #import "ZGPreferencesController.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGDebuggerController.h"
@@ -54,6 +56,10 @@
 #define ZGLoggerIdentifier @"ZGLoggerIdentifier"
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
 #define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
+
+@interface ZGAppController : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, ZGChosenProcessDelegate>
+
+@end
 
 @implementation ZGAppController
 {
@@ -97,12 +103,14 @@
 		 breakPointController:_breakPointController
 		 scriptingInterpreter:_scriptingInterpreter
 		 hotKeyCenter:_hotKeyCenter
-		 loggerWindowController:_loggerWindowController];
+		 loggerWindowController:_loggerWindowController
+		 delegate:self];
 		
 		_memoryViewer =
 		[[ZGMemoryViewerController alloc]
 		 initWithProcessTaskManager:_processTaskManager
-		 haltedBreakPoints:_debuggerController.haltedBreakPoints];
+		 haltedBreakPoints:_debuggerController.haltedBreakPoints
+		 delegate:self];
 		
 		__weak ZGAppController *weakSelf = self;
 		_documentController = [[ZGDocumentController alloc] initWithMakeDocumentWindowController:^ZGDocumentWindowController *{
@@ -117,7 +125,8 @@
 			 scriptingInterpreter:selfReference->_scriptingInterpreter
 			 hotKeyCenter:selfReference->_hotKeyCenter
 			 loggerWindowController:selfReference->_loggerWindowController
-			 lastChosenInternalProcessName:selfReference->_lastChosenInternalProcessName];
+			 lastChosenInternalProcessName:selfReference->_lastChosenInternalProcessName
+			 delegate:selfReference];
 		}];
 		
 		[[NSNotificationCenter defaultCenter]
@@ -130,12 +139,6 @@
 		 addObserver:self
 		 selector:@selector(showWindowControllerNotification:)
 		 name:ZGNavigationShowDebuggerNotification
-		 object:nil];
-
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(lastChosenInternalProcessNameChanged:)
-		 name:ZGLastChosenInternalProcessNameNotification
 		 object:nil];
 		
 		[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
@@ -275,20 +278,20 @@
 	}
 }
 
-- (void)lastChosenInternalProcessNameChanged:(NSNotification *)notification
+#pragma mark Delegate Methods
+
+- (void)memoryWindowController:(ZGMemoryWindowController *)memoryWindowController didChangeProcessInternalName:(NSString *)newChosenInternalProcessName
 {
-	NSString *lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
-
-	_lastChosenInternalProcessName = [lastChosenInternalProcessName copy];
-
-	if (_debuggerController != notification.object)
+	_lastChosenInternalProcessName = [newChosenInternalProcessName copy];
+	
+	if (_debuggerController != memoryWindowController)
 	{
-		_debuggerController.lastChosenInternalProcessName = lastChosenInternalProcessName;
+		_debuggerController.lastChosenInternalProcessName = newChosenInternalProcessName;
 	}
-
-	if (_memoryViewer != notification.object)
+	
+	if (_memoryViewer != memoryWindowController)
 	{
-		_memoryViewer.lastChosenInternalProcessName = lastChosenInternalProcessName;
+		_memoryViewer.lastChosenInternalProcessName = newChosenInternalProcessName;
 	}
 }
 

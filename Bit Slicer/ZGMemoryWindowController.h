@@ -33,12 +33,10 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import "ZGChosenProcessDelegate.h"
 #import "ZGMemoryTypes.h"
 #import <HexFiend/HFTypes.h>
 #import <HexFiend/HFFunctions.h>
-
-extern NSString *ZGLastChosenInternalProcessNameNotification;
-extern NSString *ZGLastChosenInternalProcessNameKey;
 
 @class ZGProcess;
 @class ZGProcessTaskManager;
@@ -48,7 +46,7 @@ extern NSString *ZGLastChosenInternalProcessNameKey;
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate>)delegate;
 
 @property (nonatomic, readonly) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic, readonly) ZGProcessList *processList;
