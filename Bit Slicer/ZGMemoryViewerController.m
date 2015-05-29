@@ -718,7 +718,7 @@
 	for (NSMenuItem *menuItem in self.runningApplicationsPopUpButton.menu.itemArray)
 	{
 		ZGProcess *process = menuItem.representedObject;
-		if (process.processID == requestedProcess.processID)
+		if ([process isEqual:requestedProcess])
 		{
 			targetMenuItem = menuItem;
 			break;
