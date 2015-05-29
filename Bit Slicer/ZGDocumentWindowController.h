@@ -51,6 +51,7 @@
 @class ZGSearchData;
 @class ZGScriptManager;
 @class ZGTableView;
+@class ZGDebuggerController;
 @class ZGBreakPointController;
 @class ZGScriptingInterpreter;
 @class ZGLoggerWindowController;
@@ -82,7 +83,7 @@
 @property (nonatomic, readonly) NSString *flagsStringValue;
 @property (nonatomic, readonly) BOOL showsFlags;
 
-- (id)initWithDocument:(ZGDocument *)document;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName;
 
 - (void)loadDocumentUserInterface;
 

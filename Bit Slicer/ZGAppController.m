@@ -67,6 +67,8 @@
 	ZGProcessTaskManager *_processTaskManager;
 	ZGHotKeyCenter *_hotKeyCenter;
 	ZGScriptingInterpreter *_scriptingInterpreter;
+	
+	NSString *_lastChosenInternalProcessName;
 }
 
 #pragma mark Birth & Death
@@ -102,14 +104,21 @@
 		 initWithProcessTaskManager:_processTaskManager
 		 haltedBreakPoints:_debuggerController.haltedBreakPoints];
 		
-		_documentController =
-		[[ZGDocumentController alloc]
-		 initWithProcessTaskManager:_processTaskManager
-		 debuggerController:_debuggerController
-		 breakPointController:_breakPointController
-		 scriptingInterpreter:_scriptingInterpreter
-		 hotKeyCenter:_hotKeyCenter
-		 loggerWindowController:_loggerWindowController];
+		__weak ZGAppController *weakSelf = self;
+		_documentController = [[ZGDocumentController alloc] initWithMakeDocumentWindowController:^ZGDocumentWindowController *{
+			ZGAppController *selfReference = weakSelf;
+			assert(selfReference != nil);
+			
+			return
+			[[ZGDocumentWindowController alloc]
+			 initWithProcessTaskManager:selfReference->_processTaskManager
+			 debuggerController:selfReference->_debuggerController
+			 breakPointController:selfReference->_breakPointController
+			 scriptingInterpreter:selfReference->_scriptingInterpreter
+			 hotKeyCenter:selfReference->_hotKeyCenter
+			 loggerWindowController:selfReference->_loggerWindowController
+			 lastChosenInternalProcessName:selfReference->_lastChosenInternalProcessName];
+		}];
 		
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
@@ -270,7 +279,7 @@
 {
 	NSString *lastChosenInternalProcessName = [notification.userInfo objectForKey:ZGLastChosenInternalProcessNameKey];
 
-	_documentController.lastChosenInternalProcessName = lastChosenInternalProcessName;
+	_lastChosenInternalProcessName = [lastChosenInternalProcessName copy];
 
 	if (_debuggerController != notification.object)
 	{

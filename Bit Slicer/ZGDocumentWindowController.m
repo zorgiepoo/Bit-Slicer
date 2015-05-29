@@ -111,18 +111,18 @@
 	IBOutlet NSView *_scopeBarFlagsView;
 }
 
-- (id)initWithDocument:(ZGDocument *)document
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName
 {
-	self = [super initWithProcessTaskManager:document.processTaskManager];
+	self = [super initWithProcessTaskManager:processTaskManager];
 	if (self != nil)
 	{
-		self.lastChosenInternalProcessName = document.lastChosenInternalProcessName;
+		self.lastChosenInternalProcessName = lastChosenInternalProcessName;
 		
-		_debuggerController = document.debuggerController;
-		_breakPointController = document.breakPointController;
-		_scriptingInterpreter = document.scriptingInterpreter;
-		_loggerWindowController = document.loggerWindowController;
-		_hotKeyCenter = document.hotKeyCenter;
+		_debuggerController = debuggerController;
+		_breakPointController = breakPointController;
+		_scriptingInterpreter = scriptingInterpreter;
+		_loggerWindowController = loggerWindowController;
+		_hotKeyCenter = hotKeyCenter;
 	}
 	return self;
 }
