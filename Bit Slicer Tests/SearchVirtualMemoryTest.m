@@ -41,16 +41,16 @@
 #import "ZGDataValueExtracting.h"
 
 @interface SearchVirtualMemoryTest : XCTestCase
+
+@end
+
+@implementation SearchVirtualMemoryTest
 {
 	NSTask *_task;
 	ZGMemoryMap _processTask;
 	NSData *_data;
 	ZGMemorySize _pageSize;
 }
-
-@end
-
-@implementation SearchVirtualMemoryTest
 
 - (void)setUp
 {
