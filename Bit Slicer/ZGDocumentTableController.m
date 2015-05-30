@@ -75,7 +75,7 @@
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController
 {
 	self = [super init];
-	if (self)
+	if (self != nil)
 	{
 		_windowController = windowController;
 		_documentData = windowController.documentData;

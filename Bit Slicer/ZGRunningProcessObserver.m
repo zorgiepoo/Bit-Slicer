@@ -40,7 +40,7 @@
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier observer:(id)observer
 {
 	self = [super init];
-	if (self)
+	if (self != nil)
 	{
 		ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processIdentifier];
 		

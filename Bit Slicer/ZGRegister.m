@@ -43,7 +43,7 @@
 - (id)initWithRegisterType:(ZGRegisterType)registerType variable:(ZGVariable *)variable pointerSize:(ZGMemorySize)pointerSize
 {
 	self = [super init];
-	if (self)
+	if (self != nil)
 	{
 		_registerType = registerType;
 		_size = variable.size;

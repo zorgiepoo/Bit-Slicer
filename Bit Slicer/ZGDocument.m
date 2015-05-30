@@ -50,7 +50,7 @@
 - (id)init
 {
 	self = [super init];
-	if (self)
+	if (self != nil)
 	{
 		_data = [[ZGDocumentData alloc] init];
 		_searchData = [[ZGSearchData alloc] init];
