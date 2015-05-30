@@ -52,13 +52,12 @@
 	{
 		Py_XDECREF(_executeFunction);
 	}
-	
 	_executeFunction = executeFunction;
 }
 
 - (NSString *)moduleName
 {
-	return [[self.path lastPathComponent] stringByDeletingPathExtension];
+	return [[_path lastPathComponent] stringByDeletingPathExtension];
 }
 
 - (void)setModule:(PyObject *)module

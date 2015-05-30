@@ -205,12 +205,6 @@ static PyTypeObject VirtualMemoryType =
 	0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
-@interface ZGPyVirtualMemory ()
-
-@property (atomic) ZGSearchProgress *searchProgress;
-
-@end
-
 @implementation ZGPyVirtualMemory
 {
 	ZGProcess *_process;
@@ -629,7 +623,7 @@ static PyObject *VirtualMemory_unpause(VirtualMemory *self, PyObject * __unused 
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress
 {
-	self.searchProgress = searchProgress;
+	_searchProgress = searchProgress;
 }
 
 - (void)progress:(ZGSearchProgress *)__unused searchProgress advancedWithResultSet:(NSData *)__unused resultSet

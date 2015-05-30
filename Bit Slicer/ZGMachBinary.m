@@ -226,16 +226,16 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 
 - (NSComparisonResult)compare:(ZGMachBinary *)binaryImage
 {
-	return [@(self.headerAddress) compare:@(binaryImage.headerAddress)];
+	return [@(_headerAddress) compare:@(binaryImage.headerAddress)];
 }
 
 - (NSString *)filePathInProcess:(ZGProcess *)process
 {
 	NSString *filePath = nil;
 	ZGMemoryMap processTask = process.processTask;
-	ZGMemorySize pathSize = ZGGetStringSize(processTask, self.filePathAddress, ZGString8, 200, PATH_MAX);
+	ZGMemorySize pathSize = ZGGetStringSize(processTask, _filePathAddress, ZGString8, 200, PATH_MAX);
 	void *filePathBytes = NULL;
-	if (ZGReadBytes(processTask, self.filePathAddress, &filePathBytes, &pathSize))
+	if (ZGReadBytes(processTask, _filePathAddress, &filePathBytes, &pathSize))
 	{
 		filePath = [[NSString alloc] initWithBytes:filePathBytes length:pathSize encoding:NSUTF8StringEncoding];
 		ZGFreeBytes(filePathBytes, pathSize);
@@ -245,7 +245,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 
 - (ZGMachBinaryInfo *)parseMachHeaderWithBytes:(const void *)machHeaderBytes startPointer:(const void *)startPointer dataLength:(ZGMemorySize)dataLength pointerSize:(size_t)pointerSize
 {
-	ZGMemoryAddress machHeaderAddress = self.headerAddress;
+	ZGMemoryAddress machHeaderAddress = _headerAddress;
 	
 	const struct mach_header_64 *machHeader = machHeaderBytes;
 	
@@ -304,16 +304,16 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 {
 	ZGMachBinaryInfo *binaryInfo = nil;
 	
-	ZGMemoryAddress regionAddress = self.headerAddress;
+	ZGMemoryAddress regionAddress = _headerAddress;
 	ZGMemorySize regionSize = 0x1;
 	ZGMemoryBasicInfo unusedInfo;
 	
-	if (ZGRegionInfo(process.processTask, &regionAddress, &regionSize, &unusedInfo) && self.headerAddress >= regionAddress && self.headerAddress < regionAddress + regionSize)
+	if (ZGRegionInfo(process.processTask, &regionAddress, &regionSize, &unusedInfo) && _headerAddress >= regionAddress && _headerAddress < regionAddress + regionSize)
 	{
 		void *regionBytes = NULL;
 		if (ZGReadBytes(process.processTask, regionAddress, &regionBytes, &regionSize))
 		{
-			const struct mach_header_64 *machHeader = (void *)((uint8_t *)regionBytes + self.headerAddress - regionAddress);
+			const struct mach_header_64 *machHeader = (void *)((uint8_t *)regionBytes + _headerAddress - regionAddress);
 			binaryInfo = [self parseMachHeaderWithBytes:machHeader startPointer:regionBytes dataLength:regionSize pointerSize:process.pointerSize];
 			
 			ZGFreeBytes(regionBytes, regionSize);

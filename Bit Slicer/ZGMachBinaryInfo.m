@@ -42,17 +42,11 @@ typedef struct
 	NSRange range;
 } ZGMachBinarySegment;
 
-@interface ZGMachBinaryInfo ()
-
-@property (nonatomic) ZGMemorySize slide;
-@property (nonatomic) ZGMemoryAddress firstInstructionAddress; // aka location of __text section
-
-@property (nonatomic) uint32_t numberOfSegments;
-@property (nonatomic) ZGMachBinarySegment *segments;
-
-@end
-
 @implementation ZGMachBinaryInfo
+{
+	uint32_t _numberOfSegments;
+	ZGMachBinarySegment *_segments;
+}
 
 - (id)initWithMachHeaderAddress:(ZGMemoryAddress)machHeaderAddress segmentBytes:(const void * const)segmentBytes commandSize:(uint32_t)commandSize
 {
@@ -78,7 +72,7 @@ typedef struct
 		return nil;
 	}
 	
-	self.segments = malloc(sizeof(*_segments) * maxNumberOfSegmentCommands);
+	_segments = malloc(sizeof(*_segments) * maxNumberOfSegmentCommands);
 	
 	loadCommand = NULL;
 	for (const uint8_t *commandBytes = segmentBytes; commandBytes < (uint8_t *)segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
@@ -116,37 +110,37 @@ typedef struct
 				{
 					// We could use firstSection64->offset instead, but this seems to catch some obfuscation cases
 					uint64_t offset = firstSection64->addr - *(uint64_t *)segmentVMAddressPointer;
-					self.firstInstructionAddress = machHeaderAddress + offset;
-					self.slide = machHeaderAddress + offset - firstSection64->addr;
+					_firstInstructionAddress = machHeaderAddress + offset;
+					_slide = machHeaderAddress + offset - firstSection64->addr;
 				}
 				else
 				{
 					// We could use firstSection32->offset instead, but this seems to catch some obfuscation cases
 					uint32_t offset = firstSection32->addr - *(uint32_t *)segmentVMAddressPointer;
-					self.firstInstructionAddress = machHeaderAddress + offset;
-					self.slide = machHeaderAddress + offset - firstSection32->addr;
+					_firstInstructionAddress = machHeaderAddress + offset;
+					_slide = machHeaderAddress + offset - firstSection32->addr;
 				}
 			}
 		}
 		// We assume __TEXT is the first segment, so we can obtain the slide needed by other segments
 		// This is also assumed precondition below in -textSegmentRange
 		// This might skip __PAGEZERO in some cases, but I don't think it's that important anyway
-		else if (self.numberOfSegments == 0)
+		else if (_numberOfSegments == 0)
 		{
 			continue;
 		}
 		
 		if (loadCommand->cmd == LC_SEGMENT_64)
 		{
-			newSegment.range = NSMakeRange(segmentCommand64->vmaddr + self.slide, segmentCommand64->vmsize);
+			newSegment.range = NSMakeRange(segmentCommand64->vmaddr + _slide, segmentCommand64->vmsize);
 		}
 		else
 		{
-			newSegment.range = NSMakeRange(segmentCommand32->vmaddr + self.slide, segmentCommand32->vmsize);
+			newSegment.range = NSMakeRange(segmentCommand32->vmaddr + _slide, segmentCommand32->vmsize);
 		}
 		
-		self.segments[self.numberOfSegments] = newSegment;
-		self.numberOfSegments++;
+		_segments[_numberOfSegments] = newSegment;
+		_numberOfSegments++;
 	}
 	
 	return self;
@@ -154,24 +148,24 @@ typedef struct
 
 - (void)dealloc
 {
-	free(self.segments);
+	free(_segments);
 }
 
 - (NSRange)totalSegmentRange
 {
-	if (self.numberOfSegments == 0) return NSMakeRange(0, 0);
+	if (_numberOfSegments == 0) return NSMakeRange(0, 0);
 	
-	ZGMachBinarySegment firstSegment = self.segments[0];
-	ZGMachBinarySegment lastSegment = self.segments[self.numberOfSegments - 1];
+	ZGMachBinarySegment firstSegment = _segments[0];
+	ZGMachBinarySegment lastSegment = _segments[_numberOfSegments - 1];
 	
 	return NSMakeRange(firstSegment.range.location, lastSegment.range.location - firstSegment.range.location + lastSegment.range.length);
 }
 
 - (NSString *)segmentNameAtAddress:(ZGMemoryAddress)address
 {
-	for (ZGMemorySize segmentIndex = 0; segmentIndex < self.numberOfSegments; segmentIndex++)
+	for (ZGMemorySize segmentIndex = 0; segmentIndex < _numberOfSegments; segmentIndex++)
 	{
-		ZGMachBinarySegment *segment = self.segments + segmentIndex;
+		ZGMachBinarySegment *segment = _segments + segmentIndex;
 		if (segment->range.location <= address && address < segment->range.location + segment->range.length)
 		{
 			return @(segment->name);

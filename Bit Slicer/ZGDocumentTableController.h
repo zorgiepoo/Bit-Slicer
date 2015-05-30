@@ -36,7 +36,7 @@
 
 @class ZGDocumentWindowController;
 
-@interface ZGDocumentTableController : NSObject <NSTableViewDelegate>
+@interface ZGDocumentTableController : NSObject <NSTableViewDelegate, NSTableViewDataSource>
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 

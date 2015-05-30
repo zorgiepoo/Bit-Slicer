@@ -485,7 +485,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 			[self setRunningScripts:[[NSMutableArray alloc] init]];
 		}
 		
-		[self.runningScripts addObject:script];
+		[[self runningScripts] addObject:script];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			[[NSNotificationCenter defaultCenter]

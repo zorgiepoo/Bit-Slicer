@@ -375,7 +375,7 @@
 	 didEndSelector:nil
 	 contextInfo:NULL];
 	
-	self.watchProcess = process;
+	[self setWatchProcess:process];
 	_completionHandler = [completionHandler copy];
 	
 	_foundWatchVariables = [[NSMutableArray alloc] init];

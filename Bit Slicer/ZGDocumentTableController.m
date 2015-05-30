@@ -89,9 +89,8 @@
 - (void)setVariablesTableView:(ZGTableView *)tableView
 {
 	_variablesTableView = tableView;
-	__unsafe_unretained id selfReference = self;
-	[_variablesTableView setDataSource:selfReference];
-	[_variablesTableView setDelegate:selfReference];
+	[_variablesTableView setDataSource:self];
+	[_variablesTableView setDelegate:self];
 	[_variablesTableView registerForDraggedTypes:@[ZGVariableReorderType, ZGVariablePboardType]];
 }
 
@@ -103,7 +102,7 @@
 	_watchVariablesTimer = nil;
 	
 	_windowController = nil;
-	self.variablesTableView = nil;
+	[self setVariablesTableView:nil];
 }
 
 #pragma mark Updating Table

@@ -81,7 +81,7 @@
 {
 	if (!_didFetchInfo)
 	{
-		NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier];
+		NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:_processIdentifier];
 		if (runningApplication != nil)
 		{
 			self->_activationPolicy = runningApplication.activationPolicy;
@@ -92,7 +92,7 @@
 		{
 			self->_activationPolicy = NSApplicationActivationPolicyProhibited;
 			self->_icon = [NSImage imageNamed:@"NSDefaultApplicationIcon"];
-			self->_name = _internalName;
+			self->_name = [_internalName copy];
 		}
 		
 		_didFetchInfo = YES;

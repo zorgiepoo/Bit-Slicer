@@ -494,7 +494,7 @@
 	}
 	else if (menuItem.action == @selector(copy:))
 	{
-		if (self.selectedRegisters.count == 0)
+		if ([self selectedRegisters].count == 0)
 		{
 			return NO;
 		}
@@ -520,7 +520,7 @@
 	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
 	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
 	
-	for (ZGRegister *theRegister in self.selectedRegisters)
+	for (ZGRegister *theRegister in [self selectedRegisters])
 	{
 		[descriptionComponents addObject:[@[theRegister.variable.name, theRegister.variable.stringValue] componentsJoinedByString:@"\t"]];
 		[variablesArray addObject:theRegister.variable];

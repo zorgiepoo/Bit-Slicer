@@ -48,12 +48,12 @@
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-	[encoder encodeObject:self.name];
+	[encoder encodeObject:_name];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
-	_name = [decoder decodeObject];
+	_name = [[decoder decodeObject] copy];
 	return self;
 }
 

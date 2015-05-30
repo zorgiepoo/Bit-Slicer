@@ -68,7 +68,7 @@
 - (IBAction)changeCondition:(id)__unused sender
 {
 	id <ZGBreakPointConditionDelegate> delegate = _delegate;
-	[delegate breakPointCondition:_conditionTextField.stringValue didChangeAtAddress:self.targetAddress];
+	[delegate breakPointCondition:_conditionTextField.stringValue didChangeAtAddress:_targetAddress];
 }
 
 - (IBAction)cancel:(id)__unused sender
