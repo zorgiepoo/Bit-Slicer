@@ -47,14 +47,15 @@
 	if (self != nil)
 	{
 		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &_collator);
-		self.endAddress = MAX_MEMORY_ADDRESS;
-		self.protectionMode = ZGProtectionAll;
-		self.epsilon = DEFAULT_FLOATING_POINT_EPSILON;
+		_endAddress = MAX_MEMORY_ADDRESS;
+		_protectionMode = ZGProtectionAll;
+		_epsilon = DEFAULT_FLOATING_POINT_EPSILON;
 		
-		self.searchValue = searchValue;
-		self.dataSize = dataSize;
-		self.dataAlignment = dataAlignment;
-		self.pointerSize = pointerSize;
+		_dataSize = dataSize;
+		_dataAlignment = dataAlignment;
+		_pointerSize = pointerSize;
+		
+		[self setSearchValue:searchValue];
 	}
 	return self;
 }
@@ -63,12 +64,12 @@
 {
 	UCDisposeCollator(&_collator);
 	
-	self.rangeValue = NULL;
-	self.swappedValue = NULL;
-	self.byteArrayFlags = NULL;
-	self.searchValue = NULL;
-	self.savedData = nil;
-	self.additiveConstant = NULL;
+	[self setRangeValue:NULL];
+	[self setSwappedValue:NULL];
+	[self setByteArrayFlags:NULL];
+	[self setSearchValue:NULL];
+	[self setSavedData:NULL];
+	[self setAdditiveConstant:NULL];
 }
 
 - (void)setSearchValue:(void *)searchValue
