@@ -38,7 +38,7 @@
 #import "ZGSearchData.h"
 #import "ZGSearchResults.h"
 #import "ZGStoredData.h"
-#import "ZGUtilities.h"
+#import "ZGDataValueExtracting.h"
 
 @interface SearchVirtualMemoryTest : XCTestCase
 {

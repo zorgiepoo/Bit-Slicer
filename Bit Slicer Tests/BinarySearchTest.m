@@ -34,6 +34,7 @@
 
 #import <XCTest/XCTest.h>
 #import "NSArrayAdditions.h"
+#import "ZGVariableDataInfo.h"
 
 @interface BinarySearchTest : XCTestCase
 
