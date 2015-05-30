@@ -299,7 +299,7 @@
 		 initWithValue:NULL
 		 size:dataSize
 		 address:variableAddress
-		 type:(ZGVariableType)searchResults.dataType
+		 type:searchResults.dataType
 		 qualifier:qualifier
 		 pointerSize:pointerSize
 		 description:[[NSAttributedString alloc] initWithString:@""]
@@ -684,7 +684,7 @@
 		}
 		else
 		{
-			self->_temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self->_searchData, self, dataType, (ZGVariableQualifier)self->_documentData.qualifierTag, self->_functionType, firstSearchResults, (self->_searchResults.dataType == dataType && currentProcess.pointerSize == self->_searchResults.pointerSize) ? self->_searchResults : nil);
+			self->_temporarySearchResults = ZGNarrowSearchForData(currentProcess.processTask, self->_searchData, self, dataType, self->_documentData.qualifierTag, self->_functionType, firstSearchResults, (self->_searchResults.dataType == dataType && currentProcess.pointerSize == self->_searchResults.pointerSize) ? self->_searchResults : nil);
 		}
 		
 		self->_temporarySearchResults.dataType = dataType;
