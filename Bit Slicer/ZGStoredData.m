@@ -36,12 +36,6 @@
 #import "ZGVirtualMemory.h"
 #import "ZGRegion.h"
 
-@interface ZGStoredData ()
-
-@property (nonatomic) NSArray *regions;
-
-@end
-
 @implementation ZGStoredData
 
 + (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask
@@ -70,14 +64,14 @@
 	self = [super init];
 	if (self != nil)
 	{
-		self.regions = regions;
+		_regions = regions;
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	for (ZGRegion *region in self.regions)
+	for (ZGRegion *region in _regions)
 	{
 		ZGFreeBytes(region.bytes, region.size);
 	}
