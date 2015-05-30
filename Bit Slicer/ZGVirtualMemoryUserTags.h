@@ -34,16 +34,13 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
-#import "ZGVariableTypes.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 	
-NSString *ZGUserTagDescription(unsigned int userTag);
+NSString *ZGUserTagDescription(uint32_t userTag);
 NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
-
-ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize, ZGMemorySize maxStringSizeLimit);
 	
 #ifdef __cplusplus
 }

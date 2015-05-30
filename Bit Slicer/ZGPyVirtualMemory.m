@@ -34,7 +34,7 @@
 
 #import "ZGPyVirtualMemory.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
+#import "ZGVirtualMemoryStringReading.h"
 #import "ZGMachBinaryInfo.h"
 #import "ZGUtilities.h"
 #import "ZGSearchData.h"

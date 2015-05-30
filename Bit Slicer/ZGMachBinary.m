@@ -35,7 +35,7 @@
 #import "ZGMachBinary.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
+#import "ZGVirtualMemoryStringReading.h"
 #import "ZGRegion.h"
 #import "ZGMachBinaryInfo.h"
 

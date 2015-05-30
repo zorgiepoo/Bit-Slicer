@@ -42,7 +42,7 @@
 #import "ZGUtilities.h"
 #import "ZGInstruction.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
+#import "ZGVirtualMemoryUserTags.h"
 #import "ZGDocumentSearchController.h"
 #import "ZGSearchResults.h"
 #import "ZGDocumentWindowController.h"

@@ -50,7 +50,6 @@
 #import "ZGPreferencesController.h"
 #import "NSArrayAdditions.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 #import "ZGTableView.h"

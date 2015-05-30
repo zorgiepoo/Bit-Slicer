@@ -37,7 +37,6 @@
 #import "ZGSearchProgress.h"
 #import "ZGRegion.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
 #import "NSArrayAdditions.h"
 #import "ZGSearchResults.h"
 #import "ZGStoredData.h"

@@ -19,6 +19,7 @@
 		722CAADF19BB625E009C6AAE /* VariableDisplayTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAADE19BB625E009C6AAE /* VariableDisplayTest.m */; };
 		722CAAE119BBB5A1009C6AAE /* SearchVirtualMemoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 722CAAE019BBB5A1009C6AAE /* SearchVirtualMemoryTest.m */; };
 		722CAAE219BBD7EE009C6AAE /* ZGStoredData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77282122189E769B0044E4BC /* ZGStoredData.m */; };
+		722EE77D1B193ABD00934EF3 /* ZGVirtualMemoryStringReading.m in Sources */ = {isa = PBXBuildFile; fileRef = 722EE77C1B193ABD00934EF3 /* ZGVirtualMemoryStringReading.m */; };
 		7231440519C57A5300FBE342 /* ZGRegistersState.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440419C57A5300FBE342 /* ZGRegistersState.m */; };
 		7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440719C607C700FBE342 /* ZGWatchVariable.m */; };
 		7231440E19C6230F00FBE342 /* [Code] Watch Variable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 7231440C19C6230F00FBE342 /* [Code] Watch Variable.stringsdict */; };
@@ -150,7 +151,7 @@
 		77E2BBD118FD8FF600E41FA0 /* ZGMachBinaryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7789C37A189A570F00F1FDAF /* ZGMachBinaryInfo.m */; };
 		77E2BBD218FD900300E41FA0 /* ZGVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162B17D2EF50009E002A /* ZGVariable.m */; };
 		77E2BBD318FD900C00E41FA0 /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162717D2EF3A009E002A /* ZGProcess.m */; };
-		77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */; };
+		77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryUserTags.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGVirtualMemoryUserTags.m */; };
 		77E2BBD518FD904400E41FA0 /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
 		77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162417D2EF31009E002A /* ZGRegion.m */; };
 		77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */; };
@@ -185,7 +186,7 @@
 		77F1161517D2EEEC009E002A /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGSearchResults.m */; };
 		77F1161817D2EEF6009E002A /* ZGSearchFunctions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */; };
 		77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161D17D2EF14009E002A /* ZGVirtualMemory.c */; };
-		77F1162217D2EF28009E002A /* ZGVirtualMemoryHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */; };
+		77F1162217D2EF28009E002A /* ZGVirtualMemoryUserTags.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162117D2EF28009E002A /* ZGVirtualMemoryUserTags.m */; };
 		77F1162517D2EF31009E002A /* ZGRegion.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162417D2EF31009E002A /* ZGRegion.m */; };
 		77F1162817D2EF3A009E002A /* ZGProcess.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162717D2EF3A009E002A /* ZGProcess.m */; };
 		77F1162C17D2EF50009E002A /* ZGVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162B17D2EF50009E002A /* ZGVariable.m */; };
@@ -269,6 +270,9 @@
 		722EE74D1B18D8B000934EF3 /* ZGChosenProcessDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGChosenProcessDelegate.h; path = "Bit Slicer/ZGChosenProcessDelegate.h"; sourceTree = "<group>"; };
 		722EE74E1B18F8CC00934EF3 /* ZGShowMemoryWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGShowMemoryWindow.h; path = "Bit Slicer/ZGShowMemoryWindow.h"; sourceTree = "<group>"; };
 		722EE74F1B1914B900934EF3 /* ZGMemorySelectionDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemorySelectionDelegate.h; path = "Bit Slicer/ZGMemorySelectionDelegate.h"; sourceTree = "<group>"; };
+		722EE77C1B193ABD00934EF3 /* ZGVirtualMemoryStringReading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGVirtualMemoryStringReading.m; path = "Bit Slicer/ZGVirtualMemoryStringReading.m"; sourceTree = "<group>"; };
+		722EE77E1B193AED00934EF3 /* ZGVirtualMemoryStringReading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGVirtualMemoryStringReading.h; path = "Bit Slicer/ZGVirtualMemoryStringReading.h"; sourceTree = "<group>"; };
+		722EE77F1B193C2200934EF3 /* ZGVirtualMemoryUserTags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGVirtualMemoryUserTags.h; path = "Bit Slicer/ZGVirtualMemoryUserTags.h"; sourceTree = "<group>"; };
 		7231440319C57A5300FBE342 /* ZGRegistersState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegistersState.h; path = "Bit Slicer/ZGRegistersState.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7231440419C57A5300FBE342 /* ZGRegistersState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegistersState.m; path = "Bit Slicer/ZGRegistersState.m"; sourceTree = "<group>"; usesTabs = 1; };
 		7231440619C607C700FBE342 /* ZGWatchVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGWatchVariable.h; path = "Bit Slicer/ZGWatchVariable.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -669,8 +673,7 @@
 		77F1161C17D2EF09009E002A /* ZGMemoryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryTypes.h; path = "Bit Slicer/ZGMemoryTypes.h"; sourceTree = "<group>"; usesTabs = 1; };
 		77F1161D17D2EF14009E002A /* ZGVirtualMemory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ZGVirtualMemory.c; path = "Bit Slicer/ZGVirtualMemory.c"; sourceTree = "<group>"; usesTabs = 1; };
 		77F1161E17D2EF14009E002A /* ZGVirtualMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGVirtualMemory.h; path = "Bit Slicer/ZGVirtualMemory.h"; sourceTree = "<group>"; usesTabs = 1; };
-		77F1162017D2EF28009E002A /* ZGVirtualMemoryHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGVirtualMemoryHelpers.h; path = "Bit Slicer/ZGVirtualMemoryHelpers.h"; sourceTree = "<group>"; usesTabs = 1; };
-		77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGVirtualMemoryHelpers.m; path = "Bit Slicer/ZGVirtualMemoryHelpers.m"; sourceTree = "<group>"; usesTabs = 1; };
+		77F1162117D2EF28009E002A /* ZGVirtualMemoryUserTags.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGVirtualMemoryUserTags.m; path = "Bit Slicer/ZGVirtualMemoryUserTags.m"; sourceTree = "<group>"; usesTabs = 1; };
 		77F1162317D2EF31009E002A /* ZGRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRegion.h; path = "Bit Slicer/ZGRegion.h"; sourceTree = "<group>"; usesTabs = 1; };
 		77F1162417D2EF31009E002A /* ZGRegion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRegion.m; path = "Bit Slicer/ZGRegion.m"; sourceTree = "<group>"; usesTabs = 1; };
 		77F1162617D2EF3A009E002A /* ZGProcess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGProcess.h; path = "Bit Slicer/ZGProcess.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -1329,8 +1332,10 @@
 				77F1161C17D2EF09009E002A /* ZGMemoryTypes.h */,
 				77F1161E17D2EF14009E002A /* ZGVirtualMemory.h */,
 				77F1161D17D2EF14009E002A /* ZGVirtualMemory.c */,
-				77F1162017D2EF28009E002A /* ZGVirtualMemoryHelpers.h */,
-				77F1162117D2EF28009E002A /* ZGVirtualMemoryHelpers.m */,
+				722EE77F1B193C2200934EF3 /* ZGVirtualMemoryUserTags.h */,
+				77F1162117D2EF28009E002A /* ZGVirtualMemoryUserTags.m */,
+				722EE77E1B193AED00934EF3 /* ZGVirtualMemoryStringReading.h */,
+				722EE77C1B193ABD00934EF3 /* ZGVirtualMemoryStringReading.m */,
 				77282124189EA4520044E4BC /* ZGProcessTaskManager.h */,
 				77282125189EA4520044E4BC /* ZGProcessTaskManager.m */,
 				77F1162317D2EF31009E002A /* ZGRegion.h */,
@@ -1577,7 +1582,7 @@
 				77E1340119312B1700B5B799 /* ZGSearchData.m in Sources */,
 				77A5B03119189DA5002BEC69 /* NSArrayAdditions.m in Sources */,
 				77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */,
-				77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryHelpers.m in Sources */,
+				77E2BBD418FD901600E41FA0 /* ZGVirtualMemoryUserTags.m in Sources */,
 				77E2BBD318FD900C00E41FA0 /* ZGProcess.m in Sources */,
 				77E2BBD218FD900300E41FA0 /* ZGVariable.m in Sources */,
 				77E2BBD118FD8FF600E41FA0 /* ZGMachBinaryInfo.m in Sources */,
@@ -1650,7 +1655,8 @@
 				77F1161817D2EEF6009E002A /* ZGSearchFunctions.mm in Sources */,
 				770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */,
 				77F1161F17D2EF14009E002A /* ZGVirtualMemory.c in Sources */,
-				77F1162217D2EF28009E002A /* ZGVirtualMemoryHelpers.m in Sources */,
+				722EE77D1B193ABD00934EF3 /* ZGVirtualMemoryStringReading.m in Sources */,
+				77F1162217D2EF28009E002A /* ZGVirtualMemoryUserTags.m in Sources */,
 				77F1162517D2EF31009E002A /* ZGRegion.m in Sources */,
 				770FABB71849160200C176B7 /* ZGEditSizeWindowController.m in Sources */,
 				779D56C518F1284200FD5408 /* ZGMemoryDumpRangeWindowController.m in Sources */,

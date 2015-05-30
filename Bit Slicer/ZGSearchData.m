@@ -33,7 +33,6 @@
  */
 
 #import "ZGSearchData.h"
-#import "ZGVirtualMemoryHelpers.h"
 
 @implementation ZGSearchData
 

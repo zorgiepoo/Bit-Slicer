@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 2/2/14.
+ * Created by Mayur Pawashe on 5/29/15.
  *
- * Copyright (c) 2014 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,58 +32,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGStoredData.h"
-#import "ZGVirtualMemory.h"
-#import "ZGSearchData.h"
-#import "ZGRegion.h"
-#import "ZGSearchProgress.h"
-#import "ZGUtilities.h"
+#import <Foundation/Foundation.h>
+#import "ZGMemoryTypes.h"
+#import "ZGVariableTypes.h"
 
-@interface ZGStoredData ()
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-@property (nonatomic) NSArray *regions;
+ZGMemorySize ZGGetStringSize(ZGMemoryMap processTask, ZGMemoryAddress address, ZGVariableType dataType, ZGMemorySize oldSize, ZGMemorySize maxStringSizeLimit);
 
-@end
-
-@implementation ZGStoredData
-
-+ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask
-{
-	NSMutableArray *regions = [[NSMutableArray alloc] init];
-	
-	for (ZGRegion *region in [ZGRegion regionsFromProcessTask:processTask])
-	{
-		void *bytes = NULL;
-		ZGMemorySize size = region.size;
-		
-		if (ZGReadBytes(processTask, region.address, &bytes, &size))
-		{
-			ZGRegion *newRegion = [[ZGRegion alloc] initWithAddress:region.address size:region.size protection:region.protection];
-			newRegion->_bytes = bytes;
-			
-			[regions addObject:newRegion];
-		}
-	}
-	
-	return [[self alloc] initWithRegions:regions];
+#ifdef __cplusplus
 }
-
-- (id)initWithRegions:(NSArray *)regions
-{
-	self = [super init];
-	if (self != nil)
-	{
-		self.regions = regions;
-	}
-	return self;
-}
-
-- (void)dealloc
-{
-	for (ZGRegion *region in self.regions)
-	{
-		ZGFreeBytes(region.bytes, region.size);
-	}
-}
-
-@end
+#endif

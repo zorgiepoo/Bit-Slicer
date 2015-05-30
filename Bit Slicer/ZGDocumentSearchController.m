@@ -37,7 +37,6 @@
 #import "ZGProcess.h"
 #import "ZGDocumentTableController.h"
 #import "ZGVirtualMemory.h"
-#import "ZGVirtualMemoryHelpers.h"
 #import "ZGRegion.h"
 #import "ZGSearchData.h"
 #import "ZGSearchProgress.h"
