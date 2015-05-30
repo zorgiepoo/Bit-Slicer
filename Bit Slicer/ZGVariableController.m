@@ -439,6 +439,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[self
 	 addVariables:@[variable]
 	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
+	
+	[[self class] annotateVariableAutomatically:variable process:windowController.currentProcess];
 }
 
 #pragma mark Changing Variables
@@ -498,6 +500,12 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[[windowController.undoManager prepareWithInvocationTarget:self]
 	 changeVariable:variable
 	 newDescription:variable.fullAttributedDescription];
+	
+	// Ignore formatting to detect if user has annotated anything of significance
+	if (![variable.fullAttributedDescription.string isEqualToString:newDescription.string])
+	{
+		variable.userAnnotated = YES;
+	}
 	
 	variable.fullAttributedDescription = newDescription;
 	
@@ -925,6 +933,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		[windowController.variablesTableView reloadData];
 	}
 	variable.finishedEvaluatingDynamicAddress = NO;
+	
+	[[self class] annotateVariableAutomatically:variable process:windowController.currentProcess];
 }
 
 #pragma mark Relativizing Variable Addresses
@@ -1008,6 +1018,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	
 	return staticVariableDescription;
+}
+
++ (void)annotateVariableAutomatically:(ZGVariable *)variable process:(ZGProcess *)process
+{
+	if (!variable.userAnnotated)
+	{
+		variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:@""];
+		[self annotateVariables:@[variable] process:process];
+	}
 }
 
 + (void)annotateVariables:(NSArray *)variables process:(ZGProcess *)process

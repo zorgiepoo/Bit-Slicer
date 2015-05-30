@@ -68,6 +68,7 @@ extern NSString *ZGVariablePboardType;
 @property (copy, nonatomic) NSString *scriptValue;
 @property (copy, nonatomic) NSString *cachedScriptPath;
 @property (readonly, nonatomic) NSString *sizeStringValue;
+@property (nonatomic) BOOL userAnnotated;
 @property (copy, nonatomic) NSAttributedString *fullAttributedDescription;
 @property (nonatomic, readonly) NSString *shortDescription;
 @property (nonatomic, readonly) NSString *name;
