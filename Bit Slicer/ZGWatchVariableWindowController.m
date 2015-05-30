@@ -95,7 +95,6 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[self setWatchProcess:nil];
 }
 
 - (void)windowDidLoad
@@ -118,7 +117,7 @@
 - (void)stopWatchingAndInvokeCompletionHandler:(BOOL)shouldInvokeCompletionHandler
 {
 	[_breakPointController removeObserver:self];
-	[self setWatchProcess:nil];
+	_watchProcess = nil;
 	
 	[_progressIndicator stopAnimation:nil];
 	
@@ -164,7 +163,7 @@
 	[self stopWatchingAndInvokeCompletionHandler:NO];
 }
 
-- (void)watchProcessDied:(NSNotification *)__unused notification
+- (void)triggerCurrentProcessChanged
 {
 	if (_foundWatchVariables.count == 0)
 	{
@@ -172,10 +171,7 @@
 	}
 	else
 	{
-		NSInteger result = ZGRunAlertPanelWithDefaultAndCancelButton(
-						[NSString stringWithFormat:ZGLocalizableWatchVariableString(@"targetTeriminatedAlertTitleFormat"), _watchProcess.name],
-						ZGLocalizableWatchVariableString(@"targetTeriminatedAlertMessage"),
-						ZGLocalizableWatchVariableString(@"targetTeriminatedAlertAddButton"));
+		NSInteger result = ZGRunAlertPanelWithDefaultAndCancelButton([NSString stringWithFormat:ZGLocalizableWatchVariableString(@"targetTeriminatedAlertTitleFormat"), _watchProcess.name], ZGLocalizableWatchVariableString(@"targetTeriminatedAlertMessage"), ZGLocalizableWatchVariableString(@"targetTeriminatedAlertAddButton"));
 		switch (result)
 		{
 			case NSAlertFirstButtonReturn:
@@ -189,28 +185,6 @@
 }
 
 #pragma mark Misc.
-
-- (void)setWatchProcess:(ZGProcess *)watchProcess
-{
-	if (_watchProcess != nil)
-	{
-		[[NSNotificationCenter defaultCenter]
-		 removeObserver:self
-		 name:ZGTargetProcessDiedNotification
-		 object:watchProcess];
-	}
-	
-	_watchProcess = watchProcess;
-	
-	if (_watchProcess != nil)
-	{
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(watchProcessDied:)
-		 name:ZGTargetProcessDiedNotification
-		 object:watchProcess];
-	}
-}
 
 - (void)updateAddButton
 {
@@ -375,7 +349,7 @@
 	 didEndSelector:nil
 	 contextInfo:NULL];
 	
-	[self setWatchProcess:process];
+	_watchProcess = process;
 	_completionHandler = [completionHandler copy];
 	
 	_foundWatchVariables = [[NSMutableArray alloc] init];

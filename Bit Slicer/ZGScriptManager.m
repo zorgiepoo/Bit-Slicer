@@ -386,7 +386,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	return retValue != NULL;
 }
 
-- (void)watchProcessDied:(NSNotification *)__unused notification
+- (void)triggerCurrentProcessChanged
 {
 	[_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *__unused stop) {
 		if ([[self runningScripts] containsObject:pyScript])
@@ -486,14 +486,6 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		}
 		
 		[[self runningScripts] addObject:script];
-		
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[[NSNotificationCenter defaultCenter]
-			 addObserver:self
-			 selector:@selector(watchProcessDied:)
-			 name:ZGTargetProcessDiedNotification
-			 object:windowController.currentProcess];
-		});
 		
 		PyObject_SetAttrString(script.module, "vm", virtualMemoryInstance.object);
 		PyObject_SetAttrString(script.module, "debug", debuggerInstance.object);
@@ -615,8 +607,6 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 					});
 				}
 			});
-			
-			[[NSNotificationCenter defaultCenter] removeObserver:self];
 		}
 		
 		if ([self hasAttachedPrompt] && _scriptPromptWindowController.delegate == script.debuggerInstance)

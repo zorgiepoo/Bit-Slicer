@@ -39,8 +39,6 @@
 
 #define ZGLocalizableSearchDocumentString(string) NSLocalizedStringFromTable(string, @"[Code] Search Document", nil)
 
-#define ZGTargetProcessDiedNotification @"ZGTargetProcessDiedNotification"
-
 @class ZGDocumentTableController;
 @class ZGVariableController;
 @class ZGDocumentSearchController;

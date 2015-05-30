@@ -49,4 +49,6 @@ typedef void (^watch_variable_completion_t)(NSArray *variablesFound);
 
 - (void)watchVariable:(ZGVariable *)variable withWatchPointType:(ZGWatchPointType)watchPointType inProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow completionHandler:(watch_variable_completion_t)completionHandler;
 
+- (void)triggerCurrentProcessChanged;
+
 @end

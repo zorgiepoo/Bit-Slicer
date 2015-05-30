@@ -61,6 +61,8 @@ extern NSString *ZGScriptDefaultApplicationEditorKey;
 - (void)cleanup;
 - (void)cleanupWithAppTerminationState:(ZGAppTerminationState *)appTerminationState;
 
+- (void)triggerCurrentProcessChanged;
+
 - (void)loadCachedScriptsFromVariables:(NSArray *)variables;
 
 - (void)openScriptForVariable:(ZGVariable *)variable;

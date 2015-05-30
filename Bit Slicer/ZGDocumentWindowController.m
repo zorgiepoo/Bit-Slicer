@@ -328,10 +328,9 @@
 		{
 			[_searchController cancelTask];
 		}
-
-		[[NSNotificationCenter defaultCenter]
-		 postNotificationName:ZGTargetProcessDiedNotification
-		 object:oldProcess];
+		
+		[_scriptManager triggerCurrentProcessChanged];
+		[_watchVariableWindowController triggerCurrentProcessChanged];
 	}
 }
 
