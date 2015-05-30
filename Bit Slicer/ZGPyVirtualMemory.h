@@ -40,14 +40,12 @@
 @class ZGProcess;
 @class ZGSearchProgress;
 
-extern PyObject *gVirtualMemoryException;
-
 @interface ZGPyVirtualMemory : NSObject <ZGSearchProgressDelegate>
 
-+ (void)loadPythonClassInMainModule:(PyObject *)module;
++ (PyObject *)loadPythonClassInMainModule:(PyObject *)module;
 
-- (id)initWithProcess:(ZGProcess *)process;
-- (id)initWithProcessNoCopy:(ZGProcess *)process;
+- (id)initWithProcess:(ZGProcess *)process virtualMemoryException:(PyObject *)virtualMemoryException;
+- (id)initWithProcessNoCopy:(ZGProcess *)process virtualMemoryException:(PyObject *)virtualMemoryException;
 
 @property (nonatomic, readonly) PyObject *object;
 @property (atomic, readonly) ZGSearchProgress *searchProgress; // main queue property

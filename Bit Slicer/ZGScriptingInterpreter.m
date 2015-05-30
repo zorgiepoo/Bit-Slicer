@@ -137,8 +137,11 @@
 		PyObject *mainModule = loadMainPythonModule();
 		if (mainModule != NULL)
 		{
-			[ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
-			[ZGPyDebugger loadPythonClassInMainModule:mainModule];
+			self->_virtualMemoryException = [ZGPyVirtualMemory loadPythonClassInMainModule:mainModule];
+			self->_debuggerException = [ZGPyDebugger loadPythonClassInMainModule:mainModule];
+			
+			assert(self->_virtualMemoryException != NULL);
+			assert(self->_debuggerException != NULL);
 		}
 		else
 		{
@@ -260,7 +263,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	dispatch_sync(_pythonQueue, ^{
 		PyObject *mainModule = PyImport_AddModule("__main__");
 		
-		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessNoCopy:process];
+		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessNoCopy:process virtualMemoryException:self->_virtualMemoryException];
 		CFRetain((__bridge CFTypeRef)(virtualMemoryInstance));
 		
 		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.object);

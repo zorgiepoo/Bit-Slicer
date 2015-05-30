@@ -463,7 +463,8 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		
 		Py_XDECREF(scriptClassType);
 		
-		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:windowController.currentProcess];
+		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:windowController.currentProcess virtualMemoryException:self->_scriptingInterpreter.virtualMemoryException];
+		
 		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptingInterpreter:self->_scriptingInterpreter scriptManager:self breakPointController:windowController.breakPointController hotKeyCenter:windowController.hotKeyCenter loggerWindowController:windowController.loggerWindowController];
 		
 		script.virtualMemoryInstance = virtualMemoryInstance;

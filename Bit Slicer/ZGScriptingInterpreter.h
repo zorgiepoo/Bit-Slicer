@@ -53,6 +53,8 @@
 - (void)acquireInterpreter;
 
 @property (nonatomic, readonly) dispatch_queue_t pythonQueue;
+@property (nonatomic, readonly) PyObject *virtualMemoryException;
+@property (nonatomic, readonly) PyObject *debuggerException;
 
 - (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
 

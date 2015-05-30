@@ -66,6 +66,8 @@ typedef struct
 	uint32_t processTask;
 	int32_t processIdentifier;
 	int8_t is64Bit;
+	PyObject *virtualMemoryException;
+	PyObject *debuggerException;
 	__unsafe_unretained ZGPyDebugger *objcSelf;
 	__unsafe_unretained id <ZGBreakPointDelegate> breakPointDelegate;
 } DebuggerClass;
@@ -197,10 +199,9 @@ static PyTypeObject DebuggerType =
 	NSDictionary *_vectorRegisterOffsetsDictionary;
 }
 
-static PyObject *gDebuggerException;
-
-+ (void)loadPythonClassInMainModule:(PyObject *)module
++ (PyObject *)loadPythonClassInMainModule:(PyObject *)module
 {
+	PyObject *debuggerException = NULL;
 	DebuggerType.tp_new = PyType_GenericNew;
 	if (PyType_Ready(&DebuggerType) >= 0)
 	{
@@ -211,13 +212,18 @@ static PyObject *gDebuggerException;
 		const char *debuggerExceptionName = "DebuggerError";
 		NSString *exceptionNameWithModule = [NSString stringWithFormat:@"%s.%s", PyModule_GetName(module), debuggerExceptionName];
 		
-		gDebuggerException = PyErr_NewException([exceptionNameWithModule UTF8String], NULL, NULL);
-		PyModule_AddObject(module, debuggerExceptionName, gDebuggerException);
+		debuggerException = PyErr_NewException([exceptionNameWithModule UTF8String], NULL, NULL);
+		if (PyModule_AddObject(module, debuggerExceptionName, debuggerException) != 0)
+		{
+			NSLog(@"Failed to add Debugger to Python Module");
+		}
 	}
 	else
 	{
 		NSLog(@"Error: DebuggerType was not ready!");
 	}
+	
+	return debuggerException;
 }
 
 - (id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController
@@ -226,7 +232,7 @@ static PyObject *gDebuggerException;
 	if (self != nil)
 	{
 		PyTypeObject *type = &DebuggerType;
-		self.object = (PyObject *)((DebuggerClass *)type->tp_alloc(type, 0));
+		[self setObject:(PyObject *)((DebuggerClass *)type->tp_alloc(type, 0))];
 		if (_object == NULL)
 		{
 			return nil;
@@ -245,6 +251,8 @@ static PyObject *gDebuggerException;
 		debuggerObject->processIdentifier = process.processID;
 		debuggerObject->processTask = process.processTask;
 		debuggerObject->is64Bit = process.is64Bit;
+		debuggerObject->virtualMemoryException = scriptingInterpreter.virtualMemoryException;
+		debuggerObject->debuggerException = scriptingInterpreter.debuggerException;
 		debuggerObject->breakPointDelegate = self;
 		
 		_cachedInstructionPointers = [[NSMutableDictionary alloc] init];
@@ -289,7 +297,7 @@ static PyObject *gDebuggerException;
 		}
 	}
 	
-	self.object = NULL;
+	[self setObject:NULL];
 }
 
 - (void)setObject:(PyObject *)object
@@ -420,7 +428,7 @@ static PyObject *Debugger_prompt(DebuggerClass *self, PyObject *args)
 	
 	if (attachedPrompt)
 	{
-		PyErr_SetString(gDebuggerException, "debug.prompt failed because a prompt is already visible");
+		PyErr_SetString(self->debuggerException, "debug.prompt failed because a prompt is already visible");
 		return NULL;
 	}
 	
@@ -491,7 +499,7 @@ static PyObject *Debugger_registerHotkey(DebuggerClass *self, PyObject *args)
 	
 	if (!registeredHotKey)
 	{
-		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.registerHotKey failed to register code = 0x%X, flags = 0x%X. Perhaps it is already being in use?", keyCode, modifierFlags] UTF8String]);
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.registerHotKey failed to register code = 0x%X, flags = 0x%X. Perhaps it is already being in use?", keyCode, modifierFlags] UTF8String]);
 		return NULL;
 	}
 	
@@ -516,7 +524,7 @@ static PyObject *Debugger_unregisterHotkey(DebuggerClass *self, PyObject *args)
 	
 	if (unregisteredHotKey == nil)
 	{
-		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.unregisterHotKey failed to unregister hot key with ID %d", hotKeyID] UTF8String]);
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.unregisterHotKey failed to unregister hot key with ID %d", hotKeyID] UTF8String]);
 		return NULL;
 	}
 	
@@ -624,7 +632,7 @@ static PyObject *Debugger_readBytes(DebuggerClass *self, PyObject *args)
 		}
 		else
 		{
-			PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"debug.readBytes failed to read %llu byte(s) at 0x%llX", size, address] UTF8String]);
+			PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"debug.readBytes failed to read %llu byte(s) at 0x%llX", size, address] UTF8String]);
 			
 			NSString *errorMessage = @"Error: Failed to read bytes using debug object";
 			ZGPyDebugger *debugger = self->objcSelf;
@@ -656,7 +664,7 @@ static PyObject *Debugger_writeBytes(DebuggerClass *self, PyObject *args)
 		
 		if (!success)
 		{
-			PyErr_SetString(gVirtualMemoryException, [[NSString stringWithFormat:@"debug.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
+			PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"debug.writeBytes failed to write %lu byte(s) at 0x%llX", buffer.len, memoryAddress] UTF8String]);
 		}
 		
 		PyBuffer_Release(&buffer);
@@ -738,7 +746,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 		}
 		else
 		{
-			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.bytesBeforeInjection failed with source address: 0x%llX, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
+			PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.bytesBeforeInjection failed with source address: 0x%llX, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
 		}
 	}
 	return retValue;
@@ -774,7 +782,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		
 		if (!injectedCode)
 		{
-			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.injectCode failed with source address: 0x%llx, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
+			PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.injectCode failed with source address: 0x%llx, destination address: 0x%llX", sourceAddress, destinationAddress] UTF8String]);
 			
 			ZGPyDebugger *debugger = self->objcSelf;
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -842,7 +850,7 @@ static PyObject *watchAccess(DebuggerClass *self, PyObject *args, NSString *func
 	ZGBreakPoint *breakPoint = nil;
 	if (![self->objcSelf->_breakPointController addWatchpointOnVariable:variable inProcess:self->objcSelf->_process watchPointType:watchPointType delegate:self->breakPointDelegate getBreakPoint:&breakPoint])
 	{
-		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.%@ failed adding watchpoint at 0x%llX (%llu byte(s))", functionName, memoryAddress, numberOfBytes] UTF8String]);
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.%@ failed adding watchpoint at 0x%llX (%llu byte(s))", functionName, memoryAddress, numberOfBytes] UTF8String]);
 		
 		return NULL;
 	}
@@ -959,13 +967,13 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 	
 	if (instruction == nil)
 	{
-		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.addBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.addBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
 		return NULL;
 	}
 	
 	if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:instruction inProcess:self->objcSelf->_process callback:callback delegate:self->breakPointDelegate])
 	{
-		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX", memoryAddress] UTF8String]);
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.addBreakpoint failed to add breakpoint at: 0x%llX", memoryAddress] UTF8String]);
 		return NULL;
 	}
 	
@@ -987,7 +995,7 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 	
 	if (instruction == nil)
 	{
-		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.removeBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.removeBreakpoint failed to find instruction at: 0x%llX", memoryAddress] UTF8String]);
 		return NULL;
 	}
 	
@@ -1045,7 +1053,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	x86_thread_state_t threadState;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, NULL))
 	{
-		PyErr_SetString(gDebuggerException, "debug.stepOver failed to retrieve current general thread state");
+		PyErr_SetString(self->debuggerException, "debug.stepOver failed to retrieve current general thread state");
 		return NULL;
 	}
 	
@@ -1057,7 +1065,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	if (currentInstruction == nil)
 	{
-		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to retrieve instruction at 0x%llX", instructionPointer] UTF8String]);
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to retrieve instruction at 0x%llX", instructionPointer] UTF8String]);
 		return NULL;
 	}
 	
@@ -1067,7 +1075,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		
 		if (nextInstruction == nil)
 		{
-			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to retrieve instruction at 0x%llX", instructionPointer] UTF8String]);
+			PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to retrieve instruction at 0x%llX", instructionPointer] UTF8String]);
 			return NULL;
 		}
 		
@@ -1075,7 +1083,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		
 		if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:nextInstruction inProcess:self->objcSelf->_process thread:self->objcSelf->_haltedBreakPoint.thread basePointer:basePointer callback:callback delegate:self->objcSelf])
 		{
-			PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to set breakpoint at 0x%llX", nextInstruction.variable.address] UTF8String]);
+			PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.stepOver failed to set breakpoint at 0x%llX", nextInstruction.variable.address] UTF8String]);
 			return NULL;
 		}
 		
@@ -1103,7 +1111,7 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	x86_thread_state_t threadState;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, NULL))
 	{
-		PyErr_SetString(gDebuggerException, "debug.stepOut failed to retrieve current general thread state");
+		PyErr_SetString(self->debuggerException, "debug.stepOut failed to retrieve current general thread state");
 		return NULL;
 	}
 	
@@ -1115,7 +1123,7 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf->_process breakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries maxLimit:2];
 	if (backtrace.instructions.count < 2)
 	{
-		PyErr_SetString(gDebuggerException, "debug.stepOut failed to find available instruction to step out to");
+		PyErr_SetString(self->debuggerException, "debug.stepOut failed to find available instruction to step out to");
 		return NULL;
 	}
 	
@@ -1131,7 +1139,7 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 
 	if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:returnInstruction inProcess:self->objcSelf->_process thread:self->objcSelf->_haltedBreakPoint.thread basePointer:outerBasePointer.unsignedLongLongValue callback:callback delegate:self->objcSelf])
 	{
-		PyErr_SetString(gDebuggerException, [[NSString stringWithFormat:@"debug.stepOut failed to set breakpoint at 0x%llX", outerInstruction.variable.address] UTF8String]);
+		PyErr_SetString(self->debuggerException, [[NSString stringWithFormat:@"debug.stepOut failed to set breakpoint at 0x%llX", outerInstruction.variable.address] UTF8String]);
 		return NULL;
 	}
 	
@@ -1146,14 +1154,14 @@ static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject * __unused arg
 {
 	if (self->objcSelf->_haltedBreakPoint == nil)
 	{
-		PyErr_SetString(gDebuggerException, "debug.backtrace called without a current breakpoint set");
+		PyErr_SetString(self->debuggerException, "debug.backtrace called without a current breakpoint set");
 		return NULL;
 	}
 	
 	x86_thread_state_t threadState;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, NULL))
 	{
-		PyErr_SetString(gDebuggerException, "debug.backtrace failed to retrieve current general thread state");
+		PyErr_SetString(self->debuggerException, "debug.backtrace failed to retrieve current general thread state");
 		return NULL;
 	}
 	
@@ -1255,7 +1263,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	if (self->objcSelf->_haltedBreakPoint == nil)
 	{
-		PyErr_SetString(gDebuggerException, "debug.writeRegisters failed because we are not at a halted breakpoint");
+		PyErr_SetString(self->debuggerException, "debug.writeRegisters failed because we are not at a halted breakpoint");
 		return NULL;
 	}
 	
@@ -1265,7 +1273,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, &threadStateCount))
 	{
-		PyErr_SetString(gDebuggerException, "debug.writeRegisters failed retrieving target's thread state");
+		PyErr_SetString(self->debuggerException, "debug.writeRegisters failed retrieving target's thread state");
 		ZGResumeTask(self->processTask);
 		return NULL;
 	}
@@ -1336,7 +1344,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		
 		if (!ZGSetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, threadStateCount))
 		{
-			PyErr_SetString(gDebuggerException, "debug.writeRegisters failed to write the new thread state");
+			PyErr_SetString(self->debuggerException, "debug.writeRegisters failed to write the new thread state");
 			success = NO;
 		}
 		
@@ -1349,7 +1357,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		
 		if (!ZGSetVectorThreadState(&vectorState, self->objcSelf->_haltedBreakPoint.thread, vectorStateCount, self->is64Bit))
 		{
-			PyErr_SetString(gDebuggerException, "debug.writeRegisters failed to write the new vector state");
+			PyErr_SetString(self->debuggerException, "debug.writeRegisters failed to write the new vector state");
 			success = NO;
 		}
 		

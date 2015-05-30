@@ -48,7 +48,7 @@
 
 @interface ZGPyDebugger : NSObject <ZGBreakPointDelegate, ZGHotKeyDelegate, ZGScriptPromptDelegate>
 
-+ (void)loadPythonClassInMainModule:(PyObject *)module;
++ (PyObject *)loadPythonClassInMainModule:(PyObject *)module;
 
 - (id)initWithProcess:(ZGProcess *)process scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter scriptManager:(ZGScriptManager *)scriptManager breakPointController:(ZGBreakPointController *)breakPointController hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController;
 - (void)cleanup;
