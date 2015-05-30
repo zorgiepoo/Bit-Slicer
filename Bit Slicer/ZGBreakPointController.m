@@ -963,7 +963,10 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 						continue;
 					}
 					
-					[self updateThreadListInWatchpoint:existingBreakPoint type:watchPointType];
+					if (!existingBreakPoint.dead && ![self updateThreadListInWatchpoint:existingBreakPoint type:watchPointType])
+					{
+						existingBreakPoint.dead = YES;
+					}
 				}
 			});
 			dispatch_resume(self->_watchPointTimer);
