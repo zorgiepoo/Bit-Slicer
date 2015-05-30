@@ -33,7 +33,7 @@
  */
 
 #import "ZGPyVMProtModule.h"
-#import "ZGPyUtilities.h"
+#import "ZGPyModuleAdditions.h"
 #import "ZGVirtualMemory.h"
 
 #define VMPROT_MODULE_NAME "vmprot"

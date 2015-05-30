@@ -33,7 +33,7 @@
  */
 
 #import "ZGPyKeyModModule.h"
-#import "ZGPyUtilities.h"
+#import "ZGPyModuleAdditions.h"
 #import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
 

@@ -34,7 +34,7 @@
 
 #import "ZGPyKeyCodeModule.h"
 #import <Carbon/Carbon.h>
-#import "ZGPyUtilities.h"
+#import "ZGPyModuleAdditions.h"
 
 #define KEYCODE_MODULE_NAME "keycode"
 

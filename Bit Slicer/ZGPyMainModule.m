@@ -33,7 +33,7 @@
  */
 
 #import "ZGPyMainModule.h"
-#import "ZGPyUtilities.h"
+#import "ZGPyModuleAdditions.h"
 
 #define MAIN_MODULE_NAME "bitslicer"
 

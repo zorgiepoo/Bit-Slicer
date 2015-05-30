@@ -32,7 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGPyUtilities.h"
+#import "ZGPyModuleAdditions.h"
 #import "ZGDebugLogging.h"
 
 void ZGPyAddModuleToSys(const char *moduleName, PyObject *module)
