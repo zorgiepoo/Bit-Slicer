@@ -184,12 +184,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		[hotKeyCenter registerHotKey:_stepInHotKey delegate:self];
 		[hotKeyCenter registerHotKey:_stepOverHotKey delegate:self];
 		[hotKeyCenter registerHotKey:_stepOutHotKey delegate:self];
-
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(applicationWillTerminate:)
-		 name:NSApplicationWillTerminateNotification
-		 object:nil];
 	}
 
 	return self;
@@ -2116,11 +2110,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			[self stepOut:nil];
 			break;
 	}
-}
-
-- (void)applicationWillTerminate:(NSNotification *)__unused notification
-{
-	[self cleanup];
 }
 
 - (void)cleanup

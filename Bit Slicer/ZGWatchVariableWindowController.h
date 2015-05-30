@@ -51,4 +51,6 @@ typedef void (^watch_variable_completion_t)(NSArray *variablesFound);
 
 - (void)triggerCurrentProcessChanged;
 
+- (void)cleanup;
+
 @end

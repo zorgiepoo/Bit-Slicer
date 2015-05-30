@@ -273,6 +273,13 @@
 	_loadedDocumentBefore = YES;
 }
 
+- (void)cleanupWithAppTerminationState:(ZGAppTerminationState *)appTerminationState
+{
+	[_scriptManager cleanupWithAppTerminationState:appTerminationState];
+	[_watchVariableWindowController cleanup];
+	[super cleanup];
+}
+
 - (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess
 {
 	for (ZGVariable *variable in _documentData.variables)

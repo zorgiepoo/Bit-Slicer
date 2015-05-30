@@ -55,6 +55,7 @@
 @class ZGLoggerWindowController;
 @class ZGHotKeyCenter;
 @class ZGDocument;
+@class ZGAppTerminationState;
 
 @interface ZGDocumentWindowController : ZGMemoryWindowController <AGScopeBarDelegate>
 
@@ -84,6 +85,8 @@
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 - (void)loadDocumentUserInterface;
+
+- (void)cleanupWithAppTerminationState:(ZGAppTerminationState *)appTerminationState;
 
 - (void)markDocumentChange;
 

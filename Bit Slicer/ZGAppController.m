@@ -150,8 +150,7 @@
 	for (ZGDocument *document in _documentController.documents)
 	{
 		ZGDocumentWindowController *documentWindowController = document.windowControllers.firstObject;
-		[documentWindowController.scriptManager cleanupWithAppTerminationState:appTerminationState];
-		[documentWindowController cleanup];
+		[documentWindowController cleanupWithAppTerminationState:appTerminationState];
 	}
 	
 	return appTerminationState.isDead ? NSTerminateNow : NSTerminateLater;

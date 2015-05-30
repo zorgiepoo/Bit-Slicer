@@ -80,21 +80,10 @@
 	self = [super init];
 	if (self != nil)
 	{
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(applicationWillTerminate:)
-		 name:NSApplicationWillTerminateNotification
-		 object:nil];
-		
 		_breakPointController = breakPointController;
 		_delegate = delegate;
 	}
 	return self;
-}
-
-- (void)dealloc
-{
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)windowDidLoad
@@ -102,7 +91,9 @@
 	ZGAdjustLocalizableWidthsForTableColumns(self.window, @[_addTableColumn], @{@"ru" : @[@20.0]});
 }
 
-- (void)applicationWillTerminate:(NSNotification *)__unused notification
+// This method may not realistically be called due to the watch window sheet preventing normal app termination..
+// But just in case..
+- (void)cleanup
 {
 	[_breakPointController removeObserver:self];
 }
