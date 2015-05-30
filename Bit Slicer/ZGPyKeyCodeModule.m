@@ -33,7 +33,6 @@
  */
 
 #import "ZGPyKeyCodeModule.h"
-#import "ZGUtilities.h"
 #import <Carbon/Carbon.h>
 #import "ZGPyUtilities.h"
 

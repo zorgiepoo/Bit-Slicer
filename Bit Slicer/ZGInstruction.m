@@ -34,7 +34,6 @@
 
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
-#import "ZGUtilities.h"
 
 @implementation ZGInstruction
 

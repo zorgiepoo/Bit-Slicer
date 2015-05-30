@@ -66,7 +66,7 @@
 #import "ZGRunningProcess.h"
 #import "ZGScriptingInterpreter.h"
 #import "ZGScriptManager.h"
-#import "ZGUtilities.h"
+#import "ZGDebugLogging.h"
 #import "NSArrayAdditions.h"
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"

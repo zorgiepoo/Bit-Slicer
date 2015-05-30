@@ -36,7 +36,8 @@
 #import "ZGVariableController.h"
 #import "ZGCalculator.h"
 #import "NSStringAdditions.h"
-#import "ZGUtilities.h"
+#import "ZGMemoryAddressExpressionParsing.h"
+#import "ZGRunAlertPanel.h"
 
 #define ZGEditSizeLocalizableTable @"[Code] Edit Variable Size"
 

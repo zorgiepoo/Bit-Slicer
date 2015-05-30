@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 5/3/14.
+ * Created by Mayur Pawashe on 5/29/15.
  *
- * Copyright (c) 2014 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,42 +32,62 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGPyKeyModModule.h"
-#import "ZGPyUtilities.h"
-#import <Cocoa/Cocoa.h>
-#import <Carbon/Carbon.h>
+#import "ZGVariableDataInfo.h"
 
-#define KEYMOD_MODULE_NAME "keymod"
-
-static struct PyModuleDef keyModModuleDefinition =
+BOOL ZGIsNumericalDataType(ZGVariableType dataType)
 {
-	PyModuleDef_HEAD_INIT,
-	KEYMOD_MODULE_NAME,
-	"Key Mod Module",
-	-1,
-	NULL,
-	NULL, NULL, NULL, NULL
-};
-
-static void addKeyMods(PyObject *keyModModule)
-{
-	ZGPyAddIntegerConstant(keyModModule, "NONE", 0x0);
-	ZGPyAddIntegerConstant(keyModModule, "SHIFT", shiftKey);
-	ZGPyAddIntegerConstant(keyModModule, "COMMAND", cmdKey);
-	ZGPyAddIntegerConstant(keyModModule, "ALPHA_LOCK", alphaLock);
-	ZGPyAddIntegerConstant(keyModModule, "OPTION", optionKey);
-	ZGPyAddIntegerConstant(keyModModule, "CONTROL", controlKey);
-	
-	// shortcut recorder uses this modifier for carbon flags, so we may as well provide it too
-	ZGPyAddIntegerConstant(keyModModule, "FUNCTION", NSFunctionKeyMask);
+	return (dataType != ZGByteArray && dataType != ZGString8 && dataType != ZGString16);
 }
 
-PyObject *loadKeyModPythonModule(void)
+ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType dataType)
 {
-	PyObject *keyModModule = PyModule_Create(&keyModModuleDefinition);
-	ZGPyAddModuleToSys(KEYMOD_MODULE_NAME, keyModModule);
+	ZGMemorySize dataSize;
+	switch (dataType)
+	{
+		case ZGInt8:
+			dataSize = 1;
+			break;
+		case ZGInt16:
+			dataSize = 2;
+			break;
+		case ZGInt32:
+		case ZGFloat:
+			dataSize = 4;
+			break;
+		case ZGInt64:
+		case ZGDouble:
+			dataSize = 8;
+			break;
+		case ZGPointer:
+			dataSize = isProcess64Bit ? 8 : 4;
+			break;
+		case ZGString8:
+		case ZGString16:
+		case ZGByteArray:
+		case ZGScript:
+			dataSize = 0;
+			break;
+	}
+	return dataSize;
+}
+
+ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
+{
+	ZGMemorySize dataAlignment;
 	
-	addKeyMods(keyModModule);
+	if (dataType == ZGString8 || dataType == ZGByteArray)
+	{
+		dataAlignment = sizeof(int8_t);
+	}
+	else if (dataType == ZGString16)
+	{
+		dataAlignment = sizeof(int16_t);
+	}
+	else
+	{
+		// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while every other integral type is on its own size of boundary
+		dataAlignment = (!isProcess64Bit && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
+	}
 	
-	return keyModModule;
+	return dataAlignment;
 }

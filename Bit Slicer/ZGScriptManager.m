@@ -49,7 +49,7 @@
 #import "ZGPyVMProtModule.h"
 #import "ZGSearchProgress.h"
 #import "ZGTableView.h"
-#import "ZGUtilities.h"
+#import "ZGDeliverUserNotifications.h"
 #import "ZGRegisterEntries.h"
 #import "ZGAppTerminationState.h"
 #import "ZGAppPathUtilities.h"

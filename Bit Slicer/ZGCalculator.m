@@ -43,7 +43,7 @@
 #import <DDMathParser/NSString+DDMathParsing.h>
 #import <DDMathParser/DDExpression.h>
 #import <DDMathParser/DDExpressionRewriter.h>
-#import "ZGUtilities.h"
+#import "ZGDebugLogging.h"
 
 #define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"
 #define ZGFindSymbolFunction @"symbol"

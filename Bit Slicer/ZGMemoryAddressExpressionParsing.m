@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 5/3/14.
+ * Created by Mayur Pawashe on 5/29/15.
  *
- * Copyright (c) 2014 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,42 +32,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGPyKeyModModule.h"
-#import "ZGPyUtilities.h"
-#import <Cocoa/Cocoa.h>
-#import <Carbon/Carbon.h>
+#import "ZGMemoryAddressExpressionParsing.h"
+#import "NSStringAdditions.h"
 
-#define KEYMOD_MODULE_NAME "keymod"
-
-static struct PyModuleDef keyModModuleDefinition =
+ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression)
 {
-	PyModuleDef_HEAD_INIT,
-	KEYMOD_MODULE_NAME,
-	"Key Mod Module",
-	-1,
-	NULL,
-	NULL, NULL, NULL, NULL
-};
-
-static void addKeyMods(PyObject *keyModModule)
-{
-	ZGPyAddIntegerConstant(keyModModule, "NONE", 0x0);
-	ZGPyAddIntegerConstant(keyModModule, "SHIFT", shiftKey);
-	ZGPyAddIntegerConstant(keyModModule, "COMMAND", cmdKey);
-	ZGPyAddIntegerConstant(keyModModule, "ALPHA_LOCK", alphaLock);
-	ZGPyAddIntegerConstant(keyModModule, "OPTION", optionKey);
-	ZGPyAddIntegerConstant(keyModModule, "CONTROL", controlKey);
+	ZGMemoryAddress address;
+	if (expression.zgIsHexRepresentation)
+	{
+		[[NSScanner scannerWithString:expression] scanHexLongLong:&address];
+	}
+	else
+	{
+		address = expression.zgUnsignedLongLongValue;
+	}
 	
-	// shortcut recorder uses this modifier for carbon flags, so we may as well provide it too
-	ZGPyAddIntegerConstant(keyModModule, "FUNCTION", NSFunctionKeyMask);
+	return address;
 }
 
-PyObject *loadKeyModPythonModule(void)
+BOOL ZGIsValidNumber(NSString *expression)
 {
-	PyObject *keyModModule = PyModule_Create(&keyModModuleDefinition);
-	ZGPyAddModuleToSys(KEYMOD_MODULE_NAME, keyModModule);
+	BOOL result = YES;
 	
-	addKeyMods(keyModModule);
+	// If it's in hex, then we assume it's valid
+	if (![expression zgIsHexRepresentation])
+	{
+		NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+		// We have to use en_US locale since we don't want commas to be used for decimal points
+		// Also DDMathParser won't handle a comma as decimal point for evaluating expressions either due to ambiguity
+		[numberFormatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
+		NSNumber *number = [numberFormatter numberFromString:expression];
+		result = (number != nil);
+	}
 	
-	return keyModModule;
+	return result;
 }

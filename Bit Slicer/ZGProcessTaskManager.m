@@ -34,7 +34,7 @@
 
 #import "ZGProcessTaskManager.h"
 #import "ZGVirtualMemory.h"
-#import "ZGUtilities.h"
+#import "ZGDebugLogging.h"
 
 @interface ZGProcessTaskManager ()
 

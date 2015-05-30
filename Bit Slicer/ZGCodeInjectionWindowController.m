@@ -39,7 +39,7 @@
 #import "ZGDebuggerUtilities.h"
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
-#import "ZGUtilities.h"
+#import "ZGRunAlertPanel.h"
 
 @implementation ZGCodeInjectionWindowController
 {

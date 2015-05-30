@@ -40,7 +40,8 @@
 #import "ZGProcess.h"
 #import "ZGRegion.h"
 #import "ZGMachBinary.h"
-#import "ZGUtilities.h"
+#import "ZGDebugLogging.h"
+#import "ZGDataValueExtracting.h"
 
 #define JUMP_REL32_INSTRUCTION_LENGTH 5
 #define INDIRECT_JUMP_INSTRUCTIONS_LENGTH 14

@@ -37,7 +37,8 @@
 #import "ZGCalculator.h"
 #import "ZGMemoryTypes.h"
 #import "ZGVirtualMemory.h"
-#import "ZGUtilities.h"
+#import "ZGMemoryAddressExpressionParsing.h"
+#import "ZGRunAlertPanel.h"
 
 #define ZGLocalizedStringFromDumpMemoryRangeTable(string) NSLocalizedStringFromTable((string), @"[Code] Dump Memory Range", nil)
 

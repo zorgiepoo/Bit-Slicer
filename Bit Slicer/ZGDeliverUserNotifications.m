@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 5/3/14.
+ * Created by Mayur Pawashe on 5/29/15.
  *
- * Copyright (c) 2014 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,42 +32,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGPyKeyModModule.h"
-#import "ZGPyUtilities.h"
-#import <Cocoa/Cocoa.h>
-#import <Carbon/Carbon.h>
+#import "ZGDeliverUserNotifications.h"
 
-#define KEYMOD_MODULE_NAME "keymod"
-
-static struct PyModuleDef keyModModuleDefinition =
+void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitle, NSString *informativeText, BOOL hasReplyButton, NSString *responsePlaceholder, NSDictionary *userInfo)
 {
-	PyModuleDef_HEAD_INIT,
-	KEYMOD_MODULE_NAME,
-	"Key Mod Module",
-	-1,
-	NULL,
-	NULL, NULL, NULL, NULL
-};
-
-static void addKeyMods(PyObject *keyModModule)
-{
-	ZGPyAddIntegerConstant(keyModModule, "NONE", 0x0);
-	ZGPyAddIntegerConstant(keyModModule, "SHIFT", shiftKey);
-	ZGPyAddIntegerConstant(keyModModule, "COMMAND", cmdKey);
-	ZGPyAddIntegerConstant(keyModModule, "ALPHA_LOCK", alphaLock);
-	ZGPyAddIntegerConstant(keyModModule, "OPTION", optionKey);
-	ZGPyAddIntegerConstant(keyModModule, "CONTROL", controlKey);
-	
-	// shortcut recorder uses this modifier for carbon flags, so we may as well provide it too
-	ZGPyAddIntegerConstant(keyModModule, "FUNCTION", NSFunctionKeyMask);
+	NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+	userNotification.title = title;
+	userNotification.subtitle = subtitle;
+	userNotification.informativeText = informativeText;
+	userNotification.userInfo = userInfo;
+	if ([userNotification respondsToSelector:@selector(hasReplyButton)])
+	{
+		userNotification.hasReplyButton = hasReplyButton;
+		
+		if ([userNotification respondsToSelector:@selector(responsePlaceholder)])
+		{
+			userNotification.responsePlaceholder = responsePlaceholder;
+		}
+		
+		if (hasReplyButton && [NSApp isActive])
+		{
+			userNotification.deliveryDate = [[NSDate date] dateByAddingTimeInterval:5.0];
+		}
+	}
+	[[NSUserNotificationCenter defaultUserNotificationCenter] scheduleNotification:userNotification];
 }
 
-PyObject *loadKeyModPythonModule(void)
+void ZGDeliverUserNotificationWithReply(NSString *title, NSString *subtitle, NSString *informativeText, NSString *responsePlaceholder, NSDictionary *userInfo)
 {
-	PyObject *keyModModule = PyModule_Create(&keyModModuleDefinition);
-	ZGPyAddModuleToSys(KEYMOD_MODULE_NAME, keyModModule);
-	
-	addKeyMods(keyModModule);
-	
-	return keyModModule;
+	ZGDeliverUserNotificationWithReplyOption(title, subtitle, informativeText, YES, responsePlaceholder, userInfo);
+}
+
+void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, NSDictionary *userInfo)
+{
+	ZGDeliverUserNotificationWithReplyOption(title, subtitle, informativeText, NO, nil, userInfo);
 }

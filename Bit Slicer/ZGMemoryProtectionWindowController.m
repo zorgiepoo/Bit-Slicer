@@ -36,7 +36,8 @@
 #import "ZGProcess.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
-#import "ZGUtilities.h"
+#import "ZGRunAlertPanel.h"
+#import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGMemoryTypes.h"
 
 #define ZGLocalizedStringFromMemoryProtectionTable(string) NSLocalizedStringFromTable((string), @"[Code] Memory Protection", nil)

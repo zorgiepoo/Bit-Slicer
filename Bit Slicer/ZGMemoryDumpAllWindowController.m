@@ -36,7 +36,8 @@
 #import "ZGSearchProgress.h"
 #import "ZGProcess.h"
 #import "ZGMemoryDumpFunctions.h"
-#import "ZGUtilities.h"
+#import "ZGRunAlertPanel.h"
+#import "ZGDeliverUserNotifications.h"
 
 @implementation ZGMemoryDumpAllWindowController
 {

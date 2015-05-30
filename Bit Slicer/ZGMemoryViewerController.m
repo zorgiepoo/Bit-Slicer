@@ -39,7 +39,7 @@
 #import "DataInspectorRepresenter.h"
 #import "ZGProcess.h"
 #import "ZGSearchProgress.h"
-#import "ZGUtilities.h"
+#import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGCalculator.h"
 #import "ZGVirtualMemory.h"
 #import "ZGRegion.h"

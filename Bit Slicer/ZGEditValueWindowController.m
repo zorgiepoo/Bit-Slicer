@@ -38,7 +38,7 @@
 #import "ZGVariable.h"
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
-#import "ZGUtilities.h"
+#import "ZGRunAlertPanel.h"
 
 #define ZGEditValueLocalizableTable @"[Code] Edit Variable Value"
 

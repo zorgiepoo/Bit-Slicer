@@ -34,10 +34,7 @@
 
 #import "ZGStoredData.h"
 #import "ZGVirtualMemory.h"
-#import "ZGSearchData.h"
 #import "ZGRegion.h"
-#import "ZGSearchProgress.h"
-#import "ZGUtilities.h"
 
 @interface ZGStoredData ()
 

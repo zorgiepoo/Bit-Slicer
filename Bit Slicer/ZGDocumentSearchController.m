@@ -43,12 +43,17 @@
 #import "ZGSearchResults.h"
 #import "ZGStoredData.h"
 #import "ZGCalculator.h"
-#import "ZGUtilities.h"
+#import "ZGDeliverUserNotifications.h"
+#import "ZGRunAlertPanel.h"
 #import "NSArrayAdditions.h"
 #import "ZGDocumentData.h"
 #import "ZGSearchToken.h"
 #import "ZGVariableController.h"
 #import "ZGTableView.h"
+#import "ZGDataValueExtracting.h"
+#import "ZGVariableDataInfo.h"
+#import "ZGMemoryAddressExpressionParsing.h"
+
 #import <DDMathParser/DDMathStringToken.h>
 #import <DDMathParser/DDMathStringTokenizer.h>
 #import <DDMathParser/DDMathOperator.h>

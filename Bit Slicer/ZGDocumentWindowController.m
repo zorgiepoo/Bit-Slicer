@@ -59,7 +59,7 @@
 #import "ZGMachBinaryInfo.h"
 #import "ZGDocumentOptionsViewController.h"
 #import "ZGWatchVariableWindowController.h"
-#import "ZGUtilities.h"
+#import "ZGRunAlertPanel.h"
 #import "ZGLocalization.h"
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"

@@ -38,7 +38,7 @@
 #import "ZGBreakPoint.h"
 #import "ZGRegistersState.h"
 #import "ZGProcess.h"
-#import "ZGUtilities.h"
+#import "ZGDataValueExtracting.h"
 #import "ZGLocalization.h"
 #import "ZGRegister.h"
 #import "ZGRegisterEntries.h"

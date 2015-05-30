@@ -36,13 +36,14 @@
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryStringReading.h"
 #import "ZGMachBinaryInfo.h"
-#import "ZGUtilities.h"
 #import "ZGSearchData.h"
 #import "ZGSearchFunctions.h"
 #import "ZGSearchResults.h"
 #import "ZGSearchProgress.h"
 #import "ZGProcess.h"
 #import "ZGMachBinary.h"
+#import "ZGDataValueExtracting.h"
+#import "ZGVariableDataInfo.h"
 #import "structmember.h"
 
 typedef struct

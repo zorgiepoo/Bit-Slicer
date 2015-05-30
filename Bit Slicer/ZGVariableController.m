@@ -39,7 +39,7 @@
 #import "ZGProcess.h"
 #import "NSStringAdditions.h"
 #import "ZGCalculator.h"
-#import "ZGUtilities.h"
+#import "ZGRunAlertPanel.h"
 #import "ZGInstruction.h"
 #import "ZGVirtualMemory.h"
 #import "ZGVirtualMemoryUserTags.h"
@@ -52,6 +52,9 @@
 #import "ZGMachBinaryInfo.h"
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
+#import "ZGVariableDataInfo.h"
+#import "ZGDataValueExtracting.h"
+#import "ZGProtectionDescription.h"
 
 #define ZGLocalizedStringFromVariableActionsTable(string) NSLocalizedStringFromTable((string), @"[Code] Variable Actions", nil)
 

@@ -33,6 +33,7 @@
  */
 
 #import "ZGMemoryWindowController.h"
+#import "ZGProcessTaskManager.h"
 #import "ZGBreakPoint.h" // For seeing if we can pause/unpause a process
 #import "NSArrayAdditions.h"
 #import "ZGProcessList.h"
@@ -44,7 +45,8 @@
 #import "ZGMemoryProtectionWindowController.h"
 #import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
-#import "ZGUtilities.h"
+#import "ZGStaticSelectorChecker.h"
+#import "ZGDebugLogging.h"
 
 #define ZGLocalizedStringFromMemoryWindowTable(string) NSLocalizedStringFromTable((string), @"[Code] Memory Window", nil)
 

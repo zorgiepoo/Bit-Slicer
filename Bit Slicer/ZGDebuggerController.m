@@ -34,6 +34,7 @@
 
 #import "ZGDebuggerController.h"
 #import "ZGDebuggerUtilities.h"
+#import "ZGProcessTaskManager.h"
 #import "ZGProcess.h"
 #import "ZGRegion.h"
 #import "ZGCalculator.h"
@@ -46,7 +47,9 @@
 #import "ZGScriptingInterpreter.h"
 #import "ZGScriptManager.h"
 #import "ZGDisassemblerObject.h"
-#import "ZGUtilities.h"
+#import "ZGDebugLogging.h"
+#import "ZGDeliverUserNotifications.h"
+#import "ZGRunAlertPanel.h"
 #import "ZGPreferencesController.h"
 #import "NSArrayAdditions.h"
 #import "ZGVirtualMemory.h"
@@ -57,6 +60,8 @@
 #import "ZGBacktrace.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGHotKey.h"
+#import "ZGDataValueExtracting.h"
+#import "ZGMemoryAddressExpressionParsing.h"
 
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"

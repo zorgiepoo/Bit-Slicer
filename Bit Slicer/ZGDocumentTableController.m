@@ -50,9 +50,9 @@
 #import "ZGDocumentData.h"
 #import "ZGDocumentWindowController.h"
 #import "ZGScriptManager.h"
-#import "ZGUtilities.h"
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
+#import "ZGProtectionDescription.h"
 
 @implementation ZGDocumentTableController
 {

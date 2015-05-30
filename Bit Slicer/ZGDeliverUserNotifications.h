@@ -1,7 +1,7 @@
 /*
- * Created by Mayur Pawashe on 5/12/11.
+ * Created by Mayur Pawashe on 5/29/15.
  *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2015 zgcoder
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,40 +32,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
-#import "ZGVariable.h"
-#import "ZGSearchData.h"
-#import "ZGSearchFunctions.h"
-#import "ZGProcessTaskManager.h"
-#import "ZGProcess.h"
-
-#ifdef _BSDEBUG
-	#define ZG_LOG(format, args...) NSLog(format, ##args)
-#else
-	#define ZG_LOG(format, ...) do { } while (0)
-#endif
-
-#define ZG_SELECTOR_STRING(object, name) (sizeof(object.name), @#name)
-
-ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression);
-BOOL ZGIsValidNumber(NSString *expression);
-
-BOOL ZGIsNumericalDataType(ZGVariableType dataType);
-ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType dataType);
-
-void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
-void *ZGSwappedValue(BOOL isProcess64Bit, void *value, ZGVariableType dataType, ZGMemorySize dataSize);
-
-ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
-
-NSArray *ZGByteArrayComponentsFromString(NSString *searchString);
-unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);
-
-NSString *ZGProtectionDescription(ZGMemoryProtection protection);
+#import <Cocoa/Cocoa.h>
 
 void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, NSDictionary *userInfo);
 void ZGDeliverUserNotificationWithReply(NSString *title, NSString *subtitle, NSString *informativeText, NSString *responsePlaceholder, NSDictionary *userInfo);
-
-void ZGRunAlertPanelWithOKButton(NSString *title, NSString *message);
-NSInteger ZGRunAlertPanelWithDefaultAndCancelButton(NSString *title, NSString *message, NSString *defaultButtonTitle);
