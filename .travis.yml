@@ -1,2 +1,2 @@
 language: objective-c
-script: xcodebuild -target 'Bit Slicer Tests' -scheme 'Tests' test
+script: xcodebuild -target 'Bit Slicer Tests' -scheme 'Tests' test CODE_SIGNING_REQUIRED=NO
