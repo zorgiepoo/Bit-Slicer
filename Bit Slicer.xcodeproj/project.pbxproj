@@ -2629,6 +2629,7 @@
 					"-Wno-selector",
 					"-Wno-c++11-long-long",
 					"-Wno-variadic-macros",
+					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
 					"-Werror",
 				);
@@ -2733,6 +2734,7 @@
 					"-Wno-selector",
 					"-Wno-c++11-long-long",
 					"-Wno-variadic-macros",
+					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
 					"-Werror",
 				);

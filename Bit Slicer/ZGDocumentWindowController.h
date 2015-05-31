@@ -74,7 +74,7 @@
 @property (nonatomic) ZGDocumentSearchController *searchController;
 @property (nonatomic) ZGScriptManager *scriptManager;
 
-@property (nonatomic) ZGProcess *currentProcess;
+//@property (nonatomic) ZGProcess *currentProcess;
 
 @property (assign, nonatomic) ZGDocumentData *documentData;
 @property (assign, nonatomic) ZGSearchData *searchData;

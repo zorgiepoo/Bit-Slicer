@@ -86,7 +86,7 @@
 @property (nonatomic) NSString *flagsStringValue;
 @property (nonatomic) NSString *flagsLabelStringValue;
 
-@property (nonatomic) ZGDebuggerController *debuggerController;
+//@property (nonatomic) ZGDebuggerController *debuggerController;
 @property (nonatomic) ZGBreakPointController *breakPointController;
 @property (nonatomic) ZGMemoryViewerController *memoryViewer;
 @property (nonatomic) ZGLoggerWindowController *loggerWindowController;
