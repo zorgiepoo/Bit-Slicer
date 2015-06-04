@@ -35,6 +35,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class ZGDocumentWindowController;
+@class ZGVariable;
 
 @interface ZGDocumentTableController : NSObject <NSTableViewDelegate, NSTableViewDataSource>
 
@@ -42,6 +43,8 @@
 
 - (BOOL)updateWatchVariablesTimer;
 - (BOOL)updateVariableValuesInRange:(NSRange)variableRange;
+
+- (BOOL)updateDynamicVariableAddress:(ZGVariable *)variable;
 
 - (void)clearCache;
 

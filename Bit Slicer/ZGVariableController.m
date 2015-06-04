@@ -440,7 +440,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	 addVariables:@[variable]
 	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
 	
-	[[self class] annotateVariableAutomatically:variable process:windowController.currentProcess];
+	[self annotateVariableAutomatically:variable process:windowController.currentProcess];
 }
 
 #pragma mark Changing Variables
@@ -930,11 +930,12 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		variable.usesDynamicAddress = NO;
 		variable.addressStringValue = [ZGCalculator evaluateExpression:newAddressFormula];
+		
 		[windowController.variablesTableView reloadData];
 	}
 	variable.finishedEvaluatingDynamicAddress = NO;
 	
-	[[self class] annotateVariableAutomatically:variable process:windowController.currentProcess];
+	[self annotateVariableAutomatically:variable process:windowController.currentProcess];
 }
 
 #pragma mark Relativizing Variable Addresses
@@ -981,7 +982,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		if (segmentName != nil)
 		{
 			NSString *partialPath = [machFilePath lastPathComponent];
-			if (machBinaryInfo.slide > 0)
+			if (machBinaryInfo.slide > 0 && !variable.usesDynamicAddress)
 			{
 				NSString *pathToUse = nil;
 				NSString *baseArgument = @"";
@@ -1020,12 +1021,20 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	return staticVariableDescription;
 }
 
-+ (void)annotateVariableAutomatically:(ZGVariable *)variable process:(ZGProcess *)process
+- (void)annotateVariableAutomatically:(ZGVariable *)variable process:(ZGProcess *)process
 {
 	if (!variable.userAnnotated)
 	{
+		// Clear the description so we can automatically fill it again
 		variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:@""];
-		[self annotateVariables:@[variable] process:process];
+		
+		// Update the variable's address
+		ZGDocumentWindowController *windowController = _windowController;
+		[windowController.tableController updateDynamicVariableAddress:variable];
+		
+		// Re-annotate the variable
+		[[self class] annotateVariables:@[variable] process:process];
+		[windowController.variablesTableView reloadData];
 	}
 }
 
