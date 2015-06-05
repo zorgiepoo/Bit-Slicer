@@ -586,9 +586,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	_size = (newType == ZGByteArray) ? requestedSize : [ZGVariable sizeFromType:newType pointerSize:pointerSize];
 }
 
-// Precondition: size != pointerSize, otherwise this is a wasted effort
-//               also, this must be a pointer type variable
-- (void)setPointerSize:(ZGMemorySize)pointerSize
+// Precondition: size != pointerSize, otherwise this is a wasted. Also, this must be a pointer type variable
+- (void)changePointerSize:(ZGMemorySize)pointerSize
 {
 	[self cleanState];
 	_size = [ZGVariable sizeFromType:_type pointerSize:pointerSize];

@@ -313,7 +313,7 @@
 		{
 			if (variable.type == ZGPointer)
 			{
-				variable.pointerSize = self.currentProcess.pointerSize;
+				[variable changePointerSize:self.currentProcess.pointerSize];
 			}
 		}
 	}

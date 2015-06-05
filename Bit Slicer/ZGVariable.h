@@ -88,6 +88,6 @@ extern NSString *ZGVariablePboardType;
 - (void)updateStringValue;
 
 - (void)setType:(ZGVariableType)newType requestedSize:(ZGMemorySize)requestedSize pointerSize:(ZGMemorySize)pointerSize;
-- (void)setPointerSize:(ZGMemorySize)pointerSize;
+- (void)changePointerSize:(ZGMemorySize)pointerSize;
 
 @end

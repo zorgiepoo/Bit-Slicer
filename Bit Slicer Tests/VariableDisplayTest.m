@@ -451,7 +451,7 @@ static double ZGSwapDoubleHostToBig(double value)
 	
 	XCTAssertEqualObjects(pointerVariable.stringValue, @"0xFFFFFFFFFFFFFFFF");
 	
-	[pointerVariable setPointerSize:4];
+	[pointerVariable changePointerSize:4];
 	pointerVariable.rawValue = (uint32_t []){(uint32_t)-1};
 	
 	XCTAssertEqualObjects(pointerVariable.stringValue, @"0xFFFFFFFF");
