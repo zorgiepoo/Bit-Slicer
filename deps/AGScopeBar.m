@@ -119,7 +119,11 @@
 	mIsEnabled = YES;
 	
 	{
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
 		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_9) {
+#else
+		if (floor(NSAppKitVersionNumber) > 1265) {
+#endif
 			// Yosemite and Later
 			mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
 			
@@ -1039,7 +1043,11 @@
 			[mGroupPopupButton setFont:mScopeBar.scopeBarAppearance.itemButtonFont];
 			[mGroupPopupButton setBezelStyle:NSRecessedBezelStyle];
 			[mGroupPopupButton setButtonType:NSPushOnPushOffButton];
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
 			[mGroupPopupButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
+#else
+			[mGroupPopupButton.cell setHighlightsBy:(NSCellIsBordered | NSCellIsInsetButton)];
+#endif
 			[mGroupPopupButton setShowsBorderOnlyWhileMouseInside:YES];
 			[mGroupPopupButton.cell setAltersStateOfSelectedItem:NO];
 			[mGroupPopupButton.cell setArrowPosition:NSPopUpArrowAtBottom];
@@ -1529,7 +1537,11 @@
 	[button setAction:@selector(scopeButtonClicked:)];
 	[button setBezelStyle:NSRecessedBezelStyle];
 	[button setButtonType:NSPushOnPushOffButton];
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
 	[button.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
+#else
+	[button.cell setHighlightsBy:(NSCellIsBordered | NSCellIsInsetButton)];
+#endif
 	[button setShowsBorderOnlyWhileMouseInside:YES];
 	[button.cell setBackgroundStyle:NSBackgroundStyleRaised];
 	
@@ -1632,7 +1644,11 @@
 	mRecessedButton.buttonType = NSPushOnPushOffButton;
 	mRecessedButton.bezelStyle = NSRecessedBezelStyle;
 	mRecessedButton.showsBorderOnlyWhileMouseInside = NO;
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
 	[mRecessedButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
+#else
+	[mRecessedButton.cell setHighlightsBy:(NSCellIsBordered | NSCellIsInsetButton)];
+#endif
 	mRecessedButton.state = NSOnState;
 	
 	// We use another popup cell so that the font of the displayed menu does not

@@ -107,8 +107,14 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_LIBDISPATCH, @"libdispatch")
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ACCELERATE)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREUI, @"CoreUI")
+			
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREUIFILE, @"CoreUI File")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_GENEALOGY, @"Genealogy");
+#else
+			ZGHandleUserTagCaseWithDescription(userTagDescription, 77, @"CoreUI File")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, 78, @"Genealogy");
+#endif
 	}
 	
 	return userTagDescription;

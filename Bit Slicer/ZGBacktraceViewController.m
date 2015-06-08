@@ -67,7 +67,11 @@
 	_tableView.target = self;
 	_tableView.doubleAction = @selector(changeInstructionSelection:);
 	
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
 	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_9)
+#else
+	if (floor(NSAppKitVersionNumber) <= 1265)
+#endif
 	{
 		[self setNextResponder:[_tableView nextResponder]];
 		[_tableView setNextResponder:self];
