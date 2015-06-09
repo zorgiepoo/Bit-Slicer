@@ -39,11 +39,11 @@
 
 @interface ZGInstruction : NSObject
 
-- (id)initWithVariable:(ZGVariable *)variable text:(NSString *)text mnemonic:(int)mnemonic;
+- (nonnull id)initWithVariable:(nonnull ZGVariable *)variable text:(nonnull NSString *)text mnemonic:(int)mnemonic;
 
-@property (nonatomic, readonly, copy) NSString *text;
+@property (nonatomic, readonly, copy, nonnull) NSString *text;
 @property (nonatomic, readonly) int mnemonic;
-@property (nonatomic, readonly) ZGVariable *variable;
-@property (nonatomic, copy) NSString *symbols;
+@property (nonatomic, readonly, nonnull) ZGVariable *variable;
+@property (nonatomic, copy, nullable) NSString *symbols;
 
 @end

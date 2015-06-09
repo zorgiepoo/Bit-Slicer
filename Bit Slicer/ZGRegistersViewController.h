@@ -45,13 +45,13 @@
 
 @interface ZGRegistersViewController : NSViewController
 
-- (id)initWithUndoManager:(NSUndoManager *)undoManager delegate:(id <ZGRegistersViewDelegate>)delegate;
+- (nonnull id)initWithUndoManager:(nullable NSUndoManager *)undoManager delegate:(nullable id <ZGRegistersViewDelegate>)delegate;
 
 @property (nonatomic, readonly) ZGMemoryAddress instructionPointer;
 @property (nonatomic, readonly) ZGMemoryAddress basePointer;
 
 - (void)changeInstructionPointer:(ZGMemoryAddress)newInstructionPointer;
 
-- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint;
+- (void)updateRegistersFromBreakPoint:(nonnull ZGBreakPoint *)breakPoint;
 
 @end

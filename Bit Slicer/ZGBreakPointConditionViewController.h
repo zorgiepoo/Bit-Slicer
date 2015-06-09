@@ -37,16 +37,16 @@
 
 @protocol ZGBreakPointConditionDelegate <NSObject>
 
-- (void)breakPointCondition:(NSString *)condition didChangeAtAddress:(ZGMemoryAddress)address;
+- (void)breakPointCondition:(nonnull NSString *)condition didChangeAtAddress:(ZGMemoryAddress)address;
 - (void)breakPointConditionDidCancel;
 
 @end
 
 @interface ZGBreakPointConditionViewController : NSViewController
 
-- (id)initWithDelegate:(id <ZGBreakPointConditionDelegate>)delegate;
+- (nonnull id)initWithDelegate:(nullable id <ZGBreakPointConditionDelegate>)delegate;
 
 @property (nonatomic) ZGMemoryAddress targetAddress;
-@property (nonatomic, copy) NSString *condition;
+@property (nonatomic, copy, nullable) NSString *condition;
 
 @end

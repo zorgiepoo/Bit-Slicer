@@ -43,18 +43,18 @@
 
 - (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address;
 
-@property (nonatomic, weak, readonly) id <ZGShowMemoryWindow> delegate;
+@property (nonatomic, weak, readonly, nullable) id <ZGShowMemoryWindow> delegate;
 
 @end
 
 @interface ZGBacktraceViewController : NSViewController
 
-- (id)initWithDelegate:(id <ZGBacktraceViewControllerDelegate>)delegate;
+- (nonnull id)initWithDelegate:(nullable id <ZGBacktraceViewControllerDelegate>)delegate;
 
-@property (nonatomic) ZGBacktrace *backtrace;
-@property (nonatomic) ZGProcess *process;
+@property (nonatomic, nonnull) ZGBacktrace *backtrace;
+@property (nonatomic, nonnull) ZGProcess *process;
 
-@property (nonatomic, readonly) NSArray *selectedInstructions;
-@property (nonatomic, readonly) NSTableView *tableView;
+@property (nonatomic, readonly, nonnull) NSArray *selectedInstructions;
+@property (nonatomic, readonly, nonnull) NSTableView *tableView;
 
 @end

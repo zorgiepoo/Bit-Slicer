@@ -41,13 +41,13 @@
 + (BOOL)isCallMnemonic:(int)mnemonic;
 + (BOOL)isJumpMnemonic:(int)mnemonic;
 
-- (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize;
+- (nonnull id)initWithBytes:(const void * __nonnull)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize;
 
-@property (readonly, nonatomic) void *bytes;
+@property (readonly, nonatomic) void * __nonnull bytes;
 
 // These methods may advance the object's internal position for disassembling instructions
-- (NSArray *)readInstructions;
-- (ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize;
-- (NSString *)readBranchOperand;
+- (nonnull NSArray *)readInstructions;
+- (nullable ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize;
+- (nullable NSString *)readBranchOperand;
 
 @end
