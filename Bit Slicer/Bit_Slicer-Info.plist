@@ -50,7 +50,7 @@
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>SUFeedURL</key>
-	<string>http://web.zgcoder.net/bitslicer/update.php</string>
+	<string>https://zgcoder.net/bitslicer/update/appcast.xml</string>
 	<key>SUEnableSystemProfiling</key>
 	<string>YES</string>
 	<key>LSMinimumSystemVersion</key>
