@@ -149,7 +149,7 @@
 	
 	for (ZGDocument *document in _documentController.documents)
 	{
-		ZGDocumentWindowController *documentWindowController = document.windowControllers.firstObject;
+		ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
 		[documentWindowController cleanupWithAppTerminationState:appTerminationState];
 	}
 	
@@ -160,7 +160,7 @@
 
 + (void)restoreWindowWithIdentifier:(NSString *)identifier state:(NSCoder *)__unused state completionHandler:(void (^)(NSWindow *, NSError *))completionHandler
 {
-	ZGAppController *appController = (ZGAppController *)[[NSApplication sharedApplication] delegate];
+	ZGAppController *appController = (ZGAppController *)[(NSApplication *)[NSApplication sharedApplication] delegate];
 	
 	assert([appController isKindOfClass:[ZGAppController class]]);
 	
@@ -311,7 +311,7 @@
 		{
 			for (ZGDocument *document in _documentController.documents)
 			{
-				ZGDocumentWindowController *documentWindowController = [document.windowControllers firstObject];
+				ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
 				ZGScriptManager *scriptManager = documentWindowController.scriptManager;
 				[scriptManager handleScriptPromptHash:scriptPromptHash withUserNotificationReply:notification.response.string];
 			}

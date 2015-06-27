@@ -106,7 +106,7 @@
 		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
 		7735B05518DAB3E8000371AA /* ZGMemoryNavigationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7735B05418DAB3E8000371AA /* ZGMemoryNavigationWindowController.m */; };
 		773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972EF17D2E6AE00B958EE /* mach_excServer.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros"; }; };
-		773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972F017D2E6AE00B958EE /* mach_excUser.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros"; }; };
+		773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972F017D2E6AE00B958EE /* mach_excUser.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros -Wno-unused-local-typedef"; }; };
 		773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
 		773972FA17D2E80F00B958EE /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
@@ -2509,6 +2509,9 @@
 					"-Wno-variadic-macros",
 					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
+					"-Wno-reserved-id-macro",
+					"-Wno-nullable-to-nonnull-conversion",
+					"-Wno-cast-qual",
 					"-Wno-auto-import",
 					"-Werror",
 				);
@@ -2606,6 +2609,9 @@
 					"-Wno-variadic-macros",
 					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
+					"-Wno-reserved-id-macro",
+					"-Wno-nullable-to-nonnull-conversion",
+					"-Wno-cast-qual",
 					"-Wno-auto-import",
 					"-Werror",
 				);
