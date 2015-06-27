@@ -2513,6 +2513,7 @@
 					"-Wno-nullable-to-nonnull-conversion",
 					"-Wno-cast-qual",
 					"-Wno-auto-import",
+					"-Wno-unknown-warning-option",
 					"-Werror",
 				);
 			};
@@ -2613,6 +2614,7 @@
 					"-Wno-nullable-to-nonnull-conversion",
 					"-Wno-cast-qual",
 					"-Wno-auto-import",
+					"-Wno-unknown-warning-option",
 					"-Werror",
 				);
 			};
