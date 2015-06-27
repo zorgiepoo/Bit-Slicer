@@ -123,7 +123,7 @@
 		if (args.count == 1)
 		{
 			NSError *unusedError = nil;
-			NSNumber *memoryAddressNumber = [[args objectAtIndex:0] evaluateWithSubstitutions:vars evaluator:eval error:&unusedError];
+			NSNumber *memoryAddressNumber = [eval evaluateExpression:args[0] withSubstitutions:vars error:&unusedError];
 			
 			ZGMemoryAddress memoryAddress = [memoryAddressNumber unsignedLongLongValue];
 			ZGProcess *process = [vars objectForKey:ZGProcessVariable];
