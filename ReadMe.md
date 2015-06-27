@@ -50,8 +50,8 @@ It allows you to cheat in video games by searching and modifying values such as 
 ## Contributing
 * Improve the current [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) by fixing errors or by adding content
 * Report bugs or request features on the [issue tracker](https://github.com/zorgiepoo/Bit-Slicer/issues)
-* Help [translate](https://github.com/zorgiepoo/Bit-Slicer/wiki/Localization) Bit Slicer into a different language.
-* Help design better artwork (e.g. application icon), following OS X's Human Interface Guidelines (HIG).
+* Help [translate](https://github.com/zorgiepoo/Bit-Slicer/wiki/Localization) Bit Slicer into a different language
+* Help [design improved artwork](https://github.com/zorgiepoo/Bit-Slicer/issues/18)
 * Learn how to build and contribute to the [source code](https://github.com/zorgiepoo/Bit-Slicer/wiki/Source-Code)
 
 Please read this project's [Code Of Conduct](https://github.com/zorgiepoo/Bit-Slicer/blob/master/CODE_OF_CONDUCT.md) residing in the root level of the project.
