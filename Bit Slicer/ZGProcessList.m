@@ -37,6 +37,7 @@
 #import "ZGRunningProcessObserver.h"
 #import "ZGVirtualMemory.h"
 #import "ZGProcessTaskManager.h"
+#import "ZGStaticSelectorChecker.h"
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
@@ -139,15 +140,15 @@
 	
 	NSMutableArray *newRunningProcesses = [[NSMutableArray alloc] init];
 	
-	int processCount = (int)(length / sizeof(struct kinfo_proc));
-	for (int processIndex = 0; processIndex < processCount; processIndex++)
+	size_t processCount = length / sizeof(struct kinfo_proc);
+	for (size_t processIndex = 0; processIndex < processCount; processIndex++)
 	{
 		uid_t uid = processList[processIndex].kp_eproc.e_ucred.cr_uid;
 		pid_t processID = processList[processIndex].kp_proc.p_pid;
 		
 		// I want user processes and I don't want zombies!
 		// Also don't get a process if it's still being created by fork() or if the pid is -1
-		if (processID != -1 && uid == getuid() && !(processList[processIndex].kp_proc.p_stat & SIDL))
+		if (processID != -1 && uid == getuid() && (processList[processIndex].kp_proc.p_stat & SIDL) == 0)
 		{
 			// Get CPU type
 			// http://stackoverflow.com/questions/1350181/determine-a-processs-architecture
@@ -173,7 +174,7 @@
 		}
 	}
 	
-	NSMutableArray *currentProcesses = [self mutableArrayValueForKey:@"runningProcesses"];
+	NSMutableArray *currentProcesses = [self mutableArrayValueForKey:ZG_SELECTOR_STRING(self, runningProcesses)];
 	
 	if (![currentProcesses isEqualToArray:newRunningProcesses])
 	{
