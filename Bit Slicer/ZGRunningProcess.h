@@ -46,6 +46,10 @@
 @property (readonly, nonatomic) NSString *name;
 @property (readonly, nonatomic) NSImage *icon;
 @property (readonly, nonatomic) BOOL is64Bit;
+@property (readonly, nonatomic) BOOL isGame;
+@property (readonly, nonatomic) BOOL isThirdParty;
+@property (readonly, nonatomic) BOOL isWebContent;
+@property (readonly, nonatomic) BOOL hasHelpers;
 @property (readonly, nonatomic) NSApplicationActivationPolicy activationPolicy;
 
 @end

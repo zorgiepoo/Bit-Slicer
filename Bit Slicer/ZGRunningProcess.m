@@ -42,6 +42,10 @@
 	NSImage *_icon;
 	NSString *_name;
 	BOOL _didFetchInfo;
+	BOOL _isGame;
+	BOOL _isThirdParty;
+	BOOL _isWebContent;
+	BOOL _hasHelpers;
 }
 
 #pragma mark Birth
@@ -84,15 +88,30 @@
 		NSRunningApplication *runningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:_processIdentifier];
 		if (runningApplication != nil)
 		{
-			self->_activationPolicy = runningApplication.activationPolicy;
-			self->_icon = runningApplication.icon;
-			self->_name = runningApplication.localizedName;
+			_activationPolicy = runningApplication.activationPolicy;
+			_icon = runningApplication.icon;
+			_name = runningApplication.localizedName;
+			
+			NSString *bundleIdentifier = runningApplication.bundleIdentifier;
+			_isThirdParty = ![bundleIdentifier hasPrefix:@"com.apple."];
+			_isWebContent = ([_name isEqualToString:@"Safari Web Content"] || [_name isEqualToString:@"Google Chrome Helper"] || [_name isEqualToString:@"Firefox Web Content"]);
+			_hasHelpers = [bundleIdentifier isEqualToString:@"com.apple.Safari"] || [bundleIdentifier isEqualToString:@"com.google.Chrome"];
+			
+			NSBundle *applicationBundle = [NSBundle bundleWithURL:runningApplication.bundleURL];
+			if (applicationBundle != nil)
+			{
+				NSString *category = [applicationBundle objectForInfoDictionaryKey:@"LSApplicationCategoryType"];
+				if ([category isKindOfClass:[NSString class]])
+				{
+					_isGame = [category containsString:@"games"];
+				}
+			}
 		}
 		else
 		{
-			self->_activationPolicy = NSApplicationActivationPolicyProhibited;
-			self->_icon = [NSImage imageNamed:@"NSDefaultApplicationIcon"];
-			self->_name = [_internalName copy];
+			_activationPolicy = NSApplicationActivationPolicyProhibited;
+			_icon = [NSImage imageNamed:@"NSDefaultApplicationIcon"];
+			_name = [_internalName copy];
 		}
 		
 		_didFetchInfo = YES;
@@ -120,6 +139,30 @@
 {
 	[self fetchRunningApplicationInfo];
 	return _name;
+}
+
+- (BOOL)isGame
+{
+	[self fetchRunningApplicationInfo];
+	return _isGame;
+}
+
+- (BOOL)isThirdParty
+{
+	[self fetchRunningApplicationInfo];
+	return _isThirdParty;
+}
+
+- (BOOL)isWebContent
+{
+	[self fetchRunningApplicationInfo];
+	return _isWebContent;
+}
+
+- (BOOL)hasHelpers
+{
+	[self fetchRunningApplicationInfo];
+	return _hasHelpers;
 }
 
 @end

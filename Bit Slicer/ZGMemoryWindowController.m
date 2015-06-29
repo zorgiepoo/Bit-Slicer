@@ -451,7 +451,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 	pid_t ourProcessIdentifier = NSRunningApplication.currentApplication.processIdentifier;
 	
 	BOOL foundTargetProcess = NO;
-	for (ZGRunningProcess *runningProcess in  [_processList.runningProcesses sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"activationPolicy" ascending:YES], [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]])
+	for (ZGRunningProcess *runningProcess in  [_processList.runningProcesses sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, isGame) ascending:NO], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, activationPolicy) ascending:YES], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, isThirdParty) ascending:NO], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, hasHelpers) ascending:YES], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, isWebContent) ascending:NO], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, name) ascending:YES]]])
 	{
 		if (runningProcess.processIdentifier != ourProcessIdentifier)
 		{
