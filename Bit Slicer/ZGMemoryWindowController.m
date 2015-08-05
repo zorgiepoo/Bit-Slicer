@@ -34,6 +34,7 @@
 
 #import "ZGMemoryWindowController.h"
 #import "ZGProcessTaskManager.h"
+#import "ZGRootlessConfiguration.h"
 #import "ZGBreakPoint.h" // For seeing if we can pause/unpause a process
 #import "NSArrayAdditions.h"
 #import "ZGProcessList.h"
@@ -64,13 +65,14 @@
 
 #pragma mark Birth
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
 	self = [super init];
 	
 	if (self != nil)
 	{
 		_processTaskManager = processTaskManager;
+		_rootlessConfiguration = rootlessConfiguration;
 		_delegate = delegate;
 	}
 	
@@ -453,36 +455,43 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 	BOOL foundTargetProcess = NO;
 	for (ZGRunningProcess *runningProcess in  [_processList.runningProcesses sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, isGame) ascending:NO], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, activationPolicy) ascending:YES], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, isThirdParty) ascending:NO], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, hasHelpers) ascending:YES], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, isWebContent) ascending:NO], [NSSortDescriptor sortDescriptorWithKey:ZG_SELECTOR_STRING(runningProcess, name) ascending:YES]]])
 	{
-		if (runningProcess.processIdentifier != ourProcessIdentifier)
+		if (runningProcess.processIdentifier == ourProcessIdentifier)
 		{
-			NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-			assert(runningProcess.name != nil);
-			[[self class] updateProcessMenuItem:menuItem name:runningProcess.name processIdentifier:runningProcess.processIdentifier icon:runningProcess.icon];
+			continue;
+		}
+		
+		if (_rootlessConfiguration != nil && [_rootlessConfiguration isFileURLAffected:runningProcess.fileURL])
+		{
+			continue;
+		}
+		
+		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
+		assert(runningProcess.name != nil);
+		[[self class] updateProcessMenuItem:menuItem name:runningProcess.name processIdentifier:runningProcess.processIdentifier icon:runningProcess.icon];
+		
+		ZGProcess *oldProcess = [oldProcessesDictionary objectForKey:@(runningProcess.processIdentifier)];
+		if (oldProcess != nil)
+		{
+			menuItem.representedObject = oldProcess;
+		}
+		else
+		{
+			ZGProcess *representedProcess =
+			[[ZGProcess alloc]
+			 initWithName:runningProcess.name
+			 internalName:runningProcess.internalName
+			 processID:runningProcess.processIdentifier
+			 is64Bit:runningProcess.is64Bit];
 			
-			ZGProcess *oldProcess = [oldProcessesDictionary objectForKey:@(runningProcess.processIdentifier)];
-			if (oldProcess != nil)
-			{
-				menuItem.representedObject = oldProcess;
-			}
-			else
-			{
-				ZGProcess *representedProcess =
-				[[ZGProcess alloc]
-				 initWithName:runningProcess.name
-				 internalName:runningProcess.internalName
-				 processID:runningProcess.processIdentifier
-				 is64Bit:runningProcess.is64Bit];
-				
-				menuItem.representedObject = representedProcess;
-			}
-			
-			[_runningApplicationsPopUpButton.menu addItem:menuItem];
-			
-			if ((_currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [_desiredProcessInternalName isEqualToString:runningProcess.internalName])
-			{
-				[_runningApplicationsPopUpButton selectItem:_runningApplicationsPopUpButton.lastItem];
-				foundTargetProcess = YES;
-			}
+			menuItem.representedObject = representedProcess;
+		}
+		
+		[_runningApplicationsPopUpButton.menu addItem:menuItem];
+		
+		if ((_currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [_desiredProcessInternalName isEqualToString:runningProcess.internalName])
+		{
+			[_runningApplicationsPopUpButton selectItem:_runningApplicationsPopUpButton.lastItem];
+			foundTargetProcess = YES;
 		}
 	}
 	

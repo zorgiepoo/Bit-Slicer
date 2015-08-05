@@ -39,9 +39,9 @@
 
 @implementation ZGMemoryNavigationWindowController
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
-	self = [super initWithProcessTaskManager:processTaskManager delegate:delegate];
+	self = [super initWithProcessTaskManager:processTaskManager rootlessConfiguration:rootlessConfiguration delegate:delegate];
 	
 	if (self != nil)
 	{

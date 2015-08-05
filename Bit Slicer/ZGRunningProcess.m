@@ -35,12 +35,14 @@
 #import "ZGRunningProcess.h"
 #import <sys/types.h>
 #import <sys/sysctl.h>
+#import <libproc.h>
 
 @implementation ZGRunningProcess
 {
 	NSApplicationActivationPolicy _activationPolicy;
 	NSImage *_icon;
 	NSString *_name;
+	NSURL *_fileURL;
 	BOOL _didFetchInfo;
 	BOOL _isGame;
 	BOOL _isThirdParty;
@@ -91,6 +93,7 @@
 			_activationPolicy = runningApplication.activationPolicy;
 			_icon = runningApplication.icon;
 			_name = runningApplication.localizedName;
+			_fileURL = runningApplication.bundleURL;
 			
 			NSString *bundleIdentifier = runningApplication.bundleIdentifier;
 			_isThirdParty = ![bundleIdentifier hasPrefix:@"com.apple."];
@@ -112,6 +115,17 @@
 			_activationPolicy = NSApplicationActivationPolicyProhibited;
 			_icon = [NSImage imageNamed:@"NSDefaultApplicationIcon"];
 			_name = [_internalName copy];
+			
+			char pathBuffer[PROC_PIDPATHINFO_MAXSIZE] = {0};
+			int numberOfBytesRead = proc_pidpath(_processIdentifier, pathBuffer, sizeof(pathBuffer));
+			if (numberOfBytesRead > 0)
+			{
+				NSString *path = [[NSString alloc] initWithBytes:pathBuffer length:(NSUInteger)numberOfBytesRead encoding:NSUTF8StringEncoding];
+				if (path != nil)
+				{
+					_fileURL = [NSURL fileURLWithPath:path];
+				}
+			}
 		}
 		
 		_didFetchInfo = YES;
@@ -139,6 +153,12 @@
 {
 	[self fetchRunningApplicationInfo];
 	return _name;
+}
+
+- (NSURL *)fileURL
+{
+	[self fetchRunningApplicationInfo];
+	return _fileURL;
 }
 
 - (BOOL)isGame

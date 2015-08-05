@@ -48,6 +48,7 @@
 #import "ZGScriptPrompt.h"
 #import "ZGScriptPromptWindowController.h"
 #import "ZGProcessTaskManager.h"
+#import "ZGRootlessConfiguration.h"
 #import "ZGDocumentController.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGAppUpdaterController.h"
@@ -58,6 +59,8 @@
 #define ZGLoggerIdentifier @"ZGLoggerIdentifier"
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
 #define ZGDebuggerIdentifier @"ZGDebuggerIdentifier"
+
+#define ZGRemoveRootlessProcessesKey @"ZGRemoveRootlessProcessesKey"
 
 @interface ZGAppController : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>
 
@@ -73,6 +76,7 @@
 	ZGBreakPointController *_breakPointController;
 	ZGLoggerWindowController *_loggerWindowController;
 	ZGProcessTaskManager *_processTaskManager;
+	ZGRootlessConfiguration *_rootlessConfiguration;
 	ZGHotKeyCenter *_hotKeyCenter;
 	ZGScriptingInterpreter *_scriptingInterpreter;
 	
@@ -81,6 +85,17 @@
 }
 
 #pragma mark Birth & Death
+
++ (void)initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_10)
+		{
+			[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGRemoveRootlessProcessesKey: @YES}];
+		}
+	});
+}
 
 - (id)init
 {
@@ -91,6 +106,12 @@
 		_appUpdaterController = [[ZGAppUpdaterController alloc] init];
 		
 		_processTaskManager = [[ZGProcessTaskManager alloc] init];
+		
+		NSProcessInfo *processInfo = [NSProcessInfo processInfo];
+		if ([processInfo respondsToSelector:@selector(isOperatingSystemAtLeastVersion:)] && [processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 11, 0}] && [[NSUserDefaults standardUserDefaults] boolForKey:ZGRemoveRootlessProcessesKey])
+		{
+			_rootlessConfiguration = [[ZGRootlessConfiguration alloc] init];
+		}
 
 		_hotKeyCenter = [[ZGHotKeyCenter alloc] init];
 
@@ -103,6 +124,7 @@
 		_debuggerController =
 		[[ZGDebuggerController alloc]
 		 initWithProcessTaskManager:_processTaskManager
+		 rootlessConfiguration:_rootlessConfiguration
 		 breakPointController:_breakPointController
 		 scriptingInterpreter:_scriptingInterpreter
 		 hotKeyCenter:_hotKeyCenter
@@ -112,6 +134,7 @@
 		_memoryViewer =
 		[[ZGMemoryViewerController alloc]
 		 initWithProcessTaskManager:_processTaskManager
+		 rootlessConfiguration:_rootlessConfiguration
 		 haltedBreakPoints:_debuggerController.haltedBreakPoints
 		 delegate:self];
 		
@@ -123,6 +146,7 @@
 			return
 			[[ZGDocumentWindowController alloc]
 			 initWithProcessTaskManager:selfReference->_processTaskManager
+			 rootlessConfiguration:selfReference->_rootlessConfiguration
 			 debuggerController:selfReference->_debuggerController
 			 breakPointController:selfReference->_breakPointController
 			 scriptingInterpreter:selfReference->_scriptingInterpreter

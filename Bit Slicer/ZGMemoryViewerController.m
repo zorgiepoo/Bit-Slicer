@@ -116,9 +116,9 @@
 	});
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>)delegate
 {
-	self = [super initWithProcessTaskManager:processTaskManager delegate:delegate];
+	self = [super initWithProcessTaskManager:processTaskManager rootlessConfiguration:rootlessConfiguration delegate:delegate];
 	if (self != nil)
 	{
 		_haltedBreakPoints = haltedBreakPoints;

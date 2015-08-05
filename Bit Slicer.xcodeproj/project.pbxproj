@@ -82,6 +82,7 @@
 		72D051CB1960A41F00EC532A /* Registers View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051C91960A41F00EC532A /* Registers View.xib */; };
 		72D271D4197C2A6800CC6914 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D271D2197C2A6800CC6914 /* InfoPlist.strings */; };
 		72D72BCB1AB3E9FA005044CF /* ZGLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D72BCA1AB3E9FA005044CF /* ZGLocalization.m */; };
+		72DBC8D51B71A4BB0092ED75 /* ZGRootlessConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8D41B71A4BB0092ED75 /* ZGRootlessConfiguration.m */; };
 		72DEBBB11ADA0ED30053CD3E /* yasm in CopyFiles */ = {isa = PBXBuildFile; fileRef = 77F115A917D2E8AC009E002A /* yasm */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
@@ -425,6 +426,8 @@
 		72D72BC91AB3E9FA005044CF /* ZGLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGLocalization.h; path = "Bit Slicer/ZGLocalization.h"; sourceTree = "<group>"; usesTabs = 1; };
 		72D72BCA1AB3E9FA005044CF /* ZGLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGLocalization.m; path = "Bit Slicer/ZGLocalization.m"; sourceTree = "<group>"; usesTabs = 1; };
 		72D72BCC1AB3FEC0005044CF /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] Script Manager.strings"; sourceTree = "<group>"; };
+		72DBC8D31B71A4BB0092ED75 /* ZGRootlessConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRootlessConfiguration.h; path = "Bit Slicer/ZGRootlessConfiguration.h"; sourceTree = "<group>"; };
+		72DBC8D41B71A4BB0092ED75 /* ZGRootlessConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRootlessConfiguration.m; path = "Bit Slicer/ZGRootlessConfiguration.m"; sourceTree = "<group>"; };
 		770136E8192309740072A192 /* ZGPyVMProtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyVMProtModule.h; path = "Bit Slicer/ZGPyVMProtModule.h"; sourceTree = "<group>"; usesTabs = 1; };
 		770136E9192309740072A192 /* ZGPyVMProtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyVMProtModule.m; path = "Bit Slicer/ZGPyVMProtModule.m"; sourceTree = "<group>"; usesTabs = 1; };
 		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -1409,6 +1412,8 @@
 				722EE74E1B18F8CC00934EF3 /* ZGShowMemoryWindow.h */,
 				777DA25018CE97BE0092DEC9 /* ZGAppTerminationState.h */,
 				777DA25118CE97BE0092DEC9 /* ZGAppTerminationState.m */,
+				72DBC8D31B71A4BB0092ED75 /* ZGRootlessConfiguration.h */,
+				72DBC8D41B71A4BB0092ED75 /* ZGRootlessConfiguration.m */,
 				777DA25318CEA0390092DEC9 /* ZGAppPathUtilities.h */,
 				777DA25418CEA0390092DEC9 /* ZGAppPathUtilities.m */,
 				77179F6918CD34F100BCB6D0 /* ZGAppUpdaterController.h */,
@@ -1662,6 +1667,7 @@
 				77F115EB17D2EDE3009E002A /* ZGRunningProcess.m in Sources */,
 				77F115EE17D2EDEE009E002A /* ZGRunningProcessObserver.m in Sources */,
 				77F115F117D2EDF9009E002A /* ZGDocument.m in Sources */,
+				72DBC8D51B71A4BB0092ED75 /* ZGRootlessConfiguration.m in Sources */,
 				72D72BCB1AB3E9FA005044CF /* ZGLocalization.m in Sources */,
 				77F115F417D2EE0B009E002A /* ZGDocumentData.m in Sources */,
 				770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */,

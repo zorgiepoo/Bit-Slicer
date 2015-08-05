@@ -42,16 +42,18 @@
 
 @class ZGProcess;
 @class ZGProcessTaskManager;
+@class ZGRootlessConfiguration;
 @class ZGProcessList;
 
 @interface ZGMemoryWindowController : NSWindowController
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 @property (nonatomic, readonly) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic, readonly) ZGProcessList *processList;
+@property (nonatomic, readonly) ZGRootlessConfiguration *rootlessConfiguration;
 
 @property (nonatomic, weak, readonly) id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow> delegate;
 
