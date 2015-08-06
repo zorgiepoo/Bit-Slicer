@@ -106,7 +106,7 @@
 				NSString *category = [applicationBundle objectForInfoDictionaryKey:@"LSApplicationCategoryType"];
 				if ([category isKindOfClass:[NSString class]])
 				{
-					_isGame = [category containsString:@"games"];
+					_isGame = [category rangeOfString:@"games"].location != NSNotFound;
 				}
 			}
 		}
