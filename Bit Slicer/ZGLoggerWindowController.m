@@ -33,6 +33,7 @@
  */
 
 #import "ZGLoggerWindowController.h"
+#import "ZGOperatingSystemCompatibility.h"
 
 #define ZGLoggerWindowText @"ZGLoggerWindowText"
 #define MIN_LOG_LINES_TO_RESTORE 50U
@@ -96,7 +97,7 @@
 		[_statusTextField setTextColor:[NSColor controlTextColor]];
 	}
 	
-	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8)
+	if (ZGIsOnMavericksOrLater())
 	{
 		[_statusTextField setStringValue:[NSString stringWithFormat:ZGLocalizedStringFromLoggerWindowTable(@"loggedMessagesFormat"), _numberOfMessages]];
 	}

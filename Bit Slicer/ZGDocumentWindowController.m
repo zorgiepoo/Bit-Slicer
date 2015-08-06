@@ -63,6 +63,7 @@
 #import "ZGLocalization.h"
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
+#import "ZGOperatingSystemCompatibility.h"
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
@@ -383,7 +384,7 @@
 	NSString *formattedNumber = [numberOfVariablesFormatter stringFromNumber:@(variableCount)];
 	
 	NSString *valuesDisplayedString =
-	[(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8) ?
+	[ZGIsOnMavericksOrLater() ?
 	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"displayingValuesLabelFormat"), variableCount] :
 	[NSString stringWithFormat:ZGLocalizableSearchDocumentString((variableCount == 1) ? @"displayingSingleValueLabelFormat" : @"displayingMultipleValuesLabelFormat"), variableCount]
 	 stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];

@@ -33,7 +33,7 @@
 // and replacing deprecated Gestalt() with using NSAppKitVersionNumber
 
 #import "AGScopeBar.h"
-
+#import "ZGOperatingSystemCompatibility.h"
 
 
 #define SCOPE_BAR_HORZ_INSET			8.0						// inset on left and right
@@ -119,11 +119,7 @@
 	mIsEnabled = YES;
 	
 	{
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
-		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_9) {
-#else
-		if (floor(NSAppKitVersionNumber) > 1265) {
-#endif
+		if (ZGIsOnYosemiteOrLater()) {
 			// Yosemite and Later
 			mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
 			

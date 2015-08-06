@@ -52,6 +52,7 @@
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
 #import "ZGTableView.h"
+#import "ZGOperatingSystemCompatibility.h"
 
 #define ZGLocalizableWatchVariableString(string) NSLocalizedStringFromTable(string, @"[Code] Watch Variable", nil)
 
@@ -229,7 +230,7 @@
 	ZGRegistersState *registersState = watchVariable.registersState;
 	
 	NSString *accessedTimes = @"";
-	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8)
+	if (ZGIsOnMavericksOrLater())
 	{
 		accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedTimesFormat"), watchVariable.accessCount];
 	}

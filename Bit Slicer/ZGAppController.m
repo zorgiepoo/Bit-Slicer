@@ -55,6 +55,7 @@
 #import "ZGAppTerminationState.h"
 #import "ZGScriptingInterpreter.h"
 #import "ZGProcess.h"
+#import "ZGOperatingSystemCompatibility.h"
 
 #define ZGLoggerIdentifier @"ZGLoggerIdentifier"
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
@@ -90,7 +91,7 @@
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_10)
+		if (ZGIsOnElCapitanOrLater())
 		{
 			[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGRemoveRootlessProcessesKey: @YES}];
 		}
@@ -107,8 +108,7 @@
 		
 		_processTaskManager = [[ZGProcessTaskManager alloc] init];
 		
-		NSProcessInfo *processInfo = [NSProcessInfo processInfo];
-		if ([processInfo respondsToSelector:@selector(isOperatingSystemAtLeastVersion:)] && [processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 11, 0}] && [[NSUserDefaults standardUserDefaults] boolForKey:ZGRemoveRootlessProcessesKey])
+		if (ZGIsOnElCapitanOrLater() && [[NSUserDefaults standardUserDefaults] boolForKey:ZGRemoveRootlessProcessesKey])
 		{
 			_rootlessConfiguration = [[ZGRootlessConfiguration alloc] init];
 		}

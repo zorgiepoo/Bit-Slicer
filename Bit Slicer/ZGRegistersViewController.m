@@ -42,6 +42,7 @@
 #import "ZGLocalization.h"
 #import "ZGRegister.h"
 #import "ZGRegisterEntries.h"
+#import "ZGOperatingSystemCompatibility.h"
 
 #define ZG_REGISTER_TYPES @"ZG_REGISTER_TYPES"
 #define ZG_DEBUG_QUALIFIER @"ZG_DEBUG_QUALIFIER"
@@ -88,11 +89,7 @@
 {
 	[super loadView];
 	
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
-	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_9)
-#else
-	if (floor(NSAppKitVersionNumber) <= 1265)
-#endif
+	if (!ZGIsOnYosemiteOrLater())
 	{
 		[self setNextResponder:[_tableView nextResponder]];
 		[_tableView setNextResponder:self];

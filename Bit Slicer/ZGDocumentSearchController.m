@@ -53,6 +53,7 @@
 #import "ZGDataValueExtracting.h"
 #import "ZGVariableDataInfo.h"
 #import "ZGMemoryAddressExpressionParsing.h"
+#import "ZGOperatingSystemCompatibility.h"
 
 #import <DDMathParser/DDMathStringToken.h>
 #import <DDMathParser/DDMathStringTokenizer.h>
@@ -229,7 +230,7 @@
 	NSUInteger numberOfVariablesFound = searchProgress.numberOfVariablesFound;
 	NSString *formattedNumber = [numberOfVariablesFoundFormatter stringFromNumber:@(numberOfVariablesFound)];
 	
-	return [(floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_8) ?
+	return [ZGIsOnMavericksOrLater() ?
 	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"foundValuesLabelFormat"), numberOfVariablesFound] :
 	[NSString stringWithFormat:ZGLocalizableSearchDocumentString((numberOfVariablesFound != 1) ? @"foundMultipleValuesLabelFormat" : @"foundSingleValueLabelFormat"), numberOfVariablesFound]
 			stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
