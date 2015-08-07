@@ -46,7 +46,6 @@
 
 @implementation SearchVirtualMemoryTest
 {
-	NSTask *_task;
 	ZGMemoryMap _processTask;
 	NSData *_data;
 	ZGMemorySize _pageSize;
@@ -55,8 +54,6 @@
 - (void)setUp
 {
     [super setUp];
-	
-    // Put setup code here. This method is called before the invocation of each test method in the class.
 	
 	_data = [NSData dataWithContentsOfFile:[[NSBundle bundleForClass:[self class]] pathForResource:@"random_data" ofType:@""]];
 	XCTAssertNotNil(_data);
@@ -67,13 +64,8 @@
 		XCTFail(@"%@ does not exist", taskPath);
 	}
 	
-	_task = [[NSTask alloc] init];
-	_task.launchPath = taskPath;
-	_task.arguments = @[@"man"];
-	_task.standardInput = [NSFileHandle fileHandleWithNullDevice];
-	[_task launch];
-	
-	if (!ZGTaskForPID(_task.processIdentifier, &_processTask))
+	// We'll use our own process because it's a pain to use another one
+	if (!ZGTaskForPID(getpid(), &_processTask))
 	{
 		XCTFail(@"Failed to grant access to task");
 	}
@@ -126,7 +118,6 @@
 {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 	ZGDeallocatePort(_processTask);
-	[_task terminate];
 	
     [super tearDown];
 }
