@@ -4,3 +4,6 @@
 
 /* Menu item for unpausing the target process */
 "unpauseTargetProcess" = "Unpause Target";
+
+/* Selection label name when there is no running target available to select from (i.e, user isn't running any detectable programs) */
+"noTargetAvailable" = "None Available";

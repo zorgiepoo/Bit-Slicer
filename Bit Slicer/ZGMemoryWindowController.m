@@ -488,7 +488,12 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 		
 		[_runningApplicationsPopUpButton.menu addItem:menuItem];
 		
-		if ((_currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [_desiredProcessInternalName isEqualToString:runningProcess.internalName])
+		if (_currentProcess.isDummy)
+		{
+			[_runningApplicationsPopUpButton selectItem:_runningApplicationsPopUpButton.lastItem];
+			foundTargetProcess = YES;
+		}
+		else if ((_currentProcess.processID == runningProcess.processIdentifier || !foundTargetProcess) && [_desiredProcessInternalName isEqualToString:runningProcess.internalName])
 		{
 			[_runningApplicationsPopUpButton selectItem:_runningApplicationsPopUpButton.lastItem];
 			foundTargetProcess = YES;
@@ -496,12 +501,21 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 	}
 	
 	// Handle dead process
-	if (_desiredProcessInternalName != nil && ![_desiredProcessInternalName isEqualToString:[_runningApplicationsPopUpButton.selectedItem.representedObject internalName]])
+	ZGProcess *selectedProcess = _runningApplicationsPopUpButton.selectedItem.representedObject;
+	if (selectedProcess == nil || (_desiredProcessInternalName != nil && ![_desiredProcessInternalName isEqualToString:selectedProcess.internalName]))
 	{
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		[[self class] updateProcessMenuItem:menuItem name:_desiredProcessInternalName processIdentifier:-1 icon:nil];
+		NSString *nameToUse = (_desiredProcessInternalName != nil) ? _desiredProcessInternalName : ZGLocalizedStringFromMemoryWindowTable(@"noTargetAvailable");
+		[[self class] updateProcessMenuItem:menuItem name:nameToUse processIdentifier:-1 icon:nil];
 		
-		menuItem.representedObject = [[ZGProcess alloc] initWithName:nil internalName:_desiredProcessInternalName is64Bit:YES];
+		ZGProcess *deadProcess = [[ZGProcess alloc] initWithName:nil internalName:nameToUse is64Bit:YES];
+		if (_desiredProcessInternalName == nil)
+		{
+			// we want to change the target whenever one comes online regardless of what it is
+			deadProcess.isDummy = YES;
+		}
+		
+		menuItem.representedObject = deadProcess;
 
 		[_runningApplicationsPopUpButton.menu insertItem:menuItem atIndex:0];
 		[_runningApplicationsPopUpButton selectItem:menuItem];
@@ -516,7 +530,10 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 	}
 
 	[self setCurrentProcess:_runningApplicationsPopUpButton.selectedItem.representedObject];
-	[self setDesiredProcessInternalName:_currentProcess.internalName];
+	if (!_currentProcess.isDummy)
+	{
+		[self setDesiredProcessInternalName:_currentProcess.internalName];
+	}
 }
 
 - (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)__unused notification

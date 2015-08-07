@@ -59,6 +59,9 @@
 @property (nonatomic, readonly) NSString *internalName;
 @property (nonatomic, readonly) BOOL is64Bit;
 
+// indicates if this represents any sort of actual program.. admittingly, this is kind of a hack
+@property (nonatomic) BOOL isDummy;
+
 @property (nonatomic, readonly) ZGMachBinary *mainMachBinary;
 @property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
 
