@@ -51,7 +51,7 @@ typedef struct
 
 #endif
 
-BOOL ZGIsOnAtLeast10Dot(NSInteger minorVersion)
+static BOOL ZGIsOnAtLeast10Dot(NSInteger minorVersion)
 {
 	NSProcessInfo *processInfo = [NSProcessInfo processInfo];
 	// This selector exists in at least 10.10 (and possibly even 10.9 as a private API but we shouldn't rely on that)
