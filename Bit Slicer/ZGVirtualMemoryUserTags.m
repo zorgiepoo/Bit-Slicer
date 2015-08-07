@@ -50,6 +50,20 @@ case value: \
 		result = description; \
 		break;
 
+// Needed for building on 10.9 SDK
+#ifndef VM_MEMORY_COREUIFILE
+#define VM_MEMORY_COREUIFILE 77
+#endif
+
+// Needed for building on 10.9 SDK
+#ifndef VM_MEMORY_GENEALOGY
+#define VM_MEMORY_GENEALOGY 78
+#endif
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > 101003 /* __MAC_10_10_3 */
+#error Need to update the user tag descriptions
+#endif
+
 NSString *ZGUserTagDescription(uint32_t userTag)
 {
 	NSString *userTagDescription = nil;
@@ -108,13 +122,8 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ACCELERATE)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREUI, @"CoreUI")
 			
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREUIFILE, @"CoreUI File")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_GENEALOGY, @"Genealogy");
-#else
-			ZGHandleUserTagCaseWithDescription(userTagDescription, 77, @"CoreUI File")
-			ZGHandleUserTagCaseWithDescription(userTagDescription, 78, @"Genealogy");
-#endif
 	}
 	
 	return userTagDescription;

@@ -34,7 +34,7 @@
 
 #import "ZGOperatingSystemCompatibility.h"
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED <= 1090
+#if __MAC_OS_X_VERSION_MAX_ALLOWED <= __MAC_10_9
 
 typedef struct
 {

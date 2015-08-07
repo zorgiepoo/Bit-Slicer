@@ -1039,7 +1039,7 @@
 			[mGroupPopupButton setFont:mScopeBar.scopeBarAppearance.itemButtonFont];
 			[mGroupPopupButton setBezelStyle:NSRecessedBezelStyle];
 			[mGroupPopupButton setButtonType:NSPushOnPushOffButton];
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_9
 			[mGroupPopupButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 #else
 			[mGroupPopupButton.cell setHighlightsBy:(NSCellIsBordered | NSCellIsInsetButton)];
@@ -1533,7 +1533,7 @@
 	[button setAction:@selector(scopeButtonClicked:)];
 	[button setBezelStyle:NSRecessedBezelStyle];
 	[button setButtonType:NSPushOnPushOffButton];
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_9
 	[button.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 #else
 	[button.cell setHighlightsBy:(NSCellIsBordered | NSCellIsInsetButton)];
@@ -1640,7 +1640,7 @@
 	mRecessedButton.buttonType = NSPushOnPushOffButton;
 	mRecessedButton.bezelStyle = NSRecessedBezelStyle;
 	mRecessedButton.showsBorderOnlyWhileMouseInside = NO;
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > 1090
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_9
 	[mRecessedButton.cell setHighlightsBy:(NSCellStyleMask)(NSCellIsBordered | NSCellIsInsetButton)];
 #else
 	[mRecessedButton.cell setHighlightsBy:(NSCellIsBordered | NSCellIsInsetButton)];
