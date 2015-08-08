@@ -84,6 +84,12 @@
 		72D72BCB1AB3E9FA005044CF /* ZGLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D72BCA1AB3E9FA005044CF /* ZGLocalization.m */; };
 		72DBC8D51B71A4BB0092ED75 /* ZGRootlessConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8D41B71A4BB0092ED75 /* ZGRootlessConfiguration.m */; };
 		72DBC8D81B72F31B0092ED75 /* ZGOperatingSystemCompatibility.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8D71B72F31B0092ED75 /* ZGOperatingSystemCompatibility.m */; };
+		72DBC8DB1B755A190092ED75 /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
+		72DBC8DE1B7576D30092ED75 /* ZGTextViewLayoutController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DD1B7576D30092ED75 /* ZGTextViewLayoutController.m */; };
+		72DBC8E61B759BA90092ED75 /* ZGAboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8E41B759BA90092ED75 /* ZGAboutWindowController.m */; };
+		72DBC8EA1B75A7430092ED75 /* About Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC8E81B75A7430092ED75 /* About Window.xib */; };
+		72DBC8F01B7657F20092ED75 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC8EF1B7657F20092ED75 /* LICENSE */; };
+		72DBC91F1B7690BA0092ED75 /* [Code] About Window.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC91D1B7690BA0092ED75 /* [Code] About Window.strings */; };
 		72DEBBB11ADA0ED30053CD3E /* yasm in CopyFiles */ = {isa = PBXBuildFile; fileRef = 77F115A917D2E8AC009E002A /* yasm */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
@@ -431,6 +437,18 @@
 		72DBC8D41B71A4BB0092ED75 /* ZGRootlessConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRootlessConfiguration.m; path = "Bit Slicer/ZGRootlessConfiguration.m"; sourceTree = "<group>"; };
 		72DBC8D61B72F31B0092ED75 /* ZGOperatingSystemCompatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGOperatingSystemCompatibility.h; path = "Bit Slicer/ZGOperatingSystemCompatibility.h"; sourceTree = "<group>"; };
 		72DBC8D71B72F31B0092ED75 /* ZGOperatingSystemCompatibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGOperatingSystemCompatibility.m; path = "Bit Slicer/ZGOperatingSystemCompatibility.m"; sourceTree = "<group>"; };
+		72DBC8D91B755A190092ED75 /* HFByteArray_FindReplace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HFByteArray_FindReplace.h; path = "Bit Slicer/HFByteArray_FindReplace.h"; sourceTree = "<group>"; };
+		72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HFByteArray_FindReplace.cpp; path = "Bit Slicer/HFByteArray_FindReplace.cpp"; sourceTree = "<group>"; };
+		72DBC8DC1B7576D30092ED75 /* ZGTextViewLayoutController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGTextViewLayoutController.h; path = "Bit Slicer/ZGTextViewLayoutController.h"; sourceTree = "<group>"; };
+		72DBC8DD1B7576D30092ED75 /* ZGTextViewLayoutController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGTextViewLayoutController.m; path = "Bit Slicer/ZGTextViewLayoutController.m"; sourceTree = "<group>"; };
+		72DBC8E31B759BA90092ED75 /* ZGAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGAboutWindowController.h; path = "Bit Slicer/ZGAboutWindowController.h"; sourceTree = "<group>"; };
+		72DBC8E41B759BA90092ED75 /* ZGAboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGAboutWindowController.m; path = "Bit Slicer/ZGAboutWindowController.m"; sourceTree = "<group>"; };
+		72DBC8E91B75A7430092ED75 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/About Window.xib"; sourceTree = "<group>"; };
+		72DBC8EC1B75A7670092ED75 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/About Window.strings"; sourceTree = "<group>"; };
+		72DBC8EE1B75A76C0092ED75 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/About Window.strings"; sourceTree = "<group>"; };
+		72DBC8EF1B7657F20092ED75 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		72DBC91E1B7690BA0092ED75 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] About Window.strings"; sourceTree = "<group>"; };
+		72DBC9201B7690C20092ED75 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] About Window.strings"; sourceTree = "<group>"; };
 		770136E8192309740072A192 /* ZGPyVMProtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyVMProtModule.h; path = "Bit Slicer/ZGPyVMProtModule.h"; sourceTree = "<group>"; usesTabs = 1; };
 		770136E9192309740072A192 /* ZGPyVMProtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyVMProtModule.m; path = "Bit Slicer/ZGPyVMProtModule.m"; sourceTree = "<group>"; usesTabs = 1; };
 		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -832,6 +850,7 @@
 				77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */,
 				77F115AD17D2EAE4009E002A /* bitslicericon.iconset */,
 				77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */,
+				72DBC8EF1B7657F20092ED75 /* LICENSE */,
 				77F115B217D2EAFE009E002A /* Credits.rtf */,
 				7216F7D01AC66133005288A8 /* dsa_pub.pem */,
 			);
@@ -865,6 +884,7 @@
 			isa = PBXGroup;
 			children = (
 				726CA29E19606CA600A6AD40 /* MainMenu.xib */,
+				72DBC8E81B75A7430092ED75 /* About Window.xib */,
 				726CA2A119606CB600A6AD40 /* Search Document Window.xib */,
 				726CA2AA19606D0700A6AD40 /* Debugger Window.xib */,
 				72D051AE1960891900EC532A /* Backtrace View.xib */,
@@ -896,6 +916,7 @@
 			isa = PBXGroup;
 			children = (
 				7284245519A96B470081C673 /* Localizable.strings */,
+				72DBC91D1B7690BA0092ED75 /* [Code] About Window.strings */,
 				724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */,
 				724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */,
 				724A9F0719A1657500E72C9D /* [Code] Debugger.strings */,
@@ -1220,6 +1241,8 @@
 			children = (
 				77F115CB17D2ED64009E002A /* ZGMemoryViewerController.h */,
 				77F115CC17D2ED64009E002A /* ZGMemoryViewerController.m */,
+				72DBC8DC1B7576D30092ED75 /* ZGTextViewLayoutController.h */,
+				72DBC8DD1B7576D30092ED75 /* ZGTextViewLayoutController.m */,
 				773972F417D2E7B600B958EE /* DataInspectorRepresenter.h */,
 				773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */,
 				77F115CE17D2ED74009E002A /* ZGVerticalScrollerRepresenter.h */,
@@ -1334,6 +1357,8 @@
 				77F1161417D2EEEC009E002A /* ZGSearchResults.m */,
 				77F1161617D2EEF6009E002A /* ZGSearchFunctions.h */,
 				77F1161717D2EEF6009E002A /* ZGSearchFunctions.mm */,
+				72DBC8D91B755A190092ED75 /* HFByteArray_FindReplace.h */,
+				72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */,
 				7728211E189B854D0044E4BC /* ZGFunctionTypes.h */,
 				7728211F189B854D0044E4BC /* ZGFunctionTypes.m */,
 			);
@@ -1427,6 +1452,8 @@
 				771A3F4418CC0B0900D19676 /* ZGDocumentController.m */,
 				72030ADA1B00191400A5621C /* ZGScriptingInterpreter.h */,
 				72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */,
+				72DBC8E31B759BA90092ED75 /* ZGAboutWindowController.h */,
+				72DBC8E41B759BA90092ED75 /* ZGAboutWindowController.m */,
 				772D1264190E0CE500800B1B /* Preferences */,
 				77CE28B417D538E300998F28 /* ZGLoggerWindowController.h */,
 				77CE28B517D538E300998F28 /* ZGLoggerWindowController.m */,
@@ -1557,7 +1584,9 @@
 				726CA2A919606D0000A6AD40 /* Code Injection Window.xib in Resources */,
 				724A9F5119A8F54600E72C9D /* [Code] Search Document.stringsdict in Resources */,
 				724A9F2619A1657500E72C9D /* [Code] Memory Viewer.strings in Resources */,
+				72DBC91F1B7690BA0092ED75 /* [Code] About Window.strings in Resources */,
 				7284245719A96B470081C673 /* Localizable.strings in Resources */,
+				72DBC8EA1B75A7430092ED75 /* About Window.xib in Resources */,
 				77DA9D0B1800639E00549A37 /* continue.pdf in Resources */,
 				726CA2AF19606D1200A6AD40 /* Memory Viewer Window.xib in Resources */,
 				722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */,
@@ -1599,6 +1628,7 @@
 				724A9F2419A1657500E72C9D /* [Code] Memory Protection.strings in Resources */,
 				72D051CB1960A41F00EC532A /* Registers View.xib in Resources */,
 				72D051AC1960891900EC532A /* Backtrace View.xib in Resources */,
+				72DBC8F01B7657F20092ED75 /* LICENSE in Resources */,
 				7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */,
 				72D051A91960890800EC532A /* Data Inspector View.xib in Resources */,
 				726CA2B019606DA000A6AD40 /* Logs Window.xib in Resources */,
@@ -1708,6 +1738,7 @@
 				770FABB71849160200C176B7 /* ZGEditSizeWindowController.m in Sources */,
 				779D56C518F1284200FD5408 /* ZGMemoryDumpRangeWindowController.m in Sources */,
 				771A3F4818CCF32F00D19676 /* ZGHotKeyCenter.m in Sources */,
+				72DBC8DE1B7576D30092ED75 /* ZGTextViewLayoutController.m in Sources */,
 				772D1217190D85CC00800B1B /* ZGHotKey.m in Sources */,
 				77282126189EA4520044E4BC /* ZGProcessTaskManager.m in Sources */,
 				7231440519C57A5300FBE342 /* ZGRegistersState.m in Sources */,
@@ -1726,6 +1757,7 @@
 				7789C37B189A570F00F1FDAF /* ZGMachBinaryInfo.m in Sources */,
 				770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */,
 				7714194118AC7D8500600423 /* ZGMemoryDumpFunctions.m in Sources */,
+				72DBC8E61B759BA90092ED75 /* ZGAboutWindowController.m in Sources */,
 				77F1164017D2EF9E009E002A /* ZGDebuggerController.m in Sources */,
 				77F1164317D2EFB4009E002A /* ZGDisassemblerObject.m in Sources */,
 				77F1164617D2EFBD009E002A /* ZGInstruction.m in Sources */,
@@ -1748,6 +1780,7 @@
 				77CE28BA17D580AD00998F28 /* ZGPyMainModule.m in Sources */,
 				779D56C018F0775500FD5408 /* ZGMemoryProtectionWindowController.m in Sources */,
 				777AD8C717D96F30003A5317 /* ZGPyDebugger.m in Sources */,
+				72DBC8DB1B755A190092ED75 /* HFByteArray_FindReplace.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2241,6 +2274,25 @@
 				72D72BC81AB28B8C005044CF /* ru */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		72DBC8E81B75A7430092ED75 /* About Window.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				72DBC8E91B75A7430092ED75 /* Base */,
+				72DBC8EC1B75A7670092ED75 /* en */,
+				72DBC8EE1B75A76C0092ED75 /* ru */,
+			);
+			name = "About Window.xib";
+			sourceTree = "<group>";
+		};
+		72DBC91D1B7690BA0092ED75 /* [Code] About Window.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				72DBC91E1B7690BA0092ED75 /* en */,
+				72DBC9201B7690C20092ED75 /* ru */,
+			);
+			name = "[Code] About Window.strings";
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

@@ -8,8 +8,6 @@ Bit Slicer is a universal game trainer for OS X, written using Cocoa and Mach ke
 
 It allows you to cheat in video games by searching and modifying values such as your score, lives, ammunition, and much more.
 
-*Disclaimer: Use this software at your own risk. I'm not responsible for any damage that could occur.*
-
 ## Features
 * Memory Scanner
 	* Search & narrow down values of several types: integers, floating-points, strings, byte arrays, and pointers

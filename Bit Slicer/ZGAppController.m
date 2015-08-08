@@ -1,7 +1,5 @@
 /*
- * Created by Mayur Pawashe on 2/5/10.
- *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2012 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,6 +54,7 @@
 #import "ZGScriptingInterpreter.h"
 #import "ZGProcess.h"
 #import "ZGOperatingSystemCompatibility.h"
+#import "ZGAboutWindowController.h"
 
 #define ZGLoggerIdentifier @"ZGLoggerIdentifier"
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
@@ -80,6 +79,8 @@
 	ZGRootlessConfiguration *_rootlessConfiguration;
 	ZGHotKeyCenter *_hotKeyCenter;
 	ZGScriptingInterpreter *_scriptingInterpreter;
+	ZGAboutWindowController *_aboutWindowController;
+	
 	
 	NSString *_lastChosenInternalProcessName;
 	NSMutableDictionary *_memorySelectionRanges;
@@ -269,6 +270,15 @@
 - (IBAction)checkForUpdates:(id)__unused sender
 {
 	[_appUpdaterController checkForUpdates];
+}
+
+- (IBAction)openAboutWindow:(id)__unused sender
+{
+	if (_aboutWindowController == nil)
+	{
+		_aboutWindowController = [[ZGAboutWindowController alloc] init];
+	}
+	[_aboutWindowController showWindow:nil];
 }
 
 #pragma mark Delegate Methods

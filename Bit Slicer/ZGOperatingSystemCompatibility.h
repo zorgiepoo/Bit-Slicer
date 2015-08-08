@@ -1,7 +1,5 @@
 /*
- * Created by Mayur Pawashe on 8/5/15.
- *
- * Copyright (c) 2015 zgcoder
+ * Copyright (c) 2015 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

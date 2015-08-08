@@ -1,7 +1,5 @@
 /*
- * Created by Mayur Pawashe on 8/29/13.
- *
- * Copyright (c) 2013 zgcoder
+ * Copyright (c) 2013 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,6 +38,7 @@
 #import "NSArrayAdditions.h"
 #import "ZGSearchResults.h"
 #import "ZGStoredData.h"
+#import "HFByteArray_FindReplace.h"
 #import <stdint.h>
 
 #define MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES 4096U
@@ -111,68 +110,6 @@ double ZGSwapBytes<double>(double value)
 {
 	CFSwappedFloat64 swappedValue = *(reinterpret_cast<CFSwappedFloat64 *>(&value));
 	return CFConvertFloat64SwappedToHost(swappedValue);
-}
-
-#pragma mark Boyer Moore Function
-
-// Fast string-searching function from HexFiend's framework
-extern "C" unsigned char* boyer_moore_helper(const unsigned char *haystack, const unsigned char *needle, unsigned long haystack_length, unsigned long needle_length, const unsigned long *char_jump, const unsigned long *match_jump);
-
-// This portion of code is mostly stripped from a function in Hex Fiend's framework; it's wicked fast.
-void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long needle_length, unsigned long *char_jump, unsigned long *match_jump)
-{
-	unsigned long *backup;
-	unsigned long u, ua, ub;
-	backup = match_jump + needle_length + 1;
-	
-	// heuristic #1 setup, simple text search
-	for (u=0; u < sizeof char_jump / sizeof *char_jump; u++)
-	{
-		char_jump[u] = needle_length;
-	}
-	
-	for (u = 0; u < needle_length; u++)
-	{
-		char_jump[(static_cast<unsigned char>(needle[u]))] = needle_length - u - 1;
-	}
-	
-	// heuristic #2 setup, repeating pattern search
-	for (u = 1; u <= needle_length; u++)
-	{
-		match_jump[u] = 2 * needle_length - u;
-	}
-	
-	u = needle_length;
-	ua = needle_length + 1;
-	while (u > 0)
-	{
-		backup[u] = ua;
-		while (ua <= needle_length && needle[u - 1] != needle[ua - 1])
-		{
-			if (match_jump[ua] > needle_length - u) match_jump[ua] = needle_length - u;
-			ua = backup[ua];
-		}
-		u--; ua--;
-	}
-	
-	for (u = 1; u <= ua; u++)
-	{
-		if (match_jump[u] > needle_length + ua - u) match_jump[u] = needle_length + ua - u;
-	}
-	
-	ub = ua;
-	while (ua <= needle_length)
-	{
-		ub = backup[ub];
-		while (ua <= ub)
-		{
-			if (match_jump[ua] > ub - ua + needle_length)
-			{
-				match_jump[ua] = ub - ua + needle_length;
-			}
-			ua++;
-		}
-	}
 }
 
 #pragma mark Generic Searching

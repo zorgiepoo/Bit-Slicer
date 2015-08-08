@@ -29,8 +29,8 @@
 //	distribution.
 //
 
-// Modified by Mayur to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
-// and replacing deprecated Gestalt() with using NSAppKitVersionNumber
+// Modified to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
+// and replacing deprecated Gestalt() usage
 
 #import "AGScopeBar.h"
 #import "ZGOperatingSystemCompatibility.h"

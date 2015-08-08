@@ -1,0 +1,5 @@
+/* Label for Credits button */
+"credits" = "Credits";
+
+/* Label for Acknowledgements button (shows copyrights, software licenses, etc) */
+"acknowledgements" = "Acknowledgements";

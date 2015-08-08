@@ -1,7 +1,5 @@
 /*
- * Created by Mayur Pawashe on 5/11/11.
- *
- * Copyright (c) 2012 zgcoder
+ * Copyright (c) 2012 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +31,7 @@
  */
 
 #import "ZGMemoryViewerController.h"
+#import "ZGTextViewLayoutController.h"
 #import "ZGStatusBarRepresenter.h"
 #import "ZGLineCountingRepresenter.h"
 #import "ZGVerticalScrollerRepresenter.h"
@@ -58,6 +57,8 @@
 @implementation ZGMemoryViewerController
 {
 	NSMutableArray *_haltedBreakPoints;
+	
+	ZGTextViewLayoutController *_textViewLayoutController;
 	
 	ZGStatusBarRepresenter *_statusBarRepresenter;
 	ZGLineCountingRepresenter *_lineCountingRepresenter;
@@ -159,6 +160,8 @@
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
+	
+	_textViewLayoutController = [[ZGTextViewLayoutController alloc] init];
 
 	// So, I've no idea what HFTextView does by default, remove any type of representer that it might have and that we want to add
 	NSMutableArray *representersToRemove = [[NSMutableArray alloc] init];
@@ -269,7 +272,7 @@
 	_dataInspectorRepresenter = [[DataInspectorRepresenter alloc] init];
 	
 	[_dataInspectorRepresenter resizeTableViewAfterChangingRowCount];
-	[self relayoutAndResizeWindowPreservingFrame];
+	[_textViewLayoutController relayoutAndResizeWindow:self.window preservingFrameWithTextView:_textView];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataInspectorChangedRowCount:) name:DataInspectorDidChangeRowCount object:_dataInspectorRepresenter];
 	
@@ -287,71 +290,22 @@
 	[[NSUserDefaults standardUserDefaults] setBool:_showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
 }
 
-- (NSSize)minimumWindowFrameSizeForProposedSize:(NSSize)frameSize
+- (void)dataInspectorDeletedAllRows:(NSNotification *)notification
 {
-    NSView *layoutView = [_textView.layoutRepresenter view];
-    NSSize proposedSizeInLayoutCoordinates = [layoutView convertSize:frameSize fromView:nil];
-    CGFloat resultingWidthInLayoutCoordinates = [_textView.layoutRepresenter minimumViewWidthForLayoutInProposedWidth:proposedSizeInLayoutCoordinates.width];
-    NSSize resultSize = [layoutView convertSize:NSMakeSize(resultingWidthInLayoutCoordinates, proposedSizeInLayoutCoordinates.height) toView:nil];
-    return resultSize;
-}
-
-- (void)relayoutAndResizeWindowPreservingBytesPerLine
-{
-	const NSUInteger bytesMultiple = 4;
-	NSUInteger remainder = _textView.controller.bytesPerLine % bytesMultiple;
-	NSUInteger bytesPerLineRoundedUp = (remainder == 0) ? (_textView.controller.bytesPerLine) : (_textView.controller.bytesPerLine + bytesMultiple - remainder);
-	NSUInteger bytesPerLineRoundedDown = bytesPerLineRoundedUp - bytesMultiple;
+	[_textViewLayoutController dataInspectorDeletedAllRows:notification.object window:self.window textView:_textView];
 	
-	// Pick bytes per line that is closest to what we already have and is multiple of bytesMultiple
-	NSUInteger bytesPerLine = (bytesPerLineRoundedUp - _textView.controller.bytesPerLine) > (_textView.controller.bytesPerLine - bytesPerLineRoundedDown) ? bytesPerLineRoundedDown : bytesPerLineRoundedUp;
-	
-    NSWindow *window = [self window];
-    NSRect windowFrame = [window frame];
-    NSView *layoutView = [_textView.layoutRepresenter view];
-    CGFloat minViewWidth = [_textView.layoutRepresenter minimumViewWidthForBytesPerLine:bytesPerLine];
-    CGFloat minWindowWidth = [layoutView convertSize:NSMakeSize(minViewWidth, 1) toView:nil].width;
-    windowFrame.size.width = minWindowWidth;
-    [window setFrame:windowFrame display:YES];
-}
-
-// Relayout the window without increasing its window frame size
-- (void)relayoutAndResizeWindowPreservingFrame
-{
-	NSWindow *window = [self window];
-	NSRect windowFrame = [window frame];
-	windowFrame.size = [self minimumWindowFrameSizeForProposedSize:windowFrame.size];
-	[window setFrame:windowFrame display:YES];
-}
-
-- (void)dataInspectorDeletedAllRows:(NSNotification *)note
-{
-	DataInspectorRepresenter *inspector = [note object];
-	[_textView.controller removeRepresenter:inspector];
-	[[_textView layoutRepresenter] removeRepresenter:inspector];
-	[self relayoutAndResizeWindowPreservingFrame];
 	_showsDataInspector = NO;
-	
 	[[NSUserDefaults standardUserDefaults] setBool:_showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
 }
 
-// Called when our data inspector changes its size (number of rows)
 - (void)dataInspectorChangedRowCount:(NSNotification *)note
 {
-	DataInspectorRepresenter *inspector = [note object];
-	CGFloat newHeight = (CGFloat)[[[note userInfo] objectForKey:@"height"] doubleValue];
-	NSView *dataInspectorView = [inspector view];
-	NSSize size = [dataInspectorView frame].size;
-	size.height = newHeight;
-	size.width = 1; // this is a hack that makes the data inspector's width actually resize..
-	[dataInspectorView setFrameSize:size];
-	
-	[_textView.layoutRepresenter performLayout];
+	[_textViewLayoutController dataInspectorChangedRowCount:note.object withHeight:note.userInfo[@"height"] textView:_textView];
 }
 
 - (void)windowDidResize:(NSNotification *)__unused notification
 {
-	[self relayoutAndResizeWindowPreservingBytesPerLine];
+	[_textViewLayoutController relayoutAndResizeWindow:self.window preservingBytesPerLineWithTextView:_textView];
 }
 
 #pragma mark Updating running applications
@@ -543,7 +497,7 @@
 			}
 		}
 		
-		[self relayoutAndResizeWindowPreservingBytesPerLine];
+		[_textViewLayoutController relayoutAndResizeWindow:self.window preservingBytesPerLineWithTextView:_textView];
 		
 		[self jumpToMemoryAddress:desiredMemoryAddress withSelectionLength:selectionLength];
 		
