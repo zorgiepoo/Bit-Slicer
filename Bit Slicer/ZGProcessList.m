@@ -39,6 +39,8 @@
 #import <sys/types.h>
 #import <sys/sysctl.h>
 
+#define SYSCTL_PROC_CPUTYPE "sysctl.proc_cputype"
+
 @implementation ZGProcessList
 {
 	ZGProcessTaskManager *_processTaskManager;
@@ -48,6 +50,10 @@
 	NSUInteger _pollRequestCount;
 	NSMutableArray *_priorityProcesses;
 	NSMutableArray *_pollObservers;
+	
+	// For SYSCTL_PROC_CPUTYPE MIB storage
+	int _processTypeName[CTL_MAXNAME];
+	size_t _processTypeNameLength;
 }
 
 #pragma mark Setter & Accessors
@@ -95,6 +101,7 @@
 	if (self != nil)
 	{
 		_runningProcesses = [[NSMutableArray alloc] init];
+		[self retrieveProcessTypeInfoForMIB];
 		[self retrieveList];
 	}
 	return self;
@@ -112,25 +119,43 @@
 
 #pragma mark Process Retrieval
 
-// http://stackoverflow.com/questions/7729245/can-i-use-sysctl-to-retrieve-a-process-list-with-the-user
-// http://www.nightproductions.net/dsprocessesinfo_m.html
-// Apparently I could use proc_listpids instead of sysctl.. Although we are already using sysctl for obtaining CPU architecture, and I'm unsure if this would actually be a better choice
+- (void)retrieveProcessTypeInfoForMIB
+{
+	const size_t maxLength = sizeof(_processTypeName) / sizeof(*_processTypeName);
+	_processTypeNameLength = maxLength;
+	
+	int result = sysctlnametomib(SYSCTL_PROC_CPUTYPE, _processTypeName, &_processTypeNameLength);
+	assert(result == 0);
+	assert(_processTypeNameLength < maxLength);
+	
+	// last element in the name MIB will be the process ID that the client fills in before calling sysctl()
+	_processTypeNameLength++;
+}
+
+// Useful reference: https://developer.apple.com/legacy/library/qa/qa2001/qa1123.html
+// Could also use proc_listpids() instead, but we may not get enough info back with it compared to kinfo_proc
 - (void)retrieveList
 {
-	struct kinfo_proc *processList = NULL;
-	size_t length = 0;
+	static const int processListName[] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL};
+	static const size_t processListNameLength = sizeof(processListName) / sizeof(*processListName);
+	
+	// Request the size we'll need to fill the process list buffer
+	size_t processListRequestSize = 0;
+	if (sysctl((int *)processListName, (u_int)processListNameLength, NULL, &processListRequestSize, NULL, 0) != 0) return;
 
-	static const int name[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
+	struct kinfo_proc *processList = malloc(processListRequestSize);
+	if (processList == NULL) return;
+	
+	// Note that it is realistic for the next call to fail or not have enough memory to write into processList, or
+	// it could just return 0 size back. Between requesting the process list size and actually obtaining the list,
+	// the process list could change enough such that we won't have enough space to fill in the buffer
+	// (e.g, too many processes were spawned in between)
+	// We could just always request for a really big buffer, but this might not be a better solution
 
-	// Call sysctl with a NULL buffer to get proper length
-	if (sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1, NULL, &length, NULL, 0) != 0) return;
-
-	// Allocate buffer
-	processList = malloc(length);
-	if (!processList) return;
-
-	// Get the actual process list
-	if (sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1, processList, &length, NULL, 0) != 0)
+	// Retrieve the actual process list using the obtained size
+	size_t processListActualSize = processListRequestSize;
+	if (sysctl((int *)processListName, (u_int)processListNameLength, processList, &processListActualSize, NULL, 0) != 0
+		|| (processListActualSize == 0))
 	{
 		free(processList);
 		return;
@@ -138,39 +163,37 @@
 	
 	NSMutableArray *newRunningProcesses = [[NSMutableArray alloc] init];
 	
-	size_t processCount = length / sizeof(struct kinfo_proc);
+	const size_t processCount = processListActualSize / sizeof(*processList);
 	for (size_t processIndex = 0; processIndex < processCount; processIndex++)
 	{
-		uid_t uid = processList[processIndex].kp_eproc.e_ucred.cr_uid;
-		pid_t processID = processList[processIndex].kp_proc.p_pid;
+		struct kinfo_proc processInfo = processList[processIndex];
 		
-		// I want user processes and I don't want zombies!
-		// Also don't get a process if it's still being created by fork() or if the pid is -1
-		if (processID != -1 && uid == getuid() && (processList[processIndex].kp_proc.p_stat & SIDL) == 0)
+		uid_t uid = processInfo.kp_eproc.e_ucred.cr_uid;
+		pid_t processIdentifier = processInfo.kp_proc.p_pid;
+		
+		// We want user processes, not zombies!
+		BOOL isBeingForked = (processInfo.kp_proc.p_stat & SIDL) != 0;
+		if (processIdentifier != -1 && uid == getuid() && !isBeingForked)
 		{
-			// Get CPU type
-			// http://stackoverflow.com/questions/1350181/determine-a-processs-architecture
+			cpu_type_t cpuType = 0;
+			size_t cpuTypeSize = sizeof(cpuType);
 			
-			size_t mibLen = CTL_MAXNAME;
-			int mib[CTL_MAXNAME];
-			
-			if (sysctlnametomib("sysctl.proc_cputype", mib, &mibLen) == 0)
+			// Grab CPU architecture type
+			_processTypeName[_processTypeNameLength - 1] = processIdentifier;
+			if (sysctl(_processTypeName, (u_int)_processTypeNameLength, &cpuType, &cpuTypeSize, NULL, 0) == 0)
 			{
-				mib[mibLen] = processID;
-				mibLen++;
+				BOOL is64Bit = ((cpuType & CPU_ARCH_ABI64) != 0);
+				// Note that the internal name is not really the "true" name of the process since it has a very small max character limit
+				const char *internalName = processInfo.kp_proc.p_comm;
 				
-				cpu_type_t cpuType;
-				size_t cpuTypeSize;
-				cpuTypeSize = sizeof(cpuType);
+				ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processIdentifier is64Bit:is64Bit internalName:@(internalName)];
 				
-				if (sysctl(mib, (u_int)mibLen, &cpuType, &cpuTypeSize, 0, 0) == 0)
-				{
-					ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processID is64Bit:((cpuType & CPU_ARCH_ABI64) != 0) internalName:@(processList[processIndex].kp_proc.p_comm)];
-					[newRunningProcesses addObject:runningProcess];
-				}
+				[newRunningProcesses addObject:runningProcess];
 			}
 		}
 	}
+	
+	free(processList);
 	
 	NSMutableArray *currentProcesses = [self mutableArrayValueForKey:ZG_SELECTOR_STRING(self, runningProcesses)];
 	
@@ -202,8 +225,6 @@
 		
 		[currentProcesses addObjectsFromArray:processesToAdd];
 	}
-	
-	free(processList);
 }
 
 #pragma mark Polling
