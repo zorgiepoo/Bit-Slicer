@@ -58,7 +58,11 @@
  * Defines
  */
 #define kCSNull								((CSTypeRef) {NULL, NULL})
-#define kCSNow								0x80000000u
+
+//#define kCSNow								0x80000000u
+// See https://github.com/mountainstorm/CoreSymbolication/issues/2
+#define kCSNow								0x8000000000000000llu
+
 // we've no idea what value kCSSymbolOwnerDataFoundDsym has; its only use in dtrace has been optimised out
 #define kCSSymbolOwnerDataFoundDsym			0
 #define kCSSymbolOwnerIsAOut				0
