@@ -90,6 +90,7 @@
 		72DBC8EA1B75A7430092ED75 /* About Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC8E81B75A7430092ED75 /* About Window.xib */; };
 		72DBC8F01B7657F20092ED75 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC8EF1B7657F20092ED75 /* LICENSE */; };
 		72DBC91F1B7690BA0092ED75 /* [Code] About Window.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC91D1B7690BA0092ED75 /* [Code] About Window.strings */; };
+		72DBC9541B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */; };
 		72DEBBB11ADA0ED30053CD3E /* yasm in CopyFiles */ = {isa = PBXBuildFile; fileRef = 77F115A917D2E8AC009E002A /* yasm */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
@@ -449,6 +450,9 @@
 		72DBC8EF1B7657F20092ED75 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		72DBC91E1B7690BA0092ED75 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] About Window.strings"; sourceTree = "<group>"; };
 		72DBC9201B7690C20092ED75 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] About Window.strings"; sourceTree = "<group>"; };
+		72DBC9521B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPrivateCoreSymbolicator.h; path = "Bit Slicer/ZGPrivateCoreSymbolicator.h"; sourceTree = "<group>"; };
+		72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPrivateCoreSymbolicator.m; path = "Bit Slicer/ZGPrivateCoreSymbolicator.m"; sourceTree = "<group>"; };
+		72DBC9551B77C2A10092ED75 /* ZGSymbolicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSymbolicator.h; path = "Bit Slicer/ZGSymbolicator.h"; sourceTree = "<group>"; };
 		770136E8192309740072A192 /* ZGPyVMProtModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyVMProtModule.h; path = "Bit Slicer/ZGPyVMProtModule.h"; sourceTree = "<group>"; usesTabs = 1; };
 		770136E9192309740072A192 /* ZGPyVMProtModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyVMProtModule.m; path = "Bit Slicer/ZGPyVMProtModule.m"; sourceTree = "<group>"; usesTabs = 1; };
 		770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBreakPointConditionViewController.h; path = "Bit Slicer/ZGBreakPointConditionViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -1026,7 +1030,7 @@
 		77329B5A168D07B6007DCAE2 /* Debugger */ = {
 			isa = PBXGroup;
 			children = (
-				773E8B0B1821E01700D1A71A /* CoreSymbolication */,
+				773E8B0B1821E01700D1A71A /* Symbolication */,
 				7701EF411696A29100877373 /* mach_exc */,
 				77329B74168D0E16007DCAE2 /* libudis86 */,
 				77F1163E17D2EF9E009E002A /* ZGDebuggerController.h */,
@@ -1108,12 +1112,15 @@
 			name = Scripting;
 			sourceTree = "<group>";
 		};
-		773E8B0B1821E01700D1A71A /* CoreSymbolication */ = {
+		773E8B0B1821E01700D1A71A /* Symbolication */ = {
 			isa = PBXGroup;
 			children = (
 				773E8B091821E01200D1A71A /* CoreSymbolication.h */,
+				72DBC9551B77C2A10092ED75 /* ZGSymbolicator.h */,
+				72DBC9521B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.h */,
+				72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */,
 			);
-			name = CoreSymbolication;
+			name = Symbolication;
 			sourceTree = "<group>";
 		};
 		7743F9C718024D0E00DBC19A /* Python */ = {
@@ -1678,6 +1685,7 @@
 				770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */,
 				77FFC14C18711D2700122357 /* ZGEditDescriptionWindowController.m in Sources */,
 				772C0F7E18B88AFA009FFF72 /* ZGRegisterEntries.m in Sources */,
+				72DBC9541B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m in Sources */,
 				777C34B5187523D0005E64E1 /* ZGNoSmallSizeToolbar.m in Sources */,
 				773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */,
 				773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */,

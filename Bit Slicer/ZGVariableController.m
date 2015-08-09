@@ -1059,7 +1059,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process];
 		
-		NSString *symbol = [process symbolAtAddress:variable.address relativeOffset:NULL];
+		NSString *symbol = [process.symbolicator symbolAtAddress:variable.address relativeOffset:NULL];
 
 		if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
 		{

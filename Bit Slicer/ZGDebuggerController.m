@@ -440,7 +440,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	for (ZGInstruction *instruction in instructions)
 	{
 		ZGMemoryAddress relativeProcedureOffset = 0x0;
-		NSString *symbolName = [self.currentProcess symbolAtAddress:instruction.variable.address relativeOffset:&relativeProcedureOffset];
+		NSString *symbolName = [self.currentProcess.symbolicator symbolAtAddress:instruction.variable.address relativeOffset:&relativeProcedureOffset];
 
 		instruction.symbols = (symbolName != nil) ? [NSString stringWithFormat:@"%@ + %llu", symbolName, relativeProcedureOffset] : @"";
 	}

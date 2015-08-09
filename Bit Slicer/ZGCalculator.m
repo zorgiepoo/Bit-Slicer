@@ -212,7 +212,7 @@
 				
 				if (!encounteredError)
 				{
-					symbolAddressNumber = [process findSymbol:symbolString withPartialSymbolOwnerName:targetOwnerNameSuffix requiringExactMatch:NO pastAddress:[currentAddressNumber unsignedLongLongValue] allowsWrappingToBeginning:YES];
+					symbolAddressNumber = [process.symbolicator findSymbol:symbolString withPartialSymbolOwnerName:targetOwnerNameSuffix requiringExactMatch:NO pastAddress:[currentAddressNumber unsignedLongLongValue] allowsWrappingToBeginning:YES];
 					if (symbolAddressNumber == nil)
 					{
 						if (error != NULL)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Mayur Pawashe
+ * Copyright (c) 2015 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,47 +31,29 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGSymbolicator.h"
 #import "ZGMemoryTypes.h"
-#import <sys/sysctl.h>
 
-#define NON_EXISTENT_PID_NUMBER -1
+NS_ASSUME_NONNULL_BEGIN
 
-@class ZGMachBinary;
+@protocol ZGSymbolicator <NSObject>
 
-@interface ZGProcess : NSObject
+typedef struct
+{
+	ZGMemoryAddress location;
+	ZGMemorySize length;
+} ZGSymbolRange;
 
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
+- (nullable id)initWithTask:(ZGMemoryMap)task; // do not call often as this can be somewhat expensive
+- (void)invalidate; // do not call if the task is not valid anymore
 
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
+- (nullable NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(nullable ZGMemoryAddress *)relativeOffset;
 
-- (instancetype)initWithProcess:(ZGProcess *)process;
+// Returns NSArray<NSValue *>, each value containing a ZGSymbolRange
+// Currently not used outside of this class but I anticipate it may be eventually (eg: for scripting)
+- (NSArray *)findSymbolsWithName:(NSString *)symbolName partialSymbolOwnerName:(nullable NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch;
 
-- (instancetype)initWithProcess:(ZGProcess *)process name:(NSString *)name;
-
-- (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask;
-
-@property (nonatomic, readonly) pid_t processID;
-@property (nonatomic, readonly) ZGMemoryMap processTask;
-@property (nonatomic, readonly) BOOL valid;
-@property (nonatomic, readonly) NSString *name;
-@property (nonatomic, readonly) NSString *internalName;
-@property (nonatomic, readonly) BOOL is64Bit;
-
-// indicates if this represents any sort of actual program.. admittingly, this is kind of a hack
-@property (nonatomic) BOOL isDummy;
-
-@property (nonatomic, readonly) ZGMachBinary *mainMachBinary;
-@property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
-
-@property (nonatomic, readonly) NSMutableDictionary *cacheDictionary;
-
-@property (nonatomic, readonly) id <ZGSymbolicator> symbolicator;
-
-- (BOOL)isEqual:(id)process;
-
-- (BOOL)hasGrantedAccess;
-
-- (ZGMemorySize)pointerSize;
+- (nullable NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(nullable NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress allowsWrappingToBeginning:(BOOL)allowsWrapping;
 
 @end
+
+NS_ASSUME_NONNULL_END
