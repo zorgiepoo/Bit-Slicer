@@ -1324,7 +1324,10 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 					}
 				}
 				
-				helper(resultSetIndex, startIndex, oldResultSet, newResultSet);
+				if (oldResultSet.length >= pointerSize && startIndex < oldResultSet.length)
+				{
+					helper(resultSetIndex, startIndex, oldResultSet, newResultSet);
+				}
 				
 				if (delegate != nil)
 				{
