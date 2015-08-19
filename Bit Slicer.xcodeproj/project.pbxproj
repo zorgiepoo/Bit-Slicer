@@ -77,6 +77,8 @@
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
+		72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
+		72BD7EB01B84070F00B7E3CC /* ZGPrivateCoreSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
 		72D051AC1960891900EC532A /* Backtrace View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AE1960891900EC532A /* Backtrace View.xib */; };
 		72D051CB1960A41F00EC532A /* Registers View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051C91960A41F00EC532A /* Registers View.xib */; };
@@ -1651,6 +1653,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72BD7EB01B84070F00B7E3CC /* ZGPrivateCoreSymbolicator.m in Sources */,
+				72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */,
 				722EE7921B19584300934EF3 /* ZGVirtualMemoryStringReading.m in Sources */,
 				722EE7911B19580200934EF3 /* ZGVariableDataInfo.m in Sources */,
 				72431BA919BFFB6100418893 /* ZGDataValueExtracting.m in Sources */,
