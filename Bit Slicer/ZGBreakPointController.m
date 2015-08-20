@@ -674,8 +674,11 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	if (exception == EXC_BREAKPOINT)
 	{
-		handledWatchPoint = [gBreakPointController handleWatchPointsWithTask:task inThread:thread];
-		handledInstructionBreakPoint = [gBreakPointController handleInstructionBreakPointsWithTask:task inThread:thread];
+		@autoreleasepool
+		{
+			handledWatchPoint = [gBreakPointController handleWatchPointsWithTask:task inThread:thread];
+			handledInstructionBreakPoint = [gBreakPointController handleInstructionBreakPointsWithTask:task inThread:thread];
+		}
 	}
 	
 	return (handledWatchPoint || handledInstructionBreakPoint) ? KERN_SUCCESS : KERN_FAILURE;
