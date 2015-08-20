@@ -40,11 +40,21 @@
 #import "ZGPyKeyCodeModule.h"
 #import "ZGPyKeyModModule.h"
 #import "ZGPyVMProtModule.h"
+#import "ZGThreadSafeQueue.h"
 
+#import <pthread.h>
 #import "structmember.h"
+
+typedef NS_ENUM(NSInteger, ZGDispatchType)
+{
+	ZGDispatchTypeSynchronous,
+	ZGDispatchTypeAsynchronous
+};
 
 @implementation ZGScriptingInterpreter
 {
+	ZGThreadSafeQueue *_pythonQueue;
+	dispatch_semaphore_t _pythonSyncSemaphore;
 	PyObject *_cTypesObject;
 	PyObject *_structObject;
 	BOOL _initializedInterpreter;
@@ -95,9 +105,46 @@
 			[fileManager removeItemAtPath:filename error:nil];
 		}
 		
-		_pythonQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
+		_pythonQueue = [[ZGThreadSafeQueue alloc] init];
+		_pythonSyncSemaphore = dispatch_semaphore_create(0);
+		assert(_pythonSyncSemaphore != NULL);
 	}
 	return self;
+}
+
+// Python has stingy threading requirements and requires all python calls to be invoked from the same thread
+// Thus using dispatch queues will not work without running into potential memory corruption issues (as verified by ASan)
+static void *runPythonQueueThread(void *userData)
+{
+	ZGScriptingInterpreter *interpreter = CFBridgingRelease(userData);
+	while (YES)
+	{
+		@autoreleasepool
+		{
+			NSArray *arguments = [interpreter->_pythonQueue dequeue];
+			dispatch_block_t work = arguments[0];
+			ZGDispatchType dispatchType = [arguments[1] integerValue];
+			
+			work();
+			
+			if (dispatchType == ZGDispatchTypeSynchronous)
+			{
+				dispatch_semaphore_signal(interpreter->_pythonSyncSemaphore);
+			}
+		}
+	}
+	return NULL;
+}
+
+- (void)dispatchAsync:(dispatch_block_t)work
+{
+	[_pythonQueue enqueue:@[work, @(ZGDispatchTypeAsynchronous)]];
+}
+
+- (void)dispatchSync:(dispatch_block_t)work
+{
+	[_pythonQueue enqueue:@[work, @(ZGDispatchTypeSynchronous)]];
+	dispatch_semaphore_wait(_pythonSyncSemaphore, DISPATCH_TIME_FOREVER);
 }
 
 - (void)appendPath:(NSString *)path toSysPath:(PyObject *)sysPath
@@ -117,6 +164,10 @@
 	if (_initializedInterpreter) return;
 	_initializedInterpreter = YES;
 	
+	pthread_t pythonThread;
+	int pthreadResult = pthread_create(&pythonThread, NULL, runPythonQueueThread, (void *)CFBridgingRetain(self));
+	assert(pthreadResult == 0);
+	
 	setenv("PYTHONDONTWRITEBYTECODE", "1", 1);
 	
 	NSString *userModulesDirectory = [ZGAppPathUtilities createUserModulesDirectory];
@@ -124,8 +175,9 @@
 	NSString *pythonDirectory = [[NSBundle mainBundle] pathForResource:@"python3.3" ofType:nil];
 	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
 	setenv("PYTHONPATH", [pythonDirectory UTF8String], 1);
-	dispatch_async(_pythonQueue, ^{
+	[self dispatchAsync:^{
 		Py_Initialize();
+		
 		PyObject *path = PySys_GetObject("path");
 		
 		[self appendPath:[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] toSysPath:path];
@@ -153,7 +205,7 @@
 		
 		self->_cTypesObject = PyImport_ImportModule("ctypes");
 		self->_structObject = PyImport_ImportModule("struct");
-	});
+	}];
 }
 
 - (NSString *)fetchPythonErrorDescriptionFromObject:(PyObject *)pythonObject
@@ -196,7 +248,7 @@
 	
 	__block PyObject *compiledExpression = NULL;
 	
-	dispatch_sync(_pythonQueue, ^{
+	[self dispatchSync:^{
 		compiledExpression = Py_CompileString([expression UTF8String], "EvaluateCondition", Py_eval_input);
 		
 		if (compiledExpression == NULL)
@@ -207,7 +259,7 @@
 				*error = [NSError errorWithDomain:@"CompileConditionFailure" code:2 userInfo:@{SCRIPT_PYTHON_ERROR : pythonErrorDescription}];
 			}
 		}
-	});
+	}];
 	
 	return compiledExpression;
 }
@@ -258,7 +310,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 - (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError * __autoreleasing *)error
 {
 	__block BOOL result = NO;
-	dispatch_sync(_pythonQueue, ^{
+	[self dispatchSync:^{
 		PyObject *mainModule = PyImport_AddModule("__main__");
 		
 		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessNoCopy:process virtualMemoryException:self->_virtualMemoryException];
@@ -306,7 +358,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		Py_XDECREF(localDictionary);
 		
 		CFRelease((__bridge CFTypeRef)(virtualMemoryInstance));
-	});
+	}];
 	return result;
 }
 

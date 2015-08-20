@@ -30,38 +30,50 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "Python.h"
-#import "ZGRegisterEntries.h"
+#import "ZGThreadSafeQueue.h"
 
-#define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
-#define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
+typedef NS_ENUM(NSInteger, ZGThreadSafeLockCondition)
+{
+	ZGThreadSafeEmptyCondition,
+	ZGThreadSafeNonEmptyCondition
+};
 
-#define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
+@implementation ZGThreadSafeQueue
+{
+	NSConditionLock *_lock;
+	NSMutableArray *_queue;
+}
 
-#define SCRIPT_FILENAME_PREFIX @"Script"
+- (instancetype)init
+{
+	self = [super init];
+	if (self != nil)
+	{
+		_lock = [[NSConditionLock alloc] initWithCondition:ZGThreadSafeEmptyCondition];
+		_queue = [NSMutableArray array];
+	}
+	return self;
+}
 
-@class ZGProcess;
-@class ZGRegistersState;
+- (void)enqueue:(id)object
+{
+	[_lock lock];
+	
+	[_queue addObject:object];
 
-@interface ZGScriptingInterpreter : NSObject
+	[_lock unlockWithCondition:ZGThreadSafeNonEmptyCondition];
+}
 
-+ (instancetype)createInterpreterOnce;
-
-- (void)acquireInterpreter;
-
-- (void)dispatchAsync:(dispatch_block_t)block;
-- (void)dispatchSync:(dispatch_block_t)block;
-
-@property (nonatomic, readonly) PyObject *virtualMemoryException;
-@property (nonatomic, readonly) PyObject *debuggerException;
-
-- (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
-
-- (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError * __autoreleasing *)error;
-
-- (PyObject *)registersfromRegistersState:(ZGRegistersState *)registersState;
-
-- (NSString *)fetchPythonErrorDescriptionFromObject:(PyObject *)pythonObject;
+- (id)dequeue
+{
+	[_lock lockWhenCondition:ZGThreadSafeNonEmptyCondition];
+	
+	id object = _queue[0];
+	[_queue removeObjectAtIndex:0];
+	
+	[_lock unlockWithCondition:_queue.count > 0 ? ZGThreadSafeNonEmptyCondition : ZGThreadSafeEmptyCondition];
+	
+	return object;
+}
 
 @end

@@ -31,37 +31,12 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Python.h"
-#import "ZGRegisterEntries.h"
 
-#define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
-#define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
+@interface ZGThreadSafeQueue : NSObject
 
-#define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
+- (instancetype)init;
 
-#define SCRIPT_FILENAME_PREFIX @"Script"
-
-@class ZGProcess;
-@class ZGRegistersState;
-
-@interface ZGScriptingInterpreter : NSObject
-
-+ (instancetype)createInterpreterOnce;
-
-- (void)acquireInterpreter;
-
-- (void)dispatchAsync:(dispatch_block_t)block;
-- (void)dispatchSync:(dispatch_block_t)block;
-
-@property (nonatomic, readonly) PyObject *virtualMemoryException;
-@property (nonatomic, readonly) PyObject *debuggerException;
-
-- (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
-
-- (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError * __autoreleasing *)error;
-
-- (PyObject *)registersfromRegistersState:(ZGRegistersState *)registersState;
-
-- (NSString *)fetchPythonErrorDescriptionFromObject:(PyObject *)pythonObject;
+- (void)enqueue:(id)object;
+- (id)dequeue;
 
 @end

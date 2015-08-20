@@ -184,7 +184,7 @@ static PyTypeObject DebuggerType =
 
 @implementation ZGPyDebugger
 {
-	dispatch_queue_t _pythonQueue;
+	ZGScriptingInterpreter *_scriptingInterpreter;
 	
 	__weak ZGScriptManager *_scriptManager;
 	ZGBreakPointController *_breakPointController;
@@ -237,12 +237,11 @@ static PyTypeObject DebuggerType =
 		}
 		
 		_scriptManager = scriptManager;
+		_scriptingInterpreter = scriptingInterpreter;
 		_process = [[ZGProcess alloc] initWithProcess:process];
 		_breakPointController = breakPointController;
 		_loggerWindowController = loggerWindowController;
 		_hotKeyCenter = hotKeyCenter;
-		
-		_pythonQueue = scriptingInterpreter.pythonQueue;
 		
 		DebuggerClass *debuggerObject = (DebuggerClass *)_object;
 		debuggerObject->objcSelf = self;
@@ -382,9 +381,9 @@ static PyObject *Debugger_notify(DebuggerClass * __unused self, PyObject *args)
 - (void)scriptPrompt:(ZGScriptPrompt *)scriptPrompt didReceiveAnswer:(NSString *)answer
 {
 	ZGScriptManager *scriptManager = _scriptManager;
-	dispatch_async(_pythonQueue, ^{
+	[_scriptingInterpreter dispatchAsync:^{
 		[scriptManager handleScriptPrompt:scriptPrompt withAnswer:answer sender:self];
-	});
+	}];
 }
 
 static PyObject *Debugger_prompt(DebuggerClass *self, PyObject *args)
@@ -466,9 +465,9 @@ static PyObject *Debugger_activate(DebuggerClass *self, PyObject *__unused args)
 	PyObject *callback = hotKey.userData;
 	
 	ZGScriptManager *scriptManager = _scriptManager;
-	dispatch_async(_pythonQueue, ^{
+	[_scriptingInterpreter dispatchAsync:^{
 		[scriptManager handleHotKeyTriggerWithInternalID:hotKeyID callback:callback sender:self];
-	});
+	}];
 }
 
 static PyObject *Debugger_registerHotkey(DebuggerClass *self, PyObject *args)
@@ -806,7 +805,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 	PyObject *callback = breakPoint.callback;
 	ZGScriptManager *scriptManager = _scriptManager;
 	
-	dispatch_async(_pythonQueue, ^{
+	[_scriptingInterpreter dispatchAsync:^{
 		NSNumber *instructionPointerNumber = @(instructionPointer);
 		ZGMemoryAddress instructionAddress = 0;
 		NSNumber *cachedInstructionAddress = [self->_cachedInstructionPointers objectForKey:instructionPointerNumber];
@@ -823,7 +822,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		}
 		
 		[scriptManager handleDataAddress:dataAddress accessedFromInstructionAddress:instructionAddress registersState:registersState callback:callback sender:self];
-	});
+	}];
 }
 
 static PyObject *watchAccess(DebuggerClass *self, PyObject *args, NSString *functionName, ZGWatchPointType watchPointType)
@@ -920,7 +919,7 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 	BOOL hidden = breakPoint.hidden;
 	ZGScriptManager *scriptManager = _scriptManager;
 	
-	dispatch_async(_pythonQueue, ^{
+	[_scriptingInterpreter dispatchAsync:^{
 		self->_haltedBreakPoint = breakPoint;
 		
 		if (hidden)
@@ -942,7 +941,7 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 		{
 			[scriptManager handleInstructionBreakPoint:breakPoint withRegistersState:registersState callback:breakPoint.callback sender:self];
 		}
-	});
+	}];
 }
 
 static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
