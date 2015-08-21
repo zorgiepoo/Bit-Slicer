@@ -819,6 +819,8 @@
 			);
 			name = "Bit Slicer";
 			sourceTree = "<group>";
+			usesTabs = 1;
+			wrapsLines = 1;
 		};
 		2A37F4ABFDCFA73011CA2CEA /* Code */ = {
 			isa = PBXGroup;
