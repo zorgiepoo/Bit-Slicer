@@ -40,7 +40,7 @@
 #import "ZGPyKeyCodeModule.h"
 #import "ZGPyKeyModModule.h"
 #import "ZGPyVMProtModule.h"
-#import "ZGThreadSafeQueue.h"
+#import "OSCSingleThreadQueue.h"
 
 #import <pthread.h>
 #import "structmember.h"
@@ -53,8 +53,7 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 
 @implementation ZGScriptingInterpreter
 {
-	ZGThreadSafeQueue *_pythonQueue;
-	dispatch_semaphore_t _pythonSyncSemaphore;
+	OSCSingleThreadQueue *_pythonQueue;
 	PyObject *_cTypesObject;
 	PyObject *_structObject;
 	BOOL _initializedInterpreter;
@@ -104,47 +103,21 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 		{
 			[fileManager removeItemAtPath:filename error:nil];
 		}
-		
-		_pythonQueue = [[ZGThreadSafeQueue alloc] init];
-		_pythonSyncSemaphore = dispatch_semaphore_create(0);
-		assert(_pythonSyncSemaphore != NULL);
 	}
 	return self;
 }
 
 // Python has stingy threading requirements and requires all python calls to be invoked from the same thread
-// Thus using dispatch queues will not work without running into potential memory corruption issues (as verified by ASan)
-static void *runPythonQueueThread(void *userData)
-{
-	ZGScriptingInterpreter *interpreter = CFBridgingRelease(userData);
-	while (YES)
-	{
-		@autoreleasepool
-		{
-			NSArray *arguments = [interpreter->_pythonQueue dequeue];
-			dispatch_block_t work = arguments[0];
-			ZGDispatchType dispatchType = [arguments[1] integerValue];
-			
-			work();
-			
-			if (dispatchType == ZGDispatchTypeSynchronous)
-			{
-				dispatch_semaphore_signal(interpreter->_pythonSyncSemaphore);
-			}
-		}
-	}
-	return NULL;
-}
+// Otherwise we may run into memory corruption issues (as verified by ASan)
 
 - (void)dispatchAsync:(dispatch_block_t)work
 {
-	[_pythonQueue enqueue:@[work, @(ZGDispatchTypeAsynchronous)]];
+	[_pythonQueue dispatchAsync:work];
 }
 
 - (void)dispatchSync:(dispatch_block_t)work
 {
-	[_pythonQueue enqueue:@[work, @(ZGDispatchTypeSynchronous)]];
-	dispatch_semaphore_wait(_pythonSyncSemaphore, DISPATCH_TIME_FOREVER);
+	[_pythonQueue dispatchSync:work];
 }
 
 - (void)appendPath:(NSString *)path toSysPath:(PyObject *)sysPath
@@ -164,9 +137,7 @@ static void *runPythonQueueThread(void *userData)
 	if (_initializedInterpreter) return;
 	_initializedInterpreter = YES;
 	
-	pthread_t pythonThread;
-	int pthreadResult = pthread_create(&pythonThread, NULL, runPythonQueueThread, (void *)CFBridgingRetain(self));
-	assert(pthreadResult == 0);
+	_pythonQueue = [OSCSingleThreadQueue startWithPriority:DISPATCH_QUEUE_PRIORITY_DEFAULT label:"com.zgcoder.python-thread"];
 	
 	setenv("PYTHONDONTWRITEBYTECODE", "1", 1);
 	

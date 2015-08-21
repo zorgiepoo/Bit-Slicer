@@ -11,7 +11,7 @@
 		72030C7A1B0558F800A5621C /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72030C791B0558F800A5621C /* DDMathParser.framework */; };
 		72030C7B1B0558F800A5621C /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72030C791B0558F800A5621C /* DDMathParser.framework */; };
 		72030C7C1B055B3500A5621C /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 72030C791B0558F800A5621C /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		720C72A61B844289000C18BF /* ZGThreadSafeQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 720C72A51B844289000C18BF /* ZGThreadSafeQueue.m */; };
+		720D9EAF1B859ABB00B8E01E /* OSCSingleThreadQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 720D9EAE1B859ABB00B8E01E /* OSCSingleThreadQueue.m */; };
 		7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7216F7D01AC66133005288A8 /* dsa_pub.pem */; };
 		722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5519AD4AED009C6AAE /* hotkey.png */; };
 		722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5619AD4AED009C6AAE /* hotkey@2x.png */; };
@@ -279,8 +279,8 @@
 		72030ADA1B00191400A5621C /* ZGScriptingInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptingInterpreter.h; path = "Bit Slicer/ZGScriptingInterpreter.h"; sourceTree = "<group>"; };
 		72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptingInterpreter.m; path = "Bit Slicer/ZGScriptingInterpreter.m"; sourceTree = "<group>"; };
 		72030C791B0558F800A5621C /* DDMathParser.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DDMathParser.framework; path = deps/DDMathParser.framework; sourceTree = "<group>"; };
-		720C72A41B844289000C18BF /* ZGThreadSafeQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGThreadSafeQueue.h; path = "Bit Slicer/ZGThreadSafeQueue.h"; sourceTree = "<group>"; };
-		720C72A51B844289000C18BF /* ZGThreadSafeQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGThreadSafeQueue.m; path = "Bit Slicer/ZGThreadSafeQueue.m"; sourceTree = "<group>"; };
+		720D9EAD1B859ABB00B8E01E /* OSCSingleThreadQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSCSingleThreadQueue.h; path = "Bit Slicer/OSCSingleThreadQueue.h"; sourceTree = "<group>"; };
+		720D9EAE1B859ABB00B8E01E /* OSCSingleThreadQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSCSingleThreadQueue.m; path = "Bit Slicer/OSCSingleThreadQueue.m"; sourceTree = "<group>"; };
 		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
 		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
 		722CAA5619AD4AED009C6AAE /* hotkey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hotkey@2x.png"; path = "Bit Slicer/preficons/hotkey@2x.png"; sourceTree = "<group>"; };
@@ -1437,6 +1437,8 @@
 				77F1163117D2EF62009E002A /* ZGCalculator.m */,
 				77F115A617D2E87E009E002A /* VDKQueue.h */,
 				77F115A717D2E87E009E002A /* VDKQueue.m */,
+				720D9EAD1B859ABB00B8E01E /* OSCSingleThreadQueue.h */,
+				720D9EAE1B859ABB00B8E01E /* OSCSingleThreadQueue.m */,
 				777C34B3187523D0005E64E1 /* ZGNoSmallSizeToolbar.h */,
 				777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */,
 				771A931B18791A8D0098511D /* ZGTableView.h */,
@@ -1464,8 +1466,6 @@
 				771A3F4418CC0B0900D19676 /* ZGDocumentController.m */,
 				72030ADA1B00191400A5621C /* ZGScriptingInterpreter.h */,
 				72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */,
-				720C72A41B844289000C18BF /* ZGThreadSafeQueue.h */,
-				720C72A51B844289000C18BF /* ZGThreadSafeQueue.m */,
 				72DBC8E31B759BA90092ED75 /* ZGAboutWindowController.h */,
 				72DBC8E41B759BA90092ED75 /* ZGAboutWindowController.m */,
 				772D1264190E0CE500800B1B /* Preferences */,
@@ -1701,7 +1701,6 @@
 				773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */,
 				72DBC8D81B72F31B0092ED75 /* ZGOperatingSystemCompatibility.m in Sources */,
 				77FFC107186BDA3600122357 /* ZGWatchVariableWindowController.m in Sources */,
-				720C72A61B844289000C18BF /* ZGThreadSafeQueue.m in Sources */,
 				77F115A817D2E87E009E002A /* VDKQueue.m in Sources */,
 				77F115CD17D2ED64009E002A /* ZGMemoryViewerController.m in Sources */,
 				77F115D017D2ED74009E002A /* ZGVerticalScrollerRepresenter.m in Sources */,
@@ -1709,6 +1708,7 @@
 				77F115D317D2ED82009E002A /* ZGStatusBarRepresenter.m in Sources */,
 				770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */,
 				77F115D617D2ED8E009E002A /* ZGLineCountingRepresenter.m in Sources */,
+				720D9EAF1B859ABB00B8E01E /* OSCSingleThreadQueue.m in Sources */,
 				772D1268190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m in Sources */,
 				771A931D18791A8D0098511D /* ZGTableView.m in Sources */,
 				77F115D917D2ED9D009E002A /* ZGLineCountingView.m in Sources */,
