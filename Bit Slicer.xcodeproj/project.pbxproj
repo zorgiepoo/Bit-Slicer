@@ -11,7 +11,6 @@
 		72030C7A1B0558F800A5621C /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72030C791B0558F800A5621C /* DDMathParser.framework */; };
 		72030C7B1B0558F800A5621C /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72030C791B0558F800A5621C /* DDMathParser.framework */; };
 		72030C7C1B055B3500A5621C /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 72030C791B0558F800A5621C /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		720D9EAF1B859ABB00B8E01E /* OSCSingleThreadQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 720D9EAE1B859ABB00B8E01E /* OSCSingleThreadQueue.m */; };
 		7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7216F7D01AC66133005288A8 /* dsa_pub.pem */; };
 		722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5519AD4AED009C6AAE /* hotkey.png */; };
 		722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5619AD4AED009C6AAE /* hotkey@2x.png */; };
@@ -53,6 +52,7 @@
 		724A9F4819A8792000E72C9D /* [Code] Memory Window.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4619A8791F00E72C9D /* [Code] Memory Window.strings */; };
 		724A9F4E19A8EDD700E72C9D /* [Code] Logger Window.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4C19A8EDD700E72C9D /* [Code] Logger Window.stringsdict */; };
 		724A9F5119A8F54600E72C9D /* [Code] Search Document.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F4F19A8F54600E72C9D /* [Code] Search Document.stringsdict */; };
+		7257EFF31B87EF220045991F /* OSCSingleThreadQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 7257EFF21B87EF220045991F /* OSCSingleThreadQueue.m */; };
 		725DEC881A24F7610095C9B3 /* [Code] Script Manager.strings in Resources */ = {isa = PBXBuildFile; fileRef = 725DEC861A24F7610095C9B3 /* [Code] Script Manager.strings */; };
 		726B7CA61A23E849004354BC /* Script Prompt Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726B7CA41A23E849004354BC /* Script Prompt Dialog.xib */; };
 		726B7CA91A23F0EE004354BC /* ZGScriptPromptWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 726B7CA81A23F0EE004354BC /* ZGScriptPromptWindowController.m */; };
@@ -279,8 +279,6 @@
 		72030ADA1B00191400A5621C /* ZGScriptingInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptingInterpreter.h; path = "Bit Slicer/ZGScriptingInterpreter.h"; sourceTree = "<group>"; };
 		72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptingInterpreter.m; path = "Bit Slicer/ZGScriptingInterpreter.m"; sourceTree = "<group>"; };
 		72030C791B0558F800A5621C /* DDMathParser.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DDMathParser.framework; path = deps/DDMathParser.framework; sourceTree = "<group>"; };
-		720D9EAD1B859ABB00B8E01E /* OSCSingleThreadQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSCSingleThreadQueue.h; path = "Bit Slicer/OSCSingleThreadQueue.h"; sourceTree = "<group>"; usesTabs = 1; };
-		720D9EAE1B859ABB00B8E01E /* OSCSingleThreadQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSCSingleThreadQueue.m; path = "Bit Slicer/OSCSingleThreadQueue.m"; sourceTree = "<group>"; usesTabs = 1; };
 		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
 		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
 		722CAA5619AD4AED009C6AAE /* hotkey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hotkey@2x.png"; path = "Bit Slicer/preficons/hotkey@2x.png"; sourceTree = "<group>"; };
@@ -332,6 +330,8 @@
 		724A9F4719A8791F00E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Memory Window.strings"; sourceTree = "<group>"; };
 		724A9F4D19A8EDD700E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Logger Window.stringsdict"; sourceTree = "<group>"; };
 		724A9F5019A8F54600E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Search Document.stringsdict"; sourceTree = "<group>"; };
+		7257EFF11B87EF220045991F /* OSCSingleThreadQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OSCSingleThreadQueue.h; path = deps/OSCSingleThreadQueue.h; sourceTree = "<group>"; };
+		7257EFF21B87EF220045991F /* OSCSingleThreadQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OSCSingleThreadQueue.m; path = deps/OSCSingleThreadQueue.m; sourceTree = "<group>"; };
 		725DEC851A24EE6F0095C9B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Script Prompt Dialog.strings"; sourceTree = "<group>"; };
 		725DEC871A24F7610095C9B3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Script Manager.strings"; sourceTree = "<group>"; };
 		726B7CA51A23E849004354BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Script Prompt Dialog.xib"; sourceTree = "<group>"; };
@@ -1439,8 +1439,8 @@
 				77F1163117D2EF62009E002A /* ZGCalculator.m */,
 				77F115A617D2E87E009E002A /* VDKQueue.h */,
 				77F115A717D2E87E009E002A /* VDKQueue.m */,
-				720D9EAD1B859ABB00B8E01E /* OSCSingleThreadQueue.h */,
-				720D9EAE1B859ABB00B8E01E /* OSCSingleThreadQueue.m */,
+				7257EFF11B87EF220045991F /* OSCSingleThreadQueue.h */,
+				7257EFF21B87EF220045991F /* OSCSingleThreadQueue.m */,
 				777C34B3187523D0005E64E1 /* ZGNoSmallSizeToolbar.h */,
 				777C34B4187523D0005E64E1 /* ZGNoSmallSizeToolbar.m */,
 				771A931B18791A8D0098511D /* ZGTableView.h */,
@@ -1710,7 +1710,6 @@
 				77F115D317D2ED82009E002A /* ZGStatusBarRepresenter.m in Sources */,
 				770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */,
 				77F115D617D2ED8E009E002A /* ZGLineCountingRepresenter.m in Sources */,
-				720D9EAF1B859ABB00B8E01E /* OSCSingleThreadQueue.m in Sources */,
 				772D1268190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m in Sources */,
 				771A931D18791A8D0098511D /* ZGTableView.m in Sources */,
 				77F115D917D2ED9D009E002A /* ZGLineCountingView.m in Sources */,
@@ -1791,6 +1790,7 @@
 				722EE7841B19406700934EF3 /* ZGRunAlertPanel.m in Sources */,
 				77F1165017D2EFE4009E002A /* ZGDebugThread.m in Sources */,
 				77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */,
+				7257EFF31B87EF220045991F /* OSCSingleThreadQueue.m in Sources */,
 				77F1165917D2F001009E002A /* ZGRegister.m in Sources */,
 				774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */,
 				7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */,
