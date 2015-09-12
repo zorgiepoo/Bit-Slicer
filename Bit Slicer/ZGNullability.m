@@ -34,6 +34,6 @@
 
 id _Nonnull ZGUnwrapNullableObject(id _Nullable object)
 {
-	assert(object != NULL);
+	assert(object != nil);
 	return (id _Nonnull)object;
 }
