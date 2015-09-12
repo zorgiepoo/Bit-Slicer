@@ -37,6 +37,7 @@
 #import "ZGProcess.h"
 #import "ZGVirtualMemory.h"
 #import "ZGRunAlertPanel.h"
+#import "ZGNullability.h"
 
 #define ZGEditValueLocalizableTable @"[Code] Edit Variable Value"
 
@@ -137,7 +138,7 @@
 	
 	if (firstNonScriptVariable == nil) return;
 	
-	[self window]; // ensure window is loaded
+	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
 	if (!isAllByteArrays)
 	{
@@ -154,7 +155,7 @@
 	_processTask = processTask;
 	
 	[NSApp
-	 beginSheet:self.window
+	 beginSheet:window
 	 modalForWindow:parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil
@@ -163,8 +164,9 @@
 
 - (IBAction)editValues:(id)__unused sender
 {
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject(self.window);
+	[NSApp endSheet:window];
+	[window close];
 	
 	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
 	
@@ -205,8 +207,9 @@
 
 - (IBAction)cancelEditingValues:(id)__unused sender
 {
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject(self.window);
+	[NSApp endSheet:window];
+	[window close];
 	_variablesToEdit = nil;
 }
 

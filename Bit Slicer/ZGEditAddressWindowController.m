@@ -33,6 +33,7 @@
 #import "ZGEditAddressWindowController.h"
 #import "ZGVariableController.h"
 #import "ZGVariable.h"
+#import "ZGNullability.h"
 
 @implementation ZGEditAddressWindowController
 {
@@ -59,7 +60,7 @@
 
 - (void)requestEditingAddressFromVariable:(ZGVariable *)variable attachedToWindow:(NSWindow *)parentWindow
 {
-	[self window]; // ensure window is loaded
+	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
 	_variable = variable;
 	_addressTextField.stringValue = variable.addressFormula;
@@ -67,7 +68,7 @@
 	[_addressTextField selectText:nil];
 	
 	[NSApp
-	 beginSheet:self.window
+	 beginSheet:window
 	 modalForWindow:parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil
@@ -76,8 +77,9 @@
 
 - (IBAction)editAddress:(id)__unused sender
 {
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject([self window]);
+	[NSApp endSheet:window];
+	[window close];
 	
 	[_variableController
 	 editVariable:_variable
@@ -88,8 +90,9 @@
 
 - (IBAction)cancelEditingAddress:(id)__unused sender
 {
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject([self window]);
+	[NSApp endSheet:window];
+	[window close];
 	
 	_variable = nil;
 }

@@ -32,6 +32,7 @@
 
 #import "ZGScriptPromptWindowController.h"
 #import "ZGScriptPrompt.h"
+#import "ZGNullability.h"
 
 @implementation ZGScriptPromptWindowController
 {
@@ -46,7 +47,8 @@
 
 - (void)attachToWindow:(NSWindow *)parentWindow withScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate
 {
-	[self window];
+	// Must load the window before setting text field values
+	NSWindow *window = ZGUnwrapNullableObject([self window]);
 	
 	_messageTextField.stringValue = scriptPrompt.message;
 	_answerTextField.stringValue = scriptPrompt.answer;
@@ -54,7 +56,7 @@
 	[_answerTextField selectText:nil];
 	
 	[NSApp
-	 beginSheet:self.window
+	 beginSheet:window
 	 modalForWindow:parentWindow
 	 modalDelegate:nil
 	 didEndSelector:nil
@@ -77,7 +79,7 @@
 {
 	if (_isAttached)
 	{
-		[NSApp endSheet:self.window];
+		[NSApp endSheet:ZGUnwrapNullableObject(self.window)];
 		[self.window close];
 		
 		_isAttached = NO;

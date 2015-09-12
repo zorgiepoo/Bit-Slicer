@@ -60,6 +60,7 @@
 #import "ZGHotKey.h"
 #import "ZGDataValueExtracting.h"
 #import "ZGMemoryAddressExpressionParsing.h"
+#import "ZGNullability.h"
 
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
@@ -173,10 +174,10 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		
 		_haltedBreakPoints = [[NSMutableArray alloc] init];
 		
-		_pauseAndUnpauseHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGPauseAndUnpauseHotKey]];
-		_stepInHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGStepInHotKey]];
-		_stepOverHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOverHotKey]];
-		_stepOutHotKey = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOutHotKey]];
+		_pauseAndUnpauseHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGPauseAndUnpauseHotKey])]);
+		_stepInHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepInHotKey])]);
+		_stepOverHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOverHotKey])]);
+		_stepOutHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGStepOutHotKey])]);
 
 		[hotKeyCenter registerHotKey:_pauseAndUnpauseHotKey delegate:self];
 		[hotKeyCenter registerHotKey:_stepInHotKey delegate:self];
@@ -1933,7 +1934,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 		else
 		{
-			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.symbols];
+			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:(NSString * _Nonnull)instruction.symbols];
 		}
 	}
 	

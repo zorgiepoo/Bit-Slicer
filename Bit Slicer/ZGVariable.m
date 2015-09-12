@@ -32,6 +32,7 @@
 
 #import "ZGVariable.h"
 #import "NSStringAdditions.h"
+#import "ZGNullability.h"
 
 NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
@@ -210,7 +211,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 - (id)copyWithZone:(NSZone *)__unused zone
 {
 	NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:self];
-	return [NSKeyedUnarchiver unarchiveObjectWithData:archivedData];
+	return ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:archivedData]);
 }
 
 + (ZGMemorySize)sizeFromType:(ZGVariableType)type pointerSize:(ZGMemorySize)pointerSize

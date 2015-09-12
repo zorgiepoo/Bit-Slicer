@@ -31,6 +31,7 @@
  */
 
 #import "ZGBreakPointConditionViewController.h"
+#import "ZGNullability.h"
 
 @implementation ZGBreakPointConditionViewController
 {
@@ -53,7 +54,7 @@
 {
 	if (_condition != nil)
 	{
-		[_conditionTextField setStringValue:_condition];
+		[_conditionTextField setStringValue:(NSString * _Nonnull)_condition];
 	}
 }
 
@@ -78,7 +79,7 @@
 #define BREAKPOINT_CONDITION_SCRIPTING @"https://github.com/zorgiepoo/Bit-Slicer/wiki/Setting-Breakpoints"
 - (IBAction)showHelp:(id)__unused sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:BREAKPOINT_CONDITION_SCRIPTING]];
+	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:BREAKPOINT_CONDITION_SCRIPTING])];
 }
 
 @end

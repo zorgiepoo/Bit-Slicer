@@ -41,6 +41,7 @@
 #import "ZGPyKeyModModule.h"
 #import "ZGPyVMProtModule.h"
 #import "OSCSingleThreadQueue.h"
+#import "ZGNullability.h"
 
 #import <pthread.h>
 #import "structmember.h"
@@ -68,6 +69,18 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 	return scriptingInterpreter;
 }
 
++ (NSURL *)scriptCachesURL
+{
+	NSFileManager *fileManager = [[NSFileManager alloc] init];
+	NSURL *cachesURL = [fileManager URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:NULL];
+	assert(cachesURL != nil);
+	
+	NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+	assert(bundleIdentifier != nil);
+	
+	return [[cachesURL URLByAppendingPathComponent:bundleIdentifier] URLByAppendingPathComponent:@"Scripts_Temp"];
+}
+
 - (id)init
 {
 	self = [super init];
@@ -75,24 +88,33 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 	{
 		NSFileManager *fileManager = [[NSFileManager alloc] init];
 		
-		if (![fileManager fileExistsAtPath:SCRIPT_CACHES_PATH])
+		NSURL *scriptCachesURL = [[self class] scriptCachesURL];
+		NSString *scriptCachesPath = scriptCachesURL.path;
+		assert(scriptCachesPath != nil);
+		
+		if (![fileManager fileExistsAtPath:scriptCachesPath])
 		{
-			[fileManager createDirectoryAtPath:SCRIPT_CACHES_PATH withIntermediateDirectories:YES attributes:nil error:nil];
+			NSError *createDirectoryError = nil;
+			if (![fileManager createDirectoryAtURL:scriptCachesURL withIntermediateDirectories:YES attributes:nil error:&createDirectoryError])
+			{
+				NSLog(@"Failed to create scripting cache directory at %@ with error %@", scriptCachesURL, createDirectoryError);
+				assert(false);
+			}
 		}
 		
 		NSMutableArray *filePathsToRemove = [NSMutableArray array];
-		NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtPath:SCRIPT_CACHES_PATH];
+		NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtPath:scriptCachesPath];
 		for (NSString *filename in directoryEnumerator)
 		{
 			if ([filename hasPrefix:SCRIPT_FILENAME_PREFIX] && [[filename pathExtension] isEqualToString:@"py"])
 			{
-				NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:[SCRIPT_CACHES_PATH stringByAppendingPathComponent:filename] error:nil];
+				NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:[scriptCachesPath stringByAppendingPathComponent:filename] error:nil];
 				if (fileAttributes != nil)
 				{
 					NSDate *lastModificationDate = [fileAttributes objectForKey:NSFileModificationDate];
 					if ([[NSDate date] timeIntervalSinceDate:lastModificationDate] > 864000) // 10 days
 					{
-						[filePathsToRemove addObject:[SCRIPT_CACHES_PATH stringByAppendingPathComponent:filename]];
+						[filePathsToRemove addObject:[scriptCachesPath stringByAppendingPathComponent:filename]];
 					}
 				}
 			}
@@ -152,7 +174,7 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 		PyObject *path = PySys_GetObject("path");
 		
 		[self appendPath:[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] toSysPath:path];
-		[self appendPath:SCRIPT_CACHES_PATH toSysPath:path];
+		[self appendPath:[[[self class] scriptCachesURL] path] toSysPath:path];
 		[self appendPath:userModulesDirectory toSysPath:path];
 		
 		PyObject *mainModule = loadMainPythonModule();

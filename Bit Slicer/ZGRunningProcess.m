@@ -98,13 +98,17 @@
 			_isWebContent = ([_name isEqualToString:@"Safari Web Content"] || [_name isEqualToString:@"Google Chrome Helper"] || [_name isEqualToString:@"Firefox Web Content"]);
 			_hasHelpers = [bundleIdentifier isEqualToString:@"com.apple.Safari"] || [bundleIdentifier isEqualToString:@"com.google.Chrome"];
 			
-			NSBundle *applicationBundle = [NSBundle bundleWithURL:runningApplication.bundleURL];
-			if (applicationBundle != nil)
+			NSURL *applicationBundleURL = runningApplication.bundleURL;
+			if (applicationBundleURL != nil)
 			{
-				NSString *category = [applicationBundle objectForInfoDictionaryKey:@"LSApplicationCategoryType"];
-				if ([category isKindOfClass:[NSString class]])
+				NSBundle *applicationBundle = [NSBundle bundleWithURL:applicationBundleURL];
+				if (applicationBundle != nil)
 				{
-					_isGame = [category rangeOfString:@"games"].location != NSNotFound;
+					NSString *category = [applicationBundle objectForInfoDictionaryKey:@"LSApplicationCategoryType"];
+					if ([category isKindOfClass:[NSString class]])
+					{
+						_isGame = [category rangeOfString:@"games"].location != NSNotFound;
+					}
 				}
 			}
 		}

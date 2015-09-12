@@ -36,6 +36,7 @@
 #import "NSStringAdditions.h"
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGRunAlertPanel.h"
+#import "ZGNullability.h"
 
 #define ZGEditSizeLocalizableTable @"[Code] Edit Variable Size"
 
@@ -64,7 +65,7 @@
 
 - (void)requestEditingSizesFromVariables:(NSArray *)variables attachedToWindow:(NSWindow *)parentWindow
 {
-	[self window]; // ensure window is loaded
+	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
 	ZGVariable *firstVariable = [variables objectAtIndex:0];
 	_sizeTextField.stringValue = firstVariable.sizeStringValue;
@@ -74,7 +75,7 @@
 	_variables = variables;
 	
 	[NSApp
-	 beginSheet:self.window
+	 beginSheet:window
 	 modalForWindow:parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil
@@ -105,8 +106,9 @@
 	}
 	else
 	{
-		[NSApp endSheet:self.window];
-		[self.window close];
+		NSWindow *window = ZGUnwrapNullableObject(self.window);
+		[NSApp endSheet:window];
+		[window close];
 		
 		NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
 		
@@ -126,8 +128,9 @@
 
 - (IBAction)cancelEditingVariablesSizes:(id)__unused sender
 {
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject(self.window);
+	[NSApp endSheet:window];
+	[window close];
 	
 	_variables = nil;
 }

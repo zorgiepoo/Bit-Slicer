@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mayur Pawashe
+ * Copyright (c) 2015 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,36 +30,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "ZGSearchToken.h"
 #import "ZGNullability.h"
 
-@implementation ZGSearchToken
-
-- (id)initWithName:(NSString *)name
+id _Nonnull ZGUnwrapNullableObject(id _Nullable object)
 {
-	self = [super init];
-	if (self != nil)
-	{
-		_name = [name copy];
-	}
-	return self;
+	assert(object != NULL);
+	return (id _Nonnull)object;
 }
-
-- (void)encodeWithCoder:(NSCoder *)encoder
-{
-	[encoder encodeObject:_name];
-}
-
-- (id)initWithCoder:(NSCoder *)decoder
-{
-	_name = [[decoder decodeObject] copy];
-	return self;
-}
-
-- (id)copyWithZone:(NSZone *)__unused zone
-{
-	NSData *archivedData = [NSKeyedArchiver archivedDataWithRootObject:self];
-	return ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:archivedData]);
-}
-
-@end

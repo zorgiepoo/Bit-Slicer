@@ -51,6 +51,8 @@
 #import "ZGMachBinary.h"
 #import "ZGTableView.h"
 #import "ZGOperatingSystemCompatibility.h"
+#import "ZGNullability.h"
+#import "ZGDebugLogging.h"
 
 #define ZGLocalizableWatchVariableString(string) NSLocalizedStringFromTable(string, @"[Code] Watch Variable", nil)
 
@@ -111,8 +113,9 @@
 	
 	[_progressIndicator stopAnimation:nil];
 	
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject([self window]);
+	[NSApp endSheet:window];
+	[window close];
 	
 	if (_watchActivity != nil)
 	{
@@ -222,7 +225,21 @@
 - (void)annotateWatchVariableDescription:(ZGWatchVariable *)watchVariable
 {
 	NSFont *userFont = [NSFont userFontOfSize:12];
-	NSFont *boldFont = [[NSFontManager sharedFontManager] fontWithFamily:userFont.familyName traits:NSBoldFontMask weight:0 size:userFont.pointSize];
+	NSString *userFontFamilyName = userFont.familyName;
+	
+	if (userFontFamilyName == nil)
+	{
+		ZG_LOG(@"Failed to retrieve user font family name from %@", userFont);
+		return;
+	}
+	
+	NSFont *boldFont = [[NSFontManager sharedFontManager] fontWithFamily:userFontFamilyName traits:NSBoldFontMask weight:0 size:userFont.pointSize];
+	
+	if (boldFont == nil)
+	{
+		ZG_LOG(@"Failed to retrieve bold font from family name %@", userFontFamilyName);
+		return;
+	}
 	
 	ZGInstruction *instruction = watchVariable.instruction;
 	ZGRegistersState *registersState = watchVariable.registersState;
@@ -323,7 +340,7 @@
 		return;
 	}
 	
-	[self window]; // ensure window is loaded
+	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
 	[self updateAddButton];
 	
@@ -333,7 +350,7 @@
 	[_tableView reloadData];
 	
 	[NSApp
-	 beginSheet:self.window
+	 beginSheet:window
 	 modalForWindow:parentWindow
 	 modalDelegate:nil
 	 didEndSelector:nil

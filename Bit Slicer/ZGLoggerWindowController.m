@@ -78,8 +78,12 @@
 {
 	[super restoreStateWithCoder:coder];
 	
-	_loggerText = [NSMutableString stringWithString:[coder decodeObjectForKey:ZGLoggerWindowText]];
-	[self writeLine:ZGLocalizedStringFromLoggerWindowTable(@"restoredText") withDateFormatting:NO];
+	NSString *restoredText = [coder decodeObjectForKey:ZGLoggerWindowText];
+	if (restoredText != nil)
+	{
+		_loggerText = [NSMutableString stringWithString:restoredText];
+		[self writeLine:ZGLocalizedStringFromLoggerWindowTable(@"restoredText") withDateFormatting:NO];
+	}
 }
 
 - (void)updateDisplay

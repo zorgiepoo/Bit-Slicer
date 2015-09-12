@@ -37,6 +37,7 @@
 #import "ZGRunAlertPanel.h"
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGMemoryTypes.h"
+#import "ZGNullability.h"
 
 #define ZGLocalizedStringFromMemoryProtectionTable(string) NSLocalizedStringFromTable((string), @"[Code] Memory Protection", nil)
 
@@ -119,8 +120,9 @@
 			
 			if ([self changeProtectionAtAddress:address size:size oldProtection:oldProtection newProtection:protection])
 			{
-				[NSApp endSheet:self.window];
-				[self.window close];
+				NSWindow *window = ZGUnwrapNullableObject(self.window);
+				[NSApp endSheet:window];
+				[window close];
 			}
 		}
 	}
@@ -134,8 +136,9 @@
 
 - (IBAction)cancelMemoryProtectionChange:(id)__unused sender
 {
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject(self.window);
+	[NSApp endSheet:window];
+	[window close];
 }
 
 - (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process requestedAddressRange:(HFRange)requestedAddressRange undoManager:(NSUndoManager *)undoManager
@@ -143,7 +146,7 @@
 	_process = process;
 	_undoManager = undoManager;
 	
-	[self window]; // ensure window is loaded
+	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
 	if (requestedAddressRange.length > 0)
 	{
@@ -172,7 +175,7 @@
 	}
 	
 	[NSApp
-	 beginSheet:self.window
+	 beginSheet:window
 	 modalForWindow:parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil

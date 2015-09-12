@@ -32,6 +32,7 @@
 
 #import "ZGEditDescriptionWindowController.h"
 #import "ZGVariableController.h"
+#import "ZGNullability.h"
 
 @implementation ZGEditDescriptionWindowController
 {
@@ -58,14 +59,14 @@
 
 - (void)requestEditingDescriptionFromVariable:(ZGVariable *)variable attachedToWindow:(NSWindow *)parentWindow
 {
-	[self window]; // ensure window is loaded
+	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
 	[_descriptionTextView.textStorage setAttributedString:variable.fullAttributedDescription];
 	[_descriptionTextView scrollRangeToVisible:NSMakeRange(0, 0)];
 	_variable = variable;
 	
 	[NSApp
-	 beginSheet:self.window
+	 beginSheet:window
 	 modalForWindow:parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil
@@ -75,14 +76,17 @@
 - (IBAction)editVariableDescription:(id)__unused sender
 {
 	[_variableController changeVariable:_variable newDescription:[_descriptionTextView.textStorage copy]];
-	[NSApp endSheet:self.window];
-	[self.window close];
+	
+	NSWindow *window = ZGUnwrapNullableObject([self window]);
+	[NSApp endSheet:window];
+	[window close];
 }
 
 - (IBAction)cancelEditingVariableDescription:(id)__unused sender
 {
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject([self window]);
+	[NSApp endSheet:window];
+	[window close];
 }
 
 // Make this controller the only one that can use the font and color panels, since nobody else needs it

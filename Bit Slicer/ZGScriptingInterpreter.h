@@ -37,8 +37,6 @@
 #define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"
 #define SCRIPT_EVALUATION_ERROR_REASON @"Reason"
 
-#define SCRIPT_CACHES_PATH [[[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] stringByAppendingPathComponent:@"Scripts_Temp"]
-
 #define SCRIPT_FILENAME_PREFIX @"Script"
 
 @class ZGProcess;
@@ -47,6 +45,8 @@
 @interface ZGScriptingInterpreter : NSObject
 
 + (instancetype)createInterpreterOnce;
+
++ (NSURL *)scriptCachesURL;
 
 - (void)acquireInterpreter;
 

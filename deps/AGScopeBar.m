@@ -30,11 +30,11 @@
 //
 
 // Modified to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
-// and replacing deprecated Gestalt() usage
+// replacing deprecated Gestalt() usage, and fixing nullability warnings
 
 #import "AGScopeBar.h"
 #import "ZGOperatingSystemCompatibility.h"
-
+#import "ZGNullability.h"
 
 #define SCOPE_BAR_HORZ_INSET			8.0						// inset on left and right
 #define SCOPE_BAR_HEIGHT				25.0					// used in -sizeToFit
@@ -894,7 +894,7 @@
 
 - (void)menuWillOpen:(NSMenu *)menu;
 {
-	if (menu == mGroupPopupButton.menu) {
+	if (menu == ZGUnwrapNullableObject(mGroupPopupButton.menu)) {
 		[mGroupPopupButton removeAllItems];
 		
 		for (AGScopeBarItem * item in self.items) {
@@ -907,16 +907,16 @@
 }
 
 
-- (void)menuDidClose:(NSMenu *)menu;
+- (void)menuDidClose:(NSMenu *)__unused menu;
 {
-	if (menu == mGroupPopupButton.menu) {
-		
-		// Hmm. Was doing this for some reason that I unfortunately cannot recall.
-		// The issue in doing it though is that the clicked-on menu item's action
-		// will not be sent to the target if it's removed from the menu! I thought
-		// it use to work though. This may be a recent change in 10.9?
-		//[mGroupPopupButton removeAllItems];
-	}
+//	if (menu == mGroupPopupButton.menu) {
+//		
+//		// Hmm. Was doing this for some reason that I unfortunately cannot recall.
+//		// The issue in doing it though is that the clicked-on menu item's action
+//		// will not be sent to the target if it's removed from the menu! I thought
+//		// it use to work though. This may be a recent change in 10.9?
+//		//[mGroupPopupButton removeAllItems];
+//	}
 }
 
 
@@ -1209,7 +1209,7 @@
 	
 	if (!self.allowsMultipleSelection) {
 		if (selectedItems.count > 1) {
-			selectedItems = [NSArray arrayWithObject:[selectedItems lastObject]];
+			selectedItems = [NSArray arrayWithObject:(id _Nonnull)[selectedItems lastObject]];
 		}
 	}
 	

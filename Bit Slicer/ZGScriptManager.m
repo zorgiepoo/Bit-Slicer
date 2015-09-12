@@ -53,6 +53,7 @@
 #import "ZGAppPathUtilities.h"
 #import "ZGScriptPrompt.h"
 #import "ZGScriptPromptWindowController.h"
+#import "ZGNullability.h"
 
 #import "structmember.h"
 
@@ -227,15 +228,17 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		{
 			uint32_t randomInteger = arc4random();
 			
+			NSString *scriptCachesPath = ZGUnwrapNullableObject([ZGScriptingInterpreter scriptCachesURL].path);
+			
 			NSMutableString *randomFilename = [NSMutableString stringWithFormat:@"%@ %X", SCRIPT_FILENAME_PREFIX, randomInteger];
-			while ([fileManager fileExistsAtPath:[[SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename] stringByAppendingString:@".py"]])
+			while ([fileManager fileExistsAtPath:[[scriptCachesPath stringByAppendingPathComponent:randomFilename] stringByAppendingString:@".py"]])
 			{
 				[randomFilename appendString:@"1"];
 			}
 			
 			[randomFilename appendString:@".py"];
 			
-			scriptPath = [SCRIPT_CACHES_PATH stringByAppendingPathComponent:randomFilename];
+			scriptPath = [scriptCachesPath stringByAppendingPathComponent:randomFilename];
 		}
 		
 		if (variable.cachedScriptPath == nil || ![variable.cachedScriptPath isEqualToString:scriptPath])

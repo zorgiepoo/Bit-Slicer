@@ -91,18 +91,21 @@ typedef NS_ENUM(NSInteger, ZGScriptIndentationTag)
 	NSMutableArray *addedEditorPaths = [NSMutableArray array];
 	for (NSURL *editorURL in editorURLs)
 	{
-		NSString *editorPath = [editorURL relativePath];
-		NSString *editorName = [[editorPath lastPathComponent] stringByDeletingPathExtension];
+		NSString *editorName = [[editorURL lastPathComponent] stringByDeletingPathExtension];
 		if (![addedEditorPaths containsObject:editorName])
 		{
-			NSImage *icon = [workspace iconForFile:editorPath];
-			
-			NSMenuItem *editorMenuItem = [[NSMenuItem alloc] initWithTitle:editorName action:NULL keyEquivalent:@""];
-			editorMenuItem.image = [icon copy];
-			[editorMenuItem.image setSize:EDITOR_ICON_SIZE];
-			
-			[_applicationEditorsPopUpButton.menu addItem:editorMenuItem];
-			[addedEditorPaths addObject:editorName];
+			NSString *editorURLPath = editorURL.path;
+			if (editorURLPath != nil)
+			{
+				NSImage *icon = [workspace iconForFile:editorURLPath];
+				
+				NSMenuItem *editorMenuItem = [[NSMenuItem alloc] initWithTitle:editorName action:NULL keyEquivalent:@""];
+				editorMenuItem.image = [icon copy];
+				[editorMenuItem.image setSize:EDITOR_ICON_SIZE];
+				
+				[_applicationEditorsPopUpButton.menu addItem:editorMenuItem];
+				[addedEditorPaths addObject:editorName];
+			}
 		}
 	}
 	

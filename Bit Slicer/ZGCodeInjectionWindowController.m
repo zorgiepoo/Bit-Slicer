@@ -38,6 +38,7 @@
 #import "ZGInstruction.h"
 #import "ZGVariable.h"
 #import "ZGRunAlertPanel.h"
+#import "ZGNullability.h"
 
 @implementation ZGCodeInjectionWindowController
 {
@@ -126,7 +127,7 @@
 		[suggestedCode appendString:@"\n"];
 	}
 	
-	[self window]; // Ensure window is loaded
+	NSWindow *window = ZGUnwrapNullableObject([self window]); // Ensure window is loaded
 	
 	[self setSuggestedCode:suggestedCode];
 	
@@ -138,7 +139,7 @@
 	_breakPoints = breakPoints;
 	
 	[NSApp
-	 beginSheet:self.window
+	 beginSheet:window
 	 modalForWindow:parentWindow
 	 modalDelegate:nil
 	 didEndSelector:nil
@@ -161,8 +162,9 @@
 	}
 	else
 	{
-		[NSApp endSheet:self.window];
-		[self.window close];
+		NSWindow *window = ZGUnwrapNullableObject(self.window);
+		[NSApp endSheet:window];
+		[window close];
 	}
 }
 
@@ -173,8 +175,9 @@
 		NSLog(@"Error: Failed to deallocate VM memory after canceling from injecting code..");
 	}
 	
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject(self.window);
+	[NSApp endSheet:window];
+	[window close];
 }
 
 @end

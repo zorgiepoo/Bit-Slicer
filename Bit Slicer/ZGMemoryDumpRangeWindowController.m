@@ -37,6 +37,7 @@
 #import "ZGVirtualMemory.h"
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGRunAlertPanel.h"
+#import "ZGNullability.h"
 
 #define ZGLocalizedStringFromDumpMemoryRangeTable(string) NSLocalizedStringFromTable((string), @"[Code] Dump Memory Range", nil)
 
@@ -64,8 +65,9 @@
 	
 	if (toAddress > fromAddress && fromAddressExpression.length > 0 && toAddressExpression.length > 0)
 	{
-		[NSApp endSheet:self.window];
-		[self.window close];
+		NSWindow *window = ZGUnwrapNullableObject(self.window);
+		[NSApp endSheet:window];
+		[window close];
 		
 		NSSavePanel *savePanel = NSSavePanel.savePanel;
 		[savePanel
@@ -81,13 +83,13 @@
 				 if ((success = ZGReadBytes(self->_process.processTask, fromAddress, &bytes, &size)))
 				 {
 					 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
-					 success = [data writeToURL:savePanel.URL atomically:NO];
+					 success = [data writeToURL:ZGUnwrapNullableObject(savePanel.URL) atomically:NO];
 					 
 					 ZGFreeBytes(bytes, size);
 				 }
 				 else
 				 {
-					 NSLog(@"Failed to read region");
+					 NSLog(@"Failed to read memory from %@ at 0x%llX (0x%llX bytes)", self->_process.name, fromAddress, size);
 				 }
 				 
 				 if (!success)
@@ -105,8 +107,9 @@
 
 - (IBAction)cancel:(id)__unused sender
 {
-	[NSApp endSheet:self.window];
-	[self.window close];
+	NSWindow *window = ZGUnwrapNullableObject(self.window);
+	[NSApp endSheet:window];
+	[window close];
 }
 
 - (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process requestedAddressRange:(HFRange)requestedAddressRange
@@ -114,13 +117,13 @@
 	_process = process;
 	_parentWindow = parentWindow;
 	
-	[self window]; // ensure window is loaded
+	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
 	_fromAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", requestedAddressRange.location];
 	_toAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", requestedAddressRange.location + requestedAddressRange.length];
 	
 	[NSApp
-	 beginSheet:self.window
+	 beginSheet:window
 	 modalForWindow:_parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil

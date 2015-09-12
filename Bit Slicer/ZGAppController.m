@@ -55,6 +55,7 @@
 #import "ZGProcess.h"
 #import "ZGOperatingSystemCompatibility.h"
 #import "ZGAboutWindowController.h"
+#import "ZGNullability.h"
 
 #define ZGLoggerIdentifier @"ZGLoggerIdentifier"
 #define ZGMemoryViewerIdentifier @"ZGMemoryViewerIdentifier"
@@ -358,31 +359,31 @@
 #define WIKI_URL @"https://github.com/zorgiepoo/Bit-Slicer/wiki"
 - (IBAction)help:(id)__unused sender
 {	
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:WIKI_URL]];
+	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:WIKI_URL])];
 }
 
 #define ISSUES_TRACKER_URL @"https://github.com/zorgiepoo/Bit-Slicer/issues"
 - (IBAction)reportABug:(id)__unused sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:ISSUES_TRACKER_URL]];
+	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:ISSUES_TRACKER_URL])];
 }
 
 #define FORUMS_URL @"http://portingteam.com/forum/157-bit-slicer/"
 - (IBAction)visitForums:(id)__unused sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:FORUMS_URL]];
+	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:FORUMS_URL])];
 }
 
 #define FEEDBACK_EMAIL @"zorgiepoo@gmail.com"
 - (IBAction)sendFeedback:(id)__unused sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[@"mailto:" stringByAppendingString:FEEDBACK_EMAIL]]];
+	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:[@"mailto:" stringByAppendingString:FEEDBACK_EMAIL]])];
 }
 
 #define DONATION_URL @"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A3DTDV2F3VE5G&lc=US&item_name=Bit%20Slicer%20App&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"
 - (IBAction)openDonationURL:(id)__unused sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:DONATION_URL]];
+	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:DONATION_URL])];
 }
 
 @end

@@ -76,6 +76,7 @@
 		726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D319606E2900A6AD40 /* Edit Description Dialog.xib */; };
 		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
+		7275F8A51BA4756100FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; settings = {ASSET_TAGS = (); }; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
 		72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
@@ -357,6 +358,8 @@
 		726CA2D219606E2900A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Edit Description Dialog.xib"; sourceTree = "<group>"; };
 		726CA2D519606E3100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Search Options.xib"; sourceTree = "<group>"; };
 		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Watch Variable Dialog.xib"; sourceTree = "<group>"; };
+		7275F8A31BA4756100FD144C /* ZGNullability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGNullability.h; path = "Bit Slicer/ZGNullability.h"; sourceTree = "<group>"; };
+		7275F8A41BA4756100FD144C /* ZGNullability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGNullability.m; path = "Bit Slicer/ZGNullability.m"; sourceTree = "<group>"; };
 		7284245619A96B470081C673 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPrompt.h; path = "Bit Slicer/ZGScriptPrompt.h"; sourceTree = "<group>"; usesTabs = 1; };
 		72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPrompt.m; path = "Bit Slicer/ZGScriptPrompt.m"; sourceTree = "<group>"; usesTabs = 1; };
@@ -1418,6 +1421,8 @@
 			isa = PBXGroup;
 			children = (
 				722EE7801B193FAE00934EF3 /* ZGDebugLogging.h */,
+				7275F8A31BA4756100FD144C /* ZGNullability.h */,
+				7275F8A41BA4756100FD144C /* ZGNullability.m */,
 				722EE7811B19402100934EF3 /* ZGStaticSelectorChecker.h */,
 				722EE7821B19406700934EF3 /* ZGRunAlertPanel.h */,
 				722EE7831B19406700934EF3 /* ZGRunAlertPanel.m */,
@@ -1788,6 +1793,7 @@
 				77F1164D17D2EFDA009E002A /* ZGBreakPoint.m in Sources */,
 				72030ADC1B00191400A5621C /* ZGScriptingInterpreter.m in Sources */,
 				722EE7841B19406700934EF3 /* ZGRunAlertPanel.m in Sources */,
+				7275F8A51BA4756100FD144C /* ZGNullability.m in Sources */,
 				77F1165017D2EFE4009E002A /* ZGDebugThread.m in Sources */,
 				77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */,
 				7257EFF31B87EF220045991F /* OSCSingleThreadQueue.m in Sources */,
@@ -2598,10 +2604,8 @@
 					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
 					"-Wno-reserved-id-macro",
-					"-Wno-nullable-to-nonnull-conversion",
 					"-Wno-cast-qual",
 					"-Wno-auto-import",
-					"-Wno-unknown-warning-option",
 					"-Werror",
 				);
 			};
@@ -2701,10 +2705,8 @@
 					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
 					"-Wno-reserved-id-macro",
-					"-Wno-nullable-to-nonnull-conversion",
 					"-Wno-cast-qual",
 					"-Wno-auto-import",
-					"-Wno-unknown-warning-option",
 					"-Werror",
 				);
 			};

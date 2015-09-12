@@ -51,6 +51,7 @@
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
 #import "ZGProtectionDescription.h"
+#import "ZGNullability.h"
 
 @implementation ZGDocumentTableController
 {
@@ -390,7 +391,7 @@
 	}
 	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType])
 	{
-		NSArray *variables = [NSKeyedUnarchiver unarchiveObjectWithData:[[draggingInfo draggingPasteboard] dataForType:ZGVariablePboardType]];
+		NSArray *variables = [NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[draggingInfo draggingPasteboard] dataForType:ZGVariablePboardType])];
 		
 		NSMutableIndexSet *rowIndexes = [NSMutableIndexSet indexSet];
 		for (NSUInteger rowIndex = 0; rowIndex < variables.count; rowIndex++)

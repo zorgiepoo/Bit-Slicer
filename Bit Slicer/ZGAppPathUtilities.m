@@ -31,6 +31,7 @@
  */
 
 #import "ZGAppPathUtilities.h"
+#import "ZGNullability.h"
 
 @implementation ZGAppPathUtilities
 
@@ -72,7 +73,7 @@
 		return nil;
 	}
 	
-	NSString *emptyPythonFilePath = [applicationSupportPath stringByAppendingPathComponent:[@"temporary_script" stringByAppendingPathExtension:@"py"]];
+	NSString *emptyPythonFilePath = [applicationSupportPath stringByAppendingPathComponent:ZGUnwrapNullableObject([@"temporary_script" stringByAppendingPathExtension:@"py"])];
 	
 	if ([fileManager fileExistsAtPath:emptyPythonFilePath])
 	{

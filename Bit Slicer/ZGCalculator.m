@@ -42,6 +42,7 @@
 #import <DDMathParser/DDExpression.h>
 #import <DDMathParser/DDExpressionRewriter.h>
 #import "ZGDebugLogging.h"
+#import "ZGNullability.h"
 
 #define ZGCalculatePointerFunction @"ZGCalculatePointerFunction"
 #define ZGFindSymbolFunction @"symbol"
@@ -97,7 +98,7 @@
 					if (error != NULL && *error != nil)
 					{
 						NSError *imageError = *error;
-						[failedImages addObject:[imageError.userInfo objectForKey:ZGFailedImageName]];
+						[failedImages addObject:ZGUnwrapNullableObject(imageError.userInfo[ZGFailedImageName])];
 					}
 				}
 			}
@@ -461,7 +462,8 @@
 		
 		if (substitutionString != nil)
 		{
-			[newData appendBytes:[substitutionString UTF8String] length:strlen([substitutionString UTF8String])];
+			const char *substitutionCString = [substitutionString UTF8String];
+			[newData appendBytes:substitutionCString length:strlen(substitutionCString)];
 		}
 		else
 		{
