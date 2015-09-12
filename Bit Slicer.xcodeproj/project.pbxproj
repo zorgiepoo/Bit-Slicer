@@ -77,6 +77,7 @@
 		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
 		7275F8A51BA4756100FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; settings = {ASSET_TAGS = (); }; };
+		7275F8A61BA4BD7200FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
 		72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
@@ -1665,6 +1666,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7275F8A61BA4BD7200FD144C /* ZGNullability.m in Sources */,
 				72BD7EB01B84070F00B7E3CC /* ZGPrivateCoreSymbolicator.m in Sources */,
 				72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */,
 				722EE7921B19584300934EF3 /* ZGVirtualMemoryStringReading.m in Sources */,
@@ -2412,6 +2414,7 @@
 					"-Wno-auto-import",
 					"-Wno-documentation-unknown-command",
 					"-Wno-c++98-compat-pedantic",
+					"-Wno-reserved-id-macro",
 					"-Werror",
 				);
 				WRAPPER_EXTENSION = xctest;
@@ -2502,6 +2505,7 @@
 					"-Wno-auto-import",
 					"-Wno-documentation-unknown-command",
 					"-Wno-c++98-compat-pedantic",
+					"-Wno-reserved-id-macro",
 					"-Werror",
 				);
 				WRAPPER_EXTENSION = xctest;

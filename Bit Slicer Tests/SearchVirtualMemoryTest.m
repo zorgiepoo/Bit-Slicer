@@ -53,7 +53,11 @@
 {
     [super setUp];
 	
-	_data = [NSData dataWithContentsOfFile:[[NSBundle bundleForClass:[self class]] pathForResource:@"random_data" ofType:@""]];
+	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+	NSString *randomDataPath = [bundle pathForResource:@"random_data" ofType:@""];
+	XCTAssertNotNil(randomDataPath);
+	
+	_data = [NSData dataWithContentsOfFile:randomDataPath];
 	XCTAssertNotNil(_data);
 	
 	NSString *taskPath = @"/usr/bin/man";
@@ -149,7 +153,7 @@
 	XCTAssertTrue(foundAddress);
 }
 
-- (ZGSearchData *)searchDataFromBytes:(void *)bytes size:(ZGMemorySize)size address:(ZGMemoryAddress)address alignment:(ZGMemorySize)alignment
+- (ZGSearchData *)searchDataFromBytes:(const void *)bytes size:(ZGMemorySize)size address:(ZGMemoryAddress)address alignment:(ZGMemorySize)alignment
 {
 	void *copiedBytes = malloc(size);
 	if (copiedBytes == NULL)
@@ -530,7 +534,7 @@
 	size_t mooLength = strlen("moo") * 2;
 	if (!ZGWriteBytes(_processTask, address + 5000, moo, mooLength)) XCTFail(@"Failed to write moo string");
 	
-	ZGSearchData *mooSearchData = [self searchDataFromBytes:(void *)moo size:mooLength address:address alignment:2];
+	ZGSearchData *mooSearchData = [self searchDataFromBytes:moo size:mooLength address:address alignment:2];
 	
 	ZGSearchResults *equalNarrowedResults = ZGNarrowSearchForData(_processTask, mooSearchData, nil, ZGString16, 0, ZGEquals, [[ZGSearchResults alloc] init], equalResults);
 	XCTAssertEqual(equalNarrowedResults.addressCount, 1U);
@@ -552,7 +556,7 @@
 	ZGSearchResults *notEqualNarrowedIgnoreCaseResults = ZGNarrowSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals, [[ZGSearchResults alloc] init], equalResults);
 	XCTAssertEqual(notEqualNarrowedIgnoreCaseResults.addressCount, 1U);
 	
-	ZGSearchData *nooSearchData = [self searchDataFromBytes:(void *)noo size:nooLength address:address alignment:2];
+	ZGSearchData *nooSearchData = [self searchDataFromBytes:noo size:nooLength address:address alignment:2];
 	nooSearchData.beginAddress = address + _pageSize;
 	nooSearchData.endAddress = address + _pageSize * 2;
 	
