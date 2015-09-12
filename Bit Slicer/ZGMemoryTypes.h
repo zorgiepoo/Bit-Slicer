@@ -30,8 +30,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _ZG_MEMORY_TYPES_H
-#define _ZG_MEMORY_TYPES_H
+#ifndef ZG_MEMORY_TYPES_H
+#define ZG_MEMORY_TYPES_H
 
 #include <mach/std_types.h>
 #include <mach/vm_prot.h>

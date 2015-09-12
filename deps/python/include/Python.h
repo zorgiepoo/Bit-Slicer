@@ -4,6 +4,9 @@
 
 /* Include nearly all Python header files */
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
+
 #include "patchlevel.h"
 #include "pyconfig.h"
 #include "pymacconfig.h"
@@ -128,5 +131,7 @@
 #include "dtoa.h"
 #include "fileutils.h"
 #include "pyfpe.h"
+
+#pragma clang diagnostic pop
 
 #endif /* !Py_PYTHON_H */

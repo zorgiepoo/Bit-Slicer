@@ -30,8 +30,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _ZG_VIRTUAL_MEMORY_H
-#define _ZG_VIRTUAL_MEMORY_H
+#ifndef ZG_VIRTUAL_MEMORY_H
+#define ZG_VIRTUAL_MEMORY_H
 
 #ifdef __cplusplus
 extern "C" {

@@ -58,9 +58,15 @@
 
 #define ZGDataInspectorLocalizationTable @"[Code] Data Inspector"
 
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
+
 #ifndef __BIG_ENDIAN__
 #define __BIG_ENDIAN__ 0
 #endif
+
+#pragma clang diagnostic pop
 
 static BOOL isRunningOnLeopardOrLater(void) {
     return NSAppKitVersionNumber >= 860.;

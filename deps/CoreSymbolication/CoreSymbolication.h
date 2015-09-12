@@ -43,9 +43,9 @@
 //  - a Symbol represents a symbol e.g. function, variable
 //
 
-#if !defined(__CORESYMBOLICATION_CORESYMBOLICATION__)
-#define __CORESYMBOLICATION_CORESYMBOLICATION__ 1
-#define __CORESYMBOLICATION__ 1
+#if !defined(CS_CORESYMBOLICATION_CORESYMBOLICATION__)
+#define CS_CORESYMBOLICATION_CORESYMBOLICATION__ 1
+#define CS_CORESYMBOLICATION_CORESYMBOLICATION__ 1
 
 
 #include <CoreFoundation/CoreFoundation.h>
