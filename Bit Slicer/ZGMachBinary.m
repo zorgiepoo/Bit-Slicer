@@ -250,13 +250,13 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	// If this is a fat binary that is being loaded from disk, we'll need to find our target architecture
 	if (machHeader->magic == FAT_CIGAM) // not checking FAT_MAGIC, only interested in little endian
 	{
-		uint32_t numberOfArchitectures = CFSwapInt32BigToHost(((struct fat_header *)machHeader)->nfat_arch);
+		uint32_t numberOfArchitectures = CFSwapInt32BigToHost(((const struct fat_header *)machHeader)->nfat_arch);
 		for (uint32_t architectureIndex = 0; architectureIndex < numberOfArchitectures; architectureIndex++)
 		{
-			struct fat_arch *fatArchitecture = (void *)(((uint8_t *)(void *)machHeader) + sizeof(struct fat_header) + sizeof(struct fat_arch) * architectureIndex);
+			const struct fat_arch *fatArchitecture = (const void *)(((const uint8_t *)(const void *)machHeader) + sizeof(struct fat_header) + sizeof(struct fat_arch) * architectureIndex);
 			if ((pointerSize == sizeof(ZGMemoryAddress) && fatArchitecture->cputype & CPU_TYPE_X86_64) || (pointerSize == sizeof(ZG32BitMemoryAddress) && fatArchitecture->cputype & CPU_TYPE_I386))
 			{
-				machHeader = (void *)(((uint8_t *)(void *)machHeader) + CFSwapInt32BigToHost(fatArchitecture->offset));
+				machHeader = (const void *)(((const uint8_t *)(const void *)machHeader) + CFSwapInt32BigToHost(fatArchitecture->offset));
 				break;
 			}
 		}
@@ -266,8 +266,8 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	
 	if (machHeader->magic == MH_MAGIC || machHeader->magic == MH_MAGIC_64)
 	{
-		void *segmentBytes = ((uint8_t *)(void *)machHeader) + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
-		if ((uint8_t *)segmentBytes + machHeader->sizeofcmds <= (uint8_t *)startPointer + dataLength)
+		const void *segmentBytes = ((const uint8_t *)(const void *)machHeader) + ((machHeader->magic == MH_MAGIC) ? sizeof(struct mach_header) : sizeof(struct mach_header_64));
+		if ((const uint8_t *)segmentBytes + machHeader->sizeofcmds <= (const uint8_t *)startPointer + dataLength)
 		{
 			machBinaryInfo = [[ZGMachBinaryInfo alloc] initWithMachHeaderAddress:machHeaderAddress segmentBytes:segmentBytes commandSize:machHeader->sizeofcmds];
 		}

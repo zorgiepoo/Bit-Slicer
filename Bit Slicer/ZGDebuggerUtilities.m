@@ -113,13 +113,13 @@
 			
 			if (address + data.length - targetBreakPoint.variable.address - 1 > 0)
 			{
-				if (!ZGWriteBytesIgnoringProtection(processTask, targetBreakPoint.variable.address + 1, (uint8_t *)data.bytes + (targetBreakPoint.variable.address + 1 - address), address + data.length - targetBreakPoint.variable.address - 1))
+				if (!ZGWriteBytesIgnoringProtection(processTask, targetBreakPoint.variable.address + 1, (const uint8_t *)data.bytes + (targetBreakPoint.variable.address + 1 - address), address + data.length - targetBreakPoint.variable.address - 1))
 				{
 					success = NO;
 				}
 			}
 			
-			*(uint8_t *)targetBreakPoint.variable.rawValue = *((uint8_t *)data.bytes + targetBreakPoint.variable.address - address);
+			*(uint8_t *)targetBreakPoint.variable.rawValue = *((const uint8_t *)data.bytes + targetBreakPoint.variable.address - address);
 		}
 	}
 	
@@ -209,7 +209,7 @@
 				}
 				else
 				{
-					data = [NSData dataWithBytes:(uint8_t *)tempData.bytes + numberOfNoppedInstructions length:tempData.length - numberOfNoppedInstructions];
+					data = [NSData dataWithBytes:(const uint8_t *)tempData.bytes + numberOfNoppedInstructions length:tempData.length - numberOfNoppedInstructions];
 				}
 			}
 			else
@@ -461,7 +461,7 @@ error:(NSError * __autoreleasing *)error
 	
 	ZGVariable *variable =
 	[[ZGVariable alloc]
-	 initWithValue:(void *)jumpToIslandData.bytes
+	 initWithValue:jumpToIslandData.bytes
 	 size:jumpToIslandData.length
 	 address:firstInstruction.variable.address
 	 type:ZGByteArray

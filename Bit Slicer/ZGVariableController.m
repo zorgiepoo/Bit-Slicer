@@ -534,7 +534,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag
 {	
-	void *newValue = NULL;
+	const void *newValue = NULL;
 	ZGMemorySize writeSize = variable.size; // specifically needed for byte arrays
 	
 	// It's important to retrieve this now instead of later as changing the variable's size may cause a bad side effect to this method
@@ -646,7 +646,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			newValue = doubleValue;
 			break;
 		case ZGString8:
-			newValue = (void *)[stringObject cStringUsingEncoding:NSUTF8StringEncoding];
+			newValue = (const void *)[stringObject cStringUsingEncoding:NSUTF8StringEncoding];
 			variable.size = strlen(newValue) + 1;
 			writeSize = variable.size;
 			break;
@@ -659,7 +659,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				utf16Value = malloc((size_t)variable.size);
 				newValue = utf16Value;
 				[stringObject
-				 getCharacters:newValue
+				 getCharacters:utf16Value
 				 range:NSMakeRange(0, stringObject.length)];
 			}
 			else
@@ -668,10 +668,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				utf16Value = malloc(sizeof(unichar));
 				newValue = utf16Value;
 				
-				if (newValue)
+				if (newValue != NULL)
 				{
 					unichar nullTerminator = 0;
-					memcpy(newValue, &nullTerminator, sizeof(unichar));
+					memcpy(utf16Value, &nullTerminator, sizeof(unichar));
 				}
 			}
 			
@@ -704,9 +704,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			byteArrayValue = malloc((size_t)variable.size);
 			newValue = byteArrayValue;
 			
-			if (newValue != nil)
+			if (newValue != NULL)
 			{
-				unsigned char *valuePtr = newValue;
+				unsigned char *valuePtr = byteArrayValue;
 				writeSize = 0;
 				
 				NSArray *oldComponents = ZGByteArrayComponentsFromString(oldStringValue);
@@ -752,7 +752,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			break;
 	}
 	
-	if (newValue != nil)
+	if (newValue != NULL)
 	{
 		if (variable.byteOrder != CFByteOrderGetCurrent())
 		{

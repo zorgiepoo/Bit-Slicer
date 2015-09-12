@@ -56,9 +56,9 @@ typedef struct
 	
 	uint32_t maxNumberOfSegmentCommands = 0;
 	const struct load_command *loadCommand = NULL;
-	for (const uint8_t *commandBytes = segmentBytes; commandBytes < (uint8_t *)segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
+	for (const uint8_t *commandBytes = segmentBytes; commandBytes < (const uint8_t *)segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
 	{
-		loadCommand = (void *)commandBytes;
+		loadCommand = (const void *)commandBytes;
 		if (loadCommand->cmd == LC_SEGMENT_64 || loadCommand->cmd == LC_SEGMENT)
 		{
 			maxNumberOfSegmentCommands++;
@@ -73,17 +73,17 @@ typedef struct
 	_segments = malloc(sizeof(*_segments) * maxNumberOfSegmentCommands);
 	
 	loadCommand = NULL;
-	for (const uint8_t *commandBytes = segmentBytes; commandBytes < (uint8_t *)segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
+	for (const uint8_t *commandBytes = segmentBytes; commandBytes < (const uint8_t *)segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)
 	{
-		loadCommand = (void *)commandBytes;
+		loadCommand = (const void *)commandBytes;
 		
 		if (loadCommand->cmd != LC_SEGMENT_64 && loadCommand->cmd != LC_SEGMENT)
 		{
 			continue;
 		}
 		
-		const struct segment_command_64 *segmentCommand64 = (void *)commandBytes;
-		const struct segment_command *segmentCommand32 = (void *)commandBytes;
+		const struct segment_command_64 *segmentCommand64 = (const void *)commandBytes;
+		const struct segment_command *segmentCommand32 = (const void *)commandBytes;
 		
 		if ((loadCommand->cmd == LC_SEGMENT_64 && segmentCommand64->vmsize == 0) || (loadCommand->cmd == LC_SEGMENT && segmentCommand32->vmsize == 0))
 		{
@@ -102,19 +102,19 @@ typedef struct
 			const void *segmentVMAddressPointer = &segmentCommand32->vmaddr;
 			
 			// struct section has enough relevant fields to make this test for 64-bit as well
-			if ((uint8_t *)sectionsOffset + sizeof(*firstSection32) <= commandBytes + loadCommand->cmdsize)
+			if ((const uint8_t *)sectionsOffset + sizeof(*firstSection32) <= commandBytes + loadCommand->cmdsize)
 			{
 				if (loadCommand->cmd == LC_SEGMENT_64)
 				{
 					// We could use firstSection64->offset instead, but this seems to catch some obfuscation cases
-					uint64_t offset = firstSection64->addr - *(uint64_t *)segmentVMAddressPointer;
+					uint64_t offset = firstSection64->addr - *(const uint64_t *)segmentVMAddressPointer;
 					_firstInstructionAddress = machHeaderAddress + offset;
 					_slide = machHeaderAddress + offset - firstSection64->addr;
 				}
 				else
 				{
 					// We could use firstSection32->offset instead, but this seems to catch some obfuscation cases
-					uint32_t offset = firstSection32->addr - *(uint32_t *)segmentVMAddressPointer;
+					uint32_t offset = firstSection32->addr - *(const uint32_t *)segmentVMAddressPointer;
 					_firstInstructionAddress = machHeaderAddress + offset;
 					_slide = machHeaderAddress + offset - firstSection32->addr;
 				}

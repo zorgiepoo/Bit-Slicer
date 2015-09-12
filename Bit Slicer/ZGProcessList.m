@@ -141,8 +141,10 @@
 	
 	// Request the size we'll need to fill the process list buffer
 	size_t processListRequestSize = 0;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-qual"
 	if (sysctl((int *)processListName, (u_int)processListNameLength, NULL, &processListRequestSize, NULL, 0) != 0) return;
-
+#pragma clang diagnostic pop
 	struct kinfo_proc *processList = malloc(processListRequestSize);
 	if (processList == NULL) return;
 	
@@ -154,8 +156,11 @@
 
 	// Retrieve the actual process list using the obtained size
 	size_t processListActualSize = processListRequestSize;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-qual"
 	if (sysctl((int *)processListName, (u_int)processListNameLength, processList, &processListActualSize, NULL, 0) != 0
 		|| (processListActualSize == 0))
+#pragma clang diagnostic pop
 	{
 		free(processList);
 		return;

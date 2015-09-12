@@ -178,11 +178,14 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 		NSArray *systemHotKeyDictionaries = (__bridge_transfer NSArray *)cfSystemHotKeyDictionaries;
 		for (NSDictionary *hotKeyDictionary in systemHotKeyDictionaries)
 		{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-qual"
 			BOOL enabled = [[hotKeyDictionary objectForKey:(NSString *)kHISymbolicHotKeyEnabled] boolValue];
 			if (enabled)
 			{
 				UInt32 keyCode = [[hotKeyDictionary objectForKey:(NSString *)kHISymbolicHotKeyCode] unsignedIntValue];
 				UInt32 modifierFlags = [[hotKeyDictionary objectForKey:(NSString *)kHISymbolicHotKeyModifiers] unsignedIntValue];
+#pragma clang diagnostic pop
 				if (hotKey.keyCombo.code == keyCode && hotKey.keyCombo.flags == modifierFlags)
 				{
 					return YES;

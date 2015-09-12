@@ -110,10 +110,10 @@
 				switch (pointerSize)
 				{
 					case sizeof(ZGMemoryAddress):
-						address = *(ZGMemoryAddress *)(void *)((uint8_t *)resultBytes + offset);
+						address = *(const ZGMemoryAddress *)(const void *)((const uint8_t *)resultBytes + offset);
 						break;
 					case sizeof(ZG32BitMemoryAddress):
-						address = *(ZG32BitMemoryAddress *)(void *)((uint8_t *)resultBytes + offset);
+						address = *(const ZG32BitMemoryAddress *)(const void *)((const uint8_t *)resultBytes + offset);
 						break;
 					default:
 						assert("Retrieved unexpected pointer size" == NULL);

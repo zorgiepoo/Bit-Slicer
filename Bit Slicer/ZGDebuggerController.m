@@ -1655,7 +1655,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			
 			if (shouldOverwriteInstructions)
 			{
-				ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:(void *)outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
+				ZGVariable *newVariable = [[ZGVariable alloc] initWithValue:outputData.bytes size:outputData.length address:0 type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
 				
 				[self writeStringValue:newVariable.stringValue atInstructionFromIndex:instructionIndex];
 			}

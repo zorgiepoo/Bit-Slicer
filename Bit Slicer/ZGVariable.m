@@ -55,6 +55,9 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 @implementation ZGVariable
 {
+	void *_rawValue;
+	void *_freezeValue;
+	
 	NSString *_stringValue;
 	NSString *_addressStringValue;
 }
@@ -183,7 +186,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		
 		if (returnedLength == _size)
 		{
-			[self setRawValue:(void *)buffer];
+			[self setRawValue:(const void *)buffer];
 		}
 		
 		returnedLength = 0;
@@ -194,7 +197,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		
 		if (returnedLength == _size)
 		{
-			[self setFreezeValue:(void *)buffer];
+			[self setFreezeValue:(const void *)buffer];
 		}
 		
 		NSString *scriptValue = [coder decodeObjectForKey:ZGScriptKey];
@@ -250,7 +253,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return size;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description enabled:(BOOL)enabled byteOrder:(CFByteOrder)byteOrder
+- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description enabled:(BOOL)enabled byteOrder:(CFByteOrder)byteOrder
 {
 	if ((self = [super init]))
 	{
@@ -271,7 +274,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		
 		_byteOrder = byteOrder;
 		
-		if (value != nil)
+		if (value != NULL)
 		{
 			[self setRawValue:value];
 		}
@@ -285,22 +288,22 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return self;
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description enabled:(BOOL)enabled
+- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description enabled:(BOOL)enabled
 {
 	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:description enabled:enabled byteOrder:CFByteOrderGetCurrent()];
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description
+- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description
 {
 	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:description enabled:YES];
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize
+- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize
 {
 	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:[[NSAttributedString alloc] initWithString:@""]];
 }
 
-- (id)initWithValue:(void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize byteOrder:(CFByteOrder)byteOrder
+- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize byteOrder:(CFByteOrder)byteOrder
 {
 	return [self initWithValue:value size:size address:address type:type qualifier:qualifier pointerSize:pointerSize description:[[NSAttributedString alloc] initWithString:@""] enabled:YES byteOrder:byteOrder];
 }
@@ -508,7 +511,12 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return [NSString stringWithFormat:@"%llu", _size];
 }
 
-- (void)setRawValue:(void *)newValue
+- (void *)rawValue
+{
+	return _rawValue;
+}
+
+- (void)setRawValue:(const void *)newValue
 {
 	free(_rawValue);
 	_rawValue = NULL;
@@ -523,7 +531,12 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	}
 }
 
-- (void)setFreezeValue:(void *)newFreezeValue
+- (void *)freezeValue
+{
+	return _freezeValue;
+}
+
+- (void)setFreezeValue:(const void *)newFreezeValue
 {
 	free(_freezeValue);
 	_freezeValue = NULL;

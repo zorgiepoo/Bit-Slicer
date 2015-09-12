@@ -654,7 +654,10 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 					const char *finishFunctionName = "finish";
 					if (Py_IsInitialized() && windowController.currentProcess.valid && script.scriptObject != NULL && PyObject_HasAttrString(script.scriptObject, finishFunctionName))
 					{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-qual"
 						PyObject *retValue = PyObject_CallMethod(script.scriptObject, (char *)finishFunctionName, NULL);
+#pragma clang diagnostic pop
 						if (Py_IsInitialized())
 						{
 							if (retValue == NULL)

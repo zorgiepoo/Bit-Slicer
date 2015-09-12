@@ -202,7 +202,7 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 	return value;
 }
 
-void *ZGSwappedValue(BOOL isProcess64Bit, void *value, ZGVariableType dataType, ZGMemorySize dataSize)
+void *ZGSwappedValue(BOOL isProcess64Bit, const void *value, ZGVariableType dataType, ZGMemorySize dataSize)
 {
 	void *swappedValue = malloc(dataSize);
 	
@@ -215,35 +215,35 @@ void *ZGSwappedValue(BOOL isProcess64Bit, void *value, ZGVariableType dataType, 
 	{
 		case ZGInt16:
 		{
-			uint16_t tempValue = CFSwapInt16(*(uint16_t *)value);
+			uint16_t tempValue = CFSwapInt16(*(const uint16_t *)value);
 			memcpy(swappedValue, &tempValue, dataSize);
 			break;
 		}
 			
 		case ZGInt32:
 		{
-			uint32_t tempValue = CFSwapInt32(*(uint32_t *)value);
+			uint32_t tempValue = CFSwapInt32(*(const uint32_t *)value);
 			memcpy(swappedValue, &tempValue, dataSize);
 			break;
 		}
 			
 		case ZGInt64:
 		{
-			uint64_t tempValue = CFSwapInt64(*(uint64_t *)value);
+			uint64_t tempValue = CFSwapInt64(*(const uint64_t *)value);
 			memcpy(swappedValue, &tempValue, dataSize);
 			break;
 		}
 			
 		case ZGFloat:
 		{
-			CFSwappedFloat32 tempValue = CFConvertFloat32HostToSwapped(*(Float32 *)value);
+			CFSwappedFloat32 tempValue = CFConvertFloat32HostToSwapped(*(const Float32 *)value);
 			memcpy(swappedValue, &tempValue, dataSize);
 			break;
 		}
 			
 		case ZGDouble:
 		{
-			CFSwappedFloat64 tempValue = CFConvertFloat64HostToSwapped(*(Float64 *)value);
+			CFSwappedFloat64 tempValue = CFConvertFloat64HostToSwapped(*(const Float64 *)value);
 			memcpy(swappedValue, &tempValue, dataSize);
 			break;
 		}
@@ -252,7 +252,7 @@ void *ZGSwappedValue(BOOL isProcess64Bit, void *value, ZGVariableType dataType, 
 		{
 			for (ZGMemorySize characterIndex = 0; characterIndex < dataSize / sizeof(uint16_t); characterIndex++)
 			{
-				((uint16_t *)swappedValue)[characterIndex] = CFSwapInt16(((uint16_t *)value)[characterIndex]);
+				((uint16_t *)swappedValue)[characterIndex] = CFSwapInt16(((const uint16_t *)value)[characterIndex]);
 			}
 			break;
 		}

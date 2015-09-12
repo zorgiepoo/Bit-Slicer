@@ -35,7 +35,7 @@
 #import "ZGVariableTypes.h"
 
 void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize);
-void *ZGSwappedValue(BOOL isProcess64Bit, void *value, ZGVariableType dataType, ZGMemorySize dataSize);
+void *ZGSwappedValue(BOOL isProcess64Bit, const void *value, ZGVariableType dataType, ZGMemorySize dataSize);
 
 NSArray *ZGByteArrayComponentsFromString(NSString *searchString);
 unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);
