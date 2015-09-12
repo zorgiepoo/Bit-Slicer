@@ -48,17 +48,22 @@ case value: \
 		result = description; \
 		break;
 
-// Needed for building on 10.9 SDK
-#ifndef VM_MEMORY_COREUIFILE
-#define VM_MEMORY_COREUIFILE 77
+// Needed for building on 10.10 SDK
+#ifndef VM_MEMORY_RAWCAMERA
+#define VM_MEMORY_RAWCAMERA 79
 #endif
 
-// Needed for building on 10.9 SDK
-#ifndef VM_MEMORY_GENEALOGY
-#define VM_MEMORY_GENEALOGY 78
+// Needed for building on 10.10 SDK
+#ifndef VM_MEMORY_CORPSEINFO
+#define VM_MEMORY_CORPSEINFO 80
 #endif
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > 101003 /* __MAC_10_10_3 */
+// Needed for building on 10.10 SDK
+#ifndef VM_MEMORY_ASL
+#define VM_MEMORY_ASL 81
+#endif
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > 101100 /* __MAC_10_11 */
 #error Need to update the user tag descriptions
 #endif
 
@@ -122,6 +127,10 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREUIFILE, @"CoreUI File")
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_GENEALOGY, @"Genealogy");
+			
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_RAWCAMERA, @"RAW Camera");
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CORPSEINFO, @"Corpse Info");
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_ASL, @"Apple System Log (ASL)");
 	}
 	
 	return userTagDescription;
