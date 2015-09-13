@@ -45,7 +45,6 @@
 #import "ZGRunAlertPanel.h"
 #import "NSArrayAdditions.h"
 #import "ZGDocumentData.h"
-#import "ZGSearchToken.h"
 #import "ZGVariableController.h"
 #import "ZGTableView.h"
 #import "ZGDataValueExtracting.h"

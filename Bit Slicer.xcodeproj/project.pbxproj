@@ -103,7 +103,6 @@
 		770FABAC1848354100C176B7 /* ZGEditValueWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABAA1848354100C176B7 /* ZGEditValueWindowController.m */; };
 		770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABAF18490DB400C176B7 /* ZGEditAddressWindowController.m */; };
 		770FABB71849160200C176B7 /* ZGEditSizeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */; };
-		770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 770FAC0518542BFF00C176B7 /* ZGSearchToken.m */; };
 		7714194118AC7D8500600423 /* ZGMemoryDumpFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7714194018AC7D8500600423 /* ZGMemoryDumpFunctions.m */; };
 		77179F6B18CD34F100BCB6D0 /* ZGAppUpdaterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77179F6A18CD34F100BCB6D0 /* ZGAppUpdaterController.m */; };
 		771A3F4518CC0B0900D19676 /* ZGDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 771A3F4418CC0B0900D19676 /* ZGDocumentController.m */; };
@@ -474,8 +473,6 @@
 		770FABAF18490DB400C176B7 /* ZGEditAddressWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditAddressWindowController.m; path = "Bit Slicer/ZGEditAddressWindowController.m"; sourceTree = "<group>"; usesTabs = 1; };
 		770FABB41849160200C176B7 /* ZGEditSizeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGEditSizeWindowController.h; path = "Bit Slicer/ZGEditSizeWindowController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		770FABB51849160200C176B7 /* ZGEditSizeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGEditSizeWindowController.m; path = "Bit Slicer/ZGEditSizeWindowController.m"; sourceTree = "<group>"; usesTabs = 1; };
-		770FAC0418542BFF00C176B7 /* ZGSearchToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchToken.h; path = "Bit Slicer/ZGSearchToken.h"; sourceTree = "<group>"; usesTabs = 1; };
-		770FAC0518542BFF00C176B7 /* ZGSearchToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGSearchToken.m; path = "Bit Slicer/ZGSearchToken.m"; sourceTree = "<group>"; usesTabs = 1; };
 		7714193F18AC7D8500600423 /* ZGMemoryDumpFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryDumpFunctions.h; path = "Bit Slicer/ZGMemoryDumpFunctions.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7714194018AC7D8500600423 /* ZGMemoryDumpFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMemoryDumpFunctions.m; path = "Bit Slicer/ZGMemoryDumpFunctions.m"; sourceTree = "<group>"; usesTabs = 1; };
 		77179F6918CD34F100BCB6D0 /* ZGAppUpdaterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGAppUpdaterController.h; path = "Bit Slicer/ZGAppUpdaterController.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -987,15 +984,13 @@
 			name = "Variable Controllers";
 			sourceTree = "<group>";
 		};
-		770FAC4A1854EC9A00C176B7 /* Search Controls & Tokens */ = {
+		770FAC4A1854EC9A00C176B7 /* Search Controls */ = {
 			isa = PBXGroup;
 			children = (
 				77607AAF185CD50100AC532B /* AGScopeBar.h */,
 				77607AB0185CD50100AC532B /* AGScopeBar.m */,
-				770FAC0418542BFF00C176B7 /* ZGSearchToken.h */,
-				770FAC0518542BFF00C176B7 /* ZGSearchToken.m */,
 			);
-			name = "Search Controls & Tokens";
+			name = "Search Controls";
 			sourceTree = "<group>";
 		};
 		7728EE0C16BE3DDA00F9E1AD /* Dumping Memory */ = {
@@ -1340,7 +1335,7 @@
 		77FF507D16EACF520005915D /* Documents */ = {
 			isa = PBXGroup;
 			children = (
-				770FAC4A1854EC9A00C176B7 /* Search Controls & Tokens */,
+				770FAC4A1854EC9A00C176B7 /* Search Controls */,
 				770FABB318490DDD00C176B7 /* Variable Controllers */,
 				77F115EF17D2EDF9009E002A /* ZGDocument.h */,
 				77F115F017D2EDF9009E002A /* ZGDocument.m */,
@@ -1732,7 +1727,6 @@
 				72DBC8D51B71A4BB0092ED75 /* ZGRootlessConfiguration.m in Sources */,
 				72D72BCB1AB3E9FA005044CF /* ZGLocalization.m in Sources */,
 				77F115F417D2EE0B009E002A /* ZGDocumentData.m in Sources */,
-				770FAC0618542BFF00C176B7 /* ZGSearchToken.m in Sources */,
 				77F115F717D2EE28009E002A /* ZGDocumentWindowController.m in Sources */,
 				77CECE1718B8861C006D45E9 /* ZGRegistersViewController.m in Sources */,
 				77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */,

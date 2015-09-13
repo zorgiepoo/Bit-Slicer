@@ -202,14 +202,15 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	[super restoreStateWithCoder:coder];
 	
-	NSString *addressField = [coder decodeObjectForKey:ZGDebuggerAddressField];
-	if (addressField)
+	NSString *addressField = [coder decodeObjectOfClass:[NSString class] forKey:ZGDebuggerAddressField];
+	if (addressField != nil)
 	{
 		self.addressTextField.stringValue = addressField;
 	}
 	
-	_offsetFromBase = [[coder decodeObjectForKey:ZGDebuggerOffsetFromBase] unsignedLongLongValue];
-	_mappedFilePath = [coder decodeObjectForKey:ZGDebuggerMappedFilePath];
+	_offsetFromBase = [[coder decodeObjectOfClass:[NSNumber class] forKey:ZGDebuggerOffsetFromBase] unsignedLongLongValue];
+	
+	_mappedFilePath = [coder decodeObjectOfClass:[NSObject class] forKey:ZGDebuggerMappedFilePath];
 	if ((id)_mappedFilePath == [NSNull null])
 	{
 		_mappedFilePath = nil;

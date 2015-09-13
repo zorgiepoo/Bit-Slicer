@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *ZGVariablePboardType;
 
-@interface ZGVariable : NSObject <NSCoding, NSCopying>
+@interface ZGVariable : NSObject <NSSecureCoding, NSCopying>
 {
 @public
 #pragma clang diagnostic push

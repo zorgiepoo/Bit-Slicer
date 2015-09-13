@@ -49,7 +49,6 @@
 #define ZGAboveValueKey @"ZGAboveValueKey"
 #define ZGBelowValueKey @"ZGBelowValueKey"
 #define ZGSearchStringValueKeyNew @"ZGSearchStringValueNewKey"
-#define ZGSearchValueComponentsOldKey @"ZGSearchValueKey" // legacy
 #define ZGSearchStringValueKeyOld @"ZGSearchStringValueKey" // legacy
 
 NS_ASSUME_NONNULL_BEGIN

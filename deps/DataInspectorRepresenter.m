@@ -114,7 +114,7 @@ static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) 
 }
 
 /* A class representing a single row of the data inspector */
-@interface DataInspector : NSObject
+@interface DataInspector : NSObject <NSSecureCoding>
 
 - (enum InspectorType_t)type;
 - (void)setType:(enum InspectorType_t)type;
@@ -155,6 +155,10 @@ static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) 
     inspectorType = (enum InspectorType_t)[coder decodeInt32ForKey:@"InspectorType"];
     endianness = (enum Endianness_t)[coder decodeInt32ForKey:@"Endianness"];
     return self;
+}
+
++ (BOOL)supportsSecureCoding {
+    return YES;
 }
 
 - (void)setType:(enum InspectorType_t)type {

@@ -78,7 +78,7 @@
 {
 	[super restoreStateWithCoder:coder];
 	
-	NSString *restoredText = [coder decodeObjectForKey:ZGLoggerWindowText];
+	NSString *restoredText = [coder decodeObjectOfClass:[NSString class] forKey:ZGLoggerWindowText];
 	if (restoredText != nil)
 	{
 		_loggerText = [NSMutableString stringWithString:restoredText];

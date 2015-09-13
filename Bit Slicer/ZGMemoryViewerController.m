@@ -140,13 +140,13 @@
 {
 	[super restoreStateWithCoder:coder];
 	
-	NSString *memoryViewerAddressField = [coder decodeObjectForKey:ZGMemoryViewerAddressField];
+	NSString *memoryViewerAddressField = [coder decodeObjectOfClass:[NSString class] forKey:ZGMemoryViewerAddressField];
 	if (memoryViewerAddressField != nil)
 	{
 		self.addressTextField.stringValue = memoryViewerAddressField;
 	}
 	
-	self.desiredProcessInternalName = [coder decodeObjectForKey:ZGMemoryViewerProcessInternalName];
+	self.desiredProcessInternalName = [coder decodeObjectOfClass:[NSString class] forKey:ZGMemoryViewerProcessInternalName];
 	
 	[self updateRunningProcesses];
 	[self setAndPostLastChosenInternalProcessName];

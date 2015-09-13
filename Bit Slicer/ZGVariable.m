@@ -161,12 +161,12 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		}
 		
 		_usesDynamicAddress = [coder decodeBoolForKey:ZGDynamicAddressKey];
-		_addressFormula = [coder decodeObjectForKey:ZGAddressFormulaKey];
+		_addressFormula = [coder decodeObjectOfClass:[NSString class] forKey:ZGAddressFormulaKey];
 		
-		NSAttributedString *variableDescription = [coder decodeObjectForKey:ZGDescriptionKey];
+		NSAttributedString *variableDescription = [coder decodeObjectOfClass:[NSAttributedString class] forKey:ZGDescriptionKey];
 		if (variableDescription == nil)
 		{
-			NSString *name = [coder decodeObjectForKey:ZGNameKey];
+			NSString *name = [coder decodeObjectOfClass:[NSString class] forKey:ZGNameKey];
 			if (name != nil)
 			{
 				variableDescription = [[NSAttributedString alloc] initWithString:name];
@@ -174,41 +174,40 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		}
 		_fullAttributedDescription = variableDescription != nil ? variableDescription : [[NSAttributedString alloc] initWithString:@""];
 		
-		NSNumber *userAnnotatedValue = [coder decodeObjectForKey:ZGUserAnnotatedKey];
+		NSNumber *userAnnotatedValue = [coder decodeObjectOfClass:[NSNumber class] forKey:ZGUserAnnotatedKey];
 		// In order to not annoy the user, if the user annotated key does not exist, assume the description could have been modified by the user before
 		_userAnnotated = (userAnnotatedValue == nil) ? (_fullAttributedDescription.length != 0) : userAnnotatedValue.boolValue;
 		
 		NSUInteger returnedLength = 0;
-		const uint8_t *buffer =
-		[coder
-		 decodeBytesForKey:ZGValueKey
-		 returnedLength:&returnedLength];
+		const uint8_t *buffer = [coder decodeBytesForKey:ZGValueKey returnedLength:&returnedLength];
 		
 		if (returnedLength == _size)
 		{
-			[self setRawValue:(const void *)buffer];
+			[self setRawValue:buffer];
 		}
 		
 		returnedLength = 0;
-		buffer =
-		[coder
-		 decodeBytesForKey:ZGFreezeValueKey
-		 returnedLength:&returnedLength];
+		buffer = [coder decodeBytesForKey:ZGFreezeValueKey returnedLength:&returnedLength];
 		
 		if (returnedLength == _size)
 		{
-			[self setFreezeValue:(const void *)buffer];
+			[self setFreezeValue:buffer];
 		}
 		
-		NSString *scriptValue = [coder decodeObjectForKey:ZGScriptKey];
+		NSString *scriptValue = [coder decodeObjectOfClass:[NSString class] forKey:ZGScriptKey];
 		_scriptValue = scriptValue != nil ? [scriptValue copy] : @"";
 		
-		_cachedScriptPath = [[coder decodeObjectForKey:ZGScriptCachePathKey] copy];
+		_cachedScriptPath = [[coder decodeObjectOfClass:[NSString class] forKey:ZGScriptCachePathKey] copy];
 		
 		return self;
 	}
 	
 	return self;
+}
+
++ (BOOL)supportsSecureCoding
+{
+	return YES;
 }
 
 - (id)copyWithZone:(NSZone *)__unused zone

@@ -40,7 +40,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZGHotKey : NSObject <NSCoding>
+@interface ZGHotKey : NSObject <NSSecureCoding>
 
 + (instancetype)hotKey;
 + (instancetype)hotKeyWithKeyCombo:(KeyCombo)keyCombo;

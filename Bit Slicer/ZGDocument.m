@@ -36,7 +36,6 @@
 #import "ZGSearchData.h"
 #import "ZGVariable.h"
 #import "ZGScriptManager.h"
-#import "ZGSearchToken.h"
 
 @implementation ZGDocument
 {
@@ -180,7 +179,7 @@
 		_data.variables = [NSArray array];
 	}
 	
-	id desiredProcessInternalName = [keyedUnarchiver decodeObjectForKey:ZGProcessInternalNameKey];
+	id desiredProcessInternalName = [keyedUnarchiver decodeObjectOfClass:[NSObject class] forKey:ZGProcessInternalNameKey];
 	if (desiredProcessInternalName == [NSNull null] || ![desiredProcessInternalName isKindOfClass:[NSString class]])
 	{
 		_data.desiredProcessInternalName = nil;
@@ -211,29 +210,8 @@
 	NSString *newSearchStringValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGSearchStringValueKeyNew];
 	if (newSearchStringValue == nil)
 	{
-		NSArray *legacySearchValueComponents = [keyedUnarchiver decodeObjectForKey:ZGSearchValueComponentsOldKey];
-		if (legacySearchValueComponents != nil)
-		{
-			NSMutableArray *tokens = [NSMutableArray array];
-			for (id component in legacySearchValueComponents)
-			{
-				if ([component isKindOfClass:[NSString class]])
-				{
-					[tokens addObject:component];
-				}
-				else if ([component isKindOfClass:[ZGSearchToken class]])
-				{
-					NSString *tokenName = [[[(ZGSearchToken *)component name] componentsSeparatedByString:@" "] componentsJoinedByString:@""];
-					[tokens addObject:[@"$" stringByAppendingString:tokenName]];
-				}
-			}
-			searchValue = [tokens componentsJoinedByString:@""];
-		}
-		else
-		{
-			NSString *legacySearchStringValue = [keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKeyOld];
-			searchValue = legacySearchStringValue;
-		}
+		NSString *legacySearchStringValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGSearchStringValueKeyOld];
+		searchValue = legacySearchStringValue;
 	}
 	else
 	{
