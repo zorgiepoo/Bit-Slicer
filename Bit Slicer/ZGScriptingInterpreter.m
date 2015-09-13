@@ -46,12 +46,6 @@
 #import <pthread.h>
 #import "structmember.h"
 
-typedef NS_ENUM(NSInteger, ZGDispatchType)
-{
-	ZGDispatchTypeSynchronous,
-	ZGDispatchTypeAsynchronous
-};
-
 @implementation ZGScriptingInterpreter
 {
 	OSCSingleThreadQueue * _Nullable _pythonQueue;
