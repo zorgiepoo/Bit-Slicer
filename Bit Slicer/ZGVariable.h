@@ -70,8 +70,11 @@ extern NSString *ZGVariablePboardType;
 - (void)setAddressStringValue:(nullable NSString *)newAddressString;
 
 @property (readonly, nonatomic) NSString *stringValue;
+
 @property (copy, nonatomic, nullable) NSString *scriptValue;
 @property (copy, nonatomic, nullable) NSString *cachedScriptPath;
+@property (copy, nonatomic, nullable) NSString *cachedScriptUUID;
+
 @property (readonly, nonatomic) NSString *sizeStringValue;
 @property (nonatomic) BOOL userAnnotated;
 @property (copy, nonatomic) NSAttributedString *fullAttributedDescription;

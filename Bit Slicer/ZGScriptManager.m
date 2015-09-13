@@ -60,6 +60,7 @@
 #define ZGLocalizableScriptManagerString(string) NSLocalizedStringFromTable(string, @"[Code] Script Manager", nil)
 
 NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEditorKey";
+static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 
 @interface ZGScriptManager ()
 
@@ -87,7 +88,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGScriptDefaultApplicationEditorKey : @""}];
+		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGScriptDefaultApplicationEditorKey : @"", ZGMachineUUIDKey : @""}];
 	});
 }
 
@@ -180,7 +181,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	{
 		if (variable.type == ZGScript)
 		{
-			NSString *cachedScriptPath = [self fullPathForRelativeScriptPath:variable.cachedScriptPath cachePath:[ZGScriptingInterpreter scriptCachesURL].path];
+			NSString *cachedScriptPath = [self fullPathForRelativeScriptPath:variable.cachedScriptPath cachePath:[ZGScriptingInterpreter scriptCachesURL].path cacheUUID:variable.cachedScriptUUID];
 			if (cachedScriptPath != nil && [fileManager fileExistsAtPath:cachedScriptPath])
 			{
 				NSString *cachedScriptString = [[NSString alloc] initWithContentsOfFile:cachedScriptPath encoding:NSUTF8StringEncoding error:NULL];
@@ -203,9 +204,33 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	}
 }
 
-- (NSString *)fullPathForRelativeScriptPath:(NSString *)relativeScriptPath cachePath:(NSString *)scriptCachePath
+- (NSString *)machineUUID
+{
+	NSString *machineUUID = nil;
+	NSString *machineUUIDFromDefaults = [[NSUserDefaults standardUserDefaults] stringForKey:ZGMachineUUIDKey];
+	if (machineUUIDFromDefaults.length == 0)
+	{
+		machineUUID = [NSUUID UUID].UUIDString;
+		[[NSUserDefaults standardUserDefaults] setObject:machineUUID forKey:ZGMachineUUIDKey];
+	}
+	else
+	{
+		machineUUID = machineUUIDFromDefaults;
+	}
+	
+	return machineUUID;
+}
+
+- (NSString *)fullPathForRelativeScriptPath:(NSString *)relativeScriptPath cachePath:(NSString *)scriptCachePath cacheUUID:(NSString *)scriptCacheUUID
 {
 	if (relativeScriptPath == nil || scriptCachePath == nil)
+	{
+		return nil;
+	}
+	
+	NSString *machineUUID = [self machineUUID];
+	BOOL validUUID = scriptCacheUUID != nil && machineUUID != nil && [machineUUID isEqualToString:scriptCacheUUID];
+	if (!validUUID)
 	{
 		return nil;
 	}
@@ -252,7 +277,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		NSString *scriptCachesPath = ZGUnwrapNullableObject([ZGScriptingInterpreter scriptCachesURL].path);
 		NSString *relativeCachedScriptPath = variable.cachedScriptPath;
 		
-		NSString *cachedScriptPath =[self fullPathForRelativeScriptPath:relativeCachedScriptPath cachePath:scriptCachesPath];
+		NSString *cachedScriptPath =[self fullPathForRelativeScriptPath:relativeCachedScriptPath cachePath:scriptCachesPath cacheUUID:variable.cachedScriptUUID];
 		if (cachedScriptPath != nil && [fileManager fileExistsAtPath:cachedScriptPath])
 		{
 			scriptPath = cachedScriptPath;
@@ -275,6 +300,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		if (variable.cachedScriptPath == nil || ![variable.cachedScriptPath isEqualToString:scriptPath])
 		{
 			variable.cachedScriptPath = [self relativePathForFullScriptPath:scriptPath cachePath:scriptCachesPath];
+			variable.cachedScriptUUID = [self machineUUID];
 			
 			ZGDocumentWindowController *windowController = _windowController;
 			[windowController markDocumentChange];

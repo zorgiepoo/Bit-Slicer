@@ -52,6 +52,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGAddressFormulaKey @"ZGAddressFormulaKey"
 #define ZGScriptKey @"ZGScriptKey"
 #define ZGScriptCachePathKey @"ZGScriptCachePathKey"
+#define ZGScriptCacheUUIDKey @"ZGScriptCacheUUIDKey"
 
 @implementation ZGVariable
 {
@@ -138,6 +139,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		[coder encodeObject:_cachedScriptPath forKey:ZGScriptCachePathKey];
 	}
+	
+	if (_cachedScriptUUID != nil)
+	{
+		[coder encodeObject:_cachedScriptUUID forKey:ZGScriptCacheUUIDKey];
+	}
 }
 
 - (id)initWithCoder:(NSCoder *)coder
@@ -198,6 +204,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		_scriptValue = scriptValue != nil ? [scriptValue copy] : @"";
 		
 		_cachedScriptPath = [[coder decodeObjectOfClass:[NSString class] forKey:ZGScriptCachePathKey] copy];
+		
+		_cachedScriptUUID = [[coder decodeObjectOfClass:[NSString class] forKey:ZGScriptCacheUUIDKey] copy];
 		
 		return self;
 	}
