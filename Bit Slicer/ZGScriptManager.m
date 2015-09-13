@@ -145,7 +145,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		{
 			if ([fileManager fileExistsAtPath:script.path])
 			{
-				NSString *newScriptValue = [[NSString alloc] initWithContentsOfFile:script.path encoding:NSUTF8StringEncoding error:nil];
+				NSString *newScriptValue = [[NSString alloc] initWithContentsOfFile:script.path encoding:NSUTF8StringEncoding error:NULL];
 				if (newScriptValue != nil)
 				{
 					ZGVariable *variable = [variableValue pointerValue];
@@ -180,10 +180,10 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	{
 		if (variable.type == ZGScript)
 		{
-			NSString *cachedScriptPath = variable.cachedScriptPath;
+			NSString *cachedScriptPath = [self fullPathForRelativeScriptPath:variable.cachedScriptPath cachePath:[ZGScriptingInterpreter scriptCachesURL].path];
 			if (cachedScriptPath != nil && [fileManager fileExistsAtPath:cachedScriptPath])
 			{
-				NSString *cachedScriptString = [[NSString alloc] initWithContentsOfFile:cachedScriptPath encoding:NSUTF8StringEncoding error:nil];
+				NSString *cachedScriptString = [[NSString alloc] initWithContentsOfFile:cachedScriptPath encoding:NSUTF8StringEncoding error:NULL];
 				if (cachedScriptString != nil && variable.scriptValue != nil && ![variable.scriptValue isEqualToString:cachedScriptString] && cachedScriptString.length > 0)
 				{
 					variable.scriptValue = cachedScriptString;
@@ -203,6 +203,35 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	}
 }
 
+- (NSString *)fullPathForRelativeScriptPath:(NSString *)relativeScriptPath cachePath:(NSString *)scriptCachePath
+{
+	if (relativeScriptPath == nil || scriptCachePath == nil)
+	{
+		return nil;
+	}
+	
+	NSArray<NSString *> *relativePathComponents = relativeScriptPath.pathComponents;
+	NSArray<NSString *> *scriptCacheComponents = scriptCachePath.pathComponents;
+	
+	if (relativePathComponents.count >= scriptCacheComponents.count)
+	{
+		// Old versions used to store a full path rather than a relative one, so reaching here is possible
+		return nil;
+	}
+	
+	return [NSString pathWithComponents:[scriptCacheComponents arrayByAddingObjectsFromArray:relativePathComponents]];
+}
+
+- (NSString *)relativePathForFullScriptPath:(NSString *)fullScriptPath cachePath:(NSString *)scriptCachePath
+{
+	NSArray<NSString *> *fullPathComponents = fullScriptPath.pathComponents;
+	NSArray<NSString *> *scriptCacheComponents = scriptCachePath.pathComponents;
+	
+	assert(fullPathComponents.count > scriptCacheComponents.count);
+	
+	return [NSString pathWithComponents:[fullPathComponents subarrayWithRange:NSMakeRange(scriptCacheComponents.count, fullPathComponents.count - scriptCacheComponents.count)]];
+}
+
 - (ZGPyScript *)scriptForVariable:(ZGVariable *)variable
 {
 	NSFileManager *fileManager = [[NSFileManager alloc] init];
@@ -220,7 +249,10 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		[_scriptingInterpreter acquireInterpreter];
 		
 		NSString *scriptPath = nil;
-		NSString *cachedScriptPath = variable.cachedScriptPath;
+		NSString *scriptCachesPath = ZGUnwrapNullableObject([ZGScriptingInterpreter scriptCachesURL].path);
+		NSString *relativeCachedScriptPath = variable.cachedScriptPath;
+		
+		NSString *cachedScriptPath =[self fullPathForRelativeScriptPath:relativeCachedScriptPath cachePath:scriptCachesPath];
 		if (cachedScriptPath != nil && [fileManager fileExistsAtPath:cachedScriptPath])
 		{
 			scriptPath = cachedScriptPath;
@@ -228,8 +260,6 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		else
 		{
 			uint32_t randomInteger = arc4random();
-			
-			NSString *scriptCachesPath = ZGUnwrapNullableObject([ZGScriptingInterpreter scriptCachesURL].path);
 			
 			NSMutableString *randomFilename = [NSMutableString stringWithFormat:@"%@ %X", SCRIPT_FILENAME_PREFIX, randomInteger];
 			while ([fileManager fileExistsAtPath:[[scriptCachesPath stringByAppendingPathComponent:randomFilename] stringByAppendingString:@".py"]])
@@ -244,7 +274,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		
 		if (variable.cachedScriptPath == nil || ![variable.cachedScriptPath isEqualToString:scriptPath])
 		{
-			variable.cachedScriptPath = scriptPath;
+			variable.cachedScriptPath = [self relativePathForFullScriptPath:scriptPath cachePath:scriptCachesPath];
 			
 			ZGDocumentWindowController *windowController = _windowController;
 			[windowController markDocumentChange];
