@@ -327,7 +327,7 @@
 		return NSMakeRange(0, 0);
 	}
 	
-	return [(NSValue *)(_memorySelectionRanges[@(process.processID)]) rangeValue];
+	return _memorySelectionRanges[@(process.processID)].rangeValue;
 }
 
 #pragma mark User Notifications
