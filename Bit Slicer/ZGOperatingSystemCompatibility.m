@@ -32,23 +32,6 @@
 
 #import "ZGOperatingSystemCompatibility.h"
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED <= __MAC_10_9
-
-typedef struct
-{
-	NSInteger majorVersion;
-	NSInteger minorVersion;
-	NSInteger patchVersion;
-} NSOperatingSystemVersion;
-
-@interface NSProcessInfo (OperatingSystemCompatibility)
-
-- (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)operatingSystemVersion;
-
-@end
-
-#endif
-
 static BOOL ZGIsOnAtLeast10Dot(NSInteger minorVersion)
 {
 	NSProcessInfo *processInfo = [NSProcessInfo processInfo];

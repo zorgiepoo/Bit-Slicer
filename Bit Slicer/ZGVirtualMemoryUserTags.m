@@ -48,21 +48,6 @@ case value: \
 		result = description; \
 		break;
 
-// Needed for building on 10.10 SDK
-#ifndef VM_MEMORY_RAWCAMERA
-#define VM_MEMORY_RAWCAMERA 79
-#endif
-
-// Needed for building on 10.10 SDK
-#ifndef VM_MEMORY_CORPSEINFO
-#define VM_MEMORY_CORPSEINFO 80
-#endif
-
-// Needed for building on 10.10 SDK
-#ifndef VM_MEMORY_ASL
-#define VM_MEMORY_ASL 81
-#endif
-
 #if __MAC_OS_X_VERSION_MAX_ALLOWED > 101100 /* __MAC_10_11 */
 #error Need to update the user tag descriptions
 #endif
