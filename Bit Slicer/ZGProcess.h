@@ -66,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) ZGMachBinary *mainMachBinary;
 @property (nonatomic, readonly, nullable) ZGMachBinary *dylinkerBinary;
 
-@property (nonatomic, readonly) NSMutableDictionary *cacheDictionary;
+@property (nonatomic, readonly) NSMutableDictionary<NSString *, NSMutableDictionary *> *cacheDictionary;
 
 @property (nonatomic, readonly, nullable) id <ZGSymbolicator> symbolicator;
 

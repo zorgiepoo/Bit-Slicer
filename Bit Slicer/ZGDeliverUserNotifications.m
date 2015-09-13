@@ -32,7 +32,7 @@
 
 #import "ZGDeliverUserNotifications.h"
 
-void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitle, NSString *informativeText, BOOL hasReplyButton, NSString *responsePlaceholder, NSDictionary *userInfo)
+void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitle, NSString *informativeText, BOOL hasReplyButton, NSString *responsePlaceholder, NSDictionary<NSString *, id> *userInfo)
 {
 	NSUserNotification *userNotification = [[NSUserNotification alloc] init];
 	userNotification.title = title;
@@ -56,12 +56,12 @@ void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitl
 	[[NSUserNotificationCenter defaultUserNotificationCenter] scheduleNotification:userNotification];
 }
 
-void ZGDeliverUserNotificationWithReply(NSString *title, NSString *subtitle, NSString *informativeText, NSString *responsePlaceholder, NSDictionary *userInfo)
+void ZGDeliverUserNotificationWithReply(NSString *title, NSString *subtitle, NSString *informativeText, NSString *responsePlaceholder, NSDictionary<NSString *, id> *userInfo)
 {
 	ZGDeliverUserNotificationWithReplyOption(title, subtitle, informativeText, YES, responsePlaceholder, userInfo);
 }
 
-void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, NSDictionary *userInfo)
+void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, NSDictionary<NSString *, id> *userInfo)
 {
 	ZGDeliverUserNotificationWithReplyOption(title, subtitle, informativeText, NO, nil, userInfo);
 }

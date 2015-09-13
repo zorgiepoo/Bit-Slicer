@@ -85,9 +85,9 @@
 	return symbolName;
 }
 
-- (NSArray *)findSymbolsWithName:(NSString *)symbolName partialSymbolOwnerName:(nullable NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch
+- (NSArray<NSValue *> *)findSymbolsWithName:(NSString *)symbolName partialSymbolOwnerName:(nullable NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch
 {
-	NSMutableArray *symbolRanges = [NSMutableArray array];
+	NSMutableArray<NSValue *> *symbolRanges = [NSMutableArray array];
 	
 	const char *symbolCString = [symbolName UTF8String];
 	
@@ -130,7 +130,7 @@
 
 - (nullable NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(nullable NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress allowsWrappingToBeginning:(BOOL)allowsWrapping
 {
-	NSArray *symbols = [self findSymbolsWithName:symbolName partialSymbolOwnerName:partialSymbolOwnerName requiringExactMatch:requiresExactMatch];
+	NSArray<NSValue *> *symbols = [self findSymbolsWithName:symbolName partialSymbolOwnerName:partialSymbolOwnerName requiringExactMatch:requiresExactMatch];
 	
 	ZGSymbolRange symbolRange = {};
 	BOOL foundSymbol = NO;

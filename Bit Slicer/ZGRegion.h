@@ -47,9 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic pop
 }
 
-+ (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask;
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask;
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
++ (NSArray<ZGRegion *> *)regionsFromProcessTask:(ZGMemoryMap)processTask;
++ (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask;
++ (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
 
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection;
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;

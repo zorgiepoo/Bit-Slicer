@@ -79,7 +79,7 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 
 @implementation ZGBreakPointController
 {
-	NSArray *_breakPoints;
+	NSArray<ZGBreakPoint *> *_breakPoints;
 	mach_port_t _exceptionPort;
 	ZGScriptingInterpreter *_scriptingInterpreter;
 	dispatch_source_t _watchPointTimer;
@@ -285,9 +285,9 @@ static ZGBreakPointController *gBreakPointController;
 	return handledWatchPoint;
 }
 
-- (NSArray *)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint
+- (NSArray<ZGBreakPoint *> *)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	NSMutableArray *removedBreakPoints = [NSMutableArray array];
+	NSMutableArray<ZGBreakPoint *> *removedBreakPoints = [NSMutableArray array];
 	
 	for (ZGBreakPoint *candidateBreakPoint in [self breakPoints])
 	{
@@ -426,7 +426,7 @@ static ZGBreakPointController *gBreakPointController;
 - (BOOL)handleInstructionBreakPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
 {
 	BOOL handledInstructionBreakPoint = NO;
-	NSArray *breakPoints = [self breakPoints];
+	NSArray<ZGBreakPoint *> *breakPoints = [self breakPoints];
 	
 	ZGSuspendTask(task);
 	
@@ -438,7 +438,7 @@ static ZGBreakPointController *gBreakPointController;
 	}
 	
 	BOOL hitBreakPoint = NO;
-	NSMutableArray *breakPointsToNotify = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGBreakPoint *> *breakPointsToNotify = [[NSMutableArray alloc] init];
 	
 	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
@@ -482,7 +482,7 @@ static ZGBreakPointController *gBreakPointController;
 			NSNumber *existingInstructionAddress = [breakPoint.cacheDictionary objectForKey:instructionPointerNumber];
 			if (existingInstructionAddress == nil)
 			{
-				NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:breakPoint.process];
+				NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:breakPoint.process];
 				ZGInstruction *foundInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:[self breakPoints] machBinaries:machBinaries];
 				foundInstructionAddress = foundInstruction.variable.address;
 				[breakPoint.cacheDictionary setObject:@(foundInstructionAddress) forKey:instructionPointerNumber];
@@ -684,27 +684,27 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	return (handledWatchPoint || handledInstructionBreakPoint) ? KERN_SUCCESS : KERN_FAILURE;
 }
 
-- (NSArray *)removeObserver:(id)observer
+- (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer
 {
 	return [self removeObserver:observer runningProcess:nil withProcessID:-1 atAddress:0];
 }
 
-- (NSArray *)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address
+- (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address
 {
 	return [self removeObserver:observer runningProcess:nil withProcessID:processID atAddress:address];
 }
 
-- (NSArray *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process
+- (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process
 {
 	return [self removeObserver:observer runningProcess:process withProcessID:-1 atAddress:0];
 }
 
-- (NSArray *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address
+- (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address
 {
-	NSMutableArray *removedBreakPoints = [NSMutableArray array];
+	NSMutableArray<ZGBreakPoint *> *removedBreakPoints = [NSMutableArray array];
 	@synchronized(self)
 	{
-		NSArray *runningProcesses = [[[ZGProcessList alloc] init] runningProcesses];
+		NSArray<ZGRunningProcess *> *runningProcesses = [[[ZGProcessList alloc] init] runningProcesses];
 		for (ZGBreakPoint *breakPoint in [self breakPoints])
 		{
 			if (processID <= 0 || (processID == breakPoint.process.processID && breakPoint.variable.address == address))
@@ -820,7 +820,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	BOOL is64Bit = watchPoint.process.is64Bit;
 	ZGMemorySize watchSize = watchPoint.watchSize;
 	ZGVariable *variable = watchPoint.variable;
-	NSArray *oldDebugThreads = watchPoint.debugThreads;
+	NSArray<ZGDebugThread *> *oldDebugThreads = watchPoint.debugThreads;
 	
 	ZGSuspendTask(processTask);
 	
@@ -833,7 +833,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		return NO;
 	}
 	
-	NSMutableArray *newDebugThreads = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGDebugThread *> *newDebugThreads = [[NSMutableArray alloc] init];
 	
 	for (mach_msg_type_number_t threadIndex = 0; threadIndex < threadListCount; threadIndex++)
 	{
@@ -1087,7 +1087,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 {
 	@synchronized(self)
 	{
-		NSMutableArray *currentBreakPoints = [NSMutableArray arrayWithArray:[self breakPoints]];
+		NSMutableArray<ZGBreakPoint *> *currentBreakPoints = [NSMutableArray arrayWithArray:[self breakPoints]];
 		[currentBreakPoints addObject:breakPoint];
 		_breakPoints = [NSArray arrayWithArray:currentBreakPoints];
 	}
@@ -1097,13 +1097,13 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 {
 	@synchronized(self)
 	{
-		NSMutableArray *currentBreakPoints = [NSMutableArray arrayWithArray:[self breakPoints]];
+		NSMutableArray<ZGBreakPoint *> *currentBreakPoints = [NSMutableArray arrayWithArray:[self breakPoints]];
 		[currentBreakPoints removeObject:breakPoint];
 		_breakPoints = [NSArray arrayWithArray:currentBreakPoints];
 	}
 }
 
-- (NSArray *)breakPoints
+- (NSArray<ZGBreakPoint *> *)breakPoints
 {
 	@synchronized(self)
 	{

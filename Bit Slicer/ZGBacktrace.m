@@ -39,7 +39,7 @@
 
 @implementation ZGBacktrace
 
-- (id)initWithInstructions:(NSArray *)instructions basePointers:(NSArray *)basePointers
+- (id)initWithInstructions:(NSArray<ZGInstruction *> *)instructions basePointers:(NSArray<NSNumber *> *)basePointers
 {
 	self = [super init];
 	if (self != nil)
@@ -50,10 +50,10 @@
 	return self;
 }
 
-+ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints machBinaries:(NSArray<ZGMachBinary *> *)machBinaries maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved
 {
-	NSMutableArray *newInstructions = [[NSMutableArray alloc] init];
-	NSMutableArray *newBasePointers = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGInstruction *> *newInstructions = [[NSMutableArray alloc] init];
+	NSMutableArray<NSNumber *> *newBasePointers = [[NSMutableArray alloc] init];
 	
 	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer+1 inProcess:process withBreakPoints:breakPoints machBinaries:machBinaries];
 	if (currentInstruction != nil)
@@ -123,7 +123,7 @@
 	return [[ZGBacktrace alloc] initWithInstructions:newInstructions basePointers:newBasePointers];
 }
 
-+ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints machBinaries:(NSArray<ZGMachBinary *> *)machBinaries
 {
 	return [self backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:process breakPoints:breakPoints machBinaries:machBinaries maxLimit:0];
 }

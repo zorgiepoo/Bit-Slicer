@@ -34,12 +34,13 @@
 
 @class ZGProcess;
 @class ZGInstruction;
+@class ZGBreakPoint;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGCodeInjectionWindowController : NSWindowController
 
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process instruction:(ZGInstruction *)instruction breakPoints:(NSArray *)breakPoints undoManager:(nullable NSUndoManager *)undoManager;
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager;
 
 @end
 

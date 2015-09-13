@@ -175,13 +175,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[[self class] copyVariableAddress:windowController.selectedVariables[0]];
 }
 
-+ (void)copyVariablesToPasteboard:(NSArray *)variables
++ (void)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables
 {
 	[NSPasteboard.generalPasteboard
 	 declareTypes:@[NSStringPboardType, ZGVariablePboardType]
 	 owner:self];
 	
-	NSMutableArray *linesToWrite = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *linesToWrite = [[NSMutableArray alloc] init];
 	
 	for (ZGVariable *variable in variables)
 	{
@@ -212,7 +212,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	if (pasteboardData)
 	{
 		ZGDocumentWindowController *windowController = _windowController;
-		NSArray *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
+		NSArray<ZGVariable *> *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
 		NSUInteger currentIndex = windowController.selectedVariableIndexes.count == 0 ? 0 : windowController.selectedVariableIndexes.firstIndex + 1;
 		
 		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, variablesToInsertArray.count)];
@@ -231,7 +231,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	[[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:windowController.documentData.variables searchResults:windowController.searchController.searchResults];
 	
-	NSArray *newVariables = nil;
+	NSArray<ZGVariable *> *newVariables = nil;
 	if (shouldFilterForSearchVariables)
 	{
 		newVariables = [_documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
@@ -284,7 +284,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithCapacity:_documentData.variables.count];
+	NSMutableArray<ZGVariable *> *temporaryArray = [[NSMutableArray alloc] initWithCapacity:_documentData.variables.count];
 	
 	NSString *undoActionName = nil;
 	if (windowController.undoManager.isUndoing)
@@ -298,7 +298,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	windowController.undoManager.actionName = undoActionName;
 	
-	NSArray *variablesToRemove = [_documentData.variables objectsAtIndexes:rowIndexes];
+	NSArray<ZGVariable *> *variablesToRemove = [_documentData.variables objectsAtIndexes:rowIndexes];
 	
 	[[windowController.undoManager prepareWithInvocationTarget:self]
 	 addVariables:variablesToRemove
@@ -333,7 +333,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[windowController.variablesTableView reloadData];
 }
 
-- (void)disableHarmfulVariables:(NSArray *)variables
+- (void)disableHarmfulVariables:(NSArray<ZGVariable *> *)variables
 {
 	for (ZGVariable *variable in variables)
 	{
@@ -346,11 +346,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[self updateFrozenActivity];
 }
 
-- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes
+- (void)addVariables:(NSArray<ZGVariable *> *)variables atRowIndexes:(NSIndexSet *)rowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	NSMutableArray *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.variables];
+	NSMutableArray<ZGVariable *> *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.variables];
 	[temporaryArray insertObjects:variables atIndexes:rowIndexes];
 	
 	[self disableHarmfulVariables:variables];
@@ -443,11 +443,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 #pragma mark Changing Variables
 
-- (BOOL)nopVariables:(NSArray *)variables withNewValues:(NSArray *)newValues
+- (BOOL)nopVariables:(NSArray<ZGVariable *> *)variables withNewValues:(NSArray<NSString *> *)newValues
 {
 	BOOL completeSuccess = YES;
 	
-	NSMutableArray *oldValues = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *oldValues = [[NSMutableArray alloc] init];
 	for (ZGVariable *variable in variables)
 	{
 		[oldValues addObject:variable.stringValue];
@@ -468,13 +468,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	return completeSuccess;
 }
 
-- (void)nopVariables:(NSArray *)variables
+- (void)nopVariables:(NSArray<ZGVariable *> *)variables
 {
-	NSMutableArray *nopValues = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *nopValues = [[NSMutableArray alloc] init];
 	
 	for (ZGVariable *variable in variables)
 	{
-		NSMutableArray *nopComponents = [[NSMutableArray alloc] init];
+		NSMutableArray<NSString *> *nopComponents = [[NSMutableArray alloc] init];
 		for (NSUInteger index = 0; index < variable.size; index++)
 		{
 			[nopComponents addObject:@"90"];
@@ -679,7 +679,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			
 		case ZGByteArray:
 		{
-			NSArray *bytesArray = ZGByteArrayComponentsFromString(stringObject);
+			NSArray<NSString *> *bytesArray = ZGByteArrayComponentsFromString(stringObject);
 			
 			if (variable.size != bytesArray.count)
 			{
@@ -709,7 +709,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 				unsigned char *valuePtr = byteArrayValue;
 				writeSize = 0;
 				
-				NSArray *oldComponents = ZGByteArrayComponentsFromString(oldStringValue);
+				NSArray<NSString *> *oldComponents = ZGByteArrayComponentsFromString(oldStringValue);
 				
 				for (NSString *byteString in bytesArray)
 				{
@@ -885,11 +885,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 #pragma mark Edit Variables Values
 
-- (void)editVariables:(NSArray *)variables newValues:(NSArray *)newValues
+- (void)editVariables:(NSArray<ZGVariable *> *)variables newValues:(NSArray<NSString *> *)newValues
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	NSMutableArray *oldValues = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *oldValues = [[NSMutableArray alloc] init];
 	
 	[variables enumerateObjectsUsingBlock:^(ZGVariable *variable, NSUInteger index, BOOL * __unused stop) {
 		[oldValues addObject:variable.stringValue];
@@ -938,7 +938,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 #pragma mark Relativizing Variable Addresses
 
-- (void)unrelativizeVariables:(NSArray *)variables
+- (void)unrelativizeVariables:(NSArray<ZGVariable *> *)variables
 {
 	for (ZGVariable *variable in variables)
 	{
@@ -953,7 +953,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[[windowController.undoManager prepareWithInvocationTarget:self] relativizeVariables:variables];
 }
 
-- (void)relativizeVariables:(NSArray *)variables
+- (void)relativizeVariables:(NSArray<ZGVariable *> *)variables
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	[[self class] annotateVariables:variables process:windowController.currentProcess];
@@ -964,7 +964,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	[[windowController.undoManager prepareWithInvocationTarget:self] unrelativizeVariables:variables];
 }
 
-+ (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray *)machBinaries filePathDictionary:(NSDictionary *)machFilePathDictionary process:(ZGProcess *)process
++ (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries filePathDictionary:(NSDictionary<NSNumber *, NSString *> *)machFilePathDictionary process:(ZGProcess *)process
 {
 	NSString *staticVariableDescription = nil;
 	
@@ -1036,11 +1036,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 }
 
-+ (void)annotateVariables:(NSArray *)variables process:(ZGProcess *)process
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process
 {
 	ZGMemoryMap processTask = process.processTask;
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:process];
-	NSMutableDictionary *machFilePathDictionary = [[NSMutableDictionary alloc] init];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
+	NSMutableDictionary<NSNumber *, NSString *> *machFilePathDictionary = [[NSMutableDictionary alloc] init];
 	
 	for (ZGMachBinary *machBinary in machBinaries)
 	{
@@ -1080,7 +1080,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			protectionDescription = ZGProtectionDescription(cachedSubmapInfo.protection);
 		}
 		
-		NSMutableArray *validDescriptionComponents = [NSMutableArray array];
+		NSMutableArray<NSString *> *validDescriptionComponents = [NSMutableArray array];
 		if (symbol.length > 0) [validDescriptionComponents addObject:symbol];
 		if (staticDescription != nil) [validDescriptionComponents addObject:staticDescription];
 		if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];
@@ -1102,10 +1102,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 #pragma mark Edit Variables Sizes (Byte Arrays)
 
-- (void)editVariables:(NSArray *)variables requestedSizes:(NSArray *)requestedSizes
+- (void)editVariables:(NSArray<ZGVariable *> *)variables requestedSizes:(NSArray<NSNumber *> *)requestedSizes
 {
-	NSMutableArray *currentVariableSizes = [[NSMutableArray alloc] init];
-	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
+	NSMutableArray<NSNumber *> *currentVariableSizes = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *validVariables = [[NSMutableArray alloc] init];
 	
 	ZGDocumentWindowController *windowController = _windowController;
 	

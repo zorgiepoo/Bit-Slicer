@@ -42,7 +42,7 @@
 
 - (void)testOddLengthSearch
 {
-    NSArray *numbers = @[@1, @2, @4, @5, @7, @21, @25];
+    NSArray<NSNumber *> *numbers = @[@1, @2, @4, @5, @7, @21, @25];
 	for (NSNumber *target in numbers)
 	{
 		NSNumber *foundNumber = [numbers zgBinarySearchUsingBlock:^(NSNumber *number) { return [number compare:target]; }];
@@ -54,7 +54,7 @@
 
 - (void)testEvenLengthSearch
 {
-	NSArray *numbers = @[@1, @2, @4, @5, @7, @21, @22, @25];
+	NSArray<NSNumber *> *numbers = @[@1, @2, @4, @5, @7, @21, @22, @25];
 	for (NSNumber *target in numbers)
 	{
 		NSNumber *foundNumber = [numbers zgBinarySearchUsingBlock:^(NSNumber *number) { return [number compare:target]; }];
@@ -66,7 +66,7 @@
 
 - (void)testOneElementSearch
 {
-	NSArray *numbers = @[@4];
+	NSArray<NSNumber *> *numbers = @[@4];
 	NSNumber *target = @4;
 	NSNumber *foundNumber = [numbers zgBinarySearchUsingBlock:^(NSNumber *number) { return [target compare:number]; }];
 	XCTAssertEqualObjects(target, foundNumber);
@@ -76,7 +76,7 @@
 
 - (void)testZeroElementSearch
 {
-	NSArray *numbers = @[];
+	NSArray<NSNumber *> *numbers = @[];
 	XCTAssertNil([numbers zgBinarySearchUsingBlock:^(NSNumber *number) { return [@3 compare:number]; }]);
 }
 

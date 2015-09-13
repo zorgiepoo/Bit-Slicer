@@ -32,6 +32,7 @@
 
 #import <Foundation/Foundation.h>
 
+@class ZGRunningProcess;
 @class ZGProcessTaskManager;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -42,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager;
 
 // Observable for new and old changes via KVO
-@property (nonatomic, readonly) NSArray *runningProcesses;
+@property (nonatomic, readonly) NSArray<ZGRunningProcess *> *runningProcesses;
 
 // Forces to fetch all process information
 - (void)retrieveList;

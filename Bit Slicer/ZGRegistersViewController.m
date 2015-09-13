@@ -52,7 +52,7 @@
 {
 	__weak id <ZGRegistersViewDelegate> _delegate;
 	NSUndoManager *_undoManager;
-	NSArray *_registers;
+	NSArray<ZGRegister *> *_registers;
 	ZGBreakPoint *_breakPoint;
 	ZGVariableQualifier _qualifier;
 	
@@ -66,11 +66,7 @@
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		NSDictionary *registeredDefaultTypes =
-		@{
-		  @"rflags" : @(ZGByteArray),
-		  @"eflags" : @(ZGByteArray)
-		  };
+		NSDictionary<NSString *, NSNumber *> *registeredDefaultTypes = @{@"rflags" : @(ZGByteArray), @"eflags" : @(ZGByteArray) };
 		[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZG_REGISTER_TYPES : registeredDefaultTypes, ZG_DEBUG_QUALIFIER : @0}];
 	});
 }
@@ -160,11 +156,11 @@
 	ZGRegistersState *registersState = breakPoint.registersState;
 	
 	ZGMemorySize pointerSize = breakPoint.process.pointerSize;
-	NSDictionary *registerDefaultsDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES];
+	NSDictionary<NSString *, NSNumber *> *registerDefaultsDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES];
 	
-	NSMutableArray *newRegisters = [NSMutableArray array];
+	NSMutableArray<ZGRegister *> *newRegisters = [NSMutableArray array];
 	
-	NSArray *registerVariables = [ZGRegisterEntries registerVariablesFromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:registersState.is64Bit];
+	NSArray<ZGVariable *> *registerVariables = [ZGRegisterEntries registerVariablesFromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:registersState.is64Bit];
 	
 	for (ZGVariable *registerVariable in registerVariables)
 	{
@@ -172,7 +168,7 @@
 		
 		ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterGeneralPurpose variable:registerVariable pointerSize:pointerSize];
 		
-		NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
+		NSNumber *registerDefaultType = registerDefaultsDictionary[registerVariable.name];
 		ZGVariableType dataType = (registerDefaultType == nil) ? ZGPointer : (ZGVariableType)[registerDefaultType intValue];
 		if (dataType != newRegister.variable.type)
 		{
@@ -187,7 +183,7 @@
 	
 	if (registersState.hasVectorState)
 	{
-		NSArray *registerVectorVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:registersState.vectorState is64Bit:registersState.is64Bit hasAVXSupport:registersState.hasAVXSupport];
+		NSArray<ZGVariable *> *registerVectorVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:registersState.vectorState is64Bit:registersState.is64Bit hasAVXSupport:registersState.hasAVXSupport];
 		for (ZGVariable *registerVariable in registerVectorVariables)
 		{
 			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterVector variable:registerVariable pointerSize:pointerSize];
@@ -213,7 +209,7 @@
 	[theRegister.variable setType:newType requestedSize:theRegister.size pointerSize:_breakPoint.process.pointerSize];
 	[theRegister.variable setRawValue:theRegister.rawValue];
 	
-	NSMutableDictionary *registerTypesDictionary = [NSMutableDictionary dictionaryWithDictionary:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES])];
+	NSMutableDictionary<NSString *, NSNumber *> *registerTypesDictionary = [NSMutableDictionary dictionaryWithDictionary:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZG_REGISTER_TYPES])];
 	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.name];
 	[[NSUserDefaults standardUserDefaults] setObject:registerTypesDictionary forKey:ZG_REGISTER_TYPES];
 	
@@ -318,7 +314,7 @@
 	BOOL shouldWriteRegister = NO;
 	if (_breakPoint.registersState.is64Bit)
 	{
-		NSArray *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
+		NSArray<NSString *> *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
 		if ([registers64 containsObject:theRegister.variable.name])
 		{
 			memcpy((uint64_t *)&threadState.uts.ts64 + [registers64 indexOfObject:theRegister.variable.name], newVariable.rawValue, MIN(newVariable.size, sizeof(uint64_t)));
@@ -327,7 +323,7 @@
 	}
 	else
 	{
-		NSArray *registers32 = @[@"eax", @"ebx", @"ecx", @"edx", @"edi", @"esi", @"ebp", @"esp", @"ss", @"eflags", @"eip", @"cs", @"ds", @"es", @"fs", @"gs"];
+		NSArray<NSString *> *registers32 = @[@"eax", @"ebx", @"ecx", @"edx", @"edi", @"esi", @"ebp", @"esp", @"ss", @"eflags", @"eip", @"cs", @"ds", @"es", @"fs", @"gs"];
 		if ([registers32 containsObject:theRegister.variable.name])
 		{
 			memcpy((uint32_t *)&threadState.uts.ts32 + [registers32 indexOfObject:theRegister.variable.name], newVariable.rawValue, MIN(newVariable.size, sizeof(uint32_t)));
@@ -385,7 +381,7 @@
 
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-	NSArray *variables = [[_registers objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	NSArray<ZGVariable *> *variables = [[_registers objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
@@ -508,7 +504,7 @@
 
 #pragma mark Copy
 
-- (NSArray *)selectedRegisters
+- (NSArray<ZGRegister *> *)selectedRegisters
 {
 	NSIndexSet *tableIndexSet = _tableView.selectedRowIndexes;
 	NSInteger clickedRow = _tableView.clickedRow;
@@ -520,8 +516,8 @@
 
 - (IBAction)copy:(id)__unused sender
 {
-	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
-	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *descriptionComponents = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *variablesArray = [[NSMutableArray alloc] init];
 	
 	for (ZGRegister *theRegister in [self selectedRegisters])
 	{

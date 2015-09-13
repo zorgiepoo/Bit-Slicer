@@ -87,7 +87,7 @@
 	NSMutableData *writeData = [[NSMutableData alloc] init];
 	NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:writeData];
 	
-	NSArray *watchVariablesArrayToSave = nil;
+	NSArray<ZGVariable *> *watchVariablesArrayToSave = nil;
 	
 	watchVariablesArrayToSave = _data.variables;
 	
@@ -170,7 +170,7 @@
 	NSData *readData = [fileWrapper regularFileContents];
 	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
 	
-	NSArray *newVariables = [keyedUnarchiver decodeObjectOfClass:[NSArray class] forKey:ZGWatchVariablesArrayKey];
+	NSArray<ZGVariable *> *newVariables = [keyedUnarchiver decodeObjectOfClass:[NSArray class] forKey:ZGWatchVariablesArrayKey];
 	if (newVariables != nil)
 	{
 		_data.variables = newVariables;

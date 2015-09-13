@@ -173,7 +173,7 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 	
 	else if (dataType == ZGByteArray)
 	{
-		NSArray *bytesArray = ZGByteArrayComponentsFromString(stringValue);
+		NSArray<NSString *> *bytesArray = ZGByteArrayComponentsFromString(stringValue);
 		
 		tempDataSize = bytesArray.count;
 		value = malloc((size_t)tempDataSize);
@@ -283,10 +283,10 @@ void *ZGSwappedValue(BOOL isProcess64Bit, const void *value, ZGVariableType data
 	return swappedValue;
 }
 
-NSArray *ZGByteArrayComponentsFromString(NSString *searchString)
+NSArray<NSString *> *ZGByteArrayComponentsFromString(NSString *searchString)
 {
-	NSArray *originalByteArray = [searchString componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-	NSMutableArray *transformedByteArray = [NSMutableArray array];
+	NSArray<NSString *> *originalByteArray = [searchString componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+	NSMutableArray<NSString *> *transformedByteArray = [NSMutableArray array];
 	
 	for (NSString *byteString in originalByteArray)
 	{
@@ -308,7 +308,7 @@ NSArray *ZGByteArrayComponentsFromString(NSString *searchString)
 
 unsigned char *ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue)
 {
-	NSArray *bytesArray = ZGByteArrayComponentsFromString(searchValue);
+	NSArray<NSString *> *bytesArray = ZGByteArrayComponentsFromString(searchValue);
 	
 	unsigned char *data = calloc(1, bytesArray.count * sizeof(unsigned char));
 	

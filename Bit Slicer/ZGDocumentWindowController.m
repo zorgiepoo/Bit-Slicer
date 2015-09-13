@@ -480,14 +480,14 @@
 	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 }
 
-- (NSArray *)selectedVariables
+- (NSArray<ZGVariable *> *)selectedVariables
 {
 	return [_documentData.variables objectsAtIndexes:[self selectedVariableIndexes]];
 }
 
 - (HFRange)preferredMemoryRequestRange
 {
-	NSArray *selectedVariables = [[self selectedVariables] zgFilterUsingBlock:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGScript); }];
+	NSArray<ZGVariable *> *selectedVariables = [[self selectedVariables] zgFilterUsingBlock:^(ZGVariable *variable) { return (BOOL)(variable.type != ZGScript); }];
 	ZGVariable *firstVariable = [selectedVariables firstObject];
 	ZGVariable *lastVariable = [selectedVariables lastObject];
 	
@@ -812,7 +812,7 @@
 
 #pragma mark Useful Methods
 
-- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults
+- (void)updateVariables:(NSArray<ZGVariable *> *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults
 {
 	if ([self undoManager].isUndoing || [self undoManager].isRedoing)
 	{
@@ -896,7 +896,7 @@
 	
 	else if (menuItem.action == @selector(freezeVariables:))
 	{
-		NSArray *selectedVariables = [self selectedVariables];
+		NSArray<ZGVariable *> *selectedVariables = [self selectedVariables];
 		if (selectedVariables.count > 0)
 		{
 			// All the variables selected need to either be all unfrozen or all frozen
@@ -1014,7 +1014,7 @@
     
     else if (menuItem.action == @selector(requestEditingVariablesSize:))
     {
-		NSArray *selectedVariables = [self selectedVariables];
+		NSArray<ZGVariable *> *selectedVariables = [self selectedVariables];
 		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"editMultipleVariableSizesTitle") : ZGLocalizableSearchDocumentString(@"editSingleVariableSizeTitle");
 		
 		if ([_searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
@@ -1034,7 +1034,7 @@
 	
 	else if (menuItem.action == @selector(relativizeVariablesAddress:))
 	{
-		NSArray *selectedVariables = [self selectedVariables];
+		NSArray<ZGVariable *> *selectedVariables = [self selectedVariables];
 		
 		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"relativizeMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"relativizeSingleVariableTitle");
 		
@@ -1043,7 +1043,7 @@
 			return NO;
 		}
 		
-		NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+		NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 		ZGMachBinary *mainMachBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:machBinaries];
 		for (ZGVariable *variable in selectedVariables)
 		{
@@ -1357,7 +1357,7 @@
 		_watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:_breakPointController delegate:self.delegate];
 	}
 	
-	[_watchVariableWindowController watchVariable:[self selectedVariables][0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:ZGUnwrapNullableObject(self.window) completionHandler:^(NSArray *foundVariables) {
+	[_watchVariableWindowController watchVariable:[self selectedVariables][0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:ZGUnwrapNullableObject(self.window) completionHandler:^(NSArray<ZGVariable *> *foundVariables) {
 		if (foundVariables.count > 0)
 		{
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];

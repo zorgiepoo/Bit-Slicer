@@ -43,6 +43,7 @@
 
 @class ZGProcess;
 @class ZGInstruction;
+@class ZGBreakPoint;
 @class ZGMachBinary;
 @class ZGProcessTaskManager;
 @class ZGBreakPointController;
@@ -63,7 +64,7 @@ extern NSString *ZGStepOutHotKey;
 
 - (void)cleanup;
 
-@property (nonatomic, readonly) NSMutableArray *haltedBreakPoints;
+@property (nonatomic, readonly) NSMutableArray<ZGBreakPoint *> *haltedBreakPoints;
 
 @property (nonatomic, readonly) ZGHotKey *pauseAndUnpauseHotKey;
 @property (nonatomic, readonly) ZGHotKey *stepInHotKey;
@@ -74,7 +75,7 @@ extern NSString *ZGStepOutHotKey;
 
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier;
 
-- (nonnull NSArray *)selectedInstructions;
+- (nonnull NSArray<ZGInstruction *> *)selectedInstructions;
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
 

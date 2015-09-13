@@ -43,7 +43,7 @@
 @implementation ZGEditSizeWindowController
 {
 	ZGVariableController *_variableController;
-	NSArray *_variables;
+	NSArray<ZGVariable *> *_variables;
 	
 	IBOutlet NSTextField *_sizeTextField;
 }
@@ -63,7 +63,7 @@
 	return self;
 }
 
-- (void)requestEditingSizesFromVariables:(NSArray *)variables attachedToWindow:(NSWindow *)parentWindow
+- (void)requestEditingSizesFromVariables:(NSArray<ZGVariable *> *)variables attachedToWindow:(NSWindow *)parentWindow
 {
 	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
 	
@@ -110,7 +110,7 @@
 		[NSApp endSheet:window];
 		[window close];
 		
-		NSMutableArray *requestedSizes = [[NSMutableArray alloc] init];
+		NSMutableArray<NSNumber *> *requestedSizes = [[NSMutableArray alloc] init];
 		
 		NSUInteger variableIndex;
 		for (variableIndex = 0; variableIndex < _variables.count; variableIndex++)

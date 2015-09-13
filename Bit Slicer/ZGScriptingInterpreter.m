@@ -108,16 +108,16 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 			}
 		}
 		
-		NSMutableArray *filePathsToRemove = [NSMutableArray array];
+		NSMutableArray<NSString *> *filePathsToRemove = [NSMutableArray array];
 		NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtPath:scriptCachesPath];
 		for (NSString *filename in directoryEnumerator)
 		{
 			if ([filename hasPrefix:SCRIPT_FILENAME_PREFIX] && [[filename pathExtension] isEqualToString:@"py"])
 			{
-				NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:[scriptCachesPath stringByAppendingPathComponent:filename] error:nil];
+				NSDictionary<NSString *, id> *fileAttributes = [fileManager attributesOfItemAtPath:[scriptCachesPath stringByAppendingPathComponent:filename] error:nil];
 				if (fileAttributes != nil)
 				{
-					NSDate *lastModificationDate = [fileAttributes objectForKey:NSFileModificationDate];
+					NSDate *lastModificationDate = fileAttributes[NSFileModificationDate];
 					if ([[NSDate date] timeIntervalSinceDate:lastModificationDate] > 864000) // 10 days
 					{
 						[filePathsToRemove addObject:[scriptCachesPath stringByAppendingPathComponent:filename]];
@@ -235,7 +235,7 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 	PyObject *type, *value, *traceback;
 	PyErr_Fetch(&type, &value, &traceback);
 	
-	NSArray *errorDescriptionComponents = @[[self fetchPythonErrorDescriptionFromObject:type], [self fetchPythonErrorDescriptionFromObject:value], [self fetchPythonErrorDescriptionFromObject:traceback]];
+	NSArray<NSString *> *errorDescriptionComponents = @[[self fetchPythonErrorDescriptionFromObject:type], [self fetchPythonErrorDescriptionFromObject:value], [self fetchPythonErrorDescriptionFromObject:traceback]];
 	
 	PyErr_Clear();
 	

@@ -79,7 +79,7 @@ typedef NS_ENUM(NSInteger, ZGScriptIndentationTag)
 	[_applicationEditorsPopUpButton.menu addItem:defaultEditorMenuItem];
 	
 	NSString *emptyPythonFile = [ZGAppPathUtilities createEmptyPythonFile];
-	NSArray *editorURLs = CFBridgingRelease(LSCopyApplicationURLsForURL((__bridge CFURLRef)([NSURL fileURLWithPath:emptyPythonFile]), kLSRolesEditor));
+	NSArray<NSURL *> *editorURLs = CFBridgingRelease(LSCopyApplicationURLsForURL((__bridge CFURLRef)([NSURL fileURLWithPath:emptyPythonFile]), kLSRolesEditor));
 	
 	if (editorURLs.count == 0)
 	{
@@ -88,7 +88,7 @@ typedef NS_ENUM(NSInteger, ZGScriptIndentationTag)
 	
 	[_applicationEditorsPopUpButton.menu addItem:[NSMenuItem separatorItem]];
 	
-	NSMutableArray *addedEditorPaths = [NSMutableArray array];
+	NSMutableArray<NSString *> *addedEditorPaths = [NSMutableArray array];
 	for (NSURL *editorURL in editorURLs)
 	{
 		NSString *editorName = [[editorURL lastPathComponent] stringByDeletingPathExtension];

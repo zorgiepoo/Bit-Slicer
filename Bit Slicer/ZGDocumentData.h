@@ -54,6 +54,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class ZGVariable;
+
 @interface ZGDocumentData : NSObject
 
 @property (nonatomic) NSInteger selectedDatatypeTag;
@@ -64,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic) NSString *beginningAddressStringValue;
 @property (copy, nonatomic) NSString *endingAddressStringValue;
 @property (copy, nonatomic) NSString *searchValue;
-@property (nonatomic) NSArray *variables;
+@property (nonatomic) NSArray<ZGVariable *> *variables;
 @property (copy, nonatomic, nullable) NSString *desiredProcessInternalName;
 @property (copy, nonatomic) NSString *lastEpsilonValue;
 @property (copy, nonatomic, nullable) NSString *lastAboveRangeValue;

@@ -67,9 +67,9 @@
 {
     [super encodeRestorableStateWithCoder:coder];
 	
-	NSArray *lines = [_loggerText componentsSeparatedByString:@"\n"];
+	NSArray<NSString *> *lines = [_loggerText componentsSeparatedByString:@"\n"];
 	NSUInteger numberOfLinesToTake = MIN(MIN_LOG_LINES_TO_RESTORE, lines.count);
-	NSArray *lastFewLines = [lines subarrayWithRange:NSMakeRange(lines.count - numberOfLinesToTake, numberOfLinesToTake)];
+	NSArray<NSString *> *lastFewLines = [lines subarrayWithRange:NSMakeRange(lines.count - numberOfLinesToTake, numberOfLinesToTake)];
 	
 	[coder encodeObject:[lastFewLines componentsJoinedByString:@"\n"] forKey:ZGLoggerWindowText];
 }

@@ -39,7 +39,7 @@
 
 @implementation ZGProcess
 {
-	NSMutableDictionary *_cacheDictionary;
+	NSMutableDictionary<NSString *, NSMutableDictionary *> *_cacheDictionary;
 	
 	ZGMachBinary *_mainMachBinary;
 	ZGMachBinary *_dylinkerBinary;
@@ -128,7 +128,7 @@
 	return _symbolicator;
 }
 
-- (NSMutableDictionary *)cacheDictionary
+- (NSMutableDictionary<NSString *, NSMutableDictionary *> *)cacheDictionary
 {
 	if (_cacheDictionary == nil)
 	{

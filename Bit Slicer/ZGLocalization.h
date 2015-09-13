@@ -34,7 +34,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-void ZGAdjustLocalizableWidthsForWindowAndTableColumns(NSWindow *window, NSArray *tableColumns, NSDictionary *deltaWidthsDictionary);
-void ZGAdjustLocalizableWidthsForTableColumns(NSArray *tableColumns, NSDictionary *deltaWidthsDictionary);
+typedef NSString * ZGLocalizationLanguage;
+typedef NSArray<NSNumber *> * ZGLocalizationWidths;
+
+void ZGAdjustLocalizableWidthsForWindowAndTableColumns(NSWindow *window, NSArray<NSTableColumn *> *tableColumns, NSDictionary<ZGLocalizationLanguage, ZGLocalizationWidths> *deltaWidthsDictionary);
+void ZGAdjustLocalizableWidthsForTableColumns(NSArray<NSTableColumn *> *tableColumns, NSDictionary<ZGLocalizationLanguage, ZGLocalizationWidths> *deltaWidthsDictionary);
 
 NS_ASSUME_NONNULL_END

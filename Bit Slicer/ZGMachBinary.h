@@ -45,10 +45,10 @@ extern NSString * const ZGFailedImageName;
 @interface ZGMachBinary : NSObject
 
 + (nullable instancetype)dynamicLinkerMachBinaryInProcess:(ZGProcess *)process;
-+ (NSArray *)machBinariesInProcess:(ZGProcess *)process;
-+ (nullable instancetype)mainMachBinaryFromMachBinaries:(NSArray *)machBinaries;
-+ (nullable instancetype)machBinaryNearestToAddress:(ZGMemoryAddress)address fromMachBinaries:(NSArray *)machBinaries;
-+ (nullable instancetype)machBinaryWithPartialImageName:(NSString *)partialImageName inProcess:(ZGProcess *)process fromCachedMachBinaries:(nullable NSArray *)machBinaries error:(NSError **)error;
++ (NSArray<ZGMachBinary *> *)machBinariesInProcess:(ZGProcess *)process;
++ (nullable instancetype)mainMachBinaryFromMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries;
++ (nullable instancetype)machBinaryNearestToAddress:(ZGMemoryAddress)address fromMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries;
++ (nullable instancetype)machBinaryWithPartialImageName:(NSString *)partialImageName inProcess:(ZGProcess *)process fromCachedMachBinaries:(nullable NSArray<ZGMachBinary *> *)machBinaries error:(NSError **)error;
 
 - (id)initWithHeaderAddress:(ZGMemoryAddress)headerAddress filePathAddress:(ZGMemoryAddress)filePathAddress;
 

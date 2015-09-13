@@ -224,9 +224,9 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 	return entryIndex;
 }
 
-+ (NSArray *)registerVariablesFromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
++ (NSArray<ZGVariable *> *)registerVariablesFromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
 {
-	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *registerVariables = [[NSMutableArray alloc] init];
 	
 	ZGRegisterEntry entries[64];
 	[ZGRegisterEntries getRegisterEntries:entries fromVectorThreadState:vectorState is64Bit:is64Bit hasAVXSupport:hasAVXSupport];
@@ -249,9 +249,9 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 	return registerVariables;
 }
 
-+ (NSArray *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
++ (NSArray<ZGVariable *> *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
 {
-	NSMutableArray *registerVariables = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *registerVariables = [[NSMutableArray alloc] init];
 	
 	ZGRegisterEntry entries[28];
 	[ZGRegisterEntries getRegisterEntries:entries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];

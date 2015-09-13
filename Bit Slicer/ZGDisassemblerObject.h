@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nonatomic) void *bytes;
 
 // These methods may advance the object's internal position for disassembling instructions
-- (NSArray *)readInstructions;
+- (NSArray<ZGInstruction *> *)readInstructions;
 - (nullable ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize;
 - (nullable NSString *)readBranchOperand;
 

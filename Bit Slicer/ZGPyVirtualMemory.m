@@ -206,7 +206,7 @@ static PyTypeObject VirtualMemoryType =
 @implementation ZGPyVirtualMemory
 {
 	ZGProcess *_process;
-	NSMutableDictionary *_allocationSizeTable;
+	NSMutableDictionary<NSNumber *, NSNumber *> *_allocationSizeTable;
 }
 
 + (PyObject *)loadPythonClassInMainModule:(PyObject *)module
@@ -269,7 +269,7 @@ static PyTypeObject VirtualMemoryType =
 	return [self initWithProcess:process shouldCopy:NO virtualMemoryException:virtualMemoryException];
 }
 
-- (NSMutableDictionary *)allocationSizeTable
+- (NSMutableDictionary<NSNumber *, NSNumber *> *)allocationSizeTable
 {
 	if (_allocationSizeTable == nil)
 	{

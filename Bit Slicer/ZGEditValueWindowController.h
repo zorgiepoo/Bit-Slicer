@@ -33,6 +33,7 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
+@class ZGVariable;
 @class ZGVariableController;
 @class ZGScriptManager;
 
@@ -42,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)initWithVariableController:(ZGVariableController *)variableController;
 
-- (void)requestEditingValuesFromVariables:(NSArray *)variables withProcessTask:(ZGMemoryMap)processTask attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager;
+- (void)requestEditingValuesFromVariables:(NSArray<ZGVariable *> *)variables withProcessTask:(ZGMemoryMap)processTask attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager;
 
 @end
 

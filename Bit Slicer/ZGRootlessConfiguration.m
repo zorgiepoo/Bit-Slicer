@@ -39,8 +39,8 @@
 
 @implementation ZGRootlessConfiguration
 {
-	NSArray *_rootlessApplicationURLs;
-	NSCache *_affectedFileURLsCache;
+	NSArray<NSURL *> *_rootlessApplicationURLs;
+	NSCache<NSURL *, NSNumber *> *_affectedFileURLsCache;
 }
 
 - (id)init
@@ -66,7 +66,7 @@
 			}
 			else
 			{
-				NSMutableArray *tempRootlessApplicationURLs = [[NSMutableArray alloc] init];
+				NSMutableArray<NSURL *> *tempRootlessApplicationURLs = [[NSMutableArray alloc] init];
 				for (NSString *line in [rootlessApplicationsContents componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]])
 				{
 					if ([line hasPrefix:@"#"])
@@ -74,7 +74,7 @@
 						continue;
 					}
 					
-					NSArray *components = [line componentsSeparatedByString:@"\t"];
+					NSArray<NSString *> *components = [line componentsSeparatedByString:@"\t"];
 					if (components.count == 0)
 					{
 						continue;
@@ -102,7 +102,7 @@
 
 - (BOOL)_isFileURLAffected:(NSURL *)fileURL
 {
-	NSArray *pathComponents = fileURL.pathComponents;
+	NSArray<NSString *> *pathComponents = fileURL.pathComponents;
 	if (pathComponents.count > 1)
 	{
 		if ([[pathComponents subarrayWithRange:NSMakeRange(0, 2)] isEqualToArray:@"/System".pathComponents])

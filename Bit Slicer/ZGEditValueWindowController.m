@@ -44,7 +44,7 @@
 @implementation ZGEditValueWindowController
 {
 	ZGVariableController *_variableController;
-	NSArray *_variablesToEdit;
+	NSArray<ZGVariable *> *_variablesToEdit;
 	ZGMemoryMap _processTask;
 	
 	IBOutlet NSTextField *_valueTextField;
@@ -65,7 +65,7 @@
 	return @"Edit Value Dialog";
 }
 
-- (NSString *)commonByteArrayPatternFromVariables:(NSArray *)variables
+- (NSString *)commonByteArrayPatternFromVariables:(NSArray<ZGVariable *> *)variables
 {
 	ZGVariable *shortestVariable = nil;
 	for (ZGVariable *variable in variables)
@@ -76,12 +76,12 @@
 		}
 	}
 	
-	NSMutableArray *commonComponents = [NSMutableArray arrayWithArray:[shortestVariable.stringValue componentsSeparatedByString:@" "]];
+	NSMutableArray<NSString *> *commonComponents = [NSMutableArray arrayWithArray:[shortestVariable.stringValue componentsSeparatedByString:@" "]];
 	for (ZGVariable *variable in variables)
 	{
 		if (shortestVariable == variable) continue;
 		
-		NSArray *components = [variable.stringValue componentsSeparatedByString:@" "];
+		NSArray<NSString *> *components = [variable.stringValue componentsSeparatedByString:@" "];
 		for (NSUInteger componentIndex = 0; componentIndex < commonComponents.count; componentIndex++)
 		{
 			NSString *commonComponent = [commonComponents objectAtIndex:componentIndex];
@@ -115,7 +115,7 @@
 	return [commonComponents componentsJoinedByString:@" "];
 }
 
-- (void)requestEditingValuesFromVariables:(NSArray *)variables withProcessTask:(ZGMemoryMap)processTask attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager
+- (void)requestEditingValuesFromVariables:(NSArray<ZGVariable *> *)variables withProcessTask:(ZGMemoryMap)processTask attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager
 {
 	ZGVariable *firstNonScriptVariable = nil;
 	BOOL isAllByteArrays = YES;
@@ -168,7 +168,7 @@
 	[NSApp endSheet:window];
 	[window close];
 	
-	NSMutableArray *validVariables = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *validVariables = [[NSMutableArray alloc] init];
 	
 	for (ZGVariable *variable in _variablesToEdit)
 	{
@@ -194,7 +194,7 @@
 		return;
 	}
 	
-	NSMutableArray *newValues = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *newValues = [[NSMutableArray alloc] init];
 	NSString *replaceString = _valueTextField.stringValue;
 	
 	for (NSUInteger index = 0; index < validVariables.count; index++)

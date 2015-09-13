@@ -34,7 +34,7 @@
 
 NSString *ZGProtectionDescription(ZGMemoryProtection protection)
 {
-	NSMutableArray *protectionAttributes = [NSMutableArray array];
+	NSMutableArray<NSString *> *protectionAttributes = [NSMutableArray array];
 	[protectionAttributes addObject:(protection & VM_PROT_READ) ? @"r" : @"-"];
 	[protectionAttributes addObject:(protection & VM_PROT_WRITE) ? @"w" : @"-"];
 	[protectionAttributes addObject:(protection & VM_PROT_EXECUTE) ? @"x" : @"-"];

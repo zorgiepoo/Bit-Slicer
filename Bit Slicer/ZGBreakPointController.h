@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)createBreakPointControllerOnceWithScriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter;
 
-@property (nonatomic, readonly) NSArray *breakPoints;
+@property (nonatomic, readonly) NSArray<ZGBreakPoint *> *breakPoints;
 @property (nonatomic) ZGAppTerminationState *appTerminationState;
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate;
@@ -67,14 +67,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (ZGBreakPoint *)removeBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process;
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint;
 - (ZGBreakPoint *)addSingleStepBreakPointFromBreakPoint:(ZGBreakPoint *)breakPoint;
-- (NSArray *)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint;
+- (NSArray<ZGBreakPoint *> *)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint;
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint;
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointDelegate>)delegate getBreakPoint:(ZGBreakPoint * _Nullable * _Nonnull)returnedBreakPoint;
 
-- (NSArray *)removeObserver:(id)observer;
-- (NSArray *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;
-- (NSArray *)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address;
+- (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer;
+- (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;
+- (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address;
 
 @end
 

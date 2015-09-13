@@ -35,11 +35,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class ZGRegion;
+
 @interface ZGStoredData : NSObject
 
 + (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask;
 
-@property (nonatomic, readonly) NSArray *regions;
+@property (nonatomic, readonly) NSArray<ZGRegion *> *regions;
 
 @end
 

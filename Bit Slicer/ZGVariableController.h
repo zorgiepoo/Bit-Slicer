@@ -49,7 +49,7 @@ extern NSString *ZGScriptIndentationUsingTabsKey;
 
 - (void)freezeVariables;
 
-+ (void)copyVariablesToPasteboard:(NSArray *)variables;
++ (void)copyVariablesToPasteboard:(NSArray<ZGVariable *> *)variables;
 + (void)copyVariableAddress:(ZGVariable *)variable;
 
 - (void)copyVariables;
@@ -61,23 +61,23 @@ extern NSString *ZGScriptIndentationUsingTabsKey;
 - (BOOL)canClearSearch;
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes;
 - (void)removeSelectedSearchValues;
-- (void)disableHarmfulVariables:(NSArray *)variables;
+- (void)disableHarmfulVariables:(NSArray<ZGVariable *> *)variables;
 - (void)addVariable:(nullable id)sender;
-- (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
+- (void)addVariables:(NSArray<ZGVariable *> *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
 
-- (void)nopVariables:(NSArray *)variables;
+- (void)nopVariables:(NSArray<ZGVariable *> *)variables;
 
 - (void)changeVariable:(ZGVariable *)variable newDescription:(NSAttributedString *)newDescription;
 - (void)changeVariable:(ZGVariable *)variable newType:(ZGVariableType)type newSize:(ZGMemorySize)size;
 - (void)changeVariable:(ZGVariable *)variable newValue:(NSString *)stringObject shouldRecordUndo:(BOOL)recordUndoFlag;
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
 
-- (void)relativizeVariables:(NSArray *)variables;
-+ (void)annotateVariables:(NSArray *)variables process:(ZGProcess *)process;
+- (void)relativizeVariables:(NSArray<ZGVariable *> *)variables;
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process;
 
-- (void)editVariables:(NSArray *)variables newValues:(NSArray *)newValues;
+- (void)editVariables:(NSArray<ZGVariable *> *)variables newValues:(NSArray<NSString *> *)newValues;
 - (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula;
-- (void)editVariables:(NSArray *)variables requestedSizes:(NSArray *)requestedSizes;
+- (void)editVariables:(NSArray<ZGVariable *> *)variables requestedSizes:(NSArray<NSNumber *> *)requestedSizes;
 
 @end
 

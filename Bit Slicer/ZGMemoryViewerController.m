@@ -57,7 +57,7 @@
 
 @implementation ZGMemoryViewerController
 {
-	NSMutableArray *_haltedBreakPoints;
+	NSMutableArray<ZGBreakPoint *> *_haltedBreakPoints;
 	
 	ZGTextViewLayoutController *_textViewLayoutController;
 	
@@ -118,7 +118,7 @@
 	});
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration haltedBreakPoints:(NSMutableArray<ZGBreakPoint *> *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager rootlessConfiguration:rootlessConfiguration delegate:delegate];
 	if (self != nil)
@@ -165,7 +165,7 @@
 	_textViewLayoutController = [[ZGTextViewLayoutController alloc] init];
 
 	// So, I've no idea what HFTextView does by default, remove any type of representer that it might have and that we want to add
-	NSMutableArray *representersToRemove = [[NSMutableArray alloc] init];
+	NSMutableArray<HFRepresenter *> *representersToRemove = [[NSMutableArray alloc] init];
 	
 	for (HFRepresenter *representer in _textView.layoutRepresenter.representers)
 	{
@@ -356,7 +356,7 @@
 		return;
 	}
 	
-	NSArray *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
+	NSArray<ZGRegion *> *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
 	if (memoryRegions.count == 0)
 	{
 		cleanupOnSuccess(NO);

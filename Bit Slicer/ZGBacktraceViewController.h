@@ -36,6 +36,7 @@
 
 @class ZGProcess;
 @class ZGBacktrace;
+@class ZGInstruction;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -54,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) ZGBacktrace *backtrace;
 @property (nonatomic) ZGProcess *process;
 
-@property (nonatomic, readonly) NSArray *selectedInstructions;
+@property (nonatomic, readonly) NSArray<ZGInstruction *> *selectedInstructions;
 @property (nonatomic, readonly) NSTableView *tableView;
 
 @end

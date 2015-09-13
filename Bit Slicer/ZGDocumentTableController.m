@@ -57,7 +57,7 @@
 {
 	__weak ZGDocumentWindowController *_windowController;
 	NSTimer *_watchVariablesTimer;
-	NSMutableArray *_failedExecutableImages;
+	NSMutableArray<NSString *> *_failedExecutableImages;
 	NSDate *_lastUpdatedDate;
 	ZGDocumentData *_documentData;
 	ZGTableView *_variablesTableView;
@@ -341,7 +341,7 @@
 	return NSDragOperationNone;
 }
 
-- (void)reorderVariables:(NSArray *)newVariables
+- (void)reorderVariables:(NSArray<ZGVariable *> *)newVariables
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	NSUndoManager *undoManager = windowController.undoManager;
@@ -362,15 +362,15 @@
 	
 	if ([draggingInfo draggingSource] == _variablesTableView && [draggingInfo.draggingPasteboard.types containsObject:ZGVariableReorderType])
 	{
-		NSMutableArray *variables = [NSMutableArray arrayWithArray:_documentData.variables];
-		NSArray *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableReorderType];
+		NSMutableArray<ZGVariable *> *variables = [NSMutableArray arrayWithArray:_documentData.variables];
+		NSArray<NSNumber *> *rows = [draggingInfo.draggingPasteboard propertyListForType:ZGVariableReorderType];
 		
 		// Fill in the current rows with null objects
 		for (NSNumber *row in rows)
 		{
 			[variables
 			 replaceObjectAtIndex:row.unsignedIntegerValue
-			 withObject:NSNull.null];
+			 withObject:(id)[NSNull null]];
 		}
 		
 		// Insert the objects to the new position
@@ -384,14 +384,14 @@
 		}
 		
 		// Remove all the old objects
-		[variables removeObject:NSNull.null];
+		[variables removeObject:(id)[NSNull null]];
 		
 		// Set the new variables
 		[self reorderVariables:variables];
 	}
 	else if ([draggingInfo.draggingPasteboard.types containsObject:ZGVariablePboardType])
 	{
-		NSArray *variables = [NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[draggingInfo draggingPasteboard] dataForType:ZGVariablePboardType])];
+		NSArray<ZGVariable *> *variables = [NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[draggingInfo draggingPasteboard] dataForType:ZGVariablePboardType])];
 		
 		NSMutableIndexSet *rowIndexes = [NSMutableIndexSet indexSet];
 		for (NSUInteger rowIndex = 0; rowIndex < variables.count; rowIndex++)
@@ -410,13 +410,13 @@
 {
 	[pasteboard declareTypes:@[ZGVariableReorderType, ZGVariablePboardType] owner:self];
 	
-	NSMutableArray *rows = [[NSMutableArray alloc] init];
+	NSMutableArray<NSNumber *> *rows = [[NSMutableArray alloc] init];
 	[rowIndexes enumerateIndexesUsingBlock:^(NSUInteger index, BOOL * __unused stop) {
 		[rows addObject:@(index)];
 	}];
 	[pasteboard  setPropertyList:[NSArray arrayWithArray:rows] forType:ZGVariableReorderType];
 	
-	NSArray *variables = [_documentData.variables objectsAtIndexes:rowIndexes];
+	NSArray<ZGVariable *> *variables = [_documentData.variables objectsAtIndexes:rowIndexes];
 	[pasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 	
 	return YES;
@@ -459,7 +459,7 @@
 		{
 			if (variable.type == ZGScript)
 			{
-				NSArray *lines = [variable.scriptValue componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+				NSArray<NSString *> *lines = [variable.scriptValue componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 				if (lines.count > 0)
 				{
 					return [lines objectAtIndex:0];
@@ -607,7 +607,7 @@
 
 - (NSString *)tableView:(NSTableView *)__unused aTableView toolTipForCell:(NSCell *)__unused aCell rect:(NSRectPointer)__unused rect tableColumn:(NSTableColumn *)__unused aTableColumn row:(NSInteger)row mouseLocation:(NSPoint)__unused mouseLocation
 {
-	NSMutableArray *displayComponents = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *displayComponents = [[NSMutableArray alloc] init];
 	
 	if (row >= 0 && (NSUInteger)row < _documentData.variables.count)
 	{
@@ -617,8 +617,8 @@
 		NSUInteger fullDescriptionLength = fullDescription.length;
 		if (variable.name.length < fullDescriptionLength)
 		{
-			NSArray *lines = [fullDescription componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-			NSArray *trimmedLines = [lines subarrayWithRange:NSMakeRange(0, MIN(lines.count, 6U))];
+			NSArray<NSString *> *lines = [fullDescription componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+			NSArray<NSString *> *trimmedLines = [lines subarrayWithRange:NSMakeRange(0, MIN(lines.count, 6U))];
 			NSString *descriptionFromTrimmedLines = [trimmedLines componentsJoinedByString:@"\n"];
 			NSString *trimmedDescription = [descriptionFromTrimmedLines substringWithRange:NSMakeRange(0, MIN(descriptionFromTrimmedLines.length, 100U))];
 			if (trimmedDescription.length < fullDescriptionLength)

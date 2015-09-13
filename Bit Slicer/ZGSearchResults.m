@@ -34,7 +34,7 @@
 
 @implementation ZGSearchResults
 
-- (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize
+- (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize
 {
 	self = [super init];
 	if (self != nil)

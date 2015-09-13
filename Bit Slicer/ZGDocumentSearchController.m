@@ -281,8 +281,8 @@
 		numberOfVariables = searchResults.addressCount;
 	}
 	
-	NSMutableArray *allVariables = [[NSMutableArray alloc] initWithArray:_documentData.variables];
-	NSMutableArray *newVariables = [NSMutableArray array];
+	NSMutableArray<ZGVariable *> *allVariables = [[NSMutableArray alloc] initWithArray:_documentData.variables];
+	NSMutableArray<ZGVariable *> *newVariables = [NSMutableArray array];
 	
 	ZGDocumentWindowController *windowController = _windowController;
 	
@@ -335,7 +335,7 @@
 	}
 }
 
-- (void)finalizeSearchWithOldVariables:(NSArray *)oldVariables andNotSearchedVariables:(NSArray *)notSearchedVariables
+- (void)finalizeSearchWithOldVariables:(NSArray<ZGVariable *> *)oldVariables andNotSearchedVariables:(NSArray<ZGVariable *> *)notSearchedVariables
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
@@ -374,7 +374,7 @@
 		// Make the table first responder if we come back from a search and only one variable was found. Hopefully the user found what he was looking for.
 		if (!_searchProgress.shouldCancelSearch && _documentData.variables.count <= MAX_NUMBER_OF_VARIABLES_TO_FETCH)
 		{
-			NSArray *filteredVariables = [_documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
+			NSArray<ZGVariable *> *filteredVariables = [_documentData.variables zgFilterUsingBlock:(zg_array_filter_t)^(ZGVariable *variable) {
 				return variable.enabled;
 			}];
 			
@@ -690,7 +690,7 @@
 	return YES;
 }
 
-- (void)searchVariables:(NSArray *)variables byNarrowing:(BOOL)isNarrowing usingCompletionBlock:(dispatch_block_t)completeSearchBlock
+- (void)searchVariables:(NSArray<ZGVariable *> *)variables byNarrowing:(BOOL)isNarrowing usingCompletionBlock:(dispatch_block_t)completeSearchBlock
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	ZGProcess *currentProcess = windowController.currentProcess;
@@ -746,8 +746,8 @@
 		return;
 	}
 	
-	NSMutableArray *notSearchedVariables = [[NSMutableArray alloc] init];
-	NSMutableArray *searchedVariables = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *notSearchedVariables = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *searchedVariables = [[NSMutableArray alloc] init];
 	
 	BOOL isNarrowingSearch = allowsNarrowing && [self isInNarrowSearchMode];
 	
@@ -772,7 +772,7 @@
 		searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
 	}
 	
-	NSArray *oldVariables = _documentData.variables;
+	NSArray<ZGVariable *> *oldVariables = _documentData.variables;
 	
 	_documentData.variables = notSearchedVariables;
 	[_windowController.variablesTableView reloadData];

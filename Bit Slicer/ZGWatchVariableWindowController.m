@@ -67,8 +67,8 @@
 	ZGBreakPointController *_breakPointController;
 	ZGProcess *_watchProcess;
 	id _watchActivity;
-	NSMutableArray *_foundWatchVariables;
-	NSMutableDictionary *_foundWatchVariablesDictionary;
+	NSMutableArray<ZGWatchVariable *> *_foundWatchVariables;
+	NSMutableDictionary<NSNumber *, ZGWatchVariable *> *_foundWatchVariablesDictionary;
 	watch_variable_completion_t _completionHandler;
 	
 	__weak id <ZGShowMemoryWindow> _delegate;
@@ -125,14 +125,14 @@
 	
 	if (shouldInvokeCompletionHandler)
 	{
-		NSArray *desiredWatchVariables = [_foundWatchVariables zgFilterUsingBlock:^(ZGWatchVariable *watchVariable) { return watchVariable.instruction.variable.enabled; }];
+		NSArray<ZGWatchVariable *> *desiredWatchVariables = [_foundWatchVariables zgFilterUsingBlock:^(ZGWatchVariable *watchVariable) { return watchVariable.instruction.variable.enabled; }];
 		
 		for (ZGWatchVariable *watchVariable in desiredWatchVariables)
 		{
 			[self annotateWatchVariableDescription:watchVariable];
 		}
 		
-		NSArray *desiredVariables = [desiredWatchVariables zgMapUsingBlock:^id(ZGWatchVariable *watchVariable) { return watchVariable.instruction.variable; }];
+		NSArray<ZGVariable *> *desiredVariables = [desiredWatchVariables zgMapUsingBlock:^id(ZGWatchVariable *watchVariable) { return watchVariable.instruction.variable; }];
 		
 		for (ZGVariable *variable in desiredVariables)
 		{
@@ -193,7 +193,7 @@
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:registerLabel attributes:@{NSFontAttributeName : boldFont}]];
 	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
 	
-	NSMutableArray *registerLines = [NSMutableArray array];
+	NSMutableArray<NSString *> *registerLines = [NSMutableArray array];
 	
 	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(registerEntry); registerEntry++)
 	{
@@ -298,7 +298,7 @@
 	
 	NSNumber *instructionAddressNumber = @(instructionAddress);
 	
-	ZGWatchVariable *existingWatchVariable = [_foundWatchVariablesDictionary objectForKey:instructionAddressNumber];
+	ZGWatchVariable *existingWatchVariable = _foundWatchVariablesDictionary[instructionAddressNumber];
 	if (existingWatchVariable != nil)
 	{
 		[existingWatchVariable increaseAccessCount];
@@ -306,7 +306,7 @@
 		return;
 	}
 	
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:_watchProcess];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:_watchProcess];
 	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddress inProcess:_watchProcess withBreakPoints:_breakPointController.breakPoints machBinaries:machBinaries];
 	
 	if (instruction == nil)
@@ -378,7 +378,7 @@
 	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 }
 
-- (NSArray *)selectedWatchVariables
+- (NSArray<ZGWatchVariable *> *)selectedWatchVariables
 {
 	return [_foundWatchVariables objectsAtIndexes:[self selectedWatchVariableIndexes]];
 }
@@ -431,7 +431,7 @@
 	{
 		watchVariable.instruction.variable.enabled = [object boolValue];
 		
-		NSArray *selectedWatchVariables = [self selectedWatchVariables];
+		NSArray<ZGWatchVariable *> *selectedWatchVariables = [self selectedWatchVariables];
 		if (selectedWatchVariables.count > 1 && [selectedWatchVariables containsObject:watchVariable])
 		{
 			_tableView.shouldIgnoreNextSelection = YES;
@@ -479,13 +479,13 @@
 
 - (IBAction)copy:(id)__unused sender
 {
-	NSArray *selectedWatchVariables = [self selectedWatchVariables];
+	NSArray<ZGWatchVariable *> *selectedWatchVariables = [self selectedWatchVariables];
 	for (ZGWatchVariable *watchVariable in selectedWatchVariables)
 	{
 		[self annotateWatchVariableDescription:watchVariable];
 	}
 	
-	NSArray *variables = [selectedWatchVariables zgMapUsingBlock:^(ZGWatchVariable *watchVariable) {
+	NSArray<ZGVariable *> *variables = [selectedWatchVariables zgMapUsingBlock:^(ZGWatchVariable *watchVariable) {
 		return watchVariable.instruction.variable;
 	}];
 	

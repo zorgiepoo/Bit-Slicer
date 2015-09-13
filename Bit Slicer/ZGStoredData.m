@@ -38,7 +38,7 @@
 
 + (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask
 {
-	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGRegion *> *regions = [[NSMutableArray alloc] init];
 	
 	for (ZGRegion *region in [ZGRegion regionsFromProcessTask:processTask])
 	{
@@ -57,7 +57,7 @@
 	return [[self alloc] initWithRegions:regions];
 }
 
-- (id)initWithRegions:(NSArray *)regions
+- (id)initWithRegions:(NSArray<ZGRegion *> *)regions
 {
 	self = [super init];
 	if (self != nil)

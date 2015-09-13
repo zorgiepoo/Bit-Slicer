@@ -39,6 +39,7 @@
 @class ZGVariable;
 @class ZGProcess;
 @class ZGRegistersState;
+@class ZGDebugThread;
 
 typedef NS_ENUM(NSInteger, ZGBreakPointType)
 {
@@ -59,13 +60,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) ZGVariable *variable;
 @property (nonatomic) ZGMemorySize watchSize;
 @property (readonly, nonatomic) ZGProcess *process;
-@property (atomic, nullable) NSArray *debugThreads;
+@property (atomic, nullable) NSArray<ZGDebugThread *> *debugThreads;
 @property (readonly, nonatomic) ZGBreakPointType type;
 @property (atomic) BOOL needsToRestore;
 @property (nonatomic) BOOL hidden;
 @property (atomic) BOOL dead;
 @property (nonatomic) ZGMemoryAddress basePointer;
-@property (nonatomic) NSMutableDictionary *cacheDictionary;
+@property (nonatomic) NSMutableDictionary<NSNumber *, NSNumber *> *cacheDictionary;
 @property (nonatomic, nullable) PyObject *condition;
 @property (nonatomic, nullable) PyObject *callback;
 @property (nonatomic, nullable) NSError *error;

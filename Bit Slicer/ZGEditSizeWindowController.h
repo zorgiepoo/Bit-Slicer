@@ -32,6 +32,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class ZGVariable;
 @class ZGVariableController;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -40,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)initWithVariableController:(ZGVariableController *)variableController;
 
-- (void)requestEditingSizesFromVariables:(NSArray *)variables attachedToWindow:(NSWindow *)parentWindow;
+- (void)requestEditingSizesFromVariables:(NSArray<ZGVariable *> *)variables attachedToWindow:(NSWindow *)parentWindow;
 
 @end
 

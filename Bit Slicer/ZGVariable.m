@@ -360,7 +360,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 + (NSString *)byteArrayStringFromValue:(unsigned char *)value size:(ZGMemorySize)size
 {
-	NSMutableArray *byteStringComponents = [NSMutableArray array];
+	NSMutableArray<NSString *> *byteStringComponents = [NSMutableArray array];
 	
 	for (ZGMemorySize byteIndex = 0; byteIndex < size; byteIndex++)
 	{
@@ -553,7 +553,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (NSString *)name
 {
-	NSArray *lines = [_fullAttributedDescription.string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+	NSArray<NSString *> *lines = [_fullAttributedDescription.string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 	if (lines.count <= 1)
 	{
 		return _fullAttributedDescription.string;
@@ -564,7 +564,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (NSString *)shortDescription
 {
-	NSArray *lines = [_fullAttributedDescription.string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+	NSArray<NSString *> *lines = [_fullAttributedDescription.string componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 	if (lines.count <= 1)
 	{
 		return _fullAttributedDescription.string;

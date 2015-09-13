@@ -41,7 +41,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^watch_variable_completion_t)(NSArray *variablesFound);
+typedef void (^watch_variable_completion_t)(NSArray<ZGVariable *> *variablesFound);
 
 @interface ZGWatchVariableWindowController : NSWindowController <ZGBreakPointDelegate, NSTableViewDataSource>
 

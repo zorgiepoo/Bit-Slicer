@@ -70,7 +70,7 @@
 
 + (void)registerBaseAddressFunctionWithEvaluator:(DDMathEvaluator *)evaluator
 {
-	[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator * __unused eval, NSError *__autoreleasing *error) {
+	[evaluator registerFunction:^DDExpression *(NSArray<DDExpression *> *args, NSDictionary<NSString *, id> *vars, DDMathEvaluator * __unused eval, NSError *__autoreleasing *error) {
 		ZGProcess *process = [vars objectForKey:ZGProcessVariable];
 		ZGMemoryAddress foundAddress = 0x0;
 		if (args.count == 0)
@@ -79,7 +79,7 @@
 		}
 		else if (args.count == 1)
 		{
-			NSMutableArray *failedImages = [vars objectForKey:ZGFailedImagesVariable];
+			NSMutableArray<NSString *> *failedImages = [vars objectForKey:ZGFailedImagesVariable];
 			
 			DDExpression *expression = [args objectAtIndex:0];
 			if (expression.expressionType == DDExpressionTypeVariable)
@@ -117,7 +117,7 @@
 
 + (void)registerCalculatePointerFunctionWithEvaluator:(DDMathEvaluator *)evaluator
 {
-	[evaluator registerFunction:^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
+	[evaluator registerFunction:^DDExpression *(NSArray<DDExpression *> *args, NSDictionary<NSString *, id> *vars, DDMathEvaluator *eval, NSError *__autoreleasing *error) {
 		ZGMemoryAddress pointer = 0x0;
 		if (args.count == 1)
 		{
@@ -156,10 +156,10 @@
 
 + (DDMathFunction)registerFindSymbolFunctionWithEvaluator:(DDMathEvaluator *)evaluator
 {
-	DDMathFunction findSymbolFunction = ^DDExpression *(NSArray *args, NSDictionary *vars, DDMathEvaluator * __unused eval, NSError *__autoreleasing *error) {
-		NSNumber *symbolicatesNumber = [vars objectForKey:ZGSymbolicatesVariable];
-		ZGProcess *process = [vars objectForKey:ZGProcessVariable];
-		NSNumber *currentAddressNumber = [vars objectForKey:ZGLastSearchInfoVariable];
+	DDMathFunction findSymbolFunction = ^DDExpression *(NSArray<DDExpression *> *args, NSDictionary<NSString *, id> *vars, DDMathEvaluator * __unused eval, NSError *__autoreleasing *error) {
+		NSNumber *symbolicatesNumber = vars[ZGSymbolicatesVariable];
+		ZGProcess *process = vars[ZGProcessVariable];
+		NSNumber *currentAddressNumber = vars[ZGLastSearchInfoVariable];
 
 		__block NSNumber *symbolAddressNumber = @(0);
 
@@ -236,13 +236,13 @@
 + (void)registerFunctionResolverWithEvaluator:(DDMathEvaluator *)evaluator findSymbolFunction:(DDMathFunction)findSymbolFunction
 {
 	evaluator.functionResolver = (DDFunctionResolver)^(NSString *name) {
-		return (DDMathFunction)^(NSArray *args, NSDictionary *vars, DDMathEvaluator *eval, NSError **error) {
+		return (DDMathFunction)^(NSArray<DDExpression *> *args, NSDictionary<NSString *, id> *vars, DDMathEvaluator *eval, NSError **error) {
 			DDExpression *result = nil;
 			if ([[vars objectForKey:ZGSymbolicatesVariable] boolValue] && args.count == 0)
 			{
-				if ([vars objectForKey:ZGDidFindSymbol] != nil && [vars isKindOfClass:[NSMutableDictionary class]])
+				if (vars[ZGDidFindSymbol] != nil && [vars isKindOfClass:[NSMutableDictionary class]])
 				{
-					[(NSMutableDictionary *)vars setObject:@(YES) forKey:ZGDidFindSymbol];
+					((NSMutableDictionary *)vars)[ZGDidFindSymbol] = @YES;
 				}
 				
 				result = findSymbolFunction(@[[DDExpression variableExpressionWithVariable:name]], vars, eval, error);
@@ -414,7 +414,7 @@
 	return [[expression stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0;
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression substitutions:(NSDictionary *)substitutions error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression substitutions:(NSDictionary<NSString *, id> *)substitutions error:(NSError * __autoreleasing *)error
 {
 	if (![self isValidExpression:expression])
 	{
@@ -476,11 +476,11 @@
 	return [[NSString alloc] initWithData:newData encoding:NSUTF8StringEncoding];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
 {
 	NSString *newExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:expression];
 	
-	NSMutableDictionary *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process, ZGSymbolicatesVariable : @(symbolicates), ZGLastSearchInfoVariable : @(currentAddress), ZGDidFindSymbol : @(NO)}];
+	NSMutableDictionary<NSString *, id> *substitutions = [NSMutableDictionary dictionaryWithDictionary:@{ZGProcessVariable : process, ZGSymbolicatesVariable : @(symbolicates), ZGLastSearchInfoVariable : @(currentAddress), ZGDidFindSymbol : @(NO)}];
 
 	if (failedImages != nil)
 	{
@@ -501,7 +501,7 @@
 	return [self evaluateExpression:expression process:process failedImages:nil symbolicates:YES foundSymbol:didSymbolicate currentAddress:currentAddress error:error];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray * __unsafe_unretained)failedImages error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages error:(NSError * __autoreleasing *)error
 {
 	return [self evaluateExpression:expression process:process failedImages:failedImages symbolicates:NO foundSymbol:NULL currentAddress:0x0 error:error];
 }

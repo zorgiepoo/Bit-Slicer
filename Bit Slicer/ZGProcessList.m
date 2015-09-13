@@ -44,11 +44,11 @@
 @implementation ZGProcessList
 {
 	ZGProcessTaskManager *_processTaskManager;
-	NSMutableArray *_runningProcesses;
+	NSMutableArray<ZGRunningProcess *> *_runningProcesses;
 	
 	NSTimer *_pollTimer;
 	NSUInteger _pollRequestCount;
-	NSMutableArray *_priorityProcesses;
+	NSMutableArray<ZGRunningProcessObserver *> *_priorityProcesses;
 	NSMutableArray *_pollObservers;
 	
 	// For SYSCTL_PROC_CPUTYPE MIB storage
@@ -61,12 +61,12 @@
 // http://stackoverflow.com/questions/477204/key-value-observing-a-to-many-relationship-in-cocoa
 // KVO with a one-to-many relationship
 
-- (NSArray *)runningProcesses
+- (NSArray<ZGRunningProcess *> *)runningProcesses
 {
 	return [_runningProcesses copy];
 }
 
-- (void)setRunningProcesses:(NSArray *)runningProcesses
+- (void)setRunningProcesses:(NSArray<ZGRunningProcess *> *)runningProcesses
 {
 	if (![_runningProcesses isEqualToArray:runningProcesses])
 	{
@@ -88,7 +88,7 @@
 	return [_runningProcesses objectAtIndex:index];
 }
 
-- (NSArray *)runningProcessesAtIndexes:(NSIndexSet *)indexes
+- (NSArray<ZGRunningProcess *> *)runningProcessesAtIndexes:(NSIndexSet *)indexes
 {
 	return [_runningProcesses objectsAtIndexes:indexes];
 }
@@ -166,7 +166,7 @@
 		return;
 	}
 	
-	NSMutableArray *newRunningProcesses = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGRunningProcess *> *newRunningProcesses = [[NSMutableArray alloc] init];
 	
 	const size_t processCount = processListActualSize / sizeof(*processList);
 	for (size_t processIndex = 0; processIndex < processCount; processIndex++)
@@ -200,14 +200,14 @@
 	
 	free(processList);
 	
-	NSMutableArray *currentProcesses = [self mutableArrayValueForKey:ZG_SELECTOR_STRING(self, runningProcesses)];
+	NSMutableArray<ZGRunningProcess *> *currentProcesses = [self mutableArrayValueForKey:ZG_SELECTOR_STRING(self, runningProcesses)];
 	
 	if (![currentProcesses isEqualToArray:newRunningProcesses])
 	{
 		// Remove old processes
-		NSMutableArray *processesToRemove = [[NSMutableArray alloc] init];
+		NSMutableArray<ZGRunningProcess *> *processesToRemove = [[NSMutableArray alloc] init];
 		
-		for (id process in currentProcesses)
+		for (ZGRunningProcess *process in currentProcesses)
 		{
 			if (![newRunningProcesses containsObject:process])
 			{
@@ -218,9 +218,9 @@
 		[currentProcesses removeObjectsInArray:processesToRemove];
 		
 		// Add new processes
-		NSMutableArray *processesToAdd = [[NSMutableArray alloc] init];
+		NSMutableArray<ZGRunningProcess *> *processesToAdd = [[NSMutableArray alloc] init];
 		
-		for (id process in newRunningProcesses)
+		for (ZGRunningProcess *process in newRunningProcesses)
 		{
 			if (![currentProcesses containsObject:process])
 			{

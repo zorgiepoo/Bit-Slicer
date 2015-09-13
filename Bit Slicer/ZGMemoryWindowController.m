@@ -319,11 +319,11 @@
 	menuItem.image = smallIcon;
 }
 
-- (void)observeValueForKeyPath:(NSString *)__unused keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)__unused context
+- (void)observeValueForKeyPath:(NSString *)__unused keyPath ofObject:(id)object change:(NSDictionary<NSString *, id> *)change context:(void *)__unused context
 {
 	if (object == _processList)
 	{
-		for (ZGRunningProcess *runningProcess in [change objectForKey:NSKeyValueChangeOldKey])
+		for (ZGRunningProcess *runningProcess in change[NSKeyValueChangeOldKey])
 		{
 			if ([_processTaskManager taskExistsForProcessIdentifier:runningProcess.processIdentifier])
 			{
@@ -336,8 +336,8 @@
 	}
 	else if (object == [NSWorkspace sharedWorkspace])
 	{
-		NSArray *newRunningProcesses = [change objectForKey:NSKeyValueChangeNewKey];
-		NSArray *currentRunningProcesses = _processList.runningProcesses;
+		NSArray<NSRunningApplication *> *newRunningProcesses = change[NSKeyValueChangeNewKey];
+		NSArray<ZGRunningProcess *> *currentRunningProcesses = _processList.runningProcesses;
 		
 		// ZGProcessList may report processes to us faster than NSRunningApplication can ocasionally
 		// So be sure to get updated localized name and icon
@@ -376,7 +376,7 @@
 	}
 }
 
-- (void)processListChanged:(NSDictionary *)__unused change
+- (void)processListChanged:(NSDictionary<NSString *, id> *)__unused change
 {
 }
 
@@ -441,7 +441,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 
 - (void)updateRunningProcesses
 {
-	NSMutableDictionary *oldProcessesDictionary = [[NSMutableDictionary alloc] init];
+	NSMutableDictionary<NSNumber *, ZGProcess *> *oldProcessesDictionary = [[NSMutableDictionary alloc] init];
 	for (NSMenuItem *oldMenuItem in _runningApplicationsPopUpButton.itemArray)
 	{
 		ZGProcess *oldProcess = oldMenuItem.representedObject;
@@ -684,7 +684,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 	}
 }
 
-- (BOOL)isProcessIdentifier:(pid_t)processIdentifier inHaltedBreakPoints:(NSArray *)haltedBreakPoints
+- (BOOL)isProcessIdentifier:(pid_t)processIdentifier inHaltedBreakPoints:(NSArray<ZGBreakPoint *> *)haltedBreakPoints
 {
 	return [haltedBreakPoints zgHasObjectMatchingCondition:^BOOL (ZGBreakPoint *breakPoint) { return (breakPoint.process.processID == processIdentifier); }];
 }

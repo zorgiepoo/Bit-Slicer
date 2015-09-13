@@ -42,6 +42,7 @@
 @class ZGProcessTaskManager;
 @class ZGRootlessConfiguration;
 @class ZGProcessList;
+@class ZGBreakPoint;
 
 @interface ZGMemoryWindowController : NSWindowController
 
@@ -75,7 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (IBAction)pauseOrUnpauseProcess:(id)sender;
 
-- (BOOL)isProcessIdentifier:(pid_t)processIdentifier inHaltedBreakPoints:(NSArray *)haltedBreakPoints;
+- (BOOL)isProcessIdentifier:(pid_t)processIdentifier inHaltedBreakPoints:(NSArray<ZGBreakPoint *> *)haltedBreakPoints;
 - (BOOL)isProcessIdentifierHalted:(pid_t)processIdentifier; // should be overridden
 
 - (void)updateWindow;
@@ -93,7 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)stopProcessActivity;
 
 - (void)currentProcessChangedWithOldProcess:(nullable ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess;
-- (void)processListChanged:(NSDictionary *)change;
+- (void)processListChanged:(NSDictionary<NSString *, id> *)change;
 - (void)updateRunningProcesses;
 - (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification;
 

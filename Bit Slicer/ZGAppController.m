@@ -84,7 +84,7 @@
 	
 	
 	NSString *_lastChosenInternalProcessName;
-	NSMutableDictionary *_memorySelectionRanges;
+	NSMutableDictionary<NSNumber *, NSValue *> *_memorySelectionRanges;
 }
 
 #pragma mark Birth & Death

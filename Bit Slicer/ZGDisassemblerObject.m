@@ -63,7 +63,7 @@ static void disassemblerTranslator(ud_t *object)
 		// test for '0x' as a cheap way to detect if it's an immediate operand as opposed to an indirect register
 		if (strstr(originalText, "short") == NULL && strstr(originalText, "0x") != NULL)
 		{
-			NSMutableArray *textComponents = [NSMutableArray arrayWithArray:[@(originalText) componentsSeparatedByString:@" "]];
+			NSMutableArray<NSString *> *textComponents = [NSMutableArray arrayWithArray:[@(originalText) componentsSeparatedByString:@" "]];
 			[textComponents insertObject:@"short" atIndex:1];
 			const char *text = [[textComponents componentsJoinedByString:@" "] UTF8String];
 			if (strlen(text)+1 <= object->asm_buf_size)
@@ -102,9 +102,9 @@ static void disassemblerTranslator(ud_t *object)
 	free(_bytes); _bytes = NULL;
 }
 
-- (NSArray *)readInstructions
+- (NSArray<ZGInstruction *> *)readInstructions
 {
-	NSMutableArray *instructions = [NSMutableArray array];
+	NSMutableArray<ZGInstruction *> *instructions = [NSMutableArray array];
 	
 	while (ud_disassemble(_object) > 0)
 	{

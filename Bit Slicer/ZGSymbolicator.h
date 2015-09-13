@@ -50,7 +50,7 @@ typedef struct
 
 // Returns NSArray<NSValue *>, each value containing a ZGSymbolRange
 // Currently not used outside of this class but I anticipate it may be eventually (eg: for scripting)
-- (NSArray *)findSymbolsWithName:(NSString *)symbolName partialSymbolOwnerName:(nullable NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch;
+- (NSArray<NSValue *> *)findSymbolsWithName:(NSString *)symbolName partialSymbolOwnerName:(nullable NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch;
 
 - (nullable NSNumber *)findSymbol:(NSString *)symbolName withPartialSymbolOwnerName:(nullable NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch pastAddress:(ZGMemoryAddress)pastAddress allowsWrappingToBeginning:(BOOL)allowsWrapping;
 

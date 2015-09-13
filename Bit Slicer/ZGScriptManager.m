@@ -63,7 +63,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 
 @interface ZGScriptManager ()
 
-@property (atomic) NSMutableArray *runningScripts;
+@property (atomic) NSMutableArray<ZGPyScript *> *runningScripts;
 
 @end
 
@@ -73,7 +73,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	__weak ZGDocumentWindowController *_windowController;
 	ZGLoggerWindowController *_loggerWindowController;
 	ZGScriptingInterpreter *_scriptingInterpreter;
-	NSMutableDictionary *_scriptsDictionary;
+	NSMutableDictionary<NSValue *, ZGPyScript *> *_scriptsDictionary;
 	VDKQueue *_fileWatchingQueue;
 	dispatch_source_t _scriptTimer;
 	dispatch_queue_t _scriptTimerQueue;
@@ -172,7 +172,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	[_fileWatchingQueue addPath:fullPath];
 }
 
-- (void)loadCachedScriptsFromVariables:(NSArray *)variables
+- (void)loadCachedScriptsFromVariables:(NSArray<ZGVariable *> *)variables
 {
 	NSFileManager *fileManager = [[NSFileManager alloc] init];
 	BOOL needsToMarkChange = NO;
@@ -207,7 +207,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 {
 	NSFileManager *fileManager = [[NSFileManager alloc] init];
 	
-	ZGPyScript *script = [_scriptsDictionary objectForKey:[NSValue valueWithNonretainedObject:variable]];
+	ZGPyScript *script = _scriptsDictionary[[NSValue valueWithNonretainedObject:variable]];
 	if (script != nil && ![fileManager fileExistsAtPath:script.path])
 	{
 		[_scriptsDictionary removeObjectForKey:[NSValue valueWithNonretainedObject:variable]];
@@ -743,7 +743,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	}
 }
 
-- (void)removeUserNotifications:(NSArray *)userNotifications withScriptPrompt:(ZGScriptPrompt *)scriptPrompt
+- (void)removeUserNotifications:(NSArray<NSUserNotification *> *)userNotifications withScriptPrompt:(ZGScriptPrompt *)scriptPrompt
 {
 	for (NSUserNotification *userNotification in userNotifications)
 	{

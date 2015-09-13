@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 void * _Nullable ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize * _Nullable dataSize);
 void * _Nullable ZGSwappedValue(BOOL isProcess64Bit, const void *value, ZGVariableType dataType, ZGMemorySize dataSize);
 
-NSArray *ZGByteArrayComponentsFromString(NSString *searchString);
+NSArray<NSString *> *ZGByteArrayComponentsFromString(NSString *searchString);
 unsigned char * _Nullable ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);
 
 NS_ASSUME_NONNULL_END

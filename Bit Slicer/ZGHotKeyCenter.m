@@ -36,7 +36,7 @@
 
 @implementation ZGHotKeyCenter
 {
-	NSMutableArray *_registeredHotKeys;
+	NSMutableArray<ZGHotKey *> *_registeredHotKeys;
 	UInt32 _nextRegisteredHotKeyID;
 }
 
@@ -144,9 +144,9 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 	return foundHotKey;
 }
 
-- (NSArray *)unregisterHotKeysWithDelegate:(id <ZGHotKeyDelegate>)delegate
+- (NSArray<ZGHotKey *> *)unregisterHotKeysWithDelegate:(id <ZGHotKeyDelegate>)delegate
 {
-	NSMutableArray *foundHotKeys = [NSMutableArray array];
+	NSMutableArray<ZGHotKey *> *foundHotKeys = [NSMutableArray array];
 	for (ZGHotKey *hotKey in _registeredHotKeys)
 	{
 		if (hotKey.delegate == delegate)
@@ -175,8 +175,8 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 	CFArrayRef cfSystemHotKeyDictionaries = NULL;
 	if (CopySymbolicHotKeys(&cfSystemHotKeyDictionaries) == noErr)
 	{
-		NSArray *systemHotKeyDictionaries = (__bridge_transfer NSArray *)cfSystemHotKeyDictionaries;
-		for (NSDictionary *hotKeyDictionary in systemHotKeyDictionaries)
+		NSArray<NSDictionary<NSString *, id> *> *systemHotKeyDictionaries = (__bridge_transfer NSArray *)cfSystemHotKeyDictionaries;
+		for (NSDictionary<NSString *, id> *hotKeyDictionary in systemHotKeyDictionaries)
 		{
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcast-qual"

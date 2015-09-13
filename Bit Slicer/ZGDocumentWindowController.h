@@ -40,6 +40,7 @@
 @class ZGDocumentTableController;
 @class ZGVariableController;
 @class ZGDocumentSearchController;
+@class ZGVariable;
 @class ZGProcess;
 @class ZGSearchResults;
 @class ZGRunningProcess;
@@ -97,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)requestEditingVariableAddress:(nullable id)sender;
 
 - (NSIndexSet *)selectedVariableIndexes;
-- (NSArray *)selectedVariables;
+- (NSArray<ZGVariable *> *)selectedVariables;
 
 - (void)updateOptions;
 
@@ -107,7 +108,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deselectSearchField;
 - (void)insertStoredValueToken;
 
-- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(nullable ZGSearchResults *)searchResults;
+- (void)updateVariables:(NSArray<ZGVariable *> *)newWatchVariablesArray searchResults:(nullable ZGSearchResults *)searchResults;
 
 @end
 

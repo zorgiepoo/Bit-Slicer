@@ -63,7 +63,7 @@ extern NSString *ZGScriptDefaultApplicationEditorKey;
 
 - (void)triggerCurrentProcessChanged;
 
-- (void)loadCachedScriptsFromVariables:(NSArray *)variables;
+- (void)loadCachedScriptsFromVariables:(NSArray<ZGVariable *> *)variables;
 
 - (void)openScriptForVariable:(ZGVariable *)variable;
 

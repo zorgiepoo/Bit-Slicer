@@ -103,7 +103,7 @@
 
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-	NSArray *variables = [[_backtrace.instructions objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	NSArray<ZGVariable *> *variables = [[_backtrace.instructions objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
@@ -176,7 +176,7 @@
 
 #pragma mark Selection
 
-- (NSArray *)selectedInstructions
+- (NSArray<ZGInstruction *> *)selectedInstructions
 {
 	NSIndexSet *tableIndexSet = _tableView.selectedRowIndexes;
 	NSInteger clickedRow = _tableView.clickedRow;
@@ -190,8 +190,8 @@
 
 - (IBAction)copy:(id)__unused sender
 {
-	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
-	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *descriptionComponents = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *variablesArray = [[NSMutableArray alloc] init];
 	
 	for (ZGInstruction *instruction in [self selectedInstructions])
 	{

@@ -34,21 +34,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSArray (NSArrayAdditions)
+@interface NSArray<ObjectType> (NSArrayAdditions)
 
-typedef BOOL (^zg_array_filter_t)(id __unsafe_unretained item);
+typedef BOOL (^zg_array_filter_t)(ObjectType __unsafe_unretained item);
 
-typedef NSComparisonResult (^zg_binary_search_t)(id __unsafe_unretained currentObject);
+typedef NSComparisonResult (^zg_binary_search_t)(ObjectType __unsafe_unretained currentObject);
 typedef id _Nonnull (^zg_map_t)(id __unsafe_unretained oldObject);
 
-- (NSArray *)zgFilterUsingBlock:(zg_array_filter_t)shouldKeep;
+- (NSArray<ObjectType> *)zgFilterUsingBlock:(zg_array_filter_t)shouldKeep;
 - (NSArray *)zgMapUsingBlock:(zg_map_t)map;
 
-- (nullable id)zgFirstObjectThatMatchesCondition:(zg_array_filter_t)matchingCondition;
+- (nullable ObjectType)zgFirstObjectThatMatchesCondition:(zg_array_filter_t)matchingCondition;
 - (BOOL)zgHasObjectMatchingCondition:(zg_array_filter_t)matchingCondition;
 - (BOOL)zgAllObjectsMatchingCondition:(zg_array_filter_t)matchingCondition;
 
-- (nullable id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator;
+- (nullable ObjectType)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator;
 
 @end
 

@@ -49,7 +49,7 @@
 
 #pragma mark Reading & Writing Data
 
-+ (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray *)breakPoints
++ (NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
 	void *originalBytes = NULL;
 	if (!ZGReadBytes(processTask, address, &originalBytes, &size))
@@ -73,7 +73,7 @@
 	return [NSData dataWithBytesNoCopy:newBytes length:size];
 }
 
-+ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPoints:(NSArray *)breakPoints
++ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
 	BOOL success = YES;
 	pid_t processID = 0;
@@ -126,7 +126,7 @@
 	return success;
 }
 
-+ (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process breakPoints:(NSArray *)breakPoints
++ (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
 	ZGMemorySize newSize = 0;
 	void *newValue = ZGValueFromString(process.is64Bit, stringValue, ZGByteArray, &newSize);
@@ -238,7 +238,7 @@
 	return data;
 }
 
-+ (ZGDisassemblerObject *)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray *)breakPoints
++ (ZGDisassemblerObject *)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
 	ZGDisassemblerObject *newObject = nil;
 	NSData *data = [self readDataWithProcessTask:processTask address:address size:size breakPoints:breakPoints];
@@ -251,7 +251,7 @@
 
 #pragma mark Finding Instructions
 
-+ (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process withBreakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries
++ (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints machBinaries:(NSArray<ZGMachBinary *> *)machBinaries
 {
 	ZGInstruction *instruction = nil;
 	
@@ -307,11 +307,11 @@
 #pragma mark Replacing Instructions
 
 + (void)
-replaceInstructions:(NSArray *)instructions
-fromOldStringValues:(NSArray *)oldStringValues
-toNewStringValues:(NSArray *)newStringValues
+replaceInstructions:(NSArray<ZGInstruction *> *)instructions
+fromOldStringValues:(NSArray<NSString *> *)oldStringValues
+toNewStringValues:(NSArray<NSString *> *)newStringValues
 inProcess:(ZGProcess *)process
-breakPoints:(NSArray *)breakPoints
+breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 undoManager:(NSUndoManager *)undoManager
 actionName:(NSString *)actionName
 {
@@ -332,17 +332,17 @@ actionName:(NSString *)actionName
 	}
 }
 
-+ (void)nopInstructions:(NSArray *)instructions inProcess:(ZGProcess *)process breakPoints:(NSArray *)breakPoints undoManager:(NSUndoManager *)undoManager actionName:(NSString *)actionName
++ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(NSUndoManager *)undoManager actionName:(NSString *)actionName
 {
-	NSMutableArray *newStringValues = [[NSMutableArray alloc] init];
-	NSMutableArray *oldStringValues = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *newStringValues = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *oldStringValues = [[NSMutableArray alloc] init];
 	
 	for (NSUInteger instructionIndex = 0; instructionIndex < instructions.count; instructionIndex++)
 	{
 		ZGInstruction *instruction = [instructions objectAtIndex:instructionIndex];
 		[oldStringValues addObject:instruction.variable.stringValue];
 		
-		NSMutableArray *nopComponents = [[NSMutableArray alloc] init];
+		NSMutableArray<NSString *> *nopComponents = [[NSMutableArray alloc] init];
 		for (NSUInteger nopIndex = 0; nopIndex < instruction.variable.size; nopIndex++)
 		{
 			[nopComponents addObject:@"90"];
@@ -368,9 +368,9 @@ actionName:(NSString *)actionName
 + (BOOL)
 injectCode:(NSData *)codeData
 intoAddress:(ZGMemoryAddress)allocatedAddress
-hookingIntoOriginalInstructions:(NSArray *)hookedInstructions
+hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
 process:(ZGProcess *)process
-breakPoints:(NSArray *)breakPoints
+breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 undoManager:(NSUndoManager *)undoManager
 error:(NSError * __autoreleasing *)error
 {
@@ -499,15 +499,15 @@ error:(NSError * __autoreleasing *)error
 	return YES;
 }
 
-+ (NSArray *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray *)breakPoints
++ (NSArray<ZGInstruction *> *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
 	int consumedLength =
 	[self shouldInjectCodeWithRelativeBranchingWithProcess:process sourceAddress:address destinationAddress:destinationAddress] ?
 	JUMP_REL32_INSTRUCTION_LENGTH :
 	INDIRECT_JUMP_INSTRUCTIONS_LENGTH;
 	
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:process];
-	NSMutableArray *instructions = [[NSMutableArray alloc] init];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
+	NSMutableArray<ZGInstruction *> *instructions = [[NSMutableArray alloc] init];
 	while (consumedLength > 0)
 	{
 		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inProcess:process withBreakPoints:breakPoints machBinaries:machBinaries];

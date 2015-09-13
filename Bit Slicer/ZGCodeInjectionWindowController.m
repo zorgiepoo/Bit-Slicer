@@ -48,8 +48,8 @@
 	ZGMemoryAddress _allocatedAddress;
 	ZGMemorySize _numberOfAllocatedBytes;
 	ZGProcess *_process;
-	NSArray *_instructions;
-	NSArray *_breakPoints;
+	NSArray<ZGInstruction *> *_instructions;
+	NSArray<ZGBreakPoint *> *_breakPoints;
 }
 
 - (NSString *)windowNibName
@@ -68,7 +68,7 @@
 	_suggestedCode = [_textView.textStorage.mutableString copy];
 }
 
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process instruction:(ZGInstruction *)instruction breakPoints:(NSArray *)breakPoints undoManager:(NSUndoManager *)undoManager
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(NSUndoManager *)undoManager
 {
 	ZGMemoryAddress allocatedAddress = 0;
 	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
@@ -89,7 +89,7 @@
 	}
 	free(nopBuffer);
 	
-	NSArray *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:instruction.variable.address injectingIntoDestination:allocatedAddress inProcess:process withBreakPoints:breakPoints];
+	NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:instruction.variable.address injectingIntoDestination:allocatedAddress inProcess:process withBreakPoints:breakPoints];
 	
 	if (instructions == nil)
 	{

@@ -101,13 +101,13 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	ZGMemoryAddress _baseAddress;
 	ZGMemoryAddress _offsetFromBase;
 	
-	NSArray *_instructions;
+	NSArray<ZGInstruction *> *_instructions;
 	NSRange _instructionBoundary;
 	
 	ZGCodeInjectionWindowController *_codeInjectionController;
 	
 	NSPopover *_breakPointConditionPopover;
-	NSMutableArray *_breakPointConditions;
+	NSMutableArray<ZGBreakPointCondition *> *_breakPointConditions;
 	
 	IBOutlet ZGTableView *_instructionsTableView;
 	IBOutlet NSSplitView *_splitView;
@@ -436,7 +436,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 #pragma mark Symbols
 
 // prerequisite: should call shouldUpdateSymbolsForInstructions: beforehand
-- (void)updateSymbolsForInstructions:(NSArray *)instructions
+- (void)updateSymbolsForInstructions:(NSArray<ZGInstruction *> *)instructions
 {
 	for (ZGInstruction *instruction in instructions)
 	{
@@ -447,7 +447,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 }
 
-- (BOOL)shouldUpdateSymbolsForInstructions:(NSArray *)instructions
+- (BOOL)shouldUpdateSymbolsForInstructions:(NSArray<ZGInstruction *> *)instructions
 {
 	return self.currentProcess.valid && [instructions zgHasObjectMatchingCondition:^(ZGInstruction *instruction){ return (BOOL)(instruction.symbols == nil); }];
 }
@@ -492,7 +492,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		
 		if (needsToUpdateWindow)
 		{
-			NSArray *machBinaries = nil;
+			NSArray<ZGMachBinary *> *machBinaries = nil;
 			
 			// Find a [start, end) range that we are allowed to remove from the table and insert in again with new instructions
 			// Pick start and end such that they are aligned with the assembly instructions
@@ -588,10 +588,10 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size breakPoints:_breakPointController.breakPoints];
 			if (disassemblerObject != nil)
 			{
-				NSArray *instructionsToReplace = [disassemblerObject readInstructions];
+				NSArray<ZGInstruction *> *instructionsToReplace = [disassemblerObject readInstructions];
 				
 				// Replace the visible instructions
-				NSMutableArray *newInstructions = [[NSMutableArray alloc] initWithArray:_instructions];
+				NSMutableArray<ZGInstruction *> *newInstructions = [[NSMutableArray alloc] initWithArray:_instructions];
 				[newInstructions replaceObjectsInRange:NSMakeRange(startRow, endRow - startRow) withObjectsFromArray:instructionsToReplace];
 				_instructions = [NSArray arrayWithArray:newInstructions];
 				
@@ -606,7 +606,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	NSRange visibleRowsRange = [_instructionsTableView rowsInRect:_instructionsTableView.visibleRect];
 	if (visibleRowsRange.location + visibleRowsRange.length <= _instructions.count)
 	{
-		NSArray *instructions = [_instructions subarrayWithRange:visibleRowsRange];
+		NSArray<ZGInstruction *> *instructions = [_instructions subarrayWithRange:visibleRowsRange];
 		if ([self shouldUpdateSymbolsForInstructions:instructions])
 		{
 			[self updateSymbolsForInstructions:instructions];
@@ -628,7 +628,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		return;
 	}
 	
-	NSArray *machBinaries = nil;
+	NSArray<ZGMachBinary *> *machBinaries = nil;
 	
 	while (startInstruction == nil && bytesBehind > 0)
 	{
@@ -656,7 +656,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		
 		if (disassemblerObject != nil)
 		{
-			NSMutableArray *instructionsToAdd = [NSMutableArray arrayWithArray:[disassemblerObject readInstructions]];
+			NSMutableArray<ZGInstruction *> *instructionsToAdd = [NSMutableArray arrayWithArray:[disassemblerObject readInstructions]];
 			
 			NSUInteger numberOfInstructionsAdded = instructionsToAdd.count;
 			NSRange visibleRowsRange = [_instructionsTableView rowsInRect:_instructionsTableView.visibleRect];
@@ -681,7 +681,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	ZGInstruction *lastInstruction = _instructions.lastObject;
 	
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 	
 	ZGInstruction *startInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:(lastInstruction.variable.address + lastInstruction.variable.size + 1) inProcess:self.currentProcess withBreakPoints:_breakPointController.breakPoints machBinaries:machBinaries];
 	
@@ -715,8 +715,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			
 			if (disassemblerObject != nil)
 			{
-				NSArray *instructionsToAdd = [disassemblerObject readInstructions];
-				NSMutableArray *appendedInstructions = [NSMutableArray arrayWithArray:_instructions];
+				NSArray<ZGInstruction *> *instructionsToAdd = [disassemblerObject readInstructions];
+				NSMutableArray<ZGInstruction *> *appendedInstructions = [NSMutableArray arrayWithArray:_instructions];
 				[appendedInstructions addObjectsFromArray:instructionsToAdd];
 				
 				_instructions = [NSArray arrayWithArray:appendedInstructions];
@@ -761,7 +761,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	[_instructionsTableView reloadData];
 
 	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size breakPoints:_breakPointController.breakPoints];
-	NSArray *newInstructions = @[];
+	NSArray<ZGInstruction *> *newInstructions = @[];
 
 	if (disassemblerObject != nil)
 	{
@@ -793,9 +793,9 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 #pragma mark Handling Processes
 
-- (void)processListChanged:(NSDictionary *)change
+- (void)processListChanged:(NSDictionary<NSString *, id> *)change
 {
-	NSArray *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
+	NSArray<ZGRunningProcess *> *oldRunningProcesses = [change objectForKey:NSKeyValueChangeOldKey];
 	if (oldRunningProcesses)
 	{
 		for (ZGRunningProcess *runningProcess in oldRunningProcesses)
@@ -886,10 +886,10 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 	else
 	{
-		NSArray *selectedInstructions = [self selectedInstructions];
+		NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 		if (selectedInstructions.count > 0)
 		{
-			ZGInstruction *firstSelectedInstruction = [selectedInstructions objectAtIndex:0];
+			ZGInstruction *firstSelectedInstruction = selectedInstructions[0];
 			[_statusTextField setStringValue:[NSString stringWithFormat:@"%@ + 0x%llX", _mappedFilePath, firstSelectedInstruction.variable.address - _baseAddress]];
 		}
 	}
@@ -909,7 +909,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		return;
 	}
 	
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 	ZGMachBinary *mainMachBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:machBinaries];
 	
 	ZGMemoryAddress calculatedMemoryAddress = 0;
@@ -974,7 +974,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		return;
 	}
 	
-	NSArray *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
+	NSArray<ZGRegion *> *memoryRegions = [ZGRegion regionsFromProcessTask:self.currentProcess.processTask];
 	if (memoryRegions.count == 0)
 	{
 		cleanupOnFailure();
@@ -987,7 +987,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	
 	if (chosenRegion != nil)
 	{
-		NSArray *submapRegions =  [ZGRegion submapRegionsFromProcessTask:self.currentProcess.processTask region:chosenRegion];
+		NSArray<ZGRegion *> *submapRegions =  [ZGRegion submapRegionsFromProcessTask:self.currentProcess.processTask region:chosenRegion];
 		
 		chosenRegion = [submapRegions zgFirstObjectThatMatchesCondition:^(ZGRegion *region) {
 			return (BOOL)((region.protection & VM_PROT_READ) != 0 && (calculatedMemoryAddress >= region.address && calculatedMemoryAddress < region.address + region.size));
@@ -1093,14 +1093,14 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 }
 
-- (NSArray *)selectedInstructions
+- (NSArray<ZGInstruction *> *)selectedInstructions
 {
 	return [_instructions objectsAtIndexes:[self selectedInstructionIndexes]];
 }
 
 - (HFRange)preferredMemoryRequestRange
 {
-	NSArray *selectedInstructions = [self selectedInstructions];
+	NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 	ZGInstruction *firstInstruction = [selectedInstructions firstObject];
 	ZGInstruction *lastInstruction = [selectedInstructions lastObject];
 	
@@ -1171,7 +1171,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		return NO;
 	}
 	
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 	
 	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:_registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:_breakPointController.breakPoints machBinaries:machBinaries];
 	if (!currentInstruction)
@@ -1229,7 +1229,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	
 	if (userInterfaceItem.action == @selector(nopVariables:))
 	{
-		NSArray *selectedInstructions = [self selectedInstructions];
+		NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 		NSString *localizableKey = [NSString stringWithFormat:@"nopInstruction%@", selectedInstructions.count != 1 ? @"s" : @""];
 		menuItem.title = ZGLocalizedStringFromDebuggerTable(localizableKey);
 		
@@ -1275,7 +1275,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 	else if (userInterfaceItem.action == @selector(toggleBreakPoints:))
 	{
-		NSArray *selectedInstructions = [self selectedInstructions];
+		NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 		if (selectedInstructions.count == 0)
 		{
 			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"addBreakpoint");
@@ -1328,7 +1328,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			return NO;
 		}
 		
-		NSArray *selectedInstructions = [self selectedInstructions];
+		NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 		if (selectedInstructions.count != 1)
 		{
 			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToCallAddress");
@@ -1374,9 +1374,9 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
-- (void)annotateInstructions:(NSArray *)instructions
+- (void)annotateInstructions:(NSArray<ZGInstruction *> *)instructions
 {
-	NSArray *variablesToAnnotate = [[instructions zgMapUsingBlock:^(ZGInstruction *instruction) { return instruction.variable; }]
+	NSArray<ZGVariable *> *variablesToAnnotate = [[instructions zgMapUsingBlock:^(ZGInstruction *instruction) { return instruction.variable; }]
 	 zgFilterUsingBlock:^(ZGVariable *variable) {
 		 return (BOOL)(!variable.usesDynamicAddress);
 	 }];
@@ -1400,12 +1400,12 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (IBAction)copy:(id)__unused sender
 {
-	NSArray *selectedInstructions = [self selectedInstructions];
+	NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 	
 	[self annotateInstructions:selectedInstructions];
 	
-	NSMutableArray *descriptionComponents = [[NSMutableArray alloc] init];
-	NSMutableArray *variablesArray = [[NSMutableArray alloc] init];
+	NSMutableArray<NSString *> *descriptionComponents = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGVariable *> *variablesArray = [[NSMutableArray alloc] init];
 	
 	for (ZGInstruction *instruction in selectedInstructions)
 	{
@@ -1454,7 +1454,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-	NSArray *instructions = [_instructions objectsAtIndexes:rowIndexes];
+	NSArray<ZGInstruction *> *instructions = [_instructions objectsAtIndexes:rowIndexes];
 	[self annotateInstructions:instructions];
 	
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:[instructions valueForKey:@"variable"]] forType:ZGVariablePboardType];
@@ -1464,7 +1464,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	if (_instructions.count > 0)
 	{
-		NSArray *selectedInstructions = [self selectedInstructions];
+		NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 		if (selectedInstructions.count > 0)
 		{
 			ZGInstruction *firstInstruction = [selectedInstructions objectAtIndex:0];
@@ -1538,8 +1538,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
-			NSArray *targetInstructions = nil;
-			NSArray *selectedInstructions = [self selectedInstructions];
+			NSArray<ZGInstruction *> *targetInstructions = nil;
+			NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 			ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
 			if (![selectedInstructions containsObject:instruction])
 			{
@@ -1752,9 +1752,9 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 }
 
-- (void)removeBreakPointsToInstructions:(NSArray *)instructions
+- (void)removeBreakPointsToInstructions:(NSArray<ZGInstruction *> *)instructions
 {
-	NSMutableArray *changedInstructions = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGInstruction *> *changedInstructions = [[NSMutableArray alloc] init];
 	
 	for (ZGInstruction *instruction in instructions)
 	{
@@ -1782,9 +1782,9 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	[_instructionsTableView reloadData];
 }
 
-- (void)addBreakPointsToInstructions:(NSArray *)instructions
+- (void)addBreakPointsToInstructions:(NSArray<ZGInstruction *> *)instructions
 {
-	NSMutableArray *changedInstructions = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGInstruction *> *changedInstructions = [[NSMutableArray alloc] init];
 	
 	BOOL addedAtLeastOneBreakPoint = NO;
 	
@@ -1828,7 +1828,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (IBAction)toggleBreakPoints:(id)__unused sender
 {
-	NSArray *selectedInstructions = [self selectedInstructions];
+	NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 	if ([self isBreakPointAtInstruction:[selectedInstructions objectAtIndex:0]])
 	{
 		[self removeBreakPointsToInstructions:selectedInstructions];
@@ -2057,7 +2057,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (IBAction)stepOver:(id)__unused sender
 {
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self.currentProcess];
 	
 	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:_registersViewController.instructionPointer + 1 inProcess:self.currentProcess withBreakPoints:_breakPointController.breakPoints machBinaries:machBinaries];
 	
@@ -2194,7 +2194,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 	}
 	
-	NSArray *breakPoints = _breakPointController.breakPoints;
+	NSArray<ZGBreakPoint *> *breakPoints = _breakPointController.breakPoints;
 	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
 		if (breakPoint.type == ZGBreakPointInstruction && [breakPoint.process.internalName isEqualToString:self.currentProcess.internalName] && breakPoint.variable.address == address)

@@ -35,9 +35,9 @@
 
 @implementation ZGRegion
 
-+ (NSArray *)regionsFromProcessTask:(ZGMemoryMap)processTask
++ (NSArray<ZGRegion *> *)regionsFromProcessTask:(ZGMemoryMap)processTask
 {
-	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGRegion *> *regions = [[NSMutableArray alloc] init];
 	
 	ZGMemoryAddress address = 0x0;
 	ZGMemorySize size;
@@ -61,9 +61,9 @@
 	return [NSArray arrayWithArray:regions];
 }
 
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask
++ (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask
 {
-	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGRegion *> *regions = [[NSMutableArray alloc] init];
 	
 	ZGMemoryAddress address = 0x0;
 	ZGMemorySize size;
@@ -94,9 +94,9 @@
 	return [NSArray arrayWithArray:regions];
 }
 
-+ (NSArray *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region
++ (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region
 {
-	NSMutableArray *regions = [[NSMutableArray alloc] init];
+	NSMutableArray<ZGRegion *> *regions = [[NSMutableArray alloc] init];
 	
 	ZGMemoryAddress address = region.address;
 	ZGMemorySize size = region.size; // possibly not necessary to initialize

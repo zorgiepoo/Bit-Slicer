@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) ZGMemorySize addressCount;
 @property (nonatomic, readonly) ZGMemorySize pointerSize;
 @property (nonatomic, readonly) ZGMemorySize dataSize;
-@property (nonatomic, readonly) NSArray *resultSets;
+@property (nonatomic, readonly) NSArray<NSData *> *resultSets;
 
 // User data fields
 @property (nonatomic) NSInteger dataType;
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *stop);
 
-- (id)initWithResultSets:(NSArray *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize;
+- (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize;
 
 - (void)removeNumberOfAddresses:(ZGMemorySize)numberOfAddresses;
 

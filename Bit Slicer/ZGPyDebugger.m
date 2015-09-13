@@ -189,12 +189,12 @@ static PyTypeObject DebuggerType =
 	__weak ZGScriptManager *_scriptManager;
 	ZGBreakPointController *_breakPointController;
 	ZGLoggerWindowController *_loggerWindowController;
-	NSMutableDictionary *_cachedInstructionPointers;
+	NSMutableDictionary<NSNumber *, NSNumber *> *_cachedInstructionPointers;
 	ZGHotKeyCenter *_hotKeyCenter;
 	ZGProcess *_process;
 	ZGBreakPoint *_haltedBreakPoint;
-	NSDictionary *_generalPurposeRegisterOffsetsDictionary;
-	NSDictionary *_vectorRegisterOffsetsDictionary;
+	NSDictionary<NSString *, NSValue *> *_generalPurposeRegisterOffsetsDictionary;
+	NSDictionary<NSString *, NSValue *> *_vectorRegisterOffsetsDictionary;
 }
 
 + (PyObject *)loadPythonClassInMainModule:(PyObject *)module
@@ -260,7 +260,7 @@ static PyTypeObject DebuggerType =
 // Use cleanup method instead of dealloc since the break point controller's weak delegate reference may be nil by that time
 - (void)cleanup
 {
-	__block NSArray *unregisteredHotKeys = nil;
+	__block NSArray<ZGHotKey *> *unregisteredHotKeys = nil;
 	dispatch_async(dispatch_get_main_queue(), ^{
 		unregisteredHotKeys = [self->_hotKeyCenter unregisterHotKeysWithDelegate:self];
 	});
@@ -280,7 +280,7 @@ static PyTypeObject DebuggerType =
 		[_breakPointController resumeFromBreakPoint:_haltedBreakPoint];
 	}
 	
-	NSArray *removedBreakPoints = [_breakPointController removeObserver:self];
+	NSArray<ZGBreakPoint *> *removedBreakPoints = [_breakPointController removeObserver:self];
 	if (Py_IsInitialized())
 	{
 		for (ZGBreakPoint *breakPoint in removedBreakPoints)
@@ -604,7 +604,7 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 		
 		ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
 		
-		NSArray *instructions = [disassemblerObject readInstructions];
+		NSArray<ZGInstruction *> *instructions = [disassemblerObject readInstructions];
 		
 		NSString *disassembledString = [[instructions zgMapUsingBlock:^(ZGInstruction *instruction) { return instruction.text; }] componentsJoinedByString:@"\n"];
 		retValue = Py_BuildValue("s", [disassembledString UTF8String]);
@@ -720,7 +720,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 	ZGMemoryAddress destinationAddress = 0x0;
 	if (PyArg_ParseTuple(args, "KK:bytesBeforeInjection", &sourceAddress, &destinationAddress))
 	{
-		NSArray *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints];
+		NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints];
 		ZGMemorySize bufferLength = 0;
 		for (ZGInstruction *instruction in instructions)
 		{
@@ -764,7 +764,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		NSArray *originalInstructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints];
+		NSArray<ZGInstruction *> *originalInstructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints];
 		
 		NSError *error = nil;
 		BOOL injectedCode =
@@ -877,7 +877,7 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 		return NULL;
 	}
 	
-	NSArray *breakPointsRemoved = [self->objcSelf->_breakPointController removeObserver:self->breakPointDelegate withProcessID:self->processIdentifier atAddress:memoryAddress];
+	NSArray<ZGBreakPoint *> *breakPointsRemoved = [self->objcSelf->_breakPointController removeObserver:self->breakPointDelegate withProcessID:self->processIdentifier atAddress:memoryAddress];
 	
 	for (ZGBreakPoint *breakPoint in breakPointsRemoved)
 	{
@@ -899,7 +899,7 @@ static void resumeFromHaltedBreakPointInDebugger(DebuggerClass *self)
 
 static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 {
-	NSArray *removedBreakPoints = [self->objcSelf->_breakPointController removeSingleStepBreakPointsFromBreakPoint:self->objcSelf->_haltedBreakPoint];
+	NSArray<ZGBreakPoint *> *removedBreakPoints = [self->objcSelf->_breakPointController removeSingleStepBreakPointsFromBreakPoint:self->objcSelf->_haltedBreakPoint];
 	for (ZGBreakPoint *breakPoint in removedBreakPoints)
 	{
 		if (breakPoint.callback != NULL)
@@ -1056,7 +1056,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 	
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
 	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries];
 	
@@ -1115,7 +1115,7 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
 	ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
 	
-	NSArray *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
 	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf->_process breakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries maxLimit:2];
 	if (backtrace.instructions.count < 2)
@@ -1185,9 +1185,9 @@ static PyObject *Debugger_resume(DebuggerClass *self, PyObject * __unused args)
 	return Py_BuildValue("");
 }
 
-static NSDictionary *registerOffsetsCacheDictionary(ZGRegisterEntry *registerEntries)
+static NSDictionary<NSString *, NSValue *> *registerOffsetsCacheDictionary(ZGRegisterEntry *registerEntries)
 {
-	NSMutableDictionary *offsetsDictionary = [NSMutableDictionary dictionary];
+	NSMutableDictionary<NSString *, NSValue *> *offsetsDictionary = [NSMutableDictionary dictionary];
 	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(registerEntry); registerEntry++)
 	{
 		[offsetsDictionary
@@ -1198,11 +1198,11 @@ static NSDictionary *registerOffsetsCacheDictionary(ZGRegisterEntry *registerEnt
 	return [NSDictionary dictionaryWithDictionary:offsetsDictionary];
 }
 
-static BOOL writeRegister(NSDictionary *registerOffsetsDictionary, const char *registerString, PyObject *value, void *registerStartPointer, BOOL *wroteValue)
+static BOOL writeRegister(NSDictionary<NSString *, NSValue *> *registerOffsetsDictionary, const char *registerString, PyObject *value, void *registerStartPointer, BOOL *wroteValue)
 {
 	if (wroteValue != NULL) *wroteValue = NO;
 	
-	NSValue *registerValue = [registerOffsetsDictionary objectForKey:@(registerString)];
+	NSValue *registerValue = registerOffsetsDictionary[@(registerString)];
 	if (registerValue == nil)
 	{
 		return YES;
@@ -1300,8 +1300,8 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	BOOL success = YES;
 	
-	NSDictionary *generalPurposeRegisterOffsetsDictionary = self->objcSelf->_generalPurposeRegisterOffsetsDictionary;
-	NSDictionary *vectorRegisterOffsetsDictionary = self->objcSelf->_vectorRegisterOffsetsDictionary;
+	NSDictionary<NSString *, NSValue *> *generalPurposeRegisterOffsetsDictionary = self->objcSelf->_generalPurposeRegisterOffsetsDictionary;
+	NSDictionary<NSString *, NSValue *> *vectorRegisterOffsetsDictionary = self->objcSelf->_vectorRegisterOffsetsDictionary;
 	
 	BOOL needsToWriteGeneralRegisters = NO;
 	BOOL needsToWriteVectorRegisters = NO;
