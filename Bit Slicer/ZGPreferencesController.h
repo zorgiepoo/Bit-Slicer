@@ -36,8 +36,12 @@
 @class ZGAppUpdaterController;
 @class ZGDebuggerController;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGPreferencesController : NSWindowController
 
 - (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController;
 
 @end
+
+NS_ASSUME_NONNULL_END

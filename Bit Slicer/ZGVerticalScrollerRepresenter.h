@@ -33,6 +33,10 @@
 #import <Foundation/Foundation.h>
 #import <HexFiend/HexFiend.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGVerticalScrollerRepresenter : HFVerticalScrollerRepresenter
 
 @end
+
+NS_ASSUME_NONNULL_END

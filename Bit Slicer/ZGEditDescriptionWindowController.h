@@ -35,6 +35,8 @@
 @class ZGVariableController;
 @class ZGVariable;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGEditDescriptionWindowController : NSWindowController
 
 - (id)initWithVariableController:(ZGVariableController *)variableController;
@@ -42,3 +44,5 @@
 - (void)requestEditingDescriptionFromVariable:(ZGVariable *)variable attachedToWindow:(NSWindow *)parentWindow;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -35,6 +35,8 @@
 
 @class ZGHotKey;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGHotKeyCenter : NSObject
 
 - (BOOL)registerHotKey:(ZGHotKey *)hotKey delegate:(id <ZGHotKeyDelegate>)delegate;
@@ -46,3 +48,5 @@
 - (BOOL)isRegisteredHotKey:(ZGHotKey *)hotKey;
 
 @end
+
+NS_ASSUME_NONNULL_END

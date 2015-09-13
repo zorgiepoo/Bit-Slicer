@@ -35,6 +35,8 @@
 @class ZGVariable;
 @class ZGVariableController;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGEditAddressWindowController : NSWindowController
 
 - (id)initWithVariableController:(ZGVariableController *)variableController;
@@ -42,3 +44,5 @@
 - (void)requestEditingAddressFromVariable:(ZGVariable *)variable attachedToWindow:(NSWindow *)parentWindow;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -62,6 +62,7 @@
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
 #import "ZGOperatingSystemCompatibility.h"
+#import "ZGNullability.h"
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
@@ -242,7 +243,7 @@
 	[super windowDidLoad];
 	
 	_documentData = [(ZGDocument *)self.document data];
-	_searchData = [self.document searchData];
+	_searchData = [(ZGDocument *)self.document searchData];
 	
 	_tableController = [[ZGDocumentTableController alloc] initWithWindowController:self];
 	_variableController = [[ZGVariableController alloc] initWithWindowController:self];
@@ -257,7 +258,7 @@
 	searchFieldCell.cancelButtonCell.action = @selector(clearSearchValues:);
 	
 	[self setupScopeBar];
-	ZGAdjustLocalizableWidthsForTableColumns(self.window, @[_dataTypeTableColumn], @{@"ru" : @[@60.0]});
+	ZGAdjustLocalizableWidthsForWindowAndTableColumns(ZGUnwrapNullableObject(self.window), @[_dataTypeTableColumn], @{@"ru" : @[@60.0]});
 	
 	[_storeValuesButton.image setTemplate:YES];
 	[[NSImage imageNamed:@"container_filled"] setTemplate:YES];
@@ -296,7 +297,7 @@
 		}
 	}
 
-	[self.undoManager removeAllActions];
+	[[self undoManager] removeAllActions];
 
 	[_tableController clearCache];
 
@@ -507,7 +508,7 @@
 
 - (id)undoManager
 {
-	return [(ZGDocument *)self.document undoManager];
+	return ZGUnwrapNullableObject([(ZGDocument *)self.document undoManager]);
 }
 
 - (void)markDocumentChange
@@ -517,12 +518,12 @@
 
 - (IBAction)undoDocument:(id)__unused sender
 {
-	[self.undoManager undo];
+	[[self undoManager] undo];
 }
 
 - (IBAction)redoDocument:(id)__unused sender
 {
-	[self.undoManager redo];
+	[[self undoManager] redo];
 }
 
 #pragma mark Watching other applications
@@ -725,8 +726,8 @@
 	
 	if (recordUndo && oldVariableTypeTag != newTag)
 	{
-		[self.undoManager setActionName:ZGLocalizableSearchDocumentString(@"undoDataTypeChangeAction")];
-		[[self.undoManager prepareWithInvocationTarget:self]
+		[[self undoManager] setActionName:ZGLocalizableSearchDocumentString(@"undoDataTypeChangeAction")];
+		[[[self undoManager] prepareWithInvocationTarget:self]
 		 selectDataTypeWithTag:oldVariableTypeTag
 		 recordUndo:YES];
 	}
@@ -813,9 +814,9 @@
 
 - (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults
 {
-	if (self.undoManager.isUndoing || self.undoManager.isRedoing)
+	if ([self undoManager].isUndoing || [self undoManager].isRedoing)
 	{
-		[[self.undoManager prepareWithInvocationTarget:self] updateVariables:_documentData.variables searchResults:_searchController.searchResults];
+		[[[self undoManager] prepareWithInvocationTarget:self] updateVariables:_documentData.variables searchResults:_searchController.searchResults];
 	}
 	
 	_documentData.variables = newWatchVariablesArray;
@@ -1227,7 +1228,7 @@
 		{
 			if (_documentData.variables.count == 0)
 			{
-				[self.undoManager removeAllActions];
+				[[self undoManager] removeAllActions];
 			}
 			
 			[_searchController searchVariablesWithString:_documentData.searchValue withDataType:[self selectedDataType] functionType:functionType allowsNarrowing:YES];
@@ -1252,7 +1253,7 @@
 	if (_advancedOptionsPopover == nil)
 	{
 		_advancedOptionsPopover = [[NSPopover alloc] init];
-		_advancedOptionsPopover.contentViewController = [[ZGDocumentOptionsViewController alloc] initWithDocument:self.document];
+		_advancedOptionsPopover.contentViewController = [[ZGDocumentOptionsViewController alloc] initWithDocument:ZGUnwrapNullableObject(self.document)];
 		_advancedOptionsPopover.behavior = NSPopoverBehaviorTransient;
 	}
 	
@@ -1309,7 +1310,7 @@
 		_editValueWindowController = [[ZGEditValueWindowController alloc] initWithVariableController:_variableController];
 	}
 	
-	[_editValueWindowController requestEditingValuesFromVariables:[self selectedVariables] withProcessTask:self.currentProcess.processTask attachedToWindow:self.window scriptManager:_scriptManager];
+	[_editValueWindowController requestEditingValuesFromVariables:[self selectedVariables] withProcessTask:self.currentProcess.processTask attachedToWindow:ZGUnwrapNullableObject(self.window) scriptManager:_scriptManager];
 }
 
 - (IBAction)requestEditingVariableDescription:(id)__unused sender
@@ -1319,7 +1320,7 @@
 		_editDescriptionWindowController = [[ZGEditDescriptionWindowController alloc] initWithVariableController:_variableController];
 	}
 	
-	[_editDescriptionWindowController requestEditingDescriptionFromVariable:[self selectedVariables][0] attachedToWindow:self.window];
+	[_editDescriptionWindowController requestEditingDescriptionFromVariable:[self selectedVariables][0] attachedToWindow:ZGUnwrapNullableObject(self.window)];
 }
 
 - (IBAction)requestEditingVariableAddress:(id)__unused sender
@@ -1329,7 +1330,7 @@
 		_editAddressWindowController = [[ZGEditAddressWindowController alloc] initWithVariableController:_variableController];
 	}
 	
-	[_editAddressWindowController requestEditingAddressFromVariable:[self selectedVariables][0] attachedToWindow:self.window];
+	[_editAddressWindowController requestEditingAddressFromVariable:[self selectedVariables][0] attachedToWindow:ZGUnwrapNullableObject(self.window)];
 }
 
 - (IBAction)requestEditingVariablesSize:(id)__unused sender
@@ -1339,7 +1340,7 @@
 		_editSizeWindowController = [[ZGEditSizeWindowController alloc] initWithVariableController:_variableController];
 	}
 	
-	[_editSizeWindowController requestEditingSizesFromVariables:[self selectedVariables] attachedToWindow:self.window];
+	[_editSizeWindowController requestEditingSizesFromVariables:[self selectedVariables] attachedToWindow:ZGUnwrapNullableObject(self.window)];
 }
 
 - (IBAction)relativizeVariablesAddress:(id)__unused sender
@@ -1356,7 +1357,7 @@
 		_watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:_breakPointController delegate:self.delegate];
 	}
 	
-	[_watchVariableWindowController watchVariable:[self selectedVariables][0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:self.window completionHandler:^(NSArray *foundVariables) {
+	[_watchVariableWindowController watchVariable:[self selectedVariables][0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:ZGUnwrapNullableObject(self.window) completionHandler:^(NSArray *foundVariables) {
 		if (foundVariables.count > 0)
 		{
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];

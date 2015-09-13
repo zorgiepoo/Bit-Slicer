@@ -33,6 +33,8 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGSearchProgress : NSObject
 
 typedef NS_ENUM(NSInteger, ZGSearchProgressType)
@@ -53,3 +55,5 @@ typedef NS_ENUM(NSInteger, ZGSearchProgressType)
 @property (atomic) BOOL shouldCancelSearch;
 
 @end
+
+NS_ASSUME_NONNULL_END

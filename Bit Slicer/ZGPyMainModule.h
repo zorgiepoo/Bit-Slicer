@@ -30,6 +30,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <Foundation/Foundation.h>
 #import "Python.h"
 
-PyObject *loadMainPythonModule(void);
+NS_ASSUME_NONNULL_BEGIN
+
+PyObject * _Nullable loadMainPythonModule(void);
+
+NS_ASSUME_NONNULL_END

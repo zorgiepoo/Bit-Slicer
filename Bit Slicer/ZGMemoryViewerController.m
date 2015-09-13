@@ -44,6 +44,7 @@
 #import "ZGRegion.h"
 #import "ZGVariableController.h"
 #import "NSArrayAdditions.h"
+#import "ZGNullability.h"
 
 #define READ_MEMORY_INTERVAL 0.1
 #define DEFAULT_MINIMUM_LINE_DIGIT_COUNT 12
@@ -272,7 +273,7 @@
 	_dataInspectorRepresenter = [[DataInspectorRepresenter alloc] init];
 	
 	[_dataInspectorRepresenter resizeTableViewAfterChangingRowCount];
-	[_textViewLayoutController relayoutAndResizeWindow:self.window preservingFrameWithTextView:_textView];
+	[_textViewLayoutController relayoutAndResizeWindow:ZGUnwrapNullableObject(self.window) preservingFrameWithTextView:_textView];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataInspectorChangedRowCount:) name:DataInspectorDidChangeRowCount object:_dataInspectorRepresenter];
 	
@@ -292,7 +293,7 @@
 
 - (void)dataInspectorDeletedAllRows:(NSNotification *)notification
 {
-	[_textViewLayoutController dataInspectorDeletedAllRows:notification.object window:self.window textView:_textView];
+	[_textViewLayoutController dataInspectorDeletedAllRows:ZGUnwrapNullableObject(notification.object) window:ZGUnwrapNullableObject(self.window) textView:_textView];
 	
 	_showsDataInspector = NO;
 	[[NSUserDefaults standardUserDefaults] setBool:_showsDataInspector forKey:ZGMemoryViewerShowsDataInspector];
@@ -300,12 +301,12 @@
 
 - (void)dataInspectorChangedRowCount:(NSNotification *)note
 {
-	[_textViewLayoutController dataInspectorChangedRowCount:note.object withHeight:note.userInfo[@"height"] textView:_textView];
+	[_textViewLayoutController dataInspectorChangedRowCount:ZGUnwrapNullableObject(note.object) withHeight:ZGUnwrapNullableObject(note.userInfo[@"height"]) textView:_textView];
 }
 
 - (void)windowDidResize:(NSNotification *)__unused notification
 {
-	[_textViewLayoutController relayoutAndResizeWindow:self.window preservingBytesPerLineWithTextView:_textView];
+	[_textViewLayoutController relayoutAndResizeWindow:ZGUnwrapNullableObject(self.window) preservingBytesPerLineWithTextView:_textView];
 }
 
 #pragma mark Updating running applications
@@ -497,7 +498,7 @@
 			}
 		}
 		
-		[_textViewLayoutController relayoutAndResizeWindow:self.window preservingBytesPerLineWithTextView:_textView];
+		[_textViewLayoutController relayoutAndResizeWindow:ZGUnwrapNullableObject(self.window) preservingBytesPerLineWithTextView:_textView];
 		
 		[self jumpToMemoryAddress:desiredMemoryAddress withSelectionLength:selectionLength];
 		

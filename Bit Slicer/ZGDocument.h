@@ -36,6 +36,8 @@
 @class ZGDocumentData;
 @class ZGSearchData;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGDocument : NSDocument
 
 @property (nonatomic, copy) ZGDocumentWindowController * (^makeDocumentWindowController)(void);
@@ -46,3 +48,5 @@
 - (void)markChange;
 
 @end
+
+NS_ASSUME_NONNULL_END

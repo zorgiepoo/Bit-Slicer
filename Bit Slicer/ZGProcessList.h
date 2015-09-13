@@ -34,6 +34,8 @@
 
 @class ZGProcessTaskManager;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGProcessList : NSObject
 
 - (id)init;
@@ -55,3 +57,5 @@
 - (void)removePriorityToProcessIdentifier:(pid_t)processIdentifier withObserver:(id)observer;
 
 @end
+
+NS_ASSUME_NONNULL_END

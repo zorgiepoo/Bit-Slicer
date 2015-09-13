@@ -33,6 +33,8 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGRegion : NSObject
 {
 @public
@@ -41,7 +43,7 @@
 #pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 	ZGMemoryAddress _address;
 	ZGMemorySize _size;
-	void *_bytes;
+	void * _Nullable _bytes;
 #pragma clang diagnostic pop
 }
 
@@ -55,6 +57,8 @@
 @property (nonatomic, readonly) ZGMemoryAddress address;
 @property (nonatomic, readonly) ZGMemorySize size;
 @property (nonatomic, readonly) ZGMemoryProtection protection;
-@property (nonatomic, readonly) void *bytes;
+@property (nonatomic, readonly, nullable) void *bytes;
 
 @end
+
+NS_ASSUME_NONNULL_END

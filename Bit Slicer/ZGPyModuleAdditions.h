@@ -30,7 +30,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <Foundation/Foundation.h>
 #import "Python.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 void ZGPyAddModuleToSys(const char *moduleName, PyObject *module);
 void ZGPyAddIntegerConstant(PyObject *module, const char *name, long value);
+
+NS_ASSUME_NONNULL_END

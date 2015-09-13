@@ -34,8 +34,12 @@
 
 @class ZGHotKey;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGHotKeyDelegate <NSObject>
 
 - (void)hotKeyDidTrigger:(ZGHotKey *)hotKey;
 
 @end
+
+NS_ASSUME_NONNULL_END

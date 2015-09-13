@@ -50,23 +50,25 @@
 @class ZGHotKeyCenter;
 @class ZGLoggerWindowController;
 
-extern NSString * __nonnull ZGPauseAndUnpauseHotKey;
-extern NSString * __nonnull ZGStepInHotKey;
-extern NSString * __nonnull ZGStepOverHotKey;
-extern NSString * __nonnull ZGStepOutHotKey;
+NS_ASSUME_NONNULL_BEGIN
+
+extern NSString *ZGPauseAndUnpauseHotKey;
+extern NSString *ZGStepInHotKey;
+extern NSString *ZGStepOverHotKey;
+extern NSString *ZGStepOutHotKey;
 
 @interface ZGDebuggerController : ZGMemoryNavigationWindowController <NSTableViewDataSource, ZGBreakPointDelegate, ZGBreakPointConditionDelegate, ZGBacktraceViewControllerDelegate, ZGHotKeyDelegate, ZGRegistersViewDelegate>
 
-- (nonnull id)initWithProcessTaskManager:(nonnull ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration breakPointController:(nonnull ZGBreakPointController *)breakPointController scriptingInterpreter:(nonnull ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(nonnull ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(nonnull ZGLoggerWindowController *)loggerWindowController delegate:(nullable id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration breakPointController:(nonnull ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController delegate:(nullable id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 - (void)cleanup;
 
-@property (nonatomic, readonly, nonnull) NSMutableArray *haltedBreakPoints;
+@property (nonatomic, readonly) NSMutableArray *haltedBreakPoints;
 
-@property (nonatomic, readonly, nonnull) ZGHotKey *pauseAndUnpauseHotKey;
-@property (nonatomic, readonly, nonnull) ZGHotKey *stepInHotKey;
-@property (nonatomic, readonly, nonnull) ZGHotKey *stepOverHotKey;
-@property (nonatomic, readonly, nonnull) ZGHotKey *stepOutHotKey;
+@property (nonatomic, readonly) ZGHotKey *pauseAndUnpauseHotKey;
+@property (nonatomic, readonly) ZGHotKey *stepInHotKey;
+@property (nonatomic, readonly) ZGHotKey *stepOverHotKey;
+@property (nonatomic, readonly) ZGHotKey *stepOutHotKey;
 
 - (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
 
@@ -74,6 +76,8 @@ extern NSString * __nonnull ZGStepOutHotKey;
 
 - (nonnull NSArray *)selectedInstructions;
 
-- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(nonnull ZGProcess *)requestedProcess;
+- (void)jumpToMemoryAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)requestedProcess;
 
 @end
+
+NS_ASSUME_NONNULL_END

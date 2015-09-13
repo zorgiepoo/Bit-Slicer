@@ -50,6 +50,8 @@
 #define ZGScriptNotificationTypeKey @"script_type"
 #define ZGScriptNotificationPromptHashKey @"ZGScriptNotificationPromptHashKey"
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern NSString *ZGScriptDefaultApplicationEditorKey;
 
 @interface ZGScriptManager : NSObject <VDKQueueDelegate, NSUserNotificationCenterDelegate>
@@ -72,11 +74,13 @@ extern NSString *ZGScriptDefaultApplicationEditorKey;
 - (BOOL)hasAttachedPrompt;
 - (void)showScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate;
 - (void)handleScriptPrompt:(ZGScriptPrompt *)scriptPrompt withAnswer:(NSString *)answer sender:(id)sender;
-- (void)handleScriptPromptHash:(NSNumber *)scriptPromptHash withUserNotificationReply:(NSString *)reply;
+- (void)handleScriptPromptHash:(NSNumber *)scriptPromptHash withUserNotificationReply:(nullable NSString *)reply;
 
 - (void)handleDataAddress:(ZGMemoryAddress)dataAddress accessedFromInstructionAddress:(ZGMemoryAddress)instructionAddress registersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender;
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender;
+- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState callback:(nullable PyObject *)callback sender:(id)sender;
 
 - (void)handleHotKeyTriggerWithInternalID:(UInt32)hotKeyID callback:(PyObject *)callback sender:(id)sender;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -35,6 +35,8 @@
 
 @class DataInspectorRepresenter;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGTextViewLayoutController : NSObject
 
 - (void)relayoutAndResizeWindow:(NSWindow *)window preservingBytesPerLineWithTextView:(HFTextView *)textView;
@@ -44,3 +46,5 @@
 - (void)dataInspectorChangedRowCount:(DataInspectorRepresenter *)inspector withHeight:(NSNumber *)height textView:(HFTextView *)textView;
 
 @end
+
+NS_ASSUME_NONNULL_END

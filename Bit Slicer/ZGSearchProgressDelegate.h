@@ -34,9 +34,13 @@
 
 @class ZGSearchProgress;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGSearchProgressDelegate <NSObject>
 
 - (void)progressWillBegin:(ZGSearchProgress *)searchProgress;
 - (void)progress:(ZGSearchProgress *)searchProgress advancedWithResultSet:(NSData *)resultSet;
 
 @end
+
+NS_ASSUME_NONNULL_END

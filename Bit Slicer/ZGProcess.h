@@ -37,17 +37,19 @@
 
 #define NON_EXISTENT_PID_NUMBER -1
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class ZGMachBinary;
 
 @interface ZGProcess : NSObject
 
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
+- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
 
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
+- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
 
 - (instancetype)initWithProcess:(ZGProcess *)process;
 
-- (instancetype)initWithProcess:(ZGProcess *)process name:(NSString *)name;
+- (instancetype)initWithProcess:(ZGProcess *)process name:(nullable NSString *)name;
 
 - (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask;
 
@@ -61,12 +63,12 @@
 // indicates if this represents any sort of actual program.. admittingly, this is kind of a hack
 @property (nonatomic) BOOL isDummy;
 
-@property (nonatomic, readonly) ZGMachBinary *mainMachBinary;
-@property (nonatomic, readonly) ZGMachBinary *dylinkerBinary;
+@property (nonatomic, readonly, nullable) ZGMachBinary *mainMachBinary;
+@property (nonatomic, readonly, nullable) ZGMachBinary *dylinkerBinary;
 
 @property (nonatomic, readonly) NSMutableDictionary *cacheDictionary;
 
-@property (nonatomic, readonly) id <ZGSymbolicator> symbolicator;
+@property (nonatomic, readonly, nullable) id <ZGSymbolicator> symbolicator;
 
 - (BOOL)isEqual:(id)process;
 
@@ -75,3 +77,5 @@
 - (ZGMemorySize)pointerSize;
 
 @end
+
+NS_ASSUME_NONNULL_END

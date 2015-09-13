@@ -38,9 +38,11 @@
 
 @class ZGProcess;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGMemoryViewerController : ZGMemoryNavigationWindowController <NSWindowDelegate>
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration haltedBreakPoints:(NSMutableArray *)haltedBreakPoints delegate:(nullable id <ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>)delegate;
 
 @property (nonatomic, readonly) ZGMemoryAddress currentMemoryAddress;
 @property (nonatomic, readonly) ZGMemorySize currentMemorySize;
@@ -49,6 +51,8 @@
 
 - (void)jumpToMemoryAddress:(ZGMemoryAddress)memoryAddress withSelectionLength:(ZGMemorySize)selectionLength inProcess:(ZGProcess *)requestedProcess;
 
-- (IBAction)toggleDataInspector:(id)sender;
+- (IBAction)toggleDataInspector:(nullable id)sender;
 
 @end
+
+NS_ASSUME_NONNULL_END

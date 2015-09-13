@@ -34,6 +34,8 @@
 
 @class ZGVariableController;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGEditSizeWindowController : NSWindowController
 
 - (id)initWithVariableController:(ZGVariableController *)variableController;
@@ -41,3 +43,5 @@
 - (void)requestEditingSizesFromVariables:(NSArray *)variables attachedToWindow:(NSWindow *)parentWindow;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -35,6 +35,8 @@
 
 @class ZGScriptPrompt;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGScriptPromptWindowController : NSWindowController
 
 @property (nonatomic, readonly, weak) id <ZGScriptPromptDelegate> delegate;
@@ -43,7 +45,9 @@
 
 - (void)attachToWindow:(NSWindow *)parentWindow withScriptPrompt:(ZGScriptPrompt *)scriptPrompt delegate:(id <ZGScriptPromptDelegate>)delegate;
 
-- (void)terminateSessionWithAnswer:(NSString *)answer;
+- (void)terminateSessionWithAnswer:(nullable NSString *)answer;
 - (void)terminateSession;
 
 @end
+
+NS_ASSUME_NONNULL_END

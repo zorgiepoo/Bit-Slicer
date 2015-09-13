@@ -36,16 +36,19 @@
 #import "ZGSearchProgressDelegate.h"
 #import "ZGFunctionTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class ZGSearchData;
 @class ZGSearchResults;
 
 #ifdef __cplusplus
 extern "C"
 #endif
-ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType);
+ZGSearchResults *ZGSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> _Nullable delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType);
 
 #ifdef __cplusplus
 extern "C"
 #endif
-ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults *laterSearchResults);
+ZGSearchResults *ZGNarrowSearchForData(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> _Nullable delegate, ZGVariableType dataType, ZGVariableQualifier integerQualifier, ZGFunctionType functionType, ZGSearchResults *firstSearchResults, ZGSearchResults * _Nullable laterSearchResults);
 
+NS_ASSUME_NONNULL_END

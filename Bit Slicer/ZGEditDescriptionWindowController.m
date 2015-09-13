@@ -75,11 +75,15 @@
 
 - (IBAction)editVariableDescription:(id)__unused sender
 {
-	[_variableController changeVariable:_variable newDescription:[_descriptionTextView.textStorage copy]];
-	
-	NSWindow *window = ZGUnwrapNullableObject([self window]);
-	[NSApp endSheet:window];
-	[window close];
+	NSAttributedString *newDescription = [_descriptionTextView.textStorage copy];
+	if (newDescription != nil)
+	{
+		[_variableController changeVariable:_variable newDescription:newDescription];
+		
+		NSWindow *window = ZGUnwrapNullableObject([self window]);
+		[NSApp endSheet:window];
+		[window close];
+	}
 }
 
 - (IBAction)cancelEditingVariableDescription:(id)__unused sender

@@ -34,6 +34,8 @@
 #import <HexFiend/HexFiend.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGStatusBarRepresenter : HFStatusBarRepresenter
 
 @property (nonatomic) ZGMemoryAddress beginningMemoryAddress;
@@ -42,3 +44,5 @@
 - (void)updateString;
 
 @end
+
+NS_ASSUME_NONNULL_END

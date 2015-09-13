@@ -43,7 +43,7 @@
 
 @implementation ZGMemoryProtectionWindowController
 {
-	NSUndoManager *_undoManager;
+	NSUndoManager * _Nullable _undoManager;
 	ZGProcess *_process;
 	
 	IBOutlet NSTextField *_addressTextField;
@@ -71,8 +71,8 @@
 	}
 	else
 	{
-		self.undoManager.actionName = ZGLocalizedStringFromMemoryProtectionTable(@"undoProtectionChangeAction");
-		[[self.undoManager prepareWithInvocationTarget:self]
+		_undoManager.actionName = ZGLocalizedStringFromMemoryProtectionTable(@"undoProtectionChangeAction");
+		[[_undoManager prepareWithInvocationTarget:self]
 		 changeProtectionAtAddress:address size:size oldProtection:newProtection newProtection:oldProtection	];
 	}
 	

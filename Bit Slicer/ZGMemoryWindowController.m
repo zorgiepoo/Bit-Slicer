@@ -46,6 +46,7 @@
 #import "ZGMachBinaryInfo.h"
 #import "ZGStaticSelectorChecker.h"
 #import "ZGDebugLogging.h"
+#import "ZGNullability.h"
 
 #define ZGLocalizedStringFromMemoryWindowTable(string) NSLocalizedStringFromTable((string), @"[Code] Memory Window", nil)
 
@@ -59,6 +60,7 @@
 	ZGMemoryProtectionWindowController *_memoryProtectionWindowController;
 	
 	NSUndoManager *_undoManager;
+	NSTimer *_updateDisplayTimer;
 }
 
 #pragma mark Birth
@@ -113,7 +115,7 @@
 - (void)postLastChosenInternalProcessNameChange
 {
 	id <ZGChosenProcessDelegate> delegate = _delegate;
-	[delegate memoryWindowController:self didChangeProcessInternalName:_lastChosenInternalProcessName];
+	[delegate memoryWindowController:self didChangeProcessInternalName:ZGUnwrapNullableObject(_lastChosenInternalProcessName)];
 }
 
 - (void)setAndPostLastChosenInternalProcessName
@@ -378,7 +380,7 @@
 {
 }
 
-- (void)currentProcessChangedWithOldProcess:(ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
+- (void)currentProcessChangedWithOldProcess:(nullable ZGProcess *)__unused oldProcess newProcess:(ZGProcess *)__unused newProcess
 {
 }
 
@@ -458,9 +460,13 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 			continue;
 		}
 		
-		if (_rootlessConfiguration != nil && [_rootlessConfiguration isFileURLAffected:runningProcess.fileURL])
+		if (_rootlessConfiguration != nil)
 		{
-			continue;
+			NSURL *fileURL = runningProcess.fileURL;
+			if (fileURL != nil && [_rootlessConfiguration isFileURLAffected:fileURL])
+			{
+				continue;
+			}
 		}
 		
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
@@ -527,7 +533,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 		[_processList unrequestPollingWithObserver:self];
 	}
 
-	[self setCurrentProcess:_runningApplicationsPopUpButton.selectedItem.representedObject];
+	[self setCurrentProcess:ZGUnwrapNullableObject(_runningApplicationsPopUpButton.selectedItem.representedObject)];
 	if (!_currentProcess.isDummy)
 	{
 		[self setDesiredProcessInternalName:_currentProcess.internalName];
@@ -557,7 +563,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 		[self postLastChosenInternalProcessNameChange];
 	}
 	
-	[self setCurrentProcess:_runningApplicationsPopUpButton.selectedItem.representedObject];
+	[self setCurrentProcess:ZGUnwrapNullableObject(_runningApplicationsPopUpButton.selectedItem.representedObject)];
 	[self updateRunningProcesses];
 }
 
@@ -771,7 +777,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 		_memoryDumpAllWindowController = [[ZGMemoryDumpAllWindowController alloc] init];
 	}
 	
-	[_memoryDumpAllWindowController attachToWindow:self.window withProcess:_currentProcess];
+	[_memoryDumpAllWindowController attachToWindow:ZGUnwrapNullableObject(self.window) withProcess:_currentProcess];
 }
 
 - (IBAction)dumpMemoryInRange:(id)__unused sender
@@ -782,7 +788,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 	}
 	
 	[_memoryDumpRangeWindowController
-	 attachToWindow:self.window
+	 attachToWindow:ZGUnwrapNullableObject(self.window)
 	 withProcess:_currentProcess
 	 requestedAddressRange:[self preferredMemoryRequestRange]];
 }
@@ -797,7 +803,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 	}
 	
 	[_memoryProtectionWindowController
-	 attachToWindow:self.window
+	 attachToWindow:ZGUnwrapNullableObject(self.window)
 	 withProcess:_currentProcess
 	 requestedAddressRange:[self preferredMemoryRequestRange]
 	 undoManager:[self undoManager]];

@@ -42,26 +42,30 @@
 @class ZGProcess;
 @class ZGRegistersState;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGScriptingInterpreter : NSObject
 
 + (instancetype)createInterpreterOnce;
 
-+ (NSURL *)scriptCachesURL;
++ (nullable NSURL *)scriptCachesURL;
 
 - (void)acquireInterpreter;
 
 - (void)dispatchAsync:(dispatch_block_t)block;
 - (void)dispatchSync:(dispatch_block_t)block;
 
-@property (nonatomic, readonly) PyObject *virtualMemoryException;
-@property (nonatomic, readonly) PyObject *debuggerException;
+@property (nonatomic, readonly, nullable) PyObject *virtualMemoryException;
+@property (nonatomic, readonly, nullable) PyObject *debuggerException;
 
-- (PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
+- (nullable PyObject *)compiledExpressionFromExpression:(NSString *)expression error:(NSError * __autoreleasing *)error;
 
-- (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError * __autoreleasing *)error;
+- (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError **)error;
 
 - (PyObject *)registersfromRegistersState:(ZGRegistersState *)registersState;
 
 - (NSString *)fetchPythonErrorDescriptionFromObject:(PyObject *)pythonObject;
 
 @end
+
+NS_ASSUME_NONNULL_END

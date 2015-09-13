@@ -33,6 +33,8 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGRegistersViewDelegate <NSObject>
 
 - (void)instructionPointerDidChange;
@@ -43,13 +45,15 @@
 
 @interface ZGRegistersViewController : NSViewController
 
-- (nonnull id)initWithUndoManager:(nullable NSUndoManager *)undoManager delegate:(nullable id <ZGRegistersViewDelegate>)delegate;
+- (id)initWithWindow:(NSWindow *)window undoManager:(nullable NSUndoManager *)undoManager delegate:(nullable id <ZGRegistersViewDelegate>)delegate;
 
 @property (nonatomic, readonly) ZGMemoryAddress instructionPointer;
 @property (nonatomic, readonly) ZGMemoryAddress basePointer;
 
 - (void)changeInstructionPointer:(ZGMemoryAddress)newInstructionPointer;
 
-- (void)updateRegistersFromBreakPoint:(nonnull ZGBreakPoint *)breakPoint;
+- (void)updateRegistersFromBreakPoint:(ZGBreakPoint *)breakPoint;
 
 @end
+
+NS_ASSUME_NONNULL_END

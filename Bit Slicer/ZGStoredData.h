@@ -33,6 +33,8 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGStoredData : NSObject
 
 + (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask;
@@ -40,3 +42,5 @@
 @property (nonatomic, readonly) NSArray *regions;
 
 @end
+
+NS_ASSUME_NONNULL_END

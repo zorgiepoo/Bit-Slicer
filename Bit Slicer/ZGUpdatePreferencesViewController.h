@@ -34,8 +34,12 @@
 
 @class ZGAppUpdaterController;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGUpdatePreferencesViewController : NSViewController
 
 - (id)initWithAppUpdaterController:(ZGAppUpdaterController *)appUpdaterController;
 
 @end
+
+NS_ASSUME_NONNULL_END

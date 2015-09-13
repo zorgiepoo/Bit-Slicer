@@ -71,6 +71,10 @@ typedef struct
 	}
 	
 	_segments = malloc(sizeof(*_segments) * maxNumberOfSegmentCommands);
+	if (_segments == NULL)
+	{
+		return NULL;
+	}
 	
 	loadCommand = NULL;
 	for (const uint8_t *commandBytes = segmentBytes; commandBytes < (const uint8_t *)segmentBytes + commandSize; commandBytes += loadCommand->cmdsize)

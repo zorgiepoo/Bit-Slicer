@@ -35,6 +35,8 @@
 
 @class ZGProcess;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGMemoryDumpAllWindowController : NSWindowController <ZGSearchProgressDelegate>
 
 - (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process;
@@ -42,3 +44,5 @@
 @property (nonatomic, readonly) BOOL isBusy;
 
 @end
+
+NS_ASSUME_NONNULL_END

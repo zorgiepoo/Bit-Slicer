@@ -32,5 +32,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 void ZGRunAlertPanelWithOKButton(NSString *title, NSString *message);
 NSInteger ZGRunAlertPanelWithDefaultAndCancelButton(NSString *title, NSString *message, NSString *defaultButtonTitle);
+
+NS_ASSUME_NONNULL_END

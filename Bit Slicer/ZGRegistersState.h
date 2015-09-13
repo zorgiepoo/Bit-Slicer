@@ -34,6 +34,8 @@
 #import "ZGMemoryTypes.h"
 #import "ZGThreadStates.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGRegistersState : NSObject
 
 - (id)initWithGeneralPurposeThreadState:(x86_thread_state_t)generalPurposeThreadState vectorState:(zg_x86_vector_state_t)vectorState hasVectorState:(BOOL)hasVectorState hasAVXSupport:(BOOL)hasAVXSupport is64Bit:(BOOL)is64Bit;
@@ -46,3 +48,5 @@
 @property (nonatomic, readonly) BOOL is64Bit;
 
 @end
+
+NS_ASSUME_NONNULL_END

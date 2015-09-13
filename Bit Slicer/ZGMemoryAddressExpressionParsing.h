@@ -33,5 +33,9 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 ZGMemoryAddress ZGMemoryAddressFromExpression(NSString *expression);
 BOOL ZGIsValidNumber(NSString *expression);
+
+NS_ASSUME_NONNULL_END

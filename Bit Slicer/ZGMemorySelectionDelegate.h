@@ -34,6 +34,8 @@
 
 @class ZGProcess;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGMemorySelectionDelegate <NSObject>
 
 - (void)memorySelectionDidChange:(NSRange)newMemorySelectionRange process:(ZGProcess *)process;
@@ -41,3 +43,5 @@
 - (NSRange)lastMemorySelectionForProcess:(ZGProcess *)process;
 
 @end
+
+NS_ASSUME_NONNULL_END

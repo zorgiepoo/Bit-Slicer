@@ -38,6 +38,8 @@ typedef NS_ENUM(NSInteger, ZGNavigation)
 	ZGNavigationForward
 };
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGMemoryNavigationWindowController : ZGMemoryWindowController
 
 @property (nonatomic) IBOutlet NSSegmentedControl *navigationSegmentedControl;
@@ -49,3 +51,5 @@ typedef NS_ENUM(NSInteger, ZGNavigation)
 - (BOOL)canEnableNavigationButtons;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -22,6 +22,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface OSCSingleThreadQueue : NSObject
 
 + (instancetype)startWithPriority:(long)priority label:(char const *)label;
@@ -30,3 +32,5 @@
 - (void)dispatchAsync:(dispatch_block_t)block;
 
 @end
+
+NS_ASSUME_NONNULL_END

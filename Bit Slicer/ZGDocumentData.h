@@ -52,6 +52,8 @@
 #define ZGSearchValueComponentsOldKey @"ZGSearchValueKey" // legacy
 #define ZGSearchStringValueKeyOld @"ZGSearchStringValueKey" // legacy
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGDocumentData : NSObject
 
 @property (nonatomic) NSInteger selectedDatatypeTag;
@@ -63,9 +65,11 @@
 @property (copy, nonatomic) NSString *endingAddressStringValue;
 @property (copy, nonatomic) NSString *searchValue;
 @property (nonatomic) NSArray *variables;
-@property (copy, nonatomic) NSString *desiredProcessInternalName;
+@property (copy, nonatomic, nullable) NSString *desiredProcessInternalName;
 @property (copy, nonatomic) NSString *lastEpsilonValue;
-@property (copy, nonatomic) NSString *lastAboveRangeValue;
-@property (copy, nonatomic) NSString *lastBelowRangeValue;
+@property (copy, nonatomic, nullable) NSString *lastAboveRangeValue;
+@property (copy, nonatomic, nullable) NSString *lastBelowRangeValue;
 
 @end
+
+NS_ASSUME_NONNULL_END

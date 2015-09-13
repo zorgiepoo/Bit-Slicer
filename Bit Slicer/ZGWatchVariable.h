@@ -35,6 +35,8 @@
 @class ZGInstruction;
 @class ZGRegistersState;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGWatchVariable : NSObject
 
 - (id)initWithInstruction:(ZGInstruction *)instruction registersState:(ZGRegistersState *)registersState;
@@ -46,3 +48,5 @@
 @property (nonatomic, readonly) NSUInteger accessCount;
 
 @end
+
+NS_ASSUME_NONNULL_END

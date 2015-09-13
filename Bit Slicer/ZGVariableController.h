@@ -36,6 +36,8 @@
 
 #define SIGNED_BUTTON_CELL_TAG 0
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern NSString *ZGScriptIndentationUsingTabsKey;
 
 @class ZGDocumentWindowController;
@@ -60,7 +62,7 @@ extern NSString *ZGScriptIndentationUsingTabsKey;
 - (void)removeVariablesAtRowIndexes:(NSIndexSet *)rowIndexes;
 - (void)removeSelectedSearchValues;
 - (void)disableHarmfulVariables:(NSArray *)variables;
-- (void)addVariable:(id)sender;
+- (void)addVariable:(nullable id)sender;
 - (void)addVariables:(NSArray *)variables atRowIndexes:(NSIndexSet *)rowIndexes;
 
 - (void)nopVariables:(NSArray *)variables;
@@ -78,3 +80,5 @@ extern NSString *ZGScriptIndentationUsingTabsKey;
 - (void)editVariables:(NSArray *)variables requestedSizes:(NSArray *)requestedSizes;
 
 @end
+
+NS_ASSUME_NONNULL_END

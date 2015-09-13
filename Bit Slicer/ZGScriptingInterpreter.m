@@ -73,10 +73,16 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 {
 	NSFileManager *fileManager = [[NSFileManager alloc] init];
 	NSURL *cachesURL = [fileManager URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:NULL];
-	assert(cachesURL != nil);
+	if (cachesURL == nil)
+	{
+		return cachesURL;
+	}
 	
 	NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-	assert(bundleIdentifier != nil);
+	if (bundleIdentifier == nil)
+	{
+		return nil;
+	}
 	
 	return [[cachesURL URLByAppendingPathComponent:bundleIdentifier] URLByAppendingPathComponent:@"Scripts_Temp"];
 }
@@ -190,6 +196,7 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 		{
 			NSLog(@"Error: Main Module could not be loaded");
 			NSLog(@"Error Message: %@", [self fetchPythonErrorDescriptionWithoutDescriptiveTraceback]);
+			assert(false);
 		}
 		
 		loadKeyCodePythonModule();
@@ -306,7 +313,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 	[self dispatchSync:^{
 		PyObject *mainModule = PyImport_AddModule("__main__");
 		
-		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessNoCopy:process virtualMemoryException:self->_virtualMemoryException];
+		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcessNoCopy:process virtualMemoryException:(PyObject * _Nonnull)self->_virtualMemoryException];
 		CFRetain((__bridge CFTypeRef)(virtualMemoryInstance));
 		
 		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.object);

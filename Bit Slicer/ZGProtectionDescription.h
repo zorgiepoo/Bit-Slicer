@@ -33,4 +33,8 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 NSString *ZGProtectionDescription(ZGMemoryProtection protection);
+
+NS_ASSUME_NONNULL_END

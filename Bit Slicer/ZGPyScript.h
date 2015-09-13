@@ -36,19 +36,23 @@
 @class ZGPyVirtualMemory;
 @class ZGPyDebugger;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGPyScript : NSObject
 
 - (id)initWithPath:(NSString *)path;
 - (NSString *)moduleName;
 
 @property (nonatomic, copy, readonly) NSString *path;
-@property (nonatomic) PyObject *module;
-@property (nonatomic) PyObject *scriptObject;
-@property (nonatomic) PyObject *executeFunction;
+@property (nonatomic, nullable) PyObject *module;
+@property (nonatomic, nullable) PyObject *scriptObject;
+@property (nonatomic, nullable) PyObject *executeFunction;
 @property (nonatomic) NSTimeInterval lastTime;
 @property (nonatomic) NSTimeInterval deltaTime;
-@property (atomic) ZGPyVirtualMemory *virtualMemoryInstance;
-@property (atomic) ZGPyDebugger *debuggerInstance;
+@property (atomic, nullable) ZGPyVirtualMemory *virtualMemoryInstance;
+@property (atomic, nullable) ZGPyDebugger *debuggerInstance;
 @property (atomic) NSUInteger finishedCount;
 
 @end
+
+NS_ASSUME_NONNULL_END

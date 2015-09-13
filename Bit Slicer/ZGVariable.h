@@ -34,6 +34,8 @@
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern NSString *ZGVariablePboardType;
 
 @interface ZGVariable : NSObject <NSCoding, NSCopying>
@@ -58,31 +60,33 @@ extern NSString *ZGVariablePboardType;
 @property (nonatomic) BOOL usesDynamicAddress;
 @property (nonatomic) BOOL finishedEvaluatingDynamicAddress;
 
-- (void *)rawValue;
-- (void)setRawValue:(const void *)rawValue;
+- (nullable void *)rawValue;
+- (void)setRawValue:(nullable const void *)rawValue;
 
-- (void *)freezeValue;
-- (void)setFreezeValue:(const void *)freezeValue;
+- (nullable void *)freezeValue;
+- (void)setFreezeValue:(nullable const void *)freezeValue;
 
-@property (copy, nonatomic) NSString *addressStringValue;
+- (NSString *)addressStringValue;
+- (void)setAddressStringValue:(nullable NSString *)newAddressString;
+
 @property (readonly, nonatomic) NSString *stringValue;
-@property (copy, nonatomic) NSString *scriptValue;
-@property (copy, nonatomic) NSString *cachedScriptPath;
+@property (copy, nonatomic, nullable) NSString *scriptValue;
+@property (copy, nonatomic, nullable) NSString *cachedScriptPath;
 @property (readonly, nonatomic) NSString *sizeStringValue;
 @property (nonatomic) BOOL userAnnotated;
 @property (copy, nonatomic) NSAttributedString *fullAttributedDescription;
 @property (nonatomic, readonly) NSString *shortDescription;
 @property (nonatomic, readonly) NSString *name;
 
-- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize;
+- (id)initWithValue:(nullable const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize;
 
-- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description;
+- (id)initWithValue:(nullable const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(nullable NSAttributedString *)description;
 
-- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description enabled:(BOOL)enabled;
+- (id)initWithValue:(nullable const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(nullable NSAttributedString *)description enabled:(BOOL)enabled;
 
-- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize byteOrder:(CFByteOrder)byteOrder;
+- (id)initWithValue:(nullable const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize byteOrder:(CFByteOrder)byteOrder;
 
-- (id)initWithValue:(const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(NSAttributedString *)description enabled:(BOOL)enabled byteOrder:(CFByteOrder)byteOrder;
+- (id)initWithValue:(nullable const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(nullable NSAttributedString *)description enabled:(BOOL)enabled byteOrder:(CFByteOrder)byteOrder;
 
 + (NSString *)byteArrayStringFromValue:(unsigned char *)value size:(ZGMemorySize)size;
 
@@ -92,3 +96,5 @@ extern NSString *ZGVariablePboardType;
 - (void)changePointerSize:(ZGMemorySize)pointerSize;
 
 @end
+
+NS_ASSUME_NONNULL_END

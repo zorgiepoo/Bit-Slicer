@@ -32,8 +32,12 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGLoggerWindowController : NSWindowController
 
-- (void)writeLine:(NSString *)text;
+- (void)writeLine:(nullable NSString *)text;
 
 @end
+
+NS_ASSUME_NONNULL_END

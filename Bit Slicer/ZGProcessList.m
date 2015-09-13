@@ -310,7 +310,11 @@
 		if (!increasedUserReference || !MACH_PORT_VALID(task))
 		{
 			shouldRetrieveList = YES;
-			[self removePriorityToProcessIdentifier:processIdentifier withObserver:runningProcessObserver.observer];
+			id observer = runningProcessObserver.observer;
+			if (observer != nil)
+			{
+				[self removePriorityToProcessIdentifier:processIdentifier withObserver:observer];
+			}
 		}
 		
 		if (increasedUserReference && MACH_PORT_VALID(task))

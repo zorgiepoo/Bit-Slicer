@@ -36,6 +36,8 @@
 @class ZGBreakPoint;
 @class ZGRegistersState;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGBreakPointDelegate <NSObject>
 
 @optional
@@ -47,3 +49,5 @@
 - (void)conditionalInstructionBreakPointWasRemoved;
 
 @end
+
+NS_ASSUME_NONNULL_END

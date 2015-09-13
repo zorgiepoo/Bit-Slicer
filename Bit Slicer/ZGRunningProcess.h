@@ -32,18 +32,20 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGRunningProcess : NSObject
 
-- (id)initWithProcessIdentifier:(pid_t)processIdentifier is64Bit:(BOOL)is64Bit internalName:(NSString *)name;
+- (id)initWithProcessIdentifier:(pid_t)processIdentifier is64Bit:(BOOL)is64Bit internalName:(nullable NSString *)name;
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier;
 
 - (void)invalidateAppInfoCache;
 
 @property (readonly, nonatomic) pid_t processIdentifier;
 @property (readonly, nonatomic, copy) NSString *internalName;
-@property (readonly, nonatomic) NSString *name;
-@property (readonly, nonatomic) NSImage *icon;
-@property (readonly, nonatomic) NSURL *fileURL;
+@property (readonly, nonatomic, nullable) NSString *name;
+@property (readonly, nonatomic, nullable) NSImage *icon;
+@property (readonly, nonatomic, nullable) NSURL *fileURL;
 @property (readonly, nonatomic) BOOL is64Bit;
 @property (readonly, nonatomic) BOOL isGame;
 @property (readonly, nonatomic) BOOL isThirdParty;
@@ -52,3 +54,5 @@
 @property (readonly, nonatomic) NSApplicationActivationPolicy activationPolicy;
 
 @end
+
+NS_ASSUME_NONNULL_END

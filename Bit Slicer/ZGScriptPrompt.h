@@ -32,6 +32,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGScriptPrompt : NSObject
 
 - (id)initWithMessage:(NSString *)message defaultAnswer:(NSString *)defaultAnswer userData:(void *)userData;
@@ -41,3 +43,5 @@
 @property (nonatomic, readonly) void *userData;
 
 @end
+
+NS_ASSUME_NONNULL_END

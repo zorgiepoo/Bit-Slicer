@@ -39,11 +39,13 @@
 @class ZGProcess;
 @class ZGBreakPointController;
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef void (^watch_variable_completion_t)(NSArray *variablesFound);
 
 @interface ZGWatchVariableWindowController : NSWindowController <ZGBreakPointDelegate, NSTableViewDataSource>
 
-- (id)initWithBreakPointController:(ZGBreakPointController *)breakPointController delegate:(id <ZGShowMemoryWindow>)delegate;
+- (id)initWithBreakPointController:(ZGBreakPointController *)breakPointController delegate:(nullable id <ZGShowMemoryWindow>)delegate;
 
 - (void)watchVariable:(ZGVariable *)variable withWatchPointType:(ZGWatchPointType)watchPointType inProcess:(ZGProcess *)process attachedToWindow:(NSWindow *)parentWindow completionHandler:(watch_variable_completion_t)completionHandler;
 
@@ -52,3 +54,5 @@ typedef void (^watch_variable_completion_t)(NSArray *variablesFound);
 - (void)cleanup;
 
 @end
+
+NS_ASSUME_NONNULL_END

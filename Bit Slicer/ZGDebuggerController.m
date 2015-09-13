@@ -1721,7 +1721,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 	
 	[_codeInjectionController
-	 attachToWindow:self.window
+	 attachToWindow:ZGUnwrapNullableObject(self.window)
 	 process:self.currentProcess
 	 instruction:[[self selectedInstructions] objectAtIndex:0]
 	 breakPoints:_breakPointController.breakPoints
@@ -1956,14 +1956,15 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	
 	if (currentBreakPoint != nil)
 	{
-		if (!self.window.isVisible)
+		NSWindow *window = ZGUnwrapNullableObject(self.window);
+		if (!window.isVisible)
 		{
 			[self showWindow:nil];
 		}
 		
 		if (_registersViewController == nil)
 		{
-			_registersViewController = [[ZGRegistersViewController alloc] initWithUndoManager:self.undoManager delegate:self];
+			_registersViewController = [[ZGRegistersViewController alloc] initWithWindow:window undoManager:self.undoManager delegate:self];
 			
 			[_registersView addSubview:_registersViewController.view];
 			_registersViewController.view.frame = _registersView.bounds;

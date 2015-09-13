@@ -54,7 +54,7 @@
 
 - (void)dealloc
 {
-	[self setVariable:nil];
+	free(_rawValue);
 }
 
 - (void)setVariable:(ZGVariable *)variable
@@ -62,12 +62,9 @@
 	_variable = variable;
 	
 	free(_rawValue);
-	
-	if (_variable != nil)
-	{
-		_rawValue = calloc(1, _internalSize);
-		memcpy(_rawValue, _variable.rawValue, _size);
-	}
+	_rawValue = calloc(1, _internalSize);
+	assert(_rawValue != NULL);
+	memcpy(_rawValue, _variable.rawValue, _size);
 }
 
 @end

@@ -89,7 +89,7 @@
 
 - (void)windowDidLoad
 {
-	ZGAdjustLocalizableWidthsForTableColumns(self.window, @[_addTableColumn], @{@"ru" : @[@20.0]});
+	ZGAdjustLocalizableWidthsForWindowAndTableColumns(ZGUnwrapNullableObject(self.window), @[_addTableColumn], @{@"ru" : @[@20.0]});
 }
 
 // This method may not realistically be called due to the watch window sheet preventing normal app termination..

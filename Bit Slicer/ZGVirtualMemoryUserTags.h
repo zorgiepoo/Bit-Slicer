@@ -37,8 +37,12 @@
 extern "C" {
 #endif
 	
-NSString *ZGUserTagDescription(uint32_t userTag);
-NSString *ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
+NS_ASSUME_NONNULL_BEGIN
+	
+NSString * _Nullable ZGUserTagDescription(uint32_t userTag);
+NSString * _Nullable ZGUserTagDescriptionFromAddress(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size);
+	
+NS_ASSUME_NONNULL_END
 	
 #ifdef __cplusplus
 }

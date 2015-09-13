@@ -37,6 +37,8 @@
 @class ZGProcess;
 @class ZGBacktrace;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGBacktraceViewControllerDelegate <NSObject>
 
 - (void)backtraceSelectionChangedToAddress:(ZGMemoryAddress)address;
@@ -47,12 +49,14 @@
 
 @interface ZGBacktraceViewController : NSViewController
 
-- (nonnull id)initWithDelegate:(nullable id <ZGBacktraceViewControllerDelegate>)delegate;
+- (id)initWithDelegate:(nullable id <ZGBacktraceViewControllerDelegate>)delegate;
 
-@property (nonatomic, nonnull) ZGBacktrace *backtrace;
-@property (nonatomic, nonnull) ZGProcess *process;
+@property (nonatomic) ZGBacktrace *backtrace;
+@property (nonatomic) ZGProcess *process;
 
-@property (nonatomic, readonly, nonnull) NSArray *selectedInstructions;
-@property (nonatomic, readonly, nonnull) NSTableView *tableView;
+@property (nonatomic, readonly) NSArray *selectedInstructions;
+@property (nonatomic, readonly) NSTableView *tableView;
 
 @end
+
+NS_ASSUME_NONNULL_END

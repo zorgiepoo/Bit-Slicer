@@ -36,6 +36,8 @@
 @class ZGVariableController;
 @class ZGScriptManager;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGEditValueWindowController : NSWindowController
 
 - (id)initWithVariableController:(ZGVariableController *)variableController;
@@ -43,3 +45,5 @@
 - (void)requestEditingValuesFromVariables:(NSArray *)variables withProcessTask:(ZGMemoryMap)processTask attachedToWindow:(NSWindow *)parentWindow scriptManager:(ZGScriptManager *)scriptManager;
 
 @end
+
+NS_ASSUME_NONNULL_END

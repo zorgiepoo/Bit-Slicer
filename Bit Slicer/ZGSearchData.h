@@ -37,6 +37,8 @@
 
 @class ZGStoredData;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGSearchData : NSObject
 {
 @public
@@ -44,21 +46,21 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 	ZGMemorySize _dataSize;
-	void *_rangeValue;
+	void * _Nullable _rangeValue;
 	double _epsilon;
 	BOOL _shouldIgnoreStringCase;
 	BOOL _shouldIncludeNullTerminator;
 	
 	// For searching non-native byte order
-	void *_swappedValue;
+	void * _Nullable _swappedValue;
 	BOOL _bytesSwapped;
 	
 	// For linearly express stored values
-	void *_additiveConstant;
-	void *_multiplicativeConstant;
+	void * _Nullable _additiveConstant;
+	void * _Nullable _multiplicativeConstant;
 	
-	CollatorRef _collator; // For comparing unicode strings
-	unsigned char *_byteArrayFlags; // For wildcard byte array searches
+	CollatorRef _Nullable _collator; // For comparing unicode strings
+	unsigned char * _Nullable _byteArrayFlags; // For wildcard byte array searches
 #pragma clang diagnostic pop
 }
 
@@ -69,16 +71,16 @@ typedef NS_ENUM(NSInteger, ZGProtectionMode)
 	ZGProtectionExecute
 };
 
-@property (nonatomic) void *searchValue;
+@property (nonatomic, nullable) void *searchValue;
 @property (nonatomic) ZGMemorySize dataSize;
 @property (nonatomic) ZGMemorySize dataAlignment;
 @property (nonatomic) ZGMemorySize pointerSize;
 
-@property (nonatomic) void *swappedValue;
+@property (nonatomic, nullable) void *swappedValue;
 @property (nonatomic) BOOL bytesSwapped;
 
-@property (nonatomic) void *rangeValue;
-@property (nonatomic) ZGStoredData *savedData;
+@property (nonatomic, nullable) void *rangeValue;
+@property (nonatomic, nullable) ZGStoredData *savedData;
 @property (nonatomic) BOOL shouldCompareStoredValues;
 @property (nonatomic) double epsilon;
 @property (nonatomic) BOOL shouldIgnoreStringCase;
@@ -86,10 +88,12 @@ typedef NS_ENUM(NSInteger, ZGProtectionMode)
 @property (nonatomic) ZGMemoryAddress beginAddress;
 @property (nonatomic) ZGMemoryAddress endAddress;
 @property (nonatomic) ZGProtectionMode protectionMode;
-@property (nonatomic) void *additiveConstant;
-@property (nonatomic) void *multiplicativeConstant;
-@property (nonatomic) unsigned char *byteArrayFlags;
+@property (nonatomic, nullable) void *additiveConstant;
+@property (nonatomic, nullable) void *multiplicativeConstant;
+@property (nonatomic, nullable) unsigned char *byteArrayFlags;
 
-- (id)initWithSearchValue:(void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
+- (id)initWithSearchValue:(nullable void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
 
 @end
+
+NS_ASSUME_NONNULL_END

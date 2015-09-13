@@ -41,6 +41,8 @@ typedef NS_ENUM(uint8_t, ZGRegisterType)
 	ZGRegisterVector
 };
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGRegister : NSObject
 
 @property (nonatomic) ZGVariable *variable;
@@ -53,3 +55,5 @@ typedef NS_ENUM(uint8_t, ZGRegisterType)
 - (id)initWithRegisterType:(ZGRegisterType)registerType variable:(ZGVariable *)variable pointerSize:(ZGMemorySize)pointerSize;
 
 @end
+
+NS_ASSUME_NONNULL_END

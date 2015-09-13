@@ -34,8 +34,12 @@
 
 @class ZGMemoryWindowController;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGChosenProcessDelegate <NSObject>
 
 - (void)memoryWindowController:(ZGMemoryWindowController *)memoryWindowController didChangeProcessInternalName:(NSString *)newChosenInternalProcessName;
 
 @end
+
+NS_ASSUME_NONNULL_END

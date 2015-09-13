@@ -34,8 +34,12 @@
 
 @class ZGScriptPrompt;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGScriptPromptDelegate <NSObject>
 
-- (void)scriptPrompt:(ZGScriptPrompt *)scriptPrompt didReceiveAnswer:(NSString *)answer;
+- (void)scriptPrompt:(ZGScriptPrompt *)scriptPrompt didReceiveAnswer:(nullable NSString *)answer;
 
 @end
+
+NS_ASSUME_NONNULL_END

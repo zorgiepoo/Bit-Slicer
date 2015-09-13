@@ -610,7 +610,7 @@ static ZGBreakPointController *gBreakPointController;
 		if (canNotifyDelegate && breakPoint.condition != NULL)
 		{
 			NSError *error = nil;
-			if (![_scriptingInterpreter evaluateCondition:breakPoint.condition process:breakPoint.process registerEntries:registerEntries error:&error])
+			if (![_scriptingInterpreter evaluateCondition:(PyObject * _Nonnull)breakPoint.condition process:breakPoint.process registerEntries:registerEntries error:&error])
 			{
 				if (error == nil)
 				{
@@ -975,7 +975,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 
 		[self addBreakPoint:breakPoint];
 		
-		if (returnedBreakPoint)
+		if (returnedBreakPoint != NULL)
 		{
 			*returnedBreakPoint = breakPoint;
 		}

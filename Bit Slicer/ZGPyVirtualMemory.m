@@ -716,29 +716,50 @@ static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
 	const char *partialPath = NULL;
 	if (PyArg_ParseTuple(args, "|s:base", &partialPath))
 	{
-		NSError *error = nil;
-		ZGMemoryAddress imageAddress;
+		BOOL retrievedImageAddress = NO;
+		ZGMemoryAddress imageAddress = 0x0;
 		
 		if (partialPath != NULL)
 		{
-			imageAddress = [[ZGMachBinary machBinaryWithPartialImageName:[NSString stringWithUTF8String:partialPath] inProcess:self->objcSelf->_process fromCachedMachBinaries:nil error:&error] headerAddress];
+			NSString *partialUTF8String = [NSString stringWithUTF8String:partialPath];
+			if (partialUTF8String != nil)
+			{
+				ZGMachBinary *targetBinary = [ZGMachBinary machBinaryWithPartialImageName:partialUTF8String inProcess:self->objcSelf->_process fromCachedMachBinaries:nil error:NULL];
+				
+				if (targetBinary != nil)
+				{
+					imageAddress = targetBinary.headerAddress;
+					retrievedImageAddress = YES;
+				}
+			}
 		}
 		else
 		{
-			if (self->baseAddress == 0)
+			if (self->baseAddress == 0x0)
 			{
-				self->baseAddress = [[ZGMachBinary mainMachBinaryFromMachBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]] headerAddress];
+				ZGMachBinary *mainBinary = [ZGMachBinary mainMachBinaryFromMachBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
+				
+				if (mainBinary != nil)
+				{
+					self->baseAddress = mainBinary.headerAddress;
+					imageAddress = self->baseAddress;
+					retrievedImageAddress = YES;
+				}
 			}
-			imageAddress = self->baseAddress;
+			else
+			{
+				retrievedImageAddress = YES;
+			}
 		}
 		
-		if (error == nil)
+		if (retrievedImageAddress)
 		{
 			result = Py_BuildValue("K", imageAddress);
 		}
 		else
 		{
-			PyErr_SetString(self->virtualMemoryException, [[NSString stringWithFormat:@"vm.base failed to find image matching with %s", partialPath] UTF8String]);
+			NSString *errorMessage = partialPath != NULL ? [NSString stringWithFormat:@"vm.base failed to find image matching with %s", partialPath] : @"vm.base failed to find main binary image";
+			PyErr_SetString(self->virtualMemoryException, [errorMessage UTF8String]);
 		}
 	}
 	return result;

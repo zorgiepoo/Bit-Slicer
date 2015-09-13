@@ -33,6 +33,10 @@
 #import <Foundation/Foundation.h>
 #import "HFLineCountingView.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGLineCountingView : HFLineCountingView
 
 @end
+
+NS_ASSUME_NONNULL_END

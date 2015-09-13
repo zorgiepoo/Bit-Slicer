@@ -32,6 +32,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGRootlessConfiguration : NSObject
 
 - (id)init;
@@ -39,3 +41,5 @@
 - (BOOL)isFileURLAffected:(NSURL *)fileURL;
 
 @end
+
+NS_ASSUME_NONNULL_END

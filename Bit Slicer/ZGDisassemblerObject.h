@@ -34,18 +34,22 @@
 #import "ZGMemoryTypes.h"
 #import "ZGInstruction.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGDisassemblerObject : NSObject
 
 + (BOOL)isCallMnemonic:(int)mnemonic;
 + (BOOL)isJumpMnemonic:(int)mnemonic;
 
-- (nonnull id)initWithBytes:(const void * __nonnull)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize;
+- (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize;
 
-@property (readonly, nonatomic) void * __nonnull bytes;
+@property (readonly, nonatomic) void *bytes;
 
 // These methods may advance the object's internal position for disassembling instructions
-- (nonnull NSArray *)readInstructions;
+- (NSArray *)readInstructions;
 - (nullable ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize;
 - (nullable NSString *)readBranchOperand;
 
 @end
+
+NS_ASSUME_NONNULL_END

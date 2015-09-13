@@ -32,11 +32,15 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGAppPathUtilities : NSObject
 
-+ (NSString *)createUserModulesDirectory;
-+ (NSString *)lastErrorLogPath;
++ (nullable NSString *)createUserModulesDirectory;
++ (nullable NSString *)lastErrorLogPath;
 
-+ (NSString *)createEmptyPythonFile;
++ (nullable NSString *)createEmptyPythonFile;
 
 @end
+
+NS_ASSUME_NONNULL_END

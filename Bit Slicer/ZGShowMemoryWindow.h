@@ -37,9 +37,13 @@
 
 #define DEFAULT_MEMORY_VIEWER_SELECTION_LENGTH 0x4
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGShowMemoryWindow <NSObject>
 
 - (void)showDebuggerWindowWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address;
 - (void)showMemoryViewerWindowWithProcess:(ZGProcess *)process address:(ZGMemoryAddress)address selectionLength:(ZGMemorySize)selectionLength;
 
 @end
+
+NS_ASSUME_NONNULL_END

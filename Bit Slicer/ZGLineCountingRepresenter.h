@@ -34,8 +34,12 @@
 #import <HexFiend/HexFiend.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGLineCountingRepresenter : HFLineCountingRepresenter
 
 @property (nonatomic) ZGMemoryAddress beginningMemoryAddress;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -45,17 +45,19 @@
 
 @interface ZGMemoryWindowController : NSWindowController
 
+NS_ASSUME_NONNULL_BEGIN
+
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration delegate:(nullable id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 @property (nonatomic, readonly) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic, readonly) ZGProcessList *processList;
 @property (nonatomic, readonly) ZGRootlessConfiguration *rootlessConfiguration;
 
-@property (nonatomic, weak, readonly) id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow> delegate;
+@property (nonatomic, weak, readonly, nullable) id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow> delegate;
 
-@property (nonatomic, copy) NSString *lastChosenInternalProcessName;
+@property (nonatomic, copy, nullable) NSString *lastChosenInternalProcessName;
 
 @property (nonatomic) IBOutlet NSPopUpButton *runningApplicationsPopUpButton;
 
@@ -65,9 +67,7 @@
 @property (nonatomic) ZGProcess *currentProcess;
 
 // Mutator method can be overridden
-@property (nonatomic, copy) NSString *desiredProcessInternalName;
-
-@property (nonatomic, readonly) NSTimer *updateDisplayTimer;
+@property (nonatomic, copy, nullable) NSString *desiredProcessInternalName;
 
 @property (nonatomic, readonly) BOOL isOccluded;
 
@@ -92,20 +92,22 @@
 - (void)startProcessActivity;
 - (void)stopProcessActivity;
 
-- (void)currentProcessChangedWithOldProcess:(ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess;
+- (void)currentProcessChangedWithOldProcess:(nullable ZGProcess *)oldProcess newProcess:(ZGProcess *)newProcess;
 - (void)processListChanged:(NSDictionary *)change;
 - (void)updateRunningProcesses;
 - (void)runningApplicationsPopUpButtonWillPopUp:(NSNotification *)notification;
 
 - (void)switchProcess;
 
-- (IBAction)runningApplicationsPopUpButton:(id)__unused sender;
+- (IBAction)runningApplicationsPopUpButton:(nullable id)__unused sender;
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)userInterfaceItem;
 
 - (HFRange)preferredMemoryRequestRange;
-- (IBAction)dumpAllMemory:(id)sender;
-- (IBAction)dumpMemoryInRange:(id)sender;
-- (IBAction)changeMemoryProtection:(id)sender;
+- (IBAction)dumpAllMemory:(nullable id)sender;
+- (IBAction)dumpMemoryInRange:(nullable id)sender;
+- (IBAction)changeMemoryProtection:(nullable id)sender;
+
+NS_ASSUME_NONNULL_END
 
 @end

@@ -105,7 +105,7 @@
 		 }
 		 
 		 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			 if (!ZGDumpAllDataToDirectory(savePanel.URL.path, process.processTask, self))
+			 if (!ZGDumpAllDataToDirectory(saveURLPath, process.processTask, self))
 			 {
 				 ZGRunAlertPanelWithOKButton(
 											 ZGLocalizedStringFromDumpAllMemoryTable(@"failedMemoryDumpAlertTitle"),

@@ -35,8 +35,12 @@
 
 @class ZGProcess;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGMemoryDumpRangeWindowController : NSWindowController
 
 - (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process requestedAddressRange:(HFRange)requestedAddressRange;
 
 @end
+
+NS_ASSUME_NONNULL_END

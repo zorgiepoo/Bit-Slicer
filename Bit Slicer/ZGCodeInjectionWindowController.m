@@ -44,7 +44,7 @@
 {
 	IBOutlet NSTextView *_textView;
 	NSString *_suggestedCode;
-	NSUndoManager *_undoManager;
+	NSUndoManager * _Nullable _undoManager;
 	ZGMemoryAddress _allocatedAddress;
 	ZGMemorySize _numberOfAllocatedBytes;
 	ZGProcess *_process;

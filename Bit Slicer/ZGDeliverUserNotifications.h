@@ -32,5 +32,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-void ZGDeliverUserNotification(NSString *title, NSString *subtitle, NSString *informativeText, NSDictionary *userInfo);
-void ZGDeliverUserNotificationWithReply(NSString *title, NSString *subtitle, NSString *informativeText, NSString *responsePlaceholder, NSDictionary *userInfo);
+NS_ASSUME_NONNULL_BEGIN
+
+void ZGDeliverUserNotification(NSString *title, NSString * _Nullable subtitle, NSString *informativeText, NSDictionary * _Nullable userInfo);
+void ZGDeliverUserNotificationWithReply(NSString *title, NSString * _Nullable subtitle, NSString *informativeText, NSString *responsePlaceholder, NSDictionary * _Nullable userInfo);
+
+NS_ASSUME_NONNULL_END

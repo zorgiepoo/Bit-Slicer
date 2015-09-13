@@ -170,8 +170,7 @@
 	NSData *readData = [fileWrapper regularFileContents];
 	NSKeyedUnarchiver *keyedUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:readData];
 	
-	NSArray *newVariables = [keyedUnarchiver decodeObjectForKey:ZGWatchVariablesArrayKey];
-	
+	NSArray *newVariables = [keyedUnarchiver decodeObjectOfClass:[NSArray class] forKey:ZGWatchVariablesArrayKey];
 	if (newVariables != nil)
 	{
 		_data.variables = newVariables;
@@ -181,10 +180,14 @@
 		_data.variables = [NSArray array];
 	}
 	
-	_data.desiredProcessInternalName = [keyedUnarchiver decodeObjectForKey:ZGProcessInternalNameKey];
-	if ((id)_data.desiredProcessInternalName == [NSNull null])
+	id desiredProcessInternalName = [keyedUnarchiver decodeObjectForKey:ZGProcessInternalNameKey];
+	if (desiredProcessInternalName == [NSNull null] || ![desiredProcessInternalName isKindOfClass:[NSString class]])
 	{
 		_data.desiredProcessInternalName = nil;
+	}
+	else
+	{
+		_data.desiredProcessInternalName = desiredProcessInternalName;
 	}
 	
 	_data.selectedDatatypeTag = (NSInteger)[keyedUnarchiver decodeInt32ForKey:ZGSelectedDataTypeTag];
@@ -194,8 +197,9 @@
 	_data.ignoreDataAlignment = [keyedUnarchiver decodeBoolForKey:ZGIgnoreDataAlignmentKey];
 	_searchData.shouldIncludeNullTerminator = [keyedUnarchiver decodeBoolForKey:ZGExactStringLengthKey];
 	_searchData.shouldIgnoreStringCase = [keyedUnarchiver decodeBoolForKey:ZGIgnoreStringCaseKey];
-	_data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGBeginningAddressKey]];
-	_data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectForKey:ZGEndingAddressKey]];
+	
+	_data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGBeginningAddressKey]];
+	_data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEndingAddressKey]];
 	
 	_data.byteOrderTag = [keyedUnarchiver decodeInt32ForKey:ZGByteOrderTagKey];
 	if (_data.byteOrderTag == CFByteOrderUnknown)
@@ -204,7 +208,7 @@
 	}
 	
 	NSString *searchValue = nil;
-	NSString *newSearchStringValue = [keyedUnarchiver decodeObjectForKey:ZGSearchStringValueKeyNew];
+	NSString *newSearchStringValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGSearchStringValueKeyNew];
 	if (newSearchStringValue == nil)
 	{
 		NSArray *legacySearchValueComponents = [keyedUnarchiver decodeObjectForKey:ZGSearchValueComponentsOldKey];
@@ -238,9 +242,11 @@
 	
 	_data.searchValue = (searchValue != nil) ? searchValue : @"";
 	
-	_data.lastEpsilonValue = [keyedUnarchiver decodeObjectForKey:ZGEpsilonKey];
-	_data.lastAboveRangeValue = [keyedUnarchiver decodeObjectForKey:ZGAboveValueKey];
-	_data.lastBelowRangeValue = [keyedUnarchiver decodeObjectForKey:ZGBelowValueKey];
+	NSString *lastEpsilonValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEpsilonKey];
+	_data.lastEpsilonValue = lastEpsilonValue != nil ? lastEpsilonValue : @"";
+	
+	_data.lastAboveRangeValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGAboveValueKey];
+	_data.lastBelowRangeValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGBelowValueKey];
 	
 	return YES;
 }

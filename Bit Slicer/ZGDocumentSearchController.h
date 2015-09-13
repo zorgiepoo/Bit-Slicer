@@ -43,14 +43,16 @@
 
 #define MAX_NUMBER_OF_VARIABLES_TO_FETCH ((NSUInteger)1000)
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGDocumentSearchController : NSObject <ZGSearchProgressDelegate>
 
-+ (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression isLinearlyExpressed:(BOOL *)isLinearlyExpressedReference;
++ (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression isLinearlyExpressed:(nullable BOOL *)isLinearlyExpressedReference;
 + (BOOL)hasStoredValueTokenFromExpression:(NSString *)expression;
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
 
-@property (nonatomic) ZGSearchResults *searchResults;
+@property (nonatomic, nullable) ZGSearchResults *searchResults;
 @property (nonatomic, readonly) ZGSearchProgress *searchProgress;
 
 - (BOOL)canStartTask;
@@ -69,3 +71,5 @@
 - (void)cleanUp;
 
 @end
+
+NS_ASSUME_NONNULL_END

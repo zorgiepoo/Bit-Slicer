@@ -32,6 +32,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGDebugThread : NSObject
 
 // registerIndex should only be within [0, 4)
@@ -41,3 +43,5 @@
 @property (readonly, nonatomic) uint8_t registerIndex;
 
 @end
+
+NS_ASSUME_NONNULL_END

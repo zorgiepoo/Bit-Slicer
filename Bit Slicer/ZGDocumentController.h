@@ -34,8 +34,12 @@
 
 @class ZGDocumentWindowController;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGDocumentController : NSDocumentController
 
 - (id)initWithMakeDocumentWindowController:(ZGDocumentWindowController * (^)(void))makeDocumentWindowController;
 
 @end
+
+NS_ASSUME_NONNULL_END

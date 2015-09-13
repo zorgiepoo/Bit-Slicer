@@ -35,8 +35,12 @@
 @class ZGHotKeyCenter;
 @class ZGDebuggerController;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGHotKeyPreferencesViewController : NSViewController
 
 - (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController;
 
 @end
+
+NS_ASSUME_NONNULL_END

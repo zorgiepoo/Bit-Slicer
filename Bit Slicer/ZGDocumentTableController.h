@@ -35,6 +35,8 @@
 @class ZGDocumentWindowController;
 @class ZGVariable;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGDocumentTableController : NSObject <NSTableViewDelegate, NSTableViewDataSource>
 
 - (id)initWithWindowController:(ZGDocumentWindowController *)windowController;
@@ -49,3 +51,5 @@
 - (void)cleanUp;
 
 @end
+
+NS_ASSUME_NONNULL_END

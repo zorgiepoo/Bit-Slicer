@@ -70,6 +70,8 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 		[delegate progressWillBegin:searchProgress];
 	});
 	
+	NSData *emptyResultSet = [NSData data];
+	
 	for (ZGRegion *region in regions)
 	{
 		if (lastAddress != region.address || !(region.protection & VM_PROT_READ))
@@ -101,7 +103,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			searchProgress.progress++;
-			[delegate progress:searchProgress advancedWithResultSet:nil];
+			[delegate progress:searchProgress advancedWithResultSet:emptyResultSet];
 		});
   	    
 		if (searchProgress.shouldCancelSearch)

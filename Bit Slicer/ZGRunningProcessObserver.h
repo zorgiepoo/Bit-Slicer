@@ -34,6 +34,8 @@
 
 @class ZGRunningProcess;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGRunningProcessObserver : NSObject
 
 @property (nonatomic, readonly) ZGRunningProcess *runningProcess;
@@ -42,3 +44,5 @@
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier observer:(id)observer;
 
 @end
+
+NS_ASSUME_NONNULL_END

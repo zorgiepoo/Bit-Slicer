@@ -32,6 +32,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGAppUpdaterController : NSObject
 
 + (BOOL)runningAlpha;
@@ -44,3 +46,5 @@
 - (void)checkForUpdates;
 
 @end
+
+NS_ASSUME_NONNULL_END

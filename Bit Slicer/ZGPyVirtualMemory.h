@@ -38,14 +38,18 @@
 @class ZGProcess;
 @class ZGSearchProgress;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGPyVirtualMemory : NSObject <ZGSearchProgressDelegate>
 
-+ (PyObject *)loadPythonClassInMainModule:(PyObject *)module;
++ (nullable PyObject *)loadPythonClassInMainModule:(PyObject *)module;
 
-- (id)initWithProcess:(ZGProcess *)process virtualMemoryException:(PyObject *)virtualMemoryException;
-- (id)initWithProcessNoCopy:(ZGProcess *)process virtualMemoryException:(PyObject *)virtualMemoryException;
+- (nullable id)initWithProcess:(ZGProcess *)process virtualMemoryException:(PyObject *)virtualMemoryException;
+- (nullable id)initWithProcessNoCopy:(ZGProcess *)process virtualMemoryException:(PyObject *)virtualMemoryException;
 
 @property (nonatomic, readonly) PyObject *object;
-@property (nonatomic, readonly) ZGSearchProgress *searchProgress; // main queue property
+@property (nonatomic, readonly, nullable) ZGSearchProgress *searchProgress; // main queue property
 
 @end
+
+NS_ASSUME_NONNULL_END

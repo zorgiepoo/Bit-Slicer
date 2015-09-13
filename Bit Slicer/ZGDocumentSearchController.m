@@ -52,6 +52,7 @@
 #import "ZGVariableDataInfo.h"
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGOperatingSystemCompatibility.h"
+#import "ZGNullability.h"
 
 #import <DDMathParser/DDMathStringToken.h>
 #import <DDMathParser/DDMathStringTokenizer.h>
@@ -427,6 +428,11 @@
 				// Clearly a range type of search
 				ZGMemorySize rangeDataSize;
 				_searchData.rangeValue = ZGValueFromString(currentProcess.is64Bit, flagsExpression, dataType, &rangeDataSize);
+				if (_searchData.rangeValue == NULL)
+				{
+					NSLog(@"Failed to parse range value from %@...", flagsExpression);
+					return NO;
+				}
 			}
 			else
 			{
@@ -449,7 +455,7 @@
 				// Clearly an epsilon flag
 				ZGMemorySize epsilonDataSize;
 				void *epsilon = ZGValueFromString(currentProcess.is64Bit, flagsExpression, ZGDouble, &epsilonDataSize);
-				if (epsilon)
+				if (epsilon != NULL)
 				{
 					_searchData.epsilon = *((double *)epsilon);
 					free(epsilon);
@@ -477,17 +483,25 @@
 	{
 		if (!ZGIsValidNumber(stringValue))
 		{
-			if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"invalidFlagsFieldErrorMessageFormat"), label]}];
-			}
-			
 			success = NO;
 		}
 		else
 		{
-			*boundaryAddress = ZGMemoryAddressFromExpression([ZGCalculator evaluateExpression:stringValue]);
+			NSString *evaluatedExpression = [ZGCalculator evaluateExpression:stringValue];
+			if (evaluatedExpression != nil)
+			{
+				*boundaryAddress = ZGMemoryAddressFromExpression(evaluatedExpression);
+			}
+			else
+			{
+				success = NO;
+			}
 		}
+	}
+	
+	if (!success && error != NULL)
+	{
+		*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"invalidFlagsFieldErrorMessageFormat"), label]}];
 	}
 	
 	return success;
@@ -525,7 +539,16 @@
 		}
 		
 		ZGMemorySize dataSize = 0;
-		_searchData.searchValue = ZGValueFromString(is64Bit, finalSearchExpression, dataType, &dataSize);
+		void *searchValue = ZGValueFromString(is64Bit, finalSearchExpression, dataType, &dataSize);
+		if (searchValue != NULL)
+		{
+			_searchData.searchValue = searchValue;
+		}
+		else
+		{
+			NSLog(@"Failed to retrieve search value from %@", finalSearchExpression);
+			return NO;
+		}
 		
 		if (_searchData.shouldIncludeNullTerminator)
 		{
@@ -544,6 +567,11 @@
 		if (dataType == ZGByteArray)
 		{
 			_searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(finalSearchExpression);
+			if (_searchData.byteArrayFlags == NULL)
+			{
+				NSLog(@"Failed to allocate byte array flags for %@", finalSearchExpression);
+				return NO;
+			}
 		}
 	}
 	else
@@ -594,7 +622,18 @@
 		_searchData.bytesSwapped = YES;
 		if (ZGSupportsSwappingBeforeSearch(functionType, dataType))
 		{
-			_searchData.swappedValue = ZGSwappedValue(is64Bit, _searchData.searchValue, dataType, _searchData.dataSize);
+			void *searchValue = _searchData.searchValue;
+			assert(searchValue != NULL);
+			void *swappedValue = ZGSwappedValue(is64Bit, searchValue, dataType, _searchData.dataSize);
+			if (swappedValue != NULL)
+			{
+				_searchData.swappedValue = swappedValue;
+			}
+			else
+			{
+				NSLog(@"Failed allocating memory for swapped value..");
+				return NO;
+			}
 		}
 	}
 	else
@@ -703,7 +742,7 @@
 	NSError *error = nil;
 	if (![self retrieveSearchDataWithError:&error])
 	{
-		ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"invalidSearchInputAlertTitle"), [error.userInfo objectForKey:ZGRetrieveFlagsErrorDescriptionKey]);
+		ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"invalidSearchInputAlertTitle"), ZGUnwrapNullableObject(error.userInfo[ZGRetrieveFlagsErrorDescriptionKey]));
 		return;
 	}
 	

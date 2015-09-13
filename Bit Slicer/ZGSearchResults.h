@@ -33,6 +33,8 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGSearchResults : NSObject
 
 @property (nonatomic, readonly) ZGMemorySize addressIndex;
@@ -55,3 +57,5 @@ typedef void (^zg_enumerate_search_results_t)(ZGMemoryAddress address, BOOL *sto
 - (void)enumerateUsingBlock:(zg_enumerate_search_results_t)addressCallback;
 
 @end
+
+NS_ASSUME_NONNULL_END

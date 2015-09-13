@@ -34,6 +34,8 @@
 
 @class ZGDocument;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGDocumentOptionsViewController : NSViewController
 
 - (id)initWithDocument:(ZGDocument *)document;
@@ -41,3 +43,5 @@
 - (void)reloadInterface;
 
 @end
+
+NS_ASSUME_NONNULL_END

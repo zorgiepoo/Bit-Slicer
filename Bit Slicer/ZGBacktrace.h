@@ -35,12 +35,16 @@
 
 @class ZGProcess;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGBacktrace : NSObject
 
-+ (nonnull instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(nonnull ZGProcess *)process breakPoints:(nonnull NSArray *)breakPoints machBinaries:(nonnull NSArray *)machBinaries;
-+ (nonnull instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(nonnull ZGProcess *)process breakPoints:(nonnull NSArray *)breakPoints machBinaries:(nonnull NSArray *)machBinaries maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved;
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries;
++ (instancetype)backtraceWithBasePointer:(ZGMemoryAddress)basePointer instructionPointer:(ZGMemoryAddress)instructionPointer process:(ZGProcess *)process breakPoints:(NSArray *)breakPoints machBinaries:(NSArray *)machBinaries maxLimit:(NSUInteger)maxNumberOfInstructionsRetrieved;
 
-@property (nonatomic, readonly, nonnull) NSArray *instructions;
-@property (nonatomic, readonly, nonnull) NSArray *basePointers;
+@property (nonatomic, readonly) NSArray *instructions;
+@property (nonatomic, readonly) NSArray *basePointers;
 
 @end
+
+NS_ASSUME_NONNULL_END

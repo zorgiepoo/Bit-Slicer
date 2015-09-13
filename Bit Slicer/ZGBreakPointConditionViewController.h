@@ -33,9 +33,11 @@
 #import <Cocoa/Cocoa.h>
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol ZGBreakPointConditionDelegate <NSObject>
 
-- (void)breakPointCondition:(nonnull NSString *)condition didChangeAtAddress:(ZGMemoryAddress)address;
+- (void)breakPointCondition:(NSString *)condition didChangeAtAddress:(ZGMemoryAddress)address;
 - (void)breakPointConditionDidCancel;
 
 @end
@@ -48,3 +50,5 @@
 @property (nonatomic, copy, nullable) NSString *condition;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -32,20 +32,24 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NSArray (NSArrayAdditions)
 
 typedef BOOL (^zg_array_filter_t)(id __unsafe_unretained item);
 
 typedef NSComparisonResult (^zg_binary_search_t)(id __unsafe_unretained currentObject);
-typedef id (^zg_map_t)(id __unsafe_unretained oldObject);
+typedef id _Nonnull (^zg_map_t)(id __unsafe_unretained oldObject);
 
 - (NSArray *)zgFilterUsingBlock:(zg_array_filter_t)shouldKeep;
 - (NSArray *)zgMapUsingBlock:(zg_map_t)map;
 
-- (id)zgFirstObjectThatMatchesCondition:(zg_array_filter_t)matchingCondition;
+- (nullable id)zgFirstObjectThatMatchesCondition:(zg_array_filter_t)matchingCondition;
 - (BOOL)zgHasObjectMatchingCondition:(zg_array_filter_t)matchingCondition;
 - (BOOL)zgAllObjectsMatchingCondition:(zg_array_filter_t)matchingCondition;
 
-- (id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator;
+- (nullable id)zgBinarySearchUsingBlock:(zg_binary_search_t)comparator;
 
 @end
+
+NS_ASSUME_NONNULL_END

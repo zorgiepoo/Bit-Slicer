@@ -55,6 +55,8 @@
 @class ZGDocument;
 @class ZGAppTerminationState;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGDocumentWindowController : ZGMemoryWindowController <AGScopeBarDelegate>
 
 @property (readonly, nonatomic) ZGBreakPointController *breakPointController;
@@ -80,7 +82,7 @@
 @property (nonatomic, readonly) NSString *flagsStringValue;
 @property (nonatomic, readonly) BOOL showsFlags;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName delegate:(nullable id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 - (void)loadDocumentUserInterface;
 
@@ -91,8 +93,8 @@
 - (void)updateNumberOfValuesDisplayedStatus;
 - (void)setStatusString:(NSString *)statusString;
 
-- (IBAction)requestEditingVariableDescription:(id)sender;
-- (IBAction)requestEditingVariableAddress:(id)sender;
+- (IBAction)requestEditingVariableDescription:(nullable id)sender;
+- (IBAction)requestEditingVariableAddress:(nullable id)sender;
 
 - (NSIndexSet *)selectedVariableIndexes;
 - (NSArray *)selectedVariables;
@@ -105,6 +107,8 @@
 - (void)deselectSearchField;
 - (void)insertStoredValueToken;
 
-- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(ZGSearchResults *)searchResults;
+- (void)updateVariables:(NSArray *)newWatchVariablesArray searchResults:(nullable ZGSearchResults *)searchResults;
 
 @end
+
+NS_ASSUME_NONNULL_END

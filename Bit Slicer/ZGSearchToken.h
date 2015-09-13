@@ -32,10 +32,14 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGSearchToken : NSObject <NSCoding, NSCopying>
 
-@property (nonatomic, readonly) NSString *name;
+@property (nonatomic, readonly, nullable) NSString *name;
 
 - (id)initWithName:(NSString *)name;
 
 @end
+
+NS_ASSUME_NONNULL_END

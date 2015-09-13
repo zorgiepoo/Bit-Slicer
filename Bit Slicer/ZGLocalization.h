@@ -32,4 +32,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-void ZGAdjustLocalizableWidthsForTableColumns(NSWindow *window, NSArray *tableColumns, NSDictionary *deltaWidthsDictionary);
+NS_ASSUME_NONNULL_BEGIN
+
+void ZGAdjustLocalizableWidthsForWindowAndTableColumns(NSWindow *window, NSArray *tableColumns, NSDictionary *deltaWidthsDictionary);
+void ZGAdjustLocalizableWidthsForTableColumns(NSArray *tableColumns, NSDictionary *deltaWidthsDictionary);
+
+NS_ASSUME_NONNULL_END

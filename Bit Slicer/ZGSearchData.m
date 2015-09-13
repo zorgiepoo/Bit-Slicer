@@ -31,6 +31,7 @@
  */
 
 #import "ZGSearchData.h"
+#import "ZGDebugLogging.h"
 
 @implementation ZGSearchData
 
@@ -44,7 +45,11 @@
 	self = [super init];
 	if (self != nil)
 	{
-		UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &_collator);
+		if (UCCreateCollator(NULL, 0, kUCCollateCaseInsensitiveMask, &_collator) != noErr)
+		{
+			ZG_LOG(@"Error: Failed to create Collator..");
+		}
+		
 		_endAddress = MAX_MEMORY_ADDRESS;
 		_protectionMode = ZGProtectionAll;
 		_epsilon = DEFAULT_FLOATING_POINT_EPSILON;

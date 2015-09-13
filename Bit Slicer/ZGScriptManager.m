@@ -121,7 +121,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 					[self->_appTerminationState increaseLifeCount];
 					self->_delayedAppTermination = YES;
 				}
-				[self stopScriptForVariable:[variableValue pointerValue]];
+				[self stopScriptForVariable:ZGUnwrapNullableObject([variableValue pointerValue])];
 			}
 		}];
 		
@@ -133,7 +133,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 
 - (void)cleanup
 {
-	[self cleanupWithAppTerminationState:nil];
+	[self cleanupWithAppTerminationState:[[ZGAppTerminationState alloc] init]];
 }
 
 - (void)VDKQueue:(VDKQueue *)__unused queue receivedNotification:(NSString *)__unused noteName forPath:(NSString *)fullPath
@@ -180,9 +180,10 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	{
 		if (variable.type == ZGScript)
 		{
-			if (variable.cachedScriptPath != nil && [fileManager fileExistsAtPath:variable.cachedScriptPath])
+			NSString *cachedScriptPath = variable.cachedScriptPath;
+			if (cachedScriptPath != nil && [fileManager fileExistsAtPath:cachedScriptPath])
 			{
-				NSString *cachedScriptString = [[NSString alloc] initWithContentsOfFile:variable.cachedScriptPath encoding:NSUTF8StringEncoding error:nil];
+				NSString *cachedScriptString = [[NSString alloc] initWithContentsOfFile:cachedScriptPath encoding:NSUTF8StringEncoding error:nil];
 				if (cachedScriptString != nil && variable.scriptValue != nil && ![variable.scriptValue isEqualToString:cachedScriptString] && cachedScriptString.length > 0)
 				{
 					variable.scriptValue = cachedScriptString;
@@ -219,10 +220,10 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		[_scriptingInterpreter acquireInterpreter];
 		
 		NSString *scriptPath = nil;
-		
-		if (variable.cachedScriptPath != nil && [fileManager fileExistsAtPath:variable.cachedScriptPath])
+		NSString *cachedScriptPath = variable.cachedScriptPath;
+		if (cachedScriptPath != nil && [fileManager fileExistsAtPath:cachedScriptPath])
 		{
-			scriptPath = variable.cachedScriptPath;
+			scriptPath = cachedScriptPath;
 		}
 		else
 		{
@@ -370,7 +371,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 			if (pyScript == script)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
-					[self stopScriptForVariable:[variableValue pointerValue]];
+					[self stopScriptForVariable:ZGUnwrapNullableObject([variableValue pointerValue])];
 				});
 				*stop = YES;
 			}
@@ -390,7 +391,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 	[_scriptsDictionary enumerateKeysAndObjectsUsingBlock:^(NSValue *variableValue, ZGPyScript *pyScript, BOOL *__unused stop) {
 		if ([[self runningScripts] containsObject:pyScript])
 		{
-			[self stopScriptForVariable:[variableValue pointerValue]];
+			[self stopScriptForVariable:ZGUnwrapNullableObject([variableValue pointerValue])];
 		}
 	}];
 }
@@ -462,7 +463,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		
 		Py_XDECREF(scriptClassType);
 		
-		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:windowController.currentProcess virtualMemoryException:self->_scriptingInterpreter.virtualMemoryException];
+		ZGPyVirtualMemory *virtualMemoryInstance = [[ZGPyVirtualMemory alloc] initWithProcess:windowController.currentProcess virtualMemoryException:(PyObject * _Nonnull)self->_scriptingInterpreter.virtualMemoryException];
 		
 		ZGPyDebugger *debuggerInstance = [[ZGPyDebugger alloc] initWithProcess:windowController.currentProcess scriptingInterpreter:self->_scriptingInterpreter scriptManager:self breakPointController:windowController.breakPointController hotKeyCenter:windowController.hotKeyCenter loggerWindowController:windowController.loggerWindowController];
 		
@@ -729,7 +730,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 		{
 			ZGDeliverUserNotificationWithReply(ZGLocalizableScriptManagerString(@"scriptPromptNotificationTitle"), windowController.currentProcess.name, scriptPrompt.message, scriptPrompt.answer, @{ZGScriptNotificationPromptHashKey : @(scriptPrompt.hash)});
 			
-			[_scriptPromptWindowController attachToWindow:windowController.window withScriptPrompt:scriptPrompt delegate:delegate];
+			[_scriptPromptWindowController attachToWindow:ZGUnwrapNullableObject(windowController.window) withScriptPrompt:scriptPrompt delegate:delegate];
 		}
 	}
 }

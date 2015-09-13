@@ -38,6 +38,8 @@
 #define INVALID_KEY_CODE -1
 #define INVALID_KEY_MODIFIER 0
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGHotKey : NSObject <NSCoding>
 
 + (instancetype)hotKey;
@@ -50,6 +52,8 @@
 @property (nonatomic) EventHotKeyRef hotKeyRef;
 @property (nonatomic, weak) id <ZGHotKeyDelegate> delegate;
 @property (nonatomic) UInt32 internalID;
-@property (nonatomic) void *userData;
+@property (nonatomic, nullable) void *userData;
 
 @end
+
+NS_ASSUME_NONNULL_END

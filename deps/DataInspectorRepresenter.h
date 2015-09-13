@@ -23,6 +23,8 @@
 
 #import <HexFiend/HexFiend.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 //notification posted when our DataInspector's height changes.  Has a single key "height" which is the new height for the scroll view
 extern NSString * const DataInspectorDidChangeRowCount;
 
@@ -35,9 +37,9 @@ extern NSString * const DataInspectorDidDeleteAllRows;
 
 - (NSUInteger)rowCount;
 
-- (IBAction)addRow:(id)sender;
-- (IBAction)removeRow:(id)sender;
-- (IBAction)doubleClickedTable:(id)sender;
+- (IBAction)addRow:(nullable id)sender;
+- (IBAction)removeRow:(nullable id)sender;
+- (IBAction)doubleClickedTable:(nullable id)sender;
 - (void)resizeTableViewAfterChangingRowCount;
 
 @end
@@ -50,3 +52,5 @@ extern NSString * const DataInspectorDidDeleteAllRows;
 
 @interface DataInspectorTableView : NSTableView
 @end
+
+NS_ASSUME_NONNULL_END

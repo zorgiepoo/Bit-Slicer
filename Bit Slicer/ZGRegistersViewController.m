@@ -58,6 +58,8 @@
 	
 	IBOutlet NSTableView *_tableView;
 	IBOutlet NSTableColumn *_dataTypeTableColumn;
+	
+	NSWindow *_window;
 }
 
 + (void)initialize
@@ -73,11 +75,12 @@
 	});
 }
 
-- (id)initWithUndoManager:(NSUndoManager *)undoManager delegate:(id <ZGRegistersViewDelegate>)delegate
+- (id)initWithWindow:(NSWindow *)window undoManager:(NSUndoManager *)undoManager delegate:(id <ZGRegistersViewDelegate>)delegate
 {
 	self = [super initWithNibName:@"Registers View" bundle:nil];
 	if (self != nil)
 	{
+		_window = window;
 		_undoManager = undoManager;
 		_delegate = delegate;
 	}
@@ -96,7 +99,7 @@
 	
 	[_tableView registerForDraggedTypes:@[ZGVariablePboardType]];
 	
-	ZGAdjustLocalizableWidthsForTableColumns(self.view.window, @[_dataTypeTableColumn], @{@"ru" : @[@80.0]});
+	ZGAdjustLocalizableWidthsForWindowAndTableColumns(_window, @[_dataTypeTableColumn], @{@"ru" : @[@80.0]});
 }
 
 - (void)setInstructionPointer:(ZGMemoryAddress)instructionPointer

@@ -47,27 +47,31 @@ typedef NS_ENUM(NSInteger, ZGBreakPointType)
 	ZGBreakPointSingleStepInstruction,
 };
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGBreakPoint : NSObject
 
-- (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type  delegate:(id <ZGBreakPointDelegate>)delegate;
+- (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type delegate:(nullable id <ZGBreakPointDelegate>)delegate;
 
-@property (atomic, weak) id <ZGBreakPointDelegate> delegate;
+@property (atomic, weak, nullable) id <ZGBreakPointDelegate> delegate;
 @property (readonly, nonatomic) ZGMemoryMap task;
 @property (nonatomic) thread_act_t thread;
-@property (nonatomic) ZGVariable *variable;
+@property (nonatomic, nullable) ZGVariable *variable;
 @property (nonatomic) ZGMemorySize watchSize;
 @property (readonly, nonatomic) ZGProcess *process;
-@property (atomic) NSArray *debugThreads;
+@property (atomic, nullable) NSArray *debugThreads;
 @property (readonly, nonatomic) ZGBreakPointType type;
 @property (atomic) BOOL needsToRestore;
 @property (nonatomic) BOOL hidden;
 @property (atomic) BOOL dead;
 @property (nonatomic) ZGMemoryAddress basePointer;
 @property (nonatomic) NSMutableDictionary *cacheDictionary;
-@property (nonatomic) PyObject *condition;
-@property (nonatomic) PyObject *callback;
-@property (nonatomic) NSError *error;
+@property (nonatomic, nullable) PyObject *condition;
+@property (nonatomic, nullable) PyObject *callback;
+@property (nonatomic, nullable) NSError *error;
 @property (nonatomic) ZGMemoryProtection originalProtection;
 @property (nonatomic) ZGRegistersState *registersState;
 
 @end
+
+NS_ASSUME_NONNULL_END

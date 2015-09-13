@@ -34,6 +34,8 @@
 #import "ZGMemoryTypes.h"
 #import "ZGMachBinaryInfo.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern NSString * const ZGMachBinaryPathToBinaryInfoDictionary;
 extern NSString * const ZGMachBinaryPathToBinaryDictionary;
 extern NSString * const ZGFailedImageName;
@@ -42,21 +44,21 @@ extern NSString * const ZGFailedImageName;
 
 @interface ZGMachBinary : NSObject
 
-+ (instancetype)dynamicLinkerMachBinaryInProcess:(ZGProcess *)process;
++ (nullable instancetype)dynamicLinkerMachBinaryInProcess:(ZGProcess *)process;
 + (NSArray *)machBinariesInProcess:(ZGProcess *)process;
-+ (instancetype)mainMachBinaryFromMachBinaries:(NSArray *)machBinaries;
-+ (instancetype)machBinaryNearestToAddress:(ZGMemoryAddress)address fromMachBinaries:(NSArray *)machBinaries;
-+ (instancetype)machBinaryWithPartialImageName:(NSString *)partialImageName inProcess:(ZGProcess *)process fromCachedMachBinaries:(NSArray *)machBinaries error:(NSError * __autoreleasing *)error;
++ (nullable instancetype)mainMachBinaryFromMachBinaries:(NSArray *)machBinaries;
++ (nullable instancetype)machBinaryNearestToAddress:(ZGMemoryAddress)address fromMachBinaries:(NSArray *)machBinaries;
++ (nullable instancetype)machBinaryWithPartialImageName:(NSString *)partialImageName inProcess:(ZGProcess *)process fromCachedMachBinaries:(nullable NSArray *)machBinaries error:(NSError **)error;
 
 - (id)initWithHeaderAddress:(ZGMemoryAddress)headerAddress filePathAddress:(ZGMemoryAddress)filePathAddress;
 
 @property (nonatomic, readonly) ZGMemoryAddress headerAddress;
 @property (nonatomic, readonly) ZGMemoryAddress filePathAddress;
 
-- (NSComparisonResult)compare:(ZGMachBinary *)binaryImage;
+- (nullable NSString *)filePathInProcess:(ZGProcess *)process;
 
-- (NSString *)filePathInProcess:(ZGProcess *)process;
-
-- (ZGMachBinaryInfo *)machBinaryInfoInProcess:(ZGProcess *)process;
+- (nullable ZGMachBinaryInfo *)machBinaryInfoInProcess:(ZGProcess *)process;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -34,13 +34,17 @@
 #import "Python.h"
 #import "ZGMemoryTypes.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ZGBreakPointCondition : NSObject
 
-- (nonnull id)initWithInternalProcessName:(nonnull NSString *)internalProcessName address:(ZGMemoryAddress)address condition:(nonnull NSString *)condition compiledCondition:(nonnull PyObject *)compiledCondition;
+- (id)initWithInternalProcessName:(NSString *)internalProcessName address:(ZGMemoryAddress)address condition:(NSString *)condition compiledCondition:(PyObject *)compiledCondition;
 
-@property (nonatomic, copy, nonnull) NSString *condition;
-@property (nonatomic, nonnull) PyObject *compiledCondition;
-@property (nonatomic, readonly, nonnull) NSString *internalProcessName;
+@property (nonatomic, copy) NSString *condition;
+@property (nonatomic) PyObject *compiledCondition;
+@property (nonatomic, readonly) NSString *internalProcessName;
 @property (nonatomic, readonly) ZGMemoryAddress address;
 
 @end
+
+NS_ASSUME_NONNULL_END

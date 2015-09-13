@@ -45,13 +45,15 @@
 @class ZGAppTerminationState;
 @class ZGScriptingInterpreter;
 
-@interface ZGBreakPointController : NSObject
-
 typedef NS_ENUM(uint8_t, ZGWatchPointType)
 {
 	ZGWatchPointWrite,
 	ZGWatchPointReadOrWrite,
 };
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface ZGBreakPointController : NSObject
 
 + (instancetype)createBreakPointControllerOnceWithScriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter;
 
@@ -68,10 +70,12 @@ typedef NS_ENUM(uint8_t, ZGWatchPointType)
 - (NSArray *)removeSingleStepBreakPointsFromBreakPoint:(ZGBreakPoint *)breakPoint;
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint;
 
-- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointDelegate>)delegate getBreakPoint:(ZGBreakPoint **)returnedBreakPoint;
+- (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointDelegate>)delegate getBreakPoint:(ZGBreakPoint * _Nullable * _Nonnull)returnedBreakPoint;
 
 - (NSArray *)removeObserver:(id)observer;
 - (NSArray *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;
 - (NSArray *)removeObserver:(id)observer withProcessID:(pid_t)processID atAddress:(ZGMemoryAddress)address;
 
 @end
+
+NS_ASSUME_NONNULL_END
