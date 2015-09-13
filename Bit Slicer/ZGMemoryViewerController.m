@@ -57,17 +57,17 @@
 
 @implementation ZGMemoryViewerController
 {
-	NSMutableArray<ZGBreakPoint *> *_haltedBreakPoints;
+	NSMutableArray<ZGBreakPoint *> * _Nonnull _haltedBreakPoints;
 	
-	ZGTextViewLayoutController *_textViewLayoutController;
+	ZGTextViewLayoutController * _Nullable _textViewLayoutController;
 	
-	ZGStatusBarRepresenter *_statusBarRepresenter;
-	ZGLineCountingRepresenter *_lineCountingRepresenter;
-	DataInspectorRepresenter *_dataInspectorRepresenter;
+	ZGStatusBarRepresenter * _Nullable _statusBarRepresenter;
+	ZGLineCountingRepresenter * _Nullable _lineCountingRepresenter;
+	DataInspectorRepresenter * _Nullable _dataInspectorRepresenter;
 	
 	BOOL _showsDataInspector;
 	
-	NSData *_lastUpdatedData;
+	NSData * _Nullable _lastUpdatedData;
 	HFRange _lastUpdatedRange;
 	NSInteger _lastUpdateCount;
 	
@@ -118,7 +118,7 @@
 	});
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration haltedBreakPoints:(NSMutableArray<ZGBreakPoint *> *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration haltedBreakPoints:(NSMutableArray<ZGBreakPoint *> *)haltedBreakPoints delegate:(id <ZGChosenProcessDelegate, ZGShowMemoryWindow, ZGMemorySelectionDelegate>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager rootlessConfiguration:rootlessConfiguration delegate:delegate];
 	if (self != nil)

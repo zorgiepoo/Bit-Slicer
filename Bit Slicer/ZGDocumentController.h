@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGDocumentController : NSDocumentController
 
-- (id)initWithMakeDocumentWindowController:(ZGDocumentWindowController * (^)(void))makeDocumentWindowController;
+- (id)initWithMakeDocumentWindowController:(ZGDocumentWindowController * _Nonnull (^)(void))makeDocumentWindowController;
 
 @end
 

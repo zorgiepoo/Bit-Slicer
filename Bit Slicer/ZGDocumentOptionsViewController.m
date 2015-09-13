@@ -37,8 +37,8 @@
 
 @implementation ZGDocumentOptionsViewController
 {
-	__weak ZGDocument *_document;
-	ZGDocumentData *_documentData;
+	__weak ZGDocument * _Nullable _document;
+	ZGDocumentData * _Nonnull _documentData;
 	
 	IBOutlet NSButton *_ignoreDataAlignmentCheckbox;
 	IBOutlet NSTextField *_beginningAddressTextField;

@@ -41,7 +41,7 @@
 
 @implementation ZGBacktraceViewController
 {
-	__weak id <ZGBacktraceViewControllerDelegate> _delegate;
+	__weak id <ZGBacktraceViewControllerDelegate> _Nullable _delegate;
 	BOOL _shouldIgnoreTableSelection;
 	
 	IBOutlet NSTableView *_tableView;

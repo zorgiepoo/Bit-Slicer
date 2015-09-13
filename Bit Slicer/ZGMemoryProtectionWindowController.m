@@ -44,7 +44,7 @@
 @implementation ZGMemoryProtectionWindowController
 {
 	NSUndoManager * _Nullable _undoManager;
-	ZGProcess *_process;
+	ZGProcess * _Nullable _process;
 	
 	IBOutlet NSTextField *_addressTextField;
 	IBOutlet NSTextField *_sizeTextField;

@@ -91,23 +91,23 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	
 	// We start a working activity whenever we have an instruction or watchpoint breakpoint set,
 	// but I'm not sure if this is *actually* necessary
-	id _breakPointActivity;
+	id _Nullable _breakPointActivity;
 	
 	ZGBreakPointController *_breakPointController;
 	ZGScriptingInterpreter *_scriptingInterpreter;
 	ZGLoggerWindowController *_loggerWindowController;
 	
-	NSString *_mappedFilePath;
+	NSString * _Nullable _mappedFilePath;
 	ZGMemoryAddress _baseAddress;
 	ZGMemoryAddress _offsetFromBase;
 	
 	NSArray<ZGInstruction *> *_instructions;
 	NSRange _instructionBoundary;
 	
-	ZGCodeInjectionWindowController *_codeInjectionController;
+	ZGCodeInjectionWindowController * _Nullable _codeInjectionController;
 	
-	NSPopover *_breakPointConditionPopover;
-	NSMutableArray<ZGBreakPointCondition *> *_breakPointConditions;
+	NSPopover * _Nullable _breakPointConditionPopover;
+	NSMutableArray<ZGBreakPointCondition *> * _Nullable _breakPointConditions;
 	
 	IBOutlet ZGTableView *_instructionsTableView;
 	IBOutlet NSSplitView *_splitView;
@@ -162,7 +162,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	});
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager rootlessConfiguration:rootlessConfiguration delegate:delegate];
 	
@@ -172,6 +172,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		_scriptingInterpreter = scriptingInterpreter;
 		_loggerWindowController = loggerWindowController;
 		
+		_instructions = @[];
 		_haltedBreakPoints = [[NSMutableArray alloc] init];
 		
 		_pauseAndUnpauseHotKey = ZGUnwrapNullableObject([NSKeyedUnarchiver unarchiveObjectWithData:ZGUnwrapNullableObject([[NSUserDefaults standardUserDefaults] objectForKey:ZGPauseAndUnpauseHotKey])]);
@@ -918,12 +919,11 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 	if (_mappedFilePath != nil && sender == nil)
 	{
-		NSError *error = nil;
-		ZGMemoryAddress guessAddress = [[ZGMachBinary machBinaryWithPartialImageName:_mappedFilePath inProcess:self.currentProcess fromCachedMachBinaries:machBinaries error:&error] headerAddress] + _offsetFromBase;
+		ZGMachBinary *targetBinary = [ZGMachBinary machBinaryWithPartialImageName:(NSString * _Nonnull)_mappedFilePath inProcess:self.currentProcess fromCachedMachBinaries:machBinaries error:NULL];
 		
-		if (error == nil)
+		if (targetBinary != nil)
 		{
-			calculatedMemoryAddress = guessAddress;
+			calculatedMemoryAddress = targetBinary.headerAddress + _offsetFromBase;
 			[self.addressTextField setStringValue:[NSString stringWithFormat:@"0x%llX", calculatedMemoryAddress]];
 		}
 	}
@@ -1748,7 +1748,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	if (_breakPointActivity != nil)
 	{
-		[[NSProcessInfo processInfo] endActivity:_breakPointActivity];
+		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_breakPointActivity];
 		_breakPointActivity = nil;
 	}
 }

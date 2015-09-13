@@ -38,9 +38,9 @@
 @implementation ZGRunningProcess
 {
 	NSApplicationActivationPolicy _activationPolicy;
-	NSImage *_icon;
-	NSString *_name;
-	NSURL *_fileURL;
+	NSImage * _Nullable _icon;
+	NSString * _Nullable _name;
+	NSURL * _Nullable _fileURL;
 	BOOL _didFetchInfo;
 	BOOL _isGame;
 	BOOL _isThirdParty;

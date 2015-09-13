@@ -40,7 +40,7 @@
 
 @implementation ZGLoggerWindowController
 {
-	NSMutableString *_loggerText;
+	NSMutableString * _Nonnull _loggerText;
 	NSUInteger _numberOfMessages;
 	
 	IBOutlet NSTextView *_loggerTextView;
@@ -79,9 +79,10 @@
 	[super restoreStateWithCoder:coder];
 	
 	NSString *restoredText = [coder decodeObjectOfClass:[NSString class] forKey:ZGLoggerWindowText];
+	
+	_loggerText = [NSMutableString stringWithString:restoredText != nil ? restoredText : @""];
 	if (restoredText != nil)
 	{
-		_loggerText = [NSMutableString stringWithString:restoredText];
 		[self writeLine:ZGLocalizedStringFromLoggerWindowTable(@"restoredText") withDateFormatting:NO];
 	}
 }

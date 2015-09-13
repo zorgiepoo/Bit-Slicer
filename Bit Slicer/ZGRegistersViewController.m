@@ -50,10 +50,10 @@
 
 @implementation ZGRegistersViewController
 {
-	__weak id <ZGRegistersViewDelegate> _delegate;
-	NSUndoManager *_undoManager;
-	NSArray<ZGRegister *> *_registers;
-	ZGBreakPoint *_breakPoint;
+	__weak id <ZGRegistersViewDelegate> _Nullable _delegate;
+	NSUndoManager * _Nonnull _undoManager;
+	NSArray<ZGRegister *> * _Nonnull _registers;
+	ZGBreakPoint * _Nullable _breakPoint;
 	ZGVariableQualifier _qualifier;
 	
 	IBOutlet NSTableView *_tableView;
@@ -76,6 +76,7 @@
 	self = [super initWithNibName:@"Registers View" bundle:nil];
 	if (self != nil)
 	{
+		_registers = @[];
 		_window = window;
 		_undoManager = undoManager;
 		_delegate = delegate;

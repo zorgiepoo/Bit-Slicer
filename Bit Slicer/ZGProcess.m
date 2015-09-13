@@ -39,12 +39,12 @@
 
 @implementation ZGProcess
 {
-	NSMutableDictionary<NSString *, NSMutableDictionary *> *_cacheDictionary;
+	NSMutableDictionary<NSString *, NSMutableDictionary *> * _Nullable _cacheDictionary;
 	
-	ZGMachBinary *_mainMachBinary;
-	ZGMachBinary *_dylinkerBinary;
+	ZGMachBinary * _Nullable _mainMachBinary;
+	ZGMachBinary * _Nullable _dylinkerBinary;
 	
-	id <ZGSymbolicator> _symbolicator;
+	id <ZGSymbolicator> _Nullable _symbolicator;
 	BOOL _failedCreatingSymbolicator;
 }
 
@@ -134,7 +134,7 @@
 	{
 		_cacheDictionary = [[NSMutableDictionary alloc] initWithDictionary:@{ZGMachBinaryPathToBinaryInfoDictionary : [NSMutableDictionary dictionary], ZGMachBinaryPathToBinaryDictionary : [NSMutableDictionary dictionary]}];
 	}
-	return _cacheDictionary;
+	return (id _Nonnull)_cacheDictionary;
 }
 
 - (ZGMachBinary *)dylinkerBinary

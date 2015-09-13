@@ -38,8 +38,8 @@
 
 @implementation ZGHotKeyPreferencesViewController
 {
-	ZGHotKeyCenter *_hotKeyCenter;
-	ZGDebuggerController *_debuggerController;
+	ZGHotKeyCenter * _Nonnull _hotKeyCenter;
+	ZGDebuggerController * _Nonnull _debuggerController;
 	
 	IBOutlet SRRecorderControl *_pauseAndUnpauseHotKeyRecorder;
 	IBOutlet SRRecorderControl *_stepInHotKeyRecorder;

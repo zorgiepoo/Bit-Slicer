@@ -36,7 +36,7 @@
 
 @implementation ZGHotKeyCenter
 {
-	NSMutableArray<ZGHotKey *> *_registeredHotKeys;
+	NSMutableArray<ZGHotKey *> * _Nullable _registeredHotKeys;
 	UInt32 _nextRegisteredHotKeyID;
 }
 

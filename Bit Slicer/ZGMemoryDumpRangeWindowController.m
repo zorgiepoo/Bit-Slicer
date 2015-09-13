@@ -43,8 +43,8 @@
 
 @implementation ZGMemoryDumpRangeWindowController
 {
-	ZGProcess *_process;
-	NSWindow *_parentWindow;
+	ZGProcess * _Nullable _process;
+	NSWindow * _Nullable _parentWindow;
 	
 	IBOutlet NSTextField *_fromAddressTextField;
 	IBOutlet NSTextField *_toAddressTextField;
@@ -71,7 +71,7 @@
 		
 		NSSavePanel *savePanel = NSSavePanel.savePanel;
 		[savePanel
-		 beginSheetModalForWindow:_parentWindow
+		 beginSheetModalForWindow:ZGUnwrapNullableObject(_parentWindow)
 		 completionHandler:^(NSInteger result)
 		 {
 			 if (result == NSFileHandlingPanelOKButton)
@@ -124,7 +124,7 @@
 	
 	[NSApp
 	 beginSheet:window
-	 modalForWindow:_parentWindow
+	 modalForWindow:parentWindow
 	 modalDelegate:self
 	 didEndSelector:nil
 	 contextInfo:NULL];

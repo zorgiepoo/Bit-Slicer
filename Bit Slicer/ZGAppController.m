@@ -69,22 +69,21 @@
 
 @implementation ZGAppController
 {
-	ZGAppUpdaterController *_appUpdaterController;
-	ZGDocumentController *_documentController;
-	ZGPreferencesController *_preferencesController;
-	ZGMemoryViewerController *_memoryViewer;
-	ZGDebuggerController *_debuggerController;
-	ZGBreakPointController *_breakPointController;
-	ZGLoggerWindowController *_loggerWindowController;
-	ZGProcessTaskManager *_processTaskManager;
-	ZGRootlessConfiguration *_rootlessConfiguration;
-	ZGHotKeyCenter *_hotKeyCenter;
-	ZGScriptingInterpreter *_scriptingInterpreter;
-	ZGAboutWindowController *_aboutWindowController;
+	ZGAppUpdaterController * _Nonnull _appUpdaterController;
+	ZGDocumentController * _Nonnull _documentController;
+	ZGPreferencesController * _Nullable _preferencesController;
+	ZGMemoryViewerController * _Nonnull _memoryViewer;
+	ZGDebuggerController * _Nonnull _debuggerController;
+	ZGBreakPointController * _Nonnull _breakPointController;
+	ZGLoggerWindowController * _Nonnull _loggerWindowController;
+	ZGProcessTaskManager * _Nonnull _processTaskManager;
+	ZGRootlessConfiguration * _Nullable _rootlessConfiguration;
+	ZGHotKeyCenter * _Nonnull _hotKeyCenter;
+	ZGScriptingInterpreter * _Nonnull _scriptingInterpreter;
+	ZGAboutWindowController * _Nullable _aboutWindowController;
 	
-	
-	NSString *_lastChosenInternalProcessName;
-	NSMutableDictionary<NSNumber *, NSValue *> *_memorySelectionRanges;
+	NSString * _Nullable _lastChosenInternalProcessName;
+	NSMutableDictionary<NSNumber *, NSValue *> * _Nullable _memorySelectionRanges;
 }
 
 #pragma mark Birth & Death

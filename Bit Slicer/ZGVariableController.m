@@ -61,10 +61,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 @implementation ZGVariableController
 {
-	__weak ZGDocumentWindowController *_windowController;
+	__weak ZGDocumentWindowController * _Nullable _windowController;
 	
-	ZGDocumentData *_documentData;
-	id _frozenActivity;
+	ZGDocumentData * _Nonnull _documentData;
+	id _Nullable _frozenActivity;
 }
 
 + (void)initialize
@@ -98,7 +98,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	else if (!hasFrozenVariable && _frozenActivity != nil)
 	{
-		[[NSProcessInfo processInfo] endActivity:_frozenActivity];
+		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_frozenActivity];
 		_frozenActivity = nil;
 	}
 }

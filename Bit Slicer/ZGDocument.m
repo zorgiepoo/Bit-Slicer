@@ -39,7 +39,7 @@
 
 @implementation ZGDocument
 {
-	ZGDocumentWindowController *_windowController;
+	ZGDocumentWindowController * _Nullable _windowController;
 }
 
 #pragma mark Document stuff
@@ -68,8 +68,11 @@
 
 - (void)makeWindowControllers
 {
-	_windowController = _makeDocumentWindowController();
-	[self addWindowController:_windowController];
+	ZGDocumentWindowController *windowController = _makeDocumentWindowController();
+	assert(windowController != nil);
+	
+	_windowController = windowController;
+	[self addWindowController:windowController];
 }
 
 // Since there appears to be an AppKit bug where window controllers are removed *before* the app is asked if it really wants to terminate (if the document is marked dirty), we'll make a workaround for cleaning the document's state

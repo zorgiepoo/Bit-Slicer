@@ -43,7 +43,7 @@ typedef struct
 @implementation ZGMachBinaryInfo
 {
 	uint32_t _numberOfSegments;
-	ZGMachBinarySegment *_segments;
+	ZGMachBinarySegment * _Nonnull _segments;
 }
 
 - (id)initWithMachHeaderAddress:(ZGMemoryAddress)machHeaderAddress segmentBytes:(const void * const)segmentBytes commandSize:(uint32_t)commandSize

@@ -43,13 +43,13 @@
 
 @implementation ZGProcessList
 {
-	ZGProcessTaskManager *_processTaskManager;
-	NSMutableArray<ZGRunningProcess *> *_runningProcesses;
+	ZGProcessTaskManager * _Nonnull _processTaskManager;
+	NSMutableArray<ZGRunningProcess *> * _Nonnull _runningProcesses;
 	
-	NSTimer *_pollTimer;
+	NSTimer * _Nullable _pollTimer;
 	NSUInteger _pollRequestCount;
-	NSMutableArray<ZGRunningProcessObserver *> *_priorityProcesses;
-	NSMutableArray *_pollObservers;
+	NSMutableArray<ZGRunningProcessObserver *> * _Nullable _priorityProcesses;
+	NSMutableArray * _Nullable _pollObservers;
 	
 	// For SYSCTL_PROC_CPUTYPE MIB storage
 	int _processTypeName[CTL_MAXNAME];

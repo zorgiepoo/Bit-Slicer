@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGDocument : NSDocument
 
-@property (nonatomic, copy) ZGDocumentWindowController * (^makeDocumentWindowController)(void);
+@property (nonatomic, copy) ZGDocumentWindowController * _Nonnull (^makeDocumentWindowController)(void);
 
 @property (nonatomic, readonly) ZGDocumentData *data;
 @property (nonatomic, readonly) ZGSearchData *searchData;

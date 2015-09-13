@@ -81,8 +81,8 @@ extern boolean_t mach_exc_server(mach_msg_header_t *InHeadP, mach_msg_header_t *
 {
 	NSArray<ZGBreakPoint *> *_breakPoints;
 	mach_port_t _exceptionPort;
-	ZGScriptingInterpreter *_scriptingInterpreter;
-	dispatch_source_t _watchPointTimer;
+	ZGScriptingInterpreter * _Nonnull _scriptingInterpreter;
+	dispatch_source_t _Nullable _watchPointTimer;
 	BOOL _delayedTermination;
 }
 
@@ -100,6 +100,7 @@ static ZGBreakPointController *gBreakPointController;
 	self = [super init];
 	if (self != nil)
 	{
+		_breakPoints = @[];
 		_scriptingInterpreter = scriptingInterpreter;
 	}
 	return self;

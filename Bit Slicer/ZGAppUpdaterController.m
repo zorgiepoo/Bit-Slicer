@@ -45,7 +45,7 @@
 
 @implementation ZGAppUpdaterController
 {
-	SUUpdater *_updater;
+	SUUpdater * _Nonnull _updater;
 }
 
 + (BOOL)runningAlpha

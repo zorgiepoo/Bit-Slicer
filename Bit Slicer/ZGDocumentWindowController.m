@@ -83,23 +83,23 @@
 
 @implementation ZGDocumentWindowController
 {
-	ZGDebuggerController *_debuggerController;
-	ZGWatchVariableWindowController *_watchVariableWindowController;
+	ZGDebuggerController * _Nonnull _debuggerController;
+	ZGWatchVariableWindowController * _Nullable _watchVariableWindowController;
 	
-	ZGEditValueWindowController *_editValueWindowController;
-	ZGEditAddressWindowController *_editAddressWindowController;
-	ZGEditDescriptionWindowController *_editDescriptionWindowController;
-	ZGEditSizeWindowController *_editSizeWindowController;
+	ZGEditValueWindowController * _Nullable _editValueWindowController;
+	ZGEditAddressWindowController * _Nullable _editAddressWindowController;
+	ZGEditDescriptionWindowController * _Nullable _editDescriptionWindowController;
+	ZGEditSizeWindowController * _Nullable _editSizeWindowController;
 	
 	BOOL _loadedDocumentBefore;
-	NSString *_flagsLabelStringValue;
+	NSString * _Nullable _flagsLabelStringValue;
 	
-	AGScopeBarGroup *_protectionGroup;
-	AGScopeBarGroup *_qualifierGroup;
-	AGScopeBarGroup *_stringMatchingGroup;
-	AGScopeBarGroup *_endianGroup;
+	AGScopeBarGroup * _Nullable _protectionGroup;
+	AGScopeBarGroup * _Nullable _qualifierGroup;
+	AGScopeBarGroup * _Nullable _stringMatchingGroup;
+	AGScopeBarGroup * _Nullable _endianGroup;
 	
-	NSPopover *_advancedOptionsPopover;
+	NSPopover * _Nullable _advancedOptionsPopover;
 	
 	IBOutlet NSTableColumn *_dataTypeTableColumn;
 	IBOutlet NSTextField *_generalStatusTextField;
@@ -109,7 +109,7 @@
 	IBOutlet NSView *_scopeBarFlagsView;
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(NSString *)lastChosenInternalProcessName delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(nullable NSString *)lastChosenInternalProcessName delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager rootlessConfiguration:rootlessConfiguration delegate:delegate];
 	if (self != nil)
@@ -570,7 +570,7 @@
 - (void)setFlagsLabelStringValue:(NSString *)flagsLabelStringValue
 {
 	_flagsLabelStringValue = [flagsLabelStringValue copy];
-	[_flagsLabel setStringValue:_flagsLabelStringValue];
+	[_flagsLabel setStringValue:flagsLabelStringValue];
 }
 
 - (void)setFlagsStringValue:(NSString *)flagsStringValue

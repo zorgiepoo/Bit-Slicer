@@ -48,11 +48,11 @@
 
 @implementation ZGPreferencesController
 {
-	ZGHotKeyCenter *_hotKeyCenter;
-	ZGAppUpdaterController *_appUpdaterController;
-	ZGDebuggerController *_debuggerController;
+	ZGHotKeyCenter * _Nonnull _hotKeyCenter;
+	ZGAppUpdaterController * _Nonnull _appUpdaterController;
+	ZGDebuggerController * _Nonnull _debuggerController;
 	
-	NSViewController *_preferencesViewController;
+	NSViewController * _Nullable _preferencesViewController;
 }
 
 - (id)initWithHotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter debuggerController:(ZGDebuggerController *)debuggerController appUpdaterController:(ZGAppUpdaterController *)appUpdaterController

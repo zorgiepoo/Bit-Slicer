@@ -43,7 +43,7 @@
 	IBOutlet NSButton *_cancelButton;
 	IBOutlet NSProgressIndicator *_progressIndicator;
 	
-	ZGSearchProgress *_searchProgress;
+	ZGSearchProgress * _Nullable _searchProgress;
 	BOOL _isBusy;
 }
 

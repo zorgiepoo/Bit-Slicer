@@ -35,7 +35,7 @@
 
 @implementation ZGBreakPointConditionViewController
 {
-	__weak id <ZGBreakPointConditionDelegate> _delegate;
+	__weak id <ZGBreakPointConditionDelegate> _Nullable _delegate;
 	
 	IBOutlet NSTextField *_conditionTextField;
 }

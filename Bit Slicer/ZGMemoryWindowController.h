@@ -50,11 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)pauseOrUnpauseProcessTask:(ZGMemoryMap)processTask;
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(ZGRootlessConfiguration *)rootlessConfiguration delegate:(nullable id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration delegate:(nullable id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate;
 
 @property (nonatomic, readonly) ZGProcessTaskManager *processTaskManager;
 @property (nonatomic, readonly) ZGProcessList *processList;
-@property (nonatomic, readonly) ZGRootlessConfiguration *rootlessConfiguration;
+@property (nonatomic, readonly, nullable) ZGRootlessConfiguration *rootlessConfiguration;
 
 @property (nonatomic, weak, readonly, nullable) id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow> delegate;
 

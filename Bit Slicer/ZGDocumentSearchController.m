@@ -59,17 +59,16 @@
 
 @implementation ZGDocumentSearchController
 {
-	__weak ZGDocumentWindowController *_windowController;
-	ZGDocumentData *_documentData;
-	ZGSearchProgress *_searchProgress;
-	ZGSearchResults *_temporarySearchResults;
-	ZGStoredData *_tempSavedData;
+	__weak ZGDocumentWindowController * _Nullable _windowController;
+	ZGDocumentData * _Nonnull _documentData;
+	ZGSearchProgress * _Nonnull _searchProgress;
+	ZGSearchResults * _Nullable _temporarySearchResults;
 	BOOL _isBusy;
 	ZGVariableType _dataType;
 	ZGFunctionType _functionType;
 	BOOL _allowsNarrowing;
 	NSString *_searchValueString;
-	ZGSearchData *_searchData;
+	ZGSearchData * _Nonnull _searchData;
 }
 
 #pragma mark Class Utilities
@@ -818,13 +817,13 @@
 	[windowController setStatusString:ZGLocalizableSearchDocumentString(@"storingValuesStatusLabel")];
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		self->_tempSavedData = [ZGStoredData storedDataFromProcessTask:windowController.currentProcess.processTask];
+		__block ZGStoredData *tempSavedData = [ZGStoredData storedDataFromProcessTask:windowController.currentProcess.processTask];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			if (!self->_searchProgress.shouldCancelSearch)
 			{
-				self->_searchData.savedData = self->_tempSavedData;
-				self->_tempSavedData = nil;
+				self->_searchData.savedData = tempSavedData;
+				tempSavedData = nil;
 				windowController.storeValuesButton.image = [NSImage imageNamed:@"container_filled"];
 				
 				if (![[self class] hasStoredValueTokenFromExpression:self->_documentData.searchValue])

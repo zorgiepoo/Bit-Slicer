@@ -55,12 +55,12 @@
 
 @implementation ZGDocumentTableController
 {
-	__weak ZGDocumentWindowController *_windowController;
-	NSTimer *_watchVariablesTimer;
-	NSMutableArray<NSString *> *_failedExecutableImages;
-	NSDate *_lastUpdatedDate;
-	ZGDocumentData *_documentData;
-	ZGTableView *_variablesTableView;
+	__weak ZGDocumentWindowController * _Nullable _windowController;
+	NSTimer * _Nullable _watchVariablesTimer;
+	NSMutableArray<NSString *> * _Nonnull _failedExecutableImages;
+	NSDate * _Nullable _lastUpdatedDate;
+	ZGDocumentData * _Nonnull _documentData;
+	ZGTableView * _Nullable _variablesTableView;
 }
 
 #define ZGVariableReorderType @"ZGVariableReorderType"
@@ -250,7 +250,7 @@
 	}
 	
 	// Don't look up executable images that have been known to fail frequently, otherwise it'd be a serious penalty cost
-	if (windowController.currentProcess.hasGrantedAccess && _failedExecutableImages.count > 0 && (_lastUpdatedDate == nil || [[NSDate date] timeIntervalSinceDate:_lastUpdatedDate] > 5.0))
+	if (windowController.currentProcess.hasGrantedAccess && _failedExecutableImages.count > 0 && (_lastUpdatedDate == nil || [[NSDate date] timeIntervalSinceDate:(NSDate * _Nonnull)_lastUpdatedDate] > 5.0))
 	{
 		[self clearCache];
 	}

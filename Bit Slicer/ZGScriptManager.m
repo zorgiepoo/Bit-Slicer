@@ -70,16 +70,16 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 @implementation ZGScriptManager
 {
 	BOOL _cleanedUp;
-	__weak ZGDocumentWindowController *_windowController;
-	ZGLoggerWindowController *_loggerWindowController;
-	ZGScriptingInterpreter *_scriptingInterpreter;
-	NSMutableDictionary<NSValue *, ZGPyScript *> *_scriptsDictionary;
-	VDKQueue *_fileWatchingQueue;
-	dispatch_source_t _scriptTimer;
-	dispatch_queue_t _scriptTimerQueue;
-	id _scriptActivity;
-	ZGScriptPromptWindowController *_scriptPromptWindowController;
-	ZGAppTerminationState *_appTerminationState;
+	__weak ZGDocumentWindowController * _Nonnull _windowController;
+	ZGLoggerWindowController * _Nonnull _loggerWindowController;
+	ZGScriptingInterpreter * _Nonnull _scriptingInterpreter;
+	NSMutableDictionary<NSValue *, ZGPyScript *> * _Nonnull _scriptsDictionary;
+	VDKQueue * _Nullable _fileWatchingQueue;
+	dispatch_source_t _Nullable _scriptTimer;
+	dispatch_queue_t _Nullable _scriptTimerQueue;
+	id _Nullable _scriptActivity;
+	ZGScriptPromptWindowController * _Nonnull _scriptPromptWindowController;
+	ZGAppTerminationState * _Nullable _appTerminationState;
 	BOOL _delayedAppTermination;
 }
 
@@ -610,7 +610,7 @@ NSString *ZGScriptDefaultApplicationEditorKey = @"ZGScriptDefaultApplicationEdit
 						dispatch_async(dispatch_get_main_queue(), ^{
 							if (self->_scriptActivity != nil)
 							{
-								[[NSProcessInfo processInfo] endActivity:self->_scriptActivity];
+								[[NSProcessInfo processInfo] endActivity:(id _Nonnull)self->_scriptActivity];
 								self->_scriptActivity = nil;
 							}
 							

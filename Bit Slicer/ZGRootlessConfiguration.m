@@ -39,8 +39,8 @@
 
 @implementation ZGRootlessConfiguration
 {
-	NSArray<NSURL *> *_rootlessApplicationURLs;
-	NSCache<NSURL *, NSNumber *> *_affectedFileURLsCache;
+	NSArray<NSURL *> * _Nullable _rootlessApplicationURLs;
+	NSCache<NSURL *, NSNumber *> * _Nonnull _affectedFileURLsCache;
 }
 
 - (id)init

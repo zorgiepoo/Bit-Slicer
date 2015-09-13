@@ -36,8 +36,8 @@
 
 @implementation ZGDisassemblerObject
 {
-	ud_t *_object;
-	void *_bytes;
+	ud_t * _Nonnull _object;
+	void * _Nonnull _bytes;
 	ZGMemoryAddress _startAddress;
 	ZGMemorySize _pointerSize;
 }
@@ -80,6 +80,7 @@ static void disassemblerTranslator(ud_t *object)
 	if (self != nil)
 	{
 		_bytes = malloc(size);
+		if (_bytes == NULL) return nil;
 		memcpy(_bytes, bytes, size);
 		
 		_startAddress = address;

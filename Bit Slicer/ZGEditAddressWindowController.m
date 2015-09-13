@@ -37,8 +37,8 @@
 
 @implementation ZGEditAddressWindowController
 {
-	ZGVariableController *_variableController;
-	ZGVariable *_variable;
+	ZGVariableController * _Nonnull _variableController;
+	ZGVariable * _Nullable _variable;
 	
 	IBOutlet NSTextField *_addressTextField;
 }
@@ -81,9 +81,7 @@
 	[NSApp endSheet:window];
 	[window close];
 	
-	[_variableController
-	 editVariable:_variable
-	 addressFormula:_addressTextField.stringValue];
+	[_variableController editVariable:ZGUnwrapNullableObject(_variable) addressFormula:_addressTextField.stringValue];
 	
 	_variable = nil;
 }

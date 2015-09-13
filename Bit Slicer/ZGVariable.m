@@ -55,11 +55,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 @implementation ZGVariable
 {
-	void *_rawValue;
-	void *_freezeValue;
+	void * _Nullable _rawValue;
+	void * _Nullable _freezeValue;
 	
-	NSString *_stringValue;
-	NSString *_addressStringValue;
+	NSString * _Nullable _stringValue;
+	NSString * _Nullable _addressStringValue;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -320,7 +320,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		[self setAddressStringValue:nil];
 	}
 	
-	return _addressStringValue;
+	return (NSString * _Nonnull)_addressStringValue;
 }
 
 - (void)setAddressStringValue:(NSString *)newAddressString
@@ -329,7 +329,10 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		if ([newAddressString zgIsHexRepresentation])
 		{
-			[[NSScanner scannerWithString:newAddressString] scanHexLongLong:&_address];
+			if (![[NSScanner scannerWithString:newAddressString] scanHexLongLong:&_address])
+			{
+				_address = 0x0;
+			}
 		}
 		else
 		{
@@ -337,7 +340,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		}
 	}
 	
-	_addressStringValue = [[NSString stringWithFormat:@"0x%llX", _address] copy];
+	_addressStringValue = [NSString stringWithFormat:@"0x%llX", _address];
 }
 
 - (NSString *)addressFormula
@@ -354,7 +357,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 {
 	[self updateStringValue];
 	
-	return _stringValue;
+	return (NSString * _Nonnull)_stringValue;
 }
 
 + (NSString *)byteArrayStringFromValue:(unsigned char *)value size:(ZGMemorySize)size
@@ -372,7 +375,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 
 - (void)updateStringValue
 {
-	if (_size > 0 && _rawValue != NULL)
+	void *rawValue = _rawValue;
+	if (_size > 0 && rawValue != NULL)
 	{
 		NSString *newStringValue = nil;
 		
@@ -383,16 +387,16 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			case ZGInt8:
 				if (_qualifier == ZGSigned)
 				{
-					_stringValue = [NSString stringWithFormat:@"%d", *((int8_t *)_rawValue)];
+					_stringValue = [NSString stringWithFormat:@"%d", *((int8_t *)rawValue)];
 				}
 				else
 				{
-					_stringValue = [NSString stringWithFormat:@"%u", *((uint8_t *)_rawValue)];
+					_stringValue = [NSString stringWithFormat:@"%u", *((uint8_t *)rawValue)];
 				}
 				break;
 			case ZGInt16:
 			{
-				uint16_t value = needsByteSwapping ? CFSwapInt16(*(uint16_t *)_rawValue) : *(uint16_t *)_rawValue;
+				uint16_t value = needsByteSwapping ? CFSwapInt16(*(uint16_t *)rawValue) : *(uint16_t *)rawValue;
 				if (_qualifier == ZGSigned)
 				{
 					_stringValue = [NSString stringWithFormat:@"%d", (int16_t)value];
@@ -405,7 +409,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			}
 			case ZGInt32:
 			{
-				uint32_t value = needsByteSwapping ? CFSwapInt32(*(uint32_t *)_rawValue) : *(uint32_t *)_rawValue;
+				uint32_t value = needsByteSwapping ? CFSwapInt32(*(uint32_t *)rawValue) : *(uint32_t *)rawValue;
 				if (_qualifier == ZGSigned)
 				{
 					_stringValue = [NSString stringWithFormat:@"%d", (int32_t)value];
@@ -418,7 +422,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			}
 			case ZGInt64:
 			{
-				uint64_t value = needsByteSwapping ? CFSwapInt64(*(uint64_t *)_rawValue) : *(uint64_t *)_rawValue;
+				uint64_t value = needsByteSwapping ? CFSwapInt64(*(uint64_t *)rawValue) : *(uint64_t *)rawValue;
 				if (_qualifier == ZGSigned)
 				{
 					_stringValue = [NSString stringWithFormat:@"%lld", (int64_t)value];
@@ -432,31 +436,31 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			case ZGPointer:
 				if (_size == sizeof(int32_t))
 				{
-					uint32_t value = needsByteSwapping ? CFSwapInt32(*(uint32_t *)_rawValue) : *(uint32_t *)_rawValue;
+					uint32_t value = needsByteSwapping ? CFSwapInt32(*(uint32_t *)_rawValue) : *(uint32_t *)rawValue;
 					_stringValue = [NSString stringWithFormat:@"0x%X", value];
 				}
 				else if (_size == sizeof(int64_t))
 				{
-					uint64_t value = needsByteSwapping ? CFSwapInt64(*(uint64_t *)_rawValue) : *(uint64_t *)_rawValue;
+					uint64_t value = needsByteSwapping ? CFSwapInt64(*(uint64_t *)_rawValue) : *(uint64_t *)rawValue;
 					_stringValue = [NSString stringWithFormat:@"0x%llX", value];
 				}
 				break;
 			case ZGFloat:
 			{
-				float value = needsByteSwapping ? CFConvertFloat32SwappedToHost(*(CFSwappedFloat32 *)_rawValue) : *(float *)_rawValue;
+				float value = needsByteSwapping ? CFConvertFloat32SwappedToHost(*(CFSwappedFloat32 *)rawValue) : *(float *)rawValue;
 				_stringValue = [NSString stringWithFormat:@"%f", value];
 				break;
 			}
 			case ZGDouble:
 			{
-				double value = needsByteSwapping ? CFConvertFloat64SwappedToHost(*(CFSwappedFloat64 *)_rawValue) : *(double *)_rawValue;
+				double value = needsByteSwapping ? CFConvertFloat64SwappedToHost(*(CFSwappedFloat64 *)rawValue) : *(double *)rawValue;
 				_stringValue = [NSString stringWithFormat:@"%lf", value];
 				break;
 			}
 			case ZGString8:
 				_stringValue =
 					[[NSString alloc]
-					 initWithData:[NSData dataWithBytes:_rawValue length:_size]
+					 initWithData:[NSData dataWithBytes:rawValue length:_size]
 					 encoding:NSUTF8StringEncoding];
 				
 				// UTF8 string encoding can fail sometimes on some invalid-ish strings
@@ -464,7 +468,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				{
 					newStringValue =
 						[[NSString alloc]
-						 initWithData:[NSData dataWithBytes:_rawValue length:_size]
+						 initWithData:[NSData dataWithBytes:rawValue length:_size]
 						 encoding:NSASCIIStringEncoding];
 					
 					_stringValue = newStringValue;
@@ -479,7 +483,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			case ZGString16:
 				newStringValue =
 					[[NSString alloc]
-					 initWithData:[NSData dataWithBytes:_rawValue length:_size]
+					 initWithData:[NSData dataWithBytes:rawValue length:_size]
 					 encoding:_byteOrder == CFByteOrderLittleEndian ? NSUTF16LittleEndianStringEncoding : NSUTF16BigEndianStringEncoding];
 				
 				_stringValue = newStringValue;
@@ -492,10 +496,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 				break;
 			case ZGByteArray:
 			{
-				_stringValue = [[self class] byteArrayStringFromValue:_rawValue size:_size];
+				_stringValue = [[self class] byteArrayStringFromValue:rawValue size:_size];
 				break;
 			}
 			case ZGScript:
+				_stringValue = @"";
 				break;
 		}
 	}

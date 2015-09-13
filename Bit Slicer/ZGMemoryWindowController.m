@@ -55,12 +55,12 @@
 	BOOL _isWatchingActiveProcess;
 	BOOL _inactiveProcessSuspended;
 	
-	ZGMemoryDumpAllWindowController *_memoryDumpAllWindowController;
-	ZGMemoryDumpRangeWindowController *_memoryDumpRangeWindowController;
-	ZGMemoryProtectionWindowController *_memoryProtectionWindowController;
+	ZGMemoryDumpAllWindowController * _Nullable _memoryDumpAllWindowController;
+	ZGMemoryDumpRangeWindowController * _Nullable _memoryDumpRangeWindowController;
+	ZGMemoryProtectionWindowController * _Nullable _memoryProtectionWindowController;
 	
-	NSUndoManager *_undoManager;
-	NSTimer *_updateDisplayTimer;
+	NSUndoManager * _Nullable _undoManager;
+	NSTimer * _Nullable _updateDisplayTimer;
 }
 
 #pragma mark Birth
@@ -85,7 +85,7 @@
 	{
 		_undoManager = [[NSUndoManager alloc] init];
 	}
-	return _undoManager;
+	return (NSUndoManager * _Nonnull)_undoManager;
 }
 
 - (void)cleanup
@@ -469,8 +469,12 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 			}
 		}
 		
+		if (runningProcess.name == nil)
+		{
+			continue;
+		}
+		
 		NSMenuItem *menuItem = [[NSMenuItem alloc] init];
-		assert(runningProcess.name != nil);
 		[[self class] updateProcessMenuItem:menuItem name:runningProcess.name processIdentifier:runningProcess.processIdentifier icon:runningProcess.icon];
 		
 		ZGProcess *oldProcess = [oldProcessesDictionary objectForKey:@(runningProcess.processIdentifier)];

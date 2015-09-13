@@ -54,9 +54,9 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 
 @implementation ZGScriptingInterpreter
 {
-	OSCSingleThreadQueue *_pythonQueue;
-	PyObject *_cTypesObject;
-	PyObject *_structObject;
+	OSCSingleThreadQueue * _Nullable _pythonQueue;
+	PyObject * _Nullable _cTypesObject;
+	PyObject * _Nullable _structObject;
 	BOOL _initializedInterpreter;
 }
 
@@ -95,8 +95,7 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 		NSFileManager *fileManager = [[NSFileManager alloc] init];
 		
 		NSURL *scriptCachesURL = [[self class] scriptCachesURL];
-		NSString *scriptCachesPath = scriptCachesURL.path;
-		assert(scriptCachesPath != nil);
+		NSString *scriptCachesPath = ZGUnwrapNullableObject(scriptCachesURL.path);
 		
 		if (![fileManager fileExistsAtPath:scriptCachesPath])
 		{
@@ -104,7 +103,7 @@ typedef NS_ENUM(NSInteger, ZGDispatchType)
 			if (![fileManager createDirectoryAtURL:scriptCachesURL withIntermediateDirectories:YES attributes:nil error:&createDirectoryError])
 			{
 				NSLog(@"Failed to create scripting cache directory at %@ with error %@", scriptCachesURL, createDirectoryError);
-				assert(false);
+				assert("Failed to crete script cache directory" == NULL);
 			}
 		}
 		

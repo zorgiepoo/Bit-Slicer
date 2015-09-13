@@ -35,7 +35,7 @@
 
 @implementation ZGUpdatePreferencesViewController
 {
-	ZGAppUpdaterController *_appUpdaterController;
+	ZGAppUpdaterController * _Nonnull _appUpdaterController;
 	
 	IBOutlet NSButton *_checkForUpdatesButton;
 	IBOutlet NSButton *_checkForAlphaUpdatesButton;

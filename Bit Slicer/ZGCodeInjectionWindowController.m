@@ -43,11 +43,11 @@
 @implementation ZGCodeInjectionWindowController
 {
 	IBOutlet NSTextView *_textView;
-	NSString *_suggestedCode;
+	NSString * _Nullable _suggestedCode;
 	NSUndoManager * _Nullable _undoManager;
 	ZGMemoryAddress _allocatedAddress;
 	ZGMemorySize _numberOfAllocatedBytes;
-	ZGProcess *_process;
+	ZGProcess * _Nullable _process;
 	NSArray<ZGInstruction *> *_instructions;
 	NSArray<ZGBreakPoint *> *_breakPoints;
 }
@@ -60,7 +60,7 @@
 - (void)setSuggestedCode:(NSString *)suggestedCode
 {
 	_suggestedCode = [suggestedCode copy];
-	[_textView.textStorage.mutableString setString:_suggestedCode];
+	[_textView.textStorage.mutableString setString:suggestedCode];
 }
 
 - (void)updateSuggestedCode
@@ -151,9 +151,9 @@
 	[self updateSuggestedCode];
 	
 	NSError *error = nil;
-	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:_suggestedCode atInstructionPointer:_allocatedAddress usingArchitectureBits:_process.pointerSize * 8 error:&error];
+	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress usingArchitectureBits:_process.pointerSize * 8 error:&error];
 	
-	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:_process breakPoints:_breakPoints undoManager:_undoManager error:&error])
+	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) breakPoints:_breakPoints undoManager:_undoManager error:&error])
 	{
 		NSLog(@"Error while injecting code");
 		NSLog(@"%@", error);

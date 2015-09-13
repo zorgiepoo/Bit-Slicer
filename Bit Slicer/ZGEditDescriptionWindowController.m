@@ -36,8 +36,8 @@
 
 @implementation ZGEditDescriptionWindowController
 {
-	ZGVariableController *_variableController;
-	ZGVariable *_variable;
+	ZGVariableController * _Nonnull _variableController;
+	ZGVariable * _Nullable _variable;
 	
 	IBOutlet NSTextView *_descriptionTextView;
 }
@@ -78,7 +78,7 @@
 	NSAttributedString *newDescription = [_descriptionTextView.textStorage copy];
 	if (newDescription != nil)
 	{
-		[_variableController changeVariable:_variable newDescription:newDescription];
+		[_variableController changeVariable:ZGUnwrapNullableObject(_variable) newDescription:newDescription];
 		
 		NSWindow *window = ZGUnwrapNullableObject([self window]);
 		[NSApp endSheet:window];

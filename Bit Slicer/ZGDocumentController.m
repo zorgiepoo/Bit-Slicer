@@ -36,10 +36,10 @@
 
 @implementation ZGDocumentController
 {
-	ZGDocumentWindowController * (^_makeDocumentWindowController)(void);
+	ZGDocumentWindowController * _Nonnull (^_makeDocumentWindowController)(void);
 }
 
-- (id)initWithMakeDocumentWindowController:(ZGDocumentWindowController * (^)(void))makeDocumentWindowController
+- (id)initWithMakeDocumentWindowController:(ZGDocumentWindowController * _Nonnull (^)(void))makeDocumentWindowController
 {
 	self = [super init];
 	if (self != nil)

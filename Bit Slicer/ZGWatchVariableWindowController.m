@@ -64,14 +64,14 @@
 	IBOutlet ZGTableView *_tableView;
 	IBOutlet NSTableColumn *_addTableColumn;
 	
-	ZGBreakPointController *_breakPointController;
-	ZGProcess *_watchProcess;
-	id _watchActivity;
-	NSMutableArray<ZGWatchVariable *> *_foundWatchVariables;
-	NSMutableDictionary<NSNumber *, ZGWatchVariable *> *_foundWatchVariablesDictionary;
-	watch_variable_completion_t _completionHandler;
+	ZGBreakPointController * _Nonnull _breakPointController;
+	ZGProcess * _Nullable _watchProcess;
+	id _Nullable _watchActivity;
+	NSMutableArray<ZGWatchVariable *> * _Nullable _foundWatchVariables;
+	NSMutableDictionary<NSNumber *, ZGWatchVariable *> * _Nullable _foundWatchVariablesDictionary;
+	watch_variable_completion_t _Nullable _completionHandler;
 	
-	__weak id <ZGShowMemoryWindow> _delegate;
+	__weak id <ZGShowMemoryWindow> _Nullable _delegate;
 }
 
 #pragma mark Birth & Death
@@ -119,7 +119,7 @@
 	
 	if (_watchActivity != nil)
 	{
-		[[NSProcessInfo processInfo] endActivity:_watchActivity];
+		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_watchActivity];
 		_watchActivity = nil;
 	}
 	
@@ -291,7 +291,8 @@
 
 - (void)dataAccessedByBreakPoint:(ZGBreakPoint *)__unused breakPoint fromInstructionPointer:(ZGMemoryAddress)instructionAddress withRegistersState:(ZGRegistersState *)registersState
 {
-	if (!_watchProcess.valid)
+	ZGProcess *watchProcess = _watchProcess;
+	if (!watchProcess.valid)
 	{
 		return;
 	}
@@ -306,8 +307,8 @@
 		return;
 	}
 	
-	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:_watchProcess];
-	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddress inProcess:_watchProcess withBreakPoints:_breakPointController.breakPoints machBinaries:machBinaries];
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:watchProcess];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddress inProcess:watchProcess withBreakPoints:_breakPointController.breakPoints machBinaries:machBinaries];
 	
 	if (instruction == nil)
 	{
@@ -502,14 +503,22 @@
 {
 	ZGWatchVariable *selectedWatchVariable = [[self selectedWatchVariables] firstObject];
 	id <ZGShowMemoryWindow> delegate = _delegate;
-	[delegate showMemoryViewerWindowWithProcess:_watchProcess address:selectedWatchVariable.instruction.variable.address selectionLength:selectedWatchVariable.instruction.variable.size];
+	ZGProcess *watchProcess = _watchProcess;
+	if (watchProcess != nil)
+	{
+		[delegate showMemoryViewerWindowWithProcess:watchProcess address:selectedWatchVariable.instruction.variable.address selectionLength:selectedWatchVariable.instruction.variable.size];
+	}
 }
 
 - (IBAction)showDebugger:(id)__unused sender
 {
 	ZGWatchVariable *selectedWatchVariable = [[self selectedWatchVariables] firstObject];
 	id <ZGShowMemoryWindow> delegate = _delegate;
-	[delegate showDebuggerWindowWithProcess:_watchProcess address:selectedWatchVariable.instruction.variable.address];
+	ZGProcess *watchProcess = _watchProcess;
+	if (watchProcess != nil)
+	{
+		[delegate showDebuggerWindowWithProcess:watchProcess address:selectedWatchVariable.instruction.variable.address];
+	}
 }
 
 @end

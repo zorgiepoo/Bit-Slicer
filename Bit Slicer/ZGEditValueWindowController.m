@@ -43,8 +43,8 @@
 
 @implementation ZGEditValueWindowController
 {
-	ZGVariableController *_variableController;
-	NSArray<ZGVariable *> *_variablesToEdit;
+	ZGVariableController * _Nonnull _variableController;
+	NSArray<ZGVariable *> * _Nullable _variablesToEdit;
 	ZGMemoryMap _processTask;
 	
 	IBOutlet NSTextField *_valueTextField;

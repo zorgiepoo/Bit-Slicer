@@ -55,6 +55,7 @@
 #import "ZGHotKeyCenter.h"
 #import "ZGHotKey.h"
 #import "ZGScriptPrompt.h"
+#import "ZGNullability.h"
 
 @class ZGPyDebugger;
 
@@ -184,17 +185,17 @@ static PyTypeObject DebuggerType =
 
 @implementation ZGPyDebugger
 {
-	ZGScriptingInterpreter *_scriptingInterpreter;
+	ZGScriptingInterpreter * _Nonnull _scriptingInterpreter;
 	
-	__weak ZGScriptManager *_scriptManager;
-	ZGBreakPointController *_breakPointController;
-	ZGLoggerWindowController *_loggerWindowController;
-	NSMutableDictionary<NSNumber *, NSNumber *> *_cachedInstructionPointers;
-	ZGHotKeyCenter *_hotKeyCenter;
-	ZGProcess *_process;
-	ZGBreakPoint *_haltedBreakPoint;
-	NSDictionary<NSString *, NSValue *> *_generalPurposeRegisterOffsetsDictionary;
-	NSDictionary<NSString *, NSValue *> *_vectorRegisterOffsetsDictionary;
+	__weak ZGScriptManager * _Nullable _scriptManager;
+	ZGBreakPointController * _Nonnull _breakPointController;
+	ZGLoggerWindowController * _Nonnull _loggerWindowController;
+	NSMutableDictionary<NSNumber *, NSNumber *> * _Nonnull _cachedInstructionPointers;
+	ZGHotKeyCenter * _Nonnull _hotKeyCenter;
+	ZGProcess * _Nonnull _process;
+	ZGBreakPoint * _Nullable _haltedBreakPoint;
+	NSDictionary<NSString *, NSValue *> * _Nullable _generalPurposeRegisterOffsetsDictionary;
+	NSDictionary<NSString *, NSValue *> * _Nullable _vectorRegisterOffsetsDictionary;
 }
 
 + (PyObject *)loadPythonClassInMainModule:(PyObject *)module
@@ -277,7 +278,7 @@ static PyTypeObject DebuggerType =
 	if (_haltedBreakPoint != nil)
 	{
 		_haltedBreakPoint.dead = YES;
-		[_breakPointController resumeFromBreakPoint:_haltedBreakPoint];
+		[_breakPointController resumeFromBreakPoint:(ZGBreakPoint * _Nonnull)_haltedBreakPoint];
 	}
 	
 	NSArray<ZGBreakPoint *> *removedBreakPoints = [_breakPointController removeObserver:self];
@@ -893,13 +894,13 @@ static PyObject *Debugger_removeWatchAccesses(DebuggerClass *self, PyObject *arg
 
 static void resumeFromHaltedBreakPointInDebugger(DebuggerClass *self)
 {
-	[self->objcSelf->_breakPointController resumeFromBreakPoint:self->objcSelf->_haltedBreakPoint];
+	[self->objcSelf->_breakPointController resumeFromBreakPoint:ZGUnwrapNullableObject(self->objcSelf->_haltedBreakPoint)];
 	self->objcSelf->_haltedBreakPoint = nil;
 }
 
 static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 {
-	NSArray<ZGBreakPoint *> *removedBreakPoints = [self->objcSelf->_breakPointController removeSingleStepBreakPointsFromBreakPoint:self->objcSelf->_haltedBreakPoint];
+	NSArray<ZGBreakPoint *> *removedBreakPoints = [self->objcSelf->_breakPointController removeSingleStepBreakPointsFromBreakPoint:ZGUnwrapNullableObject(self->objcSelf->_haltedBreakPoint)];
 	for (ZGBreakPoint *breakPoint in removedBreakPoints)
 	{
 		if (breakPoint.callback != NULL)
@@ -1006,8 +1007,7 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 
 static void stepIntoDebuggerWithHaltedBreakPointAndCallback(DebuggerClass *self, PyObject *callback)
 {
-	ZGBreakPoint *haltedBreakPoint = self->objcSelf->_haltedBreakPoint;
-	ZGBreakPoint *singleStepBreakPoint = [self->objcSelf->_breakPointController addSingleStepBreakPointFromBreakPoint:haltedBreakPoint];
+	ZGBreakPoint *singleStepBreakPoint = [self->objcSelf->_breakPointController addSingleStepBreakPointFromBreakPoint:ZGUnwrapNullableObject(self->objcSelf->_haltedBreakPoint)];
 	
 	singleStepBreakPoint.callback = callback;
 	Py_XINCREF(callback);
@@ -1024,6 +1024,12 @@ static PyObject *Debugger_stepIn(DebuggerClass *self, PyObject *args)
 	if (PyCallable_Check(callback) == 0)
 	{
 		PyErr_SetString(PyExc_ValueError, [@"debug.stepIn failed because callback is not callable" UTF8String]);
+		return NULL;
+	}
+	
+	if (self->objcSelf->_haltedBreakPoint == nil)
+	{
+		PyErr_SetString(self->debuggerException, "debug.stepIn called without a current breakpoint set");
 		return NULL;
 	}
 	
@@ -1044,6 +1050,12 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	if (PyCallable_Check(callback) == 0)
 	{
 		PyErr_SetString(PyExc_ValueError, "debug.stepOver failed because callback is not callable");
+		return NULL;
+	}
+	
+	if (self->objcSelf->_haltedBreakPoint == nil)
+	{
+		PyErr_SetString(self->debuggerException, "debug.stepOver called without a current breakpoint set");
 		return NULL;
 	}
 	
@@ -1102,6 +1114,12 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	PyObject *callback = NULL;
 	if (!PyArg_ParseTuple(args, "O:stepOut", &callback))
 	{
+		return NULL;
+	}
+	
+	if (self->objcSelf->_haltedBreakPoint == nil)
+	{
+		PyErr_SetString(self->debuggerException, "debug.stepOut called without a current breakpoint set");
 		return NULL;
 	}
 	
@@ -1180,6 +1198,12 @@ static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject * __unused arg
 
 static PyObject *Debugger_resume(DebuggerClass *self, PyObject * __unused args)
 {
+	if (self->objcSelf->_haltedBreakPoint == nil)
+	{
+		PyErr_SetString(self->debuggerException, "debug.resume called without a current breakpoint set");
+		return NULL;
+	}
+	
 	continueFromHaltedBreakPointsInDebugger(self);
 	
 	return Py_BuildValue("");

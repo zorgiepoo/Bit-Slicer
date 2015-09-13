@@ -36,7 +36,7 @@
 
 @implementation ZGProcessTaskManager
 {
-	NSMutableDictionary<NSNumber *, NSNumber *> *_tasksDictionary;
+	NSMutableDictionary<NSNumber *, NSNumber *> * _Nullable _tasksDictionary;
 }
 
 - (BOOL)taskExistsForProcessIdentifier:(pid_t)processIdentifier

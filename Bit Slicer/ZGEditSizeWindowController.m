@@ -42,8 +42,8 @@
 
 @implementation ZGEditSizeWindowController
 {
-	ZGVariableController *_variableController;
-	NSArray<ZGVariable *> *_variables;
+	ZGVariableController * _Nonnull _variableController;
+	NSArray<ZGVariable *> * _Nullable _variables;
 	
 	IBOutlet NSTextField *_sizeTextField;
 }
@@ -118,9 +118,7 @@
 			[requestedSizes addObject:@(requestedSize)];
 		}
 		
-		[_variableController
-		 editVariables:_variables
-		 requestedSizes:requestedSizes];
+		[_variableController editVariables:ZGUnwrapNullableObject(_variables) requestedSizes:requestedSizes];
 		
 		_variables = nil;
 	}

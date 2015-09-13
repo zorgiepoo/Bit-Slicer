@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isCallMnemonic:(int)mnemonic;
 + (BOOL)isJumpMnemonic:(int)mnemonic;
 
-- (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize;
+- (nullable id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize;
 
 @property (readonly, nonatomic) void *bytes;
 
