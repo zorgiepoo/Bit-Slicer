@@ -38,6 +38,7 @@
 #import "ZGMemoryViewerController.h"
 #import "ZGBacktrace.h"
 #import "ZGOperatingSystemCompatibility.h"
+#import "NSArrayAdditions.h"
 
 @implementation ZGBacktraceViewController
 {
@@ -103,7 +104,9 @@
 
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-	NSArray<ZGVariable *> *variables = [[_backtrace.instructions objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	NSArray<ZGVariable *> *variables = [[_backtrace.instructions objectsAtIndexes:rowIndexes] zgMapUsingBlock:^(ZGInstruction *instruction) {
+		return instruction.variable;
+	}];
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 

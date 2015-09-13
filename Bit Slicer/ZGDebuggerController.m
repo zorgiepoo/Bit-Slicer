@@ -1458,7 +1458,11 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	NSArray<ZGInstruction *> *instructions = [_instructions objectsAtIndexes:rowIndexes];
 	[self annotateInstructions:instructions];
 	
-	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:[instructions valueForKey:@"variable"]] forType:ZGVariablePboardType];
+	NSArray<ZGVariable *> *variables = [instructions zgMapUsingBlock:^(ZGInstruction *instruction) {
+		return instruction.variable;
+	}];
+	
+	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)__unused aNotification

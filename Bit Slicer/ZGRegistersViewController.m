@@ -42,6 +42,7 @@
 #import "ZGRegisterEntries.h"
 #import "ZGOperatingSystemCompatibility.h"
 #import "ZGNullability.h"
+#import "NSArrayAdditions.h"
 
 #define ZG_REGISTER_TYPES @"ZG_REGISTER_TYPES"
 #define ZG_DEBUG_QUALIFIER @"ZG_DEBUG_QUALIFIER"
@@ -382,7 +383,9 @@
 
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-	NSArray<ZGVariable *> *variables = [[_registers objectsAtIndexes:rowIndexes] valueForKey:@"variable"];
+	NSArray<ZGVariable *> *variables = [[_registers objectsAtIndexes:rowIndexes] zgMapUsingBlock:^id _Nonnull(ZGRegister *theRegister) {
+		return theRegister.variable;
+	}];
 	return [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:variables] forType:ZGVariablePboardType];
 }
 
