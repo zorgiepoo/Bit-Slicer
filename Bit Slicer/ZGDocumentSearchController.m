@@ -544,6 +544,10 @@
 		}
 		else
 		{
+			if (error != NULL)
+			{
+				*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @""}];
+			}
 			NSLog(@"Failed to retrieve search value from %@", finalSearchExpression);
 			return NO;
 		}
@@ -564,12 +568,8 @@
 		
 		if (dataType == ZGByteArray)
 		{
+			// If this returns NULL, then there just were no wildcards
 			_searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(finalSearchExpression);
-			if (_searchData.byteArrayFlags == NULL)
-			{
-				NSLog(@"Failed to allocate byte array flags for %@", finalSearchExpression);
-				return NO;
-			}
 		}
 	}
 	else
@@ -629,6 +629,10 @@
 			}
 			else
 			{
+				if (error != NULL)
+				{
+					*error = [NSError errorWithDomain:ZGRetrieveFlagsErrorDomain code:0 userInfo:@{ZGRetrieveFlagsErrorDescriptionKey : @""}];
+				}
 				NSLog(@"Failed allocating memory for swapped value..");
 				return NO;
 			}
