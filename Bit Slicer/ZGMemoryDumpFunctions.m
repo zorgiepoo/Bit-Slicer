@@ -34,33 +34,19 @@
 #import "ZGVirtualMemory.h"
 #import "ZGSearchProgress.h"
 #import "ZGRegion.h"
-
-// helper function for ZGSaveAllDataToDirectory
-static void ZGDumpPieceOfData(NSMutableData *currentData, ZGMemoryAddress currentStartingAddress, NSString *directory, int *fileNumber, FILE *mergedFile)
-{
-	if (currentData != nil)
-	{
-		ZGMemoryAddress endAddress = currentStartingAddress + [currentData length];
-		(*fileNumber)++;
-		[currentData
-		 writeToFile:[directory stringByAppendingPathComponent:[[NSString alloc] initWithFormat:@"(%d) 0x%llX - 0x%llX", *fileNumber, currentStartingAddress, endAddress]]
-		 atomically:NO];
-		
-		if (mergedFile != NULL)
-		{
-			fwrite(currentData.bytes, currentData.length, 1, mergedFile);
-		}
-	}
-}
+#import "ZGProtectionDescription.h"
+#import "ZGDebugLogging.h"
 
 BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <ZGSearchProgressDelegate> delegate)
 {
-	NSMutableData *currentData = nil;
-	ZGMemoryAddress currentStartingAddress = 0;
-	ZGMemoryAddress lastAddress = currentStartingAddress;
-	int fileNumber = 0;
+	NSString *mergedPath = [directory stringByAppendingPathComponent:ZGLocalizedStringFromDumpAllMemoryTable(@"mergedFilename")];
 	
-	FILE *mergedFile = fopen([directory stringByAppendingPathComponent:ZGLocalizedStringFromDumpAllMemoryTable(@"mergedFilename")].UTF8String, "w");
+	FILE *mergedFile = fopen(mergedPath.UTF8String, "w");
+	if (mergedFile == NULL)
+	{
+		NSLog(@"Failed to create merged file at %@ with error %s", mergedPath, strerror(errno));
+		return NO;
+	}
 	
 	NSArray<ZGRegion *> *regions = [ZGRegion submapRegionsFromProcessTask:processTask];
 	
@@ -70,57 +56,45 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 		[delegate progressWillBegin:searchProgress];
 	});
 	
-	NSData *emptyResultSet = [NSData data];
-	
+	NSUInteger regionNumber = 0;
 	for (ZGRegion *region in regions)
 	{
-		if (lastAddress != region.address || !(region.protection & VM_PROT_READ))
+		if ((region.protection & VM_PROT_READ) != 0)
 		{
-			// We're done with this piece of data
-			ZGDumpPieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
-			currentData = nil;
-		}
-		
-		if (region.protection & VM_PROT_READ)
-		{
-			if (!currentData)
-			{
-				currentData = [[NSMutableData alloc] init];
-				currentStartingAddress = region.address;
-			}
-			
-			// outputSize should not differ from size
 			ZGMemorySize outputSize = region.size;
 			void *bytes = NULL;
 			if (ZGReadBytes(processTask, region.address, &bytes, &outputSize))
 			{
-				[currentData appendBytes:bytes length:(NSUInteger)outputSize];
+				NSString *regionPath = [directory stringByAppendingPathComponent:[NSString stringWithFormat:@"(%lu) 0x%llX - 0x%llX %@", (unsigned long)regionNumber, region.address, region.address + outputSize, ZGProtectionDescription(region.protection)]];
+				
+				NSData *regionData = [NSData dataWithBytesNoCopy:bytes length:outputSize freeWhenDone:NO];
+				
+				BOOL wroteRegionOutToFile = [regionData writeToFile:regionPath atomically:YES];
+				if (wroteRegionOutToFile)
+				{
+					if (fwrite(regionData.bytes, regionData.length, 1, mergedFile) == 0)
+					{
+						ZG_LOG(@"Error: Failed to dump region bytes 0x%llX - 0x%llX to merge file", region.address, region.address + outputSize);
+					}
+					regionNumber++;
+				}
+				
 				ZGFreeBytes(bytes, outputSize);
 			}
 		}
 		
-		lastAddress = region.address;
-		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			searchProgress.progress++;
-			[delegate progress:searchProgress advancedWithResultSet:emptyResultSet];
+			[delegate progress:searchProgress advancedWithResultSet:[NSData data]];
 		});
-  	    
+		
 		if (searchProgress.shouldCancelSearch)
 		{
 			break;
 		}
 	}
 	
-	if (!searchProgress.shouldCancelSearch)
-	{
-		ZGDumpPieceOfData(currentData, currentStartingAddress, directory, &fileNumber, mergedFile);
-	}
-	
-	if (mergedFile != NULL)
-	{
-		fclose(mergedFile);
-	}
+	fclose(mergedFile);
 	
 	return YES;
 }

@@ -107,15 +107,19 @@
 			}
 			 
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-				if (!ZGDumpAllDataToDirectory(saveURLPath, process.processTask, self))
-				{
-					ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDumpAllMemoryTable(@"failedMemoryDumpAlertTitle"), ZGLocalizedStringFromDumpAllMemoryTable(@"failedMemoryDumpAlertMessage"));
-				}
-
+				BOOL dumpedAllData = ZGDumpAllDataToDirectory(saveURLPath, process.processTask, self);
+				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					if (!self->_searchProgress.shouldCancelSearch)
 					{
-						ZGDeliverUserNotification(ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationMessageFormat"), process.name], nil);
+						if (dumpedAllData)
+						{
+							ZGDeliverUserNotification(ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationTitle"), nil, [NSString stringWithFormat:ZGLocalizedStringFromDumpAllMemoryTable(@"finishedDumpingMemoryNotificationMessageFormat"), process.name], nil);
+						}
+						else
+						{
+							ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDumpAllMemoryTable(@"failedMemoryDumpAlertTitle"), ZGLocalizedStringFromDumpAllMemoryTable(@"failedMemoryDumpAlertMessage"));
+						}
 					}
 
 					self->_progressIndicator.doubleValue = 0.0;
