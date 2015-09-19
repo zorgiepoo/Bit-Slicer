@@ -72,32 +72,31 @@
 		NSSavePanel *savePanel = NSSavePanel.savePanel;
 		[savePanel
 		 beginSheetModalForWindow:ZGUnwrapNullableObject(_parentWindow)
-		 completionHandler:^(NSInteger result)
-		 {
-			 if (result == NSFileHandlingPanelOKButton)
-			 {
-				 BOOL success = NO;
-				 ZGMemorySize size = toAddress - fromAddress;
-				 void *bytes = NULL;
-				 
-				 if ((success = ZGReadBytes(self->_process.processTask, fromAddress, &bytes, &size)))
-				 {
-					 NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
-					 success = [data writeToURL:ZGUnwrapNullableObject(savePanel.URL) atomically:NO];
-					 
-					 ZGFreeBytes(bytes, size);
-				 }
-				 else
-				 {
-					 NSLog(@"Failed to read memory from %@ at 0x%llX (0x%llX bytes)", self->_process.name, fromAddress, size);
-				 }
-				 
-				 if (!success)
-				 {
-					 ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDumpMemoryRangeTable(@"failedDumpingMemoryAlertTitle"), [NSString stringWithFormat:ZGLocalizedStringFromDumpMemoryRangeTable(@"failedDumpingMemoryAlertMessageFormat"), fromAddress, toAddress]);
-				 }
-			 }
-		 }];
+		 completionHandler:^(NSInteger result) {
+		 	if (result == NSFileHandlingPanelOKButton)
+		 	{
+		 		BOOL success = NO;
+		 		ZGMemorySize size = toAddress - fromAddress;
+		 		void *bytes = NULL;
+
+		 		if ((success = ZGReadBytes(self->_process.processTask, fromAddress, &bytes, &size)))
+		 		{
+		 			NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
+		 			success = [data writeToURL:ZGUnwrapNullableObject(savePanel.URL) atomically:NO];
+
+		 			ZGFreeBytes(bytes, size);
+		 		}
+		 		else
+		 		{
+		 			NSLog(@"Failed to read memory from %@ at 0x%llX (0x%llX bytes)", self->_process.name, fromAddress, size);
+		 		}
+
+		 		if (!success)
+		 		{
+		 			ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDumpMemoryRangeTable(@"failedDumpingMemoryAlertTitle"), [NSString stringWithFormat:ZGLocalizedStringFromDumpMemoryRangeTable(@"failedDumpingMemoryAlertMessageFormat"), fromAddress, toAddress]);
+		 		}
+		 	}
+		}];
 	}
 	else
 	{
