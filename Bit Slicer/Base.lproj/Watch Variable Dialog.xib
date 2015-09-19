@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="15A279b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGWatchVariableWindowController">
@@ -21,7 +21,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="458" height="242"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1366" height="745"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="416" height="242"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="458" height="242"/>
@@ -29,6 +29,7 @@
                 <subviews>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Fqd-Of-gZ2">
                         <rect key="frame" x="18" y="205" width="422" height="17"/>
+                        <animations/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="watching_accesses_at_address" id="WtT-PG-TBK">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -36,7 +37,8 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Wlf-lu-mTm">
-                        <rect key="frame" x="361" y="6" width="83" height="32"/>
+                        <rect key="frame" x="362" y="6" width="82" height="32"/>
+                        <animations/>
                         <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wdf-l9-OcB">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -48,11 +50,13 @@ DQ
                             <action selector="stopWatchingAndAddInstructions:" target="-2" id="H1a-Rs-dYA"/>
                         </connections>
                     </button>
-                    <progressIndicator maxValue="100" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="VzN-Qp-l3Q">
-                        <rect key="frame" x="20" y="13" width="256" height="20"/>
+                    <progressIndicator wantsLayer="YES" maxValue="100" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="VzN-Qp-l3Q">
+                        <rect key="frame" x="20" y="13" width="258" height="20"/>
+                        <animations/>
                     </progressIndicator>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Doa-r8-Eag">
-                        <rect key="frame" x="278" y="6" width="83" height="32"/>
+                        <rect key="frame" x="280" y="6" width="82" height="32"/>
+                        <animations/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6mE-1V-0N8">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -67,12 +71,13 @@ Gw
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="20" horizontalPageScroll="10" verticalLineScroll="20" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fgo-4x-ix4">
                         <rect key="frame" x="20" y="47" width="418" height="150"/>
                         <clipView key="contentView" id="AnS-if-Uae">
-                            <rect key="frame" x="1" y="17" width="416" height="132"/>
+                            <rect key="frame" x="1" y="0.0" width="416" height="149"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" columnResizing="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" headerView="e31-yt-wOh" id="4bY-Uc-6gw" customClass="ZGTableView">
-                                    <rect key="frame" x="0.0" y="0.0" width="416" height="20"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="416" height="126"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <animations/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -133,21 +138,26 @@ Gw
                                     </connections>
                                 </tableView>
                             </subviews>
+                            <animations/>
                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="418" id="zck-E0-mxy"/>
                         </constraints>
+                        <animations/>
                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="4Cq-1k-8yC">
                             <rect key="frame" x="1" y="133" width="451" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
+                            <animations/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="BaW-Aq-Nh6">
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="BaW-Aq-Nh6">
                             <autoresizingMask key="autoresizingMask"/>
+                            <animations/>
                         </scroller>
                         <tableHeaderView key="headerView" id="e31-yt-wOh">
-                            <rect key="frame" x="0.0" y="0.0" width="416" height="17"/>
+                            <rect key="frame" x="0.0" y="0.0" width="416" height="23"/>
                             <autoresizingMask key="autoresizingMask"/>
+                            <animations/>
                         </tableHeaderView>
                     </scrollView>
                 </subviews>
@@ -168,6 +178,7 @@ Gw
                     <constraint firstAttribute="bottom" secondItem="VzN-Qp-l3Q" secondAttribute="bottom" constant="14" id="xmU-wJ-Ehc"/>
                     <constraint firstItem="Fqd-Of-gZ2" firstAttribute="top" secondItem="2" secondAttribute="top" constant="20" id="z5C-eQ-J6n"/>
                 </constraints>
+                <animations/>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="4"/>
