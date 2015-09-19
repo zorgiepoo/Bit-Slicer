@@ -79,7 +79,7 @@
 		 		ZGMemorySize size = toAddress - fromAddress;
 		 		void *bytes = NULL;
 
-		 		if ((success = ZGReadBytes(self->_process.processTask, fromAddress, &bytes, &size)))
+				if (ZGReadBytes(self->_process.processTask, fromAddress, &bytes, &size))
 		 		{
 		 			NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
 					success = [data writeToURL:ZGUnwrapNullableObject(savePanel.URL) atomically:YES];
