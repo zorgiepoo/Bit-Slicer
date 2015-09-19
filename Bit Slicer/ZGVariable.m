@@ -523,6 +523,15 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return [NSString stringWithFormat:@"%llu", _size];
 }
 
+- (void)setSize:(ZGMemorySize)size
+{
+	if (size > _size)
+	{
+		[self setRawValue:NULL];
+	}
+	_size = size;
+}
+
 - (void *)rawValue
 {
 	return _rawValue;

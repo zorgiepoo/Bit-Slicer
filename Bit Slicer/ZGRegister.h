@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) ZGMemorySize size;
 @property (nonatomic, readonly) ZGRegisterType registerType;
 
-- (id)initWithRegisterType:(ZGRegisterType)registerType variable:(ZGVariable *)variable pointerSize:(ZGMemorySize)pointerSize;
+- (id)initWithRegisterType:(ZGRegisterType)registerType variable:(ZGVariable *)variable;
 
 @end
 

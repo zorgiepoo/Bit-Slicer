@@ -168,7 +168,7 @@
 	{
 		[registerVariable setQualifier:_qualifier];
 		
-		ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterGeneralPurpose variable:registerVariable pointerSize:pointerSize];
+		ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterGeneralPurpose variable:registerVariable];
 		
 		NSNumber *registerDefaultType = registerDefaultsDictionary[registerVariable.name];
 		ZGVariableType dataType = (registerDefaultType == nil) ? ZGPointer : (ZGVariableType)[registerDefaultType intValue];
@@ -188,7 +188,7 @@
 		NSArray<ZGVariable *> *registerVectorVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:registersState.vectorState is64Bit:registersState.is64Bit hasAVXSupport:registersState.hasAVXSupport];
 		for (ZGVariable *registerVariable in registerVectorVariables)
 		{
-			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterVector variable:registerVariable pointerSize:pointerSize];
+			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterVector variable:registerVariable];
 			
 			NSNumber *registerDefaultType = [registerDefaultsDictionary objectForKey:registerVariable.name];
 			if (registerDefaultType != nil && [registerDefaultType intValue] != ZGByteArray)

@@ -38,15 +38,15 @@
 	ZGMemorySize _internalSize;
 }
 
-- (id)initWithRegisterType:(ZGRegisterType)registerType variable:(ZGVariable *)variable pointerSize:(ZGMemorySize)pointerSize
+- (id)initWithRegisterType:(ZGRegisterType)registerType variable:(ZGVariable *)variable
 {
 	self = [super init];
 	if (self != nil)
 	{
 		_registerType = registerType;
 		_size = variable.size;
-		// If variable's type is changed, ensure there is enough space for pointer size
-		_internalSize = MAX(pointerSize, _size);
+		// If variable's type is changed, ensure there is enough space for pointer size, double, 64-bit integers, etc
+		_internalSize = MAX(sizeof(int64_t), MAX(sizeof(double), MAX(sizeof(ZGMemorySize), _size)));
 		[self setVariable:variable];
 	}
 	return self;
