@@ -33,6 +33,7 @@
 #define ZGLocalizedStringFromAboutWindowTable(string) NSLocalizedStringFromTable((string), @"[Code] About Window", nil)
 
 #import "ZGAboutWindowController.h"
+#import "ZGAppUpdaterController.h"
 #import "ZGNullability.h"
 
 @implementation ZGAboutWindowController
@@ -75,9 +76,16 @@
 }
 
 #define VERSION_HISTORY_URL @"https://zgcoder.net/bitslicer/update/releasenotes.html"
+#define VERSION_HISTORY_ALPHA_URL @"https://zgcoder.net/bitslicer/update/releasenotes_alpha.html"
+
 - (IBAction)viewVersionHistory:(id)__unused sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:VERSION_HISTORY_URL])];
+	NSString *urlString = ![ZGAppUpdaterController runningAlpha] ? VERSION_HISTORY_URL : VERSION_HISTORY_ALPHA_URL;
+	NSURL *versionHistoryURL = [NSURL URLWithString:urlString];
+	if (versionHistoryURL != nil)
+	{
+		[[NSWorkspace sharedWorkspace] openURL:versionHistoryURL];
+	}
 }
 
 - (IBAction)toggleShowingCreditsAndAcknowledgements:(id)__unused sender
