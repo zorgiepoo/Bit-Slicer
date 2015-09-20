@@ -1,7 +1,7 @@
 # Bit Slicer
 ![Bit Slicer icon](https://dl.dropbox.com/u/10108199/bit_slicer/web_icon.png)
 
-[Download Bit Slicer 1.7.5](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.7.5.zip)
+[Download Bit Slicer 1.7.5](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.7.5_1112/Bit_Slicer_1.7.5.zip)
 
 ## Introduction
 Bit Slicer is a universal game trainer for OS X, written using Cocoa and Mach kernel APIs.
@@ -36,8 +36,8 @@ It allows you to cheat in video games by searching and modifying values such as 
 
 ## System Requirements
 * **Bit Slicer 1.7.5**: OS X 10.8 or newer
-* [Bit Slicer 1.6.2](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.6.2.zip): OS X 10.6.8, a 64-bit intel Mac
-* [Bit Slicer 1.5.2](https://bitbucket.org/zorgiepoo/bit-slicer/downloads/Bit%20Slicer%201.5.2.zip): OS X 10.6.8
+* [Bit Slicer 1.6.2](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.6.2/Bit_Slicer_1.6.2.zip): OS X 10.6.8, a 64-bit intel Mac
+* [Bit Slicer 1.5.2](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.5.2/Bit_Slicer_1.5.2.zip): OS X 10.6.8
 
 ## Support
 * Check the [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) for how to use Bit Slicer
