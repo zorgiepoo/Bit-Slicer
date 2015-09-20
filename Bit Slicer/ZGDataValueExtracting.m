@@ -159,15 +159,17 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 	{
 		const char *variableValue = [stringValue cStringUsingEncoding:NSUTF8StringEncoding];
 		tempDataSize = strlen(variableValue);
-		value = malloc((size_t)tempDataSize);
-		assert(value != NULL);
+		// pad extra character in case caller wants to use it as a null terminator
+		value = calloc(1, (size_t)tempDataSize + sizeof(char));
+		if (value == NULL) return NULL;
 		strncpy(value, variableValue, (size_t)tempDataSize);
 	}
 	else if (dataType == ZGString16)
 	{
 		tempDataSize = stringValue.length * sizeof(unichar);
-		value = malloc((size_t)tempDataSize);
-		assert(value != NULL);
+		// pad extra character in case caller wants to use it as a null terminator
+		value = calloc(1, (size_t)tempDataSize + sizeof(unichar));
+		if (value == NULL) return NULL;
 		[stringValue getCharacters:value range:NSMakeRange(0, stringValue.length)];
 	}
 	
@@ -177,7 +179,7 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 		
 		tempDataSize = bytesArray.count;
 		value = malloc((size_t)tempDataSize);
-		assert(value != NULL);
+		if (value == NULL) return NULL;
 		
 		unsigned char *valuePtr = value;
 		
