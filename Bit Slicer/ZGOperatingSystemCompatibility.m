@@ -41,7 +41,6 @@ static BOOL ZGIsOnAtLeast10Dot(NSInteger minorVersion)
 		return [processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, minorVersion, 0}];
 	}
 	
-	assert(minorVersion == 9);
 	return floor(NSFoundationVersionNumber) > NSFoundationVersionNumber10_8;
 }
 
