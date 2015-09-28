@@ -65,11 +65,8 @@
 	NSString *shortVersion = [mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
 	if (shortVersion == nil) return;
 	
-	const NSString *bundleVersionKey = (const NSString *)kCFBundleVersionKey;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wcast-qual"
-	NSString *buildNumber = [mainBundle objectForInfoDictionaryKey:(NSString *)bundleVersionKey];
-#pragma clang diagnostic pop
+	NSString *bundleVersionKey = (__bridge NSString *)kCFBundleVersionKey;
+	NSString *buildNumber = [mainBundle objectForInfoDictionaryKey:bundleVersionKey];
 	if (buildNumber == nil) return;
 	
 	[_versionAndBuildTextField setStringValue:[NSString stringWithFormat:@"%@ (%@)", shortVersion, buildNumber]];
