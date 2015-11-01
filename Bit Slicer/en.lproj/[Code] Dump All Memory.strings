@@ -2,6 +2,9 @@
 /* Filename for merged file when dumping all memory */
 "mergedFilename" = "(All) Merged";
 
+/* Filename for mach binary images information when dumping all memory */
+"machBinaryImagesFilename" = "Binary Images Info.txt";
+
 /* Prompt message that shows up in the save panel for choosing a folder to save memory dump files to */
 "savePanelPromptMessage" = "Choose a folder name to save the memory dump files to.";
 

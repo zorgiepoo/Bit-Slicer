@@ -35,9 +35,13 @@
 #import "ZGSearchProgress.h"
 #import "ZGRegion.h"
 #import "ZGProtectionDescription.h"
+#import "ZGMachBinary.h"
+#import "ZGMachBinaryInfo.h"
+#import "ZGProcess.h"
+#import "NSArrayAdditions.h"
 #import "ZGDebugLogging.h"
 
-BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <ZGSearchProgressDelegate> delegate)
+BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGProcess *process, id <ZGSearchProgressDelegate> delegate)
 {
 	NSString *mergedPath = [directory stringByAppendingPathComponent:ZGLocalizedStringFromDumpAllMemoryTable(@"mergedFilename")];
 	
@@ -48,7 +52,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 		return NO;
 	}
 	
-	NSArray<ZGRegion *> *regions = [ZGRegion submapRegionsFromProcessTask:processTask];
+	NSArray<ZGRegion *> *regions = [ZGRegion submapRegionsFromProcessTask:process.processTask];
 	
 	ZGSearchProgress *searchProgress = [[ZGSearchProgress alloc] initWithProgressType:ZGSearchProgressMemoryDumping maxProgress:regions.count];
 	
@@ -63,7 +67,7 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 		{
 			ZGMemorySize outputSize = region.size;
 			void *bytes = NULL;
-			if (ZGReadBytes(processTask, region.address, &bytes, &outputSize))
+			if (ZGReadBytes(process.processTask, region.address, &bytes, &outputSize))
 			{
 				NSString *regionPath = [directory stringByAppendingPathComponent:[NSString stringWithFormat:@"(%lu) 0x%llX - 0x%llX %@", (unsigned long)regionNumber, region.address, region.address + outputSize, ZGProtectionDescription(region.protection)]];
 				
@@ -95,6 +99,27 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <
 	}
 	
 	fclose(mergedFile);
+	
+	if (!searchProgress.shouldCancelSearch)
+	{
+		NSString *imagesPath = [directory stringByAppendingPathComponent:ZGLocalizedStringFromDumpAllMemoryTable(@"machBinaryImagesFilename")];
+		
+		NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
+		NSError *machBinaryImagesError = nil;
+		
+		NSArray<NSString *> *header = @[[@"#" stringByAppendingString:[@[@"Path", @"Start", @"End"] componentsJoinedByString:@"\t"]]];
+		if (![[[header arrayByAddingObjectsFromArray:[machBinaries zgMapUsingBlock:^(ZGMachBinary *machBinary) {
+			NSString *filePath = [machBinary filePathInProcess:process];
+			
+			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:process];
+			NSRange imageRange = machBinaryInfo.totalSegmentRange;
+			
+			return [@[filePath, [NSString stringWithFormat:@"0x%lX", imageRange.location], [NSString stringWithFormat:@"0x%lX", imageRange.location + imageRange.length]] componentsJoinedByString:@"\t"];
+		}]] componentsJoinedByString:@"\n"] writeToFile:imagesPath atomically:YES encoding:NSUTF8StringEncoding error:&machBinaryImagesError])
+		{
+			NSLog(@"Failed to write mach binary images info file at %@ with error: %@", imagesPath, machBinaryImagesError);
+		}
+	}
 	
 	return YES;
 }

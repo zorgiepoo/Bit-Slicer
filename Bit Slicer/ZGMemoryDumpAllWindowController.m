@@ -107,7 +107,7 @@
 			}
 			 
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-				BOOL dumpedAllData = ZGDumpAllDataToDirectory(saveURLPath, process.processTask, self);
+				BOOL dumpedAllData = ZGDumpAllDataToDirectory(saveURLPath, process, self);
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					if (!self->_searchProgress.shouldCancelSearch)

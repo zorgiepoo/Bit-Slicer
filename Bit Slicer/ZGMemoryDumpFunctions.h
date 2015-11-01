@@ -34,10 +34,12 @@
 #import "ZGSearchProgressDelegate.h"
 #import "ZGMemoryTypes.h"
 
+@class ZGProcess;
+
 NS_ASSUME_NONNULL_BEGIN
 
 #define ZGLocalizedStringFromDumpAllMemoryTable(string) NSLocalizedStringFromTable((string), @"[Code] Dump All Memory", nil)
 
-BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGMemoryMap processTask, id <ZGSearchProgressDelegate> _Nullable delegate);
+BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGProcess *process, id <ZGSearchProgressDelegate> _Nullable delegate);
 
 NS_ASSUME_NONNULL_END
