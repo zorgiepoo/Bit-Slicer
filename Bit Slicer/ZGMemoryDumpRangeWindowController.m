@@ -69,7 +69,11 @@
 		[NSApp endSheet:window];
 		[window close];
 		
+		ZGProcess *process = ZGUnwrapNullableObject(_process);
+		
 		NSSavePanel *savePanel = NSSavePanel.savePanel;
+		savePanel.nameFieldStringValue = [process.name stringByAppendingFormat:@" 0x%llX - 0x%llX", fromAddress, toAddress];
+		
 		[savePanel
 		 beginSheetModalForWindow:ZGUnwrapNullableObject(_parentWindow)
 		 completionHandler:^(NSInteger result) {
@@ -79,7 +83,7 @@
 		 		ZGMemorySize size = toAddress - fromAddress;
 		 		void *bytes = NULL;
 
-				if (ZGReadBytes(self->_process.processTask, fromAddress, &bytes, &size))
+				if (ZGReadBytes(process.processTask, fromAddress, &bytes, &size))
 		 		{
 		 			NSData *data = [NSData dataWithBytes:bytes length:(NSUInteger)size];
 					success = [data writeToURL:ZGUnwrapNullableObject(savePanel.URL) atomically:YES];

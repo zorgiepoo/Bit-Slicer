@@ -55,6 +55,7 @@
 - (void)attachToWindow:(NSWindow *)parentWindow withProcess:(ZGProcess *)process
 {
 	NSSavePanel *savePanel = NSSavePanel.savePanel;
+	savePanel.nameFieldStringValue = process.name;
 	savePanel.message = ZGLocalizedStringFromDumpAllMemoryTable(@"savePanelPromptMessage");
 	
 	[savePanel beginSheetModalForWindow:parentWindow completionHandler:^(NSInteger result) {
