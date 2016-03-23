@@ -388,9 +388,9 @@ static inline unsigned long ll2l(unsigned long long val) { assert(val <= ULONG_M
 static inline CGFloat ld2f(long double val) {
 #if ! NDEBUG
      if (isfinite(val)) {
-        assert(val <= CGFLOAT_MAX);
-        assert(val >= -CGFLOAT_MAX);
-        if ((val > 0 && val < CGFLOAT_MIN) || (val < 0 && val > -CGFLOAT_MIN)) {
+        assert(val <= (long double)CGFLOAT_MAX);
+        assert(val >= -(long double)CGFLOAT_MAX);
+        if ((val > 0 && val < (long double)CGFLOAT_MIN) || (val < 0.0L && val > -(long double)CGFLOAT_MIN)) {
             NSLog(@"Warning - conversion of long double %Lf to CGFloat will result in the non-normal CGFloat %f", val, (CGFloat)val);
         }
      }

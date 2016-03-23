@@ -347,7 +347,11 @@
 			{
 				ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
 				ZGScriptManager *scriptManager = documentWindowController.scriptManager;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+				// This code will only be triggered on 10.9 due to NSUserNotificationActivationTypeReplied, so ignore warning about notification.response
 				[scriptManager handleScriptPromptHash:scriptPromptHash withUserNotificationReply:notification.response.string];
+#pragma clang diagnostic pop
 			}
 		}
 	}

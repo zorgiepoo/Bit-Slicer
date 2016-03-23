@@ -586,7 +586,7 @@ static ZGBreakPointController *gBreakPointController;
 	BOOL retrievedRegisterEntries = NO;
 	BOOL retrievedVectorState = NO;
 	bool hasAVXSupport = NO;
-	zg_x86_vector_state_t vectorState;
+	zg_x86_vector_state_t vectorState = {};
 	
 	// We should notify delegates if a breakpoint hits after we modify thread states
 	for (ZGBreakPoint *breakPoint in breakPointsToNotify)

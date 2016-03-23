@@ -655,7 +655,7 @@
 	HFFPRange displayedLineRange = _textView.controller.displayedLineRange;
 	
 	// the line we want to jump to should be in the middle of the view
-	[_textView.controller scrollByLines:offsetLine - displayedLineRange.location - displayedLineRange.length / 2.0];
+	[_textView.controller scrollByLines:offsetLine - displayedLineRange.location - displayedLineRange.length / 2.0L];
 	
 	if (selectionLength > 0)
 	{

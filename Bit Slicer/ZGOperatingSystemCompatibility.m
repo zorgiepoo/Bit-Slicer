@@ -38,7 +38,10 @@ static BOOL ZGIsOnAtLeast10Dot(NSInteger minorVersion)
 	// This selector exists in at least 10.10 (and possibly even 10.9 as a private API but we shouldn't rely on that)
 	if ([processInfo respondsToSelector:@selector(isOperatingSystemAtLeastVersion:)])
 	{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 		return [processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, minorVersion, 0}];
+#pragma clang diagnostic pop
 	}
 	
 	return floor(NSFoundationVersionNumber) > NSFoundationVersionNumber10_8;

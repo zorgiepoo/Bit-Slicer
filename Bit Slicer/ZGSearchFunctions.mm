@@ -674,7 +674,7 @@ ZGSearchResults *ZGSearchForIntegers(ZGMemoryMap processTask, ZGSearchData *sear
 template <typename T>
 bool ZGFloatingPointEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue)
 {
-	return ABS(*(static_cast<T *>(variableValue)) - *(static_cast<T *>(compareValue))) <= searchData->_epsilon;
+	return ABS(*(static_cast<T *>(variableValue)) - *(static_cast<T *>(compareValue))) <= static_cast<T>(searchData->_epsilon);
 }
 
 template <typename T>

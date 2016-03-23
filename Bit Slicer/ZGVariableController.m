@@ -53,6 +53,7 @@
 #import "ZGVariableDataInfo.h"
 #import "ZGDataValueExtracting.h"
 #import "ZGProtectionDescription.h"
+#import "ZGOperatingSystemCompatibility.h"
 
 #define ZGLocalizedStringFromVariableActionsTable(string) NSLocalizedStringFromTable((string), @"[Code] Variable Actions", nil)
 
@@ -92,13 +93,19 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	BOOL hasFrozenVariable = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }];
 
-	if (hasFrozenVariable && _frozenActivity == nil && [[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)]	)
+	if (hasFrozenVariable && _frozenActivity == nil && ZGIsOnMavericksOrLater())
 	{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 		_frozenActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Freezing Variables"];
+#pragma clang diagnostic pop
 	}
 	else if (!hasFrozenVariable && _frozenActivity != nil)
 	{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_frozenActivity];
+#pragma clang diagnostic pop
 		_frozenActivity = nil;
 	}
 }

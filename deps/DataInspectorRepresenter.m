@@ -308,7 +308,7 @@ static id floatingPointDescription(const void *bytes, NSUInteger length, enum En
             assert(sizeof temp.f == sizeof temp.i);
             temp.i = *(const uint32_t *)bytes;
             if (endianness != eNativeEndianness) temp.i = (uint32_t)reverse(temp.i, sizeof(float));
-            return [NSString stringWithFormat:@"%f", temp.f];
+            return [NSString stringWithFormat:@"%f", (double)temp.f];
         }
         case sizeof(double):
         {

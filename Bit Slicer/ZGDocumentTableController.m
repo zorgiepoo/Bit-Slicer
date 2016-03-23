@@ -236,7 +236,7 @@
 	
 	BOOL needsToReloadTable = NO;
 	BOOL isOccluded = windowController.isOccluded;
-	NSRange visibleRowsRange;
+	NSRange visibleRowsRange = {};
 	
 	if (!isOccluded)
 	{

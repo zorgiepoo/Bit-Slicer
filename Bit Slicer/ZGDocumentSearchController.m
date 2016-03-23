@@ -769,9 +769,12 @@
 	[self prepareTask];
 	
 	id searchDataActivity = nil;
-	if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+	if (ZGIsOnMavericksOrLater())
 	{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 		searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
+#pragma clang diagnostic pop
 	}
 	
 	NSArray<ZGVariable *> *oldVariables = _documentData.variables;
@@ -787,7 +790,10 @@
 			
 			if (searchDataActivity != nil)
 			{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
+#pragma clang diagnostic pop
 			}
 			
 			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];

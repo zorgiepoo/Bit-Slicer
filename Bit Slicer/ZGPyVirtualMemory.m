@@ -297,7 +297,7 @@ static PyTypeObject VirtualMemoryType =
 	[self setObject:NULL];
 }
 
-#define VirtualMemory_read(type, typeFormat, functionName) \
+#define VirtualMemory_read(type, typePromotion, typeFormat, functionName) \
 static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *args) \
 { \
 	PyObject *retValue = NULL; \
@@ -308,7 +308,7 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 		ZGMemorySize size = sizeof(type); \
 		if (ZGReadBytes(self->processTask, memoryAddress, &bytes, &size)) \
 		{ \
-			retValue =  Py_BuildValue(typeFormat, *(type *)bytes); \
+			retValue =  Py_BuildValue(typeFormat, (typePromotion)*(type *)bytes); \
 			ZGFreeBytes(bytes, size); \
 		} \
 		else \
@@ -319,16 +319,16 @@ static PyObject *VirtualMemory_##functionName(VirtualMemory *self, PyObject *arg
 	return retValue; \
 }
 
-VirtualMemory_read(int8_t, "b", readInt8)
-VirtualMemory_read(uint8_t, "B", readUInt8)
-VirtualMemory_read(int16_t, "h", readInt16)
-VirtualMemory_read(uint16_t, "H", readUInt16)
-VirtualMemory_read(int32_t, "i", readInt32)
-VirtualMemory_read(uint32_t, "I", readUInt32)
-VirtualMemory_read(int64_t, "L", readInt64)
-VirtualMemory_read(uint64_t, "K", readUInt64)
-VirtualMemory_read(float, "f", readFloat)
-VirtualMemory_read(double, "d", readDouble)
+VirtualMemory_read(int8_t, int8_t, "b", readInt8)
+VirtualMemory_read(uint8_t, uint8_t, "B", readUInt8)
+VirtualMemory_read(int16_t, int16_t, "h", readInt16)
+VirtualMemory_read(uint16_t, uint16_t, "H", readUInt16)
+VirtualMemory_read(int32_t, int32_t, "i", readInt32)
+VirtualMemory_read(uint32_t, uint32_t, "I", readUInt32)
+VirtualMemory_read(int64_t, int64_t, "L", readInt64)
+VirtualMemory_read(uint64_t, uint64_t, "K", readUInt64)
+VirtualMemory_read(float, double, "f", readFloat)
+VirtualMemory_read(double, double, "d", readDouble)
 
 static PyObject *VirtualMemory_readPointer(VirtualMemory *self, PyObject *args)
 {

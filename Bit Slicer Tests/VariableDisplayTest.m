@@ -280,7 +280,7 @@ static double ZGSwapDoubleHostToBig(double value)
 			
 			for (ZGMemorySize pointerSize = 4; pointerSize <= 8; pointerSize += 4)
 			{
-				XCTAssertEqualWithAccuracy([[[[ZGVariable alloc] initWithValue:(double []){byteOrderFunction(0.0)} size:0 address:0x0 type:type qualifier:qualifier pointerSize:pointerSize byteOrder:byteOrder] stringValue] floatValue], 0.0f, 0.01);
+				XCTAssertEqualWithAccuracy([[[[ZGVariable alloc] initWithValue:(double []){byteOrderFunction(0.0)} size:0 address:0x0 type:type qualifier:qualifier pointerSize:pointerSize byteOrder:byteOrder] stringValue] floatValue], 0.0, 0.01);
 				
 				XCTAssertEqualWithAccuracy([[[[ZGVariable alloc] initWithValue:(double []){byteOrderFunction(35.0)} size:0 address:0x0 type:type qualifier:qualifier pointerSize:pointerSize byteOrder:byteOrder] stringValue] doubleValue], 35.0, 0.01);
 				

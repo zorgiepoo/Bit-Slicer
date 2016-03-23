@@ -76,7 +76,7 @@
 		726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D319606E2900A6AD40 /* Edit Description Dialog.xib */; };
 		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
-		7275F8A51BA4756100FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; settings = {ASSET_TAGS = (); }; };
+		7275F8A51BA4756100FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; };
 		7275F8A61BA4BD7200FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
@@ -1540,7 +1540,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0730;
 				TargetAttributes = {
 					77E2BBA318FD88A700E41FA0 = {
 						TestTargetID = 8D15AC270486D014006FF6A4;
@@ -2410,6 +2410,7 @@
 					"-Wno-documentation-unknown-command",
 					"-Wno-c++98-compat-pedantic",
 					"-Wno-reserved-id-macro",
+					"-Wno-partial-availability",
 					"-Werror",
 				);
 				WRAPPER_EXTENSION = xctest;
@@ -2502,6 +2503,7 @@
 					"-Wno-documentation-unknown-command",
 					"-Wno-c++98-compat-pedantic",
 					"-Wno-reserved-id-macro",
+					"-Wno-partial-availability",
 					"-Werror",
 				);
 				WRAPPER_EXTENSION = xctest;
@@ -2549,13 +2551,11 @@
 					"$(PROJECT_DIR)/deps",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
-				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
@@ -2651,12 +2651,10 @@
 					"$(SRCROOT)/deps",
 					"$(PROJECT_DIR)/deps",
 				);
-				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
-				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;

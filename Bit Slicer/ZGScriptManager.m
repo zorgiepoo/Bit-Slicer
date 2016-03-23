@@ -54,6 +54,7 @@
 #import "ZGScriptPrompt.h"
 #import "ZGScriptPromptWindowController.h"
 #import "ZGNullability.h"
+#import "ZGOperatingSystemCompatibility.h"
 
 #import "structmember.h"
 
@@ -547,9 +548,12 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		PyObject_SetAttrString(script.module, "debug", debuggerInstance.object);
 		
 		id scriptInitActivity = nil;
-		if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+		if (ZGIsOnMavericksOrLater())
 		{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 			scriptInitActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script initializer"];
+#pragma clang diagnostic pop
 		}
 		
 		[self setUpStackDepthLimit];
@@ -558,7 +562,10 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		
 		if (scriptInitActivity != nil)
 		{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 			[[NSProcessInfo processInfo] endActivity:scriptInitActivity];
+#pragma clang diagnostic pop
 		}
 		
 		BOOL stillInitialized = (BOOL)Py_IsInitialized();
@@ -600,9 +607,12 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 			if (self->_scriptTimer != NULL)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
-					if ([[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)])
+					if (ZGIsOnMavericksOrLater())
 					{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 						self->_scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script execute timer"];
+#pragma clang diagnostic pop
 					}
 				});
 				
@@ -666,7 +676,10 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 						dispatch_async(dispatch_get_main_queue(), ^{
 							if (self->_scriptActivity != nil)
 							{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 								[[NSProcessInfo processInfo] endActivity:(id _Nonnull)self->_scriptActivity];
+#pragma clang diagnostic pop
 								self->_scriptActivity = nil;
 							}
 							

@@ -31,6 +31,7 @@
  */
 
 #import <XCTest/XCTest.h>
+
 #import "ZGVirtualMemory.h"
 #import "ZGSearchFunctions.h"
 #import "ZGSearchData.h"
@@ -393,12 +394,12 @@
 	ZGMemoryAddress address = [self allocateDataIntoProcess];
 	float value = -0.036687f;
 	ZGSearchData *searchData = [self searchDataFromBytes:&value size:sizeof(value) address:address alignment:sizeof(value)];
-	searchData.epsilon = 0.0000001f;
+	searchData.epsilon = 0.0000001;
 	
 	ZGSearchResults *results = ZGSearchForData(_processTask, searchData, nil, ZGFloat, 0, ZGEquals);
 	XCTAssertEqual(results.addressCount, 1U);
 	
-	searchData.epsilon = 0.01f;
+	searchData.epsilon = 0.01;
 	ZGSearchResults *resultsWithBigEpsilon = ZGSearchForData(_processTask, searchData, nil, ZGFloat, 0, ZGEquals);
 	XCTAssertEqual(resultsWithBigEpsilon.addressCount, 5U);
 	
@@ -412,7 +413,7 @@
 	ZGSearchResults *bigEndianResults = ZGSearchForData(_processTask, searchData, nil, ZGFloat, 0, ZGEquals);
 	XCTAssertEqual(bigEndianResults.addressCount, 1U);
 	
-	searchData.epsilon = 100.0f;
+	searchData.epsilon = 100.0;
 	ZGSearchResults *bigEndianResultsWithBigEpsilon = ZGSearchForData(_processTask, searchData, nil, ZGFloat, 0, ZGEquals);
 	XCTAssertEqual(bigEndianResultsWithBigEpsilon.addressCount, 2U);
 }

@@ -456,7 +456,7 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 			case ZGFloat:
 			{
 				float value = needsByteSwapping ? CFConvertFloat32SwappedToHost(*(CFSwappedFloat32 *)rawValue) : *(float *)rawValue;
-				_stringValue = [NSString stringWithFormat:@"%f", value];
+				_stringValue = [NSString stringWithFormat:@"%f", (double)value];
 				break;
 			}
 			case ZGDouble:

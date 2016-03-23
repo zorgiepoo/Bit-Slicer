@@ -61,6 +61,7 @@
 #import "ZGDataValueExtracting.h"
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGNullability.h"
+#import "ZGOperatingSystemCompatibility.h"
 
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
@@ -1742,9 +1743,12 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (void)startBreakPointActivity
 {
-	if (_breakPointActivity == nil && [[NSProcessInfo processInfo] respondsToSelector:@selector(beginActivityWithOptions:reason:)]	)
+	if (_breakPointActivity == nil && ZGIsOnMavericksOrLater())
 	{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 		_breakPointActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityBackground reason:@"Software Breakpoint"];
+#pragma clang diagnostic pop
 	}
 }
 
@@ -1752,7 +1756,10 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	if (_breakPointActivity != nil)
 	{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_breakPointActivity];
+#pragma clang diagnostic pop
 		_breakPointActivity = nil;
 	}
 }
