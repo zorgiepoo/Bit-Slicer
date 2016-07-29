@@ -162,6 +162,9 @@
 	
 	NSMutableArray<ZGRunningProcess *> *newRunningProcesses = [[NSMutableArray alloc] init];
 	
+	// Show all processes if we are root
+	BOOL isRoot = (geteuid() == 0);
+	
 	const size_t processCount = processListActualSize / sizeof(*processList);
 	for (size_t processIndex = 0; processIndex < processCount; processIndex++)
 	{
@@ -172,7 +175,7 @@
 		
 		// We want user processes, not zombies!
 		BOOL isBeingForked = (processInfo.kp_proc.p_stat & SIDL) != 0;
-		if (processIdentifier != -1 && uid == getuid() && !isBeingForked)
+		if (processIdentifier != -1 && (uid == getuid() || isRoot) && !isBeingForked)
 		{
 			cpu_type_t cpuType = 0;
 			size_t cpuTypeSize = sizeof(cpuType);
