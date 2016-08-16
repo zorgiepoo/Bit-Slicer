@@ -9,7 +9,11 @@
 #ifndef SUSTANDARDVERSIONCOMPARATOR_H
 #define SUSTANDARDVERSIONCOMPARATOR_H
 
+#if __has_feature(modules)
+@import Foundation;
+#else
 #import <Foundation/Foundation.h>
+#endif
 #import "SUExport.h"
 #import "SUVersionComparisonProtocol.h"
 
@@ -23,8 +27,15 @@
 SU_EXPORT @interface SUStandardVersionComparator : NSObject <SUVersionComparison>
 
 /*!
-    Returns a singleton instance of the comparator.
+    Initializes a new instance of the standard version comparator.
 */
+- (instancetype)init;
+
+/*!
+    Returns a singleton instance of the comparator.
+
+    It is usually preferred to alloc/init new a comparator instead.
+ */
 + (SUStandardVersionComparator *)defaultComparator;
 
 /*!

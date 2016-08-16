@@ -6,7 +6,12 @@
 //  Copyright 2009 Elgato Systems GmbH. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#if __has_feature(modules)
+@import Foundation;
+#else
+#import <Foundation/Foundation.h>
+#endif
+
 #import "SUExport.h"
 
 /*!

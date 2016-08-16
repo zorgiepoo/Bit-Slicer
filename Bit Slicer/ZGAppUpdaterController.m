@@ -33,6 +33,7 @@
 #import "ZGAppUpdaterController.h"
 
 #import <Sparkle/Sparkle.h>
+#import "ZGNullability.h"
 
 #define ZG_CHECK_FOR_UPDATES @"SUEnableAutomaticChecks"
 #define ZG_CHECK_FOR_ALPHA_UPDATES @"ZG_CHECK_FOR_ALPHA_UPDATES_2"
@@ -45,7 +46,7 @@
 
 @implementation ZGAppUpdaterController
 {
-	SUUpdater * _Nonnull _updater;
+	SPUUpdater * _Nonnull _updater;
 }
 
 + (BOOL)runningAlpha
@@ -71,8 +72,20 @@
 	{
 		[self reloadValuesFromDefaults];
 		
-		_updater = [[SUUpdater alloc] init];
+		NSBundle *updateBundle = [NSBundle mainBundle];
+		
+		id<SPUUserDriver> userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:updateBundle applicationBundle:updateBundle delegate:nil];
+		_updater = [[SPUUpdater alloc] initWithHostBundle:updateBundle applicationBundle:updateBundle userDriver:userDriver delegate:nil];
+		
 		[self updateFeedURL];
+		
+		NSError *updateError = nil;
+		if (![_updater startUpdater:&updateError])
+		{
+			NSLog(@"Error: Failed to start updater with error: %@", updateError);
+			// I don't want users stranded on old versions
+			abort();
+		}
 	}
 	return self;
 }
@@ -86,7 +99,7 @@
 
 - (void)updateFeedURL
 {
-	[_updater setFeedURL:[NSURL URLWithString:_checksForAlphaUpdates ? ALPHA_APPCAST_URL : APPCAST_URL]];
+	[_updater setFeedURL:ZGUnwrapNullableObject([NSURL URLWithString:_checksForAlphaUpdates ? ALPHA_APPCAST_URL : APPCAST_URL])];
 }
 
 - (void)setChecksForUpdates:(BOOL)checksForUpdates
@@ -116,7 +129,7 @@
 
 - (void)checkForUpdates
 {
-	[_updater checkForUpdates:nil];
+	[_updater checkForUpdates];
 }
 
 @end
