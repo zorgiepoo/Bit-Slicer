@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16A322" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDebuggerController">
@@ -97,11 +97,11 @@
                                 <rect key="frame" x="0.0" y="0.0" width="840" height="285"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <clipView key="contentView" focusRingType="none" id="QCs-yF-iGW">
-                                    <rect key="frame" x="0.0" y="17" width="840" height="268"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="840" height="285"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA" customClass="ZGTableView">
-                                            <rect key="frame" x="0.0" y="0.0" width="840" height="19"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="840" height="268"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -179,7 +179,6 @@
                                             </connections>
                                         </tableView>
                                     </subviews>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="Uyj-zZ-YCW">
                                     <rect key="frame" x="0.0" y="269" width="840" height="16"/>
@@ -258,8 +257,8 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" id="V6x-9g-MBo">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="81" height="25"/>
-                        <size key="maxSize" width="195" height="25"/>
+                        <size key="minSize" width="81" height="27"/>
+                        <size key="maxSize" width="195" height="27"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="fpR-fU-ajG">
                             <rect key="frame" x="0.0" y="14" width="145" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -275,10 +274,10 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="1A9DCB4E-799C-4634-B1F6-CB15382E7DF9" label="Continue" paletteLabel="Continue" image="continue" id="KQE-fj-qqG">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="39" height="25"/>
-                        <size key="maxSize" width="39" height="25"/>
+                        <size key="minSize" width="41" height="27"/>
+                        <size key="maxSize" width="41" height="27"/>
                         <button key="view" verticalHuggingPriority="750" id="2Xc-JX-DhY">
-                            <rect key="frame" x="9" y="14" width="39" height="25"/>
+                            <rect key="frame" x="8" y="14" width="39" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="continue" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pHW-hV-Whn">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

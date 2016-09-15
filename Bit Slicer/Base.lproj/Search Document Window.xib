@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16A322" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDocumentWindowController">
@@ -296,7 +296,6 @@
                                     </connections>
                                 </tableView>
                             </subviews>
-                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
                         <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="pdf-AY-ffZ">
                             <rect key="frame" x="1" y="222" width="720" height="16"/>
@@ -637,8 +636,8 @@
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="160" height="25"/>
-                        <size key="maxSize" width="160" height="26"/>
+                        <size key="minSize" width="162" height="27"/>
+                        <size key="maxSize" width="162" height="27"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="1ts-DF-nZQ">
                             <rect key="frame" x="0.0" y="14" width="160" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -654,8 +653,8 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="41602B2F-FA2E-443A-88AC-9DAD73A95550" label="Data Type" paletteLabel="Data Type" id="70m-RL-vim">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="136" height="25"/>
-                        <size key="maxSize" width="143" height="26"/>
+                        <size key="minSize" width="138" height="27"/>
+                        <size key="maxSize" width="143" height="27"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="wMv-KV-nmE">
                             <rect key="frame" x="0.0" y="14" width="136" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -688,8 +687,8 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="A5AF15E6-88A9-4678-ACAF-0F6E1D87D554" label="Operator" paletteLabel="Operator" id="LxQ-Vs-KYQ">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="109" height="25"/>
-                        <size key="maxSize" width="125" height="26"/>
+                        <size key="minSize" width="111" height="27"/>
+                        <size key="maxSize" width="125" height="27"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="Vpc-Jb-WRb">
                             <rect key="frame" x="0.0" y="14" width="109" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
@@ -707,8 +706,8 @@
                     <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="AUv-ym-Pvh"/>
                     <toolbarItem implicitItemIdentifier="A2B7475C-29AA-4716-9400-D2EF29F1ED5A" label="Store Values" paletteLabel="Store Values" image="container" id="q4V-IG-gxK">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="39" height="25"/>
-                        <size key="maxSize" width="39" height="25"/>
+                        <size key="minSize" width="41" height="27"/>
+                        <size key="maxSize" width="41" height="27"/>
                         <button key="view" verticalHuggingPriority="750" id="evf-rf-Ae5">
                             <rect key="frame" x="17" y="14" width="39" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -749,7 +748,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="6az-i4-Aaj"/>
             </connections>
-            <point key="canvasLocation" x="272" y="426.5"/>
+            <point key="canvasLocation" x="486" y="448"/>
         </window>
         <customView id="053-lf-ydX" userLabel="Flags Accessory">
             <rect key="frame" x="0.0" y="0.0" width="174" height="25"/>
