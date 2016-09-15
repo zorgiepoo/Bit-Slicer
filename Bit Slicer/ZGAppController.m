@@ -371,22 +371,10 @@
 	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:ISSUES_TRACKER_URL])];
 }
 
-#define FORUMS_URL @"http://portingteam.com/forum/157-bit-slicer/"
-- (IBAction)visitForums:(id)__unused sender
-{
-	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:FORUMS_URL])];
-}
-
 #define FEEDBACK_EMAIL @"zorgiepoo@gmail.com"
 - (IBAction)sendFeedback:(id)__unused sender
 {
 	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:[@"mailto:" stringByAppendingString:FEEDBACK_EMAIL]])];
-}
-
-#define DONATION_URL @"https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A3DTDV2F3VE5G&lc=US&item_name=Bit%20Slicer%20App&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"
-- (IBAction)openDonationURL:(id)__unused sender
-{
-	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:DONATION_URL])];
 }
 
 @end
