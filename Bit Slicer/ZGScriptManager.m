@@ -616,8 +616,10 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 					}
 				});
 				
-				dispatch_source_set_timer(self->_scriptTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC * 3 / 100, NSEC_PER_SEC * 1 / 100);
-				dispatch_source_set_event_handler(self->_scriptTimer, ^{
+				dispatch_source_t scriptTimer = self->_scriptTimer;
+				
+				dispatch_source_set_timer(scriptTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC * 3 / 100, NSEC_PER_SEC * 1 / 100);
+				dispatch_source_set_event_handler(scriptTimer, ^{
 					for (ZGPyScript *runningScript in [self runningScripts])
 					{
 						[self->_scriptingInterpreter dispatchAsync:^{
@@ -628,7 +630,7 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 						}];
 					}
 				});
-				dispatch_resume(self->_scriptTimer);
+				dispatch_resume(scriptTimer);
 			}
 		}
 		

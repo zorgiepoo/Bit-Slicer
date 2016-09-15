@@ -187,7 +187,7 @@ static ZGBreakPointController *gBreakPointController;
 			BOOL shouldKeepTimer = [[self breakPoints] zgHasObjectMatchingCondition:^(ZGBreakPoint *watchPoint){ return (BOOL)(watchPoint.type != ZGBreakPointWatchData && watchPoint != breakPoint); }];
 			if (!shouldKeepTimer)
 			{
-				dispatch_source_cancel(self->_watchPointTimer);
+				dispatch_source_cancel((dispatch_source_t _Nonnull)self->_watchPointTimer);
 				self->_watchPointTimer = NULL;
 			}
 		}
@@ -956,8 +956,10 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 
 		if (self->_watchPointTimer == NULL && (self->_watchPointTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())) != NULL)
 		{
-			dispatch_source_set_timer(self->_watchPointTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC / 2, NSEC_PER_SEC / 10);
-			dispatch_source_set_event_handler(self->_watchPointTimer, ^{
+			dispatch_source_t watchPointTimer = self->_watchPointTimer;
+			
+			dispatch_source_set_timer(watchPointTimer, DISPATCH_TIME_NOW, NSEC_PER_SEC / 2, NSEC_PER_SEC / 10);
+			dispatch_source_set_event_handler(watchPointTimer, ^{
 				for (ZGBreakPoint *existingBreakPoint in [self breakPoints])
 				{
 					if (existingBreakPoint.type != ZGBreakPointWatchData)
@@ -971,7 +973,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 					}
 				}
 			});
-			dispatch_resume(self->_watchPointTimer);
+			dispatch_resume(watchPointTimer);
 		}
 
 		[self addBreakPoint:breakPoint];
