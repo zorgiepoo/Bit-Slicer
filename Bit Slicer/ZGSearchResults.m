@@ -57,7 +57,7 @@
 	
 	if (_addressCount == 0)
 	{
-		_resultSets = nil;
+		_resultSets = @[];
 	}
 }
 

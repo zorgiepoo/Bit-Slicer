@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cleanup;
 
 @property (nonatomic, weak, readonly) ZGScriptManager *scriptManager;
-@property (nonatomic, readonly) PyObject *object;
+@property (nonatomic, readonly, nullable) PyObject *object;
 
 @end
 

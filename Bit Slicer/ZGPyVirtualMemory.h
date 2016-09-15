@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable id)initWithProcess:(ZGProcess *)process virtualMemoryException:(PyObject *)virtualMemoryException;
 - (nullable id)initWithProcessNoCopy:(ZGProcess *)process virtualMemoryException:(PyObject *)virtualMemoryException;
 
-@property (nonatomic, readonly) PyObject *object;
+@property (nonatomic, readonly, nullable) PyObject *object;
 @property (nonatomic, readonly, nullable) ZGSearchProgress *searchProgress; // main queue property
 
 @end

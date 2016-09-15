@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)initWithInternalProcessName:(NSString *)internalProcessName address:(ZGMemoryAddress)address condition:(NSString *)condition compiledCondition:(PyObject *)compiledCondition;
 
 @property (nonatomic, copy) NSString *condition;
-@property (nonatomic) PyObject *compiledCondition;
+@property (nonatomic, nullable) PyObject *compiledCondition;
 @property (nonatomic, readonly) NSString *internalProcessName;
 @property (nonatomic, readonly) ZGMemoryAddress address;
 

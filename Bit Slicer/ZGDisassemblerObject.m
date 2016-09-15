@@ -99,8 +99,8 @@ static void disassemblerTranslator(ud_t *object)
 
 - (void)dealloc
 {
-	free(_object); _object = NULL;
-	free(_bytes); _bytes = NULL;
+	free(_object);
+	free(_bytes);
 }
 
 - (NSArray<ZGInstruction *> *)readInstructions

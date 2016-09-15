@@ -56,7 +56,7 @@
 	if (self != nil)
 	{
 		_processIdentifier = processIdentifier;
-		_internalName = [name copy];
+		_internalName = (name != nil) ? [name copy] : [NSString stringWithFormat:@"%d", processIdentifier];
 		_is64Bit = is64Bit;
 	}
 	return self;

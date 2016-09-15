@@ -670,10 +670,10 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		{
 			if (_scriptTimerQueue != NULL)
 			{
-				dispatch_async(_scriptTimerQueue, ^{
+				dispatch_async((_Nonnull dispatch_queue_t)_scriptTimerQueue, ^{
 					if (self->_scriptTimer != NULL)
 					{
-						dispatch_source_cancel(self->_scriptTimer);
+						dispatch_source_cancel((_Nonnull dispatch_source_t)self->_scriptTimer);
 						self->_scriptTimer = NULL;
 						dispatch_async(dispatch_get_main_queue(), ^{
 							if (self->_scriptActivity != nil)

@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)registerHotKey:(ZGHotKey *)hotKey delegate:(id <ZGHotKeyDelegate>)delegate;
 
 - (BOOL)unregisterHotKey:(ZGHotKey *)hotKey;
-- (ZGHotKey *)unregisterHotKeyWithInternalID:(UInt32)internalID;
+- (ZGHotKey * _Nullable)unregisterHotKeyWithInternalID:(UInt32)internalID;
 - (NSArray<ZGHotKey *> *)unregisterHotKeysWithDelegate:(id <ZGHotKeyDelegate>)delegate;
 
 - (BOOL)isRegisteredHotKey:(ZGHotKey *)hotKey;
