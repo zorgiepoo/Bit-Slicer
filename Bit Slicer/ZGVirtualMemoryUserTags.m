@@ -48,7 +48,7 @@ case value: \
 		result = description; \
 		break;
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_11_4
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_12
 #warning Need to update the user tag descriptions
 #endif
 
@@ -116,6 +116,12 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_RAWCAMERA, @"RAW Camera");
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CORPSEINFO, @"Corpse Info");
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_ASL, @"Apple System Log (ASL)");
+			
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SWIFT_RUNTIME);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SWIFT_METADATA);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_DHMM);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SCENEKIT);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SKYWALK);
 	}
 	
 	return userTagDescription;
