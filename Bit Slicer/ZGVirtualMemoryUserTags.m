@@ -49,7 +49,7 @@ case value: \
 		break;
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_11_4
-#error Need to update the user tag descriptions
+#warning Need to update the user tag descriptions
 #endif
 
 NSString *ZGUserTagDescription(uint32_t userTag)
