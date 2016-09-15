@@ -6,7 +6,12 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if __has_feature(modules)
+@import Foundation;
+#else
 #import <Foundation/Foundation.h>
+#endif
+
 #import "SPUStatusCompletionResults.h"
 #import "SUExport.h"
 
@@ -20,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  This protocol is used for implementing a user interface for the Sparkle updater. Sparkle's internal drivers tell
  an object that implements this protocol what actions to take and show to the user.
  
- Every method in this protocol has a void return type and can optionally take a single parameter block, which waits for
+ Every method in this protocol is required (i.e, not optional) and has a void return type and can optionally take a single parameter block, which waits for
  a response back from the user driver. Note that every parameter block, or reply, *must* be responded to eventually -
  that is, none can be ignored. Furthermore, they can only be replied to *once* - a reply or completion block should be considered
  invalidated after it's once used. The faster a reply can be made, the more Sparkle may be able to idle, and so the better.
@@ -61,7 +66,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Respond to the user initiating an update check. Sparkle uses this to show the user a window with an indeterminate progress bar.
  *
  * @param updateCheckStatusCompletion A reply indicating whether the initiated update check is done or canceled.
- * Attempts to canceling can be made before -dismissUserInitiatedUpdateCheck is invoked. Replying with SUUserInitiatedCheckDone
+ * Attempts to canceling can be made before -dismissUserInitiatedUpdateCheck is invoked. Replying with SPUUserInitiatedCheckDone
  * on the other hand should not be done until -dismissUserInitiatedUpdateCheck is invoked.
  *
  * This can be called from any thread
@@ -72,7 +77,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Dismiss the user initiated update check from the user
  *
  * Dismiss whatever was started in -showUserInitiatedUpdateCheckWithCompletion:
- * This is an appropriate time to reply with SUUserInitiatedCheckDone if not having done so already
+ * This is an appropriate time to reply with SPUUserInitiatedCheckDone if not having done so already
  *
  * This can be called from any thread
  */
@@ -85,24 +90,26 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
+ * @param userInitiated A flag indicating whether or not a user initiated this update check
+ *
  * @param reply
- * A reply of SUInstallUpdateChoice begins downloading and installing the new update.
+ * A reply of SPUInstallUpdateChoice begins downloading and installing the new update.
  *
- * A reply of SUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
+ * A reply of SPUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
  *
- * A reply of SUSkipThisVersionChoice skips this particular version and won't bother the user again,
+ * A reply of SPUSkipThisVersionChoice skips this particular version and won't bother the user again,
  * unless they initiate an update check themselves.
  *
  * This can be called from any thread
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply;
 
 /*!
  * Show the user a new update has been downloaded and can be installed
  *
  * This method behaves just like -showUpdateFoundWithAppcastItem:reply: except the update has already been downloaded.
  */
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply;
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply;
 
 /*!
  * Show the user an update that has started installing can be resumed and installed immediately
@@ -112,14 +119,18 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
- * @param reply A reply of SUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
- * A reply of SUInstallUpdateNow installs the update immediately but does not relaunch the new update.
- * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update will attempt to finish installation
+ * @param userInitiated A flag indicating whether or not a user initiated this update check
+ *
+ * @param reply
+ * A reply of SPUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
+ * Note: the application is not relaunched if it was not running before installing the update.
+ * A reply of SPUInstallUpdateNow installs the update immediately but does not relaunch the new update.
+ * A reply of SPUDismissUpdateInstallation dismisses the update installation. Note the update will attempt to finish installation
  * after the application terminates.
  *
  * This can be called from any thread
  */
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUInstallUpdateStatus))reply;
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply;
 
 /*!
  * Show the user the release notes for the new update
@@ -175,9 +186,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Let the user know that downloading the new update started.
  *
- * @param downloadUpdateStatusCompletion A reply of SUDownloadUpdateCanceled can be used to cancel
+ * @param downloadUpdateStatusCompletion A reply of SPUDownloadUpdateCanceled can be used to cancel
  * the download at any point before -showDownloadDidStartExtractingUpdate is invoked.
- * A reply of SUDownloadUpdateDone signifies that the download is done, which should not be invoked until
+ * A reply of SPUDownloadUpdateDone signifies that the download is done, which should not be invoked until
  * -showDownloadDidStartExtractingUpdate
  *
  * This can be called from any thread
@@ -206,7 +217,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 /*!
  * Show the user that the update finished downloading and started extracting
  *
- * This is an appropriate time to reply with SUDownloadUpdateDone if not done so already
+ * This is an appropriate time to reply with SPUDownloadUpdateDone if not done so already
  * Sparkle uses this to show an indeterminate progress bar.
  *
  * Note that an update can resume at this point after having been downloaded before,
@@ -233,9 +244,11 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Let the user know that the update is ready and ask them whether they want to install or not.
  * Note if the target application is already terminated and an update can be performed silently, this method may not be invoked.
  *
- * @param installUpdateHandler A reply of SUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
- * A reply of SUInstallUpdateNow installes the update immediately but does not relaunch the new update.
- * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
+ * @param installUpdateHandler
+ * A reply of SPUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
+ * Note: the application is not relaunched if it was not running before installing the update.
+ * A reply of SPUInstallUpdateNow installes the update immediately but does not relaunch the new update.
+ * A reply of SPUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
  * the application terminates, however there is not a strong guarantee that this will happen.
  *
  * This can be called from any thread
@@ -252,16 +265,17 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showInstallingUpdate;
 
 /*!
- * Terminate the application and show or dismiss installer progress.
+ * Show or dismiss progress while a termination signal is being sent to the application
  *
- * Sparkle is asking us to send a request to terminate the application.
+ * Terminating and relaunching the application (if requested to be relaunched) may happen quickly,
+ * or it may take some time to perform the final installation, or the termination signal can be canceled or delayed by the application or user.
  *
- * If this will terminate the current application, one may decide to dismiss progress UI in case the termination request is delayed or canceled.
- * Or if this will terminate a remote application, one may decide to show the user that the update is currently installing.
+ * It is up to the implementor whether or not to decide to continue showing installation progress
+ * or dismissing UI that won't remain obscuring other parts of the user interface.
  *
  * This can be called from any thread
  */
-- (void)terminateApplication;
+- (void)showSendingTerminationSignal;
 
 /*!
  * Show the user that the update installation finished
@@ -281,11 +295,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Stop and tear down everything. Reply to all outstanding reply/completion blocks.
  * Dismiss all update windows, alerts, progress, etc from the user.
- * Unregister for application termination and system power off if not done so already.
  * Basically, stop everything that could have been started. Sparkle may invoke this when aborting or finishing an update.
- * Do not, however, invaldate the next update check timer.
  *
- * This can be called from any thread, and could be called multiple times in succession.
+ * This can be called from any thread
  */
 - (void)dismissUpdateInstallation;
 

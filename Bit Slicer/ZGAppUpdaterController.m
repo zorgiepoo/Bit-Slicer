@@ -74,7 +74,7 @@
 		
 		NSBundle *updateBundle = [NSBundle mainBundle];
 		
-		id<SPUUserDriver> userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:updateBundle applicationBundle:updateBundle delegate:nil];
+		id<SPUUserDriver> userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:updateBundle delegate:nil];
 		_updater = [[SPUUpdater alloc] initWithHostBundle:updateBundle applicationBundle:updateBundle userDriver:userDriver delegate:nil];
 		
 		[self updateFeedURL];

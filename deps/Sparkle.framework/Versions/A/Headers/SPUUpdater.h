@@ -65,47 +65,110 @@ SU_EXPORT @interface SPUUpdater : NSObject
  */
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
-@property (readonly, strong) NSBundle *hostBundle;
-@property (strong, readonly) NSBundle *sparkleBundle;
+/*!
+ * Checks for updates, and displays progress while doing so.
+ *
+ * This is meant for users initiating an update check.
+ * This may find a resumable update that has already been downloaded or has begun installing, or
+ * this may find a new update that can start to be downloaded if the user requests it.
+ * This will find updates that the user has opted into skipping.
+ */
+- (void)checkForUpdates;
 
+/*!
+ * Checks for updates, but does not display any UI unless an update is found.
+ *
+ * This is meant for programmatically initating a check for updates.
+ * That is, it will display no UI unless it finds an update, in which case it proceeds as usual.
+ * This will not find updates that the user has opted into skipping.
+ *
+ * Note if there is no resumable update found, and automated updating is turned on,
+ * the update will be downloaded in the background without disrupting the user.
+ */
+- (void)checkForUpdatesInBackground;
+
+/*!
+ * Begins a "probing" check for updates which will not actually offer to
+ * update to that version.
+ *
+ * However, the delegate methods
+ * SPUUpdaterDelegate::updater:didFindValidUpdate: and
+ * SPUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
+ * so you can use that information in your UI.
+ *
+ * Updates that have been skipped by the user will not be found.
+ */
+- (void)checkForUpdateInformation;
+
+/*!
+ * A property indicating whether or not to check for updates automatically.
+ *
+ * Setting this property will persist in the host bundle's user defaults.
+ * The update schedule cycle will be reset in a short delay after the property's new value is set.
+ * This is to allow reverting this property without kicking off a schedule change immediately
+ */
 @property (nonatomic) BOOL automaticallyChecksForUpdates;
 
+/*!
+ * A property indicating the current automatic update check interval.
+ *
+ * Setting this property will persist in the host bundle's user defaults.
+ * The update schedule cycle will be reset in a short delay after the property's new value is set.
+ * This is to allow reverting this property without kicking off a schedule change immediately
+ */
 @property (nonatomic) NSTimeInterval updateCheckInterval;
 
 /*!
+ * A property indicating whether or not updates can be automatically downloaded in the background.
+ *
+ * Note that the developer can disallow automatic downloading of updates from being enabled.
+ * In this case, -automaticallyDownloadsUpdates will return NO regardless of how this property is set.
+ *
+ * Setting this property will persist in the host bundle's user defaults.
+ */
+@property (nonatomic) BOOL automaticallyDownloadsUpdates;
+
+/*!
  * The URL of the appcast used to download update information.
+ *
+ * Setting this property will persist in the host bundle's user defaults.
+ * To avoid this, you may want to consider instead implementing
+ * -[SPUUpdaterDelegate feedURLStringForUpdater:] or -[SPUUpdaterDelegate feedParametersForUpdater:sendingSystemProfile:]
  *
  * This property must be called on the main thread.
  */
 @property (copy) NSURL *feedURL;
 
+/*!
+ * The host bundle that is being updated.
+ */
+@property (readonly, strong) NSBundle *hostBundle;
+
+/*!
+ * The bundle this class (SPUUpdater) is loaded into
+ */
+@property (strong, readonly) NSBundle *sparkleBundle;
+
+/*!
+ * The user agent used when checking for updates.
+ *
+ * The default implementation can be overrided.
+ */
 @property (nonatomic, copy) NSString *userAgentString;
 
-@property (copy, nullable) NSDictionary *httpHeaders;
+/*!
+ * The HTTP headers used when checking for updates.
+ *
+ * The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
+ */
+@property (copy, nullable) NSDictionary<NSString *, NSString *> *httpHeaders;
 
+/*!
+ * A property indicating whether or not the user's system profile information is sent when checking for updates.
+ *
+ * Setting this property will persist in the host bundle's user defaults.
+ */
 @property (nonatomic) BOOL sendsSystemProfile;
-
-@property (nonatomic) BOOL automaticallyDownloadsUpdates;
-
-/*!
-    Checks for updates, and displays progress while doing so.
- 
-    This is meant for users initiating an update check
- */
-- (void)checkForUpdates;
-
-/*!
-    Checks for updates, but does not display any UI unless an update is found.
-
-    This is meant for programmatically initating a check for updates. That is,
-    it will display no UI unless it actually finds an update, in which case it
-    proceeds as usual.
-
-    If the fully automated updating is turned on, however, this will invoke that
-    behavior, and if an update is found, it will be downloaded and prepped for
-    installation.
- */
-- (void)checkForUpdatesInBackground;
 
 /*!
     Returns the date of last update check.
@@ -113,17 +176,6 @@ SU_EXPORT @interface SPUUpdater : NSObject
     \returns \c nil if no check has been performed.
  */
 @property (readonly, copy, nullable) NSDate *lastUpdateCheckDate;
-
-/*!
-    Begins a "probing" check for updates which will not actually offer to
-    update to that version.
-
-    However, the delegate methods
-    SPUUpdaterDelegate::updater:didFindValidUpdate: and
-    SPUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
-    so you can use that information in your UI.
- */
-- (void)checkForUpdateInformation;
 
 /*!
     Appropriately schedules or cancels the update checking timer according to
