@@ -47,6 +47,11 @@ static BOOL ZGIsOnAtLeast10Dot(NSInteger minorVersion)
 	return floor(NSFoundationVersionNumber) > NSFoundationVersionNumber10_8;
 }
 
+BOOL ZGIsOnSierraOrLater(void)
+{
+	return ZGIsOnAtLeast10Dot(12);
+}
+
 BOOL ZGIsOnElCapitanOrLater(void)
 {
 	return ZGIsOnAtLeast10Dot(11);

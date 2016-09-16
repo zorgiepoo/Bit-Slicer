@@ -86,6 +86,8 @@
 	ZGDebuggerController * _Nonnull _debuggerController;
 	ZGWatchVariableWindowController * _Nullable _watchVariableWindowController;
 	
+	BOOL _preferringNewTab;
+	
 	ZGEditValueWindowController * _Nullable _editValueWindowController;
 	ZGEditAddressWindowController * _Nullable _editAddressWindowController;
 	ZGEditDescriptionWindowController * _Nullable _editDescriptionWindowController;
@@ -109,12 +111,13 @@
 	IBOutlet NSView *_scopeBarFlagsView;
 }
 
-- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(nullable NSString *)lastChosenInternalProcessName delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
+- (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(nullable NSString *)lastChosenInternalProcessName preferringNewTab:(BOOL)preferringNewTab delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
 {
 	self = [super initWithProcessTaskManager:processTaskManager rootlessConfiguration:rootlessConfiguration delegate:delegate];
 	if (self != nil)
 	{
 		self.lastChosenInternalProcessName = lastChosenInternalProcessName;
+		_preferringNewTab = preferringNewTab;
 		
 		_debuggerController = debuggerController;
 		_breakPointController = breakPointController;
@@ -241,6 +244,15 @@
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
+	
+	if (_preferringNewTab)
+	{
+		// This code should only trigger if we are running on 10.12 or later
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+		self.window.tabbingMode = NSWindowTabbingModePreferred;
+#pragma clang diagnostic pop
+	}
 	
 	_documentData = [(ZGDocument *)self.document data];
 	_searchData = [(ZGDocument *)self.document searchData];

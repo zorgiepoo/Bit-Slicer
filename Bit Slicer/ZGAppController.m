@@ -84,6 +84,11 @@
 	
 	NSString * _Nullable _lastChosenInternalProcessName;
 	NSMutableDictionary<NSNumber *, NSValue *> * _Nullable _memorySelectionRanges;
+	
+	BOOL _creatingNewTab;
+	IBOutlet NSMenu * _Nonnull _fileMenu;
+	IBOutlet NSMenuItem * _Nonnull _newDocumentMenuItem;
+	IBOutlet NSMenuItem * _Nonnull _showFontsMenuItem;
 }
 
 #pragma mark Birth & Death
@@ -144,6 +149,9 @@
 			ZGAppController *selfReference = weakSelf;
 			assert(selfReference != nil);
 			
+			BOOL creatingNewTab = selfReference->_creatingNewTab;
+			selfReference->_creatingNewTab = NO;
+			
 			return
 			[[ZGDocumentWindowController alloc]
 			 initWithProcessTaskManager:selfReference->_processTaskManager
@@ -154,6 +162,7 @@
 			 hotKeyCenter:selfReference->_hotKeyCenter
 			 loggerWindowController:selfReference->_loggerWindowController
 			 lastChosenInternalProcessName:selfReference->_lastChosenInternalProcessName
+			 preferringNewTab:creatingNewTab
 			 delegate:selfReference];
 		}];
 		
@@ -179,6 +188,32 @@
 	}
 	
 	return appTerminationState.isDead ? NSTerminateNow : NSTerminateLater;
+}
+
+#pragma mark Tabs
+
+- (void)applicationDidFinishLaunching:(NSNotification *)__unused notification
+{
+	// Add New Tab menu item only if we are on 10.12 or later
+	if (ZGIsOnSierraOrLater())
+	{
+		// New Tab should use cmd t so make show font use cmd shift t
+		[_showFontsMenuItem setKeyEquivalent:@"T"];
+		
+		NSMenuItem *newTabMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"New Tab", nil) action:@selector(createNewTabbedWindow:) keyEquivalent:@"t"];
+		
+		[newTabMenuItem setKeyEquivalentModifierMask:NSCommandKeyMask];
+		[newTabMenuItem setTarget:self];
+		
+		NSInteger insertionIndex = [_fileMenu indexOfItem:_newDocumentMenuItem] + 1;
+		[_fileMenu insertItem:newTabMenuItem atIndex:insertionIndex];
+	}
+}
+
+- (IBAction)createNewTabbedWindow:(id)sender
+{
+	_creatingNewTab = YES;
+	[_documentController newDocument:sender];
 }
 
 #pragma mark Restoration

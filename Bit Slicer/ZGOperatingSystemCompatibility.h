@@ -32,6 +32,7 @@
 
 #import <Foundation/Foundation.h>
 
+BOOL ZGIsOnSierraOrLater(void);
 BOOL ZGIsOnElCapitanOrLater(void);
 BOOL ZGIsOnYosemiteOrLater(void);
 BOOL ZGIsOnMavericksOrLater(void);

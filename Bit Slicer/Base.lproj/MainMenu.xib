@@ -734,6 +734,12 @@ CA
             </items>
         </menu>
         <customObject id="419" customClass="NSFontManager"/>
-        <customObject id="695" customClass="ZGAppController"/>
+        <customObject id="695" customClass="ZGAppController">
+            <connections>
+                <outlet property="_fileMenu" destination="81" id="z29-58-6oQ"/>
+                <outlet property="_newDocumentMenuItem" destination="82" id="7xw-87-BcJ"/>
+                <outlet property="_showFontsMenuItem" destination="196-mO-a1w" id="nyT-PT-bA7"/>
+            </connections>
+        </customObject>
     </objects>
 </document>

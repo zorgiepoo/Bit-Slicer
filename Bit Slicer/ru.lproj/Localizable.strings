@@ -9,3 +9,6 @@
 
 /* 'Multiple' selection label for AGScopeBar (scope bar used in search window) */
 "(Multiple)" = "(несколько)";
+
+/* 'New Tab' menu item for 10.12 and later for creating a new tabbed search window */
+"New Tab" = "Новая вкладка";
