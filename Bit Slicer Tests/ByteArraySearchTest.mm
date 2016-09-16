@@ -49,7 +49,11 @@ extern void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigne
 {
 	[super setUp];
 	
-	NSData *data = [NSData dataWithContentsOfFile:[[NSBundle bundleForClass:[self class]] pathForResource:@"random_data" ofType:@""]];
+	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+	NSString *randomDataPath = [bundle pathForResource:@"random_data" ofType:@""];
+	XCTAssertNotNil(randomDataPath);
+	
+	NSData *data = [NSData dataWithContentsOfFile:randomDataPath];
 	XCTAssertNotNil(data);
 	
 	_data = data;
