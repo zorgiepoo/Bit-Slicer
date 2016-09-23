@@ -109,6 +109,7 @@
 	IBOutlet NSTextField *_flagsLabel;
 	IBOutlet AGScopeBar *_scopeBar;
 	IBOutlet NSView *_scopeBarFlagsView;
+	IBOutlet NSToolbar *_toolbar;
 }
 
 - (id)initWithProcessTaskManager:(ZGProcessTaskManager *)processTaskManager rootlessConfiguration:(nullable ZGRootlessConfiguration *)rootlessConfiguration debuggerController:(ZGDebuggerController *)debuggerController breakPointController:(ZGBreakPointController *)breakPointController scriptingInterpreter:(ZGScriptingInterpreter *)scriptingInterpreter hotKeyCenter:(ZGHotKeyCenter *)hotKeyCenter loggerWindowController:(ZGLoggerWindowController *)loggerWindowController lastChosenInternalProcessName:(nullable NSString *)lastChosenInternalProcessName preferringNewTab:(BOOL)preferringNewTab delegate:(id <ZGChosenProcessDelegate, ZGMemorySelectionDelegate, ZGShowMemoryWindow>)delegate
@@ -138,6 +139,20 @@
 	[_searchController cleanUp];
 	[_tableController cleanUp];
 	[_scriptManager cleanup];
+}
+
+- (void)restoreStateWithCoder:(NSCoder *)coder
+{
+	[super restoreStateWithCoder:coder];
+	
+	// On 10.12, when search document windows are restored, the separator is thicker
+	// I don't know why this happens, but one workaround is just resetting the baseline separator property
+	// to NO and then back to YES
+	if (ZGIsOnSierraOrLater())
+	{
+		_toolbar.showsBaselineSeparator = NO;
+		_toolbar.showsBaselineSeparator = YES;
+	}
 }
 
 - (void)setupScopeBar
