@@ -1,3 +1,5 @@
 osx_image: xcode8
 language: objective-c
+before_install:
+	- brew update
 script: xcodebuild -target 'Bit Slicer Tests' -scheme 'Release' test
