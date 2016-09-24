@@ -61,12 +61,6 @@
 	_data = [NSData dataWithContentsOfFile:randomDataPath];
 	XCTAssertNotNil(_data);
 	
-	NSString *taskPath = @"/usr/bin/man";
-	if (![[NSFileManager defaultManager] fileExistsAtPath:taskPath])
-	{
-		XCTFail(@"%@ does not exist", taskPath);
-	}
-	
 	// We'll use our own process because it's a pain to use another one
 	if (!ZGTaskForPID(getpid(), &_processTask))
 	{
