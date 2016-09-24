@@ -187,7 +187,7 @@
 	XCTAssertEqual(greaterThanResults.addressCount, 6228U);
 	
 	ZGSearchResults *lessThanResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGLessThan);
-	XCTAssertEqual(lessThanResults.addressCount, 14163U);
+	XCTAssertEqual(lessThanResults.addressCount, 14162U);
 	
 	searchData.shouldCompareStoredValues = YES;
 	ZGSearchResults *storedEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEqualsStored);
