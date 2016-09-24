@@ -1,0 +1,3 @@
+osx_image: xcode8
+language: objective-c
+script: xcodebuild -target 'Bit Slicer Tests' -scheme 'Release' test
