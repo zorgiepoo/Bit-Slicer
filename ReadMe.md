@@ -1,5 +1,5 @@
 # Bit Slicer
-![Bit Slicer icon](https://dl.dropbox.com/u/10108199/bit_slicer/web_icon.png)
+![Bit Slicer icon](https://zgcoder.net/software/bitslicer/images/web_icon.png)
 
 [Download Bit Slicer](https://zgcoder.net/software/bitslicer/dist/stable/Bit%20Slicer.zip)
 
