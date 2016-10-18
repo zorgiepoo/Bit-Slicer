@@ -1,5 +1,5 @@
 /* Label for Credits button */
-"credits" = "кредиты";
+"credits" = "Создатели";
 
 /* Label for Acknowledgements button (shows copyrights, software licenses, etc) */
 "acknowledgements" = "Благодарности";

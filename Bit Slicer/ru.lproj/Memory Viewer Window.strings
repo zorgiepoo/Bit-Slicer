@@ -3,10 +3,10 @@
 "1.title" = "Просмотр памяти";
 
 /* Class = "NSToolbarItem"; label = "Target"; ObjectID = "2oH-t9-bYi"; */
-"2oH-t9-bYi.label" = "Мишень";
+"2oH-t9-bYi.label" = "Целевой Процесс";
 
 /* Class = "NSToolbarItem"; paletteLabel = "Target"; ObjectID = "2oH-t9-bYi"; */
-"2oH-t9-bYi.paletteLabel" = "Мишень";
+"2oH-t9-bYi.paletteLabel" = "Целевой Процесс";
 
 /* Class = "NSToolbarItem"; label = "Back/Forward"; ObjectID = "Z6W-2O-OWd"; */
 "Z6W-2O-OWd.label" = "Назад/Вперед";
