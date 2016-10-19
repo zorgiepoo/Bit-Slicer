@@ -9,4 +9,4 @@
 "dZL-uw-7Rv.title" = "Конечный адрес";
 
 /* Class = "NSButtonCell"; title = "Ignore Data Alignment"; ObjectID = "mdD-ud-Xce"; */
-"mdD-ud-Xce.title" = "Не учитывать кратность адреса";
+"mdD-ud-Xce.title" = "Игнорировать кратность";

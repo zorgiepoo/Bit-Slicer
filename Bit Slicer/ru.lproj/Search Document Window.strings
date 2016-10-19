@@ -174,10 +174,10 @@
 "i6q-5D-Acx.headerCell.title" = "Адрес";
 
 /* Class = "NSToolbarItem"; label = "Target"; ObjectID = "jO3-Z2-Pv7"; */
-"jO3-Z2-Pv7.label" = "Мишень";
+"jO3-Z2-Pv7.label" = "Целевой Процесс";
 
 /* Class = "NSToolbarItem"; paletteLabel = "Target"; ObjectID = "jO3-Z2-Pv7"; */
-"jO3-Z2-Pv7.paletteLabel" = "Мишень";
+"jO3-Z2-Pv7.paletteLabel" = "Целевой Процесс";
 
 /* Class = "NSMenuItem"; title = "32-bit Integer"; ObjectID = "lg9-Ou-rda"; */
 "lg9-Ou-rda.title" = "32-разрядное число";

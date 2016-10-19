@@ -39,10 +39,10 @@
 "Quq-lP-8lz.title" = "Другие виды";
 
 /* Class = "NSToolbarItem"; label = "Target"; ObjectID = "V6x-9g-MBo"; */
-"V6x-9g-MBo.label" = "Мишень";
+"V6x-9g-MBo.label" = "Целевой Процесс";
 
 /* Class = "NSToolbarItem"; paletteLabel = "Target"; ObjectID = "V6x-9g-MBo"; */
-"V6x-9g-MBo.paletteLabel" = "Мишень";
+"V6x-9g-MBo.paletteLabel" = "Целевой Процесс";
 
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "aiN-oG-EaF"; */
 "aiN-oG-EaF.title" = "Текстовая ячейка";
