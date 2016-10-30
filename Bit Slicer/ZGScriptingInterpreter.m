@@ -240,6 +240,8 @@
 	[self acquireInterpreter];
 	
 	__block PyObject *compiledExpression = NULL;
+	// If we don't declare a local __block NSError* for our synchronous dispatch, we may run into a bad memory access error
+	__block NSError *compileError = nil;
 	
 	[self dispatchSync:^{
 		compiledExpression = Py_CompileString([expression UTF8String], "EvaluateCondition", Py_eval_input);
@@ -247,12 +249,14 @@
 		if (compiledExpression == NULL)
 		{
 			NSString *pythonErrorDescription = [self fetchPythonErrorDescriptionWithoutDescriptiveTraceback];
-			if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:@"CompileConditionFailure" code:2 userInfo:@{SCRIPT_PYTHON_ERROR : pythonErrorDescription}];
-			}
+			compileError = [NSError errorWithDomain:@"CompileConditionFailure" code:2 userInfo:@{SCRIPT_PYTHON_ERROR : pythonErrorDescription}];
 		}
 	}];
+	
+	if (compileError != nil && error != NULL)
+	{
+		*error = compileError;
+	}
 	
 	return compiledExpression;
 }
@@ -303,6 +307,9 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 - (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError * __autoreleasing *)error
 {
 	__block BOOL result = NO;
+	// If we don't declare a local __block NSError* for our synchronous dispatch, we may run into a bad memory access error
+	__block NSError *evaluateError = nil;
+	
 	[self dispatchSync:^{
 		PyObject *mainModule = PyImport_AddModule("__main__");
 		
@@ -324,10 +331,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			NSString *pythonErrorDescription = [self fetchPythonErrorDescriptionWithoutDescriptiveTraceback];
 			
 			result = NO;
-			if (error != NULL)
-			{
-				*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:2 userInfo:@{SCRIPT_EVALUATION_ERROR_REASON : @"expression could not be evaluated", SCRIPT_PYTHON_ERROR : pythonErrorDescription}];
-			}
+			evaluateError = [NSError errorWithDomain:@"EvaluateConditionFailure" code:2 userInfo:@{SCRIPT_EVALUATION_ERROR_REASON : @"expression could not be evaluated", SCRIPT_PYTHON_ERROR : pythonErrorDescription}];
 		}
 		else
 		{
@@ -335,10 +339,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 			if (temporaryResult == -1)
 			{
 				result = NO;
-				if (error != NULL)
-				{
-					*error = [NSError errorWithDomain:@"EvaluateConditionFailure" code:3 userInfo:@{SCRIPT_EVALUATION_ERROR_REASON : @"expression did not evaluate to a boolean value"}];
-				}
+				evaluateError = [NSError errorWithDomain:@"EvaluateConditionFailure" code:3 userInfo:@{SCRIPT_EVALUATION_ERROR_REASON : @"expression did not evaluate to a boolean value"}];;
 			}
 			else
 			{
@@ -352,6 +353,11 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		
 		CFRelease((__bridge CFTypeRef)(virtualMemoryInstance));
 	}];
+	
+	if (evaluateError != nil && error != NULL)
+	{
+		*error = evaluateError;
+	}
 	return result;
 }
 
