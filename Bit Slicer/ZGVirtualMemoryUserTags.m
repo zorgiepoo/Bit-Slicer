@@ -48,6 +48,11 @@ case value: \
 		result = description; \
 		break;
 
+// Temporary workaround for those not yet on Xcode 8.1 (including Travis)
+#ifndef __MAC_10_12_1
+#define __MAC_10_12_1 101201
+#endif
+
 #if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_12_1
 #warning Need to update the user tag descriptions
 #endif
