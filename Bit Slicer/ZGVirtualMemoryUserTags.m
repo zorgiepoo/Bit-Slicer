@@ -48,7 +48,7 @@ case value: \
 		result = description; \
 		break;
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_12
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_12_1
 #warning Need to update the user tag descriptions
 #endif
 
