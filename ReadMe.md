@@ -1,7 +1,7 @@
 # Bit Slicer
 ![Bit Slicer icon](https://zgcoder.net/software/bitslicer/images/web_icon.png)
 
-[Download Bit Slicer](https://zgcoder.net/software/bitslicer/dist/stable/Bit%20Slicer.zip)
+[Download Bit Slicer](https://zgcoder.net/software/bitslicer/dist/stable/Bit%20Slicer.dmg)
 
 ## Introduction
 Bit Slicer is a universal game trainer for macOS, written using Cocoa and Mach kernel APIs.
