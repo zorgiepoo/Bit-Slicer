@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16A322" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGDebuggerController">
@@ -78,7 +79,7 @@
                 </menuItem>
             </items>
         </menu>
-        <window title="Debugger" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ZGDebuggerWindow" animationBehavior="default" id="5" userLabel="Window - Debugger">
+        <window title="Debugger" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="ZGDebuggerWindow" animationBehavior="default" tabbingMode="disallowed" id="5" userLabel="Window - Debugger">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -257,7 +258,7 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" id="V6x-9g-MBo">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="81" height="27"/>
+                        <size key="minSize" width="81" height="25"/>
                         <size key="maxSize" width="195" height="27"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="fpR-fU-ajG">
                             <rect key="frame" x="0.0" y="14" width="145" height="25"/>
@@ -274,7 +275,7 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="1A9DCB4E-799C-4634-B1F6-CB15382E7DF9" label="Continue" paletteLabel="Continue" image="continue" id="KQE-fj-qqG">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="41" height="27"/>
+                        <size key="minSize" width="39" height="25"/>
                         <size key="maxSize" width="41" height="27"/>
                         <button key="view" verticalHuggingPriority="750" id="2Xc-JX-DhY">
                             <rect key="frame" x="8" y="14" width="39" height="25"/>
