@@ -406,10 +406,4 @@
 	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:ISSUES_TRACKER_URL])];
 }
 
-#define FEEDBACK_EMAIL @"zorgiepoo@gmail.com"
-- (IBAction)sendFeedback:(id)__unused sender
-{
-	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:[@"mailto:" stringByAppendingString:FEEDBACK_EMAIL]])];
-}
-
 @end
