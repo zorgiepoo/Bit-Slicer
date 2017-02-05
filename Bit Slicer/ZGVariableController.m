@@ -445,7 +445,9 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	 addVariables:@[variable]
 	 atRowIndexes:[NSIndexSet indexSetWithIndex:0]];
 	
-	[self annotateVariableAutomatically:variable process:windowController.currentProcess];
+	if (variable.type != ZGScript) {
+		[self annotateVariableAutomatically:variable process:windowController.currentProcess];
+	}
 }
 
 #pragma mark Changing Variables
