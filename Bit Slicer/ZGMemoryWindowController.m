@@ -205,16 +205,13 @@
 
 - (void)updateOcclusionActivity
 {
-	if ([self.window respondsToSelector:@selector(occlusionState)])
+	if (!_isOccluded)
 	{
-		if (!_isOccluded)
-		{
-			[self startProcessActivity];
-		}
-		else
-		{
-			[self stopProcessActivity];
-		}
+		[self startProcessActivity];
+	}
+	else
+	{
+		[self stopProcessActivity];
 	}
 }
 
