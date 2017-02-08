@@ -78,6 +78,8 @@
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
 		7275F8A51BA4756100FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; };
 		7275F8A61BA4BD7200FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; };
+		7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7278DC031E4A967700C37150 /* Sparkle.framework */; };
+		7278DC051E4A968A00C37150 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7278DC031E4A967700C37150 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
 		72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
@@ -122,7 +124,6 @@
 		773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972F017D2E6AE00B958EE /* mach_excUser.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros -Wno-unused-local-typedef -Wno-reserved-id-macro"; }; };
 		773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
-		773972FA17D2E80F00B958EE /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; };
 		773DE962190F4D130078E8F9 /* ZGScriptPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */; };
 		773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
 		773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
@@ -176,7 +177,6 @@
 		77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162417D2EF31009E002A /* ZGRegion.m */; };
 		77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */; };
 		77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E9DBCD181F812E009F4982 /* ZGMachBinary.m */; };
-		77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F817D2E80F00B958EE /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		77F115A817D2E87E009E002A /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115A717D2E87E009E002A /* VDKQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */; };
@@ -255,7 +255,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				77F115A317D2E832009E002A /* Sparkle.framework in Copy Frameworks */,
+				7278DC051E4A968A00C37150 /* Sparkle.framework in Copy Frameworks */,
 				72030C7C1B055B3500A5621C /* DDMathParser.framework in Copy Frameworks */,
 				77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */,
 				773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */,
@@ -360,6 +360,7 @@
 		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Watch Variable Dialog.xib"; sourceTree = "<group>"; };
 		7275F8A31BA4756100FD144C /* ZGNullability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGNullability.h; path = "Bit Slicer/ZGNullability.h"; sourceTree = "<group>"; };
 		7275F8A41BA4756100FD144C /* ZGNullability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGNullability.m; path = "Bit Slicer/ZGNullability.m"; sourceTree = "<group>"; };
+		7278DC031E4A967700C37150 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = deps/Sparkle/Sparkle.framework; sourceTree = "<group>"; };
 		7284245619A96B470081C673 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPrompt.h; path = "Bit Slicer/ZGScriptPrompt.h"; sourceTree = "<group>"; usesTabs = 1; };
 		72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPrompt.m; path = "Bit Slicer/ZGScriptPrompt.m"; sourceTree = "<group>"; usesTabs = 1; };
@@ -515,7 +516,6 @@
 		773972F417D2E7B600B958EE /* DataInspectorRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DataInspectorRepresenter.h; path = deps/DataInspectorRepresenter.h; sourceTree = "<group>"; usesTabs = 0; };
 		773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DataInspectorRepresenter.m; path = deps/DataInspectorRepresenter.m; sourceTree = "<group>"; usesTabs = 0; };
 		773972F717D2E80F00B958EE /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = deps/ShortcutRecorder.framework; sourceTree = "<group>"; };
-		773972F817D2E80F00B958EE /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = deps/Sparkle.framework; sourceTree = "<group>"; };
 		773DE95F190F4D130078E8F9 /* ZGScriptPreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPreferencesViewController.h; path = "Bit Slicer/ZGScriptPreferencesViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPreferencesViewController.m; path = "Bit Slicer/ZGScriptPreferencesViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
 		773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreSymbolication.framework; path = /System/Library/PrivateFrameworks/CoreSymbolication.framework; sourceTree = "<absolute>"; };
@@ -787,8 +787,8 @@
 				72030C7A1B0558F800A5621C /* DDMathParser.framework in Frameworks */,
 				773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */,
 				773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */,
+				7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */,
 				773E8B081821DEAC00D1A71A /* libpython3.3m.a in Frameworks */,
-				773972FA17D2E80F00B958EE /* Sparkle.framework in Frameworks */,
 				773E8B061821DE9300D1A71A /* libudis86.a in Frameworks */,
 				773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */,
 			);
@@ -872,11 +872,11 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7278DC031E4A967700C37150 /* Sparkle.framework */,
 				773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */,
 				72030C791B0558F800A5621C /* DDMathParser.framework */,
 				773E8B031821DE5300D1A71A /* HexFiend.framework */,
 				773972F717D2E80F00B958EE /* ShortcutRecorder.framework */,
-				773972F817D2E80F00B958EE /* Sparkle.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2547,6 +2547,7 @@
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
 					"$(PROJECT_DIR)/deps",
+					"$(PROJECT_DIR)/deps/Sparkle",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -2647,6 +2648,7 @@
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
 					"$(PROJECT_DIR)/deps",
+					"$(PROJECT_DIR)/deps/Sparkle",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;

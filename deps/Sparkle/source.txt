@@ -1,0 +1,2 @@
+Source: https://github.com/zorgiepoo/Sparkle/tree/ui-separation-and-xpc
+Commit: a4eefe6725630ca49cb5041e00b03316083e793c
