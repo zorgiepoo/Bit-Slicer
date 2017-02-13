@@ -42,8 +42,7 @@ It allows you to cheat in video games by searching and modifying values such as 
 ## Support
 * Check the [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) for how to use Bit Slicer
 * Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for discussion and current development
-* Visit the [chat room](http://webchat.freenode.net/?channels=bitslicer) for support or development (#bitslicer on irc.freenode.net). Note I am not available 24/7.
-* Send an email to zorgiepoo (at) gmail (dot) com
+* Visit the [chat room](http://webchat.freenode.net/?channels=bitslicer) for support or development (#bitslicer on irc.freenode.net). Note availability for support is not 24/7.
 
 ## Contributing
 * Improve the current [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) by fixing errors or by adding content
@@ -53,3 +52,5 @@ It allows you to cheat in video games by searching and modifying values such as 
 * Learn how to build and contribute to the [source code](https://github.com/zorgiepoo/Bit-Slicer/wiki/Source-Code)
 
 Please read this project's [Code Of Conduct](https://github.com/zorgiepoo/Bit-Slicer/blob/master/CODE_OF_CONDUCT.md) residing in the root level of the project.
+
+**Update**: This project may need some help! I cannot guarantee my activeness in reviewing / pulling in future changes, as well as pushing out new releases.
