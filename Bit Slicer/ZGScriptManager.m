@@ -622,12 +622,15 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 				dispatch_source_set_event_handler(scriptTimer, ^{
 					for (ZGPyScript *runningScript in [self runningScripts])
 					{
-						[self->_scriptingInterpreter dispatchAsync:^{
-							NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
-							runningScript.deltaTime = currentTime - runningScript.lastTime;
-							runningScript.lastTime = currentTime;
-							[self executeScript:runningScript];
-						}];
+						if (runningScript.executeFunction != NULL)
+						{
+							[self->_scriptingInterpreter dispatchAsync:^{
+								NSTimeInterval currentTime = [NSDate timeIntervalSinceReferenceDate];
+								runningScript.deltaTime = currentTime - runningScript.lastTime;
+								runningScript.lastTime = currentTime;
+								[self executeScript:runningScript];
+							}];
+						}
 					}
 				});
 				dispatch_resume(scriptTimer);
