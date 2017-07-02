@@ -126,7 +126,7 @@ static NSArray<ZGRegion *> *ZGFilterRegions(NSArray<ZGRegion *> *regions, ZGMemo
 	}];
 }
 
-typedef void (^zg_search_for_data_helper_t)(ZGMemorySize dataIndex, ZGMemoryAddress address, ZGMemorySize size, NSMutableData * __unsafe_unretained resultSet, void *bytes, void *regionBytes);
+typedef NSData *(^zg_search_for_data_helper_t)(ZGMemorySize dataIndex, ZGMemoryAddress address, ZGMemorySize size, void *bytes, void *regionBytes);
 
 ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *searchData, id <ZGSearchProgressDelegate> delegate,  zg_search_for_data_helper_t helper)
 {
@@ -158,10 +158,10 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 		});
 	}
 	
-	NSMutableArray<NSMutableData *> *allResultSets = [[NSMutableArray alloc] init];
+	NSMutableArray<NSData *> *allResultSets = [[NSMutableArray alloc] init];
 	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
 	{
-		[allResultSets addObject:[[NSMutableData alloc] init]];
+		[allResultSets addObject:[[NSData alloc] init]];
 	}
 	
 	dispatch_apply(regions.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
@@ -171,8 +171,6 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 			ZGMemoryAddress address = region.address;
 			ZGMemorySize size = region.size;
 			void *regionBytes = region.bytes;
-			
-			NSMutableData *resultSet = [allResultSets objectAtIndex:regionIndex];
 			
 			ZGMemorySize dataIndex = 0;
 			char *bytes = NULL;
@@ -193,7 +191,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 				
 				if (!searchProgress.shouldCancelSearch && ZGReadBytes(processTask, address, reinterpret_cast<void **>(&bytes), &size))
 				{
-					helper(dataIndex, address, size, resultSet, bytes, regionBytes);
+					allResultSets[regionIndex] = helper(dataIndex, address, size, bytes, regionBytes);
 					
 					ZGFreeBytes(bytes, size);
 				}
@@ -202,15 +200,15 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 			if (delegate != nil)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
-					searchProgress.numberOfVariablesFound += resultSet.length / pointerSize;
+					searchProgress.numberOfVariablesFound += allResultSets[regionIndex].length / pointerSize;
 					searchProgress.progress++;
-					[delegate progress:searchProgress advancedWithResultSet:resultSet];
+					[delegate progress:searchProgress advancedWithResultSet:allResultSets[regionIndex]];
 				});
 			}
 		}
 	});
 	
-	NSArray<NSMutableData *> *resultSets;
+	NSArray<NSData *> *resultSets;
 	
 	if (searchProgress.shouldCancelSearch)
 	{
@@ -225,7 +223,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	}
 	else
 	{
-		resultSets = [allResultSets zgFilterUsingBlock:^(NSMutableData *resultSet) {
+		resultSets = [allResultSets zgFilterUsingBlock:^(NSData *resultSet) {
 			return static_cast<BOOL>(resultSet.length != 0);
 		}];
 	}
@@ -234,8 +232,9 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 }
 
 template <typename T, typename P, typename F>
-void ZGSearchWithFunctionHelperRegular(T *searchValue, F comparisonFunction, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, NSMutableData * __unsafe_unretained resultSet, ZGMemoryAddress address, void *bytes)
+NSData *ZGSearchWithFunctionHelperRegular(T *searchValue, F comparisonFunction, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, ZGMemoryAddress address, void *bytes)
 {
+	NSMutableData *resultSet = [NSMutableData data];
 	while (dataIndex <= endLimit)
 	{
 		ZGMemorySize numberOfVariablesFound = 0;
@@ -255,12 +254,14 @@ void ZGSearchWithFunctionHelperRegular(T *searchValue, F comparisonFunction, ZGS
 		
 		[resultSet appendBytes:memoryAddresses length:sizeof(P) * numberOfVariablesFound];
 	}
+	return resultSet;
 }
 
 // like ZGSearchWithFunctionHelperRegular above except against stored values
 template <typename T, typename P, typename F>
-void ZGSearchWithFunctionHelperStored(T *regionBytes, F comparisonFunction, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, NSMutableData * __unsafe_unretained resultSet, ZGMemoryAddress address, void *bytes)
+NSData *ZGSearchWithFunctionHelperStored(T *regionBytes, F comparisonFunction, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, ZGMemoryAddress address, void *bytes)
 {
+	NSMutableData *resultSet = [NSMutableData data];
 	while (dataIndex <= endLimit)
 	{
 		ZGMemorySize numberOfVariablesFound = 0;
@@ -280,6 +281,7 @@ void ZGSearchWithFunctionHelperStored(T *regionBytes, F comparisonFunction, ZGSe
 		
 		[resultSet appendBytes:memoryAddresses length:sizeof(P) * numberOfVariablesFound];
 	}
+	return resultSet;
 }
 
 template <typename T, typename F>
@@ -290,31 +292,35 @@ ZGSearchResults *ZGSearchWithFunction(F comparisonFunction, ZGMemoryMap processT
 	ZGMemorySize dataSize = searchData.dataSize;
 	BOOL shouldCompareStoredValues = searchData.shouldCompareStoredValues;
 	
-	return ZGSearchForDataHelper(processTask, searchData, delegate, ^(ZGMemorySize dataIndex, ZGMemoryAddress address, ZGMemorySize size, NSMutableData * __unsafe_unretained resultSet, void *bytes, void *regionBytes) {
+	return ZGSearchForDataHelper(processTask, searchData, delegate, ^NSData *(ZGMemorySize dataIndex, ZGMemoryAddress address, ZGMemorySize size, void *bytes, void *regionBytes) {
 		ZGMemorySize endLimit = size - dataSize;
+		
+		NSData *resultSet;
 		
 		if (!shouldCompareStoredValues)
 		{
 			if (pointerSize == sizeof(ZGMemoryAddress))
 			{
-				ZGSearchWithFunctionHelperRegular<T, ZGMemoryAddress>(searchValue, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, resultSet, address, bytes);
+				resultSet = ZGSearchWithFunctionHelperRegular<T, ZGMemoryAddress>(searchValue, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, address, bytes);
 			}
 			else
 			{
-				ZGSearchWithFunctionHelperRegular<T, ZG32BitMemoryAddress>(searchValue, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, resultSet, address, bytes);
+				resultSet = ZGSearchWithFunctionHelperRegular<T, ZG32BitMemoryAddress>(searchValue, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, address, bytes);
 			}
 		}
 		else
 		{
 			if (pointerSize == sizeof(ZGMemoryAddress))
 			{
-				ZGSearchWithFunctionHelperStored<T, ZGMemoryAddress>(static_cast<T *>(regionBytes), comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, resultSet, address, bytes);
+				resultSet = ZGSearchWithFunctionHelperStored<T, ZGMemoryAddress>(static_cast<T *>(regionBytes), comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, address, bytes);
 			}
 			else
 			{
-				ZGSearchWithFunctionHelperStored<T, ZG32BitMemoryAddress>(static_cast<T *>(regionBytes), comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, resultSet, address, bytes);
+				resultSet = ZGSearchWithFunctionHelperStored<T, ZG32BitMemoryAddress>(static_cast<T *>(regionBytes), comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, address, bytes);
 			}
 		}
+		
+		return resultSet;
 	});
 }
 
@@ -325,7 +331,7 @@ ZGSearchResults *_ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *search
 	const unsigned char *searchValue = (searchData.bytesSwapped && searchData.swappedValue != NULL) ? static_cast<const unsigned char *>(searchData.swappedValue) : static_cast<const unsigned char *>(searchData.searchValue);
 	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	
-	return ZGSearchForDataHelper(processTask, searchData, delegate, ^(ZGMemorySize __unused dataIndex, ZGMemoryAddress address, ZGMemorySize size, NSMutableData * __unsafe_unretained resultSet, void *bytes, void * __unused regionBytes) {
+	return ZGSearchForDataHelper(processTask, searchData, delegate, ^NSData *(ZGMemorySize __unused dataIndex, ZGMemoryAddress address, ZGMemorySize size, void *bytes, void * __unused regionBytes) {
 		// generate the two Boyer-Moore auxiliary buffers
 		unsigned long charJump[UCHAR_MAX + 1] = {0};
 		unsigned long *matchJump = static_cast<unsigned long *>(malloc(2 * (dataSize + 1) * sizeof(*matchJump)));
@@ -337,6 +343,8 @@ ZGSearchResults *_ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *search
 
 		P memoryAddresses[MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES];
 		ZGMemorySize numberOfVariablesFound = 0;
+		
+		NSMutableData *resultSet = [NSMutableData data];
 		
 		while (haystackLengthLeft >= dataSize)
 		{
@@ -367,6 +375,8 @@ ZGSearchResults *_ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *search
 		}
 
 		free(matchJump);
+		
+		return resultSet;
 	});
 }
 
