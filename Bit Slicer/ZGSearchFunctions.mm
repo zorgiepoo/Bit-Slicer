@@ -1468,14 +1468,20 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 	ZGMemoryAddress beginAddress = searchData.beginAddress;
 	ZGMemoryAddress endAddress = searchData.endAddress;
 	
-	NSMutableData *newResultSet = [NSMutableData data];
+	size_t addressCapacity = INITIAL_BUFFER_ADDRESSES_CAPACITY;
+	P *memoryAddresses = static_cast<P *>(malloc(addressCapacity * sizeof(*memoryAddresses)));
+	ZGMemorySize numberOfVariablesFound = 0;
 
 	ZGMemoryAddress dataIndex = oldResultSetStartIndex;
 	while (dataIndex < oldDataLength)
 	{
-		P memoryAddresses[INITIAL_BUFFER_ADDRESSES_CAPACITY];
-		ZGMemorySize numberOfVariablesFound = 0;
-		ZGMemorySize numberOfStepsToTake = MIN(INITIAL_BUFFER_ADDRESSES_CAPACITY, (oldDataLength - dataIndex) / sizeof(P));
+		if (numberOfVariablesFound == addressCapacity)
+		{
+			addressCapacity = static_cast<size_t>(addressCapacity * REALLOCATION_GROWTH_RATE);
+			memoryAddresses = static_cast<P *>(realloc(memoryAddresses, addressCapacity * sizeof(*memoryAddresses)));
+		}
+		
+		ZGMemorySize numberOfStepsToTake = MIN(addressCapacity - numberOfVariablesFound, (oldDataLength - dataIndex) / sizeof(P));
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			P variableAddress = *(static_cast<P *>(const_cast<void *>(oldResultSetBytes)) + dataIndex / sizeof(P));
@@ -1532,8 +1538,6 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 			
 			dataIndex += sizeof(P);
 		}
-		
-		[newResultSet appendBytes:memoryAddresses length:sizeof(P) * numberOfVariablesFound];
 	}
 	
 	if (lastUsedRegion != nil)
@@ -1541,7 +1545,7 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 		ZGFreeBytes(lastUsedRegion->_bytes, lastUsedRegion->_size);
 	}
 	
-	return newResultSet;
+	return [NSData dataWithBytesNoCopy:memoryAddresses length:numberOfVariablesFound * sizeof(*memoryAddresses) freeWhenDone:YES];
 }
 
 template <typename T, typename F>
