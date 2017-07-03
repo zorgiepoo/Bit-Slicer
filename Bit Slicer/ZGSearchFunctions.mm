@@ -41,7 +41,8 @@
 #import "HFByteArray_FindReplace.h"
 #import <stdint.h>
 
-#define MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES 4096U
+#define INITIAL_BUFFER_ADDRESSES_CAPACITY 4096U
+#define REALLOCATION_GROWTH_RATE 1.5f
 
 template <typename T>
 bool ZGByteArrayNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *compareValue);
@@ -234,13 +235,19 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 template <typename T, typename P, typename F>
 NSData *ZGSearchWithFunctionHelperRegular(T *searchValue, F comparisonFunction, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, ZGMemoryAddress address, void *bytes)
 {
-	NSMutableData *resultSet = [NSMutableData data];
+	size_t addressCapacity = INITIAL_BUFFER_ADDRESSES_CAPACITY;
+	P *memoryAddresses = static_cast<P *>(malloc(addressCapacity * sizeof(*memoryAddresses)));
+	ZGMemorySize numberOfVariablesFound = 0;
+	
 	while (dataIndex <= endLimit)
 	{
-		ZGMemorySize numberOfVariablesFound = 0;
-		P memoryAddresses[MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES];
+		if (numberOfVariablesFound == addressCapacity)
+		{
+			addressCapacity = static_cast<size_t>(addressCapacity * REALLOCATION_GROWTH_RATE);
+			memoryAddresses = static_cast<P *>(realloc(memoryAddresses, addressCapacity * sizeof(*memoryAddresses)));
+		}
 		
-		ZGMemorySize numberOfStepsToTake = MIN(MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES, (endLimit + dataAlignment - dataIndex) / dataAlignment);
+		ZGMemorySize numberOfStepsToTake = MIN(addressCapacity - numberOfVariablesFound, (endLimit + dataAlignment - dataIndex) / dataAlignment);
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			if (comparisonFunction(searchData, static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(bytes) + dataIndex)), searchValue))
@@ -251,23 +258,28 @@ NSData *ZGSearchWithFunctionHelperRegular(T *searchValue, F comparisonFunction, 
 			
 			dataIndex += dataAlignment;
 		}
-		
-		[resultSet appendBytes:memoryAddresses length:sizeof(P) * numberOfVariablesFound];
 	}
-	return resultSet;
+	
+	return [NSData dataWithBytesNoCopy:memoryAddresses length:numberOfVariablesFound * sizeof(*memoryAddresses) freeWhenDone:YES];
 }
 
 // like ZGSearchWithFunctionHelperRegular above except against stored values
 template <typename T, typename P, typename F>
 NSData *ZGSearchWithFunctionHelperStored(T *regionBytes, F comparisonFunction, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, ZGMemoryAddress address, void *bytes)
 {
-	NSMutableData *resultSet = [NSMutableData data];
+	size_t addressCapacity = INITIAL_BUFFER_ADDRESSES_CAPACITY;
+	P *memoryAddresses = static_cast<P *>(malloc(addressCapacity * sizeof(*memoryAddresses)));
+	ZGMemorySize numberOfVariablesFound = 0;
+	
 	while (dataIndex <= endLimit)
 	{
-		ZGMemorySize numberOfVariablesFound = 0;
-		P memoryAddresses[MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES];
+		if (numberOfVariablesFound == addressCapacity)
+		{
+			addressCapacity = static_cast<size_t>(addressCapacity * REALLOCATION_GROWTH_RATE);
+			memoryAddresses = static_cast<P *>(realloc(memoryAddresses, addressCapacity * sizeof(*memoryAddresses)));
+		}
 		
-		ZGMemorySize numberOfStepsToTake = MIN(MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES, (endLimit + dataAlignment - dataIndex) / dataAlignment);
+		ZGMemorySize numberOfStepsToTake = MIN(addressCapacity - numberOfVariablesFound, (endLimit + dataAlignment - dataIndex) / dataAlignment);
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			if (comparisonFunction(searchData, (static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(bytes) + dataIndex))), static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(static_cast<void *>(regionBytes)) + dataIndex))))
@@ -278,10 +290,9 @@ NSData *ZGSearchWithFunctionHelperStored(T *regionBytes, F comparisonFunction, Z
 			
 			dataIndex += dataAlignment;
 		}
-		
-		[resultSet appendBytes:memoryAddresses length:sizeof(P) * numberOfVariablesFound];
 	}
-	return resultSet;
+	
+	return [NSData dataWithBytesNoCopy:memoryAddresses length:numberOfVariablesFound * sizeof(*memoryAddresses) freeWhenDone:YES];
 }
 
 template <typename T, typename F>
@@ -341,7 +352,7 @@ ZGSearchResults *_ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *search
 		unsigned char *foundSubstring = static_cast<unsigned char *>(bytes);
 		unsigned long haystackLengthLeft = size;
 
-		P memoryAddresses[MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES];
+		P memoryAddresses[INITIAL_BUFFER_ADDRESSES_CAPACITY];
 		ZGMemorySize numberOfVariablesFound = 0;
 		
 		NSMutableData *resultSet = [NSMutableData data];
@@ -358,7 +369,7 @@ ZGSearchResults *_ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *search
 				memoryAddresses[numberOfVariablesFound] = static_cast<P>(foundAddress);
 				numberOfVariablesFound++;
 
-				if (numberOfVariablesFound >= MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES)
+				if (numberOfVariablesFound >= INITIAL_BUFFER_ADDRESSES_CAPACITY)
 				{
 					[resultSet appendBytes:memoryAddresses length:sizeof(memoryAddresses[0]) * numberOfVariablesFound];
 					numberOfVariablesFound = 0;
@@ -1461,9 +1472,9 @@ void ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap processTas
 	ZGMemoryAddress dataIndex = oldResultSetStartIndex;
 	while (dataIndex < oldDataLength)
 	{
-		P memoryAddresses[MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES];
+		P memoryAddresses[INITIAL_BUFFER_ADDRESSES_CAPACITY];
 		ZGMemorySize numberOfVariablesFound = 0;
-		ZGMemorySize numberOfStepsToTake = MIN(MAX_NUMBER_OF_LOCAL_BUFFER_ADDRESSES, (oldDataLength - dataIndex) / sizeof(P));
+		ZGMemorySize numberOfStepsToTake = MIN(INITIAL_BUFFER_ADDRESSES_CAPACITY, (oldDataLength - dataIndex) / sizeof(P));
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			P variableAddress = *(static_cast<P *>(const_cast<void *>(oldResultSetBytes)) + dataIndex / sizeof(P));
