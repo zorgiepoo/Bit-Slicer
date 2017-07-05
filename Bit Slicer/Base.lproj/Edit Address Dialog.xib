@@ -71,7 +71,7 @@ Gw
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" preferredMaxLayoutWidth="370" translatesAutoresizingMaskIntoConstraints="NO" id="wy6-1I-QI5">
                         <rect key="frame" x="17" y="45" width="374" height="28"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="yr8-jR-NWj">
+                        <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" id="yr8-jR-NWj">
                             <font key="font" metaFont="smallSystem"/>
                             <string key="title">[address] will be substituted with the pointer value read at address. 
 base("executable") will be substituted with the address of executable.</string>
