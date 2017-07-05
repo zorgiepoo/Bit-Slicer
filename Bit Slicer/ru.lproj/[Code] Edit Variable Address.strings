@@ -1,0 +1,2 @@
+/* Description of how a variable can be referenced by using its tag */
+"tagReferenceDescription" = "This address can be referenced from other variables by using %@";

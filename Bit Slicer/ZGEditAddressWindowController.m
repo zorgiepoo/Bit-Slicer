@@ -35,6 +35,8 @@
 #import "ZGVariable.h"
 #import "ZGNullability.h"
 
+#define ZGEditAddressLocalizableTable @"[Code] Edit Variable Address"
+
 @implementation ZGEditAddressWindowController
 {
 	ZGVariableController * _Nonnull _variableController;
@@ -80,8 +82,9 @@
 	}
 	else
 	{
-#warning localize this
-		_addressDescriptionTextField.stringValue = [NSString stringWithFormat:@"%@ This address can be referenced from other variables by using %@", _genericAddressDescription, [ZGVariable tagIdentifierStringValueFromTagIdentifier:variable.tagIdentifier dollarPrefix:YES]];
+		NSString *tagDescription = [NSString stringWithFormat:NSLocalizedStringFromTable(@"tagReferenceDescription", ZGEditAddressLocalizableTable, nil), [ZGVariable tagIdentifierStringValueFromTagIdentifier:variable.tagIdentifier dollarPrefix:YES]];
+		
+		_addressDescriptionTextField.stringValue = [NSString stringWithFormat:@"%@ %@", _genericAddressDescription, tagDescription];
 	}
 	
 	[NSApp

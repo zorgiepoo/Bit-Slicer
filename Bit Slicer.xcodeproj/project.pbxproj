@@ -30,6 +30,7 @@
 		7231440519C57A5300FBE342 /* ZGRegistersState.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440419C57A5300FBE342 /* ZGRegistersState.m */; };
 		7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440719C607C700FBE342 /* ZGWatchVariable.m */; };
 		7231440E19C6230F00FBE342 /* [Code] Watch Variable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 7231440C19C6230F00FBE342 /* [Code] Watch Variable.stringsdict */; };
+		7235598A1F0CAF0700DB60A0 /* [Code] Edit Variable Address.strings in Resources */ = {isa = PBXBuildFile; fileRef = 723559881F0CAF0700DB60A0 /* [Code] Edit Variable Address.strings */; };
 		72431BA919BFFB6100418893 /* ZGDataValueExtracting.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162E17D2EF5A009E002A /* ZGDataValueExtracting.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
@@ -310,6 +311,8 @@
 		7231440619C607C700FBE342 /* ZGWatchVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGWatchVariable.h; path = "Bit Slicer/ZGWatchVariable.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7231440719C607C700FBE342 /* ZGWatchVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGWatchVariable.m; path = "Bit Slicer/ZGWatchVariable.m"; sourceTree = "<group>"; usesTabs = 1; };
 		7231440D19C6230F00FBE342 /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Watch Variable.stringsdict"; sourceTree = "<group>"; };
+		723559891F0CAF0700DB60A0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Edit Variable Address.strings"; sourceTree = "<group>"; };
+		7235598B1F0CAF1D00DB60A0 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] Edit Variable Address.strings"; sourceTree = "<group>"; };
 		724A9F0419A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Data Inspector.strings"; sourceTree = "<group>"; };
 		724A9F0619A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger Registers.strings"; sourceTree = "<group>"; };
 		724A9F0819A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger.strings"; sourceTree = "<group>"; };
@@ -947,6 +950,7 @@
 				724A9F1B19A1657500E72C9D /* [Code] Variable Actions.strings */,
 				724A9F3719A813D600E72C9D /* [Code] Edit Variable Value.strings */,
 				724A9F3A19A8173900E72C9D /* [Code] Edit Variable Size.strings */,
+				723559881F0CAF0700DB60A0 /* [Code] Edit Variable Address.strings */,
 				724A9F3D19A823C300E72C9D /* [Code] Search Document.strings */,
 				724A9F4F19A8F54600E72C9D /* [Code] Search Document.stringsdict */,
 				724A9F4019A85D3F00E72C9D /* [Code] Search Table.strings */,
@@ -1637,6 +1641,7 @@
 				722CAA5C19AD4AED009C6AAE /* scripts@2x.png in Resources */,
 				726CA2A019606CA600A6AD40 /* MainMenu.xib in Resources */,
 				724A9F2019A1657500E72C9D /* [Code] Dump All Memory.strings in Resources */,
+				7235598A1F0CAF0700DB60A0 /* [Code] Edit Variable Address.strings in Resources */,
 				724A9F3C19A8173900E72C9D /* [Code] Edit Variable Size.strings in Resources */,
 				724A9F2219A1657500E72C9D /* [Code] Logger Window.strings in Resources */,
 				726CA2CE19606E2600A6AD40 /* Edit Size Dialog.xib in Resources */,
@@ -1824,6 +1829,15 @@
 				72D72B601AB2878C005044CF /* ru */,
 			);
 			name = "[Code] Watch Variable.stringsdict";
+			sourceTree = "<group>";
+		};
+		723559881F0CAF0700DB60A0 /* [Code] Edit Variable Address.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				723559891F0CAF0700DB60A0 /* en */,
+				7235598B1F0CAF1D00DB60A0 /* ru */,
+			);
+			name = "[Code] Edit Variable Address.strings";
 			sourceTree = "<group>";
 		};
 		724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */ = {
