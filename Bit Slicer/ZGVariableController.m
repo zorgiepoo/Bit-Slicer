@@ -1127,42 +1127,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 }
 
-#pragma mark ID Variables
-
-// Note: caller currently must update the document's last used tag *before* invoking this method
-- (void)tagVariables:(NSArray<ZGVariable *> *)variables beginningWithTag:(uint64_t)firstTag
-{
-	[self tagVariables:variables beginningWithTag:firstTag erase:NO];
-}
-
-- (void)tagVariables:(NSArray<ZGVariable *> *)variables beginningWithTag:(uint64_t)firstTag erase:(BOOL)shouldErase
-{
-	if (shouldErase)
-	{
-		for (ZGVariable *variable in variables)
-		{
-			variable.tagIdentifier = 0;
-		}
-	}
-	else
-	{
-		uint64_t currentTag = firstTag;
-		for (ZGVariable *variable in variables)
-		{
-			variable.tagIdentifier = currentTag;
-			currentTag++;
-		}
-	}
-	
-	ZGDocumentWindowController *windowController = _windowController;
-	
-	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoTagChange");
-	[[windowController.undoManager prepareWithInvocationTarget:self]
-	 tagVariables:variables
-	 beginningWithTag:firstTag
-	 erase:!shouldErase];
-}
-
 #pragma mark Edit Variables Sizes (Byte Arrays)
 
 - (void)editVariables:(NSArray<ZGVariable *> *)variables requestedSizes:(NSArray<NSNumber *> *)requestedSizes

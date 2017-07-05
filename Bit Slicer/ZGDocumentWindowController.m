@@ -1098,26 +1098,6 @@
 		}
 	}
 	
-	else if (menuItem.action == @selector(tagVariables:))
-	{
-		NSArray<ZGVariable *> *selectedVariables = [self selectedVariables];
-		
-		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"tagMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"tagSingleVariableTitle");
-		
-		if ([_searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
-		{
-			return NO;
-		}
-		
-		for (ZGVariable *variable in selectedVariables)
-		{
-			if (variable.tagIdentifier > 0)
-			{
-				return NO;
-			}
-		}
-	}
-	
 	else if (menuItem.action == @selector(watchVariable:))
 	{
 		if ([_searchController canCancelTask] || !self.currentProcess.valid || [self selectedVariables].count != 1)
@@ -1372,12 +1352,25 @@
 
 - (IBAction)requestEditingVariableAddress:(id)__unused sender
 {
+	ZGVariable *selectedVariable = [self selectedVariables][0];
+	
+	if (selectedVariable.tagIdentifier == 0)
+	{
+		// Before request editing the variable address, create a referenceable tag for it if it doesn't already have one
+		// We don't want every single variable to have a tag, but we don't want the user to have to go out of their way to create one
+		// A good compromise is creating a tag automatically when a user is about to view a variable address in detail
+		selectedVariable.tagIdentifier = _documentData.lastUsedVariableTag + 1;
+		_documentData.lastUsedVariableTag++;
+		
+		[self markDocumentChange];
+	}
+	
 	if (_editAddressWindowController == nil)
 	{
 		_editAddressWindowController = [[ZGEditAddressWindowController alloc] initWithVariableController:_variableController];
 	}
 	
-	[_editAddressWindowController requestEditingAddressFromVariable:[self selectedVariables][0] attachedToWindow:ZGUnwrapNullableObject(self.window)];
+	[_editAddressWindowController requestEditingAddressFromVariable:selectedVariable attachedToWindow:ZGUnwrapNullableObject(self.window)];
 }
 
 - (IBAction)requestEditingVariablesSize:(id)__unused sender
@@ -1393,15 +1386,6 @@
 - (IBAction)relativizeVariablesAddress:(id)__unused sender
 {
 	[_variableController relativizeVariables:[self selectedVariables]];
-}
-
-- (IBAction)tagVariables:(id)__unused sender
-{
-	NSArray<ZGVariable *> *selectedVariables = [self selectedVariables];
-	uint64_t firstTag = _documentData.lastUsedVariableTag + 1;
-	
-	_documentData.lastUsedVariableTag += selectedVariables.count;
-	[_variableController tagVariables:selectedVariables beginningWithTag:firstTag];
 }
 
 #pragma mark Variable Watching Handling

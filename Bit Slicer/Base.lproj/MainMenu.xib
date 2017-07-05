@@ -630,11 +630,6 @@ CA
                                     <action selector="relativizeVariablesAddress:" target="-1" id="Vo0-8B-DJA"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Tag Variables" keyEquivalent="I" id="Spg-gp-FGl">
-                                <connections>
-                                    <action selector="tagVariables:" target="-1" id="ifj-eb-5Rv"/>
-                                </connections>
-                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="MzU-P6-Yvq"/>
                             <menuItem title="Watch Variable" id="1047">
                                 <modifierMask key="keyEquivalentModifierMask"/>

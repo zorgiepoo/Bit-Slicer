@@ -110,12 +110,6 @@
 /* NOP multiple variables menu item title */
 "nopMultipleVariablesTitle" = "NOP Variables";
 
-/* Tag single variable menu item title */
-"tagSingleVariableTitle" = "Tag Variable";
-
-/* Tag multiple variables menu item title */
-"tagMultipleVariablesTitle" = "Tag Variables";
-
 /* Previous Operator menu item title */
 "previousOperatorMenuItem" = "Previous Operator";
 

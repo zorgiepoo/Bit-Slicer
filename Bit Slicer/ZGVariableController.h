@@ -75,8 +75,6 @@ extern NSString *ZGScriptIndentationUsingTabsKey;
 - (void)relativizeVariables:(NSArray<ZGVariable *> *)variables;
 + (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process;
 
-- (void)tagVariables:(NSArray<ZGVariable *> *)variables beginningWithTag:(uint64_t)firstTag;
-
 - (void)editVariables:(NSArray<ZGVariable *> *)variables newValues:(NSArray<NSString *> *)newValues;
 - (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula;
 - (void)editVariables:(NSArray<ZGVariable *> *)variables requestedSizes:(NSArray<NSNumber *> *)requestedSizes;
