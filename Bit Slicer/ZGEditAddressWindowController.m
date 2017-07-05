@@ -39,8 +39,10 @@
 {
 	ZGVariableController * _Nonnull _variableController;
 	ZGVariable * _Nullable _variable;
+	NSString *_genericAddressDescription;
 	
 	IBOutlet NSTextField *_addressTextField;
+	IBOutlet NSTextField *_addressDescriptionTextField;
 }
 
 - (NSString *)windowNibName
@@ -58,6 +60,11 @@
 	return self;
 }
 
+- (void)windowDidLoad
+{
+	_genericAddressDescription = _addressDescriptionTextField.stringValue;
+}
+
 - (void)requestEditingAddressFromVariable:(ZGVariable *)variable attachedToWindow:(NSWindow *)parentWindow
 {
 	NSWindow *window = ZGUnwrapNullableObject([self window]); // ensure window is loaded
@@ -66,6 +73,16 @@
 	_addressTextField.stringValue = variable.addressFormula;
 	
 	[_addressTextField selectText:nil];
+	
+	if (variable.tagIdentifier == 0)
+	{
+		_addressDescriptionTextField.stringValue = _genericAddressDescription;
+	}
+	else
+	{
+#warning localize this
+		_addressDescriptionTextField.stringValue = [NSString stringWithFormat:@"%@ This address can be referenced from other variables by using %@", _genericAddressDescription, [ZGVariable tagIdentifierStringValueFromTagIdentifier:variable.tagIdentifier dollarPrefix:YES]];
+	}
 	
 	[NSApp
 	 beginSheet:window

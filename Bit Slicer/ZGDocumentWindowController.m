@@ -1098,6 +1098,26 @@
 		}
 	}
 	
+	else if (menuItem.action == @selector(tagVariables:))
+	{
+		NSArray<ZGVariable *> *selectedVariables = [self selectedVariables];
+		
+		menuItem.title = (selectedVariables.count != 1) ? ZGLocalizableSearchDocumentString(@"tagMultipleVariablesTitle") : ZGLocalizableSearchDocumentString(@"tagSingleVariableTitle");
+		
+		if ([_searchController canCancelTask] || selectedVariables.count == 0 || !self.currentProcess.valid)
+		{
+			return NO;
+		}
+		
+		for (ZGVariable *variable in selectedVariables)
+		{
+			if (variable.tagIdentifier > 0)
+			{
+				return NO;
+			}
+		}
+	}
+	
 	else if (menuItem.action == @selector(watchVariable:))
 	{
 		if ([_searchController canCancelTask] || !self.currentProcess.valid || [self selectedVariables].count != 1)
@@ -1373,6 +1393,15 @@
 - (IBAction)relativizeVariablesAddress:(id)__unused sender
 {
 	[_variableController relativizeVariables:[self selectedVariables]];
+}
+
+- (IBAction)tagVariables:(id)__unused sender
+{
+	NSArray<ZGVariable *> *selectedVariables = [self selectedVariables];
+	uint64_t firstTag = _documentData.lastUsedVariableTag + 1;
+	
+	_documentData.lastUsedVariableTag += selectedVariables.count;
+	[_variableController tagVariables:selectedVariables beginningWithTag:firstTag];
 }
 
 #pragma mark Variable Watching Handling

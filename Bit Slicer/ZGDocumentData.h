@@ -50,6 +50,7 @@
 #define ZGBelowValueKey @"ZGBelowValueKey"
 #define ZGSearchStringValueKeyNew @"ZGSearchStringValueNewKey"
 #define ZGSearchStringValueKeyOld @"ZGSearchStringValueKey" // legacy
+#define ZGLastUsedVariableTagKey @"ZGLastUsedVariableTagKey"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -70,6 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (copy, nonatomic) NSString *lastEpsilonValue;
 @property (copy, nonatomic, nullable) NSString *lastAboveRangeValue;
 @property (copy, nonatomic, nullable) NSString *lastBelowRangeValue;
+@property (nonatomic) uint64_t lastUsedVariableTag;
 
 @end
 

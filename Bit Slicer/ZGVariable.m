@@ -50,9 +50,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 #define ZGNameKey @"ZGNameKey" // legacy
 #define ZGDynamicAddressKey @"ZGIsPointerKey" // value is for backwards compatibility
 #define ZGAddressFormulaKey @"ZGAddressFormulaKey"
+#define ZGAddressTagKey @"ZGAddressTagKey"
 #define ZGScriptKey @"ZGScriptKey"
 #define ZGScriptCachePathKey @"ZGScriptCachePathKey"
 #define ZGScriptCacheUUIDKey @"ZGScriptCacheUUIDKey"
+#define ZGCachedReferencedTagIdentifiersKey @"ZGCachedReferencedTagIdentifiersKey"
 
 @implementation ZGVariable
 {
@@ -114,6 +116,10 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	 encodeObject:[self addressFormula]
 	 forKey:ZGAddressFormulaKey];
 	
+	[coder
+	 encodeInt64:(int64_t)_tagIdentifier
+	 forKey:ZGAddressTagKey];
+	
 	if (_rawValue != nil)
 	{
 		[coder
@@ -144,6 +150,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	{
 		[coder encodeObject:_cachedScriptUUID forKey:ZGScriptCacheUUIDKey];
 	}
+	
+	if (_cachedReferencedTagIdentifiers != nil)
+	{
+		[coder encodeObject:_cachedReferencedTagIdentifiers forKey:ZGCachedReferencedTagIdentifiersKey];
+	}
 }
 
 - (id)initWithCoder:(NSCoder *)coder
@@ -165,6 +176,8 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		{
 			_byteOrder = CFByteOrderGetCurrent();
 		}
+		
+		_tagIdentifier = (uint64_t)[coder decodeInt64ForKey:ZGAddressTagKey];
 		
 		_usesDynamicAddress = [coder decodeBoolForKey:ZGDynamicAddressKey];
 		_addressFormula = [coder decodeObjectOfClass:[NSString class] forKey:ZGAddressFormulaKey];
@@ -206,6 +219,26 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		_cachedScriptPath = [[coder decodeObjectOfClass:[NSString class] forKey:ZGScriptCachePathKey] copy];
 		
 		_cachedScriptUUID = [[coder decodeObjectOfClass:[NSString class] forKey:ZGScriptCacheUUIDKey] copy];
+		
+		NSSet<NSNumber *> *cachedReferencedTagIdentifiers = [coder decodeObjectOfClasses:[NSSet setWithArray:@[[NSNumber class], [NSSet class]]] forKey:ZGCachedReferencedTagIdentifiersKey];
+		
+		if ([cachedReferencedTagIdentifiers isKindOfClass:[NSSet class]] && cachedReferencedTagIdentifiers.count > 0)
+		{
+			BOOL hasNonNumber = NO;
+			for (id identifier in cachedReferencedTagIdentifiers)
+			{
+				if (![identifier isKindOfClass:[NSNumber class]])
+				{
+					hasNonNumber = YES;
+					break;
+				}
+			}
+			
+			if (!hasNonNumber)
+			{
+				_cachedReferencedTagIdentifiers = cachedReferencedTagIdentifiers;
+			}
+		}
 		
 		return self;
 	}
@@ -368,6 +401,12 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	return (NSString * _Nonnull)_stringValue;
 }
 
++ (NSString *)tagIdentifierStringValueFromTagIdentifier:(uint64_t)tagIdentifier dollarPrefix:(BOOL)dollarPrefix
+{
+	NSString *prefix = dollarPrefix ? @"$" : @"";
+	return [NSString stringWithFormat:@"%@a%llx", prefix, tagIdentifier];
+}
+
 + (NSString *)byteArrayStringFromValue:(unsigned char *)value size:(ZGMemorySize)size
 {
 	NSMutableArray<NSString *> *byteStringComponents = [NSMutableArray array];
@@ -379,6 +418,22 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	}
 	
 	return [byteStringComponents componentsJoinedByString:@" "];
+}
+
++ (uint64_t)tagIdentifierFromTagIdentifierStringValue:(NSString *)stringValue
+{
+	NSString *prefix = @"a";
+	if ([stringValue hasPrefix:prefix])
+	{
+		NSString *hexString = [stringValue substringFromIndex:prefix.length];
+		
+		uint64_t tagIdentifier = 0;
+		if ([[NSScanner scannerWithString:hexString] scanHexLongLong:&tagIdentifier])
+		{
+			return tagIdentifier;
+		}
+	}
+	return 0;
 }
 
 - (void)updateStringValue

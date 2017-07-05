@@ -157,6 +157,10 @@
 	 encodeObject:_data.searchValue
 	 forKey:ZGSearchStringValueKeyNew];
 	
+	[keyedArchiver
+	 encodeInt64:(int64_t)_data.lastUsedVariableTag
+	 forKey:ZGLastUsedVariableTagKey];
+	
 	[keyedArchiver finishEncoding];
 	
 	return [[NSFileWrapper alloc] initRegularFileWithContents:writeData];
@@ -228,6 +232,8 @@
 	
 	_data.lastAboveRangeValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGAboveValueKey];
 	_data.lastBelowRangeValue = [keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGBelowValueKey];
+	
+	_data.lastUsedVariableTag = (uint64_t)[keyedUnarchiver decodeInt64ForKey:ZGLastUsedVariableTagKey];
 	
 	return YES;
 }

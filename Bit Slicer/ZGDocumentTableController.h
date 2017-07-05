@@ -44,7 +44,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)updateWatchVariablesTimer;
 - (BOOL)updateVariableValuesInRange:(NSRange)variableRange;
 
-- (BOOL)updateDynamicVariableAddress:(ZGVariable *)variable;
+- (NSDictionary<NSString *, NSNumber *> *)referencedIdentifiersUsedBySelectionVariables:(NSArray<ZGVariable *> *)selectionVariables allVariables:(NSArray<ZGVariable *> *)allVariables;
+
+- (BOOL)updateDynamicVariableAddress:(ZGVariable *)variable referencedAddressIdentifiers:(NSDictionary<NSString *, NSNumber *> *)referencedAddressIdentifiers;
 
 - (void)clearCache;
 

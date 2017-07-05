@@ -52,6 +52,12 @@
 #define ZGDidFindSymbol @"ZGDidFindSymbol"
 #define ZGLastSearchInfoVariable @"ZGLastSearchInfoVariable"
 
+@interface ZGCalculator ()
+
++ (NSString *)expressionBySubstitutingCalculatePointerFunctionInExpression:(NSString *)expression;
+
+@end
+
 @implementation ZGVariable (ZGCalculatorAdditions)
 
 - (BOOL)usesDynamicPointerAddress
@@ -62,6 +68,52 @@
 - (BOOL)usesDynamicBaseAddress
 {
 	return _addressFormula != nil && [_addressFormula rangeOfString:ZGBaseAddressFunction].location != NSNotFound;
+}
+
+- (NSSet<NSNumber *> *)referencedTagIdentifiers
+{
+	NSString *stringExpression = [ZGCalculator expressionBySubstitutingCalculatePointerFunctionInExpression:_addressFormula];
+	
+	NSError *error = nil;
+	DDExpression *expression = [DDExpression expressionFromString:stringExpression error:&error];
+	
+	NSMutableArray<NSNumber *> *identifiers = [NSMutableArray array];
+	if (expression != nil)
+	{
+		NSArray<DDExpression *> *currentExpressions = @[expression];
+		while (currentExpressions.count > 0)
+		{
+			NSMutableArray<DDExpression *> *newExpressions = [NSMutableArray array];
+			for (DDExpression *currentExpression in currentExpressions)
+			{
+				switch (currentExpression.expressionType)
+				{
+					case DDExpressionTypeNumber:
+						break;
+					case DDExpressionTypeFunction:
+						[newExpressions addObjectsFromArray:currentExpression.arguments];
+						break;
+					case DDExpressionTypeVariable:
+					{
+						uint64_t newTagIdentifier = [ZGVariable tagIdentifierFromTagIdentifierStringValue:currentExpression.variable];
+						
+						// Try preventing a variable from referencing itself directly
+						if (newTagIdentifier != self.tagIdentifier)
+						{
+							[identifiers addObject:@([ZGVariable tagIdentifierFromTagIdentifierStringValue:currentExpression.variable])];
+						}
+						break;
+					}
+				}
+			}
+			currentExpressions = newExpressions;
+		}
+	}
+	else
+	{
+		ZG_LOG(@"Failed to parse expression in -referencedIdentifiers with error: %@", error);
+	}
+	return [NSSet setWithArray:identifiers];
 }
 
 @end
@@ -476,7 +528,7 @@
 	return [[NSString alloc] initWithData:newData encoding:NSUTF8StringEncoding];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages symbolicates:(BOOL)symbolicates foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages referencedAddresses:(NSDictionary<NSString *, NSNumber *> *)referencedAddresses symbolicates:(BOOL)symbolicates foundSymbol:(BOOL *)foundSymbol currentAddress:(ZGMemoryAddress)currentAddress error:(NSError * __autoreleasing *)error
 {
 	NSString *newExpression = [self expressionBySubstitutingCalculatePointerFunctionInExpression:expression];
 	
@@ -485,6 +537,11 @@
 	if (failedImages != nil)
 	{
 		[substitutions setObject:failedImages forKey:ZGFailedImagesVariable];
+	}
+	
+	if (referencedAddresses != nil)
+	{
+		[substitutions addEntriesFromDictionary:referencedAddresses];
 	}
 
 	NSString *evaluatedExpression = [self evaluateExpression:newExpression substitutions:substitutions error:error];
@@ -498,12 +555,12 @@
 
 + (NSString *)evaluateAndSymbolicateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process currentAddress:(ZGMemoryAddress)currentAddress didSymbolicate:(BOOL *)didSymbolicate error:(NSError * __autoreleasing *)error
 {
-	return [self evaluateExpression:expression process:process failedImages:nil symbolicates:YES foundSymbol:didSymbolicate currentAddress:currentAddress error:error];
+	return [self evaluateExpression:expression process:process failedImages:nil referencedAddresses:nil symbolicates:YES foundSymbol:didSymbolicate currentAddress:currentAddress error:error];
 }
 
-+ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages error:(NSError * __autoreleasing *)error
++ (NSString *)evaluateExpression:(NSString *)expression process:(ZGProcess * __unsafe_unretained)process failedImages:(NSMutableArray<NSString *> * __unsafe_unretained)failedImages referencedAddresses:(NSDictionary<NSString *, NSNumber *> *)referencedAddresses  error:(NSError * __autoreleasing *)error
 {
-	return [self evaluateExpression:expression process:process failedImages:failedImages symbolicates:NO foundSymbol:NULL currentAddress:0x0 error:error];
+	return [self evaluateExpression:expression process:process failedImages:failedImages referencedAddresses:referencedAddresses symbolicates:NO foundSymbol:NULL currentAddress:0x0 error:error];
 }
 
 @end

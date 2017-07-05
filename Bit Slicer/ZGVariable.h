@@ -59,6 +59,8 @@ extern NSString *ZGVariablePboardType;
 @property (nonatomic) ZGMemorySize lastUpdatedSize;
 @property (nonatomic) BOOL usesDynamicAddress;
 @property (nonatomic) BOOL finishedEvaluatingDynamicAddress;
+@property (nonatomic) uint64_t tagIdentifier;
+@property (nonatomic, nullable) NSSet<NSNumber *> *cachedReferencedTagIdentifiers;
 
 - (nullable void *)rawValue;
 - (void)setRawValue:(nullable const void *)rawValue;
@@ -92,6 +94,9 @@ extern NSString *ZGVariablePboardType;
 - (id)initWithValue:(nullable const void *)value size:(ZGMemorySize)size address:(ZGMemoryAddress)address type:(ZGVariableType)type qualifier:(ZGVariableQualifier)qualifier pointerSize:(ZGMemorySize)pointerSize description:(nullable NSAttributedString *)description enabled:(BOOL)enabled byteOrder:(CFByteOrder)byteOrder;
 
 + (NSString *)byteArrayStringFromValue:(unsigned char *)value size:(ZGMemorySize)size;
+
++ (NSString *)tagIdentifierStringValueFromTagIdentifier:(uint64_t)tagIdentifier dollarPrefix:(BOOL)dollarPrefix;
++ (uint64_t)tagIdentifierFromTagIdentifierStringValue:(NSString *)stringValue;
 
 - (void)updateStringValue;
 

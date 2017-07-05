@@ -1,12 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ZGEditAddressWindowController">
             <connections>
+                <outlet property="_addressDescriptionTextField" destination="wy6-1I-QI5" id="54u-iM-aNf"/>
                 <outlet property="_addressTextField" destination="vG1-K0-EpQ" id="MlQ-ER-GQQ"/>
                 <outlet property="window" destination="k1t-hI-27g" id="Dzu-QF-ncj"/>
             </connections>
@@ -23,7 +25,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bjO-A3-mOo">
-                        <rect key="frame" x="311" y="9" width="83" height="32"/>
+                        <rect key="frame" x="312" y="9" width="82" height="32"/>
                         <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ln7-Xd-Cjr">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -36,7 +38,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TwY-0A-a93">
-                        <rect key="frame" x="228" y="9" width="83" height="32"/>
+                        <rect key="frame" x="230" y="9" width="82" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="E8L-gt-bay">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -48,8 +50,8 @@ Gw
                             <action selector="cancelEditingAddress:" target="-2" id="d2M-06-JLV"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vG1-K0-EpQ">
-                        <rect key="frame" x="81" y="85" width="307" height="22"/>
+                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vG1-K0-EpQ">
+                        <rect key="frame" x="80" y="85" width="308" height="22"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="307" id="hYW-Ot-DYy"/>
                         </constraints>
@@ -59,15 +61,15 @@ Gw
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZUM-6j-hbA">
-                        <rect key="frame" x="17" y="88" width="59" height="17"/>
+                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZUM-6j-hbA">
+                        <rect key="frame" x="17" y="88" width="58" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Address:" id="En6-Kd-M7t">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="wy6-1I-QI5">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" preferredMaxLayoutWidth="370" translatesAutoresizingMaskIntoConstraints="NO" id="wy6-1I-QI5">
                         <rect key="frame" x="17" y="45" width="374" height="28"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="yr8-jR-NWj">
                             <font key="font" metaFont="smallSystem"/>

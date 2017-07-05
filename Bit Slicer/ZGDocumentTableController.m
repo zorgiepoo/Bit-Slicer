@@ -197,7 +197,45 @@
 	_lastUpdatedDate = [NSDate date];
 }
 
-- (BOOL)updateDynamicVariableAddress:(ZGVariable *)variable
+- (NSDictionary<NSString *, NSNumber *> *)referencedIdentifiersUsedBySelectionVariables:(NSArray<ZGVariable *> *)selectionVariables allVariables:(NSArray<ZGVariable *> *)allVariables
+{
+	NSMutableSet<NSNumber *> *referencedIdentifiers = [NSMutableSet set];
+	
+	for (ZGVariable *variable in selectionVariables)
+	{
+		NSSet<NSNumber *> *cachedReferencedTagIdentifiers = variable.cachedReferencedTagIdentifiers;
+		if (cachedReferencedTagIdentifiers != nil)
+		{
+			[referencedIdentifiers addObjectsFromArray:cachedReferencedTagIdentifiers.allObjects];
+		}
+	}
+	
+	NSMutableDictionary<NSString *, NSNumber *> *identifiersDictionary = [NSMutableDictionary dictionary];
+	
+	if (referencedIdentifiers.count > 0)
+	{
+		for (ZGVariable *variable in allVariables)
+		{
+			NSNumber *identifierNumber = @(variable.tagIdentifier);
+			if ([referencedIdentifiers containsObject:identifierNumber])
+			{
+#warning in the future we may have to update the variable's dynamic address first
+				// (Depending on our finished updating dynamic address optimization...)
+				[identifiersDictionary setObject:@(variable.address) forKey:[ZGVariable tagIdentifierStringValueFromTagIdentifier:identifierNumber.unsignedLongLongValue dollarPrefix:NO]];
+				
+				[referencedIdentifiers removeObject:identifierNumber];
+				if (referencedIdentifiers.count == 0)
+				{
+					break;
+				}
+			}
+		}
+	}
+	
+	return identifiersDictionary;
+}
+
+- (BOOL)updateDynamicVariableAddress:(ZGVariable *)variable referencedAddressIdentifiers:(NSDictionary<NSString *, NSNumber *> *)referencedAddressIdentifiers
 {
 	BOOL needsToReload = NO;
 	ZGDocumentWindowController *windowController = _windowController;
@@ -209,6 +247,7 @@
 			 evaluateExpression:[NSMutableString stringWithString:variable.addressFormula]
 			 process:windowController.currentProcess
 			 failedImages:_failedExecutableImages
+			 referencedAddresses:referencedAddressIdentifiers
 			 error:&error];
 		
 		if (variable.address != newAddressString.zgUnsignedLongLongValue)
@@ -218,7 +257,7 @@
 		}
 		
 		// We don't have to evaluate it more than once if we're not doing any pointer calculations
-		if (error == nil && !variable.usesDynamicPointerAddress)
+		if (error == nil && !variable.usesDynamicPointerAddress && variable.cachedReferencedTagIdentifiers.count == 0)
 		{
 			variable.finishedEvaluatingDynamicAddress = YES;
 		}
@@ -259,9 +298,14 @@
 	// We don't want to update this when the user is editing something in the table
 	if (!isOccluded && windowController.currentProcess.hasGrantedAccess && _variablesTableView.editedRow == -1)
 	{
-		for (ZGVariable *variable in [_documentData.variables subarrayWithRange:visibleRowsRange])
+		NSArray<ZGVariable *> *selectionVariables = [_documentData.variables subarrayWithRange:visibleRowsRange];
+		
+		NSDictionary<NSString *, NSNumber *> *referencedIdentifiers =
+		[self referencedIdentifiersUsedBySelectionVariables:selectionVariables allVariables:_documentData.variables];
+		 
+		for (ZGVariable *variable in selectionVariables)
 		{
-			if ([self updateDynamicVariableAddress:variable])
+			if ([self updateDynamicVariableAddress:variable referencedAddressIdentifiers:referencedIdentifiers])
 			{
 				needsToReloadTable = YES;
 			}
@@ -280,7 +324,8 @@
 				// We have to make sure variable's address is up to date before proceeding
 				if (isOccluded || variableIndex < visibleRowsRange.location || variableIndex >= visibleRowsRange.location + visibleRowsRange.length)
 				{
-					if ([self updateDynamicVariableAddress:variable])
+#warning fix what should be passed to referencedIdentifiers
+					if ([self updateDynamicVariableAddress:variable referencedAddressIdentifiers:@{}])
 					{
 						needsToReloadTable = YES;
 					}

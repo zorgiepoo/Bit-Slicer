@@ -222,6 +222,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		NSArray<ZGVariable *> *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
 		NSUInteger currentIndex = windowController.selectedVariableIndexes.count == 0 ? 0 : windowController.selectedVariableIndexes.firstIndex + 1;
 		
+#warning Figure out what should really be done later
+		// Avoid having identical tag identifiers
+		// In the future, we ought to do some better logic here..
+		// I guess I don't need to touch the cached identifiers for now
+		for (ZGVariable *variable in variablesToInsertArray)
+		{
+			variable.tagIdentifier = 0;
+		}
+		
 		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, variablesToInsertArray.count)];
 		
 		[self
@@ -929,7 +938,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	 addressFormula:variable.addressFormula];
 	
 	variable.addressFormula = newAddressFormula;
-	if (variable.usesDynamicPointerAddress || variable.usesDynamicBaseAddress)
+	
+	NSSet<NSNumber *> *referencedTagIdentifiers = [variable referencedTagIdentifiers];
+	
+	if (referencedTagIdentifiers.count > 0 || variable.cachedReferencedTagIdentifiers != nil)
+	{
+		variable.cachedReferencedTagIdentifiers = referencedTagIdentifiers;
+	}
+	
+	if (variable.usesDynamicPointerAddress || variable.usesDynamicBaseAddress || referencedTagIdentifiers.count > 0)
 	{
 		variable.usesDynamicAddress = YES;
 	}
@@ -1037,7 +1054,8 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		
 		// Update the variable's address
 		ZGDocumentWindowController *windowController = _windowController;
-		[windowController.tableController updateDynamicVariableAddress:variable];
+#warning Decide later if we should pass something real for referencedAddressIdentifiers
+		[windowController.tableController updateDynamicVariableAddress:variable referencedAddressIdentifiers:@{}];
 		
 		// Re-annotate the variable
 		[[self class] annotateVariables:@[variable] process:process];
@@ -1107,6 +1125,42 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			variable.fullAttributedDescription = newDescription;
 		}
 	}
+}
+
+#pragma mark ID Variables
+
+// Note: caller currently must update the document's last used tag *before* invoking this method
+- (void)tagVariables:(NSArray<ZGVariable *> *)variables beginningWithTag:(uint64_t)firstTag
+{
+	[self tagVariables:variables beginningWithTag:firstTag erase:NO];
+}
+
+- (void)tagVariables:(NSArray<ZGVariable *> *)variables beginningWithTag:(uint64_t)firstTag erase:(BOOL)shouldErase
+{
+	if (shouldErase)
+	{
+		for (ZGVariable *variable in variables)
+		{
+			variable.tagIdentifier = 0;
+		}
+	}
+	else
+	{
+		uint64_t currentTag = firstTag;
+		for (ZGVariable *variable in variables)
+		{
+			variable.tagIdentifier = currentTag;
+			currentTag++;
+		}
+	}
+	
+	ZGDocumentWindowController *windowController = _windowController;
+	
+	windowController.undoManager.actionName = ZGLocalizedStringFromVariableActionsTable(@"undoTagChange");
+	[[windowController.undoManager prepareWithInvocationTarget:self]
+	 tagVariables:variables
+	 beginningWithTag:firstTag
+	 erase:!shouldErase];
 }
 
 #pragma mark Edit Variables Sizes (Byte Arrays)
