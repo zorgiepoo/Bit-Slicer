@@ -222,15 +222,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		NSArray<ZGVariable *> *variablesToInsertArray = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
 		NSUInteger currentIndex = windowController.selectedVariableIndexes.count == 0 ? 0 : windowController.selectedVariableIndexes.firstIndex + 1;
 		
-#warning Figure out what should really be done later
-		// Avoid having identical tag identifiers
-		// In the future, we ought to do some better logic here..
-		// I guess I don't need to touch the cached identifiers for now
-		for (ZGVariable *variable in variablesToInsertArray)
-		{
-			variable.tagIdentifier = 0;
-		}
-		
 		NSIndexSet *indexesToInsert = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(currentIndex, variablesToInsertArray.count)];
 		
 		[self
@@ -365,6 +356,15 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)addVariables:(NSArray<ZGVariable *> *)variables atRowIndexes:(NSIndexSet *)rowIndexes
 {
 	ZGDocumentWindowController *windowController = _windowController;
+	
+#warning Figure out what should really be done later
+	// Avoid having identical tag identifiers
+	// In the future, we ought to do some better logic here..
+	// I guess I don't need to touch the cached identifiers for now
+	for (ZGVariable *variable in variables)
+	{
+		variable.tagIdentifier = 0;
+	}
 	
 	NSMutableArray<ZGVariable *> *temporaryArray = [[NSMutableArray alloc] initWithArray:_documentData.variables];
 	[temporaryArray insertObjects:variables atIndexes:rowIndexes];
