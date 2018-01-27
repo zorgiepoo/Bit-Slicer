@@ -558,7 +558,8 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 
 - (IBAction)runningApplicationsPopUpButton:(id)__unused sender
 {
-	if ([_runningApplicationsPopUpButton.selectedItem.representedObject processID] != _currentProcess.processID)
+	ZGProcess *process = _runningApplicationsPopUpButton.selectedItem.representedObject;
+	if (process.processID != _currentProcess.processID)
 	{
 		[self switchProcess];
 	}
