@@ -1,0 +1,27 @@
+
+/* Class = "NSWindow"; title = "Memory Viewer"; ObjectID = "1"; */
+"1.title" = "Visor de memoria";
+
+/* Class = "NSToolbarItem"; label = "Target"; ObjectID = "2oH-t9-bYi"; */
+"2oH-t9-bYi.label" = "Objetivo";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Target"; ObjectID = "2oH-t9-bYi"; */
+"2oH-t9-bYi.paletteLabel" = "Objetivo";
+
+/* Class = "NSToolbarItem"; label = "Back/Forward"; ObjectID = "Z6W-2O-OWd"; */
+"Z6W-2O-OWd.label" = "Atrás/Adelante";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Back/Forward"; ObjectID = "Z6W-2O-OWd"; */
+"Z6W-2O-OWd.paletteLabel" = "Atrás/Adelante";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "a0O-5N-OUy"; */
+"a0O-5N-OUy.title" = "Otras vistas";
+
+/* Class = "NSToolbarItem"; label = "Address"; ObjectID = "dKv-kA-cOR"; */
+"dKv-kA-cOR.label" = "Dirección";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Address"; ObjectID = "dKv-kA-cOR"; */
+"dKv-kA-cOR.paletteLabel" = "Dirección";
+
+/* Class = "NSTextFieldCell"; title = "0x0"; ObjectID = "o8x-c0-Kha"; */
+"o8x-c0-Kha.title" = "0x0";

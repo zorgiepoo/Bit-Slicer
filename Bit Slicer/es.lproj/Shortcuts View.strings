@@ -1,0 +1,12 @@
+
+/* Class = "NSTextFieldCell"; title = "Pausing/Continuing:"; ObjectID = "OZp-xD-Aza"; */
+"OZp-xD-Aza.title" = "Detener/Continuar:";
+
+/* Class = "NSTextFieldCell"; title = "Stepping Over:"; ObjectID = "TC3-Sc-pTc"; */
+"TC3-Sc-pTc.title" = "Saltar sobre:";
+
+/* Class = "NSTextFieldCell"; title = "Stepping Out:"; ObjectID = "TWO-T9-AWJ"; */
+"TWO-T9-AWJ.title" = "Saltar fuera:";
+
+/* Class = "NSTextFieldCell"; title = "Stepping Into:"; ObjectID = "rgu-ne-tsn"; */
+"rgu-ne-tsn.title" = "Saltar dentro:";

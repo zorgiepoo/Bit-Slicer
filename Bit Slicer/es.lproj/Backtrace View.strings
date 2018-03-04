@@ -1,0 +1,18 @@
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3XX-NZ-UPf"; */
+"3XX-NZ-UPf.title" = "Celda de texto";
+
+/* Class = "NSTableColumn"; headerCell.title = "Backtrace"; ObjectID = "4kh-yY-nSc"; */
+"4kh-yY-nSc.headerCell.title" = "Rastrear";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "ALu-mJ-3Ud"; */
+"ALu-mJ-3Ud.title" = "Copiar";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "aXd-k8-FQC"; */
+"aXd-k8-FQC.title" = "Copiar Dirección";
+
+/* Class = "NSMenu"; title = "Right Click Menu"; ObjectID = "dO3-lj-Kst"; */
+"dO3-lj-Kst.title" = "Menú de clic derecho";
+
+/* Class = "NSMenuItem"; title = "Show in Memory Viewer"; ObjectID = "teb-0W-szd"; */
+"teb-0W-szd.title" = "Mostrar en el visor de memoria";

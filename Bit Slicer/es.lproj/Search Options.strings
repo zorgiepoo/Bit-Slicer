@@ -1,0 +1,12 @@
+
+/* Class = "NSBox"; title = "Box"; ObjectID = "86H-Wp-nuT"; */
+"86H-Wp-nuT.title" = "Caja";
+
+/* Class = "NSTextFieldCell"; title = "Beginning Address"; ObjectID = "T3N-9g-brJ"; */
+"T3N-9g-brJ.title" = "Dirección inicial";
+
+/* Class = "NSTextFieldCell"; title = "Ending Address"; ObjectID = "dZL-uw-7Rv"; */
+"dZL-uw-7Rv.title" = "Dirección final";
+
+/* Class = "NSButtonCell"; title = "Ignore Data Alignment"; ObjectID = "mdD-ud-Xce"; */
+"mdD-ud-Xce.title" = "Ignorar la alineación de datos";

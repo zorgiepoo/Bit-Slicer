@@ -1,0 +1,9 @@
+
+/* Class = "NSButtonCell"; title = "Include anonymous system profile"; ObjectID = "0Zb-Wu-Gxr"; */
+"0Zb-Wu-Gxr.title" = "Incluir perfil de sistema anónimo";
+
+/* Class = "NSButtonCell"; title = "Include alpha versions"; ObjectID = "4vc-tu-6vd"; */
+"4vc-tu-6vd.title" = "Incluir versiones alfa";
+
+/* Class = "NSButtonCell"; title = "Automatically check for updates"; ObjectID = "Lzv-Qr-Svz"; */
+"Lzv-Qr-Svz.title" = "Buscar actualizaciones automáticamente";

@@ -1,0 +1,9 @@
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "5hL-cg-7rG"; */
+"5hL-cg-7rG.title" = "Cancelar";
+
+/* Class = "NSTextFieldCell"; title = "Description:"; ObjectID = "Mol-tr-SJG"; */
+"Mol-tr-SJG.title" = "Descripción:";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "c40-Cm-nxU"; */
+"c40-Cm-nxU.title" = "OK";

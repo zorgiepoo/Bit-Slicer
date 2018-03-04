@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>loggedMessagesFormat</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>Registrado %#@messages_logged@</string>
+		<key>messages_logged</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lu</string>
+			<key>one</key>
+			<string>%lu mensaje</string>
+			<key>other</key>
+			<string>%lu mensajes</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
