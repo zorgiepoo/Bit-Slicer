@@ -1,0 +1,48 @@
+
+/* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "0i9-HZ-I9p"; */
+"0i9-HZ-I9p.title" = "16-bit Integer";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "2cF-bq-GAj"; */
+"2cF-bq-GAj.title" = "Otras vistas";
+
+/* Class = "NSMenuItem"; title = "8-bit Integer"; ObjectID = "5MT-fz-hGb"; */
+"5MT-fz-hGb.title" = "8-bit Integer";
+
+/* Class = "NSMenuItem"; title = "64-bit Integer"; ObjectID = "ChS-nX-CDX"; */
+"ChS-nX-CDX.title" = "64-bit Integer";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "EGY-fh-QqL"; */
+"EGY-fh-QqL.title" = "Celda de texto";
+
+/* Class = "NSMenuItem"; title = "Float"; ObjectID = "Ec5-yn-9Qy"; */
+"Ec5-yn-9Qy.title" = "Float";
+
+/* Class = "NSTableColumn"; headerCell.title = "Register"; ObjectID = "Eia-a6-6kJ"; */
+"Eia-a6-6kJ.headerCell.title" = "Registro";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "J7T-de-2Ht"; */
+"J7T-de-2Ht.title" = "Celda de texto";
+
+/* Class = "NSMenuItem"; title = "Byte Array"; ObjectID = "Vpg-t8-W1B"; */
+"Vpg-t8-W1B.title" = "Byte Array";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "WEg-d2-avs"; */
+"WEg-d2-avs.title" = "Copiar";
+
+/* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "aEL-fJ-gBa"; */
+"aEL-fJ-gBa.title" = "Pointer";
+
+/* Class = "NSTableColumn"; headerCell.title = "Type"; ObjectID = "d5c-kz-wqB"; */
+"d5c-kz-wqB.headerCell.title" = "Tipo";
+
+/* Class = "NSTableColumn"; headerCell.title = "Value"; ObjectID = "eDj-ed-Anz"; */
+"eDj-ed-Anz.headerCell.title" = "Valor";
+
+/* Class = "NSMenuItem"; title = "32-bit Integer"; ObjectID = "kf1-YH-NwJ"; */
+"kf1-YH-NwJ.title" = "32-bit Integer";
+
+/* Class = "NSMenuItem"; title = "Double"; ObjectID = "kmx-nO-J4e"; */
+"kmx-nO-J4e.title" = "Double";
+
+/* Class = "NSMenu"; title = "Right Click Menu"; ObjectID = "wdN-rE-kkd"; */
+"wdN-rE-kkd.title" = "Menú de clic derecho";

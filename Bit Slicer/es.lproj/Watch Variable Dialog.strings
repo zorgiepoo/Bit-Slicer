@@ -1,0 +1,39 @@
+
+/* Class = "NSTableColumn"; headerCell.title = "Instruction"; ObjectID = "0aX-X4-2Ly"; */
+"0aX-X4-2Ly.headerCell.title" = "Instrucción";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "6mE-1V-0N8"; */
+"6mE-1V-0N8.title" = "Cancelar";
+
+/* Class = "NSMenuItem"; title = "Show in Memory Viewer"; ObjectID = "Ow4-Q4-j9x"; */
+"Ow4-Q4-j9x.title" = "Mostrar en el visor de memoria";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "TfC-P6-K4a"; */
+"TfC-P6-K4a.title" = "Copiar";
+
+/* Class = "NSTextFieldCell"; title = "watching_accesses_at_address"; ObjectID = "WtT-PG-TBK"; */
+"WtT-PG-TBK.title" = "watching_accesses_at_address";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "YnN-82-eBf"; */
+"YnN-82-eBf.title" = "Text Cell";
+
+/* Class = "NSMenuItem"; title = "Show in Debugger"; ObjectID = "aEU-ED-MgK"; */
+"aEU-ED-MgK.title" = "Mostrar en depurador";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "aeq-Fb-A5m"; */
+"aeq-Fb-A5m.title" = "Copiar dirección";
+
+/* Class = "NSTableColumn"; headerCell.title = "Address"; ObjectID = "bJK-aR-RHL"; */
+"bJK-aR-RHL.headerCell.title" = "Dirección";
+
+/* Class = "NSTableColumn"; headerCell.title = "Count"; ObjectID = "Daf-V9-g6D"; */
+"Daf-V9-g6D.headerCell.title" = "Contar";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "eqG-Mx-tbd"; */
+"eqG-Mx-tbd.title" = "Text Cell";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "wdf-l9-OcB"; */
+"wdf-l9-OcB.title" = "Añadir";
+
+/* Class = "NSTableColumn"; headerCell.title = "Add"; ObjectID = "xrl-DE-ToL"; */
+"xrl-DE-ToL.headerCell.title" = "Añadir";

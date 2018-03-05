@@ -1,0 +1,21 @@
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "D3u-o3-tRk"; */
+"D3u-o3-tRk.title" = "Cancelar";
+
+/* Class = "NSButtonCell"; title = "Execute"; ObjectID = "KVO-05-6x6"; */
+"KVO-05-6x6.title" = "Ejecutar";
+
+/* Class = "NSButtonCell"; title = "Write"; ObjectID = "TGb-cl-oVH"; */
+"TGb-cl-oVH.title" = "Escribir";
+
+/* Class = "NSButtonCell"; title = "Read"; ObjectID = "UyF-4s-9Md"; */
+"UyF-4s-9Md.title" = "Leer";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "aDk-Xu-4dA"; */
+"aDk-Xu-4dA.title" = "OK";
+
+/* Class = "NSTextFieldCell"; title = "Address:"; ObjectID = "cNH-6m-YCj"; */
+"cNH-6m-YCj.title" = "Dirección:";
+
+/* Class = "NSTextFieldCell"; title = "Bytes:"; ObjectID = "ja8-Pp-8AC"; */
+"ja8-Pp-8AC.title" = "Bytes:";

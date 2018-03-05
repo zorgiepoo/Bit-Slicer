@@ -1,0 +1,210 @@
+
+/* Class = "NSMenuItem"; title = "Show in Memory Viewer"; ObjectID = "100781"; */
+"100781.title" = "Mostrar en el visor de memoria";
+
+/* Class = "NSMenuItem"; title = "Show in Debugger"; ObjectID = "100786"; */
+"100786.title" = "Mostrar en depurador";
+
+/* Class = "NSMenuItem"; title = "Watch Write Accesses…"; ObjectID = "100787"; */
+"100787.title" = "Observar los accesos de escritura…";
+
+/* Class = "NSMenuItem"; title = "nop_variable"; ObjectID = "100797"; */
+"100797.title" = "nop_variable";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "100802"; */
+"100802.title" = "Copiar";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "100803"; */
+"100803.title" = "Pegar";
+
+/* Class = "NSMenuItem"; title = "edit_variable_value"; ObjectID = "100819"; */
+"100819.title" = "edit_variable_value";
+
+/* Class = "NSMenuItem"; title = "edit_variable_size"; ObjectID = "100822"; */
+"100822.title" = "edit_variable_size";
+
+/* Class = "NSMenuItem"; title = "freeze_variable"; ObjectID = "100823"; */
+"100823.title" = "freeze_variable";
+
+/* Class = "NSMenuItem"; title = "Add Variable"; ObjectID = "100843"; */
+"100843.title" = "Añadir Variable";
+
+/* Class = "NSMenu"; title = "Add Variable"; ObjectID = "100844"; */
+"100844.title" = "Añadir Variable";
+
+/* Class = "NSMenuItem"; title = "08-bit Integer"; ObjectID = "100846"; */
+"100846.title" = "08-bit Integer";
+
+/* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "100847"; */
+"100847.title" = "16-bit Integer";
+
+/* Class = "NSMenuItem"; title = "32-bit integer"; ObjectID = "100848"; */
+"100848.title" = "32-bit integer";
+
+/* Class = "NSMenuItem"; title = "64-bit Integer"; ObjectID = "100849"; */
+"100849.title" = "64-bit Integer";
+
+/* Class = "NSMenuItem"; title = "Float"; ObjectID = "100851"; */
+"100851.title" = "Float";
+
+/* Class = "NSMenuItem"; title = "Double"; ObjectID = "100852"; */
+"100852.title" = "Double";
+
+/* Class = "NSMenuItem"; title = "UTF-8 String"; ObjectID = "100854"; */
+"100854.title" = "UTF-8 String";
+
+/* Class = "NSMenuItem"; title = "UTF-16 String"; ObjectID = "100855"; */
+"100855.title" = "UTF-16 String";
+
+/* Class = "NSMenuItem"; title = "Byte Array"; ObjectID = "100857"; */
+"100857.title" = "Matriz de Byte";
+
+/* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "100859"; */
+"100859.title" = "Pointer";
+
+/* Class = "NSMenuItem"; title = "Watch Read & Write Accesses…"; ObjectID = "100885"; */
+"100885.title" = "Observar los accesos de lectura y escritura…";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "100889"; */
+"100889.title" = "Copiar dirección";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "0RQ-cA-Uk7"; */
+"0RQ-cA-Uk7.title" = "Text Cell";
+
+/* Class = "NSMenuItem"; title = "Byte Array"; ObjectID = "1hY-GB-cNT"; */
+"1hY-GB-cNT.title" = "Matriz de Bytes";
+
+/* Class = "NSMenuItem"; title = "64-bit Integer"; ObjectID = "36Y-12-hRf"; */
+"36Y-12-hRf.title" = "64-bit Integer";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3G0-oE-PRY"; */
+"3G0-oE-PRY.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "displaying_or_found_x_variables"; ObjectID = "6Kr-rx-QwW"; */
+"6Kr-rx-QwW.title" = "displaying_or_found_x_variables";
+
+/* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "6iU-LJ-nRI"; */
+"6iU-LJ-nRI.title" = "Pointer";
+
+/* Class = "NSToolbarItem"; label = "Data Type"; ObjectID = "70m-RL-vim"; */
+"70m-RL-vim.label" = "Tipo de Data";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Data Type"; ObjectID = "70m-RL-vim"; */
+"70m-RL-vim.paletteLabel" = "Tipo de Data";
+
+/* Class = "NSMenuItem"; title = "Double"; ObjectID = "7kW-nd-EFZ"; */
+"7kW-nd-EFZ.title" = "Double";
+
+/* Class = "NSTableColumn"; headerCell.title = "Description"; ObjectID = "7xt-Ka-k1E"; */
+"7xt-Ka-k1E.headerCell.title" = "Descripción";
+
+/* Class = "NSTableColumn"; headerCell.title = "Type"; ObjectID = "87D-Rg-AzL"; */
+"87D-Rg-AzL.headerCell.title" = "Tipo";
+
+/* Class = "NSMenuItem"; title = "Script"; ObjectID = "9ec-8k-PKW"; */
+"9ec-8k-PKW.title" = "Script";
+
+/* Class = "NSTextFieldCell"; title = "Flags:"; ObjectID = "AOM-F4-uKc"; */
+"AOM-F4-uKc.title" = "Banderas:";
+
+/* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "DZX-8q-NsT"; */
+"DZX-8q-NsT.title" = "16-bit Integer";
+
+/* Class = "NSMenuItem"; title = "Byte Array"; ObjectID = "FMi-B9-hS9"; */
+"FMi-B9-hS9.title" = "Matriz de Byte";
+
+/* Class = "NSMenuItem"; title = "Pointer"; ObjectID = "GzQ-9Y-rMY"; */
+"GzQ-9Y-rMY.title" = "Pointer";
+
+/* Class = "NSMenuItem"; title = "Search Pointer to Variable"; ObjectID = "JI2-jh-sbh"; */
+"JI2-jh-sbh.title" = "Buscar Pointer a variable";
+
+/* Class = "NSMenuItem"; title = "16-bit Integer"; ObjectID = "JKq-De-dsT"; */
+"JKq-De-dsT.title" = "16-bit Integer";
+
+/* Class = "NSMenuItem"; title = "16-bit String"; ObjectID = "JPE-UV-Y18"; */
+"JPE-UV-Y18.title" = "16-bit String";
+
+/* Class = "NSToolbarItem"; label = "Operator"; ObjectID = "LxQ-Vs-KYQ"; */
+"LxQ-Vs-KYQ.label" = "Operador";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Operator"; ObjectID = "LxQ-Vs-KYQ"; */
+"LxQ-Vs-KYQ.paletteLabel" = "Operador";
+
+/* Class = "NSMenuItem"; title = "8-bit Integer"; ObjectID = "QE7-Hz-jsV"; */
+"QE7-Hz-jsV.title" = "8-bit Integer";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "Rd8-r5-KgJ"; */
+"Rd8-r5-KgJ.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "Double"; ObjectID = "TGp-7r-Dbo"; */
+"TGp-7r-Dbo.title" = "Double";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "UJa-HE-MpN"; */
+"UJa-HE-MpN.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "8-bit String"; ObjectID = "XPu-Mw-Wzt"; */
+"XPu-Mw-Wzt.title" = "8-bit String";
+
+/* Class = "NSMenuItem"; title = "8-bit Integer"; ObjectID = "XYq-IR-3Gw"; */
+"XYq-IR-3Gw.title" = "8-bit Integer";
+
+/* Class = "NSMenuItem"; title = "32-bit Integer"; ObjectID = "YPf-99-vvE"; */
+"YPf-99-vvE.title" = "32-bit Integer";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "a2r-06-14a"; */
+"a2r-06-14a.title" = "OtherViews";
+
+/* Class = "NSTableColumn"; headerCell.title = "Value"; ObjectID = "aom-rv-8rE"; */
+"aom-rv-8rE.headerCell.title" = "Valor";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "cNT-1t-BfB"; */
+"cNT-1t-BfB.title" = "OtherViews";
+
+/* Class = "NSMenuItem"; title = "relativize_variable"; ObjectID = "drP-6a-Xg6"; */
+"drP-6a-Xg6.title" = "relativize_variable";
+
+/* Class = "NSMenuItem"; title = "64-bit Integer"; ObjectID = "dsI-Uc-Vqg"; */
+"dsI-Uc-Vqg.title" = "64-bit Integer";
+
+/* Class = "NSMenuItem"; title = "8-bit String"; ObjectID = "eBO-7y-dRd"; */
+"eBO-7y-dRd.title" = "8-bit String";
+
+/* Class = "NSTableColumn"; headerCell.title = "Address"; ObjectID = "i6q-5D-Acx"; */
+"i6q-5D-Acx.headerCell.title" = "Dirección";
+
+/* Class = "NSToolbarItem"; label = "Target"; ObjectID = "jO3-Z2-Pv7"; */
+"jO3-Z2-Pv7.label" = "Objetivo";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Target"; ObjectID = "jO3-Z2-Pv7"; */
+"jO3-Z2-Pv7.paletteLabel" = "Objetivo";
+
+/* Class = "NSMenuItem"; title = "32-bit Integer"; ObjectID = "lg9-Ou-rda"; */
+"lg9-Ou-rda.title" = "32-bit Integer";
+
+/* Class = "NSMenuItem"; title = "Float"; ObjectID = "luK-87-e1C"; */
+"luK-87-e1C.title" = "Float";
+
+/* Class = "NSToolbarItem"; label = "Store Values"; ObjectID = "q4V-IG-gxK"; */
+"q4V-IG-gxK.label" = "Almacenar valores";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Store Values"; ObjectID = "q4V-IG-gxK"; */
+"q4V-IG-gxK.paletteLabel" = "Almacenar valores";
+
+/* Class = "NSTextFieldCell"; title = "Address"; ObjectID = "qcP-TU-pcN"; */
+"qcP-TU-pcN.title" = "Dirección";
+
+/* Class = "NSTableColumn"; headerCell.title = "Active"; ObjectID = "trw-dN-JKj"; */
+"trw-dN-JKj.headerCell.title" = "Activo";
+
+/* Class = "NSMenuItem"; title = "16-bit String"; ObjectID = "vKC-PR-XXm"; */
+"vKC-PR-XXm.title" = "16-bit String";
+
+/* Class = "NSToolbarItem"; label = "Search"; ObjectID = "xlb-JZ-GJa"; */
+"xlb-JZ-GJa.label" = "Buscar";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Search"; ObjectID = "xlb-JZ-GJa"; */
+"xlb-JZ-GJa.paletteLabel" = "Buscar";
+
+/* Class = "NSMenuItem"; title = "Float"; ObjectID = "xya-wF-ZfW"; */
+"xya-wF-ZfW.title" = "Float";

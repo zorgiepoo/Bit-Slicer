@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>accessedTimesFormat</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>Accesos %#@number_accesses@</string>
+		<key>number_accesses</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lu</string>
+			<key>one</key>
+			<string>%lu vez</string>
+			<key>other</key>
+			<string>%lu veces</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

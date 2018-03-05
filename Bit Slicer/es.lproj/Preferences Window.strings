@@ -1,0 +1,21 @@
+
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "1"; */
+"1.title" = "preferences_title";
+
+/* Class = "NSToolbarItem"; label = "Updates"; ObjectID = "f0w-AB-SR1"; */
+"f0w-AB-SR1.label" = "Actualizaciones";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Updates"; ObjectID = "f0w-AB-SR1"; */
+"f0w-AB-SR1.paletteLabel" = "Actualizaciones";
+
+/* Class = "NSToolbarItem"; label = "Scripts"; ObjectID = "kPj-yB-vNE"; */
+"kPj-yB-vNE.label" = "Scripts";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Scripts"; ObjectID = "kPj-yB-vNE"; */
+"kPj-yB-vNE.paletteLabel" = "Scripts";
+
+/* Class = "NSToolbarItem"; label = "Shortcuts"; ObjectID = "kgo-oj-XB3"; */
+"kgo-oj-XB3.label" = "Accesos directos";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Shortcuts"; ObjectID = "kgo-oj-XB3"; */
+"kgo-oj-XB3.paletteLabel" = "Accesos directos";

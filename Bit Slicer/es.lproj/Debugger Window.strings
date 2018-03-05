@@ -1,0 +1,90 @@
+
+/* Class = "NSWindow"; title = "Debugger"; ObjectID = "5"; */
+"5.title" = "Depurador";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "127"; */
+"127.title" = "Copiar";
+
+/* Class = "NSMenuItem"; title = "NOP Instruction"; ObjectID = "155"; */
+"155.title" = "NOP Instrucción";
+
+/* Class = "NSMenuItem"; title = "Jump to Instruction"; ObjectID = "156"; */
+"156.title" = "Saltar a Instrucción";
+
+/* Class = "NSMenuItem"; title = "Show in Memory Viewer"; ObjectID = "261"; */
+"261.title" = "Mostrar en el visor de memoria";
+
+/* Class = "NSMenuItem"; title = "Copy Address"; ObjectID = "286"; */
+"286.title" = "Copiar dirección";
+
+/* Class = "NSMenuItem"; title = "Go to Call Address"; ObjectID = "292"; */
+"292.title" = "Ir a la dirección de llamada";
+
+/* Class = "NSTableColumn"; headerCell.title = "Address"; ObjectID = "4OJ-Sj-EC7"; */
+"4OJ-Sj-EC7.headerCell.title" = "Dirección";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "BKb-RB-2tf"; */
+"BKb-RB-2tf.title" = "Celda de texto";
+
+/* Class = "NSMenuItem"; title = "Set Breakpoint Condition…"; ObjectID = "FMB-Ym-nZO"; */
+"FMB-Ym-nZO.title" = "Establecer condición de Breakpoint…";
+
+/* Class = "NSToolbarItem"; label = "Continue"; ObjectID = "KQE-fj-qqG"; */
+"KQE-fj-qqG.label" = "Continuar";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Continue"; ObjectID = "KQE-fj-qqG"; */
+"KQE-fj-qqG.paletteLabel" = "Continuar";
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "Quq-lP-8lz"; */
+"Quq-lP-8lz.title" = "Otras vistas";
+
+/* Class = "NSToolbarItem"; label = "Target"; ObjectID = "V6x-9g-MBo"; */
+"V6x-9g-MBo.label" = "Objetivo";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Target"; ObjectID = "V6x-9g-MBo"; */
+"V6x-9g-MBo.paletteLabel" = "Objetivo";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "aiN-oG-EaF"; */
+"aiN-oG-EaF.title" = "Celda de texto";
+
+/* Class = "NSTableColumn"; headerCell.title = "Bytes"; ObjectID = "bfc-Km-I9g"; */
+"bfc-Km-I9g.headerCell.title" = "Bytes";
+
+/* Class = "NSTableColumn"; headerCell.title = "Instruction"; ObjectID = "hhm-Yo-i9h"; */
+"hhm-Yo-i9h.headerCell.title" = "Instrucción";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "jN6-XG-Ypp"; */
+"jN6-XG-Ypp.title" = "Celda de texto";
+
+/* Class = "NSTextFieldCell"; title = "0x0"; ObjectID = "mHS-Rp-HdH"; */
+"mHS-Rp-HdH.title" = "0x0";
+
+/* Class = "NSTableColumn"; headerCell.title = "Break"; ObjectID = "pCd-L4-hx2"; */
+"pCd-L4-hx2.headerCell.title" = "Break";
+
+/* Class = "NSToolbarItem"; label = "Back/Forward"; ObjectID = "saO-Gp-UGR"; */
+"saO-Gp-UGR.label" = "Atras/Adelante";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Back/Forward"; ObjectID = "saO-Gp-UGR"; */
+"saO-Gp-UGR.paletteLabel" = "Atras/Adelante";
+
+/* Class = "NSMenuItem"; title = "Inject Code…"; ObjectID = "sc9-6G-u0H"; */
+"sc9-6G-u0H.title" = "inyectar código…";
+
+/* Class = "NSTableColumn"; headerCell.title = "Symbols"; ObjectID = "t9W-pd-V9s"; */
+"t9W-pd-V9s.headerCell.title" = "Símbolos";
+
+/* Class = "NSToolbarItem"; label = "Address/Symbol"; ObjectID = "u3o-PN-adL"; */
+"u3o-PN-adL.label" = "Dirección/Símbolo";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Address/Symbol"; ObjectID = "u3o-PN-adL"; */
+"u3o-PN-adL.paletteLabel" = "Dirección/Símbolo";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "y3E-4i-zXd"; */
+"y3E-4i-zXd.title" = "Celda de texto";
+
+/* Class = "NSToolbarItem"; label = "Step"; ObjectID = "yIQ-3L-cfP"; */
+"yIQ-3L-cfP.label" = "Paso";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Step"; ObjectID = "yIQ-3L-cfP"; */
+"yIQ-3L-cfP.paletteLabel" = "Paso";
