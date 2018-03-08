@@ -310,6 +310,57 @@
 		7231440619C607C700FBE342 /* ZGWatchVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGWatchVariable.h; path = "Bit Slicer/ZGWatchVariable.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7231440719C607C700FBE342 /* ZGWatchVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGWatchVariable.m; path = "Bit Slicer/ZGWatchVariable.m"; sourceTree = "<group>"; usesTabs = 1; };
 		7231440D19C6230F00FBE342 /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Watch Variable.stringsdict"; sourceTree = "<group>"; };
+		72456B5A204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Preferences.strings"; sourceTree = "<group>"; };
+		72456B5D204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Search Document.strings"; sourceTree = "<group>"; };
+		72456B5E204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Dump All Memory.strings"; sourceTree = "<group>"; };
+		72456B61204D2281006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Memory Navigation.strings"; sourceTree = "<group>"; };
+		72456B62204D2281006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Logger Window.strings"; sourceTree = "<group>"; };
+		72456B63204D2281006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Memory Viewer.strings"; sourceTree = "<group>"; };
+		72456B6A204D2282006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Memory Window.strings"; sourceTree = "<group>"; };
+		72456B71204D2284006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Watch Variable.strings"; sourceTree = "<group>"; };
+		72456B72204D2284006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Debugger.strings"; sourceTree = "<group>"; };
+		72456B75204D2285006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Edit Variable Size.strings"; sourceTree = "<group>"; };
+		72456B78204D2285006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Script Preferences.strings"; sourceTree = "<group>"; };
+		72456B7B204D2285006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		72456B8A204D2287006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Search Table.strings"; sourceTree = "<group>"; };
+		72456B8B204D2287006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Script Manager.strings"; sourceTree = "<group>"; };
+		72456B8C204D2287006EFE08 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = "Bit Slicer/es.lproj/[Code] Search Document.stringsdict"; sourceTree = "<group>"; };
+		72456B91204D2288006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Edit Variable Value.strings"; sourceTree = "<group>"; };
+		72456B92204D2288006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Debugger Registers.strings"; sourceTree = "<group>"; };
+		72456B93204D2288006EFE08 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = "Bit Slicer/es.lproj/[Code] Watch Variable.stringsdict"; sourceTree = "<group>"; };
+		72456B94204D2288006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] About Window.strings"; sourceTree = "<group>"; };
+		72456B95204D2288006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		72456B9A204D2289006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Data Inspector.strings"; sourceTree = "<group>"; };
+		72456B9D204D2289006EFE08 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = "Bit Slicer/es.lproj/[Code] Logger Window.stringsdict"; sourceTree = "<group>"; };
+		72456B9E204D2289006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Dump Memory Range.strings"; sourceTree = "<group>"; };
+		72456BA1204D2289006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Memory Viewer Status Bar.strings"; sourceTree = "<group>"; };
+		72456BA2204D2289006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Memory Protection.strings"; sourceTree = "<group>"; };
+		72456BA5204D228A006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Variable Actions.strings"; sourceTree = "<group>"; };
+		72456BC5204D2434006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/MainMenu.strings"; sourceTree = "<group>"; };
+		72456BC6204D2439006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/About Window.strings"; sourceTree = "<group>"; };
+		72456BC7204D2440006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/Search Document Window.strings"; sourceTree = "<group>"; };
+		72456BC8204D244D006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/Debugger Window.strings"; sourceTree = "<group>"; };
+		72456BC9204D2452006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Backtrace View.strings"; sourceTree = "<group>"; };
+		72456BCA204D2456006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/Registers View.strings"; sourceTree = "<group>"; };
+		72456BCB204D245A006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Breakpoint Condition View.strings"; sourceTree = "<group>"; };
+		72456BCC204D245E006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/Code Injection Window.strings"; sourceTree = "<group>"; };
+		72456BCD204D2463006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/Memory Viewer Window.strings"; sourceTree = "<group>"; };
+		72456BCE204D2467006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Data Inspector View.strings"; sourceTree = "<group>"; };
+		72456BCF204D246B006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Change Memory Protection Dialog.strings"; sourceTree = "<group>"; };
+		72456BD0204D246F006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Dump All Memory Dialog.strings"; sourceTree = "<group>"; };
+		72456BD1204D2473006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Dump Memory Range Dialog.strings"; sourceTree = "<group>"; };
+		72456BD2204D2476006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/Preferences Window.strings"; sourceTree = "<group>"; };
+		72456BD3204D247B006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Software Update View.strings"; sourceTree = "<group>"; };
+		72456BD4204D247F006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Shortcuts View.strings"; sourceTree = "<group>"; };
+		72456BD5204D2482006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Scripts View.strings"; sourceTree = "<group>"; };
+		72456BD6204D2486006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Logs Window.strings"; sourceTree = "<group>"; };
+		72456BD7204D248A006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Edit Value Dialog.strings"; sourceTree = "<group>"; };
+		72456BD8204D248F006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Edit Address Dialog.strings"; sourceTree = "<group>"; };
+		72456BD9204D2493006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Edit Size Dialog.strings"; sourceTree = "<group>"; };
+		72456BDA204D2497006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Edit Description Dialog.strings"; sourceTree = "<group>"; };
+		72456BDB204D249B006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Search Options.strings"; sourceTree = "<group>"; };
+		72456BDC204D249F006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/Watch Variable Dialog.strings"; sourceTree = "<group>"; };
+		72456BDD204D24A3006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/Script Prompt Dialog.strings"; sourceTree = "<group>"; };
 		724A9F0419A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Data Inspector.strings"; sourceTree = "<group>"; };
 		724A9F0619A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger Registers.strings"; sourceTree = "<group>"; };
 		724A9F0819A1657500E72C9D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Bit Slicer/en.lproj/[Code] Debugger.strings"; sourceTree = "<group>"; };
@@ -1560,6 +1611,7 @@
 				Base,
 				fr,
 				ru,
+				es,
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Bit Slicer */;
 			projectDirPath = "";
@@ -1822,6 +1874,7 @@
 			children = (
 				7231440D19C6230F00FBE342 /* en */,
 				72D72B601AB2878C005044CF /* ru */,
+				72456B93204D2288006EFE08 /* es */,
 			);
 			name = "[Code] Watch Variable.stringsdict";
 			sourceTree = "<group>";
@@ -1831,6 +1884,7 @@
 			children = (
 				724A9F0419A1657500E72C9D /* en */,
 				72D72B4B1AB2878C005044CF /* ru */,
+				72456B9A204D2289006EFE08 /* es */,
 			);
 			name = "[Code] Data Inspector.strings";
 			sourceTree = "<group>";
@@ -1840,6 +1894,7 @@
 			children = (
 				724A9F0619A1657500E72C9D /* en */,
 				72D72B4C1AB2878C005044CF /* ru */,
+				72456B92204D2288006EFE08 /* es */,
 			);
 			name = "[Code] Debugger Registers.strings";
 			sourceTree = "<group>";
@@ -1849,6 +1904,7 @@
 			children = (
 				724A9F0819A1657500E72C9D /* en */,
 				72D72B4D1AB2878C005044CF /* ru */,
+				72456B72204D2284006EFE08 /* es */,
 			);
 			name = "[Code] Debugger.strings";
 			sourceTree = "<group>";
@@ -1858,6 +1914,7 @@
 			children = (
 				724A9F0A19A1657500E72C9D /* en */,
 				72D72B4E1AB2878C005044CF /* ru */,
+				72456B5E204D2280006EFE08 /* es */,
 			);
 			name = "[Code] Dump All Memory.strings";
 			sourceTree = "<group>";
@@ -1867,6 +1924,7 @@
 			children = (
 				724A9F0C19A1657500E72C9D /* en */,
 				72D72B4F1AB2878C005044CF /* ru */,
+				72456B9E204D2289006EFE08 /* es */,
 			);
 			name = "[Code] Dump Memory Range.strings";
 			sourceTree = "<group>";
@@ -1876,6 +1934,7 @@
 			children = (
 				724A9F0E19A1657500E72C9D /* en */,
 				72D72B521AB2878C005044CF /* ru */,
+				72456B62204D2281006EFE08 /* es */,
 			);
 			name = "[Code] Logger Window.strings";
 			sourceTree = "<group>";
@@ -1885,6 +1944,7 @@
 			children = (
 				724A9F1019A1657500E72C9D /* en */,
 				72D72B541AB2878C005044CF /* ru */,
+				72456B61204D2281006EFE08 /* es */,
 			);
 			name = "[Code] Memory Navigation.strings";
 			sourceTree = "<group>";
@@ -1894,6 +1954,7 @@
 			children = (
 				724A9F1219A1657500E72C9D /* en */,
 				72D72B551AB2878C005044CF /* ru */,
+				72456BA2204D2289006EFE08 /* es */,
 			);
 			name = "[Code] Memory Protection.strings";
 			sourceTree = "<group>";
@@ -1903,6 +1964,7 @@
 			children = (
 				724A9F1419A1657500E72C9D /* en */,
 				72D72B561AB2878C005044CF /* ru */,
+				72456BA1204D2289006EFE08 /* es */,
 			);
 			name = "[Code] Memory Viewer Status Bar.strings";
 			sourceTree = "<group>";
@@ -1912,6 +1974,7 @@
 			children = (
 				724A9F1619A1657500E72C9D /* en */,
 				72D72B571AB2878C005044CF /* ru */,
+				72456B63204D2281006EFE08 /* es */,
 			);
 			name = "[Code] Memory Viewer.strings";
 			sourceTree = "<group>";
@@ -1921,6 +1984,7 @@
 			children = (
 				724A9F1819A1657500E72C9D /* en */,
 				72D72B591AB2878C005044CF /* ru */,
+				72456B5A204D2280006EFE08 /* es */,
 			);
 			name = "[Code] Preferences.strings";
 			sourceTree = "<group>";
@@ -1930,6 +1994,7 @@
 			children = (
 				724A9F1A19A1657500E72C9D /* en */,
 				72D72B5A1AB2878C005044CF /* ru */,
+				72456B78204D2285006EFE08 /* es */,
 			);
 			name = "[Code] Script Preferences.strings";
 			sourceTree = "<group>";
@@ -1939,6 +2004,7 @@
 			children = (
 				724A9F1C19A1657500E72C9D /* en */,
 				72D72B5E1AB2878C005044CF /* ru */,
+				72456BA5204D228A006EFE08 /* es */,
 			);
 			name = "[Code] Variable Actions.strings";
 			sourceTree = "<group>";
@@ -1948,6 +2014,7 @@
 			children = (
 				724A9F3819A813D600E72C9D /* en */,
 				72D72B511AB2878C005044CF /* ru */,
+				72456B91204D2288006EFE08 /* es */,
 			);
 			name = "[Code] Edit Variable Value.strings";
 			sourceTree = "<group>";
@@ -1957,6 +2024,7 @@
 			children = (
 				724A9F3B19A8173900E72C9D /* en */,
 				72D72B501AB2878C005044CF /* ru */,
+				72456B75204D2285006EFE08 /* es */,
 			);
 			name = "[Code] Edit Variable Size.strings";
 			sourceTree = "<group>";
@@ -1966,6 +2034,7 @@
 			children = (
 				724A9F3E19A823C300E72C9D /* en */,
 				72D72B5B1AB2878C005044CF /* ru */,
+				72456B5D204D2280006EFE08 /* es */,
 			);
 			name = "[Code] Search Document.strings";
 			sourceTree = "<group>";
@@ -1975,6 +2044,7 @@
 			children = (
 				724A9F4119A85D3F00E72C9D /* en */,
 				72D72B5D1AB2878C005044CF /* ru */,
+				72456B8A204D2287006EFE08 /* es */,
 			);
 			name = "[Code] Search Table.strings";
 			sourceTree = "<group>";
@@ -1984,6 +2054,7 @@
 			children = (
 				724A9F4419A863A800E72C9D /* en */,
 				72D72B5F1AB2878C005044CF /* ru */,
+				72456B71204D2284006EFE08 /* es */,
 			);
 			name = "[Code] Watch Variable.strings";
 			sourceTree = "<group>";
@@ -1993,6 +2064,7 @@
 			children = (
 				724A9F4719A8791F00E72C9D /* en */,
 				72D72B581AB2878C005044CF /* ru */,
+				72456B6A204D2282006EFE08 /* es */,
 			);
 			name = "[Code] Memory Window.strings";
 			sourceTree = "<group>";
@@ -2002,6 +2074,7 @@
 			children = (
 				724A9F4D19A8EDD700E72C9D /* en */,
 				72D72B531AB2878C005044CF /* ru */,
+				72456B9D204D2289006EFE08 /* es */,
 			);
 			name = "[Code] Logger Window.stringsdict";
 			sourceTree = "<group>";
@@ -2011,6 +2084,7 @@
 			children = (
 				724A9F5019A8F54600E72C9D /* en */,
 				72D72B5C1AB2878C005044CF /* ru */,
+				72456B8C204D2287006EFE08 /* es */,
 			);
 			name = "[Code] Search Document.stringsdict";
 			sourceTree = "<group>";
@@ -2020,6 +2094,7 @@
 			children = (
 				725DEC871A24F7610095C9B3 /* en */,
 				72D72BCC1AB3FEC0005044CF /* ru */,
+				72456B8B204D2287006EFE08 /* es */,
 			);
 			name = "[Code] Script Manager.strings";
 			sourceTree = "<group>";
@@ -2030,6 +2105,7 @@
 				726B7CA51A23E849004354BC /* Base */,
 				725DEC851A24EE6F0095C9B3 /* en */,
 				72D72BC71AB28884005044CF /* ru */,
+				72456BDD204D24A3006EFE08 /* es */,
 			);
 			name = "Script Prompt Dialog.xib";
 			sourceTree = "<group>";
@@ -2040,6 +2116,7 @@
 				726CA29F19606CA600A6AD40 /* Base */,
 				72D271B2197C26AB00CC6914 /* en */,
 				72D72BB01AB2882A005044CF /* ru */,
+				72456BC5204D2434006EFE08 /* es */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -2050,6 +2127,7 @@
 				726CA2A219606CB600A6AD40 /* Base */,
 				72D271B3197C26AB00CC6914 /* en */,
 				72D72BB11AB2882F005044CF /* ru */,
+				72456BC7204D2440006EFE08 /* es */,
 			);
 			name = "Search Document Window.xib";
 			sourceTree = "<group>";
@@ -2060,6 +2138,7 @@
 				726CA2A519606CDD00A6AD40 /* Base */,
 				72D271BE197C26AC00CC6914 /* en */,
 				72D72BBC1AB2885B005044CF /* ru */,
+				72456BD2204D2476006EFE08 /* es */,
 			);
 			name = "Preferences Window.xib";
 			sourceTree = "<group>";
@@ -2070,6 +2149,7 @@
 				726CA2A819606D0000A6AD40 /* Base */,
 				72D271B8197C26AB00CC6914 /* en */,
 				72D72BB61AB28843005044CF /* ru */,
+				72456BCC204D245E006EFE08 /* es */,
 			);
 			name = "Code Injection Window.xib";
 			sourceTree = "<group>";
@@ -2080,6 +2160,7 @@
 				726CA2AB19606D0700A6AD40 /* Base */,
 				72D271B4197C26AB00CC6914 /* en */,
 				72D72BB21AB28833005044CF /* ru */,
+				72456BC8204D244D006EFE08 /* es */,
 			);
 			name = "Debugger Window.xib";
 			sourceTree = "<group>";
@@ -2090,6 +2171,7 @@
 				726CA2AE19606D1200A6AD40 /* Base */,
 				72D271B9197C26AB00CC6914 /* en */,
 				72D72BB71AB28847005044CF /* ru */,
+				72456BCD204D2463006EFE08 /* es */,
 			);
 			name = "Memory Viewer Window.xib";
 			sourceTree = "<group>";
@@ -2100,6 +2182,7 @@
 				726CA2B119606DA000A6AD40 /* Base */,
 				72D272F9198B085F00CC6914 /* en */,
 				72D72BC01AB28869005044CF /* ru */,
+				72456BD6204D2486006EFE08 /* es */,
 			);
 			name = "Logs Window.xib";
 			path = "Bit Slicer";
@@ -2111,6 +2194,7 @@
 				726CA2B419606DB300A6AD40 /* Base */,
 				72D271B7197C26AB00CC6914 /* en */,
 				72D72BB51AB2883F005044CF /* ru */,
+				72456BCB204D245A006EFE08 /* es */,
 			);
 			name = "Breakpoint Condition View.xib";
 			path = "Bit Slicer";
@@ -2122,6 +2206,7 @@
 				726CA2B719606DD200A6AD40 /* Base */,
 				72D271BB197C26AC00CC6914 /* en */,
 				72D72BB91AB2884F005044CF /* ru */,
+				72456BCF204D246B006EFE08 /* es */,
 			);
 			name = "Change Memory Protection Dialog.xib";
 			path = "Bit Slicer";
@@ -2133,6 +2218,7 @@
 				726CA2BA19606DD900A6AD40 /* Base */,
 				72D271BC197C26AC00CC6914 /* en */,
 				72D72BBA1AB28854005044CF /* ru */,
+				72456BD0204D246F006EFE08 /* es */,
 			);
 			name = "Dump All Memory Dialog.xib";
 			path = "Bit Slicer";
@@ -2144,6 +2230,7 @@
 				726CA2BD19606DDD00A6AD40 /* Base */,
 				72D271BD197C26AC00CC6914 /* en */,
 				72D72BBB1AB28857005044CF /* ru */,
+				72456BD1204D2473006EFE08 /* es */,
 			);
 			name = "Dump Memory Range Dialog.xib";
 			path = "Bit Slicer";
@@ -2155,6 +2242,7 @@
 				726CA2C019606DF200A6AD40 /* Base */,
 				72D271BF197C26AC00CC6914 /* en */,
 				72D72BBD1AB2885F005044CF /* ru */,
+				72456BD3204D247B006EFE08 /* es */,
 			);
 			name = "Software Update View.xib";
 			path = "Bit Slicer";
@@ -2166,6 +2254,7 @@
 				726CA2C319606DFC00A6AD40 /* Base */,
 				72D271C0197C26AC00CC6914 /* en */,
 				72D72BBE1AB28862005044CF /* ru */,
+				72456BD4204D247F006EFE08 /* es */,
 			);
 			name = "Shortcuts View.xib";
 			path = "Bit Slicer";
@@ -2177,6 +2266,7 @@
 				726CA2C619606E0100A6AD40 /* Base */,
 				72D271C1197C26AC00CC6914 /* en */,
 				72D72BBF1AB28866005044CF /* ru */,
+				72456BD5204D2482006EFE08 /* es */,
 			);
 			name = "Scripts View.xib";
 			path = "Bit Slicer";
@@ -2188,6 +2278,7 @@
 				726CA2C919606E1D00A6AD40 /* Base */,
 				72D271C3197C26AC00CC6914 /* en */,
 				72D72BC11AB2886E005044CF /* ru */,
+				72456BD7204D248A006EFE08 /* es */,
 			);
 			name = "Edit Value Dialog.xib";
 			path = "Bit Slicer";
@@ -2199,6 +2290,7 @@
 				726CA2CC19606E2200A6AD40 /* Base */,
 				72D271C4197C26AC00CC6914 /* en */,
 				72D72BC21AB28871005044CF /* ru */,
+				72456BD8204D248F006EFE08 /* es */,
 			);
 			name = "Edit Address Dialog.xib";
 			path = "Bit Slicer";
@@ -2210,6 +2302,7 @@
 				726CA2CF19606E2600A6AD40 /* Base */,
 				72D271C5197C26AC00CC6914 /* en */,
 				72D72BC31AB28876005044CF /* ru */,
+				72456BD9204D2493006EFE08 /* es */,
 			);
 			name = "Edit Size Dialog.xib";
 			path = "Bit Slicer";
@@ -2221,6 +2314,7 @@
 				726CA2D219606E2900A6AD40 /* Base */,
 				72D271C6197C26AC00CC6914 /* en */,
 				72D72BC41AB2887A005044CF /* ru */,
+				72456BDA204D2497006EFE08 /* es */,
 			);
 			name = "Edit Description Dialog.xib";
 			path = "Bit Slicer";
@@ -2232,6 +2326,7 @@
 				726CA2D519606E3100A6AD40 /* Base */,
 				72D271C7197C26AC00CC6914 /* en */,
 				72D72BC51AB2887D005044CF /* ru */,
+				72456BDB204D249B006EFE08 /* es */,
 			);
 			name = "Search Options.xib";
 			path = "Bit Slicer";
@@ -2243,6 +2338,7 @@
 				726CA2D819606E3800A6AD40 /* Base */,
 				72D271C8197C26AC00CC6914 /* en */,
 				72D72BC61AB28881005044CF /* ru */,
+				72456BDC204D249F006EFE08 /* es */,
 			);
 			name = "Watch Variable Dialog.xib";
 			path = "Bit Slicer";
@@ -2253,6 +2349,7 @@
 			children = (
 				7284245619A96B470081C673 /* en */,
 				72D72B611AB287A6005044CF /* ru */,
+				72456B95204D2288006EFE08 /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2263,6 +2360,7 @@
 				72D051AA1960890800EC532A /* Base */,
 				72D271BA197C26AC00CC6914 /* en */,
 				72D72BB81AB2884B005044CF /* ru */,
+				72456BCE204D2467006EFE08 /* es */,
 			);
 			name = "Data Inspector View.xib";
 			path = "Bit Slicer";
@@ -2274,6 +2372,7 @@
 				72D051AD1960891900EC532A /* Base */,
 				72D271B5197C26AB00CC6914 /* en */,
 				72D72BB31AB28837005044CF /* ru */,
+				72456BC9204D2452006EFE08 /* es */,
 			);
 			name = "Backtrace View.xib";
 			path = "Bit Slicer";
@@ -2285,6 +2384,7 @@
 				72D051CA1960A41F00EC532A /* Base */,
 				72D271B6197C26AB00CC6914 /* en */,
 				72D72BB41AB2883B005044CF /* ru */,
+				72456BCA204D2456006EFE08 /* es */,
 			);
 			name = "Registers View.xib";
 			sourceTree = "<group>";
@@ -2294,6 +2394,7 @@
 			children = (
 				72D271D3197C2A6800CC6914 /* en */,
 				72D72BC81AB28B8C005044CF /* ru */,
+				72456B7B204D2285006EFE08 /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -2304,6 +2405,7 @@
 				72DBC8E91B75A7430092ED75 /* Base */,
 				72DBC8EC1B75A7670092ED75 /* en */,
 				72DBC8EE1B75A76C0092ED75 /* ru */,
+				72456BC6204D2439006EFE08 /* es */,
 			);
 			name = "About Window.xib";
 			sourceTree = "<group>";
@@ -2313,6 +2415,7 @@
 			children = (
 				72DBC91E1B7690BA0092ED75 /* en */,
 				72DBC9201B7690C20092ED75 /* ru */,
+				72456B94204D2288006EFE08 /* es */,
 			);
 			name = "[Code] About Window.strings";
 			sourceTree = "<group>";
