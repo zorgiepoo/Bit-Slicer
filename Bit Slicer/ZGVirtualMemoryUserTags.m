@@ -48,12 +48,12 @@ case value: \
 		result = description; \
 		break;
 
-// Temporary workaround for those not yet on Xcode 8.1 (including Travis)
-#ifndef __MAC_10_12_1
-#define __MAC_10_12_1 101201
+// Temporary workaround for those not yet on current Xcode (including Travis)
+#ifndef __MAC_10_13_4
+#define __MAC_10_13_4 101304
 #endif
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_12_1
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_13_4
 #warning Need to update the user tag descriptions
 #endif
 
@@ -127,6 +127,11 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_DHMM);
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SCENEKIT);
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SKYWALK);
+			
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_IOSURFACE);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_LIBNETWORK);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_AUDIO);
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_VIDEOBITSTREAM, @"Video Bitstream");
 	}
 	
 	return userTagDescription;
