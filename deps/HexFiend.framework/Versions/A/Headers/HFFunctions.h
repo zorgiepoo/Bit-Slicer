@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define HFZeroRange (HFRange){0, 0}
 
+#define NDEBUG 1
+
 /*!
   Makes an HFRange.  An HFRange is like an NSRange except it uses unsigned long longs.
 */
