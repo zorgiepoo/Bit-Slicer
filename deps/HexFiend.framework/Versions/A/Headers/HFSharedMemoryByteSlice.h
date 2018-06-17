@@ -7,6 +7,8 @@
 
 #import <HexFiend/HFByteSlice.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*! @class HFSharedMemoryByteSlice
     @brief A subclass of HFByteSlice for working with data stored in memory.
     
@@ -14,13 +16,21 @@
     
     Instances of HFSharedMemoryByteSlice are immutable (like all instances of HFByteSlice).  However, to support efficient typing, the backing data is an instance of NSMutableData that may be grown.  A referenced range of the NSMutableData will never have its contents changed, but it may be allowed to grow larger, so that the data does not have to be copied merely to append a single byte.  This is implemented by overriding the  -byteSliceByAppendingSlice: method of HFByteSlice.
 */
-@interface HFSharedMemoryByteSlice : HFByteSlice
+@interface HFSharedMemoryByteSlice : HFByteSlice {
+    NSMutableData *data;
+    NSUInteger offset;
+    NSUInteger length;
+    unsigned char inlineTailLength;
+    unsigned char inlineTail[15]; //size chosen to exhaust padding of 32-byte allocator
+}
 
 // copies the data
-- (id)initWithUnsharedData:(NSData *)data;
+- (instancetype)initWithUnsharedData:(NSData *)data;
 
 // retains, does not copy
-- (id)initWithData:(NSMutableData *)data;
-- (id)initWithData:(NSMutableData *)data offset:(NSUInteger)offset length:(NSUInteger)length;
+- (instancetype)initWithData:(NSMutableData *)data;
+- (instancetype)initWithData:(NSMutableData *)data offset:(NSUInteger)offset length:(NSUInteger)length;
 
 @end
+
+NS_ASSUME_NONNULL_END

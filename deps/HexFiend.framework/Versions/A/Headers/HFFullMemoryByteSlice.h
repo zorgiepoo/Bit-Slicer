@@ -7,13 +7,19 @@
 
 #import <HexFiend/HFByteSlice.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*! @class HFFullMemoryByteSlice
 
     @brief A simple subclass of HFByteSlice that wraps an NSData.  For most uses, prefer HFSharedMemoryByteSlice.
 */
-@interface HFFullMemoryByteSlice : HFByteSlice
+@interface HFFullMemoryByteSlice : HFByteSlice {
+    NSData *data;
+}
 
 /*! Init with a given NSData, which is copied via the \c -copy message. */
-- (id)initWithData:(NSData *)val;
+- (instancetype)initWithData:(NSData *)val;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -338,7 +338,8 @@
 		
 		// Revert back to overwrite mode
 		self->_textView.controller.editable = YES;
-		[self->_textView.controller setInOverwriteMode:YES];
+		//[self->_textView.controller setInOverwriteMode:YES];
+		self->_textView.controller.editMode = HFOverwriteMode;
 		
 		[self->_textView.controller.undoManager removeAllActions];
 		
@@ -348,7 +349,8 @@
 	// When filling or clearing the memory viewer, make sure we aren't in overwrite mode
 	// If we are, filling the memory viewer will take too long, or clearing it will fail
 	_textView.controller.editable = NO;
-	[_textView.controller setInOverwriteMode:NO];
+	//[_textView.controller setInOverwriteMode:NO];
+	self->_textView.controller.editMode = HFReadOnlyMode;
 	
 	if (!self.currentProcess.valid || ![self.currentProcess hasGrantedAccess])
 	{

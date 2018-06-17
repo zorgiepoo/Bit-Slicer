@@ -8,6 +8,8 @@
 #import <HexFiend/HFRepresenter.h>
 #import <HexFiend/HFByteArray.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*! @class HFTextRepresenter
     @brief An HFRepresenter that draws text (e.g. the hex or ASCII view).
     
@@ -15,8 +17,7 @@
     
     Most of the functionality of HFTextRepresenter is private, and there is not yet enough exposed to allow creating new representers based on it.  However, there is a small amount of configurability.
 */
-@interface HFTextRepresenter : HFRepresenter
-
+@interface HFTextRepresenter : HFRepresenter {}
 /*! Given a rect edge, return an NSRect representing the maximum edge in that direction, in the coordinate system of the receiver's view.  The dimension in the direction of the edge is 0 (so if edge is NSMaxXEdge, the resulting width is 0).  The returned rect is in the coordinate space of the receiver's view.  If the byte range is not displayed, returns NSZeroRect.
  
     If range is entirely above the visible region, returns an NSRect whose width and height are 0, and whose origin is -CGFLOAT_MAX (the most negative CGFloat).  If range is entirely below the visible region, returns the same except with CGFLOAT_MAX (positive).
@@ -29,18 +30,16 @@
  */
 - (NSPoint)locationOfCharacterAtByteIndex:(unsigned long long)byteIndex;
 
-/*! Returns the per-row background colors.  The default is <tt>-[NSControl controlAlternatingRowBackgroundColors]</tt>. */
-- (NSArray *)rowBackgroundColors;
+/*! The per-row background colors. Each row is drawn with the next color in turn, cycling back to the beginning when the array is exhausted.  Any empty space is filled with the first color in the array.  If the array is empty, then the background is drawn with \c clearColor.
+ */
+@property (nonatomic, copy) NSArray *rowBackgroundColors;
 
-/*! Sets the per-row background colors.  Each row is drawn with the next color in turn, cycling back to the beginning when the array is exhausted.  Any empty space is filled with the first color in the array.  If the array is empty, then the background is drawn with \c clearColor. */
-- (void)setRowBackgroundColors:(NSArray *)colors;
-
-/*! Set whether the text view behaves like a text field (YES) or a text view (NO).  Currently this determines whether it draws a focus ring when it is the first responder.
+/*! Whether the text view behaves like a text field (YES) or a text view (NO).  Currently this determines whether it draws a focus ring when it is the first responder.
 */
-- (void)setBehavesAsTextField:(BOOL)val;
+@property (nonatomic) BOOL behavesAsTextField;
 
-/*! Returns whether the text view behaves like a text field (YES) or a text view (NO).
-*/
-- (BOOL)behavesAsTextField;
+- (void)selectAll:(id)sender;
 
 @end
+
+NS_ASSUME_NONNULL_END

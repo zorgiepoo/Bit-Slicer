@@ -52,11 +52,11 @@
 	NSUInteger characterCount;
 	
 	NSUInteger lineCount = ll2l(range.length);
-	const NSUInteger stride = bytesPerLine;
+	const NSUInteger stride = self.bytesPerLine;
 	ZGLineCountingRepresenter *rep = (ZGLineCountingRepresenter *)[self representer];
 	HFLineNumberFormat format = [self lineNumberFormat];
 	if (format == HFLineNumberFormatDecimal) {
-		unsigned long long lineValue = HFProductULL(range.location, bytesPerLine) + [rep beginningMemoryAddress];
+		unsigned long long lineValue = HFProductULL(range.location, self.bytesPerLine) + [rep beginningMemoryAddress];
 		characterCount = lineCount /* newlines */;
 		while (lineCount--) {
 			characterCount += HFCountDigitsBase10(lineValue);
@@ -77,8 +77,8 @@
 {
 	HFASSERT(range.length <= NSUIntegerMax);
 	NSUInteger lineCount = ll2l(range.length);
-	const NSUInteger stride = bytesPerLine;
-	unsigned long long lineValue = HFProductULL(range.location, bytesPerLine) + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
+	const NSUInteger stride = self.bytesPerLine;
+	unsigned long long lineValue = HFProductULL(range.location, self.bytesPerLine) + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
 	NSUInteger characterCount = [self characterCountForLineRange:range];
 	if (characterCount == 0)
 	{
@@ -127,13 +127,13 @@ static inline int common_prefix_length(const char *a, const char *b)
 #endif
 	NSUInteger previousTextStorageCharacterCount = [textStorage length];
 	
-	CGFloat verticalOffset = ld2f(lineRangeToDraw.location - floorl(lineRangeToDraw.location));
+	CGFloat verticalOffset = ld2f(self.lineRangeToDraw.location - floorl(self.lineRangeToDraw.location));
 	NSRect textRect = [self bounds];
-	textRect.size.height = lineHeight;
-	textRect.origin.y -= verticalOffset * lineHeight;
-	unsigned long long lineIndex = HFFPToUL(floorl(lineRangeToDraw.location));
-	unsigned long long lineValue = lineIndex * bytesPerLine + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
-	NSUInteger linesRemaining = ll2l(HFFPToUL(ceill(lineRangeToDraw.length + lineRangeToDraw.location) - floorl(lineRangeToDraw.location)));
+	textRect.size.height = self.lineHeight;
+	textRect.origin.y -= verticalOffset * self.lineHeight;
+	unsigned long long lineIndex = HFFPToUL(floorl(self.lineRangeToDraw.location));
+	unsigned long long lineValue = lineIndex * self.bytesPerLine + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
+	NSUInteger linesRemaining = ll2l(HFFPToUL(ceill(self.lineRangeToDraw.length + self.lineRangeToDraw.location) - floorl(self.lineRangeToDraw.location)));
 	char previousBuff[256];
 	int previousStringLength = (int)previousTextStorageCharacterCount;
 	/* BOOL conversionResult = */
@@ -160,7 +160,7 @@ static inline int common_prefix_length(const char *a, const char *b)
 			NSUInteger glyphCount;
 			[textStorage replaceCharactersInRange:replacementRange withString:replacementCharacters];
 			if (previousTextStorageCharacterCount == 0) {
-				NSDictionary *atts = [[NSDictionary alloc] initWithObjectsAndKeys:font, NSFontAttributeName, [NSColor colorWithCalibratedWhite:(CGFloat).1 alpha:(CGFloat).8], NSForegroundColorAttributeName, nil];
+				NSDictionary *atts = [[NSDictionary alloc] initWithObjectsAndKeys:self.font, NSFontAttributeName, [NSColor colorWithCalibratedWhite:(CGFloat).1 alpha:(CGFloat).8], NSForegroundColorAttributeName, nil];
 				[textStorage setAttributes:atts range:NSMakeRange(0, (NSUInteger)newStringLength)];
 				[atts release];
 			}
@@ -174,9 +174,9 @@ static inline int common_prefix_length(const char *a, const char *b)
 			memcpy(previousBuff, buff, (size_t)(newStringLength + 1));
 			previousStringLength = newStringLength;
 		}
-		textRect.origin.y += lineHeight;
+		textRect.origin.y += self.lineHeight;
 		lineIndex++;
-		lineValue = HFSum(lineValue, bytesPerLine);
+		lineValue = HFSum(lineValue, self.bytesPerLine);
 	}
 #if TIME_LINE_NUMBERS
 	CFAbsoluteTime endTime = CFAbsoluteTimeGetCurrent();
@@ -186,20 +186,20 @@ static inline int common_prefix_length(const char *a, const char *b)
 
 - (void)drawLineNumbersWithClipStringDrawing:(NSRect)clipRect
 {
-	CGFloat verticalOffset = ld2f(lineRangeToDraw.location - floorl(lineRangeToDraw.location));
+	CGFloat verticalOffset = ld2f(self.lineRangeToDraw.location - floorl(self.lineRangeToDraw.location));
 	NSRect textRect = [self bounds];
-	textRect.size.height = lineHeight;
+	textRect.size.height = self.lineHeight;
 	textRect.size.width -= 5;
-	textRect.origin.y -= verticalOffset * lineHeight + 1;
-	unsigned long long lineIndex = HFFPToUL(floorl(lineRangeToDraw.location));
-	unsigned long long lineValue = lineIndex * bytesPerLine + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
-	NSUInteger linesRemaining = ll2l(HFFPToUL(ceill(lineRangeToDraw.length + lineRangeToDraw.location) - floorl(lineRangeToDraw.location)));
+	textRect.origin.y -= verticalOffset * self.lineHeight + 1;
+	unsigned long long lineIndex = HFFPToUL(floorl(self.lineRangeToDraw.location));
+	unsigned long long lineValue = lineIndex * self.bytesPerLine + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
+	NSUInteger linesRemaining = ll2l(HFFPToUL(ceill(self.lineRangeToDraw.length + self.lineRangeToDraw.location) - floorl(self.lineRangeToDraw.location)));
 	if (! textAttributes) {
 		NSMutableParagraphStyle *mutableStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		[mutableStyle setAlignment:NSRightTextAlignment];
 		NSParagraphStyle *paragraphStyle = [mutableStyle copy];
 		[mutableStyle release];
-		textAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:font, NSFontAttributeName, [NSColor colorWithCalibratedWhite:(CGFloat).1 alpha:(CGFloat).8], NSForegroundColorAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
+		textAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:self.font, NSFontAttributeName, [NSColor colorWithCalibratedWhite:(CGFloat).1 alpha:(CGFloat).8], NSForegroundColorAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
 		[paragraphStyle release];
 	}
 
@@ -218,9 +218,9 @@ static inline int common_prefix_length(const char *a, const char *b)
 			[string drawInRect:textRect withAttributes:textAttributes];
 			[string release];
 		}
-		textRect.origin.y += lineHeight;
+		textRect.origin.y += self.lineHeight;
 		lineIndex++;
-		lineValue = HFSum(lineValue, bytesPerLine);
+		lineValue = HFSum(lineValue, self.bytesPerLine);
 	}
 }
 

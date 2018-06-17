@@ -19,30 +19,18 @@
     This class is currently missing a fair amount of functionality, such as enabled state.
 */
     
-@interface HFTextField : NSControl
+@interface HFTextField : NSControl {
+    HFController *dataController;
+    HFLayoutRepresenter *layoutRepresenter;
+    HFHexTextRepresenter *hexRepresenter;
+    HFStringEncodingTextRepresenter *textRepresenter;
+    IBOutlet id target;
+    SEL action;
+}
 
-/*! Returns whether the hexadecimal view is shown. */
-- (BOOL)usesHexArea;
-
-/*! Sets whether the hexadecimal view is shown. */
-- (void)setUsesHexArea:(BOOL)val;
-
-/*! Returns whether the text area is shown. */
-- (BOOL)usesTextArea;
-
-/*! Sets whether the text area is shown. */
-- (void)setUsesTextArea:(BOOL)val;
-
-/*! Sets the string encoding used by the text area. */
-- (void)setStringEncoding:(NSStringEncoding)encoding;
-
-/*! Gets the string encoding used by the text area. */
-- (NSStringEncoding)stringEncoding;
-
-/*! Sets editability. */
-- (void)setEditable:(BOOL)flag;
-
-/*! Returns editability. */
-- (BOOL)isEditable;
+@property (nonatomic) BOOL usesHexArea; ///< Whether the hexadecimal view is shown.
+@property (nonatomic) BOOL usesTextArea; ///< Whether the text area is shown.
+@property (nonatomic) NSStringEncoding stringEncoding; ///< The string encoding used by the text area.
+@property (nonatomic, getter=isEditable) BOOL editable; ///< Whether the field is editable.
 
 @end

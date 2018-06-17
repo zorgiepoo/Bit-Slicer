@@ -16,6 +16,11 @@
 
 
 @class HFByteRangeAttributeArray;
-@interface HFAttributedByteArray : HFByteArray
+@interface HFAttributedByteArray : HFByteArray {
+@private
+    HFByteArray *impl;
+    HFByteRangeAttributeArray *attributes;
+    
+}
 
 @end

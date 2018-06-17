@@ -7,23 +7,38 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*! @class HFFileReference
     @brief A reference to an open file.
     
     HFFileReference encapsulates a reference to an open file.  Multiple instances of HFFileByteSlice may share an HFFileReference, so that the file only needs to be opened once.
  
-    HFFileReference is an abstract class.  You must instantiate either HFUnprivilegedFileReference or HFPrivilegedFileReference.
+    HFFileReference is an abstract class.  You must instantiate HFConcreteFileReference.
     
     All HFFileReferences use non-caching IO (F_NOCACHE is set).
 */
-@interface HFFileReference : NSObject
+@interface HFFileReference : NSObject {
+    @protected
+    int fileDescriptor;
+    dev_t device;
+    unsigned long long inode;
+    unsigned long long fileLength;
+    mode_t fileMode;
+    BOOL isWritable;
+    uint32_t blockSize;
+    BOOL isPrivileged;
+    BOOL isFixedLength;
+}
 
+@property (readonly) BOOL isPrivileged;
+@property (readonly) BOOL isFixedLength;
 
-/*! Open a file for reading and writing at the given path.  The permissions mode of any newly created file is 0744.  Returns nil if the file could not be opened, in which case the error parameter (if not nil) will be set. */
-- (id)initWritableWithPath:(NSString *)path error:(NSError **)error;
+/*! Open a file for reading and writing at the given path.  The permissions mode of any newly created file is 0644.  Returns nil if the file could not be opened, in which case the error parameter (if not nil) will be set. */
+- (nullable instancetype)initWritableWithPath:(NSString *)path error:(NSError **)error;
 
 /*! Open a file for reading only at the given path.  Returns nil if the file could not be opened, in which case the error parameter (if not nil) will be set. */
-- (id)initWithPath:(NSString *)path error:(NSError **)error;
+- (nullable instancetype)initWithPath:(NSString *)path error:(NSError **)error;
 
 /*! Closes the file. */
 - (void)close;
@@ -54,20 +69,10 @@
 
 @end
 
-/*! @class HFUnprivilegedFileReference
+/*! @class HFConcreteFileReference
  @brief A reference to an open file that can be read (and possibly written) using normal C functions
 */
-@interface HFUnprivilegedFileReference : HFFileReference
+@interface HFConcreteFileReference : HFFileReference
 @end
 
-#ifndef HF_NO_PRIVILEGED_FILE_OPERATIONS
-/*! @class HFPrivilegedFileReference
- @brief A reference to an open file that can be read (and possibly written) using our privileged helper process
- */
-@interface HFPrivilegedFileReference : HFFileReference
-
-/*! Attempts to authenticate, returning an error on failure. */
-+ (BOOL)preflightAuthenticationReturningError:(NSError **)error;
-
-@end
-#endif
+NS_ASSUME_NONNULL_END

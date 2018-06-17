@@ -8,6 +8,8 @@
 
 #import <HexFiend/HFByteArray.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class HFBTree;
 
 /*! @class HFBTreeByteArray
@@ -18,10 +20,15 @@ HFBTreeByteArray is an efficient subclass of HFByteArray that stores @link HFByt
 Create an HFBTreeByteArray via \c -init.  It has no methods other than those on HFByteArray.
 */
 
-@interface HFBTreeByteArray : HFByteArray
+@interface HFBTreeByteArray : HFByteArray {
+@private
+    HFBTree *btree;
+}
 
 /*! Designated initializer for HFBTreeByteArray.
 */
-- (id)init;
+- (instancetype)init;
 
 @end
+
+NS_ASSUME_NONNULL_END
