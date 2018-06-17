@@ -373,20 +373,18 @@
 
 - (void)userNotificationCenter:(NSUserNotificationCenter *)__unused center didActivateNotification:(NSUserNotification *)notification
 {
-	if (notification.activationType == NSUserNotificationActivationTypeReplied)
-	{
-		NSNumber *scriptPromptHash = notification.userInfo[ZGScriptNotificationPromptHashKey];
-		if (scriptPromptHash != nil)
+	if (@available(macOS 10.9, *)) {
+		if (notification.activationType == NSUserNotificationActivationTypeReplied)
 		{
-			for (ZGDocument *document in _documentController.documents)
+			NSNumber *scriptPromptHash = notification.userInfo[ZGScriptNotificationPromptHashKey];
+			if (scriptPromptHash != nil)
 			{
-				ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
-				ZGScriptManager *scriptManager = documentWindowController.scriptManager;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-				// This code will only be triggered on 10.9 due to NSUserNotificationActivationTypeReplied, so ignore warning about notification.response
-				[scriptManager handleScriptPromptHash:scriptPromptHash withUserNotificationReply:notification.response.string];
-#pragma clang diagnostic pop
+				for (ZGDocument *document in _documentController.documents)
+				{
+					ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
+					ZGScriptManager *scriptManager = documentWindowController.scriptManager;
+					[scriptManager handleScriptPromptHash:scriptPromptHash withUserNotificationReply:notification.response.string];
+				}
 			}
 		}
 	}

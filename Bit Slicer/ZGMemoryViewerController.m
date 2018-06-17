@@ -78,7 +78,7 @@
 
 - (NSUndoManager *)undoManager
 {
-	return _textView.controller.undoManager;
+	return ZGUnwrapNullableObject(_textView.controller.undoManager);
 }
 
 - (HFRange)selectedAddressRange
@@ -184,16 +184,16 @@
 	_statusBarRepresenter = [[ZGStatusBarRepresenter alloc] init];
 	_statusBarRepresenter.statusMode = HFStatusModeHexadecimal;
 	
-	[_textView.controller addRepresenter:_statusBarRepresenter];
-	[[_textView layoutRepresenter] addRepresenter:_statusBarRepresenter];
+	[_textView.controller addRepresenter:ZGUnwrapNullableObject(_statusBarRepresenter)];
+	[[_textView layoutRepresenter] addRepresenter:ZGUnwrapNullableObject(_statusBarRepresenter)];
 	
 	// Add custom line counter
 	_lineCountingRepresenter = [[ZGLineCountingRepresenter alloc] init];
 	_lineCountingRepresenter.minimumDigitCount = DEFAULT_MINIMUM_LINE_DIGIT_COUNT;
 	_lineCountingRepresenter.lineNumberFormat = HFLineNumberFormatHexadecimal;
 	
-	[_textView.controller addRepresenter:_lineCountingRepresenter];
-	[_textView.layoutRepresenter addRepresenter:_lineCountingRepresenter];
+	[_textView.controller addRepresenter:ZGUnwrapNullableObject(_lineCountingRepresenter)];
+	[_textView.layoutRepresenter addRepresenter:ZGUnwrapNullableObject(_lineCountingRepresenter)];
 	
 	// Add custom scroller
 	ZGVerticalScrollerRepresenter *verticalScrollerRepresenter = [[ZGVerticalScrollerRepresenter alloc] init];

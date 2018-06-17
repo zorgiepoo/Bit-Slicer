@@ -175,7 +175,8 @@
 			failedToLaunchTask = YES;
 			if (error != nil)
 			{
-				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"%@: Name: %@, Reason: %@", ZGLocalizedStringFromDebuggerTable(@"failedLaunchYasm"), exception.name, exception.reason], @"reason" : exception.reason}];
+				NSString *exceptionReason = exception.reason != nil ? exception.reason : @"";
+				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"%@: Name: %@, Reason: %@", ZGLocalizedStringFromDebuggerTable(@"failedLaunchYasm"), exception.name, exceptionReason], @"reason" : exceptionReason}];
 			}
 		}
 		
