@@ -24,6 +24,8 @@ typedef NS_ENUM(NSUInteger, HFLineNumberFormat) {
     HFLineCountingRepresenter is the HFRepresenter used to show the "line number gutter."  HFLineCountingRepresenter makes space for a certain number of digits.
 */
 @interface HFLineCountingRepresenter : HFRepresenter {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     CGFloat lineHeight;
     NSUInteger digitsToRepresentContentsLength;
     NSUInteger minimumDigitCount;
@@ -31,6 +33,7 @@ typedef NS_ENUM(NSUInteger, HFLineNumberFormat) {
     NSInteger interiorShadowEdge;
     CGFloat preferredWidth;
     CGFloat digitAdvance;
+#pragma clang diagnostic pop
 }
 
 /// The minimum digit count.  The receiver will always ensure it is big enough to display at least the minimum digit count.  The default is 2.

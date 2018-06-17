@@ -36,9 +36,12 @@ HFByteArray is an abstract class.  It will raise an exception if you attempt to 
 @class HFByteRangeAttributeArray;
 
 @interface HFByteArray : NSObject <NSCopying, NSMutableCopying> {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 @private
     NSUInteger changeLockCounter;
     NSUInteger changeGenerationCount;
+#pragma clang diagnostic pop
 }
 
 /*! @name Initialization

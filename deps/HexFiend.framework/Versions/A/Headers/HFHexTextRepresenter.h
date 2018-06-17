@@ -14,8 +14,11 @@
     HFHexTextRepresenter is an HFRepresenter responsible for showing data in hexadecimal form.  It has no methods except those inherited from HFTextRepresenter.
 */
 @interface HFHexTextRepresenter : HFTextRepresenter {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     unsigned long long omittedNybbleLocation;
     unsigned char unpartneredLastNybble;
+#pragma clang diagnostic pop
 }
 
 @end

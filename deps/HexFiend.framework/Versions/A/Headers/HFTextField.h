@@ -20,12 +20,15 @@
 */
     
 @interface HFTextField : NSControl {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     HFController *dataController;
     HFLayoutRepresenter *layoutRepresenter;
     HFHexTextRepresenter *hexRepresenter;
     HFStringEncodingTextRepresenter *textRepresenter;
     IBOutlet id target;
     SEL action;
+#pragma clang diagnostic pop
 }
 
 @property (nonatomic) BOOL usesHexArea; ///< Whether the hexadecimal view is shown.

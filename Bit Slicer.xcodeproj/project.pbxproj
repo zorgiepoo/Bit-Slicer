@@ -2705,6 +2705,7 @@
 					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
 					"-Wno-auto-import",
+					"-Wno-c11-extensions",
 				);
 			};
 			name = Debug;
@@ -2803,6 +2804,7 @@
 					"-Wno-cstring-format-directive",
 					"-Wno-c++98-compat",
 					"-Wno-auto-import",
+					"-Wno-c11-extensions",
 				);
 			};
 			name = Release;

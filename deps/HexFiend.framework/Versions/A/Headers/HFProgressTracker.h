@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 */
 
 @interface HFProgressTracker : NSObject {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     @public
     volatile unsigned long long currentProgress;
     volatile int cancelRequested;
@@ -38,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSTimer *progressTimer;
     double lastSetValue;
     id delegate;
+#pragma clang diagnostic pop
 }
 
 /*!

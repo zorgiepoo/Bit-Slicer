@@ -21,8 +21,11 @@ Create an HFBTreeByteArray via \c -init.  It has no methods other than those on 
 */
 
 @interface HFBTreeByteArray : HFByteArray {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 @private
     HFBTree *btree;
+#pragma clang diagnostic pop
 }
 
 /*! Designated initializer for HFBTreeByteArray.

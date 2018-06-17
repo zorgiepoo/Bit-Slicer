@@ -29,10 +29,13 @@ NS_ASSUME_NONNULL_BEGIN
     
 */
 @interface HFRepresenter : NSObject <NSCoding> {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     @private
     id view;
     HFController *controller;
     NSPoint layoutPosition;
+#pragma clang diagnostic pop
 }
 
 /*! @name View management

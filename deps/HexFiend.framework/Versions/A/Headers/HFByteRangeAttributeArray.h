@@ -52,14 +52,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 #ifndef DOXYGEN_ONLY
 @interface HFNaiveByteRangeAttributeArray : HFByteRangeAttributeArray {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     NSMutableArray *attributeRuns;
+#pragma clang diagnostic pop
 }
 @end
 
 @class HFAnnotatedTree;
 @interface HFAnnotatedTreeByteRangeAttributeArray : HFByteRangeAttributeArray {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     HFAnnotatedTree *atree;
     NSMutableDictionary *attributesToNodes;
+#pragma clang diagnostic pop
 }
 @end
 #endif

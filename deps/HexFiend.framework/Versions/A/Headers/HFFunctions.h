@@ -220,7 +220,10 @@ static inline BOOL HFIntersectsRange(HFRange a, HFRange b) {
 /*! Returns YES if the given ranges intersect. Two ranges are considered to intersect if any fraction overlaps; zero-length ranges do not intersect anything. */
 static inline BOOL HFFPIntersectsRange(HFFPRange a, HFFPRange b) {
     // Ranges are said to intersect if they share at least one value.  Therefore, zero length ranges never intersect anything.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
     if (a.length == 0 || b.length == 0) return NO;
+#pragma clang diagnostic pop
     
     if (a.location <= b.location && a.location + a.length >= b.location) return YES;
     if (b.location <= a.location && b.location + b.length >= a.location) return YES;
@@ -321,7 +324,10 @@ static inline CGFloat HFMax(CGFloat a, CGFloat b) {
 
 /*! Returns true if the given HFFPRanges are equal.  */
 static inline BOOL HFFPRangeEqualsRange(HFFPRange a, HFFPRange b) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
     return a.location == b.location && a.length == b.length;
+#pragma clang diagnostic pop
 }
 
 /*! copysign() for a CGFloat */
@@ -342,7 +348,10 @@ static inline NSUInteger HFAtomicIncrement(volatile NSUInteger *ptr, BOOL barrie
 #if ULONG_MAX == UINT32_MAX
         volatile unsigned long *:      (barrier ? OSAtomicIncrement32Barrier : OSAtomicIncrement32)((volatile int32_t *)ptr),
 #else
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
         volatile unsigned long *:      (barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr),
+#pragma clang diagnostic pop
 #endif
         volatile unsigned long long *: (barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr));
 }
@@ -354,7 +363,10 @@ static inline NSUInteger HFAtomicDecrement(volatile NSUInteger *ptr, BOOL barrie
 #if ULONG_MAX == UINT32_MAX
         volatile unsigned long *:      (barrier ? OSAtomicDecrement32Barrier : OSAtomicDecrement32)((volatile int32_t *)ptr),
 #else
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
         volatile unsigned long *:      (barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr),
+#pragma clang diagnostic pop
 #endif
         volatile unsigned long long *: (barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr));
 }
@@ -365,7 +377,10 @@ static inline unsigned long long HFFPToUL(long double val) {
     assert(val >= 0);
     assert(val <= ULLONG_MAX);
     unsigned long long result = (unsigned long long)val;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
     assert((long double)result == val);
+#pragma clang diagnostic pop
     return result;
 }
 
@@ -459,8 +474,11 @@ NSString *HFDescribeByteCount(unsigned long long count);
 
   A simple class responsible for holding an immutable HFRange as an object.  Methods that logically work on multiple HFRanges usually take or return arrays of HFRangeWrappers. */
 @interface HFRangeWrapper : NSObject <NSCopying> {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     @public
     HFRange range;
+#pragma clang diagnostic pop
 }
 
 /*! Returns the HFRange for this HFRangeWrapper. */
@@ -489,8 +507,11 @@ NSString *HFDescribeByteCount(unsigned long long count);
  TODO: HFRangeSet needs to be tested! I guarantee it has bugs! (Which doesn't matter right now because it's all dead code...)
  */
 @interface HFRangeSet : NSObject <NSCopying, NSSecureCoding> {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     @private
     CFMutableArrayRef array;
+#pragma clang diagnostic pop
 }
 
 /*! Create a range set with just one range. */

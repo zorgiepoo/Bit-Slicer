@@ -18,11 +18,15 @@ NS_ASSUME_NONNULL_BEGIN
     HFTextField encapsulates a HFController and HFRepresenters into a single "do it all" NSControl analagous to NSTextView.  
 */    
 @interface HFTextView : NSControl {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     HFController *dataController;
     HFLayoutRepresenter *layoutRepresenter;
     BOOL bordered;
     IBOutlet id delegate;
     NSData *cachedData;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 }
 
 /*! @name Accessing MVC components
