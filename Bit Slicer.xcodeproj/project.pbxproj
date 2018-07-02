@@ -673,6 +673,8 @@
 		774B5EE71915362900D7AA69 /* ZGPyKeyCodeModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyKeyCodeModule.h; path = "Bit Slicer/ZGPyKeyCodeModule.h"; sourceTree = "<group>"; usesTabs = 1; };
 		77607AAF185CD50100AC532B /* AGScopeBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AGScopeBar.h; path = deps/AGScopeBar.h; sourceTree = "<group>"; usesTabs = 1; };
 		77607AB0185CD50100AC532B /* AGScopeBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AGScopeBar.m; path = deps/AGScopeBar.m; sourceTree = "<group>"; usesTabs = 1; };
+		7761651920D78EE400E4EF51 /* Bit Slicer Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Bit Slicer Debug.entitlements"; path = "Bit Slicer/Bit Slicer Debug.entitlements"; sourceTree = "<group>"; };
+		7767CB5A20D62D1900C773F0 /* Bit Slicer Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Bit Slicer Release.entitlements"; path = "Bit Slicer/Bit Slicer Release.entitlements"; sourceTree = "<group>"; };
 		7768063E18B96A64007F2CAF /* ZGThreadStates.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ZGThreadStates.c; path = "Bit Slicer/ZGThreadStates.c"; sourceTree = "<group>"; usesTabs = 1; };
 		7768063F18B96A64007F2CAF /* ZGThreadStates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGThreadStates.h; path = "Bit Slicer/ZGThreadStates.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7768064118B9A36E007F2CAF /* ZGBacktrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGBacktrace.h; path = "Bit Slicer/ZGBacktrace.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -860,6 +862,8 @@
 		2A37F4AAFDCFA73011CA2CEA /* Bit Slicer */ = {
 			isa = PBXGroup;
 			children = (
+				7767CB5A20D62D1900C773F0 /* Bit Slicer Release.entitlements */,
+				7761651920D78EE400E4EF51 /* Bit Slicer Debug.entitlements */,
 				2A37F4ABFDCFA73011CA2CEA /* Code */,
 				72D051C619609C0A00EC532A /* Nibs */,
 				72D271D1197C2A1400CC6914 /* Strings */,
@@ -1595,6 +1599,16 @@
 				TargetAttributes = {
 					77E2BBA318FD88A700E41FA0 = {
 						TestTargetID = 8D15AC270486D014006FF6A4;
+					};
+					8D15AC270486D014006FF6A4 = {
+						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
 					};
 				};
 			};
@@ -2639,8 +2653,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Bit Slicer/Bit Slicer Debug.entitlements";
+				CODE_SIGN_IDENTITY = bitslicer_codesign;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2740,9 +2757,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Bit Slicer/Bit Slicer Release.entitlements";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
