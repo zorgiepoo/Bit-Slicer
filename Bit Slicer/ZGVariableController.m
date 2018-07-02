@@ -53,7 +53,6 @@
 #import "ZGVariableDataInfo.h"
 #import "ZGDataValueExtracting.h"
 #import "ZGProtectionDescription.h"
-#import "ZGOperatingSystemCompatibility.h"
 
 #define ZGLocalizedStringFromVariableActionsTable(string) NSLocalizedStringFromTable((string), @"[Code] Variable Actions", nil)
 
@@ -93,7 +92,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	BOOL hasFrozenVariable = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }];
 
-	if (hasFrozenVariable && _frozenActivity == nil && ZGIsOnMavericksOrLater())
+	if (hasFrozenVariable && _frozenActivity == nil && @available(macOS 10.9, *))
 	{
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"

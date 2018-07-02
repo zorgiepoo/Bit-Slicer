@@ -37,7 +37,6 @@
 #import "ZGVariable.h"
 #import "ZGMemoryViewerController.h"
 #import "ZGBacktrace.h"
-#import "ZGOperatingSystemCompatibility.h"
 #import "NSArrayAdditions.h"
 
 @implementation ZGBacktraceViewController
@@ -67,7 +66,10 @@
 	_tableView.target = self;
 	_tableView.doubleAction = @selector(changeInstructionSelection:);
 	
-	if (!ZGIsOnYosemiteOrLater())
+	if (@available(macOS 10.10, *))
+	{
+	}
+	else
 	{
 		[self setNextResponder:[_tableView nextResponder]];
 		[_tableView setNextResponder:self];

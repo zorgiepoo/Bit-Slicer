@@ -37,7 +37,6 @@
 #import "ZGRunAlertPanel.h"
 #import "ZGDeliverUserNotifications.h"
 #import "ZGNullability.h"
-#import "ZGOperatingSystemCompatibility.h"
 
 @implementation ZGMemoryDumpAllWindowController
 {
@@ -103,12 +102,9 @@
 			self->_isBusy = YES;
 			 
 			id dumpMemoryActivity = nil;
-			if (ZGIsOnMavericksOrLater())
+			if (@available(macOS 10.9, *))
 			{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 			 	dumpMemoryActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Dumping All Memory"];
-#pragma clang diagnostic pop
 			}
 			
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -137,10 +133,10 @@
 
 					if (dumpMemoryActivity != nil)
 					{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-						[[NSProcessInfo processInfo] endActivity:dumpMemoryActivity];
-#pragma clang diagnostic pop
+						if (@available(macOS 10.9, *))
+						{
+							[[NSProcessInfo processInfo] endActivity:dumpMemoryActivity];
+						}
 					}
 				});
 			});

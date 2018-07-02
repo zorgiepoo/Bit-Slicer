@@ -31,7 +31,6 @@
  */
 
 #import "ZGDeliverUserNotifications.h"
-#import "ZGOperatingSystemCompatibility.h"
 
 void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitle, NSString *informativeText, BOOL hasReplyButton, NSString *responsePlaceholder, NSDictionary<NSString *, id> *userInfo)
 {
@@ -41,13 +40,10 @@ void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitl
 	userNotification.informativeText = informativeText;
 	userNotification.userInfo = userInfo;
 	
-	if (ZGIsOnMavericksOrLater())
+	if (@available(macOS 10.9, *))
 	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 		userNotification.hasReplyButton = hasReplyButton;
 		userNotification.responsePlaceholder = responsePlaceholder;
-#pragma clang diagnostic pop
 		
 		if (hasReplyButton && [NSApp isActive])
 		{

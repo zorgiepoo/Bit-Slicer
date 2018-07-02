@@ -33,7 +33,6 @@
 // replacing deprecated Gestalt() usage, and fixing nullability warnings
 
 #import "AGScopeBar.h"
-#import "ZGOperatingSystemCompatibility.h"
 #import "ZGNullability.h"
 
 #define SCOPE_BAR_HORZ_INSET			8.0						// inset on left and right
@@ -119,7 +118,7 @@
 	mIsEnabled = YES;
 	
 	{
-		if (ZGIsOnYosemiteOrLater()) {
+		if (@available(macOS 10.10, *)) {
 			// Yosemite and Later
 			mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
 			

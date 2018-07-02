@@ -53,7 +53,6 @@
 #import "ZGAppTerminationState.h"
 #import "ZGScriptingInterpreter.h"
 #import "ZGProcess.h"
-#import "ZGOperatingSystemCompatibility.h"
 #import "ZGAboutWindowController.h"
 #import "ZGNullability.h"
 
@@ -97,7 +96,7 @@
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		if (ZGIsOnElCapitanOrLater())
+		if (@available(macOS 10.11, *))
 		{
 			[[NSUserDefaults standardUserDefaults] registerDefaults:@{ZGRemoveRootlessProcessesKey: @YES}];
 		}
@@ -114,9 +113,12 @@
 		
 		_processTaskManager = [[ZGProcessTaskManager alloc] init];
 		
-		if (ZGIsOnElCapitanOrLater() && [[NSUserDefaults standardUserDefaults] boolForKey:ZGRemoveRootlessProcessesKey])
+		if (@available(macOS 10.11, *))
 		{
-			_rootlessConfiguration = [[ZGRootlessConfiguration alloc] init];
+			if ([[NSUserDefaults standardUserDefaults] boolForKey:ZGRemoveRootlessProcessesKey])
+			{
+				_rootlessConfiguration = [[ZGRootlessConfiguration alloc] init];
+			}
 		}
 
 		_hotKeyCenter = [[ZGHotKeyCenter alloc] init];
@@ -195,7 +197,7 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)__unused notification
 {
 	// Add New Tab menu item only if we are on 10.12 or later
-	if (ZGIsOnSierraOrLater())
+	if (@available(macOS 10.12, *))
 	{
 		// New Tab should use cmd t so make show font use cmd shift t
 		[_showFontsMenuItem setKeyEquivalent:@"T"];
@@ -373,7 +375,8 @@
 
 - (void)userNotificationCenter:(NSUserNotificationCenter *)__unused center didActivateNotification:(NSUserNotification *)notification
 {
-	if (@available(macOS 10.9, *)) {
+	if (@available(macOS 10.9, *))
+	{
 		if (notification.activationType == NSUserNotificationActivationTypeReplied)
 		{
 			NSNumber *scriptPromptHash = notification.userInfo[ZGScriptNotificationPromptHashKey];

@@ -90,7 +90,6 @@
 		72D271D4197C2A6800CC6914 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72D271D2197C2A6800CC6914 /* InfoPlist.strings */; };
 		72D72BCB1AB3E9FA005044CF /* ZGLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D72BCA1AB3E9FA005044CF /* ZGLocalization.m */; };
 		72DBC8D51B71A4BB0092ED75 /* ZGRootlessConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8D41B71A4BB0092ED75 /* ZGRootlessConfiguration.m */; };
-		72DBC8D81B72F31B0092ED75 /* ZGOperatingSystemCompatibility.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8D71B72F31B0092ED75 /* ZGOperatingSystemCompatibility.m */; };
 		72DBC8DB1B755A190092ED75 /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
 		72DBC8DE1B7576D30092ED75 /* ZGTextViewLayoutController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DD1B7576D30092ED75 /* ZGTextViewLayoutController.m */; };
 		72DBC8E61B759BA90092ED75 /* ZGAboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8E41B759BA90092ED75 /* ZGAboutWindowController.m */; };
@@ -496,8 +495,6 @@
 		72D72BCC1AB3FEC0005044CF /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "Bit Slicer/ru.lproj/[Code] Script Manager.strings"; sourceTree = "<group>"; };
 		72DBC8D31B71A4BB0092ED75 /* ZGRootlessConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGRootlessConfiguration.h; path = "Bit Slicer/ZGRootlessConfiguration.h"; sourceTree = "<group>"; };
 		72DBC8D41B71A4BB0092ED75 /* ZGRootlessConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGRootlessConfiguration.m; path = "Bit Slicer/ZGRootlessConfiguration.m"; sourceTree = "<group>"; };
-		72DBC8D61B72F31B0092ED75 /* ZGOperatingSystemCompatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGOperatingSystemCompatibility.h; path = "Bit Slicer/ZGOperatingSystemCompatibility.h"; sourceTree = "<group>"; };
-		72DBC8D71B72F31B0092ED75 /* ZGOperatingSystemCompatibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGOperatingSystemCompatibility.m; path = "Bit Slicer/ZGOperatingSystemCompatibility.m"; sourceTree = "<group>"; };
 		72DBC8D91B755A190092ED75 /* HFByteArray_FindReplace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HFByteArray_FindReplace.h; path = "Bit Slicer/HFByteArray_FindReplace.h"; sourceTree = "<group>"; };
 		72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HFByteArray_FindReplace.cpp; path = "Bit Slicer/HFByteArray_FindReplace.cpp"; sourceTree = "<group>"; };
 		72DBC8DC1B7576D30092ED75 /* ZGTextViewLayoutController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGTextViewLayoutController.h; path = "Bit Slicer/ZGTextViewLayoutController.h"; sourceTree = "<group>"; };
@@ -1477,8 +1474,6 @@
 				722EE7811B19402100934EF3 /* ZGStaticSelectorChecker.h */,
 				722EE7821B19406700934EF3 /* ZGRunAlertPanel.h */,
 				722EE7831B19406700934EF3 /* ZGRunAlertPanel.m */,
-				72DBC8D61B72F31B0092ED75 /* ZGOperatingSystemCompatibility.h */,
-				72DBC8D71B72F31B0092ED75 /* ZGOperatingSystemCompatibility.m */,
 				722EE7851B1940EC00934EF3 /* ZGDeliverUserNotifications.h */,
 				722EE7861B1940EC00934EF3 /* ZGDeliverUserNotifications.m */,
 				722EE7881B19461000934EF3 /* ZGMemoryAddressExpressionParsing.h */,
@@ -1769,7 +1764,6 @@
 				773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */,
 				773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */,
 				773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */,
-				72DBC8D81B72F31B0092ED75 /* ZGOperatingSystemCompatibility.m in Sources */,
 				77FFC107186BDA3600122357 /* ZGWatchVariableWindowController.m in Sources */,
 				77F115A817D2E87E009E002A /* VDKQueue.m in Sources */,
 				77F115CD17D2ED64009E002A /* ZGMemoryViewerController.m in Sources */,

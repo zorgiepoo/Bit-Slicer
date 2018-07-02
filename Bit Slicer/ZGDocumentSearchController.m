@@ -50,7 +50,6 @@
 #import "ZGDataValueExtracting.h"
 #import "ZGVariableDataInfo.h"
 #import "ZGMemoryAddressExpressionParsing.h"
-#import "ZGOperatingSystemCompatibility.h"
 #import "ZGNullability.h"
 
 #import <DDMathParser/DDMathStringToken.h>
@@ -227,7 +226,7 @@
 	NSUInteger numberOfVariablesFound = searchProgress.numberOfVariablesFound;
 	NSString *formattedNumber = [numberOfVariablesFoundFormatter stringFromNumber:@(numberOfVariablesFound)];
 	
-	return [ZGIsOnMavericksOrLater() ?
+	return [@available(macOS 10.9, *) ?
 	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"foundValuesLabelFormat"), numberOfVariablesFound] :
 	[NSString stringWithFormat:ZGLocalizableSearchDocumentString((numberOfVariablesFound != 1) ? @"foundMultipleValuesLabelFormat" : @"foundSingleValueLabelFormat"), numberOfVariablesFound]
 			stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
@@ -769,12 +768,9 @@
 	[self prepareTask];
 	
 	id searchDataActivity = nil;
-	if (ZGIsOnMavericksOrLater())
+	if (@available(macOS 10.9, *))
 	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 		searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
-#pragma clang diagnostic pop
 	}
 	
 	NSArray<ZGVariable *> *oldVariables = _documentData.variables;

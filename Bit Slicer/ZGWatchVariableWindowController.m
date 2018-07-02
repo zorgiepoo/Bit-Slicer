@@ -50,7 +50,6 @@
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
 #import "ZGTableView.h"
-#import "ZGOperatingSystemCompatibility.h"
 #import "ZGNullability.h"
 #import "ZGDebugLogging.h"
 
@@ -248,7 +247,7 @@
 	ZGRegistersState *registersState = watchVariable.registersState;
 	
 	NSString *accessedTimes = @"";
-	if (ZGIsOnMavericksOrLater())
+	if (@available(macOS 10.9, *))
 	{
 		accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedTimesFormat"), watchVariable.accessCount];
 	}
@@ -366,12 +365,9 @@
 	_foundWatchVariables = [[NSMutableArray alloc] init];
 	_foundWatchVariablesDictionary = [[NSMutableDictionary alloc] init];
 	
-	if (ZGIsOnMavericksOrLater())
+	if (@available(macOS 10.9, *))
 	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 		_watchActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Watching Data Accesses"];
-#pragma clang diagnostic pop
 	}
 }
 

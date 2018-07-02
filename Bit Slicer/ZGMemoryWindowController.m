@@ -33,7 +33,6 @@
 #import "ZGMemoryWindowController.h"
 #import "ZGProcessTaskManager.h"
 #import "ZGRootlessConfiguration.h"
-#import "ZGOperatingSystemCompatibility.h"
 #import "ZGBreakPoint.h" // For seeing if we can pause/unpause a process
 #import "NSArrayAdditions.h"
 #import "ZGProcessList.h"
@@ -96,15 +95,12 @@
 
 - (void)dealloc
 {
-	if (ZGIsOnMavericksOrLater())
+	if (@available(macOS 10.9, *))
 	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 		[[NSNotificationCenter defaultCenter]
 		 removeObserver:self
 		 name:NSWindowDidChangeOcclusionStateNotification
 		 object:nil];
-#pragma clang diagnostic pop
 	}
 	
 	[[NSWorkspace sharedWorkspace]
@@ -226,16 +222,13 @@
 
 - (void)windowDidLoad
 {
-	if (ZGIsOnMavericksOrLater())
+	if (@available(macOS 10.9, *))
 	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 		[[NSNotificationCenter defaultCenter]
 		 addObserver:self
 		 selector:@selector(windowDidChangeOcclusionState:)
 		 name:NSWindowDidChangeOcclusionStateNotification
 		 object:self.window];
-#pragma clang diagnostic pop
 	}
 }
 

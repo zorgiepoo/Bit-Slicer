@@ -40,7 +40,6 @@
 #import "ZGLocalization.h"
 #import "ZGRegister.h"
 #import "ZGRegisterEntries.h"
-#import "ZGOperatingSystemCompatibility.h"
 #import "ZGNullability.h"
 #import "NSArrayAdditions.h"
 
@@ -89,7 +88,10 @@
 {
 	[super loadView];
 	
-	if (!ZGIsOnYosemiteOrLater())
+	if (@available(macOS 10.10, *))
+	{
+	}
+	else
 	{
 		[self setNextResponder:[_tableView nextResponder]];
 		[_tableView setNextResponder:self];

@@ -54,7 +54,6 @@
 #import "ZGScriptPrompt.h"
 #import "ZGScriptPromptWindowController.h"
 #import "ZGNullability.h"
-#import "ZGOperatingSystemCompatibility.h"
 
 #import "structmember.h"
 
@@ -548,12 +547,9 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		PyObject_SetAttrString(script.module, "debug", debuggerInstance.object);
 		
 		id scriptInitActivity = nil;
-		if (ZGIsOnMavericksOrLater())
+		if (@available(macOS 10.9, *))
 		{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 			scriptInitActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script initializer"];
-#pragma clang diagnostic pop
 		}
 		
 		[self setUpStackDepthLimit];
@@ -607,12 +603,9 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 			if (self->_scriptTimer != NULL)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
-					if (ZGIsOnMavericksOrLater())
+					if (@available(macOS 10.9, *))
 					{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 						self->_scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script execute timer"];
-#pragma clang diagnostic pop
 					}
 				});
 				

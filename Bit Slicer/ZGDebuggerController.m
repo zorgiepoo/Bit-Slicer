@@ -61,7 +61,6 @@
 #import "ZGDataValueExtracting.h"
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGNullability.h"
-#import "ZGOperatingSystemCompatibility.h"
 
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
@@ -1580,9 +1579,12 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		BOOL isInstructionBreakPoint = ([self currentBreakPoint] && _registersViewController.instructionPointer == instruction.variable.address);
 		
 		NSColor *redTextColor;
-		if (@available(macOS 10.10, *)) {
+		if (@available(macOS 10.10, *))
+		{
 			redTextColor = NSColor.systemRedColor;
-		} else {
+		}
+		else
+		{
 			redTextColor = NSColor.redColor;
 		}
 		[cell setTextColor:isInstructionBreakPoint ? redTextColor : NSColor.controlTextColor];
@@ -1749,12 +1751,12 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (void)startBreakPointActivity
 {
-	if (_breakPointActivity == nil && ZGIsOnMavericksOrLater())
+	if (_breakPointActivity == nil)
 	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-		_breakPointActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityBackground reason:@"Software Breakpoint"];
-#pragma clang diagnostic pop
+		if (@available(macOS 10.9, *))
+		{
+			_breakPointActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityBackground reason:@"Software Breakpoint"];
+		}
 	}
 }
 
@@ -1762,11 +1764,11 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	if (_breakPointActivity != nil)
 	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_breakPointActivity];
-#pragma clang diagnostic pop
-		_breakPointActivity = nil;
+		if (@available(macOS 10.9, *))
+		{
+			[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_breakPointActivity];
+			_breakPointActivity = nil;
+		}
 	}
 }
 

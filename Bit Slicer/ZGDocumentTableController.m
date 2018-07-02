@@ -601,9 +601,12 @@
 		if (rowIndex >= 0 && (NSUInteger)rowIndex < _documentData.variables.count)
 		{
 			NSColor *redTextColor;
-			if (@available(macOS 10.10, *)) {
+			if (@available(macOS 10.10, *))
+			{
 				redTextColor = NSColor.systemRedColor;
-			} else {
+			}
+			else
+			{
 				redTextColor = NSColor.redColor;
 			}
 			
