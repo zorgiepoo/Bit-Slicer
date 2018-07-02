@@ -105,6 +105,63 @@
 	AGScopeBarAppearance * mScopeBarAppearance;
 	
 	BOOL mNeedsTiling;
+	NSAppearance *currentAppearance;
+}
+
+static CGFloat colorValue(CGFloat value, BOOL invert)
+{
+	return invert ? (1.0 - value) : value;
+}
+
+- (void)updateAppearance
+{
+	if (@available(macOS 10.10, *)) {
+		// Yosemite and Later
+		mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
+		
+		BOOL invertColors;
+		if (@available(macOS 10.14, *)) {
+			// Borrowing how HexFiend detects dark mode
+			invertColors = [NSAppearance.currentAppearance.name isEqualToString:NSAppearanceNameDarkAqua];
+			currentAppearance = NSAppearance.currentAppearance;
+		} else {
+			invertColors = NO;
+		}
+		
+		mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:colorValue(0.89, invertColors) alpha:1.0];
+		mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:colorValue(0.87, invertColors) alpha:1.0];
+		mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
+		mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:colorValue(0.95, invertColors) alpha:1.0];
+		mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:colorValue(0.6, invertColors) alpha:1.0];
+		
+		mScopeBarAppearance.separatorColor                  = [NSColor colorWithCalibratedWhite:colorValue(0.52, invertColors) alpha:1.0];
+		mScopeBarAppearance.separatorWidth                  = 1.0;
+		mScopeBarAppearance.separatorHeight                 = 16.0;
+		
+		mScopeBarAppearance.labelColor                      = [NSColor colorWithCalibratedWhite:colorValue(0.45, invertColors) alpha:1.0];
+		mScopeBarAppearance.labelFont                       = [NSFont boldSystemFontOfSize:12.0];
+		mScopeBarAppearance.itemButtonFont                  = [NSFont boldSystemFontOfSize:12.0];
+		mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSRegularControlSize]];
+		
+	} else {
+		// Mavericks and before
+		mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
+		
+		mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:0.90 alpha:1.0];
+		mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:0.75 alpha:1.0];
+		mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:0.90 alpha:1.0];
+		mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:0.75 alpha:1.0];
+		mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:0.5 alpha:1.0];
+		
+		mScopeBarAppearance.separatorColor                  = [NSColor colorWithCalibratedWhite:0.52 alpha:1.0];
+		mScopeBarAppearance.separatorWidth                  = 1.0;
+		mScopeBarAppearance.separatorHeight                 = 16.0;
+		
+		mScopeBarAppearance.labelColor                      = [NSColor colorWithCalibratedWhite:0.45 alpha:1.0];
+		mScopeBarAppearance.labelFont                       = [NSFont boldSystemFontOfSize:12.0];
+		mScopeBarAppearance.itemButtonFont                  = [NSFont boldSystemFontOfSize:12.0];
+		mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSRegularControlSize]];
+	}
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -117,46 +174,7 @@
 	mGroups = [[NSArray array] retain];
 	mIsEnabled = YES;
 	
-	{
-		if (@available(macOS 10.10, *)) {
-			// Yosemite and Later
-			mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
-			
-			mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:0.89 alpha:1.0];
-			mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:0.87 alpha:1.0];
-			mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:0.95 alpha:1.0];
-			mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:0.95 alpha:1.0];
-			mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:0.6 alpha:1.0];
-			
-			mScopeBarAppearance.separatorColor                  = [NSColor colorWithCalibratedWhite:0.52 alpha:1.0];
-			mScopeBarAppearance.separatorWidth                  = 1.0;
-			mScopeBarAppearance.separatorHeight                 = 16.0;
-			
-			mScopeBarAppearance.labelColor                      = [NSColor colorWithCalibratedWhite:0.45 alpha:1.0];
-			mScopeBarAppearance.labelFont                       = [NSFont boldSystemFontOfSize:12.0];
-			mScopeBarAppearance.itemButtonFont                  = [NSFont boldSystemFontOfSize:12.0];
-			mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSRegularControlSize]];
-			
-		} else {
-			// Mavericks and before
-			mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
-			
-			mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:0.90 alpha:1.0];
-			mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:0.75 alpha:1.0];
-			mScopeBarAppearance.inactiveBackgroundTopColor      = [NSColor colorWithCalibratedWhite:0.90 alpha:1.0];
-			mScopeBarAppearance.inactiveBackgroundBottomColor   = [NSColor colorWithCalibratedWhite:0.75 alpha:1.0];
-			mScopeBarAppearance.borderBottomColor               = [NSColor colorWithCalibratedWhite:0.5 alpha:1.0];
-			
-			mScopeBarAppearance.separatorColor                  = [NSColor colorWithCalibratedWhite:0.52 alpha:1.0];
-			mScopeBarAppearance.separatorWidth                  = 1.0;
-			mScopeBarAppearance.separatorHeight                 = 16.0;
-			
-			mScopeBarAppearance.labelColor                      = [NSColor colorWithCalibratedWhite:0.45 alpha:1.0];
-			mScopeBarAppearance.labelFont                       = [NSFont boldSystemFontOfSize:12.0];
-			mScopeBarAppearance.itemButtonFont                  = [NSFont boldSystemFontOfSize:12.0];
-			mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSRegularControlSize]];
-		}
-	}
+	[self updateAppearance];
 	
 	return self;
 }
@@ -426,6 +444,9 @@
 {
 	BOOL isWindowActive = (self.window.isMainWindow || self.window.isKeyWindow);
 	
+	if (currentAppearance != nil && ![currentAppearance.name isEqualToString:NSAppearance.currentAppearance.name]) {
+		[self updateAppearance];
+	}
 	
 	// Draw gradient background
 	NSGradient * gradient = nil;
