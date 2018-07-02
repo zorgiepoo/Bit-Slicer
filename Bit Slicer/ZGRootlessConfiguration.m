@@ -136,26 +136,26 @@
 	
 	if (_rootlessApplicationURLs != nil)
 	{
-		NSURL *rootMostAppURL = nil;
+		NSURL *rootMostBundleURL = nil;
 		NSUInteger pathComponentIndex = 0;
 		for (NSString *pathComponent in fileURL.pathComponents)
 		{
-			if ([pathComponent.pathExtension isEqualToString:@"app"])
+			if ([pathComponent.pathExtension isEqualToString:@"app"] || [pathComponent.pathExtension isEqualToString:@"xpc"])
 			{
-				rootMostAppURL = [[NSURL fileURLWithPathComponents:[pathComponents subarrayWithRange:NSMakeRange(0, pathComponentIndex)]] URLByAppendingPathComponent:pathComponent isDirectory:YES];
+				rootMostBundleURL = [[NSURL fileURLWithPathComponents:[pathComponents subarrayWithRange:NSMakeRange(0, pathComponentIndex)]] URLByAppendingPathComponent:pathComponent isDirectory:YES];
 				break;
 			}
 			pathComponentIndex++;
 		}
 		
-		if (rootMostAppURL != nil)
+		if (rootMostBundleURL != nil)
 		{
-			if ([_rootlessApplicationURLs containsObject:rootMostAppURL])
+			if ([_rootlessApplicationURLs containsObject:rootMostBundleURL])
 			{
 				return YES;
 			}
 			
-			if ([[[NSBundle bundleWithURL:rootMostAppURL] bundleIdentifier] hasPrefix:@"com.apple."])
+			if ([[[NSBundle bundleWithURL:rootMostBundleURL] bundleIdentifier] hasPrefix:@"com.apple."])
 			{
 				return YES;
 			}
