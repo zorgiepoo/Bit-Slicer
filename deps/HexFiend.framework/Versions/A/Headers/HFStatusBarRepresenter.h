@@ -22,12 +22,7 @@ typedef NS_ENUM(NSUInteger, HFStatusBarMode) {
     
     HFStatusBarRepresenter is a subclass of HFRepresenter responsible for showing the status bar, which displays information like the total length of the document, or the number of selected bytes.
 */
-@interface HFStatusBarRepresenter : HFRepresenter {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
-    HFStatusBarMode statusMode;
-#pragma clang diagnostic pop
-}
+@interface HFStatusBarRepresenter : HFRepresenter
 
 @property (nonatomic) HFStatusBarMode statusMode;
 

@@ -1,26 +1,3 @@
-/* Copyright (c) 2005-2011, Peter Ammon
- * All rights reserved.
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 //
 //  DataInspectorRepresenter.m
 //  HexFiend_2
@@ -30,12 +7,15 @@
 //
 
 #import "DataInspectorRepresenter.h"
-#import "ZGLocalization.h"
 
 // Don't want to include these macros, so not using them
 
 #ifndef HFASSERT
 #define HFASSERT(x) ;
+#endif
+
+#ifndef USE
+#define USE(x) (void)(x)
 #endif
 
 /* NSTableColumn identifiers */
@@ -51,41 +31,37 @@
 #define NSTableViewSelectionHighlightStyleNone (-1)
 
 /* The largest number of bytes that any inspector type can edit */
-#define MAX_EDITABLE_BYTE_COUNT 8
+#define MAX_EDITABLE_BYTE_COUNT 128
 #define INVALID_EDITING_BYTE_COUNT NSUIntegerMax
 
 #define kDataInspectorUserDefaultsKey @"DataInspectorDefaults"
 
-#define ZGDataInspectorLocalizationTable @"[Code] Data Inspector"
-
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wreserved-id-macro"
-
-#ifndef __BIG_ENDIAN__
-#define __BIG_ENDIAN__ 0
-#endif
-
-#pragma clang diagnostic pop
-
-static BOOL isRunningOnLeopardOrLater(void) {
-    return NSAppKitVersionNumber >= 860.;
-}
-
 NSString * const DataInspectorDidChangeRowCount = @"DataInspectorDidChangeRowCount";
 NSString * const DataInspectorDidDeleteAllRows = @"DataInspectorDidDeleteAllRows";
 
-/* Inspector types */
+// Inspector types
+// Needs to match menu order in DataInspectorView.xib
 enum InspectorType_t {
-    eInspectorTypeInteger,
     eInspectorTypeSignedInteger,
-    eInspectorTypeFloatingPoint
+    eInspectorTypeUnsignedInteger,
+    eInspectorTypeFloatingPoint,
+    eInspectorTypeUTF8Text,
+    eInspectorTypeSLEB128,
+    eInspectorTypeULEB128,
+    eInspectorTypeBinary,
+    
+    // Total number of inspector types.
+    eInspectorTypeCount
 };
 
+// Needs to match menu order in DataInspectorView.xib
 enum Endianness_t {
+    eEndianLittle, // (Endianness_t)0 is the default endianness.
     eEndianBig,
-    eEndianLittle,
 
+    // Total number of endiannesses.
+    eEndianCount,
+    
 #if __BIG_ENDIAN__
     eNativeEndianness = eEndianBig
 #else
@@ -93,72 +69,87 @@ enum Endianness_t {
 #endif
 };
 
-enum InspectionStatus_t {
-    eInspectionCanInspect,
-    eInspectionNoData,
-    eInspectionTooMuchData,
-    eInspectionBadByteCount
+enum NumberBase_t {
+    eNumberBaseDecimal,
+    eNumberBaseHexadecimal,
 };
 
-static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) {
-    switch (status) {
-        case eInspectionNoData:
-            return NSLocalizedStringFromTable(@"noData", ZGDataInspectorLocalizationTable, nil);
-        case eInspectionTooMuchData:
-            return NSLocalizedStringFromTable(@"tooMuchData", ZGDataInspectorLocalizationTable, nil);
-        case eInspectionBadByteCount:
-            return NSLocalizedStringFromTable(@"badByteCount", ZGDataInspectorLocalizationTable, nil);
-        case eInspectionCanInspect:
-            return nil;
-    }
+/* A class representing a single row of the data inspector */
+@interface DataInspector : NSObject<NSCoding> {
+    enum InspectorType_t inspectorType;
+    enum Endianness_t endianness;
+    enum NumberBase_t numberBase;
 }
 
-/* A class representing a single row of the data inspector */
-@interface DataInspector : NSObject <NSSecureCoding>
+/* A data inspector that is different from the given inspectors, if possible. */
++ (DataInspector*)dataInspectorSupplementing:(NSArray*)inspectors;
 
-- (enum InspectorType_t)type;
-- (void)setType:(enum InspectorType_t)type;
+@property (nonatomic) enum InspectorType_t type;
+@property (nonatomic) enum Endianness_t endianness;
+@property (nonatomic) enum NumberBase_t numberBase;
 
-- (enum Endianness_t)endianness;
-- (void)setEndianness:(enum Endianness_t)endianness;
-
-- (enum InspectionStatus_t)inspectionStatusForByteCount:(unsigned long long)count;
-- (id)valueForBytes:(const unsigned char *)bytes length:(NSUInteger)length;
+- (id)valueForController:(HFController *)controller ranges:(NSArray*)ranges isError:(BOOL *)outIsError;
+- (id)valueForData:(NSData *)data isError:(BOOL *)outIsError;
+- (id)valueForBytes:(const unsigned char *)bytes length:(NSUInteger)length isError:(BOOL *)outIsError;
 
 /* Returns YES if we can replace the given number of bytes with this string value */
 - (BOOL)acceptStringValue:(NSString *)value replacingByteCount:(NSUInteger)count intoData:(unsigned char *)outData;
 
-/* returns YES if types wrapped around */
-- (BOOL)incrementToNextType;
-
 /* Get and set a property list representation, for persisting to user defaults */
-- (id)propertyListRepresentation;
-- (void)setPropertyListRepresentation:(id)plist;
+@property (nonatomic, strong) id propertyListRepresentation;
 
 @end
 
 @implementation DataInspector
-{
-    enum InspectorType_t inspectorType;
-    enum Endianness_t endianness;
+
++ (DataInspector*)dataInspectorSupplementing:(NSArray*)inspectors {
+    DataInspector *ret = [[DataInspector alloc] init];
+
+    enum Endianness_t preferredEndian; // Prefer the most popular endianness among inspectors
+    uint32_t present = 0; // Bit set of all inspector types that are already present.
+    
+    _Static_assert(eEndianCount <= 2, "This part of the code assumes only two supported endianesses.");
+    int endianessVote = 0; // +1 for enum == 0, -1 enum != 0.
+    for(DataInspector *di in inspectors) {
+        endianessVote += !di->endianness ? 1 : -1;
+        present |= 1 << di->inspectorType << di->endianness*eInspectorTypeCount;
+    }
+    preferredEndian = endianessVote < 0;
+    
+    uint32_t pref = (~present >> preferredEndian*eInspectorTypeCount) & ((1<<eInspectorTypeCount)-1);
+    if(pref) { // There is a missing inspector type for preffered endianness, pick that one.
+        ret->endianness = preferredEndian;
+        ret->inspectorType = __builtin_ffs(pref)-1;
+        return ret;
+    }
+    
+    // Pick an absent inspector type.
+    int x = __builtin_ffs(~present)-1;
+    enum Endianness_t y = x/eInspectorTypeCount;
+    enum InspectorType_t z = x % eInspectorTypeCount;
+    
+    if(x < 0 || y >= eEndianCount || z >= eInspectorTypeCount) // No absent inspector type
+        return ret;
+    
+    ret->endianness = y;
+    ret->inspectorType = z;
+    return ret;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
     HFASSERT([coder allowsKeyedCoding]);
     [coder encodeInt32:inspectorType forKey:@"InspectorType"];
     [coder encodeInt32:endianness forKey:@"Endianness"];
+    [coder encodeInt32:numberBase forKey:@"NumberBase"];
 }
 
-- (id)initWithCoder:(NSCoder *)coder {
+- (instancetype)initWithCoder:(NSCoder *)coder {
     HFASSERT([coder allowsKeyedCoding]);
     self = [super init];
-    inspectorType = (enum InspectorType_t)[coder decodeInt32ForKey:@"InspectorType"];
-    endianness = (enum Endianness_t)[coder decodeInt32ForKey:@"Endianness"];
+    inspectorType = [coder decodeInt32ForKey:@"InspectorType"];
+    endianness = [coder decodeInt32ForKey:@"Endianness"];
+    numberBase = [coder decodeInt32ForKey:@"NumberBase"];
     return self;
-}
-
-+ (BOOL)supportsSecureCoding {
-    return YES;
 }
 
 - (void)setType:(enum InspectorType_t)type {
@@ -177,35 +168,21 @@ static NSString *errorStringForInspectionStatus(enum InspectionStatus_t status) 
     return endianness;
 }
 
+- (void)setNumberBase:(enum NumberBase_t)base {
+    numberBase = base;
+}
+
+- (enum NumberBase_t)numberBase {
+    return numberBase;
+}
+
 - (NSUInteger)hash {
     return inspectorType + (endianness << 8UL);
 }
 
-- (BOOL)isEqual:(id)himObject {
-    if (! [himObject isKindOfClass:[DataInspector class]]) return NO;
-	DataInspector *him = himObject;
-    return inspectorType == him->inspectorType && endianness == him->endianness;
-}
-
-- (enum InspectionStatus_t)inspectionStatusForByteCount:(unsigned long long)count {
-    switch ([self type]) {
-        case eInspectorTypeInteger:
-        case eInspectorTypeSignedInteger:
-            /* Only allow positive powers of 2 up to 8 */
-	    switch (count) {
-		case 0: return eInspectionNoData;
-		case 1: case 2: case 4: case 8: return eInspectionCanInspect;
-		default: return (count > 8) ? eInspectionTooMuchData : eInspectionBadByteCount;
-	    }
-            
-        case eInspectorTypeFloatingPoint:
-            /* Only 4 and 8 */
-	    switch (count) {
-		case 0: return eInspectionNoData;
-		case 4: case 8: return eInspectionCanInspect;
-		default: return (count > 8) ? eInspectionTooMuchData : eInspectionBadByteCount;
-	    }
-    }
+- (BOOL)isEqual:(DataInspector *)him {
+    if (! [him isKindOfClass:[DataInspector class]]) return NO;
+    return inspectorType == him->inspectorType && endianness == him->endianness && numberBase == him->numberBase;
 }
 
 static uint64_t reverse(uint64_t val, NSUInteger amount) {
@@ -232,62 +209,93 @@ static void flip(void *val, NSUInteger amount) {
 
 #define FETCH(type) type s = *(const type *)bytes;
 #define FLIP(amount) if (endianness != eNativeEndianness) { flip(&s, amount); }
-#define FORMAT(specifier) return [NSString stringWithFormat:specifier, s];
-static id unsignedIntegerDescription(const void *bytes, NSUInteger length, enum Endianness_t endianness) {
+#define FORMAT(decSpecifier, hexSpecifier) return [NSString stringWithFormat:numberBase == eNumberBaseDecimal ? decSpecifier : hexSpecifier, s];
+static id signedIntegerDescription(const unsigned char *bytes, NSUInteger length, enum Endianness_t endianness, enum NumberBase_t numberBase) {
     switch (length) {
         case 1:
         {
             FETCH(int8_t)
-            FORMAT(@"%d")
+            FORMAT(@"%" PRId8, @"0x%" PRIX8);
         }
         case 2:
         {
             FETCH(int16_t)
             FLIP(2)
-            FORMAT(@"%hi")
+            FORMAT(@"%" PRId16, @"0x%" PRIX16)
         }
         case 4:
         {
             FETCH(int32_t)
             FLIP(4)
-            FORMAT(@"%d")
+            FORMAT(@"%" PRId32, @"0x%" PRIX32)
         }
         case 8:
         {
             FETCH(int64_t)
             FLIP(8)
-            FORMAT(@"%lli")
-
+            FORMAT(@"%" PRId64, @"0x%" PRIX64)
+        }
+        case 16:
+        {
+            FETCH(__int128_t)
+            FLIP(16)
+            BOOL neg;
+            if (s < 0) {
+                s=-s;
+                neg = YES;
+            } else {
+                neg = NO;
+            }
+            char buf[50], *b = buf;
+            while(s) {
+                *(b++) = (char)(s%10)+'0';
+                s /= 10;
+            }
+            *b = 0;
+            flip(buf, b-buf);
+            return [NSString stringWithFormat:@"%s%s", (neg?"-":""), buf];
         }
         default: return nil;
     }
 }
 
-static id signedIntegerDescription(const void *bytes, NSUInteger length, enum Endianness_t endianness) {
+static id unsignedIntegerDescription(const unsigned char *bytes, NSUInteger length, enum Endianness_t endianness, enum NumberBase_t numberBase) {
     switch (length) {
         case 1:
         {
             FETCH(uint8_t)
-            FORMAT(@"%u")
+            FORMAT(@"%" PRIu8, @"0x%" PRIX8);
         }
         case 2:
         {
             FETCH(uint16_t)
             FLIP(2)
-            FORMAT(@"%hu")
+            FORMAT(@"%" PRIu16, @"0x%" PRIX16)
         }
         case 4:
         {
             FETCH(uint32_t)
             FLIP(4)
-            FORMAT(@"%u")
+            FORMAT(@"%" PRIu32, @"0x%" PRIX32)
         }
         case 8:
         {
             FETCH(uint64_t)
             FLIP(8)
-            FORMAT(@"%llu")
-            
+            FORMAT(@"%" PRIu64, @"0x%" PRIX64)
+        }
+        case 16:
+        {
+            FETCH(__uint128_t)
+            FLIP(16)
+            char buf[50], *b = buf;
+            while(s) {
+                *(b++) = (char)(s%10)+'0';
+                s /= 10;
+            }
+            *b = 0;
+            flip(buf, b-buf);
+            return [NSString stringWithFormat:@"%s", buf];
         }
         default: return nil;
     }
@@ -296,8 +304,43 @@ static id signedIntegerDescription(const void *bytes, NSUInteger length, enum En
 #undef FLIP
 #undef FORMAT
 
+static long double ieeeToLD(const void *bytes, unsigned exp, unsigned man) {
+    __uint128_t b = 0;
+    memcpy(&b, bytes, (1 + exp + man + 7)/8);
+    
+    __uint128_t m = b << (1+exp) >> (128 - man);
+    int64_t e = (uint64_t)(b << 1 >> (128 - exp));
+    unsigned s = b >> 127;
+    
+    if(e) {
+        if(e ^ ((1ULL<<exp)-1)) {
+            // normal
+            int64_t e2 = e + 1 - (1ULL<<(exp-1));
+            long double t = ldexpl(m, (int)(e2-man)) + ldexpl(1, (int)e2);
+            return s ? -t : t;
+        } else {
+            if(m) {
+                // nan
+                return __builtin_nanl(""); // No attempt to translate codes.
+            } {
+                // infinity
+                return s ? __builtin_infl() : -__builtin_infl();
+            }
+        }
+    } else {
+        if(m) {
+            // subnormal
+            int64_t e2 = 2 - (1ULL<<(exp-1));
+            long double t = ldexpl(m, (int)(e2-man));
+            return s ? -t : t;
+        } else {
+            // zero
+            return s ? -0.0L : 0.0L;
+        }
+    }
+}
 
-static id floatingPointDescription(const void *bytes, NSUInteger length, enum Endianness_t endianness) {
+static id floatingPointDescription(const unsigned char *bytes, NSUInteger length, enum Endianness_t endianness) {
     switch (length) {
         case sizeof(float):
         {
@@ -305,10 +348,10 @@ static id floatingPointDescription(const void *bytes, NSUInteger length, enum En
                 uint32_t i;
                 float f;
             } temp;
-            assert(sizeof temp.f == sizeof temp.i);
+            _Static_assert(sizeof temp.f == sizeof temp.i, "sizeof(float) is not 4!");
             temp.i = *(const uint32_t *)bytes;
             if (endianness != eNativeEndianness) temp.i = (uint32_t)reverse(temp.i, sizeof(float));
-            return [NSString stringWithFormat:@"%f", (double)temp.f];
+            return [NSString stringWithFormat:@"%.15g", temp.f];
         }
         case sizeof(double):
         {
@@ -316,38 +359,222 @@ static id floatingPointDescription(const void *bytes, NSUInteger length, enum En
                 uint64_t i;
                 double f;
             } temp;
-            assert(sizeof temp.f == sizeof temp.i);
+            _Static_assert(sizeof temp.f == sizeof temp.i, "sizeof(double) is not 8!");
             temp.i = *(const uint64_t *)bytes;
             if (endianness != eNativeEndianness) temp.i = reverse(temp.i, sizeof(double));
-            return [NSString stringWithFormat:@"%e", temp.f];
+            return [NSString stringWithFormat:@"%.15g", temp.f];
+        }
+        case 10:
+        {
+            typedef float __attribute__((mode(XF))) float80;
+            union {
+                uint8_t i[10];
+                float80 f;
+            } temp;
+            if (endianness == eNativeEndianness) {
+                memcpy(temp.i, bytes, 10);
+            } else {
+                for(unsigned i = 0; i < 10; i++) {
+                    temp.i[9 - i] = bytes[i];
+                }
+            }
+            return [NSString stringWithFormat:@"%.15Lg", (long double)temp.f];
+        }
+        case 16:
+        {
+            //typedef float __attribute__((mode(TF))) float128; // Here's to hoping clang support comes one day.
+            uint64_t temp[2];
+            temp[0] = ((uint64_t*)bytes)[0];
+            temp[1] = ((uint64_t*)bytes)[1];
+            if (endianness != eNativeEndianness) {
+                uint64_t t = temp[0];
+                temp[0] = reverse(temp[1], 8);
+                temp[1] = reverse(t, 8);
+            }
+            return [NSString stringWithFormat:@"%.15Lg", ieeeToLD(temp, 15, 112)];
         }
         default: return nil;
     }
 }
 
-- (id)valueForBytes:(const unsigned char *)bytes length:(NSUInteger)length {
-    assert([self inspectionStatusForByteCount:length] == eInspectionCanInspect);
-    switch ([self type]) {
-        case eInspectorTypeInteger:
-            return unsignedIntegerDescription(bytes, length, endianness);
-            
-        case eInspectorTypeSignedInteger:
-            return signedIntegerDescription(bytes, length, endianness);
-        
-        case eInspectorTypeFloatingPoint:
-            return floatingPointDescription(bytes, length, endianness);
-    }
+static NSString * const InspectionErrorNoData =  @"(select some data)";
+static NSString * const InspectionErrorTooMuch = @"(select less data)";
+static NSString * const InspectionErrorTooLittle = @"(select more data)";
+static NSString * const InspectionErrorNonPwr2 = @"(select a power of 2 bytes)";
+static NSString * const InspectionErrorInternal = @"(internal error)";
+
+static NSAttributedString *inspectionError(NSString *s) {
+    NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+    [paragraphStyle setMinimumLineHeight:(CGFloat)16.];
+    NSAttributedString *result = [[NSAttributedString alloc] initWithString:s attributes:@{NSForegroundColorAttributeName: [NSColor disabledControlTextColor], NSFontAttributeName: [NSFont controlContentFontOfSize:11], NSParagraphStyleAttributeName: paragraphStyle}];
+    return result;
 }
 
-- (BOOL)incrementToNextType {
-    BOOL wrapped = NO;
-	inspectorType++;
-    if (inspectorType > eInspectorTypeFloatingPoint)
-	{
-		inspectorType = eInspectorTypeInteger;
-		wrapped = YES;
-	}
-    return wrapped;
+- (id)valueForController:(HFController *)controller ranges:(NSArray *)ranges isError:(BOOL *)outIsError {
+    /* Just do a rough cut on length before going to valueForData. */
+    
+    if ([ranges count] != 1) {
+        if(outIsError) *outIsError = YES;
+        return inspectionError(NSLocalizedString(@"(select a contiguous range)", ""));
+    }
+    HFRange range = [ranges[0] HFRange];
+    
+    if(range.length == 0) {
+        if(outIsError) *outIsError = YES;
+        return inspectionError(InspectionErrorNoData);
+    }
+    
+    if(range.length > MAX_EDITABLE_BYTE_COUNT) {
+        if(outIsError) *outIsError = YES;
+        return inspectionError(InspectionErrorTooMuch);
+    }
+    
+    switch ([self type]) {
+        case eInspectorTypeUnsignedInteger:
+        case eInspectorTypeSignedInteger:
+        case eInspectorTypeFloatingPoint:
+            if(range.length > 16) {
+                if(outIsError) *outIsError = YES;
+                return inspectionError(InspectionErrorTooMuch);
+            }
+            break;
+        case eInspectorTypeUTF8Text:
+            // MAX_EDITABLE_BYTE_COUNT already checked above
+            break;
+        case eInspectorTypeSLEB128:
+        case eInspectorTypeULEB128:
+        case eInspectorTypeBinary:
+            if(range.length > 24) {
+                if(outIsError) *outIsError = YES;
+                return inspectionError(InspectionErrorTooMuch);
+            }
+            break;
+        default:
+            if(outIsError) *outIsError = YES;
+            return inspectionError(InspectionErrorInternal);
+    }
+    
+    return [self valueForData:[controller dataForRange:range] isError:outIsError];
+}
+
+- (id)valueForData:(NSData *)data isError:(BOOL *)outIsError {
+    return [self valueForBytes:[data bytes] length:[data length] isError:outIsError];
+}
+
+- (id)valueForBytes:(const unsigned char *)bytes length:(NSUInteger)length isError:(BOOL *)outIsError {
+    if(outIsError) *outIsError = YES;
+    
+    switch ([self type]) {
+        case eInspectorTypeUnsignedInteger:
+        case eInspectorTypeSignedInteger:
+            /* Only allow powers of 2 up to 8 */
+            switch (length) {
+                case 0: return inspectionError(InspectionErrorNoData);
+                case 1: case 2: case 4: case 8:
+                    if(outIsError) *outIsError = NO;
+                    if(inspectorType == eInspectorTypeSignedInteger)
+                        return signedIntegerDescription(bytes, length, endianness, numberBase);
+                    else
+                        return unsignedIntegerDescription(bytes, length, endianness, numberBase);
+                default:
+                    return length > 8 ? inspectionError(InspectionErrorTooMuch) : inspectionError(InspectionErrorNonPwr2);
+            }
+        
+        case eInspectorTypeFloatingPoint:
+            switch (length) {
+                case 0:
+                    return inspectionError(InspectionErrorNoData);
+                case 1: case 2: case 3:
+                    return inspectionError(InspectionErrorTooLittle);
+                case 4: case 8: case 10: case 16:
+                    if(outIsError) *outIsError = NO;
+                    return floatingPointDescription(bytes, length, endianness);
+                default:
+                    return length > 16 ? inspectionError(InspectionErrorTooMuch) : inspectionError(InspectionErrorNonPwr2);
+            }
+                
+        case eInspectorTypeUTF8Text: {
+            if(length == 0) return inspectionError(InspectionErrorNoData);
+            if(length > MAX_EDITABLE_BYTE_COUNT) return inspectionError(InspectionErrorTooMuch);
+            NSString *ret = [[NSString alloc] initWithBytes:bytes length:length encoding:NSUTF8StringEncoding];
+            if(ret == nil) return inspectionError(@"(bytes are not valid UTF-8)");
+            if(outIsError) *outIsError = NO;
+            return ret;
+        }
+        case eInspectorTypeBinary: {
+            NSString* ret = @"";
+            
+            for (NSUInteger i = 0; i < length; ++i) {
+                char input = bytes[i];
+
+                char binary[] = "00000000";
+                
+                if ( input & 0x80 )
+                    binary[0] = '1';
+                
+                if ( input & 0x40 )
+                    binary[1] = '1';
+                
+                if ( input & 0x20 )
+                    binary[2] = '1';
+                
+                if ( input & 0x10 )
+                    binary[3] = '1';
+                
+                if ( input & 0x08 )
+                    binary[4] = '1';
+                
+                if ( input & 0x04 )
+                    binary[5] = '1';
+                
+                if ( input & 0x02 )
+                    binary[6] = '1';
+                
+                if ( input & 0x01 )
+                    binary[7] = '1';
+
+                ret = [ret stringByAppendingFormat:@"%s ", binary ];
+            }
+            
+            return  ret;
+        }
+        
+        case eInspectorTypeSLEB128: {
+            int64_t result = 0;
+            int shift = 0;
+            for (size_t i = 0; i < length; i++) {
+                result |= ((bytes[i] & 0x7F) << shift);
+                shift += 7;
+                
+                if ((bytes[i] & 0x80) == 0) {
+                    if (shift < 64 && (bytes[i] & 0x40)) {
+                        result |= -(1 << shift);
+                    }
+                    return [NSString stringWithFormat:@"%qd (%ld bytes)", result, i + 1];
+                }
+            }
+            
+            return inspectionError(InspectionErrorTooLittle);
+        }
+        
+        case eInspectorTypeULEB128: {
+            uint64_t result = 0;
+            int shift = 0;
+            for (size_t i = 0; i < length; i++) {
+                result |= ((bytes[i] & 0x7F) << shift);
+                shift += 7;
+                
+                if ((bytes[i] & 0x80) == 0) {
+                    return [NSString stringWithFormat:@"%qu (%ld bytes)", result, i + 1];
+                }
+            }
+            
+            return inspectionError(InspectionErrorTooLittle);
+        }
+            
+        default:
+            return inspectionError(InspectionErrorInternal);
+    }
 }
 
 static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger count) {
@@ -366,123 +593,199 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
     }
 }
 
-- (BOOL)acceptStringValue:(NSString *)value replacingByteCount:(NSUInteger)count intoData:(unsigned char *)outData {
-    if (inspectorType == eInspectorTypeInteger || inspectorType == eInspectorTypeSignedInteger) {
-	if (! (count == 1 || count == 2 || count == 4 || count == 8)) return NO;
-	
-	char buffer[256];
-	BOOL success = [value getCString:buffer maxLength:sizeof buffer encoding:NSASCIIStringEncoding];
-	if (! success) return NO;
+static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
+    static const int bufferChars = 256;
+    static const unichar zeroBuf[bufferChars] = {0}; //unicode null bytes
+    unichar buffer[bufferChars];
     
+    NSRange r = NSMakeRange(range.location, bufferChars);
+    
+    if(range.length > bufferChars) { // No underflow please.
+        NSUInteger lastBlock = range.location + range.length - bufferChars;
+        for(; r.location < lastBlock; r.location += bufferChars) {
+            [string getCharacters:buffer range:r];
+            if(memcmp(buffer, zeroBuf, bufferChars)) return NO;
+        }
+    }
+
+    // Handle the uneven bytes at the end.
+    r.length = range.location + range.length - r.location;
+    [string getCharacters:buffer range:r];
+    if(memcmp(buffer, zeroBuf, r.length)) return NO;    
+
+    return YES;
+}
+
+- (BOOL)acceptStringValue:(NSString *)value replacingByteCount:(NSUInteger)count intoData:(unsigned char *)outData {
+    if (inspectorType == eInspectorTypeUnsignedInteger || inspectorType == eInspectorTypeSignedInteger) {
+        if (numberBase == eNumberBaseHexadecimal) {
+            NSScanner *scanner = [NSScanner scannerWithString:value];
+            unsigned long long unsignedHexValue = 0;
+            if (![scanner scanHexLongLong:&unsignedHexValue]) {
+                NSLog(@"Invalid hex value %@", value);
+                return NO;
+            }
+            value = [NSString stringWithFormat:@"%llu", unsignedHexValue];
+        }
+        
+        char buffer[256];
+        BOOL success = [value getCString:buffer maxLength:sizeof buffer encoding:NSASCIIStringEncoding];
+        if (! success) return NO;
+
+        if (! (count == 1 || count == 2 || count == 4 || count == 8)) return NO;
 	
-	errno = 0;
-	char *endPtr = NULL;
-	// note that strtoull handles negative values
-	unsigned long long unsignedValue = strtoull(buffer, &endPtr, 0);
-	int resultError = errno;
+        errno = 0;
+        char *endPtr = NULL;
+        /* note that strtoull handles negative values */
+        unsigned long long unsignedValue = strtoull(buffer, &endPtr, 0);
+        int resultError = errno;
+        
+        /* Make sure we consumed some of the string */
+        if (endPtr == buffer) return NO;
+        
+        /* Check for conversion errors (overflow, etc.) */
+        if (resultError != 0) return NO;
+        
+        /* Now check to make sure we fit */
+        if (! valueCanFitInByteCount(unsignedValue, count)) return NO;
+        
+        if (outData == NULL) return YES; // No need to continue if we're not outputting
+
+        /* Get all 8 bytes in big-endian form */
+        unsigned long long consumableValue = unsignedValue;
+        unsigned char bytes[8];
+        unsigned i = 8;
+        while (i--) {
+            bytes[i] = consumableValue & 0xFF;
+            consumableValue >>= 8;
+        }
+    
+        /* Now copy the last (least significant) 'count' bytes to outData in the requested endianness */
+        for (i=0; i < count; i++) {
+            unsigned char byte = bytes[(8 - count + i)];
+            if (endianness == eEndianBig) {
+                outData[i] = byte;
+            }
+            else {
+                outData[count - i - 1] = byte;
+            }
+        }
 	
-	// Make sure we consumed some of the string
-	if (endPtr == buffer) return NO;
-	
-	// Check for conversion errors (overflow, etc.)
-	if (resultError != 0) return NO;
-	
-	// Now check to make sure we fit
-	if (! valueCanFitInByteCount(unsignedValue, count)) return NO;
-	
-	// Actually return the bytes if requested
-	if (outData != NULL) {
-	    // Get all 8 bytes in big-endian form
-	    unsigned long long consumableValue = unsignedValue;
-	    unsigned char bytes[8];
-	    unsigned i = 8;
-	    while (i--) {
-		bytes[i] = consumableValue & 0xFF;
-		consumableValue >>= 8;
-	    }
-	    
-	    // Now copy the last (least significant) 'count' bytes to outData in the requested endianness
-	    for (i=0; i < count; i++) {
-		unsigned char byte = bytes[(8 - count + i)];
-		if (endianness == eEndianBig) {
-		    outData[i] = byte;
-		}
-		else {
-		    outData[count - i - 1] = byte;
-		}
-	    }
-	}
-	
-	// Victory
-	return YES;
+        /* Victory */
+        return YES;
     }
     else if (inspectorType == eInspectorTypeFloatingPoint) {
-	if (! (count == 4 || count == 8)) return NO;
-	assert(sizeof(float) == 4);
-	assert(sizeof(double) == 8);
-	
-	BOOL useFloat = (count == 4);
-	
-	char buffer[256];
-	BOOL success = [value getCString:buffer maxLength:sizeof buffer encoding:NSASCIIStringEncoding];
-	if (! success) return NO;
-	
-	double doubleValue = 0;
-	float floatValue = 0;
-	
-	errno = 0;
-	char *endPtr = NULL;
-	if (useFloat) {
-	    floatValue = strtof(buffer, &endPtr);
-	}
-	else {
-	    doubleValue = strtod(buffer, &endPtr);
-	}
-	int resultError = errno;
-	
-	// Make sure we consumed some of the string
-	if (endPtr == buffer) return NO;
-	
-	// Check for conversion errors (overflow, etc.)
-	if (resultError != 0) return NO;
-	
-	if (outData != NULL) {
-	    unsigned char bytes[8];
-	    if (useFloat) {
-		memcpy(bytes, &floatValue, sizeof floatValue);
-	    }
-	    else {
-		memcpy(bytes, &doubleValue, sizeof doubleValue);
-	    }
+        char buffer[256];
+        BOOL success = [value getCString:buffer maxLength:sizeof buffer encoding:NSASCIIStringEncoding];
+        if (! success) return NO;
+
+        union {
+            float  f;
+            double d;
+            float __attribute__((mode(XF))) x;
+            __uint128_t t; // Maybe clang will support mode(TF) one day.
+        } val;
+
+        char *endPtr = NULL;
+        errno = 0;
+        
+        switch(count) {
+            case 4: val.f = strtof(buffer, &endPtr); break;
+            case 8: val.d = strtod(buffer, &endPtr); break;
+            case 10: val.x = strtold(buffer, &endPtr); break;
+            case 16: {
+                val.x = strtold(buffer, &endPtr);
+                val.t = (val.t >> 64 << 112) | (val.t << 48 << 17 >> 16);
+                break;
+            }
+            default: return NO;
+        }
+        
+        if (errno != 0) return NO; // Check for conversion errors (overflow, etc.)
+        if (endPtr == buffer) return NO; // Make sure we consumed some of the string
+
+        if (outData == NULL) return YES; // No need to continue if we're not outputting
+        
+        unsigned char bytes[sizeof(val)];
+        memcpy(bytes, &val, count);
 	    
-	    // Now copy the first 'count' bytes to outData in the requested endianness.  This is different from the integer case - there we always work big-endian because we support more different byteCounts, but here we work in the native endianness because there's no simple way to convert a float or double to big endian form
-	    NSUInteger i;
-	    for (i=0; i < count; i++) {
-		if (endianness == eNativeEndianness) {
-		    outData[i] = bytes[i];
-		}
-		else {
-		    outData[count - i - 1] = bytes[i];
-		}
+	    /* Now copy the first 'count' bytes to outData in the requested endianness.  This is different from the integer case - there we always work big-endian because we support more different byteCounts, but here we work in the native endianness because there's no simple way to convert a float or double to big endian form */
+	    for (NSUInteger i = 0; i < count; i++) {
+            if (endianness == eNativeEndianness) {
+                outData[i] = bytes[i];
+            } else {
+                outData[count - i - 1] = bytes[i];
+            }
 	    }
-	}
-	
-	// Return triumphantly!
-	return YES;
+        
+        /* Return triumphantly! */
+        return YES;
+    }
+    else if (inspectorType == eInspectorTypeUTF8Text) {
+        /*
+         * If count is longer than the UTF-8 encoded value, succeed and zero fill
+         * the rest of outbuf. It's obvious behavior and probably more useful than
+         * only allowing an exact length UTF-8 replacement.
+         *
+         * By the same token, allow ending zero bytes to be dropped, so re-editing
+         * the same text doesn't fail due to the null bytes we added at the end.
+         */
+        
+        unsigned char buffer_[256];
+        unsigned char *buffer = buffer_;
+        NSUInteger used;
+        BOOL ret;
+        NSRange fullRange = NSMakeRange(0, [value length]);
+        NSRange leftover;
+        
+        // Speculate that 256 chars is enough.
+        ret = [value getBytes:buffer maxLength:count < sizeof(buffer_) ? count : sizeof(buffer_) usedLength:&used
+                     encoding:NSUTF8StringEncoding options:0 range:fullRange remainingRange:&leftover];
+        
+        if(!ret) return NO;
+        if(leftover.length == 0 || stringRangeIsNullBytes(value, leftover)) {
+            // Buffer was large enough, yay!
+            if(outData) {
+                memcpy(outData, buffer, used);
+                memset(outData+used, 0, count-used);
+            }
+            return YES;
+        }
+        
+        // Buffer wasn't large enough.
+        // Don't bother trying to reuse previous conversion, it's small beans anyways.
+        
+        if(!outData) return count <= [value lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+        
+        buffer = malloc(count);
+        ret = [value getBytes:buffer maxLength:count usedLength:&used encoding:NSUTF8StringEncoding
+                      options:0 range:fullRange remainingRange:&leftover];
+        ret = ret && (leftover.length == 0 || stringRangeIsNullBytes(value, leftover)) && used <= count;
+        if(ret) {
+            memcpy(outData, buffer, used);
+            memset(outData+used, 0, count-used);
+        }
+        free(buffer);
+        return ret;
     }
     else {
-	// Unknown inspector type
-	return NO;
+        /* Unknown inspector type */
+        return NO;
     }
 }
 
 - (id)propertyListRepresentation {
-    return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:inspectorType], @"InspectorType", [NSNumber numberWithInt:endianness], @"Endianness", nil];
+    return @{
+        @"InspectorType": @(inspectorType),
+        @"Endianness": @(endianness),
+        @"NumberBase": @(numberBase),
+    };
 }
 
 - (void)setPropertyListRepresentation:(id)plist {
-    inspectorType = (enum InspectorType_t)[[(NSDictionary *)plist objectForKey:@"InspectorType"] intValue];
-    endianness = (enum Endianness_t)[[(NSDictionary *)plist objectForKey:@"Endianness"] intValue];
+    inspectorType = [plist[@"InspectorType"] intValue];
+    endianness = [plist[@"Endianness"] intValue];
+    numberBase = [plist[@"NumberBase"] intValue];
 }
 
 @end
@@ -490,16 +793,31 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 @implementation DataInspectorScrollView
 
 - (void)drawDividerWithClip:(NSRect)clipRect {
-    [[NSColor lightGrayColor] set];
+    NSColor *separatorColor = [NSColor lightGrayColor];
+    if (HFDarkModeEnabled()) {
+        if (@available(macOS 10.14, *)) {
+            separatorColor = [NSColor separatorColor];
+        }
+    }
+    [separatorColor set];
     NSRect bounds = [self bounds];
     NSRect lineRect = bounds;
     lineRect.size.height = 1;
-    NSRectFill(NSIntersectionRect(lineRect, clipRect));
+    NSRectFillUsingOperation(NSIntersectionRect(lineRect, clipRect), NSCompositeSourceOver);
 }
 
 - (void)drawRect:(NSRect)rect {
-    [[NSColor colorWithCalibratedWhite:(CGFloat).91 alpha:1] set];
-    NSRectFill(rect);
+    if (!HFDarkModeEnabled()) {
+        [[NSColor colorWithCalibratedWhite:(CGFloat).91 alpha:1] set];
+        NSRectFillUsingOperation(rect, NSCompositeSourceOver);
+    }
+    
+    if (HFDarkModeEnabled()) {
+        [[NSColor colorWithCalibratedWhite:(CGFloat).09 alpha:1] set];
+    } else {
+        [[NSColor colorWithCalibratedWhite:(CGFloat).91 alpha:1] set];
+    }
+    NSRectFillUsingOperation(rect, NSCompositeSourceOver);
     [self drawDividerWithClip:rect];
 }
 
@@ -507,15 +825,10 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 
 @implementation DataInspectorRepresenter
 {
-	id _topLevelObjects;
-    IBOutlet NSView *outletView; //used only for loading the nib
-    IBOutlet NSTableView *table; //not retained - is a subview of our view (stored in superclass)
-    IBOutlet NSTableColumn *integerQualifierTableColumn;
-    IBOutlet NSTableColumn *endianTableColumn;
-    NSMutableArray *inspectors;
+    id _topLevelObjects;
 }
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
     inspectors = [[NSMutableArray alloc] init];
     [self loadDefaultInspectors];
@@ -523,7 +836,6 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (void)dealloc {
-    [inspectors release];
     [_topLevelObjects release];
     [super dealloc];
 }
@@ -534,26 +846,18 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
     [coder encodeObject:inspectors forKey:@"HFInspectors"];
 }
 
-- (id)initWithCoder:(NSCoder *)coder {
+- (instancetype)initWithCoder:(NSCoder *)coder {
     HFASSERT([coder allowsKeyedCoding]);
     self = [super initWithCoder:coder];
-    inspectors = [[coder decodeObjectForKey:@"HFInspectors"] retain];
+    inspectors = [coder decodeObjectForKey:@"HFInspectors"];
     return self;
 }
 
 - (void)loadDefaultInspectors {
-    /*
-    DataInspector *ins = [[DataInspector alloc] init];
-    [ins setEndianness:eNativeEndianness];
-    [inspectors addObject:ins];
-    [ins release];
-     */
-
     NSArray *defaultInspectorDictionaries = [[NSUserDefaults standardUserDefaults] objectForKey:kDataInspectorUserDefaultsKey];
     if (! defaultInspectorDictionaries) {
         DataInspector *ins = [[DataInspector alloc] init];
         [inspectors addObject:ins];
-        [ins release];
     }
     else {
         NSEnumerator *enumer = [defaultInspectorDictionaries objectEnumerator];
@@ -562,7 +866,6 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
             DataInspector *ins = [[DataInspector alloc] init];
             [ins setPropertyListRepresentation:inspectorDictionary];
             [inspectors addObject:ins];
-            [ins release];            
         }
     }
 }
@@ -575,11 +878,12 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
         [inspectorDictionaries addObject:[inspector propertyListRepresentation]];
     }
     [[NSUserDefaults standardUserDefaults] setObject:inspectorDictionaries forKey:kDataInspectorUserDefaultsKey];
-    [inspectorDictionaries release];
 }
 
 - (NSView *)createView {
-    BOOL loaded = [[NSBundle mainBundle] loadNibNamed:@"Data Inspector View" owner:self topLevelObjects:&_topLevelObjects];
+    BOOL loaded = NO;
+    _topLevelObjects = [NSMutableArray array];
+    loaded = [[NSBundle mainBundle] loadNibNamed:@"Data Inspector View" owner:self topLevelObjects:&_topLevelObjects];
     if (! loaded || ! outletView) {
         [NSException raise:NSInternalInconsistencyException format:@"Unable to load nib named DataInspectorView"];
     }
@@ -587,21 +891,17 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
     // clang's analyzer thinks we are leaking, but we *need* to keep the top level objects alive
     [_topLevelObjects retain];
 #endif
-
+    
     NSView *resultView = outletView; //want to inherit its retain here
     outletView = nil;
-    if ([table respondsToSelector:@selector(setSelectionHighlightStyle:)]) {
-        [table setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
-    }
-    [table setBackgroundColor:[NSColor colorWithCalibratedWhite:(CGFloat).91 alpha:1]];
+    [table setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
     [table setRefusesFirstResponder:YES];
     [table setTarget:self];
-    [table setDoubleAction:@selector(doubleClickedTable:)];
+    [table setDoubleAction:@selector(doubleClickedTable:)];    
     return resultView;
 }
 
 - (void)initializeView {
-    ZGAdjustLocalizableWidthsForTableColumns(@[integerQualifierTableColumn, endianTableColumn], @{@"ru" : @[@50, @120]});
     [self resizeTableViewAfterChangingRowCount];
 }
 
@@ -614,69 +914,39 @@ static BOOL valueCanFitInByteCount(unsigned long long unsignedValue, NSUInteger 
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-#pragma unused(tableView)
-    return (NSInteger)[self rowCount];
+    USE(tableView);
+    return [self rowCount];
 }
 
 /* returns the number of bytes that are selected, or NSUIntegerMax if there is more than one selection, or the selection is larger than MAX_EDITABLE_BYTE_COUNT */
-- (NSUInteger)selectedByteCountForEditing {
+- (NSInteger)selectedByteCountForEditing {
     NSArray *selectedRanges = [[self controller] selectedContentsRanges];
     if ([selectedRanges count] != 1) return INVALID_EDITING_BYTE_COUNT;
-    HFRange selectedRange = [[selectedRanges objectAtIndex:0] HFRange];
+    HFRange selectedRange = [selectedRanges[0] HFRange];
     if (selectedRange.length > MAX_EDITABLE_BYTE_COUNT) return INVALID_EDITING_BYTE_COUNT;
     return ll2l(selectedRange.length);
 }
 
-static NSAttributedString *inspectionError(NSString *s) {
-    NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-    [paragraphStyle setMinimumLineHeight:(CGFloat)16.];
-    NSAttributedString *result = [[NSAttributedString alloc] initWithString:s attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor disabledControlTextColor], NSForegroundColorAttributeName, [NSFont controlContentFontOfSize:11], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil]];
-    [paragraphStyle release];
-    return [result autorelease];
-}
-
 - (id)valueFromInspector:(DataInspector *)inspector isError:(BOOL *)outIsError{
     HFController *controller = [self controller];
-    NSArray *selectedRanges = [controller selectedContentsRanges];
-    if ([selectedRanges count] != 1) {
-	if (outIsError) *outIsError = YES;
-	return inspectionError(NSLocalizedStringFromTable(@"contiguousRange", ZGDataInspectorLocalizationTable, nil));
-    }
-
-    HFRange selectedRange = [[selectedRanges objectAtIndex:0] HFRange];
-    enum InspectionStatus_t inspectionStatus = [inspector inspectionStatusForByteCount:selectedRange.length];
-    if (inspectionStatus != eInspectionCanInspect) {
-	if (outIsError) *outIsError = YES;
-	return inspectionError(errorStringForInspectionStatus(inspectionStatus));
-    }
-    
-    NSData *selection = [controller dataForRange:selectedRange];
-    [selection retain];
-    const unsigned char *bytes = [selection bytes];
-    id result = [inspector valueForBytes:bytes length:ll2l(selectedRange.length)];
-    [selection release]; //keep it alive for GC
-    if (outIsError) *outIsError = NO;
-    return result;
+    return [inspector valueForController:controller ranges:[controller selectedContentsRanges] isError:outIsError];
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-#pragma unused(tableView)
-	
-	if (row < 0) return nil;
-	
-    DataInspector *inspector = [inspectors objectAtIndex:(NSUInteger)row];
+    USE(tableView);
+    DataInspector *inspector = inspectors[row];
     NSString *ident = [tableColumn identifier];
     if ([ident isEqualToString:kInspectorTypeColumnIdentifier]) {
-        return [NSNumber numberWithInt:[inspector type]];
+        return @([inspector type]);
     }
     else if ([ident isEqualToString:kInspectorSubtypeColumnIdentifier]) {
-        return [NSNumber numberWithInt:[inspector endianness]];
+        return nil; // cell customized in willDisplayCell:
     }
     else if ([ident isEqualToString:kInspectorValueColumnIdentifier]) {
         return [self valueFromInspector:inspector isError:NULL];
     }
     else if ([ident isEqualToString:kInspectorAddButtonColumnIdentifier] || [ident isEqualToString:kInspectorSubtractButtonColumnIdentifier]) {
-        return [NSNumber numberWithInt:1]; //just a button
+        return @1; //just a button
     }
     else {
         NSLog(@"Unknown column identifier %@", ident);
@@ -688,34 +958,36 @@ static NSAttributedString *inspectionError(NSString *s) {
     NSString *ident = [tableColumn identifier];
     /* This gets called after clicking on the + or - button.  If you delete the last row, then this gets called with a row >= the number of inspectors, so bail out for +/- buttons before pulling out our inspector */
     if ([ident isEqualToString:kInspectorSubtractButtonColumnIdentifier]) return;
-	
-	if (row < 0) return;
     
-    DataInspector *inspector = [inspectors objectAtIndex:(NSUInteger)row];
+    DataInspector *inspector = inspectors[row];
     if ([ident isEqualToString:kInspectorTypeColumnIdentifier]) {
-        [inspector setType:(enum InspectorType_t)[object intValue]];
+        [inspector setType:[object intValue]];
         [tableView reloadData];
     }
     else if ([ident isEqualToString:kInspectorSubtypeColumnIdentifier]) {
-        [inspector setEndianness:(enum Endianness_t)[object intValue]];
+        const NSInteger index = [object integerValue];
+        HFASSERT(index >= -1 && index <= 5 && index != 3); // 3 is the separator
+        if (index == 1 || index == 2) {
+            inspector.endianness = index == 1 ? eEndianLittle : eEndianBig;
+        } else if (index == 4 || index == 5) {
+            inspector.numberBase = index == 4 ? eNumberBaseDecimal : eNumberBaseHexadecimal;
+        }
         [tableView reloadData];
+        [self saveDefaultInspectors];
     }
     else if ([ident isEqualToString:kInspectorValueColumnIdentifier]) {
-            /*
-	NSUInteger byteCount = [self selectedByteCountForEditing];
-	if (byteCount != INVALID_EDITING_BYTE_COUNT) {
-	    HFASSERT(byteCount <= MAX_EDITABLE_BYTE_COUNT);
-	    unsigned char bytes[MAX_EDITABLE_BYTE_COUNT];
-	    if ([inspector acceptStringValue:object replacingByteCount:byteCount intoData:bytes]) {
-		HFController *controller = [self controller];
-		NSArray *selectedRanges = [controller selectedContentsRanges];
-		NSData *data = [[NSData alloc] initWithBytes:bytes length:byteCount];
-		[controller insertData:data replacingPreviousBytes:0 allowUndoCoalescing:NO];
-		[data release];
-		[controller setSelectedContentsRanges:selectedRanges]; //Hack to preserve the selection across the data insertion
-	    }
-	}
-            */
+        NSUInteger byteCount = [self selectedByteCountForEditing];
+        if (byteCount != INVALID_EDITING_BYTE_COUNT) {
+            unsigned char bytes[MAX_EDITABLE_BYTE_COUNT];
+            HFASSERT(byteCount <= sizeof(bytes));
+            if ([inspector acceptStringValue:object replacingByteCount:byteCount intoData:bytes]) {
+                HFController *controller = [self controller];
+                NSArray *selectedRanges = [controller selectedContentsRanges];
+                NSData *data = [[NSData alloc] initWithBytesNoCopy:bytes length:byteCount freeWhenDone:NO];
+                [controller insertData:data replacingPreviousBytes:0 allowUndoCoalescing:NO];
+                [controller setSelectedContentsRanges:selectedRanges]; //Hack to preserve the selection across the data insertion
+            }
+        }
     }
     else if ([ident isEqualToString:kInspectorAddButtonColumnIdentifier] || [ident isEqualToString:kInspectorSubtractButtonColumnIdentifier]) {
         /* Nothing to do */
@@ -723,68 +995,110 @@ static NSAttributedString *inspectionError(NSString *s) {
     else {
         NSLog(@"Unknown column identifier %@", ident);
     }
+}
 
-    [self saveDefaultInspectors];
+- (void)tableView:(NSTableView *)__unused tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)__unused row
+{
+    NSString *ident = [tableColumn identifier];
+    if ([ident isEqualToString:kInspectorSubtypeColumnIdentifier]) {
+        const DataInspector *inspector = inspectors[row];
+        const bool allowsEndianness = (inspector.type == eInspectorTypeSignedInteger ||
+                                 inspector.type == eInspectorTypeUnsignedInteger ||
+                                 inspector.type == eInspectorTypeFloatingPoint);
+        const bool allowsNumberBase = (inspector.type == eInspectorTypeSignedInteger ||
+                                 inspector.type == eInspectorTypeUnsignedInteger);
+        [cell setEnabled:allowsEndianness || allowsNumberBase];
+        NSPopUpButtonCell *popUpCell = (NSPopUpButtonCell*)cell;
+        HFASSERT(popUpCell.numberOfItems == 6);
+        [popUpCell itemAtIndex:1].state = NSOffState;
+        [popUpCell itemAtIndex:2].state = NSOffState;
+        [popUpCell itemAtIndex:4].state = NSOffState;
+        [popUpCell itemAtIndex:5].state = NSOffState;
+        [popUpCell itemAtIndex:1].enabled = false;
+        [popUpCell itemAtIndex:2].enabled = false;
+        [popUpCell itemAtIndex:4].enabled = false;
+        [popUpCell itemAtIndex:5].enabled = false;
+        NSMutableArray *titleItems = [NSMutableArray array];
+        if (allowsEndianness) {
+            NSInteger endianIndex;
+            if (inspector.endianness == eEndianLittle) {
+                endianIndex = 1;
+                [titleItems addObject:@"le"];
+            } else {
+                endianIndex = 2;
+                [titleItems addObject:@"be"];
+            }
+            [popUpCell itemAtIndex:endianIndex].state = NSOnState;
+            [popUpCell itemAtIndex:1].enabled = true;
+            [popUpCell itemAtIndex:2].enabled = true;
+        }
+        if (allowsNumberBase) {
+            NSInteger numberBaseIndex;
+            if (inspector.numberBase == eNumberBaseDecimal) {
+                numberBaseIndex = 4;
+                [titleItems addObject:@"dec"];
+            } else {
+                numberBaseIndex = 5;
+                [titleItems addObject:@"hex"];
+            }
+            [popUpCell itemAtIndex:numberBaseIndex].state = NSOnState;
+            [popUpCell itemAtIndex:4].enabled = true;
+            [popUpCell itemAtIndex:5].enabled = true;
+        }
+        NSMenuItem* titleMenuItem = [popUpCell itemAtIndex:0];
+        if (titleItems.count > 1) {
+            titleMenuItem.title = [titleItems componentsJoinedByString:@", "];
+        } else if (titleItems.count == 1) {
+            titleMenuItem.title = [titleItems objectAtIndex:0];
+        } else {
+            titleMenuItem.title = @"";
+        }
+    }
 }
 
 - (void)resizeTableViewAfterChangingRowCount {
     [table noteNumberOfRowsChanged];
-    NSUInteger rowCount = (NSUInteger)[table numberOfRows];
+    NSUInteger rowCount = [table numberOfRows];
     if (rowCount > 0) {
         NSScrollView *scrollView = [table enclosingScrollView];
         NSSize newTableViewBoundsSize = [table frame].size;
-        newTableViewBoundsSize.height = NSMaxY([table rectOfRow:(NSInteger)(rowCount - 1)]) - NSMinY([table bounds]);
+        newTableViewBoundsSize.height = NSMaxY([table rectOfRow:rowCount - 1]) - NSMinY([table bounds]);
         /* Is converting to the scroll view's coordinate system right?  It doesn't matter much because nothing is scaled except possibly the window */
         CGFloat newScrollViewHeight = [[scrollView class] frameSizeForContentSize:[table convertSize:newTableViewBoundsSize toView:scrollView]
                                                             hasHorizontalScroller:[scrollView hasHorizontalScroller]
                                                               hasVerticalScroller:[scrollView hasVerticalScroller]
                                                                        borderType:[scrollView borderType]].height + kScrollViewExtraPadding;
-        [[NSNotificationCenter defaultCenter] postNotificationName:DataInspectorDidChangeRowCount object:self userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithDouble:newScrollViewHeight] forKey:@"height"]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:DataInspectorDidChangeRowCount object:self userInfo:@{@"height": @(newScrollViewHeight)}];
     }
 }
 
 - (void)addRow:(id)sender {
-#pragma unused(sender)
-    DataInspector *ins = [[DataInspector alloc] init];
-    [ins setEndianness:eNativeEndianness];
-	
-    // Try to add an inspector that we don't already have
-    NSMutableSet *existingInspectors = [[NSMutableSet alloc] initWithArray:inspectors];
-    while ([existingInspectors containsObject:ins]) {
-		BOOL wrapped = [ins incrementToNextType];
-		if (wrapped) break;
-    }
-    [existingInspectors release];
-    
-    NSInteger clickedRow = [table clickedRow];
-    [inspectors insertObject:ins atIndex:(NSUInteger)(clickedRow + 1)];
-    [ins release];
+    USE(sender);
+    DataInspector *x = [DataInspector dataInspectorSupplementing:inspectors];
+    [inspectors insertObject:x atIndex:[table clickedRow]+1];
     [self saveDefaultInspectors];
     [self resizeTableViewAfterChangingRowCount];
 }
 
 - (void)removeRow:(id)sender {
-#pragma unused(sender)
-	if ([self rowCount] == 1) {
-		[[NSNotificationCenter defaultCenter] postNotificationName:DataInspectorDidDeleteAllRows object:self userInfo:nil];
-	}
-	else {
-		NSInteger clickedRow = [table clickedRow];
-		if (clickedRow >= 0)
-		{
-			[inspectors removeObjectAtIndex:(NSUInteger)clickedRow];
-			[self saveDefaultInspectors];
-			[self resizeTableViewAfterChangingRowCount];
-		}
-	}
+    USE(sender);
+    if ([self rowCount] == 1) {
+	[[NSNotificationCenter defaultCenter] postNotificationName:DataInspectorDidDeleteAllRows object:self userInfo:nil];
+    }
+    else {
+	NSInteger clickedRow = [table clickedRow];
+	[inspectors removeObjectAtIndex:clickedRow];
+        [self saveDefaultInspectors];
+	[self resizeTableViewAfterChangingRowCount];
+    }
 }
 
 - (IBAction)doubleClickedTable:(id)sender {
-#pragma unused(sender)
+    USE(sender);
     NSInteger column = [table clickedColumn], row = [table clickedRow];
-    if (column >= 0 && row >= 0 && [[(NSTableColumn *)[[table tableColumns] objectAtIndex:(NSUInteger)column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
+    if (column >= 0 && row >= 0 && [[[table tableColumns][column] identifier] isEqual:kInspectorValueColumnIdentifier]) {
 	BOOL isError;
-	[self valueFromInspector:[inspectors objectAtIndex:(NSUInteger)row] isError:&isError];
+	[self valueFromInspector:inspectors[row] isError:&isError];
 	if (! isError) {
 	    [table editColumn:column row:row withEvent:[NSApp currentEvent] select:YES];
 	}
@@ -795,14 +1109,14 @@ static NSAttributedString *inspectionError(NSString *s) {
 }
 
 - (BOOL)control:(NSControl *)control textShouldEndEditing:(NSText *)fieldEditor {
-#pragma unused(control)
+    USE(control);
     NSInteger row = [table editedRow];
     if (row < 0) return YES; /* paranoia */
     
     NSUInteger byteCount = [self selectedByteCountForEditing];
     if (byteCount == INVALID_EDITING_BYTE_COUNT) return NO;
     
-    DataInspector *inspector = [inspectors objectAtIndex:(NSUInteger)row];
+    DataInspector *inspector = inspectors[row];
     return [inspector acceptStringValue:[fieldEditor string] replacingByteCount:byteCount intoData:NULL];
 }
 
@@ -810,17 +1124,16 @@ static NSAttributedString *inspectionError(NSString *s) {
 /* Prevent all row selection */
 
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
-    /* since shouldTrackCell is only available on 10.5, fall back to crappier behavior on 10.4 */
-#pragma unused(tableView)
-#pragma unused(row)
-    return ! isRunningOnLeopardOrLater();
+    USE(tableView);
+    USE(row);
+    return NO;
 }
 
 - (BOOL)tableView:(NSTableView *)tableView shouldTrackCell:(NSCell *)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-#pragma unused(tableView)
-#pragma unused(row)
-#pragma unused(cell)
-#pragma unused(tableColumn)
+    USE(tableView);
+    USE(row);
+    USE(cell);
+    USE(tableColumn);
     return YES;
 }
 
@@ -840,7 +1153,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 
 @implementation DataInspectorPlusMinusButtonCell
 
-- (id)initWithCoder:(NSCoder *)coder {
+- (instancetype)initWithCoder:(NSCoder *)coder {
     self = [super initWithCoder:coder];
     [self setBezelStyle:NSRoundRectBezelStyle];
     return self;
@@ -880,7 +1193,7 @@ static NSAttributedString *inspectionError(NSString *s) {
     
     const unsigned char * const bitmapData = (const unsigned char *)(isPlus ? plusData : minusData);
     
-    NSUInteger width = 8, height = 8;
+    NSInteger width = 8, height = 8;
     assert(width * height * bytesPerPixel == sizeof plusData);
     assert(width * height * bytesPerPixel == sizeof minusData);
     NSRect bitmapRect = NSMakeRect(NSMidX(cellFrame) - width/2, NSMidY(cellFrame) - height/2, width, height);
@@ -888,7 +1201,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 
     CGColorSpaceRef space = CGColorSpaceCreateWithName(kCGColorSpaceGenericGray);
     CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, bitmapData, width * height * bytesPerPixel, NULL);
-    CGImageRef image = CGImageCreate(width, height, CHAR_BIT, bytesPerPixel * CHAR_BIT, bytesPerPixel * width, space, (enum CGBitmapInfo)kCGImageAlphaPremultipliedLast, provider, NULL, YES, kCGRenderingIntentDefault);
+    CGImageRef image = CGImageCreate(width, height, CHAR_BIT, bytesPerPixel * CHAR_BIT, bytesPerPixel * width, space, (CGBitmapInfo)kCGImageAlphaPremultipliedLast, provider, NULL, YES, kCGRenderingIntentDefault);
     CGDataProviderRelease(provider);
     CGColorSpaceRelease(space);
     [[NSGraphicsContext currentContext] setCompositingOperation:NSCompositeSourceOver];
@@ -898,9 +1211,9 @@ static NSAttributedString *inspectionError(NSString *s) {
 
 - (NSRect)drawTitle:(NSAttributedString*)title withFrame:(NSRect)frame inView:(NSView*)controlView {
     /* Defeat title drawing by doing nothing */
-#pragma unused(title)
-#pragma unused(frame)
-#pragma unused(controlView)
+    USE(title);
+    USE(frame);
+    USE(controlView);
     return NSZeroRect;
 }
 
@@ -915,7 +1228,7 @@ static NSAttributedString *inspectionError(NSString *s) {
 @implementation DataInspectorTableView
 
 - (void)highlightSelectionInClipRect:(NSRect)clipRect {
-#pragma unused(clipRect)
+    USE(clipRect);
 }
 
 @end

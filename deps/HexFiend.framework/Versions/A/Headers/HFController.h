@@ -11,12 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 /*! @header HFController
     @abstract The HFController.h header contains the HFController class, which is a central class in Hex Fiend. 
 */
-#pragma clang diagnostic pop
 
 @class HFRepresenter, HFByteArray, HFFileReference, HFControllerCoalescedUndo, HFByteRangeAttributeArray, HFColorRange;
 
@@ -101,8 +98,6 @@ You create an HFController via <tt>[[HFController alloc] init]</tt>.  After that
 
 */
 @interface HFController : NSObject <NSCoding> {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 @private
     NSMutableArray *representers;
     HFByteArray *byteArray;
@@ -146,7 +141,6 @@ You create an HFController via <tt>[[HFController alloc] init]</tt>.  After that
         BOOL commandExtendSelection;
         BOOL livereload;
     } _hfflags;
-#pragma clang diagnostic pop
 }
 
 /*! @name Representer handling.

@@ -6,22 +6,18 @@
 //
 
 #import <HexFiend/HFTextRepresenter.h>
+#import <HexFiend/HFStringEncoding.h>
 
 /*! @class HFStringEncodingTextRepresenter
 
-    @brief An HFRepresenter responsible for showing data interpreted via an NSStringEncoding.
+    @brief An HFRepresenter responsible for showing data interpreted via an HFStringEncoding.
 
-    HFHexTextRepresenter is an HFRepresenter responsible for showing and editing data interpreted via an NSStringEncoding.  Currently only supersets of ASCII are supported.
+    HFHexTextRepresenter is an HFRepresenter responsible for showing and editing data interpreted via an HFStringEncoding.  Currently only supersets of ASCII are supported.
 */
-@interface HFStringEncodingTextRepresenter : HFTextRepresenter {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
-    NSStringEncoding stringEncoding;
-#pragma clang diagnostic pop
-}
+@interface HFStringEncodingTextRepresenter : HFTextRepresenter
 
-/*! Get the string encoding for this representer.  The default encoding is <tt>[NSString defaultCStringEncoding]</tt>. */
-@property (nonatomic) NSStringEncoding encoding;
+/*! Get the string encoding for this representer. */ 
+@property (nonatomic) HFStringEncoding *encoding;
 
 /*! Set the string encoding for this representer. */
 

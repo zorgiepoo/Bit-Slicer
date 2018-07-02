@@ -18,12 +18,7 @@ HFByteSlice is an abstract class encapsulating primitive data sources (files, me
 
 The two principal subclasses of HFByteSlice are HFSharedMemoryByteSlice and HFFileByteSlice, which respectively encapsulate data from memory and from a file.
 */
-@interface HFByteSlice : NSObject {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
-    NSUInteger retainCount;
-#pragma clang diagnostic pop
-}
+@interface HFByteSlice : NSObject
 
 /*! Return the length of the byte slice as a 64 bit value.  This is an abstract method that concrete subclasses must override. */
 - (unsigned long long)length;

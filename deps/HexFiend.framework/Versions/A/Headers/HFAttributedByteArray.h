@@ -16,14 +16,11 @@
 
 
 @class HFByteRangeAttributeArray;
-
 @interface HFAttributedByteArray : HFByteArray {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
 @private
     HFByteArray *impl;
     HFByteRangeAttributeArray *attributes;
-#pragma clang diagnostic pop
+    
 }
 
 @end

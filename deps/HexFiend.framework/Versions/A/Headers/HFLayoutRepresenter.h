@@ -41,11 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
     
 */
 @interface HFLayoutRepresenter : HFRepresenter {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     NSMutableArray *representers;
     BOOL maximizesBytesPerLine;
-#pragma clang diagnostic pop
 }
 
 /*! @name Managed representers

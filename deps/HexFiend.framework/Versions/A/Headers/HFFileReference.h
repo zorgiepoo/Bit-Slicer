@@ -19,8 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
     All HFFileReferences use non-caching IO (F_NOCACHE is set).
 */
 @interface HFFileReference : NSObject {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     @protected
     int fileDescriptor;
     dev_t device;
@@ -31,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
     uint32_t blockSize;
     BOOL isPrivileged;
     BOOL isFixedLength;
-#pragma clang diagnostic pop
 }
 
 @property (readonly) BOOL isPrivileged;

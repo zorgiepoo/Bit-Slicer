@@ -282,9 +282,16 @@
 
 - (IBAction)toggleDataInspector:(id)__unused sender
 {
-	SEL action = _showsDataInspector ? @selector(removeRepresenter:) : @selector(addRepresenter:);
-	
-	[@[_textView.controller, _textView.layoutRepresenter] makeObjectsPerformSelector:action withObject:_dataInspectorRepresenter];
+	if (_showsDataInspector)
+	{
+		[_textView.layoutRepresenter removeRepresenter:_dataInspectorRepresenter];
+		[_textView.controller removeRepresenter:_dataInspectorRepresenter];
+	}
+	else
+	{
+		[_textView.controller addRepresenter:_dataInspectorRepresenter];
+		[_textView.layoutRepresenter addRepresenter:_dataInspectorRepresenter];
+	}
 	
 	_showsDataInspector = !_showsDataInspector;
 	

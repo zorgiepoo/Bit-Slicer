@@ -32,8 +32,6 @@ struct HFEditInstruction_t {
 };
 
 @interface HFByteArrayEditScript : NSObject {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
     HFByteArray *source;
     HFByteArray *destination;
     
@@ -47,7 +45,6 @@ struct HFEditInstruction_t {
     dispatch_queue_t insnQueue;
     struct HFEditInstruction_t *insns;
     size_t insnCount, insnCapacity;
-#pragma clang diagnostic pop
 }
 
 /*! Computes the edit script (differences) from src to dst.  This retains both src and dst, and if they are modified then the receiver will likely no longer function. You may optionally pass an HFProgressTracker for progress reporting and cancellation.  This returns nil if it was cancelled. */
