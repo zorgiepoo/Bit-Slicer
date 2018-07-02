@@ -600,7 +600,14 @@
 	{
 		if (rowIndex >= 0 && (NSUInteger)rowIndex < _documentData.variables.count)
 		{
-			[cell setTextColor:[[_documentData.variables objectAtIndex:(NSUInteger)rowIndex] isFrozen] ? NSColor.redColor : NSColor.textColor];
+			NSColor *redTextColor;
+			if (@available(macOS 10.10, *)) {
+				redTextColor = NSColor.systemRedColor;
+			} else {
+				redTextColor = NSColor.redColor;
+			}
+			
+			[cell setTextColor:[[_documentData.variables objectAtIndex:(NSUInteger)rowIndex] isFrozen] ? redTextColor : NSColor.controlTextColor];
 		}
 	}
 }

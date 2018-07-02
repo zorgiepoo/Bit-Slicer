@@ -1579,7 +1579,13 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
 		BOOL isInstructionBreakPoint = ([self currentBreakPoint] && _registersViewController.instructionPointer == instruction.variable.address);
 		
-		[cell setTextColor:isInstructionBreakPoint ? NSColor.redColor : NSColor.textColor];
+		NSColor *redTextColor;
+		if (@available(macOS 10.10, *)) {
+			redTextColor = NSColor.systemRedColor;
+		} else {
+			redTextColor = NSColor.redColor;
+		}
+		[cell setTextColor:isInstructionBreakPoint ? redTextColor : NSColor.controlTextColor];
 	}
 }
 
