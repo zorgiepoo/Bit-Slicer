@@ -219,7 +219,10 @@ static inline BOOL HFIntersectsRange(HFRange a, HFRange b) {
 /*! Returns YES if the given ranges intersect. Two ranges are considered to intersect if any fraction overlaps; zero-length ranges do not intersect anything. */
 static inline BOOL HFFPIntersectsRange(HFFPRange a, HFFPRange b) {
     // Ranges are said to intersect if they share at least one value.  Therefore, zero length ranges never intersect anything.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
     if (a.length == 0 || b.length == 0) return NO;
+#pragma clang diagnostic push
     
     if (a.location <= b.location && a.location + a.length >= b.location) return YES;
     if (b.location <= a.location && b.location + b.length >= a.location) return YES;
@@ -320,7 +323,10 @@ static inline CGFloat HFMax(CGFloat a, CGFloat b) {
 
 /*! Returns true if the given HFFPRanges are equal.  */
 static inline BOOL HFFPRangeEqualsRange(HFFPRange a, HFFPRange b) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
     return a.location == b.location && a.length == b.length;
+#pragma clang diagnostic pop
 }
 
 /*! copysign() for a CGFloat */
@@ -341,7 +347,7 @@ static inline NSUInteger HFAtomicIncrement(volatile NSUInteger *ptr, BOOL barrie
 #if ULONG_MAX == UINT32_MAX
         volatile unsigned long *:      (barrier ? OSAtomicIncrement32Barrier : OSAtomicIncrement32)((volatile int32_t *)ptr),
 #else
-        volatile unsigned long *:      (barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr),
+        volatile unsigned long *:      (NSUInteger)(barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr),
 #endif
         volatile unsigned long long *: (barrier ? OSAtomicIncrement64Barrier : OSAtomicIncrement64)((volatile int64_t *)ptr));
 }
@@ -353,7 +359,7 @@ static inline NSUInteger HFAtomicDecrement(volatile NSUInteger *ptr, BOOL barrie
 #if ULONG_MAX == UINT32_MAX
         volatile unsigned long *:      (barrier ? OSAtomicDecrement32Barrier : OSAtomicDecrement32)((volatile int32_t *)ptr),
 #else
-        volatile unsigned long *:      (barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr),
+        volatile unsigned long *:      (NSUInteger)(barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr),
 #endif
         volatile unsigned long long *: (barrier ? OSAtomicDecrement64Barrier : OSAtomicDecrement64)((volatile int64_t *)ptr));
 }
@@ -364,7 +370,10 @@ static inline unsigned long long HFFPToUL(long double val) {
     assert(val >= 0);
     assert(val <= ULLONG_MAX);
     unsigned long long result = (unsigned long long)val;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
     assert((long double)result == val);
+#pragma clang diagnostic pop
     return result;
 }
 

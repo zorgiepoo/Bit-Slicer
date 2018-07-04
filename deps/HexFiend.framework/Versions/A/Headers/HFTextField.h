@@ -31,7 +31,7 @@
 
 @property (nonatomic) BOOL usesHexArea; ///< Whether the hexadecimal view is shown.
 @property (nonatomic) BOOL usesTextArea; ///< Whether the text area is shown.
-@property (nonatomic) HFStringEncoding *stringEncoding; ///< The string encoding used by the text area.
+@property (nonatomic, retain) HFStringEncoding *stringEncoding; ///< The string encoding used by the text area.
 @property (nonatomic, getter=isEditable) BOOL editable; ///< Whether the field is editable.
 
 @end

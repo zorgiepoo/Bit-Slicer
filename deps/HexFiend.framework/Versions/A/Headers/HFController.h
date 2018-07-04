@@ -11,9 +11,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 /*! @header HFController
     @abstract The HFController.h header contains the HFController class, which is a central class in Hex Fiend. 
 */
+#pragma clang diagnostic pop
 
 @class HFRepresenter, HFByteArray, HFFileReference, HFControllerCoalescedUndo, HFByteRangeAttributeArray, HFColorRange;
 

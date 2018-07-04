@@ -17,7 +17,7 @@
 @interface HFStringEncodingTextRepresenter : HFTextRepresenter
 
 /*! Get the string encoding for this representer. */ 
-@property (nonatomic) HFStringEncoding *encoding;
+@property (nonatomic, retain) HFStringEncoding *encoding;
 
 /*! Set the string encoding for this representer. */
 
