@@ -33,7 +33,6 @@
 // replacing deprecated Gestalt() usage, and fixing nullability warnings
 
 #import "AGScopeBar.h"
-#import "ZGNullability.h"
 
 #define SCOPE_BAR_HORZ_INSET			8.0						// inset on left and right
 #define SCOPE_BAR_HEIGHT				25.0					// used in -sizeToFit
@@ -921,7 +920,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 
 - (void)menuWillOpen:(NSMenu *)menu;
 {
-	if (menu == ZGUnwrapNullableObject(mGroupPopupButton.menu)) {
+	if (menu == (NSMenu * _Nonnull)mGroupPopupButton.menu) {
 		[mGroupPopupButton removeAllItems];
 		
 		for (AGScopeBarItem * item in self.items) {
