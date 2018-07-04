@@ -122,6 +122,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 		mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
 		
 		BOOL invertColors;
+#if defined(MAC_OS_X_VERSION_10_14) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_14
 		if (@available(macOS 10.14, *)) {
 			// Borrowing how HexFiend detects dark mode
 			invertColors = [NSAppearance.currentAppearance.name isEqualToString:NSAppearanceNameDarkAqua];
@@ -129,6 +130,9 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 		} else {
 			invertColors = NO;
 		}
+#else
+		invertColors = NO;
+#endif
 		
 		mScopeBarAppearance.backgroundTopColor              = [NSColor colorWithCalibratedWhite:colorValue(0.89, invertColors) alpha:1.0];
 		mScopeBarAppearance.backgroundBottomColor           = [NSColor colorWithCalibratedWhite:colorValue(0.87, invertColors) alpha:1.0];
