@@ -2521,6 +2521,7 @@
 					"-Wno-c++98-compat-pedantic",
 					"-Wno-reserved-id-macro",
 					"-Wno-partial-availability",
+					"-Wno-objc-messaging-id",
 				);
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -2612,6 +2613,7 @@
 					"-Wno-c++98-compat-pedantic",
 					"-Wno-reserved-id-macro",
 					"-Wno-partial-availability",
+					"-Wno-objc-messaging-id",
 				);
 				WRAPPER_EXTENSION = xctest;
 			};

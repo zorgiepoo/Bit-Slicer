@@ -89,7 +89,7 @@ extern void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigne
 	while (haystackLengthLeft >= dataSize)
 	{
 		foundSubstring = boyer_moore_helper(foundSubstring, bytes, haystackLengthLeft, dataSize, charJump, matchJump);
-		if (foundSubstring == NULL) break;
+		if (foundSubstring == nullptr) break;
 		
 		// boyer_moore_helper is only checking 0 .. dataSize-1 characters, so make a check to see if the last characters are equal
 		if (foundSubstring[dataSize-1] == bytes[dataSize-1])
