@@ -54,7 +54,7 @@ case value: \
 #endif
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_13_4
-#warning Need to update the user tag descriptions
+#pragma message("Need to update the user tag descriptions")
 #endif
 
 NSString *ZGUserTagDescription(uint32_t userTag)
