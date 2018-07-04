@@ -32,6 +32,7 @@
 
 #import "ZGRegisterEntries.h"
 #import "ZGVariable.h"
+#import "ZGNullability.h"
 
 @implementation ZGRegisterEntries
 
@@ -241,7 +242,7 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 		 type:ZGByteArray
 		 qualifier:0
 		 pointerSize:is64Bit ? sizeof(int64_t) : sizeof(int32_t)
-		 description:[[NSAttributedString alloc] initWithString:@(entry->name)]];
+		 description:[[NSAttributedString alloc] initWithString:ZGUnwrapNullableObject(@(entry->name))]];
 		
 		[registerVariables addObject:variable];
 	}
@@ -266,7 +267,7 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 		 type:ZGByteArray
 		 qualifier:0
 		 pointerSize:is64Bit ? sizeof(int64_t) : sizeof(int32_t)
-		 description:[[NSAttributedString alloc] initWithString:@(entry->name)]];
+		 description:[[NSAttributedString alloc] initWithString:ZGUnwrapNullableObject(@(entry->name))]];
 		
 		[registerVariables addObject:variable];
 	}

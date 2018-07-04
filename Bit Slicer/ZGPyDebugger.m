@@ -562,25 +562,33 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 	
 	if (PyArg_ParseTuple(args, "s|K:assemble", &codeString, &instructionPointer))
 	{
-		NSError *error = nil;
-		NSData *assembledData = [ZGDebuggerUtilities assembleInstructionText:@(codeString) atInstructionPointer:instructionPointer usingArchitectureBits:self->is64Bit ? sizeof(int64_t)*8 : sizeof(int32_t)*8 error:&error];
-		
-		if (error == nil)
+		NSString *codeStringValue = @(codeString);
+		if (codeStringValue != nil)
 		{
-			retValue = Py_BuildValue("y#", assembledData.bytes, assembledData.length);
+			NSError *error = nil;
+			NSData *assembledData = [ZGDebuggerUtilities assembleInstructionText:codeStringValue atInstructionPointer:instructionPointer usingArchitectureBits:self->is64Bit ? sizeof(int64_t)*8 : sizeof(int32_t)*8 error:&error];
+			
+			if (error == nil)
+			{
+				retValue = Py_BuildValue("y#", assembledData.bytes, assembledData.length);
+			}
+			else
+			{
+				PyErr_SetString(PyExc_ValueError, [[NSString stringWithFormat:@"debug.assemble failed to assemble:\n%s", codeString] UTF8String]);
+				
+				ZGPyDebugger *debugger = self->objcSelf;
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[debugger->_loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
+					if ([[error userInfo] objectForKey:@"description"] != nil)
+					{
+						[debugger->_loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
+					}
+				});
+			}
 		}
 		else
 		{
-			PyErr_SetString(PyExc_ValueError, [[NSString stringWithFormat:@"debug.assemble failed to assemble:\n%s", codeString] UTF8String]);
-			
-			ZGPyDebugger *debugger = self->objcSelf;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[debugger->_loggerWindowController writeLine:[[error userInfo] objectForKey:@"reason"]];
-				if ([[error userInfo] objectForKey:@"description"] != nil)
-				{
-					[debugger->_loggerWindowController writeLine:[[error userInfo] objectForKey:@"description"]];
-				}
-			});
+			PyErr_SetString(PyExc_BufferError, "debug.assemble can't parse provided code string");
 		}
 	}
 	
@@ -678,15 +686,23 @@ static PyObject *Debugger_findSymbol(DebuggerClass *self, PyObject *args)
 	char *symbolOwner = NULL;
 	if (PyArg_ParseTuple(args, "s|s:findSymbol", &symbolName, &symbolOwner))
 	{
-		ZGProcess *process = self->objcSelf->_process;
-		NSNumber *symbolAddressNumber = [process.symbolicator findSymbol:@(symbolName) withPartialSymbolOwnerName:symbolOwner == NULL ? nil : @(symbolOwner) requiringExactMatch:YES pastAddress:0x0 allowsWrappingToBeginning:NO];
-		if (symbolAddressNumber != nil)
+		NSString *symbolNameValue = @(symbolName);
+		if (symbolNameValue != nil)
 		{
-			retValue = Py_BuildValue("K", [symbolAddressNumber unsignedLongLongValue]);
+			ZGProcess *process = self->objcSelf->_process;
+			NSNumber *symbolAddressNumber = [process.symbolicator findSymbol:symbolNameValue withPartialSymbolOwnerName:symbolOwner == NULL ? nil : @(symbolOwner) requiringExactMatch:YES pastAddress:0x0 allowsWrappingToBeginning:NO];
+			if (symbolAddressNumber != nil)
+			{
+				retValue = Py_BuildValue("K", [symbolAddressNumber unsignedLongLongValue]);
+			}
+			else
+			{
+				retValue = Py_BuildValue("");
+			}
 		}
 		else
 		{
-			retValue = Py_BuildValue("");
+			PyErr_SetString(PyExc_BufferError, "debug.findSymbol can't parse symbol name");
 		}
 	}
 	return retValue;
@@ -1214,9 +1230,13 @@ static NSDictionary<NSString *, NSValue *> *registerOffsetsCacheDictionary(ZGReg
 	NSMutableDictionary<NSString *, NSValue *> *offsetsDictionary = [NSMutableDictionary dictionary];
 	for (ZGRegisterEntry *registerEntry = registerEntries; !ZG_REGISTER_ENTRY_IS_NULL(registerEntry); registerEntry++)
 	{
-		[offsetsDictionary
-		 setObject:[NSValue valueWithBytes:registerEntry objCType:@encode(ZGRegisterEntry)]
-		 forKey:@(registerEntry->name)];
+		NSString *registerEntryName = @(registerEntry->name);
+		if (registerEntryName != nil)
+		{
+			[offsetsDictionary
+			 setObject:[NSValue valueWithBytes:registerEntry objCType:@encode(ZGRegisterEntry)]
+			 forKey:registerEntryName];
+		}
 	}
 	
 	return [NSDictionary dictionaryWithDictionary:offsetsDictionary];
@@ -1226,7 +1246,13 @@ static BOOL writeRegister(NSDictionary<NSString *, NSValue *> *registerOffsetsDi
 {
 	if (wroteValue != NULL) *wroteValue = NO;
 	
-	NSValue *registerValue = registerOffsetsDictionary[@(registerString)];
+	NSString *registerStringValue = @(registerString);
+	if (registerStringValue == nil)
+	{
+		return YES;
+	}
+	
+	NSValue *registerValue = registerOffsetsDictionary[registerStringValue];
 	if (registerValue == nil)
 	{
 		return YES;

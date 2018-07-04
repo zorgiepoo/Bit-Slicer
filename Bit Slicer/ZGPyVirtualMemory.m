@@ -661,19 +661,27 @@ static PyObject *VirtualMemory_scanByteString(VirtualMemory *self, PyObject *arg
 	
 	if (PyArg_ParseTuple(args, "s:scanByteString", &byteArrayString))
 	{
-		ZGMemorySize dataSize = 0;
-		void *searchValue = ZGValueFromString(self->is64Bit, @(byteArrayString), ZGByteArray, &dataSize);
-		
-		ZGSearchData *searchData =
-		[[ZGSearchData alloc]
-		 initWithSearchValue:searchValue
-		 dataSize:dataSize
-		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, dataSize)
-		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
-		
-		searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(@(byteArrayString));
-		
-		retValue = scanSearchData(self, searchData, "scanByteString");
+		NSString *byteArrayStringValue = @(byteArrayString);
+		if (byteArrayStringValue != nil)
+		{
+			ZGMemorySize dataSize = 0;
+			void *searchValue = ZGValueFromString(self->is64Bit, byteArrayStringValue, ZGByteArray, &dataSize);
+			
+			ZGSearchData *searchData =
+			[[ZGSearchData alloc]
+			 initWithSearchValue:searchValue
+			 dataSize:dataSize
+			 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, dataSize)
+			 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+			
+			searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(byteArrayStringValue);
+			
+			retValue = scanSearchData(self, searchData, "scanByteString");
+		}
+		else
+		{
+			PyErr_SetString(PyExc_BufferError, "vm.scanByteString can't parse provided byte array string");
+		}
 	}
 	
 	return retValue;

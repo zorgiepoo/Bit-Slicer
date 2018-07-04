@@ -63,12 +63,16 @@ static void disassemblerTranslator(ud_t *object)
 		// test for '0x' as a cheap way to detect if it's an immediate operand as opposed to an indirect register
 		if (strstr(originalText, "short") == NULL && strstr(originalText, "0x") != NULL)
 		{
-			NSMutableArray<NSString *> *textComponents = [NSMutableArray arrayWithArray:[@(originalText) componentsSeparatedByString:@" "]];
-			[textComponents insertObject:@"short" atIndex:1];
-			const char *text = [[textComponents componentsJoinedByString:@" "] UTF8String];
-			if (strlen(text)+1 <= object->asm_buf_size)
+			NSString *originalTextValue = @(originalText);
+			if (originalTextValue != nil)
 			{
-				strncpy(object->asm_buf, text, strlen(text)+1);
+				NSMutableArray<NSString *> *textComponents = [NSMutableArray arrayWithArray:[originalTextValue componentsSeparatedByString:@" "]];
+				[textComponents insertObject:@"short" atIndex:1];
+				const char *text = [[textComponents componentsJoinedByString:@" "] UTF8String];
+				if (strlen(text)+1 <= object->asm_buf_size)
+				{
+					strncpy(object->asm_buf, text, strlen(text)+1);
+				}
 			}
 		}
 	}

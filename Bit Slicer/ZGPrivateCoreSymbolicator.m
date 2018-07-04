@@ -93,7 +93,8 @@
 	
 	CSSymbolicatorForeachSymbolOwnerAtTime(_symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
 		const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
-		if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && [partialSymbolOwnerName hasSuffix:@(symbolOwnerName)]))
+		NSString *symbolOwnerNameValue;
+		if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && ((symbolOwnerNameValue = @(symbolOwnerName)) != nil) && [partialSymbolOwnerName hasSuffix:symbolOwnerNameValue]))
 		{
 			CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
 				const char *symbolFound = CSSymbolGetName(symbol);

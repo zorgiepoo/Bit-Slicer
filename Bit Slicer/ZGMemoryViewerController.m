@@ -282,15 +282,17 @@
 
 - (IBAction)toggleDataInspector:(id)__unused sender
 {
+	DataInspectorRepresenter *dataInspectorRepresenter = ZGUnwrapNullableObject(_dataInspectorRepresenter);
+	
 	if (_showsDataInspector)
 	{
-		[_textView.layoutRepresenter removeRepresenter:_dataInspectorRepresenter];
-		[_textView.controller removeRepresenter:_dataInspectorRepresenter];
+		[_textView.layoutRepresenter removeRepresenter:dataInspectorRepresenter];
+		[_textView.controller removeRepresenter:dataInspectorRepresenter];
 	}
 	else
 	{
-		[_textView.controller addRepresenter:_dataInspectorRepresenter];
-		[_textView.layoutRepresenter addRepresenter:_dataInspectorRepresenter];
+		[_textView.controller addRepresenter:dataInspectorRepresenter];
+		[_textView.layoutRepresenter addRepresenter:dataInspectorRepresenter];
 	}
 	
 	_showsDataInspector = !_showsDataInspector;
