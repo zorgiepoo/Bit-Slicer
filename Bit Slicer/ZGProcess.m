@@ -101,7 +101,7 @@
 
 - (BOOL)isEqual:(id)process
 {
-	return ([process processID] == _processID);
+	return ([(ZGProcess *)process processID] == _processID);
 }
 
 - (NSUInteger)hash

@@ -2717,7 +2717,6 @@
 					"-Wno-c++98-compat",
 					"-Wno-auto-import",
 					"-Wno-c11-extensions",
-					"-Wno-objc-messaging-id",
 				);
 			};
 			name = Debug;
@@ -2819,7 +2818,6 @@
 					"-Wno-c++98-compat",
 					"-Wno-auto-import",
 					"-Wno-c11-extensions",
-					"-Wno-objc-messaging-id",
 				);
 			};
 			name = Release;

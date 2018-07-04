@@ -348,7 +348,7 @@
 		if (notSearchedVariables.count + _temporarySearchResults.addressCount != oldVariables.count)
 		{
 			windowController.undoManager.actionName = ZGLocalizableSearchDocumentString(@"undoSearchAction");
-			[[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:oldVariables searchResults:_searchResults];
+			[(ZGDocumentWindowController *)[windowController.undoManager prepareWithInvocationTarget:windowController] updateVariables:oldVariables searchResults:_searchResults];
 			
 			_searchResults = _temporarySearchResults;
 			_documentData.variables = notSearchedVariables;

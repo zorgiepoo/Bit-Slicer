@@ -49,7 +49,7 @@
 
 - (BOOL)isEqual:(id)object
 {
-	if (![object isKindOfClass:[ZGInstruction class]])
+	if (![(id<NSObject>)object isKindOfClass:[ZGInstruction class]])
 	{
 		return NO;
 	}

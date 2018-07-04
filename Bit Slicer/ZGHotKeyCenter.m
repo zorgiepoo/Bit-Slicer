@@ -178,11 +178,11 @@ static OSStatus hotKeyHandler(EventHandlerCallRef __unused nextHandler, EventRef
 		NSArray<NSDictionary<NSString *, id> *> *systemHotKeyDictionaries = (__bridge_transfer NSArray *)cfSystemHotKeyDictionaries;
 		for (NSDictionary<NSString *, id> *hotKeyDictionary in systemHotKeyDictionaries)
 		{
-			BOOL enabled = [[hotKeyDictionary objectForKey:(__bridge NSString *)kHISymbolicHotKeyEnabled] boolValue];
+			BOOL enabled = [(NSNumber *)[hotKeyDictionary objectForKey:(__bridge NSString *)kHISymbolicHotKeyEnabled] boolValue];
 			if (enabled)
 			{
-				UInt32 keyCode = [[hotKeyDictionary objectForKey:(__bridge NSString *)kHISymbolicHotKeyCode] unsignedIntValue];
-				UInt32 modifierFlags = [[hotKeyDictionary objectForKey:(__bridge NSString *)kHISymbolicHotKeyModifiers] unsignedIntValue];
+				UInt32 keyCode = [(NSNumber *)[hotKeyDictionary objectForKey:(__bridge NSString *)kHISymbolicHotKeyCode] unsignedIntValue];
+				UInt32 modifierFlags = [(NSNumber *)[hotKeyDictionary objectForKey:(__bridge NSString *)kHISymbolicHotKeyModifiers] unsignedIntValue];
 				if (hotKey.keyCombo.code == keyCode && hotKey.keyCombo.flags == modifierFlags)
 				{
 					return YES;

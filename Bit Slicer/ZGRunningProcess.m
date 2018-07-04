@@ -71,7 +71,7 @@
 
 - (BOOL)isEqual:(id)object
 {
-	return _processIdentifier == [object processIdentifier];
+	return _processIdentifier == [(ZGRunningProcess *)object processIdentifier];
 }
 
 - (NSUInteger)hash

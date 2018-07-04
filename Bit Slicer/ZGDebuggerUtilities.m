@@ -328,8 +328,11 @@ actionName:(NSString *)actionName
 		{
 			[undoManager setActionName:[actionName stringByAppendingFormat:@"%@", instructions.count == 1 ? @"" : @"s"]];
 		}
-		
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-messaging-id"
+		// There's no way that I know of to typecast to an obj-c class so you can send that instance a class message, rather than an instance level one.
 		[[undoManager prepareWithInvocationTarget:self] replaceInstructions:instructions fromOldStringValues:newStringValues toNewStringValues:oldStringValues inProcess:process breakPoints:breakPoints undoManager:undoManager actionName:actionName];
+#pragma clang diagnostic pop
 	}
 }
 

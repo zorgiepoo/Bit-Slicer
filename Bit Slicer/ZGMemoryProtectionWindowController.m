@@ -72,7 +72,7 @@
 	else
 	{
 		_undoManager.actionName = ZGLocalizedStringFromMemoryProtectionTable(@"undoProtectionChangeAction");
-		[[_undoManager prepareWithInvocationTarget:self]
+		[(ZGMemoryProtectionWindowController *)[_undoManager prepareWithInvocationTarget:self]
 		 changeProtectionAtAddress:address size:size oldProtection:newProtection newProtection:oldProtection	];
 	}
 	

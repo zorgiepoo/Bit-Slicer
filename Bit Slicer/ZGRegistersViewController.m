@@ -217,7 +217,7 @@
 	[registerTypesDictionary setObject:@(theRegister.variable.type) forKey:theRegister.variable.name];
 	[[NSUserDefaults standardUserDefaults] setObject:registerTypesDictionary forKey:ZG_REGISTER_TYPES];
 	
-	[[_undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
+	[(ZGRegistersViewController *)[_undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldType:newType newType:oldType];
 	[_undoManager setActionName:ZGLocalizedStringFromDebuggerRegistersTable(@"undoRegisterTypeChange")];
 	
 	[_tableView reloadData];
@@ -374,7 +374,7 @@
 	
 	if (success)
 	{
-		[[_undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
+		[(ZGRegistersViewController *)[_undoManager prepareWithInvocationTarget:self] changeRegister:theRegister oldVariable:newVariable newVariable:oldVariable];
 		[_undoManager setActionName:ZGLocalizedStringFromDebuggerRegistersTable(@"undoRegisterValueChange")];
 		
 		[_tableView reloadData];
@@ -412,7 +412,7 @@
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
-			return @([[tableColumn dataCell] indexOfItemWithTag:theRegister.variable.type]);
+			return @([(NSPopUpButtonCell *)[tableColumn dataCell] indexOfItemWithTag:theRegister.variable.type]);
 		}
 	}
 	
@@ -449,7 +449,7 @@
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
-			ZGVariableType newType = (ZGVariableType)[[[tableColumn.dataCell itemArray] objectAtIndex:[object unsignedIntegerValue]] tag];
+			ZGVariableType newType = (ZGVariableType)[[[(NSPopUpButtonCell *)tableColumn.dataCell itemArray] objectAtIndex:[(NSNumber *)object unsignedIntegerValue]] tag];
 			[self changeRegister:theRegister oldType:theRegister.variable.type newType:newType];
 		}
 	}
@@ -478,9 +478,9 @@
 
 - (IBAction)changeQualifier:(id)sender
 {
-	if (_qualifier != [sender tag])
+	if (_qualifier != [(NSControl *)sender tag])
 	{
-		_qualifier = (ZGVariableQualifier)[sender tag];
+		_qualifier = (ZGVariableQualifier)[(NSControl *)sender tag];
 		[[NSUserDefaults standardUserDefaults] setInteger:_qualifier forKey:ZG_DEBUG_QUALIFIER];
 		for (ZGRegister *theRegister in _registers)
 		{

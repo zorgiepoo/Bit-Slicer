@@ -362,7 +362,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 
 - (void)insertGroup:(AGScopeBarGroup *)group atIndex:(NSUInteger)index;
 {
-	NSMutableArray * groups = [[self.groups mutableCopy] autorelease];
+	NSMutableArray * groups = [(NSMutableArray *)[self.groups mutableCopy] autorelease];
 	[groups insertObject:group atIndex:index];
 	self.groups = groups;
 }
@@ -370,7 +370,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 
 - (void)removeGroupAtIndex:(NSUInteger)index;
 {
-	NSMutableArray * groups = [[self.groups mutableCopy] autorelease];
+	NSMutableArray * groups = [(NSMutableArray *)[self.groups mutableCopy] autorelease];
 	[groups removeObjectAtIndex:index];
 	self.groups = groups;
 }
@@ -506,7 +506,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	
 	
 	// Remove all group views (clears out any old ones too)
-	for (NSView * view in [[self.subviews copy] autorelease]) {
+	for (NSView * view in [(NSArray *)[self.subviews copy] autorelease]) {
 		[view removeFromSuperview];
 	}
 	
@@ -884,7 +884,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 
 - (void)insertItem:(AGScopeBarItem *)item atIndex:(NSUInteger)index;
 {
-	NSMutableArray * items = [[self.items mutableCopy] autorelease];
+	NSMutableArray * items = [(NSMutableArray *)[self.items mutableCopy] autorelease];
 	[items insertObject:item atIndex:index];
 	self.items = items;
 }
@@ -892,7 +892,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 
 - (void)removeItemAtIndex:(NSUInteger)index;
 {
-	NSMutableArray * items = [[self.items mutableCopy] autorelease];
+	NSMutableArray * items = [(NSMutableArray *)[self.items mutableCopy] autorelease];
 	[items removeObjectAtIndex:index];
 	self.items = items;
 }
@@ -968,7 +968,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 	// Full View
 	// -----------------------------------------
 	{
-		for (NSView * view in [[self.view.subviews copy] autorelease]) {
+		for (NSView * view in [(NSArray *)[self.view.subviews copy] autorelease]) {
 			[view removeFromSuperview];
 		}
 		
@@ -1196,9 +1196,9 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 		}
 	} else {
 		
-		NSMutableArray * items = [[oldSelectedItems mutableCopy] autorelease];
+		NSMutableArray * items = [(NSMutableArray *)[oldSelectedItems mutableCopy] autorelease];
 		[items removeObject:item];
-		newSelectedItems = [[items copy] autorelease];
+		newSelectedItems = [(NSArray *)[items copy] autorelease];
 		
 		if (self.requiresSelection) {
 			if (newSelectedItems.count == 0) {

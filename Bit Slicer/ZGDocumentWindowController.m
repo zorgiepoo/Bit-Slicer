@@ -543,7 +543,7 @@
 
 - (void)markDocumentChange
 {
-	[self.document markChange];
+	[(ZGDocument *)self.document markChange];
 }
 
 - (IBAction)undoDocument:(id)__unused sender
@@ -611,7 +611,7 @@
 
 - (IBAction)changeFlags:(id)sender
 {
-	[self setFlagsStringValue:[sender stringValue]];
+	[self setFlagsStringValue:[(NSControl *)sender stringValue]];
 }
 
 - (void)updateFlagsRangeTextField
@@ -757,7 +757,7 @@
 	if (recordUndo && oldVariableTypeTag != newTag)
 	{
 		[[self undoManager] setActionName:ZGLocalizableSearchDocumentString(@"undoDataTypeChangeAction")];
-		[[[self undoManager] prepareWithInvocationTarget:self]
+		[(ZGDocumentWindowController *)[[self undoManager] prepareWithInvocationTarget:self]
 		 selectDataTypeWithTag:oldVariableTypeTag
 		 recordUndo:YES];
 	}
@@ -765,7 +765,7 @@
 
 - (IBAction)dataTypePopUpButtonRequest:(id)sender
 {
-	[self selectDataTypeWithTag:(ZGVariableType)[[sender selectedItem] tag] recordUndo:YES];
+	[self selectDataTypeWithTag:(ZGVariableType)[[(NSPopUpButton *)sender selectedItem] tag] recordUndo:YES];
 }
 
 - (ZGVariableType)selectedDataType
@@ -846,7 +846,7 @@
 {
 	if ([self undoManager].isUndoing || [self undoManager].isRedoing)
 	{
-		[[[self undoManager] prepareWithInvocationTarget:self] updateVariables:_documentData.variables searchResults:_searchController.searchResults];
+		[(ZGDocumentWindowController *)[[self undoManager] prepareWithInvocationTarget:self] updateVariables:_documentData.variables searchResults:_searchController.searchResults];
 	}
 	
 	_documentData.variables = newWatchVariablesArray;
@@ -1287,7 +1287,7 @@
 		_advancedOptionsPopover.behavior = NSPopoverBehaviorTransient;
 	}
 	
-	[_advancedOptionsPopover showRelativeToRect:[sender bounds] ofView:sender preferredEdge:NSMaxYEdge];
+	[_advancedOptionsPopover showRelativeToRect:[(NSControl *)sender bounds] ofView:sender preferredEdge:NSMaxYEdge];
 }
 
 #pragma mark Variables Handling
@@ -1387,7 +1387,7 @@
 		_watchVariableWindowController = [[ZGWatchVariableWindowController alloc] initWithBreakPointController:_breakPointController delegate:self.delegate];
 	}
 	
-	[_watchVariableWindowController watchVariable:[self selectedVariables][0] withWatchPointType:(ZGWatchPointType)[sender tag] inProcess:self.currentProcess attachedToWindow:ZGUnwrapNullableObject(self.window) completionHandler:^(NSArray<ZGVariable *> *foundVariables) {
+	[_watchVariableWindowController watchVariable:[self selectedVariables][0] withWatchPointType:(ZGWatchPointType)[(NSControl *)sender tag] inProcess:self.currentProcess attachedToWindow:ZGUnwrapNullableObject(self.window) completionHandler:^(NSArray<ZGVariable *> *foundVariables) {
 		if (foundVariables.count > 0)
 		{
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];

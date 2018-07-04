@@ -560,7 +560,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 
 - (void)switchProcess
 {
-	[self setDesiredProcessInternalName:[_runningApplicationsPopUpButton.selectedItem.representedObject internalName]];
+	[self setDesiredProcessInternalName:[(ZGProcess *)_runningApplicationsPopUpButton.selectedItem.representedObject internalName]];
 	
 	if (_desiredProcessInternalName != nil)
 	{

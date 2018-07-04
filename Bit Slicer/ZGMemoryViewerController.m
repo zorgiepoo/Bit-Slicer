@@ -86,7 +86,7 @@
 	HFRange selectedRange = {.location = 0, .length = 0};
 	if (_currentMemorySize > 0)
 	{
-		selectedRange = [[_textView.controller.selectedContentsRanges objectAtIndex:0] HFRange];
+		selectedRange = [(HFRangeWrapper *)_textView.controller.selectedContentsRanges[0] HFRange];
 		selectedRange.location += _currentMemoryAddress;
 	}
 	return selectedRange;
@@ -449,7 +449,7 @@
 		if (_textView.data && ![_textView.data isEqualToData:[NSData data]])
 		{
 			HFFPRange displayedLineRange = _textView.controller.displayedLineRange;
-			HFRange selectionRange = [[_textView.controller.selectedContentsRanges objectAtIndex:0] HFRange];
+			HFRange selectionRange = [(HFRangeWrapper *)_textView.controller.selectedContentsRanges[0] HFRange];
 			
 			ZGMemoryAddress navigationAddress;
 			ZGMemorySize navigationLength;
@@ -467,7 +467,7 @@
 				navigationLength = 0;
 			}
 			
-			[[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:navigationLength andChangeFirstResponder:shouldChangeFirstResponder];
+			[(ZGMemoryViewerController *)[self.navigationManager prepareWithInvocationTarget:self] updateMemoryViewerAtAddress:navigationAddress withSelectionLength:navigationLength andChangeFirstResponder:shouldChangeFirstResponder];
 		}
 		
 		// Replace all the contents of the self.textView
@@ -484,7 +484,7 @@
 		_lineCountingRepresenter.minimumDigitCount = HFCountDigitsBase10(memoryAddress + memorySize);
 		_lineCountingRepresenter.beginningMemoryAddress = _currentMemoryAddress;
 		// This will force the line numbers to update
-		[_lineCountingRepresenter.view setNeedsDisplay:YES];
+		[(NSView *)_lineCountingRepresenter.view setNeedsDisplay:YES];
 		// This will force the line representer's layout to re-draw, which is necessary from calling setMinimumDigitCount:
 		[_textView.layoutRepresenter performLayout];
 		
@@ -553,7 +553,7 @@
 	if (ZGWriteBytesIgnoringProtection(self.currentProcess.processTask, address, newData.bytes, size))
 	{
 		[_textView.controller.undoManager setActionName:ZGLocalizedStringFromMemoryViewerTable(@"undoMemoryWrite")];
-		[[_textView.controller.undoManager prepareWithInvocationTarget:self] writeNewData:oldData oldData:newData address:address size:size];
+		[(ZGMemoryViewerController *)[_textView.controller.undoManager prepareWithInvocationTarget:self] writeNewData:oldData oldData:newData address:address size:size];
 	}
 }
 

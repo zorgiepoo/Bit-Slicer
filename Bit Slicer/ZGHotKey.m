@@ -42,7 +42,7 @@
 
 + (instancetype)hotKeyWithKeyCombo:(KeyCombo)keyCombo
 {
-	return [[self alloc] initWithKeyCombo:keyCombo];
+	return [(ZGHotKey *)[self alloc] initWithKeyCombo:keyCombo];
 }
 
 + (instancetype)hotKey

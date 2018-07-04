@@ -432,7 +432,7 @@
 	ZGWatchVariable *watchVariable = _foundWatchVariables[(NSUInteger)rowIndex];
 	if ([tableColumn.identifier isEqualToString:@"enabled"])
 	{
-		watchVariable.instruction.variable.enabled = [object boolValue];
+		watchVariable.instruction.variable.enabled = [(NSString *)object boolValue];
 		
 		NSArray<ZGWatchVariable *> *selectedWatchVariables = [self selectedWatchVariables];
 		if (selectedWatchVariables.count > 1 && [selectedWatchVariables containsObject:watchVariable])

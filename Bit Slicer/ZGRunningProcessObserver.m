@@ -50,12 +50,12 @@
 
 - (BOOL)isEqual:(id)object
 {
-	return [_runningProcess isEqual:[object runningProcess]] && _observer == [object observer];
+	return [_runningProcess isEqual:[(ZGRunningProcessObserver *)object runningProcess]] && _observer == [(ZGRunningProcessObserver *)object observer];
 }
 
 - (NSUInteger)hash
 {
-	id observer = _observer; // nothing we can really do if _observer == nil?
+	ZGRunningProcessObserver *observer = _observer; // nothing we can really do if _observer == nil?
 	return [[NSString stringWithFormat:@"%lu_%lu", _runningProcess.hash, [observer hash]] hash];
 }
 

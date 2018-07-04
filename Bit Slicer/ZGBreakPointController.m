@@ -91,7 +91,7 @@ static ZGBreakPointController *gBreakPointController;
 {
 	assert(gBreakPointController == nil);
 	
-	gBreakPointController = [[self alloc] initWithScriptingInterpreter:scriptingInterpreter];
+	gBreakPointController = [(ZGBreakPointController *)[self alloc] initWithScriptingInterpreter:scriptingInterpreter];
 	return gBreakPointController;
 }
 

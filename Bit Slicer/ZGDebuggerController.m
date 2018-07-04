@@ -194,7 +194,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
     [super encodeRestorableStateWithCoder:coder];
 	
 	[coder encodeObject:self.addressTextField.stringValue forKey:ZGDebuggerAddressField];
-	[coder encodeObject:[self.runningApplicationsPopUpButton.selectedItem.representedObject internalName] forKey:ZGDebuggerProcessInternalName];
+	[coder encodeObject:[(ZGProcess *)self.runningApplicationsPopUpButton.selectedItem.representedObject internalName] forKey:ZGDebuggerProcessInternalName];
 	[coder encodeObject:@(_offsetFromBase) forKey:ZGDebuggerOffsetFromBase];
 	[coder encodeObject:_mappedFilePath == nil ? [NSNull null] : _mappedFilePath forKey:ZGDebuggerMappedFilePath];
 }
@@ -209,7 +209,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		self.addressTextField.stringValue = addressField;
 	}
 	
-	_offsetFromBase = [[coder decodeObjectOfClass:[NSNumber class] forKey:ZGDebuggerOffsetFromBase] unsignedLongLongValue];
+	_offsetFromBase = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:ZGDebuggerOffsetFromBase] unsignedLongLongValue];
 	
 	_mappedFilePath = [coder decodeObjectOfClass:[NSObject class] forKey:ZGDebuggerMappedFilePath];
 	if ((id)_mappedFilePath == [NSNull null])
@@ -818,7 +818,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (void)switchProcessMenuItemAndSelectAddressStringValue:(NSString *)addressStringValue
 {
-	if (![self.runningApplicationsPopUpButton.selectedItem.representedObject isEqual:self.currentProcess])
+	if (![(ZGProcess *)self.runningApplicationsPopUpButton.selectedItem.representedObject isEqual:self.currentProcess])
 	{
 		self.addressTextField.stringValue = addressStringValue;
 		_mappedFilePath = nil;
@@ -866,7 +866,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		if (_instructionsTableView.selectedRowIndexes.count > 0 && _instructionsTableView.selectedRowIndexes.firstIndex >= visibleRowsRange.location && _instructionsTableView.selectedRowIndexes.firstIndex < visibleRowsRange.location + visibleRowsRange.length && _instructionsTableView.selectedRowIndexes.firstIndex < _instructions.count)
 		{
 			ZGInstruction *selectedInstruction = [_instructions objectAtIndex:_instructionsTableView.selectedRowIndexes.firstIndex];
-			[[self.navigationManager prepareWithInvocationTarget:self] jumpToMemoryAddress:selectedInstruction.variable.address];
+			[(ZGDebuggerController *)[self.navigationManager prepareWithInvocationTarget:self] jumpToMemoryAddress:selectedInstruction.variable.address];
 		}
 		else
 		{
@@ -874,7 +874,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			if (centeredInstructionIndex < _instructions.count)
 			{
 				ZGInstruction *centeredInstruction = [_instructions objectAtIndex:centeredInstructionIndex];
-				[[self.navigationManager prepareWithInvocationTarget:self] jumpToMemoryAddress:centeredInstruction.variable.address];
+				[(ZGDebuggerController *)[self.navigationManager prepareWithInvocationTarget:self] jumpToMemoryAddress:centeredInstruction.variable.address];
 			}
 		}
 	}
@@ -1140,7 +1140,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	{
 		self.addressTextField.stringValue = memoryAddressStringValue;
 		
-		if (![targetMenuItem.representedObject isEqual:self.currentProcess])
+		if (![(ZGProcess *)targetMenuItem.representedObject isEqual:self.currentProcess])
 		{
 			[self.runningApplicationsPopUpButton selectItem:targetMenuItem];
 			
@@ -1559,7 +1559,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 				}
 			}
 			
-			if ([object boolValue])
+			if ([(NSNumber *)object boolValue])
 			{
 				[self addBreakPointsToInstructions:targetInstructions];
 			}
@@ -1587,7 +1587,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		{
 			redTextColor = NSColor.redColor;
 		}
-		[cell setTextColor:isInstructionBreakPoint ? redTextColor : NSColor.controlTextColor];
+		[(NSTextFieldCell *)cell setTextColor:isInstructionBreakPoint ? redTextColor : NSColor.controlTextColor];
 	}
 }
 
@@ -1792,7 +1792,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	
 	NSString *localizableKey = [NSString stringWithFormat:@"addBreakpoint%@", changedInstructions.count != 1 ? @"s" : @""];
 	[self.undoManager setActionName:ZGLocalizedStringFromDebuggerTable(localizableKey)];
-	[[self.undoManager prepareWithInvocationTarget:self] addBreakPointsToInstructions:changedInstructions];
+	[(ZGDebuggerController *)[self.undoManager prepareWithInvocationTarget:self] addBreakPointsToInstructions:changedInstructions];
 	
 	[_instructionsTableView reloadData];
 }
@@ -1837,7 +1837,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		
 		NSString *localizableKey = [NSString stringWithFormat:@"removeBreakpoint%@", changedInstructions.count != 1 ? @"s" : @""];
 		[self.undoManager setActionName:ZGLocalizedStringFromDebuggerTable(localizableKey)];
-		[[self.undoManager prepareWithInvocationTarget:self] removeBreakPointsToInstructions:changedInstructions];
+		[(ZGDebuggerController *)[self.undoManager prepareWithInvocationTarget:self] removeBreakPointsToInstructions:changedInstructions];
 		[_instructionsTableView reloadData];
 	}
 	else
@@ -1925,7 +1925,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	{
 		ZGMemoryAddress currentAddress = _registersViewController.instructionPointer;
 		[_registersViewController changeInstructionPointer:newAddress];
-		[[self.undoManager prepareWithInvocationTarget:self] moveInstructionPointerToAddress:currentAddress];
+		[(ZGDebuggerController *)[self.undoManager prepareWithInvocationTarget:self] moveInstructionPointerToAddress:currentAddress];
 		[self.undoManager setActionName:ZGLocalizedStringFromDebuggerTable(@"undoMoveInstructionPointer")];
 	}
 }
@@ -2118,7 +2118,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (IBAction)stepExecution:(id)sender
 {
-	switch ((enum ZGStepExecution)[sender selectedSegment])
+	switch ((enum ZGStepExecution)[(NSSegmentedControl *)sender selectedSegment])
 	{
 		case ZGStepIntoExecution:
 			[self stepInto:nil];
@@ -2254,7 +2254,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		  compiledCondition:newCompiledCondition]];
 	}
 	
-	[[self.undoManager prepareWithInvocationTarget:self] changeBreakPointCondition:oldCondition atAddress:address error:error];
+	[(ZGDebuggerController *)[self.undoManager prepareWithInvocationTarget:self] changeBreakPointCondition:oldCondition atAddress:address error:error];
 	
 	return YES;
 }

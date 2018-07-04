@@ -59,7 +59,7 @@
 	static ZGScriptingInterpreter *scriptingInterpreter;
 	assert(scriptingInterpreter == nil);
 	
-	scriptingInterpreter = [[[self class] alloc] init];
+	scriptingInterpreter = [(ZGScriptingInterpreter *)[[self class] alloc] init];
 	return scriptingInterpreter;
 }
 

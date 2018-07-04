@@ -346,7 +346,7 @@
 	ZGDocumentWindowController *windowController = _windowController;
 	NSUndoManager *undoManager = windowController.undoManager;
 	undoManager.actionName = ZGLocalizableSearchTableString(@"undoMoveAction");
-	[[undoManager prepareWithInvocationTarget:self] reorderVariables:_documentData.variables];
+	[(ZGDocumentTableController *)[undoManager prepareWithInvocationTarget:self] reorderVariables:_documentData.variables];
 	
 	_documentData.variables = [NSArray arrayWithArray:newVariables];
 	
@@ -470,13 +470,13 @@
 		else if ([tableColumn.identifier isEqualToString:@"enabled"])
 		{
 			ZGDocumentWindowController *windowController = _windowController;
-			[[tableColumn dataCellForRow:rowIndex] setEnabled:windowController.currentProcess.valid];
+			[(NSControl *)[tableColumn dataCellForRow:rowIndex] setEnabled:windowController.currentProcess.valid];
 			return @(variable.enabled);
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
 			// Using a space to align the text field cell with the popup button cell
-			return variable.type == ZGScript ? [@" " stringByAppendingString:ZGLocalizableSearchTableString(@"scriptVariableType")] : @([tableColumn.dataCell indexOfItemWithTag:variable.type]);
+			return variable.type == ZGScript ? [@" " stringByAppendingString:ZGLocalizableSearchTableString(@"scriptVariableType")] : @([(NSPopUpButtonCell *)tableColumn.dataCell indexOfItemWithTag:variable.type]);
 		}
 	}
 	
@@ -499,14 +499,14 @@
 		else if ([tableColumn.identifier isEqualToString:@"enabled"])
 		{
 			[windowController.variableController
-			 changeVariableEnabled:[object boolValue]
+			 changeVariableEnabled:[(NSNumber *)object boolValue]
 			 rowIndexes:windowController.selectedVariableIndexes];
 		}
 		else if ([tableColumn.identifier isEqualToString:@"type"])
 		{
 			[windowController.variableController
 			 changeVariable:variable
-			 newType:(ZGVariableType)[[[tableColumn.dataCell itemArray] objectAtIndex:[object unsignedIntegerValue]] tag]
+			 newType:(ZGVariableType)[[[(NSPopUpButtonCell *)tableColumn.dataCell itemArray] objectAtIndex:[(NSNumber *)object unsignedIntegerValue]] tag]
 			 newSize:variable.size];
 		}
 	}
@@ -610,7 +610,7 @@
 				redTextColor = NSColor.redColor;
 			}
 			
-			[cell setTextColor:[[_documentData.variables objectAtIndex:(NSUInteger)rowIndex] isFrozen] ? redTextColor : NSColor.controlTextColor];
+			[(NSTextFieldCell *)cell setTextColor:[[_documentData.variables objectAtIndex:(NSUInteger)rowIndex] isFrozen] ? redTextColor : NSColor.controlTextColor];
 		}
 	}
 }

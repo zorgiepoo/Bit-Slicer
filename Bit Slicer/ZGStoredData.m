@@ -54,7 +54,7 @@
 		}
 	}
 	
-	return [[self alloc] initWithRegions:regions];
+	return [(ZGStoredData *)[self alloc] initWithRegions:regions];
 }
 
 - (id)initWithRegions:(NSArray<ZGRegion *> *)regions

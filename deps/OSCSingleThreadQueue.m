@@ -32,7 +32,7 @@
 
 + (instancetype)startWithPriority:(long)priority label:(char const *)label
 {
-	OSCSingleThreadQueue *stq = [[self alloc] init];
+	OSCSingleThreadQueue *stq = [(OSCSingleThreadQueue *)[self alloc] init];
 	stq->_queue = dispatch_queue_create(label, DISPATCH_QUEUE_SERIAL);
 	stq->_haveWork = dispatch_semaphore_create(0);
 	stq->_needWork = dispatch_semaphore_create(0);

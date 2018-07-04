@@ -265,7 +265,7 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
                         //        object attached as the udata parameter is not an event we registered for, so we should not be "missing" any events. In theory.
                         //
                         id pe = ev.udata;
-                        if (pe && [pe respondsToSelector:@selector(path)])
+                        if (pe && [(VDKQueuePathEntry *)pe respondsToSelector:@selector(path)])
                         {
                             NSString *fpath = [((VDKQueuePathEntry *)pe).path retain];         // Need to retain so it does not disappear while the block at the bottom is waiting to run on the main thread. Released in that block.
                             if (!fpath) continue;

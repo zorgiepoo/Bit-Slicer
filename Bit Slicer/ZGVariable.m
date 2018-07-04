@@ -203,9 +203,9 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		NSString *scriptValue = [coder decodeObjectOfClass:[NSString class] forKey:ZGScriptKey];
 		_scriptValue = scriptValue != nil ? [scriptValue copy] : @"";
 		
-		_cachedScriptPath = [[coder decodeObjectOfClass:[NSString class] forKey:ZGScriptCachePathKey] copy];
+		_cachedScriptPath = [(NSString *)[coder decodeObjectOfClass:[NSString class] forKey:ZGScriptCachePathKey] copy];
 		
-		_cachedScriptUUID = [[coder decodeObjectOfClass:[NSString class] forKey:ZGScriptCacheUUIDKey] copy];
+		_cachedScriptUUID = [(NSString *)[coder decodeObjectOfClass:[NSString class] forKey:ZGScriptCacheUUIDKey] copy];
 		
 		return self;
 	}

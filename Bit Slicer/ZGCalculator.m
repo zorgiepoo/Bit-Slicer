@@ -238,7 +238,7 @@
 	evaluator.functionResolver = (DDFunctionResolver)^(NSString *name) {
 		return (DDMathFunction)^(NSArray<DDExpression *> *args, NSDictionary<NSString *, id> *vars, DDMathEvaluator *eval, NSError **error) {
 			DDExpression *result = nil;
-			if ([[vars objectForKey:ZGSymbolicatesVariable] boolValue] && args.count == 0)
+			if ([(NSNumber *)[vars objectForKey:ZGSymbolicatesVariable] boolValue] && args.count == 0)
 			{
 				if (vars[ZGDidFindSymbol] != nil && [vars isKindOfClass:[NSMutableDictionary class]])
 				{
@@ -345,7 +345,7 @@
 	[rewriter addRewriteRule:@"add(multiply(__exp2, __exp1), multiply(__exp2, __func1))" forExpressionsMatchingTemplate:@"multiply(add(__exp1, __func1), __exp2)" condition:nil];
 	[rewriter addRewriteRule:@"add(multiply(__exp2, __exp1), multiply(__exp2, __func1))" forExpressionsMatchingTemplate:@"multiply(add(__func1, __exp1), __exp2)" condition:nil];
 	
-	DDExpression *simplifiedExpression = [[DDExpression expressionFromString:linearExpression error:&error] simplifiedExpression];
+	DDExpression *simplifiedExpression = [(DDExpression *)[DDExpression expressionFromString:linearExpression error:&error] simplifiedExpression];
 	if (simplifiedExpression == nil)
 	{
 		ZG_LOG(@"Error simplifiying expression: %@", error);
@@ -490,7 +490,7 @@
 	NSString *evaluatedExpression = [self evaluateExpression:newExpression substitutions:substitutions error:error];
 	if (foundSymbol != NULL)
 	{
-		*foundSymbol = [[substitutions objectForKey:ZGDidFindSymbol] boolValue];
+		*foundSymbol = [(NSNumber *)[substitutions objectForKey:ZGDidFindSymbol] boolValue];
 	}
 	
 	return evaluatedExpression;

@@ -268,7 +268,7 @@
 
 #pragma mark Menu Actions
 
-- (void)showMemoryWindowController:(id)memoryWindowController withWindowIdentifier:(NSString *)windowIdentifier andCanReadMemory:(BOOL)canReadMemory
+- (void)showMemoryWindowController:(ZGMemoryNavigationWindowController *)memoryWindowController withWindowIdentifier:(NSString *)windowIdentifier andCanReadMemory:(BOOL)canReadMemory
 {
 	[memoryWindowController showWindow:nil];
 	
@@ -370,7 +370,7 @@
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)__unused center shouldPresentNotification:(NSUserNotification *)notification
 {
-	return [notification.userInfo[ZGScriptNotificationTypeKey] boolValue] || ![NSApp isActive];
+	return [(NSNumber *)notification.userInfo[ZGScriptNotificationTypeKey] boolValue] || ![NSApp isActive];
 }
 
 - (void)userNotificationCenter:(NSUserNotificationCenter *)__unused center didActivateNotification:(NSUserNotification *)notification

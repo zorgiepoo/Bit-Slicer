@@ -55,6 +55,10 @@
 	[self updateNavigationButtons];
 }
 
+- (void)updateWindowAndReadMemory:(BOOL)__unused shouldReadMemory
+{
+}
+
 - (void)setCurrentProcess:(ZGProcess *)newProcess
 {
 	[super setCurrentProcess:newProcess];
@@ -85,7 +89,7 @@
 
 - (IBAction)navigate:(id)sender
 {
-	switch ([sender selectedSegment])
+	switch ([(NSSegmentedControl *)sender selectedSegment])
 	{
 		case ZGNavigationBack:
 			[self goBack:nil];

@@ -183,7 +183,7 @@
 	}
 	
 	id desiredProcessInternalName = [keyedUnarchiver decodeObjectOfClass:[NSObject class] forKey:ZGProcessInternalNameKey];
-	if (desiredProcessInternalName == [NSNull null] || ![desiredProcessInternalName isKindOfClass:[NSString class]])
+	if (desiredProcessInternalName == [NSNull null] || ![(id<NSObject>)desiredProcessInternalName isKindOfClass:[NSString class]])
 	{
 		_data.desiredProcessInternalName = nil;
 	}

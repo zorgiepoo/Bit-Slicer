@@ -50,6 +50,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateNavigationButtons;
 - (BOOL)canEnableNavigationButtons;
 
+// This implementation does nothing, it should be overridden by subclasses
+- (void)updateWindowAndReadMemory:(BOOL)shouldReadMemory;
+
 @end
 
 NS_ASSUME_NONNULL_END

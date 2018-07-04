@@ -181,7 +181,7 @@ enum NumberBase_t {
 }
 
 - (BOOL)isEqual:(id)him {
-    if (! [him isKindOfClass:[DataInspector class]]) return NO;
+    if (! [(id <NSObject>)him isKindOfClass:[DataInspector class]]) return NO;
     return inspectorType == ((DataInspector *)him)->inspectorType && endianness == ((DataInspector *)him)->endianness && numberBase == ((DataInspector *)him)->numberBase;
 }
 
@@ -417,7 +417,7 @@ static NSAttributedString *inspectionError(NSString *s) {
         if(outIsError) *outIsError = YES;
         return inspectionError(NSLocalizedString(@"(select a contiguous range)", ""));
     }
-    HFRange range = [ranges[0] HFRange];
+    HFRange range = [(HFRangeWrapper *)ranges[0] HFRange];
     
     if(range.length == 0) {
         if(outIsError) *outIsError = YES;
@@ -789,9 +789,9 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
 }
 
 - (void)setPropertyListRepresentation:(id)plist {
-    inspectorType = (enum InspectorType_t)[plist[@"InspectorType"] intValue];
-    endianness = (enum Endianness_t)[plist[@"Endianness"] intValue];
-    numberBase = (enum NumberBase_t)[plist[@"NumberBase"] intValue];
+    inspectorType = (enum InspectorType_t)[(NSNumber *)plist[@"InspectorType"] intValue];
+    endianness = (enum Endianness_t)[(NSNumber *)plist[@"Endianness"] intValue];
+    numberBase = (enum NumberBase_t)[(NSNumber *)plist[@"NumberBase"] intValue];
 }
 
 @end
@@ -842,7 +842,7 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
 }
 
 - (void)dealloc {
-    [_topLevelObjects release];
+    [(id <NSObject>)_topLevelObjects release];
     [super dealloc];
 }
 
@@ -895,7 +895,7 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
     }
 #ifndef __clang_analyzer__
     // clang's analyzer thinks we are leaking, but we *need* to keep the top level objects alive
-    [_topLevelObjects retain];
+    [(id <NSObject>)_topLevelObjects retain];
 #endif
     
     NSView *resultView = outletView; //want to inherit its retain here
@@ -928,7 +928,7 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
 - (NSUInteger)selectedByteCountForEditing {
     NSArray *selectedRanges = [[self controller] selectedContentsRanges];
     if ([selectedRanges count] != 1) return INVALID_EDITING_BYTE_COUNT;
-    HFRange selectedRange = [selectedRanges[0] HFRange];
+    HFRange selectedRange = [(HFRangeWrapper *)selectedRanges[0] HFRange];
     if (selectedRange.length > MAX_EDITABLE_BYTE_COUNT) return INVALID_EDITING_BYTE_COUNT;
     return ll2l(selectedRange.length);
 }
@@ -971,11 +971,11 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
     
     DataInspector *inspector = inspectors[(NSUInteger)row];
     if ([ident isEqualToString:kInspectorTypeColumnIdentifier]) {
-        [inspector setType:(enum InspectorType_t)[object intValue]];
+        [inspector setType:(enum InspectorType_t)[(NSString *)object intValue]];
         [tableView reloadData];
     }
     else if ([ident isEqualToString:kInspectorSubtypeColumnIdentifier]) {
-        const NSInteger index = [object integerValue];
+        const NSInteger index = [(NSString *)object integerValue];
         HFASSERT(index >= -1 && index <= 5 && index != 3); // 3 is the separator
         if (index == 1 || index == 2) {
             inspector.endianness = index == 1 ? eEndianLittle : eEndianBig;
@@ -1021,7 +1021,7 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
                                  inspector.type == eInspectorTypeFloatingPoint);
         const bool allowsNumberBase = (inspector.type == eInspectorTypeSignedInteger ||
                                  inspector.type == eInspectorTypeUnsignedInteger);
-        [cell setEnabled:allowsEndianness || allowsNumberBase];
+        [(NSCell *)cell setEnabled:allowsEndianness || allowsNumberBase];
         NSPopUpButtonCell *popUpCell = (NSPopUpButtonCell*)cell;
         HFASSERT(popUpCell.numberOfItems == 6);
         [popUpCell itemAtIndex:1].state = NSOffState;
