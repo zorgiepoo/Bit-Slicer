@@ -408,11 +408,15 @@
 	
 	NSString *formattedNumber = [numberOfVariablesFormatter stringFromNumber:@(variableCount)];
 	
-	NSString *valuesDisplayedString =
-	[@available(macOS 10.9, *) ?
-	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"displayingValuesLabelFormat"), variableCount] :
-	[NSString stringWithFormat:ZGLocalizableSearchDocumentString((variableCount == 1) ? @"displayingSingleValueLabelFormat" : @"displayingMultipleValuesLabelFormat"), variableCount]
-	 stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
+	NSString *valuesDisplayedString;
+	if (@available(macOS 10.9, *))
+	{
+		valuesDisplayedString = [[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"displayingValuesLabelFormat"), variableCount] stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
+	}
+	else
+	{
+		valuesDisplayedString = [[NSString stringWithFormat:ZGLocalizableSearchDocumentString((variableCount == 1) ? @"displayingSingleValueLabelFormat" : @"displayingMultipleValuesLabelFormat"), variableCount] stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
+	}
 	
 	[self setStatusString:valuesDisplayedString];
 }

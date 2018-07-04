@@ -226,10 +226,15 @@
 	NSUInteger numberOfVariablesFound = searchProgress.numberOfVariablesFound;
 	NSString *formattedNumber = [numberOfVariablesFoundFormatter stringFromNumber:@(numberOfVariablesFound)];
 	
-	return [@available(macOS 10.9, *) ?
-	[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"foundValuesLabelFormat"), numberOfVariablesFound] :
-	[NSString stringWithFormat:ZGLocalizableSearchDocumentString((numberOfVariablesFound != 1) ? @"foundMultipleValuesLabelFormat" : @"foundSingleValueLabelFormat"), numberOfVariablesFound]
-			stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
+	if (@available(macOS 10.9, *))
+	{
+		return [[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"foundValuesLabelFormat"), numberOfVariablesFound] stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
+	}
+	else
+	{
+		return [[NSString stringWithFormat:ZGLocalizableSearchDocumentString((numberOfVariablesFound != 1) ? @"foundMultipleValuesLabelFormat" : @"foundSingleValueLabelFormat"), numberOfVariablesFound]
+				stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
+	}
 }
 
 - (void)updateProgressBarFromProgress:(ZGSearchProgress *)searchProgress

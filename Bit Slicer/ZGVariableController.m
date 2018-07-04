@@ -90,22 +90,19 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 - (void)updateFrozenActivity
 {
-	BOOL hasFrozenVariable = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }];
-
-	if (hasFrozenVariable && _frozenActivity == nil && @available(macOS 10.9, *))
+	if (@available(macOS 10.9, *))
 	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-		_frozenActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Freezing Variables"];
-#pragma clang diagnostic pop
-	}
-	else if (!hasFrozenVariable && _frozenActivity != nil)
-	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_frozenActivity];
-#pragma clang diagnostic pop
-		_frozenActivity = nil;
+		BOOL hasFrozenVariable = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }];
+		
+		if (hasFrozenVariable && _frozenActivity == nil)
+		{
+			_frozenActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Freezing Variables"];
+		}
+		else if (!hasFrozenVariable && _frozenActivity != nil)
+		{
+			[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_frozenActivity];
+			_frozenActivity = nil;
+		}
 	}
 }
 
