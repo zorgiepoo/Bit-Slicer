@@ -800,11 +800,13 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
 
 - (void)drawDividerWithClip:(NSRect)clipRect {
     NSColor *separatorColor = [NSColor lightGrayColor];
+#if defined(MAC_OS_X_VERSION_10_14) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_14
     if (HFDarkModeEnabled()) {
         if (@available(macOS 10.14, *)) {
             separatorColor = [NSColor separatorColor];
         }
     }
+#endif
     [separatorColor set];
     NSRect bounds = [self bounds];
     NSRect lineRect = bounds;
