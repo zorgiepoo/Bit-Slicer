@@ -105,7 +105,10 @@
 	AGScopeBarAppearance * mScopeBarAppearance;
 	
 	BOOL mNeedsTiling;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
 	NSAppearance *currentAppearance;
+#pragma clang diagnostic pop
 }
 
 static CGFloat colorValue(CGFloat value, BOOL invert)
@@ -444,9 +447,13 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 {
 	BOOL isWindowActive = (self.window.isMainWindow || self.window.isKeyWindow);
 	
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+	// currentAppearance != nil only if we're on at least 10.14
 	if (currentAppearance != nil && ![currentAppearance.name isEqualToString:NSAppearance.currentAppearance.name]) {
 		[self updateAppearance];
 	}
+#pragma clang diagnostic pop
 	
 	// Draw gradient background
 	NSGradient * gradient = nil;
