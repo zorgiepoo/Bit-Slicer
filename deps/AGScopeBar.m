@@ -29,8 +29,8 @@
 //	distribution.
 //
 
-// Modified to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
-// replacing deprecated Gestalt() usage, and fixing nullability warnings
+// NOTE: This class has been modified to fix some unused var warnings, inserting some typecasts for [[self class] alloc],
+// replacing deprecated Gestalt() usage, fixing nullability warnings, and adding dark mode support
 
 #import "AGScopeBar.h"
 
