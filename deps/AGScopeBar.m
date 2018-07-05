@@ -128,7 +128,8 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 		if (@available(macOS 10.14, *)) {
 			// Borrowing how HexFiend detects dark mode
 			invertColors = [NSAppearance.currentAppearance.name isEqualToString:NSAppearanceNameDarkAqua];
-			currentAppearance = NSAppearance.currentAppearance;
+			[currentAppearance release];
+			currentAppearance = [NSAppearance.currentAppearance retain];
 		} else {
 			invertColors = NO;
 		}
