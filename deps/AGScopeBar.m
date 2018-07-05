@@ -117,6 +117,8 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 
 - (void)updateAppearance
 {
+	[mScopeBarAppearance release];
+	
 	if (@available(macOS 10.10, *)) {
 		// Yosemite and Later
 		mScopeBarAppearance = [[AGScopeBarAppearance alloc] init];
