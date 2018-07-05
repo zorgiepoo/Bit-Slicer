@@ -121,7 +121,7 @@
 		7735B05518DAB3E8000371AA /* ZGMemoryNavigationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7735B05418DAB3E8000371AA /* ZGMemoryNavigationWindowController.m */; };
 		773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972EF17D2E6AE00B958EE /* mach_excServer.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros -Wno-reserved-id-macro"; }; };
 		773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972F017D2E6AE00B958EE /* mach_excUser.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros -Wno-unused-local-typedef -Wno-reserved-id-macro"; }; };
-		773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */; };
 		773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
 		773DE962190F4D130078E8F9 /* ZGScriptPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */; };
 		773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
@@ -185,7 +185,7 @@
 		77F115D017D2ED74009E002A /* ZGVerticalScrollerRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115CF17D2ED74009E002A /* ZGVerticalScrollerRepresenter.m */; };
 		77F115D317D2ED82009E002A /* ZGStatusBarRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115D217D2ED82009E002A /* ZGStatusBarRepresenter.m */; };
 		77F115D617D2ED8E009E002A /* ZGLineCountingRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115D517D2ED8E009E002A /* ZGLineCountingRepresenter.m */; };
-		77F115D917D2ED9D009E002A /* ZGLineCountingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115D817D2ED9D009E002A /* ZGLineCountingView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		77F115D917D2ED9D009E002A /* ZGLineCountingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115D817D2ED9D009E002A /* ZGLineCountingView.m */; };
 		77F115E217D2EDC3009E002A /* ZGAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115E117D2EDC3009E002A /* ZGAppController.m */; };
 		77F115E517D2EDCD009E002A /* ZGPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115E417D2EDCD009E002A /* ZGPreferencesController.m */; };
 		77F115E817D2EDD9009E002A /* ZGProcessList.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115E717D2EDD9009E002A /* ZGProcessList.m */; };

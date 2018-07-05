@@ -833,7 +833,7 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
 
 @implementation DataInspectorRepresenter
 {
-    id _topLevelObjects;
+    NSMutableArray *_topLevelObjects;
 }
 
 - (instancetype)init {
@@ -841,11 +841,6 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
     inspectors = [[NSMutableArray alloc] init];
     [self loadDefaultInspectors];
     return self;
-}
-
-- (void)dealloc {
-    [(id <NSObject>)_topLevelObjects release];
-    [super dealloc];
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
@@ -890,15 +885,12 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
 
 - (NSView *)createView {
     BOOL loaded = NO;
-    _topLevelObjects = [NSMutableArray array];
-    loaded = [[NSBundle mainBundle] loadNibNamed:@"Data Inspector View" owner:self topLevelObjects:&_topLevelObjects];
+    NSMutableArray *topLevelObjects = [NSMutableArray array];
+    loaded = [[NSBundle mainBundle] loadNibNamed:@"Data Inspector View" owner:self topLevelObjects:&topLevelObjects];
     if (! loaded || ! outletView) {
         [NSException raise:NSInternalInconsistencyException format:@"Unable to load nib named DataInspectorView"];
     }
-#ifndef __clang_analyzer__
-    // clang's analyzer thinks we are leaking, but we *need* to keep the top level objects alive
-    [(id <NSObject>)_topLevelObjects retain];
-#endif
+    _topLevelObjects = topLevelObjects;
     
     NSView *resultView = outletView; //want to inherit its retain here
     outletView = nil;
