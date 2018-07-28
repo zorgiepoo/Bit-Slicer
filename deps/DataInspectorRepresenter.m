@@ -18,6 +18,8 @@
 #define USE(x) (void)(x)
 #endif
 
+#define ZGStatusBarLocalizationTable @"[Code] Memory Viewer Status Bar"
+
 /* NSTableColumn identifiers */
 #define kInspectorTypeColumnIdentifier @"inspector_type"
 #define kInspectorSubtypeColumnIdentifier @"inspector_subtype"
@@ -1031,10 +1033,10 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
             NSInteger endianIndex;
             if (inspector.endianness == eEndianLittle) {
                 endianIndex = 1;
-                [titleItems addObject:@"le"];
+                [titleItems addObject:NSLocalizedStringFromTable(@"littleEndian", ZGStatusBarLocalizationTable, nil)];
             } else {
                 endianIndex = 2;
-                [titleItems addObject:@"be"];
+                [titleItems addObject:NSLocalizedStringFromTable(@"bigEndian", ZGStatusBarLocalizationTable, nil)];
             }
             [popUpCell itemAtIndex:endianIndex].state = NSOnState;
             [popUpCell itemAtIndex:1].enabled = true;
@@ -1044,10 +1046,10 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
             NSInteger numberBaseIndex;
             if (inspector.numberBase == eNumberBaseDecimal) {
                 numberBaseIndex = 4;
-                [titleItems addObject:@"dec"];
+                [titleItems addObject:NSLocalizedStringFromTable(@"decimalBase", ZGStatusBarLocalizationTable, nil)];
             } else {
                 numberBaseIndex = 5;
-                [titleItems addObject:@"hex"];
+                [titleItems addObject:NSLocalizedStringFromTable(@"hexadecimalBase", ZGStatusBarLocalizationTable, nil)];
             }
             [popUpCell itemAtIndex:numberBaseIndex].state = NSOnState;
             [popUpCell itemAtIndex:4].enabled = true;

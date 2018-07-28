@@ -10,3 +10,15 @@
 
 /* Label format for when multiple range is selected */
 "multipleSelectionLengthFormat" = "%@ selected at multiple addresses";
+
+/* Label for little endian popup button menu option */
+"littleEndian" = "le";
+
+/* Label for big endian popup button menu option */
+"bigEndian" = "be";
+
+/* Label for decimal popup button menu option */
+"decimalBase" = "dec";
+
+/* Label for hexadecimal popup button menu option */
+"hexadecimalBase" = "hex";

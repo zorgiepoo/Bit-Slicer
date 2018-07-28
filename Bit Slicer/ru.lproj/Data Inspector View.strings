@@ -1,30 +1,33 @@
 
-/* Class = "NSButtonCell"; title = "+"; ObjectID = "65"; */
-"65.title" = "+";
-
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "67"; */
-"67.title" = "Другие виды";
-
 /* Class = "NSMenuItem"; title = "Floats"; ObjectID = "69"; */
-"69.title" = "Плавающие (floats)";
+"69.title" = "Floats";
 
-/* Class = "NSMenuItem"; title = "Signed Int"; ObjectID = "70"; */
-"70.title" = "Знаковый (signed int)";
+/* Class = "NSMenuItem"; title = "Signed Integer"; ObjectID = "70"; */
+"70.title" = "Signed Int";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "71"; */
-"71.title" = "Текстовая ячейка";
+/* Class = "NSMenuItem"; title = "Big"; ObjectID = "83"; */
+"83.title" = "big";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "82"; */
-"82.title" = "Другие виды";
+/* Class = "NSMenuItem"; title = "Little"; ObjectID = "84"; */
+"84.title" = "little";
 
-/* Class = "NSMenuItem"; title = "big"; ObjectID = "83"; */
-"83.title" = "обратное размещение байтов";
+/* Class = "NSMenuItem"; title = "Unsigned Integer"; ObjectID = "93"; */
+"93.title" = "Unsigned Int";
 
-/* Class = "NSMenuItem"; title = "little"; ObjectID = "84"; */
-"84.title" = "прямое размещение байтов";
+/* Class = "NSMenuItem"; title = "UTF-8"; ObjectID = "94"; */
+"94.title" = "UTF-8";
 
-/* Class = "NSButtonCell"; title = "-"; ObjectID = "87"; */
-"87.title" = "-";
+/* Class = "NSMenuItem"; title = "SLEB128"; ObjectID = "Zh9-Vv-mpr"; */
+"Zh9-Vv-mpr.title" = "SLEB128";
 
-/* Class = "NSMenuItem"; title = "Unsigned Int"; ObjectID = "93"; */
-"93.title" = "Не знаковый (unsigned int)";
+/* Class = "NSMenuItem"; title = "ULEB128"; ObjectID = "glG-XB-fsS"; */
+"glG-XB-fsS.title" = "ULEB128";
+
+/* Class = "NSMenuItem"; title = "Binary"; ObjectID = "MIA-go-iIQ"; */
+"MIA-go-iIQ.title" = "Binary";
+
+/* Class = "NSMenuItem"; title = "decimal"; ObjectID = "eCt-49-RSK"; */
+"eCt-49-RSK.title" = "decimal";
+
+/* Class = "NSMenuItem"; title = "hexadecimal"; ObjectID = "FAh-do-3LY"; */
+"FAh-do-3LY.title" = "hexadecimal";
