@@ -65,11 +65,7 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  
  \return An array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
  */
-#if __has_feature(objc_generics)
 - (NSArray<NSDictionary<NSString *, NSString *> *> *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
-#else
-- (NSArray *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
-#endif
 
 /*!
  Returns a custom appcast URL.
@@ -194,6 +190,13 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  \param updater The SUUpdater instance.
  */
 - (void)updaterWillRelaunchApplication:(SUUpdater *)updater;
+
+/*!
+ Called immediately after relaunching. SUUpdater delegate must be set before applicationDidFinishLaunching: to catch this event.
+ 
+ \param updater The SUUpdater instance.
+ */
+- (void)updaterDidRelaunchApplication:(SUUpdater *)updater;
 
 /*!
  Returns an object that compares version numbers to determine their arithmetic relation to each other.
