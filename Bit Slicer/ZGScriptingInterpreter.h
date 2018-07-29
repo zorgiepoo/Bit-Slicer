@@ -31,7 +31,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Python.h"
+#import "Python/Python.h"
 #import "ZGRegisterEntries.h"
 
 #define SCRIPT_PYTHON_ERROR @"SCRIPT_PYTHON_ERROR"

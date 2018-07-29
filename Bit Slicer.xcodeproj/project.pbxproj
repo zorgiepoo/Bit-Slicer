@@ -117,6 +117,8 @@
 		772D1217190D85CC00800B1B /* ZGHotKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 772D1216190D85CC00800B1B /* ZGHotKey.m */; };
 		772D121D190E008500800B1B /* ZGUpdatePreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 772D121B190E008500800B1B /* ZGUpdatePreferencesViewController.m */; };
 		772D1268190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 772D1266190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m */; };
+		772D88DC210D613400AF41B7 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 772D88DB210D613400AF41B7 /* Python.framework */; };
+		772D88DD210D614E00AF41B7 /* Python.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 772D88DB210D613400AF41B7 /* Python.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
 		7735B05518DAB3E8000371AA /* ZGMemoryNavigationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7735B05418DAB3E8000371AA /* ZGMemoryNavigationWindowController.m */; };
 		773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972EF17D2E6AE00B958EE /* mach_excServer.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros -Wno-reserved-id-macro"; }; };
@@ -127,9 +129,7 @@
 		773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
 		773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
 		773E8B061821DE9300D1A71A /* libudis86.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B051821DE9300D1A71A /* libudis86.a */; };
-		773E8B081821DEAC00D1A71A /* libpython3.3m.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B071821DEAC00D1A71A /* libpython3.3m.a */; };
 		773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		7743F9C618024CE400DBC19A /* python3.3 in Resources */ = {isa = PBXBuildFile; fileRef = 7743F9C518024CE400DBC19A /* python3.3 */; };
 		774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */; };
 		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -Wno-semicolon-before-method-body"; }; };
 		7768064018B96A64007F2CAF /* ZGThreadStates.c in Sources */ = {isa = PBXBuildFile; fileRef = 7768063E18B96A64007F2CAF /* ZGThreadStates.c */; };
@@ -254,6 +254,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				772D88DD210D614E00AF41B7 /* Python.framework in Copy Frameworks */,
 				7278DC051E4A968A00C37150 /* Sparkle.framework in Copy Frameworks */,
 				72030C7C1B055B3500A5621C /* DDMathParser.framework in Copy Frameworks */,
 				77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */,
@@ -549,6 +550,7 @@
 		772D121B190E008500800B1B /* ZGUpdatePreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGUpdatePreferencesViewController.m; path = "Bit Slicer/ZGUpdatePreferencesViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
 		772D1265190E0D8600800B1B /* ZGHotKeyPreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGHotKeyPreferencesViewController.h; path = "Bit Slicer/ZGHotKeyPreferencesViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		772D1266190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGHotKeyPreferencesViewController.m; path = "Bit Slicer/ZGHotKeyPreferencesViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
+		772D88DB210D613400AF41B7 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = deps/Python.framework; sourceTree = "<group>"; };
 		772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchProgressDelegate.h; path = "Bit Slicer/ZGSearchProgressDelegate.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
@@ -569,103 +571,8 @@
 		773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreSymbolication.framework; path = /System/Library/PrivateFrameworks/CoreSymbolication.framework; sourceTree = "<absolute>"; };
 		773E8B031821DE5300D1A71A /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend.framework; sourceTree = "<group>"; };
 		773E8B051821DE9300D1A71A /* libudis86.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libudis86.a; path = deps/libudis86.a; sourceTree = "<group>"; };
-		773E8B071821DEAC00D1A71A /* libpython3.3m.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpython3.3m.a; path = deps/python/lib/libpython3.3m.a; sourceTree = "<group>"; };
 		773E8B091821E01200D1A71A /* CoreSymbolication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreSymbolication.h; path = deps/CoreSymbolication/CoreSymbolication.h; sourceTree = "<group>"; usesTabs = 1; };
 		7743F9C518024CE400DBC19A /* python3.3 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = python3.3; path = deps/python/lib/python3.3; sourceTree = "<group>"; };
-		7743F9CA18024D2A00DBC19A /* abstract.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = abstract.h; path = deps/python/include/abstract.h; sourceTree = "<group>"; };
-		7743F9CB18024D2A00DBC19A /* accu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = accu.h; path = deps/python/include/accu.h; sourceTree = "<group>"; };
-		7743F9CC18024D2A00DBC19A /* asdl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = asdl.h; path = deps/python/include/asdl.h; sourceTree = "<group>"; };
-		7743F9CD18024D2A00DBC19A /* ast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ast.h; path = deps/python/include/ast.h; sourceTree = "<group>"; };
-		7743F9CE18024D2A00DBC19A /* bitset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitset.h; path = deps/python/include/bitset.h; sourceTree = "<group>"; };
-		7743F9CF18024D2A00DBC19A /* bltinmodule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bltinmodule.h; path = deps/python/include/bltinmodule.h; sourceTree = "<group>"; };
-		7743F9D018024D2A00DBC19A /* boolobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = boolobject.h; path = deps/python/include/boolobject.h; sourceTree = "<group>"; };
-		7743F9D118024D2A00DBC19A /* bytearrayobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bytearrayobject.h; path = deps/python/include/bytearrayobject.h; sourceTree = "<group>"; };
-		7743F9D218024D2A00DBC19A /* bytes_methods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bytes_methods.h; path = deps/python/include/bytes_methods.h; sourceTree = "<group>"; };
-		7743F9D318024D2A00DBC19A /* bytesobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bytesobject.h; path = deps/python/include/bytesobject.h; sourceTree = "<group>"; };
-		7743F9D418024D2A00DBC19A /* cellobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cellobject.h; path = deps/python/include/cellobject.h; sourceTree = "<group>"; };
-		7743F9D518024D2A00DBC19A /* ceval.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ceval.h; path = deps/python/include/ceval.h; sourceTree = "<group>"; };
-		7743F9D618024D2A00DBC19A /* classobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = classobject.h; path = deps/python/include/classobject.h; sourceTree = "<group>"; };
-		7743F9D718024D2A00DBC19A /* code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = code.h; path = deps/python/include/code.h; sourceTree = "<group>"; };
-		7743F9D818024D2A00DBC19A /* codecs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = codecs.h; path = deps/python/include/codecs.h; sourceTree = "<group>"; };
-		7743F9D918024D2A00DBC19A /* compile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compile.h; path = deps/python/include/compile.h; sourceTree = "<group>"; };
-		7743F9DA18024D2A00DBC19A /* complexobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = complexobject.h; path = deps/python/include/complexobject.h; sourceTree = "<group>"; };
-		7743F9DB18024D2A00DBC19A /* datetime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = datetime.h; path = deps/python/include/datetime.h; sourceTree = "<group>"; };
-		7743F9DC18024D2A00DBC19A /* descrobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = descrobject.h; path = deps/python/include/descrobject.h; sourceTree = "<group>"; };
-		7743F9DD18024D2A00DBC19A /* dictobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dictobject.h; path = deps/python/include/dictobject.h; sourceTree = "<group>"; };
-		7743F9DE18024D2A00DBC19A /* dtoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dtoa.h; path = deps/python/include/dtoa.h; sourceTree = "<group>"; };
-		7743F9DF18024D2A00DBC19A /* dynamic_annotations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynamic_annotations.h; path = deps/python/include/dynamic_annotations.h; sourceTree = "<group>"; };
-		7743F9E018024D2A00DBC19A /* enumobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = enumobject.h; path = deps/python/include/enumobject.h; sourceTree = "<group>"; };
-		7743F9E118024D2A00DBC19A /* errcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = errcode.h; path = deps/python/include/errcode.h; sourceTree = "<group>"; };
-		7743F9E218024D2A00DBC19A /* eval.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eval.h; path = deps/python/include/eval.h; sourceTree = "<group>"; };
-		7743F9E318024D2A00DBC19A /* fileobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fileobject.h; path = deps/python/include/fileobject.h; sourceTree = "<group>"; };
-		7743F9E418024D2A00DBC19A /* fileutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fileutils.h; path = deps/python/include/fileutils.h; sourceTree = "<group>"; };
-		7743F9E518024D2A00DBC19A /* floatobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = floatobject.h; path = deps/python/include/floatobject.h; sourceTree = "<group>"; };
-		7743F9E618024D2A00DBC19A /* frameobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frameobject.h; path = deps/python/include/frameobject.h; sourceTree = "<group>"; };
-		7743F9E718024D2A00DBC19A /* funcobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = funcobject.h; path = deps/python/include/funcobject.h; sourceTree = "<group>"; };
-		7743F9E818024D2A00DBC19A /* genobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = genobject.h; path = deps/python/include/genobject.h; sourceTree = "<group>"; };
-		7743F9E918024D2A00DBC19A /* graminit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = graminit.h; path = deps/python/include/graminit.h; sourceTree = "<group>"; };
-		7743F9EA18024D2A00DBC19A /* grammar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grammar.h; path = deps/python/include/grammar.h; sourceTree = "<group>"; };
-		7743F9EB18024D2A00DBC19A /* import.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = import.h; path = deps/python/include/import.h; sourceTree = "<group>"; };
-		7743F9EC18024D2A00DBC19A /* intrcheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intrcheck.h; path = deps/python/include/intrcheck.h; sourceTree = "<group>"; };
-		7743F9ED18024D2A00DBC19A /* iterobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iterobject.h; path = deps/python/include/iterobject.h; sourceTree = "<group>"; };
-		7743F9EE18024D2A00DBC19A /* listobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = listobject.h; path = deps/python/include/listobject.h; sourceTree = "<group>"; };
-		7743F9EF18024D2A00DBC19A /* longintrepr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = longintrepr.h; path = deps/python/include/longintrepr.h; sourceTree = "<group>"; };
-		7743F9F018024D2A00DBC19A /* longobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = longobject.h; path = deps/python/include/longobject.h; sourceTree = "<group>"; };
-		7743F9F118024D2A00DBC19A /* marshal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = marshal.h; path = deps/python/include/marshal.h; sourceTree = "<group>"; };
-		7743F9F218024D2A00DBC19A /* memoryobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = memoryobject.h; path = deps/python/include/memoryobject.h; sourceTree = "<group>"; };
-		7743F9F318024D2A00DBC19A /* metagrammar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metagrammar.h; path = deps/python/include/metagrammar.h; sourceTree = "<group>"; };
-		7743F9F418024D2A00DBC19A /* methodobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = methodobject.h; path = deps/python/include/methodobject.h; sourceTree = "<group>"; };
-		7743F9F518024D2A00DBC19A /* modsupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = modsupport.h; path = deps/python/include/modsupport.h; sourceTree = "<group>"; };
-		7743F9F618024D2A00DBC19A /* moduleobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = moduleobject.h; path = deps/python/include/moduleobject.h; sourceTree = "<group>"; };
-		7743F9F718024D2A00DBC19A /* namespaceobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = namespaceobject.h; path = deps/python/include/namespaceobject.h; sourceTree = "<group>"; };
-		7743F9F818024D2A00DBC19A /* node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = node.h; path = deps/python/include/node.h; sourceTree = "<group>"; };
-		7743F9F918024D2A00DBC19A /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = object.h; path = deps/python/include/object.h; sourceTree = "<group>"; };
-		7743F9FA18024D2A00DBC19A /* objimpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = objimpl.h; path = deps/python/include/objimpl.h; sourceTree = "<group>"; };
-		7743F9FB18024D2A00DBC19A /* opcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = opcode.h; path = deps/python/include/opcode.h; sourceTree = "<group>"; };
-		7743F9FC18024D2A00DBC19A /* osdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = osdefs.h; path = deps/python/include/osdefs.h; sourceTree = "<group>"; };
-		7743F9FD18024D2A00DBC19A /* parsetok.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parsetok.h; path = deps/python/include/parsetok.h; sourceTree = "<group>"; };
-		7743F9FE18024D2A00DBC19A /* patchlevel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = patchlevel.h; path = deps/python/include/patchlevel.h; sourceTree = "<group>"; };
-		7743F9FF18024D2A00DBC19A /* pgen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pgen.h; path = deps/python/include/pgen.h; sourceTree = "<group>"; };
-		7743FA0018024D2A00DBC19A /* pgenheaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pgenheaders.h; path = deps/python/include/pgenheaders.h; sourceTree = "<group>"; };
-		7743FA0118024D2A00DBC19A /* py_curses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = py_curses.h; path = deps/python/include/py_curses.h; sourceTree = "<group>"; };
-		7743FA0218024D2A00DBC19A /* pyarena.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pyarena.h; path = deps/python/include/pyarena.h; sourceTree = "<group>"; };
-		7743FA0318024D2A00DBC19A /* pyatomic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pyatomic.h; path = deps/python/include/pyatomic.h; sourceTree = "<group>"; };
-		7743FA0418024D2A00DBC19A /* pycapsule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pycapsule.h; path = deps/python/include/pycapsule.h; sourceTree = "<group>"; };
-		7743FA0518024D2A00DBC19A /* pyconfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pyconfig.h; path = deps/python/include/pyconfig.h; sourceTree = "<group>"; };
-		7743FA0618024D2A00DBC19A /* pyctype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pyctype.h; path = deps/python/include/pyctype.h; sourceTree = "<group>"; };
-		7743FA0718024D2A00DBC19A /* pydebug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pydebug.h; path = deps/python/include/pydebug.h; sourceTree = "<group>"; };
-		7743FA0818024D2A00DBC19A /* pyerrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pyerrors.h; path = deps/python/include/pyerrors.h; sourceTree = "<group>"; };
-		7743FA0918024D2A00DBC19A /* pyexpat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pyexpat.h; path = deps/python/include/pyexpat.h; sourceTree = "<group>"; };
-		7743FA0A18024D2A00DBC19A /* pyfpe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pyfpe.h; path = deps/python/include/pyfpe.h; sourceTree = "<group>"; };
-		7743FA0B18024D2A00DBC19A /* pygetopt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pygetopt.h; path = deps/python/include/pygetopt.h; sourceTree = "<group>"; };
-		7743FA0C18024D2A00DBC19A /* pymacconfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pymacconfig.h; path = deps/python/include/pymacconfig.h; sourceTree = "<group>"; };
-		7743FA0D18024D2A00DBC19A /* pymacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pymacro.h; path = deps/python/include/pymacro.h; sourceTree = "<group>"; };
-		7743FA0E18024D2A00DBC19A /* pymath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pymath.h; path = deps/python/include/pymath.h; sourceTree = "<group>"; };
-		7743FA0F18024D2A00DBC19A /* pymem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pymem.h; path = deps/python/include/pymem.h; sourceTree = "<group>"; };
-		7743FA1018024D2A00DBC19A /* pyport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pyport.h; path = deps/python/include/pyport.h; sourceTree = "<group>"; };
-		7743FA1118024D2A00DBC19A /* pystate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pystate.h; path = deps/python/include/pystate.h; sourceTree = "<group>"; };
-		7743FA1218024D2A00DBC19A /* pystrcmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pystrcmp.h; path = deps/python/include/pystrcmp.h; sourceTree = "<group>"; };
-		7743FA1318024D2A00DBC19A /* pystrtod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pystrtod.h; path = deps/python/include/pystrtod.h; sourceTree = "<group>"; };
-		7743FA1418024D2A00DBC19A /* Python-ast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Python-ast.h"; path = "deps/python/include/Python-ast.h"; sourceTree = "<group>"; };
-		7743FA1518024D2A00DBC19A /* Python.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Python.h; path = deps/python/include/Python.h; sourceTree = "<group>"; };
-		7743FA1618024D2A00DBC19A /* pythonrun.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pythonrun.h; path = deps/python/include/pythonrun.h; sourceTree = "<group>"; };
-		7743FA1718024D2A00DBC19A /* pythread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pythread.h; path = deps/python/include/pythread.h; sourceTree = "<group>"; };
-		7743FA1818024D2A00DBC19A /* pytime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pytime.h; path = deps/python/include/pytime.h; sourceTree = "<group>"; };
-		7743FA1918024D2A00DBC19A /* rangeobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rangeobject.h; path = deps/python/include/rangeobject.h; sourceTree = "<group>"; };
-		7743FA1A18024D2A00DBC19A /* setobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = setobject.h; path = deps/python/include/setobject.h; sourceTree = "<group>"; };
-		7743FA1B18024D2A00DBC19A /* sliceobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sliceobject.h; path = deps/python/include/sliceobject.h; sourceTree = "<group>"; };
-		7743FA1C18024D2A00DBC19A /* structmember.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = structmember.h; path = deps/python/include/structmember.h; sourceTree = "<group>"; };
-		7743FA1D18024D2A00DBC19A /* structseq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = structseq.h; path = deps/python/include/structseq.h; sourceTree = "<group>"; };
-		7743FA1E18024D2A00DBC19A /* symtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symtable.h; path = deps/python/include/symtable.h; sourceTree = "<group>"; };
-		7743FA1F18024D2A00DBC19A /* sysmodule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysmodule.h; path = deps/python/include/sysmodule.h; sourceTree = "<group>"; };
-		7743FA2018024D2A00DBC19A /* token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = token.h; path = deps/python/include/token.h; sourceTree = "<group>"; };
-		7743FA2118024D2A00DBC19A /* traceback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = traceback.h; path = deps/python/include/traceback.h; sourceTree = "<group>"; };
-		7743FA2218024D2A00DBC19A /* tupleobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tupleobject.h; path = deps/python/include/tupleobject.h; sourceTree = "<group>"; };
-		7743FA2318024D2A00DBC19A /* typeslots.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = typeslots.h; path = deps/python/include/typeslots.h; sourceTree = "<group>"; };
-		7743FA2418024D2A00DBC19A /* ucnhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ucnhash.h; path = deps/python/include/ucnhash.h; sourceTree = "<group>"; };
-		7743FA2518024D2A00DBC19A /* unicodeobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unicodeobject.h; path = deps/python/include/unicodeobject.h; sourceTree = "<group>"; };
-		7743FA2618024D2A00DBC19A /* warnings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = warnings.h; path = deps/python/include/warnings.h; sourceTree = "<group>"; };
-		7743FA2718024D2A00DBC19A /* weakrefobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = weakrefobject.h; path = deps/python/include/weakrefobject.h; sourceTree = "<group>"; };
 		774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyKeyCodeModule.m; path = "Bit Slicer/ZGPyKeyCodeModule.m"; sourceTree = "<group>"; usesTabs = 1; };
 		774B5EE71915362900D7AA69 /* ZGPyKeyCodeModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyKeyCodeModule.h; path = "Bit Slicer/ZGPyKeyCodeModule.h"; sourceTree = "<group>"; usesTabs = 1; };
 		77607AAF185CD50100AC532B /* AGScopeBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AGScopeBar.h; path = deps/AGScopeBar.h; sourceTree = "<group>"; usesTabs = 1; };
@@ -834,11 +741,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				772D88DC210D613400AF41B7 /* Python.framework in Frameworks */,
 				72030C7A1B0558F800A5621C /* DDMathParser.framework in Frameworks */,
 				773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */,
 				773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */,
 				7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */,
-				773E8B081821DEAC00D1A71A /* libpython3.3m.a in Frameworks */,
 				773E8B061821DE9300D1A71A /* libudis86.a in Frameworks */,
 				773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */,
 			);
@@ -878,7 +785,6 @@
 		2A37F4ABFDCFA73011CA2CEA /* Code */ = {
 			isa = PBXGroup;
 			children = (
-				7743F9C718024D0E00DBC19A /* Python */,
 				77FF507B16E9B7D40005915D /* Memory Window Controllers */,
 				77C19AB31916D4440028F7F1 /* Changing Memory Protection */,
 				7728EE0C16BE3DDA00F9E1AD /* Dumping Memory */,
@@ -924,6 +830,7 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				772D88DB210D613400AF41B7 /* Python.framework */,
 				7278DC031E4A967700C37150 /* Sparkle.framework */,
 				773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */,
 				72030C791B0558F800A5621C /* DDMathParser.framework */,
@@ -1179,108 +1086,6 @@
 				72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */,
 			);
 			name = Symbolication;
-			sourceTree = "<group>";
-		};
-		7743F9C718024D0E00DBC19A /* Python */ = {
-			isa = PBXGroup;
-			children = (
-				773E8B071821DEAC00D1A71A /* libpython3.3m.a */,
-				7743F9CA18024D2A00DBC19A /* abstract.h */,
-				7743F9CB18024D2A00DBC19A /* accu.h */,
-				7743F9CC18024D2A00DBC19A /* asdl.h */,
-				7743F9CD18024D2A00DBC19A /* ast.h */,
-				7743F9CE18024D2A00DBC19A /* bitset.h */,
-				7743F9CF18024D2A00DBC19A /* bltinmodule.h */,
-				7743F9D018024D2A00DBC19A /* boolobject.h */,
-				7743F9D118024D2A00DBC19A /* bytearrayobject.h */,
-				7743F9D218024D2A00DBC19A /* bytes_methods.h */,
-				7743F9D318024D2A00DBC19A /* bytesobject.h */,
-				7743F9D418024D2A00DBC19A /* cellobject.h */,
-				7743F9D518024D2A00DBC19A /* ceval.h */,
-				7743F9D618024D2A00DBC19A /* classobject.h */,
-				7743F9D718024D2A00DBC19A /* code.h */,
-				7743F9D818024D2A00DBC19A /* codecs.h */,
-				7743F9D918024D2A00DBC19A /* compile.h */,
-				7743F9DA18024D2A00DBC19A /* complexobject.h */,
-				7743F9DB18024D2A00DBC19A /* datetime.h */,
-				7743F9DC18024D2A00DBC19A /* descrobject.h */,
-				7743F9DD18024D2A00DBC19A /* dictobject.h */,
-				7743F9DE18024D2A00DBC19A /* dtoa.h */,
-				7743F9DF18024D2A00DBC19A /* dynamic_annotations.h */,
-				7743F9E018024D2A00DBC19A /* enumobject.h */,
-				7743F9E118024D2A00DBC19A /* errcode.h */,
-				7743F9E218024D2A00DBC19A /* eval.h */,
-				7743F9E318024D2A00DBC19A /* fileobject.h */,
-				7743F9E418024D2A00DBC19A /* fileutils.h */,
-				7743F9E518024D2A00DBC19A /* floatobject.h */,
-				7743F9E618024D2A00DBC19A /* frameobject.h */,
-				7743F9E718024D2A00DBC19A /* funcobject.h */,
-				7743F9E818024D2A00DBC19A /* genobject.h */,
-				7743F9E918024D2A00DBC19A /* graminit.h */,
-				7743F9EA18024D2A00DBC19A /* grammar.h */,
-				7743F9EB18024D2A00DBC19A /* import.h */,
-				7743F9EC18024D2A00DBC19A /* intrcheck.h */,
-				7743F9ED18024D2A00DBC19A /* iterobject.h */,
-				7743F9EE18024D2A00DBC19A /* listobject.h */,
-				7743F9EF18024D2A00DBC19A /* longintrepr.h */,
-				7743F9F018024D2A00DBC19A /* longobject.h */,
-				7743F9F118024D2A00DBC19A /* marshal.h */,
-				7743F9F218024D2A00DBC19A /* memoryobject.h */,
-				7743F9F318024D2A00DBC19A /* metagrammar.h */,
-				7743F9F418024D2A00DBC19A /* methodobject.h */,
-				7743F9F518024D2A00DBC19A /* modsupport.h */,
-				7743F9F618024D2A00DBC19A /* moduleobject.h */,
-				7743F9F718024D2A00DBC19A /* namespaceobject.h */,
-				7743F9F818024D2A00DBC19A /* node.h */,
-				7743F9F918024D2A00DBC19A /* object.h */,
-				7743F9FA18024D2A00DBC19A /* objimpl.h */,
-				7743F9FB18024D2A00DBC19A /* opcode.h */,
-				7743F9FC18024D2A00DBC19A /* osdefs.h */,
-				7743F9FD18024D2A00DBC19A /* parsetok.h */,
-				7743F9FE18024D2A00DBC19A /* patchlevel.h */,
-				7743F9FF18024D2A00DBC19A /* pgen.h */,
-				7743FA0018024D2A00DBC19A /* pgenheaders.h */,
-				7743FA0118024D2A00DBC19A /* py_curses.h */,
-				7743FA0218024D2A00DBC19A /* pyarena.h */,
-				7743FA0318024D2A00DBC19A /* pyatomic.h */,
-				7743FA0418024D2A00DBC19A /* pycapsule.h */,
-				7743FA0518024D2A00DBC19A /* pyconfig.h */,
-				7743FA0618024D2A00DBC19A /* pyctype.h */,
-				7743FA0718024D2A00DBC19A /* pydebug.h */,
-				7743FA0818024D2A00DBC19A /* pyerrors.h */,
-				7743FA0918024D2A00DBC19A /* pyexpat.h */,
-				7743FA0A18024D2A00DBC19A /* pyfpe.h */,
-				7743FA0B18024D2A00DBC19A /* pygetopt.h */,
-				7743FA0C18024D2A00DBC19A /* pymacconfig.h */,
-				7743FA0D18024D2A00DBC19A /* pymacro.h */,
-				7743FA0E18024D2A00DBC19A /* pymath.h */,
-				7743FA0F18024D2A00DBC19A /* pymem.h */,
-				7743FA1018024D2A00DBC19A /* pyport.h */,
-				7743FA1118024D2A00DBC19A /* pystate.h */,
-				7743FA1218024D2A00DBC19A /* pystrcmp.h */,
-				7743FA1318024D2A00DBC19A /* pystrtod.h */,
-				7743FA1418024D2A00DBC19A /* Python-ast.h */,
-				7743FA1518024D2A00DBC19A /* Python.h */,
-				7743FA1618024D2A00DBC19A /* pythonrun.h */,
-				7743FA1718024D2A00DBC19A /* pythread.h */,
-				7743FA1818024D2A00DBC19A /* pytime.h */,
-				7743FA1918024D2A00DBC19A /* rangeobject.h */,
-				7743FA1A18024D2A00DBC19A /* setobject.h */,
-				7743FA1B18024D2A00DBC19A /* sliceobject.h */,
-				7743FA1C18024D2A00DBC19A /* structmember.h */,
-				7743FA1D18024D2A00DBC19A /* structseq.h */,
-				7743FA1E18024D2A00DBC19A /* symtable.h */,
-				7743FA1F18024D2A00DBC19A /* sysmodule.h */,
-				7743FA2018024D2A00DBC19A /* token.h */,
-				7743FA2118024D2A00DBC19A /* traceback.h */,
-				7743FA2218024D2A00DBC19A /* tupleobject.h */,
-				7743FA2318024D2A00DBC19A /* typeslots.h */,
-				7743FA2418024D2A00DBC19A /* ucnhash.h */,
-				7743FA2518024D2A00DBC19A /* unicodeobject.h */,
-				7743FA2618024D2A00DBC19A /* warnings.h */,
-				7743FA2718024D2A00DBC19A /* weakrefobject.h */,
-			);
-			name = Python;
 			sourceTree = "<group>";
 		};
 		77988F18185803DA00476A37 /* Document Icons */ = {
@@ -1682,7 +1487,6 @@
 				724A9F2319A1657500E72C9D /* [Code] Memory Navigation.strings in Resources */,
 				726CA2AC19606D0700A6AD40 /* Debugger Window.xib in Resources */,
 				77988F1C185804AC00476A37 /* container_filled.pdf in Resources */,
-				7743F9C618024CE400DBC19A /* python3.3 in Resources */,
 				77988F1A185803E800476A37 /* container.pdf in Resources */,
 				726CA2BC19606DDD00A6AD40 /* Dump Memory Range Dialog.xib in Resources */,
 				724A9F3F19A823C300E72C9D /* [Code] Search Document.strings in Resources */,
@@ -2696,7 +2500,6 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
-					"$(SRCROOT)/deps/python/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_CFLAGS = "-D_BSDEBUG";
@@ -2798,7 +2601,6 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
-					"$(SRCROOT)/deps/python/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zgcoder.BitSlicer;

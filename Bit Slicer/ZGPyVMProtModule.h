@@ -31,7 +31,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Python.h"
+#import "Python/Python.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

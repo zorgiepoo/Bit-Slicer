@@ -44,7 +44,7 @@
 #import "ZGNullability.h"
 
 #import <pthread.h>
-#import "structmember.h"
+#import "Python/structmember.h"
 
 @implementation ZGScriptingInterpreter
 {
@@ -164,7 +164,15 @@
 	
 	NSString *userModulesDirectory = [ZGAppPathUtilities createUserModulesDirectory];
 	
-	NSString *pythonDirectory = [[NSBundle mainBundle] pathForResource:@"python3.3" ofType:nil];
+	NSString *privateFrameworksPath = [[NSBundle mainBundle] privateFrameworksPath];
+	assert(privateFrameworksPath != nil);
+	
+	NSBundle *pythonBundle = [NSBundle bundleWithPath:[privateFrameworksPath stringByAppendingPathComponent:@"Python.framework"]];
+	assert(pythonBundle != nil);
+	
+	NSString *pythonDirectory = [pythonBundle pathForResource:@"python3.7" ofType:nil];
+	assert(pythonDirectory != nil);
+	
 	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
 	setenv("PYTHONPATH", [pythonDirectory UTF8String], 1);
 	[self dispatchAsync:^{

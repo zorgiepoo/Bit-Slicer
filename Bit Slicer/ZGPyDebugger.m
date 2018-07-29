@@ -47,7 +47,7 @@
 #import "ZGThreadStates.h"
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
-#import "structmember.h"
+#import "Python/structmember.h"
 #import "ZGDeliverUserNotifications.h"
 #import "ZGPyVirtualMemory.h"
 #import "ZGBacktrace.h"
@@ -180,7 +180,7 @@ static PyTypeObject DebuggerType =
 	0, // tp_init
 	0, // tp_alloc
 	0, // tp_new
-	0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
 @implementation ZGPyDebugger

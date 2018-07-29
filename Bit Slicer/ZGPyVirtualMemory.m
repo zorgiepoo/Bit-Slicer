@@ -42,7 +42,7 @@
 #import "ZGMachBinary.h"
 #import "ZGDataValueExtracting.h"
 #import "ZGVariableDataInfo.h"
-#import "structmember.h"
+#import "Python/structmember.h"
 
 typedef struct
 {
@@ -200,7 +200,7 @@ static PyTypeObject VirtualMemoryType =
 	0, // tp_init
 	0, // tp_alloc
 	0, // tp_new
-	0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
 @implementation ZGPyVirtualMemory

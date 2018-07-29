@@ -55,7 +55,7 @@
 #import "ZGScriptPromptWindowController.h"
 #import "ZGNullability.h"
 
-#import "structmember.h"
+#import "Python/structmember.h"
 
 #define ZGLocalizableScriptManagerString(string) NSLocalizedStringFromTable(string, @"[Code] Script Manager", nil)
 
