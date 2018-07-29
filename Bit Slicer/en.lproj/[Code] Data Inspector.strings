@@ -9,3 +9,22 @@
 
 /* Label for when selected range is not contiguous */
 "contiguousRange" = "(select a contiguous range)";
+
+/* Label for little endian popup button menu option */
+"littleEndian" = "le";
+
+/* Label for big endian popup button menu option */
+"bigEndian" = "be";
+
+/* Label for decimal popup button menu option */
+"decimalBase" = "dec";
+
+/* Label for hexadecimal popup button menu option */
+"hexadecimalBase" = "hex";
+
+/* Label for when too little data is selected */
+"tooLittleData" = "(select more data)";
+
+/* Label for when an internal error occurred during selection */
+"internalError" = "(internal error)";
+

@@ -18,7 +18,7 @@
 #define USE(x) (void)(x)
 #endif
 
-#define ZGStatusBarLocalizationTable @"[Code] Memory Viewer Status Bar"
+#define ZGDataInspectorLocalizationTable @"[Code] Data Inspector"
 
 /* NSTableColumn identifiers */
 #define kInspectorTypeColumnIdentifier @"inspector_type"
@@ -399,11 +399,11 @@ static id floatingPointDescription(const unsigned char *bytes, NSUInteger length
     }
 }
 
-static NSString * const InspectionErrorNoData =  @"(select some data)";
-static NSString * const InspectionErrorTooMuch = @"(select less data)";
-static NSString * const InspectionErrorTooLittle = @"(select more data)";
-static NSString * const InspectionErrorNonPwr2 = @"(select a power of 2 bytes)";
-static NSString * const InspectionErrorInternal = @"(internal error)";
+static NSString * const InspectionErrorNoDataKey =  @"noData";
+static NSString * const InspectionErrorTooMuchKey = @"tooMuchData";
+static NSString * const InspectionErrorTooLittleKey = @"tooLittleData";
+static NSString * const InspectionErrorNonPwr2Key = @"badByteCount";
+static NSString * const InspectionErrorInternalKey = @"internalError";
 
 static NSAttributedString *inspectionError(NSString *s) {
     NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
@@ -417,18 +417,18 @@ static NSAttributedString *inspectionError(NSString *s) {
     
     if ([ranges count] != 1) {
         if(outIsError) *outIsError = YES;
-        return inspectionError(NSLocalizedString(@"(select a contiguous range)", ""));
+        return inspectionError(NSLocalizedStringFromTable(@"contiguousRange", ZGDataInspectorLocalizationTable, nil));
     }
     HFRange range = [(HFRangeWrapper *)ranges[0] HFRange];
     
     if(range.length == 0) {
         if(outIsError) *outIsError = YES;
-        return inspectionError(InspectionErrorNoData);
+        return inspectionError(NSLocalizedStringFromTable(InspectionErrorNoDataKey, ZGDataInspectorLocalizationTable, nil));
     }
     
     if(range.length > MAX_EDITABLE_BYTE_COUNT) {
         if(outIsError) *outIsError = YES;
-        return inspectionError(InspectionErrorTooMuch);
+        return inspectionError(NSLocalizedStringFromTable(InspectionErrorTooMuchKey, ZGDataInspectorLocalizationTable, nil));
     }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
@@ -438,7 +438,7 @@ static NSAttributedString *inspectionError(NSString *s) {
         case eInspectorTypeFloatingPoint:
             if(range.length > 16) {
                 if(outIsError) *outIsError = YES;
-                return inspectionError(InspectionErrorTooMuch);
+                return inspectionError(NSLocalizedStringFromTable(InspectionErrorTooMuchKey, ZGDataInspectorLocalizationTable, nil));
             }
             break;
         case eInspectorTypeUTF8Text:
@@ -449,13 +449,13 @@ static NSAttributedString *inspectionError(NSString *s) {
         case eInspectorTypeBinary:
             if(range.length > 24) {
                 if(outIsError) *outIsError = YES;
-                return inspectionError(InspectionErrorTooMuch);
+                return inspectionError(NSLocalizedStringFromTable(InspectionErrorTooMuchKey, ZGDataInspectorLocalizationTable, nil));
             }
             break;
         case eInspectorTypeCount:
         default:
             if(outIsError) *outIsError = YES;
-            return inspectionError(InspectionErrorInternal);
+            return inspectionError(NSLocalizedStringFromTable(InspectionErrorInternalKey, ZGDataInspectorLocalizationTable, nil));
     }
 #pragma clang diagnostic pop
     
@@ -475,7 +475,7 @@ static NSAttributedString *inspectionError(NSString *s) {
         case eInspectorTypeSignedInteger:
             /* Only allow powers of 2 up to 8 */
             switch (length) {
-                case 0: return inspectionError(InspectionErrorNoData);
+                case 0: return inspectionError(NSLocalizedStringFromTable(InspectionErrorNoDataKey, ZGDataInspectorLocalizationTable, nil));
                 case 1: case 2: case 4: case 8:
                     if(outIsError) *outIsError = NO;
                     if(inspectorType == eInspectorTypeSignedInteger)
@@ -483,25 +483,25 @@ static NSAttributedString *inspectionError(NSString *s) {
                     else
                         return unsignedIntegerDescription(bytes, length, endianness, numberBase);
                 default:
-                    return length > 8 ? inspectionError(InspectionErrorTooMuch) : inspectionError(InspectionErrorNonPwr2);
+                    return length > 8 ? inspectionError(NSLocalizedStringFromTable(InspectionErrorTooMuchKey, ZGDataInspectorLocalizationTable, nil)) : inspectionError(NSLocalizedStringFromTable(InspectionErrorNonPwr2Key, ZGDataInspectorLocalizationTable, nil));
             }
         
         case eInspectorTypeFloatingPoint:
             switch (length) {
                 case 0:
-                    return inspectionError(InspectionErrorNoData);
+                    return inspectionError(NSLocalizedStringFromTable(InspectionErrorNoDataKey, ZGDataInspectorLocalizationTable, nil));
                 case 1: case 2: case 3:
-                    return inspectionError(InspectionErrorTooLittle);
+                    return inspectionError(NSLocalizedStringFromTable(InspectionErrorTooLittleKey, ZGDataInspectorLocalizationTable, nil));
                 case 4: case 8: case 10: case 16:
                     if(outIsError) *outIsError = NO;
                     return floatingPointDescription(bytes, length, endianness);
                 default:
-                    return length > 16 ? inspectionError(InspectionErrorTooMuch) : inspectionError(InspectionErrorNonPwr2);
+                    return length > 16 ? inspectionError(NSLocalizedStringFromTable(InspectionErrorTooMuchKey, ZGDataInspectorLocalizationTable, nil)) : inspectionError(NSLocalizedStringFromTable(InspectionErrorNonPwr2Key, ZGDataInspectorLocalizationTable, nil));
             }
                 
         case eInspectorTypeUTF8Text: {
-            if(length == 0) return inspectionError(InspectionErrorNoData);
-            if(length > MAX_EDITABLE_BYTE_COUNT) return inspectionError(InspectionErrorTooMuch);
+            if(length == 0) return inspectionError(NSLocalizedStringFromTable(InspectionErrorNoDataKey, ZGDataInspectorLocalizationTable, nil));
+            if(length > MAX_EDITABLE_BYTE_COUNT) return inspectionError(NSLocalizedStringFromTable(InspectionErrorTooMuchKey, ZGDataInspectorLocalizationTable, nil));
             NSString *ret = [[NSString alloc] initWithBytes:bytes length:length encoding:NSUTF8StringEncoding];
             if(ret == nil) return inspectionError(@"(bytes are not valid UTF-8)");
             if(outIsError) *outIsError = NO;
@@ -560,7 +560,7 @@ static NSAttributedString *inspectionError(NSString *s) {
                 }
             }
             
-            return inspectionError(InspectionErrorTooLittle);
+            return inspectionError(NSLocalizedStringFromTable(InspectionErrorTooLittleKey, ZGDataInspectorLocalizationTable, nil));
         }
         
         case eInspectorTypeULEB128: {
@@ -575,12 +575,12 @@ static NSAttributedString *inspectionError(NSString *s) {
                 }
             }
             
-            return inspectionError(InspectionErrorTooLittle);
+            return inspectionError(NSLocalizedStringFromTable(InspectionErrorTooLittleKey, ZGDataInspectorLocalizationTable, nil));
         }
         
         case eInspectorTypeCount:
         default:
-            return inspectionError(InspectionErrorInternal);
+            return inspectionError(NSLocalizedStringFromTable(InspectionErrorInternalKey, ZGDataInspectorLocalizationTable, nil));
     }
 #pragma clang diagnostic pop
 }
@@ -1033,10 +1033,10 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
             NSInteger endianIndex;
             if (inspector.endianness == eEndianLittle) {
                 endianIndex = 1;
-                [titleItems addObject:NSLocalizedStringFromTable(@"littleEndian", ZGStatusBarLocalizationTable, nil)];
+                [titleItems addObject:NSLocalizedStringFromTable(@"littleEndian", ZGDataInspectorLocalizationTable, nil)];
             } else {
                 endianIndex = 2;
-                [titleItems addObject:NSLocalizedStringFromTable(@"bigEndian", ZGStatusBarLocalizationTable, nil)];
+                [titleItems addObject:NSLocalizedStringFromTable(@"bigEndian", ZGDataInspectorLocalizationTable, nil)];
             }
             [popUpCell itemAtIndex:endianIndex].state = NSOnState;
             [popUpCell itemAtIndex:1].enabled = true;
@@ -1046,10 +1046,10 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
             NSInteger numberBaseIndex;
             if (inspector.numberBase == eNumberBaseDecimal) {
                 numberBaseIndex = 4;
-                [titleItems addObject:NSLocalizedStringFromTable(@"decimalBase", ZGStatusBarLocalizationTable, nil)];
+                [titleItems addObject:NSLocalizedStringFromTable(@"decimalBase", ZGDataInspectorLocalizationTable, nil)];
             } else {
                 numberBaseIndex = 5;
-                [titleItems addObject:NSLocalizedStringFromTable(@"hexadecimalBase", ZGStatusBarLocalizationTable, nil)];
+                [titleItems addObject:NSLocalizedStringFromTable(@"hexadecimalBase", ZGDataInspectorLocalizationTable, nil)];
             }
             [popUpCell itemAtIndex:numberBaseIndex].state = NSOnState;
             [popUpCell itemAtIndex:4].enabled = true;
