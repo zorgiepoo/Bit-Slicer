@@ -375,19 +375,16 @@
 
 - (void)userNotificationCenter:(NSUserNotificationCenter *)__unused center didActivateNotification:(NSUserNotification *)notification
 {
-	if (@available(macOS 10.9, *))
+	if (notification.activationType == NSUserNotificationActivationTypeReplied)
 	{
-		if (notification.activationType == NSUserNotificationActivationTypeReplied)
+		NSNumber *scriptPromptHash = notification.userInfo[ZGScriptNotificationPromptHashKey];
+		if (scriptPromptHash != nil)
 		{
-			NSNumber *scriptPromptHash = notification.userInfo[ZGScriptNotificationPromptHashKey];
-			if (scriptPromptHash != nil)
+			for (ZGDocument *document in _documentController.documents)
 			{
-				for (ZGDocument *document in _documentController.documents)
-				{
-					ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
-					ZGScriptManager *scriptManager = documentWindowController.scriptManager;
-					[scriptManager handleScriptPromptHash:scriptPromptHash withUserNotificationReply:notification.response.string];
-				}
+				ZGDocumentWindowController *documentWindowController = (ZGDocumentWindowController *)document.windowControllers[0];
+				ZGScriptManager *scriptManager = documentWindowController.scriptManager;
+				[scriptManager handleScriptPromptHash:scriptPromptHash withUserNotificationReply:notification.response.string];
 			}
 		}
 	}

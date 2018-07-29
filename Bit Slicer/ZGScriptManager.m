@@ -546,11 +546,7 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		PyObject_SetAttrString(script.module, "vm", virtualMemoryInstance.object);
 		PyObject_SetAttrString(script.module, "debug", debuggerInstance.object);
 		
-		id scriptInitActivity = nil;
-		if (@available(macOS 10.9, *))
-		{
-			scriptInitActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script initializer"];
-		}
+		id scriptInitActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script initializer"];
 		
 		[self setUpStackDepthLimit];
 		
@@ -603,10 +599,7 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 			if (self->_scriptTimer != NULL)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
-					if (@available(macOS 10.9, *))
-					{
-						self->_scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script execute timer"];
-					}
+					self->_scriptActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Script execute timer"];
 				});
 				
 				dispatch_source_t scriptTimer = self->_scriptTimer;

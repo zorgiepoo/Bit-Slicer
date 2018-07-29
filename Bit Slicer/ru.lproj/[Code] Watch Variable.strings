@@ -7,12 +7,6 @@
 /* Alert responce to adding the found instructions when the target process terminated */
 "targetTeriminatedAlertAddButton" = "Добавить";
 
-/* Annotated description for variable being accessed one time; not used on 10.9 or later */
-"accessedSingleTimeFormat" = "Сработано %lu раз";
-
-/* Annotated description for variable being accessed multiple times; not used on 10.9 or later */
-"accessedMultipleTimesFormat" = "Сработано %lu раз";
-
 /* Annotated description annotated label for general purpose registers; not sure if this should be localized */
 "generalPurposeRegistersDescriptionLabel" = "Регистры общего назначения";
 

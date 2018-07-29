@@ -99,14 +99,7 @@
 		[_statusTextField setTextColor:[NSColor controlTextColor]];
 	}
 	
-	if (@available(macOS 10.9, *))
-	{
-		[_statusTextField setStringValue:[NSString stringWithFormat:ZGLocalizedStringFromLoggerWindowTable(@"loggedMessagesFormat"), _numberOfMessages]];
-	}
-	else
-	{
-		[_statusTextField setStringValue:[NSString stringWithFormat:ZGLocalizedStringFromLoggerWindowTable((_numberOfMessages == 1) ? @"loggedSingleMessageFormat" : @"loggedMultipleMessagesFormat"), _numberOfMessages]];
-	}
+	[_statusTextField setStringValue:[NSString stringWithFormat:ZGLocalizedStringFromLoggerWindowTable(@"loggedMessagesFormat"), _numberOfMessages]];
 	
 	[self invalidateRestorableState];
 }

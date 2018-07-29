@@ -95,13 +95,10 @@
 
 - (void)dealloc
 {
-	if (@available(macOS 10.9, *))
-	{
-		[[NSNotificationCenter defaultCenter]
-		 removeObserver:self
-		 name:NSWindowDidChangeOcclusionStateNotification
-		 object:nil];
-	}
+	[[NSNotificationCenter defaultCenter]
+	 removeObserver:self
+	 name:NSWindowDidChangeOcclusionStateNotification
+	 object:nil];
 	
 	[[NSWorkspace sharedWorkspace]
 	 removeObserver:self
@@ -222,14 +219,11 @@
 
 - (void)windowDidLoad
 {
-	if (@available(macOS 10.9, *))
-	{
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-		 selector:@selector(windowDidChangeOcclusionState:)
-		 name:NSWindowDidChangeOcclusionStateNotification
-		 object:self.window];
-	}
+	[[NSNotificationCenter defaultCenter]
+	 addObserver:self
+	 selector:@selector(windowDidChangeOcclusionState:)
+	 name:NSWindowDidChangeOcclusionStateNotification
+	 object:self.window];
 }
 
 - (void)updateWindow

@@ -226,15 +226,7 @@
 	NSUInteger numberOfVariablesFound = searchProgress.numberOfVariablesFound;
 	NSString *formattedNumber = [numberOfVariablesFoundFormatter stringFromNumber:@(numberOfVariablesFound)];
 	
-	if (@available(macOS 10.9, *))
-	{
-		return [[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"foundValuesLabelFormat"), numberOfVariablesFound] stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
-	}
-	else
-	{
-		return [[NSString stringWithFormat:ZGLocalizableSearchDocumentString((numberOfVariablesFound != 1) ? @"foundMultipleValuesLabelFormat" : @"foundSingleValueLabelFormat"), numberOfVariablesFound]
-				stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
-	}
+	return [[NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"foundValuesLabelFormat"), numberOfVariablesFound] stringByReplacingOccurrencesOfString:@"_NUM_" withString:formattedNumber];
 }
 
 - (void)updateProgressBarFromProgress:(ZGSearchProgress *)searchProgress
@@ -772,11 +764,7 @@
 	
 	[self prepareTask];
 	
-	id searchDataActivity = nil;
-	if (@available(macOS 10.9, *))
-	{
-		searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
-	}
+	id searchDataActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Searching Data"];
 	
 	NSArray<ZGVariable *> *oldVariables = _documentData.variables;
 	
@@ -791,10 +779,7 @@
 			
 			if (searchDataActivity != nil)
 			{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 				[[NSProcessInfo processInfo] endActivity:searchDataActivity];
-#pragma clang diagnostic pop
 			}
 			
 			[self finalizeSearchWithOldVariables:oldVariables andNotSearchedVariables:notSearchedVariables];

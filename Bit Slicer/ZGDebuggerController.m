@@ -1753,10 +1753,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	if (_breakPointActivity == nil)
 	{
-		if (@available(macOS 10.9, *))
-		{
-			_breakPointActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityBackground reason:@"Software Breakpoint"];
-		}
+		_breakPointActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityBackground reason:@"Software Breakpoint"];
 	}
 }
 
@@ -1764,11 +1761,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	if (_breakPointActivity != nil)
 	{
-		if (@available(macOS 10.9, *))
-		{
-			[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_breakPointActivity];
-			_breakPointActivity = nil;
-		}
+		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_breakPointActivity];
+		_breakPointActivity = nil;
 	}
 }
 

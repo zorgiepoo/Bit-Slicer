@@ -40,16 +40,14 @@ void ZGDeliverUserNotificationWithReplyOption(NSString *title, NSString *subtitl
 	userNotification.informativeText = informativeText;
 	userNotification.userInfo = userInfo;
 	
-	if (@available(macOS 10.9, *))
+	userNotification.hasReplyButton = hasReplyButton;
+	userNotification.responsePlaceholder = responsePlaceholder;
+	
+	if (hasReplyButton && [NSApp isActive])
 	{
-		userNotification.hasReplyButton = hasReplyButton;
-		userNotification.responsePlaceholder = responsePlaceholder;
-		
-		if (hasReplyButton && [NSApp isActive])
-		{
-			userNotification.deliveryDate = [[NSDate date] dateByAddingTimeInterval:5.0];
-		}
+		userNotification.deliveryDate = [[NSDate date] dateByAddingTimeInterval:5.0];
 	}
+	
 	[[NSUserNotificationCenter defaultUserNotificationCenter] scheduleNotification:userNotification];
 }
 

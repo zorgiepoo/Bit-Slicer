@@ -90,19 +90,16 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 
 - (void)updateFrozenActivity
 {
-	if (@available(macOS 10.9, *))
+	BOOL hasFrozenVariable = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }];
+	
+	if (hasFrozenVariable && _frozenActivity == nil)
 	{
-		BOOL hasFrozenVariable = [_documentData.variables zgHasObjectMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.isFrozen && variable.enabled); }];
-		
-		if (hasFrozenVariable && _frozenActivity == nil)
-		{
-			_frozenActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Freezing Variables"];
-		}
-		else if (!hasFrozenVariable && _frozenActivity != nil)
-		{
-			[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_frozenActivity];
-			_frozenActivity = nil;
-		}
+		_frozenActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Freezing Variables"];
+	}
+	else if (!hasFrozenVariable && _frozenActivity != nil)
+	{
+		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_frozenActivity];
+		_frozenActivity = nil;
 	}
 }
 

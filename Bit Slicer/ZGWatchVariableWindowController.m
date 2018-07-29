@@ -246,19 +246,7 @@
 	ZGInstruction *instruction = watchVariable.instruction;
 	ZGRegistersState *registersState = watchVariable.registersState;
 	
-	NSString *accessedTimes = @"";
-	if (@available(macOS 10.9, *))
-	{
-		accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedTimesFormat"), watchVariable.accessCount];
-	}
-	else if (watchVariable.accessCount == 1)
-	{
-		accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedSingleTimeFormat"), watchVariable.accessCount];
-	}
-	else
-	{
-		accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedMultipleTimesFormat"), watchVariable.accessCount];
-	}
+	NSString *accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedTimesFormat"), watchVariable.accessCount];
 	
 	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n%@", instruction.text, accessedTimes]];
 	
@@ -365,10 +353,7 @@
 	_foundWatchVariables = [[NSMutableArray alloc] init];
 	_foundWatchVariablesDictionary = [[NSMutableDictionary alloc] init];
 	
-	if (@available(macOS 10.9, *))
-	{
-		_watchActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Watching Data Accesses"];
-	}
+	_watchActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Watching Data Accesses"];
 }
 
 #pragma mark Selection Accessors

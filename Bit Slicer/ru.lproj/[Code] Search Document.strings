@@ -46,12 +46,6 @@
 /* Scope Bar accessory for Round Error label when doing = or != float/double value search; also used for error reporting */
 "searchRoundErrorLabel" = "Погрешность";
 
-/* Display Value Label format for one variable; only used prior to 10.9 */
-"displayingSingleValueLabelFormat" = "Отображено _NUM_ значение";
-
-/* Display Value Label format for multiple variables; only used prior to 10.9 */
-"displayingMultipleValuesLabelFormat" = "Отображено _NUM_ значения";
-
 /* Equals Operator Title */
 "equalsOperatorTitle" = "равно";
 
@@ -129,12 +123,6 @@
 
 /* Alert Message that no Stored Values are available when searching with a stored value token */
 "noStoredValuesAlertMessage" = "Нет сохраненых значений для сравнения. Пожалуйста, сделайте снимок всех значений прежде чем продолжить.";
-
-/* Label format for indicating a single value has been found during a search; only used prior to 10.9 */
-"foundSingleValueLabelFormat" = "Найдено _NUM_ значение…";
-
-/* Label format for indicating multiple values have been found during a search; only used prior to 10.9 */
-"foundMultipleValuesLabelFormat" = "Найдены _NUM_ значения…";
 
 /* Search Finished Notification Title */
 "searchFinishedNotificationTitle" = "Поиск завершен";

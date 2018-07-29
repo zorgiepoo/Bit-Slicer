@@ -101,11 +101,7 @@
 
 			self->_isBusy = YES;
 			 
-			id dumpMemoryActivity = nil;
-			if (@available(macOS 10.9, *))
-			{
-			 	dumpMemoryActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Dumping All Memory"];
-			}
+			id dumpMemoryActivity = [[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiated reason:@"Dumping All Memory"];
 			
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 				BOOL dumpedAllData = ZGDumpAllDataToDirectory(saveURLPath, process, self);
@@ -133,10 +129,7 @@
 
 					if (dumpMemoryActivity != nil)
 					{
-						if (@available(macOS 10.9, *))
-						{
-							[[NSProcessInfo processInfo] endActivity:dumpMemoryActivity];
-						}
+						[[NSProcessInfo processInfo] endActivity:dumpMemoryActivity];
 					}
 				});
 			});
