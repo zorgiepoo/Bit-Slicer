@@ -400,6 +400,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	
 	topSubview.frameSize = topFrame.size;
 	bottomSubview.frame = bottomFrame;
+	[_splitView layout];
 	[_splitView display];
 }
 
@@ -410,6 +411,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	
 	[bottomSubview setHidden:YES];
 	[topSubview setFrameSize:NSMakeSize(topSubview.frame.size.width, _splitView.frame.size.height)];
+	[_splitView layout];
 	[_splitView display];
 }
 
