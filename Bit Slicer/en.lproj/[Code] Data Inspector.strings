@@ -28,3 +28,5 @@
 /* Label for when an internal error occurred during selection */
 "internalError" = "(internal error)";
 
+/* Label for when the bytes selected do not represent a valid form of UTF-8 */
+"invalidUTF8Bytes" = "(bytes are not valid UTF-8)";

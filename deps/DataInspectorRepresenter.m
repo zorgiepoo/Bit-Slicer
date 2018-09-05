@@ -402,6 +402,7 @@ static id floatingPointDescription(const unsigned char *bytes, NSUInteger length
 static NSString * const InspectionErrorNoDataKey =  @"noData";
 static NSString * const InspectionErrorTooMuchKey = @"tooMuchData";
 static NSString * const InspectionErrorTooLittleKey = @"tooLittleData";
+static NSString * const InspectionErrorInvalidUTF8BytesKey = @"invalidUTF8Bytes";
 static NSString * const InspectionErrorNonPwr2Key = @"badByteCount";
 static NSString * const InspectionErrorInternalKey = @"internalError";
 
@@ -503,7 +504,7 @@ static NSAttributedString *inspectionError(NSString *s) {
             if(length == 0) return inspectionError(NSLocalizedStringFromTable(InspectionErrorNoDataKey, ZGDataInspectorLocalizationTable, nil));
             if(length > MAX_EDITABLE_BYTE_COUNT) return inspectionError(NSLocalizedStringFromTable(InspectionErrorTooMuchKey, ZGDataInspectorLocalizationTable, nil));
             NSString *ret = [[NSString alloc] initWithBytes:bytes length:length encoding:NSUTF8StringEncoding];
-            if(ret == nil) return inspectionError(@"(bytes are not valid UTF-8)");
+            if(ret == nil) return inspectionError(NSLocalizedStringFromTable(InspectionErrorInvalidUTF8BytesKey, ZGDataInspectorLocalizationTable, nil));
             if(outIsError) *outIsError = NO;
             return ret;
         }
