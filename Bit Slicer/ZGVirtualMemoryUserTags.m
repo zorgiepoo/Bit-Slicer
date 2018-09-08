@@ -49,11 +49,11 @@ case value: \
 		break;
 
 // Temporary workaround for those not yet on current Xcode (including Travis)
-#ifndef __MAC_10_13_4
-#define __MAC_10_13_4 101304
+#ifndef __MAC_10_14
+#define __MAC_10_14 101400
 #endif
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_13_4
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_14
 #pragma message("Need to update the user tag descriptions")
 #endif
 
@@ -132,6 +132,16 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_LIBNETWORK);
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_AUDIO);
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_VIDEOBITSTREAM, @"Video Bitstream");
+			
+#if defined(MAC_OS_X_VERSION_10_14) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_14
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_XPC, @"Core Media XPC");
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_RPC, @"Core Media RPC");
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_MEMORYPOOL, @"Core Media Memory Pool");
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_READCACHE, @"Core Media Read Cache");
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_CRABS, @"Core Media Crabs");
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_QUICKLOOK_THUMBNAILS);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ACCOUNTS);
+#endif
 	}
 	
 	return userTagDescription;
