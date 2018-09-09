@@ -109,6 +109,7 @@
     [super windowDidLoad];
 	
 	[[[_loggerTextView textStorage] mutableString] setString:_loggerText];
+	[[_loggerTextView textStorage] setForegroundColor:[NSColor textColor]];
 	[_loggerTextView scrollRangeToVisible:NSMakeRange(_loggerText.length, 0)];
 	
 	[self updateDisplay];
@@ -118,6 +119,7 @@
 {
 	[_loggerText setString:@""];
 	[[[_loggerTextView textStorage] mutableString] setString:_loggerText];
+	[[_loggerTextView textStorage] setForegroundColor:[NSColor textColor]];
 	_numberOfMessages = 0;
 	[self updateDisplay];
 }
@@ -145,6 +147,7 @@
 	
 	[_loggerText appendString:newText];
 	[[[_loggerTextView textStorage] mutableString] setString:_loggerText];
+	[[_loggerTextView textStorage] setForegroundColor:[NSColor textColor]];
 	
 	[_loggerTextView scrollRangeToVisible:NSMakeRange(_loggerText.length, 0)];
 	

@@ -1026,7 +1026,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	if (!variable.userAnnotated)
 	{
 		// Clear the description so we can automatically fill it again
-		variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:@""];
+		variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:@"" attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
 		
 		// Update the variable's address
 		ZGDocumentWindowController *windowController = _windowController;
@@ -1090,13 +1090,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		
 		if (variable.fullAttributedDescription.length == 0)
 		{
-			variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:[validDescriptionComponents componentsJoinedByString:@", "]];
+			variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:[validDescriptionComponents componentsJoinedByString:@", "] attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
 		}
 		else
 		{
 			NSString *appendedString = [NSString stringWithFormat:@"\n\n%@", [validDescriptionComponents componentsJoinedByString:@"\n"]];
 			NSMutableAttributedString *newDescription = [variable.fullAttributedDescription mutableCopy];
-			[newDescription appendAttributedString:[[NSAttributedString alloc] initWithString:appendedString]];
+			[newDescription appendAttributedString:[[NSAttributedString alloc] initWithString:appendedString attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}]];
 			variable.fullAttributedDescription = newDescription;
 		}
 	}

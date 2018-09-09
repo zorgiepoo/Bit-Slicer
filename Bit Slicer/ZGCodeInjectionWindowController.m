@@ -61,6 +61,7 @@
 {
 	_suggestedCode = [suggestedCode copy];
 	[_textView.textStorage.mutableString setString:suggestedCode];
+	[_textView.textStorage setForegroundColor:[NSColor textColor]];
 }
 
 - (void)updateSuggestedCode

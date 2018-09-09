@@ -191,9 +191,9 @@
 
 - (void)appendDescription:(NSMutableAttributedString *)description withRegisterEntries:(ZGRegisterEntry *)registerEntries registerLabel:(NSString *)registerLabel boldFont:(NSFont *)boldFont
 {
-	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n\n"]];
-	[description appendAttributedString:[[NSAttributedString alloc] initWithString:registerLabel attributes:@{NSFontAttributeName : boldFont}]];
-	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
+	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n\n" attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}]];
+	[description appendAttributedString:[[NSAttributedString alloc] initWithString:registerLabel attributes:@{NSForegroundColorAttributeName : [NSColor textColor], NSFontAttributeName : boldFont}]];
+	[description appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}]];
 	
 	NSMutableArray<NSString *> *registerLines = [NSMutableArray array];
 	
@@ -221,7 +221,7 @@
 		[registerLines addObject:registerLine];
 	}
 	
-	[description appendAttributedString:[[NSAttributedString alloc] initWithString:[registerLines componentsJoinedByString:@"\n"]]];
+	[description appendAttributedString:[[NSAttributedString alloc] initWithString:[registerLines componentsJoinedByString:@"\n"] attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}]];
 }
 
 - (void)annotateWatchVariableDescription:(ZGWatchVariable *)watchVariable
@@ -248,7 +248,7 @@
 	
 	NSString *accessedTimes = [NSString stringWithFormat:ZGLocalizableWatchVariableString(@"accessedTimesFormat"), watchVariable.accessCount];
 	
-	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n%@", instruction.text, accessedTimes]];
+	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n%@", instruction.text, accessedTimes] attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
 	
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
 	int numberOfGeneralRegisters = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:registersState.is64Bit];

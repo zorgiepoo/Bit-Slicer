@@ -1946,11 +1946,11 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		if (instruction.symbols.length == 0)
 		{
 			instruction.symbols = @""; // in case symbols is nil
-			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.variable.addressStringValue];
+			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.variable.addressStringValue attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
 		}
 		else
 		{
-			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:(NSString * _Nonnull)instruction.symbols];
+			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:(NSString * _Nonnull)instruction.symbols attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
 		}
 	}
 	
