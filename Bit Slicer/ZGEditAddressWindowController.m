@@ -67,12 +67,8 @@
 	
 	[_addressTextField selectText:nil];
 	
-	[NSApp
-	 beginSheet:window
-	 modalForWindow:parentWindow
-	 modalDelegate:self
-	 didEndSelector:nil
-	 contextInfo:NULL];
+	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
+	}];
 }
 
 - (IBAction)editAddress:(id)__unused sender

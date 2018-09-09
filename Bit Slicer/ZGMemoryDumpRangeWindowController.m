@@ -125,12 +125,8 @@
 	_fromAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", requestedAddressRange.location];
 	_toAddressTextField.stringValue = [NSString stringWithFormat:@"0x%llX", requestedAddressRange.location + requestedAddressRange.length];
 	
-	[NSApp
-	 beginSheet:window
-	 modalForWindow:parentWindow
-	 modalDelegate:self
-	 didEndSelector:nil
-	 contextInfo:NULL];
+	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
+	}];
 }
 
 @end

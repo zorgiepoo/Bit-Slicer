@@ -139,12 +139,8 @@
 	_instructions = instructions;
 	_breakPoints = breakPoints;
 	
-	[NSApp
-	 beginSheet:window
-	 modalForWindow:parentWindow
-	 modalDelegate:nil
-	 didEndSelector:nil
-	 contextInfo:NULL];
+	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
+	}];
 }
 
 - (IBAction)injectCode:(id)__unused sender

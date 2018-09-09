@@ -66,15 +66,6 @@
 	_tableView.target = self;
 	_tableView.doubleAction = @selector(changeInstructionSelection:);
 	
-	if (@available(macOS 10.10, *))
-	{
-	}
-	else
-	{
-		[self setNextResponder:[_tableView nextResponder]];
-		[_tableView setNextResponder:self];
-	}
-	
 	[_tableView registerForDraggedTypes:@[ZGVariablePboardType]];
 }
 

@@ -74,12 +74,8 @@
 	
 	_variables = variables;
 	
-	[NSApp
-	 beginSheet:window
-	 modalForWindow:parentWindow
-	 modalDelegate:self
-	 didEndSelector:nil
-	 contextInfo:NULL];
+	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
+	}];
 }
 
 - (IBAction)editVariablesSizes:(id)__unused sender

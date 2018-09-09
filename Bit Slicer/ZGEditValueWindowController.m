@@ -154,12 +154,8 @@
 	_variablesToEdit = variables;
 	_processTask = processTask;
 	
-	[NSApp
-	 beginSheet:window
-	 modalForWindow:parentWindow
-	 modalDelegate:self
-	 didEndSelector:nil
-	 contextInfo:NULL];
+	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
+	}];
 }
 
 - (IBAction)editValues:(id)__unused sender

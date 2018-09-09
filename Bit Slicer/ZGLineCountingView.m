@@ -111,12 +111,7 @@
         NSMutableParagraphStyle *mutableStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [mutableStyle setAlignment:NSRightTextAlignment];
         NSParagraphStyle *paragraphStyle = [mutableStyle copy];
-        NSColor *foregroundColor;
-        if (@available(macOS 10.10, *)) {
-            foregroundColor = [NSColor secondaryLabelColor];
-        } else {
-            foregroundColor = [NSColor colorWithCalibratedWhite:(CGFloat).1 alpha:(CGFloat).8];
-        }
+        NSColor *foregroundColor = [NSColor secondaryLabelColor];
         textAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:self.font, NSFontAttributeName, foregroundColor, NSForegroundColorAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
     }
     

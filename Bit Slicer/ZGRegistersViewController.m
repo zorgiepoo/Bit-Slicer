@@ -88,15 +88,6 @@
 {
 	[super loadView];
 	
-	if (@available(macOS 10.10, *))
-	{
-	}
-	else
-	{
-		[self setNextResponder:[_tableView nextResponder]];
-		[_tableView setNextResponder:self];
-	}
-	
 	[_tableView registerForDraggedTypes:@[ZGVariablePboardType]];
 	
 	ZGAdjustLocalizableWidthsForWindowAndTableColumns(_window, @[_dataTypeTableColumn], @{@"ru" : @[@80.0]});

@@ -55,12 +55,8 @@
 	
 	[_answerTextField selectText:nil];
 	
-	[NSApp
-	 beginSheet:window
-	 modalForWindow:parentWindow
-	 modalDelegate:nil
-	 didEndSelector:nil
-	 contextInfo:NULL];
+	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
+	}];
 	
 	_scriptPrompt = scriptPrompt;
 	_isAttached = YES;

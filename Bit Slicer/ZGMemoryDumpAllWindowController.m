@@ -89,13 +89,9 @@
 		// Dispatch our task later so that the sheet shows up *after* our save panel is dismissed
 		dispatch_async(dispatch_get_main_queue(), ^{
 			NSWindow *window = ZGUnwrapNullableObject(self.window);
-			 
-			[NSApp
-			 beginSheet:window
-			 modalForWindow:parentWindow
-			 modalDelegate:self
-			 didEndSelector:nil
-			 contextInfo:NULL];
+			
+			[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
+			}];
 			 
 			[self->_cancelButton setEnabled:YES];
 

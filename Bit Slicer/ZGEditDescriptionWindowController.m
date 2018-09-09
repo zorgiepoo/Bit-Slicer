@@ -65,12 +65,8 @@
 	[_descriptionTextView scrollRangeToVisible:NSMakeRange(0, 0)];
 	_variable = variable;
 	
-	[NSApp
-	 beginSheet:window
-	 modalForWindow:parentWindow
-	 modalDelegate:self
-	 didEndSelector:nil
-	 contextInfo:NULL];
+	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
+	}];
 }
 
 - (IBAction)editVariableDescription:(id)__unused sender

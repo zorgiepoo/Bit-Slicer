@@ -340,12 +340,8 @@
 	[_progressIndicator startAnimation:nil];
 	[_tableView reloadData];
 	
-	[NSApp
-	 beginSheet:window
-	 modalForWindow:parentWindow
-	 modalDelegate:nil
-	 didEndSelector:nil
-	 contextInfo:NULL];
+	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
+	}];
 	
 	_watchProcess = process;
 	_completionHandler = [completionHandler copy];
