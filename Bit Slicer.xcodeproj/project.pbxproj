@@ -1378,6 +1378,7 @@
 				8D15AC330486D014006FF6A4 /* Frameworks */,
 				770EA827137B74F2007FB85A /* Copy Frameworks */,
 				72DEBBB01ADA0EB80053CD3E /* CopyFiles */,
+				772B7CCD2144186800E993B2 /* Sign Sparkle Tools */,
 			);
 			buildRules = (
 			);
@@ -1520,6 +1521,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		772B7CCD2144186800E993B2 /* Sign Sparkle Tools */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Sign Sparkle Tools";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -n \"$CODE_SIGN_IDENTITY\" ]\nthen\ncodesign --verbose --force -o runtime --sign \"$CODE_SIGN_IDENTITY\" \"$TARGET_BUILD_DIR/$TARGETNAME.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/AutoUpdate\"\ncodesign --verbose --force --deep -o runtime --sign \"$CODE_SIGN_IDENTITY\" \"$TARGET_BUILD_DIR/$TARGETNAME.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Updater.app\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		77E2BBA018FD88A700E41FA0 /* Sources */ = {
