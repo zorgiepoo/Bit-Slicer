@@ -110,6 +110,7 @@
 	if (attributedCredits == nil) return;
 	
 	[_textView.textStorage setAttributedString:attributedCredits];
+	_textView.textColor = [NSColor textColor];
 	[_creditsAndAcknowledgementsButton setTitle:ZGLocalizedStringFromAboutWindowTable(@"acknowledgements")];
 }
 
@@ -171,6 +172,7 @@
 	}
 	
 	[_textView.textStorage setAttributedString:attributedLicense];
+	_textView.textColor = [NSColor textColor];
 	[_creditsAndAcknowledgementsButton setTitle:ZGLocalizedStringFromAboutWindowTable(@"credits")];
 }
 
