@@ -32,7 +32,7 @@
 
 #import "ZGRunAlertPanel.h"
 
-static NSInteger ZGRunAlertPanelWithDefaultAndAlternativeButton(NSString *title, NSString *message, NSString *defaultButtonTitle, NSString *alternativeButtonTitle)
+static NSInteger ZGRunAlertPanelWithDefaultAndAlternativeButton(NSString *title, NSString *message, NSString *defaultButtonTitle, NSString *alternativeButtonTitle, id<NSAlertDelegate> helpDelegate)
 {
 	NSAlert *alert = [[NSAlert alloc] init];
 	
@@ -41,16 +41,26 @@ static NSInteger ZGRunAlertPanelWithDefaultAndAlternativeButton(NSString *title,
 	
 	if (defaultButtonTitle != nil) [alert addButtonWithTitle:defaultButtonTitle];
 	if (alternativeButtonTitle != nil) [alert addButtonWithTitle:alternativeButtonTitle];
+	if (helpDelegate != nil)
+	{
+		[alert setDelegate:helpDelegate];
+		alert.showsHelp = YES;
+	}
 	
 	return [alert runModal];
 }
 
 void ZGRunAlertPanelWithOKButton(NSString *title, NSString *message)
 {
-	ZGRunAlertPanelWithDefaultAndAlternativeButton(title, message, NSLocalizedString(@"OK", nil), nil);
+	ZGRunAlertPanelWithDefaultAndAlternativeButton(title, message, NSLocalizedString(@"OK", nil), nil, nil);
+}
+
+void ZGRunAlertPanelWithOKButtonAndHelp(NSString *title, NSString *message, id<NSAlertDelegate> helpDelegate)
+{
+	ZGRunAlertPanelWithDefaultAndAlternativeButton(title, message, NSLocalizedString(@"OK", nil), nil, helpDelegate);
 }
 
 NSInteger ZGRunAlertPanelWithDefaultAndCancelButton(NSString *title, NSString *message, NSString *defaultButtonTitle)
 {
-	return ZGRunAlertPanelWithDefaultAndAlternativeButton(title, message, defaultButtonTitle, NSLocalizedString(@"Cancel", nil));
+	return ZGRunAlertPanelWithDefaultAndAlternativeButton(title, message, defaultButtonTitle, NSLocalizedString(@"Cancel", nil), nil);
 }

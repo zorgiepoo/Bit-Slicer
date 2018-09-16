@@ -58,7 +58,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZGDocumentWindowController : ZGMemoryWindowController <AGScopeBarDelegate>
+@interface ZGDocumentWindowController : ZGMemoryWindowController <AGScopeBarDelegate, NSAlertDelegate>
 
 @property (readonly, nonatomic) ZGBreakPointController *breakPointController;
 @property (readonly, nonatomic) ZGScriptingInterpreter *scriptingInterpreter;

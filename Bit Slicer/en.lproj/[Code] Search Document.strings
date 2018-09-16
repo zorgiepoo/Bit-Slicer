@@ -166,3 +166,12 @@
 
 /* Label for Storing all Values operation is occuring */
 "storingValuesStatusLabel" = "Storing All Values…";
+
+/* Alert Title indicating that searching is failing */
+"searchFailureAlertTitle" = "Search Failure";
+
+/* Alert Message indicating that searching is failing due to system protections */
+"searchFailureSystemProtectionAlertMessageFormat" = "%@'s memory cannot be searched due to system protections.";
+
+/* Alert Message indicating that searching is failing due to the target runnning with elevated privileges */
+"searchFailureElevatedPrivilegesAlertMessageFormat" = "%@ cannot be searched because it may be running with elevated privileges.";

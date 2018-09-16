@@ -35,6 +35,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 void ZGRunAlertPanelWithOKButton(NSString *title, NSString *message);
+void ZGRunAlertPanelWithOKButtonAndHelp(NSString *title, NSString *message, id<NSAlertDelegate> helpDelegate);
 NSInteger ZGRunAlertPanelWithDefaultAndCancelButton(NSString *title, NSString *message, NSString *defaultButtonTitle);
 
 NS_ASSUME_NONNULL_END

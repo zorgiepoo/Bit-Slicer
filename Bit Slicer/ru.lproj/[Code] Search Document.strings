@@ -165,3 +165,12 @@
 
 /* Label for Storing all Values operation is occuring */
 "storingValuesStatusLabel" = "Сохранение всех значений…";
+
+/* Alert Title indicating that searching is failing */
+"searchFailureAlertTitle" = "Ошибка поиска";
+
+/* Alert Message indicating that searching is failing due to system protections */
+"searchFailureSystemProtectionAlertMessageFormat" = "Память %@ не может быть найдена из-за системных защит.";
+
+/* Alert Message indicating that searching is failing due to the target runnning with elevated privileges */
+"searchFailureElevatedPrivilegesAlertMessageFormat" = "%@ cannot be searched because it may be running with elevated privileges.";

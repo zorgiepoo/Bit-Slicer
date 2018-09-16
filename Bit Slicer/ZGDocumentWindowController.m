@@ -62,6 +62,7 @@
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
 #import "ZGNullability.h"
+#import <libproc.h>
 
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
@@ -1241,21 +1242,103 @@
 	BOOL hasEmptyExpression = (_documentData.searchValue.length == 0);
 	if (!hasEmptyExpression && _searchController.canStartTask && self.currentProcess.valid)
 	{
-		ZGFunctionType functionType = [self selectedFunctionType];
-		if (ZGIsFunctionTypeStore(functionType) && _searchData.savedData == nil)
+		if (self.currentProcess.hasGrantedAccess)
 		{
-			ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"noStoredValuesAlertTitle"), ZGLocalizableSearchDocumentString(@"noStoredValuesAlertMessage"));
+			ZGFunctionType functionType = [self selectedFunctionType];
+			if (ZGIsFunctionTypeStore(functionType) && _searchData.savedData == nil)
+			{
+				ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"noStoredValuesAlertTitle"), ZGLocalizableSearchDocumentString(@"noStoredValuesAlertMessage"));
+			}
+			else
+			{
+				if (_documentData.variables.count == 0)
+				{
+					[[self undoManager] removeAllActions];
+				}
+				
+				[_searchController searchVariablesWithString:_documentData.searchValue withDataType:[self selectedDataType] functionType:functionType allowsNarrowing:YES];
+			}
 		}
 		else
 		{
-			if (_documentData.variables.count == 0)
+			// We failed to grant access to this process the user is trying to search in
+			// Notify the user why this may be the case
+			if ([self isCurrentProcessProtectedByEntitlement])
 			{
-				[[self undoManager] removeAllActions];
+				ZGRunAlertPanelWithOKButtonAndHelp(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureSystemProtectionAlertMessageFormat"), self.currentProcess.name], self);
 			}
-			
-			[_searchController searchVariablesWithString:_documentData.searchValue withDataType:[self selectedDataType] functionType:functionType allowsNarrowing:YES];
+			else
+			{
+				// While we don't show apps that are running as root user, some processes can still require the debugger running as root to access them
+				ZGRunAlertPanelWithOKButton(ZGLocalizableSearchDocumentString(@"searchFailureAlertTitle"), [NSString stringWithFormat:ZGLocalizableSearchDocumentString(@"searchFailureElevatedPrivilegesAlertMessageFormat"), self.currentProcess.name]);
+			}
 		}
 	}
+}
+
+- (BOOL)isCurrentProcessProtectedByEntitlement
+{
+	char pathBuffer[PROC_PIDPATHINFO_MAXSIZE] = {0};
+	int numberOfBytesRead = proc_pidpath(self.currentProcess.processID, pathBuffer, sizeof(pathBuffer));
+	if (numberOfBytesRead > 0)
+	{
+		NSString *path = [[NSString alloc] initWithBytes:pathBuffer length:(NSUInteger)numberOfBytesRead encoding:NSUTF8StringEncoding];
+		if (path != nil)
+		{
+			NSString *codesignPath = @"/usr/bin/codesign";
+			if ([[NSFileManager defaultManager] fileExistsAtPath:codesignPath])
+			{
+				NSTask *codesignTask = [[NSTask alloc] init];
+				codesignTask.launchPath = codesignPath;
+				codesignTask.arguments = @[@"-dv", path];
+				
+				NSPipe *outputPipe = [NSPipe pipe];
+				codesignTask.standardError = outputPipe;
+				
+				@try
+				{
+					[codesignTask launch];
+					[codesignTask waitUntilExit];
+					
+					NSFileHandle *fileHandle = [outputPipe fileHandleForReading];
+					NSData *dataRead = [fileHandle readDataToEndOfFile];
+					if (dataRead != nil)
+					{
+						__block BOOL foundProtection = NO;
+						NSString *contents = [[NSString alloc] initWithData:dataRead encoding:NSUTF8StringEncoding];
+						[contents enumerateLinesUsingBlock:^(NSString * _Nonnull line, BOOL * _Nonnull stop) {
+							NSString *trimmedLine = [line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+							// Google Chrome opted into restrict bit a couple years before 10.14 came about
+							// Apps opting in notarization will have the runtime bit set
+							if ([trimmedLine hasPrefix:@"CodeDirectory"])
+							{
+								if (([trimmedLine containsString:@"restrict"] || [trimmedLine containsString:@"runtime"]))
+								{
+									foundProtection = YES;
+								}
+								*stop = YES;
+							}
+						}];
+						return foundProtection;
+					}
+				}
+				@catch (NSException *exception)
+				{
+					NSLog(@"Failed to execute codesign verification command: %@", exception);
+				}
+			}
+		}
+	}
+	return NO;
+}
+
+// Show help for being unable to search likely due to security protections
+#define SECURITY_PROTECTIONS_HELP_URL @"https://github.com/zorgiepoo/Bit-Slicer/wiki/Security-Protections"
+- (BOOL)alertShowHelp:(NSAlert *)__unused alert
+{
+	[[NSWorkspace sharedWorkspace] openURL:ZGUnwrapNullableObject([NSURL URLWithString:SECURITY_PROTECTIONS_HELP_URL])];
+	// Don't know if YES or NO should be returned -- doesn't seem to matter either way
+	return NO;
 }
 
 - (IBAction)searchPointerToSelectedVariable:(id)__unused sender
