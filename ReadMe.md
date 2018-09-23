@@ -31,11 +31,11 @@ It allows you to cheat in video games by searching and modifying values such as 
 * Undo & Redo many kinds of changes, including searches
 * Evaluate mathematical expressions automatically (eg: in a flash game, search for 58 * 8)
 * Run as a normal user, not as the superuser (root)!
-* Enjoy OS level features such as auto-saving, document versioning, window restoration, notification center, app nap, etc.
-
+* Enjoy OS level features such as auto-saving, document versioning, window restoration, notification center, app nap, dark mode, etc.
 
 ## System Requirements
-* **Current Release**: macOS 10.8 or newer
+* **Current Release**: macOS 10.10 or newer
+* [1.7.8](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.7.8/Bit.Slicer.dmg): macOS 10.8
 * [1.6.2](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.6.2/Bit_Slicer_1.6.2.zip): macOS 10.6.8, a 64-bit intel Mac
 * [1.5.2](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.5.2/Bit_Slicer_1.5.2.zip): macOS 10.6.8
 
