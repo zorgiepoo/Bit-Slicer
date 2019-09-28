@@ -82,11 +82,11 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 	 forKey:ZGIsFrozenKey];
 	
 	[coder
-	 encodeInt32:_type
+	 encodeInt32:(int32_t)_type
 	 forKey:ZGTypeKey];
 	
 	[coder
-	 encodeInt32:_qualifier
+	 encodeInt32:(int32_t)_qualifier
 	 forKey:ZGQualifierKey];
 	
 	[coder
