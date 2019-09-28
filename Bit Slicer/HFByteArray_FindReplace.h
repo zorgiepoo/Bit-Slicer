@@ -33,9 +33,11 @@
 #ifndef HFByteArray_FindReplace_H
 #define HFByteArray_FindReplace_H
 
+#include <stddef.h>
+
 // Fast string-searching function linked from HexFiend's framework
 extern "C" unsigned char* boyer_moore_helper(const unsigned char *haystack, const unsigned char *needle, unsigned long haystack_length, unsigned long needle_length, const unsigned long *char_jump, const unsigned long *match_jump);
 
-void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long needle_length, unsigned long *char_jump, unsigned long *match_jump);
+void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long needle_length, unsigned long *char_jump, size_t char_jump_size, unsigned long *match_jump);
 
 #endif

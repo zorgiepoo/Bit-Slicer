@@ -43,7 +43,7 @@
 
 extern "C" unsigned char* boyer_moore_helper(const unsigned char *haystack, const unsigned char *needle, unsigned long haystack_length, unsigned long needle_length, const unsigned long *char_jump, const unsigned long *match_jump);
 
-extern void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long needle_length, unsigned long *char_jump, unsigned long *match_jump);
+extern void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long needle_length, unsigned long *char_jump, size_t char_jump_size, unsigned long *match_jump);
 
 - (void)setUp
 {
@@ -81,7 +81,7 @@ extern void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigne
 	unsigned long charJump[UCHAR_MAX + 1] = {0};
 	unsigned long *matchJump = static_cast<unsigned long *>(malloc(2 * (dataSize + 1) * sizeof(*matchJump)));
 	
-	ZGPrepareBoyerMooreSearch(bytes, dataSize, charJump, matchJump);
+	ZGPrepareBoyerMooreSearch(bytes, dataSize, charJump, sizeof charJump / sizeof *charJump, matchJump);
 	
 	const unsigned char *foundSubstring = static_cast<const unsigned char *>(dataBytes);
 	unsigned long haystackLengthLeft = size;

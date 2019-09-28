@@ -513,7 +513,7 @@
 	searchData.dataSize -= 2 * 1;
 	
 	ZGSearchResults *equalResults = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
-	XCTAssertEqual(equalResults.addressCount, 3U);
+	XCTAssertEqual(equalResults.addressCount, 4U);
 	
 	ZGSearchResults *notEqualResults = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals);
 	XCTAssertEqual(notEqualResults.addressCount, _data.length / sizeof(unichar) - 3 - 4*5);

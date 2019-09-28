@@ -24,14 +24,14 @@
 #include "HFByteArray_FindReplace.h"
 
 // This portion of code is mostly stripped from a function in Hex Fiend's framework; it's wicked fast.
-void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long needle_length, unsigned long *char_jump, unsigned long *match_jump)
+void ZGPrepareBoyerMooreSearch(const unsigned char *needle, const unsigned long needle_length, unsigned long *char_jump, size_t char_jump_size, unsigned long *match_jump)
 {
 	unsigned long *backup;
 	unsigned long u, ua, ub;
 	backup = match_jump + needle_length + 1;
 	
 	// heuristic #1 setup, simple text search
-	for (u=0; u < sizeof char_jump / sizeof *char_jump; u++)
+	for (u=0; u < char_jump_size; u++)
 	{
 		char_jump[u] = needle_length;
 	}
