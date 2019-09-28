@@ -105,7 +105,7 @@ typedef enum {
 @interface AGScopeBar : NSView
 
 
-@property (nonatomic, readwrite, assign) IBOutlet id<AGScopeBarDelegate> delegate;
+@property (nonatomic, readwrite, unsafe_unretained) IBOutlet id<AGScopeBarDelegate> delegate;
 @property (nonatomic, readwrite, assign) BOOL smartResizeEnabled;
 @property (nonatomic, readwrite, retain) NSView * accessoryView;
 @property (nonatomic, readwrite, copy) NSArray * groups;

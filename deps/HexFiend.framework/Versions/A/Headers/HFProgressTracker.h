@@ -78,7 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
   Set and get the delegate, which may implement the optional methods below.
 */
-@property (nullable, nonatomic, assign) id delegate;
+@property (nullable, nonatomic, unsafe_unretained) id delegate;
 
 @end
 
