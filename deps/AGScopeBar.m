@@ -58,7 +58,7 @@
 
 
 @interface AGScopeBarItem ()
-@property (nonatomic, readwrite, assign) AGScopeBarGroup * group;
+@property (nonatomic, readwrite, unsafe_unretained) AGScopeBarGroup * group;
 @property (nonatomic, readonly) NSButton * button;
 @property (nonatomic, readonly) NSMenuItem * menuItem;
 
@@ -71,7 +71,7 @@
 
 
 @interface AGScopeBarGroup ()
-@property (nonatomic, readwrite, assign) AGScopeBar * scopeBar;
+@property (nonatomic, readwrite, unsafe_unretained) AGScopeBar * scopeBar;
 @property (nonatomic, readwrite, assign) BOOL isCollapsed;
 @property (nonatomic, readonly) NSView * view;
 @property (nonatomic, readonly) NSView * collapsedView;

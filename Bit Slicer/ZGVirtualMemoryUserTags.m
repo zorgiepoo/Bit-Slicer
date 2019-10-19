@@ -53,7 +53,11 @@ case value: \
 #define __MAC_10_14 101400
 #endif
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_14
+#ifndef __MAC_10_15
+#define __MAC_10_15 101500
+#endif
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_15
 #pragma message("Need to update the user tag descriptions")
 #endif
 
@@ -141,6 +145,12 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_CRABS, @"Core Media Crabs");
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_QUICKLOOK_THUMBNAILS);
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ACCOUNTS);
+#endif
+			
+#if defined(MAC_OS_X_VERSION_10_15) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_15
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SANITIZER);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_IOACCELERATOR);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_CM_REGWARP);
 #endif
 	}
 	

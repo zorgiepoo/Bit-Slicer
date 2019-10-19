@@ -118,7 +118,7 @@
 	 forKey:ZGFunctionTypeTagKey];
 	
 	[keyedArchiver
-	 encodeInt32:_searchData.protectionMode
+	 encodeInt32:(int32_t)_searchData.protectionMode
 	 forKey:ZGProtectionModeKey];
     
 	[keyedArchiver

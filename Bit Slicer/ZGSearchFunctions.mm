@@ -340,14 +340,13 @@ ZGSearchResults *_ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *search
 {
 	const unsigned long dataSize = searchData.dataSize;
 	const unsigned char *searchValue = (searchData.bytesSwapped && searchData.swappedValue != nullptr) ? static_cast<const unsigned char *>(searchData.swappedValue) : static_cast<const unsigned char *>(searchData.searchValue);
-	ZGMemorySize dataAlignment = searchData.dataAlignment;
 	
 	return ZGSearchForDataHelper(processTask, searchData, delegate, ^NSData *(ZGMemorySize __unused dataIndex, ZGMemoryAddress address, ZGMemorySize size, void *bytes, void * __unused regionBytes) {
 		// generate the two Boyer-Moore auxiliary buffers
 		unsigned long charJump[UCHAR_MAX + 1] = {0};
 		unsigned long *matchJump = static_cast<unsigned long *>(malloc(2 * (dataSize + 1) * sizeof(*matchJump)));
 		
-		ZGPrepareBoyerMooreSearch(searchValue, dataSize, charJump, matchJump);
+		ZGPrepareBoyerMooreSearch(searchValue, dataSize, charJump, sizeof charJump / sizeof *charJump, matchJump);
 		
 		unsigned char *foundSubstring = static_cast<unsigned char *>(bytes);
 		unsigned long haystackLengthLeft = size;
@@ -363,17 +362,13 @@ ZGSearchResults *_ZGSearchForBytes(ZGMemoryMap processTask, ZGSearchData *search
 			if (foundSubstring == nullptr) break;
 			
 			ZGMemoryAddress foundAddress = address + static_cast<ZGMemoryAddress>(foundSubstring - static_cast<unsigned char *>(bytes));
-			// boyer_moore_helper is only checking 0 .. dataSize-1 characters, so make a check to see if the last characters are equal
-			if (foundAddress % dataAlignment == 0 && foundSubstring[dataSize-1] == searchValue[dataSize-1])
-			{
-				memoryAddresses[numberOfVariablesFound] = static_cast<P>(foundAddress);
-				numberOfVariablesFound++;
+			memoryAddresses[numberOfVariablesFound] = static_cast<P>(foundAddress);
+			numberOfVariablesFound++;
 
-				if (numberOfVariablesFound >= INITIAL_BUFFER_ADDRESSES_CAPACITY)
-				{
-					[resultSet appendBytes:memoryAddresses length:sizeof(memoryAddresses[0]) * numberOfVariablesFound];
-					numberOfVariablesFound = 0;
-				}
+			if (numberOfVariablesFound >= INITIAL_BUFFER_ADDRESSES_CAPACITY)
+			{
+				[resultSet appendBytes:memoryAddresses length:sizeof(memoryAddresses[0]) * numberOfVariablesFound];
+				numberOfVariablesFound = 0;
 			}
 			
 			foundSubstring++;

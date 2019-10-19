@@ -1396,7 +1396,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1000;
+				LastUpgradeCheck = 1100;
 				TargetAttributes = {
 					77E2BBA318FD88A700E41FA0 = {
 						TestTargetID = 8D15AC270486D014006FF6A4;
@@ -1415,18 +1415,16 @@
 			};
 			buildConfigurationList = C05733CB08A9546B00998B17 /* Build configuration list for PBXProject "Bit Slicer" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 1;
 			knownRegions = (
-				English,
-				Japanese,
-				French,
-				German,
 				en,
 				Base,
 				fr,
 				ru,
 				es,
+				ja,
+				de,
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Bit Slicer */;
 			projectDirPath = "";

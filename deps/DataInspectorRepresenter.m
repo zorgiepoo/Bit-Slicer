@@ -126,7 +126,7 @@ enum NumberBase_t {
     }
     
     // Pick an absent inspector type.
-    int x = (enum Endianness_t)(__builtin_ffs((int32_t)(~present))-1);
+    int x = (__builtin_ffs((int32_t)(~present))-1);
     enum Endianness_t y = (enum Endianness_t)(x/eInspectorTypeCount);
     enum InspectorType_t z = x % eInspectorTypeCount;
     
@@ -140,9 +140,9 @@ enum NumberBase_t {
 
 - (void)encodeWithCoder:(NSCoder *)coder {
     HFASSERT([coder allowsKeyedCoding]);
-    [coder encodeInt32:inspectorType forKey:@"InspectorType"];
-    [coder encodeInt32:endianness forKey:@"Endianness"];
-    [coder encodeInt32:numberBase forKey:@"NumberBase"];
+    [coder encodeInt32:(int32_t)inspectorType forKey:@"InspectorType"];
+    [coder encodeInt32:(int32_t)endianness forKey:@"Endianness"];
+    [coder encodeInt32:(int32_t)numberBase forKey:@"NumberBase"];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
