@@ -40,9 +40,9 @@ It allows you to cheat in video games by searching and modifying values such as 
 * [1.5.2](https://github.com/zorgiepoo/Bit-Slicer/releases/download/1.5.2/Bit_Slicer_1.5.2.zip): macOS 10.6.8
 
 ## Support
-* Check the [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) for how to use Bit Slicer
-* Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for discussion and current development
-* Visit the [chat room](http://webchat.freenode.net/?channels=bitslicer) for support or development (#bitslicer on irc.freenode.net). Note availability for support is not 24/7.
+* Read the [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) for how to use Bit Slicer
+* Chat in the [discord room](https://discord.gg/9jWe8Mf) for support or development. Note availability for support is not 24/7.
+* Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for past discussion (no longer used).
 
 ## Contributing
 * Improve the current [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) by fixing errors or by adding content
@@ -52,5 +52,3 @@ It allows you to cheat in video games by searching and modifying values such as 
 * Learn how to build and contribute to the [source code](https://github.com/zorgiepoo/Bit-Slicer/wiki/Source-Code)
 
 Please read this project's [Code Of Conduct](https://github.com/zorgiepoo/Bit-Slicer/blob/master/CODE_OF_CONDUCT.md) residing in the root level of the project.
-
-**Update**: This project may need some help! I cannot guarantee my activeness in reviewing / pulling in future changes, as well as pushing out new releases.
