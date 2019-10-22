@@ -41,7 +41,7 @@ It allows you to cheat in video games by searching and modifying values such as 
 
 ## Support
 * Read the [wiki](https://github.com/zorgiepoo/Bit-Slicer/wiki/) for how to use Bit Slicer
-* Chat in the [discord room](https://discord.gg/9jWe8Mf) for support or development. Note availability for support is not 24/7.
+* Chat in the [discord room](https://discord.gg/qpfdYYw) for support or development. Note availability for support is not 24/7.
 * Visit the [forums](http://portingteam.com/forum/157-bit-slicer/) for past discussion (no longer used).
 
 ## Contributing
