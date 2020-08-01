@@ -185,7 +185,17 @@ bool ZGMemoryProtectionInRegion(ZGMemoryMap processTask, ZGMemoryAddress *addres
 
 bool ZGProtect(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemorySize size, ZGMemoryProtection protection)
 {
-	return (mach_vm_protect(processTask, address, size, FALSE, protection) == KERN_SUCCESS);
+	kern_return_t initialResult = mach_vm_protect(processTask, address, size, FALSE, protection);
+	kern_return_t finalResult;
+	if (initialResult != KERN_SUCCESS)
+	{
+		finalResult = mach_vm_protect(processTask, address, size, FALSE, protection | VM_PROT_COPY);
+	}
+	else
+	{
+		finalResult = initialResult;
+	}
+	return (finalResult == KERN_SUCCESS);
 }
 
 bool ZGSuspendCount(ZGMemoryMap processTask, integer_t *suspendCount)
