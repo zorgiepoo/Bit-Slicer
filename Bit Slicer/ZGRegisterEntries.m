@@ -42,7 +42,7 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 }
 
 #define ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName) \
-{ \
+do { \
 	strncpy((char *)&entries[entryIndex].name, #registerName, sizeof(entries[entryIndex].name)); \
 	entries[entryIndex].name[sizeof(entries[entryIndex].name) - 1] = '\0'; \
 	entries[entryIndex].size = sizeof(threadState.uts.structureType.__##registerName); \
@@ -50,7 +50,7 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 	entries[entryIndex].offset = offsetof(structName, __##registerName); \
 	entries[entryIndex].type = ZGRegisterGeneralPurpose; \
 	entryIndex++; \
-}
+} while(0)
 
 #define ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, x86_thread_state32_t)
 #define ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, x86_thread_state64_t)
@@ -131,7 +131,7 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 }
 
 #define ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, registerName) \
-{ \
+do { \
 	strncpy((char *)&entries[entryIndex].name, #registerName, sizeof(entries[entryIndex].name)); \
 	entries[entryIndex].name[sizeof(entries[entryIndex].name) - 1] = '\0'; \
 	entries[entryIndex].size = sizeof(vectorState.ufs.as64.__fpu_##registerName); \
@@ -139,7 +139,7 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 	memcpy(&entries[entryIndex].value, &vectorState.ufs.as64.__fpu_##registerName, entries[entryIndex].size); \
 	entries[entryIndex].type = ZGRegisterVector; \
 	entryIndex++; \
-}
+} while(0)
 
 + (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
 {

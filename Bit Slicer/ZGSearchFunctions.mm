@@ -1375,7 +1375,7 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 	}
 	else
 	{
-		resultSets = [newResultSets zgFilterUsingBlock:^(NSMutableData *resultSet) {
+		resultSets = [newResultSets zgFilterUsingBlock:^(NSData *resultSet) {
 			return static_cast<BOOL>(resultSet.length != 0);
 		}];
 	}
