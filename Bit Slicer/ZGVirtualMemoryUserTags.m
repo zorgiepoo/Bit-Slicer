@@ -57,7 +57,11 @@ case value: \
 #define __MAC_10_15 101500
 #endif
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_15
+#ifndef __MAC_11_0
+#define __MAC_11_0 110000
+#endif
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_11_0
 #pragma message("Need to update the user tag descriptions")
 #endif
 
@@ -151,6 +155,19 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SANITIZER);
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_IOACCELERATOR);
 			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_CM_REGWARP);
+#endif
+			
+#if defined(MAC_OS_VERSION_11_0) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_EAR_DECODER, @"Embedded Acoustic Recognition Decoder");
+			
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ROSETTA);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ROSETTA_THREAD_CONTEXT);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ROSETTA_INDIRECT_BRANCH_MAP);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ROSETTA_RETURN_STACK);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ROSETTA_EXECUTABLE_HEAP);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ROSETTA_USER_LDT);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ROSETTA_ARENA);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ROSETTA_10);
 #endif
 	}
 	
