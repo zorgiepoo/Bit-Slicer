@@ -62,17 +62,17 @@
 {
 	[super loadView];
 	
-	[_pauseAndUnpauseHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	_pauseAndUnpauseHotKeyRecorder.keyCombo = _debuggerController.pauseAndUnpauseHotKey.keyCombo;
-	
-	[_stepInHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	_stepInHotKeyRecorder.keyCombo = _debuggerController.stepInHotKey.keyCombo;
-	
-	[_stepOverHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	_stepOverHotKeyRecorder.keyCombo = _debuggerController.stepOverHotKey.keyCombo;
-	
-	[_stepOutHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-	_stepOutHotKeyRecorder.keyCombo = _debuggerController.stepOutHotKey.keyCombo;
+//	[_pauseAndUnpauseHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
+//	_pauseAndUnpauseHotKeyRecorder.keyCombo = _debuggerController.pauseAndUnpauseHotKey.keyCombo;
+//	
+//	[_stepInHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
+//	_stepInHotKeyRecorder.keyCombo = _debuggerController.stepInHotKey.keyCombo;
+//	
+//	[_stepOverHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
+//	_stepOverHotKeyRecorder.keyCombo = _debuggerController.stepOverHotKey.keyCombo;
+//	
+//	[_stepOutHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
+//	_stepOutHotKeyRecorder.keyCombo = _debuggerController.stepOutHotKey.keyCombo;
 }
 
 - (void)shortcutRecorder:(SRRecorderControl *)recorder keyComboDidChange:(KeyCombo)newKeyCombo

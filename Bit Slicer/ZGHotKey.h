@@ -32,13 +32,18 @@
 
 #import <Carbon/Carbon.h>
 #import <Foundation/Foundation.h>
-#import <ShortcutRecorder/SRCommon.h>
 #import "ZGHotKeyDelegate.h"
 
 #define INVALID_KEY_CODE -1
 #define INVALID_KEY_MODIFIER 0
 
 NS_ASSUME_NONNULL_BEGIN
+
+typedef struct
+{
+	NSInteger code;
+	NSUInteger flags;
+} KeyCombo;
 
 @interface ZGHotKey : NSObject <NSSecureCoding>
 

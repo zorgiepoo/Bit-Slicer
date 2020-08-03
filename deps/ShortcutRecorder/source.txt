@@ -1,0 +1,4 @@
+Source: https://github.com/Kentzo/ShortcutRecorder.git
+Branch: master
+Commit: 133dd8ec8dc780abd0ccdba1309ea35f7784a439
+Config: Change scheme to build for Release

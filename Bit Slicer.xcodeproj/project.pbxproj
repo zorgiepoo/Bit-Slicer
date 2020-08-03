@@ -35,6 +35,8 @@
 		7235B7A724D7C1260029580A /* yasm in Copy Files */ = {isa = PBXBuildFile; fileRef = 7235B7A524D7C1050029580A /* yasm */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7235B7AC24D7C9940029580A /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7AB24D7C9940029580A /* Python.framework */; };
 		7235B7AD24D7C9A10029580A /* Python.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7AB24D7C9940029580A /* Python.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7235B7AF24D7CE0B0029580A /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */; };
+		7235B7B024D7CE180029580A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		72431BA919BFFB6100418893 /* ZGDataValueExtracting.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162E17D2EF5A009E002A /* ZGDataValueExtracting.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
@@ -126,7 +128,6 @@
 		773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972EF17D2E6AE00B958EE /* mach_excServer.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros -Wno-reserved-id-macro"; }; };
 		773972F217D2E6AE00B958EE /* mach_excUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972F017D2E6AE00B958EE /* mach_excUser.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros -Wno-unused-local-typedef -Wno-reserved-id-macro"; }; };
 		773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */; };
-		773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; };
 		773DE962190F4D130078E8F9 /* ZGScriptPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */; };
 		773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
 		773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
@@ -177,7 +178,6 @@
 		77E2BBD618FD905B00E41FA0 /* ZGRegion.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162417D2EF31009E002A /* ZGRegion.m */; };
 		77E2BBD818FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */; };
 		77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */ = {isa = PBXBuildFile; fileRef = 77E9DBCD181F812E009F4982 /* ZGMachBinary.m */; };
-		77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773972F717D2E80F00B958EE /* ShortcutRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		77F115A817D2E87E009E002A /* VDKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F115A717D2E87E009E002A /* VDKQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */; };
 		77F115AF17D2EAE4009E002A /* bitslicericon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 77F115AD17D2EAE4009E002A /* bitslicericon.iconset */; };
@@ -256,10 +256,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				7235B7B024D7CE180029580A /* ShortcutRecorder.framework in Copy Frameworks */,
 				7235B7AD24D7C9A10029580A /* Python.framework in Copy Frameworks */,
 				7278DC051E4A968A00C37150 /* Sparkle.framework in Copy Frameworks */,
 				72030C7C1B055B3500A5621C /* DDMathParser.framework in Copy Frameworks */,
-				77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */,
 				773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -319,6 +319,7 @@
 		7235B7A324D7BF980029580A /* libudis86.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libudis86.a; path = deps/udis86/udis86/libudis86.a; sourceTree = "<group>"; };
 		7235B7A524D7C1050029580A /* yasm */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = yasm; path = deps/yasm/yasm; sourceTree = "<group>"; };
 		7235B7AB24D7C9940029580A /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = deps/python/Python.framework; sourceTree = "<group>"; };
+		7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = deps/ShortcutRecorder/ShortcutRecorder.framework; sourceTree = "<group>"; };
 		72456B5A204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Preferences.strings"; sourceTree = "<group>"; };
 		72456B5D204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Search Document.strings"; sourceTree = "<group>"; };
 		72456B5E204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Dump All Memory.strings"; sourceTree = "<group>"; };
@@ -569,7 +570,6 @@
 		773972F017D2E6AE00B958EE /* mach_excUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excUser.c; path = deps/mach_exc/mach_excUser.c; sourceTree = "<group>"; usesTabs = 1; };
 		773972F417D2E7B600B958EE /* DataInspectorRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DataInspectorRepresenter.h; path = deps/DataInspectorRepresenter.h; sourceTree = "<group>"; usesTabs = 0; };
 		773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DataInspectorRepresenter.m; path = deps/DataInspectorRepresenter.m; sourceTree = "<group>"; usesTabs = 0; };
-		773972F717D2E80F00B958EE /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = deps/ShortcutRecorder.framework; sourceTree = "<group>"; };
 		773DE95F190F4D130078E8F9 /* ZGScriptPreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPreferencesViewController.h; path = "Bit Slicer/ZGScriptPreferencesViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPreferencesViewController.m; path = "Bit Slicer/ZGScriptPreferencesViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
 		773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreSymbolication.framework; path = /System/Library/PrivateFrameworks/CoreSymbolication.framework; sourceTree = "<absolute>"; };
@@ -745,9 +745,9 @@
 				7235B7AC24D7C9940029580A /* Python.framework in Frameworks */,
 				72030C7A1B0558F800A5621C /* DDMathParser.framework in Frameworks */,
 				7235B7A424D7BF980029580A /* libudis86.a in Frameworks */,
-				773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */,
 				773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */,
 				7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */,
+				7235B7AF24D7CE0B0029580A /* ShortcutRecorder.framework in Frameworks */,
 				773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -830,12 +830,12 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */,
 				7235B7AB24D7C9940029580A /* Python.framework */,
 				7278DC031E4A967700C37150 /* Sparkle.framework */,
 				773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */,
 				72030C791B0558F800A5621C /* DDMathParser.framework */,
 				773E8B031821DE5300D1A71A /* HexFiend.framework */,
-				773972F717D2E80F00B958EE /* ShortcutRecorder.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2485,6 +2485,7 @@
 					"$(PROJECT_DIR)/deps",
 					"$(PROJECT_DIR)/deps/Sparkle",
 					"$(PROJECT_DIR)/deps/python",
+					"$(PROJECT_DIR)/deps/ShortcutRecorder",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -2590,6 +2591,7 @@
 					"$(PROJECT_DIR)/deps",
 					"$(PROJECT_DIR)/deps/Sparkle",
 					"$(PROJECT_DIR)/deps/python",
+					"$(PROJECT_DIR)/deps/ShortcutRecorder",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
@@ -2675,7 +2677,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				ONLY_ACTIVE_ARCH = YES;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PROVISIONING_PROFILE = "";
@@ -2711,7 +2713,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
