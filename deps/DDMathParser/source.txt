@@ -1,0 +1,4 @@
+Source: https://github.com/zorgiepoo/DDMathParser
+Branch: bit-slicer
+Commit: 4a712ee5be91e6055322c21c623b20d3dd717ab1
+Config: Build with DDMathParser-release scheme
