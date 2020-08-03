@@ -1,0 +1,5 @@
+Patches pending for arm64:
+https://github.com/python/cpython/pull/21564
+https://github.com/python/cpython/pull/21577
+https://github.com/python/cpython/pull/21249
+https://github.com/python/cpython/pull/21114
