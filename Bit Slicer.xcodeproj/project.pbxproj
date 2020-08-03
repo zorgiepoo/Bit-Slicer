@@ -30,6 +30,11 @@
 		7231440519C57A5300FBE342 /* ZGRegistersState.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440419C57A5300FBE342 /* ZGRegistersState.m */; };
 		7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440719C607C700FBE342 /* ZGWatchVariable.m */; };
 		7231440E19C6230F00FBE342 /* [Code] Watch Variable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 7231440C19C6230F00FBE342 /* [Code] Watch Variable.stringsdict */; };
+		7235B7A424D7BF980029580A /* libudis86.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7A324D7BF980029580A /* libudis86.a */; };
+		7235B7A624D7C1050029580A /* yasm in Resources */ = {isa = PBXBuildFile; fileRef = 7235B7A524D7C1050029580A /* yasm */; };
+		7235B7A724D7C1260029580A /* yasm in Copy Files */ = {isa = PBXBuildFile; fileRef = 7235B7A524D7C1050029580A /* yasm */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		7235B7A924D7C8370029580A /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7A824D7C8370029580A /* Python.framework */; };
+		7235B7AA24D7C8450029580A /* Python.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7A824D7C8370029580A /* Python.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		72431BA919BFFB6100418893 /* ZGDataValueExtracting.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162E17D2EF5A009E002A /* ZGDataValueExtracting.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
@@ -97,7 +102,6 @@
 		72DBC8F01B7657F20092ED75 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC8EF1B7657F20092ED75 /* LICENSE */; };
 		72DBC91F1B7690BA0092ED75 /* [Code] About Window.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72DBC91D1B7690BA0092ED75 /* [Code] About Window.strings */; };
 		72DBC9541B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */; };
-		72DEBBB11ADA0ED30053CD3E /* yasm in CopyFiles */ = {isa = PBXBuildFile; fileRef = 77F115A917D2E8AC009E002A /* yasm */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		770136EA192309740072A192 /* ZGPyVMProtModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 770136E9192309740072A192 /* ZGPyVMProtModule.m */; };
 		770F283E18827D1B001B828C /* ZGBreakPointConditionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F283C18827D1B001B828C /* ZGBreakPointConditionViewController.m */; };
 		770F284218832132001B828C /* ZGBreakPointCondition.m in Sources */ = {isa = PBXBuildFile; fileRef = 770F284118832132001B828C /* ZGBreakPointCondition.m */; };
@@ -117,8 +121,6 @@
 		772D1217190D85CC00800B1B /* ZGHotKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 772D1216190D85CC00800B1B /* ZGHotKey.m */; };
 		772D121D190E008500800B1B /* ZGUpdatePreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 772D121B190E008500800B1B /* ZGUpdatePreferencesViewController.m */; };
 		772D1268190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 772D1266190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m */; };
-		772D88DC210D613400AF41B7 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 772D88DB210D613400AF41B7 /* Python.framework */; };
-		772D88DD210D614E00AF41B7 /* Python.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 772D88DB210D613400AF41B7 /* Python.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */; };
 		7735B05518DAB3E8000371AA /* ZGMemoryNavigationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7735B05418DAB3E8000371AA /* ZGMemoryNavigationWindowController.m */; };
 		773972F117D2E6AE00B958EE /* mach_excServer.c in Sources */ = {isa = PBXBuildFile; fileRef = 773972EF17D2E6AE00B958EE /* mach_excServer.c */; settings = {COMPILER_FLAGS = "-Wno-unused-macros -Wno-reserved-id-macro"; }; };
@@ -128,7 +130,6 @@
 		773DE962190F4D130078E8F9 /* ZGScriptPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */; };
 		773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
 		773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
-		773E8B061821DE9300D1A71A /* libudis86.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B051821DE9300D1A71A /* libudis86.a */; };
 		773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */; };
 		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -Wno-semicolon-before-method-body"; }; };
@@ -238,14 +239,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		72DEBBB01ADA0EB80053CD3E /* CopyFiles */ = {
+		72DEBBB01ADA0EB80053CD3E /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				72DEBBB11ADA0ED30053CD3E /* yasm in CopyFiles */,
+				7235B7A724D7C1260029580A /* yasm in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		770EA827137B74F2007FB85A /* Copy Frameworks */ = {
@@ -254,7 +256,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				772D88DD210D614E00AF41B7 /* Python.framework in Copy Frameworks */,
+				7235B7AA24D7C8450029580A /* Python.framework in Copy Frameworks */,
 				7278DC051E4A968A00C37150 /* Sparkle.framework in Copy Frameworks */,
 				72030C7C1B055B3500A5621C /* DDMathParser.framework in Copy Frameworks */,
 				77F115A417D2E834009E002A /* ShortcutRecorder.framework in Copy Frameworks */,
@@ -310,6 +312,13 @@
 		7231440619C607C700FBE342 /* ZGWatchVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGWatchVariable.h; path = "Bit Slicer/ZGWatchVariable.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7231440719C607C700FBE342 /* ZGWatchVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGWatchVariable.m; path = "Bit Slicer/ZGWatchVariable.m"; sourceTree = "<group>"; usesTabs = 1; };
 		7231440D19C6230F00FBE342 /* en */ = {isa = PBXFileReference; lastKnownFileType = text; name = en; path = "Bit Slicer/en.lproj/[Code] Watch Variable.stringsdict"; sourceTree = "<group>"; };
+		7235B79F24D7BF650029580A /* udis86.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = udis86.h; path = deps/udis86/udis86/udis86.h; sourceTree = "<group>"; };
+		7235B7A024D7BF770029580A /* extern.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = extern.h; path = deps/udis86/udis86/libudis86/extern.h; sourceTree = "<group>"; };
+		7235B7A124D7BF770029580A /* types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = types.h; path = deps/udis86/udis86/libudis86/types.h; sourceTree = "<group>"; };
+		7235B7A224D7BF770029580A /* itab.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = itab.h; path = deps/udis86/udis86/libudis86/itab.h; sourceTree = "<group>"; };
+		7235B7A324D7BF980029580A /* libudis86.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libudis86.a; path = deps/udis86/udis86/libudis86.a; sourceTree = "<group>"; };
+		7235B7A524D7C1050029580A /* yasm */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = yasm; path = deps/yasm/yasm; sourceTree = "<group>"; };
+		7235B7A824D7C8370029580A /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = deps/Python.framework; sourceTree = "<group>"; };
 		72456B5A204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Preferences.strings"; sourceTree = "<group>"; };
 		72456B5D204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Search Document.strings"; sourceTree = "<group>"; };
 		72456B5E204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Dump All Memory.strings"; sourceTree = "<group>"; };
@@ -550,19 +559,14 @@
 		772D121B190E008500800B1B /* ZGUpdatePreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGUpdatePreferencesViewController.m; path = "Bit Slicer/ZGUpdatePreferencesViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
 		772D1265190E0D8600800B1B /* ZGHotKeyPreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGHotKeyPreferencesViewController.h; path = "Bit Slicer/ZGHotKeyPreferencesViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		772D1266190E0D8600800B1B /* ZGHotKeyPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGHotKeyPreferencesViewController.m; path = "Bit Slicer/ZGHotKeyPreferencesViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
-		772D88DB210D613400AF41B7 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = deps/Python.framework; sourceTree = "<group>"; };
 		772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGSearchProgressDelegate.h; path = "Bit Slicer/ZGSearchProgressDelegate.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7730999A18660A29008B71DA /* ZGDocumentOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGDocumentOptionsViewController.h; path = "Bit Slicer/ZGDocumentOptionsViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7730999B18660A29008B71DA /* ZGDocumentOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGDocumentOptionsViewController.m; path = "Bit Slicer/ZGDocumentOptionsViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
 		7735B05318DAB3E8000371AA /* ZGMemoryNavigationWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMemoryNavigationWindowController.h; path = "Bit Slicer/ZGMemoryNavigationWindowController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		7735B05418DAB3E8000371AA /* ZGMemoryNavigationWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMemoryNavigationWindowController.m; path = "Bit Slicer/ZGMemoryNavigationWindowController.m"; sourceTree = "<group>"; usesTabs = 1; };
-		773972DC17D2E67D00B958EE /* extern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = extern.h; path = deps/libudis86/extern.h; sourceTree = "<group>"; };
-		773972E017D2E67D00B958EE /* itab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = itab.h; path = deps/libudis86/itab.h; sourceTree = "<group>"; };
-		773972E517D2E67D00B958EE /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = deps/libudis86/types.h; sourceTree = "<group>"; };
 		773972EE17D2E6AE00B958EE /* mach_exc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mach_exc.h; path = deps/mach_exc/mach_exc.h; sourceTree = "<group>"; usesTabs = 1; };
 		773972EF17D2E6AE00B958EE /* mach_excServer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excServer.c; path = deps/mach_exc/mach_excServer.c; sourceTree = "<group>"; usesTabs = 1; };
 		773972F017D2E6AE00B958EE /* mach_excUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mach_excUser.c; path = deps/mach_exc/mach_excUser.c; sourceTree = "<group>"; usesTabs = 1; };
-		773972F317D2E70400B958EE /* udis86.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = udis86.h; path = deps/udis86.h; sourceTree = "<group>"; };
 		773972F417D2E7B600B958EE /* DataInspectorRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DataInspectorRepresenter.h; path = deps/DataInspectorRepresenter.h; sourceTree = "<group>"; usesTabs = 0; };
 		773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DataInspectorRepresenter.m; path = deps/DataInspectorRepresenter.m; sourceTree = "<group>"; usesTabs = 0; };
 		773972F717D2E80F00B958EE /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = deps/ShortcutRecorder.framework; sourceTree = "<group>"; };
@@ -570,9 +574,7 @@
 		773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPreferencesViewController.m; path = "Bit Slicer/ZGScriptPreferencesViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
 		773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreSymbolication.framework; path = /System/Library/PrivateFrameworks/CoreSymbolication.framework; sourceTree = "<absolute>"; };
 		773E8B031821DE5300D1A71A /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend.framework; sourceTree = "<group>"; };
-		773E8B051821DE9300D1A71A /* libudis86.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libudis86.a; path = deps/libudis86.a; sourceTree = "<group>"; };
 		773E8B091821E01200D1A71A /* CoreSymbolication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreSymbolication.h; path = deps/CoreSymbolication/CoreSymbolication.h; sourceTree = "<group>"; usesTabs = 1; };
-		7743F9C518024CE400DBC19A /* python3.3 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = python3.3; path = deps/python/lib/python3.3; sourceTree = "<group>"; };
 		774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyKeyCodeModule.m; path = "Bit Slicer/ZGPyKeyCodeModule.m"; sourceTree = "<group>"; usesTabs = 1; };
 		774B5EE71915362900D7AA69 /* ZGPyKeyCodeModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyKeyCodeModule.h; path = "Bit Slicer/ZGPyKeyCodeModule.h"; sourceTree = "<group>"; usesTabs = 1; };
 		77607AAF185CD50100AC532B /* AGScopeBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AGScopeBar.h; path = deps/AGScopeBar.h; sourceTree = "<group>"; usesTabs = 1; };
@@ -630,7 +632,6 @@
 		77F115A517D2E865009E002A /* HFLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HFLineCountingView.h; sourceTree = "<group>"; usesTabs = 1; };
 		77F115A617D2E87E009E002A /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VDKQueue.h; path = deps/VDKQueue.h; sourceTree = "<group>"; };
 		77F115A717D2E87E009E002A /* VDKQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VDKQueue.m; path = deps/VDKQueue.m; sourceTree = "<group>"; };
-		77F115A917D2E8AC009E002A /* yasm */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = yasm; path = deps/yasm; sourceTree = "<group>"; };
 		77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = bitslicerdocicon.iconset; path = "Bit Slicer/bitslicerdocicon.iconset"; sourceTree = "<group>"; };
 		77F115AD17D2EAE4009E002A /* bitslicericon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = bitslicericon.iconset; path = "Bit Slicer/bitslicericon.iconset"; sourceTree = "<group>"; };
 		77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Bit_Slicer-Info.plist"; path = "Bit Slicer/Bit_Slicer-Info.plist"; sourceTree = "<group>"; };
@@ -741,12 +742,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				772D88DC210D613400AF41B7 /* Python.framework in Frameworks */,
+				7235B7A924D7C8370029580A /* Python.framework in Frameworks */,
 				72030C7A1B0558F800A5621C /* DDMathParser.framework in Frameworks */,
+				7235B7A424D7BF980029580A /* libudis86.a in Frameworks */,
 				773972F917D2E80F00B958EE /* ShortcutRecorder.framework in Frameworks */,
 				773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */,
 				7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */,
-				773E8B061821DE9300D1A71A /* libudis86.a in Frameworks */,
 				773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -812,11 +813,10 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				7743F9C518024CE400DBC19A /* python3.3 */,
+				7235B7A524D7C1050029580A /* yasm */,
 				77DA9D0F180063A600549A37 /* Debugger Icons */,
 				77988F18185803DA00476A37 /* Document Icons */,
 				722CAA5D19AD4AF2009C6AAE /* Preference Icons */,
-				77F115A917D2E8AC009E002A /* yasm */,
 				77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */,
 				77F115AD17D2EAE4009E002A /* bitslicericon.iconset */,
 				77F115B017D2EAF3009E002A /* Bit_Slicer-Info.plist */,
@@ -830,7 +830,7 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				772D88DB210D613400AF41B7 /* Python.framework */,
+				7235B7A824D7C8370029580A /* Python.framework */,
 				7278DC031E4A967700C37150 /* Sparkle.framework */,
 				773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */,
 				72030C791B0558F800A5621C /* DDMathParser.framework */,
@@ -849,6 +849,18 @@
 				722CAA5819AD4AED009C6AAE /* scripts@2x.png */,
 			);
 			name = "Preference Icons";
+			sourceTree = "<group>";
+		};
+		7235B79E24D7BE9C0029580A /* udis86 */ = {
+			isa = PBXGroup;
+			children = (
+				7235B7A324D7BF980029580A /* libudis86.a */,
+				7235B79F24D7BF650029580A /* udis86.h */,
+				7235B7A024D7BF770029580A /* extern.h */,
+				7235B7A224D7BF770029580A /* itab.h */,
+				7235B7A124D7BF770029580A /* types.h */,
+			);
+			name = udis86;
 			sourceTree = "<group>";
 		};
 		72D051C619609C0A00EC532A /* Nibs */ = {
@@ -997,7 +1009,7 @@
 			children = (
 				773E8B0B1821E01700D1A71A /* Symbolication */,
 				7701EF411696A29100877373 /* mach_exc */,
-				77329B74168D0E16007DCAE2 /* libudis86 */,
+				7235B79E24D7BE9C0029580A /* udis86 */,
 				77F1163E17D2EF9E009E002A /* ZGDebuggerController.h */,
 				77F1163F17D2EF9E009E002A /* ZGDebuggerController.m */,
 				779C6CC118E7309B0076D647 /* ZGDebuggerUtilities.h */,
@@ -1033,18 +1045,6 @@
 				77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */,
 			);
 			name = Debugger;
-			sourceTree = "<group>";
-		};
-		77329B74168D0E16007DCAE2 /* libudis86 */ = {
-			isa = PBXGroup;
-			children = (
-				773E8B051821DE9300D1A71A /* libudis86.a */,
-				773972F317D2E70400B958EE /* udis86.h */,
-				773972DC17D2E67D00B958EE /* extern.h */,
-				773972E017D2E67D00B958EE /* itab.h */,
-				773972E517D2E67D00B958EE /* types.h */,
-			);
-			name = libudis86;
 			sourceTree = "<group>";
 		};
 		7739728017D26A1600B958EE /* Scripting */ = {
@@ -1377,7 +1377,7 @@
 				8D15AC300486D014006FF6A4 /* Sources */,
 				8D15AC330486D014006FF6A4 /* Frameworks */,
 				770EA827137B74F2007FB85A /* Copy Frameworks */,
-				72DEBBB01ADA0EB80053CD3E /* CopyFiles */,
+				72DEBBB01ADA0EB80053CD3E /* Copy Files */,
 				772B7CCD2144186800E993B2 /* Sign Sparkle Tools */,
 			);
 			buildRules = (
@@ -1454,6 +1454,7 @@
 				724A9F2819A1657500E72C9D /* [Code] Script Preferences.strings in Resources */,
 				726CA2CB19606E2200A6AD40 /* Edit Address Dialog.xib in Resources */,
 				724A9F4E19A8EDD700E72C9D /* [Code] Logger Window.stringsdict in Resources */,
+				7235B7A624D7C1050029580A /* yasm in Resources */,
 				726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */,
 				722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */,
 				77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */,
@@ -2517,6 +2518,7 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
+					"$(PROJECT_DIR)/deps/udis86/udis86",
 				);
 				OTHER_CFLAGS = "-D_BSDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zgcoder.BitSlicer;
@@ -2618,6 +2620,7 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
+					"$(PROJECT_DIR)/deps/udis86/udis86",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.zgcoder.BitSlicer;
 				PRODUCT_NAME = "Bit Slicer";

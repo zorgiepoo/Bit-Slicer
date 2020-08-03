@@ -1,0 +1,2 @@
+Source: http://sourceforge.net/projects/udis86/files/udis86/1.7/udis86-1.7.2.tar.gz/download
+Config: make CFLAGS="-mmacosx-version-min=10.10 -arch x86_64 -arch arm64"
