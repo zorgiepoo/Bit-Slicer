@@ -31,7 +31,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Python/Python.h"
+#import "pythonlib.h"
 #import "VDKQueue.h"
 #import "ZGMemoryTypes.h"
 #import "ZGRegisterEntries.h"
@@ -77,7 +77,7 @@ extern NSString *ZGScriptDefaultApplicationEditorKey;
 - (void)handleScriptPromptHash:(NSNumber *)scriptPromptHash withUserNotificationReply:(nullable NSString *)reply;
 
 - (void)handleDataAddress:(ZGMemoryAddress)dataAddress accessedFromInstructionAddress:(ZGMemoryAddress)instructionAddress registersState:(ZGRegistersState *)registersState callback:(PyObject *)callback sender:(id)sender;
-- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState callback:(nullable PyObject *)callback sender:(id)sender;
+- (void)handleInstructionBreakPoint:(ZGBreakPoint *)breakPoint withRegistersState:(ZGRegistersState *)registersState callback:(PyObject * _Nullable)callback sender:(id)sender;
 
 - (void)handleHotKeyTriggerWithInternalID:(UInt32)hotKeyID callback:(PyObject *)callback sender:(id)sender;
 

@@ -31,7 +31,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Python/Python.h"
+#import "pythonlib.h"
 
 @class ZGPyVirtualMemory;
 @class ZGPyDebugger;

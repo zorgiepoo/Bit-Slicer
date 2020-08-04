@@ -44,7 +44,8 @@
 #import "ZGNullability.h"
 
 #import <pthread.h>
-#import "Python/structmember.h"
+//#import "Python/structmember.h"
+#import "pythonlib.h"
 
 @implementation ZGScriptingInterpreter
 {

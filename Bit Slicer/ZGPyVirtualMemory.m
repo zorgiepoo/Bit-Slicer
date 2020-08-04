@@ -42,7 +42,8 @@
 #import "ZGMachBinary.h"
 #import "ZGDataValueExtracting.h"
 #import "ZGVariableDataInfo.h"
-#import "Python/structmember.h"
+//#import "Python/structmember.h"
+#import "pythonlib.h"
 
 typedef struct
 {
