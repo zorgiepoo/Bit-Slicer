@@ -1,0 +1,4 @@
+Source: https://github.com/ridiculousfish/HexFiend.git
+Commit: b86a0d28e4b792b01dd5b806cd4cb684d8a34d40
+Branch: master
+Config: Use Framework Only (Release) scheme, fix warnings, update HFLineCountingView.h, and check if anything has changed in the classes Bit Slicer overrides compared to official repository.

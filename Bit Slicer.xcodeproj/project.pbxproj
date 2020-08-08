@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		72030ADC1B00191400A5621C /* ZGScriptingInterpreter.m in Sources */ = {isa = PBXBuildFile; fileRef = 72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */; };
+		721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
+		7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7216F7D01AC66133005288A8 /* dsa_pub.pem */; };
 		722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5519AD4AED009C6AAE /* hotkey.png */; };
 		722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 722CAA5619AD4AED009C6AAE /* hotkey@2x.png */; };
@@ -130,8 +132,6 @@
 		773972F617D2E7B600B958EE /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */; };
 		773DE962190F4D130078E8F9 /* ZGScriptPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */; };
 		773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */; };
-		773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
-		773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */; };
 		77607AB1185CD50100AC532B /* AGScopeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 77607AB0185CD50100AC532B /* AGScopeBar.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -Wno-semicolon-before-method-body"; }; };
 		7768064018B96A64007F2CAF /* ZGThreadStates.c in Sources */ = {isa = PBXBuildFile; fileRef = 7768063E18B96A64007F2CAF /* ZGThreadStates.c */; };
@@ -160,8 +160,6 @@
 		77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D081800639E00549A37 /* stepin.pdf */; };
 		77DA9D0D1800639E00549A37 /* stepout.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D091800639E00549A37 /* stepout.pdf */; };
 		77DA9D0E1800639E00549A37 /* stepover.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 77DA9D0A1800639E00549A37 /* stepover.pdf */; };
-		77E133FE19312AD500B5B799 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; };
-		77E1340019312AFE00B5B799 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 773E8B031821DE5300D1A71A /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		77E1340119312B1700B5B799 /* ZGSearchData.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1160E17D2EED6009E002A /* ZGSearchData.m */; };
 		77E1340219312B1F00B5B799 /* ZGSearchResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161417D2EEEC009E002A /* ZGSearchResults.m */; };
 		77E1340319312B2800B5B799 /* ZGSearchProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1161117D2EEE1009E002A /* ZGSearchProgress.m */; };
@@ -256,10 +254,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */,
 				7235B7B324D7D9C30029580A /* DDMathParser.framework in Copy Frameworks */,
 				7235B7B024D7CE180029580A /* ShortcutRecorder.framework in Copy Frameworks */,
 				7278DC051E4A968A00C37150 /* Sparkle.framework in Copy Frameworks */,
-				773E8B0C1821E45900D1A71A /* HexFiend.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -271,7 +269,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				7235B7B424D7D9EA0029580A /* DDMathParser.framework in Copy Frameworks */,
-				77E1340019312AFE00B5B799 /* HexFiend.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -281,6 +278,8 @@
 /* Begin PBXFileReference section */
 		72030ADA1B00191400A5621C /* ZGScriptingInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptingInterpreter.h; path = "Bit Slicer/ZGScriptingInterpreter.h"; sourceTree = "<group>"; };
 		72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptingInterpreter.m; path = "Bit Slicer/ZGScriptingInterpreter.m"; sourceTree = "<group>"; };
+		721594FD24DF36360027F600 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend/HexFiend.framework; sourceTree = "<group>"; };
+		721594FF24DF36460027F600 /* HFLineCountingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HexFiend/HFLineCountingView.h; sourceTree = "<group>"; };
 		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
 		722CAA5519AD4AED009C6AAE /* hotkey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hotkey.png; path = "Bit Slicer/preficons/hotkey.png"; sourceTree = "<group>"; };
 		722CAA5619AD4AED009C6AAE /* hotkey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "hotkey@2x.png"; path = "Bit Slicer/preficons/hotkey@2x.png"; sourceTree = "<group>"; };
@@ -574,7 +573,6 @@
 		773DE95F190F4D130078E8F9 /* ZGScriptPreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPreferencesViewController.h; path = "Bit Slicer/ZGScriptPreferencesViewController.h"; sourceTree = "<group>"; usesTabs = 1; };
 		773DE960190F4D130078E8F9 /* ZGScriptPreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPreferencesViewController.m; path = "Bit Slicer/ZGScriptPreferencesViewController.m"; sourceTree = "<group>"; usesTabs = 1; };
 		773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreSymbolication.framework; path = /System/Library/PrivateFrameworks/CoreSymbolication.framework; sourceTree = "<absolute>"; };
-		773E8B031821DE5300D1A71A /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend.framework; sourceTree = "<group>"; };
 		773E8B091821E01200D1A71A /* CoreSymbolication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreSymbolication.h; path = deps/CoreSymbolication/CoreSymbolication.h; sourceTree = "<group>"; usesTabs = 1; };
 		774B5EE51915361400D7AA69 /* ZGPyKeyCodeModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGPyKeyCodeModule.m; path = "Bit Slicer/ZGPyKeyCodeModule.m"; sourceTree = "<group>"; usesTabs = 1; };
 		774B5EE71915362900D7AA69 /* ZGPyKeyCodeModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGPyKeyCodeModule.h; path = "Bit Slicer/ZGPyKeyCodeModule.h"; sourceTree = "<group>"; usesTabs = 1; };
@@ -630,7 +628,6 @@
 		77E2BBD718FDC45F00E41FA0 /* PointerFunctionSubstitutionTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PointerFunctionSubstitutionTest.m; sourceTree = "<group>"; usesTabs = 1; };
 		77E9DBCC181F812E009F4982 /* ZGMachBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGMachBinary.h; path = "Bit Slicer/ZGMachBinary.h"; sourceTree = "<group>"; usesTabs = 1; };
 		77E9DBCD181F812E009F4982 /* ZGMachBinary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGMachBinary.m; path = "Bit Slicer/ZGMachBinary.m"; sourceTree = "<group>"; usesTabs = 1; };
-		77F115A517D2E865009E002A /* HFLineCountingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HFLineCountingView.h; sourceTree = "<group>"; usesTabs = 1; };
 		77F115A617D2E87E009E002A /* VDKQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VDKQueue.h; path = deps/VDKQueue.h; sourceTree = "<group>"; };
 		77F115A717D2E87E009E002A /* VDKQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VDKQueue.m; path = deps/VDKQueue.m; sourceTree = "<group>"; };
 		77F115AC17D2EAE4009E002A /* bitslicerdocicon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = bitslicerdocicon.iconset; path = "Bit Slicer/bitslicerdocicon.iconset"; sourceTree = "<group>"; };
@@ -734,7 +731,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				77E2BBD518FD904400E41FA0 /* CoreSymbolication.framework in Frameworks */,
-				77E133FE19312AD500B5B799 /* HexFiend.framework in Frameworks */,
 				7235B7B524D7D9F40029580A /* DDMathParser.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -744,8 +740,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				7235B7B224D7D9B10029580A /* DDMathParser.framework in Frameworks */,
+				721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */,
 				7235B7A424D7BF980029580A /* libudis86.a in Frameworks */,
-				773E8B041821DE5300D1A71A /* HexFiend.framework in Frameworks */,
 				7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */,
 				7235B7AF24D7CE0B0029580A /* ShortcutRecorder.framework in Frameworks */,
 				773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */,
@@ -832,11 +828,11 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				721594FD24DF36360027F600 /* HexFiend.framework */,
 				7235B7B124D7D9B10029580A /* DDMathParser.framework */,
 				7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */,
 				7278DC031E4A967700C37150 /* Sparkle.framework */,
 				773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */,
-				773E8B031821DE5300D1A71A /* HexFiend.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1122,7 +1118,7 @@
 				77F115D217D2ED82009E002A /* ZGStatusBarRepresenter.m */,
 				77F115D417D2ED8E009E002A /* ZGLineCountingRepresenter.h */,
 				77F115D517D2ED8E009E002A /* ZGLineCountingRepresenter.m */,
-				77F115A517D2E865009E002A /* HFLineCountingView.h */,
+				721594FF24DF36460027F600 /* HFLineCountingView.h */,
 				77F115D717D2ED9D009E002A /* ZGLineCountingView.h */,
 				77F115D817D2ED9D009E002A /* ZGLineCountingView.m */,
 			);
@@ -2491,6 +2487,7 @@
 					"$(PROJECT_DIR)/deps/python",
 					"$(PROJECT_DIR)/deps/ShortcutRecorder",
 					"$(PROJECT_DIR)/deps/DDMathParser",
+					"$(PROJECT_DIR)/deps/HexFiend",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -2598,6 +2595,7 @@
 					"$(PROJECT_DIR)/deps/python",
 					"$(PROJECT_DIR)/deps/ShortcutRecorder",
 					"$(PROJECT_DIR)/deps/DDMathParser",
+					"$(PROJECT_DIR)/deps/HexFiend",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
