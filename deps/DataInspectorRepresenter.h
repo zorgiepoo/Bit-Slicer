@@ -48,11 +48,10 @@ extern NSString * const DataInspectorDidDeleteAllRows;
 
 @end
 
+// Added interfaces for the xib
+
 @interface DataInspectorScrollView : NSScrollView
 @end
 
 @interface DataInspectorPlusMinusButtonCell : NSButtonCell
-@end
-
-@interface DataInspectorTableView : NSTableView
 @end

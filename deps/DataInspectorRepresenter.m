@@ -1264,11 +1264,3 @@ static BOOL stringRangeIsNullBytes(NSString *string, NSRange range) {
 }
 
 @end
-
-@implementation DataInspectorTableView
-
-- (void)highlightSelectionInClipRect:(NSRect)clipRect {
-    USE(clipRect);
-}
-
-@end
