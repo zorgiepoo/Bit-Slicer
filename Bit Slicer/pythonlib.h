@@ -157,8 +157,8 @@ void PyErr_Clear(void);
 
 #define PyExc_ValueError NULL
 
-#define Py_RETURN_FALSE NULL
-#define Py_RETURN_TRUE NULL
+#define Py_RETURN_FALSE return NULL
+#define Py_RETURN_TRUE return NULL
 
 #define Py_None NULL
 
