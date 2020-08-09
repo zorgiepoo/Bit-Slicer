@@ -1059,8 +1059,6 @@ static PyObject *Debugger_stepIn(DebuggerClass *self, PyObject *args)
 
 static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 {
-#if TARGET_CPU_ARM64
-#else
 	PyObject *callback = NULL;
 	if (!PyArg_ParseTuple(args, "O:stepOver", &callback))
 	{
@@ -1125,7 +1123,6 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		stepIntoDebuggerWithHaltedBreakPointAndCallback(self, callback);
 		resumeFromHaltedBreakPointInDebugger(self);
 	}
-#endif
 	
 	return Py_BuildValue("");
 }

@@ -41,6 +41,9 @@ typedef x86_float_state_t zg_float_state_t;
 bool ZGGetGeneralThreadState(zg_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t *stateCount)
 {
 #if TARGET_CPU_ARM64
+	(void)threadState;
+	(void)thread;
+	(void)stateCount;
 	return false;
 #else
 	mach_msg_type_number_t localStateCount = x86_THREAD_STATE_COUNT;
@@ -113,72 +116,44 @@ bool ZGSetDebugThreadState(zg_debug_state_t *debugState, thread_act_t thread, ma
 #endif
 }
 
+#if TARGET_CPU_ARM64
+#else
 // For some reason for AVX set/get thread functions, it is important to distinguish between 32 vs 64 bit,
 // even when I can use more generic versions for general purpose and debug registers
 
 static bool ZGGetAVXThreadState(zg_vector_state_t * avxState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit)
 {
-#if TARGET_CPU_ARM64
-	(void)avxState;
-	(void)thread;
-	(void)stateCount;
-	(void)is64Bit;
-	return false;
-#else
 	mach_msg_type_number_t localStateCount = is64Bit ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
 	bool success = (thread_get_state(thread, is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, is64Bit ? (thread_state_t)&(avxState->ufs.as64) : (thread_state_t)&(avxState->ufs.as32), &localStateCount) == KERN_SUCCESS);
 	
 	if (stateCount != NULL) *stateCount = localStateCount;
 	
 	return success;
-#endif
 }
 
 static bool ZGSetAVXThreadState(zg_vector_state_t *avxState, thread_act_t thread, mach_msg_type_number_t stateCount, bool is64Bit)
 {
-#if TARGET_CPU_ARM64
-	(void)avxState;
-	(void)thread;
-	(void)stateCount;
-	(void)is64Bit;
-	return false;
-#else
 	return (thread_set_state(thread, is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, is64Bit ? (thread_state_t)&(avxState->ufs.as64) : (thread_state_t)&(avxState->ufs.as32), stateCount) == KERN_SUCCESS);
-#endif
 }
 
 // I will assume I have to provide 64-bit flag for same reasons I have to for AVX (see above)
 
 static bool ZGGetFloatThreadState(zg_float_state_t *floatState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit)
 {
-#if TARGET_CPU_ARM64
-	(void)floatState;
-	(void)thread;
-	(void)stateCount;
-	(void)is64Bit;
-	return false;
-#else
 	mach_msg_type_number_t localStateCount = is64Bit ? x86_FLOAT_STATE64_COUNT : x86_FLOAT_STATE32_COUNT;
 	bool success = (thread_get_state(thread, is64Bit ? x86_FLOAT_STATE64 : x86_FLOAT_STATE32, is64Bit ? (thread_state_t)&(floatState->ufs.fs64) : (thread_state_t)&(floatState->ufs.fs32), &localStateCount) == KERN_SUCCESS);
 	
 	if (stateCount != NULL) *stateCount = localStateCount;
 	
 	return success;
-#endif
 }
 
 static bool ZGSetFloatThreadState(zg_float_state_t *floatState, thread_act_t thread, mach_msg_type_number_t stateCount, bool is64Bit)
 {
-#if TARGET_CPU_ARM64
-	(void)floatState;
-	(void)thread;
-	(void)stateCount;
-	(void)is64Bit;
-	return false;
-#else
 	return (thread_set_state(thread, is64Bit ? x86_FLOAT_STATE64 : x86_FLOAT_STATE32, is64Bit ? (thread_state_t)&floatState->ufs.fs64 : (thread_state_t)&floatState->ufs.fs32, stateCount) == KERN_SUCCESS);
-#endif
 }
+
+#endif
 
 bool ZGGetVectorThreadState(zg_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit, bool *hasAVXSupport)
 {

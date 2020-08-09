@@ -218,7 +218,10 @@
 	[_tableView reloadData];
 }
 
+#if TARGET_CPU_ARM64
+#else
 #define WRITE_VECTOR_STATE(vectorState, variable, registerName) memcpy(&vectorState.ufs.as64.__fpu_##registerName, variable.rawValue, MIN(variable.size, sizeof(vectorState.ufs.as64.__fpu_##registerName)))
+#endif
 
 - (BOOL)changeFloatingPointRegister:(ZGRegister *)theRegister newVariable:(ZGVariable *)newVariable
 {
@@ -232,6 +235,7 @@
 	}
 	
 #if TARGET_CPU_ARM64
+	return NO;
 #else
 	NSString *registerName = theRegister.variable.name;
 	if ([registerName isEqualToString:@"fcw"])
@@ -285,7 +289,6 @@
 		int ymmhIndexValue = [[registerName substringFromIndex:[@"ymmh" length]] intValue];
 		memcpy((_STRUCT_XMM_REG *)&vectorState.ufs.as64.__fpu_ymmh0 + ymmhIndexValue, newVariable.rawValue, MIN(newVariable.size, sizeof(_STRUCT_XMM_REG)));
 	}
-#endif
 	else
 	{
 		return NO;
@@ -302,6 +305,7 @@
 	theRegister.variable = newVariable;
 	
 	return YES;
+#endif
 }
 
 - (BOOL)changeGeneralPurposeRegister:(ZGRegister *)theRegister newVariable:(ZGVariable *)newVariable

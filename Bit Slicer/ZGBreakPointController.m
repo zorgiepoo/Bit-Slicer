@@ -106,6 +106,9 @@ static ZGBreakPointController *gBreakPointController;
 	return self;
 }
 
+#if TARGET_CPU_ARM64
+#else
+
 #define RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(type) \
 	if (debugRegisterIndex == 0) { debugState.uds.type.__dr0 = 0x0; } \
 	else if (debugRegisterIndex == 1) { debugState.uds.type.__dr1 = 0x0; } \
@@ -121,7 +124,9 @@ static ZGBreakPointController *gBreakPointController;
 	debugState.uds.type.__dr7 &= ~(1 << (16 + 4*debugRegisterIndex+1)); \
 	\
 	debugState.uds.type.__dr7 &= ~(1 << (18 + 4*debugRegisterIndex)); \
-	debugState.uds.type.__dr7 &= ~(1 << (18 + 4*debugRegisterIndex+1)); \
+	debugState.uds.type.__dr7 &= ~(1 << (18 + 4*debugRegisterIndex+1));
+
+#endif
 
 - (void)removeWatchPoint:(ZGBreakPoint *)breakPoint
 {
@@ -197,8 +202,11 @@ static ZGBreakPointController *gBreakPointController;
 	});
 }
 
+#if TARGET_CPU_ARM64
+#else
 #define IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, type) \
 	(((debugState.uds.type.__dr6 & (1 << debugRegisterIndex)) != 0) && ((debugState.uds.type.__dr7 & (1 << 2*debugRegisterIndex)) != 0))
+#endif
 
 - (BOOL)handleWatchPointsWithTask:(mach_port_t)task inThread:(mach_port_t)thread
 {
@@ -820,6 +828,8 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 #define IS_REGISTER_AVAILABLE(debugState, registerIndex, type) (!(debugState.uds.type.__dr7 & (1 << (2*registerIndex))) && !(debugState.uds.type.__dr7 & (1 << (2*registerIndex+1))))
 #endif
 
+#if TARGET_CPU_ARM64
+#else
 #define WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(debugRegisterIndex, debugState, variable, watchSize, watchPointType, type, typecast) \
 	if (debugRegisterIndex == 0) { debugState.uds.type.__dr0 = (typecast)variable.address; } \
 	else if (debugRegisterIndex == 1) { debugState.uds.type.__dr1 = (typecast)variable.address; } \
@@ -838,13 +848,17 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	else if (watchSize == 2) { debugState.uds.type.__dr7 |= (1 << (18 + 4*debugRegisterIndex)); debugState.uds.type.__dr7 &= ~(1 << (18 + 4*debugRegisterIndex+1)); } \
 	else if (watchSize == 4) { debugState.uds.type.__dr7 |= (1 << (18 + 4*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 4*debugRegisterIndex+1)); } \
 	else if (watchSize == 8) { debugState.uds.type.__dr7 &= ~(1 << (18 + 4*debugRegisterIndex)); debugState.uds.type.__dr7 |= (1 << (18 + 4*debugRegisterIndex+1)); }
+#endif
 
 - (BOOL)updateThreadListInWatchpoint:(ZGBreakPoint *)watchPoint type:(ZGWatchPointType)watchPointType
 {
 	ZGMemoryMap processTask = watchPoint.process.processTask;
 	BOOL is64Bit = watchPoint.process.is64Bit;
+#if TARGET_CPU_ARM64
+#else
 	ZGMemorySize watchSize = watchPoint.watchSize;
 	ZGVariable *variable = watchPoint.variable;
+#endif
 	NSArray<ZGDebugThread *> *oldDebugThreads = watchPoint.debugThreads;
 	
 	ZGSuspendTask(processTask);
