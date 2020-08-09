@@ -103,11 +103,16 @@
 
 - (void)showCredits
 {
-	NSString *creditsPath = [[NSBundle mainBundle] pathForResource:@"Credits" ofType:@"rtf"];
-	if (creditsPath == nil) return;
+	NSURL *creditsURL = [[NSBundle mainBundle] URLForResource:@"Credits" withExtension:@"rtf"];
+	if (creditsURL == nil) return;
 	
-	NSAttributedString *attributedCredits = [[NSAttributedString alloc] initWithPath:creditsPath documentAttributes:NULL];
-	if (attributedCredits == nil) return;
+	NSError *error = nil;
+	NSAttributedString *attributedCredits = [[NSAttributedString alloc] initWithURL:creditsURL options:@{} documentAttributes:nil error:&error];
+	if (attributedCredits == nil)
+	{
+		NSLog(@"Failed to show credits attributed string: %@", error);
+		return;
+	}
 	
 	[_textView.textStorage setAttributedString:attributedCredits];
 	_textView.textColor = [NSColor textColor];
