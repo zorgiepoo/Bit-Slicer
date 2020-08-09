@@ -134,7 +134,7 @@
 {
 	ZGMemoryAddress basePointer = 0x0;
 	
-	x86_thread_state_t threadState;
+	zg_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
 	if (ZGGetGeneralThreadState(&threadState, _breakPoint.thread, &threadStateCount))
 	{
@@ -220,7 +220,7 @@
 {
 	BOOL is64Bit = _breakPoint.process.is64Bit;
 	
-	zg_x86_vector_state_t vectorState;
+	zg_vector_state_t vectorState;
 	mach_msg_type_number_t vectorStateCount;
 	if (!ZGGetVectorThreadState(&vectorState, _breakPoint.thread, &vectorStateCount, is64Bit, NULL))
 	{
@@ -299,7 +299,7 @@
 
 - (BOOL)changeGeneralPurposeRegister:(ZGRegister *)theRegister newVariable:(ZGVariable *)newVariable
 {
-	x86_thread_state_t threadState;
+	zg_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, _breakPoint.thread, &threadStateCount))
 	{

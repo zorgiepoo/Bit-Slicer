@@ -1076,7 +1076,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	x86_thread_state_t threadState;
+	zg_thread_state_t threadState;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, NULL))
 	{
 		PyErr_SetString(self->debuggerException, "debug.stepOver failed to retrieve current general thread state");
@@ -1140,7 +1140,7 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	x86_thread_state_t threadState;
+	zg_thread_state_t threadState;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, NULL))
 	{
 		PyErr_SetString(self->debuggerException, "debug.stepOut failed to retrieve current general thread state");
@@ -1190,7 +1190,7 @@ static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject * __unused arg
 		return NULL;
 	}
 	
-	x86_thread_state_t threadState;
+	zg_thread_state_t threadState;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, NULL))
 	{
 		PyErr_SetString(self->debuggerException, "debug.backtrace failed to retrieve current general thread state");
@@ -1317,7 +1317,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	
 	ZGSuspendTask(self->processTask);
 	
-	x86_thread_state_t threadState;
+	zg_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, self->objcSelf->_haltedBreakPoint.thread, &threadStateCount))
 	{
@@ -1326,7 +1326,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	zg_x86_vector_state_t vectorState;
+	zg_vector_state_t vectorState;
 	mach_msg_type_number_t vectorStateCount;
 	bool hasAVXSupport = NO;
 	BOOL hasVectorRegisters = ZGGetVectorThreadState(&vectorState, self->objcSelf->_haltedBreakPoint.thread, &vectorStateCount, self->is64Bit, &hasAVXSupport);
@@ -1374,12 +1374,12 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 		}
 		
 		BOOL wroteValue = NO;
-		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (uint8_t *)&threadState + sizeof(x86_state_hdr_t), &wroteValue);
+		success = writeRegister(generalPurposeRegisterOffsetsDictionary, registerString, value, (uint8_t *)&threadState + sizeof(zg_state_hdr_t), &wroteValue);
 		if (wroteValue) needsToWriteGeneralRegisters = YES;
 		
 		if (success && !wroteValue && hasVectorRegisters)
 		{
-			success = writeRegister(vectorRegisterOffsetsDictionary, registerString, value, (uint8_t *)&vectorState + sizeof(x86_state_hdr_t), &wroteValue);
+			success = writeRegister(vectorRegisterOffsetsDictionary, registerString, value, (uint8_t *)&vectorState + sizeof(zg_state_hdr_t), &wroteValue);
 			if (wroteValue) needsToWriteVectorRegisters = YES;
 		}
 		

@@ -34,7 +34,7 @@
 
 @implementation ZGRegistersState
 
-- (id)initWithGeneralPurposeThreadState:(x86_thread_state_t)generalPurposeThreadState vectorState:(zg_x86_vector_state_t)vectorState hasVectorState:(BOOL)hasVectorState hasAVXSupport:(BOOL)hasAVXSupport is64Bit:(BOOL)is64Bit
+- (id)initWithGeneralPurposeThreadState:(zg_thread_state_t)generalPurposeThreadState vectorState:(zg_vector_state_t)vectorState hasVectorState:(BOOL)hasVectorState hasAVXSupport:(BOOL)hasAVXSupport is64Bit:(BOOL)is64Bit
 {
 	self = [super init];
 	if (self != nil)

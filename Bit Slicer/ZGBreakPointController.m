@@ -150,7 +150,7 @@ static ZGBreakPointController *gBreakPointController;
 			continue;
 		}
 		
-		x86_debug_state_t debugState;
+		zg_debug_state_t debugState;
 		mach_msg_type_number_t stateCount;
 		if (!ZGGetDebugThreadState(&debugState, debugThread.thread, &stateCount))
 		{
@@ -226,7 +226,7 @@ static ZGBreakPointController *gBreakPointController;
 			// To be safe, we will just pretend we handled the watchpoint so that we don't crash the target process
 			handledWatchPoint = YES;
 
-			x86_debug_state_t debugState;
+			zg_debug_state_t debugState;
 			mach_msg_type_number_t debugStateCount;
 			if (!ZGGetDebugThreadState(&debugState, thread, &debugStateCount))
 			{
@@ -257,7 +257,7 @@ static ZGBreakPointController *gBreakPointController;
 				ZG_LOG(@"ERROR: Failure in setting debug thread registers for clearing dr6 in handle watchpoint...Not good.");
 			}
 			
-			x86_thread_state_t threadState;
+			zg_thread_state_t threadState;
 			if (!ZGGetGeneralThreadState(&threadState, thread, NULL))
 			{
 				continue;
@@ -265,7 +265,7 @@ static ZGBreakPointController *gBreakPointController;
 			
 			ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
 			
-			zg_x86_vector_state_t vectorState;
+			zg_vector_state_t vectorState;
 			bool hasAVXSupport = NO;
 			BOOL retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit, &hasAVXSupport);
 			
@@ -304,7 +304,7 @@ static ZGBreakPointController *gBreakPointController;
 
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
-	x86_thread_state_t threadState;
+	zg_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, breakPoint.thread, &threadStateCount))
 	{
@@ -431,7 +431,7 @@ static ZGBreakPointController *gBreakPointController;
 	
 	ZGSuspendTask(task);
 	
-	x86_thread_state_t threadState;
+	zg_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, thread, &threadStateCount))
 	{
@@ -586,7 +586,7 @@ static ZGBreakPointController *gBreakPointController;
 	BOOL retrievedRegisterEntries = NO;
 	BOOL retrievedVectorState = NO;
 	bool hasAVXSupport = NO;
-	zg_x86_vector_state_t vectorState = {};
+	zg_vector_state_t vectorState = {};
 	
 	// We should notify delegates if a breakpoint hits after we modify thread states
 	for (ZGBreakPoint *breakPoint in breakPointsToNotify)
@@ -854,7 +854,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 			continue;
 		}
 		
-		x86_debug_state_t debugState;
+		zg_debug_state_t debugState;
 		mach_msg_type_number_t stateCount;
 		if (!ZGGetDebugThreadState(&debugState, threadList[threadIndex], &stateCount))
 		{

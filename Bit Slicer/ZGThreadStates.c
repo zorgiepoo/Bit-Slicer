@@ -32,7 +32,7 @@
 
 #include "ZGThreadStates.h"
 
-bool ZGGetGeneralThreadState(x86_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t *stateCount)
+bool ZGGetGeneralThreadState(zg_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t *stateCount)
 {
 	mach_msg_type_number_t localStateCount = x86_THREAD_STATE_COUNT;
 	bool success = (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)threadState, &localStateCount) == KERN_SUCCESS);
@@ -40,12 +40,12 @@ bool ZGGetGeneralThreadState(x86_thread_state_t *threadState, thread_act_t threa
 	return success;
 }
 
-bool ZGSetGeneralThreadState(x86_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t stateCount)
+bool ZGSetGeneralThreadState(zg_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t stateCount)
 {
 	return (thread_set_state(thread, x86_THREAD_STATE, (thread_state_t)threadState, stateCount) == KERN_SUCCESS);
 }
 
-bool ZGGetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t *stateCount)
+bool ZGGetDebugThreadState(zg_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t *stateCount)
 {
 	mach_msg_type_number_t localStateCount = x86_DEBUG_STATE_COUNT;
 	bool success = (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)debugState, &localStateCount) == KERN_SUCCESS);
@@ -53,7 +53,7 @@ bool ZGGetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, m
 	return success;
 }
 
-bool ZGSetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t stateCount)
+bool ZGSetDebugThreadState(zg_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t stateCount)
 {
 	return (thread_set_state(thread, x86_DEBUG_STATE, (thread_state_t)debugState, stateCount) == KERN_SUCCESS);
 }
@@ -61,7 +61,7 @@ bool ZGSetDebugThreadState(x86_debug_state_t *debugState, thread_act_t thread, m
 // For some reason for AVX set/get thread functions, it is important to distinguish between 32 vs 64 bit,
 // even when I can use more generic versions for general purpose and debug registers
 
-static bool ZGGetAVXThreadState(x86_avx_state_t * avxState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit)
+static bool ZGGetAVXThreadState(zg_vector_state_t * avxState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit)
 {
 	mach_msg_type_number_t localStateCount = is64Bit ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
 	bool success = (thread_get_state(thread, is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, is64Bit ? (thread_state_t)&(avxState->ufs.as64) : (thread_state_t)&(avxState->ufs.as32), &localStateCount) == KERN_SUCCESS);
@@ -71,7 +71,7 @@ static bool ZGGetAVXThreadState(x86_avx_state_t * avxState, thread_act_t thread,
 	return success;
 }
 
-static bool ZGSetAVXThreadState(x86_avx_state_t *avxState, thread_act_t thread, mach_msg_type_number_t stateCount, bool is64Bit)
+static bool ZGSetAVXThreadState(zg_vector_state_t *avxState, thread_act_t thread, mach_msg_type_number_t stateCount, bool is64Bit)
 {
 	return (thread_set_state(thread, is64Bit ? x86_AVX_STATE64 : x86_AVX_STATE32, is64Bit ? (thread_state_t)&(avxState->ufs.as64) : (thread_state_t)&(avxState->ufs.as32), stateCount) == KERN_SUCCESS);
 }
@@ -93,9 +93,9 @@ static bool ZGSetFloatThreadState(x86_float_state_t *floatState, thread_act_t th
 	return (thread_set_state(thread, is64Bit ? x86_FLOAT_STATE64 : x86_FLOAT_STATE32, is64Bit ? (thread_state_t)&floatState->ufs.fs64 : (thread_state_t)&floatState->ufs.fs32, stateCount) == KERN_SUCCESS);
 }
 
-bool ZGGetVectorThreadState(zg_x86_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit, bool *hasAVXSupport)
+bool ZGGetVectorThreadState(zg_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t *stateCount, bool is64Bit, bool *hasAVXSupport)
 {
-	if (ZGGetAVXThreadState((x86_avx_state_t *)vectorState, thread, stateCount, is64Bit))
+	if (ZGGetAVXThreadState((zg_vector_state_t *)vectorState, thread, stateCount, is64Bit))
 	{
 		if (hasAVXSupport != NULL) *hasAVXSupport = true;
 		return true;
@@ -106,9 +106,9 @@ bool ZGGetVectorThreadState(zg_x86_vector_state_t *vectorState, thread_act_t thr
 	return ZGGetFloatThreadState((x86_float_state_t *)vectorState, thread, stateCount, is64Bit);
 }
 
-bool ZGSetVectorThreadState(zg_x86_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t stateCount, bool is64Bit)
+bool ZGSetVectorThreadState(zg_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t stateCount, bool is64Bit)
 {
-	if (ZGSetAVXThreadState((x86_avx_state_t *)vectorState, thread, stateCount, is64Bit))
+	if (ZGSetAVXThreadState((zg_vector_state_t *)vectorState, thread, stateCount, is64Bit))
 	{
 		return true;
 	}

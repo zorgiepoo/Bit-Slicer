@@ -38,10 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGRegistersState : NSObject
 
-- (id)initWithGeneralPurposeThreadState:(x86_thread_state_t)generalPurposeThreadState vectorState:(zg_x86_vector_state_t)vectorState hasVectorState:(BOOL)hasVectorState hasAVXSupport:(BOOL)hasAVXSupport is64Bit:(BOOL)is64Bit;
+- (id)initWithGeneralPurposeThreadState:(zg_thread_state_t)generalPurposeThreadState vectorState:(zg_vector_state_t)vectorState hasVectorState:(BOOL)hasVectorState hasAVXSupport:(BOOL)hasAVXSupport is64Bit:(BOOL)is64Bit;
 
-@property (nonatomic) x86_thread_state_t generalPurposeThreadState;
-@property (nonatomic) zg_x86_vector_state_t vectorState;
+@property (nonatomic) zg_thread_state_t generalPurposeThreadState;
+@property (nonatomic) zg_vector_state_t vectorState;
 
 @property (nonatomic, readonly) BOOL hasVectorState;
 @property (nonatomic, readonly) BOOL hasAVXSupport;

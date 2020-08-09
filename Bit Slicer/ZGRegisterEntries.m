@@ -52,10 +52,10 @@ do { \
 	entryIndex++; \
 } while(0)
 
-#define ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, x86_thread_state32_t)
-#define ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, x86_thread_state64_t)
+#define ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts32, zg_thread_state32_t)
+#define ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, registerName) ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, ts64, zg_thread_state64_t)
 
-+ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(zg_thread_state_t)threadState is64Bit:(BOOL)is64Bit
 {
 	int entryIndex = 0;
 	
@@ -141,7 +141,7 @@ do { \
 	entryIndex++; \
 } while(0)
 
-+ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
 {
 	int entryIndex = 0;
 	
@@ -225,7 +225,7 @@ do { \
 	return entryIndex;
 }
 
-+ (NSArray<ZGVariable *> *)registerVariablesFromVectorThreadState:(zg_x86_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
++ (NSArray<ZGVariable *> *)registerVariablesFromVectorThreadState:(zg_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
 {
 	NSMutableArray<ZGVariable *> *registerVariables = [[NSMutableArray alloc] init];
 	
@@ -250,7 +250,7 @@ do { \
 	return registerVariables;
 }
 
-+ (NSArray<ZGVariable *> *)registerVariablesFromGeneralPurposeThreadState:(x86_thread_state_t)threadState is64Bit:(BOOL)is64Bit
++ (NSArray<ZGVariable *> *)registerVariablesFromGeneralPurposeThreadState:(zg_thread_state_t)threadState is64Bit:(BOOL)is64Bit
 {
 	NSMutableArray<ZGVariable *> *registerVariables = [[NSMutableArray alloc] init];
 	
