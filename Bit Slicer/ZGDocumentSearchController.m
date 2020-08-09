@@ -52,8 +52,11 @@
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGNullability.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wincomplete-umbrella"
 #import <DDMathParser/DDMathStringToken.h>
 #import <DDMathParser/DDMathStringTokenizer.h>
+#pragma clang diagnostic pop
 #import <DDMathParser/DDMathOperator.h>
 
 @implementation ZGDocumentSearchController
