@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		72030ADC1B00191400A5621C /* ZGScriptingInterpreter.m in Sources */ = {isa = PBXBuildFile; fileRef = 72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */; };
+		720844FA24E0715C00F3D449 /* DataInspector.m in Sources */ = {isa = PBXBuildFile; fileRef = 720844F924E0715C00F3D449 /* DataInspector.m */; };
+		720844FD24E072DB00F3D449 /* DataInspectorScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 720844FC24E072DB00F3D449 /* DataInspectorScrollView.m */; };
+		7208450024E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 720844FF24E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m */; };
 		721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
 		7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7216F7D01AC66133005288A8 /* dsa_pub.pem */; };
@@ -278,6 +281,12 @@
 /* Begin PBXFileReference section */
 		72030ADA1B00191400A5621C /* ZGScriptingInterpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptingInterpreter.h; path = "Bit Slicer/ZGScriptingInterpreter.h"; sourceTree = "<group>"; };
 		72030ADB1B00191400A5621C /* ZGScriptingInterpreter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptingInterpreter.m; path = "Bit Slicer/ZGScriptingInterpreter.m"; sourceTree = "<group>"; };
+		720844F824E0715C00F3D449 /* DataInspector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DataInspector.h; path = deps/HexFiend/DataInspector.h; sourceTree = "<group>"; };
+		720844F924E0715C00F3D449 /* DataInspector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DataInspector.m; path = deps/HexFiend/DataInspector.m; sourceTree = "<group>"; };
+		720844FB24E072DB00F3D449 /* DataInspectorScrollView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DataInspectorScrollView.h; path = deps/HexFiend/DataInspectorScrollView.h; sourceTree = "<group>"; };
+		720844FC24E072DB00F3D449 /* DataInspectorScrollView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DataInspectorScrollView.m; path = deps/HexFiend/DataInspectorScrollView.m; sourceTree = "<group>"; };
+		720844FE24E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DataInspectorPlusMinusButtonCell.h; path = deps/HexFiend/DataInspectorPlusMinusButtonCell.h; sourceTree = "<group>"; };
+		720844FF24E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DataInspectorPlusMinusButtonCell.m; path = deps/HexFiend/DataInspectorPlusMinusButtonCell.m; sourceTree = "<group>"; };
 		721594FD24DF36360027F600 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend/HexFiend.framework; sourceTree = "<group>"; };
 		721594FF24DF36460027F600 /* HFLineCountingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HexFiend/HFLineCountingView.h; sourceTree = "<group>"; };
 		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
@@ -1112,6 +1121,12 @@
 				72DBC8DD1B7576D30092ED75 /* ZGTextViewLayoutController.m */,
 				773972F417D2E7B600B958EE /* DataInspectorRepresenter.h */,
 				773972F517D2E7B600B958EE /* DataInspectorRepresenter.m */,
+				720844F824E0715C00F3D449 /* DataInspector.h */,
+				720844F924E0715C00F3D449 /* DataInspector.m */,
+				720844FE24E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.h */,
+				720844FF24E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m */,
+				720844FB24E072DB00F3D449 /* DataInspectorScrollView.h */,
+				720844FC24E072DB00F3D449 /* DataInspectorScrollView.m */,
 				77F115CE17D2ED74009E002A /* ZGVerticalScrollerRepresenter.h */,
 				77F115CF17D2ED74009E002A /* ZGVerticalScrollerRepresenter.m */,
 				77F115D117D2ED82009E002A /* ZGStatusBarRepresenter.h */,
@@ -1578,6 +1593,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				777DA25518CEA0390092DEC9 /* ZGAppPathUtilities.m in Sources */,
+				720844FA24E0715C00F3D449 /* DataInspector.m in Sources */,
 				770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */,
 				77FFC14C18711D2700122357 /* ZGEditDescriptionWindowController.m in Sources */,
 				772C0F7E18B88AFA009FFF72 /* ZGRegisterEntries.m in Sources */,
@@ -1609,6 +1625,7 @@
 				72DBC8D51B71A4BB0092ED75 /* ZGRootlessConfiguration.m in Sources */,
 				72D72BCB1AB3E9FA005044CF /* ZGLocalization.m in Sources */,
 				77F115F417D2EE0B009E002A /* ZGDocumentData.m in Sources */,
+				720844FD24E072DB00F3D449 /* DataInspectorScrollView.m in Sources */,
 				77F115F717D2EE28009E002A /* ZGDocumentWindowController.m in Sources */,
 				77CECE1718B8861C006D45E9 /* ZGRegistersViewController.m in Sources */,
 				77F115FA17D2EE6F009E002A /* ZGDocumentSearchController.m in Sources */,
@@ -1625,6 +1642,7 @@
 				777DA25218CE97BE0092DEC9 /* ZGAppTerminationState.m in Sources */,
 				77F1160F17D2EED6009E002A /* ZGSearchData.m in Sources */,
 				77282120189B854D0044E4BC /* ZGFunctionTypes.m in Sources */,
+				7208450024E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m in Sources */,
 				77F1161217D2EEE1009E002A /* ZGSearchProgress.m in Sources */,
 				77F1161517D2EEEC009E002A /* ZGSearchResults.m in Sources */,
 				7730999D18660A29008B71DA /* ZGDocumentOptionsViewController.m in Sources */,

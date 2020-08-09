@@ -21,29 +21,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//
+//  DataInspectorScrollView.h
+//  HexFiend_2
+//
+//  Copyright © 2019 ridiculous_fish. All rights reserved.
+//
 
 #import <Cocoa/Cocoa.h>
-#import <HexFiend/HexFiend.h>
 
-//notification posted when our DataInspector's height changes.  Has a single key "height" which is the new height for the scroll view
-extern NSString * const DataInspectorDidChangeRowCount;
-
-// notification posted when all rows are deleted
-extern NSString * const DataInspectorDidDeleteAllRows;
-
-@interface DataInspectorRepresenter : HFRepresenter {
-    IBOutlet NSView *outletView; //used only for loading the nib
-    IBOutlet NSTableView *table; //not retained - is a subview of our view (stored in superclass)
-    NSMutableArray *inspectors;
-}
-
-- (void)loadDefaultInspectors;
-
-- (NSUInteger)rowCount;
-
-- (IBAction)addRow:(id)sender;
-- (IBAction)removeRow:(id)sender;
-- (IBAction)doubleClickedTable:(id)sender;
-- (void)resizeTableViewAfterChangingRowCount;
-
+@interface DataInspectorScrollView : NSScrollView
 @end

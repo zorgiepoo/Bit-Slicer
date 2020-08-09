@@ -21,29 +21,48 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//
+//  DataInspectorScrollView.m
+//  HexFiend_2
+//
+//  Copyright © 2019 ridiculous_fish. All rights reserved.
+//
 
-#import <Cocoa/Cocoa.h>
-#import <HexFiend/HexFiend.h>
+#import "DataInspectorScrollView.h"
 
-//notification posted when our DataInspector's height changes.  Has a single key "height" which is the new height for the scroll view
-extern NSString * const DataInspectorDidChangeRowCount;
+#import <HexFiend/HFFunctions.h>
 
-// notification posted when all rows are deleted
-extern NSString * const DataInspectorDidDeleteAllRows;
+@implementation DataInspectorScrollView
 
-@interface DataInspectorRepresenter : HFRepresenter {
-    IBOutlet NSView *outletView; //used only for loading the nib
-    IBOutlet NSTableView *table; //not retained - is a subview of our view (stored in superclass)
-    NSMutableArray *inspectors;
+- (void)drawDividerWithClip:(NSRect)clipRect {
+	NSColor *separatorColor = [NSColor lightGrayColor];
+#if defined(MAC_OS_X_VERSION_10_14) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_14
+	if (HFDarkModeEnabled()) {
+		if (@available(macOS 10.14, *)) {
+			separatorColor = [NSColor separatorColor];
+		}
+	}
+#endif
+	[separatorColor set];
+	NSRect bounds = [self bounds];
+	NSRect lineRect = bounds;
+	lineRect.size.height = 1;
+	NSRectFillUsingOperation(NSIntersectionRect(lineRect, clipRect), NSCompositeSourceOver);
 }
 
-- (void)loadDefaultInspectors;
-
-- (NSUInteger)rowCount;
-
-- (IBAction)addRow:(id)sender;
-- (IBAction)removeRow:(id)sender;
-- (IBAction)doubleClickedTable:(id)sender;
-- (void)resizeTableViewAfterChangingRowCount;
+- (void)drawRect:(NSRect)rect {
+	if (!HFDarkModeEnabled()) {
+		[[NSColor colorWithCalibratedWhite:(CGFloat).91 alpha:1] set];
+		NSRectFillUsingOperation(rect, NSCompositeSourceOver);
+	}
+	
+	if (HFDarkModeEnabled()) {
+		[[NSColor colorWithCalibratedWhite:(CGFloat).09 alpha:1] set];
+	} else {
+		[[NSColor colorWithCalibratedWhite:(CGFloat).91 alpha:1] set];
+	}
+	NSRectFillUsingOperation(rect, NSCompositeSourceOver);
+	[self drawDividerWithClip:rect];
+}
 
 @end
