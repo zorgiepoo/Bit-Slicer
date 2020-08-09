@@ -51,7 +51,7 @@
     HFLineCountingRepresenter *rep = self.representer;
     HFLineNumberFormat format = self.lineNumberFormat;
     if (format == HFLineNumberFormatDecimal) {
-        unsigned long long lineValue = HFProductULL(range.location, self.bytesPerLine) + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
+        unsigned long long lineValue = HFProductULL(range.location, self.bytesPerLine) + [((ZGLineCountingRepresenter *)rep) beginningMemoryAddress];
         characterCount = lineCount /* newlines */;
         while (lineCount--) {
             characterCount += HFCountDigitsBase10(lineValue);
