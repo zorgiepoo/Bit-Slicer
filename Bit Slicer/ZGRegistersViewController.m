@@ -138,10 +138,7 @@
 	mach_msg_type_number_t threadStateCount;
 	if (ZGGetGeneralThreadState(&threadState, _breakPoint.thread, &threadStateCount))
 	{
-#if TARGET_CPU_ARM64
-#else
 		basePointer = ZGBasePointerFromGeneralThreadState(&threadState, _breakPoint.process.is64Bit);
-#endif
 	}
 	
 	return basePointer;
