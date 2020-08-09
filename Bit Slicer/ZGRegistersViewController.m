@@ -138,7 +138,10 @@
 	mach_msg_type_number_t threadStateCount;
 	if (ZGGetGeneralThreadState(&threadState, _breakPoint.thread, &threadStateCount))
 	{
-		basePointer = _breakPoint.process.is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+#if TARGET_CPU_ARM64
+#else
+		basePointer = ZGBasePointerFromGeneralThreadState(&threadState, _breakPoint.process.is64Bit);
+#endif
 	}
 	
 	return basePointer;
@@ -174,7 +177,8 @@
 		[newRegisters addObject:newRegister];
 	}
 	
-	[self setInstructionPointer:registersState.is64Bit ? registersState.generalPurposeThreadState.uts.ts64.__rip : registersState.generalPurposeThreadState.uts.ts32.__eip];
+	zg_thread_state_t generalPurposeThreadState = registersState.generalPurposeThreadState;
+	[self setInstructionPointer:ZGInstructionPointerFromGeneralThreadState(&generalPurposeThreadState, registersState.is64Bit)];
 	
 	if (registersState.hasVectorState)
 	{
@@ -227,6 +231,8 @@
 		return NO;
 	}
 	
+#if TARGET_CPU_ARM64
+#else
 	NSString *registerName = theRegister.variable.name;
 	if ([registerName isEqualToString:@"fcw"])
 	{
@@ -279,6 +285,7 @@
 		int ymmhIndexValue = [[registerName substringFromIndex:[@"ymmh" length]] intValue];
 		memcpy((_STRUCT_XMM_REG *)&vectorState.ufs.as64.__fpu_ymmh0 + ymmhIndexValue, newVariable.rawValue, MIN(newVariable.size, sizeof(_STRUCT_XMM_REG)));
 	}
+#endif
 	else
 	{
 		return NO;
@@ -307,6 +314,8 @@
 	}
 	
 	BOOL shouldWriteRegister = NO;
+#if TARGET_CPU_ARM64
+#else
 	if (_breakPoint.registersState.is64Bit)
 	{
 		NSArray<NSString *> *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
@@ -325,6 +334,7 @@
 			shouldWriteRegister = YES;
 		}
 	}
+#endif
 	
 	if (!shouldWriteRegister) return NO;
 	

@@ -2530,7 +2530,6 @@
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Weverything",
 					"-Wno-objc-missing-property-synthesis",
@@ -2635,7 +2634,6 @@
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
 				WARNING_CFLAGS = (
 					"-Weverything",
 					"-Wno-objc-missing-property-synthesis",
@@ -2682,12 +2680,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				ONLY_ACTIVE_ARCH = YES;
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				SHARED_PRECOMPS_DIR = "";
-				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -2722,7 +2718,6 @@
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				SHARED_PRECOMPS_DIR = "";
-				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};

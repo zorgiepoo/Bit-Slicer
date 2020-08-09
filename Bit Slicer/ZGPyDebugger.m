@@ -942,7 +942,8 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 		
 		if (hidden)
 		{
-			ZGMemoryAddress basePointer = breakPoint.process.is64Bit ? registersState.generalPurposeThreadState.uts.ts64.__rbp : registersState.generalPurposeThreadState.uts.ts32.__ebp;
+			zg_thread_state_t threadState = registersState.generalPurposeThreadState;
+			ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, breakPoint.process.is64Bit);
 			
 			if (basePointer == breakPointBasePointer)
 			{
@@ -1058,6 +1059,8 @@ static PyObject *Debugger_stepIn(DebuggerClass *self, PyObject *args)
 
 static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 {
+#if TARGET_CPU_ARM64
+#else
 	PyObject *callback = NULL;
 	if (!PyArg_ParseTuple(args, "O:stepOver", &callback))
 	{
@@ -1083,7 +1086,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
+	ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, self->is64Bit);
 	
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
@@ -1105,7 +1108,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+		ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, self->is64Bit);
 		
 		if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:nextInstruction inProcess:self->objcSelf->_process thread:self->objcSelf->_haltedBreakPoint.thread basePointer:basePointer callback:callback delegate:self->objcSelf])
 		{
@@ -1122,6 +1125,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		stepIntoDebuggerWithHaltedBreakPointAndCallback(self, callback);
 		resumeFromHaltedBreakPointInDebugger(self);
 	}
+#endif
 	
 	return Py_BuildValue("");
 }
@@ -1147,8 +1151,8 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
-	ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+	ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, self->is64Bit);
+	ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, self->is64Bit);
 	
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
@@ -1197,8 +1201,8 @@ static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject * __unused arg
 		return NULL;
 	}
 	
-	ZGMemoryAddress instructionPointer = self->is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
-	ZGMemoryAddress basePointer = self->is64Bit ? threadState.uts.ts64.__rbp : threadState.uts.ts32.__ebp;
+	ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, self->is64Bit);
+	ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, self->is64Bit);
 	
 	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf->_process breakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
 	

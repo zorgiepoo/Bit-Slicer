@@ -158,8 +158,9 @@ static ZGBreakPointController *gBreakPointController;
 			continue;
 		}
 		
+#if TARGET_CPU_ARM64
+#else
 		uint8_t debugRegisterIndex = debugThread.registerIndex;
-		
 		if (breakPoint.process.is64Bit)
 		{
 			RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds64);
@@ -168,6 +169,7 @@ static ZGBreakPointController *gBreakPointController;
 		{
 			RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds32);
 		}
+#endif
 		
 		if (!ZGSetDebugThreadState(&debugState, debugThread.thread, stateCount))
 		{
@@ -233,15 +235,20 @@ static ZGBreakPointController *gBreakPointController;
 				continue;
 			}
 			
+#if TARGET_CPU_ARM64
+			BOOL isWatchPointAvailable = NO;
+#else
 			uint8_t debugRegisterIndex = debugThread.registerIndex;
-			
 			BOOL isWatchPointAvailable = breakPoint.process.is64Bit ? IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds64) : IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds32);
+#endif
 			
 			if (!isWatchPointAvailable)
 			{
 				continue;
 			}
 			
+#if TARGET_CPU_ARM64
+#else
 			// Clear dr6 debug status
 			if (breakPoint.process.is64Bit)
 			{
@@ -251,6 +258,7 @@ static ZGBreakPointController *gBreakPointController;
 			{
 				debugState.uds.ds32.__dr6 &= ~(1 << debugRegisterIndex);
 			}
+#endif
 			
 			if (!ZGSetDebugThreadState(&debugState, debugThread.thread, debugStateCount))
 			{
@@ -263,7 +271,7 @@ static ZGBreakPointController *gBreakPointController;
 				continue;
 			}
 			
-			ZGMemoryAddress instructionAddress = breakPoint.process.is64Bit ? (ZGMemoryAddress)threadState.uts.ts64.__rip : (ZGMemoryAddress)threadState.uts.ts32.__eip;
+			ZGMemoryAddress instructionAddress = ZGInstructionPointerFromGeneralThreadState(&threadState, breakPoint.process.is64Bit);
 			
 			zg_vector_state_t vectorState;
 			bool hasAVXSupport = NO;
@@ -340,6 +348,8 @@ static ZGBreakPointController *gBreakPointController;
 	
 	if (shouldSingleStep)
 	{
+#if TARGET_CPU_ARM64
+#else
 		if (breakPoint.process.is64Bit)
 		{
 			threadState.uts.ts64.__rflags |= (1 << 8);
@@ -348,6 +358,7 @@ static ZGBreakPointController *gBreakPointController;
 		{
 			threadState.uts.ts32.__eflags |= (1 << 8);
 		}
+#endif
 	}
 	
 	if (!ZGSetGeneralThreadState(&threadState, breakPoint.thread, threadStateCount))
@@ -456,6 +467,8 @@ static ZGBreakPointController *gBreakPointController;
 		breakPoint.thread = thread;
 		
 		// Remove single-stepping
+#if TARGET_CPU_ARM64
+#else
 		if (breakPoint.process.is64Bit)
 		{
 			threadState.uts.ts64.__rflags &= ~(1U << 8);
@@ -464,6 +477,7 @@ static ZGBreakPointController *gBreakPointController;
 		{
 			threadState.uts.ts32.__eflags &= ~(1U << 8);
 		}
+#endif
 		
 		// If we had single-stepped in here, use current program counter, otherwise use instruction address before program counter
 		BOOL foundSingleStepBreakPoint = [[self breakPoints] zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
@@ -471,7 +485,7 @@ static ZGBreakPointController *gBreakPointController;
 		}];
 		
 		ZGMemoryAddress foundInstructionAddress = 0x0;
-		ZGMemoryAddress instructionPointer = breakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip;
+		ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, breakPoint.process.is64Bit);
 		
 		if (foundSingleStepBreakPoint)
 		{
@@ -506,6 +520,8 @@ static ZGBreakPointController *gBreakPointController;
 					hitBreakPoint = YES;
 					ZGSuspendTask(task);
 					
+#if TARGET_CPU_ARM64
+#else
 					// Restore program counter
 					if (breakPoint.process.is64Bit)
 					{
@@ -515,6 +531,7 @@ static ZGBreakPointController *gBreakPointController;
 					{
 						threadState.uts.ts32.__eip = (uint32_t)breakPoint.variable.address;
 					}
+#endif
 					
 					[breakPointsToNotify addObject:breakPoint];
 				}
@@ -549,6 +566,8 @@ static ZGBreakPointController *gBreakPointController;
 		}
 		
 		// Remove single-stepping
+#if TARGET_CPU_ARM64
+#else
 		if (candidateBreakPoint.process.is64Bit)
 		{
 			threadState.uts.ts64.__rflags &= ~(1U << 8);
@@ -557,12 +576,13 @@ static ZGBreakPointController *gBreakPointController;
 		{
 			threadState.uts.ts32.__eflags &= ~(1U << 8);
 		}
+#endif
 		
 		if (!hitBreakPoint)
 		{
 			ZGSuspendTask(task);
 			
-			candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:(candidateBreakPoint.process.is64Bit ? threadState.uts.ts64.__rip : threadState.uts.ts32.__eip) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
+			candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:ZGInstructionPointerFromGeneralThreadState(&threadState, candidateBreakPoint.process.is64Bit) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
 			
 			[breakPointsToNotify addObject:candidateBreakPoint];
 			
@@ -794,7 +814,11 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	return YES;
 }
 
+#if TARGET_CPU_ARM64
+#define IS_REGISTER_AVAILABLE(debugState, registerIndex, type) false
+#else
 #define IS_REGISTER_AVAILABLE(debugState, registerIndex, type) (!(debugState.uds.type.__dr7 & (1 << (2*registerIndex))) && !(debugState.uds.type.__dr7 & (1 << (2*registerIndex+1))))
+#endif
 
 #define WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(debugRegisterIndex, debugState, variable, watchSize, watchPointType, type, typecast) \
 	if (debugRegisterIndex == 0) { debugState.uds.type.__dr0 = (typecast)variable.address; } \
@@ -882,6 +906,8 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		
 		ZGDebugThread *debugThread = [[ZGDebugThread alloc] initWithThread:threadList[threadIndex] registerIndex:debugRegisterIndex];
 		
+#if TARGET_CPU_ARM64
+#else
 		if (is64Bit)
 		{
 			WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(debugRegisterIndex, debugState, variable, watchSize, watchPointType, ds64, uint64_t);
@@ -890,6 +916,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		{
 			WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(debugRegisterIndex, debugState, variable, watchSize, watchPointType, ds32, uint32_t);
 		}
+#endif
 		
 		if (!ZGSetDebugThreadState(&debugState, threadList[threadIndex], stateCount))
 		{

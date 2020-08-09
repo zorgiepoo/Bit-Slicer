@@ -33,21 +33,35 @@
 #ifndef Bit_Slicer_ZGThreadStates_h
 #define Bit_Slicer_ZGThreadStates_h
 
+#include "ZGMemoryTypes.h"
+
 #include <machine/_mcontext.h> // this header is needed when modules are enabled
 #include <mach/message.h>
 #include <mach/thread_act.h>
 #include <stdbool.h>
+#include <TargetConditionals.h>
 
+#if TARGET_CPU_ARM64
+typedef arm_amx_state_t zg_vector_state_t;
+typedef arm_thread_state_t zg_thread_state_t;
+typedef arm_debug_state_t zg_debug_state_t;
+typedef arm_state_hdr_t zg_state_hdr_t;
+typedef arm_thread_state32_t zg_thread_state32_t;
+typedef arm_thread_state64_t zg_thread_state64_t;
+#else
 typedef x86_avx_state_t zg_vector_state_t;
 typedef x86_thread_state_t zg_thread_state_t;
 typedef x86_debug_state_t zg_debug_state_t;
 typedef x86_state_hdr_t zg_state_hdr_t;
-
 typedef x86_thread_state32_t zg_thread_state32_t;
 typedef x86_thread_state64_t zg_thread_state64_t;
+#endif
 
 bool ZGGetGeneralThreadState(zg_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t *stateCount);
 bool ZGSetGeneralThreadState(zg_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t stateCount);
+
+ZGMemoryAddress ZGInstructionPointerFromGeneralThreadState(zg_thread_state_t *threadState, bool is64Bit);
+ZGMemoryAddress ZGBasePointerFromGeneralThreadState(zg_thread_state_t *threadState, bool is64Bit);
 
 bool ZGGetDebugThreadState(zg_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t *stateCount);
 bool ZGSetDebugThreadState(zg_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t stateCount);

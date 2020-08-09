@@ -59,6 +59,8 @@ do { \
 {
 	int entryIndex = 0;
 	
+#if TARGET_CPU_ARM64
+#else
 	if (is64Bit)
 	{
 		// General registers
@@ -124,6 +126,7 @@ do { \
 		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, fs);
 		ADD_GENERAL_REGISTER_32(entries, entryIndex, threadState, gs);
 	}
+#endif
 	
 	entries[entryIndex].name[0] = 0;
 	
@@ -145,6 +148,8 @@ do { \
 {
 	int entryIndex = 0;
 	
+#if TARGET_CPU_ARM64
+#else
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fcw); // FPU control word
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fsw); // FPU status word
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ftw); // FPU tag word
@@ -219,6 +224,7 @@ do { \
 			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh15);
 		}
 	}
+#endif
 	
 	entries[entryIndex].name[0] = 0;
 	
