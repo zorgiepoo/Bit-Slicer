@@ -36,6 +36,9 @@
 #import "ZGHotKey.h"
 #import <ShortcutRecorder/ShortcutRecorder.h>
 
+@interface ZGHotKeyPreferencesViewController () <SRRecorderControlDelegate>
+@end
+
 @implementation ZGHotKeyPreferencesViewController
 {
 	ZGHotKeyCenter * _Nonnull _hotKeyCenter;
@@ -58,26 +61,49 @@
 	return self;
 }
 
+- (void)_setUpRecorder:(SRRecorderControl *)recorder keyCombo:(ZGHotKey *)hotKey
+{
+	KeyCombo keyCombo = hotKey.keyCombo;
+	
+	recorder.delegate = self;
+	
+	if (keyCombo.code == INVALID_KEY_CODE && keyCombo.flags == INVALID_KEY_MODIFIER)
+	{
+		recorder.objectValue = nil;
+	}
+	else
+	{
+		recorder.objectValue =
+		[SRShortcut
+		 shortcutWithCode:(SRKeyCode)keyCombo.code
+		 modifierFlags:SRCarbonToCocoaFlags((UInt32)keyCombo.flags)
+		 characters:nil
+		 charactersIgnoringModifiers:nil];
+	}
+}
+
 - (void)loadView
 {
 	[super loadView];
 	
-//	[_pauseAndUnpauseHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-//	_pauseAndUnpauseHotKeyRecorder.keyCombo = _debuggerController.pauseAndUnpauseHotKey.keyCombo;
-//	
-//	[_stepInHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-//	_stepInHotKeyRecorder.keyCombo = _debuggerController.stepInHotKey.keyCombo;
-//	
-//	[_stepOverHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-//	_stepOverHotKeyRecorder.keyCombo = _debuggerController.stepOverHotKey.keyCombo;
-//	
-//	[_stepOutHotKeyRecorder setAllowsKeyOnly:YES escapeKeysRecord:NO];
-//	_stepOutHotKeyRecorder.keyCombo = _debuggerController.stepOutHotKey.keyCombo;
+	[self _setUpRecorder:_pauseAndUnpauseHotKeyRecorder keyCombo:_debuggerController.pauseAndUnpauseHotKey];
+	
+	[self _setUpRecorder:_stepInHotKeyRecorder keyCombo:_debuggerController.stepInHotKey];
+	
+	[self _setUpRecorder:_stepOverHotKeyRecorder keyCombo:_debuggerController.stepOverHotKey];
+	
+	[self _setUpRecorder:_stepOutHotKeyRecorder keyCombo:_debuggerController.stepOutHotKey];
 }
 
-- (void)shortcutRecorder:(SRRecorderControl *)recorder keyComboDidChange:(KeyCombo)newKeyCombo
+- (BOOL)recorderControl:(SRRecorderControl *)aControl shouldUnconditionallyAllowModifierFlags:(NSEventModifierFlags)aModifierFlags forKeyCode:(SRKeyCode)aKeyCode
 {
-	KeyCombo newCarbonKeyCode = {.code = newKeyCombo.code, .flags = SRCocoaToCarbonFlags(newKeyCombo.flags)};
+	return YES;
+}
+
+- (void)recorderControlDidEndRecording:(SRRecorderControl *)recorder
+{
+	SRShortcut *shortcut = recorder.objectValue;
+	
 	ZGHotKey *hotKey = nil;
 	NSString *hotKeyDefaultsKey = nil;
 	if (recorder == _pauseAndUnpauseHotKeyRecorder)
@@ -100,14 +126,25 @@
 		hotKey = _debuggerController.stepOutHotKey;
 		hotKeyDefaultsKey = ZGStepOutHotKey;
 	}
-	
+
 	if (hotKey != nil)
 	{
 		[_hotKeyCenter unregisterHotKey:hotKey];
-		hotKey.keyCombo = newCarbonKeyCode;
-		[_hotKeyCenter registerHotKey:hotKey delegate:_debuggerController];
 		
-		[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:hotKey] forKey:hotKeyDefaultsKey];
+		if (shortcut == nil)
+		{
+			hotKey.keyCombo = [ZGHotKey hotKey].keyCombo;
+			[[NSUserDefaults standardUserDefaults] removeObjectForKey:hotKeyDefaultsKey];
+		}
+		else
+		{
+			KeyCombo newCarbonKeyCode = {.code = shortcut.carbonKeyCode, .flags = shortcut.carbonModifierFlags};
+			
+			hotKey.keyCombo = newCarbonKeyCode;
+			[_hotKeyCenter registerHotKey:hotKey delegate:_debuggerController];
+			
+			[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:hotKey] forKey:hotKeyDefaultsKey];
+		}
 	}
 }
 
