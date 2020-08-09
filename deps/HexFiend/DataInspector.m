@@ -507,6 +507,7 @@ static NSAttributedString *inspectionSuccess(NSString *s) {
 			return inspectionSuccess(ret);
 		}
 		case eInspectorTypeBinary: {
+			if(outIsError) *outIsError = NO;
 			NSString* ret = @"";
 			
 			for (NSUInteger i = 0; i < length; ++i) {
