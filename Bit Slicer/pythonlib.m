@@ -32,6 +32,8 @@
 
 #include "pythonlib.h"
 
+#if USE_PYTHON_STUB
+
 PyObject *PyImport_AddModule(const char * __unused module)
 {
 	return NULL;
@@ -324,3 +326,5 @@ unsigned long long PyLong_AsUnsignedLongLongMask(PyObject *__unused obj)
 {
 	return 0;
 }
+
+#endif

@@ -30,10 +30,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// This is just a stub for Python framework until I can compile an arm64 version of it
+// On arm64, this is a stub for Python framework until I can compile an arm64 version of it
 
 #ifndef pythonlib_h
 #define pythonlib_h
+
+#import <TargetConditionals.h>
+
+#define USE_PYTHON_STUB TARGET_CPU_ARM64
+
+#if !USE_PYTHON_STUB
+
+#import <Python/Python.h>
+#import <Python/structmember.h>
+
+#else
 
 #include <stdlib.h>
 
@@ -267,5 +278,7 @@ PyObject *PyUnicode_AsASCIIString(PyObject *obj);
 int PyObject_GetBuffer(PyObject *value, Py_buffer *buffer, int flag);
 
 unsigned long long PyLong_AsUnsignedLongLongMask(PyObject *obj);
+
+#endif
 
 #endif /* pythonlib_h */

@@ -12,6 +12,8 @@
 		720844FD24E072DB00F3D449 /* DataInspectorScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 720844FC24E072DB00F3D449 /* DataInspectorScrollView.m */; };
 		7208450024E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 720844FF24E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m */; };
 		7208450424E076B400F3D449 /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7208450224E076B400F3D449 /* DataInspectorRepresenter.m */; };
+		7208450624E084F400F3D449 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7208450524E084F400F3D449 /* Python.framework */; };
+		7208450724E0851000F3D449 /* Python.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7208450524E084F400F3D449 /* Python.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
 		7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7216F7D01AC66133005288A8 /* dsa_pub.pem */; };
@@ -42,7 +44,7 @@
 		7235B7B324D7D9C30029580A /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7235B7B424D7D9EA0029580A /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7235B7B524D7D9F40029580A /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; };
-		7235B7B924D7DE660029580A /* pythonlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 7235B7B824D7DE660029580A /* pythonlib.c */; };
+		7235B7B924D7DE660029580A /* pythonlib.m in Sources */ = {isa = PBXBuildFile; fileRef = 7235B7B824D7DE660029580A /* pythonlib.m */; };
 		72431BA919BFFB6100418893 /* ZGDataValueExtracting.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162E17D2EF5A009E002A /* ZGDataValueExtracting.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
@@ -257,6 +259,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				7208450724E0851000F3D449 /* Python.framework in Copy Frameworks */,
 				7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */,
 				7235B7B324D7D9C30029580A /* DDMathParser.framework in Copy Frameworks */,
 				7235B7B024D7CE180029580A /* ShortcutRecorder.framework in Copy Frameworks */,
@@ -289,6 +292,7 @@
 		720844FF24E0759F00F3D449 /* DataInspectorPlusMinusButtonCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DataInspectorPlusMinusButtonCell.m; path = deps/HexFiend/DataInspectorPlusMinusButtonCell.m; sourceTree = "<group>"; };
 		7208450224E076B400F3D449 /* DataInspectorRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DataInspectorRepresenter.m; path = deps/HexFiend/DataInspectorRepresenter.m; sourceTree = "<group>"; };
 		7208450324E076B400F3D449 /* DataInspectorRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DataInspectorRepresenter.h; path = deps/HexFiend/DataInspectorRepresenter.h; sourceTree = "<group>"; };
+		7208450524E084F400F3D449 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = deps/python/Python.framework; sourceTree = "<group>"; };
 		721594FD24DF36360027F600 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend/HexFiend.framework; sourceTree = "<group>"; };
 		721594FF24DF36460027F600 /* HFLineCountingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HexFiend/HFLineCountingView.h; sourceTree = "<group>"; };
 		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
@@ -330,7 +334,7 @@
 		7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = deps/ShortcutRecorder/ShortcutRecorder.framework; sourceTree = "<group>"; };
 		7235B7B124D7D9B10029580A /* DDMathParser.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DDMathParser.framework; path = deps/DDMathParser/DDMathParser.framework; sourceTree = "<group>"; };
 		7235B7B724D7DD8C0029580A /* pythonlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pythonlib.h; path = "Bit Slicer/pythonlib.h"; sourceTree = "<group>"; };
-		7235B7B824D7DE660029580A /* pythonlib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = pythonlib.c; path = "Bit Slicer/pythonlib.c"; sourceTree = "<group>"; };
+		7235B7B824D7DE660029580A /* pythonlib.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = pythonlib.m; path = "Bit Slicer/pythonlib.m"; sourceTree = "<group>"; };
 		72456B5A204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Preferences.strings"; sourceTree = "<group>"; };
 		72456B5D204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Search Document.strings"; sourceTree = "<group>"; };
 		72456B5E204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Dump All Memory.strings"; sourceTree = "<group>"; };
@@ -748,6 +752,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7208450624E084F400F3D449 /* Python.framework in Frameworks */,
 				7235B7B224D7D9B10029580A /* DDMathParser.framework in Frameworks */,
 				721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */,
 				7235B7A424D7BF980029580A /* libudis86.a in Frameworks */,
@@ -792,7 +797,7 @@
 			isa = PBXGroup;
 			children = (
 				7235B7B724D7DD8C0029580A /* pythonlib.h */,
-				7235B7B824D7DE660029580A /* pythonlib.c */,
+				7235B7B824D7DE660029580A /* pythonlib.m */,
 				77FF507B16E9B7D40005915D /* Memory Window Controllers */,
 				77C19AB31916D4440028F7F1 /* Changing Memory Protection */,
 				7728EE0C16BE3DDA00F9E1AD /* Dumping Memory */,
@@ -837,6 +842,7 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7208450524E084F400F3D449 /* Python.framework */,
 				721594FD24DF36360027F600 /* HexFiend.framework */,
 				7235B7B124D7D9B10029580A /* DDMathParser.framework */,
 				7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */,
@@ -1693,7 +1699,7 @@
 				772C0F8218B95603009FFF72 /* ZGBacktraceViewController.m in Sources */,
 				77C19AAF19158ABF0028F7F1 /* ZGPyModuleAdditions.m in Sources */,
 				722EE7901B19481300934EF3 /* ZGProtectionDescription.m in Sources */,
-				7235B7B924D7DE660029580A /* pythonlib.c in Sources */,
+				7235B7B924D7DE660029580A /* pythonlib.m in Sources */,
 				722EE78A1B19461000934EF3 /* ZGMemoryAddressExpressionParsing.m in Sources */,
 				77F1164D17D2EFDA009E002A /* ZGBreakPoint.m in Sources */,
 				72030ADC1B00191400A5621C /* ZGScriptingInterpreter.m in Sources */,
