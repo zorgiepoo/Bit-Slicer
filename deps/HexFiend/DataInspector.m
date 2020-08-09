@@ -284,6 +284,17 @@ static long double ieeeToLD(const void *bytes, unsigned exp, unsigned man) {
 
 static NSString *floatingPointDescription(const unsigned char *bytes, NSUInteger length, enum Endianness_t endianness) {
 	switch (length) {
+		case sizeof(uint16_t):
+		{
+			union {
+				uint16_t i;
+				__fp16 f;
+			} temp;
+			_Static_assert(sizeof temp.f == sizeof temp.i, "sizeof(uint16_t) is not 2!");
+			temp.i = *(const uint16_t *)(const void *)bytes;
+			if (endianness != eNativeEndianness) temp.i = (uint16_t)reverse(temp.i, sizeof(uint16_t));
+			return [NSString stringWithFormat:@"%.15g", (double)temp.f];
+		}
 		case sizeof(float):
 		{
 			union {
@@ -478,11 +489,9 @@ static NSAttributedString *inspectionSuccess(NSString *s) {
 			switch (length) {
 				case 0:
 					return inspectionError(InspectionErrorNoData);
-				case 1: case 2: case 3:
+				case 1: case 3:
 					return inspectionError(InspectionErrorTooLittle);
-				// Note: we diverge from upstream here which handles 2-byte floating point
-				// In my experience this is unstable, so not bringing over that change.
-				case 4: case 8: case 10: case 16:
+				case 2: case 4: case 8: case 10: case 16:
 					if(outIsError) *outIsError = NO;
 					return inspectionSuccess(floatingPointDescription(bytes, length, endianness));
 				default:
