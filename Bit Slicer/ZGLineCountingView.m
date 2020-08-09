@@ -98,41 +98,4 @@
     return string;
 }
 
-- (void)drawLineNumbersWithClipStringDrawing:(NSRect)clipRect {
-    CGFloat verticalOffset = ld2f(self.lineRangeToDraw.location - floorl(self.lineRangeToDraw.location));
-    NSRect textRect = self.bounds;
-    textRect.size.height = self.lineHeight;
-    textRect.size.width -= 5;
-    textRect.origin.y -= verticalOffset * self.lineHeight + 1;
-    unsigned long long lineIndex = HFFPToUL(floorl(self.lineRangeToDraw.location));
-    unsigned long long lineValue = lineIndex * self.bytesPerLine + [((ZGLineCountingRepresenter *)[self representer]) beginningMemoryAddress];
-    NSUInteger linesRemaining = ll2l(HFFPToUL(ceill(self.lineRangeToDraw.length + self.lineRangeToDraw.location) - floorl(self.lineRangeToDraw.location)));
-    if (! textAttributes) {
-        NSMutableParagraphStyle *mutableStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-        [mutableStyle setAlignment:NSRightTextAlignment];
-        NSParagraphStyle *paragraphStyle = [mutableStyle copy];
-        NSColor *foregroundColor = [NSColor secondaryLabelColor];
-        textAttributes = [[NSDictionary alloc] initWithObjectsAndKeys:self.font, NSFontAttributeName, foregroundColor, NSForegroundColorAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
-    }
-    
-    char formatString[64];
-    [self getLineNumberFormatString:formatString length:sizeof formatString];
-    
-    while (linesRemaining--) {
-        if (NSIntersectsRect(textRect, clipRect)) {
-            char buff[256];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
-            int newStringLength = snprintf(buff, sizeof buff, formatString, lineValue);
-#pragma clang diagnostic pop
-            HFASSERT(newStringLength > 0);
-            NSString *string = [[NSString alloc] initWithBytesNoCopy:buff length:(NSUInteger)newStringLength encoding:NSASCIIStringEncoding freeWhenDone:NO];
-            [string drawInRect:textRect withAttributes:textAttributes];
-        }
-        textRect.origin.y += self.lineHeight;
-        lineIndex++;
-        if (linesRemaining > 0) lineValue = HFSum(lineValue, self.bytesPerLine); //we could do this unconditionally, but then we risk overflow
-    }
-}
-
 @end
