@@ -114,7 +114,7 @@
 		{
 			ZGVariable *newVariable = [theRegister.variable copy];
 			
-			if (_breakPoint.process.type == ZGProcessTypeX86_64)
+			if (ZG_PROCESS_TYPE_IS_X86_64(_breakPoint.process.type))
 			{
 				[newVariable setRawValue:&newInstructionPointer];
 			}
@@ -317,7 +317,7 @@
 	BOOL shouldWriteRegister = NO;
 #if TARGET_CPU_ARM64
 #else
-	if (_breakPoint.registersState.processType == ZGProcessTypeX86_64)
+	if (ZG_PROCESS_TYPE_IS_X86_64(_breakPoint.registersState.processType))
 	{
 		NSArray<NSString *> *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
 		if ([registers64 containsObject:theRegister.variable.name])

@@ -166,7 +166,7 @@ static ZGBreakPointController *gBreakPointController;
 #if TARGET_CPU_ARM64
 #else
 		uint8_t debugRegisterIndex = debugThread.registerIndex;
-		if (breakPoint.process.type == ZGProcessTypeX86_64)
+		if (ZG_PROCESS_TYPE_IS_X86_64(breakPoint.process.type))
 		{
 			RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds64);
 		}
@@ -247,7 +247,7 @@ static ZGBreakPointController *gBreakPointController;
 			BOOL isWatchPointAvailable = NO;
 #else
 			uint8_t debugRegisterIndex = debugThread.registerIndex;
-			BOOL isWatchPointAvailable = breakPoint.process.type == ZGProcessTypeX86_64 ? IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds64) : IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds32);
+			BOOL isWatchPointAvailable = ZG_PROCESS_TYPE_IS_X86_64(breakPoint.process.type) ? IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds64) : IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds32);
 #endif
 			
 			if (!isWatchPointAvailable)
@@ -258,7 +258,7 @@ static ZGBreakPointController *gBreakPointController;
 #if TARGET_CPU_ARM64
 #else
 			// Clear dr6 debug status
-			if (breakPoint.process.type == ZGProcessTypeX86_64)
+			if (ZG_PROCESS_TYPE_IS_X86_64(breakPoint.process.type))
 			{
 				debugState.uds.ds64.__dr6 &= ~(1 << debugRegisterIndex);
 			}
@@ -358,7 +358,7 @@ static ZGBreakPointController *gBreakPointController;
 	{
 #if TARGET_CPU_ARM64
 #else
-		if (breakPoint.process.type == ZGProcessTypeX86_64)
+		if (ZG_PROCESS_TYPE_IS_X86_64(breakPoint.process.type))
 		{
 			threadState.uts.ts64.__rflags |= (1 << 8);
 		}
@@ -477,7 +477,7 @@ static ZGBreakPointController *gBreakPointController;
 		// Remove single-stepping
 #if TARGET_CPU_ARM64
 #else
-		if (breakPoint.process.type == ZGProcessTypeX86_64)
+		if (ZG_PROCESS_TYPE_IS_X86_64(breakPoint.process.type))
 		{
 			threadState.uts.ts64.__rflags &= ~(1U << 8);
 		}
@@ -531,7 +531,7 @@ static ZGBreakPointController *gBreakPointController;
 #if TARGET_CPU_ARM64
 #else
 					// Restore program counter
-					if (breakPoint.process.type == ZGProcessTypeX86_64)
+					if (ZG_PROCESS_TYPE_IS_X86_64(breakPoint.process.type))
 					{
 						threadState.uts.ts64.__rip = breakPoint.variable.address;
 					}
@@ -576,7 +576,7 @@ static ZGBreakPointController *gBreakPointController;
 		// Remove single-stepping
 #if TARGET_CPU_ARM64
 #else
-		if (candidateBreakPoint.process.type == ZGProcessTypeX86_64)
+		if (ZG_PROCESS_TYPE_IS_X86_64(candidateBreakPoint.process.type))
 		{
 			threadState.uts.ts64.__rflags &= ~(1U << 8);
 		}
@@ -904,7 +904,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		uint8_t debugRegisterIndex = 0;
 		for (uint8_t registerIndex = 0; registerIndex < 4; registerIndex++)
 		{
-			if (((processType == ZGProcessTypeX86_64) && IS_REGISTER_AVAILABLE(debugState, registerIndex, ds64)) || ((processType == ZGProcessTypeI386) && IS_REGISTER_AVAILABLE(debugState, registerIndex, ds32)))
+			if ((ZG_PROCESS_TYPE_IS_X86_64(processType) && IS_REGISTER_AVAILABLE(debugState, registerIndex, ds64)) || (ZG_PROCESS_TYPE_IS_I386(processType) && IS_REGISTER_AVAILABLE(debugState, registerIndex, ds32)))
 			{
 				debugRegisterIndex = registerIndex;
 				foundRegisterIndex = YES;
@@ -922,7 +922,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		
 #if TARGET_CPU_ARM64
 #else
-		if (processType == ZGProcessTypeX86_64)
+		if (ZG_PROCESS_TYPE_IS_X86_64(processType))
 		{
 			WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(debugRegisterIndex, debugState, variable, watchSize, watchPointType, ds64, uint64_t);
 		}

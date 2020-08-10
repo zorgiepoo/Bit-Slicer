@@ -110,7 +110,7 @@
 	for (ZGInstruction *suggestedInstruction in instructions)
 	{
 		NSMutableString *instructionText = [NSMutableString stringWithString:[suggestedInstruction text]];
-		if (process.type == ZGProcessTypeX86_64 && [instructionText rangeOfString:@"rip"].location != NSNotFound)
+		if (ZG_PROCESS_TYPE_IS_X86_64(process.type) && [instructionText rangeOfString:@"rip"].location != NSNotFound)
 		{
 			NSString *ripReplacement = nil;
 			if (allocatedAddress > instruction.variable.address)

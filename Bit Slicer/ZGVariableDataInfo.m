@@ -84,7 +84,7 @@ ZGMemorySize ZGDataAlignment(ZGProcessType processType, ZGVariableType dataType,
 	else
 	{
 		// doubles and 64-bit integers are on 4 byte boundaries only in i386 processes, while every other integral type is on its own size of boundary
-		bool isI386 = (processType == ZGProcessTypeI386);
+		bool isI386 = ZG_PROCESS_TYPE_IS_I386(processType);
 		dataAlignment = (isI386 && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
 	}
 	

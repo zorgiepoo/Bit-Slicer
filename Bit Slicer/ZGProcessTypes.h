@@ -52,4 +52,7 @@ typedef enum : int8_t
 
 #define ZG_PROCESS_POINTER_SIZE_BITS(processType) (ZG_PROCESS_POINTER_SIZE(processType) * 8)
 
+#define ZG_PROCESS_TYPE_IS_X86_64(processType) (processType == ZGProcessTypeX86_64)
+#define ZG_PROCESS_TYPE_IS_I386(processType) (processType == ZGProcessTypeI386)
+
 #endif

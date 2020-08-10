@@ -66,7 +66,7 @@ do { \
 	
 #if TARGET_CPU_ARM64
 #else
-	if (processType == ZGProcessTypeX86_64)
+	if (ZG_PROCESS_TYPE_IS_X86_64(processType))
 	{
 		// General registers
 		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rax);
@@ -196,7 +196,7 @@ do { \
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm6);
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm7);
 	
-	if (processType == ZGProcessTypeX86_64)
+	if (ZG_PROCESS_TYPE_IS_X86_64(processType))
 	{
 		// XMM 8 through 15
 		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm8);
@@ -221,7 +221,7 @@ do { \
 		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh6);
 		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh7);
 		
-		if (processType == ZGProcessTypeX86_64)
+		if (ZG_PROCESS_TYPE_IS_X86_64(processType))
 		{
 			// YMMH 8 through 15
 			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh8);

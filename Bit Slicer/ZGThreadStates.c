@@ -72,7 +72,7 @@ ZGMemoryAddress ZGInstructionPointerFromGeneralThreadState(zg_thread_state_t *th
 	(void)type;
 	return 0;
 #else
-	ZGMemoryAddress instructionPointer = (type == ZGProcessTypeX86_64) ? threadState->uts.ts64.__rip : threadState->uts.ts32.__eip;
+	ZGMemoryAddress instructionPointer = (ZG_PROCESS_TYPE_IS_X86_64(type)) ? threadState->uts.ts64.__rip : threadState->uts.ts32.__eip;
 	return instructionPointer;
 #endif
 }
@@ -84,7 +84,7 @@ ZGMemoryAddress ZGBasePointerFromGeneralThreadState(zg_thread_state_t *threadSta
 	(void)type;
 	return 0;
 #else
-	ZGMemoryAddress basePointer = (type == ZGProcessTypeX86_64) ? threadState->uts.ts64.__rbp : threadState->uts.ts32.__ebp;
+	ZGMemoryAddress basePointer = (ZG_PROCESS_TYPE_IS_X86_64(type)) ? threadState->uts.ts64.__rbp : threadState->uts.ts32.__ebp;
 	return basePointer;
 #endif
 }
@@ -123,8 +123,9 @@ bool ZGSetDebugThreadState(zg_debug_state_t *debugState, thread_act_t thread, ma
 
 static bool ZGGetAVXThreadState(zg_vector_state_t * avxState, thread_act_t thread, mach_msg_type_number_t *stateCount, ZGProcessType type)
 {
-	mach_msg_type_number_t localStateCount = (type == ZGProcessTypeX86_64) ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
-	bool success = (thread_get_state(thread, (type == ZGProcessTypeX86_64) ? x86_AVX_STATE64 : x86_AVX_STATE32, (type == ZGProcessTypeX86_64) ? (thread_state_t)&(avxState->ufs.as64) : (thread_state_t)&(avxState->ufs.as32), &localStateCount) == KERN_SUCCESS);
+	bool isX86_64 = ZG_PROCESS_TYPE_IS_X86_64(type);
+	mach_msg_type_number_t localStateCount = isX86_64 ? x86_AVX_STATE64_COUNT : x86_AVX_STATE32_COUNT;
+	bool success = (thread_get_state(thread, isX86_64 ? x86_AVX_STATE64 : x86_AVX_STATE32, isX86_64 ? (thread_state_t)&(avxState->ufs.as64) : (thread_state_t)&(avxState->ufs.as32), &localStateCount) == KERN_SUCCESS);
 	
 	if (stateCount != NULL) *stateCount = localStateCount;
 	
@@ -133,24 +134,27 @@ static bool ZGGetAVXThreadState(zg_vector_state_t * avxState, thread_act_t threa
 
 static bool ZGSetAVXThreadState(zg_vector_state_t *avxState, thread_act_t thread, mach_msg_type_number_t stateCount, ZGProcessType type)
 {
-	return (thread_set_state(thread, (type == ZGProcessTypeX86_64) ? x86_AVX_STATE64 : x86_AVX_STATE32, (type == ZGProcessTypeX86_64) ? (thread_state_t)&(avxState->ufs.as64) : (thread_state_t)&(avxState->ufs.as32), stateCount) == KERN_SUCCESS);
+	bool isX86_64 = ZG_PROCESS_TYPE_IS_X86_64(type);
+	return (thread_set_state(thread, isX86_64 ? x86_AVX_STATE64 : x86_AVX_STATE32, isX86_64 ? (thread_state_t)&(avxState->ufs.as64) : (thread_state_t)&(avxState->ufs.as32), stateCount) == KERN_SUCCESS);
 }
 
 // I will assume I have to provide 64-bit flag for same reasons I have to for AVX (see above)
 
 static bool ZGGetFloatThreadState(zg_float_state_t *floatState, thread_act_t thread, mach_msg_type_number_t *stateCount, ZGProcessType type)
 {
-	mach_msg_type_number_t localStateCount = (type == ZGProcessTypeX86_64) ? x86_FLOAT_STATE64_COUNT : x86_FLOAT_STATE32_COUNT;
-	bool success = (thread_get_state(thread, (type == ZGProcessTypeX86_64) ? x86_FLOAT_STATE64 : x86_FLOAT_STATE32, (type == ZGProcessTypeX86_64) ? (thread_state_t)&(floatState->ufs.fs64) : (thread_state_t)&(floatState->ufs.fs32), &localStateCount) == KERN_SUCCESS);
+	bool isX86_64 = ZG_PROCESS_TYPE_IS_X86_64(type);
+	mach_msg_type_number_t localStateCount = isX86_64 ? x86_FLOAT_STATE64_COUNT : x86_FLOAT_STATE32_COUNT;
+	bool success = (thread_get_state(thread, isX86_64 ? x86_FLOAT_STATE64 : x86_FLOAT_STATE32, isX86_64 ? (thread_state_t)&(floatState->ufs.fs64) : (thread_state_t)&(floatState->ufs.fs32), &localStateCount) == KERN_SUCCESS);
 	
 	if (stateCount != NULL) *stateCount = localStateCount;
 	
 	return success;
 }
 
-static bool ZGSetFloatThreadState(zg_float_state_t *floatState, thread_act_t thread, mach_msg_type_number_t stateCount, bool is64Bit)
+static bool ZGSetFloatThreadState(zg_float_state_t *floatState, thread_act_t thread, mach_msg_type_number_t stateCount, ZGProcessType type)
 {
-	return (thread_set_state(thread, is64Bit ? x86_FLOAT_STATE64 : x86_FLOAT_STATE32, is64Bit ? (thread_state_t)&floatState->ufs.fs64 : (thread_state_t)&floatState->ufs.fs32, stateCount) == KERN_SUCCESS);
+	bool isX86_64 = ZG_PROCESS_TYPE_IS_X86_64(type);
+	return (thread_set_state(thread, isX86_64 ? x86_FLOAT_STATE64 : x86_FLOAT_STATE32, isX86_64 ? (thread_state_t)&floatState->ufs.fs64 : (thread_state_t)&floatState->ufs.fs32, stateCount) == KERN_SUCCESS);
 }
 
 #endif
