@@ -251,7 +251,7 @@
 	NSMutableAttributedString *description = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n%@", instruction.text, accessedTimes] attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
 	
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
-	int numberOfGeneralRegisters = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:registersState.is64Bit];
+	int numberOfGeneralRegisters = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState processType:registersState.processType];
 	
 	NSString *generalPurposeLabel = ZGLocalizableWatchVariableString(@"generalPurposeRegistersDescriptionLabel");
 	NSString *generalPurposeAnnotatedLabel = watchVariable.accessCount > 1 ? [NSString stringWithFormat:@"%@ %@", generalPurposeLabel, ZGLocalizableWatchVariableString(@"firstRegisterAccessLabel")] : generalPurposeLabel;
@@ -264,7 +264,7 @@
 	
 	if (registersState.hasVectorState)
 	{
-		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:registersState.vectorState is64Bit:registersState.is64Bit hasAVXSupport:registersState.hasAVXSupport];
+		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralRegisters fromVectorThreadState:registersState.vectorState processType:registersState.processType hasAVXSupport:registersState.hasAVXSupport];
 		
 		NSString *vectorLabel = ZGLocalizableWatchVariableString(@"floatAndVectorRegistersDescriptionLabel");
 		NSString *vectorAnnotatedLabel = watchVariable.accessCount > 1 ? [NSString stringWithFormat:@"%@ %@", vectorLabel, ZGLocalizableWatchVariableString(@"firstRegisterAccessLabel")] : vectorLabel;

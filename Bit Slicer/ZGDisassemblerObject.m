@@ -78,7 +78,7 @@ static void disassemblerTranslator(ud_t *object)
 	}
 }
 
-- (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize
+- (id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size processType:(ZGProcessType)processType
 {
 	self = [super init];
 	if (self != nil)
@@ -90,7 +90,7 @@ static void disassemblerTranslator(ud_t *object)
 		_startAddress = address;
 		_object = malloc(sizeof(*_object));
 		
-		_pointerSize = pointerSize;
+		_pointerSize = ZG_PROCESS_POINTER_SIZE(processType);
 		
 		ud_init(_object);
 		ud_set_input_buffer(_object, _bytes, size);

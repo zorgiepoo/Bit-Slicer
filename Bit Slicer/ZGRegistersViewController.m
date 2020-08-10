@@ -114,7 +114,7 @@
 		{
 			ZGVariable *newVariable = [theRegister.variable copy];
 			
-			if (_breakPoint.process.is64Bit)
+			if (_breakPoint.process.type == ZGProcessTypeX86_64)
 			{
 				[newVariable setRawValue:&newInstructionPointer];
 			}
@@ -138,7 +138,7 @@
 	mach_msg_type_number_t threadStateCount;
 	if (ZGGetGeneralThreadState(&threadState, _breakPoint.thread, &threadStateCount))
 	{
-		basePointer = ZGBasePointerFromGeneralThreadState(&threadState, _breakPoint.process.is64Bit);
+		basePointer = ZGBasePointerFromGeneralThreadState(&threadState, _breakPoint.process.type);
 	}
 	
 	return basePointer;
@@ -155,7 +155,7 @@
 	
 	NSMutableArray<ZGRegister *> *newRegisters = [NSMutableArray array];
 	
-	NSArray<ZGVariable *> *registerVariables = [ZGRegisterEntries registerVariablesFromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:registersState.is64Bit];
+	NSArray<ZGVariable *> *registerVariables = [ZGRegisterEntries registerVariablesFromGeneralPurposeThreadState:registersState.generalPurposeThreadState processType:registersState.processType];
 	
 	for (ZGVariable *registerVariable in registerVariables)
 	{
@@ -175,11 +175,11 @@
 	}
 	
 	zg_thread_state_t generalPurposeThreadState = registersState.generalPurposeThreadState;
-	[self setInstructionPointer:ZGInstructionPointerFromGeneralThreadState(&generalPurposeThreadState, registersState.is64Bit)];
+	[self setInstructionPointer:ZGInstructionPointerFromGeneralThreadState(&generalPurposeThreadState, registersState.processType)];
 	
 	if (registersState.hasVectorState)
 	{
-		NSArray<ZGVariable *> *registerVectorVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:registersState.vectorState is64Bit:registersState.is64Bit hasAVXSupport:registersState.hasAVXSupport];
+		NSArray<ZGVariable *> *registerVectorVariables = [ZGRegisterEntries registerVariablesFromVectorThreadState:registersState.vectorState processType:registersState.processType hasAVXSupport:registersState.hasAVXSupport];
 		for (ZGVariable *registerVariable in registerVectorVariables)
 		{
 			ZGRegister *newRegister = [[ZGRegister alloc] initWithRegisterType:ZGRegisterVector variable:registerVariable];
@@ -222,11 +222,11 @@
 
 - (BOOL)changeFloatingPointRegister:(ZGRegister *)theRegister newVariable:(ZGVariable *)newVariable
 {
-	BOOL is64Bit = _breakPoint.process.is64Bit;
+	ZGProcessType processType = _breakPoint.process.type;
 	
 	zg_vector_state_t vectorState;
 	mach_msg_type_number_t vectorStateCount;
-	if (!ZGGetVectorThreadState(&vectorState, _breakPoint.thread, &vectorStateCount, is64Bit, NULL))
+	if (!ZGGetVectorThreadState(&vectorState, _breakPoint.thread, &vectorStateCount, processType, NULL))
 	{
 		return NO;
 	}
@@ -291,7 +291,7 @@
 		return NO;
 	}
 	
-	if (!ZGSetVectorThreadState(&vectorState, _breakPoint.thread, vectorStateCount, is64Bit))
+	if (!ZGSetVectorThreadState(&vectorState, _breakPoint.thread, vectorStateCount, processType))
 	{
 		NSLog(@"Failure in setting registers thread state for writing register value (floating point): %d", _breakPoint.thread);
 		return NO;
@@ -317,7 +317,7 @@
 	BOOL shouldWriteRegister = NO;
 #if TARGET_CPU_ARM64
 #else
-	if (_breakPoint.registersState.is64Bit)
+	if (_breakPoint.registersState.processType == ZGProcessTypeX86_64)
 	{
 		NSArray<NSString *> *registers64 = @[@"rax", @"rbx", @"rcx", @"rdx", @"rdi", @"rsi", @"rbp", @"rsp", @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15", @"rip", @"rflags", @"cs", @"fs", @"gs"];
 		if ([registers64 containsObject:theRegister.variable.name])
@@ -429,7 +429,7 @@
 		if ([tableColumn.identifier isEqualToString:@"value"])
 		{
 			ZGMemorySize size;
-			void *newValue = ZGValueFromString(_breakPoint.process.is64Bit, object, theRegister.variable.type, &size);
+			void *newValue = ZGValueFromString(ZG_PROCESS_TYPE_IS_64_BIT(_breakPoint.process.type), object, theRegister.variable.type, &size);
 			if (newValue != NULL)
 			{
 				[self

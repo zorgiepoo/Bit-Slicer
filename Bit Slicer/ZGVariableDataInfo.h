@@ -33,7 +33,8 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
+#import "ZGProcessTypes.h"
 
 BOOL ZGIsNumericalDataType(ZGVariableType dataType);
-ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType dataType);
-ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize);
+ZGMemorySize ZGDataSizeFromNumericalDataType(ZGProcessType processType, ZGVariableType dataType);
+ZGMemorySize ZGDataAlignment(ZGProcessType processType, ZGVariableType dataType, ZGMemorySize dataSize);

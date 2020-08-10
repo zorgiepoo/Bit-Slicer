@@ -589,7 +589,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			
 			ZGMemorySize size = endAddress - startAddress;
 			
-			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startAddress size:size breakPoints:_breakPointController.breakPoints];
+			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask processType:self.currentProcess.type address:startAddress size:size breakPoints:_breakPointController.breakPoints];
 			if (disassemblerObject != nil)
 			{
 				NSArray<ZGInstruction *> *instructionsToReplace = [disassemblerObject readInstructions];
@@ -656,7 +656,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	{
 		ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 		
-		ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size breakPoints:_breakPointController.breakPoints];
+		ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask processType:self.currentProcess.type address:startInstruction.variable.address size:size breakPoints:_breakPointController.breakPoints];
 		
 		if (disassemblerObject != nil)
 		{
@@ -715,7 +715,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		{
 			ZGMemorySize size = endInstruction.variable.address - startInstruction.variable.address;
 			
-			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:startInstruction.variable.address size:size breakPoints:_breakPointController.breakPoints];
+			ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask processType:self.currentProcess.type address:startInstruction.variable.address size:size breakPoints:_breakPointController.breakPoints];
 			
 			if (disassemblerObject != nil)
 			{
@@ -764,7 +764,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	_instructions = @[];
 	[_instructionsTableView reloadData];
 
-	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:address size:size breakPoints:_breakPointController.breakPoints];
+	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask processType:self.currentProcess.type address:address size:size breakPoints:_breakPointController.breakPoints];
 	NSArray<ZGInstruction *> *newInstructions = @[];
 
 	if (disassemblerObject != nil)
@@ -839,7 +839,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
 	
-	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask pointerSize:self.currentProcess.pointerSize address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:_breakPointController.breakPoints];
+	ZGDisassemblerObject *disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask processType:self.currentProcess.type address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:_breakPointController.breakPoints];
 	
 	if (disassemblerObject != nil)
 	{
@@ -1677,7 +1677,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	// Make sure the old and new value that we are writing have the same size in bytes, so that undo/redo will work correctly for different sizes
 	
 	ZGMemorySize newWriteSize = 0;
-	void *newWriteValue = ZGValueFromString(self.currentProcess.is64Bit, stringValue, ZGByteArray, &newWriteSize);
+	void *newWriteValue = ZGValueFromString(ZG_PROCESS_TYPE_IS_64_BIT(self.currentProcess.type), stringValue, ZGByteArray, &newWriteSize);
 	if (newWriteValue)
 	{
 		if (newWriteSize > 0)

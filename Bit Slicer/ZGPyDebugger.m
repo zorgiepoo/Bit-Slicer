@@ -65,7 +65,7 @@ typedef struct
 	PyObject_HEAD
 	uint32_t processTask;
 	int32_t processIdentifier;
-	int8_t is64Bit;
+	int8_t processType;
 	PyObject *virtualMemoryException;
 	PyObject *debuggerException;
 	__unsafe_unretained ZGPyDebugger *objcSelf;
@@ -249,7 +249,7 @@ static PyTypeObject DebuggerType =
 		debuggerObject->objcSelf = self;
 		debuggerObject->processIdentifier = process.processID;
 		debuggerObject->processTask = process.processTask;
-		debuggerObject->is64Bit = process.is64Bit;
+		debuggerObject->processType = process.type;
 		debuggerObject->virtualMemoryException = scriptingInterpreter.virtualMemoryException;
 		debuggerObject->debuggerException = scriptingInterpreter.debuggerException;
 		debuggerObject->breakPointDelegate = self;
@@ -567,7 +567,7 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 		if (codeStringValue != nil)
 		{
 			NSError *error = nil;
-			NSData *assembledData = [ZGDebuggerUtilities assembleInstructionText:codeStringValue atInstructionPointer:instructionPointer usingArchitectureBits:self->is64Bit ? sizeof(int64_t)*8 : sizeof(int32_t)*8 error:&error];
+			NSData *assembledData = [ZGDebuggerUtilities assembleInstructionText:codeStringValue atInstructionPointer:instructionPointer usingArchitectureBits:ZG_PROCESS_POINTER_SIZE_BITS(self->processType) error:&error];
 			
 			if (error == nil)
 			{
@@ -612,7 +612,7 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len processType:self->processType];
 		
 		NSArray<ZGInstruction *> *instructions = [disassemblerObject readInstructions];
 		
@@ -943,7 +943,7 @@ static void continueFromHaltedBreakPointsInDebugger(DebuggerClass *self)
 		if (hidden)
 		{
 			zg_thread_state_t threadState = registersState.generalPurposeThreadState;
-			ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, breakPoint.process.is64Bit);
+			ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, breakPoint.process.type);
 			
 			if (basePointer == breakPointBasePointer)
 			{
@@ -1084,7 +1084,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, self->is64Bit);
+	ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, self->processType);
 	
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
@@ -1106,7 +1106,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, self->is64Bit);
+		ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, self->processType);
 		
 		if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:nextInstruction inProcess:self->objcSelf->_process thread:self->objcSelf->_haltedBreakPoint.thread basePointer:basePointer callback:callback delegate:self->objcSelf])
 		{
@@ -1148,8 +1148,8 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, self->is64Bit);
-	ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, self->is64Bit);
+	ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, self->processType);
+	ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, self->processType);
 	
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
@@ -1198,8 +1198,8 @@ static PyObject *Debugger_backtrace(DebuggerClass *self, PyObject * __unused arg
 		return NULL;
 	}
 	
-	ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, self->is64Bit);
-	ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, self->is64Bit);
+	ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, self->processType);
+	ZGMemoryAddress basePointer = ZGBasePointerFromGeneralThreadState(&threadState, self->processType);
 	
 	ZGBacktrace *backtrace = [ZGBacktrace backtraceWithBasePointer:basePointer instructionPointer:instructionPointer process:self->objcSelf->_process breakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
 	
@@ -1330,14 +1330,14 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	zg_vector_state_t vectorState;
 	mach_msg_type_number_t vectorStateCount;
 	bool hasAVXSupport = NO;
-	BOOL hasVectorRegisters = ZGGetVectorThreadState(&vectorState, self->objcSelf->_haltedBreakPoint.thread, &vectorStateCount, self->is64Bit, &hasAVXSupport);
+	BOOL hasVectorRegisters = ZGGetVectorThreadState(&vectorState, self->objcSelf->_haltedBreakPoint.thread, &vectorStateCount, self->processType, &hasAVXSupport);
 	
 	ZGResumeTask(self->processTask);
 	
 	if (self->objcSelf->_generalPurposeRegisterOffsetsDictionary == nil)
 	{
 		ZGRegisterEntry generalPurposeRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
-		[ZGRegisterEntries getRegisterEntries:generalPurposeRegisterEntries fromGeneralPurposeThreadState:threadState is64Bit:self->is64Bit];
+		[ZGRegisterEntries getRegisterEntries:generalPurposeRegisterEntries fromGeneralPurposeThreadState:threadState processType:self->processType];
 		
 		self->objcSelf->_generalPurposeRegisterOffsetsDictionary = registerOffsetsCacheDictionary(generalPurposeRegisterEntries);
 	}
@@ -1345,7 +1345,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	if (hasVectorRegisters && self->objcSelf->_vectorRegisterOffsetsDictionary == nil)
 	{
 		ZGRegisterEntry vectorRegisterEntries[ZG_MAX_REGISTER_ENTRIES];
-		[ZGRegisterEntries getRegisterEntries:vectorRegisterEntries fromVectorThreadState:vectorState is64Bit:self->is64Bit hasAVXSupport:hasAVXSupport];
+		[ZGRegisterEntries getRegisterEntries:vectorRegisterEntries fromVectorThreadState:vectorState processType:self->processType hasAVXSupport:hasAVXSupport];
 		
 		self->objcSelf->_vectorRegisterOffsetsDictionary = registerOffsetsCacheDictionary(vectorRegisterEntries);
 	}
@@ -1404,7 +1404,7 @@ static PyObject *Debugger_writeRegisters(DebuggerClass *self, PyObject *args)
 	{
 		ZGSuspendTask(self->processTask);
 		
-		if (!ZGSetVectorThreadState(&vectorState, self->objcSelf->_haltedBreakPoint.thread, vectorStateCount, self->is64Bit))
+		if (!ZGSetVectorThreadState(&vectorState, self->objcSelf->_haltedBreakPoint.thread, vectorStateCount, self->processType))
 		{
 			PyErr_SetString(self->debuggerException, "debug.writeRegisters failed to write the new vector state");
 			success = NO;

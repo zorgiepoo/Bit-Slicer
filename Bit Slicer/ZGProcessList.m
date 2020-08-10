@@ -184,11 +184,25 @@
 			_processTypeName[_processTypeNameLength - 1] = processIdentifier;
 			if (sysctl(_processTypeName, (u_int)_processTypeNameLength, &cpuType, &cpuTypeSize, NULL, 0) == 0)
 			{
-				BOOL is64Bit = ((cpuType & CPU_ARCH_ABI64) != 0);
+				ZGProcessType processType;
+				switch (cpuType)
+				{
+					case CPU_TYPE_X86_64:
+						processType = ZGProcessTypeX86_64;
+						break;
+					case CPU_TYPE_X86:
+						processType = ZGProcessTypeI386;
+						break;
+					case CPU_TYPE_ARM64:
+						processType = ZGProcessTypeARM64;
+						break;
+					default:
+						processType = ZGProcessTypeNone;
+				}
 				// Note that the internal name is not really the "true" name of the process since it has a very small max character limit
 				const char *internalName = processInfo.kp_proc.p_comm;
 				
-				ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processIdentifier is64Bit:is64Bit internalName:@(internalName)];
+				ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processIdentifier type:processType internalName:@(internalName)];
 				
 				[newRunningProcesses addObject:runningProcess];
 			}

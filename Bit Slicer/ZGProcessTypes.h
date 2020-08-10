@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Mayur Pawashe
+ * Copyright (c) 2020 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,24 +30,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
-#import "ZGThreadStates.h"
-#import "ZGProcessTypes.h"
+#ifndef ZG_PROCESS_TYPES_H
+#define ZG_PROCESS_TYPES_H
 
-NS_ASSUME_NONNULL_BEGIN
+#include <stdint.h>
 
-@interface ZGRegistersState : NSObject
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfixed-enum-extension"
+typedef enum : int8_t
+{
+	ZGProcessTypeNone = 0,
+	ZGProcessTypeI386,
+	ZGProcessTypeX86_64,
+	ZGProcessTypeARM64
+} ZGProcessType;
+#pragma clang diagnostic pop
 
-- (id)initWithGeneralPurposeThreadState:(zg_thread_state_t)generalPurposeThreadState vectorState:(zg_vector_state_t)vectorState hasVectorState:(BOOL)hasVectorState hasAVXSupport:(BOOL)hasAVXSupport processType:(ZGProcessType)processType;
+#define ZG_PROCESS_TYPE_IS_64_BIT(processType) (processType != ZGProcessTypeI386)
 
-@property (nonatomic) zg_thread_state_t generalPurposeThreadState;
-@property (nonatomic) zg_vector_state_t vectorState;
+#define ZG_PROCESS_POINTER_SIZE(processType) (ZG_PROCESS_TYPE_IS_64_BIT(processType) ? sizeof(int64_t) : sizeof(int32_t))
 
-@property (nonatomic, readonly) BOOL hasVectorState;
-@property (nonatomic, readonly) BOOL hasAVXSupport;
-@property (nonatomic, readonly) ZGProcessType processType;
+#define ZG_PROCESS_POINTER_SIZE_BITS(processType) (ZG_PROCESS_POINTER_SIZE(processType) * 8)
 
-@end
-
-NS_ASSUME_NONNULL_END
+#endif

@@ -129,7 +129,7 @@
 + (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
 	ZGMemorySize newSize = 0;
-	void *newValue = ZGValueFromString(process.is64Bit, stringValue, ZGByteArray, &newSize);
+	void *newValue = ZGValueFromString(ZG_PROCESS_TYPE_IS_64_BIT(process.type), stringValue, ZGByteArray, &newSize);
 	
 	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] atAddress:address processTask:process.processTask breakPoints:breakPoints];
 }
@@ -239,13 +239,13 @@
 	return data;
 }
 
-+ (ZGDisassemblerObject *)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask pointerSize:(ZGMemorySize)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
++ (ZGDisassemblerObject *)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask processType:(ZGProcessType)processType address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
 	ZGDisassemblerObject *newObject = nil;
 	NSData *data = [self readDataWithProcessTask:processTask address:address size:size breakPoints:breakPoints];
 	if (data != nil)
 	{
-		newObject = [[ZGDisassemblerObject alloc] initWithBytes:data.bytes address:address size:data.length pointerSize:pointerSize];
+		newObject = [[ZGDisassemblerObject alloc] initWithBytes:data.bytes address:address size:data.length processType:processType];
 	}
 	return newObject;
 }
@@ -297,7 +297,7 @@
 			readSize = targetRegion.address + targetRegion.size - startAddress;
 		}
 		
-		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask pointerSize:process.pointerSize address:startAddress size:readSize breakPoints:breakPoints];
+		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask processType:process.type address:startAddress size:readSize breakPoints:breakPoints];
 		
 		instruction = [disassemblerObject readLastInstructionWithMaxSize:size];
 	}

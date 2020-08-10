@@ -33,6 +33,7 @@
 #import <Foundation/Foundation.h>
 #import "ZGSymbolicator.h"
 #import "ZGMemoryTypes.h"
+#import "ZGProcessTypes.h"
 #import <sys/sysctl.h>
 
 #define NON_EXISTENT_PID_NUMBER -1
@@ -43,9 +44,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGProcess : NSObject
 
-- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit;
+- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID type:(ZGProcessType)processType;
 
-- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit;
+- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName type:(ZGProcessType)processType;
 
 - (instancetype)initWithProcess:(ZGProcess *)process;
 
@@ -58,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL valid;
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *internalName;
-@property (nonatomic, readonly) BOOL is64Bit;
+@property (nonatomic, readonly) ZGProcessType type;
 
 // indicates if this represents any sort of actual program.. admittingly, this is kind of a hack
 @property (nonatomic) BOOL isDummy;

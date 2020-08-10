@@ -37,7 +37,7 @@ BOOL ZGIsNumericalDataType(ZGVariableType dataType)
 	return (dataType != ZGByteArray && dataType != ZGString8 && dataType != ZGString16);
 }
 
-ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType dataType)
+ZGMemorySize ZGDataSizeFromNumericalDataType(ZGProcessType processType, ZGVariableType dataType)
 {
 	ZGMemorySize dataSize;
 	switch (dataType)
@@ -57,7 +57,7 @@ ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType
 			dataSize = 8;
 			break;
 		case ZGPointer:
-			dataSize = isProcess64Bit ? 8 : 4;
+			dataSize = ZG_PROCESS_POINTER_SIZE(processType);
 			break;
 		case ZGString8:
 		case ZGString16:
@@ -69,7 +69,7 @@ ZGMemorySize ZGDataSizeFromNumericalDataType(BOOL isProcess64Bit, ZGVariableType
 	return dataSize;
 }
 
-ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMemorySize dataSize)
+ZGMemorySize ZGDataAlignment(ZGProcessType processType, ZGVariableType dataType, ZGMemorySize dataSize)
 {
 	ZGMemorySize dataAlignment;
 	
@@ -83,8 +83,9 @@ ZGMemorySize ZGDataAlignment(BOOL isProcess64Bit, ZGVariableType dataType, ZGMem
 	}
 	else
 	{
-		// doubles and 64-bit integers are on 4 byte boundaries only in 32-bit processes, while every other integral type is on its own size of boundary
-		dataAlignment = (!isProcess64Bit && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
+		// doubles and 64-bit integers are on 4 byte boundaries only in i386 processes, while every other integral type is on its own size of boundary
+		bool isI386 = (processType == ZGProcessTypeI386);
+		dataAlignment = (isI386 && dataSize == sizeof(int64_t)) ? sizeof(int32_t) : dataSize;
 	}
 	
 	return dataAlignment;

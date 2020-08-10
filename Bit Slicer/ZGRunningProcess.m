@@ -50,21 +50,21 @@
 
 #pragma mark Birth
 
-- (id)initWithProcessIdentifier:(pid_t)processIdentifier is64Bit:(BOOL)is64Bit internalName:(NSString *)name
+- (id)initWithProcessIdentifier:(pid_t)processIdentifier type:(ZGProcessType)processType internalName:(NSString *)name
 {
 	self = [super init];
 	if (self != nil)
 	{
 		_processIdentifier = processIdentifier;
 		_internalName = (name != nil) ? [name copy] : [NSString stringWithFormat:@"%d", processIdentifier];
-		_is64Bit = is64Bit;
+		_type = processType;
 	}
 	return self;
 }
 
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier
 {
-	return [self initWithProcessIdentifier:processIdentifier is64Bit:YES internalName:nil];
+	return [self initWithProcessIdentifier:processIdentifier type:ZGProcessTypeNone internalName:nil];
 }
 
 #pragma mark Comparisons

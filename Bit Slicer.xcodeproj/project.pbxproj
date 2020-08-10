@@ -293,6 +293,7 @@
 		7208450224E076B400F3D449 /* DataInspectorRepresenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DataInspectorRepresenter.m; path = deps/HexFiend/DataInspectorRepresenter.m; sourceTree = "<group>"; };
 		7208450324E076B400F3D449 /* DataInspectorRepresenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DataInspectorRepresenter.h; path = deps/HexFiend/DataInspectorRepresenter.h; sourceTree = "<group>"; };
 		7208450524E084F400F3D449 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = deps/python/Python.framework; sourceTree = "<group>"; };
+		7208454724E0B1DC00F3D449 /* ZGProcessTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGProcessTypes.h; path = "Bit Slicer/ZGProcessTypes.h"; sourceTree = "<group>"; };
 		721594FD24DF36360027F600 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend/HexFiend.framework; sourceTree = "<group>"; };
 		721594FF24DF36460027F600 /* HFLineCountingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HexFiend/HFLineCountingView.h; sourceTree = "<group>"; };
 		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
@@ -1362,6 +1363,7 @@
 		77FF508316EAD0B00005915D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				7208454724E0B1DC00F3D449 /* ZGProcessTypes.h */,
 				77F1162617D2EF3A009E002A /* ZGProcess.h */,
 				77F1162717D2EF3A009E002A /* ZGProcess.m */,
 				77F1162917D2EF46009E002A /* ZGVariableTypes.h */,

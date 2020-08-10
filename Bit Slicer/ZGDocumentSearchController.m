@@ -424,7 +424,7 @@
 			{
 				// Clearly a range type of search
 				ZGMemorySize rangeDataSize;
-				_searchData.rangeValue = ZGValueFromString(currentProcess.is64Bit, flagsExpression, dataType, &rangeDataSize);
+				_searchData.rangeValue = ZGValueFromString(ZG_PROCESS_TYPE_IS_64_BIT(currentProcess.type), flagsExpression, dataType, &rangeDataSize);
 				if (_searchData.rangeValue == NULL)
 				{
 					NSLog(@"Failed to parse range value from %@...", flagsExpression);
@@ -451,7 +451,7 @@
 			{
 				// Clearly an epsilon flag
 				ZGMemorySize epsilonDataSize;
-				void *epsilon = ZGValueFromString(currentProcess.is64Bit, flagsExpression, ZGDouble, &epsilonDataSize);
+				void *epsilon = ZGValueFromString(ZG_PROCESS_TYPE_IS_64_BIT(currentProcess.type), flagsExpression, ZGDouble, &epsilonDataSize);
 				if (epsilon != NULL)
 				{
 					_searchData.epsilon = *((double *)epsilon);
@@ -517,7 +517,8 @@
 	
 	ZGFunctionType functionType = _functionType;
 	
-	BOOL is64Bit = windowController.currentProcess.is64Bit;
+	ZGProcessType processType = windowController.currentProcess.type;
+	BOOL is64Bit = ZG_PROCESS_TYPE_IS_64_BIT(processType);
 	
 	_searchData.shouldCompareStoredValues = ZGIsFunctionTypeStore(functionType);
 	
@@ -583,7 +584,7 @@
 		}
 		
 		_searchData.searchValue = NULL;
-		_searchData.dataSize = ZGDataSizeFromNumericalDataType(is64Bit, dataType);
+		_searchData.dataSize = ZGDataSizeFromNumericalDataType(processType, dataType);
 		
 		if (ZGIsFunctionTypeLinear(functionType))
 		{
@@ -600,8 +601,8 @@
 				return NO;
 			}
 			
-			_searchData.additiveConstant = ZGValueFromString(windowController.currentProcess.is64Bit, additiveConstantString, dataType, NULL);
-			_searchData.multiplicativeConstant = ZGValueFromString(windowController.currentProcess.is64Bit, multiplicativeConstantString, dataType, NULL);
+			_searchData.additiveConstant = ZGValueFromString(is64Bit, additiveConstantString, dataType, NULL);
+			_searchData.multiplicativeConstant = ZGValueFromString(is64Bit, multiplicativeConstantString, dataType, NULL);
 			
 			if (_searchData.additiveConstant == NULL || _searchData.multiplicativeConstant == NULL)
 			{
@@ -646,7 +647,7 @@
 	_searchData.dataAlignment =
 		_documentData.ignoreDataAlignment
 		? sizeof(int8_t)
-		: ZGDataAlignment(windowController.currentProcess.is64Bit, dataType, _searchData.dataSize);
+		: ZGDataAlignment(processType, dataType, _searchData.dataSize);
 	
 	if (![self retrieveFlagsSearchDataWithDataType:dataType functionType:functionType error:error])
 	{

@@ -166,7 +166,7 @@ static ZGBreakPointController *gBreakPointController;
 #if TARGET_CPU_ARM64
 #else
 		uint8_t debugRegisterIndex = debugThread.registerIndex;
-		if (breakPoint.process.is64Bit)
+		if (breakPoint.process.type == ZGProcessTypeX86_64)
 		{
 			RESTORE_BREAKPOINT_IN_DEBUG_REGISTERS(ds64);
 		}
@@ -247,7 +247,7 @@ static ZGBreakPointController *gBreakPointController;
 			BOOL isWatchPointAvailable = NO;
 #else
 			uint8_t debugRegisterIndex = debugThread.registerIndex;
-			BOOL isWatchPointAvailable = breakPoint.process.is64Bit ? IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds64) : IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds32);
+			BOOL isWatchPointAvailable = breakPoint.process.type == ZGProcessTypeX86_64 ? IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds64) : IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, ds32);
 #endif
 			
 			if (!isWatchPointAvailable)
@@ -258,7 +258,7 @@ static ZGBreakPointController *gBreakPointController;
 #if TARGET_CPU_ARM64
 #else
 			// Clear dr6 debug status
-			if (breakPoint.process.is64Bit)
+			if (breakPoint.process.type == ZGProcessTypeX86_64)
 			{
 				debugState.uds.ds64.__dr6 &= ~(1 << debugRegisterIndex);
 			}
@@ -279,13 +279,13 @@ static ZGBreakPointController *gBreakPointController;
 				continue;
 			}
 			
-			ZGMemoryAddress instructionAddress = ZGInstructionPointerFromGeneralThreadState(&threadState, breakPoint.process.is64Bit);
+			ZGMemoryAddress instructionAddress = ZGInstructionPointerFromGeneralThreadState(&threadState, breakPoint.process.type);
 			
 			zg_vector_state_t vectorState;
 			bool hasAVXSupport = NO;
-			BOOL retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit, &hasAVXSupport);
+			BOOL retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.type, &hasAVXSupport);
 			
-			ZGRegistersState *registersState = [[ZGRegistersState alloc] initWithGeneralPurposeThreadState:threadState vectorState:vectorState hasVectorState:retrievedVectorState hasAVXSupport:hasAVXSupport is64Bit:breakPoint.process.is64Bit];
+			ZGRegistersState *registersState = [[ZGRegistersState alloc] initWithGeneralPurposeThreadState:threadState vectorState:vectorState hasVectorState:retrievedVectorState hasAVXSupport:hasAVXSupport processType:breakPoint.process.type];
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
@@ -358,7 +358,7 @@ static ZGBreakPointController *gBreakPointController;
 	{
 #if TARGET_CPU_ARM64
 #else
-		if (breakPoint.process.is64Bit)
+		if (breakPoint.process.type == ZGProcessTypeX86_64)
 		{
 			threadState.uts.ts64.__rflags |= (1 << 8);
 		}
@@ -477,7 +477,7 @@ static ZGBreakPointController *gBreakPointController;
 		// Remove single-stepping
 #if TARGET_CPU_ARM64
 #else
-		if (breakPoint.process.is64Bit)
+		if (breakPoint.process.type == ZGProcessTypeX86_64)
 		{
 			threadState.uts.ts64.__rflags &= ~(1U << 8);
 		}
@@ -493,7 +493,7 @@ static ZGBreakPointController *gBreakPointController;
 		}];
 		
 		ZGMemoryAddress foundInstructionAddress = 0x0;
-		ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, breakPoint.process.is64Bit);
+		ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, breakPoint.process.type);
 		
 		if (foundSingleStepBreakPoint)
 		{
@@ -531,7 +531,7 @@ static ZGBreakPointController *gBreakPointController;
 #if TARGET_CPU_ARM64
 #else
 					// Restore program counter
-					if (breakPoint.process.is64Bit)
+					if (breakPoint.process.type == ZGProcessTypeX86_64)
 					{
 						threadState.uts.ts64.__rip = breakPoint.variable.address;
 					}
@@ -576,7 +576,7 @@ static ZGBreakPointController *gBreakPointController;
 		// Remove single-stepping
 #if TARGET_CPU_ARM64
 #else
-		if (candidateBreakPoint.process.is64Bit)
+		if (candidateBreakPoint.process.type == ZGProcessTypeX86_64)
 		{
 			threadState.uts.ts64.__rflags &= ~(1U << 8);
 		}
@@ -590,7 +590,7 @@ static ZGBreakPointController *gBreakPointController;
 		{
 			ZGSuspendTask(task);
 			
-			candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:ZGInstructionPointerFromGeneralThreadState(&threadState, candidateBreakPoint.process.is64Bit) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
+			candidateBreakPoint.variable = [[ZGVariable alloc] initWithValue:NULL size:1 address:ZGInstructionPointerFromGeneralThreadState(&threadState, candidateBreakPoint.process.type) type:ZGByteArray qualifier:0 pointerSize:candidateBreakPoint.process.pointerSize];
 			
 			[breakPointsToNotify addObject:candidateBreakPoint];
 			
@@ -623,14 +623,14 @@ static ZGBreakPointController *gBreakPointController;
 		
 		if (canNotifyDelegate && !retrievedRegisterEntries)
 		{
-			BOOL is64Bit = breakPoint.process.is64Bit;
+			ZGProcessType processType = breakPoint.process.type;
 			
-			int numberOfGeneralPurposeEntries = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
+			int numberOfGeneralPurposeEntries = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:threadState processType:processType];
 			
-			retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, breakPoint.process.is64Bit, &hasAVXSupport);
+			retrievedVectorState = ZGGetVectorThreadState(&vectorState, thread, NULL, processType, &hasAVXSupport);
 			if (retrievedVectorState)
 			{
-				[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:vectorState is64Bit:is64Bit hasAVXSupport:hasAVXSupport];
+				[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:vectorState processType:processType hasAVXSupport:hasAVXSupport];
 			}
 			
 			retrievedRegisterEntries = YES;
@@ -654,7 +654,7 @@ static ZGBreakPointController *gBreakPointController;
 		
 		if (canNotifyDelegate)
 		{
-			BOOL is64Bit = breakPoint.process.is64Bit;
+			ZGProcessType processType = breakPoint.process.type;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				@synchronized(self)
@@ -662,7 +662,7 @@ static ZGBreakPointController *gBreakPointController;
 					id <ZGBreakPointDelegate> delegate = breakPoint.delegate;
 					if (delegate != nil)
 					{
-						ZGRegistersState *registersState = [[ZGRegistersState alloc] initWithGeneralPurposeThreadState:threadState vectorState:vectorState hasVectorState:retrievedVectorState hasAVXSupport:hasAVXSupport is64Bit:is64Bit];
+						ZGRegistersState *registersState = [[ZGRegistersState alloc] initWithGeneralPurposeThreadState:threadState vectorState:vectorState hasVectorState:retrievedVectorState hasAVXSupport:hasAVXSupport processType:processType];
 						
 						breakPoint.registersState = registersState;
 						
@@ -853,7 +853,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 - (BOOL)updateThreadListInWatchpoint:(ZGBreakPoint *)watchPoint type:(ZGWatchPointType)watchPointType
 {
 	ZGMemoryMap processTask = watchPoint.process.processTask;
-	BOOL is64Bit = watchPoint.process.is64Bit;
+	ZGProcessType processType = watchPoint.process.type;
 #if TARGET_CPU_ARM64
 #else
 	ZGMemorySize watchSize = watchPoint.watchSize;
@@ -904,7 +904,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		uint8_t debugRegisterIndex = 0;
 		for (uint8_t registerIndex = 0; registerIndex < 4; registerIndex++)
 		{
-			if ((is64Bit && IS_REGISTER_AVAILABLE(debugState, registerIndex, ds64)) || (!is64Bit && IS_REGISTER_AVAILABLE(debugState, registerIndex, ds32)))
+			if (((processType == ZGProcessTypeX86_64) && IS_REGISTER_AVAILABLE(debugState, registerIndex, ds64)) || ((processType == ZGProcessTypeI386) && IS_REGISTER_AVAILABLE(debugState, registerIndex, ds32)))
 			{
 				debugRegisterIndex = registerIndex;
 				foundRegisterIndex = YES;
@@ -922,7 +922,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		
 #if TARGET_CPU_ARM64
 #else
-		if (is64Bit)
+		if (processType == ZGProcessTypeX86_64)
 		{
 			WRITE_BREAKPOINT_IN_DEBUG_REGISTERS(debugRegisterIndex, debugState, variable, watchSize, watchPointType, ds64, uint64_t);
 		}
@@ -977,7 +977,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		{
 			watchSize = 2;
 		}
-		else if (variable.size <= 4 || !process.is64Bit)
+		else if (variable.size <= 4 || !ZG_PROCESS_TYPE_IS_64_BIT(process.type))
 		{
 			watchSize = 4;
 		}

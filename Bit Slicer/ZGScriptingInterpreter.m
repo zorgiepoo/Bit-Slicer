@@ -301,16 +301,16 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 - (PyObject *)registersfromRegistersState:(ZGRegistersState *)registersState
 {
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
-	BOOL is64Bit = registersState.is64Bit;
+	ZGProcessType processType = registersState.processType;
 	
-	int numberOfGeneralPurposeEntries = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState is64Bit:is64Bit];
+	int numberOfGeneralPurposeEntries = [ZGRegisterEntries getRegisterEntries:registerEntries fromGeneralPurposeThreadState:registersState.generalPurposeThreadState processType:processType];
 	
 	if (registersState.hasVectorState)
 	{
-		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:registersState.vectorState is64Bit:is64Bit hasAVXSupport:registersState.hasAVXSupport];
+		[ZGRegisterEntries getRegisterEntries:registerEntries + numberOfGeneralPurposeEntries fromVectorThreadState:registersState.vectorState processType:processType hasAVXSupport:registersState.hasAVXSupport];
 	}
 	
-	return convertRegisterEntriesToPyDict(registerEntries, is64Bit);
+	return convertRegisterEntriesToPyDict(registerEntries, ZG_PROCESS_TYPE_IS_64_BIT(processType));
 }
 
 - (BOOL)evaluateCondition:(PyObject *)compiledExpression process:(ZGProcess *)process registerEntries:(ZGRegisterEntry *)registerEntries error:(NSError * __autoreleasing *)error
@@ -328,7 +328,7 @@ static PyObject *convertRegisterEntriesToPyDict(ZGRegisterEntry *registerEntries
 		PyObject_SetAttrString(mainModule, "vm", virtualMemoryInstance.object);
 		
 		PyObject *globalDictionary = PyModule_GetDict(mainModule);
-		PyObject *localDictionary = convertRegisterEntriesToPyDict(registerEntries, process.is64Bit);
+		PyObject *localDictionary = convertRegisterEntriesToPyDict(registerEntries, ZG_PROCESS_TYPE_IS_64_BIT(process.type));
 		
 		PyDict_SetItemString(localDictionary, "ctypes", self->_cTypesObject);
 		PyDict_SetItemString(localDictionary, "struct", self->_structObject);

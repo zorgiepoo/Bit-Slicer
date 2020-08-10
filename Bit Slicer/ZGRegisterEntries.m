@@ -60,13 +60,13 @@ do { \
 
 #endif
 
-+ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(zg_thread_state_t)threadState is64Bit:(BOOL)is64Bit
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromGeneralPurposeThreadState:(zg_thread_state_t)threadState processType:(ZGProcessType)processType
 {
 	int entryIndex = 0;
 	
 #if TARGET_CPU_ARM64
 #else
-	if (is64Bit)
+	if (processType == ZGProcessTypeX86_64)
 	{
 		// General registers
 		ADD_GENERAL_REGISTER_64(entries, entryIndex, threadState, rax);
@@ -154,7 +154,7 @@ do { \
 
 #endif
 
-+ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
++ (int)getRegisterEntries:(ZGRegisterEntry *)entries fromVectorThreadState:(zg_vector_state_t)vectorState processType:(ZGProcessType)processType hasAVXSupport:(BOOL)hasAVXSupport
 {
 	int entryIndex = 0;
 	
@@ -196,7 +196,7 @@ do { \
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm6);
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm7);
 	
-	if (is64Bit)
+	if (processType == ZGProcessTypeX86_64)
 	{
 		// XMM 8 through 15
 		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, xmm8);
@@ -221,7 +221,7 @@ do { \
 		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh6);
 		ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh7);
 		
-		if (is64Bit)
+		if (processType == ZGProcessTypeX86_64)
 		{
 			// YMMH 8 through 15
 			ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, ymmh8);
@@ -241,12 +241,12 @@ do { \
 	return entryIndex;
 }
 
-+ (NSArray<ZGVariable *> *)registerVariablesFromVectorThreadState:(zg_vector_state_t)vectorState is64Bit:(BOOL)is64Bit hasAVXSupport:(BOOL)hasAVXSupport
++ (NSArray<ZGVariable *> *)registerVariablesFromVectorThreadState:(zg_vector_state_t)vectorState processType:(ZGProcessType)processType hasAVXSupport:(BOOL)hasAVXSupport
 {
 	NSMutableArray<ZGVariable *> *registerVariables = [[NSMutableArray alloc] init];
 	
 	ZGRegisterEntry entries[64];
-	[ZGRegisterEntries getRegisterEntries:entries fromVectorThreadState:vectorState is64Bit:is64Bit hasAVXSupport:hasAVXSupport];
+	[ZGRegisterEntries getRegisterEntries:entries fromVectorThreadState:vectorState processType:processType hasAVXSupport:hasAVXSupport];
 	
 	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(entry); entry++)
 	{
@@ -257,7 +257,7 @@ do { \
 		 address:0
 		 type:ZGByteArray
 		 qualifier:0
-		 pointerSize:is64Bit ? sizeof(int64_t) : sizeof(int32_t)
+		 pointerSize:ZG_PROCESS_POINTER_SIZE(processType)
 		 description:[[NSAttributedString alloc] initWithString:ZGUnwrapNullableObject(@(entry->name))]];
 		
 		[registerVariables addObject:variable];
@@ -266,12 +266,12 @@ do { \
 	return registerVariables;
 }
 
-+ (NSArray<ZGVariable *> *)registerVariablesFromGeneralPurposeThreadState:(zg_thread_state_t)threadState is64Bit:(BOOL)is64Bit
++ (NSArray<ZGVariable *> *)registerVariablesFromGeneralPurposeThreadState:(zg_thread_state_t)threadState processType:(ZGProcessType)processType
 {
 	NSMutableArray<ZGVariable *> *registerVariables = [[NSMutableArray alloc] init];
 	
 	ZGRegisterEntry entries[28];
-	[ZGRegisterEntries getRegisterEntries:entries fromGeneralPurposeThreadState:threadState is64Bit:is64Bit];
+	[ZGRegisterEntries getRegisterEntries:entries fromGeneralPurposeThreadState:threadState processType:processType];
 	
 	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(entry); entry++)
 	{
@@ -282,7 +282,7 @@ do { \
 		 address:0
 		 type:ZGByteArray
 		 qualifier:0
-		 pointerSize:is64Bit ? sizeof(int64_t) : sizeof(int32_t)
+		 pointerSize:ZG_PROCESS_POINTER_SIZE(processType)
 		 description:[[NSAttributedString alloc] initWithString:ZGUnwrapNullableObject(@(entry->name))]];
 		
 		[registerVariables addObject:variable];

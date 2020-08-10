@@ -334,7 +334,7 @@
 		variable.rawValue = NULL;
 	}
 
-	if (oldProcess.is64Bit != newProcess.is64Bit)
+	if (ZG_PROCESS_POINTER_SIZE(oldProcess.type) != ZG_PROCESS_POINTER_SIZE(newProcess.type))
 	{
 		for (ZGVariable *variable in _documentData.variables)
 		{

@@ -42,6 +42,7 @@
 #import "ZGMachBinary.h"
 #import "ZGDataValueExtracting.h"
 #import "ZGVariableDataInfo.h"
+#import "ZGProcessTypes.h"
 //#import "Python/structmember.h"
 #import "pythonlib.h"
 
@@ -51,6 +52,7 @@ typedef struct
 	uint32_t processTask;
 	int32_t processIdentifier;
 	int8_t is64Bit;
+	ZGProcessType processType;
 	ZGMemoryAddress baseAddress;
 	integer_t suspendCount;
 	PyObject *virtualMemoryException;
@@ -252,7 +254,8 @@ static PyTypeObject VirtualMemoryType =
 		vmObject->objcSelf = self;
 		vmObject->processTask = process.processTask;
 		vmObject->processIdentifier = process.processID;
-		vmObject->is64Bit = process.is64Bit;
+		vmObject->processType = process.type;
+		vmObject->is64Bit = ZG_PROCESS_TYPE_IS_64_BIT(vmObject->processType);
 		vmObject->virtualMemoryException = virtualMemoryException;
 		
 		_process = shouldCopyProcess ? [[ZGProcess alloc] initWithProcess:process] : process;
@@ -335,7 +338,7 @@ static PyObject *VirtualMemory_readPointer(VirtualMemory *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress memoryAddress = 0x0;
-	ZGMemorySize size = self->is64Bit ? sizeof(ZGMemoryAddress) : sizeof(ZG32BitMemoryAddress);
+	ZGMemorySize size = ZG_PROCESS_POINTER_SIZE(self->processType);
 	if (PyArg_ParseTuple(args, "K:readPointer", &memoryAddress))
 	{
 		void *bytes = NULL;
@@ -672,8 +675,8 @@ static PyObject *VirtualMemory_scanByteString(VirtualMemory *self, PyObject *arg
 			[[ZGSearchData alloc]
 			 initWithSearchValue:searchValue
 			 dataSize:dataSize
-			 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, dataSize)
-			 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+			 dataAlignment:ZGDataAlignment(self->processType, ZGByteArray, dataSize)
+			 pointerSize:ZG_PROCESS_POINTER_SIZE(self->processType)];
 			
 			searchData.byteArrayFlags = ZGAllocateFlagsForByteArrayWildcards(byteArrayStringValue);
 			
@@ -709,8 +712,8 @@ static PyObject *VirtualMemory_scanBytes(VirtualMemory *self, PyObject *args)
 		[[ZGSearchData alloc]
 		 initWithSearchValue:data
 		 dataSize:(ZGMemorySize)buffer.len
-		 dataAlignment:ZGDataAlignment(self->is64Bit, ZGByteArray, (ZGMemorySize)buffer.len)
-		 pointerSize:self->is64Bit ? sizeof(int64_t) : sizeof(int32_t)];
+		 dataAlignment:ZGDataAlignment(self->processType, ZGByteArray, (ZGMemorySize)buffer.len)
+		 pointerSize:ZG_PROCESS_POINTER_SIZE(self->processType)];
 		
 		retValue = scanSearchData(self, searchData, "scanBytes");
 		

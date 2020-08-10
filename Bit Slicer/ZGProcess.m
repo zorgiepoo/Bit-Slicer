@@ -48,27 +48,27 @@
 	BOOL _failedCreatingSymbolicator;
 }
 
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID is64Bit:(BOOL)flag64Bit
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID type:(ZGProcessType)processType
 {
 	if ((self = [super init]))
 	{
 		_name = [processName copy];
 		_internalName = [internalName copy];
 		_processID = aProcessID;
-		_is64Bit = flag64Bit;
+		_type = processType;
 	}
 	
 	return self;
 }
 
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName is64Bit:(BOOL)flag64Bit
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName type:(ZGProcessType)processType
 {
-	return [self initWithName:processName internalName:internalName processID:NON_EXISTENT_PID_NUMBER is64Bit:flag64Bit];
+	return [self initWithName:processName internalName:internalName processID:NON_EXISTENT_PID_NUMBER type:processType];
 }
 
 - (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask name:(NSString *)name
 {
-	self = [self initWithName:name internalName:process.internalName processID:process.processID is64Bit:process.is64Bit];
+	self = [self initWithName:name internalName:process.internalName processID:process.processID type:process.type];
 	if (self != nil)
 	{
 		_processTask = processTask;
@@ -162,7 +162,7 @@
 
 - (ZGMemorySize)pointerSize
 {
-	return _is64Bit ? sizeof(int64_t) : sizeof(int32_t);
+	return ZG_PROCESS_POINTER_SIZE(_type);
 }
 
 @end

@@ -34,7 +34,7 @@
 
 @implementation ZGRegistersState
 
-- (id)initWithGeneralPurposeThreadState:(zg_thread_state_t)generalPurposeThreadState vectorState:(zg_vector_state_t)vectorState hasVectorState:(BOOL)hasVectorState hasAVXSupport:(BOOL)hasAVXSupport is64Bit:(BOOL)is64Bit
+- (id)initWithGeneralPurposeThreadState:(zg_thread_state_t)generalPurposeThreadState vectorState:(zg_vector_state_t)vectorState hasVectorState:(BOOL)hasVectorState hasAVXSupport:(BOOL)hasAVXSupport processType:(ZGProcessType)processType
 {
 	self = [super init];
 	if (self != nil)
@@ -43,7 +43,7 @@
 		_vectorState = vectorState;
 		_hasVectorState = hasVectorState;
 		_hasAVXSupport = hasAVXSupport;
-		_is64Bit = is64Bit;
+		_processType = processType;
 	}
 	return self;
 }

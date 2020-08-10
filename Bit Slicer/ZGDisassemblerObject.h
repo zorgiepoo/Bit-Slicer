@@ -32,6 +32,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGProcessTypes.h"
 #import "ZGInstruction.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -41,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isCallMnemonic:(int)mnemonic;
 + (BOOL)isJumpMnemonic:(int)mnemonic;
 
-- (nullable id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size pointerSize:(ZGMemorySize)pointerSize;
+- (nullable id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size processType:(ZGProcessType)processType;
 
 @property (readonly, nonatomic) void *bytes;
 
