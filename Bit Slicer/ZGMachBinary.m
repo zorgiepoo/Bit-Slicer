@@ -241,22 +241,42 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	return filePath;
 }
 
-- (ZGMachBinaryInfo *)parseMachHeaderWithBytes:(const void *)machHeaderBytes startPointer:(const void *)startPointer dataLength:(ZGMemorySize)dataLength pointerSize:(size_t)pointerSize
+- (ZGMachBinaryInfo *)parseMachHeaderWithBytes:(const void *)machHeaderBytes startPointer:(const void *)startPointer dataLength:(ZGMemorySize)dataLength processType:(ZGProcessType)processType
 {
 	ZGMemoryAddress machHeaderAddress = _headerAddress;
 	
-	const struct mach_header_64 *machHeader = machHeaderBytes;
+	const struct mach_header_64 *headMachHeader = machHeaderBytes;
+	const struct mach_header_64 *machHeader = headMachHeader;
 	
 	// If this is a fat binary that is being loaded from disk, we'll need to find our target architecture
-	if (machHeader->magic == FAT_CIGAM) // not checking FAT_MAGIC, only interested in little endian
+	if (headMachHeader->magic == FAT_CIGAM)
 	{
-		uint32_t numberOfArchitectures = CFSwapInt32BigToHost(((const struct fat_header *)machHeader)->nfat_arch);
+		uint32_t fatMagic = CFSwapInt32BigToHost(((const struct fat_header *)headMachHeader)->magic);
+		uint32_t numberOfArchitectures = CFSwapInt32BigToHost(((const struct fat_header *)headMachHeader)->nfat_arch);
+		
+		size_t fatArchSize = (fatMagic == FAT_MAGIC) ? (sizeof(struct fat_arch)) : sizeof(struct fat_arch_64);
+		
 		for (uint32_t architectureIndex = 0; architectureIndex < numberOfArchitectures; architectureIndex++)
 		{
-			const struct fat_arch *fatArchitecture = (const void *)(((const uint8_t *)(const void *)machHeader) + sizeof(struct fat_header) + sizeof(struct fat_arch) * architectureIndex);
-			if ((pointerSize == sizeof(ZGMemoryAddress) && fatArchitecture->cputype & CPU_TYPE_X86_64) || (pointerSize == sizeof(ZG32BitMemoryAddress) && fatArchitecture->cputype & CPU_TYPE_I386))
+			const void *fatArchitecture = (((const uint8_t *)(const void *)headMachHeader) + sizeof(struct fat_header) + fatArchSize * architectureIndex);
+			
+			cpu_type_t cpuType = (cpu_type_t)CFSwapInt32BigToHost((uint32_t)((const struct fat_arch *)fatArchitecture)->cputype);
+			
+			if ((cpuType == CPU_TYPE_X86_64 && ZG_PROCESS_TYPE_IS_X86_64(processType)) ||
+				(cpuType == CPU_TYPE_I386 && ZG_PROCESS_TYPE_IS_I386(processType)) ||
+				(cpuType == CPU_TYPE_ARM64 && ZG_PROCESS_TYPE_IS_ARM64(processType)))
 			{
-				machHeader = (const void *)(((const uint8_t *)(const void *)machHeader) + CFSwapInt32BigToHost(fatArchitecture->offset));
+				uint64_t offset;
+				if (fatMagic == FAT_MAGIC)
+				{
+					offset = CFSwapInt32BigToHost((uint32_t)((const struct fat_arch *)fatArchitecture)->offset);
+				}
+				else
+				{
+					offset = CFSwapInt64BigToHost((uint64_t)((const struct fat_arch_64 *)fatArchitecture)->offset);
+				}
+				
+				machHeader = (const void *)(((const uint8_t *)(const void *)headMachHeader) + offset);
 				break;
 			}
 		}
@@ -287,7 +307,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		NSData *machFileData = [NSData dataWithContentsOfFile:filePath];
 		if (machFileData != nil)
 		{
-			binaryInfo = [self parseMachHeaderWithBytes:machFileData.bytes startPointer:machFileData.bytes dataLength:machFileData.length pointerSize:process.pointerSize];
+			binaryInfo = [self parseMachHeaderWithBytes:machFileData.bytes startPointer:machFileData.bytes dataLength:machFileData.length processType:process.type];
 			if (binaryInfo != nil)
 			{
 				[machPathToInfoDictionary setObject:binaryInfo forKey:filePath];
@@ -312,7 +332,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		if (ZGReadBytes(process.processTask, regionAddress, &regionBytes, &regionSize))
 		{
 			const struct mach_header_64 *machHeader = (void *)((uint8_t *)regionBytes + _headerAddress - regionAddress);
-			binaryInfo = [self parseMachHeaderWithBytes:machHeader startPointer:regionBytes dataLength:regionSize pointerSize:process.pointerSize];
+			binaryInfo = [self parseMachHeaderWithBytes:machHeader startPointer:regionBytes dataLength:regionSize processType:process.type];
 			
 			ZGFreeBytes(regionBytes, regionSize);
 		}
