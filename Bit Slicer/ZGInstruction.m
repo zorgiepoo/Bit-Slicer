@@ -35,7 +35,7 @@
 
 @implementation ZGInstruction
 
-- (id)initWithVariable:(ZGVariable *)variable text:(NSString *)text mnemonic:(int)mnemonic
+- (id)initWithVariable:(ZGVariable *)variable text:(NSString *)text mnemonic:(int64_t)mnemonic
 {
 	self = [super init];
 	if (self != nil)

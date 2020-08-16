@@ -99,6 +99,10 @@
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
 		72ABCBC524E8BA8200EF63A9 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
 		72ABCBC624E8BA8900EF63A9 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		72ABCBE524E8CFF300EF63A9 /* ZGX86DisassemblerObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72ABCBE424E8CFF300EF63A9 /* ZGX86DisassemblerObject.m */; };
+		72ABCBEA24E8D7D700EF63A9 /* Capstone.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72ABCBE924E8D7D700EF63A9 /* Capstone.framework */; };
+		72ABCBEB24E8DA1800EF63A9 /* Capstone.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 72ABCBE924E8D7D700EF63A9 /* Capstone.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		72ABCBEE24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72ABCBED24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m */; };
 		72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
 		72BD7EB01B84070F00B7E3CC /* ZGPrivateCoreSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
@@ -261,6 +265,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				72ABCBEB24E8DA1800EF63A9 /* Capstone.framework in Copy Frameworks */,
 				7208450724E0851000F3D449 /* Python.framework in Copy Frameworks */,
 				7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */,
 				7235B7B324D7D9C30029580A /* DDMathParser.framework in Copy Frameworks */,
@@ -445,6 +450,12 @@
 		72AA79811A23FDDF005A9BD6 /* ZGScriptPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPrompt.h; path = "Bit Slicer/ZGScriptPrompt.h"; sourceTree = "<group>"; usesTabs = 1; };
 		72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGScriptPrompt.m; path = "Bit Slicer/ZGScriptPrompt.m"; sourceTree = "<group>"; usesTabs = 1; };
 		72AA79841A2413B4005A9BD6 /* ZGScriptPromptDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGScriptPromptDelegate.h; path = "Bit Slicer/ZGScriptPromptDelegate.h"; sourceTree = "<group>"; usesTabs = 1; };
+		72ABCBE424E8CFF300EF63A9 /* ZGX86DisassemblerObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGX86DisassemblerObject.m; path = "Bit Slicer/ZGX86DisassemblerObject.m"; sourceTree = "<group>"; };
+		72ABCBE624E8D00E00EF63A9 /* ZGX86DisassemblerObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGX86DisassemblerObject.h; path = "Bit Slicer/ZGX86DisassemblerObject.h"; sourceTree = "<group>"; };
+		72ABCBE724E8D0B900EF63A9 /* ZGDisassemblerObjectProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGDisassemblerObjectProtocol.h; path = "Bit Slicer/ZGDisassemblerObjectProtocol.h"; sourceTree = "<group>"; };
+		72ABCBE924E8D7D700EF63A9 /* Capstone.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Capstone.framework; path = deps/capstone/Capstone.framework; sourceTree = "<group>"; };
+		72ABCBEC24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGARM64DisassemblerObject.h; path = "Bit Slicer/ZGARM64DisassemblerObject.h"; sourceTree = "<group>"; };
+		72ABCBED24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGARM64DisassemblerObject.m; path = "Bit Slicer/ZGARM64DisassemblerObject.m"; sourceTree = "<group>"; };
 		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Data Inspector View.xib"; sourceTree = "<group>"; };
 		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Backtrace View.xib"; sourceTree = "<group>"; };
 		72D051CA1960A41F00EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Registers View.xib"; sourceTree = "<group>"; };
@@ -760,6 +771,7 @@
 				7208450624E084F400F3D449 /* Python.framework in Frameworks */,
 				7235B7B224D7D9B10029580A /* DDMathParser.framework in Frameworks */,
 				721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */,
+				72ABCBEA24E8D7D700EF63A9 /* Capstone.framework in Frameworks */,
 				7235B7A424D7BF980029580A /* libudis86.a in Frameworks */,
 				7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */,
 				7235B7AF24D7CE0B0029580A /* ShortcutRecorder.framework in Frameworks */,
@@ -850,6 +862,7 @@
 				7208450524E084F400F3D449 /* Python.framework */,
 				721594FD24DF36360027F600 /* HexFiend.framework */,
 				7235B7B124D7D9B10029580A /* DDMathParser.framework */,
+				72ABCBE924E8D7D700EF63A9 /* Capstone.framework */,
 				7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */,
 				7278DC031E4A967700C37150 /* Sparkle.framework */,
 				773E8B011821DDAD00D1A71A /* CoreSymbolication.framework */,
@@ -1054,8 +1067,13 @@
 				772C0F8018B95603009FFF72 /* ZGBacktraceViewController.m */,
 				7768064118B9A36E007F2CAF /* ZGBacktrace.h */,
 				7768064218B9A36E007F2CAF /* ZGBacktrace.m */,
+				72ABCBE724E8D0B900EF63A9 /* ZGDisassemblerObjectProtocol.h */,
 				77F1164117D2EFB4009E002A /* ZGDisassemblerObject.h */,
 				77F1164217D2EFB4009E002A /* ZGDisassemblerObject.m */,
+				72ABCBE624E8D00E00EF63A9 /* ZGX86DisassemblerObject.h */,
+				72ABCBE424E8CFF300EF63A9 /* ZGX86DisassemblerObject.m */,
+				72ABCBEC24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.h */,
+				72ABCBED24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m */,
 				77F1164417D2EFBD009E002A /* ZGInstruction.h */,
 				77F1164517D2EFBD009E002A /* ZGInstruction.m */,
 				770F283B18827D1B001B828C /* ZGBreakPointConditionViewController.h */,
@@ -1642,6 +1660,7 @@
 				77F115EE17D2EDEE009E002A /* ZGRunningProcessObserver.m in Sources */,
 				77F115F117D2EDF9009E002A /* ZGDocument.m in Sources */,
 				72DBC8D51B71A4BB0092ED75 /* ZGRootlessConfiguration.m in Sources */,
+				72ABCBEE24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m in Sources */,
 				72D72BCB1AB3E9FA005044CF /* ZGLocalization.m in Sources */,
 				77F115F417D2EE0B009E002A /* ZGDocumentData.m in Sources */,
 				720844FD24E072DB00F3D449 /* DataInspectorScrollView.m in Sources */,
@@ -1714,6 +1733,7 @@
 				77F1165017D2EFE4009E002A /* ZGDebugThread.m in Sources */,
 				77E9DBCE181F812E009F4982 /* ZGMachBinary.m in Sources */,
 				7257EFF31B87EF220045991F /* OSCSingleThreadQueue.m in Sources */,
+				72ABCBE524E8CFF300EF63A9 /* ZGX86DisassemblerObject.m in Sources */,
 				77F1165917D2F001009E002A /* ZGRegister.m in Sources */,
 				774B5EE61915361400D7AA69 /* ZGPyKeyCodeModule.m in Sources */,
 				7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */,
@@ -2528,6 +2548,7 @@
 					"$(PROJECT_DIR)/deps/ShortcutRecorder",
 					"$(PROJECT_DIR)/deps/DDMathParser",
 					"$(PROJECT_DIR)/deps/HexFiend",
+					"$(PROJECT_DIR)/deps/capstone",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -2635,6 +2656,7 @@
 					"$(PROJECT_DIR)/deps/ShortcutRecorder",
 					"$(PROJECT_DIR)/deps/DDMathParser",
 					"$(PROJECT_DIR)/deps/HexFiend",
+					"$(PROJECT_DIR)/deps/capstone",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;

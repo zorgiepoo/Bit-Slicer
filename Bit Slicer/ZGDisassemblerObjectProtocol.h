@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Mayur Pawashe
+ * Copyright (c) 2020 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,19 +32,22 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
-
-@class ZGVariable;
+#import "ZGProcessTypes.h"
+#import "ZGInstruction.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZGInstruction : NSObject
+@protocol ZGDisassemblerObject <NSObject>
 
-- (nonnull id)initWithVariable:(ZGVariable *)variable text:(NSString *)text mnemonic:(int64_t)mnemonic;
+@property (readonly, nonatomic) void *bytes;
 
-@property (nonatomic, readonly, copy) NSString *text;
-@property (nonatomic, readonly) int64_t mnemonic;
-@property (nonatomic, readonly) ZGVariable *variable;
-@property (nonatomic, copy, nullable) NSString *symbols;
+// These methods may advance the object's internal position for disassembling instructions
+- (NSArray<ZGInstruction *> *)readInstructions;
+- (nullable NSString *)readBranchOperand;
+
+@optional
+
+- (nullable ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize;
 
 @end
 

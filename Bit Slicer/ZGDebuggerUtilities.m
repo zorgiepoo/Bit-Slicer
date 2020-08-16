@@ -239,13 +239,13 @@
 	return data;
 }
 
-+ (ZGDisassemblerObject *)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask processType:(ZGProcessType)processType address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
++ (id<ZGDisassemblerObject>)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask processType:(ZGProcessType)processType address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
-	ZGDisassemblerObject *newObject = nil;
+	id<ZGDisassemblerObject> newObject = nil;
 	NSData *data = [self readDataWithProcessTask:processTask address:address size:size breakPoints:breakPoints];
 	if (data != nil)
 	{
-		newObject = [[ZGDisassemblerObject alloc] initWithBytes:data.bytes address:address size:data.length processType:processType];
+		newObject = [ZGDisassemblerObject disassemblerObjectWithBytes:data.bytes address:address size:data.length processType:processType];
 	}
 	return newObject;
 }
@@ -256,50 +256,74 @@
 {
 	ZGInstruction *instruction = nil;
 	
-	ZGMemoryBasicInfo regionInfo;
-	ZGRegion *targetRegion = [[ZGRegion alloc] initWithAddress:address size:1];
-	if (!ZGRegionInfo(process.processTask, &targetRegion->_address, &targetRegion->_size, &regionInfo))
+	ZGMemorySize intructionEncodingSize = [ZGDisassemblerObject instructionEncodingSizeForProcessType:process.type];
+	if (intructionEncodingSize != VARIABLE_INSTRUCTION_ENCODING_SIZE)
 	{
-		targetRegion = nil;
+		ZGMemoryAddress startAddress;
+		if (address <= intructionEncodingSize)
+		{
+			startAddress = 0x0;
+		}
+		else if (address % intructionEncodingSize == 0)
+		{
+			startAddress = address - intructionEncodingSize;
+		}
+		else
+		{
+			startAddress = address - (address % intructionEncodingSize);
+		}
+		
+		id<ZGDisassemblerObject> disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask processType:process.type address:startAddress size:intructionEncodingSize breakPoints:breakPoints];
+		
+		instruction = [[disassemblerObject readInstructions] firstObject];
 	}
-	
-	if (targetRegion != nil && address >= targetRegion.address && address <= targetRegion.address + targetRegion.size)
+	else
 	{
-		// Start an arbitrary number of bytes before our address and decode the instructions
-		// Eventually they will converge into correct offsets
-		// So retrieve the offset and size to the last instruction while decoding
-		// We do this instead of starting at region.address due to this leading to better performance
-		
-		ZGMemoryAddress startAddress = address - 1024;
-		if (startAddress < targetRegion.address)
+		ZGMemoryBasicInfo regionInfo;
+		ZGRegion *targetRegion = [[ZGRegion alloc] initWithAddress:address size:1];
+		if (!ZGRegionInfo(process.processTask, &targetRegion->_address, &targetRegion->_size, &regionInfo))
 		{
-			startAddress = targetRegion.address;
+			targetRegion = nil;
 		}
 		
-		// If we can find a close starting address in a mach binary, we should use it, otherwise we may disassemble the first instruction in it incorrectly
-		ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:address fromMachBinaries:machBinaries];
-		ZGMemoryAddress firstInstructionAddress = [[machBinary machBinaryInfoInProcess:process] firstInstructionAddress];
-		
-		if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
+		if (targetRegion != nil && address >= targetRegion.address && address <= targetRegion.address + targetRegion.size)
 		{
-			startAddress = firstInstructionAddress;
-			if (address < startAddress)
+			// Start an arbitrary number of bytes before our address and decode the instructions
+			// Eventually they will converge into correct offsets
+			// So retrieve the offset and size to the last instruction while decoding
+			// We do this instead of starting at region.address due to this leading to better performance
+			
+			ZGMemoryAddress startAddress = address - 1024;
+			if (startAddress < targetRegion.address)
 			{
-				return instruction;
+				startAddress = targetRegion.address;
 			}
+			
+			// If we can find a close starting address in a mach binary, we should use it, otherwise we may disassemble the first instruction in it incorrectly
+			ZGMachBinary *machBinary = [ZGMachBinary machBinaryNearestToAddress:address fromMachBinaries:machBinaries];
+			ZGMemoryAddress firstInstructionAddress = [[machBinary machBinaryInfoInProcess:process] firstInstructionAddress];
+			
+			if (firstInstructionAddress != 0 && startAddress < firstInstructionAddress)
+			{
+				startAddress = firstInstructionAddress;
+				if (address < startAddress)
+				{
+					return instruction;
+				}
+			}
+			
+			ZGMemorySize size = address - startAddress;
+			// Read in more bytes to ensure we return the whole instruction
+			ZGMemorySize readSize = size + 30;
+			if (startAddress + readSize > targetRegion.address + targetRegion.size)
+			{
+				readSize = targetRegion.address + targetRegion.size - startAddress;
+			}
+			
+			id<ZGDisassemblerObject> disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask processType:process.type address:startAddress size:readSize breakPoints:breakPoints];
+			
+			instruction = [disassemblerObject readLastInstructionWithMaxSize:size];
 		}
-		
-		ZGMemorySize size = address - startAddress;
-		// Read in more bytes to ensure we return the whole instruction
-		ZGMemorySize readSize = size + 30;
-		if (startAddress + readSize > targetRegion.address + targetRegion.size)
-		{
-			readSize = targetRegion.address + targetRegion.size - startAddress;
-		}
-		
-		ZGDisassemblerObject *disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask processType:process.type address:startAddress size:readSize breakPoints:breakPoints];
-		
-		instruction = [disassemblerObject readLastInstructionWithMaxSize:size];
 	}
 	
 	return instruction;

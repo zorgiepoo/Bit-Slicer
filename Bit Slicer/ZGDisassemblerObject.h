@@ -31,25 +31,21 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "ZGMemoryTypes.h"
 #import "ZGProcessTypes.h"
-#import "ZGInstruction.h"
+#import "ZGDisassemblerObjectProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define VARIABLE_INSTRUCTION_ENCODING_SIZE 0x0
+
 @interface ZGDisassemblerObject : NSObject
 
-+ (BOOL)isCallMnemonic:(int)mnemonic;
-+ (BOOL)isJumpMnemonic:(int)mnemonic;
++ (id<ZGDisassemblerObject>)disassemblerObjectWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size processType:(ZGProcessType)processType;
 
-- (nullable id)initWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size processType:(ZGProcessType)processType;
++ (BOOL)isCallMnemonic:(int64_t)mnemonic processType:(ZGProcessType)processType;
++ (BOOL)isJumpMnemonic:(int64_t)mnemonic processType:(ZGProcessType)processType;
 
-@property (readonly, nonatomic) void *bytes;
-
-// These methods may advance the object's internal position for disassembling instructions
-- (NSArray<ZGInstruction *> *)readInstructions;
-- (nullable ZGInstruction *)readLastInstructionWithMaxSize:(ZGMemorySize)maxSize;
-- (nullable NSString *)readBranchOperand;
++ (ZGMemorySize)instructionEncodingSizeForProcessType:(ZGProcessType)processType;
 
 @end
 

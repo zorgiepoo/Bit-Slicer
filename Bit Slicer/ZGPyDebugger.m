@@ -612,7 +612,7 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		ZGDisassemblerObject *disassemblerObject = [[ZGDisassemblerObject alloc] initWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len processType:self->processType];
+		id<ZGDisassemblerObject> disassemblerObject = [ZGDisassemblerObject disassemblerObjectWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len processType:self->processType];
 		
 		NSArray<ZGInstruction *> *instructions = [disassemblerObject readInstructions];
 		
@@ -1096,7 +1096,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic])
+	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic processType:self->processType])
 	{
 		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries];
 		

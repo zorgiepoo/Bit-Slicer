@@ -1,0 +1,2 @@
+Source: https://github.com/aquynh/capstone/archive/4.0.2.tar.gz
+Config: Use Xcode project, set macOS deployment target to 10.11, add evm.h to Xcode project (stray reference that wasn't added in capstone/include/). Alter preprocessor macros to only build for arm64 on framework target (CAPSTONE_HAS_ARM64=1). Modify scheme to build for Release.
