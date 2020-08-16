@@ -54,6 +54,9 @@ typedef enum : int8_t
 
 #define ZG_PROCESS_TYPE_IS_X86_64(processType) (processType == ZGProcessTypeX86_64)
 #define ZG_PROCESS_TYPE_IS_I386(processType) (processType == ZGProcessTypeI386)
+
+#define ZG_PROCESS_TYPE_IS_X86_FAMILY(processType) (ZG_PROCESS_TYPE_IS_X86_64(processType) || ZG_PROCESS_TYPE_IS_I386(processType))
+
 #define ZG_PROCESS_TYPE_IS_ARM64(processType) (processType == ZGProcessTypeARM64)
 
 #endif

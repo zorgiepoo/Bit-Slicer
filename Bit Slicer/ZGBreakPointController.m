@@ -523,7 +523,7 @@ static ZGBreakPointController *gBreakPointController;
 			
 			if (ZGReadBytes(breakPoint.process.processTask, foundInstructionAddress, (void **)&opcode, &opcodeSize))
 			{
-				if (*opcode == INSTRUCTION_BREAKPOINT_OPCODE)
+				if (*opcode == X86_INSTRUCTION_BREAKPOINT_OPCODE)
 				{
 					hitBreakPoint = YES;
 					ZGSuspendTask(task);
@@ -553,7 +553,7 @@ static ZGBreakPointController *gBreakPointController;
 		if (breakPoint.needsToRestore)
 		{
 			// Restore our breakpoint
-			uint8_t writeOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
+			uint8_t writeOpcode = X86_INSTRUCTION_BREAKPOINT_OPCODE;
 			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
 			
 			breakPoint.needsToRestore = NO;
@@ -1092,7 +1092,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	ZGVariable *variable = [instruction.variable copy];
 	
-	uint8_t breakPointOpcode = INSTRUCTION_BREAKPOINT_OPCODE;
+	uint8_t breakPointOpcode = X86_INSTRUCTION_BREAKPOINT_OPCODE;
 	
 	ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] initWithProcess:process type:ZGBreakPointInstruction delegate:delegate];
 	

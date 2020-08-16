@@ -476,7 +476,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 				{
 					// Ignore trivial breakpoint changes
 					BOOL foundBreakPoint = NO;
-					if (*(uint8_t *)bytes == INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp((uint8_t *)bytes + sizeof(uint8_t), (uint8_t *)instruction.variable.rawValue + sizeof(uint8_t), size - sizeof(uint8_t)) == 0))
+					if (ZG_PROCESS_TYPE_IS_X86_FAMILY(self.currentProcess.type) && *(uint8_t *)bytes == X86_INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp((uint8_t *)bytes + sizeof(uint8_t), (uint8_t *)instruction.variable.rawValue + sizeof(uint8_t), size - sizeof(uint8_t)) == 0))
 					{
 						foundBreakPoint = [_breakPointController.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) {
 							return (BOOL)(breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.rawValue == *(uint8_t *)instruction.variable.rawValue);
@@ -538,7 +538,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 				
 				ZGInstruction *searchedInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:startInstruction.variable.address inProcess:self.currentProcess withBreakPoints:_breakPointController.breakPoints machBinaries:machBinaries];
 				
-				if (searchedInstruction.variable.address + searchedInstruction.variable.size != startAddress)
+				if (searchedInstruction != nil && searchedInstruction.variable.address + searchedInstruction.variable.size != startAddress)
 				{
 					startAddress = searchedInstruction.variable.address;
 				}

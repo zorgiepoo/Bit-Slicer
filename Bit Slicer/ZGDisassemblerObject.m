@@ -39,7 +39,7 @@
 + (id<ZGDisassemblerObject>)disassemblerObjectWithBytes:(const void *)bytes address:(ZGMemoryAddress)address size:(ZGMemorySize)size processType:(ZGProcessType)processType
 {
 	id<ZGDisassemblerObject> disassemblerObject;
-	if (ZG_PROCESS_TYPE_IS_X86_64(processType) || ZG_PROCESS_TYPE_IS_I386(processType))
+	if (ZG_PROCESS_TYPE_IS_X86_FAMILY(processType))
 	{
 		disassemblerObject = [[ZGX86DisassemblerObject alloc] initWithBytes:bytes address:address size:size pointerSize:ZG_PROCESS_POINTER_SIZE(processType)];
 	}
@@ -54,7 +54,7 @@
 
 + (BOOL)isCallMnemonic:(int64_t)mnemonic processType:(ZGProcessType)processType
 {
-	if (ZG_PROCESS_TYPE_IS_X86_64(processType) || ZG_PROCESS_TYPE_IS_I386(processType))
+	if (ZG_PROCESS_TYPE_IS_X86_FAMILY(processType))
 	{
 		return [ZGX86DisassemblerObject isCallMnemonic:mnemonic];
 	}
@@ -67,7 +67,7 @@
 
 + (BOOL)isJumpMnemonic:(int64_t)mnemonic processType:(ZGProcessType)processType
 {
-	if (ZG_PROCESS_TYPE_IS_X86_64(processType) || ZG_PROCESS_TYPE_IS_I386(processType))
+	if (ZG_PROCESS_TYPE_IS_X86_FAMILY(processType))
 	{
 		return [ZGX86DisassemblerObject isJumpMnemonic:mnemonic];
 	}
@@ -80,7 +80,7 @@
 
 + (ZGMemorySize)instructionEncodingSizeForProcessType:(ZGProcessType)processType
 {
-	return (ZG_PROCESS_TYPE_IS_X86_64(processType) || ZG_PROCESS_TYPE_IS_I386(processType)) ? VARIABLE_INSTRUCTION_ENCODING_SIZE : 0x4;
+	return ZG_PROCESS_TYPE_IS_X86_FAMILY(processType) ? VARIABLE_INSTRUCTION_ENCODING_SIZE : 0x4;
 }
 
 @end
