@@ -97,6 +97,8 @@
 		7278DC051E4A968A00C37150 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7278DC031E4A967700C37150 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7284245719A96B470081C673 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7284245519A96B470081C673 /* Localizable.strings */; };
 		72AA79831A23FDDF005A9BD6 /* ZGScriptPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AA79821A23FDDF005A9BD6 /* ZGScriptPrompt.m */; };
+		72ABCBC524E8BA8200EF63A9 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
+		72ABCBC624E8BA8900EF63A9 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
 		72BD7EB01B84070F00B7E3CC /* ZGPrivateCoreSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
@@ -274,6 +276,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				72ABCBC624E8BA8900EF63A9 /* HexFiend.framework in Copy Frameworks */,
 				7235B7B424D7D9EA0029580A /* DDMathParser.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -746,6 +749,7 @@
 			files = (
 				77E2BBD518FD904400E41FA0 /* CoreSymbolication.framework in Frameworks */,
 				7235B7B524D7D9F40029580A /* DDMathParser.framework in Frameworks */,
+				72ABCBC524E8BA8200EF63A9 /* HexFiend.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2324,6 +2328,7 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(PROJECT_DIR)/deps",
 					"$(PROJECT_DIR)/deps/DDMathParser",
+					"$(PROJECT_DIR)/deps/HexFiend",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -2422,6 +2427,7 @@
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 					"$(PROJECT_DIR)/deps",
 					"$(PROJECT_DIR)/deps/DDMathParser",
+					"$(PROJECT_DIR)/deps/HexFiend",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
