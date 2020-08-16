@@ -76,6 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)hasGrantedAccess;
 
 - (ZGMemorySize)pointerSize;
+- (ZGMemorySize)pointerSizeInBits;
 
 @end
 

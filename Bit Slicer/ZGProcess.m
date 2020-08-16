@@ -165,4 +165,9 @@
 	return ZG_PROCESS_POINTER_SIZE(_type);
 }
 
+- (ZGMemorySize)pointerSizeInBits
+{
+	return [self pointerSize] * 8;
+}
+
 @end

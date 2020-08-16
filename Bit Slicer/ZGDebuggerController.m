@@ -1611,7 +1611,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	NSError *error = nil;
 	ZGInstruction *firstInstruction = [_instructions objectAtIndex:instructionIndex];
-	NSData *data = [ZGDebuggerUtilities assembleInstructionText:instructionText atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:self.currentProcess.pointerSize * 8 error:&error];
+	NSData *data = [ZGDebuggerUtilities assembleInstructionText:instructionText atInstructionPointer:firstInstruction.variable.address usingArchitectureBits:self.currentProcess.pointerSizeInBits error:&error];
 	if (data.length == 0)
 	{
 		if (error != nil)
