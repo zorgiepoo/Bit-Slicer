@@ -148,7 +148,7 @@
 	[self updateSuggestedCode];
 	
 	NSError *error = nil;
-	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress usingArchitectureBits:_process.pointerSizeInBits error:&error];
+	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress processType:_process.type error:&error];
 	
 	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) breakPoints:_breakPoints undoManager:_undoManager error:&error])
 	{

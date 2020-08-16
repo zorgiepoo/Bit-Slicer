@@ -40,6 +40,7 @@
 #import "ZGMachBinary.h"
 #import "ZGDebugLogging.h"
 #import "ZGDataValueExtracting.h"
+#import "keystone.h"
 
 #define JUMP_REL32_INSTRUCTION_LENGTH 5
 #define INDIRECT_JUMP_INSTRUCTIONS_LENGTH 14
@@ -137,104 +138,129 @@
 #pragma mark Assembling & Disassembling
 
 #define ASSEMBLER_ERROR_DOMAIN @"Assembling Failed"
-+ (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer usingArchitectureBits:(ZGMemorySize)numberOfBits error:(NSError * __autoreleasing *)error
++ (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer processType:(ZGProcessType)processType error:(NSError * __autoreleasing *)error
 {
-	NSData *data = [NSData data];
-	NSString *outputFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"assembler_output.XXXXXX"];
-	const char *tempFileTemplateCString = [outputFileTemplate fileSystemRepresentation];
-	size_t templateFileTemplateLength = strlen(tempFileTemplateCString);
-	char *tempFileNameCString = malloc(templateFileTemplateLength + 1);
-	strncpy(tempFileNameCString, tempFileTemplateCString, templateFileTemplateLength + 1);
-	int fileDescriptor = mkstemp(tempFileNameCString);
-	
-	if (fileDescriptor != -1)
+	NSData *data = nil;
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
 	{
-		close(fileDescriptor);
-		
-		NSFileManager *fileManager = [[NSFileManager alloc] init];
-		NSString *outputFilePath = [fileManager stringWithFileSystemRepresentation:tempFileNameCString length:strlen(tempFileNameCString)];
-		
-		NSTask *task = [[NSTask alloc] init];
-		task.launchPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"yasm"];
-		[task setArguments:@[@"--arch=x86", @"-", @"-o", outputFilePath]];
-		
-		NSPipe *inputPipe = [NSPipe pipe];
-		[task setStandardInput:inputPipe];
-		
-		NSPipe *errorPipe = [NSPipe pipe];
-		[task setStandardError:errorPipe];
-		
-		BOOL failedToLaunchTask = NO;
-		
-		@try
+		ks_engine *engine;
+		// TODO: populate potential errors
+		if (ks_open(KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN, &engine) == KS_ERR_OK)
 		{
-			[task launch];
-		}
-		@catch (NSException *exception)
-		{
-			failedToLaunchTask = YES;
-			if (error != nil)
+			unsigned char *encoding = NULL;
+			size_t encodingSize = 0;
+			size_t numberOfStatementsEncoded = 0;
+			
+			if (ks_asm(engine, instructionText.UTF8String, instructionPointer, &encoding, &encodingSize, &numberOfStatementsEncoded) == KS_ERR_OK)
 			{
-				NSString *exceptionReason = exception.reason != nil ? exception.reason : @"";
-				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"%@: Name: %@, Reason: %@", ZGLocalizedStringFromDebuggerTable(@"failedLaunchYasm"), exception.name, exceptionReason], @"reason" : exceptionReason}];
-			}
-		}
-		
-		if (!failedToLaunchTask)
-		{
-			// yasm likes to be fed in an aligned instruction pointer for its org specifier, so we'll comply with that
-			ZGMemoryAddress alignedInstructionPointer = instructionPointer - (instructionPointer % 4);
-			NSUInteger numberOfNoppedInstructions = instructionPointer - alignedInstructionPointer;
-			
-			// clever way of @"nop" * numberOfNoppedInstructions, if it existed
-			NSString *nopLine = @"nop\n";
-			NSString *nopsString = [@"" stringByPaddingToLength:numberOfNoppedInstructions * nopLine.length withString:nopLine startingAtIndex:0];
-			
-			NSData *inputData = [[NSString stringWithFormat:@"BITS %lld\norg %lld\n%@%@\n", numberOfBits, alignedInstructionPointer, nopsString, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
-			
-			[[inputPipe fileHandleForWriting] writeData:inputData];
-			[[inputPipe fileHandleForWriting] closeFile];
-			
-			[task waitUntilExit];
-			
-			if ([task terminationStatus] == EXIT_SUCCESS)
-			{
-				NSData *tempData = [NSData dataWithContentsOfFile:outputFilePath];
+				data = [NSData dataWithBytes:encoding length:encodingSize];
 				
-				if (tempData.length <= numberOfNoppedInstructions)
+				ks_free(encoding);
+			}
+			
+			ks_close(engine);
+		}
+	}
+	else if (ZG_PROCESS_TYPE_IS_X86_FAMILY(processType))
+	{
+		data = [NSData data];
+		
+		NSString *outputFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"assembler_output.XXXXXX"];
+		const char *tempFileTemplateCString = [outputFileTemplate fileSystemRepresentation];
+		size_t templateFileTemplateLength = strlen(tempFileTemplateCString);
+		char *tempFileNameCString = malloc(templateFileTemplateLength + 1);
+		strncpy(tempFileNameCString, tempFileTemplateCString, templateFileTemplateLength + 1);
+		int fileDescriptor = mkstemp(tempFileNameCString);
+		
+		if (fileDescriptor != -1)
+		{
+			close(fileDescriptor);
+			
+			NSFileManager *fileManager = [[NSFileManager alloc] init];
+			NSString *outputFilePath = [fileManager stringWithFileSystemRepresentation:tempFileNameCString length:strlen(tempFileNameCString)];
+			
+			NSTask *task = [[NSTask alloc] init];
+			task.launchPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"yasm"];
+			[task setArguments:@[@"--arch=x86", @"-", @"-o", outputFilePath]];
+			
+			NSPipe *inputPipe = [NSPipe pipe];
+			[task setStandardInput:inputPipe];
+			
+			NSPipe *errorPipe = [NSPipe pipe];
+			[task setStandardError:errorPipe];
+			
+			BOOL failedToLaunchTask = NO;
+			
+			@try
+			{
+				[task launch];
+			}
+			@catch (NSException *exception)
+			{
+				failedToLaunchTask = YES;
+				if (error != nil)
 				{
-					if (error != nil)
+					NSString *exceptionReason = exception.reason != nil ? exception.reason : @"";
+					*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"description" : [NSString stringWithFormat:@"%@: Name: %@, Reason: %@", ZGLocalizedStringFromDebuggerTable(@"failedLaunchYasm"), exception.name, exceptionReason], @"reason" : exceptionReason}];
+				}
+			}
+			
+			if (!failedToLaunchTask)
+			{
+				// yasm likes to be fed in an aligned instruction pointer for its org specifier, so we'll comply with that
+				ZGMemoryAddress alignedInstructionPointer = instructionPointer - (instructionPointer % 4);
+				NSUInteger numberOfNoppedInstructions = instructionPointer - alignedInstructionPointer;
+				
+				// clever way of @"nop" * numberOfNoppedInstructions, if it existed
+				NSString *nopLine = @"nop\n";
+				NSString *nopsString = [@"" stringByPaddingToLength:numberOfNoppedInstructions * nopLine.length withString:nopLine startingAtIndex:0];
+				
+				NSData *inputData = [[NSString stringWithFormat:@"BITS %lu\norg %lld\n%@%@\n", ZG_PROCESS_POINTER_SIZE_BITS(processType), alignedInstructionPointer, nopsString, instructionText] dataUsingEncoding:NSUTF8StringEncoding];
+				
+				[[inputPipe fileHandleForWriting] writeData:inputData];
+				[[inputPipe fileHandleForWriting] closeFile];
+				
+				[task waitUntilExit];
+				
+				if ([task terminationStatus] == EXIT_SUCCESS)
+				{
+					NSData *tempData = [NSData dataWithContentsOfFile:outputFilePath];
+					
+					if (tempData.length <= numberOfNoppedInstructions)
 					{
-						*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : ZGLocalizedStringFromDebuggerTable(@"failedAssembleWithZeroBytes")}];
+						if (error != nil)
+						{
+							*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : ZGLocalizedStringFromDebuggerTable(@"failedAssembleWithZeroBytes")}];
+						}
+					}
+					else
+					{
+						data = [NSData dataWithBytes:(const uint8_t *)tempData.bytes + numberOfNoppedInstructions length:tempData.length - numberOfNoppedInstructions];
 					}
 				}
 				else
 				{
-					data = [NSData dataWithBytes:(const uint8_t *)tempData.bytes + numberOfNoppedInstructions length:tempData.length - numberOfNoppedInstructions];
+					NSData *errorData = [[errorPipe fileHandleForReading] readDataToEndOfFile];
+					if (errorData != nil && error != nil)
+					{
+						NSString *errorString = [[[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] objectAtIndex:0];
+						*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : errorString}];
+					}
 				}
-			}
-			else
-			{
-				NSData *errorData = [[errorPipe fileHandleForReading] readDataToEndOfFile];
-				if (errorData != nil && error != nil)
+				
+				if ([fileManager fileExistsAtPath:outputFilePath])
 				{
-					NSString *errorString = [[[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding] componentsSeparatedByString:@"\n"] objectAtIndex:0];
-					*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : errorString}];
+					[fileManager removeItemAtPath:outputFilePath error:NULL];
 				}
-			}
-			
-			if ([fileManager fileExistsAtPath:outputFilePath])
-			{
-				[fileManager removeItemAtPath:outputFilePath error:NULL];
 			}
 		}
+		else if (error != nil)
+		{
+			*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : [NSString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"failedAssembleWithBadFileDescriptor"), tempFileNameCString]}];
+		}
+		
+		free(tempFileNameCString);
 	}
-	else if (error != nil)
-	{
-		*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : [NSString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"failedAssembleWithBadFileDescriptor"), tempFileNameCString]}];
-	}
-	
-	free(tempFileNameCString);
 	
 	return data;
 }
@@ -457,7 +483,7 @@ error:(NSError * __autoreleasing *)error
 	NSMutableData *newInstructionsData = [NSMutableData data];
 	if (!usingRelativeBranching)
 	{
-		NSData *popRaxData = [self assembleInstructionText:@"pop rax" atInstructionPointer:allocatedAddress usingArchitectureBits:process.pointerSize*8 error:error];
+		NSData *popRaxData = [self assembleInstructionText:@"pop rax" atInstructionPointer:allocatedAddress processType:process.type error:error];
 		if (popRaxData.length == 0)
 		{
 			ZG_LOG(@"Error: Failed to assemble pop rax");
@@ -477,7 +503,7 @@ error:(NSError * __autoreleasing *)error
 	[[self class]
 	 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", allocatedAddress] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax\npop rax", allocatedAddress]
 	 atInstructionPointer:firstInstruction.variable.address
-	 usingArchitectureBits:process.pointerSize*8
+	 processType:process.type
 	 error:error];
 	
 	if (jumpToIslandData.length == 0)
@@ -509,7 +535,7 @@ error:(NSError * __autoreleasing *)error
 	[[self class]
 	 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax", firstInstruction.variable.address + jumpToIslandData.length - POP_REGISTER_INSTRUCTION_LENGTH]
 	 atInstructionPointer:allocatedAddress + newInstructionsData.length
-	 usingArchitectureBits:process.pointerSize*8
+	 processType:process.type
 	 error:error];
 	
 	if (jumpFromIslandData.length == 0)

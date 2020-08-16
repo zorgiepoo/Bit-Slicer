@@ -103,6 +103,8 @@
 		72ABCBEA24E8D7D700EF63A9 /* Capstone.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72ABCBE924E8D7D700EF63A9 /* Capstone.framework */; };
 		72ABCBEB24E8DA1800EF63A9 /* Capstone.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 72ABCBE924E8D7D700EF63A9 /* Capstone.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		72ABCBEE24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 72ABCBED24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m */; };
+		72ABCBF024E9DE9100EF63A9 /* libkeystone.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72ABCBEF24E9DE9000EF63A9 /* libkeystone.0.dylib */; };
+		72ABCBF124E9DEA100EF63A9 /* libkeystone.0.dylib in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 72ABCBEF24E9DE9000EF63A9 /* libkeystone.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		72BD7EAF1B8406FA00B7E3CC /* HFByteArray_FindReplace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC8DA1B755A190092ED75 /* HFByteArray_FindReplace.cpp */; };
 		72BD7EB01B84070F00B7E3CC /* ZGPrivateCoreSymbolicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 72DBC9531B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m */; };
 		72D051A91960890800EC532A /* Data Inspector View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D051AB1960890800EC532A /* Data Inspector View.xib */; };
@@ -265,6 +267,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				72ABCBF124E9DEA100EF63A9 /* libkeystone.0.dylib in Copy Frameworks */,
 				72ABCBEB24E8DA1800EF63A9 /* Capstone.framework in Copy Frameworks */,
 				7208450724E0851000F3D449 /* Python.framework in Copy Frameworks */,
 				7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */,
@@ -456,6 +459,17 @@
 		72ABCBE924E8D7D700EF63A9 /* Capstone.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Capstone.framework; path = deps/capstone/Capstone.framework; sourceTree = "<group>"; };
 		72ABCBEC24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGARM64DisassemblerObject.h; path = "Bit Slicer/ZGARM64DisassemblerObject.h"; sourceTree = "<group>"; };
 		72ABCBED24E8DB9900EF63A9 /* ZGARM64DisassemblerObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGARM64DisassemblerObject.m; path = "Bit Slicer/ZGARM64DisassemblerObject.m"; sourceTree = "<group>"; };
+		72ABCBEF24E9DE9000EF63A9 /* libkeystone.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libkeystone.0.dylib; path = deps/keystone/libkeystone.0.dylib; sourceTree = "<group>"; };
+		72ABCBF524E9DF4A00EF63A9 /* hexagon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hexagon.h; path = deps/keystone/keystone/hexagon.h; sourceTree = "<group>"; };
+		72ABCBF624E9DF4A00EF63A9 /* keystone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = keystone.h; path = deps/keystone/keystone/keystone.h; sourceTree = "<group>"; };
+		72ABCBF724E9DF4A00EF63A9 /* mips.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = mips.h; path = deps/keystone/keystone/mips.h; sourceTree = "<group>"; };
+		72ABCBF824E9DF4A00EF63A9 /* arm64.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = arm64.h; path = deps/keystone/keystone/arm64.h; sourceTree = "<group>"; };
+		72ABCBF924E9DF4A00EF63A9 /* sparc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sparc.h; path = deps/keystone/keystone/sparc.h; sourceTree = "<group>"; };
+		72ABCBFA24E9DF4A00EF63A9 /* systemz.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = systemz.h; path = deps/keystone/keystone/systemz.h; sourceTree = "<group>"; };
+		72ABCBFB24E9DF4A00EF63A9 /* ppc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ppc.h; path = deps/keystone/keystone/ppc.h; sourceTree = "<group>"; };
+		72ABCBFC24E9DF4A00EF63A9 /* evm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = evm.h; path = deps/keystone/keystone/evm.h; sourceTree = "<group>"; };
+		72ABCBFD24E9DF4A00EF63A9 /* arm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = arm.h; path = deps/keystone/keystone/arm.h; sourceTree = "<group>"; };
+		72ABCBFE24E9DF4A00EF63A9 /* x86.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = x86.h; path = deps/keystone/keystone/x86.h; sourceTree = "<group>"; };
 		72D051AA1960890800EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Data Inspector View.xib"; sourceTree = "<group>"; };
 		72D051AD1960891900EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Backtrace View.xib"; sourceTree = "<group>"; };
 		72D051CA1960A41F00EC532A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Bit Slicer/Base.lproj/Registers View.xib"; sourceTree = "<group>"; };
@@ -776,6 +790,7 @@
 				7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */,
 				7235B7AF24D7CE0B0029580A /* ShortcutRecorder.framework in Frameworks */,
 				773E8B021821DDAD00D1A71A /* CoreSymbolication.framework in Frameworks */,
+				72ABCBF024E9DE9100EF63A9 /* libkeystone.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -859,6 +874,7 @@
 		2A37F4C3FDCFA73011CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				72ABCBEF24E9DE9000EF63A9 /* libkeystone.0.dylib */,
 				7208450524E084F400F3D449 /* Python.framework */,
 				721594FD24DF36360027F600 /* HexFiend.framework */,
 				7235B7B124D7D9B10029580A /* DDMathParser.framework */,
@@ -906,6 +922,23 @@
 				7235B7A124D7BF770029580A /* types.h */,
 			);
 			name = udis86;
+			sourceTree = "<group>";
+		};
+		72ABCBF424E9DF3E00EF63A9 /* keystone */ = {
+			isa = PBXGroup;
+			children = (
+				72ABCBFD24E9DF4A00EF63A9 /* arm.h */,
+				72ABCBF824E9DF4A00EF63A9 /* arm64.h */,
+				72ABCBFC24E9DF4A00EF63A9 /* evm.h */,
+				72ABCBF524E9DF4A00EF63A9 /* hexagon.h */,
+				72ABCBF624E9DF4A00EF63A9 /* keystone.h */,
+				72ABCBF724E9DF4A00EF63A9 /* mips.h */,
+				72ABCBFB24E9DF4A00EF63A9 /* ppc.h */,
+				72ABCBF924E9DF4A00EF63A9 /* sparc.h */,
+				72ABCBFA24E9DF4A00EF63A9 /* systemz.h */,
+				72ABCBFE24E9DF4A00EF63A9 /* x86.h */,
+			);
+			name = keystone;
 			sourceTree = "<group>";
 		};
 		72D051C619609C0A00EC532A /* Nibs */ = {
@@ -1052,6 +1085,7 @@
 		77329B5A168D07B6007DCAE2 /* Debugger */ = {
 			isa = PBXGroup;
 			children = (
+				72ABCBF424E9DF3E00EF63A9 /* keystone */,
 				773E8B0B1821E01700D1A71A /* Symbolication */,
 				7701EF411696A29100877373 /* mach_exc */,
 				7235B79E24D7BE9C0029580A /* udis86 */,
@@ -2584,6 +2618,7 @@
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
 					"$(PROJECT_DIR)/deps/udis86/udis86",
+					"$(PROJECT_DIR)/deps/keystone",
 				);
 				OTHER_CFLAGS = "-D_BSDEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zgcoder.BitSlicer;
@@ -2690,6 +2725,7 @@
 					"$(SRCROOT)",
 					"$(SRCROOT)/deps",
 					"$(PROJECT_DIR)/deps/udis86/udis86",
+					"$(PROJECT_DIR)/deps/keystone",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.zgcoder.BitSlicer;
 				PRODUCT_NAME = "Bit Slicer";
