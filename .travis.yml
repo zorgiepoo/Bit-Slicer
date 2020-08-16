@@ -1,5 +1,5 @@
 language: objective-c
-osx_image: xcode9.4
+osx_image: xcode12u
 before_install:
   - brew update
 script: xcodebuild -target 'Bit Slicer Tests' -scheme 'Bit Slicer' test CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
