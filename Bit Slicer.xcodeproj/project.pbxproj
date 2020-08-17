@@ -36,7 +36,6 @@
 		7231440819C607C700FBE342 /* ZGWatchVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 7231440719C607C700FBE342 /* ZGWatchVariable.m */; };
 		7231440E19C6230F00FBE342 /* [Code] Watch Variable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 7231440C19C6230F00FBE342 /* [Code] Watch Variable.stringsdict */; };
 		7235B7A424D7BF980029580A /* libudis86.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7A324D7BF980029580A /* libudis86.a */; };
-		7235B7A624D7C1050029580A /* yasm in Resources */ = {isa = PBXBuildFile; fileRef = 7235B7A524D7C1050029580A /* yasm */; };
 		7235B7A724D7C1260029580A /* yasm in Copy Files */ = {isa = PBXBuildFile; fileRef = 7235B7A524D7C1050029580A /* yasm */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7235B7AF24D7CE0B0029580A /* ShortcutRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */; };
 		7235B7B024D7CE180029580A /* ShortcutRecorder.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -1538,7 +1537,6 @@
 				724A9F2819A1657500E72C9D /* [Code] Script Preferences.strings in Resources */,
 				726CA2CB19606E2200A6AD40 /* Edit Address Dialog.xib in Resources */,
 				724A9F4E19A8EDD700E72C9D /* [Code] Logger Window.stringsdict in Resources */,
-				7235B7A624D7C1050029580A /* yasm in Resources */,
 				726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */,
 				722CAA5919AD4AED009C6AAE /* hotkey.png in Resources */,
 				77F115AE17D2EAE4009E002A /* bitslicerdocicon.iconset in Resources */,
