@@ -144,8 +144,8 @@
 	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
 	{
 		ks_engine *engine;
-		// TODO: populate potential errors
-		if (ks_open(KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN, &engine) == KS_ERR_OK)
+		ks_err openResult = ks_open(KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN, &engine);
+		if (openResult == KS_ERR_OK)
 		{
 			unsigned char *encoding = NULL;
 			size_t encodingSize = 0;
@@ -157,14 +157,26 @@
 				
 				ks_free(encoding);
 			}
+			else
+			{
+				if (error != nil)
+				{
+					*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : [NSString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"failedAssembleCode"), ks_errno(engine)]}];
+				}
+			}
 			
 			ks_close(engine);
+		}
+		else
+		{
+			if (error != nil)
+			{
+				*error = [NSError errorWithDomain:ASSEMBLER_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : [NSString stringWithFormat:ZGLocalizedStringFromDebuggerTable(@"failedAssembleWithStartingEngine"), openResult]}];
+			}
 		}
 	}
 	else if (ZG_PROCESS_TYPE_IS_X86_FAMILY(processType))
 	{
-		data = [NSData data];
-		
 		NSString *outputFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"assembler_output.XXXXXX"];
 		const char *tempFileTemplateCString = [outputFileTemplate fileSystemRepresentation];
 		size_t templateFileTemplateLength = strlen(tempFileTemplateCString);

@@ -569,7 +569,7 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 			NSError *error = nil;
 			NSData *assembledData = [ZGDebuggerUtilities assembleInstructionText:codeStringValue atInstructionPointer:instructionPointer processType:self->processType error:&error];
 			
-			if (error == nil)
+			if (assembledData != nil)
 			{
 				retValue = Py_BuildValue("y#", assembledData.bytes, assembledData.length);
 			}

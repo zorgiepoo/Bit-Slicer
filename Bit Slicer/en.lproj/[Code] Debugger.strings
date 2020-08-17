@@ -112,6 +112,12 @@
 /* Error indicating yasm task could not be started */
 "failedAssembleWithBadFileDescriptor" = "failed to open file descriptor on %s.";
 
+/* Error indicating keystone engine could not be started (unlikely to occur) */
+"failedAssembleWithStartingEngine" = "assembly engine failed to start with error %u.";
+
+/* Error indicating keystone engine could not assemble code */
+"failedAssembleCode" = "failed to generate code with error %u.";
+
 /* Error indicating current instructions could not be NOP'ed for code injection */
 "failedNOPInstructionsForInjectingCode" = "failed to NOP current instructions";
 
