@@ -250,7 +250,8 @@ NSData *ZGSearchWithFunctionHelperRegular(T *searchValue, F comparisonFunction, 
 		ZGMemorySize numberOfStepsToTake = MIN(addressCapacity - numberOfVariablesFound, (endLimit + dataAlignment - dataIndex) / dataAlignment);
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
-			if (comparisonFunction(searchData, static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(bytes) + dataIndex)), searchValue))
+			T *variableValue = static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(bytes) + dataIndex));
+			if (comparisonFunction(searchData, variableValue, searchValue))
 			{
 				memoryAddresses[numberOfVariablesFound] = static_cast<P>(address + dataIndex);
 				numberOfVariablesFound++;
@@ -282,7 +283,9 @@ NSData *ZGSearchWithFunctionHelperStored(T *regionBytes, F comparisonFunction, Z
 		ZGMemorySize numberOfStepsToTake = MIN(addressCapacity - numberOfVariablesFound, (endLimit + dataAlignment - dataIndex) / dataAlignment);
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
-			if (comparisonFunction(searchData, (static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(bytes) + dataIndex))), static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(static_cast<void *>(regionBytes)) + dataIndex))))
+			T *variableValue = (static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(bytes) + dataIndex)));
+			T *compareValue = static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(static_cast<void *>(regionBytes)) + dataIndex));
+			if (comparisonFunction(searchData, variableValue, compareValue))
 			{
 				memoryAddresses[numberOfVariablesFound] = static_cast<P>(address + dataIndex);
 				numberOfVariablesFound++;
