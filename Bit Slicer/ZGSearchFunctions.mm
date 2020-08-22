@@ -266,7 +266,7 @@ NSData *ZGSearchWithFunctionHelperRegular(T *searchValue, F comparisonFunction, 
 
 // like ZGSearchWithFunctionHelperRegular above except against stored values
 template <typename T, typename P, typename F>
-NSData *ZGSearchWithFunctionHelperStored(T *regionBytes, F comparisonFunction, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, ZGMemoryAddress address, void *bytes)
+NSData *ZGSearchWithFunctionHelperStored(void *regionBytes, F comparisonFunction, ZGSearchData * __unsafe_unretained searchData, ZGMemorySize dataIndex, ZGMemorySize dataAlignment, ZGMemorySize endLimit, ZGMemoryAddress address, void *bytes)
 {
 	size_t addressCapacity = INITIAL_BUFFER_ADDRESSES_CAPACITY;
 	P *memoryAddresses = static_cast<P *>(malloc(addressCapacity * sizeof(*memoryAddresses)));
@@ -284,7 +284,7 @@ NSData *ZGSearchWithFunctionHelperStored(T *regionBytes, F comparisonFunction, Z
 		for (ZGMemorySize stepIndex = 0; stepIndex < numberOfStepsToTake; stepIndex++)
 		{
 			T *variableValue = (static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(bytes) + dataIndex)));
-			T *compareValue = static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(static_cast<void *>(regionBytes)) + dataIndex));
+			T *compareValue = static_cast<T *>(static_cast<void *>(static_cast<uint8_t *>(regionBytes) + dataIndex));
 			if (comparisonFunction(searchData, variableValue, compareValue))
 			{
 				memoryAddresses[numberOfVariablesFound] = static_cast<P>(address + dataIndex);
@@ -326,11 +326,11 @@ ZGSearchResults *ZGSearchWithFunction(F comparisonFunction, ZGMemoryMap processT
 		{
 			if (pointerSize == sizeof(ZGMemoryAddress))
 			{
-				resultSet = ZGSearchWithFunctionHelperStored<T, ZGMemoryAddress>(static_cast<T *>(regionBytes), comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, address, bytes);
+				resultSet = ZGSearchWithFunctionHelperStored<T, ZGMemoryAddress>(regionBytes, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, address, bytes);
 			}
 			else
 			{
-				resultSet = ZGSearchWithFunctionHelperStored<T, ZG32BitMemoryAddress>(static_cast<T *>(regionBytes), comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, address, bytes);
+				resultSet = ZGSearchWithFunctionHelperStored<T, ZG32BitMemoryAddress>(regionBytes, comparisonFunction, searchData, dataIndex, dataAlignment, endLimit, address, bytes);
 			}
 		}
 		
