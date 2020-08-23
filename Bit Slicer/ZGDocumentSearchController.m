@@ -248,7 +248,9 @@
 		
 		if (currentVariableCount < MAX_NUMBER_OF_VARIABLES_TO_FETCH && resultSet.length > 0)
 		{
-			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:_searchData.dataSize pointerSize:_searchData.pointerSize];
+			// These progress search results are thrown away,
+			// so doesn't matter if accesses are unaligned or not
+			ZGSearchResults *searchResults = [[ZGSearchResults alloc] initWithResultSets:@[resultSet] dataSize:_searchData.dataSize pointerSize:_searchData.pointerSize unalignedAccess:YES];
 			searchResults.dataType = _dataType;
 			searchResults.enabled = _allowsNarrowing;
 			[self fetchNumberOfVariables:MAX_NUMBER_OF_VARIABLES_TO_FETCH - currentVariableCount fromResults:searchResults];
@@ -700,21 +702,29 @@
 	ZGSearchResults *firstSearchResults = nil;
 	if (isNarrowing)
 	{
+		ZGMemorySize hostAlignment = ZGDataAlignment(ZG_PROCESS_TYPE_HOST, dataType, _searchData.dataSize);
+		BOOL unalignedAddressAccess = NO;
+		
 		NSMutableData *firstResultSets = [NSMutableData data];
 		for (ZGVariable *variable in variables)
 		{
+			ZGMemoryAddress variableAddress = variable.address;
 			if (_searchData.pointerSize == sizeof(ZGMemoryAddress))
 			{
-				ZGMemoryAddress variableAddress = variable.address;
 				[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
 			}
 			else
 			{
-				ZG32BitMemoryAddress variableAddress = (ZG32BitMemoryAddress)variable.address;
-				[firstResultSets appendBytes:&variableAddress length:sizeof(variableAddress)];
+				ZG32BitMemoryAddress halfVariableAddress = (ZG32BitMemoryAddress)variableAddress;
+				[firstResultSets appendBytes:&halfVariableAddress length:sizeof(halfVariableAddress)];
+			}
+			
+			if (!unalignedAddressAccess && variableAddress % hostAlignment != 0)
+			{
+				unalignedAddressAccess = YES;
 			}
 		}
-		firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] dataSize:_searchData.dataSize pointerSize:_searchData.pointerSize];
+		firstSearchResults = [[ZGSearchResults alloc] initWithResultSets:@[firstResultSets] dataSize:_searchData.dataSize pointerSize:_searchData.pointerSize unalignedAccess:unalignedAddressAccess];
 	}
 	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

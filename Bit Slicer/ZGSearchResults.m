@@ -34,7 +34,7 @@
 
 @implementation ZGSearchResults
 
-- (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize
+- (id)initWithResultSets:(NSArray<NSData *> *)resultSets dataSize:(ZGMemorySize)dataSize pointerSize:(ZGMemorySize)pointerSize unalignedAccess:(BOOL)unalignedAccess
 {
 	self = [super init];
 	if (self != nil)
@@ -46,6 +46,7 @@
 			_addressCount += result.length / _pointerSize;
 		}
 		_dataSize = dataSize;
+		_unalignedAccess = unalignedAccess;
 	}
 	return self;
 }
