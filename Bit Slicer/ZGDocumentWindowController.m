@@ -1132,7 +1132,17 @@
 			return NO;
 		}
 		
-		if (![[self selectedVariables] zgAllObjectsMatchingCondition:^(ZGVariable *variable) { return (BOOL)(variable.type == ZGByteArray && variable.rawValue != NULL); }])
+		ZGProcessType processType = self.currentProcess.type;
+		if (![[self selectedVariables] zgAllObjectsMatchingCondition:^(ZGVariable *variable) {
+			BOOL validByteArray = (variable.type == ZGByteArray && variable.rawValue != NULL);
+			
+			if (!validByteArray)
+			{
+				return NO;
+			}
+			
+			return (BOOL)(ZG_PROCESS_TYPE_IS_ARM64(processType) ? variable.size == 4 : YES);
+		}])
 		{
 			return NO;
 		}
@@ -1405,7 +1415,7 @@
 
 - (IBAction)nopVariables:(id)__unused sender
 {
-	[_variableController nopVariables:[self selectedVariables]];
+	[_variableController nopVariables:[self selectedVariables] process:self.currentProcess];
 }
 
 - (IBAction)requestEditingVariablesValue:(id)__unused sender

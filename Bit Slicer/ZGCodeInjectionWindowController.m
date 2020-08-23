@@ -83,7 +83,7 @@
 	}
 	
 	void *nopBuffer = malloc(numberOfAllocatedBytes);
-	memset(nopBuffer, NOP_VALUE, numberOfAllocatedBytes);
+	memset(nopBuffer, X86_NOP_VALUE, numberOfAllocatedBytes);
 	if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, numberOfAllocatedBytes))
 	{
 		NSLog(@"Failed to nop allocated memory for code injection"); // not a fatal error

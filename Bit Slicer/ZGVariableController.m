@@ -470,16 +470,27 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	return completeSuccess;
 }
 
-- (void)nopVariables:(NSArray<ZGVariable *> *)variables
+- (void)nopVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process
 {
 	NSMutableArray<NSString *> *nopValues = [[NSMutableArray alloc] init];
+	ZGProcessType processType = process.type;
 	
 	for (ZGVariable *variable in variables)
 	{
-		NSMutableArray<NSString *> *nopComponents = [[NSMutableArray alloc] init];
-		for (NSUInteger index = 0; index < variable.size; index++)
+		NSArray<NSString *> *nopComponents;
+		
+		if (ZG_PROCESS_TYPE_IS_ARM64(processType))
 		{
-			[nopComponents addObject:@"90"];
+			nopComponents = @[@"1F", @"20", @"03", @"D5"];
+		}
+		else
+		{
+			NSMutableArray<NSString *> *mutableNopComponents = [[NSMutableArray alloc] init];
+			for (NSUInteger index = 0; index < variable.size; index++)
+			{
+				[mutableNopComponents addObject:@"90"];
+			}
+			nopComponents = mutableNopComponents;
 		}
 		[nopValues addObject:[nopComponents componentsJoinedByString:@" "]];
 	}

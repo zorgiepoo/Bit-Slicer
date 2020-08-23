@@ -1610,8 +1610,9 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 - (void)writeInstructionText:(NSString *)instructionText atInstructionFromIndex:(NSUInteger)instructionIndex
 {
 	NSError *error = nil;
+	ZGProcessType processType = self.currentProcess.type;
 	ZGInstruction *firstInstruction = [_instructions objectAtIndex:instructionIndex];
-	NSData *data = [ZGDebuggerUtilities assembleInstructionText:instructionText atInstructionPointer:firstInstruction.variable.address processType:self.currentProcess.type error:&error];
+	NSData *data = [ZGDebuggerUtilities assembleInstructionText:instructionText atInstructionPointer:firstInstruction.variable.address processType:processType error:&error];
 	if (data.length == 0)
 	{
 		if (error != nil)
@@ -1624,7 +1625,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	{
 		NSMutableData *outputData = [NSMutableData dataWithData:data];
 		
-		// Fill leftover bytes with NOP's so that the instructions won't 'slide'
+		// Fill leftover bytes with NOP's on x86 so that the instructions won't 'slide'
 		NSUInteger originalOutputLength = outputData.length;
 		NSUInteger bytesRead = 0;
 		NSUInteger numberOfInstructionsOverwritten = 0;
@@ -1635,9 +1636,9 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			bytesRead += currentInstruction.variable.size;
 			numberOfInstructionsOverwritten++;
 			
-			if (bytesRead > originalOutputLength)
+			if (bytesRead > originalOutputLength && ZG_PROCESS_TYPE_IS_X86_FAMILY(processType))
 			{
-				const uint8_t nopValue = NOP_VALUE;
+				const uint8_t nopValue = X86_NOP_VALUE;
 				for (ZGMemorySize byteIndex = currentInstruction.variable.address + currentInstruction.variable.size - (bytesRead - originalOutputLength); byteIndex < currentInstruction.variable.address + currentInstruction.variable.size; byteIndex++)
 				{
 					[outputData appendBytes:&nopValue length:sizeof(int8_t)];

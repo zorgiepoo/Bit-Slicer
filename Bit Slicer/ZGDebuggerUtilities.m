@@ -403,15 +403,25 @@ actionName:(NSString *)actionName
 	NSMutableArray<NSString *> *newStringValues = [[NSMutableArray alloc] init];
 	NSMutableArray<NSString *> *oldStringValues = [[NSMutableArray alloc] init];
 	
+	ZGProcessType processType = process.type;
 	for (NSUInteger instructionIndex = 0; instructionIndex < instructions.count; instructionIndex++)
 	{
 		ZGInstruction *instruction = [instructions objectAtIndex:instructionIndex];
 		[oldStringValues addObject:instruction.variable.stringValue];
 		
-		NSMutableArray<NSString *> *nopComponents = [[NSMutableArray alloc] init];
-		for (NSUInteger nopIndex = 0; nopIndex < instruction.variable.size; nopIndex++)
+		NSArray<NSString *> *nopComponents;
+		if (ZG_PROCESS_TYPE_IS_ARM64(processType))
 		{
-			[nopComponents addObject:@"90"];
+			nopComponents = @[@"1F", @"20", @"03", @"D5"];
+		}
+		else
+		{
+			NSMutableArray<NSString *> *mutableNopComponents = [[NSMutableArray alloc] init];
+			for (NSUInteger nopIndex = 0; nopIndex < instruction.variable.size; nopIndex++)
+			{
+				[mutableNopComponents addObject:@"90"];
+			}
+			nopComponents = mutableNopComponents;
 		}
 		
 		[newStringValues addObject:[nopComponents componentsJoinedByString:@" "]];
@@ -445,10 +455,20 @@ error:(NSError * __autoreleasing *)error
 		return NO;
 	}
 	
+	if (ZG_PROCESS_TYPE_IS_ARM64(process.type))
+	{
+		if (error != nil)
+		{
+			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"Code Injection is not supported on ARM64"}];
+		}
+		
+		return NO;
+	}
+	
 	ZGSuspendTask(process.processTask);
 	
 	void *nopBuffer = malloc(codeData.length);
-	memset(nopBuffer, NOP_VALUE, codeData.length);
+	memset(nopBuffer, X86_NOP_VALUE, codeData.length);
 	
 	if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, codeData.length))
 	{
@@ -506,7 +526,7 @@ error:(NSError * __autoreleasing *)error
 	}
 	while (newInstructionsData.length < INJECTED_NOP_SLIDE_LENGTH)
 	{
-		uint8_t nopValue = NOP_VALUE;
+		uint8_t nopValue = X86_NOP_VALUE;
 		[newInstructionsData appendBytes:&nopValue length:1];
 	}
 	[newInstructionsData appendData:codeData];

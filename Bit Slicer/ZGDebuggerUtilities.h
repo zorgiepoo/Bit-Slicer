@@ -41,7 +41,7 @@
 @class ZGBreakPoint;
 
 #define INJECTED_NOP_SLIDE_LENGTH 0x10
-#define NOP_VALUE 0x90
+#define X86_NOP_VALUE 0x90
 
 #define ZGLocalizedStringFromDebuggerTable(string) NSLocalizedStringFromTable((string), @"[Code] Debugger", nil)
 
