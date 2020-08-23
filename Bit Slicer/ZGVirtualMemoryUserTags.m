@@ -124,37 +124,37 @@ NSString *ZGUserTagDescription(uint32_t userTag)
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREUI, @"CoreUI")
 			
 			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_COREUIFILE, @"CoreUI File")
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_GENEALOGY, @"Genealogy");
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_GENEALOGY, @"Genealogy")
 			
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_RAWCAMERA, @"RAW Camera");
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CORPSEINFO, @"Corpse Info");
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_ASL, @"Apple System Log (ASL)");
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_RAWCAMERA, @"RAW Camera")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CORPSEINFO, @"Corpse Info")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_ASL, @"Apple System Log (ASL)")
 			
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SWIFT_RUNTIME);
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SWIFT_METADATA);
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_DHMM);
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SCENEKIT);
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SKYWALK);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SWIFT_RUNTIME)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SWIFT_METADATA)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_DHMM)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SCENEKIT)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SKYWALK)
 			
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_IOSURFACE);
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_LIBNETWORK);
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_AUDIO);
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_VIDEOBITSTREAM, @"Video Bitstream");
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_IOSURFACE)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_LIBNETWORK)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_AUDIO)
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_VIDEOBITSTREAM, @"Video Bitstream")
 			
 #if defined(MAC_OS_X_VERSION_10_14) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_14
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_XPC, @"Core Media XPC");
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_RPC, @"Core Media RPC");
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_MEMORYPOOL, @"Core Media Memory Pool");
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_READCACHE, @"Core Media Read Cache");
-			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_CRABS, @"Core Media Crabs");
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_QUICKLOOK_THUMBNAILS);
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ACCOUNTS);
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_XPC, @"Core Media XPC")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_RPC, @"Core Media RPC")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_MEMORYPOOL, @"Core Media Memory Pool")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_READCACHE, @"Core Media Read Cache")
+			ZGHandleUserTagCaseWithDescription(userTagDescription, VM_MEMORY_CM_CRABS, @"Core Media Crabs")
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_QUICKLOOK_THUMBNAILS)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_ACCOUNTS)
 #endif
 			
 #if defined(MAC_OS_X_VERSION_10_15) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_15
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SANITIZER);
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_IOACCELERATOR);
-			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_CM_REGWARP);
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_SANITIZER)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_IOACCELERATOR)
+			ZGHandleUserTagCase(userTagDescription, VM_MEMORY_CM_REGWARP)
 #endif
 			
 #if defined(MAC_OS_VERSION_11_0) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
