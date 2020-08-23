@@ -1008,9 +1008,21 @@ bool ZGString16CaseInsensitiveEquals(ZGSearchData *__unsafe_unretained searchDat
 }
 
 template <typename T>
-bool ZGString16SwappedCaseInsensitiveEquals(ZGSearchData *__unsafe_unretained searchData, T *__restrict__ __unused variableValue, T *__restrict__ compareValue)
+bool ZGString16SwappedCaseInsensitiveEquals(ZGSearchData *__unsafe_unretained searchData, T *__restrict__ variableValue, T *__restrict__ compareValue)
 {
-	return ZGString16CaseInsensitiveEquals(searchData, static_cast<T *>(searchData->_swappedValue), compareValue);
+	for (uint32_t index = 0; index < searchData->_dataSize / sizeof(T); index++)
+	{
+		variableValue[index] = ZGSwapBytes(variableValue[index]);
+	}
+
+	bool retValue = ZGString16CaseInsensitiveEquals(searchData, variableValue, compareValue);
+
+	for (uint32_t index = 0; index < searchData->_dataSize / sizeof(T); index++)
+	{
+		variableValue[index] = ZGSwapBytes(variableValue[index]);
+	}
+
+	return retValue;
 }
 
 template <typename T>
