@@ -70,6 +70,8 @@
 #import "ZGMachBinary.h"
 #import "ZGAppTerminationState.h"
 
+#include <TargetConditionals.h>
+
 #import <mach/task.h>
 #import <mach/thread_act.h>
 #import <mach/mach_port.h>
@@ -781,6 +783,11 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 
 - (BOOL)setUpExceptionPortForProcess:(ZGProcess *)process
 {
+#if TARGET_CPU_ARM64
+	// Debugging is not supported on arm64 yet.
+	(void)process;
+	return NO;
+#else
 	if (_exceptionPort == MACH_PORT_NULL)
 	{
 		if (mach_port_allocate(current_task(), MACH_PORT_RIGHT_RECEIVE, &_exceptionPort) != KERN_SUCCESS)
@@ -820,6 +827,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
     });
 	
 	return YES;
+#endif
 }
 
 #if TARGET_CPU_ARM64

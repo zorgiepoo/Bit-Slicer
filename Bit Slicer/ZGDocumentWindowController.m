@@ -64,6 +64,8 @@
 #import "ZGNullability.h"
 #import <libproc.h>
 
+#import <TargetConditionals.h>
+
 #define ZGProtectionGroup @"ZGProtectionGroup"
 #define ZGProtectionItemAll @"ZGProtectionAll"
 #define ZGProtectionItemWrite @"ZGProtectionWrite"
@@ -1096,6 +1098,10 @@
 	
 	else if (menuItem.action == @selector(watchVariable:))
 	{
+#if TARGET_CPU_ARM64
+		// Watchpoints not supported on arm64 yet
+		return NO;
+#else
 		if ([_searchController canCancelTask] || !self.currentProcess.valid || [self selectedVariables].count != 1)
 		{
 			return NO;
@@ -1121,6 +1127,7 @@
 		{
 			return NO;
 		}
+#endif
 	}
 	
 	else if (menuItem.action == @selector(nopVariables:))

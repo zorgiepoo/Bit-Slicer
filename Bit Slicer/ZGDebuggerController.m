@@ -62,6 +62,8 @@
 #import "ZGMemoryAddressExpressionParsing.h"
 #import "ZGNullability.h"
 
+#import <TargetConditionals.h>
+
 #define ZGDebuggerSplitViewAutosaveName @"ZGDisassemblerHorizontalSplitter"
 #define ZGRegistersAndBacktraceSplitViewAutosaveName @"ZGDisassemblerVerticalSplitter"
 
@@ -1279,6 +1281,12 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	else if (userInterfaceItem.action == @selector(toggleBreakPoints:))
 	{
 		NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
+		
+#if TARGET_CPU_ARM64
+		// Setting breakpoints is not supported on arm64
+		BOOL shouldValidate = NO;
+		BOOL isBreakPoint = NO;
+#else
 		if (selectedInstructions.count == 0)
 		{
 			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"addBreakpoint");
@@ -1303,6 +1311,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 				}
 			}
 		}
+#endif
 		
 		NSString *localizableKey = [NSString stringWithFormat:@"%@Breakpoint%@", isBreakPoint ? @"remove" : @"add", selectedInstructions.count != 1 ? @"s" : @""];
 		menuItem.title = ZGLocalizedStringFromDebuggerTable(localizableKey);
@@ -1361,17 +1370,27 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 	else if (userInterfaceItem.action == @selector(requestCodeInjection:))
 	{
+#if TARGET_CPU_ARM64
+		// Code injection is not supported on arm64
+		return NO;
+#else
 		if ([[self selectedInstructions] count] != 1)
 		{
 			return NO;
 		}
+#endif
 	}
 	else if (userInterfaceItem.action == @selector(showBreakPointCondition:))
 	{
+#if TARGET_CPU_ARM64
+		// Breakpoints are not supported on arm64
+		return NO;
+#else
 		if ([[self selectedInstructions] count] != 1)
 		{
 			return NO;
 		}
+#endif
 	}
 	
 	return [super validateUserInterfaceItem:userInterfaceItem];
@@ -1545,6 +1564,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
+			// Breakpoints are not supported on arm64
+#if !TARGET_CPU_ARM64
 			NSArray<ZGInstruction *> *targetInstructions = nil;
 			NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 			ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
@@ -1569,6 +1590,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			{
 				[self removeBreakPointsToInstructions:targetInstructions];
 			}
+#endif
 		}
 	}
 }
