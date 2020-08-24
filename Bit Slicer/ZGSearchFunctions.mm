@@ -1171,9 +1171,9 @@ bool ZGString16CaseInsensitiveNotEquals(ZGSearchData *__unsafe_unretained search
 }
 
 template <typename T>
-bool ZGString16SwappedCaseInsensitiveNotEquals(ZGSearchData *__unsafe_unretained searchData, T *__restrict__ variableValue, T *__restrict__ compareValue, T * __restrict__ extraStorage)
+bool ZGString16SwappedCaseInsensitiveNotEquals(ZGSearchData *__unsafe_unretained searchData, T *variableValue, T *__restrict__ compareValue, T * extraStorage)
 {
-	return ZGString16CaseInsensitiveNotEquals(searchData, variableValue, compareValue, extraStorage);
+	return !ZGString16SwappedCaseInsensitiveEquals(searchData, variableValue, compareValue, extraStorage);
 }
 
 template <typename T>

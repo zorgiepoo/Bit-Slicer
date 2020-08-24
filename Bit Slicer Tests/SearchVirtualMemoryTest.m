@@ -619,8 +619,10 @@
 	ZGSearchResults *equalResultsBigCaseInsensitiveNullTerminated = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGEquals);
 	XCTAssertEqual(equalResultsBigCaseInsensitiveNullTerminated.addressCount, 1U);
 
+	const ZGMemorySize regionCount = 5;
+	const ZGMemorySize chancesMissedPerRegion = 5;
 	ZGSearchResults *notEqualResultsBigCaseInsensitiveNullTerminated = ZGSearchForData(_processTask, searchData, nil, ZGString16, 0, ZGNotEquals);
-	XCTAssertEqual(notEqualResultsBigCaseInsensitiveNullTerminated.addressCount, _data.length / sizeof(unichar) - 5 * 5);
+	XCTAssertEqual(notEqualResultsBigCaseInsensitiveNullTerminated.addressCount, _data.length / sizeof(unichar) - regionCount * chancesMissedPerRegion - equalResultsBigCaseInsensitiveNullTerminated.addressCount);
 
 	searchData.shouldIgnoreStringCase = NO;
 	searchData.bytesSwapped = NO;
