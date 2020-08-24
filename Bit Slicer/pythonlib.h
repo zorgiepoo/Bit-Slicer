@@ -68,7 +68,7 @@ typedef struct
 
 typedef struct
 {
-	int unused;
+	int64_t unused;
 } PyObject;
 
 typedef PyObject* (*PyCFunction)(PyObject *obj1, PyObject *obj2);
