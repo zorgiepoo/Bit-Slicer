@@ -118,10 +118,7 @@
 	
 	if (_watchActivity != nil)
 	{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 		[[NSProcessInfo processInfo] endActivity:(id _Nonnull)_watchActivity];
-#pragma clang diagnostic pop
 		_watchActivity = nil;
 	}
 	

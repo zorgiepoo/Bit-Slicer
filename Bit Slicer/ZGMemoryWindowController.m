@@ -210,10 +210,7 @@
 
 - (void)windowDidChangeOcclusionState:(NSNotification *)__unused notification
 {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 	_isOccluded = ([self.window occlusionState] & NSWindowOcclusionStateVisible) == 0;
-#pragma clang diagnostic pop
 	[self updateOcclusionActivity];
 }
 
