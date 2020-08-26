@@ -44,6 +44,12 @@
 		7235B7B424D7D9EA0029580A /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7235B7B524D7D9F40029580A /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; };
 		7235B7B924D7DE660029580A /* pythonlib.m in Sources */ = {isa = PBXBuildFile; fileRef = 7235B7B824D7DE660029580A /* pythonlib.m */; };
+		723FC6E824F4BEB10083F568 /* stepover@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E424F4BEB00083F568 /* stepover@2x.pdf */; };
+		723FC6E924F4BEB10083F568 /* stepin@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E524F4BEB00083F568 /* stepin@2x.pdf */; };
+		723FC6EA24F4BEB10083F568 /* stepout@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E624F4BEB00083F568 /* stepout@2x.pdf */; };
+		723FC6EB24F4BEB10083F568 /* continue@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E724F4BEB00083F568 /* continue@2x.pdf */; };
+		723FC6EE24F4BEE90083F568 /* container@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6EC24F4BEE80083F568 /* container@2x.pdf */; };
+		723FC6EF24F4BEE90083F568 /* container_filled@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6ED24F4BEE90083F568 /* container_filled@2x.pdf */; };
 		72431BA919BFFB6100418893 /* ZGDataValueExtracting.m in Sources */ = {isa = PBXBuildFile; fileRef = 77F1162E17D2EF5A009E002A /* ZGDataValueExtracting.m */; };
 		724A9F1D19A1657500E72C9D /* [Code] Data Inspector.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0319A1657500E72C9D /* [Code] Data Inspector.strings */; };
 		724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */ = {isa = PBXBuildFile; fileRef = 724A9F0519A1657500E72C9D /* [Code] Debugger Registers.strings */; };
@@ -346,6 +352,12 @@
 		7235B7B124D7D9B10029580A /* DDMathParser.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DDMathParser.framework; path = deps/DDMathParser/DDMathParser.framework; sourceTree = "<group>"; };
 		7235B7B724D7DD8C0029580A /* pythonlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pythonlib.h; path = "Bit Slicer/pythonlib.h"; sourceTree = "<group>"; };
 		7235B7B824D7DE660029580A /* pythonlib.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = pythonlib.m; path = "Bit Slicer/pythonlib.m"; sourceTree = "<group>"; };
+		723FC6E424F4BEB00083F568 /* stepover@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "stepover@2x.pdf"; path = "Bit Slicer/debuggericons/stepover@2x.pdf"; sourceTree = "<group>"; };
+		723FC6E524F4BEB00083F568 /* stepin@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "stepin@2x.pdf"; path = "Bit Slicer/debuggericons/stepin@2x.pdf"; sourceTree = "<group>"; };
+		723FC6E624F4BEB00083F568 /* stepout@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "stepout@2x.pdf"; path = "Bit Slicer/debuggericons/stepout@2x.pdf"; sourceTree = "<group>"; };
+		723FC6E724F4BEB00083F568 /* continue@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "continue@2x.pdf"; path = "Bit Slicer/debuggericons/continue@2x.pdf"; sourceTree = "<group>"; };
+		723FC6EC24F4BEE80083F568 /* container@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "container@2x.pdf"; path = "Bit Slicer/docicons/container@2x.pdf"; sourceTree = "<group>"; };
+		723FC6ED24F4BEE90083F568 /* container_filled@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "container_filled@2x.pdf"; path = "Bit Slicer/docicons/container_filled@2x.pdf"; sourceTree = "<group>"; };
 		72456B5A204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Preferences.strings"; sourceTree = "<group>"; };
 		72456B5D204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Search Document.strings"; sourceTree = "<group>"; };
 		72456B5E204D2280006EFE08 /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = "Bit Slicer/es.lproj/[Code] Dump All Memory.strings"; sourceTree = "<group>"; };
@@ -1175,7 +1187,9 @@
 			isa = PBXGroup;
 			children = (
 				77988F19185803E800476A37 /* container.pdf */,
+				723FC6EC24F4BEE80083F568 /* container@2x.pdf */,
 				77988F1B185804AC00476A37 /* container_filled.pdf */,
+				723FC6ED24F4BEE90083F568 /* container_filled@2x.pdf */,
 			);
 			name = "Document Icons";
 			sourceTree = "<group>";
@@ -1214,9 +1228,13 @@
 			isa = PBXGroup;
 			children = (
 				77DA9D071800639E00549A37 /* continue.pdf */,
+				723FC6E724F4BEB00083F568 /* continue@2x.pdf */,
 				77DA9D081800639E00549A37 /* stepin.pdf */,
+				723FC6E524F4BEB00083F568 /* stepin@2x.pdf */,
 				77DA9D091800639E00549A37 /* stepout.pdf */,
+				723FC6E624F4BEB00083F568 /* stepout@2x.pdf */,
 				77DA9D0A1800639E00549A37 /* stepover.pdf */,
+				723FC6E424F4BEB00083F568 /* stepover@2x.pdf */,
 			);
 			name = "Debugger Icons";
 			sourceTree = "<group>";
@@ -1551,8 +1569,11 @@
 				724A9F2619A1657500E72C9D /* [Code] Memory Viewer.strings in Resources */,
 				72DBC91F1B7690BA0092ED75 /* [Code] About Window.strings in Resources */,
 				7284245719A96B470081C673 /* Localizable.strings in Resources */,
+				723FC6EF24F4BEE90083F568 /* container_filled@2x.pdf in Resources */,
 				72DBC8EA1B75A7430092ED75 /* About Window.xib in Resources */,
 				77DA9D0B1800639E00549A37 /* continue.pdf in Resources */,
+				723FC6EE24F4BEE90083F568 /* container@2x.pdf in Resources */,
+				723FC6E924F4BEB10083F568 /* stepin@2x.pdf in Resources */,
 				726CA2AF19606D1200A6AD40 /* Memory Viewer Window.xib in Resources */,
 				722CAA5A19AD4AED009C6AAE /* hotkey@2x.png in Resources */,
 				726CA2B619606DD200A6AD40 /* Change Memory Protection Dialog.xib in Resources */,
@@ -1560,6 +1581,7 @@
 				724A9F2919A1657500E72C9D /* [Code] Variable Actions.strings in Resources */,
 				724A9F1E19A1657500E72C9D /* [Code] Debugger Registers.strings in Resources */,
 				726CA2BF19606DF200A6AD40 /* Software Update View.xib in Resources */,
+				723FC6EB24F4BEB10083F568 /* continue@2x.pdf in Resources */,
 				77DA9D0C1800639E00549A37 /* stepin.pdf in Resources */,
 				726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */,
 				77F115B317D2EAFE009E002A /* Credits.rtf in Resources */,
@@ -1578,6 +1600,7 @@
 				726CA2C219606DFC00A6AD40 /* Shortcuts View.xib in Resources */,
 				724A9F4819A8792000E72C9D /* [Code] Memory Window.strings in Resources */,
 				724A9F4519A863A800E72C9D /* [Code] Watch Variable.strings in Resources */,
+				723FC6EA24F4BEB10083F568 /* stepout@2x.pdf in Resources */,
 				724A9F4219A85D3F00E72C9D /* [Code] Search Table.strings in Resources */,
 				726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */,
 				724A9F2719A1657500E72C9D /* [Code] Preferences.strings in Resources */,
@@ -1587,6 +1610,7 @@
 				724A9F3C19A8173900E72C9D /* [Code] Edit Variable Size.strings in Resources */,
 				724A9F2219A1657500E72C9D /* [Code] Logger Window.strings in Resources */,
 				726CA2CE19606E2600A6AD40 /* Edit Size Dialog.xib in Resources */,
+				723FC6E824F4BEB10083F568 /* stepover@2x.pdf in Resources */,
 				72D271D4197C2A6800CC6914 /* InfoPlist.strings in Resources */,
 				725DEC881A24F7610095C9B3 /* [Code] Script Manager.strings in Resources */,
 				724A9F2419A1657500E72C9D /* [Code] Memory Protection.strings in Resources */,
