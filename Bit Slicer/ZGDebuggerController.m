@@ -1408,11 +1408,11 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		{
 			if (instruction.variable.fullAttributedDescription.length == 0)
 			{
-				instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.text];
+				instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.text attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
 			}
 			else if ([variablesToAnnotate containsObject:instruction.variable])
 			{
-				NSMutableAttributedString *newDescription = [[NSMutableAttributedString alloc] initWithString:[instruction.text stringByAppendingString:@"\n"]];
+				NSMutableAttributedString *newDescription = [[NSMutableAttributedString alloc] initWithString:[instruction.text stringByAppendingString:@"\n"] attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
 				[newDescription appendAttributedString:instruction.variable.fullAttributedDescription];
 				instruction.variable.fullAttributedDescription = newDescription;
 			}
