@@ -37,10 +37,13 @@
 #import "ZGMachBinaryInfo.h"
 #import "ZGRegion.h"
 #import "ZGProcess.h"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wincomplete-umbrella"
 #import <DDMathParser/DDMathEvaluator.h>
 #import <DDMathParser/NSString+DDMathParsing.h>
 #import <DDMathParser/DDExpression.h>
 #import <DDMathParser/DDExpressionRewriter.h>
+#pragma clang diagnostic pop
 #import "ZGDebugLogging.h"
 #import "ZGNullability.h"
 

@@ -37,6 +37,8 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+#pragma clang diagnostic ignored "-Wobjc-messaging-id"
 #import <ShortcutRecorder/ShortcutRecorder.h>
 #pragma clang diagnostic pop
 

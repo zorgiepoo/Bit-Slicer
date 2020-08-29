@@ -56,8 +56,8 @@
 #pragma clang diagnostic ignored "-Wincomplete-umbrella"
 #import <DDMathParser/DDMathStringToken.h>
 #import <DDMathParser/DDMathStringTokenizer.h>
-#pragma clang diagnostic pop
 #import <DDMathParser/DDMathOperator.h>
+#pragma clang diagnostic pop
 
 @implementation ZGDocumentSearchController
 {
