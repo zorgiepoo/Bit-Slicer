@@ -34,7 +34,11 @@
 #import "ZGDebuggerController.h"
 #import "ZGHotKeyCenter.h"
 #import "ZGHotKey.h"
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 #import <ShortcutRecorder/ShortcutRecorder.h>
+#pragma clang diagnostic pop
 
 @interface ZGHotKeyPreferencesViewController () <SRRecorderControlDelegate>
 @end

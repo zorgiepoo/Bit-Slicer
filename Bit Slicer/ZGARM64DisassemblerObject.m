@@ -32,7 +32,7 @@
 
 #import "ZGARM64DisassemblerObject.h"
 #import "ZGVariable.h"
-#import <Capstone/Capstone.h>
+#import <Capstone/capstone.h>
 
 @implementation ZGARM64DisassemblerObject
 {
