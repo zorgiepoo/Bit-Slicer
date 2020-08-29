@@ -310,7 +310,10 @@
 	
 	[searchResults removeNumberOfAddresses:numberOfVariables];
 	
-	[ZGVariableController annotateVariables:newVariables process:currentProcess];
+	// Waiting for completion would lead to a bad user experience and there is no need to
+	[ZGVariableController annotateVariables:newVariables process:currentProcess async:YES completionHandler:^{
+		[windowController.variablesTableView reloadData];
+	}];
 	
 	[allVariables addObjectsFromArray:newVariables];
 	_documentData.variables = [NSArray arrayWithArray:allVariables];

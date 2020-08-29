@@ -1396,57 +1396,59 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
-- (void)annotateInstructions:(NSArray<ZGInstruction *> *)instructions
+- (void)annotateInstructions:(NSArray<ZGInstruction *> *)instructions async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	NSArray<ZGVariable *> *variablesToAnnotate = [[instructions zgMapUsingBlock:^(ZGInstruction *instruction) { return instruction.variable; }]
 	 zgFilterUsingBlock:^(ZGVariable *variable) {
 		 return (BOOL)(!variable.usesDynamicAddress);
 	 }];
 	
-	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess];
-	
-	for (ZGInstruction *instruction in instructions)
-	{
-		if (instruction.variable.fullAttributedDescription.length == 0)
+	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess async:async completionHandler:^{
+		for (ZGInstruction *instruction in instructions)
 		{
-			instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.text];
+			if (instruction.variable.fullAttributedDescription.length == 0)
+			{
+				instruction.variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:instruction.text];
+			}
+			else if ([variablesToAnnotate containsObject:instruction.variable])
+			{
+				NSMutableAttributedString *newDescription = [[NSMutableAttributedString alloc] initWithString:[instruction.text stringByAppendingString:@"\n"]];
+				[newDescription appendAttributedString:instruction.variable.fullAttributedDescription];
+				instruction.variable.fullAttributedDescription = newDescription;
+			}
 		}
-		else if ([variablesToAnnotate containsObject:instruction.variable])
-		{
-			NSMutableAttributedString *newDescription = [[NSMutableAttributedString alloc] initWithString:[instruction.text stringByAppendingString:@"\n"]];
-			[newDescription appendAttributedString:instruction.variable.fullAttributedDescription];
-			instruction.variable.fullAttributedDescription = newDescription;
-		}
-	}
+		
+		completionHandler();
+	}];
 }
 
 - (IBAction)copy:(id)__unused sender
 {
 	NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 	
-	[self annotateInstructions:selectedInstructions];
-	
-	NSMutableArray<NSString *> *descriptionComponents = [[NSMutableArray alloc] init];
-	NSMutableArray<ZGVariable *> *variablesArray = [[NSMutableArray alloc] init];
-	
-	for (ZGInstruction *instruction in selectedInstructions)
-	{
-		[descriptionComponents addObject:[@[instruction.variable.addressFormula, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
-		[variablesArray addObject:instruction.variable];
-	}
-	
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
-	[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
+	[self annotateInstructions:selectedInstructions async:YES completionHandler:^{
+		NSMutableArray<NSString *> *descriptionComponents = [[NSMutableArray alloc] init];
+		NSMutableArray<ZGVariable *> *variablesArray = [[NSMutableArray alloc] init];
+		
+		for (ZGInstruction *instruction in selectedInstructions)
+		{
+			[descriptionComponents addObject:[@[instruction.variable.addressFormula, instruction.text, instruction.variable.stringValue] componentsJoinedByString:@"\t"]];
+			[variablesArray addObject:instruction.variable];
+		}
+		
+		[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType, ZGVariablePboardType] owner:self];
+		[[NSPasteboard generalPasteboard] setString:[descriptionComponents componentsJoinedByString:@"\n"] forType:NSStringPboardType];
+		[[NSPasteboard generalPasteboard] setData:[NSKeyedArchiver archivedDataWithRootObject:variablesArray] forType:ZGVariablePboardType];
+	}];
 }
 
 - (IBAction)copyAddress:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
-	[self annotateInstructions:@[selectedInstruction]];
-
-	[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
-	[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressFormula forType:NSStringPboardType];
+	[self annotateInstructions:@[selectedInstruction] async:YES completionHandler:^{
+		[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
+		[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressFormula forType:NSStringPboardType];
+	}];
 }
 
 - (void)scrollAndSelectRow:(NSUInteger)selectionRow
@@ -1477,7 +1479,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
 	NSArray<ZGInstruction *> *instructions = [_instructions objectsAtIndexes:rowIndexes];
-	[self annotateInstructions:instructions];
+	[self annotateInstructions:instructions async:NO completionHandler:^{}];
 	
 	NSArray<ZGVariable *> *variables = [instructions zgMapUsingBlock:^(ZGInstruction *instruction) {
 		return instruction.variable;

@@ -36,6 +36,7 @@
 @implementation ZGPrivateCoreSymbolicator
 {
 	CSSymbolicatorRef _symbolicator;
+	dispatch_queue_t _queue;
 }
 
 - (nullable id)initWithTask:(ZGMemoryMap)task
@@ -50,17 +51,21 @@
 		{
 			return nil;
 		}
+		
+		_queue = dispatch_queue_create(NULL, NULL);
 	}
 	return self;
 }
 
 - (void)invalidate
 {
-	CSRelease(_symbolicator);
-	_symbolicator = kCSNull;
+	dispatch_sync(_queue, ^{
+		CSRelease(_symbolicator);
+		_symbolicator = kCSNull;
+	});
 }
 
-- (nullable NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(nullable ZGMemoryAddress *)relativeOffset
+- (nullable NSString *)_symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(nullable ZGMemoryAddress *)relativeOffset
 {
 	NSString *symbolName = nil;
 	if (!CSIsNull(_symbolicator))
@@ -81,8 +86,24 @@
 			}
 		}
 	}
-	
 	return symbolName;
+}
+
+- (nullable NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(nullable ZGMemoryAddress *)relativeOffset
+{
+	__block NSString *symbolName = nil;
+	dispatch_sync(_queue, ^{
+		symbolName = [self _symbolAtAddress:address relativeOffset:relativeOffset];
+	});
+	return symbolName;
+}
+
+- (void)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(nullable ZGMemoryAddress *)relativeOffset completion:(void (^)(NSString *_Nullable))completionHandler
+{
+	dispatch_async(_queue, ^{
+		NSString *symbolName = [self _symbolAtAddress:address relativeOffset:relativeOffset];
+		completionHandler(symbolName);
+	});
 }
 
 - (NSArray<NSValue *> *)findSymbolsWithName:(NSString *)symbolName partialSymbolOwnerName:(nullable NSString *)partialSymbolOwnerName requiringExactMatch:(BOOL)requiresExactMatch
@@ -91,29 +112,31 @@
 	
 	const char *symbolCString = [symbolName UTF8String];
 	
-	CSSymbolicatorForeachSymbolOwnerAtTime(_symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
-		const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
-		NSString *symbolOwnerNameValue;
-		if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && ((symbolOwnerNameValue = @(symbolOwnerName)) != nil) && [partialSymbolOwnerName hasSuffix:symbolOwnerNameValue]))
-		{
-			CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
-				const char *symbolFound = CSSymbolGetName(symbol);
-				if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
-				{
-					CSRange csSymbolRange = CSSymbolGetRange(symbol);
-					const ZGSymbolRange symbolRange = {csSymbolRange.location, csSymbolRange.length};
-					[symbolRanges addObject:[NSValue valueWithBytes:&symbolRange objCType:@encode(ZGSymbolRange)]];
-				}
-			});
-		}
+	dispatch_sync(_queue, ^{
+		CSSymbolicatorForeachSymbolOwnerAtTime(_symbolicator, kCSNow, ^(CSSymbolOwnerRef owner) {
+			const char *symbolOwnerName = CSSymbolOwnerGetName(owner); // this really returns a suffix
+			NSString *symbolOwnerNameValue;
+			if (partialSymbolOwnerName == nil || (symbolOwnerName != NULL && ((symbolOwnerNameValue = @(symbolOwnerName)) != nil) && [partialSymbolOwnerName hasSuffix:symbolOwnerNameValue]))
+			{
+				CSSymbolOwnerForeachSymbol(owner, ^(CSSymbolRef symbol) {
+					const char *symbolFound = CSSymbolGetName(symbol);
+					if (symbolFound != NULL && ((requiresExactMatch && strcmp(symbolCString, symbolFound) == 0) || (!requiresExactMatch && strstr(symbolFound, symbolCString) != NULL)))
+					{
+						CSRange csSymbolRange = CSSymbolGetRange(symbol);
+						const ZGSymbolRange symbolRange = {csSymbolRange.location, csSymbolRange.length};
+						[symbolRanges addObject:[NSValue valueWithBytes:&symbolRange objCType:@encode(ZGSymbolRange)]];
+					}
+				});
+			}
+		});
 	});
 	
 	return [symbolRanges sortedArrayUsingComparator:^(NSValue *rangeValue1, NSValue *rangeValue2) {
 		ZGSymbolRange symbolRange1 = {};
-		[rangeValue1	getValue:&symbolRange1];
+		[rangeValue1 getValue:&symbolRange1];
 		
 		ZGSymbolRange symbolRange2 = {};
-		[rangeValue2	getValue:&symbolRange2];
+		[rangeValue2 getValue:&symbolRange2];
 		
 		if (symbolRange1.location > symbolRange2.location)
 		{

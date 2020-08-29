@@ -1484,8 +1484,10 @@
 		{
 			NSIndexSet *rowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, foundVariables.count)];
 			[self->_variableController addVariables:foundVariables atRowIndexes:rowIndexes];
-			[ZGVariableController annotateVariables:foundVariables process:self.currentProcess];
 			[self->_variablesTableView scrollRowToVisible:0];
+			[ZGVariableController annotateVariables:foundVariables process:self.currentProcess async:YES completionHandler:^{
+				[self->_variablesTableView reloadData];
+			}];
 		}
 	}];
 }

@@ -969,12 +969,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 - (void)relativizeVariables:(NSArray<ZGVariable *> *)variables
 {
 	ZGDocumentWindowController *windowController = _windowController;
-	[[self class] annotateVariables:variables process:windowController.currentProcess];
 	
-	NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeMultipleVariables");
-	
-	windowController.undoManager.actionName = actionName;
-	[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self] unrelativizeVariables:variables];
+	[[self class] annotateVariables:variables process:windowController.currentProcess async:YES completionHandler:^{
+		NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeMultipleVariables");
+		
+		windowController.undoManager.actionName = actionName;
+		[(ZGVariableController *)[windowController.undoManager prepareWithInvocationTarget:self] unrelativizeVariables:variables];
+	}];
 }
 
 + (NSString *)relativizeVariable:(ZGVariable * __unsafe_unretained)variable withMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries filePathDictionary:(NSDictionary<NSNumber *, NSString *> *)machFilePathDictionary process:(ZGProcess *)process
@@ -1044,12 +1045,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		[windowController.tableController updateDynamicVariableAddress:variable];
 		
 		// Re-annotate the variable
-		[[self class] annotateVariables:@[variable] process:process];
-		[windowController.variablesTableView reloadData];
+		[[self class] annotateVariables:@[variable] process:process async:YES completionHandler:^{
+			[windowController.variablesTableView reloadData];
+		}];
 	}
 }
 
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMemoryMap processTask = process.processTask;
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
@@ -1064,52 +1066,96 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		}
 	}];
 	
-	ZGMemoryAddress cachedSubmapRegionAddress = 0;
-	ZGMemorySize cachedSubmapRegionSize = 0;
-	ZGMemorySubmapInfo cachedSubmapInfo;
+	// Relativize variables first
+	NSUInteger capacity = variables.count;
+	NSMutableArray *staticDescriptions = [[NSMutableArray alloc] initWithCapacity:capacity];
+	NSMutableArray<NSNumber *> *variableAddresses = [[NSMutableArray alloc] initWithCapacity:capacity];
 	
 	for (ZGVariable *variable in variables)
 	{
 		NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process];
 		
-		NSString *symbol = [process.symbolicator symbolAtAddress:variable.address relativeOffset:NULL];
-
-		if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
+		[staticDescriptions addObject:staticDescription != nil ? staticDescription : [NSNull null]];
+		[variableAddresses addObject:@(variable.address)];
+	}
+	
+	NSArray *(^retrieveSymbols)(void) = ^{
+		NSMutableArray *symbols = [[NSMutableArray alloc] initWithCapacity:capacity];
+		for (NSNumber *variableAddress in variableAddresses)
 		{
-			cachedSubmapRegionAddress = variable.address;
-			if (!ZGRegionSubmapInfo(processTask, &cachedSubmapRegionAddress, &cachedSubmapRegionSize, &cachedSubmapInfo))
+			NSString *symbol = [process.symbolicator symbolAtAddress:variableAddress.unsignedLongLongValue relativeOffset:NULL];
+			[symbols addObject:symbol != nil ? symbol : [NSNull null]];
+		}
+		return symbols;
+	};
+	
+	void (^finishAnnotations)(NSArray *) = ^(NSArray *symbols) {
+		__block ZGMemoryAddress cachedSubmapRegionAddress = 0;
+		__block ZGMemorySize cachedSubmapRegionSize = 0;
+		__block ZGMemorySubmapInfo cachedSubmapInfo;
+		
+		[variables enumerateObjectsUsingBlock:^(ZGVariable * _Nonnull variable, NSUInteger index, BOOL * _Nonnull __unused stop) {
+			id staticDescriptionObject = staticDescriptions[index];
+			NSString *staticDescription = (staticDescriptionObject != [NSNull null]) ? staticDescriptionObject : nil;
+			
+			id symbolObject = symbols[index];
+			NSString *symbol = (symbolObject != [NSNull null]) ? symbolObject : nil;
+			
+			if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
 			{
-				cachedSubmapRegionAddress = 0;
-				cachedSubmapRegionSize = 0;
+				cachedSubmapRegionAddress = variable.address;
+				if (!ZGRegionSubmapInfo(processTask, &cachedSubmapRegionAddress, &cachedSubmapRegionSize, &cachedSubmapInfo))
+				{
+					cachedSubmapRegionAddress = 0;
+					cachedSubmapRegionSize = 0;
+				}
 			}
-		}
-		
-		NSString *userTagDescription = nil;
-		NSString *protectionDescription = nil;
-		
-		if (cachedSubmapRegionAddress <= variable.address && cachedSubmapRegionAddress + cachedSubmapRegionSize >= variable.address + variable.size)
-		{
-			userTagDescription = ZGUserTagDescription(cachedSubmapInfo.user_tag);
-			protectionDescription = ZGProtectionDescription(cachedSubmapInfo.protection);
-		}
-		
-		NSMutableArray<NSString *> *validDescriptionComponents = [NSMutableArray array];
-		if (symbol.length > 0) [validDescriptionComponents addObject:symbol];
-		if (staticDescription != nil) [validDescriptionComponents addObject:staticDescription];
-		if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];
-		if (protectionDescription != nil) [validDescriptionComponents addObject:protectionDescription];
-		
-		if (variable.fullAttributedDescription.length == 0)
-		{
-			variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:[validDescriptionComponents componentsJoinedByString:@", "] attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
-		}
-		else
-		{
-			NSString *appendedString = [NSString stringWithFormat:@"\n\n%@", [validDescriptionComponents componentsJoinedByString:@"\n"]];
-			NSMutableAttributedString *newDescription = [variable.fullAttributedDescription mutableCopy];
-			[newDescription appendAttributedString:[[NSAttributedString alloc] initWithString:appendedString attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}]];
-			variable.fullAttributedDescription = newDescription;
-		}
+			
+			NSString *userTagDescription = nil;
+			NSString *protectionDescription = nil;
+			
+			if (cachedSubmapRegionAddress <= variable.address && cachedSubmapRegionAddress + cachedSubmapRegionSize >= variable.address + variable.size)
+			{
+				userTagDescription = ZGUserTagDescription(cachedSubmapInfo.user_tag);
+				protectionDescription = ZGProtectionDescription(cachedSubmapInfo.protection);
+			}
+			
+			NSMutableArray<NSString *> *validDescriptionComponents = [NSMutableArray array];
+			if (symbol.length > 0) [validDescriptionComponents addObject:symbol];
+			if (staticDescription != nil) [validDescriptionComponents addObject:staticDescription];
+			if (userTagDescription != nil) [validDescriptionComponents addObject:userTagDescription];
+			if (protectionDescription != nil) [validDescriptionComponents addObject:protectionDescription];
+			
+			if (variable.fullAttributedDescription.length == 0)
+			{
+				variable.fullAttributedDescription = [[NSAttributedString alloc] initWithString:[validDescriptionComponents componentsJoinedByString:@", "] attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}];
+			}
+			else
+			{
+				NSString *appendedString = [NSString stringWithFormat:@"\n\n%@", [validDescriptionComponents componentsJoinedByString:@"\n"]];
+				NSMutableAttributedString *newDescription = [variable.fullAttributedDescription mutableCopy];
+				[newDescription appendAttributedString:[[NSAttributedString alloc] initWithString:appendedString attributes:@{NSForegroundColorAttributeName : [NSColor textColor]}]];
+				variable.fullAttributedDescription = newDescription;
+			}
+		}];
+	};
+	
+	if (async)
+	{
+		dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+			NSArray *symbols = retrieveSymbols();
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				finishAnnotations(symbols);
+				completionHandler();
+			});
+		});
+	}
+	else
+	{
+		NSArray *symbols = retrieveSymbols();
+		finishAnnotations(symbols);
+		completionHandler();
 	}
 }
 

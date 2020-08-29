@@ -47,6 +47,7 @@ typedef struct
 - (void)invalidate; // do not call if the task is not valid anymore
 
 - (nullable NSString *)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(nullable ZGMemoryAddress *)relativeOffset;
+- (void)symbolAtAddress:(ZGMemoryAddress)address relativeOffset:(nullable ZGMemoryAddress *)relativeOffset completion:(void (^)(NSString *_Nullable))completionHandler;
 
 // Returns NSArray<NSValue *>, each value containing a ZGSymbolRange
 // Currently not used outside of this class but I anticipate it may be eventually (eg: for scripting)
