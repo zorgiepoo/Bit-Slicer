@@ -311,7 +311,7 @@
 	[searchResults removeNumberOfAddresses:numberOfVariables];
 	
 	// Waiting for completion would lead to a bad user experience and there is no need to
-	[ZGVariableController annotateVariables:newVariables process:currentProcess async:YES completionHandler:^{
+	[ZGVariableController annotateVariables:newVariables process:currentProcess symbols:YES async:YES completionHandler:^{
 		[windowController.variablesTableView reloadData];
 	}];
 	

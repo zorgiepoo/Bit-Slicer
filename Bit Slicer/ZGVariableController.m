@@ -970,7 +970,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	[[self class] annotateVariables:variables process:windowController.currentProcess async:YES completionHandler:^{
+	[[self class] annotateVariables:variables process:windowController.currentProcess symbols:YES async:YES completionHandler:^{
 		NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeMultipleVariables");
 		
 		windowController.undoManager.actionName = actionName;
@@ -1045,13 +1045,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		[windowController.tableController updateDynamicVariableAddress:variable];
 		
 		// Re-annotate the variable
-		[[self class] annotateVariables:@[variable] process:process async:YES completionHandler:^{
+		[[self class] annotateVariables:@[variable] process:process symbols:YES async:YES completionHandler:^{
 			[windowController.variablesTableView reloadData];
 		}];
 	}
 }
 
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process async:(BOOL)async completionHandler:(void (^)(void))completionHandler
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMemoryMap processTask = process.processTask;
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
@@ -1089,7 +1089,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		return symbols;
 	};
 	
-	void (^finishAnnotations)(NSArray *) = ^(NSArray *symbols) {
+	void (^finishAnnotations)(NSArray *) = ^(NSArray * _Nullable symbols) {
 		__block ZGMemoryAddress cachedSubmapRegionAddress = 0;
 		__block ZGMemorySize cachedSubmapRegionSize = 0;
 		__block ZGMemorySubmapInfo cachedSubmapInfo;
@@ -1098,8 +1098,16 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 			id staticDescriptionObject = staticDescriptions[index];
 			NSString *staticDescription = (staticDescriptionObject != [NSNull null]) ? staticDescriptionObject : nil;
 			
-			id symbolObject = symbols[index];
-			NSString *symbol = (symbolObject != [NSNull null]) ? symbolObject : nil;
+			NSString *symbol;
+			if (symbols != nil)
+			{
+				id symbolObject = symbols[index];
+				symbol = (symbolObject != [NSNull null]) ? symbolObject : nil;
+			}
+			else
+			{
+				symbol = nil;
+			}
 			
 			if (cachedSubmapRegionAddress >= variable.address + variable.size || cachedSubmapRegionAddress + cachedSubmapRegionSize <= variable.address)
 			{
@@ -1143,7 +1151,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	if (async)
 	{
 		dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-			NSArray *symbols = retrieveSymbols();
+			NSArray *symbols = requiresSymbols ? retrieveSymbols() : nil;
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
 				finishAnnotations(symbols);
@@ -1153,7 +1161,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	}
 	else
 	{
-		NSArray *symbols = retrieveSymbols();
+		NSArray *symbols = requiresSymbols ? retrieveSymbols() : nil;
 		finishAnnotations(symbols);
 		completionHandler();
 	}

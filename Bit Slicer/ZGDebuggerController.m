@@ -1396,14 +1396,14 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	return [super validateUserInterfaceItem:userInterfaceItem];
 }
 
-- (void)annotateInstructions:(NSArray<ZGInstruction *> *)instructions async:(BOOL)async completionHandler:(void (^)(void))completionHandler
+- (void)annotateInstructions:(NSArray<ZGInstruction *> *)instructions symbols:(BOOL)symbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	NSArray<ZGVariable *> *variablesToAnnotate = [[instructions zgMapUsingBlock:^(ZGInstruction *instruction) { return instruction.variable; }]
 	 zgFilterUsingBlock:^(ZGVariable *variable) {
 		 return (BOOL)(!variable.usesDynamicAddress);
 	 }];
 	
-	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess async:async completionHandler:^{
+	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess symbols:symbols async:async completionHandler:^{
 		for (ZGInstruction *instruction in instructions)
 		{
 			if (instruction.variable.fullAttributedDescription.length == 0)
@@ -1426,7 +1426,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 {
 	NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 	
-	[self annotateInstructions:selectedInstructions async:YES completionHandler:^{
+	[self annotateInstructions:selectedInstructions symbols:YES async:YES completionHandler:^{
 		NSMutableArray<NSString *> *descriptionComponents = [[NSMutableArray alloc] init];
 		NSMutableArray<ZGVariable *> *variablesArray = [[NSMutableArray alloc] init];
 		
@@ -1445,7 +1445,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 - (IBAction)copyAddress:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
-	[self annotateInstructions:@[selectedInstruction] async:YES completionHandler:^{
+	[self annotateInstructions:@[selectedInstruction] symbols:NO async:NO completionHandler:^{
 		[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
 		[[NSPasteboard generalPasteboard] setString:selectedInstruction.variable.addressFormula forType:NSStringPboardType];
 	}];
@@ -1479,7 +1479,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 - (BOOL)tableView:(NSTableView *)__unused tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
 	NSArray<ZGInstruction *> *instructions = [_instructions objectsAtIndexes:rowIndexes];
-	[self annotateInstructions:instructions async:NO completionHandler:^{}];
+	[self annotateInstructions:instructions symbols:YES async:NO completionHandler:^{}];
 	
 	NSArray<ZGVariable *> *variables = [instructions zgMapUsingBlock:^(ZGInstruction *instruction) {
 		return instruction.variable;
