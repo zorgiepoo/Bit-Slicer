@@ -108,14 +108,22 @@ BOOL ZGDumpAllDataToDirectory(NSString *directory, ZGProcess *process, id <ZGSea
 		NSError *machBinaryImagesError = nil;
 		
 		NSArray<NSString *> *header = @[[@"#" stringByAppendingString:[@[@"Path", @"Start", @"End"] componentsJoinedByString:@"\t"]]];
-		if (![[[header arrayByAddingObjectsFromArray:[machBinaries zgMapUsingBlock:^(ZGMachBinary *machBinary) {
-			NSString *filePath = [machBinary filePathInProcess:process];
+		
+		NSArray<NSString *> *filePaths = [ZGMachBinary filePathsForMachBinaries:machBinaries inProcess:process];
+		
+		NSMutableArray<NSString *> *fileDescriptions = [[NSMutableArray alloc] init];
+		[machBinaries enumerateObjectsUsingBlock:^(ZGMachBinary * _Nonnull machBinary, NSUInteger index, BOOL * _Nonnull __unused stop) {
+			NSString *filePath = [filePaths objectAtIndex:index];
 			
 			ZGMachBinaryInfo *machBinaryInfo = [machBinary machBinaryInfoInProcess:process];
 			NSRange imageRange = machBinaryInfo.totalSegmentRange;
 			
-			return [@[filePath, [NSString stringWithFormat:@"0x%lX", imageRange.location], [NSString stringWithFormat:@"0x%lX", imageRange.location + imageRange.length]] componentsJoinedByString:@"\t"];
-		}]] componentsJoinedByString:@"\n"] writeToFile:imagesPath atomically:YES encoding:NSUTF8StringEncoding error:&machBinaryImagesError])
+			NSString *description = [@[filePath, [NSString stringWithFormat:@"0x%lX", imageRange.location], [NSString stringWithFormat:@"0x%lX", imageRange.location + imageRange.length]] componentsJoinedByString:@"\t"];
+			
+			[fileDescriptions addObject:description];
+		}];
+		
+		if (![[[header arrayByAddingObjectsFromArray:fileDescriptions] componentsJoinedByString:@"\n"] writeToFile:imagesPath atomically:YES encoding:NSUTF8StringEncoding error:&machBinaryImagesError])
 		{
 			NSLog(@"Failed to write mach binary images info file at %@ with error: %@", imagesPath, machBinaryImagesError);
 		}

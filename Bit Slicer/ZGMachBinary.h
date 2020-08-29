@@ -55,6 +55,7 @@ extern NSString * const ZGFailedImageName;
 @property (nonatomic, readonly) ZGMemoryAddress headerAddress;
 @property (nonatomic, readonly) ZGMemoryAddress filePathAddress;
 
++ (NSArray<NSString *> *)filePathsForMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries inProcess:(ZGProcess *)process;
 - (nullable NSString *)filePathInProcess:(ZGProcess *)process;
 
 - (nullable ZGMachBinaryInfo *)machBinaryInfoInProcess:(ZGProcess *)process;

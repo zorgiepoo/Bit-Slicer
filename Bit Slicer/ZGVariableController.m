@@ -1055,14 +1055,14 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
 	NSMutableDictionary<NSNumber *, NSString *> *machFilePathDictionary = [[NSMutableDictionary alloc] init];
 	
-	for (ZGMachBinary *machBinary in machBinaries)
-	{
-		NSString *filePath = [machBinary filePathInProcess:process];
-		if (filePath != nil)
+	NSArray<NSString *> *filePaths = [ZGMachBinary filePathsForMachBinaries:machBinaries inProcess:process];
+	[machBinaries enumerateObjectsUsingBlock:^(ZGMachBinary * _Nonnull machBinary, NSUInteger index, BOOL * _Nonnull __unused stop) {
+		NSString *filePath = [filePaths objectAtIndex:index];
+		if (filePath.length > 0)
 		{
 			[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
 		}
-	}
+	}];
 	
 	ZGMemoryAddress cachedSubmapRegionAddress = 0;
 	ZGMemorySize cachedSubmapRegionSize = 0;

@@ -227,6 +227,53 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	return [@(_headerAddress) compare:@(binaryImage.headerAddress)];
 }
 
++ (NSArray<NSString *> *)filePathsForMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries inProcess:(ZGProcess *)process
+{
+	NSMutableArray *filePaths = [[NSMutableArray alloc] init];
+	ZGRegion *cachedRegion = nil;
+	
+	ZGMemoryMap processTask = process.processTask;
+	
+	for (ZGMachBinary *machBinary in machBinaries)
+	{
+		ZGMemoryAddress filePathAddress = machBinary.filePathAddress;
+		
+		if (cachedRegion == nil || (filePathAddress < cachedRegion->_address || filePathAddress >= cachedRegion->_address + cachedRegion->_size))
+		{
+			if (cachedRegion != nil && cachedRegion->_bytes != NULL)
+			{
+				ZGFreeBytes(cachedRegion->_bytes, cachedRegion->_size);
+			}
+			
+			ZGMemorySubmapInfo regionInfo;
+			cachedRegion = [[ZGRegion alloc] initWithAddress:filePathAddress size:1];
+			if (!ZGRegionSubmapInfo(processTask, &cachedRegion->_address, &cachedRegion->_size, &regionInfo) ||
+				!ZGReadBytes(processTask, cachedRegion->_address, &cachedRegion->_bytes, &cachedRegion->_size))
+			{
+				[filePaths addObject:@""];
+				cachedRegion = nil;
+				continue;
+			}
+		}
+		
+		char buffer[PATH_MAX + 1] = {0};
+		strncpy(buffer, filePathAddress - cachedRegion->_address + (const char *)cachedRegion->_bytes, sizeof(buffer) - 1);
+		
+		NSString *filePath = [[NSString alloc] initWithCString:buffer encoding:NSUTF8StringEncoding];
+		if (filePath != nil)
+		{
+			[filePaths addObject:filePath];
+		}
+	}
+	
+	if (cachedRegion != nil && cachedRegion->_bytes != NULL)
+	{
+		ZGFreeBytes(cachedRegion->_bytes, cachedRegion->_size);
+	}
+	
+	return [filePaths copy];
+}
+
 - (NSString *)filePathInProcess:(ZGProcess *)process
 {
 	NSString *filePath = nil;
