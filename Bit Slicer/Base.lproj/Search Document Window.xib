@@ -632,13 +632,14 @@
             </view>
             <toolbar key="toolbar" implicitIdentifier="4D254971-E277-470E-ACED-5E2858027E36" explicitIdentifier="ZGDocumentToolbarIdentifier" displayMode="iconOnly" sizeMode="regular" id="UZg-mb-r8g" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" id="jO3-Z2-Pv7">
+                    <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" sizingBehavior="auto" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="160" height="25"/>
-                        <size key="maxSize" width="180" height="25"/>
-                        <popUpButton key="view" verticalHuggingPriority="750" id="1ts-DF-nZQ">
-                            <rect key="frame" x="0.0" y="14" width="160" height="25"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ts-DF-nZQ">
+                            <rect key="frame" x="0.0" y="14" width="187" height="25"/>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="0SL-Gj-qtF"/>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="cvc-cY-mNk"/>
+                            </constraints>
                             <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ftJ-ti-LVO">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -652,7 +653,7 @@
                     <toolbarItem implicitItemIdentifier="41602B2F-FA2E-443A-88AC-9DAD73A95550" label="Data Type" paletteLabel="Data Type" sizingBehavior="auto" id="70m-RL-vim">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="wMv-KV-nmE">
-                            <rect key="frame" x="0.0" y="14" width="136" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="124" height="25"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9Kh-lP-68f">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -684,7 +685,7 @@
                     <toolbarItem implicitItemIdentifier="A5AF15E6-88A9-4678-ACAF-0F6E1D87D554" label="Operator" paletteLabel="Operator" sizingBehavior="auto" id="LxQ-Vs-KYQ">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="Vpc-Jb-WRb">
-                            <rect key="frame" x="0.0" y="14" width="109" height="25"/>
+                            <rect key="frame" x="8" y="14" width="39" height="25"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TkL-8a-mN8">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -701,7 +702,7 @@
                     <toolbarItem implicitItemIdentifier="A2B7475C-29AA-4716-9400-D2EF29F1ED5A" label="Store Values" paletteLabel="Store Values" image="container" sizingBehavior="auto" id="q4V-IG-gxK">
                         <nil key="toolTip"/>
                         <button key="view" verticalHuggingPriority="750" id="evf-rf-Ae5">
-                            <rect key="frame" x="17" y="14" width="39" height="25"/>
+                            <rect key="frame" x="22" y="14" width="30" height="23"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="container" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="alb-bt-VIc">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -766,6 +767,7 @@
                     </textFieldCell>
                 </textField>
             </subviews>
+            <point key="canvasLocation" x="-4" y="292"/>
         </customView>
     </objects>
     <resources>
