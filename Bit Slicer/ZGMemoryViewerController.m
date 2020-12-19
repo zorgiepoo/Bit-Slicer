@@ -343,6 +343,8 @@
 		if (!success)
 		{
 			[self clearData];
+			// Make sure status bar text is updated on failure
+			[self->_statusBarRepresenter updateString];
 		}
 		
 		// Revert back to overwrite mode
