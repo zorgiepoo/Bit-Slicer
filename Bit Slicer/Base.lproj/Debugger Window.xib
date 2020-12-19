@@ -229,10 +229,8 @@
             </view>
             <toolbar key="toolbar" implicitIdentifier="F9D0051C-FE7D-4F94-9EC2-33F7D47F4239" explicitIdentifier="ZGDebuggerToolbar2" displayMode="iconOnly" sizeMode="regular" id="BPq-cf-Fjg" customClass="ZGNoSmallSizeToolbar">
                 <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="31B40B1D-066A-465E-9326-51493CC4C4EB" label="Back/Forward" paletteLabel="Back/Forward" id="saO-Gp-UGR">
+                    <toolbarItem implicitItemIdentifier="31B40B1D-066A-465E-9326-51493CC4C4EB" label="Back/Forward" paletteLabel="Back/Forward" sizingBehavior="auto" id="saO-Gp-UGR">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="53" height="25"/>
-                        <size key="maxSize" width="57" height="25"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="vkH-Yd-fy0">
                             <rect key="frame" x="13" y="14" width="53" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -252,13 +250,14 @@
                             </connections>
                         </segmentedControl>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" id="V6x-9g-MBo">
+                    <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" sizingBehavior="auto" id="V6x-9g-MBo">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="81" height="25"/>
-                        <size key="maxSize" width="195" height="27"/>
-                        <popUpButton key="view" verticalHuggingPriority="750" id="fpR-fU-ajG">
-                            <rect key="frame" x="0.0" y="14" width="145" height="25"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fpR-fU-ajG">
+                            <rect key="frame" x="0.0" y="14" width="167" height="25"/>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="bEq-IZ-Wag"/>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="ngH-El-940"/>
+                            </constraints>
                             <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ohg-Gh-2fU">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -269,10 +268,8 @@
                             </connections>
                         </popUpButton>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="1A9DCB4E-799C-4634-B1F6-CB15382E7DF9" label="Continue" paletteLabel="Continue" image="continue" id="KQE-fj-qqG">
+                    <toolbarItem implicitItemIdentifier="1A9DCB4E-799C-4634-B1F6-CB15382E7DF9" label="Continue" paletteLabel="Continue" image="continue" sizingBehavior="auto" id="KQE-fj-qqG">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="39" height="25"/>
-                        <size key="maxSize" width="41" height="27"/>
                         <button key="view" verticalHuggingPriority="750" id="2Xc-JX-DhY">
                             <rect key="frame" x="8" y="14" width="39" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -285,10 +282,8 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="F91B22CB-7E27-4BA1-A2E8-AD190222BAAF" label="Step" paletteLabel="Step" id="yIQ-3L-cfP">
+                    <toolbarItem implicitItemIdentifier="F91B22CB-7E27-4BA1-A2E8-AD190222BAAF" label="Step" paletteLabel="Step" sizingBehavior="auto" id="yIQ-3L-cfP">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="100" height="25"/>
-                        <size key="maxSize" width="104" height="25"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="hed-Ji-GwK">
                             <rect key="frame" x="0.0" y="14" width="100" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -311,13 +306,14 @@
                             </connections>
                         </segmentedControl>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="306F877D-325E-4A4F-9705-FC98ED04464E" label="Address/Symbol" paletteLabel="Address/Symbol" id="u3o-PN-adL">
+                    <toolbarItem implicitItemIdentifier="306F877D-325E-4A4F-9705-FC98ED04464E" label="Address/Symbol" paletteLabel="Address/Symbol" sizingBehavior="auto" id="u3o-PN-adL">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="150" height="22"/>
-                        <size key="maxSize" width="175" height="22"/>
-                        <textField key="view" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" id="ztk-ei-XwG">
+                        <textField key="view" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ztk-ei-XwG">
                             <rect key="frame" x="0.0" y="14" width="171" height="22"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="49z-Sq-ig3"/>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="175" id="UDK-Sx-ERW"/>
+                            </constraints>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" title="0x0" bezelStyle="round" id="mHS-Rp-HdH">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
