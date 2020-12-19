@@ -715,9 +715,11 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="52E16CE5-DDC6-4458-A993-F5F7CF90040C" label="Search" paletteLabel="Search" sizingBehavior="auto" id="x8t-Jw-Hi9" userLabel="Search">
                         <nil key="toolTip"/>
-                        <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" id="WaT-8a-dxh">
+                        <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WaT-8a-dxh">
                             <rect key="frame" x="0.0" y="14" width="200" height="22"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="Jey-Lt-NQ6"/>
+                            </constraints>
                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" sendsWholeSearchString="YES" id="LLw-3d-Kna">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
