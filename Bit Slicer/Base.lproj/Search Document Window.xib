@@ -653,7 +653,7 @@
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="wMv-KV-nmE">
                             <rect key="frame" x="0.0" y="14" width="136" height="25"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9Kh-lP-68f">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -685,7 +685,7 @@
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" id="Vpc-Jb-WRb">
                             <rect key="frame" x="0.0" y="14" width="109" height="25"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TkL-8a-mN8">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
@@ -702,7 +702,7 @@
                         <nil key="toolTip"/>
                         <button key="view" verticalHuggingPriority="750" id="evf-rf-Ae5">
                             <rect key="frame" x="17" y="14" width="39" height="25"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="container" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="alb-bt-VIc">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -716,7 +716,7 @@
                         <nil key="toolTip"/>
                         <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" id="WaT-8a-dxh">
                             <rect key="frame" x="0.0" y="14" width="200" height="22"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" sendsWholeSearchString="YES" id="LLw-3d-Kna">
                                 <font key="font" metaFont="system"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
