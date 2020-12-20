@@ -181,7 +181,7 @@ static PyTypeObject DebuggerType =
 	0, // tp_init
 	0, // tp_alloc
 	0, // tp_new
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // the rest
 };
 
 @implementation ZGPyDebugger

@@ -43,7 +43,6 @@
 		7235B7B324D7D9C30029580A /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7235B7B424D7D9EA0029580A /* DDMathParser.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7235B7B524D7D9F40029580A /* DDMathParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7235B7B124D7D9B10029580A /* DDMathParser.framework */; };
-		7235B7B924D7DE660029580A /* pythonlib.m in Sources */ = {isa = PBXBuildFile; fileRef = 7235B7B824D7DE660029580A /* pythonlib.m */; };
 		723FC6E824F4BEB10083F568 /* stepover@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E424F4BEB00083F568 /* stepover@2x.pdf */; };
 		723FC6E924F4BEB10083F568 /* stepin@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E524F4BEB00083F568 /* stepin@2x.pdf */; };
 		723FC6EA24F4BEB10083F568 /* stepout@2x.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 723FC6E624F4BEB00083F568 /* stepout@2x.pdf */; };
@@ -351,7 +350,6 @@
 		7235B7AE24D7CE0B0029580A /* ShortcutRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ShortcutRecorder.framework; path = deps/ShortcutRecorder/ShortcutRecorder.framework; sourceTree = "<group>"; };
 		7235B7B124D7D9B10029580A /* DDMathParser.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DDMathParser.framework; path = deps/DDMathParser/DDMathParser.framework; sourceTree = "<group>"; };
 		7235B7B724D7DD8C0029580A /* pythonlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pythonlib.h; path = "Bit Slicer/pythonlib.h"; sourceTree = "<group>"; };
-		7235B7B824D7DE660029580A /* pythonlib.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = pythonlib.m; path = "Bit Slicer/pythonlib.m"; sourceTree = "<group>"; };
 		723FC6E424F4BEB00083F568 /* stepover@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "stepover@2x.pdf"; path = "Bit Slicer/debuggericons/stepover@2x.pdf"; sourceTree = "<group>"; };
 		723FC6E524F4BEB00083F568 /* stepin@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "stepin@2x.pdf"; path = "Bit Slicer/debuggericons/stepin@2x.pdf"; sourceTree = "<group>"; };
 		723FC6E624F4BEB00083F568 /* stepout@2x.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = "stepout@2x.pdf"; path = "Bit Slicer/debuggericons/stepout@2x.pdf"; sourceTree = "<group>"; };
@@ -840,7 +838,6 @@
 			isa = PBXGroup;
 			children = (
 				7235B7B724D7DD8C0029580A /* pythonlib.h */,
-				7235B7B824D7DE660029580A /* pythonlib.m */,
 				77FF507B16E9B7D40005915D /* Memory Window Controllers */,
 				77C19AB31916D4440028F7F1 /* Changing Memory Protection */,
 				7728EE0C16BE3DDA00F9E1AD /* Dumping Memory */,
@@ -1780,7 +1777,6 @@
 				772C0F8218B95603009FFF72 /* ZGBacktraceViewController.m in Sources */,
 				77C19AAF19158ABF0028F7F1 /* ZGPyModuleAdditions.m in Sources */,
 				722EE7901B19481300934EF3 /* ZGProtectionDescription.m in Sources */,
-				7235B7B924D7DE660029580A /* pythonlib.m in Sources */,
 				722EE78A1B19461000934EF3 /* ZGMemoryAddressExpressionParsing.m in Sources */,
 				77F1164D17D2EFDA009E002A /* ZGBreakPoint.m in Sources */,
 				72030ADC1B00191400A5621C /* ZGScriptingInterpreter.m in Sources */,
