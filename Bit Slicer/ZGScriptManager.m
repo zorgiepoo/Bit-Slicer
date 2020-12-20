@@ -55,8 +55,6 @@
 #import "ZGScriptPromptWindowController.h"
 #import "ZGNullability.h"
 
-#import <TargetConditionals.h>
-
 //#import "Python/structmember.h"
 #import "pythonlib.h"
 
@@ -332,10 +330,6 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 
 - (void)openScriptForVariable:(ZGVariable *)variable
 {
-#if TARGET_CPU_ARM64
-	// Scripting is temporarily disabled on arm64
-	(void)variable;
-#else
 	ZGPyScript *script = [self scriptForVariable:variable];
 	NSString *editorApplication = [[NSUserDefaults standardUserDefaults] objectForKey:ZGScriptDefaultApplicationEditorKey];
 	if (editorApplication.length == 0)
@@ -349,7 +343,6 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 			[[NSWorkspace sharedWorkspace] openFile:script.path];
 		}
 	}
-#endif
 }
 
 - (void)logPythonObject:(PyObject *)pythonObject
@@ -493,10 +486,6 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 
 - (void)runScriptForVariable:(ZGVariable *)variable
 {
-#if TARGET_CPU_ARM64
-	// Scripting is temporarily disabled on arm64
-	(void)variable;
-#else
 	ZGPyScript *script = [self scriptForVariable:variable];
 	
 	ZGDocumentWindowController *windowController = _windowController;
@@ -641,7 +630,6 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 		
 		Py_XDECREF(initMethodResult);
 	}];
-#endif
 }
 
 - (void)removeScriptForVariable:(ZGVariable *)variable
@@ -656,10 +644,6 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 
 - (void)stopScriptForVariable:(ZGVariable *)variable
 {
-#if TARGET_CPU_ARM64
-	// Scripting is temporarily disabled on arm64
-	(void)variable;
-#else
 	[self disableVariable:variable];
 	
 	ZGPyScript *script = [self scriptForVariable:variable];
@@ -768,7 +752,6 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 			}
 		});
 	}
-#endif
 }
 
 - (void)handleFailureWithVariable:(ZGVariable *)variable methodCallResult:(PyObject *)methodCallResult forMethodName:(NSString *)methodName
