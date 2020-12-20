@@ -558,7 +558,7 @@ static NSString *ZGMachineUUIDKey = @"ZGMachineUUIDKey";
 			[[NSProcessInfo processInfo] endActivity:scriptInitActivity];
 		}
 		
-		BOOL stillInitialized = (BOOL)Py_IsInitialized();
+		BOOL stillInitialized = !!Py_IsInitialized();
 		if (initMethodResult == NULL || !stillInitialized)
 		{
 			if (stillInitialized)
