@@ -1,5 +1,72 @@
-Patches pending for arm64:
-https://github.com/python/cpython/pull/21564
-https://github.com/python/cpython/pull/21577
-https://github.com/python/cpython/pull/21249
-https://github.com/python/cpython/pull/21114
+Source: https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tgz
+
+Config:
+Check Mac/README.rst for info
+
+env MACOSX_DEPLOYMENT_TARGET=10.11 ./configure --enable-framework=/Users/msp/Desktop/python-install/ --enable-universalsdk --with-universal-archs=universal2
+env MACOSX_DEPLOYMENT_TARGET=10.11 make
+make install
+
+Copy ~/Desktop/python-install/Python.framework/ to ~/Desktop/Python.framework/ for framework we will modify
+cd ~/Desktop/Python.framework/
+rm -rf Resources/Python.app
+rm -rf Resources/English.lproj
+rm -rf Versions/3.9/share/
+~Desktop/python-install/Python.framework/Versions/3.9/bin/python3 -m compileall ~/Python.framework/Versions/3.9/lib/python3.9 -b
+rm -rf Versions/3.9/bin/
+rm -rf Versions/3.9/lib/pkgconfig/
+rm -rf Versions/3.9/lib/libpython3.9.dylib
+rm Versions/3.9/lib/libpython3.9.dylib
+find Versions/3.9/lib/python3.9  -name "*\.py" -delete
+Remove all __pycache__ directories in Versions/3.9/lib/python3.9
+
+cd Versions/3.9/lib/python3.9
+rm __phello__.foo.pyc
+rm antigravity.pyc
+rm cgi.pyc
+rm -rf config-3.9-darwin
+rm -rf ctypes/test/
+rm -rf curses
+rm -rf distutils
+rm -rf email
+rm -rf ensurepip
+rm -rf idlelib
+rm -rf lib2to3
+rm LICENSE.txt
+rm -rf site-packages
+rm -rf sqlite3/test
+rm -rf test
+rm -rf tkinter
+rm turtle.pyc
+rm -rf turtledemo
+rm -rf unittest
+rm -rf wsgiref
+
+cd lib-dynload
+rm _curses_panel.cpython-39-darwin.so
+rm _curses.cpython-39-darwin.so
+
+cd ~/Desktop/Python.framework/
+rm Headers
+
+mv Versions/Current/lib/python3.9 Versions/Current/Resources/python3.9
+rm -rf Versions/Current/lib
+
+mv Versions/Current/lib/python3.9/lib-dynload/ Versions/Current/Frameworks
+ln -s Versions/Current/Frameworks
+mv Versions/3.9/ Versions/A
+install_name_tool -id "@rpath/Python.framework/Versions/A/Python" Versions/Current/Python
+
+cd Versions
+rm Current
+ln -s A Current
+
+Fix #include in cypthon/pystate.h:
+#include "cpython/initconfig.h" to..
+#include "initconfig.h"
+
+cd ~/Desktop
+codesign --deep -f -s "-" Python.framework
+
+Update LICENSE url to new python release URL
+Update code to look for "python3.x" for library loading

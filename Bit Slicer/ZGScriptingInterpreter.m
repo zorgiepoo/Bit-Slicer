@@ -171,7 +171,7 @@
 	NSBundle *pythonBundle = [NSBundle bundleWithPath:[privateFrameworksPath stringByAppendingPathComponent:@"Python.framework"]];
 	assert(pythonBundle != nil);
 	
-	NSString *pythonDirectory = [pythonBundle pathForResource:@"python3.7" ofType:nil];
+	NSString *pythonDirectory = [pythonBundle pathForResource:@"python3.9" ofType:nil];
 	assert(pythonDirectory != nil);
 	
 	setenv("PYTHONHOME", [pythonDirectory UTF8String], 1);
@@ -181,7 +181,11 @@
 		
 		PyObject *path = PySys_GetObject("path");
 		
-		[self appendPath:[pythonDirectory stringByAppendingPathComponent:@"lib-dynload"] toSysPath:path];
+		NSString *nativeLibPath = [[[pythonBundle.bundleURL URLByAppendingPathComponent:@"Frameworks"] URLByResolvingSymlinksInPath] path];
+		
+		assert(nativeLibPath != nil);
+		
+		[self appendPath:nativeLibPath toSysPath:path];
 		[self appendPath:[[[self class] scriptCachesURL] path] toSysPath:path];
 		[self appendPath:userModulesDirectory toSysPath:path];
 		
