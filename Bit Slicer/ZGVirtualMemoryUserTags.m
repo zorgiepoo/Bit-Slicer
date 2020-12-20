@@ -57,11 +57,11 @@ case value: \
 #define __MAC_10_15 101500
 #endif
 
-#ifndef __MAC_11_0
-#define __MAC_11_0 110000
+#ifndef MAC_OS_VERSION_11_1
+#define MAC_OS_VERSION_11_1 110100
 #endif
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_11_0
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_VERSION_11_1
 #pragma message("Need to update the user tag descriptions")
 #endif
 
