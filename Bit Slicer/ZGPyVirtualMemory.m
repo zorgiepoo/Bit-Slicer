@@ -52,6 +52,7 @@ typedef struct
 	uint32_t processTask;
 	int32_t processIdentifier;
 	int8_t is64Bit;
+	int8_t isARM;
 	ZGProcessType processType;
 	ZGMemoryAddress baseAddress;
 	integer_t suspendCount;
@@ -63,6 +64,7 @@ static PyMemberDef VirtualMemory_members[] =
 {
 	{"pid", T_INT, offsetof(VirtualMemory, processIdentifier), 0, "process identifier"},
 	{"is64Bit", T_BOOL, offsetof(VirtualMemory, is64Bit), 0, "is process 64-bit"},
+	{"isARM", T_BOOL, offsetof(VirtualMemory, isARM), 0, "is process ARM architecture"},
 	{NULL, 0, 0, 0, NULL}
 };
 
@@ -256,6 +258,7 @@ static PyTypeObject VirtualMemoryType =
 		vmObject->processIdentifier = process.processID;
 		vmObject->processType = process.type;
 		vmObject->is64Bit = ZG_PROCESS_TYPE_IS_64_BIT(vmObject->processType);
+		vmObject->isARM = ZG_PROCESS_TYPE_IS_ARM64(vmObject->processType);
 		vmObject->virtualMemoryException = virtualMemoryException;
 		
 		_process = shouldCopyProcess ? [[ZGProcess alloc] initWithProcess:process] : process;
