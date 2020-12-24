@@ -1,0 +1,22 @@
+name: XCTests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build and Test Bit Slicer on macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        run: |
+          xcodebuild build-for-testing -target 'Bit Slicer Tests' -scheme 'Bit Slicer' CODE_SIGN_IDENTITY="-"
+      - name: Test
+        run: |
+		  xcodebuild test-without-building -target 'Bit Slicer Tests' -scheme 'Bit Slicer'
