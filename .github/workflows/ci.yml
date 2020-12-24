@@ -19,4 +19,4 @@ jobs:
           xcodebuild build-for-testing -target 'Bit Slicer Tests' -scheme 'Bit Slicer'
       - name: Test
         run: |
-		  xcodebuild test-without-building -target 'Bit Slicer Tests' -scheme 'Bit Slicer'
+          xcodebuild test-without-building -target 'Bit Slicer Tests' -scheme 'Bit Slicer'
