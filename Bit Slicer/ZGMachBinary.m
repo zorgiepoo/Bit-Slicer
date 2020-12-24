@@ -296,7 +296,8 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	const struct mach_header_64 *machHeader = headMachHeader;
 	
 	// If this is a fat binary that is being loaded from disk, we'll need to find our target architecture
-	if (headMachHeader->magic == FAT_CIGAM)
+	// TODO: this code should be moved out into machBinaryInfoFromFilePath:process:
+	if (headMachHeader->magic == FAT_CIGAM || headMachHeader->magic == FAT_CIGAM_64)
 	{
 		uint32_t fatMagic = CFSwapInt32BigToHost(((const struct fat_header *)headMachHeader)->magic);
 		uint32_t numberOfArchitectures = CFSwapInt32BigToHost(((const struct fat_header *)headMachHeader)->nfat_arch);
@@ -369,20 +370,46 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 {
 	ZGMachBinaryInfo *binaryInfo = nil;
 	
-	ZGMemoryAddress regionAddress = _headerAddress;
-	ZGMemorySize regionSize = 0x1;
-	ZGMemoryBasicInfo unusedInfo;
+	void *headerBytes = NULL;
+	ZGMemorySize headerSize = sizeof(struct mach_header_64);
 	
-	if (ZGRegionInfo(process.processTask, &regionAddress, &regionSize, &unusedInfo) && _headerAddress >= regionAddress && _headerAddress < regionAddress + regionSize)
+	// If we are reading mach header from memory, assume we will receive header in little endian
+	// and we won't encounter fat headers.
+	// Before we were also trying to read an entire VM region containing the header address, however,
+	// this is sometimes huge and resulted in failures reading all the bytes.
+	if (ZGReadBytes(process.processTask, _headerAddress, &headerBytes, &headerSize))
 	{
-		void *regionBytes = NULL;
-		if (ZGReadBytes(process.processTask, regionAddress, &regionBytes, &regionSize))
+		const struct mach_header_64 *machHeader = headerBytes;
+		
+		size_t machHeaderSize;
+		switch (machHeader->magic)
 		{
-			const struct mach_header_64 *machHeader = (void *)((uint8_t *)regionBytes + _headerAddress - regionAddress);
-			binaryInfo = [self parseMachHeaderWithBytes:machHeader startPointer:regionBytes dataLength:regionSize processType:process.type];
-			
-			ZGFreeBytes(regionBytes, regionSize);
+			case MH_MAGIC:
+				machHeaderSize = sizeof(struct mach_header);
+				break;
+			case MH_MAGIC_64:
+				machHeaderSize = sizeof(struct mach_header_64);
+				break;
+			default:
+				machHeaderSize = 0;
 		}
+		if (machHeaderSize > 0)
+		{
+			uint32_t sizeOfCommands = machHeader->sizeofcmds;
+			uint64_t totalSize = machHeaderSize + sizeOfCommands;
+			
+			ZGMemorySize machBinarySize = totalSize;
+			void *machBinaryBytes = NULL;
+			
+			if (ZGReadBytes(process.processTask, _headerAddress, &machBinaryBytes, &machBinarySize))
+			{
+				binaryInfo = [self parseMachHeaderWithBytes:machBinaryBytes startPointer:machBinaryBytes dataLength:machBinarySize processType:process.type];
+				
+				ZGFreeBytes(machBinaryBytes, machBinarySize);
+			}
+		}
+		
+		ZGFreeBytes(headerBytes, headerSize);
 	}
 	
 	return binaryInfo;
