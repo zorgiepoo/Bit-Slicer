@@ -51,4 +51,4 @@ It allows you to cheat in video games by searching and modifying values such as 
 * Help [design improved artwork](https://github.com/zorgiepoo/Bit-Slicer/issues/18)
 * Learn how to build and contribute to the [source code](https://github.com/zorgiepoo/Bit-Slicer/wiki/Source-Code)
 
-Please read this project's [Code Of Conduct](https://github.com/zorgiepoo/Bit-Slicer/blob/master/CODE_OF_CONDUCT.md) residing in the root level of the project.
+Please read this project's [Code Of Conduct](https://github.com/zorgiepoo/Bit-Slicer/blob/main/CODE_OF_CONDUCT.md) residing in the root level of the project.
