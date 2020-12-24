@@ -256,8 +256,16 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 			}
 		}
 		
+		if (filePathAddress < cachedRegion->_address)
+		{
+			continue;
+		}
+		
 		char buffer[PATH_MAX + 1] = {0};
-		strncpy(buffer, filePathAddress - cachedRegion->_address + (const char *)cachedRegion->_bytes, sizeof(buffer) - 1);
+		ZGMemoryAddress offset = filePathAddress - cachedRegion->_address;
+		size_t maxSize = (sizeof(buffer) - 1) < (cachedRegion->_size - offset) ? (sizeof(buffer) - 1) : (cachedRegion->_size - offset);
+		
+		strncpy(buffer, filePathAddress - cachedRegion->_address + (const char *)cachedRegion->_bytes, maxSize);
 		
 		NSString *filePath = [[NSString alloc] initWithCString:buffer encoding:NSUTF8StringEncoding];
 		if (filePath != nil)
