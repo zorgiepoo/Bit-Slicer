@@ -1054,32 +1054,44 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 + (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMemoryMap processTask = process.processTask;
-	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
-	NSMutableDictionary<NSNumber *, NSString *> *machFilePathDictionary = [[NSMutableDictionary alloc] init];
-	
-	NSArray<NSString *> *filePaths = [ZGMachBinary filePathsForMachBinaries:machBinaries inProcess:process];
-	[machBinaries enumerateObjectsUsingBlock:^(ZGMachBinary * _Nonnull machBinary, NSUInteger index, BOOL * _Nonnull __unused stop) {
-		NSString *filePath = [filePaths objectAtIndex:index];
-		if (filePath.length > 0)
-		{
-			[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
-		}
-	}];
-	
-	// Relativize variables first
 	NSUInteger capacity = variables.count;
-	NSMutableArray *staticDescriptions = [[NSMutableArray alloc] initWithCapacity:capacity];
-	NSMutableArray<NSNumber *> *variableAddresses = [[NSMutableArray alloc] initWithCapacity:capacity];
 	
-	for (ZGVariable *variable in variables)
-	{
-		NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process];
+	NSArray<ZGMachBinary *> *(^retrieveMachBinaries)(NSDictionary<NSNumber *, NSString *> **) = ^(NSDictionary<NSNumber *, NSString *> **filePathDictionary) {
+		NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
+		NSMutableDictionary<NSNumber *, NSString *> *machFilePathDictionary = [[NSMutableDictionary alloc] init];
 		
-		[staticDescriptions addObject:staticDescription != nil ? staticDescription : [NSNull null]];
-		[variableAddresses addObject:@(variable.address)];
-	}
+		NSArray<NSString *> *filePaths = [ZGMachBinary filePathsForMachBinaries:machBinaries inProcess:process];
+		[machBinaries enumerateObjectsUsingBlock:^(ZGMachBinary * _Nonnull machBinary, NSUInteger index, BOOL * _Nonnull __unused stop) {
+			NSString *filePath = [filePaths objectAtIndex:index];
+			if (filePath.length > 0)
+			{
+				[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
+			}
+		}];
+		
+		*filePathDictionary = machFilePathDictionary;
+		
+		return machBinaries;
+	};
 	
-	NSArray *(^retrieveSymbols)(void) = ^{
+	NSArray<NSNumber *> *(^relativizeVariables)(NSArray<ZGMachBinary *> *, NSDictionary<NSNumber *, NSString *> *, NSArray **) = ^(NSArray<ZGMachBinary *> *machBinaries, NSDictionary<NSNumber *, NSString *> *machFilePathDictionary, NSArray **staticDescriptionsRef) {
+		NSMutableArray *staticDescriptions = [[NSMutableArray alloc] initWithCapacity:capacity];
+		NSMutableArray<NSNumber *> *variableAddresses = [[NSMutableArray alloc] initWithCapacity:capacity];
+		
+		for (ZGVariable *variable in variables)
+		{
+			NSString *staticDescription = [self relativizeVariable:variable withMachBinaries:machBinaries filePathDictionary:machFilePathDictionary process:process];
+			
+			[staticDescriptions addObject:staticDescription != nil ? staticDescription : [NSNull null]];
+			[variableAddresses addObject:@(variable.address)];
+		}
+		
+		*staticDescriptionsRef = staticDescriptions;
+		
+		return variableAddresses;
+	};
+	
+	NSArray *(^retrieveSymbols)(NSArray<NSNumber *> *) = ^(NSArray<NSNumber *> *variableAddresses) {
 		NSMutableArray *symbols = [[NSMutableArray alloc] initWithCapacity:capacity];
 		for (NSNumber *variableAddress in variableAddresses)
 		{
@@ -1089,7 +1101,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		return symbols;
 	};
 	
-	void (^finishAnnotations)(NSArray *) = ^(NSArray * _Nullable symbols) {
+	void (^finishAnnotations)(NSArray *, NSArray *) = ^(NSArray * _Nullable symbols, NSArray *staticDescriptions) {
 		__block ZGMemoryAddress cachedSubmapRegionAddress = 0;
 		__block ZGMemorySize cachedSubmapRegionSize = 0;
 		__block ZGMemorySubmapInfo cachedSubmapInfo;
@@ -1151,18 +1163,34 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	if (async)
 	{
 		dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-			NSArray *symbols = requiresSymbols ? retrieveSymbols() : nil;
+			NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = nil;
+			NSArray<ZGMachBinary *> *machBinaries = retrieveMachBinaries(&machFilePathDictionary);
 			
 			dispatch_async(dispatch_get_main_queue(), ^{
-				finishAnnotations(symbols);
-				completionHandler();
+				NSArray *staticDescriptions = nil;
+				NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);
+				
+				dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+					NSArray *symbols = requiresSymbols ? retrieveSymbols(variableAddresses) : nil;
+					
+					dispatch_async(dispatch_get_main_queue(), ^{
+						finishAnnotations(symbols, staticDescriptions);
+						completionHandler();
+					});
+				});
 			});
 		});
 	}
 	else
 	{
-		NSArray *symbols = requiresSymbols ? retrieveSymbols() : nil;
-		finishAnnotations(symbols);
+		NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = nil;
+		NSArray<ZGMachBinary *> *machBinaries = retrieveMachBinaries(&machFilePathDictionary);
+		NSArray *staticDescriptions = nil;
+		
+		NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);
+		
+		NSArray *symbols = requiresSymbols ? retrieveSymbols(variableAddresses) : nil;
+		finishAnnotations(symbols, staticDescriptions);
 		completionHandler();
 	}
 }
