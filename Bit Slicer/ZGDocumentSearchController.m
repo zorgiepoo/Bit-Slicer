@@ -71,6 +71,7 @@
 	BOOL _allowsNarrowing;
 	NSString *_searchValueString;
 	ZGSearchData * _Nonnull _searchData;
+	ZGMachBinaryAnnotationInfo _machBinaryAnnotationInfo;
 }
 
 #pragma mark Class Utilities
@@ -311,7 +312,7 @@
 	[searchResults removeNumberOfAddresses:numberOfVariables];
 	
 	// Waiting for completion would lead to a bad user experience and there is no need to
-	[ZGVariableController annotateVariables:newVariables process:currentProcess symbols:YES async:YES completionHandler:^{
+	[ZGVariableController annotateVariables:newVariables annotationInfo:&_machBinaryAnnotationInfo process:currentProcess symbols:YES async:YES completionHandler:^{
 		[windowController.variablesTableView reloadData];
 	}];
 	
@@ -362,6 +363,9 @@
 		_documentData.variables = oldVariables;
 		[windowController.variablesTableView reloadData];
 	}
+	
+	_machBinaryAnnotationInfo.machBinaries = nil;
+	_machBinaryAnnotationInfo.machFilePathDictionary = nil;
 	
 	[windowController updateOcclusionActivity];
 	

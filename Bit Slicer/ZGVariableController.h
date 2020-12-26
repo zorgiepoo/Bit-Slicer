@@ -33,6 +33,7 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 #import "ZGVariable.h"
+#import "ZGMachBinary.h"
 
 #define SIGNED_BUTTON_CELL_TAG 0
 
@@ -42,6 +43,12 @@ extern NSString *ZGScriptIndentationUsingTabsKey;
 
 @class ZGDocumentWindowController;
 @class ZGProcess;
+
+typedef struct
+{
+	NSArray<ZGMachBinary *> *machBinaries;
+	NSDictionary<NSNumber *, NSString *> *machFilePathDictionary;
+} ZGMachBinaryAnnotationInfo;
 
 @interface ZGVariableController : NSObject
 
@@ -73,7 +80,7 @@ extern NSString *ZGScriptIndentationUsingTabsKey;
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
 
 - (void)relativizeVariables:(NSArray<ZGVariable *> *)variables;
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process symbols:(BOOL)symbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler;
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo * _Nullable)annotationInfo process:(ZGProcess *)process symbols:(BOOL)symbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler;
 
 - (void)editVariables:(NSArray<ZGVariable *> *)variables newValues:(NSArray<NSString *> *)newValues;
 - (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula;

@@ -46,7 +46,6 @@
 #import "ZGDocumentWindowController.h"
 #import "ZGDocumentData.h"
 #import "ZGScriptManager.h"
-#import "ZGMachBinary.h"
 #import "ZGMachBinaryInfo.h"
 #import "ZGTableView.h"
 #import "NSArrayAdditions.h"
@@ -970,7 +969,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	[[self class] annotateVariables:variables process:windowController.currentProcess symbols:YES async:YES completionHandler:^{
+	[[self class] annotateVariables:variables annotationInfo:NULL process:windowController.currentProcess symbols:YES async:YES completionHandler:^{
 		NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeMultipleVariables");
 		
 		windowController.undoManager.actionName = actionName;
@@ -1045,13 +1044,13 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		[windowController.tableController updateDynamicVariableAddress:variable];
 		
 		// Re-annotate the variable
-		[[self class] annotateVariables:@[variable] process:process symbols:YES async:YES completionHandler:^{
+		[[self class] annotateVariables:@[variable] annotationInfo:NULL process:process symbols:YES async:YES completionHandler:^{
 			[windowController.variablesTableView reloadData];
 		}];
 	}
 }
 
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo * _Nullable)annotationInfo process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMemoryMap processTask = process.processTask;
 	NSUInteger capacity = variables.count;
@@ -1162,29 +1161,67 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	if (async)
 	{
-		dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-			NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = nil;
-			NSArray<ZGMachBinary *> *machBinaries = retrieveMachBinaries(&machFilePathDictionary);
+		if (annotationInfo != NULL && annotationInfo->machBinaries != nil && annotationInfo->machFilePathDictionary != nil)
+		{
+			NSArray<ZGMachBinary *> *machBinaries = annotationInfo->machBinaries;
+			NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = annotationInfo->machFilePathDictionary;
 			
-			dispatch_async(dispatch_get_main_queue(), ^{
-				NSArray *staticDescriptions = nil;
-				NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);
+			NSArray *staticDescriptions = nil;
+			NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);
+			
+			dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+				NSArray *symbols = requiresSymbols ? retrieveSymbols(variableAddresses) : nil;
 				
-				dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-					NSArray *symbols = requiresSymbols ? retrieveSymbols(variableAddresses) : nil;
+				dispatch_async(dispatch_get_main_queue(), ^{
+					finishAnnotations(symbols, staticDescriptions);
+					completionHandler();
+				});
+			});
+		}
+		else
+		{
+			dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+				NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = nil;
+				NSArray<ZGMachBinary *> *machBinaries = retrieveMachBinaries(&machFilePathDictionary);
+				
+				dispatch_async(dispatch_get_main_queue(), ^{
+					NSArray *staticDescriptions = nil;
+					NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);
 					
-					dispatch_async(dispatch_get_main_queue(), ^{
-						finishAnnotations(symbols, staticDescriptions);
-						completionHandler();
+					dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+						NSArray *symbols = requiresSymbols ? retrieveSymbols(variableAddresses) : nil;
+						
+						dispatch_async(dispatch_get_main_queue(), ^{
+							finishAnnotations(symbols, staticDescriptions);
+							
+							if (annotationInfo != NULL)
+							{
+								annotationInfo->machBinaries = machBinaries;
+								annotationInfo->machFilePathDictionary = machFilePathDictionary;
+							}
+							completionHandler();
+						});
 					});
 				});
 			});
-		});
+		}
 	}
 	else
 	{
+		
 		NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = nil;
-		NSArray<ZGMachBinary *> *machBinaries = retrieveMachBinaries(&machFilePathDictionary);
+		NSArray<ZGMachBinary *> *machBinaries = nil;
+		
+		if (annotationInfo != NULL && annotationInfo->machBinaries != nil && annotationInfo->machFilePathDictionary != nil)
+		{
+			machBinaries = annotationInfo->machBinaries;
+			machFilePathDictionary = annotationInfo->machFilePathDictionary;
+		}
+		else
+		{
+			machBinaries = retrieveMachBinaries(&machFilePathDictionary);
+		}
+		
 		NSArray *staticDescriptions = nil;
 		
 		NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);

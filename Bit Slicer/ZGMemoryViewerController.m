@@ -708,7 +708,7 @@
 	HFRange selectedAddressRange = [self selectedAddressRange];
 	ZGVariable *variable = [[ZGVariable alloc] initWithValue:NULL size:selectedAddressRange.length address:selectedAddressRange.location type:ZGByteArray qualifier:ZGUnsigned pointerSize:self.currentProcess.pointerSize];
 	
-	[ZGVariableController annotateVariables:@[variable] process:self.currentProcess symbols:NO async:NO completionHandler:^{
+	[ZGVariableController annotateVariables:@[variable] annotationInfo:NULL process:self.currentProcess symbols:NO async:NO completionHandler:^{
 		[[NSPasteboard generalPasteboard] declareTypes:@[NSStringPboardType] owner:self];
 		[[NSPasteboard generalPasteboard] setString:variable.addressFormula forType:NSStringPboardType];
 	}];
