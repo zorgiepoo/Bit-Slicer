@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,7 +16,7 @@
                 <outlet property="_scopeBarFlagsView" destination="053-lf-ydX" id="bS5-vp-dPP"/>
                 <outlet property="_toolbar" destination="UZg-mb-r8g" id="9bW-ar-bQK"/>
                 <outlet property="dataTypesPopUpButton" destination="wMv-KV-nmE" id="ohz-17-Uj6"/>
-                <outlet property="functionPopUpButton" destination="Vpc-Jb-WRb" id="9wG-B2-0wl"/>
+                <outlet property="functionPopUpButton" destination="Icp-Tb-DVJ" id="Bbf-kY-5xD"/>
                 <outlet property="progressIndicator" destination="SfW-co-kf4" id="T8e-Oe-5Fc"/>
                 <outlet property="runningApplicationsPopUpButton" destination="1ts-DF-nZQ" id="rls-ER-d1b"/>
                 <outlet property="searchValueTextField" destination="WaT-8a-dxh" id="fXI-m4-PoJ"/>
@@ -635,15 +635,21 @@
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" sizingBehavior="auto" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ts-DF-nZQ">
-                            <rect key="frame" x="0.0" y="14" width="187" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="66" height="25"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="0SL-Gj-qtF"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="cvc-cY-mNk"/>
                             </constraints>
-                            <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ftJ-ti-LVO">
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="MWD-2T-28b" id="ftJ-ti-LVO">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
-                                <menu key="menu" title="OtherViews" id="a2r-06-14a"/>
+                                <menu key="menu" title="OtherViews" id="a2r-06-14a">
+                                    <items>
+                                        <menuItem title="Item" id="MWD-2T-28b">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                    </items>
+                                </menu>
                                 <connections>
                                     <action selector="runningApplicationsPopUpButton:" target="-2" id="SGA-if-PXe"/>
                                 </connections>
@@ -682,18 +688,24 @@
                             </connections>
                         </popUpButton>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="A5AF15E6-88A9-4678-ACAF-0F6E1D87D554" label="Operator" paletteLabel="Operator" sizingBehavior="auto" id="LxQ-Vs-KYQ">
+                    <toolbarItem implicitItemIdentifier="8E5DA537-8055-458D-9CED-FB55D84CC763" label="Operator" paletteLabel="Operator" sizingBehavior="auto" id="moB-Wu-fvx">
                         <nil key="toolTip"/>
-                        <popUpButton key="view" verticalHuggingPriority="750" id="Vpc-Jb-WRb">
-                            <rect key="frame" x="8" y="14" width="39" height="25"/>
+                        <popUpButton key="view" verticalHuggingPriority="750" id="Icp-Tb-DVJ">
+                            <rect key="frame" x="0.0" y="14" width="66" height="25"/>
                             <autoresizingMask key="autoresizingMask"/>
-                            <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="TkL-8a-mN8">
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="gJQ-Bu-nkf" id="25Z-9U-W3R">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
-                                <menu key="menu" title="OtherViews" id="cNT-1t-BfB"/>
+                                <menu key="menu" title="OtherViews" id="0pR-Pq-Kby">
+                                    <items>
+                                        <menuItem title="Item" id="gJQ-Bu-nkf">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                    </items>
+                                </menu>
                             </popUpButtonCell>
                             <connections>
-                                <action selector="functionTypePopUpButtonRequest:" target="-2" id="vHM-nz-Hhc"/>
+                                <action selector="functionTypePopUpButtonRequest:" target="-2" id="TRH-OK-9d0"/>
                             </connections>
                         </popUpButton>
                     </toolbarItem>
@@ -731,7 +743,7 @@
                 <defaultToolbarItems>
                     <toolbarItem reference="jO3-Z2-Pv7"/>
                     <toolbarItem reference="70m-RL-vim"/>
-                    <toolbarItem reference="LxQ-Vs-KYQ"/>
+                    <toolbarItem reference="moB-Wu-fvx"/>
                     <toolbarItem reference="q4V-IG-gxK"/>
                     <toolbarItem reference="cbr-z0-cak"/>
                     <toolbarItem reference="x8t-Jw-Hi9"/>

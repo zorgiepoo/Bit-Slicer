@@ -216,6 +216,9 @@
 
 - (void)windowDidLoad
 {
+	// The reason we have a stock menu item is to preserve the font settings of menu items
+	[_runningApplicationsPopUpButton removeAllItems];
+	
 	[[NSNotificationCenter defaultCenter]
 	 addObserver:self
 	 selector:@selector(windowDidChangeOcclusionState:)

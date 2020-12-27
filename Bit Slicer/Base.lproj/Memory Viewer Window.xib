@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -42,8 +42,8 @@
                     <toolbarItem implicitItemIdentifier="A7558654-1EA6-4021-982D-10521377C75E" label="Back/Forward" paletteLabel="Back/Forward" sizingBehavior="auto" id="Z6W-2O-OWd">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="w6k-bm-Myo">
-                            <rect key="frame" x="13" y="14" width="53" height="25"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <rect key="frame" x="9" y="14" width="61" height="23"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="KIW-ls-ljL">
                                 <font key="font" metaFont="system"/>
                                 <segments>
@@ -63,15 +63,21 @@
                     <toolbarItem implicitItemIdentifier="7AD14AA0-A832-40BF-890E-22C1420E5869" label="Target" paletteLabel="Target" sizingBehavior="auto" id="2oH-t9-bYi">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fPm-5I-zjY">
-                            <rect key="frame" x="0.0" y="14" width="187" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="66" height="25"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="afV-Tx-EmX"/>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="jBR-jV-p5j"/>
                             </constraints>
-                            <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6D0-9L-tIs">
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="O54-Nm-FQR" id="6D0-9L-tIs">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
-                                <menu key="menu" title="OtherViews" id="a0O-5N-OUy"/>
+                                <menu key="menu" title="OtherViews" id="a0O-5N-OUy">
+                                    <items>
+                                        <menuItem title="Item" id="O54-Nm-FQR">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                    </items>
+                                </menu>
                             </popUpButtonCell>
                             <connections>
                                 <action selector="runningApplicationsPopUpButton:" target="-2" id="ikj-x5-Zyv"/>

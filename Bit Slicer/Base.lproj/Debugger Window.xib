@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -232,8 +232,8 @@
                     <toolbarItem implicitItemIdentifier="31B40B1D-066A-465E-9326-51493CC4C4EB" label="Back/Forward" paletteLabel="Back/Forward" sizingBehavior="auto" id="saO-Gp-UGR">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="vkH-Yd-fy0">
-                            <rect key="frame" x="13" y="14" width="53" height="25"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <rect key="frame" x="9" y="14" width="61" height="23"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="4Gz-L1-umm">
                                 <font key="font" metaFont="system"/>
                                 <segments>
@@ -253,15 +253,21 @@
                     <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" sizingBehavior="auto" id="V6x-9g-MBo">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fpR-fU-ajG">
-                            <rect key="frame" x="0.0" y="14" width="167" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="66" height="25"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="bEq-IZ-Wag"/>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="ngH-El-940"/>
                             </constraints>
-                            <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ohg-Gh-2fU">
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="vAn-gJ-wjp" id="ohg-Gh-2fU">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
-                                <menu key="menu" title="OtherViews" id="Quq-lP-8lz"/>
+                                <menu key="menu" title="OtherViews" id="Quq-lP-8lz">
+                                    <items>
+                                        <menuItem title="Item" id="vAn-gJ-wjp">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                    </items>
+                                </menu>
                             </popUpButtonCell>
                             <connections>
                                 <action selector="runningApplicationsPopUpButton:" target="-2" id="44z-bJ-smY"/>
@@ -271,8 +277,8 @@
                     <toolbarItem implicitItemIdentifier="1A9DCB4E-799C-4634-B1F6-CB15382E7DF9" label="Continue" paletteLabel="Continue" image="continue" sizingBehavior="auto" id="KQE-fj-qqG">
                         <nil key="toolTip"/>
                         <button key="view" verticalHuggingPriority="750" id="2Xc-JX-DhY">
-                            <rect key="frame" x="8" y="14" width="39" height="25"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <rect key="frame" x="13" y="14" width="30" height="23"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="continue" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pHW-hV-Whn">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -285,8 +291,8 @@
                     <toolbarItem implicitItemIdentifier="F91B22CB-7E27-4BA1-A2E8-AD190222BAAF" label="Step" paletteLabel="Step" sizingBehavior="auto" id="yIQ-3L-cfP">
                         <nil key="toolTip"/>
                         <segmentedControl key="view" verticalHuggingPriority="750" id="hed-Ji-GwK">
-                            <rect key="frame" x="0.0" y="14" width="100" height="25"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <rect key="frame" x="0.0" y="14" width="112" height="23"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="momentary" id="AnD-9c-1f5">
                                 <font key="font" metaFont="system"/>
                                 <segments>
