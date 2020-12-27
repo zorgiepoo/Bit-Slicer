@@ -253,17 +253,17 @@
                     <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" sizingBehavior="auto" id="V6x-9g-MBo">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fpR-fU-ajG">
-                            <rect key="frame" x="0.0" y="14" width="66" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="78" height="25"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="bEq-IZ-Wag"/>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="ngH-El-940"/>
                             </constraints>
-                            <popUpButtonCell key="cell" type="roundTextured" title="Item" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="vAn-gJ-wjp" id="ohg-Gh-2fU">
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="vAn-gJ-wjp" id="ohg-Gh-2fU">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
                                 <menu key="menu" title="OtherViews" id="Quq-lP-8lz">
                                     <items>
-                                        <menuItem title="Item" id="vAn-gJ-wjp">
+                                        <menuItem title="Item_1" id="vAn-gJ-wjp">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                     </items>
