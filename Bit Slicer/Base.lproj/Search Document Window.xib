@@ -635,17 +635,17 @@
                     <toolbarItem implicitItemIdentifier="7067EEED-50B2-47C5-B940-15BDC90F3B87" label="Target" paletteLabel="Target" sizingBehavior="auto" id="jO3-Z2-Pv7">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1ts-DF-nZQ">
-                            <rect key="frame" x="0.0" y="14" width="66" height="25"/>
+                            <rect key="frame" x="0.0" y="14" width="78" height="25"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="0SL-Gj-qtF"/>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="cvc-cY-mNk"/>
                             </constraints>
-                            <popUpButtonCell key="cell" type="roundTextured" title="Item" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="MWD-2T-28b" id="ftJ-ti-LVO">
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="MWD-2T-28b" id="ftJ-ti-LVO">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
                                 <menu key="menu" title="OtherViews" id="a2r-06-14a">
                                     <items>
-                                        <menuItem title="Item" id="MWD-2T-28b">
+                                        <menuItem title="Item_1" id="MWD-2T-28b" userLabel="Item_1">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                     </items>
@@ -690,15 +690,17 @@
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="8E5DA537-8055-458D-9CED-FB55D84CC763" label="Operator" paletteLabel="Operator" sizingBehavior="auto" id="moB-Wu-fvx">
                         <nil key="toolTip"/>
-                        <popUpButton key="view" verticalHuggingPriority="750" id="Icp-Tb-DVJ">
-                            <rect key="frame" x="0.0" y="14" width="66" height="25"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                            <popUpButtonCell key="cell" type="roundTextured" title="Item" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="gJQ-Bu-nkf" id="25Z-9U-W3R">
+                        <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Icp-Tb-DVJ">
+                            <rect key="frame" x="0.0" y="14" width="78" height="25"/>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="Kiy-8R-fMo"/>
+                            </constraints>
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="gJQ-Bu-nkf" id="25Z-9U-W3R">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
                                 <menu key="menu" title="OtherViews" id="0pR-Pq-Kby">
                                     <items>
-                                        <menuItem title="Item" id="gJQ-Bu-nkf">
+                                        <menuItem title="Item_1" id="gJQ-Bu-nkf">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                     </items>
