@@ -248,17 +248,12 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 			ZGMemorySubmapInfo regionInfo;
 			cachedRegion = [[ZGRegion alloc] initWithAddress:filePathAddress size:1];
 			if (!ZGRegionSubmapInfo(processTask, &cachedRegion->_address, &cachedRegion->_size, &regionInfo) ||
-				!ZGReadBytes(processTask, cachedRegion->_address, &cachedRegion->_bytes, &cachedRegion->_size))
+				!ZGReadBytes(processTask, cachedRegion->_address, &cachedRegion->_bytes, &cachedRegion->_size) || (filePathAddress < cachedRegion->_address || filePathAddress >= cachedRegion->_address + cachedRegion->_size))
 			{
 				[filePaths addObject:@""];
 				cachedRegion = nil;
 				continue;
 			}
-		}
-		
-		if (filePathAddress < cachedRegion->_address)
-		{
-			continue;
 		}
 		
 		char buffer[PATH_MAX + 1] = {0};
@@ -271,6 +266,10 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		if (filePath != nil)
 		{
 			[filePaths addObject:filePath];
+		}
+		else
+		{
+			[filePaths addObject:@""];
 		}
 	}
 	
