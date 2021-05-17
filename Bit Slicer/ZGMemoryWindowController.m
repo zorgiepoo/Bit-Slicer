@@ -489,7 +489,8 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 			 initWithName:runningProcess.name
 			 internalName:runningProcess.internalName
 			 processID:runningProcess.processIdentifier
-			 type:runningProcess.type];
+			 type:runningProcess.type
+			 translated:runningProcess.translated];
 			
 			menuItem.representedObject = representedProcess;
 		}
@@ -516,7 +517,7 @@ static ZGProcess *ZGGrantMemoryAccessToProcess(ZGProcessTaskManager *processTask
 		NSString *nameToUse = (_desiredProcessInternalName != nil) ? _desiredProcessInternalName : ZGLocalizedStringFromMemoryWindowTable(@"noTargetAvailable");
 		[[self class] updateProcessMenuItem:menuItem name:nameToUse processIdentifier:-1 icon:nil];
 		
-		ZGProcess *deadProcess = [[ZGProcess alloc] initWithName:nil internalName:nameToUse type:ZGProcessTypeNone];
+		ZGProcess *deadProcess = [[ZGProcess alloc] initWithName:nil internalName:nameToUse type:ZGProcessTypeNone translated:NO];
 		if (_desiredProcessInternalName == nil)
 		{
 			// we want to change the target whenever one comes online regardless of what it is

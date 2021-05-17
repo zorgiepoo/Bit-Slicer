@@ -199,10 +199,13 @@
 					default:
 						processType = ZGProcessTypeNone;
 				}
+				
+				bool translated = (processInfo.kp_proc.p_flag & P_TRANSLATED) != 0;
+				
 				// Note that the internal name is not really the "true" name of the process since it has a very small max character limit
 				const char *internalName = processInfo.kp_proc.p_comm;
 				
-				ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processIdentifier type:processType internalName:@(internalName)];
+				ZGRunningProcess *runningProcess = [[ZGRunningProcess alloc] initWithProcessIdentifier:processIdentifier type:processType translated:translated internalName:@(internalName)];
 				
 				[newRunningProcesses addObject:runningProcess];
 			}

@@ -50,7 +50,7 @@
 
 #pragma mark Birth
 
-- (id)initWithProcessIdentifier:(pid_t)processIdentifier type:(ZGProcessType)processType internalName:(NSString *)name
+- (id)initWithProcessIdentifier:(pid_t)processIdentifier type:(ZGProcessType)processType translated:(BOOL)translated internalName:(NSString *)name
 {
 	self = [super init];
 	if (self != nil)
@@ -58,13 +58,14 @@
 		_processIdentifier = processIdentifier;
 		_internalName = (name != nil) ? [name copy] : [NSString stringWithFormat:@"%d", processIdentifier];
 		_type = processType;
+		_translated = translated;
 	}
 	return self;
 }
 
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier
 {
-	return [self initWithProcessIdentifier:processIdentifier type:ZGProcessTypeNone internalName:nil];
+	return [self initWithProcessIdentifier:processIdentifier type:ZGProcessTypeNone translated:NO internalName:nil];
 }
 
 #pragma mark Comparisons

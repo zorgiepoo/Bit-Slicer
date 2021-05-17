@@ -48,7 +48,7 @@
 	BOOL _failedCreatingSymbolicator;
 }
 
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID type:(ZGProcessType)processType
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID type:(ZGProcessType)processType translated:(BOOL)translated
 {
 	if ((self = [super init]))
 	{
@@ -56,19 +56,20 @@
 		_internalName = [internalName copy];
 		_processID = aProcessID;
 		_type = processType;
+		_translated = translated;
 	}
 	
 	return self;
 }
 
-- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName type:(ZGProcessType)processType
+- (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName type:(ZGProcessType)processType translated:(BOOL)translated
 {
-	return [self initWithName:processName internalName:internalName processID:NON_EXISTENT_PID_NUMBER type:processType];
+	return [self initWithName:processName internalName:internalName processID:NON_EXISTENT_PID_NUMBER type:processType translated:translated];
 }
 
 - (instancetype)initWithProcess:(ZGProcess *)process processTask:(ZGMemoryMap)processTask name:(NSString *)name
 {
-	self = [self initWithName:name internalName:process.internalName processID:process.processID type:process.type];
+	self = [self initWithName:name internalName:process.internalName processID:process.processID type:process.type translated:process.translated];
 	if (self != nil)
 	{
 		_processTask = processTask;

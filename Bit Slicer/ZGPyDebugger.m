@@ -47,7 +47,6 @@
 #import "ZGThreadStates.h"
 #import "ZGRegisterEntries.h"
 #import "ZGMachBinary.h"
-//#import "Python/structmember.h"
 #import "pythonlib.h"
 #import "ZGDeliverUserNotifications.h"
 #import "ZGPyVirtualMemory.h"

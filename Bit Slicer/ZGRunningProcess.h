@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGRunningProcess : NSObject
 
-- (id)initWithProcessIdentifier:(pid_t)processIdentifier type:(ZGProcessType)processType internalName:(nullable NSString *)name;
+- (id)initWithProcessIdentifier:(pid_t)processIdentifier type:(ZGProcessType)processType translated:(BOOL)translated internalName:(nullable NSString *)name;
 - (id)initWithProcessIdentifier:(pid_t)processIdentifier;
 
 - (void)invalidateAppInfoCache;
@@ -48,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nonatomic, nullable) NSImage *icon;
 @property (readonly, nonatomic, nullable) NSURL *fileURL;
 @property (readonly, nonatomic) ZGProcessType type;
+@property (readonly, nonatomic) BOOL translated;
 @property (readonly, nonatomic) BOOL isGame;
 @property (readonly, nonatomic) BOOL isThirdParty;
 @property (readonly, nonatomic) BOOL isWebContent;

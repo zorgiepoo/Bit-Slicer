@@ -43,7 +43,6 @@
 #import "ZGDataValueExtracting.h"
 #import "ZGVariableDataInfo.h"
 #import "ZGProcessTypes.h"
-//#import "Python/structmember.h"
 #import "pythonlib.h"
 
 typedef struct
@@ -53,6 +52,7 @@ typedef struct
 	int32_t processIdentifier;
 	int8_t is64Bit;
 	int8_t isARM;
+	int8_t isTranslated;
 	ZGProcessType processType;
 	ZGMemoryAddress baseAddress;
 	integer_t suspendCount;
@@ -65,6 +65,7 @@ static PyMemberDef VirtualMemory_members[] =
 	{"pid", T_INT, offsetof(VirtualMemory, processIdentifier), 0, "process identifier"},
 	{"is64Bit", T_BOOL, offsetof(VirtualMemory, is64Bit), 0, "is process 64-bit"},
 	{"isARM", T_BOOL, offsetof(VirtualMemory, isARM), 0, "is process ARM architecture"},
+	{"isTranslated", T_BOOL, offsetof(VirtualMemory, isTranslated), 0, "is process translated under Rosetta"},
 	{NULL, 0, 0, 0, NULL}
 };
 
@@ -259,6 +260,7 @@ static PyTypeObject VirtualMemoryType =
 		vmObject->processType = process.type;
 		vmObject->is64Bit = ZG_PROCESS_TYPE_IS_64_BIT(vmObject->processType);
 		vmObject->isARM = ZG_PROCESS_TYPE_IS_ARM64(vmObject->processType);
+		vmObject->isTranslated = process.translated;
 		vmObject->virtualMemoryException = virtualMemoryException;
 		
 		_process = shouldCopyProcess ? [[ZGProcess alloc] initWithProcess:process] : process;

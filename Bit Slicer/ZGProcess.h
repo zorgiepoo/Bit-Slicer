@@ -44,9 +44,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGProcess : NSObject
 
-- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID type:(ZGProcessType)processType;
+- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID type:(ZGProcessType)processType translated:(BOOL)translated;
 
-- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName type:(ZGProcessType)processType;
+- (instancetype)initWithName:(nullable NSString *)processName internalName:(NSString *)internalName type:(ZGProcessType)processType translated:(BOOL)translated;
 
 - (instancetype)initWithProcess:(ZGProcess *)process;
 
@@ -60,6 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString *name;
 @property (nonatomic, readonly) NSString *internalName;
 @property (nonatomic, readonly) ZGProcessType type;
+@property (nonatomic, readonly) BOOL translated;
 
 // indicates if this represents any sort of actual program.. admittingly, this is kind of a hack
 @property (nonatomic) BOOL isDummy;
