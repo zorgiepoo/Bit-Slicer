@@ -6,10 +6,16 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if __has_feature(modules)
+#if __has_warning("-Watimport-in-framework-header")
+#pragma clang diagnostic ignored "-Watimport-in-framework-header"
+#endif
+@import Cocoa;
+#else
 #import <Cocoa/Cocoa.h>
-#import <Sparkle/SPUUserDriver.h>
-#import <Sparkle/SPUStandardUserDriverProtocol.h>
-#import <Sparkle/SUExport.h>
+#endif
+#import "SPUUserDriver.h"
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Sparkle's standard built-in user driver for updater interactions
  */
-SU_EXPORT @interface SPUStandardUserDriver : NSObject <SPUUserDriver, SPUStandardUserDriverProtocol>
+SU_EXPORT @interface SPUStandardUserDriver : NSObject <SPUUserDriver>
 
 /*!
  Initializes a Sparkle's standard user driver for user update interactions
@@ -29,9 +35,9 @@ SU_EXPORT @interface SPUStandardUserDriver : NSObject <SPUUserDriver, SPUStandar
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(nullable id<SPUStandardUserDriverDelegate>)delegate;
 
 /*!
- * Enable or disable hideOnDeactivate for standard update window.
+ Use initWithHostBundle:delegate: instead.
  */
-@property (nonatomic) BOOL hideOnDeactivate;
+- (instancetype)init NS_UNAVAILABLE;
 
 @end
 

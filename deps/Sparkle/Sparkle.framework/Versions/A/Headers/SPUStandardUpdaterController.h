@@ -6,13 +6,21 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if __has_feature(modules)
+#if __has_warning("-Watimport-in-framework-header")
+#pragma clang diagnostic ignored "-Watimport-in-framework-header"
+#endif
+@import Cocoa;
+#else
 #import <Cocoa/Cocoa.h>
-#import <Sparkle/SUExport.h>
+#endif
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class SPUUpdater;
-@protocol SPUUserDriver, SPUStandardUserDriverProtocol, SPUUpdaterDelegate, SPUStandardUserDriverDelegate;
+@class SPUStandardUserDriver;
+@protocol SPUUserDriver, SPUUpdaterDelegate, SPUStandardUserDriverDelegate;
 
 /*!
  A controller class that instantiates a SPUUpdater and allows binding UI to it.
@@ -24,11 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
  up the updater's and user driver's delegates.
  
  This controller class may not be valuable to you if:
- * You want to control or defer the instantiation of an SPUUpdater, or don't want to be tied into a nib's instantiation, or don't want to use a nib
+ * You want to control or defer starting the SPUUpdater, or don't want to be tied into a nib's instantiation, or don't want to use a nib
  * You want to target a bundle that's not the main bundle
- * You want to provide a custom user interface, or perhaps one that provides little-to-none
- * You don't want to use a convenience class that provides very little glue ;)
- 
+ * You want to provide a custom user interface (SPUUserDriver), or perhaps one that provides little-to-none
   */
 SU_EXPORT @interface SPUStandardUpdaterController : NSObject
 
@@ -60,7 +66,7 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
  This is nil before being loaded from the nib.
  You may access this property after your application has finished launching, or after your window controller has finished loading.
  */
-@property (nonatomic, readonly, nullable) id <SPUStandardUserDriverProtocol> userDriver;
+@property (nonatomic, readonly, nullable) SPUStandardUserDriver *userDriver;
 
 /*!
  Use initWithUpdaterDelegate:userDriverDelegate: instead.
@@ -87,7 +93,7 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
 /*!
  Validates if the menu item for checkForUpdates: can be invoked or not
  
- This validates the menu item by checking -[SPUStandardUserDriver canCheckForUpdates]
+ This validates the menu item by checking -SPUUpdater.canCheckForUpdates
  */
 - (BOOL)validateMenuItem:(NSMenuItem *)item;
 
