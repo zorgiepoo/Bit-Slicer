@@ -46,8 +46,8 @@ extern NSString *ZGScriptIndentationUsingTabsKey;
 
 typedef struct
 {
-	NSArray<ZGMachBinary *> *machBinaries;
-	NSDictionary<NSNumber *, NSString *> *machFilePathDictionary;
+	NSArray<ZGMachBinary *> * _Nullable machBinaries;
+	NSDictionary<NSNumber *, NSString *> * _Nullable machFilePathDictionary;
 } ZGMachBinaryAnnotationInfo;
 
 @interface ZGVariableController : NSObject
