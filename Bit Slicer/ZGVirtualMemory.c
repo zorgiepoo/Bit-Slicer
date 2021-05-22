@@ -36,6 +36,8 @@
 #include <mach/task.h>
 #include <mach/mach_port.h>
 
+#include <TargetConditionals.h>
+
 bool ZGTaskForPID(int processID, ZGMemoryMap *processTask)
 {
 	return (task_for_pid(current_task(), processID, processTask) == KERN_SUCCESS);
@@ -114,20 +116,50 @@ static bool ZGWriteBytesOverwritingProtectionAndRevertingBack(ZGMemoryMap proces
 		return false;
 	}
 	
-	if (!(oldProtection & VM_PROT_WRITE))
+	bool needsExecutableProtectionModified;
+	if ((oldProtection & VM_PROT_WRITE) == 0)
 	{
-		if (!ZGProtect(processTask, protectionAddress, protectionSize, oldProtection | VM_PROT_WRITE))
+		ZGMemoryProtection newProtection;
+#if TARGET_CPU_ARM64
+		if ((oldProtection & VM_PROT_EXECUTE) != 0)
 		{
+			newProtection = (oldProtection & ~VM_PROT_EXECUTE) | VM_PROT_WRITE;
+			needsExecutableProtectionModified = true;
+			
+			ZGSuspendTask(processTask);
+		}
+		else
+#endif
+		{
+			newProtection = (oldProtection | VM_PROT_WRITE);
+			needsExecutableProtectionModified = false;
+		}
+		
+		if (!ZGProtect(processTask, protectionAddress, protectionSize, newProtection))
+		{
+			if (needsExecutableProtectionModified)
+			{
+				ZGResumeTask(processTask);
+			}
 			return false;
 		}
+	}
+	else
+	{
+		needsExecutableProtectionModified = false;
 	}
 	
 	bool success = ZGWriteBytes(processTask, address, bytes, size);
 	
 	// Re-protect the region back to the way it was
-	if (revertingBack && !(oldProtection & VM_PROT_WRITE))
+	if ((revertingBack || needsExecutableProtectionModified) && (oldProtection & VM_PROT_WRITE) == 0)
 	{
 		ZGProtect(processTask, protectionAddress, protectionSize, oldProtection);
+		
+		if (needsExecutableProtectionModified)
+		{
+			ZGResumeTask(processTask);
+		}
 	}
 	
 	return success;
