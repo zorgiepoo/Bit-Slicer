@@ -44,8 +44,8 @@
 
 #if TARGET_CPU_ARM64
 typedef arm_amx_state_t zg_vector_state_t;
-typedef arm_thread_state_t zg_thread_state_t;
-typedef arm_debug_state_t zg_debug_state_t;
+typedef arm_thread_state64_t zg_thread_state_t;
+typedef arm_debug_state64_t zg_debug_state_t;
 typedef arm_state_hdr_t zg_state_hdr_t;
 typedef arm_thread_state32_t zg_thread_state32_t;
 typedef arm_thread_state64_t zg_thread_state64_t;
@@ -62,6 +62,8 @@ bool ZGGetGeneralThreadState(zg_thread_state_t *threadState, thread_act_t thread
 bool ZGSetGeneralThreadState(zg_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t stateCount);
 
 ZGMemoryAddress ZGInstructionPointerFromGeneralThreadState(zg_thread_state_t *threadState, ZGProcessType type);
+void ZGSetInstructionPointerFromGeneralThreadState(zg_thread_state_t *threadState, ZGMemoryAddress instructionAddress, ZGProcessType type);
+
 ZGMemoryAddress ZGBasePointerFromGeneralThreadState(zg_thread_state_t *threadState, ZGProcessType type);
 
 bool ZGGetDebugThreadState(zg_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t *stateCount);

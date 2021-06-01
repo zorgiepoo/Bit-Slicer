@@ -41,39 +41,54 @@ typedef x86_float_state_t zg_float_state_t;
 bool ZGGetGeneralThreadState(zg_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t *stateCount)
 {
 #if TARGET_CPU_ARM64
-	(void)threadState;
-	(void)thread;
-	(void)stateCount;
-	return false;
+	mach_msg_type_number_t localStateCount = ARM_THREAD_STATE64_COUNT;
+	thread_state_flavor_t flavor = ARM_THREAD_STATE64;
 #else
 	mach_msg_type_number_t localStateCount = x86_THREAD_STATE_COUNT;
-	bool success = (thread_get_state(thread, x86_THREAD_STATE, (thread_state_t)threadState, &localStateCount) == KERN_SUCCESS);
+	thread_state_flavor_t flavor = x86_THREAD_STATE;
+#endif
+	
+	bool success = (thread_get_state(thread, flavor, (thread_state_t)threadState, &localStateCount) == KERN_SUCCESS);
 	if (stateCount != NULL) *stateCount = localStateCount;
 	return success;
-#endif
 }
 
 bool ZGSetGeneralThreadState(zg_thread_state_t *threadState, thread_act_t thread, mach_msg_type_number_t stateCount)
 {
 #if TARGET_CPU_ARM64
-	(void)threadState;
-	(void)thread;
-	(void)stateCount;
-	return false;
+	thread_state_flavor_t flavor = ARM_THREAD_STATE64;
 #else
-	return (thread_set_state(thread, x86_THREAD_STATE, (thread_state_t)threadState, stateCount) == KERN_SUCCESS);
+	thread_state_flavor_t flavor = x86_THREAD_STATE;
 #endif
+	
+	return (thread_set_state(thread, flavor, (thread_state_t)threadState, stateCount) == KERN_SUCCESS);
 }
 
 ZGMemoryAddress ZGInstructionPointerFromGeneralThreadState(zg_thread_state_t *threadState, ZGProcessType type)
 {
 #if TARGET_CPU_ARM64
-	(void)threadState;
 	(void)type;
-	return 0;
+	ZGMemoryAddress instructionPointer = arm_thread_state64_get_pc(*threadState);
 #else
 	ZGMemoryAddress instructionPointer = (ZG_PROCESS_TYPE_IS_X86_64(type)) ? threadState->uts.ts64.__rip : threadState->uts.ts32.__eip;
+#endif
 	return instructionPointer;
+}
+
+void ZGSetInstructionPointerFromGeneralThreadState(zg_thread_state_t *threadState, ZGMemoryAddress instructionAddress, ZGProcessType type)
+{
+#if TARGET_CPU_ARM64
+	(void)type;
+	arm_thread_state64_set_pc_fptr(*threadState, instructionAddress);
+#else
+	if (ZG_PROCESS_TYPE_IS_X86_64(type))
+	{
+		threadState->uts.ts64.__rip = instructionAddress;
+	}
+	else
+	{
+		threadState->uts.ts32.__eip = (uint32_t)instructionAddress;
+	}
 #endif
 }
 
@@ -92,28 +107,27 @@ ZGMemoryAddress ZGBasePointerFromGeneralThreadState(zg_thread_state_t *threadSta
 bool ZGGetDebugThreadState(zg_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t *stateCount)
 {
 #if TARGET_CPU_ARM64
-	(void)debugState;
-	(void)thread;
-	(void)stateCount;
-	return false;
+	thread_state_flavor_t flavor = ARM_DEBUG_STATE64;
+	mach_msg_type_number_t localStateCount = ARM_DEBUG_STATE64_COUNT;
 #else
+	thread_state_flavor_t flavor = x86_DEBUG_STATE;
 	mach_msg_type_number_t localStateCount = x86_DEBUG_STATE_COUNT;
-	bool success = (thread_get_state(thread, x86_DEBUG_STATE, (thread_state_t)debugState, &localStateCount) == KERN_SUCCESS);
+#endif
+	
+	bool success = (thread_get_state(thread, flavor, (thread_state_t)debugState, &localStateCount) == KERN_SUCCESS);
 	if (stateCount != NULL) *stateCount = localStateCount;
 	return success;
-#endif
 }
 
 bool ZGSetDebugThreadState(zg_debug_state_t *debugState, thread_act_t thread, mach_msg_type_number_t stateCount)
 {
 #if TARGET_CPU_ARM64
-	(void)debugState;
-	(void)thread;
-	(void)stateCount;
-	return false;
+	thread_state_flavor_t flavor = ARM_DEBUG_STATE64;
 #else
-	return (thread_set_state(thread, x86_DEBUG_STATE, (thread_state_t)debugState, stateCount) == KERN_SUCCESS);
+	thread_state_flavor_t flavor = x86_DEBUG_STATE;
 #endif
+	
+	return (thread_set_state(thread, flavor, (thread_state_t)debugState, stateCount) == KERN_SUCCESS);
 }
 
 #if TARGET_CPU_ARM64

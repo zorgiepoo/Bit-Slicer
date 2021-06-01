@@ -1098,10 +1098,6 @@
 	
 	else if (menuItem.action == @selector(watchVariable:))
 	{
-#if TARGET_CPU_ARM64
-		// Watchpoints not supported on arm64 yet
-		return NO;
-#else
 		if ([_searchController canCancelTask] || !self.currentProcess.valid || [self selectedVariables].count != 1)
 		{
 			return NO;
@@ -1127,7 +1123,6 @@
 		{
 			return NO;
 		}
-#endif
 	}
 	
 	else if (menuItem.action == @selector(nopVariables:))
