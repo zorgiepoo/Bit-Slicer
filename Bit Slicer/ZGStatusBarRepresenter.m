@@ -24,6 +24,9 @@
 // Originally derived from and extends HFStatusBarRepresenter.m
 // Made alterations to include beginningMemoryAddress property as well as localizations
 
+#import <CoreGraphics/CoreGraphics.h> // needed for HexFiend
+#import <Cocoa/Cocoa.h> // needed for HexFiend
+
 #import "ZGStatusBarRepresenter.h"
 
 #define ZGStatusBarLocalizationTable @"[Code] Memory Viewer Status Bar"

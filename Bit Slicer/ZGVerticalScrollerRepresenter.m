@@ -21,6 +21,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#import <CoreGraphics/CoreGraphics.h> // needed for HexFiend
+#import <Cocoa/Cocoa.h> // needed for HexFiend
+
 #import "ZGVerticalScrollerRepresenter.h"
 
 @implementation ZGVerticalScrollerRepresenter
