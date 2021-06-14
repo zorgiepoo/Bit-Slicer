@@ -28,6 +28,9 @@
 //  Copyright © 2019 ridiculous_fish. All rights reserved.
 //
 
+#import <CoreGraphics/CoreGraphics.h> // needed for HexFiend
+#import <Cocoa/Cocoa.h> // needed for HexFiend
+
 #import "DataInspector.h"
 
 #import <HexFiend/HFFunctions.h>
