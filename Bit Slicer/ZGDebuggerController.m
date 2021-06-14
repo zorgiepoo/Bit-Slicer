@@ -478,7 +478,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 				{
 					// Ignore trivial breakpoint changes
 					BOOL foundBreakPoint = NO;
-					if (ZG_PROCESS_TYPE_IS_X86_FAMILY(self.currentProcess.type) && *(uint8_t *)bytes == X86_INSTRUCTION_BREAKPOINT_OPCODE && (size == sizeof(uint8_t) || memcmp((uint8_t *)bytes + sizeof(uint8_t), (uint8_t *)instruction.variable.rawValue + sizeof(uint8_t), size - sizeof(uint8_t)) == 0))
+					if (size >= sizeof(gBreakpointOpcode) && memcmp(bytes, gBreakpointOpcode, sizeof(gBreakpointOpcode)) == 0 && (size == sizeof(gBreakpointOpcode) || memcmp((uint8_t *)bytes + sizeof(gBreakpointOpcode), (uint8_t *)instruction.variable.rawValue + sizeof(gBreakpointOpcode), size - sizeof(gBreakpointOpcode)) == 0))
 					{
 						foundBreakPoint = [_breakPointController.breakPoints zgHasObjectMatchingCondition:^(ZGBreakPoint *breakPoint) {
 							return (BOOL)(breakPoint.type == ZGBreakPointInstruction && breakPoint.variable.address == instruction.variable.address && *(uint8_t *)breakPoint.variable.rawValue == *(uint8_t *)instruction.variable.rawValue);
@@ -1282,11 +1282,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	{
 		NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 		
-#if TARGET_CPU_ARM64
-		// Setting breakpoints is not supported on arm64
-		BOOL shouldValidate = NO;
-		BOOL isBreakPoint = NO;
-#else
 		if (selectedInstructions.count == 0)
 		{
 			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"addBreakpoint");
@@ -1311,7 +1306,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 				}
 			}
 		}
-#endif
 		
 		NSString *localizableKey = [NSString stringWithFormat:@"%@Breakpoint%@", isBreakPoint ? @"remove" : @"add", selectedInstructions.count != 1 ? @"s" : @""];
 		menuItem.title = ZGLocalizedStringFromDebuggerTable(localizableKey);
@@ -1382,15 +1376,10 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 	else if (userInterfaceItem.action == @selector(showBreakPointCondition:))
 	{
-#if TARGET_CPU_ARM64
-		// Breakpoints are not supported on arm64
-		return NO;
-#else
 		if ([[self selectedInstructions] count] != 1)
 		{
 			return NO;
 		}
-#endif
 	}
 	
 	return [super validateUserInterfaceItem:userInterfaceItem];
@@ -1566,8 +1555,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
-			// Breakpoints are not supported on arm64
-#if !TARGET_CPU_ARM64
 			NSArray<ZGInstruction *> *targetInstructions = nil;
 			NSArray<ZGInstruction *> *selectedInstructions = [self selectedInstructions];
 			ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
@@ -1592,7 +1579,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			{
 				[self removeBreakPointsToInstructions:targetInstructions];
 			}
-#endif
 		}
 	}
 }

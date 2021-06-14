@@ -42,6 +42,12 @@
 #import "ZGDataValueExtracting.h"
 #import "keystone.h"
 
+#if TARGET_CPU_ARM64
+const uint8_t gBreakpointOpcode[4] = {0x00, 0x00, 0x20, 0xD4};
+#else
+const uint8_t gBreakpointOpcode[1] = {0xCC};
+#endif
+
 #define JUMP_REL32_INSTRUCTION_LENGTH 5
 #define INDIRECT_JUMP_INSTRUCTIONS_LENGTH 14
 #define POP_REGISTER_INSTRUCTION_LENGTH 1
@@ -65,9 +71,9 @@
 	
 	for (ZGBreakPoint *breakPoint in breakPoints)
 	{
-		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == processTask && breakPoint.variable.address >= address && breakPoint.variable.address < address + size)
+		if (breakPoint.type == ZGBreakPointInstruction && breakPoint.task == processTask && breakPoint.variable.address >= address && breakPoint.variable.address + sizeof(gBreakpointOpcode) <= address + size)
 		{
-			memcpy((uint8_t *)newBytes + (breakPoint.variable.address - address), breakPoint.variable.rawValue, sizeof(uint8_t));
+			memcpy((uint8_t *)newBytes + (breakPoint.variable.address - address), breakPoint.variable.rawValue, sizeof(gBreakpointOpcode));
 		}
 	}
 	

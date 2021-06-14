@@ -70,8 +70,6 @@
 #import "ZGMachBinary.h"
 #import "ZGAppTerminationState.h"
 
-#include <TargetConditionals.h>
-
 #import <mach/task.h>
 #import <mach/thread_act.h>
 #import <mach/mach_port.h>
@@ -211,6 +209,8 @@ static ZGBreakPointController *gBreakPointController;
 
 #if TARGET_CPU_ARM64
 #define IS_REGISTER_AVAILABLE(debugState, registerIndex) ((debugState.__wcr[registerIndex] & 1u) == 0)
+#define DISABLE_SINGLE_STEP(debugState) debugState.__mdscr_el1 &= ~((uint32_t)0x1)
+#define ENABLE_SINGLE_STEP(debugState) debugState.__mdscr_el1 |= (uint32_t)0x1
 #else
 #define IS_DEBUG_REGISTER_AND_STATUS_ENABLED(debugState, debugRegisterIndex, type) \
 	(((debugState.uds.type.__dr6 & (1 << debugRegisterIndex)) != 0) && ((debugState.uds.type.__dr7 & (1 << 2*debugRegisterIndex)) != 0))
@@ -266,7 +266,7 @@ static ZGBreakPointController *gBreakPointController;
 					ENABLE_WATCHPOINT(debugState, debugRegisterIndex);
 					
 					// Disable single-stepping
-					debugState.__mdscr_el1 &= ~((uint32_t)0x1);
+					DISABLE_SINGLE_STEP(debugState);
 					
 					if (!ZGSetDebugThreadState(&debugState, debugThread.thread, debugStateCount))
 					{
@@ -284,7 +284,7 @@ static ZGBreakPointController *gBreakPointController;
 			DISABLE_WATCHPOINT(debugState, debugRegisterIndex);
 			
 			// Enable single-stepping
-			debugState.__mdscr_el1 |= (uint32_t)0x1;
+			ENABLE_SINGLE_STEP(debugState);
 			
 			breakPoint.needsToRestore = YES;
 #else
@@ -358,12 +358,21 @@ static ZGBreakPointController *gBreakPointController;
 
 - (void)resumeFromBreakPoint:(ZGBreakPoint *)breakPoint
 {
+#if TARGET_CPU_ARM64
+	zg_debug_state_t debugState;
+	mach_msg_type_number_t debugStateCount;
+	if (!ZGGetDebugThreadState(&debugState, breakPoint.thread, &debugStateCount))
+	{
+		ZG_LOG(@"ERROR: Grabbing debug state failed in %s", __PRETTY_FUNCTION__);
+	}
+#else
 	zg_thread_state_t threadState;
 	mach_msg_type_number_t threadStateCount;
 	if (!ZGGetGeneralThreadState(&threadState, breakPoint.thread, &threadStateCount))
 	{
-			ZG_LOG(@"ERROR: Grabbing thread state failed in %s", __PRETTY_FUNCTION__);
+		ZG_LOG(@"ERROR: Grabbing thread state failed in %s", __PRETTY_FUNCTION__);
 	}
+#endif
 	
 	BOOL shouldSingleStep = NO;
 	
@@ -371,7 +380,7 @@ static ZGBreakPointController *gBreakPointController;
 	if (breakPoint.type == ZGBreakPointInstruction && [[self breakPoints] containsObject:breakPoint])
 	{
 		// Restore our instruction
-		ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
+		ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(gBreakpointOpcode));
 		
 		breakPoint.needsToRestore = YES;
 		
@@ -395,6 +404,7 @@ static ZGBreakPointController *gBreakPointController;
 	if (shouldSingleStep)
 	{
 #if TARGET_CPU_ARM64
+		ENABLE_SINGLE_STEP(debugState);
 #else
 		if (ZG_PROCESS_TYPE_IS_X86_64(breakPoint.process.type))
 		{
@@ -407,18 +417,28 @@ static ZGBreakPointController *gBreakPointController;
 #endif
 	}
 	
+#if TARGET_CPU_ARM64
+	if (!ZGSetDebugThreadState(&debugState, breakPoint.thread, debugStateCount))
+	{
+		ZG_LOG(@"Failure in setting registers debug state for thread %d, %s", breakPoint.thread, __PRETTY_FUNCTION__);
+	}
+#else
 	if (!ZGSetGeneralThreadState(&threadState, breakPoint.thread, threadStateCount))
 	{
 		ZG_LOG(@"Failure in setting registers thread state for thread %d, %s", breakPoint.thread, __PRETTY_FUNCTION__);
 	}
+#endif
 	
 	ZGResumeTask(breakPoint.process.processTask);
 }
 
 - (void)revertInstructionBackToNormal:(ZGBreakPoint *)breakPoint
 {
-	ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(uint8_t));
+	ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.rawValue, sizeof(gBreakpointOpcode));
+#if TARGET_CPU_ARM64
+#else
 	ZGProtect(breakPoint.process.processTask, breakPoint.variable.address, breakPoint.variable.size, breakPoint.originalProtection);
+#endif
 }
 
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint
@@ -495,6 +515,15 @@ static ZGBreakPointController *gBreakPointController;
 		ZG_LOG(@"ERROR: Grabbing thread state failed in obtaining instruction address, skipping. %s", __PRETTY_FUNCTION__);
 	}
 	
+#if TARGET_CPU_ARM64
+	zg_debug_state_t debugState;
+	mach_msg_type_number_t debugStateCount;
+	if (!ZGGetDebugThreadState(&debugState, thread, &debugStateCount))
+	{
+		ZG_LOG(@"ERROR: Grabbing debug state failed in handling instruction.. %s", __PRETTY_FUNCTION__);
+	}
+#endif
+	
 	BOOL hitBreakPoint = NO;
 	NSMutableArray<ZGBreakPoint *> *breakPointsToNotify = [[NSMutableArray alloc] init];
 	
@@ -514,6 +543,7 @@ static ZGBreakPointController *gBreakPointController;
 		
 		// Remove single-stepping
 #if TARGET_CPU_ARM64
+		DISABLE_SINGLE_STEP(debugState);
 #else
 		if (ZG_PROCESS_TYPE_IS_X86_64(breakPoint.process.type))
 		{
@@ -525,13 +555,16 @@ static ZGBreakPointController *gBreakPointController;
 		}
 #endif
 		
+		ZGMemoryAddress foundInstructionAddress = 0x0;
+		ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, breakPoint.process.type);
+		
+#if TARGET_CPU_ARM64
+		foundInstructionAddress = instructionPointer;
+#else
 		// If we had single-stepped in here, use current program counter, otherwise use instruction address before program counter
 		BOOL foundSingleStepBreakPoint = [[self breakPoints] zgHasObjectMatchingCondition:^(ZGBreakPoint *candidateBreakPoint) {
 			return (BOOL)((candidateBreakPoint.needsToRestore || candidateBreakPoint.type == ZGBreakPointSingleStepInstruction) && candidateBreakPoint.task == task && candidateBreakPoint.thread == thread);
 		}];
-		
-		ZGMemoryAddress foundInstructionAddress = 0x0;
-		ZGMemoryAddress instructionPointer = ZGInstructionPointerFromGeneralThreadState(&threadState, breakPoint.process.type);
 		
 		if (foundSingleStepBreakPoint)
 		{
@@ -553,21 +586,21 @@ static ZGBreakPointController *gBreakPointController;
 				foundInstructionAddress = [existingInstructionAddress unsignedLongLongValue];
 			}
 		}
+#endif
 		
 		if (foundInstructionAddress == breakPoint.variable.address)
 		{
-			uint8_t *opcode = NULL;
-			ZGMemorySize opcodeSize = 0x1;
+			void *opcode = NULL;
+			ZGMemorySize opcodeSize = sizeof(gBreakpointOpcode);
 			
-			if (ZGReadBytes(breakPoint.process.processTask, foundInstructionAddress, (void **)&opcode, &opcodeSize))
+			if (ZGReadBytes(breakPoint.process.processTask, foundInstructionAddress, &opcode, &opcodeSize))
 			{
-				if (*opcode == X86_INSTRUCTION_BREAKPOINT_OPCODE)
+				if (memcmp(opcode, gBreakpointOpcode, opcodeSize) == 0)
 				{
 					hitBreakPoint = YES;
 					ZGSuspendTask(task);
 					
-#if TARGET_CPU_ARM64
-#else
+#if !TARGET_CPU_ARM64
 					// Restore program counter
 					ZGSetInstructionPointerFromGeneralThreadState(&threadState, breakPoint.variable.address, breakPoint.process.type);
 #endif
@@ -584,8 +617,7 @@ static ZGBreakPointController *gBreakPointController;
 		if (breakPoint.needsToRestore)
 		{
 			// Restore our breakpoint
-			uint8_t writeOpcode = X86_INSTRUCTION_BREAKPOINT_OPCODE;
-			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, &writeOpcode, sizeof(uint8_t));
+			ZGWriteBytesOverwritingProtection(breakPoint.process.processTask, breakPoint.variable.address, gBreakpointOpcode, sizeof(gBreakpointOpcode));
 			
 			breakPoint.needsToRestore = NO;
 			handledInstructionBreakPoint = YES;
@@ -606,6 +638,7 @@ static ZGBreakPointController *gBreakPointController;
 		
 		// Remove single-stepping
 #if TARGET_CPU_ARM64
+		DISABLE_SINGLE_STEP(debugState);
 #else
 		if (ZG_PROCESS_TYPE_IS_X86_64(candidateBreakPoint.process.type))
 		{
@@ -635,10 +668,17 @@ static ZGBreakPointController *gBreakPointController;
 	
 	if (handledInstructionBreakPoint)
 	{
+#if TARGET_CPU_ARM64
+		if (!ZGSetDebugThreadState(&debugState, thread, debugStateCount))
+		{
+			ZG_LOG(@"Failure in setting registers debug state for catching instruction breakpoint for thread %d, %s", thread, __PRETTY_FUNCTION__);
+		}
+#else
 		if (!ZGSetGeneralThreadState(&threadState, thread, threadStateCount))
 		{
 			ZG_LOG(@"Failure in setting registers thread state for catching instruction breakpoint for thread %d, %s", thread, __PRETTY_FUNCTION__);
 		}
+#endif
 	}
 	
 	ZGRegisterEntry registerEntries[ZG_MAX_REGISTER_ENTRIES];
@@ -737,9 +777,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		@autoreleasepool
 		{
 			handledWatchPoint = [gBreakPointController handleWatchPointsWithTask:task inThread:thread];
-#if !TARGET_CPU_ARM64
 			handledInstructionBreakPoint = [gBreakPointController handleInstructionBreakPointsWithTask:task inThread:thread];
-#endif
 		}
 	}
 	
@@ -1116,7 +1154,9 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 		return NO;
 	}
 	
-	// Find memory protection of instruction. If it's not executable, make it executable
+#if TARGET_CPU_ARM64
+#else
+	// Find memory protection of instruction. If it's not executable, make it executable for efficiency
 	ZGMemoryAddress protectionAddress = instruction.variable.address;
 	ZGMemorySize protectionSize = instruction.variable.size;
 	ZGMemoryProtection memoryProtection = 0;
@@ -1139,12 +1179,11 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	{
 		return NO;
 	}
+#endif
 	
 	ZGSuspendTask(process.processTask);
 	
 	ZGVariable *variable = [instruction.variable copy];
-	
-	uint8_t breakPointOpcode = X86_INSTRUCTION_BREAKPOINT_OPCODE;
 	
 	ZGBreakPoint *breakPoint = [[ZGBreakPoint alloc] initWithProcess:process type:ZGBreakPointInstruction delegate:delegate];
 	
@@ -1152,13 +1191,16 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	breakPoint.hidden = isHidden;
 	breakPoint.thread = thread;
 	breakPoint.basePointer = basePointer;
+#if TARGET_CPU_ARM64
+#else
 	breakPoint.originalProtection = memoryProtection;
+#endif
 	breakPoint.condition = condition;
 	breakPoint.callback = callback;
 	
 	[self addBreakPoint:breakPoint];
 	
-	BOOL success = ZGWriteBytesIgnoringProtection(process.processTask, variable.address, &breakPointOpcode, sizeof(uint8_t));
+	BOOL success = ZGWriteBytesIgnoringProtection(process.processTask, variable.address, gBreakpointOpcode, sizeof(gBreakpointOpcode));
 	if (!success)
 	{
 		[self removeBreakPoint:breakPoint];

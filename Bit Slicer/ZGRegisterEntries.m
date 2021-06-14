@@ -42,6 +42,17 @@ void *ZGRegisterEntryValue(ZGRegisterEntry *entry)
 }
 
 #if TARGET_CPU_ARM64
+
+#define ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName) \
+do { \
+	strncpy((char *)&entries[entryIndex].name, #registerName, sizeof(entries[entryIndex].name)); \
+	entries[entryIndex].size = sizeof(threadState.__##registerName); \
+	memcpy(&entries[entryIndex].value, &threadState.__##registerName, entries[entryIndex].size); \
+	entries[entryIndex].offset = offsetof(zg_thread_state_t, __##registerName); \
+	entries[entryIndex].type = ZGRegisterGeneralPurpose; \
+	entryIndex++; \
+} while(0)
+
 #else
 
 #define ADD_GENERAL_REGISTER(entries, entryIndex, threadState, registerName, structureType, structName) \
@@ -80,18 +91,21 @@ do { \
 		entryIndex++;
 	}
 	
-	// Add program status register
-	{
-		const char *registerName = "cpsr";
-		strncpy((char *)&entries[entryIndex].name, registerName, sizeof(entries[entryIndex].name));
-		
-		entries[entryIndex].size = sizeof(threadState.__cpsr);
-		memcpy(&entries[entryIndex].value, &threadState.__cpsr, entries[entryIndex].size);
-		entries[entryIndex].offset = offsetof(zg_thread_state_t, __cpsr);
-		entries[entryIndex].type = ZGRegisterGeneralPurpose;
-		
-		entryIndex++;
-	}
+	// Frame pointer register
+	ADD_GENERAL_REGISTER(entries, entryIndex, threadState, fp);
+	
+	// Link register
+	ADD_GENERAL_REGISTER(entries, entryIndex, threadState, lr);
+	
+	// Stack pointer
+	ADD_GENERAL_REGISTER(entries, entryIndex, threadState, sp);
+	
+	// Program counter
+	ADD_GENERAL_REGISTER(entries, entryIndex, threadState, pc);
+	
+	// Program status register
+	ADD_GENERAL_REGISTER(entries, entryIndex, threadState, cpsr);
+	
 #else
 	if (ZG_PROCESS_TYPE_IS_X86_64(processType))
 	{
@@ -338,7 +352,7 @@ do { \
 {
 	NSMutableArray<ZGVariable *> *registerVariables = [[NSMutableArray alloc] init];
 	
-	ZGRegisterEntry entries[28];
+	ZGRegisterEntry entries[35];
 	[ZGRegisterEntries getRegisterEntries:entries fromGeneralPurposeThreadState:threadState processType:processType];
 	
 	for (ZGRegisterEntry *entry = entries; !ZG_REGISTER_ENTRY_IS_NULL(entry); entry++)

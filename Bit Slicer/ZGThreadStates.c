@@ -95,9 +95,9 @@ void ZGSetInstructionPointerFromGeneralThreadState(zg_thread_state_t *threadStat
 ZGMemoryAddress ZGBasePointerFromGeneralThreadState(zg_thread_state_t *threadState, ZGProcessType type)
 {
 #if TARGET_CPU_ARM64
-	(void)threadState;
 	(void)type;
-	return 0;
+	ZGMemoryAddress framePointer = arm_thread_state64_get_fp(*threadState);
+	return framePointer;
 #else
 	ZGMemoryAddress basePointer = (ZG_PROCESS_TYPE_IS_X86_64(type)) ? threadState->uts.ts64.__rbp : threadState->uts.ts32.__ebp;
 	return basePointer;

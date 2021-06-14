@@ -35,8 +35,6 @@
 #import "ZGMemoryTypes.h"
 #import "ZGBreakPointDelegate.h"
 
-#define X86_INSTRUCTION_BREAKPOINT_OPCODE 0xCC
-
 @class ZGVariable;
 @class ZGProcess;
 @class ZGBreakPoint;
