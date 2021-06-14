@@ -314,7 +314,7 @@ static ZGBreakPointController *gBreakPointController;
 			ZGMemoryAddress hitInstructionAddress = ZGInstructionPointerFromGeneralThreadState(&threadState, breakPoint.process.type);
 			ZGMemoryAddress relocatedInstructionAddress;
 #if TARGET_CPU_ARM64
-			relocatedInstructionAddress = hitInstructionAddress + 0x4;
+			relocatedInstructionAddress = hitInstructionAddress + 0x1;
 #else
 			relocatedInstructionAddress = hitInstructionAddress;
 #endif
