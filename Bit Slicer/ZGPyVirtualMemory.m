@@ -674,7 +674,7 @@ static PyObject *VirtualMemory_scanByteString(VirtualMemory *self, PyObject *arg
 		if (byteArrayStringValue != nil)
 		{
 			ZGMemorySize dataSize = 0;
-			void *searchValue = ZGValueFromString(self->is64Bit, byteArrayStringValue, ZGByteArray, &dataSize);
+			void *searchValue = ZGValueFromString(self->processType, byteArrayStringValue, ZGByteArray, &dataSize);
 			
 			ZGSearchData *searchData =
 			[[ZGSearchData alloc]

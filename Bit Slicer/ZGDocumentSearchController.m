@@ -433,7 +433,7 @@
 			{
 				// Clearly a range type of search
 				ZGMemorySize rangeDataSize;
-				_searchData.rangeValue = ZGValueFromString(ZG_PROCESS_TYPE_IS_64_BIT(currentProcess.type), flagsExpression, dataType, &rangeDataSize);
+				_searchData.rangeValue = ZGValueFromString(currentProcess.type, flagsExpression, dataType, &rangeDataSize);
 				if (_searchData.rangeValue == NULL)
 				{
 					NSLog(@"Failed to parse range value from %@...", flagsExpression);
@@ -460,7 +460,7 @@
 			{
 				// Clearly an epsilon flag
 				ZGMemorySize epsilonDataSize;
-				void *epsilon = ZGValueFromString(ZG_PROCESS_TYPE_IS_64_BIT(currentProcess.type), flagsExpression, ZGDouble, &epsilonDataSize);
+				void *epsilon = ZGValueFromString(currentProcess.type, flagsExpression, ZGDouble, &epsilonDataSize);
 				if (epsilon != NULL)
 				{
 					_searchData.epsilon = *((double *)epsilon);
@@ -527,7 +527,6 @@
 	ZGFunctionType functionType = _functionType;
 	
 	ZGProcessType processType = windowController.currentProcess.type;
-	BOOL is64Bit = ZG_PROCESS_TYPE_IS_64_BIT(processType);
 	
 	_searchData.shouldCompareStoredValues = ZGIsFunctionTypeStore(functionType);
 	
@@ -546,7 +545,7 @@
 		}
 		
 		ZGMemorySize dataSize = 0;
-		void *searchValue = ZGValueFromString(is64Bit, finalSearchExpression, dataType, &dataSize);
+		void *searchValue = ZGValueFromString(processType, finalSearchExpression, dataType, &dataSize);
 		if (searchValue != NULL)
 		{
 			_searchData.searchValue = searchValue;
@@ -610,8 +609,8 @@
 				return NO;
 			}
 			
-			_searchData.additiveConstant = ZGValueFromString(is64Bit, additiveConstantString, dataType, NULL);
-			_searchData.multiplicativeConstant = ZGValueFromString(is64Bit, multiplicativeConstantString, dataType, NULL);
+			_searchData.additiveConstant = ZGValueFromString(processType, additiveConstantString, dataType, NULL);
+			_searchData.multiplicativeConstant = ZGValueFromString(processType, multiplicativeConstantString, dataType, NULL);
 			
 			if (_searchData.additiveConstant == NULL || _searchData.multiplicativeConstant == NULL)
 			{
@@ -631,7 +630,7 @@
 		{
 			void *searchValue = _searchData.searchValue;
 			assert(searchValue != NULL);
-			void *swappedValue = ZGSwappedValue(is64Bit, searchValue, dataType, _searchData.dataSize);
+			void *swappedValue = ZGSwappedValue(processType, searchValue, dataType, _searchData.dataSize);
 			if (swappedValue != NULL)
 			{
 				_searchData.swappedValue = swappedValue;

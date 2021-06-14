@@ -161,7 +161,7 @@
 	ZGSearchData *searchData = [[ZGSearchData alloc] initWithSearchValue:copiedBytes dataSize:size dataAlignment:alignment pointerSize:8];
 	searchData.beginAddress = address;
 	searchData.endAddress = address + _data.length;
-	searchData.swappedValue = ZGSwappedValue(YES, bytes, dataType, size);
+	searchData.swappedValue = ZGSwappedValue(ZGProcessTypeX86_64, bytes, dataType, size);
 	
 	return searchData;
 }
@@ -668,7 +668,7 @@
 	if (byteArrayFlags == NULL) XCTFail(@"Byte array flags is NULL");
 	
 	searchData.byteArrayFlags = byteArrayFlags;
-	searchData.searchValue = ZGValueFromString(YES, wildcardExpression, ZGByteArray, NULL);
+	searchData.searchValue = ZGValueFromString(ZGProcessTypeX86_64, wildcardExpression, ZGByteArray, NULL);
 	
 	ZGSearchResults *equalResultsWildcards = ZGSearchForData(_processTask, searchData, nil, ZGByteArray, 0, ZGEquals);
 	XCTAssertEqual(equalResultsWildcards.addressCount, 1U);

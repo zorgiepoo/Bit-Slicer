@@ -768,7 +768,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	{
 		if (variable.byteOrder != CFByteOrderGetCurrent())
 		{
-			swappedValue = ZGSwappedValue(ZG_PROCESS_TYPE_IS_64_BIT(windowController.currentProcess.type), newValue, variableType, writeSize);
+			swappedValue = ZGSwappedValue(windowController.currentProcess.type, newValue, variableType, writeSize);
 			newValue = swappedValue;
 		}
 		

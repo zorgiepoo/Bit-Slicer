@@ -1688,7 +1688,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	// Make sure the old and new value that we are writing have the same size in bytes, so that undo/redo will work correctly for different sizes
 	
 	ZGMemorySize newWriteSize = 0;
-	void *newWriteValue = ZGValueFromString(ZG_PROCESS_TYPE_IS_64_BIT(self.currentProcess.type), stringValue, ZGByteArray, &newWriteSize);
+	void *newWriteValue = ZGValueFromString(self.currentProcess.type, stringValue, ZGByteArray, &newWriteSize);
 	if (newWriteValue)
 	{
 		if (newWriteSize > 0)

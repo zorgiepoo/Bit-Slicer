@@ -34,15 +34,17 @@
 #import "ZGVariableDataInfo.h"
 #import "NSStringAdditions.h"
 
-void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
+void *ZGValueFromString(ZGProcessType processType, NSString *stringValue, ZGVariableType dataType, ZGMemorySize *dataSize)
 {
 	void *value = NULL;
 	BOOL searchValueIsAHexRepresentation = stringValue.zgIsHexRepresentation;
 	ZGMemorySize tempDataSize = 0;
 	
+	BOOL isProcess64Bit = ZG_PROCESS_TYPE_IS_64_BIT(processType);
+	
 	if (ZGIsNumericalDataType(dataType))
 	{
-		tempDataSize = ZGDataSizeFromNumericalDataType(isProcess64Bit, dataType);
+		tempDataSize = ZGDataSizeFromNumericalDataType(processType, dataType);
 	}
 	
 	if (dataType == ZGInt8 && tempDataSize > 0)
@@ -213,7 +215,7 @@ void *ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableTy
 	return value;
 }
 
-void *ZGSwappedValue(BOOL isProcess64Bit, const void *value, ZGVariableType dataType, ZGMemorySize dataSize)
+void *ZGSwappedValue(ZGProcessType processType, const void *value, ZGVariableType dataType, ZGMemorySize dataSize)
 {
 	void *swappedValue = malloc(dataSize);
 	if (swappedValue == NULL)
@@ -223,7 +225,7 @@ void *ZGSwappedValue(BOOL isProcess64Bit, const void *value, ZGVariableType data
 	
 	if (dataType == ZGPointer)
 	{
-		dataType = isProcess64Bit ? ZGInt64 : ZGInt32;
+		dataType = ZG_PROCESS_TYPE_IS_64_BIT(processType) ? ZGInt64 : ZGInt32;
 	}
 	
 	switch (dataType)

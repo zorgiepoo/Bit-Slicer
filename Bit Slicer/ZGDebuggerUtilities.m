@@ -136,7 +136,7 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 + (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
 	ZGMemorySize newSize = 0;
-	void *newValue = ZGValueFromString(ZG_PROCESS_TYPE_IS_64_BIT(process.type), stringValue, ZGByteArray, &newSize);
+	void *newValue = ZGValueFromString(process.type, stringValue, ZGByteArray, &newSize);
 	
 	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] atAddress:address processTask:process.processTask breakPoints:breakPoints];
 }

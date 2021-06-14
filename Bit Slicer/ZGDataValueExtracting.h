@@ -33,11 +33,12 @@
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
 #import "ZGVariableTypes.h"
+#import "ZGProcessTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-void * _Nullable ZGValueFromString(BOOL isProcess64Bit, NSString *stringValue, ZGVariableType dataType, ZGMemorySize * _Nullable dataSize);
-void * _Nullable ZGSwappedValue(BOOL isProcess64Bit, const void *value, ZGVariableType dataType, ZGMemorySize dataSize);
+void * _Nullable ZGValueFromString(ZGProcessType processType, NSString *stringValue, ZGVariableType dataType, ZGMemorySize * _Nullable dataSize);
+void * _Nullable ZGSwappedValue(ZGProcessType processType, const void *value, ZGVariableType dataType, ZGMemorySize dataSize);
 
 NSArray<NSString *> *ZGByteArrayComponentsFromString(NSString *searchString);
 unsigned char * _Nullable ZGAllocateFlagsForByteArrayWildcards(NSString *searchValue);

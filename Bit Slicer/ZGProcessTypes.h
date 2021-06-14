@@ -47,7 +47,7 @@ typedef enum : int8_t
 } ZGProcessType;
 #pragma clang diagnostic pop
 
-#define ZG_PROCESS_TYPE_IS_64_BIT(processType) (processType != ZGProcessTypeI386)
+#define ZG_PROCESS_TYPE_IS_64_BIT(processType) (processType == ZGProcessTypeX86_64 || processType == ZGProcessTypeARM64)
 
 #define ZG_PROCESS_POINTER_SIZE(processType) (ZG_PROCESS_TYPE_IS_64_BIT(processType) ? sizeof(int64_t) : sizeof(int32_t))
 
