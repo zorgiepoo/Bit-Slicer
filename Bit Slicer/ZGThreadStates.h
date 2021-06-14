@@ -43,7 +43,8 @@
 #include <TargetConditionals.h>
 
 #if TARGET_CPU_ARM64
-typedef arm_amx_state_t zg_vector_state_t;
+//typedef arm_amx_state_t zg_vector_state_t;
+typedef arm_neon_state64_t zg_vector_state_t;
 typedef arm_thread_state64_t zg_thread_state_t;
 typedef arm_debug_state64_t zg_debug_state_t;
 typedef arm_state_hdr_t zg_state_hdr_t;

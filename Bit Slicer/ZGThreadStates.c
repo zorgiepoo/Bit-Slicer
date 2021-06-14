@@ -33,7 +33,7 @@
 #include "ZGThreadStates.h"
 
 #if TARGET_CPU_ARM64
-typedef arm_neon_state_t zg_float_state_t;
+typedef arm_neon_state64_t zg_float_state_t;
 #else
 typedef x86_float_state_t zg_float_state_t;
 #endif
@@ -176,12 +176,24 @@ static bool ZGSetFloatThreadState(zg_float_state_t *floatState, thread_act_t thr
 bool ZGGetVectorThreadState(zg_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t *stateCount, ZGProcessType type, bool *hasAVXSupport)
 {
 #if TARGET_CPU_ARM64
-	(void)vectorState;
-	(void)thread;
-	(void)stateCount;
 	(void)type;
-	(void)hasAVXSupport;
-	return false;
+	
+	/*
+	 _STRUCT_ARM_NEON_STATE64
+	 {
+		 __uint128_t __v[32];
+		 __uint32_t  __fpsr;
+		 __uint32_t  __fpcr;
+	 };
+	 */
+	
+	mach_msg_type_number_t localStateCount = ARM_NEON_STATE64_COUNT;
+	bool success = (thread_get_state(thread, ARM_NEON_STATE64, (thread_state_t)vectorState, &localStateCount) == KERN_SUCCESS);
+	
+	if (hasAVXSupport != NULL) *hasAVXSupport = false;
+	if (stateCount != NULL) *stateCount = localStateCount;
+	
+	return success;
 #else
 	if (ZGGetAVXThreadState((zg_vector_state_t *)vectorState, thread, stateCount, type))
 	{
@@ -198,11 +210,9 @@ bool ZGGetVectorThreadState(zg_vector_state_t *vectorState, thread_act_t thread,
 bool ZGSetVectorThreadState(zg_vector_state_t *vectorState, thread_act_t thread, mach_msg_type_number_t stateCount, ZGProcessType type)
 {
 #if TARGET_CPU_ARM64
-	(void)vectorState;
-	(void)thread;
-	(void)stateCount;
 	(void)type;
-	return false;
+	
+	return (thread_set_state(thread, ARM_NEON_STATE64, (thread_state_t)vectorState, stateCount) == KERN_SUCCESS);
 #else
 	if (ZGSetAVXThreadState((zg_vector_state_t *)vectorState, thread, stateCount, type))
 	{

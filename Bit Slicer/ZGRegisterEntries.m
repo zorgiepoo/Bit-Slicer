@@ -65,6 +65,33 @@ do { \
 	int entryIndex = 0;
 	
 #if TARGET_CPU_ARM64
+	// Add general purpose registers
+	for (size_t registerIndex = 0; registerIndex < sizeof(threadState.__x) / sizeof(*threadState.__x); registerIndex++)
+	{
+		const char *registerName = [[NSString stringWithFormat:@"x%ld", registerIndex] UTF8String];
+		if (registerName == NULL) continue;
+		
+		strncpy((char *)&entries[entryIndex].name, registerName, sizeof(entries[entryIndex].name));
+		entries[entryIndex].size = sizeof(*threadState.__x);
+		memcpy(&entries[entryIndex].value, &threadState.__x[registerIndex], entries[entryIndex].size);
+		entries[entryIndex].offset = registerIndex * sizeof(*threadState.__x);
+		entries[entryIndex].type = ZGRegisterGeneralPurpose;
+		
+		entryIndex++;
+	}
+	
+	// Add program status register
+	{
+		const char *registerName = "cpsr";
+		strncpy((char *)&entries[entryIndex].name, registerName, sizeof(entries[entryIndex].name));
+		
+		entries[entryIndex].size = sizeof(threadState.__cpsr);
+		memcpy(&entries[entryIndex].value, &threadState.__cpsr, entries[entryIndex].size);
+		entries[entryIndex].offset = offsetof(zg_thread_state_t, __cpsr);
+		entries[entryIndex].type = ZGRegisterGeneralPurpose;
+		
+		entryIndex++;
+	}
 #else
 	if (ZG_PROCESS_TYPE_IS_X86_64(processType))
 	{
@@ -159,6 +186,47 @@ do { \
 	int entryIndex = 0;
 	
 #if TARGET_CPU_ARM64
+	// Add vector registers
+	for (size_t registerIndex = 0; registerIndex < sizeof(vectorState.__v) / sizeof(*vectorState.__v); registerIndex++)
+	{
+		const char *registerName = [[NSString stringWithFormat:@"v%ld", registerIndex] UTF8String];
+		if (registerName == NULL) continue;
+		
+		strncpy((char *)&entries[entryIndex].name, registerName, sizeof(entries[entryIndex].name));
+		entries[entryIndex].size = sizeof(*vectorState.__v);
+		memcpy(&entries[entryIndex].value, &vectorState.__v[registerIndex], entries[entryIndex].size);
+		entries[entryIndex].offset = registerIndex * sizeof(*vectorState.__v);
+		entries[entryIndex].type = ZGRegisterVector;
+		
+		entryIndex++;
+	}
+	
+	// Add fpsr
+	{
+		const char *registerName = "fpsr";
+		
+		strncpy((char *)&entries[entryIndex].name, registerName, sizeof(entries[entryIndex].name));
+		entries[entryIndex].size = sizeof(vectorState.__fpsr);
+		memcpy(&entries[entryIndex].value, &vectorState.__fpsr, entries[entryIndex].size);
+		entries[entryIndex].offset = offsetof(zg_vector_state_t, __fpsr);
+		entries[entryIndex].type = ZGRegisterVector;
+		
+		entryIndex++;
+	}
+	
+	// Add fpcr
+	{
+		const char *registerName = "fpcr";
+		
+		strncpy((char *)&entries[entryIndex].name, registerName, sizeof(entries[entryIndex].name));
+		entries[entryIndex].size = sizeof(vectorState.__fpcr);
+		memcpy(&entries[entryIndex].value, &vectorState.__fpcr, entries[entryIndex].size);
+		entries[entryIndex].offset = offsetof(zg_vector_state_t, __fpcr);
+		entries[entryIndex].type = ZGRegisterVector;
+		
+		entryIndex++;
+	}
+	
 #else
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fcw); // FPU control word
 	ADD_VECTOR_REGISTER(entries, entryIndex, vectorState, fsw); // FPU status word
