@@ -178,15 +178,6 @@ bool ZGGetVectorThreadState(zg_vector_state_t *vectorState, thread_act_t thread,
 #if TARGET_CPU_ARM64
 	(void)type;
 	
-	/*
-	 _STRUCT_ARM_NEON_STATE64
-	 {
-		 __uint128_t __v[32];
-		 __uint32_t  __fpsr;
-		 __uint32_t  __fpcr;
-	 };
-	 */
-	
 	mach_msg_type_number_t localStateCount = ARM_NEON_STATE64_COUNT;
 	bool success = (thread_get_state(thread, ARM_NEON_STATE64, (thread_state_t)vectorState, &localStateCount) == KERN_SUCCESS);
 	
