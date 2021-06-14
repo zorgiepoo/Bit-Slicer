@@ -75,7 +75,8 @@
 			switch (returnAddressSize)
 			{
 				case sizeof(ZGMemoryAddress):
-					returnAddress = *(ZGMemoryAddress *)returnAddressBytes;
+					// Ignore bits which may be used for something other than the return address
+					returnAddress = *(ZGMemoryAddress *)returnAddressBytes & 0x00007FFFFFFFFFFF;
 					break;
 				case sizeof(ZG32BitMemoryAddress):
 					returnAddress = *(ZG32BitMemoryAddress *)returnAddressBytes;
