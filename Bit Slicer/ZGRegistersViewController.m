@@ -110,6 +110,16 @@
 	
 	for (ZGRegister *theRegister in _registers)
 	{
+#if TARGET_CPU_ARM64
+		if ([theRegister.variable.name isEqualToString:@"pc"])
+		{
+			ZGVariable *newVariable = [theRegister.variable copy];
+			[newVariable setRawValue:&newInstructionPointer];
+			
+			[self changeRegister:theRegister oldVariable:theRegister.variable newVariable:newVariable];
+			break;
+		}
+#else
 		if ([@[@"eip", @"rip"] containsObject:theRegister.variable.name])
 		{
 			ZGVariable *newVariable = [theRegister.variable copy];
@@ -127,6 +137,7 @@
 			[self changeRegister:theRegister oldVariable:theRegister.variable newVariable:newVariable];
 			break;
 		}
+#endif
 	}
 }
 
