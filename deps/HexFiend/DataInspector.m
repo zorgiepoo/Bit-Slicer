@@ -71,7 +71,7 @@
 	// Pick an absent inspector type.
 	int x = (__builtin_ffs((int32_t)(~present))-1);
 	enum Endianness_t y = (enum Endianness_t)(x/eInspectorTypeCount);
-	enum InspectorType_t z = x % eInspectorTypeCount;
+	enum InspectorType_t z = (enum InspectorType_t)(x % (int)eInspectorTypeCount);
 	
 	if(x < 0 || y >= eEndianCount || z >= eInspectorTypeCount) // No absent inspector type
 		return ret;

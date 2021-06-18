@@ -250,6 +250,7 @@
 	else
 	{
 		NSLog(@"Error: Restored window controller is nil from identifier %@", identifier);
+		completionHandler(nil, nil);
 	}
 }
 

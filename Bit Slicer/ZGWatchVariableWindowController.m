@@ -325,6 +325,8 @@
 		ZGRunAlertPanelWithOKButton(
 						ZGLocalizableWatchVariableString(@"failedToWatchVariableAlertTitle"),
 						ZGLocalizableWatchVariableString(@"failedToWatchVariableAlertMessage"));
+		
+		completionHandler(@[]);
 		return;
 	}
 	
