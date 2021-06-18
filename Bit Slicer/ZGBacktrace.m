@@ -61,7 +61,8 @@
 		[newInstructions addObject:currentInstruction];
 		[newBasePointers addObject:@(basePointer)];
 		
-		while (basePointer > 0 && (maxNumberOfInstructionsRetrieved == 0 || newInstructions.count < maxNumberOfInstructionsRetrieved))
+		// Rosetta processes don't use the base pointer register we retrieved, don't even try
+		while (!process.translated && basePointer > 0 && (maxNumberOfInstructionsRetrieved == 0 || newInstructions.count < maxNumberOfInstructionsRetrieved))
 		{
 			// Read return address
 			void *returnAddressBytes = NULL;
