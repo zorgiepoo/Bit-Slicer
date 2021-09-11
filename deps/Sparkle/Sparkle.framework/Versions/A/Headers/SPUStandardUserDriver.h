@@ -10,31 +10,31 @@
 #if __has_warning("-Watimport-in-framework-header")
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
-@import Cocoa;
+@import Foundation;
 #else
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #endif
-#import "SPUUserDriver.h"
-#import "SUExport.h"
+#import <Sparkle/SPUUserDriver.h>
+#import <Sparkle/SUExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUStandardUserDriverDelegate;
 
-/*!
+/**
  Sparkle's standard built-in user driver for updater interactions
  */
 SU_EXPORT @interface SPUStandardUserDriver : NSObject <SPUUserDriver>
 
-/*!
+/**
  Initializes a Sparkle's standard user driver for user update interactions
  
  @param hostBundle The target bundle of the host that is being updated.
- @param delegate The delegate to this user driver. Pass nil if you don't want to provide one.
+ @param delegate The optional delegate to this user driver.
  */
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(nullable id<SPUStandardUserDriverDelegate>)delegate;
 
-/*!
+/**
  Use initWithHostBundle:delegate: instead.
  */
 - (instancetype)init NS_UNAVAILABLE;

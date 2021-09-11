@@ -14,14 +14,14 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import "SUExport.h"
+#import <Sparkle/SUExport.h>
 
-/*!
+/**
     Applies special display formatting to version numbers.
 */
-@protocol SUVersionDisplay
+SU_EXPORT @protocol SUVersionDisplay
 
-/*!
+/**
     Formats two version strings.
 
     Both versions are provided so that important distinguishing information

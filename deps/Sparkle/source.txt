@@ -1,4 +1,2 @@
 Source: https://github.com/sparkle-project/Sparkle
-Commit: 91e71c219cd92eb29f824f97a71d7273569dd409
-Branch: 2.x
-Config: Set MACOSX_DEPLOYMENT_TARGET=10.11
+Tag: 2.0.0-beta.2
