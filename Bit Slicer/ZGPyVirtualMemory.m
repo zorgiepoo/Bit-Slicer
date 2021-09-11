@@ -765,6 +765,7 @@ static PyObject *VirtualMemory_base(VirtualMemory *self, PyObject *args)
 			}
 			else
 			{
+				imageAddress = self->baseAddress;
 				retrievedImageAddress = YES;
 			}
 		}
