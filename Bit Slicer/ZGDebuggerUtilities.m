@@ -593,6 +593,12 @@ error:(NSError * __autoreleasing *)error
 
 + (NSArray<ZGInstruction *> *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 {
+	// Code injection for arm64 is not supported
+	if (ZG_PROCESS_TYPE_IS_ARM64(process.type))
+	{
+		return nil;
+	}
+	
 	int consumedLength =
 	[self shouldInjectCodeWithRelativeBranchingWithProcess:process sourceAddress:address destinationAddress:destinationAddress] ?
 	JUMP_REL32_INSTRUCTION_LENGTH :
