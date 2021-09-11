@@ -38,11 +38,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.7.10</string>
+	<string>1.7.11a1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1139</string>
+	<string>1140</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -54,7 +54,7 @@
 	<key>SUEnableSystemProfiling</key>
 	<string>YES</string>
 	<key>SUFeedURL</key>
-	<string>https://zgcoder.net/bitslicer/update/appcast.xml</string>
+	<string>https://zgcoder.net/bitslicer/update/appcast_v2.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 	<key>SUPublicEDKey</key>

@@ -42,7 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL checksForAlphaUpdates;
 @property (nonatomic) BOOL sendsAnonymousInfo;
 
-- (void)reloadValuesFromDefaults;
 - (void)checkForUpdates;
 
 @end

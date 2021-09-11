@@ -35,17 +35,15 @@
 #import <Sparkle/Sparkle.h>
 #import "ZGNullability.h"
 
-#define ZG_CHECK_FOR_UPDATES @"SUEnableAutomaticChecks"
 #define ZG_CHECK_FOR_ALPHA_UPDATES @"ZG_CHECK_FOR_ALPHA_UPDATES_2"
+#define ZG_ENABLE_STAGING_CHANNEL @"ZG_ENABLE_STAGING_CHANNEL"
 
-#define SU_FEED_URL_KEY @"SUFeedURL"
-#define SU_SEND_PROFILE_INFO_KEY @"SUSendProfileInfo"
-
-#define APPCAST_URL @"https://zgcoder.net/bitslicer/update/appcast.xml"
-#define ALPHA_APPCAST_URL @"https://zgcoder.net/bitslicer/update/appcast_alpha.xml"
+@interface ZGAppUpdaterController () <SPUUpdaterDelegate>
+@end
 
 @implementation ZGAppUpdaterController
 {
+	SPUStandardUpdaterController * _Nonnull _updaterController;
 	SPUUpdater * _Nonnull _updater;
 }
 
@@ -59,9 +57,8 @@
 	[NSUserDefaults.standardUserDefaults
 	 registerDefaults:
 	 @{
-	   // If user is running an alpha version, we should set this to YES
-	   ZG_CHECK_FOR_ALPHA_UPDATES : @([self runningAlpha]),
-	   SU_FEED_URL_KEY : ([self runningAlpha] ? ALPHA_APPCAST_URL : APPCAST_URL),
+	   // If user is running an alpha version, we should default alpha update checks to YES
+	   ZG_CHECK_FOR_ALPHA_UPDATES : @([self runningAlpha])
 	   }];
 }
 
@@ -70,61 +67,62 @@
 	self = [super init];
 	if (self != nil)
 	{
-		[self reloadValuesFromDefaults];
+		_updaterController = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:NO updaterDelegate:self userDriverDelegate:nil];
+		_updater = _updaterController.updater;
 		
-		NSBundle *updateBundle = [NSBundle mainBundle];
+		// Clear feed URL so we don't use its cache
+		[_updater setFeedURL:nil];
 		
-		id<SPUUserDriver> userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:updateBundle delegate:nil];
-		_updater = [[SPUUpdater alloc] initWithHostBundle:updateBundle applicationBundle:updateBundle userDriver:userDriver delegate:nil];
-		
-		[self updateFeedURL];
-		
-		NSError *updateError = nil;
-		if (![_updater startUpdater:&updateError])
-		{
-			NSLog(@"Error: Failed to start updater with error: %@", updateError);
-			// I don't want users stranded on old versions
-			abort();
-		}
+		[_updaterController startUpdater];
 	}
 	return self;
 }
 
-- (void)reloadValuesFromDefaults
+- (NSSet<NSString *> *)allowedChannelsForUpdater:(SPUUpdater *)__unused updater
 {
-	_checksForUpdates = [[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_UPDATES];
-	_checksForAlphaUpdates = [[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES];
-	_sendsAnonymousInfo = [[NSUserDefaults standardUserDefaults] boolForKey:SU_SEND_PROFILE_INFO_KEY];
+	NSMutableArray<NSString *> *channels = [NSMutableArray array];
+	
+	if ([self checksForAlphaUpdates])
+	{
+		[channels addObject:@"alpha"];
+	}
+	
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:ZG_ENABLE_STAGING_CHANNEL])
+	{
+		[channels addObject:@"staging"];
+	}
+	
+	return [NSSet setWithArray:channels];
 }
 
-- (void)updateFeedURL
+- (BOOL)checksForUpdates
 {
-	[_updater setFeedURL:ZGUnwrapNullableObject([NSURL URLWithString:_checksForAlphaUpdates ? ALPHA_APPCAST_URL : APPCAST_URL])];
+	return _updater.automaticallyChecksForUpdates;
 }
 
 - (void)setChecksForUpdates:(BOOL)checksForUpdates
 {
-	_checksForUpdates = checksForUpdates;
-	
-	[self updateFeedURL];
-	
-	[[NSUserDefaults standardUserDefaults] setBool:_checksForUpdates forKey:ZG_CHECK_FOR_UPDATES];
+	_updater.automaticallyChecksForUpdates = checksForUpdates;
+}
+
+- (BOOL)checksForAlphaUpdates
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:ZG_CHECK_FOR_ALPHA_UPDATES];
 }
 
 - (void)setChecksForAlphaUpdates:(BOOL)checksForAlphaUpdates
 {
-	_checksForAlphaUpdates = checksForAlphaUpdates;
-	
-	[self updateFeedURL];
-	
-	[[NSUserDefaults standardUserDefaults] setBool:_checksForAlphaUpdates forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+	[[NSUserDefaults standardUserDefaults] setBool:checksForAlphaUpdates forKey:ZG_CHECK_FOR_ALPHA_UPDATES];
+}
+
+- (BOOL)sendsAnonymousInfo
+{
+	return _updater.sendsSystemProfile;
 }
 
 - (void)setSendsAnonymousInfo:(BOOL)sendsAnonymousInfo
 {
-	_sendsAnonymousInfo = sendsAnonymousInfo;
-	
-	[[NSUserDefaults standardUserDefaults] setBool:_sendsAnonymousInfo forKey:SU_SEND_PROFILE_INFO_KEY];
+	_updater.sendsSystemProfile = sendsAnonymousInfo;
 }
 
 - (void)checkForUpdates

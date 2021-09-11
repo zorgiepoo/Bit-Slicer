@@ -57,7 +57,6 @@
 	[super loadView];
 	
 	// These states could change, for example, when the user has to make Sparkle pick between checking for automatic updates or not checking for them
-	[_appUpdaterController reloadValuesFromDefaults];
 	[self updateCheckingForUpdateButtons];
 }
 
