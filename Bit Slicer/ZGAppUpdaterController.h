@@ -32,6 +32,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class NSMenuItem;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGAppUpdaterController : NSObject
@@ -42,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL checksForAlphaUpdates;
 @property (nonatomic) BOOL sendsAnonymousInfo;
 
-- (void)checkForUpdates;
+- (void)configureCheckForUpdatesMenuItem:(NSMenuItem *)checkForUpdatesMenuItem;
 
 @end
 

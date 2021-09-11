@@ -88,6 +88,8 @@
 	IBOutlet NSMenu * _Nonnull _fileMenu;
 	IBOutlet NSMenuItem * _Nonnull _newDocumentMenuItem;
 	IBOutlet NSMenuItem * _Nonnull _showFontsMenuItem;
+	
+	IBOutlet NSMenuItem * _Nonnull _checkForUpdatesMenuItem;
 }
 
 #pragma mark Birth & Death
@@ -210,6 +212,8 @@
 		NSInteger insertionIndex = [_fileMenu indexOfItem:_newDocumentMenuItem] + 1;
 		[_fileMenu insertItem:newTabMenuItem atIndex:insertionIndex];
 	}
+	
+	[_appUpdaterController configureCheckForUpdatesMenuItem:_checkForUpdatesMenuItem];
 }
 
 - (IBAction)createNewTabbedWindow:(id)sender
@@ -303,11 +307,6 @@
 	}
 	
 	[_preferencesController showWindow:nil];
-}
-
-- (IBAction)checkForUpdates:(id)__unused sender
-{
-	[_appUpdaterController checkForUpdates];
 }
 
 - (IBAction)openAboutWindow:(id)__unused sender

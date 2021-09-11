@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -33,9 +33,6 @@
                             </menuItem>
                             <menuItem title="Check for Updates…" id="1093">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="checkForUpdates:" target="695" id="VlS-aQ-esY"/>
-                                </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="sBq-te-pN3">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
@@ -723,10 +720,12 @@ CA
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="-12" y="130"/>
         </menu>
         <customObject id="419" customClass="NSFontManager"/>
         <customObject id="695" customClass="ZGAppController">
             <connections>
+                <outlet property="_checkForUpdatesMenuItem" destination="1093" id="Wmh-K2-WgX"/>
                 <outlet property="_fileMenu" destination="81" id="z29-58-6oQ"/>
                 <outlet property="_newDocumentMenuItem" destination="82" id="7xw-87-BcJ"/>
                 <outlet property="_showFontsMenuItem" destination="196-mO-a1w" id="nyT-PT-bA7"/>

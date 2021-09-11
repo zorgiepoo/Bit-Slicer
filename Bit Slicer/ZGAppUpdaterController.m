@@ -32,6 +32,7 @@
 
 #import "ZGAppUpdaterController.h"
 
+#import <AppKit/AppKit.h>
 #import <Sparkle/Sparkle.h>
 #import "ZGNullability.h"
 
@@ -125,9 +126,10 @@
 	_updater.sendsSystemProfile = sendsAnonymousInfo;
 }
 
-- (void)checkForUpdates
+- (void)configureCheckForUpdatesMenuItem:(NSMenuItem *)checkForUpdatesMenuItem
 {
-	[_updater checkForUpdates];
+	checkForUpdatesMenuItem.target = _updaterController;
+	checkForUpdatesMenuItem.action = @selector(checkForUpdates:);
 }
 
 @end
