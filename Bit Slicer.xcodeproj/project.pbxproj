@@ -2724,7 +2724,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zgcoder.BitSlicer;
 				PRODUCT_NAME = "Bit Slicer";
 				PROVISIONING_PROFILE = "";
-				RUN_CLANG_STATIC_ANALYZER = YES;
+				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx;
 				WARNING_CFLAGS = (
 					"-Weverything",
