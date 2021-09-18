@@ -136,7 +136,7 @@ bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes,
 			
 			_ZGFreeBytes(bytesInPage, bytesRead);
 			
-			if (bytesRead < sizeToRead)
+			if (bytesRead != sizeToRead)
 			{
 				currentAddress += bytesRead;
 				break;
@@ -144,6 +144,9 @@ bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes,
 		}
 		else
 		{
+			// We still need to free bytes otherwise we leak
+			_ZGFreeBytes(bytesInPage, bytesRead);
+			
 			break;
 		}
 		
