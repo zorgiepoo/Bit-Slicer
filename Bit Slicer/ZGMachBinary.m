@@ -155,7 +155,10 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 			ZGFreeBytes(allImageInfos, allImageInfosSize);
 		}
 		
-		[machBinaries addObject:dylinkerBinary];
+		if (dylinkerBinary != nil)
+		{
+			[machBinaries addObject:dylinkerBinary];
+		}
 	}
 	
 	return [machBinaries sortedArrayUsingSelector:@selector(compare:)];
