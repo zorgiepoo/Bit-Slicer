@@ -35,6 +35,7 @@
 #include <mach/mach_vm.h>
 #include <mach/task.h>
 #include <mach/mach_port.h>
+#include <stdlib.h>
 
 #include <TargetConditionals.h>
 
@@ -79,7 +80,7 @@ bool ZGDeallocateMemory(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemo
 	return (mach_vm_deallocate(processTask, address, size) == KERN_SUCCESS);
 }
 
-bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size)
+bool _ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size)
 {
 	ZGMemorySize originalSize = *size;
 	vm_offset_t dataPointer = 0;
@@ -95,9 +96,76 @@ bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes,
 	return success;
 }
 
-bool ZGFreeBytes(const void *bytes, ZGMemorySize size)
+bool _ZGFreeBytes(const void *bytes, ZGMemorySize size)
 {
 	return mach_vm_deallocate(current_task(), (vm_offset_t)bytes, size) == KERN_SUCCESS;
+}
+
+bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size)
+{
+	ZGMemorySize pageSize = 0;
+	if (!ZGPageSize(processTask, &pageSize) || pageSize == 0)
+	{
+		return false;
+	}
+	
+	ZGMemorySize requestedSize = *size;
+	uint8_t *data = calloc(1, requestedSize);
+	if (data == NULL)
+	{
+		return false;
+	}
+	
+	*bytes = data;
+	
+	ZGMemoryAddress currentAddress = address;
+	
+	while (currentAddress < address + requestedSize)
+	{
+		ZGMemorySize bytesLeftOverall = address + requestedSize - currentAddress;
+		ZGMemorySize bytesLeftInPage = pageSize - (currentAddress % pageSize);
+		
+		ZGMemorySize sizeToRead = (bytesLeftInPage < bytesLeftOverall) ? bytesLeftInPage : bytesLeftOverall;
+		
+		ZGMemorySize bytesRead = sizeToRead;
+		
+		void *bytesInPage = NULL;
+		if (_ZGReadBytes(processTask, currentAddress, &bytesInPage, &bytesRead))
+		{
+			memcpy(data + (currentAddress - address), bytesInPage, bytesRead);
+			
+			_ZGFreeBytes(bytesInPage, bytesRead);
+			
+			if (bytesRead < sizeToRead)
+			{
+				currentAddress += bytesRead;
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+		
+		currentAddress += sizeToRead;
+	}
+	
+	ZGMemorySize overallSizeRead = (currentAddress - address);
+	*size = overallSizeRead;
+	
+	if (overallSizeRead == 0)
+	{
+		free(data);
+		return false;
+	}
+	
+	return true;
+}
+
+bool ZGFreeBytes(void *bytes, ZGMemorySize __unused size)
+{
+	free(bytes);
+	return true;
 }
 
 bool ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)

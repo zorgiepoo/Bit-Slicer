@@ -56,7 +56,7 @@ bool ZGDeallocateMemory(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemo
 
 // ZGReadBytes allocates memory, the caller is responsible for deallocating it using ZGFreeBytes(...)
 bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size);
-bool ZGFreeBytes(const void *bytes, ZGMemorySize size);
+bool ZGFreeBytes(void *bytes, ZGMemorySize size);
 
 bool ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
 bool ZGWriteBytesOverwritingProtection(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size);
