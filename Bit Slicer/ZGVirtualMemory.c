@@ -91,6 +91,11 @@ bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes,
 		*bytes = (void *)dataPointer;
 		*size = dataSize;
 	}
+	else
+	{
+		// We still need to free bytes on failure otherwise we leak
+		ZGFreeBytes((const void *)dataPointer, dataSize);
+	}
 	
 	return success;
 }
