@@ -35,6 +35,7 @@
 #include <mach/mach_vm.h>
 #include <mach/task.h>
 #include <mach/mach_port.h>
+#include <stdlib.h>
 
 #include <TargetConditionals.h>
 
@@ -81,28 +82,31 @@ bool ZGDeallocateMemory(ZGMemoryMap processTask, ZGMemoryAddress address, ZGMemo
 
 bool ZGReadBytes(ZGMemoryMap processTask, ZGMemoryAddress address, void **bytes, ZGMemorySize *size)
 {
-	ZGMemorySize originalSize = *size;
-	vm_offset_t dataPointer = 0;
-	mach_msg_type_number_t dataSize = 0;
-	bool success = false;
-	if (mach_vm_read(processTask, address, originalSize, &dataPointer, &dataSize) == KERN_SUCCESS)
+	ZGMemorySize requestedSize = *size;
+	void *data = calloc(1, requestedSize);
+	if (data == NULL)
 	{
-		success = true;
-		*bytes = (void *)dataPointer;
-		*size = dataSize;
+		return false;
+	}
+	*bytes = data;
+	
+	// mach_vm_read() may cause issues when reading multiple pages
+	// Let mach_vm_read_overwrite() handle the correct logic for us when requesting a large buffer size
+	if (mach_vm_read_overwrite(processTask, address, requestedSize, (mach_vm_address_t)data, size) == KERN_SUCCESS)
+	{
+		return true;
 	}
 	else
 	{
-		// We still need to free bytes on failure otherwise we leak
-		ZGFreeBytes((const void *)dataPointer, dataSize);
+		free(data);
+		return false;
 	}
-	
-	return success;
 }
 
-bool ZGFreeBytes(const void *bytes, ZGMemorySize size)
+bool ZGFreeBytes(void *bytes, ZGMemorySize __unused size)
 {
-	return mach_vm_deallocate(current_task(), (vm_offset_t)bytes, size) == KERN_SUCCESS;
+	free(bytes);
+	return true;
 }
 
 bool ZGWriteBytes(ZGMemoryMap processTask, ZGMemoryAddress address, const void *bytes, ZGMemorySize size)
