@@ -22,7 +22,7 @@
 		</data>
 		<key>Resources/Info.plist</key>
 		<data>
-		LBre+A3YBJ3UdLOI+7dBw6vx5gg=
+		zr538WW9xEojhSgCvvpGEjJVnY8=
 		</data>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
 		<data>
@@ -85,7 +85,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			puzARYN3LTu1fJra7j+Tm3Cnl94=
+			6FhFjRyN+3hLbyTT9ktpM03KPCY=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -634,7 +634,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			VpSLGNvZ6sbRYsF23L8m6TG+P6E=
+			x6JdY7WL2dHnGXX6PHJl5da7WKE=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -862,10 +862,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			1LX4qUlp2myVMjLZYiWSrEw9XjQ=
+			JA1r2/QyvzZ2GoBWUuyPbstDoK4=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"10bbc2b1af17a7934155d65b994418f208bbd573" or cdhash H"d4b5f8a94969da6c953232d9622592ac4c3d5e34" or cdhash H"667b118c5c1673dc6cfb9f6a4b994d911485103b" or cdhash H"99cf44424e9f62c8b231e6dbc5865c74b0609fbf"</string>
+			<string>cdhash H"5054890d46c92a9ed1a151bf13002dfaefde0ffd" or cdhash H"240d6bdbf432bf36761a805652ec8f6ecb43a0ae" or cdhash H"44de0b64e3e6062187b6394ae6ebf6d1d939d3f0" or cdhash H"e6443388f63c6fec93bd08d5b6d10119d5880bc7"</string>
 		</dict>
 		<key>Headers/SPUDownloadData.h</key>
 		<dict>
@@ -882,11 +882,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Inh1hK4LxmTE1rRKYNPpraMTh0A=
+			rroC2T0pW2a1s5aeoWcrH299pkI=
 			</data>
 			<key>hash2</key>
 			<data>
-			Z8oqZTK1L2HkiG9ZSbd9ZME7eVesCCmkc0noBM7alWQ=
+			5u1wtf+kXuZUCKWodSbJLD/RP9aWaQxGgdYJqxzY5TY=
 			</data>
 		</dict>
 		<key>Headers/SPUStandardUserDriver.h</key>
@@ -937,11 +937,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			OoT/mm2l0SyiPvFD+q3zSkQrqT8=
+			BOHwbkoaLfgBB/TBllKIzaWkqKU=
 			</data>
 			<key>hash2</key>
 			<data>
-			gOxzv5ui0LbpjWA0hRud15dhc17IU5lJWvZ4FJNn/8M=
+			1XhgNQeHWSEJ85pNaYy4YcjmtY1tkrhA2LQoYP+nAu4=
 			</data>
 		</dict>
 		<key>Headers/SPUUpdaterDelegate.h</key>
@@ -970,11 +970,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			1VTX5X3Wk5RqVNWhzjGMcSovbeg=
+			MBqyIPu6dKc3G7Xz8B5LQztEWhA=
 			</data>
 			<key>hash2</key>
 			<data>
-			WRS/4A6+tvMQRvtu2Ow1hv8+oCn/TqsTw7TneDR+Uzk=
+			HQFlSgW4y2JJtlbXC1hFo8+DXJdSPAGHUkrM6GtVztg=
 			</data>
 		</dict>
 		<key>Headers/SPUUserUpdateState.h</key>
@@ -1157,11 +1157,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			choAGn5mLk/zEIE2+S+ssz+GG0M=
+			rW8h5V0sZXJRXHegj1zPQbreTz8=
 			</data>
 			<key>hash2</key>
 			<data>
-			s23fZh0B59IcL6rQFBIqMQ7zlgmoKnqWG3dyN4qcnUQ=
+			9igX5fnwg2PfKMmhEabcLvBsNhtWTQD1NsfXfCmQJp8=
 			</data>
 		</dict>
 		<key>Resources/Base.lproj/SUUpdateAlert.nib</key>
@@ -1212,11 +1212,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			LBre+A3YBJ3UdLOI+7dBw6vx5gg=
+			zr538WW9xEojhSgCvvpGEjJVnY8=
 			</data>
 			<key>hash2</key>
 			<data>
-			Js/ZsG1OEZbHTgxbSYv7l0mJu2Vzs98B3VtTsDfbL1A=
+			UbQIf/DmR79aPh/OHFLTROQRw/26qUukx5/Uvg6hu/A=
 			</data>
 		</dict>
 		<key>Resources/ReleaseNotesColorStyle.css</key>
@@ -1321,11 +1321,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			puzARYN3LTu1fJra7j+Tm3Cnl94=
+			6FhFjRyN+3hLbyTT9ktpM03KPCY=
 			</data>
 			<key>hash2</key>
 			<data>
-			YdNEwb3/1EM4TO7EZ0dasTP7huQP2XEAbCNz5BDk9wk=
+			h79+1Dya86ZmFGCEIMzPA8X71PytyJ2sKMYTgxyGUG8=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -2114,11 +2114,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			VpSLGNvZ6sbRYsF23L8m6TG+P6E=
+			x6JdY7WL2dHnGXX6PHJl5da7WKE=
 			</data>
 			<key>hash2</key>
 			<data>
-			wJZ5NG+mvj4anRFPUFyvSD0kGrg+ZAqklsPfHuCxLQY=
+			+vCWSRbECqQcsR6Nd8erQda/7x+ku/kQSUvZtTvemyQ=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -2439,10 +2439,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			Yb1nocF6yPccZCXToyJfScwxPS8=
+			T3P36IX4OzdvcgNQ7YR5NYdyAEQ=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"707da13e0edc4dd8986b72999c1a31d6146d23bb" or cdhash H"61bd67a1c17ac8f71c6425d3a3225f49cc313d2f" or cdhash H"1814f23b216b691898c6671d319b921f913b2d32" or cdhash H"51a25f82aca269e859c1de72f1db53836a0f0138"</string>
+			<string>cdhash H"3c9e637e412336067127b7826bc35fc49a7b59a4" or cdhash H"4f73f7e885f83b376f720350ed84793587720044" or cdhash H"5f8b5a77fd30936fa7adaafad89f54c2ecf341df" or cdhash H"257f570ada6663021b5e061014dbe931fb133508"</string>
 		</dict>
 	</dict>
 	<key>rules</key>

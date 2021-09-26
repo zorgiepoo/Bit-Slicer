@@ -1,2 +1,3 @@
 Source: https://github.com/sparkle-project/Sparkle
-Tag: 2.0.0-beta.2
+Branch: 2.x
+Commit: a9d5a4276886de9a905e542a9dc07bf8716b9fda
