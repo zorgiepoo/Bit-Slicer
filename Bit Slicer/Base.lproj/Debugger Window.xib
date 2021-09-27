@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19158" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19158"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -84,26 +84,26 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="113" y="199" width="839" height="506"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
-            <value key="minSize" type="size" width="700" height="419"/>
+            <rect key="contentRect" x="113" y="199" width="839" height="510"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <value key="minSize" type="size" width="700" height="414"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="839" height="506"/>
+                <rect key="frame" x="0.0" y="0.0" width="839" height="510"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <splitView fixedFrame="YES" autosaveName="" dividerStyle="thin" translatesAutoresizingMaskIntoConstraints="NO" id="239">
-                        <rect key="frame" x="-1" y="22" width="840" height="485"/>
+                        <rect key="frame" x="-1" y="22" width="840" height="489"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView focusRingType="none" fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="cFD-3I-ALg">
-                                <rect key="frame" x="0.0" y="0.0" width="840" height="285"/>
+                                <rect key="frame" x="0.0" y="0.0" width="840" height="287"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <clipView key="contentView" focusRingType="none" id="QCs-yF-iGW">
-                                    <rect key="frame" x="0.0" y="0.0" width="840" height="285"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="840" height="287"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" autosaveColumns="NO" headerView="tpt-Jt-lnH" id="Ksp-7e-9HA" customClass="ZGTableView">
-                                            <rect key="frame" x="0.0" y="0.0" width="840" height="268"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="840" height="270"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -190,15 +190,15 @@
                                 </tableHeaderView>
                             </scrollView>
                             <splitView fixedFrame="YES" autosaveName="" dividerStyle="thin" vertical="YES" id="246" userLabel="Registers/Backtrace SplitView">
-                                <rect key="frame" x="0.0" y="286" width="840" height="199"/>
+                                <rect key="frame" x="0.0" y="288" width="840" height="201"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <customView fixedFrame="YES" id="Bh5-To-vJR" userLabel="Backtrace View">
-                                        <rect key="frame" x="0.0" y="0.0" width="523" height="199"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="523" height="201"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     </customView>
                                     <customView fixedFrame="YES" id="YKc-8G-cFS" userLabel="Registers View">
-                                        <rect key="frame" x="524" y="0.0" width="316" height="199"/>
+                                        <rect key="frame" x="524" y="0.0" width="316" height="201"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     </customView>
                                 </subviews>
@@ -250,20 +250,20 @@
                             </connections>
                         </segmentedControl>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" sizingBehavior="auto" id="V6x-9g-MBo">
+                    <toolbarItem implicitItemIdentifier="FDC43EA3-3666-4087-AFD1-D12E844C7CC3" label="Target" paletteLabel="Target" title="Item_1" sizingBehavior="auto" id="V6x-9g-MBo">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fpR-fU-ajG">
-                            <rect key="frame" x="0.0" y="14" width="78" height="25"/>
+                            <rect key="frame" x="-3" y="-4" width="167" height="25"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="bEq-IZ-Wag"/>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="ngH-El-940"/>
                             </constraints>
-                            <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="vAn-gJ-wjp" id="ohg-Gh-2fU">
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="vAn-gJ-wjp" id="ohg-Gh-2fU">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
                                 <menu key="menu" title="OtherViews" id="Quq-lP-8lz">
                                     <items>
-                                        <menuItem title="Item_1" id="vAn-gJ-wjp">
+                                        <menuItem title="Item_1" state="on" id="vAn-gJ-wjp">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                     </items>
@@ -315,7 +315,7 @@
                     <toolbarItem implicitItemIdentifier="306F877D-325E-4A4F-9705-FC98ED04464E" label="Address/Symbol" paletteLabel="Address/Symbol" sizingBehavior="auto" id="u3o-PN-adL">
                         <nil key="toolTip"/>
                         <textField key="view" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ztk-ei-XwG">
-                            <rect key="frame" x="0.0" y="14" width="171" height="22"/>
+                            <rect key="frame" x="0.0" y="0.0" width="171" height="22"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="49z-Sq-ig3"/>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="175" id="UDK-Sx-ERW"/>

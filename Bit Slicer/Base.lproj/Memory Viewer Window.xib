@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19158" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19158"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -21,15 +21,15 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="668" y="321" width="577" height="424"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
-            <value key="minSize" type="size" width="577" height="424"/>
+            <rect key="contentRect" x="668" y="321" width="577" height="422"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <value key="minSize" type="size" width="577" height="422"/>
             <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="577" height="424"/>
+                <rect key="frame" x="0.0" y="0.0" width="577" height="422"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="70" customClass="HFTextView">
-                        <rect key="frame" x="0.0" y="0.0" width="577" height="424"/>
+                        <rect key="frame" x="0.0" y="0.0" width="577" height="422"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <connections>
                             <outlet property="delegate" destination="-2" id="iNM-Rx-cNE"/>
@@ -60,20 +60,20 @@
                             </connections>
                         </segmentedControl>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="7AD14AA0-A832-40BF-890E-22C1420E5869" label="Target" paletteLabel="Target" sizingBehavior="auto" id="2oH-t9-bYi">
+                    <toolbarItem implicitItemIdentifier="7AD14AA0-A832-40BF-890E-22C1420E5869" label="Target" paletteLabel="Target" title="Item_1" sizingBehavior="auto" id="2oH-t9-bYi">
                         <nil key="toolTip"/>
                         <popUpButton key="view" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fPm-5I-zjY">
-                            <rect key="frame" x="0.0" y="14" width="78" height="25"/>
+                            <rect key="frame" x="-3" y="-4" width="167" height="25"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="160" id="afV-Tx-EmX"/>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="180" id="jBR-jV-p5j"/>
                             </constraints>
-                            <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="O54-Nm-FQR" id="6D0-9L-tIs">
+                            <popUpButtonCell key="cell" type="roundTextured" title="Item_1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="O54-Nm-FQR" id="6D0-9L-tIs">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="menu"/>
                                 <menu key="menu" title="OtherViews" id="a0O-5N-OUy">
                                     <items>
-                                        <menuItem title="Item_1" id="O54-Nm-FQR">
+                                        <menuItem title="Item_1" state="on" id="O54-Nm-FQR">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                     </items>
@@ -87,7 +87,7 @@
                     <toolbarItem implicitItemIdentifier="4317D272-6BC6-4B90-B1BD-AEEBC90B4775" label="Address" paletteLabel="Address" sizingBehavior="auto" id="dKv-kA-cOR">
                         <nil key="toolTip"/>
                         <textField key="view" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DkB-mV-Rmo">
-                            <rect key="frame" x="0.0" y="14" width="175" height="22"/>
+                            <rect key="frame" x="0.0" y="0.0" width="175" height="22"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="Kud-I6-eIQ"/>
                                 <constraint firstAttribute="width" relation="lessThanOrEqual" constant="175" id="M4D-hv-7AE"/>
