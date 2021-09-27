@@ -1638,7 +1638,13 @@ NSData *ZGNarrowSearchWithFunctionType(F comparisonFunction, ZGMemoryMap process
 				
 				if (newRegion != nil && variableAddress >= newRegion->_address && variableAddress + dataSize <= newRegion->_address + newRegion->_size)
 				{
-					lastUsedRegion = [[ZGRegion alloc] initWithAddress:newRegion->_address size:newRegion->_size];
+					// Read all the pages enclosing the start and end variable address
+					// Reading the entire region may be too expensive
+					ZGMemoryAddress startPageAddress = variableAddress - (variableAddress % pageSize);
+					ZGMemoryAddress endPageAddress = (variableAddress + dataSize) + (pageSize - ((variableAddress + dataSize) % pageSize));
+					ZGMemorySize totalRegionSize = (endPageAddress - startPageAddress);
+					
+					lastUsedRegion = [[ZGRegion alloc] initWithAddress:startPageAddress size:totalRegionSize];
 					
 					void *bytes = nullptr;
 					if (ZGReadBytes(processTask, lastUsedRegion->_address, &bytes, &lastUsedRegion->_size))
