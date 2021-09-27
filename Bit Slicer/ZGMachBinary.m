@@ -247,7 +247,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 	{
 		ZGMemoryAddress filePathAddress = machBinary.filePathAddress;
 
-		if (cachedAddress == 0x0 || (filePathAddress < cachedAddress || filePathAddress + PATH_MAX >= cachedAddress + cachedSize))
+		if (cachedAddress == 0x0 || (filePathAddress < cachedAddress || filePathAddress + PATH_MAX > cachedAddress + cachedSize))
 		{
 			if (cachedAddress != 0x0 && cachedBytes != NULL)
 			{
