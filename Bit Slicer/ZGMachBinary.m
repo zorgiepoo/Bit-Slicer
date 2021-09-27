@@ -233,47 +233,71 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 + (NSArray<NSString *> *)filePathsForMachBinaries:(NSArray<ZGMachBinary *> *)machBinaries inProcess:(ZGProcess *)process
 {
 	NSMutableArray *filePaths = [[NSMutableArray alloc] init];
-	ZGRegion *cachedRegion = nil;
-	
+
 	ZGMemoryMap processTask = process.processTask;
 	
+	ZGMemoryAddress cachedAddress = 0x0;
+	ZGMemorySize cachedSize = 0;
+	void *cachedBytes = NULL;
+	
+	ZGMemorySize pageSize = NSPageSize(); // sane default
+	ZGPageSize(processTask, &pageSize);
+
 	for (ZGMachBinary *machBinary in machBinaries)
 	{
 		ZGMemoryAddress filePathAddress = machBinary.filePathAddress;
-		
-		if (cachedRegion == nil || (filePathAddress < cachedRegion->_address || filePathAddress >= cachedRegion->_address + cachedRegion->_size))
+
+		if (cachedAddress == 0x0 || (filePathAddress < cachedAddress || filePathAddress + PATH_MAX >= cachedAddress + cachedSize))
 		{
-			if (cachedRegion != nil && cachedRegion->_bytes != NULL)
+			if (cachedAddress != 0x0 && cachedBytes != NULL)
 			{
-				ZGFreeBytes(cachedRegion->_bytes, cachedRegion->_size);
+				ZGFreeBytes(cachedBytes, cachedSize);
 			}
 			
+			cachedAddress = 0x0;
+			cachedSize = 0x0;
+			cachedBytes = NULL;
+
 			ZGMemorySubmapInfo regionInfo;
-			cachedRegion = [[ZGRegion alloc] initWithAddress:filePathAddress size:1];
-			if (!ZGRegionSubmapInfo(processTask, &cachedRegion->_address, &cachedRegion->_size, &regionInfo) ||
-				!ZGReadBytes(processTask, cachedRegion->_address, &cachedRegion->_bytes, &cachedRegion->_size))
+			ZGRegion *region = [[ZGRegion alloc] initWithAddress:filePathAddress size:1];
+			if (!ZGRegionSubmapInfo(processTask, &region->_address, &region->_size, &regionInfo) || filePathAddress < region->_address || filePathAddress >= region->_address + region->_size)
 			{
 				[filePaths addObject:@""];
-				cachedRegion = nil;
 				continue;
 			}
 			
-			// Also check bounds
-			if (filePathAddress < cachedRegion->_address || filePathAddress >= cachedRegion->_address + cachedRegion->_size)
+			// Try to read and cache all pages that may occupy this file path address
+			ZGMemorySize maxSizeToRead;
+			ZGMemorySize bytesLeftInPage = pageSize - (filePathAddress % pageSize);
+			if (filePathAddress + bytesLeftInPage >= (filePathAddress + PATH_MAX))
 			{
-				ZGFreeBytes(cachedRegion->_bytes, cachedRegion->_size);
+				maxSizeToRead = bytesLeftInPage;
+			}
+			else if (region->_address + region->_size >= filePathAddress + bytesLeftInPage + pageSize)
+			{
+				maxSizeToRead = bytesLeftInPage + pageSize;
+			}
+			else
+			{
+				maxSizeToRead = (region->_address + region->_size) - filePathAddress;
+			}
+			
+			if (!ZGReadBytes(processTask, filePathAddress, &cachedBytes, &maxSizeToRead))
+			{
 				[filePaths addObject:@""];
-				cachedRegion = nil;
 				continue;
 			}
+			
+			cachedAddress = filePathAddress;
+			cachedSize = maxSizeToRead;
 		}
-		
+
 		char buffer[PATH_MAX + 1] = {0};
-		ZGMemoryAddress offset = filePathAddress - cachedRegion->_address;
-		size_t maxSize = (sizeof(buffer) - 1) < (cachedRegion->_size - offset) ? (sizeof(buffer) - 1) : (cachedRegion->_size - offset);
-		
-		strncpy(buffer, filePathAddress - cachedRegion->_address + (const char *)cachedRegion->_bytes, maxSize);
-		
+		ZGMemoryAddress offset = filePathAddress - cachedAddress;
+		size_t maxSize = (sizeof(buffer) - 1) < (cachedSize - offset) ? (sizeof(buffer) - 1) : (cachedSize - offset);
+
+		strncpy(buffer, filePathAddress - cachedAddress + (const char *)cachedBytes, maxSize);
+
 		NSString *filePath = [[NSString alloc] initWithCString:buffer encoding:NSUTF8StringEncoding];
 		if (filePath != nil)
 		{
@@ -284,12 +308,12 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 			[filePaths addObject:@""];
 		}
 	}
-	
-	if (cachedRegion != nil && cachedRegion->_bytes != NULL)
+
+	if (cachedAddress != 0x0 && cachedBytes != NULL)
 	{
-		ZGFreeBytes(cachedRegion->_bytes, cachedRegion->_size);
+		ZGFreeBytes(cachedBytes, cachedSize);
 	}
-	
+
 	return [filePaths copy];
 }
 
