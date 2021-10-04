@@ -36,18 +36,19 @@
 
 @implementation ZGStoredData
 
-+ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask
++ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask includeSharedMemory:(BOOL)includeSharedMemory
 {
 	NSMutableArray<ZGRegion *> *regions = [[NSMutableArray alloc] init];
 	
-	for (ZGRegion *region in [ZGRegion regionsFromProcessTask:processTask])
+	NSArray<ZGRegion *> *initialRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] : [ZGRegion regionsFromProcessTask:processTask];
+	for (ZGRegion *region in initialRegions)
 	{
 		void *bytes = NULL;
 		ZGMemorySize size = region.size;
 		
 		if (ZGReadBytes(processTask, region.address, &bytes, &size))
 		{
-			ZGRegion *newRegion = [[ZGRegion alloc] initWithAddress:region.address size:region.size protection:region.protection];
+			ZGRegion *newRegion = [[ZGRegion alloc] initWithAddress:region.address size:region.size protection:region.protection userTag:region.userTag];
 			newRegion->_bytes = bytes;
 			
 			[regions addObject:newRegion];

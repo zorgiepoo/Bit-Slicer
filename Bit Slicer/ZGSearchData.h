@@ -91,6 +91,7 @@ typedef NS_ENUM(NSInteger, ZGProtectionMode)
 @property (nonatomic, nullable) void *additiveConstant;
 @property (nonatomic, nullable) void *multiplicativeConstant;
 @property (nonatomic, nullable) unsigned char *byteArrayFlags;
+@property (nonatomic) BOOL includeSharedMemory;
 
 - (id)initWithSearchValue:(nullable void *)searchValue dataSize:(ZGMemorySize)dataSize dataAlignment:(ZGMemorySize)dataAlignment pointerSize:(ZGMemorySize)pointerSize;
 

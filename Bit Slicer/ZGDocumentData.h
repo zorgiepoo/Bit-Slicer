@@ -50,6 +50,7 @@
 #define ZGBelowValueKey @"ZGBelowValueKey"
 #define ZGSearchStringValueKeyNew @"ZGSearchStringValueNewKey"
 #define ZGSearchStringValueKeyOld @"ZGSearchStringValueKey" // legacy
+#define ZGIncludeSharedMemoryKey @"ZGIncludeSharedMemoryKey"
 
 NS_ASSUME_NONNULL_BEGIN
 

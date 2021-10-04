@@ -51,12 +51,14 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask;
 + (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
 
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection;
+- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection userTag:(uint32_t)userTag;
+//- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection;
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;
 
 @property (nonatomic, readonly) ZGMemoryAddress address;
 @property (nonatomic, readonly) ZGMemorySize size;
 @property (nonatomic, readonly) ZGMemoryProtection protection;
+@property (nonatomic, readonly) uint32_t userTag;
 @property (nonatomic, readonly, nullable) void *bytes;
 
 @end

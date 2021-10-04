@@ -140,6 +140,10 @@
 	[keyedArchiver
 	 encodeObject:_data.endingAddressStringValue
 	 forKey:ZGEndingAddressKey];
+	
+	[keyedArchiver
+	 encodeBool:_searchData.includeSharedMemory
+	 forKey:ZGIncludeSharedMemoryKey];
     
 	[keyedArchiver
 	 encodeObject:_data.lastEpsilonValue
@@ -202,6 +206,8 @@
 	
 	_data.beginningAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGBeginningAddressKey]];
 	_data.endingAddressStringValue = [self parseStringSafely:[keyedUnarchiver decodeObjectOfClass:[NSString class] forKey:ZGEndingAddressKey]];
+	
+	_searchData.includeSharedMemory = [keyedUnarchiver decodeBoolForKey:ZGIncludeSharedMemoryKey];
 	
 	_data.byteOrderTag = [keyedUnarchiver decodeInt32ForKey:ZGByteOrderTagKey];
 	if (_data.byteOrderTag == CFByteOrderUnknown)

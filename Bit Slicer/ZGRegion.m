@@ -53,7 +53,7 @@
 			break;
 		}
 		
-		[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection]];
+		[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection userTag:0]];
 		
 		address += size;
 	}
@@ -85,7 +85,7 @@
 		}
 		else
 		{
-			[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection]];
+			[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection userTag:info.user_tag]];
 			
 			address += size;
 		}
@@ -121,7 +121,7 @@
 		{
 			if (address >= region.address && address + size <= region.address + region.size)
 			{
-				[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection]];
+				[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection userTag:info.user_tag]];
 			
 				address += size;
 				
@@ -140,7 +140,7 @@
 	return regions;
 }
 
-- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection
+- (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection userTag:(uint32_t)userTag
 {
 	self = [super init];
 	if (self != nil)
@@ -148,13 +148,14 @@
 		_address = address;
 		_size = size;
 		_protection = protection;
+		_userTag = userTag;
 	}
 	return self;
 }
 
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size
 {
-	return [self initWithAddress:address size:size protection:0];
+	return [self initWithAddress:address size:size protection:0 userTag:0];
 }
 
 @end

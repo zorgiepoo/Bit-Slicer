@@ -172,7 +172,7 @@
 	uint8_t valueToFind = 0xB1;
 	
 	ZGSearchData *searchData = [self searchDataFromBytes:&valueToFind size:sizeof(valueToFind) dataType:ZGInt8 address:address alignment:1];
-	searchData.savedData = [ZGStoredData storedDataFromProcessTask:_processTask];
+	searchData.savedData = [ZGStoredData storedDataFromProcessTask:_processTask includeSharedMemory:NO];
 	XCTAssertNotNil(searchData.savedData);
 	
 	ZGSearchResults *equalResults = ZGSearchForData(_processTask, searchData, nil, ZGInt8, ZGUnsigned, ZGEquals);
@@ -325,7 +325,7 @@
 	ZGSearchResults *betweenSwappedResults = ZGSearchForData(_processTask, searchData, nil, ZGInt32, ZGSigned, ZGLessThan);
 	XCTAssertEqual(betweenSwappedResults.addressCount, 354U);
 	
-	searchData.savedData = [ZGStoredData storedDataFromProcessTask:_processTask];
+	searchData.savedData = [ZGStoredData storedDataFromProcessTask:_processTask includeSharedMemory:NO];
 	XCTAssertNotNil(searchData.savedData);
 	
 	int32_t *integerReadReference = NULL;

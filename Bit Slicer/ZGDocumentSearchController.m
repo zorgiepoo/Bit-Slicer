@@ -832,8 +832,10 @@
 	
 	[windowController setStatusString:ZGLocalizableSearchDocumentString(@"storingValuesStatusLabel")];
 	
+	BOOL includeSharedMemory = _searchData.includeSharedMemory;
+	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		__block ZGStoredData *tempSavedData = [ZGStoredData storedDataFromProcessTask:windowController.currentProcess.processTask];
+		__block ZGStoredData *tempSavedData = [ZGStoredData storedDataFromProcessTask:windowController.currentProcess.processTask includeSharedMemory:includeSharedMemory];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			if (!self->_searchProgress.shouldCancelSearch)

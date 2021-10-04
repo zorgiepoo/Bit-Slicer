@@ -33,14 +33,17 @@
 #import "ZGDocumentOptionsViewController.h"
 #import "ZGDocument.h"
 #import "ZGDocumentData.h"
+#import "ZGSearchData.h"
 #import "ZGVariable.h"
 
 @implementation ZGDocumentOptionsViewController
 {
 	__weak ZGDocument * _Nullable _document;
 	ZGDocumentData * _Nonnull _documentData;
+	ZGSearchData * _Nonnull _searchData;
 	
 	IBOutlet NSButton *_ignoreDataAlignmentCheckbox;
+	IBOutlet NSButton *_includeSharedMemoryCheckbox;
 	IBOutlet NSTextField *_beginningAddressTextField;
 	IBOutlet NSTextField *_endingAddressTextField;
 }
@@ -52,6 +55,7 @@
 	{
 		_document = document;
 		_documentData = document.data;
+		_searchData = document.searchData;
 	}
 	return self;
 }
@@ -59,6 +63,7 @@
 - (void)reloadInterface
 {
 	[_ignoreDataAlignmentCheckbox setState:_documentData.ignoreDataAlignment];
+	[_includeSharedMemoryCheckbox setState:_searchData.includeSharedMemory];
 	_beginningAddressTextField.stringValue = _documentData.beginningAddressStringValue;
 	_endingAddressTextField.stringValue = _documentData.endingAddressStringValue;
 }
@@ -73,6 +78,14 @@
 - (IBAction)changeIgnoreDataAlignment:(id)sender
 {
 	_documentData.ignoreDataAlignment = ([(NSCell *)sender state] == NSOnState);
+	
+	ZGDocument *document = _document;
+	[document markChange];
+}
+
+- (IBAction)changeIncludeSharedMemory:(id)sender
+{
+	_searchData.includeSharedMemory = ([(NSCell *)sender state] == NSOnState);
 	
 	ZGDocument *document = _document;
 	[document markChange];
