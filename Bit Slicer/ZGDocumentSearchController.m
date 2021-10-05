@@ -72,6 +72,7 @@
 	NSString *_searchValueString;
 	ZGSearchData * _Nonnull _searchData;
 	ZGMachBinaryAnnotationInfo _machBinaryAnnotationInfo;
+	dispatch_queue_t _machBinaryAnnotationInfoQueue;
 }
 
 #pragma mark Class Utilities
@@ -126,6 +127,8 @@
 		_documentData = windowController.documentData;
 		_searchData = windowController.searchData;
 		_searchProgress = [[ZGSearchProgress alloc] init];
+		
+		_machBinaryAnnotationInfoQueue = dispatch_queue_create("com.zgcoder.search-mach-binary-info", DISPATCH_QUEUE_SERIAL);
 	}
 	
 	return self;
@@ -311,10 +314,23 @@
 	
 	[searchResults removeNumberOfAddresses:numberOfVariables];
 	
-	// Waiting for completion would lead to a bad user experience and there is no need to
-	[ZGVariableController annotateVariables:newVariables annotationInfo:&_machBinaryAnnotationInfo process:currentProcess symbols:YES async:YES completionHandler:^{
-		[windowController.variablesTableView reloadData];
-	}];
+	dispatch_async(_machBinaryAnnotationInfoQueue, ^{
+		__block ZGMachBinaryAnnotationInfo annotationInfo;
+		if (self->_machBinaryAnnotationInfo.machBinaries == nil)
+		{
+			self->_machBinaryAnnotationInfo = [ZGVariableController machBinaryAnnotationInfoForProcess:currentProcess];
+		}
+		
+		// Copy annotation info
+		annotationInfo = self->_machBinaryAnnotationInfo;
+		
+		dispatch_async(dispatch_get_main_queue(), ^{
+			// Waiting for completion would lead to a bad user experience and there is no need to
+			[ZGVariableController annotateVariables:newVariables annotationInfo:annotationInfo process:currentProcess symbols:YES async:YES completionHandler:^{
+				[windowController.variablesTableView reloadData];
+			}];
+		});
+	});
 	
 	[allVariables addObjectsFromArray:newVariables];
 	_documentData.variables = [NSArray arrayWithArray:allVariables];
@@ -364,8 +380,10 @@
 		[windowController.variablesTableView reloadData];
 	}
 	
-	_machBinaryAnnotationInfo.machBinaries = nil;
-	_machBinaryAnnotationInfo.machFilePathDictionary = nil;
+	dispatch_async(_machBinaryAnnotationInfoQueue, ^{
+		self->_machBinaryAnnotationInfo.machBinaries = nil;
+		self->_machBinaryAnnotationInfo.machFilePathDictionary = nil;
+	});
 	
 	[windowController updateOcclusionActivity];
 	

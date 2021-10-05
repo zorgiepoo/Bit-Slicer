@@ -1392,7 +1392,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		 return (BOOL)(!variable.usesDynamicAddress);
 	 }];
 	
-	[ZGVariableController annotateVariables:variablesToAnnotate annotationInfo:NULL process:self.currentProcess symbols:symbols async:async completionHandler:^{
+	[ZGVariableController annotateVariables:variablesToAnnotate process:self.currentProcess symbols:symbols async:async completionHandler:^{
 		for (ZGInstruction *instruction in instructions)
 		{
 			if (instruction.variable.fullAttributedDescription.length == 0)

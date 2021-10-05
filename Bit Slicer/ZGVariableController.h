@@ -80,7 +80,9 @@ typedef struct
 - (void)changeVariableEnabled:(BOOL)enabled rowIndexes:(NSIndexSet *)rowIndexes;
 
 - (void)relativizeVariables:(NSArray<ZGVariable *> *)variables;
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo * _Nullable)annotationInfo process:(ZGProcess *)process symbols:(BOOL)symbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler;
++ (ZGMachBinaryAnnotationInfo)machBinaryAnnotationInfoForProcess:(ZGProcess *)process;
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process symbols:(BOOL)symbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler;
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler;
 
 - (void)editVariables:(NSArray<ZGVariable *> *)variables newValues:(NSArray<NSString *> *)newValues;
 - (void)editVariable:(ZGVariable *)variable addressFormula:(NSString *)newAddressFormula;

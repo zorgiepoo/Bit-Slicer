@@ -969,7 +969,7 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 {
 	ZGDocumentWindowController *windowController = _windowController;
 	
-	[[self class] annotateVariables:variables annotationInfo:NULL process:windowController.currentProcess symbols:YES async:YES completionHandler:^{
+	[[self class] annotateVariables:variables process:windowController.currentProcess symbols:YES async:YES completionHandler:^{
 		NSString *actionName = (variables.count == 1) ? ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeSingleVariable") : ZGLocalizedStringFromVariableActionsTable(@"undoRelativizeMultipleVariables");
 		
 		windowController.undoManager.actionName = actionName;
@@ -1044,34 +1044,43 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		[windowController.tableController updateDynamicVariableAddress:variable];
 		
 		// Re-annotate the variable
-		[[self class] annotateVariables:@[variable] annotationInfo:NULL process:process symbols:YES async:YES completionHandler:^{
+		[[self class] annotateVariables:@[variable] process:process symbols:YES async:YES completionHandler:^{
 			[windowController.variablesTableView reloadData];
 		}];
 	}
 }
 
-+ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo * _Nullable)annotationInfo process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
++ (ZGMachBinaryAnnotationInfo)machBinaryAnnotationInfoForProcess:(ZGProcess *)process
+{
+	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
+	NSMutableDictionary<NSNumber *, NSString *> *machFilePathDictionary = [[NSMutableDictionary alloc] init];
+	
+	NSArray<NSString *> *filePaths = [ZGMachBinary filePathsForMachBinaries:machBinaries inProcess:process];
+	[machBinaries enumerateObjectsUsingBlock:^(ZGMachBinary * _Nonnull machBinary, NSUInteger index, BOOL * _Nonnull __unused stop) {
+		NSString *filePath = [filePaths objectAtIndex:index];
+		if (filePath.length > 0)
+		{
+			[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
+		}
+	}];
+	
+	ZGMachBinaryAnnotationInfo annotationInfo;
+	annotationInfo.machBinaries = machBinaries;
+	annotationInfo.machFilePathDictionary = machFilePathDictionary;
+	return annotationInfo;
+}
+
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
+{
+	ZGMachBinaryAnnotationInfo annotationInfo = {0};
+	
+	[self annotateVariables:variables annotationInfo:annotationInfo process:process symbols:requiresSymbols async:async completionHandler:completionHandler];
+}
+
++ (void)annotateVariables:(NSArray<ZGVariable *> *)variables annotationInfo:(ZGMachBinaryAnnotationInfo)annotationInfo process:(ZGProcess *)process symbols:(BOOL)requiresSymbols async:(BOOL)async completionHandler:(void (^)(void))completionHandler
 {
 	ZGMemoryMap processTask = process.processTask;
 	NSUInteger capacity = variables.count;
-	
-	NSArray<ZGMachBinary *> *(^retrieveMachBinaries)(NSDictionary<NSNumber *, NSString *> **) = ^(NSDictionary<NSNumber *, NSString *> **filePathDictionary) {
-		NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
-		NSMutableDictionary<NSNumber *, NSString *> *machFilePathDictionary = [[NSMutableDictionary alloc] init];
-		
-		NSArray<NSString *> *filePaths = [ZGMachBinary filePathsForMachBinaries:machBinaries inProcess:process];
-		[machBinaries enumerateObjectsUsingBlock:^(ZGMachBinary * _Nonnull machBinary, NSUInteger index, BOOL * _Nonnull __unused stop) {
-			NSString *filePath = [filePaths objectAtIndex:index];
-			if (filePath.length > 0)
-			{
-				[machFilePathDictionary setObject:filePath forKey:@(machBinary.filePathAddress)];
-			}
-		}];
-		
-		*filePathDictionary = machFilePathDictionary;
-		
-		return machBinaries;
-	};
 	
 	NSArray<NSNumber *> *(^relativizeVariables)(NSArray<ZGMachBinary *> *, NSDictionary<NSNumber *, NSString *> *, NSArray **) = ^(NSArray<ZGMachBinary *> *machBinaries, NSDictionary<NSNumber *, NSString *> *machFilePathDictionary, NSArray **staticDescriptionsRef) {
 		NSMutableArray *staticDescriptions = [[NSMutableArray alloc] initWithCapacity:capacity];
@@ -1161,10 +1170,10 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 	
 	if (async)
 	{
-		if (annotationInfo != NULL && annotationInfo->machBinaries != nil && annotationInfo->machFilePathDictionary != nil)
+		if (annotationInfo.machBinaries != nil && annotationInfo.machFilePathDictionary != nil)
 		{
-			NSArray<ZGMachBinary *> *machBinaries = annotationInfo->machBinaries;
-			NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = annotationInfo->machFilePathDictionary;
+			NSArray<ZGMachBinary *> *machBinaries = annotationInfo.machBinaries;
+			NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = annotationInfo.machFilePathDictionary;
 			
 			NSArray *staticDescriptions = nil;
 			NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);
@@ -1181,12 +1190,11 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		else
 		{
 			dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-				NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = nil;
-				NSArray<ZGMachBinary *> *machBinaries = retrieveMachBinaries(&machFilePathDictionary);
+				ZGMachBinaryAnnotationInfo retrievedAnnotationInfo = [self machBinaryAnnotationInfoForProcess:process];
 				
 				dispatch_async(dispatch_get_main_queue(), ^{
 					NSArray *staticDescriptions = nil;
-					NSArray<NSNumber *> *variableAddresses = relativizeVariables(machBinaries, machFilePathDictionary, &staticDescriptions);
+					NSArray<NSNumber *> *variableAddresses = relativizeVariables(retrievedAnnotationInfo.machBinaries, retrievedAnnotationInfo.machFilePathDictionary, &staticDescriptions);
 					
 					dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
 						NSArray *symbols = requiresSymbols ? retrieveSymbols(variableAddresses) : nil;
@@ -1194,11 +1202,6 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 						dispatch_async(dispatch_get_main_queue(), ^{
 							finishAnnotations(symbols, staticDescriptions);
 							
-							if (annotationInfo != NULL)
-							{
-								annotationInfo->machBinaries = machBinaries;
-								annotationInfo->machFilePathDictionary = machFilePathDictionary;
-							}
 							completionHandler();
 						});
 					});
@@ -1212,14 +1215,16 @@ static NSString *ZGScriptIndentationSpacesWidthKey = @"ZGScriptIndentationSpaces
 		NSDictionary<NSNumber *, NSString *> *machFilePathDictionary = nil;
 		NSArray<ZGMachBinary *> *machBinaries = nil;
 		
-		if (annotationInfo != NULL && annotationInfo->machBinaries != nil && annotationInfo->machFilePathDictionary != nil)
+		if (annotationInfo.machBinaries != nil && annotationInfo.machFilePathDictionary != nil)
 		{
-			machBinaries = annotationInfo->machBinaries;
-			machFilePathDictionary = annotationInfo->machFilePathDictionary;
+			machBinaries = annotationInfo.machBinaries;
+			machFilePathDictionary = annotationInfo.machFilePathDictionary;
 		}
 		else
 		{
-			machBinaries = retrieveMachBinaries(&machFilePathDictionary);
+			ZGMachBinaryAnnotationInfo retrievedAnnotationInfo = [self machBinaryAnnotationInfoForProcess:process];
+			machBinaries = retrievedAnnotationInfo.machBinaries;
+			machFilePathDictionary = retrievedAnnotationInfo.machFilePathDictionary;
 		}
 		
 		NSArray *staticDescriptions = nil;
