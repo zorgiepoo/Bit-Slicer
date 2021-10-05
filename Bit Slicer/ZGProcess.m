@@ -46,6 +46,7 @@
 	
 	id <ZGSymbolicator> _Nullable _symbolicator;
 	BOOL _failedCreatingSymbolicator;
+	dispatch_queue_t _symbolicatorQueue;
 }
 
 - (instancetype)initWithName:(NSString *)processName internalName:(NSString *)internalName processID:(pid_t)aProcessID type:(ZGProcessType)processType translated:(BOOL)translated
@@ -57,6 +58,7 @@
 		_processID = aProcessID;
 		_type = processType;
 		_translated = translated;
+		_symbolicatorQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT);
 	}
 	
 	return self;
@@ -115,18 +117,25 @@
 	return _processID != NON_EXISTENT_PID_NUMBER;
 }
 
-- (id <ZGSymbolicator>)symbolicator
+- (id<ZGSymbolicator>)symbolicator
 {
-	if ([self valid] && _symbolicator == nil && !_failedCreatingSymbolicator)
-	{
-		_symbolicator = [[ZGPrivateCoreSymbolicator alloc] initWithTask:_processTask];
-		// Creating the symbolicator can be very costly; make sure we don't try creating one often if it keeps failing
-		if (_symbolicator == nil)
+	__block id<ZGSymbolicator> symbolicator = nil;
+	
+	dispatch_sync(_symbolicatorQueue, ^{
+		if ([self valid] && _symbolicator == nil && !_failedCreatingSymbolicator)
 		{
-			_failedCreatingSymbolicator = YES;
+			symbolicator = [[ZGPrivateCoreSymbolicator alloc] initWithTask:_processTask];
+			// Creating the symbolicator can be very costly; make sure we don't try creating one often if it keeps failing
+			if (symbolicator == nil)
+			{
+				_failedCreatingSymbolicator = YES;
+			}
+			
+			_symbolicator = symbolicator;
 		}
-	}
-	return _symbolicator;
+	});
+	
+	return symbolicator;
 }
 
 - (NSMutableDictionary<NSString *, NSMutableDictionary *> *)cacheDictionary
