@@ -10,3 +10,6 @@
 
 /* Class = "NSButtonCell"; title = "Ignore Data Alignment"; ObjectID = "mdD-ud-Xce"; */
 "mdD-ud-Xce.title" = "Ignorar la alineación de datos";
+
+/* Class = "NSButtonCell"; title = "Include Shared Memory"; ObjectID = "qqP-sp-LSO"; */
+"qqP-sp-LSO.title" = "Incluir memoria compartida";
