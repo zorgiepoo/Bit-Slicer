@@ -17,12 +17,12 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView misplaced="YES" id="1">
-            <rect key="frame" x="0.0" y="0.0" width="208" height="184"/>
+        <customView id="1">
+            <rect key="frame" x="0.0" y="0.0" width="208" height="193"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="lvI-Pm-BtL">
-                    <rect key="frame" x="18" y="156" width="164" height="18"/>
+                    <rect key="frame" x="18" y="156" width="170" height="18"/>
                     <buttonCell key="cell" type="check" title="Ignore Data Alignment" bezelStyle="regularSquare" imagePosition="left" inset="2" id="mdD-ud-Xce">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
@@ -88,6 +88,7 @@
                 <constraint firstItem="gXR-Ol-foa" firstAttribute="top" secondItem="nq5-hs-gV3" secondAttribute="bottom" constant="8" id="3nz-1V-qXv"/>
                 <constraint firstAttribute="trailing" secondItem="fmL-Km-UYZ" secondAttribute="trailing" constant="20" symbolic="YES" id="Gdd-DR-V1f"/>
                 <constraint firstItem="86H-Wp-nuT" firstAttribute="top" secondItem="fmL-Km-UYZ" secondAttribute="bottom" constant="8" id="KZ0-9A-wXY"/>
+                <constraint firstAttribute="trailing" secondItem="lvI-Pm-BtL" secondAttribute="trailing" constant="20" id="MN2-LB-K0A"/>
                 <constraint firstItem="nq5-hs-gV3" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="20" id="OpR-bK-ZuE"/>
                 <constraint firstItem="fmL-Km-UYZ" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="20" symbolic="YES" id="OtS-KC-5af"/>
                 <constraint firstAttribute="trailing" secondItem="gXR-Ol-foa" secondAttribute="trailing" constant="20" id="PQT-Ec-HW1"/>
@@ -103,11 +104,10 @@
                 <constraint firstAttribute="trailing" secondItem="as8-mk-Lla" secondAttribute="trailing" constant="20" id="pAG-ft-9ZX"/>
                 <constraint firstItem="fmL-Km-UYZ" firstAttribute="top" secondItem="lvI-Pm-BtL" secondAttribute="bottom" constant="6" symbolic="YES" id="rk6-rv-JBS"/>
                 <constraint firstItem="JHr-1W-ydt" firstAttribute="top" secondItem="86H-Wp-nuT" secondAttribute="bottom" constant="8" id="sHV-4H-lLb"/>
-                <constraint firstAttribute="trailing" secondItem="lvI-Pm-BtL" secondAttribute="trailing" constant="26" id="xUg-Vf-UYO"/>
                 <constraint firstAttribute="bottom" secondItem="gXR-Ol-foa" secondAttribute="bottom" constant="20" id="yCd-S4-DhQ"/>
                 <constraint firstAttribute="trailing" secondItem="nq5-hs-gV3" secondAttribute="trailing" constant="20" id="zeg-3J-18e"/>
             </constraints>
-            <point key="canvasLocation" x="-7" y="110"/>
+            <point key="canvasLocation" x="86" y="108.5"/>
         </customView>
     </objects>
 </document>
