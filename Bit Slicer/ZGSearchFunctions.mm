@@ -164,11 +164,8 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 		});
 	}
 	
-	NSMutableArray<NSData *> *allResultSets = [[NSMutableArray alloc] init];
-	for (NSUInteger regionIndex = 0; regionIndex < regions.count; regionIndex++)
-	{
-		[allResultSets addObject:[[NSData alloc] init]];
-	}
+	const void **allResultSets = static_cast<const void **>(calloc(regions.count, sizeof(*allResultSets)));
+	assert(allResultSets != NULL);
 	
 	dispatch_apply(regions.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t regionIndex) {
 		@autoreleasepool
@@ -177,6 +174,8 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 			ZGMemoryAddress address = region.address;
 			ZGMemorySize size = region.size;
 			void *regionBytes = region.bytes;
+			
+			NSData *results = nil;
 			
 			ZGMemorySize dataIndex = 0;
 			char *bytes = nullptr;
@@ -199,7 +198,8 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 				{
 					void *extraStorage = usesExtraStorage ? calloc(1, dataSize) : nullptr;
 					
-					allResultSets[regionIndex] = helper(dataIndex, address, size, bytes, regionBytes, extraStorage);
+					results = helper(dataIndex, address, size, bytes, regionBytes, extraStorage);
+					allResultSets[regionIndex] = CFBridgingRetain(results);
 					
 					free(extraStorage);
 					ZGFreeBytes(bytes, size);
@@ -209,9 +209,9 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 			if (delegate != nil)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
-					searchProgress.numberOfVariablesFound += allResultSets[regionIndex].length / pointerSize;
+					searchProgress.numberOfVariablesFound += results.length / pointerSize;
 					searchProgress.progress++;
-					[delegate progress:searchProgress advancedWithResultSet:allResultSets[regionIndex]];
+					[delegate progress:searchProgress advancedWithResultSet:results];
 				});
 			}
 		}
@@ -224,17 +224,39 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 		resultSets = [NSArray array];
 		
 		// Deallocate results into separate queue since this could take some time
-		__block id oldResultSets = allResultSets;
-		allResultSets = nil;
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			oldResultSets = nil;
+			for (NSUInteger resultSetIndex = 0; resultSetIndex < regions.count; resultSetIndex++)
+			{
+				const void *resultSetData = allResultSets[resultSetIndex];
+				if (resultSetData != nullptr)
+				{
+					CFRelease(resultSetData);
+				}
+			}
+			
+			free(allResultSets);
 		});
 	}
 	else
 	{
-		resultSets = [allResultSets zgFilterUsingBlock:^(NSData *resultSet) {
-			return static_cast<BOOL>(resultSet.length != 0);
-		}];
+		NSMutableArray<NSData *> *filteredResultSets = [NSMutableArray array];
+		for (NSUInteger resultSetIndex = 0; resultSetIndex < regions.count; resultSetIndex++)
+		{
+			const void *resultSetData = allResultSets[resultSetIndex];
+			if (resultSetData != nullptr)
+			{
+				NSData *resultSetObjCData = static_cast<NSData *>(CFBridgingRelease(resultSetData));
+				
+				if (resultSetObjCData.length != 0)
+				{
+					[filteredResultSets addObject:resultSetObjCData];
+				}
+			}
+		}
+		
+		free(allResultSets);
+		
+		resultSets = [filteredResultSets copy];
 	}
 	
 	return [[ZGSearchResults alloc] initWithResultSets:resultSets dataSize:dataSize pointerSize:pointerSize unalignedAccess:unalignedAccesses];
@@ -1444,10 +1466,11 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 	ZGMemorySize *laterResultSetsAbsoluteIndexes = static_cast<ZGMemorySize *>(malloc(sizeof(*laterResultSetsAbsoluteIndexes) * laterSearchResults.resultSets.count));
 	ZGMemorySize laterResultSetsAbsoluteIndexAccumulator = 0;
 	
-	NSMutableArray<NSData *> *newResultSets = [[NSMutableArray alloc] init];
+	const void **newResultSets = static_cast<const void **>(calloc(newResultSetCount, sizeof(*newResultSets)));
+	assert(newResultSets != NULL);
+	
 	for (NSUInteger regionIndex = 0; regionIndex < newResultSetCount; regionIndex++)
 	{
-		[newResultSets addObject:[[NSData alloc] init]];
 		if (regionIndex >= firstSearchResults.resultSets.count)
 		{
 			laterResultSetsAbsoluteIndexes[regionIndex - firstSearchResults.resultSets.count] = laterResultSetsAbsoluteIndexAccumulator;
@@ -1475,19 +1498,22 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 					}
 				}
 				
+				NSData *results = nil;
+				
 				if (oldResultSet.length >= pointerSize && startIndex < oldResultSet.length)
 				{
 					void *extraStorage = usesExtraStorage ? calloc(1, dataSize) : nullptr;
-					newResultSets[resultSetIndex] = helper(resultSetIndex, startIndex, oldResultSet, extraStorage);
+					results = helper(resultSetIndex, startIndex, oldResultSet, extraStorage);
+					newResultSets[resultSetIndex] = CFBridgingRetain(results);
 					free(extraStorage);
 				}
 				
 				if (delegate != nil)
 				{
 					dispatch_async(dispatch_get_main_queue(), ^{
-						searchProgress.numberOfVariablesFound += newResultSets[resultSetIndex].length / pointerSize;
+						searchProgress.numberOfVariablesFound += results.length / pointerSize;
 						searchProgress.progress++;
-						[delegate progress:searchProgress advancedWithResultSet:newResultSets[resultSetIndex]];
+						[delegate progress:searchProgress advancedWithResultSet:results];
 					});
 				}
 			}
@@ -1503,17 +1529,39 @@ ZGSearchResults *ZGNarrowSearchForDataHelper(ZGSearchData *searchData, id <ZGSea
 		resultSets = [NSArray array];
 		
 		// Deallocate results into separate queue since this could take some time
-		__block id oldResultSets = newResultSets;
-		newResultSets = nil;
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			oldResultSets = nil;
+			for (NSUInteger resultSetIndex = 0; resultSetIndex < newResultSetCount; resultSetIndex++)
+			{
+				const void *resultSetData = newResultSets[resultSetIndex];
+				if (resultSetData != nullptr)
+				{
+					CFRelease(resultSetData);
+				}
+			}
+			
+			free(newResultSets);
 		});
 	}
 	else
 	{
-		resultSets = [newResultSets zgFilterUsingBlock:^(NSData *resultSet) {
-			return static_cast<BOOL>(resultSet.length != 0);
-		}];
+		NSMutableArray<NSData *> *filteredResultSets = [NSMutableArray array];
+		for (NSUInteger resultSetIndex = 0; resultSetIndex < newResultSetCount; resultSetIndex++)
+		{
+			const void *resultSetData = newResultSets[resultSetIndex];
+			if (resultSetData != nullptr)
+			{
+				NSData *resultSetObjCData = static_cast<NSData *>(CFBridgingRelease(resultSetData));
+				
+				if (resultSetObjCData.length != 0)
+				{
+					[filteredResultSets addObject:resultSetObjCData];
+				}
+			}
+		}
+		
+		free(newResultSets);
+		
+		resultSets = [filteredResultSets copy];
 	}
 	
 	return [[ZGSearchResults alloc] initWithResultSets:resultSets dataSize:dataSize pointerSize:pointerSize unalignedAccess:unalignedAccess];
