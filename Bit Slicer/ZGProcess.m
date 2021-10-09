@@ -58,7 +58,7 @@
 		_processID = aProcessID;
 		_type = processType;
 		_translated = translated;
-		_symbolicatorQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT);
+		_symbolicatorQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
 	}
 	
 	return self;
@@ -132,6 +132,10 @@
 			}
 			
 			_symbolicator = symbolicator;
+		}
+		else
+		{
+			symbolicator = _symbolicator;
 		}
 	});
 	
