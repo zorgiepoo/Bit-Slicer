@@ -61,6 +61,32 @@
 	return [NSArray arrayWithArray:regions];
 }
 
++ (NSArray<ZGRegion *> *)regionsWithExtendedInfoFromProcessTask:(ZGMemoryMap)processTask
+{
+	NSMutableArray<ZGRegion *> *regions = [[NSMutableArray alloc] init];
+	
+	ZGMemoryAddress address = 0x0;
+	ZGMemorySize size;
+	vm_region_extended_info_data_t info;
+	mach_msg_type_number_t infoCount;
+	mach_port_t objectName = MACH_PORT_NULL;
+	
+	while (YES)
+	{
+		infoCount = VM_REGION_EXTENDED_INFO_COUNT;
+		if (mach_vm_region(processTask, &address, &size, VM_REGION_EXTENDED_INFO, (vm_region_info_t)&info, &infoCount, &objectName) != KERN_SUCCESS)
+		{
+			break;
+		}
+		
+		[regions addObject:[[ZGRegion alloc] initWithAddress:address size:size protection:info.protection userTag:info.user_tag]];
+		
+		address += size;
+	}
+	
+	return [NSArray arrayWithArray:regions];
+}
+
 + (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask
 {
 	NSMutableArray<ZGRegion *> *regions = [[NSMutableArray alloc] init];

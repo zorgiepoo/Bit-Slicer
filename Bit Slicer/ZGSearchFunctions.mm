@@ -146,7 +146,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 	{
 		BOOL includeSharedMemory = searchData.includeSharedMemory;
 		
-		NSArray<ZGRegion *> *nonFilteredRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] :  [ZGRegion regionsFromProcessTask:processTask];
+		NSArray<ZGRegion *> *nonFilteredRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] :  [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
 		
 		regions = ZGFilterRegions(nonFilteredRegions, dataBeginAddress, dataEndAddress, searchData.protectionMode, includeSharedMemory);
 	}
@@ -1695,7 +1695,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(F comparisonFunction, ZGMemoryMap pr
 	ZGPageSize(processTask, &pageSize);
 	
 	BOOL includeSharedMemory = searchData.includeSharedMemory;
-	NSArray<ZGRegion *> *allRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] : [ZGRegion regionsFromProcessTask:processTask];
+	NSArray<ZGRegion *> *allRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] : [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
 	
 	BOOL unalignedAccess = firstSearchResults.unalignedAccess || laterSearchResults.unalignedAccess;
 	BOOL requiresExtraCopy = NO;

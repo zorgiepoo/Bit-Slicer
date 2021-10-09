@@ -48,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 + (NSArray<ZGRegion *> *)regionsFromProcessTask:(ZGMemoryMap)processTask;
++ (NSArray<ZGRegion *> *)regionsWithExtendedInfoFromProcessTask:(ZGMemoryMap)processTask;
 + (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask;
 + (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
 
