@@ -40,9 +40,14 @@
 {
 	NSMutableArray<ZGRegion *> *regions = [[NSMutableArray alloc] init];
 	
-	NSArray<ZGRegion *> *initialRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] : [ZGRegion regionsFromProcessTask:processTask];
+	NSArray<ZGRegion *> *initialRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] : [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
 	for (ZGRegion *region in initialRegions)
 	{
+		if (!includeSharedMemory && region.userTag == VM_MEMORY_SHARED_PMAP)
+		{
+			continue;
+		}
+		
 		void *bytes = NULL;
 		ZGMemorySize size = region.size;
 		
