@@ -14,6 +14,7 @@
 		7208450424E076B400F3D449 /* DataInspectorRepresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7208450224E076B400F3D449 /* DataInspectorRepresenter.m */; };
 		7208450624E084F400F3D449 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7208450524E084F400F3D449 /* Python.framework */; };
 		7208450724E0851000F3D449 /* Python.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 7208450524E084F400F3D449 /* Python.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		720C192C271B4F9700740C8E /* ZGSearchProtectionMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */; };
 		721594FE24DF36360027F600 /* HexFiend.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; };
 		7215950024DF36520027F600 /* HexFiend.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 721594FD24DF36360027F600 /* HexFiend.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7216F7D11AC66133005288A8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 7216F7D01AC66133005288A8 /* dsa_pub.pem */; };
@@ -310,6 +311,8 @@
 		7208450524E084F400F3D449 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = deps/python/Python.framework; sourceTree = "<group>"; };
 		7208454724E0B1DC00F3D449 /* ZGProcessTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGProcessTypes.h; path = "Bit Slicer/ZGProcessTypes.h"; sourceTree = "<group>"; };
 		720C1929271B46B600740C8E /* ReadMe.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ReadMe.md; sourceTree = "<group>"; };
+		720C192A271B4F9700740C8E /* ZGSearchProtectionMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGSearchProtectionMode.h; path = "Bit Slicer/ZGSearchProtectionMode.h"; sourceTree = "<group>"; };
+		720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGSearchProtectionMode.m; path = "Bit Slicer/ZGSearchProtectionMode.m"; sourceTree = "<group>"; };
 		721594FD24DF36360027F600 /* HexFiend.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HexFiend.framework; path = deps/HexFiend/HexFiend.framework; sourceTree = "<group>"; };
 		721594FF24DF36460027F600 /* HFLineCountingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HFLineCountingView.h; path = deps/HexFiend/HFLineCountingView.h; sourceTree = "<group>"; };
 		7216F7D01AC66133005288A8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Bit Slicer/dsa_pub.pem"; sourceTree = "<group>"; };
@@ -1317,6 +1320,8 @@
 			children = (
 				77F1160D17D2EED6009E002A /* ZGSearchData.h */,
 				77F1160E17D2EED6009E002A /* ZGSearchData.m */,
+				720C192A271B4F9700740C8E /* ZGSearchProtectionMode.h */,
+				720C192B271B4F9700740C8E /* ZGSearchProtectionMode.m */,
 				77282121189E769B0044E4BC /* ZGStoredData.h */,
 				77282122189E769B0044E4BC /* ZGStoredData.m */,
 				772DA7E71868F0A7009DD963 /* ZGSearchProgressDelegate.h */,
@@ -1759,6 +1764,7 @@
 				722EE7901B19481300934EF3 /* ZGProtectionDescription.m in Sources */,
 				722EE78A1B19461000934EF3 /* ZGMemoryAddressExpressionParsing.m in Sources */,
 				77F1164D17D2EFDA009E002A /* ZGBreakPoint.m in Sources */,
+				720C192C271B4F9700740C8E /* ZGSearchProtectionMode.m in Sources */,
 				72030ADC1B00191400A5621C /* ZGScriptingInterpreter.m in Sources */,
 				722EE7841B19406700934EF3 /* ZGRunAlertPanel.m in Sources */,
 				7275F8A51BA4756100FD144C /* ZGNullability.m in Sources */,

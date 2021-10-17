@@ -850,10 +850,15 @@
 	
 	[windowController setStatusString:ZGLocalizableSearchDocumentString(@"storingValuesStatusLabel")];
 	
+	ZGMemoryAddress beginAddress = _searchData.beginAddress;
+	ZGMemoryAddress endAddress = _searchData.endAddress;
+	ZGProtectionMode protectionMode = _searchData.protectionMode;
 	BOOL includeSharedMemory = _searchData.includeSharedMemory;
 	
+	ZGMemoryMap processTask = windowController.currentProcess.processTask;
+	
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		__block ZGStoredData *tempSavedData = [ZGStoredData storedDataFromProcessTask:windowController.currentProcess.processTask includeSharedMemory:includeSharedMemory];
+		__block ZGStoredData *tempSavedData = [ZGStoredData storedDataFromProcessTask:processTask beginAddress:beginAddress endAddress:endAddress protectionMode:protectionMode includeSharedMemory:includeSharedMemory];
 		
 		dispatch_async(dispatch_get_main_queue(), ^{
 			if (!self->_searchProgress.shouldCancelSearch)

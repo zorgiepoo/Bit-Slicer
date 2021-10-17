@@ -32,6 +32,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGSearchProtectionMode.h"
 
 #define DEFAULT_FLOATING_POINT_EPSILON 0.1
 
@@ -63,13 +64,6 @@ NS_ASSUME_NONNULL_BEGIN
 	unsigned char * _Nullable _byteArrayFlags; // For wildcard byte array searches
 #pragma clang diagnostic pop
 }
-
-typedef NS_ENUM(NSInteger, ZGProtectionMode)
-{
-	ZGProtectionAll,
-	ZGProtectionWrite,
-	ZGProtectionExecute
-};
 
 @property (nonatomic, nullable) void *searchValue;
 @property (nonatomic) ZGMemorySize dataSize;

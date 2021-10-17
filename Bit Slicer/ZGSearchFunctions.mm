@@ -115,19 +115,6 @@ double ZGSwapBytes<double>(double value)
 
 #pragma mark Generic Searching
 
-static bool ZGMemoryProtectionMatchesProtectionMode(ZGMemoryProtection memoryProtection, ZGProtectionMode protectionMode)
-{
-	return ((protectionMode == ZGProtectionAll && memoryProtection & VM_PROT_READ) || (protectionMode == ZGProtectionWrite && memoryProtection & VM_PROT_WRITE) || (protectionMode == ZGProtectionExecute && memoryProtection & VM_PROT_EXECUTE));
-}
-
-static NSArray<ZGRegion *> *ZGFilterRegions(NSArray<ZGRegion *> *regions, ZGMemoryAddress beginAddress, ZGMemoryAddress endAddress, ZGProtectionMode protectionMode, BOOL includeSharedMemory)
-{
-	return [regions zgFilterUsingBlock:^(ZGRegion *region) {
-		// For shared memory / pmap, see https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/vm/vm.html
-		return static_cast<BOOL>(region.address < endAddress && region.address + region.size > beginAddress && ZGMemoryProtectionMatchesProtectionMode(region.protection, protectionMode) && (includeSharedMemory || region.userTag != VM_MEMORY_SHARED_PMAP));
-	}];
-}
-
 typedef NSData *(^zg_search_for_data_helper_t)(ZGMemorySize dataIndex, ZGMemoryAddress address, ZGMemorySize size, void *bytes, void *regionBytes, void *extraStorage);
 
 ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *searchData, BOOL unalignedAccesses, BOOL usesExtraStorage, id <ZGSearchProgressDelegate> delegate,  zg_search_for_data_helper_t helper)
@@ -148,7 +135,7 @@ ZGSearchResults *ZGSearchForDataHelper(ZGMemoryMap processTask, ZGSearchData *se
 		
 		NSArray<ZGRegion *> *nonFilteredRegions = includeSharedMemory ? [ZGRegion submapRegionsFromProcessTask:processTask] :  [ZGRegion regionsWithExtendedInfoFromProcessTask:processTask];
 		
-		regions = ZGFilterRegions(nonFilteredRegions, dataBeginAddress, dataEndAddress, searchData.protectionMode, includeSharedMemory);
+		regions = [ZGRegion regionsFilteredFromRegions:nonFilteredRegions beginAddress:dataBeginAddress endAddress:dataEndAddress protectionMode:searchData.protectionMode includeSharedMemory:includeSharedMemory];
 	}
 	else
 	{
@@ -1780,7 +1767,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(F comparisonFunction, ZGMemoryMap pr
 				lastAddress = searchData.endAddress;
 			}
 
-			NSArray<ZGRegion *> *regions = ZGFilterRegions(allRegions, firstAddress, lastAddress, searchData.protectionMode, includeSharedMemory);
+			NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:allRegions beginAddress:firstAddress endAddress:lastAddress protectionMode:searchData.protectionMode includeSharedMemory:includeSharedMemory];
 			
 			for (ZGRegion *region in regions)
 			{
@@ -1850,7 +1837,7 @@ ZGSearchResults *ZGNarrowSearchWithFunction(F comparisonFunction, ZGMemoryMap pr
 			{
 				pageToSavedRegionTable = [[NSMutableDictionary alloc] init];
 				
-				NSArray<ZGRegion *> *regions = ZGFilterRegions(savedData, firstAddress, lastAddress, searchData.protectionMode, includeSharedMemory);
+				NSArray<ZGRegion *> *regions = [ZGRegion regionsFilteredFromRegions:savedData beginAddress:firstAddress endAddress:lastAddress protectionMode:searchData.protectionMode includeSharedMemory:includeSharedMemory];
 				
 				for (ZGRegion *region in regions)
 				{

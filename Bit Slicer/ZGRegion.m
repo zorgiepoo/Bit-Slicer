@@ -32,6 +32,7 @@
 
 #import "ZGRegion.h"
 #import <mach/mach_vm.h>
+#import "NSArrayAdditions.h"
 
 @implementation ZGRegion
 
@@ -164,6 +165,14 @@
 	}
 	
 	return regions;
+}
+
++ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory
+{
+	return [regions zgFilterUsingBlock:^(ZGRegion *region) {
+		// For shared memory / pmap, see https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/vm/vm.html
+		return (BOOL)(region.address < endAddress && region.address + region.size > beginAddress && ZGMemoryProtectionMatchesProtectionMode(region.protection, protectionMode) && (includeSharedMemory || region.userTag != VM_MEMORY_SHARED_PMAP));
+	}];
 }
 
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection userTag:(uint32_t)userTag

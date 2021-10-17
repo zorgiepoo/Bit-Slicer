@@ -32,6 +32,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGSearchProtectionMode.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -51,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<ZGRegion *> *)regionsWithExtendedInfoFromProcessTask:(ZGMemoryMap)processTask;
 + (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask;
 + (NSArray<ZGRegion *> *)submapRegionsFromProcessTask:(ZGMemoryMap)processTask region:(ZGRegion *)region;
+
++ (NSArray<ZGRegion *> *)regionsFilteredFromRegions:(NSArray<ZGRegion *> *)regions beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory;
 
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size protection:(ZGMemoryProtection)protection userTag:(uint32_t)userTag;
 - (id)initWithAddress:(ZGMemoryAddress)address size:(ZGMemorySize)size;

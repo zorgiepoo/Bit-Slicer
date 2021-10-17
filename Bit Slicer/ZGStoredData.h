@@ -32,6 +32,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ZGMemoryTypes.h"
+#import "ZGSearchProtectionMode.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -39,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGStoredData : NSObject
 
-+ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask includeSharedMemory:(BOOL)includeSharedMemory;
++ (instancetype)storedDataFromProcessTask:(ZGMemoryMap)processTask beginAddress:(ZGMemoryAddress)beginAddress endAddress:(ZGMemoryAddress)endAddress protectionMode:(ZGProtectionMode)protectionMode includeSharedMemory:(BOOL)includeSharedMemory;
 
 @property (nonatomic, readonly) NSArray<ZGRegion *> *regions;
 
