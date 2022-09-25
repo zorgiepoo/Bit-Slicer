@@ -90,8 +90,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 {
 	ZGDisassemblerModeAutomatic,
-	ZGDisassemblerModeX86_64,
-	ZGDisassemblerModeARM64
+	ZGDisassemblerModeIntel,
+	ZGDisassemblerModeARM
 };
 
 @implementation ZGDebuggerController
@@ -1109,31 +1109,39 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 	_baseAddress = baseAddress;
 	_offsetFromBase = calculatedMemoryAddress - baseAddress;
 	
+	ZGProcessType currentProcessType = self.currentProcess.type;
+	
 	switch (_currentDisassemblerMode)
 	{
 		case ZGDisassemblerModeAutomatic:
-			if (!self.currentProcess.translated)
+			if (ZG_PROCESS_TYPE_IS_ARM64(currentProcessType) && self.currentProcess.translated)
 			{
-				_disassemblerProcessType = self.currentProcess.type;
+				if (shouldUseFirstInstruction || (segmentName != nil && [segmentName isEqualToString:@"__TEXT"]))
+				{
+					_disassemblerProcessType = ZGProcessTypeX86_64;
+				}
+				else
+				{
+					_disassemblerProcessType = ZGProcessTypeARM64;
+				}
 			}
-			else if (shouldUseFirstInstruction)
+			else
 			{
-				_disassemblerProcessType = ZGProcessTypeX86_64;
+				_disassemblerProcessType = currentProcessType;
 			}
-			else if (segmentName != nil &&  [segmentName isEqualToString:@"__TEXT"])
+			
+			break;
+		case ZGDisassemblerModeIntel:
+			if (ZG_PROCESS_TYPE_IS_ARM64(currentProcessType))
 			{
 				_disassemblerProcessType = ZGProcessTypeX86_64;
 			}
 			else
 			{
-				_disassemblerProcessType = ZGProcessTypeARM64;
+				_disassemblerProcessType = currentProcessType;
 			}
-			
 			break;
-		case ZGDisassemblerModeX86_64:
-			_disassemblerProcessType = ZGProcessTypeX86_64;
-			break;
-		case ZGDisassemblerModeARM64:
+		case ZGDisassemblerModeARM:
 			_disassemblerProcessType = ZGProcessTypeARM64;
 			break;
 	}
