@@ -930,8 +930,20 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 	if (requestedDisassemblerMode != _currentDisassemblerMode)
 	{
 		_currentDisassemblerMode = requestedDisassemblerMode;
+		
+		ZGMemoryAddress selectedAddress;
+		if (_instructions.count > 0)
+		{
+			selectedAddress = ((ZGInstruction *)[[self selectedInstructions] lastObject]).variable.address;
+		}
+		else
+		{
+			selectedAddress = 0x0;
+		}
+		
 		_instructions = @[];
-		[self readMemory:nil];
+		
+		[self jumpToMemoryAddress:selectedAddress];
 	}
 }
 
@@ -968,7 +980,16 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 	else
 	{
 		NSString *userInput = self.addressTextField.stringValue;
-		ZGMemoryAddress selectedAddress = ((ZGInstruction *)[[self selectedInstructions] lastObject]).variable.address;
+		ZGMemoryAddress selectedAddress;
+		if (_instructions.count > 0)
+		{
+			selectedAddress = ((ZGInstruction *)[[self selectedInstructions] lastObject]).variable.address;
+		}
+		else
+		{
+			selectedAddress = 0x0;
+		}
+		
 		NSError *error = nil;
 		NSString *calculatedMemoryAddressExpression = [ZGCalculator evaluateAndSymbolicateExpression:userInput process:self.currentProcess currentAddress:selectedAddress didSymbolicate:&didFindSymbol error:&error];
 		if (error != nil)
