@@ -55,7 +55,7 @@
 	NSMutableArray<ZGInstruction *> *newInstructions = [[NSMutableArray alloc] init];
 	NSMutableArray<NSNumber *> *newBasePointers = [[NSMutableArray alloc] init];
 	
-	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer+1 inProcess:process withBreakPoints:breakPoints machBinaries:machBinaries];
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer+1 inProcess:process withBreakPoints:breakPoints processType:process.type machBinaries:machBinaries];
 	if (currentInstruction != nil)
 	{
 		[newInstructions addObject:currentInstruction];
@@ -88,7 +88,7 @@
 			
 			ZGFreeBytes(returnAddressBytes, returnAddressSize);
 			
-			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints machBinaries:machBinaries];
+			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:returnAddress inProcess:process withBreakPoints:breakPoints processType:process.type machBinaries:machBinaries];
 			if (instruction == nil)
 			{
 				break;

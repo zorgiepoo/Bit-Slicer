@@ -295,7 +295,7 @@
 	}
 	
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:watchProcess];
-	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddress inProcess:watchProcess withBreakPoints:_breakPointController.breakPoints machBinaries:machBinaries];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionAddress inProcess:watchProcess withBreakPoints:_breakPointController.breakPoints processType:watchProcess.type machBinaries:machBinaries];
 	
 	if (instruction == nil)
 	{

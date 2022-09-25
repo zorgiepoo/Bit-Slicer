@@ -577,7 +577,7 @@ static ZGBreakPointController *gBreakPointController;
 			if (existingInstructionAddress == nil)
 			{
 				NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:breakPoint.process];
-				ZGInstruction *foundInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:[self breakPoints] machBinaries:machBinaries];
+				ZGInstruction *foundInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer inProcess:breakPoint.process withBreakPoints:[self breakPoints] processType:breakPoint.process.type machBinaries:machBinaries];
 				foundInstructionAddress = foundInstruction.variable.address;
 				[breakPoint.cacheDictionary setObject:@(foundInstructionAddress) forKey:instructionPointerNumber];
 			}

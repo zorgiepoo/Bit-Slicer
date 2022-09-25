@@ -828,7 +828,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		NSNumber *cachedInstructionAddress = [self->_cachedInstructionPointers objectForKey:instructionPointerNumber];
 		if (cachedInstructionAddress == nil)
 		{
-			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:[instructionPointerNumber unsignedLongLongValue] inProcess:self->_process withBreakPoints:self->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->_process]];
+			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:[instructionPointerNumber unsignedLongLongValue] inProcess:self->_process withBreakPoints:self->_breakPointController.breakPoints processType:self->_process.type machBinaries:[ZGMachBinary machBinariesInProcess:self->_process]];
 			
 			instructionAddress = instruction.variable.address;
 			[self->_cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointerNumber];
@@ -978,7 +978,7 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->objcSelf->_process.type machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
 	
 	if (instruction == nil)
 	{
@@ -1006,7 +1006,7 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->objcSelf->_process.type machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
 	
 	if (instruction == nil)
 	{
@@ -1087,7 +1087,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
-	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries];
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->objcSelf->_process.type machBinaries:machBinaries];
 	
 	if (currentInstruction == nil)
 	{
@@ -1097,7 +1097,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic processType:self->processType])
 	{
-		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries];
+		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->objcSelf->_process.type machBinaries:machBinaries];
 		
 		if (nextInstruction == nil)
 		{
@@ -1167,6 +1167,7 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	 findInstructionBeforeAddress:outerInstruction.variable.address + outerInstruction.variable.size + 1
 	 inProcess:self->objcSelf->_process
 	 withBreakPoints:self->objcSelf->_breakPointController.breakPoints
+	 processType:self->objcSelf->_process.type
 	 machBinaries:machBinaries];
 
 	if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:returnInstruction inProcess:self->objcSelf->_process thread:self->objcSelf->_haltedBreakPoint.thread basePointer:outerBasePointer.unsignedLongLongValue callback:callback delegate:self->objcSelf])

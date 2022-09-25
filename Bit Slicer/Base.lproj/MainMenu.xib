@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21503.1" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21503.1"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -458,6 +458,31 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1026"/>
+                            <menuItem title="Interpreted Architecture" id="vV8-3a-ezp">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Interpreted Architecture" id="BaG-A0-N8t">
+                                    <items>
+                                        <menuItem title="Automatic" state="on" id="rWs-2Z-FeI">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDisassemblerMode:" target="-1" id="hJG-iN-xqs"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="X86_64" tag="1" id="w1U-cj-wiW">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDisassemblerMode:" target="-1" id="xTQ-1s-gUi"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="ARM64" tag="2" id="kZY-ld-8iB">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeDisassemblerMode:" target="-1" id="9in-Rx-hJt"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
                             <menuItem title="Registers Qualifier" id="1027">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Registers Qualifier" id="1028">
