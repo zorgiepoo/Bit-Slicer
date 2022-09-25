@@ -1453,15 +1453,16 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 	}
 	else if (userInterfaceItem.action == @selector(requestCodeInjection:))
 	{
-#if TARGET_CPU_ARM64
 		// Code injection is not supported on arm64
-		return NO;
-#else
+		if (_disassemblerProcessType == ZGProcessTypeARM64)
+		{
+			return NO;
+		}
+		
 		if ([[self selectedInstructions] count] != 1)
 		{
 			return NO;
 		}
-#endif
 	}
 	else if (userInterfaceItem.action == @selector(showBreakPointCondition:))
 	{
@@ -1842,6 +1843,7 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 	[_codeInjectionController
 	 attachToWindow:ZGUnwrapNullableObject(self.window)
 	 process:self.currentProcess
+	 processType:_disassemblerProcessType
 	 instruction:[[self selectedInstructions] objectAtIndex:0]
 	 breakPoints:_breakPointController.breakPoints
 	 undoManager:self.undoManager];

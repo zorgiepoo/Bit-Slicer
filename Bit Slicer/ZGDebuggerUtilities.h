@@ -78,13 +78,14 @@ actionName:(nullable NSString *)actionName;
 
 + (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process processType:(ZGProcessType)processType breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager actionName:(nullable NSString *)actionName;
 
-+ (NSArray<ZGInstruction *> * _Nullable)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints;
++ (NSArray<ZGInstruction *> * _Nullable)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints processType:(ZGProcessType)processType;
 
 + (BOOL)
 injectCode:(NSData *)codeData
 intoAddress:(ZGMemoryAddress)allocatedAddress
 hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
 process:(ZGProcess *)process
+processType:(ZGProcessType)processType
 breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 undoManager:(nullable NSUndoManager *)undoManager
 error:(NSError  **)error;

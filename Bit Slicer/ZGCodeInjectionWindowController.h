@@ -31,6 +31,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import "ZGProcessTypes.h"
 
 @class ZGProcess;
 @class ZGInstruction;
@@ -40,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGCodeInjectionWindowController : NSWindowController
 
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager;
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager;
 
 @end
 
