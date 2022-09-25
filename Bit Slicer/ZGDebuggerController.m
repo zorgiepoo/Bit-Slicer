@@ -1466,7 +1466,7 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 	}
 	else if (userInterfaceItem.action == @selector(showBreakPointCondition:))
 	{
-		if ([[self selectedInstructions] count] != 1)
+		if ([[self selectedInstructions] count] != 1 || ![self disassemblerProcessTypeIsNative])
 		{
 			return NO;
 		}
@@ -1636,7 +1636,7 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
-			result = @([self isBreakPointAtInstruction:instruction]);
+			result = @([self disassemblerProcessTypeIsNative] && [self isBreakPointAtInstruction:instruction]);
 		}
 	}
 	
@@ -1687,30 +1687,47 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 
 - (void)tableView:(NSTableView *)__unused tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
-	if ([tableColumn.identifier isEqualToString:@"address"] && rowIndex >= 0 && (NSUInteger)rowIndex < _instructions.count)
+	if (rowIndex >= 0 && (NSUInteger)rowIndex < _instructions.count)
 	{
-		ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
-		BOOL isInstructionBreakPoint = ([self currentBreakPoint] && _registersViewController.instructionPointer == instruction.variable.address);
-		
-		[(NSTextFieldCell *)cell setTextColor:isInstructionBreakPoint ? NSColor.systemRedColor : NSColor.controlTextColor];
+		if ([tableColumn.identifier isEqualToString:@"address"])
+		{
+			ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
+			BOOL isInstructionBreakPoint = ([self currentBreakPoint] && _registersViewController.instructionPointer == instruction.variable.address);
+			
+			[(NSTextFieldCell *)cell setTextColor:isInstructionBreakPoint ? NSColor.systemRedColor : NSColor.controlTextColor];
+		}
+		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
+		{
+			BOOL enabled = [self disassemblerProcessTypeIsNative];
+			
+			NSButtonCell *buttonCell = (NSButtonCell *)cell;
+			buttonCell.enabled = enabled;
+		}
 	}
 }
 
-- (NSString *)tableView:(NSTableView *)__unused tableView toolTipForCell:(NSCell *)__unused cell rect:(NSRectPointer)__unused rect tableColumn:(NSTableColumn *)__unused tableColumn row:(NSInteger)row mouseLocation:(NSPoint)__unused mouseLocation
+- (NSString *)tableView:(NSTableView *)__unused tableView toolTipForCell:(NSCell *)__unused cell rect:(NSRectPointer)__unused rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)__unused mouseLocation
 {
 	NSString *toolTip = nil;
 	
 	if (row >= 0 && (NSUInteger)row < _instructions.count)
 	{
-		ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)row];
-		
-		for (ZGBreakPointCondition *breakPointCondition in _breakPointConditions)
+		if ([self disassemblerProcessTypeIsNative])
 		{
-			if ([breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && instruction.variable.address == breakPointCondition.address)
+			ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)row];
+			
+			for (ZGBreakPointCondition *breakPointCondition in _breakPointConditions)
 			{
-				toolTip = [NSString stringWithFormat:@"%@: %@", ZGLocalizedStringFromDebuggerTable(@"breakpointConditionTooltipLabel"), breakPointCondition.condition];
-				break;
+				if ([breakPointCondition.internalProcessName isEqualToString:self.currentProcess.internalName] && instruction.variable.address == breakPointCondition.address)
+				{
+					toolTip = [NSString stringWithFormat:@"%@: %@", ZGLocalizedStringFromDebuggerTable(@"breakpointConditionTooltipLabel"), breakPointCondition.condition];
+					break;
+				}
 			}
+		}
+		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
+		{
+			toolTip = @"Debugging Intel code in Rosetta targets is not supported. Debugging ARM code is supported however.";
 		}
 	}
 	
