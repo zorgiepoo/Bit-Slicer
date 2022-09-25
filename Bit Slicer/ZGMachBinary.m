@@ -398,7 +398,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 		NSData *machFileData = [NSData dataWithContentsOfFile:filePath];
 		if (machFileData != nil)
 		{
-			ZGProcessType processType = process.translated ? ZGProcessTypeX86_64 : process.type;
+			ZGProcessType processType = (ZG_PROCESS_TYPE_IS_ARM64(process.type) && process.translated) ? ZGProcessTypeX86_64 : process.type;
 			binaryInfo = [self parseMachHeaderWithBytes:machFileData.bytes startPointer:machFileData.bytes dataLength:machFileData.length processType:processType];
 			if (binaryInfo != nil)
 			{
@@ -447,7 +447,7 @@ NSString * const ZGFailedImageName = @"ZGFailedImageName";
 			
 			if (ZGReadBytes(process.processTask, _headerAddress, &machBinaryBytes, &machBinarySize))
 			{
-				ZGProcessType processType = process.translated ? ZGProcessTypeX86_64 : process.type;
+				ZGProcessType processType = (ZG_PROCESS_TYPE_IS_ARM64(process.type) && process.translated) ? ZGProcessTypeX86_64 : process.type;
 				
 				binaryInfo = [self parseMachHeaderWithBytes:machBinaryBytes startPointer:machBinaryBytes dataLength:machBinarySize processType:processType];
 				
