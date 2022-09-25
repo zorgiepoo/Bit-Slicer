@@ -254,6 +254,12 @@
 /* Class = "NSMenu"; title = "Registers Qualifier"; ObjectID = "1028"; */
 "1028.title" = "Класификатор регистров";
 
+/* Class = "NSMenu"; title = "Interpreted Architecture"; ObjectID = "vV8-3a-ezp"; */
+"vV8-3a-ezp.title" = "Интерпретированная архитектура";
+
+/* Class = "NSMenuItem"; title = "Automatic"; ObjectID = "rWs-2Z-FeI"; */
+"rWs-2Z-FeI.title" = "автоматический";
+
 /* Class = "NSMenuItem"; title = "Watch Variable"; ObjectID = "1047"; */
 "1047.title" = "Следить за переменной";
 

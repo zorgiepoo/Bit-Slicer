@@ -254,6 +254,12 @@
 /* Class = "NSMenu"; title = "Registers Qualifier"; ObjectID = "1028"; */
 "1028.title" = "Registra el Qualifier";
 
+/* Class = "NSMenu"; title = "Interpreted Architecture"; ObjectID = "vV8-3a-ezp"; */
+"vV8-3a-ezp.title" = "Arquitectura Interpretada";
+
+/* Class = "NSMenuItem"; title = "Automatic"; ObjectID = "rWs-2Z-FeI"; */
+"rWs-2Z-FeI.title" = "Auto";
+
 /* Class = "NSMenuItem"; title = "Watch Variable"; ObjectID = "1047"; */
 "1047.title" = "Observar Variable";
 

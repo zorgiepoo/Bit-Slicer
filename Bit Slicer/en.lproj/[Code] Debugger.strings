@@ -37,6 +37,9 @@
 /* Tooltip Label when mouse hovering over an instruction that has a breakpoint condition configured */
 "breakpointConditionTooltipLabel" = "Breakpoint Condition";
 
+/* Tooltip Label for letting user know debugging intel code in Rosetta process is unsupported when mouse hovering over an instruction breakpoint column */
+"breakpointIntelRosettaUnsupportedTooltipLabel" = "Debugging Intel code in Rosetta targets is not supported. Debugging ARM code is supported however.";
+
 /* Alert title that shows up when failing to alter an instruction's assembly */
 "failedModifyInstructionAlertTitle" = "Failed to Modify Instruction";
 

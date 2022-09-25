@@ -1748,7 +1748,7 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 		}
 		else if ([tableColumn.identifier isEqualToString:@"breakpoint"])
 		{
-			toolTip = @"Debugging Intel code in Rosetta targets is not supported. Debugging ARM code is supported however.";
+			toolTip = ZGLocalizedStringFromDebuggerTable(@"breakpointIntelRosettaUnsupportedTooltipLabel");
 		}
 	}
 	
