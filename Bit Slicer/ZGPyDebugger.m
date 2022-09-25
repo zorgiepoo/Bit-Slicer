@@ -554,19 +554,49 @@ static PyObject *Debugger_isRegisteredHotkey(DebuggerClass *self, PyObject *args
 	Py_RETURN_TRUE;
 }
 
+static ZGProcessType _processTypeFromDisassemblerMode(DebuggerClass *self, char disassemblerMode)
+{
+	ZGProcessType processType;
+	switch ((NSInteger)disassemblerMode)
+	{
+		case ZGDisassemblerModeIntel:
+			if (ZG_PROCESS_TYPE_IS_ARM64(self->processType))
+			{
+				processType = ZGProcessTypeX86_64;
+			}
+			else
+			{
+				processType = self->processType;
+			}
+			break;
+		case ZGDisassemblerModeARM:
+			processType = ZGProcessTypeARM64;
+			break;
+		case ZGDisassemblerModeAutomatic:
+		default:
+			processType = self->processType;
+			break;
+	}
+	
+	return processType;
+}
+
 static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress instructionPointer = 0;
+	char assembleMode = 0;
 	char *codeString = NULL;
 	
-	if (PyArg_ParseTuple(args, "s|K:assemble", &codeString, &instructionPointer))
+	if (PyArg_ParseTuple(args, "s|Kb:assemble", &codeString, &instructionPointer, &assembleMode))
 	{
 		NSString *codeStringValue = @(codeString);
 		if (codeStringValue != nil)
 		{
+			ZGProcessType processType = _processTypeFromDisassemblerMode(self, assembleMode);
+			
 			NSError *error = nil;
-			NSData *assembledData = [ZGDebuggerUtilities assembleInstructionText:codeStringValue atInstructionPointer:instructionPointer processType:self->processType error:&error];
+			NSData *assembledData = [ZGDebuggerUtilities assembleInstructionText:codeStringValue atInstructionPointer:instructionPointer processType:processType error:&error];
 			
 			if (assembledData != nil)
 			{
@@ -600,8 +630,9 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 	PyObject *retValue = NULL;
 	Py_buffer buffer;
 	ZGMemoryAddress instructionPointer = 0;
+	char disassembleMode = 0;
 	
-	if (PyArg_ParseTuple(args, "s*|K:disassemble", &buffer, &instructionPointer))
+	if (PyArg_ParseTuple(args, "s*|Kb:disassemble", &buffer, &instructionPointer, &disassembleMode))
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{
@@ -611,7 +642,9 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		id<ZGDisassemblerObject> disassemblerObject = [ZGDisassemblerObject disassemblerObjectWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len processType:self->processType];
+		ZGProcessType processType = _processTypeFromDisassemblerMode(self, disassembleMode);
+		
+		id<ZGDisassemblerObject> disassemblerObject = [ZGDisassemblerObject disassemblerObjectWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len processType:processType];
 		
 		NSArray<ZGInstruction *> *instructions = [disassemblerObject readInstructions];
 		

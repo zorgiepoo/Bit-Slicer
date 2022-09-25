@@ -87,13 +87,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	ZGStepOutExecution
 };
 
-typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
-{
-	ZGDisassemblerModeAutomatic,
-	ZGDisassemblerModeIntel,
-	ZGDisassemblerModeARM
-};
-
 @implementation ZGDebuggerController
 {
 	BOOL _cleanedUp;

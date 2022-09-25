@@ -48,6 +48,13 @@ extern const uint8_t gBreakpointOpcode[1];
 @class ZGMachBinary;
 @class ZGBreakPoint;
 
+typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
+{
+	ZGDisassemblerModeAutomatic,
+	ZGDisassemblerModeIntel,
+	ZGDisassemblerModeARM
+};
+
 #define INJECTED_NOP_SLIDE_LENGTH 0x10
 #define X86_NOP_VALUE 0x90
 
