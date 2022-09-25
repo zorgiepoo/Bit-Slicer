@@ -468,13 +468,13 @@ CA
                                                 <action selector="changeDisassemblerMode:" target="-1" id="hJG-iN-xqs"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="X86_64" tag="1" id="w1U-cj-wiW">
+                                        <menuItem title="Intel" tag="1" id="w1U-cj-wiW">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="changeDisassemblerMode:" target="-1" id="xTQ-1s-gUi"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="ARM64" tag="2" id="kZY-ld-8iB">
+                                        <menuItem title="ARM" tag="2" id="kZY-ld-8iB">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="changeDisassemblerMode:" target="-1" id="9in-Rx-hJt"/>
