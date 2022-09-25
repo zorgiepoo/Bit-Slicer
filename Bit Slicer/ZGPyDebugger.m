@@ -77,6 +77,7 @@ static PyMemberDef Debugger_members[] =
 };
 
 #define declareDebugPrototypeMethod(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args);
+#define declareDebugPrototypeMethodWithKeywords(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args, PyObject *kwargs);
 
 declareDebugPrototypeMethod(log)
 declareDebugPrototypeMethod(notify)
@@ -86,8 +87,8 @@ declareDebugPrototypeMethod(registerHotkey)
 declareDebugPrototypeMethod(unregisterHotkey)
 declareDebugPrototypeMethod(isRegisteredHotkey)
 
-declareDebugPrototypeMethod(assemble)
-declareDebugPrototypeMethod(disassemble)
+declareDebugPrototypeMethodWithKeywords(assemble)
+declareDebugPrototypeMethodWithKeywords(disassemble)
 declareDebugPrototypeMethod(readBytes)
 declareDebugPrototypeMethod(writeBytes)
 declareDebugPrototypeMethod(findSymbol)
@@ -108,6 +109,7 @@ declareDebugPrototypeMethod(writeRegisters)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
 #define declareDebugMethod(name) declareDebugMethod2(name, METH_VARARGS)
+#define declareDebugMethodWithKeywords(name) declareDebugMethod2(name, METH_VARARGS | METH_KEYWORDS)
 
 static PyMethodDef Debugger_methods[] =
 {
@@ -118,8 +120,8 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(registerHotkey)
 	declareDebugMethod(unregisterHotkey)
 	declareDebugMethod(isRegisteredHotkey)
-	declareDebugMethod(assemble)
-	declareDebugMethod(disassemble)
+	declareDebugMethodWithKeywords(assemble)
+	declareDebugMethodWithKeywords(disassemble)
 	declareDebugMethod(findSymbol)
 	declareDebugMethod(symbolAt)
 	declareDebugMethod(readBytes)
@@ -581,14 +583,16 @@ static ZGProcessType _processTypeFromDisassemblerMode(DebuggerClass *self, char 
 	return processType;
 }
 
-static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
+static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args, PyObject *kwargs)
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress instructionPointer = 0;
 	char assembleMode = 0;
 	char *codeString = NULL;
 	
-	if (PyArg_ParseTuple(args, "s|Kb:assemble", &codeString, &instructionPointer, &assembleMode))
+	static char *kwlist[] = {"string", "instructionPointer", "mode", NULL};
+	
+	if (PyArg_ParseTupleAndKeywords(args, kwargs, "s|Kb:assemble", kwlist, &codeString, &instructionPointer, &assembleMode))
 	{
 		NSString *codeStringValue = @(codeString);
 		if (codeStringValue != nil)
@@ -625,14 +629,16 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 	return retValue;
 }
 
-static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
+static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args, PyObject *kwargs)
 {
 	PyObject *retValue = NULL;
 	Py_buffer buffer;
 	ZGMemoryAddress instructionPointer = 0;
 	char disassembleMode = 0;
 	
-	if (PyArg_ParseTuple(args, "s*|Kb:disassemble", &buffer, &instructionPointer, &disassembleMode))
+	static char *kwlist[] = {"buffer", "instructionPointer", "mode", NULL};
+	
+	if (PyArg_ParseTupleAndKeywords(args, kwargs, "s*|Kb:disassemble", kwlist, &buffer, &instructionPointer, &disassembleMode))
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{
