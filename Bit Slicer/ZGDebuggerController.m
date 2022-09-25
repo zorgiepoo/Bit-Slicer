@@ -1431,11 +1431,11 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 		}
 		
 		ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
-		if ([ZGDisassemblerObject isCallMnemonic:selectedInstruction.mnemonic processType:self.currentProcess.type])
+		if ([ZGDisassemblerObject isCallMnemonic:selectedInstruction.mnemonic processType:_disassemblerProcessType])
 		{
 			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToCallAddress");
 		}
-		else if ([ZGDisassemblerObject isJumpMnemonic:selectedInstruction.mnemonic processType:self.currentProcess.type])
+		else if ([ZGDisassemblerObject isJumpMnemonic:selectedInstruction.mnemonic processType:_disassemblerProcessType])
 		{
 			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToBranchAddress");
 		}
