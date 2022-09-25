@@ -260,6 +260,12 @@
 /* Class = "NSMenuItem"; title = "Automatic"; ObjectID = "rWs-2Z-FeI"; */
 "rWs-2Z-FeI.title" = "Automatic";
 
+/* Class = "NSMenuItem"; title = "Intel"; ObjectID = "w1U-cj-wiW"; */
+"w1U-cj-wiW.title" = "Intel";
+
+/* Class = "NSMenuItem"; title = "ARM"; ObjectID = "kZY-ld-8iB"; */
+"kZY-ld-8iB.title" = "ARM";
+
 /* Class = "NSMenuItem"; title = "Watch Variable"; ObjectID = "1047"; */
 "1047.title" = "Watch Variable";
 
