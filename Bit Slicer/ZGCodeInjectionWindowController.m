@@ -48,6 +48,7 @@
 	ZGMemoryAddress _allocatedAddress;
 	ZGMemorySize _numberOfAllocatedBytes;
 	ZGProcess * _Nullable _process;
+	ZGProcessType _processType;
 	NSArray<ZGInstruction *> *_instructions;
 	NSArray<ZGBreakPoint *> *_breakPoints;
 }
@@ -69,7 +70,7 @@
 	_suggestedCode = [_textView.textStorage.mutableString copy];
 }
 
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(NSUndoManager *)undoManager
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(NSUndoManager *)undoManager
 {
 	ZGMemoryAddress allocatedAddress = 0;
 	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
@@ -90,7 +91,7 @@
 	}
 	free(nopBuffer);
 	
-	NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:instruction.variable.address injectingIntoDestination:allocatedAddress inProcess:process withBreakPoints:breakPoints];
+	NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:instruction.variable.address injectingIntoDestination:allocatedAddress inProcess:process withBreakPoints:breakPoints processType:processType];
 	
 	if (instructions == nil)
 	{
@@ -134,6 +135,7 @@
 	
 	_undoManager = undoManager;
 	_process = process;
+	_processType = processType;
 	_allocatedAddress = allocatedAddress;
 	_numberOfAllocatedBytes = numberOfAllocatedBytes;
 	_instructions = instructions;
@@ -148,9 +150,9 @@
 	[self updateSuggestedCode];
 	
 	NSError *error = nil;
-	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress processType:_process.type error:&error];
+	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress processType:_processType error:&error];
 	
-	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) breakPoints:_breakPoints undoManager:_undoManager error:&error])
+	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType breakPoints:_breakPoints undoManager:_undoManager error:&error])
 	{
 		NSLog(@"Error while injecting code");
 		NSLog(@"%@", error);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mayur Pawashe
+ * Copyright (c) 2022 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,19 +30,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "ZGProcessTypes.h"
-
-@class ZGProcess;
-@class ZGInstruction;
-@class ZGBreakPoint;
+#import <Foundation/Foundation.h>
+#import "pythonlib.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZGCodeInjectionWindowController : NSWindowController
-
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager;
-
-@end
+PyObject *loadArchPythonModule(void);
 
 NS_ASSUME_NONNULL_END

@@ -296,11 +296,11 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 
 #pragma mark Finding Instructions
 
-+ (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints machBinaries:(NSArray<ZGMachBinary *> *)machBinaries
++ (ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints processType:(ZGProcessType)processType machBinaries:(NSArray<ZGMachBinary *> *)machBinaries
 {
 	ZGInstruction *instruction = nil;
 	
-	ZGMemorySize intructionEncodingSize = [ZGDisassemblerObject instructionEncodingSizeForProcessType:process.type];
+	ZGMemorySize intructionEncodingSize = [ZGDisassemblerObject instructionEncodingSizeForProcessType:processType];
 	if (intructionEncodingSize != VARIABLE_INSTRUCTION_ENCODING_SIZE)
 	{
 		ZGMemoryAddress startAddress;
@@ -317,7 +317,7 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 			startAddress = address - (address % intructionEncodingSize);
 		}
 		
-		id<ZGDisassemblerObject> disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask processType:process.type address:startAddress size:intructionEncodingSize breakPoints:breakPoints];
+		id<ZGDisassemblerObject> disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask processType:processType address:startAddress size:intructionEncodingSize breakPoints:breakPoints];
 		
 		instruction = [[disassemblerObject readInstructions] firstObject];
 	}
@@ -364,7 +364,7 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 				readSize = targetRegion.address + targetRegion.size - startAddress;
 			}
 			
-			id<ZGDisassemblerObject> disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask processType:process.type address:startAddress size:readSize breakPoints:breakPoints];
+			id<ZGDisassemblerObject> disassemblerObject = [self disassemblerObjectWithProcessTask:process.processTask processType:processType address:startAddress size:readSize breakPoints:breakPoints];
 			
 			instruction = [disassemblerObject readLastInstructionWithMaxSize:size];
 		}
@@ -404,12 +404,11 @@ actionName:(NSString *)actionName
 	}
 }
 
-+ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(NSUndoManager *)undoManager actionName:(NSString *)actionName
++ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process processType:(ZGProcessType)processType breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(NSUndoManager *)undoManager actionName:(NSString *)actionName
 {
 	NSMutableArray<NSString *> *newStringValues = [[NSMutableArray alloc] init];
 	NSMutableArray<NSString *> *oldStringValues = [[NSMutableArray alloc] init];
 	
-	ZGProcessType processType = process.type;
 	for (NSUInteger instructionIndex = 0; instructionIndex < instructions.count; instructionIndex++)
 	{
 		ZGInstruction *instruction = [instructions objectAtIndex:instructionIndex];
@@ -452,6 +451,7 @@ injectCode:(NSData *)codeData
 intoAddress:(ZGMemoryAddress)allocatedAddress
 hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
 process:(ZGProcess *)process
+processType:(ZGProcessType)processType
 breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 undoManager:(NSUndoManager *)undoManager
 error:(NSError * __autoreleasing *)error
@@ -461,7 +461,7 @@ error:(NSError * __autoreleasing *)error
 		return NO;
 	}
 	
-	if (ZG_PROCESS_TYPE_IS_ARM64(process.type))
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
 	{
 		if (error != nil)
 		{
@@ -505,7 +505,7 @@ error:(NSError * __autoreleasing *)error
 	
 	[undoManager setActionName:@"Inject code"];
 	
-	[self nopInstructions:hookedInstructions inProcess:process breakPoints:breakPoints undoManager:undoManager actionName:nil];
+	[self nopInstructions:hookedInstructions inProcess:process processType:processType breakPoints:breakPoints undoManager:undoManager actionName:nil];
 	
 	ZGMemorySize hookedInstructionsLength = 0;
 	for (ZGInstruction *instruction in hookedInstructions)
@@ -521,7 +521,7 @@ error:(NSError * __autoreleasing *)error
 	NSMutableData *newInstructionsData = [NSMutableData data];
 	if (!usingRelativeBranching)
 	{
-		NSData *popRaxData = [self assembleInstructionText:@"pop rax" atInstructionPointer:allocatedAddress processType:process.type error:error];
+		NSData *popRaxData = [self assembleInstructionText:@"pop rax" atInstructionPointer:allocatedAddress processType:processType error:error];
 		if (popRaxData.length == 0)
 		{
 			ZG_LOG(@"Error: Failed to assemble pop rax");
@@ -541,7 +541,7 @@ error:(NSError * __autoreleasing *)error
 	[[self class]
 	 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", allocatedAddress] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax\npop rax", allocatedAddress]
 	 atInstructionPointer:firstInstruction.variable.address
-	 processType:process.type
+	 processType:processType
 	 error:error];
 	
 	if (jumpToIslandData.length == 0)
@@ -573,7 +573,7 @@ error:(NSError * __autoreleasing *)error
 	[[self class]
 	 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax", firstInstruction.variable.address + jumpToIslandData.length - POP_REGISTER_INSTRUCTION_LENGTH]
 	 atInstructionPointer:allocatedAddress + newInstructionsData.length
-	 processType:process.type
+	 processType:processType
 	 error:error];
 	
 	if (jumpFromIslandData.length == 0)
@@ -591,10 +591,10 @@ error:(NSError * __autoreleasing *)error
 	return YES;
 }
 
-+ (NSArray<ZGInstruction *> *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
++ (NSArray<ZGInstruction *> *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints processType:(ZGProcessType)processType
 {
 	// Code injection for arm64 is not supported
-	if (ZG_PROCESS_TYPE_IS_ARM64(process.type))
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
 	{
 		return nil;
 	}
@@ -608,7 +608,7 @@ error:(NSError * __autoreleasing *)error
 	NSMutableArray<ZGInstruction *> *instructions = [[NSMutableArray alloc] init];
 	while (consumedLength > 0)
 	{
-		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inProcess:process withBreakPoints:breakPoints machBinaries:machBinaries];
+		ZGInstruction *newInstruction = [self findInstructionBeforeAddress:address+1 inProcess:process withBreakPoints:breakPoints processType:processType machBinaries:machBinaries];
 		if (newInstruction == nil)
 		{
 			instructions = nil;

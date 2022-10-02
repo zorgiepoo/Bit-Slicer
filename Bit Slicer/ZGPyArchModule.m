@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Mayur Pawashe
+ * Copyright (c) 2022 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,19 +30,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "ZGProcessTypes.h"
+#import "ZGPyArchModule.h"
+#import "ZGPyModuleAdditions.h"
+#import "ZGDebuggerUtilities.h"
 
-@class ZGProcess;
-@class ZGInstruction;
-@class ZGBreakPoint;
+#define ARCH_MODULE_NAME "arch"
 
-NS_ASSUME_NONNULL_BEGIN
+static struct PyModuleDef archModuleDefinition =
+{
+	PyModuleDef_HEAD_INIT,
+	ARCH_MODULE_NAME,
+	"Architecture Module",
+	-1,
+	NULL,
+	NULL, NULL, NULL, NULL
+};
 
-@interface ZGCodeInjectionWindowController : NSWindowController
-
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager;
-
-@end
-
-NS_ASSUME_NONNULL_END
+PyObject *loadArchPythonModule(void)
+{
+	PyObject *archModule = PyModule_Create(&archModuleDefinition);
+	ZGPyAddModuleToSys(ARCH_MODULE_NAME, archModule);
+	
+	ZGPyAddIntegerConstant(archModule, "AUTOMATIC", ZGDisassemblerModeAutomatic);
+	ZGPyAddIntegerConstant(archModule, "INTEL", ZGDisassemblerModeIntel);
+	ZGPyAddIntegerConstant(archModule, "ARM", ZGDisassemblerModeARM);
+	
+	return archModule;
+}

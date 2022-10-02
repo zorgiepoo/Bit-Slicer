@@ -96,6 +96,7 @@
 		726CA2D119606E2900A6AD40 /* Edit Description Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D319606E2900A6AD40 /* Edit Description Dialog.xib */; };
 		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
+		727151DB28E92E9D003B7DD0 /* ZGPyArchModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 727151DA28E92E9D003B7DD0 /* ZGPyArchModule.m */; };
 		7275F8A51BA4756100FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; };
 		7275F8A61BA4BD7200FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; };
 		7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7278DC031E4A967700C37150 /* Sparkle.framework */; };
@@ -459,6 +460,8 @@
 		726CA2D219606E2900A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Edit Description Dialog.xib"; sourceTree = "<group>"; };
 		726CA2D519606E3100A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Search Options.xib"; sourceTree = "<group>"; };
 		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Watch Variable Dialog.xib"; sourceTree = "<group>"; };
+		727151D928E92E9D003B7DD0 /* ZGPyArchModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGPyArchModule.h; path = "Bit Slicer/ZGPyArchModule.h"; sourceTree = "<group>"; };
+		727151DA28E92E9D003B7DD0 /* ZGPyArchModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGPyArchModule.m; path = "Bit Slicer/ZGPyArchModule.m"; sourceTree = "<group>"; };
 		7275F8A31BA4756100FD144C /* ZGNullability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGNullability.h; path = "Bit Slicer/ZGNullability.h"; sourceTree = "<group>"; };
 		7275F8A41BA4756100FD144C /* ZGNullability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGNullability.m; path = "Bit Slicer/ZGNullability.m"; sourceTree = "<group>"; };
 		7278DC031E4A967700C37150 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = deps/Sparkle/Sparkle.framework; sourceTree = "<group>"; };
@@ -1162,6 +1165,8 @@
 				77C19AB119158C190028F7F1 /* ZGPyKeyModModule.m */,
 				770136E8192309740072A192 /* ZGPyVMProtModule.h */,
 				770136E9192309740072A192 /* ZGPyVMProtModule.m */,
+				727151D928E92E9D003B7DD0 /* ZGPyArchModule.h */,
+				727151DA28E92E9D003B7DD0 /* ZGPyArchModule.m */,
 				77C19AAD19158ABF0028F7F1 /* ZGPyModuleAdditions.h */,
 				77C19AAE19158ABF0028F7F1 /* ZGPyModuleAdditions.m */,
 				77F1160717D2EEC0009E002A /* ZGPyVirtualMemory.h */,
@@ -1761,6 +1766,7 @@
 				77F1164917D2EFC8009E002A /* ZGBreakPointController.m in Sources */,
 				772C0F8218B95603009FFF72 /* ZGBacktraceViewController.m in Sources */,
 				77C19AAF19158ABF0028F7F1 /* ZGPyModuleAdditions.m in Sources */,
+				727151DB28E92E9D003B7DD0 /* ZGPyArchModule.m in Sources */,
 				722EE7901B19481300934EF3 /* ZGProtectionDescription.m in Sources */,
 				722EE78A1B19461000934EF3 /* ZGMemoryAddressExpressionParsing.m in Sources */,
 				77F1164D17D2EFDA009E002A /* ZGBreakPoint.m in Sources */,

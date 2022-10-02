@@ -40,6 +40,7 @@
 #import "ZGPyKeyCodeModule.h"
 #import "ZGPyKeyModModule.h"
 #import "ZGPyVMProtModule.h"
+#import "ZGPyArchModule.h"
 #import "OSCSingleThreadQueue.h"
 #import "ZGNullability.h"
 
@@ -207,6 +208,7 @@
 		loadKeyCodePythonModule();
 		loadKeyModPythonModule();
 		loadVMProtPythonModule();
+		loadArchPythonModule();
 		
 		self->_cTypesObject = PyImport_ImportModule("ctypes");
 		self->_structObject = PyImport_ImportModule("struct");

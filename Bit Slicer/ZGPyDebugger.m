@@ -77,6 +77,7 @@ static PyMemberDef Debugger_members[] =
 };
 
 #define declareDebugPrototypeMethod(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args);
+#define declareDebugPrototypeMethodWithKeywords(name) static PyObject *Debugger_##name(DebuggerClass *self, PyObject *args, PyObject *kwargs);
 
 declareDebugPrototypeMethod(log)
 declareDebugPrototypeMethod(notify)
@@ -86,8 +87,8 @@ declareDebugPrototypeMethod(registerHotkey)
 declareDebugPrototypeMethod(unregisterHotkey)
 declareDebugPrototypeMethod(isRegisteredHotkey)
 
-declareDebugPrototypeMethod(assemble)
-declareDebugPrototypeMethod(disassemble)
+declareDebugPrototypeMethodWithKeywords(assemble)
+declareDebugPrototypeMethodWithKeywords(disassemble)
 declareDebugPrototypeMethod(readBytes)
 declareDebugPrototypeMethod(writeBytes)
 declareDebugPrototypeMethod(findSymbol)
@@ -108,6 +109,7 @@ declareDebugPrototypeMethod(writeRegisters)
 
 #define declareDebugMethod2(name, argsType) {#name"", (PyCFunction)Debugger_##name, argsType, NULL},
 #define declareDebugMethod(name) declareDebugMethod2(name, METH_VARARGS)
+#define declareDebugMethodWithKeywords(name) declareDebugMethod2(name, METH_VARARGS | METH_KEYWORDS)
 
 static PyMethodDef Debugger_methods[] =
 {
@@ -118,8 +120,8 @@ static PyMethodDef Debugger_methods[] =
 	declareDebugMethod(registerHotkey)
 	declareDebugMethod(unregisterHotkey)
 	declareDebugMethod(isRegisteredHotkey)
-	declareDebugMethod(assemble)
-	declareDebugMethod(disassemble)
+	declareDebugMethodWithKeywords(assemble)
+	declareDebugMethodWithKeywords(disassemble)
 	declareDebugMethod(findSymbol)
 	declareDebugMethod(symbolAt)
 	declareDebugMethod(readBytes)
@@ -554,19 +556,51 @@ static PyObject *Debugger_isRegisteredHotkey(DebuggerClass *self, PyObject *args
 	Py_RETURN_TRUE;
 }
 
-static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
+static ZGProcessType _processTypeFromDisassemblerMode(DebuggerClass *self, char disassemblerMode)
+{
+	ZGProcessType processType;
+	switch ((NSInteger)disassemblerMode)
+	{
+		case ZGDisassemblerModeIntel:
+			if (ZG_PROCESS_TYPE_IS_ARM64(self->processType))
+			{
+				processType = ZGProcessTypeX86_64;
+			}
+			else
+			{
+				processType = self->processType;
+			}
+			break;
+		case ZGDisassemblerModeARM:
+			processType = ZGProcessTypeARM64;
+			break;
+		case ZGDisassemblerModeAutomatic:
+		default:
+			processType = self->processType;
+			break;
+	}
+	
+	return processType;
+}
+
+static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args, PyObject *kwargs)
 {
 	PyObject *retValue = NULL;
 	ZGMemoryAddress instructionPointer = 0;
+	char assembleMode = 0;
 	char *codeString = NULL;
 	
-	if (PyArg_ParseTuple(args, "s|K:assemble", &codeString, &instructionPointer))
+	static char *kwlist[] = {"string", "instructionPointer", "mode", NULL};
+	
+	if (PyArg_ParseTupleAndKeywords(args, kwargs, "s|Kb:assemble", kwlist, &codeString, &instructionPointer, &assembleMode))
 	{
 		NSString *codeStringValue = @(codeString);
 		if (codeStringValue != nil)
 		{
+			ZGProcessType processType = _processTypeFromDisassemblerMode(self, assembleMode);
+			
 			NSError *error = nil;
-			NSData *assembledData = [ZGDebuggerUtilities assembleInstructionText:codeStringValue atInstructionPointer:instructionPointer processType:self->processType error:&error];
+			NSData *assembledData = [ZGDebuggerUtilities assembleInstructionText:codeStringValue atInstructionPointer:instructionPointer processType:processType error:&error];
 			
 			if (assembledData != nil)
 			{
@@ -595,13 +629,16 @@ static PyObject *Debugger_assemble(DebuggerClass *self, PyObject *args)
 	return retValue;
 }
 
-static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
+static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args, PyObject *kwargs)
 {
 	PyObject *retValue = NULL;
 	Py_buffer buffer;
 	ZGMemoryAddress instructionPointer = 0;
+	char disassembleMode = 0;
 	
-	if (PyArg_ParseTuple(args, "s*|K:disassemble", &buffer, &instructionPointer))
+	static char *kwlist[] = {"buffer", "instructionPointer", "mode", NULL};
+	
+	if (PyArg_ParseTupleAndKeywords(args, kwargs, "s*|Kb:disassemble", kwlist, &buffer, &instructionPointer, &disassembleMode))
 	{
 		if (!PyBuffer_IsContiguous(&buffer, 'C') || buffer.len <= 0)
 		{
@@ -611,7 +648,9 @@ static PyObject *Debugger_disassemble(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		id<ZGDisassemblerObject> disassemblerObject = [ZGDisassemblerObject disassemblerObjectWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len processType:self->processType];
+		ZGProcessType processType = _processTypeFromDisassemblerMode(self, disassembleMode);
+		
+		id<ZGDisassemblerObject> disassemblerObject = [ZGDisassemblerObject disassemblerObjectWithBytes:buffer.buf address:instructionPointer size:(ZGMemorySize)buffer.len processType:processType];
 		
 		NSArray<ZGInstruction *> *instructions = [disassemblerObject readInstructions];
 		
@@ -737,7 +776,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 	ZGMemoryAddress destinationAddress = 0x0;
 	if (PyArg_ParseTuple(args, "KK:bytesBeforeInjection", &sourceAddress, &destinationAddress))
 	{
-		NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints];
+		NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->processType];
 		ZGMemorySize bufferLength = 0;
 		for (ZGInstruction *instruction in instructions)
 		{
@@ -781,7 +820,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		NSArray<ZGInstruction *> *originalInstructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints];
+		NSArray<ZGInstruction *> *originalInstructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->processType];
 		
 		NSError *error = nil;
 		BOOL injectedCode =
@@ -790,6 +829,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		 intoAddress:destinationAddress
 		 hookingIntoOriginalInstructions:originalInstructions
 		 process:self->objcSelf->_process
+		 processType:self->processType
 		 breakPoints:self->objcSelf->_breakPointController.breakPoints
 		 undoManager:nil
 		 error:&error];
@@ -828,7 +868,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		NSNumber *cachedInstructionAddress = [self->_cachedInstructionPointers objectForKey:instructionPointerNumber];
 		if (cachedInstructionAddress == nil)
 		{
-			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:[instructionPointerNumber unsignedLongLongValue] inProcess:self->_process withBreakPoints:self->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->_process]];
+			ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:[instructionPointerNumber unsignedLongLongValue] inProcess:self->_process withBreakPoints:self->_breakPointController.breakPoints processType:self->_process.type machBinaries:[ZGMachBinary machBinariesInProcess:self->_process]];
 			
 			instructionAddress = instruction.variable.address;
 			[self->_cachedInstructionPointers setObject:@(instruction.variable.address) forKey:instructionPointerNumber];
@@ -978,7 +1018,7 @@ static PyObject *Debugger_addBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->processType machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
 	
 	if (instruction == nil)
 	{
@@ -1006,7 +1046,7 @@ static PyObject *Debugger_removeBreakpoint(DebuggerClass *self, PyObject *args)
 		return NULL;
 	}
 	
-	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
+	ZGInstruction *instruction = [ZGDebuggerUtilities findInstructionBeforeAddress:memoryAddress + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->processType machBinaries:[ZGMachBinary machBinariesInProcess:self->objcSelf->_process]];
 	
 	if (instruction == nil)
 	{
@@ -1087,7 +1127,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:self->objcSelf->_process];
 	
-	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries];
+	ZGInstruction *currentInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:instructionPointer + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->processType machBinaries:machBinaries];
 	
 	if (currentInstruction == nil)
 	{
@@ -1097,7 +1137,7 @@ static PyObject *Debugger_stepOver(DebuggerClass *self, PyObject *args)
 	
 	if ([ZGDisassemblerObject isCallMnemonic:currentInstruction.mnemonic processType:self->processType])
 	{
-		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints machBinaries:machBinaries];
+		ZGInstruction *nextInstruction = [ZGDebuggerUtilities findInstructionBeforeAddress:currentInstruction.variable.address + currentInstruction.variable.size + 1 inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->processType machBinaries:machBinaries];
 		
 		if (nextInstruction == nil)
 		{
@@ -1167,6 +1207,7 @@ static PyObject *Debugger_stepOut(DebuggerClass *self, PyObject *args)
 	 findInstructionBeforeAddress:outerInstruction.variable.address + outerInstruction.variable.size + 1
 	 inProcess:self->objcSelf->_process
 	 withBreakPoints:self->objcSelf->_breakPointController.breakPoints
+	 processType:self->processType
 	 machBinaries:machBinaries];
 
 	if (![self->objcSelf->_breakPointController addBreakPointOnInstruction:returnInstruction inProcess:self->objcSelf->_process thread:self->objcSelf->_haltedBreakPoint.thread basePointer:outerBasePointer.unsignedLongLongValue callback:callback delegate:self->objcSelf])

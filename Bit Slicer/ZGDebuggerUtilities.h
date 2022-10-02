@@ -48,6 +48,13 @@ extern const uint8_t gBreakpointOpcode[1];
 @class ZGMachBinary;
 @class ZGBreakPoint;
 
+typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
+{
+	ZGDisassemblerModeAutomatic,
+	ZGDisassemblerModeIntel,
+	ZGDisassemblerModeARM
+};
+
 #define INJECTED_NOP_SLIDE_LENGTH 0x10
 #define X86_NOP_VALUE 0x90
 
@@ -65,7 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable id<ZGDisassemblerObject>)disassemblerObjectWithProcessTask:(ZGMemoryMap)processTask processType:(ZGProcessType)pointerSize address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints;
 
 // This method is generally useful for a) finding instruction address when returning from a breakpoint where the program counter is set ahead of the instruction, and b) figuring out correct offsets of where instructions are aligned in memory
-+ (nullable ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints machBinaries:(NSArray<ZGMachBinary *> *)machBinaries;
++ (nullable ZGInstruction *)findInstructionBeforeAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints processType:(ZGProcessType)processType machBinaries:(NSArray<ZGMachBinary *> *)machBinaries;
 
 + (void)
 replaceInstructions:(NSArray<ZGInstruction *> *)instructions
@@ -76,15 +83,16 @@ breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 undoManager:(nullable NSUndoManager *)undoManager
 actionName:(nullable NSString *)actionName;
 
-+ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager actionName:(nullable NSString *)actionName;
++ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process processType:(ZGProcessType)processType breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager actionName:(nullable NSString *)actionName;
 
-+ (NSArray<ZGInstruction *> * _Nullable)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints;
++ (NSArray<ZGInstruction *> * _Nullable)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints processType:(ZGProcessType)processType;
 
 + (BOOL)
 injectCode:(NSData *)codeData
 intoAddress:(ZGMemoryAddress)allocatedAddress
 hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
 process:(ZGProcess *)process
+processType:(ZGProcessType)processType
 breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
 undoManager:(nullable NSUndoManager *)undoManager
 error:(NSError  **)error;
