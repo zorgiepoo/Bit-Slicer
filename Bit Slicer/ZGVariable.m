@@ -180,9 +180,16 @@ NSString *ZGVariablePboardType = @"ZGVariablePboardType";
 		}
 		_fullAttributedDescription = variableDescription != nil ? variableDescription : [[NSAttributedString alloc] initWithString:@""];
 		
-		NSNumber *userAnnotatedValue = [coder decodeObjectOfClass:[NSNumber class] forKey:ZGUserAnnotatedKey];
 		// In order to not annoy the user, if the user annotated key does not exist, assume the description could have been modified by the user before
-		_userAnnotated = (userAnnotatedValue == nil) ? (_fullAttributedDescription.length != 0) : userAnnotatedValue.boolValue;
+		if (![coder containsValueForKey:ZGUserAnnotatedKey])
+		{
+			_userAnnotated = (_fullAttributedDescription.length != 0);
+		}
+		else
+		{
+			BOOL userAnnotatedValue = [coder decodeBoolForKey:ZGUserAnnotatedKey];
+			_userAnnotated = userAnnotatedValue;
+		}
 		
 		NSUInteger returnedLength = 0;
 		const uint8_t *buffer = [coder decodeBytesForKey:ZGValueKey returnedLength:&returnedLength];
