@@ -1,3 +1,8 @@
 Source: https://github.com/sparkle-project/Sparkle
 Branch: 2.x
-Commit: a9d5a4276886de9a905e542a9dc07bf8716b9fda
+Tag: 2.3.0
+
+Instructions:
+rm -rf deps/Sparkle/Sparkle.framework/Versions/B/XPCServices
+rm -f deps/Sparkle/Sparkle.framework/XPCServices
+codesign -f -s "-" deps/Sparkle/Sparkle.framework/Versions/B/Sparkle
