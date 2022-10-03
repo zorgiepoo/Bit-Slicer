@@ -206,7 +206,7 @@
 		
 		NSMenuItem *newTabMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"New Tab", nil) action:@selector(createNewTabbedWindow:) keyEquivalent:@"t"];
 		
-		[newTabMenuItem setKeyEquivalentModifierMask:NSCommandKeyMask];
+		[newTabMenuItem setKeyEquivalentModifierMask:NSEventModifierFlagCommand];
 		[newTabMenuItem setTarget:self];
 		
 		NSInteger insertionIndex = [_fileMenu indexOfItem:_newDocumentMenuItem] + 1;

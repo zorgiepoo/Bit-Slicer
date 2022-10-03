@@ -77,7 +77,7 @@
 		[savePanel
 		 beginSheetModalForWindow:ZGUnwrapNullableObject(_parentWindow)
 		 completionHandler:^(NSInteger result) {
-		 	if (result == NSFileHandlingPanelOKButton)
+			if (result == NSModalResponseOK)
 		 	{
 		 		BOOL success = NO;
 		 		ZGMemorySize size = toAddress - fromAddress;

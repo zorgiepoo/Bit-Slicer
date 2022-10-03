@@ -59,7 +59,7 @@
 	savePanel.message = ZGLocalizedStringFromDumpAllMemoryTable(@"savePanelPromptMessage");
 	
 	[savePanel beginSheetModalForWindow:parentWindow completionHandler:^(NSInteger result) {
-		if (result != NSFileHandlingPanelOKButton)
+		if (result != NSModalResponseOK)
 		{
 			return;
 		}

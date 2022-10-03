@@ -57,7 +57,7 @@ static void addKeyMods(PyObject *keyModModule)
 	ZGPyAddIntegerConstant(keyModModule, "CONTROL", controlKey);
 	
 	// shortcut recorder uses this modifier for carbon flags, so we may as well provide it too
-	ZGPyAddIntegerConstant(keyModModule, "FUNCTION", NSFunctionKeyMask);
+	ZGPyAddIntegerConstant(keyModModule, "FUNCTION", NSEventModifierFlagFunction);
 }
 
 PyObject *loadKeyModPythonModule(void)
