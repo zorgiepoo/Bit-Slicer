@@ -150,7 +150,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 		mScopeBarAppearance.labelColor                      = [NSColor colorWithCalibratedWhite:colorValue(0.45, invertColors) alpha:1.0];
 		mScopeBarAppearance.labelFont                       = [NSFont boldSystemFontOfSize:12.0];
 		mScopeBarAppearance.itemButtonFont                  = [NSFont boldSystemFontOfSize:12.0];
-		mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSRegularControlSize]];
+		mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSControlSizeRegular]];
 		
 	} else {
 		// Mavericks and before
@@ -169,7 +169,7 @@ static CGFloat colorValue(CGFloat value, BOOL invert)
 		mScopeBarAppearance.labelColor                      = [NSColor colorWithCalibratedWhite:0.45 alpha:1.0];
 		mScopeBarAppearance.labelFont                       = [NSFont boldSystemFontOfSize:12.0];
 		mScopeBarAppearance.itemButtonFont                  = [NSFont boldSystemFontOfSize:12.0];
-		mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSRegularControlSize]];
+		mScopeBarAppearance.menuItemFont                    = [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSControlSizeRegular]];
 	}
 }
 
