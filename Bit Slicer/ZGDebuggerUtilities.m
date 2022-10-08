@@ -149,6 +149,26 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 	NSData *data = nil;
 	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
 	{
+		NSString *sanitizedInstructionText;
+		if ([instructionText hasPrefix:@";"])
+		{
+			// Skip the first comment line which may come from the code injection prompt
+			// Keystone doesn't support feeding in comments
+			NSRange newlineRange = [instructionText rangeOfString:@"\n"];
+			if (newlineRange.location != NSNotFound)
+			{
+				sanitizedInstructionText = [instructionText substringFromIndex:newlineRange.location];
+			}
+			else
+			{
+				sanitizedInstructionText = instructionText;
+			}
+		}
+		else
+		{
+			sanitizedInstructionText = instructionText;
+		}
+		
 		ks_engine *engine;
 		ks_err openResult = ks_open(KS_ARCH_ARM64, KS_MODE_LITTLE_ENDIAN, &engine);
 		if (openResult == KS_ERR_OK)
@@ -157,7 +177,7 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 			size_t encodingSize = 0;
 			size_t numberOfStatementsEncoded = 0;
 			
-			if (ks_asm(engine, instructionText.UTF8String, instructionPointer, &encoding, &encodingSize, &numberOfStatementsEncoded) == KS_ERR_OK)
+			if (ks_asm(engine, sanitizedInstructionText.UTF8String, instructionPointer, &encoding, &encodingSize, &numberOfStatementsEncoded) == KS_ERR_OK)
 			{
 				data = [NSData dataWithBytes:encoding length:encodingSize];
 				
@@ -437,12 +457,21 @@ actionName:(NSString *)actionName
 
 #pragma mark Code Injection
 
-+ (BOOL)shouldInjectCodeWithRelativeBranchingWithProcess:(ZGProcess *)process sourceAddress:(ZGMemoryAddress)sourceAddress destinationAddress:(ZGMemoryAddress)destinationAddress
++ (BOOL)shouldInjectCodeWithRelativeBranchingWithProcess:(ZGProcess *)process processType:(ZGProcessType)processType sourceAddress:(ZGMemoryAddress)sourceAddress destinationAddress:(ZGMemoryAddress)destinationAddress
 {
-	return
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
+	{
+		return
+		 (destinationAddress > sourceAddress && destinationAddress - sourceAddress <= 128 * 1024 * 1024) ||
+		 (sourceAddress > destinationAddress && sourceAddress - destinationAddress <= 128 * 1024 * 1024);
+	}
+	else
+	{
+		return
 		(process.pointerSize == sizeof(ZG32BitMemoryAddress) ||
 		 (destinationAddress > sourceAddress && destinationAddress - sourceAddress <= INT32_MAX) ||
 		 (sourceAddress > destinationAddress && sourceAddress - destinationAddress <= INT32_MAX));
+	}
 }
 
 #define INJECT_ERROR_DOMAIN @"INJECT_CODE_FAILED"
@@ -461,20 +490,21 @@ error:(NSError * __autoreleasing *)error
 		return NO;
 	}
 	
-	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
-	{
-		if (error != nil)
-		{
-			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"Code Injection is not supported on ARM64"}];
-		}
-		
-		return NO;
-	}
-	
 	ZGSuspendTask(process.processTask);
 	
 	void *nopBuffer = malloc(codeData.length);
-	memset(nopBuffer, X86_NOP_VALUE, codeData.length);
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
+	{
+		size_t elementCount = codeData.length / 4;
+		for (size_t elementIndex = 0; elementIndex < elementCount; elementIndex++)
+		{
+			*((uint32_t *)nopBuffer + elementIndex) = ARM64_NOP_VALUE;
+		}
+	}
+	else
+	{
+		memset(nopBuffer, X86_NOP_VALUE, codeData.length);
+	}
 	
 	if (!ZGWriteBytesIgnoringProtection(process.processTask, allocatedAddress, nopBuffer, codeData.length))
 	{
@@ -503,10 +533,6 @@ error:(NSError * __autoreleasing *)error
 		return NO;
 	}
 	
-	[undoManager setActionName:@"Inject code"];
-	
-	[self nopInstructions:hookedInstructions inProcess:process processType:processType breakPoints:breakPoints undoManager:undoManager actionName:nil];
-	
 	ZGMemorySize hookedInstructionsLength = 0;
 	for (ZGInstruction *instruction in hookedInstructions)
 	{
@@ -515,34 +541,66 @@ error:(NSError * __autoreleasing *)error
 	ZGInstruction *firstInstruction = [hookedInstructions objectAtIndex:0];
 
 	BOOL usingRelativeBranching =
-	[self shouldInjectCodeWithRelativeBranchingWithProcess:process sourceAddress:firstInstruction.variable.address destinationAddress:allocatedAddress] &&
-	[self shouldInjectCodeWithRelativeBranchingWithProcess:process sourceAddress:allocatedAddress + codeData.length destinationAddress:firstInstruction.variable.address + hookedInstructionsLength];
+	[self shouldInjectCodeWithRelativeBranchingWithProcess:process processType:processType sourceAddress:firstInstruction.variable.address destinationAddress:allocatedAddress] &&
+	[self shouldInjectCodeWithRelativeBranchingWithProcess:process processType:processType sourceAddress:allocatedAddress + codeData.length destinationAddress:firstInstruction.variable.address + hookedInstructionsLength];
+	
+	if (!usingRelativeBranching && ZG_PROCESS_TYPE_IS_ARM64(processType))
+	{
+		ZG_LOG(@"Error: Failed to inject code..");
+		if (error != nil)
+		{
+			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : @"Far away branches on arm64 are not supported."}];
+		}
+		
+		ZGResumeTask(process.processTask);
+		return NO;
+	}
+	
+	[undoManager setActionName:@"Inject code"];
+	
+	[self nopInstructions:hookedInstructions inProcess:process processType:processType breakPoints:breakPoints undoManager:undoManager actionName:nil];
 	
 	NSMutableData *newInstructionsData = [NSMutableData data];
-	if (!usingRelativeBranching)
+	if (ZG_PROCESS_TYPE_IS_X86_FAMILY(processType))
 	{
-		NSData *popRaxData = [self assembleInstructionText:@"pop rax" atInstructionPointer:allocatedAddress processType:processType error:error];
-		if (popRaxData.length == 0)
+		if (!usingRelativeBranching)
 		{
-			ZG_LOG(@"Error: Failed to assemble pop rax");
-			ZGResumeTask(process.processTask);
-			return NO;
+			NSData *popRaxData = [self assembleInstructionText:@"pop rax" atInstructionPointer:allocatedAddress processType:processType error:error];
+			if (popRaxData.length == 0)
+			{
+				ZG_LOG(@"Error: Failed to assemble pop rax");
+				ZGResumeTask(process.processTask);
+				return NO;
+			}
+			[newInstructionsData appendData:popRaxData	];
 		}
-		[newInstructionsData appendData:popRaxData	];
-	}
-	while (newInstructionsData.length < INJECTED_NOP_SLIDE_LENGTH)
-	{
-		uint8_t nopValue = X86_NOP_VALUE;
-		[newInstructionsData appendBytes:&nopValue length:1];
+		while (newInstructionsData.length < INJECTED_X86_NOP_SLIDE_LENGTH)
+		{
+			uint8_t nopValue = X86_NOP_VALUE;
+			[newInstructionsData appendBytes:&nopValue length:1];
+		}
 	}
 	[newInstructionsData appendData:codeData];
 
-	NSData *jumpToIslandData =
-	[[self class]
-	 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", allocatedAddress] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax\npop rax", allocatedAddress]
-	 atInstructionPointer:firstInstruction.variable.address
-	 processType:processType
-	 error:error];
+	NSData *jumpToIslandData;
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
+	{
+		jumpToIslandData =
+		[[self class]
+		 assembleInstructionText:[NSString stringWithFormat:@"b %lld", allocatedAddress]
+		 atInstructionPointer:firstInstruction.variable.address
+		 processType:processType
+		 error:error];
+	}
+	else
+	{
+		jumpToIslandData =
+		[[self class]
+		 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", allocatedAddress] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax\npop rax", allocatedAddress]
+		 atInstructionPointer:firstInstruction.variable.address
+		 processType:processType
+		 error:error];
+	}
 	
 	if (jumpToIslandData.length == 0)
 	{
@@ -569,12 +627,25 @@ error:(NSError * __autoreleasing *)error
 	 undoManager:undoManager
 	 actionName:nil];
 
-	NSData *jumpFromIslandData =
-	[[self class]
-	 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax", firstInstruction.variable.address + jumpToIslandData.length - POP_REGISTER_INSTRUCTION_LENGTH]
-	 atInstructionPointer:allocatedAddress + newInstructionsData.length
-	 processType:processType
-	 error:error];
+	NSData *jumpFromIslandData;
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
+	{
+		jumpFromIslandData =
+		[[self class]
+		 assembleInstructionText:[NSString stringWithFormat:@"b %lld", firstInstruction.variable.address + hookedInstructionsLength]
+		 atInstructionPointer:allocatedAddress + newInstructionsData.length
+		 processType:processType
+		 error:error];
+	}
+	else
+	{
+		jumpFromIslandData =
+		[[self class]
+		 assembleInstructionText:usingRelativeBranching ? [NSString stringWithFormat:@"jmp %lld", firstInstruction.variable.address + hookedInstructionsLength] : [NSString stringWithFormat:@"push rax\nmov rax, %lld\njmp rax", firstInstruction.variable.address + jumpToIslandData.length - POP_REGISTER_INSTRUCTION_LENGTH]
+		 atInstructionPointer:allocatedAddress + newInstructionsData.length
+		 processType:processType
+		 error:error];
+	}
 	
 	if (jumpFromIslandData.length == 0)
 	{
@@ -593,16 +664,27 @@ error:(NSError * __autoreleasing *)error
 
 + (NSArray<ZGInstruction *> *)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process withBreakPoints:(NSArray<ZGBreakPoint *> *)breakPoints processType:(ZGProcessType)processType
 {
-	// Code injection for arm64 is not supported
-	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
+	BOOL useRelativeBranching = [self shouldInjectCodeWithRelativeBranchingWithProcess:process processType:processType sourceAddress:address destinationAddress:destinationAddress];
+	
+	// Code injection for arm64 using far branches is not supported
+	if (!useRelativeBranching && ZG_PROCESS_TYPE_IS_ARM64(processType))
 	{
+		ZG_LOG(@"Far away branches are not supported for arm64");
 		return nil;
 	}
 	
-	int consumedLength =
-	[self shouldInjectCodeWithRelativeBranchingWithProcess:process sourceAddress:address destinationAddress:destinationAddress] ?
-	JUMP_REL32_INSTRUCTION_LENGTH :
-	INDIRECT_JUMP_INSTRUCTIONS_LENGTH;
+	int consumedLength;
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType))
+	{
+		consumedLength = 4;
+	}
+	else
+	{
+		consumedLength =
+		useRelativeBranching ?
+		JUMP_REL32_INSTRUCTION_LENGTH :
+		INDIRECT_JUMP_INSTRUCTIONS_LENGTH;
+	}
 	
 	NSArray<ZGMachBinary *> *machBinaries = [ZGMachBinary machBinariesInProcess:process];
 	NSMutableArray<ZGInstruction *> *instructions = [[NSMutableArray alloc] init];

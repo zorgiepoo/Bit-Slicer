@@ -1475,12 +1475,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 	else if (userInterfaceItem.action == @selector(requestCodeInjection:))
 	{
-		// Code injection is not supported on arm64
-		if (_disassemblerProcessType == ZGProcessTypeARM64)
-		{
-			return NO;
-		}
-		
 		if ([[self selectedInstructions] count] != 1)
 		{
 			return NO;

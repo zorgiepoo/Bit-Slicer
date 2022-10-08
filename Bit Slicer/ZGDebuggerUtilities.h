@@ -55,8 +55,9 @@ typedef NS_ENUM(NSInteger, ZGDisassemblerMode)
 	ZGDisassemblerModeARM
 };
 
-#define INJECTED_NOP_SLIDE_LENGTH 0x10
+#define INJECTED_X86_NOP_SLIDE_LENGTH 0x10
 #define X86_NOP_VALUE 0x90
+#define ARM64_NOP_VALUE 0xD503201F
 
 #define ZGLocalizedStringFromDebuggerTable(string) NSLocalizedStringFromTable((string), @"[Code] Debugger", nil)
 
