@@ -1120,25 +1120,30 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process callback:(PyObject *)callback delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO condition:NULL callback:callback delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO emulated:NO condition:NULL callback:callback delegate:delegate];
 }
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process condition:(PyObject *)condition delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO condition:condition callback:NULL delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO emulated:NO condition:condition callback:NULL delegate:delegate];
 }
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES condition:NULL callback:NULL delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES emulated:NO condition:NULL callback:NULL delegate:delegate];
 }
 
 - (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer callback:(PyObject *)callback delegate:(id)delegate
 {
-	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES condition:NULL callback:callback delegate:delegate];
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:thread basePointer:basePointer hidden:YES emulated:NO condition:NULL callback:callback delegate:delegate];
 }
 
-- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer hidden:(BOOL)isHidden condition:(PyObject *)condition callback:(PyObject *)callback delegate:(id)delegate
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process emulated:(BOOL)emulated delegate:(id)delegate
+{
+	return [self addBreakPointOnInstruction:instruction inProcess:process thread:0 basePointer:0 hidden:NO emulated:emulated condition:NULL callback:NULL delegate:delegate];
+}
+
+- (BOOL)addBreakPointOnInstruction:(ZGInstruction *)instruction inProcess:(ZGProcess *)process thread:(thread_act_t)thread basePointer:(ZGMemoryAddress)basePointer hidden:(BOOL)isHidden emulated:(BOOL)emulated condition:(PyObject *)condition callback:(PyObject *)callback delegate:(id)delegate
 {
 	if (![self setUpExceptionPortForProcess:process])
 	{
@@ -1189,6 +1194,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 	
 	breakPoint.variable = variable;
 	breakPoint.hidden = isHidden;
+	breakPoint.emulated = emulated;
 	breakPoint.thread = thread;
 	breakPoint.basePointer = basePointer;
 #if TARGET_CPU_ARM64

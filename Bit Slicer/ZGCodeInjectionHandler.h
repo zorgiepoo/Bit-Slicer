@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Mayur Pawashe
+ * Copyright (c) 2022 Mayur Pawashe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,49 +31,26 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "pythonlib.h"
-#import "ZGMemoryTypes.h"
+#import "ZGProcessTypes.h"
 #import "ZGBreakPointDelegate.h"
-#import "ZGThreadStates.h"
 
-@class ZGVariable;
 @class ZGProcess;
-@class ZGRegistersState;
-@class ZGDebugThread;
-
-typedef NS_ENUM(NSInteger, ZGBreakPointType)
-{
-	ZGBreakPointWatchData,
-	ZGBreakPointInstruction,
-	ZGBreakPointSingleStepInstruction,
-};
+@class ZGInstruction;
+@class ZGBreakPointController;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZGBreakPoint : NSObject
+@interface ZGCodeInjectionHandler : NSObject <ZGBreakPointDelegate>
 
-- (id)initWithProcess:(ZGProcess *)process type:(ZGBreakPointType)type delegate:(nullable id <ZGBreakPointDelegate>)delegate;
+@property (nonatomic, readonly, nullable) ZGInstruction *toIslandInstruction;
+@property (nonatomic, readonly, nullable) ZGInstruction *fromIslandInstruction;
+@property (nonatomic, readonly) ZGMemoryAddress islandAddress;
 
-@property (atomic, weak, nullable) id <ZGBreakPointDelegate> delegate;
-@property (readonly, nonatomic) ZGMemoryMap task;
-@property (nonatomic) thread_act_t thread;
-@property (nonatomic, nullable) ZGVariable *variable;
-@property (nonatomic) ZGMemorySize watchSize;
-@property (readonly, nonatomic) ZGProcess *process;
-@property (atomic, nullable) NSArray<ZGDebugThread *> *debugThreads;
-@property (readonly, nonatomic) ZGBreakPointType type;
-@property (atomic) BOOL needsToRestore;
-@property (nonatomic) BOOL hidden;
-@property (atomic) BOOL dead;
-@property (nonatomic) ZGMemoryAddress basePointer;
-@property (nonatomic) NSMutableDictionary<NSNumber *, NSNumber *> *cacheDictionary;
-@property (nonatomic, nullable) PyObject *condition;
-@property (nonatomic, nullable) PyObject *callback;
-@property (nonatomic, nullable) NSError *error;
-@property (nonatomic) ZGMemoryProtection originalProtection;
-@property (nonatomic) ZGRegistersState *registersState;
-@property (nonatomic) BOOL emulated;
+- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController;
+
+- (void)removeBreakPoints;
 
 @end
+
 
 NS_ASSUME_NONNULL_END

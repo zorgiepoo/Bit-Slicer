@@ -31,6 +31,7 @@
  */
 
 #import "ZGCodeInjectionWindowController.h"
+#import "ZGBreakPointController.h"
 #import "ZGProcess.h"
 #import "ZGMemoryTypes.h"
 #import "ZGVirtualMemory.h"
@@ -50,7 +51,8 @@
 	ZGProcess * _Nullable _process;
 	ZGProcessType _processType;
 	NSArray<ZGInstruction *> *_instructions;
-	NSArray<ZGBreakPoint *> *_breakPoints;
+	ZGBreakPointController *_breakPointController;
+	void (^_completionHandler)(ZGCodeInjectionHandler * _Nullable);
 }
 
 - (NSString *)windowNibName
@@ -70,8 +72,10 @@
 	_suggestedCode = [_textView.textStorage.mutableString copy];
 }
 
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(NSUndoManager *)undoManager
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPointController:(ZGBreakPointController *)breakPointController undoManager:(NSUndoManager *)undoManager completionHandler:(void (^)(ZGCodeInjectionHandler * _Nullable))completionHandler
 {
+	_completionHandler = [completionHandler copy];
+	
 	ZGMemoryAddress allocatedAddress = 0;
 	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
 	ZGPageSize(process.processTask, &numberOfAllocatedBytes);
@@ -80,6 +84,8 @@
 	{
 		NSLog(@"Failed to allocate code for code injection");
 		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedAllocateMemoryForInjectingCodeAlertTitle"), ZGLocalizedStringFromDebuggerTable(@"failedAllocateMemoryForInjectingCodeAlertMessage"));
+		_completionHandler(nil);
+		_completionHandler = NULL;
 		return;
 	}
 	
@@ -102,7 +108,7 @@
 	}
 	free(nopBuffer);
 	
-	NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:instruction.variable.address injectingIntoDestination:allocatedAddress inProcess:process withBreakPoints:breakPoints processType:processType];
+	NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:instruction.variable.address injectingIntoDestination:allocatedAddress inProcess:process breakPointController:breakPointController processType:processType];
 	
 	if (instructions == nil)
 	{
@@ -113,6 +119,9 @@
 		
 		NSLog(@"Error: not enough instructions to override, or allocated memory address was too far away. Source: 0x%llX, destination: 0x%llX", instruction.variable.address, allocatedAddress);
 		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedInjectCodeAlertTitle"), ZGLocalizedStringFromDebuggerTable(@"failedInjectCodeAlertMessage"));
+		
+		_completionHandler(nil);
+		_completionHandler = NULL;
 		
 		return;
 	}
@@ -160,7 +169,7 @@
 	_allocatedAddress = allocatedAddress;
 	_numberOfAllocatedBytes = numberOfAllocatedBytes;
 	_instructions = instructions;
-	_breakPoints = breakPoints;
+	_breakPointController = breakPointController;
 	
 	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
 	}];
@@ -173,19 +182,32 @@
 	NSError *error = nil;
 	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress processType:_processType error:&error];
 	
-	if (injectedCode.length == 0 || error != nil || ![ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType breakPoints:_breakPoints undoManager:_undoManager error:&error])
+	ZGCodeInjectionHandler *injectionHandler = nil;
+	if (injectedCode.length == 0 || error != nil || (injectionHandler = [ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType breakPointController:_breakPointController undoManager:ZGUnwrapNullableObject(_undoManager) error:&error]) == nil)
 	{
 		NSLog(@"Error while injecting code");
 		NSLog(@"%@", error);
 				
 		ZGRunAlertPanelWithOKButton(ZGLocalizedStringFromDebuggerTable(@"failedInjectCodeAlertTitle"), [NSString stringWithFormat:@"%@: %@", ZGLocalizedStringFromDebuggerTable(@"failedAssemblingForInjectingCodeMessage"), [error.userInfo objectForKey:@"reason"]]);
+		
+		if (_completionHandler != NULL)
+		{
+			_completionHandler(nil);
+		}
 	}
 	else
 	{
+		if (_completionHandler != NULL)
+		{
+			_completionHandler(injectionHandler);
+		}
+		
 		NSWindow *window = ZGUnwrapNullableObject(self.window);
 		[NSApp endSheet:window];
 		[window close];
 	}
+	
+	_completionHandler = NULL;
 }
 
 - (IBAction)cancel:(id)__unused sender

@@ -776,7 +776,7 @@ static PyObject *Debugger_bytesBeforeInjection(DebuggerClass *self, PyObject *ar
 	ZGMemoryAddress destinationAddress = 0x0;
 	if (PyArg_ParseTuple(args, "KK:bytesBeforeInjection", &sourceAddress, &destinationAddress))
 	{
-		NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->processType];
+		NSArray<ZGInstruction *> *instructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process breakPointController:self->objcSelf->_breakPointController processType:self->processType];
 		ZGMemorySize bufferLength = 0;
 		for (ZGInstruction *instruction in instructions)
 		{
@@ -820,19 +820,21 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 			return NULL;
 		}
 		
-		NSArray<ZGInstruction *> *originalInstructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process withBreakPoints:self->objcSelf->_breakPointController.breakPoints processType:self->processType];
+		NSArray<ZGInstruction *> *originalInstructions = [ZGDebuggerUtilities instructionsBeforeHookingIntoAddress:sourceAddress injectingIntoDestination:destinationAddress inProcess:self->objcSelf->_process breakPointController:self->objcSelf->_breakPointController processType:self->processType];
+		
+		NSData * _Nonnull codeData = [NSData dataWithBytes:newCode.buf length:(NSUInteger)newCode.len];
 		
 		NSError *error = nil;
 		BOOL injectedCode =
-		[ZGDebuggerUtilities
-		 injectCode:[NSData dataWithBytes:newCode.buf length:(NSUInteger)newCode.len]
+		([ZGDebuggerUtilities
+		 injectCode:codeData
 		 intoAddress:destinationAddress
 		 hookingIntoOriginalInstructions:originalInstructions
 		 process:self->objcSelf->_process
 		 processType:self->processType
-		 breakPoints:self->objcSelf->_breakPointController.breakPoints
+		 breakPointController:self->objcSelf->_breakPointController
 		 undoManager:nil
-		 error:&error];
+		 error:&error] != nil);
 		
 		if (!injectedCode)
 		{

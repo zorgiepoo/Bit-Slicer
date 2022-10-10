@@ -97,6 +97,7 @@
 		726CA2D419606E3100A6AD40 /* Search Options.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D619606E3100A6AD40 /* Search Options.xib */; };
 		726CA2D719606E3800A6AD40 /* Watch Variable Dialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726CA2D919606E3800A6AD40 /* Watch Variable Dialog.xib */; };
 		727151DB28E92E9D003B7DD0 /* ZGPyArchModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 727151DA28E92E9D003B7DD0 /* ZGPyArchModule.m */; };
+		727151F128F28554003B7DD0 /* ZGCodeInjectionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 727151F028F28554003B7DD0 /* ZGCodeInjectionHandler.m */; };
 		7275F8A51BA4756100FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; };
 		7275F8A61BA4BD7200FD144C /* ZGNullability.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F8A41BA4756100FD144C /* ZGNullability.m */; };
 		7278DC041E4A967700C37150 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7278DC031E4A967700C37150 /* Sparkle.framework */; };
@@ -462,6 +463,8 @@
 		726CA2D819606E3800A6AD40 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = "Base.lproj/Watch Variable Dialog.xib"; sourceTree = "<group>"; };
 		727151D928E92E9D003B7DD0 /* ZGPyArchModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGPyArchModule.h; path = "Bit Slicer/ZGPyArchModule.h"; sourceTree = "<group>"; };
 		727151DA28E92E9D003B7DD0 /* ZGPyArchModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGPyArchModule.m; path = "Bit Slicer/ZGPyArchModule.m"; sourceTree = "<group>"; };
+		727151EF28F28554003B7DD0 /* ZGCodeInjectionHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZGCodeInjectionHandler.h; path = "Bit Slicer/ZGCodeInjectionHandler.h"; sourceTree = "<group>"; };
+		727151F028F28554003B7DD0 /* ZGCodeInjectionHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZGCodeInjectionHandler.m; path = "Bit Slicer/ZGCodeInjectionHandler.m"; sourceTree = "<group>"; };
 		7275F8A31BA4756100FD144C /* ZGNullability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ZGNullability.h; path = "Bit Slicer/ZGNullability.h"; sourceTree = "<group>"; };
 		7275F8A41BA4756100FD144C /* ZGNullability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ZGNullability.m; path = "Bit Slicer/ZGNullability.m"; sourceTree = "<group>"; };
 		7278DC031E4A967700C37150 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = deps/Sparkle/Sparkle.framework; sourceTree = "<group>"; };
@@ -1143,6 +1146,8 @@
 				77F1165817D2F001009E002A /* ZGRegister.m */,
 				77F1165A17D2F00A009E002A /* ZGCodeInjectionWindowController.h */,
 				77F1165B17D2F00A009E002A /* ZGCodeInjectionWindowController.m */,
+				727151EF28F28554003B7DD0 /* ZGCodeInjectionHandler.h */,
+				727151F028F28554003B7DD0 /* ZGCodeInjectionHandler.m */,
 			);
 			name = Debugger;
 			sourceTree = "<group>";
@@ -1677,6 +1682,7 @@
 				720844FA24E0715C00F3D449 /* DataInspector.m in Sources */,
 				770FABB118490DB400C176B7 /* ZGEditAddressWindowController.m in Sources */,
 				77FFC14C18711D2700122357 /* ZGEditDescriptionWindowController.m in Sources */,
+				727151F128F28554003B7DD0 /* ZGCodeInjectionHandler.m in Sources */,
 				772C0F7E18B88AFA009FFF72 /* ZGRegisterEntries.m in Sources */,
 				72DBC9541B77B84D0092ED75 /* ZGPrivateCoreSymbolicator.m in Sources */,
 				777C34B5187523D0005E64E1 /* ZGNoSmallSizeToolbar.m in Sources */,
