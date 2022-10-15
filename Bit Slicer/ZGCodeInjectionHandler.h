@@ -45,10 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) ZGInstruction *toIslandInstruction;
 @property (nonatomic, readonly, nullable) ZGInstruction *fromIslandInstruction;
 @property (nonatomic, readonly) ZGMemoryAddress islandAddress;
+@property (nonatomic, readonly, nullable) ZGProcess *process;
 
 - (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController;
-
-- (void)removeBreakPoints;
 
 @end
 

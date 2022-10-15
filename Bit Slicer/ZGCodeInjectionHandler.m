@@ -59,33 +59,7 @@
 	_processType = processType;
 	_process = process;
 	
-	if (![breakPointController addBreakPointOnInstruction:toIslandInstruction inProcess:process emulated:YES delegate:self])
-	{
-		return NO;
-	}
-	
-	if (![breakPointController addBreakPointOnInstruction:fromIslandInstruction inProcess:process emulated:YES delegate:self])
-	{
-		[breakPointController removeBreakPointOnInstruction:toIslandInstruction inProcess:process];
-		return NO;
-	}
-	
-	return YES;
-}
-
-- (void)removeBreakPoints
-{
-	if (_fromIslandInstruction != nil)
-	{
-		[_breakPointController removeBreakPointOnInstruction:_fromIslandInstruction inProcess:_process];
-		_fromIslandInstruction = nil;
-	}
-	
-	if (_toIslandInstruction != nil)
-	{
-		[_breakPointController removeBreakPointOnInstruction:_toIslandInstruction inProcess:_process];
-		_toIslandInstruction = nil;
-	}
+	return [breakPointController addCodeInjectionHandler:self];
 }
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint

@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZGCodeInjectionWindowController : NSWindowController
 
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPointController:(ZGBreakPointController *)breakPointController undoManager:(nullable NSUndoManager *)undoManager completionHandler:(void (^)(ZGCodeInjectionHandler * _Nullable))completionHandler;
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPointController:(ZGBreakPointController *)breakPointController undoManager:(nullable NSUndoManager *)undoManager;
 
 @end
 

@@ -42,6 +42,7 @@
 @class ZGRunningProcess;
 @class ZGAppTerminationState;
 @class ZGScriptingInterpreter;
+@class ZGCodeInjectionHandler;
 
 typedef NS_ENUM(uint8_t, ZGWatchPointType)
 {
@@ -70,6 +71,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeInstructionBreakPoint:(ZGBreakPoint *)breakPoint;
 
 - (BOOL)addWatchpointOnVariable:(ZGVariable *)variable inProcess:(ZGProcess *)process watchPointType:(ZGWatchPointType)watchPointType delegate:(id <ZGBreakPointDelegate>)delegate getBreakPoint:(ZGBreakPoint * _Nullable * _Nonnull)returnedBreakPoint;
+
+- (BOOL)addCodeInjectionHandler:(ZGCodeInjectionHandler *)codeInjectionHandler;
+
+- (ZGCodeInjectionHandler * _Nullable)codeInjectionHandlerForInstruction:(ZGInstruction *)instruction process:(ZGProcess *)process;
 
 - (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer;
 - (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;

@@ -110,7 +110,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	NSRange _instructionBoundary;
 	
 	ZGCodeInjectionWindowController * _Nullable _codeInjectionWindowController;
-	NSMutableDictionary<NSNumber *, ZGCodeInjectionHandler *> *_codeInjectionMappings;
 	
 	NSPopover * _Nullable _breakPointConditionPopover;
 	NSMutableArray<ZGBreakPointCondition *> * _Nullable _breakPointConditions;
@@ -858,30 +857,31 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 - (IBAction)jumpToOperandOffset:(id)__unused sender
 {
 	ZGInstruction *selectedInstruction = [[self selectedInstructions] objectAtIndex:0];
+	ZGProcess *process = self.currentProcess;
 	
-	ZGCodeInjectionHandler *injectionHandler;
-	if (_codeInjectionMappings != nil && (injectionHandler = _codeInjectionMappings[@(selectedInstruction.variable.address)]) != nil)
+	ZGCodeInjectionHandler *injectionHandler = [_breakPointController codeInjectionHandlerForInstruction:selectedInstruction process:process];
+	if (injectionHandler != nil)
 	{
 		ZGInstruction *toIslandInstruction = injectionHandler.toIslandInstruction;
 		if (toIslandInstruction.variable.address == selectedInstruction.variable.address)
 		{
-			[self jumpToMemoryAddress:injectionHandler.islandAddress inProcess:self.currentProcess];
+			[self jumpToMemoryAddress:injectionHandler.islandAddress inProcess:process];
 		}
 		else
 		{
-			[self jumpToMemoryAddress:(toIslandInstruction.variable.address + toIslandInstruction.variable.size) inProcess:self.currentProcess];
+			[self jumpToMemoryAddress:(toIslandInstruction.variable.address + toIslandInstruction.variable.size) inProcess:process];
 		}
 	}
 	else
 	{
-		id<ZGDisassemblerObject> disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:self.currentProcess.processTask processType:_disassemblerProcessType address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:_breakPointController.breakPoints];
+		id<ZGDisassemblerObject> disassemblerObject = [ZGDebuggerUtilities disassemblerObjectWithProcessTask:process.processTask processType:_disassemblerProcessType address:selectedInstruction.variable.address size:selectedInstruction.variable.size breakPoints:_breakPointController.breakPoints];
 		
 		if (disassemblerObject != nil)
 		{
 			NSString *branchDestination = [disassemblerObject readBranchOperand];
 			if (branchDestination != nil)
 			{
-				[self jumpToMemoryAddressStringValue:branchDestination inProcess:self.currentProcess];
+				[self jumpToMemoryAddressStringValue:branchDestination inProcess:process];
 			}
 			else
 			{
@@ -1471,7 +1471,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 		
 		ZGInstruction *selectedInstruction = [selectedInstructions objectAtIndex:0];
-		if (_codeInjectionMappings != nil && _codeInjectionMappings[@(selectedInstruction.variable.address)] != nil)
+		if ([_breakPointController codeInjectionHandlerForInstruction:selectedInstruction process:self.currentProcess] != nil)
 		{
 			menuItem.title = ZGLocalizedStringFromDebuggerTable(@"goToBranchAddress");
 		}
@@ -1669,8 +1669,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		}
 		else if ([tableColumn.identifier isEqualToString:@"instruction"])
 		{
-			ZGCodeInjectionHandler *injectionHandler;
-			if (_codeInjectionMappings != nil && (injectionHandler = _codeInjectionMappings[@(instruction.variable.address)]) != nil)
+			ZGCodeInjectionHandler *injectionHandler = [_breakPointController codeInjectionHandlerForInstruction:instruction process:self.currentProcess];
+			if (injectionHandler != nil)
 			{
 				ZGInstruction *toIslandInstruction = injectionHandler.toIslandInstruction;
 				if (toIslandInstruction.variable.address == instruction.variable.address)
@@ -1782,7 +1782,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 			else
 			{
 				ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
-				buttonCell.enabled = (_codeInjectionMappings == nil || _codeInjectionMappings[@(instruction.variable.address)] == nil);
+				ZGCodeInjectionHandler *injectionHandler = [_breakPointController codeInjectionHandlerForInstruction:instruction process:self.currentProcess];
+				buttonCell.enabled = (injectionHandler == nil);
 			}
 		}
 	}
@@ -1793,7 +1794,8 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	if ((rowIndex >= 0 && (NSUInteger)rowIndex < _instructions.count) && ([tableColumn.identifier isEqualToString:@"instruction"] || [tableColumn.identifier isEqualToString:@"bytes"]))
 	{
 		ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
-		return (_codeInjectionMappings == nil || _codeInjectionMappings[@(instruction.variable.address)] == nil);
+		ZGCodeInjectionHandler *injectionHandler = [_breakPointController codeInjectionHandlerForInstruction:instruction process:self.currentProcess];
+		return (injectionHandler == nil);
 	}
 	else
 	{
@@ -1950,10 +1952,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	if (_codeInjectionWindowController == nil)
 	{
 		_codeInjectionWindowController = [[ZGCodeInjectionWindowController alloc] init];
-		_codeInjectionMappings = [NSMutableDictionary dictionary];
 	}
-	
-	// TODO: remove potential mappings(?)
 	
 	[_codeInjectionWindowController
 	 attachToWindow:ZGUnwrapNullableObject(self.window)
@@ -1961,19 +1960,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	 processType:_disassemblerProcessType
 	 instruction:[[self selectedInstructions] objectAtIndex:0]
 	 breakPointController:_breakPointController
-	 undoManager:self.undoManager
-	 completionHandler:^(ZGCodeInjectionHandler * _Nullable codeInjectionHandler) {
-		ZGInstruction *toIslandInstruction = codeInjectionHandler.toIslandInstruction;
-		ZGInstruction *fromIslandInstruction = codeInjectionHandler.fromIslandInstruction;
-		
-		if (toIslandInstruction != nil && fromIslandInstruction != nil)
-		{
-			self->_codeInjectionMappings[@(toIslandInstruction.variable.address)] = codeInjectionHandler;
-			self->_codeInjectionMappings[@(fromIslandInstruction.variable.address)] = codeInjectionHandler;
-			
-			[self->_instructionsTableView reloadData];
-		}
-	}];
+	 undoManager:self.undoManager];
 }
 
 #pragma mark Break Points
