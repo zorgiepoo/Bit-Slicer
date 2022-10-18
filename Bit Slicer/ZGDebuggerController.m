@@ -1789,22 +1789,6 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 }
 
-/*
-- (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
-{
-	if ((rowIndex >= 0 && (NSUInteger)rowIndex < _instructions.count) && ([tableColumn.identifier isEqualToString:@"instruction"] || [tableColumn.identifier isEqualToString:@"bytes"]))
-	{
-		ZGInstruction *instruction = [_instructions objectAtIndex:(NSUInteger)rowIndex];
-		ZGCodeInjectionHandler *injectionHandler = [_breakPointController codeInjectionHandlerForInstruction:instruction process:self.currentProcess];
-		return (injectionHandler == nil);
-	}
-	else
-	{
-		return YES;
-	}
-}
-*/
-
 - (NSString *)tableView:(NSTableView *)__unused tableView toolTipForCell:(NSCell *)__unused cell rect:(NSRectPointer)__unused rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)__unused mouseLocation
 {
 	NSString *toolTip = nil;
