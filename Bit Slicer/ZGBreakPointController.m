@@ -1336,9 +1336,14 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 
 - (ZGCodeInjectionHandler * _Nullable)codeInjectionHandlerForInstruction:(ZGInstruction *)instruction process:(ZGProcess *)process
 {
+	return [self codeInjectionHandlerForMemoryAddress:instruction.variable.address process:process];
+}
+
+- (ZGCodeInjectionHandler * _Nullable)codeInjectionHandlerForMemoryAddress:(ZGMemoryAddress)memoryAddress process:(ZGProcess *)process
+{
 	@synchronized(self)
 	{
-		for (ZGCodeInjectionHandler *codeInjectionHandler in _codeInjectionMappings[@(instruction.variable.address)])
+		for (ZGCodeInjectionHandler *codeInjectionHandler in _codeInjectionMappings[@(memoryAddress)])
 		{
 			if (codeInjectionHandler.process.processTask == process.processTask)
 			{

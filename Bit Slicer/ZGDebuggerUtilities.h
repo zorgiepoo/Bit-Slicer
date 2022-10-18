@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ZGDebuggerUtilities : NSObject
 
 + (nullable NSData *)readDataWithProcessTask:(ZGMemoryMap)processTask address:(ZGMemoryAddress)address size:(ZGMemorySize)size breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints;
-+ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints;
++ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPointController:(ZGBreakPointController *)breakPointController;
 
 + (NSData *)assembleInstructionText:(NSString *)instructionText atInstructionPointer:(ZGMemoryAddress)instructionPointer processType:(ZGProcessType)processType error:(NSError **)error;
 
@@ -82,11 +82,11 @@ replaceInstructions:(NSArray<ZGInstruction *> *)instructions
 fromOldStringValues:(NSArray<NSString *> *)oldStringValues
 toNewStringValues:(NSArray<NSString *> *)newStringValues
 inProcess:(ZGProcess *)process
-breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
+breakPointController:(ZGBreakPointController *)breakPointController
 undoManager:(nullable NSUndoManager *)undoManager
 actionName:(nullable NSString *)actionName;
 
-+ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process processType:(ZGProcessType)processType breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(nullable NSUndoManager *)undoManager actionName:(nullable NSString *)actionName;
++ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController undoManager:(nullable NSUndoManager *)undoManager actionName:(nullable NSString *)actionName;
 
 + (NSArray<ZGInstruction *> * _Nullable)instructionsBeforeHookingIntoAddress:(ZGMemoryAddress)address injectingIntoDestination:(ZGMemoryAddress)destinationAddress inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController processType:(ZGProcessType)processType;
 

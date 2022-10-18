@@ -49,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController;
 
+- (void)removeCodeInjection;
+
 @end
 
 

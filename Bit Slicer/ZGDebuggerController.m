@@ -1204,7 +1204,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	NSIndexSet *tableIndexSet = _instructionsTableView.selectedRowIndexes;
 	NSInteger clickedRow = _instructionsTableView.clickedRow;
 	
-	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow]) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
+	return (clickedRow >= 0 && ![tableIndexSet containsIndex:(NSUInteger)clickedRow] && (NSUInteger)clickedRow < _instructions.count) ? [NSIndexSet indexSetWithIndex:(NSUInteger)clickedRow] : tableIndexSet;
 }
 
 - (NSArray<ZGInstruction *> *)selectedInstructions
@@ -1789,6 +1789,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	}
 }
 
+/*
 - (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)rowIndex
 {
 	if ((rowIndex >= 0 && (NSUInteger)rowIndex < _instructions.count) && ([tableColumn.identifier isEqualToString:@"instruction"] || [tableColumn.identifier isEqualToString:@"bytes"]))
@@ -1802,6 +1803,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 		return YES;
 	}
 }
+*/
 
 - (NSString *)tableView:(NSTableView *)__unused tableView toolTipForCell:(NSCell *)__unused cell rect:(NSRectPointer)__unused rect tableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row mouseLocation:(NSPoint)__unused mouseLocation
 {
@@ -1931,7 +1933,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 					
 					ZGVariable *oldVariable = [[ZGVariable alloc] initWithValue:oldValue size:newWriteSize address:instruction.variable.address type:ZGByteArray qualifier:ZGSigned pointerSize:self.currentProcess.pointerSize];
 					
-					[ZGDebuggerUtilities replaceInstructions:@[instruction] fromOldStringValues:@[oldVariable.stringValue] toNewStringValues:@[newVariable.stringValue] inProcess:self.currentProcess breakPoints:_breakPointController.breakPoints undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoInstructionChange")];
+					[ZGDebuggerUtilities replaceInstructions:@[instruction] fromOldStringValues:@[oldVariable.stringValue] toNewStringValues:@[newVariable.stringValue] inProcess:self.currentProcess breakPointController:_breakPointController undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoInstructionChange")];
 				}
 				
 				free(oldValue);
@@ -1944,7 +1946,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 
 - (IBAction)nopVariables:(id)__unused sender
 {
-	[ZGDebuggerUtilities nopInstructions:[self selectedInstructions] inProcess:self.currentProcess processType:_disassemblerProcessType breakPoints:_breakPointController.breakPoints undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoNOPChange")];
+	[ZGDebuggerUtilities nopInstructions:[self selectedInstructions] inProcess:self.currentProcess processType:_disassemblerProcessType breakPointController:_breakPointController undoManager:self.undoManager actionName:ZGLocalizedStringFromDebuggerTable(@"undoNOPChange")];
 }
 
 - (IBAction)requestCodeInjection:(id)__unused sender

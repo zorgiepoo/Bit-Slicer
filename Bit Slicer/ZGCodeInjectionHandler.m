@@ -42,7 +42,7 @@
 
 @implementation ZGCodeInjectionHandler
 {
-	ZGBreakPointController *_breakPointController;
+	__weak ZGBreakPointController *_breakPointController;
 	ZGInstruction *_toIslandInstruction;
 	ZGInstruction *_fromIslandInstruction;
 	ZGMemoryAddress _islandAddress;
@@ -60,6 +60,11 @@
 	_process = process;
 	
 	return [breakPointController addCodeInjectionHandler:self];
+}
+
+- (void)removeCodeInjection
+{
+	[_breakPointController removeObserver:self];
 }
 
 - (void)breakPointDidHit:(ZGBreakPoint *)breakPoint

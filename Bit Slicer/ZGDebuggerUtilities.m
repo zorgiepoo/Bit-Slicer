@@ -82,7 +82,7 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 	return [NSData dataWithBytesNoCopy:newBytes length:size];
 }
 
-+ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
++ (BOOL)writeData:(NSData *)data atAddress:(ZGMemoryAddress)address processTask:(ZGMemoryMap)processTask breakPointController:(ZGBreakPointController *)breakPointController
 {
 	BOOL success = YES;
 	pid_t processID = 0;
@@ -93,6 +93,8 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 	}
 	else
 	{
+		NSArray<ZGBreakPoint *> *breakPoints = breakPointController.breakPoints;
+		
 		ZGBreakPoint *targetBreakPoint = nil;
 		for (ZGBreakPoint *breakPoint in breakPoints)
 		{
@@ -103,8 +105,15 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 			}
 		}
 		
-		if (targetBreakPoint == nil)
+		if (targetBreakPoint == nil || targetBreakPoint.emulated)
 		{
+			if (targetBreakPoint.emulated)
+			{
+				ZGCodeInjectionHandler *injectionHandler = [breakPointController codeInjectionHandlerForMemoryAddress:targetBreakPoint.variable.address process:targetBreakPoint.process];
+				
+				[injectionHandler removeCodeInjection];
+			}
+			
 			if (!ZGWriteBytesIgnoringProtection(processTask, address, data.bytes, data.length))
 			{
 				success = NO;
@@ -112,7 +121,7 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 		}
 		else
 		{
-			if (targetBreakPoint.variable.address - address > 0)
+			if (targetBreakPoint.variable.address > address)
 			{
 				if (!ZGWriteBytesIgnoringProtection(processTask, address, data.bytes, targetBreakPoint.variable.address - address))
 				{
@@ -120,27 +129,28 @@ const uint8_t gBreakpointOpcode[1] = {0xCC};
 				}
 			}
 			
-			if (address + data.length - targetBreakPoint.variable.address - 1 > 0)
+			size_t breakPointOpcodeSize = sizeof(gBreakpointOpcode);
+			if (address + data.length > targetBreakPoint.variable.address + breakPointOpcodeSize)
 			{
-				if (!ZGWriteBytesIgnoringProtection(processTask, targetBreakPoint.variable.address + 1, (const uint8_t *)data.bytes + (targetBreakPoint.variable.address + 1 - address), address + data.length - targetBreakPoint.variable.address - 1))
+				if (!ZGWriteBytesIgnoringProtection(processTask, targetBreakPoint.variable.address + breakPointOpcodeSize, (const uint8_t *)data.bytes + (targetBreakPoint.variable.address + breakPointOpcodeSize - address), address + data.length - targetBreakPoint.variable.address - breakPointOpcodeSize))
 				{
 					success = NO;
 				}
 			}
 			
-			*(uint8_t *)targetBreakPoint.variable.rawValue = *((const uint8_t *)data.bytes + targetBreakPoint.variable.address - address);
+			memcpy(targetBreakPoint.variable.rawValue, (const uint8_t *)data.bytes + targetBreakPoint.variable.address - address, breakPointOpcodeSize);
 		}
 	}
 	
 	return success;
 }
 
-+ (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
++ (void)writeStringValue:(NSString *)stringValue atAddress:(ZGMemoryAddress)address inProcess:(ZGProcess *)process breakPointController:(ZGBreakPointController *)breakPointController
 {
 	ZGMemorySize newSize = 0;
 	void *newValue = ZGValueFromString(process.type, stringValue, ZGByteArray, &newSize);
 	
-	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] atAddress:address processTask:process.processTask breakPoints:breakPoints];
+	[self writeData:[NSData dataWithBytesNoCopy:newValue length:newSize] atAddress:address processTask:process.processTask breakPointController:breakPointController];
 }
 
 #pragma mark Assembling & Disassembling
@@ -402,14 +412,14 @@ replaceInstructions:(NSArray<ZGInstruction *> *)instructions
 fromOldStringValues:(NSArray<NSString *> *)oldStringValues
 toNewStringValues:(NSArray<NSString *> *)newStringValues
 inProcess:(ZGProcess *)process
-breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints
+breakPointController:(ZGBreakPointController *)breakPointController
 undoManager:(NSUndoManager *)undoManager
 actionName:(NSString *)actionName
 {
 	for (NSUInteger index = 0; index < instructions.count; index++)
 	{
 		ZGInstruction *instruction = [instructions objectAtIndex:index];
-		[self writeStringValue:[newStringValues objectAtIndex:index] atAddress:instruction.variable.address inProcess:process breakPoints:breakPoints];
+		[self writeStringValue:[newStringValues objectAtIndex:index] atAddress:instruction.variable.address inProcess:process breakPointController:breakPointController];
 	}
 	
 	if (undoManager != nil)
@@ -421,12 +431,12 @@ actionName:(NSString *)actionName
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-messaging-id"
 		// There's no way that I know of to typecast to an obj-c class so you can send that instance a class message, rather than an instance level one.
-		[[undoManager prepareWithInvocationTarget:self] replaceInstructions:instructions fromOldStringValues:newStringValues toNewStringValues:oldStringValues inProcess:process breakPoints:breakPoints undoManager:undoManager actionName:actionName];
+		[[undoManager prepareWithInvocationTarget:self] replaceInstructions:instructions fromOldStringValues:newStringValues toNewStringValues:oldStringValues inProcess:process breakPointController:breakPointController undoManager:undoManager actionName:actionName];
 #pragma clang diagnostic pop
 	}
 }
 
-+ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process processType:(ZGProcessType)processType breakPoints:(NSArray<ZGBreakPoint *> *)breakPoints undoManager:(NSUndoManager *)undoManager actionName:(NSString *)actionName
++ (void)nopInstructions:(NSArray<ZGInstruction *> *)instructions inProcess:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController undoManager:(NSUndoManager *)undoManager actionName:(NSString *)actionName
 {
 	NSMutableArray<NSString *> *newStringValues = [[NSMutableArray alloc] init];
 	NSMutableArray<NSString *> *oldStringValues = [[NSMutableArray alloc] init];
@@ -454,7 +464,7 @@ actionName:(NSString *)actionName
 		[newStringValues addObject:[nopComponents componentsJoinedByString:@" "]];
 	}
 	
-	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues inProcess:process breakPoints:breakPoints undoManager:undoManager actionName:actionName];
+	[self replaceInstructions:instructions fromOldStringValues:oldStringValues toNewStringValues:newStringValues inProcess:process breakPointController:breakPointController undoManager:undoManager actionName:actionName];
 }
 
 #pragma mark Code Injection
@@ -556,7 +566,7 @@ error:(NSError * __autoreleasing *)error
 	{
 		[undoManager setActionName:@"Inject code"];
 		
-		[self nopInstructions:hookedInstructions inProcess:process processType:processType breakPoints:breakPoints undoManager:undoManager actionName:nil];
+		[self nopInstructions:hookedInstructions inProcess:process processType:processType breakPointController:breakPointController undoManager:undoManager actionName:nil];
 		
 		if (ZG_PROCESS_TYPE_IS_X86_FAMILY(processType))
 		{
@@ -643,7 +653,7 @@ error:(NSError * __autoreleasing *)error
 		 fromOldStringValues:@[firstInstruction.variable.stringValue]
 		 toNewStringValues:@[variable.stringValue]
 		 inProcess:process
-		 breakPoints:breakPoints
+		 breakPointController:breakPointController
 		 undoManager:undoManager
 		 actionName:nil];
 		

@@ -75,6 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)addCodeInjectionHandler:(ZGCodeInjectionHandler *)codeInjectionHandler;
 
 - (ZGCodeInjectionHandler * _Nullable)codeInjectionHandlerForInstruction:(ZGInstruction *)instruction process:(ZGProcess *)process;
+- (ZGCodeInjectionHandler * _Nullable)codeInjectionHandlerForMemoryAddress:(ZGMemoryAddress)memoryAddress process:(ZGProcess *)process;
 
 - (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer;
 - (NSArray<ZGBreakPoint *> *)removeObserver:(id)observer runningProcess:(ZGRunningProcess *)process;
