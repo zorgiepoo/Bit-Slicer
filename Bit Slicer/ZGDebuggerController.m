@@ -1962,6 +1962,7 @@ typedef NS_ENUM(NSInteger, ZGStepExecution)
 	 processType:_disassemblerProcessType
 	 instruction:[[self selectedInstructions] objectAtIndex:0]
 	 breakPointController:_breakPointController
+	 owner:self
 	 undoManager:self.undoManager];
 }
 

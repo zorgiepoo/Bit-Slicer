@@ -97,6 +97,7 @@ hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
 process:(ZGProcess *)process
 processType:(ZGProcessType)processType
 breakPointController:(ZGBreakPointController *)breakPointController
+owner:(id)owner
 undoManager:(NSUndoManager *)undoManager
 error:(NSError * __autoreleasing *)error;
 

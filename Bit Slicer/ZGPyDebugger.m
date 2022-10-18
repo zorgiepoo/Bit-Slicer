@@ -833,6 +833,7 @@ static PyObject *Debugger_injectCode(DebuggerClass *self, PyObject *args)
 		 process:self->objcSelf->_process
 		 processType:self->processType
 		 breakPointController:self->objcSelf->_breakPointController
+		 owner:self->breakPointDelegate
 		 undoManager:nil
 		 error:&error] != nil);
 		

@@ -46,8 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) ZGInstruction *fromIslandInstruction;
 @property (nonatomic, readonly) ZGMemoryAddress islandAddress;
 @property (nonatomic, readonly, nullable) ZGProcess *process;
+@property (nonatomic, readonly, weak) id owner;
 
-- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController;
+- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner;
 
 - (void)removeCodeInjection;
 

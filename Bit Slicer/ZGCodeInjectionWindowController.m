@@ -52,6 +52,7 @@
 	ZGProcessType _processType;
 	NSArray<ZGInstruction *> *_instructions;
 	ZGBreakPointController *_breakPointController;
+	__weak id _owner;
 }
 
 - (NSString *)windowNibName
@@ -71,7 +72,7 @@
 	_suggestedCode = [_textView.textStorage.mutableString copy];
 }
 
-- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPointController:(ZGBreakPointController *)breakPointController undoManager:(NSUndoManager *)undoManager
+- (void)attachToWindow:(NSWindow *)parentWindow process:(ZGProcess *)process processType:(ZGProcessType)processType instruction:(ZGInstruction *)instruction breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner undoManager:(NSUndoManager *)undoManager
 {
 	ZGMemoryAddress allocatedAddress = 0;
 	ZGMemorySize numberOfAllocatedBytes = NSPageSize(); // sane default
@@ -161,6 +162,7 @@
 	_allocatedAddress = allocatedAddress;
 	_numberOfAllocatedBytes = numberOfAllocatedBytes;
 	_instructions = instructions;
+	_owner = owner;
 	_breakPointController = breakPointController;
 	
 	[parentWindow beginSheet:window completionHandler:^(NSModalResponse __unused returnCode) {
@@ -175,7 +177,7 @@
 	NSData *injectedCode = [ZGDebuggerUtilities assembleInstructionText:ZGUnwrapNullableObject(_suggestedCode) atInstructionPointer:_allocatedAddress processType:_processType error:&error];
 	
 	ZGCodeInjectionHandler *injectionHandler = nil;
-	if (injectedCode.length == 0 || error != nil || (injectionHandler = [ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType breakPointController:_breakPointController undoManager:ZGUnwrapNullableObject(_undoManager) error:&error]) == nil)
+	if (injectedCode.length == 0 || error != nil || (injectionHandler = [ZGDebuggerUtilities injectCode:injectedCode intoAddress:_allocatedAddress hookingIntoOriginalInstructions:_instructions process:ZGUnwrapNullableObject(_process) processType:_processType breakPointController:_breakPointController owner:_owner undoManager:ZGUnwrapNullableObject(_undoManager) error:&error]) == nil)
 	{
 		NSLog(@"Error while injecting code");
 		NSLog(@"%@", error);

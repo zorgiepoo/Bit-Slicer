@@ -50,9 +50,10 @@
 	ZGProcess *_process;
 }
 
-- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController
+- (BOOL)addBreakPointWithToIslandInstruction:(ZGInstruction *)toIslandInstruction fromIslandInstruction:(ZGInstruction *)fromIslandInstruction islandAddress:(ZGMemoryAddress)islandAddress process:(ZGProcess *)process processType:(ZGProcessType)processType breakPointController:(ZGBreakPointController *)breakPointController owner:(id)owner
 {
 	_breakPointController = breakPointController;
+	_owner = owner;
 	_toIslandInstruction = toIslandInstruction;
 	_fromIslandInstruction = fromIslandInstruction;
 	_islandAddress = islandAddress;

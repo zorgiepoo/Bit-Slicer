@@ -494,6 +494,7 @@ hookingIntoOriginalInstructions:(NSArray<ZGInstruction *> *)hookedInstructions
 process:(ZGProcess *)process
 processType:(ZGProcessType)processType
 breakPointController:(ZGBreakPointController *)breakPointController
+owner:(id)owner
 undoManager:(NSUndoManager *)undoManager
 error:(NSError * __autoreleasing *)error
 {
@@ -700,7 +701,7 @@ error:(NSError * __autoreleasing *)error
 			instructionBack = [[disassemblerObject readInstructions] firstObject];
 		}
 		
-		if (![codeInjectionHandler addBreakPointWithToIslandInstruction:firstInstruction fromIslandInstruction:instructionBack islandAddress:allocatedAddress process:process processType:processType breakPointController:breakPointController])
+		if (![codeInjectionHandler addBreakPointWithToIslandInstruction:firstInstruction fromIslandInstruction:instructionBack islandAddress:allocatedAddress process:process processType:processType breakPointController:breakPointController owner:owner])
 		{
 			ZG_LOG(@"Error: Failed to add breakpoints for code injection..");
 			return nil;

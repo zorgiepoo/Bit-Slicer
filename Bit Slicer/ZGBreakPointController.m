@@ -813,7 +813,7 @@ kern_return_t catch_mach_exception_raise(mach_port_t __unused exception_port, ma
 			{
 				// Also check for code injection handlers which we will automatically remove when removing another observer
 				id<ZGBreakPointDelegate> breakPointDelegate = breakPoint.delegate;
-				if ((breakPointDelegate == observer || [breakPointDelegate isKindOfClass:[ZGCodeInjectionHandler class]]) && (!process || breakPoint.process.processID == process.processIdentifier))
+				if ((breakPointDelegate == observer || ([breakPointDelegate isKindOfClass:[ZGCodeInjectionHandler class]] && [(ZGCodeInjectionHandler *)breakPointDelegate owner] == observer)) && (!process || breakPoint.process.processID == process.processIdentifier))
 				{
 					BOOL isDead = ![runningProcesses zgHasObjectMatchingCondition:^(ZGRunningProcess *runningProcess) {
 						return (BOOL)(runningProcess.processIdentifier == breakPoint.process.processID);
