@@ -498,12 +498,24 @@ owner:(id)owner
 undoManager:(NSUndoManager *)undoManager
 error:(NSError * __autoreleasing *)error
 {
-	NSArray<ZGBreakPoint *> *breakPoints = breakPointController.breakPoints;
-	
 	if (hookedInstructions == nil)
 	{
+		ZG_LOG(@"Error: hookedInstructions is not nil..");
 		return NO;
 	}
+	
+	// Code injection is not currently supported for Rosetta because our far-away emulated breakpoints don't work well there
+	if (ZG_PROCESS_TYPE_IS_ARM64(processType) && process.translated)
+	{
+		if (error != nil)
+		{
+			*error = [NSError errorWithDomain:INJECT_ERROR_DOMAIN code:kCFStreamErrorDomainCustom userInfo:@{@"reason" : ZGLocalizedStringFromDebuggerTable(@"failedInjectCodeForRosetta")}];
+		}
+		
+		return NO;
+	}
+	
+	NSArray<ZGBreakPoint *> *breakPoints = breakPointController.breakPoints;
 	
 	ZGSuspendTask(process.processTask);
 	
